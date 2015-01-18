@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.130 2015-01-11 23:49:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.131 2015-01-18 17:36:22 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -42,12 +42,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.130 2015-01-11 2
 #include <time.h>
 
 /* external functions */
-void ParseIdent( enum flag interpret );
+void ParseIdent(ParseCtx *ctx, Bool compile_active);
 
 /* local functions */
-void ifstatement(enum flag interpret);
-void ifdefstatement(enum flag interpret);
-void parseline(enum flag interpret);
+void ifstatement(ParseCtx *ctx, Bool compile_active);
+void ifdefstatement(ParseCtx *ctx, Bool compile_active);
 void Z80pass2( void );
 void WriteSymbolTable( char *msg, SymbolHash *symtab );
 struct sourcefile *Prevfile( void );
@@ -55,27 +54,7 @@ struct sourcefile *Newfile( struct sourcefile *curfile, char *fname );
 struct sourcefile *Setfile( struct sourcefile *curfile, struct sourcefile *newfile, char *fname );
 struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
-
-void Z80pass1( char *filename )
-{
-    if ( opts.verbose )
-        printf( "Reading '%s'...\n", filename );	/* display name of file */
-
-	src_push();
-	{
-		src_open( filename, opts.inc_path );
-		parse_init();
-		sym.tok = TK_NIL;
-		while ( sym.tok != TK_END )
-			parseline( ON );              /* before parsing it */
-	}
-	src_pop();
-}
-
-
-
-void
-parseline( enum flag interpret )
+void parseline(ParseCtx *ctx, Bool compile_active)
 {
 	int start_num_errors;
 
@@ -89,7 +68,7 @@ parseline( enum flag interpret )
 
 	if (get_num_errors() != start_num_errors)		/* detect errors in GetSym() */
 		Skipline();
-	else if (!interpret || !parse_statement(interpret))
+	else if (!compile_active || !parse_statement(ctx, compile_active))
 	{
 		scan_expect_operands();
 
@@ -107,7 +86,7 @@ parseline( enum flag interpret )
 		{
 			if (sym.tok == TK_DOT || sym.tok == TK_LABEL)
 			{
-				if (interpret == ON)
+				if (compile_active)
 				{
 					/* Generate only possible label declaration if line parsing is allowed */
 					if (sym.tok == TK_LABEL || GetSym() == TK_NAME)
@@ -133,7 +112,7 @@ parseline( enum flag interpret )
 			switch (sym.tok)
 			{
 			case TK_NAME:
-				ParseIdent(interpret);
+				ParseIdent(ctx, compile_active);
 				break;
 
 			case TK_END:
@@ -141,7 +120,7 @@ parseline( enum flag interpret )
 				break;                /* empty line, get next... */
 
 			default:
-				if (interpret == ON)
+				if (compile_active)
 					error_syntax();    /* Syntax error */
 			}
 			Skipline();
@@ -153,12 +132,12 @@ parseline( enum flag interpret )
 
 /* multilevel contitional assembly logic */
 
-static void if_body(enum flag interpret, Bool (*check_condition)(void))
+static void if_body(ParseCtx *ctx, Bool compile_active, Bool (*check_condition)(void))
 {
 	int num_errors;
 	Bool condition;
 
-	if (interpret == ON)
+	if (compile_active)
 	{
 		/* check if value */
 		num_errors = get_num_errors();
@@ -176,7 +155,7 @@ static void if_body(enum flag interpret, Bool (*check_condition)(void))
 				/* expression is TRUE, interpret lines until #else or #endif */
 				if (sym.tok != TK_END)
 				{
-					parseline(ON);
+					parseline(ctx, TRUE);
 				}
 				else
 				{
@@ -191,7 +170,7 @@ static void if_body(enum flag interpret, Bool (*check_condition)(void))
 					/* then ignore lines until #endif ... */
 					if (sym.tok != TK_END)
 					{
-						parseline(OFF);
+						parseline(ctx, FALSE);
 					}
 					else
 					{
@@ -207,7 +186,7 @@ static void if_body(enum flag interpret, Bool (*check_condition)(void))
 				/* expression is FALSE, ignore until #else or #endif */
 				if (sym.tok != TK_END)
 				{
-					parseline(OFF);
+					parseline(ctx, FALSE);
 				}
 				else
 				{
@@ -221,7 +200,7 @@ static void if_body(enum flag interpret, Bool (*check_condition)(void))
 				{
 					if (sym.tok != TK_END)
 					{
-						parseline(ON);
+						parseline(ctx, TRUE);
 					}
 					else
 					{
@@ -238,7 +217,7 @@ static void if_body(enum flag interpret, Bool (*check_condition)(void))
 			/* don't evaluate #if expression and ignore all lines until #endif */
 			if (sym.tok != TK_END)
 			{
-				parseline(OFF);
+				parseline(ctx, FALSE);
 			}
 			else
 			{
@@ -262,9 +241,9 @@ static Bool check_if_condition(void)
 
 
 void
-ifstatement( enum flag interpret )
+ifstatement(ParseCtx *ctx, Bool compile_active)
 {
-	if_body(interpret, check_if_condition);
+	if_body(ctx, compile_active, check_if_condition);
 }
 
 
@@ -295,15 +274,15 @@ static Bool check_ifndef_condition(void)
 
 
 void
-ifdefstatement(enum flag interpret)
+ifdefstatement(ParseCtx *ctx, Bool compile_active)
 {
-	if_body(interpret, check_ifdef_condition);
+	if_body(ctx, compile_active, check_ifdef_condition);
 }
 
 void
-ifndefstatement(enum flag interpret)
+ifndefstatement(ParseCtx *ctx, Bool compile_active)
 {
-	if_body(interpret, check_ifndef_condition);
+	if_body(ctx, compile_active, check_ifndef_condition);
 }
 
 

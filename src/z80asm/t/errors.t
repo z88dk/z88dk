@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.29 2015-01-05 23:34:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.30 2015-01-18 17:36:22 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -49,15 +49,6 @@ t_z80asm_capture(asm_file(), "",
 		"Error: cannot read file '".asm_file()."'\n".
 		"1 errors occurred during assembly\n",
 		1);
-
-unlink_testfiles();
-t_z80asm_error('
-	ld a, 1
-	include "'.inc_file().'"
-	ld b, 1
-	', 
-	"Error at file 'test.asm' line 3: cannot read file 'test.inc'",
-	"-l");
 
 unlink_testfiles();
 t_z80asm_error('
@@ -652,17 +643,6 @@ t_z80asm_capture("-r0 -b -i".lib_file()." ".asm_file(), "",
 		"Error: file 'test.lib' not a library file\n".
 		"1 errors occurred during assembly\n",
 		1);
-
-#------------------------------------------------------------------------------
-# fatal_include_recursion
-unlink_testfiles();
-write_file(asm_file(), 'include "'.inc_file().'"');
-write_file(inc_file(), 'include "'.inc_file().'"');
-t_z80asm_capture(asm_file(), "",
-		"Error at file 'test.inc' line 1: cannot include file 'test.inc' recursively\n".
-		"1 errors occurred during assembly\n",
-		1);
-
 
 #------------------------------------------------------------------------------
 # White box tests

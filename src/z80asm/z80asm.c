@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.183 2015-01-03 18:39:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.184 2015-01-18 17:36:22 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,6 +32,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.183 2015-01-03 18
 #include "modlink.h"
 #include "objfile.h"
 #include "options.h"
+#include "parse.h"
 #include "scan.h"
 #include "strpool.h"
 #include "strutil.h"
@@ -169,7 +170,7 @@ static void do_assemble( char *src_filename )
         if ( opts.verbose )
             printf( "Assembling '%s'...\nPass1...\n", src_filename );
 
-        Z80pass1( src_filename );
+        parse_file( src_filename );
 
         list_end();                    /* get_used_symbol will only generate page references until list_end() */
 

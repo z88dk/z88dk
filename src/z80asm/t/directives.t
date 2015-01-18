@@ -13,12 +13,94 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.5 2015-01-05 23:34:03 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.6 2015-01-18 17:36:22 pauloscustodio Exp $
 #
 # Test assembly directives
 
 use Modern::Perl;
 use t::TestZ80asm;
+use File::Slurp;
+use File::Path qw( make_path remove_tree );
+
+#------------------------------------------------------------------------------
+# INCLUDE
+#------------------------------------------------------------------------------
+
+# no -I, multiple levels
+write_file("test0.inc", 'ld a,10');
+for (1..9) { write_file("test$_.inc", 'include "test'.($_-1).'.inc"'."\n defb $_"); }
+z80asm(
+	asm		=> <<'END',
+		include "test9.inc"		;; 3E 0A 01 02 03 04 05 06 07 08 09
+		nop						;; 00
+END
+);
+
+# -I, --inc-path
+unlink(<test*.inc>);
+make_path("test_dir");
+delete $ENV{Z80_OZFILES};
+	write_file("test_dir/test.inc", 'ld a,10');
+	
+	# no -I, full path : OK
+	z80asm(
+		asm		=> 'include "test_dir/test.inc"		;; 3E 0A',
+	);
+	
+	# no -I, only file name : error
+	z80asm(
+		asm		=> 'include "test.inc"	;; error: cannot read file \'test.inc\'',
+	);
+	
+	# -I : OK
+	z80asm(
+		asm		=> 'include "test.inc"				;; 3E 0A',
+		options	=> "-b -Itest_dir",
+	);
+	z80asm(
+		asm		=> 'include "test.inc"				;; 3E 0A',
+		options	=> "-b -I=test_dir",
+	);
+	z80asm(
+		asm		=> 'include "test.inc"				;; 3E 0A',
+		options	=> "-b --inc-path=test_dir",
+	);
+	z80asm(
+		asm		=> 'include "test.inc"				;; 3E 0A',
+		options	=> "-b --inc-pathtest_dir",
+	);
+	z80asm(
+		asm		=> 'include "test_dir/test.inc"		;; 3E 0A',
+		options	=> "-b -Itest_dir",
+	);
+	
+	# Z80_OZFILES : OK
+	$ENV{Z80_OZFILES} = "test_dir";
+	z80asm(
+		asm		=> 'include "test.inc"				;; 3E 0A',
+	);
+remove_tree("test_dir");
+delete $ENV{Z80_OZFILES};
+
+# fatal_read_file
+# BUG_0034 : If assembly process fails with fatal error, invalid library is kept
+unlink("test.lib", "test.inc");
+z80asm(
+	asm		=> <<'ASM',
+		include "test.inc"		;; error: cannot read file 'test.inc'
+ASM
+	options	=> "-xtest.lib",
+);
+ok ! -f "test.lib", "test.lib does not exist";
+
+# fatal_include_recursion
+write_file("test.inc", 'include "test.asm"');
+z80asm(
+	asm		=> <<'ASM',
+		include "test.inc"
+ASM
+	error	=> "Error at file 'test.inc' line 1: cannot include file 'test.asm' recursively",
+);
 
 #------------------------------------------------------------------------------
 # DEFGROUP - simple use tested in opcodes.t

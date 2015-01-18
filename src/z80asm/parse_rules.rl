@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-11 23:49:25 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.33 2015-01-18 17:36:22 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -47,7 +47,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 			}
 
 #define _DO_stmt_(suffix, opcode) \
-			{ 	Expr *expr = pop_expr(); \
+			{ 	Expr *expr = pop_expr(ctx); \
 				if (compile_active) { \
 					DO_STMT_LABEL(); \
 					add_opcode_##suffix((opcode), expr); \
@@ -62,8 +62,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 #define DO_stmt_idx(opcode)		_DO_stmt_(idx, opcode)
 
 #define DO_stmt_idx_n(opcode) \
-			{ 	Expr *n_expr   = pop_expr(); \
-				Expr *idx_expr = pop_expr(); \
+			{ 	Expr *n_expr   = pop_expr(ctx); \
+				Expr *idx_expr = pop_expr(ctx); \
 				if (compile_active) { \
 					DO_STMT_LABEL(); \
 					add_opcode_idx_n((opcode), \
@@ -83,7 +83,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 			}
 
 #define DO_stmt_call_flag(flag) \
-			{ 	Expr *expr = pop_expr(); \
+			{ 	Expr *expr = pop_expr(ctx); \
 				if (compile_active) { \
 					DO_STMT_LABEL(); \
 					add_call_flag(FLAG_##flag, expr); \
@@ -96,9 +96,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 *   Expression macros
 *----------------------------------------------------------------------------*/
 #define EXPR_START_ACTION() \
-			expr_start = p; \
-			expr_in_parens = (expr_start->tok == TK_LPAREN) ? TRUE : FALSE; \
-			expr_open_parens = 0;
+			ctx->expr_start = ctx->p; \
+			ctx->expr_in_parens = (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE; \
+			ctx->expr_open_parens = 0;
 
 /*-----------------------------------------------------------------------------
 *   State Machine
@@ -109,26 +109,23 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 
 	/* type of token and way to retrieve */
 	alphtype short;
-	getkey ((int) p->tok);
-
-	/* dynamically grow state stack */
-#if 0
-	prepush {
-		utarray_reserve(state_stack, 1);
-		stack = (int *)utarray_front(state_stack);
-	}
-#endif
+	getkey ((int)ctx->p->tok);
+	variable cs  ctx->cs;
+	variable p   ctx->p;
+	variable pe  ctx->pe;
+	variable eof ctx->eof;
 
 	/* label, name */
-	label = _TK_LABEL @{ Str_set_n(stmt_label, p->tstart, p->tlen); };
-	name  = _TK_NAME  @{ Str_set_n(name,       p->tstart, p->tlen); };
+	label  = _TK_LABEL  @{ Str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); };
+	name   = _TK_NAME   @{ Str_set_n(name,       ctx->p->tstart, ctx->p->tlen); };
+	string = _TK_STRING @{ Str_set_n(name,       ctx->p->tstart, ctx->p->tlen); };
 	
 	/* expression */
-	action parens_open { expr_open_parens > 0 }
+	action parens_open { ctx->expr_open_parens > 0 }
 	lparen = (_TK_LPAREN | _TK_LSQUARE) 
-			>{ expr_open_parens++; };
+			>{ ctx->expr_open_parens++; };
 	rparen = (_TK_RPAREN | _TK_RSQUARE) when parens_open
-			%{ expr_open_parens--; };
+			%{ ctx->expr_open_parens--; };
 
 	unary 	= _TK_MINUS | _TK_PLUS |
 #ifndef __LEGACY_Z80ASM_SYNTAX
@@ -158,35 +155,43 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 	/* expression */
 	expr 	= expr1 
 			  >{ EXPR_START_ACTION(); }
-			  %{ push_expr(expr_start, p); };
+			  %{ push_expr(ctx); };
 	
 	/* expression within parentheses */
 	paren_expr = expr1 
 			  >{ EXPR_START_ACTION(); }
-			  %{ if (! expr_in_parens)
+			  %{ if (! ctx->expr_in_parens)
 					return FALSE;		/* syntax error */
-				 push_expr(expr_start, p); 
+				 push_expr(ctx); 
 			   };
 	
 	const_expr = 
-			  expr %{ pop_eval_expr(&expr_value, &expr_error); };
+			  expr %{ pop_eval_expr(ctx); };
 	
+	/*---------------------------------------------------------------------
+	*   INCLUDE
+	*--------------------------------------------------------------------*/
+	include_op = 
+		  _TK_INCLUDE string _TK_NEWLINE
+		  @{ parse_file(name->str); }
+		;
+
 	/*---------------------------------------------------------------------
 	*   DEFGROUP
 	*--------------------------------------------------------------------*/
 	defgroup =
 		  _TK_DEFGROUP _TK_NEWLINE
 		  @{ defgroup_start(0);
-		     current_sm = SM_DEFGROUP_OPEN; }
+		     ctx->current_sm = SM_DEFGROUP_OPEN; }
 		| _TK_DEFGROUP _TK_LCURLY _TK_NEWLINE
 		  @{ defgroup_start(0);
-		     current_sm = SM_DEFGROUP_LINE; }
+		     ctx->current_sm = SM_DEFGROUP_LINE; }
 		;
 
 	defgroup_var_value =
 		  name _TK_EQUAL const_expr	
-		  %{ if (! expr_error) 
-				defgroup_start(expr_value);
+		  %{ if (! ctx->expr_error) 
+				defgroup_start(ctx->expr_value);
 			 defgroup_define_const(name->str);
 		  };
 	
@@ -200,13 +205,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 	defgroup_open :=
 		  _TK_NEWLINE
 		| _TK_END 					@{ error_missing_block(); }
-		| _TK_LCURLY _TK_NEWLINE 	@{ current_sm = SM_DEFGROUP_LINE; }
+		| _TK_LCURLY _TK_NEWLINE 	@{ ctx->current_sm = SM_DEFGROUP_LINE; }
 		;
 	
 	defgroup_line := 
 		  _TK_NEWLINE
 		| _TK_END 					@{ error_missing_close_block(); }
-		| _TK_RCURLY _TK_NEWLINE	@{ current_sm = SM_MAIN; }
+		| _TK_RCURLY _TK_NEWLINE	@{ ctx->current_sm = SM_MAIN; }
 		| defgroup_var (_TK_COMMA defgroup_var)* _TK_COMMA? _TK_NEWLINE
 		;
 	
@@ -216,13 +221,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 	defs = 
 		  label? _TK_DEFS const_expr _TK_NEWLINE 
 		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! expr_error) defs(expr_value, 0); }
+		     if (compile_active && ! ctx->expr_error) defs(ctx->expr_value, 0); }
 		| label? _TK_DEFS 
 				const_expr _TK_COMMA
-				@{ value1 = expr_error ? 0 : expr_value; }
+				@{ value1 = ctx->expr_error ? 0 : ctx->expr_value; }
 				const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! expr_error) defs(value1, expr_value); }
+		     if (compile_active && ! ctx->expr_error) defs(value1, ctx->expr_value); }
 		;			     
 		
 	/*---------------------------------------------------------------------
@@ -230,33 +235,33 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 	*--------------------------------------------------------------------*/
 	defvars = 
 		  _TK_DEFVARS const_expr _TK_NEWLINE
-		  @{ if (! expr_error) 
-				defvars_start(expr_value);
-			 current_sm = SM_DEFVARS_OPEN;
+		  @{ if (! ctx->expr_error) 
+				defvars_start(ctx->expr_value);
+			 ctx->current_sm = SM_DEFVARS_OPEN;
 		  }
 		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
-		  @{ if (! expr_error) 
-				defvars_start(expr_value);
-			 current_sm = SM_DEFVARS_LINE;
+		  @{ if (! ctx->expr_error) 
+				defvars_start(ctx->expr_value);
+			 ctx->current_sm = SM_DEFVARS_LINE;
 		  }
 		;
 		
 	defvars_open :=
 		  _TK_NEWLINE
 		| _TK_END 					@{ error_missing_block(); }
-		| _TK_LCURLY _TK_NEWLINE 	@{ current_sm = SM_DEFVARS_LINE; }
+		| _TK_LCURLY _TK_NEWLINE 	@{ ctx->current_sm = SM_DEFVARS_LINE; }
 		;
 		
 	defvars_line := 
 		  _TK_NEWLINE
 		| _TK_END 					@{ error_missing_close_block(); }
-		| _TK_RCURLY _TK_NEWLINE	@{ current_sm = SM_MAIN; }
+		| _TK_RCURLY _TK_NEWLINE	@{ ctx->current_sm = SM_MAIN; }
 		| name _TK_NEWLINE
 		  @{ defvars_define_const( name->str, 0, 0 ); }
 #foreach <S> in B, W, P, L
 		| name _TK_DS_<S> const_expr _TK_NEWLINE
-		  @{ if (! expr_error) 
-				defvars_define_const( name->str, DEFVARS_SIZE_<S>, expr_value ); 
+		  @{ if (! ctx->expr_error) 
+				defvars_define_const( name->str, DEFVARS_SIZE_<S>, ctx->expr_value ); 
 		  }
 #endfor  <S>
 		;
@@ -265,8 +270,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 	*   ORG
 	*--------------------------------------------------------------------*/
 	org = _TK_ORG const_expr _TK_NEWLINE
-		  @{ if (!expr_error)
-				set_origin_directive(expr_value);
+		  @{ if (!ctx->expr_error)
+				set_origin_directive(ctx->expr_value);
 		  };
 	
 	/*---------------------------------------------------------------------
@@ -276,6 +281,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 		  _TK_END
 		| _TK_NEWLINE
 		
+		| include_op
 		| defgroup
 		| defs
 		| defvars
@@ -329,7 +335,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 		/* LD r,N | LD A,(NN) */
 		|	label? _TK_LD _TK_<R1> _TK_COMMA expr _TK_NEWLINE
 			@{ 
-				if ( expr_in_parens ) {
+				if ( ctx->expr_in_parens ) {
 					if ( REG_<R1> == REG_A ) {
 						DO_stmt_nn( Z80_LD_A_IND_NN );		/* ld a,(NN) */
 					}
@@ -397,7 +403,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 		/* ld (NN),A */
 		| label? _TK_LD expr _TK_COMMA _TK_A _TK_NEWLINE
 		  @{
-				if (! expr_in_parens)
+				if (! ctx->expr_in_parens)
 					return FALSE;			/* syntax error */
 					
 				DO_stmt_nn( Z80_LD_IND_NN_A );		/* ld (NN),a */
@@ -418,7 +424,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 		/* ld dd,NN | ld dd,(NN) */
 		| label? _TK_LD _TK_<DD> _TK_COMMA expr _TK_NEWLINE
 		  @{
-				if ( expr_in_parens ) {
+				if ( ctx->expr_in_parens ) {
 					if ( REG_<DD> == REG_HL ) {		/* ld hl,(NN) */
 						DO_stmt_nn( P_<DD> + Z80_LD_idx_IND_nn );
 					}
@@ -436,7 +442,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 #foreach <DD> in HL, IX, IY
 		| label? _TK_LD expr _TK_COMMA _TK_<DD> _TK_NEWLINE
 		  @{
-				if (! expr_in_parens)
+				if (! ctx->expr_in_parens)
 					return FALSE;			/* syntax error */
 					
 				DO_stmt_nn( P_<DD> + Z80_LD_IND_nn_idx );
@@ -447,7 +453,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 #foreach <DD> in BC, DE, SP
 		| label? _TK_LD expr _TK_COMMA _TK_<DD> _TK_NEWLINE
 		  @{
-				if (! expr_in_parens)
+				if (! ctx->expr_in_parens)
 					return FALSE;			/* syntax error */
 					
 				DO_stmt_nn( Z80_LD_IND_nn_dd( REG_<DD> ) );	/* ld (NN),dd */
@@ -626,8 +632,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 #foreach <OP> in BIT, SET, RES
 	#foreach <R> in B, C, D, E, H, L, A
 		| label? _TK_<OP> const_expr _TK_COMMA _TK_<R> _TK_NEWLINE
-		  @{ if (!expr_error)
-				DO_stmt( Z80_<OP>( expr_value, REG_<R> ) ); 
+		  @{ if (!ctx->expr_error)
+				DO_stmt( Z80_<OP>( ctx->expr_value, REG_<R> ) ); 
 		  }
 	#endfor  <R>
 	
@@ -635,27 +641,27 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 		/* (x) */
 		| label? _TK_<OP> const_expr _TK_COMMA  
 					_TK_IND_<X> _TK_RPAREN _TK_NEWLINE
-		  @{ if (!expr_error)
+		  @{ if (!ctx->expr_error)
 				DO_stmt( ((P_<X>                           << 16) & 0xFF000000) +
-						 ((Z80_<OP>( expr_value, REG_idx ) << 8 ) & 0x00FF0000) +
+						 ((Z80_<OP>( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) +
 						 ((0                               << 8 ) & 0x0000FF00) +
-						 ((Z80_<OP>( expr_value, REG_idx ) << 0 ) & 0x000000FF) );
+						 ((Z80_<OP>( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF) );
 		   }
 			
 		/* (x+d) */
 		| label? _TK_<OP> const_expr _TK_COMMA  
 					_TK_IND_<X> expr _TK_RPAREN _TK_NEWLINE
-		  @{ if (!expr_error)
+		  @{ if (!ctx->expr_error)
 				DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
-						     Z80_<OP>( expr_value, REG_idx ) ); 
+						     Z80_<OP>( ctx->expr_value, REG_idx ) ); 
 		  }
 	#endfor  <X>
 	
 		/* (hl) */
 		| label? _TK_<OP>  const_expr _TK_COMMA
 					_TK_IND_HL _TK_NEWLINE
-		  @{ if (!expr_error)
-				DO_stmt( Z80_<OP>( expr_value, REG_idx ) ); 
+		  @{ if (!ctx->expr_error)
+				DO_stmt( Z80_<OP>( ctx->expr_value, REG_idx ) ); 
 		  }
 #endfor  <OP>
 
@@ -732,8 +738,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 		*--------------------------------------------------------------------*/
 #foreach <OP> in IM, RST
 		| label? _TK_<OP> const_expr _TK_NEWLINE
-		  @{ if (!expr_error)
-				DO_stmt( Z80_<OP>( expr_value ) );
+		  @{ if (!ctx->expr_error)
+				DO_stmt( Z80_<OP>( ctx->expr_value ) );
 		  }
 #endfor  <OP>
 
@@ -743,45 +749,40 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.32 2015-01-
 
 %%write data;
 
-static void _parse_init(void)
+static Bool _parse_statement(ParseCtx *ctx, Bool compile_active)
 {
-	current_sm = SM_MAIN;
-}
-
-static Bool _parse_statement(Bool compile_active)
-{
-	int start_num_errors = get_num_errors();;
 	static Str  *name = NULL;		/* identifier name */
 	static Str  *stmt_label = NULL;	/* statement label, NULL if none */
 	int value1 = 0;
+	int start_num_errors = get_num_errors();;
 
 	INIT_OBJ(Str, &name); 		Str_clear(name);
 	INIT_OBJ(Str, &stmt_label);	Str_clear(stmt_label);
 	
 	%%write init nocs;
-	switch (current_sm)
+	switch (ctx->current_sm)
 	{
-	case SM_MAIN:			cs = parser_en_main; break;
-	case SM_DEFVARS_OPEN:	cs = parser_en_defvars_open;  scan_expect_operands(); break;
-	case SM_DEFVARS_LINE:	cs = parser_en_defvars_line;  scan_expect_operands(); break;
-	case SM_DEFGROUP_OPEN:	cs = parser_en_defgroup_open; scan_expect_operands(); break;
-	case SM_DEFGROUP_LINE:	cs = parser_en_defgroup_line; scan_expect_operands(); break;
+	case SM_MAIN:			ctx->cs = parser_en_main; break;
+	case SM_DEFVARS_OPEN:	ctx->cs = parser_en_defvars_open;  scan_expect_operands(); break;
+	case SM_DEFVARS_LINE:	ctx->cs = parser_en_defvars_line;  scan_expect_operands(); break;
+	case SM_DEFGROUP_OPEN:	ctx->cs = parser_en_defgroup_open; scan_expect_operands(); break;
+	case SM_DEFGROUP_LINE:	ctx->cs = parser_en_defgroup_line; scan_expect_operands(); break;
 	default: assert(0);
 	}
 	
-	p = pe = eof = expr_start = NULL;
+	ctx->p = ctx->pe = ctx->eof = ctx->expr_start = NULL;
 	
-	while ( eof == NULL || eof != pe )
+	while ( ctx->eof == NULL || ctx->eof != ctx->pe )
 	{
-		read_token();
+		read_token(ctx);
 		
 		%%write exec;
 
 		/* Did parsing succeed? */
-		if ( cs == %%{ write error; }%% )
+		if ( ctx->cs == %%{ write error; }%% )
 			return FALSE;
 		
-		if ( cs >= %%{ write first_final; }%% )
+		if ( ctx->cs >= %%{ write first_final; }%% )
 			return TRUE;
 			
 		/* assembly error? must test after check for end of parse */

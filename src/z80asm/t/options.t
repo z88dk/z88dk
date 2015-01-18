@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.52 2015-01-02 14:36:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.53 2015-01-18 17:36:22 pauloscustodio Exp $
 #
 # Test options
 
@@ -823,32 +823,8 @@ ok -f map_file(), map_file();
 eq_or_diff scalar(read_file(map_file())), $map, "mapfile contents";
 
 #------------------------------------------------------------------------------
-# -I, --inc-path
+# -I, --inc-path - tested in directives.t
 #------------------------------------------------------------------------------
-
-# create include file
-my $inc = 't/data/'.basename(inc_file());
-my $inc_base = basename($inc);
-my $inc_dir  = dirname($inc);
-write_file($inc, "ld a,1");
-
-# no -I, full path : OK
-t_z80asm_ok(0, "include \"$inc\"", "\x3E\x01");
-
-# no -I, only file name : error
-t_z80asm_error("include \"$inc_base\"", 
-			"Error at file 'test.asm' line 1: cannot read file 'test.inc'");
-
-# -I : OK
-for my $options ('-I', '-I=', '--inc-path', '--inc-path=') {
-	t_z80asm_ok(0, "include \"$inc_base\"", "\x3E\x01", "$options$inc_dir");
-}
-
-# Z80_OZFILES : OK
-$ENV{Z80_OZFILES} = $inc_dir;
-t_z80asm_ok(0, "include \"$inc_base\"", "\x3E\x01");
-
-unlink_testfiles($inc);
 
 #------------------------------------------------------------------------------
 # -L, --lib-path

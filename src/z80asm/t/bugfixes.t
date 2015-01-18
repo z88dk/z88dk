@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.45 2015-01-11 23:49:25 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.46 2015-01-18 17:36:22 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -472,18 +472,6 @@ note "BUG_0033";
 		bin		=> "\x3E\x03",
 	);
 }
-
-#------------------------------------------------------------------------------
-# BUG_0034 : If assembly process fails with fatal error, invalid library is kept
-note "BUG_0034";
-unlink("test.lib");
-z80asm(
-	asm		=> <<'ASM',
-		include "FILE_NOT_FOUND"	;; error: cannot read file 'FILE_NOT_FOUND'
-ASM
-	options	=> "-xtest.lib",
-);
-ok ! -f "test.lib", "test.lib does not exist";
 
 #------------------------------------------------------------------------------
 # BUG_0035 : Symbol not defined in forward references

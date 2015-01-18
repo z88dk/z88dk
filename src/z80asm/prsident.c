@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.106 2015-01-11 23:49:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.107 2015-01-18 17:36:22 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,6 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.106 2015-
 #include "listfile.h"
 #include "options.h"
 #include "scan.h"
+#include "parse.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "types.h"
@@ -34,17 +35,17 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.106 2015-
 /* external functions */
 void DeclModuleName( void );
 void DEFINE( void );
-void ifstatement(enum flag interpret);
-void ifdefstatement(enum flag interpret);
-void ifndefstatement(enum flag interpret);
-void INCLUDE(void), BINARY(void), CALL_OZ(void), OZ(void), CALL_PKG(void), FPP(void);
+void ifstatement(ParseCtx *ctx, Bool compile_active);
+void ifdefstatement(ParseCtx *ctx, Bool compile_active);
+void ifndefstatement(ParseCtx *ctx, Bool compile_active);
+void BINARY(void), CALL_OZ(void), OZ(void), CALL_PKG(void), FPP(void);
 void INVOKE( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
 void UNDEFINE( void );
 
 
 /* local functions */
-void ParseIdent( enum flag interpret );
+void ParseIdent(ParseCtx *ctx, Bool compile_active);
 void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
 void LIB( void ), XLIB( void );
 void IF(void), IFDEF(void), IFNDEF(void), ELSE(void), ENDIF(void);
@@ -84,8 +85,7 @@ struct Z80sym Z80ident[] =
 	DEF_ENTRY( IF ),
 	DEF_ENTRY( IFDEF ),
 	DEF_ENTRY( IFNDEF ),
-	DEF_ENTRY( INCLUDE ),
-    DEF_ENTRY( INVOKE ),
+	DEF_ENTRY( INVOKE ),
     DEF_ENTRY( LIB ),
     DEF_ENTRY( LINE ),
     DEF_ENTRY( LSTOFF ),
@@ -120,7 +120,7 @@ struct Z80sym *SearchId( void )
 
 
 void
-ParseIdent( enum flag interpret )
+ParseIdent(ParseCtx *ctx, Bool compile_active)
 {
     struct Z80sym *foundsym;
 
@@ -128,7 +128,7 @@ ParseIdent( enum flag interpret )
 
     if ( foundsym == NULL )
     {
-        if ( interpret == ON )      /* only issue error message if interpreting */
+        if ( compile_active )      /* only issue error message if interpreting */
 			error_syntax();
             //error_unknown_ident();
     }
@@ -136,24 +136,24 @@ ParseIdent( enum flag interpret )
     {
 		if (foundsym->z80func == IF)
 		{
-			if (interpret == OFF)
+			if (! compile_active)
 				Skipline();    /* skip current line until EOL */
 
-			ifstatement(interpret);
+			ifstatement(ctx, compile_active);
 		}
 		else if (foundsym->z80func == IFDEF)
 		{
-			if (interpret == OFF)
+			if (! compile_active)
 				Skipline();    /* skip current line until EOL */
 
-			ifdefstatement(interpret);
+			ifdefstatement(ctx, compile_active);
 		}
 		else if (foundsym->z80func == IFNDEF)
 		{
-			if (interpret == OFF)
+			if (! compile_active)
 				Skipline();    /* skip current line until EOL */
 
-			ifndefstatement(interpret);
+			ifndefstatement(ctx, compile_active);
 		}
 		else if (foundsym->z80func == ELSE ||
                   foundsym->z80func == ENDIF )
@@ -163,7 +163,7 @@ ParseIdent( enum flag interpret )
         }
         else
         {
-            if ( interpret == ON )
+            if ( compile_active )
                 ( foundsym->z80func )();
 
             Skipline();               /* skip current line until EOL */
