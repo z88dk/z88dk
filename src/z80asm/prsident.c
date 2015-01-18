@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.109 2015-01-18 18:37:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.110 2015-01-18 19:09:38 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -45,11 +45,9 @@ void UNDEFINE( void );
 
 /* local functions */
 void ParseIdent(ParseCtx *ctx, Bool compile_active);
-void XREF( void ), XDEF( void ), LSTON( void ), LSTOFF( void );
-void LIB( void ), XLIB( void );
+void LSTON( void ), LSTOFF( void );
 void IF(void), IFDEF(void), IFNDEF(void), ELSE(void), ENDIF(void);
 void LINE( void );
-void PUBLIC( void ); void EXTERN( void ); 
 
 
 typedef void ( *ptrfunc )( void ); /* ptr to function returning void */
@@ -77,22 +75,16 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( DEFW ),
     DEF_ENTRY( ELSE ),
     DEF_ENTRY( ENDIF ),
-    DEF_ENTRY( EXTERN ),
     DEF_ENTRY( FPP ),
 	DEF_ENTRY( IF ),
 	DEF_ENTRY( IFDEF ),
 	DEF_ENTRY( IFNDEF ),
 	DEF_ENTRY( INVOKE ),
-    DEF_ENTRY( LIB ),
     DEF_ENTRY( LINE ),
     DEF_ENTRY( LSTOFF ),
     DEF_ENTRY( LSTON ),
     DEF_ENTRY( OZ ),
-    DEF_ENTRY( PUBLIC ),
     DEF_ENTRY( UNDEFINE ),
-    DEF_ENTRY( XDEF ),
-    DEF_ENTRY( XLIB ),
-    DEF_ENTRY( XREF )
 };
 #undef DEF_ENTRY
 
@@ -236,87 +228,4 @@ void
 ENDIF( void )
 {
     sym.tok = TK_ENDIF_STMT;
-}
-
-
-void
-PUBLIC( void )
-{
-    do
-    {
-        if ( GetSym() == TK_NAME )
-        {
-			declare_public_symbol(sym_text(&sym));
-        }
-        else
-        {
-            error_syntax();
-            return;
-        }
-    }
-    while ( GetSym() == TK_COMMA );
-
-    if ( sym.tok != TK_NEWLINE && sym.tok != TK_END )
-    {
-		error_syntax();
-    }
-}
-
-void
-XDEF( void )
-{
-#if 0
-	warn_deprecated("XDEF", "PUBLIC");
-#endif
-	PUBLIC();
-}
-
-void
-XLIB( void )
-{
-#if 0
-	warn_deprecated("XLIB", "PUBLIC");
-#endif
-	PUBLIC();
-}
-
-void
-EXTERN( void )
-{
-    do
-    {
-        if ( GetSym() == TK_NAME )
-        {
-			declare_extern_symbol(sym_text(&sym));    /* Define symbol as extern */
-        }
-        else
-        {
-			error_syntax();
-            return;
-        }
-    }
-    while ( GetSym() == TK_COMMA );
-
-    if ( sym.tok != TK_NEWLINE && sym.tok != TK_END )
-    {
-		error_syntax();
-    }
-}
-
-void
-XREF( void )
-{
-#if 0
-	warn_deprecated("XREF", "EXTERN");
-#endif
-	EXTERN();
-}
-
-void
-LIB( void )
-{
-#if 0
-	warn_deprecated("LIB", "EXTERN");
-#endif
-	EXTERN();
 }

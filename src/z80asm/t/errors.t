@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.31 2015-01-18 18:37:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.32 2015-01-18 19:09:38 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -294,30 +294,8 @@ t_binary(read_binfile(bin_file()), pack("C*",
 ));
 
 # defvar out of range - tested in directives.t
-
 # defs out of range - tested in opcodes.t
-
-# org out of range
-t_z80asm(
-	asm		=> "org -2",
-	err		=> "Error at file 'test.asm' line 1: integer '-2' out of range",
-);
-
-t_z80asm(
-	asm		=> "org 0",
-	bin		=> "",
-);
-
-t_z80asm(
-	asm		=> "org 65535",
-	bin		=> "",
-);
-
-t_z80asm(
-	asm		=> "org 65536",
-	err		=> "Error at file 'test.asm' line 1: integer '65536' out of range",
-);
-
+# org out of range - tested in directives.t
 
 # JR / DJNZ
 for ([jr => chr(0x18)], [djnz => chr(0x10)])

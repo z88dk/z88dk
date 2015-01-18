@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.7 2015-01-18 18:37:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.8 2015-01-18 19:09:38 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -424,12 +424,23 @@ z80asm(
 	asm		=> "org 0x1234 \n org 0x5678 ;; error: ORG redefined",
 );
 
-# ORG out of range
+# ORG OK
 z80asm(
-	asm		=> "org -2 ;; error: integer '-2' out of range",
+	asm		=> "org 0 \n jp ASMPC ;; C3 00 00",
 );
 z80asm(
-	asm		=> "org 65536 ;; error: integer '65536' out of range",
+	asm		=> "org 65535 \n defb ASMPC & 0xFF ;; FF",
+);
+z80asm(
+	asm		=> "org 65535 \n defb ASMPC >> 8 ;; FF",
+);
+
+# ORG out of range
+z80asm(
+	asm		=> "org -2 		;; error: integer '-2' out of range",
+);
+z80asm(
+	asm		=> "org 65536 	;; error: integer '65536' out of range",
 );
 
 # ORG not constant
@@ -538,3 +549,33 @@ ok   -f "test.bin";
 ok ! -f "test_code.bin";
 test_binfile("test_data.bin", 	pack("v*", 0x4000));
 test_binfile("test_bss.bin", 	pack("v*", 0x4002));
+
+#------------------------------------------------------------------------------
+# EXTERN / PUBLIC / XDEF / XLIB / XREF / LIB
+#------------------------------------------------------------------------------
+z80asm(
+	asm		=> <<'END',
+		extern 				;; error: syntax error
+		public 				;; error: syntax error
+END
+);
+
+z80asm(
+	asm		=> <<'END',
+		public	p1,p2
+		xdef    p3			;; warn: 'XDEF' is deprecated, use 'PUBLIC' instead
+		xlib    p4			;; warn: 'XLIB' is deprecated, use 'PUBLIC' instead
+		
+	p1:	defb ASMPC			;; 00
+	p2:	defb ASMPC			;; 01
+	p3:	defb ASMPC			;; 02
+	p4:	defb ASMPC			;; 03
+END
+	asm1	=> <<'END',
+		extern p1,p2
+		xref   p3			;; warn: 'XREF' is deprecated, use 'EXTERN' instead
+		lib	   p4			;; warn: 'LIB' is deprecated, use 'EXTERN' instead
+		
+		defb p1,p2,p3,p4	;; 00 01 02 03
+END
+);

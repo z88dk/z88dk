@@ -1988,7 +1988,7 @@ jr2:
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
-                          lib  ld
+                          extern ld
 
                           nop           ;; 00
                           jr   nop      ;; 18 00
@@ -3944,7 +3944,7 @@ jr2:
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
-                          lib  ld
+                          extern ld
 
                           nop           ;; 00
                           jr   nop      ;; 18 00

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.35 2015-01-18 18:37:16 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.36 2015-01-18 19:09:38 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -291,6 +291,31 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.35 2015-01-
 		;
 
 	/*---------------------------------------------------------------------
+	*   EXTERN / PUBLIC / XDEF / XLIB / XREF / LIB
+	*--------------------------------------------------------------------*/
+	action extern_action { declare_extern_symbol(name->str); } 
+	action xref_action   { warn_deprecated("XREF", "EXTERN");
+						   declare_extern_symbol(name->str); } 
+	action lib_action    { warn_deprecated("LIB", "EXTERN");
+						   declare_extern_symbol(name->str); } 
+
+	action public_action { declare_public_symbol(name->str); } 
+	action xdef_action   { warn_deprecated("XDEF", "PUBLIC");
+						   declare_public_symbol(name->str); } 
+	action xlib_action   { warn_deprecated("XLIB", "PUBLIC");
+						   declare_public_symbol(name->str); } 
+						   
+#foreach <OP> in extern, xref, lib, public, xdef, xlib
+	<OP>_op =
+		_TK_#UCASE( <OP> ) name @<OP>_action
+		       ( _TK_COMMA name @<OP>_action )*
+		_TK_NEWLINE ;
+#endfor  <OP>
+
+	extern_public_op = extern_op | xref_op | lib_op |
+					   public_op | xdef_op | xlib_op ;
+
+	/*---------------------------------------------------------------------
 	*   assembly statement
 	*--------------------------------------------------------------------*/
 	main := 
@@ -304,6 +329,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.35 2015-01-
 		| module
 		| org
 		| section
+		| extern_public_op
 		
 		/*---------------------------------------------------------------------
 		*   Z80 assembly

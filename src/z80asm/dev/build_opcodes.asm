@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.17 2015-01-11 23:49:25 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.18 2015-01-18 19:09:37 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -743,7 +743,7 @@ ds:	defs not_defined	; BUG_0007		;; error: symbol not defined
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
-	lib ld								;;
+	extern ld							;;
 
 	nop
 	jr nop

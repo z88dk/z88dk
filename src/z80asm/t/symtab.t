@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.22 2014-09-11 22:28:36 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.23 2015-01-18 19:09:38 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -240,12 +240,12 @@ write_file(asm1_file(), "
 	LIB		var3
 	DEFB 	var3
 ");
-t_z80asm_capture("-l -b -r0 ".asm_file()." ".asm1_file(), "", "", 0);
-#Warning at file 'test.asm' line 5: 'XDEF' is deprecated, use 'PUBLIC' instead
-#Warning at file 'test.asm' line 8: 'XLIB' is deprecated, use 'PUBLIC' instead
-#Warning at file 'test1.asm' line 5: 'XREF' is deprecated, use 'EXTERN' instead
-#Warning at file 'test1.asm' line 8: 'LIB' is deprecated, use 'EXTERN' instead
-#ERR
+t_z80asm_capture("-l -b -r0 ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
+Warning at file 'test.asm' line 5: 'XDEF' is deprecated, use 'PUBLIC' instead
+Warning at file 'test.asm' line 8: 'XLIB' is deprecated, use 'PUBLIC' instead
+Warning at file 'test1.asm' line 5: 'XREF' is deprecated, use 'EXTERN' instead
+Warning at file 'test1.asm' line 8: 'LIB' is deprecated, use 'EXTERN' instead
+ERR
 t_binary(read_binfile(bin_file()), "\x01\x02\x03");
 
 # delete directories and files

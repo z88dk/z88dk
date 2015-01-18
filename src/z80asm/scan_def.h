@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.40 2015-01-18 18:37:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.41 2015-01-18 19:09:38 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -228,10 +228,16 @@ TOKEN_RE(TK_IND_SP, "(SP)", "(" hspace "SP"i hspace ")", )
 TOKEN_OPCODE(DEFGROUP	)
 TOKEN_OPCODE(DEFS		)
 TOKEN_OPCODE(DEFVARS	)
+TOKEN_OPCODE(EXTERN		)
 TOKEN_OPCODE(INCLUDE	)
+TOKEN_OPCODE(LIB		)
 TOKEN_OPCODE(MODULE		)
 TOKEN_OPCODE(ORG		)
+TOKEN_OPCODE(PUBLIC		)
 TOKEN_OPCODE(SECTION	)
+TOKEN_OPCODE(XDEF		)
+TOKEN_OPCODE(XLIB		)
+TOKEN_OPCODE(XREF		)
 
 /* DEFGROUP storage specifiers */
 TOKEN(TK_DS_B, "DS.B", )
