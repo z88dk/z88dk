@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.5 2015-01-18 18:37:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.6 2015-01-19 22:50:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -137,4 +137,19 @@ void default_module_name(void)
 {
 	if (! CURRENTMODULE->modname)     /* Module name must be defined */
 		CURRENTMODULE->modname = path_remove_ext(path_basename(CURRENTMODULE->filename));
+}
+
+/*-----------------------------------------------------------------------------
+*   LSTON / LSTOFF
+*----------------------------------------------------------------------------*/
+void list_on(void)
+{
+	if (opts.list)
+		opts.cur_list = TRUE;
+}
+
+void list_off(void)
+{
+	if (opts.list)
+		opts.cur_list = FALSE;
 }

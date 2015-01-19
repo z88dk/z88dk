@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.110 2015-01-18 19:09:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.111 2015-01-19 22:50:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -45,7 +45,6 @@ void UNDEFINE( void );
 
 /* local functions */
 void ParseIdent(ParseCtx *ctx, Bool compile_active);
-void LSTON( void ), LSTOFF( void );
 void IF(void), IFDEF(void), IFNDEF(void), ELSE(void), ENDIF(void);
 void LINE( void );
 
@@ -81,8 +80,6 @@ struct Z80sym Z80ident[] =
 	DEF_ENTRY( IFNDEF ),
 	DEF_ENTRY( INVOKE ),
     DEF_ENTRY( LINE ),
-    DEF_ENTRY( LSTOFF ),
-    DEF_ENTRY( LSTON ),
     DEF_ENTRY( OZ ),
     DEF_ENTRY( UNDEFINE ),
 };
@@ -159,22 +156,6 @@ ParseIdent(ParseCtx *ctx, Bool compile_active)
 }
 
 
-
-void
-LSTON( void )
-{
-    if ( opts.list )
-        opts.cur_list = TRUE;				/* switch listing ON again... */
-}
-
-
-
-void
-LSTOFF( void )
-{
-    if ( opts.list )
-        opts.cur_list = FALSE;
-}
 
 /* Function for Line number in C source */
 void LINE( void )

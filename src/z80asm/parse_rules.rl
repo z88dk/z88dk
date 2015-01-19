@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.36 2015-01-18 19:09:38 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.37 2015-01-19 22:50:01 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -267,6 +267,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.36 2015-01-
 		;
 
 	/*---------------------------------------------------------------------
+	*   LSTON / LSTOFF
+	*--------------------------------------------------------------------*/
+	list_on_off = 
+			_TK_LSTON  _TK_NEWLINE @{ list_on();  }
+		|	_TK_LSTOFF _TK_NEWLINE @{ list_off(); }
+		;
+
+	/*---------------------------------------------------------------------
 	*   MODULE
 	*--------------------------------------------------------------------*/
 	module = 
@@ -322,14 +330,15 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.36 2015-01-
 		  _TK_END
 		| _TK_NEWLINE
 		
-		| include_op
 		| defgroup
 		| defs
 		| defvars
+		| extern_public_op
+		| include_op
+		| list_on_off
 		| module
 		| org
 		| section
-		| extern_public_op
 		
 		/*---------------------------------------------------------------------
 		*   Z80 assembly

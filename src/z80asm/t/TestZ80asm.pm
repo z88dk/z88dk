@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.13 2015-01-18 18:37:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.14 2015-01-19 22:50:01 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -76,7 +76,10 @@ sub z80asm {
 	for (sort keys %args) {
 		if (my($id) = /^asm(\d*)$/) {
 			# asm[n]
-			unlink("test$id.err", "test$id.obj", <test$id*.bin>);
+			unlink("test$id.err", "test$id.obj", 
+			       "test$id.map", "test$id.syn", 
+				   "test$id.lst", "test$id.def", 
+				   <test$id*.bin>);
 			
 			$bin_file ||=    "test$id.bin";
 			push @asm_files, "test$id.asm"

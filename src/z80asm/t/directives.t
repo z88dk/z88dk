@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.8 2015-01-18 19:09:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.9 2015-01-19 22:50:01 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -579,3 +579,34 @@ END
 		defb p1,p2,p3,p4	;; 00 01 02 03
 END
 );
+
+#------------------------------------------------------------------------------
+# LSTON / LSTOFF
+#------------------------------------------------------------------------------
+z80asm(
+	asm		=> <<'END',
+		lstoff				;;
+		ld bc,1				;; 01 01 00
+		lston				;;
+		ld hl,1				;; 21 01 00
+END
+	options => "-b -l",
+);
+ok -f "test.lst", "test.lst exists";
+ok my @lines = read_file("test.lst");
+ok $lines[3] =~ /^ \s* $/x;
+ok $lines[4] =~ /^ 1 \s+ 0000                      \s+ lstoff          /x;
+ok $lines[5] =~ /^ 4 \s+ 0003 \s+ 21 \s+ 01 \s+ 00 \s+ ld     \s+ hl,1 /x;
+ok $lines[6] =~ /^ 5 \s+ 0006 \s* $/x;
+ok $lines[7] =~ /^ \s* $/x;
+
+z80asm(
+	asm		=> <<'END',
+		lstoff				;;
+		ld bc,1				;; 01 01 00
+		lston				;;
+		ld hl,1				;; 21 01 00
+END
+	options => "-b",
+);
+ok ! -f "test.lst", "test.lst does not exist";
