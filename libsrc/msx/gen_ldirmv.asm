@@ -4,11 +4,11 @@
 ;	LIDRMV
 ;
 ;
-;	$Id: gen_ldirmv.asm,v 1.1 2010-06-30 13:21:38 stefano Exp $
+;	$Id: gen_ldirmv.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	LIDRMV
-	LIB		SETRD
+	PUBLIC	LIDRMV
+	EXTERN		SETRD
 	
 	INCLUDE	"msx/vdp.inc"
 	

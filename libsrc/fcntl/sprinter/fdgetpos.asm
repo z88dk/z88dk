@@ -1,10 +1,10 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: fdgetpos.asm,v 1.1 2002-10-03 20:07:20 dom Exp $
+;	$Id: fdgetpos.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
 
-                XLIB    fdgetpos
+                PUBLIC    fdgetpos
 
 ;int fgetpos(int fd, long *dump)
 ;

@@ -7,12 +7,12 @@
 ;	Get a PSG register
 ;
 ;
-;	$Id: get_psg.asm,v 1.1 2013-11-21 09:03:38 stefano Exp $
+;	$Id: get_psg.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XLIB	get_psg
-	XDEF	psg_patch2
-	XDEF	psg_patch3
+	PUBLIC	get_psg
+	PUBLIC	psg_patch2
+	PUBLIC	psg_patch3
 	
 get_psg:
 

@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB fputc
-LIB fputc_callee
-XREF ASMDISP_FPUTC_CALLEE
+PUBLIC fputc
+EXTERN fputc_callee
+EXTERN ASMDISP_FPUTC_CALLEE
 
 .fputc
 

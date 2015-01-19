@@ -8,9 +8,9 @@
 ;	ZSock Lib function: tcp_pageout
 
 
-	XLIB	tcp_pageout
+	PUBLIC	tcp_pageout
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

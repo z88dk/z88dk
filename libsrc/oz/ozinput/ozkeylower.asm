@@ -9,11 +9,11 @@
 ;	returns key pressed bitmap for lower part of keyboard
 ;
 ; ------
-; $Id: ozkeylower.asm,v 1.2 2011-08-12 18:38:11 pauloscustodio Exp $
+; $Id: ozkeylower.asm,v 1.3 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
 
-	XLIB	ozkeylower
+	PUBLIC	ozkeylower
 
 
 ozkeylower:

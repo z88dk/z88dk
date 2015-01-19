@@ -4,12 +4,12 @@
 ;	Back to default FRAMES counter + 1 extra byte ;)
 ;
 ; --------
-; $Id: clock.asm,v 1.8 2013-10-12 15:11:56 stefano Exp $
+; $Id: clock.asm,v 1.9 2015-01-19 01:33:25 pauloscustodio Exp $
 
 
-	XLIB	clock
+	PUBLIC	clock
 ;	XREF	frames3
-	XREF	_FRAMES
+	EXTERN	_FRAMES
 
 .clock
 IF FORzx81

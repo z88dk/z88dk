@@ -6,17 +6,17 @@
 ;      int __CALLEE__ tape_save_block_callee(void *addr, size_t len, unsigned char type)
 ;
 ;
-;	$Id: tape_save_block_callee.asm,v 1.3 2014-09-28 18:27:01 pauloscustodio Exp $
+;	$Id: tape_save_block_callee.asm,v 1.4 2015-01-19 01:33:27 pauloscustodio Exp $
 ;
 
 
-XLIB tape_save_block_callee
-XDEF ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+PUBLIC tape_save_block_callee
+PUBLIC ASMDISP_TAPE_SAVE_BLOCK_CALLEE
 
-LIB  musamy_save
+EXTERN  musamy_save
 
-LIB zx_fast
-LIB zx_slow
+EXTERN zx_fast
+EXTERN zx_slow
 
 
 ; Very simple header, only check the 'type' byte in a Spectrum-ish way.

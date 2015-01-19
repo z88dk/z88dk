@@ -6,17 +6,17 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undrawb.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;	$Id: undrawb.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
 
-                XLIB    undrawb
+                PUBLIC    undrawb
 
-                LIB     drawbox
-                LIB     respixel
-                LIB     swapgfxbk
-                XREF	swapgfxbk1
+                EXTERN     drawbox
+                EXTERN     respixel
+                EXTERN     swapgfxbk
+                EXTERN	swapgfxbk1
 
 
 .undrawb

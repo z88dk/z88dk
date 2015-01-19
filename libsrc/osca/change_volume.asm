@@ -4,13 +4,13 @@
 ;
 ;	Wait video hardware to be ready
 ;
-;	$Id: change_volume.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: change_volume.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  change_volume
-	LIB   flos_err
+	PUBLIC  change_volume
+	EXTERN   flos_err
 	
 change_volume:
 	ld	a,l ; __FASTCALL__

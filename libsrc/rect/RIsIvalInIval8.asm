@@ -2,7 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIsIvalInIval8
+PUBLIC RIsIvalInIval8
 
 ; Determine if two 8-bit intervals intersect.  Intervals
 ; can wrap across 0-255 boundary.  Amazingly this test

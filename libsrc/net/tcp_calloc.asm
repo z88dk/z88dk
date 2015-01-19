@@ -8,9 +8,9 @@
 ;	ZSock Lib function: tcp_calloc
 
 
-	XLIB	tcp_calloc
+	PUBLIC	tcp_calloc
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

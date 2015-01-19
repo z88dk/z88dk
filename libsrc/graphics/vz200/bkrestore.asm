@@ -4,12 +4,12 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: bkrestore.asm,v 1.5 2009-01-23 13:48:12 stefano Exp $
+; $Id: bkrestore.asm,v 1.6 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 
-	XLIB    bkrestore
-	LIB	pixeladdress
+	PUBLIC    bkrestore
+	EXTERN	pixeladdress
 
 .bkrestore
 

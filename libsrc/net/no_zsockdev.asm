@@ -5,7 +5,7 @@
 ;	djm  7/2/2001
 
 
-	XLIB	no_zsock
+	PUBLIC	no_zsock
 
 
 

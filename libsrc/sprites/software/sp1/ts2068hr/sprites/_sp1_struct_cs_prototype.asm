@@ -1,5 +1,5 @@
 
-XLIB _sp1_struct_cs_prototype
+PUBLIC _sp1_struct_cs_prototype
 
 ._sp1_struct_cs_prototype
 

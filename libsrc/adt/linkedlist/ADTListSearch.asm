@@ -1,8 +1,8 @@
 ; void *adt_ListSearch(struct adt_List *list, void *match, void *item1)
 ; 02.2003, 08.2005 aralbrec
 
-XLIB ADTListSearch
-LIB l_jpix
+PUBLIC ADTListSearch
+EXTERN l_jpix
 
 ; enter: HL = struct adt_List *
 ;        DE = item1 *

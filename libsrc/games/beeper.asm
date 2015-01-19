@@ -1,13 +1,13 @@
-; $Id: beeper.asm,v 1.4 2013-10-21 14:23:44 stefano Exp $
+; $Id: beeper.asm,v 1.5 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; Generic 1 bit sound functions
 ;
 
-    XLIB     beeper
+    PUBLIC     beeper
     INCLUDE  "games/games.inc"
 
-    LIB      bit_open_di
-    LIB      bit_close_ei
+    EXTERN      bit_open_di
+    EXTERN      bit_close_ei
 
 ;
 ; Ported by Dominic Morris

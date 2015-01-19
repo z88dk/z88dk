@@ -11,12 +11,12 @@
 ;
 ;
 ; ------
-; $Id: ozdisplayactivepage.asm,v 1.1 2003-10-23 10:42:50 stefano Exp $
+; $Id: ozdisplayactivepage.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozdisplayactivepage
+	PUBLIC	ozdisplayactivepage
 	
-	XREF	ozactivepage
+	EXTERN	ozactivepage
 
 
 ozdisplayactivepage:

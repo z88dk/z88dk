@@ -5,18 +5,18 @@
 ;	void ozcircle(int x,int y,byte r,byte color);
 ;
 ; ------
-; $Id: ozcircle.asm,v 1.1 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozcircle.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozcircle
+	PUBLIC	ozcircle
 
-        LIB     swapgfxbk
-        LIB     swapgfxbk1
+        EXTERN     swapgfxbk
+        EXTERN     swapgfxbk1
 
-	LIB     draw_circle
-        LIB     ozplotpixel
+	EXTERN     draw_circle
+        EXTERN     ozplotpixel
         
-        LIB	ozpointcolor
+        EXTERN	ozpointcolor
 
 
 

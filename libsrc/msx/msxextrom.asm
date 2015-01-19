@@ -5,11 +5,11 @@
 ;	Internal function, call an EXTROM subroutine
 ;
 ;
-;	$Id: msxextrom.asm,v 1.1 2007-12-13 11:28:42 stefano Exp $
+;	$Id: msxextrom.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msxextrom
-	LIB	msxrompage
+	PUBLIC	msxextrom
+	EXTERN	msxrompage
 
 	defc EXTROM = $015f
 

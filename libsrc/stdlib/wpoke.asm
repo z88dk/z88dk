@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB wpoke
-LIB wpoke_callee
-XREF ASMDISP_WPOKE_CALLEE
+PUBLIC wpoke
+EXTERN wpoke_callee
+EXTERN ASMDISP_WPOKE_CALLEE
 
 .wpoke
 

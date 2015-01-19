@@ -6,13 +6,13 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.4 2013-11-13 11:04:54 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
 
-	XLIB	ansi_del_line
-	XREF	text_cols
-	XREF	ATTR
+	PUBLIC	ansi_del_line
+	EXTERN	text_cols
+	EXTERN	ATTR
 
 
 .ansi_del_line

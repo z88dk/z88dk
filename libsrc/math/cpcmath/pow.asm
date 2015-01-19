@@ -3,17 +3,17 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: pow.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: pow.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 
-		XLIB		pow
-		XDEF		powc
+		PUBLIC		pow
+		PUBLIC		powc
 
 
-		XREF		fa
+		EXTERN		fa
 
 .pow
 		ld      hl,8

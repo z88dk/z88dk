@@ -16,11 +16,11 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    atan2
+                PUBLIC    atan2
 
-                LIB	fsetup
-                LIB	stkequ2
-                XREF    fa
+                EXTERN	fsetup
+                EXTERN	stkequ2
+                EXTERN    fa
 
 
 .atan2

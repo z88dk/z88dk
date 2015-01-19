@@ -6,10 +6,10 @@
 ;
 ;	Stylish, this returned the wrong way! (djm 17/5/99)
 ;
-;	$Id: iscntrl.asm,v 1.4 2009-07-21 21:14:57 dom Exp $
+;	$Id: iscntrl.asm,v 1.5 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-XLIB iscntrl
+PUBLIC iscntrl
 
 ; FASTCALL
 

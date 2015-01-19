@@ -14,10 +14,10 @@
 ;	- 6 TS2068
 ;	(disabled) - 7 Scorpion or similar clone
 ;
-;	$Id: zx_model.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: zx_model.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
 ;
 
-	XLIB	zx_model
+	PUBLIC	zx_model
 	
 zx_model:
 

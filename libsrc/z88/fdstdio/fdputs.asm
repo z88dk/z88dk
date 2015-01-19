@@ -3,8 +3,8 @@
 
                 INCLUDE "stdio.def"
 
-                XLIB    fdputs    ;Print string
-                LIB     putconsole
+                PUBLIC    fdputs    ;Print string
+                EXTERN     putconsole
 
 
 .fdputs

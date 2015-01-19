@@ -1,8 +1,8 @@
-	xlib	drawbox
-	lib	plotpixel
+	PUBLIC	drawbox
+	EXTERN	plotpixel
 
 ;
-;	$Id: drawbox.asm,v 1.4 2002-03-28 11:08:49 stefano Exp $
+;	$Id: drawbox.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ***********************************************************************

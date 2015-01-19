@@ -8,17 +8,17 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm,v 1.7 2014-07-17 09:37:53 stefano Exp $
+;	$Id: plotpixl.asm,v 1.8 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
-			XLIB	plotpixel
+			PUBLIC	plotpixel
 
-			LIB	div3
-			XREF	coords
-			XREF	base_graphics
+			EXTERN	div3
+			EXTERN	coords
+			EXTERN	base_graphics
 
 .plotpixel
 			ld	a,h

@@ -1,4 +1,4 @@
-		XLIB	txtboldon
+		PUBLIC	txtboldon
 
 .txtboldon
 		jp 0xB842

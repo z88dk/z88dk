@@ -5,10 +5,10 @@
 ;	integer to float;
 ;
 ; ------
-; $Id: i2f.asm,v 1.1 2009-04-10 12:47:42 stefano Exp $
+; $Id: i2f.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
 ;
 
-	XLIB	i2f
+	PUBLIC	i2f
 	
 
 .i2f

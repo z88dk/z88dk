@@ -1,4 +1,4 @@
-; $Id: bit_fx.asm,v 1.1 2011-11-15 16:40:47 stefano Exp $
+; $Id: bit_fx.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 ; Generic platform sound effects module.
 ;
@@ -14,12 +14,12 @@
 ;>get there
 
 
-          XLIB     bit_fx
+          PUBLIC     bit_fx
           INCLUDE  "games/games.inc"
 
-          LIB      beeper
-          LIB      bit_open_di
-          LIB      bit_close_ei
+          EXTERN      beeper
+          EXTERN      bit_open_di
+          EXTERN      bit_close_ei
 
 
 ;Sound routine..enter in with e holding the desired effect!

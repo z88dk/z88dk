@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB rindex
-LIB strrchr_callee
-XREF ASMDISP_STRRCHR_CALLEE
+PUBLIC rindex
+EXTERN strrchr_callee
+EXTERN ASMDISP_STRRCHR_CALLEE
 
 .rindex
 

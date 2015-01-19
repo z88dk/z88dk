@@ -5,11 +5,11 @@
 ;
 ;	17/2/99 djm - rewritten to remove jp - shorter
 ;
-;	$Id: isupper.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
+;	$Id: isupper.asm,v 1.5 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-XLIB isupper
-LIB asm_isupper
+PUBLIC isupper
+EXTERN asm_isupper
 
 ; FASTCALL
 

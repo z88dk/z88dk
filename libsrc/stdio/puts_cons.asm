@@ -4,12 +4,12 @@
 ;	puts(char *s) - put string to screen
 ;
 ;
-;	$Id: puts_cons.asm,v 1.1 2007-10-04 10:28:47 stefano Exp $
+;	$Id: puts_cons.asm,v 1.2 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
 
-		XLIB	puts_cons
-		LIB	fputc_cons
+		PUBLIC	puts_cons
+		EXTERN	fputc_cons
 
 
 ; Enter in with hl holding the address of string to print

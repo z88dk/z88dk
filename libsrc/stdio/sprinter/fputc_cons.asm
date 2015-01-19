@@ -9,11 +9,11 @@
 ;
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2002-10-02 11:21:55 dom Exp $
+;	$Id: fputc_cons.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
-                XLIB    fputc_cons	;Print char
+                PUBLIC    fputc_cons	;Print char
 
 .fputc_cons
         ld      hl,2

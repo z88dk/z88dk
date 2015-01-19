@@ -10,15 +10,15 @@
 ;	Font Pointers
 ;
 ; ------
-; $Id: ozfontpointers.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozfontpointers.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozfontpointers
+	PUBLIC	ozfontpointers
 
-	XDEF	LowerFontPage1
-	XDEF	LowerFontPage2
-	XDEF	HigherFontPage1
-	XDEF	HigherFontPage2
+	PUBLIC	LowerFontPage1
+	PUBLIC	LowerFontPage2
+	PUBLIC	HigherFontPage1
+	PUBLIC	HigherFontPage2
 	
 ozfontpointers:
         defw    Font0

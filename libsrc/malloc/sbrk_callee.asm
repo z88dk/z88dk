@@ -1,11 +1,11 @@
 ; void __CALLEE__ sbrk_callee(void *addr, unsigned int size)
 ; 12.2006 aralbrec
 
-XLIB sbrk_callee
-XDEF ASMDISP_SBRK_CALLEE
+PUBLIC sbrk_callee
+PUBLIC ASMDISP_SBRK_CALLEE
 
-LIB HeapSbrk_callee
-XREF _heap, ASMDISP_HEAPSBRK_CALLEE
+EXTERN HeapSbrk_callee
+EXTERN _heap, ASMDISP_HEAPSBRK_CALLEE
 
 .sbrk_callee
 

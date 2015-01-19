@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;       $Id: point.asm,v 1.4 2007-08-17 13:52:33 stefano Exp $
+;       $Id: point.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
@@ -14,11 +14,11 @@
 ;Result is true/false
 
 
-                XLIB    point
+                PUBLIC    point
 
-                LIB     pointxy
-                LIB     swapgfxbk
-                LIB     swapgfxbk1
+                EXTERN     pointxy
+                EXTERN     swapgfxbk
+                EXTERN     swapgfxbk1
 
 
 .point

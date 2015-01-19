@@ -4,7 +4,7 @@
 ;
 ;	Supporting helpers
 ;
-		XLIB nc_lseek		; can't call it fseek as the OS does
+		PUBLIC nc_lseek		; can't call it fseek as the OS does
 
 .nc_lseek	pop hl
 		pop de

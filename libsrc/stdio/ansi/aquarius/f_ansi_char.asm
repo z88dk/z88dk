@@ -9,18 +9,18 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2001-12-27 09:35:57 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 	
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 	
-	XREF	aquarius_attr
+	EXTERN	aquarius_attr
 
 .text_cols   defb 40
 .text_rows   defb 24

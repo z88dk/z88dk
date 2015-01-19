@@ -1,8 +1,8 @@
 ; void wpoke_callee(void *addr, uint word)
 ; 11.2006 aralbrec
 
-XLIB wpoke_callee
-XDEF ASMDISP_WPOKE_CALLEE
+PUBLIC wpoke_callee
+PUBLIC ASMDISP_WPOKE_CALLEE
 
 .wpoke_callee
 

@@ -4,10 +4,10 @@
 ;
 ; int print_error(code)
 ;
-;       $Id: print_error.asm,v 1.2 2013-12-05 09:34:01 stefano Exp $
+;       $Id: print_error.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-XLIB print_error
+PUBLIC print_error
 
 print_error:
 	ld	a,l

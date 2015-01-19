@@ -2,8 +2,8 @@
 ; swap N bytes in the two memory regions
 ; 01.2007 aralbrec
 
-XLIB memswap_callee
-XDEF ASMDISP_MEMSWAP_CALLEE
+PUBLIC memswap_callee
+PUBLIC ASMDISP_MEMSWAP_CALLEE
 
 .memswap_callee
 

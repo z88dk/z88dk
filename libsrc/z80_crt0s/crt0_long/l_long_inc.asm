@@ -6,7 +6,7 @@
 ;       djm 26/2/2000
 ;       aralbrec 01/2007
 
-XLIB    l_long_inc
+PUBLIC    l_long_inc
 
 .l_long_inc
 

@@ -1,7 +1,7 @@
 ; uint in_JoyTimex1(void)
 ; 2002 aralbrec
 
-XLIB in_JoyTimex1
+PUBLIC in_JoyTimex1
 
 ; exit : A = HL = F000RLDU active high
 ; uses : AF,HL

@@ -11,22 +11,22 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.5 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 
     INCLUDE "cpcfirm.def"
                
 	
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 
-	XREF	INVRS
-	XREF	UNDRL
+	EXTERN	INVRS
+	EXTERN	UNDRL
 	
 .text_cols   defb 80
 

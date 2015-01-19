@@ -1,4 +1,4 @@
-	XLIB	load_tiles
+	PUBLIC	load_tiles
 
 ;==============================================================
 ; load_tiles(unsigned char *data, int index, int count, int bpp)	

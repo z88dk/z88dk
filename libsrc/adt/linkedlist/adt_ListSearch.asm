@@ -1,10 +1,10 @@
 ; void *adt_ListSearch(struct adt_List *list, void *match, void *item1)
 ; CALLER linkage for function pointers
 
-XLIB adt_ListSearch
+PUBLIC adt_ListSearch
 
-LIB adt_ListSearch_callee
-XREF ASMDISP_ADT_LISTSEARCH_CALLEE
+EXTERN adt_ListSearch_callee
+EXTERN ASMDISP_ADT_LISTSEARCH_CALLEE
 
 .adt_ListSearch
 

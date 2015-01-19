@@ -2,7 +2,7 @@
 ; 	ANSI Video handling for the Sharp OZ family
 ;	Stefano Bodrato - Nov. 2002
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2002-11-20 14:15:19 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 ; 	Handles Attributes INVERSE + UNDERLINED
 ;
@@ -39,22 +39,22 @@
 ;
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 	
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 	
-	XREF	base_graphics
+	EXTERN	base_graphics
 	
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 
-	LIB     swapgfxbk
-        XREF	swapgfxbk1
+	EXTERN     swapgfxbk
+        EXTERN	swapgfxbk1
 
 	
 ; Dirty thing for self modifying code
-	XDEF	INVRS
+	PUBLIC	INVRS
 
 .text_cols   defb columns
 .text_rows   defb 10

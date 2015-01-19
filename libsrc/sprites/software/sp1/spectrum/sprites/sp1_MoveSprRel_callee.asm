@@ -2,11 +2,11 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB sp1_MoveSprRel_callee
-XDEF ASMDISP_SP1_MOVESPRREL_CALLEE
+PUBLIC sp1_MoveSprRel_callee
+PUBLIC ASMDISP_SP1_MOVESPRREL_CALLEE
 
-LIB sp1_MoveSprAbs_callee
-XREF ASMDISP_SP1_MOVESPRABS_CALLEE
+EXTERN sp1_MoveSprAbs_callee
+EXTERN ASMDISP_SP1_MOVESPRABS_CALLEE
 
 .sp1_MoveSprRel_callee
 

@@ -6,11 +6,11 @@
 ; Doesn't directly set the current cursor position
 ;--------------------------------------------------------------
 ;
-;       $Id: scrolluptxt.asm,v 1.1 2010-05-06 14:42:38 stefano Exp $
+;       $Id: scrolluptxt.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 
-        XLIB    scrolluptxt
+        PUBLIC    scrolluptxt
 
 scrolluptxt:
 	ld	hl,(16396)

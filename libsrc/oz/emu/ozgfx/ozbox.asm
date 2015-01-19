@@ -5,16 +5,16 @@
 ;	void ozbox(int x, int y, int width, int height);
 ;
 ; ------
-; $Id: ozbox.asm,v 1.1 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozbox.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozbox
+	PUBLIC	ozbox
 
-        LIB     swapgfxbk
-        LIB     swapgfxbk1
+        EXTERN     swapgfxbk
+        EXTERN     swapgfxbk1
 
-        LIB     drawbox
-        LIB     plotpixel	; yes, this costs some byte, but I preferred to
+        EXTERN     drawbox
+        EXTERN     plotpixel	; yes, this costs some byte, but I preferred to
         			; leave ozpointcolor and ozplotpixel as they are.
 
 

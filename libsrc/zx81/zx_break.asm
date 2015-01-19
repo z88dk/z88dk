@@ -1,7 +1,7 @@
 ;
 ;       ZX81 libraries
 ;
-;       $Id: zx_break.asm,v 1.2 2012-01-09 16:02:36 stefano Exp $
+;       $Id: zx_break.asm,v 1.3 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -10,7 +10,7 @@
 ;
 ;----------------------------------------------------------------
 
-        XLIB    zx_break
+        PUBLIC    zx_break
 
 zx_break:
 				call $f46	; BREAK-1

@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: zx_cls.asm,v 1.6 2012-12-31 10:38:24 stefano Exp $
+;	$Id: zx_cls.asm,v 1.7 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -11,13 +11,13 @@
 ;
 ;----------------------------------------------------------------
 
-	XLIB   zx_cls
+	PUBLIC   zx_cls
 	
 IF FORzx81
-	LIB	   restore81
-	LIB    zx_topleft
+	EXTERN	   restore81
+	EXTERN    zx_topleft
 ELSE
-	LIB    filltxt
+	EXTERN    filltxt
 ENDIF
 
 zx_cls:

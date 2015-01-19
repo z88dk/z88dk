@@ -10,12 +10,12 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.5 2014-10-28 21:07:08 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.6 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
 
-	XLIB	ansi_del_line
-	XREF	base_graphics
+	PUBLIC	ansi_del_line
+	EXTERN	base_graphics
 
 
 .ansi_del_line

@@ -7,17 +7,17 @@
 ;       Inverts pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.3 2014-04-18 09:30:31 stefano Exp $
+;	$Id: xorpixl.asm,v 1.4 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 
 			INCLUDE	"graphics/text/textgfx.inc"
 
-			XLIB	xorpixel
+			PUBLIC	xorpixel
 
-			LIB	textpixl
-			XREF	coords
-			XREF	base_graphics
+			EXTERN	textpixl
+			EXTERN	coords
+			EXTERN	base_graphics
 
 
 .xorpixel			

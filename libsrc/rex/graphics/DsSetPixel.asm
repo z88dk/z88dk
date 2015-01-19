@@ -3,8 +3,8 @@
 ;
 ;	$Id;$
 
-	XLIB	DsSetPixel
-	LIB	setpix
+	PUBLIC	DsSetPixel
+	EXTERN	setpix
 
 
 .DsSetPixel

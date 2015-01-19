@@ -5,12 +5,12 @@
 ; 11/3/99 djm ***UNTESTED***
 ;
 ;
-;	$Id: fdgetpos.asm,v 1.4 2014-04-11 11:14:00 stefano Exp $
+;	$Id: fdgetpos.asm,v 1.5 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
                 INCLUDE "fileio.def"
 
-                XLIB    fdgetpos
+                PUBLIC    fdgetpos
 
 ;int fgetpos(int fd, long *dump)
 ;

@@ -1,6 +1,6 @@
 
-XLIB ADThcompare
-LIB l_jpiy
+PUBLIC ADThcompare
+EXTERN l_jpiy
 
 .ADThcompare
 

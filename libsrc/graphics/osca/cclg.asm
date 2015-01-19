@@ -3,16 +3,16 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: cclg.asm,v 1.1 2012-01-31 20:58:07 stefano Exp $
+;	$Id: cclg.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
     INCLUDE "osca.def"
 
-                XLIB    cclg
+                PUBLIC    cclg
 
-                LIB     swapgfxbk
-                XREF    swapgfxbk1
+                EXTERN     swapgfxbk
+                EXTERN    swapgfxbk1
 
 ;	LIB y_offset_list
 ;	XREF	base_graphics

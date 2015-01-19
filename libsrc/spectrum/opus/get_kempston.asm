@@ -5,10 +5,10 @@
 ;
 ; 	This routine get the kempston joystick emulation status.
 ;
-;	$Id: get_kempston.asm,v 1.1 2007-10-04 12:18:55 stefano Exp $
+;	$Id: get_kempston.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
-	XLIB	get_kempston
+	PUBLIC	get_kempston
 	
 get_kempston:
 

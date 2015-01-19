@@ -6,10 +6,10 @@
 ;	Stefano Bodrato - Apr 2001
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.3 2001-11-05 09:47:11 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.4 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
-	XLIB	fputc_cons
+	PUBLIC	fputc_cons
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 

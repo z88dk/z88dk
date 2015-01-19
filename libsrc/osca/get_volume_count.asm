@@ -4,12 +4,12 @@
 ;
 ;	Get number of volumes available
 ;
-;	$Id: get_volume_count.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: get_volume_count.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  get_volume_count
+	PUBLIC  get_volume_count
 	
 get_volume_count:
 	call	kjt_get_volume_info

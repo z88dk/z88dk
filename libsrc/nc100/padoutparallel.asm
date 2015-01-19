@@ -1,5 +1,5 @@
 
-		XLIB	padoutparallel
+		PUBLIC	padoutparallel
 ; fast call
 .padoutparallel
 		ld a, l

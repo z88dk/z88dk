@@ -8,9 +8,9 @@
 ;	ZSock Lib function: sethostaddr
 
 
-	XLIB	sethostaddr
+	PUBLIC	sethostaddr
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

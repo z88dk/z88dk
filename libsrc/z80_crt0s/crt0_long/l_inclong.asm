@@ -5,7 +5,7 @@
 ;       djm 21/2/99
 ;       Rewritten so that I know it works properly!
 
-                XLIB    l_inclong
+                PUBLIC    l_inclong
 
 .l_inclong
 

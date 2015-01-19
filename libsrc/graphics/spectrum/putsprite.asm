@@ -8,12 +8,12 @@
 ; no need anymore of the row table, saving a lot of memory.
 ;
 ;
-; $Id: putsprite.asm,v 1.4 2009-08-27 16:51:17 stefano Exp $
+; $Id: putsprite.asm,v 1.5 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
-	XLIB    putsprite
-	LIB	pixeladdress
-	LIB	zx_saddrpdown
+	PUBLIC    putsprite
+	EXTERN	pixeladdress
+	EXTERN	zx_saddrpdown
 
 	INCLUDE	"graphics/grafix.inc"
 

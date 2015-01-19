@@ -1,8 +1,8 @@
 
-	xlib	rightbitmask
+	PUBLIC	rightbitmask
 
 ;
-;	$Id: rbitmask.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: rbitmask.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ************************************************************************

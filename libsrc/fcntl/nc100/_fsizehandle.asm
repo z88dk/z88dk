@@ -4,7 +4,7 @@
 ;
 ;	Supporting helpers
 ;
-		XLIB _fsizehandle
+		PUBLIC _fsizehandle
 ; fastcall
 ._fsizehandle	ex de, hl
 		jp 0xB8B7		; fsizehandle

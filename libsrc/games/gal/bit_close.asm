@@ -1,4 +1,4 @@
-; $Id: bit_close.asm,v 1.1 2008-12-09 17:48:18 stefano Exp $
+; $Id: bit_close.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; Galaksija 1 bit sound functions
 ;
@@ -7,7 +7,7 @@
 ; Stefano Bodrato
 ;
 
-    XLIB     bit_close
+    PUBLIC     bit_close
 
 .bit_close
           ret

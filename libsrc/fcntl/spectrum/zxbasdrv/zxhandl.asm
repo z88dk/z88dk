@@ -3,9 +3,9 @@
 ;
 ; Stefano - 5/7/2006
 ;
-; $Id: zxhandl.asm,v 1.1 2006-07-18 21:02:55 stefano Exp $
+; $Id: zxhandl.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 
-	XLIB	zxhandl
+	PUBLIC	zxhandl
 	
 ; handles: list of used streams, we keep #14 an #15 reserved,
 ;          10 files open at once should be enough.

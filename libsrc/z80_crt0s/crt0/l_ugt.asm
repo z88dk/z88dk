@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-XLIB    l_ugt
+PUBLIC    l_ugt
 
 ;
 ; DE > HL [unsigned]

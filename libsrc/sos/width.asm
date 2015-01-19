@@ -4,12 +4,12 @@
 ;
 ;; int width(columns)
 ;
-;       $Id: width.asm,v 1.2 2013-12-05 09:34:01 stefano Exp $
+;       $Id: width.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
 
-XLIB width
+PUBLIC width
 
 width:
    ld	a,l

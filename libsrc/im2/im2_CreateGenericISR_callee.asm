@@ -1,10 +1,10 @@
 ; void __CALLEE__ *im2_CreateGenericISR_callee(uchar numhooks, void *addr)
 ; 04.2004 aralbrec
 
-XLIB im2_CreateGenericISR_callee
-XDEF ASMDISP_IM2_CREATEGENERICISR_CALLEE
+PUBLIC im2_CreateGenericISR_callee
+PUBLIC ASMDISP_IM2_CREATEGENERICISR_CALLEE
 
-LIB IM2CreateCommon
+EXTERN IM2CreateCommon
 
 .im2_CreateGenericISR_callee
 

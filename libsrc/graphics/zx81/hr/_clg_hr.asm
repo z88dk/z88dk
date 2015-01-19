@@ -8,12 +8,12 @@
 ;       Stefano - 10/1/2007
 ;
 ;
-;	$Id: _clg_hr.asm,v 1.1 2014-10-27 20:38:15 stefano Exp $
+;	$Id: _clg_hr.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-                XLIB    _clg_hr
-                XREF	base_graphics
-                XREF	hr_rows
+                PUBLIC    _clg_hr
+                EXTERN	base_graphics
+                EXTERN	hr_rows
 
 ._clg_hr
 ;----------------------------------------------------------------

@@ -1,10 +1,10 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: rmdir.asm,v 1.1 2002-11-20 20:28:44 dom Exp $
+;	$Id: rmdir.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
 
-                XLIB   rmdir
+                PUBLIC   rmdir
 
 ;int rmdir(char *path, mode_t mode)
 

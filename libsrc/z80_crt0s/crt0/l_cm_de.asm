@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_cm_de
+                PUBLIC    l_cm_de
 
 
 .l_cm_de

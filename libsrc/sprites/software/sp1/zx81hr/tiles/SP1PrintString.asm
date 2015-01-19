@@ -2,12 +2,12 @@
 ; 02.2008 aralbrec, Sprite Pack v3.0
 ; zx81 hi-res version
 
-XLIB SP1PrintString
+PUBLIC SP1PrintString
 
-LIB sp1_GetUpdateStruct_callee, l_jpix
-XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
-XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
-XREF SP1V_TEMP_IX, SP1V_TEMP_AF
+EXTERN sp1_GetUpdateStruct_callee, l_jpix
+EXTERN ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
+EXTERN SP1V_UPDATELISTT, SP1V_DISPWIDTH
+EXTERN SP1V_TEMP_IX, SP1V_TEMP_AF
 
 ; A sophisticated print string function
 ;

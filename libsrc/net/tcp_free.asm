@@ -8,9 +8,9 @@
 ;	ZSock Lib function: tcp_free
 
 
-	XLIB	tcp_free
+	PUBLIC	tcp_free
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

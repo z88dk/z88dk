@@ -2,11 +2,11 @@
 ;	Z88dk Z88 Maths Library
 ;
 ;
-;	$Id: stkequ.asm,v 1.1 2008-07-27 21:44:58 aralbrec Exp $
+;	$Id: stkequ.asm,v 1.2 2015-01-19 01:32:56 pauloscustodio Exp $
 
-		XLIB	stkequ
+		PUBLIC	stkequ
 
-		XREF	fa
+		EXTERN	fa
 
 ;Equalise the stack, and put the calculated value into FA
 

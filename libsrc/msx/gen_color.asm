@@ -5,13 +5,13 @@
 ;
 ;	Change the color attributes (MSX style)
 ;
-;	$Id: gen_color.asm,v 1.1 2010-06-30 13:21:38 stefano Exp $
+;	$Id: gen_color.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_color
+	PUBLIC	msx_color
 
-	LIB	SETWRT
-	LIB	set_vdp_reg
+	EXTERN	SETWRT
+	EXTERN	set_vdp_reg
 	
 	;XREF	SCRMOD
 

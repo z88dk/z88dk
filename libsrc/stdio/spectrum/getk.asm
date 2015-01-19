@@ -6,11 +6,11 @@
 ;	17/5/99 djm
 ;
 ;
-;	$Id: getk.asm,v 1.3 2003-01-24 23:20:17 dom Exp $
+;	$Id: getk.asm,v 1.4 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
-		XLIB	getk
+		PUBLIC	getk
 
 .getk
 	ld	h,0

@@ -8,14 +8,14 @@
 ;       Reset pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl_smc.asm,v 1.1 2007-01-04 17:41:34 stefano Exp $
+;	$Id: respixl_smc.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-		XLIB	respixel
+		PUBLIC	respixel
 
-		LIB	pixel
-		XREF	pixmode
+		EXTERN	pixel
+		EXTERN	pixmode
 
 .respixel	push	hl
 		ld	hl,0A62Fh	; CPL - AND (HL)

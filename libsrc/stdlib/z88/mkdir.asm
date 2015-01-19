@@ -8,14 +8,14 @@
 ; This doesn't check for validity of filename at all.
 ;
 ; -----
-; $Id: mkdir.asm,v 1.5 2014-04-11 11:14:01 stefano Exp $
+; $Id: mkdir.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
 
                 INCLUDE "fileio.def"
                 INCLUDE "stdio.def"
                 INCLUDE "dor.def"
                 INCLUDE "error.def"
 
-                XLIB    mkdir
+                PUBLIC    mkdir
 
 ;int mkdir(char *s1,int mode)
 ;on stack:

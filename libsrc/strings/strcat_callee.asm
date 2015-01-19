@@ -2,9 +2,9 @@
 ; copy src to end of dst
 ; 12.2006 aralbrec
 
-XLIB strcat_callee
-XDEF ASMDISP_STRCAT_CALLEE
-LIB     rcmx_cpir
+PUBLIC strcat_callee
+PUBLIC ASMDISP_STRCAT_CALLEE
+EXTERN     rcmx_cpir
 
 
 .strcat_callee

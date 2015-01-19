@@ -1,4 +1,4 @@
-; $Id: bit_synth_mwr.asm,v 1.1 2008-03-31 17:16:19 stefano Exp $
+; $Id: bit_synth_mwr.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; void bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4);
 ;
@@ -14,11 +14,11 @@
 ; This routine shouldn't stay in contended memory locations !!
 ;
 
-          XLIB     bit_synth
+          PUBLIC     bit_synth
           INCLUDE  "games/games.inc"
 
-          LIB      bit_open_di
-          LIB      bit_close_ei
+          EXTERN      bit_open_di
+          EXTERN      bit_close_ei
 
 .bit_synth
           ld      ix,2

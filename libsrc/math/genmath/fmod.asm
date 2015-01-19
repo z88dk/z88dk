@@ -9,12 +9,12 @@
 ;       Don't know if it works correctly..let me know!
 
 
-                XLIB    fmod
-                LIB	pushfa
-                LIB	fdiv
-                LIB	floor
-                LIB	fsub
-                LIB	fmul
+                PUBLIC    fmod
+                EXTERN	pushfa
+                EXTERN	fdiv
+                EXTERN	floor
+                EXTERN	fsub
+                EXTERN	fmul
 
 
 ;

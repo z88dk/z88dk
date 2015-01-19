@@ -1,8 +1,8 @@
 ; int isoob(int)
 ; 08.2009 aralbrec
 
-XLIB isoob
-LIB asm_isoob
+PUBLIC isoob
+EXTERN asm_isoob
 
 ; FASTCALL
 

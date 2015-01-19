@@ -4,12 +4,12 @@
 ; PC6001 version
 ;
 ;
-; $Id: bkrestore.asm,v 1.1 2013-01-24 15:31:38 stefano Exp $
+; $Id: bkrestore.asm,v 1.2 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 
-	XLIB    bkrestore
-	LIB	pixeladdress
+	PUBLIC    bkrestore
+	EXTERN	pixeladdress
 
 .bkrestore
 

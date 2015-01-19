@@ -2,11 +2,11 @@
 ; 02.2008 aralbrec, Sprite Pack v3.0
 ; zx81 hi-res version
 
-XLIB sp1_InitCharStruct_callee
-XDEF ASMDISP_SP1_INITCHARSTRUCT_CALLEE
+PUBLIC sp1_InitCharStruct_callee
+PUBLIC ASMDISP_SP1_INITCHARSTRUCT_CALLEE
 
-LIB _sp1_struct_cs_prototype
-XREF SP1V_ROTTBL
+EXTERN _sp1_struct_cs_prototype
+EXTERN SP1V_ROTTBL
 
 .sp1_InitCharStruct_callee
 

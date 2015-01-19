@@ -10,7 +10,7 @@
 ;	$Id:
 ;
 
-	XLIB	trdos_installed
+	PUBLIC	trdos_installed
 	
 trdos_installed:
 	ld	hl,(23635)

@@ -11,12 +11,12 @@
 ;
 ;
 ; ------
-; $Id: ozhour.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozhour.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XLIB	ozhour
+	PUBLIC	ozhour
 
-	LIB	Compute	
+	EXTERN	Compute	
 
 ozhour:
         ld      c,35h

@@ -12,8 +12,8 @@
 ;
 ;       Replaced use of ix with bcbc'
 
-XLIB    l_long_div_u
-XDEF    L_LONG_DIVIDE0, L_LONG_DIVENTRY
+PUBLIC    l_long_div_u
+PUBLIC    L_LONG_DIVIDE0, L_LONG_DIVENTRY
 
 ; 32 bit division
 ; enter:

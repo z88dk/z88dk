@@ -6,15 +6,15 @@
 ;       Clear the graph. screen
 ;
 ;
-;	$Id: clg.asm,v 1.3 2003-05-21 13:52:35 stefano Exp $
+;	$Id: clg.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 
-	XLIB    clg
-	XREF	base_graphics
+	PUBLIC    clg
+	EXTERN	base_graphics
 
-	LIB     swapgfxbk
-	XREF	swapgfxbk1
+	EXTERN     swapgfxbk
+	EXTERN	swapgfxbk1
 
 .clg
 

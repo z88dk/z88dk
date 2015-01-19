@@ -4,11 +4,11 @@
 ; Return absolute value of long
 ;
 ; -----
-; $Id: labs_callee.asm,v 1.2 2014-09-28 18:27:00 pauloscustodio Exp $
+; $Id: labs_callee.asm,v 1.3 2015-01-19 01:33:22 pauloscustodio Exp $
 
-XLIB labs_callee
-LIB l_long_neg
-XDEF ASMDISP_LABS_CALLEE
+PUBLIC labs_callee
+EXTERN l_long_neg
+PUBLIC ASMDISP_LABS_CALLEE
 
 .labs_callee
 

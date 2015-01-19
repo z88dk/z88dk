@@ -1,10 +1,10 @@
 ; uint sp1_ScreenStr(uchar row, uchar col)
 ; CALLER linkage for function pointers
 
-XLIB sp1_ScreenStr
+PUBLIC sp1_ScreenStr
 
-LIB sp1_ScreenStr_callee
-XREF ASMDISP_SP1_SCREENSTR_CALLEE
+EXTERN sp1_ScreenStr_callee
+EXTERN ASMDISP_SP1_SCREENSTR_CALLEE
 
 .sp1_ScreenStr
 

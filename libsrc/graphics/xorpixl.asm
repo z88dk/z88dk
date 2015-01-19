@@ -1,12 +1,12 @@
 	INCLUDE	"graphics/grafix.inc"
 
-	XLIB	xorpixel
+	PUBLIC	xorpixel
 
-	LIB pixeladdress
-	XREF	coords
+	EXTERN pixeladdress
+	EXTERN	coords
 
 ;
-;	$Id: xorpixl.asm,v 1.5 2014-04-18 09:30:31 stefano Exp $
+;	$Id: xorpixl.asm,v 1.6 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

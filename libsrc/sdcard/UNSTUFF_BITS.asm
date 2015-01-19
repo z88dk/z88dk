@@ -1,10 +1,10 @@
 ; unsigned long UNSTUFF_BITS(unsigned char *resp, unsigned int start, unsigned int size)
 ; CALLER linkage for function pointers
 
-XLIB UNSTUFF_BITS
+PUBLIC UNSTUFF_BITS
 
-LIB UNSTUFF_BITS_callee
-XREF ASMDISP_UNSTUFF_BITS_CALLEE
+EXTERN UNSTUFF_BITS_callee
+EXTERN ASMDISP_UNSTUFF_BITS_CALLEE
 
 .UNSTUFF_BITS
 

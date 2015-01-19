@@ -3,10 +3,10 @@
 ;
 ;
 ; ------
-; $Id: clock.asm,v 1.1 2010-05-31 10:32:57 stefano Exp $
+; $Id: clock.asm,v 1.2 2015-01-19 01:33:24 pauloscustodio Exp $
 ;
 
-	XLIB	clock
+	PUBLIC	clock
 
 .clock
 	ld	hl,($3C2B)

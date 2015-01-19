@@ -15,12 +15,12 @@
 
 
 
-                XLIB    itox
-                LIB     l_gint
-                LIB     l_pint
-                LIB     l_neg
-                LIB     l_and
-                LIB     l_asr
+                PUBLIC    itox
+                EXTERN     l_gint
+                EXTERN     l_pint
+                EXTERN     l_neg
+                EXTERN     l_and
+                EXTERN     l_asr
 
 .itox
 ; if (sz > 0)

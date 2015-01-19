@@ -11,12 +11,12 @@
 ;
 ;
 ; ------
-; $Id: ozmonth.asm,v 1.1 2003-10-21 17:15:22 stefano Exp $
+; $Id: ozmonth.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XDEF	ozmonth
+	PUBLIC	ozmonth
 	
-	LIB	Compute	
+	EXTERN	Compute	
 
 ozmonth:
         ld      c,3ah

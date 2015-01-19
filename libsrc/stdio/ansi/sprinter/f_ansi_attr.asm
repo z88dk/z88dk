@@ -12,12 +12,12 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2002-10-10 22:03:26 dom Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_attr
+	PUBLIC	ansi_attr
 
-	XDEF	text_attr
+	PUBLIC	text_attr
 
 ; 0 = reset all attributes
 ; 1 = bold on

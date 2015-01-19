@@ -8,8 +8,8 @@
 
 ; ----- void __CALLEE__ vz_gotoxy_callee(int x, int y)
 
-XLIB vz_gotoxy_callee
-XDEF ASMDISP_VZ_GOTOXY_CALLEE
+PUBLIC vz_gotoxy_callee
+PUBLIC ASMDISP_VZ_GOTOXY_CALLEE
 
 .vz_gotoxy_callee
 

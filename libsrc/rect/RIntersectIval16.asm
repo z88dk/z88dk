@@ -2,7 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIntersectIval16
+PUBLIC RIntersectIval16
 
 ; Returns the intersection of two 16-bit intervals.
 ; Since intervals can wrap across the 0-65535 boundary,

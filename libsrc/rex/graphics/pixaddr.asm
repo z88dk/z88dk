@@ -1,9 +1,9 @@
 ;
 ;	written by Waleed Hasan
 ;
-;	$Id: pixaddr.asm,v 1.2 2003-03-13 15:02:09 dom Exp $
+;	$Id: pixaddr.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
 
-	XLIB	pixaddr
+	PUBLIC	pixaddr
 	
 ;
 ; LCD memory pixel addres

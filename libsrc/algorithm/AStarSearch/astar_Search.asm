@@ -16,15 +16,15 @@
 ;   does not perform this cleanup automatically on exit in order
 ;   to allow search resumption.
 
-XLIB astar_Search
-XDEF ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS, ASMDISP_ASTAR_SEARCH_RESUME_FAIL
+PUBLIC astar_Search
+PUBLIC ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS, ASMDISP_ASTAR_SEARCH_RESUME_FAIL
 
-LIB l_setmem, l_jpix, ADTHeapAdd, ADTHeapExtract, astar_DeletePath
-XREF _u_malloc, _u_free
+EXTERN l_setmem, l_jpix, ADTHeapAdd, ADTHeapExtract, astar_DeletePath
+EXTERN _u_malloc, _u_free
 
-XREF _astar_TestAndClose, _astar_Successor
-XREF _astar_queue, _astar_queueSize, _astar_queueN
-XREF _astar_startNode, _astar_destNode
+EXTERN _astar_TestAndClose, _astar_Successor
+EXTERN _astar_queue, _astar_queueSize, _astar_queueN
+EXTERN _astar_startNode, _astar_destNode
 
 .astar_Search
 

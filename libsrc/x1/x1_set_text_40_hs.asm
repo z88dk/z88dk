@@ -3,13 +3,13 @@
 ;   switch to 40 columns text mode
 ;	Uses high resolution text if available
 ;
-;	$Id: x1_set_text_40_hs.asm,v 1.1 2013-11-18 16:13:11 stefano Exp $
+;	$Id: x1_set_text_40_hs.asm,v 1.2 2015-01-19 01:33:25 pauloscustodio Exp $
 ;
 
-	XLIB	x1_set_text_40_hs
+	PUBLIC	x1_set_text_40_hs
 ;	LIB		x1_get_pcg_version
-	LIB		set_crtc_10
-	XREF	text_cols
+	EXTERN		set_crtc_10
+	EXTERN	text_cols
 
 
 ;t40v1:

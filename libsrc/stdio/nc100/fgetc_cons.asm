@@ -9,13 +9,13 @@
 ;	On an nc100 we have to test for "yellow"
 
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
 
-		XLIB	fgetc_cons
+		PUBLIC	fgetc_cons
 
-		XREF	cleanup		;in crt0
+		EXTERN	cleanup		;in crt0
 
 .fgetc_cons
 	call	$B9B3	;kmreadchar

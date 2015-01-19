@@ -3,8 +3,8 @@
 ; 01.2008 aralbrec, Sprite Pack v3.0
 ; ts2068 hi-res version
 
-XLIB sp1_RemoveCharStruct
-LIB SP1RemoveSprChar
+PUBLIC sp1_RemoveCharStruct
+EXTERN SP1RemoveSprChar
 
 ; remove an independent char struct that may be
 ; inserted into a struct_sp1_update's draw list

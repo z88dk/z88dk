@@ -3,7 +3,7 @@
 ; 01.2008 aralbrec, Sprite Pack v3.0
 ; ts2068 hi-res version
 
-XLIB sp1_RemoveUpdateStruct
+PUBLIC sp1_RemoveUpdateStruct
 
 ; FASTCALL
 

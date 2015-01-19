@@ -3,14 +3,14 @@
 ;	code by Luca Bisti
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;	
-;	$Id: mmc_fastpage.asm,v 1.2 2010-03-27 18:59:25 stefano Exp $ 
+;	$Id: mmc_fastpage.asm,v 1.3 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; Page in the requested ZXMMC bank
 ;-----------------------------------------------------------------------------------------
 ;
 
-	XLIB	mmc_fastpage
+	PUBLIC	mmc_fastpage
 	
 	INCLUDE "zxmmc.def"
 

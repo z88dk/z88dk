@@ -8,10 +8,10 @@
 ;	int currah_detect();
 ;
 ;
-;	$Id: currah_detect.asm,v 1.1 2008-06-29 08:25:48 aralbrec Exp $
+;	$Id: currah_detect.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
 ;
 
-	XLIB	currah_detect
+	PUBLIC	currah_detect
 	
 currah_detect:
 	

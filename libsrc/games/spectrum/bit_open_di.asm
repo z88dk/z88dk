@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.5 2014-01-03 15:20:43 stefano Exp $
+; $Id: bit_open_di.asm,v 1.6 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -7,9 +7,9 @@
 ; Stefano Bodrato - 28/9/2001
 ;
 
-    XLIB     bit_open_di
-    XREF     snd_tick
-    XREF     bit_irqstatus
+    PUBLIC     bit_open_di
+    EXTERN     snd_tick
+    EXTERN     bit_irqstatus
 
     INCLUDE  "games/games.inc"
     

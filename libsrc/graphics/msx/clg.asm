@@ -3,12 +3,12 @@
 ;
 ;       MSX version by Stefano Bodrato, December 2007
 ;
-;	$Id: clg.asm,v 1.8 2009-06-22 21:44:17 dom Exp $
+;	$Id: clg.asm,v 1.9 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
-        XLIB    clg
-        LIB	msxbios
-        LIB	msx_color
+        PUBLIC    clg
+        EXTERN	msxbios
+        EXTERN	msx_color
 
         INCLUDE	"graphics/grafix.inc"
 

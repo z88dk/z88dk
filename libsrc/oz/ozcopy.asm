@@ -9,10 +9,10 @@
 ;
 ;
 ; ------
-; $Id: ozcopy.asm,v 1.1 2003-10-21 17:15:19 stefano Exp $
+; $Id: ozcopy.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozcopy
+	PUBLIC	ozcopy
 	
 defc	load_address = 0ff02h
 

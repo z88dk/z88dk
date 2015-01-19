@@ -7,12 +7,12 @@
 ;	int __CALLEE__ screen_callee(x,y);
 ;
 ;
-;	$Id: screen_callee\040.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
+;	$Id: screen_callee\040.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-XLIB	screen_callee
-XDEF	ASMDISP_screen_CALLEE
+PUBLIC	screen_callee
+PUBLIC	ASMDISP_screen_CALLEE
 
 
 screen_callee:

@@ -10,15 +10,15 @@
 ; N$ will always hold the file name
 ; The character specifying the current block is handled
 ;
-; $Id: zxgetfname2.asm,v 1.2 2014-01-20 11:20:18 stefano Exp $
+; $Id: zxgetfname2.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 
-	XLIB	zxgetfname2
+	PUBLIC	zxgetfname2
 	
-	LIB	zx_setint_callee
-	LIB	zx_setstr_callee
+	EXTERN	zx_setint_callee
+	EXTERN	zx_setstr_callee
 
-	XREF ASMDISP_ZX_SETSTR_CALLEE
-	XREF ASMDISP_ZX_SETINT_CALLEE
+	EXTERN ASMDISP_ZX_SETSTR_CALLEE
+	EXTERN ASMDISP_ZX_SETINT_CALLEE
 
 ; BASIC variable names for numeric values
 .dvar	defb 'D',0

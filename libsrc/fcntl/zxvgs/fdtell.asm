@@ -1,10 +1,10 @@
 ;long fdtell(int fd)
 ;returns position in file
 ;
-;	$Id: fdtell.asm,v 1.1 2002-06-23 12:11:31 dom Exp $
+;	$Id: fdtell.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
-	XLIB	fdtell
+	PUBLIC	fdtell
 
 .fdtell
 	POP	BC	;ret

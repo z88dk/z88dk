@@ -9,10 +9,10 @@
 ;	Maybe someone wants to improve this ?
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2011-10-03 15:22:20 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-		XLIB	fgetc_cons
+		PUBLIC	fgetc_cons
 
 .fgetc_cons
 ;		call	$9b3	; wait for a key

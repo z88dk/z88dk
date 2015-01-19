@@ -6,11 +6,11 @@
 ;
 ;	Short delay to sync communications with card
 ;
-;	$Id: pause_4ms.asm,v 1.4 2012-09-26 14:15:25 stefano Exp $
+;	$Id: pause_4ms.asm,v 1.5 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-	XLIB	pause_4ms
+	PUBLIC	pause_4ms
 	
     INCLUDE "flos.def"
 

@@ -4,11 +4,11 @@
 ; PC6001 version
 ;
 ;
-; $Id: bksave.asm,v 1.1 2013-01-24 15:31:38 stefano Exp $
+; $Id: bksave.asm,v 1.2 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
-	XLIB    bksave
-	LIB	pixeladdress
+	PUBLIC    bksave
+	EXTERN	pixeladdress
 
 .bksave
         ld      hl,2

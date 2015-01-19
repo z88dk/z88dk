@@ -1,11 +1,11 @@
 ; uint __CALLEE__ zx_attr_callee(uchar row, uchar col)
 ; aralbrec 06.2007
 
-XLIB zx_attr_callee
-XDEF ASMDISP_ZX_ATTR_CALLEE
+PUBLIC zx_attr_callee
+PUBLIC ASMDISP_ZX_ATTR_CALLEE
 
-LIB zx_cyx2aaddr_callee
-XREF ASMDISP_ZX_CYX2AADDR_CALLEE
+EXTERN zx_cyx2aaddr_callee
+EXTERN ASMDISP_ZX_CYX2AADDR_CALLEE
 
 .zx_attr_callee
 

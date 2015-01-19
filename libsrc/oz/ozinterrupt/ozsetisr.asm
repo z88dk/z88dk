@@ -9,11 +9,11 @@
 ;
 ;
 ; ------
-; $Id: ozsetisr.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
+; $Id: ozsetisr.asm,v 1.4 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozsetisr
-	LIB	ozinstisr
+	PUBLIC	ozsetisr
+	EXTERN	ozinstisr
 	
 ozsetisr:
 ;; load in interrupt handler stub

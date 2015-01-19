@@ -1,4 +1,4 @@
-		XLIB	kmreadkbd
+		PUBLIC	kmreadkbd
 
 .kmreadkbd
 		call 0xB806

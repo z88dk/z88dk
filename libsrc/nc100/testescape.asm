@@ -1,4 +1,4 @@
-		XLIB	testescape
+		PUBLIC	testescape
 
 .testescape
 		call 0xB815

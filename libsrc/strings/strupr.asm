@@ -6,10 +6,10 @@
 ; exit : hl = char *s
 ; uses : af
 
-XLIB strupr
-XDEF ASMDISP_STRUPR
+PUBLIC strupr
+PUBLIC ASMDISP_STRUPR
 
-LIB asm_toupper
+EXTERN asm_toupper
 
 .strupr
 

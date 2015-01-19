@@ -5,12 +5,12 @@
 ; Exit: HL=word
 
 ;
-; $Id: lp_gint.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: lp_gint.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-        XLIB    lp_gint
+        PUBLIC    lp_gint
 
-        LIB     farseg1,incfar
+        EXTERN     farseg1,incfar
 
 
 .lp_gint

@@ -11,15 +11,15 @@
 ;       Plot/unplot/invert pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pixel.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
+;	$Id: pixel.asm,v 1.3 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 
 
-			XLIB	pixel
+			PUBLIC	pixel
 			
-			XDEF	pixmode
+			PUBLIC	pixmode
 
-			XREF	coords
+			EXTERN	coords
 
 .pixel
 			ld	d,l

@@ -1,10 +1,10 @@
 ; void in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord)
 ; CALLER linkage for function pointers
 
-XLIB in_MouseSimSetPos
+PUBLIC in_MouseSimSetPos
 
-LIB in_MouseSimSetPos_callee
-XREF ASMDISP_IN_MOUSESIMSETPOS_CALLEE
+EXTERN in_MouseSimSetPos_callee
+EXTERN ASMDISP_IN_MOUSESIMSETPOS_CALLEE
 
 
 .in_MouseSimSetPos

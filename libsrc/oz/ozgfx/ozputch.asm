@@ -10,12 +10,12 @@
 ;	int ozputch (int x, int y, char c);
 ;
 ; ------
-; $Id: ozputch.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozputch.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozputch
+	PUBLIC	ozputch
 
-	LIB	ozputs
+	EXTERN	ozputs
 
 ozputchbuf:
         defb 0	; Char to be printed

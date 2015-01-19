@@ -1,10 +1,10 @@
 
-	XLIB	pointxy
+	PUBLIC	pointxy
 
-	XREF	coords
+	EXTERN	coords
 
 ;
-;	$Id: pointxy.asm,v 1.2 2014-05-21 19:34:14 stefano Exp $
+;	$Id: pointxy.asm,v 1.3 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

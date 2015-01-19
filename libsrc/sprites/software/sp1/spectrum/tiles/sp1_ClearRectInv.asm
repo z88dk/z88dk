@@ -1,10 +1,10 @@
 ; void sp1_ClearRectInv(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag)
 ; CALLER linkage for function pointers
 
-XLIB sp1_ClearRectInv
+PUBLIC sp1_ClearRectInv
 
-LIB sp1_ClearRectInv_callee
-XREF ASMDISP_SP1_CLEARRECTINV_CALLEE
+EXTERN sp1_ClearRectInv_callee
+EXTERN ASMDISP_SP1_CLEARRECTINV_CALLEE
 
 .sp1_ClearRectInv
 

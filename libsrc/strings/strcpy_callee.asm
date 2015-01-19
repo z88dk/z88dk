@@ -2,8 +2,8 @@
 ; copy src to dst including '\0'
 ; 03.1999 djm, 12.2006 aralbrec
 
-XLIB strcpy_callee
-XDEF ASMDISP_STRCPY_CALLEE
+PUBLIC strcpy_callee
+PUBLIC ASMDISP_STRCPY_CALLEE
 
 .strcpy_callee
 

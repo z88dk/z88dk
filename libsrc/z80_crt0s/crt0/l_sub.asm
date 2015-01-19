@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_sub
+                PUBLIC    l_sub
 
 ; HL = DE - HL
 

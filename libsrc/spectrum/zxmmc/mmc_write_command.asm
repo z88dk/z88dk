@@ -4,14 +4,14 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: mmc_write_command.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: mmc_write_command.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; Sends a command with parameters = 00 and checksum = $95. 
 ;-----------------------------------------------------------------------------------------
 ;
 
-	XLIB	mmc_write_command
+	PUBLIC	mmc_write_command
 	
 	INCLUDE "zxmmc.def"
 

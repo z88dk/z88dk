@@ -12,14 +12,14 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: gets.asm,v 1.3 2014-04-09 08:05:57 stefano Exp $
+;	$Id: gets.asm,v 1.4 2015-01-19 01:33:22 pauloscustodio Exp $
 ;
 
                 INCLUDE "stdio.def"
                 INCLUDE	"syspar.def"
 
-                XLIB    gets
-                XREF    processcmd
+                PUBLIC    gets
+                EXTERN    processcmd
 
 ;
 ; Read a string from the console - this is limited to 255 characters

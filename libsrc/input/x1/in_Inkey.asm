@@ -5,8 +5,8 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
-        XLIB in_Inkey
-        XREF _x1_keyboard_io
+        PUBLIC in_Inkey
+        EXTERN _x1_keyboard_io
 
 ; exit : carry = no key registered (and HL=0)
 ;        else HL = ascii code of key pressed

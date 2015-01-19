@@ -8,11 +8,11 @@
 ;
 ;
 ; ------
-; $Id: ozsnap.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozsnap.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XLIB	ozsnap
-	XREF	ozactivepage
+	PUBLIC	ozsnap
+	EXTERN	ozactivepage
 
 ozsnap:
 	in a,(43h)

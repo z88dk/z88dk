@@ -5,10 +5,10 @@
 ;	exos_write_block(unsigned char channel, unsigned int byte_count, unsigned char *address);
 ;
 ;
-;	$Id: exos_write_block.asm,v 1.1 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_write_block.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-	XLIB	exos_write_block
+	PUBLIC	exos_write_block
 
 exos_write_block:
 	

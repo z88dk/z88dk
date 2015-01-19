@@ -10,14 +10,14 @@
 ;       Simply does a swap...
 
 ;
-;	$Id: swapgfxbk.asm,v 1.4 2002-01-27 22:28:52 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 
-                XLIB    swapgfxbk
+                PUBLIC    swapgfxbk
 
-                XREF    gfx_bank
-		XDEF	swapgfxbk1
+                EXTERN    gfx_bank
+		PUBLIC	swapgfxbk1
 
 
 		INCLUDE	"graphics/grafix.inc"

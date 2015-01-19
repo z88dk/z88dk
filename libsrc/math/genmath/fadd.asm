@@ -3,21 +3,21 @@
 ;
 ;	Add bc ix de to FA
 ;
-;       $Id: fadd.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: fadd.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $:
 
 
-		XLIB	fadd
+		PUBLIC	fadd
 
-		LIB	ldbcfa
-		LIB	ldfabc
-		LIB	norma
-		LIB	unpack
-		LIB	rshift
-		LIB	pack
-		LIB	fradd
+		EXTERN	ldbcfa
+		EXTERN	ldfabc
+		EXTERN	norma
+		EXTERN	unpack
+		EXTERN	rshift
+		EXTERN	pack
+		EXTERN	fradd
 
-		XREF	rsh8
-		XREF	fa
+		EXTERN	rsh8
+		EXTERN	fa
 
 .fadd   LD      A,B
         OR      A

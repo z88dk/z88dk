@@ -1,4 +1,4 @@
-	XLIB	set_sound_freq
+	PUBLIC	set_sound_freq
 	
 	INCLUDE "sms/sms.hdr"
 

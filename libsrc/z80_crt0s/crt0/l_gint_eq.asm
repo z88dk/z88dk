@@ -7,7 +7,7 @@
 ;       13/5/99 djm Optimizer routine to test against zero
 ;       Returns z=0 nz otherwise as well as the int in hl
 
-                XLIB    l_gint_eq
+                PUBLIC    l_gint_eq
 
 
 .l_gint_eq

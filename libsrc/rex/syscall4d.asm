@@ -5,9 +5,9 @@
 ;	simply rewritten the function with Damjan's algorithm
 ;	Daniel
 ;
-;	$Id: syscall4d.asm,v 1.3 2002-04-17 21:30:25 dom Exp $
+;	$Id: syscall4d.asm,v 1.4 2015-01-19 01:33:06 pauloscustodio Exp $
 
-		XLIB	syscall4d
+		PUBLIC	syscall4d
 
 
 .syscall4d

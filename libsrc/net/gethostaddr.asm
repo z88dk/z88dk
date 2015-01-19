@@ -8,9 +8,9 @@
 ;	ZSock Lib function: gethostaddr
 
 
-	XLIB	gethostaddr
+	PUBLIC	gethostaddr
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

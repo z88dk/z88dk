@@ -9,17 +9,17 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.3 2014-07-16 09:59:57 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.4 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_del_line
+	PUBLIC	ansi_del_line
 
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 
-	XREF	text_cols
+	EXTERN	text_cols
 
-	LIB	ansi_CHAR
+	EXTERN	ansi_CHAR
 
 .ansi_del_line
 

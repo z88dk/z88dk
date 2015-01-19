@@ -2,7 +2,7 @@
 
 ;020121	(C) created by Yarek
 
-	XLIB	j3
+	PUBLIC	j3
 
 ;int j3()
 ;returns joystick 3 state

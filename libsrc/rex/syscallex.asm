@@ -1,14 +1,14 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: syscallex.asm,v 1.7 2002-04-17 21:30:25 dom Exp $
+;	$Id: syscallex.asm,v 1.8 2015-01-19 01:33:06 pauloscustodio Exp $
 ;
 ; extern INT SYSCALLEX( int, ... );
 ;
 ;	Latest version from Damjan..it works. 
 ; 
 
-		XLIB	syscallex
+		PUBLIC	syscallex
 
 .syscallex
  	ld 	b,a

@@ -2,10 +2,10 @@
 ; caseless compare
 ; 12.2006 aralbrec
 
-XLIB strnicmp_callee
-XDEF ASMDISP_STRNICMP_CALLEE
+PUBLIC strnicmp_callee
+PUBLIC ASMDISP_STRNICMP_CALLEE
 
-LIB asm_tolower
+EXTERN asm_tolower
 
 .strnicmp_callee
 

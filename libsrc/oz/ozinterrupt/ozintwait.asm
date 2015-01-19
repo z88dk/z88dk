@@ -10,16 +10,16 @@
 ;
 ;
 ; ------
-; $Id: ozintwait.asm,v 1.2 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozintwait.asm,v 1.3 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozintwait
-	LIB	ozcustomisr
+	PUBLIC	ozintwait
+	EXTERN	ozcustomisr
 	
-	XDEF	serial_check_hook
+	PUBLIC	serial_check_hook
 
-	XREF	KeyBufGetPos
-	XREF	KeyBufPutPos
+	EXTERN	KeyBufGetPos
+	EXTERN	KeyBufPutPos
 
 
 ozintwait:

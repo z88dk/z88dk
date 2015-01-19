@@ -1,10 +1,10 @@
 ; void sp1_GetSprClr(uchar **sprsrc, struct sp1_ap *dest, uchar n)
 ; CALLER linkage for function pointers
 
-XLIB sp1_GetSprClr
+PUBLIC sp1_GetSprClr
 
-LIB sp1_GetSprClr_callee
-XREF ASMDISP_SP1_GETSPRCLR_CALLEE
+EXTERN sp1_GetSprClr_callee
+EXTERN ASMDISP_SP1_GETSPRCLR_CALLEE
 
 .sp1_GetSprClr
 

@@ -2,8 +2,8 @@
 ;       Long functions
 ;
 
-                XLIB    l_long_ule
-                LIB     l_long_ucmp
+                PUBLIC    l_long_ule
+                EXTERN     l_long_ucmp
 
 
 

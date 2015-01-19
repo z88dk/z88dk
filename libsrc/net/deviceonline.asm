@@ -8,9 +8,9 @@
 ;	ZSock Lib function: device_online
 
 
-	XLIB 	deviceonline	
+	PUBLIC 	deviceonline	
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

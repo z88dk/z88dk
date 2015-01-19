@@ -10,11 +10,11 @@
 ;
 ;	Compute mask of a pixel given its number
 ;
-;	$Id: msx_map_m2_subpixel.asm,v 1.1 2009-01-07 09:50:15 stefano Exp $
+;	$Id: msx_map_m2_subpixel.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
-	XLIB	msx_map_m2_subpixel
+	PUBLIC	msx_map_m2_subpixel
 	
 
 msx_map_m2_subpixel:

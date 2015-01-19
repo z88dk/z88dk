@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_gchar
+                PUBLIC    l_gchar
 
 ; fetch char from (HL) and sign extend into HL
 .l_gchar  ld a,(hl)

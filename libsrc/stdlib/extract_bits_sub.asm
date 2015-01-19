@@ -9,7 +9,7 @@
 ;	DE = bit position (0..65535)
 ;	BC = size in bits
 
-XLIB extract_bits_sub
+PUBLIC extract_bits_sub
 
 .extract_bits_sub
 

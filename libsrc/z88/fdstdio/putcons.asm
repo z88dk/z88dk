@@ -9,7 +9,7 @@
 
                 INCLUDE "stdio.def"
 
-                XLIB    putconsole
+                PUBLIC    putconsole
 
 ;Entry: hl=string, a print nl at end or not (0=no)
 

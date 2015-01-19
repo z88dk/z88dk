@@ -1,4 +1,4 @@
-		XLIB fabandon
+		PUBLIC fabandon
 .fabandon
 	ret
 

@@ -4,12 +4,12 @@
 ;
 ;	Get the first sector used by a file
 ;
-;	$Id: get_first_file_cluster.asm,v 1.3 2012-03-08 07:16:46 stefano Exp $
+;	$Id: get_first_file_cluster.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  get_first_file_cluster
+	PUBLIC  get_first_file_cluster
 	
 get_first_file_cluster:
 ; __FASTCALL__, HL points to filename

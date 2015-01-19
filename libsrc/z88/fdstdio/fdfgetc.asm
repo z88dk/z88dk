@@ -17,9 +17,9 @@
 
 
 
-                XLIB    fdfgetc
-		LIB	fgetc_cons
-                LIB     fhand_ck
+                PUBLIC    fdfgetc
+		EXTERN	fgetc_cons
+                EXTERN     fhand_ck
 
 ;fgetc(fp)
 ;FILE *fp

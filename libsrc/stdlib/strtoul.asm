@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB strtoul
-LIB strtol_callee
-XREF ASMDISP_STRTOL_CALLEE
+PUBLIC strtoul
+EXTERN strtol_callee
+EXTERN ASMDISP_STRTOL_CALLEE
 
 .strtoul
 

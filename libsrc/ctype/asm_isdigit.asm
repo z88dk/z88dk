@@ -1,6 +1,6 @@
 ; asm_isdigit
 
-XLIB asm_isdigit
+PUBLIC asm_isdigit
 
 ; determine whether ascii char is a decimal digit
 

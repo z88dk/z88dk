@@ -8,9 +8,9 @@
 ;	ZSock Lib function: sock_waitopen
 
 
-	XLIB	sock_waitopen
+	PUBLIC	sock_waitopen
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

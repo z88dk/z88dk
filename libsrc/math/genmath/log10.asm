@@ -1,10 +1,10 @@
 ;       Small C+ Math Library
 
 
-                XLIB    log10
+                PUBLIC    log10
 
-                LIB     log
-                LIB     fmul
+                EXTERN     log
+                EXTERN     fmul
 
 
 

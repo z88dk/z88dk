@@ -9,13 +9,13 @@
 ;
 ;
 ; ------
-; $Id: ozscroll.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozscroll.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozscroll
+	PUBLIC	ozscroll
 	
-	XREF	ozactivepage
-	LIB	restore_a000
+	EXTERN	ozactivepage
+	EXTERN	restore_a000
 
 
 ozscroll:

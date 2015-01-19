@@ -1,7 +1,7 @@
 ; uchar __FASTCALL__ *zx_saddrcup(void *pixeladdr)
 ; aralbrec 06.2007
 
-XLIB zx_saddrcup
+PUBLIC zx_saddrcup
 
 .zx_saddrcup
 

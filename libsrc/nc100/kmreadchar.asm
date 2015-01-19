@@ -1,4 +1,4 @@
-		XLIB	kmreadchar
+		PUBLIC	kmreadchar
 
 .kmreadchar
 		call 0xB9B3

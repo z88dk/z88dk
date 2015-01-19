@@ -1,4 +1,4 @@
-		XLIB	txtsetcursor
+		PUBLIC	txtsetcursor
 
 ; fastcall so in HL!
 .txtwrchar

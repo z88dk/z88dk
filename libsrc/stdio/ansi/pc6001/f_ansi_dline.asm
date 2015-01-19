@@ -11,11 +11,11 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.1 2013-01-25 09:05:46 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
 
-	XLIB	ansi_del_line
+	PUBLIC	ansi_del_line
 
 	;XREF	vram_addr
 

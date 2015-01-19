@@ -4,7 +4,7 @@
 ;	$Id;$
 ;
 
-	XLIB	DsFillScreen
+	PUBLIC	DsFillScreen
 
 .DsFillScreen	
 ;

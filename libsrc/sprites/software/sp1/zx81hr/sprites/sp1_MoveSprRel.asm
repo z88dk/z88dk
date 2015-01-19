@@ -1,12 +1,12 @@
 ; void sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot)
 ; CALLER linkage for function pointers
 
-XLIB sp1_MoveSprRel
+PUBLIC sp1_MoveSprRel
 
-LIB sp1_MoveSprRel_callee
-XREF ASMDISP_SP1_MOVESPRREL_CALLEE
+EXTERN sp1_MoveSprRel_callee
+EXTERN ASMDISP_SP1_MOVESPRREL_CALLEE
 
-XREF SP1V_TEMP_IY
+EXTERN SP1V_TEMP_IY
 
 .sp1_MoveSprRel
 

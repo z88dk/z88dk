@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ddiv.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: ddiv.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
 ;
 
 
@@ -14,10 +14,10 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB    ddiv
+                PUBLIC    ddiv
 
-                LIB	fsetup
-                LIB	stkequ
+                EXTERN	fsetup
+                EXTERN	stkequ
 
 .ddiv
         call    fsetup

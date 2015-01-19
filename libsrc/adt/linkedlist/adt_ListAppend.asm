@@ -3,10 +3,10 @@
 
 ; CALLER linkage for function pointers
 
-XLIB adt_ListAppend
+PUBLIC adt_ListAppend
 
-LIB adt_ListAppend_callee
-XREF ASMDISP_ADT_LISTAPPEND_CALLEE
+EXTERN adt_ListAppend_callee
+EXTERN ASMDISP_ADT_LISTAPPEND_CALLEE
 
 .adt_ListAppend
 

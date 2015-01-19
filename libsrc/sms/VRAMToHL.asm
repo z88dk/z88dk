@@ -1,4 +1,4 @@
-	XLIB	VRAMToHL
+	PUBLIC	VRAMToHL
 
 ;==============================================================
 ; VRAM to HL

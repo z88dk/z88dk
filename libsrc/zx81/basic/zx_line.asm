@@ -8,11 +8,11 @@
 ;	Returns with BASIC error code.
 ;	0=OK,... -1=no program lines found
 ;
-;	$Id: zx_line.asm,v 1.1 2008-07-25 15:31:25 stefano Exp $
+;	$Id: zx_line.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 
-XLIB	zx_line
-XREF	restore81
+PUBLIC	zx_line
+EXTERN	restore81
 
 ; enter : hl = line number
 

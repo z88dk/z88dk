@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_deneg
+                PUBLIC    l_deneg
 
 ; {DE = -DE}
 .l_deneg 

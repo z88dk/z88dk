@@ -9,12 +9,12 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: stencil_init.asm,v 1.2 2009-09-23 17:33:44 stefano Exp $
+;	$Id: stencil_init.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 	INCLUDE	"graphics/grafix.inc"
 
-                XLIB    stencil_init
+                PUBLIC    stencil_init
 
 .stencil_init
 		; __FASTCALL__ means no need to pick HL ptr from stack

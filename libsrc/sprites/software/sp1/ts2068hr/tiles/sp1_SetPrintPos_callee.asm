@@ -2,11 +2,11 @@
 ; 01.2008 aralbrec, Sprite Pack v3.0
 ; ts2068 hi-res version
 
-XLIB sp1_SetPrintPos_callee
-XDEF ASMDISP_SP1_SETPRINTPOS_CALLEE
+PUBLIC sp1_SetPrintPos_callee
+PUBLIC ASMDISP_SP1_SETPRINTPOS_CALLEE
 
-LIB sp1_GetUpdateStruct_callee
-XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
+EXTERN sp1_GetUpdateStruct_callee
+EXTERN ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
 
 .sp1_SetPrintPos_callee
 

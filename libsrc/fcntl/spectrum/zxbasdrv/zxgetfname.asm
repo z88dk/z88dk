@@ -9,15 +9,15 @@
 ; the 'D' BASIC variable with the drive number.
 ; N$ will always hold the file name
 ;
-; $Id: zxgetfname.asm,v 1.3 2014-01-20 11:04:30 stefano Exp $
+; $Id: zxgetfname.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
 
-	XLIB	zxgetfname
+	PUBLIC	zxgetfname
 	
-	LIB	zx_setint_callee
-	LIB	zx_setstr_callee
+	EXTERN	zx_setint_callee
+	EXTERN	zx_setstr_callee
 	
-	XREF ASMDISP_ZX_SETSTR_CALLEE
-	XREF ASMDISP_ZX_SETINT_CALLEE
+	EXTERN ASMDISP_ZX_SETSTR_CALLEE
+	EXTERN ASMDISP_ZX_SETINT_CALLEE
 
 
 ; BASIC variable names for numeric values

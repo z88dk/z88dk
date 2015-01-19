@@ -2,11 +2,11 @@
 ; on each call, return next token in s using delimiters from string delim
 ; 01.2007 aralbrec
 
-XLIB strtok_r_callee
-XDEF ASMDISP_STRTOK_R_CALLEE
+PUBLIC strtok_r_callee
+PUBLIC ASMDISP_STRTOK_R_CALLEE
 
-LIB strchr_callee
-XREF ASMDISP_STRCHR_CALLEE
+EXTERN strchr_callee
+EXTERN ASMDISP_STRCHR_CALLEE
 
 ; static data stored here, not ROMable
 

@@ -2,7 +2,7 @@ lstoff
 
 ; Spectravideo SVI functions definition
 ;
-; $Id: svibios.def,v 1.4 2009-05-27 10:41:07 stefano Exp $
+; $Id: svibios.def,v 1.5 2015-01-19 01:29:18 pauloscustodio Exp $
 ;
 
 
@@ -39,9 +39,9 @@ defc RDVRM  = $3734 ; Reads the VRAM address by [HL] (VPEEK).
 defc WRTVRM = $372A ; Write to the VRAM address by [HL] (VPOKE).
 defc SETRD  = $3747 ; Sets up the VDP for read.
 defc SETWRT = $373C ; Sets up the VDP for write.
- LIB FILVRM         ; Fill the vram with specified data
- LIB LDIRMV         ; Block transfer to memory from VRAM
- LIB LDIRVM         ; Block transfer to VRAM from memory
+ EXTERN FILVRM         ; Fill the vram with specified data
+ EXTERN LDIRMV         ; Block transfer to memory from VRAM
+ EXTERN LDIRVM         ; Block transfer to VRAM from memory
 defc CHGMOD = $37D9 ; Sets the VDP mode according to SCRMOD.
 defc CHGCLR = $3750 ; Changes the color of the screen.
 defc NMI    = $0066 ; Performs non-maskable interrupt procedures.
@@ -92,8 +92,8 @@ defc TOTEXT = $3768 ; Forcidly places the screen in text mode.
 
 ; Game I/O devices
 
-    LIB GTSTCK         ; Return the current joystick status. (STICK+8)
-    LIB GTTRIG         ; Return the current trigger button status. (TRIGF+3)
+    EXTERN GTSTCK         ; Return the current joystick status. (STICK+8)
+    EXTERN GTTRIG         ; Return the current trigger button status. (TRIGF+3)
 ;; defc GTPAD  = $???? ; Check the current touch PAD status.
 ;; defc GTPDL  = $???? ; Return the value of the paddle.
 

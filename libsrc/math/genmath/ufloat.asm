@@ -2,10 +2,10 @@
 ;       Converts integer in hl to fp number
 
 
-                XLIB    ufloat
+                PUBLIC    ufloat
 
-                LIB     float
-                XREF    float1
+                EXTERN     float
+                EXTERN    float1
 
 
 ;

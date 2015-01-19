@@ -7,7 +7,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: clga2.asm,v 1.1 2011-09-02 12:43:57 stefano Exp $
+;	$Id: clga2.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 
@@ -15,10 +15,10 @@
 
 
 	INCLUDE	"graphics/grafix.inc"
-	XLIB    clga
-	LIB	w_pixeladdress
-	LIB     swapgfxbk
-	XREF	swapgfxbk1
+	PUBLIC    clga
+	EXTERN	w_pixeladdress
+	EXTERN     swapgfxbk
+	EXTERN	swapgfxbk1
 
 .clga
 		ld	ix,0

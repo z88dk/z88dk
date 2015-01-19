@@ -2,10 +2,10 @@
 ;	Game device library for the PC6001
 ;       Stefano Bodrato - 3/12/2007
 ;
-;	$Id: joystick.asm,v 1.1 2013-01-24 15:31:38 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
-        XLIB    joystick
+        PUBLIC    joystick
 
 
 .joystick

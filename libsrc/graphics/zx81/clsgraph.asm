@@ -1,8 +1,8 @@
 
-	XLIB	cleargraphics
+	PUBLIC	cleargraphics
 
 ;
-;	$Id: clsgraph.asm,v 1.4 2009-08-20 05:59:11 stefano Exp $
+;	$Id: clsgraph.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************
@@ -10,7 +10,7 @@
 ;	Clear graphics area
 ;
 
-		LIB	filltxt
+		EXTERN	filltxt
 
 .cleargraphics
 		ld	l,0

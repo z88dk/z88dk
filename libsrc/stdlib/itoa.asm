@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB itoa
-LIB itoa_callee
-XREF ASMDISP_ITOA_CALLEE
+PUBLIC itoa
+EXTERN itoa_callee
+EXTERN ASMDISP_ITOA_CALLEE
 
 .itoa
 

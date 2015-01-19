@@ -8,22 +8,22 @@
 ;       Stefano Bodrato - 08/10/2009
 ;
 ;
-;	$Id: stencil_add_liner.asm,v 1.3 2014-04-30 18:34:18 stefano Exp $
+;	$Id: stencil_add_liner.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ;; void stencil_add_liner(int dx, int dy, unsigned char *stencil)
 
 
 
-                XLIB    stencil_add_liner
+                PUBLIC    stencil_add_liner
 
-                LIB     Line_r
-                LIB     stencil_add_pixel 
+                EXTERN     Line_r
+                EXTERN     stencil_add_pixel 
 
-                LIB     swapgfxbk
-                XREF    swapgfxbk1
+                EXTERN     swapgfxbk
+                EXTERN    swapgfxbk1
 
-                XREF    stencil_ptr
+                EXTERN    stencil_ptr
 
 .stencil_add_liner
 		ld	ix,0

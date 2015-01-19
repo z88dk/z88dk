@@ -5,16 +5,16 @@
 ;
 ;	set HL to ptr to buffer location, sd card addres must be requested already.
 ;
-;	$Id: sd_write_sector_main.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_write_sector_main.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_write_sector_main
+	PUBLIC	sd_write_sector_main
 
-	XREF	sector_buffer_loc
+	EXTERN	sector_buffer_loc
 	
-	LIB		sd_send_eight_clocks
-	LIB		sd_send_byte
-	LIB		sd_get_byte
+	EXTERN		sd_send_eight_clocks
+	EXTERN		sd_send_byte
+	EXTERN		sd_get_byte
 
     INCLUDE "sdcard.def"
 

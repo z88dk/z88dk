@@ -7,10 +7,10 @@
 ;	Wait for the next video frame
 ;	clock
 ;
-;	$Id: ula_sync.asm,v 1.1 2010-04-02 09:05:06 stefano Exp $
+;	$Id: ula_sync.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
 ;
 
-	XLIB	ula_sync
+	PUBLIC	ula_sync
 
 ula_sync:
 	; Sync to avoid screen flickering

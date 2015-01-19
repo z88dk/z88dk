@@ -3,14 +3,14 @@
 ;
 ;	HRG PLOT
 ;
-;	$Id: cplotpixel.asm,v 1.1 2012-01-31 20:58:07 stefano Exp $
+;	$Id: cplotpixel.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 
-	XLIB   cplotpixel
+	PUBLIC   cplotpixel
 ;	LIB    y_offset_list
 	
-	LIB    l_cmp
+	EXTERN    l_cmp
 
     INCLUDE "osca.def"
     

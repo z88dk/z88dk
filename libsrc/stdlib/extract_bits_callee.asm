@@ -6,9 +6,9 @@
 ; unsigned long extract_bits(unsigned char *resp, unsigned int start, unsigned int size)
 ;
 
-XLIB extract_bits_callee
-XDEF ASMDISP_EXTRACT_BITS_CALLEE
-LIB  extract_bits_sub
+PUBLIC extract_bits_callee
+PUBLIC ASMDISP_EXTRACT_BITS_CALLEE
+EXTERN  extract_bits_sub
 
 .extract_bits_callee
 

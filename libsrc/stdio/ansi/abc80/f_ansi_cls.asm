@@ -7,10 +7,10 @@
 ;	Stefano Bodrato - May 2000
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.3 2007-10-31 14:01:47 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.4 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_cls
+	PUBLIC	ansi_cls
 
 .ansi_cls
 	jp	$276

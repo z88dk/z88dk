@@ -2,11 +2,11 @@
 ;	Game device library for the Amstrad CPC
 ;	Stefano Bodrato - May 2008
 ;
-;	$Id: joystick.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+;	$Id: joystick.asm,v 1.4 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
 
-        XLIB    joystick
+        PUBLIC    joystick
 
         INCLUDE "cpcfirm.def"
 

@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB memopi
-LIB memopi_callee
-XREF ASMDISP_MEMOPI_CALLEE
+PUBLIC memopi
+EXTERN memopi_callee
+EXTERN ASMDISP_MEMOPI_CALLEE
 
 .memopi
 

@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB im2_RegHookLast
+PUBLIC im2_RegHookLast
 
-LIB im2_RegHookLast_callee
-XREF ASMDISP_IM2_REGHOOKLAST_CALLEE
+EXTERN im2_RegHookLast_callee
+EXTERN ASMDISP_IM2_REGHOOKLAST_CALLEE
 
 .im2_RegHookLast
 

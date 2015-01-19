@@ -2,11 +2,11 @@
 ; on each call, return next token in s using delimiters from string delim
 ; 01.2007 aralbrec
 
-XLIB strsep_callee
-XDEF ASMDISP_STRSEP_CALLEE
+PUBLIC strsep_callee
+PUBLIC ASMDISP_STRSEP_CALLEE
 
-LIB strchr_callee
-XREF ASMDISP_STRCHR_CALLEE
+EXTERN strchr_callee
+EXTERN ASMDISP_STRCHR_CALLEE
 
 ; 
 

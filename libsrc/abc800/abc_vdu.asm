@@ -7,10 +7,10 @@
 ;	int  abc_vdu(unsigned char register, unsigned char value);
 ;
 ;
-;	$Id: abc_vdu.asm,v 1.1 2007-11-08 14:11:50 stefano Exp $
+;	$Id: abc_vdu.asm,v 1.2 2015-01-19 01:32:41 pauloscustodio Exp $
 ;	
 
-XLIB	abc_vdu
+PUBLIC	abc_vdu
 
 abc_vdu:
 	pop	bc

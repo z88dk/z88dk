@@ -6,10 +6,10 @@
 ; exit : hl = char *s
 ; uses : af
 
-XLIB strlwr
-XDEF ASMDISP_STRLWR
+PUBLIC strlwr
+PUBLIC ASMDISP_STRLWR
 
-LIB asm_tolower
+EXTERN asm_tolower
 
 .strlwr
 

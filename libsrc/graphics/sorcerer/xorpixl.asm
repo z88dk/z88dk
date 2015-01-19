@@ -8,17 +8,17 @@
 ;       XOR pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.4 2014-07-10 08:17:16 stefano Exp $
+;	$Id: xorpixl.asm,v 1.5 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
-			XLIB	xorpixel
+			PUBLIC	xorpixel
 
-			LIB	div3
-			XREF	coords
-			XREF	base_graphics
+			EXTERN	div3
+			EXTERN	coords
+			EXTERN	base_graphics
 
 .xorpixel
 			ld	a,h

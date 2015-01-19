@@ -11,8 +11,8 @@
                 INCLUDE "stdio.def"
                 INCLUDE "libdefs.def"
 
-                XLIB    fdfputs
-                LIB     putconsole
+                PUBLIC    fdfputs
+                EXTERN     putconsole
 
 ;*fputs(s1,fp)
 ;char s1 int fp

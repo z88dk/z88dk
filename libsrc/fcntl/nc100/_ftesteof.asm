@@ -1,4 +1,4 @@
-		XLIB _ftesteof
+		PUBLIC _ftesteof
 
 ._ftesteof	pop hl
 		pop de

@@ -4,11 +4,11 @@
 ;	stefano 5/4/2007
 ;
 ; ------
-; $Id: clock.asm,v 1.2 2007-06-06 08:43:47 stefano Exp $
+; $Id: clock.asm,v 1.3 2015-01-19 01:33:24 pauloscustodio Exp $
 ;
 
-	XLIB	clock
-	XREF	nbclockptr
+	PUBLIC	clock
+	EXTERN	nbclockptr
 
 .clock
 	ld	hl,(nbclockptr)

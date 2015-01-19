@@ -1,10 +1,10 @@
 ; void sp1_ChangeSprType(struct sp1_cs *c, void *drawf)
 ; CALLER linkage for function pointers
 
-XLIB sp1_ChangeSprType
+PUBLIC sp1_ChangeSprType
 
-LIB sp1_ChangeSprType_callee
-XREF ASMDISP_SP1_CHANGESPRTYPE_CALLEE
+EXTERN sp1_ChangeSprType_callee
+EXTERN ASMDISP_SP1_CHANGESPRTYPE_CALLEE
 
 .sp1_ChangeSprType
 

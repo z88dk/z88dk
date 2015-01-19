@@ -1,6 +1,6 @@
 ; asm_toupper
 
-XLIB asm_toupper
+PUBLIC asm_toupper
 
 ; if the char is in [a-z], make it upper case
 

@@ -3,15 +3,15 @@
 ;       transcendental floating point routines
 ;
 
-                XLIB    tan
+                PUBLIC    tan
 
-                LIB     sin
-                LIB     cos
-                LIB     ldfabc
+                EXTERN     sin
+                EXTERN     cos
+                EXTERN     ldfabc
 
-                LIB     pushfa
-                XREF    pushf2
-                LIB     div1
+                EXTERN     pushfa
+                EXTERN    pushf2
+                EXTERN     div1
 
 
 

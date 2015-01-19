@@ -3,14 +3,14 @@
 ;
 ;       set flags per FA - ( bc ix de )
 ;
-;       $Id: compare.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: compare.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $:
 
-		XLIB	compare
+		PUBLIC	compare
 
-		LIB	sgn
+		EXTERN	sgn
 
-		XREF	setflgs
-		XREF	fa
+		EXTERN	setflgs
+		EXTERN	fa
 
 .compare 
 	LD     A,B

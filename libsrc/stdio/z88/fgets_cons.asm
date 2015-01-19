@@ -12,14 +12,14 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: fgets_cons.asm,v 1.5 2014-04-09 08:05:57 stefano Exp $
+;	$Id: fgets_cons.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
 ;
 
                 INCLUDE "stdio.def"
                 INCLUDE	"syspar.def"
 
-                XLIB    fgets_cons
-                XREF    processcmd
+                PUBLIC    fgets_cons
+                EXTERN    processcmd
 
 ;
 ; Read a string from the console

@@ -12,10 +12,10 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    acos
+                PUBLIC    acos
 
-                LIB	fsetup
-                LIb	stkequ2
+                EXTERN	fsetup
+                EXTERN	stkequ2
 
 .acos
         call    fsetup

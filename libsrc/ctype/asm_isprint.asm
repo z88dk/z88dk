@@ -1,7 +1,7 @@
 ; asm_isprint
 
-XLIB asm_isprint
-LIB asm_isgraph
+PUBLIC asm_isprint
+EXTERN asm_isgraph
 
 ; determine if the char is printable
 

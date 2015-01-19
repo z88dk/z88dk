@@ -3,7 +3,7 @@
 ;020128 created by Yarek
 
 
-	XLIB	opensound
+	PUBLIC	opensound
 
 ;int opensound(int device,int mode)
 ;returns opened mode (0 means the device is closed)

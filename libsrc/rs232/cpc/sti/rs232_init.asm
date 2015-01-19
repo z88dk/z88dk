@@ -5,9 +5,9 @@
 ;
 ;       unsigned char rs232_init()
 ;
-;       $Id: rs232_init.asm,v 1.2 2008-06-05 14:31:24 stefano Exp $
+;       $Id: rs232_init.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 
-                XLIB   rs232_init
+                PUBLIC   rs232_init
                 
 rs232_init:
 

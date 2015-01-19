@@ -2,11 +2,11 @@
 ; 31/3/00 GWL
 
 ;
-; $Id: strncpy_far.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: strncpy_far.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-                LIB farseg1,incfar
-                XLIB strncpy_far
+                EXTERN farseg1,incfar
+                PUBLIC strncpy_far
 
 
 ;far *strncpy(far *s1,far *s2,int n)

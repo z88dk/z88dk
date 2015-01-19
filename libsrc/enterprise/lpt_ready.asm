@@ -6,10 +6,10 @@
 ;
 ;	Check if the line printer is ready (1=ready, 0 if not)
 ;
-;	$Id: lpt_ready.asm,v 1.1 2011-03-19 14:32:51 stefano Exp $
+;	$Id: lpt_ready.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-	XLIB	lpt_ready
+	PUBLIC	lpt_ready
 	
 lpt_ready:
 	in	a,($b5)

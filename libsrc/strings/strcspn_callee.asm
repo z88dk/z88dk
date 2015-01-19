@@ -2,11 +2,11 @@
 ; return length of prefix of s1 NOT containing chars in s2
 ; 01.2007 aralbrec
 
-XLIB strcspn_callee
-XDEF ASMDISP_STRCSPN_CALLEE
+PUBLIC strcspn_callee
+PUBLIC ASMDISP_STRCSPN_CALLEE
 
-LIB strchr_callee
-XREF ASMDISP_STRCHR_CALLEE
+EXTERN strchr_callee
+EXTERN ASMDISP_STRCHR_CALLEE
 
 .strcspn_callee
 

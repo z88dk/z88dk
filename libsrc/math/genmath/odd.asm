@@ -1,8 +1,8 @@
 ;       Small C+ Math Library - Support routine
 ;       Negate a fp number push address
 
-                XLIB    odd
-                LIB     minusfa
+                PUBLIC    odd
+                EXTERN     minusfa
 
 ;
 ;       negate FA, and push address of MINUSFA

@@ -7,10 +7,10 @@
 ;	- 0 (false) if the ZX Interface1 is missing or not paged in
 ;	- 1 (true) if the ZX Interface1 is connected and activated.
 ;
-;	$Id: if1_installed.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: if1_installed.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	if1_installed
+	PUBLIC	if1_installed
 	
 if1_installed:
 	ld	hl,(23635)

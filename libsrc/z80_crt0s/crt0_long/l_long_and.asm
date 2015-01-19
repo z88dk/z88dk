@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-XLIB l_long_and
+PUBLIC l_long_and
 
 ; primary = dehl
 ; stack = secondary, ret

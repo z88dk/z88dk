@@ -6,13 +6,13 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.2 2003-10-14 08:36:19 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.3 2015-01-19 01:32:50 pauloscustodio Exp $
 ;
 
-                XLIB    swapgfxbk
-		XDEF	swapgfxbk1
+                PUBLIC    swapgfxbk
+		PUBLIC	swapgfxbk1
 
-		XREF	ozactivepage
+		EXTERN	ozactivepage
 
 ;.iysave		defw	0
 

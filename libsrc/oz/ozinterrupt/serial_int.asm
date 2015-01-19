@@ -9,26 +9,26 @@
 ;
 ;
 ; ------
-; $Id: serial_int.asm,v 1.3 2003-10-27 16:56:57 stefano Exp $
+; $Id: serial_int.asm,v 1.4 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	serial_int
+	PUBLIC	serial_int
 	
-	XDEF	serial_int_check
-	XDEF	ozserbufget
-	XDEF	ozserbufput
-	XDEF	SerialBuffer
-	XDEF	ozrxhandshaking
-	XDEF	ozrxxoff
+	PUBLIC	serial_int_check
+	PUBLIC	ozserbufget
+	PUBLIC	ozserbufput
+	PUBLIC	SerialBuffer
+	PUBLIC	ozrxhandshaking
+	PUBLIC	ozrxxoff
 
-	LIB	ozcustomisr
+	EXTERN	ozcustomisr
 
-	XREF	rxxoff_hook
-	XREF	serial_hook
+	EXTERN	rxxoff_hook
+	EXTERN	serial_hook
 
-	LIB	ozintwait
+	EXTERN	ozintwait
 	
-	XREF	serial_check_hook
+	EXTERN	serial_check_hook
 	
 
 ; Don't exchange the items position !!

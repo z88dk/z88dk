@@ -2,11 +2,11 @@
 ; 31/3/00 GWL
 
 ;
-; $Id: strrchr_far.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: strrchr_far.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-		LIB farseg1,incfar
-                XLIB strrchr_far
+		EXTERN farseg1,incfar
+                PUBLIC strrchr_far
 
 
 ;far *strrchr(far *s,int c)

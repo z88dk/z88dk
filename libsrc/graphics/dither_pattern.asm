@@ -6,10 +6,10 @@
 ;
 ;	Stefano Bodrato, 18/3/2009
 ;
-;	$Id: dither_pattern.asm,v 1.1 2009-04-15 21:00:58 stefano Exp $
+;	$Id: dither_pattern.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
-	XLIB	dither_pattern
+	PUBLIC	dither_pattern
 	
 .dither_pattern
 		and	a

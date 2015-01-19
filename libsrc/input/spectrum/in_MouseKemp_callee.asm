@@ -1,8 +1,8 @@
 ; void __CALLEE__ in_MouseKemp_callee(uchar *buttons, uint *xcoord, uint *ycoord)
 ; 09.2005 aralbrec
 
-XLIB in_MouseKemp_callee
-LIB INMouseKemp
+PUBLIC in_MouseKemp_callee
+EXTERN INMouseKemp
 
 .in_MouseKemp_callee
 

@@ -2,7 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIsPtInRect16
+PUBLIC RIsPtInRect16
 
 ; Determine if 16-bit (x,y) point lies in a 16-bit bounding
 ; rectangle.  Rectangle bounds wrap across 0-65535 boundaries.

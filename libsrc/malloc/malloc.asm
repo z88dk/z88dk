@@ -1,10 +1,10 @@
 ; void __FASTCALL__ *malloc(unsigned int size)
 ; 12.2006 aralbrec
 
-XLIB malloc
+PUBLIC malloc
 
-LIB HeapAlloc_callee
-XREF _heap, ASMDISP_HEAPALLOC_CALLEE
+EXTERN HeapAlloc_callee
+EXTERN _heap, ASMDISP_HEAPALLOC_CALLEE
 
 .malloc
 

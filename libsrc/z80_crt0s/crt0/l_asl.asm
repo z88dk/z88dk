@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_asl
+                PUBLIC    l_asl
 
 
 ; shift DE left arithmetically by HL, move to HL

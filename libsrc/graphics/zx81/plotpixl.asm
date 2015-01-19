@@ -1,10 +1,10 @@
 
-	XLIB	plotpixel
+	PUBLIC	plotpixel
 
-	XREF	coords
+	EXTERN	coords
 
 ;
-;	$Id: plotpixl.asm,v 1.10 2014-05-21 19:34:14 stefano Exp $
+;	$Id: plotpixl.asm,v 1.11 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

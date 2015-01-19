@@ -4,13 +4,13 @@
 ;
 ;	Enter in current directory entry
 ;
-;	$Id: change_dir.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: change_dir.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  change_dir
-	LIB   flos_err
+	PUBLIC  change_dir
+	EXTERN   flos_err
 	
 change_dir:
 	call	kjt_change_dir

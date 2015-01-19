@@ -2,11 +2,11 @@
 ; /* void __FASTCALL__ (*delete)(void *item) */
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListDeleteS_callee
-XDEF ASMDISP_ADT_LISTDELETES_CALLEE
+PUBLIC adt_ListDeleteS_callee
+PUBLIC ASMDISP_ADT_LISTDELETES_CALLEE
 
-LIB l_jpix
-XREF _u_free
+EXTERN l_jpix
+EXTERN _u_free
 
 .adt_ListDeleteS_callee
 

@@ -1,14 +1,14 @@
 ;       Small C+ Math Library
 ;       More polynomial evaluation
 
-                XLIB    poly
+                PUBLIC    poly
 
-                LIB     pushfa
-                LIB     ldbchl
-                LIB     fadd
-                LIB     fmul
+                EXTERN     pushfa
+                EXTERN     ldbchl
+                EXTERN     fadd
+                EXTERN     fmul
 
-                XREF    dload
+                EXTERN    dload
 
 ;
 .poly   CALL    pushfa  

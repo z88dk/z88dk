@@ -8,8 +8,8 @@
 
 ; ----- void __CALLEE__ vz_brick_callee(void *addr, char byte)
 
-XLIB vz_brick_callee
-XDEF ASMDISP_VZ_BRICK_CALLEE
+PUBLIC vz_brick_callee
+PUBLIC ASMDISP_VZ_BRICK_CALLEE
 
 .vz_brick_callee
 

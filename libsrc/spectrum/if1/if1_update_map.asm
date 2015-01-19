@@ -7,11 +7,11 @@
 ;	Load in a Microdrive MAP array (32 bytes) 
 ;	the actual values for the specified drive.
 ;	
-;	$Id: if1_update_map.asm,v 1.1 2008-06-29 08:25:48 aralbrec Exp $
+;	$Id: if1_update_map.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	if1_update_map
+		PUBLIC 	if1_update_map
 
 filename:	defm	"!h7$"		; foo file name: it will never be written !
 

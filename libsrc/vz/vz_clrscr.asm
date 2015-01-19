@@ -8,7 +8,7 @@
 
 ; ----- void vz_clrscr(void)
 
-XLIB vz_clrscr
+PUBLIC vz_clrscr
 
 .vz_clrscr                   ; almost same as clg() except ROM call might behave differently
                              ;  for text mode and won't set graphics mode

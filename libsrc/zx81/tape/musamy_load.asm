@@ -5,11 +5,11 @@
 ;      Load (L=0) and verify (L=0x40), speed auto-calibration
 ;
 ;
-;	$Id: musamy_load.asm,v 1.4 2014-03-05 23:01:59 pauloscustodio Exp $
+;	$Id: musamy_load.asm,v 1.5 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 
 
-XLIB musamy_load
+PUBLIC musamy_load
 
 
 

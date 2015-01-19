@@ -6,19 +6,19 @@
 ;	int sd_load(slot, struct SD_INFO sd_descriptor)
 ;		result: 0-OK, 
 ;
-;	$Id: sd_load.asm,v 1.7 2012-09-26 14:15:25 stefano Exp $ 
+;	$Id: sd_load.asm,v 1.8 2015-01-19 01:33:07 pauloscustodio Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; Init SD interface. look for card, etc..
 ;-----------------------------------------------------------------------------------------
 ;
 
-	XLIB	sd_load
-	LIB		sd_initialize
-	LIB		sd_get_cid_csd
+	PUBLIC	sd_load
+	EXTERN		sd_initialize
+	EXTERN		sd_get_cid_csd
 
-	XREF	card_select
-	XREF	sd_card_info
+	EXTERN	card_select
+	EXTERN	sd_card_info
 
     INCLUDE "sdcard.def"
 

@@ -4,10 +4,10 @@
 ;
 ;    --fFUDLR 	Stick bit pattern (nc, nc, fire2, fire1, up, down, left, right)
 ;
-;	$Id: joystick.asm,v 1.1 2012-02-02 16:12:58 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
-        XLIB    joystick
+        PUBLIC    joystick
 
         INCLUDE "flos.def"
         INCLUDE "osca.def"

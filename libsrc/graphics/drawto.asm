@@ -6,21 +6,21 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawto.asm,v 1.4 2014-04-30 18:34:18 stefano Exp $
+;	$Id: drawto.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
 ;Usage: drawto(struct *pixels)
 
 
-                XLIB    drawto
-                LIB     swapgfxbk
-                XREF	swapgfxbk1
+                PUBLIC    drawto
+                EXTERN     swapgfxbk
+                EXTERN	swapgfxbk1
 
-				XREF	coords
+				EXTERN	coords
 
-                LIB     Line
-                LIB     plotpixel
+                EXTERN     Line
+                EXTERN     plotpixel
 
 
 

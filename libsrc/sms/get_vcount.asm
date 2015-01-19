@@ -1,4 +1,4 @@
-	XLIB	get_vcount
+	PUBLIC	get_vcount
 	
 ;==============================================================
 ; int get_vcount()

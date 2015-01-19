@@ -2,8 +2,8 @@
 ; 02.2008 aralbrec
 ; zx81 hi-res version
 
-XLIB SP1PSPUSH
-XREF SP1V_TEMP_IX
+PUBLIC SP1PSPUSH
+EXTERN SP1V_TEMP_IX
 
 ; enter : hl  = & struct sp1_pss to write to
 ;         de' = & struct sp1_update

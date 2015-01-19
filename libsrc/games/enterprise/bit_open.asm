@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.2 2013-10-21 14:23:45 stefano Exp $
+; $Id: bit_open.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; Enterprise 64/128 1 bit sound functions
 ;
@@ -7,8 +7,8 @@
 ; Stefano Bodrato - 2011
 ;
 
-    XLIB     bit_open
-    XREF     snd_tick
+    PUBLIC     bit_open
+    EXTERN     snd_tick
 
 .bit_open
 

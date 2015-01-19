@@ -1,10 +1,10 @@
 ; struct adt_List *adt_ListCreate(void)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListCreate
+PUBLIC adt_ListCreate
 
-LIB l_setmem
-XREF _u_malloc
+EXTERN l_setmem
+EXTERN _u_malloc
 
 ; Create List
 ;

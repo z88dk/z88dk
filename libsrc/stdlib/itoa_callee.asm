@@ -3,12 +3,12 @@
 ; 06.2008 aralbrec
 ; redone to be more in line with modern versions of this function
 
-XLIB itoa_callee
-XDEF ASMDISP_ITOA_CALLEE
-XDEF LIBDISP_ITOA_CALLEE
+PUBLIC itoa_callee
+PUBLIC ASMDISP_ITOA_CALLEE
+PUBLIC LIBDISP_ITOA_CALLEE
 
-LIB l_deneg, l_div_u, strrev
-LIB stdio_basechar, stdio_error_zc
+EXTERN l_deneg, l_div_u, strrev
+EXTERN stdio_basechar, stdio_error_zc
 
 .itoa_callee
 

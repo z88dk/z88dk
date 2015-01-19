@@ -1,11 +1,11 @@
 ; void __CALLEE__ HeapRealloc_callee(void *heap, void *p, unsigned int size)
 ; 12.2006 aralbrec
 
-XLIB HeapRealloc_callee
-XDEF ASMDISP_HEAPREALLOC_CALLEE
+PUBLIC HeapRealloc_callee
+PUBLIC ASMDISP_HEAPREALLOC_CALLEE
 
-LIB HeapAlloc_callee, HeapFree_callee
-XREF ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
+EXTERN HeapAlloc_callee, HeapFree_callee
+EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
 
 .HeapRealloc_callee
 

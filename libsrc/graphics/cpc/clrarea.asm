@@ -1,11 +1,11 @@
 
-	xlib	cleararea
+	PUBLIC	cleararea
 
         INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: clrarea.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: clrarea.asm,v 1.3 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 ; ***********************************************************************

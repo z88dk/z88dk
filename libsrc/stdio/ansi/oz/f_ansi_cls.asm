@@ -7,14 +7,14 @@
 ;	Stefano Bodrato - Aug. 2002
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.3 2003-05-21 13:56:01 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.4 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_cls
-	XREF	base_graphics
+	PUBLIC	ansi_cls
+	EXTERN	base_graphics
 
-	LIB     swapgfxbk
-        XREF	swapgfxbk1
+	EXTERN     swapgfxbk
+        EXTERN	swapgfxbk1
 
 .ansi_cls
 

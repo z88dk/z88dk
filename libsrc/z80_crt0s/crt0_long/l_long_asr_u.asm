@@ -11,7 +11,7 @@
 ;
 ;       djm 22/3/99 Unsigned version
 
-XLIB    l_long_asr_u
+PUBLIC    l_long_asr_u
 
 ; Shift primary (on stack) right by secondary, 
 ; We can only shift a maximum of 32 bits (or so), so the counter can

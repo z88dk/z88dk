@@ -15,7 +15,7 @@
 
 
 
-                XLIB    readmail
+                PUBLIC    readmail
 
                 INCLUDE "saverst.def"
 

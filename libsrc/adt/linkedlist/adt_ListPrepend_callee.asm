@@ -1,12 +1,12 @@
 ; int __CALLEE__ adt_ListPrepend_callee(struct adt_List *list, void *item)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListPrepend_callee
-XDEF ASMDISP_ADT_LISTPREPEND_CALLEE
-XDEF ASMDISP_ADT_LISTPREPEND2
+PUBLIC adt_ListPrepend_callee
+PUBLIC ASMDISP_ADT_LISTPREPEND_CALLEE
+PUBLIC ASMDISP_ADT_LISTPREPEND2
 
-LIB ADTemptylistadd
-XREF _u_malloc
+EXTERN ADTemptylistadd
+EXTERN _u_malloc
 
 .adt_ListPrepend_callee
 

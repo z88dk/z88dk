@@ -8,11 +8,11 @@
 ;
 ;	set \a value at a given vram address \a addr, merging bits (OR) with the existing value
 ;
-;	$Id: msx_vmerge.asm,v 1.4 2010-06-30 13:21:38 stefano Exp $
+;	$Id: msx_vmerge.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
-	XLIB	msx_vmerge
+	PUBLIC	msx_vmerge
 	
 	INCLUDE	"msx/vdp.inc"
 

@@ -7,26 +7,26 @@
 ;	Init SD card communications
 ;	On entry: A=card slot number
 ;
-;	$Id: sd_init_main.asm,v 1.5 2012-09-26 14:15:25 stefano Exp $
+;	$Id: sd_init_main.asm,v 1.6 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-	XLIB	sd_init_main
+	PUBLIC	sd_init_main
 	
-	LIB		pause_4ms
-	LIB		sd_power_on
-	LIB		sd_power_off
-	LIB		sd_send_eight_clocks
-	LIB		sd_send_command_string
-	XREF	sd_send_command_int_args
-	XREF	sd_send_command_null_args
-	XREF	sd_card_info
-	LIB		sd_read_bytes_to_sector_buffer
+	EXTERN		pause_4ms
+	EXTERN		sd_power_on
+	EXTERN		sd_power_off
+	EXTERN		sd_send_eight_clocks
+	EXTERN		sd_send_command_string
+	EXTERN	sd_send_command_int_args
+	EXTERN	sd_send_command_null_args
+	EXTERN	sd_card_info
+	EXTERN		sd_read_bytes_to_sector_buffer
 	
 
     INCLUDE "sdcard.def"
     
-    XREF	sd_card_info
+    EXTERN	sd_card_info
 
 
 ;CMD0_string:

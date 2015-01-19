@@ -6,7 +6,7 @@
 ;       djm 24/4/99
 
 
-                XLIB    htons
+                PUBLIC    htons
 
 .htons
         ld      a,l

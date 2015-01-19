@@ -6,11 +6,11 @@
 ;       void srand(int) - seed "random" number
 ;
 ; -----
-; $Id: srand.asm,v 1.5 2007-01-03 22:23:48 aralbrec Exp $
+; $Id: srand.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
 
-XLIB srand
-XREF _std_seed
-XDEF ASMDISP_SRAND
+PUBLIC srand
+EXTERN _std_seed
+PUBLIC ASMDISP_SRAND
 
 ; FASTCALL
 

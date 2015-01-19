@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB strcspn
-LIB strcspn_callee
-XREF ASMDISP_STRCSPN_CALLEE
+PUBLIC strcspn
+EXTERN strcspn_callee
+EXTERN ASMDISP_STRCSPN_CALLEE
 
 .strcspn
 

@@ -2,11 +2,11 @@
 ; 05.2006, 12.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1PrintString
+PUBLIC SP1PrintString
 
-LIB sp1_GetUpdateStruct_callee, l_jpix
-XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
-XREF SP1V_UPDATELISTT, SP1V_DISPWIDTH
+EXTERN sp1_GetUpdateStruct_callee, l_jpix
+EXTERN ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
+EXTERN SP1V_UPDATELISTT, SP1V_DISPWIDTH
 
 ; A sophisticated print string function
 ;

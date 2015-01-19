@@ -3,7 +3,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: mmc_wait_response.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: mmc_wait_response.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;
 ;-----------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@
 ;-----------------------------------------------------------------------------------------
 ;
 
-	XLIB	mmc_wait_response
+	PUBLIC	mmc_wait_response
 
 	INCLUDE "zxmmc.def"
 	

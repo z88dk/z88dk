@@ -8,11 +8,11 @@
 ;	It is necessary to load a copy of the microdirve MAP and to pass it
 ;	putting its location into the record structure.;	
 ;	
-;	$Id: if1_write_record.asm,v 1.1 2008-06-29 08:25:48 aralbrec Exp $
+;	$Id: if1_write_record.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	if1_write_record
+		PUBLIC 	if1_write_record
 		
 filename:	defm	3
 

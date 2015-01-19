@@ -1,9 +1,9 @@
 ; void __CALLEE__ *l_bsearch_callee(void *key, void *base, unsigned int n, void *cmp)
 ; 01.2007 aralbrec
 
-XLIB l_bsearch_callee
-XDEF ASMDISP_L_BSEARCH_CALLEE
-LIB Lbsearch, l_jpiy
+PUBLIC l_bsearch_callee
+PUBLIC ASMDISP_L_BSEARCH_CALLEE
+EXTERN Lbsearch, l_jpiy
 
 .l_bsearch_callee
 

@@ -1,7 +1,7 @@
 ; uchar __FASTCALL__ *zx_cy2aaddr(uchar row)
 ; aralbrec 06.2007
 
-XLIB zx_cy2aaddr
+PUBLIC zx_cy2aaddr
 
 .zx_cy2aaddr
 

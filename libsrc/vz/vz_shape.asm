@@ -8,9 +8,9 @@
 
 ; ----- void vz_shape(int x, int y, int w, int h, int c, char *data)
 
-XLIB vz_shape
-XDEF char_shape
-XREF scrbase
+PUBLIC vz_shape
+PUBLIC char_shape
+EXTERN scrbase
 
 ; This one is difficult to ween off the stack so left
 ; as is for another enterprising person to improve

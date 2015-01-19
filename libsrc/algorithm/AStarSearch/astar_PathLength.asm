@@ -2,7 +2,7 @@
 ; return the length of the path
 ; 01.2007 aralbrec
 
-XLIB astar_PathLength
+PUBLIC astar_PathLength
 
 ; enter : hl = struct astar_path *
 ; exit  : hl = path length

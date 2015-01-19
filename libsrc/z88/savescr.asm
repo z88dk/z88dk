@@ -15,7 +15,7 @@
 
 
 
-               XLIB    savescr
+               PUBLIC    savescr
 
                 INCLUDE "saverst.def"
 

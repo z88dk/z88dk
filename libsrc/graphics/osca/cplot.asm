@@ -7,18 +7,18 @@
 ;
 ;       Color HRG version by Stefano Bodrato
 ;
-;	$Id: cplot.asm,v 1.1 2012-01-31 20:58:07 stefano Exp $
+;	$Id: cplot.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ;Usage: cplot(int x, int y, int color)
 
 
 
-                XLIB    cplot
-                LIB     swapgfxbk
-                XREF    swapgfxbk1
+                PUBLIC    cplot
+                EXTERN     swapgfxbk
+                EXTERN    swapgfxbk1
 
-                LIB     cplotpixel
+                EXTERN     cplotpixel
 
 .cplot
 		pop	af

@@ -1,10 +1,10 @@
 	INCLUDE "graphics/grafix.inc"
-	XLIB	undrawb
-	LIB	w_pixeladdress
+	PUBLIC	undrawb
+	EXTERN	w_pixeladdress
 ;	LIB	l_cmp
 
 ;
-;	$Id: undrawb.asm,v 1.1 2010-11-16 19:41:11 stefano Exp $
+;	$Id: undrawb.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ***********************************************************************

@@ -2,10 +2,10 @@
 ; a caseless string comparison
 ; 12.2006 aralbrec
 
-XLIB stricmp_callee
-XDEF stricmp1
+PUBLIC stricmp_callee
+PUBLIC stricmp1
 
-LIB asm_tolower
+EXTERN asm_tolower
 
 .stricmp_callee
 

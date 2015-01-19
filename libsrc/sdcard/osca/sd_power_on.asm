@@ -6,11 +6,11 @@
 ;
 ;	Power on the sdcard slot
 ;
-;	$Id: sd_power_on.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_power_on.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-	XLIB	sd_power_on
+	PUBLIC	sd_power_on
     INCLUDE "osca.def"
 
 

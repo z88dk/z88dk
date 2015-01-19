@@ -10,12 +10,12 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.1 2001-12-27 09:35:57 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
 
-	XLIB	ansi_del_line
-	XREF	aquarius_attr
+	PUBLIC	ansi_del_line
+	EXTERN	aquarius_attr
 
 .ansi_del_line
 	ld	hl,$3000

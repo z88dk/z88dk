@@ -1,8 +1,8 @@
 ; void in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord)
 ; CALLER linkage for function pointers
 
-XLIB in_MouseSim
-LIB INMouseSim
+PUBLIC in_MouseSim
+EXTERN INMouseSim
 
 .in_MouseSim
 

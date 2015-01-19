@@ -10,11 +10,11 @@
 ;	Stefano Bodrato - May 2000
 ;	Stefano Bodrato - Jan 2002..fixed
 ;
-;	$Id: f_ansi_attr.asm,v 1.4 2002-01-17 17:09:21 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_attr
-	XDEF	current_attr
+	PUBLIC	ansi_attr
+	PUBLIC	current_attr
 
 .current_attr	defb	$70 ; White text on black background
 .mz_inverse	defb	0

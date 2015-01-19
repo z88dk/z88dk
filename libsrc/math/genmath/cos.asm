@@ -3,11 +3,11 @@
 ;       transcendental floating point routines
 ;
 
-                XLIB    cos
-                LIB     sin
-		LIB	hladd
+                PUBLIC    cos
+                EXTERN     sin
+		EXTERN	hladd
 
-		XREF	__halfpi
+		EXTERN	__halfpi
 
 
 

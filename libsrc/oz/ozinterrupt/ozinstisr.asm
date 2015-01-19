@@ -9,10 +9,10 @@
 ;
 ;
 ; ------
-; $Id: ozinstisr.asm,v 1.3 2014-03-05 23:01:59 pauloscustodio Exp $
+; $Id: ozinstisr.asm,v 1.4 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozinstisr
+	PUBLIC	ozinstisr
 	
 ozinstisr:
         ld      a,(0)

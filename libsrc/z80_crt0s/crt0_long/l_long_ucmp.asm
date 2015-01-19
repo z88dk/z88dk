@@ -7,7 +7,7 @@
 ;       out which one was larger
 ;
 
-                XLIB    l_long_ucmp
+                PUBLIC    l_long_ucmp
 
 
 ; Unsigned compare of dehl (stack) and dehl (registers)

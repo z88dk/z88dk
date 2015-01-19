@@ -3,8 +3,8 @@
 ; 01.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1_DRAW_XOR1NR
-XREF SP1RETSPRDRAW, SP1V_PIXELBUFFER
+PUBLIC SP1_DRAW_XOR1NR
+EXTERN SP1RETSPRDRAW, SP1V_PIXELBUFFER
 
 ; following data segment copied into struct sp1_cs
 

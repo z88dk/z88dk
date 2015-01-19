@@ -1,8 +1,8 @@
 ; void in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord)
 ; CALLER linkage for function pointers
 
-XLIB in_MouseAMX
-LIB INMouseAMX
+PUBLIC in_MouseAMX
+EXTERN INMouseAMX
 
 .in_MouseAMX
 

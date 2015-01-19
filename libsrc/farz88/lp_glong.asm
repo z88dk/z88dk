@@ -5,12 +5,12 @@
 ; Exit: DEHL=long
 
 ;
-; $Id: lp_glong.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: lp_glong.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-        XLIB    lp_glong
+        PUBLIC    lp_glong
 
-        LIB     farseg1,incfar
+        EXTERN     farseg1,incfar
 
 
 .lp_glong

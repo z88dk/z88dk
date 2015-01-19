@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-                XLIB    l_plong
+                PUBLIC    l_plong
 
 
 .l_plong

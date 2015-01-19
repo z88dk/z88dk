@@ -2,10 +2,10 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB sp1_IterateSprChar_callee
-XDEF ASMDISP_SP1_ITERATESPRCHAR_CALLEE
+PUBLIC sp1_IterateSprChar_callee
+PUBLIC ASMDISP_SP1_ITERATESPRCHAR_CALLEE
 
-LIB l_jpix
+EXTERN l_jpix
 
 .sp1_IterateSprChar_callee
 

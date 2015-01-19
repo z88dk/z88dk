@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: pow.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: pow.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 ;double pow(double x,double y)  
 ;y is in the FA
@@ -18,10 +18,10 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB    pow
+                PUBLIC    pow
 
-                LIB	fsetupf
-                LIB	stkequ
+                EXTERN	fsetupf
+                EXTERN	stkequ
 
 .pow
         call    fsetupf

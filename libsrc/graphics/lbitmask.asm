@@ -1,8 +1,8 @@
 
-	xlib	leftbitmask
+	PUBLIC	leftbitmask
 
 ;
-;	$Id: lbitmask.asm,v 1.2 2001-04-18 13:21:37 stefano Exp $
+;	$Id: lbitmask.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ************************************************************************

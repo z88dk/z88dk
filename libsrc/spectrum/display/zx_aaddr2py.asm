@@ -1,7 +1,7 @@
 ; uint __FASTCALL__ zx_aaddr2py(void *attraddr)
 ; aralbrec 06.2007
 
-XLIB zx_aaddr2py
+PUBLIC zx_aaddr2py
 
 .zx_aaddr2py
 

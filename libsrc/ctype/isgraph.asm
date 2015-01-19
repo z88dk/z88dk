@@ -1,6 +1,6 @@
 
-XLIB isgraph
-LIB asm_isgraph
+PUBLIC isgraph
+EXTERN asm_isgraph
 
 .isgraph
 

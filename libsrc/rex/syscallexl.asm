@@ -4,9 +4,9 @@
 ;
 ; extern LONG SYSCALLEXL( int, ... );
 ;
-;	$Id: syscallexl.asm,v 1.5 2002-04-17 21:30:25 dom Exp $ 
+;	$Id: syscallexl.asm,v 1.6 2015-01-19 01:33:06 pauloscustodio Exp $ 
 
-		XLIB	syscallexl
+		PUBLIC	syscallexl
 
 ; we supply a pointer to a pointer to the args push'd
 ;

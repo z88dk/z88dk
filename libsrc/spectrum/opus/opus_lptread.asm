@@ -5,15 +5,15 @@
 ;
 ;	unsigned char opus_lptread;
 ;	
-;	$Id: opus_lptread.asm,v 1.3 2014-11-25 17:09:23 stefano Exp $
+;	$Id: opus_lptread.asm,v 1.4 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	opus_lptread
+		PUBLIC 	opus_lptread
 
-		LIB	opus_rommap
+		EXTERN	opus_rommap
 
-		XREF	P_DEVICE
+		EXTERN	P_DEVICE
 		
 
 opus_lptread:

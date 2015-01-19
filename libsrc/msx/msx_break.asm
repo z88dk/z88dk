@@ -7,11 +7,11 @@
 ;	Checks if the Ctrl-STOP key is being pressed (1 = pressed, 0 = not pressed)
 ;
 ;
-;	$Id: msx_break.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
+;	$Id: msx_break.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_break
-	LIB     msxbios
+	PUBLIC	msx_break
+	EXTERN     msxbios
 	
 IF FORmsx
         INCLUDE "msxbios.def"

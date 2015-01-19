@@ -7,17 +7,17 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_xorplot.asm,v 1.2 2011-04-01 06:50:45 stefano Exp $
+;	$Id: w_xorplot.asm,v 1.3 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 ;Usage: xorplot(int x, int y)
 
 
-                XLIB    xorplot
-                LIB     swapgfxbk
-                XREF    swapgfxbk1
+                PUBLIC    xorplot
+                EXTERN     swapgfxbk
+                EXTERN    swapgfxbk1
 
-                LIB     w_xorpixel
+                EXTERN     w_xorpixel
 
 .xorplot
 		pop	bc

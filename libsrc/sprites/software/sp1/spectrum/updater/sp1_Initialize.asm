@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB sp1_Initialize
+PUBLIC sp1_Initialize
 
-LIB sp1_Initialize_callee
-XREF ASMDISP_SP1_INITIALIZE_CALLEE
+EXTERN sp1_Initialize_callee
+EXTERN ASMDISP_SP1_INITIALIZE_CALLEE
 
 .sp1_Initialize
 

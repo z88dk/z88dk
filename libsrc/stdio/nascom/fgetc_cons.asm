@@ -5,11 +5,11 @@
 ;	getkey() Wait for keypress
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2014-03-05 23:01:59 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-		XLIB	fgetc_cons
-		LIB	montest
+		PUBLIC	fgetc_cons
+		EXTERN	montest
 
 .fgetc_cons
 

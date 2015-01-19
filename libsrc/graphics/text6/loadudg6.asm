@@ -9,10 +9,10 @@
 ;   starting from character C up to character B-1
 ;
 ;
-;	$Id: loadudg6.asm,v 1.3 2014-07-09 10:12:55 stefano Exp $
+;	$Id: loadudg6.asm,v 1.4 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
-			XLIB	loadudg6
+			PUBLIC	loadudg6
 
 .loadudg6
 	;push bc

@@ -1,4 +1,4 @@
-	XLIB	read_joypad1
+	PUBLIC	read_joypad1
 	
 ;==============================================================
 ; int read_joypad1()

@@ -2,11 +2,11 @@
 ; convert unsigned long to string and store in s
 ; 04.2007 aralbrec
 
-XLIB ultoa_callee
-XDEF ASMDISP_ULTOA_CALLEE
+PUBLIC ultoa_callee
+PUBLIC ASMDISP_ULTOA_CALLEE
 
-LIB ltoa_callee, stdio_error_zc
-XREF LIBDISP_LTOA_CALLEE
+EXTERN ltoa_callee, stdio_error_zc
+EXTERN LIBDISP_LTOA_CALLEE
 
 .ultoa_callee
 

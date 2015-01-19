@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.1 2008-03-31 17:16:20 stefano Exp $
+; $Id: bit_open.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 ; VZ 200 - 1 bit sound functions
 ;
@@ -7,8 +7,8 @@
 ; Stefano Bodrato - 31/3/2008
 ;
 
-    XLIB     bit_open
-    XREF     snd_tick
+    PUBLIC     bit_open
+    EXTERN     snd_tick
 
 .bit_open
           ld    a,($783b)

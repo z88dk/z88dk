@@ -1,13 +1,13 @@
 ;  int find_file (char *filename, struct flos_file file);
 ;  CALLER linkage for function pointers
 ;
-;	$Id: find_file.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
+;	$Id: find_file.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
-XLIB find_file
+PUBLIC find_file
 
-LIB find_file_callee
-XREF ASMDISP_FIND_FILE_CALLEE
+EXTERN find_file_callee
+EXTERN ASMDISP_FIND_FILE_CALLEE
 
 find_file:
 	pop		bc

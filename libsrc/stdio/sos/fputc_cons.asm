@@ -5,12 +5,12 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: fputc_cons.asm,v 1.2 2013-11-27 12:58:14 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 ;
 
-	XLIB	fputc_cons
+	PUBLIC	fputc_cons
 
 .fputc_cons
 

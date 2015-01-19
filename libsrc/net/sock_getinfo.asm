@@ -8,9 +8,9 @@
 ;	ZSock Lib function: sock_getinfo
 
 
-	XLIB	sock_getinfo
+	PUBLIC	sock_getinfo
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

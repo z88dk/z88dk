@@ -1,4 +1,4 @@
-		XLIB	_fsetattr
+		PUBLIC	_fsetattr
 
 ._fsetattr	pop de
 		pop hl

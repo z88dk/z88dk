@@ -12,8 +12,8 @@
 ; Set up the registers for our operation
 ; Return with main set in
 
-                XLIB    fsetup
-		XREF	fa
+                PUBLIC    fsetup
+		EXTERN	fa
 
 .fsetup
         ld      ix,4    ;ret to this function and ret to code

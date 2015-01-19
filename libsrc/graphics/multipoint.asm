@@ -4,7 +4,7 @@
 ;       Stefano Bodrato 19/7/2007
 ;
 ;
-;       $Id: multipoint.asm,v 1.1 2007-08-17 13:52:33 stefano Exp $
+;       $Id: multipoint.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
@@ -12,11 +12,11 @@
 ;pick a vertical or horizontal bit bar, up to 16 bits long
 
 
-                XLIB    multipoint
+                PUBLIC    multipoint
 
-                LIB     pointxy
-                LIB     swapgfxbk
-                LIB     swapgfxbk1
+                EXTERN     pointxy
+                EXTERN     swapgfxbk
+                EXTERN     swapgfxbk1
 
 
 .multipoint

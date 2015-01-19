@@ -1,11 +1,11 @@
 ; void __CALLEE__ adt_QueueDeleteS_callee(struct adt_Queue *q, void *delete)
 ; 09.2005 aralbrec
 
-XLIB adt_QueueDeleteS_callee
-XDEF ASMDISP_ADT_QUEUEDELETES_CALLEE
+PUBLIC adt_QueueDeleteS_callee
+PUBLIC ASMDISP_ADT_QUEUEDELETES_CALLEE
 
-LIB l_jpix
-XREF _u_free
+EXTERN l_jpix
+EXTERN _u_free
 
 .adt_QueueDeleteS_callee
 

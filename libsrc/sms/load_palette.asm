@@ -1,4 +1,4 @@
-	XLIB	load_palette
+	PUBLIC	load_palette
 
 ;==============================================================
 ; void load_palette(unsigned char *data, int index, int count)

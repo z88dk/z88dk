@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB l_qsort
-LIB l_qsort_callee
-XREF ASMDISP_L_QSORT_CALLEE
+PUBLIC l_qsort
+EXTERN l_qsort_callee
+EXTERN ASMDISP_L_QSORT_CALLEE
 
 .l_qsort
 

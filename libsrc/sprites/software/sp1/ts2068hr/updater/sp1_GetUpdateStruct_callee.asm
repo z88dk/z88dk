@@ -4,8 +4,8 @@
 
 INCLUDE "ts2068hr/customize.asm"
 
-XLIB sp1_GetUpdateStruct_callee
-XDEF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
+PUBLIC sp1_GetUpdateStruct_callee
+PUBLIC ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
 
 .sp1_GetUpdateStruct_callee
 

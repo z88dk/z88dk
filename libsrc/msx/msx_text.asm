@@ -6,11 +6,11 @@
 ;
 ;	Switch to text mode
 ;
-;	$Id: msx_text.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: msx_text.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_text
-	LIB	msxbios
+	PUBLIC	msx_text
+	EXTERN	msxbios
 	
 IF FORmsx
         INCLUDE "msxbios.def"

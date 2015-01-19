@@ -1,7 +1,7 @@
 ; uchar __FASTCALL__ *zx_cy2saddr(uchar row)
 ; aralbrec 06.2007
 
-XLIB zx_cy2saddr
+PUBLIC zx_cy2saddr
 
 ; l = char Y 0..23
 

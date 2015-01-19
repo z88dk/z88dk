@@ -7,11 +7,11 @@
 ;	Non IY dependent (self modifying code)
 ;	A' isn't used
 ;
-;	$Id: dcircle2.asm,v 1.4 2007-09-24 08:07:24 stefano Exp $
+;	$Id: dcircle2.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-                XLIB    draw_circle
+                PUBLIC    draw_circle
 
 DEFVARS 0
 {

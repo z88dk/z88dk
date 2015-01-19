@@ -3,8 +3,8 @@
 ; 01.2008 aralbrec, Sprite Pack v3.0
 ; ts2068 hi-res version
 
-XLIB sp1_InvUpdateStruct
-XREF SP1V_UPDATELISTT
+PUBLIC sp1_InvUpdateStruct
+EXTERN SP1V_UPDATELISTT
 
 ; FASTCALL
 

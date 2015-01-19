@@ -1,4 +1,4 @@
-; $Id: bit_close.asm,v 1.2 2002-04-17 21:30:24 dom Exp $
+; $Id: bit_close.asm,v 1.3 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 ; TI calculator "Infrared port" 1 bit sound functions stub
 ;
@@ -7,7 +7,7 @@
 ; Stefano Bodrato - 24/10/2001
 ;
 
-    XLIB     bit_close
+    PUBLIC     bit_close
 
 .bit_close
           ret

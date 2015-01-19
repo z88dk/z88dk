@@ -3,11 +3,11 @@
 ;
 ;	Print string to the screen
 ;
-;	$Id: puts_cons.asm,v 1.1 2010-06-24 09:05:52 stefano Exp $
+;	$Id: puts_cons.asm,v 1.2 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
-		XLIB	puts_cons
+		PUBLIC	puts_cons
 
 
 ; Enter in with hl holding the address of string to print

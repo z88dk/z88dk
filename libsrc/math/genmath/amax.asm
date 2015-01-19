@@ -1,10 +1,10 @@
 ;       Small C+ Math Library
 
-        XLIB amax
+        PUBLIC amax
         
-        LIB	ldbchl
-        LIB	compare
-        LIB	ldfabc
+        EXTERN	ldbchl
+        EXTERN	compare
+        EXTERN	ldfabc
 
 
 

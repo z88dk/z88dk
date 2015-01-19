@@ -5,9 +5,9 @@
 ;	again with Damjan's algorithm
 ;	Daniel
 ;
-;	$Id: syscall5p.asm,v 1.2 2002-04-17 21:30:25 dom Exp $
+;	$Id: syscall5p.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
 
-		XLIB	syscall5p
+		PUBLIC	syscall5p
 
 .syscall5p
         ld      ix,2

@@ -9,12 +9,12 @@
 ;
 ;	Debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_getstr_callee.asm,v 1.4 2014-09-28 18:26:58 pauloscustodio Exp $ 
+;	$Id: zx_getstr_callee.asm,v 1.5 2015-01-19 01:33:07 pauloscustodio Exp $ 
 ;
 
-XLIB	zx_getstr_callee
-XDEF	ASMDISP_ZX_GETSTR_CALLEE
-XREF	call_rom3
+PUBLIC	zx_getstr_callee
+PUBLIC	ASMDISP_ZX_GETSTR_CALLEE
+EXTERN	call_rom3
 
 zx_getstr_callee:
 

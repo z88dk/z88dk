@@ -1,10 +1,10 @@
 ; int adt_ListPrepend(struct adt_List *list, void *item)
 ; CALLER linkage for function pointers
 
-XLIB adt_ListPrepend
+PUBLIC adt_ListPrepend
 
-LIB adt_ListPrepend_callee
-XREF ASMDISP_ADT_LISTPREPEND_CALLEE
+EXTERN adt_ListPrepend_callee
+EXTERN ASMDISP_ADT_LISTPREPEND_CALLEE
 
 .adt_ListPrepend
 

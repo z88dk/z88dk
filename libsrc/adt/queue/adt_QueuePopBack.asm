@@ -1,8 +1,8 @@
 ; void __FASTCALL__ *adt_QueuePopBack(struct adt_Queue *q)
 ; 11.2006 aralbrec
 
-XLIB adt_QueuePopBack
-XREF _u_free
+PUBLIC adt_QueuePopBack
+EXTERN _u_free
 
 ; enter: HL = struct adt_Queue *
 ; exit : HL = top item, item removed from queue

@@ -7,12 +7,12 @@
 ;	void ozscrolllinesclear(byte n);
 ;
 ; ------
-; $Id: ozscrolllinesclear.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozscrolllinesclear.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozscrolllinesclear
+	PUBLIC	ozscrolllinesclear
 	
-	XREF	ozactivepage
+	EXTERN	ozactivepage
 	
 
 ozscrolllinesclear:

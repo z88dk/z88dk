@@ -10,10 +10,10 @@
 ; char __FASTCALL *strdup(char *orig)
 ; 12.2006 aralbrec
 
-XLIB strdup
+PUBLIC strdup
 
-LIB HeapAlloc_callee
-XREF _heap, ASMDISP_HEAPALLOC_CALLEE
+EXTERN HeapAlloc_callee
+EXTERN _heap, ASMDISP_HEAPALLOC_CALLEE
 
 .strdup
 

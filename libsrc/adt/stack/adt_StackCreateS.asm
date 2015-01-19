@@ -1,8 +1,8 @@
 ; void __FASTCALL__ adt_StackCreateS(struct adt_Stack *s)
 ; 11.2006 aralbrec
 
-XLIB adt_StackCreateS
-LIB l_setmem
+PUBLIC adt_StackCreateS
+EXTERN l_setmem
 
 ; initialize an adt_Stack*
 

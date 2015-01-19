@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB im2_InstallISR
+PUBLIC im2_InstallISR
 
-LIB im2_InstallISR_callee
-XREF ASMDISP_IM2_INSTALLISR_CALLEE
+EXTERN im2_InstallISR_callee
+EXTERN ASMDISP_IM2_INSTALLISR_CALLEE
 
 .im2_InstallISR
 

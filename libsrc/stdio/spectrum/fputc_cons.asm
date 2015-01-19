@@ -12,14 +12,14 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.11 2014-01-03 20:49:42 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.12 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
-          XLIB  fputc_cons
+          PUBLIC  fputc_cons
 
 
-	  XREF  call_rom3
+	  EXTERN  call_rom3
 ;
 ; Entry:        a= char to print
 ;

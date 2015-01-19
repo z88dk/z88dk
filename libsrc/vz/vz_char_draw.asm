@@ -8,9 +8,9 @@
 
 ; ----- void vz_char_draw(int x, int y, int c, char ch)
 
-XLIB vz_char_draw
-LIB vz_shape
-XREF char_shape
+PUBLIC vz_char_draw
+EXTERN vz_shape
+EXTERN char_shape
 
 ; This one tied to vz_shape so can't ween off the stack
 ; without fixing vz_shape -- so left as is

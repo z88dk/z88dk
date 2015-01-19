@@ -3,7 +3,7 @@
 
                 INCLUDE "stdio.def"
 
-                XLIB    setxy   ;Set xy position in window
+                PUBLIC    setxy   ;Set xy position in window
 
 
 .setxy

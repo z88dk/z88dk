@@ -4,7 +4,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: mmc_init.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: mmc_init.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;
 ;-----------------------------------------------------------------------------------------
@@ -22,12 +22,12 @@
 ;-----------------------------------------------------------------------------------------
 ;
 
-	XLIB	mmc_init
+	PUBLIC	mmc_init
 	
-	LIB		cs_high
-	LIB		cs_low
-	LIB		mmc_wait_response
-	LIB		mmc_write_command
+	EXTERN		cs_high
+	EXTERN		cs_low
+	EXTERN		mmc_wait_response
+	EXTERN		mmc_write_command
 
 	INCLUDE "zxmmc.def"
 

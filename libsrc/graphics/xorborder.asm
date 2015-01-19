@@ -1,10 +1,10 @@
-	XLIB	xorborder
-	LIB	xorpixel
-        LIB     swapgfxbk
-	XREF	swapgfxbk1
+	PUBLIC	xorborder
+	EXTERN	xorpixel
+        EXTERN     swapgfxbk
+	EXTERN	swapgfxbk1
 
 ;
-;	$Id: xorborder.asm,v 1.3 2002-04-03 10:56:52 stefano Exp $
+;	$Id: xorborder.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 ; ***********************************************************************

@@ -3,7 +3,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: mmc_send_command.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: mmc_send_command.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; SEND COMMAND TO MMC subroutine with trailing CRC7 checkum
@@ -21,11 +21,11 @@
 ;-----------------------------------------------------------------------------------------
 
 
-	XLIB	mmc_send_command
-	LIB		mmc_wait_response
-	LIB		cs_high
-	LIB		cs_low
-	LIB		clock32
+	PUBLIC	mmc_send_command
+	EXTERN		mmc_wait_response
+	EXTERN		cs_high
+	EXTERN		cs_low
+	EXTERN		clock32
 
 	INCLUDE "zxmmc.def"
 

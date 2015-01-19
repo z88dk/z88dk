@@ -1,6 +1,6 @@
 ; asm_ispunct
 
-XLIB asm_ispunct
+PUBLIC asm_ispunct
 
 IF FORrcmx000
 LIB  rcmx_cpir

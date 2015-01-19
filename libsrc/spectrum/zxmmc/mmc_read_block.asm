@@ -4,7 +4,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Mar 2010
 ;
-;	$Id: mmc_read_block.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: mmc_read_block.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ; Read a 512 byte data block from the MMC card
 ; extern int __LIB__ mmc_read_block(struct MMC mmc_descriptor, long card_address, unsigned char *address);
@@ -25,14 +25,14 @@
 ; DESTROYS AF, HL
 ;-----------------------------------------------------------------------------------------
 
-	XLIB   mmc_read_block
+	PUBLIC   mmc_read_block
 	
-	LIB    mmc_send_command
-	LIB    mmc_waitdata_token
-	LIB    clock32
-	LIB    cs_high
+	EXTERN    mmc_send_command
+	EXTERN    mmc_waitdata_token
+	EXTERN    clock32
+	EXTERN    cs_high
 
-	XREF   card_select
+	EXTERN   card_select
 
 	INCLUDE "zxmmc.def"
 

@@ -6,11 +6,11 @@
 ;	Read SD card until data token ($FE) arrives,
 ;	if no answer is given after a timeout period, exit keeping ZF not set
 ;
-;	$Id: sd_wait_data_token.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_wait_data_token.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_wait_data_token
-	LIB		sd_get_byte
+	PUBLIC	sd_wait_data_token
+	EXTERN		sd_get_byte
 	
 
 sd_wait_data_token:

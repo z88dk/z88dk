@@ -5,12 +5,12 @@
 ;
 ; int remove(char *name)
 ;
-; $Id: rnd_erase.asm,v 1.1 2014-01-20 09:15:31 stefano Exp $
+; $Id: rnd_erase.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 
-	XLIB	rnd_erase
+	PUBLIC	rnd_erase
 	
-	LIB	zx_goto
-	LIB	zxgetfname2
+	EXTERN	zx_goto
+	EXTERN	zxgetfname2
 
 .rnd_erase
 	pop	bc

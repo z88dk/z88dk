@@ -4,13 +4,13 @@
 ;	extern void _FASTCALL_ osca_set_palette(char palette[256]);
 ;	set colour palette
 ;
-;	$Id: osca_set_palette.asm,v 1.3 2012-03-08 07:16:46 stefano Exp $
+;	$Id: osca_set_palette.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB	osca_set_palette
-	LIB     swapgfxbk
-	XREF    swapgfxbk1
+	PUBLIC	osca_set_palette
+	EXTERN     swapgfxbk
+	EXTERN    swapgfxbk1
 	
     INCLUDE "osca.def"
 

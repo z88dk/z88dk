@@ -1,10 +1,10 @@
 ; struct adt_Stack *adt_StackCreate(void)
 ; 09.2005, 11.2006 aralbrec
 
-XLIB adt_StackCreate
+PUBLIC adt_StackCreate
 
-LIB l_setmem
-XREF _u_malloc
+EXTERN l_setmem
+EXTERN _u_malloc
 
 ; create an empty stack
 ;

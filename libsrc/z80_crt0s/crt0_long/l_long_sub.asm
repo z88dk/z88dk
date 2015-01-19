@@ -5,7 +5,7 @@
 ;       The old routine is fubarred! Written a new one now..but
 ;       I'm mystified!
 
-XLIB    l_long_sub
+PUBLIC    l_long_sub
 
 ; dehl = primary
 ; stack = secondary, ret

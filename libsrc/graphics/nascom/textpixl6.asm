@@ -4,12 +4,12 @@
 ;	Version for the 2x3 graphics symbols
 ;	Sequence: blank, top-left, top-right, top-half, medium-left, top-left + medium-left, etc..
 ;
-;	$Id: textpixl6.asm,v 1.1 2006-12-28 18:08:36 stefano Exp $
+;	$Id: textpixl6.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 ;
 
 
-	XLIB	textpixl
+	PUBLIC	textpixl
 
 
 .textpixl

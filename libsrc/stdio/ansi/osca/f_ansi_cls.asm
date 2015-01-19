@@ -9,10 +9,10 @@
 ;	Stefano Bodrato - June 2012
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.1 2012-05-31 14:52:59 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_cls
+	PUBLIC	ansi_cls
     INCLUDE "flos.def"
 
 .ansi_cls

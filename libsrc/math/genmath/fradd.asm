@@ -3,9 +3,9 @@
 ;
 ;       fraction add c ix de += (hl)
 ;
-;       $Id: fradd.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: fradd.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $:
 
-		XLIB	fradd
+		PUBLIC	fradd
 
 .fradd  LD      A,(HL)
         ADD     A,E

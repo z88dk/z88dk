@@ -1,10 +1,10 @@
 
-	XLIB	xorpixel
+	PUBLIC	xorpixel
 
-	XREF	coords
+	EXTERN	coords
 
 ;
-;	$Id: xorpixl.asm,v 1.5 2014-04-18 09:30:32 stefano Exp $
+;	$Id: xorpixl.asm,v 1.6 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

@@ -14,17 +14,17 @@
 ;
 ;       Frode Tennebø - 29/12/2002
 ;
-;       $Id: f_ansi_attr.asm,v 1.2 2014-04-11 11:14:01 stefano Exp $
+;       $Id: f_ansi_attr.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-        XLIB    ansi_attr
-        LIB     ansi_default
-        LIB     ansi_restore
+        PUBLIC    ansi_attr
+        EXTERN     ansi_default
+        EXTERN     ansi_restore
 
-        XREF    UNDRLN
+        EXTERN    UNDRLN
 
-        XDEF    FOREGR
-        XDEF    BACKGR
+        PUBLIC    FOREGR
+        PUBLIC    BACKGR
 
 .ansi_attr
         and     a

@@ -5,11 +5,11 @@
 ;	getk() Read key status
 ;
 ;
-;	$Id: getk.asm,v 1.2 2014-03-05 23:01:59 pauloscustodio Exp $
+;	$Id: getk.asm,v 1.3 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-		XLIB	getk
-		LIB	montest
+		PUBLIC	getk
+		EXTERN	montest
 
 .getk
 	call	montest

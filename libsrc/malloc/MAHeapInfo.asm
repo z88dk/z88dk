@@ -1,5 +1,5 @@
 
-XLIB MAHeapInfo
+PUBLIC MAHeapInfo
 
 .MAHeapInfo
 

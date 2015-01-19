@@ -6,10 +6,10 @@
 ;	1	SEEK_CUR from current position
 ;	2	SEEK_END from end of file (always -ve)
 ;
-;	$Id: lseek.asm,v 1.1 2002-06-23 12:11:31 dom Exp $
+;	$Id: lseek.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
-	XLIB	lseek
+	PUBLIC	lseek
 
 .lseek
 	LD	IX,0	

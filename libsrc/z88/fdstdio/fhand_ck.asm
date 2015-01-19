@@ -9,7 +9,7 @@
                 INCLUDE "libdefs.def"
 
 
-                XLIB    fhand_ck
+                PUBLIC    fhand_ck
 
 ;Entry: de=handle
 

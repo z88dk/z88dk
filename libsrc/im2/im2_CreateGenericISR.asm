@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB im2_CreateGenericISR
+PUBLIC im2_CreateGenericISR
 
-LIB im2_CreateGenericISR_callee
-XREF ASMDISP_IM2_CREATEGENERICISR_CALLEE
+EXTERN im2_CreateGenericISR_callee
+EXTERN ASMDISP_IM2_CREATEGENERICISR_CALLEE
 
 .im2_CreateGenericISR
 

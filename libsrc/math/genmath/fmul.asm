@@ -3,16 +3,16 @@
 ;
 ;       Multiply fa y bc ix de
 ;
-;       $Id: fmul.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: fmul.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $:
 
 
-		XLIB	fmul
+		PUBLIC	fmul
 
-		LIB	sgn
-		LIB	div14
-		LIB	norm
+		EXTERN	sgn
+		EXTERN	div14
+		EXTERN	norm
 
-		XREF	fa
+		EXTERN	fa
 
 
 .fmul   CALL    sgn

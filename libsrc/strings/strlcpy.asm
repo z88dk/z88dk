@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB strlcpy
+PUBLIC strlcpy
 
-LIB strlcpy_callee
-XREF ASMDISP_STRLCPY_CALLEE
+EXTERN strlcpy_callee
+EXTERN ASMDISP_STRLCPY_CALLEE
 
 .strlcpy
 

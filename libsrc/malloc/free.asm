@@ -1,10 +1,10 @@
 ; void __FASTCALL__ free(void *addr)
 ; 12.2006 aralbrec
 
-XLIB free
+PUBLIC free
 
-LIB HeapFree_callee
-XREF _heap, ASMDISP_HEAPFREE_CALLEE
+EXTERN HeapFree_callee
+EXTERN _heap, ASMDISP_HEAPFREE_CALLEE
 
 .free
 

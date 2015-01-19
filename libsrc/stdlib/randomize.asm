@@ -7,11 +7,11 @@
 ;       void randomize() - randomize the seed for rand()
 ;
 ; -----
-; $Id: randomize.asm,v 1.3 2011-08-12 18:53:50 pauloscustodio Exp $
+; $Id: randomize.asm,v 1.4 2015-01-19 01:33:22 pauloscustodio Exp $
 
-XLIB randomize
-XREF _std_seed
-XREF cleanup
+PUBLIC randomize
+EXTERN _std_seed
+EXTERN cleanup
 
 ; you must declare an integer named "std_seed" in your
 ; main.c file to hold the seed.

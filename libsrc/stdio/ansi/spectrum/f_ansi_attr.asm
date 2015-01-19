@@ -12,11 +12,11 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.4 2014-01-03 20:49:42 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_attr
-	XREF	INVRS
+	PUBLIC	ansi_attr
+	EXTERN	INVRS
 
 
 .ansi_attr

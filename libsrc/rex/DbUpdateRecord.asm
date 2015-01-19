@@ -1,12 +1,12 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: DbUpdateRecord.asm,v 1.1 2001-07-24 09:11:20 dmarion Exp $
+;	$Id: DbUpdateRecord.asm,v 1.2 2015-01-19 01:33:06 pauloscustodio Exp $
 ;
 ; extern INT DbUpdateRecord( int, ... );
 ;
 
-		XLIB	DbUpdateRecord
+		PUBLIC	DbUpdateRecord
 
 .DbUpdateRecord
  	ld 	b,a

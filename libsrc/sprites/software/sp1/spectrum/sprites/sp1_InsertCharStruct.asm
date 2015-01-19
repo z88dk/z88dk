@@ -1,10 +1,10 @@
 ; void sp1_InsertCharStruct(struct sp1_update *u, struct sp1_cs *cs)
 ; CALLER linkage for function pointers
 
-XLIB sp1_InsertCharStruct
+PUBLIC sp1_InsertCharStruct
 
-LIB sp1_InsertCharStruct_callee
-XREF ASMDISP_SP1_INSERTCHARSTRUCT_CALLEE
+EXTERN sp1_InsertCharStruct_callee
+EXTERN ASMDISP_SP1_INSERTCHARSTRUCT_CALLEE
 
 .sp1_InsertCharStruct
 

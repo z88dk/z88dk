@@ -1,7 +1,7 @@
 ; CALLER linkage for function pointers
 
-XLIB ba_BestFit
-LIB BABestFit
+PUBLIC ba_BestFit
+EXTERN BABestFit
 
 .ba_BestFit
 

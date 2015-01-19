@@ -3,8 +3,8 @@
 ;
 ;	$Id;$
 
-	XLIB	DsGetPixelAddr
-	LIB	pixaddr
+	PUBLIC	DsGetPixelAddr
+	EXTERN	pixaddr
 
 
 .DsGetPixelAddr

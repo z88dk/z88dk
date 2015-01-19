@@ -3,7 +3,7 @@
 ;
 ;--------------------------------------------------------------
 ;
-;       $Id: gen_tv_field_init.asm,v 1.1 2013-01-02 14:55:32 stefano Exp $
+;       $Id: gen_tv_field_init.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -13,9 +13,9 @@
 ;
 ;----------------------------------------------------------------
 
-        XLIB    gen_tv_field_init
-        XREF    DFILE_PTRA
-        XREF    DFILE_PTRB
+        PUBLIC    gen_tv_field_init
+        EXTERN    DFILE_PTRA
+        EXTERN    DFILE_PTRB
 
 gen_tv_field_init:
 ;	push	hl

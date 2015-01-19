@@ -15,13 +15,13 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_puts.asm,v 1.1 2007-06-03 15:13:06 stefano Exp $
+; $Id: nb_puts.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB nb_puts
+	PUBLIC nb_puts
 	
-	LIB ZCALL
+	EXTERN ZCALL
 
 .nb_puts
 

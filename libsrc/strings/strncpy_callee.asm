@@ -2,8 +2,8 @@
 ; copy at most n chars from src to dst and padding with '\0' if nec
 ; 04.2001 dom, 12.2006 aralbrec
 
-XLIB strncpy_callee
-XDEF ASMDISP_STRNCPY_CALLEE
+PUBLIC strncpy_callee
+PUBLIC ASMDISP_STRNCPY_CALLEE
 
 .strncpy_callee
 

@@ -1,7 +1,7 @@
 ;
 ;	create a file on an Amstrad NC100
 ;
-		XLIB creat
+		PUBLIC creat
 
 .creat		pop de
 		pop bc		; don't care

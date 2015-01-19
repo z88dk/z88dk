@@ -1,7 +1,7 @@
 ; We should scroll the screen up one character here
 ; Blanking the bottom row..
-	XLIB	ansi_SCROLLUP
-	LIB     zx_rowtab
+	PUBLIC	ansi_SCROLLUP
+	EXTERN     zx_rowtab
 
 .ansi_SCROLLUP
 	ld      ix,zx_rowtab

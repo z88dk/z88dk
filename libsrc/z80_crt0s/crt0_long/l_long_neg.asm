@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-XLIB    l_long_neg
+PUBLIC    l_long_neg
 
 ; deHL = -deHL
 

@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB bzero
-LIB memset_callee
-XREF ASMDISP_MEMSET_CALLEE
+PUBLIC bzero
+EXTERN memset_callee
+EXTERN ASMDISP_MEMSET_CALLEE
 
 .bzero
 

@@ -1,8 +1,8 @@
 ; void adt_Heapify(void **array, uint n, void *compare)
 ; 08.2005 aralbrec
 
-XLIB ADTHeapify
-LIB ADTHeapSiftDown
+PUBLIC ADTHeapify
+EXTERN ADTHeapSiftDown
 
 ; enter:  BC = array address
 ;         IX = compare (de) < (hl)? set carry if true  MUST PRESERVE BC,DE,HL,IX

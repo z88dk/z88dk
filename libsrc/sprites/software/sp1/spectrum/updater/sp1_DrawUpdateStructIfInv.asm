@@ -5,8 +5,8 @@
 
 ; FASTCALL
 
-XLIB sp1_DrawUpdateStructIfInv
-LIB SP1DrawUpdateStruct
+PUBLIC sp1_DrawUpdateStructIfInv
+EXTERN SP1DrawUpdateStruct
 
 ; Draw the char's graphics to screen but only
 ; if the update struct is currently invalidated

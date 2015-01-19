@@ -3,12 +3,12 @@
 ;
 ;	MSX version
 ;
-;	$Id: bkrestore.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: bkrestore.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 
-	XLIB    bkrestore
-	XREF	bkpixeladdress
+	PUBLIC    bkrestore
+	EXTERN	bkpixeladdress
 
 
 IF FORmsx

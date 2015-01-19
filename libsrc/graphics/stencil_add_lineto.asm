@@ -8,24 +8,24 @@
 ;       Stefano Bodrato - 08/10/2009
 ;
 ;
-;	$Id: stencil_add_lineto.asm,v 1.5 2014-04-30 18:34:18 stefano Exp $
+;	$Id: stencil_add_lineto.asm,v 1.6 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ;; void stencil_add_lineto(int x, int y, unsigned char *stencil)
 
 
 
-                XLIB    stencil_add_lineto
+                PUBLIC    stencil_add_lineto
 
-                LIB     Line
-                LIB     stencil_add_pixel 
+                EXTERN     Line
+                EXTERN     stencil_add_pixel 
 
-				XREF	coords
+				EXTERN	coords
 
-                LIB     swapgfxbk
-                XREF    swapgfxbk1
+                EXTERN     swapgfxbk
+                EXTERN    swapgfxbk1
 
-                XREF    stencil_ptr
+                EXTERN    stencil_ptr
 
 .stencil_add_lineto
 		ld	ix,0

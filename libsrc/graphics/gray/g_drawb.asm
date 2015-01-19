@@ -4,18 +4,18 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_drawb.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;	$Id: g_drawb.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ;Usage: g_drawb(int tlx, int tly, int width, int height, int GrayLevel);
 
 
-                XLIB    g_drawb
+                PUBLIC    g_drawb
 
-                LIB     drawbox
-                LIB     plotpixel
-                LIB     respixel
-                LIB	graypage
+                EXTERN     drawbox
+                EXTERN     plotpixel
+                EXTERN     respixel
+                EXTERN	graypage
 
 
 .g_drawb

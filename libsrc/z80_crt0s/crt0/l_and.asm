@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_and
+                PUBLIC    l_and
 
 ; "and" HL and DE into HL
 .l_and 

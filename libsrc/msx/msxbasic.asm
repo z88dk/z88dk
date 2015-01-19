@@ -5,11 +5,11 @@
 ;	Internal function, call a ROM BASIC subroutine
 ;
 ;
-;	$Id: msxbasic.asm,v 1.2 2014-05-19 07:13:09 stefano Exp $
+;	$Id: msxbasic.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msxbasic
-	LIB	msxrompage
+	PUBLIC	msxbasic
+	EXTERN	msxrompage
 
 	INCLUDE "msxbios.def"
 

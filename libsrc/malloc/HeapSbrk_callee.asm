@@ -1,11 +1,11 @@
 ; void __CALLEE__ HeapSbrk_callee(void *heap, void *addr, unsigned int size)
 ; 12.2006 aralbrec
 
-XLIB HeapSbrk_callee
-XDEF ASMDISP_HEAPSBRK_CALLEE
+PUBLIC HeapSbrk_callee
+PUBLIC ASMDISP_HEAPSBRK_CALLEE
 
-LIB HeapFree_callee
-XREF ASMDISP_HEAPFREE_CALLEE
+EXTERN HeapFree_callee
+EXTERN ASMDISP_HEAPFREE_CALLEE
 
 .HeapSbrk_callee
 

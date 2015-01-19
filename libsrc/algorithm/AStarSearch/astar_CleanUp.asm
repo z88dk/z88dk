@@ -2,9 +2,9 @@
 ; delete paths in astar's priority queue and optional path in parameter
 ; 01.2007 aralbrec
 
-XLIB astar_CleanUp
-LIB astar_DeletePath
-XREF _astar_queueN, _astar_queue
+PUBLIC astar_CleanUp
+EXTERN astar_DeletePath
+EXTERN _astar_queueN, _astar_queue
 
 .astar_CleanUp
 

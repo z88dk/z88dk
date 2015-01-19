@@ -6,12 +6,12 @@
 ;
 ;	Change the MSX screen mode; mode in HL (FASTCALL)
 ;
-;	$Id: msx_screen.asm,v 1.5 2009-06-22 21:44:17 dom Exp $
+;	$Id: msx_screen.asm,v 1.6 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_screen
-	LIB	msxbios
-	LIB	msxextrom
+	PUBLIC	msx_screen
+	EXTERN	msxbios
+	EXTERN	msxextrom
 	
         INCLUDE "msxbios.def"
 

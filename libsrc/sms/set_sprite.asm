@@ -1,4 +1,4 @@
-	XLIB	set_sprite
+	PUBLIC	set_sprite
 
 ;==============================================================
 ; set_sprite(int n, int x, int y, int tile)	

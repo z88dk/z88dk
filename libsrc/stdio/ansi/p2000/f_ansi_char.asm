@@ -10,13 +10,13 @@
 ;	$Id:
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 	
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 	
 .text_cols   defb 40
 .text_rows   defb 25

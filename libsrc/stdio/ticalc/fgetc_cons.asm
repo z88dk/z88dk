@@ -6,13 +6,13 @@
 ;	Stefano Bodrato - Dec 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.7 2014-05-25 19:48:04 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.8 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
-		XLIB	fgetc_cons
-		LIB	getk_decode
-		XREF	tiei
-		XREF	tidi
+		PUBLIC	fgetc_cons
+		EXTERN	getk_decode
+		EXTERN	tiei
+		EXTERN	tidi
 
 		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 

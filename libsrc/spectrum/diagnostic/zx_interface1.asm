@@ -12,11 +12,11 @@
 ;
 ;	Shouldn't conflict with other interfaces.
 ;
-;	$Id: zx_interface1.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: zx_interface1.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
 ;
 
-	XLIB	zx_interface1
-	LIB	if1_installed
+	PUBLIC	zx_interface1
+	EXTERN	if1_installed
 	
 zx_interface1:
 	ld	bc,($5c3d)

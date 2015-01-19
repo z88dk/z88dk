@@ -1,7 +1,7 @@
 ; uchar __FASTCALL__ *zx_py2saddr(uchar ycoord)
 ; aralbrec 06.2007
 
-XLIB zx_py2saddr
+PUBLIC zx_py2saddr
 
 .zx_py2saddr
 

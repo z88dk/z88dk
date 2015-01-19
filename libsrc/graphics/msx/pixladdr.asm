@@ -1,15 +1,15 @@
 
-	XLIB	pixeladdress
+	PUBLIC	pixeladdress
 
 	;XREF	base_graphics
-	XREF	pixelbyte
-	XDEF	pix_return
+	EXTERN	pixelbyte
+	PUBLIC	pix_return
 
 	INCLUDE	"graphics/grafix.inc"
 	INCLUDE	"msx/vdp.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.7 2014-10-08 18:33:51 stefano Exp $
+;	$Id: pixladdr.asm,v 1.8 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

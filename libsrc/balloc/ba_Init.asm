@@ -1,7 +1,7 @@
 ; 04.2004 aralbrec
 
-XLIB ba_Init
-XREF _ba_qtbl
+PUBLIC ba_Init
+EXTERN _ba_qtbl
 
 ; Clears all memory queues to empty.
 ;

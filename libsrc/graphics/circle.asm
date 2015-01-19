@@ -6,19 +6,19 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: circle.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: circle.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
 ;Usage: circle(struct *pixels)
 
 
-                XLIB    circle
+                PUBLIC    circle
 
-                LIB     draw_circle
-                LIB     plotpixel
-                LIB     swapgfxbk
-		XREF	swapgfxbk1
+                EXTERN     draw_circle
+                EXTERN     plotpixel
+                EXTERN     swapgfxbk
+		EXTERN	swapgfxbk1
 
 
 .circle

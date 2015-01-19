@@ -3,9 +3,9 @@
 ;       transcendental floating point routines
 ;
 
-                XLIB    pi
+                PUBLIC    pi
 
-		LIB	ldfabc
+		EXTERN	ldfabc
 
 
 ;double pi()

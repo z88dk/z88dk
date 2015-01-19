@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: float.asm,v 1.3 2014-04-11 11:14:01 stefano Exp $
+;       $Id: float.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
@@ -29,8 +29,8 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB	float
-		LIB	stkequ
+                PUBLIC	float
+		EXTERN	stkequ
 .float
 IF TINYMODE
 

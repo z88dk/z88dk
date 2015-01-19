@@ -1,4 +1,4 @@
-; $Id: bit_close_ei.asm,v 1.2 2013-10-21 14:23:45 stefano Exp $
+; $Id: bit_close_ei.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; CCE MC-1000 bit sound functions
 ;
@@ -8,9 +8,9 @@
 ;
 
 
-    XLIB     bit_close_ei
-    LIB		bit_close
-    XREF     bit_irqstatus
+    PUBLIC     bit_close_ei
+    EXTERN		bit_close
+    EXTERN     bit_irqstatus
 
 .bit_close_ei
 	call bit_close

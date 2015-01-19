@@ -1,7 +1,7 @@
 ; operations for memopi() and memopd()
 ; 06.2007 aralbrec
 
-XLIB memops
+PUBLIC memops
 
 .memops
 .opload

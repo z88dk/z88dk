@@ -4,12 +4,12 @@
 ;
 ;	getk() Read key status
 ;
-;	$Id: savecia.asm,v 1.1 2008-06-23 17:34:34 stefano Exp $
+;	$Id: savecia.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
 
-		XLIB	savecia
-		XDEF	SaveA
+		PUBLIC	savecia
+		PUBLIC	SaveA
 
 .SaveA  defw  0
 

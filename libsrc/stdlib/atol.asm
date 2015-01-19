@@ -1,8 +1,8 @@
 ; long __FASTCALL__ atol(char *s)
 ; 12.2006 aralbrec
 
-XLIB atol
-LIB l_long_neg, asm_isspace
+PUBLIC atol
+EXTERN l_long_neg, asm_isspace
 
 ; FASTCALL
 

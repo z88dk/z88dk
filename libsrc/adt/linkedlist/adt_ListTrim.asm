@@ -1,10 +1,10 @@
 ; void __FASTCALL__ *adt_ListTrim(struct adt_List *list)
 ; 02.2003, 08.2005 aralbrec
 
-XLIB adt_ListTrim
+PUBLIC adt_ListTrim
 
-LIB l_setmem
-XREF _u_free
+EXTERN l_setmem
+EXTERN _u_free
 
 .adt_ListTrim
 

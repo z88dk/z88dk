@@ -5,15 +5,15 @@
 ;
 ;	Stefano Bodrato - Nov. 2002
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.4 2014-03-05 23:01:59 pauloscustodio Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.5 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_SCROLLUP
+	PUBLIC	ansi_SCROLLUP
 
-	XREF	base_graphics
+	EXTERN	base_graphics
 
-	LIB     swapgfxbk
-        XREF	swapgfxbk1
+	EXTERN     swapgfxbk
+        EXTERN	swapgfxbk1
 
 
 .ansi_SCROLLUP

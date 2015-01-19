@@ -10,20 +10,20 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_read_sector_callee.asm,v 1.4 2014-09-28 18:26:58 pauloscustodio Exp $
+;	$Id: sd_read_sector_callee.asm,v 1.5 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_read_sector_callee
-	XDEF	ASMDISP_SD_READ_SECTOR_CALLEE
+	PUBLIC	sd_read_sector_callee
+	PUBLIC	ASMDISP_SD_READ_SECTOR_CALLEE
 
-	XREF	sd_card_info
-	XREF	card_select
+	EXTERN	sd_card_info
+	EXTERN	card_select
 	
-	LIB		sd_read_sector_main
-	LIB		sd_set_sector_addr_regs
-	LIB		sd_send_command_current_args
-	LIB		sd_wait_data_token
-	LIB		sd_deselect_card
+	EXTERN		sd_read_sector_main
+	EXTERN		sd_set_sector_addr_regs
+	EXTERN		sd_send_command_current_args
+	EXTERN		sd_wait_data_token
+	EXTERN		sd_deselect_card
 
     INCLUDE "sdcard.def"
     INCLUDE "osca.def"

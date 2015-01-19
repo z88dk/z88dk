@@ -14,12 +14,12 @@
 ; Output Registers :  FLOS style error handling
 ;
 ;
-;	$Id: force_load.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
+;	$Id: force_load.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
-	XLIB  force_load
-	LIB  force_load_callee
-	XREF ASMDISP_FORCE_LOAD_CALLEE
+	PUBLIC  force_load
+	EXTERN  force_load_callee
+	EXTERN ASMDISP_FORCE_LOAD_CALLEE
 
 force_load:
 	pop de

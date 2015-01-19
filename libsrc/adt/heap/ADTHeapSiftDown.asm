@@ -1,8 +1,8 @@
 ; void adt_HeapSiftDown(uint start, void **array, uint n, void *compare)
 ; 03.2003, 08.2005 aralbrec
 
-XLIB ADTHeapSiftDown
-LIB l_jpix
+PUBLIC ADTHeapSiftDown
+EXTERN l_jpix
 
 ; enter:  DE = start index * 2 (offset into array in bytes)
 ;         BC = array address

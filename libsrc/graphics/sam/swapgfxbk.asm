@@ -7,16 +7,16 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.2 2011-08-12 18:24:13 pauloscustodio Exp $
+;	$Id: swapgfxbk.asm,v 1.3 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 ; registers changed after return:
 ;  ..bcdejl/..iy same
 ;  af....../ix.. different
 ; NB! Mad hack! I hope that iy is not used for anything else around. 
 	
-                XLIB    swapgfxbk
+                PUBLIC    swapgfxbk
 
-		XDEF	swapgfxbk1
+		PUBLIC	swapgfxbk1
 
 
 

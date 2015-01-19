@@ -2,9 +2,9 @@
 ; compare first n chars of s1 and s2
 ; 11.1999 djm, 12.2006 aralbrec
 
-XLIB memcmp_callee
-XDEF ASMDISP_MEMCMP_CALLEE
-LIB     rcmx_cpi
+PUBLIC memcmp_callee
+PUBLIC ASMDISP_MEMCMP_CALLEE
+EXTERN     rcmx_cpi
 
 
 .memcmp_callee

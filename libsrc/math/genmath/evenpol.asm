@@ -1,12 +1,12 @@
 ;       Small C+ Math Library
 
 
-                XLIB    evenpol
-                LIB     poly
+                PUBLIC    evenpol
+                EXTERN     poly
 
-                LIB	pushfa
-                LIB	ldbcfa
-                LIB	fmul
+                EXTERN	pushfa
+                EXTERN	ldbcfa
+                EXTERN	fmul
 
 ;
 ;       transcendental floating point routines: polynomial evaluation

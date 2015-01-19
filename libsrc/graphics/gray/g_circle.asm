@@ -4,18 +4,18 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_circle.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;	$Id: g_circle.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ;Usage: g_circle(int x, int y, int radius, int skip, int GrayLevel)
 
 
-                XLIB    g_circle
+                PUBLIC    g_circle
 
-                LIB     draw_circle
-                LIB     plotpixel
-                LIB     respixel
-                LIB     graypage
+                EXTERN     draw_circle
+                EXTERN     plotpixel
+                EXTERN     respixel
+                EXTERN     graypage
 
 
 .g_circle

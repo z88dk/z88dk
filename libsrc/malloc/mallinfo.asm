@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB mallinfo
+PUBLIC mallinfo
 
-LIB HeapInfo
-XREF _heap
+EXTERN HeapInfo
+EXTERN _heap
 
 .mallinfo
 

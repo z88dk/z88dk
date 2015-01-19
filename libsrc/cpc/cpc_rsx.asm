@@ -7,10 +7,10 @@
 ;       It accepts the command name (it will be adapted "on the fly"),
 ;       and a list of pointers to variables.
 ;
-;       $Id: cpc_rsx.asm,v 1.2 2009-06-22 21:44:16 dom Exp $
+;       $Id: cpc_rsx.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-        XLIB    cpc_rsx
+        PUBLIC    cpc_rsx
 
         INCLUDE "cpcfirm.def"              
 

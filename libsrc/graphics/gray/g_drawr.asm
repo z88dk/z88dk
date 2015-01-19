@@ -4,19 +4,19 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_drawr.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
+;	$Id: g_drawr.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ;Usage: g_drawr(int px, int py, int GrayLevel)
 
-                XLIB    g_drawr
+                PUBLIC    g_drawr
 
-		XREF	coords
+		EXTERN	coords
 
-                LIB     line_r
-                LIB     plotpixel
-                LIB     respixel
-                LIB     graypage
+                EXTERN     line_r
+                EXTERN     plotpixel
+                EXTERN     respixel
+                EXTERN     graypage
 
 
 .g_drawr

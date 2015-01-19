@@ -1,8 +1,8 @@
 ; 05.2005 aralbrec
 ; binary search
 
-XLIB Lbsearch
-LIB l_jpix
+PUBLIC Lbsearch
+EXTERN l_jpix
 
 ; The ansi-C bsearch function searches an array of n-byte items.
 ; This is a 'little' version that searches arrays of 2-byte items.

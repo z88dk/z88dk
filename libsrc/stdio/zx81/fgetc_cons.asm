@@ -6,13 +6,13 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.5 2007-10-25 17:10:54 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
 ;
 
-	XLIB	fgetc_cons
-	LIB	zx81toasc
+	PUBLIC	fgetc_cons
+	EXTERN	zx81toasc
 
-        XREF    restore81
+        EXTERN    restore81
 
 .fgetc_cons
 	call	restore81

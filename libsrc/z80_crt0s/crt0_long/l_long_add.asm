@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-XLIB l_long_add
+PUBLIC l_long_add
 
 .l_long_add
 

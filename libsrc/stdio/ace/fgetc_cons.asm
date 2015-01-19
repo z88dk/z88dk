@@ -5,10 +5,10 @@
 ;	getkey() Wait for keypress
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2001-10-22 09:33:55 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2015-01-19 01:33:17 pauloscustodio Exp $
 ;
 
-	XLIB	fgetc_cons
+	PUBLIC	fgetc_cons
 
 .fgetc_cons
 

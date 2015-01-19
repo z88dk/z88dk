@@ -8,9 +8,9 @@
 ;	ZSock Lib function: device_online
 
 
-	XLIB 	GoTCP
+	PUBLIC 	GoTCP
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

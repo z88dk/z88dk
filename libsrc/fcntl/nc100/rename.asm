@@ -1,4 +1,4 @@
-		XLIB rename
+		PUBLIC rename
 
 .rename
 		pop bc

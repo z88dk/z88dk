@@ -10,12 +10,12 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_attr
+	PUBLIC	ansi_attr
 
-	XDEF	vz_inverse
+	PUBLIC	vz_inverse
 	
 .vz_inverse	defb 0
 

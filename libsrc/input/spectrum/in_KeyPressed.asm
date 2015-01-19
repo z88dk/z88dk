@@ -1,7 +1,7 @@
 ; uint in_KeyPressed(uint scancode)
 ; 09.2005 aralbrec
 
-XLIB in_KeyPressed
+PUBLIC in_KeyPressed
 
 ; Determines if a key is pressed using the scan code
 ; returned by in_LookupKey.

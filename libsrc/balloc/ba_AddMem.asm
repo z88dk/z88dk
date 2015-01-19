@@ -1,7 +1,7 @@
 ; CALLER linkage for function pointers
 
-XLIB ba_AddMem
-LIB BAAddMem
+PUBLIC ba_AddMem
+EXTERN BAAddMem
 
 .ba_AddMem
 

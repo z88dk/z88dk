@@ -1,7 +1,7 @@
 ; CALLER linkage for function pointers
 
-XLIB HeapInfo
-LIB MAHeapInfo
+PUBLIC HeapInfo
+EXTERN MAHeapInfo
 
 .HeapInfo
 

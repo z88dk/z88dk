@@ -6,8 +6,8 @@
 ;       Karl Von Dyson (for X1s.org) - 24/10/2013
 ;
 
-        XLIB fgetc_cons
-        XREF _x1_keyboard_io
+        PUBLIC fgetc_cons
+        EXTERN _x1_keyboard_io
 
 fgetc_cons:      
         ld hl, _x1_keyboard_io+1

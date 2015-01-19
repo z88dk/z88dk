@@ -7,7 +7,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: clga2.asm,v 1.1 2010-11-23 15:45:33 stefano Exp $
+;	$Id: clga2.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 
@@ -15,8 +15,8 @@
 
 
 	INCLUDE	"graphics/grafix.inc"
-	XLIB    clga
-	LIB	w_pixeladdress
+	PUBLIC    clga
+	EXTERN	w_pixeladdress
 
 .clga
 		ld	ix,0

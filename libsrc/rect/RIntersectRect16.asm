@@ -2,8 +2,8 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIntersectRect16
-LIB RIntersectIval16
+PUBLIC RIntersectRect16
+EXTERN RIntersectIval16
 
 ; Returns the intersection of two 16-bit rectangles.
 ; Since rectangles can wrap across their 0-65535

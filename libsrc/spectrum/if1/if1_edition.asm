@@ -7,11 +7,11 @@
 ;       int (if1_issue);
 ;        - detect the Interface 1 shadow rom edition version
 ;
-;       $Id: if1_edition.asm,v 1.1 2010-01-22 16:00:38 stefano Exp $
+;       $Id: if1_edition.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-                XLIB    if1_edition
+                PUBLIC    if1_edition
 
 if1_edition:     ; start creating an 'M' channel
 

@@ -7,14 +7,14 @@
 ;
 ;
 ; ------
-; $Id: ozexitto.asm,v 1.2 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozexitto.asm,v 1.3 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozexitto
+	PUBLIC	ozexitto
 	
-	LIB	ozkeyclear
-	LIB	ozungetch2
-	XREF	cleanup		;exit
+	EXTERN	ozkeyclear
+	EXTERN	ozungetch2
+	EXTERN	cleanup		;exit
 
 
 ozexitto:

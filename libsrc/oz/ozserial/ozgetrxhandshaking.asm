@@ -8,14 +8,14 @@
 ;	buffered serial input
 ;
 ; ------
-; $Id: ozgetrxhandshaking.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozgetrxhandshaking.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XLIB	ozgetrxhandshaking
+	PUBLIC	ozgetrxhandshaking
 
-	LIB	serial_int
-	XREF	SerialBuffer
-	XREF	ozrxhandshaking
+	EXTERN	serial_int
+	EXTERN	SerialBuffer
+	EXTERN	ozrxhandshaking
 
 
 ozgetrxhandshaking:

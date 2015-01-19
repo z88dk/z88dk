@@ -7,12 +7,12 @@
 ;	float zx_getfloat(char *variable);
 ;
 ;
-;	$Id: zx_getfloat.asm,v 1.1 2009-08-04 14:07:18 stefano Exp $
+;	$Id: zx_getfloat.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 
-XLIB	zx_getfloat
-LIB	zx_locatenum
-XREF	fa
+PUBLIC	zx_getfloat
+EXTERN	zx_locatenum
+EXTERN	fa
 
 INCLUDE  "81fp.def"
 

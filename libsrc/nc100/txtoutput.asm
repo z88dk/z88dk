@@ -1,4 +1,4 @@
-		XLIB txtoutput
+		PUBLIC txtoutput
 ; fastcall
 .txtoutput
 		ld a, l	

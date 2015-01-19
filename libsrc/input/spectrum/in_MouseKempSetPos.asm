@@ -1,10 +1,10 @@
 ; void in_MouseKempSetPos(uint xcoord, uint ycoord)
 ; 09.2005 aralbrec
 
-XLIB in_MouseKempSetPos
+PUBLIC in_MouseKempSetPos
 
-LIB in_MouseKempSetPos_callee
-XREF CDISP_IN_MOUSEKEMPSETPOS_CALLEE
+EXTERN in_MouseKempSetPos_callee
+EXTERN CDISP_IN_MOUSEKEMPSETPOS_CALLEE
 
 .in_MouseKempSetPos
 

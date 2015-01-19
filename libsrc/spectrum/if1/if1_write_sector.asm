@@ -6,16 +6,16 @@
 ;	Writes the specified sector to the specified drive.
 ;
 ;	
-;	$Id: if1_write_sector.asm,v 1.1 2008-06-29 08:25:48 aralbrec Exp $
+;	$Id: if1_write_sector.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	if1_write_sector
+		PUBLIC 	if1_write_sector
 		
-		LIB 	if1_rommap
+		EXTERN 	if1_rommap
 		
-		XREF	MAKE_M
-		XREF	MOTOR
+		EXTERN	MAKE_M
+		EXTERN	MOTOR
 
 
 if1_write_sector:

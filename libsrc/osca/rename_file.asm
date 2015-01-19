@@ -4,13 +4,13 @@
 ;
 ;	Like 'rename' but with a FLOS style error handling
 ;
-;	$Id: rename_file.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
+;	$Id: rename_file.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB  rename_file
-	LIB  rename_file_callee
-	XREF ASMDISP_RENAME_FILE_CALLEE
+	PUBLIC  rename_file
+	EXTERN  rename_file_callee
+	EXTERN ASMDISP_RENAME_FILE_CALLEE
 
 rename_file:
 	pop bc

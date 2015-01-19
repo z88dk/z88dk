@@ -2,7 +2,7 @@
 ; return length of s
 ; 12.2006 aralbrec
 
-XLIB strlen
+PUBLIC strlen
 
 ; enter: hl = char *s
 ; exit : hl = length, z flag set if 0 length

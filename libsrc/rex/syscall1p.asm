@@ -3,9 +3,9 @@
 ;
 ;	I've never tested this function, hope it works. Daniel
 ;
-;	$Id: syscall1p.asm,v 1.3 2002-04-17 21:30:25 dom Exp $
+;	$Id: syscall1p.asm,v 1.4 2015-01-19 01:33:06 pauloscustodio Exp $
 
-		XLIB	syscall1p
+		PUBLIC	syscall1p
 
 
 .syscall1p

@@ -6,11 +6,11 @@
 ;
 ;	Enable screen
 ;
-;	$Id: msx_noblank.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
+;	$Id: msx_noblank.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_noblank
-	LIB	msxbios
+	PUBLIC	msx_noblank
+	EXTERN	msxbios
 	
         INCLUDE "msxbios.def"
 

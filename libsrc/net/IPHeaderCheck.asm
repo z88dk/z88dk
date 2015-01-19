@@ -7,7 +7,7 @@
 ;
 
 
-	XLIB	IPHeaderCheck
+	PUBLIC	IPHeaderCheck
 
 
 ; void IPHeaderSum(ipheader_t *pkt)

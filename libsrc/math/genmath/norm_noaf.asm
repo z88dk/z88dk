@@ -5,16 +5,16 @@
 ;	current exponent in fa+5
 ;	Result -> fa +5
 ;
-;       $Id: norm_noaf.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: norm_noaf.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $:
 
 
-		XLIB	norm
+		PUBLIC	norm
 
-		LIB	pack
-		LIB	norm4
-		LIB	afswap
+		EXTERN	pack
+		EXTERN	norm4
+		EXTERN	afswap
 
-		XREF	fa
+		EXTERN	fa
 
 .norm   LD      L,B
         LD      H,E

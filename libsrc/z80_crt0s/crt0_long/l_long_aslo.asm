@@ -11,7 +11,7 @@
 ;       aralbrec 01/2007
 ;       switched to shifts from slower doubling using de/hl
 
-XLIB l_long_aslo
+PUBLIC l_long_aslo
 
 ; Shift primary left by secondary
 ;

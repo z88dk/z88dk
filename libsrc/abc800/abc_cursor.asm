@@ -7,10 +7,10 @@
 ;	void abc_cursor(unsigned char shape);
 ;
 ;
-;	$Id: abc_cursor.asm,v 1.1 2007-11-08 14:11:50 stefano Exp $
+;	$Id: abc_cursor.asm,v 1.2 2015-01-19 01:32:41 pauloscustodio Exp $
 ;	
 
-XLIB	abc_cursor
+PUBLIC	abc_cursor
 
 abc_cursor:
 	ld	a,11

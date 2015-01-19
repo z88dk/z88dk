@@ -1,8 +1,8 @@
 ; void __FASTCALL__ *adt_StackPop(struct adt_Stack *s)
 ; 09.2005, 11.2006 aralbrec
 
-XLIB adt_StackPop
-XREF _u_free
+PUBLIC adt_StackPop
+EXTERN _u_free
 
 ; pop item off the top of stack and update stack ptr
 ;

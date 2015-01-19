@@ -8,9 +8,9 @@
 ;	ZSock Lib function: inet_ntoa
 
 
-	XLIB	inet_ntoa
+	PUBLIC	inet_ntoa
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

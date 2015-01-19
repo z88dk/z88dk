@@ -8,9 +8,9 @@
 
 ; ----- void __CALLEE__ vz_soundcopy_callee(char *dst, char *src, int size, int sound1, int sound2);
 
-XLIB vz_soundcopy_callee
-XDEF ASMDISP_VZ_SOUNDCOPY_CALLEE
-XREF _std_seed
+PUBLIC vz_soundcopy_callee
+PUBLIC ASMDISP_VZ_SOUNDCOPY_CALLEE
+EXTERN _std_seed
 
 .vz_soundcopy_callee
 

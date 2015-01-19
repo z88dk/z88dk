@@ -6,13 +6,13 @@
 ;
 ;	Find a file and load its properties in a structure
 ;
-;	$Id: find_file_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
+;	$Id: find_file_callee.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  find_file_callee
-	XDEF  ASMDISP_FIND_FILE_CALLEE
+	PUBLIC  find_file_callee
+	PUBLIC  ASMDISP_FIND_FILE_CALLEE
 
 .find_file_callee
 	pop		bc

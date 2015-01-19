@@ -10,13 +10,13 @@
 ;
 ;	Move the screen cursor to a given position
 ;
-;	$Id: msx_locate.asm,v 1.5 2009-06-22 21:44:17 dom Exp $
+;	$Id: msx_locate.asm,v 1.6 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
-	XLIB	msx_locate
+	PUBLIC	msx_locate
 	
-	LIB	msxbios
+	EXTERN	msxbios
 
 IF FORmsx
         INCLUDE "msxbios.def"

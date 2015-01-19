@@ -6,9 +6,9 @@
 ;    Jun 2014 - Joaopa
 ;
 ;
-;    $Id: fgetc_cons.asm,v 1.2 2014-07-16 09:59:57 stefano Exp $
+;    $Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
-    XLIB    fgetc_cons
+    PUBLIC    fgetc_cons
 	ld	ix,$47FA
 .fgetc_cons
 ;	push	bc

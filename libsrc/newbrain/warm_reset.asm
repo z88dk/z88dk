@@ -8,11 +8,11 @@
 ;
 ;
 ;
-; $Id: warm_reset.asm,v 1.2 2007-06-03 15:13:06 stefano Exp $
+; $Id: warm_reset.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB warm_reset
+	PUBLIC warm_reset
 
 .warm_reset
 	jp	49373

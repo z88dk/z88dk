@@ -8,9 +8,9 @@
 ;	ZSock Lib function: setnameservers
 
 
-	XLIB	setnameservers
+	PUBLIC	setnameservers
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

@@ -4,12 +4,12 @@
 ;
 ;	Get line from console
 ;
-;	$Id: flos_get_input_string.asm,v 1.1 2012-03-30 14:46:52 stefano Exp $
+;	$Id: flos_get_input_string.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  flos_get_input_string
+	PUBLIC  flos_get_input_string
 	
 flos_get_input_string:
 	pop de

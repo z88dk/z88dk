@@ -4,11 +4,11 @@
 ; TI calculators version
 ;
 ;
-; $Id: bksave.asm,v 1.5 2002-04-17 21:30:25 dom Exp $
+; $Id: bksave.asm,v 1.6 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
-	XLIB    bksave
-	LIB	pixeladdress
+	PUBLIC    bksave
+	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 

@@ -6,10 +6,10 @@
 ;	Stefano Bodrato - Jul. 2004
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
+;	$Id: f_ansi_cls.asm,v 1.4 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-        XLIB	ansi_cls
+        PUBLIC	ansi_cls
 
         INCLUDE "cpcfirm.def"
 

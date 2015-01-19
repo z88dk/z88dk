@@ -14,25 +14,25 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2013-03-08 13:40:20 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 
 	;XREF	base_graphics
-	XREF	pix_rl
-	XREF	pix_pre
-	XREF	pix_post
+	EXTERN	pix_rl
+	EXTERN	pix_pre
+	EXTERN	pix_post
 
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 		
 ; Dirty thing for self modifying code
-	XDEF	INVRS
-	XDEF	BOLD
+	PUBLIC	INVRS
+	PUBLIC	BOLD
 
 IF A128COL
 .text_cols   defb 128

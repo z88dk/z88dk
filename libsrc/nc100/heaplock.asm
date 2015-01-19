@@ -1,4 +1,4 @@
-		XLIB	heaplock
+		PUBLIC	heaplock
 
 .heaplock
 		pop hl

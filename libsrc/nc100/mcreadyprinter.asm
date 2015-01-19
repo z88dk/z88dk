@@ -1,4 +1,4 @@
-		XLIB	mcreadyprinter
+		PUBLIC	mcreadyprinter
 
 .mcreadyprinter	
 		call 0xb854

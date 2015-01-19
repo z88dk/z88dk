@@ -1,4 +1,4 @@
-		XLIB	padgettime
+		PUBLIC	padgettime
 
 ; fastcall
 .padgettime

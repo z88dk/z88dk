@@ -1,10 +1,10 @@
 ; void in_MouseAMXSetPos(uint xcoord, uint ycoord)
 ; CALLER linkage for function pointers
 
-XLIB in_MouseAMXSetPos
+PUBLIC in_MouseAMXSetPos
 
-LIB in_MouseAMXSetPos_callee
-XREF CDISP_IN_MOUSEAMXSETPOS_CALLEE
+EXTERN in_MouseAMXSetPos_callee
+EXTERN CDISP_IN_MOUSEAMXSETPOS_CALLEE
 
 .in_MouseAMXSetPos
 

@@ -6,11 +6,11 @@
 ;	Stefano Bodrato - Jan 2013
 ;
 ;
-;	$Id: zx80_decode_keys.asm,v 1.1 2013-01-02 15:31:30 stefano Exp $
+;	$Id: zx80_decode_keys.asm,v 1.2 2015-01-19 01:33:22 pauloscustodio Exp $
 ;
 
-	XLIB	zx80_decode_keys
-	LIB		zx81toasc
+	PUBLIC	zx80_decode_keys
+	EXTERN		zx81toasc
 
 .zx80_decode_keys
 	LD D,$00

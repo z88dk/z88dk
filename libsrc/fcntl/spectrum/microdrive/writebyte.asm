@@ -3,9 +3,9 @@
 ;
 ; Stefano - 2/3/2005
 ;
-; $Id: writebyte.asm,v 1.1 2005-03-02 17:29:33 stefano Exp $
+; $Id: writebyte.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 
-	XLIB	writebyte
+	PUBLIC	writebyte
 
 .writebyte
 	ld	hl,-1

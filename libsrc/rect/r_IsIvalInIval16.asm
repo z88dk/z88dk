@@ -2,8 +2,8 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB r_IsIvalInIval16
-LIB RIsIvalInIval16
+PUBLIC r_IsIvalInIval16
+EXTERN RIsIvalInIval16
 
 ; int r_IsIvalInIval16(struct r_Ival16 *i1, struct r_Ival16 *i2)
 

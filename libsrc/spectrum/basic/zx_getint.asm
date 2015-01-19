@@ -8,12 +8,12 @@
 ;	int __FASTCALL__ zx_getint(char *variable);
 ;
 ;
-;	$Id: zx_getint.asm,v 1.3 2014-01-20 09:15:32 stefano Exp $
+;	$Id: zx_getint.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
 ;	
 
-XLIB	zx_getint
-LIB	zx_locatenum
-XREF	call_rom3
+PUBLIC	zx_getint
+EXTERN	zx_locatenum
+EXTERN	call_rom3
 
 INCLUDE  "zxfp.def"
 

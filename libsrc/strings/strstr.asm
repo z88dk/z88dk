@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB strstr
-LIB strstr_callee
-XREF ASMDISP_STRSTR_CALLEE
+PUBLIC strstr
+EXTERN strstr_callee
+EXTERN ASMDISP_STRSTR_CALLEE
 
 .strstr
 

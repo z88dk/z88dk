@@ -11,10 +11,10 @@
 ;
 ;
 ; ------
-; $Id: ozgetdisplaypage.asm,v 1.1 2003-10-23 10:42:50 stefano Exp $
+; $Id: ozgetdisplaypage.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozgetdisplaypage
+	PUBLIC	ozgetdisplaypage
 
 
 ozgetdisplaypage:

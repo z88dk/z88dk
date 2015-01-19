@@ -3,10 +3,10 @@
 ;       Stefano - 10/1/2007
 ;
 ;
-;	$Id: clg.asm,v 1.3 2013-09-17 12:00:07 stefano Exp $
+;	$Id: clg.asm,v 1.4 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
-        XLIB    clg
+        PUBLIC    clg
 
 .clg
         ld a,i

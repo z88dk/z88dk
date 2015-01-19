@@ -2,8 +2,8 @@
 ; 01.2008 aralbrec, Sprite Pack v3.0
 ; ts2068 hi-res version
 
-XLIB sp1_ChangeSprType_callee
-XDEF ASMDISP_SP1_CHANGESPRTYPE_CALLEE
+PUBLIC sp1_ChangeSprType_callee
+PUBLIC ASMDISP_SP1_CHANGESPRTYPE_CALLEE
 
 .sp1_ChangeSprType_callee
 

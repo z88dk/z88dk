@@ -1,4 +1,4 @@
-		XLIB	kmcharreturn
+		PUBLIC	kmcharreturn
 
 .kmcharreturn
 		pop ix

@@ -10,14 +10,14 @@
 ;
 ;
 ; ------
-; $Id: ozgetch.asm,v 1.1 2003-10-23 10:42:50 stefano Exp $
+; $Id: ozgetch.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
 
-	XLIB	ozgetch2	; renamed (will be redefined if used)
+	PUBLIC	ozgetch2	; renamed (will be redefined if used)
 
-	XREF	KeyBufGetPos
-	XREF	EnableKeyboard
+	EXTERN	KeyBufGetPos
+	EXTERN	EnableKeyboard
 
 ozgetch2:
     ld	    hl,KeyBufGetPos

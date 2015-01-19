@@ -1,10 +1,10 @@
 ; void sp1_PutSprClr(uchar **sprdest, struct sp1_ap *src, uchar n)
 ; CALLER linkage for function pointers
 
-XLIB sp1_PutSprClr
+PUBLIC sp1_PutSprClr
 
-LIB sp1_PutSprClr_callee
-XREF ASMDISP_SP1_PUTSPRCLR_CALLEE
+EXTERN sp1_PutSprClr_callee
+EXTERN ASMDISP_SP1_PUTSPRCLR_CALLEE
 
 .sp1_PutSprClr
 

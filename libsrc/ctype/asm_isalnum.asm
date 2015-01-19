@@ -1,6 +1,6 @@
 ; asm_isalnum
 
-XLIB asm_isalnum
+PUBLIC asm_isalnum
 
 ; determine if the char is in [0-9A-Za-z]
 

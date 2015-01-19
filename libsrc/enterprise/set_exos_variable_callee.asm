@@ -5,12 +5,12 @@
 ;	set_exos_variable(unsigned char variable, unsigned char value);
 ;
 ;
-;	$Id: set_exos_variable_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
+;	$Id: set_exos_variable_callee.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
 
-XLIB	set_exos_variable_callee
-XDEF 	ASMDISP_SET_EXOS_VARIABLE_CALLEE
+PUBLIC	set_exos_variable_callee
+PUBLIC 	ASMDISP_SET_EXOS_VARIABLE_CALLEE
 
 set_exos_variable_callee:
 

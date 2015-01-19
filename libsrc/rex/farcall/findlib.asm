@@ -4,7 +4,7 @@
 ; Fixed list of pages (were off by 4)
 ; Graham R. Cobb 19 May 2002
 
-	XLIB	findlib
+	PUBLIC	findlib
 
 
 .findlib

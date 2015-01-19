@@ -3,10 +3,10 @@
 ;
 ; 	This routine sets the kempston joystick emulation mode.
 ;
-;	$Id: set_kempston.asm,v 1.1 2007-10-04 12:18:57 stefano Exp $
+;	$Id: set_kempston.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
 ;
 
-		XLIB	set_kempston
+		PUBLIC	set_kempston
 	
 set_kempston:
 

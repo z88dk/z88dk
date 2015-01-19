@@ -1,6 +1,6 @@
-	XLIB	add_raster_int
+	PUBLIC	add_raster_int
 	
-	XREF	raster_procs
+	EXTERN	raster_procs
 
 ;==============================================================
 ; add_raster_int(void *ptr)	

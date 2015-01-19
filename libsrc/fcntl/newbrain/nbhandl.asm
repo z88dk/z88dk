@@ -3,9 +3,9 @@
 ;
 ; Stefano - 29/5/2007
 ;
-; $Id: nbhandl.asm,v 1.1 2007-06-03 15:13:06 stefano Exp $
+; $Id: nbhandl.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 
-	XLIB	nbhandl
+	PUBLIC	nbhandl
 	
 ; handles:
 ;          10 files open at once should be enough.

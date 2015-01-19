@@ -2,8 +2,8 @@
 ; copy n chars from s2 to s1
 ; 11.1999 djm
 
-XLIB memcpy_callee
-XDEF ASMDISP_MEMCPY_CALLEE
+PUBLIC memcpy_callee
+PUBLIC ASMDISP_MEMCPY_CALLEE
 
 .memcpy_callee
 

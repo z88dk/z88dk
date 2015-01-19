@@ -7,10 +7,10 @@
 ;	Truncate or fill with blanks when necessary.
 ;	Return with the file name length
 ;
-;	$Id: if1_setname.asm,v 1.2 2011-08-12 18:46:43 pauloscustodio Exp $
+;	$Id: if1_setname.asm,v 1.3 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
-		XLIB	if1_setname
+		PUBLIC	if1_setname
 	
 if1_setname:
 		pop	bc	; ret addr

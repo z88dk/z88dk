@@ -1,4 +1,4 @@
-		XLIB	padreadyserial
+		PUBLIC	padreadyserial
 
 ; fastcall
 .padreadyserial

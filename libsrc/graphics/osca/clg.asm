@@ -3,17 +3,17 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: clg.asm,v 1.3 2012-09-20 21:13:15 stefano Exp $
+;	$Id: clg.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
     INCLUDE "osca.def"
 
-                XLIB    clg
+                PUBLIC    clg
                 
-                LIB     swapgfxbk
-                XREF    swapgfxbk1
-                XREF	base_graphics
+                EXTERN     swapgfxbk
+                EXTERN    swapgfxbk1
+                EXTERN	base_graphics
 
 .clg
 

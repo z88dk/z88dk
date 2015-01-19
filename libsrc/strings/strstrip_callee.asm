@@ -2,8 +2,8 @@
 ; remove occurences of leading char c from string s
 ; 01.2007 aralbrec
 
-XLIB strstrip_callee
-XDEF ASMDISP_STRSTRIP_CALLEE
+PUBLIC strstrip_callee
+PUBLIC ASMDISP_STRSTRIP_CALLEE
 
 .strstrip_callee
 

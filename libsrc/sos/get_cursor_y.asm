@@ -4,10 +4,10 @@
 ;
 ;; int get_cursor_x()
 ;
-;       $Id: get_cursor_y.asm,v 1.2 2013-12-05 09:34:01 stefano Exp $
+;       $Id: get_cursor_y.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-        XLIB    get_cursor_y
+        PUBLIC    get_cursor_y
 
 get_cursor_y:
 				call $2018

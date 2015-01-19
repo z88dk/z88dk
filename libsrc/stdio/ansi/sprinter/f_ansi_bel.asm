@@ -9,10 +9,10 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.1 2002-10-10 20:38:22 dom Exp $
+;	$Id: f_ansi_bel.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_BEL
+	PUBLIC	ansi_BEL
 
 
 .ansi_BEL

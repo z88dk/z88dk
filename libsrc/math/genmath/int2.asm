@@ -3,16 +3,16 @@
 ;
 ;       ???
 ;
-;       $Id: int2.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: int2.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $:
 
 
-		XLIB	int2
+		PUBLIC	int2
 
-		LIB	rshift
-		LIB	incr
-		LIB	ldbcfa
-		LIB	minusbc
-		LIB	unpack
+		EXTERN	rshift
+		EXTERN	incr
+		EXTERN	ldbcfa
+		EXTERN	minusbc
+		EXTERN	unpack
 
 .int2   LD      B,A     ;if a==0, return with  bc ix de = 0...
         LD      C,A

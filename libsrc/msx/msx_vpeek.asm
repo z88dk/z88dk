@@ -8,10 +8,10 @@
 ;
 ;	Read the MSX video memory
 ;
-;	$Id: msx_vpeek.asm,v 1.8 2010-06-30 13:21:38 stefano Exp $
+;	$Id: msx_vpeek.asm,v 1.9 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_vpeek
+	PUBLIC	msx_vpeek
 	
 	INCLUDE	"msx/vdp.inc"
 

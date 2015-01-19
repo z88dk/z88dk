@@ -5,10 +5,10 @@
 ;	by Stefano Bodrato - Oct. 2003
 ;
 ; ------
-; $Id: ozgetautorun.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozgetautorun.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozgetautorun
+	PUBLIC	ozgetautorun
 	
 
 ozgetautorun:

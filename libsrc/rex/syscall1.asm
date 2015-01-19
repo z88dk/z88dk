@@ -1,10 +1,10 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: syscall1.asm,v 1.5 2002-04-17 21:30:25 dom Exp $
+;	$Id: syscall1.asm,v 1.6 2015-01-19 01:33:06 pauloscustodio Exp $
 ;
 
-		XLIB	syscall1
+		PUBLIC	syscall1
 
 
 .syscall1

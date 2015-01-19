@@ -1,11 +1,11 @@
 ; void __CALLEE__ *HeapCalloc_callee(void *heap, unsigned int nobj, unsigned int size)
 ; 12.2006 aralbrec
 
-XLIB HeapCalloc_callee
-XDEF ASMDISP_HEAPCALLOC_CALLEE
+PUBLIC HeapCalloc_callee
+PUBLIC ASMDISP_HEAPCALLOC_CALLEE
 
-LIB l_mult, HeapAlloc_callee
-XREF ASMDISP_HEAPALLOC_CALLEE
+EXTERN l_mult, HeapAlloc_callee
+EXTERN ASMDISP_HEAPALLOC_CALLEE
 
 .HeapCalloc_callee
 

@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB strtok_r
-LIB strtok_r_callee
-XREF ASMDISP_STRTOK_R_CALLEE
+PUBLIC strtok_r
+EXTERN strtok_r_callee
+EXTERN ASMDISP_STRTOK_R_CALLEE
 
 .strtok_r
 

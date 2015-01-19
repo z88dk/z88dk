@@ -3,10 +3,10 @@
 ;
 ;	Print character to the screen
 ;
-;	$Id: fputc_cons.asm,v 1.3 2010-05-31 10:32:57 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.4 2015-01-19 01:33:17 pauloscustodio Exp $
 ;
 
-	XLIB  fputc_cons
+	PUBLIC  fputc_cons
 
 ;
 ; Entry:        char to print

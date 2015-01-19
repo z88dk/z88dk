@@ -1,7 +1,7 @@
 ; void __FASTCALL__ im2_Init_callee(void *tableaddr)
 ; 04.2004, 02.2008 aralbrec
 
-XLIB im2_Init
+PUBLIC im2_Init
 
 .im2_Init
 

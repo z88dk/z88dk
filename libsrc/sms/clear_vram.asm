@@ -1,5 +1,5 @@
-	XLIB	clear_vram
-	LIB	VRAMToHL
+	PUBLIC	clear_vram
+	EXTERN	VRAMToHL
 	
 ;==============================================================
 ; Clear VRAM

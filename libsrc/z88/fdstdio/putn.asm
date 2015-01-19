@@ -3,7 +3,7 @@
 
                 INCLUDE "stdio.def"
 
-                XLIB    putn    ;Display integer
+                PUBLIC    putn    ;Display integer
 
 
 ;Display an integer on screen..

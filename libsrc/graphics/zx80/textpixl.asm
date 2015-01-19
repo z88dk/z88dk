@@ -3,12 +3,12 @@
 ;	Support char table (pseudo graph symbols) for the ZX80
 ;	Sequence: blank, top-left, top-right, top-half, bottom-left, left-half, etc..
 ;
-;	$Id: textpixl.asm,v 1.1 2012-12-31 10:38:23 stefano Exp $
+;	$Id: textpixl.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 ;
 
 
-	XLIB	textpixl
+	PUBLIC	textpixl
 
 
 .textpixl

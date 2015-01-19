@@ -1,10 +1,10 @@
 ; int __CALLEE__ adt_QueuePushBack_callee(struct adt_Queue *q, void *item)
 ; 09.2005 aralbrec
 
-XLIB adt_QueuePushBack_callee
-XDEF ASMDISP_ADT_QUEUEPUSHBACK_CALLEE
+PUBLIC adt_QueuePushBack_callee
+PUBLIC ASMDISP_ADT_QUEUEPUSHBACK_CALLEE
 
-XREF _u_malloc
+EXTERN _u_malloc
 
 .adt_QueuePushBack_callee
 

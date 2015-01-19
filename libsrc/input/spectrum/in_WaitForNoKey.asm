@@ -1,7 +1,7 @@
 ; void in_WaitForNoKey(void)
 ; 09.2005 aralbrec
 
-XLIB in_WaitForNoKey
+PUBLIC in_WaitForNoKey
 
 ; uses : AF
 

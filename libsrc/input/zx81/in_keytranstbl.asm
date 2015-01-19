@@ -4,7 +4,7 @@
 ; I would like to add lower case letters too but not
 ; sure how to go about it with just one shift key
 
-XLIB in_keytranstbl
+PUBLIC in_keytranstbl
 
 .in_keytranstbl
 

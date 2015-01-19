@@ -3,8 +3,8 @@
 ; write up to N nodes from the end of the path into the end of NODE_ARR, ret ptr in array to first node
 ; 01.2007 aralbrec
 
-XLIB astar_WalkPath_callee
-XDEF ASMDISP_ASTAR_WALKPATH_CALLEE
+PUBLIC astar_WalkPath_callee
+PUBLIC ASMDISP_ASTAR_WALKPATH_CALLEE
 
 .astar_WalkPath_callee
 

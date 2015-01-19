@@ -1,7 +1,7 @@
 ;
 ;	Close a file handle
 ;
-		XLIB close
+		PUBLIC close
 
 .close		pop hl
 		pop de

@@ -1,4 +1,4 @@
-		XLIB	heapaddress
+		PUBLIC	heapaddress
 
 ; fastcall
 .heapaddress

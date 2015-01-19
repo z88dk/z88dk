@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB HeapSbrk
+PUBLIC HeapSbrk
 
-LIB HeapSbrk_callee
-XREF ASMDISP_HEAPSBRK_CALLEE
+EXTERN HeapSbrk_callee
+EXTERN ASMDISP_HEAPSBRK_CALLEE
 
 .HeapSbrk
 

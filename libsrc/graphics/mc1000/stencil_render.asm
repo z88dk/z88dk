@@ -15,20 +15,20 @@
 	INCLUDE	"graphics/grafix.inc"
 	;INCLUDE	"msx/vdp.inc"
 
-	LIB	pixeladdress
-	XREF	pix_return
+	EXTERN	pixeladdress
+	EXTERN	pix_return
 
-	XLIB	stencil_render
-	LIB	dither_pattern
+	PUBLIC	stencil_render
+	EXTERN	dither_pattern
 
 	;LIB swapgfxbk
-	LIB pixeladdress
-	XREF pixelbyte
-	LIB leftbitmask, rightbitmask
+	EXTERN pixeladdress
+	EXTERN pixelbyte
+	EXTERN leftbitmask, rightbitmask
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.3 2013-03-08 13:40:20 stefano Exp $
+;	$Id: stencil_render.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 .stencil_render

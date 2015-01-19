@@ -1,9 +1,9 @@
 ;       Sprinter fcntl library
 ;
-;	$Id: remove.asm,v 1.2 2003-09-10 20:22:52 dom Exp $
+;	$Id: remove.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-                XLIB    remove
+                PUBLIC    remove
 
 ;int remove(char *name)
 

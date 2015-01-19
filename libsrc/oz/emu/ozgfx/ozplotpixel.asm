@@ -3,15 +3,15 @@
 ;	by Stefano Bodrato - Oct. 2003
 ;
 ; ------
-; $Id: ozplotpixel.asm,v 1.2 2014-06-02 16:32:18 stefano Exp $
+; $Id: ozplotpixel.asm,v 1.3 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozplotpixel
-	XDEF	put_instr
+	PUBLIC	ozplotpixel
+	PUBLIC	put_instr
 
-	LIB	pixeladdress
+	EXTERN	pixeladdress
 
-	XREF	COORDS
+	EXTERN	COORDS
 
 
 	INCLUDE	"graphics/grafix.inc"

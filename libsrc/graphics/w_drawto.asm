@@ -6,19 +6,19 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: w_drawto.asm,v 1.1 2010-12-24 11:59:35 stefano Exp $
+;	$Id: w_drawto.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
 ;Usage: drawto(struct *pixels)
 
 
-                XLIB    drawto
-                LIB     swapgfxbk
-                XREF	swapgfxbk1
+                PUBLIC    drawto
+                EXTERN     swapgfxbk
+                EXTERN	swapgfxbk1
 
-                LIB     w_line
-                LIB     w_plotpixel
+                EXTERN     w_line
+                EXTERN     w_plotpixel
 
 
 .drawto

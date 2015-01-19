@@ -4,10 +4,10 @@
 ; 	BEL - chr(7)   Beep it out
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.4 2013-11-13 11:04:54 stefano Exp $
+;	$Id: f_ansi_bel.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_BEL
+	PUBLIC	ansi_BEL
 
 .BEPDAT
 		defw 142	; C channel frequency:  880Hz

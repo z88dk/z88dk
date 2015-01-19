@@ -15,13 +15,13 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_getblock.asm,v 1.2 2007-06-08 15:15:21 stefano Exp $
+; $Id: nb_getblock.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB nb_getblock
+	PUBLIC nb_getblock
 	
-	LIB ZCALL
+	EXTERN ZCALL
 
 .nb_getblock
 

@@ -7,10 +7,10 @@
 ;	This function returns the base memory size in kbytes
 ;	Measures only up to the RAMPTOP limit
 ;
-;	$Id: zx_basemem.asm,v 1.1 2008-07-25 15:31:25 stefano Exp $
+;	$Id: zx_basemem.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 
-	XLIB	zx_basemem
+	PUBLIC	zx_basemem
 	
 zx_basemem:
 	ld	a,(16389)

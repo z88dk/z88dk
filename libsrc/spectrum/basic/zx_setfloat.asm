@@ -1,11 +1,11 @@
 ; int zx_setfloat(char *variable, int value)
 ; CALLER linkage for function pointers
 
-XLIB zx_setfloat
+PUBLIC zx_setfloat
 
-LIB zx_setfloat_callee
-XREF ASMDISP_zx_setfloat_CALLEE
-XREF fa
+EXTERN zx_setfloat_callee
+EXTERN ASMDISP_zx_setfloat_CALLEE
+EXTERN fa
 
 .zx_setfloat
 

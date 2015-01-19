@@ -8,17 +8,17 @@
 ;
 ;
 ; ------
-; $Id: ozserintoff.asm,v 1.2 2003-10-23 10:42:50 stefano Exp $
+; $Id: ozserintoff.asm,v 1.3 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XLIB	ozserintoff
+	PUBLIC	ozserintoff
 
-	LIB	ozcustomisr
-	XREF	serial_hook
-	XREF	rxxoff_hook
+	EXTERN	ozcustomisr
+	EXTERN	serial_hook
+	EXTERN	rxxoff_hook
 
-	LIB	ozintwait
-	XREF	serial_check_hook
+	EXTERN	ozintwait
+	EXTERN	serial_check_hook
 	
 ozserintoff:
         ld      hl,serial_hook+3

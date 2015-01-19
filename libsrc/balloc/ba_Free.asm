@@ -1,7 +1,7 @@
 ; 04.2004 aralbrec
 
-XLIB ba_Free
-XREF _ba_qtbl
+PUBLIC ba_Free
+EXTERN _ba_qtbl
 
 ; Frees block of memory back to queues for reuse.
 ;

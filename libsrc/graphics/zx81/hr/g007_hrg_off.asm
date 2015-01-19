@@ -5,15 +5,15 @@
 ;
 ;   Exit from HRG mode
 ;
-;	$Id: g007_hrg_off.asm,v 1.2 2015-01-02 17:23:10 dom Exp $
+;	$Id: g007_hrg_off.asm,v 1.3 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB	hrg_off
+	PUBLIC	hrg_off
 
-	XREF	L0292
-	XREF	G007_P1
-	XREF	G007_P2
-	XREF	G007_P3
+	EXTERN	L0292
+	EXTERN	G007_P1
+	EXTERN	G007_P2
+	EXTERN	G007_P3
 	
 .hrg_off
 

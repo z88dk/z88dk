@@ -5,18 +5,18 @@
 ;
 ;	Returns HL = Pointer to device ID string
 ;
-;	$Id: sd_read_cid.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_read_cid.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_read_cid
-	XDEF	sd_vnchars
+	PUBLIC	sd_read_cid
+	PUBLIC	sd_vnchars
 
-	XREF	sector_buffer_loc
-	XREF	sd_card_info
+	EXTERN	sector_buffer_loc
+	EXTERN	sd_card_info
 
-	LIB		sd_send_command_null_args
-	LIB		sd_wait_data_token
-	LIB		sd_read_bytes_to_sector_buffer
+	EXTERN		sd_send_command_null_args
+	EXTERN		sd_wait_data_token
+	EXTERN		sd_read_bytes_to_sector_buffer
 
     INCLUDE "sdcard.def"
 

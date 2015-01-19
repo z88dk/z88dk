@@ -8,7 +8,7 @@
 
 ; ----- int vz_getch(void)
 
-XLIB vz_getch
+PUBLIC vz_getch
 
 .vz_getch
 

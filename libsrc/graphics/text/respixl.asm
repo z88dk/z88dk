@@ -7,17 +7,17 @@
 ;	Erases pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.4 2014-05-02 14:18:40 stefano Exp $
+;	$Id: respixl.asm,v 1.5 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 
 			INCLUDE	"graphics/text/textgfx.inc"
 
-			XLIB	respixel
+			PUBLIC	respixel
 
-			LIB	textpixl
-			XREF	coords
-			XREF	base_graphics
+			EXTERN	textpixl
+			EXTERN	coords
+			EXTERN	base_graphics
 
 
 .respixel			

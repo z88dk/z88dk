@@ -1,8 +1,8 @@
 ; void sp1_PrintString(struct sp1_pss *ps, uchar *s)
 ; CALLER linkage for function pointers
 
-XLIB sp1_PrintString
-LIB SP1PrintString, SP1PSPOP, SP1PSPUSH
+PUBLIC sp1_PrintString
+EXTERN SP1PrintString, SP1PSPOP, SP1PSPUSH
 
 .sp1_PrintString
 

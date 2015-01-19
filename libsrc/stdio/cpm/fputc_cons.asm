@@ -6,10 +6,10 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.3 2001-05-01 13:55:22 dom Exp $
+;	$Id: fputc_cons.asm,v 1.4 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-          XLIB  fputc_cons
+          PUBLIC  fputc_cons
 
 ;
 ; Entry:        hl = points to char

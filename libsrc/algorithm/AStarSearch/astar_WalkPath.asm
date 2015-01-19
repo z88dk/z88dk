@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB astar_WalkPath
-LIB astar_WalkPath_callee
-XREF ASMDISP_ASTAR_WALKPATH_CALLEE
+PUBLIC astar_WalkPath
+EXTERN astar_WalkPath_callee
+EXTERN ASMDISP_ASTAR_WALKPATH_CALLEE
 
 .astar_WalkPath
 

@@ -8,9 +8,9 @@
 ;	ZSock Lib function: killdaemon
 
 
-	XLIB	killdaemon
+	PUBLIC	killdaemon
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

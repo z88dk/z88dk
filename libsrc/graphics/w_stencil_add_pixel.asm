@@ -11,7 +11,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: w_stencil_add_pixel.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
+;	$Id: w_stencil_add_pixel.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; registers changed after return:
@@ -21,11 +21,11 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-                XLIB    stencil_add_pixel
-                XDEF	stencil_ptr
-                XREF	coords
+                PUBLIC    stencil_add_pixel
+                PUBLIC	stencil_ptr
+                EXTERN	coords
                 
-                LIB		l_cmp
+                EXTERN		l_cmp
 
 .stencil_ptr	defw	0
 

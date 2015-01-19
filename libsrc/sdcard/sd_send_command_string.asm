@@ -6,23 +6,23 @@
 ;	set HL = location of 6 byte command string
 ;	returns command response in A (ZF set if $00)
 ;
-;	$Id: sd_send_command_string.asm,v 1.7 2012-09-26 14:15:25 stefano Exp $
+;	$Id: sd_send_command_string.asm,v 1.8 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-	XLIB	sd_send_command_string
-	XDEF	sd_send_command_null_args
-	XDEF	sd_send_command_int_args
-	XDEF	sd_send_command_current_args
+	PUBLIC	sd_send_command_string
+	PUBLIC	sd_send_command_null_args
+	PUBLIC	sd_send_command_int_args
+	PUBLIC	sd_send_command_current_args
 	
-	XDEF	cmd_generic
-	XDEF	cmd_generic_args
-	XDEF	cmd_generic_crc
+	PUBLIC	cmd_generic
+	PUBLIC	cmd_generic_args
+	PUBLIC	cmd_generic_crc
 
-	LIB		sd_select_card
-	LIB		sd_send_eight_clocks
-	LIB		sd_send_byte
-	LIB		sd_get_byte
+	EXTERN		sd_select_card
+	EXTERN		sd_send_eight_clocks
+	EXTERN		sd_send_byte
+	EXTERN		sd_get_byte
 
 
 

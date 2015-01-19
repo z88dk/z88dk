@@ -6,13 +6,13 @@
 ; ZX81 - ARX816 mode version
 ;
 ;
-; $Id: putsprite_arx.asm,v 1.1 2011-10-22 08:37:36 stefano Exp $
+; $Id: putsprite_arx.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB    putsprite
-	LIB	pixeladdress
-	LIB     swapgfxbk
-        XREF	swapgfxbk1
+	PUBLIC    putsprite
+	EXTERN	pixeladdress
+	EXTERN     swapgfxbk
+        EXTERN	swapgfxbk1
 
 	INCLUDE	"graphics/grafix.inc"
 

@@ -3,8 +3,8 @@
 ; 05.2007 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB sp1_RemoveCharStruct
-LIB SP1RemoveSprChar
+PUBLIC sp1_RemoveCharStruct
+EXTERN SP1RemoveSprChar
 
 ; remove an independent char struct that may be
 ; inserted into a struct_sp1_update's draw list

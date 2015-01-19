@@ -6,11 +6,11 @@
 ;
 ;	Switch the sdcard to fast clock
 ;
-;	$Id: sd_spi_port_fast.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_spi_port_fast.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-	XLIB	sd_spi_port_fast
+	PUBLIC	sd_spi_port_fast
     INCLUDE "osca.def"
 
 

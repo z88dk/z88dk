@@ -2,14 +2,14 @@
 ;	z88dk library: Generic VDP support code
 ;
 ;
-;	$Id: gen_clg.asm,v 1.2 2010-09-15 09:00:39 stefano Exp $
+;	$Id: gen_clg.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
-        XLIB  clg
+        PUBLIC  clg
         
-        LIB	msx_set_mode
-        LIB	msx_color
-        LIB	FILVRM
+        EXTERN	msx_set_mode
+        EXTERN	msx_color
+        EXTERN	FILVRM
 
 .clg
 	ld    hl,2		; set graphics mode

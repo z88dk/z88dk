@@ -8,13 +8,13 @@
 ; This doesn't check for validity of filename at all.
 
 ;
-;	$Id: rename.asm,v 1.2 2009-06-22 21:44:16 dom Exp $
+;	$Id: rename.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
                 INCLUDE "fileio.def"
                 INCLUDE "stdio.def"
 
-                XLIB    rename
+                PUBLIC    rename
 
 ;int rename(char *s1,char *s2)
 ;on stack:

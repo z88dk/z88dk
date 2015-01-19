@@ -9,11 +9,11 @@
 ;	These perhaps could be optimized when in non-MSXDOS environment.
 ;
 ;
-;	$Id: msxrompage.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: msxrompage.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msxrompage
-	LIB	msxbios
+	PUBLIC	msxrompage
+	EXTERN	msxbios
 
         INCLUDE "msxbios.def"
 

@@ -3,12 +3,12 @@
 ;
 ;	Generic version (just a bit slow)
 ;
-;	$Id: bksave.asm,v 1.4 2002-03-11 17:11:34 stefano Exp $
+;	$Id: bksave.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-	XLIB    bksave
-	LIB	pixeladdress
+	PUBLIC    bksave
+	EXTERN	pixeladdress
 
 
 .bksave

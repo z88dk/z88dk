@@ -1,8 +1,8 @@
 ; void __FASTCALL__ adt_ListCreateS(struct adt_List *)
 ; 11.2006 aralbrec
 
-XLIB adt_ListCreateS
-LIB l_setmem
+PUBLIC adt_ListCreateS
+EXTERN l_setmem
 
 ; initialize a struct adt_List
 

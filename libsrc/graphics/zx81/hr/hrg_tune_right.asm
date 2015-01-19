@@ -8,12 +8,12 @@
 ;       Stefano - Oct 2011
 ;
 ;
-;	$Id: hrg_tune_right.asm,v 1.1 2011-11-02 14:24:33 stefano Exp $
+;	$Id: hrg_tune_right.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-                XLIB	hrg_tune_right
+                PUBLIC	hrg_tune_right
 				
-				XREF	HRG_Handler
+				EXTERN	HRG_Handler
 
 hrg_tune_right:
 		ld	hl,HRG_Handler+1

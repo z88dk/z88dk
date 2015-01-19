@@ -1,4 +1,4 @@
-		XLIB	lapcat_send
+		PUBLIC	lapcat_send
 
 ; fast call
 .lapcat_send

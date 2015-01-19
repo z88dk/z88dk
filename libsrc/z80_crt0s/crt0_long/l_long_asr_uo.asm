@@ -11,7 +11,7 @@
 ;
 ;       aralbrec 01/2007 Sped up, would be better with a or b = counter
 
-XLIB l_long_asr_uo
+PUBLIC l_long_asr_uo
 
 ; Shift primary (on stack) right by secondary, 
 ; We can only shift a maximum of 32 bits (or so), so the counter can

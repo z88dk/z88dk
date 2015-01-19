@@ -8,10 +8,10 @@
 ;	- 0 (false) if the spectrum is not a ZX128 or if it is in 48K mode
 ;	- 1 (true) if the spectrum is a Spectrum 128K in 128K mode
 ;
-;	$Id: zx_128mode.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: zx_128mode.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	zx_128mode
+	PUBLIC	zx_128mode
 	
 zx_128mode:
 	ld	hl,0

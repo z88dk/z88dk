@@ -3,10 +3,10 @@
 ;
 ;	Signed integer compare
 ;
-;	$Id: l_cmp.asm,v 1.7 2002-02-21 19:21:35 dom Exp $:
+;	$Id: l_cmp.asm,v 1.8 2015-01-19 01:33:25 pauloscustodio Exp $:
 
 
-                XLIB    l_cmp
+                PUBLIC    l_cmp
 
 ; signed compare of DE and HL
 ;   carry is sign of difference [set => DE < HL]

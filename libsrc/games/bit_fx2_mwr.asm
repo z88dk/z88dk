@@ -1,4 +1,4 @@
-; $Id: bit_fx2_mwr.asm,v 1.1 2008-03-31 17:16:18 stefano Exp $
+; $Id: bit_fx2_mwr.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; 1 bit sound library - version for "memory write" I/O architectures
 ; sound effects module.
@@ -6,13 +6,13 @@
 ;
 
 
-          XLIB     bit_fx2
+          PUBLIC     bit_fx2
           INCLUDE  "games/games.inc"
 
-          LIB      bit_open
-          LIB      bit_open_di
-          LIB      bit_close
-          LIB      bit_close_ei
+          EXTERN      bit_open
+          EXTERN      bit_open_di
+          EXTERN      bit_close
+          EXTERN      bit_close_ei
 
 
 .bit_fx2

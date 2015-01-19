@@ -10,11 +10,11 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.2 2002-10-10 22:03:26 dom Exp $
+;	$Id: f_ansi_dline.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
 
-	XLIB	ansi_del_line
+	PUBLIC	ansi_del_line
 
 ; a = line
 .ansi_del_line

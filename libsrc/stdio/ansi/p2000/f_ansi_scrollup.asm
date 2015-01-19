@@ -7,10 +7,10 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.1 2014-04-18 07:38:59 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_SCROLLUP
+	PUBLIC	ansi_SCROLLUP
 
 
 .ansi_SCROLLUP

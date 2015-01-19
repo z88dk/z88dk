@@ -2,7 +2,7 @@
 ; 02.2008 aralbrec
 ; ts2068 hi-res version
 
-XLIB SP1PSPOP
+PUBLIC SP1PSPOP
 
 ; enter : de  = & string to print (or something else)
 ;         hl  = & struct sp1_pss to read

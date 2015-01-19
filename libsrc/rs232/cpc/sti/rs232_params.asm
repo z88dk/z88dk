@@ -7,9 +7,9 @@
 ;
 ;       Specify the serial interface parameters
 ;
-;       $Id: rs232_params.asm,v 1.2 2008-06-05 14:31:24 stefano Exp $
+;       $Id: rs232_params.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 
-                XLIB   rs232_params
+                PUBLIC   rs232_params
                 
 rs232_params:
                 pop  bc

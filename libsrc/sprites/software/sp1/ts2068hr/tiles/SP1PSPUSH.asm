@@ -2,7 +2,7 @@
 ; 02.2008 aralbrec
 ; ts2068 hi-res version
 
-XLIB SP1PSPUSH
+PUBLIC SP1PSPUSH
 
 ; exit  : hl = & struct sp1_pss to write to
 ;          e = flags (bit 0 = invalidate?, bit 1 = xwrap?, bit 2 = yinc?, bit3 = ywrap?)

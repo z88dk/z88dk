@@ -11,14 +11,14 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.1 2003-02-04 09:10:24 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_del_line
- 	LIB	ansi_default
-	LIB	ansi_restore	
+	PUBLIC	ansi_del_line
+ 	EXTERN	ansi_default
+	EXTERN	ansi_restore	
 	
-	XREF	ansi_ROW
+	EXTERN	ansi_ROW
 	
 .ansi_del_line
  	ld	(ansi_ROW),a

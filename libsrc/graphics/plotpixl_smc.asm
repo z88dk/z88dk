@@ -8,14 +8,14 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl_smc.asm,v 1.1 2007-01-04 17:41:34 stefano Exp $
+;	$Id: plotpixl_smc.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-		XLIB	plotpixel
+		PUBLIC	plotpixel
 
-		LIB	pixel
-		XREF	pixmode
+		EXTERN	pixel
+		EXTERN	pixmode
 
 .plotpixel	push	hl
 		ld	hl,182 		; OR (HL)

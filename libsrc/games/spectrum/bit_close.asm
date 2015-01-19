@@ -1,4 +1,4 @@
-; $Id: bit_close.asm,v 1.3 2013-10-21 14:23:45 stefano Exp $
+; $Id: bit_close.asm,v 1.4 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -7,7 +7,7 @@
 ; Stefano Bodrato - 28/9/2001
 ;
 
-    XLIB     bit_close
+    PUBLIC     bit_close
 
 .bit_close
           ret

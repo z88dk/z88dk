@@ -13,12 +13,12 @@
 ;
 ;
 ; ------
-; $Id: ozdisplayandbyte.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozdisplayandbyte.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozdisplayandbyte
+	PUBLIC	ozdisplayandbyte
 	
-	XREF	ozactivepage
+	EXTERN	ozactivepage
 
 
 ozdisplayandbyte:

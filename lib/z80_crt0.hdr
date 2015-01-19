@@ -10,206 +10,206 @@
 ;       routines in different modules, we have got rid of
 ;       the conditional assembly around the float routines
 ;
-;	$Id: z80_crt0.hdr,v 1.8 2012-04-12 16:56:35 stefano Exp $
+;	$Id: z80_crt0.hdr,v 1.9 2015-01-19 01:29:18 pauloscustodio Exp $
 
-	XREF    base_graphics	; Address of graphics screen
+	EXTERN    base_graphics	; Address of graphics screen
 
-	XREF	_cpfar2near	; Far->near conversion (z88)
-	XREF	packintrout	; Process interrupt (z88 apps)
+	EXTERN	_cpfar2near	; Far->near conversion (z88)
+	EXTERN	packintrout	; Process interrupt (z88 apps)
 
-	XREF    l_dcal		; jp(hl)
-	XREF    cleanup		; cleanup before program exit
+	EXTERN    l_dcal		; jp(hl)
+	EXTERN    cleanup		; cleanup before program exit
 
 
-	LIB     l_jphl        ; another jp(hl)
-	LIB     l_jpix        ; jp(ix)
-	LIB     l_jpiy        ; jp(iy)
+	EXTERN     l_jphl        ; another jp(hl)
+	EXTERN     l_jpix        ; jp(ix)
+	EXTERN     l_jpiy        ; jp(iy)
         
 
 ;------------------------------------
 ; Scopes for integer library routines
 ;------------------------------------
 
-	LIB    l_getptr		;Get 3 byte pointer
-	LIB    l_putptr		;Put 3 byte pointer
-	LIB    l_gchar		;Get signed char
-	LIB    l_gcharsp	;Get signed char
-	LIB    l_gcharspsp	;Get signed char and push
-	LIB    l_sxt		;Sign extend char
-	LIB    l_gint		;Get int
-	LIB    l_gintsp		;Get int
-	LIB    l_gintspsp	;Get int and push
-	LIB    l_gint7de	;Get int, multiply by 7 and add from SP by de
-	LIB    l_gint_eq	;Get int and test == 0
-	LIB    l_ghtonsint	;Get reverse order int
-	LIB    l_pint		;Put int
-	LIB    l_pint_eq	;Put int and test == 0
-	LIB    l_pint_pop	;Put int and pop place address
-	LIB    l_pint_ex	;Put int hl to addr de return addr in hl
-	LIB    l_or		;Int logical or
-	LIB    l_xor		;Int logical xor
-	LIB    l_and		;Int logical and
-	LIB    l_eq		;Int equality
-	LIB    l_ne		;Int inequality
-	LIB    l_gt		;Int signed >
-	LIB    l_le		;Int signed <=
-	LIB    l_ge		;Int signed >=
-	LIB    l_lt		;Int signed <
-	LIB    l_uge		;Int unsigned >=
-	LIB    l_ult		;Int unsigned <
-	LIB    l_ugt		;Int unsigned >
-	LIB    l_ule		;Int unsigned <=
-	LIB    l_cmp		;Int signed compare
-	LIB    l_ucmp		;Int unsigned compare
-	LIB    l_asr		;Int signed >>
-	LIB    l_asr_u		;Int unsigned >>
-	LIB    l_asl		;Int <<
-	LIB    l_sub		;Int subtract
-	LIB    l_neg		;Int negate
-	LIB    l_com		;Int ~
-	LIB    l_lneg		;Int logical negate
-	LIB    l_bool		;Int boolean tetst
-	LIB    l_cm_de		;
-	LIB    l_cm_bc
-	LIB    l_deneg
-	LIB    l_bcneg
-	LIB    l_case		;Integer case
-	LIB    l_mult		;Integer *
-	LIB    l_div		;Integer signed /
-	LIB    l_div_u		;Integer unsigned /
+	EXTERN    l_getptr		;Get 3 byte pointer
+	EXTERN    l_putptr		;Put 3 byte pointer
+	EXTERN    l_gchar		;Get signed char
+	EXTERN    l_gcharsp	;Get signed char
+	EXTERN    l_gcharspsp	;Get signed char and push
+	EXTERN    l_sxt		;Sign extend char
+	EXTERN    l_gint		;Get int
+	EXTERN    l_gintsp		;Get int
+	EXTERN    l_gintspsp	;Get int and push
+	EXTERN    l_gint7de	;Get int, multiply by 7 and add from SP by de
+	EXTERN    l_gint_eq	;Get int and test == 0
+	EXTERN    l_ghtonsint	;Get reverse order int
+	EXTERN    l_pint		;Put int
+	EXTERN    l_pint_eq	;Put int and test == 0
+	EXTERN    l_pint_pop	;Put int and pop place address
+	EXTERN    l_pint_ex	;Put int hl to addr de return addr in hl
+	EXTERN    l_or		;Int logical or
+	EXTERN    l_xor		;Int logical xor
+	EXTERN    l_and		;Int logical and
+	EXTERN    l_eq		;Int equality
+	EXTERN    l_ne		;Int inequality
+	EXTERN    l_gt		;Int signed >
+	EXTERN    l_le		;Int signed <=
+	EXTERN    l_ge		;Int signed >=
+	EXTERN    l_lt		;Int signed <
+	EXTERN    l_uge		;Int unsigned >=
+	EXTERN    l_ult		;Int unsigned <
+	EXTERN    l_ugt		;Int unsigned >
+	EXTERN    l_ule		;Int unsigned <=
+	EXTERN    l_cmp		;Int signed compare
+	EXTERN    l_ucmp		;Int unsigned compare
+	EXTERN    l_asr		;Int signed >>
+	EXTERN    l_asr_u		;Int unsigned >>
+	EXTERN    l_asl		;Int <<
+	EXTERN    l_sub		;Int subtract
+	EXTERN    l_neg		;Int negate
+	EXTERN    l_com		;Int ~
+	EXTERN    l_lneg		;Int logical negate
+	EXTERN    l_bool		;Int boolean tetst
+	EXTERN    l_cm_de		;
+	EXTERN    l_cm_bc
+	EXTERN    l_deneg
+	EXTERN    l_bcneg
+	EXTERN    l_case		;Integer case
+	EXTERN    l_mult		;Integer *
+	EXTERN    l_div		;Integer signed /
+	EXTERN    l_div_u		;Integer unsigned /
 
 ;------------------
 ;Long functions now
 ;------------------
 
-	LIB     lpush2		;Push a long under the stack
-	LIB     l_int2long_s	;Int->long signed conversion
-	LIB     l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
-	LIB     l_long2int_s	;Long->int signed conversion
-	LIB     l_glong		;Get long
-	LIB     l_long_add
-	LIB     l_long_and
-	LIB     l_long_asl
-	LIB     l_long_asr
-	LIB     l_long_aslo	;Long << shift in c
-	LIB     l_long_asro	;Long >> shift in c (signed)
-	LIB     l_long_bool
-	LIB     l_long_cmp
-	LIB     l_long_com
-	LIB     l_long_eq
-	LIB     l_long_ge
-	LIB     l_long_gt
-	LIB     l_long_le
-	LIB     l_long_lneg
-	LIB     l_long_lt
-	LIB     l_long_ne
-	LIB     l_long_neg
-	LIB     l_long_or
-	LIB     l_long_sub
-	LIB     l_long_ucmp
-	LIB     l_long_uge
-	LIB     l_long_ugt
-	LIB     l_long_ule
-	LIB     l_long_ult
-	LIB     l_long_xor
-	LIB     l_plong
-	LIB     l_inclong	;Increment long
-	LIB     l_declong	;Decrement long
-	LIB     l_long_div
-	LIB     l_long_div_u
-	LIB     l_long_mult
-	LIB     l_long_asr_u	;Long unsigned >>
-	LIB     l_long_asr_uo	;Long unsigned >> shift in c
-	LIB     l_long_case
+	EXTERN     lpush2		;Push a long under the stack
+	EXTERN     l_int2long_s	;Int->long signed conversion
+	EXTERN     l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
+	EXTERN     l_long2int_s	;Long->int signed conversion
+	EXTERN     l_glong		;Get long
+	EXTERN     l_long_add
+	EXTERN     l_long_and
+	EXTERN     l_long_asl
+	EXTERN     l_long_asr
+	EXTERN     l_long_aslo	;Long << shift in c
+	EXTERN     l_long_asro	;Long >> shift in c (signed)
+	EXTERN     l_long_bool
+	EXTERN     l_long_cmp
+	EXTERN     l_long_com
+	EXTERN     l_long_eq
+	EXTERN     l_long_ge
+	EXTERN     l_long_gt
+	EXTERN     l_long_le
+	EXTERN     l_long_lneg
+	EXTERN     l_long_lt
+	EXTERN     l_long_ne
+	EXTERN     l_long_neg
+	EXTERN     l_long_or
+	EXTERN     l_long_sub
+	EXTERN     l_long_ucmp
+	EXTERN     l_long_uge
+	EXTERN     l_long_ugt
+	EXTERN     l_long_ule
+	EXTERN     l_long_ult
+	EXTERN     l_long_xor
+	EXTERN     l_plong
+	EXTERN     l_inclong	;Increment long
+	EXTERN     l_declong	;Decrement long
+	EXTERN     l_long_div
+	EXTERN     l_long_div_u
+	EXTERN     l_long_mult
+	EXTERN     l_long_asr_u	;Long unsigned >>
+	EXTERN     l_long_asr_uo	;Long unsigned >> shift in c
+	EXTERN     l_long_case
 
 ;--------------------------------------------------------------
 ; Floating point support routines, mostly in library
 ;--------------------------------------------------------------
 
-	LIB	dadd
-	LIB	ddiv
-	LIB	dsub
-	LIB	dmul
+	EXTERN	dadd
+	EXTERN	ddiv
+	EXTERN	dsub
+	EXTERN	dmul
 
-	LIB	dge
-	LIB	dgt
-	LIB	dleq
-	LIB	dlt
-	LIB	deq
-	LIB	dne
+	EXTERN	dge
+	EXTERN	dgt
+	EXTERN	dleq
+	EXTERN	dlt
+	EXTERN	deq
+	EXTERN	dne
 
-	LIB	minusfa		;FA=-FA
+	EXTERN	minusfa		;FA=-FA
 
-	LIB	dswap		;Exchange FA with top of stack
-	LIB   	float		;Convert int to float
-	LIB   	ufloat		;unsigned int to float
-	LIB   	ifix		;Convert float to int
+	EXTERN	dswap		;Exchange FA with top of stack
+	EXTERN   	float		;Convert int to float
+	EXTERN   	ufloat		;unsigned int to float
+	EXTERN   	ifix		;Convert float to int
 
-	XREF	dstore		;FA->(de)
-	XREF	dload		;FA<-(hl)
-	XREF	dldpsh		;(hl)->(stack)
-	XREF	dpush		;FA->(stack)
-	XREF	dpush2		;FA->(stack under)
+	EXTERN	dstore		;FA->(de)
+	EXTERN	dload		;FA<-(hl)
+	EXTERN	dldpsh		;(hl)->(stack)
+	EXTERN	dpush		;FA->(stack)
+	EXTERN	dpush2		;FA->(stack under)
 
-	XREF	fa		;may not be needed in this file
-	XREF	extra		;dittot
-	XREF  	__atof2		;string->fa convsersion
+	EXTERN	fa		;may not be needed in this file
+	EXTERN	extra		;dittot
+	EXTERN  	__atof2		;string->fa convsersion
 
 
 ;--------------------------------------------------
 ; Routines for picking up variables from far memory
 ;--------------------------------------------------
 
-	LIB	lp_gchar
-	LIB	lp_gdoub
-	LIB	lp_gint
-	LIB	lp_glong
-	LIB	lp_gptr
-	LIB	lp_pchar
-	LIB	lp_pdoub
-	LIB	lp_pint
-	LIB	lp_plong
-	LIB	lp_pptr
+	EXTERN	lp_gchar
+	EXTERN	lp_gdoub
+	EXTERN	lp_gint
+	EXTERN	lp_glong
+	EXTERN	lp_gptr
+	EXTERN	lp_pchar
+	EXTERN	lp_pdoub
+	EXTERN	lp_pint
+	EXTERN	lp_plong
+	EXTERN	lp_pptr
 
 
 ;-------------------
 ; Routines for SDCC
 ;-------------------
 
-	LIB     __divsint_rrx_s
-	LIB     __divsint_rrx_hds
-	LIB     __divuint_rrx_s
-	LIB     __divuint_rrx_hds
-	LIB     __divsuchar_rrx_s
-	LIB     __divuschar_rrx_s
-	LIB     __divuchar_rrx_s
-	LIB     __divuchar_rrx_hds
-	LIB     __moduchar_rrx_s
-	LIB     __moduchar_rrx_hds
-	LIB     __moduschar_rrx_s
-	LIB     __modsuchar_rrx_s
-    LIB     __modschar_rrx_s
-	LIB     __modschar_rrx_hds
-	LIB     __modsint_rrx_s
-	LIB     __modsint_rrx_hds
-	LIB     __moduint_rrx_s
-	LIB     __moduint_rrx_hds
-	LIB     __get_remainder
-	LIB     __divunsigned
-    LIB     __div_signexte
-	LIB     __divu16
-	LIB     __div16
-	LIB     __div8
-	LIB     __muluchar_rrx_s
-	LIB     __muluchar_rrx_hds
-	LIB     __mulsuchar_rrx_s
-	LIB     __muluschar_rrx_s
-	LIB     __mulschar_rrx_s
-	LIB     __mulschar_rrx_hds
-	LIB     __mulint_rrx_s
-	LIB     __mulint_rrx_hds
-	LIB     __mul16
-	LIB    	__rrulong_rrx_s
-	LIB    	__rrslong_rrx_s
-	LIB    	__rlslong_rrx_s
-	LIB    	__rlulong_rrx_s
+	EXTERN     __divsint_rrx_s
+	EXTERN     __divsint_rrx_hds
+	EXTERN     __divuint_rrx_s
+	EXTERN     __divuint_rrx_hds
+	EXTERN     __divsuchar_rrx_s
+	EXTERN     __divuschar_rrx_s
+	EXTERN     __divuchar_rrx_s
+	EXTERN     __divuchar_rrx_hds
+	EXTERN     __moduchar_rrx_s
+	EXTERN     __moduchar_rrx_hds
+	EXTERN     __moduschar_rrx_s
+	EXTERN     __modsuchar_rrx_s
+    EXTERN     __modschar_rrx_s
+	EXTERN     __modschar_rrx_hds
+	EXTERN     __modsint_rrx_s
+	EXTERN     __modsint_rrx_hds
+	EXTERN     __moduint_rrx_s
+	EXTERN     __moduint_rrx_hds
+	EXTERN     __get_remainder
+	EXTERN     __divunsigned
+    EXTERN     __div_signexte
+	EXTERN     __divu16
+	EXTERN     __div16
+	EXTERN     __div8
+	EXTERN     __muluchar_rrx_s
+	EXTERN     __muluchar_rrx_hds
+	EXTERN     __mulsuchar_rrx_s
+	EXTERN     __muluschar_rrx_s
+	EXTERN     __mulschar_rrx_s
+	EXTERN     __mulschar_rrx_hds
+	EXTERN     __mulint_rrx_s
+	EXTERN     __mulint_rrx_hds
+	EXTERN     __mul16
+	EXTERN    	__rrulong_rrx_s
+	EXTERN    	__rrslong_rrx_s
+	EXTERN    	__rlslong_rrx_s
+	EXTERN    	__rlulong_rrx_s

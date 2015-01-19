@@ -6,21 +6,21 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undrawto.asm,v 1.3 2014-04-18 09:30:31 stefano Exp $
+;	$Id: undrawto.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
 ;Usage: undrawto(struct *pixels)
 
 
-                XLIB    undrawto
-                LIB     swapgfxbk
-                XREF	swapgfxbk1
+                PUBLIC    undrawto
+                EXTERN     swapgfxbk
+                EXTERN	swapgfxbk1
 
-				XREF	coords
+				EXTERN	coords
 
-                LIB     line
-                LIB     respixel
+                EXTERN     line
+                EXTERN     respixel
 
 
 

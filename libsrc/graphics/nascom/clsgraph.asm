@@ -6,12 +6,12 @@
 ;       Stefano Bodrato - June 2003
 ;
 ;
-;       $Id: clsgraph.asm,v 1.3 2014-05-26 06:15:06 stefano Exp $
+;       $Id: clsgraph.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 
-        XLIB    cleargraphics
-        LIB     ansi_cls
+        PUBLIC    cleargraphics
+        EXTERN     ansi_cls
 
 defc	vram	=	0800h
 defc	vl1	=	vram+10

@@ -5,10 +5,10 @@
 ;	int exos_system_status(struct EXOS_INFO info);
 ;
 ;
-;	$Id: exos_system_status.asm,v 1.1 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_system_status.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-	XLIB	exos_system_status
+	PUBLIC	exos_system_status
 
 exos_system_status:
 

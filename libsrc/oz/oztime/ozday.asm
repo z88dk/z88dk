@@ -11,12 +11,12 @@
 ;
 ;
 ; ------
-; $Id: ozday.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozday.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XLIB	ozday
+	PUBLIC	ozday
 	
-	LIB	Compute	
+	EXTERN	Compute	
 
 ozday:
         ld      c,38h

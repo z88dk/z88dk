@@ -3,20 +3,20 @@
 ;       transcendental floating point routines
 ;
 
-                XLIB    atan
+                PUBLIC    atan
 
-                LIB     evenpol
-		LIB	hlsub
-                LIB	odd
+                EXTERN     evenpol
+		EXTERN	hlsub
+                EXTERN	odd
 
-                LIB	sgn
-                LIB	fdiv
+                EXTERN	sgn
+                EXTERN	fdiv
 
-		XREF	dload
-		XREF	fa
+		EXTERN	dload
+		EXTERN	fa
 
-		XDEF	__halfpi
-		XDEF	__pi
+		PUBLIC	__halfpi
+		PUBLIC	__pi
 
 .__pi  
         DEFB    $22,$A2,$DA,$0F,$49,$82   ;pi

@@ -10,11 +10,11 @@
 ;       Stefano Bodrato - Apr.2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.3 2003-09-30 10:23:12 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.4 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
-          XLIB  fputc_cons
+          PUBLIC  fputc_cons
 
 ;
 ; Entry:        hl points char to print

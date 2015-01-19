@@ -2,7 +2,7 @@
 
 ; void __FASTCALL__ zx_colour(uchar colour)
 
-XLIB zx_colour
+PUBLIC zx_colour
 
 .zx_colour
         ld a,i

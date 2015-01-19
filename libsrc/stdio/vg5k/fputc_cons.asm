@@ -6,10 +6,10 @@
 ;    Jun. 2014 -Joaopa, Stefano Bodrato
 ;
 ;
-;    $Id: fputc_cons.asm,v 1.2 2014-07-16 09:59:57 stefano Exp $
+;    $Id: fputc_cons.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
-    XLIB  fputc_cons
+    PUBLIC  fputc_cons
 ;
 ; Entry:        char to print
 ;

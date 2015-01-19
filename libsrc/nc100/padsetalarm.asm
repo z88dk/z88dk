@@ -1,4 +1,4 @@
-		XLIB	padsetalarm
+		PUBLIC	padsetalarm
 
 ; fastcall
 .padsetalarm

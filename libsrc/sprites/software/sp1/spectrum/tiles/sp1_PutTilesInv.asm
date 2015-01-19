@@ -1,10 +1,10 @@
 ; void sp1_PutTilesInv(struct sp1_Rect *r, struct sp1_tp *src)
 ; CALLER linkage for function pointers
 
-XLIB sp1_PutTilesInv
+PUBLIC sp1_PutTilesInv
 
-LIB sp1_PutTilesInv_callee
-XREF ASMDISP_SP1_PUTTILESINV_CALLEE
+EXTERN sp1_PutTilesInv_callee
+EXTERN ASMDISP_SP1_PUTTILESINV_CALLEE
 
 .sp1_PutTilesInv
 

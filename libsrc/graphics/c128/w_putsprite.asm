@@ -6,11 +6,11 @@
 ; c128 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+; $Id: w_putsprite.asm,v 1.2 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
-        XLIB    putsprite
-        LIB     w_pixeladdress
+        PUBLIC    putsprite
+        EXTERN     w_pixeladdress
         ;LIB     vdcset
         ;LIB     vdcget
         ;LIB     swapgfxbk

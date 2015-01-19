@@ -8,10 +8,10 @@
 ;	void ozdelay(unsigned d)
 ;
 ; ------
-; $Id: ozdelay.asm,v 1.1 2003-10-22 13:55:49 stefano Exp $
+; $Id: ozdelay.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozdelay
+	PUBLIC	ozdelay
 	
 
 ozdelay:

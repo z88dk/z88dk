@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB memmove
-LIB memmove_callee
-XREF ASMDISP_MEMMOVE_CALLEE
+PUBLIC memmove
+EXTERN memmove_callee
+EXTERN ASMDISP_MEMMOVE_CALLEE
 
 .memmove
 

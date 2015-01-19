@@ -1,7 +1,7 @@
 ; 04.2004 aralbrec
 
-XLIB BAAddMem
-LIB ba_Free
+PUBLIC BAAddMem
+EXTERN ba_Free
 
 ; Adds memory blocks to a queue
 ;

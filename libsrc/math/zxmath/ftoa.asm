@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ftoa.asm,v 1.3 2009-08-06 08:37:01 stefano Exp $
+;       $Id: ftoa.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 ;
 ;void ftoa(x,prec,str)   -> Convert double to string
@@ -21,7 +21,7 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB    ftoa
+                PUBLIC    ftoa
 
 .ftoa
 		ld	hl,2

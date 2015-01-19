@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: window.asm,v 1.5 2011-08-12 16:59:38 pauloscustodio Exp $
+;	$Id: window.asm,v 1.6 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 ;       This function will open a window of any type (graphics/text)
@@ -36,10 +36,10 @@
                 INCLUDE "screen.def"
 
 
-                XLIB    window
+                PUBLIC    window
                 
-                XREF    base_graphics
-                XREF    gfx_bank
+                EXTERN    base_graphics
+                EXTERN    gfx_bank
 
 .window
                 pop     bc

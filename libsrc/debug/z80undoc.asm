@@ -6,10 +6,10 @@
 ; *	TRUE if Z80 supports undocumented instructions.
 ; *	extern int  __LIB__ z80undoc(void);
 ; *
-; *	$Id: z80undoc.asm,v 1.1 2009-07-09 17:21:18 stefano Exp $
+; *	$Id: z80undoc.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ; *
 
-	XLIB	z80undoc
+	PUBLIC	z80undoc
 
 
 z80undoc:

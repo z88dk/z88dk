@@ -15,7 +15,7 @@
 
 
 
-                XLIB    sendmail
+                PUBLIC    sendmail
 
                 INCLUDE "saverst.def"
 

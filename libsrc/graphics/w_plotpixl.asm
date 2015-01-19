@@ -1,14 +1,14 @@
         INCLUDE "graphics/grafix.inc"
 
-        XLIB    w_plotpixel
+        PUBLIC    w_plotpixel
 
-        LIB     l_cmp
-        LIB     w_pixeladdress
+        EXTERN     l_cmp
+        EXTERN     w_pixeladdress
 
-        XREF    coords
+        EXTERN    coords
 
 ;
-;       $Id: w_plotpixl.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
+;       $Id: w_plotpixl.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

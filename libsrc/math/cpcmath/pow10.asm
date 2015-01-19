@@ -3,18 +3,18 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: pow10.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: pow10.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 
-		XLIB		pow10
-		XDEF		pow10c
+		PUBLIC		pow10
+		PUBLIC		pow10c
 
-		LIB		float
+		EXTERN		float
 
-		XREF		fa
+		EXTERN		fa
 
 .pow10	ld      hl,1
 		call	float

@@ -1,8 +1,8 @@
 ; void __CALLEE__ in_MouseAMX_callee(uchar *buttons, uint *xcoord, uint *ycoord)
 ; 09.2005 aralbrec
 
-XLIB in_MouseAMX_callee
-LIB INMouseAMX
+PUBLIC in_MouseAMX_callee
+EXTERN INMouseAMX
 
 .in_MouseAMX_callee
 

@@ -1,10 +1,10 @@
 ; void __CALLEE__ in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uint ycoord)
 ; 09.2005 aralbrec
 
-XLIB in_MouseSimSetPos_callee
-XDEF ASMDISP_IN_MOUSESIMSETPOS_CALLEE
+PUBLIC in_MouseSimSetPos_callee
+PUBLIC ASMDISP_IN_MOUSESIMSETPOS_CALLEE
 
-LIB l_setmem
+EXTERN l_setmem
 
 .in_MouseSimSetPos_callee
 

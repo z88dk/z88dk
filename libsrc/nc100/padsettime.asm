@@ -1,4 +1,4 @@
-		XLIB	padsettime
+		PUBLIC	padsettime
 
 ; fastcall
 .padsettime

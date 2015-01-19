@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.2 2013-04-03 15:24:32 stefano Exp $
+; $Id: bit_open.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; CCE MC-1000 bit sound functions
 ;
@@ -7,9 +7,9 @@
 ; Ensjo - 2013
 ;
 
-    XLIB     bit_open
-    LIB      bit_close
-    XREF     snd_tick
+    PUBLIC     bit_open
+    EXTERN      bit_close
+    EXTERN     snd_tick
 
 .bit_open
     ;di

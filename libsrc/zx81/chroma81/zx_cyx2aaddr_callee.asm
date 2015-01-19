@@ -1,9 +1,9 @@
 ; uchar __CALLEE__ *zx_cyx2aaddr_callee(uchar row, uchar col)
 ; Stefano, 2014.12
 
-XLIB zx_cyx2aaddr_callee
-XDEF ASMDISP_ZX_CYX2AADDR_CALLEE
-XREF HRG_LineStart
+PUBLIC zx_cyx2aaddr_callee
+PUBLIC ASMDISP_ZX_CYX2AADDR_CALLEE
+EXTERN HRG_LineStart
 
 .zx_cyx2aaddr_callee
 

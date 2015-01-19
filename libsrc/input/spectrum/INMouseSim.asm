@@ -1,8 +1,8 @@
 ; Simulates a Mouse using Joystick Functions
 ; 06.2003, 09.2005 aralbrec
 
-XLIB INMouseSim
-LIB l_jpix
+PUBLIC INMouseSim
+EXTERN l_jpix
 
 ; enter: HL = struct in_UDM *
 ; exit : C = button state 11111MRL active low

@@ -4,7 +4,7 @@
 ;
 ;       23/05/06 - Stefano Bodrato
 ;
-;       $Id: f_yesno.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: f_yesno.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
@@ -16,7 +16,7 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-        XLIB    f_yesno
+        PUBLIC    f_yesno
 
 
 .f_yesno

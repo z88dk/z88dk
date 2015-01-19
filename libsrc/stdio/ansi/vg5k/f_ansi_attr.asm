@@ -10,13 +10,13 @@
 ;	Stefano Bodrato - 2014
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.1 2014-07-16 09:59:57 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_attr
+	PUBLIC	ansi_attr
 
-	XDEF	vg5k_attr
-	XDEF	vg5k_inverse
+	PUBLIC	vg5k_attr
+	PUBLIC	vg5k_inverse
 	
 
 .vg5k_attr		defb 7	; White on Black

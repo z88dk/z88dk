@@ -3,9 +3,9 @@
 ;
 ;	DbInsertText
 ;
-;	$Id: DbInsertText.asm,v 1.2 2002-04-17 21:30:25 dom Exp $
+;	$Id: DbInsertText.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
 
-		XLIB	DbInsertText
+		PUBLIC	DbInsertText
 
 
 .DbInsertText

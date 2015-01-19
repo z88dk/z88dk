@@ -1,7 +1,7 @@
 ; CALLER linkage for function pointers
 
-XLIB strcmp
-LIB strcmp1
+PUBLIC strcmp
+EXTERN strcmp1
 
 
 .strcmp

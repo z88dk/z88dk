@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB outp
-LIB outp_callee
-XREF ASMDISP_OUTP_CALLEE
+PUBLIC outp
+EXTERN outp_callee
+EXTERN ASMDISP_OUTP_CALLEE
 
 .outp
 

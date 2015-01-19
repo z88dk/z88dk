@@ -4,13 +4,13 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.7 2013-04-19 15:40:48 stefano Exp $
+;	$Id: gets.asm,v 1.8 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
 
-		XLIB  gets
-		LIB   fgetc_cons
-		LIB   fputc_cons
+		PUBLIC  gets
+		EXTERN   fgetc_cons
+		EXTERN   fputc_cons
 
 DEFINE EMULATECURSOR
 

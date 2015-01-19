@@ -5,11 +5,11 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	$Id: f_ansi_cls.asm,v 1.4 2014-10-29 16:16:54 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.5 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_cls
-	LIB	_clg_hr		; we use the graphics CLS routine
+	PUBLIC	ansi_cls
+	EXTERN	_clg_hr		; we use the graphics CLS routine
 IF MTHRG
 	XREF	text_rows
 	XREF	MTCH_P2

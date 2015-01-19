@@ -1,11 +1,11 @@
 ; void __CALLEE__ in_MouseAMXSetPos_callee(uint xcoord, uint ycoord)
 ; 09.2005 aralbrec
 
-XLIB in_MouseAMXSetPos_callee
-XDEF ASMDISP_IN_MOUSEAMXSETPOS_CALLEE
-XDEF CDISP_IN_MOUSEAMXSETPOS_CALLEE
+PUBLIC in_MouseAMXSetPos_callee
+PUBLIC ASMDISP_IN_MOUSEAMXSETPOS_CALLEE
+PUBLIC CDISP_IN_MOUSEAMXSETPOS_CALLEE
 
-XREF _in_AMXcoordX, _in_AMXcoordY
+EXTERN _in_AMXcoordX, _in_AMXcoordY
 
 .in_MouseAMXSetPos_callee
 

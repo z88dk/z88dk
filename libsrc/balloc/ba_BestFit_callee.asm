@@ -1,8 +1,8 @@
 ; void __CALLEE__ *ba_BestFit_callee(uchar q, uchar numq)
 ; 04.2004 aralbrec
 
-XLIB ba_BestFit_callee
-LIB BABestFit
+PUBLIC ba_BestFit_callee
+EXTERN BABestFit
 
 .ba_BestFit_callee
 

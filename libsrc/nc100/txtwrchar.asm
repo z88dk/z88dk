@@ -1,4 +1,4 @@
-		XLIB	txtwrchar
+		PUBLIC	txtwrchar
 
 ; fastcall so in HL!
 .txtwrchar

@@ -2,7 +2,7 @@
 ;
 ;       Get Long Pointer from Near Memory
 
-                XLIB    l_getptr
+                PUBLIC    l_getptr
 
 
 ;Fetch long from (hl)

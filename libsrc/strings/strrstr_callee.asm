@@ -2,9 +2,9 @@
 ; return ptr to last occurrence of string w in s
 ; 01.2007 aralbrec
 
-XLIB strrstr_callee
-XDEF ASMDISP_STRRSTR_CALLEE
-LIB     rcmx_cpir
+PUBLIC strrstr_callee
+PUBLIC ASMDISP_STRRSTR_CALLEE
+EXTERN     rcmx_cpir
 
 
 .strrstr_callee

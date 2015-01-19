@@ -1,10 +1,10 @@
-	XLIB	fputc_cons
+	PUBLIC	fputc_cons
 	
 	INCLUDE "sms/sms.hdr"
 
-	XREF	fputc_vdp_offs
+	EXTERN	fputc_vdp_offs
 	
-	LIB	VRamToHL
+	EXTERN	VRamToHL
 	
 .fputc_cons
 	ld	a, (fputc_vdp_offs)

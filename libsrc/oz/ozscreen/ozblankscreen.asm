@@ -10,18 +10,18 @@
 ;
 ;
 ; ------
-; $Id: ozblankscreen.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozblankscreen.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozblankscreen
+	PUBLIC	ozblankscreen
 	
-	LIB	ozunblankscreen
-	LIB	ozsetlcdstate
+	EXTERN	ozunblankscreen
+	EXTERN	ozsetlcdstate
 	
-	XREF	s_blanked
+	EXTERN	s_blanked
 	
-	XREF	s_ozlcdstatus
-	XREF	s_init_unblank
+	EXTERN	s_ozlcdstatus
+	EXTERN	s_init_unblank
 
 
 ozblankscreen:

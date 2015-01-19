@@ -4,11 +4,11 @@
 ;
 ;	1/3/99 djm
 ;
-;	$Id: isxdigit.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
+;	$Id: isxdigit.asm,v 1.5 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-XLIB isxdigit
-LIB asm_isxdigit
+PUBLIC isxdigit
+EXTERN asm_isxdigit
 
 ; FASTCALL
 

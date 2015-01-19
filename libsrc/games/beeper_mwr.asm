@@ -1,4 +1,4 @@
-; $Id: beeper_mwr.asm,v 1.2 2013-10-21 14:23:44 stefano Exp $
+; $Id: beeper_mwr.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; 1 bit sound library - version for "memory write" I/O architectures
 ; by Stefano Bodrato, 31/03/08
@@ -9,12 +9,12 @@
 ;
 
 
-    XLIB     beeper
+    PUBLIC     beeper
     INCLUDE  "games/games.inc"
-    XREF     snd_tick
+    EXTERN     snd_tick
 
-    LIB      bit_open_di
-    LIB      bit_close_ei
+    EXTERN      bit_open_di
+    EXTERN      bit_close_ei
 
 .beeper
           ld   a,l

@@ -6,17 +6,17 @@
 ;	Init SD card communications
 ;	Input: HL = card slot number
 ;
-;	$Id: sd_initialize.asm,v 1.6 2012-09-26 14:15:25 stefano Exp $
+;	$Id: sd_initialize.asm,v 1.7 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_initialize
+	PUBLIC	sd_initialize
 	
-	LIB		sd_init_main
-	LIB		sd_power_off
-	LIB		sd_spi_port_fast
-	LIB		sd_read_cid
-	LIB		sd_read_csd
-	LIB		sd_deselect_card
+	EXTERN		sd_init_main
+	EXTERN		sd_power_off
+	EXTERN		sd_spi_port_fast
+	EXTERN		sd_read_cid
+	EXTERN		sd_read_csd
+	EXTERN		sd_deselect_card
 
 
 sd_initialize:

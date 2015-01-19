@@ -7,12 +7,12 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.1 2014-05-26 06:15:06 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.2 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
-                XLIB    swapgfxbk
+                PUBLIC    swapgfxbk
 
-		XDEF	swapgfxbk1
+		PUBLIC	swapgfxbk1
 
 
 

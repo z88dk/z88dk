@@ -17,24 +17,24 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.6 2002-04-17 21:30:26 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.7 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 	
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 	
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 	
-	XREF	base_graphics
-	XREF	cpygraph
+	EXTERN	base_graphics
+	EXTERN	cpygraph
 	
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 	
 ; Dirty thing for self modifying code
-	XDEF	INVRS
+	PUBLIC	INVRS
 
 .text_cols   defb columns
 .text_rows   defb 8

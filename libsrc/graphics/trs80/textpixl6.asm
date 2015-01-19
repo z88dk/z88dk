@@ -7,12 +7,12 @@
 ;	NOTE: there's no point really to use a table on the TRS80,
 ;	      it is only a very quick way to get the result.
 ;
-;	$Id: textpixl6.asm,v 1.1 2008-04-07 17:43:30 stefano Exp $
+;	$Id: textpixl6.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 ;
 
 
-	XLIB	textpixl
+	PUBLIC	textpixl
 
 
 .textpixl

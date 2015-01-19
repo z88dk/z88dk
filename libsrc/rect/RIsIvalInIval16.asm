@@ -2,7 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIsIvalInIval16
+PUBLIC RIsIvalInIval16
 
 ; Determine if two 16-bit intervals intersect.  Intervals
 ; can wrap across 0-65535 boundary.  Amazingly this test

@@ -5,14 +5,14 @@
 ;
 ;   Set HRG mode and clear screen
 ;
-;	$Id: mt_clg_hr.asm,v 1.4 2014-10-27 20:38:15 stefano Exp $
+;	$Id: mt_clg_hr.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB	_clg_hr
+	PUBLIC	_clg_hr
 
-	LIB		mt_hrg_on
+	EXTERN		mt_hrg_on
 
-	XREF	base_graphics
+	EXTERN	base_graphics
 
 	
 ._clg_hr

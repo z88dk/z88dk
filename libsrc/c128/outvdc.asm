@@ -2,14 +2,14 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: outvdc.asm,v 1.1 2008-06-23 17:34:34 stefano Exp $
+;$Id: outvdc.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
 ;set vdc register
 
-        XLIB    outvdc
-        LIB     outvdc_callee
-        XREF    ASMDISP_OUTVDC_CALLEE 
+        PUBLIC    outvdc
+        EXTERN     outvdc_callee
+        EXTERN    ASMDISP_OUTVDC_CALLEE 
 
 outvdc:
         pop     bc              ;return address

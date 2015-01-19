@@ -3,9 +3,9 @@
 ;
 ;	Return true
 ;
-;       $Id: f_yes.asm,v 1.1 2008-07-27 21:44:57 aralbrec Exp $:
+;       $Id: f_yes.asm,v 1.2 2015-01-19 01:32:56 pauloscustodio Exp $:
 
-		XLIB	f_yes
+		PUBLIC	f_yes
 
 .f_yes
 	ld	hl,1

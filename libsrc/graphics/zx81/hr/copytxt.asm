@@ -7,7 +7,7 @@
 ; Original function name: "HRG_Tool_TXTcopy"
 ;--------------------------------------------------------------
 ;
-;	$Id: copytxt.asm,v 1.1 2009-08-20 05:59:11 stefano Exp $
+;	$Id: copytxt.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -18,9 +18,9 @@
 ;
 ;----------------------------------------------------------------
 
-	XLIB	copytxt
+	PUBLIC	copytxt
 
-	XREF	base_graphics
+	EXTERN	base_graphics
 
 copytxt:
 	ld	(ovmode),hl

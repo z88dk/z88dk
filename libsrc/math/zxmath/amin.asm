@@ -4,7 +4,7 @@
 ;
 ;       7/12/02 - Stefano Bodrato
 ;
-;       $Id: amin.asm,v 1.4 2012-04-16 08:44:34 stefano Exp $
+;       $Id: amin.asm,v 1.5 2015-01-19 01:32:56 pauloscustodio Exp $
 ;
 
 
@@ -19,10 +19,10 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB    amin
+                PUBLIC    amin
 
-                LIB	fsetup
-                LIB	stkequ
+                EXTERN	fsetup
+                EXTERN	stkequ
 
 .amin
 	call    fsetup

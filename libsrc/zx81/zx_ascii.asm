@@ -7,11 +7,11 @@
 ;	char zx_ascii(char character);
 ;
 ;
-;	$Id: zx_ascii.asm,v 1.3 2007-12-10 18:01:38 stefano Exp $
+;	$Id: zx_ascii.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
 ;	
 
-XLIB	zx_ascii
-LIB	zx81toasc
+PUBLIC	zx_ascii
+EXTERN	zx81toasc
 
 zx_ascii:
 	ld	hl,zx81toasc+1

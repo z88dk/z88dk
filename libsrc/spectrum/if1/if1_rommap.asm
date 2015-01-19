@@ -11,22 +11,22 @@
 ;       MAKE_M can't be called with the 'hook code' system because
 ;       the first issue of the interface one just doesn't have it.
 ;       
-;       $Id: if1_rommap.asm,v 1.2 2010-01-22 16:00:38 stefano Exp $
+;       $Id: if1_rommap.asm,v 1.3 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-                XLIB    if1_rommap
+                PUBLIC    if1_rommap
 
-                XDEF    MAKE_M
-                XDEF    CLOSE_M
-                XDEF    FETCH_H
-                XDEF    MOTOR
-                XDEF    RD_BUFF
-                XDEF    ERASEM
-                XDEF    ADD_RECD
-                XDEF    DEL_S_1
+                PUBLIC    MAKE_M
+                PUBLIC    CLOSE_M
+                PUBLIC    FETCH_H
+                PUBLIC    MOTOR
+                PUBLIC    RD_BUFF
+                PUBLIC    ERASEM
+                PUBLIC    ADD_RECD
+                PUBLIC    DEL_S_1
 
-                XDEF    mdvbuffer
+                PUBLIC    mdvbuffer
 
 mdvbuffer:      defw    0
 

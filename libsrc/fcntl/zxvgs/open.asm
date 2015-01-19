@@ -10,10 +10,10 @@
 ;no sense to test number of opened files - the limit is 255...
 ;usually one is opened...
 ;
-;	$Id: open.asm,v 1.1 2002-06-23 12:11:31 dom Exp $
+;	$Id: open.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
-	XLIB	open
+	PUBLIC	open
 
 .open
 	LD	IX,0

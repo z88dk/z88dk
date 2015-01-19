@@ -1,6 +1,6 @@
 ; 02.2003 aralbrec
 
-XLIB ADTemptylistadd
+PUBLIC ADTemptylistadd
 
 ; enter: HL = LIST.count+1
 ;        DE = new NODE.next

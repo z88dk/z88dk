@@ -5,10 +5,10 @@
 ;	exos_channel_read_status(unsigned char ch_number);
 ;
 ;
-;	$Id: exos_channel_read_status.asm,v 1.1 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_channel_read_status.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-	XLIB	exos_channel_read_status
+	PUBLIC	exos_channel_read_status
 
 exos_channel_read_status:
 

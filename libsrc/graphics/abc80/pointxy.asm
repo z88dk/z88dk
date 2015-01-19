@@ -8,13 +8,13 @@
 ;       imported by Stefano Bodrato - 29/12/2006  :o)
 ;
 ;
-;	$Id: pointxy.asm,v 1.1 2014-09-29 07:38:41 stefano Exp $
+;	$Id: pointxy.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 
 
-			XLIB	pointxy
+			PUBLIC	pointxy
 			
-			XREF	coords
+			EXTERN	coords
 
 .pointxy
 			ld	d,l

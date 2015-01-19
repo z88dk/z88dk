@@ -4,7 +4,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Mar 2010
 ;
-;	$Id: mmc_read_multidata.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: mmc_read_multidata.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;	extern int __LIB__ mmc_read_multidata(struct MMC mmc_descriptor, long card_address, unsigned char *address, int block_count);
 ;
@@ -26,16 +26,16 @@
 ;-----------------------------------------------------------------------------------------
 ;
 
-	XLIB   mmc_read_multidata
+	PUBLIC   mmc_read_multidata
 
-	LIB    mmc_write_command
-	LIB    mmc_send_command
-	LIB    mmc_waitdata_token
-	LIB    mmc_wait_response
-	LIB    clock32
-	LIB    cs_high
+	EXTERN    mmc_write_command
+	EXTERN    mmc_send_command
+	EXTERN    mmc_waitdata_token
+	EXTERN    mmc_wait_response
+	EXTERN    clock32
+	EXTERN    cs_high
 
-	XREF   card_select
+	EXTERN   card_select
 
 	INCLUDE "zxmmc.def"
 

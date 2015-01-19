@@ -8,7 +8,7 @@
 ;      Save data !  ...set custom speed in (SAVE_SPEED+1)
 ;
 ;
-;	$Id: musamy_save.asm,v 1.3 2014-03-05 23:01:59 pauloscustodio Exp $
+;	$Id: musamy_save.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 ;
 ; speed extimations:
@@ -19,9 +19,9 @@
 ;
 
 
-XLIB musamy_save
+PUBLIC musamy_save
 
-XDEF SAVE_SPEED
+PUBLIC SAVE_SPEED
 
 
 musamy_save:

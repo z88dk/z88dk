@@ -15,7 +15,7 @@
 
 
 
-               XLIB    pagewait
+               PUBLIC    pagewait
 
                 INCLUDE "saverst.def"
 

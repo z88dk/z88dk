@@ -6,15 +6,15 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: clg.asm,v 1.3 2001-04-18 13:21:37 stefano Exp $
+;	$Id: clg.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-                XLIB    clg
-                LIB     swapgfxbk
-		XREF	swapgfxbk1
+                PUBLIC    clg
+                EXTERN     swapgfxbk
+		EXTERN	swapgfxbk1
 
-                LIB     cleargraphics
+                EXTERN     cleargraphics
                 
 
 .clg

@@ -1,7 +1,7 @@
 ; isodigit
 
-XLIB isodigit
-LIB asm_isodigit
+PUBLIC isodigit
+EXTERN asm_isodigit
 
 ; FASTCALL
 

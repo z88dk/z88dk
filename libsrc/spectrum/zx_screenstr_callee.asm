@@ -8,11 +8,11 @@
 ; if the bit pattern contains a mixture of inverted
 ; and non-inverted bit patterns.
 
-XLIB zx_screenstr_callee
-XDEF ASMDISP_ZX_SCREENSTR_CALLEE
+PUBLIC zx_screenstr_callee
+PUBLIC ASMDISP_ZX_SCREENSTR_CALLEE
 
-LIB zx_cyx2saddr_callee
-XREF ASMDISP_ZX_CYX2SADDR_CALLEE
+EXTERN zx_cyx2saddr_callee
+EXTERN ASMDISP_ZX_CYX2SADDR_CALLEE
 
 .zx_screenstr_callee
 

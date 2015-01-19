@@ -1,10 +1,10 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: rename.asm,v 1.2 2003-09-10 20:22:52 dom Exp $
+;	$Id: rename.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
 
-                XLIB    rename
+                PUBLIC    rename
 
 ;int rename(char *s1,char *s2)
 ;on stack:

@@ -2,9 +2,9 @@
 ; return ptr to last occurence of c in s (reverse search)
 ; 12.1999 djm, 12.2006 aralbrec, 04.2012 stefano
 
-XLIB memrchr_callee
-XDEF ASMDISP_MEMRCHR_CALLEE
-LIB     rcmx_cpdr
+PUBLIC memrchr_callee
+PUBLIC ASMDISP_MEMRCHR_CALLEE
+EXTERN     rcmx_cpdr
 
 
 .memrchr_callee

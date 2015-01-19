@@ -5,12 +5,12 @@
 ;	int flos_version();
 ;
 ;
-;	$Id: flos_version.asm,v 1.2 2011-08-03 08:13:40 stefano Exp $
+;	$Id: flos_version.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  flos_version
+	PUBLIC  flos_version
 	
 flos_version:
 	jp	kjt_get_version

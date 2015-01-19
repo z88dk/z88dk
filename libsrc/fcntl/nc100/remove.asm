@@ -1,4 +1,4 @@
-		XLIB remove
+		PUBLIC remove
 
 .remove
 		call 0xB893

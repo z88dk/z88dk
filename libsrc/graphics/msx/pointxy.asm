@@ -1,11 +1,11 @@
 	INCLUDE	"graphics/grafix.inc"
 
-	XLIB	pointxy
+	PUBLIC	pointxy
 
-	LIB	pixeladdress
+	EXTERN	pixeladdress
 
 ;
-;	$Id: pointxy.asm,v 1.4 2009-05-21 06:58:11 stefano Exp $
+;	$Id: pointxy.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

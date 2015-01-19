@@ -10,8 +10,8 @@
 ;
                 INCLUDE "fileio.def"
 
-                XLIB    fdfeof
-                LIB     fhand_ck
+                PUBLIC    fdfeof
+                EXTERN     fhand_ck
 
 ;*feof(fp)
 ;int fp

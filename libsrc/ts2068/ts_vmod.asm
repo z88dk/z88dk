@@ -1,7 +1,7 @@
 ; void __FASTCALL__ ts_vmod(uchar mode)
 ; 02.2008 aralbrec
 
-XLIB ts_vmod
+PUBLIC ts_vmod
 
 .ts_vmod
 

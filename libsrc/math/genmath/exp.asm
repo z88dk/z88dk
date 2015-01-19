@@ -4,17 +4,17 @@
 ; FIXME: norm4
 
 
-                XLIB    exp
+                PUBLIC    exp
 
-                LIB     sgn
-                LIB     floor
-                LIB     poly
+                EXTERN     sgn
+                EXTERN     floor
+                EXTERN     poly
 
-                LIB     fmul
-                LIB     pushfa
-                LIB     norm4
-                XREF    fa
-                LIB     fsub
+                EXTERN     fmul
+                EXTERN     pushfa
+                EXTERN     norm4
+                EXTERN    fa
+                EXTERN     fsub
 
 ;
 

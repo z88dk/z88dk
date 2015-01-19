@@ -12,12 +12,12 @@
 ; *	djm 5/1/2000
 ; *
 ; * -----
-; * $Id: atoi.asm,v 1.7 2008-06-29 06:40:25 aralbrec Exp $
+; * $Id: atoi.asm,v 1.8 2015-01-19 01:33:22 pauloscustodio Exp $
 ; *
 ; */
 
-XLIB atoi
-LIB l_neg, stdio_atou, asm_isspace
+PUBLIC atoi
+EXTERN l_neg, stdio_atou, asm_isspace
 
 ; FASTCALL
 

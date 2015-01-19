@@ -1,7 +1,7 @@
 ; uchar __FASTCALL__ *zx_aaddrcleft(void *attraddr)
 ; aralbrec 06.2007
 
-XLIB zx_aaddrcleft
+PUBLIC zx_aaddrcleft
 
 .zx_aaddrcleft
 

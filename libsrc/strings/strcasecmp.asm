@@ -1,7 +1,7 @@
 ; CALLER linkage for function pointers
 
-XLIB strcasecmp
-LIB stricmp1
+PUBLIC strcasecmp
+EXTERN stricmp1
 
 .strcasecmp
 

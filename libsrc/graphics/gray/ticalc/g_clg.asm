@@ -4,7 +4,7 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_clg.asm,v 1.5 2011-08-12 16:56:33 pauloscustodio Exp $
+;	$Id: g_clg.asm,v 1.6 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 
@@ -12,10 +12,10 @@
 
 		INCLUDE "graphics/grafix.inc"    ; Contains fn defs
 
-		XLIB    g_clg
+		PUBLIC    g_clg
 
-		XREF	graybit1
-		XREF	graybit2
+		EXTERN	graybit1
+		EXTERN	graybit2
 
 .g_clg
 		ld	ix,0

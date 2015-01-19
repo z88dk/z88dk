@@ -1,8 +1,8 @@
 ; void adt_HeapAdd(void *item, void **array, uint n, void *compare)
 ; 08.2005 aralbrec
 
-XLIB ADTHeapAdd
-LIB ADTHeapSiftUp
+PUBLIC ADTHeapAdd
+EXTERN ADTHeapSiftUp
 
 ; enter:  HL = N+1 (number of items in array after this one added)
 ;         BC = array address

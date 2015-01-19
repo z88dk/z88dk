@@ -1,10 +1,10 @@
 ; int zx_setint(char *variable, int value)
 ; CALLER linkage for function pointers
 
-XLIB zx_setint
+PUBLIC zx_setint
 
-LIB zx_setint_callee
-XREF ASMDISP_ZX_SETINT_CALLEE
+EXTERN zx_setint_callee
+EXTERN ASMDISP_ZX_SETINT_CALLEE
 
 .zx_setint
 

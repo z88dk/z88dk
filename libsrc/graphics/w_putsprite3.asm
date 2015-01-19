@@ -7,15 +7,15 @@
 ; Uses plot, unplot and xorplot
 ;
 ;
-; $Id: w_putsprite3.asm,v 1.1 2011-04-01 06:50:45 stefano Exp $
+; $Id: w_putsprite3.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-	XLIB    putsprite
+	PUBLIC    putsprite
 
-	LIB	plot
-	LIB	unplot
-	LIB	xorplot
+	EXTERN	plot
+	EXTERN	unplot
+	EXTERN	xorplot
 
 ; coords: h,l (vert-horz)
 ; sprite: (ix)

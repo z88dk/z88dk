@@ -15,13 +15,13 @@
 ; - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_gets.asm,v 1.1 2007-06-08 15:15:21 stefano Exp $
+; $Id: nb_gets.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB nb_gets
+	PUBLIC nb_gets
 	
-	LIB ZCALL
+	EXTERN ZCALL
 
 .nb_gets
 

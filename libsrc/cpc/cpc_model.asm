@@ -7,12 +7,12 @@
 ;    2 - 6128
 
 
-; $Id: cpc_model.asm,v 1.5 2012-04-05 09:17:33 stefano Exp $
+; $Id: cpc_model.asm,v 1.6 2015-01-19 01:32:42 pauloscustodio Exp $
 
 
         INCLUDE "cpcfirm.def"              
 
-        XDEF cpc_model
+        PUBLIC cpc_model
 
 .cpc_model
 	call	firmware

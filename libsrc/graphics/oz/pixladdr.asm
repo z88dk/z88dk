@@ -3,14 +3,14 @@
 ; Stefano Bodrato - Aug 2002
 ;
 
-	XLIB	pixeladdress
+	PUBLIC	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 
-	XREF	base_graphics
+	EXTERN	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.1 2002-11-20 14:15:19 stefano Exp $
+;	$Id: pixladdr.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

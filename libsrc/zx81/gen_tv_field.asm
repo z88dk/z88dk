@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: gen_tv_field.asm,v 1.1 2013-01-02 14:55:32 stefano Exp $
+;	$Id: gen_tv_field.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -15,9 +15,9 @@
 ;
 ;----------------------------------------------------------------
 
-	XLIB	gen_tv_field
-	XDEF	DFILE_PTRA
-	XDEF	DFILE_PTRB
+	PUBLIC	gen_tv_field
+	PUBLIC	DFILE_PTRA
+	PUBLIC	DFILE_PTRB
 
 gen_tv_field:
         OUT  ($FF),A                    ; 11        Turn off the vertical sync generator.

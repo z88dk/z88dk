@@ -5,7 +5,7 @@
 ;       21/03/03 - Stefano Bodrato
 ;
 ;
-;       $Id: tanh.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: tanh.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 ;double tanh(double)
@@ -19,10 +19,10 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB    tanh
+                PUBLIC    tanh
 
-                LIB	fsetup1
-                LIB	stkequ
+                EXTERN	fsetup1
+                EXTERN	stkequ
 
 .tanh
 

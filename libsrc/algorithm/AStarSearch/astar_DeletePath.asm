@@ -2,8 +2,8 @@
 ; delete the path by freeing any memory associated with it
 ; 01.2007 aralbrec
 
-XLIB astar_DeletePath
-XREF _u_free
+PUBLIC astar_DeletePath
+EXTERN _u_free
 
 ; enter: hl = struct astar_path *
 ; uses : af, bc, de, hl

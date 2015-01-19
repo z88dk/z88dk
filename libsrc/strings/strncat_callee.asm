@@ -2,10 +2,10 @@
 ; copy src to dst but no more than n chars, add '\0'
 ; 04.2001 dom, 12.2006 aralbrec
 
-XLIB strncat_callee
-XDEF ASMDISP_STRNCAT_CALLEE
+PUBLIC strncat_callee
+PUBLIC ASMDISP_STRNCAT_CALLEE
 
-LIB  rcmx_cpir
+EXTERN  rcmx_cpir
 
 .strncat_callee
 

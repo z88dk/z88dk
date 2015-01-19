@@ -5,17 +5,17 @@
 ;
 ;	int mmc_command(struct MMC mmc_descriptor, unsigned char command, long parameter)
 ;
-;	$Id: mmc_command.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: mmc_command.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; SEND COMMAND TO MMC
 ;-----------------------------------------------------------------------------------------
 ;
 
-	XLIB	mmc_command
+	PUBLIC	mmc_command
 	
-	LIB		mmc_send_command
-	XREF	card_select
+	EXTERN		mmc_send_command
+	EXTERN	card_select
 
 	
 	INCLUDE "zxmmc.def"

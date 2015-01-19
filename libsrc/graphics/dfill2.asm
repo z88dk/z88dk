@@ -13,14 +13,14 @@
 ;   IT DOESN'T MAKE USE OF ALTERNATE REGISTERS
 ;   IT IS BASED ON "pointxy" and "plotpixel"
 ;
-;	$Id: dfill2.asm,v 1.2 2014-05-21 19:34:14 stefano Exp $
+;	$Id: dfill2.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 	INCLUDE	"graphics/grafix.inc"
 
-        XLIB    do_fill
-        LIB   pointxy
-        LIB   plotpixel
+        PUBLIC    do_fill
+        EXTERN   pointxy
+        EXTERN   plotpixel
 
 .spsave	defw 0
 

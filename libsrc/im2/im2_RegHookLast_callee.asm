@@ -1,9 +1,9 @@
 ; void __CALLEE__ im2_RegHookLast_callee(uchar vector, void *hook)
 ; 04.2004 aralbrec
 
-XLIB im2_RegHookLast_callee
-XDEF ASMDISP_IM2_REGHOOKLAST_CALLEE
-XREF _im2_hookDisp
+PUBLIC im2_RegHookLast_callee
+PUBLIC ASMDISP_IM2_REGHOOKLAST_CALLEE
+EXTERN _im2_hookDisp
 
 .im2_RegHookLast_callee
 

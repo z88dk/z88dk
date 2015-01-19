@@ -2,10 +2,10 @@
 ;	Game device library for the Memotech MTX
 ;       Stefano Bodrato - 2011
 ;
-;	$Id: joystick.asm,v 1.1 2011-05-10 12:15:08 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
-        XLIB    joystick
+        PUBLIC    joystick
 
 KEYS:
 	defb	0

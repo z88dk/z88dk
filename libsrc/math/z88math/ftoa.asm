@@ -8,7 +8,7 @@
 ;char *str ;             /* output string */
 
 
-		XLIB	ftoa
+		PUBLIC	ftoa
 
 		INCLUDE	"fpp.def"
 

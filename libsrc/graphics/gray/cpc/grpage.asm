@@ -3,7 +3,7 @@
 ;
 ;       Written by Stefano Bodrato - June 2004
 ;
-;	$Id: grpage.asm,v 1.1 2004-06-30 12:50:57 stefano Exp $
+;	$Id: grpage.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 ;
 ; A trick to be used with the dafault graph functions
@@ -12,10 +12,10 @@
 ; all registers are saved
 
 
-		XLIB	graypage
+		PUBLIC	graypage
 		
-                XREF    base_graphics
-		XREF	grayaltpage
+                EXTERN    base_graphics
+		EXTERN	grayaltpage
 		
 .graypage
 		and	a

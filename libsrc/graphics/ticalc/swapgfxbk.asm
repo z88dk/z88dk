@@ -10,14 +10,14 @@
 ;	By Stefano Bodrato - Dec. 2000
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.7 2002-04-17 21:30:25 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.8 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 
-                XLIB    swapgfxbk
-		XDEF	swapgfxbk1
+                PUBLIC    swapgfxbk
+		PUBLIC	swapgfxbk1
 
-		XREF	cpygraph
+		EXTERN	cpygraph
 
 
 .swapgfxbk

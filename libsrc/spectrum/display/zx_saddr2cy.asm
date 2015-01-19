@@ -1,7 +1,7 @@
 ; uint __FASTCALL__ zx_saddr2cy(void *pixeladdr)
 ; aralbrec 06.2007
 
-XLIB zx_saddr2cy
+PUBLIC zx_saddr2cy
 
 .zx_saddr2cy
 

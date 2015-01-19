@@ -4,14 +4,14 @@
 ; modified by Stefano Bodrato - Jan 2001
 ;
 
-	XLIB    putsprite
-	XREF	cpygraph
-	LIB	pixeladdress
+	PUBLIC    putsprite
+	EXTERN	cpygraph
+	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: putsprite.asm,v 1.4 2002-04-17 21:30:25 dom Exp $
+;	$Id: putsprite.asm,v 1.5 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 ; coords: d,e (vert-horz)

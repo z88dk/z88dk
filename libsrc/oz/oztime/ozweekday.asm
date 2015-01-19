@@ -11,10 +11,10 @@
 ;
 ;
 ; ------
-; $Id: ozweekday.asm,v 1.1 2003-10-21 17:15:22 stefano Exp $
+; $Id: ozweekday.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XDEF	ozweekday
+	PUBLIC	ozweekday
 	
 
 ozweekday:

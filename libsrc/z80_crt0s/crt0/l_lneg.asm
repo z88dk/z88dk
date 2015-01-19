@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-XLIB    l_lneg
+PUBLIC    l_lneg
 
 
 ; HL = !HL

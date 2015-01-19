@@ -8,10 +8,10 @@
 ;	void ozinitsound(void)
 ;
 ; ------
-; $Id: ozinitsound.asm,v 1.1 2003-10-27 17:03:40 stefano Exp $
+; $Id: ozinitsound.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozinitsound
+	PUBLIC	ozinitsound
 
 
 ozinitsound:

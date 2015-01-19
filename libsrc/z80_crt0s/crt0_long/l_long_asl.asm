@@ -8,7 +8,7 @@
 ;       shifts are faster than doubling and ex with de/hl
 
 
-XLIB l_long_asl
+PUBLIC l_long_asl
 
 
 ; Shift primary left by secondary

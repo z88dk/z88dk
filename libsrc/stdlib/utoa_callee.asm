@@ -3,11 +3,11 @@
 ; 06.2008 aralbrec
 ; redone to be more in line with modern versions of this function
 
-XLIB utoa_callee
-XDEF ASMDISP_UTOA_CALLEE
+PUBLIC utoa_callee
+PUBLIC ASMDISP_UTOA_CALLEE
 
-LIB itoa_callee, stdio_error_zc
-XREF LIBDISP_ITOA_CALLEE
+EXTERN itoa_callee, stdio_error_zc
+EXTERN LIBDISP_ITOA_CALLEE
 
 .utoa_callee
 

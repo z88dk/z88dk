@@ -5,8 +5,8 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
-        XLIB in_WaitForKey
-        XREF _x1_keyboard_io
+        PUBLIC in_WaitForKey
+        EXTERN _x1_keyboard_io
 
 ; uses : AF, HL
 

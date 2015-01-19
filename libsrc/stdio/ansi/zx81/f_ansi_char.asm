@@ -19,21 +19,21 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.9 2014-10-28 21:07:08 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.10 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 
 IF ROMFONT
 	LIB	asctozx81
 ENDIF
 	
-	XREF	base_graphics
+	EXTERN	base_graphics
 
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 
-	XDEF	text_cols
+	PUBLIC	text_cols
 IF G007
 	XDEF	text_rows
 ENDIF
@@ -42,8 +42,8 @@ IF MTHRG
 ENDIF
 	
 ; Dirty thing for self modifying code
-	XDEF	INVRS
-	XDEF	BOLD
+	PUBLIC	INVRS
+	PUBLIC	BOLD
 
 IF A136COL
 .text_cols   defb 136

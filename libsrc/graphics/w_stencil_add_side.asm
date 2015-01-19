@@ -9,20 +9,20 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: w_stencil_add_side.asm,v 1.1 2010-12-24 11:59:35 stefano Exp $
+;	$Id: w_stencil_add_side.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ;; void stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil)
 
 
 
-                XLIB    stencil_add_side
+                PUBLIC    stencil_add_side
 
-                LIB     w_line
-                LIB     stencil_add_pixel 
-                LIB     swapgfxbk
-                XREF    swapgfxbk1
-                XREF	stencil_ptr
+                EXTERN     w_line
+                EXTERN     stencil_add_pixel 
+                EXTERN     swapgfxbk
+                EXTERN    swapgfxbk1
+                EXTERN	stencil_ptr
 
 .stencil_add_side
 		ld	ix,0

@@ -9,10 +9,10 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.1 2003-02-04 09:10:22 stefano Exp $
+;	$Id: f_ansi_bel.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_BEL
+	PUBLIC	ansi_BEL
 
 ; A fine double frequency beep for BEL
 

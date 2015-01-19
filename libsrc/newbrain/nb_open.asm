@@ -11,13 +11,13 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_open.asm,v 1.1 2007-06-03 15:13:06 stefano Exp $
+; $Id: nb_open.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB nb_open
+	PUBLIC nb_open
 	
-	LIB ZCALL
+	EXTERN ZCALL
 
 .nb_open
 	ld	ix,2

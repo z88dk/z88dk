@@ -9,11 +9,11 @@
 ;       imported by Stefano Bodrato - 29/12/2006  :o)
 ;
 ;
-;       $Id: clsgraph.asm,v 1.1 2007-01-04 17:41:34 stefano Exp $
+;       $Id: clsgraph.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 
 
-		XLIB    cleargraphics
+		PUBLIC    cleargraphics
 
 .cleargraphics
 		ld	ix,884

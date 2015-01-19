@@ -6,12 +6,12 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: putsprite.asm,v 1.4 2002-04-17 21:30:25 dom Exp $
+; $Id: putsprite.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB    putsprite
-	XREF	cpygraph
-	LIB	pixeladdress
+	PUBLIC    putsprite
+	EXTERN	cpygraph
+	EXTERN	pixeladdress
 
 ; coords: d,e (vert-horz)
 ; sprite: (ix)

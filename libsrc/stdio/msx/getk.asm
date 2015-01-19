@@ -6,12 +6,12 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: getk.asm,v 1.6 2009-06-22 21:44:17 dom Exp $
+;	$Id: getk.asm,v 1.7 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	getk
-	LIB	fgetc_cons
-        LIB	msxbios
+	PUBLIC	getk
+	EXTERN	fgetc_cons
+        EXTERN	msxbios
 
 
 IF FORmsx

@@ -1,4 +1,4 @@
-		XLIB	kmsettickcount
+		PUBLIC	kmsettickcount
 
 .kmsettickcount
 		pop bc

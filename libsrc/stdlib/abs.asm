@@ -6,10 +6,10 @@
 ; version would do..
 ;
 ; -----
-; $Id: abs.asm,v 1.5 2007-01-10 08:17:06 aralbrec Exp $
+; $Id: abs.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
 
-XLIB abs
-LIB l_neg
+PUBLIC abs
+EXTERN l_neg
 
 ; FASTCALL
 

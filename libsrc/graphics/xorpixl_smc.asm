@@ -8,14 +8,14 @@
 ;       Invert pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl_smc.asm,v 1.1 2007-01-04 17:41:34 stefano Exp $
+;	$Id: xorpixl_smc.asm,v 1.2 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 
-		XLIB	xorpixel
+		PUBLIC	xorpixel
 
-		LIB	pixel
-		XREF	pixmode
+		EXTERN	pixel
+		EXTERN	pixmode
 
 .xorpixel	push	hl
 		ld	hl,174		; XOR (HL)

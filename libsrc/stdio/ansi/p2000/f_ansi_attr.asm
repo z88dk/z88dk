@@ -10,7 +10,7 @@
 ;	$Id:
 ;
 
-	XLIB	ansi_attr
+	PUBLIC	ansi_attr
 
 .ansi_attr
         ret

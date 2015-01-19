@@ -2,8 +2,8 @@
 ; 02.2008 aralbrec, Sprite Pack v3.0
 ; zxz81 hi-res version
 
-XLIB sp1_PrintString_callee
-LIB SP1PrintString, SP1PSPOP, SP1PSPUSH
+PUBLIC sp1_PrintString_callee
+EXTERN SP1PrintString, SP1PSPOP, SP1PSPUSH
 
 .sp1_PrintString_callee
 

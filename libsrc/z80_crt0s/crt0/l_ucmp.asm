@@ -5,7 +5,7 @@
 ;       6/9/98  djm
 ;
 
-                XLIB    l_ucmp
+                PUBLIC    l_ucmp
 
 ; unsigned compare of DE and HL
 ;   carry is sign of difference [set => DE < HL]

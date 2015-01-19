@@ -2,7 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIntersectRect8
+PUBLIC RIntersectRect8
 
 ; Returns the intersection of two 8-bit rectangles.
 ; Since rectangles can wrap across their 0-255

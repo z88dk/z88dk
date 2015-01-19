@@ -3,20 +3,20 @@
 ;       transcendental floating point routines
 ;
 
-                XLIB  sin
-                LIB   hlsub
-                LIB   hladd
-                LIB   addhalf
+                PUBLIC  sin
+                EXTERN   hlsub
+                EXTERN   hladd
+                EXTERN   addhalf
 
-                LIB   evenpol
-                LIB   floor
+                EXTERN   evenpol
+                EXTERN   floor
 
-                LIB   pushfa
-                LIB   ldfabc
-                LIB   fsub
-                LIB   sgn
-                LIB   minusfa
-                LIB   fdiv
+                EXTERN   pushfa
+                EXTERN   ldfabc
+                EXTERN   fsub
+                EXTERN   sgn
+                EXTERN   minusfa
+                EXTERN   fdiv
 
 
 

@@ -1,8 +1,8 @@
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 
-XLIB vz_score
-LIB vz_score_callee
-XREF ASMDISP_VZ_SCORE_CALLEE
+PUBLIC vz_score
+EXTERN vz_score_callee
+EXTERN ASMDISP_VZ_SCORE_CALLEE
 
 .vz_score
 

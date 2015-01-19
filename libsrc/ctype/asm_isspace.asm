@@ -1,6 +1,6 @@
 ; asm_isspace
 
-XLIB asm_isspace
+PUBLIC asm_isspace
 
 ; determine whether ascii char is a whitespace char
 

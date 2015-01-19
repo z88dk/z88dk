@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-XLIB    l_long_or
+PUBLIC    l_long_or
 
 ; "or" primary and secondary into dehl
 ; dehl = primary

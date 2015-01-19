@@ -7,7 +7,7 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_point.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;	$Id: w_point.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
@@ -15,11 +15,11 @@
 ;Result is true/false
 
 
-                XLIB    point
+                PUBLIC    point
 
-                LIB     w_pointxy
-                LIB     swapgfxbk
-                LIB     swapgfxbk1
+                EXTERN     w_pointxy
+                EXTERN     swapgfxbk
+                EXTERN     swapgfxbk1
 
 
 .point

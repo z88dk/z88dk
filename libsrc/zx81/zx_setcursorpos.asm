@@ -1,10 +1,10 @@
 ; int zx_setcursorpos(char variable, char *value)
 ; CALLER linkage for function pointers
 
-XLIB zx_setcursorpos
+PUBLIC zx_setcursorpos
 
-LIB zx_setcursorpos_callee
-XREF ASMDISP_ZX_SETCURSORPOS_CALLEE
+EXTERN zx_setcursorpos_callee
+EXTERN ASMDISP_ZX_SETCURSORPOS_CALLEE
 
 zx_setcursorpos:
    pop bc

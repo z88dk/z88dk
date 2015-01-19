@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB strncasecmp
-LIB strnicmp_callee
-XREF ASMDISP_STRNICMP_CALLEE
+PUBLIC strncasecmp
+EXTERN strnicmp_callee
+EXTERN ASMDISP_STRNICMP_CALLEE
 
 .strncasecmp
 

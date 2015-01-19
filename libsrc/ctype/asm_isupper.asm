@@ -1,6 +1,6 @@
 ; asm_isupper
 
-XLIB asm_isupper
+PUBLIC asm_isupper
 
 ; determine if the char is in [A-Z]
 

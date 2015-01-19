@@ -3,10 +3,10 @@
 ;
 ;	(HL)=char to display
 ;
-;	$Id: fputc_cons.asm,v 1.2 2011-05-09 14:31:38 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	fputc_cons
+	PUBLIC	fputc_cons
 
 .fputc_cons
 	ld	hl,2

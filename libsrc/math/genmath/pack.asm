@@ -2,11 +2,11 @@
 ;       Z88dk Generic Floating Point Math Library
 ;
 ;
-;       $Id: pack.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: pack.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $:
 
-		XLIB	pack
+		PUBLIC	pack
 
-		LIB	pack2
+		EXTERN	pack2
 
 		
 

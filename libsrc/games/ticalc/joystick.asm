@@ -3,11 +3,11 @@
 ;	Stefano Bodrato - 21/8/2001
 ;	Henk Poley	- 03/9/2001
 ;
-;	$Id: joystick.asm,v 1.5 2009-01-23 08:22:27 stefano Exp $
+;	$Id: joystick.asm,v 1.6 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 
 
-        XLIB    joystick
+        PUBLIC    joystick
 
 .joystick
 	;__FASTALL__ : joystick no. in HL

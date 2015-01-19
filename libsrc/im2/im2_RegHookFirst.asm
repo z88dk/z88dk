@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB im2_RegHookFirst
+PUBLIC im2_RegHookFirst
 
-LIB im2_RegHookFirst_callee
-XREF ASMDISP_IM2_REGHOOKFIRST_CALLEE
+EXTERN im2_RegHookFirst_callee
+EXTERN ASMDISP_IM2_REGHOOKFIRST_CALLEE
 
 .im2_RegHookFirst
 

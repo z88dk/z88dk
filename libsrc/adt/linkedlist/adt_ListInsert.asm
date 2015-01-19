@@ -1,10 +1,10 @@
 ; int adt_ListInsert(struct adt_List *list, void *item)
 ; CALLER linkage for function pointers
 
-XLIB adt_ListInsert
+PUBLIC adt_ListInsert
 
-LIB adt_ListInsert_callee
-XREF ASMDISP_ADT_LISTINSERT_CALLEE
+EXTERN adt_ListInsert_callee
+EXTERN ASMDISP_ADT_LISTINSERT_CALLEE
 
 .adt_ListInsert
 

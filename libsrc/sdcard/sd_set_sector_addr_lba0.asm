@@ -6,15 +6,15 @@
 ;	set HL to dest address for data
 ;	set B to number of bytes required  
 ;
-;	$Id: sd_set_sector_addr_lba0.asm,v 1.3 2012-09-11 13:09:39 stefano Exp $
+;	$Id: sd_set_sector_addr_lba0.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_set_sector_addr_lba0
+	PUBLIC	sd_set_sector_addr_lba0
 
-	XREF	cmd_generic_args
-	XREF	sector_lba0	
+	EXTERN	cmd_generic_args
+	EXTERN	sector_lba0	
 IF SDHC_SUPPORT
-	XREF	sd_card_info
+	EXTERN	sd_card_info
 ENDIF
 
 

@@ -1,8 +1,8 @@
 ; uint __FASTCALL__ zx_aaddr2px(void *attraddr)
 ; Stefano, 2014.12
 
-XLIB zx_aaddr2px
-XREF HRG_LineStart
+PUBLIC zx_aaddr2px
+EXTERN HRG_LineStart
 
 .zx_aaddr2px
 

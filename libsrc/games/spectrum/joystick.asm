@@ -2,11 +2,11 @@
 ;	Game device library for the ZX Spectrum
 ;	Stefano Bodrato - 20/8/2001
 ;
-;	$Id: joystick.asm,v 1.3 2009-01-23 08:22:27 stefano Exp $
+;	$Id: joystick.asm,v 1.4 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 
 
-        XLIB    joystick
+        PUBLIC    joystick
 
 .joystick
 	;__FASTALL__ : joystick no. in HL

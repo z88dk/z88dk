@@ -5,13 +5,13 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.7 2014-10-29 16:16:54 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.8 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_SCROLLUP
-	LIB	ansi_del_line
-	XREF	base_graphics
-	XREF	text_rows
+	PUBLIC	ansi_SCROLLUP
+	EXTERN	ansi_del_line
+	EXTERN	base_graphics
+	EXTERN	text_rows
 
 
 .ansi_SCROLLUP

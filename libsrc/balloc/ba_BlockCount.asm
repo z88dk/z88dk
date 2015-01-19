@@ -1,7 +1,7 @@
 ; 05.2005 aralbrec
 
-XLIB ba_BlockCount
-LIB BABlockCount
+PUBLIC ba_BlockCount
+EXTERN BABlockCount
 
 .ba_BlockCount
    call BABlockCount

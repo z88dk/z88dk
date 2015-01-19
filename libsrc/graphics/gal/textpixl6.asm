@@ -7,12 +7,12 @@
 ;	NOTE: we shouldn't use a table on the Galaksija,
 ;	      it is only a very quick way to get the result.
 ;
-;	$Id: textpixl6.asm,v 1.1 2008-12-09 17:48:18 stefano Exp $
+;	$Id: textpixl6.asm,v 1.2 2015-01-19 01:32:48 pauloscustodio Exp $
 ;
 ;
 
 
-	XLIB	textpixl
+	PUBLIC	textpixl
 
 
 .textpixl

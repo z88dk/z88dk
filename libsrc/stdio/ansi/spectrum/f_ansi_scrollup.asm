@@ -8,12 +8,12 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.4 2014-01-03 15:20:43 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_SCROLLUP
+	PUBLIC	ansi_SCROLLUP
 
-	XREF  call_rom3
+	EXTERN  call_rom3
 
 
 .ansi_SCROLLUP

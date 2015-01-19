@@ -1,6 +1,6 @@
-	XLIB	wait_vblank_noint
+	PUBLIC	wait_vblank_noint
 	
-	LIB	get_vcount
+	EXTERN	get_vcount
 	
 ;==============================================================
 ; void wait_vblank_noint()

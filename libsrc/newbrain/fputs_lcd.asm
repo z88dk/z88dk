@@ -8,13 +8,13 @@
 ;
 ;
 ;
-; $Id: fputs_lcd.asm,v 1.2 2007-06-07 08:23:09 stefano Exp $
+; $Id: fputs_lcd.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB fputs_lcd
+	PUBLIC fputs_lcd
 
-	LIB ZCALL
+	EXTERN ZCALL
 
 
 .fputs_lcd

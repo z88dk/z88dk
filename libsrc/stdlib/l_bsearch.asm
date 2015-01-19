@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB l_bsearch
-LIB l_bsearch_callee
-XREF ASMDISP_L_BSEARCH_CALLEE
+PUBLIC l_bsearch
+EXTERN l_bsearch_callee
+EXTERN ASMDISP_L_BSEARCH_CALLEE
 
 .l_bsearch
 

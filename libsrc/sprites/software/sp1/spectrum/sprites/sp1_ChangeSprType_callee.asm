@@ -2,8 +2,8 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB sp1_ChangeSprType_callee
-XDEF ASMDISP_SP1_CHANGESPRTYPE_CALLEE
+PUBLIC sp1_ChangeSprType_callee
+PUBLIC ASMDISP_SP1_CHANGESPRTYPE_CALLEE
 
 .sp1_ChangeSprType_callee
 

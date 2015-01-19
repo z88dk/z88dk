@@ -12,14 +12,14 @@
 ;
 ;
 ; ------
-; $Id: ozsetlcdstate.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozsetlcdstate.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozsetlcdstate
+	PUBLIC	ozsetlcdstate
 	
-	XREF	s_ozlcdstatus
+	EXTERN	s_ozlcdstatus
 
-	LIB	restore_a000
+	EXTERN	restore_a000
 
 ozsetlcdstate:
         pop     de

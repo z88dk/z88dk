@@ -4,12 +4,12 @@
 ;
 ;	Get the size for the given file
 ;
-;	$Id: get_file_size.asm,v 1.3 2012-03-08 07:16:46 stefano Exp $
+;	$Id: get_file_size.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  get_file_size
+	PUBLIC  get_file_size
 	
 get_file_size:
 ; __FASTCALL__, HL points to filename

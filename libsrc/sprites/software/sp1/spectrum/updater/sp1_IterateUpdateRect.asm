@@ -1,10 +1,10 @@
 ; void sp1_IterateUpdateRect(struct sp1_Rect *r, void *hook)
 ; CALLER linkage for function pointers
 
-XLIB sp1_IterateUpdateRect
+PUBLIC sp1_IterateUpdateRect
 
-LIB sp1_IterateUpdateRect_callee
-XREF CDISP_SP1_ITERATEUPDATERECT_CALLEE
+EXTERN sp1_IterateUpdateRect_callee
+EXTERN CDISP_SP1_ITERATEUPDATERECT_CALLEE
 
 .sp1_IterateUpdateRect
 

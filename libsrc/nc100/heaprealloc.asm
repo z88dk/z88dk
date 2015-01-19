@@ -1,4 +1,4 @@
-		XLIB	heaprealloc
+		PUBLIC	heaprealloc
 
 .heaprealloc
 		pop hl

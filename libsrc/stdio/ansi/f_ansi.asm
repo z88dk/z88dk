@@ -18,24 +18,24 @@
 ;       M - Delete lines: to be completed
 ;
 ;
-;       $Id: f_ansi.asm,v 1.13 2014-04-18 07:38:58 stefano Exp $
+;       $Id: f_ansi.asm,v 1.14 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-        XLIB    f_ansi
-        LIB     ansi_putc
-        LIB     ansi_attr
-        LIB     ansi_CHAR
-        LIB     ansi_cls
-        LIB     ansi_LF
-        LIB     ansi_DSR6
-        LIB     ansi_BEL
-        LIB     ansi_del_line
+        PUBLIC    f_ansi
+        EXTERN     ansi_putc
+        EXTERN     ansi_attr
+        EXTERN     ansi_CHAR
+        EXTERN     ansi_cls
+        EXTERN     ansi_LF
+        EXTERN     ansi_DSR6
+        EXTERN     ansi_BEL
+        EXTERN     ansi_del_line
 
-        XDEF    ansi_COLUMN
-        XDEF    ansi_ROW
+        PUBLIC    ansi_COLUMN
+        PUBLIC    ansi_ROW
 
-        XREF    text_cols
-        XREF    text_rows
+        EXTERN    text_cols
+        EXTERN    text_rows
 
 
 

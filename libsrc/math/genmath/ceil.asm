@@ -2,10 +2,10 @@
 ;       ceil(x)
 
 
-                XLIB    ceil
+                PUBLIC    ceil
 
-                LIB     floor
-                LIB     odd
+                EXTERN     floor
+                EXTERN     odd
 
 
 ;       return -(floor(-x))

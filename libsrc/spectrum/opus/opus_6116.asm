@@ -5,12 +5,12 @@
 ;
 ; 	This routine checks if the 6116 memory expansion is present.
 ;
-;	$Id: opus_6116.asm,v 1.3 2014-11-25 17:09:21 stefano Exp $
+;	$Id: opus_6116.asm,v 1.4 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
-		XLIB	opus_6116
+		PUBLIC	opus_6116
 	
-		LIB	opus_rommap
+		EXTERN	opus_rommap
 
 .opus_6116
 		call	opus_rommap

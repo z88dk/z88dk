@@ -8,9 +8,9 @@
 ;	ZSock Lib function: sock_dataready
 
 
-	XLIB	sock_dataready
+	PUBLIC	sock_dataready
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

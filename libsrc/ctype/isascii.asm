@@ -5,10 +5,10 @@
 ;
 ;       djm 1/3/99
 ;
-;	$Id: isascii.asm,v 1.5 2009-07-21 21:14:57 dom Exp $
+;	$Id: isascii.asm,v 1.6 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-XLIB isascii
+PUBLIC isascii
 
 ; FASTCALL
 

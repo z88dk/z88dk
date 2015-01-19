@@ -10,15 +10,15 @@
 ;though...
 ;
 ; -----
-; $Id: exit.asm,v 1.5 2007-01-09 21:54:21 stefano Exp $
+; $Id: exit.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
 
-XLIB exit
+PUBLIC exit
 
-XREF cleanup, exitsp, exitcount
+EXTERN cleanup, exitsp, exitcount
 
-LIB l_jphl
+EXTERN l_jphl
 
-XDEF ASMDISP_EXIT
+PUBLIC ASMDISP_EXIT
 
 ; FASTCALL
 

@@ -2,11 +2,11 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB sp1_GetTiles_callee
-XDEF ASMDISP_SP1_GETTILES_CALLEE
+PUBLIC sp1_GetTiles_callee
+PUBLIC ASMDISP_SP1_GETTILES_CALLEE
 
-LIB sp1_GetUpdateStruct_callee
-XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
+EXTERN sp1_GetUpdateStruct_callee
+EXTERN ASMDISP_SP1_GETUPDATESTRUCT_CALLEE, SP1V_DISPWIDTH
 
 .sp1_GetTiles_callee
 

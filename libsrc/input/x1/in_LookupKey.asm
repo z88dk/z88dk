@@ -13,7 +13,7 @@
 ;       This routine does not differentiate between keys and their numeric keypad
 ;       equivalents. 
 
-        XLIB in_LookupKey
+        PUBLIC in_LookupKey
 
 .in_LookupKey
         ld a, l

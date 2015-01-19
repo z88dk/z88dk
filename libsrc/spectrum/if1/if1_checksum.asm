@@ -6,10 +6,10 @@
 ;	check BC bytes starting from HL 
 ;	and compare with the following byte
 ;
-;	$Id: if1_checksum.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: if1_checksum.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
-	XLIB	if1_checksum
+	PUBLIC	if1_checksum
 	
 if1_checksum:
 		push	hl

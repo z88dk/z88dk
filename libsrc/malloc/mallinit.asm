@@ -1,10 +1,10 @@
 ; void mallinit(void)
 ; 12.2006 aralbrec
 
-XLIB mallinit
+PUBLIC mallinit
 
-LIB l_setmem
-XREF _heap
+EXTERN l_setmem
+EXTERN _heap
 
 .mallinit
 

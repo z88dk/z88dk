@@ -6,13 +6,13 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;       $Id: clsgraph.asm,v 1.2 2014-07-17 09:37:53 stefano Exp $
+;       $Id: clsgraph.asm,v 1.3 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 
 
-			XLIB    cleargraphics
-			LIB     loadudg6
-			XREF	base_graphics
+			PUBLIC    cleargraphics
+			EXTERN     loadudg6
+			EXTERN	base_graphics
 
 			INCLUDE	"graphics/grafix.inc"
 

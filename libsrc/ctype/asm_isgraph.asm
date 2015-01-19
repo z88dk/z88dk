@@ -1,6 +1,6 @@
 ; asm_isgraph
 
-XLIB asm_isgraph
+PUBLIC asm_isgraph
 
 ; called by asm_isprint
 ; determine if the char is printable but not a space

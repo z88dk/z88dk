@@ -1,14 +1,14 @@
         INCLUDE "graphics/grafix.inc"
 
-        XLIB    w_pointxy
+        PUBLIC    w_pointxy
 
         ;LIB     l_cmp
-        LIB     w_pixeladdress
+        EXTERN     w_pixeladdress
 
-        XREF    coords
+        EXTERN    coords
 
 ;
-;       $Id: w_pointxy.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
+;       $Id: w_pointxy.asm,v 1.3 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

@@ -5,10 +5,10 @@
 ;	toggle_exos_variable(unsigned char variable);
 ;
 ;
-;	$Id: toggle_exos_variable.asm,v 1.2 2011-03-15 14:34:08 stefano Exp $
+;	$Id: toggle_exos_variable.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-	XLIB	toggle_exos_variable
+	PUBLIC	toggle_exos_variable
 
 ;_FASTCALL_
 

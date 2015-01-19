@@ -6,11 +6,11 @@
 ;
 ;	Disable screen / Enable screen
 ;
-;	$Id: svi_blank_noblank.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: svi_blank_noblank.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_blank
-	XDEF	msx_noblank
+	PUBLIC	msx_blank
+	PUBLIC	msx_noblank
 	
         INCLUDE "svi.def"
 

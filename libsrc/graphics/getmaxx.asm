@@ -3,14 +3,14 @@
 ;
 ;       Written around the Interlogic Standard Library
 ;
-;	$Id: getmaxx.asm,v 1.2 2009-04-23 10:16:22 stefano Exp $
+;	$Id: getmaxx.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
 	INCLUDE	"graphics/grafix.inc"
 
 
-                XLIB    getmaxx
+                PUBLIC    getmaxx
 
 .getmaxx
 		ld	hl,maxx-1

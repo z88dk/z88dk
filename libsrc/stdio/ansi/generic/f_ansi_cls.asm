@@ -8,14 +8,14 @@
 ;	Stefano Bodrato - 2014
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.1 2014-07-16 09:59:57 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_cls
+	PUBLIC	ansi_cls
 
-	LIB		ansi_del_line
+	EXTERN		ansi_del_line
 
-	XREF	text_rows
+	EXTERN	text_rows
 
 .ansi_cls
 	ld a,(text_rows)

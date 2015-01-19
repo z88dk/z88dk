@@ -2,10 +2,10 @@
 ;       Z88dk Z88 Maths Library
 ;
 ;
-;       $Id: stkequcmp.asm,v 1.1 2008-07-27 21:44:58 aralbrec Exp $
+;       $Id: stkequcmp.asm,v 1.2 2015-01-19 01:32:56 pauloscustodio Exp $
 
 
-		XLIB	stkequcmp
+		PUBLIC	stkequcmp
 
 .stkequcmp
         pop     de      ;return address

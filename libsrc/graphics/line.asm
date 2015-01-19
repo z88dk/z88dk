@@ -1,13 +1,13 @@
 	INCLUDE	"graphics/grafix.inc"
 	
-	XLIB	Line
+	PUBLIC	Line
 
-	LIB	Line_r
+	EXTERN	Line_r
 
-	XREF	coords
+	EXTERN	coords
 
 ;
-;	$Id: line.asm,v 1.4 2014-04-18 09:30:31 stefano Exp $
+;	$Id: line.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ******************************************************************************

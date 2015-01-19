@@ -13,13 +13,13 @@
 ; Output Registers :  FLOS style error handling
 ;
 ;
-;	$Id: write_bytes_to_file.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
+;	$Id: write_bytes_to_file.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  write_bytes_to_file
-	LIB   flos_err
+	PUBLIC  write_bytes_to_file
+	EXTERN   flos_err
 	
 write_bytes_to_file:
 	ld	ix,2

@@ -7,12 +7,12 @@
 ;	Sets which of the 32KB banks is mapped into address space $8000-$ffff
 ;	bank = required bank (range: 0 - max_bank)
 ;
-;	$Id: set_bank.asm,v 1.3 2012-03-08 07:16:46 stefano Exp $
+;	$Id: set_bank.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  set_bank
+	PUBLIC  set_bank
 	
 set_bank:
 	; __FASTCALL__

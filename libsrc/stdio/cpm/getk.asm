@@ -7,10 +7,10 @@
 ;	Stefano Bodrato - Mar. 2004 - fixed
 ;
 ;
-;	$Id: getk.asm,v 1.3 2004-03-20 11:16:24 stefano Exp $
+;	$Id: getk.asm,v 1.4 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	getk
+	PUBLIC	getk
 
 .getk
 	LD 	c,6

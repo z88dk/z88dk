@@ -2,9 +2,9 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB sp1_TileEntry_callee
-XDEF ASMDISP_SP1_TILEENTRY_CALLEE
-XREF SP1V_TILEARRAY
+PUBLIC sp1_TileEntry_callee
+PUBLIC ASMDISP_SP1_TILEENTRY_CALLEE
+EXTERN SP1V_TILEARRAY
 
 .sp1_TileEntry_callee
 

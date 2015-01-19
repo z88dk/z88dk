@@ -8,9 +8,9 @@
 ;	ZSock Lib function: inet_addr
 
 
-	XLIB	inet_addr
+	PUBLIC	inet_addr
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

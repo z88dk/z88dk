@@ -2,7 +2,7 @@
 
 ;020121	(C) created by Yarek
 
-	XLIB	loadany
+	PUBLIC	loadany
 
 ;int loadany(char *name, int adr, int len)
 ;returns 0 if OK

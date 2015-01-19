@@ -1,7 +1,7 @@
 ;
 ;	read from disk
 ;
-		XLIB read
+		PUBLIC read
 .read
 		pop ix
 		pop de

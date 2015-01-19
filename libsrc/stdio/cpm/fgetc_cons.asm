@@ -7,10 +7,10 @@
 ;	Stefano Bodrato - Mar. 2004 - removed the BS trick
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.5 2013-06-07 14:14:03 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.6 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	fgetc_cons
+	PUBLIC	fgetc_cons
 
 .fgetc_cons
 

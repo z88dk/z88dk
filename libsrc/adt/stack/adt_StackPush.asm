@@ -1,10 +1,10 @@
 ; int adt_StackPush(struct adt_Stack *s, void *item)
 ; CALLER linkage for function pointers
 
-XLIB adt_StackPush
+PUBLIC adt_StackPush
 
-LIB adt_StackPush_callee
-XREF ASMDISP_ADT_STACKPUSH_CALLEE
+EXTERN adt_StackPush_callee
+EXTERN ASMDISP_ADT_STACKPUSH_CALLEE
 
 .adt_StackPush
 

@@ -5,12 +5,12 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	$Id: f_ansi_cls.asm,v 1.3 2013-11-12 13:50:15 stefano Exp $
+;	$Id: f_ansi_cls.asm,v 1.4 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_cls
-	XREF	ATTR
-	XREF	text_cols
+	PUBLIC	ansi_cls
+	EXTERN	ATTR
+	EXTERN	text_cols
 
 ansi_cls:
         ld bc, $3000

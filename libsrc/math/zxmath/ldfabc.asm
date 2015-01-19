@@ -4,9 +4,9 @@
 ;	FA = bc ix de
 
 
-		XLIB	ldfabc
+		PUBLIC	ldfabc
 
-		XREF	fa
+		EXTERN	fa
 
 .ldfabc LD      (fa),DE
         LD      (fa+2),IX

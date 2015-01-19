@@ -1,8 +1,8 @@
 
-	XLIB	clg
+	PUBLIC	clg
 
 ;
-;	$Id: clg.asm,v 1.3 2009-08-20 05:59:11 stefano Exp $
+;	$Id: clg.asm,v 1.4 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************
@@ -10,7 +10,7 @@
 ;	Clear graphics area, 
 ;
 
-		LIB	filltxt
+		EXTERN	filltxt
 
 .clg
 		ld	l,0

@@ -2,9 +2,9 @@
 ; resume a search previously stopped
 ; 01.2007 aralbrec
 
-XLIB astar_SearchResume
-LIB astar_Search
-XREF ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS, ASMDISP_ASTAR_SEARCH_RESUME_FAIL
+PUBLIC astar_SearchResume
+EXTERN astar_Search
+EXTERN ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS, ASMDISP_ASTAR_SEARCH_RESUME_FAIL
 
 ; enter : hl = path to start search with
 ;              if 0, search not resumed from path but from queue

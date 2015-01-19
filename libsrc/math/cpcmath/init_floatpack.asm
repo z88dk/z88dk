@@ -3,74 +3,74 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: init_floatpack.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: init_floatpack.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
 ;
 
 		INCLUDE		"cpcfp.def"
 
-		XLIB		init_floatpack
+		PUBLIC		init_floatpack
 
 ; All the library routines that we have to change
-                LIB             atan
-                LIB             cos
-                LIB             dadd
-                LIB             ddiv
-                LIB             deg
-                LIB             deq
-                LIB             dge
-                LIB             dgt
-                LIB             dleq
-                LIB             dlt
-                LIB             dmul
-                LIB             dne
-                LIB             dsub
-                LIB             exp
-                LIB             float
-                LIB             floor
-                LIB             fprand
-                LIB             ifix
-                LIB             log10
-                LIB             log
-                LIB             minusfa
-                LIB             pi
-                LIB             pow10
-                LIB             pow
-                LIB             rad
-                LIB             sin
-                LIB             sqrt
-                LIB             tan
+                EXTERN             atan
+                EXTERN             cos
+                EXTERN             dadd
+                EXTERN             ddiv
+                EXTERN             deg
+                EXTERN             deq
+                EXTERN             dge
+                EXTERN             dgt
+                EXTERN             dleq
+                EXTERN             dlt
+                EXTERN             dmul
+                EXTERN             dne
+                EXTERN             dsub
+                EXTERN             exp
+                EXTERN             float
+                EXTERN             floor
+                EXTERN             fprand
+                EXTERN             ifix
+                EXTERN             log10
+                EXTERN             log
+                EXTERN             minusfa
+                EXTERN             pi
+                EXTERN             pow10
+                EXTERN             pow
+                EXTERN             rad
+                EXTERN             sin
+                EXTERN             sqrt
+                EXTERN             tan
 
 ; The actual place where we have to change things
-                XREF            atanc
-                XREF            cosc
-                XREF            daddc
-                XREF            ddivc
-                XREF            degc
-                XREF            deqc
-                XREF            dgec
-                XREF            dgtc
-                XREF            dleqc
-                XREF            dltc
-                XREF            dmulc
-                XREF            dnec
-                XREF            dsubc
-                XREF            expc
-                XREF            floatc
-                XREF            floorc
-                XREF            floorc2
-                XREF            fprandc
-                XREF            ifixc
-                XREF            log10c
-                XREF            logc
-                XREF            minusfac
-                XREF            pic
-                XREF            pow10c
-                XREF            powc
-                XREF            radc
-                XREF            sinc
-                XREF            skelc
-                XREF            sqrtc
-                XREF            tanc
+                EXTERN            atanc
+                EXTERN            cosc
+                EXTERN            daddc
+                EXTERN            ddivc
+                EXTERN            degc
+                EXTERN            deqc
+                EXTERN            dgec
+                EXTERN            dgtc
+                EXTERN            dleqc
+                EXTERN            dltc
+                EXTERN            dmulc
+                EXTERN            dnec
+                EXTERN            dsubc
+                EXTERN            expc
+                EXTERN            floatc
+                EXTERN            floorc
+                EXTERN            floorc2
+                EXTERN            fprandc
+                EXTERN            ifixc
+                EXTERN            log10c
+                EXTERN            logc
+                EXTERN            minusfac
+                EXTERN            pic
+                EXTERN            pow10c
+                EXTERN            powc
+                EXTERN            radc
+                EXTERN            sinc
+                EXTERN            skelc
+                EXTERN            sqrtc
+                EXTERN            tanc
 
 ; Now, a hack around z80asm - we have to reference the .lib labels to get
 ; them into scope. Ideally we'd go (libroutine+offset), but the offset may

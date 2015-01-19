@@ -1,4 +1,4 @@
-		XLIB	kmsetexpand
+		PUBLIC	kmsetexpand
 
 .kmsetexpand
 		pop de

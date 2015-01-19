@@ -10,10 +10,10 @@
 ;
 ;	Caps-shift + space version A.Schifano 29/12/2008
 ;
-;	$Id: zx_break.asm,v 1.2 2008-12-31 13:58:11 stefano Exp $
+;	$Id: zx_break.asm,v 1.3 2015-01-19 01:33:11 pauloscustodio Exp $
 ;
 
-	XLIB	zx_break
+	PUBLIC	zx_break
 	
 zx_break:
 	ld	hl,0	; assume break is not pressed

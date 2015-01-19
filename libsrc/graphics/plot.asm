@@ -6,18 +6,18 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: plot.asm,v 1.5 2008-06-30 16:43:00 stefano Exp $
+;	$Id: plot.asm,v 1.6 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ;Usage: plot(struct *pixel)
 
 
 
-                XLIB    plot
-                LIB     swapgfxbk
-                XREF    swapgfxbk1
+                PUBLIC    plot
+                EXTERN     swapgfxbk
+                EXTERN    swapgfxbk1
 
-                LIB     plotpixel
+                EXTERN     plotpixel
 
 .plot
 		ld	ix,0

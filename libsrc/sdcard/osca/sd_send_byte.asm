@@ -8,12 +8,12 @@
 ;	C holds the checksum, do not alter it in a command sequence
 ;   Corrupts H and B
 ;
-;	$Id: sd_send_byte.asm,v 1.4 2012-09-26 14:15:25 stefano Exp $
+;	$Id: sd_send_byte.asm,v 1.5 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-	XLIB	sd_send_byte
-	XDEF	sd_waitserend
+	PUBLIC	sd_send_byte
+	PUBLIC	sd_waitserend
 	
     INCLUDE "osca.def"
 

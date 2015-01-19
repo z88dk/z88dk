@@ -1,10 +1,10 @@
 ; void adt_ListDeleteS(struct adt_List *list, void *delete)
 ; CALLER linkage for function pointers
 
-XLIB adt_ListDeleteS
+PUBLIC adt_ListDeleteS
 
-LIB adt_ListDeleteS_callee
-XREF ASMDISP_ADT_LISTDELETES_CALLEE
+EXTERN adt_ListDeleteS_callee
+EXTERN ASMDISP_ADT_LISTDELETES_CALLEE
 
 .adt_ListDeleteS
 

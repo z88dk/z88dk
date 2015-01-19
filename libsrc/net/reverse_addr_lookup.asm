@@ -8,9 +8,9 @@
 ;	ZSock Lib function: reverse_addr_lookup
 
 
-	XLIB	reverse_addr_lookup
+	PUBLIC	reverse_addr_lookup
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

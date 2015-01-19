@@ -1,10 +1,10 @@
 ; int __CALLEE__ adt_StackPush_callee(struct adt_Stack *s, void *item)
 ; 09.2005, 11.2006 aralbrec
 
-XLIB adt_StackPush_callee
-XDEF ASMDISP_ADT_STACKPUSH_CALLEE
+PUBLIC adt_StackPush_callee
+PUBLIC ASMDISP_ADT_STACKPUSH_CALLEE
 
-XREF _u_malloc
+EXTERN _u_malloc
 
 .adt_StackPush_callee
 

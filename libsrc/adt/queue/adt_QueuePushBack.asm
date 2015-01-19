@@ -1,10 +1,10 @@
 ; int adt_QueuePushBack(struct adt_Queue *q, void *item)
 ; CALLER linkage for function pointers
 
-XLIB adt_QueuePushBack
+PUBLIC adt_QueuePushBack
 
-LIB adt_QueuePushBack_callee
-XREF ASMDISP_ADT_QUEUEPUSHBACK_CALLEE
+EXTERN adt_QueuePushBack_callee
+EXTERN ASMDISP_ADT_QUEUEPUSHBACK_CALLEE
 
 .adt_QueuePushBack
 

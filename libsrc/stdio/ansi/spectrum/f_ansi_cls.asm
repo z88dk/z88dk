@@ -9,10 +9,10 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.3 2003-03-07 10:49:40 dom Exp $
+;	$Id: f_ansi_cls.asm,v 1.4 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_cls
+	PUBLIC	ansi_cls
 
 .ansi_cls
         ld      hl,16384

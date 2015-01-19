@@ -5,9 +5,9 @@
 ;
 ; Not written as yet!
 ;
-; $Id: fdtell.asm,v 1.4 2009-06-22 21:44:16 dom Exp $
+; $Id: fdtell.asm,v 1.5 2015-01-19 01:32:43 pauloscustodio Exp $
 
-		XLIB	fdtell
+		PUBLIC	fdtell
 
 	        INCLUDE "p3dos.def"
 

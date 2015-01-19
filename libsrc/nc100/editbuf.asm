@@ -1,4 +1,4 @@
-		XLIB	editbuf
+		PUBLIC	editbuf
 
 .editbuf
 		pop de

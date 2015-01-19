@@ -1,9 +1,9 @@
 ;       Small C+ Math Library
 ;       General "fudging routine"
 
-                XLIB    addhalf
+                PUBLIC    addhalf
 
-		LIB	hladd
+		EXTERN	hladd
 
 
 .addhalf

@@ -1,7 +1,7 @@
 ; CALLER linkage for function pointers
 
-XLIB stricmp
-LIB stricmp1
+PUBLIC stricmp
+EXTERN stricmp1
 
 .stricmp
 

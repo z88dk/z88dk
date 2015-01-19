@@ -8,9 +8,9 @@
 ;	ZSock Lib function: sock_setmode
 
 
-	XLIB	sock_setmode
+	PUBLIC	sock_setmode
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

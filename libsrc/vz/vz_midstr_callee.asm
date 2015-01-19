@@ -8,8 +8,8 @@
 
 ; ----- char __CALLEE__ *vz_midstr_callee(char *str, int pos)
 
-XLIB vz_midstr_callee
-XDEF ASMDISP_VZ_MIDSTR_CALLEE
+PUBLIC vz_midstr_callee
+PUBLIC ASMDISP_VZ_MIDSTR_CALLEE
 
 .vz_midstr_callee
 

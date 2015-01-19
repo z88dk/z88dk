@@ -1,6 +1,6 @@
 ; asm_isascii
 
-XLIB asm_isascii
+PUBLIC asm_isascii
 
 ; determine if the char is an ascii char
 

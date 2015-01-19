@@ -1,8 +1,8 @@
-	XLIB	set_bkg_map
+	PUBLIC	set_bkg_map
 
 	INCLUDE "sms/sms.hdr"
 	
-	LIB	DrawOneLine
+	EXTERN	DrawOneLine
 	
 ;==============================================================
 ; void set_bkg_map(unsigned int *data, int x, int y, int w, int h)

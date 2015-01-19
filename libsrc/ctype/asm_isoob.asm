@@ -1,7 +1,7 @@
 ; asm_isoob
 ; 08.2009 aralbrec
 
-XLIB asm_isoob
+PUBLIC asm_isoob
 
 ; Used by tty drivers to identify out-of-band characters
 ; supplied by the keyboard.

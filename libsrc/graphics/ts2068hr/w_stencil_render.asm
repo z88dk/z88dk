@@ -13,17 +13,17 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-	XLIB	stencil_render
-	LIB	dither_pattern
+	PUBLIC	stencil_render
+	EXTERN	dither_pattern
 	;LIB	l_cmp
 
 	;LIB swapgfxbk
-	LIB w_pixeladdress
-	LIB leftbitmask, rightbitmask
+	EXTERN w_pixeladdress
+	EXTERN leftbitmask, rightbitmask
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: w_stencil_render.asm,v 1.2 2010-12-27 11:17:42 stefano Exp $
+;	$Id: w_stencil_render.asm,v 1.3 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 .stencil_render

@@ -1,10 +1,10 @@
 ; uchar *zx_cyx2aaddr(uchar row, uchar col)
 ; CALLER linkage for function pointers
 
-XLIB zx_cyx2aaddr
+PUBLIC zx_cyx2aaddr
 
-LIB zx_cyx2aaddr_callee
-XREF ASMDISP_ZX_CYX2AADDR_CALLEE
+EXTERN zx_cyx2aaddr_callee
+EXTERN ASMDISP_ZX_CYX2AADDR_CALLEE
 
 .zx_cyx2aaddr
 

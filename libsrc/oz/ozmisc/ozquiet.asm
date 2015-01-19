@@ -8,14 +8,14 @@
 ;	void ozquiet()
 ;
 ; ------
-; $Id: ozquiet.asm,v 1.1 2003-10-27 17:03:40 stefano Exp $
+; $Id: ozquiet.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozquiet
+	PUBLIC	ozquiet
 
-	LIB	ozclick
+	EXTERN	ozclick
 
-	XREF	ozclick_setting
+	EXTERN	ozclick_setting
 
 
 ozquiet:

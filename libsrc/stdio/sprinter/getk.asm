@@ -4,11 +4,11 @@
 ;11/3/99 djm Saved two bytes by removing useless ld h,0
 ;
 ;
-;	$Id: getk.asm,v 1.1 2002-10-01 13:53:17 dom Exp $
+;	$Id: getk.asm,v 1.2 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
-                XLIB    getk    ;Read keys
+                PUBLIC    getk    ;Read keys
 
 
 

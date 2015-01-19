@@ -8,9 +8,9 @@
 ;	ZSock Lib function: getdomainname
 
 
-	XLIB	getdomainname
+	PUBLIC	getdomainname
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

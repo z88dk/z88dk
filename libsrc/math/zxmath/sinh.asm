@@ -4,7 +4,7 @@
 ;
 ;       21/03/03 - Stefano Bodrato
 ;
-;       $Id: sinh.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: sinh.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 ;double sinh(double)
@@ -17,10 +17,10 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB    sinh
+                PUBLIC    sinh
 
-                LIB	fsetup1
-                LIB	stkequ
+                EXTERN	fsetup1
+                EXTERN	stkequ
 
 .sinh
         call    fsetup1

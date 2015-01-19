@@ -10,13 +10,13 @@
 ;       1: Cartridge is write protected
 ;       2: Microdrive not present
 ;
-;       $Id: if1_mdv_status.asm,v 1.1 2008-06-29 08:25:48 aralbrec Exp $
+;       $Id: if1_mdv_status.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
-                XLIB    if1_mdv_status
+                PUBLIC    if1_mdv_status
 
-                LIB     if1_rommap
-                XREF    MOTOR
+                EXTERN     if1_rommap
+                EXTERN    MOTOR
                 
 
 if1_mdv_status:

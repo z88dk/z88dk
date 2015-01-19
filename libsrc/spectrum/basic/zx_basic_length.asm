@@ -6,10 +6,10 @@
 ; 	This routine gives the length of the current BASIC program.
 ; 	Memory used by variables is not included.
 ;
-;	$Id: zx_basic_length.asm,v 1.2 2008-12-31 13:58:11 stefano Exp $
+;	$Id: zx_basic_length.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	zx_basic_length
+	PUBLIC	zx_basic_length
 	
 zx_basic_length:
 

@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.1 2007-12-03 16:05:19 stefano Exp $
+; $Id: bit_open.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; MSX bit sound functions
 ;
@@ -7,8 +7,8 @@
 ; Stefano Bodrato - 3/12/2007
 ;
 
-    XLIB     bit_open
-    XREF     snd_tick
+    PUBLIC     bit_open
+    EXTERN     snd_tick
 
 ;Port 0AAh, PPI Port C - Keyboard Row,LED,Cassette (Read/Write)
 ;  Bit  Name   Expl.

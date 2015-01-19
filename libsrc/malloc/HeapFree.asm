@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB HeapFree
+PUBLIC HeapFree
 
-LIB HeapFree_callee
-XREF ASMDISP_HEAPFREE_CALLEE
+EXTERN HeapFree_callee
+EXTERN ASMDISP_HEAPFREE_CALLEE
 
 .HeapFree
 

@@ -7,11 +7,11 @@
 ;	Disable BREAK
 ;
 ;
-;	$Id: msx_breakoff.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: msx_breakoff.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_breakoff
-	XREF	brksave
+	PUBLIC	msx_breakoff
+	EXTERN	brksave
 	
         INCLUDE "msxbasic.def"
 

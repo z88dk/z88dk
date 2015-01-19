@@ -13,12 +13,12 @@
 ;
 ;
 ; ------
-; $Id: ozputsprite.asm,v 1.1 2003-10-29 11:37:11 stefano Exp $
+; $Id: ozputsprite.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozputsprite
+	PUBLIC	ozputsprite
 
-	XREF	ozactivepage
+	EXTERN	ozactivepage
 
 	
 ozputsprite:

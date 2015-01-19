@@ -7,16 +7,16 @@
 ;
 ;	Stefano Bodrato - 21/4/2000
 ;
-;	$Id: f_ansi_lf.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: f_ansi_lf.asm,v 1.3 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_LF
+	PUBLIC	ansi_LF
 	
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
-	XREF	text_rows
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
+	EXTERN	text_rows
 
-	LIB	ansi_SCROLLUP
+	EXTERN	ansi_SCROLLUP
 
 .ansi_LF
  xor a          ; yes,

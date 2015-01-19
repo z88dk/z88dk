@@ -1,4 +1,4 @@
-		XLIB	selectfile
+		PUBLIC	selectfile
 
 .selectfile
 		call 0xb8c3

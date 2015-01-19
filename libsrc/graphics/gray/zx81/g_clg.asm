@@ -3,7 +3,7 @@
 ;
 ;       Written by Stefano Bodrato - Oct 2007
 ;
-;	$Id: g_clg.asm,v 1.1 2007-10-25 14:53:04 stefano Exp $
+;	$Id: g_clg.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 ;
 
@@ -11,11 +11,11 @@
 ;Usage: g_clg(GrayLevel)
 
 
-		XLIB    g_clg
-		XREF	base_graphics
+		PUBLIC    g_clg
+		EXTERN	base_graphics
 
-		XREF	graybit1
-		XREF	graybit2
+		EXTERN	graybit1
+		EXTERN	graybit2
 
 .g_clg
 		pop	hl

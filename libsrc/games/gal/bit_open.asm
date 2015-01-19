@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.2 2008-12-11 16:42:22 stefano Exp $
+; $Id: bit_open.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; Galaksija 1 bit sound functions
 ;
@@ -7,8 +7,8 @@
 ; Stefano Bodrato - 8/4/2008
 ;
 
-    XLIB     bit_open
-    XREF     snd_tick
+    PUBLIC     bit_open
+    EXTERN     snd_tick
 
 .bit_open
           ld   a,@10111000

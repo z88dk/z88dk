@@ -1,17 +1,17 @@
 ;
 ;       Z88DK Graphics Functions - Small C+ stubs
 ;
-;	$Id: xorplot.asm,v 1.2 2008-06-30 16:43:00 stefano Exp $
+;	$Id: xorplot.asm,v 1.3 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 ;Usage: xorplot(struct *pixel)
 
 
-                XLIB    xorplot
-                LIB     swapgfxbk
-                XREF     swapgfxbk1
+                PUBLIC    xorplot
+                EXTERN     swapgfxbk
+                EXTERN     swapgfxbk1
 
-                LIB     xorpixel
+                EXTERN     xorpixel
 
 .xorplot
 		ld	ix,0

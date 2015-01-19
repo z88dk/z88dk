@@ -6,16 +6,16 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawb.asm,v 1.4 2002-04-03 10:56:52 stefano Exp $
+;	$Id: drawb.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-                XLIB    drawb
+                PUBLIC    drawb
 
-                LIB     drawbox
-                LIB     plotpixel
-                LIB     swapgfxbk
-		XREF	swapgfxbk1
+                EXTERN     drawbox
+                EXTERN     plotpixel
+                EXTERN     swapgfxbk
+		EXTERN	swapgfxbk1
 
 
 .drawb

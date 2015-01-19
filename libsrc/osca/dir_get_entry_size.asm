@@ -4,12 +4,12 @@
 ;
 ;	Get file size (long) associated to current directory entry
 ;
-;	$Id: dir_get_entry_size.asm,v 1.3 2012-03-08 07:16:46 stefano Exp $
+;	$Id: dir_get_entry_size.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  dir_get_entry_size
+	PUBLIC  dir_get_entry_size
 	
 dir_get_entry_size:
 ;	push	iy

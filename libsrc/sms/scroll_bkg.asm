@@ -1,4 +1,4 @@
-	XLIB	scroll_bkg
+	PUBLIC	scroll_bkg
 	
 ;==============================================================
 ; void scroll_bkg(int x, int y)

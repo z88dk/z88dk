@@ -1,11 +1,11 @@
 	INCLUDE	"graphics/grafix.inc"
-	XLIB	setxy
-	LIB	l_cmp
+	PUBLIC	setxy
+	EXTERN	l_cmp
 
-	XREF	coords
+	EXTERN	coords
 
 ;
-;	$Id: w_setxy.asm,v 1.2 2014-04-18 09:30:31 stefano Exp $
+;	$Id: w_setxy.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

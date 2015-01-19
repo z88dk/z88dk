@@ -2,8 +2,8 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB r_IntersectRect16
-LIB RIntersectRect16
+PUBLIC r_IntersectRect16
+EXTERN RIntersectRect16
 
 ; int r_IntersectRect16(struct r_Rect16 *r1, struct r_Rect16 *r2, struct r_Rect16 *result)
 

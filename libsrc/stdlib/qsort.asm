@@ -1,12 +1,12 @@
 
 ;
-; $Id: qsort.asm,v 1.2 2010-11-03 10:03:49 stefano Exp $
+; $Id: qsort.asm,v 1.3 2015-01-19 01:33:22 pauloscustodio Exp $
 ;
 
 
-XLIB qsort
-LIB qsort_callee
-XREF ASMDISP_QSORT_CALLEE
+PUBLIC qsort
+EXTERN qsort_callee
+EXTERN ASMDISP_QSORT_CALLEE
 
 .qsort
 	pop	af

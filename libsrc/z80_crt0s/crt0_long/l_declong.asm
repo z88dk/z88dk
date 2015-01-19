@@ -5,7 +5,7 @@
 ;       djm 21/2/99
 ;       Rewritten so that I know it works
 
-                XLIB    l_declong
+                PUBLIC    l_declong
 
 .l_declong
         ld      a,h

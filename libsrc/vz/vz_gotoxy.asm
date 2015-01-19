@@ -1,8 +1,8 @@
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 
-XLIB vz_gotoxy
-LIB vz_gotoxy_callee
-XREF ASMDISP_VZ_GOTOXY_CALLEE
+PUBLIC vz_gotoxy
+EXTERN vz_gotoxy_callee
+EXTERN ASMDISP_VZ_GOTOXY_CALLEE
 
 .vz_gotoxy
 

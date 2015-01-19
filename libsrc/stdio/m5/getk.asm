@@ -6,11 +6,11 @@
 ;	Stefano Bodrato - 18/5/2001
 ;
 ;
-;	$Id: getk.asm,v 1.5 2014-03-05 23:01:59 pauloscustodio Exp $
+;	$Id: getk.asm,v 1.6 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	getk
-	LIB	msxbios
+	PUBLIC	getk
+	EXTERN	msxbios
 
 	INCLUDE "m5bios.def"
 

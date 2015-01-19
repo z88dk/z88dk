@@ -4,7 +4,7 @@
 ;	bc ix de = (hl)
 
 
-		XLIB	ldbchl
+		PUBLIC	ldbchl
 
 .ldbchl ld      e,(hl)
         inc     hl

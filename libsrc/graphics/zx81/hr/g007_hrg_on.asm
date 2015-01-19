@@ -5,16 +5,16 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: g007_hrg_on.asm,v 1.4 2015-01-02 17:23:10 dom Exp $
+;	$Id: g007_hrg_on.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB    hrg_on
-	XREF     base_graphics
+	PUBLIC    hrg_on
+	EXTERN     base_graphics
 
-	XREF	L0292
-	XREF	G007_P1
-	XREF	G007_P2
-	XREF	G007_P3
+	EXTERN	L0292
+	EXTERN	G007_P1
+	EXTERN	G007_P2
+	EXTERN	G007_P3
 
 
 .hrg_on

@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.2 2013-10-21 14:23:45 stefano Exp $
+; $Id: bit_open_di.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; Enterprise 64/128 1 bit sound functions
 ;
@@ -8,9 +8,9 @@
 ;
 
 
-    XLIB     bit_open_di
-    XREF     snd_tick
-    XREF     bit_irqstatus
+    PUBLIC     bit_open_di
+    EXTERN     snd_tick
+    EXTERN     bit_irqstatus
 
     INCLUDE  "games/games.inc"
     

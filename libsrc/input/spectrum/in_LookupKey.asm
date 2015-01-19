@@ -1,8 +1,8 @@
 ; uint in_LookupKey(uchar c)
 ; 09.2005 aralbrec
 
-XLIB in_LookupKey
-LIB in_keytranstbl
+PUBLIC in_LookupKey
+EXTERN in_keytranstbl
 
 ; Given the ascii code of a character, returns the scan row and mask
 ; corresponding to the key that needs to be pressed to generate the

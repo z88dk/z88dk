@@ -4,14 +4,14 @@
 ;
 ;       getk() Read key status
 ;
-;       $Id: getk.asm,v 1.3 2008-06-23 17:34:36 stefano Exp $
+;       $Id: getk.asm,v 1.4 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
 
-                XLIB    getk
+                PUBLIC    getk
                 
-                LIB	savecia
-                LIB	restorecia
+                EXTERN	savecia
+                EXTERN	restorecia
 
 .getk
         call    savecia         ; save CIA registers

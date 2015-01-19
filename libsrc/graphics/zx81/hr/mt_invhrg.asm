@@ -5,11 +5,11 @@
 ;
 ;   Invert HRG video output (hardware)
 ;
-;	$Id: mt_invhrg.asm,v 1.1 2010-02-10 16:15:35 stefano Exp $
+;	$Id: mt_invhrg.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB	invhrg
-	XREF	hrgmode
+	PUBLIC	invhrg
+	EXTERN	hrgmode
 
 	; 2=true video, 3=inverse video
 

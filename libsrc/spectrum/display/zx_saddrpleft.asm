@@ -1,10 +1,10 @@
 ; uchar *zx_saddrpleft(void *pixeladdr, uchar *mask)
 ; CALLER linkage for function pointers
 
-XLIB zx_saddrpleft
+PUBLIC zx_saddrpleft
 
-LIB zx_saddrpleft_callee
-XREF ASMDISP_ZX_SADDRPLEFT_CALLEE
+EXTERN zx_saddrpleft_callee
+EXTERN ASMDISP_ZX_SADDRPLEFT_CALLEE
 
 .zx_saddrpleft
 

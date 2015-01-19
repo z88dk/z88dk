@@ -2,11 +2,11 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB sp1_GetSprClrAddr_callee
-XDEF ASMDISP_SP1_GETSPRCLRADDR_CALLEE
+PUBLIC sp1_GetSprClrAddr_callee
+PUBLIC ASMDISP_SP1_GETSPRCLRADDR_CALLEE
 
-LIB sp1_IterateSprChar_callee
-XREF ASMDISP_SP1_ITERATESPRCHAR_CALLEE
+EXTERN sp1_IterateSprChar_callee
+EXTERN ASMDISP_SP1_ITERATESPRCHAR_CALLEE
 
 .sp1_GetSprClrAddr_callee
 

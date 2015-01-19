@@ -1,12 +1,12 @@
 ;
 ;	written by Waleed Hasan
 ;
-;	$Id: DsDisplayCircle.asm,v 1.2 2003-03-13 15:02:07 dom Exp $
+;	$Id: DsDisplayCircle.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
 ;
 
-	XLIB	DsDisplayCircle
-	LIB	set4pix
-	LIB	setpixsave
+	PUBLIC	DsDisplayCircle
+	EXTERN	set4pix
+	EXTERN	setpixsave
 
 
 .DsDisplayCircle

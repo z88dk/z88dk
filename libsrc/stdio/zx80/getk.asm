@@ -6,11 +6,11 @@
 ;	Stefano Bodrato - Dec 2011
 ;
 ;
-;	$Id: getk.asm,v 1.2 2013-01-02 15:31:30 stefano Exp $
+;	$Id: getk.asm,v 1.3 2015-01-19 01:33:22 pauloscustodio Exp $
 ;
 
-	XLIB	getk
-	LIB		zx80_decode_keys
+	PUBLIC	getk
+	EXTERN		zx80_decode_keys
 
 .getk
 	;call restore81

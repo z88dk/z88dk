@@ -8,11 +8,11 @@
 ;
 ;
 ;
-; $Id: fputc_lcd.asm,v 1.3 2007-06-03 15:13:06 stefano Exp $
+; $Id: fputc_lcd.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB fputc_lcd
+	PUBLIC fputc_lcd
 
 .fputc_lcd
 	ld	hl,2

@@ -13,7 +13,7 @@
 
 ; actually use of ix saves us 4T
 
-XLIB    lpush2
+PUBLIC    lpush2
 
 .lpush2
 

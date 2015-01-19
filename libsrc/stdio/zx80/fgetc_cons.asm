@@ -6,11 +6,11 @@
 ;	Stefano Bodrato - Dec 2011
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2013-01-02 15:31:30 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:22 pauloscustodio Exp $
 ;
 
-	XLIB	fgetc_cons
-	LIB		zx80_decode_keys
+	PUBLIC	fgetc_cons
+	EXTERN		zx80_decode_keys
 
 .fgetc_cons
 	ld      iy,16384	; no ix/iy swap here

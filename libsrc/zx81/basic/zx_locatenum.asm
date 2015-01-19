@@ -8,10 +8,10 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.3 2009-08-05 07:14:47 stefano Exp $
+;	$Id: zx_locatenum.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 
-	XLIB	zx_locatenum
+	PUBLIC	zx_locatenum
 
 zx_locatenum:
 

@@ -1,6 +1,6 @@
 ; asm_isxdigit
 
-XLIB asm_isxdigit
+PUBLIC asm_isxdigit
 
 ; determine whether ascii char is a hexadecimal digit
 

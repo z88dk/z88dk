@@ -5,18 +5,18 @@
 ;	void ozhline(byte x,byte y,byte len,byte color)
 ;
 ; ------
-; $Id: ozhline.asm,v 1.2 2003-10-29 11:37:11 stefano Exp $
+; $Id: ozhline.asm,v 1.3 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozhline
+	PUBLIC	ozhline
 
-        LIB	swapgfxbk
-        LIB	swapgfxbk1
+        EXTERN	swapgfxbk
+        EXTERN	swapgfxbk1
 
-	LIB	line
-        LIB	ozplotpixel
+	EXTERN	line
+        EXTERN	ozplotpixel
         
-        LIB	ozpointcolor
+        EXTERN	ozpointcolor
 
 
 .ozhline

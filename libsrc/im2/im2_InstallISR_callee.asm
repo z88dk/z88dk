@@ -1,8 +1,8 @@
 ; void __CALLEE__ *im2_InstallISR_callee(uchar vector, void *isr)
 ; 04.2004 aralbrec
 
-XLIB im2_InstallISR_callee
-XDEF ASMDISP_IM2_INSTALLISR_CALLEE
+PUBLIC im2_InstallISR_callee
+PUBLIC ASMDISP_IM2_INSTALLISR_CALLEE
 
 .im2_InstallISR_callee
 

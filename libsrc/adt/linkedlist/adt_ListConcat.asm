@@ -1,10 +1,10 @@
 ; void adt_ListConcat(struct adt_List *list1, struct sp_List *list2)
 ; CALLER linkage for function pointers
 
-XLIB adt_ListConcat
+PUBLIC adt_ListConcat
 
-LIB adt_ListConcat_callee
-XREF ASMDISP_ADT_LISTCONCAT_CALLEE
+EXTERN adt_ListConcat_callee
+EXTERN ASMDISP_ADT_LISTCONCAT_CALLEE
 
 .adt_ListConcat
 

@@ -1,10 +1,10 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: mkdir.asm,v 1.1 2002-11-20 20:28:44 dom Exp $
+;	$Id: mkdir.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
 
-                XLIB   mkdir
+                PUBLIC   mkdir
 
 ;int mkdir(char *path, mode_t mode)
 

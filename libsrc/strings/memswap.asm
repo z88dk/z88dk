@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB memswap
-LIB memswap_callee
-XREF ASMDISP_MEMSWAP_CALLEE
+PUBLIC memswap
+EXTERN memswap_callee
+EXTERN ASMDISP_MEMSWAP_CALLEE
 
 .memswap
 

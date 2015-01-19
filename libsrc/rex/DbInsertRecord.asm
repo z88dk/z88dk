@@ -1,12 +1,12 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: DbInsertRecord.asm,v 1.1 2001-07-24 09:11:43 dmarion Exp $
+;	$Id: DbInsertRecord.asm,v 1.2 2015-01-19 01:33:06 pauloscustodio Exp $
 ;
 ; extern INT DbInsertRecord( int, ... );
 ;
 
-		XLIB	DbInsertRecord
+		PUBLIC	DbInsertRecord
 
 .DbInsertRecord
  	ld 	b,a

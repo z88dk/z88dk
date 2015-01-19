@@ -2,11 +2,11 @@
 ; return ptr to first occurrence in s1 of any char in match
 ; 01.2007 aralbrec
 
-XLIB strpbrk_callee
-XDEF ASMDISP_STRPBRK_CALLEE
+PUBLIC strpbrk_callee
+PUBLIC ASMDISP_STRPBRK_CALLEE
 
-LIB strchr_callee
-XREF ASMDISP_STRCHR_CALLEE
+EXTERN strchr_callee
+EXTERN ASMDISP_STRCHR_CALLEE
 
 .strpbrk_callee
 

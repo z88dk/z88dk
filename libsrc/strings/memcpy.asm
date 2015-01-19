@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB memcpy
-LIB memcpy_callee
-XREF ASMDISP_MEMCPY_CALLEE
+PUBLIC memcpy
+EXTERN memcpy_callee
+EXTERN ASMDISP_MEMCPY_CALLEE
 
 .memcpy
 

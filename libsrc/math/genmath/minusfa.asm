@@ -1,9 +1,9 @@
 ;       Small C+ Math Library - Support routine
 ;       Negate a floating point number
 
-                XLIB    minusfa
+                PUBLIC    minusfa
 
-                XREF    fa
+                EXTERN    fa
 
 .minusfa LD     HL,fa+4
         LD      A,(HL)

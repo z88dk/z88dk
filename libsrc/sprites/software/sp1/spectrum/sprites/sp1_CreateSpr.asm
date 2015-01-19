@@ -1,10 +1,10 @@
 ; struct sp1_ss *sp1_CreateSpr(void *drawf, uchar type, uchar height, int graphic, uchar plane)
 ; CALLER linkage for function pointers
 
-XLIB sp1_CreateSpr
+PUBLIC sp1_CreateSpr
 
-LIB sp1_CreateSpr_callee
-XREF ASMDISP_SP1_CREATESPR_CALLEE
+EXTERN sp1_CreateSpr_callee
+EXTERN ASMDISP_SP1_CREATESPR_CALLEE
 
 .sp1_CreateSpr
 

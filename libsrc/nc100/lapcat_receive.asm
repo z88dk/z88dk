@@ -1,4 +1,4 @@
-		XLIB	lapcat_receive
+		PUBLIC	lapcat_receive
 
 .lapcat_receive
 		call 0xb8d5

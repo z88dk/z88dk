@@ -8,13 +8,13 @@
 ;
 ;	get state of joystick button (trigger) number \a id, true = pressed
 ;
-;	$Id: msx_get_trigger.asm,v 1.5 2009-06-22 21:44:17 dom Exp $
+;	$Id: msx_get_trigger.asm,v 1.6 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
-	XLIB	msx_get_trigger
+	PUBLIC	msx_get_trigger
 
-	LIB	msxbios
+	EXTERN	msxbios
 
 IF FORmsx
         INCLUDE "msxbios.def"

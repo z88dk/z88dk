@@ -1,10 +1,10 @@
 ; void *adt_HeapExtract(void **array, uint *n, void *compare)
 ; CALLER linkage for function pointers
 
-XLIB adt_HeapExtract
+PUBLIC adt_HeapExtract
 
-LIB adt_HeapExtract_callee
-XREF CDISP_HEAPEXTRACT_CALLEE
+EXTERN adt_HeapExtract_callee
+EXTERN CDISP_HEAPEXTRACT_CALLEE
 
 .adt_HeapExtract
 

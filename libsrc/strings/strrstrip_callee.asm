@@ -2,8 +2,8 @@
 ; remove any occurrences of c at the end of s
 ; 01.2007 aralbrec
 
-XLIB strrstrip_callee
-XDEF ASMDISP_STRRSTRIP_CALLEE
+PUBLIC strrstrip_callee
+PUBLIC ASMDISP_STRRSTRIP_CALLEE
 
 .strrstrip_callee
 

@@ -1,8 +1,8 @@
 ; void outp_callee(uint port, uchar byte)
 ; 09.2005 aralbrec
 
-XLIB outp_callee
-XDEF ASMDISP_OUTP_CALLEE
+PUBLIC outp_callee
+PUBLIC ASMDISP_OUTP_CALLEE
 
 .outp_callee
 

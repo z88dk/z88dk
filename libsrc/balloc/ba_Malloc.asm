@@ -1,7 +1,7 @@
 ; 04.2004 aralbrec
 
-XLIB ba_Malloc
-XREF _ba_qtbl
+PUBLIC ba_Malloc
+EXTERN _ba_qtbl
 
 ; Returns block of memory from the indicated queue.
 ;

@@ -6,10 +6,10 @@
 ;	Dec 2001 - Stefano Bodrato
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.1 2001-12-24 13:23:08 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.2 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	fgetc_cons
+	PUBLIC	fgetc_cons
 
 .fgetc_cons
 	call	$1e80

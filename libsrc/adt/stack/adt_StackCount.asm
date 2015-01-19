@@ -1,7 +1,7 @@
 ; uint __FASTCALL__ adt_StackCount(struct adt_Stack *s)
 ; 11.2006 aralbrec
 
-XLIB adt_StackCount
+PUBLIC adt_StackCount
 
 ; return number of items in stack
 ;

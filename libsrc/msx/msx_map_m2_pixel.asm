@@ -10,11 +10,11 @@
 ;
 ;	Compute address of a gfx block position on VRAM (mode 2)
 ;
-;	$Id: msx_map_m2_pixel.asm,v 1.4 2009-05-21 06:58:11 stefano Exp $
+;	$Id: msx_map_m2_pixel.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
-	XLIB	msx_map_m2_pixel
+	PUBLIC	msx_map_m2_pixel
 	
 msx_map_m2_pixel:
 

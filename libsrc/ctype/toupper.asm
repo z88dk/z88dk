@@ -3,11 +3,11 @@
 ;	Written by Dominic Morris <djm@jb.man.ac.uk>
 ;	22 August 1998
 ;
-;	$Id: toupper.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
+;	$Id: toupper.asm,v 1.5 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-XLIB toupper
-LIB asm_toupper
+PUBLIC toupper
+EXTERN asm_toupper
 
 ; FASTCALL
 

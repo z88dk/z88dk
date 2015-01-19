@@ -8,18 +8,18 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.4 2014-05-26 06:15:06 stefano Exp $
+;	$Id: pointxy.asm,v 1.5 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
-			XLIB	pointxy
+			PUBLIC	pointxy
 
-			LIB	textpixl
-			LIB	div3
-			XREF	coords
-			XREF	base_graphics
+			EXTERN	textpixl
+			EXTERN	div3
+			EXTERN	coords
+			EXTERN	base_graphics
 
 .pointxy
 			ld	a,h

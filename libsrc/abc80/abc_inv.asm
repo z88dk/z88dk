@@ -9,10 +9,10 @@
 ;       imported by Stefano Bodrato - 29/12/2006  :o)
 ;
 ;
-;       $Id: abc_inv.asm,v 1.1 2007-10-31 16:15:36 stefano Exp $
+;       $Id: abc_inv.asm,v 1.2 2015-01-19 01:32:41 pauloscustodio Exp $
 ;
 
-		XLIB	abc_inv
+		PUBLIC	abc_inv
 
 .abc_inv
 		ld	ix,884

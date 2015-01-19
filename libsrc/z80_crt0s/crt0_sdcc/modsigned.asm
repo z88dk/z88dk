@@ -26,13 +26,13 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	XLIB __modschar_rrx_s
-	XDEF __modschar_rrx_hds
-	LIB  __div8
-	LIB __get_remainder
-	XDEF __modsint_rrx_s
-	XDEF __modsint_rrx_hds
-	LIB __div16
+	PUBLIC __modschar_rrx_s
+	PUBLIC __modschar_rrx_hds
+	EXTERN  __div8
+	EXTERN __get_remainder
+	PUBLIC __modsint_rrx_s
+	PUBLIC __modsint_rrx_hds
+	EXTERN __div16
 
 __modschar_rrx_s:
         ld      hl,#2+1

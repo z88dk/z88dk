@@ -1,8 +1,8 @@
 ; uint in_Pause(uint ticks)
 ; 09.2005 aralbrec
 
-XLIB in_Pause
-LIB in_WaitForNoKey, in_WaitForKey, t_delay
+PUBLIC in_Pause
+EXTERN in_WaitForNoKey, in_WaitForKey, t_delay
 
 ; Waits a period of time measured in milliseconds and exits
 ; early if a key is pressed

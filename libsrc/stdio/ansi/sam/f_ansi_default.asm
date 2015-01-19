@@ -10,7 +10,7 @@
 ;
 
 
-	XLIB	ansi_default
+	PUBLIC	ansi_default
 	
 .ansi_default
         ld      a,16            ; INK

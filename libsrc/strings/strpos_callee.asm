@@ -2,8 +2,8 @@
 ; find index of first occurrence of c in s
 ; 01.2007 aralbrec
 
-XLIB strpos_callee
-XDEF ASMDISP_STRPOS_CALLEE
+PUBLIC strpos_callee
+PUBLIC ASMDISP_STRPOS_CALLEE
 
 .strpos_callee
 

@@ -1,13 +1,13 @@
 	INCLUDE	"graphics/grafix.inc"
 
-	XLIB	plotpixel
+	PUBLIC	plotpixel
 
-	LIB pixeladdress
-	XREF	coords
-	XREF	pix_return
+	EXTERN pixeladdress
+	EXTERN	coords
+	EXTERN	pix_return
 
 ;
-;	$Id: plotpixl.asm,v 1.5 2014-04-18 09:30:31 stefano Exp $
+;	$Id: plotpixl.asm,v 1.6 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB im2_RemoveHook
+PUBLIC im2_RemoveHook
 
-LIB im2_RemoveHook_callee
-XREF ASMDISP_REMOVEHOOK_CALLEE
+EXTERN im2_RemoveHook_callee
+EXTERN ASMDISP_REMOVEHOOK_CALLEE
 
 .im2_RemoveHook
 

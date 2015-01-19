@@ -1,9 +1,9 @@
 ; CALLEE linkage for function pointers
 
-XLIB calloc
+PUBLIC calloc
 
-LIB HeapCalloc_callee
-XREF _heap, ASMDISP_HEAPCALLOC_CALLEE
+EXTERN HeapCalloc_callee
+EXTERN _heap, ASMDISP_HEAPCALLOC_CALLEE
 
 .calloc
 

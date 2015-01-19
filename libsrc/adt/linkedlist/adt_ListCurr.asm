@@ -1,7 +1,7 @@
 ; void __FASTCALL__ *adt_ListCurr(struct adt_List *list)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListCurr
+PUBLIC adt_ListCurr
 
 .adt_ListCurr
 

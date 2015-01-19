@@ -1,6 +1,6 @@
 ; asm_tolower
 
-XLIB asm_tolower
+PUBLIC asm_tolower
 
 ; if the char is in [A-Z], make it lower case
 

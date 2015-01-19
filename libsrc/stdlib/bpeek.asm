@@ -1,7 +1,7 @@
 ; uchar __FASTCALL__ bpeek(void *addr)
 ; 11.2006 aralbrec
 
-XLIB bpeek
+PUBLIC bpeek
 
 .bpeek
 

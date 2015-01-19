@@ -1,4 +1,4 @@
-		XLIB	_fgetattr
+		PUBLIC	_fgetattr
 
 ; Fastcall 
 ._fgetattr	call 0xB8C9

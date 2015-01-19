@@ -5,14 +5,14 @@
 ;
 ;       Exchange FA with top of stack (under ret address)
 ;
-;	$Id: dswap.asm,v 1.2 2014-04-11 11:14:01 stefano Exp $
+;	$Id: dswap.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 
 
-		XLIB	dswap
+		PUBLIC	dswap
 		
-		LIB	ldfabc
+		EXTERN	ldfabc
 
-		XREF	dpush
+		EXTERN	dpush
 
 .dswap  POP     HL      ;return addr
         POP     DE

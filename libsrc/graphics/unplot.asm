@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: unplot.asm,v 1.4 2008-06-30 16:43:00 stefano Exp $
+;	$Id: unplot.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
@@ -14,11 +14,11 @@
 
 
 
-                XLIB    unplot
-                LIB     swapgfxbk
-                XREF    swapgfxbk1
+                PUBLIC    unplot
+                EXTERN     swapgfxbk
+                EXTERN    swapgfxbk1
 
-                LIB     respixel
+                EXTERN     respixel
 
 
 

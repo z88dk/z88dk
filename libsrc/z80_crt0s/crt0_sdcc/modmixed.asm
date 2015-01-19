@@ -25,11 +25,11 @@
 ;  not however invalidate any other reasons why the executable file
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
-	XLIB __modsuchar_rrx_s
-	XDEF __moduschar_rrx_s
-        LIB  __div_signexte
-	LIB  __get_remainder
-	LIB __div16
+	PUBLIC __modsuchar_rrx_s
+	PUBLIC __moduschar_rrx_s
+        EXTERN  __div_signexte
+	EXTERN  __get_remainder
+	EXTERN __div16
 
 __modsuchar_rrx_s:
         ld      hl,#2+1

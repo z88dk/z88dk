@@ -6,7 +6,7 @@
 ;
 ;	Get the current sector and update the sector/cluster counters
 ;
-;	$Id: file_sector_list.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
+;	$Id: file_sector_list.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 
 ;----------------------------------------------------------------
 ; ** doc related to kjt_file_sector_list **
@@ -38,7 +38,7 @@
 
     INCLUDE "flos.def"
 
-	XLIB  file_sector_list
+	PUBLIC  file_sector_list
 
 
 file_sector_list:

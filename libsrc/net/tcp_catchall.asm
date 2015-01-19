@@ -8,9 +8,9 @@
 ;	ZSock Lib function: tcp_regcatchall
 
 
-	XLIB	tcp_regcatchall
+	PUBLIC	tcp_regcatchall
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

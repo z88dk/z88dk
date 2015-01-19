@@ -1,7 +1,7 @@
 
 
-	XLIB	disz80
-	LIB	fputc_cons
+	PUBLIC	disz80
+	EXTERN	fputc_cons
 
 
 ;  This code is been found in a ZX Spectrum tool called UTILITY3 v1.3

@@ -5,14 +5,14 @@
 ;	Print character to the screen
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.6 2013-06-21 10:25:28 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.7 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
     INCLUDE "flos.def"
 
-	XLIB  fputc_cons
-	XREF  cursor_x
+	PUBLIC  fputc_cons
+	EXTERN  cursor_x
 
 ;
 ; Entry:        char to print

@@ -2,9 +2,9 @@
 ; return ptr to first occurence of c in s
 ; 12.1999 djm, 12.2006 aralbrec
 
-XLIB memchr_callee
-XDEF ASMDISP_MEMCHR_CALLEE
-LIB     rcmx_cpir
+PUBLIC memchr_callee
+PUBLIC ASMDISP_MEMCHR_CALLEE
+EXTERN     rcmx_cpir
 
 
 .memchr_callee

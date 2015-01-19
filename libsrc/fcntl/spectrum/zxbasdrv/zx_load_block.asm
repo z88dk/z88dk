@@ -5,13 +5,13 @@
 ;
 ; int zx_load_block(char *name, void *addr, size_t len)
 ;
-; $Id: zx_load_block.asm,v 1.1 2007-07-03 07:32:03 stefano Exp $
+; $Id: zx_load_block.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 
-	XLIB	zx_load_block
+	PUBLIC	zx_load_block
 	
-	LIB	zx_setint
-	LIB	zx_goto
-	LIB	zxgetfname
+	EXTERN	zx_setint
+	EXTERN	zx_goto
+	EXTERN	zxgetfname
 
 
 ; BASIC variable name

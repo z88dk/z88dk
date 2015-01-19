@@ -8,8 +8,8 @@
 
 ; ----- void __CALLEE__ vz_score_callee(void *addr, char byte)
 
-XLIB vz_score_callee
-XREF ASMDISP_VZ_SCORE_CALLEE
+PUBLIC vz_score_callee
+EXTERN ASMDISP_VZ_SCORE_CALLEE
 
 .vz_score_callee
 

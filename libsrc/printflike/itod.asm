@@ -15,11 +15,11 @@
 
 
 
-                XLIB    itod
-                LIB     l_gint
-                LIB     l_pint
-                LIB     l_neg
-                LIB     l_div
+                PUBLIC    itod
+                EXTERN     l_gint
+                EXTERN     l_pint
+                EXTERN     l_neg
+                EXTERN     l_div
 
 .itod
         dec     sp

@@ -1,10 +1,10 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: getwd.asm,v 1.1 2002-11-20 20:28:44 dom Exp $
+;	$Id: getwd.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
 
-                XLIB   getwd
+                PUBLIC   getwd
 
 ;int getwd(char *buf);
 ; NB buf must be at least 256 bytes

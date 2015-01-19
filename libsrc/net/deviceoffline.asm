@@ -8,9 +8,9 @@
 ;	ZSock Lib function: device_offline
 
 
-	XLIB 	deviceoffline	
+	PUBLIC 	deviceoffline	
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

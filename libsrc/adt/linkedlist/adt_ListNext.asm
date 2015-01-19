@@ -1,8 +1,8 @@
 ; void __FASTCALL__ *adt_ListNext(struct adt_List *list)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListNext
-LIB adt_ListFirst
+PUBLIC adt_ListNext
+EXTERN adt_ListFirst
 
 .adt_ListNext
 

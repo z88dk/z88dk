@@ -6,19 +6,19 @@
 ;	int mmc_load(slot, struct MMC mmc_descriptor)
 ;		result: 0-OK, 
 ;
-;	$Id: mmc_load.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: mmc_load.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; Init MMC interface. look for card, etc..
 ;-----------------------------------------------------------------------------------------
 ;
 
-	XLIB	mmc_load
+	PUBLIC	mmc_load
 	
-	XREF	card_select
+	EXTERN	card_select
 
-	LIB		mmc_get_cid_csd
-	LIB		mmc_init
+	EXTERN		mmc_get_cid_csd
+	EXTERN		mmc_init
 
 	
 	INCLUDE "zxmmc.def"
@@ -116,8 +116,8 @@ need_init:
 ;-----------------------------------------------------------------------------------------
 
 
-	LIB		cs_high
-	LIB		cs_low
+	EXTERN		cs_high
+	EXTERN		cs_low
 
 mmc_send_blocksize:
 	call	cs_low			; set cs low

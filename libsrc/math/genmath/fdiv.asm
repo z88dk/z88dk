@@ -3,20 +3,20 @@
 ;
 ;	divide bc ix de by FA, leave result in FA
 ;
-;	$Id: fdiv.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $
+;	$Id: fdiv.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $
 
 
 
-		XLIB	fdiv
+		PUBLIC	fdiv
 
-		LIB	sgn
-		LIB	div14
-		LIB	pack2
-		LIB	norm4
+		EXTERN	sgn
+		EXTERN	div14
+		EXTERN	pack2
+		EXTERN	norm4
 
 
-		XREF	fa
-		XREF	extra
+		EXTERN	fa
+		EXTERN	extra
 
 
 .fdiv

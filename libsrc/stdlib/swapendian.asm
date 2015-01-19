@@ -1,7 +1,7 @@
 ; void __FASTCALL__ *swapendian(void *addr)
 ; 04.2006 aralbrec
 
-XLIB swapendian
+PUBLIC swapendian
 
 .swapendian
 

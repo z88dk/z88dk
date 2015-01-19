@@ -6,10 +6,10 @@
 ;
 ;       djm 1/3/99
 ;
-;	$Id: toascii.asm,v 1.3 2006-12-31 21:44:58 aralbrec Exp $
+;	$Id: toascii.asm,v 1.4 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-XLIB toascii
+PUBLIC toascii
 
 ; FASTCALL
 

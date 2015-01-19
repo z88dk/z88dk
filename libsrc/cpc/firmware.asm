@@ -15,11 +15,11 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: firmware.asm,v 1.2 2008-05-26 06:38:08 stefano Exp $
+; $Id: firmware.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-        XLIB firmware
-        XREF firmware_bc
+        PUBLIC firmware
+        EXTERN firmware_bc
         
 .firmware
         exx                      ; Use alternate registers

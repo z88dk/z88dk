@@ -4,11 +4,11 @@
 ;       Amstrad CPC version by Stefano Bodrato  15/6/2001
 ;
 ;
-;	$Id: clg.asm,v 1.7 2009-06-22 21:44:17 dom Exp $
+;	$Id: clg.asm,v 1.8 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 
-        XLIB    clg
+        PUBLIC    clg
 
         INCLUDE "cpcfirm.def"
         

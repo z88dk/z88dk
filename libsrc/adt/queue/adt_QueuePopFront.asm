@@ -1,8 +1,8 @@
 ; void *adt_QueuePopFront(struct adt_Queue *q)
 ; 09.2005 aralbrec
 
-XLIB adt_QueuePopFront
-XREF _u_free
+PUBLIC adt_QueuePopFront
+EXTERN _u_free
 
 ; enter: HL = struct adt_Queue *
 ; exit : HL = top item, item removed from queue

@@ -3,10 +3,10 @@
 
 ; mainly for symmetry with AMX mouse functions
 
-XLIB in_MouseKempInit
+PUBLIC in_MouseKempInit
 
-LIB INMouseKemp
-XREF _in_KempcoordX, _in_KempcoordY
+EXTERN INMouseKemp
+EXTERN _in_KempcoordX, _in_KempcoordY
 
 ; just set initial coordinates to (0,0)
 ; uses : AF

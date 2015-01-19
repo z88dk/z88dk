@@ -4,11 +4,11 @@
 ;
 ;	getk() Read key status
 ;
-;	$Id: restorecia.asm,v 1.1 2008-06-23 17:34:34 stefano Exp $
+;	$Id: restorecia.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-		XLIB	restorecia
-		XREF	SaveA
+		PUBLIC	restorecia
+		EXTERN	SaveA
 
 .restorecia
 

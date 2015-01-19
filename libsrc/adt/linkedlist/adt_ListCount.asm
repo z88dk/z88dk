@@ -1,7 +1,7 @@
 ; uint __FASTCALL__ adt_ListCount(struct adt_List *list)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListCount
+PUBLIC adt_ListCount
 
 ; Return # elements in list
 ;

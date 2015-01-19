@@ -5,12 +5,12 @@
 ;        L=byte
 
 ;
-; $Id: lp_pchar.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: lp_pchar.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-        XLIB    lp_pchar
+        PUBLIC    lp_pchar
 
-        LIB     farseg1
+        EXTERN     farseg1
 
 
 .lp_pchar

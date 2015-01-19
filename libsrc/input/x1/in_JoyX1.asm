@@ -5,7 +5,7 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
-        XLIB in_JoyX1
+        PUBLIC in_JoyX1
 
 ; in   : (HL) = gamepad/joystick number
 ; exit : HL = FF00RLDU

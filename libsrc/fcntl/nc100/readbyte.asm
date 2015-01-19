@@ -1,7 +1,7 @@
 ;
 ;	readbyte, fastcall fd is in HL
 ;
-		XLIB readbyte
+		PUBLIC readbyte
 
 .readbyte	ex de, hl
 		call 0xB899

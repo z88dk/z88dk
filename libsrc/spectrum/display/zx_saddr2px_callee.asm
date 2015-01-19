@@ -1,8 +1,8 @@
 ; uint __CALLEE__ zx_saddr2px_callee(void *pixeladdr, uchar mask)
 ; aralbrec 06.2007
 
-XLIB zx_saddr2px_callee
-XDEF ASMDISP_ZX_SADDR2PX_CALLEE
+PUBLIC zx_saddr2px_callee
+PUBLIC ASMDISP_ZX_SADDR2PX_CALLEE
 
 .zx_saddr2px_callee
 

@@ -5,19 +5,19 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: fputc_cons.asm,v 1.16 2013-10-23 17:11:58 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.17 2015-01-19 01:33:22 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 ;
 
-	XLIB	fputc_cons
+	PUBLIC	fputc_cons
 
-	LIB     asctozx81
-	LIB     restore81
-	LIB     filltxt
-	LIB     scrolluptxt
-	LIB     zx_dfile_addr
-	LIB     zx_coord_adj
+	EXTERN     asctozx81
+	EXTERN     restore81
+	EXTERN     filltxt
+	EXTERN     scrolluptxt
+	EXTERN     zx_dfile_addr
+	EXTERN     zx_coord_adj
 	
 	DEFC	ROWS=24
 	DEFC	COLUMNS=32

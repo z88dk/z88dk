@@ -5,18 +5,18 @@
 ;	void ozfilledbox(int x, int y, int width, int height);
 ;
 ; ------
-; $Id: ozfilledbox.asm,v 1.1 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozfilledbox.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozfilledbox
+	PUBLIC	ozfilledbox
 
-        LIB     swapgfxbk
-        LIB     swapgfxbk1
+        EXTERN     swapgfxbk
+        EXTERN     swapgfxbk1
 
-        LIB     drawbox
-        LIB     ozplotpixel
+        EXTERN     drawbox
+        EXTERN     ozplotpixel
         
-        LIB	ozpointcolor
+        EXTERN	ozpointcolor
 
 
 

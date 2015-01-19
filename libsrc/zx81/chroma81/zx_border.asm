@@ -2,7 +2,7 @@
 
 ; void __FASTCALL__ zx_border(uchar colour)
 
-XLIB zx_border
+PUBLIC zx_border
 
 zx_border:
 

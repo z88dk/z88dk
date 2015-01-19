@@ -3,14 +3,14 @@
 ;
 ;----------------------------------------------------------------
 ;
-; $Id: scrolldowntxt.asm,v 1.3 2012-01-09 16:02:36 stefano Exp $
+; $Id: scrolldowntxt.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 ; Text scrolldown.
 ;----------------------------------------------------------------
 
-    XLIB   scrolldowntxt
-    LIB    zx_topleft
+    PUBLIC   scrolldowntxt
+    EXTERN    zx_topleft
 
 scrolldowntxt:
 	ld	hl,(16396)

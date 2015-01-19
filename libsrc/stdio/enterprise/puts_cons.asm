@@ -6,10 +6,10 @@
 ;	Stefano Bodrato - 2011
 ;
 ;
-;	$Id: puts_cons.asm,v 1.1 2011-02-17 20:44:23 stefano Exp $
+;	$Id: puts_cons.asm,v 1.2 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB  puts_cons
+	PUBLIC  puts_cons
 
 ;
 ; Entry:        hl = points text

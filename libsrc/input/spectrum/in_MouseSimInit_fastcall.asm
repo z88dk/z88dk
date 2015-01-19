@@ -3,8 +3,8 @@
 
 ; mainly for symmetry with AMX mouse functions
 
-XLIB in_MouseSimInit_fastcall
-LIB l_setmem
+PUBLIC in_MouseSimInit_fastcall
+EXTERN l_setmem
 
 .in_MouseSimInit_fastcall
 

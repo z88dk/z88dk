@@ -1,10 +1,10 @@
 ;
 ;	written by Benjamin Green, adapting code from Waleed Hasan
 ;
-;	$Id: DsClearScreen.asm,v 1.3 2003-03-13 15:02:06 dom Exp $
+;	$Id: DsClearScreen.asm,v 1.4 2015-01-19 01:33:06 pauloscustodio Exp $
 ;
 
-	XLIB	DsClearScreen
+	PUBLIC	DsClearScreen
 
 
 .DsClearScreen

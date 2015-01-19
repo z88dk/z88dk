@@ -2,8 +2,8 @@
 ; return ptr to first occurrence of string w in s
 ; 01.2007 aralbrec
 
-XLIB strstr_callee
-XDEF ASMDISP_STRSTR_CALLEE
+PUBLIC strstr_callee
+PUBLIC ASMDISP_STRSTR_CALLEE
 
 .strstr_callee
 

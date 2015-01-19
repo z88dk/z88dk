@@ -1,9 +1,9 @@
 ; int __CALLEE__ im2_RemoveHook_callee(uchar vector, void *hook)
 ; 04.2004 aralbrec
 
-XLIB im2_RemoveHook_callee
-XDEF ASMDISP_IM2_REMOVEHOOK_CALLEE
-LIB IM2RemoveHook
+PUBLIC im2_RemoveHook_callee
+PUBLIC ASMDISP_IM2_REMOVEHOOK_CALLEE
+EXTERN IM2RemoveHook
 
 .im2_RemoveHook_callee
 

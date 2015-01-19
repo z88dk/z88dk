@@ -4,13 +4,13 @@
 ;		just in case they become critical.
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.2 2013-03-08 13:40:20 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
-		XLIB    swapgfxbk
-		LIB	pixeladdress
+		PUBLIC    swapgfxbk
+		EXTERN	pixeladdress
 
-		XDEF	swapgfxbk1
+		PUBLIC	swapgfxbk1
 
 .swapgfxbk
 		di

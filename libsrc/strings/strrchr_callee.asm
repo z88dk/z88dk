@@ -2,8 +2,8 @@
 ; return ptr to last occurrence of c in s
 ; 04.2001 dom, 01.2007 aralbrec
 
-XLIB strrchr_callee
-XDEF ASMDISP_STRRCHR_CALLEE
+PUBLIC strrchr_callee
+PUBLIC ASMDISP_STRRCHR_CALLEE
 
 .strrchr_callee
 

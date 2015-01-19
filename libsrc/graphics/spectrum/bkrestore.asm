@@ -3,12 +3,12 @@
 ;
 ;	ZX Spectrum version (speeded up with a row table)
 ;
-;	$Id: bkrestore.asm,v 1.3 2009-01-23 13:48:12 stefano Exp $
+;	$Id: bkrestore.asm,v 1.4 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 
-	XLIB    bkrestore
-	LIB	zx_rowtab
+	PUBLIC    bkrestore
+	EXTERN	zx_rowtab
 
 
 .bkrestore

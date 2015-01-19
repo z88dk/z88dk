@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_bool
+                PUBLIC    l_bool
 
 
 .l_bool

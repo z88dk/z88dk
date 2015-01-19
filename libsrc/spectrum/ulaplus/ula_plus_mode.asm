@@ -8,10 +8,10 @@
 ;	- 0 (false) ULAPlus not installed / emulated
 ;	- 1 ULAPlus 64 colour mode is available
 ;
-;	$Id: ula_plus_mode.asm,v 1.1 2010-04-02 09:05:06 stefano Exp $
+;	$Id: ula_plus_mode.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
 ;
 
-	XLIB	ula_plus_mode
+	PUBLIC	ula_plus_mode
 
 ula_plus_mode:
 	; Enter in 64 colour mode

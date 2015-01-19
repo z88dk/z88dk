@@ -9,13 +9,13 @@
 ;	2 = xor
 ;
 ; ------
-; $Id: ozpointcolor.asm,v 1.1 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozpointcolor.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozpointcolor
+	PUBLIC	ozpointcolor
 
-        LIB     ozplotpixel
-        XREF	put_instr
+        EXTERN     ozplotpixel
+        EXTERN	put_instr
 
 
 .ozpointcolor

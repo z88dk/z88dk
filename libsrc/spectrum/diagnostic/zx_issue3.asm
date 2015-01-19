@@ -8,10 +8,10 @@
 ;	- 0 (false) if the spectrum is issue 1 or 2.
 ;	- 1 (true) if the spectrum is an "issue 3" or more
 ;
-;	$Id: zx_issue3.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: zx_issue3.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
 ;
 
-	XLIB	zx_issue3
+	PUBLIC	zx_issue3
 	
 zx_issue3:
 	ld	a,(23624)  

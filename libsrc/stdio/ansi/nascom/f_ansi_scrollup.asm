@@ -6,11 +6,11 @@
 ;	Stefano Bodrato - Jul 2004
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.2 2004-07-27 09:40:19 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.3 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
 
-	XLIB	ansi_SCROLLUP
+	PUBLIC	ansi_SCROLLUP
 
 .ansi_SCROLLUP
 	

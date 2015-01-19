@@ -15,7 +15,7 @@
 
 
 
-               XLIB    freescr
+               PUBLIC    freescr
 
                 INCLUDE "saverst.def"
 

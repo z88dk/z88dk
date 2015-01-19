@@ -1,7 +1,7 @@
 ; void __FASTCALL__ *adt_StackPeek(struct adt_Stack *s)
 ; 09.2005, 11.2006 aralbrec
 
-XLIB adt_StackPeek
+PUBLIC adt_StackPeek
 
 ; return the item at the top of the stack
 ; but don't pop it!

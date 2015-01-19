@@ -5,13 +5,13 @@
 ;	getk() Read key status
 ;
 ;
-;	$Id: getk.asm,v 1.2 2011-07-27 15:11:27 stefano Exp $
+;	$Id: getk.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
     INCLUDE "flos.def"
 
-	XLIB	getk
+	PUBLIC	getk
 
 .getk
 	call kjt_get_key

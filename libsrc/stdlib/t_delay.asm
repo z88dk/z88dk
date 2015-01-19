@@ -1,6 +1,6 @@
 ; void __FASTCALL__ t_delay(unsigned int tstates)
 
-XLIB t_delay
+PUBLIC t_delay
 
 ; Z80 delay routine
 ; by Jan Bobrowski, license GPL

@@ -1,4 +1,4 @@
-		XLIB	heapfree
+		PUBLIC	heapfree
 
 ; fastcall
 .heapfree

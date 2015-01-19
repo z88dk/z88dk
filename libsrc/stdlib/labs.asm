@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB labs
-LIB labs_callee
-XREF ASMDISP_LABS_CALLEE
+PUBLIC labs
+EXTERN labs_callee
+EXTERN ASMDISP_LABS_CALLEE
 
 .labs
 

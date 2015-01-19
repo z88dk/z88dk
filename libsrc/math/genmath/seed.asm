@@ -4,9 +4,9 @@
 ;       Set the floating point seed
 ;
 ;
-                XLIB    fpseed
-                XREF    dstore
-                XREF    fp_seed
+                PUBLIC    fpseed
+                EXTERN    dstore
+                EXTERN    fp_seed
 
 
 .fpseed

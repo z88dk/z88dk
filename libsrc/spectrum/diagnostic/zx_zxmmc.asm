@@ -8,10 +8,10 @@
 ;	- 0 (false) zxmmc interface is not present
 ;	- 1 DISCiPle is installed
 ;
-;	$Id: zx_zxmmc.asm,v 1.1 2010-03-27 18:59:26 stefano Exp $
+;	$Id: zx_zxmmc.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
 ;
 
-	XLIB	zx_zxmmc
+	PUBLIC	zx_zxmmc
 	INCLUDE "zxmmc.def"
 
 fast_save:	defb	0

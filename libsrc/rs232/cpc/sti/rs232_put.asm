@@ -5,12 +5,12 @@
 ;
 ;       unsigned char rs232_put(char)
 ;
-;       $Id: rs232_put.asm,v 1.3 2012-06-26 06:09:53 stefano Exp $
+;       $Id: rs232_put.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
 
 ; Fastcall so implicit push
 
 
-                XLIB   rs232_put
+                PUBLIC   rs232_put
 
 rs232_put:
                 ld   bc,$f8ee

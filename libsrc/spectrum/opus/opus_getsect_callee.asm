@@ -9,17 +9,17 @@
 ;
 ;	int __CALLEE__ opus_getsect_callee(int drive, int sector, char * buffer); 
 ;
-;	$Id: opus_getsect_callee.asm,v 1.2 2014-11-25 17:09:23 stefano Exp $
+;	$Id: opus_getsect_callee.asm,v 1.3 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-XLIB	opus_getsect_callee
+PUBLIC	opus_getsect_callee
 ;XDEF	ASMDISP_OPUS_GETSECT_CALLEE
 
 PUBLIC	opus_getsect_asmentry
 
-	LIB	opus_rommap
-	XREF	P_DEVICE
+	EXTERN	opus_rommap
+	EXTERN	P_DEVICE
 
 opus_getsect_callee:
 

@@ -9,11 +9,11 @@
 ;
 ;
 ;
-; $Id: break_status.asm,v 1.2 2007-06-03 15:13:06 stefano Exp $
+; $Id: break_status.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB break_status
+	PUBLIC break_status
 
 .break_status
 	rst	20h

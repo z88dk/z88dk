@@ -4,12 +4,12 @@
 ;
 ;	Internal routine to manage FLOS errors
 ;
-;	$Id: flos_err.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: flos_err.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  flos_err
+	PUBLIC  flos_err
 
 flos_err:
 	ld	hl,0

@@ -6,12 +6,12 @@
 ;
 ;       char __LIB__ *cpc_rsx_strcpy(char *dst, char *src);
 ;
-;       $Id: cpc_rsx_strcpy.asm,v 1.1 2008-05-26 06:38:08 stefano Exp $
+;       $Id: cpc_rsx_strcpy.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-        XLIB    cpc_rsx_strcpy
-        LIB     cpc_rsx_strcpy_callee
-        XREF    ASMDISP_CPC_RSX_STRCPY_CALLEE
+        PUBLIC    cpc_rsx_strcpy
+        EXTERN     cpc_rsx_strcpy_callee
+        EXTERN    ASMDISP_CPC_RSX_STRCPY_CALLEE
 
 .cpc_rsx_strcpy
         pop     bc

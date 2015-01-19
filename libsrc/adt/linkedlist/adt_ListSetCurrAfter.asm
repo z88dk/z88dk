@@ -1,8 +1,8 @@
 ; void __FASTCALL__ adt_ListSetCurrAfter(struct adt_List *list)
 ; 11.2006 aralbrec
 
-XLIB adt_ListSetCurrAfter
-LIB l_setmem
+PUBLIC adt_ListSetCurrAfter
+EXTERN l_setmem
 
 ; enter: hl = struct adt_List*
 

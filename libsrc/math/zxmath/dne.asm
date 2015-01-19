@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: dne.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: dne.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
@@ -14,10 +14,10 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB    dne
+                PUBLIC    dne
 
-                LIB	fsetup
-                LIB	f_yesno
+                EXTERN	fsetup
+                EXTERN	f_yesno
 
 .dne
         call    fsetup

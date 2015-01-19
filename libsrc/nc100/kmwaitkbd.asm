@@ -1,4 +1,4 @@
-		XLIB	kmwaitkbd
+		PUBLIC	kmwaitkbd
 
 .kmwaitkbd
 		call 0xB80F

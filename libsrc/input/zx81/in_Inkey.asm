@@ -4,8 +4,8 @@
 ; Read current state of keyboard but only return
 ; keypress if a single key is pressed.
 
-XLIB in_Inkey
-LIB in_keytranstbl
+PUBLIC in_Inkey
+EXTERN in_keytranstbl
 
 ; exit : carry set and HL = 0 for no keys registered
 ;        else HL = ASCII character code

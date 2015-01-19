@@ -4,12 +4,12 @@
 ;--------------------------------------------------------------
 
 
-	XLIB	pixeladdress
+	PUBLIC	pixeladdress
 
-	XREF	base_graphics
+	EXTERN	base_graphics
 
 ;
-;	$Id: g007_pixladdr.asm,v 1.2 2014-10-27 20:38:15 stefano Exp $
+;	$Id: g007_pixladdr.asm,v 1.3 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

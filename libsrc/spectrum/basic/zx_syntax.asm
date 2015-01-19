@@ -11,12 +11,12 @@
 ;		Terminate the string with carriage return.
 ;
 ;
-;	$Id: zx_syntax.asm,v 1.2 2014-01-20 09:15:32 stefano Exp $
+;	$Id: zx_syntax.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-XLIB	zx_syntax
-LIB	zx_interface1
-XREF	call_rom3
+PUBLIC	zx_syntax
+EXTERN	zx_interface1
+EXTERN	call_rom3
 
 	; max space for BASIC command(s)
 	defc	cmdlen = 20

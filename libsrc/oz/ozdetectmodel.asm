@@ -14,13 +14,13 @@
 ;;   bit 2:  0 if 7xxPC and 1 if 7xxM
 ;
 ; ------
-; $Id: ozdetectmodel.asm,v 1.1 2003-10-21 17:15:19 stefano Exp $
+; $Id: ozdetectmodel.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozdetectmodel
-	XREF	ozmodel
-	XREF	s_filetypetable
-	LIB	restore_a000
+	PUBLIC	ozdetectmodel
+	EXTERN	ozmodel
+	EXTERN	s_filetypetable
+	EXTERN	restore_a000
 
 
 

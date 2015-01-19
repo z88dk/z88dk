@@ -3,11 +3,11 @@
 ;
 ;	DbUpdateField
 ;
-;	$Id: DbUpdateField.asm,v 1.1 2001-09-03 16:13:20 dom Exp $
+;	$Id: DbUpdateField.asm,v 1.2 2015-01-19 01:33:06 pauloscustodio Exp $
 
 
 
-		XLIB	DbUpdateField
+		PUBLIC	DbUpdateField
 
 
 .DbUpdateField

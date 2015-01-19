@@ -8,10 +8,10 @@
 ;	- 1 (true) if a sound chip on the TS2068 standard location is present
 ;	- 0 (false) otherwise
 ;
-;	$Id: zx_timexsound.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: zx_timexsound.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
 ;
 
-	XLIB	zx_timexsound
+	PUBLIC	zx_timexsound
 	
 zx_timexsound:
 	ld	hl,0

@@ -6,9 +6,9 @@
 ; exit : hl = char *s
 ; uses : af, bc, de
 
-XLIB strrev
-XDEF ASMDISP_STRREV
-LIB     rcmx_cpir
+PUBLIC strrev
+PUBLIC ASMDISP_STRREV
+EXTERN     rcmx_cpir
 
 
 .strrev

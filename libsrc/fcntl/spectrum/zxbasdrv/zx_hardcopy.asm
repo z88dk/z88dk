@@ -5,11 +5,11 @@
 ;
 ; void zx_hardcopy()
 ;
-; $Id: zx_hardcopy.asm,v 1.3 2007-06-28 20:16:20 stefano Exp $
+; $Id: zx_hardcopy.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
 
-	XLIB	zx_hardcopy
+	PUBLIC	zx_hardcopy
 	
-	LIB	zx_goto
+	EXTERN	zx_goto
 
 
 .zx_hardcopy

@@ -5,9 +5,9 @@
 ;	djm 12/2/2000
 
 
-	XLIB	no_zsock
+	PUBLIC	no_zsock
 
-	LIB	exit
+	EXTERN	exit
 
 	INCLUDE	"stdio.def"
 

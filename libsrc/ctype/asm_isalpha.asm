@@ -1,6 +1,6 @@
 ; asm_isalpha
 
-XLIB asm_isalpha
+PUBLIC asm_isalpha
 
 ; determine if the char is in [A-Za-z]
 

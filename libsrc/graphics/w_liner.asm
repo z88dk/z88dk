@@ -1,14 +1,14 @@
         INCLUDE "graphics/grafix.inc"
 
-        XLIB    w_line_r
+        PUBLIC    w_line_r
         
-        LIB     line
-        LIB     l_cmp
+        EXTERN     line
+        EXTERN     l_cmp
 
-        XREF    coords
+        EXTERN    coords
 
 ;
-;       $Id: w_liner.asm,v 1.4 2015-01-02 07:22:27 aralbrec Exp $
+;       $Id: w_liner.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ******************************************************************************

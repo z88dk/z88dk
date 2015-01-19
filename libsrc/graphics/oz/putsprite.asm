@@ -8,15 +8,15 @@
 ; modified by Stefano Bodrato - Aug 2002
 ;
 
-	XLIB    putsprite
-	LIB	pixeladdress
-	LIB     swapgfxbk
-        XREF	swapgfxbk1
+	PUBLIC    putsprite
+	EXTERN	pixeladdress
+	EXTERN     swapgfxbk
+        EXTERN	swapgfxbk1
 
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: putsprite.asm,v 1.2 2002-11-21 08:40:51 stefano Exp $
+;	$Id: putsprite.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ; coords: d,e (vert-horz)

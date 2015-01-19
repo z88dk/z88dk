@@ -5,7 +5,7 @@
 ; This code comes from the FidoNET Sinclair newsgroup
 ;--------------------------------------------------------------
 ;
-;       $Id: mirrortxt.asm,v 1.1 2007-10-12 14:49:16 stefano Exp $
+;       $Id: mirrortxt.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -13,7 +13,7 @@
 ;
 ;----------------------------------------------------------------
 
-        XLIB    mirrortxt
+        PUBLIC    mirrortxt
 
 mirrortxt:
 	

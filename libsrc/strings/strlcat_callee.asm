@@ -1,8 +1,8 @@
 ; uint __CALLEE__ strlcat_callee(char *dst, char *src, uint size)
 ; 06.2008 aralbrec
 
-XLIB strlcat_callee
-XDEF ASMDISP_STRLCAT_CALLEE
+PUBLIC strlcat_callee
+PUBLIC ASMDISP_STRLCAT_CALLEE
 
 IF FORrcmx000
 LIB  rcmx_cpir

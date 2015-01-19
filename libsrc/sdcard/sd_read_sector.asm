@@ -10,13 +10,13 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_read_sector.asm,v 1.5 2012-09-20 21:13:16 stefano Exp $
+;	$Id: sd_read_sector.asm,v 1.6 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_read_sector
+	PUBLIC	sd_read_sector
 
-	LIB		sd_read_sector_callee
-	XREF	ASMDISP_SD_READ_SECTOR_CALLEE
+	EXTERN		sd_read_sector_callee
+	EXTERN	ASMDISP_SD_READ_SECTOR_CALLEE
 
 sd_read_sector:
 	pop af	; ret addr

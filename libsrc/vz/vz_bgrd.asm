@@ -8,7 +8,7 @@
 
 ; ----- void __FASTCALL__ vz_bgrd(int n)
 
-XLIB vz_bgrd
+PUBLIC vz_bgrd
 
 .vz_bgrd
 

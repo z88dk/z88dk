@@ -8,8 +8,8 @@
 
 ; ----- void __FASTCALL__ vz_setbase(void *start)
 
-XLIB vz_setbase
-XDEF scrbase
+PUBLIC vz_setbase
+PUBLIC scrbase
 
 .vz_setbase
 

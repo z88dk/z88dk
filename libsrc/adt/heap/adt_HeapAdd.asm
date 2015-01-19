@@ -1,10 +1,10 @@
 ; void adt_HeapAdd(void *item, void **array, uint *n, void *compare)
 ; CALLER linkage for function pointers
 
-XLIB adt_HeapAdd
+PUBLIC adt_HeapAdd
 
-LIB adt_HeapAdd_callee
-XREF CDISP_ADT_HEAPADD_CALLEE
+EXTERN adt_HeapAdd_callee
+EXTERN CDISP_ADT_HEAPADD_CALLEE
 
 .adt_HeapAdd
 

@@ -3,9 +3,9 @@
 ;
 ;	djm 7/3/2001
 ;
-;	$Id: input8.asm,v 1.3 2002-04-17 21:30:25 dom Exp $
+;	$Id: input8.asm,v 1.4 2015-01-19 01:33:06 pauloscustodio Exp $
 
-	XLIB	input8
+	PUBLIC	input8
 
 
 .input8

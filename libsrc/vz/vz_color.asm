@@ -8,7 +8,7 @@
 
 ; ----- void __FASTCALL__ vz_color(int n)
 
-XLIB vz_color
+PUBLIC vz_color
 
 .vz_color
 

@@ -4,7 +4,7 @@
 ;
 ;	Supporting helpers
 ;
-		XLIB nc_ltell
+		PUBLIC nc_ltell
 
 .nc_ltell	ex de, hl
 		jp 0xB8BD

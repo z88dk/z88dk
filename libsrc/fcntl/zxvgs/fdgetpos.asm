@@ -1,10 +1,10 @@
 ;int close(int handle)
 ;returns 0 if OK
 ;
-;	$Id: fdgetpos.asm,v 1.1 2002-06-23 12:11:31 dom Exp $
+;	$Id: fdgetpos.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
-	XLIB	close
+	PUBLIC	close
 
 .close
 	POP	BC	;ret

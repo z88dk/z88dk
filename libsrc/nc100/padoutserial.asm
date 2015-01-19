@@ -1,4 +1,4 @@
-		XLIB	padoutserial
+		PUBLIC	padoutserial
 
 ; fastcall
 .padoutserial

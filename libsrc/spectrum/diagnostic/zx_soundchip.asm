@@ -8,10 +8,10 @@
 ;	- 1 (true) if a sound chip is present
 ;	- 0 (false) otherwise
 ;
-;	$Id: zx_soundchip.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: zx_soundchip.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
 ;
 
-	XLIB	zx_soundchip
+	PUBLIC	zx_soundchip
 	
 zx_soundchip:
 	ld	hl,0

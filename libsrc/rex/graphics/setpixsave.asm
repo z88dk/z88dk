@@ -1,10 +1,10 @@
 ;
 ;	written by Waleed Hasan
 ;
-;	$Id: setpixsave.asm,v 1.2 2003-03-13 15:02:10 dom Exp $
+;	$Id: setpixsave.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
 
-	XLIB	setpixsave
-	LIB	setpix
+	PUBLIC	setpixsave
+	EXTERN	setpix
 	
 .setpixsave
 

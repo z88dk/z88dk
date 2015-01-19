@@ -1,10 +1,10 @@
 ; struct sp1_update *sp1_GetUpdateStruct(uchar row, uchar col)
 ; CALLER linkage for function pointers
 
-XLIB sp1_GetUpdateStruct
+PUBLIC sp1_GetUpdateStruct
 
-LIB sp1_GetUpdateStruct_callee
-XREF ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
+EXTERN sp1_GetUpdateStruct_callee
+EXTERN ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
 
 .sp1_GetUpdateStruct
 

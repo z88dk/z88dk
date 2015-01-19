@@ -2,8 +2,8 @@
 ; 02.2008 aralbrec
 ; zx81 hi-res version
 
-XLIB SP1PSPOP
-XREF SP1V_TEMP_IX
+PUBLIC SP1PSPOP
+EXTERN SP1V_TEMP_IX
 
 ; enter : de  = & string to print (or something else)
 ;         hl  = & struct sp1_pss to read

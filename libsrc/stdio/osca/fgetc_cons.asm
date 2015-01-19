@@ -5,13 +5,13 @@
 ;	getkey() Wait for keypress
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.4 2013-06-21 10:25:28 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.5 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
     INCLUDE "flos.def"
 
-	XLIB	fgetc_cons
+	PUBLIC	fgetc_cons
 
 .buf defb 0
 

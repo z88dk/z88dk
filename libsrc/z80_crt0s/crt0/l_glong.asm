@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-XLIB    l_glong
+PUBLIC    l_glong
 
 
 ;Fetch long dehl from (hl)

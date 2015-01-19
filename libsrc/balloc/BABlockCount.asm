@@ -1,7 +1,7 @@
 ; 04.2004 aralbrec
 
-XLIB BABlockCount
-XREF _ba_qtbl
+PUBLIC BABlockCount
+EXTERN _ba_qtbl
 
 ; Count the number of memory blocks available in a queue.
 ;

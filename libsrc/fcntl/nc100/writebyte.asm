@@ -1,4 +1,4 @@
-		XLIB writebyte
+		PUBLIC writebyte
 
 .writebyte	pop bc
 		pop de

@@ -1,8 +1,8 @@
-	xlib	cleararea
-	lib	respixel
+	PUBLIC	cleararea
+	EXTERN	respixel
 
 ;
-;	$Id: clrarea.asm,v 1.3 2002-03-28 09:41:14 stefano Exp $
+;	$Id: clrarea.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ***********************************************************************

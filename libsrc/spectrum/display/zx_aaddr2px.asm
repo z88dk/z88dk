@@ -1,7 +1,7 @@
 ; uint __FASTCALL__ zx_aaddr2px(void *attraddr)
 ; aralbrec 06.2007
 
-XLIB zx_aaddr2px
+PUBLIC zx_aaddr2px
 
 .zx_aaddr2px
 

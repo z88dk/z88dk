@@ -1,9 +1,9 @@
 ; void sp1_ClearRect(struct sp1_Rect *r, uchar tile, uchar rflag)
 ; CALLER linkage for function pointers
 
-XLIB sp1_ClearRect
-LIB sp1_ClearRect_callee
-XREF ASMDISP_SP1_CLEARRECT_CALLEE
+PUBLIC sp1_ClearRect
+EXTERN sp1_ClearRect_callee
+EXTERN ASMDISP_SP1_CLEARRECT_CALLEE
 
 .sp1_ClearRect
 

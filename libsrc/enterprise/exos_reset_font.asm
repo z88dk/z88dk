@@ -5,10 +5,10 @@
 ;	exos_reset_font();
 ;
 ;
-;	$Id: exos_reset_font.asm,v 1.2 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_reset_font.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-	XLIB	exos_reset_font
+	PUBLIC	exos_reset_font
 
 	INCLUDE "enterprise.def"
 

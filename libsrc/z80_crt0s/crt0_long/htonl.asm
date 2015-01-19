@@ -6,7 +6,7 @@
 ;       djm 24/4/99
 
 
-                XLIB    htonl
+                PUBLIC    htonl
 
 .htonl
         ex      de,hl   ;exchange order of bytes

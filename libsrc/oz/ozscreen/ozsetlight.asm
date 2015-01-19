@@ -13,16 +13,16 @@
 ;
 ;
 ; ------
-; $Id: ozsetlight.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozsetlight.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozsetlight
+	PUBLIC	ozsetlight
 	
-	XREF	ozbacklight
-	XREF	ozbacklight_save
-	XREF	s_ozlcdstatus
+	EXTERN	ozbacklight
+	EXTERN	ozbacklight_save
+	EXTERN	s_ozlcdstatus
 	
-	LIB	ozsetlcdstate
+	EXTERN	ozsetlcdstate
 
 
 ozsetlight:

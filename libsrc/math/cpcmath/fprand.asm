@@ -3,16 +3,16 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: fprand.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: fprand.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 
-		XLIB		fprand
-		XDEF		fprandc
+		PUBLIC		fprand
+		PUBLIC		fprandc
 		
-		XREF		fa
+		EXTERN		fa
 
 .fprand
 		ld      hl,fa+1

@@ -6,10 +6,10 @@
 ;	Stefano Bodrato - Dec 2000
 ;
 ;
-;	$Id: getk_decode.asm,v 1.5 2002-04-17 21:30:26 dom Exp $
+;	$Id: getk_decode.asm,v 1.6 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
-		XLIB	getk_decode
+		PUBLIC	getk_decode
 
 		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 

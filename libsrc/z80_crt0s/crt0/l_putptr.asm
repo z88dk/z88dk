@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-                XLIB    l_putptr
+                PUBLIC    l_putptr
 
 
 .l_putptr

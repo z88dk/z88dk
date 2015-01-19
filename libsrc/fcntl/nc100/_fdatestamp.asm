@@ -1,4 +1,4 @@
-		XLIB	_fdatestamp
+		PUBLIC	_fdatestamp
 
 ; Fastcall
 ._fdatestamp

@@ -1,13 +1,13 @@
 ; FREE function for far memory model
 ; 31/3/00 GWL
 ;
-; $Id: free_far.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+; $Id: free_far.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-        XLIB    free_far
+        PUBLIC    free_far
 
-        XDEF    free_loop
-        XREF    malloc_table,pool_table
+        PUBLIC    free_loop
+        EXTERN    malloc_table,pool_table
 
 include "memory.def"
 

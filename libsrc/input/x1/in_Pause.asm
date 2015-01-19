@@ -5,9 +5,9 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
-        XLIB in_Pause
-        LIB in_WaitForKey, t_delay
-        XREF _x1_keyboard_io
+        PUBLIC in_Pause
+        EXTERN in_WaitForKey, t_delay
+        EXTERN _x1_keyboard_io
 
 ; Waits a period of time measured in milliseconds and exits
 ; early if a key is pressed

@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB realloc
+PUBLIC realloc
 
-LIB realloc_callee
-XREF ASMDISP_REALLOC_CALLEE
+EXTERN realloc_callee
+EXTERN ASMDISP_REALLOC_CALLEE
 
 .realloc
 

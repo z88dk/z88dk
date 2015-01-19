@@ -1,8 +1,8 @@
 ; void adt_HeapSiftUp(uint start, void **array, void *compare)
 ; 03.2003, 08.2005 aralbrec
 
-XLIB ADTHeapSiftUp
-LIB l_jpix
+PUBLIC ADTHeapSiftUp
+EXTERN l_jpix
 
 ; enter:  DE = start index * 2 (offset into array in bytes)
 ;         HL = &array[start] = bc + de

@@ -6,10 +6,10 @@
 ;	returns TRUE if the current program 
 ;	has been loaded from the microdrive
 ;
-;	$Id: if1_from_mdv.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: if1_from_mdv.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
-	XLIB	if1_from_mdv
+	PUBLIC	if1_from_mdv
 	
 if1_from_mdv:
 		ld	de,($5c53) 	; PROG :location of BASIC program 

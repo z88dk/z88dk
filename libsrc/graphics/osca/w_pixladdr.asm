@@ -1,15 +1,15 @@
 
-        XLIB    w_pixeladdress
+        PUBLIC    w_pixeladdress
 
         INCLUDE "graphics/grafix.inc"
 
-        XREF   base_graphics
+        EXTERN   base_graphics
 
 ;
 ;
 ;       Stefano - Sept 2011
 ;
-;	$Id: w_pixladdr.asm,v 1.2 2012-09-20 21:13:15 stefano Exp $
+;	$Id: w_pixladdr.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 ;
 ; ******************************************************************

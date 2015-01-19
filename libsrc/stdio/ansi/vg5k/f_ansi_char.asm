@@ -11,18 +11,18 @@
 ;	Stefano Bodrato - 2014
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2014-07-16 09:59:57 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 	
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 	
-	XREF	vg5k_attr
+	EXTERN	vg5k_attr
 
 .text_cols   defb 40
 .text_rows   defb 25

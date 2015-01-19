@@ -2,7 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIsRectInRect8
+PUBLIC RIsRectInRect8
 
 ; Determine if two 8-bit rectangles intersect.  Rectangles
 ; can wrap across 0-255 boundaries.

@@ -3,9 +3,9 @@
 ; 01.2008 aralbrec, Sprite Pack v3.0
 ; ts2068 hi-res version
 
-XLIB sp1_InsertCharStruct_callee
-XDEF ASMDISP_SP1_INSERTCHARSTRUCT_CALLEE
-LIB SP1AddSprChar
+PUBLIC sp1_InsertCharStruct_callee
+PUBLIC ASMDISP_SP1_INSERTCHARSTRUCT_CALLEE
+EXTERN SP1AddSprChar
 
 .sp1_InsertCharStruct_callee
 

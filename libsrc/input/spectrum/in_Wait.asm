@@ -1,8 +1,8 @@
 ; void in_Wait(uint ticks)
 ; 09.2005 aralbrec
 
-XLIB in_Wait
-LIB t_delay
+PUBLIC in_Wait
+EXTERN t_delay
 
 ; Waits a period of time measured in milliseconds.
 ;

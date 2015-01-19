@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.1 2013-10-21 14:23:45 stefano Exp $
+; $Id: bit_open.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; Generic 1 bit sound functions
 ;
@@ -9,8 +9,8 @@
 
     INCLUDE  "games/games.inc"
 
-    XLIB     bit_open
-    XREF     snd_tick
+    PUBLIC     bit_open
+    EXTERN     snd_tick
 
 .bit_open
 	  ld a,(snd_tick)

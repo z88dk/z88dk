@@ -5,14 +5,14 @@
 ;	exos_open_channel(unsigned char ch_number, char *device);
 ;
 ;
-;	$Id: exos_open_channel.asm,v 1.2 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_open_channel.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-	XLIB    exos_open_channel
+	PUBLIC    exos_open_channel
 
-	LIB     exos_open_channel_callee
+	EXTERN     exos_open_channel_callee
 
-XREF ASMDISP_EXOS_OPEN_CHANNEL_CALLEE
+EXTERN ASMDISP_EXOS_OPEN_CHANNEL_CALLEE
 
 exos_open_channel:
 

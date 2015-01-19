@@ -1,10 +1,10 @@
-	xlib	cleararea
+	PUBLIC	cleararea
 
-	lib pixeladdress
-	lib leftbitmask, rightbitmask
+	EXTERN pixeladdress
+	EXTERN leftbitmask, rightbitmask
 
 ;
-;	$Id: clrarea2.asm,v 1.3 2008-03-19 17:31:24 stefano Exp $
+;	$Id: clrarea2.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ***********************************************************************

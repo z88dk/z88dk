@@ -4,7 +4,7 @@
 ; this key translation table to emulate a PC keyboard with the 'CTRL'
 ; key represented by CAPS SHIFT + SYM SHIFT.
 
-XLIB in_keytranstbl
+PUBLIC in_keytranstbl
 
 .in_keytranstbl
    defb 255,'z','x','c','v'      ; CAPS SHIFT, Z, X, C, V

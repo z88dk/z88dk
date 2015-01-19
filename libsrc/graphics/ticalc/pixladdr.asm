@@ -1,12 +1,12 @@
 
-	XLIB	pixeladdress
+	PUBLIC	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 
-	XREF	base_graphics
+	EXTERN	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.6 2002-04-17 21:30:25 dom Exp $
+;	$Id: pixladdr.asm,v 1.7 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

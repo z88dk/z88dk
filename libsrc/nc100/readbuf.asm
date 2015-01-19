@@ -1,4 +1,4 @@
-		XLIB	readbuf
+		PUBLIC	readbuf
 
 .readbuf
 		pop de

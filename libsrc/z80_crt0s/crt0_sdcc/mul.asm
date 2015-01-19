@@ -27,10 +27,10 @@
 ;--------------------------------------------------------------------------
 
 
-	XLIB __mulint_rrx_s
-	XDEF __muluchar_rrx_hds
-	XDEF __mulint_rrx_hds
-	XDEF __mul16
+	PUBLIC __mulint_rrx_s
+	PUBLIC __muluchar_rrx_hds
+	PUBLIC __mulint_rrx_hds
+	PUBLIC __mul16
 
 __mulint_rrx_s:
         pop     af

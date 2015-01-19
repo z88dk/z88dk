@@ -1,10 +1,10 @@
 ; void in_MouseAMXInit(uchar xvector, uchar yvector)
 ; CALLER linkage for function pointers
 
-XLIB in_MouseAMXInit
+PUBLIC in_MouseAMXInit
 
-LIB in_MouseAMXInit_callee
-XREF ASMDISP_IN_MOUSEAMXINIT_CALLEE
+EXTERN in_MouseAMXInit_callee
+EXTERN ASMDISP_IN_MOUSEAMXINIT_CALLEE
 
 .in_MouseAMXInit
 

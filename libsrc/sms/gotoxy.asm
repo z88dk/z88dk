@@ -1,8 +1,8 @@
-	XLIB	gotoxy
+	PUBLIC	gotoxy
 	
 	INCLUDE "sms/sms.hdr"
 
-	XREF	fputc_vdp_offs
+	EXTERN	fputc_vdp_offs
 	
 ;==============================================================
 ; void gotoxy(int x, int y)

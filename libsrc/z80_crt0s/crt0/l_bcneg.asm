@@ -4,7 +4,7 @@
 ;
 ;       6/9/98  djm
 
-                XLIB    l_bcneg
+                PUBLIC    l_bcneg
 
 
 

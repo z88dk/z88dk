@@ -5,13 +5,13 @@
 ;	current exponent in fa+5
 ;	Result -> fa +5
 ;
-;       $Id: norm4.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: norm4.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $:
 
 
-		XLIB	norm4
+		PUBLIC	norm4
 
 
-		XREF	fa
+		EXTERN	fa
 
 .norm4  XOR     A
 .norm6  LD      (fa+5),A

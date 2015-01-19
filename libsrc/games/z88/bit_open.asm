@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+; $Id: bit_open.asm,v 1.4 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 ; Z88 1 bit sound functions
 ;
@@ -8,11 +8,11 @@
 ; Based on the Dominic Morris' code
 ;
 
-    XLIB     bit_open
+    PUBLIC     bit_open
     INCLUDE  "interrpt.def"
 
-    XREF     snd_asave
-    XREF     snd_tick
+    EXTERN     snd_asave
+    EXTERN     snd_tick
 
 .bit_open
           ld   (snd_asave),a

@@ -5,10 +5,10 @@
 ;	exos_read_block(unsigned char channel, unsigned int byte_count, unsigned char *address);
 ;
 ;
-;	$Id: exos_read_block.asm,v 1.1 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_read_block.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-	XLIB	exos_read_block
+	PUBLIC	exos_read_block
 
 exos_read_block:
 	

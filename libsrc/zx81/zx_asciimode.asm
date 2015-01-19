@@ -9,12 +9,12 @@
 ;	int __FASTCALL__ zx_asciimode(int mode);
 ;
 ;
-;	$Id: zx_asciimode.asm,v 1.2 2007-12-04 07:02:11 stefano Exp $
+;	$Id: zx_asciimode.asm,v 1.3 2015-01-19 01:33:26 pauloscustodio Exp $
 ;	
 
-XLIB	zx_asciimode
-LIB	asctozx81
-LIB	zx81toasc
+PUBLIC	zx_asciimode
+EXTERN	asctozx81
+EXTERN	zx81toasc
 
 zx_asciimode:
 

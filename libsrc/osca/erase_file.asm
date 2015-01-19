@@ -4,13 +4,13 @@
 ;
 ;	Like 'remove' but with a FLOS style error handling
 ;
-;	$Id: erase_file.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: erase_file.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  erase_file
-	LIB   flos_err
+	PUBLIC  erase_file
+	EXTERN   flos_err
 	
 erase_file:
 	; __FASTCALL__

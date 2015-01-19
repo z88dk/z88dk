@@ -8,14 +8,14 @@
 ;
 ;	Get state of a specified joystick number id
 ;
-;	$Id: msx_get_stick.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: msx_get_stick.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
-	XLIB	msx_get_stick
-	XDEF	_st_dir
+	PUBLIC	msx_get_stick
+	PUBLIC	_st_dir
 	
-	LIB	msxbios
+	EXTERN	msxbios
 
 IF FORmsx
         INCLUDE "msxbios.def"

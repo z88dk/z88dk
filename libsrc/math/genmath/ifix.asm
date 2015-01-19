@@ -2,11 +2,11 @@
 
 
 
-                XLIB    ifix
-                LIB     floor
-                LIB     l_long_neg
+                PUBLIC    ifix
+                EXTERN     floor
+                EXTERN     l_long_neg
 
-                XREF    fa
+                EXTERN    fa
 
 ;
 ;       convert the floating point number in FA

@@ -41,14 +41,14 @@
 ; joystick interface ($1f), the Disciple disk interface ($1f) and
 ; the Multiface ($3f).
 
-XLIB in_MouseAMXInit_callee
-XDEF ASMDISP_IN_MOUSEAMXINIT_CALLEE
+PUBLIC in_MouseAMXInit_callee
+PUBLIC ASMDISP_IN_MOUSEAMXINIT_CALLEE
 
-LIB im2_InstallISR_callee
-XREF ASMDISP_IM2_INSTALLISR_CALLEE
+EXTERN im2_InstallISR_callee
+EXTERN ASMDISP_IM2_INSTALLISR_CALLEE
 
-XREF _in_AMXdeltaX, _in_AMXdeltaY
-XREF _in_AMXcoordX, _in_AMXcoordY
+EXTERN _in_AMXdeltaX, _in_AMXdeltaY
+EXTERN _in_AMXcoordX, _in_AMXcoordY
 
 .in_MouseAMXInit_callee
 

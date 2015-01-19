@@ -4,7 +4,7 @@
 ; ---FUDLR  Stick bit pattern (nc, nc, nc, fire, up, down, left, right)
 ;
 
-    XLIB    joystick
+    PUBLIC    joystick
 
 .joystick
 

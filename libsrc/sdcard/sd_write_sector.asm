@@ -10,13 +10,13 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_write_sector.asm,v 1.4 2012-09-20 21:13:16 stefano Exp $
+;	$Id: sd_write_sector.asm,v 1.5 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_write_sector
+	PUBLIC	sd_write_sector
 
-	LIB		sd_write_sector_callee
-	XREF	ASMDISP_SD_WRITE_SECTOR_CALLEE
+	EXTERN		sd_write_sector_callee
+	EXTERN	ASMDISP_SD_WRITE_SECTOR_CALLEE
 
 sd_write_sector:
 	pop af	; ret addr

@@ -13,17 +13,17 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-	XLIB	surface_stencil_render
-	XREF	base_graphics
-	LIB	dither_pattern
+	PUBLIC	surface_stencil_render
+	EXTERN	base_graphics
+	EXTERN	dither_pattern
 
 	;LIB swapgfxbk
-	LIB surface_pixeladdress
-	LIB leftbitmask, rightbitmask
+	EXTERN surface_pixeladdress
+	EXTERN leftbitmask, rightbitmask
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: surface_stencil_render.asm,v 1.4 2009-10-08 09:48:54 stefano Exp $
+;	$Id: surface_stencil_render.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 .surface_stencil_render

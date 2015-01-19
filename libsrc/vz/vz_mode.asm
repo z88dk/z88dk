@@ -8,7 +8,7 @@
 
 ; ----- void __FASTCALL__ vz_mode(int n)
 
-XLIB vz_mode
+PUBLIC vz_mode
 
 .vz_mode
 

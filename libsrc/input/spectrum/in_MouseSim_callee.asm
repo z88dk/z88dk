@@ -1,8 +1,8 @@
 ; void __CALLEE__ in_MouseSim_callee(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord)
 ; 09.2005 aralbrec
 
-XLIB in_MouseSim_callee
-LIB INMouseSim
+PUBLIC in_MouseSim_callee
+EXTERN INMouseSim
 
 .in_MouseSim_callee
 

@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: closegfx.asm,v 1.5 2011-08-12 16:53:07 pauloscustodio Exp $
+;	$Id: closegfx.asm,v 1.6 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
@@ -18,7 +18,7 @@
                 INCLUDE "graphics/grafix.inc"    ; Contains fn defs
                 INCLUDE "map.def"
 
-                XLIB    closegfx
+                PUBLIC    closegfx
 
  ;               XREF    oldozbank
 

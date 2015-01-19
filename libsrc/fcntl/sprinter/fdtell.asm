@@ -1,10 +1,10 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: fdtell.asm,v 1.1 2002-10-03 20:07:20 dom Exp $
+;	$Id: fdtell.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
 
-                XLIB    fdtell
+                PUBLIC    fdtell
 
 ;int fdtell(int fd)
 ;

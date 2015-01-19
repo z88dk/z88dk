@@ -13,8 +13,8 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    qfloat
-		XREF	fa
+                PUBLIC    qfloat
+		EXTERN	fa
 
 .qfloat
         push    de      ;msb

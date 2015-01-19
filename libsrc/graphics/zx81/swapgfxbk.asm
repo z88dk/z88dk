@@ -3,13 +3,13 @@
 ;
 ;	ZX 81 version By Stefano Bodrato
 ;
-;	$Id: swapgfxbk.asm,v 1.7 2007-10-04 10:28:47 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.8 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 
-                XLIB    swapgfxbk
+                PUBLIC    swapgfxbk
 
-		XDEF	swapgfxbk1
+		PUBLIC	swapgfxbk1
 		
 		;XREF	save81
 		;XREF	restore81

@@ -1,11 +1,11 @@
 ;
 ;	written by Waleed Hasan
 ;
-;	$Id: setpix.asm,v 1.2 2003-03-13 15:02:10 dom Exp $
+;	$Id: setpix.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
 ;
 
-	XLIB	setpix
-	LIB	pixaddr
+	PUBLIC	setpix
+	EXTERN	pixaddr
 	
 ;
 ; direct LCD pixel plot

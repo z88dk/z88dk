@@ -7,16 +7,16 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_drawr.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+;	$Id: w_drawr.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-                XLIB    drawr
-                LIB     swapgfxbk
-                XREF	swapgfxbk1
+                PUBLIC    drawr
+                EXTERN     swapgfxbk
+                EXTERN	swapgfxbk1
 
-                LIB     w_line_r
-                LIB     w_plotpixel
+                EXTERN     w_line_r
+                EXTERN     w_plotpixel
 
 
 .drawr

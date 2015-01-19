@@ -1,4 +1,4 @@
-		XLIB	padserialwaiting
+		PUBLIC	padserialwaiting
 
 .padserialwaiting
 		call 0xb86F

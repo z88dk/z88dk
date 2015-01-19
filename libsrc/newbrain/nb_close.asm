@@ -15,13 +15,13 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_close.asm,v 1.1 2007-06-03 15:13:06 stefano Exp $
+; $Id: nb_close.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
 
-	XLIB nb_close
+	PUBLIC nb_close
 
-	LIB ZCALL
+	EXTERN ZCALL
 	
 .nb_close
 	; __FASTCALL__ mode, stream number is stored in HL

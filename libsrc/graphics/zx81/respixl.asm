@@ -1,10 +1,10 @@
 
-	XLIB	respixel
+	PUBLIC	respixel
 
-	XREF	coords
+	EXTERN	coords
 
 ;
-;	$Id: respixl.asm,v 1.6 2014-05-02 14:18:40 stefano Exp $
+;	$Id: respixl.asm,v 1.7 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

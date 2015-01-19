@@ -1,10 +1,10 @@
 ; void sp1_IterateSprChar(struct sp1_ss *s, void *hook1)
 ; CALLER linkage for function pointers
 
-XLIB sp1_IterateSprChar
+PUBLIC sp1_IterateSprChar
 
-LIB sp1_IterateSprChar_callee
-XREF ASMDISP_SP1_ITERATESPRCHAR_CALLEE
+EXTERN sp1_IterateSprChar_callee
+EXTERN ASMDISP_SP1_ITERATESPRCHAR_CALLEE
 
 .sp1_IterateSprChar
 

@@ -8,8 +8,8 @@
 
 ; ----- void __CALLEE__ vz_sound_callee(int freq, int cycles)
 
-XLIB vz_sound_callee
-XREF ASMDISP_VZ_SOUND_CALLEE
+PUBLIC vz_sound_callee
+EXTERN ASMDISP_VZ_SOUND_CALLEE
 
 .vz_sound_callee
 

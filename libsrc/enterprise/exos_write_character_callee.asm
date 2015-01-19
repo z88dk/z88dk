@@ -5,12 +5,12 @@
 ;	exos_write_character(unsigned char ch_number, char character);
 ;
 ;
-;	$Id: exos_write_character_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
+;	$Id: exos_write_character_callee.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
 
-XLIB	exos_write_character_callee
-XDEF 	ASMDISP_EXOS_WRITE_CHARACTER_CALLEE
+PUBLIC	exos_write_character_callee
+PUBLIC 	ASMDISP_EXOS_WRITE_CHARACTER_CALLEE
 
 exos_write_character_callee:
 

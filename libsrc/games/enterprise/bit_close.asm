@@ -1,4 +1,4 @@
-; $Id: bit_close.asm,v 1.1 2011-03-18 07:12:41 stefano Exp $
+; $Id: bit_close.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; Enterprise 64/128 1 bit sound functions
 ;
@@ -7,7 +7,7 @@
 ; Stefano Bodrato - 2011
 ;
 
-    XLIB     bit_close
+    PUBLIC     bit_close
 
 .bit_close
           ret

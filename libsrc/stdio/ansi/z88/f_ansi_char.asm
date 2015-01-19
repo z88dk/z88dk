@@ -7,17 +7,17 @@
 ;	This ain't pretty..we do far too many calls to oz for my liking..
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-		XLIB ansi_char
+		PUBLIC ansi_char
 
 		INCLUDE	"stdio.def"
 
-		XREF ansi_ROW
-		XREF ansi_COLUMN
-		XDEF text_rows
-		XDEF text_cols
+		EXTERN ansi_ROW
+		EXTERN ansi_COLUMN
+		PUBLIC text_rows
+		PUBLIC text_cols
 
 
 .text_rows	defb 8

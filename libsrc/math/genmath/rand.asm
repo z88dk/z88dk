@@ -5,19 +5,19 @@
 
 
 
-                XLIB    fprand
+                PUBLIC    fprand
                 
-                LIB	fmul
-                lIB	fadd
-                LIB	ldbcfa
-                LIB	norm
+                EXTERN	fmul
+                EXTERN	fadd
+                EXTERN	ldbcfa
+                EXTERN	norm
                 
 
-                XREF    fp_seed
-                XREF    dload
-                XREF    fa
-                XREF    fasign
-                XREF    dstore
+                EXTERN    fp_seed
+                EXTERN    dload
+                EXTERN    fa
+                EXTERN    fasign
+                EXTERN    dstore
 
 
 .fprand

@@ -2,12 +2,12 @@
 ;	Generic game device library - VG-5000 port
 ;	Stefano Bodrato - 2014
 ;
-;	$Id: joystick.asm,v 1.1 2014-07-16 09:59:57 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 
 
-	XLIB    joystick
-	LIB	getk
+	PUBLIC    joystick
+	EXTERN	getk
 
 .joystick
 	;__FASTALL__ : joystick no. in HL

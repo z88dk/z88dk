@@ -7,12 +7,12 @@
 ; *** THIS IS A Z88 SPECIFIC ROUTINE!!! ***
 ;
 ;
-;	$Id: fdtell.asm,v 1.4 2014-04-11 11:14:00 stefano Exp $
+;	$Id: fdtell.asm,v 1.5 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
                 INCLUDE "fileio.def"
 
-                XLIB    fdtell
+                PUBLIC    fdtell
 
 ;long fdtell(int fd)
 

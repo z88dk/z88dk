@@ -2,7 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIsPtInRect8
+PUBLIC RIsPtInRect8
 
 ; Determine if 8-bit (x,y) point lies in an 8-bit bounding
 ; rectangle.  Rectangle bounds wrap across 0-255 boundaries.

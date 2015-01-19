@@ -2,11 +2,11 @@
 ;	CPC fcntl Routines
 ;       Donated by **_warp6_** <kbaccam@free.fr>
 ;
-;	$Id: cpc_setup_open.asm,v 1.1 2003-09-12 16:30:43 dom Exp $
+;	$Id: cpc_setup_open.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
 
-		XLIB	cpc_setup_open
+		PUBLIC	cpc_setup_open
 
 ; We enter with sp + 4 = buffer, sp + 6 = lengthm sp + 8 = filename
 .cpc_setup_open

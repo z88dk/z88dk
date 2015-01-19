@@ -9,14 +9,14 @@
 ;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr85.asm,v 1.1 2013-02-14 11:29:54 stefano Exp $
+;	$Id: f_ansi_attr85.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_attr
+	PUBLIC	ansi_attr
 
-	XREF	INVRS
-	XREF	BOLD
-	XREF	UNDERLINE
+	EXTERN	INVRS
+	EXTERN	BOLD
+	EXTERN	UNDERLINE
 
 .ansi_attr
         and     a

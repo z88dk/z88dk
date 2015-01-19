@@ -9,11 +9,11 @@
 ;	which sector can be written !!!.
 ;
 ;	
-;	$Id: if1_find_sector.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: if1_find_sector.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	if1_find_sector
+		PUBLIC 	if1_find_sector
 
 filename:	defm	"0-!g"
 

@@ -6,15 +6,15 @@
 ;
 ;	Returns byte read from card in A
 ;
-;	$Id: sd_get_byte.asm,v 1.2 2012-09-20 21:13:16 stefano Exp $
+;	$Id: sd_get_byte.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-	XLIB	sd_get_byte
-	XDEF	sd_before_get
+	PUBLIC	sd_get_byte
+	PUBLIC	sd_before_get
 	
-	LIB		sd_send_eight_clocks
-	XREF	sd_waitserend
+	EXTERN		sd_send_eight_clocks
+	EXTERN	sd_waitserend
 	
     INCLUDE "osca.def"
 

@@ -6,7 +6,7 @@
 ;
 ;*****************************************************
 
-XLIB isqrt
+PUBLIC isqrt
 
 ; ----- uint __FASTCALL__ isqrt(uint val)
 

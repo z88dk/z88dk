@@ -2,20 +2,20 @@
 
 
 
-                XLIB    log
+                PUBLIC    log
 
-                LIB	hlsub
-                LIB	evenpol
-                LIB	sgn
-                LIB	fdiv
-                LIB	fmul
-                LIB	fadd
-                LIB	norma
-                LIB	pushfa
+                EXTERN	hlsub
+                EXTERN	evenpol
+                EXTERN	sgn
+                EXTERN	fdiv
+                EXTERN	fmul
+                EXTERN	fadd
+                EXTERN	norma
+                EXTERN	pushfa
 
 
-                XREF    fa
-                XREF    fasign
+                EXTERN    fa
+                EXTERN    fasign
 
 ;
 ;       transcendental functions: log

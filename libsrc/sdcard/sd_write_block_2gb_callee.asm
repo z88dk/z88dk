@@ -10,22 +10,22 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_write_block_2gb_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
+;	$Id: sd_write_block_2gb_callee.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_write_block_2gb_callee
-	XDEF	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
+	PUBLIC	sd_write_block_2gb_callee
+	PUBLIC	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
 
-	XREF	sd_card_info
-	XREF	card_select
+	EXTERN	sd_card_info
+	EXTERN	card_select
 
-	LIB		sd_write_sector_main
-	LIB		sd_deselect_card
-	LIB		sd_set_sector_addr_regs
-	LIB		sd_send_command_current_args
-	LIB		sd_send_eight_clocks
-	LIB		sd_send_byte
-	LIB		sd_get_byte
+	EXTERN		sd_write_sector_main
+	EXTERN		sd_deselect_card
+	EXTERN		sd_set_sector_addr_regs
+	EXTERN		sd_send_command_current_args
+	EXTERN		sd_send_eight_clocks
+	EXTERN		sd_send_byte
+	EXTERN		sd_get_byte
 
     INCLUDE "sdcard.def"
 

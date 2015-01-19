@@ -1,12 +1,12 @@
 
-	XLIB	respixel
+	PUBLIC	respixel
 
-	XREF	coords
+	EXTERN	coords
 
-	LIB	textpixl
+	EXTERN	textpixl
 
 ;
-;	$Id: respixl.asm,v 1.3 2014-05-02 14:18:40 stefano Exp $
+;	$Id: respixl.asm,v 1.4 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

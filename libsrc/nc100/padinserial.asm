@@ -1,5 +1,5 @@
 
-		XLIB	padinserial
+		PUBLIC	padinserial
 
 .padinserial
 		call 0xb85d

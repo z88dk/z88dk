@@ -1,8 +1,8 @@
 ; void __FASTCALL__ HeapCreate(void *heap)
 ; 12.2006 aralbrec
 
-XLIB HeapCreate
-LIB l_setmem
+PUBLIC HeapCreate
+EXTERN l_setmem
 
 ; Just zero heap pointer to indicate empty heap.
 ;

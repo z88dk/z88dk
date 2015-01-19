@@ -2,7 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIsPtInIval16
+PUBLIC RIsPtInIval16
 
 ; Determine if 16-bit point lies in a 16-bit interval.
 ; Interval bounds wrap across 0-65535 boundaries.

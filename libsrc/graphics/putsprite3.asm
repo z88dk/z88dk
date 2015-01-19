@@ -11,15 +11,15 @@
 ; ** putsprite3 is a thin version with a Self Modifying Code trick **
 ;
 ;
-; $Id: putsprite3.asm,v 1.1 2003-09-22 13:30:52 stefano Exp $
+; $Id: putsprite3.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-	XLIB    putsprite
+	PUBLIC    putsprite
 
-	LIB	plotpixel
-	LIB	respixel
-	LIB	xorpixel
+	EXTERN	plotpixel
+	EXTERN	respixel
+	EXTERN	xorpixel
 
 ; coords: h,l (vert-horz)
 ; sprite: (ix)

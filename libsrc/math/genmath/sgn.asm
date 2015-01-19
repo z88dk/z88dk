@@ -3,14 +3,14 @@
 ;
 ;       set z and Z flags per fa
 ;
-;	$Id: sgn.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
+;	$Id: sgn.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $:
 
 
-		XLIB	sgn
+		PUBLIC	sgn
 	
-		XDEF	setflgs
+		PUBLIC	setflgs
 
-		XREF	fa
+		EXTERN	fa
 
 .sgn    LD      A,(fa+5)
         OR      A

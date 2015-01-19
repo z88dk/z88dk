@@ -8,9 +8,9 @@
 ;	ZSock Lib function: user_pagein
 
 
-	XLIB	tcp_pagein
+	PUBLIC	tcp_pagein
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

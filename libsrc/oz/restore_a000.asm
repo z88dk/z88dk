@@ -9,10 +9,10 @@
 ;
 ;
 ; ------
-; $Id: restore_a000.asm,v 1.1 2003-10-21 17:15:19 stefano Exp $
+; $Id: restore_a000.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	restore_a000
+	PUBLIC	restore_a000
 	
 restore_a000:
         ld      a,7

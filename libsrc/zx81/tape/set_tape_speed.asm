@@ -5,14 +5,14 @@
 ; void __FASTCALL__ set_tape_speed(uchar speed)
 ;
 ;
-;	$Id: set_tape_speed.asm,v 1.1 2012-01-09 16:02:36 stefano Exp $
+;	$Id: set_tape_speed.asm,v 1.2 2015-01-19 01:33:27 pauloscustodio Exp $
 ;
 
 
-XLIB set_tape_speed
+PUBLIC set_tape_speed
 
-LIB musamy_save
-XREF SAVE_SPEED
+EXTERN musamy_save
+EXTERN SAVE_SPEED
 
 
 set_tape_speed:

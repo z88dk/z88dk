@@ -9,23 +9,23 @@
 ;       2/3 sector number
 ;       0/1 buffer
 ;
-;       $Id: if1_load_sector.asm,v 1.1 2008-06-29 08:25:48 aralbrec Exp $
+;       $Id: if1_load_sector.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-                XLIB    if1_load_sector
+                PUBLIC    if1_load_sector
 
-                LIB     if1_rommap
-                XREF    mdvbuffer
+                EXTERN     if1_rommap
+                EXTERN    mdvbuffer
 
-                LIB     if1_checkblock
-                XREF    if1_sect_read
+                EXTERN     if1_checkblock
+                EXTERN    if1_sect_read
 
-                XREF    MAKE_M
-                XREF    CLOSE_M
-                XREF    FETCH_H
-                XREF    MOTOR
-                XREF    RD_BUFF
+                EXTERN    MAKE_M
+                EXTERN    CLOSE_M
+                EXTERN    FETCH_H
+                EXTERN    MOTOR
+                EXTERN    RD_BUFF
                 
 
 ;; various flags

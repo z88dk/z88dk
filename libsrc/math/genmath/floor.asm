@@ -2,14 +2,14 @@
 ;       ceil(x)
 
 
-                XLIB    floor
+                PUBLIC    floor
 
 
-                LIB	int2
-                LIB	norma
+                EXTERN	int2
+                EXTERN	norma
 
 
-                XREF    fa
+                EXTERN    fa
 
 
 ;

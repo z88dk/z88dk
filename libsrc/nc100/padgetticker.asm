@@ -1,4 +1,4 @@
-		XLIB	padgetticker
+		PUBLIC	padgetticker
 
 .padgetticker
 		jp 0xb872

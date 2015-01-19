@@ -11,7 +11,7 @@
 ;       void ei(int)
 
 
-               XLIB    ei
+               PUBLIC    ei
 
                 INCLUDE "interrpt.def"
 

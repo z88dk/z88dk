@@ -5,10 +5,10 @@
 ;
 ;	Write data to a CRTC register
 ;
-;	$Id: set_crtc_reg.asm,v 1.1 2013-11-12 13:50:16 stefano Exp $
+;	$Id: set_crtc_reg.asm,v 1.2 2015-01-19 01:33:25 pauloscustodio Exp $
 ;
 
-	XLIB	set_crtc_reg
+	PUBLIC	set_crtc_reg
 	
 
 set_crtc_reg:

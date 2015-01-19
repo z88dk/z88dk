@@ -12,10 +12,10 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    asin
+                PUBLIC    asin
 
-                XREF    fsetup
-                XREF    stkequ2
+                EXTERN    fsetup
+                EXTERN    stkequ2
 
 .asin
         call    fsetup

@@ -7,17 +7,17 @@
 ;
 ;	Stefano Bodrato - 21/4/2000
 ;
-;	$Id: f_ansi_putc.asm,v 1.3 2013-07-22 09:37:39 stefano Exp $
+;	$Id: f_ansi_putc.asm,v 1.4 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_putc
+	PUBLIC	ansi_putc
 
-	XREF	ansi_COLUMN
+	EXTERN	ansi_COLUMN
 
-	XREF	text_cols
+	EXTERN	text_cols
 
-	LIB	ansi_CHAR
-	LIB	ansi_LF
+	EXTERN	ansi_CHAR
+	EXTERN	ansi_LF
 
 
 .ansi_putc

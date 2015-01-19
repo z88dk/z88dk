@@ -1,8 +1,8 @@
 ; uchar __FASTCALL__ *zx_py2aaddr(uchar ycoord)
 ; aralbrec 06.2007
 
-XLIB zx_py2aaddr
-XREF HRG_LineStart
+PUBLIC zx_py2aaddr
+EXTERN HRG_LineStart
 
 .zx_py2aaddr
 

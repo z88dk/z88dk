@@ -1,10 +1,10 @@
 
-	XLIB	cleargraphics
+	PUBLIC	cleargraphics
 
-	XREF	base_graphics
+	EXTERN	base_graphics
 
 ;
-;	$Id: clsgraph.asm,v 1.4 2008-03-31 17:16:20 stefano Exp $
+;	$Id: clsgraph.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

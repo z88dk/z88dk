@@ -1,10 +1,10 @@
 ; void __FASTCALL__ *adt_ListPopFront(struct adt_List *list)
 ; 11.2006 aralbrec
 
-XLIB adt_ListPopFront
+PUBLIC adt_ListPopFront
 
-LIB l_setmem
-XREF _u_free
+EXTERN l_setmem
+EXTERN _u_free
 
 .adt_ListPopFront
 

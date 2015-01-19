@@ -3,15 +3,15 @@
 ;
 ;	getkey() Wait for keypress
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2003-05-20 16:01:56 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 		;XREF	KeyBufGetPos
 		;XREF	KeyBufPutPos
 		;XREF	EnableKeyboard
 
-		XLIB	fgetc_cons
-		LIB	getk
+		PUBLIC	fgetc_cons
+		EXTERN	getk
 
 .fgetc_cons
 		call	getk

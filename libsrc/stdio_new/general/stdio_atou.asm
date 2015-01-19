@@ -1,7 +1,7 @@
 ; stdio_atou
 ; 05.2008 aralbrec
 
-XLIB stdio_atou
+PUBLIC stdio_atou
 
 ; ascii buffer to unsigned integer conversion
 ; whitespace is not skipped

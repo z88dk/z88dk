@@ -5,13 +5,13 @@
 ;
 ;      int __CALLEE__ tape_save_block_callee(void *addr, size_t len, unsigned char type)
 
-XLIB tape_save_block_callee
-XDEF ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+PUBLIC tape_save_block_callee
+PUBLIC ASMDISP_TAPE_SAVE_BLOCK_CALLEE
 
 IF FORts2068
-XREF call_extrom
+EXTERN call_extrom
 ELSE
-XREF call_rom3
+EXTERN call_rom3
 ENDIF
 
 .tape_save_block_callee

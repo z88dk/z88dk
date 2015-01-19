@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undrawr.asm,v 1.4 2014-04-30 18:34:18 stefano Exp $
+;	$Id: undrawr.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
@@ -14,13 +14,13 @@
 
 
 
-                XLIB    undrawr
-                LIB     swapgfxbk
-                XREF	swapgfxbk1
+                PUBLIC    undrawr
+                EXTERN     swapgfxbk
+                EXTERN	swapgfxbk1
 
 
-                LIB     Line_r
-                LIB     respixel
+                EXTERN     Line_r
+                EXTERN     respixel
 
 
 

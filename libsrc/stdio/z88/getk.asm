@@ -4,13 +4,13 @@
 ;11/3/99 djm Saved two bytes by removing useless ld h,0
 ;
 ;
-;	$Id: getk.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
+;	$Id: getk.asm,v 1.4 2015-01-19 01:33:22 pauloscustodio Exp $
 ;
 
                 INCLUDE "stdio.def"
 
-                XLIB    getk    ;Read keys
-                LIB     getcmd
+                PUBLIC    getk    ;Read keys
+                EXTERN     getcmd
 
 
 

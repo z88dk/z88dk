@@ -1,10 +1,10 @@
 ; void sp1_InitCharStruct(struct sp1_cs *cs, void *drawf, uchar type, void *graphic, uchar plane)
 ; CALLER linkage for function pointers
 
-XLIB sp1_InitCharStruct
+PUBLIC sp1_InitCharStruct
 
-LIB sp1_InitCharStruct_callee
-XREF ASMDISP_SP1_INITCHARSTRUCT_CALLEE
+EXTERN sp1_InitCharStruct_callee
+EXTERN ASMDISP_SP1_INITCHARSTRUCT_CALLEE
 
 .sp1_InitCharStruct
 

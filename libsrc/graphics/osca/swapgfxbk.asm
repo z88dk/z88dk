@@ -13,14 +13,14 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.2 2011-09-26 15:43:29 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ;    INCLUDE "flos.def"
     INCLUDE "osca.def"
 
-		XLIB    swapgfxbk
-		XDEF	swapgfxbk1
+		PUBLIC    swapgfxbk
+		PUBLIC	swapgfxbk1
 
 
 

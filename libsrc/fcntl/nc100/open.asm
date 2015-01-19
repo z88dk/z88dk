@@ -1,7 +1,7 @@
 ;
 ;	open a file on an Amstrad NC100
 ;
-		XLIB open
+		PUBLIC open
 
 .open
 	pop ix			; return address

@@ -2,12 +2,12 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: vdcget.asm,v 1.1 2008-06-23 17:34:35 stefano Exp $
+;$Id: vdcget.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
 ;get vdc reg, d = reg, e = val
 
-	XLIB	vdcget
+	PUBLIC	vdcget
 
 vdcget:
 

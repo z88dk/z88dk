@@ -5,12 +5,12 @@
 ;	int osca_version();
 ;
 ;
-;	$Id: osca_version.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: osca_version.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  osca_version
+	PUBLIC  osca_version
 	
 osca_version:
 	call	kjt_get_version

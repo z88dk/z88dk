@@ -6,19 +6,19 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawr.asm,v 1.5 2014-04-30 18:34:18 stefano Exp $
+;	$Id: drawr.asm,v 1.6 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
 ;Usage: drawr(struct *pixels)
 
 
-                XLIB    drawr
-                LIB     swapgfxbk
-                XREF	swapgfxbk1
+                PUBLIC    drawr
+                EXTERN     swapgfxbk
+                EXTERN	swapgfxbk1
 
-                LIB     Line_r
-                LIB     plotpixel
+                EXTERN     Line_r
+                EXTERN     plotpixel
 
 
 

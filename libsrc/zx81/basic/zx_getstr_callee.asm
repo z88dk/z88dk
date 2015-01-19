@@ -7,12 +7,12 @@
 ;	int __CALLEE__ zx_getstr_callee(char variable, char *value); 
 ;
 ;
-;	$Id: zx_getstr_callee.asm,v 1.2 2014-09-28 18:27:00 pauloscustodio Exp $
+;	$Id: zx_getstr_callee.asm,v 1.3 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 
-XLIB	zx_getstr_callee
-XDEF	ASMDISP_ZX_GETSTR_CALLEE
-LIB	zx81toasc
+PUBLIC	zx_getstr_callee
+PUBLIC	ASMDISP_ZX_GETSTR_CALLEE
+EXTERN	zx81toasc
 
 zx_getstr_callee:
 

@@ -3,7 +3,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: cs_low.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: cs_low.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;------------------------------------------------------------------------------------
 ; CHIP_SELECT LOW subroutine. Destroys no registers. The card to be selected should
@@ -12,8 +12,8 @@
 ; used in: 'MMC_SEND_COMMAND', 'MMC_INIT', 'MMC_SEND_BLOCKSIZE'
 ;------------------------------------------------------------------------------------
 
-	XLIB	cs_low
-	XREF	card_select
+	PUBLIC	cs_low
+	EXTERN	card_select
 	
 	INCLUDE "zxmmc.def"
 

@@ -1,8 +1,8 @@
 ; void in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord)
 ; CALLER linkage for function pointers
 
-XLIB in_MouseKemp
-LIB INMouseKemp
+PUBLIC in_MouseKemp
+EXTERN INMouseKemp
 
 .in_MouseKemp
 

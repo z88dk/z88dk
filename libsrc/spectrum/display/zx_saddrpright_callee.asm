@@ -1,8 +1,8 @@
 ; uchar __CALLEE__ *zx_saddrpright_callee(void *pixeladdr, uchar *mask)
 ; aralbrec 06.2007
 
-XLIB zx_saddrpright_callee
-XDEF ASMDISP_ZX_SADDRPRIGHT_CALLEE
+PUBLIC zx_saddrpright_callee
+PUBLIC ASMDISP_ZX_SADDRPRIGHT_CALLEE
 
 .zx_saddrpright_callee
 

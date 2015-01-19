@@ -10,12 +10,12 @@
 ; IX:IY = Offset in bytes from start of file.
 ;
 ;
-;	$Id: set_file_pointer.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
+;	$Id: set_file_pointer.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  set_file_pointer
+	PUBLIC  set_file_pointer
 
 set_file_pointer:
 

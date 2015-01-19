@@ -6,12 +6,12 @@
 ;	GTTRIG
 ;
 ;
-;	$Id: svi_gttrig.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: svi_gttrig.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	GTTRIG
+	PUBLIC	GTTRIG
 	
-	LIB	svi_slstick
+	EXTERN	svi_slstick
 
 
         INCLUDE "svi.def"

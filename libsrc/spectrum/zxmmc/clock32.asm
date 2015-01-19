@@ -3,13 +3,13 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: clock32.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: clock32.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;------------------------------------------------------------------------------------
 ; 32 clock cycles - internal use timing loop
 ;------------------------------------------------------------------------------------
 
-	XLIB	clock32
+	PUBLIC	clock32
 
 	INCLUDE "zxmmc.def"
 	

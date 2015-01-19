@@ -9,16 +9,16 @@
 ;	Since some platform (expecially the TI83) has very little stack space,
 ;	we undersize it; this will cause a crash if a big area is filled.
 ;
-;	$Id: dfill.asm,v 1.2 2013-03-08 13:40:20 stefano Exp $
+;	$Id: dfill.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 	INCLUDE	"graphics/grafix.inc"
 
-        XLIB    do_fill
+        PUBLIC    do_fill
 
-		LIB		pixeladdress
-		XREF	pixelbyte
-		XREF	pix_return
+		EXTERN		pixeladdress
+		EXTERN	pixelbyte
+		EXTERN	pix_return
 
 .spsave	defw 0
 

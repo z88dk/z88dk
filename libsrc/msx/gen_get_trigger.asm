@@ -6,11 +6,11 @@
 ;
 ;	get state of joystick button (trigger) number \a id, true = pressed
 ;
-;	$Id: gen_get_trigger.asm,v 1.1 2010-06-30 13:21:38 stefano Exp $
+;	$Id: gen_get_trigger.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
-	XLIB	msx_get_trigger
+	PUBLIC	msx_get_trigger
 
 
 msx_get_trigger:

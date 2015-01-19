@@ -1,12 +1,12 @@
 ; void __CALLEE__ in_MouseKempSetPos_callee(uint xcoord, uint ycoord)
 ; 09.2005 aralbrec
 
-XLIB in_MouseKempSetPos_callee
-XDEF ASMDISP_IN_MOUSEKEMPSETPOS_CALLEE
-XDEF CDISP_IN_MOUSEKEMPSETPOS_CALLEE
+PUBLIC in_MouseKempSetPos_callee
+PUBLIC ASMDISP_IN_MOUSEKEMPSETPOS_CALLEE
+PUBLIC CDISP_IN_MOUSEKEMPSETPOS_CALLEE
 
-LIB INMouseKemp
-XREF _in_KempcoordX, _in_KempcoordY
+EXTERN INMouseKemp
+EXTERN _in_KempcoordX, _in_KempcoordY
 
 .in_MouseKempSetPos_callee
 

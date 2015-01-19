@@ -6,7 +6,7 @@
 ;
 ;	Optimization...check for equality
 
-                XLIB    l_pint_eq
+                PUBLIC    l_pint_eq
 
 ; store int from HL into (DE)
 .l_pint_eq   

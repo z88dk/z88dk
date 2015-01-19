@@ -6,15 +6,15 @@
 ;	set HL to dest address for data
 ;	set B to number of bytes required  
 ;
-;	$Id: sd_read_bytes.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_read_bytes.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	sd_read_bytes
-	XDEF	sd_read_bytes_to_sector_buffer
+	PUBLIC	sd_read_bytes
+	PUBLIC	sd_read_bytes_to_sector_buffer
 	
-	LIB		sd_get_byte
+	EXTERN		sd_get_byte
 	
-	XREF	sector_buffer_loc
+	EXTERN	sector_buffer_loc
 
 	
 

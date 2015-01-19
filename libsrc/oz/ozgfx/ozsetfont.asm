@@ -11,14 +11,14 @@
 ;
 ;
 ; ------
-; $Id: ozsetfont.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozsetfont.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozsetfont
+	PUBLIC	ozsetfont
 	;XDEF	ozfont
-	XDEF	ozfontniceheight
+	PUBLIC	ozfontniceheight
 	
-	XREF	ScrCharSet
+	EXTERN	ScrCharSet
 
 ozsetfont:
 ;ozfont:

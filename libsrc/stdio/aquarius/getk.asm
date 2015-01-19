@@ -6,10 +6,10 @@
 ;	Dec 200i - Stefano Bodrato
 ;
 ;
-;	$Id: getk.asm,v 1.1 2001-12-24 13:23:08 stefano Exp $
+;	$Id: getk.asm,v 1.2 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	getk
+	PUBLIC	getk
 
 .getk
 	call	$1e80

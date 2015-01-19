@@ -1,10 +1,10 @@
 
-	XLIB	pixeladdress
+	PUBLIC	pixeladdress
 
-	XREF	base_graphics
+	EXTERN	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.3 2001-04-18 13:21:38 stefano Exp $
+;	$Id: pixladdr.asm,v 1.4 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

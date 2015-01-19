@@ -9,10 +9,10 @@
 ;	Frode Tennebø - 29/12/2002
 ;
 
-	XLIB	ansi_restore
+	PUBLIC	ansi_restore
 	
-	XREF    FOREGR
-	XREF    BACKGR
+	EXTERN    FOREGR
+	EXTERN    BACKGR
 
 .ansi_restore
         ld      a,16            ; INK

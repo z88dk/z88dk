@@ -1,6 +1,6 @@
 ; 01.2007 aralbrec
 
-XLIB l_setmem
+PUBLIC l_setmem
 
 ; Many places in the library have functions
 ; that initialize structures to 0.  This

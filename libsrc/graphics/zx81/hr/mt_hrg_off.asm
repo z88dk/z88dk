@@ -5,14 +5,14 @@
 ;
 ;   Set TEXT mode
 ;
-;	$Id: mt_hrg_off.asm,v 1.4 2014-10-27 20:38:15 stefano Exp $
+;	$Id: mt_hrg_off.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB	mt_hrg_off
+	PUBLIC	mt_hrg_off
 
-	XREF	MTCH_P1
-	XREF	MTCH_P2
-	XREF	MTCH_P3
+	EXTERN	MTCH_P1
+	EXTERN	MTCH_P2
+	EXTERN	MTCH_P3
 
 .mt_hrg_off
 

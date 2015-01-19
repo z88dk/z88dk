@@ -4,12 +4,12 @@
 ;
 ;	Get name of current directory
 ;
-;	$Id: get_dir_name.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
+;	$Id: get_dir_name.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  get_dir_name
+	PUBLIC  get_dir_name
 	
 get_dir_name:
 	jp	kjt_get_dir_name

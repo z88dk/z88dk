@@ -6,10 +6,10 @@
 ;	divide by 256
 ;
 ; ------
-; $Id: div256.asm,v 1.1 2009-04-10 12:47:42 stefano Exp $
+; $Id: div256.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
 ;
 
-	XLIB	div256
+	PUBLIC	div256
 
 div256:
         pop     bc

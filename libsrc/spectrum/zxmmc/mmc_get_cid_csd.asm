@@ -4,7 +4,7 @@
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;	
 ;
-;	$Id: mmc_get_cid_csd.asm,v 1.1 2010-03-12 15:21:14 stefano Exp $ 
+;	$Id: mmc_get_cid_csd.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
 ;
 ;--------------------------------------------------------------------------------------------------------
 ; READ MMC CID subroutine. Data is stored at address (HL), command in A (MMC_READ_CID or MMC_READ_CSD).
@@ -17,11 +17,11 @@
 ;--------------------------------------------------------------------------------------------------------
 ;
 
-	XLIB	mmc_get_cid_csd
+	PUBLIC	mmc_get_cid_csd
 	
-	LIB		mmc_waitdata_token
-	LIB		mmc_send_command
-	LIB		cs_high
+	EXTERN		mmc_waitdata_token
+	EXTERN		mmc_send_command
+	EXTERN		cs_high
 
 	
 	INCLUDE "zxmmc.def"

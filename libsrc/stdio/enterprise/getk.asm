@@ -6,11 +6,11 @@
 ;	Stefano Bodrato - 2011
 ;
 ;
-;	$Id: getk.asm,v 1.1 2011-02-17 20:44:23 stefano Exp $
+;	$Id: getk.asm,v 1.2 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	getk
-	LIB	fgetc_cons
+	PUBLIC	getk
+	EXTERN	fgetc_cons
 
 
 .getk

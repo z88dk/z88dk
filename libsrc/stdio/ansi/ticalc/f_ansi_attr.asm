@@ -9,12 +9,12 @@
 ;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.3 2002-04-17 21:30:26 dom Exp $
+;	$Id: f_ansi_attr.asm,v 1.4 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_attr
+	PUBLIC	ansi_attr
 
-	XREF	INVRS
+	EXTERN	INVRS
 
 .ansi_attr
 ;        and     a

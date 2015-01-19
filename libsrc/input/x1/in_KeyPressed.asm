@@ -5,8 +5,8 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
-        XLIB in_KeyPressed
-        XREF _x1_keyboard_io
+        PUBLIC in_KeyPressed
+        EXTERN _x1_keyboard_io
 
 ;       Determines if a key is pressed using the key data
 ;       returned by in_LookupKey (or similar).

@@ -6,8 +6,8 @@
 ;      int __CALLEE__ tape_load_block_callee(void *addr, size_t len, unsigned char type)
 ;
 
-XLIB tape_load_block_callee
-XDEF ASMDISP_TAPE_LOAD_BLOCK_CALLEE
+PUBLIC tape_load_block_callee
+PUBLIC ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 
 .tape_load_block_callee
 

@@ -2,8 +2,8 @@
 
 ; void __FASTCALL__ zx_colour(uchar colour)
 
-XLIB zx_colour
-XREF HRG_LineStart
+PUBLIC zx_colour
+EXTERN HRG_LineStart
 
 .zx_colour
 		ld 	a,l

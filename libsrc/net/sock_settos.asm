@@ -8,9 +8,9 @@
 ;	ZSock Lib function: sock_settos
 
 
-	XLIB	sock_settos
+	PUBLIC	sock_settos
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

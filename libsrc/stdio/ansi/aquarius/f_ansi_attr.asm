@@ -10,13 +10,13 @@
 ;	Stefano Bodrato - Dec. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.1 2001-12-27 09:35:57 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_attr
+	PUBLIC	ansi_attr
 
-	XDEF	aquarius_attr
-	XDEF	aquarius_inverse
+	PUBLIC	aquarius_attr
+	PUBLIC	aquarius_inverse
 	
 .aquarius_inverse	defb 0
 .aquarius_attr		defb $70	; White on Black

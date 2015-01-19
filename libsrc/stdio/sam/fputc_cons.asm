@@ -8,10 +8,10 @@
 ;
 ;	Frode Tennebø - 29/12/2002
 ;
-;	$Id: fputc_cons.asm,v 1.3 2003-02-04 09:10:25 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.4 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
-          XLIB  fputc_cons
+          PUBLIC  fputc_cons
 
 ;
 ; Entry:        char to print on stack

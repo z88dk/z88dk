@@ -6,11 +6,11 @@
 ;
 ;	Stefano Bodrato - 21/4/2000
 ;
-;	$Id: fputc_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-          XLIB  fputc_cons
-	  LIB	f_ansi
+          PUBLIC  fputc_cons
+	  EXTERN	f_ansi
 
 ;
 ; Entry:        hl = points to char

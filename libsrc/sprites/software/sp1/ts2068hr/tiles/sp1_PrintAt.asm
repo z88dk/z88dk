@@ -1,10 +1,10 @@
 ; void sp1_PrintAt(uchar row, uchar col, uint tile)
 ; CALLER linkage for function pointers
 
-XLIB sp1_PrintAt
+PUBLIC sp1_PrintAt
 
-LIB sp1_PrintAt_callee
-XREF ASMDISP_SP1_PRINTAT_CALLEE
+EXTERN sp1_PrintAt_callee
+EXTERN ASMDISP_SP1_PRINTAT_CALLEE
 
 .sp1_PrintAt
 

@@ -4,15 +4,15 @@
 ;
 ;       12/12/02 - Stefano Bodrato
 ;
-;       $Id: ftoe.asm,v 1.1 2008-07-27 21:44:58 aralbrec Exp $
+;       $Id: ftoe.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 ;
 
 ;	Just a dirty placeholder..   :oP
 
 
-		XLIB	ftoe
-		LIB	ftoa
+		PUBLIC	ftoe
+		EXTERN	ftoa
 		
 .ftoe
 		jp	ftoa

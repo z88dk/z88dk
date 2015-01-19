@@ -1,8 +1,8 @@
-	XLIB	DrawOneLine
+	PUBLIC	DrawOneLine
 	
 	INCLUDE "sms/sms.hdr"
 	
-	LIB	VRAMToHL
+	EXTERN	VRAMToHL
 
 ;==============================================================
 ; DrawOneLine

@@ -1,4 +1,4 @@
-		XLIB	mcprintchar
+		PUBLIC	mcprintchar
 ; Fastcall
 .mcprintchar	ld a, l
 		call 0xb851

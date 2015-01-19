@@ -1,7 +1,7 @@
 ; uint in_JoySinclair2(void)
 ; 2002 aralbrec
 
-XLIB in_JoySinclair2
+PUBLIC in_JoySinclair2
 
 ; exit : HL = F000RLDU active high
 ; uses : AF,DE,HL

@@ -6,15 +6,15 @@
 ;	void opus_testchannel (struct X_CHAN channel);
 ;	test channel parameters, return 0 if no errors
 ;	
-;	$Id: opus_testchannel.asm,v 1.3 2014-11-25 17:09:24 stefano Exp $
+;	$Id: opus_testchannel.asm,v 1.4 2015-01-19 01:33:11 pauloscustodio Exp $
 ;
 
 
-		XLIB 	opus_testchannel
+		PUBLIC 	opus_testchannel
 
-		LIB	opus_rommap
+		EXTERN	opus_rommap
 
-		XREF	P_TESTCH
+		EXTERN	P_TESTCH
 		
 
 opus_testchannel:

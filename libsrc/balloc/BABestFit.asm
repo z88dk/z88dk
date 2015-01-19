@@ -1,7 +1,7 @@
 ; 04.2004 aralbrec
 
-XLIB BABestFit
-XREF _ba_qtbl
+PUBLIC BABestFit
+EXTERN _ba_qtbl
 
 ; If the queues are arranged such that queue i contains memory blocks
 ; that are smaller than in queue j, with i<j, then this routine attempts

@@ -1,10 +1,10 @@
 ; void __CALLEE__ *adt_ListSearch_callee(struct adt_List *list, void *match, void *item1)
 ; 02.2003, 08.2005 aralbrec
 
-XLIB adt_ListSearch_callee
-XDEF ASMDISP_ADT_LISTSEARCH_CALLEE
+PUBLIC adt_ListSearch_callee
+PUBLIC ASMDISP_ADT_LISTSEARCH_CALLEE
 
-LIB ADTListSearch, l_jpiy
+EXTERN ADTListSearch, l_jpiy
 
 .adt_ListSearch_callee
 

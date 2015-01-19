@@ -9,13 +9,13 @@
 ;	... no timestamp, just opens a file creating it if necessary and closes it immediately.
 ;	A temp buffer in the BASIC area is created and destroyed, so don't locate your code too low.
 ;	
-;	$Id: if1_touch_file.asm,v 1.1 2008-06-29 08:25:48 aralbrec Exp $
+;	$Id: if1_touch_file.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	if1_touch_file
+		PUBLIC 	if1_touch_file
 
-		LIB	if1_setname
+		EXTERN	if1_setname
 
 filename:	defs	10
 

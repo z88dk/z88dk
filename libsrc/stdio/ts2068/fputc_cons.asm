@@ -12,13 +12,13 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.7 2012-05-04 09:06:57 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.8 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
 
-          XLIB  fputc_cons
-          XREF  call_rom3
-          LIB	zx_rowtab
+          PUBLIC  fputc_cons
+          EXTERN  call_rom3
+          EXTERN	zx_rowtab
 
 ;
 ; Entry:        a= char to print

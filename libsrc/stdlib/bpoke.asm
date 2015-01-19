@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB bpoke
-LIB bpoke_callee
-XREF ASMDISP_BPOKE_CALLEE
+PUBLIC bpoke
+EXTERN bpoke_callee
+EXTERN ASMDISP_BPOKE_CALLEE
 
 .bpoke
 

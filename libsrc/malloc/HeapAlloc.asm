@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB HeapAlloc
+PUBLIC HeapAlloc
 
-LIB HeapAlloc_callee
-XREF ASMDISP_HEAPALLOC_CALLEE
+EXTERN HeapAlloc_callee
+EXTERN ASMDISP_HEAPALLOC_CALLEE
 
 .HeapAlloc
 

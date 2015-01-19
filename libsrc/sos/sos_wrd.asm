@@ -1,11 +1,11 @@
 ;	S-OS specific routines
 ;	by Stefano Bodrato, 2013
 ;
-;       $Id: sos_wrd.asm,v 1.1 2013-12-05 09:34:01 stefano Exp $
+;       $Id: sos_wrd.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-XLIB sos_wrd
+PUBLIC sos_wrd
 
 sos_wrd:
 	call $1fac

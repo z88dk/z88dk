@@ -1,8 +1,8 @@
 ; uchar __CALLEE__ *zx_pxy2saddr_callee(uchar xcoord, uchar ycoord, uchar *mask)
 ; aralbrec 06.2007
 
-XLIB zx_pxy2saddr_callee
-XDEF ASMDISP_ZX_PXY2SADDR_CALLEE
+PUBLIC zx_pxy2saddr_callee
+PUBLIC ASMDISP_ZX_PXY2SADDR_CALLEE
 
 .zx_pxy2saddr_callee
 

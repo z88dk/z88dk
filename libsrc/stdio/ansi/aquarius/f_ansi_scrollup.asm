@@ -7,11 +7,11 @@
 ;
 ;	Stefano Bodrato - Dec. 2001
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.1 2001-12-27 09:35:57 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_SCROLLUP
-	XREF	aquarius_attr
+	PUBLIC	ansi_SCROLLUP
+	EXTERN	aquarius_attr
 
 
 .ansi_SCROLLUP

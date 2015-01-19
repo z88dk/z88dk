@@ -1,10 +1,10 @@
 ; void *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift)
 ; CALLER linkage for function pointers
 
-XLIB sp1_PreShiftSpr
+PUBLIC sp1_PreShiftSpr
 
-LIB sp1_PreShiftSpr_callee
-XREF ASMDISP_SP1_PRESHIFTSPR_CALLEE
+EXTERN sp1_PreShiftSpr_callee
+EXTERN ASMDISP_SP1_PRESHIFTSPR_CALLEE
 
 .sp1_PreShiftSpr
 

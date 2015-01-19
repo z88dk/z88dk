@@ -9,7 +9,7 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.5 2014-01-20 09:15:32 stefano Exp $
+;	$Id: zx_locatenum.asm,v 1.6 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 ;	vars format:
 ;
@@ -18,8 +18,8 @@
 ;	for single char name:	a|$80 v vt vs (a lower case)
 ;
 
-	XLIB	zx_locatenum
-	XREF	call_rom3
+	PUBLIC	zx_locatenum
+	EXTERN	call_rom3
 	
 zx_locatenum:
 

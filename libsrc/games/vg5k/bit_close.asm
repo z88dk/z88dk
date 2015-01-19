@@ -1,4 +1,4 @@
-; $Id: bit_close.asm,v 1.1 2014-07-16 09:59:56 stefano Exp $
+; $Id: bit_close.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
 ;
 ; VG-5000 1 bit sound functions
 ;
@@ -7,7 +7,7 @@
 ; Stefano Bodrato - 2014
 ;
 
-    XLIB     bit_close
+    PUBLIC     bit_close
 
 .bit_close
           ret

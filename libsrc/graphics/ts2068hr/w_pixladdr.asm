@@ -1,11 +1,11 @@
 ; libsrc/graphics/ts2068hr/w_pixladdr.asm
 ; posted by rdk77, 11/11/2010
 
-        XLIB    w_pixeladdress
+        PUBLIC    w_pixeladdress
 
         INCLUDE "graphics/grafix.inc"
 ;
-;       $Id: w_pixladdr.asm,v 1.3 2010-12-24 11:59:35 stefano Exp $
+;       $Id: w_pixladdr.asm,v 1.4 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 ; ******************************************************************
 ; Get absolute  pixel address in map of virtual (x,y) coordinate.

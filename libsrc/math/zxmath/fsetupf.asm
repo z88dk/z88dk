@@ -3,7 +3,7 @@
 ;
 ;       30/12/02 - Stefano Bodrato
 ;
-;       $Id: fsetupf.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: fsetupf.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
@@ -20,8 +20,8 @@ ELSE
 ENDIF
 
 
-                XLIB    fsetupf
-		LIB	fsetup1
+                PUBLIC    fsetupf
+		EXTERN	fsetup1
  
 .fsetupf
 	

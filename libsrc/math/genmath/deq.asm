@@ -3,13 +3,13 @@
 ;
 ;	TOS >= FA
 ;
-;       $Id: deq.asm,v 1.1 2008-07-27 21:44:57 aralbrec Exp $:
+;       $Id: deq.asm,v 1.2 2015-01-19 01:32:56 pauloscustodio Exp $:
 
-		XLIB	deq
+		PUBLIC	deq
 
-		LIB	dcompar
-		LIB	f_yes
-		LIB	f_no
+		EXTERN	dcompar
+		EXTERN	f_yes
+		EXTERN	f_no
 
 .deq	call dcompar
 	jp	z,f_yes

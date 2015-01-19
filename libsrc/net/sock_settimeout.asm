@@ -8,9 +8,9 @@
 ;	ZSock Lib function: sock_settimeout
 
 
-	XLIB	sock_settimeout
+	PUBLIC	sock_settimeout
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

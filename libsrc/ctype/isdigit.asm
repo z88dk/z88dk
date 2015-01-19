@@ -5,11 +5,11 @@
 ;
 ;	17/2/99 djm rewritten to be shorter
 ;
-;	$Id: isdigit.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
+;	$Id: isdigit.asm,v 1.5 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-XLIB isdigit
-LIB asm_isdigit
+PUBLIC isdigit
+EXTERN asm_isdigit
 
 ; FASTCALL
 

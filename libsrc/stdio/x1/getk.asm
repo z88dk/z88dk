@@ -6,8 +6,8 @@
 ;       Karl Von Dyson (for X1s.org) - 24/10/2013
 ;
 
-        XLIB getk
-        XREF _x1_keyboard_io
+        PUBLIC getk
+        EXTERN _x1_keyboard_io
 
 getk:
         ld hl, _x1_keyboard_io

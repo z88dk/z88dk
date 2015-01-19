@@ -5,11 +5,11 @@
 ;	
 ;	Counts the number of free sectors in the specified drive.
 ;	
-;	$Id: if1_free_sectors.asm,v 1.1 2010-01-22 16:00:38 stefano Exp $
+;	$Id: if1_free_sectors.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	if1_free_sectors
+		PUBLIC 	if1_free_sectors
 
 filename:	defm	"!h7$"		; foo file name: it will never be written !
 

@@ -1,7 +1,7 @@
 ; uint __FASTCALL__ zx_aaddr2cy(void *attraddr)
 ; aralbrec 06.2007
 
-XLIB zx_aaddr2cy
+PUBLIC zx_aaddr2cy
 
 .zx_aaddr2cy
 

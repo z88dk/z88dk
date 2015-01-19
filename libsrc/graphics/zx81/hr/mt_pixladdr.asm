@@ -3,10 +3,10 @@
 ; by Stefano Bodrato, Feb. 2010
 ;--------------------------------------------------------------
 ;
-;	$Id: mt_pixladdr.asm,v 1.2 2010-06-24 09:05:51 stefano Exp $
+;	$Id: mt_pixladdr.asm,v 1.3 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB	pixeladdress
+	PUBLIC	pixeladdress
 
 	;;XREF	base_graphics
 

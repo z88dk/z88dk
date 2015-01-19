@@ -3,8 +3,8 @@
 ;       Long library functions
 ;
 
-                XLIB    l_long_ugt
-                LIB     l_long_ucmp
+                PUBLIC    l_long_ugt
+                EXTERN     l_long_ucmp
 
 
 

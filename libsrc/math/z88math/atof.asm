@@ -12,9 +12,9 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    atof
+                PUBLIC    atof
 
-                LIB	stkequ2
+                EXTERN	stkequ2
 
 .atof
 	pop	de

@@ -5,10 +5,10 @@
 ;	int ulaplus_set(attribute,rgbvalue);
 ;
 ;
-;	$Id: ulaplus_set.asm,v 1.1 2010-04-02 09:05:06 stefano Exp $
+;	$Id: ulaplus_set.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
 ;
 
-	XLIB	ulaplus_set
+	PUBLIC	ulaplus_set
 
 ulaplus_set:
 	pop	bc

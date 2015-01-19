@@ -6,11 +6,11 @@
 ;
 ;	Select the sdcard
 ;
-;	$Id: sd_select_card.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_select_card.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-	XLIB	sd_select_card	
+	PUBLIC	sd_select_card	
 	
 	
     INCLUDE "osca.def"

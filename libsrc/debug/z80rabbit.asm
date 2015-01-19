@@ -6,10 +6,10 @@
 ; *	TRUE if we're running on a rabbit.
 ; *	extern int  __LIB__ z80rabbit(void);
 ; *
-; *	$Id: z80rabbit.asm,v 1.1 2009-07-09 17:21:18 stefano Exp $
+; *	$Id: z80rabbit.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ; *
 
-	XLIB	z80rabbit
+	PUBLIC	z80rabbit
 
 z80rabbit:
 	ld	hl,0

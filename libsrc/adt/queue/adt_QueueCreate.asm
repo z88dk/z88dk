@@ -1,10 +1,10 @@
 ; struct adt_Queue *adt_QueueCreate(void)
 ; 09.2005 aralbrec
 
-XLIB adt_QueueCreate
+PUBLIC adt_QueueCreate
 
-LIB l_setmem
-XREF _u_malloc
+EXTERN l_setmem
+EXTERN _u_malloc
 
 ; exit : HL = struct adt_Queue * and carry set
 ;           = 0 and nc if fail

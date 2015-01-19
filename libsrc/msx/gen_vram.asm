@@ -5,10 +5,10 @@
 ;
 ;	Detects the VRAM size (in KB)
 ;
-;	$Id: gen_vram.asm,v 1.1 2010-06-30 13:21:38 stefano Exp $
+;	$Id: gen_vram.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_vram
+	PUBLIC	msx_vram
 
 	INCLUDE	"msx/vdp.inc"
 

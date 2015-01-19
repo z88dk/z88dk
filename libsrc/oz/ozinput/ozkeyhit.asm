@@ -8,14 +8,14 @@
 ;	Keyboard routines
 ;
 ; ------
-; $Id: ozkeyhit.asm,v 1.2 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozkeyhit.asm,v 1.3 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
 
-	XLIB	ozkeyhit2	; renamed (will be redefined if used)
+	PUBLIC	ozkeyhit2	; renamed (will be redefined if used)
 	
-	XREF	KeyBufGetPos
-	XREF	EnableKeyboard
+	EXTERN	KeyBufGetPos
+	EXTERN	EnableKeyboard
 
 
 ozkeyhit2:

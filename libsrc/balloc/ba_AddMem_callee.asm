@@ -1,8 +1,8 @@
 ; void __CALLEE__ *ba_AddMem_callee(uchar q, uchar numblocks, uint size, void *addr)
 ; 05.2005 aralbrec
 
-XLIB ba_AddMem_callee
-LIB BAAddMem
+PUBLIC ba_AddMem_callee
+EXTERN BAAddMem
 
 .ba_AddMem_callee
 

@@ -10,14 +10,14 @@
 ;       original code by Patrick Davidson (TI 85)
 ;
 ; 
-;	$Id: putsprite_smc.asm,v 1.1 2007-01-04 17:41:34 stefano Exp $
+;	$Id: putsprite_smc.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
-	XLIB    putsprite
+	PUBLIC    putsprite
 
-	LIB	pixel
-	XREF	pixmode
+	EXTERN	pixel
+	EXTERN	pixmode
 
 
 ; coords: h,l (vert-horz)

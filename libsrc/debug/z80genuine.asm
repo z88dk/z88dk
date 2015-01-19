@@ -6,10 +6,10 @@
 ; *	TRUE if Z80 undocumented flags behave like the real Z80.
 ; *	extern int  __LIB__ z80undoc(void);
 ; *
-; *	$Id: z80genuine.asm,v 1.1 2009-07-09 17:21:17 stefano Exp $
+; *	$Id: z80genuine.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ; *
 
-	XLIB	z80genuine
+	PUBLIC	z80genuine
 
 z80genuine:
 	ld	h,@00001000	; test bit 3

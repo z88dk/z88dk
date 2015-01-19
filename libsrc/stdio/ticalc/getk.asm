@@ -6,13 +6,13 @@
 ;	Stefano Bodrato - Dec 2000
 ;
 ;
-;	$Id: getk.asm,v 1.6 2014-05-25 19:48:04 stefano Exp $
+;	$Id: getk.asm,v 1.7 2015-01-19 01:33:21 pauloscustodio Exp $
 ;
 
-		XLIB	getk
-		LIB	getk_decode
-		XREF	tidi
-		XREF	tiei
+		PUBLIC	getk
+		EXTERN	getk_decode
+		EXTERN	tidi
+		EXTERN	tiei
 
 		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 

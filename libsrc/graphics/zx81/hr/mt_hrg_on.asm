@@ -5,18 +5,18 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: mt_hrg_on.asm,v 1.7 2014-10-29 16:16:54 stefano Exp $
+;	$Id: mt_hrg_on.asm,v 1.8 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB	mt_hrg_on
-	XDEF	hrgmode
+	PUBLIC	mt_hrg_on
+	PUBLIC	hrgmode
 
-	XREF	MTCH_P1
-	XREF	MTCH_P2
-	XREF	MTCH_P3
+	EXTERN	MTCH_P1
+	EXTERN	MTCH_P2
+	EXTERN	MTCH_P3
 
-	XDEF	hrg_on
-	XREF	base_graphics
+	PUBLIC	hrg_on
+	EXTERN	base_graphics
 
 hrgmode:	defb	2
 

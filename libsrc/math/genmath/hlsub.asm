@@ -1,10 +1,10 @@
 ;       Small C+ Math Library
 ;       General "fudging routine"
 
-                XLIB    hlsub
+                PUBLIC    hlsub
 
-                LIB	ldbchl
-                LIB	fsub
+                EXTERN	ldbchl
+                EXTERN	fsub
 
 
 ;

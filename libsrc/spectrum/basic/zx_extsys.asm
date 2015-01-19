@@ -12,10 +12,10 @@
 ;	- 0 (false) the BASIC is at its normal position
 ;	- 1 (true) the BASIC program has been moved
 ;
-;	$Id: zx_extsys.asm,v 1.2 2008-12-31 13:58:11 stefano Exp $
+;	$Id: zx_extsys.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
-	XLIB	zx_extsys
+	PUBLIC	zx_extsys
 	
 zx_extsys:
 	ld	hl,(23635)

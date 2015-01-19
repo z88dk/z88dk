@@ -1,8 +1,8 @@
 ; uchar __FASTCALL__ *zx_cy2aaddr(uchar row)
 ; Stefano, 2014.12
 
-XLIB zx_cy2aaddr
-XREF HRG_LineStart
+PUBLIC zx_cy2aaddr
+EXTERN HRG_LineStart
 
 .zx_cy2aaddr
 

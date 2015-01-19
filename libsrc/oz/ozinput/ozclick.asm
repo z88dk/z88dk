@@ -8,14 +8,14 @@
 ;	handles the click sound effect on keypress
 ;
 ; ------
-; $Id: ozclick.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozclick.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
 
-	XLIB	ozclick
-	XDEF	enable_click
+	PUBLIC	ozclick
+	PUBLIC	enable_click
 	
-	XREF	ozclick_setting
+	EXTERN	ozclick_setting
 
 
 ozclick:

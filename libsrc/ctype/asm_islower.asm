@@ -1,6 +1,6 @@
 ; asm_islower
 
-XLIB asm_islower
+PUBLIC asm_islower
 
 ; determine if the char is in [a-z]
 

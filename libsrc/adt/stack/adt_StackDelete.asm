@@ -1,10 +1,10 @@
 ; void adt_StackDelete(struct adt_Stack *s, void *delete)
 ; CALLER linkage for function pointers
 
-XLIB adt_StackDelete
+PUBLIC adt_StackDelete
 
-LIB adt_StackDelete_callee
-XREF ASMDISP_ADT_STACKDELETE_CALLEE
+EXTERN adt_StackDelete_callee
+EXTERN ASMDISP_ADT_STACKDELETE_CALLEE
 
 .adt_StackDelete
 

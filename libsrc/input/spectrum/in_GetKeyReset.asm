@@ -1,8 +1,8 @@
 ; void in_GetKeyReset(void)
 ; 09.2005 aralbrec
 
-XLIB in_GetKeyReset
-XREF _in_KeyDebounce, _in_KbdState
+PUBLIC in_GetKeyReset
+EXTERN _in_KeyDebounce, _in_KbdState
 
 .in_GetKeyReset
    ld a,(_in_KeyDebounce)

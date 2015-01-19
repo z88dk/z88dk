@@ -1,7 +1,7 @@
 	INCLUDE "graphics/grafix.inc"
-	XLIB	fill
-	LIB	w_pixeladdress
-	LIB	l_cmp
+	PUBLIC	fill
+	EXTERN	w_pixeladdress
+	EXTERN	l_cmp
 
 .ws1	defw 0
 .index	defw 0

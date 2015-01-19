@@ -4,10 +4,10 @@
 ;ZXVGS buffers bytes, when drives a disk interface.
 ;In case of cable (TMX, UPB), the byte is transmitted each time...
 ;
-;	$Id: writebyte.asm,v 1.1 2002-06-23 12:11:31 dom Exp $
+;	$Id: writebyte.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 
-	XLIB	writebyte
+	PUBLIC	writebyte
 
 .writebyte
 	LD	HL,2

@@ -3,12 +3,12 @@
 
 
 
-                XLIB    fabs
-                LIB     minusfa
+                PUBLIC    fabs
+                EXTERN     minusfa
 
 
-                LIB	sgn
-                XREF    fa
+                EXTERN	sgn
+                EXTERN    fa
 
 
 ;

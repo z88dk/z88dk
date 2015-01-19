@@ -6,7 +6,7 @@
 ;
 ;       22/3/99 djm Rewritten to be shorter..
 
-                XLIB    l_asr
+                PUBLIC    l_asr
 
 .l_asr
         ex      de,hl

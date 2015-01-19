@@ -3,12 +3,12 @@
 ; 06.2008 aralbrec
 ; redone to be more in line with modern versions of this function
 
-XLIB ltoa_callee
-XDEF ASMDISP_LTOA_CALLEE
-XDEF LIBDISP_LTOA_CALLEE
+PUBLIC ltoa_callee
+PUBLIC ASMDISP_LTOA_CALLEE
+PUBLIC LIBDISP_LTOA_CALLEE
 
-LIB l_long_neg, l_long_div_u, strrev
-LIB stdio_basechar, stdio_error_zc
+EXTERN l_long_neg, l_long_div_u, strrev
+EXTERN stdio_basechar, stdio_error_zc
 
 .ltoa_callee
 

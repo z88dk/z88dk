@@ -1,14 +1,14 @@
 ; int screen(x,y)
 ; CALLER linkage for function pointers
 ;
-;       $Id: screen.asm,v 1.2 2013-12-05 09:34:01 stefano Exp $
+;       $Id: screen.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-XLIB screen
+PUBLIC screen
 
-LIB screen_callee
-XREF ASMDISP_screen_CALLEE
+EXTERN screen_callee
+EXTERN ASMDISP_screen_CALLEE
 
 screen:
    pop bc

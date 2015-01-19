@@ -1,4 +1,4 @@
-		XLIB	kmgetyellow
+		PUBLIC	kmgetyellow
 
 .kmgetyellow
 		call 0xb8d2

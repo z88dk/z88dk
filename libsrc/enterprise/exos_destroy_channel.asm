@@ -5,10 +5,10 @@
 ;	exos_destroy_channel(unsigned char ch_number);
 ;
 ;
-;	$Id: exos_destroy_channel.asm,v 1.2 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_destroy_channel.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-	XLIB	exos_destroy_channel
+	PUBLIC	exos_destroy_channel
 
 exos_destroy_channel:
 

@@ -6,14 +6,14 @@
 ; 
 ;	int __CALLEE__ zx_setfloat_callee(char *variable, float value); 
 ; 
-;	$Id: zx_setfloat_callee.asm,v 1.3 2014-09-28 18:27:00 pauloscustodio Exp $ 
+;	$Id: zx_setfloat_callee.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $ 
 ;  	
 
-XLIB	zx_setfloat_callee
-XDEF 	ASMDISP_zx_setfloat_CALLEE
+PUBLIC	zx_setfloat_callee
+PUBLIC 	ASMDISP_zx_setfloat_CALLEE
 
-LIB	zx_locatenum
-XREF	fa
+EXTERN	zx_locatenum
+EXTERN	fa
 
 zx_setfloat_callee:
 

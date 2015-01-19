@@ -8,15 +8,15 @@
 ;	buffered serial input
 ;
 ; ------
-; $Id: ozclearserialbuffer.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozclearserialbuffer.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XLIB	ozclearserialbuffer
+	PUBLIC	ozclearserialbuffer
 
-	LIB	serial_int
-	XREF	SerialBuffer
-	XREF	ozserbufget
-	XREF	ozrxxoff
+	EXTERN	serial_int
+	EXTERN	SerialBuffer
+	EXTERN	ozserbufget
+	EXTERN	ozrxxoff
 
 
 ozclearserialbuffer:

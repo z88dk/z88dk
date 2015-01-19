@@ -1,9 +1,9 @@
-	XLIB	aplib_depack
+	PUBLIC	aplib_depack
 
-	XREF	aPLibMemory_bits
-	XREF	aPLibMemory_byte
-	XREF	aPLibMemory_LWM
-	XREF	aPLibMemory_R0
+	EXTERN	aPLibMemory_bits
+	EXTERN	aPLibMemory_byte
+	EXTERN	aPLibMemory_LWM
+	EXTERN	aPLibMemory_R0
 
 ;==============================================================
 ; aplib_depack(unsigned char *src, unsigned char *dest)	

@@ -8,10 +8,10 @@
 ;	serial control commands
 ;
 ; ------
-; $Id: ozparity.asm,v 1.1 2003-10-22 09:56:34 stefano Exp $
+; $Id: ozparity.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XLIB	ozparity
+	PUBLIC	ozparity
 
 
 ozparity:

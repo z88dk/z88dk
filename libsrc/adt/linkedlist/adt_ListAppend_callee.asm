@@ -1,12 +1,12 @@
 ; int adt_ListAppend_callee(struct adt_List *list, void *item)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListAppend_callee
-XDEF ASMDISP_ADT_LISTAPPEND_CALLEE
-XDEF ASMDISP_ADT_LISTAPPEND2
+PUBLIC adt_ListAppend_callee
+PUBLIC ASMDISP_ADT_LISTAPPEND_CALLEE
+PUBLIC ASMDISP_ADT_LISTAPPEND2
 
-LIB ADTemptylistadd
-XREF _u_malloc
+EXTERN ADTemptylistadd
+EXTERN _u_malloc
 
 .adt_ListAppend_callee
 

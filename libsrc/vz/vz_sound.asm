@@ -1,8 +1,8 @@
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 
-XLIB vz_sound
-LIB vz_sound_callee
-XREF ASMDISP_VZ_SOUND_CALLEE
+PUBLIC vz_sound
+EXTERN vz_sound_callee
+EXTERN ASMDISP_VZ_SOUND_CALLEE
 
 .vz_sound
 

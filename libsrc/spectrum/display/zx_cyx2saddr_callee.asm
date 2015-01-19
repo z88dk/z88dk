@@ -1,8 +1,8 @@
 ; uchar __CALLEE__ *zx_cyx2saddr_callee(uchar row, uchar col)
 ; aralbrec 06.2007
 
-XLIB zx_cyx2saddr_callee
-XDEF ASMDISP_ZX_CYX2SADDR_CALLEE
+PUBLIC zx_cyx2saddr_callee
+PUBLIC ASMDISP_ZX_CYX2SADDR_CALLEE
 
 .zx_cyx2saddr_callee
 

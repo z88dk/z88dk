@@ -1,6 +1,6 @@
 ; asm_isbdigit
 
-XLIB asm_isbdigit
+PUBLIC asm_isbdigit
 
 ; determine whether ascii char is a binary digit
 

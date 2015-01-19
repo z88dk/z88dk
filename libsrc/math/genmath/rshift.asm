@@ -3,12 +3,12 @@
 ;
 ;	Shift c ix de b right by a
 ;
-;       $Id: rshift.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: rshift.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $:
 
 
-		XLIB	rshift
+		PUBLIC	rshift
 
-		XDEF	rsh8
+		PUBLIC	rsh8
 
 
 .rshift LD      B,0

@@ -2,8 +2,8 @@
 ; write c into first n chars of s
 ; 04.2001 djm, 12.2006 aralbrec
 
-XLIB memset_callee
-XDEF ASMDISP_MEMSET_CALLEE
+PUBLIC memset_callee
+PUBLIC ASMDISP_MEMSET_CALLEE
 
 .memset_callee
 

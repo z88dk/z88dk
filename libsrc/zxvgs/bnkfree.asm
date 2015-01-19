@@ -2,7 +2,7 @@
 
 ;020128	(C) created by Yarek
 
-	XLIB	bnkfree
+	PUBLIC	bnkfree
 
 ;int bnkfree()
 ;returns number of free memory banks

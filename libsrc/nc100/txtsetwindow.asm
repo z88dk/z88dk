@@ -1,4 +1,4 @@
-		XLIB	txtsetwindow
+		PUBLIC	txtsetwindow
 
 .txtsetwindow	pop bc
 		pop hl

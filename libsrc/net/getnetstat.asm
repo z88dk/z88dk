@@ -8,9 +8,9 @@
 ;	ZSock Lib function: getnetstat
 
 
-	XLIB	getnetstat
+	PUBLIC	getnetstat
 
-	LIB	no_zsock
+	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"

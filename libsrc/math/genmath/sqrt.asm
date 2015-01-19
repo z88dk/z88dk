@@ -10,20 +10,20 @@
 
         INCLUDE "stdio.def"
 
-        XLIB    sqrt
+        PUBLIC    sqrt
 
-        XREF    dload
-        XREF    dpush
-        XREF    dstore
-        XREF    dldpsh
+        EXTERN    dload
+        EXTERN    dpush
+        EXTERN    dstore
+        EXTERN    dldpsh
 
-        LIB     l_pint
-        LIB     l_gint
-        LIB     l_sxt
-        LIB	ddiv
-        LIB	dadd
-        LIB	dleq
-        LIB	dlt
+        EXTERN     l_pint
+        EXTERN     l_gint
+        EXTERN     l_sxt
+        EXTERN	ddiv
+        EXTERN	dadd
+        EXTERN	dleq
+        EXTERN	dlt
 
 
 .sqrt

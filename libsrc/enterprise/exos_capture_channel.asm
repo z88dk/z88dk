@@ -5,14 +5,14 @@
 ;	exos_capture_channel(unsigned char main_channel, unsigned char secondary_channel);
 ;
 ;
-;	$Id: exos_capture_channel.asm,v 1.1 2011-03-15 14:34:08 stefano Exp $
+;	$Id: exos_capture_channel.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-	XLIB    exos_capture_channel
+	PUBLIC    exos_capture_channel
 
-	LIB     exos_capture_channel_callee
+	EXTERN     exos_capture_channel_callee
 
-XREF ASMDISP_EXOS_CAPTURE_CHANNEL_CALLEE
+EXTERN ASMDISP_EXOS_CAPTURE_CHANNEL_CALLEE
 
 exos_capture_channel:
 

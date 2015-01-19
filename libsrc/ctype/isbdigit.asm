@@ -1,7 +1,7 @@
 ; isbdigit
 
-XLIB isbdigit
-LIB asm_isbdigit
+PUBLIC isbdigit
+EXTERN asm_isbdigit
 
 ; FASTCALL
 

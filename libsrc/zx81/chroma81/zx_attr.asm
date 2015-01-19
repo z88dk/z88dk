@@ -1,10 +1,10 @@
 ; uint zx_attr(uchar row, uchar col)
 ; CALLER linkage for function pointers
 
-XLIB zx_attr
+PUBLIC zx_attr
 
-LIB zx_attr_callee
-XREF ASMDISP_ZX_ATTR_CALLEE
+EXTERN zx_attr_callee
+EXTERN ASMDISP_ZX_ATTR_CALLEE
 
 .zx_attr
 

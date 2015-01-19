@@ -2,7 +2,7 @@
 
 ;020121	(C) created by Yarek
 
-	XLIB	j0
+	PUBLIC	j0
 
 ;int j0()
 ;returns joystick 0 state

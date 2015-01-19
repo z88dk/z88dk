@@ -5,15 +5,15 @@
 ;
 ;	void opus_lptwrite (unsigned char databyte);
 ;	
-;	$Id: opus_lptwrite.asm,v 1.3 2014-11-25 17:09:23 stefano Exp $
+;	$Id: opus_lptwrite.asm,v 1.4 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	opus_lptwrite
+		PUBLIC 	opus_lptwrite
 
-		LIB	opus_rommap
+		EXTERN	opus_rommap
 
-		XREF	P_DEVICE
+		EXTERN	P_DEVICE
 		
 
 opus_lptwrite:

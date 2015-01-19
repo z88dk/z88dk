@@ -11,7 +11,7 @@
 ;       int di(void)
 
 
-               XLIB    di
+               PUBLIC    di
 
                 INCLUDE "interrpt.def"
 

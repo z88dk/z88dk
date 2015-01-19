@@ -2,8 +2,8 @@
 ; return ptr to first occurrence of c in s
 ; 04.2001 dom
 
-XLIB strchr_callee
-XDEF ASMDISP_STRCHR_CALLEE
+PUBLIC strchr_callee
+PUBLIC ASMDISP_STRCHR_CALLEE
 
 .strchr_callee
 

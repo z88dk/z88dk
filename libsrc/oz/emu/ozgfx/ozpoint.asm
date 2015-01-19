@@ -5,17 +5,17 @@
 ;	int ozpoint(int x, int y, byte color);
 ;
 ; ------
-; $Id: ozpoint.asm,v 1.1 2003-10-27 16:56:57 stefano Exp $
+; $Id: ozpoint.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozpoint
+	PUBLIC	ozpoint
 
-        LIB     swapgfxbk
-        LIB     swapgfxbk1
+        EXTERN     swapgfxbk
+        EXTERN     swapgfxbk1
 
-        LIB     ozplotpixel
+        EXTERN     ozplotpixel
         
-        LIB	ozpointcolor
+        EXTERN	ozpointcolor
 
 
 

@@ -1,4 +1,4 @@
-		XLIB textoutcount
+		PUBLIC textoutcount
 ; fastcall
 .textoutcount
 		call 0xB821

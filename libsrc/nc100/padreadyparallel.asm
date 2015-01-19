@@ -1,4 +1,4 @@
-		XLIB	padreadyparallel
+		PUBLIC	padreadyparallel
 
 ; fastcall
 .padreadyparallel

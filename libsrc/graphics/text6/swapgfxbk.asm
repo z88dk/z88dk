@@ -8,13 +8,13 @@
 ;	Dummy gfx paging for text mode.
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.1 2006-12-23 21:33:10 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.2 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 
-                XLIB    swapgfxbk
+                PUBLIC    swapgfxbk
 
-                XDEF    swapgfxbk1
+                PUBLIC    swapgfxbk1
 
 
 .swapgfxbk

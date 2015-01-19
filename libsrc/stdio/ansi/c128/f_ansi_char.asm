@@ -10,19 +10,19 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2002-04-17 21:30:26 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 	
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 
-	XDEF	INVRS
-	XDEF	ATTR
+	PUBLIC	INVRS
+	PUBLIC	ATTR
 
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 	
 	
 .text_cols   defb 40

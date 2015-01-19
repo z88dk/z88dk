@@ -1,4 +1,4 @@
-		XLIB	kmsetyellow
+		PUBLIC	kmsetyellow
 
 ; fastcall
 .kmsetyellow

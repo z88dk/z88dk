@@ -1,7 +1,7 @@
 ;
 ;	Write a file on an Amstrad NC100
 ;
-		XLIB write
+		PUBLIC write
 
 .write		pop ix
 		pop de

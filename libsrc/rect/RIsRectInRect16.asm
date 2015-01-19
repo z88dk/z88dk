@@ -2,8 +2,8 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB RIsRectInRect16
-LIB RIsIvalInIval16
+PUBLIC RIsRectInRect16
+EXTERN RIsIvalInIval16
 
 ; Determine if two 16-bit rectangles intersect.  Rectangles
 ; can wrap across 0-65535 boundaries.

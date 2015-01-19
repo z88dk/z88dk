@@ -2,7 +2,7 @@
 ;       Long functions
 ;
 
-                XLIB    l_long_com
+                PUBLIC    l_long_com
 
 
 ; deHL = ~deHL

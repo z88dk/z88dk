@@ -6,12 +6,12 @@
 ;
 ;	Stefano Bodrato - 3/4/2001
 ;
-;	$Id: puts_cons.asm,v 1.2 2001-04-13 14:13:59 stefano Exp $
+;	$Id: puts_cons.asm,v 1.3 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
 
-		XLIB	puts_cons
-		LIB	f_ansi
+		PUBLIC	puts_cons
+		EXTERN	f_ansi
 
 
 ; Enter in with hl holding the address of string to print

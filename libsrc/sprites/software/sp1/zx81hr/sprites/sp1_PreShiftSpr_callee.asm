@@ -2,8 +2,8 @@
 ; 02.2008 aralbrec, Sprite Pack v3.0
 ; zx81 hi-res version
 
-XLIB sp1_PreShiftSpr_callee
-XDEF ASMDISP_SP1_PRESHIFTSPR_CALLEE
+PUBLIC sp1_PreShiftSpr_callee
+PUBLIC ASMDISP_SP1_PRESHIFTSPR_CALLEE
 
 .sp1_PreShiftSpr_callee
 

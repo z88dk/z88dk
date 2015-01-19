@@ -9,13 +9,13 @@
 ;	puts a character back in the keyboard buffer
 ;
 ; ------
-; $Id: ozungetch.asm,v 1.1 2003-10-23 10:42:50 stefano Exp $
+; $Id: ozungetch.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
 
-	XLIB	ozungetch2	; renamed (will be redefined if used)
+	PUBLIC	ozungetch2	; renamed (will be redefined if used)
 
-	XREF	KeyBufGetPos
+	EXTERN	KeyBufGetPos
 
 
 ozungetch2:

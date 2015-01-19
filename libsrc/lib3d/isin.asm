@@ -7,10 +7,10 @@
 ;	returns value from -255 to +255
 ;
 ; ------
-; $Id: isin.asm,v 1.1 2009-04-10 12:47:42 stefano Exp $
+; $Id: isin.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
 ;
 
-	XLIB	isin
+	PUBLIC	isin
 
 
 isin:

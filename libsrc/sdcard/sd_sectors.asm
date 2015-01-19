@@ -3,7 +3,7 @@
 ;	ZX Spectrum ZXMMC specific routines 
 ;	code by Stefano Bodrato,   Mar 2010
 ;
-;	$Id: sd_sectors.asm,v 1.1 2012-09-03 07:31:56 stefano Exp $ 
+;	$Id: sd_sectors.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $ 
 ;
 ; Get the size in sectors of an MMC/SD card
 ; unsigned long sd_size(struct SD_INFO descriptor);
@@ -30,7 +30,7 @@ defc CSD_OFFSET = 19
 ;	
 
 
-        XLIB    sd_sectors
+        PUBLIC    sd_sectors
         INCLUDE "z80_crt0.hdr"
 		
 sd_sectors:

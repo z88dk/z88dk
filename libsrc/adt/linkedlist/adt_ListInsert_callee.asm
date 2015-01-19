@@ -1,17 +1,17 @@
 ; int __CALLEE__ adt_ListInsert_callee(struct adt_List *list, void *item)
 ; 08.2005 aralbrec
 
-XLIB adt_ListInsert_callee
-XDEF ASMDISP_ADT_LISTINSERT_CALLEE
+PUBLIC adt_ListInsert_callee
+PUBLIC ASMDISP_ADT_LISTINSERT_CALLEE
 
-LIB adt_ListPrepend_callee
-XREF ASMDISP_ADT_LISTPREPEND2
+EXTERN adt_ListPrepend_callee
+EXTERN ASMDISP_ADT_LISTPREPEND2
 
-LIB adt_ListAppend_callee
-XREF ASMDISP_ADT_LISTAPPEND2
+EXTERN adt_ListAppend_callee
+EXTERN ASMDISP_ADT_LISTAPPEND2
 
-LIB ADTemptylistadd
-XREF _u_malloc
+EXTERN ADTemptylistadd
+EXTERN _u_malloc
 
 .adt_ListInsert_callee
 

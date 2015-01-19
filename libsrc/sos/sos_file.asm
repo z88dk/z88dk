@@ -1,14 +1,14 @@
 ; int sos_file(char *name,type)
 ; CALLER linkage for function pointers
 ;
-;       $Id: sos_file.asm,v 1.2 2013-12-05 09:34:01 stefano Exp $
+;       $Id: sos_file.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-XLIB sos_file
+PUBLIC sos_file
 
-LIB sos_file_callee
-XREF ASMDISP_SOS_FILE_CALLEE
+EXTERN sos_file_callee
+EXTERN ASMDISP_SOS_FILE_CALLEE
 
 sos_file:
    pop bc

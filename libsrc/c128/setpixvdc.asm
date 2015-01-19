@@ -2,17 +2,17 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: setpixvdc.asm,v 1.1 2008-06-23 17:34:35 stefano Exp $
+;$Id: setpixvdc.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
 ;set pixel in 640 x 200 bit map mode.  math and local vdc i/o optimized
 ;for speed.
 
-		XLIB	setpixvdc
-		XREF	_vdcDispMem
+		PUBLIC	setpixvdc
+		EXTERN	_vdcDispMem
 		
-		LIB	vdcset
-		LIB	vdcget
+		EXTERN	vdcset
+		EXTERN	vdcget
 
 ;fast pixel look up using x mod 8 as index into bit table
 

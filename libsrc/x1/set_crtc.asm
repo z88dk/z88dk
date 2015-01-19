@@ -6,10 +6,10 @@
 ;
 ;	Set 16 6845 CRTC registers at once
 ;
-;	$Id: set_crtc.asm,v 1.1 2013-11-12 13:50:15 stefano Exp $
+;	$Id: set_crtc.asm,v 1.2 2015-01-19 01:33:25 pauloscustodio Exp $
 ;
 
-	XLIB	set_crtc
+	PUBLIC	set_crtc
 	
 
 set_crtc:

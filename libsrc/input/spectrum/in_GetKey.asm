@@ -12,10 +12,10 @@
 ; state machine returns to the debounce state.  Time intervals
 ; depend on how often GetKey is called.
 
-XLIB in_GetKey
-LIB in_Inkey, in_GetKeyReset
-XREF _in_KeyDebounce, _in_KeyStartRepeat, _in_KeyRepeatPeriod
-XREF _in_KbdState
+PUBLIC in_GetKey
+EXTERN in_Inkey, in_GetKeyReset
+EXTERN _in_KeyDebounce, _in_KeyStartRepeat, _in_KeyRepeatPeriod
+EXTERN _in_KbdState
 
 ; exit : carry = no key registered (and HL=0)
 ;        else HL = ascii code of key pressed

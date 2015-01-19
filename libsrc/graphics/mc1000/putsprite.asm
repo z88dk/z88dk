@@ -6,16 +6,16 @@
 ; MSX version
 ;
 ;
-; $Id: putsprite.asm,v 1.2 2013-03-08 13:40:20 stefano Exp $
+; $Id: putsprite.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
-	XLIB    putsprite
-	LIB		pixeladdress
-	XREF	pixelbyte
-	XREF	pix_return
-	XREF	gfxbyte_get
-	LIB     swapgfxbk
-	XREF	swapgfxbk1
+	PUBLIC    putsprite
+	EXTERN		pixeladdress
+	EXTERN	pixelbyte
+	EXTERN	pix_return
+	EXTERN	gfxbyte_get
+	EXTERN     swapgfxbk
+	EXTERN	swapgfxbk1
 
 	INCLUDE	"graphics/grafix.inc"
 

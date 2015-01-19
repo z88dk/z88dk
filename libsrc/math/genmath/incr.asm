@@ -3,9 +3,9 @@
 ;
 ;	increment c ix de
 ;
-;       $Id: incr.asm,v 1.3 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: incr.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $:
 
-		XLIB	incr
+		PUBLIC	incr
 
 .incr   INC     E       ;increment c ix de
         RET     NZ

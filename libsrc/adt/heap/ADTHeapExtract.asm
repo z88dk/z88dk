@@ -1,8 +1,8 @@
 ; void *adt_HeapExtract(void **array, uint n, void *compare)
 ; 08.2005 aralbrec
 
-XLIB ADTHeapExtract
-LIB ADTHeapSiftDown
+PUBLIC ADTHeapExtract
+EXTERN ADTHeapSiftDown
 
 ; enter:  DE = array address
 ;         HL = N (number of items in array, set to one less after calling)

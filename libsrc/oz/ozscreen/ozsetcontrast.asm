@@ -8,15 +8,15 @@
 ;	display contrast control functions
 ;
 ; ------
-; $Id: ozsetcontrast.asm,v 1.1 2003-10-21 17:15:21 stefano Exp $
+; $Id: ozsetcontrast.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
 ;
 
-	XLIB	ozsetcontrast
+	PUBLIC	ozsetcontrast
 	
-	LIB	ozsetlcdstate
+	EXTERN	ozsetlcdstate
 
-	XREF	ozcontrast
-	XREF	s_ozlcdstatus
+	EXTERN	ozcontrast
+	EXTERN	s_ozlcdstatus
 
 
 ozsetcontrast:

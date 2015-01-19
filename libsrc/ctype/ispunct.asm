@@ -6,11 +6,11 @@
 ;
 ;	Hurrah, this is our first table for our isxxx routines!
 ;
-;	$Id: ispunct.asm,v 1.4 2008-06-29 06:38:24 aralbrec Exp $
+;	$Id: ispunct.asm,v 1.5 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-XLIB ispunct
-LIB asm_ispunct
+PUBLIC ispunct
+EXTERN asm_ispunct
 
 ; FASTCALL
 

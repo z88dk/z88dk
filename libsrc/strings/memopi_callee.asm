@@ -3,10 +3,10 @@
 ; OP: 0=load, 1=or, 2=xor, 3=and, 4=add, 5 = adc, 6=sub, 7 = sbc, 8 = rls, 9 = rrs else address of OP function
 ; 05.2007 aralbrec
 
-XLIB memopi_callee
-XDEF ASMDISP_MEMOPI_CALLEE
+PUBLIC memopi_callee
+PUBLIC ASMDISP_MEMOPI_CALLEE
 
-LIB l_jpix, memops
+EXTERN l_jpix, memops
 
 .memopi_callee
 

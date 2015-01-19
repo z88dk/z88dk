@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: ifix.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: ifix.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
@@ -18,7 +18,7 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB    ifix
+                PUBLIC    ifix
 
 .ifix
 
@@ -29,7 +29,7 @@ ENDIF
  
 IF TINYMODE
 
-	LIB	fsetup1
+	EXTERN	fsetup1
 
 	call	fsetup1
 	defb	ZXFP_END_CALC
@@ -39,8 +39,8 @@ IF TINYMODE
 	ret
 ELSE
 
-	XREF	fa
-	LIB	l_long_neg
+	EXTERN	fa
+	EXTERN	l_long_neg
 
 	;call	fsetup1
 	;defb	ZXFP_END_CALC

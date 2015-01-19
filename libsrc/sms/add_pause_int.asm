@@ -1,6 +1,6 @@
-	XLIB	add_pause_int
+	PUBLIC	add_pause_int
 	
-	XREF	pause_procs
+	EXTERN	pause_procs
 
 ;==============================================================
 ; add_pause_int(void *ptr)	

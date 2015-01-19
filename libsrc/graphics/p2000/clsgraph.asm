@@ -6,12 +6,12 @@
 ;       Stefano Bodrato - Apr 2014
 ;
 ;
-;       $Id: clsgraph.asm,v 1.1 2014-05-06 06:01:48 stefano Exp $
+;       $Id: clsgraph.asm,v 1.2 2015-01-19 01:32:50 pauloscustodio Exp $
 ;
 
 
-        XLIB    cleargraphics
-		XREF	base_graphics
+        PUBLIC    cleargraphics
+		EXTERN	base_graphics
 
 .cleargraphics
 ;	ld		a,12

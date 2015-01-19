@@ -4,7 +4,7 @@
 ;
 ;       10/12/02 - Stefano Bodrato
 ;
-;       $Id: tan.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: tan.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
@@ -18,10 +18,10 @@ ELSE
 		INCLUDE  "81fp.def"
 ENDIF
 
-                XLIB    tan
+                PUBLIC    tan
 
-                LIB	fsetup1
-                LIB	stkequ
+                EXTERN	fsetup1
+                EXTERN	stkequ
 
 .tan
         call    fsetup1

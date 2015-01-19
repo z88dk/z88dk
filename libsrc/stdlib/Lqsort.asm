@@ -1,8 +1,8 @@
 ; 05.2005 aralbrec
 ; iterative qsort, partition element taken from middle
 
-XLIB Lqsort
-LIB l_jpix
+PUBLIC Lqsort
+EXTERN l_jpix
 
 ; The ansi-C qsort function sorts an array of n-byte items.
 ; This is a 'little' version that sorts arrays of 2-byte items.

@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB strchrnul
-LIB strchrnul_callee
-XREF ASMDISP_STRCHRNUL_CALLEE
+PUBLIC strchrnul
+EXTERN strchrnul_callee
+EXTERN ASMDISP_STRCHRNUL_CALLEE
 
 .strchrnul
 

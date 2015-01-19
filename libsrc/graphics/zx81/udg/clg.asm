@@ -6,14 +6,14 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;       $Id: clg.asm,v 1.1 2014-07-18 06:18:08 stefano Exp $
+;       $Id: clg.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
 ;
 
 
-			XLIB    clg
-			LIB     loadudg6
-			LIB     filltxt
-			XREF	base_graphics
+			PUBLIC    clg
+			EXTERN     loadudg6
+			EXTERN     filltxt
+			EXTERN	base_graphics
 
 			INCLUDE	"graphics/grafix.inc"
 

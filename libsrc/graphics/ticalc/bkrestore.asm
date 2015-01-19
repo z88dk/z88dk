@@ -4,12 +4,12 @@
 ; TI calculators version
 ;
 ;
-; $Id: bkrestore.asm,v 1.7 2009-01-23 13:48:12 stefano Exp $
+; $Id: bkrestore.asm,v 1.8 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
-	XLIB    bkrestore
-	XREF	cpygraph
-	LIB	pixeladdress
+	PUBLIC    bkrestore
+	EXTERN	cpygraph
+	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 

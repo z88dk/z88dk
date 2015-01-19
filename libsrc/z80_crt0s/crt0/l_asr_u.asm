@@ -7,7 +7,7 @@
 ;       22/3/99 djm Rewritten to be shorter.. unsigned version
 
 
-                XLIB    l_asr_u
+                PUBLIC    l_asr_u
 
 .l_asr_u
         ex      de,hl

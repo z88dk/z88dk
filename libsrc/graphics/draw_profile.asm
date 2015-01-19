@@ -5,28 +5,28 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile.asm,v 1.6 2013-03-01 09:42:47 stefano Exp $
+;	$Id: draw_profile.asm,v 1.7 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
 	INCLUDE	"graphics/grafix.inc"
 
-                XLIB    draw_profile
+                PUBLIC    draw_profile
 
-                LIB     stencil_init
-                LIB     stencil_render
-                LIB		stencil_add_point
-                LIB		stencil_add_lineto
-                LIB		stencil_add_side
-                LIB		plot
-                LIB		unplot
-                LIB		draw
-                LIB		undraw
-                LIB		drawto
-                LIB		undrawto
+                EXTERN     stencil_init
+                EXTERN     stencil_render
+                EXTERN		stencil_add_point
+                EXTERN		stencil_add_lineto
+                EXTERN		stencil_add_side
+                EXTERN		plot
+                EXTERN		unplot
+                EXTERN		draw
+                EXTERN		undraw
+                EXTERN		drawto
+                EXTERN		undrawto
                 
-                LIB		l_mult
-                LIB		l_div
+                EXTERN		l_mult
+                EXTERN		l_div
 
 ;
 ; DE > HL [unsigned]

@@ -11,8 +11,8 @@
                 INCLUDE "stdio.def"
                 INCLUDE "libdefs.def"
 
-                XLIB    fdfgets
-                XREF    processcmd
+                PUBLIC    fdfgets
+                EXTERN    processcmd
 
 ;char *fgets(s1,n,fp)
 ;char s1 int n int fp

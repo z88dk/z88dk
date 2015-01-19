@@ -1,8 +1,8 @@
 ; void __CALLEE__ HeapFree_callee(void *heap, void *addr)
 ; 12.2006 aralbrec
 
-XLIB HeapFree_callee
-XDEF ASMDISP_HEAPFREE_CALLEE
+PUBLIC HeapFree_callee
+PUBLIC ASMDISP_HEAPFREE_CALLEE
 
 .HeapFree_callee
 

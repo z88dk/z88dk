@@ -6,14 +6,14 @@
 ;
 ;	 - init the jump table
 ;
-;	$Id: opus_rommap.asm,v 1.3 2014-11-25 17:09:24 stefano Exp $
+;	$Id: opus_rommap.asm,v 1.4 2015-01-19 01:33:11 pauloscustodio Exp $
 ;
 
 
-		XLIB 	opus_rommap
+		PUBLIC 	opus_rommap
 
-		XDEF	P_DEVICE
-		XDEF	P_TESTCH
+		PUBLIC	P_DEVICE
+		PUBLIC	P_TESTCH
 
 opus_rommap:
 

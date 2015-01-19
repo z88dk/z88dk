@@ -5,17 +5,17 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.6 2014-05-26 07:43:13 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.7 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
-	XLIB	ansi_SCROLLUP
-	XREF	base_graphics
-	XREF	tidi
-	XREF	tiei
-	LIB	ansi_del_line
-	LIB	fgetc_cons
+	PUBLIC	ansi_SCROLLUP
+	EXTERN	base_graphics
+	EXTERN	tidi
+	EXTERN	tiei
+	EXTERN	ansi_del_line
+	EXTERN	fgetc_cons
 
 .ansi_SCROLLUP
 

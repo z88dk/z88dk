@@ -1,7 +1,7 @@
 ; uint __FASTCALL__ zx_saddr2py(void *pixeladdr)
 ; aralbrec 06.2007
 
-XLIB zx_saddr2py
+PUBLIC zx_saddr2py
 
 .zx_saddr2py
 

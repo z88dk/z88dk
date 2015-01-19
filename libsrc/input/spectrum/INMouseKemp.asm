@@ -4,9 +4,9 @@
 ; based on Chris Cowley's Kempston Mouse
 ; driver for Spectrum Basic (2003)
 
-XLIB INMouseKemp
-XREF _in_KempcoordX, _in_KempcoordY
-XREF _in_KemprawX, _in_KemprawY
+PUBLIC INMouseKemp
+EXTERN _in_KempcoordX, _in_KempcoordY
+EXTERN _in_KemprawX, _in_KemprawY
 
 ; exit : C = button state 000000RL active high
 ;        B = X coordinate (0..255)

@@ -3,10 +3,10 @@ lstoff
 ; CPC Firmware Calculations
 ;
 ; September 2003
-; $Id: cpcfirm.def,v 1.5 2008-05-26 06:38:07 stefano Exp $
+; $Id: cpcfirm.def,v 1.6 2015-01-19 01:29:18 pauloscustodio Exp $
 ;
 
-    LIB     firmware    ; Interposer for firmware routines
+    EXTERN     firmware    ; Interposer for firmware routines
 
     defc    kl_probe_rom    = $b915
     defc    kl_choke_off    = $bcc8

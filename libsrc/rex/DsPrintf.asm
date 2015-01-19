@@ -1,14 +1,14 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: DsPrintf.asm,v 1.2 2002-04-17 21:30:25 dom Exp $
+;	$Id: DsPrintf.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
 ;
 ;	DsPrintf (int, int, int, char*)
 ;
 ;	Written by Damjan Marion <dmarion@iskon.hr>
 
-		XLIB	DsPrintf
-		LIB	syscallex
+		PUBLIC	DsPrintf
+		EXTERN	syscallex
 
 .DsPrintf
         ld      ix,$08

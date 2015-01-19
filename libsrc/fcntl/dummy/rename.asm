@@ -1,7 +1,7 @@
 ; Dummy file libs
 ;
 
-		XLIB	rename
+		PUBLIC	rename
 
 .rename
 	ld	hl,-1	;error

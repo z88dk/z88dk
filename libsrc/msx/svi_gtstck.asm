@@ -6,13 +6,13 @@
 ;	GTSTCK
 ;
 ;
-;	$Id: svi_gtstck.asm,v 1.3 2009-05-27 10:41:08 stefano Exp $
+;	$Id: svi_gtstck.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	GTSTCK
+	PUBLIC	GTSTCK
 	
-	LIB	svi_slstick
-	LIB	msxbios
+	EXTERN	svi_slstick
+	EXTERN	msxbios
 
 
 

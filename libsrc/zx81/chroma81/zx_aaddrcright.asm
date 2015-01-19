@@ -1,8 +1,8 @@
 ; uchar __FASTCALL__ *zx_aaddrcright(void *attraddr)
 ; Stefano, 2014.12
 
-XLIB zx_aaddrcright
-XREF HRG_LineStart
+PUBLIC zx_aaddrcright
+EXTERN HRG_LineStart
 
 .zx_aaddrcright
 

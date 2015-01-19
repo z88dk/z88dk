@@ -1,8 +1,8 @@
 ; void adt_Heapify(void **array, uint n, void *compare)
 ; CALLER linkage for function pointers
 
-XLIB adt_Heapify
-LIB ADTHeapify, ADThcompare
+PUBLIC adt_Heapify
+EXTERN ADTHeapify, ADThcompare
 
 .adt_Heapify
 

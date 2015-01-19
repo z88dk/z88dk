@@ -8,11 +8,11 @@
 
 ; ----- void __CALLEE__ vz_line_callee(int x1, int y1, int x2, int y2, int c)
 
-XLIB vz_line_callee
-XDEF ASMDISP_VZ_LINE_CALLEE
+PUBLIC vz_line_callee
+PUBLIC ASMDISP_VZ_LINE_CALLEE
 
-LIB vz_plot_callee
-XREF ASMDISP_VZ_PLOT_CALLEE
+EXTERN vz_plot_callee
+EXTERN ASMDISP_VZ_PLOT_CALLEE
 
 .vz_line_callee
 

@@ -10,12 +10,12 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.3 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
-                XLIB    swapgfxbk
+                PUBLIC    swapgfxbk
 
-		XDEF	swapgfxbk1
+		PUBLIC	swapgfxbk1
 
 
 

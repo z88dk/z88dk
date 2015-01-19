@@ -4,18 +4,18 @@
 ;       Fill stub - Stefano Bodrato 11/6/2000
 ;
 ;
-;	$Id: fill.asm,v 1.2 2001-04-18 13:21:37 stefano Exp $
+;	$Id: fill.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 
 ;Usage: fill(struct *pixel)
 
 
-                XLIB    fill
+                PUBLIC    fill
 
-                LIB     do_fill
-                LIB     swapgfxbk
-		XREF	swapgfxbk1
+                EXTERN     do_fill
+                EXTERN     swapgfxbk
+		EXTERN	swapgfxbk1
 
 .fill
 		ld	ix,0

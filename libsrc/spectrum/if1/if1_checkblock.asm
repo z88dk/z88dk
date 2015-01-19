@@ -8,17 +8,17 @@
 ;	 - check the loaded block for integrity
 ;	 - other various checks
 ;	
-;	$Id: if1_checkblock.asm,v 1.1 2008-06-29 08:25:47 aralbrec Exp $
+;	$Id: if1_checkblock.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	if1_checkblock
+		PUBLIC 	if1_checkblock
 		
-		LIB	if1_checksum
+		EXTERN	if1_checksum
 		
-		XREF	mdvbuffer
-		XDEF	if1_sect_read
-		XDEF	if1_verifymode
+		EXTERN	mdvbuffer
+		PUBLIC	if1_sect_read
+		PUBLIC	if1_verifymode
 
 
 status:		defb	0

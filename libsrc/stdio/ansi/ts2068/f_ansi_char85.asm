@@ -13,21 +13,21 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char85.asm,v 1.2 2013-02-19 12:46:39 stefano Exp $
+;	$Id: f_ansi_char85.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 
 ; Dirty thing for self modifying code
-	XDEF	INVRS
-	XDEF	BOLD
-	XDEF	UNDERLINE
+	PUBLIC	INVRS
+	PUBLIC	BOLD
+	PUBLIC	UNDERLINE
 
 IF A85COL
 .text_cols   defb 85

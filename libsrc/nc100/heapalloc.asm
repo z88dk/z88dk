@@ -1,4 +1,4 @@
-		XLIB	heapalloc
+		PUBLIC	heapalloc
 
 ; fastcall
 .heapalloc

@@ -2,8 +2,8 @@
 ;       Long functions
 ;
 
-                XLIB    l_long_ge
-                LIB     l_long_cmp
+                PUBLIC    l_long_ge
+                EXTERN     l_long_cmp
 
 
 

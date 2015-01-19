@@ -7,11 +7,11 @@
 ; values for ROW and COLUMN
 ;----------------------------------------------------------------
 ;
-;  $Id: zx_dfile_addr.asm,v 1.3 2012-12-31 10:38:24 stefano Exp $
+;  $Id: zx_dfile_addr.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
 ;
 ;----------------------------------------------------------------
 
-	XLIB    zx_dfile_addr
+	PUBLIC    zx_dfile_addr
 
 IF FORzx81
 	DEFC    COLUMN=$4039    ; S_POSN_x

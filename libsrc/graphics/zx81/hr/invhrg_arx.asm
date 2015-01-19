@@ -8,12 +8,12 @@
 ;       Stefano - Oct 2011
 ;
 ;
-;	$Id: invhrg_arx.asm,v 1.1 2011-10-22 08:37:36 stefano Exp $
+;	$Id: invhrg_arx.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-                XLIB	invhrg
+                PUBLIC	invhrg
 				
-				XREF	HRG_LineStart
+				EXTERN	HRG_LineStart
 
 invhrg:
 		ld	hl,HRG_LineStart

@@ -6,11 +6,11 @@
 ;
 ;	Change the MSX color attributes
 ;
-;	$Id: msx_color.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: msx_color.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	msx_color
-	LIB	msxbios
+	PUBLIC	msx_color
+	EXTERN	msxbios
 	
 IF FORmsx
         INCLUDE "msxbios.def"

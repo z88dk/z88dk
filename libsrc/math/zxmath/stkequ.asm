@@ -3,15 +3,15 @@
 ;
 ;       10/12/02 - Stefano Bodrato
 ;
-;       $Id: stkequ.asm,v 1.3 2009-08-04 14:07:17 stefano Exp $
+;       $Id: stkequ.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 ; Equalise the ZX FP stack and put the calculated value into FA
 ; the "real" stack has been already fixed in fsetup.
 ;
 
-		XLIB	stkequ
+		PUBLIC	stkequ
 
-		XREF	fa
+		EXTERN	fa
 
 IF FORzx
 		INCLUDE  "zxfp.def"

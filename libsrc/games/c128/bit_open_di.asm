@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.1 2008-07-11 15:10:57 stefano Exp $
+; $Id: bit_open_di.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
 ;
 ; TRS-80 1 bit sound functions
 ;
@@ -7,8 +7,8 @@
 ; Stefano Bodrato - 8/4/2008
 ;
 
-    XLIB     bit_open_di
-    LIB      bit_open
+    PUBLIC     bit_open_di
+    EXTERN      bit_open
 
 .bit_open_di
 	jp	bit_open

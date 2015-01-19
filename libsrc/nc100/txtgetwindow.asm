@@ -1,4 +1,4 @@
-		XLIB txtgetwindow
+		PUBLIC txtgetwindow
 
 ; fastcall
 .txtgetwindow	push hl

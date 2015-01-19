@@ -7,12 +7,12 @@
 ;	; int sos_file(char *name,type)
 ;
 ;
-;	$Id: sos_file_callee.asm,v 1.3 2014-09-28 18:26:58 pauloscustodio Exp $
+;	$Id: sos_file_callee.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-XLIB	sos_file_callee
-XDEF	ASMDISP_SOS_FILE_CALLEE
+PUBLIC	sos_file_callee
+PUBLIC	ASMDISP_SOS_FILE_CALLEE
 
 
 sos_file_callee:

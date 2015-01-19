@@ -13,11 +13,11 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    pow
+                PUBLIC    pow
 
-                LIB	fsetup
-                LIB	stkequ2
-                XREF    fa
+                EXTERN	fsetup
+                EXTERN	stkequ2
+                EXTERN    fa
 
 
 .pow

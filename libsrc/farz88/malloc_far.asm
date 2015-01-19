@@ -3,13 +3,13 @@
 ; 30/3/00 Changed size type to long, so >64K mallocs possible
 
 ;
-; $Id: malloc_far.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+; $Id: malloc_far.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-        XLIB malloc_far
+        PUBLIC malloc_far
 
-        XREF    malloc_table,pool_table,farpages,farmemspec
-        XREF    free_loop
+        EXTERN    malloc_table,pool_table,farpages,farmemspec
+        EXTERN    free_loop
 
 include "memory.def"
 

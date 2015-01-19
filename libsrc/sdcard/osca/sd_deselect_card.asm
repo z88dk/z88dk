@@ -7,13 +7,13 @@
 ;	Deselect the sdcard
 ;	AF holds the result code of the previous operations and must be preserved.
 ;
-;	$Id: sd_deselect_card.asm,v 1.1 2012-07-10 05:55:38 stefano Exp $
+;	$Id: sd_deselect_card.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
 ;
 
 
-	XLIB	sd_deselect_card
+	PUBLIC	sd_deselect_card
 	
-	LIB		sd_send_eight_clocks
+	EXTERN		sd_send_eight_clocks
 	
     INCLUDE "osca.def"
 

@@ -8,13 +8,13 @@
 ;
 ;	Frode Tennebø - 29/12/2002
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.1 2003-02-04 09:10:25 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
 	
-	XLIB	ansi_SCROLLUP	
-	LIB	ansi_default
-	LIB	ansi_restore
+	PUBLIC	ansi_SCROLLUP	
+	EXTERN	ansi_default
+	EXTERN	ansi_restore
 			
 .ansi_SCROLLUP
 	call	ansi_default

@@ -9,10 +9,10 @@
 ;	Stefano Bodrato - June 2012
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.3 2012-06-04 14:04:24 stefano Exp $
+;	$Id: f_ansi_bel.asm,v 1.4 2015-01-19 01:33:18 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_BEL
+	PUBLIC	ansi_BEL
     INCLUDE "osca.def"
     INCLUDE "flos.def"
 

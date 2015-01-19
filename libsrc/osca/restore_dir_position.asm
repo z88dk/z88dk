@@ -4,12 +4,12 @@
 ;
 ;
 ;
-;	$Id: restore_dir_position.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: restore_dir_position.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  restore_dir_position
+	PUBLIC  restore_dir_position
 	
 restore_dir_position:
 	jp	kjt_restore_dir_position

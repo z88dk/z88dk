@@ -1,8 +1,8 @@
 ; void __FASTCALL__ *adt_ListPrev(struct adt_List *list)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListPrev
-LIB adt_ListLast, l_setmem
+PUBLIC adt_ListPrev
+EXTERN adt_ListLast, l_setmem
 
 .adt_ListPrev
 

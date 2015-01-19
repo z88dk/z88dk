@@ -6,13 +6,13 @@
 ; Generic version (just a bit slow)
 ;
 ;
-; $Id: putsprite.asm,v 1.6 2002-04-18 15:27:18 stefano Exp $
+; $Id: putsprite.asm,v 1.7 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
-	XLIB    putsprite
-	LIB	pixeladdress
-	LIB     swapgfxbk
-        XREF	swapgfxbk1
+	PUBLIC    putsprite
+	EXTERN	pixeladdress
+	EXTERN     swapgfxbk
+        EXTERN	swapgfxbk1
 
 	INCLUDE	"graphics/grafix.inc"
 

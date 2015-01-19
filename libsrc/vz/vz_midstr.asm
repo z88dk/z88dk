@@ -1,8 +1,8 @@
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 
-XLIB vz_midstr
-LIB vz_midstr_callee
-XREF ASMDISP_VZ_MIDSTR_CALLEE
+PUBLIC vz_midstr
+EXTERN vz_midstr_callee
+EXTERN ASMDISP_VZ_MIDSTR_CALLEE
 
 .vz_midstr
 

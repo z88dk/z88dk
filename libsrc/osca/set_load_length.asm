@@ -10,12 +10,12 @@
 ; IX:IY = Bytes to load
 ;
 ;
-;	$Id: set_load_length.asm,v 1.2 2012-03-08 07:16:46 stefano Exp $
+;	$Id: set_load_length.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  set_load_length
+	PUBLIC  set_load_length
 
 set_load_length:
 

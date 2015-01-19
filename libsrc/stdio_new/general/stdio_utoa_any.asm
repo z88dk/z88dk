@@ -1,8 +1,8 @@
 ; stdio_utoa_any
 ; 05.2008 aralbrec
 
-XLIB stdio_utoa_any
-LIB stdio_basechar, l_div_u
+PUBLIC stdio_utoa_any
+EXTERN stdio_basechar, l_div_u
 
 ; unsigned int to ascii conversion
 ; string built backwards without terminating '\0'

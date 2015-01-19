@@ -3,12 +3,12 @@
 ;
 ;	ZX Spectrum version (speeded up with a row table)
 ;
-;	$Id: bksave.asm,v 1.2 2002-03-11 17:11:34 stefano Exp $
+;	$Id: bksave.asm,v 1.3 2015-01-19 01:32:51 pauloscustodio Exp $
 ;
 
 
-	XLIB    bksave
-	LIB	zx_rowtab
+	PUBLIC    bksave
+	EXTERN	zx_rowtab
 
 
 .actrow  defw 0

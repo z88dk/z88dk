@@ -2,14 +2,14 @@
 ;       Z88dk Generic Floating Point Math Library
 ;
 ;
-;       $Id: pack2.asm,v 1.2 2014-04-08 07:06:20 stefano Exp $:
+;       $Id: pack2.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $:
 
-		XLIB	pack2
+		PUBLIC	pack2
 
-		LIB	ldfabc
-		LIB	incr
+		EXTERN	ldfabc
+		EXTERN	incr
 
-		XREF	fa
+		EXTERN	fa
 		
 
 .pack2  LD      HL,fa+5 ;round c ix de b to 40 bits

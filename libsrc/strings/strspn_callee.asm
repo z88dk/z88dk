@@ -2,11 +2,11 @@
 ; return length of prefix in s1 containing chars in s2
 ; 01.2007 aralbrec
 
-XLIB strspn_callee
-XDEF ASMDISP_STRSPN_CALLEE
+PUBLIC strspn_callee
+PUBLIC ASMDISP_STRSPN_CALLEE
 
-LIB strchr_callee
-XREF ASMDISP_STRCHR_CALLEE
+EXTERN strchr_callee
+EXTERN ASMDISP_STRCHR_CALLEE
 
 .strspn_callee
 

@@ -6,11 +6,11 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.5 2015-01-19 01:33:20 pauloscustodio Exp $
 ;
 
-	XLIB	fgetc_cons
-	LIB	msxbios
+	PUBLIC	fgetc_cons
+	EXTERN	msxbios
 
 	INCLUDE "m5bios.def"
 

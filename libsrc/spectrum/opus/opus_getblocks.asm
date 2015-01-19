@@ -5,15 +5,15 @@
 ;
 ;	int opus_getblocks (int drive);
 ;	
-;	$Id: opus_getblocks.asm,v 1.2 2014-11-21 15:17:37 stefano Exp $
+;	$Id: opus_getblocks.asm,v 1.3 2015-01-19 01:33:10 pauloscustodio Exp $
 ;
 
 
-		XLIB 	opus_getblocks
+		PUBLIC 	opus_getblocks
 
-		LIB	opus_rommap
+		EXTERN	opus_rommap
 
-		XREF	P_DEVICE
+		EXTERN	P_DEVICE
 		
 
 opus_getblocks:

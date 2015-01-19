@@ -1,10 +1,10 @@
 	INCLUDE "graphics/grafix.inc"
-	XLIB	xorborder
-	LIB	w_pixeladdress
+	PUBLIC	xorborder
+	EXTERN	w_pixeladdress
 ;	LIB	l_cmp
 
 ;
-;	$Id: xorborder.asm,v 1.1 2010-11-16 19:41:11 stefano Exp $
+;	$Id: xorborder.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
 ; ***********************************************************************

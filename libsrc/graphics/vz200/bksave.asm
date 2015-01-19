@@ -4,11 +4,11 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: bksave.asm,v 1.4 2002-04-17 21:30:25 dom Exp $
+; $Id: bksave.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
 ;
 
-	XLIB    bksave
-	LIB	pixeladdress
+	PUBLIC    bksave
+	EXTERN	pixeladdress
 
 .bksave
         ld      hl,2

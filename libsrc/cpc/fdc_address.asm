@@ -2,12 +2,12 @@
 ;       Amstrad CPC library
 ;       Internal function to get the disk address in BC
 ;
-;       $Id: fdc_address.asm,v 1.1 2008-05-26 06:38:08 stefano Exp $
+;       $Id: fdc_address.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
 ;
 
-        XLIB    disk_address
+        PUBLIC    disk_address
         
-        LIB	cpc_fdc
+        EXTERN	cpc_fdc
 
 
 .disk_address

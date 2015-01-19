@@ -14,7 +14,7 @@
 
 
 
-                XLIB    fdfputc
+                PUBLIC    fdfputc
 
 ;*fputc(n,fp)
 ;int n int fp

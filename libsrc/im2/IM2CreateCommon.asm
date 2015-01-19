@@ -1,6 +1,6 @@
 
-XLIB IM2CreateCommon
-XDEF _im2_hookDisp
+PUBLIC IM2CreateCommon
+PUBLIC _im2_hookDisp
 
 .IM2CreateCommon
 

@@ -7,11 +7,11 @@
 ;	Gets the value of a VDP register
 ;==============================================================
 ;
-;	$Id: gen_get_vdp_reg.asm,v 1.1 2010-06-30 13:21:38 stefano Exp $
+;	$Id: gen_get_vdp_reg.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
-	XLIB	get_vdp_reg
-	XREF	RG0SAV
+	PUBLIC	get_vdp_reg
+	EXTERN	RG0SAV
 
 
 get_vdp_reg:

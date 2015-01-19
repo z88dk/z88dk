@@ -1,10 +1,10 @@
 ; int __CALLEE__ adt_QueuePushFront_callee(struct adt_Queue *q, void *item)
 ; 11.2006 aralbrec
 
-XLIB adt_QueuePushFront_callee
-XDEF ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
+PUBLIC adt_QueuePushFront_callee
+PUBLIC ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
 
-XREF _u_malloc
+EXTERN _u_malloc
 
 .adt_QueuePushFront_callee
 

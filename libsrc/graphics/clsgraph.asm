@@ -1,11 +1,11 @@
 	INCLUDE	"graphics/grafix.inc"
 
-	XLIB	cleargraphics
+	PUBLIC	cleargraphics
 
-	XREF	base_graphics
+	EXTERN	base_graphics
 
 ;
-;	$Id: clsgraph.asm,v 1.4 2014-10-21 12:18:26 stefano Exp $
+;	$Id: clsgraph.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

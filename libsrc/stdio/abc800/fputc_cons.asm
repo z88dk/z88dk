@@ -8,10 +8,10 @@
 ;       We can corrupt any register
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.1 2007-11-08 14:11:50 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2015-01-19 01:33:17 pauloscustodio Exp $
 ;
 
-	XLIB  fputc_cons
+	PUBLIC  fputc_cons
 
 ;
 ; Entry:        char to print

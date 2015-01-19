@@ -1,10 +1,10 @@
 ;       Small C+ Math Library
 ;       General "fudging routine"
 
-                XLIB    hladd
+                PUBLIC    hladd
 
-                LIB	ldbchl
-                LIB	fadd
+                EXTERN	ldbchl
+                EXTERN	fadd
 
 
 ;

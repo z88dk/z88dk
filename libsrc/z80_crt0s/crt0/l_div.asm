@@ -4,10 +4,10 @@
 ; Moved from z88_crt0.asm to library function
 ;
 
-XLIB l_div
+PUBLIC l_div
 
-LIB l_div_u
-XREF L_DIVENTRY
+EXTERN l_div_u
+EXTERN L_DIVENTRY
 
 IF !ARCHAIC
 

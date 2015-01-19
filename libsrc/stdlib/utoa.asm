@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB utoa
+PUBLIC utoa
 
-LIB utoa_callee
-XREF ASMDISP_UTOA_CALLEE
+EXTERN utoa_callee
+EXTERN ASMDISP_UTOA_CALLEE
 
 .utoa
 

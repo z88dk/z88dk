@@ -4,12 +4,12 @@
 ;
 ;	Wait video hardware to be ready
 ;
-;	$Id: wait_vrt.asm,v 1.1 2011-08-03 08:13:40 stefano Exp $
+;	$Id: wait_vrt.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
 
-	XLIB  wait_vrt
+	PUBLIC  wait_vrt
 	
 wait_vrt:
 	jp	kjt_wait_vrt

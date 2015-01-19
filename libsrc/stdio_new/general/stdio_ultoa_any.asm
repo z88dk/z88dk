@@ -1,8 +1,8 @@
 ; stdio_ultoa_any
 ; 05.2008 aralbrec
 
-XLIB stdio_ultoa_any
-LIB l_long_div_u, stdio_basechar
+PUBLIC stdio_ultoa_any
+EXTERN l_long_div_u, stdio_basechar
 
 ; unsigned long to ascii conversion
 ; string built backwards without terminating '\0'

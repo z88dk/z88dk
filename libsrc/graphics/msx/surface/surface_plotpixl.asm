@@ -4,13 +4,13 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-	XLIB	surface_plotpixel
+	PUBLIC	surface_plotpixel
 
-	LIB	surface_pixeladdress
-	XREF	coords
+	EXTERN	surface_pixeladdress
+	EXTERN	coords
 
 ;
-;	$Id: surface_plotpixl.asm,v 1.4 2014-05-02 10:37:52 stefano Exp $
+;	$Id: surface_plotpixl.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

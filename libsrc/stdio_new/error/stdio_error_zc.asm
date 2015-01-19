@@ -1,7 +1,7 @@
 ; stdio_error_zc
 ; 06.2008 aralbrec
 
-XLIB stdio_error_zc
+PUBLIC stdio_error_zc
 
    pop hl
 

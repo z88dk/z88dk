@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.9 2015-01-03 16:05:53 aralbrec Exp $
+; * $Id: strtol_callee.asm,v 1.10 2015-01-19 01:33:22 pauloscustodio Exp $
 ; *
 ; */
 ;
@@ -16,9 +16,9 @@
 ; Uses all registers except iy, afp
 ; long result in dehl
 
-XLIB strtol_callee
-LIB l_long_neg, l_long_mult, asm_isspace
-XDEF ASMDISP_STRTOL_CALLEE
+PUBLIC strtol_callee
+EXTERN l_long_neg, l_long_mult, asm_isspace
+PUBLIC ASMDISP_STRTOL_CALLEE
 
 .strtol_callee
 

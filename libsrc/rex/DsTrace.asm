@@ -3,7 +3,7 @@
 ;
 ;	written by Daniel Schmidt
 
-		XLIB	DsTrace
+		PUBLIC	DsTrace
 
 .DsTrace
 	ld	d,a		;we need to reverse the param order first

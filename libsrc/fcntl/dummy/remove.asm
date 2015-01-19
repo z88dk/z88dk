@@ -1,7 +1,7 @@
 ; Dummy file libs
 ;
 
-		XLIB	remove
+		PUBLIC	remove
 
 .remove
 	ld	hl,-1	;error

@@ -1,11 +1,11 @@
 
-        XLIB	pixeladdress
+        PUBLIC	pixeladdress
 
         INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.7 2009-06-22 21:44:17 dom Exp $
+;	$Id: pixladdr.asm,v 1.8 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 ; ******************************************************************
@@ -36,7 +36,7 @@
 ;              pixels stored in a byte minus 1, AF and DE are corrupt,
 ;              and all others are preserved
 
-	XDEF	grayaltpage
+	PUBLIC	grayaltpage
 
 
 .pixeladdress

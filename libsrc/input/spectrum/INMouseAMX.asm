@@ -1,8 +1,8 @@
 ; Read AMX Mouse
 ; 08.2003 aralbrec
 
-XLIB INMouseAMX
-XREF _in_AMXcoordX, _in_AMXcoordY
+PUBLIC INMouseAMX
+EXTERN _in_AMXcoordX, _in_AMXcoordY
 
 ; exit : C = button state 00000MRL active high
 ;        B = X coordinate (0..255)

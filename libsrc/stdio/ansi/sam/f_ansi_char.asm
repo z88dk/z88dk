@@ -22,18 +22,18 @@
 ;       Frode Tennebø - 29/12/2002
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2003-02-04 09:10:23 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
 ;
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 	
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 
- 	XDEF	text_cols
- 	XDEF	text_rows
+ 	PUBLIC	text_cols
+ 	PUBLIC	text_rows
 	
-	XDEF	UNDRLN
+	PUBLIC	UNDRLN
 	
 .ansi_CHAR
 	ld	b,a		; Save char to print

@@ -2,8 +2,8 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB r_IsRectInRect8
-LIB RIsRectInRect8
+PUBLIC r_IsRectInRect8
+EXTERN RIsRectInRect8
 
 ; int r_IsRectInRect8(struct r_Rect8 *r1, struct r_Rect8 *r2)
 

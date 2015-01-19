@@ -3,9 +3,9 @@
 ;
 ;	DbReadText
 ;
-;	$Id: DbReadText.asm,v 1.2 2002-04-17 21:30:25 dom Exp $
+;	$Id: DbReadText.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
 
-		XLIB	DbReadText
+		PUBLIC	DbReadText
 
 
 .DbReadText

@@ -23,13 +23,13 @@
 ;              Carry false
 ;
 ;
-;	$Id: fill.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
+;	$Id: fill.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
 ;
 
 
 ;Usage: fill(struct *pixel)
 
-        XLIB    fill
+        PUBLIC    fill
 
         INCLUDE "cpcfirm.def"
         

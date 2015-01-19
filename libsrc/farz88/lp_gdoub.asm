@@ -5,13 +5,13 @@
 ; Exit: FA->FA+5=double
 
 ;
-; $Id: lp_gdoub.asm,v 1.2 2001-04-18 14:59:40 stefano Exp $
+; $Id: lp_gdoub.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
 ;
 
-        XLIB    lp_gdoub
-        XREF    fa
+        PUBLIC    lp_gdoub
+        EXTERN    fa
 
-        LIB     farseg1,incfar
+        EXTERN     farseg1,incfar
 
 
 .lp_gdoub

@@ -8,16 +8,16 @@
 ;
 ;
 ; ------
-; $Id: ozsavescreen.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozsavescreen.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
 ;
 
-	XLIB	ozsavescreen
+	PUBLIC	ozsavescreen
 	
 	;LIB	ozrestorescreen
-	XDEF	ozsccopy
+	PUBLIC	ozsccopy
 	
-	XREF	ozactivepage
-	LIB	ozcopy
+	EXTERN	ozactivepage
+	EXTERN	ozcopy
 
 
 ozsavescreen:

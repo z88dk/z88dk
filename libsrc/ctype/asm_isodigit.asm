@@ -1,6 +1,6 @@
 ; asm_isodigit
 
-XLIB asm_isodigit
+PUBLIC asm_isodigit
 
 ; determine whether ascii char is an octal digit
 

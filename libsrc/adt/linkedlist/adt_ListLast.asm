@@ -1,7 +1,7 @@
 ; void __FASTCALL__ *adt_ListLast(struct adt_List *list)
 ; 02.2003, 06.2005 aralbrec
 
-XLIB adt_ListLast
+PUBLIC adt_ListLast
 
 .adt_ListLast
 

@@ -1,10 +1,10 @@
 ; void __CALLEE__ *adt_HeapExtract_callee(void **array, uint *n, void *compare)
 ; 08.2005 aralbrec
 
-XLIB adt_HeapExtract_callee
-XDEF CDISP_ADT_HEAPEXTRACT_CALLEE
+PUBLIC adt_HeapExtract_callee
+PUBLIC CDISP_ADT_HEAPEXTRACT_CALLEE
 
-LIB ADTHeapExtract, ADThcompare
+EXTERN ADTHeapExtract, ADThcompare
 
 .adt_HeapExtract_callee
 

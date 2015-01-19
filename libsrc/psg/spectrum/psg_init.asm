@@ -7,17 +7,17 @@
 ;	Set up the PSG
 ;
 ;
-;	$Id: psg_init.asm,v 1.1 2013-11-21 09:01:39 stefano Exp $
+;	$Id: psg_init.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
 ;
 
-	XLIB	psg_init
-	LIB		zx_fullerstick
+	PUBLIC	psg_init
+	EXTERN		zx_fullerstick
 
-	LIB		set_psg_callee
-	LIB		get_psg
+	EXTERN		set_psg_callee
+	EXTERN		get_psg
 	
-	XREF	psg_patch0
-	XREF	psg_patch1
+	EXTERN	psg_patch0
+	EXTERN	psg_patch1
 	
 
 ; Let's force the linker to include set and get, so we can patch them

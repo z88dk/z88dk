@@ -5,8 +5,8 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
-        XLIB in_Wait
-        LIB t_delay
+        PUBLIC in_Wait
+        EXTERN t_delay
 
 ; Waits a period of time measured in milliseconds.
 ;

@@ -2,8 +2,8 @@
 ; copy n chars from s2 to s1, overlap safe
 ; 01.2007 aralbrec
 
-XLIB memmove_callee
-XDEF ASMDISP_MEMMOVE_CALLEE
+PUBLIC memmove_callee
+PUBLIC ASMDISP_MEMMOVE_CALLEE
 
 .memmove_callee
 

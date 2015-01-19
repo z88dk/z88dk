@@ -2,9 +2,9 @@
 ; compare at most n chars of string s1 to string s2
 ; 05.2002 dom, 12.2006 aralbrec
 
-XLIB strncmp_callee
-XDEF ASMDISP_STRNCMP_CALLEE
-LIB     rcmx_cpi
+PUBLIC strncmp_callee
+PUBLIC ASMDISP_STRNCMP_CALLEE
+EXTERN     rcmx_cpi
 
 
 .strncmp_callee

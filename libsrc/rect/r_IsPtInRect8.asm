@@ -2,8 +2,8 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
-XLIB r_IsPtInRect8
-LIB RIsPtInRect8
+PUBLIC r_IsPtInRect8
+EXTERN RIsPtInRect8
 
 ; int r_IsPtInRect8(uchar x, uchar y, struct r_Rect8 *r)
 

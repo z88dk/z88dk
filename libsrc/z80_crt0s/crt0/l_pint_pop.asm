@@ -4,8 +4,8 @@
 ;
 ;       23/1/2001  djm
 
-                XLIB    l_pint_pop
-		LIB	l_pint
+                PUBLIC    l_pint_pop
+		EXTERN	l_pint
 
 ; store int from HL into (DE)
 .l_pint_pop   

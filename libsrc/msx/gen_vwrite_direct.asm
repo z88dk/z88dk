@@ -5,12 +5,12 @@
 ;
 ;	Transfer count bytes from RAM (current memory page) to VRAM
 ;
-;	$Id: gen_vwrite_direct.asm,v 1.1 2010-06-30 13:21:38 stefano Exp $
+;	$Id: gen_vwrite_direct.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
 ;
 
 
-	XLIB	msx_vwrite_direct
-	LIB     SETWRT
+	PUBLIC	msx_vwrite_direct
+	EXTERN     SETWRT
 	
 	INCLUDE	"msx/vdp.inc"
 

@@ -1,7 +1,7 @@
 ; uint __FASTCALL__ in_JoyKeyboard(struct in_UDK *)
 ; 2002 aralbrec
 
-XLIB in_JoyKeyboard
+PUBLIC in_JoyKeyboard
 
 .in_JoyKeyboard
 
