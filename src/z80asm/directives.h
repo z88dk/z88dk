@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.6 2015-01-19 22:50:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.7 2015-01-20 22:39:07 pauloscustodio Exp $
 */
 
 #pragma once
@@ -53,3 +53,6 @@ extern void default_module_name(void);
 /* LSTON / LSTOFF */
 extern void list_on(void);
 extern void list_off(void);
+
+/* LINE */
+extern void c_line(int line_nr);

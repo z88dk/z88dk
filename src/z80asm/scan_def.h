@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.42 2015-01-19 22:50:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.43 2015-01-20 22:39:08 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -231,6 +231,7 @@ TOKEN_OPCODE(DEFVARS	)
 TOKEN_OPCODE(EXTERN		)
 TOKEN_OPCODE(INCLUDE	)
 TOKEN_OPCODE(LIB		)
+TOKEN_OPCODE(LINE		)
 TOKEN_OPCODE(LSTOFF		)
 TOKEN_OPCODE(LSTON		)
 TOKEN_OPCODE(MODULE		)

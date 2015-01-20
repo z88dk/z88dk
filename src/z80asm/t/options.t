@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.54 2015-01-18 18:37:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.55 2015-01-20 22:39:08 pauloscustodio Exp $
 #
 # Test options
 
@@ -714,28 +714,8 @@ t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "-IXIY");
 t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "--swap-ix-iy");
 
 #------------------------------------------------------------------------------
-# -C, --line-mode
-#------------------------------------------------------------------------------
 
-t_z80asm_error("
-	line 10
-	ld
-", 
-"Error at file 'test.asm' line 3: syntax error");
-	
-t_z80asm_error("
-	line 10
-	ld
-", 
-"Error at file 'test.asm' line 10: syntax error", "-C");
-
-t_z80asm_error("
-	line 10
-	ld
-", 
-"Error at file 'test.asm' line 10: syntax error", "--line-mode");
-
-#------------------------------------------------------------------------------
+# -C, --line-mode : tested in directives.t
 # -forcexlib, --forcexlib : tested in directives.t
 
 #------------------------------------------------------------------------------

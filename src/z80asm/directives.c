@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.6 2015-01-19 22:50:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.7 2015-01-20 22:39:07 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -24,6 +24,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.6 2015-01-19 
 #include "directives.h"
 #include "errors.h"
 #include "fileutil.h"
+#include "model.h"
 #include "module.h"
 #include "strpool.h"
 #include "types.h"
@@ -152,4 +153,18 @@ void list_off(void)
 {
 	if (opts.list)
 		opts.cur_list = FALSE;
+}
+
+/*-----------------------------------------------------------------------------
+*   LINE
+*----------------------------------------------------------------------------*/
+void c_line(int line_nr)
+{
+	DEFINE_STR(name, MAXLINE);
+
+	if (opts.line_mode)
+		set_error_line(line_nr);
+
+	Str_sprintf(name, "__C_LINE_%ld", line_nr);
+	define_symbol(name->str, get_PC(), TYPE_ADDRESS, SYM_TOUCHED);
 }

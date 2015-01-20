@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.111 2015-01-19 22:50:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.112 2015-01-20 22:39:08 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -46,7 +46,7 @@ void UNDEFINE( void );
 /* local functions */
 void ParseIdent(ParseCtx *ctx, Bool compile_active);
 void IF(void), IFDEF(void), IFNDEF(void), ELSE(void), ENDIF(void);
-void LINE( void );
+
 
 
 typedef void ( *ptrfunc )( void ); /* ptr to function returning void */
@@ -79,7 +79,6 @@ struct Z80sym Z80ident[] =
 	DEF_ENTRY( IFDEF ),
 	DEF_ENTRY( IFNDEF ),
 	DEF_ENTRY( INVOKE ),
-    DEF_ENTRY( LINE ),
     DEF_ENTRY( OZ ),
     DEF_ENTRY( UNDEFINE ),
 };
@@ -153,24 +152,6 @@ ParseIdent(ParseCtx *ctx, Bool compile_active)
             Skipline();               /* skip current line until EOL */
         }
     }
-}
-
-
-
-/* Function for Line number in C source */
-void LINE( void )
-{
-	DEFINE_STR( name, MAXLINE );
-
-    GetSym();
-	if (sym.tok != TK_NUMBER)
-		error_syntax();
-
-    if ( opts.line_mode )
-        set_error_line( sym.number );
-
-	Str_sprintf( name, "__C_LINE_%ld", sym.number );
-    define_symbol( name->str, get_PC(), TYPE_ADDRESS, SYM_TOUCHED );
 }
 
 
