@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.7 2015-01-20 22:39:07 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.8 2015-01-20 23:22:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -32,19 +32,32 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.7 2015-01-20 
 #include <assert.h>
 
 /*-----------------------------------------------------------------------------
+*   LABEL: define a label at the current location
+*----------------------------------------------------------------------------*/
+void asm_label_offset(char *name, int offset)
+{
+	define_symbol(name, get_PC() + offset, TYPE_ADDRESS, SYM_TOUCHED);
+}
+
+void asm_label(char *name)
+{
+	asm_label_offset(name, 0);
+}
+
+/*-----------------------------------------------------------------------------
 *   DEFGROUP
 *----------------------------------------------------------------------------*/
 
 static int DEFGROUP_PC;			/* next value to assign */
 
 /* start a new DEFGROUP context, give the value of the next defined constant */
-void defgroup_start(int next_value)
+void asm_defgroup_start(int next_value)
 {
 	DEFGROUP_PC = next_value;
 }
 
 /* define one constant with the next value, increment the value */
-void defgroup_define_const(char *name)
+void asm_defgroup_define_const(char *name)
 {
 	assert(name != NULL);
 	
@@ -60,7 +73,7 @@ void defgroup_define_const(char *name)
 *----------------------------------------------------------------------------*/
 
 /* create a block of empty bytes, called by the DEFS directive */
-void defs(int count, int fill)
+void asm_defs(int count, int fill)
 {
 	if (count < 0 || count > 0x10000)
 		error_int_range(count);
@@ -81,7 +94,7 @@ static int DEFVARS_STRUCT_PC;	/* DEFVARS address counter for zero based structs
 static int *DEFVARS_PC = &DEFVARS_STRUCT_PC;	/* select current DEFVARS PC*/
 
 /* start a new DEFVARS context, closing any previously open one */
-void defvars_start(int start_addr)
+void asm_defvars_start(int start_addr)
 {
 	if (start_addr == -1)
 		DEFVARS_PC = &DEFVARS_GLOBAL_PC;	/* continue from previous DEFVARS_GLOBAL_PC */
@@ -100,7 +113,7 @@ void defvars_start(int start_addr)
 }
 
 /* define one constant in the current context */
-void defvars_define_const(char *name, int elem_size, int count)
+void asm_defvars_define_const(char *name, int elem_size, int count)
 {
 	int var_size = elem_size * count;
 	int next_pc = *DEFVARS_PC + var_size;
@@ -121,7 +134,7 @@ void defvars_define_const(char *name, int elem_size, int count)
 /*-----------------------------------------------------------------------------
 *   MODULE
 *----------------------------------------------------------------------------*/
-void module_name(char *name)
+void asm_module(char *name)
 {
 	if (CURRENTMODULE->modname)
 		error_module_redefined();
@@ -134,7 +147,7 @@ void module_name(char *name)
 	}
 }
 
-void default_module_name(void)
+void asm_module_default(void)
 {
 	if (! CURRENTMODULE->modname)     /* Module name must be defined */
 		CURRENTMODULE->modname = path_remove_ext(path_basename(CURRENTMODULE->filename));
@@ -143,13 +156,13 @@ void default_module_name(void)
 /*-----------------------------------------------------------------------------
 *   LSTON / LSTOFF
 *----------------------------------------------------------------------------*/
-void list_on(void)
+void asm_lston(void)
 {
 	if (opts.list)
 		opts.cur_list = TRUE;
 }
 
-void list_off(void)
+void asm_lstoff(void)
 {
 	if (opts.list)
 		opts.cur_list = FALSE;
@@ -158,7 +171,7 @@ void list_off(void)
 /*-----------------------------------------------------------------------------
 *   LINE
 *----------------------------------------------------------------------------*/
-void c_line(int line_nr)
+void asm_line(int line_nr)
 {
 	DEFINE_STR(name, MAXLINE);
 
@@ -166,5 +179,5 @@ void c_line(int line_nr)
 		set_error_line(line_nr);
 
 	Str_sprintf(name, "__C_LINE_%ld", line_nr);
-	define_symbol(name->str, get_PC(), TYPE_ADDRESS, SYM_TOUCHED);
+	asm_label(name->str);
 }

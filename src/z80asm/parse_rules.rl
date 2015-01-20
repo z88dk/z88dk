@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.38 2015-01-20 22:39:08 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.39 2015-01-20 23:22:28 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -27,15 +27,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.38 2015-01-
 *----------------------------------------------------------------------------*/
 
 /* macros for actions - labels */
-#define DO_LABEL(name, offset) \
+#define DO_LABEL(name) \
 			if (compile_active) { \
-				define_symbol(name, get_PC() + (offset), \
-							  TYPE_ADDRESS, SYM_TOUCHED); \
+				asm_label(name); \
 			}
 
 #define DO_STMT_LABEL() \
 			if (stmt_label->len) { \
-				DO_LABEL(stmt_label->str, 0); \
+				DO_LABEL(stmt_label->str); \
 				stmt_label->len = 0; \
 			}
 
@@ -171,7 +170,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.38 2015-01-
 	/*---------------------------------------------------------------------
 	*   INCLUDE
 	*--------------------------------------------------------------------*/
-	include_op = 
+	asm_include = 
 		  _TK_INCLUDE string _TK_NEWLINE
 		  @{ parse_file(name->str); }
 		;
@@ -179,25 +178,25 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.38 2015-01-
 	/*---------------------------------------------------------------------
 	*   DEFGROUP
 	*--------------------------------------------------------------------*/
-	defgroup =
+	asm_defgroup =
 		  _TK_DEFGROUP _TK_NEWLINE
-		  @{ defgroup_start(0);
+		  @{ asm_defgroup_start(0);
 		     ctx->current_sm = SM_DEFGROUP_OPEN; }
 		| _TK_DEFGROUP _TK_LCURLY _TK_NEWLINE
-		  @{ defgroup_start(0);
+		  @{ asm_defgroup_start(0);
 		     ctx->current_sm = SM_DEFGROUP_LINE; }
 		;
 
 	defgroup_var_value =
 		  name _TK_EQUAL const_expr	
 		  %{ if (! ctx->expr_error) 
-				defgroup_start(ctx->expr_value);
-			 defgroup_define_const(name->str);
+				asm_defgroup_start(ctx->expr_value);
+			 asm_defgroup_define_const(name->str);
 		  };
 	
 	defgroup_var_next =
 		  name
-		  %{ defgroup_define_const(name->str); }
+		  %{ asm_defgroup_define_const(name->str); }
 		;
 
 	defgroup_var = defgroup_var_value | defgroup_var_next;
@@ -218,30 +217,30 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.38 2015-01-
 	/*---------------------------------------------------------------------
 	*   DEFS
 	*--------------------------------------------------------------------*/
-	defs = 
+	asm_defs = 
 		  label? _TK_DEFS const_expr _TK_NEWLINE 
 		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! ctx->expr_error) defs(ctx->expr_value, 0); }
+		     if (compile_active && ! ctx->expr_error) asm_defs(ctx->expr_value, 0); }
 		| label? _TK_DEFS 
 				const_expr _TK_COMMA
 				@{ value1 = ctx->expr_error ? 0 : ctx->expr_value; }
 				const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! ctx->expr_error) defs(value1, ctx->expr_value); }
+		     if (compile_active && ! ctx->expr_error) asm_defs(value1, ctx->expr_value); }
 		;			     
 		
 	/*---------------------------------------------------------------------
 	*   DEFVARS
 	*--------------------------------------------------------------------*/
-	defvars = 
+	asm_defvars = 
 		  _TK_DEFVARS const_expr _TK_NEWLINE
 		  @{ if (! ctx->expr_error) 
-				defvars_start(ctx->expr_value);
+				asm_defvars_start(ctx->expr_value);
 			 ctx->current_sm = SM_DEFVARS_OPEN;
 		  }
 		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
 		  @{ if (! ctx->expr_error) 
-				defvars_start(ctx->expr_value);
+				asm_defvars_start(ctx->expr_value);
 			 ctx->current_sm = SM_DEFVARS_LINE;
 		  }
 		;
@@ -257,11 +256,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.38 2015-01-
 		| _TK_END 					@{ error_missing_close_block(); }
 		| _TK_RCURLY _TK_NEWLINE	@{ ctx->current_sm = SM_MAIN; }
 		| name _TK_NEWLINE
-		  @{ defvars_define_const( name->str, 0, 0 ); }
+		  @{ asm_defvars_define_const( name->str, 0, 0 ); }
 #foreach <S> in B, W, P, L
 		| name _TK_DS_<S> const_expr _TK_NEWLINE
 		  @{ if (! ctx->expr_error) 
-				defvars_define_const( name->str, DEFVARS_SIZE_<S>, ctx->expr_value ); 
+				asm_defvars_define_const( name->str, DEFVARS_SIZE_<S>, ctx->expr_value ); 
 		  }
 #endfor  <S>
 		;
@@ -270,31 +269,31 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.38 2015-01-
 	*   LSTON / LSTOFF
 	*--------------------------------------------------------------------*/
 	list_on_off = 
-			_TK_LSTON  _TK_NEWLINE @{ list_on();  }
-		|	_TK_LSTOFF _TK_NEWLINE @{ list_off(); }
+			_TK_LSTON  _TK_NEWLINE @{ asm_lston();  }
+		|	_TK_LSTOFF _TK_NEWLINE @{ asm_lstoff(); }
 		;
 
 	/*---------------------------------------------------------------------
 	*   LINE
 	*--------------------------------------------------------------------*/
-	c_line = 
+	asm_line = 
 		_TK_LINE const_expr _TK_NEWLINE 
 		@{ 	if (!ctx->expr_error)
-				c_line(ctx->expr_value);
+				asm_line(ctx->expr_value);
 		};
 
 	/*---------------------------------------------------------------------
 	*   MODULE
 	*--------------------------------------------------------------------*/
-	module = 
+	asm_module = 
 		  _TK_MODULE name _TK_NEWLINE
-		  @{ module_name(name->str); }
+		  @{ asm_module(name->str); }
 		;
 
 	/*---------------------------------------------------------------------
 	*   ORG
 	*--------------------------------------------------------------------*/
-	org = _TK_ORG const_expr _TK_NEWLINE
+	asm_org = _TK_ORG const_expr _TK_NEWLINE
 		  @{ if (!ctx->expr_error)
 				set_origin_directive(ctx->expr_value);
 		  };
@@ -302,7 +301,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.38 2015-01-
 	/*---------------------------------------------------------------------
 	*   SECTION
 	*--------------------------------------------------------------------*/
-	section = 
+	asm_section = 
 		  _TK_SECTION name _TK_NEWLINE
 		  @{ new_section(name->str); }
 		;
@@ -339,16 +338,16 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.38 2015-01-
 		  _TK_END
 		| _TK_NEWLINE
 		
-		| c_line 
-		| defgroup
-		| defs
-		| defvars
+		| asm_line 
+		| asm_defgroup
+		| asm_defs
+		| asm_defvars
 		| extern_public_op
-		| include_op
+		| asm_include
 		| list_on_off
-		| module
-		| org
-		| section
+		| asm_module
+		| asm_org
+		| asm_section
 		
 		/*---------------------------------------------------------------------
 		*   Z80 assembly

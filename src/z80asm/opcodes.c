@@ -14,11 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.10 2014-12-31 16:11:15 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.11 2015-01-20 23:22:28 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
 
+#include "directives.h"
 #include "expr.h"
 #include "codearea.h"
 #include "model.h"
@@ -112,7 +113,7 @@ void add_call_flag(int flag, Expr *target)
 
 		add_opcode_nn(Z80_CALL, target);
 
-		define_symbol(end_label, get_PC() + jump_size + 3, TYPE_ADDRESS, SYM_TOUCHED);
+		asm_label_offset(end_label, jump_size + 3);
 	}
 }
 
