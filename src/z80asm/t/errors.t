@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.32 2015-01-18 19:09:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.33 2015-01-21 23:34:54 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -457,15 +457,7 @@ t_z80asm_ok(0, "defs 65534, 'a' \n defm \"a\" $COMMA 97 \n",
 t_z80asm_error("defs 65535, 'a' \n defm \"a\" $COMMA 97 \n",
 	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
 
-# BINARY
-my $bin_file = bin_file(); $bin_file =~ s/\.bin$/2.bin/i;
-write_file($bin_file, {binmode => ':raw'}, "a" x 65536);
-t_z80asm_ok(0, 'binary "'.$bin_file.'"',
-	    "a" x 65536);
-
-write_file($bin_file, {binmode => ':raw'}, "a" x 65537);
-t_z80asm_error('binary "'.$bin_file.'"',
-	       "Error at file 'test.asm' line 1: max. code size of 65536 bytes reached");
+# BINARY - tested in directives.t
 
 # Linker
 write_file(asm1_file(), "defb 0xAA");

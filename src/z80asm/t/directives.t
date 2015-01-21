@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.10 2015-01-20 22:39:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.11 2015-01-21 23:34:54 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -649,3 +649,38 @@ File test.obj at $0000: Z80RMF08
   Code: 9 bytes, ORG at $0100
     C $0000: 01 01 01 11 11 11 21 21 21
 END
+
+#------------------------------------------------------------------------------
+# BINARY
+#------------------------------------------------------------------------------
+write_binfile("test1.dat", "\x00\x0A\x0D\xFF");
+z80asm(
+	asm		=> <<'END',
+		ld bc,101h			;; 01 01 01
+		binary "test1.dat"	;; 00 0A 0D FF
+		ld de,1111h			;; 11 11 11
+END
+);
+
+write_binfile("test1.dat", "a" x 65536);
+z80asm(
+	asm		=> <<'END',
+		binary "test1.dat"
+END
+	bin		=> "a" x 65536,
+);
+
+z80asm(
+	asm		=> <<'END',
+		nop
+		binary "test1.dat"	;; error: max. code size of 65536 bytes reached
+END
+);
+
+write_binfile("test1.dat", "a" x 65537);
+z80asm(
+	asm		=> <<'END',
+		binary "test1.dat"	;; error: max. code size of 65536 bytes reached
+END
+);
+unlink("test1.dat");

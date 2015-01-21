@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.9 2015-01-21 23:13:34 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.10 2015-01-21 23:34:54 pauloscustodio Exp $
 */
 
 #pragma once
@@ -58,6 +58,7 @@ extern void asm_ORG(int address);
 
 /* directives with string argument */
 extern void asm_INCLUDE(char *filename);
+extern void asm_BINARY(char *filename);
 
 /* directives with name argument */
 extern void asm_MODULE(char *name);
@@ -73,4 +74,3 @@ extern void asm_LIB(char *name);
 extern void asm_PUBLIC(char *name);
 extern void asm_XDEF(char *name);
 extern void asm_XLIB(char *name);
-

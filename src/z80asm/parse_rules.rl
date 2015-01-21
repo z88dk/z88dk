@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.40 2015-01-21 23:13:35 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.41 2015-01-21 23:34:54 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -277,11 +277,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.40 2015-01-
 	/*---------------------------------------------------------------------
 	*   directives with string argument
 	*--------------------------------------------------------------------*/
-#foreach <OP> in INCLUDE
+#foreach <OP> in INCLUDE, BINARY
 	asm_<OP> = _TK_<OP> string _TK_NEWLINE
 			@{ asm_<OP>(name->str); };
 #endfor  <OP>
-	directives_str = asm_INCLUDE;
+	directives_str = asm_INCLUDE | asm_BINARY;
 
 	/*---------------------------------------------------------------------
 	*   directives with NAME argument

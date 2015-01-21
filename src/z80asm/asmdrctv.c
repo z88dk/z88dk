@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.117 2015-01-18 18:37:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.118 2015-01-21 23:34:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -312,27 +312,4 @@ DEFM( void )
         }
     }
     while ( sym.tok != TK_NEWLINE && sym.tok != TK_END );
-}
-
-
-
-
-void
-BINARY( void )
-{
-    char      *filename;
-    FILE          *binfile;
-
-    if ( GetSym() == TK_STRING )
-    {
-		filename = search_file(sym_text(&sym), opts.inc_path);
-
-        binfile = xfopen( filename, "rb" );           /* CH_0012 */
-        append_file_contents( binfile, -1 );  /* read binary code */
-        xfclose( binfile );
-    }
-    else
-    {
-		error_syntax();
-    }
 }
