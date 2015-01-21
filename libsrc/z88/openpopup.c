@@ -24,7 +24,7 @@ static char  wincrn[] = "\0x5\0x1\2*L";   /* br corner string */
 void openpopup(int wid,int tlx,int tly,int width,int height,char *name)
 {
 #asm
-	LIB	opwin
+	EXTERN	opwin
 	include	"stdio.def"
 
 	ld	ix,2		; IX points to name

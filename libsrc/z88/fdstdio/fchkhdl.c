@@ -12,7 +12,7 @@
 int fchkhdl(FILE *fp)
 {
 #asm
-	LIB	fhand_ck
+	EXTERN	fhand_ck
 	pop	de
 	push	de
 	call	fhand_ck

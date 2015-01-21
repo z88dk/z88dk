@@ -6,7 +6,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputs_callee.c,v 1.3 2014-09-28 18:26:59 pauloscustodio Exp $
+ * $Id: fputs_callee.c,v 1.4 2015-01-21 13:27:16 stefano Exp $
  */
 
 
@@ -29,7 +29,7 @@ int fputs_callee(unsigned char *s,FILE *fp)
 .asmentry
 
 DEFC ASMDISP_FPUTS_CALLEE = # asmentry - fputs_callee
-XDEF ASMDISP_FPUTS_CALLEE
+PUBLIC ASMDISP_FPUTS_CALLEE
 
 ;	pop	hl	;ret
 ;	pop	ix	;fp

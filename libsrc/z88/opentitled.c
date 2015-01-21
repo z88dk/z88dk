@@ -20,7 +20,7 @@ void opentitled(int wid,int tlx,int tly,int width,int height,char *name)
 {
 #asm
 	include	"stdio.def"
-	LIB	opwin
+	EXTERN	opwin
 
 	ld	ix,2		; IX points to name
 	add	ix,sp

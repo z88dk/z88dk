@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputc_callee.c,v 1.3 2014-09-28 18:26:59 pauloscustodio Exp $
+ * $Id: fputc_callee.c,v 1.4 2015-01-21 13:27:16 stefano Exp $
  */
 
 
@@ -33,7 +33,7 @@ int fputc_callee(int c,FILE *fp)
 .asmentry
 
 DEFC ASMDISP_FPUTC_CALLEE = # asmentry - fputc_callee
-XDEF ASMDISP_FPUTC_CALLEE
+PUBLIC ASMDISP_FPUTC_CALLEE
 
 ;	pop	de
 ;	pop	ix	;fp

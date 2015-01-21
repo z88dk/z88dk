@@ -4,7 +4,7 @@
  *
  *	djm 15/10/2001
  *
- *	$Id: sleep.c,v 1.3 2013-11-04 08:57:56 stefano Exp $
+ *	$Id: sleep.c,v 1.4 2015-01-21 13:27:16 stefano Exp $
  */
 
 #include <stdlib.h>
@@ -38,8 +38,8 @@ void sleep(int secs)
 #asm
 	INCLUDE "time.def"
 
-	LIB	l_mult
-	LIB	l_div_u
+	EXTERN	l_mult
+	EXTERN	l_div_u
 
 	ex de,hl	; __FASTCALL__ put number of seconds in HL
     

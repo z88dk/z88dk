@@ -10,7 +10,7 @@
 void openwindow(int wid,int tlx,int tly,int width,int height)
 {
 #asm
-	LIB	opwin
+	EXTERN	opwin
 
 	ld	ix,0
 	add	ix,sp
