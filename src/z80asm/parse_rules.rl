@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.39 2015-01-20 23:22:28 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.40 2015-01-21 23:13:35 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -29,7 +29,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.39 2015-01-
 /* macros for actions - labels */
 #define DO_LABEL(name) \
 			if (compile_active) { \
-				asm_label(name); \
+				asm_LABEL(name); \
 			}
 
 #define DO_STMT_LABEL() \
@@ -168,35 +168,27 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.39 2015-01-
 			  expr %{ pop_eval_expr(ctx); };
 	
 	/*---------------------------------------------------------------------
-	*   INCLUDE
-	*--------------------------------------------------------------------*/
-	asm_include = 
-		  _TK_INCLUDE string _TK_NEWLINE
-		  @{ parse_file(name->str); }
-		;
-
-	/*---------------------------------------------------------------------
 	*   DEFGROUP
 	*--------------------------------------------------------------------*/
-	asm_defgroup =
+	asm_DEFGROUP =
 		  _TK_DEFGROUP _TK_NEWLINE
-		  @{ asm_defgroup_start(0);
+		  @{ asm_DEFGROUP_start(0);
 		     ctx->current_sm = SM_DEFGROUP_OPEN; }
 		| _TK_DEFGROUP _TK_LCURLY _TK_NEWLINE
-		  @{ asm_defgroup_start(0);
+		  @{ asm_DEFGROUP_start(0);
 		     ctx->current_sm = SM_DEFGROUP_LINE; }
 		;
 
 	defgroup_var_value =
 		  name _TK_EQUAL const_expr	
 		  %{ if (! ctx->expr_error) 
-				asm_defgroup_start(ctx->expr_value);
-			 asm_defgroup_define_const(name->str);
+				asm_DEFGROUP_start(ctx->expr_value);
+			 asm_DEFGROUP_define_const(name->str);
 		  };
 	
 	defgroup_var_next =
 		  name
-		  %{ asm_defgroup_define_const(name->str); }
+		  %{ asm_DEFGROUP_define_const(name->str); }
 		;
 
 	defgroup_var = defgroup_var_value | defgroup_var_next;
@@ -215,32 +207,17 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.39 2015-01-
 		;
 	
 	/*---------------------------------------------------------------------
-	*   DEFS
-	*--------------------------------------------------------------------*/
-	asm_defs = 
-		  label? _TK_DEFS const_expr _TK_NEWLINE 
-		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! ctx->expr_error) asm_defs(ctx->expr_value, 0); }
-		| label? _TK_DEFS 
-				const_expr _TK_COMMA
-				@{ value1 = ctx->expr_error ? 0 : ctx->expr_value; }
-				const_expr _TK_NEWLINE
-		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! ctx->expr_error) asm_defs(value1, ctx->expr_value); }
-		;			     
-		
-	/*---------------------------------------------------------------------
 	*   DEFVARS
 	*--------------------------------------------------------------------*/
-	asm_defvars = 
+	asm_DEFVARS = 
 		  _TK_DEFVARS const_expr _TK_NEWLINE
 		  @{ if (! ctx->expr_error) 
-				asm_defvars_start(ctx->expr_value);
+				asm_DEFVARS_start(ctx->expr_value);
 			 ctx->current_sm = SM_DEFVARS_OPEN;
 		  }
 		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
 		  @{ if (! ctx->expr_error) 
-				asm_defvars_start(ctx->expr_value);
+				asm_DEFVARS_start(ctx->expr_value);
 			 ctx->current_sm = SM_DEFVARS_LINE;
 		  }
 		;
@@ -256,80 +233,78 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.39 2015-01-
 		| _TK_END 					@{ error_missing_close_block(); }
 		| _TK_RCURLY _TK_NEWLINE	@{ ctx->current_sm = SM_MAIN; }
 		| name _TK_NEWLINE
-		  @{ asm_defvars_define_const( name->str, 0, 0 ); }
+		  @{ asm_DEFVARS_define_const( name->str, 0, 0 ); }
 #foreach <S> in B, W, P, L
 		| name _TK_DS_<S> const_expr _TK_NEWLINE
 		  @{ if (! ctx->expr_error) 
-				asm_defvars_define_const( name->str, DEFVARS_SIZE_<S>, ctx->expr_value ); 
+				asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_<S>, ctx->expr_value ); 
 		  }
 #endfor  <S>
 		;
 
 	/*---------------------------------------------------------------------
-	*   LSTON / LSTOFF
+	*   DEFS
 	*--------------------------------------------------------------------*/
-	list_on_off = 
-			_TK_LSTON  _TK_NEWLINE @{ asm_lston();  }
-		|	_TK_LSTOFF _TK_NEWLINE @{ asm_lstoff(); }
-		;
-
+	asm_DEFS = 
+		  label? _TK_DEFS const_expr _TK_NEWLINE 
+		  @{ DO_STMT_LABEL(); 
+		     if (compile_active && ! ctx->expr_error) asm_DEFS(ctx->expr_value, 0); }
+		| label? _TK_DEFS 
+				const_expr _TK_COMMA
+				@{ value1 = ctx->expr_error ? 0 : ctx->expr_value; }
+				const_expr _TK_NEWLINE
+		  @{ DO_STMT_LABEL(); 
+		     if (compile_active && ! ctx->expr_error) asm_DEFS(value1, ctx->expr_value); }
+		;			     
+		
 	/*---------------------------------------------------------------------
-	*   LINE
+	*   directives without arguments
 	*--------------------------------------------------------------------*/
-	asm_line = 
-		_TK_LINE const_expr _TK_NEWLINE 
-		@{ 	if (!ctx->expr_error)
-				asm_line(ctx->expr_value);
-		};
-
-	/*---------------------------------------------------------------------
-	*   MODULE
-	*--------------------------------------------------------------------*/
-	asm_module = 
-		  _TK_MODULE name _TK_NEWLINE
-		  @{ asm_module(name->str); }
-		;
-
-	/*---------------------------------------------------------------------
-	*   ORG
-	*--------------------------------------------------------------------*/
-	asm_org = _TK_ORG const_expr _TK_NEWLINE
-		  @{ if (!ctx->expr_error)
-				set_origin_directive(ctx->expr_value);
-		  };
+#foreach <OP> in LSTON, LSTOFF
+	asm_<OP> = _TK_<OP> _TK_NEWLINE @{ asm_<OP>(); };
+#endfor  <OP>
+	directives_no_args = asm_LSTON | asm_LSTOFF;
 	
 	/*---------------------------------------------------------------------
-	*   SECTION
+	*   directives with contant number argument
 	*--------------------------------------------------------------------*/
-	asm_section = 
-		  _TK_SECTION name _TK_NEWLINE
-		  @{ new_section(name->str); }
-		;
+#foreach <OP> in LINE, ORG
+	asm_<OP> = _TK_<OP> const_expr _TK_NEWLINE 
+			@{ if (!ctx->expr_error) asm_<OP>(ctx->expr_value); };
+#endfor  <OP>
+	directives_n = asm_LINE | asm_ORG;
 
 	/*---------------------------------------------------------------------
-	*   EXTERN / PUBLIC / XDEF / XLIB / XREF / LIB
+	*   directives with string argument
 	*--------------------------------------------------------------------*/
-	action extern_action { declare_extern_symbol(name->str); } 
-	action xref_action   { warn_deprecated("XREF", "EXTERN");
-						   declare_extern_symbol(name->str); } 
-	action lib_action    { warn_deprecated("LIB", "EXTERN");
-						   declare_extern_symbol(name->str); } 
-
-	action public_action { declare_public_symbol(name->str); } 
-	action xdef_action   { warn_deprecated("XDEF", "PUBLIC");
-						   declare_public_symbol(name->str); } 
-	action xlib_action   { warn_deprecated("XLIB", "PUBLIC");
-						   declare_public_symbol(name->str); } 
-						   
-#foreach <OP> in extern, xref, lib, public, xdef, xlib
-	<OP>_op =
-		_TK_#UCASE( <OP> ) name @<OP>_action
-		       ( _TK_COMMA name @<OP>_action )*
-		_TK_NEWLINE ;
+#foreach <OP> in INCLUDE
+	asm_<OP> = _TK_<OP> string _TK_NEWLINE
+			@{ asm_<OP>(name->str); };
 #endfor  <OP>
+	directives_str = asm_INCLUDE;
 
-	extern_public_op = extern_op | xref_op | lib_op |
-					   public_op | xdef_op | xlib_op ;
+	/*---------------------------------------------------------------------
+	*   directives with NAME argument
+	*--------------------------------------------------------------------*/
+#foreach <OP> in MODULE, SECTION
+	asm_<OP> = _TK_<OP> name _TK_NEWLINE
+			@{ asm_<OP>(name->str); };
+#endfor  <OP>
+	directives_name = asm_MODULE | asm_SECTION;
+
+	/*---------------------------------------------------------------------
+	*   directives with list of names argument, function called for each 
+	*	argument
+	*--------------------------------------------------------------------*/
+#foreach <OP> in EXTERN, XREF, LIB, PUBLIC, XDEF, XLIB
+	action <OP>_action { asm_<OP>(name->str); }
+	
+	asm_<OP> = _TK_<OP> name @<OP>_action
+		    ( _TK_COMMA name @<OP>_action )*
+		    _TK_NEWLINE ;
+#endfor  <OP>
+	directives_names = asm_EXTERN | asm_XREF | asm_LIB |
+					   asm_PUBLIC | asm_XDEF | asm_XLIB;
 
 	/*---------------------------------------------------------------------
 	*   assembly statement
@@ -337,17 +312,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.39 2015-01-
 	main := 
 		  _TK_END
 		| _TK_NEWLINE
-		
-		| asm_line 
-		| asm_defgroup
-		| asm_defs
-		| asm_defvars
-		| extern_public_op
-		| asm_include
-		| list_on_off
-		| asm_module
-		| asm_org
-		| asm_section
+		| directives_no_args | directives_n | directives_str
+		| directives_name | directives_names
+		| asm_DEFGROUP
+		| asm_DEFVARS
+		| asm_DEFS
 		
 		/*---------------------------------------------------------------------
 		*   Z80 assembly

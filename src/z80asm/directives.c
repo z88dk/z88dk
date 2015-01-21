@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.8 2015-01-20 23:22:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.9 2015-01-21 23:13:34 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.8 2015-01-20 
 #include "fileutil.h"
 #include "model.h"
 #include "module.h"
+#include "parse.h"
 #include "strpool.h"
 #include "types.h"
 #include "symtab.h"
@@ -34,14 +35,14 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.8 2015-01-20 
 /*-----------------------------------------------------------------------------
 *   LABEL: define a label at the current location
 *----------------------------------------------------------------------------*/
-void asm_label_offset(char *name, int offset)
+void asm_LABEL_offset(char *name, int offset)
 {
 	define_symbol(name, get_PC() + offset, TYPE_ADDRESS, SYM_TOUCHED);
 }
 
-void asm_label(char *name)
+void asm_LABEL(char *name)
 {
-	asm_label_offset(name, 0);
+	asm_LABEL_offset(name, 0);
 }
 
 /*-----------------------------------------------------------------------------
@@ -51,13 +52,13 @@ void asm_label(char *name)
 static int DEFGROUP_PC;			/* next value to assign */
 
 /* start a new DEFGROUP context, give the value of the next defined constant */
-void asm_defgroup_start(int next_value)
+void asm_DEFGROUP_start(int next_value)
 {
 	DEFGROUP_PC = next_value;
 }
 
 /* define one constant with the next value, increment the value */
-void asm_defgroup_define_const(char *name)
+void asm_DEFGROUP_define_const(char *name)
 {
 	assert(name != NULL);
 	
@@ -73,7 +74,7 @@ void asm_defgroup_define_const(char *name)
 *----------------------------------------------------------------------------*/
 
 /* create a block of empty bytes, called by the DEFS directive */
-void asm_defs(int count, int fill)
+void asm_DEFS(int count, int fill)
 {
 	if (count < 0 || count > 0x10000)
 		error_int_range(count);
@@ -94,7 +95,7 @@ static int DEFVARS_STRUCT_PC;	/* DEFVARS address counter for zero based structs
 static int *DEFVARS_PC = &DEFVARS_STRUCT_PC;	/* select current DEFVARS PC*/
 
 /* start a new DEFVARS context, closing any previously open one */
-void asm_defvars_start(int start_addr)
+void asm_DEFVARS_start(int start_addr)
 {
 	if (start_addr == -1)
 		DEFVARS_PC = &DEFVARS_GLOBAL_PC;	/* continue from previous DEFVARS_GLOBAL_PC */
@@ -113,7 +114,7 @@ void asm_defvars_start(int start_addr)
 }
 
 /* define one constant in the current context */
-void asm_defvars_define_const(char *name, int elem_size, int count)
+void asm_DEFVARS_define_const(char *name, int elem_size, int count)
 {
 	int var_size = elem_size * count;
 	int next_pc = *DEFVARS_PC + var_size;
@@ -132,9 +133,51 @@ void asm_defvars_define_const(char *name, int elem_size, int count)
 }
 
 /*-----------------------------------------------------------------------------
-*   MODULE
+*   directives without arguments
 *----------------------------------------------------------------------------*/
-void asm_module(char *name)
+void asm_LSTON(void)
+{
+	if (opts.list)
+		opts.cur_list = TRUE;
+}
+
+void asm_LSTOFF(void)
+{
+	if (opts.list)
+		opts.cur_list = FALSE;
+}
+
+/*-----------------------------------------------------------------------------
+*   directives with number argument
+*----------------------------------------------------------------------------*/
+void asm_LINE(int line_nr)
+{
+	DEFINE_STR(name, MAXLINE);
+
+	if (opts.line_mode)
+		set_error_line(line_nr);
+
+	Str_sprintf(name, "__C_LINE_%ld", line_nr);
+	asm_LABEL(name->str);
+}
+
+void asm_ORG(int address)
+{
+	set_origin_directive(address);
+}
+
+/*-----------------------------------------------------------------------------
+*   directives with string argument 
+*----------------------------------------------------------------------------*/
+void asm_INCLUDE(char *filename)
+{
+	parse_file(filename);
+}
+
+/*-----------------------------------------------------------------------------
+*   directives with name argument
+*----------------------------------------------------------------------------*/
+void asm_MODULE(char *name)
 {
 	if (CURRENTMODULE->modname)
 		error_module_redefined();
@@ -147,37 +190,50 @@ void asm_module(char *name)
 	}
 }
 
-void asm_module_default(void)
+void asm_MODULE_default(void)
 {
-	if (! CURRENTMODULE->modname)     /* Module name must be defined */
+	if (!CURRENTMODULE->modname)     /* Module name must be defined */
 		CURRENTMODULE->modname = path_remove_ext(path_basename(CURRENTMODULE->filename));
 }
 
-/*-----------------------------------------------------------------------------
-*   LSTON / LSTOFF
-*----------------------------------------------------------------------------*/
-void asm_lston(void)
+void asm_SECTION(char *name)
 {
-	if (opts.list)
-		opts.cur_list = TRUE;
-}
-
-void asm_lstoff(void)
-{
-	if (opts.list)
-		opts.cur_list = FALSE;
+	new_section(name);
 }
 
 /*-----------------------------------------------------------------------------
-*   LINE
+*   directives with list of names argument, function called for each argument
 *----------------------------------------------------------------------------*/
-void asm_line(int line_nr)
+void asm_EXTERN(char *name)
 {
-	DEFINE_STR(name, MAXLINE);
+	declare_extern_symbol(name);
+}
 
-	if (opts.line_mode)
-		set_error_line(line_nr);
+void asm_XREF(char *name)
+{
+	warn_deprecated("XREF", "EXTERN");
+	declare_extern_symbol(name);
+}
 
-	Str_sprintf(name, "__C_LINE_%ld", line_nr);
-	asm_label(name->str);
+void asm_LIB(char *name)
+{
+	warn_deprecated("LIB", "EXTERN");
+	declare_extern_symbol(name);
+}
+
+void asm_PUBLIC(char *name)
+{
+	declare_public_symbol(name);
+}
+
+void asm_XDEF(char *name)
+{
+	warn_deprecated("XDEF", "PUBLIC"); 
+	declare_public_symbol(name);
+}
+
+void asm_XLIB(char *name)
+{
+	warn_deprecated("XLIB", "PUBLIC"); 
+	declare_public_symbol(name);
 }

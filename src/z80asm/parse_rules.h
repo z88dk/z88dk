@@ -130,586 +130,586 @@ st0:
 ( ctx->cs) = 0;
 	goto _out;
 tr87:
-	{ if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; }
+	{ if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; }
 	goto st1503;
 tr91:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
-	{ if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; };
-       if (compile_active && ! ctx->expr_error) asm_defs(ctx->expr_value, 0); }
+	{ if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; };
+       if (compile_active && ! ctx->expr_error) asm_DEFS(ctx->expr_value, 0); }
 	goto st1503;
 tr100:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
-	{ if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; };
-       if (compile_active && ! ctx->expr_error) asm_defs(value1, ctx->expr_value); }
+	{ if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; };
+       if (compile_active && ! ctx->expr_error) asm_DEFS(value1, ctx->expr_value); }
 	goto st1503;
 tr105:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
-	{ if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; };
-       if (compile_active && ! ctx->expr_error) asm_defs(value1, ctx->expr_value); }
+	{ if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; };
+       if (compile_active && ! ctx->expr_error) asm_DEFS(value1, ctx->expr_value); }
 	goto st1503;
 tr108:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
-	{ if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; };
-       if (compile_active && ! ctx->expr_error) asm_defs(ctx->expr_value, 0); }
+	{ if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; };
+       if (compile_active && ! ctx->expr_error) asm_DEFS(ctx->expr_value, 0); }
 	goto st1503;
 tr130:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr135:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr138:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_C )); }; }
 	goto st1503;
 tr139:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_B )); }; }
 	goto st1503;
 tr140:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_D )); }; }
 	goto st1503;
 tr141:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_E )); }; }
 	goto st1503;
 tr142:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_H )); }; }
 	goto st1503;
 tr143:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADC( REG_H )); }; }
 	goto st1503;
 tr144:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADC( REG_H )); }; }
 	goto st1503;
 tr145:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_L )); }; }
 	goto st1503;
 tr146:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADC( REG_L )); }; }
 	goto st1503;
 tr147:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADC( REG_L )); }; }
 	goto st1503;
 tr148:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_A )); }; }
 	goto st1503;
 tr151:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_idx )); }; }
 	goto st1503;
 tr163:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_ADC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_ADC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr172:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_ADC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_ADC( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr184:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_ADC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_ADC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr193:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_ADC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_ADC( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr199:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_BC )); }; }
 	goto st1503;
 tr200:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_DE )); }; }
 	goto st1503;
 tr201:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_HL )); }; }
 	goto st1503;
 tr202:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADC16( REG_SP )); }; }
 	goto st1503;
 tr223:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr228:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr231:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_C )); }; }
 	goto st1503;
 tr232:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_B )); }; }
 	goto st1503;
 tr233:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_D )); }; }
 	goto st1503;
 tr234:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_E )); }; }
 	goto st1503;
 tr235:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_H )); }; }
 	goto st1503;
 tr236:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD( REG_H )); }; }
 	goto st1503;
 tr237:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD( REG_H )); }; }
 	goto st1503;
 tr238:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_L )); }; }
 	goto st1503;
 tr239:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD( REG_L )); }; }
 	goto st1503;
 tr240:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD( REG_L )); }; }
 	goto st1503;
 tr241:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_A )); }; }
 	goto st1503;
 tr244:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_idx )); }; }
 	goto st1503;
 tr256:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_ADD( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_ADD( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr265:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_ADD( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_ADD( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr277:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_ADD( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_ADD( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr286:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_ADD( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_ADD( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr292:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_BC )); }; }
 	goto st1503;
 tr293:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_DE )); }; }
 	goto st1503;
 tr294:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_HL )); }; }
 	goto st1503;
 tr295:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_ADD16( REG_SP )); }; }
 	goto st1503;
 tr301:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_BC )); }; }
 	goto st1503;
 tr302:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_DE )); }; }
 	goto st1503;
 tr303:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_HL )); }; }
 	goto st1503;
 tr304:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD16( REG_SP )); }; }
 	goto st1503;
 tr310:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_BC )); }; }
 	goto st1503;
 tr311:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_DE )); }; }
 	goto st1503;
 tr312:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_HL )); }; }
 	goto st1503;
 tr313:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD16( REG_SP )); }; }
 	goto st1503;
 tr331:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr336:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr339:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_C )); }; }
 	goto st1503;
 tr340:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_B )); }; }
 	goto st1503;
 tr341:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_D )); }; }
 	goto st1503;
 tr342:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_E )); }; }
 	goto st1503;
 tr343:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_H )); }; }
 	goto st1503;
 tr344:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_AND( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_AND( REG_H )); }; }
 	goto st1503;
 tr345:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_AND( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_AND( REG_H )); }; }
 	goto st1503;
 tr346:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_L )); }; }
 	goto st1503;
 tr347:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_AND( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_AND( REG_L )); }; }
 	goto st1503;
 tr348:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_AND( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_AND( REG_L )); }; }
 	goto st1503;
 tr349:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_A )); }; }
 	goto st1503;
 tr352:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_AND( REG_idx )); }; }
 	goto st1503;
 tr364:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_AND( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_AND( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr373:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_AND( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_AND( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr385:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_AND( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_AND( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr394:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_AND( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_AND( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr413:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_C )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_C )); };
     }
 	goto st1503;
 tr414:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_B )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_B )); };
     }
 	goto st1503;
 tr415:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_D )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_D )); };
     }
 	goto st1503;
 tr416:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_E )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_E )); };
     }
 	goto st1503;
 tr417:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_H )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_H )); };
     }
 	goto st1503;
 tr418:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_L )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_L )); };
     }
 	goto st1503;
 tr419:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_A )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_A )); };
     }
 	goto st1503;
 tr420:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_idx )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_BIT( ctx->expr_value, REG_idx )); };
     }
 	goto st1503;
 tr432:
 	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_BIT( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_BIT( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                                 ;
     }
 	goto st1503;
 tr441:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                                    ;
      }
 	goto st1503;
 tr453:
 	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_BIT( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_BIT( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                                 ;
     }
 	goto st1503;
 tr462:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                                    ;
      }
 	goto st1503;
 tr477:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr482:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr489:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr494:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr501:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr506:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr513:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr518:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr525:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr530:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr537:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr542:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr549:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr554:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr561:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr566:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr573:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr578:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr581:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CCF); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CCF); }; }
 	goto st1503;
 tr599:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr604:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr607:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_C )); }; }
 	goto st1503;
 tr608:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_B )); }; }
 	goto st1503;
 tr609:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_D )); }; }
 	goto st1503;
 tr610:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_E )); }; }
 	goto st1503;
 tr611:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_H )); }; }
 	goto st1503;
 tr612:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_CP( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_CP( REG_H )); }; }
 	goto st1503;
 tr613:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_CP( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_CP( REG_H )); }; }
 	goto st1503;
 tr614:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_L )); }; }
 	goto st1503;
 tr615:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_CP( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_CP( REG_L )); }; }
 	goto st1503;
 tr616:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_CP( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_CP( REG_L )); }; }
 	goto st1503;
 tr617:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_A )); }; }
 	goto st1503;
 tr620:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CP( REG_idx )); }; }
 	goto st1503;
 tr632:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_CP( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_CP( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr641:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_CP( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_CP( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr653:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_CP( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_CP( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr662:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_CP( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_CP( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr663:
-	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPD), "rcmx_cpd"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPD), "rcmx_cpd"); } }; }
 	goto st1503;
 tr664:
-	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPDR), "rcmx_cpdr"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPDR), "rcmx_cpdr"); } }; }
 	goto st1503;
 tr665:
-	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPI), "rcmx_cpi"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPI), "rcmx_cpi"); } }; }
 	goto st1503;
 tr666:
-	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPIR), "rcmx_cpir"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_CPIR), "rcmx_cpir"); } }; }
 	goto st1503;
 tr667:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CPL); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_CPL); }; }
 	goto st1503;
 tr668:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DAA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DAA); }; }
 	goto st1503;
 tr689:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_C )); }; }
 	goto st1503;
 tr690:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_B )); }; }
 	goto st1503;
 tr691:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_D )); }; }
 	goto st1503;
 tr692:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_E )); }; }
 	goto st1503;
 tr693:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_H )); }; }
 	goto st1503;
 tr694:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC( REG_H )); }; }
 	goto st1503;
 tr695:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC( REG_H )); }; }
 	goto st1503;
 tr696:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_L )); }; }
 	goto st1503;
 tr697:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC( REG_L )); }; }
 	goto st1503;
 tr698:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC( REG_L )); }; }
 	goto st1503;
 tr699:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_A )); }; }
 	goto st1503;
 tr700:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_DEC16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_DEC16( REG_BC )); }; }
 	goto st1503;
 tr701:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_DEC16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_DEC16( REG_DE )); }; }
 	goto st1503;
 tr702:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_DEC16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_DEC16( REG_HL )); }; }
 	goto st1503;
 tr703:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC16( REG_IX )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC16( REG_IX )); }; }
 	goto st1503;
 tr704:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC16( REG_IY )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC16( REG_IY )); }; }
 	goto st1503;
 tr705:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_SP + Z80_DEC16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_SP + Z80_DEC16( REG_SP )); }; }
 	goto st1503;
 tr706:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_idx )); }; }
 	goto st1503;
 tr718:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_DEC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_DEC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr727:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_DEC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_DEC( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr739:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_DEC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_DEC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr748:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_DEC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_DEC( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr749:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_DI); }; }
 	goto st1503;
 tr753:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr758:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr761:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EI); }; }
 	goto st1503;
 tr767:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EX_DE_HL); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EX_DE_HL); }; }
 	goto st1503;
 tr771:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EX_AF_AF); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EX_AF_AF); }; }
 	goto st1503;
 tr772:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EX_AF_AF); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EX_AF_AF); }; }
 	goto st1503;
 tr777:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EX_IND_SP_HL); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EX_IND_SP_HL); }; }
 	goto st1503;
 tr778:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_EX_IND_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_EX_IND_SP_idx); }; }
 	goto st1503;
 tr779:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_EX_IND_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_EX_IND_SP_idx); }; }
 	goto st1503;
 tr780:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EXX); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_EXX); }; }
 	goto st1503;
 tr781:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_HALT); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_HALT); }; }
 	goto st1503;
 tr785:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IM( ctx->expr_value )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IM( ctx->expr_value )); };
     }
 	goto st1503;
 tr790:
@@ -717,33 +717,33 @@ tr790:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IM( ctx->expr_value )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IM( ctx->expr_value )); };
     }
 	goto st1503;
 tr802:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_C )); }; }
 	goto st1503;
 tr805:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_B )); }; }
 	goto st1503;
 tr808:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_D )); }; }
 	goto st1503;
 tr811:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_E )); }; }
 	goto st1503;
 tr814:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_H )); }; }
 	goto st1503;
 tr817:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_L )); }; }
 	goto st1503;
 tr823:
 	{ if (! ctx->expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_IN_A_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_IN_A_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr828:
 	{ ctx->expr_open_parens--; }
@@ -751,271 +751,271 @@ tr828:
      return FALSE;
      push_expr(ctx);
       }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_IN_A_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_IN_A_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr831:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IN_REG_C( REG_A )); }; }
 	goto st1503;
 tr852:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_C )); }; }
 	goto st1503;
 tr853:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_B )); }; }
 	goto st1503;
 tr854:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_D )); }; }
 	goto st1503;
 tr855:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_E )); }; }
 	goto st1503;
 tr856:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_H )); }; }
 	goto st1503;
 tr857:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC( REG_H )); }; }
 	goto st1503;
 tr858:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC( REG_H )); }; }
 	goto st1503;
 tr859:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_L )); }; }
 	goto st1503;
 tr860:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC( REG_L )); }; }
 	goto st1503;
 tr861:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC( REG_L )); }; }
 	goto st1503;
 tr862:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_A )); }; }
 	goto st1503;
 tr863:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_INC16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_INC16( REG_BC )); }; }
 	goto st1503;
 tr864:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_INC16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_INC16( REG_DE )); }; }
 	goto st1503;
 tr865:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_INC16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_INC16( REG_HL )); }; }
 	goto st1503;
 tr866:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC16( REG_IX )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC16( REG_IX )); }; }
 	goto st1503;
 tr867:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC16( REG_IY )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC16( REG_IY )); }; }
 	goto st1503;
 tr868:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_SP + Z80_INC16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_SP + Z80_INC16( REG_SP )); }; }
 	goto st1503;
 tr869:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INC( REG_idx )); }; }
 	goto st1503;
 tr881:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_INC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_INC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr890:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_INC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_INC( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr902:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_INC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_INC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr911:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_INC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_INC( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr912:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IND); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_IND); }; }
 	goto st1503;
 tr913:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INDR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INDR); }; }
 	goto st1503;
 tr914:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INI); }; }
 	goto st1503;
 tr915:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_INIR); }; }
 	goto st1503;
 tr930:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr935:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr942:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr947:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr954:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr959:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr966:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr971:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr978:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr983:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr990:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr995:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1002:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1007:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1014:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1019:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1026:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1031:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1034:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_JP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_JP_idx); }; }
 	goto st1503;
 tr1036:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_JP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_JP_idx); }; }
 	goto st1503;
 tr1038:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_JP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_JP_idx); }; }
 	goto st1503;
 tr1046:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1051:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1058:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1063:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1070:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1075:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1082:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1087:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1094:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1099:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1143:
 	{
     if (! ctx->expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_NN_A), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_NN_A), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1503;
 tr1144:
 	{
     if (! ctx->expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_BC )), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_BC )), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1503;
 tr1145:
 	{
     if (! ctx->expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_DE )), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_DE )), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1503;
 tr1146:
 	{
     if (! ctx->expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1503;
 tr1147:
 	{
     if (! ctx->expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1503;
 tr1148:
 	{
     if (! ctx->expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1503;
 tr1149:
 	{
     if (! ctx->expr_in_parens)
      return FALSE;
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_SP )), expr); } else OBJ_DELETE(expr); };
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_SP )), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1503;
 tr1171:
@@ -1023,13 +1023,13 @@ tr1171:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_C == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_C )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_C )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1039,76 +1039,76 @@ tr1176:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_C == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_C )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_C )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
 tr1179:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_C )); }; }
 	goto st1503;
 tr1180:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_B )); }; }
 	goto st1503;
 tr1181:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_D )); }; }
 	goto st1503;
 tr1182:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_E )); }; }
 	goto st1503;
 tr1183:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_H )); }; }
 	goto st1503;
 tr1184:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXH )); }; }
 	goto st1503;
 tr1185:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYH )); }; }
 	goto st1503;
 tr1186:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_L )); }; }
 	goto st1503;
 tr1187:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXL )); }; }
 	goto st1503;
 tr1188:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYL )); }; }
 	goto st1503;
 tr1189:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_A )); }; }
 	goto st1503;
 tr1190:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_idx )); }; }
 	goto st1503;
 tr1202:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_C, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_C, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1211:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1223:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_C, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_C, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1232:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_C, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1251:
 	{ push_expr(ctx); }
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_B == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_B )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_B )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1118,76 +1118,76 @@ tr1256:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_B == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_B )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_B )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
 tr1259:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_C )); }; }
 	goto st1503;
 tr1260:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_B )); }; }
 	goto st1503;
 tr1261:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_D )); }; }
 	goto st1503;
 tr1262:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_E )); }; }
 	goto st1503;
 tr1263:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_H )); }; }
 	goto st1503;
 tr1264:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXH )); }; }
 	goto st1503;
 tr1265:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYH )); }; }
 	goto st1503;
 tr1266:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_L )); }; }
 	goto st1503;
 tr1267:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXL )); }; }
 	goto st1503;
 tr1268:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYL )); }; }
 	goto st1503;
 tr1269:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_A )); }; }
 	goto st1503;
 tr1270:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_idx )); }; }
 	goto st1503;
 tr1282:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_B, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_B, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1291:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1303:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_B, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_B, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1312:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_B, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1331:
 	{ push_expr(ctx); }
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_D == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_D )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_D )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1197,76 +1197,76 @@ tr1336:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_D == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_D )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_D )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
 tr1339:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_C )); }; }
 	goto st1503;
 tr1340:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_B )); }; }
 	goto st1503;
 tr1341:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_D )); }; }
 	goto st1503;
 tr1342:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_E )); }; }
 	goto st1503;
 tr1343:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_H )); }; }
 	goto st1503;
 tr1344:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXH )); }; }
 	goto st1503;
 tr1345:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYH )); }; }
 	goto st1503;
 tr1346:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_L )); }; }
 	goto st1503;
 tr1347:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXL )); }; }
 	goto st1503;
 tr1348:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYL )); }; }
 	goto st1503;
 tr1349:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_A )); }; }
 	goto st1503;
 tr1350:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_idx )); }; }
 	goto st1503;
 tr1362:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_D, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_D, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1371:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1383:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_D, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_D, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1392:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_D, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1411:
 	{ push_expr(ctx); }
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_E == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_E )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_E )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1276,76 +1276,76 @@ tr1416:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_E == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_E )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_E )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
 tr1419:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_C )); }; }
 	goto st1503;
 tr1420:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_B )); }; }
 	goto st1503;
 tr1421:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_D )); }; }
 	goto st1503;
 tr1422:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_E )); }; }
 	goto st1503;
 tr1423:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_H )); }; }
 	goto st1503;
 tr1424:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXH )); }; }
 	goto st1503;
 tr1425:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYH )); }; }
 	goto st1503;
 tr1426:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_L )); }; }
 	goto st1503;
 tr1427:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXL )); }; }
 	goto st1503;
 tr1428:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYL )); }; }
 	goto st1503;
 tr1429:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_A )); }; }
 	goto st1503;
 tr1430:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_idx )); }; }
 	goto st1503;
 tr1442:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_E, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_E, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1451:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1463:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_E, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_E, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1472:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_E, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1487:
 	{ push_expr(ctx); }
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_H == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_H )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_H )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1355,124 +1355,124 @@ tr1492:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_H == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_H )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_H )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
 tr1495:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_C )); }; }
 	goto st1503;
 tr1496:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_B )); }; }
 	goto st1503;
 tr1497:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_D )); }; }
 	goto st1503;
 tr1498:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_E )); }; }
 	goto st1503;
 tr1499:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_H )); }; }
 	goto st1503;
 tr1500:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_L )); }; }
 	goto st1503;
 tr1501:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_A )); }; }
 	goto st1503;
 tr1502:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_H, REG_idx )); }; }
 	goto st1503;
 tr1514:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_H, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_H, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1523:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1535:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_H, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_H, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1544:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_H, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1556:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1561:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1564:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_C )); }; }
 	goto st1503;
 tr1565:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_B )); }; }
 	goto st1503;
 tr1566:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_D )); }; }
 	goto st1503;
 tr1567:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_E )); }; }
 	goto st1503;
 tr1568:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXH )); }; }
 	goto st1503;
 tr1569:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXL )); }; }
 	goto st1503;
 tr1570:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_A )); }; }
 	goto st1503;
 tr1582:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1587:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1590:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_C )); }; }
 	goto st1503;
 tr1591:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_B )); }; }
 	goto st1503;
 tr1592:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_D )); }; }
 	goto st1503;
 tr1593:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_E )); }; }
 	goto st1503;
 tr1594:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYH )); }; }
 	goto st1503;
 tr1595:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYL )); }; }
 	goto st1503;
 tr1596:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_A )); }; }
 	goto st1503;
 tr1611:
 	{ push_expr(ctx); }
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_L == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_L )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_L )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1482,124 +1482,124 @@ tr1616:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_L == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_L )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_L )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
 tr1619:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_C )); }; }
 	goto st1503;
 tr1620:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_B )); }; }
 	goto st1503;
 tr1621:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_D )); }; }
 	goto st1503;
 tr1622:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_E )); }; }
 	goto st1503;
 tr1623:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_H )); }; }
 	goto st1503;
 tr1624:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_L )); }; }
 	goto st1503;
 tr1625:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_A )); }; }
 	goto st1503;
 tr1626:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_L, REG_idx )); }; }
 	goto st1503;
 tr1638:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_L, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_L, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1647:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1659:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_L, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_L, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1668:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_L, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1680:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1685:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1688:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_C )); }; }
 	goto st1503;
 tr1689:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_B )); }; }
 	goto st1503;
 tr1690:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_D )); }; }
 	goto st1503;
 tr1691:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_E )); }; }
 	goto st1503;
 tr1692:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXH )); }; }
 	goto st1503;
 tr1693:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXL )); }; }
 	goto st1503;
 tr1694:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_A )); }; }
 	goto st1503;
 tr1706:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1711:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1714:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_C )); }; }
 	goto st1503;
 tr1715:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_B )); }; }
 	goto st1503;
 tr1716:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_D )); }; }
 	goto st1503;
 tr1717:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_E )); }; }
 	goto st1503;
 tr1718:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYH )); }; }
 	goto st1503;
 tr1719:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYL )); }; }
 	goto st1503;
 tr1720:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_A )); }; }
 	goto st1503;
 tr1745:
 	{ push_expr(ctx); }
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_A == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_A )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_A )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1609,107 +1609,107 @@ tr1750:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_A == REG_A ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
      else
       return FALSE;
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_A )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_A )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
 tr1753:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_C )); }; }
 	goto st1503;
 tr1754:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_B )); }; }
 	goto st1503;
 tr1755:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_D )); }; }
 	goto st1503;
 tr1756:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_E )); }; }
 	goto st1503;
 tr1757:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_H )); }; }
 	goto st1503;
 tr1758:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXH )); }; }
 	goto st1503;
 tr1759:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYH )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYH )); }; }
 	goto st1503;
 tr1760:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_L )); }; }
 	goto st1503;
 tr1761:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXL )); }; }
 	goto st1503;
 tr1762:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYL )); }; }
 	goto st1503;
 tr1763:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_A )); }; }
 	goto st1503;
 tr1764:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_I); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_I); }; }
 	goto st1503;
 tr1765:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_IIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_IIR); }; }
 	goto st1503;
 tr1766:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_R); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_R); }; }
 	goto st1503;
 tr1767:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_EIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_EIR); }; }
 	goto st1503;
 tr1768:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_BC )); }; }
 	goto st1503;
 tr1769:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_A_IND_dd( REG_IND_DE )); }; }
 	goto st1503;
 tr1770:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_idx )); }; }
 	goto st1503;
 tr1782:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_A, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_A, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1791:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1803:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_A, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_A, REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1812:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_A, REG_idx ) ) << 8); }; }
 	goto st1503;
 tr1815:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_I_A); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_I_A); }; }
 	goto st1503;
 tr1818:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_IIR_A); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_IIR_A); }; }
 	goto st1503;
 tr1821:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_R_A); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_R_A); }; }
 	goto st1503;
 tr1824:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_EIR_A); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_EIR_A); }; }
 	goto st1503;
 tr1829:
 	{ push_expr(ctx); }
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_BC == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1719,14 +1719,14 @@ tr1834:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_BC == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_BC + Z80_LD_dd_nn( REG_BC )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1735,14 +1735,14 @@ tr1841:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_DE == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1752,14 +1752,14 @@ tr1846:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_DE == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_DE + Z80_LD_dd_nn( REG_DE )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1768,14 +1768,14 @@ tr1853:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_HL == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1785,14 +1785,14 @@ tr1858:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_HL == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_HL + Z80_LD_dd_nn( REG_HL )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1801,14 +1801,14 @@ tr1865:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_IX == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1818,14 +1818,14 @@ tr1870:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_IX == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IX + Z80_LD_dd_nn( REG_IX )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1834,14 +1834,14 @@ tr1877:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_IY == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1851,14 +1851,14 @@ tr1882:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_IY == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_IY + Z80_LD_dd_nn( REG_IY )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1867,14 +1867,14 @@ tr1892:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_SP == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
@@ -1884,609 +1884,609 @@ tr1897:
 	{
     if ( ctx->expr_in_parens ) {
      if ( REG_SP == REG_HL ) {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
      else {
-      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
+      { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((Z80_LD_dd_IND_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
      }
     }
     else {
-     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
+     { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_nn((P_SP + Z80_LD_dd_nn( REG_SP )), expr); } else OBJ_DELETE(expr); };
     }
    }
 	goto st1503;
 tr1900:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_LD_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_LD_SP_idx); }; }
 	goto st1503;
 tr1901:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_SP_idx); }; }
 	goto st1503;
 tr1902:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_SP_idx); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_SP_idx); }; }
 	goto st1503;
 tr1905:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_BC )); }; }
 	goto st1503;
 tr1908:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_IND_dd_A( REG_IND_DE )); }; }
 	goto st1503;
 tr1920:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1925:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1928:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_C )); }; }
 	goto st1503;
 tr1929:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_B )); }; }
 	goto st1503;
 tr1930:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_D )); }; }
 	goto st1503;
 tr1931:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_E )); }; }
 	goto st1503;
 tr1932:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_H )); }; }
 	goto st1503;
 tr1933:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_L )); }; }
 	goto st1503;
 tr1934:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_idx, REG_A )); }; }
 	goto st1503;
 tr1957:
 	{ push_expr(ctx); }
-	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
+	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1503;
 tr1962:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
+	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1503;
 tr1965:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1966:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_B )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_B )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1967:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_D )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_D )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1968:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_E )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_E )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1969:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_H )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_H )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1970:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_L )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_L )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1971:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_A )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_LD_r_r( REG_idx, REG_A )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1991:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1996:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr1999:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
 	goto st1503;
 tr2000:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
 	goto st1503;
 tr2001:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
 	goto st1503;
 tr2002:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
 	goto st1503;
 tr2003:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
 	goto st1503;
 tr2004:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
 	goto st1503;
 tr2005:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IX + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
 	goto st1503;
 tr2028:
 	{ push_expr(ctx); }
-	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
+	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1503;
 tr2033:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
+	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1503;
 tr2036:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_C )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2037:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_B )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_B )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2038:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_D )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_D )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2039:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_E )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_E )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2040:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_H )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_H )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2041:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_L )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_L )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2042:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_A )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_LD_r_r( REG_idx, REG_A )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2062:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2067:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2070:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_C ) ) << 8); }; }
 	goto st1503;
 tr2071:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_B ) ) << 8); }; }
 	goto st1503;
 tr2072:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_D ) ) << 8); }; }
 	goto st1503;
 tr2073:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_E ) ) << 8); }; }
 	goto st1503;
 tr2074:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_H ) ) << 8); }; }
 	goto st1503;
 tr2075:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_L ) ) << 8); }; }
 	goto st1503;
 tr2076:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode((P_IY + Z80_LD_r_r( REG_idx, REG_A ) ) << 8); }; }
 	goto st1503;
 tr2077:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LDD); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LDD); }; }
 	goto st1503;
 tr2078:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LDDR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LDDR); }; }
 	goto st1503;
 tr2079:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LDI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LDI); }; }
 	goto st1503;
 tr2080:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LDIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_LDIR); }; }
 	goto st1503;
 tr2081:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_NEG); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_NEG); }; }
 	goto st1503;
 tr2082:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_NOP); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_NOP); }; }
 	goto st1503;
 tr2100:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2105:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2108:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_C )); }; }
 	goto st1503;
 tr2109:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_B )); }; }
 	goto st1503;
 tr2110:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_D )); }; }
 	goto st1503;
 tr2111:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_E )); }; }
 	goto st1503;
 tr2112:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_H )); }; }
 	goto st1503;
 tr2113:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_OR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_OR( REG_H )); }; }
 	goto st1503;
 tr2114:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_OR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_OR( REG_H )); }; }
 	goto st1503;
 tr2115:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_L )); }; }
 	goto st1503;
 tr2116:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_OR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_OR( REG_L )); }; }
 	goto st1503;
 tr2117:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_OR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_OR( REG_L )); }; }
 	goto st1503;
 tr2118:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_A )); }; }
 	goto st1503;
 tr2121:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OR( REG_idx )); }; }
 	goto st1503;
 tr2133:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_OR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_OR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2142:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_OR( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_OR( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr2154:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_OR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_OR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2163:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_OR( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_OR( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr2164:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OTDR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OTDR); }; }
 	goto st1503;
 tr2165:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OTIR); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OTIR); }; }
 	goto st1503;
 tr2176:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_OUT_n_A), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_OUT_n_A), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2188:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_C )); }; }
 	goto st1503;
 tr2189:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_B )); }; }
 	goto st1503;
 tr2190:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_D )); }; }
 	goto st1503;
 tr2191:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_E )); }; }
 	goto st1503;
 tr2192:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_H )); }; }
 	goto st1503;
 tr2193:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_L )); }; }
 	goto st1503;
 tr2194:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUT_C_REG( REG_A )); }; }
 	goto st1503;
 tr2195:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUTD); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUTD); }; }
 	goto st1503;
 tr2196:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUTI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_OUTI); }; }
 	goto st1503;
 tr2203:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_POP( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_POP( REG_BC )); }; }
 	goto st1503;
 tr2204:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_POP( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_POP( REG_DE )); }; }
 	goto st1503;
 tr2205:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_POP( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_POP( REG_HL )); }; }
 	goto st1503;
 tr2206:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_POP( REG_IX )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_POP( REG_IX )); }; }
 	goto st1503;
 tr2207:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_POP( REG_IY )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_POP( REG_IY )); }; }
 	goto st1503;
 tr2208:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_AF + Z80_POP( REG_AF )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_AF + Z80_POP( REG_AF )); }; }
 	goto st1503;
 tr2215:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_PUSH( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_BC + Z80_PUSH( REG_BC )); }; }
 	goto st1503;
 tr2216:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_PUSH( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_DE + Z80_PUSH( REG_DE )); }; }
 	goto st1503;
 tr2217:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_PUSH( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_HL + Z80_PUSH( REG_HL )); }; }
 	goto st1503;
 tr2218:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_PUSH( REG_IX )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_PUSH( REG_IX )); }; }
 	goto st1503;
 tr2219:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_PUSH( REG_IY )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_PUSH( REG_IY )); }; }
 	goto st1503;
 tr2220:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_AF + Z80_PUSH( REG_AF )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_AF + Z80_PUSH( REG_AF )); }; }
 	goto st1503;
 tr2239:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_C )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_C )); };
     }
 	goto st1503;
 tr2240:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_B )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_B )); };
     }
 	goto st1503;
 tr2241:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_D )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_D )); };
     }
 	goto st1503;
 tr2242:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_E )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_E )); };
     }
 	goto st1503;
 tr2243:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_H )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_H )); };
     }
 	goto st1503;
 tr2244:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_L )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_L )); };
     }
 	goto st1503;
 tr2245:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_A )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_A )); };
     }
 	goto st1503;
 tr2246:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_idx )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RES( ctx->expr_value, REG_idx )); };
     }
 	goto st1503;
 tr2258:
 	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RES( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RES( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                                 ;
     }
 	goto st1503;
 tr2267:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RES( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RES( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                                    ;
      }
 	goto st1503;
 tr2279:
 	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RES( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RES( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                                 ;
     }
 	goto st1503;
 tr2288:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RES( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RES( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                                    ;
      }
 	goto st1503;
 tr2292:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET); }; }
 	goto st1503;
 tr2301:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_NZ )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_NZ )); }; }
 	goto st1503;
 tr2302:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_Z )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_Z )); }; }
 	goto st1503;
 tr2303:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_NC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_NC )); }; }
 	goto st1503;
 tr2304:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_C )); }; }
 	goto st1503;
 tr2305:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_PO )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_PO )); }; }
 	goto st1503;
 tr2306:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_PE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_PE )); }; }
 	goto st1503;
 tr2307:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_P )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_P )); }; }
 	goto st1503;
 tr2308:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_M )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RET_FLAG( FLAG_M )); }; }
 	goto st1503;
 tr2309:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RETI); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RETI); }; }
 	goto st1503;
 tr2310:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RETN); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RETN); }; }
 	goto st1503;
 tr2321:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_C )); }; }
 	goto st1503;
 tr2322:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_B )); }; }
 	goto st1503;
 tr2323:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_D )); }; }
 	goto st1503;
 tr2324:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_E )); }; }
 	goto st1503;
 tr2325:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_H )); }; }
 	goto st1503;
 tr2326:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_L )); }; }
 	goto st1503;
 tr2327:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_A )); }; }
 	goto st1503;
 tr2328:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RL( REG_idx )); }; }
 	goto st1503;
 tr2340:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                            ; }
 	goto st1503;
 tr2349:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
 	goto st1503;
 tr2361:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                            ; }
 	goto st1503;
 tr2370:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
 	goto st1503;
 tr2371:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLA); }; }
 	goto st1503;
 tr2382:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_C )); }; }
 	goto st1503;
 tr2383:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_B )); }; }
 	goto st1503;
 tr2384:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_D )); }; }
 	goto st1503;
 tr2385:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_E )); }; }
 	goto st1503;
 tr2386:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_H )); }; }
 	goto st1503;
 tr2387:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_L )); }; }
 	goto st1503;
 tr2388:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_A )); }; }
 	goto st1503;
 tr2389:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLC( REG_idx )); }; }
 	goto st1503;
 tr2401:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2410:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2422:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RLC( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2431:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RLC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RLC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2432:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLCA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RLCA); }; }
 	goto st1503;
 tr2433:
-	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_RLD), "rcmx_rld"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_RLD), "rcmx_rld"); } }; }
 	goto st1503;
 tr2444:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_C )); }; }
 	goto st1503;
 tr2445:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_B )); }; }
 	goto st1503;
 tr2446:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_D )); }; }
 	goto st1503;
 tr2447:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_E )); }; }
 	goto st1503;
 tr2448:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_H )); }; }
 	goto st1503;
 tr2449:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_L )); }; }
 	goto st1503;
 tr2450:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_A )); }; }
 	goto st1503;
 tr2451:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RR( REG_idx )); }; }
 	goto st1503;
 tr2463:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); } else OBJ_DELETE(expr); }
                            ; }
 	goto st1503;
 tr2472:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
 	goto st1503;
 tr2484:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RR( REG_idx )), expr); } else OBJ_DELETE(expr); }
                            ; }
 	goto st1503;
 tr2493:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RR( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RR( REG_idx ) << 0 ) & 0x000000FF)); }
                                                  ; }
 	goto st1503;
 tr2494:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRA); }; }
 	goto st1503;
 tr2505:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_C )); }; }
 	goto st1503;
 tr2506:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_B )); }; }
 	goto st1503;
 tr2507:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_D )); }; }
 	goto st1503;
 tr2508:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_E )); }; }
 	goto st1503;
 tr2509:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_H )); }; }
 	goto st1503;
 tr2510:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_L )); }; }
 	goto st1503;
 tr2511:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_A )); }; }
 	goto st1503;
 tr2512:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRC( REG_idx )); }; }
 	goto st1503;
 tr2524:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2533:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2545:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RRC( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2554:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RRC( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RRC( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2555:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRCA); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RRCA); }; }
 	goto st1503;
 tr2556:
-	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_RRD), "rcmx_rrd"); } }; }
+	{ { if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_emul((Z80_RRD), "rcmx_rrd"); } }; }
 	goto st1503;
 tr2560:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RST( ctx->expr_value )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RST( ctx->expr_value )); };
     }
 	goto st1503;
 tr2565:
@@ -2494,438 +2494,438 @@ tr2565:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RST( ctx->expr_value )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_RST( ctx->expr_value )); };
     }
 	goto st1503;
 tr2586:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2591:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2594:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_C )); }; }
 	goto st1503;
 tr2595:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_B )); }; }
 	goto st1503;
 tr2596:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_D )); }; }
 	goto st1503;
 tr2597:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_E )); }; }
 	goto st1503;
 tr2598:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_H )); }; }
 	goto st1503;
 tr2599:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SBC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SBC( REG_H )); }; }
 	goto st1503;
 tr2600:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SBC( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SBC( REG_H )); }; }
 	goto st1503;
 tr2601:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_L )); }; }
 	goto st1503;
 tr2602:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SBC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SBC( REG_L )); }; }
 	goto st1503;
 tr2603:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SBC( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SBC( REG_L )); }; }
 	goto st1503;
 tr2604:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_A )); }; }
 	goto st1503;
 tr2607:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_idx )); }; }
 	goto st1503;
 tr2619:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_SBC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_SBC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2628:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_SBC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_SBC( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr2640:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_SBC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_SBC( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2649:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_SBC( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_SBC( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr2655:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_BC )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_BC )); }; }
 	goto st1503;
 tr2656:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_DE )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_DE )); }; }
 	goto st1503;
 tr2657:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_HL )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_HL )); }; }
 	goto st1503;
 tr2658:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_SP )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SBC16( REG_SP )); }; }
 	goto st1503;
 tr2659:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SCF); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SCF); }; }
 	goto st1503;
 tr2678:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_C )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_C )); };
     }
 	goto st1503;
 tr2679:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_B )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_B )); };
     }
 	goto st1503;
 tr2680:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_D )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_D )); };
     }
 	goto st1503;
 tr2681:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_E )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_E )); };
     }
 	goto st1503;
 tr2682:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_H )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_H )); };
     }
 	goto st1503;
 tr2683:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_L )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_L )); };
     }
 	goto st1503;
 tr2684:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_A )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_A )); };
     }
 	goto st1503;
 tr2685:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_idx )); };
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SET( ctx->expr_value, REG_idx )); };
     }
 	goto st1503;
 tr2697:
 	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SET( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SET( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                                 ;
     }
 	goto st1503;
 tr2706:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SET( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SET( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                                    ;
      }
 	goto st1503;
 tr2718:
 	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SET( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SET( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
                                                 ;
     }
 	goto st1503;
 tr2727:
 	{ if (!ctx->expr_error)
-    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SET( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+    if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SET( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
                                                                    ;
      }
 	goto st1503;
 tr2741:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_C )); }; }
 	goto st1503;
 tr2742:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_B )); }; }
 	goto st1503;
 tr2743:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_D )); }; }
 	goto st1503;
 tr2744:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_E )); }; }
 	goto st1503;
 tr2745:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_H )); }; }
 	goto st1503;
 tr2746:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_L )); }; }
 	goto st1503;
 tr2747:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_A )); }; }
 	goto st1503;
 tr2748:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLA( REG_idx )); }; }
 	goto st1503;
 tr2760:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2769:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2781:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLA( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2790:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2801:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_C )); }; }
 	goto st1503;
 tr2802:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_B )); }; }
 	goto st1503;
 tr2803:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_D )); }; }
 	goto st1503;
 tr2804:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_E )); }; }
 	goto st1503;
 tr2805:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_H )); }; }
 	goto st1503;
 tr2806:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_L )); }; }
 	goto st1503;
 tr2807:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_A )); }; }
 	goto st1503;
 tr2808:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SLL( REG_idx )); }; }
 	goto st1503;
 tr2820:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2829:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2841:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SLL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2850:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SLL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SLL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2861:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_C )); }; }
 	goto st1503;
 tr2862:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_B )); }; }
 	goto st1503;
 tr2863:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_D )); }; }
 	goto st1503;
 tr2864:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_E )); }; }
 	goto st1503;
 tr2865:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_H )); }; }
 	goto st1503;
 tr2866:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_L )); }; }
 	goto st1503;
 tr2867:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_A )); }; }
 	goto st1503;
 tr2868:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRA( REG_idx )); }; }
 	goto st1503;
 tr2880:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2889:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2901:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRA( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2910:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRA( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRA( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2921:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_C )); }; }
 	goto st1503;
 tr2922:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_B )); }; }
 	goto st1503;
 tr2923:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_D )); }; }
 	goto st1503;
 tr2924:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_E )); }; }
 	goto st1503;
 tr2925:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_H )); }; }
 	goto st1503;
 tr2926:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_L )); }; }
 	goto st1503;
 tr2927:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_A )); }; }
 	goto st1503;
 tr2928:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SRL( REG_idx )); }; }
 	goto st1503;
 tr2940:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2949:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2961:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); } else OBJ_DELETE(expr); }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SRL( REG_idx )), expr); } else OBJ_DELETE(expr); }
                             ; }
 	goto st1503;
 tr2970:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SRL( REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SRL( REG_idx ) << 0 ) & 0x000000FF)); }
                                                   ; }
 	goto st1503;
 tr2988:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2993:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr2996:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_C )); }; }
 	goto st1503;
 tr2997:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_B )); }; }
 	goto st1503;
 tr2998:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_D )); }; }
 	goto st1503;
 tr2999:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_E )); }; }
 	goto st1503;
 tr3000:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_H )); }; }
 	goto st1503;
 tr3001:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SUB( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SUB( REG_H )); }; }
 	goto st1503;
 tr3002:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SUB( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SUB( REG_H )); }; }
 	goto st1503;
 tr3003:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_L )); }; }
 	goto st1503;
 tr3004:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SUB( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_SUB( REG_L )); }; }
 	goto st1503;
 tr3005:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SUB( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_SUB( REG_L )); }; }
 	goto st1503;
 tr3006:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_A )); }; }
 	goto st1503;
 tr3009:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_idx )); }; }
 	goto st1503;
 tr3021:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_SUB( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_SUB( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr3030:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_SUB( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_SUB( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr3042:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_SUB( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_SUB( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr3051:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_SUB( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_SUB( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr3069:
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr3074:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr3077:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_C )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_C )); }; }
 	goto st1503;
 tr3078:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_B )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_B )); }; }
 	goto st1503;
 tr3079:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_D )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_D )); }; }
 	goto st1503;
 tr3080:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_E )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_E )); }; }
 	goto st1503;
 tr3081:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_H )); }; }
 	goto st1503;
 tr3082:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_XOR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_XOR( REG_H )); }; }
 	goto st1503;
 tr3083:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_XOR( REG_H )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_XOR( REG_H )); }; }
 	goto st1503;
 tr3084:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_L )); }; }
 	goto st1503;
 tr3085:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_XOR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IX + Z80_XOR( REG_L )); }; }
 	goto st1503;
 tr3086:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_XOR( REG_L )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(P_IY + Z80_XOR( REG_L )); }; }
 	goto st1503;
 tr3087:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_A )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_A )); }; }
 	goto st1503;
 tr3090:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_idx )); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_idx )); }; }
 	goto st1503;
 tr3102:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_XOR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IX + Z80_XOR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr3111:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_XOR( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IX + Z80_XOR( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr3123:
-	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_XOR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
+	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode_idx((P_IY + Z80_XOR( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1503;
 tr3132:
-	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_label(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_XOR( REG_idx ) ) << 8); }; }
+	{ if (compile_active) { if (stmt_label->len) { if (compile_active) { asm_LABEL(stmt_label->str); }; stmt_label->len = 0; }; add_opcode(( P_IY + Z80_XOR( REG_idx ) ) << 8); }; }
 	goto st1503;
 tr3133:
-	{ asm_defgroup_start(0);
+	{ asm_DEFGROUP_start(0);
        ctx->current_sm = SM_DEFGROUP_OPEN; }
 	goto st1503;
 tr3135:
-	{ asm_defgroup_start(0);
+	{ asm_DEFGROUP_start(0);
        ctx->current_sm = SM_DEFGROUP_LINE; }
 	goto st1503;
 tr3139:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_start(ctx->expr_value);
+    asm_DEFVARS_start(ctx->expr_value);
     ctx->current_sm = SM_DEFVARS_OPEN;
     }
 	goto st1503;
 tr3145:
 	{ if (! ctx->expr_error)
-    asm_defvars_start(ctx->expr_value);
+    asm_DEFVARS_start(ctx->expr_value);
     ctx->current_sm = SM_DEFVARS_LINE;
     }
 	goto st1503;
@@ -2934,54 +2934,46 @@ tr3146:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_start(ctx->expr_value);
+    asm_DEFVARS_start(ctx->expr_value);
     ctx->current_sm = SM_DEFVARS_OPEN;
     }
 	goto st1503;
 tr3152:
-	{ parse_file(name->str); }
+	{ asm_INCLUDE(name->str); }
 	goto st1503;
 tr3157:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error)
-    asm_line(ctx->expr_value);
-  }
+	{ if (!ctx->expr_error) asm_LINE(ctx->expr_value); }
 	goto st1503;
 tr3162:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error)
-    asm_line(ctx->expr_value);
-  }
+	{ if (!ctx->expr_error) asm_LINE(ctx->expr_value); }
 	goto st1503;
 tr3165:
-	{ asm_lstoff(); }
+	{ asm_LSTOFF(); }
 	goto st1503;
 tr3166:
-	{ asm_lston(); }
+	{ asm_LSTON(); }
 	goto st1503;
 tr3168:
-	{ asm_module(name->str); }
+	{ asm_MODULE(name->str); }
 	goto st1503;
 tr3172:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error)
-    set_origin_directive(ctx->expr_value);
-    }
+	{ if (!ctx->expr_error) asm_ORG(ctx->expr_value); }
 	goto st1503;
 tr3177:
 	{ ctx->expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error)
-    set_origin_directive(ctx->expr_value);
-    }
+	{ if (!ctx->expr_error) asm_ORG(ctx->expr_value); }
 	goto st1503;
 tr3182:
-	{ new_section(name->str); }
+	{ asm_SECTION(name->str); }
 	goto st1503;
 st1503:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33047,7 +33039,7 @@ case 1444:
 	goto st0;
 tr3150:
 	{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ declare_extern_symbol(name->str); }
+	{ asm_EXTERN(name->str); }
 	goto st1445;
 st1445:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33084,8 +33076,7 @@ case 1448:
 	goto st0;
 tr3153:
 	{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ warn_deprecated("LIB", "EXTERN");
-         declare_extern_symbol(name->str); }
+	{ asm_LIB(name->str); }
 	goto st1449;
 st1449:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33388,7 +33379,7 @@ case 1462:
 	goto st0;
 tr3180:
 	{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ declare_public_symbol(name->str); }
+	{ asm_PUBLIC(name->str); }
 	goto st1463;
 st1463:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33425,8 +33416,7 @@ case 1466:
 	goto st0;
 tr3183:
 	{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ warn_deprecated("XDEF", "PUBLIC");
-         declare_public_symbol(name->str); }
+	{ asm_XDEF(name->str); }
 	goto st1467;
 st1467:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33446,8 +33436,7 @@ case 1468:
 	goto st0;
 tr3184:
 	{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ warn_deprecated("XLIB", "PUBLIC");
-         declare_public_symbol(name->str); }
+	{ asm_XLIB(name->str); }
 	goto st1469;
 st1469:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33467,8 +33456,7 @@ case 1470:
 	goto st0;
 tr3185:
 	{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); }
-	{ warn_deprecated("XREF", "EXTERN");
-         declare_extern_symbol(name->str); }
+	{ asm_XREF(name->str); }
 	goto st1471;
 st1471:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33516,14 +33504,14 @@ tr3190:
 	{ error_missing_close_block(); }
 	goto st1505;
 tr3194:
-	{ asm_defgroup_define_const(name->str); }
+	{ asm_DEFGROUP_define_const(name->str); }
 	goto st1505;
 tr3200:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defgroup_start(ctx->expr_value);
-    asm_defgroup_define_const(name->str);
+    asm_DEFGROUP_start(ctx->expr_value);
+    asm_DEFGROUP_define_const(name->str);
     }
 	goto st1505;
 tr3206:
@@ -33531,8 +33519,8 @@ tr3206:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defgroup_start(ctx->expr_value);
-    asm_defgroup_define_const(name->str);
+    asm_DEFGROUP_start(ctx->expr_value);
+    asm_DEFGROUP_define_const(name->str);
     }
 	goto st1505;
 tr3210:
@@ -33557,14 +33545,14 @@ case 1475:
 	}
 	goto st0;
 tr3195:
-	{ asm_defgroup_define_const(name->str); }
+	{ asm_DEFGROUP_define_const(name->str); }
 	goto st1476;
 tr3202:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defgroup_start(ctx->expr_value);
-    asm_defgroup_define_const(name->str);
+    asm_DEFGROUP_start(ctx->expr_value);
+    asm_DEFGROUP_define_const(name->str);
     }
 	goto st1476;
 tr3208:
@@ -33572,8 +33560,8 @@ tr3208:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defgroup_start(ctx->expr_value);
-    asm_defgroup_define_const(name->str);
+    asm_DEFGROUP_start(ctx->expr_value);
+    asm_DEFGROUP_define_const(name->str);
     }
 	goto st1476;
 st1476:
@@ -33755,13 +33743,13 @@ tr3215:
 	{ error_missing_close_block(); }
 	goto st1507;
 tr3219:
-	{ asm_defvars_define_const( name->str, 0, 0 ); }
+	{ asm_DEFVARS_define_const( name->str, 0, 0 ); }
 	goto st1507;
 tr3227:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_define_const( name->str, DEFVARS_SIZE_B, ctx->expr_value );
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_B, ctx->expr_value );
     }
 	goto st1507;
 tr3232:
@@ -33769,14 +33757,14 @@ tr3232:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_define_const( name->str, DEFVARS_SIZE_B, ctx->expr_value );
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_B, ctx->expr_value );
     }
 	goto st1507;
 tr3238:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_define_const( name->str, DEFVARS_SIZE_W, ctx->expr_value );
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_W, ctx->expr_value );
     }
 	goto st1507;
 tr3243:
@@ -33784,14 +33772,14 @@ tr3243:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_define_const( name->str, DEFVARS_SIZE_W, ctx->expr_value );
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_W, ctx->expr_value );
     }
 	goto st1507;
 tr3249:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_define_const( name->str, DEFVARS_SIZE_P, ctx->expr_value );
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_P, ctx->expr_value );
     }
 	goto st1507;
 tr3254:
@@ -33799,14 +33787,14 @@ tr3254:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_define_const( name->str, DEFVARS_SIZE_P, ctx->expr_value );
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_P, ctx->expr_value );
     }
 	goto st1507;
 tr3260:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_define_const( name->str, DEFVARS_SIZE_L, ctx->expr_value );
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_L, ctx->expr_value );
     }
 	goto st1507;
 tr3265:
@@ -33814,7 +33802,7 @@ tr3265:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx); }
 	{ if (! ctx->expr_error)
-    asm_defvars_define_const( name->str, DEFVARS_SIZE_L, ctx->expr_value );
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_L, ctx->expr_value );
     }
 	goto st1507;
 tr3268:

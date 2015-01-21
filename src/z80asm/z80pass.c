@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.132 2015-01-20 23:22:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.133 2015-01-21 23:13:35 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -93,7 +93,7 @@ void parseline(ParseCtx *ctx, Bool compile_active)
 					if (sym.tok == TK_LABEL || GetSym() == TK_NAME)
 					{
 						/* labels must always be touched due to forward referencing problems in expressions */
-						asm_label(sym_text(&sym));
+						asm_LABEL(sym_text(&sym));
 
 						GetSym();      /* check for another identifier */
 					}

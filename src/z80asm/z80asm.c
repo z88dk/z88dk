@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.186 2015-01-20 23:22:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.187 2015-01-21 23:13:35 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -175,7 +175,7 @@ static void do_assemble( char *src_filename )
 
         list_end();						/* get_used_symbol will only generate page references until list_end() */
 
-		asm_module_default();			/* Module name must be defined */
+		asm_MODULE_default();			/* Module name must be defined */
 
         set_error_null();
         //set_error_module( CURRENTMODULE->modname );
