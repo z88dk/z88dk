@@ -6,11 +6,11 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2014-07-22 13:29:59 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2015-01-21 08:09:27 stefano Exp $
 ;
 
 
-          XLIB  fputc_cons
+          PUBLIC  fputc_cons
 
 
 .fputc_cons

@@ -6,14 +6,14 @@
 ;
 ; int close(int handle)
 ;
-; $Id: close.asm,v 1.4 2007-06-28 20:16:20 stefano Exp $
+; $Id: close.asm,v 1.5 2015-01-21 08:09:27 stefano Exp $
 
-	XLIB	close
+	PUBLIC	close
 	
-	LIB	zxhandl
+	EXTERN	zxhandl
 	
-	LIB	zx_setint
-	LIB	zx_goto
+	EXTERN	zx_setint
+	EXTERN	zx_goto
 	
 ; BASIC variable names for numeric values
 .svar	defb 'S',0

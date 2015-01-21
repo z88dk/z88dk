@@ -8,9 +8,9 @@
 ;
 ; int __LIB__ __FASTCALL__ readbyte(int handle)
 ;
-; $Id: readbyte.asm,v 1.3 2007-06-28 20:16:20 stefano Exp $
+; $Id: readbyte.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
 
-	XLIB	readbyte
+	PUBLIC	readbyte
 	
 .readbyte
 	ld	a,l

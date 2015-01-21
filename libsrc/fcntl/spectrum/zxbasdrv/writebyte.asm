@@ -5,9 +5,9 @@
 ;
 ; int writebyte(int handle, int byte)
 ;
-; $Id: writebyte.asm,v 1.3 2007-06-28 20:16:20 stefano Exp $
+; $Id: writebyte.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
 
-	XLIB	writebyte
+	PUBLIC	writebyte
 	
 .writebyte
 	pop	bc

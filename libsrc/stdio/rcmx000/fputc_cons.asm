@@ -11,13 +11,13 @@
 ;	Useful if you want to use the 3K expansion.
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.1 2007-02-28 11:23:23 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
 ;
 
-	XLIB	fputc_cons
-	LIB	rcmx000_cnvtab
+	PUBLIC	fputc_cons
+	EXTERN	rcmx000_cnvtab
 
-	XREF __sendchar
+	EXTERN __sendchar
 			
 .fputc_cons
 	; extern int __LIB__ fputc(int c, FILE *fp);

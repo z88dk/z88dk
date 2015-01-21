@@ -1,13 +1,13 @@
 ;
 ;	RCM2/3000 Stdio
 ;
-;	$Id: fgetc_cons.asm,v 1.1 2007-02-28 11:23:17 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
 ;
 
-	XLIB	fgetc_cons
-	LIB	rcmx000_cnvtab
+	PUBLIC	fgetc_cons
+	EXTERN	rcmx000_cnvtab
 
-	XREF __recvchar
+	EXTERN __recvchar
 
 .fgetc_cons
 	; extern int __LIB__ fgetc(FILE *fp);

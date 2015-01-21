@@ -9,7 +9,7 @@
 ;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2013-02-14 11:29:53 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2015-01-21 08:09:27 stefano Exp $
 ;
 IF A64COL
 	INCLUDE "stdio/ansi/ts2068/f_ansi_attr64.asm"
@@ -20,7 +20,7 @@ ELSE
 IF A85COL
 	INCLUDE "stdio/ansi/ts2068/f_ansi_attr85.asm"
 ELSE
-	XLIB	ansi_attr
+	PUBLIC	ansi_attr
 
 	XREF	INVRS
 	XREF	BOLD

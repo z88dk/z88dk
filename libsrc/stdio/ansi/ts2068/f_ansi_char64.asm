@@ -18,7 +18,7 @@
 ;	Display a char in location (ansi_ROW),(ansi_COLUMN)
 ;	A=char to display
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN

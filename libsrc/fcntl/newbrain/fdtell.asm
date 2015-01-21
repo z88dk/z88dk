@@ -8,10 +8,10 @@
 ;
 ;
 ;
-; $Id: fdtell.asm,v 1.1 2007-06-03 15:13:06 stefano Exp $
+; $Id: fdtell.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
 
 
-	XLIB	fdtell
+	PUBLIC	fdtell
 
 .fdtell
 	ld	hl,-1

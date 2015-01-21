@@ -5,11 +5,11 @@
 ;
 ; int creat(far char *name, mode_t mode);
 ;
-; $Id: creat.asm,v 1.1 2006-07-18 21:02:54 stefano Exp $
+; $Id: creat.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
 
-		XLIB	creat
-		LIB	open
-		LIB	close
+		PUBLIC	creat
+		EXTERN	open
+		EXTERN	close
 
 .creat
 	pop	bc

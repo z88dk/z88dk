@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2013-02-14 11:29:54 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
 ;
 IF A64COL
 	INCLUDE "stdio/ansi/ts2068/f_ansi_char64.asm"
@@ -33,7 +33,7 @@ IF A85COL
 	INCLUDE "stdio/ansi/ts2068/f_ansi_char85.asm"
 ELSE
 
-	XLIB	ansi_CHAR
+	PUBLIC	ansi_CHAR
 	
 	XREF	ansi_ROW
 	XREF	ansi_COLUMN

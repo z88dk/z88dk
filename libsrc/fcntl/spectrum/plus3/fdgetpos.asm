@@ -5,15 +5,15 @@
 ;
 ; This returns longs even though there's no real need to do so
 ;
-; $Id: fdgetpos.asm,v 1.3 2009-06-22 21:44:16 dom Exp $
+; $Id: fdgetpos.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
 
-		XLIB	fdgetpos
+		PUBLIC	fdgetpos
 
-	        INCLUDE "p3dos.def"
+		INCLUDE "p3dos.def"
 
-		LIB	l_plong
+		EXTERN	l_plong
 
-		XREF	dodos
+		EXTERN	dodos
 
 
 .fdgetpos

@@ -10,13 +10,13 @@
 ; If we can't have usleep we'll have csleep instead!
 ;
 ; -----
-; $Id: csleep.asm,v 1.5 2014-09-28 18:27:00 pauloscustodio Exp $
+; $Id: csleep.asm,v 1.6 2015-01-21 08:09:27 stefano Exp $
 
 
                 INCLUDE "time.def"
 
-                XLIB    csleep
-                XDEF    ASMDISP_CSLEEP
+                PUBLIC    csleep
+                PUBLIC    ASMDISP_CSLEEP
 
 
 ;csleep(int time);

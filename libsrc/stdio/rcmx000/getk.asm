@@ -1,13 +1,13 @@
 ;
 ;	RCM2/3000 Stdio
 ;
-;	$Id: getk.asm,v 1.1 2007-02-28 11:23:23 stefano Exp $
+;	$Id: getk.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
 ;
 
-	XLIB	getk
-	LIB	rcmx000_cnvtab
+	PUBLIC	getk
+	EXTERN	rcmx000_cnvtab
 
-	XREF __recvchar
+	EXTERN __recvchar
 
 .getk
 	; extern int __LIB__ fgetc(FILE *fp);

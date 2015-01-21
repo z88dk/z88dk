@@ -5,15 +5,15 @@
 ;
 ; int open(char *name, int flags, mode_t mode)
 ;
-; $Id: open.asm,v 1.5 2014-01-20 11:04:30 stefano Exp $
+; $Id: open.asm,v 1.6 2015-01-21 08:09:27 stefano Exp $
 
-	XLIB	open
+	PUBLIC	open
 	
-	LIB	zxhandl
+	EXTERN	zxhandl
 	
-	LIB	zx_setint
-	LIB	zx_goto
-	LIB	zxgetfname
+	EXTERN	zx_setint
+	EXTERN	zx_goto
+	EXTERN	zxgetfname
 
 
 ; BASIC variable names for numeric values

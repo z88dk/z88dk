@@ -10,15 +10,15 @@
 ;		 - Return number of seconds left
 ;
 ; -----
-; $Id: sleep.asm,v 1.5 2014-09-28 18:27:00 pauloscustodio Exp $
+; $Id: sleep.asm,v 1.6 2015-01-21 08:09:27 stefano Exp $
 
 
 		INCLUDE "time.def"
 
-                XLIB    sleep
-		LIB	l_mult
-		LIB	l_div_u
-		XDEF ASMDISP_SLEEP
+		PUBLIC    sleep
+		EXTERN	l_mult
+		EXTERN	l_div_u
+		PUBLIC ASMDISP_SLEEP
 
 ;sleep(int time);
 
