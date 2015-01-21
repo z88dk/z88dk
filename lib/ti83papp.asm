@@ -9,35 +9,35 @@
 
 	DEFINE TI83PLUSAPP	;Used by grayscale interrupt and the such
 
-	XREF	_main		; No matter what set up we have, main is
+	EXTERN	_main		; No matter what set up we have, main is
 				;  always, always external to this file.
 
-	XDEF	cleanup		; used by exit()
-	XDEF	l_dcal		; used by calculated calls = "call (hl)"
+	PUBLIC	cleanup		; used by exit()
+	PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
 
-	XDEF	_std_seed	; Integer rnd seed
+	PUBLIC	_std_seed	; Integer rnd seed
 
-	XDEF	_vfprintf	; vprintf is internal to this file so we
+	PUBLIC	_vfprintf	; vprintf is internal to this file so we
 				;  only ever include one of the set of
 				;  routines
 
-	XDEF	exitsp		; Exit variables
-	XDEF	exitcount	;
+	PUBLIC	exitsp		; Exit variables
+	PUBLIC	exitcount	;
 
-	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+	PUBLIC	heaplast	;Near malloc heap variables
+	PUBLIC	heapblocks
 
-	XDEF	__sgoioblk	; For stdin, stdout, stder
+	PUBLIC	__sgoioblk	; For stdin, stdout, stder
 
-	XDEF	base_graphics	; Graphics stuff
-	XDEF	coords		;
+	PUBLIC	base_graphics	; Graphics stuff
+	PUBLIC	coords		;
 
-	XDEF	snd_tick	; Sound variable
-	XDEF	bit_irqstatus	; current irq status when DI is necessary
+	PUBLIC	snd_tick	; Sound variable
+	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
-	XDEF	cpygraph	; TI calc specific stuff
-	XDEF	tidi		;
-	XDEF	tiei		;
+	PUBLIC	cpygraph	; TI calc specific stuff
+	PUBLIC	tidi		;
+	PUBLIC	tiei		;
 ;------------------------------
 ; Begin of Application header:
 ;------------------------------
@@ -167,7 +167,7 @@ ENDIF				;
 	ld      hl,$8080	;
 	ld      (fp_seed),hl	;
 
-	LIB	fputc_cons
+	EXTERN	fputc_cons
 	ld	hl,12
 	push	hl
 	call	fputc_cons
@@ -211,15 +211,15 @@ tidi:	ret
 ;---------------------------------
 _vfprintf:
 IF DEFINED_floatstdio
-        LIB     vfprintf_fp
+        EXTERN     vfprintf_fp
         jp      vfprintf_fp
 ELSE
         IF DEFINED_complexstdio
-                LIB     vfprintf_comp
+                EXTERN     vfprintf_comp
                 jp      vfprintf_comp
         ELSE
                 IF DEFINED_ministdio
-                        LIB     vfprintf_mini
+                        EXTERN     vfprintf_mini
                         jp      vfprintf_mini
                 ENDIF
         ENDIF

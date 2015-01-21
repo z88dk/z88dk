@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.31 2014-06-24 19:56:44 dom Exp $
+ *      $Id: codegen.c,v 1.32 2015-01-21 07:05:01 stefano Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -19,6 +19,10 @@
  *      related output, this means that if Gunther gets macros worked
  *      into z80asm, we can change the output of the compiler to be
  *      macros which we can then optimize a lot easier..hazzah!
+ *
+ *      21/1/2014 Stefano
+ *      z80asm syntax is evolving, now we declare the public objects
+ *      with 'EXTERN' and 'PUBLIC'.
  */
 
 
@@ -99,7 +103,8 @@ void DoLibHeader(void)
 		if (ISASM(ASM_ASXX)) {
 			outstr("\n\t.module\t");
 		} else if ( ISASM(ASM_Z80ASM) ) {
-            outstr ("\n\tMODULE\t");
+        /*    outstr ("\n\tMODULE\t"); */
+            outstr ("\n\t; MODULE\t");
         } else {
             outstr("\n;\t module\t");
         }
@@ -159,8 +164,10 @@ void DoLibHeader(void)
 	} else {
         outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
 		if ( noaltreg ) {
-		    ol("XREF\tsaved_hl");
-		    ol("XREF\tsaved_de");
+/*		    ol("XREF\tsaved_hl");
+		    ol("XREF\tsaved_de"); */
+		    ol("EXTERN\tsaved_hl");
+		    ol("EXTERN\tsaved_de");
 		}
 	}
     donelibheader=1;
@@ -2000,13 +2007,16 @@ void GlobalPrefix(char type)
     }
     switch(type) {
     case XDEF:
-        ot("XDEF\t");
+    /*    ot("XDEF\t"); */
+        ot("PUBLIC\t");
         break;
     case XREF:
-        ot("XREF\t");
+    /*    ot("XREF\t"); */
+        ot("EXTERN\t");
         break;
     case LIB:
-        ot("LIB\t");
+    /*    ot("LIB\t"); */
+        ot("EXTERN\t");
         break;
     }
 }

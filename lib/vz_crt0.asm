@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.15 2013-10-21 14:23:44 stefano Exp $
+;       $Id: vz_crt0.asm,v 1.16 2015-01-21 07:05:01 stefano Exp $
 ;
 
 
@@ -20,30 +20,30 @@
 ; Some scope definitions
 ;--------
 
-        XREF    _main           ;main() is always external to crt0 code
+        EXTERN    _main           ;main() is always external to crt0 code
 
-        XDEF    cleanup         ;jp'd to by exit()
-        XDEF    l_dcal          ;jp(hl)
+        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    l_dcal          ;jp(hl)
 
 
-        XDEF    _vfprintf       ;jp to the printf() core
+        PUBLIC    _vfprintf       ;jp to the printf() core
 
-        XDEF    exitsp          ;atexit() variables
-        XDEF    exitcount
+        PUBLIC    exitsp          ;atexit() variables
+        PUBLIC    exitcount
 
-       	XDEF	heaplast	;Near malloc heap variables
-       	XDEF	heapblocks
+       	PUBLIC	heaplast	;Near malloc heap variables
+       	PUBLIC	heapblocks
 
-        XDEF    __sgoioblk      ;stdio info block
+        PUBLIC    __sgoioblk      ;stdio info block
 
-;Graphic function XDEFS..
+;Graphic function PUBLICS..
 
-        XDEF    coords          ;Current xy position
-        XDEF    base_graphics   ;GFX memory related variables
-        XDEF    gfx_bank
+        PUBLIC    coords          ;Current xy position
+        PUBLIC    base_graphics   ;GFX memory related variables
+        PUBLIC    gfx_bank
 
-        XDEF	snd_tick	; Sound variable
-        XDEF	bit_irqstatus	; current irq status when DI is necessary
+        PUBLIC	snd_tick	; Sound variable
+        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
         IF      !myzorg
             IF (startup=3)
@@ -141,7 +141,7 @@ cleanup:
         push    hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-        LIB     closeall
+        EXTERN     closeall
         call    closeall
 ENDIF
 ENDIF
@@ -171,15 +171,15 @@ ENDIF
 
 _vfprintf:
 IF DEFINED_floatstdio
-        LIB     vfprintf_fp
+        EXTERN     vfprintf_fp
         jp      vfprintf_fp
 ELSE
         IF DEFINED_complexstdio
-                LIB     vfprintf_comp
+                EXTERN     vfprintf_comp
                 jp      vfprintf_comp
         ELSE
                 IF DEFINED_ministdio
-                        LIB     vfprintf_mini
+                        EXTERN     vfprintf_mini
                         jp      vfprintf_mini
                 ENDIF
         ENDIF
@@ -194,7 +194,7 @@ base_graphics:  defw    0       ; Address of the Graphics map
 gfx_bank:       defb    0
 
 IF !DEFINED_HAVESEED
-		XDEF    _std_seed        ;Integer rand() seed
+		PUBLIC    _std_seed        ;Integer rand() seed
 _std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
@@ -205,8 +205,8 @@ heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area
@@ -216,8 +216,8 @@ _heap:
 ENDIF
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

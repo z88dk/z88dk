@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: m5_crt0.asm,v 1.12 2013-06-18 06:11:23 stefano Exp $
+;       $Id: m5_crt0.asm,v 1.13 2015-01-21 07:05:00 stefano Exp $
 ;
 
 
@@ -21,53 +21,53 @@
 ; No matter what set up we have, main is always, always external to
 ; this file
 
-        XREF    _main
+        EXTERN    _main
 
 ;
 ; Some variables which are needed for both app and basic startup
 ;
 
-        XDEF    cleanup
-        XDEF    l_dcal
+        PUBLIC    cleanup
+        PUBLIC    l_dcal
 
 ; Integer rnd seed
 
-        XDEF    _std_seed
+        PUBLIC    _std_seed
 
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
 
-        XDEF	_vfprintf
+        PUBLIC	_vfprintf
 
 ;Exit variables
 
-        XDEF    exitsp
-        XDEF    exitcount
+        PUBLIC    exitsp
+        PUBLIC    exitcount
 
-       	XDEF	heaplast	;Near malloc heap variables
-        XDEF	heapblocks
+       	PUBLIC	heaplast	;Near malloc heap variables
+        PUBLIC	heapblocks
 
 ;For stdin, stdout, stder
 
-        XDEF    __sgoioblk
+        PUBLIC    __sgoioblk
 
 ; Graphics stuff
-        XDEF	pixelbyte	; Temp store for non-buffered mode
-        XDEF    base_graphics   ; Graphical variables
-        XDEF    coords          ; Current xy position
+        PUBLIC	pixelbyte	; Temp store for non-buffered mode
+        PUBLIC    base_graphics   ; Graphical variables
+        PUBLIC    coords          ; Current xy position
 
 ; MSX platform specific stuff
 ;
-        XDEF    msxbios
+        PUBLIC    msxbios
 
-		XDEF	RG0SAV		;keeping track of VDP register values
-		XDEF	RG1SAV
-		XDEF	RG2SAV
-		XDEF	RG3SAV
-		XDEF	RG4SAV
-		XDEF	RG5SAV
-		XDEF	RG6SAV
-		XDEF	RG7SAV
+		PUBLIC	RG0SAV		;keeping track of VDP register values
+		PUBLIC	RG1SAV
+		PUBLIC	RG2SAV
+		PUBLIC	RG3SAV
+		PUBLIC	RG4SAV
+		PUBLIC	RG5SAV
+		PUBLIC	RG6SAV
+		PUBLIC	RG7SAV
 
 ; Now, getting to the real stuff now!
 
@@ -118,7 +118,7 @@ cleanup:
 	push	hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -151,15 +151,15 @@ ENDIF
 
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -183,8 +183,8 @@ heaplast:	defw	0
 heapblocks:	defw	0
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

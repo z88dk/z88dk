@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.36 2014-11-27 15:18:20 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.37 2015-01-21 07:05:00 stefano Exp $
 ;
 
 
@@ -21,33 +21,33 @@
 ; Some scope definitions
 ;--------
 
-        XREF    _main           ; main() is always external to crt0 code
+        EXTERN    _main           ; main() is always external to crt0 code
 
-        XDEF    cleanup         ; jp'd to by exit()
-        XDEF    l_dcal          ; jp(hl)
+        PUBLIC    cleanup         ; jp'd to by exit()
+        PUBLIC    l_dcal          ; jp(hl)
 
 
-        XDEF    _vfprintf       ; jp to the printf() core
+        PUBLIC    _vfprintf       ; jp to the printf() core
 
-        XDEF    exitsp          ; atexit() variables
-        XDEF    exitcount
+        PUBLIC    exitsp          ; atexit() variables
+        PUBLIC    exitcount
 
-        XDEF    heaplast        ; Near malloc heap variables
-        XDEF    heapblocks
+        PUBLIC    heaplast        ; Near malloc heap variables
+        PUBLIC    heapblocks
 
-        XDEF    __sgoioblk      ; stdio info block
+        PUBLIC    __sgoioblk      ; stdio info block
 
-        XDEF    base_graphics   ; Graphical variables
-        XDEF    coords          ; Current xy position
+        PUBLIC    base_graphics   ; Graphical variables
+        PUBLIC    coords          ; Current xy position
 
-        XDEF    snd_tick        ; Sound variable
-        XDEF	bit_irqstatus	; current irq status when DI is necessary
+        PUBLIC    snd_tick        ; Sound variable
+        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
-        XDEF	_RND_BLOCKSIZE;
+        PUBLIC	_RND_BLOCKSIZE;
 
-        XDEF    call_rom3       ; Interposer
+        PUBLIC    call_rom3       ; Interposer
        
-        XDEF    _FRAMES
+        PUBLIC    _FRAMES
         defc    _FRAMES = 23672	; Timer
 
 ;--------
@@ -142,7 +142,7 @@ IF DEFINED_USING_amalloc
 
 		push bc ; main address for malloc area
 		push hl	; area size
-		LIB sbrk_callee
+		EXTERN sbrk_callee
 		call	sbrk_callee
 ENDIF
 
@@ -182,7 +182,7 @@ cleanup:
         push    hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-        LIB     closeall
+        EXTERN     closeall
         call    closeall
 ENDIF
 ENDIF
@@ -205,7 +205,7 @@ endif
 
 ; ########  END OF ROM INTERRUPT HANDLER ######## 
 
-XDEF zx_internal_cls
+PUBLIC zx_internal_cls
 zx_internal_cls:
         ld      hl,$4000        ; cls
         ld      d,h
@@ -258,15 +258,15 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 ;---------------------------------
 _vfprintf:
 IF DEFINED_floatstdio
-        LIB     vfprintf_fp
+        EXTERN     vfprintf_fp
         jp      vfprintf_fp
 ELSE
         IF DEFINED_complexstdio
-                LIB     vfprintf_comp
+                EXTERN     vfprintf_comp
                 jp      vfprintf_comp
         ELSE
                 IF DEFINED_ministdio
-                        LIB     vfprintf_mini
+                        EXTERN     vfprintf_mini
                         jp      vfprintf_mini
                 ENDIF
         ENDIF
@@ -281,7 +281,7 @@ IF DEFINED_NEEDresidos
         defc    ERR_NR=$5c3a            ; BASIC system variables
         defc    ERR_SP=$5c3d
 
-        XDEF    dodos
+        PUBLIC    dodos
 ;
 ; This is support for residos, we use the normal
 ; +3 -lplus3 library and rewrite the values so
@@ -353,7 +353,7 @@ IF DEFINED_NEEDplus3dodos
 ;       code to ensure we don't get paged out
 ;       (These routines have to be below 49152)
 ;       djm 17/3/2000 (after the manual!)
-        XDEF    dodos
+        PUBLIC    dodos
 dodos:
         call    dodos2          ;dummy routine to restore iy afterwards
         ld      iy,23610
@@ -440,7 +440,7 @@ ENDIF
 IF (startup=2) | (startup=3) ; ROM or moved system variables
 ;---------------------------------------------------------------------------
 
-        XDEF    romsvc		; service space for ROM
+        PUBLIC    romsvc		; service space for ROM
 
 ;; ;## Bypass to prevent an accidental insertion of the Interface 1 ##
 ;; ;## Requires a manual tuning, so it is commented out by default  ##
@@ -453,11 +453,11 @@ IF (startup=2) | (startup=3) ; ROM or moved system variables
 ;; defw    0
 
 IF DEFINED_NEED_ZXMMC
-      XDEF card_select
+      PUBLIC card_select
 ENDIF
 
 IF !DEFINED_HAVESEED
-      XDEF    _std_seed         ; Integer rand() seed
+      PUBLIC    _std_seed         ; Integer rand() seed
 ENDIF
 
 
@@ -516,7 +516,7 @@ coords:         defw    0       ; Current graphics xy coordinates
 base_graphics:  defw    0       ; Address of the Graphics map
 
 IF !DEFINED_HAVESEED
-                XDEF    _std_seed        ;Integer rand() seed
+                PUBLIC    _std_seed        ;Integer rand() seed
 _std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
@@ -529,8 +529,8 @@ heapblocks:     defw    0       ; Number of blocks
 
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area
@@ -546,7 +546,7 @@ ENDIF
 
 ; ZXMMC SD/MMC interface
 IF DEFINED_NEED_ZXMMC
-	XDEF card_select
+	PUBLIC card_select
 card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
 

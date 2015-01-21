@@ -14,7 +14,7 @@
 ;***** GreyLib version 1.0 (C) 1997 by Bill Nagel & Dines Justesen *********
 ;---------------------------------------------------------------------------
 ;
-; $Id: gray83pSE.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
+; $Id: gray83pSE.asm,v 1.6 2015-01-21 07:05:00 stefano Exp $
 ;
 
 defc LCD_BUSY_QUICK  = $000B		; Faster entry then BCALLing
@@ -131,8 +131,8 @@ WriteLoop:				; Write them
 IntProcEnd:
 
 IF !TI83PLUSAPP
-	XDEF	graybit1
-	XDEF	graybit2
+	PUBLIC	graybit1
+	PUBLIC	graybit2
 	
 defc intcount = $8A8D			; 1 byte needed
 

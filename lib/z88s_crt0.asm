@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.13 2014-04-15 20:09:20 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.14 2015-01-21 07:05:01 stefano Exp $
 
 
 
@@ -129,7 +129,7 @@ ENDIF
 	
 cleanup:			;Jump back here from exit() if needed
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall	;Close any open files (fopen)
 ENDIF
         call    resterrhan	;Restore the original error handler
@@ -188,15 +188,15 @@ errescpressed:
 ;-----------
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -207,11 +207,11 @@ ENDIF
 ; Far memory setup
 ;--------
 IF DEFINED_farheapsz
-        LIB     freeall_far
-        XDEF    farpages
-        XDEF    malloc_table
-        XDEF    farmemspec
-        XDEF    pool_table
+        EXTERN     freeall_far
+        PUBLIC    farpages
+        PUBLIC    malloc_table
+        PUBLIC    farmemspec
+        PUBLIC    pool_table
         INCLUDE "init_far.asm"
 
 ; Variables that can't be place in the normal defvars
@@ -236,7 +236,7 @@ ENDIF
 ; Prototype is extern void __FASTCALL__ *cpfar2near(far void *)
 ;--------
 IF DEFINED_farheapsz
-        LIB     strcpy_far
+        EXTERN     strcpy_far
 _cpfar2near:
         pop     bc      ;ret address
         pop     hl
@@ -274,7 +274,7 @@ ENDIF
 ;----------
 ; The system() function for the shell 
 ;----------
-	XDEF	_system
+	PUBLIC	_system
 _system:
 	pop	de		; DE=return address
 	pop	bc		; BC=command address
@@ -294,7 +294,7 @@ system_forthcode:
 ;----------
 ; The shellapi() interface
 ;----------
-	XDEF	_shellapi
+	PUBLIC	_shellapi
 
 _shellapi:
 	push	hl
@@ -357,8 +357,8 @@ heaplast:	defw	0	; Address of last block on heap
 heapblocks:	defw 	0	; Number of blocks
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

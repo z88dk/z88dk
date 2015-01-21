@@ -6,7 +6,7 @@
 ; Recoded -because of strange problems- by Henk Poley - July 2001
 ; Based upon vnGrey, a Venus greyscale library (Ti83).
 ;
-; $Id: gray83.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
+; $Id: gray83.asm,v 1.6 2015-01-21 07:05:00 stefano Exp $
 ;
 
 defc intcount    = $878A        ; 1 byte needed
@@ -120,8 +120,8 @@ fastCopyLoop:
 	jr	exit_interrupt2		;
 IntProcEnd:
 
-	XDEF	graybit1
-	XDEF	graybit2
+	PUBLIC	graybit1
+	PUBLIC	graybit2
 
 graybit1:	defw	plotSScreen
 IF DEFINED_DontUseApdRam

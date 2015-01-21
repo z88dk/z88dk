@@ -1,7 +1,7 @@
 ;
 ;	Startup for test emulator
 ;
-;	$Id: test_crt0.asm,v 1.3 2009-06-22 21:20:05 dom Exp $
+;	$Id: test_crt0.asm,v 1.4 2015-01-21 07:05:00 stefano Exp $
 
 
     module test_crt0
@@ -18,20 +18,20 @@
 ; Some scope definitions
 ;--------
 
-        XREF    _main           ;main() is always external to crt0 code
+        EXTERN    _main           ;main() is always external to crt0 code
 
-        XDEF    cleanup         ;jp'd to by exit()
-        XDEF    l_dcal          ;jp(hl)
+        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    l_dcal          ;jp(hl)
 
 
-        XDEF    _vfprintf       ;jp to the printf() core
+        PUBLIC    _vfprintf       ;jp to the printf() core
 
-        XDEF    exitsp          ;atexit() variables
-        XDEF    exitcount
+        PUBLIC    exitsp          ;atexit() variables
+        PUBLIC    exitcount
 
-        XDEF    heaplast        ;Near malloc heap variables
-        XDEF    heapblocks
-        XDEF    __sgoioblk      ;stdio info block
+        PUBLIC    heaplast        ;Near malloc heap variables
+        PUBLIC    heapblocks
+        PUBLIC    __sgoioblk      ;stdio info block
 
 
 
@@ -129,15 +129,15 @@ ENDIF
 ;---------------------------------
 _vfprintf:
 IF DEFINED_floatstdio
-        LIB     vfprintf_fp
+        EXTERN     vfprintf_fp
         jp      vfprintf_fp
 ELSE
         IF DEFINED_complexstdio
-                LIB     vfprintf_comp
+                EXTERN     vfprintf_comp
                 jp      vfprintf_comp
         ELSE
                 IF DEFINED_ministdio
-                        LIB     vfprintf_mini
+                        EXTERN     vfprintf_mini
                         jp      vfprintf_mini
                 ENDIF
         ENDIF
@@ -151,7 +151,7 @@ coords:         defw    0       ; Current graphics xy coordinates
 base_graphics:  defw    0       ; Address of the Graphics map
 
 IF !DEFINED_HAVESEED
-                XDEF    _std_seed        ;Integer rand() seed
+                PUBLIC    _std_seed        ;Integer rand() seed
 _std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 

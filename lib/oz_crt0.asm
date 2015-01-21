@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.11 2014-03-05 22:59:17 pauloscustodio Exp $
+;       $Id: oz_crt0.asm,v 1.12 2015-01-21 07:05:00 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -31,58 +31,58 @@
 ; Some general scope declarations
 ;-------
 
-        XREF    _main           ;main() is always external to crt0 code
+        EXTERN    _main           ;main() is always external to crt0 code
 
-        XDEF    cleanup         ;jp'd to by exit()
-        XDEF    l_dcal          ;jp(hl)
+        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    l_dcal          ;jp(hl)
 
-        XDEF    _std_seed        ;Integer rand() seed
+        PUBLIC    _std_seed        ;Integer rand() seed
 
-        XDEF    _vfprintf       ;jp to the printf() core
+        PUBLIC    _vfprintf       ;jp to the printf() core
 
-        XDEF    exitsp          ;atexit() variables
-        XDEF    exitcount
+        PUBLIC    exitsp          ;atexit() variables
+        PUBLIC    exitcount
 
-        XDEF    __sgoioblk      ;stdio info block
+        PUBLIC    __sgoioblk      ;stdio info block
 
-       	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+       	PUBLIC	heaplast	;Near malloc heap variables
+	PUBLIC	heapblocks
 
-        XDEF    base_graphics   ;Graphical variables
+        PUBLIC    base_graphics   ;Graphical variables
 
-        XDEF    coords          ;Current xy position
-        XDEF	s_filetypetable
+        PUBLIC    coords          ;Current xy position
+        PUBLIC	s_filetypetable
 
-	XDEF	saved_hl	;Temporary store used by compiler
-	XDEF	saved_de	;for hl and de
+	PUBLIC	saved_hl	;Temporary store used by compiler
+	PUBLIC	saved_de	;for hl and de
 
 ; --- OZ related stuff---
 
-        XDEF    ozactivepage    ;current mem page
-	XDEF    ozmodel         ;detected model (call "detect" first)
-	XDEF    ozbacklight     ;display light status
-	XDEF    ozcontrast      ;display contrast
-	XDEF	ozbacklight_save
-        XDEF	s_ozlcdstatus
-	XDEF	s_init_unblank	;service entry point to go back from "ozfast" or "ozblankscreen"
+        PUBLIC    ozactivepage    ;current mem page
+	PUBLIC    ozmodel         ;detected model (call "detect" first)
+	PUBLIC    ozbacklight     ;display light status
+	PUBLIC    ozcontrast      ;display contrast
+	PUBLIC	ozbacklight_save
+        PUBLIC	s_ozlcdstatus
+	PUBLIC	s_init_unblank	;service entry point to go back from "ozfast" or "ozblankscreen"
 
-	XDEF	ScrCharSet
+	PUBLIC	ScrCharSet
 
 IF DEFINED_ozgetch2
-	XDEF	KeyBufGetPos	;
-	XDEF	KeyBufPutPos	; don't
-        XDEF    EnableKeyboard
-	XDEF	KeyboardBuffer
+	PUBLIC	KeyBufGetPos	;
+	PUBLIC	KeyBufPutPos	; don't
+        PUBLIC    EnableKeyboard
+	PUBLIC	KeyboardBuffer
 ENDIF
 
 ; --- settings ---
-	XDEF	ozkeyrepeatspeed
-	XDEF	ozkeyrepeatdelay
-	XDEF	ozclick_setting
-	XDEF	ozautoofftime
-	XDEF	ozautoblanktime
-	XDEF	ozautolightofftime
-	XDEF	ozprogoptions
+	PUBLIC	ozkeyrepeatspeed
+	PUBLIC	ozkeyrepeatdelay
+	PUBLIC	ozclick_setting
+	PUBLIC	ozautoofftime
+	PUBLIC	ozautoblanktime
+	PUBLIC	ozautolightofftime
+	PUBLIC	ozprogoptions
 ; --- -------- ---
 	defc	contrast  = 0c026h
 	defc	lcdstatus = 0c024h
@@ -173,7 +173,7 @@ IF DEFINED_ozgetch2
 ;        ld      a,2
 ;        out     (16h),a         ;; enable key click
 
-	LIB	ozsetisr
+	EXTERN	ozsetisr
 	
         ld      hl,ozcustomisr
         push    hl
@@ -232,7 +232,7 @@ cleanup:
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -503,15 +503,15 @@ ENDIF
 ;---------------------------------
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -537,8 +537,8 @@ heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

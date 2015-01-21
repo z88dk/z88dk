@@ -11,24 +11,24 @@
 ;
 ;       djm 7/12/98
 ;
-;	$Id: float.asm,v 1.9 2009-06-10 17:26:04 stefano Exp $
+;	$Id: float.asm,v 1.10 2015-01-21 07:05:00 stefano Exp $
 
 ;-------------------------------------------------
 ; Some scope defintionons for the crt0 float stuff
 ;-------------------------------------------------
 
-        XDEF    fp_seed
-        XDEF    extra
-        XDEF    fa
-        XDEF    fasign
-        XDEF    dstore
-        XDEF    dload
-        XDEF    dldpsh
-        XDEF    dpush
-        XDEF    dpush2
-	XDEF	__atof2
+        PUBLIC    fp_seed
+        PUBLIC    extra
+        PUBLIC    fa
+        PUBLIC    fasign
+        PUBLIC    dstore
+        PUBLIC    dload
+        PUBLIC    dldpsh
+        PUBLIC    dpush
+        PUBLIC    dpush2
+	PUBLIC	__atof2
 
-	LIB	atof	;needed for __atof2
+	EXTERN	atof	;needed for __atof2
 
 ;-------------------------------------------
 ; Unused code from the generic z80 maths lib

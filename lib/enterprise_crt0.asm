@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.13 2013-10-21 14:23:44 stefano Exp $
+;	$Id: enterprise_crt0.asm,v 1.14 2015-01-21 07:05:00 stefano Exp $
 ;
 
 
@@ -30,67 +30,67 @@
 ; Some scope definitions
 ;--------
 
-        XREF    _main
+        EXTERN    _main
 
-        XDEF    cleanup
-        XDEF    l_dcal
+        PUBLIC    cleanup
+        PUBLIC    l_dcal
 
-        XDEF    _std_seed
+        PUBLIC    _std_seed
 
-        XDEF	snd_tick	; Sound variable
-        XDEF	bit_irqstatus	; current irq status when DI is necessary
+        PUBLIC	snd_tick	; Sound variable
+        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
-        XDEF	_vfprintf
+        PUBLIC	_vfprintf
 
-        XDEF    exitsp
-        XDEF    exitcount
+        PUBLIC    exitsp
+        PUBLIC    exitcount
 
-       	XDEF	heaplast	; Near malloc heap variables
-        XDEF	heapblocks
+       	PUBLIC	heaplast	; Near malloc heap variables
+        PUBLIC	heapblocks
 
-        XDEF    __sgoioblk
+        PUBLIC    __sgoioblk
 
 ; Enterprise 64/128 specific stuff
-		XDEF    warmreset
-		XDEF    set_exos_multi_variables
-		XDEF    _DEV_VIDEO
-		XDEF    _DEV_KEYBOARD
-		XDEF    _DEV_NET
-		XDEF    _DEV_EDITOR
-		XDEF    _DEV_SERIAL
-		XDEF    _DEV_TAPE
-		XDEF    _DEV_PRINTER
-		XDEF    _DEV_SOUND
+		PUBLIC    warmreset
+		PUBLIC    set_exos_multi_variables
+		PUBLIC    _DEV_VIDEO
+		PUBLIC    _DEV_KEYBOARD
+		PUBLIC    _DEV_NET
+		PUBLIC    _DEV_EDITOR
+		PUBLIC    _DEV_SERIAL
+		PUBLIC    _DEV_TAPE
+		PUBLIC    _DEV_PRINTER
+		PUBLIC    _DEV_SOUND
 
-		XDEF    _esccmd
-		XDEF    _esccmd_cmd
-		XDEF    _esccmd_x
-		XDEF    _esccmd_y
-		XDEF    _esccmd_p1
-		XDEF    _esccmd_p2
-		XDEF    _esccmd_p3
-		XDEF    _esccmd_p4
-		XDEF    _esccmd_p5
-		XDEF    _esccmd_p6
-		XDEF    _esccmd_p7
-		XDEF    _esccmd_p8
-		XDEF    _esccmd_p9
-		XDEF    _esccmd_env
-		XDEF    _esccmd_p
-		XDEF    _esccmd_vl
-		XDEF    _esccmd_vr
-		XDEF    _esccmd_sty
-		XDEF    _esccmd_ch
-		XDEF    _esccmd_d
-		XDEF    _esccmd_f
-		XDEF    _esccmd_en
-		XDEF    _esccmd_ep
-		XDEF    _esccmd_er
-		XDEF    _esccmd_phase
-		XDEF    _esccmd_cp
-		XDEF    _esccmd_cl
-		XDEF    _esccmd_cr
-		XDEF    _esccmd_pd
+		PUBLIC    _esccmd
+		PUBLIC    _esccmd_cmd
+		PUBLIC    _esccmd_x
+		PUBLIC    _esccmd_y
+		PUBLIC    _esccmd_p1
+		PUBLIC    _esccmd_p2
+		PUBLIC    _esccmd_p3
+		PUBLIC    _esccmd_p4
+		PUBLIC    _esccmd_p5
+		PUBLIC    _esccmd_p6
+		PUBLIC    _esccmd_p7
+		PUBLIC    _esccmd_p8
+		PUBLIC    _esccmd_p9
+		PUBLIC    _esccmd_env
+		PUBLIC    _esccmd_p
+		PUBLIC    _esccmd_vl
+		PUBLIC    _esccmd_vr
+		PUBLIC    _esccmd_sty
+		PUBLIC    _esccmd_ch
+		PUBLIC    _esccmd_d
+		PUBLIC    _esccmd_f
+		PUBLIC    _esccmd_en
+		PUBLIC    _esccmd_ep
+		PUBLIC    _esccmd_er
+		PUBLIC    _esccmd_phase
+		PUBLIC    _esccmd_cp
+		PUBLIC    _esccmd_cl
+		PUBLIC    _esccmd_cr
+		PUBLIC    _esccmd_pd
 
 
 IF      !myzorg
@@ -200,7 +200,7 @@ cleanup:
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -249,15 +249,15 @@ ENDIF
 
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -275,7 +275,7 @@ ENDIF
 
 ;Seed for integer rand() routines
 IF !DEFINED_HAVESEED
-		XDEF    _std_seed        ;Integer rand() seed
+		PUBLIC    _std_seed        ;Integer rand() seed
 _std_seed:       defw    0       ; Seed for integer rand() routines
 ENDIF
 
@@ -292,8 +292,8 @@ heaplast:	defw	0
 heapblocks:	defw	0
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

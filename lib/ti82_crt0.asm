@@ -2,41 +2,41 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.23 2013-10-21 14:23:44 stefano Exp $
+;	$Id: ti82_crt0.asm,v 1.24 2015-01-21 07:05:00 stefano Exp $
 ;
 ;-----------------------------------------------------
-; Some general XDEFs and XREFs needed by the assembler
+; Some general PUBLICs and EXTERNs needed by the assembler
 ;-----------------------------------------------------
 
 	MODULE  Ti82_crt0
 
-	XREF	_main		; No matter what set up we have, main is
+	EXTERN	_main		; No matter what set up we have, main is
 				;  always, always external to this file.
 
-	XDEF	cleanup		; used by exit()
-	XDEF	l_dcal		; used by calculated calls  = "call (hl)"
+	PUBLIC	cleanup		; used by exit()
+	PUBLIC	l_dcal		; used by calculated calls  = "call (hl)"
 
-	XDEF	_vfprintf	; vprintf is internal to this file so we
+	PUBLIC	_vfprintf	; vprintf is internal to this file so we
 				;  only ever include one of the set of
 				;  routines
 
-	XDEF	exitsp		; Exit variables
-	XDEF	exitcount	;
+	PUBLIC	exitsp		; Exit variables
+	PUBLIC	exitcount	;
 
-	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+	PUBLIC	heaplast	;Near malloc heap variables
+	PUBLIC	heapblocks
 
-	XDEF	__sgoioblk	; For stdin, stdout, stder
+	PUBLIC	__sgoioblk	; For stdin, stdout, stder
 
-	XDEF	base_graphics	; Graphics stuff
-	XDEF	coords		;
+	PUBLIC	base_graphics	; Graphics stuff
+	PUBLIC	coords		;
 
-	XDEF	snd_tick	; Sound variable
-	XDEF	bit_irqstatus	; current irq status when DI is necessary
+	PUBLIC	snd_tick	; Sound variable
+	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
-	XDEF	cpygraph	; TI calc specific stuff
-	XDEF	tidi		;
-	XDEF	tiei		;
+	PUBLIC	cpygraph	; TI calc specific stuff
+	PUBLIC	tidi		;
+	PUBLIC	tiei		;
 
 ;-------------------------
 ; Begin of (shell) headers
@@ -95,7 +95,7 @@ ENDIF
 		INCLUDE "amalloc.def"
 	ENDIF
 
-	LIB	fputc_cons
+	EXTERN	fputc_cons
 	ld	hl,12
 	push	hl
 	call	fputc_cons
@@ -144,15 +144,15 @@ ENDIF
 ;---------------------------------
 _vfprintf:
 IF DEFINED_floatstdio
-        LIB     vfprintf_fp
+        EXTERN     vfprintf_fp
         jp      vfprintf_fp
 ELSE
         IF DEFINED_complexstdio
-                LIB     vfprintf_comp
+                EXTERN     vfprintf_comp
                 jp      vfprintf_comp
         ELSE
                 IF DEFINED_ministdio
-                        LIB     vfprintf_mini
+                        EXTERN     vfprintf_mini
                         jp      vfprintf_mini
                 ENDIF
         ENDIF
@@ -161,7 +161,7 @@ ENDIF
 
 ;Seed for integer rand() routines
 IF !DEFINED_HAVESEED
-                XDEF    _std_seed        ;Integer rand() seed
+                PUBLIC    _std_seed        ;Integer rand() seed
 _std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
@@ -174,8 +174,8 @@ heaplast:	defw	0
 heapblocks:	defw	0
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

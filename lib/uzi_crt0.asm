@@ -15,7 +15,7 @@
 		INCLUDE	"director.def"
 
 
-		XDEF	_start_init
+		PUBLIC	_start_init
 
 
 ; UZI proper starts at 8192 and runs to 32768

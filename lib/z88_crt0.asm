@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.8 2013-10-21 14:23:44 stefano Exp $
+; $Id: z88_crt0.asm,v 1.9 2015-01-21 07:05:01 stefano Exp $
 ;
 ; - - - - - - - -
 
@@ -34,34 +34,34 @@
 ; Some general scope declarations
 ;-------
 
-	XREF    _main		;main() is always external to crt0 code
-	XDEF    cleanup		;jp'd to by exit()
-	XDEF    l_dcal		;jp(hl)
+	EXTERN    _main		;main() is always external to crt0 code
+	PUBLIC    cleanup		;jp'd to by exit()
+	PUBLIC    l_dcal		;jp(hl)
 
-	XDEF    coords		;Current graphics xy coords
-	XDEF    base_graphics	;Address of graphics map
-	XDEF    gfx_bank	;Bank for this
+	PUBLIC    coords		;Current graphics xy coords
+	PUBLIC    base_graphics	;Address of graphics map
+	PUBLIC    gfx_bank	;Bank for this
 
-	XDEF    _std_seed	;Integer rand() seed
+	PUBLIC    _std_seed	;Integer rand() seed
 
 
-	XDEF    exitsp		;Pointer to atexit() stack
-	XDEF    exitcount	;Number of atexit() functions registered
+	PUBLIC    exitsp		;Pointer to atexit() stack
+	PUBLIC    exitcount	;Number of atexit() functions registered
 
-	XDEF    __sgoioblk	;std* control block
+	PUBLIC    __sgoioblk	;std* control block
 
-	XDEF    processcmd	;Processing <> commands
+	PUBLIC    processcmd	;Processing <> commands
 
-	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks	;
+	PUBLIC	heaplast	;Near malloc heap variables
+	PUBLIC	heapblocks	;
 
-	XDEF	_cpfar2near	;Conversion of far to near data
+	PUBLIC	_cpfar2near	;Conversion of far to near data
 
-	XDEF	_vfprintf	;jp to printf() core routine
+	PUBLIC	_vfprintf	;jp to printf() core routine
 
-	XDEF	snd_asave	;sound
-	XDEF	snd_tick	;sound
-	XDEF	bit_irqstatus	; current irq status when DI is necessary
+	PUBLIC	snd_asave	;sound
+	PUBLIC	snd_tick	;sound
+	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 ;-------
 ; Select which particular startup we want

@@ -6,7 +6,7 @@
 ; Recoded -because of strange problems- by Henk Poley - July 2001
 ; Based upon vnGrey, a Venus greyscale library (Ti83).
 ;
-; $Id: gray83p.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
+; $Id: gray83p.asm,v 1.6 2015-01-21 07:05:00 stefano Exp $
 ;
 
 	INCLUDE "int83p.asm"		; Put interrupt loader here
@@ -122,8 +122,8 @@ fastCopyLoop:
 IntProcEnd:
 
 IF !TI83PLUSAPP
-	XDEF	graybit1
-	XDEF	graybit2
+	PUBLIC	graybit1
+	PUBLIC	graybit2
 	
 defc intcount = $8A8D			; 1 byte needed
 

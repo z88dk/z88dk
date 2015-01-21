@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.4 2014-01-20 09:15:31 stefano Exp $
+;       $Id: sos_crt0.asm,v 1.5 2015-01-21 07:05:00 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -26,28 +26,28 @@
 ; Some scope definitions
 ;-----------------------
 
-	XREF    _main		;main() is always external to crt0
+	EXTERN    _main		;main() is always external to crt0
 
-	XDEF    cleanup		;jp'd to by exit()
-	XDEF    l_dcal		;jp(hl)
+	PUBLIC    cleanup		;jp'd to by exit()
+	PUBLIC    l_dcal		;jp(hl)
 
-	XDEF	_vfprintf	;jp to printf core routine
+	PUBLIC	_vfprintf	;jp to printf core routine
 
-	XDEF    exitsp		;atexit() variables
-	XDEF    exitcount
+	PUBLIC    exitsp		;atexit() variables
+	PUBLIC    exitcount
 
-	XDEF    heaplast        ;Near malloc heap variables
-	XDEF    heapblocks      ;
+	PUBLIC    heaplast        ;Near malloc heap variables
+	PUBLIC    heapblocks      ;
 
-	XDEF    __sgoioblk	;std* control block
+	PUBLIC    __sgoioblk	;std* control block
 
 ;-----------------------
 ; Target specific labels
 ;-----------------------
 
-	XDEF	snd_tick	; for sound code, if any
-	XDEF	bit_irqstatus	; current irq status when DI is necessary
-	XDEF    _RND_BLOCKSIZE;
+	PUBLIC	snd_tick	; for sound code, if any
+	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
+	PUBLIC    _RND_BLOCKSIZE;
 
         IF      !myzorg
                 defc    myzorg  = $3000
@@ -154,7 +154,7 @@ IF !DEFINED_noredir
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 
-		LIB freopen
+		EXTERN freopen
 		xor a
 		add b
 		jr	nz,no_redir_stdout
@@ -258,7 +258,7 @@ cleanup:
 	push	hl		;Save return value
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall	;Close any opened files
+	EXTERN	closeall	;Close any opened files
 	call	closeall
 ENDIF
 ENDIF
@@ -284,15 +284,15 @@ ENDIF
 ;----------------------------------------
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -309,8 +309,8 @@ heaplast:	defw	0	;Pointer to last free heap block
 heapblocks:	defw	0	;Number of heap blocks available
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area
@@ -321,7 +321,7 @@ ENDIF
 
 
 IF !DEFINED_HAVESEED
-		XDEF    _std_seed        ;Integer rand() seed
+		PUBLIC    _std_seed        ;Integer rand() seed
 _std_seed:       defw    0      ; Seed for integer rand() routines
 ENDIF
 

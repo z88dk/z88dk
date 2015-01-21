@@ -15,7 +15,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.26 2014-05-25 13:41:16 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.27 2015-01-21 07:05:00 stefano Exp $
 ;
 
 
@@ -31,72 +31,72 @@
 ; No matter what set up we have, main is always, always external to
 ; this file
 
-        XREF    _main
+        EXTERN    _main
         
-        XDEF	snd_tick
-        XDEF	bit_irqstatus	; current irq status when DI is necessary
+        PUBLIC	snd_tick
+        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 ;
 ; Some variables which are needed for both app and basic startup
 ;
 
-        XDEF    cleanup
-        XDEF    l_dcal
+        PUBLIC    cleanup
+        PUBLIC    l_dcal
 
 ; Integer rnd seed
 
-        XDEF    _std_seed
+        PUBLIC    _std_seed
 
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
 
-        XDEF	_vfprintf
+        PUBLIC	_vfprintf
 
 ;Exit variables
 
-        XDEF    exitsp
-        XDEF    exitcount
+        PUBLIC    exitsp
+        PUBLIC    exitcount
 
 ;For stdin, stdout, stder
 
-        XDEF    __sgoioblk
+        PUBLIC    __sgoioblk
 
-       	XDEF	heaplast	;Near malloc heap variables
-        XDEF	heapblocks
+       	PUBLIC	heaplast	;Near malloc heap variables
+        PUBLIC	heapblocks
 
 ; Graphics stuff
-        XDEF	base_graphics
-        XDEF	coords
+        PUBLIC	base_graphics
+        PUBLIC	coords
 
 ; FLOS system variables
-        XDEF	sector_lba0		; keep this byte order
-        XDEF	sector_lba1
-        XDEF	sector_lba2
-        XDEF	sector_lba3
+        PUBLIC	sector_lba0		; keep this byte order
+        PUBLIC	sector_lba1
+        PUBLIC	sector_lba2
+        PUBLIC	sector_lba3
 
-        XDEF	a_store1		
-        XDEF	bc_store1
-        XDEF	de_store1
-        XDEF	hl_store1
-        XDEF	a_store2
-        XDEF	bc_store2
-        XDEF	de_store2
-        XDEF	hl_store2
-        XDEF	storeix
-        XDEF	storeiy
-        XDEF	storesp
-        XDEF	storepc
-        XDEF	storef	  
-        XDEF	store_registers
-        XDEF	com_start_addr
+        PUBLIC	a_store1		
+        PUBLIC	bc_store1
+        PUBLIC	de_store1
+        PUBLIC	hl_store1
+        PUBLIC	a_store2
+        PUBLIC	bc_store2
+        PUBLIC	de_store2
+        PUBLIC	hl_store2
+        PUBLIC	storeix
+        PUBLIC	storeiy
+        PUBLIC	storesp
+        PUBLIC	storepc
+        PUBLIC	storef	  
+        PUBLIC	store_registers
+        PUBLIC	com_start_addr
 
-        XDEF	cursor_y		;keep this byte order 
-        XDEF	cursor_x		;(allows read as word with y=LSB) 
+        PUBLIC	cursor_y		;keep this byte order 
+        PUBLIC	cursor_x		;(allows read as word with y=LSB) 
 		
-        XDEF	current_scancode
-        XDEF	current_asciicode
+        PUBLIC	current_scancode
+        PUBLIC	current_asciicode
 
-        XDEF	FRAMES
+        PUBLIC	FRAMES
 
 ;--------
 ; OSCA / FLOS specific definitions
@@ -248,7 +248,7 @@ IF !DEFINED_noredir
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 
-		LIB freopen
+		EXTERN freopen
 		xor a
 		add b
 		jr	nz,no_redir_stdout
@@ -357,7 +357,7 @@ cleanup:
         push	hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -465,15 +465,15 @@ ENDIF
 
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -492,8 +492,8 @@ heaplast:        defw    0
 heapblocks:      defw    0
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area
@@ -608,10 +608,10 @@ ENDIF
 ; SD CARD interface
 IF DEFINED_NEED_SDCARD
 
-	XDEF card_select
-	XDEF sd_card_info
+	PUBLIC card_select
+	PUBLIC sd_card_info
 
-	XDEF sector_buffer_loc
+	PUBLIC sector_buffer_loc
 
 ; Keep the following 2 bytes in the right order (1-card_select, 2-sd_card_info) !!!
 card_select:		defb    0    ; Currently selected MMC/SD slot

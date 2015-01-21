@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.18 2014-05-31 12:58:18 stefano Exp $
+;       $Id: rex_crt0.asm,v 1.19 2015-01-21 07:05:00 stefano Exp $
 ;
 
 	MODULE rex_crt0
@@ -13,19 +13,19 @@
 ; Some scope declarations
 ;--------
 
-	XREF	_main		;main() is always external to crt0
+	EXTERN	_main		;main() is always external to crt0
 
 IF (startup=2)                 ; Library ?
-	XREF	_LibMain
+	EXTERN	_LibMain
 ENDIF
 	
-	XDEF	_std_seed	;integer rand() seed
-	XDEF	exitsp		;atexit() variables
-	XDEF	exitcount
-	XDEF	heapblocks	;malloc() variables
-	XDEF	heaplast
-	XDEF	l_dcal		;jp(hl) instruction
-	XDEF	cleanup
+	PUBLIC	_std_seed	;integer rand() seed
+	PUBLIC	exitsp		;atexit() variables
+	PUBLIC	exitcount
+	PUBLIC	heapblocks	;malloc() variables
+	PUBLIC	heaplast
+	PUBLIC	l_dcal		;jp(hl) instruction
+	PUBLIC	cleanup
 
 
 ;	defm	"ApplicationName:Addin",10,13

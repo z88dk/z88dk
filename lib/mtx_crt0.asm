@@ -1,6 +1,6 @@
 ;       Memotech MTX CRT0 stub
 ;
-;       $Id: mtx_crt0.asm,v 1.5 2014-05-21 19:34:14 stefano Exp $
+;       $Id: mtx_crt0.asm,v 1.6 2015-01-21 07:05:00 stefano Exp $
 ;
 
 
@@ -16,54 +16,54 @@
 ; Some scope definitions
 ;--------
 
-        XREF    _main           ; main() is always external to crt0 code
+        EXTERN    _main           ; main() is always external to crt0 code
 
-        XDEF    cleanup         ; jp'd to by exit()
-        XDEF    l_dcal          ; jp(hl)
+        PUBLIC    cleanup         ; jp'd to by exit()
+        PUBLIC    l_dcal          ; jp(hl)
 
 
-        XDEF    _vfprintf       ; jp to the printf() core
+        PUBLIC    _vfprintf       ; jp to the printf() core
 
-        XDEF    exitsp          ; atexit() variables
-        XDEF    exitcount
+        PUBLIC    exitsp          ; atexit() variables
+        PUBLIC    exitcount
 
-        XDEF    heaplast        ; Near malloc heap variables
-        XDEF    heapblocks
+        PUBLIC    heaplast        ; Near malloc heap variables
+        PUBLIC    heapblocks
 
-        XDEF    __sgoioblk      ; stdio info block
+        PUBLIC    __sgoioblk      ; stdio info block
 
 ; Graphics stuff
-        XDEF    pixelbyte	; Temp store for non-buffered mode
-        XDEF    base_graphics   ; Graphical variables
-        XDEF    coords          ; Current xy position
+        PUBLIC    pixelbyte	; Temp store for non-buffered mode
+        PUBLIC    base_graphics   ; Graphical variables
+        PUBLIC    coords          ; Current xy position
 
 ; 1 bit sound status byte
-        XDEF    snd_tick        ; Sound variable
-        XDEF	bit_irqstatus	; current irq status when DI is necessary
+        PUBLIC    snd_tick        ; Sound variable
+        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 ; SEGA and MSX specific
-		XDEF	msxbios
-		XDEF	fputc_vdp_offs	;Current character pointer
+		PUBLIC	msxbios
+		PUBLIC	fputc_vdp_offs	;Current character pointer
 			
-		XDEF	aPLibMemory_bits;apLib support variable
-		XDEF	aPLibMemory_byte;apLib support variable
-		XDEF	aPLibMemory_LWM	;apLib support variable
-		XDEF	aPLibMemory_R0	;apLib support variable
+		PUBLIC	aPLibMemory_bits;apLib support variable
+		PUBLIC	aPLibMemory_byte;apLib support variable
+		PUBLIC	aPLibMemory_LWM	;apLib support variable
+		PUBLIC	aPLibMemory_R0	;apLib support variable
 
-		XDEF	raster_procs	;Raster interrupt handlers
-		XDEF	pause_procs	;Pause interrupt handlers
+		PUBLIC	raster_procs	;Raster interrupt handlers
+		PUBLIC	pause_procs	;Pause interrupt handlers
 
-		XDEF	timer		;This is incremented every time a VBL/HBL interrupt happens
-		XDEF	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
+		PUBLIC	timer		;This is incremented every time a VBL/HBL interrupt happens
+		PUBLIC	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
 
-		XDEF	RG0SAV		;keeping track of VDP register values
-		XDEF	RG1SAV
-		XDEF	RG2SAV
-		XDEF	RG3SAV
-		XDEF	RG4SAV
-		XDEF	RG5SAV
-		XDEF	RG6SAV
-		XDEF	RG7SAV       
+		PUBLIC	RG0SAV		;keeping track of VDP register values
+		PUBLIC	RG1SAV
+		PUBLIC	RG2SAV
+		PUBLIC	RG3SAV
+		PUBLIC	RG4SAV
+		PUBLIC	RG5SAV
+		PUBLIC	RG6SAV
+		PUBLIC	RG7SAV       
 
 
 ;--------
@@ -121,7 +121,7 @@ cleanup:
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-        LIB     closeall
+        EXTERN     closeall
         call    closeall
 ENDIF
 ENDIF
@@ -143,15 +143,15 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 ;---------------------------------
 _vfprintf:
 IF DEFINED_floatstdio
-        LIB     vfprintf_fp
+        EXTERN     vfprintf_fp
         jp      vfprintf_fp
 ELSE
         IF DEFINED_complexstdio
-                LIB     vfprintf_comp
+                EXTERN     vfprintf_comp
                 jp      vfprintf_comp
         ELSE
                 IF DEFINED_ministdio
-                        LIB     vfprintf_mini
+                        EXTERN     vfprintf_mini
                         jp      vfprintf_mini
                 ENDIF
         ENDIF
@@ -195,7 +195,7 @@ RG7SAV:		defb	0
 
 
 IF !DEFINED_HAVESEED
-                XDEF    _std_seed        ;Integer rand() seed
+                PUBLIC    _std_seed        ;Integer rand() seed
 _std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
@@ -207,8 +207,8 @@ heaplast:       defw    0       ; Address of last block on heap
 heapblocks:     defw    0       ; Number of blocks
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area
@@ -225,7 +225,7 @@ ENDIF
 
 ; ZXMMC SD/MMC interface
 IF DEFINED_NEED_ZXMMC
-	XDEF card_select
+	PUBLIC card_select
 card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
 

@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.6 2013-11-27 10:24:25 stefano Exp $
+;    $Id: x1_crt0.asm,v 1.7 2015-01-21 07:05:01 stefano Exp $
 ;
 
 	MODULE x1_crt0
@@ -18,27 +18,27 @@
 ; Some scope definitions
 ;--------
 
-        XREF    _main
-        XREF    _x1_printf
+        EXTERN    _main
+        EXTERN    _x1_printf
 
-        XDEF    cleanup 
-        XDEF    l_dcal
-        XDEF    _std_seed
-        XDEF    _vfprintf
+        PUBLIC    cleanup 
+        PUBLIC    l_dcal
+        PUBLIC    _std_seed
+        PUBLIC    _vfprintf
 
-        XDEF    exitsp
-        XDEF    exitcount
+        PUBLIC    exitsp
+        PUBLIC    exitcount
 
-        XDEF    heaplast
-        XDEF    heapblocks
-        XDEF    __sgoioblk
+        PUBLIC    heaplast
+        PUBLIC    heapblocks
+        PUBLIC    __sgoioblk
 
 ; X1 stdio support variables
-    XDEF    _x1_cursor_coords
-	XDEF    _x1_keyboard_io
+    PUBLIC    _x1_cursor_coords
+	PUBLIC    _x1_keyboard_io
 
 ; X1 stdio support entry functions
-	XDEF	_wait_sub_cpu
+	PUBLIC	_wait_sub_cpu
 
 ;--------
 ; Non-zero origins must be >=32768 (startup=2 must be used for this)
@@ -89,11 +89,11 @@ endif
 
 	ld	hl,$FE00
 	push hl
-	LIB im2_Init
+	EXTERN im2_Init
 	call im2_Init
 	pop hl
 	
-	LIB im2_EmptyISR
+	EXTERN im2_EmptyISR
 	ld hl,im2_EmptyISR
 	ld b,128
 isr_table_fill:
@@ -119,7 +119,7 @@ ENDIF
 	out (c), a
 
 ;IF !DEFINED_x1_no_clrscr
-;	LIB _x1_cls
+;	EXTERN _x1_cls
 ;	call _x1_cls
 ;ENDIF
 
@@ -138,7 +138,7 @@ ENDIF
 
 ; INIT math identify platform
 IF NEED_floatpack
-        LIB     init_floatpack
+        EXTERN     init_floatpack
         call    init_floatpack
 ENDIF
 
@@ -157,7 +157,7 @@ cleanup:
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-        LIB     closeall
+        EXTERN     closeall
         call    closeall
 ENDIF
 ENDIF
@@ -231,15 +231,15 @@ ENDIF
 ; Now, which of the vfprintf routines do we need?
 _vfprintf:
 IF DEFINED_floatstdio
-        LIB     vfprintf_fp
+        EXTERN     vfprintf_fp
         jp      vfprintf_fp
 ELSE
         IF DEFINED_complexstdio
-                LIB     vfprintf_comp
+                EXTERN     vfprintf_comp
                 jp      vfprintf_comp
         ELSE
                 IF DEFINED_ministdio
-                        LIB     vfprintf_mini
+                        EXTERN     vfprintf_mini
                         jp      vfprintf_mini
                 ENDIF
         ENDIF
@@ -247,7 +247,7 @@ ENDIF
 
 ;Seed for integer rand() routines
 IF !DEFINED_HAVESEED
-		XDEF    _std_seed        ; Integer rand() seed
+		PUBLIC    _std_seed        ; Integer rand() seed
 _std_seed:      defw    0                ; Seed for integer rand() routines
 ENDIF
 
@@ -277,8 +277,8 @@ _wait_sub_cpu:
 
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

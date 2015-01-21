@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.7 2013-08-30 01:26:40 pauloscustodio Exp $
+;	$Id: sms_crt0.asm,v 1.8 2015-01-21 07:05:00 stefano Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -25,43 +25,43 @@
 ; Some general scope declarations
 ;-------
 
-        XREF    _main           ;main() is always external to crt0 code
-        XDEF    cleanup         ;jp'd to by exit()
-        XDEF    l_dcal          ;jp(hl)
+        EXTERN    _main           ;main() is always external to crt0 code
+        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    l_dcal          ;jp(hl)
 
-        XDEF    _std_seed       ;Integer rand() seed
+        PUBLIC    _std_seed       ;Integer rand() seed
 
-        XDEF    exitsp          ;Pointer to atexit() stack
-        XDEF    exitcount       ;Number of atexit() functions registered
+        PUBLIC    exitsp          ;Pointer to atexit() stack
+        PUBLIC    exitcount       ;Number of atexit() functions registered
 
-        XDEF    __sgoioblk      ;std* control block
+        PUBLIC    __sgoioblk      ;std* control block
 
-        XDEF    heaplast        ;Near malloc heap variables
-        XDEF    heapblocks      ;
+        PUBLIC    heaplast        ;Near malloc heap variables
+        PUBLIC    heapblocks      ;
 
-        XDEF    _vfprintf       ;jp to printf() core routine
+        PUBLIC    _vfprintf       ;jp to printf() core routine
         
-        XDEF	fputc_vdp_offs	;Current character pointer
+        PUBLIC	fputc_vdp_offs	;Current character pointer
         
-	XDEF	aPLibMemory_bits;apLib support variable
-	XDEF	aPLibMemory_byte;apLib support variable
-	XDEF	aPLibMemory_LWM	;apLib support variable
-	XDEF	aPLibMemory_R0	;apLib support variable
+	PUBLIC	aPLibMemory_bits;apLib support variable
+	PUBLIC	aPLibMemory_byte;apLib support variable
+	PUBLIC	aPLibMemory_LWM	;apLib support variable
+	PUBLIC	aPLibMemory_R0	;apLib support variable
 
-	XDEF	raster_procs	;Raster interrupt handlers
-	XDEF	pause_procs	;Pause interrupt handlers
+	PUBLIC	raster_procs	;Raster interrupt handlers
+	PUBLIC	pause_procs	;Pause interrupt handlers
 	
-	XDEF	timer		;This is incremented every time a VBL/HBL interrupt happens
-	XDEF	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
+	PUBLIC	timer		;This is incremented every time a VBL/HBL interrupt happens
+	PUBLIC	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
 	
-	XDEF	RG0SAV		;keeping track of VDP register values
-	XDEF	RG1SAV
-	XDEF	RG2SAV
-	XDEF	RG3SAV
-	XDEF	RG4SAV
-	XDEF	RG5SAV
-	XDEF	RG6SAV
-	XDEF	RG7SAV
+	PUBLIC	RG0SAV		;keeping track of VDP register values
+	PUBLIC	RG1SAV
+	PUBLIC	RG2SAV
+	PUBLIC	RG3SAV
+	PUBLIC	RG4SAV
+	PUBLIC	RG5SAV
+	PUBLIC	RG6SAV
+	PUBLIC	RG7SAV
 
 	org    ROM_Start
 
@@ -194,7 +194,7 @@ cleanup:
 	push	hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN 	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -258,15 +258,15 @@ _End:
 ;---------------------------------
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN 	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN 	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN 	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.33 2014-05-05 07:26:37 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.34 2015-01-21 07:05:00 stefano Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -33,35 +33,35 @@ IF startup != 3
 ; Some scope definitions
 ;--------
 
-	XREF    _main
+	EXTERN    _main
 
-        XDEF    cleanup
-        XDEF    l_dcal
+        PUBLIC    cleanup
+        PUBLIC    l_dcal
 
-        XDEF    _std_seed
+        PUBLIC    _std_seed
 
-        XDEF	snd_tick	; Sound variable
-        XDEF	bit_irqstatus	; current irq status when DI is necessary
+        PUBLIC	snd_tick	; Sound variable
+        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
-        XDEF	_vfprintf
+        PUBLIC	_vfprintf
 
-        XDEF    exitsp
-        XDEF    exitcount
+        PUBLIC    exitsp
+        PUBLIC    exitcount
 
-       	XDEF	heaplast	; Near malloc heap variables
-        XDEF	heapblocks
+       	PUBLIC	heaplast	; Near malloc heap variables
+        PUBLIC	heapblocks
 
-        XDEF    __sgoioblk
+        PUBLIC    __sgoioblk
 
 ; Graphics stuff
-        XDEF	pixelbyte	; Temp store for non-buffered mode
-        XDEF    base_graphics   ; Graphical variables
-        XDEF    coords          ; Current xy position
+        PUBLIC	pixelbyte	; Temp store for non-buffered mode
+        PUBLIC    base_graphics   ; Graphical variables
+        PUBLIC    coords          ; Current xy position
 
 ; MSX platform specific stuff
 ;
-        XDEF    msxbios
-        XDEF    brksave
+        PUBLIC    msxbios
+        PUBLIC    brksave
 
 
 ; Now, getting to the real stuff now!
@@ -72,7 +72,7 @@ IF (!DEFINED_startup | (startup=1))
         ENDIF
                 org     myzorg
 ELSE
-	XDEF	__fcb		; file control block
+	PUBLIC	__fcb		; file control block
         org     $100		; MSXDOS
 ENDIF
 
@@ -167,7 +167,7 @@ IF !DEFINED_noredir
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
 
-		LIB freopen
+		EXTERN freopen
 		xor a
 		add b
 		jr	nz,no_redir_stdout
@@ -288,7 +288,7 @@ cleanup:
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -315,15 +315,15 @@ ENDIF
 
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -360,7 +360,7 @@ ENDIF
 
 ;Seed for integer rand() routines
 IF !DEFINED_HAVESEED
-		XDEF    _std_seed        ;Integer rand() seed
+		PUBLIC    _std_seed        ;Integer rand() seed
 _std_seed:       defw    0       ; Seed for integer rand() routines
 ENDIF
 
@@ -383,8 +383,8 @@ heaplast:	defw	0
 heapblocks:	defw	0
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area
@@ -456,9 +456,9 @@ ELSE
 ;  Declarations
 ;
 
-	XREF _main		; main() entrance point
-	XDEF	l_dcal	; jp(hl) instruction
-	XDEF cleanup
+	EXTERN _main		; main() entrance point
+	PUBLIC	l_dcal	; jp(hl) instruction
+	PUBLIC cleanup
 
 ;
 ;  Main Code Entrance Point
@@ -525,8 +525,8 @@ IF (HEAPSIZE > 4)
         ld bc,HEAPSIZE
         ld de,_heap
         
-        LIB HeapSbrk_callee
-        XREF ASMDISP_HEAPSBRK_CALLEE
+        EXTERN HeapSbrk_callee
+        EXTERN ASMDISP_HEAPSBRK_CALLEE
         
         call HeapSbrk_callee + ASMDISP_HEAPSBRK_CALLEE
 ELSE
@@ -549,43 +549,43 @@ endloop:
 l_dcal:	jp	(hl)		;Used for call by function pointer
 
 
-XDEF __sgoioblk
-XDEF coords
-XDEF base_graphics
-XDEF pixelbyte
-XDEF _std_seed
-XDEF exitsp
-XDEF exitcount
-XDEF fp_seed
-XDEF extra
-XDEF fa
-XDEF fasign
-XDEF heaplast
-XDEF heapblocks
-XDEF _heap
-XDEF _heap_area
-XDEF brksave
-XDEF snd_tick
-XDEF bit_irqstatus
-XDEF CRT_AVAILABLE_MEMORY
+PUBLIC __sgoioblk
+PUBLIC coords
+PUBLIC base_graphics
+PUBLIC pixelbyte
+PUBLIC _std_seed
+PUBLIC exitsp
+PUBLIC exitcount
+PUBLIC fp_seed
+PUBLIC extra
+PUBLIC fa
+PUBLIC fasign
+PUBLIC heaplast
+PUBLIC heapblocks
+PUBLIC _heap
+PUBLIC _heap_area
+PUBLIC brksave
+PUBLIC snd_tick
+PUBLIC bit_irqstatus
+PUBLIC CRT_AVAILABLE_MEMORY
 
-XDEF _vfprintf
-XDEF msxbios
+PUBLIC _vfprintf
+PUBLIC msxbios
 
 ; Now, which of the vfprintf routines do we need?
 
 
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF

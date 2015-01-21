@@ -10,11 +10,11 @@
 ; Subject:  LZ: Graydraw source!
 ;------------------------------------------------------------
 ;
-; $Id: gray85.asm,v 1.5 2009-06-10 17:26:04 stefano Exp $
+; $Id: gray85.asm,v 1.6 2015-01-21 07:05:00 stefano Exp $
 ;
 
-	XDEF	graybit1
-	XDEF	graybit2
+	PUBLIC	graybit1
+	PUBLIC	graybit2
 
 defc	intcount = $8980
 

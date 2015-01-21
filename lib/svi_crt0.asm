@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;       $Id: svi_crt0.asm,v 1.12 2013-10-21 14:23:44 stefano Exp $
+;       $Id: svi_crt0.asm,v 1.13 2015-01-21 07:05:00 stefano Exp $
 ;
 
 
@@ -19,35 +19,35 @@
 ; Some scope definitions
 ;--------
 
-		XREF    _main
+		EXTERN    _main
 
-		XDEF    cleanup
-		XDEF    l_dcal
+		PUBLIC    cleanup
+		PUBLIC    l_dcal
 
-		XDEF    _std_seed
+		PUBLIC    _std_seed
 
-		XDEF	snd_tick	; Sound variable
-		XDEF	bit_irqstatus	; current irq status when DI is necessary
+		PUBLIC	snd_tick	; Sound variable
+		PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
-		XDEF	_vfprintf
+		PUBLIC	_vfprintf
 
-		XDEF    exitsp
-		XDEF    exitcount
+		PUBLIC    exitsp
+		PUBLIC    exitcount
 
-		XDEF	heaplast	; Near malloc heap variables
-		XDEF	heapblocks
+		PUBLIC	heaplast	; Near malloc heap variables
+		PUBLIC	heapblocks
 
-		XDEF    __sgoioblk
+		PUBLIC    __sgoioblk
 
 		; Graphics stuff
-		XDEF	pixelbyte	; Temp store for non-buffered mode
-		XDEF    base_graphics   ; Graphical variables
-		XDEF    coords          ; Current xy position
+		PUBLIC	pixelbyte	; Temp store for non-buffered mode
+		PUBLIC    base_graphics   ; Graphical variables
+		PUBLIC    coords          ; Current xy position
 
 		; MSX platform specific stuff
 		;
-		XDEF    msxbios
-		;; XDEF    brksave
+		PUBLIC    msxbios
+		;; PUBLIC    brksave
 
 
 
@@ -93,7 +93,7 @@ cleanup:
 
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -123,15 +123,15 @@ ENDIF
 
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -154,7 +154,7 @@ ENDIF
 
 ;Seed for integer rand() routines
 IF !DEFINED_HAVESEED
-		XDEF    _std_seed        ;Integer rand() seed
+		PUBLIC    _std_seed        ;Integer rand() seed
 _std_seed:      defw    0       ; Seed for integer rand() routines
 ENDIF
 
@@ -172,8 +172,8 @@ heaplast:	defw	0
 heapblocks:	defw	0
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

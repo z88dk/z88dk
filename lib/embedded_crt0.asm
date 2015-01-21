@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.6 2015-01-21 07:05:00 stefano Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -24,21 +24,21 @@
 ; Some general scope declarations
 ;-------
 
-        XREF    _main           ;main() is always external to crt0 code
-        XDEF    cleanup         ;jp'd to by exit()
-        XDEF    l_dcal          ;jp(hl)
+        EXTERN    _main           ;main() is always external to crt0 code
+        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    l_dcal          ;jp(hl)
 
-        XDEF    _std_seed        ;Integer rand() seed
+        PUBLIC    _std_seed        ;Integer rand() seed
 
-        XDEF    exitsp          ;Pointer to atexit() stack
-        XDEF    exitcount       ;Number of atexit() functions registered
+        PUBLIC    exitsp          ;Pointer to atexit() stack
+        PUBLIC    exitcount       ;Number of atexit() functions registered
 
-        XDEF    __sgoioblk      ;std* control block
+        PUBLIC    __sgoioblk      ;std* control block
 
-        XDEF    heaplast        ;Near malloc heap variables
-        XDEF    heapblocks      ;
+        PUBLIC    heaplast        ;Near malloc heap variables
+        PUBLIC    heapblocks      ;
 
-        XDEF    _vfprintf       ;jp to printf() core routine
+        PUBLIC    _vfprintf       ;jp to printf() core routine
 
 
 	org    ROM_Start
@@ -83,7 +83,7 @@ cleanup:
 	push	hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -98,15 +98,15 @@ l_dcal:
 ;---------------------------------
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF

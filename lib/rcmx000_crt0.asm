@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: rcmx000_crt0.asm,v 1.7 2013-08-30 01:22:25 pauloscustodio Exp $
+;       $Id: rcmx000_crt0.asm,v 1.8 2015-01-21 07:05:00 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -22,36 +22,36 @@
 ; Simulate unsupported z80 instructions
 ;-------
 
-        LIB     rcmx_cpd
-        LIB     rcmx_cpdr
-        LIB     rcmx_cpi
-        LIB     rcmx_cpir
-        LIB     rcmx_rld
-        LIB     rcmx_rrd
+        EXTERN     rcmx_cpd
+        EXTERN     rcmx_cpdr
+        EXTERN     rcmx_cpi
+        EXTERN     rcmx_cpir
+        EXTERN     rcmx_rld
+        EXTERN     rcmx_rrd
 
 ;-------
 ; Some general scope declarations
 ;-------
 
-        XREF    _main           ;main() is always external to crt0 code
+        EXTERN    _main           ;main() is always external to crt0 code
 
-	XDEF	__sendchar	;  Used by stdio
-	XDEF    __recvchar
+	PUBLIC	__sendchar	;  Used by stdio
+	PUBLIC    __recvchar
 	
-        XDEF    cleanup         ;jp'd to by exit()
-        XDEF    l_dcal          ;jp(hl)
+        PUBLIC    cleanup         ;jp'd to by exit()
+        PUBLIC    l_dcal          ;jp(hl)
 
-        XDEF    _std_seed        ;Integer rand() seed
+        PUBLIC    _std_seed        ;Integer rand() seed
 
-        XDEF    _vfprintf       ;jp to the printf() core
+        PUBLIC    _vfprintf       ;jp to the printf() core
 
-        XDEF    exitsp          ;atexit() variables
-        XDEF    exitcount
+        PUBLIC    exitsp          ;atexit() variables
+        PUBLIC    exitcount
 
-        XDEF    __sgoioblk      ;stdio info block
+        PUBLIC    __sgoioblk      ;stdio info block
 
-       	XDEF	heaplast	;Near malloc heap variables
-	XDEF	heapblocks
+       	PUBLIC	heaplast	;Near malloc heap variables
+	PUBLIC	heapblocks
 
 	org 0
 start:
@@ -81,7 +81,7 @@ cleanup:
 	push	hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -115,15 +115,15 @@ ENDIF
 ;---------------------------------
 _vfprintf:			
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.7 2013-10-21 14:23:44 stefano Exp $
+;	$Id: sc3000_crt0.asm,v 1.8 2015-01-21 07:05:00 stefano Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -28,61 +28,61 @@
 ; No matter what set up we have, main is always, always external to
 ; this file
 
-		XREF    _main
+		EXTERN    _main
 
 ; Some variables which are needed for both app and basic startup
-		XDEF    cleanup
-		XDEF    l_dcal
+		PUBLIC    cleanup
+		PUBLIC    l_dcal
 
 ; Integer rnd seed
-		XDEF    _std_seed
+		PUBLIC    _std_seed
 
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
-		XDEF	_vfprintf
+		PUBLIC	_vfprintf
 
 ;Exit variables
-		XDEF    exitsp
-		XDEF    exitcount
+		PUBLIC    exitsp
+		PUBLIC    exitcount
 
 ;For stdin, stdout, stder
-		XDEF    __sgoioblk
+		PUBLIC    __sgoioblk
         
-		XDEF	heaplast	;Near malloc heap variables
-		XDEF	heapblocks
+		PUBLIC	heaplast	;Near malloc heap variables
+		PUBLIC	heapblocks
 
 ; Graphics stuff
-		XDEF	pixelbyte	; Temp store for non-buffered mode
-		XDEF	base_graphics
-		XDEF	coords
+		PUBLIC	pixelbyte	; Temp store for non-buffered mode
+		PUBLIC	base_graphics
+		PUBLIC	coords
 
 ; 1 bit sound status byte
-		XDEF	snd_tick
-        XDEF	bit_irqstatus	; current irq status when DI is necessary
+		PUBLIC	snd_tick
+        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 ; SEGA and MSX specific
-		XDEF	msxbios
-		XDEF	fputc_vdp_offs	;Current character pointer
+		PUBLIC	msxbios
+		PUBLIC	fputc_vdp_offs	;Current character pointer
 			
-		XDEF	aPLibMemory_bits;apLib support variable
-		XDEF	aPLibMemory_byte;apLib support variable
-		XDEF	aPLibMemory_LWM	;apLib support variable
-		XDEF	aPLibMemory_R0	;apLib support variable
+		PUBLIC	aPLibMemory_bits;apLib support variable
+		PUBLIC	aPLibMemory_byte;apLib support variable
+		PUBLIC	aPLibMemory_LWM	;apLib support variable
+		PUBLIC	aPLibMemory_R0	;apLib support variable
 
-		XDEF	raster_procs	;Raster interrupt handlers
-		XDEF	pause_procs	;Pause interrupt handlers
+		PUBLIC	raster_procs	;Raster interrupt handlers
+		PUBLIC	pause_procs	;Pause interrupt handlers
 
-		XDEF	timer		;This is incremented every time a VBL/HBL interrupt happens
-		XDEF	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
+		PUBLIC	timer		;This is incremented every time a VBL/HBL interrupt happens
+		PUBLIC	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
 
-		XDEF	RG0SAV		;keeping track of VDP register values
-		XDEF	RG1SAV
-		XDEF	RG2SAV
-		XDEF	RG3SAV
-		XDEF	RG4SAV
-		XDEF	RG5SAV
-		XDEF	RG6SAV
-		XDEF	RG7SAV
+		PUBLIC	RG0SAV		;keeping track of VDP register values
+		PUBLIC	RG1SAV
+		PUBLIC	RG2SAV
+		PUBLIC	RG3SAV
+		PUBLIC	RG4SAV
+		PUBLIC	RG5SAV
+		PUBLIC	RG6SAV
+		PUBLIC	RG7SAV
 
 
 
@@ -260,7 +260,7 @@ cleanup:
 	push	hl
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN 	closeall
 	call	closeall
 ENDIF
 ENDIF
@@ -284,15 +284,15 @@ l_dcal:
 
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN 	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN 	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN 	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -429,8 +429,8 @@ ELSE
 	heapblocks:	defw	0
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

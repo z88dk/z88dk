@@ -4,7 +4,7 @@
 ;
 ;       Created 18/5/99 djm
 ;
-;	$Id: rel_crt0.asm,v 1.9 2013-10-21 14:23:44 stefano Exp $
+;	$Id: rel_crt0.asm,v 1.10 2015-01-21 07:05:00 stefano Exp $
 
 
 ;-----------
@@ -59,7 +59,7 @@ ENDIF
         call    _main		;Run the program
 cleanup:			;Jump back here from exit() if needed
 IF DEFINED_ANSIstdio
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall	;Close any open files (fopen)
 ENDIF
         call_oz(gn_nln)		;Print a new line
@@ -114,15 +114,15 @@ errescpressed:
 ;-----------
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
@@ -182,8 +182,8 @@ heaplast:	defw	0	; Address of last block on heap
 heapblocks:	defw 	0	; Number of blocks
 
 IF DEFINED_USING_amalloc
-XREF ASMTAIL
-XDEF _heap
+EXTERN ASMTAIL
+PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area

@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.11 2014-04-15 20:09:20 dom Exp $
+;	$Id: app_crt0.asm,v 1.12 2015-01-21 07:05:00 stefano Exp $
 
 
 ;--------
@@ -36,9 +36,9 @@
 ;--------
 ; Set some scope variables
 ;--------
-        XDEF    app_entrypoint	;Start of execution in this file 
-        XREF    applname	;Application name (in DOR)
-        XREF    in_dor		;DOR address
+        PUBLIC    app_entrypoint	;Start of execution in this file 
+        EXTERN    applname	;Application name (in DOR)
+        EXTERN    in_dor		;DOR address
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 49152
@@ -168,7 +168,7 @@ ENDIF
 cleanup:			;Jump back to here from exit()
 IF DEFINED_ANSIstdio
 	push	af		;Save exit value
-	LIB	closeall
+	EXTERN	closeall
 	call	closeall	;Close all files
  IF DEFINED_farheapsz
  	call	freeall_far	;Deallocate far memory
@@ -191,7 +191,7 @@ l_dcal:	jp	(hl)		;Used by various things
 ;-------
 processcmd:
 IF DEFINED_handlecmds
-        XREF    _handlecmds
+        EXTERN    _handlecmds
         ld      l,a
         ld      h,0
         push    hl
@@ -207,7 +207,7 @@ ENDIF
 ;--------
 errhan:	ret	z		;Fatal error - far mem probs?
 IF DEFINED_redrawscreen
-        XREF    _redrawscreen
+        EXTERN    _redrawscreen
         cp      RC_Draw		;(Rc_susp for BASIC!)
         jr      nz,errhan2
         push    af		;Call users screen redraw fn if defined
@@ -218,7 +218,7 @@ errhan2:
         cp      RC_Quit		;they don't like us!
         jr      nz,keine_error
 IF DEFINED_applicationquit
-	XREF	_applicationquit	;Call users routine if defined
+	EXTERN	_applicationquit	;Call users routine if defined
 	call	_applicationquit
 ENDIF
         xor     a		;Standard cleanup
@@ -232,11 +232,11 @@ keine_error:
 ; Far memory setup
 ;--------
 IF DEFINED_farheapsz
-	LIB	freeall_far
-	XDEF	farpages
-	XDEF	malloc_table
-	XDEF	farmemspec
-	XDEF	pool_table
+	EXTERN	freeall_far
+	PUBLIC	farpages
+	PUBLIC	malloc_table
+	PUBLIC	farmemspec
+	PUBLIC	pool_table
 ; All far memory variables now in init_far.asm
 	INCLUDE	"init_far.asm"
 
@@ -249,7 +249,7 @@ ENDIF
 ; Prototype is extern void __FASTCALL__ *cpfar2near(far void *)
 ;--------
 IF DEFINED_farheapsz
-	LIB	strcpy_far
+	EXTERN	strcpy_far
 _cpfar2near:
 	pop	bc	;ret address
 	pop	hl
@@ -288,15 +288,15 @@ ENDIF
 ;--------
 _vfprintf:
 IF DEFINED_floatstdio
-	LIB	vfprintf_fp
+	EXTERN	vfprintf_fp
 	jp	vfprintf_fp
 ELSE
 	IF DEFINED_complexstdio
-		LIB	vfprintf_comp
+		EXTERN	vfprintf_comp
 		jp	vfprintf_comp
 	ELSE
 		IF DEFINED_ministdio
-			LIB	vfprintf_mini
+			EXTERN	vfprintf_mini
 			jp	vfprintf_mini
 		ENDIF
 	ENDIF
