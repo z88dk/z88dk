@@ -2,7 +2,7 @@ lstoff
 
 ; +3DOS routine addresses
 ;
-; $Id: p3dos.def,v 1.1 2003-10-10 11:03:41 dom Exp $
+; $Id: p3dos.def,v 1.2 2015-01-21 15:38:59 stefano Exp $
 ;
 ; Stolen from Residos - thanks Garry!
 
@@ -68,33 +68,35 @@ lstoff
 
 ; +3DOS Error codes
 
-defgroup {	rc_ready,
-		rc_wp,
-		rc_seek,
-		rc_crc,
-		rc_nodata,
-		rc_mark,
-		rc_unrecog,
-		rc_unknown,
-		rc_diskchg,
-		rc_unsuit,
-		rc_badname=20,
-		rc_badparam,
-		rc_nodrive,
-		rc_nofile,
-		rc_exists,
-		rc_eof,
-		rc_diskfull,
-		rc_dirfull,
-		rc_ro,
-		rc_number,
-		rc_denied,
-		rc_norename,
-		rc_extent,
-		rc_uncached,
-		rc_toobig,
-		rc_notboot,
-		rc_inuse
-	}
+defgroup
+{
+      rc_ready,
+      rc_wp,
+      rc_seek,
+      rc_crc,
+      rc_nodata,
+      rc_mark,
+      rc_unrecog,
+      rc_unknown,
+      rc_diskchg,
+      rc_unsuit,
+      rc_badname=20,
+      rc_badparam,
+      rc_nodrive,
+      rc_nofile,
+      rc_exists,
+      rc_eof,
+      rc_diskfull,
+      rc_dirfull,
+      rc_ro,
+      rc_number,
+      rc_denied,
+      rc_norename,
+      rc_extent,
+      rc_uncached,
+      rc_toobig,
+      rc_notboot,
+      rc_inuse
+}
 
 lston

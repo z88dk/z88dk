@@ -5,13 +5,13 @@
 ;
 ; Not written as yet!
 ;
-; $Id: fdtell.asm,v 1.5 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: fdtell.asm,v 1.6 2015-01-21 15:38:59 stefano Exp $
 
 		PUBLIC	fdtell
 
 	        INCLUDE "p3dos.def"
 
-		XREF	dodos
+		EXTERN	dodos
 
 .fdtell
 	pop	hl	;ret address
