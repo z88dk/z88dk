@@ -5,7 +5,7 @@ Based on the SG C Tools 1.7
 
 Rewritten in assembly by Stefano Bodrato - 17/6/2008
 
-$Id: getkeyscia.c,v 1.1 2008-06-23 17:34:33 stefano Exp $
+$Id: getkeyscia.c,v 1.2 2015-01-21 17:49:59 stefano Exp $
 
 */
 
@@ -48,8 +48,8 @@ char *getkeyscia(void)
 */
 
 #asm
-        LIB     savecia
-        LIB     restorecia
+        EXTERN     savecia
+        EXTERN     restorecia
         
         
         call    savecia         ; save CIA registers

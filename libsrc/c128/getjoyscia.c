@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: getjoyscia.c,v 1.1 2008-06-23 17:34:33 stefano Exp $
+$Id: getjoyscia.c,v 1.2 2015-01-21 17:49:59 stefano Exp $
 
 */
 
@@ -25,8 +25,8 @@ void getjoyscia(void)
 {
 #asm
 
-	LIB savecia
-	LIB restorecia
+	EXTERN savecia
+	EXTERN restorecia
 
 
 ;  uchar SaveReg;

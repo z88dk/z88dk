@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: thread_manager.c,v 1.3 2009-09-30 21:32:10 dom Exp $
+ * $Id: thread_manager.c,v 1.4 2015-01-21 17:49:59 stefano Exp $
  */
  
 
@@ -11,7 +11,7 @@
 void thread_manager()
 {
 #asm
-	XDEF	thread_manager_first_entry
+	PUBLIC	thread_manager_first_entry
           push  af            ; Preserve register on process stack
           push  bc  
           push  de  

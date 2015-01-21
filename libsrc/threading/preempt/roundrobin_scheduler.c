@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: roundrobin_scheduler.c,v 1.4 2009-09-30 23:16:07 dom Exp $
+ *  $Id: roundrobin_scheduler.c,v 1.5 2015-01-21 17:49:59 stefano Exp $
  *
  *  A simple roundrobin scheduler
  */
@@ -22,7 +22,7 @@ scheduler_t *roundrobin_scheduler(int ticks)
      
 #asm
 
-	LIB	get_task
+	EXTERN	get_task
 
 ; Jump table for the roundrobin scheduler
 .roundrobin

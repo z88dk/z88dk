@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: thread_manager_start.c,v 1.3 2009-09-30 23:03:03 dom Exp $
+ *  $Id: thread_manager_start.c,v 1.4 2015-01-21 17:49:59 stefano Exp $
  *
  *  Start the task manager up - creating a task for the thread we started on
  */
@@ -47,6 +47,6 @@ void thread_manager_start()
 	ld	(_threadbase + current),ix
         jp      thread_manager_first_entry
 
-	LIB	thread_manager_first_entry
+	EXTERN	thread_manager_first_entry
 #endasm
 }
