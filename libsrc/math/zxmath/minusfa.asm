@@ -4,7 +4,7 @@
 ;
 ;       8/1/03 - Stefano Bodrato
 ;
-;       $Id: minusfa.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
+;       $Id: minusfa.asm,v 1.5 2015-01-21 10:56:30 stefano Exp $
 ;
 ;       Negate a floating point number
 ;
@@ -31,10 +31,10 @@ ENDIF
         LD      (HL),A
         RET
 
-;                XLIB    minusfa
+;                PUBLIC    minusfa
 ;
-;                LIB	fsetup1
-;                LIB	stkequ
+;                EXTERN	fsetup1
+;                EXTERN	stkequ
 ;
 ;.minusfa
 ;        call    fsetup1

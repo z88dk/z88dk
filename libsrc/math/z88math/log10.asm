@@ -12,10 +12,10 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    log10
+                PUBLIC    log10
 
-                LIB	fsetup
-                LIB	stkequ2
+                EXTERN	fsetup
+                EXTERN	stkequ2
 
 .log10
         call    fsetup

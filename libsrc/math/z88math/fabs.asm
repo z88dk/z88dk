@@ -13,10 +13,10 @@
 		INCLUDE "fpp.def"
 
 
-                XLIB    fabs
+                PUBLIC    fabs
 
-                LIB	fsetup
-                LIB	stkequ2
+                EXTERN	fsetup
+                EXTERN	stkequ2
 
 .fabs
         call    fsetup

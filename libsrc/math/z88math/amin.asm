@@ -15,11 +15,11 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    amin
+                PUBLIC    amin
 
-                LIB	fsetup
-                lIB	stkequ2
-                XREF    fa
+                EXTERN	fsetup
+                EXTERN	stkequ2
+                EXTERN    fa
 
 
 .amin

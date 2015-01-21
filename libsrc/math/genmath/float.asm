@@ -3,14 +3,14 @@
 
 
 
-                XLIB     float
+                PUBLIC     float
 
-                LIB      norm
-                LIB      l_long_neg
+                EXTERN     norm
+                EXTERN      l_long_neg
 
-                XDEF    float1
-                XREF    fasign
-                XREF    fa
+                PUBLIC    float1
+                EXTERN    fasign
+                EXTERN    fa
 
 ;
 ;       convert the integer in hl to

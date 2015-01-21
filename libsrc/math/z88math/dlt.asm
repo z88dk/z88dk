@@ -2,12 +2,12 @@
 ;       Z88dk Z88 Maths Library
 ;
 ;
-;       $Id: dlt.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;       $Id: dlt.asm,v 1.3 2015-01-21 10:56:30 stefano Exp $
 
-		XLIB	dlt
+		PUBLIC	dlt
 
-		LIB	fsetup
-		LIB	stkequcmp
+		EXTERN	fsetup
+		EXTERN	stkequcmp
 
 		INCLUDE	"fpp.def"
 

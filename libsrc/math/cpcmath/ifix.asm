@@ -3,16 +3,16 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: ifix.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: ifix.asm,v 1.3 2015-01-21 10:56:29 stefano Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 
-		XLIB		ifix
-		XDEF		ifixc
-		XREF		fa
-		LIB		int_inv_sgn
+		PUBLIC		ifix
+		PUBLIC		ifixc
+		EXTERN		fa
+		EXTERN		int_inv_sgn
 
 .ifix	ld      hl,fa+1
         call    firmware

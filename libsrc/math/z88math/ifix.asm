@@ -12,8 +12,8 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    ifix
-		XREF	fa
+                PUBLIC    ifix
+		EXTERN	fa
 
 .ifix
         ld      hl,(fa+1)

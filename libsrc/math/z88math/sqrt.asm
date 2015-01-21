@@ -12,10 +12,10 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    sqrt
+                PUBLIC    sqrt
 
-                LIB	fsetup
-                LIB	stkequ2
+                EXTERN	fsetup
+                EXTERN	stkequ2
 
 .sqrt
         call    fsetup

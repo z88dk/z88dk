@@ -3,17 +3,17 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: floor.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: floor.asm,v 1.3 2015-01-21 10:56:29 stefano Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 
-		XLIB		floor
-		XDEF		floorc
-		XDEF		floorc2
+		PUBLIC		floor
+		PUBLIC		floorc
+		PUBLIC		floorc2
 
-		LIB		get_para
+		EXTERN		get_para
 
 .floor	call	get_para
         call    firmware

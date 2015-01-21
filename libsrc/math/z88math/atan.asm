@@ -12,10 +12,10 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    atan
+                PUBLIC    atan
 
-                LIB	fsetup
-                LIB	stkequ2
+                EXTERN	fsetup
+                EXTERN	stkequ2
 
 .atan
         call    fsetup

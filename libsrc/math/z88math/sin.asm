@@ -12,10 +12,10 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    sin
+                PUBLIC    sin
 
-                LIB	fsetup
-                LIB	stkequ2
+                EXTERN	fsetup
+                EXTERN	stkequ2
 
 .sin
         call    fsetup

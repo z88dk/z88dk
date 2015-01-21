@@ -3,18 +3,18 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: dne.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: dne.asm,v 1.3 2015-01-21 10:56:29 stefano Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 
-		XLIB		dne
-		XDEF		dnec
+		PUBLIC		dne
+		PUBLIC		dnec
 
-		LIB		fsetup
-		LIB		stkequcmp
-		LIB		cmpfin
+		EXTERN		fsetup
+		EXTERN		stkequcmp
+		EXTERN		cmpfin
 
 .dne	call	fsetup
         call    firmware

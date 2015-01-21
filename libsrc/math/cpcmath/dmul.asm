@@ -3,18 +3,18 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: dmul.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: dmul.asm,v 1.3 2015-01-21 10:56:29 stefano Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 
-		XLIB		dmul
-		XDEF		dmulc
+		PUBLIC		dmul
+		PUBLIC		dmulc
 
-		LIB		fsetup
-		LIB		stkequ
-		XREF		fa
+		EXTERN		fsetup
+		EXTERN		stkequ
+		EXTERN		fa
 
 .dmul						; (fa+1)=(fa+1)*(sp+3)
 		call	fsetup

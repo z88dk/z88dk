@@ -15,11 +15,11 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    amax
+                PUBLIC    amax
 
-                LIB	fsetup
-                LIB	stkequ2
-                XREF    fa
+                EXTERN	fsetup
+                EXTERN	stkequ2
+                EXTERN    fa
 
 
 .amax

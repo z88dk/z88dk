@@ -13,8 +13,8 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    ufloat
-                XREF    fa
+                PUBLIC    ufloat
+                EXTERN    fa
 
 .ufloat
         push    de      ;msb

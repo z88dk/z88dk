@@ -3,18 +3,18 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: dleq.asm,v 1.4 2012-04-16 08:44:33 stefano Exp $
+;	$Id: dleq.asm,v 1.5 2015-01-21 10:56:29 stefano Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 
-		XLIB		dleq
-		XDEF		dleqc
+		PUBLIC		dleq
+		PUBLIC		dleqc
 
-		LIB		fsetup
-		LIB		stkequcmp
-		LIB		cmpfin
+		EXTERN		fsetup
+		EXTERN		stkequcmp
+		EXTERN		cmpfin
 
 .dleq	call	fsetup
         call    firmware

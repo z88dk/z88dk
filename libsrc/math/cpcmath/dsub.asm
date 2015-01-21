@@ -3,17 +3,17 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: dsub.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: dsub.asm,v 1.3 2015-01-21 10:56:29 stefano Exp $
 ;
 
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 
-		XLIB		dsub
-		XDEF		dsubc
+		PUBLIC		dsub
+		PUBLIC		dsubc
 
-		LIB		stkequ
-		XREF		fa
+		EXTERN		stkequ
+		EXTERN		fa
 
 
 .dsub						; (fa+1)=(fa+1)-(sp+3)

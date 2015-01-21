@@ -2,13 +2,13 @@
 ;       Z88dk Z88 Maths Library
 ;
 ;
-;       $Id: dswap.asm,v 1.1 2008-07-27 21:44:58 aralbrec Exp $
+;       $Id: dswap.asm,v 1.2 2015-01-21 10:56:30 stefano Exp $
 
 
-		XLIB	dswap
+		PUBLIC	dswap
 
-		LIB	fsetup
-		LIB	stkequ2
+		EXTERN	fsetup
+		EXTERN	stkequ2
 
 ; Swaps FA for that on top of stack
 

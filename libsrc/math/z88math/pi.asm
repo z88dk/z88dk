@@ -6,16 +6,16 @@
 ;
 ;	30th August 2003
 ;
-;	$Id: pi.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: pi.asm,v 1.3 2015-01-21 10:56:30 stefano Exp $
 
 
 ;double pi(void) - returns the value of pi
 
                 INCLUDE  "fpp.def"
 
-                XLIB    pi
+                PUBLIC    pi
 
-                LIB	stkequ2
+                EXTERN	stkequ2
 
 .pi
         fpp(FP_PI)

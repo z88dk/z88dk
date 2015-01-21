@@ -18,11 +18,11 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    fmod
+                PUBLIC    fmod
 
-                LIB	fsetup
-                LIB	stkequ2
-                XREF    fa
+                EXTERN	fsetup
+                EXTERN	stkequ2
+                EXTERN    fa
 
 .fmod
         ld      ix,8

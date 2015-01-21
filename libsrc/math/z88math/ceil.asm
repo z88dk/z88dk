@@ -14,10 +14,10 @@
 
                 INCLUDE  "fpp.def"
 
-                XLIB    ceil
+                PUBLIC    ceil
 
-                LIB	fsetup
-                LIB	stkequ2
+                EXTERN	fsetup
+                EXTERN	stkequ2
 
 .ceil
         call    fsetup
