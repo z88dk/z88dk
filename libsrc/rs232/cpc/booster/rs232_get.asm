@@ -5,12 +5,12 @@
 ;
 ;       unsigned char rs232_get(char *)
 ;
-;       $Id: rs232_get.asm,v 1.1 2008-07-18 07:51:13 stefano Exp $
+;       $Id: rs232_get.asm,v 1.2 2015-01-21 14:00:11 stefano Exp $
 
 ;       fastcall so implicit push
 
 
-                XLIB   rs232_get
+                PUBLIC   rs232_get
                 
 rs232_get:      ld bc, $FF1C
 nowort:			in a, (c)

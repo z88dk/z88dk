@@ -5,9 +5,9 @@
 ;
 ;       unsigned char rs232_init()
 ;
-;       $Id: rs232_init.asm,v 1.1 2008-07-18 07:51:16 stefano Exp $
+;       $Id: rs232_init.asm,v 1.2 2015-01-21 14:00:11 stefano Exp $
 
-                XLIB   rs232_init
+                PUBLIC   rs232_init
                 
 rs232_init:
 		;check if CPC Booster+ is connected
