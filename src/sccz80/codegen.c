@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.32 2015-01-21 07:05:01 stefano Exp $
+ *      $Id: codegen.c,v 1.33 2015-01-21 11:29:13 stefano Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -140,7 +140,7 @@ void DoLibHeader(void)
         if (ISASM(ASM_ASXX)) {
 			outstr("\n\t.globl\t");
 		} else if (ISASM(ASM_Z80ASM) ) {
-			outstr("\n\tXLIB\t");
+			outstr("\n\tPUBLIC\t");
         } else if ( ISASM(ASM_VASM) ) {
             outstr("\n\tGLOBAL\t");
         } else if ( ISASM(ASM_GNU) ) {
