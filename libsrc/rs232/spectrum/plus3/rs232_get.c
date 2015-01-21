@@ -8,7 +8,7 @@
  *
  *	Returns RS_ERROR_OVERFLOW on error (and sets carry)
  *
- *      $Id: rs232_get.c,v 1.13 2014-11-18 07:06:41 stefano Exp $
+ *      $Id: rs232_get.c,v 1.14 2015-01-21 08:27:13 stefano Exp $
  */
 
 
@@ -22,12 +22,12 @@ u8_t __FASTCALL__ rs232_get(i8_t *char)
 	;defc	SERFL = $5b61
 	;defc	BAUD  = $5B71
 
-	XDEF rs232_patch1
+	PUBLIC rs232_patch1
 
-	XREF SERFL
-	XREF BAUD
+	EXTERN SERFL
+	EXTERN BAUD
 	
-;	LIB   zx_break
+;	EXTERN   zx_break
 
 ;	push hl 
 	call doread

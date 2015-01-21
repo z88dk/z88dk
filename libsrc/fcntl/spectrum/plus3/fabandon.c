@@ -3,7 +3,7 @@
  *
  *	30/4/2001 djm
  *
- *	$Id: fabandon.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
+ *	$Id: fabandon.c,v 1.4 2015-01-21 08:27:13 stefano Exp $
  */
 
 #include <stdio.h>
@@ -23,7 +23,7 @@ int fabandon1(int fd)
 {
 #asm
 	INCLUDE	"p3dos.def"
-	XREF	dodos
+	EXTERN	dodos
 	pop	bc
 	pop	hl
 	push	hl

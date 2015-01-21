@@ -9,7 +9,7 @@
  *
  *	Still nothing, here!
  *
- *      $Id: rs232_init.c,v 1.4 2014-11-18 07:06:41 stefano Exp $
+ *      $Id: rs232_init.c,v 1.5 2015-01-21 08:27:13 stefano Exp $
  */
 
 
@@ -22,8 +22,8 @@ u8_t __FASTCALL__ rs232_init()
 	ld	hl,RS_ERR_OK
 	ret
 
-	XDEF BAUD
-	XDEF SERFL
+	PUBLIC BAUD
+	PUBLIC SERFL
 
 	BAUD:
 		; Default speed: 2400 baud 

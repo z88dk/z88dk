@@ -3,7 +3,7 @@
  *
  *	18/3/2000 djm
  *
- *	$Id: close.c,v 1.4 2013-03-03 23:51:10 pauloscustodio Exp $
+ *	$Id: close.c,v 1.5 2015-01-21 08:27:13 stefano Exp $
  */
 
 #include <fcntl.h>
@@ -15,7 +15,7 @@ int close(int handle)
 {
 #asm
         INCLUDE "p3dos.def"
-	XREF	dodos
+	EXTERN	dodos
 	pop	bc
 	pop	hl
 	push	hl

@@ -8,7 +8,7 @@
  *
  *	No error checking, for now.
  *
- *      $Id: rs232_put.c,v 1.7 2014-11-11 15:23:43 stefano Exp $
+ *      $Id: rs232_put.c,v 1.8 2015-01-21 08:27:13 stefano Exp $
  */
 
 
@@ -19,12 +19,12 @@ u8_t rs232_put(i8_t char)
 {	/* Fastcall so implicit push */
 #asm
 
-;	LIB   zx_break
+;	EXTERN   zx_break
 
-	XDEF rs232_patch2
+	PUBLIC rs232_patch2
 
 ;;	defc	BAUD  = $5B71
-	XREF BAUD
+	EXTERN BAUD
 	
 
 	ld	a,l	;get byte

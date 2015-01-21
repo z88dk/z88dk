@@ -7,7 +7,7 @@
  *
  *	Enter with de = filehandle
  *
- *	$Id: readbyte.c,v 1.5 2013-03-03 23:51:10 pauloscustodio Exp $
+ *	$Id: readbyte.c,v 1.6 2015-01-21 08:27:13 stefano Exp $
  */
 
 #include <fcntl.h>
@@ -16,7 +16,7 @@ int __FASTCALL__ readbyte(int handle)
 {
 #asm
 	INCLUDE	"p3dos.def"
-	XREF	dodos
+	EXTERN	dodos
 	pop	bc	;for FASTCALL parameter is pushed on entry
 	push	bc
 	ld	b,c	;file handle

@@ -9,7 +9,7 @@
  *
  *	Later on, this should set panel values
  *
- *      $Id: rs232_params.c,v 1.9 2014-11-27 15:18:20 stefano Exp $
+ *      $Id: rs232_params.c,v 1.10 2015-01-21 08:27:13 stefano Exp $
  */
 
 	/* BAUD system variable: 23391
@@ -21,7 +21,7 @@
 u8_t rs232_params(unsigned char param, unsigned char parity)
 {
 #asm
-		XREF BAUD
+		EXTERN BAUD
 
         pop     bc
         pop     de
