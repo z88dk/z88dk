@@ -21,14 +21,11 @@ __quicksort_:
    push bc
    push af
    
-   push ix
-   
+   exx
+   push bc
    exx
    
-   ld ixl,c
-   ld ixh,b
-   
-   exx
+   ex (sp),ix
    
    call asm_quicksort
    

@@ -36,8 +36,8 @@ asm_ba_priority_queue_pop:
    ld d,(hl)
    inc hl
    
-   ld ixl,e
-   ld ixh,d                    ; ix = queue.compare
+   push de
+   pop ix                      ; ix = queue.compare
    
    call __array_info
    jp z, error_mc              ; if no items in queue

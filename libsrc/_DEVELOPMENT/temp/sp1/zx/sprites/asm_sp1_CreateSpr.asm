@@ -59,8 +59,8 @@ csalloc:
 
    ld de,_sp1_struct_ss_prototype
    ex de,hl                   ; hl = & struct sp1_ss prototype, de = & new struct sp1_ss
-   ld ixl,e
-   ld ixh,d                   ; ix = & struct sp1_ss
+   push de
+   pop ix                     ; ix = & struct sp1_ss
    ld bc,20                   ; sizeof(struct sp1_ss)
    ldir                       ; copy prototype into new struct
    
@@ -92,8 +92,8 @@ onebyte:
    
    ld de,_sp1_struct_cs_prototype
    ex de,hl                   ; hl = & struct sp1_cs prototype, de = & new struct sp1_cs
-   ld iyl,e
-   ld iyh,d                   ; iy = & struct sp1_cs
+   push de
+   pop iy                     ; iy = & struct sp1_cs
    push bc                    ; save c = plane
    ld bc,24                   ; sizeof(struct sp1_cs)
    ldir                       ; copy prototype into new struct
@@ -104,8 +104,8 @@ onebyte:
    ld (iy+4),c                ; store plane
    ld (iy+5),a                ; store type
 
-   ld e,iyl
-   ld d,iyh
+   push iy
+   pop de
    ld hl,10
    add hl,de
    ex de,hl                   ; de = & struct sp1_cs.draw_code (& embedded code in struct sp1_cs)
@@ -142,8 +142,8 @@ loop:
    ld (iy+0),h                ; store ptr to next struct sp1_cs
    ld (iy+1),l
 
-   ld e,iyl
-   ld d,iyh
+   push iy
+   pop de
    ex de,hl                   ; hl = last struct sp1_cs, de = new struct sp1_cs
    ld bc,24                   ; sizeof(struct sp1_cs)
    ldir                       ; make copy of last one into new one

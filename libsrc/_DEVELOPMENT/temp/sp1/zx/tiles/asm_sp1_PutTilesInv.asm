@@ -48,8 +48,8 @@ asm_sp1_PutTilesInv:
 
    ld (ix+6),d                        ; this struct sp1_update to end of list
    ld (ix+7),e
-   ld ixl,e
-   ld ixh,d
+   push de
+   pop ix
 
 .skipinval
 

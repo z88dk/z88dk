@@ -76,8 +76,8 @@ asm0_dup2:
    
    push hl                     ; save & fdtbl[fd2] + 1b
    
-   ld ixl,e
-   ld ixh,d                    ; ix = FDSTRUCT* (fd2)
+   push de
+   pop ix                      ; ix = FDSTRUCT* (fd2)
    
    ld c,1
    call asm0_close             ; close(fd2)
@@ -95,8 +95,8 @@ fd2_vacant:
    dec hl
    ld (hl),e                   ; dup FDSTRUCT into fd2
    
-   ld ixl,e
-   ld ixh,d                    ; ix = FDSTRUCT* (fd)
+   push de
+   pop ix                      ; ix = FDSTRUCT* (fd)
    
    pop hl                      ; hl = fd2
    

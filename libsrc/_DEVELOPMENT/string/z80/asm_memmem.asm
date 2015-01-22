@@ -53,8 +53,8 @@ asm_memmem:
 
    push ix                     ; save big
    
-   ld ixl,c
-   ld ixh,b                    ; ix = little_len - 1
+   push bc
+   pop ix                      ; ix = little_len - 1
    
    ld c,l
    ld b,h                      ; bc = num positions to check
@@ -83,8 +83,8 @@ search_loop:
    ; ix = little_len - 1
    ; stack = big (2nd char of substring match), num positions to check, little
 
-   ld c,ixl
-   ld b,ixh
+   push ix
+   pop bc
 
    ld a,b
    or c

@@ -29,7 +29,7 @@ __fcntl_fdstruct_from_fd_2:
    ret c                       ; if fd out of range
    jp z, error_ebdfd_zc        ; if fd vacant
    
-   ld ixl,e
-   ld ixh,d                    ; ix = FDSTRUCT *
+   push de
+   pop ix                      ; ix = FDSTRUCT *
    
    ret

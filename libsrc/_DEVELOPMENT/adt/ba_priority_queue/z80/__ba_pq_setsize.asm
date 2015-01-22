@@ -58,8 +58,8 @@ __ba_pq_setsize:
    ld b,(hl)
    inc hl
    
-   ld ixl,c
-   ld ixh,b                    ; ix = queue.compar
+   push bc
+   pop ix                      ; ix = queue.compar
    
    ld c,(hl)
    inc hl

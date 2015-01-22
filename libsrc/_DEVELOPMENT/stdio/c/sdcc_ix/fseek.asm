@@ -28,11 +28,10 @@ _fseek:
    push bc
    push af
    
-   push ix
-   
-   ld ixl,c
-   ld ixh,b
+   push bc
    exx
+   
+   ex (sp),ix
    
    call asm_fseek
    

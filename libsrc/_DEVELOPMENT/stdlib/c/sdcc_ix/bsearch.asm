@@ -28,14 +28,15 @@ _bsearch:
    push bc
    exx
    push af
-   
-   push ix
-   
+      
    exx
-   ld ixl,e
-   ld ixh,d
+   
+   push de
+   ex (sp),ix
+
    push bc
    pop af
+
    exx
 
    call asm_bsearch

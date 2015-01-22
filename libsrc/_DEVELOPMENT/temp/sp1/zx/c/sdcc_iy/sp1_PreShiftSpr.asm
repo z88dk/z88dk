@@ -15,8 +15,8 @@ _sp1_PreShiftSpr:
    dec hl
    ld e,(hl)
    dec hl
-   ld iyl,e
-   ld iyh,d
+   push de
+   pop iy
    ld d,(hl)
    dec hl
    ld e,(hl)

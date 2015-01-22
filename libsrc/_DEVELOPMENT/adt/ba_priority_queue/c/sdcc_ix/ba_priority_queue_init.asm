@@ -22,12 +22,11 @@ _ba_priority_queue_init:
    push hl
    push af
    
-   push ix
+   exx
+   push bc
+   exx
    
-   exx
-   ld ixl,c
-   ld ixh,b
-   exx
+   ex (sp),ix
    
    call asm_ba_priority_queue_init
    

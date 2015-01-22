@@ -518,8 +518,8 @@ FLSH:
    bit 5,(ix+13)               ; write buffer info ?
    jr z, _flush_terminate      ; if not writing buffer info
 
-   ld e,ixl
-   ld d,ixh                    ; de = FILE *
+   push ix
+   pop de                      ; de = FILE *
    
    ld hl,14
    add hl,de                   ; hl = & FILE.bufp
@@ -668,8 +668,9 @@ get_vector:
    ;
    ; uses  : f, de, hl
 
-   ld e,ixl
-   ld d,ixh
+   push ix
+   pop de
+
    ld hl,18
    add hl,de
    

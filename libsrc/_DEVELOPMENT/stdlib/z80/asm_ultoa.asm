@@ -110,8 +110,8 @@ compute_lp:
    ;    ix = char *
    ; stack = list of digits
 
-   ld e,ixl
-   ld d,ixh
+   push ix
+   pop de
 
 write_lp:
 
@@ -147,8 +147,9 @@ decimal:
 
    EXTERN l_ultoa
 
-   ld c,ixl
-   ld b,ixh
+   push ix
+   pop bc
+
    call l_ultoa
 
 ENDIF
@@ -173,8 +174,9 @@ hex:
    
    EXTERN l_ultoh
    
-   ld c,ixl
-   ld b,ixh
+   push ix
+   pop bc
+
    call l_ultoh
    jr terminate
 
@@ -187,8 +189,9 @@ octal:
 
    EXTERN l_ultoo
 
-   ld c,ixl
-   ld b,ixh
+   push ix
+   pop bc
+
    call l_ultoo
    jr terminate
 
@@ -201,8 +204,9 @@ binary:
 
    EXTERN l_ultob
    
-   ld c,ixl
-   ld b,ixh
+   push ix
+   pop bc
+
    call l_ultob
    jr terminate
 

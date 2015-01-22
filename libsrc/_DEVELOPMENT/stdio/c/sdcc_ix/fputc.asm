@@ -21,10 +21,8 @@ _fputc:
    push de
    push af
    
-   push ix
-   
-   ld ixl,c
-   ld ixh,b
+   push bc
+   ex (sp),ix
    
    call asm_fputc
    

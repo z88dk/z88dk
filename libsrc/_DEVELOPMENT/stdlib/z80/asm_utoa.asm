@@ -77,8 +77,8 @@ IF __CLIB_OPT_NUM2TXT & $01
 
 ENDIF
 
-   ld ixl,e
-   ld ixh,d
+   push de
+   pop ix
 
    ; use generic radix method
    
@@ -118,8 +118,8 @@ compute_lp:
    ; ix = char *buf
    ; stack = list of digits
 
-   ld e,ixl
-   ld d,ixh
+   push ix
+   pop de
    
 write_lp:
 

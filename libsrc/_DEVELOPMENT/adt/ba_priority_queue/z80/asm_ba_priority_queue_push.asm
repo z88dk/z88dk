@@ -51,8 +51,8 @@ asm0_ba_priority_queue_push:
    ld b,(hl)                   ; bc = compare function
    inc hl
    
-   ld ixl,c
-   ld ixh,b                    ; ix = compare function
+   push bc
+   pop ix                      ; ix = compare function
    
    ld c,(hl)
    inc hl

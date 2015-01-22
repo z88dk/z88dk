@@ -108,8 +108,8 @@ signed_join:
    pop bc
    exx
    
-   ld e,ixl
-   ld d,ixh                    ; de = buffer_digits
+   push ix
+   pop de                      ; de = buffer_digits
    
    pop ix
    jp __stdio_printf_number_tail

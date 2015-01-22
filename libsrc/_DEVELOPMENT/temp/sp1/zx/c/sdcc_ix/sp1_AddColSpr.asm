@@ -26,12 +26,10 @@ _sp1_AddColSpr:
    push de
    push bc
 
-   push ix
-
-   ld ixl,e
-   ld ixh,d
-   
+   push de
    exx
+   
+   ex (sp),ix
    
    call asm_sp1_AddColSpr
    

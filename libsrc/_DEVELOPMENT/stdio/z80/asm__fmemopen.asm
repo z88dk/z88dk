@@ -96,8 +96,8 @@ asm0__fmemopen:
    ld e,l
    ld d,h                      ; de = FILE *
    
-   ld ixl,e
-   ld ixh,d                    ; ix = FILE *
+   push de
+   pop ix                      ; ix = FILE *
    
    call __stdio_file_constructor
    
@@ -188,8 +188,8 @@ rejoin_0:
    
    push hl                     ; save buf
    
-   ld e,ixl
-   ld d,ixh
+   push ix
+   pop de
    
    ld hl,18
    add hl,de                   ; hl = & vector.array
@@ -288,8 +288,8 @@ vector_no_grow:
 
    ; add FILE to open list
 
-   ld e,ixl
-   ld d,ixh                    ; de = FILE *
+   push ix
+   pop de                      ; de = FILE *
 
    call __stdio_file_add_list
    

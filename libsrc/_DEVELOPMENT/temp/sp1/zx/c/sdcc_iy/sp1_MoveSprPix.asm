@@ -23,10 +23,8 @@ _sp1_MoveSprPix:
    push ix
    push af
    
-   push iy
-
-   ld iyl,c
-   ld iyh,b
+   push bc
+   ex (sp),iy
    
    call asm_sp1_MoveSprPix
    

@@ -17,10 +17,8 @@ _zx_scroll_wc_up:
    push bc
    push af
    
-   push ix
-   
-   ld ixl,c
-   ld ixh,b
+   push bc
+   ex (sp),hl
    
    call asm_zx_scroll_wc_up
    

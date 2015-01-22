@@ -412,8 +412,8 @@ investigate_end:
    cp $80
    jr c, no_wrap_new
    
-   ld e,ixl
-   ld d,ixh                    ; de = ix = top of queue
+   push ix
+   pop de                      ; de = ix = top of queue
 
 no_wrap_new:
 
@@ -487,8 +487,8 @@ add_new:
    cp $80
    jr c, an_no_wrap
    
-   ld e,ixl
-   ld d,ixh                    ; de = ix = top of queue
+   push ix
+   pop de                      ; de = ix = top of queue
 
 an_no_wrap:
 

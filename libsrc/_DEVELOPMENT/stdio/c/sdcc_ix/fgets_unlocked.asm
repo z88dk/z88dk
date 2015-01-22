@@ -17,10 +17,8 @@ _fgets_unlocked:
    push hl
    push af
    
-   push ix
-   
-   ld ixl,e
-   ld ixh,d
+   push de
+   ex (sp),ix
    
    ex de,hl
    call asm_fgets_unlocked

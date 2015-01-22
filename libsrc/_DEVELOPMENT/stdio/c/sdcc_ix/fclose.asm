@@ -19,10 +19,8 @@ _fclose:
    push bc
    push af
 
-   push ix
-   
-   ld ixl,c
-   ld ixh,b
+   push bc
+   ex (sp),ix
    
    call asm_fclose
    

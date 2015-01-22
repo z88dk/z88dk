@@ -32,12 +32,10 @@ _sp1_MoveSprRel:
    push ix
    push bc
    
-   push iy
-   
-   ld iyl,e
-   ld iyh,d
-   
+   push de
    exx
+   
+   ex (sp),iy
    
    call asm_sp1_MoveSprRel
    

@@ -34,8 +34,8 @@ asm_ba_priority_queue_init:
 
    push de
    
-   ld e,ixl
-   ld d,ixh
+   push ix
+   pop de
    
    ld (hl),e
    inc hl

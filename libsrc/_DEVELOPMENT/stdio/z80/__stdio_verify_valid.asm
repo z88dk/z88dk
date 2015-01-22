@@ -40,8 +40,8 @@ IF __CLIB_OPT_MULTITHREAD & $04
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ld c,ixl
-   ld b,ixh
+   push ix
+   pop bc
 
    ld a,b
    or c

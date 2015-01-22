@@ -52,8 +52,8 @@ asm_fprintf:
    
    call __stdio_varg_2
    
-   ld ixl,e
-   ld ixh,d                    ; ix = FILE *
+   push de
+   pop ix                      ; ix = FILE *
    
    call __stdio_nextarg_de     ; de = char *format
    

@@ -47,8 +47,8 @@ csalloc:
    
    ld de,_sp1_struct_cs_prototype
    ex de,hl                   ; hl = & struct sp1_cs prototype, de = & new struct sp1_cs
-   ld iyl,e
-   ld iyh,d                   ; iy = & struct sp1_cs
+   push de
+   pop iy                     ; iy = & struct sp1_cs
    push bc                    ; save bc = graphic def
    ld bc,24                   ; sizeof(struct sp1_cs)
    ldir                       ; copy prototype into new struct
@@ -68,8 +68,8 @@ csalloc:
    or $40
    ld (iy+5),a                ; store type
 
-   ld e,iyl
-   ld d,iyh
+   push iy
+   pop de
    ld hl,10
    add hl,de
    ex de,hl                   ; de = & struct sp1_cs.draw_code (& embedded code in struct sp1_cs)
@@ -138,8 +138,8 @@ search:
    
    push de                    ; save & first struct sp1_cs in next row of sprite
    push hl                    ; stack new memory block
-   ld e,iyl
-   ld d,iyh
+   push iy
+   pop de
    ex de,hl                   ; hl = & new struct sp1_cs just added, de = memory block for new struct sp1_cs
    ld bc,24                   ; sizeof(struct sp1_cs)
    ldir                       ; copy struct sp1_cs just added into new one
