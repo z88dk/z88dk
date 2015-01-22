@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undrawto.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: undrawto.asm,v 1.5 2015-01-22 17:23:48 stefano Exp $
 ;
 
 
@@ -19,7 +19,7 @@
 
 				EXTERN	coords
 
-                EXTERN     line
+                EXTERN     Line
                 EXTERN     respixel
 
 
@@ -33,6 +33,6 @@
 
                 call    swapgfxbk
                 ld      ix,respixel
-                call    line
+                call    Line
                 jp      swapgfxbk1
 

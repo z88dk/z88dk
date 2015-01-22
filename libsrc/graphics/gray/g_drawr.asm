@@ -4,7 +4,7 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_drawr.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: g_drawr.asm,v 1.6 2015-01-22 17:23:48 stefano Exp $
 ;
 
 ;Usage: g_drawr(int px, int py, int GrayLevel)
@@ -13,7 +13,7 @@
 
 		EXTERN	coords
 
-                EXTERN     line_r
+                EXTERN     Line_r
                 EXTERN     plotpixel
                 EXTERN     respixel
                 EXTERN     graypage
@@ -43,7 +43,7 @@
 		push	af
 		push	hl
 		push	de
-                call	line_r
+                call	Line_r
                 pop	de
 		pop	hl
 		pop	af
@@ -60,4 +60,4 @@
 		jr	nc,set2
                 ld	ix,respixel
 .set2
-                jp	line_r
+                jp	Line_r

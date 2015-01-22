@@ -4,7 +4,7 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_draw.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: g_draw.asm,v 1.5 2015-01-22 17:23:48 stefano Exp $
 ;
 
 ;Usage: g_draw(int x1, int y1, int x2, int y2, int GrayLevel)
@@ -12,7 +12,7 @@
 
                 PUBLIC    g_draw
 
-                EXTERN     line
+                EXTERN     Line
                 EXTERN     plotpixel
                 EXTERN     respixel
                 EXTERN	graypage
@@ -39,7 +39,7 @@
 		push	af
 		push	hl
 		push	de
-                call	line
+                call	Line
                 pop	de
 		pop	hl
 		pop	af
@@ -53,4 +53,4 @@
 		jr	nc,set2
                 ld	ix,respixel
 .set2
-                jp	line
+                jp	Line
