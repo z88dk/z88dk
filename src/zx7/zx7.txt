@@ -1,0 +1,98 @@
+=======================
+"ZX7" - by Einar Saukas
+=======================
+
+"ZX7" is an optimal LZ77/LZSS data compressor for all platforms, including the
+ZX-Spectrum.
+
+Available implementations of standard LZ77/LZSS compression algorithm use either
+a "greedy" or "flexible parsing" strategy, that cannot always guarantee the best
+possible encoding. In comparison, "ZX7" provides a highly efficient compression
+algorithm that always generate perfectly optimal LZ77/LZSS encoding. Technically
+it means compressing within space and time O(n) only.
+
+
+=====
+USAGE
+=====
+
+To compress a file, use the command-line compressor as follows:
+
+    zx7 Cobra.scr
+
+This will generate a compressed file called "Cobra.scr.zx7".
+
+Afterwards choose a decompressor routine in assembly Z80 for the ZX-Spectrum,
+according to your requirements for speed and size:
+
+  * "Standard" routine: 69 bytes only
+
+  * "Turbo" routine: 90 bytes, about 25% faster
+
+  * "Mega" routine: 244 bytes, about 30% faster
+
+Finally compile the chosen decompressor routine and load the compressed file
+somewhere in memory. To decompress data, just call the routine specifying the
+source address of compressed data in HL and the target address in DE.
+
+For instance, if you compile the decompressor routine to address 65000, load
+"Cobra.scr.zx7" at address 51200, and want to decompress it directly to the
+screen, execute the following code:
+
+    LD    HL, 51200  ; source address (put "Cobra.scr.zx7" there)
+    LD    DE, 16384  ; target address (screen memory in this case)
+    CALL  65000      ; decompress routine compiled at this address
+
+
+=======
+LICENSE
+=======
+
+The optimal C compressor is available under the "BSD-3" license. In practice,
+this is relevant only if you want to modify its source code and/or incorporate
+the compressor within your own products. Otherwise, if you just execute it to
+compress files, you can simply ignore these conditions.
+
+The Z80 assembly decompressors can be used freely within your own ZX-Spectrum
+programs, even for commercial releases. The only condition is that you must
+indicate somehow in your documentation that you have used "ZX7".
+
+
+=======
+HISTORY
+=======
+
+2012-12-30: Initial release (with optimal compressor and Z80 decompressors)
+
+2012-12-31: Minor changes to source code since it wasn't strictly ANSI C (thanks
+            to Metalbrain!)
+
+2013-01-03: Minor changes to data format increasing maximum offset by 6% thus
+            improving compression, and some improvements in the "Standard" Z80
+            routine (thanks to Antonio Villena!)
+
+2013-01-05: Further improvements in the "Standard" Z80 routine (thanks to
+            Metalbrain!)
+
+2013-02-25: Further improvements in the "Turbo" Z80 routine, released libraries
+            for z88dk and Boriel's ZX BASIC.
+
+
+=======
+CREDITS
+=======
+
+The compressed file format is directly based (although slightly improved) on
+  Team Bomba's Bitbuster - http://www.teambomba.net/bombaman/downloadd26a.html
+  and Gasman's Bitbuster Extreme - www.west.co.tt/matt/speccy/apology/
+
+Some of the size improvements used in "Standard" version were suggested by
+  Antonio Villena and Metalbrain.
+
+The main speed improvement used in "Turbo" version was originally suggested by
+  Urusergi for Magnus Lind's Exomizer - http://hem.bredband.net/magli143/exo/
+
+The optimal LZ77/LZSS compress algorithm was invented by myself (Einar Saukas).
+  To the best of my knowledge, there was no similar high-performance solution
+  available. I thereby present this implementation as evidence of "prior art",
+  thus preventing anyone from ever patenting it. Software patents are evil!!!
