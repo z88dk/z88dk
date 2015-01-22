@@ -37,7 +37,7 @@ zx_01_output_char_64_tty_z88dk_oterm_msg_tty:
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    EXTERN error_einval_znc
-   EXTERN zx_01_output_char_64_tty_z88dk_01_scroll
+   EXTERN zx_01_output_char_32_tty_z88dk_01_scroll
    EXTERN zx_01_output_char_32_tty_z88dk_02_font_address
    EXTERN zx_01_output_char_32_tty_z88dk_08_backspace
    EXTERN zx_01_output_char_32_tty_z88dk_09_tab
@@ -60,7 +60,7 @@ zx_01_output_char_64_tty_z88dk_oterm_msg_tty:
    
 action_table:
 
-   defw zx_01_output_char_64_tty_z88dk_01_scroll
+   defw zx_01_output_char_32_tty_z88dk_01_scroll
    defw zx_01_output_char_32_tty_z88dk_02_font_address
    defw error_einval_znc
    defw error_einval_znc
