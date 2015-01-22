@@ -55,7 +55,7 @@ c3d:
 	zcc +zx -vn c3d.c -lndos -llib3d -create-app -oc3d.bin
 
 cmandel:
-	zcc +zx -vn ccoswave.c -lndos -lm -create-app -ocmandel.bin
+	zcc +zx -vn cmandel.c -lndos -lm -create-app -ocmandel.bin
 
 csprite:
 	zcc +zx -vn csprite.c -lndos -create-app -ocsprite.bin
@@ -64,7 +64,7 @@ zxbasic:
 	zcc +zx -vn zxbasic.c -lndos -create-app -ozxbasic.bin -lm
 
 zxcurrah:
-	zcc +zx -vn zxbasic.c -lndos -create-app -ozxcurrah.bin -lm
+	zcc +zx -vn zxcurrah.c -lndos -create-app -ozxcurrah.bin -lm
 
 threading:
 	zcc +zx -vn preempt.c -lim2 -lndos -create-app -othreading.bin -lpreempt
