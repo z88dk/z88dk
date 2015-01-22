@@ -11,8 +11,7 @@ console_01_output_char_proc_putchar_scroll:
 
    ; enter: a = num rows to scroll
    ;
-   ; exit : e = new x coord
-   ;        d = new y coord
+   ; exit : carry set if screen cleared
 
    ld c,a                      ; c = num rows to scroll
 
@@ -56,11 +55,7 @@ scroll_it:
    ld a,OTERM_MSG_SCROLL
    call l_jpix
    
-   ld e,0                      ; new x = 0
-   
-   ld d,(ix+19)
-   dec d                       ; new y = rect.height - 1
-   
+   or a
    ret
 
 page_it:
@@ -73,7 +68,7 @@ page_it:
 
 no_cls:
 
-   ld de,0                     ; new x = y = 0
+   ld (ix+20),0                ; set scroll_limit to zero
 
-   ld (ix+20),e                ; set scroll_limit to zero
+   scf
    ret

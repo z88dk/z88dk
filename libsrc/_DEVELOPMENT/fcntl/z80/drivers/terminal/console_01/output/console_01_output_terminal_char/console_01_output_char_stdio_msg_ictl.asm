@@ -4,13 +4,12 @@ SECTION code_fcntl
 PUBLIC console_01_output_char_stdio_msg_ictl
 PUBLIC console_01_output_char_stdio_msg_ictl_0
 
-EXTERN OTERM_MSG_CLS, asm_vioctl_driver, l_jpix, l_offset_ix_de
-EXTERN error_einval_zc, __stdio_nextarg_bc, __stdio_nextarg_de
+EXTERN OTERM_MSG_CLS
 
+EXTERN asm_vioctl_driver, l_jpix, l_offset_ix_de
+EXTERN error_einval_zc, __stdio_nextarg_bc, __stdio_nextarg_hl
 EXTERN console_01_output_char_proc_reset_scroll_limit
-EXTERN console_01_output_char_proc_snap
-EXTERN console_01_output_char_proc_get_coord
-EXTERN console_01_output_char_proc_set_coord
+EXTERN console_01_output_char_proc_putchar_scroll_adjust
 
 console_01_output_char_stdio_msg_ictl:
 
@@ -25,6 +24,7 @@ console_01_output_char_stdio_msg_ictl:
    ; defc IOCTL_OTERM_GET_CURSOR_COORD = $0582
    ; defc IOCTL_OTERM_SET_CURSOR_COORD = $0502
    ; defc IOCTL_OTERM_GET_OTERM        = $0602
+   ; defc IOCTL_OTERM_SCROLL           = $0702
    ;
    ; in addition to flags managed by stdio.
    ;
@@ -72,7 +72,17 @@ console_01_output_char_stdio_msg_ictl_0:
    jr z, _ioctl_getset_cursor_coord
    
    dec a
+   jr z, _ioctl_get_oterm
+   
+   dec a
    jp nz, error_einval_zc
+
+_ioctl_scroll:
+
+   ; bc = first parameter (number of rows to scroll)
+
+   ld a,c
+   jp console_01_output_char_proc_putchar_scroll_adjust
 
 _ioctl_get_oterm:
 
@@ -98,21 +108,24 @@ _ioctl_getset_cursor_coord:
 
 _ioctl_set_cursor_coord:
 
-   call __stdio_nextarg_de
+   call __stdio_nextarg_hl
    
-   ld d,e                      ; d = y_coord
-   ld e,c                      ; e = x_coord
+   ; c = x_coord
+   ; l = y_coord
    
-   call console_01_output_char_proc_snap
-   call console_01_output_char_proc_set_coord
+   ld h,l
+   ld l,c
    
-   or a
+   ld (ix+14),l
+   ld (ix+15),h
+   
    ret
 
 _ioctl_get_cursor_coord:
 
-   call console_01_output_char_proc_get_coord
-   
+   ld e,(ix+14)                ; e = x_coord
+   ld d,(ix+15)                ; d = y_coord
+
    ld a,e                      ; a = x_coord
    
    ld (bc),a
@@ -138,14 +151,17 @@ _ioctl_cls:
    ld a,OTERM_MSG_CLS
    call l_jpix
    
-   ld (ix+20),0                ; set scroll_limit to zero
-   
    xor a                       ; clears carry flag
    
-   ld e,a
-   ld d,a
+   ld (ix+20),a                ; set scroll_limit to zero
    
-   jp console_01_output_char_proc_set_coord
+   ld l,a
+   ld h,a
+   
+   ld (ix+14),l
+   ld (ix+15),h
+
+   ret
 
 _ioctl_getset_window_coord:
 
@@ -154,7 +170,7 @@ _ioctl_getset_window_coord:
    ; hl = void *arg
    
    ld a,e
-   call __stdio_nextarg_de     ; de = y coord info
+   call __stdio_nextarg_hl     ; hl = y coord info
    
    add a,a
    jr c, _ioctl_get_window_coord
@@ -164,7 +180,7 @@ _ioctl_set_window_coord:
    ld a,c                      ; a = x coord
    ld (ix+16),a                ; set window.x
    
-   ld a,e                      ; a = y coord
+   ld a,l                      ; a = y coord
    ld (ix+18),a                ; set window.y
    
    ret
@@ -179,13 +195,13 @@ _ioctl_get_window_coord:
    xor a
    ld (bc),a
    
-   inc de
-   ld (de),a
+   inc hl
+   ld (hl),a
    
    ld a,(ix+18)                ; a = window.y
    
-   dec de
-   ld (de),a
+   dec hl
+   ld (hl),a
    
    ret
 

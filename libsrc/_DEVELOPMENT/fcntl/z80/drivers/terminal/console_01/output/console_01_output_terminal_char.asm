@@ -74,7 +74,7 @@
 ;               b = 255 if not supplied by iterm
 ;               l = absolute x coordinate
 ;               h = absolute y coordinate
-;     can use:  af, bc, de, hl
+;     can use:  af, bc, de, hl, af'
 ;
 ;     Print the char to screen at given character coordinate.
 ;
@@ -161,6 +161,8 @@
 ;   * IOCTL_OTERM_SET_CURSOR_COORD
 ;
 ;   * IOCTL_OTERM_GET_OTERM
+;
+;   * IOCTL_OTERM_SCROLL
 ;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT

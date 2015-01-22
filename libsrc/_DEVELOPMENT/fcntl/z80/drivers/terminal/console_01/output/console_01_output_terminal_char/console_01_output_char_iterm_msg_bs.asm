@@ -4,9 +4,7 @@ SECTION code_fcntl
 PUBLIC console_01_output_char_iterm_msg_bs
 
 EXTERN OTERM_MSG_PRINTC
-EXTERN console_01_output_char_proc_snap
-EXTERN console_01_output_char_proc_get_coord
-EXTERN console_01_output_char_proc_set_coord
+EXTERN console_01_output_char_proc_move_left
 
 console_01_output_char_iterm_msg_bs:
 
@@ -15,19 +13,30 @@ console_01_output_char_iterm_msg_bs:
    
    ; move left then print space
    
-   call console_01_output_char_proc_get_coord
+   ld e,(ix+14)                ; e = x coord
+   ld d,(ix+15)                ; d = y coord
    
-   dec e                       ; move left
+   ld c,(ix+17)                ; c = window.width
+   ld b,(ix+19)                ; b = window.height
    
-   call console_01_output_char_proc_snap
-   call console_01_output_char_proc_set_coord
+   call console_01_output_char_proc_move_left
+
+   ld (ix+14),e                ; set x coord
+   ld (ix+15),d                ; set y coord
    
-   ld l,(ix+16)                ; l = rect.x
-   ld h,(ix+18)                ; h = rect.y
+   ; print space
+   
+   ld l,(ix+16)                ; l = window.x
+   ld h,(ix+18)                ; h = window.y
    
    add hl,de                   ; hl = absolute character coords
    
    ld bc,$ff20
-   
+
+   ; b = parameter
+   ; c = ascii code >= 32
+   ; l = absolute x coord
+   ; h = absolute y coord
+
    ld a,OTERM_MSG_PRINTC
    jp (ix)

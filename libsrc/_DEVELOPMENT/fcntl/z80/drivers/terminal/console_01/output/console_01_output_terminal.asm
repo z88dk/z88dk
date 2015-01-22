@@ -46,7 +46,7 @@
 ;   Source of character is stdio.
 ;     
 ;   enter   :  c = ascii code
-;   can use : af, bc, de, hl
+;   can use : af, bc, de, hl, af'
 ;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT

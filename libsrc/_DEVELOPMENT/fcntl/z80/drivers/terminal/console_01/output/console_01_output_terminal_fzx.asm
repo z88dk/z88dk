@@ -74,12 +74,14 @@
 ;
 ;     Sound the terminal's bell.
 ;
-;   * OTERM_MSG_SCROLL
+;   * OTERM_MSG_PSCROLL
 ;
-;     enter  :   c = number of rows to scroll
+;     enter  :  hl = number of pixels to scroll
+;     exit   :  hl = actual number if pixels scrolled
+;               else carry set if screen clears
 ;     can use:  af, bc, de, hl
 ;
-;     Scroll the window upward 'c' character rows.
+;     Scroll the window upward at least hl pixels
 ;
 ;   * OTERM_MSG_CLS
 ;
@@ -106,10 +108,83 @@
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; IOCTLs UNDERSTOOD BY THIS DRIVER
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-
+;
+;   * IOCTL_OTERM_CRLF
+;     enable / disable crlf processing
+;
+;   * IOCTL_OTERM_BELL
+;     enable / disable terminal bell
+;
+;   * IOCTL_OTERM_SIGNAL
+;     enable / disable signal bell
+;
+;   * IOCTL_OTERM_COOK
+;     enable / disable cook mode (tty emulation)
+;
+;   * IOCTL_OTERM_PAUSE
+;     enable / disable pause when window filled
+;
+;   * IOCTL_OTERM_PAGE
+;     select scroll or page mode
+;
+;   * IOCTL_OTERM_CLEAR
+;     enable / disable clear window when in page mode
+;
+;   * IOCTL_OTERM_CLS
+;     clear window, set (x,y) = (0,0)
+;
+;   * IOCTL_OTERM_RESET_SCROLL
+;     reset scroll count
+;
+; THE FZX WINDOW IS THE AREA THAT IS CLEARED AND SCROLLED
+;
+;   * IOCTL_OTERM_GET_WINDOW_COORD
+;     get coord of top left corner of window
+;
+;   * IOCTL_OTERM_SET_WINDOW_COORD
+;     set coord of top left corner of window
+;
+;   * IOCTL_OTERM_GET_WINDOW_RECT
+;     get window size
+;
+;   * IOCTL_OTERM_SET_WINDOW_RECT
+;     set window size
+;
+;   * IOCTL_OTERM_GET_CURSOR_COORD
+;
+;   * IOCTL_OTERM_SET_CURSOR_COORD
+;
+;   * IOCTL_OTERM_GET_OTERM
+;
+;   * IOCTL_OTERM_SCROLL
+;
+;   * IOCTL_OTERM_FONT
+;
+; THE FZX PAPER IS THE AREA WHERE PRINTING OCCURS
+; THE FZX WINDOW CONTAINS THE FZX PAPER
+;
+;   * IOCTL_OTERM_FZX_GET_PAPER_COORD
+;     get coord of top left corner of paper
+;
+;   * IOCTL_OTERM_FZX_SET_PAPER_COORD
+;     set coord of top left corner of paper
+;
+;   * IOCTL_OTERM_FZX_GET_PAPER_RECT
+;     get paper size
+;
+;   * IOCTL_OTERM_FZX_SET_PAPER_RECT
+;     set paper size
+;
+;   * IOCTL_OTERM_FZX_LEFT_MARGIN
+;;
+;   * IOCTL_OTERM_FZX_LINE_SPACING
+;
+;   * IOCTL_OTERM_FZX_SPACE_EXPAND
+;
+;   * IOCTL_OTERM_FZX_GET_FZX_STATE
+;
+;   * IOCTL_OTERM_FZX_SET_FZX_STATE
+;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -150,7 +225,7 @@ PUBLIC console_01_output_terminal_fzx
 EXTERN console_01_output_terminal, error_zc, console_01_output_fzx_stdio_msg_ictl
 EXTERN console_01_output_fzx_oterm_msg_putc, console_01_output_fzx_iterm_msg_putc
 EXTERN console_01_output_fzx_iterm_msg_bs, console_01_output_fzx_iterm_msg_bs_pwd
-EXTERN console_01_output_fzx_iterm_msg_print_cursor, console_01_output_fzx_iterm_msg_erase_cursor, 
+EXTERN console_01_output_fzx_iterm_msg_print_cursor, console_01_output_fzx_iterm_msg_erase_cursor
 EXTERN console_01_output_fzx_iterm_msg_readline_begin, console_01_output_fzx_iterm_msg_readline_end
 
 EXTERN OTERM_MSG_TTY, OTERM_MSG_BELL, ITERM_MSG_BELL

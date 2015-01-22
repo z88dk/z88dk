@@ -28,6 +28,8 @@
 ; * STDIO_MSG_ICTL
 ; * STDIO_MSG_CLOS
 ;
+; Others result in enotsup_zc.
+;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; MESSAGES GENERATED FOR DERIVED DRIVERS
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -8,8 +8,6 @@ PUBLIC console_01_output_char_oterm_msg_putc_raw
 
 EXTERN l_jpix
 EXTERN console_01_output_char_proc_putchar_scroll
-EXTERN console_01_output_char_proc_get_coord
-EXTERN console_01_output_char_proc_set_coord
 
 EXTERN OTERM_MSG_TTY, OTERM_MSG_PRINTC, OTERM_MSG_BELL
 
@@ -47,10 +45,10 @@ cooked:
    ; b = parameter
    ; c = ascii code
    
-   ld a,c
-   
    bit 4,(ix+6)
    jr z, crlf_done             ; if not processing crlf
+
+   ld a,c
    
    cp CHAR_CR
    ret z                       ; ignore cr
@@ -75,8 +73,9 @@ putchar_ok:
    
    ; check print coordinates
    
-   call console_01_output_char_proc_get_coord
-   
+   ld e,(ix+14)
+   ld d,(ix+15)
+      
    ; c = ascii code
    ; e = x coord
    ; d = y coord
@@ -97,19 +96,30 @@ x_ok:
    jr c, y_ok                  ; if y < height
 
    ; scroll upward
-      
-   push bc                     ; save char info
+   
+   ld b,e
+   push bc                     ; save x, char
    
    inc a
    call console_01_output_char_proc_putchar_scroll
    
-   pop bc
+   pop bc                      ; b = x, c = char
+   
+   ld e,b
+   
+   ld d,(ix+19)
+   dec d                       ; d = y = window.height - 1
+   
+   jr nc, y_ok                 ; if no cls
+   
+   ld d,0
 
 y_ok:
 
    inc e                       ; advance x coord
    
-   call console_01_output_char_proc_set_coord
+   ld (ix+14),e                ; store next x coord
+   ld (ix+15),d                ; store next y coord
 
    dec e
    
@@ -126,21 +136,31 @@ y_ok:
    ld a,OTERM_MSG_PRINTC
    jp (ix)
 
-
 putchar_lf:
 
    ; linefeed
-   
-   ld e,0                      ; x = 0
-   
+ 
    ld d,(ix+15)
    inc d                       ; d = y++
    
-   ld c,(ix+19)                ; c = height
-   
    ld a,d
-   sub c
-   inc a
+   sub (ix+19)
    
-   call nc, console_01_output_char_proc_putchar_scroll
-   jp console_01_output_char_proc_set_coord
+   jr c, y_ok_2
+   
+   inc a
+   call console_01_output_char_proc_putchar_scroll
+
+   ld d,(ix+19)
+   dec d                       ; d = y = window.height - 1
+   
+   jr nc, y_ok_2               ; if no cls
+   
+   ld d,0
+
+y_ok_2:
+
+   ld (ix+14),0                ; x = 0
+   ld (ix+15),d                ; set new y coord
+   
+   ret
