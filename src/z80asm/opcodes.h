@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.25 2015-01-02 19:06:37 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.26 2015-01-22 23:24:27 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -52,6 +52,13 @@ extern void add_call_flag(int flag, struct Expr *target);
 
 /* add opcode, or call emulation function on a Rabbit */
 extern void add_opcode_emul(int opcode, char *emul_func);
+
+/* add Z88's opcodes */
+extern void add_Z88_CALL_OZ(int argument);
+extern void add_Z88_OZ(int argument);
+extern void add_Z88_CALL_PKG(int argument);
+extern void add_Z88_FPP(int argument);
+extern void add_Z88_INVOKE(int argument);
 
 /* Index prefix constants */
 #define P_BC	0

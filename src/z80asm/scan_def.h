@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.44 2015-01-21 23:34:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.45 2015-01-22 23:24:28 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -318,6 +318,13 @@ TOKEN_OPCODE(SRA  )
 TOKEN_OPCODE(SRL  )
 TOKEN_OPCODE(SUB  )
 TOKEN_OPCODE(XOR  )
+
+/* Z88DK specific opcodes */
+TOKEN_OPCODE(CALL_OZ)
+TOKEN_OPCODE(OZ		)
+TOKEN_OPCODE(CALL_PKG)
+TOKEN_OPCODE(FPP	)
+TOKEN_OPCODE(INVOKE	)
 
 #undef TOKEN_OPCODE
 #undef TOKEN_KW

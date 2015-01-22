@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.12 2015-01-21 23:13:34 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.c,v 1.13 2015-01-22 23:24:27 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -130,4 +130,66 @@ void add_opcode_emul(int opcode, char *emul_func)
 		emul_func_expr = parse_expr(emul_func);
 		add_opcode_nn(Z80_CALL, emul_func_expr);
 	}
+}
+
+/* add Z88's opcodes */
+void add_Z88_CALL_OZ(int argument)
+{
+	if (argument > 0 && argument <= 255)
+	{
+		append_byte(Z80_RST(0x20));
+		append_byte(argument);
+	}
+	else if (argument > 255 && argument <= 65535)
+	{
+		append_byte(Z80_RST(0x20));
+		append_word(argument);
+	}
+	else
+		error_int_range(argument);
+}
+
+void add_Z88_OZ(int argument)
+{
+	add_Z88_CALL_OZ(argument);
+}
+
+void add_Z88_CALL_PKG(int argument)
+{
+	if (argument >= 0 && argument <= 65535)
+	{
+		append_byte(Z80_RST(0x08));
+		append_word(argument);
+	}
+	else
+		error_int_range(argument);
+}
+
+void add_Z88_FPP(int argument)
+{
+	if (argument > 0 && argument < 255)
+	{
+		append_byte(Z80_RST(0x18));
+		append_byte(argument);
+	}
+	else
+		error_int_range(argument);
+}
+
+void add_Z88_INVOKE(int argument)
+{
+	int opcode;
+
+	if (opts.ti83plus)
+		opcode = Z80_RST(0x28);		/* Ti83Plus: RST 28H instruction */
+	else
+		opcode = Z80_CALL;			/* Ti83: CALL */
+
+	if (argument >= 0 && argument <= 65535)
+	{
+		append_byte(opcode);
+		append_word(argument);
+	}
+	else
+		error_int_range(argument);
 }

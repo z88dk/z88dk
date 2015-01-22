@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.41 2015-01-21 23:34:54 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.42 2015-01-22 23:24:28 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -307,6 +307,21 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.41 2015-01-
 					   asm_PUBLIC | asm_XDEF | asm_XLIB;
 
 	/*---------------------------------------------------------------------
+	*   Z88DK specific opcodes
+	*--------------------------------------------------------------------*/
+#foreach <OP> in CALL_OZ, OZ, CALL_PKG, FPP, INVOKE
+	asm_<OP> = label? _TK_<OP> const_expr _TK_NEWLINE
+			@{	if (compile_active) {
+					if (! ctx->expr_error) {
+						DO_STMT_LABEL();
+						add_Z88_<OP>(ctx->expr_value);
+					}
+				}
+			};
+#endfor  <OP>
+	asm_Z88DK = asm_CALL_OZ | asm_OZ | asm_CALL_PKG | asm_FPP | asm_INVOKE;
+
+	/*---------------------------------------------------------------------
 	*   assembly statement
 	*--------------------------------------------------------------------*/
 	main := 
@@ -314,6 +329,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.41 2015-01-
 		| _TK_NEWLINE
 		| directives_no_args | directives_n | directives_str
 		| directives_name | directives_names
+		| asm_Z88DK
 		| asm_DEFGROUP
 		| asm_DEFVARS
 		| asm_DEFS

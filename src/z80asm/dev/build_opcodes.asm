@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.18 2015-01-18 19:09:37 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.19 2015-01-22 23:24:27 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -775,8 +775,10 @@ ENDIF
 	{call_oz oz} {256 65535}			;; 	rst 20h ;; defw {2}
 	{call_oz oz} {0 65536}				;; error: integer '{2}' out of range
 
+IF !RABBIT
 	call_pkg {0 1 65535}				;; 	rst 08h ;; defw {1}
 	call_pkg {-1 65536} 				;; error: integer '{1}' out of range
+ENDIF
 	
 	fpp {1 254}							;; 	rst 18h ;; defb {1}
 	fpp {0 255 256}				 		;; error: integer '{1}' out of range

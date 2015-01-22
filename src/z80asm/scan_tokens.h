@@ -174,6 +174,11 @@
 #define _TK_SRL           169    /* "SRL"      */
 #define _TK_SUB           170    /* "SUB"      */
 #define _TK_XOR           171    /* "XOR"      */
+#define _TK_CALL_OZ       172    /* "CALL_OZ"  */
+#define _TK_OZ            173    /* "OZ"       */
+#define _TK_CALL_PKG      174    /* "CALL_PKG" */
+#define _TK_FPP           175    /* "FPP"      */
+#define _TK_INVOKE        176    /* "INVOKE"   */
 
 #ifndef NO_TOKEN_ENUM
 
@@ -352,6 +357,11 @@ typedef enum tokid_t
     TK_SRL         = _TK_SRL        ,    /* =   169, "SRL"      */
     TK_SUB         = _TK_SUB        ,    /* =   170, "SUB"      */
     TK_XOR         = _TK_XOR        ,    /* =   171, "XOR"      */
+    TK_CALL_OZ     = _TK_CALL_OZ    ,    /* =   172, "CALL_OZ"  */
+    TK_OZ          = _TK_OZ         ,    /* =   173, "OZ"       */
+    TK_CALL_PKG    = _TK_CALL_PKG   ,    /* =   174, "CALL_PKG" */
+    TK_FPP         = _TK_FPP        ,    /* =   175, "FPP"      */
+    TK_INVOKE      = _TK_INVOKE     ,    /* =   176, "INVOKE"   */
 } tokid_t;
 
 #endif

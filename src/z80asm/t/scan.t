@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.42 2015-01-21 23:34:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.43 2015-01-22 23:24:28 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -887,6 +887,12 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(SUB,	T_ALL);
 	T_OPCODE(XOR,	T_ALL);
 	
+	/* Z88DK specific opcodes */
+	T_OPCODE(CALL_OZ,	T_ALL);
+	T_OPCODE(OZ,		T_ALL);
+	T_OPCODE(CALL_PKG,	T_ALL);
+	T_OPCODE(FPP,		T_ALL);
+	T_OPCODE(INVOKE,	T_ALL);
 	
 	/* check limit cases */
 	SetTemporaryLine("ld(ix_save+2),ix "

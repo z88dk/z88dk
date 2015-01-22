@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.113 2015-01-21 23:34:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.114 2015-01-22 23:24:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -37,8 +37,6 @@ void DEFINE( void );
 void ifstatement(ParseCtx *ctx, Bool compile_active);
 void ifdefstatement(ParseCtx *ctx, Bool compile_active);
 void ifndefstatement(ParseCtx *ctx, Bool compile_active);
-void CALL_OZ(void), OZ(void), CALL_PKG(void), FPP(void);
-void INVOKE( void );
 void DEFB( void ), DEFC( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
 void UNDEFINE( void );
 
@@ -62,8 +60,6 @@ struct Z80sym
 #define DEF_ENTRY(func)     { #func, func }
 struct Z80sym Z80ident[] =
 {
-    DEF_ENTRY( CALL_OZ ),
-    DEF_ENTRY( CALL_PKG ),
     DEF_ENTRY( DEFB ),
     DEF_ENTRY( DEFC ),
     DEF_ENTRY( DEFINE ),
@@ -73,12 +69,9 @@ struct Z80sym Z80ident[] =
     DEF_ENTRY( DEFW ),
     DEF_ENTRY( ELSE ),
     DEF_ENTRY( ENDIF ),
-    DEF_ENTRY( FPP ),
 	DEF_ENTRY( IF ),
 	DEF_ENTRY( IFDEF ),
 	DEF_ENTRY( IFNDEF ),
-	DEF_ENTRY( INVOKE ),
-    DEF_ENTRY( OZ ),
     DEF_ENTRY( UNDEFINE ),
 };
 #undef DEF_ENTRY

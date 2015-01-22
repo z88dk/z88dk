@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.98 2014-12-29 21:19:27 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.99 2015-01-22 23:24:28 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,103 +32,3 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/z80instr.c,v 1.98 2014-1
 
 
 /* local functions */
-void CALL_OZ( void )
-{
-    long constant;
-
-    append_byte( 0xE7 );          /* RST 20H instruction */
-
-    GetSym();
-
-	if ( expr_parse_eval( &constant ) )
-	{
-        if ( ( constant > 0 ) && ( constant <= 255 ) )
-        {
-            append_byte( (Byte)constant ); /* 1 byte OZ parameter */
-        }
-        else if ( ( constant > 255 ) && ( constant <= 65535 ) )
-        {
-            append_word( constant );  /* 2 byte OZ parameter */
-        }
-        else
-        {
-            error_int_range( constant );
-        }
-    }
-}
-
-
-void OZ( void )
-{
-    CALL_OZ();
-}
-
-
-void
-CALL_PKG( void )
-{
-    long constant;
-
-    append_byte( 0xCF );          /* RST 08H instruction */
-
-	GetSym();
-
-	if ( expr_parse_eval( &constant ) )
-	{
-        if ( ( constant >= 0 ) && ( constant <= 65535 ) )
-        {
-            append_word( constant );    /* 2 byte parameter always */
-        }
-        else
-        {
-            error_int_range( constant );
-        }
-    }
-}
-
-void
-INVOKE( void )
-{
-    long constant;
-
-    if ( opts.ti83plus )
-        append_byte( 0xEF );    /* Ti83Plus: RST 28H instruction */
-    else
-        append_byte( 0xCD );    /* Ti83: CALL */
-
-	GetSym();
-
-	if ( expr_parse_eval( &constant ) )
-	{
-        if ( ( constant >= 0 ) && ( constant <= 65535 ) )
-        {
-            append_word( constant );    /* 2 byte parameter always */
-        }
-        else
-        {
-            error_int_range( constant );
-        }
-    }
-}
-
-void
-FPP( void )
-{
-    long constant;
-
-    append_byte( 0xDF );          /* RST 18H instruction */
-
-	GetSym();
-
-	if ( expr_parse_eval( &constant ) )
-	{
-        if ( ( constant > 0 ) && ( constant < 255 ) )
-        {
-            append_byte( (Byte)constant ); /* 1 byte OZ parameter */
-        }
-        else
-        {
-            error_int_range( constant );
-        }
-    }
-}
