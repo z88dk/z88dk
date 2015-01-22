@@ -5,10 +5,10 @@
 ;
 ;       unsigned char rs232_close()
 ;
-;       $Id: rs232_close.asm,v 1.1 2008-07-18 07:51:12 stefano Exp $
+;       $Id: rs232_close.asm,v 1.2 2015-01-22 12:09:57 stefano Exp $
 
 
-                XLIB   rs232_close
+                PUBLIC   rs232_close
                 
 rs232_close:
 

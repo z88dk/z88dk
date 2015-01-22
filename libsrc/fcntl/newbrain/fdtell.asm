@@ -8,7 +8,7 @@
 ;
 ;
 ;
-; $Id: fdtell.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
+; $Id: fdtell.asm,v 1.3 2015-01-22 12:09:57 stefano Exp $
 
 
 	PUBLIC	fdtell

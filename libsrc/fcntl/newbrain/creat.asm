@@ -15,7 +15,7 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: creat.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
+; $Id: creat.asm,v 1.3 2015-01-22 12:09:57 stefano Exp $
 ;
 
 		PUBLIC	creat

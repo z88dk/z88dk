@@ -15,11 +15,11 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: readbyte.asm,v 1.1 2007-06-03 15:13:06 stefano Exp $
+; $Id: readbyte.asm,v 1.2 2015-01-22 12:09:57 stefano Exp $
 ;
 
-	XLIB	readbyte
-	LIB	nb_getc
+	PUBLIC	readbyte
+	EXTERN	nb_getc
 
 .readbyte
 	jp	nb_getc

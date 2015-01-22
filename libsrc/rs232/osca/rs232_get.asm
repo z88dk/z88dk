@@ -5,12 +5,12 @@
 ;
 ;       unsigned char rs232_get(char *)
 ;
-;       $Id: rs232_get.asm,v 1.2 2012-06-26 06:16:08 stefano Exp $
+;       $Id: rs232_get.asm,v 1.3 2015-01-22 12:09:57 stefano Exp $
 
 
 ; __FASTCALL__
 
-			XLIB   rs232_get
+			PUBLIC   rs232_get
 			
 			INCLUDE "osca.def"
 

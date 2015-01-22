@@ -5,9 +5,9 @@
 ;
 ;       unsigned char rs232_init()
 ;
-;       $Id: rs232_init.asm,v 1.1 2012-06-26 06:11:23 stefano Exp $
+;       $Id: rs232_init.asm,v 1.2 2015-01-22 12:09:57 stefano Exp $
 
-		XLIB   rs232_init
+		PUBLIC   rs232_init
                 
 		INCLUDE "osca.def"
 

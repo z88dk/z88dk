@@ -18,14 +18,14 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: open.asm,v 1.2 2007-06-06 08:43:47 stefano Exp $
+; $Id: open.asm,v 1.3 2015-01-22 12:09:57 stefano Exp $
 ;
 
-	XLIB	open
+	PUBLIC	open
 	
-	LIB	nbhandl
-	LIB	nb_open
-	LIB	nb_close
+	EXTERN	nbhandl
+	EXTERN	nb_open
+	EXTERN	nb_close
 	
 
 .open
