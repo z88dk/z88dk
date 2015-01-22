@@ -182,9 +182,6 @@
     <ClCompile Include="z80asm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="z80instr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="z80pass.c">
       <Filter>Source Files</Filter>
     </ClCompile>

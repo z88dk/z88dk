@@ -174,7 +174,6 @@
     <ClCompile Include="symref.c" />
     <ClCompile Include="symtab.c" />
     <ClCompile Include="z80asm.c" />
-    <ClCompile Include="z80instr.c" />
     <ClCompile Include="z80pass.c" />
   </ItemGroup>
   <ItemGroup>
