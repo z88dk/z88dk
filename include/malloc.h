@@ -6,7 +6,7 @@
 /*
  * Now some trickery to link in the correct routines for far
  *
- * $Id: malloc.h,v 1.14 2013-06-14 16:58:19 stefano Exp $
+ * $Id: malloc.h,v 1.15 2015-01-22 11:13:36 stefano Exp $
  */
 
 
@@ -89,8 +89,8 @@ extern void __LIB__ __CALLEE__   mallinfo_callee(unsigned int *total, unsigned i
 
 #define HEAPSIZE(bp)       unsigned char heap[bp+4];
 #define heapinit(a)        mallinit(); sbrk_callee(heap+4,a);
-#define getfree()          asm("LIB\tMAHeapInfo\nXREF\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nex\tde,hl\n")
-#define getlarge()         asm("LIB\tMAHeapInfo\nXREF\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nld\tl,c\nld\th,b\n")
+#define getfree()          asm("EXTERN\tMAHeapInfo\nEXTERN\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nex\tde,hl\n")
+#define getlarge()         asm("EXTERN\tMAHeapInfo\nEXTERN\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nld\tl,c\nld\th,b\n")
 #define realloc_down(a,b)  realloc_callee(a,b)
 
 

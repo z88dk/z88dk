@@ -4,7 +4,7 @@
  *	
  *	32x48 pixels.
  *
- *	$Id: zx81lowgfx.h,v 1.4 2010-09-19 00:24:08 dom Exp $
+ *	$Id: zx81lowgfx.h,v 1.5 2015-01-22 11:13:36 stefano Exp $
  */
 
 #ifndef __ZXLOGFX_H__
@@ -255,7 +255,7 @@ cdecoded:
 void cdrawr(int x, int y, int color)
 {
 	#asm
-	LIB	line_r
+	EXTERN	Line_r
 	
 	ld	ix,0
 	add	ix,sp
@@ -271,7 +271,7 @@ mod3dr:	sub	3
 	ld	(color+1),a
 
 	ld      ix,csplot
-	jp    line_r
+	jp    Line_r
 	#endasm
 }
 
@@ -280,8 +280,8 @@ mod3dr:	sub	3
 void cdraw(int x0, int y0, int x1, int y1, int color)
 {
 	#asm
-	LIB	line
-	XREF	COORDS
+	EXTERN	Line
+	EXTERN	coords
 	
 	ld	ix,0
 	add	ix,sp
@@ -303,11 +303,11 @@ mod3drw:	sub	3
 	pop     de
 	pop	hl
 	ld      ix,csplot
-	call    line
+	call    Line
 	ret
 	
 csplot:
-	ld	(COORDS),hl
+	ld	(coords),hl
 	push	bc
 	ld	d,0
 color:	ld	e,0
@@ -435,7 +435,7 @@ void ccopybuffer(void)
 #asm
 
 #if bufferedgfx
-	XREF frames
+	EXTERN frames
 	
 	; Sync to avoid screen flickering
 ;	xor	a

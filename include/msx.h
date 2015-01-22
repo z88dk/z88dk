@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.22 2013-11-15 17:07:47 stefano Exp $
+ * $Id: msx.h,v 1.23 2015-01-22 11:13:36 stefano Exp $
  */
 
 #ifndef __MSX_H__
@@ -232,8 +232,8 @@ typedef struct {
 
 /// create / destroy lookup tables aren't necessary: 
 /// we use the existing sin/cos functions
-#define create_lookup_tables() asm("nop\n");
-#define destroy_lookup_tables() asm("nop\n");
+#define create_lookup_tables() asm("\n");
+#define destroy_lookup_tables() asm("\n");
 
 
 extern void __LIB__ msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to);

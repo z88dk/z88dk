@@ -1845,7 +1845,7 @@ void ShowRoom()
 			draw_profile(50, 20, 160, lake);
 			break;
 		case 5:
-				draw_profile(50, 20, 240, strange_house);
+			//draw_profile(50, 20, 240, strange_house);
 			break;
 		case 6:
 			draw_profile(60, 3, 180, shed);

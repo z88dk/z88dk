@@ -93,7 +93,7 @@
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.7 2014-12-03 21:26:26 stefano Exp $
+ *      $Id: wall.c,v 1.8 2015-01-22 11:13:35 stefano Exp $
  *
  * * * * * * *
  *
@@ -137,9 +137,9 @@
 
 #include "wallg.h"
 
-int stick, t,tt;
+int stick,t,tt;
 int m,n,p;
-int u, v, a, w, r, g;
+int u,v,a,w,r,g;
 int c,b;
 int i,k;
 int speed;

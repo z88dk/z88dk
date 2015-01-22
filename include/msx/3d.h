@@ -13,7 +13,7 @@ Contact the author:
 	ICQ UIN   : 10115284
 
 
-$Id: 3d.h,v 1.1 2009-04-15 21:00:57 stefano Exp $
+$Id: 3d.h,v 1.2 2015-01-22 11:13:36 stefano Exp $
 
 
 =========================================================================*/
@@ -36,22 +36,9 @@ $Id: 3d.h,v 1.1 2009-04-15 21:00:57 stefano Exp $
 #ifndef MSX3D_H
 #define MSX3D_H
 
+#include <msx/msx.h>
 #include <msx/gfx.h>
 #include <lib3d.h>
-
-/// lookup cosine table
-//--extern int *tcos;
-
-/// lookup sine table
-//--extern int *tsin;
-
-/// create the lookup tables for cos and sin. you MUST call this before operating on vectors.
-//void create_lookup_tables();
-#define create_lookup_tables() asm("nop\n");
-
-/// deallocate the lookup tables
-//void destroy_lookup_tables();
-#define destroy_lookup_tables() asm("nop\n");
 
 
 #endif

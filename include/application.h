@@ -19,7 +19,7 @@
  *
  *	Packages are now supported (work for 16k packages)
  *
- *	$Id: application.h,v 1.5 2013-08-30 01:16:39 pauloscustodio Exp $
+ *	$Id: application.h,v 1.6 2015-01-22 11:13:36 stefano Exp $
  */
 
 #ifndef HELP1
@@ -89,14 +89,14 @@
         INCLUDE "dor.def"
         INCLUDE "zcc_opt.def"   ; The universal saviour file!
 
-        XREF    app_entrypoint  ; The real starting point for our apps
-        XDEF    applname        ; So startup can pick it up
-        XDEF    in_dor
-        XDEF    in_dor_seg_setup
-	XDEF	in_dor_seg0
-	XDEF	in_dor_seg1
-	XDEF	in_dor_seg2
-	XDEF	in_dor_seg3
+        EXTERN    app_entrypoint  ; The real starting point for our apps
+        PUBLIC    applname        ; So startup can pick it up
+        PUBLIC    in_dor
+        PUBLIC    in_dor_seg_setup
+	PUBLIC	in_dor_seg0
+	PUBLIC	in_dor_seg1
+	PUBLIC	in_dor_seg2
+	PUBLIC	in_dor_seg3
 
 ; How much bad memory do we actually need
 ; If reqpag is defined already do nothing, else default to $20 pages

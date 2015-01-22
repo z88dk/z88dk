@@ -47,7 +47,7 @@
  * in memory using some inline assembler in your main.c file:
  *
  *    #asm
- *       XDEF _ba_qtbl
+ *       PUBLIC _ba_qtbl		<- XDEF on older z88dk versions
  *       DEFC _ba_qtbl = addr
  *    #endasm
  *

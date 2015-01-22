@@ -158,6 +158,6 @@ char numbers[] = {
 char numblank[] = { 
         4,5,
 		0xf0,0xf0,0xf0,0xf0,0xf0
-}
+};
 
 
