@@ -8,7 +8,7 @@ EXTERN asm_zx_cyx2saddr, asm_zx_saddr2aaddr
 zx_01_output_char_32_oterm_msg_printc:
 
    ;   enter  :  c = ascii code >= 32
-   ;             b = parameter (foreground colour = 255 if none specified)
+   ;             b = parameter (foreground colour, 255 if none specified)
    ;             l = absolute x coordinate
    ;             h = absolute y coordinate
    ;   can use:  af, bc, de, hl

@@ -20,7 +20,7 @@ zx_tty_z88dk_state_table:
 
    defw asm_tty_state_param_none_absorb          ;  0 = null, absorb
    defw asm_tty_state_param_none_action          ;  1 = scroll
-   defw asm_tty_param_bb_action                  ;  2 = font address
+   defw asm_tty_param_bb_action                  ;  2 = font address nnnn
    defw asm_tty_output_char                      ;  3 = 
    defw asm_tty_output_char                      ;  4 = 
    defw asm_tty_output_char                      ;  5 = 

@@ -11,10 +11,10 @@ zx_01_output_char_32_stdio_msg_ictl:
 
    ; ioctl messages understood:
    ;
-   ; defc IOCTL_OTERM_FONT       = $0a02
-   ; defc IOCTL_OTERM_FCOLOR     = $0b02
-   ; defc IOCTL_OTERM_FMASK      = $0c02
-   ; defc IOCTL_OTERM_BCOLOR     = $0d02
+   ; defc IOCTL_OTERM_FONT       = $0802
+   ; defc IOCTL_OTERM_FCOLOR     = $1002
+   ; defc IOCTL_OTERM_FMASK      = $1102
+   ; defc IOCTL_OTERM_BCOLOR     = $1202
    ;
    ; in addition to flags managed by stdio
    ; and messages understood by base class
@@ -46,12 +46,12 @@ zx_01_output_char_32_stdio_msg_ictl:
 zx_01_output_char_32_stdio_msg_ictl_0:
 
    ld a,d
-   sub $0a
-   jp c, console_01_output_char_stdio_msg_ictl_0
-
+   cp $08
    jr z, _ioctl_font
    
-   dec a
+   sub $10
+   jp c, console_01_output_char_stdio_msg_ictl_0
+
    jr z, _ioctl_fcolor
    
    dec a
@@ -88,8 +88,9 @@ _ioctl_font:
    ld d,(hl)                   ; de = old font address
 
    ld a,b
-   or c
-   jr z, _ioctl_font_ret       ; if font == 0
+   and c
+   inc a
+   jr z, _ioctl_font_ret       ; if font == -1
 
    ld (hl),b
    dec hl

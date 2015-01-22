@@ -10,7 +10,7 @@ zx_01_output_char_32_oterm_msg_scroll:
    ;   enter  :   c = number of rows to scroll
    ;   can use:  af, bc, de, hl
    ;
-   ;   Scroll the window upward 'L' character rows.
+   ;   Scroll the window upward 'C' character rows.
    
    ld hl,16
    call l_offset_ix_de         ; hl = window.rect *

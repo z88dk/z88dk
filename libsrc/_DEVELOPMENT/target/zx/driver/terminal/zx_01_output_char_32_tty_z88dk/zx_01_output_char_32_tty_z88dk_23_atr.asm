@@ -3,10 +3,6 @@ SECTION code_fcntl
 
 PUBLIC zx_01_output_char_32_tty_z88dk_23_atr
 
-EXTERN console_01_output_char_proc_snap
-EXTERN console_01_output_char_proc_get_coord
-EXTERN console_01_output_char_proc_set_coord
-
 zx_01_output_char_32_tty_z88dk_23_atr:
 
    ; atr dx,dy
@@ -20,8 +16,9 @@ zx_01_output_char_32_tty_z88dk_23_atr:
    ld e,(hl)                   ; e = dx
    
    ex de,hl
-   
-   call console_01_output_char_proc_get_coord
+
+   ld e,(ix+14)                ; e = x
+   ld d,(ix+15)                ; d = y
    
    ld a,l
    add a,e
@@ -30,7 +27,8 @@ zx_01_output_char_32_tty_z88dk_23_atr:
    ld a,h
    add a,d
    ld d,a                      ; d = y + dy
+
+   ld (ix+14),e                ; store x coord
+   ld (ix+15),d                ; store y coord
    
-   call console_01_output_char_proc_snap
-   jp console_01_output_char_proc_set_coord
-   
+   ret

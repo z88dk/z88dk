@@ -3,9 +3,6 @@ SECTION code_fcntl
 
 PUBLIC zx_01_output_char_32_tty_z88dk_22_at
 
-EXTERN console_01_output_char_proc_snap
-EXTERN console_01_output_char_proc_set_coord
-
 zx_01_output_char_32_tty_z88dk_22_at:
 
    ; at x,y
@@ -17,6 +14,8 @@ zx_01_output_char_32_tty_z88dk_22_at:
    ld d,(hl)                   ; d = y coord
    inc hl
    ld e,(hl)                   ; e = x coord
+
+   ld (ix+14),e                ; set x coord
+   ld (ix+15),d                ; set y coord
    
-   call console_01_output_char_proc_snap
-   jp console_01_output_char_proc_set_coord
+   ret

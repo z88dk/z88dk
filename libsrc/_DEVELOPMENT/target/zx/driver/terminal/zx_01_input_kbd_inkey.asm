@@ -18,44 +18,102 @@
 ; tied to an output terminal that understands console_01_input
 ; terminal messages.
 ;
-; Driver class diagram:
+; ;;;;;;;;;;;;;;;;;;;;
+; DRIVER CLASS DIAGRAM
+; ;;;;;;;;;;;;;;;;;;;;
 ;
 ; CONSOLE_01_INPUT_TERMINAL (root, abstract)
 ; ZX_01_INPUT_KBD_INKEY (concrete)
 ;
-; Consumes the following messages from console_01_input_terminal:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES CONSUMED FROM STDIO
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-;   * ITERM_MSG_GETC
+; * STDIO_MSG_GETC
+; * STDIO_MSG_EATC
+; * STDIO_MSG_READ
+; * STDIO_MSG_SEEK
+; * STDIO_MSG_FLSH
+; * STDIO_MSG_ICTL
+; * STDIO_MSG_CLOS
 ;
-;     exit : a = keyboard char after character set translation
-;            carry set on error, hl = 0 (stream error) or -1 (eof)
-;     uses : af, bc, de, hl
+; Others result in enotsup_zc.
 ;
-; Consumes the following messages from stdio:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES CONSUMED FROM CONSOLE_01_INPUT_TERMINAL
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-;   * STDIO_MSG_FLSH
-;     forwards to base class
+; * ITERM_MSG_GETC
 ;
-;   * STDIO_MSG_ICTL
-;     forwards to base class
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES GENERATED FOR CONSOLE_01_OUTPUT_TERMINAL
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-; IOCTLs understood by this driver (in addition to those of base):
+; * ITERM_MSG_PUTC
+; * ITERM_MSG_PRINT_CURSOR
+; * ITERM_MSG_ERASE_CURSOR
+; * ITERM_MSG_BS
+; * ITERM_MSG_BS_PWD
+; * ITERM_MSG_READLINE_BEGIN
+; * ITERM_MSG_READLINE_END
+; * ITERM_MSG_BELL
 ;
-;   * IOCTL_ITERM_GET_DELAY
-;   * IOCTL_ITERM_SET_DELAY
-;     set debounce and repeat rate times in ms.
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; IOCTLs UNDERSTOOD BY THIS DRIVER
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; * IOCTL_ITERM_RESET
+;
+; * IOCTL_ITERM_TIE
+;   Attach input device to a different output terminal (0 to disconnect)
+;
+; * IOCTL_ITERM_GET_EDITBUF
+;   Copies edit buffer details to user program
+;
+; * IOCTL_ITERM_SET_EDITBUF
+;   Writes edit buffer details into driver
+;
+; * IOCTL_ITERM_ECHO
+;   enable / disable echo mode
+;
+; * IOCTL_ITERM_PASS
+;   enable / disable password mode
+;
+; * IOCTL_ITERM_LINE
+;   enable / disable line editing mode
+;
+; * IOCTL_ITERM_COOK
+;   enable / disable cook mode
+;
+; * IOCTL_ITERM_CAPS
+;   set / reset caps lock
+;
+; * IOCTL_ITERM_CRLF
+;   enable / disable crlf processing
+;
+; * IOCTL_ITERM_CURS
+;   enable / disable cursor in line mode
+;
+; * IOCTL_ITERM_GET_DELAY
+;
+; * IOCTL_ITERM_SET_DELAY
 ; 
-; This driver reserves extra bytes in the FDSTRUCT:
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+; BYTES RESERVED IN FDSTRUCT
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
 ; offset (wrt FDSTRUCT.JP)  description
 ;
+;    8..13                  mutex
+;   14..15                  FDSTRUCT *oterm (connected output terminal, 0 if none)
+;   16                      pending_char
+;   17..18                  read_index (index of next char to read from edit buffer)
+;   19..24                  b_array (manages edit buffer)
 ;   25                      getk_state
 ;   26                      getk_lastk
 ;   27                      getk_debounce_ms
 ;   28..29                  getk_repeatbegin_ms
 ;   30..31                  getk_repeatperiod_ms
-;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 SECTION code_fcntl
 

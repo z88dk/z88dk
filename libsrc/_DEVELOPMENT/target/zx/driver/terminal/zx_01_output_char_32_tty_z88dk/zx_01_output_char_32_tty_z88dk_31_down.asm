@@ -3,17 +3,18 @@ SECTION code_fcntl
 
 PUBLIC zx_01_output_char_32_tty_z88dk_31_down
 
-EXTERN console_01_output_char_proc_get_coord
-EXTERN console_01_output_char_proc_snap
-EXTERN console_01_output_char_proc_set_coord
+EXTERN console_01_output_char_proc_move_down
 
 zx_01_output_char_32_tty_z88dk_31_down:
 
-   ; move cursor left
+   ; move cursor down
    
-   call console_01_output_char_proc_get_coord
+   ld d,(ix+15)                ; d = y coord
+   ld b,(ix+19)                ; b = window.height
+
+   call console_01_output_char_proc_move_down
    
-   inc d                       ; y++
+   ld (ix+15),d                ; store y coord
    
-   call console_01_output_char_proc_snap
-   jp console_01_output_char_proc_set_coord
+   or a
+   ret

@@ -12,8 +12,8 @@ zx_01_input_inkey_stdio_msg_ictl:
    ; ioctl messages understood:
    ;
    ; defc IOCTL_ITERM_RESET      = $0101
-   ; defc IOCTL_ITERM_GET_DELAY  = $0a81
-   ; defc IOCTL_ITERM_SET_DELAY  = $0a01
+   ; defc IOCTL_ITERM_GET_DELAY  = $1081
+   ; defc IOCTL_ITERM_SET_DELAY  = $1001
    ;
    ; in addition to flags managed by stdio
    ; and messages understood by base class
@@ -48,7 +48,7 @@ zx_01_input_inkey_stdio_msg_ictl:
    dec a
    jp z, zx_01_input_inkey_stdio_msg_flsh
    
-   cp $0a - 1
+   cp $10 - 1
    jp nz, console_01_input_stdio_msg_ictl_0
    
 _ioctl_getset_delay:

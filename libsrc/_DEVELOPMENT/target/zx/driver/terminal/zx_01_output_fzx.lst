@@ -1,0 +1,5 @@
+target/zx/driver/terminal/zx_01_output_fzx
+target/zx/driver/terminal/zx_01_output_fzx/zx_01_output_fzx_oterm_msg_cls
+target/zx/driver/terminal/zx_01_output_fzx/zx_01_output_fzx_oterm_msg_pscroll
+target/zx/driver/terminal/zx_01_output_fzx/zx_01_output_fzx_oterm_msg_scroll
+target/zx/driver/terminal/zx_01_output_fzx/zx_01_output_fzx_stdio_msg_ictl

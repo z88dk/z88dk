@@ -12,7 +12,7 @@ zx_01_input_lastk_stdio_msg_ictl:
    ; ioctl messages understood:
    ;
    ; defc IOCTL_ITERM_RESET      = $0101
-   ; defc IOCTL_ITERM_LASTK      = $0b01
+   ; defc IOCTL_ITERM_LASTK      = $1101
    ;
    ; in addition to flags managed by stdio
    ; and messages understood by base class
@@ -47,7 +47,7 @@ zx_01_input_lastk_stdio_msg_ictl:
    dec a
    jp z, zx_01_input_lastk_stdio_msg_flsh
    
-   cp $0b - 1
+   cp $11 - 1
    jp nz, console_01_input_stdio_msg_ictl_0
    
 _ioctl_iterm_lastk:
@@ -73,4 +73,11 @@ _ioctl_iterm_lastk:
 _ioctl_iterm_lastk_exit:
 
    ex de,hl                    ; hl = old lastk
+   
+   ld a,(ix+6)
+   and $03
+   dec a
+   ret nz                      ; if not in error state
+   
+   res 0,(ix+6)
    ret
