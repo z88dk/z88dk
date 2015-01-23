@@ -1,9 +1,9 @@
 ; uint kbd_lookup(uchar c)
 ; 09.2005 aralbrec
 
-XLIB kbd_lookup
+PUBLIC kbd_lookup
 
-LIB kbd_transtbl
+EXTERN kbd_transtbl
 
 ; Given the ascii code of a character, returns the scan row and mask
 ; corresponding to the key that needs to be pressed to generate the

@@ -1,7 +1,7 @@
 ; scbb0_readchar
 ; 08.2009 aralbrec
 
-XLIB scbb0_readchar
+PUBLIC scbb0_readchar
 
 ; read a char from the buffer if one is available
 ;

@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB fsetpos
+PUBLIC fsetpos
 
-LIB fsetpos_callee
-XREF ASMDISP_FSETPOS_CALLEE
+EXTERN fsetpos_callee
+EXTERN ASMDISP_FSETPOS_CALLEE
 
 .fsetpos
 

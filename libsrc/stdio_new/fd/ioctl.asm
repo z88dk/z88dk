@@ -1,10 +1,10 @@
 ; CALLER linkage for function pointers
 ; 06.2008 aralbrec
 
-XLIB ioctl
+PUBLIC ioctl
 
-LIB ioctl_callee
-XREF ASMDISP_IOCTL_CALLEE
+EXTERN ioctl_callee
+EXTERN ASMDISP_IOCTL_CALLEE
 
 .ioctl
 

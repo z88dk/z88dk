@@ -1,9 +1,9 @@
 ; int __FASTCALL__ putchar(int c)
 ; 06.2008 aralbrec
 
-XLIB putchar
-LIB fputc_callee
-XREF ASMDISP_FPUTC_CALLEE, _stdout
+PUBLIC putchar
+EXTERN fputc_callee
+EXTERN ASMDISP_FPUTC_CALLEE, _stdout
 
 .putchar
 

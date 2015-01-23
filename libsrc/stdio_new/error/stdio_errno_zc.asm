@@ -1,9 +1,9 @@
 ; stdio_errno_zc
 ; 06.2008 aralbrec
 
-XLIB stdio_errno_zc
-LIB stdio_error_zc
-XREF _errno
+PUBLIC stdio_errno_zc
+EXTERN stdio_error_zc
+EXTERN _errno
 
 .stdio_errno_zc
 

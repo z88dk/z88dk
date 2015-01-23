@@ -1,8 +1,8 @@
 ; int __FASTCALL__ feof(FILE *stream)
 ; 06.2008 aralbrec
 
-XLIB feof
-LIB stdio_error_mc, stdio_success_znc, l_jphl
+PUBLIC feof
+EXTERN stdio_error_mc, stdio_success_znc, l_jphl
 
 INCLUDE "../stdio.def"
 

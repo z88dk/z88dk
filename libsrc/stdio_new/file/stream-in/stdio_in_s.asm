@@ -1,8 +1,8 @@
 ; stdio_in_s
 ; 05.2008 aralbrec
 
-XLIB stdio_in_s
-LIB stdio_getchar, stdio_ungetchar, stdio_consumews, asm_isspace, stdio_nextarg
+PUBLIC stdio_in_s
+EXTERN stdio_getchar, stdio_ungetchar, stdio_consumews, asm_isspace, stdio_nextarg
 
 ; input %s parameter
 ;

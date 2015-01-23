@@ -1,10 +1,10 @@
 ; int sscanf(char *s, const char *fmt,...)
 ; 05.2008 aralbrec
 
-XLIB sscanf
+PUBLIC sscanf
 
-LIB vsscanf_callee, stdio_varg, stdio_nextarg
-XREF ASMDISP_VSSCANF_CALLEE
+EXTERN vsscanf_callee, stdio_varg, stdio_nextarg
+EXTERN ASMDISP_VSSCANF_CALLEE
 
 .sscanf
 

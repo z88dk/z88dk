@@ -1,8 +1,8 @@
 ; stdio_getchar
 ; 05.2008 aralbrec
 
-XLIB stdio_getchar
-LIB l_jpix
+PUBLIC stdio_getchar
+EXTERN l_jpix
 
 INCLUDE "../../stdio.def"
 

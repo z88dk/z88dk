@@ -1,9 +1,9 @@
 ; char __FASTCALL__ *gets(char *s)
 ; 06.2008 aralbrec
 
-XLIB gets
-LIB fgetc, l_jpix, stdio_error_zc
-XREF ASMDISP_FGETC, _stdin
+PUBLIC gets
+EXTERN fgetc, l_jpix, stdio_error_zc
+EXTERN ASMDISP_FGETC, _stdin
 
 INCLUDE "../stdio.def"
 

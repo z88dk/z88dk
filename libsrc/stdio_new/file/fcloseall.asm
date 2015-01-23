@@ -1,10 +1,10 @@
 ; void fcloseall(void)
 ; 07.2009 aralbrec
 
-XLIB fcloseall
+PUBLIC fcloseall
 
-LIB fclose
-XREF _stdio_filetbl, LIBDISP2_FCLOSE
+EXTERN fclose
+EXTERN _stdio_filetbl, LIBDISP2_FCLOSE
 
 INCLUDE "../stdio.def"
 

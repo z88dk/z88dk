@@ -1,8 +1,8 @@
 ; stdio_in_o
 ; 05.2008 aralbrec
 
-XLIB stdio_in_o
-LIB stdio_incommon1, stdio_incommon2, asm_isodigit, stdio_ungetchar, stdio_inexit
+PUBLIC stdio_in_o
+EXTERN stdio_incommon1, stdio_incommon2, asm_isodigit, stdio_ungetchar, stdio_inexit
 
 ; input %o parameter
 ;

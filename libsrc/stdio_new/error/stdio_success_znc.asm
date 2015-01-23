@@ -1,7 +1,7 @@
 ; stdio_success_znc
 ; 05.2008 aralbrec
 
-XLIB stdio_success_znc
+PUBLIC stdio_success_znc
 
 ; exit : hl = 0 and carry reset
 

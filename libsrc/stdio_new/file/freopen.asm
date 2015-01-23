@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB freopen
+PUBLIC freopen
 
-LIB freopen_callee
-XREF ASMDISP_FREOPEN_CALLEE
+EXTERN freopen_callee
+EXTERN ASMDISP_FREOPEN_CALLEE
 
 .freopen
 

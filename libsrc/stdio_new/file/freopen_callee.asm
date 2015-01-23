@@ -1,12 +1,12 @@
 ; FILE __CALLEE__ *freopen_callee(char *filename, char *mode, FILE *stream)
 ; 07.2009 aralbrec
 
-XLIB freopen_callee
-XDEF ASMDISP_FREOPEN_CALLEE
+PUBLIC freopen_callee
+PUBLIC ASMDISP_FREOPEN_CALLEE
 
-LIB fclose, close, stdio_parseperm, fopen_callee, stdio_findfilestruct, stdio_findfdstruct, stdio_free, fflush
-LIB stdio_error_einval_zc, stdio_error_zc, stdio_error_ebadf_zc, l_jpix, stdio_descendchain
-XREF LIBDISP_FCLOSE, LIBDISP_CLOSE, LIBDISP2_CLOSE, LIBDISP_FOPEN_CALLEE, ASMDISP_FFLUSH
+EXTERN fclose, close, stdio_parseperm, fopen_callee, stdio_findfilestruct, stdio_findfdstruct, stdio_free, fflush
+EXTERN stdio_error_einval_zc, stdio_error_zc, stdio_error_ebadf_zc, l_jpix, stdio_descendchain
+EXTERN LIBDISP_FCLOSE, LIBDISP_CLOSE, LIBDISP2_CLOSE, LIBDISP_FOPEN_CALLEE, ASMDISP_FFLUSH
 
 INCLUDE "../stdio.def"
 

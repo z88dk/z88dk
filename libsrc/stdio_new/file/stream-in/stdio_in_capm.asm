@@ -1,9 +1,9 @@
 ; stdio_in_M, read EUI-48 / MAC-48 address in canonical form
 ; 07.2009 aralbrec
 
-XLIB stdio_in_capm
-LIB stdio_incommon1, asm_isxdigit, stdio_inexit, stdio_ungetchar
-LIB stdio_getchar, stdio_atou_any_stream
+PUBLIC stdio_in_capm
+EXTERN stdio_incommon1, asm_isxdigit, stdio_inexit, stdio_ungetchar
+EXTERN stdio_getchar, stdio_atou_any_stream
 
 ; input %M parameter, read EUI-48 address in pairwise hex notation
 ;

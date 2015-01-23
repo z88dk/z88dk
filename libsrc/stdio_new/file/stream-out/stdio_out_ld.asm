@@ -1,10 +1,10 @@
 ; stdio_out_ld
 ; 05.2008 aralbrec
 
-XLIB stdio_out_ld
-LIB stdio_longnumprec, stdio_outcommon, stdio_nextarg
-LIB l_int2long_s, l_long_neg
-XREF LIBDISP_STDIO_OUTCOMMON_SIGNED
+PUBLIC stdio_out_ld
+EXTERN stdio_longnumprec, stdio_outcommon, stdio_nextarg
+EXTERN l_int2long_s, l_long_neg
+EXTERN LIBDISP_STDIO_OUTCOMMON_SIGNED
 
 INCLUDE "../../stdio.def"
 

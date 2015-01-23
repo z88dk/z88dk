@@ -1,10 +1,10 @@
 ; int asprintf(char **s, const char *fmt, ...)
 ; 05.2008 aralbrec
 
-XLIB asprintf
+PUBLIC asprintf
 
-LIB vasprintf_callee, stdio_varg, stdio_nextarg
-XREF ASMDISP_VASPRINTF_CALLEE
+EXTERN vasprintf_callee, stdio_varg, stdio_nextarg
+EXTERN ASMDISP_VASPRINTF_CALLEE
 
 .asprintf
 

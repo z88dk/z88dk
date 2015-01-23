@@ -1,8 +1,8 @@
 ; stdio_in_lo
 ; 05.2008 aralbrec
 
-XLIB stdio_in_lo
-LIB stdio_incommon1, stdio_incommon3, asm_isodigit, stdio_ungetchar, stdio_inexit
+PUBLIC stdio_in_lo
+EXTERN stdio_incommon1, stdio_incommon3, asm_isodigit, stdio_ungetchar, stdio_inexit
 
 ; input %lo parameter, handles 16-bit %o and 32-bit %lo
 ;

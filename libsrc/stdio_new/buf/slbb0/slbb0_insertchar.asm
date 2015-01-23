@@ -1,8 +1,8 @@
 ; slbb0_insertchar
 ; 08.2009 aralbrec
 
-XLIB slbb0_insertchar
-XREF slbb0_appendchar_lib
+PUBLIC slbb0_insertchar
+EXTERN slbb0_appendchar_lib
 
 ; insert a char into the buffer prior to the position
 ; indicated, making space for it by copying the rest of

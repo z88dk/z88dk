@@ -1,8 +1,8 @@
 ; stdio_buff2caps
 ; 05.2008 aralbrec
 
-XLIB stdio_buff2caps
-LIB asm_toupper
+PUBLIC stdio_buff2caps
+EXTERN asm_toupper
 
 ; capitalize all letters in buffer
 ;

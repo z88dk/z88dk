@@ -1,9 +1,9 @@
 ; wrapper for function pointers
 
-XLIB vsscanf
+PUBLIC vsscanf
 
-LIB vsscanf_callee
-XREF ASMDISP_VSSCANF_CALLEE
+EXTERN vsscanf_callee
+EXTERN ASMDISP_VSSCANF_CALLEE
 
 .vsscanf
 

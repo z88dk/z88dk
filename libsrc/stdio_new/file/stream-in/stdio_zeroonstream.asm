@@ -1,7 +1,7 @@
 ; stdio_zeroonstream
 ; 05.2008 aralbrec
 
-XLIB stdio_zeroonstream
+PUBLIC stdio_zeroonstream
 
 ; more common code from %i and %x scan converters
 

@@ -1,7 +1,7 @@
 ; slbb0_readchar
 ; 08.2009 aralbrec
 
-XLIB slbb0_readchar
+PUBLIC slbb0_readchar
 
 ; read a char from the index specified
 ;

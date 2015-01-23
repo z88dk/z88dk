@@ -1,13 +1,13 @@
 ; int __CALLEE__ vfscanf_callee(FILE *stream, const char *format, void *arg_ptr)
 ; 05.2008 aralbrec
 
-XLIB vfscanf_callee
-XDEF ASMDISP_VFSCANF_CALLEE, LIBDISP_VFSCANF_CALLEE
+PUBLIC vfscanf_callee
+PUBLIC ASMDISP_VFSCANF_CALLEE, LIBDISP_VFSCANF_CALLEE
 
-LIB stdio_atou, stdio_error_mc, stdio_error_eacces_mc
-LIB asm_isspace, asm_isdigit
-LIB stdio_getchar, stdio_ungetchar
-LIB jumptbl_scanf, stdio_consumews
+EXTERN stdio_atou, stdio_error_mc, stdio_error_eacces_mc
+EXTERN asm_isspace, asm_isdigit
+EXTERN stdio_getchar, stdio_ungetchar
+EXTERN jumptbl_scanf, stdio_consumews
 
 .vfscanf_callee
 

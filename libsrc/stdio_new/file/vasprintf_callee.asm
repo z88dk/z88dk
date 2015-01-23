@@ -1,11 +1,11 @@
 ; int __CALLEE__ vasprintf_callee(char **s, const char *fmt, void *arg_ptr)
 ; 05.2008 aralbrec
 
-XLIB vasprintf_callee
-XDEF ASMDISP_VASPRINTF_CALLEE
+PUBLIC vasprintf_callee
+PUBLIC ASMDISP_VASPRINTF_CALLEE
 
-LIB vsnprintf_callee, malloc, stdio_error_enomem_mc
-XREF ASMDISP_VSNPRINTF_CALLEE
+EXTERN vsnprintf_callee, malloc, stdio_error_enomem_mc
+EXTERN ASMDISP_VSNPRINTF_CALLEE
 
 .vasprintf_callee
 

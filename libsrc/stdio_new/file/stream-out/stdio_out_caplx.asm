@@ -1,8 +1,8 @@
 ; stdio_out_caplx
 ; 05.2008 aralbrec
 
-XLIB stdio_out_caplx
-LIB stdio_out_lx
+PUBLIC stdio_out_caplx
+EXTERN stdio_out_lx
 
 ; output %lX parameter, handles 16-bit %X and 32-bit %lX
 ;

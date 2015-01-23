@@ -1,10 +1,10 @@
 ; uint __CALLEE__ fwrite_callee(void *p, uint size, uint nitems, FILE *stream)
 ; 06.2008 aralbrec
 
-XLIB fwrite_callee
-XDEF ASMDISP_FWRITE_CALLEE
-LIB l_mult, l_div_u, l_jpix
-LIB stdio_error_mc, stdio_error_eacces_mc, stdio_success_znc
+PUBLIC fwrite_callee
+PUBLIC ASMDISP_FWRITE_CALLEE
+EXTERN l_mult, l_div_u, l_jpix
+EXTERN stdio_error_mc, stdio_error_eacces_mc, stdio_success_znc
 
 include "../stdio.def"
 

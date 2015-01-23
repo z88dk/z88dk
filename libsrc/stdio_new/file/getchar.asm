@@ -1,10 +1,10 @@
 ; int getchar(void)
 ; 06.2008 aralbrec
 
-XLIB getchar
+PUBLIC getchar
 
-LIB fgetc
-XREF ASMDISP_FGETC, _stdin
+EXTERN fgetc
+EXTERN ASMDISP_FGETC, _stdin
 
 .getchar
 

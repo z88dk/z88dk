@@ -1,11 +1,11 @@
 ; uint __CALLEE__ write_callee(int fd, void *src, uint size)
 ; 06.2008 aralbrec
 
-XLIB write_callee
-XDEF ASMDISP_WRITE_CALLEE
+PUBLIC write_callee
+PUBLIC ASMDISP_WRITE_CALLEE
 
-LIB stdio_success_znc, stdio_error_ebadf_mc, stdio_error_eacces_mc, stdio_error_mc
-LIB l_jpix, stdio_fdcommon1
+EXTERN stdio_success_znc, stdio_error_ebadf_mc, stdio_error_eacces_mc, stdio_error_mc
+EXTERN l_jpix, stdio_fdcommon1
 
 INCLUDE "../stdio.def"
 

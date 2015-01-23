@@ -1,8 +1,8 @@
 ; stdio_incommon2
 ; 05.2008 aralbrec
 
-XLIB stdio_incommon2
-LIB stdio_atou_any_stream, l_neg
+PUBLIC stdio_incommon2
+EXTERN stdio_atou_any_stream, l_neg
 
 ; common code for number scan converters
 ;

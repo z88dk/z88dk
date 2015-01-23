@@ -1,9 +1,9 @@
 ; wrapper for function pointers
 
-XLIB fputs
+PUBLIC fputs
 
-LIB fputs_callee
-XREF ASMDISP_FPUTS_CALLEE
+EXTERN fputs_callee
+EXTERN ASMDISP_FPUTS_CALLEE
 
 .fputs
 

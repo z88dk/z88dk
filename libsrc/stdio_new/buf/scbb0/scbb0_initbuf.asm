@@ -1,7 +1,7 @@
 ; scbb0_initbuf
 ; 08.2009 aralbrec
 
-XLIB scbb0_initbuf
+PUBLIC scbb0_initbuf
 
 ; initialize the circular buffer
 ;

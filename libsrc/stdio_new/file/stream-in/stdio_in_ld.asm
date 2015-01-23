@@ -1,8 +1,8 @@
 ; stdio_in_ld
 ; 05.2008 aralbrec
 
-XLIB stdio_in_ld
-LIB stdio_incommon1, stdio_incommon3, asm_isdigit, stdio_ungetchar, stdio_inexit
+PUBLIC stdio_in_ld
+EXTERN stdio_incommon1, stdio_incommon3, asm_isdigit, stdio_ungetchar, stdio_inexit
 
 ; input %ld parameter, handles both 16-bit %d and 32-bit %ld
 ;

@@ -1,7 +1,7 @@
 ; scbb0_writechar
 ; 08.2009 aralbrec
 
-XLIB scbb0_writechar
+PUBLIC scbb0_writechar
 
 ; write char to buffer if space is available
 ;

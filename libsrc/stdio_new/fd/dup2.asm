@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB dup2
+PUBLIC dup2
 
-LIB dup2_callee
-XREF ASMDISP_DUP2_CALLEE
+EXTERN dup2_callee
+EXTERN ASMDISP_DUP2_CALLEE
 
 .dup2
 

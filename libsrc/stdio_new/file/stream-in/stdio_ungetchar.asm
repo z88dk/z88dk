@@ -1,7 +1,7 @@
 ; stdio_ungetchar
 ; 05.2008 aralbrec
 
-XLIB stdio_ungetchar
+PUBLIC stdio_ungetchar
 
 ; stream guarantees exactly one unget char
 ;

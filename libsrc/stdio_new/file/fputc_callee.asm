@@ -1,10 +1,10 @@
 ; int __CALLEE__ fputc(int c, FILE *stream)
 ; 06.2008 aralbrec
 
-XLIB fputc_callee
-XDEF ASMDISP_FPUTC_CALLEE
+PUBLIC fputc_callee
+PUBLIC ASMDISP_FPUTC_CALLEE
 
-LIB l_jpix, stdio_error_mc, stdio_error_eacces_mc
+EXTERN l_jpix, stdio_error_mc, stdio_error_eacces_mc
 
 INCLUDE "../stdio.def"
 

@@ -1,8 +1,8 @@
 ; stdio_incommon1
 ; 05.2008 aralbrec
 
-XLIB stdio_incommon1
-LIB stdio_consumews, stdio_consumesign, stdio_getchar, stdio_nextarg
+PUBLIC stdio_incommon1
+EXTERN stdio_consumews, stdio_consumesign, stdio_getchar, stdio_nextarg
 
 ; common code for number scan converters
 ;

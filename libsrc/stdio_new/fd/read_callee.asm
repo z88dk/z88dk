@@ -1,11 +1,11 @@
 ; uint __CALLEE__ read_callee(int fd, void *dst, uint size)
 ; 06.2008 aralbrec
 
-XLIB read_callee
-XDEF ASMDISP_READ_CALLEE
+PUBLIC read_callee
+PUBLIC ASMDISP_READ_CALLEE
 
-LIB stdio_success_znc, stdio_error_eacces_mc, stdio_error_ebadf_mc, stdio_error_mc
-LIB l_jpix, stdio_fdcommon1
+EXTERN stdio_success_znc, stdio_error_eacces_mc, stdio_error_ebadf_mc, stdio_error_mc
+EXTERN l_jpix, stdio_fdcommon1
 
 INCLUDE "../stdio.def"
 

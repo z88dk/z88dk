@@ -1,8 +1,8 @@
 ; stdio_incommon3
 ; 05.2008 aralbrec
 
-XLIB stdio_incommon3
-LIB stdio_atoul_any_stream, l_long_neg
+PUBLIC stdio_incommon3
+EXTERN stdio_atoul_any_stream, l_long_neg
 
 ; common code for long number scan converters
 ;

@@ -1,8 +1,8 @@
 ; stdio_in_c
 ; 05.2008 aralbrec
 
-XLIB stdio_in_c
-LIB stdio_getchar, stdio_nextarg
+PUBLIC stdio_in_c
+EXTERN stdio_getchar, stdio_nextarg
 
 ; input %c parameter
 ;

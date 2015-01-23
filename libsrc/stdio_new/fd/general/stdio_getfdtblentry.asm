@@ -1,8 +1,8 @@
 ; stdio_getfdtblentry
 ; 07.2009 aralbrec
 
-XLIB stdio_getfdtblentry
-XREF _stdio_fdtbl
+PUBLIC stdio_getfdtblentry
+EXTERN _stdio_fdtbl
 
 ; return address of table entry holding fd struct address
 ;

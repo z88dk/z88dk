@@ -1,8 +1,8 @@
 ; stdio_dupcommon1
 ; 07.2009 aralbrec
 
-XLIB stdio_dupcommon1
-LIB stdio_malloc, stdio_error_enomem_mc
+PUBLIC stdio_dupcommon1
+EXTERN stdio_malloc, stdio_error_enomem_mc
 
 INCLUDE "../../stdio.def"
 

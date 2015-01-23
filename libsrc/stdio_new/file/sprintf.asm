@@ -1,10 +1,10 @@
 ; int sprintf(char *s, const char *fmt,...)
 ; 05.2008 aralbrec
 
-XLIB sprintf
+PUBLIC sprintf
 
-LIB vsprintf_callee, stdio_varg, stdio_nextarg
-XREF ASMDISP_VSPRINTF_CALLEE
+EXTERN vsprintf_callee, stdio_varg, stdio_nextarg
+EXTERN ASMDISP_VSPRINTF_CALLEE
 
 .sprintf
 

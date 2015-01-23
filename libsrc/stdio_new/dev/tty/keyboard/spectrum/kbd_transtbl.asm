@@ -7,7 +7,7 @@
 ; An effort has been made to emulate the PC keyboard with the CTRL key
 ; represented by CAPS+SYM shifts simultaneously pressed.
 
-XLIB kbd_transtbl
+PUBLIC kbd_transtbl
 
 .kbd_transtbl
 

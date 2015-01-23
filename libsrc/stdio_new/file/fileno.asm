@@ -1,10 +1,10 @@
 ; int __FASTCALL__ fileno(FILE *stream)
 ; 07.2009 aralbrec
 
-XLIB fileno
-XDEF ASMDISP_FILENO
+PUBLIC fileno
+PUBLIC ASMDISP_FILENO
 
-LIB stdio_descendchain, stdio_error_ebadf_mc, stdio_findfdstruct
+EXTERN stdio_descendchain, stdio_error_ebadf_mc, stdio_findfdstruct
 
 INCLUDE "../stdio.def"
 

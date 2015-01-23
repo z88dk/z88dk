@@ -1,9 +1,9 @@
 ; stdio_outcommon
 ; 05.2008 aralbrec
 
-XLIB stdio_outcommon
-XDEF LIBDISP_STDIO_OUTCOMMON_SIGNED
-LIB stdio_outsign, stdio_outbuff, stdio_outpad
+PUBLIC stdio_outcommon
+PUBLIC LIBDISP_STDIO_OUTCOMMON_SIGNED
+EXTERN stdio_outsign, stdio_outbuff, stdio_outpad
 
 ; common code that performs padding and justification for numbers
 ;

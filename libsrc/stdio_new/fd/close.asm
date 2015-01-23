@@ -1,11 +1,11 @@
 ; int __FASTCALL__ close(int fd)
 ; 07.2009 aralbrec
 
-XLIB close
-XDEF LIBDISP_CLOSE, LIBDISP2_CLOSE
+PUBLIC close
+PUBLIC LIBDISP_CLOSE, LIBDISP2_CLOSE
 
-LIB stdio_fdcommon1, l_jpix, stdio_findfdstruct, stdio_free
-LIB stdio_success_znc, stdio_error_ebadf_mc
+EXTERN stdio_fdcommon1, l_jpix, stdio_findfdstruct, stdio_free
+EXTERN stdio_success_znc, stdio_error_ebadf_mc
 
 INCLUDE "../stdio.def"
 

@@ -1,11 +1,11 @@
 ; int __CALLEE__ writebyte_callee(int fd, int c)
 ; 06.2008 aralbrec
 
-XLIB writebyte_callee
-XDEF ASMDISP_WRITEBYTE_CALLEE
+PUBLIC writebyte_callee
+PUBLIC ASMDISP_WRITEBYTE_CALLEE
 
-LIB stdio_fdcommon1, l_jpix
-LIB stdio_error_ebadf_mc, stdio_error_eacces_mc, stdio_error_mc, stdio_success_znc
+EXTERN stdio_fdcommon1, l_jpix
+EXTERN stdio_error_ebadf_mc, stdio_error_eacces_mc, stdio_error_mc, stdio_success_znc
 
 INCLUDE "../stdio.def"
 

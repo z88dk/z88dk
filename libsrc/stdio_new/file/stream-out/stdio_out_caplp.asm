@@ -1,8 +1,8 @@
 ; stdio_out_caplp
 ; 05.2008 aralbrec
 
-XLIB stdio_out_caplp
-LIB stdio_out_lx
+PUBLIC stdio_out_caplp
+EXTERN stdio_out_lx
 
 ; output %lP parameter, handles 16-bit %P and 24-bit %lP
 ;

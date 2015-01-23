@@ -1,8 +1,8 @@
 ; stdio_outpad
 ; 05.2008
 
-XLIB stdio_outpad
-LIB stdio_outchar
+PUBLIC stdio_outpad
+EXTERN stdio_outchar
 
 ; output n identical characters
 ;

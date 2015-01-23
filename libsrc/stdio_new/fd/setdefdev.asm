@@ -1,8 +1,8 @@
 ; void __FASTCALL__ *setdefdev(void *driver_function)
 ; 06.2008 aralbrec
 
-XLIB setdefdev
-XREF _stdio_defdev
+PUBLIC setdefdev
+EXTERN _stdio_defdev
 
 .setdefdev
 

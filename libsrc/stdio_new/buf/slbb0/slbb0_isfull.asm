@@ -1,7 +1,7 @@
 ; slbb0_isfull
 ; 08.2009 aralbrec
 
-XLIB slbb0_isfull
+PUBLIC slbb0_isfull
 
 ; enter : hl = & struct slbb
 ; exit  : carry set if buffer full

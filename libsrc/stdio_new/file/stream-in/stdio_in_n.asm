@@ -1,8 +1,8 @@
 ; stdio_in_n
 ; 05.2008 aralbrec
 
-XLIB stdio_in_n
-LIB stdio_out_n, stdio_nextarg
+PUBLIC stdio_in_n
+EXTERN stdio_out_n, stdio_nextarg
 
 ; input %n parameter
 ;

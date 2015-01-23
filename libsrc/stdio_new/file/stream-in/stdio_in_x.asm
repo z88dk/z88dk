@@ -1,8 +1,8 @@
 ; stdio_in_x
 ; 05.2008 aralbrec
 
-XLIB stdio_in_x
-LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, asm_isxdigit, stdio_zeroonstream, stdio_inexit
+PUBLIC stdio_in_x
+EXTERN stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, asm_isxdigit, stdio_zeroonstream, stdio_inexit
 
 ; input %x parameter
 ;

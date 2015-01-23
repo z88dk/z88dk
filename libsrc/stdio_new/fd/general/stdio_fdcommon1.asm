@@ -1,7 +1,7 @@
 ; stdio_fdcommon1
 ; 07.2009 aralbrec
 
-XLIB stdio_fdcommon1
+PUBLIC stdio_fdcommon1
 
 ; common code factored out of a lot of fd functions
 ;

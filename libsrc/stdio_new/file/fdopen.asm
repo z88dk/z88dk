@@ -1,10 +1,10 @@
 ; CALLER linkage for function pointers
 ; 06.2008 aralbrec
 
-XLIB fdopen
+PUBLIC fdopen
 
-LIB fdopen_callee
-XREF ASMDISP_FDOPEN_CALLEE
+EXTERN fdopen_callee
+EXTERN ASMDISP_FDOPEN_CALLEE
 
 .fdopen
 

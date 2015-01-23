@@ -1,10 +1,10 @@
 ; stdio_findfileslot
 ; 07.2009 aralbrec
 
-XLIB stdio_findfileslot
+PUBLIC stdio_findfileslot
 
-LIB stdio_findfdslot
-XREF _stdio_filetbl, LIBDISP_STDIO_FINDFDSLOT
+EXTERN stdio_findfdslot
+EXTERN _stdio_filetbl, LIBDISP_STDIO_FINDFDSLOT
 
 INCLUDE "../../stdio.def"
 

@@ -1,8 +1,8 @@
 ; slbb0_appendchar
 ; 08.2009 aralbrec
 
-XLIB slbb0_appendchar
-XDEF slbb0_appendchar_lib
+PUBLIC slbb0_appendchar
+PUBLIC slbb0_appendchar_lib
 
 ; append the char to the end of the buffer
 ;

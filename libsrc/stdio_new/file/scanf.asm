@@ -1,11 +1,11 @@
 ; int scanf(const char *fmt, ...)
 ; 05.2008 aralbrec
 
-XLIB scanf
+PUBLIC scanf
 
-LIB vfscanf_callee, stdio_varg
-XREF ASMDISP_VFSCANF_CALLEE
-XREF _stdin
+EXTERN vfscanf_callee, stdio_varg
+EXTERN ASMDISP_VFSCANF_CALLEE
+EXTERN _stdin
 
 .scanf
 

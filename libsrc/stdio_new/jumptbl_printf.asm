@@ -1,7 +1,7 @@
 ; lookup table for output format specifiers
 ; 05.2008 aralbrec
 
-XLIB jumptbl_printf
+PUBLIC jumptbl_printf
 
 ; output format specifiers: "bcdeEfFiIMnopPsuxX"
 ; place most common first, library alternatives in comments

@@ -1,7 +1,7 @@
 ; lookup table for input scan converters
 ; 05.2008 aralbrec
 
-XLIB jumptbl_scanf
+PUBLIC jumptbl_scanf
 
 ; scan converters: "[bcdeEfFiIMonpPsuxX"
 ; place most common first, library alternatives in comments

@@ -1,9 +1,9 @@
 ; int __CALLEE__ vfprintf_callee(FILE *stream, const char *format, void *arg_ptr)
 ; 05.2008 aralbrec
 
-XLIB vfprintf_callee
-LIB stdio_outchar, stdio_atou, jumptbl_printf, stdio_nextarg, stdio_error_eacces_mc, stdio_error_mc
-XDEF ASMDISP_VFPRINTF_CALLEE, LIBDISP_VFPRINTF_CALLEE
+PUBLIC vfprintf_callee
+EXTERN stdio_outchar, stdio_atou, jumptbl_printf, stdio_nextarg, stdio_error_eacces_mc, stdio_error_mc
+PUBLIC ASMDISP_VFPRINTF_CALLEE, LIBDISP_VFPRINTF_CALLEE
 
 INCLUDE "../stdio.def"
 

@@ -1,10 +1,10 @@
 ; stdio_findfilestruct
 ; 07.2009 aralbrec
 
-XLIB stdio_findfilestruct
+PUBLIC stdio_findfilestruct
 
-LIB stdio_findfdstruct
-XREF _stdio_filetbl, LIBDISP_STDIO_FINDFDSTRUCT
+EXTERN stdio_findfdstruct
+EXTERN _stdio_filetbl, LIBDISP_STDIO_FINDFDSTRUCT
 
 ; return address of table entry holding file struct address
 ;

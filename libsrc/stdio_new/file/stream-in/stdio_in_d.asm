@@ -1,8 +1,8 @@
 ; stdio_in_d
 ; 05.2008 aralbrec
 
-XLIB stdio_in_d
-LIB stdio_incommon1, stdio_incommon2, asm_isdigit, stdio_ungetchar, stdio_inexit
+PUBLIC stdio_in_d
+EXTERN stdio_incommon1, stdio_incommon2, asm_isdigit, stdio_ungetchar, stdio_inexit
 
 ; input %d parameter
 ;

@@ -1,10 +1,10 @@
 ; int snprintf(char *s, unsigned int size, const char *fmt,...)
 ; 05.2008 aralbrec
 
-XLIB snprintf
+PUBLIC snprintf
 
-LIB vsnprintf_callee, stdio_varg, stdio_nextarg
-XREF ASMDISP_VSNPRINTF_CALLEE
+EXTERN vsnprintf_callee, stdio_varg, stdio_nextarg
+EXTERN ASMDISP_VSNPRINTF_CALLEE
 
 .snprintf
 

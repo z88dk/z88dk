@@ -1,8 +1,8 @@
 ; stdio_out_p
 ; 05.2008 aralbrec
 
-XLIB stdio_out_p
-LIB stdio_out_x
+PUBLIC stdio_out_p
+EXTERN stdio_out_x
 
 ; output %p parameter
 ;

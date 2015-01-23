@@ -1,11 +1,11 @@
 ; int __CALLEE__ ioctl_callee(int fd, int request, int arg)
 ; 06.2008 aralbrec
 
-XLIB ioctl_callee
-XDEF ASMDISP_IOCTL_CALLEE
+PUBLIC ioctl_callee
+PUBLIC ASMDISP_IOCTL_CALLEE
 
-LIB stdio_error_mc, stdio_error_ebadf_mc
-LIB l_jpix, stdio_fdcommon1
+EXTERN stdio_error_mc, stdio_error_ebadf_mc
+EXTERN l_jpix, stdio_fdcommon1
 
 INCLUDE "../stdio.def"
 

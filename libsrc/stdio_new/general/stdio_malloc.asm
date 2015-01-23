@@ -1,10 +1,10 @@
 ; stdio_malloc
 ; 06.2008 aralbrec
 
-XLIB stdio_malloc
+PUBLIC stdio_malloc
 
-LIB HeapAlloc_callee
-XREF ASMDISP_HEAPALLOC_CALLEE, _stdio_heap
+EXTERN HeapAlloc_callee
+EXTERN ASMDISP_HEAPALLOC_CALLEE, _stdio_heap
 
 ; Stdio file objects are allocated from the stdio heap
 ; (_stdio_heap) which may or may not be the same heap used

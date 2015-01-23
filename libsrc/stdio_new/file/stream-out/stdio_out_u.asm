@@ -1,8 +1,8 @@
 ; stdio_out_u
 ; 05.2008 aralbrec
 
-XLIB stdio_out_u
-LIB stdio_numprec, stdio_outcommon
+PUBLIC stdio_out_u
+EXTERN stdio_numprec, stdio_outcommon
 
 INCLUDE "../../stdio.def"
 

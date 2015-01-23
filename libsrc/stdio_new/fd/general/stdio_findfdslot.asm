@@ -1,9 +1,9 @@
 ; stdio_findfdslot
 ; 06.2008 aralbrec
 
-XLIB stdio_findfdslot
-XDEF LIBDISP_STDIO_FINDFDSLOT
-XREF _stdio_fdtbl
+PUBLIC stdio_findfdslot
+PUBLIC LIBDISP_STDIO_FINDFDSLOT
+EXTERN _stdio_fdtbl
 
 INCLUDE "../../stdio.def"
 

@@ -1,10 +1,10 @@
 ; void closeall(void)
 ; 07.2009 aralbrec
 
-XLIB closeall
+PUBLIC closeall
 
-LIB close
-XREF LIBDISP2_CLOSE
+EXTERN close
+EXTERN LIBDISP2_CLOSE
 
 INCLUDE "../stdio.def"
 

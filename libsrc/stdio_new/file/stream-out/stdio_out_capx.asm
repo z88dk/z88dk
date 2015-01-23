@@ -1,8 +1,8 @@
 ; stdio_out_capx
 ; 05.2008 aralbrec
 
-XLIB stdio_out_capx
-LIB stdio_out_x
+PUBLIC stdio_out_capx
+EXTERN stdio_out_x
 
 ; output %X parameter
 ;

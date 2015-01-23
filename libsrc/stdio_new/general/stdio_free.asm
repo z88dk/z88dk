@@ -1,10 +1,10 @@
 ; stdio_free
 ; 06.2008 aralbrec
 
-XLIB stdio_free
+PUBLIC stdio_free
 
-LIB HeapFree_callee
-XREF ASMDISP_HEAPFREE_CALLEE, _stdio_heap
+EXTERN HeapFree_callee
+EXTERN ASMDISP_HEAPFREE_CALLEE, _stdio_heap
 
 ; Stdio file objects are allocated from the stdio heap
 ; (_stdio_heap) which may or may not be the same heap used

@@ -1,11 +1,11 @@
 ; int __CALLEE__ vsnprintf_callee(char *s, unsigned int size, const char *fmt, void *arg_ptr)
 ; 05.2008 aralbrec
 
-XLIB vsnprintf_callee
-XDEF ASMDISP_VSNPRINTF_CALLEE
+PUBLIC vsnprintf_callee
+PUBLIC ASMDISP_VSNPRINTF_CALLEE
 
-LIB vfprintf_callee
-XREF LIBDISP_VFPRINTF_CALLEE
+EXTERN vfprintf_callee
+EXTERN LIBDISP_VFPRINTF_CALLEE
 
 .vsnprintf_callee
 

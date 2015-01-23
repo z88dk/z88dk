@@ -1,7 +1,7 @@
 ; uint kbd_pressed(uint scancode)
 ; 09.2005 aralbrec
 
-XLIB kbd_pressed
+PUBLIC kbd_pressed
 
 ; Determines if a key is pressed using the scan code
 ; returned by kbd_lookup.

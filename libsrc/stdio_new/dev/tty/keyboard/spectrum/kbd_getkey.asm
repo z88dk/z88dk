@@ -2,10 +2,10 @@
 ; void kbd_getkeyreset(struct kbd_state *ks)
 ; 08.2009 aralbrec
 
-XLIB kbd_getkey
-XDEF kbd_getkeyreset
+PUBLIC kbd_getkey
+PUBLIC kbd_getkeyreset
 
-LIB kbd_inkey
+EXTERN kbd_inkey
 
 ; kbd_getkey() implements typewriter-like keyboard scanning
 ;

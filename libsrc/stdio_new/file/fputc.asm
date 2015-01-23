@@ -1,9 +1,9 @@
 ; wrapper for function pointers
 
-XLIB fputc
+PUBLIC fputc
 
-LIB fputc_callee
-XREF ASMDISP_FPUTC_CALLEE
+EXTERN fputc_callee
+EXTERN ASMDISP_FPUTC_CALLEE
 
 .fputc
 

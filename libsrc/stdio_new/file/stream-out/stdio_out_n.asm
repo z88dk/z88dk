@@ -1,7 +1,7 @@
 ; stdio_out_n
 ; 05.2008 aralbrec
 
-XLIB stdio_out_n
+PUBLIC stdio_out_n
 
 ; output %n parameter
 ;

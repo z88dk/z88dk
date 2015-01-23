@@ -1,8 +1,8 @@
 ; slbb0_addchar
 ; 08.2009 aralbrec
 
-XLIB slbb0_addchar
-LIB slbb0_insertchar
+PUBLIC slbb0_addchar
+EXTERN slbb0_insertchar
 
 ; add a char to the buffer after the position
 ; indicated, making space for it by copying the

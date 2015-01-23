@@ -1,12 +1,12 @@
 ; int __CALLEE__ open_callee(char *filename, int flags)
 ; 06.2008 aralbrec
 
-XLIB open_callee
-XDEF ASMDISP_OPEN_CALLEE, LIBDISP_OPEN_CALLEE
+PUBLIC open_callee
+PUBLIC ASMDISP_OPEN_CALLEE, LIBDISP_OPEN_CALLEE
 
-LIB stdio_malloc, stdio_free, l_jpix, stdio_findfdslot
-LIB stdio_error_enfile_mc, stdio_error_edevnf_mc, stdio_error_enomem_mc, stdio_error_mc
-XREF _stdio_devtbl, _stdio_defdev
+EXTERN stdio_malloc, stdio_free, l_jpix, stdio_findfdslot
+EXTERN stdio_error_enfile_mc, stdio_error_edevnf_mc, stdio_error_enomem_mc, stdio_error_mc
+EXTERN _stdio_devtbl, _stdio_defdev
 
 INCLUDE "../stdio.def"
 

@@ -1,10 +1,10 @@
 ; stdio_parseperm
 ; 07.2009 aralbrec
 
-XLIB stdio_parseperm
+PUBLIC stdio_parseperm
 
-LIB strchr_callee
-XREF ASMDISP_STRCHR_CALLEE
+EXTERN strchr_callee
+EXTERN ASMDISP_STRCHR_CALLEE
 
 ; parse file permissions
 ;

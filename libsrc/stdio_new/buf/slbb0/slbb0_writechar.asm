@@ -1,8 +1,8 @@
 ; slbb0_writechar
 ; 08.2009 aralbrec
 
-XLIB slbb0_writechar
-LIB slbb0_appendchar
+PUBLIC slbb0_writechar
+EXTERN slbb0_appendchar
 
 ; write a char to the index specified
 ;

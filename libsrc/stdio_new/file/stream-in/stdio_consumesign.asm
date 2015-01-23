@@ -1,8 +1,8 @@
 ; stdio_consumesign
 ; 05.2008 aralbrec
 
-XLIB stdio_consumesign
-LIB stdio_getchar, stdio_ungetchar
+PUBLIC stdio_consumesign
+EXTERN stdio_getchar, stdio_ungetchar
 
 ; consume a '+' or '-' sign on the stream
 ; 

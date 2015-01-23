@@ -1,11 +1,11 @@
 ; FILE __CALLEE__ *fdopen_callee(int fd, char *mode)
 ; 07.2009 aralbrec
 
-XLIB fdopen_callee
-XDEF ASMDISP_FDOPEN_CALLEE
+PUBLIC fdopen_callee
+PUBLIC ASMDISP_FDOPEN_CALLEE
 
-LIB stdio_fdcommon1, stdio_parseperm, stdio_findfileslot, stdio_malloc
-LIB stdio_error_ebadf_zc, stdio_error_einval_zc, stdio_error_enfile_zc, stdio_error_enomem_zc
+EXTERN stdio_fdcommon1, stdio_parseperm, stdio_findfileslot, stdio_malloc
+EXTERN stdio_error_ebadf_zc, stdio_error_einval_zc, stdio_error_enfile_zc, stdio_error_enomem_zc
 
 INCLUDE "../stdio.def"
 

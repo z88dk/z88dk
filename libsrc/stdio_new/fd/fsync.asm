@@ -1,10 +1,10 @@
 ; int __FASTCALL__ fsync(int fd)
 ; 07.2009 aralbrec
 
-XLIB fsync
+PUBLIC fsync
 
-LIB l_jpix, stdio_fdcommon1
-LIB stdio_error_ebadf_mc, stdio_success_znc, stdio_error_mc
+EXTERN l_jpix, stdio_fdcommon1
+EXTERN stdio_error_ebadf_mc, stdio_success_znc, stdio_error_mc
 
 INCLUDE "../stdio.def"
 

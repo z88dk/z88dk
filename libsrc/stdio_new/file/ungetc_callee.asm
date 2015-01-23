@@ -1,9 +1,9 @@
 ; int __CALLEE__ ungetc(int c, FILE *stream)
 ; 06.2008 aralbrec
 
-XLIB ungetc_callee
-XDEF ASMDISP_UNGETC_CALLEE
-LIB stdio_error_eacces_mc, stdio_error_einval_mc
+PUBLIC ungetc_callee
+PUBLIC ASMDISP_UNGETC_CALLEE
+EXTERN stdio_error_eacces_mc, stdio_error_einval_mc
 
 .ungetc_callee
 

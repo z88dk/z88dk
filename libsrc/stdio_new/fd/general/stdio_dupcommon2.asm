@@ -1,7 +1,7 @@
 ; stdio_dupcommon2
 ; 07.2009 aralbrec
 
-XLIB stdio_dupcommon2
+PUBLIC stdio_dupcommon2
 
 INCLUDE "../../stdio.def"
 

@@ -1,7 +1,7 @@
 ; slbb0_isempty
 ; 08.2009 aralbrec
 
-XLIB slbb0_isempty
+PUBLIC slbb0_isempty
 
 ; enter : hl = & strcut slbb
 ; exit  : z = buffer is empty

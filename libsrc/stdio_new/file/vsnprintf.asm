@@ -1,9 +1,9 @@
 ; wrapper for function pointers
 
-XLIB vsnprintf
+PUBLIC vsnprintf
 
-LIB vsnprintf_callee
-XREF ASMDISP_VSNPRINTF_CALLEE
+EXTERN vsnprintf_callee
+EXTERN ASMDISP_VSNPRINTF_CALLEE
 
 .vsnprintf
 

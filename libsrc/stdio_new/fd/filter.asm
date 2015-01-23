@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB filter
+PUBLIC filter
 
-LIB filter_callee
-XREF ASMDISP_FILTER_CALLEE
+EXTERN filter_callee
+EXTERN ASMDISP_FILTER_CALLEE
 
 .filter
 

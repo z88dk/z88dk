@@ -1,11 +1,11 @@
 ; long __CALLEE__ lseek_callee(int fd, long offset, int whence)
 ; 06.2008 aralbrec
 
-XLIB lseek_callee
-XDEF ASMDISP_LSEEK_CALLEE
+PUBLIC lseek_callee
+PUBLIC ASMDISP_LSEEK_CALLEE
 
-LIB l_jpix, stdio_fdcommon1
-LIB stdio_error_ebadf_mc, stdio_error_mc
+EXTERN l_jpix, stdio_fdcommon1
+EXTERN stdio_error_ebadf_mc, stdio_error_mc
 
 INCLUDE "../stdio.def"
 

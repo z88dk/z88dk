@@ -1,9 +1,9 @@
 ; stdio_out_d
 ; 05.2008 aralbrec
 
-XLIB stdio_out_d
-LIB stdio_numprec, stdio_outcommon
-XREF LIBDISP_STDIO_OUTCOMMON_SIGNED
+PUBLIC stdio_out_d
+EXTERN stdio_numprec, stdio_outcommon
+EXTERN LIBDISP_STDIO_OUTCOMMON_SIGNED
 
 INCLUDE "../../stdio.def"
 

@@ -1,8 +1,8 @@
 ; stdio_error_enfile_mc
 ; 06.2008 aralbrec
 
-XLIB stdio_error_enfile_mc
-LIB stdio_errno_mc
+PUBLIC stdio_error_enfile_mc
+EXTERN stdio_errno_mc
 
 INCLUDE "../stdio.def"
 

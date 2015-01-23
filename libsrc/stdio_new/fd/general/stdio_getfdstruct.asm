@@ -1,7 +1,7 @@
 ; stdio_getfdstruct
 ; 07.2009 aralbrec
 
-XLIB stdio_getfdstruct
+PUBLIC stdio_getfdstruct
 
 ; return fd struct address given fd table entry
 ; (see stdio_fdtblentry), validate it by checking

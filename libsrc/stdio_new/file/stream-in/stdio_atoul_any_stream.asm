@@ -1,8 +1,8 @@
 ; stdio_atoul_any_stream
 ; 05.2008 aralbrec
 
-XLIB stdio_atoul_any_stream
-LIB stdio_getchar, stdio_ungetchar, l_long_mult, asm_toupper
+PUBLIC stdio_atoul_any_stream
+EXTERN stdio_getchar, stdio_ungetchar, l_long_mult, asm_toupper
 
 ; read unsigned long number from stream, whitespace not skipped
 ;

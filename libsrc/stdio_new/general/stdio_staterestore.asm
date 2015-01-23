@@ -1,7 +1,7 @@
 ; stdio_staterestore
 ; 08.2009 aralbrec
 
-XLIB stdio_staterestore
+PUBLIC stdio_staterestore
 
 ; pops all registers from stack
 ; companion to stdio_statesave

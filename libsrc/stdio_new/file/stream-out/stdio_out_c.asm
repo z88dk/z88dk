@@ -1,8 +1,8 @@
 ; stdio_out_c
 ; 05.2008 aralbrec
 
-XLIB stdio_out_c
-LIB stdio_outchar, stdio_outpad
+PUBLIC stdio_out_c
+EXTERN stdio_outchar, stdio_outpad
 
 ; output %c parameter
 ;

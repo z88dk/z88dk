@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB read
+PUBLIC read
 
-LIB read_callee
-XREF ASMDISP_READ_CALLEE
+EXTERN read_callee
+EXTERN ASMDISP_READ_CALLEE
 
 .read
 

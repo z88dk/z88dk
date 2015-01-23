@@ -1,9 +1,9 @@
 ; wrapper for function pointers
 
-XLIB fgets
+PUBLIC fgets
 
-LIB fgets_callee
-XREF ASMDISP_FGETS_CALLEE
+EXTERN fgets_callee
+EXTERN ASMDISP_FGETS_CALLEE
 
 .fgets
 

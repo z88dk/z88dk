@@ -1,9 +1,9 @@
 ; stdio_findfdstruct
 ; 07.2009 aralbrec
 
-XLIB stdio_findfdstruct
-XDEF LIBDISP_STDIO_FINDFDSTRUCT
-XREF _stdio_fdtbl
+PUBLIC stdio_findfdstruct
+PUBLIC LIBDISP_STDIO_FINDFDSTRUCT
+EXTERN _stdio_fdtbl
 
 ; return address of table entry holding fdstruct address
 ;

@@ -1,8 +1,8 @@
 ; void kbd_tty_push(struct kbd_state_tty *)
 ; 08.2009 aralbrec
 
-XLIB kbd_tty_push
-LIB kbd_getkey
+PUBLIC kbd_tty_push
+EXTERN kbd_getkey
 
 ; Should be called from within the 50 Hz interrupt routine.
 ; Pushes keypresses to the attached tty driver.

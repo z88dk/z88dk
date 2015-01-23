@@ -2,11 +2,11 @@
 ; an fpos_t is a long
 ; 06.2008 aralbrec
 
-XLIB fsetpos_callee
-XDEF ASMDISP_FSETPOS_CALLEE
+PUBLIC fsetpos_callee
+PUBLIC ASMDISP_FSETPOS_CALLEE
 
-LIB fseek_callee
-XREF ASMDISP_FSEEK_CALLEE
+EXTERN fseek_callee
+EXTERN ASMDISP_FSEEK_CALLEE
 
 INCLUDE "../stdio.def"
 

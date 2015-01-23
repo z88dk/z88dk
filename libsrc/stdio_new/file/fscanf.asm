@@ -1,10 +1,10 @@
 ; int fscanf(FILE *stream, const char *fmt, ...)
 ; 05.2008 aralbrec
 
-XLIB fscanf
+PUBLIC fscanf
 
-LIB vfscanf_callee, stdio_varg, stdio_nextarg
-XREF ASMDISP_VFSCANF_CALLEE
+EXTERN vfscanf_callee, stdio_varg, stdio_nextarg
+EXTERN ASMDISP_VFSCANF_CALLEE
 
 .fscanf
 

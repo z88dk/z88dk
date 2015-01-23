@@ -1,10 +1,10 @@
 ; long __FASTCALL__ ftell(FILE *stream)
 ; 06.2008 aralbrec
 
-XLIB ftell
-XDEF ASMDISP_FTELL
+PUBLIC ftell
+PUBLIC ASMDISP_FTELL
 
-LIB stdio_error_mc, l_declong, l_jpix
+EXTERN stdio_error_mc, l_declong, l_jpix
 
 INCLUDE "../stdio.def"
 

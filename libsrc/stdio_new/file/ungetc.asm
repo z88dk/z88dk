@@ -1,8 +1,8 @@
 ; wrapper for function pointers
 
-XLIB ungetc
-LIB ungetc_callee
-XREF ASMDISP_UNGETC_CALLEE
+PUBLIC ungetc
+EXTERN ungetc_callee
+EXTERN ASMDISP_UNGETC_CALLEE
 
 .ungetc
 

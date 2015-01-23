@@ -4,9 +4,9 @@
 ; Read current state of keyboard but only return
 ; keypress if a single key is pressed.
 
-XLIB kbd_inkey
+PUBLIC kbd_inkey
 
-LIB kbd_transtbl
+EXTERN kbd_transtbl
 
 ; exit : carry set and hl = 0 for no valid keypress
 ;        else hl = ascii code of keypress

@@ -1,11 +1,11 @@
 ; int __FASTCALL__ fflush(FILE *stream)
 ; 07.2009 aralbrec
 
-XLIB fflush
-XDEF ASMDISP_FFLUSH
+PUBLIC fflush
+PUBLIC ASMDISP_FFLUSH
 
-LIB stdio_success_znc, l_jpix
-XREF _stdio_filetbl
+EXTERN stdio_success_znc, l_jpix
+EXTERN _stdio_filetbl
 
 INCLUDE "../stdio.def"
 

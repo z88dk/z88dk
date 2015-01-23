@@ -1,11 +1,11 @@
 ; int __CALLEE__ pollfd_callee(int fd, char event)
 ; 06.2008 aralbrec
 
-XLIB pollfd_callee
-XDEF ASMDISP_POLLFD_CALLEE
+PUBLIC pollfd_callee
+PUBLIC ASMDISP_POLLFD_CALLEE
 
-LIB stdio_fdcommon1, l_jpix
-LIB stdio_error_eacces_mc, stdio_error_ebadf_mc
+EXTERN stdio_fdcommon1, l_jpix
+EXTERN stdio_error_eacces_mc, stdio_error_ebadf_mc
 
 INCLUDE "../stdio.def"
 

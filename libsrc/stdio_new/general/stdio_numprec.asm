@@ -1,8 +1,8 @@
 ; stdio_numprec
 ; 05.2008 aralbrec
 
-XLIB stdio_numprec
-LIB stdio_utoa_any
+PUBLIC stdio_numprec
+EXTERN stdio_utoa_any
 
 INCLUDE "../stdio.def"
 

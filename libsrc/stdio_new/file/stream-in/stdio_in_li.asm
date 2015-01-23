@@ -1,9 +1,9 @@
 ; stdio_in_li
 ; 05.2008 aralbrec
 
-XLIB stdio_in_li
-LIB stdio_incommon1, stdio_incommon3, stdio_ungetchar, stdio_getchar, stdio_inexit
-LIB asm_isdigit, asm_isxdigit, asm_isodigit, asm_isbdigit, stdio_longzeroonstream
+PUBLIC stdio_in_li
+EXTERN stdio_incommon1, stdio_incommon3, stdio_ungetchar, stdio_getchar, stdio_inexit
+EXTERN asm_isdigit, asm_isxdigit, asm_isodigit, asm_isbdigit, stdio_longzeroonstream
 
 ; input %li parameter, read a binary / octal / hex / decimal number, handles 16-bit and 32-bit
 ;

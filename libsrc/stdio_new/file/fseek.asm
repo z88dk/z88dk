@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB fseek
+PUBLIC fseek
 
-LIB fseek_callee
-XREF ASMDISP_FSEEK_CALLEE
+EXTERN fseek_callee
+EXTERN ASMDISP_FSEEK_CALLEE
 
 .fseek
 

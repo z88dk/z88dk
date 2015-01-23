@@ -1,8 +1,8 @@
 ; stdio_in_lx
 ; 05.2008 aralbrec
 
-XLIB stdio_in_lx
-LIB stdio_incommon1, stdio_incommon3, stdio_ungetchar, stdio_getchar, asm_isxdigit, stdio_longzeroonstream, stdio_inexit
+PUBLIC stdio_in_lx
+EXTERN stdio_incommon1, stdio_incommon3, stdio_ungetchar, stdio_getchar, asm_isxdigit, stdio_longzeroonstream, stdio_inexit
 
 ; input %lx parameter, handles both 16-bit %x and 32-bit %lx
 ;

@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB writebyte
+PUBLIC writebyte
 
-LIB writebyte_callee
-XREF ASMDISP_WRITEBYTE_CALLEE
+EXTERN writebyte_callee
+EXTERN ASMDISP_WRITEBYTE_CALLEE
 
 .writebyte
 

@@ -1,10 +1,10 @@
 ; int __FASTCALL__ readbyte(int fd)
 ; 06.2008 aralbrec
 
-XLIB readbyte
+PUBLIC readbyte
 
-LIB stdio_error_eacces_mc, stdio_error_ebadf_mc, stdio_error_mc
-LIB l_jpix, stdio_fdcommon1
+EXTERN stdio_error_eacces_mc, stdio_error_ebadf_mc, stdio_error_mc
+EXTERN l_jpix, stdio_fdcommon1
 
 INCLUDE "../stdio.def"
 

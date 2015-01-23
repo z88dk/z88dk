@@ -1,11 +1,11 @@
 ; int __CALLEE__ filter_callee(int fd, void *filter_driver, void *init)
 ; 07.2009 aralbrec
 
-XLIB filter_callee
-XDEF ASMDISP_FILTER_CALLEE
+PUBLIC filter_callee
+PUBLIC ASMDISP_FILTER_CALLEE
 
-LIB stdio_fdcommon1, stdio_findfdslot, stdio_malloc, stdio_descendchain, l_jpix, stdio_free
-LIB stdio_error_ebadf_mc, stdio_error_enfile_mc, stdio_error_enomem_mc, stdio_error_mc
+EXTERN stdio_fdcommon1, stdio_findfdslot, stdio_malloc, stdio_descendchain, l_jpix, stdio_free
+EXTERN stdio_error_ebadf_mc, stdio_error_enfile_mc, stdio_error_enomem_mc, stdio_error_mc
 
 INCLUDE "../stdio.def"
 

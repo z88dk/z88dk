@@ -1,8 +1,8 @@
 ; stdio_consumews
 ; 05.2008 aralbrec
 
-XLIB stdio_consumews
-LIB stdio_getchar, stdio_ungetchar, asm_isspace
+PUBLIC stdio_consumews
+EXTERN stdio_getchar, stdio_ungetchar, asm_isspace
 
 ; consume whitespace chars from the input stream
 

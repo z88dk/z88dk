@@ -1,8 +1,8 @@
 ; stdio_in_bkt
 ; 05.2008 aralbrec
 
-XLIB stdio_in_bkt
-LIB stdio_getchar, stdio_ungetchar, stdio_nextarg
+PUBLIC stdio_in_bkt
+EXTERN stdio_getchar, stdio_ungetchar, stdio_nextarg
 
 ; input %[ parameter
 ;

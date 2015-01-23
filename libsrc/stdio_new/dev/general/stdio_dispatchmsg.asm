@@ -1,7 +1,7 @@
 ; stdio_dispatchmsg
 ; 08.2009 aralbrec
 
-XLIB stdio_dispatchmsg
+PUBLIC stdio_dispatchmsg
 
 ; Structure of a typical device driver message dispatcher:
 ;

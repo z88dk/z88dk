@@ -1,10 +1,10 @@
 ; stdio_errno_mc
 ; 06.2008 aralbrec
 
-XLIB stdio_errno_mc
-LIB stdio_error_mc
+PUBLIC stdio_errno_mc
+EXTERN stdio_error_mc
 
-XREF _errno
+EXTERN _errno
 
 .stdio_errno_mc
 

@@ -1,7 +1,7 @@
 ; scbb0_peekchar
 ; 08.2009 aralbrec
 
-XLIB scbb0_peekchar
+PUBLIC scbb0_peekchar
 
 ; peek at next char in the buffer without consuming it
 ;

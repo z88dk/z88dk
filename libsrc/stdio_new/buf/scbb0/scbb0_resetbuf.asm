@@ -1,7 +1,7 @@
 ; scbb0_resetbuf
 ; 08.2009 aralbrec
 
-XLIB scbb0_resetbuf
+PUBLIC scbb0_resetbuf
 
 ; empty the buffer
 ;

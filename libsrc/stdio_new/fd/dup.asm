@@ -1,10 +1,10 @@
 ; int __FASTCALL__ dup(int fd)
 ; 07.2009 aralbrec
 
-XLIB dup
+PUBLIC dup
 
-LIB stdio_fdcommon1, stdio_findfdslot, stdio_dupcommon1, stdio_dupcommon2
-LIB stdio_error_ebadf_mc, stdio_error_enfile_mc
+EXTERN stdio_fdcommon1, stdio_findfdslot, stdio_dupcommon1, stdio_dupcommon2
+EXTERN stdio_error_ebadf_mc, stdio_error_enfile_mc
 
 INCLUDE "../stdio.def"
 

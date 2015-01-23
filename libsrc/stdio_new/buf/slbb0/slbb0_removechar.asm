@@ -1,7 +1,7 @@
 ; slbb0_removechar
 ; 08.2009 aralbrec
 
-XLIB slbb0_removechar
+PUBLIC slbb0_removechar
 
 ; remove a char from the buffer at the index specified
 ; the rest of the buffer is copied backward one position

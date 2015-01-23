@@ -1,7 +1,7 @@
 ; stdio_longzeroonstream
 ; 05.2008 aralbrec
 
-XLIB stdio_longzeroonstream
+PUBLIC stdio_longzeroonstream
 
 ; more common code from %li and %lx scan converters
 

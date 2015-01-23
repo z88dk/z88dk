@@ -1,7 +1,7 @@
 ; void __FASTCALL__ rewind(FILE *stream)
 ; 06.2008 aralbrec
 
-XLIB rewind
+PUBLIC rewind
 
 INCLUDE "../stdio.def"
 

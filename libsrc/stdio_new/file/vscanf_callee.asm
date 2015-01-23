@@ -1,11 +1,11 @@
 ; int __CALLEE__ vscanf_callee(const char *format, void *arg_ptr)
 ; 05.2008 aralbrec
 
-XLIB vscanf_callee
-XDEF ASMDISP_VSCANF_CALLEE
+PUBLIC vscanf_callee
+PUBLIC ASMDISP_VSCANF_CALLEE
 
-LIB vfscanf_callee
-XREF ASMDISP_VFSCANF_CALLEE, _stdin
+EXTERN vfscanf_callee
+EXTERN ASMDISP_VFSCANF_CALLEE, _stdin
 
 .vscanf_callee
 

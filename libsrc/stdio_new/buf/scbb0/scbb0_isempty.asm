@@ -1,7 +1,7 @@
 ; scbb0_isempty
 ; 08.2009 aralbrec
 
-XLIB scbb0_isempty
+PUBLIC scbb0_isempty
 
 ; reports whether the buffer has no chars to read
 ;

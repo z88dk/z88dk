@@ -1,9 +1,9 @@
 ; stdio_in_b
 ; 05.2008 aralbrec
 
-XLIB stdio_in_b
-LIB stdio_incommon1, stdio_incommon2, asm_isbdigit
-LIB stdio_getchar, stdio_ungetchar, stdio_inexit
+PUBLIC stdio_in_b
+EXTERN stdio_incommon1, stdio_incommon2, asm_isbdigit
+EXTERN stdio_getchar, stdio_ungetchar, stdio_inexit
 
 ; input %b parameter
 ;

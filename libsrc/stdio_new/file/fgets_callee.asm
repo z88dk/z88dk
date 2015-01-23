@@ -1,12 +1,12 @@
 ; char __CALLEE__ *fgets(char *s, int n, FILE *stream)
 ; 06.2008 aralbrec
 
-XLIB fgets_callee
-XDEF ASMDISP_FGETS_CALLEE
+PUBLIC fgets_callee
+PUBLIC ASMDISP_FGETS_CALLEE
 
-LIB fgetc, l_jpix
-LIB stdio_error_einval_zc, stdio_error_zc
-XREF ASMDISP_FGETC
+EXTERN fgetc, l_jpix
+EXTERN stdio_error_einval_zc, stdio_error_zc
+EXTERN ASMDISP_FGETC
 
 INCLUDE "../stdio.def"
 

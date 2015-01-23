@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB pollfd
+PUBLIC pollfd
 
-LIB pollfd_callee
-XREF ASMDISP_POLLFD_CALLEE
+EXTERN pollfd_callee
+EXTERN ASMDISP_POLLFD_CALLEE
 
 .pollfd
 

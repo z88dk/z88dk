@@ -1,8 +1,8 @@
 ; stdio_in_lb
 ; 05.2008 aralbrec
 
-XLIB stdio_in_lb
-LIB stdio_incommon1, stdio_incommon3, stdio_getchar, stdio_ungetchar, asm_isbdigit, stdio_inexit
+PUBLIC stdio_in_lb
+EXTERN stdio_incommon1, stdio_incommon3, stdio_getchar, stdio_ungetchar, asm_isbdigit, stdio_inexit
 
 ; input %lb parameter, handles both 16-bit %b and 32-bit %lb
 ;

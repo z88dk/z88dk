@@ -1,9 +1,9 @@
 ; uint __CALLEE__ fread_callee(void *p, uint size, uint nitems, FILE *stream)
 ; 06.2008 aralbrec
 
-XLIB fread_callee
-XDEF ASMDISP_FREAD_CALLEE
-LIB fgetc, l_mult, l_div_u, l_jpix, stdio_error_mc, stdio_success_znc
+PUBLIC fread_callee
+PUBLIC ASMDISP_FREAD_CALLEE
+EXTERN fgetc, l_mult, l_div_u, l_jpix, stdio_error_mc, stdio_success_znc
 
 include "../stdio.def"
 

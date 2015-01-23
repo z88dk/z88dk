@@ -1,7 +1,7 @@
 ; stdio_nextarg
 ; 05.2008 aralbrec
 
-XLIB stdio_nextarg
+PUBLIC stdio_nextarg
 
 ; get next 16-bit parameter from a va_arg parameter list
 ;

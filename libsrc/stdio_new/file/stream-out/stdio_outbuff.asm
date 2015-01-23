@@ -1,8 +1,8 @@
 ; stdio_outbuff
 ; 05.2008 aralbrec
 
-XLIB stdio_outbuff
-LIB stdio_outchar
+PUBLIC stdio_outbuff
+EXTERN stdio_outchar
 
 ; output string of chars to file / device from temporary buffer
 ;

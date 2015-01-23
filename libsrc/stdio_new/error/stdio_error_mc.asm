@@ -1,7 +1,7 @@
 ; stdio_error_mc
 ; 06.2008 aralbrec
 
-XLIB stdio_error_mc
+PUBLIC stdio_error_mc
 
 ; exit : hl = -1 and carry set
 

@@ -1,11 +1,11 @@
 ; int printf(const char *fmt, ...)
 ; 05.2008 aralbrec
 
-XLIB printf
+PUBLIC printf
 
-LIB vfprintf_callee, stdio_varg
-XREF ASMDISP_VFPRINTF_CALLEE
-XREF _stdout
+EXTERN vfprintf_callee, stdio_varg
+EXTERN ASMDISP_VFPRINTF_CALLEE
+EXTERN _stdout
 
 .printf
 

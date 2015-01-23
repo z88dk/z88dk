@@ -1,7 +1,7 @@
 ; stdio_statesave
 ; 08.2009 aralbrec
 
-XLIB stdio_statesave
+PUBLIC stdio_statesave
 
 ; pushes all registers to stack
 ; companion to stdio_staterestore

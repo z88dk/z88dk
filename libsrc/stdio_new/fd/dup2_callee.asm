@@ -1,12 +1,12 @@
 ; int __CALLEE__ dup2_callee(int fdsrc, int fddst)
 ; 07.2009 aralbrec
 
-XLIB dup2_callee
-XDEF ASMDISP_DUP2_CALLEE
+PUBLIC dup2_callee
+PUBLIC ASMDISP_DUP2_CALLEE
 
-LIB stdio_fdcommon1, stdio_getfdtblentry, stdio_getfdstruct
-LIB close, stdio_dupcommon1, stdio_dupcommon2, stdio_error_ebadf_mc
-XREF LIBDISP2_CLOSE
+EXTERN stdio_fdcommon1, stdio_getfdtblentry, stdio_getfdstruct
+EXTERN close, stdio_dupcommon1, stdio_dupcommon2, stdio_error_ebadf_mc
+EXTERN LIBDISP2_CLOSE
 
 INCLUDE "../stdio.def"
 

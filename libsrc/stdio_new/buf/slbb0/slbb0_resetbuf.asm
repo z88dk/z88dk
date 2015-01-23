@@ -1,7 +1,7 @@
 ; slbb0_resetbuf
 ; 08.2009 aralbrec
 
-XLIB slbb0_resetbuf
+PUBLIC slbb0_resetbuf
 
 ; reset the linear buffer to empty
 ;

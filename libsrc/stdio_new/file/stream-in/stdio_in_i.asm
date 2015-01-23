@@ -1,11 +1,11 @@
 ; stdio_in_i
 ; 05.2008 aralbrec
 
-XLIB stdio_in_i
-XDEF LIBDISP_STDIO_IN_I
+PUBLIC stdio_in_i
+PUBLIC LIBDISP_STDIO_IN_I
 
-LIB stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, stdio_inexit
-LIB asm_isdigit, asm_isxdigit, asm_isodigit, asm_isbdigit, stdio_zeroonstream
+EXTERN stdio_incommon1, stdio_incommon2, stdio_ungetchar, stdio_getchar, stdio_inexit
+EXTERN asm_isdigit, asm_isxdigit, asm_isodigit, asm_isbdigit, stdio_zeroonstream
 
 ; input %i parameter, read a binary / octal / hex / decimal number
 ;

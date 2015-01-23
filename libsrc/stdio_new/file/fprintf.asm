@@ -1,10 +1,10 @@
 ; int fprintf(FILE *stream, const char *fmt, ...)
 ; 05.2008 aralbrec
 
-XLIB fprintf
+PUBLIC fprintf
 
-LIB vfprintf_callee, stdio_varg, stdio_nextarg
-XREF ASMDISP_VFPRINTF_CALLEE
+EXTERN vfprintf_callee, stdio_varg, stdio_nextarg
+EXTERN ASMDISP_VFPRINTF_CALLEE
 
 .fprintf
 

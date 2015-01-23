@@ -1,8 +1,8 @@
 ; stdio_out_lp
 ; 05.2008 aralbrec
 
-XLIB stdio_out_lp
-LIB stdio_out_lx
+PUBLIC stdio_out_lp
+EXTERN stdio_out_lx
 
 ; output %lp parameter, handles both 16-bit %p and 24-bit %lp
 ;

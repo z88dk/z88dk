@@ -1,8 +1,8 @@
 ; stdio_outsign
 ; 05.2008 aralbrec
 
-XLIB stdio_outsign
-LIB stdio_outchar
+PUBLIC stdio_outsign
+EXTERN stdio_outchar
 
 ; output a sign "+- " depending on specified flags
 ;

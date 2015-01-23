@@ -1,9 +1,9 @@
 ; CALLER linkage for function pointers
 
-XLIB fopen
+PUBLIC fopen
 
-LIB fopen_callee
-XREF ASMDISP_FOPEN_CALLEE
+EXTERN fopen_callee
+EXTERN ASMDISP_FOPEN_CALLEE
 
 .fopen
 

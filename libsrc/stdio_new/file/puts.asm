@@ -1,10 +1,10 @@
 ; int __FASTCALL__ puts(const char *s)
 ; 06.2008 aralbrec
 
-XLIB puts
-LIB fputs_callee, l_jpix, stdio_error_mc, stdio_success_znc
-XREF ASMDISP_FPUTS_CALLEE
-XREF _stdout
+PUBLIC puts
+EXTERN fputs_callee, l_jpix, stdio_error_mc, stdio_success_znc
+EXTERN ASMDISP_FPUTS_CALLEE
+EXTERN _stdout
 
 INCLUDE "../stdio.def"
 

@@ -1,11 +1,11 @@
 ; int __CALLEE__ fputs(const char *s, FILE *stream)
 ; 07.2009 aralbrec
 
-XLIB fputs_callee
-XDEF ASMDISP_FPUTS_CALLEE
+PUBLIC fputs_callee
+PUBLIC ASMDISP_FPUTS_CALLEE
 
-LIB strlen, l_jpix
-LIB stdio_error_mc, stdio_success_znc, stdio_error_eacces_mc
+EXTERN strlen, l_jpix
+EXTERN stdio_error_mc, stdio_success_znc, stdio_error_eacces_mc
 
 INCLUDE "../stdio.def"
 

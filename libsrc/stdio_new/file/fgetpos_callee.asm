@@ -2,11 +2,11 @@
 ; an fpos_t is a long
 ; 06.2008 aralbrec
 
-XLIB fgetpos_callee
-XDEF ASMDISP_FGETPOS_CALLEE
+PUBLIC fgetpos_callee
+PUBLIC ASMDISP_FGETPOS_CALLEE
 
-LIB l_declong, l_jpix
-LIB stdio_error_mc, stdio_success_znc
+EXTERN l_declong, l_jpix
+EXTERN stdio_error_mc, stdio_success_znc
 
 INCLUDE "../stdio.def"
 

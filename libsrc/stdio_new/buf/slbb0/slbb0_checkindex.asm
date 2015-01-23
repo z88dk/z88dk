@@ -1,7 +1,7 @@
 ; slbb0_checkindex
 ; 08.2009 aralbrec
 
-XLIB slbb0_checkindex
+PUBLIC slbb0_checkindex
 
 ; check if an index value points to data within the buffer
 ;

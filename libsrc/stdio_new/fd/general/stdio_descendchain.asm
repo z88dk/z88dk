@@ -1,7 +1,7 @@
 ; stdio_descendchain
 ; 07.2009 aralbrec
 
-XLIB stdio_descendchain
+PUBLIC stdio_descendchain
 
 ; descend one level in the stdio chain
 ;

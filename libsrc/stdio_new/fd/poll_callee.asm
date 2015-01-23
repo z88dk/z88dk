@@ -1,10 +1,10 @@
 ; int __CALLEE__ poll_callee(struct pollfd *fds, uint nfds, uint timeout)
 ; 06.2008 aralbrec
 
-XLIB poll_callee
-XDEF ASMDISP_POLL_CALLEE
+PUBLIC poll_callee
+PUBLIC ASMDISP_POLL_CALLEE
 
-LIB stdio_fdcommon1, l_jpix, stdio_error_einval_mc
+EXTERN stdio_fdcommon1, l_jpix, stdio_error_einval_mc
 
 INCLUDE "../stdio.def"
 

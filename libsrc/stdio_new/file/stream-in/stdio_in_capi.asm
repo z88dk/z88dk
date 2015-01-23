@@ -1,12 +1,12 @@
 ; stdio_in_I, read IPv4 address in dotted notation
 ; 09.2008 aralbrec
 
-XLIB stdio_in_capi
+PUBLIC stdio_in_capi
 
-LIB stdio_incommon1, stdio_inexit, stdio_getchar
-LIB stdio_ungetchar, stdio_in_i, htonl
+EXTERN stdio_incommon1, stdio_inexit, stdio_getchar
+EXTERN stdio_ungetchar, stdio_in_i, htonl
 
-XREF LIBDISP_STDIO_IN_I
+EXTERN LIBDISP_STDIO_IN_I
 
 ; input %I parameter, read IPv4 address in dotted notation
 ; * accepts octets in octal, hex or decimal

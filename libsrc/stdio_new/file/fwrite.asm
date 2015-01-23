@@ -1,10 +1,10 @@
 ; CALLER linkage for function pointers
 ; 06.2008 aralbrec
 
-XLIB fwrite
+PUBLIC fwrite
 
-LIB fwrite_callee
-XREF ASMDISP_FWRITE_CALLEE
+EXTERN fwrite_callee
+EXTERN ASMDISP_FWRITE_CALLEE
 
 .fwrite
 

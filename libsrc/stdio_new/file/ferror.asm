@@ -1,8 +1,8 @@
 ; int __FASTCALL__ ferror(FILE *stream)
 ; 06.2008 aralbrec
 
-XLIB ferror
-LIB l_jphl
+PUBLIC ferror
+EXTERN l_jphl
 
 INCLUDE "../stdio.def"
 

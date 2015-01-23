@@ -1,13 +1,13 @@
 ; FILE __CALLEE__ *fopen_callee(char *filename, char *mode)
 ; 07.2009 aralbrec
 
-XLIB fopen_callee
-XDEF ASMDISP_FOPEN_CALLEE, LIBDISP_FOPEN_CALLEE
+PUBLIC fopen_callee
+PUBLIC ASMDISP_FOPEN_CALLEE, LIBDISP_FOPEN_CALLEE
 
-LIB open_callee, stdio_free
-LIB stdio_parseperm, stdio_findfileslot, stdio_malloc
-LIB stdio_error_einval_zc, stdio_error_enfile_zc, stdio_error_enomem_zc
-XREF ASMDISP_OPEN_CALLEE
+EXTERN open_callee, stdio_free
+EXTERN stdio_parseperm, stdio_findfileslot, stdio_malloc
+EXTERN stdio_error_einval_zc, stdio_error_enfile_zc, stdio_error_enomem_zc
+EXTERN ASMDISP_OPEN_CALLEE
 
 INCLUDE "../stdio.def"
 

@@ -1,10 +1,10 @@
 ; int __CALLEE__ fseek_callee(FILE *stream, long offset, int whence)
 ; 06.2008 aralbrec
 
-XLIB fseek_callee
-XDEF ASMDISP_FSEEK_CALLEE
+PUBLIC fseek_callee
+PUBLIC ASMDISP_FSEEK_CALLEE
 
-LIB stdio_success_znc, stdio_error_mc, l_jpix, l_declong
+EXTERN stdio_success_znc, stdio_error_mc, l_jpix, l_declong
 
 INCLUDE "../stdio.def"
 

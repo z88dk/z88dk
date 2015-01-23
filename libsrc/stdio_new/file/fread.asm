@@ -1,8 +1,8 @@
 ; CALLER linkage for function pointers
 
-XLIB fread
-LIB fread_callee
-XREF ASMDISP_FREAD_CALLEE
+PUBLIC fread
+EXTERN fread_callee
+EXTERN ASMDISP_FREAD_CALLEE
 
 .fread
 

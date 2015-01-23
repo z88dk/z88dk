@@ -1,7 +1,7 @@
 ; scbb0_isfull
 ; 08.2009 aralbrec
 
-XLIB scbb0_isfull
+PUBLIC scbb0_isfull
 
 ; reports whether the buffer has space to write more chars
 ;

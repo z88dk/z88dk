@@ -1,9 +1,9 @@
 ; int __FASTCALL__ fgetc(FILE *stream)
 ; 05.2008 aralbrec
 
-XLIB fgetc
-XDEF ASMDISP_FGETC
-LIB l_jpix, stdio_error_mc, stdio_error_eacces_mc
+PUBLIC fgetc
+PUBLIC ASMDISP_FGETC
+EXTERN l_jpix, stdio_error_mc, stdio_error_eacces_mc
 
 INCLUDE "../stdio.def"
 
