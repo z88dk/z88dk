@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.10 2015-01-21 23:34:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.11 2015-01-23 23:14:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -247,4 +247,14 @@ void asm_XLIB(char *name)
 {
 	warn_deprecated("XLIB", "PUBLIC"); 
 	declare_public_symbol(name);
+}
+
+void asm_DEFINE(char *name)
+{
+	define_local_def_sym(name, 1);
+}
+
+void asm_UNDEFINE(char *name)
+{
+	SymbolHash_remove(CURRENTMODULE->local_symtab, name);
 }

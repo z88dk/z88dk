@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.118 2015-01-21 23:34:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.119 2015-01-23 23:14:54 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -45,54 +45,9 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 
 
 /* local functions */
-void DEFINE( void );
-void UNDEFINE( void );
 
 
-void
-UNDEFINE( void )
-{
-    Symbol *tok = NULL;
-	char *name;
 
-    do
-    {
-        if ( GetSym() == TK_NAME )
-        {
-			name = sym_text(&sym);
-			tok = find_local_symbol(name);
-        }
-
-        if ( tok != NULL )
-        {
-			SymbolHash_remove(CURRENTMODULE->local_symtab, name);
-        }
-        else
-        {
-			error_syntax();
-            break;
-        }
-    }
-    while ( GetSym() == TK_COMMA );
-}
-
-void
-DEFINE( void )
-{
-    do
-    {
-        if ( GetSym() == TK_NAME )
-        {
-			define_local_def_sym(sym_text(&sym), 1);
-        }
-        else
-        {
-			error_syntax();
-            break;
-        }
-    }
-    while ( GetSym() == TK_COMMA );
-}
 
 
 void

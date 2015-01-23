@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.42 2015-01-22 23:24:28 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-23 23:14:55 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -296,7 +296,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.42 2015-01-
 	*   directives with list of names argument, function called for each 
 	*	argument
 	*--------------------------------------------------------------------*/
-#foreach <OP> in EXTERN, XREF, LIB, PUBLIC, XDEF, XLIB
+#foreach <OP> in EXTERN, XREF, LIB, PUBLIC, XDEF, XLIB, DEFINE, UNDEFINE
 	action <OP>_action { asm_<OP>(name->str); }
 	
 	asm_<OP> = _TK_<OP> name @<OP>_action
@@ -304,7 +304,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.42 2015-01-
 		    _TK_NEWLINE ;
 #endfor  <OP>
 	directives_names = asm_EXTERN | asm_XREF | asm_LIB |
-					   asm_PUBLIC | asm_XDEF | asm_XLIB;
+					   asm_PUBLIC | asm_XDEF | asm_XLIB |
+					   asm_DEFINE | asm_UNDEFINE;
 
 	/*---------------------------------------------------------------------
 	*   Z88DK specific opcodes
