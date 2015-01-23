@@ -36,8 +36,10 @@ struct fzx_state
    struct fzx_font *font;              // selected font
    uint16_t         x;                 // x coordinate in pixels
    uint16_t         y;                 // y coordinate in pixels
-   struct r_Rect16  window;            // display area units in pixels
+   struct r_Rect16  paper;             // display area units in pixels
    uint16_t         left_margin;       // left margin in pixels
+   uint8_t          space_expand;      // addition width added to space characters
+   uint16_t         reserved;          // unused
    
    #ifdef __SPECTRUM
    
