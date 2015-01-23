@@ -88,10 +88,10 @@ stencil:
 	zcc +zx -vn ../graphics/stencil.c -lndos -lm -llib3d -create-app -ostencil.bin
 
 clock:
-	zcc +zx -vn ../graphics/clock.c -I../graphics -lndos -lm -llib3d -DDETAILED -oclock.bin
+	zcc +zx -vn ../graphics/clock.c -I../graphics -lndos -lm -llib3d -DDETAILED -create-app -oclock.bin
 
 showlib3d:
-	zcc +zx -vn ../graphics/showlib3d.c -lndos -lm -llib3d -oshowlib3d.bin
+	zcc +zx -vn ../graphics/showlib3d.c -lndos -lm -llib3d -create-app -oshowlib3d.bin
 
 smallgfx2:
 	zcc +zx -vn ../graphics/smallgfx2.c -lndos -lm -create-app -osmallgfx2.bin
