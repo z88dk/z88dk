@@ -1,6 +1,6 @@
 @echo off
 
-rem $Id: vscmake.bat,v 1.3 2007-01-09 21:54:21 stefano Exp $
+rem $Id: vscmake.bat,v 1.4 2015-01-23 07:07:31 stefano Exp $
 
 cl
 if %ERRORLEVEL% == 0 goto :build
@@ -35,6 +35,9 @@ cd z80asm
 call vscmake
 cd ..
 cd zcc
+call vscmake
+cd ..
+cd zx7
 call vscmake
 cd ..
 goto :end

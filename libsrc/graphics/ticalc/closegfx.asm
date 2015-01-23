@@ -5,10 +5,10 @@
 ;	CLOSEGFX - wait for keypress
 ;
 ;
-;	$Id: closegfx.asm,v 1.3 2002-04-17 21:30:25 dom Exp $
+;	$Id: closegfx.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
 ;
 
-	XLIB    closegfx
+	PUBLIC    closegfx
 
 .closegfx
 

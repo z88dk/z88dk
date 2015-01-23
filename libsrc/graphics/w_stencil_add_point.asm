@@ -8,7 +8,7 @@
 ;       Stefano Bodrato - 08/10/2009
 ;
 ;
-;	$Id: w_stencil_add_point.asm,v 1.3 2015-01-22 17:23:48 stefano Exp $
+;	$Id: w_stencil_add_point.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
 ;
 
 ;; void stencil_add_point(int x, int y, unsigned char *stencil)
@@ -19,8 +19,8 @@
 
                 EXTERN     stencil_add_pixel
 
-                ;LIB     swapgfxbk
-                ;XREF    swapgfxbk1
+                ;EXTERN     swapgfxbk
+                ;EXTERN     swapgfxbk1
 
                 EXTERN    stencil_ptr
 

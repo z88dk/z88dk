@@ -5,35 +5,35 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile_nostencil.asm,v 1.1 2010-12-07 17:10:49 stefano Exp $
+;	$Id: draw_profile_nostencil.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
 ;
 
 
 	INCLUDE	"graphics/grafix.inc"
 
-                XLIB    draw_profile
+                PUBLIC    draw_profile
 
-                ;LIB     stencil_init
-                ;LIB     stencil_render
-                ;LIB		stencil_add_point
-                ;LIB		stencil_add_lineto
-                ;LIB		stencil_add_side
-                LIB		plot
-                LIB		unplot
-                LIB		draw
-                LIB		undraw
-                LIB		drawto
-                LIB		undrawto
+                ;EXTERN     stencil_init
+                ;EXTERN     stencil_render
+                ;EXTERN		stencil_add_point
+                ;EXTERN		stencil_add_lineto
+                ;EXTERN		stencil_add_side
+                EXTERN		plot
+                EXTERN		unplot
+                EXTERN		draw
+                EXTERN		undraw
+                EXTERN		drawto
+                EXTERN		undrawto
                 
-                LIB		l_mult
-                LIB		l_div
+                EXTERN		l_mult
+                EXTERN		l_div
 
 ;
 ; DE > HL [unsigned]
 ; set carry if true
 ;
 ;.l_ugt
-                ;;XREF    COORDS
+                ;;EXTERN    COORDS
 
 _areaptr:	defw	0
 

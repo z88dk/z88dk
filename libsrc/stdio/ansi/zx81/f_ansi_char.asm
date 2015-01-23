@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.10 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: f_ansi_char.asm,v 1.11 2015-01-23 07:07:31 stefano Exp $
 ;
 
 	PUBLIC	ansi_CHAR
@@ -35,10 +35,10 @@ ENDIF
 
 	PUBLIC	text_cols
 IF G007
-	XDEF	text_rows
+	PUBLIC	text_rows
 ENDIF
 IF MTHRG
-	XDEF	text_rows
+	PUBLIC	text_rows
 ENDIF
 	
 ; Dirty thing for self modifying code

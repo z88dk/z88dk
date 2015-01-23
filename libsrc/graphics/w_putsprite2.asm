@@ -9,15 +9,15 @@
 ; Uses plotpixel, respixel and xorpixel
 ;
 ;
-; $Id: w_putsprite2.asm,v 1.1 2008-07-17 15:39:56 stefano Exp $
+; $Id: w_putsprite2.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
 ;
 
 
-	XLIB    putsprite
+	PUBLIC    putsprite
 
-	LIB	w_plotpixel
-	LIB	w_respixel
-	LIB	w_xorpixel
+	EXTERN	w_plotpixel
+	EXTERN	w_respixel
+	EXTERN	w_xorpixel
 
 ; coords: h,l (vert-horz)
 ; sprite: (ix)

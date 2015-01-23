@@ -2,13 +2,13 @@
 
         PUBLIC    w_pointxy
 
-        ;LIB     l_cmp
+        ;EXTERN     l_cmp
         EXTERN     w_pixeladdress
 
         EXTERN    coords
 
 ;
-;       $Id: w_pointxy.asm,v 1.3 2015-01-19 01:32:47 pauloscustodio Exp $
+;       $Id: w_pointxy.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
 ;
 
 ; ******************************************************************

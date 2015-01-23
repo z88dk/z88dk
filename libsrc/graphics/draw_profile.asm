@@ -5,7 +5,7 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile.asm,v 1.7 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: draw_profile.asm,v 1.8 2015-01-23 07:07:31 stefano Exp $
 ;
 
 
@@ -461,7 +461,7 @@ resize:
 
 IF (maxx > 256)
 
-	;LIB  l_cmp
+	;EXTERN  l_cmp
 	; TODO
 	ret
 

@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.5 2015-01-23 07:07:31 stefano Exp $
 ;
 IF A64COL
 	INCLUDE "stdio/ansi/ts2068/f_ansi_char64.asm"
@@ -35,15 +35,15 @@ ELSE
 
 	PUBLIC	ansi_CHAR
 	
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 	
 ; Dirty thing for self modifying code
-	XDEF	INVRS	
-	XDEF	BOLD
+	PUBLIC	INVRS	
+	PUBLIC	BOLD
 
 IF A255COL
 .text_cols   defb 255 ;defb 128

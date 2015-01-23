@@ -7,12 +7,12 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg.asm,v 1.2 2013-11-18 14:00:22 stefano Exp $
+;	$Id: set_psg.asm,v 1.3 2015-01-23 07:07:31 stefano Exp $
 ;
 
-	XLIB	set_psg
-	XDEF	psg_patch0
-	XDEF	psg_patch1
+	PUBLIC	set_psg
+	;PUBLIC	psg_patch0
+	;PUBLIC	psg_patch1
 	
 set_psg:
 

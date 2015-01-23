@@ -1,12 +1,12 @@
 
-	XLIB	pixeladdress
+	PUBLIC	pixeladdress
 	
-	LIB	zx_rowtab
+	EXTERN	zx_rowtab
 
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: pixladdr2.asm,v 1.3 2008-03-21 17:51:54 stefano Exp $
+;	$Id: pixladdr2.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
 ;
 ;
 ; ******************************************************************

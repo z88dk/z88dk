@@ -6,15 +6,15 @@
 ; c128 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.2 2015-01-19 01:32:47 pauloscustodio Exp $
+; $Id: w_putsprite.asm,v 1.3 2015-01-23 07:07:31 stefano Exp $
 ;
 
         PUBLIC    putsprite
         EXTERN     w_pixeladdress
-        ;LIB     vdcset
-        ;LIB     vdcget
-        ;LIB     swapgfxbk
-        ;XREF   swapgfxbk1
+        ;EXTERN    vdcset
+        ;EXTERN    vdcget
+        ;EXTERN    swapgfxbk
+        ;EXTERN  swapgfxbk1
 
         INCLUDE "graphics/grafix.inc"
 

@@ -13,12 +13,12 @@
 ; The XOR mode is totally untested.
 ;
 ;
-; $Id: putsprite3.asm,v 1.3 2009-06-22 21:44:17 dom Exp $
+; $Id: putsprite3.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
 ;
 
 
 	
-        XLIB    putsprite
+        PUBLIC    putsprite
         
         INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"

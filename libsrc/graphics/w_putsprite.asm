@@ -6,14 +6,14 @@
 ; TS2068 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.1 2010-11-23 15:45:33 stefano Exp $
+; $Id: w_putsprite.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
 ;
 
-        XLIB    putsprite
-        LIB     w_pixeladdress
+        PUBLIC    putsprite
+        EXTERN    w_pixeladdress
 
-        LIB     swapgfxbk
-        XREF    swapgfxbk1
+        EXTERN    swapgfxbk
+        EXTERN    swapgfxbk1
 
         INCLUDE "graphics/grafix.inc"
 

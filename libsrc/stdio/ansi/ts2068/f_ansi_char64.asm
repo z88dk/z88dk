@@ -20,16 +20,16 @@
 
 	PUBLIC	ansi_CHAR
 
-	XREF	ansi_ROW
-	XREF	ansi_COLUMN
+	EXTERN	ansi_ROW
+	EXTERN	ansi_COLUMN
 
-	XDEF	text_cols
-	XDEF	text_rows
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 
 ; Dirty thing for self modifying code
-	XDEF	INVRS	
-	XDEF	BOLD
-	XDEF	UNDERLINE
+	PUBLIC	INVRS	
+	PUBLIC	BOLD
+	PUBLIC	UNDERLINE
 
 .text_cols   defb 64
 .text_rows   defb 24

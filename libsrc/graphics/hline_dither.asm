@@ -9,14 +9,14 @@
 ;	hline_dither(int x1, int y1, int x2, unsigned char intensity)
 ;
 
-	XLIB	surface_hline_dither
-	XREF	base_graphics
+	PUBLIC	surface_hline_dither
+	EXTERN	base_graphics
 
-	LIB surface_pixeladdress
-	LIB leftbitmask, rightbitmask
+	EXTERN surface_pixeladdress
+	EXTERN leftbitmask, rightbitmask
 
 ;	
-;	$Id: hline_dither.asm,v 1.1 2009-04-15 21:00:58 stefano Exp $
+;	$Id: hline_dither.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
 ;
 
 .surface_hline_dither

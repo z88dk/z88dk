@@ -7,10 +7,10 @@
 ;
 ;	djm 17/3/2000 (after the manual!)
 ;
-;	$Id: dodos.asm,v 1.1 2001-05-01 13:55:21 dom Exp $
+;	$Id: dodos.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
 
 
-	XDEF	dodos
+	PUBLIC	dodos
 
 .dodos
 	push	af

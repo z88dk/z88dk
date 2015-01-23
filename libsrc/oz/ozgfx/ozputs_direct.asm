@@ -10,28 +10,28 @@
 ;	int ozputs(int x, int y, char *string);;
 ;
 ; ------
-; $Id: ozputs_direct.asm,v 1.1 2003-10-21 17:15:20 stefano Exp $
+; $Id: ozputs_direct.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
 ;
 
-	XLIB	ozputs
-	XDEF	ozputsgetend
+	PUBLIC	ozputs
+	PUBLIC	ozputsgetend
 	
-	LIB	ozdetectmodel
-	XREF	ozmodel
+	EXTERN	ozdetectmodel
+	EXTERN	ozmodel
 
-	XREF	ozactivepage
+	EXTERN	ozactivepage
 
-	XREF	ozfontpointers
+	EXTERN	ozfontpointers
 
-	XDEF	s_end_s_pointer
-	XREF	restore_a000
+	PUBLIC	s_end_s_pointer
+	EXTERN	restore_a000
 	
-	XREF	LowerFontPage1
-	XREF	LowerFontPage2
-	XREF	HigherFontPage1
-	XREF	HigherFontPage2
+	EXTERN	LowerFontPage1
+	EXTERN	LowerFontPage2
+	EXTERN	HigherFontPage1
+	EXTERN	HigherFontPage2
 
-	XREF	ScrCharSet
+	EXTERN	ScrCharSet
 
 
 ;; strlen  equ     7f0ch
