@@ -9,7 +9,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_customisr.def,v 1.1 2013-05-30 06:34:35 stefano Exp $
+;       $Id: oz_customisr.def,v 1.2 2015-01-23 07:30:50 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -20,30 +20,30 @@
 ;
 ;
 ; ------
-; $Id: oz_customisr.def,v 1.1 2013-05-30 06:34:35 stefano Exp $
+; $Id: oz_customisr.def,v 1.2 2015-01-23 07:30:50 stefano Exp $
 ;
 	
-	XDEF	serial_hook
+	PUBLIC	serial_hook
 
-	XDEF	ozkeyclick
-	XDEF	oz1hz
+	PUBLIC	ozkeyclick
+	PUBLIC	oz1hz
 
-	XDEF	frames
-	XDEF	ozi64hztime
-	XDEF	oz4sec_word
-	XDEF	ozi64hzcount
-	XDEF	ozdisablepowerkey
+	PUBLIC	frames
+	PUBLIC	ozi64hztime
+	PUBLIC	oz4sec_word
+	PUBLIC	ozi64hzcount
+	PUBLIC	ozdisablepowerkey
 
-	XDEF	ozgreyscale
-	XDEF	ozgreycount
+	PUBLIC	ozgreyscale
+	PUBLIC	ozgreycount
 
-	XDEF	s_64hz_hook
-	XDEF	s_64hz_return
+	PUBLIC	s_64hz_hook
+	PUBLIC	s_64hz_return
 
 IF DEFINED_ozgetch2
-	XREF	KeyboardBuffer
-	XREF	KeyBufGetPos
-	XREF	KeyBufPutPos
+	EXTERN	KeyboardBuffer
+	EXTERN	KeyBufGetPos
+	EXTERN	KeyBufPutPos
 ENDIF
 
 defc	PauseFirst = 32

@@ -9,18 +9,18 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg.def,v 1.25 2014-12-03 21:26:26 stefano Exp $
+;       $Id: zx81_hrg.def,v 1.26 2015-01-23 07:30:51 stefano Exp $
 ;
 ; - - - - - - -
 
-XDEF	hrg_on
-XDEF	hrg_off
-XDEF	HRG_LineStart
-XDEF	HRG_handler
-XDEF	zx_blank
-XDEF	zx_noblank
-XDEF	zx_fast
-XDEF	zx_slow
+PUBLIC	hrg_on
+PUBLIC	hrg_off
+PUBLIC	HRG_LineStart
+PUBLIC	HRG_handler
+PUBLIC	zx_blank
+PUBLIC	zx_noblank
+PUBLIC	zx_fast
+PUBLIC	zx_slow
 
 
 IF (((startup>=5)&(startup<13))|(startup>=25))
@@ -337,8 +337,8 @@ HRG_handler_patch:
 ;----------------------------------------------------------------
 
 IF ((startup=7)|(startup=27))
-		XDEF	graybit1
-		XDEF	graybit2
+		PUBLIC	graybit1
+		PUBLIC	graybit2
 gcount:
 		defb	0
 current_graphics:

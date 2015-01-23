@@ -11,7 +11,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_altint.def,v 1.17 2014-10-27 20:38:15 stefano Exp $
+;       $Id: zx81_altint.def,v 1.18 2015-01-23 07:30:50 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -19,10 +19,10 @@
 ;--------------------------------------------------------------
 ;--------------------------------------------------------------
 
-XDEF	altint_on
-XDEF	altint_off
-XDEF	zx_fast
-XDEF	zx_slow
+PUBLIC	altint_on
+PUBLIC	altint_off
+PUBLIC	zx_fast
+PUBLIC	zx_slow
 
 ;----------------------------------------------------------------
 ;
