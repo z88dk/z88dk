@@ -64,6 +64,18 @@ IF startup = 5
 
 ENDIF
 
+IF startup = 8
+
+   ; fzx terminal using ff_ao_Dutch font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_fzx full screen
+   ; stderr = dup(stdout)
+   
+   INCLUDE "startup/zx_crt_8.asm"
+
+ENDIF
+
 IF startup = 31
 
    ; no instantiated FILEs
@@ -125,6 +137,19 @@ IF startup = 37
    ; stderr = dup(stdout)
 
    INCLUDE "startup/zx_crt_37.asm"
+
+ENDIF
+
+IF startup = 40
+
+   ; if 2 cartridge
+   ; fzx terminal using ff_ao_Dutch font
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_fzx full screen
+   ; stderr = dup(stdout)
+   
+   INCLUDE "startup/zx_crt_40.asm"
 
 ENDIF
 
