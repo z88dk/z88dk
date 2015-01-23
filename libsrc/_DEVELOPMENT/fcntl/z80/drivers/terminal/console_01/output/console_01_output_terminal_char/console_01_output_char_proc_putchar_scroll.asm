@@ -13,6 +13,9 @@ console_01_output_char_proc_putchar_scroll:
    ;
    ; exit : carry set if screen cleared
 
+   or a
+   ret z
+
    ld c,a                      ; c = num rows to scroll
 
    bit 7,(ix+7)
