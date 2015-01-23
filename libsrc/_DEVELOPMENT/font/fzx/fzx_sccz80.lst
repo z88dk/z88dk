@@ -2,6 +2,7 @@ font/fzx/z80/__fzx_buffer_glyph_width
 font/fzx/z80/__fzx_char_struct
 font/fzx/z80/__fzx_partition_width_adjust
 font/fzx/z80/__fzx_puts_newline
+font/fzx/z80/__fzx_puts_single_spacing
 font/fzx/z80/__fzx_string_glyph_width
 @font/fzx/fonts/fonts.lst
 font/fzx/c/sccz80/fzx_at
