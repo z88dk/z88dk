@@ -17,7 +17,7 @@ asm_fzx_glyph_width:
    ;          c = vertical shift
    ;          b = width - 1
    ;
-   ; ueses : af, bc, hl
+   ; uses : af, bc, hl
    
    call asm_fzx_char_metrics
    

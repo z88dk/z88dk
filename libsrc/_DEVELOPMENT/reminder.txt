@@ -16,22 +16,36 @@ TODO:
 
 * known issue: fzx justify functions need to distribute remainder spacing evenly
 
+* low level fzx print functions with embedded sequences
+
 * do we really need two sets of input/output primitives for stdio
+
+* known issue:  in password mode output terminals display '*' when enter typed
+
+* add library options to opt in/out of ioctls
+
+* make some library options compile time rather than library build time
+
+
 ]
 
-* fzx output terminal
+* fzx tty_z88dk output terminal
+
+* fzx output terminal scroll limit seems off
 
 * target open
 
 * zx scroll reexamined
 
-* replace "ld rl,ixl; ld rh,ixh" pairs with "push ix; pop rp"
-saves a byte and extra speed rarely necessary
-
 * change 4x8 font to use only nibbles in definition
-
-* fzx print functions with embedded sequences
 
 * generate fresh crts for spectrum if2 target
 
 * check constraints on code location in some stdio state machines
+
+* create library functions to load from fixed offset from ix
+should save dozens of bytes
+
+* add library options to opt in/out of ioctls
+
+* make some library options compile time rather than library build time
