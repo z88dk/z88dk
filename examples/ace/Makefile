@@ -1,12 +1,15 @@
 
 
-all: dstar adv_a enigma fib mm rpn tic sorter othello
+all: dstar adv_a ansitest enigma fib mm rpn tic sorter othello
 
 dstar:
 	zcc +ace -vn -create-app dstar.c -odstar.bin
 
 adv_a:
 	zcc +ace -vn ../console/adv_a.c -I../console -create-app -DTAPE -DCOMPUTE_SCORE -O3 -oadva.bin
+
+ansitest:
+	zcc +ace -clib=ansi -vn  ../console/ansitest.c -create-app -oansitest.bin
 
 enigma:
 	zcc +ace -vn  ../console/enigma.c -create-app -oenigma.bin
