@@ -1,6 +1,6 @@
 
 
-all: wc tail sort ddir adv_a enigma fib mm rpn tic sorter dstar othello wall
+all: wc tail sort ddir ansitest adv_a enigma fib mm rpn tic sorter dstar othello wall
 
 wc:
 	zcc +osca -vn -lflosdos -DWILDCARD wc.c -create-app -owc.bin
@@ -13,6 +13,9 @@ sort:
 
 ddir:
 	zcc +osca -vn -lndos ddir.c -O3 -create-app -oddir.bin
+
+ansitest:
+	zcc +osca -clib=ansi -vn -lndos ../console/ansitest.c -create-app -oansitest.bin
 
 adv_a:
 	zcc +osca -vn -lflosdos ../console/adv_a.c -I../console -create-app -DDISK -DCOMPUTE_SCORE -O3 -oadva.bin

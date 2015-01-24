@@ -7,7 +7,7 @@ adv_a:
 	zcc +zx -vn -lndos ../console/adv_a.c -I../console -create-app -DTAPE -DPICS -DCOMPUTE_SCORE -O3 -zorg=27000 -oadv_a.bin
 
 ansitest:
-	zcc +zxansi -vn -lndos ../console/ansitest.c -create-app -oansitest.bin
+	zcc +zx -clib=ansi -vn -lndos ../console/ansitest.c -create-app -oansitest.bin
 
 enigma:
 	zcc +zx -vn -lndos ../console/enigma.c -create-app -oenigma.bin
