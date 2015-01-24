@@ -1,10 +1,13 @@
 
 
-all: adv_a enigma fib mm rpn tic sorter dstar dstar_native microman othello wall gfx save ex10b ccoswave c3d cmandel csprite zxbasic zxcurrah threading chessboard mandel julia smallgfx stencil clock showlib3d smallgfx2 wintest sinwave_fast sinwave_small coswave_fast coswave_small spritest smile xample ex10b ex12 clicktest fx sndtest synthdemo
+all: ansitest adv_a enigma fib mm rpn tic sorter dstar dstar_native microman othello wall gfx save ex10b ccoswave c3d cmandel csprite zxbasic zxcurrah threading chessboard mandel julia smallgfx stencil clock showlib3d smallgfx2 wintest sinwave_fast sinwave_small coswave_fast coswave_small spritest smile xample ex10b ex12 clicktest fx sndtest synthdemo
 
 
 adv_a:
 	zcc +zx -vn -lndos ../console/adv_a.c -I../console -create-app -DTAPE -DPICS -DCOMPUTE_SCORE -O3 -zorg=27000 -oadv_a.bin
+
+ansitest:
+	zcc +zxansi -vn -lndos ../console/ansitest.c -create-app -oansitest.bin
 
 enigma:
 	zcc +zx -vn -lndos ../console/enigma.c -create-app -oenigma.bin
