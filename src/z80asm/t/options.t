@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.55 2015-01-20 22:39:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.56 2015-01-24 21:24:45 pauloscustodio Exp $
 #
 # Test options
 
@@ -925,7 +925,7 @@ unlink_testfiles();
 
 write_file(asm_file(),  "EXTERN A51 \n defb A51");
 
-write_file(asm5_file(), "PUBLIC A5 \n PUBLIC A51 \n A5: defc A51 = 51");
+write_file(asm5_file(), "PUBLIC A5 \n PUBLIC A51 \n A5: \n defc A51 = 51");
 
 t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
 ok -f lib5_file();

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.11 2015-01-21 23:34:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.12 2015-01-24 21:24:45 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -149,6 +149,31 @@ z80asm(
 		defb f10, f11		;; 0A 0B
 END
 );
+
+#------------------------------------------------------------------------------
+# DEFINE / UNDEFINE
+#------------------------------------------------------------------------------
+z80asm(asm => "DEFINE 			;; error: syntax error");
+z80asm(asm => "DEFINE aa, 		;; error: syntax error");
+z80asm(asm => "UNDEFINE 		;; error: syntax error");
+z80asm(asm => "UNDEFINE aa, 	;; error: syntax error");
+
+z80asm(asm => "DEFINE aa    \n DEFB aa 		;; 01 ");
+z80asm(asm => "DEFINE aa,bb \n DEFB aa,bb 	;; 01 01 ");
+z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa 		\n DEFB bb 	;; 01 ");
+z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa 		\n DEFB aa 	;; error: symbol not defined");
+z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB aa 	;; error: symbol not defined");
+z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB bb 	;; error: symbol not defined");
+
+#------------------------------------------------------------------------------
+# DEFC
+#------------------------------------------------------------------------------
+z80asm(asm => "DEFC 			;; error: syntax error");
+z80asm(asm => "DEFC aa			;; error: syntax error");
+z80asm(asm => "DEFC aa=			;; error: syntax error");
+z80asm(asm => "DEFC aa=1+1,		;; error: syntax error");
+
+z80asm(asm => "DEFC aa=1+1,bb=2+2	\n DEFB aa,bb	;; 02 04");
 
 #------------------------------------------------------------------------------
 # DEFS - simple use tested in opcodes.t

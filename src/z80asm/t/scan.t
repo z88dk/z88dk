@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.44 2015-01-23 23:14:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.45 2015-01-24 21:24:45 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -802,6 +802,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(BINARY,	T_ALL);
 	T_OPCODE(DEFGROUP,	T_ALL);
 	T_OPCODE(DEFINE,	T_ALL);
+	T_OPCODE(DEFC,		T_ALL);
 	T_OPCODE(DEFS,		T_ALL);
 	T_OPCODE(DEFVARS,	T_ALL);
 	T_OPCODE(EXTERN,	T_ALL);

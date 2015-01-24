@@ -15,12 +15,14 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.11 2015-01-23 23:14:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.12 2015-01-24 21:24:45 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
+
+struct Expr;
 
 enum {
 	DEFVARS_SIZE_B = 1,
@@ -76,3 +78,6 @@ extern void asm_XDEF(char *name);
 extern void asm_XLIB(char *name);
 extern void asm_DEFINE(char *name);
 extern void asm_UNDEFINE(char *name);
+
+/* define a constant or expression */
+extern void asm_DEFC(char *name, struct Expr *expr);

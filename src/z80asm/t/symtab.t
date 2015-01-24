@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.24 2015-01-23 23:14:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.25 2015-01-24 21:24:45 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -59,17 +59,17 @@ t_z80asm(
 
 # define VAR
 t_z80asm(
-	asm		=> "define VAR,VAR2 : defb VAR,VAR2",
-	bin		=> "\1\1",
+	asm		=> "define VAR : defb VAR",
+	bin		=> "\1",
 );
 
 t_z80asm(
-	asm		=> "undefine VAR,VAR2 : defb VAR",
+	asm		=> "undefine VAR : defb VAR",
 	err		=> "Error at file 'test.asm' line 2: symbol not defined",
 );
 
 t_z80asm(
-	asm		=> "define VAR,VAR2 : undefine VAR,VAR2 : define VAR : defb VAR",
+	asm		=> "define VAR : undefine VAR : define VAR : defb VAR",
 	bin		=> "\1",
 );
 

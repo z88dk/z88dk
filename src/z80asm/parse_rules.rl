@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-23 23:14:55 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.44 2015-01-24 21:24:45 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -27,15 +27,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-
 *----------------------------------------------------------------------------*/
 
 /* macros for actions - labels */
-#define DO_LABEL(name) \
-			if (compile_active) { \
-				asm_LABEL(name); \
-			}
-
 #define DO_STMT_LABEL() \
-			if (stmt_label->len) { \
-				DO_LABEL(stmt_label->str); \
-				stmt_label->len = 0; \
+			if (compile_active) { \
+				if (stmt_label->len) { \
+					asm_LABEL(stmt_label->str); \
+					stmt_label->len = 0; \
+				} \
 			}
 
 /* macros for actions - statements */
@@ -55,10 +52,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-
 					OBJ_DELETE(expr); \
 			}
 
-#define DO_stmt_jr( opcode)		_DO_stmt_(jr,  opcode)
-#define DO_stmt_n(  opcode)		_DO_stmt_(n,   opcode)
-#define DO_stmt_nn( opcode)		_DO_stmt_(nn,  opcode)
-#define DO_stmt_idx(opcode)		_DO_stmt_(idx, opcode)
+#define DO_stmt_jr( opcode)	_DO_stmt_(jr,  opcode)
+#define DO_stmt_n(  opcode)	_DO_stmt_(n,   opcode)
+#define DO_stmt_nn( opcode)	_DO_stmt_(nn,  opcode)
+#define DO_stmt_idx(opcode)	_DO_stmt_(idx, opcode)
 
 #define DO_stmt_idx_n(opcode) \
 			{ 	Expr *n_expr   = pop_expr(ctx); \
@@ -92,14 +89,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-
 			}
 
 /*-----------------------------------------------------------------------------
-*   Expression macros
-*----------------------------------------------------------------------------*/
-#define EXPR_START_ACTION() \
-			ctx->expr_start = ctx->p; \
-			ctx->expr_in_parens = (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE; \
-			ctx->expr_open_parens = 0;
-
-/*-----------------------------------------------------------------------------
 *   State Machine
 *----------------------------------------------------------------------------*/
 
@@ -115,12 +104,25 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-
 	variable eof ctx->eof;
 
 	/* label, name */
-	label  = _TK_LABEL  @{ Str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); };
-	name   = _TK_NAME   @{ Str_set_n(name,       ctx->p->tstart, ctx->p->tlen); };
-	string = _TK_STRING @{ Str_set_n(name,       ctx->p->tstart, ctx->p->tlen); };
+	action set_stmt_label {
+		Str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen);
+	}
 	
-	/* expression */
-	action parens_open { ctx->expr_open_parens > 0 }
+	action set_name {
+		Str_set_n(name, ctx->p->tstart, ctx->p->tlen);
+	}
+	
+	label  = _TK_LABEL  @set_stmt_label;
+	name   = _TK_NAME   @set_name;
+	string = _TK_STRING @set_name;
+	
+	/*---------------------------------------------------------------------
+	*   Expression 
+	*--------------------------------------------------------------------*/
+	action parens_open { 
+		ctx->expr_open_parens > 0 
+	}
+	
 	lparen = (_TK_LPAREN | _TK_LSQUARE) 
 			>{ ctx->expr_open_parens++; };
 	rparen = (_TK_RPAREN | _TK_RSQUARE) when parens_open
@@ -151,14 +153,21 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-
 			  
 	expr1 	= _TK_CONST_EXPR ? term ( binary term )**;
 	
+	action expr_start_action {
+		ctx->expr_start = ctx->p;
+		ctx->expr_in_parens = 
+			(ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
+		ctx->expr_open_parens = 0;
+	} 
+	
 	/* expression */
 	expr 	= expr1 
-			  >{ EXPR_START_ACTION(); }
+			  >expr_start_action
 			  %{ push_expr(ctx); };
 	
 	/* expression within parentheses */
 	paren_expr = expr1 
-			  >{ EXPR_START_ACTION(); }
+			  >expr_start_action
 			  %{ if (! ctx->expr_in_parens)
 					return FALSE;		/* syntax error */
 				 push_expr(ctx); 
@@ -308,6 +317,28 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-
 					   asm_DEFINE | asm_UNDEFINE;
 
 	/*---------------------------------------------------------------------
+	*   directives with list of assignments
+	*--------------------------------------------------------------------*/
+#foreach <OP> in DEFC
+/*
+	action <OP>_action { asm_<OP>(name->str, pop_expr(ctx)); }
+	
+	asm_<OP>_next = name _TK_EQUAL expr _TK_COMMA   %<OP>_action;
+	asm_<OP>_last = name _TK_EQUAL expr _TK_NEWLINE %<OP>_action;
+*/
+	
+	asm_<OP>_iter =
+			asm_<OP>_next: 
+					name _TK_EQUAL expr (_TK_COMMA | _TK_NEWLINE)
+					@{	asm_<OP>(name->str, pop_expr(ctx));
+						if ( ctx->p->tok == TK_COMMA )
+							fgoto asm_<OP>_next;
+					};
+	asm_<OP> = _TK_<OP> asm_<OP>_iter ;
+#endfor  <OP>
+	directives_assign = asm_DEFC;
+
+	/*---------------------------------------------------------------------
 	*   Z88DK specific opcodes
 	*--------------------------------------------------------------------*/
 #foreach <OP> in CALL_OZ, OZ, CALL_PKG, FPP, INVOKE
@@ -329,7 +360,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-
 		  _TK_END
 		| _TK_NEWLINE
 		| directives_no_args | directives_n | directives_str
-		| directives_name | directives_names
+		| directives_name | directives_names | directives_assign
 		| asm_Z88DK
 		| asm_DEFGROUP
 		| asm_DEFVARS
@@ -429,12 +460,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.43 2015-01-
 #foreach <X> in IX, IY
 		/* LD (ix),N */
 		|	label? _TK_LD _TK_IND_<X> _TK_RPAREN 
-					_TK_COMMA expr _TK_NEWLINE \
+					_TK_COMMA expr _TK_NEWLINE 
 			@{ DO_stmt_n( (P_<X> + Z80_LD_r_n( REG_idx ) ) << 8 ); }
 			
 		/* LD (ix+d),N */
 		|	label? _TK_LD _TK_IND_<X> expr _TK_RPAREN 
-					_TK_COMMA expr _TK_NEWLINE \
+					_TK_COMMA expr _TK_NEWLINE 
 			@{ DO_stmt_idx_n( P_<X> + Z80_LD_r_n( REG_idx ) ); }
 #endfor  <X>		
 

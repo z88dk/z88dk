@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.119 2015-01-23 23:14:54 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/asmdrctv.c,v 1.120 2015-01-24 21:24:45 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -47,66 +47,6 @@ struct sourcefile *FindFile( struct sourcefile *srcfile, char *fname );
 /* local functions */
 
 
-
-
-
-void
-DEFC( void )
-{
-    Expr *expr;
-    long constant;
-	DEFINE_STR( name, MAXLINE );
-
-    do
-    {
-        if ( GetSym() == TK_NAME )
-        {
-			Str_set(name, sym_text(&sym)); /* remember name */
-
-            if ( GetSym() == TK_EQUAL )
-            {
-                GetSym();         /* get numerical expression */
-
-                if ( ( expr = expr_parse() ) != NULL )
-                {
-					if ( (expr->result.not_evaluable) || 
-						 (expr->sym_type >= TYPE_ADDRESS) )
-                    {
-						/* store in object file to be computed at link time */
-						expr->expr_type_mask |= RANGE_WORD;
-						expr->target_name = strpool_add( name->str );
-
-						ExprList_push( & CURRENTMODULE->exprs, expr );
-
-						/* create symbol */
-						define_symbol( expr->target_name, 0, TYPE_COMPUTED, 0 );
-                    }
-                    else
-                    {
-                        constant = Expr_eval( expr );    /* DEFC constant expression */
-                        define_symbol( name->str, constant, TYPE_CONSTANT, 0 );
-	                    OBJ_DELETE( expr );
-                    }
-                }
-                else
-                {
-                    break;    /* syntax error - get next line from file... */
-                }
-            }
-            else
-            {
-				error_syntax();
-                break;
-            }
-        }
-        else
-        {
-			error_syntax();
-            break;
-        }
-    }
-    while ( sym.tok == TK_COMMA );       /* get all DEFC definition separated by comma */
-}
 
 
 
