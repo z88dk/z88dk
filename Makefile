@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.44 2015-01-23 07:11:12 stefano Exp $
+#	$Id: Makefile,v 1.45 2015-01-24 09:59:10 stefano Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -50,9 +50,8 @@ zpragma:
 	$(MAKE) -C src/scanner PREFIX=`pwd` install
 
 zx7:
-
 	$(MAKE) -C src/zx7
-	$(MAKE) -C src/zx7 PREFIX=pwd install
+	$(MAKE) -C src/zx7 PREFIX=`pwd` install
 
 z80nm:
 	$(MAKE) -C support/ar
