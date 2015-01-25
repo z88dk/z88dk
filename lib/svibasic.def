@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: svibasic.def,v 1.6 2014-05-19 07:13:09 stefano Exp $
+; $Id: svibasic.def,v 1.7 2015-01-25 01:36:45 pauloscustodio Exp $
 ;
 
 
@@ -150,7 +150,7 @@ defc TEMP2  = $F7E8
 defc OLDLIN = $F7EA  ; old line number set up ^C ...
 defc OLDTXT = $F7EC  ; Points st. to be executed next
 defc VARTAB = $F7EE  ; Pointer to start of variable space
-defc ARYTAB = $F7F0  Pointer to begging of array table
+defc ARYTAB = $F7F0  ; Pointer to begging of array table
 defc STREND = $F7F2
 defc DATPTR = $F7F4  ; DATA pointer
 defc DEFTBL = $F7F6  ; Default valtype for each letter
@@ -218,7 +218,7 @@ defc CPLOTF = $FACA  ; (CPLDTF) Plot polarity flag
 defc CPCNT  = $FACB  ; (CPCND)1/8 of number of points in circle
 defc CPCNT8 = $FACD  ; (CPCNT)
 ;; defc CRCSUM = $????  (CRCSU)
-defc CSTCNT = $FAD1  (CSTCN)
+defc CSTCNT = $FAD1  ; (CSTCN)
 defc CSCLXY = $FAD3  ; Scale of X & Y
 defc CSAVEA = $FAD4  ; reservation area of ADVGRP
 defc CSAVEM = $FAD6  ; reservation area of ADVGRP
