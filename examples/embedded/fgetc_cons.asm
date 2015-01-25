@@ -8,7 +8,7 @@
 
 	INCLUDE "ns16450.def"
 
-	XLIB	fgetc_cons
+	PUBLIC	fgetc_cons
 
 .fgetc_cons
 	ld      bc,UART_BASE + LSR

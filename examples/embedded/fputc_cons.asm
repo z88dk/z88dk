@@ -8,7 +8,7 @@
 
 	INCLUDE "ns16450.def"
 
-	XLIB  fputc_cons
+	PUBLIC  fputc_cons
 
 .fputc_cons
 	ld      bc,UART_BASE + LSR
