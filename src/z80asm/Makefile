@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.185 2015-01-25 13:14:40 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.186 2015-01-25 17:52:01 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -240,13 +240,6 @@ depend:
 	
 # DO NOT DELETE
 
-asmdrctv.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
-asmdrctv.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
-asmdrctv.o: lib/uthash.h directives.h errors.h errors_def.h expr.h
-asmdrctv.o: lib/classlist.h scan.h legacy.h scan_tokens.h opcodes.h options.h
-asmdrctv.o: lib/list.h options_def.h sym.h symref.h lib/fileutil.h listfile.h
-asmdrctv.o: expr_def.h parse.h lib/utarray.h lib/strpool.h symbol.h model.h
-asmdrctv.o: module.h symtab.h objfile.h z80asm.h
 codearea.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 codearea.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 codearea.o: lib/uthash.h errors.h errors_def.h lib/fileutil.h lib/list.h

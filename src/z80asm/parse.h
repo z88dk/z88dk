@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.h,v 1.10 2015-01-17 14:02:03 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.h,v 1.11 2015-01-25 17:52:01 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -43,11 +43,6 @@ typedef struct ParseCtx
 
 	UT_array *token_strings;		/* strings saved from the current statement */
 	UT_array *exprs;				/* array of expressions computed during parse */
-
-	int  expr_value;				/* last computed expression value */
-	Bool expr_error;				/* last computed expression error */
-	Bool expr_in_parens;			/* true if expression has enclosing parens */
-	int  expr_open_parens;			/* number of open parens */
 } ParseCtx;
 
 /* create a new parse context */

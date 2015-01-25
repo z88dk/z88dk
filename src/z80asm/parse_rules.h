@@ -16,6 +16,10 @@ static Bool _parse_statement(ParseCtx *ctx, Bool compile_active)
  static Str *stmt_label = NULL;
  int value1 = 0;
  int start_num_errors = get_num_errors();;
+ int expr_value = 0;
+ Bool expr_error = FALSE;
+ Bool expr_in_parens = FALSE;
+ int expr_open_parens = 0;
  INIT_OBJ(Str, &name); Str_clear(name);
  INIT_OBJ(Str, &stmt_label); Str_clear(stmt_label);
 	{
@@ -158,7 +162,7 @@ tr104:
     }
 	goto st1548;
 tr109:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
      asm_DEFB_expr(pop_expr(ctx));
@@ -182,7 +186,7 @@ tr116:
     }
 	goto st1548;
 tr121:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
      asm_DEFL(pop_expr(ctx));
@@ -192,29 +196,29 @@ tr121:
 	goto st1548;
 tr127:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-       if (compile_active && ! ctx->expr_error) asm_DEFS(ctx->expr_value, 0); }
+       if (compile_active && ! expr_error) asm_DEFS(expr_value, 0); }
 	goto st1548;
 tr136:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-       if (compile_active && ! ctx->expr_error) asm_DEFS(value1, ctx->expr_value); }
+       if (compile_active && ! expr_error) asm_DEFS(value1, expr_value); }
 	goto st1548;
 tr141:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-       if (compile_active && ! ctx->expr_error) asm_DEFS(value1, ctx->expr_value); }
+       if (compile_active && ! expr_error) asm_DEFS(value1, expr_value); }
 	goto st1548;
 tr144:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-       if (compile_active && ! ctx->expr_error) asm_DEFS(ctx->expr_value, 0); }
+       if (compile_active && ! expr_error) asm_DEFS(expr_value, 0); }
 	goto st1548;
 tr151:
 	{ push_expr(ctx); }
@@ -225,7 +229,7 @@ tr151:
     }
 	goto st1548;
 tr156:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
      asm_DEFW(pop_expr(ctx));
@@ -238,7 +242,7 @@ tr177:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr182:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_ADC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -307,7 +311,7 @@ tr270:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr275:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_ADD_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -400,7 +404,7 @@ tr378:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr383:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_AND_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -453,67 +457,67 @@ tr441:
 	{ if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(( P_IY + Z80_AND( REG_idx ) ) << 8); }; }
 	goto st1548;
 tr460:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( ctx->expr_value, REG_C )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( expr_value, REG_C )); };
     }
 	goto st1548;
 tr461:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( ctx->expr_value, REG_B )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( expr_value, REG_B )); };
     }
 	goto st1548;
 tr462:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( ctx->expr_value, REG_D )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( expr_value, REG_D )); };
     }
 	goto st1548;
 tr463:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( ctx->expr_value, REG_E )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( expr_value, REG_E )); };
     }
 	goto st1548;
 tr464:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( ctx->expr_value, REG_H )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( expr_value, REG_H )); };
     }
 	goto st1548;
 tr465:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( ctx->expr_value, REG_L )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( expr_value, REG_L )); };
     }
 	goto st1548;
 tr466:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( ctx->expr_value, REG_A )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( expr_value, REG_A )); };
     }
 	goto st1548;
 tr467:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( ctx->expr_value, REG_idx )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_BIT( expr_value, REG_idx )); };
     }
 	goto st1548;
 tr479:
-	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_BIT( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
-                                                ;
+	{ if (!expr_error)
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_BIT( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+                                           ;
     }
 	goto st1548;
 tr488:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
-                                                                   ;
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_BIT( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+                                                              ;
      }
 	goto st1548;
 tr500:
-	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_BIT( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
-                                                ;
+	{ if (!expr_error)
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_BIT( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+                                           ;
     }
 	goto st1548;
 tr509:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
-                                                                   ;
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_BIT( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_BIT( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+                                                              ;
      }
 	goto st1548;
 tr524:
@@ -521,7 +525,7 @@ tr524:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr529:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_CALL), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -530,7 +534,7 @@ tr536:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr541:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_NZ, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -539,7 +543,7 @@ tr548:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr553:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_Z, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -548,7 +552,7 @@ tr560:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr565:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_NC, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -557,7 +561,7 @@ tr572:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr577:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_C, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -566,7 +570,7 @@ tr584:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr589:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_PO, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -575,7 +579,7 @@ tr596:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr601:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_PE, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -584,7 +588,7 @@ tr608:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr613:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_P, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -593,7 +597,7 @@ tr620:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr625:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_call_flag(FLAG_M, expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -605,7 +609,7 @@ tr646:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr651:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_CP_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -749,7 +753,7 @@ tr800:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr805:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_DJNZ), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -782,17 +786,17 @@ tr828:
 	goto st1548;
 tr832:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_IM( ctx->expr_value )); };
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_IM( expr_value )); };
     }
 	goto st1548;
 tr837:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_IM( ctx->expr_value )); };
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_IM( expr_value )); };
     }
 	goto st1548;
 tr849:
@@ -814,15 +818,15 @@ tr864:
 	{ if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_IN_REG_C( REG_L )); }; }
 	goto st1548;
 tr870:
-	{ if (! ctx->expr_in_parens)
+	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_IN_A_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr875:
-	{ ctx->expr_open_parens--; }
-	{ if (! ctx->expr_in_parens)
+	{ expr_open_parens--; }
+	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
@@ -914,7 +918,7 @@ tr977:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr982:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -923,7 +927,7 @@ tr989:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr994:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -932,7 +936,7 @@ tr1001:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1006:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -941,7 +945,7 @@ tr1013:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1018:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -950,7 +954,7 @@ tr1025:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1030:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -959,7 +963,7 @@ tr1037:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1042:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_PO )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -968,7 +972,7 @@ tr1049:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1054:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_PE )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -977,7 +981,7 @@ tr1061:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1066:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_P )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -986,7 +990,7 @@ tr1073:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1078:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_JP_FLAG( FLAG_M )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -1004,7 +1008,7 @@ tr1093:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1098:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -1013,7 +1017,7 @@ tr1105:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1110:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR_FLAG( FLAG_NZ )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -1022,7 +1026,7 @@ tr1117:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1122:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR_FLAG( FLAG_Z )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -1031,7 +1035,7 @@ tr1129:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1134:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR_FLAG( FLAG_NC )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -1040,55 +1044,55 @@ tr1141:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1146:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_jr((Z80_JR_FLAG( FLAG_C )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1190:
 	{
-    if (! ctx->expr_in_parens)
+    if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_IND_NN_A), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1548;
 tr1191:
 	{
-    if (! ctx->expr_in_parens)
+    if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_BC )), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1548;
 tr1192:
 	{
-    if (! ctx->expr_in_parens)
+    if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_DE )), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1548;
 tr1193:
 	{
-    if (! ctx->expr_in_parens)
+    if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_HL + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1548;
 tr1194:
 	{
-    if (! ctx->expr_in_parens)
+    if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_IX + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1548;
 tr1195:
 	{
-    if (! ctx->expr_in_parens)
+    if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_IY + Z80_LD_IND_nn_idx), expr); } else OBJ_DELETE(expr); };
    }
 	goto st1548;
 tr1196:
 	{
-    if (! ctx->expr_in_parens)
+    if (! expr_in_parens)
      return FALSE;
     { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_IND_nn_dd( REG_SP )), expr); } else OBJ_DELETE(expr); };
    }
@@ -1096,7 +1100,7 @@ tr1196:
 tr1218:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_C == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1109,10 +1113,10 @@ tr1218:
    }
 	goto st1548;
 tr1223:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_C == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1175,7 +1179,7 @@ tr1279:
 tr1298:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_B == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1188,10 +1192,10 @@ tr1298:
    }
 	goto st1548;
 tr1303:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_B == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1254,7 +1258,7 @@ tr1359:
 tr1378:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_D == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1267,10 +1271,10 @@ tr1378:
    }
 	goto st1548;
 tr1383:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_D == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1333,7 +1337,7 @@ tr1439:
 tr1458:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_E == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1346,10 +1350,10 @@ tr1458:
    }
 	goto st1548;
 tr1463:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_E == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1412,7 +1416,7 @@ tr1519:
 tr1534:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_H == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1425,10 +1429,10 @@ tr1534:
    }
 	goto st1548;
 tr1539:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_H == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1481,7 +1485,7 @@ tr1603:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1608:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -1511,7 +1515,7 @@ tr1629:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1634:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -1539,7 +1543,7 @@ tr1643:
 tr1658:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_L == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1552,10 +1556,10 @@ tr1658:
    }
 	goto st1548;
 tr1663:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_L == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1608,7 +1612,7 @@ tr1727:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1732:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -1638,7 +1642,7 @@ tr1753:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1758:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -1666,7 +1670,7 @@ tr1767:
 tr1792:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_A == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1679,10 +1683,10 @@ tr1792:
    }
 	goto st1548;
 tr1797:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_A == REG_A ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((Z80_LD_A_IND_NN), expr); } else OBJ_DELETE(expr); };
      }
@@ -1775,7 +1779,7 @@ tr1871:
 tr1876:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_BC == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1789,10 +1793,10 @@ tr1876:
    }
 	goto st1548;
 tr1881:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_BC == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_BC + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1808,7 +1812,7 @@ tr1881:
 tr1888:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_DE == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1822,10 +1826,10 @@ tr1888:
    }
 	goto st1548;
 tr1893:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_DE == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_DE + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1841,7 +1845,7 @@ tr1893:
 tr1900:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_HL == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1855,10 +1859,10 @@ tr1900:
    }
 	goto st1548;
 tr1905:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_HL == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_HL + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1874,7 +1878,7 @@ tr1905:
 tr1912:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_IX == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1888,10 +1892,10 @@ tr1912:
    }
 	goto st1548;
 tr1917:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_IX == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_IX + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1907,7 +1911,7 @@ tr1917:
 tr1924:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_IY == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1921,10 +1925,10 @@ tr1924:
    }
 	goto st1548;
 tr1929:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_IY == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_IY + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1940,7 +1944,7 @@ tr1929:
 tr1939:
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_SP == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1954,10 +1958,10 @@ tr1939:
    }
 	goto st1548;
 tr1944:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{
-    if ( ctx->expr_in_parens ) {
+    if ( expr_in_parens ) {
      if ( REG_SP == REG_HL ) {
       { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_nn((P_SP + Z80_LD_idx_IND_nn), expr); } else OBJ_DELETE(expr); };
      }
@@ -1990,7 +1994,7 @@ tr1967:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr1972:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_LD_r_n( REG_idx )), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -2020,7 +2024,7 @@ tr2004:
 	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1548;
 tr2009:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx_n((P_IX + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1548;
@@ -2050,7 +2054,7 @@ tr2038:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr2043:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n(((P_IX + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -2080,7 +2084,7 @@ tr2075:
 	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1548;
 tr2080:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx_n((P_IY + Z80_LD_r_n( REG_idx )), idx_expr, n_expr); } else { OBJ_DELETE(n_expr); OBJ_DELETE(idx_expr); } }; }
 	goto st1548;
@@ -2110,7 +2114,7 @@ tr2109:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr2114:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n(((P_IY + Z80_LD_r_n( REG_idx ) ) << 8), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -2158,7 +2162,7 @@ tr2147:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr2152:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_OR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -2283,67 +2287,67 @@ tr2267:
 	{ if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(P_AF + Z80_PUSH( REG_AF )); }; }
 	goto st1548;
 tr2286:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( ctx->expr_value, REG_C )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( expr_value, REG_C )); };
     }
 	goto st1548;
 tr2287:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( ctx->expr_value, REG_B )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( expr_value, REG_B )); };
     }
 	goto st1548;
 tr2288:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( ctx->expr_value, REG_D )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( expr_value, REG_D )); };
     }
 	goto st1548;
 tr2289:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( ctx->expr_value, REG_E )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( expr_value, REG_E )); };
     }
 	goto st1548;
 tr2290:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( ctx->expr_value, REG_H )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( expr_value, REG_H )); };
     }
 	goto st1548;
 tr2291:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( ctx->expr_value, REG_L )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( expr_value, REG_L )); };
     }
 	goto st1548;
 tr2292:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( ctx->expr_value, REG_A )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( expr_value, REG_A )); };
     }
 	goto st1548;
 tr2293:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( ctx->expr_value, REG_idx )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RES( expr_value, REG_idx )); };
     }
 	goto st1548;
 tr2305:
-	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RES( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
-                                                ;
+	{ if (!expr_error)
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_RES( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+                                           ;
     }
 	goto st1548;
 tr2314:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RES( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
-                                                                   ;
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_RES( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+                                                              ;
      }
 	goto st1548;
 tr2326:
-	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RES( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
-                                                ;
+	{ if (!expr_error)
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_RES( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+                                           ;
     }
 	goto st1548;
 tr2335:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RES( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
-                                                                   ;
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_RES( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_RES( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+                                                              ;
      }
 	goto st1548;
 tr2339:
@@ -2559,17 +2563,17 @@ tr2603:
 	goto st1548;
 tr2607:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RST( ctx->expr_value )); };
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RST( expr_value )); };
     }
 	goto st1548;
 tr2612:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RST( ctx->expr_value )); };
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_RST( expr_value )); };
     }
 	goto st1548;
 tr2633:
@@ -2577,7 +2581,7 @@ tr2633:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr2638:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_SBC_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -2645,67 +2649,67 @@ tr2706:
 	{ if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SCF); }; }
 	goto st1548;
 tr2725:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( ctx->expr_value, REG_C )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( expr_value, REG_C )); };
     }
 	goto st1548;
 tr2726:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( ctx->expr_value, REG_B )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( expr_value, REG_B )); };
     }
 	goto st1548;
 tr2727:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( ctx->expr_value, REG_D )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( expr_value, REG_D )); };
     }
 	goto st1548;
 tr2728:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( ctx->expr_value, REG_E )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( expr_value, REG_E )); };
     }
 	goto st1548;
 tr2729:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( ctx->expr_value, REG_H )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( expr_value, REG_H )); };
     }
 	goto st1548;
 tr2730:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( ctx->expr_value, REG_L )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( expr_value, REG_L )); };
     }
 	goto st1548;
 tr2731:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( ctx->expr_value, REG_A )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( expr_value, REG_A )); };
     }
 	goto st1548;
 tr2732:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( ctx->expr_value, REG_idx )); };
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(Z80_SET( expr_value, REG_idx )); };
     }
 	goto st1548;
 tr2744:
-	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SET( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
-                                                ;
+	{ if (!expr_error)
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IX << 8) & 0xFF0000) + Z80_SET( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+                                           ;
     }
 	goto st1548;
 tr2753:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SET( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
-                                                                   ;
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IX << 16) & 0xFF000000) + ((Z80_SET( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+                                                              ;
      }
 	goto st1548;
 tr2765:
-	{ if (!ctx->expr_error)
-    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SET( ctx->expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
-                                                ;
+	{ if (!expr_error)
+    { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_idx((((P_IY << 8) & 0xFF0000) + Z80_SET( expr_value, REG_idx )), expr); } else OBJ_DELETE(expr); }
+                                           ;
     }
 	goto st1548;
 tr2774:
-	{ if (!ctx->expr_error)
-    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SET( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
-                                                                   ;
+	{ if (!expr_error)
+    if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode(((P_IY << 16) & 0xFF000000) + ((Z80_SET( expr_value, REG_idx ) << 8 ) & 0x00FF0000) + ((0 << 8 ) & 0x0000FF00) + ((Z80_SET( expr_value, REG_idx ) << 0 ) & 0x000000FF)); }
+                                                              ;
      }
 	goto st1548;
 tr2788:
@@ -2873,7 +2877,7 @@ tr3035:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr3040:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_SUB_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -2930,7 +2934,7 @@ tr3116:
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
 tr3121:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ { Expr *expr = pop_expr(ctx); if (compile_active) { if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } }; add_opcode_n((Z80_XOR_n), expr); } else OBJ_DELETE(expr); }; }
 	goto st1548;
@@ -2984,115 +2988,115 @@ tr3179:
 	goto st1548;
 tr3183:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_CALL_OZ(ctx->expr_value);
+      add_Z88_CALL_OZ(expr_value);
      }
     }
    }
 	goto st1548;
 tr3188:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_CALL_OZ(ctx->expr_value);
+      add_Z88_CALL_OZ(expr_value);
      }
     }
    }
 	goto st1548;
 tr3194:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_OZ(ctx->expr_value);
+      add_Z88_OZ(expr_value);
      }
     }
    }
 	goto st1548;
 tr3199:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_OZ(ctx->expr_value);
+      add_Z88_OZ(expr_value);
      }
     }
    }
 	goto st1548;
 tr3205:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_CALL_PKG(ctx->expr_value);
+      add_Z88_CALL_PKG(expr_value);
      }
     }
    }
 	goto st1548;
 tr3210:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_CALL_PKG(ctx->expr_value);
+      add_Z88_CALL_PKG(expr_value);
      }
     }
    }
 	goto st1548;
 tr3216:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_FPP(ctx->expr_value);
+      add_Z88_FPP(expr_value);
      }
     }
    }
 	goto st1548;
 tr3221:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_FPP(ctx->expr_value);
+      add_Z88_FPP(expr_value);
      }
     }
    }
 	goto st1548;
 tr3227:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_INVOKE(ctx->expr_value);
+      add_Z88_INVOKE(expr_value);
      }
     }
    }
 	goto st1548;
 tr3232:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (compile_active) {
-     if (! ctx->expr_error) {
+     if (! expr_error) {
       if (compile_active) { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; } };
-      add_Z88_INVOKE(ctx->expr_value);
+      add_Z88_INVOKE(expr_value);
      }
     }
    }
@@ -3116,7 +3120,7 @@ tr3246:
     }
 	goto st1548;
 tr3251:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ asm_DEFC(name->str, pop_expr(ctx));
      if ( ctx->p->tok == TK_COMMA )
@@ -3125,24 +3129,24 @@ tr3251:
 	goto st1548;
 tr3257:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_start(ctx->expr_value);
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_start(expr_value);
     ctx->current_sm = SM_DEFVARS_OPEN;
     }
 	goto st1548;
 tr3263:
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_start(ctx->expr_value);
+	{ if (! expr_error)
+    asm_DEFVARS_start(expr_value);
     ctx->current_sm = SM_DEFVARS_LINE;
     }
 	goto st1548;
 tr3264:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_start(ctx->expr_value);
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_start(expr_value);
     ctx->current_sm = SM_DEFVARS_OPEN;
     }
 	goto st1548;
@@ -3151,14 +3155,14 @@ tr3270:
 	goto st1548;
 tr3275:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error) asm_LINE(ctx->expr_value); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (!expr_error) asm_LINE(expr_value); }
 	goto st1548;
 tr3280:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error) asm_LINE(ctx->expr_value); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (!expr_error) asm_LINE(expr_value); }
 	goto st1548;
 tr3283:
 	{ asm_LSTOFF(); }
@@ -3171,14 +3175,14 @@ tr3286:
 	goto st1548;
 tr3290:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error) asm_ORG(ctx->expr_value); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (!expr_error) asm_ORG(expr_value); }
 	goto st1548;
 tr3295:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (!ctx->expr_error) asm_ORG(ctx->expr_value); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (!expr_error) asm_ORG(expr_value); }
 	goto st1548;
 tr3300:
 	{ asm_SECTION(name->str); }
@@ -3302,9 +3306,9 @@ case 3:
 tr100:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st4;
 st4:
@@ -3316,13 +3320,13 @@ case 4:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -3349,25 +3353,25 @@ case 4:
 tr102:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st5;
 tr103:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st5;
 tr108:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st5;
 tr110:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st5;
 st5:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3386,7 +3390,7 @@ case 5:
 	}
 	goto st0;
 tr111:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st6;
 st6:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3397,13 +3401,13 @@ case 6:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -3459,9 +3463,9 @@ case 8:
 tr113:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st9;
 st9:
@@ -3473,13 +3477,13 @@ case 9:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -3506,25 +3510,25 @@ case 9:
 tr114:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st10;
 tr115:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st10;
 tr120:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st10;
 tr122:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st10;
 st10:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3543,7 +3547,7 @@ case 10:
 	}
 	goto st0;
 tr123:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st11;
 st11:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3554,13 +3558,13 @@ case 11:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -3604,9 +3608,9 @@ case 12:
 tr124:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st13;
 st13:
@@ -3618,13 +3622,13 @@ case 13:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -3651,25 +3655,25 @@ case 13:
 tr125:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st14;
 tr126:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st14;
 tr132:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st14;
 tr145:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st14;
 st14:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3689,14 +3693,14 @@ case 14:
 	goto st0;
 tr129:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ value1 = ctx->expr_error ? 0 : ctx->expr_value; }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ value1 = expr_error ? 0 : expr_value; }
 	goto st15;
 tr146:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ value1 = ctx->expr_error ? 0 : ctx->expr_value; }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ value1 = expr_error ? 0 : expr_value; }
 	goto st15;
 st15:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3718,9 +3722,9 @@ case 15:
 tr133:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st16;
 st16:
@@ -3732,13 +3736,13 @@ case 16:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -3765,25 +3769,25 @@ case 16:
 tr134:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st17;
 tr135:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st17;
 tr140:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st17;
 tr142:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st17;
 st17:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3802,7 +3806,7 @@ case 17:
 	}
 	goto st0;
 tr143:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st18;
 st18:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3813,13 +3817,13 @@ case 18:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -3844,7 +3848,7 @@ case 18:
 		goto tr142;
 	goto st0;
 tr147:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st19;
 st19:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3855,13 +3859,13 @@ case 19:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -3905,9 +3909,9 @@ case 20:
 tr148:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st21;
 st21:
@@ -3919,13 +3923,13 @@ case 21:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -3952,25 +3956,25 @@ case 21:
 tr149:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st22;
 tr150:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st22;
 tr155:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st22;
 tr157:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st22;
 st22:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -3989,7 +3993,7 @@ case 22:
 	}
 	goto st0;
 tr158:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st23;
 st23:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4000,13 +4004,13 @@ case 23:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4065,9 +4069,9 @@ case 24:
 tr159:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st25;
 st25:
@@ -4079,13 +4083,13 @@ case 25:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4112,25 +4116,25 @@ case 25:
 tr160:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st26;
 tr161:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st26;
 tr181:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st26;
 tr183:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st26;
 st26:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4149,7 +4153,7 @@ case 26:
 	}
 	goto st0;
 tr184:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st27;
 st27:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4160,13 +4164,13 @@ case 27:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4335,9 +4339,9 @@ case 42:
 tr199:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st43;
 st43:
@@ -4349,13 +4353,13 @@ case 43:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4380,10 +4384,10 @@ case 43:
 		goto st44;
 	goto st0;
 tr208:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st44;
 tr211:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st44;
 st44:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4410,13 +4414,13 @@ case 45:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4444,7 +4448,7 @@ tr204:
 	{ push_expr(ctx); }
 	goto st46;
 tr212:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st46;
 st46:
@@ -4455,7 +4459,7 @@ case 46:
 		goto tr210;
 	goto st0;
 tr213:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st47;
 st47:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4466,13 +4470,13 @@ case 47:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4500,7 +4504,7 @@ tr205:
 	{ push_expr(ctx); }
 	goto st48;
 tr214:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st48;
 st48:
@@ -4512,13 +4516,13 @@ case 48:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4544,7 +4548,7 @@ case 48:
 		goto tr211;
 	goto st0;
 tr215:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st49;
 st49:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4555,13 +4559,13 @@ case 49:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4588,22 +4592,22 @@ case 49:
 tr200:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st50;
 tr201:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st50;
 tr218:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st50;
 st50:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4649,9 +4653,9 @@ case 52:
 tr220:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st53;
 st53:
@@ -4663,13 +4667,13 @@ case 53:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4694,10 +4698,10 @@ case 53:
 		goto st54;
 	goto st0;
 tr229:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st54;
 tr232:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st54;
 st54:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4724,13 +4728,13 @@ case 55:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4758,7 +4762,7 @@ tr225:
 	{ push_expr(ctx); }
 	goto st56;
 tr233:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st56;
 st56:
@@ -4769,7 +4773,7 @@ case 56:
 		goto tr231;
 	goto st0;
 tr234:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st57;
 st57:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4780,13 +4784,13 @@ case 57:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4814,7 +4818,7 @@ tr226:
 	{ push_expr(ctx); }
 	goto st58;
 tr235:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st58;
 st58:
@@ -4826,13 +4830,13 @@ case 58:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4858,7 +4862,7 @@ case 58:
 		goto tr232;
 	goto st0;
 tr236:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st59;
 st59:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -4869,13 +4873,13 @@ case 59:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -4902,22 +4906,22 @@ case 59:
 tr221:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st60;
 tr222:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st60;
 tr239:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st60;
 st60:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5025,9 +5029,9 @@ case 68:
 tr250:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st69;
 st69:
@@ -5039,13 +5043,13 @@ case 69:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5072,25 +5076,25 @@ case 69:
 tr251:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st70;
 tr252:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st70;
 tr274:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st70;
 tr276:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st70;
 st70:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5109,7 +5113,7 @@ case 70:
 	}
 	goto st0;
 tr277:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st71;
 st71:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5120,13 +5124,13 @@ case 71:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5295,9 +5299,9 @@ case 86:
 tr292:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st87;
 st87:
@@ -5309,13 +5313,13 @@ case 87:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5340,10 +5344,10 @@ case 87:
 		goto st88;
 	goto st0;
 tr301:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st88;
 tr304:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st88;
 st88:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5370,13 +5374,13 @@ case 89:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5404,7 +5408,7 @@ tr297:
 	{ push_expr(ctx); }
 	goto st90;
 tr305:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st90;
 st90:
@@ -5415,7 +5419,7 @@ case 90:
 		goto tr303;
 	goto st0;
 tr306:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st91;
 st91:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5426,13 +5430,13 @@ case 91:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5460,7 +5464,7 @@ tr298:
 	{ push_expr(ctx); }
 	goto st92;
 tr307:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st92;
 st92:
@@ -5472,13 +5476,13 @@ case 92:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5504,7 +5508,7 @@ case 92:
 		goto tr304;
 	goto st0;
 tr308:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st93;
 st93:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5515,13 +5519,13 @@ case 93:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5548,22 +5552,22 @@ case 93:
 tr293:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st94;
 tr294:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st94;
 tr311:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st94;
 st94:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5609,9 +5613,9 @@ case 96:
 tr313:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st97;
 st97:
@@ -5623,13 +5627,13 @@ case 97:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5654,10 +5658,10 @@ case 97:
 		goto st98;
 	goto st0;
 tr322:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st98;
 tr325:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st98;
 st98:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5684,13 +5688,13 @@ case 99:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5718,7 +5722,7 @@ tr318:
 	{ push_expr(ctx); }
 	goto st100;
 tr326:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st100;
 st100:
@@ -5729,7 +5733,7 @@ case 100:
 		goto tr324;
 	goto st0;
 tr327:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st101;
 st101:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5740,13 +5744,13 @@ case 101:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5774,7 +5778,7 @@ tr319:
 	{ push_expr(ctx); }
 	goto st102;
 tr328:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st102;
 st102:
@@ -5786,13 +5790,13 @@ case 102:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5818,7 +5822,7 @@ case 102:
 		goto tr325;
 	goto st0;
 tr329:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st103;
 st103:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -5829,13 +5833,13 @@ case 103:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -5862,22 +5866,22 @@ case 103:
 tr314:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st104;
 tr315:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st104;
 tr332:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st104;
 st104:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6074,9 +6078,9 @@ case 124:
 tr361:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st125;
 st125:
@@ -6088,13 +6092,13 @@ case 125:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6121,25 +6125,25 @@ case 125:
 tr362:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st126;
 tr363:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st126;
 tr382:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st126;
 tr384:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st126;
 st126:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6158,7 +6162,7 @@ case 126:
 	}
 	goto st0;
 tr385:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st127;
 st127:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6169,13 +6173,13 @@ case 127:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6344,9 +6348,9 @@ case 142:
 tr400:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st143;
 st143:
@@ -6358,13 +6362,13 @@ case 143:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6389,10 +6393,10 @@ case 143:
 		goto st144;
 	goto st0;
 tr409:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st144;
 tr412:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st144;
 st144:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6419,13 +6423,13 @@ case 145:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6453,7 +6457,7 @@ tr405:
 	{ push_expr(ctx); }
 	goto st146;
 tr413:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st146;
 st146:
@@ -6464,7 +6468,7 @@ case 146:
 		goto tr411;
 	goto st0;
 tr414:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st147;
 st147:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6475,13 +6479,13 @@ case 147:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6509,7 +6513,7 @@ tr406:
 	{ push_expr(ctx); }
 	goto st148;
 tr415:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st148;
 st148:
@@ -6521,13 +6525,13 @@ case 148:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6553,7 +6557,7 @@ case 148:
 		goto tr412;
 	goto st0;
 tr416:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st149;
 st149:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6564,13 +6568,13 @@ case 149:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6597,22 +6601,22 @@ case 149:
 tr401:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st150;
 tr402:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st150;
 tr419:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st150;
 st150:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6658,9 +6662,9 @@ case 152:
 tr421:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st153;
 st153:
@@ -6672,13 +6676,13 @@ case 153:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6703,10 +6707,10 @@ case 153:
 		goto st154;
 	goto st0;
 tr430:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st154;
 tr433:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st154;
 st154:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6733,13 +6737,13 @@ case 155:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6767,7 +6771,7 @@ tr426:
 	{ push_expr(ctx); }
 	goto st156;
 tr434:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st156;
 st156:
@@ -6778,7 +6782,7 @@ case 156:
 		goto tr432;
 	goto st0;
 tr435:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st157;
 st157:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6789,13 +6793,13 @@ case 157:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6823,7 +6827,7 @@ tr427:
 	{ push_expr(ctx); }
 	goto st158;
 tr436:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st158;
 st158:
@@ -6835,13 +6839,13 @@ case 158:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6867,7 +6871,7 @@ case 158:
 		goto tr433;
 	goto st0;
 tr437:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st159;
 st159:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6878,13 +6882,13 @@ case 159:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -6911,22 +6915,22 @@ case 159:
 tr422:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st160;
 tr423:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st160;
 tr440:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st160;
 st160:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -6971,9 +6975,9 @@ case 162:
 tr442:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st163;
 st163:
@@ -6985,13 +6989,13 @@ case 163:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7017,25 +7021,25 @@ case 163:
 tr443:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st164;
 tr444:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st164;
 tr449:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st164;
 tr510:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st164;
 st164:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7055,12 +7059,12 @@ case 164:
 	goto st0;
 tr446:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	goto st165;
 tr511:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	goto st165;
 st165:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7156,9 +7160,9 @@ case 174:
 tr468:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st175;
 st175:
@@ -7170,13 +7174,13 @@ case 175:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7201,10 +7205,10 @@ case 175:
 		goto st176;
 	goto st0;
 tr477:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st176;
 tr480:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st176;
 st176:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7231,13 +7235,13 @@ case 177:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7265,7 +7269,7 @@ tr473:
 	{ push_expr(ctx); }
 	goto st178;
 tr481:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st178;
 st178:
@@ -7276,7 +7280,7 @@ case 178:
 		goto tr479;
 	goto st0;
 tr482:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st179;
 st179:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7287,13 +7291,13 @@ case 179:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7321,7 +7325,7 @@ tr474:
 	{ push_expr(ctx); }
 	goto st180;
 tr483:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st180;
 st180:
@@ -7333,13 +7337,13 @@ case 180:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7365,7 +7369,7 @@ case 180:
 		goto tr480;
 	goto st0;
 tr484:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st181;
 st181:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7376,13 +7380,13 @@ case 181:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7409,22 +7413,22 @@ case 181:
 tr469:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st182;
 tr470:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st182;
 tr487:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st182;
 st182:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7470,9 +7474,9 @@ case 184:
 tr489:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st185;
 st185:
@@ -7484,13 +7488,13 @@ case 185:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7515,10 +7519,10 @@ case 185:
 		goto st186;
 	goto st0;
 tr498:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st186;
 tr501:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st186;
 st186:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7545,13 +7549,13 @@ case 187:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7579,7 +7583,7 @@ tr494:
 	{ push_expr(ctx); }
 	goto st188;
 tr502:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st188;
 st188:
@@ -7590,7 +7594,7 @@ case 188:
 		goto tr500;
 	goto st0;
 tr503:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st189;
 st189:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7601,13 +7605,13 @@ case 189:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7635,7 +7639,7 @@ tr495:
 	{ push_expr(ctx); }
 	goto st190;
 tr504:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st190;
 st190:
@@ -7647,13 +7651,13 @@ case 190:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7679,7 +7683,7 @@ case 190:
 		goto tr501;
 	goto st0;
 tr505:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st191;
 st191:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7690,13 +7694,13 @@ case 191:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7723,22 +7727,22 @@ case 191:
 tr490:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st192;
 tr491:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st192;
 tr508:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st192;
 st192:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7764,7 +7768,7 @@ case 193:
 		goto tr509;
 	goto st0;
 tr512:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st194;
 st194:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7775,13 +7779,13 @@ case 194:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7832,9 +7836,9 @@ case 195:
 tr513:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st196;
 st196:
@@ -7846,13 +7850,13 @@ case 196:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7879,25 +7883,25 @@ case 196:
 tr514:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st197;
 tr515:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st197;
 tr528:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st197;
 tr530:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st197;
 st197:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7916,7 +7920,7 @@ case 197:
 	}
 	goto st0;
 tr531:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st198;
 st198:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -7927,13 +7931,13 @@ case 198:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -7984,9 +7988,9 @@ case 200:
 tr533:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st201;
 st201:
@@ -7998,13 +8002,13 @@ case 201:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8031,25 +8035,25 @@ case 201:
 tr534:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st202;
 tr535:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st202;
 tr540:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st202;
 tr542:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st202;
 st202:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8068,7 +8072,7 @@ case 202:
 	}
 	goto st0;
 tr543:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st203;
 st203:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8079,13 +8083,13 @@ case 203:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8136,9 +8140,9 @@ case 205:
 tr545:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st206;
 st206:
@@ -8150,13 +8154,13 @@ case 206:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8183,25 +8187,25 @@ case 206:
 tr546:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st207;
 tr547:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st207;
 tr552:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st207;
 tr554:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st207;
 st207:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8220,7 +8224,7 @@ case 207:
 	}
 	goto st0;
 tr555:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st208;
 st208:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8231,13 +8235,13 @@ case 208:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8288,9 +8292,9 @@ case 210:
 tr557:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st211;
 st211:
@@ -8302,13 +8306,13 @@ case 211:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8335,25 +8339,25 @@ case 211:
 tr558:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st212;
 tr559:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st212;
 tr564:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st212;
 tr566:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st212;
 st212:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8372,7 +8376,7 @@ case 212:
 	}
 	goto st0;
 tr567:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st213;
 st213:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8383,13 +8387,13 @@ case 213:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8440,9 +8444,9 @@ case 215:
 tr569:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st216;
 st216:
@@ -8454,13 +8458,13 @@ case 216:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8487,25 +8491,25 @@ case 216:
 tr570:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st217;
 tr571:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st217;
 tr576:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st217;
 tr578:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st217;
 st217:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8524,7 +8528,7 @@ case 217:
 	}
 	goto st0;
 tr579:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st218;
 st218:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8535,13 +8539,13 @@ case 218:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8592,9 +8596,9 @@ case 220:
 tr581:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st221;
 st221:
@@ -8606,13 +8610,13 @@ case 221:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8639,25 +8643,25 @@ case 221:
 tr582:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st222;
 tr583:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st222;
 tr588:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st222;
 tr590:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st222;
 st222:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8676,7 +8680,7 @@ case 222:
 	}
 	goto st0;
 tr591:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st223;
 st223:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8687,13 +8691,13 @@ case 223:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8744,9 +8748,9 @@ case 225:
 tr593:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st226;
 st226:
@@ -8758,13 +8762,13 @@ case 226:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8791,25 +8795,25 @@ case 226:
 tr594:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st227;
 tr595:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st227;
 tr600:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st227;
 tr602:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st227;
 st227:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8828,7 +8832,7 @@ case 227:
 	}
 	goto st0;
 tr603:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st228;
 st228:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8839,13 +8843,13 @@ case 228:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8896,9 +8900,9 @@ case 230:
 tr605:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st231;
 st231:
@@ -8910,13 +8914,13 @@ case 231:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -8943,25 +8947,25 @@ case 231:
 tr606:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st232;
 tr607:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st232;
 tr612:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st232;
 tr614:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st232;
 st232:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8980,7 +8984,7 @@ case 232:
 	}
 	goto st0;
 tr615:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st233;
 st233:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -8991,13 +8995,13 @@ case 233:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9048,9 +9052,9 @@ case 235:
 tr617:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st236;
 st236:
@@ -9062,13 +9066,13 @@ case 236:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9095,25 +9099,25 @@ case 236:
 tr618:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st237;
 tr619:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st237;
 tr624:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st237;
 tr626:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st237;
 st237:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9132,7 +9136,7 @@ case 237:
 	}
 	goto st0;
 tr627:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st238;
 st238:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9143,13 +9147,13 @@ case 238:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9214,9 +9218,9 @@ case 240:
 tr629:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st241;
 st241:
@@ -9228,13 +9232,13 @@ case 241:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9261,25 +9265,25 @@ case 241:
 tr630:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st242;
 tr631:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st242;
 tr650:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st242;
 tr652:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st242;
 st242:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9298,7 +9302,7 @@ case 242:
 	}
 	goto st0;
 tr653:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st243;
 st243:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9309,13 +9313,13 @@ case 243:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9484,9 +9488,9 @@ case 258:
 tr668:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st259;
 st259:
@@ -9498,13 +9502,13 @@ case 259:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9529,10 +9533,10 @@ case 259:
 		goto st260;
 	goto st0;
 tr677:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st260;
 tr680:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st260;
 st260:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9559,13 +9563,13 @@ case 261:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9593,7 +9597,7 @@ tr673:
 	{ push_expr(ctx); }
 	goto st262;
 tr681:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st262;
 st262:
@@ -9604,7 +9608,7 @@ case 262:
 		goto tr679;
 	goto st0;
 tr682:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st263;
 st263:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9615,13 +9619,13 @@ case 263:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9649,7 +9653,7 @@ tr674:
 	{ push_expr(ctx); }
 	goto st264;
 tr683:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st264;
 st264:
@@ -9661,13 +9665,13 @@ case 264:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9693,7 +9697,7 @@ case 264:
 		goto tr680;
 	goto st0;
 tr684:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st265;
 st265:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9704,13 +9708,13 @@ case 265:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9737,22 +9741,22 @@ case 265:
 tr669:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st266;
 tr670:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st266;
 tr687:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st266;
 st266:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9798,9 +9802,9 @@ case 268:
 tr689:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st269;
 st269:
@@ -9812,13 +9816,13 @@ case 269:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9843,10 +9847,10 @@ case 269:
 		goto st270;
 	goto st0;
 tr698:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st270;
 tr701:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st270;
 st270:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9873,13 +9877,13 @@ case 271:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9907,7 +9911,7 @@ tr694:
 	{ push_expr(ctx); }
 	goto st272;
 tr702:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st272;
 st272:
@@ -9918,7 +9922,7 @@ case 272:
 		goto tr700;
 	goto st0;
 tr703:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st273;
 st273:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -9929,13 +9933,13 @@ case 273:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -9963,7 +9967,7 @@ tr695:
 	{ push_expr(ctx); }
 	goto st274;
 tr704:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st274;
 st274:
@@ -9975,13 +9979,13 @@ case 274:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10007,7 +10011,7 @@ case 274:
 		goto tr701;
 	goto st0;
 tr705:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st275;
 st275:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10018,13 +10022,13 @@ case 275:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10051,22 +10055,22 @@ case 275:
 tr690:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st276;
 tr691:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st276;
 tr708:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st276;
 st276:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10307,9 +10311,9 @@ case 303:
 tr754:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st304;
 st304:
@@ -10321,13 +10325,13 @@ case 304:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10352,10 +10356,10 @@ case 304:
 		goto st305;
 	goto st0;
 tr763:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st305;
 tr766:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st305;
 st305:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10382,13 +10386,13 @@ case 306:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10416,7 +10420,7 @@ tr759:
 	{ push_expr(ctx); }
 	goto st307;
 tr767:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st307;
 st307:
@@ -10427,7 +10431,7 @@ case 307:
 		goto tr765;
 	goto st0;
 tr768:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st308;
 st308:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10438,13 +10442,13 @@ case 308:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10472,7 +10476,7 @@ tr760:
 	{ push_expr(ctx); }
 	goto st309;
 tr769:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st309;
 st309:
@@ -10484,13 +10488,13 @@ case 309:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10516,7 +10520,7 @@ case 309:
 		goto tr766;
 	goto st0;
 tr770:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st310;
 st310:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10527,13 +10531,13 @@ case 310:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10560,22 +10564,22 @@ case 310:
 tr755:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st311;
 tr756:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st311;
 tr773:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st311;
 st311:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10621,9 +10625,9 @@ case 313:
 tr775:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st314;
 st314:
@@ -10635,13 +10639,13 @@ case 314:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10666,10 +10670,10 @@ case 314:
 		goto st315;
 	goto st0;
 tr784:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st315;
 tr787:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st315;
 st315:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10696,13 +10700,13 @@ case 316:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10730,7 +10734,7 @@ tr780:
 	{ push_expr(ctx); }
 	goto st317;
 tr788:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st317;
 st317:
@@ -10741,7 +10745,7 @@ case 317:
 		goto tr786;
 	goto st0;
 tr789:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st318;
 st318:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10752,13 +10756,13 @@ case 318:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10786,7 +10790,7 @@ tr781:
 	{ push_expr(ctx); }
 	goto st319;
 tr790:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st319;
 st319:
@@ -10798,13 +10802,13 @@ case 319:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10830,7 +10834,7 @@ case 319:
 		goto tr787;
 	goto st0;
 tr791:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st320;
 st320:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10841,13 +10845,13 @@ case 320:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10874,22 +10878,22 @@ case 320:
 tr776:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st321;
 tr777:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st321;
 tr794:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st321;
 st321:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -10941,9 +10945,9 @@ case 324:
 tr797:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st325;
 st325:
@@ -10955,13 +10959,13 @@ case 325:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -10988,25 +10992,25 @@ case 325:
 tr798:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st326;
 tr799:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st326;
 tr804:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st326;
 tr806:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st326;
 st326:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -11025,7 +11029,7 @@ case 326:
 	}
 	goto st0;
 tr807:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st327;
 st327:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -11036,13 +11040,13 @@ case 327:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -11206,9 +11210,9 @@ case 344:
 tr829:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st345;
 st345:
@@ -11220,13 +11224,13 @@ case 345:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -11253,25 +11257,25 @@ case 345:
 tr830:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st346;
 tr831:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st346;
 tr836:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st346;
 tr838:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st346;
 st346:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -11290,7 +11294,7 @@ case 346:
 	}
 	goto st0;
 tr839:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st347;
 st347:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -11301,13 +11305,13 @@ case 347:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -11499,9 +11503,9 @@ case 368:
 tr866:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st369;
 st369:
@@ -11513,13 +11517,13 @@ case 369:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -11546,25 +11550,25 @@ case 369:
 tr867:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st370;
 tr868:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st370;
 tr874:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st370;
 tr876:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st370;
 st370:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -11583,7 +11587,7 @@ case 370:
 	}
 	goto st0;
 tr877:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st371;
 st371:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -11594,13 +11598,13 @@ case 371:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -11805,9 +11809,9 @@ case 392:
 tr917:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st393;
 st393:
@@ -11819,13 +11823,13 @@ case 393:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -11850,10 +11854,10 @@ case 393:
 		goto st394;
 	goto st0;
 tr926:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st394;
 tr929:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st394;
 st394:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -11880,13 +11884,13 @@ case 395:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -11914,7 +11918,7 @@ tr922:
 	{ push_expr(ctx); }
 	goto st396;
 tr930:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st396;
 st396:
@@ -11925,7 +11929,7 @@ case 396:
 		goto tr928;
 	goto st0;
 tr931:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st397;
 st397:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -11936,13 +11940,13 @@ case 397:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -11970,7 +11974,7 @@ tr923:
 	{ push_expr(ctx); }
 	goto st398;
 tr932:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st398;
 st398:
@@ -11982,13 +11986,13 @@ case 398:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12014,7 +12018,7 @@ case 398:
 		goto tr929;
 	goto st0;
 tr933:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st399;
 st399:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12025,13 +12029,13 @@ case 399:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12058,22 +12062,22 @@ case 399:
 tr918:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st400;
 tr919:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st400;
 tr936:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st400;
 st400:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12119,9 +12123,9 @@ case 402:
 tr938:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st403;
 st403:
@@ -12133,13 +12137,13 @@ case 403:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12164,10 +12168,10 @@ case 403:
 		goto st404;
 	goto st0;
 tr947:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st404;
 tr950:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st404;
 st404:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12194,13 +12198,13 @@ case 405:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12228,7 +12232,7 @@ tr943:
 	{ push_expr(ctx); }
 	goto st406;
 tr951:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st406;
 st406:
@@ -12239,7 +12243,7 @@ case 406:
 		goto tr949;
 	goto st0;
 tr952:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st407;
 st407:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12250,13 +12254,13 @@ case 407:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12284,7 +12288,7 @@ tr944:
 	{ push_expr(ctx); }
 	goto st408;
 tr953:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st408;
 st408:
@@ -12296,13 +12300,13 @@ case 408:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12328,7 +12332,7 @@ case 408:
 		goto tr950;
 	goto st0;
 tr954:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st409;
 st409:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12339,13 +12343,13 @@ case 409:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12372,22 +12376,22 @@ case 409:
 tr939:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st410;
 tr940:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st410;
 tr957:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st410;
 st410:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12471,9 +12475,9 @@ case 416:
 tr963:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st417;
 st417:
@@ -12485,13 +12489,13 @@ case 417:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12518,25 +12522,25 @@ case 417:
 tr964:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st418;
 tr965:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st418;
 tr981:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st418;
 tr983:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st418;
 st418:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12555,7 +12559,7 @@ case 418:
 	}
 	goto st0;
 tr984:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st419;
 st419:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12566,13 +12570,13 @@ case 419:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12623,9 +12627,9 @@ case 421:
 tr986:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st422;
 st422:
@@ -12637,13 +12641,13 @@ case 422:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12670,25 +12674,25 @@ case 422:
 tr987:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st423;
 tr988:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st423;
 tr993:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st423;
 tr995:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st423;
 st423:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12707,7 +12711,7 @@ case 423:
 	}
 	goto st0;
 tr996:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st424;
 st424:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12718,13 +12722,13 @@ case 424:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12775,9 +12779,9 @@ case 426:
 tr998:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st427;
 st427:
@@ -12789,13 +12793,13 @@ case 427:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12822,25 +12826,25 @@ case 427:
 tr999:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st428;
 tr1000:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st428;
 tr1005:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st428;
 tr1007:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st428;
 st428:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12859,7 +12863,7 @@ case 428:
 	}
 	goto st0;
 tr1008:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st429;
 st429:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -12870,13 +12874,13 @@ case 429:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12927,9 +12931,9 @@ case 431:
 tr1010:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st432;
 st432:
@@ -12941,13 +12945,13 @@ case 432:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -12974,25 +12978,25 @@ case 432:
 tr1011:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st433;
 tr1012:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st433;
 tr1017:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st433;
 tr1019:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st433;
 st433:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13011,7 +13015,7 @@ case 433:
 	}
 	goto st0;
 tr1020:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st434;
 st434:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13022,13 +13026,13 @@ case 434:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13079,9 +13083,9 @@ case 436:
 tr1022:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st437;
 st437:
@@ -13093,13 +13097,13 @@ case 437:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13126,25 +13130,25 @@ case 437:
 tr1023:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st438;
 tr1024:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st438;
 tr1029:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st438;
 tr1031:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st438;
 st438:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13163,7 +13167,7 @@ case 438:
 	}
 	goto st0;
 tr1032:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st439;
 st439:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13174,13 +13178,13 @@ case 439:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13231,9 +13235,9 @@ case 441:
 tr1034:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st442;
 st442:
@@ -13245,13 +13249,13 @@ case 442:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13278,25 +13282,25 @@ case 442:
 tr1035:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st443;
 tr1036:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st443;
 tr1041:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st443;
 tr1043:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st443;
 st443:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13315,7 +13319,7 @@ case 443:
 	}
 	goto st0;
 tr1044:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st444;
 st444:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13326,13 +13330,13 @@ case 444:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13383,9 +13387,9 @@ case 446:
 tr1046:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st447;
 st447:
@@ -13397,13 +13401,13 @@ case 447:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13430,25 +13434,25 @@ case 447:
 tr1047:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st448;
 tr1048:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st448;
 tr1053:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st448;
 tr1055:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st448;
 st448:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13467,7 +13471,7 @@ case 448:
 	}
 	goto st0;
 tr1056:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st449;
 st449:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13478,13 +13482,13 @@ case 449:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13535,9 +13539,9 @@ case 451:
 tr1058:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st452;
 st452:
@@ -13549,13 +13553,13 @@ case 452:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13582,25 +13586,25 @@ case 452:
 tr1059:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st453;
 tr1060:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st453;
 tr1065:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st453;
 tr1067:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st453;
 st453:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13619,7 +13623,7 @@ case 453:
 	}
 	goto st0;
 tr1068:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st454;
 st454:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13630,13 +13634,13 @@ case 454:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13687,9 +13691,9 @@ case 456:
 tr1070:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st457;
 st457:
@@ -13701,13 +13705,13 @@ case 457:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13734,25 +13738,25 @@ case 457:
 tr1071:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st458;
 tr1072:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st458;
 tr1077:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st458;
 tr1079:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st458;
 st458:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13771,7 +13775,7 @@ case 458:
 	}
 	goto st0;
 tr1080:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st459;
 st459:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13782,13 +13786,13 @@ case 459:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13871,9 +13875,9 @@ case 465:
 tr1086:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st466;
 st466:
@@ -13885,13 +13889,13 @@ case 466:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -13918,25 +13922,25 @@ case 466:
 tr1087:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st467;
 tr1088:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st467;
 tr1097:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st467;
 tr1099:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st467;
 st467:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13955,7 +13959,7 @@ case 467:
 	}
 	goto st0;
 tr1100:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st468;
 st468:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -13966,13 +13970,13 @@ case 468:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14023,9 +14027,9 @@ case 470:
 tr1102:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st471;
 st471:
@@ -14037,13 +14041,13 @@ case 471:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14070,25 +14074,25 @@ case 471:
 tr1103:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st472;
 tr1104:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st472;
 tr1109:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st472;
 tr1111:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st472;
 st472:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14107,7 +14111,7 @@ case 472:
 	}
 	goto st0;
 tr1112:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st473;
 st473:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14118,13 +14122,13 @@ case 473:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14175,9 +14179,9 @@ case 475:
 tr1114:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st476;
 st476:
@@ -14189,13 +14193,13 @@ case 476:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14222,25 +14226,25 @@ case 476:
 tr1115:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st477;
 tr1116:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st477;
 tr1121:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st477;
 tr1123:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st477;
 st477:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14259,7 +14263,7 @@ case 477:
 	}
 	goto st0;
 tr1124:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st478;
 st478:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14270,13 +14274,13 @@ case 478:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14327,9 +14331,9 @@ case 480:
 tr1126:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st481;
 st481:
@@ -14341,13 +14345,13 @@ case 481:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14374,25 +14378,25 @@ case 481:
 tr1127:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st482;
 tr1128:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st482;
 tr1133:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st482;
 tr1135:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st482;
 st482:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14411,7 +14415,7 @@ case 482:
 	}
 	goto st0;
 tr1136:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st483;
 st483:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14422,13 +14426,13 @@ case 483:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14479,9 +14483,9 @@ case 485:
 tr1138:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st486;
 st486:
@@ -14493,13 +14497,13 @@ case 486:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14526,25 +14530,25 @@ case 486:
 tr1139:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st487;
 tr1140:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st487;
 tr1145:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st487;
 tr1147:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st487;
 st487:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14563,7 +14567,7 @@ case 487:
 	}
 	goto st0;
 tr1148:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st488;
 st488:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14574,13 +14578,13 @@ case 488:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14650,9 +14654,9 @@ case 489:
 tr1149:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st490;
 st490:
@@ -14664,13 +14668,13 @@ case 490:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14696,25 +14700,25 @@ case 490:
 tr1150:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st491;
 tr1151:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st491;
 tr1182:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st491;
 tr1197:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st491;
 st491:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14736,7 +14740,7 @@ tr1179:
 	{ push_expr(ctx); }
 	goto st492;
 tr1198:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st492;
 st492:
@@ -14803,7 +14807,7 @@ case 499:
 		goto tr1196;
 	goto st0;
 tr1199:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st500;
 st500:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14814,13 +14818,13 @@ case 500:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14884,9 +14888,9 @@ case 502:
 tr1201:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st503;
 st503:
@@ -14898,13 +14902,13 @@ case 503:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -14931,25 +14935,25 @@ case 503:
 tr1202:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st504;
 tr1203:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st504;
 tr1222:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st504;
 tr1224:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st504;
 st504:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14968,7 +14972,7 @@ case 504:
 	}
 	goto st0;
 tr1225:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st505;
 st505:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -14979,13 +14983,13 @@ case 505:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15114,9 +15118,9 @@ case 518:
 tr1238:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st519;
 st519:
@@ -15128,13 +15132,13 @@ case 519:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15159,10 +15163,10 @@ case 519:
 		goto st520;
 	goto st0;
 tr1247:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st520;
 tr1250:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st520;
 st520:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15189,13 +15193,13 @@ case 521:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15223,7 +15227,7 @@ tr1243:
 	{ push_expr(ctx); }
 	goto st522;
 tr1251:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st522;
 st522:
@@ -15234,7 +15238,7 @@ case 522:
 		goto tr1249;
 	goto st0;
 tr1252:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st523;
 st523:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15245,13 +15249,13 @@ case 523:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15279,7 +15283,7 @@ tr1244:
 	{ push_expr(ctx); }
 	goto st524;
 tr1253:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st524;
 st524:
@@ -15291,13 +15295,13 @@ case 524:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15323,7 +15327,7 @@ case 524:
 		goto tr1250;
 	goto st0;
 tr1254:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st525;
 st525:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15334,13 +15338,13 @@ case 525:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15367,22 +15371,22 @@ case 525:
 tr1239:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st526;
 tr1240:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st526;
 tr1257:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st526;
 st526:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15428,9 +15432,9 @@ case 528:
 tr1259:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st529;
 st529:
@@ -15442,13 +15446,13 @@ case 529:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15473,10 +15477,10 @@ case 529:
 		goto st530;
 	goto st0;
 tr1268:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st530;
 tr1271:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st530;
 st530:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15503,13 +15507,13 @@ case 531:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15537,7 +15541,7 @@ tr1264:
 	{ push_expr(ctx); }
 	goto st532;
 tr1272:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st532;
 st532:
@@ -15548,7 +15552,7 @@ case 532:
 		goto tr1270;
 	goto st0;
 tr1273:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st533;
 st533:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15559,13 +15563,13 @@ case 533:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15593,7 +15597,7 @@ tr1265:
 	{ push_expr(ctx); }
 	goto st534;
 tr1274:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st534;
 st534:
@@ -15605,13 +15609,13 @@ case 534:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15637,7 +15641,7 @@ case 534:
 		goto tr1271;
 	goto st0;
 tr1275:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st535;
 st535:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15648,13 +15652,13 @@ case 535:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15681,22 +15685,22 @@ case 535:
 tr1260:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st536;
 tr1261:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st536;
 tr1278:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st536;
 st536:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15762,9 +15766,9 @@ case 539:
 tr1281:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st540;
 st540:
@@ -15776,13 +15780,13 @@ case 540:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15809,25 +15813,25 @@ case 540:
 tr1282:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st541;
 tr1283:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st541;
 tr1302:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st541;
 tr1304:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st541;
 st541:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15846,7 +15850,7 @@ case 541:
 	}
 	goto st0;
 tr1305:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st542;
 st542:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -15857,13 +15861,13 @@ case 542:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -15992,9 +15996,9 @@ case 555:
 tr1318:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st556;
 st556:
@@ -16006,13 +16010,13 @@ case 556:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16037,10 +16041,10 @@ case 556:
 		goto st557;
 	goto st0;
 tr1327:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st557;
 tr1330:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st557;
 st557:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16067,13 +16071,13 @@ case 558:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16101,7 +16105,7 @@ tr1323:
 	{ push_expr(ctx); }
 	goto st559;
 tr1331:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st559;
 st559:
@@ -16112,7 +16116,7 @@ case 559:
 		goto tr1329;
 	goto st0;
 tr1332:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st560;
 st560:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16123,13 +16127,13 @@ case 560:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16157,7 +16161,7 @@ tr1324:
 	{ push_expr(ctx); }
 	goto st561;
 tr1333:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st561;
 st561:
@@ -16169,13 +16173,13 @@ case 561:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16201,7 +16205,7 @@ case 561:
 		goto tr1330;
 	goto st0;
 tr1334:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st562;
 st562:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16212,13 +16216,13 @@ case 562:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16245,22 +16249,22 @@ case 562:
 tr1319:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st563;
 tr1320:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st563;
 tr1337:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st563;
 st563:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16306,9 +16310,9 @@ case 565:
 tr1339:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st566;
 st566:
@@ -16320,13 +16324,13 @@ case 566:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16351,10 +16355,10 @@ case 566:
 		goto st567;
 	goto st0;
 tr1348:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st567;
 tr1351:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st567;
 st567:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16381,13 +16385,13 @@ case 568:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16415,7 +16419,7 @@ tr1344:
 	{ push_expr(ctx); }
 	goto st569;
 tr1352:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st569;
 st569:
@@ -16426,7 +16430,7 @@ case 569:
 		goto tr1350;
 	goto st0;
 tr1353:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st570;
 st570:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16437,13 +16441,13 @@ case 570:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16471,7 +16475,7 @@ tr1345:
 	{ push_expr(ctx); }
 	goto st571;
 tr1354:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st571;
 st571:
@@ -16483,13 +16487,13 @@ case 571:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16515,7 +16519,7 @@ case 571:
 		goto tr1351;
 	goto st0;
 tr1355:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st572;
 st572:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16526,13 +16530,13 @@ case 572:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16559,22 +16563,22 @@ case 572:
 tr1340:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st573;
 tr1341:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st573;
 tr1358:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st573;
 st573:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16640,9 +16644,9 @@ case 576:
 tr1361:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st577;
 st577:
@@ -16654,13 +16658,13 @@ case 577:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16687,25 +16691,25 @@ case 577:
 tr1362:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st578;
 tr1363:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st578;
 tr1382:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st578;
 tr1384:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st578;
 st578:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16724,7 +16728,7 @@ case 578:
 	}
 	goto st0;
 tr1385:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st579;
 st579:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16735,13 +16739,13 @@ case 579:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16870,9 +16874,9 @@ case 592:
 tr1398:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st593;
 st593:
@@ -16884,13 +16888,13 @@ case 593:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16915,10 +16919,10 @@ case 593:
 		goto st594;
 	goto st0;
 tr1407:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st594;
 tr1410:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st594;
 st594:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -16945,13 +16949,13 @@ case 595:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -16979,7 +16983,7 @@ tr1403:
 	{ push_expr(ctx); }
 	goto st596;
 tr1411:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st596;
 st596:
@@ -16990,7 +16994,7 @@ case 596:
 		goto tr1409;
 	goto st0;
 tr1412:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st597;
 st597:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17001,13 +17005,13 @@ case 597:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17035,7 +17039,7 @@ tr1404:
 	{ push_expr(ctx); }
 	goto st598;
 tr1413:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st598;
 st598:
@@ -17047,13 +17051,13 @@ case 598:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17079,7 +17083,7 @@ case 598:
 		goto tr1410;
 	goto st0;
 tr1414:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st599;
 st599:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17090,13 +17094,13 @@ case 599:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17123,22 +17127,22 @@ case 599:
 tr1399:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st600;
 tr1400:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st600;
 tr1417:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st600;
 st600:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17184,9 +17188,9 @@ case 602:
 tr1419:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st603;
 st603:
@@ -17198,13 +17202,13 @@ case 603:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17229,10 +17233,10 @@ case 603:
 		goto st604;
 	goto st0;
 tr1428:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st604;
 tr1431:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st604;
 st604:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17259,13 +17263,13 @@ case 605:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17293,7 +17297,7 @@ tr1424:
 	{ push_expr(ctx); }
 	goto st606;
 tr1432:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st606;
 st606:
@@ -17304,7 +17308,7 @@ case 606:
 		goto tr1430;
 	goto st0;
 tr1433:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st607;
 st607:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17315,13 +17319,13 @@ case 607:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17349,7 +17353,7 @@ tr1425:
 	{ push_expr(ctx); }
 	goto st608;
 tr1434:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st608;
 st608:
@@ -17361,13 +17365,13 @@ case 608:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17393,7 +17397,7 @@ case 608:
 		goto tr1431;
 	goto st0;
 tr1435:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st609;
 st609:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17404,13 +17408,13 @@ case 609:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17437,22 +17441,22 @@ case 609:
 tr1420:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st610;
 tr1421:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st610;
 tr1438:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st610;
 st610:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17518,9 +17522,9 @@ case 613:
 tr1441:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st614;
 st614:
@@ -17532,13 +17536,13 @@ case 614:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17565,25 +17569,25 @@ case 614:
 tr1442:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st615;
 tr1443:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st615;
 tr1462:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st615;
 tr1464:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st615;
 st615:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17602,7 +17606,7 @@ case 615:
 	}
 	goto st0;
 tr1465:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st616;
 st616:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17613,13 +17617,13 @@ case 616:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17748,9 +17752,9 @@ case 629:
 tr1478:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st630;
 st630:
@@ -17762,13 +17766,13 @@ case 630:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17793,10 +17797,10 @@ case 630:
 		goto st631;
 	goto st0;
 tr1487:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st631;
 tr1490:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st631;
 st631:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17823,13 +17827,13 @@ case 632:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17857,7 +17861,7 @@ tr1483:
 	{ push_expr(ctx); }
 	goto st633;
 tr1491:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st633;
 st633:
@@ -17868,7 +17872,7 @@ case 633:
 		goto tr1489;
 	goto st0;
 tr1492:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st634;
 st634:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17879,13 +17883,13 @@ case 634:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17913,7 +17917,7 @@ tr1484:
 	{ push_expr(ctx); }
 	goto st635;
 tr1493:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st635;
 st635:
@@ -17925,13 +17929,13 @@ case 635:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -17957,7 +17961,7 @@ case 635:
 		goto tr1490;
 	goto st0;
 tr1494:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st636;
 st636:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -17968,13 +17972,13 @@ case 636:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18001,22 +18005,22 @@ case 636:
 tr1479:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st637;
 tr1480:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st637;
 tr1497:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st637;
 st637:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18062,9 +18066,9 @@ case 639:
 tr1499:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st640;
 st640:
@@ -18076,13 +18080,13 @@ case 640:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18107,10 +18111,10 @@ case 640:
 		goto st641;
 	goto st0;
 tr1508:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st641;
 tr1511:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st641;
 st641:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18137,13 +18141,13 @@ case 642:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18171,7 +18175,7 @@ tr1504:
 	{ push_expr(ctx); }
 	goto st643;
 tr1512:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st643;
 st643:
@@ -18182,7 +18186,7 @@ case 643:
 		goto tr1510;
 	goto st0;
 tr1513:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st644;
 st644:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18193,13 +18197,13 @@ case 644:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18227,7 +18231,7 @@ tr1505:
 	{ push_expr(ctx); }
 	goto st645;
 tr1514:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st645;
 st645:
@@ -18239,13 +18243,13 @@ case 645:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18271,7 +18275,7 @@ case 645:
 		goto tr1511;
 	goto st0;
 tr1515:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st646;
 st646:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18282,13 +18286,13 @@ case 646:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18315,22 +18319,22 @@ case 646:
 tr1500:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st647;
 tr1501:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st647;
 tr1518:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st647;
 st647:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18392,9 +18396,9 @@ case 650:
 tr1521:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st651;
 st651:
@@ -18406,13 +18410,13 @@ case 651:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18439,25 +18443,25 @@ case 651:
 tr1522:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st652;
 tr1523:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st652;
 tr1538:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st652;
 tr1540:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st652;
 st652:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18476,7 +18480,7 @@ case 652:
 	}
 	goto st0;
 tr1541:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st653;
 st653:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18487,13 +18491,13 @@ case 653:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18594,9 +18598,9 @@ case 662:
 tr1550:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st663;
 st663:
@@ -18608,13 +18612,13 @@ case 663:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18639,10 +18643,10 @@ case 663:
 		goto st664;
 	goto st0;
 tr1559:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st664;
 tr1562:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st664;
 st664:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18669,13 +18673,13 @@ case 665:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18703,7 +18707,7 @@ tr1555:
 	{ push_expr(ctx); }
 	goto st666;
 tr1563:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st666;
 st666:
@@ -18714,7 +18718,7 @@ case 666:
 		goto tr1561;
 	goto st0;
 tr1564:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st667;
 st667:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18725,13 +18729,13 @@ case 667:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18759,7 +18763,7 @@ tr1556:
 	{ push_expr(ctx); }
 	goto st668;
 tr1565:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st668;
 st668:
@@ -18771,13 +18775,13 @@ case 668:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18803,7 +18807,7 @@ case 668:
 		goto tr1562;
 	goto st0;
 tr1566:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st669;
 st669:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18814,13 +18818,13 @@ case 669:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18847,22 +18851,22 @@ case 669:
 tr1551:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st670;
 tr1552:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st670;
 tr1569:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st670;
 st670:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18908,9 +18912,9 @@ case 672:
 tr1571:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st673;
 st673:
@@ -18922,13 +18926,13 @@ case 673:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -18953,10 +18957,10 @@ case 673:
 		goto st674;
 	goto st0;
 tr1580:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st674;
 tr1583:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st674;
 st674:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -18983,13 +18987,13 @@ case 675:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19017,7 +19021,7 @@ tr1576:
 	{ push_expr(ctx); }
 	goto st676;
 tr1584:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st676;
 st676:
@@ -19028,7 +19032,7 @@ case 676:
 		goto tr1582;
 	goto st0;
 tr1585:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st677;
 st677:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19039,13 +19043,13 @@ case 677:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19073,7 +19077,7 @@ tr1577:
 	{ push_expr(ctx); }
 	goto st678;
 tr1586:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st678;
 st678:
@@ -19085,13 +19089,13 @@ case 678:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19117,7 +19121,7 @@ case 678:
 		goto tr1583;
 	goto st0;
 tr1587:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st679;
 st679:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19128,13 +19132,13 @@ case 679:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19161,22 +19165,22 @@ case 679:
 tr1572:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st680;
 tr1573:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st680;
 tr1590:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st680;
 st680:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19235,9 +19239,9 @@ case 683:
 tr1593:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st684;
 st684:
@@ -19249,13 +19253,13 @@ case 684:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19282,25 +19286,25 @@ case 684:
 tr1594:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st685;
 tr1595:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st685;
 tr1607:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st685;
 tr1609:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st685;
 st685:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19319,7 +19323,7 @@ case 685:
 	}
 	goto st0;
 tr1610:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st686;
 st686:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19330,13 +19334,13 @@ case 686:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19443,9 +19447,9 @@ case 695:
 tr1619:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st696;
 st696:
@@ -19457,13 +19461,13 @@ case 696:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19490,25 +19494,25 @@ case 696:
 tr1620:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st697;
 tr1621:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st697;
 tr1633:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st697;
 tr1635:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st697;
 st697:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19527,7 +19531,7 @@ case 697:
 	}
 	goto st0;
 tr1636:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st698;
 st698:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19538,13 +19542,13 @@ case 698:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19654,9 +19658,9 @@ case 707:
 tr1645:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st708;
 st708:
@@ -19668,13 +19672,13 @@ case 708:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19701,25 +19705,25 @@ case 708:
 tr1646:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st709;
 tr1647:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st709;
 tr1662:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st709;
 tr1664:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st709;
 st709:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19738,7 +19742,7 @@ case 709:
 	}
 	goto st0;
 tr1665:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st710;
 st710:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19749,13 +19753,13 @@ case 710:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19856,9 +19860,9 @@ case 719:
 tr1674:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st720;
 st720:
@@ -19870,13 +19874,13 @@ case 720:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19901,10 +19905,10 @@ case 720:
 		goto st721;
 	goto st0;
 tr1683:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st721;
 tr1686:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st721;
 st721:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19931,13 +19935,13 @@ case 722:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -19965,7 +19969,7 @@ tr1679:
 	{ push_expr(ctx); }
 	goto st723;
 tr1687:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st723;
 st723:
@@ -19976,7 +19980,7 @@ case 723:
 		goto tr1685;
 	goto st0;
 tr1688:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st724;
 st724:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -19987,13 +19991,13 @@ case 724:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20021,7 +20025,7 @@ tr1680:
 	{ push_expr(ctx); }
 	goto st725;
 tr1689:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st725;
 st725:
@@ -20033,13 +20037,13 @@ case 725:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20065,7 +20069,7 @@ case 725:
 		goto tr1686;
 	goto st0;
 tr1690:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st726;
 st726:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20076,13 +20080,13 @@ case 726:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20109,22 +20113,22 @@ case 726:
 tr1675:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st727;
 tr1676:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st727;
 tr1693:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st727;
 st727:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20170,9 +20174,9 @@ case 729:
 tr1695:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st730;
 st730:
@@ -20184,13 +20188,13 @@ case 730:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20215,10 +20219,10 @@ case 730:
 		goto st731;
 	goto st0;
 tr1704:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st731;
 tr1707:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st731;
 st731:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20245,13 +20249,13 @@ case 732:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20279,7 +20283,7 @@ tr1700:
 	{ push_expr(ctx); }
 	goto st733;
 tr1708:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st733;
 st733:
@@ -20290,7 +20294,7 @@ case 733:
 		goto tr1706;
 	goto st0;
 tr1709:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st734;
 st734:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20301,13 +20305,13 @@ case 734:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20335,7 +20339,7 @@ tr1701:
 	{ push_expr(ctx); }
 	goto st735;
 tr1710:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st735;
 st735:
@@ -20347,13 +20351,13 @@ case 735:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20379,7 +20383,7 @@ case 735:
 		goto tr1707;
 	goto st0;
 tr1711:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st736;
 st736:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20390,13 +20394,13 @@ case 736:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20423,22 +20427,22 @@ case 736:
 tr1696:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st737;
 tr1697:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st737;
 tr1714:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st737;
 st737:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20497,9 +20501,9 @@ case 740:
 tr1717:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st741;
 st741:
@@ -20511,13 +20515,13 @@ case 741:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20544,25 +20548,25 @@ case 741:
 tr1718:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st742;
 tr1719:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st742;
 tr1731:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st742;
 tr1733:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st742;
 st742:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20581,7 +20585,7 @@ case 742:
 	}
 	goto st0;
 tr1734:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st743;
 st743:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20592,13 +20596,13 @@ case 743:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20705,9 +20709,9 @@ case 752:
 tr1743:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st753;
 st753:
@@ -20719,13 +20723,13 @@ case 753:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20752,25 +20756,25 @@ case 753:
 tr1744:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st754;
 tr1745:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st754;
 tr1757:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st754;
 tr1759:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st754;
 st754:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20789,7 +20793,7 @@ case 754:
 	}
 	goto st0;
 tr1760:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st755;
 st755:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -20800,13 +20804,13 @@ case 755:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20926,9 +20930,9 @@ case 764:
 tr1769:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st765;
 st765:
@@ -20940,13 +20944,13 @@ case 765:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -20973,25 +20977,25 @@ case 765:
 tr1770:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st766;
 tr1771:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st766;
 tr1796:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st766;
 tr1798:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st766;
 st766:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21010,7 +21014,7 @@ case 766:
 	}
 	goto st0;
 tr1799:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st767;
 st767:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21021,13 +21025,13 @@ case 767:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21198,9 +21202,9 @@ case 786:
 tr1818:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st787;
 st787:
@@ -21212,13 +21216,13 @@ case 787:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21243,10 +21247,10 @@ case 787:
 		goto st788;
 	goto st0;
 tr1827:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st788;
 tr1830:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st788;
 st788:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21273,13 +21277,13 @@ case 789:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21307,7 +21311,7 @@ tr1823:
 	{ push_expr(ctx); }
 	goto st790;
 tr1831:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st790;
 st790:
@@ -21318,7 +21322,7 @@ case 790:
 		goto tr1829;
 	goto st0;
 tr1832:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st791;
 st791:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21329,13 +21333,13 @@ case 791:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21363,7 +21367,7 @@ tr1824:
 	{ push_expr(ctx); }
 	goto st792;
 tr1833:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st792;
 st792:
@@ -21375,13 +21379,13 @@ case 792:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21407,7 +21411,7 @@ case 792:
 		goto tr1830;
 	goto st0;
 tr1834:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st793;
 st793:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21418,13 +21422,13 @@ case 793:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21451,22 +21455,22 @@ case 793:
 tr1819:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st794;
 tr1820:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st794;
 tr1837:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st794;
 st794:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21512,9 +21516,9 @@ case 796:
 tr1839:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st797;
 st797:
@@ -21526,13 +21530,13 @@ case 797:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21557,10 +21561,10 @@ case 797:
 		goto st798;
 	goto st0;
 tr1848:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st798;
 tr1851:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st798;
 st798:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21587,13 +21591,13 @@ case 799:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21621,7 +21625,7 @@ tr1844:
 	{ push_expr(ctx); }
 	goto st800;
 tr1852:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st800;
 st800:
@@ -21632,7 +21636,7 @@ case 800:
 		goto tr1850;
 	goto st0;
 tr1853:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st801;
 st801:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21643,13 +21647,13 @@ case 801:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21677,7 +21681,7 @@ tr1845:
 	{ push_expr(ctx); }
 	goto st802;
 tr1854:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st802;
 st802:
@@ -21689,13 +21693,13 @@ case 802:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21721,7 +21725,7 @@ case 802:
 		goto tr1851;
 	goto st0;
 tr1855:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st803;
 st803:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21732,13 +21736,13 @@ case 803:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21765,22 +21769,22 @@ case 803:
 tr1840:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st804;
 tr1841:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st804;
 tr1858:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st804;
 st804:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -21916,9 +21920,9 @@ case 819:
 tr1873:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st820;
 st820:
@@ -21930,13 +21934,13 @@ case 820:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -21963,25 +21967,25 @@ case 820:
 tr1874:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st821;
 tr1875:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st821;
 tr1880:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st821;
 tr1882:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st821;
 st821:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22000,7 +22004,7 @@ case 821:
 	}
 	goto st0;
 tr1883:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st822;
 st822:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22011,13 +22015,13 @@ case 822:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22068,9 +22072,9 @@ case 824:
 tr1885:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st825;
 st825:
@@ -22082,13 +22086,13 @@ case 825:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22115,25 +22119,25 @@ case 825:
 tr1886:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st826;
 tr1887:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st826;
 tr1892:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st826;
 tr1894:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st826;
 st826:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22152,7 +22156,7 @@ case 826:
 	}
 	goto st0;
 tr1895:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st827;
 st827:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22163,13 +22167,13 @@ case 827:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22220,9 +22224,9 @@ case 829:
 tr1897:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st830;
 st830:
@@ -22234,13 +22238,13 @@ case 830:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22267,25 +22271,25 @@ case 830:
 tr1898:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st831;
 tr1899:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st831;
 tr1904:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st831;
 tr1906:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st831;
 st831:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22304,7 +22308,7 @@ case 831:
 	}
 	goto st0;
 tr1907:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st832;
 st832:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22315,13 +22319,13 @@ case 832:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22372,9 +22376,9 @@ case 834:
 tr1909:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st835;
 st835:
@@ -22386,13 +22390,13 @@ case 835:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22419,25 +22423,25 @@ case 835:
 tr1910:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st836;
 tr1911:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st836;
 tr1916:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st836;
 tr1918:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st836;
 st836:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22456,7 +22460,7 @@ case 836:
 	}
 	goto st0;
 tr1919:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st837;
 st837:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22467,13 +22471,13 @@ case 837:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22524,9 +22528,9 @@ case 839:
 tr1921:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st840;
 st840:
@@ -22538,13 +22542,13 @@ case 840:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22571,25 +22575,25 @@ case 840:
 tr1922:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st841;
 tr1923:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st841;
 tr1928:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st841;
 tr1930:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st841;
 st841:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22608,7 +22612,7 @@ case 841:
 	}
 	goto st0;
 tr1931:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st842;
 st842:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22619,13 +22623,13 @@ case 842:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22679,9 +22683,9 @@ case 844:
 tr1933:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st845;
 st845:
@@ -22693,13 +22697,13 @@ case 845:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22726,25 +22730,25 @@ case 845:
 tr1934:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st846;
 tr1935:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st846;
 tr1943:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st846;
 tr1945:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st846;
 st846:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22763,7 +22767,7 @@ case 846:
 	}
 	goto st0;
 tr1946:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st847;
 st847:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22774,13 +22778,13 @@ case 847:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22901,9 +22905,9 @@ case 858:
 tr1957:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st859;
 st859:
@@ -22915,13 +22919,13 @@ case 859:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -22948,25 +22952,25 @@ case 859:
 tr1958:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st860;
 tr1959:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st860;
 tr1971:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st860;
 tr1973:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st860;
 st860:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22985,7 +22989,7 @@ case 860:
 	}
 	goto st0;
 tr1974:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st861;
 st861:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -22996,13 +23000,13 @@ case 861:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23096,9 +23100,9 @@ case 869:
 tr1982:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st870;
 st870:
@@ -23110,13 +23114,13 @@ case 870:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23141,10 +23145,10 @@ case 870:
 		goto st871;
 	goto st0;
 tr1991:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st871;
 tr2019:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st871;
 st871:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -23171,13 +23175,13 @@ case 872:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23205,7 +23209,7 @@ tr1987:
 	{ push_expr(ctx); }
 	goto st873;
 tr2020:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st873;
 st873:
@@ -23242,9 +23246,9 @@ case 874:
 tr1994:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st875;
 st875:
@@ -23256,13 +23260,13 @@ case 875:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23289,25 +23293,25 @@ case 875:
 tr1995:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st876;
 tr1996:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st876;
 tr2008:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st876;
 tr2010:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st876;
 st876:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -23326,7 +23330,7 @@ case 876:
 	}
 	goto st0;
 tr2011:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st877;
 st877:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -23337,13 +23341,13 @@ case 877:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23417,7 +23421,7 @@ case 884:
 		goto tr2018;
 	goto st0;
 tr2021:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st885;
 st885:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -23428,13 +23432,13 @@ case 885:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23462,7 +23466,7 @@ tr1988:
 	{ push_expr(ctx); }
 	goto st886;
 tr2022:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st886;
 st886:
@@ -23474,13 +23478,13 @@ case 886:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23505,7 +23509,7 @@ case 886:
 		goto tr2019;
 	goto st0;
 tr2023:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st887;
 st887:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -23516,13 +23520,13 @@ case 887:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23549,22 +23553,22 @@ case 887:
 tr1983:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st888;
 tr1984:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st888;
 tr2026:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st888;
 st888:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -23616,9 +23620,9 @@ case 890:
 tr2028:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st891;
 st891:
@@ -23630,13 +23634,13 @@ case 891:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23663,25 +23667,25 @@ case 891:
 tr2029:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st892;
 tr2030:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st892;
 tr2042:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st892;
 tr2044:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st892;
 st892:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -23700,7 +23704,7 @@ case 892:
 	}
 	goto st0;
 tr2045:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st893;
 st893:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -23711,13 +23715,13 @@ case 893:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23811,9 +23815,9 @@ case 901:
 tr2053:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st902;
 st902:
@@ -23825,13 +23829,13 @@ case 902:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23856,10 +23860,10 @@ case 902:
 		goto st903;
 	goto st0;
 tr2062:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st903;
 tr2090:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st903;
 st903:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -23886,13 +23890,13 @@ case 904:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -23920,7 +23924,7 @@ tr2058:
 	{ push_expr(ctx); }
 	goto st905;
 tr2091:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st905;
 st905:
@@ -23957,9 +23961,9 @@ case 906:
 tr2065:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st907;
 st907:
@@ -23971,13 +23975,13 @@ case 907:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24004,25 +24008,25 @@ case 907:
 tr2066:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st908;
 tr2067:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st908;
 tr2079:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st908;
 tr2081:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st908;
 st908:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24041,7 +24045,7 @@ case 908:
 	}
 	goto st0;
 tr2082:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st909;
 st909:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24052,13 +24056,13 @@ case 909:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24132,7 +24136,7 @@ case 916:
 		goto tr2089;
 	goto st0;
 tr2092:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st917;
 st917:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24143,13 +24147,13 @@ case 917:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24177,7 +24181,7 @@ tr2059:
 	{ push_expr(ctx); }
 	goto st918;
 tr2093:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st918;
 st918:
@@ -24189,13 +24193,13 @@ case 918:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24220,7 +24224,7 @@ case 918:
 		goto tr2090;
 	goto st0;
 tr2094:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st919;
 st919:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24231,13 +24235,13 @@ case 919:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24264,22 +24268,22 @@ case 919:
 tr2054:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st920;
 tr2055:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st920;
 tr2097:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st920;
 st920:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24331,9 +24335,9 @@ case 922:
 tr2099:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st923;
 st923:
@@ -24345,13 +24349,13 @@ case 923:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24378,25 +24382,25 @@ case 923:
 tr2100:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st924;
 tr2101:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st924;
 tr2113:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st924;
 tr2115:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st924;
 st924:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24415,7 +24419,7 @@ case 924:
 	}
 	goto st0;
 tr2116:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st925;
 st925:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24426,13 +24430,13 @@ case 925:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24581,9 +24585,9 @@ case 939:
 tr2130:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st940;
 st940:
@@ -24595,13 +24599,13 @@ case 940:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24628,25 +24632,25 @@ case 940:
 tr2131:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st941;
 tr2132:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st941;
 tr2151:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st941;
 tr2153:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st941;
 st941:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24665,7 +24669,7 @@ case 941:
 	}
 	goto st0;
 tr2154:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st942;
 st942:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24676,13 +24680,13 @@ case 942:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24851,9 +24855,9 @@ case 957:
 tr2169:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st958;
 st958:
@@ -24865,13 +24869,13 @@ case 958:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24896,10 +24900,10 @@ case 958:
 		goto st959;
 	goto st0;
 tr2178:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st959;
 tr2181:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st959;
 st959:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24926,13 +24930,13 @@ case 960:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -24960,7 +24964,7 @@ tr2174:
 	{ push_expr(ctx); }
 	goto st961;
 tr2182:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st961;
 st961:
@@ -24971,7 +24975,7 @@ case 961:
 		goto tr2180;
 	goto st0;
 tr2183:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st962;
 st962:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -24982,13 +24986,13 @@ case 962:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25016,7 +25020,7 @@ tr2175:
 	{ push_expr(ctx); }
 	goto st963;
 tr2184:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st963;
 st963:
@@ -25028,13 +25032,13 @@ case 963:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25060,7 +25064,7 @@ case 963:
 		goto tr2181;
 	goto st0;
 tr2185:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st964;
 st964:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -25071,13 +25075,13 @@ case 964:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25104,22 +25108,22 @@ case 964:
 tr2170:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st965;
 tr2171:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st965;
 tr2188:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st965;
 st965:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -25165,9 +25169,9 @@ case 967:
 tr2190:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st968;
 st968:
@@ -25179,13 +25183,13 @@ case 968:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25210,10 +25214,10 @@ case 968:
 		goto st969;
 	goto st0;
 tr2199:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st969;
 tr2202:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st969;
 st969:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -25240,13 +25244,13 @@ case 970:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25274,7 +25278,7 @@ tr2195:
 	{ push_expr(ctx); }
 	goto st971;
 tr2203:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st971;
 st971:
@@ -25285,7 +25289,7 @@ case 971:
 		goto tr2201;
 	goto st0;
 tr2204:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st972;
 st972:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -25296,13 +25300,13 @@ case 972:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25330,7 +25334,7 @@ tr2196:
 	{ push_expr(ctx); }
 	goto st973;
 tr2205:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st973;
 st973:
@@ -25342,13 +25346,13 @@ case 973:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25374,7 +25378,7 @@ case 973:
 		goto tr2202;
 	goto st0;
 tr2206:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st974;
 st974:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -25385,13 +25389,13 @@ case 974:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25418,22 +25422,22 @@ case 974:
 tr2191:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st975;
 tr2192:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st975;
 tr2209:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st975;
 st975:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -25493,9 +25497,9 @@ case 979:
 tr2213:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st980;
 st980:
@@ -25507,13 +25511,13 @@ case 980:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25539,25 +25543,25 @@ case 980:
 tr2214:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st981;
 tr2215:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st981;
 tr2221:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st981;
 tr2224:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st981;
 st981:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -25576,14 +25580,14 @@ case 981:
 	}
 	goto st0;
 tr2218:
-	{ if (! ctx->expr_in_parens)
+	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
 	goto st982;
 tr2225:
-	{ ctx->expr_open_parens--; }
-	{ if (! ctx->expr_in_parens)
+	{ expr_open_parens--; }
+	{ if (! expr_in_parens)
      return FALSE;
      push_expr(ctx);
       }
@@ -25603,7 +25607,7 @@ case 983:
 		goto tr2223;
 	goto st0;
 tr2226:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st984;
 st984:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -25614,13 +25618,13 @@ case 984:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25857,9 +25861,9 @@ case 1010:
 tr2268:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1011;
 st1011:
@@ -25871,13 +25875,13 @@ case 1011:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -25903,25 +25907,25 @@ case 1011:
 tr2269:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1012;
 tr2270:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1012;
 tr2275:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1012;
 tr2336:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1012;
 st1012:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -25941,12 +25945,12 @@ case 1012:
 	goto st0;
 tr2272:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	goto st1013;
 tr2337:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	goto st1013;
 st1013:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26042,9 +26046,9 @@ case 1022:
 tr2294:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1023;
 st1023:
@@ -26056,13 +26060,13 @@ case 1023:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26087,10 +26091,10 @@ case 1023:
 		goto st1024;
 	goto st0;
 tr2303:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1024;
 tr2306:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1024;
 st1024:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26117,13 +26121,13 @@ case 1025:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26151,7 +26155,7 @@ tr2299:
 	{ push_expr(ctx); }
 	goto st1026;
 tr2307:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1026;
 st1026:
@@ -26162,7 +26166,7 @@ case 1026:
 		goto tr2305;
 	goto st0;
 tr2308:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1027;
 st1027:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26173,13 +26177,13 @@ case 1027:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26207,7 +26211,7 @@ tr2300:
 	{ push_expr(ctx); }
 	goto st1028;
 tr2309:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1028;
 st1028:
@@ -26219,13 +26223,13 @@ case 1028:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26251,7 +26255,7 @@ case 1028:
 		goto tr2306;
 	goto st0;
 tr2310:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1029;
 st1029:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26262,13 +26266,13 @@ case 1029:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26295,22 +26299,22 @@ case 1029:
 tr2295:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1030;
 tr2296:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1030;
 tr2313:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1030;
 st1030:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26356,9 +26360,9 @@ case 1032:
 tr2315:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1033;
 st1033:
@@ -26370,13 +26374,13 @@ case 1033:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26401,10 +26405,10 @@ case 1033:
 		goto st1034;
 	goto st0;
 tr2324:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1034;
 tr2327:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1034;
 st1034:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26431,13 +26435,13 @@ case 1035:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26465,7 +26469,7 @@ tr2320:
 	{ push_expr(ctx); }
 	goto st1036;
 tr2328:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1036;
 st1036:
@@ -26476,7 +26480,7 @@ case 1036:
 		goto tr2326;
 	goto st0;
 tr2329:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1037;
 st1037:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26487,13 +26491,13 @@ case 1037:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26521,7 +26525,7 @@ tr2321:
 	{ push_expr(ctx); }
 	goto st1038;
 tr2330:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1038;
 st1038:
@@ -26533,13 +26537,13 @@ case 1038:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26565,7 +26569,7 @@ case 1038:
 		goto tr2327;
 	goto st0;
 tr2331:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1039;
 st1039:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26576,13 +26580,13 @@ case 1039:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26609,22 +26613,22 @@ case 1039:
 tr2316:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1040;
 tr2317:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1040;
 tr2334:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1040;
 st1040:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26650,7 +26654,7 @@ case 1041:
 		goto tr2335;
 	goto st0;
 tr2338:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1042;
 st1042:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26661,13 +26665,13 @@ case 1042:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26870,9 +26874,9 @@ case 1063:
 tr2376:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1064;
 st1064:
@@ -26884,13 +26888,13 @@ case 1064:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26915,10 +26919,10 @@ case 1064:
 		goto st1065;
 	goto st0;
 tr2385:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1065;
 tr2388:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1065;
 st1065:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -26945,13 +26949,13 @@ case 1066:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -26979,7 +26983,7 @@ tr2381:
 	{ push_expr(ctx); }
 	goto st1067;
 tr2389:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1067;
 st1067:
@@ -26990,7 +26994,7 @@ case 1067:
 		goto tr2387;
 	goto st0;
 tr2390:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1068;
 st1068:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27001,13 +27005,13 @@ case 1068:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27035,7 +27039,7 @@ tr2382:
 	{ push_expr(ctx); }
 	goto st1069;
 tr2391:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1069;
 st1069:
@@ -27047,13 +27051,13 @@ case 1069:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27079,7 +27083,7 @@ case 1069:
 		goto tr2388;
 	goto st0;
 tr2392:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1070;
 st1070:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27090,13 +27094,13 @@ case 1070:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27123,22 +27127,22 @@ case 1070:
 tr2377:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1071;
 tr2378:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1071;
 tr2395:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1071;
 st1071:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27184,9 +27188,9 @@ case 1073:
 tr2397:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1074;
 st1074:
@@ -27198,13 +27202,13 @@ case 1074:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27229,10 +27233,10 @@ case 1074:
 		goto st1075;
 	goto st0;
 tr2406:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1075;
 tr2409:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1075;
 st1075:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27259,13 +27263,13 @@ case 1076:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27293,7 +27297,7 @@ tr2402:
 	{ push_expr(ctx); }
 	goto st1077;
 tr2410:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1077;
 st1077:
@@ -27304,7 +27308,7 @@ case 1077:
 		goto tr2408;
 	goto st0;
 tr2411:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1078;
 st1078:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27315,13 +27319,13 @@ case 1078:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27349,7 +27353,7 @@ tr2403:
 	{ push_expr(ctx); }
 	goto st1079;
 tr2412:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1079;
 st1079:
@@ -27361,13 +27365,13 @@ case 1079:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27393,7 +27397,7 @@ case 1079:
 		goto tr2409;
 	goto st0;
 tr2413:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1080;
 st1080:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27404,13 +27408,13 @@ case 1080:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27437,22 +27441,22 @@ case 1080:
 tr2398:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1081;
 tr2399:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1081;
 tr2416:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1081;
 st1081:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27578,9 +27582,9 @@ case 1093:
 tr2437:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1094;
 st1094:
@@ -27592,13 +27596,13 @@ case 1094:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27623,10 +27627,10 @@ case 1094:
 		goto st1095;
 	goto st0;
 tr2446:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1095;
 tr2449:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1095;
 st1095:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27653,13 +27657,13 @@ case 1096:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27687,7 +27691,7 @@ tr2442:
 	{ push_expr(ctx); }
 	goto st1097;
 tr2450:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1097;
 st1097:
@@ -27698,7 +27702,7 @@ case 1097:
 		goto tr2448;
 	goto st0;
 tr2451:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1098;
 st1098:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27709,13 +27713,13 @@ case 1098:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27743,7 +27747,7 @@ tr2443:
 	{ push_expr(ctx); }
 	goto st1099;
 tr2452:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1099;
 st1099:
@@ -27755,13 +27759,13 @@ case 1099:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27787,7 +27791,7 @@ case 1099:
 		goto tr2449;
 	goto st0;
 tr2453:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1100;
 st1100:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27798,13 +27802,13 @@ case 1100:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27831,22 +27835,22 @@ case 1100:
 tr2438:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1101;
 tr2439:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1101;
 tr2456:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1101;
 st1101:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27892,9 +27896,9 @@ case 1103:
 tr2458:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1104;
 st1104:
@@ -27906,13 +27910,13 @@ case 1104:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -27937,10 +27941,10 @@ case 1104:
 		goto st1105;
 	goto st0;
 tr2467:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1105;
 tr2470:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1105;
 st1105:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -27967,13 +27971,13 @@ case 1106:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28001,7 +28005,7 @@ tr2463:
 	{ push_expr(ctx); }
 	goto st1107;
 tr2471:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1107;
 st1107:
@@ -28012,7 +28016,7 @@ case 1107:
 		goto tr2469;
 	goto st0;
 tr2472:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1108;
 st1108:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28023,13 +28027,13 @@ case 1108:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28057,7 +28061,7 @@ tr2464:
 	{ push_expr(ctx); }
 	goto st1109;
 tr2473:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1109;
 st1109:
@@ -28069,13 +28073,13 @@ case 1109:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28101,7 +28105,7 @@ case 1109:
 		goto tr2470;
 	goto st0;
 tr2474:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1110;
 st1110:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28112,13 +28116,13 @@ case 1110:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28145,22 +28149,22 @@ case 1110:
 tr2459:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1111;
 tr2460:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1111;
 tr2477:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1111;
 st1111:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28293,9 +28297,9 @@ case 1124:
 tr2499:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1125;
 st1125:
@@ -28307,13 +28311,13 @@ case 1125:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28338,10 +28342,10 @@ case 1125:
 		goto st1126;
 	goto st0;
 tr2508:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1126;
 tr2511:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1126;
 st1126:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28368,13 +28372,13 @@ case 1127:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28402,7 +28406,7 @@ tr2504:
 	{ push_expr(ctx); }
 	goto st1128;
 tr2512:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1128;
 st1128:
@@ -28413,7 +28417,7 @@ case 1128:
 		goto tr2510;
 	goto st0;
 tr2513:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1129;
 st1129:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28424,13 +28428,13 @@ case 1129:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28458,7 +28462,7 @@ tr2505:
 	{ push_expr(ctx); }
 	goto st1130;
 tr2514:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1130;
 st1130:
@@ -28470,13 +28474,13 @@ case 1130:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28502,7 +28506,7 @@ case 1130:
 		goto tr2511;
 	goto st0;
 tr2515:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1131;
 st1131:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28513,13 +28517,13 @@ case 1131:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28546,22 +28550,22 @@ case 1131:
 tr2500:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1132;
 tr2501:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1132;
 tr2518:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1132;
 st1132:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28607,9 +28611,9 @@ case 1134:
 tr2520:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1135;
 st1135:
@@ -28621,13 +28625,13 @@ case 1135:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28652,10 +28656,10 @@ case 1135:
 		goto st1136;
 	goto st0;
 tr2529:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1136;
 tr2532:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1136;
 st1136:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28682,13 +28686,13 @@ case 1137:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28716,7 +28720,7 @@ tr2525:
 	{ push_expr(ctx); }
 	goto st1138;
 tr2533:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1138;
 st1138:
@@ -28727,7 +28731,7 @@ case 1138:
 		goto tr2531;
 	goto st0;
 tr2534:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1139;
 st1139:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28738,13 +28742,13 @@ case 1139:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28772,7 +28776,7 @@ tr2526:
 	{ push_expr(ctx); }
 	goto st1140;
 tr2535:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1140;
 st1140:
@@ -28784,13 +28788,13 @@ case 1140:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28816,7 +28820,7 @@ case 1140:
 		goto tr2532;
 	goto st0;
 tr2536:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1141;
 st1141:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -28827,13 +28831,13 @@ case 1141:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -28860,22 +28864,22 @@ case 1141:
 tr2521:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1142;
 tr2522:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1142;
 tr2539:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1142;
 st1142:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29001,9 +29005,9 @@ case 1154:
 tr2560:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1155;
 st1155:
@@ -29015,13 +29019,13 @@ case 1155:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29046,10 +29050,10 @@ case 1155:
 		goto st1156;
 	goto st0;
 tr2569:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1156;
 tr2572:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1156;
 st1156:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29076,13 +29080,13 @@ case 1157:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29110,7 +29114,7 @@ tr2565:
 	{ push_expr(ctx); }
 	goto st1158;
 tr2573:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1158;
 st1158:
@@ -29121,7 +29125,7 @@ case 1158:
 		goto tr2571;
 	goto st0;
 tr2574:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1159;
 st1159:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29132,13 +29136,13 @@ case 1159:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29166,7 +29170,7 @@ tr2566:
 	{ push_expr(ctx); }
 	goto st1160;
 tr2575:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1160;
 st1160:
@@ -29178,13 +29182,13 @@ case 1160:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29210,7 +29214,7 @@ case 1160:
 		goto tr2572;
 	goto st0;
 tr2576:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1161;
 st1161:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29221,13 +29225,13 @@ case 1161:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29254,22 +29258,22 @@ case 1161:
 tr2561:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1162;
 tr2562:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1162;
 tr2579:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1162;
 st1162:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29315,9 +29319,9 @@ case 1164:
 tr2581:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1165;
 st1165:
@@ -29329,13 +29333,13 @@ case 1165:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29360,10 +29364,10 @@ case 1165:
 		goto st1166;
 	goto st0;
 tr2590:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1166;
 tr2593:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1166;
 st1166:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29390,13 +29394,13 @@ case 1167:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29424,7 +29428,7 @@ tr2586:
 	{ push_expr(ctx); }
 	goto st1168;
 tr2594:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1168;
 st1168:
@@ -29435,7 +29439,7 @@ case 1168:
 		goto tr2592;
 	goto st0;
 tr2595:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1169;
 st1169:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29446,13 +29450,13 @@ case 1169:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29480,7 +29484,7 @@ tr2587:
 	{ push_expr(ctx); }
 	goto st1170;
 tr2596:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1170;
 st1170:
@@ -29492,13 +29496,13 @@ case 1170:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29524,7 +29528,7 @@ case 1170:
 		goto tr2593;
 	goto st0;
 tr2597:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1171;
 st1171:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29535,13 +29539,13 @@ case 1171:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29568,22 +29572,22 @@ case 1171:
 tr2582:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1172;
 tr2583:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1172;
 tr2600:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1172;
 st1172:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29642,9 +29646,9 @@ case 1176:
 tr2604:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1177;
 st1177:
@@ -29656,13 +29660,13 @@ case 1177:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29689,25 +29693,25 @@ case 1177:
 tr2605:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1178;
 tr2606:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1178;
 tr2611:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1178;
 tr2613:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1178;
 st1178:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29726,7 +29730,7 @@ case 1178:
 	}
 	goto st0;
 tr2614:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1179;
 st1179:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29737,13 +29741,13 @@ case 1179:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29802,9 +29806,9 @@ case 1180:
 tr2615:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1181;
 st1181:
@@ -29816,13 +29820,13 @@ case 1181:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -29849,25 +29853,25 @@ case 1181:
 tr2616:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1182;
 tr2617:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1182;
 tr2637:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1182;
 tr2639:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1182;
 st1182:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29886,7 +29890,7 @@ case 1182:
 	}
 	goto st0;
 tr2640:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1183;
 st1183:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -29897,13 +29901,13 @@ case 1183:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30072,9 +30076,9 @@ case 1198:
 tr2655:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1199;
 st1199:
@@ -30086,13 +30090,13 @@ case 1199:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30117,10 +30121,10 @@ case 1199:
 		goto st1200;
 	goto st0;
 tr2664:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1200;
 tr2667:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1200;
 st1200:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30147,13 +30151,13 @@ case 1201:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30181,7 +30185,7 @@ tr2660:
 	{ push_expr(ctx); }
 	goto st1202;
 tr2668:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1202;
 st1202:
@@ -30192,7 +30196,7 @@ case 1202:
 		goto tr2666;
 	goto st0;
 tr2669:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1203;
 st1203:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30203,13 +30207,13 @@ case 1203:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30237,7 +30241,7 @@ tr2661:
 	{ push_expr(ctx); }
 	goto st1204;
 tr2670:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1204;
 st1204:
@@ -30249,13 +30253,13 @@ case 1204:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30281,7 +30285,7 @@ case 1204:
 		goto tr2667;
 	goto st0;
 tr2671:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1205;
 st1205:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30292,13 +30296,13 @@ case 1205:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30325,22 +30329,22 @@ case 1205:
 tr2656:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1206;
 tr2657:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1206;
 tr2674:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1206;
 st1206:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30386,9 +30390,9 @@ case 1208:
 tr2676:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1209;
 st1209:
@@ -30400,13 +30404,13 @@ case 1209:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30431,10 +30435,10 @@ case 1209:
 		goto st1210;
 	goto st0;
 tr2685:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1210;
 tr2688:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1210;
 st1210:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30461,13 +30465,13 @@ case 1211:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30495,7 +30499,7 @@ tr2681:
 	{ push_expr(ctx); }
 	goto st1212;
 tr2689:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1212;
 st1212:
@@ -30506,7 +30510,7 @@ case 1212:
 		goto tr2687;
 	goto st0;
 tr2690:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1213;
 st1213:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30517,13 +30521,13 @@ case 1213:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30551,7 +30555,7 @@ tr2682:
 	{ push_expr(ctx); }
 	goto st1214;
 tr2691:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1214;
 st1214:
@@ -30563,13 +30567,13 @@ case 1214:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30595,7 +30599,7 @@ case 1214:
 		goto tr2688;
 	goto st0;
 tr2692:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1215;
 st1215:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30606,13 +30610,13 @@ case 1215:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30639,22 +30643,22 @@ case 1215:
 tr2677:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1216;
 tr2678:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1216;
 tr2695:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1216;
 st1216:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30752,9 +30756,9 @@ case 1225:
 tr2707:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1226;
 st1226:
@@ -30766,13 +30770,13 @@ case 1226:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30798,25 +30802,25 @@ case 1226:
 tr2708:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1227;
 tr2709:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1227;
 tr2714:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1227;
 tr2775:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1227;
 st1227:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30836,12 +30840,12 @@ case 1227:
 	goto st0;
 tr2711:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	goto st1228;
 tr2776:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	goto st1228;
 st1228:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -30937,9 +30941,9 @@ case 1237:
 tr2733:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1238;
 st1238:
@@ -30951,13 +30955,13 @@ case 1238:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -30982,10 +30986,10 @@ case 1238:
 		goto st1239;
 	goto st0;
 tr2742:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1239;
 tr2745:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1239;
 st1239:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31012,13 +31016,13 @@ case 1240:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31046,7 +31050,7 @@ tr2738:
 	{ push_expr(ctx); }
 	goto st1241;
 tr2746:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1241;
 st1241:
@@ -31057,7 +31061,7 @@ case 1241:
 		goto tr2744;
 	goto st0;
 tr2747:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1242;
 st1242:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31068,13 +31072,13 @@ case 1242:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31102,7 +31106,7 @@ tr2739:
 	{ push_expr(ctx); }
 	goto st1243;
 tr2748:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1243;
 st1243:
@@ -31114,13 +31118,13 @@ case 1243:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31146,7 +31150,7 @@ case 1243:
 		goto tr2745;
 	goto st0;
 tr2749:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1244;
 st1244:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31157,13 +31161,13 @@ case 1244:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31190,22 +31194,22 @@ case 1244:
 tr2734:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1245;
 tr2735:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1245;
 tr2752:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1245;
 st1245:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31251,9 +31255,9 @@ case 1247:
 tr2754:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1248;
 st1248:
@@ -31265,13 +31269,13 @@ case 1248:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31296,10 +31300,10 @@ case 1248:
 		goto st1249;
 	goto st0;
 tr2763:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1249;
 tr2766:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1249;
 st1249:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31326,13 +31330,13 @@ case 1250:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31360,7 +31364,7 @@ tr2759:
 	{ push_expr(ctx); }
 	goto st1251;
 tr2767:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1251;
 st1251:
@@ -31371,7 +31375,7 @@ case 1251:
 		goto tr2765;
 	goto st0;
 tr2768:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1252;
 st1252:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31382,13 +31386,13 @@ case 1252:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31416,7 +31420,7 @@ tr2760:
 	{ push_expr(ctx); }
 	goto st1253;
 tr2769:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1253;
 st1253:
@@ -31428,13 +31432,13 @@ case 1253:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31460,7 +31464,7 @@ case 1253:
 		goto tr2766;
 	goto st0;
 tr2770:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1254;
 st1254:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31471,13 +31475,13 @@ case 1254:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31504,22 +31508,22 @@ case 1254:
 tr2755:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1255;
 tr2756:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1255;
 tr2773:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1255;
 st1255:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31545,7 +31549,7 @@ case 1256:
 		goto tr2774;
 	goto st0;
 tr2777:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1257;
 st1257:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31556,13 +31560,13 @@ case 1257:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31679,9 +31683,9 @@ case 1267:
 tr2796:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1268;
 st1268:
@@ -31693,13 +31697,13 @@ case 1268:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31724,10 +31728,10 @@ case 1268:
 		goto st1269;
 	goto st0;
 tr2805:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1269;
 tr2808:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1269;
 st1269:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31754,13 +31758,13 @@ case 1270:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31788,7 +31792,7 @@ tr2801:
 	{ push_expr(ctx); }
 	goto st1271;
 tr2809:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1271;
 st1271:
@@ -31799,7 +31803,7 @@ case 1271:
 		goto tr2807;
 	goto st0;
 tr2810:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1272;
 st1272:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31810,13 +31814,13 @@ case 1272:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31844,7 +31848,7 @@ tr2802:
 	{ push_expr(ctx); }
 	goto st1273;
 tr2811:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1273;
 st1273:
@@ -31856,13 +31860,13 @@ case 1273:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31888,7 +31892,7 @@ case 1273:
 		goto tr2808;
 	goto st0;
 tr2812:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1274;
 st1274:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31899,13 +31903,13 @@ case 1274:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -31932,22 +31936,22 @@ case 1274:
 tr2797:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1275;
 tr2798:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1275;
 tr2815:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1275;
 st1275:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -31993,9 +31997,9 @@ case 1277:
 tr2817:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1278;
 st1278:
@@ -32007,13 +32011,13 @@ case 1278:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32038,10 +32042,10 @@ case 1278:
 		goto st1279;
 	goto st0;
 tr2826:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1279;
 tr2829:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1279;
 st1279:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32068,13 +32072,13 @@ case 1280:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32102,7 +32106,7 @@ tr2822:
 	{ push_expr(ctx); }
 	goto st1281;
 tr2830:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1281;
 st1281:
@@ -32113,7 +32117,7 @@ case 1281:
 		goto tr2828;
 	goto st0;
 tr2831:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1282;
 st1282:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32124,13 +32128,13 @@ case 1282:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32158,7 +32162,7 @@ tr2823:
 	{ push_expr(ctx); }
 	goto st1283;
 tr2832:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1283;
 st1283:
@@ -32170,13 +32174,13 @@ case 1283:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32202,7 +32206,7 @@ case 1283:
 		goto tr2829;
 	goto st0;
 tr2833:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1284;
 st1284:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32213,13 +32217,13 @@ case 1284:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32246,22 +32250,22 @@ case 1284:
 tr2818:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1285;
 tr2819:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1285;
 tr2836:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1285;
 st1285:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32380,9 +32384,9 @@ case 1296:
 tr2856:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1297;
 st1297:
@@ -32394,13 +32398,13 @@ case 1297:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32425,10 +32429,10 @@ case 1297:
 		goto st1298;
 	goto st0;
 tr2865:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1298;
 tr2868:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1298;
 st1298:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32455,13 +32459,13 @@ case 1299:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32489,7 +32493,7 @@ tr2861:
 	{ push_expr(ctx); }
 	goto st1300;
 tr2869:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1300;
 st1300:
@@ -32500,7 +32504,7 @@ case 1300:
 		goto tr2867;
 	goto st0;
 tr2870:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1301;
 st1301:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32511,13 +32515,13 @@ case 1301:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32545,7 +32549,7 @@ tr2862:
 	{ push_expr(ctx); }
 	goto st1302;
 tr2871:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1302;
 st1302:
@@ -32557,13 +32561,13 @@ case 1302:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32589,7 +32593,7 @@ case 1302:
 		goto tr2868;
 	goto st0;
 tr2872:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1303;
 st1303:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32600,13 +32604,13 @@ case 1303:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32633,22 +32637,22 @@ case 1303:
 tr2857:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1304;
 tr2858:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1304;
 tr2875:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1304;
 st1304:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32694,9 +32698,9 @@ case 1306:
 tr2877:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1307;
 st1307:
@@ -32708,13 +32712,13 @@ case 1307:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32739,10 +32743,10 @@ case 1307:
 		goto st1308;
 	goto st0;
 tr2886:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1308;
 tr2889:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1308;
 st1308:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32769,13 +32773,13 @@ case 1309:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32803,7 +32807,7 @@ tr2882:
 	{ push_expr(ctx); }
 	goto st1310;
 tr2890:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1310;
 st1310:
@@ -32814,7 +32818,7 @@ case 1310:
 		goto tr2888;
 	goto st0;
 tr2891:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1311;
 st1311:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32825,13 +32829,13 @@ case 1311:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32859,7 +32863,7 @@ tr2883:
 	{ push_expr(ctx); }
 	goto st1312;
 tr2892:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1312;
 st1312:
@@ -32871,13 +32875,13 @@ case 1312:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32903,7 +32907,7 @@ case 1312:
 		goto tr2889;
 	goto st0;
 tr2893:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1313;
 st1313:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -32914,13 +32918,13 @@ case 1313:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -32947,22 +32951,22 @@ case 1313:
 tr2878:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1314;
 tr2879:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1314;
 tr2896:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1314;
 st1314:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33081,9 +33085,9 @@ case 1325:
 tr2916:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1326;
 st1326:
@@ -33095,13 +33099,13 @@ case 1326:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33126,10 +33130,10 @@ case 1326:
 		goto st1327;
 	goto st0;
 tr2925:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1327;
 tr2928:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1327;
 st1327:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33156,13 +33160,13 @@ case 1328:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33190,7 +33194,7 @@ tr2921:
 	{ push_expr(ctx); }
 	goto st1329;
 tr2929:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1329;
 st1329:
@@ -33201,7 +33205,7 @@ case 1329:
 		goto tr2927;
 	goto st0;
 tr2930:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1330;
 st1330:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33212,13 +33216,13 @@ case 1330:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33246,7 +33250,7 @@ tr2922:
 	{ push_expr(ctx); }
 	goto st1331;
 tr2931:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1331;
 st1331:
@@ -33258,13 +33262,13 @@ case 1331:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33290,7 +33294,7 @@ case 1331:
 		goto tr2928;
 	goto st0;
 tr2932:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1332;
 st1332:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33301,13 +33305,13 @@ case 1332:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33334,22 +33338,22 @@ case 1332:
 tr2917:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1333;
 tr2918:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1333;
 tr2935:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1333;
 st1333:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33395,9 +33399,9 @@ case 1335:
 tr2937:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1336;
 st1336:
@@ -33409,13 +33413,13 @@ case 1336:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33440,10 +33444,10 @@ case 1336:
 		goto st1337;
 	goto st0;
 tr2946:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1337;
 tr2949:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1337;
 st1337:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33470,13 +33474,13 @@ case 1338:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33504,7 +33508,7 @@ tr2942:
 	{ push_expr(ctx); }
 	goto st1339;
 tr2950:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1339;
 st1339:
@@ -33515,7 +33519,7 @@ case 1339:
 		goto tr2948;
 	goto st0;
 tr2951:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1340;
 st1340:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33526,13 +33530,13 @@ case 1340:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33560,7 +33564,7 @@ tr2943:
 	{ push_expr(ctx); }
 	goto st1341;
 tr2952:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1341;
 st1341:
@@ -33572,13 +33576,13 @@ case 1341:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33604,7 +33608,7 @@ case 1341:
 		goto tr2949;
 	goto st0;
 tr2953:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1342;
 st1342:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33615,13 +33619,13 @@ case 1342:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33648,22 +33652,22 @@ case 1342:
 tr2938:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1343;
 tr2939:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1343;
 tr2956:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1343;
 st1343:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33782,9 +33786,9 @@ case 1354:
 tr2976:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1355;
 st1355:
@@ -33796,13 +33800,13 @@ case 1355:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33827,10 +33831,10 @@ case 1355:
 		goto st1356;
 	goto st0;
 tr2985:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1356;
 tr2988:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1356;
 st1356:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33857,13 +33861,13 @@ case 1357:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33891,7 +33895,7 @@ tr2981:
 	{ push_expr(ctx); }
 	goto st1358;
 tr2989:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1358;
 st1358:
@@ -33902,7 +33906,7 @@ case 1358:
 		goto tr2987;
 	goto st0;
 tr2990:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1359;
 st1359:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -33913,13 +33917,13 @@ case 1359:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33947,7 +33951,7 @@ tr2982:
 	{ push_expr(ctx); }
 	goto st1360;
 tr2991:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1360;
 st1360:
@@ -33959,13 +33963,13 @@ case 1360:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -33991,7 +33995,7 @@ case 1360:
 		goto tr2988;
 	goto st0;
 tr2992:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1361;
 st1361:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34002,13 +34006,13 @@ case 1361:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34035,22 +34039,22 @@ case 1361:
 tr2977:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1362;
 tr2978:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1362;
 tr2995:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1362;
 st1362:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34096,9 +34100,9 @@ case 1364:
 tr2997:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1365;
 st1365:
@@ -34110,13 +34114,13 @@ case 1365:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34141,10 +34145,10 @@ case 1365:
 		goto st1366;
 	goto st0;
 tr3006:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1366;
 tr3009:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1366;
 st1366:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34171,13 +34175,13 @@ case 1367:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34205,7 +34209,7 @@ tr3002:
 	{ push_expr(ctx); }
 	goto st1368;
 tr3010:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1368;
 st1368:
@@ -34216,7 +34220,7 @@ case 1368:
 		goto tr3008;
 	goto st0;
 tr3011:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1369;
 st1369:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34227,13 +34231,13 @@ case 1369:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34261,7 +34265,7 @@ tr3003:
 	{ push_expr(ctx); }
 	goto st1370;
 tr3012:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1370;
 st1370:
@@ -34273,13 +34277,13 @@ case 1370:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34305,7 +34309,7 @@ case 1370:
 		goto tr3009;
 	goto st0;
 tr3013:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1371;
 st1371:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34316,13 +34320,13 @@ case 1371:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34349,22 +34353,22 @@ case 1371:
 tr2998:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1372;
 tr2999:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1372;
 tr3016:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1372;
 st1372:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34423,9 +34427,9 @@ case 1374:
 tr3018:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1375;
 st1375:
@@ -34437,13 +34441,13 @@ case 1375:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34470,25 +34474,25 @@ case 1375:
 tr3019:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1376;
 tr3020:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1376;
 tr3039:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1376;
 tr3041:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1376;
 st1376:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34507,7 +34511,7 @@ case 1376:
 	}
 	goto st0;
 tr3042:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1377;
 st1377:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34518,13 +34522,13 @@ case 1377:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34693,9 +34697,9 @@ case 1392:
 tr3057:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1393;
 st1393:
@@ -34707,13 +34711,13 @@ case 1393:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34738,10 +34742,10 @@ case 1393:
 		goto st1394;
 	goto st0;
 tr3066:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1394;
 tr3069:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1394;
 st1394:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34768,13 +34772,13 @@ case 1395:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34802,7 +34806,7 @@ tr3062:
 	{ push_expr(ctx); }
 	goto st1396;
 tr3070:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1396;
 st1396:
@@ -34813,7 +34817,7 @@ case 1396:
 		goto tr3068;
 	goto st0;
 tr3071:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1397;
 st1397:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34824,13 +34828,13 @@ case 1397:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34858,7 +34862,7 @@ tr3063:
 	{ push_expr(ctx); }
 	goto st1398;
 tr3072:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1398;
 st1398:
@@ -34870,13 +34874,13 @@ case 1398:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34902,7 +34906,7 @@ case 1398:
 		goto tr3069;
 	goto st0;
 tr3073:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1399;
 st1399:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -34913,13 +34917,13 @@ case 1399:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -34946,22 +34950,22 @@ case 1399:
 tr3058:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1400;
 tr3059:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1400;
 tr3076:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1400;
 st1400:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35007,9 +35011,9 @@ case 1402:
 tr3078:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1403;
 st1403:
@@ -35021,13 +35025,13 @@ case 1403:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35052,10 +35056,10 @@ case 1403:
 		goto st1404;
 	goto st0;
 tr3087:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1404;
 tr3090:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1404;
 st1404:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35082,13 +35086,13 @@ case 1405:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35116,7 +35120,7 @@ tr3083:
 	{ push_expr(ctx); }
 	goto st1406;
 tr3091:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1406;
 st1406:
@@ -35127,7 +35131,7 @@ case 1406:
 		goto tr3089;
 	goto st0;
 tr3092:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1407;
 st1407:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35138,13 +35142,13 @@ case 1407:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35172,7 +35176,7 @@ tr3084:
 	{ push_expr(ctx); }
 	goto st1408;
 tr3093:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1408;
 st1408:
@@ -35184,13 +35188,13 @@ case 1408:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35216,7 +35220,7 @@ case 1408:
 		goto tr3090;
 	goto st0;
 tr3094:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1409;
 st1409:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35227,13 +35231,13 @@ case 1409:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35260,22 +35264,22 @@ case 1409:
 tr3079:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1410;
 tr3080:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1410;
 tr3097:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1410;
 st1410:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35334,9 +35338,9 @@ case 1412:
 tr3099:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1413;
 st1413:
@@ -35348,13 +35352,13 @@ case 1413:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35381,25 +35385,25 @@ case 1413:
 tr3100:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1414;
 tr3101:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1414;
 tr3120:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1414;
 tr3122:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1414;
 st1414:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35418,7 +35422,7 @@ case 1414:
 	}
 	goto st0;
 tr3123:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1415;
 st1415:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35429,13 +35433,13 @@ case 1415:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35604,9 +35608,9 @@ case 1430:
 tr3138:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1431;
 st1431:
@@ -35618,13 +35622,13 @@ case 1431:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35649,10 +35653,10 @@ case 1431:
 		goto st1432;
 	goto st0;
 tr3147:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1432;
 tr3150:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1432;
 st1432:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35679,13 +35683,13 @@ case 1433:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35713,7 +35717,7 @@ tr3143:
 	{ push_expr(ctx); }
 	goto st1434;
 tr3151:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1434;
 st1434:
@@ -35724,7 +35728,7 @@ case 1434:
 		goto tr3149;
 	goto st0;
 tr3152:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1435;
 st1435:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35735,13 +35739,13 @@ case 1435:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35769,7 +35773,7 @@ tr3144:
 	{ push_expr(ctx); }
 	goto st1436;
 tr3153:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1436;
 st1436:
@@ -35781,13 +35785,13 @@ case 1436:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35813,7 +35817,7 @@ case 1436:
 		goto tr3150;
 	goto st0;
 tr3154:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1437;
 st1437:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35824,13 +35828,13 @@ case 1437:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35857,22 +35861,22 @@ case 1437:
 tr3139:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1438;
 tr3140:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1438;
 tr3157:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1438;
 st1438:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35918,9 +35922,9 @@ case 1440:
 tr3159:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1441;
 st1441:
@@ -35932,13 +35936,13 @@ case 1441:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -35963,10 +35967,10 @@ case 1441:
 		goto st1442;
 	goto st0;
 tr3168:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1442;
 tr3171:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1442;
 st1442:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -35993,13 +35997,13 @@ case 1443:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36027,7 +36031,7 @@ tr3164:
 	{ push_expr(ctx); }
 	goto st1444;
 tr3172:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1444;
 st1444:
@@ -36038,7 +36042,7 @@ case 1444:
 		goto tr3170;
 	goto st0;
 tr3173:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1445;
 st1445:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36049,13 +36053,13 @@ case 1445:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36083,7 +36087,7 @@ tr3165:
 	{ push_expr(ctx); }
 	goto st1446;
 tr3174:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	goto st1446;
 st1446:
@@ -36095,13 +36099,13 @@ case 1446:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36127,7 +36131,7 @@ case 1446:
 		goto tr3171;
 	goto st0;
 tr3175:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1447;
 st1447:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36138,13 +36142,13 @@ case 1447:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36171,22 +36175,22 @@ case 1447:
 tr3160:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1448;
 tr3161:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1448;
 tr3178:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1448;
 st1448:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36231,9 +36235,9 @@ case 1450:
 tr3180:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1451;
 st1451:
@@ -36245,13 +36249,13 @@ case 1451:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36278,25 +36282,25 @@ case 1451:
 tr3181:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1452;
 tr3182:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1452;
 tr3187:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1452;
 tr3189:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1452;
 st1452:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36315,7 +36319,7 @@ case 1452:
 	}
 	goto st0;
 tr3190:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1453;
 st1453:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36326,13 +36330,13 @@ case 1453:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36376,9 +36380,9 @@ case 1454:
 tr3191:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1455;
 st1455:
@@ -36390,13 +36394,13 @@ case 1455:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36423,25 +36427,25 @@ case 1455:
 tr3192:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1456;
 tr3193:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1456;
 tr3198:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1456;
 tr3200:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1456;
 st1456:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36460,7 +36464,7 @@ case 1456:
 	}
 	goto st0;
 tr3201:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1457;
 st1457:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36471,13 +36475,13 @@ case 1457:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36521,9 +36525,9 @@ case 1458:
 tr3202:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1459;
 st1459:
@@ -36535,13 +36539,13 @@ case 1459:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36568,25 +36572,25 @@ case 1459:
 tr3203:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1460;
 tr3204:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1460;
 tr3209:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1460;
 tr3211:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1460;
 st1460:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36605,7 +36609,7 @@ case 1460:
 	}
 	goto st0;
 tr3212:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1461;
 st1461:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36616,13 +36620,13 @@ case 1461:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36666,9 +36670,9 @@ case 1462:
 tr3213:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1463;
 st1463:
@@ -36680,13 +36684,13 @@ case 1463:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36713,25 +36717,25 @@ case 1463:
 tr3214:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1464;
 tr3215:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1464;
 tr3220:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1464;
 tr3222:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1464;
 st1464:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36750,7 +36754,7 @@ case 1464:
 	}
 	goto st0;
 tr3223:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1465;
 st1465:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36761,13 +36765,13 @@ case 1465:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36811,9 +36815,9 @@ case 1466:
 tr3224:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1467;
 st1467:
@@ -36825,13 +36829,13 @@ case 1467:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -36858,25 +36862,25 @@ case 1467:
 tr3225:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1468;
 tr3226:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1468;
 tr3231:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1468;
 tr3233:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1468;
 st1468:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36895,7 +36899,7 @@ case 1468:
 	}
 	goto st0;
 tr3234:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1469;
 st1469:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -36906,13 +36910,13 @@ case 1469:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37026,9 +37030,9 @@ case 1478:
 tr3243:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1479;
 st1479:
@@ -37040,13 +37044,13 @@ case 1479:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37073,25 +37077,25 @@ case 1479:
 tr3244:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1480;
 tr3245:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1480;
 tr3250:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1480;
 tr3252:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1480;
 st1480:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -37110,7 +37114,7 @@ case 1480:
 	}
 	goto st0;
 tr3253:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1481;
 st1481:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -37121,13 +37125,13 @@ case 1481:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37171,9 +37175,9 @@ case 1482:
 tr3254:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1483;
 st1483:
@@ -37185,13 +37189,13 @@ case 1483:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37216,25 +37220,25 @@ case 1483:
 tr3255:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1484;
 tr3256:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1484;
 tr3262:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1484;
 tr3265:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1484;
 st1484:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -37254,12 +37258,12 @@ case 1484:
 	goto st0;
 tr3259:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	goto st1485;
 tr3266:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	goto st1485;
 st1485:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -37269,7 +37273,7 @@ case 1485:
 		goto tr3263;
 	goto st0;
 tr3267:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1486;
 st1486:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -37280,13 +37284,13 @@ case 1486:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37385,9 +37389,9 @@ case 1493:
 tr3272:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1494;
 st1494:
@@ -37399,13 +37403,13 @@ case 1494:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37432,25 +37436,25 @@ case 1494:
 tr3273:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1495;
 tr3274:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1495;
 tr3279:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1495;
 tr3281:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1495;
 st1495:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -37469,7 +37473,7 @@ case 1495:
 	}
 	goto st0;
 tr3282:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1496;
 st1496:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -37480,13 +37484,13 @@ case 1496:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37561,9 +37565,9 @@ case 1501:
 tr3287:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1502;
 st1502:
@@ -37575,13 +37579,13 @@ case 1502:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37608,25 +37612,25 @@ case 1502:
 tr3288:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1503;
 tr3289:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1503;
 tr3294:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1503;
 tr3296:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1503;
 st1503:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -37645,7 +37649,7 @@ case 1503:
 	}
 	goto st0;
 tr3297:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1504;
 st1504:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -37656,13 +37660,13 @@ case 1504:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37844,18 +37848,18 @@ tr3313:
 	goto st1550;
 tr3319:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFGROUP_start(ctx->expr_value);
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFGROUP_start(expr_value);
     asm_DEFGROUP_define_const(name->str);
     }
 	goto st1550;
 tr3325:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFGROUP_start(ctx->expr_value);
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFGROUP_start(expr_value);
     asm_DEFGROUP_define_const(name->str);
     }
 	goto st1550;
@@ -37885,18 +37889,18 @@ tr3314:
 	goto st1521;
 tr3321:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFGROUP_start(ctx->expr_value);
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFGROUP_start(expr_value);
     asm_DEFGROUP_define_const(name->str);
     }
 	goto st1521;
 tr3327:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFGROUP_start(ctx->expr_value);
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFGROUP_start(expr_value);
     asm_DEFGROUP_define_const(name->str);
     }
 	goto st1521;
@@ -37929,9 +37933,9 @@ case 1522:
 tr3316:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1523;
 st1523:
@@ -37943,13 +37947,13 @@ case 1523:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -37976,25 +37980,25 @@ case 1523:
 tr3317:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1524;
 tr3318:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1524;
 tr3324:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1524;
 tr3326:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1524;
 st1524:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38013,7 +38017,7 @@ case 1524:
 	}
 	goto st0;
 tr3328:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1525;
 st1525:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38024,13 +38028,13 @@ case 1525:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -38102,62 +38106,62 @@ tr3338:
 	goto st1552;
 tr3346:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_B, ctx->expr_value );
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_B, expr_value );
     }
 	goto st1552;
 tr3351:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_B, ctx->expr_value );
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_B, expr_value );
     }
 	goto st1552;
 tr3357:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_W, ctx->expr_value );
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_W, expr_value );
     }
 	goto st1552;
 tr3362:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_W, ctx->expr_value );
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_W, expr_value );
     }
 	goto st1552;
 tr3368:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_P, ctx->expr_value );
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_P, expr_value );
     }
 	goto st1552;
 tr3373:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_P, ctx->expr_value );
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_P, expr_value );
     }
 	goto st1552;
 tr3379:
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_L, ctx->expr_value );
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_L, expr_value );
     }
 	goto st1552;
 tr3384:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	{ push_expr(ctx); }
-	{ pop_eval_expr(ctx); }
-	{ if (! ctx->expr_error)
-    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_L, ctx->expr_value );
+	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
+	{ if (! expr_error)
+    asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_L, expr_value );
     }
 	goto st1552;
 tr3387:
@@ -38203,9 +38207,9 @@ case 1531:
 tr3343:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1532;
 st1532:
@@ -38217,13 +38221,13 @@ case 1532:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -38250,25 +38254,25 @@ case 1532:
 tr3344:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1533;
 tr3345:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1533;
 tr3350:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1533;
 tr3352:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1533;
 st1533:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38287,7 +38291,7 @@ case 1533:
 	}
 	goto st0;
 tr3353:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1534;
 st1534:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38298,13 +38302,13 @@ case 1534:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -38348,9 +38352,9 @@ case 1535:
 tr3354:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1536;
 st1536:
@@ -38362,13 +38366,13 @@ case 1536:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -38395,25 +38399,25 @@ case 1536:
 tr3355:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1537;
 tr3356:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1537;
 tr3361:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1537;
 tr3363:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1537;
 st1537:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38432,7 +38436,7 @@ case 1537:
 	}
 	goto st0;
 tr3364:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1538;
 st1538:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38443,13 +38447,13 @@ case 1538:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -38493,9 +38497,9 @@ case 1539:
 tr3365:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1540;
 st1540:
@@ -38507,13 +38511,13 @@ case 1540:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -38540,25 +38544,25 @@ case 1540:
 tr3366:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1541;
 tr3367:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1541;
 tr3372:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1541;
 tr3374:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1541;
 st1541:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38577,7 +38581,7 @@ case 1541:
 	}
 	goto st0;
 tr3375:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1542;
 st1542:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38588,13 +38592,13 @@ case 1542:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -38638,9 +38642,9 @@ case 1543:
 tr3376:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1544;
 st1544:
@@ -38652,13 +38656,13 @@ case 1544:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {
@@ -38685,25 +38689,25 @@ case 1544:
 tr3377:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
 	goto st1545;
 tr3378:
 	{
   ctx->expr_start = ctx->p;
-  ctx->expr_in_parens =
+  expr_in_parens =
    (ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-  ctx->expr_open_parens = 0;
+  expr_open_parens = 0;
  }
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1545;
 tr3383:
-	{ ctx->expr_open_parens++; }
+	{ expr_open_parens++; }
 	goto st1545;
 tr3385:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1545;
 st1545:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38722,7 +38726,7 @@ case 1545:
 	}
 	goto st0;
 tr3386:
-	{ ctx->expr_open_parens--; }
+	{ expr_open_parens--; }
 	goto st1546;
 st1546:
 	if ( ++( ctx->p) == ( ctx->pe) )
@@ -38733,13 +38737,13 @@ case 1546:
 		if ( 37 <= ( ((int)ctx->p->tok)) && ( ((int)ctx->p->tok)) <= 37 ) {
 			_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 			if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 		}
 	} else if ( ( ((int)ctx->p->tok)) >= 19 ) {
 		_widec = (int)(32768 + (( ((int)ctx->p->tok)) - -32768));
 		if ( 
-  ctx->expr_open_parens > 0
+  expr_open_parens > 0
   ) _widec += 65536;
 	}
 	switch( _widec ) {

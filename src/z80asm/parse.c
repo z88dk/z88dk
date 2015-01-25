@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.26 2015-01-25 13:14:40 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.27 2015-01-25 17:52:01 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -149,27 +149,27 @@ static Expr *pop_expr(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   Pop and compute expression, issue error on failure
 *----------------------------------------------------------------------------*/
-static void pop_eval_expr(ParseCtx *ctx)
+static void pop_eval_expr(ParseCtx *ctx, int *pvalue, Bool *perror)
 {
 	Expr *expr;
 
-	ctx->expr_value = 0;
-	ctx->expr_error = FALSE;
+	*pvalue = 0;
+	*perror = FALSE;
 
 	expr = pop_expr(ctx);
 	if (expr == NULL)
 	{
-		ctx->expr_error = TRUE;				/* error output by push_expr() */
+		*perror = TRUE;				/* error output by push_expr() */
 		return;
 	}
 
 	/* eval and discard expression */
-	ctx->expr_value = Expr_eval(expr);
-	ctx->expr_error = (expr->result.not_evaluable);
+	*pvalue = Expr_eval(expr);
+	*perror = (expr->result.not_evaluable);
 	OBJ_DELETE(expr);
 
 	/* check errors */
-	if (ctx->expr_error)
+	if (*perror)
 		error_not_defined();
 }
 

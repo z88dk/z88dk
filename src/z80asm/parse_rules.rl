@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-25 13:14:41 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.46 2015-01-25 17:52:01 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -112,13 +112,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 	*   Expression 
 	*--------------------------------------------------------------------*/
 	action parens_open { 
-		ctx->expr_open_parens > 0 
+		expr_open_parens > 0 
 	}
 	
 	lparen = (_TK_LPAREN | _TK_LSQUARE) 
-			>{ ctx->expr_open_parens++; };
+			>{ expr_open_parens++; };
 	rparen = (_TK_RPAREN | _TK_RSQUARE) when parens_open
-			%{ ctx->expr_open_parens--; };
+			%{ expr_open_parens--; };
 
 	unary 	= _TK_MINUS | _TK_PLUS |
 #ifndef __LEGACY_Z80ASM_SYNTAX
@@ -147,9 +147,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 	
 	action expr_start_action {
 		ctx->expr_start = ctx->p;
-		ctx->expr_in_parens = 
+		expr_in_parens = 
 			(ctx->expr_start->tok == TK_LPAREN) ? TRUE : FALSE;
-		ctx->expr_open_parens = 0;
+		expr_open_parens = 0;
 	} 
 	
 	/* expression */
@@ -160,13 +160,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 	/* expression within parentheses */
 	paren_expr = expr1 
 			  >expr_start_action
-			  %{ if (! ctx->expr_in_parens)
+			  %{ if (! expr_in_parens)
 					return FALSE;		/* syntax error */
 				 push_expr(ctx); 
 			   };
 	
 	const_expr = 
-			  expr %{ pop_eval_expr(ctx); };
+			  expr %{ pop_eval_expr(ctx, &expr_value, &expr_error); };
 	
 	/*---------------------------------------------------------------------
 	*   DEFGROUP
@@ -182,8 +182,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 
 	defgroup_var_value =
 		  name _TK_EQUAL const_expr	
-		  %{ if (! ctx->expr_error) 
-				asm_DEFGROUP_start(ctx->expr_value);
+		  %{ if (! expr_error) 
+				asm_DEFGROUP_start(expr_value);
 			 asm_DEFGROUP_define_const(name->str);
 		  };
 	
@@ -212,13 +212,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 	*--------------------------------------------------------------------*/
 	asm_DEFVARS = 
 		  _TK_DEFVARS const_expr _TK_NEWLINE
-		  @{ if (! ctx->expr_error) 
-				asm_DEFVARS_start(ctx->expr_value);
+		  @{ if (! expr_error) 
+				asm_DEFVARS_start(expr_value);
 			 ctx->current_sm = SM_DEFVARS_OPEN;
 		  }
 		| _TK_DEFVARS const_expr _TK_LCURLY _TK_NEWLINE
-		  @{ if (! ctx->expr_error) 
-				asm_DEFVARS_start(ctx->expr_value);
+		  @{ if (! expr_error) 
+				asm_DEFVARS_start(expr_value);
 			 ctx->current_sm = SM_DEFVARS_LINE;
 		  }
 		;
@@ -237,8 +237,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 		  @{ asm_DEFVARS_define_const( name->str, 0, 0 ); }
 #foreach <S> in B, W, P, L
 		| name _TK_DS_<S> const_expr _TK_NEWLINE
-		  @{ if (! ctx->expr_error) 
-				asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_<S>, ctx->expr_value ); 
+		  @{ if (! expr_error) 
+				asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_<S>, expr_value ); 
 		  }
 #endfor  <S>
 		;
@@ -249,13 +249,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 	asm_DEFS = 
 		  label? _TK_DEFS const_expr _TK_NEWLINE 
 		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! ctx->expr_error) asm_DEFS(ctx->expr_value, 0); }
+		     if (compile_active && ! expr_error) asm_DEFS(expr_value, 0); }
 		| label? _TK_DEFS 
 				const_expr _TK_COMMA
-				@{ value1 = ctx->expr_error ? 0 : ctx->expr_value; }
+				@{ value1 = expr_error ? 0 : expr_value; }
 				const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! ctx->expr_error) asm_DEFS(value1, ctx->expr_value); }
+		     if (compile_active && ! expr_error) asm_DEFS(value1, expr_value); }
 		;			     
 		
 	/*---------------------------------------------------------------------
@@ -316,7 +316,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 	*--------------------------------------------------------------------*/
 #foreach <OP> in LINE, ORG
 	asm_<OP> = _TK_<OP> const_expr _TK_NEWLINE 
-			@{ if (!ctx->expr_error) asm_<OP>(ctx->expr_value); };
+			@{ if (!expr_error) asm_<OP>(expr_value); };
 #endfor  <OP>
 	directives_n = asm_LINE | asm_ORG;
 
@@ -374,9 +374,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 #foreach <OP> in CALL_OZ, OZ, CALL_PKG, FPP, INVOKE
 	asm_<OP> = label? _TK_<OP> const_expr _TK_NEWLINE
 			@{	if (compile_active) {
-					if (! ctx->expr_error) {
+					if (! expr_error) {
 						DO_STMT_LABEL();
-						add_Z88_<OP>(ctx->expr_value);
+						add_Z88_<OP>(expr_value);
 					}
 				}
 			};
@@ -444,7 +444,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 		/* LD r,N | LD A,(NN) */
 		|	label? _TK_LD _TK_<R1> _TK_COMMA expr _TK_NEWLINE
 			@{ 
-				if ( ctx->expr_in_parens ) {
+				if ( expr_in_parens ) {
 					if ( REG_<R1> == REG_A ) {
 						DO_stmt_nn( Z80_LD_A_IND_NN );		/* ld a,(NN) */
 					}
@@ -512,7 +512,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 		/* ld (NN),A */
 		| label? _TK_LD expr _TK_COMMA _TK_A _TK_NEWLINE
 		  @{
-				if (! ctx->expr_in_parens)
+				if (! expr_in_parens)
 					return FALSE;			/* syntax error */
 					
 				DO_stmt_nn( Z80_LD_IND_NN_A );		/* ld (NN),a */
@@ -533,7 +533,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 		/* ld dd,NN | ld dd,(NN) */
 		| label? _TK_LD _TK_<DD> _TK_COMMA expr _TK_NEWLINE
 		  @{
-				if ( ctx->expr_in_parens ) {
+				if ( expr_in_parens ) {
 					if ( REG_<DD> == REG_HL ) {		/* ld hl,(NN) */
 						DO_stmt_nn( P_<DD> + Z80_LD_idx_IND_nn );
 					}
@@ -551,7 +551,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 #foreach <DD> in HL, IX, IY
 		| label? _TK_LD expr _TK_COMMA _TK_<DD> _TK_NEWLINE
 		  @{
-				if (! ctx->expr_in_parens)
+				if (! expr_in_parens)
 					return FALSE;			/* syntax error */
 					
 				DO_stmt_nn( P_<DD> + Z80_LD_IND_nn_idx );
@@ -562,7 +562,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 #foreach <DD> in BC, DE, SP
 		| label? _TK_LD expr _TK_COMMA _TK_<DD> _TK_NEWLINE
 		  @{
-				if (! ctx->expr_in_parens)
+				if (! expr_in_parens)
 					return FALSE;			/* syntax error */
 					
 				DO_stmt_nn( Z80_LD_IND_nn_dd( REG_<DD> ) );	/* ld (NN),dd */
@@ -741,8 +741,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 #foreach <OP> in BIT, SET, RES
 	#foreach <R> in B, C, D, E, H, L, A
 		| label? _TK_<OP> const_expr _TK_COMMA _TK_<R> _TK_NEWLINE
-		  @{ if (!ctx->expr_error)
-				DO_stmt( Z80_<OP>( ctx->expr_value, REG_<R> ) ); 
+		  @{ if (!expr_error)
+				DO_stmt( Z80_<OP>( expr_value, REG_<R> ) ); 
 		  }
 	#endfor  <R>
 	
@@ -750,27 +750,27 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 		/* (x) */
 		| label? _TK_<OP> const_expr _TK_COMMA  
 					_TK_IND_<X> _TK_RPAREN _TK_NEWLINE
-		  @{ if (!ctx->expr_error)
+		  @{ if (!expr_error)
 				DO_stmt( ((P_<X>                           << 16) & 0xFF000000) +
-						 ((Z80_<OP>( ctx->expr_value, REG_idx ) << 8 ) & 0x00FF0000) +
+						 ((Z80_<OP>( expr_value, REG_idx ) << 8 ) & 0x00FF0000) +
 						 ((0                               << 8 ) & 0x0000FF00) +
-						 ((Z80_<OP>( ctx->expr_value, REG_idx ) << 0 ) & 0x000000FF) );
+						 ((Z80_<OP>( expr_value, REG_idx ) << 0 ) & 0x000000FF) );
 		   }
 			
 		/* (x+d) */
 		| label? _TK_<OP> const_expr _TK_COMMA  
 					_TK_IND_<X> expr _TK_RPAREN _TK_NEWLINE
-		  @{ if (!ctx->expr_error)
+		  @{ if (!expr_error)
 				DO_stmt_idx( ((P_<X> << 8) & 0xFF0000) + 
-						     Z80_<OP>( ctx->expr_value, REG_idx ) ); 
+						     Z80_<OP>( expr_value, REG_idx ) ); 
 		  }
 	#endfor  <X>
 	
 		/* (hl) */
 		| label? _TK_<OP>  const_expr _TK_COMMA
 					_TK_IND_HL _TK_NEWLINE
-		  @{ if (!ctx->expr_error)
-				DO_stmt( Z80_<OP>( ctx->expr_value, REG_idx ) ); 
+		  @{ if (!expr_error)
+				DO_stmt( Z80_<OP>( expr_value, REG_idx ) ); 
 		  }
 #endfor  <OP>
 
@@ -847,8 +847,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-
 		*--------------------------------------------------------------------*/
 #foreach <OP> in IM, RST
 		| label? _TK_<OP> const_expr _TK_NEWLINE
-		  @{ if (!ctx->expr_error)
-				DO_stmt( Z80_<OP>( ctx->expr_value ) );
+		  @{ if (!expr_error)
+				DO_stmt( Z80_<OP>( expr_value ) );
 		  }
 #endfor  <OP>
 
@@ -862,8 +862,12 @@ static Bool _parse_statement(ParseCtx *ctx, Bool compile_active)
 {
 	static Str  *name = NULL;		/* identifier name */
 	static Str  *stmt_label = NULL;	/* statement label, NULL if none */
-	int value1 = 0;
-	int start_num_errors = get_num_errors();;
+	int  value1 = 0;
+	int  start_num_errors = get_num_errors();;
+	int  expr_value = 0;			/* last computed expression value */
+	Bool expr_error = FALSE;		/* last computed expression error */
+	Bool expr_in_parens = FALSE;	/* true if expression has enclosing parens */
+	int  expr_open_parens = 0;		/* number of open parens */
 
 	INIT_OBJ(Str, &name); 		Str_clear(name);
 	INIT_OBJ(Str, &stmt_label);	Str_clear(stmt_label);
