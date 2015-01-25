@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.44 2015-01-24 21:24:45 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.45 2015-01-25 13:14:41 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -104,17 +104,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.44 2015-01-
 	variable eof ctx->eof;
 
 	/* label, name */
-	action set_stmt_label {
-		Str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen);
-	}
-	
-	action set_name {
-		Str_set_n(name, ctx->p->tstart, ctx->p->tlen);
-	}
-	
-	label  = _TK_LABEL  @set_stmt_label;
-	name   = _TK_NAME   @set_name;
-	string = _TK_STRING @set_name;
+	label  = _TK_LABEL  @{ Str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); };
+	name   = _TK_NAME   @{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); };
+	string = _TK_STRING @{ Str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); };
 	
 	/*---------------------------------------------------------------------
 	*   Expression 
@@ -267,6 +259,51 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.44 2015-01-
 		;			     
 		
 	/*---------------------------------------------------------------------
+	*   DEFB / DEFM
+	*--------------------------------------------------------------------*/
+	asm_DEFB_iter =
+			asm_DEFB_next:
+			(
+				string (_TK_COMMA | _TK_NEWLINE)
+				@{	DO_STMT_LABEL();
+					asm_DEFB_str(name->str, name->len);
+					if ( ctx->p->tok == TK_COMMA )
+						fgoto asm_DEFB_next;
+				}
+			|	expr (_TK_COMMA | _TK_NEWLINE)
+				@{	DO_STMT_LABEL();
+					asm_DEFB_expr(pop_expr(ctx));
+					if ( ctx->p->tok == TK_COMMA )
+						fgoto asm_DEFB_next;
+				}
+			);
+	asm_DEFB = 	label? 
+				(_TK_DEFB | _TK_DEFM)
+				@{	/* if ( ctx->p->tok == TK_DEFM )
+						warn_deprecated("DEFM", "DEFB"); 
+					*/
+				}
+				asm_DEFB_iter;
+
+	/*---------------------------------------------------------------------
+	*   DEFW / DEFL
+	*--------------------------------------------------------------------*/
+#foreach <OP> in DEFW, DEFL
+	asm_<OP>_iter =
+			asm_<OP>_next:
+				expr (_TK_COMMA | _TK_NEWLINE)
+				@{	DO_STMT_LABEL();
+					asm_<OP>(pop_expr(ctx));
+					if ( ctx->p->tok == TK_COMMA )
+						fgoto asm_<OP>_next;
+				}
+			;
+	asm_<OP> = 	label? _TK_<OP>	asm_<OP>_iter;
+#endfor  <OP>
+
+	directives_DEFx = asm_DEFS | asm_DEFB | asm_DEFW | asm_DEFL;
+	
+	/*---------------------------------------------------------------------
 	*   directives without arguments
 	*--------------------------------------------------------------------*/
 #foreach <OP> in LSTON, LSTOFF
@@ -320,20 +357,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.44 2015-01-
 	*   directives with list of assignments
 	*--------------------------------------------------------------------*/
 #foreach <OP> in DEFC
-/*
-	action <OP>_action { asm_<OP>(name->str, pop_expr(ctx)); }
-	
-	asm_<OP>_next = name _TK_EQUAL expr _TK_COMMA   %<OP>_action;
-	asm_<OP>_last = name _TK_EQUAL expr _TK_NEWLINE %<OP>_action;
-*/
-	
 	asm_<OP>_iter =
 			asm_<OP>_next: 
-					name _TK_EQUAL expr (_TK_COMMA | _TK_NEWLINE)
-					@{	asm_<OP>(name->str, pop_expr(ctx));
-						if ( ctx->p->tok == TK_COMMA )
-							fgoto asm_<OP>_next;
-					};
+				name _TK_EQUAL expr (_TK_COMMA | _TK_NEWLINE)
+				@{	asm_<OP>(name->str, pop_expr(ctx));
+					if ( ctx->p->tok == TK_COMMA )
+						fgoto asm_<OP>_next;
+				};
 	asm_<OP> = _TK_<OP> asm_<OP>_iter ;
 #endfor  <OP>
 	directives_assign = asm_DEFC;
@@ -361,10 +391,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.44 2015-01-
 		| _TK_NEWLINE
 		| directives_no_args | directives_n | directives_str
 		| directives_name | directives_names | directives_assign
+		| directives_DEFx
 		| asm_Z88DK
 		| asm_DEFGROUP
 		| asm_DEFVARS
-		| asm_DEFS
 		
 		/*---------------------------------------------------------------------
 		*   Z80 assembly

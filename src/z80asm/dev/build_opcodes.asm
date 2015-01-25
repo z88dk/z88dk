@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.19 2015-01-22 23:24:27 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.20 2015-01-25 13:14:41 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -57,20 +57,23 @@
 	call {-32769 65536}					;; warn 2: integer '{1}' out of range
 
 ;------------------------------------------------------------------------------
-; Strings
+; DEFB, DEFW, DEFL
 ;------------------------------------------------------------------------------
 
 	defb 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
 	defw 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
-	defm "ABCDEFGHIJKLMNOPQRSTUVWXYZ"	;; defm 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+	defb "ABCDEFGHIJKLMNOPQRSTUVWXYZ"	;; defm 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-	defm "								;; error: unclosed quoted string
-	defm "hello							;; error: unclosed quoted string
+	defb "								;; error: unclosed quoted string
+	defb "hello							;; error: unclosed quoted string
 
 	defb '								;; error: invalid single quoted character
 	defb 'x								;; error: invalid single quoted character
 	defb ''								;; error: invalid single quoted character
 	defb 'he'							;; error: invalid single quoted character
+
+	defw 0,102h,203h,304h
+	defl 0,1020304h,5060708h			;; defb 0,0,0,0, 4,3,2,1, 8,7,6,5
 
 ;------------------------------------------------------------------------------
 ; Expressions

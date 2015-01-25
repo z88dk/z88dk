@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.46 2015-01-18 17:36:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.47 2015-01-25 13:14:41 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -116,7 +116,7 @@ z80asm(
 		
 	;; note: BUG_0006
 		defb (2				;; error: syntax error in expression
-		defb (2+[			;; error: syntax error in expression
+		defb (2+[			;; error: syntax error
 		defb (2+[3-1]		;; error: syntax error in expression
 		defb (2+[3-1)]		;; error: syntax error in expression
 ASM

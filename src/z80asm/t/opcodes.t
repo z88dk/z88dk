@@ -102,17 +102,20 @@ END_ASM
                                         ;; CD 00 00
 
 ;------------------------------------------------------------------------------
-; Strings
+; DEFB, DEFW, DEFL
 ;------------------------------------------------------------------------------
 
         defb 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
                                         ;; 01 02 03 04 05 06 07 08 0A 0B 0C 0D 0E 0F 10 11 12 13 14 21
         defw 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
                                         ;; 01 00 02 00 03 00 04 00 05 00 06 00 07 00 08 00 0A 00 0B 00 0C 00 0D 00 0E 00 0F 00 10 00 11 00 12 00 13 00 14 00 21 00
-        defm "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        defb "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                         ;; 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A
 
 
+
+        defw 0,102h,203h,304h           ;; 00 00 02 01 03 02 04 03
+        defl 0,1020304h,5060708h        ;; 00 00 00 00 04 03 02 01 08 07 06 05
 
 ;------------------------------------------------------------------------------
 ; Expressions
@@ -2041,8 +2044,8 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
-        defm "                          ;; error: unclosed quoted string
-        defm "hello                     ;; error: unclosed quoted string
+        defb "                          ;; error: unclosed quoted string
+        defb "hello                     ;; error: unclosed quoted string
         defb '                          ;; error: invalid single quoted character
         defb 'x                         ;; error: invalid single quoted character
         defb ''                         ;; error: invalid single quoted character
@@ -2232,17 +2235,20 @@ END_ASM
                                         ;; CD 00 00
 
 ;------------------------------------------------------------------------------
-; Strings
+; DEFB, DEFW, DEFL
 ;------------------------------------------------------------------------------
 
         defb 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
                                         ;; 01 02 03 04 05 06 07 08 0A 0B 0C 0D 0E 0F 10 11 12 13 14 21
         defw 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
                                         ;; 01 00 02 00 03 00 04 00 05 00 06 00 07 00 08 00 0A 00 0B 00 0C 00 0D 00 0E 00 0F 00 10 00 11 00 12 00 13 00 14 00 21 00
-        defm "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        defb "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                         ;; 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A
 
 
+
+        defw 0,102h,203h,304h           ;; 00 00 02 01 03 02 04 03
+        defl 0,1020304h,5060708h        ;; 00 00 00 00 04 03 02 01 08 07 06 05
 
 ;------------------------------------------------------------------------------
 ; Expressions
@@ -2602,10 +2608,10 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
-        cpi                             ;; CD 09 09
-        cpir                            ;; CD 26 09
-        cpd                             ;; CD 52 09
-        cpdr                            ;; CD 6F 09
+        cpi                             ;; CD 1D 09
+        cpir                            ;; CD 3A 09
+        cpd                             ;; CD 66 09
+        cpdr                            ;; CD 83 09
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -3034,8 +3040,8 @@ END_ASM
 ;	sll ...
 ;	sli ...
 
-        rld                             ;; CD 9B 09
-        rrd                             ;; CD BD 09
+        rld                             ;; CD AF 09
+        rrd                             ;; CD D1 09
 
 ;	# rotate 16 bits
 ;
@@ -3643,10 +3649,10 @@ jr2:
         call z,NN                       ;; 20 03 CD 30 00
         call nc,NN                      ;; 38 03 CD 30 00
         call c,NN                       ;; 30 03 CD 30 00
-        call po,NN                      ;; EA 84 08 CD 30 00
-        call pe,NN                      ;; E2 8A 08 CD 30 00
-        call p,NN                       ;; FA 90 08 CD 30 00
-        call m,NN                       ;; F2 96 08 CD 30 00
+        call po,NN                      ;; EA 98 08 CD 30 00
+        call pe,NN                      ;; E2 9E 08 CD 30 00
+        call p,NN                       ;; FA A4 08 CD 30 00
+        call m,NN                       ;; F2 AA 08 CD 30 00
 
 
         rst  10h                        ;; D7
@@ -3973,7 +3979,7 @@ nop:
 
                           invoke 0      ;; CD 00 00
                           invoke 1      ;; CD 01 00
-                          invoke 65535  ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 2E 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 77 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD A2 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD C4 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+                          invoke 65535  ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 42 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 8B 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD B6 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD D8 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 
@@ -3983,8 +3989,8 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
-        defm "                          ;; error: unclosed quoted string
-        defm "hello                     ;; error: unclosed quoted string
+        defb "                          ;; error: unclosed quoted string
+        defb "hello                     ;; error: unclosed quoted string
         defb '                          ;; error: invalid single quoted character
         defb 'x                         ;; error: invalid single quoted character
         defb ''                         ;; error: invalid single quoted character

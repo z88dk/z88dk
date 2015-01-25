@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-DEFM.t,v 1.5 2014-07-06 23:43:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/op-DEFM.t,v 1.6 2015-01-25 13:14:41 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -34,9 +34,8 @@ t_z80asm_ok(0, "defm 32 $COMMA \"world\"",	" world");
 t_z80asm_ok(0, "defm \"hello\" $COMMA 32",	"hello ");
 t_z80asm_ok(0, 'defm 32',					" ");
 
-t_z80asm_error('defm "hello"&',				"Error at file 'test.asm' line 1: syntax error".
-											($COMMA eq '&' ? " in expression" : ""));
-t_z80asm_error('defm "hello",',				"Error at file 'test.asm' line 1: syntax error in expression");
+t_z80asm_error('defm "hello"&',				"Error at file 'test.asm' line 1: syntax error");
+t_z80asm_error('defm "hello",',				"Error at file 'test.asm' line 1: syntax error");
 
 if ($COMMA eq ',') {
 	t_z80asm_error('defm "hello"&32&"world"', "Error at file 'test.asm' line 1: syntax error");

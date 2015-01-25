@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.14 2014-07-06 23:43:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.15 2015-01-25 13:14:41 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -155,10 +155,10 @@ t_z80asm(
 );
 
 if ( ! get_legacy() ) {
-	t_z80asm_error("defb 1?",		"Error at file 'test.asm' line 1: syntax error in expression");
+	t_z80asm_error("defb 1?",		"Error at file 'test.asm' line 1: syntax error");
 	t_z80asm_error("defb 1?2",		"Error at file 'test.asm' line 1: syntax error in expression");
-	t_z80asm_error("defb 1?2:",		"Error at file 'test.asm' line 1: syntax error in expression");
-	t_z80asm_error("defb 1?2:1?",	"Error at file 'test.asm' line 1: syntax error in expression");
+	t_z80asm_error("defb 1?2:",		"Error at file 'test.asm' line 1: syntax error");
+	t_z80asm_error("defb 1?2:1?",	"Error at file 'test.asm' line 1: syntax error");
 }
 
 # text BUG_0043

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.12 2015-01-24 21:24:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.13 2015-01-25 13:14:40 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -30,6 +30,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.12 2015-01-24
 #include "strpool.h"
 #include "types.h"
 #include "symtab.h"
+#include "z80asm.h"
 #include <assert.h>
 
 /*-----------------------------------------------------------------------------
@@ -67,21 +68,6 @@ void asm_DEFGROUP_define_const(char *name)
 	else 
 		define_symbol(name, DEFGROUP_PC, TYPE_CONSTANT, 0);
 	DEFGROUP_PC++;
-}
-
-/*-----------------------------------------------------------------------------
-*   DEFS
-*----------------------------------------------------------------------------*/
-
-/* create a block of empty bytes, called by the DEFS directive */
-void asm_DEFS(int count, int fill)
-{
-	if (count < 0 || count > 0x10000)
-		error_int_range(count);
-	else if (fill < -128 || fill > 255)
-		error_int_range(fill);
-	else
-		append_defs(count, fill);
 }
 
 /*-----------------------------------------------------------------------------
@@ -266,7 +252,8 @@ void asm_DEFC(char *name, Expr *expr)
 {
 	int value; 
 
-	if ((expr->result.not_evaluable) ||	(expr->sym_type >= TYPE_ADDRESS))
+	value = Expr_eval(expr);		/* DEFC constant expression */
+	if ((expr->result.not_evaluable) || (expr->sym_type >= TYPE_ADDRESS))
 	{
 		/* store in object file to be computed at link time */
 		expr->expr_type_mask |= RANGE_WORD;
@@ -279,8 +266,47 @@ void asm_DEFC(char *name, Expr *expr)
 	}
 	else
 	{
-		value = Expr_eval(expr);		/* DEFC constant expression */
 		define_symbol(name, value, TYPE_CONSTANT, 0);
 		OBJ_DELETE(expr);
 	}
+}
+
+/*-----------------------------------------------------------------------------
+*   DEFS - create a block of empty bytes, called by the DEFS directive
+*----------------------------------------------------------------------------*/
+void asm_DEFS(int count, int fill)
+{
+	if (count < 0 || count > 0x10000)
+		error_int_range(count);
+	else if (fill < -128 || fill > 255)
+		error_int_range(fill);
+	else
+		append_defs(count, fill);
+}
+
+/*-----------------------------------------------------------------------------
+*   DEFB - add an expression or a string
+*----------------------------------------------------------------------------*/
+void asm_DEFB_str(char *str, int length)
+{
+	while (length-- > 0)
+		add_opcode((*str++) & 0xFF);
+}
+
+void asm_DEFB_expr(Expr *expr)
+{
+	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
+}
+
+/*-----------------------------------------------------------------------------
+*   DEFW, DEFL - add 2-byte and 4-byte expressions
+*----------------------------------------------------------------------------*/
+void asm_DEFW(Expr *expr)
+{
+	Pass2infoExpr(RANGE_WORD, expr);
+}
+
+void asm_DEFL(Expr *expr)
+{
+	Pass2infoExpr(RANGE_DWORD, expr);
 }

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.33 2015-01-21 23:34:54 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.34 2015-01-25 13:14:41 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -396,40 +396,6 @@ t_z80asm_capture("-Zillegaloption ".asm_file(), "",
 #------------------------------------------------------------------------------
 # fatal_max_codesize
 unlink_testfiles();
-
-# DEFB
-t_z80asm_ok(0, "defs 65535, 0xAA \n defb 0xAA \n",
-	    "\xAA" x 65536);
-t_z80asm_error("defs 65536, 0xAA \n defb 0xAA \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-t_z80asm_ok(0, "defs 65534, 0xAA \n defb 0xAA,0xAA \n",
-	    "\xAA" x 65536);
-t_z80asm_error("defs 65535, 0xAA \n defb 0xAA,0xAA \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-# DEFW
-t_z80asm_ok(0, "defs 65534, 0xAA \n defw 0xAAAA \n",
-	    "\xAA" x 65536);
-t_z80asm_error("defs 65535, 0xAA \n defw 0xAAAA \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-t_z80asm_ok(0, "defs 65532, 0xAA \n defw 0xAAAA, 0xAAAA \n",
-	    "\xAA" x 65536);
-t_z80asm_error("defs 65533, 0xAA \n defw 0xAAAA, 0xAAAA \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-# DEFP
-t_z80asm_ok(0, "defs 65533, 0xAA \n defp 0xAAAA,0xAA \n",
-	    "\xAA" x 65536);
-t_z80asm_error("defs 65534, 0xAA \n defp 0xAAAA,0xAA \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
-
-# DEFL
-t_z80asm_ok(0, "defs 65532, 0xAA \n defl 0xAAAAAAAA \n",
-	    "\xAA" x 65536);
-t_z80asm_error("defs 65533, 0xAA \n defl 0xAAAAAAAA \n",
-	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
 
 # DEFM
 t_z80asm_ok(0, "defs 65535, 'a' \n defm \"a\" \n",

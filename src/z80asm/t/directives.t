@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.12 2015-01-24 21:24:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.13 2015-01-25 13:14:41 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -199,6 +199,60 @@ z80asm(
 		defs 65536			;; error: max. code size of 65536 bytes reached
 END
 );
+
+#------------------------------------------------------------------------------
+# DEFB, DEFM - simple use tested in opcodes.t
+# test error messages here
+#------------------------------------------------------------------------------
+z80asm(asm => "xx: DEFB 		;; error: syntax error");
+z80asm(asm => "xx: DEFB xx, 	;; error: syntax error");
+z80asm(asm => "xx: DEFB xx,xx+1	;; 00 01");
+z80asm(asm => "xx: DEFB xx,\"\\0\\1\\2\",3	;; 00 00 01 02 03");
+
+z80asm(asm => "x1: DEFS 65535,0xAA \n x2: DEFB 0xAA",
+	   bin => "\xAA" x 65536);
+z80asm(asm => "x1: DEFS 65534,0xAA \n x2: DEFB 0xAA, 0xAA",
+	   bin => "\xAA" x 65536);
+z80asm(asm => "x1: DEFS 65536,0xAA \n x2: DEFB 0xAA ;; error: max. code size of 65536 bytes reached");
+z80asm(asm => "x1: DEFS 65535,0xAA \n x2: DEFB 0xAA, 0xAA ;; error: max. code size of 65536 bytes reached");
+
+z80asm(asm => "xx: DEFM",
+	   error => "Error at file 'test.asm' line 1: syntax error");
+# error => "Warning at file 'test.asm' line 1: 'DEFM' is deprecated, use 'DEFB' instead\nError at file 'test.asm' line 1: syntax error");
+z80asm(asm => "xx: DEFM xx,",
+	   error => "Error at file 'test.asm' line 1: syntax error");
+# error => "Warning at file 'test.asm' line 1: 'DEFM' is deprecated, use 'DEFB' instead\nError at file 'test.asm' line 1: syntax error");
+z80asm(asm => "xx: DEFM xx,xx+1	;; 00 01");
+# ;; warn: 'DEFM' is deprecated, use 'DEFB' instead
+z80asm(asm => "xx: DEFM xx,\"\\0\\1\\2\",3	;; 00 00 01 02 03");
+# ;; warn: 'DEFM' is deprecated, use 'DEFB' instead
+
+#------------------------------------------------------------------------------
+# DEFW, DEFL - simple use tested in opcodes.t
+# test error messages here
+#------------------------------------------------------------------------------
+z80asm(asm => "xx: DEFW 							;; error: syntax error");
+z80asm(asm => "xx: DEFW xx, 						;; error: syntax error");
+z80asm(asm => "xx: DEFW xx,xx+102h					;; 00 00 02 01");
+
+z80asm(asm => "x1: DEFS 65534,0xAA \n x2: DEFW 0xAAAA",
+	   bin => "\xAA" x 65536);
+z80asm(asm => "x1: DEFS 65532,0xAA \n x2: DEFW 0xAAAA, 0xAAAA",
+	   bin => "\xAA" x 65536);
+z80asm(asm => "x1: DEFS 65535,0xAA \n x2: DEFW 0xAAAA ;; error: max. code size of 65536 bytes reached");
+z80asm(asm => "x1: DEFS 65533,0xAA \n x2: DEFW 0xAAAA, 0xAAAA ;; error: max. code size of 65536 bytes reached");
+
+
+z80asm(asm => "xx: DEFL 							;; error: syntax error");
+z80asm(asm => "xx: DEFL xx, 						;; error: syntax error");
+z80asm(asm => "xx: DEFL xx,xx+1020304h				;; 00 00 00 00 04 03 02 01");
+
+z80asm(asm => "x1: DEFS 65532,0xAA \n x2: DEFL 0xAAAAAAAA",
+	   bin => "\xAA" x 65536);
+z80asm(asm => "x1: DEFS 65528,0xAA \n x2: DEFL 0xAAAAAAAA, 0xAAAAAAAA",
+	   bin => "\xAA" x 65536);
+z80asm(asm => "x1: DEFS 65533,0xAA \n x2: DEFL 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached");
+z80asm(asm => "x1: DEFS 65529,0xAA \n x2: DEFL 0xAAAAAAAA, 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached");
 
 
 #------------------------------------------------------------------------------

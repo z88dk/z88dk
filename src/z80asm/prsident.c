@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.116 2015-01-24 21:24:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.117 2015-01-25 13:14:41 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -36,7 +36,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/prsident.c,v 1.116 2015-
 void ifstatement(ParseCtx *ctx, Bool compile_active);
 void ifdefstatement(ParseCtx *ctx, Bool compile_active);
 void ifndefstatement(ParseCtx *ctx, Bool compile_active);
-void DEFB( void ), DEFM( void ), DEFW( void ), DEFL( void ), DEFP( void );
 
 
 
@@ -59,11 +58,6 @@ struct Z80sym
 #define DEF_ENTRY(func)     { #func, func }
 struct Z80sym Z80ident[] =
 {
-    DEF_ENTRY( DEFB ),
-    DEF_ENTRY( DEFL ),
-    DEF_ENTRY( DEFM ),
-    DEF_ENTRY( DEFP ),
-    DEF_ENTRY( DEFW ),
     DEF_ENTRY( ELSE ),
     DEF_ENTRY( ENDIF ),
 	DEF_ENTRY( IF ),

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.12 2015-01-24 21:24:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.13 2015-01-25 13:14:40 pauloscustodio Exp $
 */
 
 #pragma once
@@ -46,9 +46,6 @@ extern void asm_DEFGROUP_start(int next_value);
 
 /* define one constant with the next value, increment the value */
 extern void asm_DEFGROUP_define_const(char *name);
-
-/* create a block of empty bytes, called by the DEFS directive */
-extern void asm_DEFS(int count, int fill);
 
 /* directives without arguments */
 extern void asm_LSTON(void);
@@ -81,3 +78,14 @@ extern void asm_UNDEFINE(char *name);
 
 /* define a constant or expression */
 extern void asm_DEFC(char *name, struct Expr *expr);
+
+/* create a block of empty bytes, called by the DEFS directive */
+extern void asm_DEFS(int count, int fill);
+
+/* DEFB - add an expression or a string */
+extern void asm_DEFB_str(char *str, int length);
+extern void asm_DEFB_expr(struct Expr *expr);
+
+/* DEFW, DEFL - add 2-byte and 4-byte expressions */
+extern void asm_DEFW(struct Expr *expr);
+extern void asm_DEFL(struct Expr *expr);

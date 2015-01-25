@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.25 2015-01-17 14:02:03 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.26 2015-01-25 13:14:40 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -229,8 +229,6 @@ static void read_token(ParseCtx *ctx)
 	case TK_NAME:
 	case TK_LABEL:
 	case TK_STRING:
-		sym_copy.tstart = token_strings_add(ctx, sym_text(&sym_copy));
-		sym_copy.tlen = strlen(sym_copy.tstart);
 		break;
 
 	case TK_END:
