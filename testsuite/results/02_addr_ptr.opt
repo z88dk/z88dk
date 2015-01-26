@@ -1,0 +1,29 @@
+
+
+
+	; MODULE	02_addr_ptr.c
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+
+._main
+	ld	hl,58056	;const
+	ld	(hl),#(100 % 256 % 256)
+	ld	l,(hl)
+	ld	h,0
+	ret
+
+
+
+
+
+
+
+
+	PUBLIC	_main
+
+
+
+

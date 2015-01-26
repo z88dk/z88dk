@@ -1,0 +1,44 @@
+
+
+
+	; MODULE	01_cast_global_pointer.c
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+
+._main
+	ld	hl,(_a)
+	push	hl
+	ld	hl,(_st_main_c)
+	pop	bc
+	ret
+
+
+
+._test
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,1	;const
+	push	hl
+	pop	bc
+	pop	bc
+	ret
+
+
+
+
+
+._a	defs	2
+._st_main_c	defs	2
+
+
+
+	PUBLIC	_a
+	PUBLIC	_main
+	PUBLIC	_test
+
+
+
+
