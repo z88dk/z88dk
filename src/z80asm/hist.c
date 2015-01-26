@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.135 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.136 2015-01-26 23:52:01 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.135 2015-01-26 23:4
 
 /*
 * $Log: hist.c,v $
-* Revision 1.135  2015-01-26 23:46:22  pauloscustodio
+* Revision 1.136  2015-01-26 23:52:01  pauloscustodio
+* Add list of future features
+*
+* Revision 1.135  2015/01/26 23:46:22  pauloscustodio
 * Updated copyright year
 *
 * Revision 1.134  2015/01/26 23:25:25  pauloscustodio
@@ -2198,8 +2201,22 @@ Based on 1.0.31
 	  the address is consecutive with the previous section.
 	  
 -------------------------------------------------------------------------------
-FUTURE CHANGES - require change of the object file format
+FUTURE CHANGES 
 -------------------------------------------------------------------------------
+	- remove legacy expression syntax support
+	- replace DEFL by DEFDW, to allow DEFL for variable labels
+	- allow EQU as synonym to DEFC
+	- finish the split between front-end and back-end;
+	- implement an expression parser with a parser generator, to get rid of
+	  the need to write a '#' to tell the assembler something it should know:
+	  a difference between two addresses is a constant;
+	- add an additional step to automatically change JR into JP if the
+	  distance is too far;
+	- cleanup the symbol table to implement the GLOBAL suggestion: declare a
+	  symbol GLOBAL and it is PUBLIC if defined, or EXTERN otherwise
+	- implement macros inside the assembler
+	- add high level constructs (IF flag / ELSE / ENDIF, DO WHILE flag, ...)
+	- add a rule based optimizer based on RAGEL as a state machine generator
 	BUG_0038: library modules not loaded in sequence
 		The library modules loaded to the linked binary file should respect
 		the order given on the command line.
