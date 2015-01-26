@@ -11,14 +11,16 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2013
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/Makefile,v 1.4 2014-06-23 22:12:07 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/Makefile,v 1.5 2015-01-26 23:27:47 pauloscustodio Exp $
 
 .SUFFIXES: .txt .html
 
-SRCS 	:= $(wildcard object_file_format_v*.txt)
+SRCS 	:= $(wildcard *.txt)
 HTMLS	:= $(SRCS:.txt=.html)
 
 .txt.html:
-	perl -MText::MultiMarkdown=markdown -e "local $$/; print markdown(<>)" $< > $@
+	perl mmd2html.pl $<
 
 all: 	$(HTMLS)
+
+$(HTMLS) : mmd2html.pl
