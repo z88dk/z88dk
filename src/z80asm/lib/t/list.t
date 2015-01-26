@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-# Copyright (C) Paulo Custodio, 2011-2014
+# Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.7 2014-07-06 03:06:15 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.8 2015-01-26 23:46:23 pauloscustodio Exp $
 #
 # Test list.c
 

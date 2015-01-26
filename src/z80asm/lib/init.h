@@ -1,9 +1,9 @@
 /*
 Macros to help define init() and fini() functions per module
 
-Copyright (C) Paulo Custodio, 2011-2014
+Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.7 2014-07-05 12:26:28 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.8 2015-01-26 23:46:22 pauloscustodio Exp $
 */
 
 #pragma once

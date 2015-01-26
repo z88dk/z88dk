@@ -4,9 +4,9 @@ includes.
 Allows pushing back of lines, for example to expand macros.
 Call back interface to declare that a new line has been read.
 
-Copyright (C) Paulo Custodio, 2011-2014
+Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.14 2015-01-03 18:39:06 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.15 2015-01-26 23:46:22 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */

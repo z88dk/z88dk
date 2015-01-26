@@ -5,9 +5,9 @@ All objects that were not deleted during the program execution
 are orderly destroyed at the exit, i.e. by calling the destructor of
 each object, which in turn may call destructors of contained objects.
 
-Copyright (C) Paulo Custodio, 2011-2014
+Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.9 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.10 2015-01-26 23:46:22 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */

@@ -2,9 +2,9 @@
 Generic doubly linked list, data allocation is handled by the caller.
 Uses queue.h for implementation.
 
-Copyright (C) Paulo Custodio, 2011-2014
+Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.15 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.h,v 1.16 2015-01-26 23:46:22 pauloscustodio Exp $
 */
 
 #pragma once

@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-# Copyright (C) Paulo Custodio, 2011-2014
+# Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.18 2014-09-01 21:09:08 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.19 2015-01-26 23:46:23 pauloscustodio Exp $
 #
 # Test fileutil.c
 

@@ -4,9 +4,9 @@ able to retrieve in the order added.
 Keys are kept in strpool, no need to release memory.
 Uses StrHash to keep the keys, takes care of memory allocation of values.
 
-Copyright (C) Paulo Custodio, 2011-2014
+Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.14 2014-09-01 21:51:55 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/classhash.h,v 1.15 2015-01-26 23:46:22 pauloscustodio Exp $
 */
 
 #pragma once

@@ -5,9 +5,9 @@ with same next/first and prev/last pointers as first elements.
 Ring head always exists and has next pointing to first element and 
 prev to last element, or to itself if list is empty.
 
-Copyright (C) Paulo Custodio, 2011-2014
+Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.c,v 1.4 2014-07-02 22:34:21 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/dlist.c,v 1.5 2015-01-26 23:46:22 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"		/* before any other include */

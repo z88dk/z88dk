@@ -2,9 +2,9 @@
 Template array that grows on request. Items may move in memory on reallocation.
 Uses strutil.h for implementation.
 
-Copyright (C) Paulo Custodio, 2011-2014
+Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.14 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.15 2015-01-26 23:46:22 pauloscustodio Exp $
 */
 
 #pragma once

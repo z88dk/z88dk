@@ -4,9 +4,9 @@ Most keywords in input program are the same, no need to keep several copies
 and manage strdup/free for each token.
 Strings with the same contents are reused.
 
-Copyright (C) Paulo Custodio, 2011-2014
+Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.h,v 1.4 2014-07-06 15:45:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.h,v 1.5 2015-01-26 23:46:22 pauloscustodio Exp $
 */
 
 #pragma once

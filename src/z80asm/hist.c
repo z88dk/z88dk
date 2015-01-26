@@ -11,9 +11,9 @@
   ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2014
+Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.134 2015-01-26 23:25:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.135 2015-01-26 23:46:22 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.134 2015-01-26 23:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.134  2015-01-26 23:25:25  pauloscustodio
+* Revision 1.135  2015-01-26 23:46:22  pauloscustodio
+* Updated copyright year
+*
+* Revision 1.134  2015/01/26 23:25:25  pauloscustodio
 * Implemented IF, IFDEF, IFNDEF, ELSE, ENDIF within the RAGEL parser.
 * Finished replacing the statement parser by a RAGEL state machine, except for
 * the expressions' parser, which is still a recursive-descent parser.
@@ -2218,7 +2221,7 @@ FUTURE CHANGES - require change of the object file format
 #include "hist.h"
 
 #define VERSION     "2.7.0"
-#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
+#define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS
 #include <qdos.h>

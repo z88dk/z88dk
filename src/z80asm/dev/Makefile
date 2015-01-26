@@ -10,11 +10,11 @@
 #  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2013
+# Copyright (C) Paulo Custodio, 2011-2015
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.13 2015-01-03 18:39:06 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.14 2015-01-26 23:46:22 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -94,7 +94,10 @@ all:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.13  2015-01-03 18:39:06  pauloscustodio
+# Revision 1.14  2015-01-26 23:46:22  pauloscustodio
+# Updated copyright year
+#
+# Revision 1.13  2015/01/03 18:39:06  pauloscustodio
 # Implemented DEFVARS within the RAGEL parser
 #
 # Revision 1.12  2014/12/13 00:49:46  pauloscustodio

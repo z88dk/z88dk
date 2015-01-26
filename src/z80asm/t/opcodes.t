@@ -26,7 +26,7 @@ END_ASM
 ;
 ; Input data for tests, to be parsed by build_opcodes.pl
 ;
-; Copyright (C) Paulo Custodio, 2011-2014
+; Copyright (C) Paulo Custodio, 2011-2015
 ;
 ;------------------------------------------------------------------------------
 
@@ -2141,7 +2141,7 @@ END_ASM
 ;
 ; Input data for tests, to be parsed by build_opcodes.pl
 ;
-; Copyright (C) Paulo Custodio, 2011-2014
+; Copyright (C) Paulo Custodio, 2011-2015
 ;
 ;------------------------------------------------------------------------------
 
@@ -4209,3 +4209,4 @@ ds:     defs not_defined                ;; error: symbol not defined
         invoke 65536                    ;; error: integer '65536' out of range
 END_ASM
 );
+
