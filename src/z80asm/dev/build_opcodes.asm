@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2014
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.20 2015-01-25 13:14:41 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.21 2015-01-26 23:25:25 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -509,12 +509,6 @@ ENDIF
 ;------------------------------------------------------------------------------
 ; IFDEF ELSE ENDIF
 ;------------------------------------------------------------------------------
-	ifdef 								;; error: syntax error
-	endif								;;
-	
-	ifdef 1								;; error: syntax error
-	endif								;;
-
 	defc   ifdef_1 = 0					;;
 	define ifdef_2						;;
 
@@ -551,12 +545,6 @@ ENDIF
 ;------------------------------------------------------------------------------
 ; IFNDEF ELSE ENDIF
 ;------------------------------------------------------------------------------
-	ifndef 								;; error: syntax error
-	endif								;;
-	
-	ifndef 1								;; error: syntax error
-	endif								;;
-
 	defc   ifndef_1 = 0					;;
 	define ifndef_2						;;
 

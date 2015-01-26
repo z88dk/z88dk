@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2014
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.13 2015-01-25 13:14:41 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.14 2015-01-26 23:25:26 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -763,3 +763,60 @@ z80asm(
 END
 );
 unlink("test1.dat");
+
+#------------------------------------------------------------------------------
+# IF ELSE ENDIF - simple use tested in opcodes.t
+# test error messages here
+#------------------------------------------------------------------------------
+z80asm(asm => "IF 		;; error: syntax error");
+z80asm(asm => "IF 1+	;; error: syntax error");
+z80asm(asm => "IF 1",
+	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.asm' line 1");
+z80asm(asm => "ELSE 	;; error: unbalanced control structure");
+z80asm(asm => "ENDIF 	;; error: unbalanced control structure");
+
+z80asm(asm => <<'END',
+	IF 1 
+	ELSE 
+	ELSE 	;; error: unbalanced control structure started at file 'test.asm' line 1
+	ENDIF
+END
+);
+
+write_file("test.inc", "IF 1\n");
+z80asm(asm => 'INCLUDE "test.inc"',
+	   error => "Error at file 'test.inc' line 2: unbalanced control structure started at file 'test.inc' line 1");
+
+z80asm(asm => "IFDEF	;; error: syntax error");
+z80asm(asm => "IFDEF 1	;; error: syntax error");
+z80asm(asm => "IFDEF hello",
+	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.asm' line 1");
+	   
+z80asm(asm => <<'END',
+	IFDEF hello 
+	ELSE 
+	ELSE 	;; error: unbalanced control structure started at file 'test.asm' line 1
+	ENDIF
+END
+);
+
+write_file("test.inc", "IFDEF hello\n");
+z80asm(asm => 'INCLUDE "test.inc"',
+	   error => "Error at file 'test.inc' line 2: unbalanced control structure started at file 'test.inc' line 1");
+
+z80asm(asm => "IFNDEF	;; error: syntax error");
+z80asm(asm => "IFNDEF 1	;; error: syntax error");
+z80asm(asm => "IFNDEF hello",
+	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.asm' line 1");
+	   
+z80asm(asm => <<'END',
+	IFNDEF hello 
+	ELSE 
+	ELSE 	;; error: unbalanced control structure started at file 'test.asm' line 1
+	ENDIF
+END
+);
+
+write_file("test.inc", "IFNDEF hello\n");
+z80asm(asm => 'INCLUDE "test.inc"',
+	   error => "Error at file 'test.inc' line 2: unbalanced control structure started at file 'test.inc' line 1");

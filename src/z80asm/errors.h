@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.28 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.29 2015-01-26 23:25:25 pauloscustodio Exp $
 */
 
 #pragma once
@@ -40,6 +40,9 @@ extern void set_error_null( void );             /* clear all locations */
 extern void set_error_file( char *filename );
 extern void set_error_module( char *modulename );
 extern void set_error_line( int lineno );
+
+extern char *get_error_file(void);
+extern int   get_error_line(void);
 
 /*-----------------------------------------------------------------------------
 *	reset count of errors and return current count

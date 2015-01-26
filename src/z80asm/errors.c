@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.48 2014-07-06 23:11:25 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.49 2015-01-26 23:25:25 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -118,6 +118,18 @@ void set_error_line( int lineno )
 {
     init();
     errors.line = lineno;
+}
+
+char *get_error_file(void)
+{
+	init();
+	return errors.filename;
+}
+
+int get_error_line(void)
+{
+	init();
+	return errors.line;
 }
 
 /*-----------------------------------------------------------------------------

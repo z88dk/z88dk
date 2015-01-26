@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.46 2015-01-25 17:52:01 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.47 2015-01-26 23:25:26 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -28,28 +28,22 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.46 2015-01-
 
 /* macros for actions - labels */
 #define DO_STMT_LABEL() \
-			if (compile_active) { \
-				if (stmt_label->len) { \
-					asm_LABEL(stmt_label->str); \
-					stmt_label->len = 0; \
-				} \
+			if (stmt_label->len) { \
+				asm_LABEL(stmt_label->str); \
+				stmt_label->len = 0; \
 			}
 
 /* macros for actions - statements */
 #define DO_stmt(opcode) \
-			if (compile_active) { \
+			{ \
 				DO_STMT_LABEL(); \
 				add_opcode(opcode); \
 			}
 
 #define _DO_stmt_(suffix, opcode) \
 			{ 	Expr *expr = pop_expr(ctx); \
-				if (compile_active) { \
-					DO_STMT_LABEL(); \
-					add_opcode_##suffix((opcode), expr); \
-				} \
-				else \
-					OBJ_DELETE(expr); \
+				DO_STMT_LABEL(); \
+				add_opcode_##suffix((opcode), expr); \
 			}
 
 #define DO_stmt_jr( opcode)	_DO_stmt_(jr,  opcode)
@@ -60,32 +54,19 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.46 2015-01-
 #define DO_stmt_idx_n(opcode) \
 			{ 	Expr *n_expr   = pop_expr(ctx); \
 				Expr *idx_expr = pop_expr(ctx); \
-				if (compile_active) { \
-					DO_STMT_LABEL(); \
-					add_opcode_idx_n((opcode), \
-									 idx_expr, n_expr); \
-				} \
-				else { \
-					OBJ_DELETE(n_expr); \
-					OBJ_DELETE(idx_expr); \
-				} \
+				DO_STMT_LABEL(); \
+				add_opcode_idx_n((opcode), idx_expr, n_expr); \
 			}
 
 #define DO_stmt_emul(opcode, emul_func) \
-			{	if (compile_active) { \
-					DO_STMT_LABEL(); \
-					add_opcode_emul((opcode), #emul_func); \
-				} \
+			{	DO_STMT_LABEL(); \
+				add_opcode_emul((opcode), #emul_func); \
 			}
 
 #define DO_stmt_call_flag(flag) \
 			{ 	Expr *expr = pop_expr(ctx); \
-				if (compile_active) { \
-					DO_STMT_LABEL(); \
-					add_call_flag(FLAG_##flag, expr); \
-				} \
-				else \
-					OBJ_DELETE(expr); \
+				DO_STMT_LABEL(); \
+				add_call_flag(FLAG_##flag, expr); \
 			}
 
 /*-----------------------------------------------------------------------------
@@ -169,6 +150,24 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.46 2015-01-
 			  expr %{ pop_eval_expr(ctx, &expr_value, &expr_error); };
 	
 	/*---------------------------------------------------------------------
+	*   IF, IFDEF, IFNDEF, ELSE, ENDIF
+	*--------------------------------------------------------------------*/
+	asm_IF = 	 _TK_IF     expr _TK_NEWLINE @{ asm_IF(ctx, pop_expr(ctx) ); };
+	asm_IFDEF =  _TK_IFDEF  name _TK_NEWLINE @{ asm_IFDEF(ctx, name->str ); };
+	asm_IFNDEF = _TK_IFNDEF name _TK_NEWLINE @{ asm_IFNDEF(ctx, name->str ); };
+	asm_ELSE =	 _TK_ELSE        _TK_NEWLINE @{ asm_ELSE(ctx); };
+	asm_ENDIF =	 _TK_ENDIF       _TK_NEWLINE @{ asm_ENDIF(ctx); };
+	
+	asm_conditional = asm_IF | asm_IFDEF | asm_IFNDEF |
+					  asm_ELSE | asm_ENDIF;
+					  
+	skip :=
+		  _TK_END
+		| _TK_NEWLINE
+		| asm_conditional 
+		| (any - _TK_NEWLINE - asm_conditional)* _TK_NEWLINE;
+	
+	/*---------------------------------------------------------------------
 	*   DEFGROUP
 	*--------------------------------------------------------------------*/
 	asm_DEFGROUP =
@@ -249,13 +248,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.46 2015-01-
 	asm_DEFS = 
 		  label? _TK_DEFS const_expr _TK_NEWLINE 
 		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! expr_error) asm_DEFS(expr_value, 0); }
+		     if (! expr_error) asm_DEFS(expr_value, 0); }
 		| label? _TK_DEFS 
 				const_expr _TK_COMMA
 				@{ value1 = expr_error ? 0 : expr_value; }
 				const_expr _TK_NEWLINE
 		  @{ DO_STMT_LABEL(); 
-		     if (compile_active && ! expr_error) asm_DEFS(value1, expr_value); }
+		     if (! expr_error) asm_DEFS(value1, expr_value); }
 		;			     
 		
 	/*---------------------------------------------------------------------
@@ -373,11 +372,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.46 2015-01-
 	*--------------------------------------------------------------------*/
 #foreach <OP> in CALL_OZ, OZ, CALL_PKG, FPP, INVOKE
 	asm_<OP> = label? _TK_<OP> const_expr _TK_NEWLINE
-			@{	if (compile_active) {
-					if (! expr_error) {
-						DO_STMT_LABEL();
-						add_Z88_<OP>(expr_value);
-					}
+			@{	if (! expr_error) {
+					DO_STMT_LABEL();
+					add_Z88_<OP>(expr_value);
 				}
 			};
 #endfor  <OP>
@@ -395,7 +392,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.46 2015-01-
 		| asm_Z88DK
 		| asm_DEFGROUP
 		| asm_DEFVARS
-		
+		| asm_conditional
 		/*---------------------------------------------------------------------
 		*   Z80 assembly
 		*--------------------------------------------------------------------*/
@@ -858,7 +855,43 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.46 2015-01-
 
 %%write data;
 
-static Bool _parse_statement(ParseCtx *ctx, Bool compile_active)
+static int get_start_state(ParseCtx *ctx)
+{
+	OpenStruct *open_struct;
+
+	switch (ctx->current_sm)
+	{
+	case SM_MAIN:
+		open_struct = (OpenStruct *)utarray_back(ctx->open_structs);
+		if (open_struct == NULL || (open_struct->active && open_struct->parent_active))
+			return parser_en_main;
+		else
+			return parser_en_skip;
+
+	case SM_DEFVARS_OPEN:
+		scan_expect_operands();
+		return parser_en_defvars_open;
+
+	case SM_DEFVARS_LINE:
+		scan_expect_operands();
+		return parser_en_defvars_line;
+
+	case SM_DEFGROUP_OPEN:
+		scan_expect_operands();
+		return parser_en_defgroup_open;
+
+	case SM_DEFGROUP_LINE:
+		scan_expect_operands();
+		return parser_en_defgroup_line;
+
+	default:
+		assert(0);
+	}
+
+	return 0;	/* not reached */
+}
+
+static Bool _parse_statement(ParseCtx *ctx)
 {
 	static Str  *name = NULL;		/* identifier name */
 	static Str  *stmt_label = NULL;	/* statement label, NULL if none */
@@ -873,16 +906,7 @@ static Bool _parse_statement(ParseCtx *ctx, Bool compile_active)
 	INIT_OBJ(Str, &stmt_label);	Str_clear(stmt_label);
 	
 	%%write init nocs;
-	switch (ctx->current_sm)
-	{
-	case SM_MAIN:			ctx->cs = parser_en_main; break;
-	case SM_DEFVARS_OPEN:	ctx->cs = parser_en_defvars_open;  scan_expect_operands(); break;
-	case SM_DEFVARS_LINE:	ctx->cs = parser_en_defvars_line;  scan_expect_operands(); break;
-	case SM_DEFGROUP_OPEN:	ctx->cs = parser_en_defgroup_open; scan_expect_operands(); break;
-	case SM_DEFGROUP_LINE:	ctx->cs = parser_en_defgroup_line; scan_expect_operands(); break;
-	default: assert(0);
-	}
-	
+	ctx->cs = get_start_state(ctx);
 	ctx->p = ctx->pe = ctx->eof = ctx->expr_start = NULL;
 	
 	while ( ctx->eof == NULL || ctx->eof != ctx->pe )

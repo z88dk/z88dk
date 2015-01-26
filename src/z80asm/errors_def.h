@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.34 2015-01-03 18:39:05 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.35 2015-01-26 23:25:25 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -52,6 +52,8 @@ ERR( ErrError,	error_unclosed_string( void ),			"unclosed quoted string" )
 ERR( ErrError,	error_divide_by_zero( void ),			"division by zero" )
 ERR(ErrError, error_missing_block(void), "missing {} block")
 ERR(ErrError, error_missing_close_block(void), "{} block not closed")
+ERR(ErrError, error_unbalanced_struct_at(char *filename, int line_nr), "unbalanced control structure started at file '%s' line %d" _C_ filename _C_ line_nr)
+ERR(ErrError, error_unbalanced_struct(void), "unbalanced control structure")
 
 ERR( ErrError,	error_not_defined( void ),				"symbol not defined" )
 

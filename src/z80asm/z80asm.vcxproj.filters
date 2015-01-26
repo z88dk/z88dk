@@ -167,9 +167,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="asmdrctv.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="hist.c">
       <Filter>Source Files</Filter>
     </ClCompile>

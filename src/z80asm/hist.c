@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2014
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.133 2015-01-18 18:37:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.134 2015-01-26 23:25:25 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.133 2015-01-18 18:3
 
 /*
 * $Log: hist.c,v $
-* Revision 1.133  2015-01-18 18:37:16  pauloscustodio
+* Revision 1.134  2015-01-26 23:25:25  pauloscustodio
+* Implemented IF, IFDEF, IFNDEF, ELSE, ENDIF within the RAGEL parser.
+* Finished replacing the statement parser by a RAGEL state machine, except for
+* the expressions' parser, which is still a recursive-descent parser.
+*
+* Revision 1.133  2015/01/18 18:37:16  pauloscustodio
 * Implemented MODULE within the RAGEL parser
 *
 * Revision 1.132  2015/01/17 14:02:03  pauloscustodio
@@ -2168,7 +2173,7 @@ Based on 1.0.31
 	  split binary files for each section with a defined ORG.
 	  
 -------------------------------------------------------------------------------
-xx.xx.2014 [2.6.2] (pauloscustodio)
+26.01.2015 [2.7.0] (pauloscustodio)
 -------------------------------------------------------------------------------
 	- Add lexer tokens for registers, CPU flags, DEFVARS size specifiers,
 	  opcodes and directives, simplifying the parser. Build in a tokenizer 
@@ -2212,7 +2217,7 @@ FUTURE CHANGES - require change of the object file format
 
 #include "hist.h"
 
-#define VERSION     "2.6.2i"
+#define VERSION     "2.7.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2014"
 
 #ifdef QDOS

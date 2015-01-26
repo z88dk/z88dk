@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2014
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.48 2015-01-25 13:14:41 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.49 2015-01-26 23:25:26 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -53,10 +53,6 @@ TOKEN(	TK_NUMBER,		"", )
 TOKEN(	TK_STRING,		"", )
 TOKEN(	TK_TERN_COND,	"", )	/* cond ? true : false */
 TOKEN(	TK_ASMPC,		"ASMPC", )
-
-TOKEN(	TK_IF_STMT,		"", )
-TOKEN(	TK_ELSE_STMT,	"", )
-TOKEN(	TK_ENDIF_STMT,	"", )
 
 /*-----------------------------------------------------------------------------
 *	lexical tokens in ASCII order
@@ -226,16 +222,21 @@ TOKEN_RE(TK_IND_SP, "(SP)", "(" hspace "SP"i hspace ")", )
 
 /* assembly directives */
 TOKEN_OPCODE(BINARY		)
-TOKEN_OPCODE(DEFGROUP	)
-TOKEN_OPCODE(DEFINE		)
 TOKEN_OPCODE(DEFB		)
 TOKEN_OPCODE(DEFC		)
+TOKEN_OPCODE(DEFGROUP	)
+TOKEN_OPCODE(DEFINE		)
 TOKEN_OPCODE(DEFL		)
 TOKEN_OPCODE(DEFM		)
 TOKEN_OPCODE(DEFS		)
-TOKEN_OPCODE(DEFW		)
 TOKEN_OPCODE(DEFVARS	)
+TOKEN_OPCODE(DEFW		)
+TOKEN_OPCODE(ELSE		)
+TOKEN_OPCODE(ENDIF		)
 TOKEN_OPCODE(EXTERN		)
+TOKEN_OPCODE(IF			)
+TOKEN_OPCODE(IFDEF		)
+TOKEN_OPCODE(IFNDEF		)
 TOKEN_OPCODE(INCLUDE	)
 TOKEN_OPCODE(LIB		)
 TOKEN_OPCODE(LINE		)

@@ -140,7 +140,6 @@
     <ClInclude Include="z80asm.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="asmdrctv.c" />
     <ClCompile Include="codearea.c" />
     <ClCompile Include="deffile.c" />
     <ClCompile Include="directives.c" />
