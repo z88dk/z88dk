@@ -173,9 +173,6 @@
     <ClCompile Include="modlink.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="prsident.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="z80asm.c">
       <Filter>Source Files</Filter>
     </ClCompile>

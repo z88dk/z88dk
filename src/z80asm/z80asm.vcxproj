@@ -167,7 +167,6 @@
     <ClCompile Include="opcodes.c" />
     <ClCompile Include="options.c" />
     <ClCompile Include="parse.c" />
-    <ClCompile Include="prsident.c" />
     <ClCompile Include="scan.c" />
     <ClCompile Include="sym.c" />
     <ClCompile Include="symref.c" />
