@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.16 2015-01-21 07:05:01 stefano Exp $
+;       $Id: vz_crt0.asm,v 1.17 2015-01-26 16:50:29 stefano Exp $
 ;
 
 
@@ -190,7 +190,7 @@ ENDIF
 ; Now some variables
 ;-----------
 coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    0       ; Address of the Graphics map
+base_graphics:  defw    7000h   ; Address of the Graphics map
 gfx_bank:       defb    0
 
 IF !DEFINED_HAVESEED

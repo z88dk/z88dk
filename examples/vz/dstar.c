@@ -323,10 +323,19 @@ setuplevel()
 
 void redrawscreen(void)
 {
-/*
-   Nothing here.
-   Text and Graphics cannot be mixed on the VZ
-*/
+/* Init Graphics page */
+#asm
+				ld	a,8
+				ld	(6800h),a
+				ld	(783bh),a		; force graph mode
+
+				ld	hl,7000h	; base of graphics area
+				ld	(hl),0
+				ld	d,h
+				ld	e,1			; de	= base_graphics+1
+				ld	bc,128*64/4-1
+				ldir				; reset graphics window (2K)
+#endasm
 }
 
 /* Draw the board, mostly written in C, even though we did take a bit

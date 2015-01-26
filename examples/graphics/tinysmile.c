@@ -11,6 +11,7 @@
  *  Lo-rez version, for Galaksija & co. by Stefano Bodrato
  */
 
+#include <graphics.h>
 #include <games.h>
 
 char smile[] =
