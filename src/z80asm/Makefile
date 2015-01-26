@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.187 2015-01-26 23:42:39 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.188 2015-01-26 23:47:04 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -329,7 +329,6 @@ parse.o: directives.h lib/except.h expr.h lib/classlist.h scan.h legacy.h
 parse.o: scan_tokens.h opcodes.h errors.h errors_def.h options.h lib/list.h
 parse.o: options_def.h sym.h symref.h listfile.h model.h module.h symtab.h
 parse.o: parse.h lib/utarray.h lib/strpool.h parse_rules.h
-prsident.o: lib/xmalloc.h
 scan.o: lib/xmalloc.h errors.h errors_def.h lib/init.h lib/types.h lib/list.h
 scan.o: lib/class.h lib/queue.h model.h module.h lib/classlist.h
 scan.o: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h lib/array.h
