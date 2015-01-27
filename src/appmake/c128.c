@@ -3,11 +3,12 @@
  *
  *      This simply adds in the length of the program
  *      
- *      $Id: c128.c,v 1.1 2007-06-02 23:26:03 dom Exp $
+ *      $Id: c128.c,v 1.2 2015-01-27 22:05:28 stefano Exp $
  */
 
 
 #include "appmake.h"
+#include <string.h>
 
 
 
@@ -34,9 +35,10 @@ option_t c128_options[] = {
 int c128_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
+    char    ldrfile[FILENAME_MAX+1];
     FILE   *fpin;
     FILE   *fpout;
-    int     len;
+    int     len,namelen;
     int     c,i;
 
     if ( help )
@@ -48,17 +50,18 @@ int c128_exec(char *target)
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);
-        suffix_change(filename,".tap");
+        suffix_change(filename,"");
     } else {
         strcpy(filename,outfile);
     }
+
+	for (i=0;i<=strlen(filename);i++)
+		filename[i]=toupper(filename[i]);
 
     if ( (fpin=fopen(binname,"rb") ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }
-
- 
 
     if (fseek(fpin,0,SEEK_END)) {
         fprintf(stderr,"Couldn't determine size of file\n");
@@ -82,8 +85,134 @@ int c128_exec(char *target)
         writebyte(c,fpout);
     }
 
-
     fclose(fpin);
+    fclose(fpout);
+    
+
+    /* Now let's create a loader block */
+
+    namelen=strlen(filename);
+    strcpy(ldrfile,filename);
+    suffix_change(ldrfile,".PRG");
+
+    if ( (fpout=fopen(ldrfile,"wb") ) == NULL ) {
+        myexit("Can't create the loader file\n",1);
+    }
+    
+    /* start address of the first line of the BASIC program */
+    writeword(0x1C01,fpout);
+    /* address of the next BASIC program line */
+    writeword(0x1C09,fpout);
+    
+    /* 10 */
+    writebyte(10,fpout);
+    writebyte(0,fpout);
+    /* BANK */
+    writebyte(0xfe,fpout);
+    writebyte(0x02,fpout);
+    /* 0 */
+    writebyte('0',fpout);
+    /* end of line */
+    writebyte(0,fpout);
+
+    /* start address of the next line of the BASIC program */
+    writeword(0x1C09+12+namelen,fpout);
+    /* 20 */
+    writebyte(20,fpout);
+    writebyte(0,fpout);
+    /* BLOAD */
+    writebyte(0xfe,fpout);
+    writebyte(0x11,fpout);
+    /* "<prgname>",B0 */
+    writebyte('"',fpout);
+    for (i=0;i<=strlen(filename);i++)
+        writebyte(filename[i],fpout);
+    writebyte('"',fpout);
+    writebyte(',',fpout);
+    writebyte('B',fpout);
+    writebyte('0',fpout);
+    /* end of line */
+    writebyte(0,fpout);
+    
+    /* start address of the next line of the BASIC program */
+    writeword(0x1C09+12+34+namelen,fpout);
+    /* 30 */
+    writebyte(30,fpout);
+    writebyte(0,fpout);
+    /* ..Z80 instructions for "JP $3000" */
+    writebyte(0x97,fpout);    /* POKE */
+    writebyte('6',fpout);
+    writebyte('5',fpout);
+    writebyte('5',fpout);
+    writebyte('1',fpout);
+    writebyte('8',fpout);
+    writebyte(',',fpout);
+    writebyte('1',fpout);
+    writebyte('9',fpout);
+    writebyte('5',fpout);
+    writebyte(':',fpout);
+    writebyte(0x97,fpout);    /* POKE */
+    writebyte('6',fpout);
+    writebyte('5',fpout);
+    writebyte('5',fpout);
+    writebyte('1',fpout);
+    writebyte('9',fpout);
+    writebyte(',',fpout);
+    writebyte('0',fpout);
+    writebyte(':',fpout);
+    writebyte(0x97,fpout);    /* POKE */
+    writebyte('6',fpout);
+    writebyte('5',fpout);
+    writebyte('5',fpout);
+    writebyte('2',fpout);
+    writebyte('0',fpout);
+    writebyte(',',fpout);
+    writebyte('4',fpout);
+    writebyte('8',fpout);
+    /* end of line */
+    writebyte(0,fpout);
+
+    /* start address of the next line of the BASIC program */
+    writeword(0x1C09+12+34+22+namelen,fpout);
+    /* 40 */
+    writebyte(40,fpout);
+    writebyte(0,fpout);
+    /* ..6502 instructions for "CLI/RTS" */
+    writebyte(0x97,fpout);    /* POKE */
+    writebyte('4',fpout);
+    writebyte('3',fpout);
+    writebyte('5',fpout);
+    writebyte('2',fpout);
+    writebyte(',',fpout);
+    writebyte('8',fpout);
+    writebyte('8',fpout);
+    writebyte(':',fpout);
+    writebyte(0x97,fpout);    /* POKE */
+    writebyte('4',fpout);
+    writebyte('3',fpout);
+    writebyte('5',fpout);
+    writebyte('3',fpout);
+    writebyte(',',fpout);
+    writebyte('9',fpout);
+    writebyte('6',fpout);
+    /* end of line */
+    writebyte(0,fpout);
+
+    /* start address of the next line of the BASIC program */
+    writeword(0x1C09+12+34+22+13+namelen,fpout);
+    /* 50 */
+    writebyte(50,fpout);
+    writebyte(0,fpout);
+    writebyte(0x9e,fpout);    /* SYS */
+    writebyte('6',fpout);
+    writebyte('5',fpout);
+    writebyte('4',fpout);
+    writebyte('8',fpout);
+    writebyte('8',fpout);
+    writebyte(':',fpout);
+    writebyte(80,fpout);    /* END */
+    writebyte(0,fpout);
+
     fclose(fpout);
 
     return 0;
