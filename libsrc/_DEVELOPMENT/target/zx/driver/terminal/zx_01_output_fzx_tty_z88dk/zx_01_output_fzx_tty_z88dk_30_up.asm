@@ -1,0 +1,8 @@
+
+SECTION code_fcntl
+
+PUBLIC zx_01_output_fzx_tty_z88dk_30_up
+
+EXTERN zx_01_output_fzx_proc_move_up
+
+defc zx_01_output_fzx_tty_z88dk_30_up = zx_01_output_fzx_proc_move_up
