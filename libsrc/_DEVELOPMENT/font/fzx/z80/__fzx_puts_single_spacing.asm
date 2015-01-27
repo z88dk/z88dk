@@ -1,5 +1,5 @@
 
-SECTION code_fcntl
+SECTION code_font_fzx
 
 PUBLIC __fzx_puts_single_spacing
 
