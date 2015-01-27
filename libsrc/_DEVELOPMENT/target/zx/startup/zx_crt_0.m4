@@ -63,11 +63,12 @@ dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
 dnl############################################################
-
-; Must EXTERN fonts referenced by the drivers
-;
-; EXTERN _font_4x8_default
-; EXTERN _ff_ao_Soxz
+dnl
+dnl#; Some default fonts:
+dnl#;
+dnl#; _font_8x8_rom
+dnl#; _font_4x8_default
+dnl#; _ff_ao_Soxz
 
 include(../../clib_instantiate_begin.m4)
 include(../../clib_instantiate_end.m4)

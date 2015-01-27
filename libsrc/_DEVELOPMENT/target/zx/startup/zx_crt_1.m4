@@ -63,11 +63,12 @@ dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
 dnl############################################################
-
-; Must EXTERN fonts referenced by the drivers
-;
-; EXTERN _font_4x8_default
-; EXTERN _ff_ao_Soxz
+dnl
+dnl#; Some default fonts:
+dnl#;
+dnl#; _font_8x8_rom
+dnl#; _font_4x8_default
+dnl#; _ff_ao_Soxz
 
 include(../../clib_instantiate_begin.m4)
 
@@ -75,7 +76,7 @@ include(../driver/terminal/zx_01_input_kbd_inkey.m4)dnl
 m4_zx_01_input_kbd_inkey(_stdin, __i_fcntl_fdstruct_1, 0x03b0, 64, 1, 500, 15)dnl
 
 include(../driver/terminal/zx_01_output_char_32.m4)dnl
-m4_zx_01_output_char_32(_stdout, 0x2370, 0, 0, 0, 32, 0, 24, 0, 15360, 56, 0, 56)dnl
+m4_zx_01_output_char_32(_stdout, 0x2370, 0, 0, 0, 32, 0, 24, 0, _font_8x8_rom, 56, 0, 56)dnl
 
 include(../../m4_file_dup.m4)dnl
 m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
