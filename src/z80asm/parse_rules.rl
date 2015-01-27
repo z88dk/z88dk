@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.48 2015-01-26 23:46:22 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.49 2015-01-27 21:03:42 pauloscustodio Exp $ 
 */
 
 #include "legacy.h"
@@ -896,7 +896,7 @@ static Bool _parse_statement(ParseCtx *ctx)
 	static Str  *name = NULL;		/* identifier name */
 	static Str  *stmt_label = NULL;	/* statement label, NULL if none */
 	int  value1 = 0;
-	int  start_num_errors = get_num_errors();;
+	int  start_num_errors = get_num_errors();
 	int  expr_value = 0;			/* last computed expression value */
 	Bool expr_error = FALSE;		/* last computed expression error */
 	Bool expr_in_parens = FALSE;	/* true if expression has enclosing parens */
