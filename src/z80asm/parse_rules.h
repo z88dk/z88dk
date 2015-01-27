@@ -44,7 +44,7 @@ static Bool _parse_statement(ParseCtx *ctx)
  static Str *name = NULL;
  static Str *stmt_label = NULL;
  int value1 = 0;
- int start_num_errors = get_num_errors();;
+ int start_num_errors = get_num_errors();
  int expr_value = 0;
  Bool expr_error = FALSE;
  Bool expr_in_parens = FALSE;
