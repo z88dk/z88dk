@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+#ifdef WIN32
+#define strcasecmp(a,b) stricmp(a,b)
+#endif
+
 #define LDRIM(r)                \
           st+= 7,               \
           r= mem[pc++]
@@ -563,7 +567,7 @@ int main (int argc, char **argv){
       if( size>65536 && size!=65574 )
         printf("\nIncorrect length: %d\n", size),
         exit(-1);
-      else if( !stricmp(strchr(argv[1], '.'), ".sna" ) && size==49179 ){
+      else if( !strcasecmp(strchr(argv[1], '.'), ".sna" ) && size==49179 ){
         FILE *fk= fopen("48.rom", "rb");
         if( !fk )
           printf("\nZX Spectrum ROM file not found: 48.rom\n"),
@@ -2925,7 +2929,7 @@ int main (int argc, char **argv){
     if( !fh )
       printf("\nCannot create or write in file: %s\n", output),
       exit(-1);
-    if( !stricmp(strchr(output, '.'), ".sna" ) )
+    if( !strcasecmp(strchr(output, '.'), ".sna" ) )
       mem[--sp]= pc>>8,
       mem[--sp]= pc,
       fwrite(&i, 1, 1, fh),
@@ -2963,7 +2967,7 @@ int main (int argc, char **argv){
       fwrite(&im, 1, 1, fh),
       fwrite(&w, 1, 1, fh),
       fwrite(mem+0x4000, 1, 0xc000, fh);
-    else if ( !stricmp(strchr(output, '.'), ".scr" ) )
+    else if ( !strcasecmp(strchr(output, '.'), ".scr" ) )
       fwrite(mem+0x4000, 1, 0x1b00, fh);
     else{
       fwrite(mem, 1, 65536, fh);
