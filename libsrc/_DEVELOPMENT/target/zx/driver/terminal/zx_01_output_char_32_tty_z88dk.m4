@@ -151,6 +151,8 @@ define(`m4_zx_01_output_char_32_tty_z88dk',dnl
       ; text mask
       ; background colour
       
+      EXTERN $10
+      
       defw $10
       defb $11
       defb $12

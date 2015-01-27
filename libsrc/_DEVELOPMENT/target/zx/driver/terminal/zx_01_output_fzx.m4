@@ -177,6 +177,8 @@ define(`m4_zx_01_output_fzx',dnl
       ; font
       ; cursor (x,y)
 
+      EXTERN $10
+
       defw $10
       defw `$3, $4'
       
