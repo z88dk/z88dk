@@ -2,50 +2,58 @@
 TODO:
 
 [
-* pattern filler
-  add shaped fill
 
-* output terminal
-  add inverse, underline, italic, xor, or
-  
 * text mode open on memstreams
 
-* all struct offsets in asm code should be defined in a DEFVARS block
+* do we really need two sets of input/output primitives for stdio
 
 * known issue: input terminals immediately repeat key on caps/lower transition
 
 * known issue: fzx justify functions need to distribute remainder spacing evenly
 
-* low level fzx print functions with embedded sequences
+* known issue: in password mode output terminals display '*' when enter typed
 
-* do we really need two sets of input/output primitives for stdio
-
-* known issue:  in password mode output terminals display '*' when enter typed
-
-* add library options to opt in/out of ioctls
-
-* make some library options compile time rather than library build time
-
-
-]
-
-* fzx tty_z88dk output terminal
-
-* fzx output terminal scroll limit seems off
-
-* target open
+* known issue: fzx output terminal scroll limit seems off
 
 * zx scroll reexamined
 
 * change 4x8 font to use only nibbles in definition
 
-* generate fresh crts for spectrum if2 target
+
+MEDIUM TERM:
+
+* add library options to opt in/out of ioctls
+
+* make some library options compile time rather than library build time
+
+
+
+LONG TERM:
+
+* all struct offsets in asm code should be defined in a DEFVARS block
+
+* low level fzx print functions with embedded sequences
+
+
+
+LONG TERM TENTATIVE:
+
+* pattern filler
+  add shaped fill
+
+* output terminal
+  add inverse, underline, italic, xor, or
+
+
+]
+
+* target open
+
+* generate fresh crts for spectrum target
+
+* EXTERN reference for PUBLIC definition in same file generates error
 
 * check constraints on code location in some stdio state machines
 
 * create library functions to load from fixed offset from ix
 should save dozens of bytes
-
-* add library options to opt in/out of ioctls
-
-* make some library options compile time rather than library build time
