@@ -15,6 +15,4 @@ zx_01_output_char_32_tty_z88dk_30_up:
    call console_01_output_char_proc_move_up
    
    ld (ix+15),d                ; store y coord
-   
-   or a
    ret

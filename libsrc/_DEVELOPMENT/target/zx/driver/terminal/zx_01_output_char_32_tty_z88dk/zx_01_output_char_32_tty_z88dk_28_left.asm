@@ -20,5 +20,4 @@ zx_01_output_char_32_tty_z88dk_28_left:
    ld (ix+14),e                ; store x coord
    ld (ix+15),d                ; store y coord
    
-   or a
    ret
