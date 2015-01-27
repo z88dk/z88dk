@@ -4209,4 +4209,3 @@ ds:     defs not_defined                ;; error: symbol not defined
         invoke 65536                    ;; error: integer '65536' out of range
 END_ASM
 );
-

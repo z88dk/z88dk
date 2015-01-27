@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.136 2015-01-26 23:52:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.137 2015-01-27 21:48:00 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.136 2015-01-26 23:5
 
 /*
 * $Log: hist.c,v $
-* Revision 1.136  2015-01-26 23:52:01  pauloscustodio
+* Revision 1.137  2015-01-27 21:48:00  pauloscustodio
+* symbol can be declared both EXTERN and PUBLIC in the same file
+*
+* Revision 1.136  2015/01/26 23:52:01  pauloscustodio
 * Add list of future features
 *
 * Revision 1.135  2015/01/26 23:46:22  pauloscustodio
@@ -2201,6 +2204,11 @@ Based on 1.0.31
 	  the address is consecutive with the previous section.
 	  
 -------------------------------------------------------------------------------
+xx.xx.2015 [2.7.1] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- symbol can be declared both EXTERN and PUBLIC in the same file
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
 	- remove legacy expression syntax support
@@ -2237,7 +2245,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.0"
+#define VERSION     "2.7.1a"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

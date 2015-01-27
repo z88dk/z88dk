@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.42 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.43 2015-01-27 21:48:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -125,28 +125,25 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
 		scope = ( sym->sym_type_mask & SYM_PUBLIC ) ? 'G' :
 			    ( sym->sym_type_mask & SYM_LOCAL  ) ? 'L' : 0;
 
-		if ( scope != 0 ) 
+		if (scope != 0 && (sym->sym_type_mask & SYM_TOUCHED) && sym->sym_type != TYPE_UNKNOWN)
 		{
-			if ( sym->sym_type_mask & SYM_TOUCHED ) 
+			/* type */
+			switch (sym->sym_type)
 			{
-				/* type */
-				switch ( sym->sym_type )
-				{
-				case TYPE_CONSTANT:	type = 'C'; break;
-				case TYPE_ADDRESS:	type = 'A'; break;
-				case TYPE_COMPUTED:	type = '='; break;
-				default: assert(0);
-				}
-
-				xfput_uint8( fp, scope );
-				xfput_uint8( fp, type );
-
-				xfput_count_byte_strz( fp, sym->section->name );
-				xfput_uint32(fp, sym->value );
-				xfput_count_byte_strz( fp, sym->name );
-
-				written++;
+			case TYPE_CONSTANT:	type = 'C'; break;
+			case TYPE_ADDRESS:	type = 'A'; break;
+			case TYPE_COMPUTED:	type = '='; break;
+			default: assert(0);
 			}
+
+			xfput_uint8(fp, scope);
+			xfput_uint8(fp, type);
+
+			xfput_count_byte_strz(fp, sym->section->name);
+			xfput_uint32(fp, sym->value);
+			xfput_count_byte_strz(fp, sym->name);
+
+			written++;
 		}
     }
 	return written;

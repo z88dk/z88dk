@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.26 2015-01-26 23:46:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.27 2015-01-27 21:48:00 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -167,25 +167,22 @@ t_z80asm(
 
 # PUBLIC
 t_z80asm(
-	asm		=> "PUBLIC VAR : PUBLIC VAR : VAR: defb VAR",
-	bin		=> "\0",
+	asm		=> "PUBLIC VAR : PUBLIC VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
 );
 
 t_z80asm(
-	asm		=> "PUBLIC VAR : EXTERN VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
-);
-
-t_z80asm(
-	asm		=> "EXTERN VAR : defb VAR",
-	asm1	=> "PUBLIC VAR : defc VAR=3",
-	bin		=> "\3",
+	asm		=> "PUBLIC VAR : EXTERN VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
 );
 
 # EXTERN
 t_z80asm(
-	asm		=> "EXTERN VAR : PUBLIC VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
+	asm		=> "EXTERN VAR : PUBLIC VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
 );
 
 t_z80asm(

@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.49 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.50 2015-01-27 21:48:00 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -424,9 +424,9 @@ void declare_public_symbol( char *name )
             }
             else if ( ( sym->sym_type_mask & SYM_PUBLIC ) != SYM_PUBLIC )
             {
-                /* re-declaration not allowed */
-                error_symbol_redecl( name );
-            }
+				sym->sym_type_mask &= ~SYM_EXTERN;	/* re-declare symbol as global if symbol was */
+				sym->sym_type_mask |= SYM_PUBLIC;	/* declared extern */
+			}
         }
     }
     else
@@ -479,6 +479,7 @@ void declare_extern_symbol( char *name )
         }
         else
         {
+#if 0
             /* not local, global */
             if ( sym->module == CURRENTMODULE )
             {
@@ -488,7 +489,8 @@ void declare_extern_symbol( char *name )
                     error_symbol_redecl( name );
                 }
             }
-        }
+#endif
+		}
     }
     else
     {
@@ -518,9 +520,11 @@ void declare_extern_symbol( char *name )
         }
         else if ( ( sym->sym_type_mask & SYM_EXTERN ) != SYM_EXTERN )
         {
-            /* re-declaration not allowed */
+#if 0
+			/* re-declaration not allowed */
             error_symbol_redecl( name );
-        }
+#endif
+		}
     }
 }
 
