@@ -78,6 +78,7 @@ l/z80/ascii/txt_to_num/small/l_small_otoul
 l/z80/integer/l_addu_hl_bc
 l/z80/integer/l_addu_hl_de
 l/z80/integer/l_asr_hl
+l/z80/integer/l_divu_hl
 l/z80/integer/l_incu_bc
 l/z80/integer/l_incu_de
 l/z80/integer/l_incu_hl
