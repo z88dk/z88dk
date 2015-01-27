@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.45 2015-01-24 09:59:10 stefano Exp $
+#	$Id: Makefile,v 1.46 2015-01-27 05:59:43 aralbrec Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -15,7 +15,7 @@ DEFAULT = z88
 
 # --> End of Configurable Options
 
-all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm config
+all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks config
 
 setup:
 	echo '#define PREFIX "${prefix}$"/lib/z88dk"' > src/config.h
@@ -56,6 +56,10 @@ zx7:
 z80nm:
 	$(MAKE) -C support/ar
 	$(MAKE) -C support/ar PREFIX=`pwd` install
+
+ticks:
+	$(MAKE) -C src/ticks
+	$(MAKE) -C src/ticks PREFIX=`pwd` install
 
 config:
 	./config.sh `pwd`/ $(DEFAULT)
