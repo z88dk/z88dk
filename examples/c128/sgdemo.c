@@ -11,7 +11,7 @@ Originally Compiled with HI-TECH C 3.09 (CP/M-80).
 Now ported to Z88DK by Stefano Bodrato
 
 To compile for a minimal C128 without CP/M:
-	zcc +c128ansi -lndos -lmalloc sgdemo.c
+	zcc +c128 -lndos -lmalloc sgdemo.c
 	bin3000 a.bin z80mc  (then use c1541 to put 'z80mc' in a disk image)
 	The BASIC loader making the Z80 Jump at address $3000:
 		10 BANK0
