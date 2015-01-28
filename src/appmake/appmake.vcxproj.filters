@@ -137,5 +137,8 @@
     <ClCompile Include="inject.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="extract.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
