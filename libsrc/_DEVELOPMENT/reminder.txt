@@ -17,7 +17,7 @@ TODO:
 
 * zx scroll reexamined
 
-* change 4x8 font to use only nibbles in definition
+* change 4x8 font to use only nibbles in font definitions
 
 
 MEDIUM TERM:
@@ -26,13 +26,12 @@ MEDIUM TERM:
 
 * make some library options compile time rather than library build time
 
+* low level fzx print functions with embedded sequences
 
 
 LONG TERM:
 
 * all struct offsets in asm code should be defined in a DEFVARS block
-
-* low level fzx print functions with embedded sequences
 
 
 
@@ -48,10 +47,6 @@ LONG TERM TENTATIVE:
 ]
 
 * target open
-
-* generate fresh crts for spectrum target
-
-* EXTERN reference for PUBLIC definition in same file generates error
 
 * check constraints on code location in some stdio state machines
 
