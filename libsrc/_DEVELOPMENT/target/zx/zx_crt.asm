@@ -76,13 +76,25 @@ ENDIF
 
 IF startup = 8
 
-   ; fzx terminal using ff_ao_Dutch font
+   ; fzx terminal using ff_ao_Soxz font
    ;
    ; stdin  = zx_01_input_kbd_inkey
    ; stdout = zx_01_output_fzx full screen
    ; stderr = dup(stdout)
    
    INCLUDE "startup/zx_crt_8.asm"
+
+ENDIF
+
+IF startup = 9
+
+   ; fzx terminal using ff_ao_Soxz font tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_fzx full screen
+   ; stderr = dup(stdout)
+   
+   INCLUDE "startup/zx_crt_9.asm"
 
 ENDIF
 
@@ -153,13 +165,26 @@ ENDIF
 IF startup = 40
 
    ; if 2 cartridge
-   ; fzx terminal using ff_ao_Dutch font
+   ; fzx terminal using ff_ao_Soxz font
    ;
    ; stdin  = zx_01_input_kbd_inkey
    ; stdout = zx_01_output_fzx full screen
    ; stderr = dup(stdout)
    
    INCLUDE "startup/zx_crt_40.asm"
+
+ENDIF
+
+IF startup = 41
+
+   ; if 2 cartridge
+   ; fzx terminal using ff_ao_Soxz font tty_z88dk terminal
+   ;
+   ; stdin  = zx_01_input_kbd_inkey
+   ; stdout = zx_01_output_fzx full screen
+   ; stderr = dup(stdout)
+   
+   INCLUDE "startup/zx_crt_41.asm"
 
 ENDIF
 

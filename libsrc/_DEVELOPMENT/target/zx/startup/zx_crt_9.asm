@@ -196,21 +196,28 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: zx_01_output_char_64_tty_z88dk
+   ; driver: zx_01_output_fzx_tty_z88dk
    ; fd    : 1
    ; mode  : write only
    ; type  : 002 = output terminal
    ;
    ; ioctl_flags   : 0x2370
-   ; cursor coord  : (0,0)
-   ; window        : (0,64,0,24)
+   ; window        : (0,32,0,24)
    ; scroll limit  : 0
-   ; font address  : _font_4x8_default
+   ; paper         : (0,256,0,192)
+   ; cursor coord  : (0,0)
+   ;
+   ; font          : _ff_ao_Soxz
+   ; fzx draw mode : XOR
+   ; left margin   : 3
+   ; line spacing  : single
+   ; space expand  : 0
+   ;
    ; text colour   : 56
    ; text mask     : 0
    ; background    : 56
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+
       
    SECTION data_stdio
    
@@ -262,14 +269,14 @@ include "clib_target_constants.inc"
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN zx_01_output_char_64_tty_z88dk
+   EXTERN zx_01_output_fzx
    
    __i_fcntl_heap_1:
    
       ; heap header
       
       defw __i_fcntl_heap_2
-      defw 41
+      defw 69
       defw __i_fcntl_heap_0
 
    __i_fcntl_fdstruct_1:
@@ -284,7 +291,7 @@ include "clib_target_constants.inc"
       ; jump to driver
       
       defb 195
-      defw zx_01_output_char_64_tty_z88dk
+      defw zx_01_output_fzx
       
       ; flags
       ; reference_count
@@ -306,26 +313,55 @@ include "clib_target_constants.inc"
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
-      ; cursor coordinate
-      ; window rectangle
+      ; reserved
+      ; window
       ; scroll limit
-
-      defb 0, 0
-      defb 0, 64, 0, 24
+      ; line spacing
+      
+      defw 0
+      defb 0, 32, 0, 24
+      defb 0
       defb 0
       
-      ; font address
-      ; text colour
-      ; text mask
+      ; temporary storage while editing
+      
+      defs 8
+      
+      ; struct fzx_state   
+   
+      EXTERN __fzx_draw_xor
+      
+      defb 195
+      defw __fzx_draw_xor
+
+      ; font
+      ; cursor (x,y)
+
+      EXTERN _ff_ao_Soxz
+
+      defw _ff_ao_Soxz
+      defw 0, 0
+      
+      ; paper dimensions
+      
+      defw 0,256,0,192
+      
+      ; left margin
+      ; space expand
+      ; reserved
+      
+      defw 3
+      defb 0
+      defw 0
+      
+      ; foreground colour
+      ; foreground mask
       ; background colour
       
-      EXTERN _font_4x8_default
-      
-      defw _font_4x8_default
       defb 56
       defb 0
       defb 56
-      
+
       ; tty_z88dk
       
       EXTERN asm_tty_state_0
@@ -565,11 +601,11 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 146  = byte size of static FDSTRUCTs
+   ; 174  = byte size of static FDSTRUCTs
    ; 2   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 146 > 0
+   IF 174 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -589,7 +625,7 @@ include "clib_target_constants.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (146 + 14)
+      IF __clib_stdio_heap_size > (174 + 14)
       
          ; expand stdio heap to desired size
          
@@ -600,7 +636,7 @@ include "clib_target_constants.inc"
             defw __i_fcntl_heap_3
             defw 0
             defw __i_fcntl_heap_1
-            defs __clib_stdio_heap_size - 146 - 14
+            defs __clib_stdio_heap_size - 174 - 14
          
          ; terminate stdio heap
          
