@@ -4,12 +4,13 @@
  *      This tool adds the location of the program at the beginning of the binary block
  *      and creates a BASIC loader; the two files must be put in a disk image
  *      
- *      $Id: c128.c,v 1.3 2015-01-28 17:01:08 stefano Exp $
+ *      $Id: c128.c,v 1.4 2015-01-29 16:59:23 aralbrec Exp $
  */
 
 
 #include "appmake.h"
 #include <string.h>
+#include <ctype.h>
 
 
 
@@ -47,6 +48,7 @@ int c128_exec(char *target)
     char    mybuf[20];
     int     len,namelen;
     int     c,i;
+    char   *p;
 
     if ( help )
         return -1;
@@ -61,7 +63,13 @@ int c128_exec(char *target)
         strcpy(filename,outfile);
     }
 	
-	strupr(filename);
+    // strupr(filename);
+    // not available on all platforms
+    
+    for (p = filename; *p !='\0'; ++p)
+       *p = toupper(*p);
+
+    //
 
     suffix_change(filename,"");
 
