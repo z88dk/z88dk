@@ -20,6 +20,7 @@
  *  -DBANNERS    (where available) big top score display
  * 
  *  Values for 'spritesize' need roughly for following resolution table:
+ *	16: 512x186 (vert. sprite size is 8)
  *	8: 256x186
  *  4: 128x94
  *  3: 96x72
@@ -90,18 +91,26 @@
  *  Amstrad CPC
  *     zcc +cpc -subtype=wav -lndos -create-app -Dspritesize=8 -DJOYSTICK -DBANNERS wall.c
  *
+ *  Commodore 128
+ *     zcc +c128 -lgfx128hr -create-app -zorg=13000 -DSOUND -DBANNERS  -Dspritesize=16 -Dspritesizeh=8 wall.c
+ *
+ *  Timex TS2068
+ *     zcc +ts2068 -create-app -DSOUND -DBANNERS -DJOYSTICK -Dspritesize=16 -Dspritesizeh=8 wall.c
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.8 2015-01-22 11:13:35 stefano Exp $
+ *      $Id: wall.c,v 1.9 2015-01-29 16:10:42 stefano Exp $
  *
  * * * * * * *
  *
  *
 */
 
-//#pragma output hrgpage = 36096
-
+#ifdef SPECTRUM
+#ifdef ZX81
+#pragma output hrgpage = 36096
+#endif
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -470,19 +479,34 @@ restart:
 #if defined(MSX) || defined(SVI) || defined(SC3000) || defined(EINSTEIN)
 	msx_text();
 #endif
-	printf("%c",12);
 
-	  printf("\n   CHOOSE YOUR JOYSTICK INTERFACE\n\n");
+#ifdef SPECTRUM
+#ifdef ZX81
+	hrg_off();
+	zx_colour(112);
+#endif
+#endif
+	printf("%c",12);
+	  printf("\n  CHOOSE YOUR JOYSTICK INTERFACE\n\n");
 	for (k=0 ; k!=GAME_DEVICES; k++)
 	  printf("    %u - %s\n\n",k+1,joystick_type[k]);
 
 	stick=0;
-	while ((stick<1) || (stick>GAME_DEVICES))
+	while ((stick<1) || (stick>GAME_DEVICES)) {
 	  stick=getk()-48;
+	  }
 #else
 	stick=1;
 #endif
 #endif
+
+#ifdef SPECTRUM
+#ifdef ZX81
+	hrg_on();
+	zx_colour(112);
+#endif
+#endif
+
 
 #ifdef CLOCK
     srand(clock());
@@ -496,7 +520,10 @@ restart:
 	speed=300;
 #endif
 #else
-	speed=1000;
+#ifdef C128
+#else
+	speed=300;
+#endif
 #endif
 
 start_level:
