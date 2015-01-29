@@ -76,6 +76,16 @@
 ;
 ;   Note: The cursor char is not stored in the buffer.
 ;
+; * ITERM_MSG_ERASE_CURSOR_PWD
+;
+;   Input terminal is backspacing to erase the cursor in password mode.
+;
+;   enter  :  e = CHAR_PASSWORD
+;            bc = int edit_buffer_len >= 0
+;   can use: af, bc, de, hl, ix
+;
+;   Note: The cursor char is not stored in the buffer.
+;
 ; * ITERM_MSG_BS
 ;
 ;   Backspace: erase the last char of the edit buffer.

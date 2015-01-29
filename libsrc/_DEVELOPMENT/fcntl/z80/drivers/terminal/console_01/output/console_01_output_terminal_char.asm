@@ -51,6 +51,7 @@
 ;   * ITERM_MSG_BS
 ;   * ITERM_MSG_BS_PWD
 ;   * ITERM_MSG_ERASE_CURSOR
+;   * ITERM_MSG_ERASE_CURSOR_PWD
 ;   * ITERM_MSG_READLINE_BEGIN
 ;   * ITERM_MSG_READLINE_END
 ;
@@ -191,6 +192,7 @@ EXTERN console_01_output_char_iterm_msg_readline_begin, console_01_output_char_i
 EXTERN OTERM_MSG_TTY, OTERM_MSG_BELL, ITERM_MSG_BELL
 EXTERN OTERM_MSG_PUTC, STDIO_MSG_ICTL, ITERM_MSG_PUTC, ITERM_MSG_BS, ITERM_MSG_READLINE_BEGIN
 EXTERN ITERM_MSG_BS_PWD, ITERM_MSG_PRINT_CURSOR, ITERM_MSG_ERASE_CURSOR, ITERM_MSG_READLINE_END
+EXTERN ITERM_MSG_ERASE_CURSOR_PWD
 
 console_01_output_terminal_char:
 
@@ -220,7 +222,10 @@ console_01_output_terminal_char:
    
    cp ITERM_MSG_ERASE_CURSOR
    jp z, console_01_output_char_iterm_msg_bs
-   
+
+   cp ITERM_MSG_ERASE_CURSOR_PWD
+   jp z, console_01_output_char_iterm_msg_bs
+
    cp ITERM_MSG_READLINE_BEGIN
    jp z, console_01_output_char_iterm_msg_readline_begin
    

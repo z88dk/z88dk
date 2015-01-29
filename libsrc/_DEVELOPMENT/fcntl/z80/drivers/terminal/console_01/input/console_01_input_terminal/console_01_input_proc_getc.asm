@@ -7,7 +7,7 @@ PUBLIC console_01_input_proc_getc
 
 EXTERN ITERM_MSG_GETC, ITERM_MSG_READLINE_BEGIN, ITERM_MSG_READLINE_END
 EXTERN ITERM_MSG_PRINT_CURSOR, ITERM_MSG_ERASE_CURSOR, ITERM_MSG_BS
-EXTERN ITERM_MSG_BS_PWD, ITERM_MSG_BELL
+EXTERN ITERM_MSG_BS_PWD, ITERM_MSG_BELL, ITERM_MSG_ERASE_CURSOR_PWD
 
 EXTERN console_01_input_proc_echo, l_setmem_hl, asm_b_array_clear
 EXTERN console_01_input_proc_oterm, l_inc_sp, l_jpix, l_offset_ix_de
@@ -207,6 +207,15 @@ cursor_print_end:
    call edit_buff_params       ; de = char *edit_buffer, bc = int edit_buffer_len
    
    ld a,ITERM_MSG_ERASE_CURSOR
+
+   bit 6,(ix+6)
+   jr z, cursor_not_pwd        ; if not password mode
+   
+   ld a,ITERM_MSG_ERASE_CURSOR_PWD
+   ld e,CHAR_PASSWORD
+
+cursor_not_pwd:
+
    call console_01_input_proc_oterm  ; instruct output terminal to erase cursor
    
    pop af
@@ -290,7 +299,7 @@ skip_bs:
    inc hl
    ld (hl),b                   ; erase last char of edit buffer
    
-   jr readline_loop
+   jp readline_loop
 
 escaped_char:
 
