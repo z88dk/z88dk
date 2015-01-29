@@ -204,7 +204,7 @@ _ioctl_getset_paper_coord:
    ld a,e                      ; a = get/set
    call __stdio_nextarg_hl     ; hl = y coord
    
-   add a.a
+   add a,a
    jr c, _ioctl_get_paper_coord
 
 _ioctl_set_paper_coord:

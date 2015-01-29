@@ -2,6 +2,7 @@
 SECTION code_fcntl
 
 PUBLIC console_01_output_fzx_iterm_msg_bs_pwd
+PUBLIC console_01_output_fzx_iterm_msg_bs_pwd_join
 
 EXTERN l_offset_ix_de, l0_divu_16_16x16, l_mulu_16_16x16
 EXTERN asm_fzx_glyph_width, console_01_output_fzx_proc_linefeed
@@ -20,6 +21,15 @@ console_01_output_fzx_iterm_msg_bs_pwd:
    dec bc                      ; do not include last char in buffer
 
    push ix                     ; save FDSTRUCT.JP *
+   push de                     ; save CHAR_PASSWORD
+
+console_01_output_fzx_iterm_msg_bs_pwd_join:
+
+   ; ix = FDSTRUCT.JP *
+   ; bc = int edit_buffer_len >= 0
+   ;  e = CHAR_PASSWORD
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD
+
    push bc                     ; save buflen
    
    ld a,e                      ; a = CHAR_PASSWORD
@@ -47,7 +57,7 @@ console_01_output_fzx_iterm_msg_bs_pwd:
    ; ix = struct fzx_state *
    ;  a = CHAR_PASSWORD
    ; hl = edit_x
-   ; stack = FDSTRUCT.JP *, buflen
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, buflen
    
    ; compute number of password chars fitting in a line
    
@@ -68,7 +78,7 @@ edit_x_ok:
    ;  a = CHAR_PASSWORD
    ; de = left_margin
    ; hl = true edit_x
-   ; stack = FDSTRUCT.JP *, buflen
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, buflen
 
    push hl                     ; save edit_x
    
@@ -94,7 +104,7 @@ edit_x_ok:
    ; ix = struct fzx_state *
    ;  a = CHAR_PASSWORD
    ; hl = struct fzx_font *
-   ; stack = FDSTRUCT.JP *, buflen, allowed_width (full_line), allowed_width (first_line)
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, buflen, allowed_width (full_line), allowed_width (first_line)
    
    inc hl
    
@@ -107,7 +117,7 @@ edit_x_ok:
    ;  a = CHAR_PASSWORD
    ; hl = struct fzx_font *
    ; de = tracking
-   ; stack = FDSTRUCT.JP *, buflen, allowed_width (full_line), allowed_width (first_line)
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, buflen, allowed_width (full_line), allowed_width (first_line)
    
    call asm_fzx_glyph_width    ; a = width - 1 - kern
    
@@ -125,7 +135,7 @@ edit_x_ok:
    ; ix = struct fzx_state *
    ; hl = allowed_width (full_line)
    ; de = glyph_width + tracking
-   ; stack = FDSTRUCT.JP *, buflen, allowed_width (first_line)
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, buflen, allowed_width (first_line)
    
    push de                     ; save glyph_width + tracking
    
@@ -146,7 +156,7 @@ edit_x_ok:
    ; ix = struct fzx_state *
    ; bc = num_fit (first_line)
    ; de = pixel_width_pwd_char = glyph_width + tracking
-   ; stack = FDSTRUCT.JP *, buflen, num_fit (full_line)
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, buflen, num_fit (full_line)
    
    pop af
    pop hl
@@ -156,7 +166,7 @@ edit_x_ok:
    ; ix = struct fzx_state *
    ; hl = buflen
    ; bc = num_fit (first_line)
-   ; stack = FDSTRUCT.JP *, pixel_width_pwd_char, num_fit (full_line)
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, pixel_width_pwd_char, num_fit (full_line)
 
 partition_loop:
 
@@ -165,7 +175,7 @@ partition_loop:
    ; ix = struct fzx_state *
    ; hl = buflen
    ; bc = num_fit (current line)
-   ; stack = FDSTRUCT.JP *, pixel_width_pwd_char, num_fit (full line)
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, pixel_width_pwd_char, num_fit (full line)
    
    or a
    sbc hl,bc
@@ -178,7 +188,7 @@ advance_line:
    ; ix = struct fzx_state *
    ; hl = buflen
    ; bc = num_fit
-   ; stack = FDSTRUCT.JP *, pixel_width_pwd_char, num_fit
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, pixel_width_pwd_char, num_fit
 
    push hl
    
@@ -198,13 +208,18 @@ position_found:
 
    ; ix = struct fzx_state *
    ; hl = buflen fits line
-   ; stack = FDSTRUCT.JP *, pixel_width_pwd_char
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD, pixel_width_pwd_char
 
    pop de
    call l_mulu_16_16x16        ; hl = pixel x offset of last char
 
    ; ix = struct fzx_state *
    ; hl = pixel offset of last char
-   ; stack = FDSTRUCT.JP *
-
+   ; stack = FDSTRUCT.JP *, CHAR_PASSWORD
+   
+   ld e,(ix+5)
+   ld d,(ix+6)                 ; de = x coord
+   
+   add hl,de                   ; hl = x coord of last char
+   
    jp console_01_output_fzx_iterm_msg_bs_join_pwd

@@ -219,29 +219,27 @@ position_found:
    ; de = remaining allowed_width
    ; stack = FDSTRUCT.JP *, char erase, struct fzx_state *, allowed_width
    
-   pop hl                      ; hl = allowed_width
-   sbc hl,de                   ; hl = allowed_width - remaining_width
+   pop bc                      ; junk item
    
-   ld e,(ix+1)
-   ld d,0                      ; de = tracking
-   
-   add hl,de                   ; undo tracking added to remaining_width by fzx_buffer_partition
+   ld c,(ix+1)
+   ld b,0                      ; bc = tracking
    
    pop ix                      ; ix = struct fzx_state *
-   pop bc                      ;  c = char erase
+
+   ld l,(ix+11)
+   ld h,(ix+12)                ; hl = paper.width
+
+   sbc hl,de                   ; hl = paper.width - remaining_width
+   add hl,bc                   ; undo tracking added to remaining_width by fzx_buffer_partition
 
 console_01_output_fzx_iterm_msg_bs_join_pwd:
 
-   ; ix = struct fzx_state *
-   ; hl = pixel offset of last char
-   ; stack = FDSTRUCT.JP *
+   pop bc
 
-   ex de,hl                    ; de = x pixel offset
-   
-   ld l,(ix+5)
-   ld h,(ix+6)                 ; hl = x coord of line
-   
-   add hl,de                   ; hl = x coord of last char
+   ; ix = struct fzx_state *
+   ; hl = x coord of last char
+   ;  c = char erase
+   ; stack = FDSTRUCT.JP *
    
    ld (ix+5),l
    ld (ix+6),h                 ; store new x coord
