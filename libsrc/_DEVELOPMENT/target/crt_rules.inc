@@ -27,6 +27,8 @@
          ENDIF
       
       ENDIF
+      
+      defc myzorg = __crt_org_code
          
    ENDIF
 
