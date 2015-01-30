@@ -663,7 +663,7 @@ EXTERN _main
    
    ; address = 0x0008
    
-IF (__crt_enable_rst & $01)
+IF (__crt_enable_rst & $02)
 
    EXTERN _z80_rst_08h
    jp _z80_rst_08h
@@ -679,7 +679,7 @@ ENDIF
 
    ; address = 0x0010
 
-IF (__crt_enable_rst & $02)
+IF (__crt_enable_rst & $04)
 
    EXTERN _z80_rst_10h
    jp _z80_rst_10h
@@ -696,7 +696,7 @@ ENDIF
 
    ; address = 0x0018
    
-IF (__crt_enable_rst & $03)
+IF (__crt_enable_rst & $08)
 
    EXTERN _z80_rst_18h
    jp _z80_rst_18h
@@ -712,7 +712,7 @@ ENDIF
 
    ; address = 0x0020
 
-IF (__crt_enable_rst & $04)
+IF (__crt_enable_rst & $10)
 
    EXTERN _z80_rst_20h
    jp _z80_rst_20h
@@ -728,7 +728,7 @@ ENDIF
 
    ; address = 0x0028
 
-IF (__crt_enable_rst & $05)
+IF (__crt_enable_rst & $20)
 
    EXTERN _z80_rst_28h
    jp _z80_rst_28h
@@ -761,7 +761,7 @@ ENDIF
 
    ; address = 0x0030
 
-IF (__crt_enable_rst & $06)
+IF (__crt_enable_rst & $40)
 
    EXTERN _z80_rst_30h
    jp _z80_rst_30h
@@ -787,7 +787,7 @@ ENDIF
    ; address = 0x0038
    ; im 1 isr
 
-IF (__crt_enable_rst & $07)
+IF (__crt_enable_rst & $80)
 
    EXTERN _z80_rst_38h
    call _z80_rst_38h
