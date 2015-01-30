@@ -1235,17 +1235,6 @@
 	ld	(hl),%2
 	inc	hl
 
-._main%1
-._main%2
-=
-; Z88DK moved 'main' before 'GSINIT'
-	INCLUDE "zcc_opt.def"
-	INCLUDE "z80_crt0.hdr"
-
-; global & static %1
-=
-._main
-
 	ld	hl,%0	;const
 	ld	(%1),hl
 	ld	hl,%0	;const
