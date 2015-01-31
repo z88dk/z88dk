@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.1 2015-01-22 21:36:51 stefano Exp $
+rem $Id: gccmake.bat,v 1.2 2015-01-31 15:59:44 stefano Exp $
 
 echo ****************
 echo * Building zx7 *

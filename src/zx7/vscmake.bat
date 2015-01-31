@@ -1,5 +1,5 @@
 @echo off
-rem $Id: vscmake.bat,v 1.1 2015-01-23 07:07:32 stefano Exp $
+rem $Id: vscmake.bat,v 1.2 2015-01-31 15:59:44 stefano Exp $
 
 echo ****************
 echo * Building zx7 *
