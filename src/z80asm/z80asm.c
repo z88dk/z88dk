@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.189 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.190 2015-01-31 18:44:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -178,10 +178,10 @@ static void do_assemble( char *src_filename )
         set_error_null();
         //set_error_module( CURRENTMODULE->modname );
 
-        if ( opts.verbose )
-            puts( "Pass2..." );
+		if (opts.verbose)
+			puts("Pass2...");
 
-        Z80pass2();
+		Z80pass2();						/* call pass 2 even if errors found, to issue pass2 errors */
     }
     FINALLY
     {

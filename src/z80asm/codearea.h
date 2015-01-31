@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.38 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.39 2015-01-31 18:44:58 pauloscustodio Exp $
 */
 
 #pragma once
@@ -45,24 +45,26 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.38 2015-01-26 2
 *   Named Section of code, introduced by "SECTION" keyword
 *----------------------------------------------------------------------------*/
 CLASS( Section )
-	char		*name;			/* name of section, kept in strpool */
-	UInt		 addr;			/* start address of this section,
-								   computed by sections_alloc_addr() */
-    int			 origin;		/* ORG address of section, -1 if not defined */
-	Bool		 origin_found;	/* ORG already found in code */
-	Bool		 origin_opts;	/* ORG was defined from command line options, 
-								   override asm code */
-	Bool		 section_split;	/* ORG -1 was given, signal that this section 
-								*  should be output to a new binary file */
-	UInt		 asmpc;			/* address of current opcode relative to start
-								   of the current module, reset to 0 at start
-								   of each module */
-	UInt		 opcode_size;	/* number of bytes added after last 
-								   set_PC() or next_PC() */
-	ByteArray	*bytes;			/* binary code of section, used to compute 
-								   current size */
-	UIntArray	*module_start;	/* at module_addr[ID] is the start offset from
-								   addr of module ID */
+	char		*name;				/* name of section, kept in strpool */
+	UInt		 addr;				/* start address of this section,
+									*  computed by sections_alloc_addr() */
+    int			 origin;			/* ORG address of section, -1 if not defined */
+	Bool		 origin_found : 1;	/* ORG already found in code */
+	Bool		 origin_opts : 1;	/* ORG was defined from command line options,
+									*  override asm code */
+	Bool		 section_split : 1;	/* ORG -1 was given, signal that this section
+									*  should be output to a new binary file */
+	Bool		 max_codesize_issued : 1;
+									/* error_max_codesize issued, ignore next calls */
+	UInt		 asmpc;				/* address of current opcode relative to start
+									*  of the current module, reset to 0 at start
+									*  of each module */
+	UInt		 opcode_size;		/* number of bytes added after last 
+									*  set_PC() or next_PC() */
+	ByteArray	*bytes;				/* binary code of section, used to compute 
+									*  current size */
+	UIntArray	*module_start;		/* at module_addr[ID] is the start offset from
+									*  addr of module ID */
 END_CLASS;
 
 CLASS_HASH( Section );

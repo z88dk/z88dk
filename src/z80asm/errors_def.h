@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.38 2015-01-31 08:55:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.39 2015-01-31 18:44:58 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -71,7 +71,7 @@ ERR( ErrError,	error_symbol_redecl( char *symbol ),	"re-declaration of '%s' not 
 #endif
 
 /* link errors */
-ERR( ErrFatal,	fatal_max_codesize( long size ),		"max. code size of %ld bytes reached" _C_ size )
+ERR(ErrError, error_max_codesize(long size), "max. code size of %ld bytes reached" _C_ size)
 ERR( ErrError,	error_module_redefined( void ),			"module name already defined" )
 ERR(ErrError, error_org_redefined(void), "ORG redefined")
 ERR(ErrError, error_invalid_org_option(char *org_hex), "invalid ORG option '%s'" _C_ org_hex)

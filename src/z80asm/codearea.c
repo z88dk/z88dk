@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.50 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.51 2015-01-31 18:44:58 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -376,8 +376,11 @@ static void inc_PC( UInt num_bytes )
 static void check_space( UInt addr, UInt num_bytes )
 {
 	init();
-    if ( addr + num_bytes > MAXCODESIZE )
-        fatal_max_codesize( ( long )MAXCODESIZE );
+	if (addr + num_bytes > MAXCODESIZE && !g_cur_section->max_codesize_issued)
+	{
+		error_max_codesize((long)MAXCODESIZE);
+		g_cur_section->max_codesize_issued = TRUE;
+	}
 }
 
 /* reserve space in bytes, increment PC if buffer expanded
