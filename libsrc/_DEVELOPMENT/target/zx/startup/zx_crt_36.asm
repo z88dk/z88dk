@@ -739,6 +739,28 @@ ELSE
 
 ENDIF
 
+IF __SDCC_IY
+
+   PUBLIC l_jpix
+   
+   l_jpix:
+   
+      defb $fd
+   
+   PUBLIC l_jphl
+   
+   l_jphl:
+   
+      jp (hl)
+   
+   PUBLIC l_jpiy
+   
+   l_jpiy:
+   
+      jp (ix)
+
+ELSE
+
    PUBLIC l_jpix
    
    l_jpix:
@@ -756,6 +778,8 @@ ENDIF
    l_jpiy:
    
       jp (iy)
+
+ENDIF
 
    defs 0x0030 - ASMPC
 
