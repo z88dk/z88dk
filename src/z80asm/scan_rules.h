@@ -174,14 +174,14 @@ tr21:
 	case 49:
 	{{p = ((te))-1;}
 	sym.tok = TK_IXH;
-	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
 	case 50:
 	{{p = ((te))-1;}
 	sym.tok = TK_IYH;
-	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
@@ -195,14 +195,14 @@ tr21:
 	case 52:
 	{{p = ((te))-1;}
 	sym.tok = TK_IXL;
-	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
 	case 53:
 	{{p = ((te))-1;}
 	sym.tok = TK_IYL;
-	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
@@ -223,28 +223,28 @@ tr21:
 	case 56:
 	{{p = ((te))-1;}
 	sym.tok = TK_I;
-	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
 	case 57:
 	{{p = ((te))-1;}
 	sym.tok = TK_IIR;
-	if ( ! (opts.cpu & CPU_RABBIT) ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
 	case 58:
 	{{p = ((te))-1;}
 	sym.tok = TK_R;
-	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
 	case 59:
 	{{p = ((te))-1;}
 	sym.tok = TK_EIR;
-	if ( ! (opts.cpu & CPU_RABBIT) ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
@@ -2342,7 +2342,7 @@ tr243:
 tr248:
 	{te = p;p--;{
 	sym.tok = TK_I;
-	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }}
 	goto st21;
@@ -2531,7 +2531,7 @@ tr338:
 tr346:
 	{te = p;p--;{
 	sym.tok = TK_R;
-	if ( opts.cpu & CPU_RABBIT ) { error_illegal_ident(); };
+	;
 	{p++; cs = 21; goto _out;}
 }}
 	goto st21;

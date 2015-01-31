@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.48 2015-01-26 23:46:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.49 2015-01-31 08:55:17 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -776,28 +776,20 @@ t_compile_module($init, <<'END', $objs);
 	T_END();
 
 	
-	/* assembly operands - Z80 only */
-	opts.cpu &= ~CPU_RABBIT;
-	SetTemporaryLine("i r I R");
+	/* assembly operands */
+	SetTemporaryLine("i r I R iir eir IIR EIR ");
 	scan_expect_operands();
 	T_GET(TK_I,    "i");
 	T_GET(TK_R,    "r");
 	T_GET(TK_I,    "I");
 	T_GET(TK_R,    "R");
-	T_END();
-	opts.cpu &= ~CPU_RABBIT;
-	
-	/* assembly operands - RABBIT only */
-	opts.cpu |= CPU_RABBIT;
-	SetTemporaryLine("iir eir IIR EIR ");
 	T_GET(TK_IIR,   "iir");
 	T_GET(TK_EIR,   "eir");
 	T_GET(TK_IIR,   "IIR");
 	T_GET(TK_EIR,   "EIR");
 	T_END();
-	opts.cpu &= ~CPU_RABBIT;
 
-
+	
 	/* assembly directives */
 	T_OPCODE(BINARY,	T_ALL);
 	T_OPCODE(DEFB,		T_ALL);

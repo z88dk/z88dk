@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define CPU opcodes
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.27 2015-01-26 23:46:22 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/opcodes.h,v 1.28 2015-01-31 08:55:14 pauloscustodio Exp $ 
 */
 
 #pragma once
@@ -60,6 +60,14 @@ extern void add_Z88_CALL_PKG(int argument);
 extern void add_Z88_FPP(int argument);
 extern void add_Z88_INVOKE(int argument);
 
+/* assert we are on a Z80 */
+#define _Z80_ONLY(x)		((opts.cpu & CPU_RABBIT) ? \
+								(error_illegal_ident(), 0) : \
+								(x))
+#define _RABBIT_ONLY(x)		(!(opts.cpu & CPU_RABBIT) ? \
+								(error_illegal_ident(), 0) : \
+								(x))
+
 /* Index prefix constants */
 #define P_BC	0
 #define P_DE	0
@@ -74,9 +82,11 @@ enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO, FLAG_PE, FLAG_P, FLAG_M };
 #define NOT_FLAG(flag)	((flag) ^ 1)
 
 /* 8-bit registers */
-enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_idx, REG_A,
-       REG_IXH = REG_H, REG_IYH = REG_H,
-	   REG_IXL = REG_L, REG_IYL = REG_L };
+enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_idx, REG_A };
+#define REG_IXH _Z80_ONLY(REG_H)
+#define REG_IYH _Z80_ONLY(REG_H)
+#define REG_IXL _Z80_ONLY(REG_L)
+#define REG_IYL _Z80_ONLY(REG_L)
 
 /* 16-bit registers */
 enum { REG_BC, REG_DE, REG_HL, REG_SP, 
@@ -117,11 +127,6 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 									((n) == 0 || (n) == 8 || (n) == 0x30) ? \
 										(error_illegal_ident(),0) : \
 										0xC7 + (n)))
-
-/* assert we are on a Z80 */
-#define _Z80_ONLY(x)		((opts.cpu & CPU_RABBIT) ? \
-								(error_illegal_ident(), 0) : \
-								(x))
 
 /* Z80 opcodes 
 *  n is a constant
@@ -176,20 +181,12 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_LDDR			0xEDB8
 #define Z80_LDI				0xEDA0
 #define Z80_LDIR 			0xEDB0
-#define Z80_LD_A_EIR		Z80_LD_A_R
-#define Z80_LD_A_I			0xED57
-#define Z80_LD_A_IIR		Z80_LD_A_I
 #define Z80_LD_A_IND_NN		0x3A
 #define Z80_LD_A_IND_dd(dd)	(0x0A + ((dd) << 4))
-#define Z80_LD_A_R			0xED5F
-#define Z80_LD_EIR_A		Z80_LD_R_A
-#define Z80_LD_IIR_A		Z80_LD_I_A
 #define Z80_LD_IND_NN_A		0x32
 #define Z80_LD_IND_dd_A(dd)	(0x02 + ((dd) << 4))
 #define Z80_LD_IND_nn_dd(dd) (0xED43 + ((dd) << 4))
 #define Z80_LD_IND_nn_idx	0x22
-#define Z80_LD_I_A			0xED47
-#define Z80_LD_R_A			0xED4F
 #define Z80_LD_SP_idx		0xF9
 #define Z80_LD_dd_IND_nn(dd) (0xED4B + ((dd) << 4))
 #define Z80_LD_dd_nn(dd)	(0x01 + ((dd) << 4))
@@ -237,3 +234,15 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_SUB_n			_Z80_ALU_n(ALU_SUB)
 #define Z80_XOR(reg)		_Z80_ALU(ALU_XOR, (reg))
 #define Z80_XOR_n			_Z80_ALU_n(ALU_XOR)
+
+#define Z80_LD_R_A			   _Z80_ONLY(0xED4F)
+#define Z80_LD_EIR_A		_RABBIT_ONLY(0xED4F)
+
+#define Z80_LD_A_R			   _Z80_ONLY(0xED5F)
+#define Z80_LD_A_EIR		_RABBIT_ONLY(0xED5F)
+
+#define Z80_LD_A_I			   _Z80_ONLY(0xED57)
+#define Z80_LD_A_IIR		_RABBIT_ONLY(0xED57)
+
+#define Z80_LD_I_A			   _Z80_ONLY(0xED47)
+#define Z80_LD_IIR_A		_RABBIT_ONLY(0xED47)

@@ -15,7 +15,7 @@
 #
 # Build opcodes.t test code, using Udo Munk's z80pack assembler as a reference implementation
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.6 2015-01-26 23:46:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.7 2015-01-31 08:55:14 pauloscustodio Exp $
 
 use Modern::Perl;
 use File::Basename;
@@ -23,6 +23,7 @@ use File::Slurp;
 use Iterator::Array::Jagged;
 use Iterator::Simple::Lookahead;
 use List::Util qw( max );
+use Data::Dump 'dump';
 
 our $KEEP_FILES;
 $KEEP_FILES	 = grep {/-keep/} @ARGV; 
@@ -60,21 +61,22 @@ my $INPUT = read_file(dirname($0).'/'.basename($0, '.pl').'.asm');
 #------------------------------------------------------------------------------
 for my $rabbit (0, 1) {
 	for my $error (0, 1) {
-		my $iter = 	filter_error_iter( $error, 
+		my $iter = 	format_iter(
+					add_hex_iter(
+					filter_error_iter( $error, 
 					compute_if_iter( {RABBIT => $rabbit}, 
+					tokenize_iter(
 					expand_iter( 
-					filter_rcs_kw( read_iter($INPUT) ) ) ) );
-		unless ($error) {
-			$iter = add_hex_iter($iter);
-		}
-		$iter = format_iter($iter);
-		my @asm; push @asm, $_ while <$iter>;
+					filter_rcs_kw( 
+					read_iter($INPUT))))))));
+		my @asm; 
+		push @asm, $_->{text}."\n" while <$iter>;
 
 		# write test code
 		if (@asm) {
 			push @OUTPUT, "z80asm(\n";
 			push @OUTPUT, "    options => \"-l -b".
-						  ($rabbit ? " -RCMX000 -i\".z80emu()" : "\"").",\n";
+						  ($rabbit ? " -DRABBIT -RCMX000 -i\".z80emu()" : "\"").",\n";
 			unless ($error) {
 				push @OUTPUT, "    asm1 => <<'END_ASM',\n";
 				push @OUTPUT, $asm1;
@@ -82,7 +84,7 @@ for my $rabbit (0, 1) {
 			}
 			push @OUTPUT, "    asm  => <<'END_ASM',\n";		
 			push @OUTPUT, @asm;
-			push @OUTPUT, "END_ASM\n);\n\n";
+			push @OUTPUT, "END_ASM\n);\n";
 		}
 	}
 }
@@ -97,7 +99,8 @@ sub read_iter {
 	return Iterator::Simple::Lookahead->new( sub {
 		my $line = shift(@input);
 		defined $line or return;
-		return "$line\n";
+		$line =~ s/\s*$//;
+		return $line."\n";
 	} );
 }
 
@@ -110,7 +113,7 @@ sub filter_rcs_kw {
 		while (1) {
 			my $line = $in->next or return;
 			next if $line =~ /\$(Header|Id|Log).*?\$/;
-			return "$line\n";
+			return $line;
 		}
 	} );
 }
@@ -201,32 +204,103 @@ sub expand_iter {
 }
 
 #------------------------------------------------------------------------------
+# Iterator to replace each line by components: 
+#	text - original assembly text
+#	asm  - z80pack assembly text
+#	error - error message, if any
+#	warn  - warning message, if any
+#------------------------------------------------------------------------------
+sub tokenize_iter {
+	my($in) = @_;
+	return Iterator::Simple::Lookahead->new( sub {
+		my $line = $in->next or return;
+		my $ret = {};
+		for ($line) {
+			s/\s*$//;
+			if (! /^;/) {
+				if (/;;\s*error.*/) {
+					$ret->{error} = $&;
+					$line = $`;
+				}
+				s/\s*$//;
+				if (/;;\s*warn.*/) {
+					$ret->{warn} = $&;
+					$line = $`;
+				}
+				s/\s*$//;
+				if (/;;(.*)/) {
+					$ret->{asm} = $1." ";
+					$line = $`;
+					$ret->{asm} =~ s/\s*;;/\n/g;		# multi-line
+				}
+			}
+			
+			s/\s*$//;
+			$ret->{text} = $line;
+			$ret->{asm} ||= $ret->{text};
+
+			$ret->{text} =~ s/\t/ /g;				# remove tabs
+			$ret->{asm} =~ s/\t/ /g;				# remove tabs
+			
+			$ret->{asm} = "" if $ret->{error};
+		}
+		return $ret;
+	} );
+}
+	
+#------------------------------------------------------------------------------
 # Iterator to handle IF/ELSE/ENDIF based on \%options
 # IF must be on column 1 and in upper case
+# add state flag: true/false
 #------------------------------------------------------------------------------
 sub compute_if_iter {
 	my($options, $in) = @_;
 
-	my @state = (1);
+	my @states = ();
+	my $state = 1;
+	my $update_state = sub { $state = 1; for (@states) { $state &&= $_ }; };
+	
 	return Iterator::Simple::Lookahead->new( sub {
 		while (1) {
 			my $line = $in->next or return;
-			if ($line =~ /^IF\s+(.*)/) {
-				my $expr = $1;
-				my $not = $expr =~ s/^\s*!\s*//;
-				$expr =~ /^(\w+)\s*(;.*)?$/ or die "IF expression must be identifier";
-				push @state, $options->{uc($1)} || 0;
-				$state[-1] = ! $state[-1] if $not;
-			}
-			elsif ($line =~ /^ELSE/) {
-				$state[-1] = ! $state[-1];
-			}
-			elsif ($line =~ /^ENDIF/) {
-				@state > 1 or die "ENDIF without IF";
-				pop @state;
-			}
-			else {
-				return $line if $state[-1];
+			for ($line->{text}) {
+				$line->{state} = 1;
+				if (/^IF\s+(.*)/) {
+					my $expr = $1;
+					my $not = $expr =~ s/^\s*!\s*//;
+					$expr =~ /^(\w+)\s*(;.*)?$/ or die "IF expression must be identifier";
+					
+					push @states, $options->{uc($1)} || 0;
+					$states[-1] = ! $states[-1] if $not;
+					
+					$line->{asm} = "";		# no IF in z80pack
+					$update_state->();
+				}
+				elsif (/^ELSE/) {
+					@states > 0 or die "ELSE without IF";
+					$states[-1] = ! $states[-1];
+					
+					$line->{asm} = "";		# no ELSE in z80pack
+					$update_state->();
+				}
+				elsif (/^ENDIF/) {
+					@states > 0 or die "ENDIF without IF";
+					pop @states;
+					
+					$line->{asm} = "";		# no ENDIF in z80pack
+					$update_state->();
+				}
+				else {
+					$line->{state} = $state || 0;
+					if (! $state) {
+						undef $line->{error};
+						undef $line->{warn};
+					}
+				}
+				
+				$line->{asm} = "" unless $state;
+				
+				return $line;
 			}
 		}		
 	} );
@@ -241,12 +315,9 @@ sub filter_error_iter {
 	return Iterator::Simple::Lookahead->new( sub {
 		while (1) {
 			my $line = $in->next or return;
-			if ($line =~ /;;\s+error\s*\d*: /) {
-				return $line if $error;
-			}
-			else {
-				return $line unless $error;
-			}
+			
+			return $line if ((!!$error == !!$line->{error})
+							 || $line->{text} =~ /^(IF|ELSE|ENDIF)/);
 		}
 	} );
 }
@@ -257,32 +328,43 @@ sub filter_error_iter {
 sub add_hex_iter {
 	my($in) = @_;
 	
-	my @asm;
-	push @asm, $_ while (defined($_ = $in->()));
-	my @hex = assemble(@asm);
-	my @out = merge_asm_hex(\@asm, \@hex);
+	# slurp whole iterator, number lines
+	my @lines;
+	while (my $line = $in->()) {
+		$line->{line_nr} = scalar(@lines)+1;
+		push @lines, $line;
+	}
 	
-	return read_iter(@out);
+	write_z80pack_asm("test.asm", \@lines);
+	call_z80pack_asm("test.asm");
+	read_z80pack_lis("test.lis", \@lines);
+
+	unlink('test.asm', 'test.lis', 'test.bin') unless $KEEP_FILES;
+
+	return Iterator::Simple::Lookahead->new(@lines);
 }
-	
+
 #------------------------------------------------------------------------------
-# use z80pack to assemble the code after ;; and return the hex bytes per line
+# write a z80pack asm file
 #------------------------------------------------------------------------------
-sub assemble {
-	my(@asm_code) = @_;
-	our $label_n;
+sub write_z80pack_asm {
+	my($file, $lines) = @_;
 	
-	my @pack_code = build_pack_code(@asm_code);
-	
-	# Append used libraries
 	my %used_libs; for (@Z80EMU) { $used_libs{$_} = 0; }
-	for (@pack_code) {
-		my $line = $_;
-		$line =~ s/;.*//;
-		if ($line =~ /call\s+(\w+)/i && exists $used_libs{$1}) {
+
+	open(my $fh, ">", $file) or die "open $file: $!\n";
+	for (@$lines) {
+		next if $_->{asm} eq "";
+		next if ! $_->{state};
+		print $fh ";;LINE ", $_->{line_nr}, "\n", $_->{asm}, "\n";
+
+		if ($_->{asm} =~ /call\s+(\w+)/i && exists $used_libs{$1}) {
 			$used_libs{$1} = 1;
 		}
 	}
+
+	# Append used libraries
+	our $label_n;
 	for my $lib (@Z80EMU) {
 		if ($used_libs{$lib}) {
 			my $lib_asm = read_file($Z80EMU_SRCDIR.'/'.$lib.'.asm');
@@ -298,58 +380,34 @@ sub assemble {
 					s/\b$label\b/$new_label/igm;
 				}
 			}
-			push @pack_code, $lib_asm;
+			print $fh $lib_asm;
 		}
 	}
-	write_file("test.asm", @pack_code);
-	call_assembler("test");
-	my @hex = read_hex("test");
-	
-	unlink('test.asm', 'test.lis', 'test.bin') unless $KEEP_FILES;
-	
-	return @hex;
 }
 
-# add LINE markers, followed by code after ;;
-sub build_pack_code {
-	my(@asm_code) = @_;
-	my @pack_code;
-	
-	for my $i (0 .. $#asm_code) {
-		my $line = $asm_code[$i];
-		push @pack_code, ";;LINE $i\n";
-		
-		$line =~ s/;;\s+warn.*//;		# remove warnings
-		
-		if ($line !~ /^;/ && $line =~ /;;(.*)/) {
-			for (split(/;;/, $1)) {
-				push @pack_code, "$_\n";
-			}
-		}
-		else {
-			push @pack_code, $line;
-		}
-	}
-	
-	return @pack_code;
-}
-		
-sub call_assembler {
+#------------------------------------------------------------------------------
+# use z80pack to assemble the asm file
+#------------------------------------------------------------------------------
+sub call_z80pack_asm {
 	my($file) = @_;
+	my $bin_file = basename($file, ".asm").".bin";
 	
-	my $args = "-fb -l -o$file.bin $file.asm";
+	my $args = "-fb -l -o$bin_file $file";
 	
 	-f $UDOMUNK_ASM && -x _ or die "cannot find assembler $UDOMUNK_ASM";
 	print "$UDOMUNK_ASM $args\n";
 	system "$UDOMUNK_ASM $args" and die "$UDOMUNK_ASM $args failed";
 }
 
+#------------------------------------------------------------------------------
 # read hex between LINE markers
-sub read_hex {
-	my($file) = @_;
-	my @hex;
+#------------------------------------------------------------------------------
+sub read_z80pack_lis {
+	my($file, $lines) = @_;
+
+	my $line_nr = 1;
 	
-	open(my $in, "<", "$file.lis") or die $!;
+	open(my $in, "<", $file) or die "open $file: $!\n";
 	while(<$in>) {
 		next if /^\f/;
 		next if /^Source file:/;
@@ -358,56 +416,13 @@ sub read_hex {
 		next unless /\S/;
 		
 		if (/^[0-9a-f]{4} (( [0-9a-f]{2}){1,4})/i) {
-			@hex or die;
-			$hex[-1]  = "" unless $hex[-1];
-			$hex[-1] .= uc($1);
+			$lines->[$line_nr - 1]{bytes} ||= "";
+			$lines->[$line_nr - 1]{bytes} .= uc($1);
 		}
 		elsif (/;;LINE (\d+)/) {
-			$hex[$1] ||= "";
+			$line_nr = 0+$1;
 		}
 	}
-	return @hex;
-}
-
-#------------------------------------------------------------------------------
-# merge asm code with hex code
-#------------------------------------------------------------------------------
-sub merge_asm_hex {
-	my($asm, $hex) = @_;
-	my @out;
-	
-	for my $i (0 .. max( $#$asm, $#$hex ) ) {
-		local $_ = $asm->[$i];
-		s/\s+$//;
-		
-		if (! defined $_) {
-			if ($hex->[$i]) {
-				push @out, "\t;; ".$hex->[$i];
-			}
-		}
-		elsif (/^\s*;/) {
-			push @out, $_;
-			if ($hex->[$i]) {
-				push @out, "\t;; ".$hex->[$i];
-			}
-		}
-		else {
-			my $warn;
-			if (/\s*;;\s+(warn\s*\d*: .*)/) {
-				$warn = $1;
-				$_ = $`;
-			}
-
-			s/;.*//;		# remove old comments
-			
-			if ($hex->[$i]) {
-				$_ .= "\t;;".$hex->[$i];
-			}
-			$_ .= "\t;; $warn" if $warn;
-			push @out, $_;
-		}
-	}
-	return @out;
 }
 
 #------------------------------------------------------------------------------
@@ -420,74 +435,81 @@ sub format_iter {
 	return Iterator::Simple::Lookahead->new( sub {
 		while (1) {
 			my @lines;
-			defined( local $_ = $in->next ) or return;
-			s/\s+$//;
+			my $line = $in->next or return;
 			
-			return "\n" unless /\S/;
-			
-			# only comment
-			if (/^;/) {
-				return "$_\n";
-			}
-			else {
-				# extract warning / error
-				my $warn;
-				/(;;\s*(warn|error)\s*\d*:\s+(.*))$/ and $warn = $1;
-				s/\s*(;;\s*(warn|error)\s*\d*:\s+(.*))$//;
-				
+			for ($line->{text}) {
+				s/\s+$//;
+				return $line unless /\S/; 		# only blanks
+				return $line if /^;/;			# only comment
+
 				# extract comment
 				my $comment;
-				/(;.*)$/ and $comment = $1;
-				s/\s*;.*$//;
+				if (/\s*(;.*)/) {
+					$comment = $1;
+					$_ = $`;
+				}
 				
 				# extract label
 				my $label;
-				/^(\w+:?|\.\w+)/ and $label = $1;
-				s/^(\w+:?|\.\w+)\s*//;
+				if (/^(\w+:?|\.\w+)/) {
+					$label = $1;
+					$_ = $';
+				}
 				
 				# remove blanks
 				s/^\s+//; s/\s+$//;
 				
 				# format opcode
 				s/(\w+)\s+/ sprintf("%-4s ", $1) /e;
-				
+					
 				# indent
 				my $this_indent = $indent;
-				if (/^if\b|^\{/) {			$indent += 2; }
-				elsif (/^else\b/) {			$this_indent -= 2; }
-				elsif (/^endif\b|^\}/) {	$indent -= 2; $this_indent = $indent; }
-				else {}				
-				
-				my $line = sprintf("%-*s ", $this_indent-1, $label || "");
-				$line   .= $_;	# opcode
-				
-				# format warning - must be on same line as opcode
-				if ($warn) {
-					$line = sprintf("%-39s %s", $line, $warn);
-					push @lines, $line;
-					$line = "";
+				if (/^if(def|ndef)?\b|\{/) {
+					$indent += 2; 
+				}
+				elsif (/^else\b/) {			
+					$this_indent -= 2; 
+				}
+				elsif (/^endif\b|\}/) {	
+					$indent -= 2; 
+					$this_indent = $indent; 
+				}
+				else {
+				}				
+					
+				# opcode
+				$_ = sprintf("%-*s ", $this_indent-1, $label || "").$_;
+					
+				# format error/warning - must be on same line as opcode
+				if ($line->{error} || $line->{warn}) {
+					$_ = sprintf("%-39s %s", $_, $line->{error} || $line->{warn});
 				}
 				
 				# format comments
 				if ($comment) {
-					if (length($line) > 39) {
-						push @lines, $line;
-						$line = sprintf("%-39s %s", "", $comment);
+					if (length($_) > 39) {
+						push @lines, $_;
+						$_ = sprintf("%-39s %s", "", $comment);
 					}
 					else {
-						$line = sprintf("%-39s %s", $line, $comment);
+						$_ = sprintf("%-39s %s", $_, $comment);
+					}
+				}
+
+				# format bytes
+				if ($line->{bytes}) {
+					if (length($_) > 39) {
+						push @lines, $_;
+						$_ = sprintf("%-39s %s", "", ";;".$line->{bytes});
+					}
+					else {
+						$_ = sprintf("%-39s %s", $_, ";;".$line->{bytes});
 					}
 				}
 				
-				if (@lines) {
-					push @lines, $line if $line ne "";
-					$line = shift(@lines);
-					$in->unget(@lines);
-					return "$line\n";
-				}
-				else {
-					return "$line\n";
-				}
+				push @lines, $_;
+				$_ = join("\n", @lines);
+				return $line;
 			}
 		}
 	} );

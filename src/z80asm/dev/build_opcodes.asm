@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2015
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.22 2015-01-26 23:46:22 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.23 2015-01-31 08:55:14 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -100,11 +100,11 @@ IF !RABBIT
 ELSE
 	ld	{b c d e ixh ixl a},{ixh ixl}	;; error: illegal identifier
 	ld	{ixh ixl},{b c d e ixh ixl a}	;; error: illegal identifier
-	ld	{ixh ixl},N						;; error: illegal identifier
+	ld	{ixh ixl},1						;; error: illegal identifier
 	
 	ld	{b c d e iyh iyl a},{iyh iyl}	;; error: illegal identifier
 	ld	{iyh iyl},{b c d e iyh iyl a}	;; error: illegal identifier
-	ld	{iyh iyl},N						;; error: illegal identifier
+	ld	{iyh iyl},1						;; error: illegal identifier
 ENDIF
 
 	ld	{b c d e h l a},(hl)
@@ -145,13 +145,13 @@ ENDIF
 	ld ({bc de}),{b c d e h l (hl) (ix+DIS) (iy+DIS) N}	;; error: syntax error
 
 IF !RABBIT
-	ld	a,{i r}
 	ld	{i r},a
+	ld	a,{i r}
 ELSE
- 	ld	a,iir							;; 	ld	a,i
- 	ld	a,eir							;; 	ld	a,r
  	ld	iir,a							;; 	ld	i,a
  	ld	eir,a							;; 	ld	r,a
+ 	ld	a,iir							;; 	ld	a,i
+ 	ld	a,eir							;; 	ld	a,r
 ENDIF
 
 ;------------------------------------------------------------------------------
@@ -361,7 +361,7 @@ ENDIF
 	jr	 ASMPC							;;	defb 18h, 0FEh
 	jr	 ASMPC-0x7E						;;	defb 18h, 080h
 	
-	djnz jr1		; 10 00       
+	djnz jr1
 jr1:
 	jr jr1
 	djnz jr1
@@ -657,10 +657,10 @@ ds:	defs not_defined	; BUG_0007		;; error: symbol not defined
 	defvars defvars_base				;;
 										;;
 	{									;;
-		df1 ds.b 4;						;; ; df1 = 0x80
-		df2 ds.w 2;						;; ; df2 = 0x80 + 4 = 0x84
-		df3 ds.p 2;						;; ; df3 = 0x84 + 2*2 = 0x88
-		df4 ds.l 2;						;; ; df4 = 0x88 + 2*3 = 0x8E
+		df1 ds.b 4						;; ; df1 = 0x80
+		df2 ds.w 2						;; ; df2 = 0x80 + 4 = 0x84
+		df3 ds.p 2						;; ; df3 = 0x84 + 2*2 = 0x88
+		df4 ds.l 2						;; ; df4 = 0x88 + 2*3 = 0x8E
 		df5 							;; ; df5 = 0x8E + 2*4 = 0x96
 		rr								;; ; opcode can be used as constant
 										;;

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.37 2015-01-27 21:48:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.38 2015-01-31 08:55:14 pauloscustodio Exp $
 */
 
 #ifndef _C_

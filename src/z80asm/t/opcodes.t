@@ -34,9 +34,9 @@ END_ASM
 
         extern ZERO
 
-        defc N   =	20h
+        defc N   = 20h
         defc NN  =  30h
-        defc DIS =	40h
+        defc DIS = 40h
 
 ;------------------------------------------------------------------------------
 ; Value ranges
@@ -184,6 +184,7 @@ END_ASM
         ld   l,N                        ;; 2E 20
         ld   a,N                        ;; 3E 20
 
+IF      !RABBIT
         ld   b,ixh                      ;; DD 44
         ld   c,ixh                      ;; DD 4C
         ld   d,ixh                      ;; DD 54
@@ -245,6 +246,69 @@ END_ASM
         ld   iyl,a                      ;; FD 6F
         ld   iyh,N                      ;; FD 26 20
         ld   iyl,N                      ;; FD 2E 20
+ELSE    
+        ld   b,ixh
+        ld   c,ixh
+        ld   d,ixh
+        ld   e,ixh
+        ld   ixh,ixh
+        ld   ixl,ixh
+        ld   a,ixh
+        ld   b,ixl
+        ld   c,ixl
+        ld   d,ixl
+        ld   e,ixl
+        ld   ixh,ixl
+        ld   ixl,ixl
+        ld   a,ixl
+        ld   ixh,b
+        ld   ixl,b
+        ld   ixh,c
+        ld   ixl,c
+        ld   ixh,d
+        ld   ixl,d
+        ld   ixh,e
+        ld   ixl,e
+        ld   ixh,ixh
+        ld   ixl,ixh
+        ld   ixh,ixl
+        ld   ixl,ixl
+        ld   ixh,a
+        ld   ixl,a
+        ld   ixh,1
+        ld   ixl,1
+
+        ld   b,iyh
+        ld   c,iyh
+        ld   d,iyh
+        ld   e,iyh
+        ld   iyh,iyh
+        ld   iyl,iyh
+        ld   a,iyh
+        ld   b,iyl
+        ld   c,iyl
+        ld   d,iyl
+        ld   e,iyl
+        ld   iyh,iyl
+        ld   iyl,iyl
+        ld   a,iyl
+        ld   iyh,b
+        ld   iyl,b
+        ld   iyh,c
+        ld   iyl,c
+        ld   iyh,d
+        ld   iyl,d
+        ld   iyh,e
+        ld   iyl,e
+        ld   iyh,iyh
+        ld   iyl,iyh
+        ld   iyh,iyl
+        ld   iyl,iyl
+        ld   iyh,a
+        ld   iyl,a
+        ld   iyh,1
+        ld   iyl,1
+ENDIF   
 
         ld   b,(hl)                     ;; 46
         ld   c,(hl)                     ;; 4E
@@ -253,20 +317,20 @@ END_ASM
         ld   h,(hl)                     ;; 66
         ld   l,(hl)                     ;; 6E
         ld   a,(hl)                     ;; 7E
-;	ldi	b,(hl)			;; 	ld	b,(hl) ;; inc hl
-;	ldi	c,(hl)			;; 	ld	c,(hl) ;; inc hl
-;	ldi	d,(hl)			;; 	ld	d,(hl) ;; inc hl
-;	ldi	e,(hl)			;; 	ld	e,(hl) ;; inc hl
-;	ldi	h,(hl)			;; 	ld	h,(hl) ;; inc hl
-;	ldi	l,(hl)			;; 	ld	l,(hl) ;; inc hl
-;	ldi	a,(hl)			;; 	ld	a,(hl) ;; inc hl
-;	ldd	b,(hl)			;; 	ld	b,(hl) ;; dec hl
-;	ldd	c,(hl)			;; 	ld	c,(hl) ;; dec hl
-;	ldd	d,(hl)			;; 	ld	d,(hl) ;; dec hl
-;	ldd	e,(hl)			;; 	ld	e,(hl) ;; dec hl
-;	ldd	h,(hl)			;; 	ld	h,(hl) ;; dec hl
-;	ldd	l,(hl)			;; 	ld	l,(hl) ;; dec hl
-;	ldd	a,(hl)			;; 	ld	a,(hl) ;; dec hl
+; ldi b,(hl)   ;;  ld b,(hl) ;; inc hl
+; ldi c,(hl)   ;;  ld c,(hl) ;; inc hl
+; ldi d,(hl)   ;;  ld d,(hl) ;; inc hl
+; ldi e,(hl)   ;;  ld e,(hl) ;; inc hl
+; ldi h,(hl)   ;;  ld h,(hl) ;; inc hl
+; ldi l,(hl)   ;;  ld l,(hl) ;; inc hl
+; ldi a,(hl)   ;;  ld a,(hl) ;; inc hl
+; ldd b,(hl)   ;;  ld b,(hl) ;; dec hl
+; ldd c,(hl)   ;;  ld c,(hl) ;; dec hl
+; ldd d,(hl)   ;;  ld d,(hl) ;; dec hl
+; ldd e,(hl)   ;;  ld e,(hl) ;; dec hl
+; ldd h,(hl)   ;;  ld h,(hl) ;; dec hl
+; ldd l,(hl)   ;;  ld l,(hl) ;; dec hl
+; ldd a,(hl)   ;;  ld a,(hl) ;; dec hl
 
         ld   b,(ix+DIS)                 ;; DD 46 40
         ld   c,(ix+DIS)                 ;; DD 4E 40
@@ -282,34 +346,34 @@ END_ASM
         ld   h,(iy+DIS)                 ;; FD 66 40
         ld   l,(iy+DIS)                 ;; FD 6E 40
         ld   a,(iy+DIS)                 ;; FD 7E 40
-;	ldi	b,(ix+DIS)	;;	ld	b,(ix+DIS) ;; inc ix
-;	ldi	c,(ix+DIS)	;;	ld	c,(ix+DIS) ;; inc ix
-;	ldi	d,(ix+DIS)	;;	ld	d,(ix+DIS) ;; inc ix
-;	ldi	e,(ix+DIS)	;;	ld	e,(ix+DIS) ;; inc ix
-;	ldi	h,(ix+DIS)	;;	ld	h,(ix+DIS) ;; inc ix
-;	ldi	l,(ix+DIS)	;;	ld	l,(ix+DIS) ;; inc ix
-;	ldi	a,(ix+DIS)	;;	ld	a,(ix+DIS) ;; inc ix
-;	ldi	b,(iy+DIS)	;;	ld	b,(iy+DIS) ;; inc iy
-;	ldi	c,(iy+DIS)	;;	ld	c,(iy+DIS) ;; inc iy
-;	ldi	d,(iy+DIS)	;;	ld	d,(iy+DIS) ;; inc iy
-;	ldi	e,(iy+DIS)	;;	ld	e,(iy+DIS) ;; inc iy
-;	ldi	h,(iy+DIS)	;;	ld	h,(iy+DIS) ;; inc iy
-;	ldi	l,(iy+DIS)	;;	ld	l,(iy+DIS) ;; inc iy
-;	ldi	a,(iy+DIS)	;;	ld	a,(iy+DIS) ;; inc iy
-;	ldd	b,(ix+DIS)	;;	ld	b,(ix+DIS) ;; dec ix
-;	ldd	c,(ix+DIS)	;;	ld	c,(ix+DIS) ;; dec ix
-;	ldd	d,(ix+DIS)	;;	ld	d,(ix+DIS) ;; dec ix
-;	ldd	e,(ix+DIS)	;;	ld	e,(ix+DIS) ;; dec ix
-;	ldd	h,(ix+DIS)	;;	ld	h,(ix+DIS) ;; dec ix
-;	ldd	l,(ix+DIS)	;;	ld	l,(ix+DIS) ;; dec ix
-;	ldd	a,(ix+DIS)	;;	ld	a,(ix+DIS) ;; dec ix
-;	ldd	b,(iy+DIS)	;;	ld	b,(iy+DIS) ;; dec iy
-;	ldd	c,(iy+DIS)	;;	ld	c,(iy+DIS) ;; dec iy
-;	ldd	d,(iy+DIS)	;;	ld	d,(iy+DIS) ;; dec iy
-;	ldd	e,(iy+DIS)	;;	ld	e,(iy+DIS) ;; dec iy
-;	ldd	h,(iy+DIS)	;;	ld	h,(iy+DIS) ;; dec iy
-;	ldd	l,(iy+DIS)	;;	ld	l,(iy+DIS) ;; dec iy
-;	ldd	a,(iy+DIS)	;;	ld	a,(iy+DIS) ;; dec iy
+; ldi b,(ix+DIS) ;; ld b,(ix+DIS) ;; inc ix
+; ldi c,(ix+DIS) ;; ld c,(ix+DIS) ;; inc ix
+; ldi d,(ix+DIS) ;; ld d,(ix+DIS) ;; inc ix
+; ldi e,(ix+DIS) ;; ld e,(ix+DIS) ;; inc ix
+; ldi h,(ix+DIS) ;; ld h,(ix+DIS) ;; inc ix
+; ldi l,(ix+DIS) ;; ld l,(ix+DIS) ;; inc ix
+; ldi a,(ix+DIS) ;; ld a,(ix+DIS) ;; inc ix
+; ldi b,(iy+DIS) ;; ld b,(iy+DIS) ;; inc iy
+; ldi c,(iy+DIS) ;; ld c,(iy+DIS) ;; inc iy
+; ldi d,(iy+DIS) ;; ld d,(iy+DIS) ;; inc iy
+; ldi e,(iy+DIS) ;; ld e,(iy+DIS) ;; inc iy
+; ldi h,(iy+DIS) ;; ld h,(iy+DIS) ;; inc iy
+; ldi l,(iy+DIS) ;; ld l,(iy+DIS) ;; inc iy
+; ldi a,(iy+DIS) ;; ld a,(iy+DIS) ;; inc iy
+; ldd b,(ix+DIS) ;; ld b,(ix+DIS) ;; dec ix
+; ldd c,(ix+DIS) ;; ld c,(ix+DIS) ;; dec ix
+; ldd d,(ix+DIS) ;; ld d,(ix+DIS) ;; dec ix
+; ldd e,(ix+DIS) ;; ld e,(ix+DIS) ;; dec ix
+; ldd h,(ix+DIS) ;; ld h,(ix+DIS) ;; dec ix
+; ldd l,(ix+DIS) ;; ld l,(ix+DIS) ;; dec ix
+; ldd a,(ix+DIS) ;; ld a,(ix+DIS) ;; dec ix
+; ldd b,(iy+DIS) ;; ld b,(iy+DIS) ;; dec iy
+; ldd c,(iy+DIS) ;; ld c,(iy+DIS) ;; dec iy
+; ldd d,(iy+DIS) ;; ld d,(iy+DIS) ;; dec iy
+; ldd e,(iy+DIS) ;; ld e,(iy+DIS) ;; dec iy
+; ldd h,(iy+DIS) ;; ld h,(iy+DIS) ;; dec iy
+; ldd l,(iy+DIS) ;; ld l,(iy+DIS) ;; dec iy
+; ldd a,(iy+DIS) ;; ld a,(iy+DIS) ;; dec iy
 
         ld   (hl),b                     ;; 70
         ld   (hl),c                     ;; 71
@@ -318,20 +382,20 @@ END_ASM
         ld   (hl),h                     ;; 74
         ld   (hl),l                     ;; 75
         ld   (hl),a                     ;; 77
-;	ldi	(hl),b			;; 	ld	(hl),b ;; inc hl
-;	ldi	(hl),c			;; 	ld	(hl),c ;; inc hl
-;	ldi	(hl),d			;; 	ld	(hl),d ;; inc hl
-;	ldi	(hl),e			;; 	ld	(hl),e ;; inc hl
-;	ldi	(hl),h			;; 	ld	(hl),h ;; inc hl
-;	ldi	(hl),l			;; 	ld	(hl),l ;; inc hl
-;	ldi	(hl),a			;; 	ld	(hl),a ;; inc hl
-;	ldd	(hl),b			;; 	ld	(hl),b ;; dec hl
-;	ldd	(hl),c			;; 	ld	(hl),c ;; dec hl
-;	ldd	(hl),d			;; 	ld	(hl),d ;; dec hl
-;	ldd	(hl),e			;; 	ld	(hl),e ;; dec hl
-;	ldd	(hl),h			;; 	ld	(hl),h ;; dec hl
-;	ldd	(hl),l			;; 	ld	(hl),l ;; dec hl
-;	ldd	(hl),a			;; 	ld	(hl),a ;; dec hl
+; ldi (hl),b   ;;  ld (hl),b ;; inc hl
+; ldi (hl),c   ;;  ld (hl),c ;; inc hl
+; ldi (hl),d   ;;  ld (hl),d ;; inc hl
+; ldi (hl),e   ;;  ld (hl),e ;; inc hl
+; ldi (hl),h   ;;  ld (hl),h ;; inc hl
+; ldi (hl),l   ;;  ld (hl),l ;; inc hl
+; ldi (hl),a   ;;  ld (hl),a ;; inc hl
+; ldd (hl),b   ;;  ld (hl),b ;; dec hl
+; ldd (hl),c   ;;  ld (hl),c ;; dec hl
+; ldd (hl),d   ;;  ld (hl),d ;; dec hl
+; ldd (hl),e   ;;  ld (hl),e ;; dec hl
+; ldd (hl),h   ;;  ld (hl),h ;; dec hl
+; ldd (hl),l   ;;  ld (hl),l ;; dec hl
+; ldd (hl),a   ;;  ld (hl),a ;; dec hl
 
         ld   (ix+DIS),b                 ;; DD 70 40
         ld   (iy+DIS),b                 ;; FD 70 40
@@ -347,68 +411,75 @@ END_ASM
         ld   (iy+DIS),l                 ;; FD 75 40
         ld   (ix+DIS),a                 ;; DD 77 40
         ld   (iy+DIS),a                 ;; FD 77 40
-;	ldi	(ix+DIS),b	;;	ld	(ix+DIS),b ;; inc ix
-;	ldi	(iy+DIS),b	;;	ld	(iy+DIS),b ;; inc iy
-;	ldi	(ix+DIS),c	;;	ld	(ix+DIS),c ;; inc ix
-;	ldi	(iy+DIS),c	;;	ld	(iy+DIS),c ;; inc iy
-;	ldi	(ix+DIS),d	;;	ld	(ix+DIS),d ;; inc ix
-;	ldi	(iy+DIS),d	;;	ld	(iy+DIS),d ;; inc iy
-;	ldi	(ix+DIS),e	;;	ld	(ix+DIS),e ;; inc ix
-;	ldi	(iy+DIS),e	;;	ld	(iy+DIS),e ;; inc iy
-;	ldi	(ix+DIS),h	;;	ld	(ix+DIS),h ;; inc ix
-;	ldi	(iy+DIS),h	;;	ld	(iy+DIS),h ;; inc iy
-;	ldi	(ix+DIS),l	;;	ld	(ix+DIS),l ;; inc ix
-;	ldi	(iy+DIS),l	;;	ld	(iy+DIS),l ;; inc iy
-;	ldi	(ix+DIS),a	;;	ld	(ix+DIS),a ;; inc ix
-;	ldi	(iy+DIS),a	;;	ld	(iy+DIS),a ;; inc iy
-;	ldd	(ix+DIS),b	;;	ld	(ix+DIS),b ;; dec ix
-;	ldd	(iy+DIS),b	;;	ld	(iy+DIS),b ;; dec iy
-;	ldd	(ix+DIS),c	;;	ld	(ix+DIS),c ;; dec ix
-;	ldd	(iy+DIS),c	;;	ld	(iy+DIS),c ;; dec iy
-;	ldd	(ix+DIS),d	;;	ld	(ix+DIS),d ;; dec ix
-;	ldd	(iy+DIS),d	;;	ld	(iy+DIS),d ;; dec iy
-;	ldd	(ix+DIS),e	;;	ld	(ix+DIS),e ;; dec ix
-;	ldd	(iy+DIS),e	;;	ld	(iy+DIS),e ;; dec iy
-;	ldd	(ix+DIS),h	;;	ld	(ix+DIS),h ;; dec ix
-;	ldd	(iy+DIS),h	;;	ld	(iy+DIS),h ;; dec iy
-;	ldd	(ix+DIS),l	;;	ld	(ix+DIS),l ;; dec ix
-;	ldd	(iy+DIS),l	;;	ld	(iy+DIS),l ;; dec iy
-;	ldd	(ix+DIS),a	;;	ld	(ix+DIS),a ;; dec ix
-;	ldd	(iy+DIS),a	;;	ld	(iy+DIS),a ;; dec iy
+; ldi (ix+DIS),b ;; ld (ix+DIS),b ;; inc ix
+; ldi (iy+DIS),b ;; ld (iy+DIS),b ;; inc iy
+; ldi (ix+DIS),c ;; ld (ix+DIS),c ;; inc ix
+; ldi (iy+DIS),c ;; ld (iy+DIS),c ;; inc iy
+; ldi (ix+DIS),d ;; ld (ix+DIS),d ;; inc ix
+; ldi (iy+DIS),d ;; ld (iy+DIS),d ;; inc iy
+; ldi (ix+DIS),e ;; ld (ix+DIS),e ;; inc ix
+; ldi (iy+DIS),e ;; ld (iy+DIS),e ;; inc iy
+; ldi (ix+DIS),h ;; ld (ix+DIS),h ;; inc ix
+; ldi (iy+DIS),h ;; ld (iy+DIS),h ;; inc iy
+; ldi (ix+DIS),l ;; ld (ix+DIS),l ;; inc ix
+; ldi (iy+DIS),l ;; ld (iy+DIS),l ;; inc iy
+; ldi (ix+DIS),a ;; ld (ix+DIS),a ;; inc ix
+; ldi (iy+DIS),a ;; ld (iy+DIS),a ;; inc iy
+; ldd (ix+DIS),b ;; ld (ix+DIS),b ;; dec ix
+; ldd (iy+DIS),b ;; ld (iy+DIS),b ;; dec iy
+; ldd (ix+DIS),c ;; ld (ix+DIS),c ;; dec ix
+; ldd (iy+DIS),c ;; ld (iy+DIS),c ;; dec iy
+; ldd (ix+DIS),d ;; ld (ix+DIS),d ;; dec ix
+; ldd (iy+DIS),d ;; ld (iy+DIS),d ;; dec iy
+; ldd (ix+DIS),e ;; ld (ix+DIS),e ;; dec ix
+; ldd (iy+DIS),e ;; ld (iy+DIS),e ;; dec iy
+; ldd (ix+DIS),h ;; ld (ix+DIS),h ;; dec ix
+; ldd (iy+DIS),h ;; ld (iy+DIS),h ;; dec iy
+; ldd (ix+DIS),l ;; ld (ix+DIS),l ;; dec ix
+; ldd (iy+DIS),l ;; ld (iy+DIS),l ;; dec iy
+; ldd (ix+DIS),a ;; ld (ix+DIS),a ;; dec ix
+; ldd (iy+DIS),a ;; ld (iy+DIS),a ;; dec iy
 
         ld   (hl),N                     ;; 36 20
-;	ldi	(hl),N							;;	ld	(hl),N ;; inc hl
-;	ldd	(hl),N							;;	ld	(hl),N ;; dec hl
+; ldi (hl),N       ;; ld (hl),N ;; inc hl
+; ldd (hl),N       ;; ld (hl),N ;; dec hl
 
         ld   (ix+DIS),N                 ;; DD 36 40 20
         ld   (iy+DIS),N                 ;; FD 36 40 20
-;	ldi	(ix+DIS),N					;;	ld	(ix+DIS),N ;; inc ix
-;	ldi	(iy+DIS),N					;;	ld	(iy+DIS),N ;; inc iy
-;	ldd	(ix+DIS),N					;;	ld	(ix+DIS),N ;; dec ix
-;	ldd	(iy+DIS),N					;;	ld	(iy+DIS),N ;; dec iy
+; ldi (ix+DIS),N     ;; ld (ix+DIS),N ;; inc ix
+; ldi (iy+DIS),N     ;; ld (iy+DIS),N ;; inc iy
+; ldd (ix+DIS),N     ;; ld (ix+DIS),N ;; dec ix
+; ldd (iy+DIS),N     ;; ld (iy+DIS),N ;; dec iy
 
         ld   a,(bc)                     ;; 0A
         ld   a,(de)                     ;; 1A
-;	ldi	a,(bc)						;;	ld	a,(bc) ;; inc bc
-;	ldi	a,(de)						;;	ld	a,(de) ;; inc de
-;	ldd	a,(bc)						;;	ld	a,(bc) ;; dec bc
-;	ldd	a,(de)						;;	ld	a,(de) ;; dec de
+; ldi a,(bc)      ;; ld a,(bc) ;; inc bc
+; ldi a,(de)      ;; ld a,(de) ;; inc de
+; ldd a,(bc)      ;; ld a,(bc) ;; dec bc
+; ldd a,(de)      ;; ld a,(de) ;; dec de
 
         ld   (bc),a                     ;; 02
         ld   (de),a                     ;; 12
-;	ldi	(bc),a						;;	ld	(bc),a ;; inc bc
-;	ldi	(de),a						;;	ld	(de),a ;; inc de
-;	ldd	(bc),a						;;	ld	(bc),a ;; dec bc
-;	ldd	(de),a						;;	ld	(de),a ;; dec de
+; ldi (bc),a      ;; ld (bc),a ;; inc bc
+; ldi (de),a      ;; ld (de),a ;; inc de
+; ldd (bc),a      ;; ld (bc),a ;; dec bc
+; ldd (de),a      ;; ld (de),a ;; dec de
 
         ld   a,(NN)                     ;; 3A 30 00
         ld   (NN),a                     ;; 32 30 00
 
 
-        ld   a,i                        ;; ED 57
-        ld   a,r                        ;; ED 5F
+IF      !RABBIT
         ld   i,a                        ;; ED 47
         ld   r,a                        ;; ED 4F
+        ld   a,i                        ;; ED 57
+        ld   a,r                        ;; ED 5F
+ELSE    
+        ld   iir,a
+        ld   eir,a
+        ld   a,iir
+        ld   a,eir
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; 16 bit load group
@@ -448,74 +519,74 @@ END_ASM
         pop  iy                         ;; FD E1
         pop  af                         ;; F1
 
-;	ld	bc,bc	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	de,bc	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	hl,bc	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	bc,de	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	de,de	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	hl,de	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	bc,hl	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	de,hl	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	hl,hl	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	bc,ix				=} 0xDD 0x44+<1:3>     0xDD 0x4D+<1:3>
-;	ld	de,ix				=} 0xDD 0x44+<1:3>     0xDD 0x4D+<1:3>
-;	ld	bc,iy				=} 0xFD 0x44+<1:3>     0xFD 0x4D+<1:3>
-;	ld	de,iy				=} 0xFD 0x44+<1:3>     0xFD 0x4D+<1:3>
+; ld bc,bc =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld de,bc =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld hl,bc =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld bc,de =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld de,de =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld hl,de =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld bc,hl =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld de,hl =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld hl,hl =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld bc,ix    =} 0xDD 0x44+<1:3>     0xDD 0x4D+<1:3>
+; ld de,ix    =} 0xDD 0x44+<1:3>     0xDD 0x4D+<1:3>
+; ld bc,iy    =} 0xFD 0x44+<1:3>     0xFD 0x4D+<1:3>
+; ld de,iy    =} 0xFD 0x44+<1:3>     0xFD 0x4D+<1:3>
 ;
-;	ld	bc,(hl)				=}      0x4E+<1:3> 0x23     0x46+<1:3> 0x2B
-;	ld	de,(hl)				=}      0x4E+<1:3> 0x23     0x46+<1:3> 0x2B
-;	ldi	bc,(hl)				=}      0x4E+<1:3> 0x23     0x46+<1:3> 0x23
-;	ldi	de,(hl)				=}      0x4E+<1:3> 0x23     0x46+<1:3> 0x23
+; ld bc,(hl)    =}      0x4E+<1:3> 0x23     0x46+<1:3> 0x2B
+; ld de,(hl)    =}      0x4E+<1:3> 0x23     0x46+<1:3> 0x2B
+; ldi bc,(hl)    =}      0x4E+<1:3> 0x23     0x46+<1:3> 0x23
+; ldi de,(hl)    =}      0x4E+<1:3> 0x23     0x46+<1:3> 0x23
 ;
-;	ld	bc,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
-;	ld	de,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
-;	ld	hl,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
-;	ldi	bc,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
-;	ldi	de,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
-;	ldi	hl,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
+; ld bc,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
+; ld de,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
+; ld hl,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
+; ldi bc,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
+; ldi de,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
+; ldi hl,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
 ;
-;	ld	bc,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
-;	ld	de,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
-;	ld	hl,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
-;	ldi	bc,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
-;	ldi	de,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
-;	ldi	hl,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
+; ld bc,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
+; ld de,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
+; ld hl,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
+; ldi bc,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
+; ldi de,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
+; ldi hl,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
 ;
-;	ld 	(hl),bc				=}      0x71+<2> 0x23     0x70+<2> 0x2B
-;	ld 	(hl),de				=}      0x71+<2> 0x23     0x70+<2> 0x2B
-;	ldi	(hl),bc				=}      0x71+<2> 0x23     0x70+<2> 0x23
-;	ldi	(hl),de				=}      0x71+<2> 0x23     0x70+<2> 0x23
+; ld  (hl),bc    =}      0x71+<2> 0x23     0x70+<2> 0x2B
+; ld  (hl),de    =}      0x71+<2> 0x23     0x70+<2> 0x2B
+; ldi (hl),bc    =}      0x71+<2> 0x23     0x70+<2> 0x23
+; ldi (hl),de    =}      0x71+<2> 0x23     0x70+<2> 0x23
 ;
-;	ld 	(ix+DIS),bc		=} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
-;	ld 	(ix+DIS),de		=} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
-;	ld 	(ix+DIS),hl		=} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
-;	ldi	(ix+DIS),bc		=} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
-;	ldi	(ix+DIS),de		=} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
-;	ldi	(ix+DIS),hl		=} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
+; ld  (ix+DIS),bc  =} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
+; ld  (ix+DIS),de  =} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
+; ld  (ix+DIS),hl  =} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
+; ldi (ix+DIS),bc  =} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
+; ldi (ix+DIS),de  =} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
+; ldi (ix+DIS),hl  =} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
 ;
-;	ld 	(iy+DIS),bc		=} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
-;	ld 	(iy+DIS),de		=} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
-;	ld 	(iy+DIS),hl		=} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
-;	ldi	(iy+DIS),bc		=} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
-;	ldi	(iy+DIS),de		=} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
-;	ldi	(iy+DIS),hl		=} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
+; ld  (iy+DIS),bc  =} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
+; ld  (iy+DIS),de  =} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
+; ld  (iy+DIS),hl  =} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
+; ldi (iy+DIS),bc  =} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
+; ldi (iy+DIS),de  =} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
+; ldi (iy+DIS),hl  =} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
 ;
-;	ld 	hl,ix						=} 0xDD 0xE5 0xE1
-;	ld 	hl,iy						=} 0xFD 0xE5 0xE1
+; ld  hl,ix      =} 0xDD 0xE5 0xE1
+; ld  hl,iy      =} 0xFD 0xE5 0xE1
 ;
-;	ld	ix,bc				=} 0xDD 0x69+<2>       0xDD 0x60+<2>
-;	ld	ix,de				=} 0xDD 0x69+<2>       0xDD 0x60+<2>
-;	ld	iy,bc				=} 0xFD 0x69+<2>       0xFD 0x60+<2>
-;	ld	iy,de				=} 0xFD 0x69+<2>       0xFD 0x60+<2>
+; ld ix,bc    =} 0xDD 0x69+<2>       0xDD 0x60+<2>
+; ld ix,de    =} 0xDD 0x69+<2>       0xDD 0x60+<2>
+; ld iy,bc    =} 0xFD 0x69+<2>       0xFD 0x60+<2>
+; ld iy,de    =} 0xFD 0x69+<2>       0xFD 0x60+<2>
 ;
-;	ld ix,hl						=} 0xE5 0xDD 0xE1
-;	ld iy,hl						=} 0xE5 0xFD 0xE1
+; ld ix,hl      =} 0xE5 0xDD 0xE1
+; ld iy,hl      =} 0xE5 0xFD 0xE1
 ;
-;	ld ix,ix						=} 0xDD 0x6D 0xDD 0x64
-;	ld ix,iy						=} 0xFD 0xE5 0xDD 0xE1
+; ld ix,ix      =} 0xDD 0x6D 0xDD 0x64
+; ld ix,iy      =} 0xFD 0xE5 0xDD 0xE1
 ;
-;	ld iy,iy						=} 0xFD 0x6D 0xFD 0x64
-;	ld iy,ix						=} 0xDD 0xE5 0xFD 0xE1
+; ld iy,iy      =} 0xFD 0x6D 0xFD 0x64
+; ld iy,ix      =} 0xDD 0xE5 0xFD 0xE1
 
 ;------------------------------------------------------------------------------
 ; Exchange, block transfer, search group
@@ -526,7 +597,11 @@ END_ASM
         ex   af,af'                     ;; 08
         exx                             ;; D9
 
+IF      !RABBIT
         ex   (sp),hl                    ;; E3
+ELSE    
+        ex   (sp),hl
+ENDIF   
         ex   (sp),ix                    ;; DD E3
         ex   (sp),iy                    ;; FD E3
 
@@ -535,10 +610,17 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
+IF      !RABBIT
         cpi                             ;; ED A1
         cpir                            ;; ED B1
         cpd                             ;; ED A9
         cpdr                            ;; ED B9
+ELSE    
+        cpi
+        cpir
+        cpd
+        cpdr
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -743,6 +825,7 @@ END_ASM
         inc  (iy+DIS)                   ;; FD 34 40
         dec  (iy+DIS)                   ;; FD 35 40
 
+IF      !RABBIT
         add  a,ixh                      ;; DD 84
         adc  a,ixh                      ;; DD 8C
         sbc  a,ixh                      ;; DD 9C
@@ -815,6 +898,80 @@ END_ASM
         dec  ixl                        ;; DD 2D
         inc  iyl                        ;; FD 2C
         dec  iyl                        ;; FD 2D
+ELSE    
+        add  a,ixh
+        adc  a,ixh
+        sbc  a,ixh
+        add  a,iyh
+        adc  a,iyh
+        sbc  a,iyh
+        add  a,ixl
+        adc  a,ixl
+        sbc  a,ixl
+        add  a,iyl
+        adc  a,iyl
+        sbc  a,iyl
+        add  ixh
+        adc  ixh
+        sbc  ixh
+        add  iyh
+        adc  iyh
+        sbc  iyh
+        add  ixl
+        adc  ixl
+        sbc  ixl
+        add  iyl
+        adc  iyl
+        sbc  iyl
+        sub  ixh
+        and  ixh
+        xor  ixh
+        or   ixh
+        cp   ixh
+        sub  iyh
+        and  iyh
+        xor  iyh
+        or   iyh
+        cp   iyh
+        sub  ixl
+        and  ixl
+        xor  ixl
+        or   ixl
+        cp   ixl
+        sub  iyl
+        and  iyl
+        xor  iyl
+        or   iyl
+        cp   iyl
+        sub  a,ixh
+        and  a,ixh
+        xor  a,ixh
+        or   a,ixh
+        cp   a,ixh
+        sub  a,iyh
+        and  a,iyh
+        xor  a,iyh
+        or   a,iyh
+        cp   a,iyh
+        sub  a,ixl
+        and  a,ixl
+        xor  a,ixl
+        or   a,ixl
+        cp   a,ixl
+        sub  a,iyl
+        and  a,iyl
+        xor  a,iyl
+        or   a,iyl
+        cp   a,iyl
+        inc  ixh
+        dec  ixh
+        inc  iyh
+        dec  iyh
+        inc  ixl
+        dec  ixl
+        inc  iyl
+        dec  iyl
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; 16 bit arithmetic and logical group
@@ -841,10 +998,10 @@ END_ASM
         adc  hl,hl                      ;; ED 6A
         sbc  hl,sp                      ;; ED 72
         adc  hl,sp                      ;; ED 7A
-;	sub       hl,bc						=} 0xB7 0xED 0x42+<2:4>
-;	sub       hl,de						=} 0xB7 0xED 0x42+<2:4>
-;	sub       hl,hl						=} 0xB7 0xED 0x42+<2:4>
-;	sub       hl,sp						=} 0xB7 0xED 0x42+<2:4>
+; sub       hl,bc      =} 0xB7 0xED 0x42+<2:4>
+; sub       hl,de      =} 0xB7 0xED 0x42+<2:4>
+; sub       hl,hl      =} 0xB7 0xED 0x42+<2:4>
+; sub       hl,sp      =} 0xB7 0xED 0x42+<2:4>
 
         inc  bc                         ;; 03
         dec  bc                         ;; 0B
@@ -938,136 +1095,141 @@ END_ASM
         sla  (iy+DIS)                   ;; FD CB 40 26
         sra  (iy+DIS)                   ;; FD CB 40 2E
         srl  (iy+DIS)                   ;; FD CB 40 3E
-;	rlc (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sll ...
-;	sli ...
+; rlc (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sll ...
+; sli ...
 
+IF      !RABBIT
         rld                             ;; ED 6F
         rrd                             ;; ED 67
+ELSE    
+        rld
+        rrd
+ENDIF   
 
-;	# rotate 16 bits
+; # rotate 16 bits
 ;
-;	rl bc					=} 0xCB 0x11+<1 0xCB 0x10+<1
-;	rl de					=} 0xCB 0x11+<1 0xCB 0x10+<1
-;	rl hl					=} 0xCB 0x11+<1 0xCB 0x10+<1
-;	rr bc					=} 0xCB 0x18+<1 0xCB 0x19+<1
-;	rr de					=} 0xCB 0x18+<1 0xCB 0x19+<1
-;	rr hl					=} 0xCB 0x18+<1 0xCB 0x19+<1
+; rl bc     =} 0xCB 0x11+<1 0xCB 0x10+<1
+; rl de     =} 0xCB 0x11+<1 0xCB 0x10+<1
+; rl hl     =} 0xCB 0x11+<1 0xCB 0x10+<1
+; rr bc     =} 0xCB 0x18+<1 0xCB 0x19+<1
+; rr de     =} 0xCB 0x18+<1 0xCB 0x19+<1
+; rr hl     =} 0xCB 0x18+<1 0xCB 0x19+<1
 ;
-;	sla hl							=} 0x29			# special case: add hl,hl
-;	sla bc				=} 0xCB 0x21+<1 0xCB 0x10+<1
-;	sla de				=} 0xCB 0x21+<1 0xCB 0x10+<1
-;	sla hl				=} 0xCB 0x21+<1 0xCB 0x10+<1
-;	sll bc				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sll de				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sll hl				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sli bc				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sli de				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sli hl				=} 0xCB 0x31+<1 0xCB 0x10+<1
+; sla hl       =} 0x29   # special case: add hl,hl
+; sla bc    =} 0xCB 0x21+<1 0xCB 0x10+<1
+; sla de    =} 0xCB 0x21+<1 0xCB 0x10+<1
+; sla hl    =} 0xCB 0x21+<1 0xCB 0x10+<1
+; sll bc    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sll de    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sll hl    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sli bc    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sli de    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sli hl    =} 0xCB 0x31+<1 0xCB 0x10+<1
 ;
-;	sra bc				=} 0xCB 0x28+<1 0xCB 0x19+<1
-;	sra de				=} 0xCB 0x28+<1 0xCB 0x19+<1
-;	sra hl				=} 0xCB 0x28+<1 0xCB 0x19+<1
-;	srl bc				=} 0xCB 0x38+<1 0xCB 0x19+<1
-;	srl de				=} 0xCB 0x38+<1 0xCB 0x19+<1
-;	srl hl				=} 0xCB 0x38+<1 0xCB 0x19+<1
+; sra bc    =} 0xCB 0x28+<1 0xCB 0x19+<1
+; sra de    =} 0xCB 0x28+<1 0xCB 0x19+<1
+; sra hl    =} 0xCB 0x28+<1 0xCB 0x19+<1
+; srl bc    =} 0xCB 0x38+<1 0xCB 0x19+<1
+; srl de    =} 0xCB 0x38+<1 0xCB 0x19+<1
+; srl hl    =} 0xCB 0x38+<1 0xCB 0x19+<1
 
 ;------------------------------------------------------------------------------
 ; General purpose arithmetic and CPU control group
@@ -1079,6 +1241,7 @@ END_ASM
         scf                             ;; 37
         nop                             ;; 00
 
+IF      !RABBIT
         daa                             ;; 27
         di                              ;; F3
         ei                              ;; FB
@@ -1088,6 +1251,15 @@ END_ASM
         im   1                          ;; ED 56
         im   2                          ;; ED 5E
 
+ELSE    
+        daa
+        di
+        ei
+        halt
+        im   0
+        im   1
+        im   2
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; Bit Set, Reset and Test Group
@@ -1335,230 +1507,230 @@ END_ASM
         set  7,(iy+DIS)                 ;; FD CB 40 FE
 
 
-;	res     0,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
 
 ;------------------------------------------------------------------------------
 ; Jump Group
@@ -1622,10 +1794,10 @@ jr2:
         jr   jr2                        ;; 18 80
 
 
-;	jr po,NN
-;	jr pe,NN
-;	jr p,NN
-;	jr m,NN
+; jr po,NN
+; jr pe,NN
+; jr p,NN
+; jr m,NN
 
 
 ;------------------------------------------------------------------------------
@@ -1643,16 +1815,17 @@ jr2:
         ret  p                          ;; F0
         ret  m                          ;; F8
         reti                            ;; ED 4D
-;	rst 0
-;	rst 1
-;	rst 2
-;	rst 3
-;	rst 4
-;	rst 5
-;	rst 6
-;	rst 7
+; rst 0
+; rst 1
+; rst 2
+; rst 3
+; rst 4
+; rst 5
+; rst 6
+; rst 7
 
 
+IF      !RABBIT
         call nz,NN                      ;; C4 30 00
         call z,NN                       ;; CC 30 00
         call nc,NN                      ;; D4 30 00
@@ -1672,12 +1845,34 @@ jr2:
         rst  28h                        ;; EF
         rst  30h                        ;; F7
         rst  38h                        ;; FF
+ELSE    
+        call nz,NN
+        call z,NN
+        call nc,NN
+        call c,NN
+        call po,NN
+        call pe,NN
+        call p,NN
+        call m,NN
+
+        retn
+
+        rst  10h
+        rst  18h
+        rst  20h
+        rst  28h
+        rst  38h
+        rst  00h
+        rst  08h
+        rst  30h
+ENDIF   
 
 
 ;------------------------------------------------------------------------------
 ; Input and Output Group
 ;------------------------------------------------------------------------------
 
+IF      !RABBIT
         in   a,(N)                      ;; DB 20
         in   b,(c)                      ;; ED 40
         in   c,(c)                      ;; ED 48
@@ -1686,7 +1881,7 @@ jr2:
         in   h,(c)                      ;; ED 60
         in   l,(c)                      ;; ED 68
         in   a,(c)                      ;; ED 78
-;	in f,(c)
+; in f,(c)
 
         ini                             ;; ED A2
         inir                            ;; ED B2
@@ -1701,12 +1896,38 @@ jr2:
         out  (c),h                      ;; ED 61
         out  (c),l                      ;; ED 69
         out  (c),a                      ;; ED 79
-;	out (c),0
+; out (c),0
 
         outi                            ;; ED A3
         otir                            ;; ED B3
         outd                            ;; ED AB
         otdr                            ;; ED BB
+ELSE    
+        in   a,(0)
+        in   b,(c)
+        in   c,(c)
+        in   d,(c)
+        in   e,(c)
+        in   h,(c)
+        in   l,(c)
+        in   a,(c)
+        ini
+        inir
+        ind
+        indr
+        out  (0),a
+        out  (c),b
+        out  (c),c
+        out  (c),d
+        out  (c),e
+        out  (c),h
+        out  (c),l
+        out  (c),a
+        outi
+        otir
+        outd
+        otdr
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; IF ELSE ENDIF
@@ -1760,270 +1981,273 @@ jr2:
         define ifdef_2
 
         ifdef ZERO
-        defb 1                          ;; 01
-      else
-        defb 2
-      endif
+          defb 1                        ;; 01
+        else
+          defb 2
+        endif
 
-      ifdef undefined
-      defb 3
-    else
-      defb 4                            ;; 04
-    endif
+        ifdef undefined
+          defb 3
+        else
+          defb 4                        ;; 04
+        endif
 
-    ifdef ifdef_1
-    defb 5                              ;; 05
-  else
-    defb 6
-  endif
+        ifdef ifdef_1
+          defb 5                        ;; 05
+        else
+          defb 6
+        endif
 
-  ifdef ifdef_2
-  defb 7                                ;; 07
-  else
-  defb 8
-  endif
+        ifdef ifdef_2
+          defb 7                        ;; 07
+        else
+          defb 8
+        endif
 
-  ifdef ifdef_3
-  defb 9
-    else
-  defb 10                               ;; 0A
-    endif
+        ifdef ifdef_3
+          defb 9
+        else
+          defb 10                       ;; 0A
+        endif
 
 ;------------------------------------------------------------------------------
 ; IFNDEF ELSE ENDIF
 ;------------------------------------------------------------------------------
-    defc ifndef_1 = 0
-    define ifndef_2
+        defc ifndef_1 = 0
+        define ifndef_2
 
-    ifndef ZERO
-    defb 1
-      else
-    defb 2                              ;; 02
-      endif
-
-      ifndef undefined
-      defb 3                            ;; 03
+        ifndef ZERO
+          defb 1
         else
-      defb 4
+          defb 2                        ;; 02
+        endif
+
+        ifndef undefined
+          defb 3                        ;; 03
+        else
+          defb 4
         endif
 
         ifndef ifndef_1
-        defb 5
-          else
-        defb 6                          ;; 06
-          endif
+          defb 5
+        else
+          defb 6                        ;; 06
+        endif
 
-          ifndef ifndef_2
+        ifndef ifndef_2
           defb 7
-            else
+        else
           defb 8                        ;; 08
-            endif
+        endif
 
-            ifndef ifndef_3
-            defb 9                      ;; 09
-              else
-            defb 10
-              endif
+        ifndef ifndef_3
+          defb 9                        ;; 09
+        else
+          defb 10
+        endif
 
 ;------------------------------------------------------------------------------
 ; DEFGROUP
 ;------------------------------------------------------------------------------
-              defgroup
-              {
-            f0, f1
-            f2, f3,
-            f10  = 10,
-            f11,
-            f20  = 20, f21
-            rl
-              }
-              defb f0,f1,f2,f3,f10,f11,f20,f21,rl
+        defgroup
+        {
+          f0, f1
+          f2, f3,
+          f10  = 10,
+          f11,
+          f20  = 20, f21
+          rl
+        }
+        defb f0,f1,f2,f3,f10,f11,f20,f21,rl
                                         ;; 00 01 02 03 0A 0B 14 15 16
 
-              defgroup
-              {
-            dg1, dg2  = 3
-            dg3  = 7,
-              }
-              defb dg1,dg2,dg3          ;; 00 03 07
+        defgroup
+        {
+          dg1, dg2  = 3
+          dg3  = 7,
+        }
+        defb dg1,dg2,dg3                ;; 00 03 07
 
                                         ; check with conditional assembly
-              if   1
-            defgroup
-            {
-          ff   = 1
-            }
-              else
-            defgroup
-            {
-          ff   = 2
-            }
-              endif
-              if   0
-            defgroup
-            {
-          fg   = 1
-            }
-              else
-            defgroup
-            {
-          fg   = 2
-            }
-              endif
-              defb ff, fg               ;; 01 02
+        if   1
+          defgroup
+          {
+            ff   = 1
+          }
+        else
+          defgroup
+          {
+            ff   = 2
+          }
+        endif
+        if   0
+          defgroup
+          {
+            fg   = 1
+          }
+        else
+          defgroup
+          {
+            fg   = 2
+          }
+        endif
+        defb ff, fg                     ;; 01 02
 
 ;------------------------------------------------------------------------------
 ; DEFS
 ;------------------------------------------------------------------------------
-              defs 0
-              defs 1                    ;; 00
-              defs 2                    ;; 00 00
-              defs 3                    ;; 00 00 00
-              defs 4                    ;; 00 00 00 00
+        defs 0
+        defs 1                          ;; 00
+        defs 2                          ;; 00 00
+        defs 3                          ;; 00 00 00
+        defs 4                          ;; 00 00 00 00
 
-              defs 2,-128               ;; 80 80
-              defs 2,-127               ;; 81 81
-              defs 2,0                  ;; 00 00
-              defs 2,255                ;; FF FF
+        defs 2,-128                     ;; 80 80
+        defs 2,-127                     ;; 81 81
+        defs 2,0                        ;; 00 00
+        defs 2,255                      ;; FF FF
 
-              if   0
-            defs 2,0
-              else
-            defs 2,2                    ;; 02 02
-              endif
+        if   0
+          defs 2,0
+        else
+          defs 2,2                      ;; 02 02
+        endif
 
 ;------------------------------------------------------------------------------
 ; DEFVARS
 ;------------------------------------------------------------------------------
-              defc defvars_base = 0x80
-              defvars defvars_base
-                                        ;;
-              {
-            df1  ds.b 4
-            df2  ds.w 2
-            df3  ds.p 2
-            df4  ds.l 2
-            df5
-            rr
-                                        ;;
-              }
-              defb df1, df2, df3, df4, df5, rr
+        defc defvars_base = 0x80
+        defvars defvars_base
+
+        {
+          df1  ds.b 4
+          df2  ds.w 2
+          df3  ds.p 2
+          df4  ds.l 2
+          df5
+          rr
+
+        }
+        defb df1, df2, df3, df4, df5, rr
                                         ;; 80 84 88 8E 96 96
 
-              defvars 0 {
-              df6  ds.b 1
-              df7  ds.b 1
-              df8
-                }
-                defb df6, df7, df8      ;; 00 01 02
+        defvars 0 {
+          df6  ds.b 1
+          df7  ds.b 1
+          df8
+        }
+        defb df6, df7, df8              ;; 00 01 02
 
-                defvars -1
-                {
-              df9  ds.b 1
-              df10 ds.b 1
-              df11
-              df12
-                }
-                defb df9, df10, df11, df12
-                                        ;; 96 97 98 98
+        defvars -1                      ; continue after df5
+        {
+          df9  ds.b 1
+          df10 ds.b 1
+          df11
+          df12
+        }
+        defb df9, df10, df11, df12      ;; 96 97 98 98
 
-                defvars 0 {
-                df13 ds.b 1
-                df14 ds.b 1
-                df15
-                  }
-                  defb df13, df14, df15 ;; 00 01 02
+        defvars 0 {
+          df13 ds.b 1
+          df14 ds.b 1
+          df15
+        }
+        defb df13, df14, df15           ;; 00 01 02
 
-                  defvars -1
-                  {
-                df16 ds.b 1
-                df17 ds.b 1
-                df18 ds.b 0
-                df19
-                  }
-                  defb df16, df17, df18, df19
-                                        ;; 98 99 9A 9A
+        defvars -1                      ; continue after df12
+        {
+          df16 ds.b 1
+          df17 ds.b 1
+          df18 ds.b 0
+          df19
+        }
+        defb df16, df17, df18, df19     ;; 98 99 9A 9A
 
                                         ; check with conditional assembly
-                  if   1
-                defvars 0
-                {
-              df20 ds.b 1
-              df21
-                }
-                  else
-                defvars 0
-                {
-              df20 ds.w 1
-              df21
-                }
-                  endif
-                  defb df20, df21       ;; 00 01
+        if   1
+          defvars 0
+          {
+            df20 ds.b 1
+            df21
+          }
+        else
+          defvars 0
+          {
+            df20 ds.w 1
+            df21
+          }
+        endif
+        defb df20, df21                 ;; 00 01
 
-                  if   0
-                defvars 0
-                {
-              df30 ds.b 1
-              df31
-                }
-                  else
-                defvars 0
-                {
-              df30 ds.w 1
-              df31
-                }
-                  endif
-                  defb df30, df31       ;; 00 02
+        if   0
+          defvars 0
+          {
+            df30 ds.b 1
+            df31
+          }
+        else
+          defvars 0
+          {
+            df30 ds.w 1
+            df31
+          }
+        endif
+        defb df30, df31                 ;; 00 02
 
 ;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
-                  extern ld
+        extern ld
 
-                  nop                   ;; 00
-                  jr   nop              ;; 18 00
-nop:              
+        nop                             ;; 00
+        jr   nop                        ;; 18 00
+nop:    
 
-                  di                    ;; F3
-                  jr   di               ;; 18 00
-di:               
-                  ei                    ;; FB
-                  jr   ei               ;; 18 00
-ei:               
+IF      !RABBIT
+        di                              ;; F3
+        jr   di                         ;; 18 00
+di:     
+        ei                              ;; FB
+        jr   ei                         ;; 18 00
+ei:     
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; Test parsing of expressions with parentheses inside parentheses
 ;------------------------------------------------------------------------------
-                  out  (N),a            ;; D3 20
-                  out  ((N)),a          ;; D3 20
-                  out  (N+2*(3-3)),a    ;; D3 20
+IF      !RABBIT
+        out  (N),a                      ;; D3 20
+        out  ((N)),a                    ;; D3 20
+        out  (N+2*(3-3)),a              ;; D3 20
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
-                  call_oz 1             ;; E7 01
-                  oz   1                ;; E7 01
-                  call_oz 255           ;; E7 FF
-                  oz   255              ;; E7 FF
-                  call_oz 256           ;; E7 00 01
-                  oz   256              ;; E7 00 01
-                  call_oz 65535         ;; E7 FF FF
-                  oz   65535            ;; E7 FF FF
+        call_oz 1                       ;; E7 01
+        oz   1                          ;; E7 01
+        call_oz 255                     ;; E7 FF
+        oz   255                        ;; E7 FF
+        call_oz 256                     ;; E7 00 01
+        oz   256                        ;; E7 00 01
+        call_oz 65535                   ;; E7 FF FF
+        oz   65535                      ;; E7 FF FF
 
-                  call_pkg 0            ;; CF 00 00
-                  call_pkg 1            ;; CF 01 00
-                  call_pkg 65535        ;; CF FF FF
+IF      !RABBIT
+        call_pkg 0                      ;; CF 00 00
+        call_pkg 1                      ;; CF 01 00
+        call_pkg 65535                  ;; CF FF FF
+ENDIF   
 
-                  fpp  1                ;; DF 01
-                  fpp  254              ;; DF FE
+        fpp  1                          ;; DF 01
+        fpp  254                        ;; DF FE
 
-                  invoke 0              ;; CD 00 00
-                  invoke 1              ;; CD 01 00
-                  invoke 65535          ;; CD FF FF
+        invoke 0                        ;; CD 00 00
+        invoke 1                        ;; CD 01 00
+        invoke 65535                    ;; CD FF FF
 END_ASM
 );
-
 z80asm(
     options => "-l -b",
     asm  => <<'END_ASM',
@@ -2037,6 +2261,9 @@ z80asm(
         defb ''                         ;; error: invalid single quoted character
         defb 'he'                       ;; error: invalid single quoted character
         ld   a,"a"                      ;; error: syntax error
+IF      !RABBIT
+ELSE    
+ENDIF   
         ld   (bc),b                     ;; error: syntax error
         ld   (de),b                     ;; error: syntax error
         ld   (bc),c                     ;; error: syntax error
@@ -2057,9 +2284,27 @@ z80asm(
         ld   (de),(iy+DIS)              ;; error: syntax error
         ld   (bc),N                     ;; error: syntax error
         ld   (de),N                     ;; error: syntax error
+IF      !RABBIT
+ELSE    
+ENDIF   
+IF      !RABBIT
+ELSE    
+ENDIF   
+IF      !RABBIT
+ELSE    
+ENDIF   
+IF      !RABBIT
+ELSE    
+ENDIF   
+IF      !RABBIT
+ELSE    
+ENDIF   
+IF      !RABBIT
         im   -1                         ;; error: integer '-1' out of range
         im   3                          ;; error: integer '3' out of range
         im   undefined                  ;; error: symbol not defined
+ELSE    
+ENDIF   
         bit  -1,a                       ;; error: integer '-1' out of range
         res  -1,a                       ;; error: integer '-1' out of range
         set  -1,a                       ;; error: integer '-1' out of range
@@ -2081,6 +2326,9 @@ z80asm(
         jr   nc,ASMPC+0x82              ;; error 2: integer '128' out of range
         jr   c,ASMPC-0x7F               ;; error 2: integer '-129' out of range
         jr   c,ASMPC+0x82               ;; error 2: integer '128' out of range
+IF      !RABBIT
+ELSE    
+ENDIF   
         rst  undefined                  ;; error: symbol not defined
         rst  -1                         ;; error: integer '-1' out of range
         rst  1                          ;; error: integer '1' out of range
@@ -2098,6 +2346,9 @@ z80asm(
         rst  49                         ;; error: integer '49' out of range
         rst  55                         ;; error: integer '55' out of range
         rst  57                         ;; error: integer '57' out of range
+IF      !RABBIT
+ELSE    
+ENDIF   
 ds:     defs not_defined                ;; error: symbol not defined
                                         ; BUG_0007
         defs -1                         ;; error: integer '-1' out of range
@@ -2105,13 +2356,19 @@ ds:     defs not_defined                ;; error: symbol not defined
         defs 2,not_defined              ;; error: symbol not defined
         defs 2,-129                     ;; error: integer '-129' out of range
         defs 2,256                      ;; error: integer '256' out of range
+IF      !RABBIT
+ENDIF   
+IF      !RABBIT
         out  N,a                        ;; error: syntax error
+ENDIF   
         call_oz 0                       ;; error: integer '0' out of range
         oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
         oz   65536                      ;; error: integer '65536' out of range
+IF      !RABBIT
         call_pkg -1                     ;; error: integer '-1' out of range
         call_pkg 65536                  ;; error: integer '65536' out of range
+ENDIF   
         fpp  0                          ;; error: integer '0' out of range
         fpp  255                        ;; error: integer '255' out of range
         fpp  256                        ;; error: integer '256' out of range
@@ -2119,9 +2376,8 @@ ds:     defs not_defined                ;; error: symbol not defined
         invoke 65536                    ;; error: integer '65536' out of range
 END_ASM
 );
-
 z80asm(
-    options => "-l -b -RCMX000 -i".z80emu(),
+    options => "-l -b -DRABBIT -RCMX000 -i".z80emu(),
     asm1 => <<'END_ASM',
         public ZERO
         defc ZERO    = 0
@@ -2149,9 +2405,9 @@ END_ASM
 
         extern ZERO
 
-        defc N   =	20h
+        defc N   = 20h
         defc NN  =  30h
-        defc DIS =	40h
+        defc DIS = 40h
 
 ;------------------------------------------------------------------------------
 ; Value ranges
@@ -2299,7 +2555,71 @@ END_ASM
         ld   l,N                        ;; 2E 20
         ld   a,N                        ;; 3E 20
 
+IF      !RABBIT
+        ld   b,ixh
+        ld   c,ixh
+        ld   d,ixh
+        ld   e,ixh
+        ld   ixh,ixh
+        ld   ixl,ixh
+        ld   a,ixh
+        ld   b,ixl
+        ld   c,ixl
+        ld   d,ixl
+        ld   e,ixl
+        ld   ixh,ixl
+        ld   ixl,ixl
+        ld   a,ixl
+        ld   ixh,b
+        ld   ixl,b
+        ld   ixh,c
+        ld   ixl,c
+        ld   ixh,d
+        ld   ixl,d
+        ld   ixh,e
+        ld   ixl,e
+        ld   ixh,ixh
+        ld   ixl,ixh
+        ld   ixh,ixl
+        ld   ixl,ixl
+        ld   ixh,a
+        ld   ixl,a
+        ld   ixh,N
+        ld   ixl,N
 
+        ld   b,iyh
+        ld   c,iyh
+        ld   d,iyh
+        ld   e,iyh
+        ld   iyh,iyh
+        ld   iyl,iyh
+        ld   a,iyh
+        ld   b,iyl
+        ld   c,iyl
+        ld   d,iyl
+        ld   e,iyl
+        ld   iyh,iyl
+        ld   iyl,iyl
+        ld   a,iyl
+        ld   iyh,b
+        ld   iyl,b
+        ld   iyh,c
+        ld   iyl,c
+        ld   iyh,d
+        ld   iyl,d
+        ld   iyh,e
+        ld   iyl,e
+        ld   iyh,iyh
+        ld   iyl,iyh
+        ld   iyh,iyl
+        ld   iyl,iyl
+        ld   iyh,a
+        ld   iyl,a
+        ld   iyh,N
+        ld   iyl,N
+ELSE    
+
+ENDIF   
 
         ld   b,(hl)                     ;; 46
         ld   c,(hl)                     ;; 4E
@@ -2308,20 +2628,20 @@ END_ASM
         ld   h,(hl)                     ;; 66
         ld   l,(hl)                     ;; 6E
         ld   a,(hl)                     ;; 7E
-;	ldi	b,(hl)			;; 	ld	b,(hl) ;; inc hl
-;	ldi	c,(hl)			;; 	ld	c,(hl) ;; inc hl
-;	ldi	d,(hl)			;; 	ld	d,(hl) ;; inc hl
-;	ldi	e,(hl)			;; 	ld	e,(hl) ;; inc hl
-;	ldi	h,(hl)			;; 	ld	h,(hl) ;; inc hl
-;	ldi	l,(hl)			;; 	ld	l,(hl) ;; inc hl
-;	ldi	a,(hl)			;; 	ld	a,(hl) ;; inc hl
-;	ldd	b,(hl)			;; 	ld	b,(hl) ;; dec hl
-;	ldd	c,(hl)			;; 	ld	c,(hl) ;; dec hl
-;	ldd	d,(hl)			;; 	ld	d,(hl) ;; dec hl
-;	ldd	e,(hl)			;; 	ld	e,(hl) ;; dec hl
-;	ldd	h,(hl)			;; 	ld	h,(hl) ;; dec hl
-;	ldd	l,(hl)			;; 	ld	l,(hl) ;; dec hl
-;	ldd	a,(hl)			;; 	ld	a,(hl) ;; dec hl
+; ldi b,(hl)   ;;  ld b,(hl) ;; inc hl
+; ldi c,(hl)   ;;  ld c,(hl) ;; inc hl
+; ldi d,(hl)   ;;  ld d,(hl) ;; inc hl
+; ldi e,(hl)   ;;  ld e,(hl) ;; inc hl
+; ldi h,(hl)   ;;  ld h,(hl) ;; inc hl
+; ldi l,(hl)   ;;  ld l,(hl) ;; inc hl
+; ldi a,(hl)   ;;  ld a,(hl) ;; inc hl
+; ldd b,(hl)   ;;  ld b,(hl) ;; dec hl
+; ldd c,(hl)   ;;  ld c,(hl) ;; dec hl
+; ldd d,(hl)   ;;  ld d,(hl) ;; dec hl
+; ldd e,(hl)   ;;  ld e,(hl) ;; dec hl
+; ldd h,(hl)   ;;  ld h,(hl) ;; dec hl
+; ldd l,(hl)   ;;  ld l,(hl) ;; dec hl
+; ldd a,(hl)   ;;  ld a,(hl) ;; dec hl
 
         ld   b,(ix+DIS)                 ;; DD 46 40
         ld   c,(ix+DIS)                 ;; DD 4E 40
@@ -2337,34 +2657,34 @@ END_ASM
         ld   h,(iy+DIS)                 ;; FD 66 40
         ld   l,(iy+DIS)                 ;; FD 6E 40
         ld   a,(iy+DIS)                 ;; FD 7E 40
-;	ldi	b,(ix+DIS)	;;	ld	b,(ix+DIS) ;; inc ix
-;	ldi	c,(ix+DIS)	;;	ld	c,(ix+DIS) ;; inc ix
-;	ldi	d,(ix+DIS)	;;	ld	d,(ix+DIS) ;; inc ix
-;	ldi	e,(ix+DIS)	;;	ld	e,(ix+DIS) ;; inc ix
-;	ldi	h,(ix+DIS)	;;	ld	h,(ix+DIS) ;; inc ix
-;	ldi	l,(ix+DIS)	;;	ld	l,(ix+DIS) ;; inc ix
-;	ldi	a,(ix+DIS)	;;	ld	a,(ix+DIS) ;; inc ix
-;	ldi	b,(iy+DIS)	;;	ld	b,(iy+DIS) ;; inc iy
-;	ldi	c,(iy+DIS)	;;	ld	c,(iy+DIS) ;; inc iy
-;	ldi	d,(iy+DIS)	;;	ld	d,(iy+DIS) ;; inc iy
-;	ldi	e,(iy+DIS)	;;	ld	e,(iy+DIS) ;; inc iy
-;	ldi	h,(iy+DIS)	;;	ld	h,(iy+DIS) ;; inc iy
-;	ldi	l,(iy+DIS)	;;	ld	l,(iy+DIS) ;; inc iy
-;	ldi	a,(iy+DIS)	;;	ld	a,(iy+DIS) ;; inc iy
-;	ldd	b,(ix+DIS)	;;	ld	b,(ix+DIS) ;; dec ix
-;	ldd	c,(ix+DIS)	;;	ld	c,(ix+DIS) ;; dec ix
-;	ldd	d,(ix+DIS)	;;	ld	d,(ix+DIS) ;; dec ix
-;	ldd	e,(ix+DIS)	;;	ld	e,(ix+DIS) ;; dec ix
-;	ldd	h,(ix+DIS)	;;	ld	h,(ix+DIS) ;; dec ix
-;	ldd	l,(ix+DIS)	;;	ld	l,(ix+DIS) ;; dec ix
-;	ldd	a,(ix+DIS)	;;	ld	a,(ix+DIS) ;; dec ix
-;	ldd	b,(iy+DIS)	;;	ld	b,(iy+DIS) ;; dec iy
-;	ldd	c,(iy+DIS)	;;	ld	c,(iy+DIS) ;; dec iy
-;	ldd	d,(iy+DIS)	;;	ld	d,(iy+DIS) ;; dec iy
-;	ldd	e,(iy+DIS)	;;	ld	e,(iy+DIS) ;; dec iy
-;	ldd	h,(iy+DIS)	;;	ld	h,(iy+DIS) ;; dec iy
-;	ldd	l,(iy+DIS)	;;	ld	l,(iy+DIS) ;; dec iy
-;	ldd	a,(iy+DIS)	;;	ld	a,(iy+DIS) ;; dec iy
+; ldi b,(ix+DIS) ;; ld b,(ix+DIS) ;; inc ix
+; ldi c,(ix+DIS) ;; ld c,(ix+DIS) ;; inc ix
+; ldi d,(ix+DIS) ;; ld d,(ix+DIS) ;; inc ix
+; ldi e,(ix+DIS) ;; ld e,(ix+DIS) ;; inc ix
+; ldi h,(ix+DIS) ;; ld h,(ix+DIS) ;; inc ix
+; ldi l,(ix+DIS) ;; ld l,(ix+DIS) ;; inc ix
+; ldi a,(ix+DIS) ;; ld a,(ix+DIS) ;; inc ix
+; ldi b,(iy+DIS) ;; ld b,(iy+DIS) ;; inc iy
+; ldi c,(iy+DIS) ;; ld c,(iy+DIS) ;; inc iy
+; ldi d,(iy+DIS) ;; ld d,(iy+DIS) ;; inc iy
+; ldi e,(iy+DIS) ;; ld e,(iy+DIS) ;; inc iy
+; ldi h,(iy+DIS) ;; ld h,(iy+DIS) ;; inc iy
+; ldi l,(iy+DIS) ;; ld l,(iy+DIS) ;; inc iy
+; ldi a,(iy+DIS) ;; ld a,(iy+DIS) ;; inc iy
+; ldd b,(ix+DIS) ;; ld b,(ix+DIS) ;; dec ix
+; ldd c,(ix+DIS) ;; ld c,(ix+DIS) ;; dec ix
+; ldd d,(ix+DIS) ;; ld d,(ix+DIS) ;; dec ix
+; ldd e,(ix+DIS) ;; ld e,(ix+DIS) ;; dec ix
+; ldd h,(ix+DIS) ;; ld h,(ix+DIS) ;; dec ix
+; ldd l,(ix+DIS) ;; ld l,(ix+DIS) ;; dec ix
+; ldd a,(ix+DIS) ;; ld a,(ix+DIS) ;; dec ix
+; ldd b,(iy+DIS) ;; ld b,(iy+DIS) ;; dec iy
+; ldd c,(iy+DIS) ;; ld c,(iy+DIS) ;; dec iy
+; ldd d,(iy+DIS) ;; ld d,(iy+DIS) ;; dec iy
+; ldd e,(iy+DIS) ;; ld e,(iy+DIS) ;; dec iy
+; ldd h,(iy+DIS) ;; ld h,(iy+DIS) ;; dec iy
+; ldd l,(iy+DIS) ;; ld l,(iy+DIS) ;; dec iy
+; ldd a,(iy+DIS) ;; ld a,(iy+DIS) ;; dec iy
 
         ld   (hl),b                     ;; 70
         ld   (hl),c                     ;; 71
@@ -2373,20 +2693,20 @@ END_ASM
         ld   (hl),h                     ;; 74
         ld   (hl),l                     ;; 75
         ld   (hl),a                     ;; 77
-;	ldi	(hl),b			;; 	ld	(hl),b ;; inc hl
-;	ldi	(hl),c			;; 	ld	(hl),c ;; inc hl
-;	ldi	(hl),d			;; 	ld	(hl),d ;; inc hl
-;	ldi	(hl),e			;; 	ld	(hl),e ;; inc hl
-;	ldi	(hl),h			;; 	ld	(hl),h ;; inc hl
-;	ldi	(hl),l			;; 	ld	(hl),l ;; inc hl
-;	ldi	(hl),a			;; 	ld	(hl),a ;; inc hl
-;	ldd	(hl),b			;; 	ld	(hl),b ;; dec hl
-;	ldd	(hl),c			;; 	ld	(hl),c ;; dec hl
-;	ldd	(hl),d			;; 	ld	(hl),d ;; dec hl
-;	ldd	(hl),e			;; 	ld	(hl),e ;; dec hl
-;	ldd	(hl),h			;; 	ld	(hl),h ;; dec hl
-;	ldd	(hl),l			;; 	ld	(hl),l ;; dec hl
-;	ldd	(hl),a			;; 	ld	(hl),a ;; dec hl
+; ldi (hl),b   ;;  ld (hl),b ;; inc hl
+; ldi (hl),c   ;;  ld (hl),c ;; inc hl
+; ldi (hl),d   ;;  ld (hl),d ;; inc hl
+; ldi (hl),e   ;;  ld (hl),e ;; inc hl
+; ldi (hl),h   ;;  ld (hl),h ;; inc hl
+; ldi (hl),l   ;;  ld (hl),l ;; inc hl
+; ldi (hl),a   ;;  ld (hl),a ;; inc hl
+; ldd (hl),b   ;;  ld (hl),b ;; dec hl
+; ldd (hl),c   ;;  ld (hl),c ;; dec hl
+; ldd (hl),d   ;;  ld (hl),d ;; dec hl
+; ldd (hl),e   ;;  ld (hl),e ;; dec hl
+; ldd (hl),h   ;;  ld (hl),h ;; dec hl
+; ldd (hl),l   ;;  ld (hl),l ;; dec hl
+; ldd (hl),a   ;;  ld (hl),a ;; dec hl
 
         ld   (ix+DIS),b                 ;; DD 70 40
         ld   (iy+DIS),b                 ;; FD 70 40
@@ -2402,68 +2722,75 @@ END_ASM
         ld   (iy+DIS),l                 ;; FD 75 40
         ld   (ix+DIS),a                 ;; DD 77 40
         ld   (iy+DIS),a                 ;; FD 77 40
-;	ldi	(ix+DIS),b	;;	ld	(ix+DIS),b ;; inc ix
-;	ldi	(iy+DIS),b	;;	ld	(iy+DIS),b ;; inc iy
-;	ldi	(ix+DIS),c	;;	ld	(ix+DIS),c ;; inc ix
-;	ldi	(iy+DIS),c	;;	ld	(iy+DIS),c ;; inc iy
-;	ldi	(ix+DIS),d	;;	ld	(ix+DIS),d ;; inc ix
-;	ldi	(iy+DIS),d	;;	ld	(iy+DIS),d ;; inc iy
-;	ldi	(ix+DIS),e	;;	ld	(ix+DIS),e ;; inc ix
-;	ldi	(iy+DIS),e	;;	ld	(iy+DIS),e ;; inc iy
-;	ldi	(ix+DIS),h	;;	ld	(ix+DIS),h ;; inc ix
-;	ldi	(iy+DIS),h	;;	ld	(iy+DIS),h ;; inc iy
-;	ldi	(ix+DIS),l	;;	ld	(ix+DIS),l ;; inc ix
-;	ldi	(iy+DIS),l	;;	ld	(iy+DIS),l ;; inc iy
-;	ldi	(ix+DIS),a	;;	ld	(ix+DIS),a ;; inc ix
-;	ldi	(iy+DIS),a	;;	ld	(iy+DIS),a ;; inc iy
-;	ldd	(ix+DIS),b	;;	ld	(ix+DIS),b ;; dec ix
-;	ldd	(iy+DIS),b	;;	ld	(iy+DIS),b ;; dec iy
-;	ldd	(ix+DIS),c	;;	ld	(ix+DIS),c ;; dec ix
-;	ldd	(iy+DIS),c	;;	ld	(iy+DIS),c ;; dec iy
-;	ldd	(ix+DIS),d	;;	ld	(ix+DIS),d ;; dec ix
-;	ldd	(iy+DIS),d	;;	ld	(iy+DIS),d ;; dec iy
-;	ldd	(ix+DIS),e	;;	ld	(ix+DIS),e ;; dec ix
-;	ldd	(iy+DIS),e	;;	ld	(iy+DIS),e ;; dec iy
-;	ldd	(ix+DIS),h	;;	ld	(ix+DIS),h ;; dec ix
-;	ldd	(iy+DIS),h	;;	ld	(iy+DIS),h ;; dec iy
-;	ldd	(ix+DIS),l	;;	ld	(ix+DIS),l ;; dec ix
-;	ldd	(iy+DIS),l	;;	ld	(iy+DIS),l ;; dec iy
-;	ldd	(ix+DIS),a	;;	ld	(ix+DIS),a ;; dec ix
-;	ldd	(iy+DIS),a	;;	ld	(iy+DIS),a ;; dec iy
+; ldi (ix+DIS),b ;; ld (ix+DIS),b ;; inc ix
+; ldi (iy+DIS),b ;; ld (iy+DIS),b ;; inc iy
+; ldi (ix+DIS),c ;; ld (ix+DIS),c ;; inc ix
+; ldi (iy+DIS),c ;; ld (iy+DIS),c ;; inc iy
+; ldi (ix+DIS),d ;; ld (ix+DIS),d ;; inc ix
+; ldi (iy+DIS),d ;; ld (iy+DIS),d ;; inc iy
+; ldi (ix+DIS),e ;; ld (ix+DIS),e ;; inc ix
+; ldi (iy+DIS),e ;; ld (iy+DIS),e ;; inc iy
+; ldi (ix+DIS),h ;; ld (ix+DIS),h ;; inc ix
+; ldi (iy+DIS),h ;; ld (iy+DIS),h ;; inc iy
+; ldi (ix+DIS),l ;; ld (ix+DIS),l ;; inc ix
+; ldi (iy+DIS),l ;; ld (iy+DIS),l ;; inc iy
+; ldi (ix+DIS),a ;; ld (ix+DIS),a ;; inc ix
+; ldi (iy+DIS),a ;; ld (iy+DIS),a ;; inc iy
+; ldd (ix+DIS),b ;; ld (ix+DIS),b ;; dec ix
+; ldd (iy+DIS),b ;; ld (iy+DIS),b ;; dec iy
+; ldd (ix+DIS),c ;; ld (ix+DIS),c ;; dec ix
+; ldd (iy+DIS),c ;; ld (iy+DIS),c ;; dec iy
+; ldd (ix+DIS),d ;; ld (ix+DIS),d ;; dec ix
+; ldd (iy+DIS),d ;; ld (iy+DIS),d ;; dec iy
+; ldd (ix+DIS),e ;; ld (ix+DIS),e ;; dec ix
+; ldd (iy+DIS),e ;; ld (iy+DIS),e ;; dec iy
+; ldd (ix+DIS),h ;; ld (ix+DIS),h ;; dec ix
+; ldd (iy+DIS),h ;; ld (iy+DIS),h ;; dec iy
+; ldd (ix+DIS),l ;; ld (ix+DIS),l ;; dec ix
+; ldd (iy+DIS),l ;; ld (iy+DIS),l ;; dec iy
+; ldd (ix+DIS),a ;; ld (ix+DIS),a ;; dec ix
+; ldd (iy+DIS),a ;; ld (iy+DIS),a ;; dec iy
 
         ld   (hl),N                     ;; 36 20
-;	ldi	(hl),N							;;	ld	(hl),N ;; inc hl
-;	ldd	(hl),N							;;	ld	(hl),N ;; dec hl
+; ldi (hl),N       ;; ld (hl),N ;; inc hl
+; ldd (hl),N       ;; ld (hl),N ;; dec hl
 
         ld   (ix+DIS),N                 ;; DD 36 40 20
         ld   (iy+DIS),N                 ;; FD 36 40 20
-;	ldi	(ix+DIS),N					;;	ld	(ix+DIS),N ;; inc ix
-;	ldi	(iy+DIS),N					;;	ld	(iy+DIS),N ;; inc iy
-;	ldd	(ix+DIS),N					;;	ld	(ix+DIS),N ;; dec ix
-;	ldd	(iy+DIS),N					;;	ld	(iy+DIS),N ;; dec iy
+; ldi (ix+DIS),N     ;; ld (ix+DIS),N ;; inc ix
+; ldi (iy+DIS),N     ;; ld (iy+DIS),N ;; inc iy
+; ldd (ix+DIS),N     ;; ld (ix+DIS),N ;; dec ix
+; ldd (iy+DIS),N     ;; ld (iy+DIS),N ;; dec iy
 
         ld   a,(bc)                     ;; 0A
         ld   a,(de)                     ;; 1A
-;	ldi	a,(bc)						;;	ld	a,(bc) ;; inc bc
-;	ldi	a,(de)						;;	ld	a,(de) ;; inc de
-;	ldd	a,(bc)						;;	ld	a,(bc) ;; dec bc
-;	ldd	a,(de)						;;	ld	a,(de) ;; dec de
+; ldi a,(bc)      ;; ld a,(bc) ;; inc bc
+; ldi a,(de)      ;; ld a,(de) ;; inc de
+; ldd a,(bc)      ;; ld a,(bc) ;; dec bc
+; ldd a,(de)      ;; ld a,(de) ;; dec de
 
         ld   (bc),a                     ;; 02
         ld   (de),a                     ;; 12
-;	ldi	(bc),a						;;	ld	(bc),a ;; inc bc
-;	ldi	(de),a						;;	ld	(de),a ;; inc de
-;	ldd	(bc),a						;;	ld	(bc),a ;; dec bc
-;	ldd	(de),a						;;	ld	(de),a ;; dec de
+; ldi (bc),a      ;; ld (bc),a ;; inc bc
+; ldi (de),a      ;; ld (de),a ;; inc de
+; ldd (bc),a      ;; ld (bc),a ;; dec bc
+; ldd (de),a      ;; ld (de),a ;; dec de
 
         ld   a,(NN)                     ;; 3A 30 00
         ld   (NN),a                     ;; 32 30 00
 
 
-        ld   a,iir                      ;; ED 57
-        ld   a,eir                      ;; ED 5F
+IF      !RABBIT
+        ld   i,a
+        ld   r,a
+        ld   a,i
+        ld   a,r
+ELSE    
         ld   iir,a                      ;; ED 47
         ld   eir,a                      ;; ED 4F
+        ld   a,iir                      ;; ED 57
+        ld   a,eir                      ;; ED 5F
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; 16 bit load group
@@ -2503,74 +2830,74 @@ END_ASM
         pop  iy                         ;; FD E1
         pop  af                         ;; F1
 
-;	ld	bc,bc	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	de,bc	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	hl,bc	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	bc,de	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	de,de	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	hl,de	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	bc,hl	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	de,hl	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	hl,hl	=}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
-;	ld	bc,ix				=} 0xDD 0x44+<1:3>     0xDD 0x4D+<1:3>
-;	ld	de,ix				=} 0xDD 0x44+<1:3>     0xDD 0x4D+<1:3>
-;	ld	bc,iy				=} 0xFD 0x44+<1:3>     0xFD 0x4D+<1:3>
-;	ld	de,iy				=} 0xFD 0x44+<1:3>     0xFD 0x4D+<1:3>
+; ld bc,bc =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld de,bc =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld hl,bc =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld bc,de =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld de,de =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld hl,de =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld bc,hl =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld de,hl =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld hl,hl =}      0x40+<1:3>+<2>      0x49+<1:3>+<2>
+; ld bc,ix    =} 0xDD 0x44+<1:3>     0xDD 0x4D+<1:3>
+; ld de,ix    =} 0xDD 0x44+<1:3>     0xDD 0x4D+<1:3>
+; ld bc,iy    =} 0xFD 0x44+<1:3>     0xFD 0x4D+<1:3>
+; ld de,iy    =} 0xFD 0x44+<1:3>     0xFD 0x4D+<1:3>
 ;
-;	ld	bc,(hl)				=}      0x4E+<1:3> 0x23     0x46+<1:3> 0x2B
-;	ld	de,(hl)				=}      0x4E+<1:3> 0x23     0x46+<1:3> 0x2B
-;	ldi	bc,(hl)				=}      0x4E+<1:3> 0x23     0x46+<1:3> 0x23
-;	ldi	de,(hl)				=}      0x4E+<1:3> 0x23     0x46+<1:3> 0x23
+; ld bc,(hl)    =}      0x4E+<1:3> 0x23     0x46+<1:3> 0x2B
+; ld de,(hl)    =}      0x4E+<1:3> 0x23     0x46+<1:3> 0x2B
+; ldi bc,(hl)    =}      0x4E+<1:3> 0x23     0x46+<1:3> 0x23
+; ldi de,(hl)    =}      0x4E+<1:3> 0x23     0x46+<1:3> 0x23
 ;
-;	ld	bc,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
-;	ld	de,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
-;	ld	hl,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
-;	ldi	bc,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
-;	ldi	de,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
-;	ldi	hl,(ix+DIS)		=} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
+; ld bc,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
+; ld de,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
+; ld hl,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS           0xDD 0x46+<1:3> DIS+1
+; ldi bc,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
+; ldi de,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
+; ldi hl,(ix+DIS)  =} 0xDD 0x4E+<1:3> DIS 0xDD 0x23 0xDD 0x46+<1:3> DIS 0xDD 0x23
 ;
-;	ld	bc,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
-;	ld	de,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
-;	ld	hl,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
-;	ldi	bc,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
-;	ldi	de,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
-;	ldi	hl,(iy+DIS)		=} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
+; ld bc,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
+; ld de,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
+; ld hl,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS           0xFD 0x46+<1:3> DIS+1
+; ldi bc,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
+; ldi de,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
+; ldi hl,(iy+DIS)  =} 0xFD 0x4E+<1:3> DIS 0xFD 0x23 0xFD 0x46+<1:3> DIS 0xFD 0x23
 ;
-;	ld 	(hl),bc				=}      0x71+<2> 0x23     0x70+<2> 0x2B
-;	ld 	(hl),de				=}      0x71+<2> 0x23     0x70+<2> 0x2B
-;	ldi	(hl),bc				=}      0x71+<2> 0x23     0x70+<2> 0x23
-;	ldi	(hl),de				=}      0x71+<2> 0x23     0x70+<2> 0x23
+; ld  (hl),bc    =}      0x71+<2> 0x23     0x70+<2> 0x2B
+; ld  (hl),de    =}      0x71+<2> 0x23     0x70+<2> 0x2B
+; ldi (hl),bc    =}      0x71+<2> 0x23     0x70+<2> 0x23
+; ldi (hl),de    =}      0x71+<2> 0x23     0x70+<2> 0x23
 ;
-;	ld 	(ix+DIS),bc		=} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
-;	ld 	(ix+DIS),de		=} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
-;	ld 	(ix+DIS),hl		=} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
-;	ldi	(ix+DIS),bc		=} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
-;	ldi	(ix+DIS),de		=} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
-;	ldi	(ix+DIS),hl		=} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
+; ld  (ix+DIS),bc  =} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
+; ld  (ix+DIS),de  =} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
+; ld  (ix+DIS),hl  =} 0xDD 0x71+<2> DIS           0xDD 0x70+<2> DIS+1
+; ldi (ix+DIS),bc  =} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
+; ldi (ix+DIS),de  =} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
+; ldi (ix+DIS),hl  =} 0xDD 0x71+<2> DIS 0xDD 0x23 0xDD 0x70+<2> DIS 0xDD 0x23
 ;
-;	ld 	(iy+DIS),bc		=} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
-;	ld 	(iy+DIS),de		=} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
-;	ld 	(iy+DIS),hl		=} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
-;	ldi	(iy+DIS),bc		=} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
-;	ldi	(iy+DIS),de		=} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
-;	ldi	(iy+DIS),hl		=} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
+; ld  (iy+DIS),bc  =} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
+; ld  (iy+DIS),de  =} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
+; ld  (iy+DIS),hl  =} 0xFD 0x71+<2> DIS 0xFD 0x70+<2> DIS+1
+; ldi (iy+DIS),bc  =} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
+; ldi (iy+DIS),de  =} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
+; ldi (iy+DIS),hl  =} 0xFD 0x71+<2> DIS 0xFD 0x23 0xFD 0x70+<2> DIS 0xFD 0x23
 ;
-;	ld 	hl,ix						=} 0xDD 0xE5 0xE1
-;	ld 	hl,iy						=} 0xFD 0xE5 0xE1
+; ld  hl,ix      =} 0xDD 0xE5 0xE1
+; ld  hl,iy      =} 0xFD 0xE5 0xE1
 ;
-;	ld	ix,bc				=} 0xDD 0x69+<2>       0xDD 0x60+<2>
-;	ld	ix,de				=} 0xDD 0x69+<2>       0xDD 0x60+<2>
-;	ld	iy,bc				=} 0xFD 0x69+<2>       0xFD 0x60+<2>
-;	ld	iy,de				=} 0xFD 0x69+<2>       0xFD 0x60+<2>
+; ld ix,bc    =} 0xDD 0x69+<2>       0xDD 0x60+<2>
+; ld ix,de    =} 0xDD 0x69+<2>       0xDD 0x60+<2>
+; ld iy,bc    =} 0xFD 0x69+<2>       0xFD 0x60+<2>
+; ld iy,de    =} 0xFD 0x69+<2>       0xFD 0x60+<2>
 ;
-;	ld ix,hl						=} 0xE5 0xDD 0xE1
-;	ld iy,hl						=} 0xE5 0xFD 0xE1
+; ld ix,hl      =} 0xE5 0xDD 0xE1
+; ld iy,hl      =} 0xE5 0xFD 0xE1
 ;
-;	ld ix,ix						=} 0xDD 0x6D 0xDD 0x64
-;	ld ix,iy						=} 0xFD 0xE5 0xDD 0xE1
+; ld ix,ix      =} 0xDD 0x6D 0xDD 0x64
+; ld ix,iy      =} 0xFD 0xE5 0xDD 0xE1
 ;
-;	ld iy,iy						=} 0xFD 0x6D 0xFD 0x64
-;	ld iy,ix						=} 0xDD 0xE5 0xFD 0xE1
+; ld iy,iy      =} 0xFD 0x6D 0xFD 0x64
+; ld iy,ix      =} 0xDD 0xE5 0xFD 0xE1
 
 ;------------------------------------------------------------------------------
 ; Exchange, block transfer, search group
@@ -2581,7 +2908,11 @@ END_ASM
         ex   af,af'                     ;; 08
         exx                             ;; D9
 
+IF      !RABBIT
+        ex   (sp),hl
+ELSE    
         ex   (sp),hl                    ;; ED 54
+ENDIF   
         ex   (sp),ix                    ;; DD E3
         ex   (sp),iy                    ;; FD E3
 
@@ -2590,10 +2921,17 @@ END_ASM
         ldd                             ;; ED A8
         lddr                            ;; ED B8
 
+IF      !RABBIT
+        cpi
+        cpir
+        cpd
+        cpdr
+ELSE    
         cpi                             ;; CD 1D 09
         cpir                            ;; CD 3A 09
         cpd                             ;; CD 66 09
         cpdr                            ;; CD 83 09
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; 8 bit arithmetic and logical group
@@ -2798,6 +3136,81 @@ END_ASM
         inc  (iy+DIS)                   ;; FD 34 40
         dec  (iy+DIS)                   ;; FD 35 40
 
+IF      !RABBIT
+        add  a,ixh
+        adc  a,ixh
+        sbc  a,ixh
+        add  a,iyh
+        adc  a,iyh
+        sbc  a,iyh
+        add  a,ixl
+        adc  a,ixl
+        sbc  a,ixl
+        add  a,iyl
+        adc  a,iyl
+        sbc  a,iyl
+        add  ixh
+        adc  ixh
+        sbc  ixh
+        add  iyh
+        adc  iyh
+        sbc  iyh
+        add  ixl
+        adc  ixl
+        sbc  ixl
+        add  iyl
+        adc  iyl
+        sbc  iyl
+        sub  ixh
+        and  ixh
+        xor  ixh
+        or   ixh
+        cp   ixh
+        sub  iyh
+        and  iyh
+        xor  iyh
+        or   iyh
+        cp   iyh
+        sub  ixl
+        and  ixl
+        xor  ixl
+        or   ixl
+        cp   ixl
+        sub  iyl
+        and  iyl
+        xor  iyl
+        or   iyl
+        cp   iyl
+        sub  a,ixh
+        and  a,ixh
+        xor  a,ixh
+        or   a,ixh
+        cp   a,ixh
+        sub  a,iyh
+        and  a,iyh
+        xor  a,iyh
+        or   a,iyh
+        cp   a,iyh
+        sub  a,ixl
+        and  a,ixl
+        xor  a,ixl
+        or   a,ixl
+        cp   a,ixl
+        sub  a,iyl
+        and  a,iyl
+        xor  a,iyl
+        or   a,iyl
+        cp   a,iyl
+        inc  ixh
+        dec  ixh
+        inc  iyh
+        dec  iyh
+        inc  ixl
+        dec  ixl
+        inc  iyl
+        dec  iyl
+ELSE    
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; 16 bit arithmetic and logical group
@@ -2824,10 +3237,10 @@ END_ASM
         adc  hl,hl                      ;; ED 6A
         sbc  hl,sp                      ;; ED 72
         adc  hl,sp                      ;; ED 7A
-;	sub       hl,bc						=} 0xB7 0xED 0x42+<2:4>
-;	sub       hl,de						=} 0xB7 0xED 0x42+<2:4>
-;	sub       hl,hl						=} 0xB7 0xED 0x42+<2:4>
-;	sub       hl,sp						=} 0xB7 0xED 0x42+<2:4>
+; sub       hl,bc      =} 0xB7 0xED 0x42+<2:4>
+; sub       hl,de      =} 0xB7 0xED 0x42+<2:4>
+; sub       hl,hl      =} 0xB7 0xED 0x42+<2:4>
+; sub       hl,sp      =} 0xB7 0xED 0x42+<2:4>
 
         inc  bc                         ;; 03
         dec  bc                         ;; 0B
@@ -2921,136 +3334,141 @@ END_ASM
         sla  (iy+DIS)                   ;; FD CB 40 26
         sra  (iy+DIS)                   ;; FD CB 40 2E
         srl  (iy+DIS)                   ;; FD CB 40 3E
-;	rlc (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),b	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),c	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),d	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),e	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),h	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),l	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rrc (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rl (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rr (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sla (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	sra (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	srl (ix+DIS),a	=} 0xDD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),b	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),c	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),d	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),e	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),h	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),l	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rlc (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rrc (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rl (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	rr (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sla (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sra (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	srl (iy+DIS),a	=} 0xFD 0xCB DIS 0x00+<0:3+<2
-;	sll ...
-;	sli ...
+; rlc (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),b =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),c =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),d =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),e =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),h =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),l =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rrc (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rl (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rr (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sla (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; sra (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; srl (ix+DIS),a =} 0xDD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),b =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),c =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),d =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),e =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),h =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),l =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rlc (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rrc (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rl (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; rr (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sla (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sra (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; srl (iy+DIS),a =} 0xFD 0xCB DIS 0x00+<0:3+<2
+; sll ...
+; sli ...
 
+IF      !RABBIT
+        rld
+        rrd
+ELSE    
         rld                             ;; CD AF 09
         rrd                             ;; CD D1 09
+ENDIF   
 
-;	# rotate 16 bits
+; # rotate 16 bits
 ;
-;	rl bc					=} 0xCB 0x11+<1 0xCB 0x10+<1
-;	rl de					=} 0xCB 0x11+<1 0xCB 0x10+<1
-;	rl hl					=} 0xCB 0x11+<1 0xCB 0x10+<1
-;	rr bc					=} 0xCB 0x18+<1 0xCB 0x19+<1
-;	rr de					=} 0xCB 0x18+<1 0xCB 0x19+<1
-;	rr hl					=} 0xCB 0x18+<1 0xCB 0x19+<1
+; rl bc     =} 0xCB 0x11+<1 0xCB 0x10+<1
+; rl de     =} 0xCB 0x11+<1 0xCB 0x10+<1
+; rl hl     =} 0xCB 0x11+<1 0xCB 0x10+<1
+; rr bc     =} 0xCB 0x18+<1 0xCB 0x19+<1
+; rr de     =} 0xCB 0x18+<1 0xCB 0x19+<1
+; rr hl     =} 0xCB 0x18+<1 0xCB 0x19+<1
 ;
-;	sla hl							=} 0x29			# special case: add hl,hl
-;	sla bc				=} 0xCB 0x21+<1 0xCB 0x10+<1
-;	sla de				=} 0xCB 0x21+<1 0xCB 0x10+<1
-;	sla hl				=} 0xCB 0x21+<1 0xCB 0x10+<1
-;	sll bc				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sll de				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sll hl				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sli bc				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sli de				=} 0xCB 0x31+<1 0xCB 0x10+<1
-;	sli hl				=} 0xCB 0x31+<1 0xCB 0x10+<1
+; sla hl       =} 0x29   # special case: add hl,hl
+; sla bc    =} 0xCB 0x21+<1 0xCB 0x10+<1
+; sla de    =} 0xCB 0x21+<1 0xCB 0x10+<1
+; sla hl    =} 0xCB 0x21+<1 0xCB 0x10+<1
+; sll bc    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sll de    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sll hl    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sli bc    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sli de    =} 0xCB 0x31+<1 0xCB 0x10+<1
+; sli hl    =} 0xCB 0x31+<1 0xCB 0x10+<1
 ;
-;	sra bc				=} 0xCB 0x28+<1 0xCB 0x19+<1
-;	sra de				=} 0xCB 0x28+<1 0xCB 0x19+<1
-;	sra hl				=} 0xCB 0x28+<1 0xCB 0x19+<1
-;	srl bc				=} 0xCB 0x38+<1 0xCB 0x19+<1
-;	srl de				=} 0xCB 0x38+<1 0xCB 0x19+<1
-;	srl hl				=} 0xCB 0x38+<1 0xCB 0x19+<1
+; sra bc    =} 0xCB 0x28+<1 0xCB 0x19+<1
+; sra de    =} 0xCB 0x28+<1 0xCB 0x19+<1
+; sra hl    =} 0xCB 0x28+<1 0xCB 0x19+<1
+; srl bc    =} 0xCB 0x38+<1 0xCB 0x19+<1
+; srl de    =} 0xCB 0x38+<1 0xCB 0x19+<1
+; srl hl    =} 0xCB 0x38+<1 0xCB 0x19+<1
 
 ;------------------------------------------------------------------------------
 ; General purpose arithmetic and CPU control group
@@ -3062,6 +3480,21 @@ END_ASM
         scf                             ;; 37
         nop                             ;; 00
 
+IF      !RABBIT
+        daa
+        di
+        ei
+        halt
+
+        im   0
+        im   1
+        im   2
+
+        im   -1
+        im   3
+        im   undefined
+ELSE    
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; Bit Set, Reset and Test Group
@@ -3309,230 +3742,230 @@ END_ASM
         set  7,(iy+DIS)                 ;; FD CB 40 FE
 
 
-;	res     0,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),b	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),c	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),d	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),e	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),h	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),l	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(ix+DIS),a	=} 0xDD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),b	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),c	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),d	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),e	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),h	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),l	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     0,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     0,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     1,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     1,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     2,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     2,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     3,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     3,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     4,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     4,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     5,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     5,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     6,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     6,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	res     7,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
-;	set     7,(iy+DIS),a	=} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),b =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),c =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),d =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),e =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),h =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),l =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     0,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     1,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     1,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     2,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     2,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     3,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     3,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     4,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     4,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     5,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     5,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     6,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     6,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     7,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; set     7,(ix+DIS),a =} 0xDD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),b =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),c =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),d =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),e =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),h =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),l =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     0,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     0,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     1,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     1,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     2,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     2,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     3,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     3,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     4,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     4,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     5,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     5,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     6,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     6,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; res     7,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
+; set     7,(iy+DIS),a =} 0xFD 0xCB DIS <0:6+<1:3+<3
 
 ;------------------------------------------------------------------------------
 ; Jump Group
@@ -3596,10 +4029,10 @@ jr2:
         jr   jr2                        ;; 18 80
 
 
-;	jr po,NN
-;	jr pe,NN
-;	jr p,NN
-;	jr m,NN
+; jr po,NN
+; jr pe,NN
+; jr p,NN
+; jr m,NN
 
 
 ;------------------------------------------------------------------------------
@@ -3617,16 +4050,37 @@ jr2:
         ret  p                          ;; F0
         ret  m                          ;; F8
         reti                            ;; ED 4D
-;	rst 0
-;	rst 1
-;	rst 2
-;	rst 3
-;	rst 4
-;	rst 5
-;	rst 6
-;	rst 7
+; rst 0
+; rst 1
+; rst 2
+; rst 3
+; rst 4
+; rst 5
+; rst 6
+; rst 7
 
 
+IF      !RABBIT
+        call nz,NN
+        call z,NN
+        call nc,NN
+        call c,NN
+        call po,NN
+        call pe,NN
+        call p,NN
+        call m,NN
+
+        retn
+
+        rst  00h
+        rst  08h
+        rst  10h
+        rst  18h
+        rst  20h
+        rst  28h
+        rst  30h
+        rst  38h
+ELSE    
         call nz,NN                      ;; 28 03 CD 30 00
         call z,NN                       ;; 20 03 CD 30 00
         call nc,NN                      ;; 38 03 CD 30 00
@@ -3642,12 +4096,45 @@ jr2:
         rst  20h                        ;; E7
         rst  28h                        ;; EF
         rst  38h                        ;; FF
+ENDIF   
 
 
 ;------------------------------------------------------------------------------
 ; Input and Output Group
 ;------------------------------------------------------------------------------
 
+IF      !RABBIT
+        in   a,(N)
+        in   b,(c)
+        in   c,(c)
+        in   d,(c)
+        in   e,(c)
+        in   h,(c)
+        in   l,(c)
+        in   a,(c)
+; in f,(c)
+
+        ini
+        inir
+        ind
+        indr
+
+        out  (N),a
+        out  (c),b
+        out  (c),c
+        out  (c),d
+        out  (c),e
+        out  (c),h
+        out  (c),l
+        out  (c),a
+; out (c),0
+
+        outi
+        otir
+        outd
+        otdr
+ELSE    
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; IF ELSE ENDIF
@@ -3701,260 +4188,278 @@ jr2:
         define ifdef_2
 
         ifdef ZERO
-        defb 1                          ;; 01
-      else
-        defb 2
-      endif
+          defb 1                        ;; 01
+        else
+          defb 2
+        endif
 
-      ifdef undefined
-      defb 3
-    else
-      defb 4                            ;; 04
-    endif
+        ifdef undefined
+          defb 3
+        else
+          defb 4                        ;; 04
+        endif
 
-    ifdef ifdef_1
-    defb 5                              ;; 05
-  else
-    defb 6
-  endif
+        ifdef ifdef_1
+          defb 5                        ;; 05
+        else
+          defb 6
+        endif
 
-  ifdef ifdef_2
-  defb 7                                ;; 07
-  else
-  defb 8
-  endif
+        ifdef ifdef_2
+          defb 7                        ;; 07
+        else
+          defb 8
+        endif
 
-  ifdef ifdef_3
-  defb 9
-    else
-  defb 10                               ;; 0A
-    endif
+        ifdef ifdef_3
+          defb 9
+        else
+          defb 10                       ;; 0A
+        endif
 
 ;------------------------------------------------------------------------------
 ; IFNDEF ELSE ENDIF
 ;------------------------------------------------------------------------------
-    defc ifndef_1 = 0
-    define ifndef_2
+        defc ifndef_1 = 0
+        define ifndef_2
 
-    ifndef ZERO
-    defb 1
-      else
-    defb 2                              ;; 02
-      endif
-
-      ifndef undefined
-      defb 3                            ;; 03
+        ifndef ZERO
+          defb 1
         else
-      defb 4
+          defb 2                        ;; 02
+        endif
+
+        ifndef undefined
+          defb 3                        ;; 03
+        else
+          defb 4
         endif
 
         ifndef ifndef_1
-        defb 5
-          else
-        defb 6                          ;; 06
-          endif
+          defb 5
+        else
+          defb 6                        ;; 06
+        endif
 
-          ifndef ifndef_2
+        ifndef ifndef_2
           defb 7
-            else
+        else
           defb 8                        ;; 08
-            endif
+        endif
 
-            ifndef ifndef_3
-            defb 9                      ;; 09
-              else
-            defb 10
-              endif
+        ifndef ifndef_3
+          defb 9                        ;; 09
+        else
+          defb 10
+        endif
 
 ;------------------------------------------------------------------------------
 ; DEFGROUP
 ;------------------------------------------------------------------------------
-              defgroup
-              {
-            f0, f1
-            f2, f3,
-            f10  = 10,
-            f11,
-            f20  = 20, f21
-            rl
-              }
-              defb f0,f1,f2,f3,f10,f11,f20,f21,rl
+        defgroup
+        {
+          f0, f1
+          f2, f3,
+          f10  = 10,
+          f11,
+          f20  = 20, f21
+          rl
+        }
+        defb f0,f1,f2,f3,f10,f11,f20,f21,rl
                                         ;; 00 01 02 03 0A 0B 14 15 16
 
-              defgroup
-              {
-            dg1, dg2  = 3
-            dg3  = 7,
-              }
-              defb dg1,dg2,dg3          ;; 00 03 07
+        defgroup
+        {
+          dg1, dg2  = 3
+          dg3  = 7,
+        }
+        defb dg1,dg2,dg3                ;; 00 03 07
 
                                         ; check with conditional assembly
-              if   1
-            defgroup
-            {
-          ff   = 1
-            }
-              else
-            defgroup
-            {
-          ff   = 2
-            }
-              endif
-              if   0
-            defgroup
-            {
-          fg   = 1
-            }
-              else
-            defgroup
-            {
-          fg   = 2
-            }
-              endif
-              defb ff, fg               ;; 01 02
+        if   1
+          defgroup
+          {
+            ff   = 1
+          }
+        else
+          defgroup
+          {
+            ff   = 2
+          }
+        endif
+        if   0
+          defgroup
+          {
+            fg   = 1
+          }
+        else
+          defgroup
+          {
+            fg   = 2
+          }
+        endif
+        defb ff, fg                     ;; 01 02
 
 ;------------------------------------------------------------------------------
 ; DEFS
 ;------------------------------------------------------------------------------
-              defs 0
-              defs 1                    ;; 00
-              defs 2                    ;; 00 00
-              defs 3                    ;; 00 00 00
-              defs 4                    ;; 00 00 00 00
+        defs 0
+        defs 1                          ;; 00
+        defs 2                          ;; 00 00
+        defs 3                          ;; 00 00 00
+        defs 4                          ;; 00 00 00 00
 
-              defs 2,-128               ;; 80 80
-              defs 2,-127               ;; 81 81
-              defs 2,0                  ;; 00 00
-              defs 2,255                ;; FF FF
+        defs 2,-128                     ;; 80 80
+        defs 2,-127                     ;; 81 81
+        defs 2,0                        ;; 00 00
+        defs 2,255                      ;; FF FF
 
-              if   0
-            defs 2,0
-              else
-            defs 2,2                    ;; 02 02
-              endif
+        if   0
+          defs 2,0
+        else
+          defs 2,2                      ;; 02 02
+        endif
 
 ;------------------------------------------------------------------------------
 ; DEFVARS
 ;------------------------------------------------------------------------------
-              defc defvars_base = 0x80
-              defvars defvars_base
-                                        ;;
-              {
-            df1  ds.b 4
-            df2  ds.w 2
-            df3  ds.p 2
-            df4  ds.l 2
-            df5
-            rr
-                                        ;;
-              }
-              defb df1, df2, df3, df4, df5, rr
+        defc defvars_base = 0x80
+        defvars defvars_base
+
+        {
+          df1  ds.b 4
+          df2  ds.w 2
+          df3  ds.p 2
+          df4  ds.l 2
+          df5
+          rr
+
+        }
+        defb df1, df2, df3, df4, df5, rr
                                         ;; 80 84 88 8E 96 96
 
-              defvars 0 {
-              df6  ds.b 1
-              df7  ds.b 1
-              df8
-                }
-                defb df6, df7, df8      ;; 00 01 02
+        defvars 0 {
+          df6  ds.b 1
+          df7  ds.b 1
+          df8
+        }
+        defb df6, df7, df8              ;; 00 01 02
 
-                defvars -1
-                {
-              df9  ds.b 1
-              df10 ds.b 1
-              df11
-              df12
-                }
-                defb df9, df10, df11, df12
-                                        ;; 96 97 98 98
+        defvars -1                      ; continue after df5
+        {
+          df9  ds.b 1
+          df10 ds.b 1
+          df11
+          df12
+        }
+        defb df9, df10, df11, df12      ;; 96 97 98 98
 
-                defvars 0 {
-                df13 ds.b 1
-                df14 ds.b 1
-                df15
-                  }
-                  defb df13, df14, df15 ;; 00 01 02
+        defvars 0 {
+          df13 ds.b 1
+          df14 ds.b 1
+          df15
+        }
+        defb df13, df14, df15           ;; 00 01 02
 
-                  defvars -1
-                  {
-                df16 ds.b 1
-                df17 ds.b 1
-                df18 ds.b 0
-                df19
-                  }
-                  defb df16, df17, df18, df19
-                                        ;; 98 99 9A 9A
+        defvars -1                      ; continue after df12
+        {
+          df16 ds.b 1
+          df17 ds.b 1
+          df18 ds.b 0
+          df19
+        }
+        defb df16, df17, df18, df19     ;; 98 99 9A 9A
 
                                         ; check with conditional assembly
-                  if   1
-                defvars 0
-                {
-              df20 ds.b 1
-              df21
-                }
-                  else
-                defvars 0
-                {
-              df20 ds.w 1
-              df21
-                }
-                  endif
-                  defb df20, df21       ;; 00 01
+        if   1
+          defvars 0
+          {
+            df20 ds.b 1
+            df21
+          }
+        else
+          defvars 0
+          {
+            df20 ds.w 1
+            df21
+          }
+        endif
+        defb df20, df21                 ;; 00 01
 
-                  if   0
-                defvars 0
-                {
-              df30 ds.b 1
-              df31
-                }
-                  else
-                defvars 0
-                {
-              df30 ds.w 1
-              df31
-                }
-                  endif
-                  defb df30, df31       ;; 00 02
+        if   0
+          defvars 0
+          {
+            df30 ds.b 1
+            df31
+          }
+        else
+          defvars 0
+          {
+            df30 ds.w 1
+            df31
+          }
+        endif
+        defb df30, df31                 ;; 00 02
 
 ;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
-                  extern ld
+        extern ld
 
-                  nop                   ;; 00
-                  jr   nop              ;; 18 00
-nop:              
+        nop                             ;; 00
+        jr   nop                        ;; 18 00
+nop:    
 
+IF      !RABBIT
+        di
+        jr   di
+di:     
+        ei
+        jr   ei
+ei:     
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; Test parsing of expressions with parentheses inside parentheses
 ;------------------------------------------------------------------------------
+IF      !RABBIT
+        out  N,a
+        out  (N),a
+        out  ((N)),a
+        out  (N+2*(3-3)),a
+ENDIF   
 
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
-                  call_oz 1             ;; E7 01
-                  oz   1                ;; E7 01
-                  call_oz 255           ;; E7 FF
-                  oz   255              ;; E7 FF
-                  call_oz 256           ;; E7 00 01
-                  oz   256              ;; E7 00 01
-                  call_oz 65535         ;; E7 FF FF
-                  oz   65535            ;; E7 FF FF
+        call_oz 1                       ;; E7 01
+        oz   1                          ;; E7 01
+        call_oz 255                     ;; E7 FF
+        oz   255                        ;; E7 FF
+        call_oz 256                     ;; E7 00 01
+        oz   256                        ;; E7 00 01
+        call_oz 65535                   ;; E7 FF FF
+        oz   65535                      ;; E7 FF FF
 
+IF      !RABBIT
+        call_pkg 0
+        call_pkg 1
+        call_pkg 65535
+        call_pkg -1
+        call_pkg 65536
+ENDIF   
 
-                  fpp  1                ;; DF 01
-                  fpp  254              ;; DF FE
+        fpp  1                          ;; DF 01
+        fpp  254                        ;; DF FE
 
-                  invoke 0              ;; CD 00 00
-                  invoke 1              ;; CD 01 00
-                  invoke 65535          ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 42 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 8B 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD B6 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD D8 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+        invoke 0                        ;; CD 00 00
+        invoke 1                        ;; CD 01 00
+        invoke 65535                    ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 42 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 8B 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD B6 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD D8 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
-
 z80asm(
-    options => "-l -b -RCMX000 -i".z80emu(),
+    options => "-l -b -DRABBIT -RCMX000 -i".z80emu(),
     asm  => <<'END_ASM',
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
@@ -3966,6 +4471,8 @@ z80asm(
         defb ''                         ;; error: invalid single quoted character
         defb 'he'                       ;; error: invalid single quoted character
         ld   a,"a"                      ;; error: syntax error
+IF      !RABBIT
+ELSE    
         ld   b,ixh                      ;; error: illegal identifier
         ld   c,ixh                      ;; error: illegal identifier
         ld   d,ixh                      ;; error: illegal identifier
@@ -3994,8 +4501,8 @@ z80asm(
         ld   ixl,ixl                    ;; error: illegal identifier
         ld   ixh,a                      ;; error: illegal identifier
         ld   ixl,a                      ;; error: illegal identifier
-        ld   ixh,N                      ;; error: illegal identifier
-        ld   ixl,N                      ;; error: illegal identifier
+        ld   ixh,1                      ;; error: illegal identifier
+        ld   ixl,1                      ;; error: illegal identifier
         ld   b,iyh                      ;; error: illegal identifier
         ld   c,iyh                      ;; error: illegal identifier
         ld   d,iyh                      ;; error: illegal identifier
@@ -4024,8 +4531,9 @@ z80asm(
         ld   iyl,iyl                    ;; error: illegal identifier
         ld   iyh,a                      ;; error: illegal identifier
         ld   iyl,a                      ;; error: illegal identifier
-        ld   iyh,N                      ;; error: illegal identifier
-        ld   iyl,N                      ;; error: illegal identifier
+        ld   iyh,1                      ;; error: illegal identifier
+        ld   iyl,1                      ;; error: illegal identifier
+ENDIF   
         ld   (bc),b                     ;; error: syntax error
         ld   (de),b                     ;; error: syntax error
         ld   (bc),c                     ;; error: syntax error
@@ -4046,6 +4554,17 @@ z80asm(
         ld   (de),(iy+DIS)              ;; error: syntax error
         ld   (bc),N                     ;; error: syntax error
         ld   (de),N                     ;; error: syntax error
+IF      !RABBIT
+ELSE    
+ENDIF   
+IF      !RABBIT
+ELSE    
+ENDIF   
+IF      !RABBIT
+ELSE    
+ENDIF   
+IF      !RABBIT
+ELSE    
         add  a,ixh                      ;; error: illegal identifier
         adc  a,ixh                      ;; error: illegal identifier
         sbc  a,ixh                      ;; error: illegal identifier
@@ -4118,6 +4637,12 @@ z80asm(
         dec  ixl                        ;; error: illegal identifier
         inc  iyl                        ;; error: illegal identifier
         dec  iyl                        ;; error: illegal identifier
+ENDIF   
+IF      !RABBIT
+ELSE    
+ENDIF   
+IF      !RABBIT
+ELSE    
         daa                             ;; error: illegal identifier
         di                              ;; error: illegal identifier
         ei                              ;; error: illegal identifier
@@ -4125,6 +4650,7 @@ z80asm(
         im   0                          ;; error: illegal identifier
         im   1                          ;; error: illegal identifier
         im   2                          ;; error: illegal identifier
+ENDIF   
         bit  -1,a                       ;; error: integer '-1' out of range
         res  -1,a                       ;; error: integer '-1' out of range
         set  -1,a                       ;; error: integer '-1' out of range
@@ -4146,10 +4672,13 @@ z80asm(
         jr   nc,ASMPC+0x82              ;; error 2: integer '128' out of range
         jr   c,ASMPC-0x7F               ;; error 2: integer '-129' out of range
         jr   c,ASMPC+0x82               ;; error 2: integer '128' out of range
+IF      !RABBIT
+ELSE    
         retn                            ;; error: illegal identifier
         rst  00h                        ;; error: illegal identifier
         rst  08h                        ;; error: illegal identifier
         rst  30h                        ;; error: illegal identifier
+ENDIF   
         rst  undefined                  ;; error: symbol not defined
         rst  -1                         ;; error: integer '-1' out of range
         rst  1                          ;; error: integer '1' out of range
@@ -4167,6 +4696,8 @@ z80asm(
         rst  49                         ;; error: integer '49' out of range
         rst  55                         ;; error: integer '55' out of range
         rst  57                         ;; error: integer '57' out of range
+IF      !RABBIT
+ELSE    
         in   a,(0)                      ;; error: illegal identifier
         in   b,(c)                      ;; error: illegal identifier
         in   c,(c)                      ;; error: illegal identifier
@@ -4191,6 +4722,7 @@ z80asm(
         otir                            ;; error: illegal identifier
         outd                            ;; error: illegal identifier
         otdr                            ;; error: illegal identifier
+ENDIF   
 ds:     defs not_defined                ;; error: symbol not defined
                                         ; BUG_0007
         defs -1                         ;; error: integer '-1' out of range
@@ -4198,10 +4730,16 @@ ds:     defs not_defined                ;; error: symbol not defined
         defs 2,not_defined              ;; error: symbol not defined
         defs 2,-129                     ;; error: integer '-129' out of range
         defs 2,256                      ;; error: integer '256' out of range
+IF      !RABBIT
+ENDIF   
+IF      !RABBIT
+ENDIF   
         call_oz 0                       ;; error: integer '0' out of range
         oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
         oz   65536                      ;; error: integer '65536' out of range
+IF      !RABBIT
+ENDIF   
         fpp  0                          ;; error: integer '0' out of range
         fpp  255                        ;; error: integer '255' out of range
         fpp  256                        ;; error: integer '256' out of range

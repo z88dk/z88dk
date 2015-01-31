@@ -288,18 +288,42 @@ tr194:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_H )); }; }
 	goto st1570;
 tr195:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADC( REG_H )); }; }
 	goto st1570;
 tr196:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADC( REG_H )); }; }
 	goto st1570;
 tr197:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_ADC( REG_L )); }; }
 	goto st1570;
 tr198:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADC( REG_L )); }; }
 	goto st1570;
 tr199:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADC( REG_L )); }; }
 	goto st1570;
 tr200:
@@ -357,18 +381,42 @@ tr287:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_H )); }; }
 	goto st1570;
 tr288:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD( REG_H )); }; }
 	goto st1570;
 tr289:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD( REG_H )); }; }
 	goto st1570;
 tr290:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_ADD( REG_L )); }; }
 	goto st1570;
 tr291:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_ADD( REG_L )); }; }
 	goto st1570;
 tr292:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_ADD( REG_L )); }; }
 	goto st1570;
 tr293:
@@ -450,18 +498,42 @@ tr395:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_AND( REG_H )); }; }
 	goto st1570;
 tr396:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_AND( REG_H )); }; }
 	goto st1570;
 tr397:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_AND( REG_H )); }; }
 	goto st1570;
 tr398:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_AND( REG_L )); }; }
 	goto st1570;
 tr399:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_AND( REG_L )); }; }
 	goto st1570;
 tr400:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_AND( REG_L )); }; }
 	goto st1570;
 tr401:
@@ -655,18 +727,42 @@ tr663:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_CP( REG_H )); }; }
 	goto st1570;
 tr664:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_CP( REG_H )); }; }
 	goto st1570;
 tr665:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_CP( REG_H )); }; }
 	goto st1570;
 tr666:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_CP( REG_L )); }; }
 	goto st1570;
 tr667:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_CP( REG_L )); }; }
 	goto st1570;
 tr668:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_CP( REG_L )); }; }
 	goto st1570;
 tr669:
@@ -721,18 +817,42 @@ tr745:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_H )); }; }
 	goto st1570;
 tr746:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC( REG_H )); }; }
 	goto st1570;
 tr747:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC( REG_H )); }; }
 	goto st1570;
 tr748:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_DEC( REG_L )); }; }
 	goto st1570;
 tr749:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_DEC( REG_L )); }; }
 	goto st1570;
 tr750:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_DEC( REG_L )); }; }
 	goto st1570;
 tr751:
@@ -877,18 +997,42 @@ tr908:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_INC( REG_H )); }; }
 	goto st1570;
 tr909:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC( REG_H )); }; }
 	goto st1570;
 tr910:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC( REG_H )); }; }
 	goto st1570;
 tr911:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_INC( REG_L )); }; }
 	goto st1570;
 tr912:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_INC( REG_L )); }; }
 	goto st1570;
 tr913:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_INC( REG_L )); }; }
 	goto st1570;
 tr914:
@@ -1170,18 +1314,42 @@ tr1235:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_H )); }; }
 	goto st1570;
 tr1236:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXH )); }; }
 	goto st1570;
 tr1237:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYH )); }; }
 	goto st1570;
 tr1238:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_C, REG_L )); }; }
 	goto st1570;
 tr1239:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_C, REG_IXL )); }; }
 	goto st1570;
 tr1240:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_C, REG_IYL )); }; }
 	goto st1570;
 tr1241:
@@ -1249,18 +1417,42 @@ tr1315:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_H )); }; }
 	goto st1570;
 tr1316:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXH )); }; }
 	goto st1570;
 tr1317:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYH )); }; }
 	goto st1570;
 tr1318:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_B, REG_L )); }; }
 	goto st1570;
 tr1319:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_B, REG_IXL )); }; }
 	goto st1570;
 tr1320:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_B, REG_IYL )); }; }
 	goto st1570;
 tr1321:
@@ -1328,18 +1520,42 @@ tr1395:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_H )); }; }
 	goto st1570;
 tr1396:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXH )); }; }
 	goto st1570;
 tr1397:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYH )); }; }
 	goto st1570;
 tr1398:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_D, REG_L )); }; }
 	goto st1570;
 tr1399:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_D, REG_IXL )); }; }
 	goto st1570;
 tr1400:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_D, REG_IYL )); }; }
 	goto st1570;
 tr1401:
@@ -1407,18 +1623,42 @@ tr1475:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_H )); }; }
 	goto st1570;
 tr1476:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXH )); }; }
 	goto st1570;
 tr1477:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYH )); }; }
 	goto st1570;
 tr1478:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_E, REG_L )); }; }
 	goto st1570;
 tr1479:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_E, REG_IXL )); }; }
 	goto st1570;
 tr1480:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_E, REG_IYL )); }; }
 	goto st1570;
 tr1481:
@@ -1516,24 +1756,66 @@ tr1613:
 	{ { Expr *expr = pop_expr(ctx); if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXH )), expr); }; }
 	goto st1570;
 tr1616:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_C )); }; }
 	goto st1570;
 tr1617:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_B )); }; }
 	goto st1570;
 tr1618:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_D )); }; }
 	goto st1570;
 tr1619:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_E )); }; }
 	goto st1570;
 tr1620:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXH )); }; }
 	goto st1570;
 tr1621:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_IXL )); }; }
 	goto st1570;
 tr1622:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXH, REG_A )); }; }
 	goto st1570;
 tr1634:
@@ -1546,24 +1828,66 @@ tr1639:
 	{ { Expr *expr = pop_expr(ctx); if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYH )), expr); }; }
 	goto st1570;
 tr1642:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_C )); }; }
 	goto st1570;
 tr1643:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_B )); }; }
 	goto st1570;
 tr1644:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_D )); }; }
 	goto st1570;
 tr1645:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_E )); }; }
 	goto st1570;
 tr1646:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYH )); }; }
 	goto st1570;
 tr1647:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_IYL )); }; }
 	goto st1570;
 tr1648:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYH, REG_A )); }; }
 	goto st1570;
 tr1663:
@@ -1643,24 +1967,66 @@ tr1737:
 	{ { Expr *expr = pop_expr(ctx); if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode_n((P_IX + Z80_LD_r_n( REG_IXL )), expr); }; }
 	goto st1570;
 tr1740:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_C )); }; }
 	goto st1570;
 tr1741:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_B )); }; }
 	goto st1570;
 tr1742:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_D )); }; }
 	goto st1570;
 tr1743:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_E )); }; }
 	goto st1570;
 tr1744:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXH )); }; }
 	goto st1570;
 tr1745:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_IXL )); }; }
 	goto st1570;
 tr1746:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_IXL, REG_A )); }; }
 	goto st1570;
 tr1758:
@@ -1673,24 +2039,66 @@ tr1763:
 	{ { Expr *expr = pop_expr(ctx); if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode_n((P_IY + Z80_LD_r_n( REG_IYL )), expr); }; }
 	goto st1570;
 tr1766:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_C )); }; }
 	goto st1570;
 tr1767:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_B )); }; }
 	goto st1570;
 tr1768:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_D )); }; }
 	goto st1570;
 tr1769:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_E )); }; }
 	goto st1570;
 tr1770:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYH )); }; }
 	goto st1570;
 tr1771:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_IYL )); }; }
 	goto st1570;
 tr1772:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_IYL, REG_A )); }; }
 	goto st1570;
 tr1797:
@@ -1740,18 +2148,42 @@ tr1809:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_H )); }; }
 	goto st1570;
 tr1810:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXH )); }; }
 	goto st1570;
 tr1811:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYH )); }; }
 	goto st1570;
 tr1812:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_LD_r_r( REG_A, REG_L )); }; }
 	goto st1570;
 tr1813:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_LD_r_r( REG_A, REG_IXL )); }; }
 	goto st1570;
 tr1814:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_LD_r_r( REG_A, REG_IYL )); }; }
 	goto st1570;
 tr1815:
@@ -2208,18 +2640,42 @@ tr2164:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_OR( REG_H )); }; }
 	goto st1570;
 tr2165:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_OR( REG_H )); }; }
 	goto st1570;
 tr2166:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_OR( REG_H )); }; }
 	goto st1570;
 tr2167:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_OR( REG_L )); }; }
 	goto st1570;
 tr2168:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_OR( REG_L )); }; }
 	goto st1570;
 tr2169:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_OR( REG_L )); }; }
 	goto st1570;
 tr2170:
@@ -2627,18 +3083,42 @@ tr2650:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_H )); }; }
 	goto st1570;
 tr2651:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_SBC( REG_H )); }; }
 	goto st1570;
 tr2652:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_SBC( REG_H )); }; }
 	goto st1570;
 tr2653:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_SBC( REG_L )); }; }
 	goto st1570;
 tr2654:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_SBC( REG_L )); }; }
 	goto st1570;
 tr2655:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_SBC( REG_L )); }; }
 	goto st1570;
 tr2656:
@@ -2923,18 +3403,42 @@ tr3052:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_H )); }; }
 	goto st1570;
 tr3053:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_SUB( REG_H )); }; }
 	goto st1570;
 tr3054:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_SUB( REG_H )); }; }
 	goto st1570;
 tr3055:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_SUB( REG_L )); }; }
 	goto st1570;
 tr3056:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_SUB( REG_L )); }; }
 	goto st1570;
 tr3057:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_SUB( REG_L )); }; }
 	goto st1570;
 tr3058:
@@ -2980,18 +3484,42 @@ tr3133:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_H )); }; }
 	goto st1570;
 tr3134:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_XOR( REG_H )); }; }
 	goto st1570;
 tr3135:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_XOR( REG_H )); }; }
 	goto st1570;
 tr3136:
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(Z80_XOR( REG_L )); }; }
 	goto st1570;
 tr3137:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IX + Z80_XOR( REG_L )); }; }
 	goto st1570;
 tr3138:
+	{
+  if ( opts.cpu & CPU_RABBIT ) {
+   error_illegal_ident();
+   {( ctx->p)++; ( ctx->cs) = 1570; goto _out;}
+  }
+ }
 	{ { if (stmt_label->len) { asm_LABEL(stmt_label->str); stmt_label->len = 0; }; add_opcode(P_IY + Z80_XOR( REG_L )); }; }
 	goto st1570;
 tr3139:

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.50 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.51 2015-01-31 08:55:16 pauloscustodio Exp $
 */
 
 #include "legacy.h"
@@ -149,13 +149,6 @@ TOKEN(TK_BIN_NOT, "~", )
 /*-----------------------------------------------------------------------------
 *	Assembly keywords
 *----------------------------------------------------------------------------*/
-#define FOR_Z80		if ( opts.cpu & CPU_RABBIT ) { \
-						error_illegal_ident(); \
-					}
-						
-#define FOR_RABBIT	if ( ! (opts.cpu & CPU_RABBIT) ) { \
-						error_illegal_ident(); \
-					}	
 
 /* flags */
 TOKEN_KW(NZ, )
@@ -174,22 +167,22 @@ TOKEN_KW(D, )
 TOKEN_KW(E, )
 
 TOKEN_KW(H, )
-TOKEN_KW(IXH, FOR_Z80)
-TOKEN_KW(IYH, FOR_Z80)
+TOKEN_KW(IXH, )
+TOKEN_KW(IYH, )
 
 TOKEN_KW(L, )
-TOKEN_KW(IXL, FOR_Z80)
-TOKEN_KW(IYL, FOR_Z80)
+TOKEN_KW(IXL, )
+TOKEN_KW(IYL, )
 
 TOKEN_KW(A, )
 
 TOKEN_KW(F, )
 
-TOKEN_KW(I,   FOR_Z80)
-TOKEN_KW(IIR, FOR_RABBIT)
+TOKEN_KW(I,   )
+TOKEN_KW(IIR, )
 
-TOKEN_KW(R,   FOR_Z80)
-TOKEN_KW(EIR, FOR_RABBIT)
+TOKEN_KW(R,   )
+TOKEN_KW(EIR, )
 
 /* indirect 8-bit register */
 TOKEN_RE(TK_IND_C, "(C)", "(" hspace "C"i hspace ")", )

@@ -16,7 +16,7 @@
 # Preprocess scan_def.h and generate scan_tokens.h with #define macros for each token ID
 # Needed to communicate scanner tokens to the parser
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_tokens.pl,v 1.4 2015-01-26 23:46:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/build_tokens.pl,v 1.5 2015-01-31 08:55:14 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -83,7 +83,6 @@ print $out <<"END";
 } tokid_t;
 
 #endif
-
 END
 
 close($in) or die "cc -E failed: $!\n";
