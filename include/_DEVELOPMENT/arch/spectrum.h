@@ -34,11 +34,11 @@
 
 // misc
 
-extern void    zx_border(uint8_t colour);
-extern void    zx_cls(uint8_t attr);
-extern void    zx_cls_wc(struct r_Rect8 *r, uint8_t attr);
-extern void    zx_scroll_up(uint8_t rows, uint8_t attr);
-extern void    zx_scroll_wc_up(struct r_Rect8 *r, uint8_t rows, uint8_t attr);
+extern void    zx_border(uint16_t colour);
+extern void    zx_cls(uint16_t attr);
+extern void    zx_cls_wc(struct r_Rect8 *r, uint16_t attr);
+extern void    zx_scroll_up(uint16_t rows, uint16_t attr);
+extern void    zx_scroll_wc_up(struct r_Rect8 *r, uint16_t rows, uint16_t attr);
 
 // display
 
@@ -114,10 +114,10 @@ extern int     zx_pattern_fill(int x, int y, void *pattern, int depth);
 // misc
 
 extern void   __LIB__ __FASTCALL__  zx_border(int colour);
-extern void   __LIB__ __FASTCALL__  zx_cls(uint8_t attr);
-extern void   __LIB__               zx_cls_wc(struct r_Rect8 *r, uint8_t attr);
-extern void   __LIB__               zx_scroll_up(uint8_t rows, uint8_t attr);
-extern void   __LIB__               zx_scroll_wc_up(struct r_Rect8 *r, uint8_t rows, uint8_t attr);
+extern void   __LIB__ __FASTCALL__  zx_cls(uint16_t attr);
+extern void   __LIB__               zx_cls_wc(struct r_Rect8 *r, uint16_t attr);
+extern void   __LIB__               zx_scroll_up(uint16_t rows, uint16_t attr);
+extern void   __LIB__               zx_scroll_wc_up(struct r_Rect8 *r, uint16_t rows, uint16_t attr);
 
 // display
 
@@ -162,9 +162,9 @@ extern int    __LIB__               zx_pattern_fill(int x, int y, void *pattern,
 
 // misc
 
-extern void   __LIB__ __CALLEE__    zx_cls_wc_callee(struct r_Rect8 *r, uint8_t attr);
-extern void   __LIB__ __CALLEE__    zx_scroll_up_callee(uint8_t rows, uint8_t attr);
-extern void   __LIB__ __CALLEE__    zx_scroll_wc_up_callee(struct r_Rect8 *r, uint8_t rows, uint8_t attr);
+extern void   __LIB__ __CALLEE__    zx_cls_wc_callee(struct r_Rect8 *r, uint16_t attr);
+extern void   __LIB__ __CALLEE__    zx_scroll_up_callee(uint16_t rows, uint16_t attr);
+extern void   __LIB__ __CALLEE__    zx_scroll_wc_up_callee(struct r_Rect8 *r, uint16_t rows, uint16_t attr);
 
 // display
 

@@ -9,12 +9,12 @@
 // SDCC
 
 extern void       im2_init(void *im2_table_address);
-extern void      *im2_install_isr(uint8_t vector, void (*isr)(void));
-extern void      *im2_create_generic_isr(uint8_t num_callbacks, void *address);
-extern void      *im2_create_generic_isr_8080(uint8_t num_callbacks, void *address);
-extern void       im2_append_generic_callback(uint8_t vector, void (*callback)(void));
-extern void       im2_prepend_generic_callback(uint8_t vector, void (*callback)(void));
-extern int        im2_remove_generic_callback(uint8_t vector, void (*callback)(void));
+extern void      *im2_install_isr(uint16_t vector, void (*isr)(void));
+extern void      *im2_create_generic_isr(uint16_t num_callbacks, void *address);
+extern void      *im2_create_generic_isr_8080(uint16_t num_callbacks, void *address);
+extern void       im2_append_generic_callback(uint16_t vector, void (*callback)(void));
+extern void       im2_prepend_generic_callback(uint16_t vector, void (*callback)(void));
+extern int        im2_remove_generic_callback(uint16_t vector, void (*callback)(void));
 
 extern void       z80_delay_ms(uint16_t ms);
 extern void       z80_delay_tstate(uint16_t tstates);
@@ -24,7 +24,7 @@ extern void       z80_set_int_state(uint16_t state);
 extern uint8_t    z80_inp(uint16_t port);
 extern void      *z80_inir(void *dst, uint16_t port);
 extern void      *z80_indr(void *dst, uint16_t port);
-extern void       z80_outp(uint16_t port, uint8_t data);
+extern void       z80_outp(uint16_t port, uint16_t data);
 extern void      *z80_otir(void *src, uint16_t port);
 extern void      *z80_otdr(void *src, uint16_t port);
 
@@ -33,12 +33,12 @@ extern void      *z80_otdr(void *src, uint16_t port);
 // SCCZ80
 
 extern void       __LIB__ __FASTCALL__  im2_init(void *im2_table_address);
-extern void       __LIB__              *im2_install_isr(uint8_t vector, void *isr);
-extern void       __LIB__              *im2_create_generic_isr(uint8_t num_callbacks, void *address);
-extern void       __LIB__              *im2_create_generic_isr_8080(uint8_t num_callbacks, void *address);
-extern void       __LIB__               im2_append_generic_callback(uint8_t vector, void *callback);
-extern void       __LIB__               im2_prepend_generic_callback(uint8_t vector, void *callback);
-extern int        __LIB__               im2_remove_generic_callback(uint8_t vector, void *callback);
+extern void       __LIB__              *im2_install_isr(uint16_t vector, void *isr);
+extern void       __LIB__              *im2_create_generic_isr(uint16_t num_callbacks, void *address);
+extern void       __LIB__              *im2_create_generic_isr_8080(uint16_t num_callbacks, void *address);
+extern void       __LIB__               im2_append_generic_callback(uint16_t vector, void *callback);
+extern void       __LIB__               im2_prepend_generic_callback(uint16_t vector, void *callback);
+extern int        __LIB__               im2_remove_generic_callback(uint16_t vector, void *callback);
 
 extern void       __LIB__ __FASTCALL__  z80_delay_ms(uint16_t ms);
 extern void       __LIB__ __FASTCALL__  z80_delay_tstate(uint16_t tstates);
@@ -48,21 +48,21 @@ extern void       __LIB__ __FASTCALL__  z80_set_int_state(uint16_t state);
 extern uint8_t    __LIB__ __FASTCALL__  z80_inp(uint16_t port);
 extern void       __LIB__              *z80_inir(void *dst, uint16_t port);
 extern void       __LIB__              *z80_indr(void *dst, uint16_t port);
-extern void       __LIB__               z80_outp(uint16_t port, uint8_t data);
+extern void       __LIB__               z80_outp(uint16_t port, uint16_t data);
 extern void       __LIB__              *z80_otir(void *src, uint16_t port);
 extern void       __LIB__              *z80_otdr(void *src, uint16_t port);
 
 // SCCZ80 CALLEE LINKAGE
 
-extern void       __LIB__ __CALLEE__   *im2_install_isr_callee(uint8_t vector, void *isr);
-extern void       __LIB__ __CALLEE__   *im2_create_generic_isr_callee(uint8_t num_callbacks, void *address);
-extern void       __LIB__ __CALLEE__   *im2_create_generic_isr_8080_callee(uint8_t num_callbacks, void *address);
-extern void       __LIB__ __CALLEE__    im2_append_generic_callback_callee(uint8_t vector, void *callback);
-extern void       __LIB__ __CALLEE__    im2_prepend_generic_callback_callee(uint8_t vector, void *callback);
-extern int        __LIB__ __CALLEE__    im2_remove_generic_callback_callee(uint8_t vector, void *callback);
+extern void       __LIB__ __CALLEE__   *im2_install_isr_callee(uint16_t vector, void *isr);
+extern void       __LIB__ __CALLEE__   *im2_create_generic_isr_callee(uint16_t num_callbacks, void *address);
+extern void       __LIB__ __CALLEE__   *im2_create_generic_isr_8080_callee(uint16_t num_callbacks, void *address);
+extern void       __LIB__ __CALLEE__    im2_append_generic_callback_callee(uint16_t vector, void *callback);
+extern void       __LIB__ __CALLEE__    im2_prepend_generic_callback_callee(uint16_t vector, void *callback);
+extern int        __LIB__ __CALLEE__    im2_remove_generic_callback_callee(uint16_t vector, void *callback);
 extern void       __LIB__ __CALLEE__   *z80_inir_callee(void *dst, uint16_t port);
 extern void       __LIB__ __CALLEE__   *z80_indr_callee(void *dst, uint16_t port);
-extern void       __LIB__ __CALLEE__    z80_outp_callee(uint16_t port, uint8_t data);
+extern void       __LIB__ __CALLEE__    z80_outp_callee(uint16_t port, uint16_t data);
 extern void       __LIB__ __CALLEE__   *z80_otir_callee(void *src, uint16_t port);
 extern void       __LIB__ __CALLEE__   *z80_otdr_callee(void *src, uint16_t port);
 

@@ -38,7 +38,7 @@ extern uint16_t  __LIB__  in_stick_sinclair2(void);
 
 // sdcc
 
-extern void               in_mouse_amx_init(unit8_t x_vector, uint8_t y_vector);
+extern void               in_mouse_amx_init(uint16_t x_vector, uint16_t y_vector);
 extern void               in_mouse_amx_reset(void);
 extern void               in_mouse_amx_setpos(uint16_t x, uint16_t y);
 extern void               in_mouse_amx(uint8_t *buttons, uint16_t *x, uint16_t *y);
@@ -56,7 +56,7 @@ extern int16_t            in_mouse_kempston_wheel_delta(void);
 
 // sccz80
 
-extern void     __LIB__   in_mouse_amx_init(uint8_t x_vector, uint8_t y_vector);
+extern void     __LIB__   in_mouse_amx_init(uint16_t x_vector, uint16_t y_vector);
 extern void     __LIB__   in_mouse_amx_reset(void);
 extern void     __LIB__   in_mouse_amx_setpos(uint16_t x, uint16_t y);
 extern void     __LIB__   in_mouse_amx(uint8_t *buttons, uint16_t *x, uint16_t *y);
@@ -72,7 +72,7 @@ extern int16_t  __LIB__   in_mouse_kempston_wheel_delta(void);
 
 // sccz80 callee linkage
 
-extern void     __LIB__ __CALLEE__  in_mouse_amx_init_callee(uint8_t x_vector, uint8_t y_vector);
+extern void     __LIB__ __CALLEE__  in_mouse_amx_init_callee(uint16_t x_vector, uint16_t y_vector);
 extern void     __LIB__ __CALLEE__  in_mouse_amx_setpos_callee(uint16_t x, uint16_t y);
 extern void     __LIB__ __CALLEE__  in_mouse_amx_callee(uint8_t *buttons, uint16_t *x, uint16_t *y);
 
