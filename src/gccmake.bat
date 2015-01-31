@@ -1,6 +1,6 @@
 @echo off
 
-rem $Id: gccmake.bat,v 1.3 2015-01-27 05:59:43 aralbrec Exp $
+rem $Id: gccmake.bat,v 1.4 2015-01-31 15:40:28 stefano Exp $
 
 gcc
 if %ERRORLEVEL% == 1 goto :build
@@ -39,9 +39,6 @@ cd zcc
 call gccmake
 cd ..
 cd zx7
-call gccmake
-cd ..
-cd ticks
 call gccmake
 cd ..
 goto :end
