@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define expression operators
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.9 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.10 2015-02-01 23:52:11 pauloscustodio Exp $
 */
 
 /* Unary, Binary and Ternary operators */
@@ -39,7 +39,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr_def.h,v 1.9 2015-01-26 23
 #endif
 
 /* define list of operators in increasing priority */
-OPERATOR_1( sentinel,	TK_INVALID,		0,	ASSOC_NONE,		0 )
+OPERATOR_1( sentinel,	TK_NIL,			0,	ASSOC_NONE,		0 )
 
 OPERATOR_3( tern_cond,	TK_TERN_COND,	1,	ASSOC_RIGHT,	a ? b : c )
           

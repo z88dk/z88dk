@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.31 2015-02-01 19:24:44 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.32 2015-02-01 23:52:11 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -33,6 +33,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.31 2015-02-01 19:2
 #include "symtab.h"
 #include "utarray.h"
 #include <assert.h>
+#include <ctype.h>
 
 /*-----------------------------------------------------------------------------
 * 	Array of tokens
@@ -132,13 +133,39 @@ static void push_expr(ParseCtx *ctx)
 	static Str *expr_text;
 	Expr *expr;
 	Sym  *expr_p;
+	Bool  last_was_prefix;
 
 	INIT_OBJ(Str, &expr_text);
 
-	/* build expression text */
+	/* build expression text - split constant prefixes from numbers and names */
 	Str_clear(expr_text);
+	last_was_prefix = FALSE;
 	for (expr_p = ctx->expr_start; expr_p < ctx->p; expr_p++)
+	{
+		if (last_was_prefix && expr_p->tlen > 0 &&
+			(isalnum(*expr_p->tstart) || *expr_p->tstart == '"'))
+		{
+			Str_append_char(expr_text, ' ');
+			last_was_prefix = FALSE;
+		}
+
 		Str_append_n(expr_text, expr_p->tstart, expr_p->tlen);
+
+		if (expr_p->tlen > 0)
+		{
+			switch (expr_p->tstart[expr_p->tlen - 1])
+			{
+			case '@':
+			case '%':
+			case '$':
+				last_was_prefix = TRUE;
+				break;
+
+			default:
+				last_was_prefix = FALSE;
+			}
+		}
+	}
 	
 	/* parse expression */
 	expr = parse_expr(expr_text->str);

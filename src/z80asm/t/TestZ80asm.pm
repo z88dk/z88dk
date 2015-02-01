@@ -15,7 +15,7 @@
 #
 # Library of test utilities to test z80asm
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.15 2015-01-26 23:46:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.16 2015-02-01 23:52:13 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -27,8 +27,7 @@ use List::AllUtils 'uniq';
 use Capture::Tiny::Extended 'capture';
 
 our @EXPORT = qw( z80asm z80emu z80nm 
-				  read_binfile write_binfile test_binfile
-				  get_legacy );
+				  read_binfile write_binfile test_binfile );
 
 our $KEEP_FILES;
 our $Z80ASM = $ENV{Z80ASM} || "./z80asm";
@@ -209,8 +208,7 @@ sub z80emu {
 	our $done_z80emu;	# only once per session
 	my $z80emu_dir = '../../libsrc/z80_crt0s/z80_emu';
 	my $z80emu = $z80emu_dir.'/z80mu.lib';
-# need to check if legacy changed and compile with -d
-#	if ( ! -f $z80emu ) {
+
 	if ( ! $done_z80emu ) {
 		z80asm(
 			options	=> '-x'.$z80emu.' -Mo -ns '.join(' ', <$z80emu_dir/*.asm>),
@@ -218,7 +216,7 @@ sub z80emu {
 		);
 		$done_z80emu++;
 	}
-#	}
+
 	return $z80emu;
 }
 
@@ -232,18 +230,6 @@ sub read_binfile {
 sub write_binfile {
 	my($file, $data) = @_;
 	write_file($file, {binmode => ':raw'}, $data);
-}
-
-#------------------------------------------------------------------------------
-# get legacy flag from legacy.h
-sub get_legacy {
-	our $legacy;
-	if ( ! defined $legacy )
-	{
-		local $_ = read_file("legacy.h");
-		$legacy = (/define\s+__LEGACY_Z80ASM_SYNTAX/) ? 1 : 0;
-	}
-	return $legacy;
 }
 
 #------------------------------------------------------------------------------
@@ -274,15 +260,14 @@ sub z80nm {
 	my($obj_file, $expected_out) = @_;
 
 	system("make -C ../../support/ar") and die;
-	unless ( get_legacy() ) {			# don't test old object file format
-		my $line = "[line ".((caller)[2])."]";
-		my($stdout, $stderr, $return) = capture {
-			system "../../support/ar/z80nm -a $obj_file";
-		};
-		eq_or_diff_text $stdout, $expected_out, "$line stdout";
-		eq_or_diff_text $stderr, "", "$line stderr";
-		ok !!$return == !!0, "$line retval";
-	}
+
+	my $line = "[line ".((caller)[2])."]";
+	my($stdout, $stderr, $return) = capture {
+		system "../../support/ar/z80nm -a $obj_file";
+	};
+	eq_or_diff_text $stdout, $expected_out, "$line stdout";
+	eq_or_diff_text $stderr, "", "$line stderr";
+	ok !!$return == !!0, "$line retval";
 }
 
 1;

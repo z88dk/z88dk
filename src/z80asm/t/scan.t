@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.50 2015-02-01 19:24:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.51 2015-02-01 23:52:14 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -30,7 +30,6 @@ my $objs = "scan.o errors.o model.o module.o codearea.o listfile.o ".
 		   "lib/list.o lib/array.o";
 		   
 my $init = <<'END';
-#include "legacy.h"
 #include "scan.h"
 #include "symbol.h"
 #include <assert.h>
@@ -76,11 +75,7 @@ char *GetLibfile( char *filename ) {return NULL;}
 #define T_HASH()			T_GET( TK_CONST_EXPR,	"#" );
 #define T_PERCENT()			T_GET( TK_MOD,			"%" );
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-#define T_AND()				T_GET( TK_STRING_CAT,	"&" );
-#else
 #define T_AND()				T_GET( TK_BIN_AND,		"&" );
-#endif
 
 #define T_AND_AND()			T_GET( TK_LOG_AND,		"&&" );
 #define T_LPAREN()			T_GET( TK_LPAREN,		"(" );
@@ -92,11 +87,7 @@ char *GetLibfile( char *filename ) {return NULL;}
 #define T_DOT()				T_GET( TK_DOT, 			"." );
 #define T_SLASH()			T_GET( TK_DIVIDE, 		"/" );
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-#define T_COLON()			T_GET( TK_BIN_XOR,		":" );
-#else
 #define T_COLON()			T_GET( TK_COLON,		":" );
-#endif
 
 #define T_LT()				T_GET( TK_LESS, 		"<" );
 #define T_LT_LT()			T_GET( TK_LEFT_SHIFT,	"<<" );
@@ -109,22 +100,13 @@ char *GetLibfile( char *filename ) {return NULL;}
 #define T_GT_GT()			T_GET( TK_RIGHT_SHIFT,	">>" );
 #define T_GT_EQ()			T_GET( TK_GREATER_EQ,	">=" );
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-#define TEXT_QUESTION()		"   "
-#define T_QUESTION()		
-#else
 #define TEXT_QUESTION()		" ? "
 #define T_QUESTION()		T_GET( TK_QUESTION,		"?" );
-#endif
 
 #define T_LSQUARE()			T_GET( TK_LSQUARE, 		"[" );
 #define T_RSQUARE()			T_GET( TK_RSQUARE, 		"]" );
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-#define T_CARET()			T_GET( TK_POWER, 		"^" );
-#else
 #define T_CARET()			T_GET( TK_BIN_XOR, 		"^" );
-#endif
 
 #define T_STAR_STAR()		T_GET( TK_POWER, 		"**" );
 
@@ -133,11 +115,7 @@ char *GetLibfile( char *filename ) {return NULL;}
 #define T_VBAR_VBAR()		T_GET( TK_LOG_OR, 		"||" );
 #define T_RCURLY()			T_GET( TK_RCURLY, 		"}" );
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-#define T_TILDE()			T_GET( TK_BIN_AND, 		"~" );
-#else
 #define T_TILDE()			T_GET( TK_BIN_NOT, 		"~" );
-#endif
 
 #define T_END() \
 	T_GET( TK_END, "" ); \
@@ -382,8 +360,10 @@ t_compile_module($init, <<'END', $objs);
 	/* numbers - binary */
 	SetTemporaryLine  ("   0000b     0011b      1111111111111111111111111111111b	"
 					   "  @0000     @0011      @1111111111111111111111111111111		"
+					   "  %0000     %0011      %1111111111111111111111111111111		"
 					   " 0b0000    0b0011     0b1111111111111111111111111111111		"
 					   "@\"----\" @\"--##\"  @\"###############################\"	"
+					   "%\"----\" %\"--##\"  %\"###############################\"	"
 					   "@\"#\" 														"
 					   "@\"#---\"													"
 					   "@\"#-------\"												"
@@ -393,6 +373,14 @@ t_compile_module($init, <<'END', $objs);
 					   "@\"#-----------------------\" 								"
 					   "@\"#---------------------------\" 							"
 					   "@\"#-------------------------------\"						");
+	T_NUMBER(0x00000000);
+	T_NUMBER(0x00000003);
+	T_NUMBER(0x7FFFFFFF);
+
+	T_NUMBER(0x00000000);
+	T_NUMBER(0x00000003);
+	T_NUMBER(0x7FFFFFFF);
+
 	T_NUMBER(0x00000000);
 	T_NUMBER(0x00000003);
 	T_NUMBER(0x7FFFFFFF);

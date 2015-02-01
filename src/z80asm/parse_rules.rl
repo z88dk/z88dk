@@ -14,10 +14,8 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.50 2015-01-31 08:55:16 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.51 2015-02-01 23:52:12 pauloscustodio Exp $ 
 */
-
-#include "legacy.h"
 
 #define NO_TOKEN_ENUM
 #include "scan_tokens.h"
@@ -112,15 +110,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.50 2015-01-
 			%{ expr_open_parens--; };
 
 	unary 	= _TK_MINUS | _TK_PLUS |
-#ifndef __LEGACY_Z80ASM_SYNTAX
 			  _TK_BIN_NOT | 
-#endif
 			  _TK_LOG_NOT;
 			  
-	binary 	= 
-#ifndef __LEGACY_Z80ASM_SYNTAX
-			  _TK_QUESTION | _TK_COLON | 
-#endif
+	binary 	= _TK_QUESTION | _TK_COLON | 
 			  _TK_LOG_OR | _TK_LOG_AND | _TK_BIN_OR | _TK_BIN_XOR |
 			  _TK_BIN_AND | 
 			  _TK_LESS | _TK_LESS_EQ | _TK_EQUAL | _TK_NOT_EQ |

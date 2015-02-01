@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 Define rules for a ragel-based scanner. Needs to be pre-preocessed before calling
 ragel, to expand token definition from token_def.h.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.13 2015-01-26 23:46:22 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_rules.rl,v 1.14 2015-02-01 23:52:12 pauloscustodio Exp $ 
 */
 
 #define TOKEN_RE(name, string, regexp, set_value)	 \
@@ -108,12 +108,8 @@ main := |*
 	};
 	
 	/* Numbers - do not accept 'D' */
-	digit+ /* 'd'i? */
+	digit+ 
 	{ 
-		/* remove 'D' 
-		if ( toupper(te[-1]) == 'D' ) te--;
-		*/
-		
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts, te - ts, 10 ); 
 		ts = te = p;
@@ -147,7 +143,7 @@ main := |*
 		ts = te = p;
 		fbreak;
 	};
-	"@" bdigit+
+	[\@\%] bdigit+
 	{ 
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts + 1, te - ts - 1, 2 ); 
@@ -161,7 +157,7 @@ main := |*
 		ts = te = p;
 		fbreak;
 	};
-	'@' '"' [\-#]+ '"'
+	[\@\%] '"' [\-#]+ '"'
 	{ 
 		sym.tok = TK_NUMBER;
 		sym.number = scan_num( ts + 2, te - ts - 3, 2 ); 

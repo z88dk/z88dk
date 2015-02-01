@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.37 2015-02-01 19:24:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.38 2015-02-01 23:52:13 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -25,22 +25,9 @@ use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
 require 't/test_utils.pl';
 
-my $COMMA = get_legacy() ? "&" : ",";
-
 #------------------------------------------------------------------------------
 # Black box tests
 #------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# fatal_divide_by_zero
-#diag "BUG_0040";
-unlink_testfiles();
-t_z80asm_error("ld a, 1/0",
-	"Error at file 'test.asm' line 1: division by zero",
-	"-l");
-t_z80asm_error("ld a, 1%0",
-	"Error at file 'test.asm' line 1: division by zero",
-	"-l");
 
 #------------------------------------------------------------------------------
 # error_read_file
@@ -413,14 +400,14 @@ t_z80asm_ok(0, "defs 65534, 'a' \n defm 97, \"a\" \n",
 t_z80asm_error("defs 65535, 'a' \n defm 97, \"a\" \n",
 	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
 
-t_z80asm_ok(0, "defs 65534, 'a' \n defm 97 $COMMA \"a\" \n",
+t_z80asm_ok(0, "defs 65534, 'a' \n defm 97 , \"a\" \n",
 	    "a" x 65536);
-t_z80asm_error("defs 65535, 'a' \n defm 97 $COMMA \"a\" \n",
+t_z80asm_error("defs 65535, 'a' \n defm 97 , \"a\" \n",
 	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
 
-t_z80asm_ok(0, "defs 65534, 'a' \n defm \"a\" $COMMA 97 \n",
+t_z80asm_ok(0, "defs 65534, 'a' \n defm \"a\" , 97 \n",
 	    "a" x 65536);
-t_z80asm_error("defs 65535, 'a' \n defm \"a\" $COMMA 97 \n",
+t_z80asm_error("defs 65535, 'a' \n defm \"a\" , 97 \n",
 	       "Error at file 'test.asm' line 2: max. code size of 65536 bytes reached");
 
 # BINARY - tested in directives.t

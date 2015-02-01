@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.139 2015-02-01 19:24:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.140 2015-02-01 23:52:11 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.139 2015-02-01 19:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.139  2015-02-01 19:24:44  pauloscustodio
+* Revision 1.140  2015-02-01 23:52:11  pauloscustodio
+*  Removed legacy expression syntax support and got rid
+* of all the #ifdef __LEGACY_Z80ASM_SYNTAX.
+*
+* Added support for binary constants %0101 syntax.
+*
+* Revision 1.139  2015/02/01 19:24:44  pauloscustodio
 * Removed fatal errors and TRY-CATCH - code with longjumps is harder to maintain.
 * Removed except.c.
 *
@@ -2222,10 +2228,14 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 	- Removed fatal errors and TRY-CATCH - code with longjumps is harder to maintain.
 	  Removed except.c.
 
+	- Removed legacy expression syntax support and got rid
+	  of all the #ifdef __LEGACY_Z80ASM_SYNTAX.
+
+	- Added support for binary constants %0101 syntax.
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
-	- remove legacy expression syntax support
 	- replace DEFL by DEFDW, to allow DEFL for variable labels
 	- allow EQU as synonym to DEFC
 	- finish the split between front-end and back-end;
@@ -2259,7 +2269,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1c"
+#define VERSION     "2.7.1d"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

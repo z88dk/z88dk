@@ -102,6 +102,196 @@ END_ASM
                                         ;; CD 00 00
 
 ;------------------------------------------------------------------------------
+; Expressions
+;------------------------------------------------------------------------------
+        ld   a,1                        ;; 3E 01
+        ld   a,'a'                      ;; 3E 61
+
+.label_1 ld   a,2                       ;; 3E 02
+label_2: ld   a,3                       ;; 3E 03
+
+        defw label_1, label_2           ;; 6D 01 6F 01
+        defw ZERO+label_1               ;; 6D 01
+        defb #label_2-label_1           ;; 02
+        defb #ZERO+label_2-label_1      ;; 02
+
+        defb 255,128,0,-128             ;; FF 80 00 80
+        defb ZERO+255,ZERO-128          ;; FF 80
+
+        defw 01234h,0FFFFh              ;; 34 12 FF FF
+        defw 0,-8000h                   ;; 00 00 00 80
+        defw ZERO+0FFFFh,ZERO-8000h     ;; FF FF 00 80
+
+        defl 012345678h,0FFFFFFFFh      ;; 78 56 34 12 FF FF FF FF
+        defl 0,-80000000h               ;; 00 00 00 00 00 00 00 80
+        defl ZERO+0FFFFFFFFh            ;; FF FF FF FF
+        defl ZERO-80000000h             ;; 00 00 00 80
+
+        defb $FF,0xFE,0BEH,0ebh         ;; FF FE BE EB
+        defb ZERO+$FF                   ;; FF
+
+        defb @1010,1010B,1010b,0b1010   ;; 0A 0A 0A 0A
+        defb ZERO+@1010                 ;; 0A
+
+; example 'A' letter
+        defb %00000000                  ;; 00
+        defb %00111100                  ;; 3C
+        defb %01000010                  ;; 42
+        defb %01000010                  ;; 42
+        defb %01111110                  ;; 7E
+        defb %01000010                  ;; 42
+        defb %01000010                  ;; 42
+        defb %00000000                  ;; 00
+
+        defb %"--------"                ;; 00
+        defb %"--####--"                ;; 3C
+        defb %"-#----#-"                ;; 42
+        defb %"-#----#-"                ;; 42
+        defb %"-######-"                ;; 7E
+        defb %"-#----#-"                ;; 42
+        defb %"-#----#-"                ;; 42
+        defb %"--------"                ;; 00
+
+        defb @00000000                  ;; 00
+        defb @00111100                  ;; 3C
+        defb @01000010                  ;; 42
+        defb @01000010                  ;; 42
+        defb @01111110                  ;; 7E
+        defb @01000010                  ;; 42
+        defb @01000010                  ;; 42
+        defb @00000000                  ;; 00
+
+        defb @"--------"                ;; 00
+        defb @"--####--"                ;; 3C
+        defb @"-#----#-"                ;; 42
+        defb @"-#----#-"                ;; 42
+        defb @"-######-"                ;; 7E
+        defb @"-#----#-"                ;; 42
+        defb @"-#----#-"                ;; 42
+        defb @"--------"                ;; 00
+
+; BUG_0044: binary constants with more than 8 bits not accepted
+        defw %"####---###--##-#"        ;; CD F1
+        defw %01111000111001101         ;; CD F1
+        defl %"#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-"
+                                        ;; AA AA AA AA
+
+        defb 1<0,1<1,1<2                ;; 00 00 01
+        defb ZERO+1<0,ZERO+1<1,ZERO+1<2 ;; 00 00 01
+
+        defb 1<=0,1<=1,1<=2             ;; 00 01 01
+        defb ZERO+1<=0,ZERO+1<=1,ZERO+1<=2
+                                        ;; 00 01 01
+
+        defb 1=0,1=1,1=2                ;; 00 01 00
+        defb ZERO+1=0,ZERO+1=1,ZERO+1=2 ;; 00 01 00
+
+        defb 1==0,1==1,1==2             ;; 00 01 00
+        defb ZERO+1==0,ZERO+1==1,ZERO+1==2
+                                        ;; 00 01 00
+
+        defb 1!=0,1!=1,1!=2             ;; 01 00 01
+        defb ZERO+1!=0,ZERO+1!=1,ZERO+1!=2
+                                        ;; 01 00 01
+
+        defb 1<>0,1<>1,1<>2             ;; 01 00 01
+        defb ZERO+1<>0,ZERO+1<>1,ZERO+1<>2
+                                        ;; 01 00 01
+
+        defb 1>0,1>1,1>2                ;; 01 00 00
+        defb ZERO+1>0,ZERO+1>1,ZERO+1>2 ;; 01 00 00
+        defb 1>=0,1>=1,1>=2             ;; 01 01 00
+        defb ZERO+1>=0,ZERO+1>=1,ZERO+1>=2
+                                        ;; 01 01 00
+        defb +1,-1                      ;; 01 FF
+        defb ZERO++1,ZERO+-1            ;; 01 FF
+
+
+        defb 1+1,3-1                    ;; 02 02
+        defb ZERO+1+1,ZERO+3-1          ;; 02 02
+
+        defb 3&2,2|0,0^2                ;; 02 02 02
+        defb ZERO+3&2,ZERO+2|0,ZERO+0^2 ;; 02 02 02
+
+        defb (~0xAA)&0xFF               ;; 55
+        defb ZERO+(~0xAA)&0xFF          ;; 55
+
+        defb 5*2,100/10,10%3            ;; 0A 0A 01
+        defb ZERO+5*2,ZERO+100/10,ZERO+10%3
+                                        ;; 0A 0A 01
+
+; BUG_0040: Detect and report division by zero instead of crashing
+
+        defb 2**7,2**6                  ;; 80 40
+        defb ZERO+2**7,ZERO+2**6        ;; 80 40
+
+        defb 2**1,2**0                  ;; 02 01
+        defb ZERO+2**1,ZERO+2**0        ;; 02 01
+
+; BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+        defb 2**-1                      ;; 00
+        defb ZERO+2**-1                 ;; 00
+
+        defb 2*[1+2*(1+2)]              ;; 0E
+        defb ZERO+2*[1+2*(1+2)]         ;; 0E
+
+        defb 2*1+2*1+2                  ;; 06
+        defb ZERO+2*1+2*1+2             ;; 06
+
+        defb !0,!1                      ;; 01 00
+        defb ZERO+!0,ZERO+!1            ;; 01 00
+
+        defb 0&&0,0&&1,1&&0,1&&1        ;; 00 00 00 01
+        defb ZERO+0&&0,ZERO+0&&1,ZERO+1&&0,ZERO+1&&1
+                                        ;; 00 00 00 01
+
+        defb 0||0,0||1,1||0,1||1        ;; 00 01 01 01
+        defb ZERO+0||0,ZERO+0||1,ZERO+1||0,ZERO+1||1
+                                        ;; 00 01 01 01
+
+        defb 0||0||1,0||0||0            ;; 01 00
+        defb ZERO+0||0||1,ZERO+0||0||0  ;; 01 00
+
+        defb ' '                        ;; 20
+        defb ZERO+' '                   ;; 20
+
+        defb 1<<7,128>>7                ;; 80 01
+        defb ZERO+1<<7,ZERO+128>>7      ;; 80 01
+
+        defb 1?2:3,0?4:5                ;; 02 05
+        defb ZERO+1?2:3,ZERO+0?4:5      ;; 02 05
+
+
+; EACH was interpreted as 0x0EAC - fixed
+EACH:   djnz EACH                       ;; 10 FE
+
+; check priorities
+        defb 1 || 0 && 0                ;; 01
+        defb 0 && 0 |  1                ;; 00
+        defb 0 && 0 ^  1                ;; 00
+        defb 0 |  1 &  1                ;; 01
+        defb 1 ^  0 &  0                ;; 01
+        defb 0 &  1 == 0                ;; 00
+        defb 0 &  0 != 1                ;; 00
+        defb 2 == 1 << 1                ;; 01
+        defb 1 << 1 +  3                ;; 10
+        defb 1 +  2 *  3                ;; 07
+        defb 2 *  3 ** 4                ;; A2
+        defw 2 ** 3 ** 2                ;; 00 02
+        defb 2 ** -3                    ;; 00
+        defb ---+--+-2                  ;; 02
+        defb 1 ? 2 : 3, 0 ? 4 : 5       ;; 02 05
+        defb 0 ? 0 ? 2 : 3 : 0 ? 4 : 5  ;; 05
+        defb 0 ? 0 ? 2 : 3 : 1 ? 4 : 5  ;; 04
+        defb 1 ? 0 ? 2 : 3 : 1 ? 4 : 5  ;; 03
+        defb 1 ? 1 ? 2 : 3 : 1 ? 4 : 5  ;; 02
+        defb ~~2                        ;; 02
+
+; BUG_0043: buffer overflow on constants longer than 128 chars in object file
+        defw ZERO+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1
+                                        ;; E8 03
+
+;------------------------------------------------------------------------------
 ; DEFB, DEFW, DEFL
 ;------------------------------------------------------------------------------
 
@@ -111,17 +301,13 @@ END_ASM
                                         ;; 01 00 02 00 03 00 04 00 05 00 06 00 07 00 08 00 0A 00 0B 00 0C 00 0D 00 0E 00 0F 00 10 00 11 00 12 00 13 00 14 00 21 00
         defb "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                         ;; 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A
-
-
-
         defw 0,102h,203h,304h           ;; 00 00 02 01 03 02 04 03
         defl 0,1020304h,5060708h        ;; 00 00 00 00 04 03 02 01 08 07 06 05
 
-;------------------------------------------------------------------------------
-; Expressions
-;------------------------------------------------------------------------------
+        defm "hello",32,"","world"      ;; 68 65 6C 6C 6F 20 77 6F 72 6C 64
+        defm "hello",ZERO+32,"","world" ;; 68 65 6C 6C 6F 20 77 6F 72 6C 64
+        defm 32,"world"                 ;; 20 77 6F 72 6C 64
 
-        ld   a,'a'                      ;; 3E 61
 
 ;------------------------------------------------------------------------------
 ; 8 bit load group
@@ -2254,13 +2440,24 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
+        ld   a,'                        ;; error: invalid single quoted character
+        ld   a,''                       ;; error: invalid single quoted character
+        ld   a,'a                       ;; error: invalid single quoted character
+        ld   a,'he'                     ;; error: invalid single quoted character
+        ld   a,"a"                      ;; error: syntax error
         defb "                          ;; error: unclosed quoted string
         defb "hello                     ;; error: unclosed quoted string
-        defb '                          ;; error: invalid single quoted character
-        defb 'x                         ;; error: invalid single quoted character
-        defb ''                         ;; error: invalid single quoted character
-        defb 'he'                       ;; error: invalid single quoted character
-        ld   a,"a"                      ;; error: syntax error
+        defb 1/0                        ;; error 2: division by zero
+        defb 1% 0                       ;; error 2: division by zero
+        defb 1?                         ;; error: syntax error
+        defb 1?2                        ;; error: syntax error in expression
+        defb 1?2:                       ;; error: syntax error
+        defb 1?2:1?                     ;; error: syntax error
+        defm "hello ",                  ;; error: syntax error
+        defm "hello "&                  ;; error: syntax error
+        defm "hello "&"world"           ;; error: syntax error
+        defm "hello"&32&"world"         ;; error: syntax error
+        defm 32,                        ;; error: syntax error
 IF      !RABBIT
 ELSE    
 ENDIF   
@@ -2473,6 +2670,196 @@ END_ASM
                                         ;; CD 00 00
 
 ;------------------------------------------------------------------------------
+; Expressions
+;------------------------------------------------------------------------------
+        ld   a,1                        ;; 3E 01
+        ld   a,'a'                      ;; 3E 61
+
+.label_1 ld   a,2                       ;; 3E 02
+label_2: ld   a,3                       ;; 3E 03
+
+        defw label_1, label_2           ;; 6D 01 6F 01
+        defw ZERO+label_1               ;; 6D 01
+        defb #label_2-label_1           ;; 02
+        defb #ZERO+label_2-label_1      ;; 02
+
+        defb 255,128,0,-128             ;; FF 80 00 80
+        defb ZERO+255,ZERO-128          ;; FF 80
+
+        defw 01234h,0FFFFh              ;; 34 12 FF FF
+        defw 0,-8000h                   ;; 00 00 00 80
+        defw ZERO+0FFFFh,ZERO-8000h     ;; FF FF 00 80
+
+        defl 012345678h,0FFFFFFFFh      ;; 78 56 34 12 FF FF FF FF
+        defl 0,-80000000h               ;; 00 00 00 00 00 00 00 80
+        defl ZERO+0FFFFFFFFh            ;; FF FF FF FF
+        defl ZERO-80000000h             ;; 00 00 00 80
+
+        defb $FF,0xFE,0BEH,0ebh         ;; FF FE BE EB
+        defb ZERO+$FF                   ;; FF
+
+        defb @1010,1010B,1010b,0b1010   ;; 0A 0A 0A 0A
+        defb ZERO+@1010                 ;; 0A
+
+; example 'A' letter
+        defb %00000000                  ;; 00
+        defb %00111100                  ;; 3C
+        defb %01000010                  ;; 42
+        defb %01000010                  ;; 42
+        defb %01111110                  ;; 7E
+        defb %01000010                  ;; 42
+        defb %01000010                  ;; 42
+        defb %00000000                  ;; 00
+
+        defb %"--------"                ;; 00
+        defb %"--####--"                ;; 3C
+        defb %"-#----#-"                ;; 42
+        defb %"-#----#-"                ;; 42
+        defb %"-######-"                ;; 7E
+        defb %"-#----#-"                ;; 42
+        defb %"-#----#-"                ;; 42
+        defb %"--------"                ;; 00
+
+        defb @00000000                  ;; 00
+        defb @00111100                  ;; 3C
+        defb @01000010                  ;; 42
+        defb @01000010                  ;; 42
+        defb @01111110                  ;; 7E
+        defb @01000010                  ;; 42
+        defb @01000010                  ;; 42
+        defb @00000000                  ;; 00
+
+        defb @"--------"                ;; 00
+        defb @"--####--"                ;; 3C
+        defb @"-#----#-"                ;; 42
+        defb @"-#----#-"                ;; 42
+        defb @"-######-"                ;; 7E
+        defb @"-#----#-"                ;; 42
+        defb @"-#----#-"                ;; 42
+        defb @"--------"                ;; 00
+
+; BUG_0044: binary constants with more than 8 bits not accepted
+        defw %"####---###--##-#"        ;; CD F1
+        defw %01111000111001101         ;; CD F1
+        defl %"#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-"
+                                        ;; AA AA AA AA
+
+        defb 1<0,1<1,1<2                ;; 00 00 01
+        defb ZERO+1<0,ZERO+1<1,ZERO+1<2 ;; 00 00 01
+
+        defb 1<=0,1<=1,1<=2             ;; 00 01 01
+        defb ZERO+1<=0,ZERO+1<=1,ZERO+1<=2
+                                        ;; 00 01 01
+
+        defb 1=0,1=1,1=2                ;; 00 01 00
+        defb ZERO+1=0,ZERO+1=1,ZERO+1=2 ;; 00 01 00
+
+        defb 1==0,1==1,1==2             ;; 00 01 00
+        defb ZERO+1==0,ZERO+1==1,ZERO+1==2
+                                        ;; 00 01 00
+
+        defb 1!=0,1!=1,1!=2             ;; 01 00 01
+        defb ZERO+1!=0,ZERO+1!=1,ZERO+1!=2
+                                        ;; 01 00 01
+
+        defb 1<>0,1<>1,1<>2             ;; 01 00 01
+        defb ZERO+1<>0,ZERO+1<>1,ZERO+1<>2
+                                        ;; 01 00 01
+
+        defb 1>0,1>1,1>2                ;; 01 00 00
+        defb ZERO+1>0,ZERO+1>1,ZERO+1>2 ;; 01 00 00
+        defb 1>=0,1>=1,1>=2             ;; 01 01 00
+        defb ZERO+1>=0,ZERO+1>=1,ZERO+1>=2
+                                        ;; 01 01 00
+        defb +1,-1                      ;; 01 FF
+        defb ZERO++1,ZERO+-1            ;; 01 FF
+
+
+        defb 1+1,3-1                    ;; 02 02
+        defb ZERO+1+1,ZERO+3-1          ;; 02 02
+
+        defb 3&2,2|0,0^2                ;; 02 02 02
+        defb ZERO+3&2,ZERO+2|0,ZERO+0^2 ;; 02 02 02
+
+        defb (~0xAA)&0xFF               ;; 55
+        defb ZERO+(~0xAA)&0xFF          ;; 55
+
+        defb 5*2,100/10,10%3            ;; 0A 0A 01
+        defb ZERO+5*2,ZERO+100/10,ZERO+10%3
+                                        ;; 0A 0A 01
+
+; BUG_0040: Detect and report division by zero instead of crashing
+
+        defb 2**7,2**6                  ;; 80 40
+        defb ZERO+2**7,ZERO+2**6        ;; 80 40
+
+        defb 2**1,2**0                  ;; 02 01
+        defb ZERO+2**1,ZERO+2**0        ;; 02 01
+
+; BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
+        defb 2**-1                      ;; 00
+        defb ZERO+2**-1                 ;; 00
+
+        defb 2*[1+2*(1+2)]              ;; 0E
+        defb ZERO+2*[1+2*(1+2)]         ;; 0E
+
+        defb 2*1+2*1+2                  ;; 06
+        defb ZERO+2*1+2*1+2             ;; 06
+
+        defb !0,!1                      ;; 01 00
+        defb ZERO+!0,ZERO+!1            ;; 01 00
+
+        defb 0&&0,0&&1,1&&0,1&&1        ;; 00 00 00 01
+        defb ZERO+0&&0,ZERO+0&&1,ZERO+1&&0,ZERO+1&&1
+                                        ;; 00 00 00 01
+
+        defb 0||0,0||1,1||0,1||1        ;; 00 01 01 01
+        defb ZERO+0||0,ZERO+0||1,ZERO+1||0,ZERO+1||1
+                                        ;; 00 01 01 01
+
+        defb 0||0||1,0||0||0            ;; 01 00
+        defb ZERO+0||0||1,ZERO+0||0||0  ;; 01 00
+
+        defb ' '                        ;; 20
+        defb ZERO+' '                   ;; 20
+
+        defb 1<<7,128>>7                ;; 80 01
+        defb ZERO+1<<7,ZERO+128>>7      ;; 80 01
+
+        defb 1?2:3,0?4:5                ;; 02 05
+        defb ZERO+1?2:3,ZERO+0?4:5      ;; 02 05
+
+
+; EACH was interpreted as 0x0EAC - fixed
+EACH:   djnz EACH                       ;; 10 FE
+
+; check priorities
+        defb 1 || 0 && 0                ;; 01
+        defb 0 && 0 |  1                ;; 00
+        defb 0 && 0 ^  1                ;; 00
+        defb 0 |  1 &  1                ;; 01
+        defb 1 ^  0 &  0                ;; 01
+        defb 0 &  1 == 0                ;; 00
+        defb 0 &  0 != 1                ;; 00
+        defb 2 == 1 << 1                ;; 01
+        defb 1 << 1 +  3                ;; 10
+        defb 1 +  2 *  3                ;; 07
+        defb 2 *  3 ** 4                ;; A2
+        defw 2 ** 3 ** 2                ;; 00 02
+        defb 2 ** -3                    ;; 00
+        defb ---+--+-2                  ;; 02
+        defb 1 ? 2 : 3, 0 ? 4 : 5       ;; 02 05
+        defb 0 ? 0 ? 2 : 3 : 0 ? 4 : 5  ;; 05
+        defb 0 ? 0 ? 2 : 3 : 1 ? 4 : 5  ;; 04
+        defb 1 ? 0 ? 2 : 3 : 1 ? 4 : 5  ;; 03
+        defb 1 ? 1 ? 2 : 3 : 1 ? 4 : 5  ;; 02
+        defb ~~2                        ;; 02
+
+; BUG_0043: buffer overflow on constants longer than 128 chars in object file
+        defw ZERO+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1+1
+                                        ;; E8 03
+
+;------------------------------------------------------------------------------
 ; DEFB, DEFW, DEFL
 ;------------------------------------------------------------------------------
 
@@ -2482,17 +2869,13 @@ END_ASM
                                         ;; 01 00 02 00 03 00 04 00 05 00 06 00 07 00 08 00 0A 00 0B 00 0C 00 0D 00 0E 00 0F 00 10 00 11 00 12 00 13 00 14 00 21 00
         defb "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                         ;; 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A
-
-
-
         defw 0,102h,203h,304h           ;; 00 00 02 01 03 02 04 03
         defl 0,1020304h,5060708h        ;; 00 00 00 00 04 03 02 01 08 07 06 05
 
-;------------------------------------------------------------------------------
-; Expressions
-;------------------------------------------------------------------------------
+        defm "hello",32,"","world"      ;; 68 65 6C 6C 6F 20 77 6F 72 6C 64
+        defm "hello",ZERO+32,"","world" ;; 68 65 6C 6C 6F 20 77 6F 72 6C 64
+        defm 32,"world"                 ;; 20 77 6F 72 6C 64
 
-        ld   a,'a'                      ;; 3E 61
 
 ;------------------------------------------------------------------------------
 ; 8 bit load group
@@ -2927,10 +3310,10 @@ IF      !RABBIT
         cpd
         cpdr
 ELSE    
-        cpi                             ;; CD 1D 09
-        cpir                            ;; CD 3A 09
-        cpd                             ;; CD 66 09
-        cpdr                            ;; CD 83 09
+        cpi                             ;; CD 33 0A
+        cpir                            ;; CD 50 0A
+        cpd                             ;; CD 7C 0A
+        cpdr                            ;; CD 99 0A
 ENDIF   
 
 ;------------------------------------------------------------------------------
@@ -3439,8 +3822,8 @@ IF      !RABBIT
         rld
         rrd
 ELSE    
-        rld                             ;; CD AF 09
-        rrd                             ;; CD D1 09
+        rld                             ;; CD C5 0A
+        rrd                             ;; CD E7 0A
 ENDIF   
 
 ; # rotate 16 bits
@@ -4085,10 +4468,10 @@ ELSE
         call z,NN                       ;; 20 03 CD 30 00
         call nc,NN                      ;; 38 03 CD 30 00
         call c,NN                       ;; 30 03 CD 30 00
-        call po,NN                      ;; EA 98 08 CD 30 00
-        call pe,NN                      ;; E2 9E 08 CD 30 00
-        call p,NN                       ;; FA A4 08 CD 30 00
-        call m,NN                       ;; F2 AA 08 CD 30 00
+        call po,NN                      ;; EA AE 09 CD 30 00
+        call pe,NN                      ;; E2 B4 09 CD 30 00
+        call p,NN                       ;; FA BA 09 CD 30 00
+        call m,NN                       ;; F2 C0 09 CD 30 00
 
 
         rst  10h                        ;; D7
@@ -4455,7 +4838,7 @@ ENDIF
 
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 42 09 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 8B 09 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD B6 09 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD D8 09 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+        invoke 65535                    ;; CD FF FF 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 58 0A 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD A1 0A 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD CC 0A 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD EE 0A 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 z80asm(
@@ -4464,13 +4847,24 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
+        ld   a,'                        ;; error: invalid single quoted character
+        ld   a,''                       ;; error: invalid single quoted character
+        ld   a,'a                       ;; error: invalid single quoted character
+        ld   a,'he'                     ;; error: invalid single quoted character
+        ld   a,"a"                      ;; error: syntax error
         defb "                          ;; error: unclosed quoted string
         defb "hello                     ;; error: unclosed quoted string
-        defb '                          ;; error: invalid single quoted character
-        defb 'x                         ;; error: invalid single quoted character
-        defb ''                         ;; error: invalid single quoted character
-        defb 'he'                       ;; error: invalid single quoted character
-        ld   a,"a"                      ;; error: syntax error
+        defb 1/0                        ;; error 2: division by zero
+        defb 1% 0                       ;; error 2: division by zero
+        defb 1?                         ;; error: syntax error
+        defb 1?2                        ;; error: syntax error in expression
+        defb 1?2:                       ;; error: syntax error
+        defb 1?2:1?                     ;; error: syntax error
+        defm "hello ",                  ;; error: syntax error
+        defm "hello "&                  ;; error: syntax error
+        defm "hello "&"world"           ;; error: syntax error
+        defm "hello"&32&"world"         ;; error: syntax error
+        defm 32,                        ;; error: syntax error
 IF      !RABBIT
 ELSE    
         ld   b,ixh                      ;; error: illegal identifier

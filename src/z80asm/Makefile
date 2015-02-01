@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.189 2015-02-01 19:24:43 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.190 2015-02-01 23:52:11 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -83,18 +83,6 @@ CFLAGS +=		-I. -I$(LOCAL_LIB) -It -Wall
 #------------------------------------------------------------------------------
 all: $(TARGET) gccmake.bat
 
-legacy:
-	echo "#define __LEGACY_Z80ASM_SYNTAX " > legacy.h
-	$(MAKE) -f dev/Makefile
-	$(MAKE) depend
-	$(MAKE)
-
-new:
-	echo "#undef __LEGACY_Z80ASM_SYNTAX " > legacy.h
-	$(MAKE) -f dev/Makefile
-	$(MAKE) depend
-	$(MAKE)
-
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
@@ -147,14 +135,7 @@ $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 clean::
 	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXESUFFIX))
 
-test:
-	$(MAKE) legacy
-	$(MAKE) prove
-	$(MAKE) new
-	$(MAKE) prove
-	$(MAKE) test_enigma
-
-prove: prove_c prove_perl
+test: prove_c prove_perl test_enigma
 
 prove_c: t/libtestlib.a $(TEST_SRC_MAIN:.c=.o) $(TEST_SRC_MAIN:.c=.out)
 
@@ -163,7 +144,6 @@ prove_perl: $(TARGET)
 
 testmsvc : $(MSVC_TARGET)
 	make Z80ASM=$(MSVC_TARGET) prove
-
 
 test_enigma: $(TARGET)
 	zcc +cpm -oenigma.bin -vn ../../examples/console/enigma.c
@@ -183,7 +163,7 @@ testzcc : $(TARGET)
 
 clean::
 	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
-	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/developer/*.tmp 
+	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/dev/*.tmp 
 	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
 
 #------------------------------------------------------------------------------
@@ -244,122 +224,117 @@ codearea.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 codearea.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 codearea.o: lib/uthash.h errors.h errors_def.h lib/fileutil.h lib/list.h
 codearea.o: lib/init.h listfile.h symref.h lib/classlist.h options.h
-codearea.o: options_def.h lib/strpool.h z80asm.h sym.h expr.h scan.h legacy.h
+codearea.o: options_def.h lib/strpool.h z80asm.h sym.h expr.h scan.h
 codearea.o: scan_tokens.h opcodes.h
 deffile.o: lib/xmalloc.h deffile.h lib/fileutil.h lib/list.h lib/class.h
 deffile.o: lib/queue.h lib/types.h lib/strutil.h listfile.h symref.h
 deffile.o: lib/classlist.h options.h options_def.h symbol.h expr.h
-deffile.o: lib/array.h scan.h legacy.h scan_tokens.h opcodes.h errors.h
-deffile.o: errors_def.h sym.h model.h module.h lib/classhash.h lib/strhash.h
-deffile.o: lib/uthash.h codearea.h symtab.h objfile.h z80asm.h
+deffile.o: lib/array.h scan.h scan_tokens.h opcodes.h errors.h errors_def.h
+deffile.o: sym.h model.h module.h lib/classhash.h lib/strhash.h lib/uthash.h
+deffile.o: codearea.h symtab.h objfile.h z80asm.h
 directives.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 directives.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 directives.o: lib/uthash.h directives.h errors.h errors_def.h lib/fileutil.h
 directives.o: lib/list.h model.h module.h lib/classlist.h expr.h scan.h
-directives.o: legacy.h scan_tokens.h opcodes.h options.h options_def.h sym.h
-directives.o: symref.h symtab.h parse.h lib/utarray.h lib/strpool.h z80asm.h
+directives.o: scan_tokens.h opcodes.h options.h options_def.h sym.h symref.h
+directives.o: symtab.h parse.h lib/utarray.h lib/strpool.h z80asm.h
 errors.o: lib/xmalloc.h errors.h errors_def.h lib/fileutil.h lib/list.h
 errors.o: lib/class.h lib/queue.h lib/types.h lib/strutil.h options.h
 errors.o: options_def.h lib/srcfile.h lib/strpool.h lib/strhash.h
 errors.o: lib/uthash.h lib/init.h
 expr.o: lib/xmalloc.h lib/array.h lib/class.h lib/queue.h lib/types.h
 expr.o: lib/strutil.h codearea.h lib/classhash.h lib/strhash.h lib/uthash.h
-expr.o: expr.h lib/classlist.h scan.h legacy.h scan_tokens.h opcodes.h
-expr.o: errors.h errors_def.h options.h lib/list.h options_def.h sym.h
-expr.o: symref.h lib/init.h model.h module.h symtab.h lib/strpool.h
-expr.o: expr_def.h
+expr.o: expr.h lib/classlist.h scan.h scan_tokens.h opcodes.h errors.h
+expr.o: errors_def.h options.h lib/list.h options_def.h sym.h symref.h
+expr.o: lib/init.h model.h module.h symtab.h lib/strpool.h expr_def.h
 hist.o: lib/xmalloc.h hist.h
 libfile.o: lib/xmalloc.h errors.h errors_def.h lib/fileutil.h lib/list.h
-libfile.o: lib/class.h lib/queue.h lib/types.h lib/strutil.h legacy.h
-libfile.o: libfile.h objfile.h lib/array.h module.h lib/classlist.h
-libfile.o: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h expr.h
-libfile.o: scan.h scan_tokens.h opcodes.h options.h options_def.h sym.h
-libfile.o: symref.h symtab.h
+libfile.o: lib/class.h lib/queue.h lib/types.h lib/strutil.h libfile.h
+libfile.o: objfile.h lib/array.h module.h lib/classlist.h lib/classhash.h
+libfile.o: lib/strhash.h lib/uthash.h codearea.h expr.h scan.h scan_tokens.h
+libfile.o: opcodes.h options.h options_def.h sym.h symref.h symtab.h
 listfile.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 listfile.o: lib/strutil.h symref.h lib/classlist.h lib/fileutil.h lib/list.h
 listfile.o: options.h options_def.h z80asm.h sym.h expr.h lib/array.h scan.h
-listfile.o: legacy.h scan_tokens.h opcodes.h errors.h errors_def.h hist.h
+listfile.o: scan_tokens.h opcodes.h errors.h errors_def.h hist.h
 listfile.o: lib/strpool.h codearea.h lib/classhash.h lib/strhash.h
 listfile.o: lib/uthash.h
 mapfile.o: lib/xmalloc.h lib/fileutil.h lib/list.h lib/class.h lib/queue.h
 mapfile.o: lib/types.h lib/strutil.h listfile.h symref.h lib/classlist.h
 mapfile.o: mapfile.h options.h options_def.h lib/strpool.h symbol.h expr.h
-mapfile.o: lib/array.h scan.h legacy.h scan_tokens.h opcodes.h errors.h
-mapfile.o: errors_def.h sym.h model.h module.h lib/classhash.h lib/strhash.h
-mapfile.o: lib/uthash.h codearea.h symtab.h objfile.h z80asm.h
+mapfile.o: lib/array.h scan.h scan_tokens.h opcodes.h errors.h errors_def.h
+mapfile.o: sym.h model.h module.h lib/classhash.h lib/strhash.h lib/uthash.h
+mapfile.o: codearea.h symtab.h objfile.h z80asm.h
 model.o: lib/xmalloc.h model.h lib/list.h lib/class.h lib/queue.h lib/types.h
 model.o: module.h lib/classlist.h lib/classhash.h lib/strhash.h lib/uthash.h
-model.o: codearea.h lib/array.h lib/strutil.h expr.h scan.h legacy.h
-model.o: scan_tokens.h opcodes.h errors.h errors_def.h options.h
-model.o: options_def.h sym.h symref.h symtab.h lib/init.h listfile.h
-model.o: lib/srcfile.h
+model.o: codearea.h lib/array.h lib/strutil.h expr.h scan.h scan_tokens.h
+model.o: opcodes.h errors.h errors_def.h options.h options_def.h sym.h
+model.o: symref.h symtab.h lib/init.h listfile.h lib/srcfile.h
 modlink.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 modlink.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 modlink.o: lib/uthash.h errors.h errors_def.h expr.h lib/classlist.h scan.h
-modlink.o: legacy.h scan_tokens.h opcodes.h options.h lib/list.h
-modlink.o: options_def.h sym.h symref.h lib/fileutil.h listfile.h modlink.h
-modlink.o: lib/strpool.h symbol.h model.h module.h symtab.h objfile.h
-modlink.o: z80asm.h
+modlink.o: scan_tokens.h opcodes.h options.h lib/list.h options_def.h sym.h
+modlink.o: symref.h lib/fileutil.h listfile.h modlink.h lib/strpool.h
+modlink.o: symbol.h model.h module.h symtab.h objfile.h z80asm.h
 module.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h lib/queue.h
 module.o: lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 module.o: lib/uthash.h lib/init.h module.h lib/classlist.h expr.h scan.h
-module.o: legacy.h scan_tokens.h opcodes.h errors.h errors_def.h options.h
-module.o: lib/list.h options_def.h sym.h symref.h symtab.h lib/strpool.h
+module.o: scan_tokens.h opcodes.h errors.h errors_def.h options.h lib/list.h
+module.o: options_def.h sym.h symref.h symtab.h lib/strpool.h
 objfile.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h codearea.h
 objfile.o: lib/array.h lib/strutil.h lib/classhash.h lib/strhash.h
 objfile.o: lib/uthash.h errors.h errors_def.h lib/fileutil.h lib/list.h
 objfile.o: options.h options_def.h model.h module.h lib/classlist.h expr.h
-objfile.o: scan.h legacy.h scan_tokens.h opcodes.h sym.h symref.h symtab.h
-objfile.o: objfile.h lib/strpool.h
+objfile.o: scan.h scan_tokens.h opcodes.h sym.h symref.h symtab.h objfile.h
+objfile.o: lib/strpool.h
 opcodes.o: lib/xmalloc.h directives.h expr.h lib/array.h lib/class.h
 opcodes.o: lib/queue.h lib/types.h lib/strutil.h lib/classlist.h scan.h
-opcodes.o: legacy.h scan_tokens.h opcodes.h errors.h errors_def.h options.h
-opcodes.o: lib/list.h options_def.h sym.h symref.h codearea.h lib/classhash.h
+opcodes.o: scan_tokens.h opcodes.h errors.h errors_def.h options.h lib/list.h
+opcodes.o: options_def.h sym.h symref.h codearea.h lib/classhash.h
 opcodes.o: lib/strhash.h lib/uthash.h model.h module.h symtab.h parse.h
 opcodes.o: lib/utarray.h z80asm.h
 options.o: lib/xmalloc.h errors.h errors_def.h lib/fileutil.h lib/list.h
 options.o: lib/class.h lib/queue.h lib/types.h lib/strutil.h hist.h
 options.o: lib/init.h model.h module.h lib/classlist.h lib/classhash.h
 options.o: lib/strhash.h lib/uthash.h codearea.h lib/array.h expr.h scan.h
-options.o: legacy.h scan_tokens.h opcodes.h options.h options_def.h sym.h
-options.o: symref.h symtab.h lib/srcfile.h lib/strpool.h z80asm.h
+options.o: scan_tokens.h opcodes.h options.h options_def.h sym.h symref.h
+options.o: symtab.h lib/srcfile.h lib/strpool.h z80asm.h
 parse.o: lib/xmalloc.h lib/class.h lib/queue.h lib/types.h codearea.h
 parse.o: lib/array.h lib/strutil.h lib/classhash.h lib/strhash.h lib/uthash.h
-parse.o: directives.h expr.h lib/classlist.h scan.h legacy.h scan_tokens.h
-parse.o: opcodes.h errors.h errors_def.h options.h lib/list.h options_def.h
-parse.o: sym.h symref.h listfile.h model.h module.h symtab.h parse.h
-parse.o: lib/utarray.h lib/strpool.h parse_rules.h
+parse.o: directives.h expr.h lib/classlist.h scan.h scan_tokens.h opcodes.h
+parse.o: errors.h errors_def.h options.h lib/list.h options_def.h sym.h
+parse.o: symref.h listfile.h model.h module.h symtab.h parse.h lib/utarray.h
+parse.o: lib/strpool.h parse_rules.h
 scan.o: lib/xmalloc.h errors.h errors_def.h lib/init.h lib/types.h lib/list.h
 scan.o: lib/class.h lib/queue.h model.h module.h lib/classlist.h
 scan.o: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h lib/array.h
-scan.o: lib/strutil.h expr.h scan.h legacy.h scan_tokens.h opcodes.h
-scan.o: options.h options_def.h sym.h symref.h symtab.h lib/utarray.h
-scan.o: scan_rules.h
+scan.o: lib/strutil.h expr.h scan.h scan_tokens.h opcodes.h options.h
+scan.o: options_def.h sym.h symref.h symtab.h lib/utarray.h scan_rules.h
 sym.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 sym.o: lib/strutil.h symref.h lib/classlist.h options.h lib/list.h
 sym.o: options_def.h lib/strpool.h sym.h symbol.h expr.h lib/array.h scan.h
-sym.o: legacy.h scan_tokens.h opcodes.h errors.h errors_def.h model.h
-sym.o: module.h lib/classhash.h lib/strhash.h lib/uthash.h codearea.h
-sym.o: symtab.h objfile.h
+sym.o: scan_tokens.h opcodes.h errors.h errors_def.h model.h module.h
+sym.o: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h symtab.h
+sym.o: objfile.h
 symref.o: lib/xmalloc.h options.h lib/types.h lib/list.h lib/class.h
 symref.o: lib/queue.h options_def.h symref.h lib/classlist.h
 symtab.o: lib/xmalloc.h errors.h errors_def.h listfile.h lib/class.h
 symtab.o: lib/queue.h lib/types.h lib/strutil.h symref.h lib/classlist.h
 symtab.o: model.h lib/list.h module.h lib/classhash.h lib/strhash.h
-symtab.o: lib/uthash.h codearea.h lib/array.h expr.h scan.h legacy.h
-symtab.o: scan_tokens.h opcodes.h options.h options_def.h sym.h symtab.h
-symtab.o: symbol.h objfile.h z80asm.h
+symtab.o: lib/uthash.h codearea.h lib/array.h expr.h scan.h scan_tokens.h
+symtab.o: opcodes.h options.h options_def.h sym.h symtab.h symbol.h objfile.h
+symtab.o: z80asm.h
 z80asm.o: lib/xmalloc.h directives.h codearea.h lib/array.h lib/class.h
 z80asm.o: lib/queue.h lib/types.h lib/strutil.h lib/classhash.h lib/strhash.h
 z80asm.o: lib/uthash.h deffile.h errors.h errors_def.h expr.h lib/classlist.h
-z80asm.o: scan.h legacy.h scan_tokens.h opcodes.h options.h lib/list.h
-z80asm.o: options_def.h sym.h symref.h lib/fileutil.h hist.h libfile.h
-z80asm.o: listfile.h mapfile.h modlink.h objfile.h module.h symtab.h parse.h
-z80asm.o: lib/utarray.h lib/strpool.h symbol.h model.h z80asm.h
+z80asm.o: scan.h scan_tokens.h opcodes.h options.h lib/list.h options_def.h
+z80asm.o: sym.h symref.h lib/fileutil.h hist.h libfile.h listfile.h mapfile.h
+z80asm.o: modlink.h objfile.h module.h symtab.h parse.h lib/utarray.h
+z80asm.o: lib/strpool.h symbol.h model.h z80asm.h
 z80pass.o: lib/xmalloc.h directives.h codearea.h lib/array.h lib/class.h
 z80pass.o: lib/queue.h lib/types.h lib/strutil.h lib/classhash.h
 z80pass.o: lib/strhash.h lib/uthash.h errors.h errors_def.h expr.h
-z80pass.o: lib/classlist.h scan.h legacy.h scan_tokens.h opcodes.h options.h
+z80pass.o: lib/classlist.h scan.h scan_tokens.h opcodes.h options.h
 z80pass.o: lib/list.h options_def.h sym.h symref.h lib/fileutil.h hist.h
 z80pass.o: listfile.h model.h module.h symtab.h modlink.h parse.h
 z80pass.o: lib/utarray.h lib/srcfile.h symbol.h objfile.h z80asm.h
@@ -389,9 +364,8 @@ t/test_codearea.o: options_def.h
 t/test_symtab.o: lib/xmalloc.h listfile.h lib/class.h lib/queue.h lib/types.h
 t/test_symtab.o: lib/strutil.h symref.h lib/classlist.h model.h lib/list.h
 t/test_symtab.o: module.h lib/classhash.h lib/strhash.h lib/uthash.h
-t/test_symtab.o: codearea.h lib/array.h expr.h scan.h legacy.h scan_tokens.h
-t/test_symtab.o: opcodes.h errors.h errors_def.h options.h options_def.h
-t/test_symtab.o: sym.h symtab.h
+t/test_symtab.o: codearea.h lib/array.h expr.h scan.h scan_tokens.h opcodes.h
+t/test_symtab.o: errors.h errors_def.h options.h options_def.h sym.h symtab.h
 lib/t/test_dlist.o: lib/xmalloc.h lib/dlist.h
 lib/t/test_init.o: lib/xmalloc.h lib/init.h lib/types.h
 lib/t/test_xmalloc.o: lib/xmalloc.h

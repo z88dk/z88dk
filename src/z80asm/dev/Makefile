@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.14 2015-01-26 23:46:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.15 2015-02-01 23:52:13 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -31,12 +31,12 @@ ASTYLE = astyle \
 #------------------------------------------------------------------------------
 all : scan_rules.h
 
-scan_rules.h : scan_rules.rl scan_tokens.h scan_def.h legacy.h \
+scan_rules.h : scan_rules.rl scan_tokens.h scan_def.h \
 			   dev/parse_ragel.pl dev/Makefile
 	perl dev/parse_ragel.pl scan_rules.rl
 #	$(ASTYLE) scan_rules.h -- formatted file too big for debugger (> 65536 lines)
 
-scan_tokens.h : scan_def.h legacy.h \
+scan_tokens.h : scan_def.h \
 				dev/build_tokens.pl dev/Makefile
 	perl dev/build_tokens.pl	
 
@@ -45,7 +45,7 @@ scan_tokens.h : scan_def.h legacy.h \
 #------------------------------------------------------------------------------
 all : parse_rules.h
 
-parse_rules.h : parse_rules.rl scan_tokens.h scan_def.h legacy.h \
+parse_rules.h : parse_rules.rl scan_tokens.h scan_def.h \
 				dev/parse_ragel.pl dev/Makefile 
 	perl dev/parse_ragel.pl parse_rules.rl
 #	$(ASTYLE) parse_rules.h -- formatted file too big for debugger (> 65536 lines)
@@ -94,7 +94,13 @@ all:
 
 #------------------------------------------------------------------------------
 # $Log: Makefile,v $
-# Revision 1.14  2015-01-26 23:46:22  pauloscustodio
+# Revision 1.15  2015-02-01 23:52:13  pauloscustodio
+#  Removed legacy expression syntax support and got rid
+# of all the #ifdef __LEGACY_Z80ASM_SYNTAX.
+#
+# Added support for binary constants %0101 syntax.
+#
+# Revision 1.14  2015/01/26 23:46:22  pauloscustodio
 # Updated copyright year
 #
 # Revision 1.13  2015/01/03 18:39:06  pauloscustodio

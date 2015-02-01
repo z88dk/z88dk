@@ -14,23 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.51 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.52 2015-02-01 23:52:12 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "legacy.h"
 #include "scan_tokens.h"
 #include "types.h"
 #include "opcodes.h"
-
-#ifdef __LEGACY_Z80ASM_SYNTAX
-#define TK_QUESTION		TK_INVALID
-#define TK_COLON		TK_INVALID
-#define TK_BIN_NOT		TK_INVALID
-#else
-#define TK_STRING_CAT	TK_COMMA
-#endif
 
 /*-----------------------------------------------------------------------------
 * 	Keep last symbol retrieved

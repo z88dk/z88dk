@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/asmpp.t,v 1.2 2015-01-26 23:46:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/asmpp.t,v 1.3 2015-02-01 23:52:13 pauloscustodio Exp $
 #
 # Test asmpp.pl
 
@@ -25,8 +25,6 @@ use Test::Differences;
 use Capture::Tiny::Extended 'capture';
 
 require 't/test_utils.pl';
-
-if ( ! get_legacy() ) {
 
 #------------------------------------------------------------------------------
 # simple code
@@ -452,14 +450,6 @@ my $cmd = "asmpp.pl --ucase -l -b -It/data CAMEL80.AZM";
 ok 0 == system($cmd), $cmd;
 t_binary(read_binfile("CAMEL80.bin"), 
 		 read_binfile("t/data/CAMEL80.COM"));
-
-
-#------------------------------------------------------------------------------
-# if not legacy
-} 
-else {
-	ok 1;
-}
 
 unlink_testfiles(qw( CAMEL80.i CAMEL80.obj CAMEL80.lst CAMEL80.map CAMEL80.bin ));
 done_testing();

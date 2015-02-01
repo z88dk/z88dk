@@ -15,10 +15,8 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.51 2015-01-31 08:55:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.52 2015-02-01 23:52:12 pauloscustodio Exp $
 */
-
-#include "legacy.h"
 
 /*-----------------------------------------------------------------------------
 *	Token IDs
@@ -46,7 +44,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.51 2015-01-31 0
 
 TOKEN(	TK_END,			"",)	/* = 0; end of file reached */
 TOKEN(	TK_NIL,			"", )	/* returned for rubish */
-TOKEN(	TK_INVALID,		"", )	/* used as impossible to get token */
 TOKEN(	TK_NAME,		"", )
 TOKEN(	TK_LABEL,		"", )
 TOKEN(	TK_NUMBER,		"", )
@@ -72,11 +69,7 @@ TOKEN(TK_CONST_EXPR, "#", )
 
 TOKEN(TK_MOD, "%", )
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-TOKEN(TK_STRING_CAT, "&", )
-#else
 TOKEN(TK_BIN_AND, "&", )
-#endif
 
 TOKEN(TK_LOG_AND, "&&", )
 
@@ -93,11 +86,7 @@ TOKEN(TK_DIVIDE, "/", )
 
 /* no token for "0" .. "9" */
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-TOKEN(TK_BIN_XOR, ":", )
-#else
 TOKEN(TK_COLON, ":", )
-#endif
 
 /* no token for ";" */
 
@@ -112,10 +101,7 @@ TOKEN(TK_GREATER, ">", )
 TOKEN(TK_RIGHT_SHIFT, ">>", )
 TOKEN(TK_GREATER_EQ, ">=", )
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-#else
 TOKEN(TK_QUESTION, "?", )
-#endif
 
 /* no token for "@", "A" .. "Z" */
 
@@ -125,13 +111,8 @@ TOKEN(TK_LSQUARE, "[", )
 
 TOKEN(TK_RSQUARE, "]", )
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-TOKEN(	TK_POWER,		"^", )
-TOKEN2(	TK_POWER,		"**", )
-#else
 TOKEN(TK_BIN_XOR, "^", )
 TOKEN(TK_POWER, "**", )
-#endif
 
 /* no token for "_", "`", "a" .. "z" */
 
@@ -140,11 +121,7 @@ TOKEN(TK_BIN_OR, "|", )
 TOKEN(TK_LOG_OR, "||", )
 TOKEN(TK_RCURLY, "}", )
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-TOKEN(	TK_BIN_AND,		"~", )
-#else
 TOKEN(TK_BIN_NOT, "~", )
-#endif
 
 /*-----------------------------------------------------------------------------
 *	Assembly keywords

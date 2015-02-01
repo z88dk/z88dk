@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.23 2015-02-01 19:24:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.24 2015-02-01 23:52:13 pauloscustodio Exp $
 #
 
 use strict;
@@ -31,15 +31,14 @@ require 't/test_utils.pl';
 system("make -C ../../support/ar") and die;
 sub t_z80nm {
 	my($obj_file, $expected_out) = @_;
-	unless ( get_legacy() ) {			# don't test old object file format
-		my $line = "[line ".((caller)[2])."]";
-		my($stdout, $stderr, $return) = capture {
-			system "../../support/ar/z80nm -a $obj_file";
-		};
-		eq_or_diff_text $stdout, $expected_out, "$line stdout";
-		eq_or_diff_text $stderr, "", "$line stderr";
-		ok !!$return == !!0, "$line retval";
-	}
+
+	my $line = "[line ".((caller)[2])."]";
+	my($stdout, $stderr, $return) = capture {
+		system "../../support/ar/z80nm -a $obj_file";
+	};
+	eq_or_diff_text $stdout, $expected_out, "$line stdout";
+	eq_or_diff_text $stderr, "", "$line stderr";
+	ok !!$return == !!0, "$line retval";
 }
 
 #------------------------------------------------------------------------------

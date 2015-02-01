@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.192 2015-02-01 19:24:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.193 2015-02-01 23:52:12 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -26,7 +26,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.192 2015-02-01 19
 #include "expr.h"
 #include "fileutil.h"
 #include "hist.h"
-#include "legacy.h"
 #include "libfile.h"
 #include "listfile.h"
 #include "mapfile.h"

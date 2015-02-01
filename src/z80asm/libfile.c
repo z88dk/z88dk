@@ -14,23 +14,18 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle library file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.5 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.6 2015-02-01 23:52:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "errors.h"
 #include "fileutil.h"
-#include "legacy.h"
 #include "libfile.h"
 #include "objfile.h"
 #include "options.h"
 
-#ifdef __LEGACY_Z80ASM_SYNTAX
-char Z80libhdr[] = "Z80LMF01";
-#else
 char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
-#endif
 
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line

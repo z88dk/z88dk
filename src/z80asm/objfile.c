@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.43 2015-01-27 21:48:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.44 2015-02-01 23:52:11 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -28,18 +28,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.43 2015-01-27 21
 #include "objfile.h"
 #include "strpool.h"
 #include "strutil.h"
-#include "legacy.h"
 
 #include <assert.h>
 
 /*-----------------------------------------------------------------------------
 *   Object header
 *----------------------------------------------------------------------------*/
-#ifdef __LEGACY_Z80ASM_SYNTAX
-char Z80objhdr[] 	= "Z80RMF01";
-#else
 char Z80objhdr[] 	= "Z80RMF" OBJ_VERSION;
-#endif
 
 #define Z80objhdr_size (sizeof(Z80objhdr)-1)
 

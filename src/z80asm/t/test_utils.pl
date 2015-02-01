@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.75 2015-02-01 19:24:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.76 2015-02-01 23:52:14 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -24,6 +24,7 @@ use Test::Differences;
 use List::AllUtils 'uniq';
 use Data::HexDump;
 
+my $OBJ_FILE_VERSION = "08";
 my $STOP_ON_ERR = grep {/-stop/} @ARGV; 
 my $KEEP_FILES	= grep {/-keep/} @ARGV; 
 my $test	 = "test";
@@ -370,7 +371,7 @@ sub objfile {
 
 	exists($args{ORG}) and die;
 	
-	my $obj = get_legacy() ? "Z80RMF01" : "Z80RMF08";
+	my $obj = "Z80RMF".$OBJ_FILE_VERSION;
 
 	# store empty pointers; mark position for later
 	my $name_addr	 = length($obj); $obj .= pack("V", -1);
@@ -472,7 +473,7 @@ sub write_binfile {
 # return library file binary representation
 sub libfile {
 	my(@obj_files) = @_;
-	my $lib = get_legacy() ? "Z80LMF01" : "Z80LMF08";
+	my $lib = "Z80LMF".$OBJ_FILE_VERSION;
 	for my $i (0 .. $#obj_files) {
 		my $obj_file = $obj_files[$i];
 		my $next_ptr = ($i == $#obj_files) ?
@@ -672,13 +673,6 @@ sub get_copyright {
 	my $copyrightmsg = "Z80 Module Assembler ".$version.", (c) ".$copyright;
 	
 	return $copyrightmsg;
-}
-
-#------------------------------------------------------------------------------
-# get legacy flag from legacy.h
-sub get_legacy {
-	my $legacy = read_file("legacy.h");
-	if ($legacy =~ /define\s+__LEGACY_Z80ASM_SYNTAX/) { return 1 } else { return 0 }
 }
 
 #------------------------------------------------------------------------------
