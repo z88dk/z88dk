@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.16 2015-01-26 23:46:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/Attic/expr.t,v 1.17 2015-02-01 19:24:44 pauloscustodio Exp $
 #
 # Test lexer and expressions
 
@@ -175,7 +175,6 @@ unlink_testfiles();
 my $objs = "expr.o errors.o sym.o symtab.o symref.o ".
 		   "options.o model.o module.o hist.o codearea.o scan.o listfile.o ".
 		   "lib/strutil.o lib/strhash.o lib/fileutil.o lib/srcfile.o ".
-		   "lib/except.o ".
 		   "lib/list.o lib/array.o lib/class.o";
 
 my $init = <<'END';

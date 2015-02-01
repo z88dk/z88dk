@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.49 2015-01-31 08:55:17 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.50 2015-02-01 19:24:44 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -26,7 +26,7 @@ require 't/test_utils.pl';
 my $objs = "scan.o errors.o model.o module.o codearea.o listfile.o ".
 		   "options.o hist.o sym.o symtab.o symref.o expr.o ".
 		   "lib/strutil.o lib/strhash.o lib/fileutil.o ".
-		   "lib/srcfile.o lib/except.o lib/class.o ".
+		   "lib/srcfile.o lib/class.o ".
 		   "lib/list.o lib/array.o";
 		   
 my $init = <<'END';

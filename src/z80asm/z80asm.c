@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.191 2015-02-01 18:18:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.192 2015-02-01 19:24:44 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -23,7 +23,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.191 2015-02-01 18
 #include "deffile.h"
 #include "directives.h"
 #include "errors.h"
-#include "except.h"
 #include "expr.h"
 #include "fileutil.h"
 #include "hist.h"
@@ -146,68 +145,62 @@ static void do_assemble( char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
 
-    /* try-catch to delete incomplete files in case of error */
-    TRY
-    {
-        /* Create error file */
-        open_error_file( src_filename );
+	/* Create error file */
+	open_error_file(src_filename);
 
-		/* create list file or symtable */
-        if ( opts.list )
-            list_open( get_lst_filename( src_filename ) );	/* set '.lst' extension */
-        else if ( opts.symtable )
-            list_open( get_sym_filename( src_filename ) );	/* set '.sym' extension */
-        else
-        {}													/* no list file */
+	/* create list file or symtable */
+	if (opts.list)
+		list_open(get_lst_filename(src_filename));	/* set '.lst' extension */
+	else if (opts.symtable)
+		list_open(get_sym_filename(src_filename));	/* set '.sym' extension */
+	else
+	{
+	}													/* no list file */
 
-        /* initialize local symtab with copy of static one (-D defines) */
-        copy_static_syms();
+	/* initialize local symtab with copy of static one (-D defines) */
+	copy_static_syms();
 
-        /* Init ASMPC */
-        set_PC( 0 );
+	/* Init ASMPC */
+	set_PC(0);
 
-        if ( opts.verbose )
-            printf( "Assembling '%s'...\nPass1...\n", src_filename );
+	if (opts.verbose)
+		printf("Assembling '%s'...\nPass1...\n", src_filename);
 
-        parse_file( src_filename );
+	parse_file(src_filename);
 
-        list_end();						/* get_used_symbol will only generate page references until list_end() */
+	list_end();						/* get_used_symbol will only generate page references until list_end() */
 
-		asm_MODULE_default();			/* Module name must be defined */
+	asm_MODULE_default();			/* Module name must be defined */
 
-        set_error_null();
-        //set_error_module( CURRENTMODULE->modname );
+	set_error_null();
+	//set_error_module( CURRENTMODULE->modname );
 
-		if (opts.verbose)
-			puts("Pass2...");
+	if (opts.verbose)
+		puts("Pass2...");
 
-		Z80pass2();						/* call pass 2 even if errors found, to issue pass2 errors */
-    }
-    FINALLY
-    {
-        /*
-         * Source file no longer needed (file could already have been closed, if error occurred during INCLUDE
-         * processing).
-         */
+	Z80pass2();						/* call pass 2 even if errors found, to issue pass2 errors */
+	
+	/*
+	* Source file no longer needed (file could already have been closed, if error occurred during INCLUDE
+	* processing).
+	*/
 
-        set_error_null();
+	set_error_null();
 
-        /* remove list file if more errors now than before */
-        list_close( start_errors == get_num_errors() );
+	/* remove list file if more errors now than before */
+	list_close(start_errors == get_num_errors());
 
-        /* remove incomplete object file */
-        if ( start_errors != get_num_errors() )
-            remove( get_obj_filename( src_filename ) );
+	/* remove incomplete object file */
+	if (start_errors != get_num_errors())
+		remove(get_obj_filename(src_filename));
 
-        close_error_file();
+	close_error_file();
 
-        remove_all_local_syms();
-        remove_all_global_syms();
+	remove_all_local_syms();
+	remove_all_global_syms();
 
-        if ( opts.verbose )
-            putchar( '\n' );    /* separate module texts */
-    }
-    ETRY;
+	if (opts.verbose)
+		putchar('\n');    /* separate module texts */
 }
 
 
@@ -335,55 +328,44 @@ int main( int argc, char *argv[] )
 	ListElem *iter;
 
 	model_init();						/* init global data */
+	libraryhdr = NULL;              /* initialise to no library files */
 
-    /* start try..catch with finally to cleanup any allocated memory */
-    TRY
-    {
-		libraryhdr = NULL;              /* initialise to no library files */
+	/* parse command line and call-back via assemble_file() */
+	parse_argv(argc, argv);
+	for (iter = List_first(opts.files); iter != NULL; iter = List_next(iter))
+		assemble_file(iter->data);
 
-        /* parse command line and call-back via assemble_file() */
-		parse_argv(argc, argv);
-		for ( iter = List_first( opts.files ); iter != NULL; iter = List_next( iter ) )
-			assemble_file( iter->data );
+	/* Create library */
+	if (!get_num_errors() && opts.lib_file)
+		make_library(opts.lib_file, opts.files);
 
-        /* Create library */
-        if ( ! get_num_errors() && opts.lib_file )
-            make_library( opts.lib_file, opts.files );
+	if (!get_num_errors() && opts.make_bin)
+		link_modules();
 
-        if ( ! get_num_errors() && opts.make_bin )
-            link_modules();
+	if (!get_num_errors() && opts.make_bin)
+	{
+		if (opts.map)
+			write_map_file();
 
-        if ( ! get_num_errors() && opts.make_bin )
-        {
-            if ( opts.map )
-                write_map_file();
+		if (opts.globaldef)
+			write_def_file();
 
-            if ( opts.globaldef )
-                write_def_file();
+		CreateBinFile();
+	}
 
-            CreateBinFile();
-        }
+	set_error_null();
+	close_error_file();
 
+	delete_modules();		/* Release module information (symbols, etc.) */
 
-    }
-    /* cleanup all allocated memory */
-    FINALLY
-    {
-        set_error_null();
-        close_error_file();
+	if (libraryhdr != NULL)
+		ReleaseLibraries();    /* Release library information */
 
-        delete_modules();		/* Release module information (symbols, etc.) */
-
-        if ( libraryhdr != NULL )
-            ReleaseLibraries();    /* Release library information */
-
-        if ( opts.relocatable )
-        {
-            if ( reloctable != NULL )
-                xfree( reloctable );
-        }
-    }
-    ETRY;
+	if (opts.relocatable)
+	{
+		if (reloctable != NULL)
+			xfree(reloctable);
+	}
 
     if ( get_num_errors() )
     {

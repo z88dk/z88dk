@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.36 2015-02-01 18:18:02 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.37 2015-02-01 19:24:44 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -33,7 +33,7 @@ my $COMMA = get_legacy() ? "&" : ",";
 
 #------------------------------------------------------------------------------
 # fatal_divide_by_zero
-diag "BUG_0040";
+#diag "BUG_0040";
 unlink_testfiles();
 t_z80asm_error("ld a, 1/0",
 	"Error at file 'test.asm' line 1: division by zero",
@@ -606,7 +606,7 @@ t_compile_module($init, <<'END', $objs);
 	error_syntax();
 	check_count(1);
 
-	warn("Fatal error not caught\n");
+	warn("File error not caught\n");
 	error_read_file("file.asm");
 	warn("end\n");	
 END
@@ -618,7 +618,7 @@ Warning
 Warning: option '-t' is deprecated
 Error
 Error: syntax error
-Fatal error not caught
+File error not caught
 Error: cannot read file 'file.asm'
 end
 ERR
@@ -640,15 +640,8 @@ t_compile_module($init, <<'END', $objs);
 
 	check_count(0);
 	
-	warn("Fatal error\n");
-	TRY
-	{
-		error_read_file("file.asm");
-	}
-	FINALLY
-	{
-	}
-	ETRY;
+	warn("File error\n");
+	error_read_file("file.asm");
 	check_count(1);
 	
 	SYNTAX(	NULL,		NULL,	0 );
@@ -686,7 +679,7 @@ t_compile_module($init, <<'END', $objs);
 END
 
 t_run_module([], '', <<'ERR', 0);
-Fatal error
+File error
 Error: cannot read file 'file.asm'
 Error: syntax error
 Error at line 1: syntax error

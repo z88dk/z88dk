@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.8 2015-01-26 23:46:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.9 2015-02-01 19:24:44 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -313,7 +313,6 @@ ungetline
 (test.f0:13)line 5
 (test.f0:13)line 6
 File test.f0 line 14 text 
-File NULL line 0 text NULL
 (eof)
 (eof)
 (eof)
@@ -322,19 +321,16 @@ File test.x1/test.f3 line 1 text F2 x1
 
 (test.x1/test.f3:1)F2 x1
 File test.x1/test.f3 line 2 text 
-File NULL line 0 text NULL
 (eof)
 File test.x1/test.f2 line 1 text F1 x1
 
 (test.x1/test.f2:1)F1 x1
 File test.x1/test.f2 line 2 text 
-File NULL line 0 text NULL
 (eof)
 File test.x1/test.f1 line 1 text F0 x1
 
 (test.x1/test.f1:1)F0 x1
 File test.x1/test.f1 line 2 text 
-File NULL line 0 text NULL
 (eof)
 (eof)
 (eof)
@@ -343,13 +339,11 @@ File test.x1/test.f1 line 1 text F0 x1
 
 (test.x1/test.f1:1)F0 x1
 File test.x1/test.f1 line 2 text 
-File NULL line 0 text NULL
 (eof)
 File test.x1/test.f1 line 1 text F0 x1
 
 (test.x1/test.f1:1)F0 x1
 File test.x1/test.f1 line 2 text 
-File NULL line 0 text NULL
 (eof)
 set callback
 recursive include, with callback

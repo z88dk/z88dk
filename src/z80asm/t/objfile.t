@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.22 2015-02-01 18:18:02 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.23 2015-02-01 19:24:44 pauloscustodio Exp $
 #
 
 use strict;
@@ -4491,7 +4491,7 @@ t_compile_module($init, <<'END', $objs);
 	
 	TITLE("File not found, test mode");	
 	remove("test.obj");
-	TRY_OK( obj = OFile_test_file("test.obj") ); 
+	obj = OFile_test_file("test.obj"); 
 	ASSERT( obj == NULL );
 
 	TITLE("File not found, read mode");	
@@ -4500,33 +4500,33 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj == NULL );
 
 	TITLE("Invalid short file, test mode");	
-	TRY_OK( file = xfopen("test.obj", "wb") );
-	TRY_OK( xfclose(file) );
-	TRY_OK( obj = OFile_test_file("test.obj") );
+	file = xfopen("test.obj", "wb");
+	xfclose(file);
+	obj = OFile_test_file("test.obj");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid short file, read mode");	
-	TRY_OK( file = xfopen("test.obj", "wb") );
-	TRY_OK( xfclose(file) );
-	TRY_OK( obj = OFile_open_read("test.obj") );
+	file = xfopen("test.obj", "wb");
+	xfclose(file);
+	obj = OFile_open_read("test.obj");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, test mode");	
-	TRY_OK( file = xfopen("test.obj", "wb") );
+	file = xfopen("test.obj", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
-	TRY_OK( xfclose(file) );
-	TRY_OK( obj = OFile_test_file("test.obj") );
+	xfclose(file);
+	obj = OFile_test_file("test.obj");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, read mode");	
-	TRY_OK( file = xfopen("test.obj", "wb") );
+	file = xfopen("test.obj", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
-	TRY_OK( xfclose(file) );
-	TRY_OK( obj = OFile_open_read("test.obj") );
+	xfclose(file);
+	obj = OFile_open_read("test.obj");
 	ASSERT( obj == NULL );
 	
 	TITLE("test1 Object file, read mode");
-	TRY_OK( obj = OFile_open_read("test1.obj") );
+	obj = OFile_open_read("test1.obj");
 	ASSERT( obj != NULL );
 	ASSERT( obj->file != NULL );
 	ASSERT( obj->start_ptr == 0 );
@@ -4542,7 +4542,7 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj == NULL );
 	
 	TITLE("test1 Object file, test mode");
-	TRY_OK( obj = OFile_test_file("test1.obj") );
+	obj = OFile_test_file("test1.obj");
 	ASSERT( obj != NULL );
 	ASSERT( obj->file != NULL );
 	ASSERT( obj->start_ptr == 0 );
@@ -4558,9 +4558,9 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj == NULL );
 	
 	TITLE("test1 Library file");
-	TRY_OK( file = xfopen("test1.lib", "rb") );
+	file = xfopen("test1.lib", "rb");
 	ASSERT( file != NULL );
-	TRY_OK( obj = OFile_read_header(file, 16) );	
+	obj = OFile_read_header(file, 16);	
 	ASSERT( obj != NULL );
 	ASSERT( obj->file == file );
 	ASSERT( obj->start_ptr == 16 );

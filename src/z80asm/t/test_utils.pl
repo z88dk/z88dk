@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.74 2015-01-26 23:46:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.75 2015-02-01 19:24:44 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -491,7 +491,7 @@ sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
 	# modules to include always
-	$compile_args .= " -DMEMALLOC_DEBUG lib/xmalloc.c lib/dlist.c lib/except.o lib/strpool.o";
+	$compile_args .= " -DMEMALLOC_DEBUG lib/xmalloc.c lib/dlist.c lib/strpool.o";
 	
 	# wait for previous run to finish
 	while (-f 'test.exe' && ! unlink('test.exe')) {
@@ -529,7 +529,6 @@ sub t_compile_module {
 
 ".join("\n", map {"#include \"$_\""} grep {-f $_} map {"$_.h"} sort keys %modules)."\n".'
 #undef main
-int _exception_raised;
 
 #define TITLE(title)	fprintf(stderr, "\n---- TEST: %s ----\n\n", (title) )
 
@@ -543,18 +542,6 @@ int _exception_raised;
 			} while(0)
 
 #define ASSERT(expr) 			TEST_DIE( ! (expr), "TEST FAILED", #expr )
-
-#define TEST_TRY(expr, err_condition, err_message, expr_str) \
-			_exception_raised = 0; \
-			TRY { expr; } \
-			FINALLY { \
-				if (THROWN()) _exception_raised = 1; \
-			} \
-			ETRY; \
-			TEST_DIE( (err_condition), "EXCEPTION " err_message "RAISED", expr_str )
-
-#define TRY_OK(expr) 	TEST_TRY( expr,   _exception_raised, "",     #expr )
-#define TRY_NOK(expr) 	TEST_TRY( expr, ! _exception_raised, "NOT ", #expr )
 
 void dump_file ( char *filename )
 {

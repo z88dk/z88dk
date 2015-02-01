@@ -13,14 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.142 2015-02-01 18:18:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.143 2015-02-01 19:24:44 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 #include "errors.h"
-#include "except.h"
 #include "expr.h"
 #include "fileutil.h"
 #include "listfile.h"
@@ -572,101 +571,95 @@ void link_modules( void )
         reloctable = NULL;
     }
 
-    TRY
-    {
-		/* remember current first and last modules, i.e. before adding library modules */
-		first_obj_module = get_first_module( &iter );
-		last_obj_module  = get_last_module( NULL );
+	/* remember current first and last modules, i.e. before adding library modules */
+	first_obj_module = get_first_module(&iter);
+	last_obj_module = get_last_module(NULL);
 
-		/* link machine code & read symbols in all modules */
-		for ( module = first_obj_module, saw_last_obj_module = FALSE ;
-			  module != NULL && ! saw_last_obj_module ;
-			  module = get_next_module( &iter ) )  
-        {
-			set_cur_module( module );
+	/* link machine code & read symbols in all modules */
+	for (module = first_obj_module, saw_last_obj_module = FALSE;
+		module != NULL && !saw_last_obj_module;
+		module = get_next_module(&iter))
+	{
+		set_cur_module(module);
 
-	        /* open error file on first module */
-			if ( CURRENTMODULE == first_obj_module )
-		        open_error_file( CURRENTMODULE->filename );
+		/* open error file on first module */
+		if (CURRENTMODULE == first_obj_module)
+			open_error_file(CURRENTMODULE->filename);
 
-            set_error_null();
-            set_error_module( CURRENTMODULE->modname );
+		set_error_null();
+		set_error_module(CURRENTMODULE->modname);
 
-            if ( opts.library )
-            {
-                CURRENTLIB = libraryhdr->firstlib;      /* begin library search  from first library for each
-                                                        * module */
-                CURRENTLIB->nextobjfile = 8;            /* point at first library module (past header) */
-            }
-
-            /* overwrite '.asm' extension with * '.obj' */
-            obj_filename = get_obj_filename( CURRENTMODULE->filename );
-
-            /* open relocatable file for reading */
-            file = xfopen( obj_filename, "rb" );           /* CH_0012 */
-			if (file)
-			{
-				/* read first 8 chars from file into array */
-				xfget_chars(file, fheader, 8);
-				fheader[8] = '\0';
-
-				/* compare header of file */
-				if (strcmp(fheader, Z80objhdr) != 0)
-				{
-					error_not_obj_file(obj_filename);  /* not a object     file */
-					xfclose(file);
-					break;
-				}
-
-				xfclose(file);
-
-				LinkModule(obj_filename, 0);       /* link code & read name definitions */
-			}
-
-	        /* parse only object modules, not added library modules */
-			if ( CURRENTMODULE == last_obj_module )
-				saw_last_obj_module = TRUE;
-
+		if (opts.library)
+		{
+			CURRENTLIB = libraryhdr->firstlib;      /* begin library search  from first library for each
+													* module */
+			CURRENTLIB->nextobjfile = 8;            /* point at first library module (past header) */
 		}
 
-        set_error_null();
+		/* overwrite '.asm' extension with * '.obj' */
+		obj_filename = get_obj_filename(CURRENTMODULE->filename);
 
-		/* allocate segment addresses and compute absolute addresses of symbols */
-		if ( ! get_num_errors() )
-			sections_alloc_addr();
+		/* open relocatable file for reading */
+		file = xfopen(obj_filename, "rb");           /* CH_0012 */
+		if (file)
+		{
+			/* read first 8 chars from file into array */
+			xfget_chars(file, fheader, 8);
+			fheader[8] = '\0';
 
-		if ( ! get_num_errors() )
-			relocate_symbols();
+			/* compare header of file */
+			if (strcmp(fheader, Z80objhdr) != 0)
+			{
+				error_not_obj_file(obj_filename);  /* not a object     file */
+				xfclose(file);
+				break;
+			}
 
-		/* define assembly size */
-		if ( ! get_num_errors() )
-			define_location_symbols();
+			xfclose(file);
 
-		if ( opts.verbose )
-			puts( "Pass2..." );
+			LinkModule(obj_filename, 0);       /* link code & read name definitions */
+		}
 
-		/* collect expressions from all modules; first compute all EQU expressions,
-		   then patch all other expressions
-		   exprs keeps the current pending list */
-		exprs = OBJ_NEW( ExprList );
-		if ( ! get_num_errors() )		
-			read_module_exprs( exprs );
-		if ( ! get_num_errors() )	
-			compute_equ_exprs( exprs, TRUE, FALSE );
-		if ( ! get_num_errors() )	
-			patch_exprs( exprs );
-    }
-    FINALLY
-    {
-		OBJ_DELETE( exprs );
+		/* parse only object modules, not added library modules */
+		if (CURRENTMODULE == last_obj_module)
+			saw_last_obj_module = TRUE;
 
-        set_error_null();
+	}
 
-        ReleaseLinkInfo();              /* Release module link information */
+	set_error_null();
 
-        close_error_file();
-    }
-    ETRY;
+	/* allocate segment addresses and compute absolute addresses of symbols */
+	if (!get_num_errors())
+		sections_alloc_addr();
+
+	if (!get_num_errors())
+		relocate_symbols();
+
+	/* define assembly size */
+	if (!get_num_errors())
+		define_location_symbols();
+
+	if (opts.verbose)
+		puts("Pass2...");
+
+	/* collect expressions from all modules; first compute all EQU expressions,
+	then patch all other expressions
+	exprs keeps the current pending list */
+	exprs = OBJ_NEW(ExprList);
+	if (!get_num_errors())
+		read_module_exprs(exprs);
+	if (!get_num_errors())
+		compute_equ_exprs(exprs, TRUE, FALSE);
+	if (!get_num_errors())
+		patch_exprs(exprs);
+	
+	OBJ_DELETE(exprs);
+
+	set_error_null();
+
+	ReleaseLinkInfo();              /* Release module link information */
+
+	close_error_file();
 }
 
 

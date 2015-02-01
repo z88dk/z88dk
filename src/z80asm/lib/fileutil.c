@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.23 2015-02-01 18:18:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.24 2015-02-01 19:24:44 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -265,6 +265,8 @@ static void file_error_filename( char *filename, Bool is_writing )
 	/* call call-back, if any */
 	if (ferr_callback != NULL)
 		ferr_callback( filename, is_writing );
+	else
+		warn("Error: cannot %s file '%s'\n", is_writing ? "write" : "read", filename );
 }
 
 static void fatal_ferr_read( FILE *file )

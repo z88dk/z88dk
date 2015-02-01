@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.19 2015-01-26 23:46:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.20 2015-02-01 19:24:44 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -177,10 +177,8 @@ END
 system($compile) and die "compile failed: $compile\n";
 t_capture("./test 0", "", "captured error test.1xxxx.bin 0\n", 1);
 t_capture("./test 1", "", "captured error x/x/x/x/test.1.bin 1\n", 1);
-t_capture("./test 2", "", "captured error test.1xxxx.bin 0\n".
-						"Error: cannot read file 'test.1xxxx.bin'\n", 1);
-t_capture("./test 3", "", "captured error x/x/x/x/test.1.bin 1\n".
-						"Error: cannot write file 'x/x/x/x/test.1.bin'\n", 1);
+t_capture("./test 2", "", "captured error test.1xxxx.bin 0\n", 0);
+t_capture("./test 3", "", "captured error x/x/x/x/test.1.bin 1\n", 0);
 
 
 #------------------------------------------------------------------------------
@@ -213,10 +211,10 @@ int main(int argc, char *argv[])
 	switch (*argv[1]) 
 	{
 		case '0':	xfopen("test.1xxxx.bin", "rb");
-					ERROR; /* not reached */
+					break;
 
 		case '1':	xfopen("x/x/x/x/test.1.bin", "wb"); 
-					ERROR; /* not reached */
+					break;
 		
 		case '2':	file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfclose(file);
@@ -231,7 +229,7 @@ int main(int argc, char *argv[])
 		case '5':	Str_set( small, BIG_STR );
 					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfwrite( small->str, sizeof(char), small->len, file );
-					ERROR; /* not reached */
+					break;
 
 		case '6':	Str_set( small, BIG_STR );
 					memset(buffer, 0, sizeof(buffer));
@@ -241,7 +239,7 @@ int main(int argc, char *argv[])
 					
 					fseek(file, 1, SEEK_SET);
 					xfread( buffer, sizeof(char), small->len, file );
-					ERROR; /* not reached */
+					break;
 		
 		case '7':	Str_set( small, BIG_STR );
 					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
@@ -265,7 +263,7 @@ int main(int argc, char *argv[])
 					memset(buffer, 0, sizeof(buffer));
 					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfget_chars( file, buffer, small->len+1 );
-					ERROR; /* not reached */
+					break;
 					
 		case '9':	Str_set( small, BIG_STR );
 					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
@@ -288,7 +286,7 @@ int main(int argc, char *argv[])
 		
 					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfget_Str( file, large, small->len+1 );
-					ERROR; /* not reached */
+					break;
 					
 		case 'B':	Str_set_bytes( small, "\0\1\2\3", 4 );
 					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
@@ -351,7 +349,7 @@ int main(int argc, char *argv[])
 		case 'D':	Str_set( large, BIG_STR );
 					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_count_byte_Str( file, large );
-					ERROR; /* not reached */
+					break;
 								
 		case 'E':	huge = OBJ_NEW(Str);
 					Str_reserve( huge, 0x10000 );
@@ -359,7 +357,7 @@ int main(int argc, char *argv[])
 					
 					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_count_word_Str( file, huge );
-					ERROR; /* not reached */
+					break;
 
 		case 'F':	file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_int8(   file,        -128 );
@@ -524,16 +522,16 @@ END
 
 system($compile) and die "compile failed: $compile\n";
 
-t_capture("./test 0", "", "Error: cannot read file 'test.1xxxx.bin'\n", 1);
-t_capture("./test 1", "", "Error: cannot write file 'x/x/x/x/test.1.bin'\n", 1);
+t_capture("./test 0", "", "Error: cannot read file 'test.1xxxx.bin'\n", 0);
+t_capture("./test 1", "", "Error: cannot write file 'x/x/x/x/test.1.bin'\n", 0);
 t_capture("./test 2", "", "", 0); is read_binfile("test.1.bin"), "";
 t_capture("./test 4", "", "", 0); is read_binfile("test.1.bin"), "1234";
-t_capture("./test 5", "", "Error: cannot write file 'test.1.bin'\n", 1);
-t_capture("./test 6", "", "Error: cannot read file 'test.1.bin'\n", 1);
+t_capture("./test 5", "", "Error: cannot write file 'test.1.bin'\n", 0);
+t_capture("./test 6", "", "Error: cannot read file 'test.1.bin'\n", 0);
 t_capture("./test 7", "", "", 0); is read_binfile("test.1.bin"), "1234123";
-t_capture("./test 8", "", "Error: cannot read file 'test.1.bin'\n", 1);
+t_capture("./test 8", "", "Error: cannot read file 'test.1.bin'\n", 0);
 t_capture("./test 9", "", "", 0); is read_binfile("test.1.bin"), "1234abc";
-t_capture("./test A", "", "Error: cannot read file 'test.1.bin'\n", 1);
+t_capture("./test A", "", "Error: cannot read file 'test.1.bin'\n", 0);
 t_capture("./test B", "", "", 0); is read_binfile("test.1.bin"), "\0\1\2\3";
 t_capture("./test C", "", "", 0); is read_binfile("test.1.bin"), 
 									pack("C",   0)."".
@@ -542,8 +540,8 @@ t_capture("./test C", "", "", 0); is read_binfile("test.1.bin"),
 									pack("v",   0)."".
 									pack("v", 256).("1234567890" x 25)."123456".
 									pack("v",  11)."hello world";
-t_capture("./test D", "", "Error: cannot write file 'test.1.bin'\n", 1);
-t_capture("./test E", "", "Error: cannot write file 'test.1.bin'\n", 1);
+t_capture("./test D", "", "Error: cannot write file 'test.1.bin'\n", 0);
+t_capture("./test E", "", "Error: cannot write file 'test.1.bin'\n", 0);
 t_capture("./test F", "", "", 0); is read_binfile("test.1.bin"), 
 									pack("C*", 
 										 128, 128, 129, 129, 0, 0, 127, 127, 

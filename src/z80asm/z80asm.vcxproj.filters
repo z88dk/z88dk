@@ -87,9 +87,6 @@
     <ClInclude Include="lib\types.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\except.h">
-      <Filter>Header Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\init.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
@@ -216,9 +213,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lib\xmalloc.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\except.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\strpool.c">

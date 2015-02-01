@@ -1,11 +1,10 @@
 @echo off
-rem $Id: gccmake.bat,v 1.52 2015-01-31 15:40:28 stefano Exp $
+rem $Id: gccmake.bat,v 1.53 2015-02-01 19:24:44 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
 echo *******************
 del *.o lib\*.o
-gcc -Ilib -Wall -c -o asmdrctv.o             asmdrctv.c
 gcc -Ilib -Wall -c -o codearea.o             codearea.c
 gcc -Ilib -Wall -c -o deffile.o              deffile.c
 gcc -Ilib -Wall -c -o directives.o           directives.c
@@ -22,7 +21,6 @@ gcc -Ilib -Wall -c -o objfile.o              objfile.c
 gcc -Ilib -Wall -c -o opcodes.o              opcodes.c
 gcc -Ilib -Wall -c -o options.o              options.c
 gcc -Ilib -Wall -c -o parse.o                parse.c
-gcc -Ilib -Wall -c -o prsident.o             prsident.c
 gcc -Ilib -Wall -c -o scan.o                 scan.c
 gcc -Ilib -Wall -c -o sym.o                  sym.c
 gcc -Ilib -Wall -c -o symref.o               symref.c
@@ -32,7 +30,6 @@ gcc -Ilib -Wall -c -o z80pass.o              z80pass.c
 gcc -Ilib -Wall -c -o lib/array.o            lib/array.c
 gcc -Ilib -Wall -c -o lib/class.o            lib/class.c
 gcc -Ilib -Wall -c -o lib/dlist.o            lib/dlist.c
-gcc -Ilib -Wall -c -o lib/except.o           lib/except.c
 gcc -Ilib -Wall -c -o lib/fileutil.o         lib/fileutil.c
 gcc -Ilib -Wall -c -o lib/list.o             lib/list.c
 gcc -Ilib -Wall -c -o lib/srcfile.o          lib/srcfile.c

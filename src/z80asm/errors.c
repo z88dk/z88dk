@@ -15,13 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.51 2015-02-01 18:18:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.52 2015-02-01 19:24:44 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
 
 #include "errors.h"
-#include "except.h"
 #include "fileutil.h"
 #include "options.h"
 #include "srcfile.h"

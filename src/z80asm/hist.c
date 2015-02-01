@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.138 2015-01-31 08:55:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.139 2015-02-01 19:24:44 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.138 2015-01-31 08:5
 
 /*
 * $Log: hist.c,v $
-* Revision 1.138  2015-01-31 08:55:14  pauloscustodio
+* Revision 1.139  2015-02-01 19:24:44  pauloscustodio
+* Removed fatal errors and TRY-CATCH - code with longjumps is harder to maintain.
+* Removed except.c.
+*
+* Revision 1.138  2015/01/31 08:55:14  pauloscustodio
 * z80asm was evaluating the false branches of IF..ENDIF again;
 * fixed and modified opcodes.t to detect this.
 *
@@ -2210,11 +2214,13 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 xx.xx.2015 [2.7.1] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- symbol can be declared both EXTERN and PUBLIC in the same file
+	- Symbol can be declared both EXTERN and PUBLIC in the same file
 	
 	- z80asm was evaluating the false branches of IF..ENDIF again;
 	  fixed and modified opcodes.t to detect this.
 
+	- Removed fatal errors and TRY-CATCH - code with longjumps is harder to maintain.
+	  Removed except.c.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
@@ -2253,7 +2259,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1b"
+#define VERSION     "2.7.1c"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.30 2015-02-01 18:18:02 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.31 2015-02-01 19:24:44 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -22,7 +22,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.30 2015-02-01 18:1
 #include "class.h"
 #include "codearea.h"
 #include "directives.h"
-#include "except.h"
 #include "expr.h"
 #include "listfile.h"
 #include "model.h"
@@ -434,41 +433,28 @@ Bool parse_file(char *filename)
 	ParseCtx *ctx;
 	OpenStruct *open_struct;
 	int num_errors = get_num_errors();
-	Bool fatal_error = FALSE;
 
 	ctx = ParseCtx_new();
-	TRY
-	{
-		if (opts.verbose)
-			printf("Reading '%s'...\n", filename);	/* display name of file */
+	if (opts.verbose)
+		printf("Reading '%s'...\n", filename);	/* display name of file */
 
-		src_push();
+	src_push();
+	{
+		if (src_open(filename, opts.inc_path))
 		{
-			if (src_open(filename, opts.inc_path))
-			{
-				sym.tok = TK_NIL;
-				while (sym.tok != TK_END)
-					parseline(ctx);				/* before parsing it */
+			sym.tok = TK_NIL;
+			while (sym.tok != TK_END)
+				parseline(ctx);				/* before parsing it */
 
-				open_struct = (OpenStruct *)utarray_back(ctx->open_structs);
-				if (open_struct != NULL)
-					error_unbalanced_struct_at(open_struct->filename, open_struct->line_nr);
-			}
+			open_struct = (OpenStruct *)utarray_back(ctx->open_structs);
+			if (open_struct != NULL)
+				error_unbalanced_struct_at(open_struct->filename, open_struct->line_nr);
 		}
-		src_pop();
-		sym.tok = TK_NEWLINE;						/* when called recursively, need to make tok != TK_NIL */
 	}
-	CATCH(FatalErrorException)
-	{
-		fatal_error = TRUE;
-	}
-	FINALLY
-	{
-		ParseCtx_delete(ctx);
-		if (fatal_error)
-			RETHROW(FatalErrorException);
-	}
-	ETRY;
+	src_pop();
+	sym.tok = TK_NEWLINE;						/* when called recursively, need to make tok != TK_NIL */
+
+	ParseCtx_delete(ctx);
 
 	return num_errors == get_num_errors();
 }
