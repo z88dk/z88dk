@@ -81,6 +81,12 @@ extern char   *strtok_r(char *s, char *delim, char **last_s);
 extern char    strupr(char *s);
 extern size_t  strxfrm(char *dst, char *src, size_t n);
 
+#define memcpy(dst, src, n)    __builtin_memcpy(dst, src, n)
+#define strcpy(dst, src)       __builtin_strcpy(dst, src)
+#define strncpy(dst, src, n)   __builtin_strncpy(dst, src, n)
+#define strchr(s, c)           __builtin_strchr(s, c)
+#define memset(dst, c, n)      __builtin_memset(dst, c, n)
+
 #else
 
 // SCCZ80 
