@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.19 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.20 2015-02-01 18:18:01 pauloscustodio Exp $
 
 */
 
@@ -76,20 +76,20 @@ void write_def_file( void )
 
     /* Create DEF file */
     file = xfopen( filename, "w" );           /* CH_0012 */
+	if (file)
+	{
+		if (opts.verbose)
+			puts("Creating global definition file...");
 
-    if ( opts.verbose )
-    {
-        puts( "Creating global definition file..." );
-    }
+		/* all global addresses */
+		def_symtab = select_symbols(cond_global_addr_symbols);
 
-	/* all global addresses */
-    def_symtab = select_symbols( cond_global_addr_symbols );
+		/* Write symbols by address */
+		SymbolHash_sort(def_symtab, SymbolHash_by_value);
+		write_def_syms(file, def_symtab);
 
-    /* Write symbols by address */
-    SymbolHash_sort( def_symtab, SymbolHash_by_value );
-    write_def_syms( file, def_symtab );
+		OBJ_DELETE(def_symtab);
 
-    OBJ_DELETE( def_symtab );
-
-    xfclose( file );
+		xfclose(file);
+	}
 }

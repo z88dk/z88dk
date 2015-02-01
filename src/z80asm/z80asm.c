@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.190 2015-01-31 18:44:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.191 2015-02-01 18:18:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -146,7 +146,7 @@ static void do_assemble( char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
 
-    /* try-catch to delete incomplete files in case of fatal error */
+    /* try-catch to delete incomplete files in case of error */
     TRY
     {
         /* Create error file */
@@ -186,7 +186,7 @@ static void do_assemble( char *src_filename )
     FINALLY
     {
         /*
-         * Source file no longer needed (file could already have been closed, if fatal error occurred during INCLUDE
+         * Source file no longer needed (file could already have been closed, if error occurred during INCLUDE
          * processing).
          */
 
@@ -246,22 +246,27 @@ char *GetLibfile( char *filename )
     newlib->libfilename = xstrdup( found_libfilename );		/* freed when newlib is freed */
 
     file = xfopen( found_libfilename, "rb" );           /* CH_0012 */
-	/* read first 8 chars from file into array */
-    xfget_chars( file, fheader, 8 );
-    fheader[8] = '\0';
+	if (!file)
+		return NULL;
+	else
+	{
+		/* read first 8 chars from file into array */
+		xfget_chars(file, fheader, 8);
+		fheader[8] = '\0';
 
-    if ( strcmp( fheader, Z80libhdr ) != 0 )            /* compare header of file */
-    {
-        error_not_lib_file( found_libfilename );    /* not a library file */
-    }
-    else
-    {
-        opts.library = TRUE;
-    }
+		if (strcmp(fheader, Z80libhdr) != 0)            /* compare header of file */
+		{
+			error_not_lib_file(found_libfilename);    /* not a library file */
+		}
+		else
+		{
+			opts.library = TRUE;
+		}
 
-    xfclose( file );
+		xfclose(file);
 
-    return found_libfilename;
+		return found_libfilename;
+	}
 }
 
 

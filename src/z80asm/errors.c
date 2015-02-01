@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.50 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.51 2015-02-01 18:18:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,7 +32,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.50 2015-01-26 23:
 #include "init.h"
 #include <stdio.h>
 
-static void fatal_file_error( char *filename, Bool writing );
+static void file_error( char *filename, Bool writing );
 
 /*-----------------------------------------------------------------------------
 *   Singleton data
@@ -73,8 +73,8 @@ DEFINE_init()
     error_file.errors = OBJ_NEW( StrHash );	
 	
 	/* init file error handling */
-	set_ferr_callback( fatal_file_error );
-	set_incl_recursion_err_cb( fatal_include_recursion );
+	set_ferr_callback( file_error );
+	set_incl_recursion_err_cb( error_include_recursion );
 }
 
 DEFINE_fini()
@@ -265,15 +265,8 @@ static void do_error( enum ErrType err_type, char *message )
     /* send to error file */
     puts_error_file( msg->str );
 
-    if ( err_type == ErrError || err_type == ErrFatal )
-    {
-        /* count number of errors */
-        errors.count++;
-
-        /* exception if fatal */
-        if ( err_type == ErrFatal )
-            THROW( FatalErrorException );
-    }
+    if ( err_type == ErrError )
+        errors.count++;		/* count number of errors */
 }
 
 /*-----------------------------------------------------------------------------
@@ -292,14 +285,14 @@ static void do_error( enum ErrType err_type, char *message )
 #undef ERR
 
 /*-----------------------------------------------------------------------------
-*   fatal file error handling
+*   file error handling
 *----------------------------------------------------------------------------*/
-static void fatal_file_error( char *filename, Bool writing )
+static void file_error( char *filename, Bool writing )
 {
 	init();
 	
 	if ( writing )
-		fatal_write_file( filename );
+		error_write_file( filename );
 	else
-		fatal_read_file( filename );
+		error_read_file( filename );
 }

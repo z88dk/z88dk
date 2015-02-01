@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.19 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.20 2015-02-01 18:18:02 pauloscustodio Exp $
 */
 
 #pragma once
@@ -30,7 +30,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.19 2015-01-
 
 /*-----------------------------------------------------------------------------
 *   File input/output
-*	Register callbacks to be used on fatal read/write of a file.
+*	Register callbacks to be used on read/write error of a file.
 *	Fatal error if number of chars read/writen not same as requested
 *   Use fwrite/fread instead for checking.
 *----------------------------------------------------------------------------*/
@@ -39,7 +39,7 @@ typedef void (*ferr_callback_t)(char *filename, Bool writing);
 /* set call-back for input/output error; return old call-back */
 extern ferr_callback_t set_ferr_callback( ferr_callback_t func );
 
-/* OS interface with fatal errors on failure */
+/* OS interface */
 extern FILE *xfopen( char *filename, char *mode );
 extern void  xfclose( FILE *file );
 

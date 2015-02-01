@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.39 2015-01-31 18:44:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.40 2015-02-01 18:18:01 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -25,10 +25,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.39 2015
 /* information */
 ERR( ErrInfo,	info_total_errors( void ),				"%d errors occurred during assembly" _C_ get_num_errors() )
 
-/* fatal errors */
-ERR( ErrFatal,	fatal_read_file( char *filename ),		"cannot read file '%s'" _C_ filename )
-ERR( ErrFatal,	fatal_write_file( char *filename ),		"cannot write file '%s'" _C_ filename )
-ERR( ErrFatal,	fatal_include_recursion( char *filename ), "cannot include file '%s' recursively" _C_ filename )
+/* file errors */
+ERR(ErrError, error_read_file(char *filename), "cannot read file '%s'" _C_ filename)
+ERR(ErrError, error_write_file(char *filename), "cannot write file '%s'" _C_ filename)
+ERR(ErrError, error_include_recursion(char *filename), "cannot include file '%s' recursively" _C_ filename)
 
 /* command line parsing errors */
 ERR( ErrWarn,	warn_option_deprecated( char *option ),	"option '%s' is deprecated" _C_ option )

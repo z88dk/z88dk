@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.15 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.16 2015-02-01 18:18:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -58,7 +58,7 @@ static void call_new_line_cb( char *filename, int line_nr, char *text )
 }
 
 /*-----------------------------------------------------------------------------
-*   Call-back interace to exit with fatal error on recursive include files
+*   Call-back interace to show error on recursive include files
 *----------------------------------------------------------------------------*/
 static incl_recursion_err_cb_t incl_recursion_err_cb = NULL;		/* default handler */
 
@@ -112,9 +112,9 @@ void SrcFile_fini( SrcFile *self )
 *	SrcFile API
 *----------------------------------------------------------------------------*/
 
-/* check for recursive includes, call error callback and abort if found
-   does nothing if callback not defined */
-static void check_recursive_include( SrcFile *self, char *filename )
+/* check for recursive includes, call error callback and return FALSE abort if found
+   returns TRUE if callback not defined */
+static Bool check_recursive_include( SrcFile *self, char *filename )
 {
 	ListElem *iter;
     FileStackElem *elem;
@@ -129,30 +129,32 @@ static void check_recursive_include( SrcFile *self, char *filename )
 				 strcmp( filename, elem->filename ) == 0 )
 			{
 				incl_recursion_err_cb( filename );
-				assert(0);	/* not reached */
+				return FALSE;
 			}
 		}
 	}
+	return TRUE;
 }
 
 /* Open the source file for reading, closing any previously open file.
    If dir_list is not NULL, calls search_file() to search the file in dir_list */
-void SrcFile_open( SrcFile *self, char *filename, List *dir_list )
+Bool SrcFile_open( SrcFile *self, char *filename, List *dir_list )
 {
     char *filename_path;
 	
-    /* search path, add to strpool */
-    filename_path = search_file( filename, dir_list );
-	
-	/* check for recursive includes, abort if found */
-	check_recursive_include( self, filename_path );
-	
-    /* close last file */
-    if ( self->file != NULL )
-    {
-        xfclose( self->file );
-        self->file = NULL;
-    }
+	/* close last file */
+	if (self->file != NULL)
+	{
+		xfclose(self->file);
+		self->file = NULL;
+	}
+
+	/* search path, add to strpool */
+	filename_path = search_file(filename, dir_list);
+
+	/* check for recursive includes, return if found */
+	if (!check_recursive_include(self, filename_path))
+		return FALSE;
 	
 	self->filename = filename_path;
 
@@ -162,6 +164,11 @@ void SrcFile_open( SrcFile *self, char *filename, List *dir_list )
 	/* init current line */
     Str_clear( self->line );
     self->line_nr = 0;
+
+	if (self->file)
+		return TRUE;
+	else
+		return FALSE;		/* error opening file */
 }
 
 /* get the next line of input, normalize end of line termination (i.e. convert

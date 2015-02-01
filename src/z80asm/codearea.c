@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.51 2015-01-31 18:44:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.52 2015-02-01 18:18:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -582,6 +582,8 @@ void fwrite_codearea( char *filename, FILE **pfile )
 
 					xfclose(*pfile);
 					*pfile = xfopen(get_bin_filename(new_name->str), "wb");         /* CH_0012 */
+					if (!*pfile)
+						return;
 
 					cur_addr = section->addr;
 				}

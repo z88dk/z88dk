@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.25 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.26 2015-02-01 18:18:01 pauloscustodio Exp $
 */
 
 
@@ -80,33 +80,33 @@ void write_map_file( void )
 
     /* Create MAP file */
     file = xfopen( filename, "w" );           /* CH_0012 */
+	if (file)
+	{
+		if (opts.verbose)
+			puts("Creating map...");
 
-    if ( opts.verbose )
-    {
-        puts( "Creating map..." );
-    }
+		/* BUG_0036, BUG_0051 */
+		map_symtab = select_symbols(cond_all_symbols);
 
-    /* BUG_0036, BUG_0051 */
-    map_symtab = select_symbols( cond_all_symbols );
+		if (SymbolHash_empty(map_symtab))
+		{
+			fputs("None.\n", file);
+		}
+		else
+		{
+			/* Write map symbols alphabetically */
+			SymbolHash_sort(map_symtab, SymbolHash_by_name);
+			write_map_syms(file, map_symtab);
 
-    if ( SymbolHash_empty( map_symtab ) )
-    {
-        fputs( "None.\n", file );
-    }
-    else
-    {
-        /* Write map symbols alphabetically */
-        SymbolHash_sort( map_symtab, SymbolHash_by_name );
-        write_map_syms( file, map_symtab );
+			fputs("\n\n", file);
 
-        fputs( "\n\n", file );
+			/* Write map symbols numerically */
+			SymbolHash_sort(map_symtab, SymbolHash_by_value);
+			write_map_syms(file, map_symtab);
+		}
 
-        /* Write map symbols numerically */
-        SymbolHash_sort( map_symtab, SymbolHash_by_value );
-        write_map_syms( file, map_symtab );
-    }
+		OBJ_DELETE(map_symtab);
 
-    OBJ_DELETE( map_symtab );
-
-    xfclose( file );
+		xfclose(file);
+	}
 }

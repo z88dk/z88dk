@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.14 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.15 2015-02-01 18:18:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include to enable memory leak detection */
@@ -167,8 +167,11 @@ void asm_BINARY(char *filename)
 	filename = search_file(filename, opts.inc_path);
 
 	binfile = xfopen(filename, "rb");		/* CH_0012 */
-	append_file_contents(binfile, -1);		/* read binary code */
-	xfclose(binfile);
+	if (binfile)
+	{
+		append_file_contents(binfile, -1);		/* read binary code */
+		xfclose(binfile);
+	}
 }
 
 /*-----------------------------------------------------------------------------

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.29 2015-01-26 23:46:22 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.30 2015-02-01 18:18:02 pauloscustodio Exp $ 
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -444,14 +444,16 @@ Bool parse_file(char *filename)
 
 		src_push();
 		{
-			src_open(filename, opts.inc_path);
-			sym.tok = TK_NIL;
-			while (sym.tok != TK_END)
-				parseline(ctx);				/* before parsing it */
+			if (src_open(filename, opts.inc_path))
+			{
+				sym.tok = TK_NIL;
+				while (sym.tok != TK_END)
+					parseline(ctx);				/* before parsing it */
 
-			open_struct = (OpenStruct *)utarray_back(ctx->open_structs);
-			if (open_struct != NULL)
-				error_unbalanced_struct_at(open_struct->filename, open_struct->line_nr);
+				open_struct = (OpenStruct *)utarray_back(ctx->open_structs);
+				if (open_struct != NULL)
+					error_unbalanced_struct_at(open_struct->filename, open_struct->line_nr);
+			}
 		}
 		src_pop();
 		sym.tok = TK_NEWLINE;						/* when called recursively, need to make tok != TK_NIL */

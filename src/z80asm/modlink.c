@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.141 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.142 2015-02-01 18:18:01 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -251,19 +251,22 @@ static void read_module_exprs( ExprList *exprs )
 
         /* open relocatable file for reading */
         file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
-        fseek( file, fptr_base + 8, SEEK_SET );			/* point at module name  pointer   */
-        /*fptr_modname*/  xfget_int32( file );			/* get file pointer to module name */
-        fptr_exprdecl	= xfget_int32( file );			/* get file pointer to expression declarations */
-        /*fptr_namedecl*/ xfget_int32( file );			/* get file pointer to name declarations */
-        /*fptr_libnmdecl*/xfget_int32( file );			/* get file pointer to library name declarations */
+		if (file)
+		{
+			fseek(file, fptr_base + 8, SEEK_SET);			/* point at module name  pointer   */
+			/*fptr_modname*/  xfget_int32(file);			/* get file pointer to module name */
+			fptr_exprdecl = xfget_int32(file);			/* get file pointer to expression declarations */
+			/*fptr_namedecl*/ xfget_int32(file);			/* get file pointer to name declarations */
+			/*fptr_libnmdecl*/xfget_int32(file);			/* get file pointer to library name declarations */
 
-        if ( fptr_exprdecl != -1 )
-        {
-        	fseek( file, fptr_base + fptr_exprdecl, SEEK_SET );
-			read_cur_module_exprs( exprs, file, curlink->objfilename );
-        }
+			if (fptr_exprdecl != -1)
+			{
+				fseek(file, fptr_base + fptr_exprdecl, SEEK_SET);
+				read_cur_module_exprs(exprs, file, curlink->objfilename);
+			}
 
-        xfclose( file );
+			xfclose(file);
+		}
 
         curlink = curlink->nextlink;
     }
@@ -601,21 +604,24 @@ void link_modules( void )
 
             /* open relocatable file for reading */
             file = xfopen( obj_filename, "rb" );           /* CH_0012 */
-			/* read first 8 chars from file into array */
-            xfget_chars( file, fheader, 8 );
-            fheader[8] = '\0';
+			if (file)
+			{
+				/* read first 8 chars from file into array */
+				xfget_chars(file, fheader, 8);
+				fheader[8] = '\0';
 
-            /* compare header of file */
-            if ( strcmp( fheader, Z80objhdr ) != 0 )
-            {
-                error_not_obj_file( obj_filename );  /* not a object     file */
-                xfclose( file );
-                break;
-            }
+				/* compare header of file */
+				if (strcmp(fheader, Z80objhdr) != 0)
+				{
+					error_not_obj_file(obj_filename);  /* not a object     file */
+					xfclose(file);
+					break;
+				}
 
-            xfclose( file );
+				xfclose(file);
 
-            LinkModule( obj_filename, 0 );       /* link code & read name definitions */
+				LinkModule(obj_filename, 0);       /* link code & read name definitions */
+			}
 
 	        /* parse only object modules, not added library modules */
 			if ( CURRENTMODULE == last_obj_module )
@@ -681,45 +687,48 @@ LinkModule( char *filename, long fptr_base )
 
     /* open object file for reading */
     file = xfopen( filename, "rb" );           /* CH_0012 */
-    fseek( file, fptr_base + 8, SEEK_SET );
+	if (file)
+	{
+		fseek(file, fptr_base + 8, SEEK_SET);
 
-    fptr_modname	= xfget_int32( file );	/* get file pointer to module name */
-					  xfget_int32( file );	/* get file pointer to expression declarations */
-    fptr_namedecl	= xfget_int32( file );	/* get file pointer to name declarations */
-    fptr_libnmdecl	= xfget_int32( file );	/* get file pointer to library name declarations */
-    fptr_modcode	= xfget_int32( file );	/* get file pointer to module code */
+		fptr_modname = xfget_int32(file);	/* get file pointer to module name */
+		xfget_int32(file);	/* get file pointer to expression declarations */
+		fptr_namedecl = xfget_int32(file);	/* get file pointer to name declarations */
+		fptr_libnmdecl = xfget_int32(file);	/* get file pointer to library name declarations */
+		fptr_modcode = xfget_int32(file);	/* get file pointer to module code */
 
-    if ( fptr_modcode != -1 )
-    {
-        fseek( file, fptr_base + fptr_modcode, SEEK_SET );  /* set file pointer to module code */
-
-		while (TRUE)	/* read sections until end marker */
+		if (fptr_modcode != -1)
 		{
-			code_size = xfget_int32( file );
-			if ( code_size < 0 )
-				break;
+			fseek(file, fptr_base + fptr_modcode, SEEK_SET);  /* set file pointer to module code */
 
-			xfget_count_byte_Str( file, section_name );
-			origin = xfget_int32( file );
+			while (TRUE)	/* read sections until end marker */
+			{
+				code_size = xfget_int32(file);
+				if (code_size < 0)
+					break;
 
-			/* load bytes to section */
-			/* BUG_0015: was reading at current position in code area, swaping order of modules */
-			section = new_section( section_name->str );
-			if ( origin >= 0 )
-				section->origin = origin;
+				xfget_count_byte_Str(file, section_name);
+				origin = xfget_int32(file);
 
-			patch_file_contents( file, 0, code_size );
+				/* load bytes to section */
+				/* BUG_0015: was reading at current position in code area, swaping order of modules */
+				section = new_section(section_name->str);
+				if (origin >= 0)
+					section->origin = origin;
+
+				patch_file_contents(file, 0, code_size);
+			}
 		}
-    }
 
-    if ( fptr_namedecl != -1 )
-    {
-        fseek( file, fptr_base + fptr_namedecl, SEEK_SET );  /* set file pointer to point at name
-                                                                 * declarations */
-		ReadNames( filename, file );
-    }
+		if (fptr_namedecl != -1)
+		{
+			fseek(file, fptr_base + fptr_namedecl, SEEK_SET);  /* set file pointer to point at name
+															   * declarations */
+			ReadNames(filename, file);
+		}
 
-    xfclose( file );
+		xfclose(file);
+	}
 
     if ( fptr_libnmdecl != -1 )
     {
@@ -749,7 +758,10 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
     {
         /* open object file for reading */
         file = xfopen( filename, "rb" );           /* CH_0012 */
-        fseek( file, fptr_base + nextname, SEEK_SET );	/* set file pointer to point at 
+		if (!file)
+			return 0;
+
+		fseek( file, fptr_base + nextname, SEEK_SET );	/* set file pointer to point at 
 														 * library name declarations */
         xfget_count_byte_Str( file, name );				/* read library reference name */
         xfclose( file );
@@ -807,6 +819,8 @@ SearchLibfile( struct libfile *curlib, char *modname )
     FILE *file;
 
     file = xfopen( curlib->libfilename, "rb" );           /* CH_0012 */
+	if (!file)
+		return 0;
 
     while ( curlib->nextobjfile != -1 )
     {
@@ -945,25 +959,27 @@ CreateBinFile( void )
 
     /* binary output to filename.bin */
     binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
+	if (binaryfile)
+	{
+		if (is_relocatable)
+		{
+			/* relocate routine */
+			xfput_chars(binaryfile, (char *)reloc_routine, sizeof_relocroutine);
 
-    if ( is_relocatable )
-    {
-		/* relocate routine */
-        xfput_chars( binaryfile, (char *) reloc_routine, sizeof_relocroutine );
+			*(reloctable + 0) = (UInt)totaladdr % 256U;
+			*(reloctable + 1) = (UInt)totaladdr / 256U;  /* total of relocation elements */
+			*(reloctable + 2) = (UInt)sizeof_reloctable % 256U;
+			*(reloctable + 3) = (UInt)sizeof_reloctable / 256U; /* total size of relocation table elements */
 
-        *( reloctable + 0 ) = (UInt) totaladdr % 256U;
-        *( reloctable + 1 ) = (UInt) totaladdr / 256U;  /* total of relocation elements */
-        *( reloctable + 2 ) = (UInt) sizeof_reloctable % 256U;
-        *( reloctable + 3 ) = (UInt) sizeof_reloctable / 256U; /* total size of relocation table elements */
+			/* write relocation table, inclusive 4 byte header */
+			xfput_chars(binaryfile, reloctable, sizeof_reloctable + 4);
 
-		/* write relocation table, inclusive 4 byte header */
-        xfput_chars( binaryfile, reloctable, sizeof_reloctable + 4 );
+			printf("Relocation header is %d bytes.\n", (int)(sizeof_relocroutine + sizeof_reloctable + 4));
+		}
 
-		printf( "Relocation header is %d bytes.\n", ( int )( sizeof_relocroutine + sizeof_reloctable + 4 ) );
-    }
-
-    fwrite_codearea( filename, &binaryfile );		/* write code as one big chunk */
-	xfclose( binaryfile );
+		fwrite_codearea(filename, &binaryfile);		/* write code as one big chunk */
+		xfclose(binaryfile);
+	}
 
     if ( opts.verbose )
         puts( "Code generation completed." );

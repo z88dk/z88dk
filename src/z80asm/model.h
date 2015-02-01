@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.27 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.28 2015-02-01 18:18:01 pauloscustodio Exp $
 */
 
 #pragma once
@@ -65,7 +65,7 @@ extern void model_init(void);
 *----------------------------------------------------------------------------*/
 
 /* interface to SrcFile singleton */
-extern void  src_open( char *filename, List *dir_list );
+extern Bool  src_open( char *filename, List *dir_list );
 extern char *src_getline( void );
 extern void  src_ungetline( char *lines );
 extern char *src_filename( void );

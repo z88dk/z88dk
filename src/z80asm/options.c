@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.95 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.96 2015-02-01 18:18:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -284,9 +284,11 @@ static void process_file( char *filename )
 		/* loop on file to read each line and recurse */
 		src_push();
 		{
-			src_open( filename, NULL );
-			while ( (line = src_getline()) != NULL )
-				process_file( line );
+			if (src_open(filename, NULL))
+			{
+				while ((line = src_getline()) != NULL)
+					process_file(line);
+			}
 		}
 		src_pop();
 		break;

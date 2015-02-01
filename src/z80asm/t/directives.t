@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.15 2015-01-26 23:46:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.16 2015-02-01 18:18:02 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -82,7 +82,7 @@ delete $ENV{Z80_OZFILES};
 remove_tree("test_dir");
 delete $ENV{Z80_OZFILES};
 
-# fatal_read_file
+# error_read_file
 # BUG_0034 : If assembly process fails with fatal error, invalid library is kept
 unlink("test.lib", "test.inc");
 z80asm(
@@ -93,7 +93,7 @@ ASM
 );
 ok ! -f "test.lib", "test.lib does not exist";
 
-# fatal_include_recursion
+# error_include_recursion
 write_file("test.inc", 'include "test.asm"');
 z80asm(
 	asm		=> <<'ASM',

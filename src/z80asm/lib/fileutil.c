@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.22 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.23 2015-02-01 18:18:02 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -18,7 +18,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.22 2015-01-
 #include <stdarg.h>
 #include <sys/stat.h>
 
-static void fatal_ferr_filename( char *filename, Bool is_writing );
+static void file_error_filename( char *filename, Bool is_writing );
 
 /*-----------------------------------------------------------------------------
 *	List to keep temporary file names that need to be deleted atexit
@@ -187,17 +187,18 @@ static FILE *OpenFile_open( char *filename, char *mode, Bool is_atomic )
 	{
 		/* error, remove object */
 		Bool is_writing = self->is_writing;
-		OBJ_DELETE( self );
-		fatal_ferr_filename( filename, is_writing );
+		file_error_filename( filename, is_writing );
+
+		return NULL;
 	}
 	else 
 	{
 		/* add object to open_files map */
 		self->is_open = TRUE;
 		add_open_file( self->file, self );
-	}
 
-	return self->file;
+		return self->file;
+	}
 }
 
 /* close a file, rename temp name if atomic, remove from hash table */
@@ -241,7 +242,7 @@ static void OpenFile_close( FILE *file )
 		
 		/* error if fclose or rename failed */
 		if ( fclose_ret < 0 || rename_ret < 0 )
-			fatal_ferr_filename( filename, is_writing );
+			file_error_filename( filename, is_writing );
 	}
 }
 
@@ -258,27 +259,24 @@ ferr_callback_t set_ferr_callback( ferr_callback_t func )
 	return old;
 }
 
-/* call fatal error for a file */
-static void fatal_ferr_filename( char *filename, Bool is_writing )
+/* show error for a file */
+static void file_error_filename( char *filename, Bool is_writing )
 {
 	/* call call-back, if any */
 	if (ferr_callback != NULL)
 		ferr_callback( filename, is_writing );
-	
-	/* safety net - abort if no call-back registered */
-	die("Error: cannot %s file '%s'\n", is_writing ? "write" : "read", filename );
 }
 
 static void fatal_ferr_read( FILE *file )
 {
     OpenFile *open_file = get_open_file( file );
-	fatal_ferr_filename( open_file ? open_file->filename : "???", FALSE );
+	file_error_filename( open_file ? open_file->filename : "???", FALSE );
 }
 
 static void fatal_ferr_write( FILE *file )
 {
     OpenFile *open_file = get_open_file( file );
-	fatal_ferr_filename( open_file ? open_file->filename : "???", TRUE );
+	file_error_filename( open_file ? open_file->filename : "???", TRUE );
 }
 
 /*-----------------------------------------------------------------------------

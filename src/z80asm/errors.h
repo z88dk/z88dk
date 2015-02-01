@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 Error handling.
 Fatal errors THROW(FatalErrorException)
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.30 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.31 2015-02-01 18:18:01 pauloscustodio Exp $
 */
 
 #pragma once
@@ -25,7 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.30 2015-01-26 23:
 
 #include <stdio.h>
 
-enum ErrType { ErrInfo, ErrWarn, ErrError, ErrFatal };
+enum ErrType { ErrInfo, ErrWarn, ErrError };
 
 /*-----------------------------------------------------------------------------
 *	initialize error module
@@ -34,7 +34,7 @@ extern void errors_init( void );
 
 /*-----------------------------------------------------------------------------
 *	define the next FILE, LINENO, MODULE to use in error messages
-*	error_xxx(), fatal_xxx(), warn_xxx()
+*	error_xxx(), warn_xxx()
 *----------------------------------------------------------------------------*/
 extern void set_error_null( void );             /* clear all locations */
 extern void set_error_file( char *filename );

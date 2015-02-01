@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.6 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.7 2015-02-01 18:18:02 pauloscustodio Exp $
 */
 
 #pragma once
@@ -16,6 +16,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.6 2015-01-26
 #include "class.h"
 #include "list.h"
 #include "strutil.h"
+#include "types.h"
 #include <stdio.h>
 
 /*-----------------------------------------------------------------------------
@@ -28,7 +29,7 @@ typedef void (*new_line_cb_t)( char *filename, int line_nr, char *text );
 extern new_line_cb_t set_new_line_cb( new_line_cb_t func );
 
 /*-----------------------------------------------------------------------------
-*   Call-back interace to exit with fatal error on recursive include files
+*   Call-back interace to exit with error on recursive include files
 *----------------------------------------------------------------------------*/
 typedef void (*incl_recursion_err_cb_t)( char *filename );
 
@@ -60,7 +61,7 @@ END_CLASS;
 /* Open the source file for reading, closing any previously open file.
    If dir_list is not NULL, calls search_file() to search the file in dir_list
    calls incl_recursion_err_cb pointed fucntion in case of recursive include */
-extern void SrcFile_open( SrcFile *self, char *filename, List *dir_list );
+extern Bool SrcFile_open( SrcFile *self, char *filename, List *dir_list );
 
 /* get the next line of input, normalize end of line termination (i.e. convert
    "\r", "\r\n" and "\n\r" to "\n"

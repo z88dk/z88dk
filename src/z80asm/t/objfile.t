@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.21 2015-01-26 23:46:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.22 2015-02-01 18:18:02 pauloscustodio Exp $
 #
 
 use strict;
@@ -4496,7 +4496,7 @@ t_compile_module($init, <<'END', $objs);
 
 	TITLE("File not found, read mode");	
 	remove("test.obj");
-	TRY_NOK( obj = OFile_open_read("test.obj") );
+	obj = OFile_open_read("test.obj");
 	ASSERT( obj == NULL );
 
 	TITLE("Invalid short file, test mode");	

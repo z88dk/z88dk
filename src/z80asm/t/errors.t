@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.35 2015-01-26 23:46:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.36 2015-02-01 18:18:02 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -43,7 +43,7 @@ t_z80asm_error("ld a, 1%0",
 	"-l");
 
 #------------------------------------------------------------------------------
-# fatal_read_file
+# error_read_file
 unlink_testfiles();
 t_z80asm_capture(asm_file(), "",
 		"Error: cannot read file '".asm_file()."'\n".
@@ -65,7 +65,7 @@ t_z80asm_capture("-r0 -b -ixxxx ".asm_file(), "",
 		1);
 	
 #------------------------------------------------------------------------------
-# fatal_write_file
+# error_write_file
 unlink_testfiles();
 make_path( err_file() );
 write_file( asm_file(), 'nop' );
@@ -607,11 +607,11 @@ t_compile_module($init, <<'END', $objs);
 	check_count(1);
 
 	warn("Fatal error not caught\n");
-	fatal_read_file("file.asm");
-	warn("NOT REACHED\n");	
+	error_read_file("file.asm");
+	warn("end\n");	
 END
 
-t_run_module([], '', <<'ERR', 1);
+t_run_module([], '', <<'ERR', 0);
 Information
 0 errors occurred during assembly
 Warning
@@ -620,7 +620,7 @@ Error
 Error: syntax error
 Fatal error not caught
 Error: cannot read file 'file.asm'
-Uncaught runtime exception at errors.c(1)
+end
 ERR
 
 
@@ -643,12 +643,10 @@ t_compile_module($init, <<'END', $objs);
 	warn("Fatal error\n");
 	TRY
 	{
-		fatal_read_file("file.asm");
-		warn("NOT REACHED\n");	
+		error_read_file("file.asm");
 	}
 	FINALLY
 	{
-		if (! THROWN()) ERROR;
 	}
 	ETRY;
 	check_count(1);
