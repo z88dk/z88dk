@@ -31,7 +31,7 @@ include "clib_target_constants.inc"
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-EXTERN _font_4x8_def
+EXTERN _font_4x8_default
 
 
 ; When FILEs and FDSTRUCTs are instantiated labels are assigned
@@ -207,7 +207,7 @@ EXTERN _font_4x8_def
    ; cursor coord  : (0,0)
    ; window        : (2,44,1,18)
    ; scroll limit  : 0
-   ; font address  : _font_4x8_def - 256
+   ; font address  : _font_4x8_default - 256
    ; text colour   : 0x0f
    ; text mask     : 0
    ; background    : 0x0f
@@ -321,7 +321,9 @@ EXTERN _font_4x8_def
       ; text mask
       ; background colour
       
-      defw _font_4x8_def - 256
+      EXTERN _font_4x8_default
+      
+      defw _font_4x8_default - 256
       defb 0x0f
       defb 0
       defb 0x0f
@@ -551,7 +553,7 @@ EXTERN _font_4x8_def
    ; cursor coord  : (0,0)
    ; window        : (48,14,1,18)
    ; scroll limit  : 0
-   ; font address  : _font_4x8_def - 256
+   ; font address  : _font_4x8_default - 256
    ; text colour   : 0x27
    ; text mask     : 0
    ; background    : 0x27
@@ -665,7 +667,7 @@ EXTERN _font_4x8_def
       ; text mask
       ; background colour
       
-      defw _font_4x8_def - 256
+      defw _font_4x8_default - 256
       defb 0x27
       defb 0
       defb 0x27
