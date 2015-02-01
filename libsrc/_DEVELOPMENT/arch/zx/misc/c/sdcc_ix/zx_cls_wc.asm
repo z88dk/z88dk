@@ -3,7 +3,7 @@
 
 SECTION code_arch
 
-PUBLIC zx_cls_wc
+PUBLIC _zx_cls_wc
 
 _zx_cls_wc:
 
@@ -16,7 +16,7 @@ _zx_cls_wc:
    push af
    
    push bc
-   ex (sp),hl
+   ex (sp),ix
    
    call asm_zx_cls_wc
    
