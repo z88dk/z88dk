@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.84 2015-01-07 05:33:54 aralbrec Exp $
+ *      $Id: zcc.c,v 1.85 2015-02-01 21:05:09 aralbrec Exp $
  */
 
 
@@ -1231,7 +1231,9 @@ static void configure_compiler()
     /* compiler= */
     if ( strcmp(c_compiler_type,"sdcc") == 0 ) {
         compiler_type = CC_SDCC;
-        snprintf(buf,sizeof(buf),"-mz80 --reserve-regs-iy --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
+        // snprintf(buf,sizeof(buf),"-mz80 --reserve-regs-iy --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
+		// move restriction on iy to target cfg
+        snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
         add_option_to_compiler(buf);
         preprocarg = " -DZ88DK_USES_SDCC=1";
         BuildOptions(&cpparg, preprocarg);
