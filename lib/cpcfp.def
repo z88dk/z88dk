@@ -8,7 +8,7 @@ lstoff
 
 ; August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 
-; $Id: cpcfp.def,v 1.4 2015-02-02 03:23:52 aralbrec Exp $
+; $Id: cpcfp.def,v 1.5 2015-02-03 06:50:50 stefano Exp $
 
 ;	
 
@@ -276,7 +276,7 @@ ELSE
 
 		defc	CPCFP_FLO_RND	= $BD7F
 
-   ENDIF
+  ENDIF
 
 ENDIF
 

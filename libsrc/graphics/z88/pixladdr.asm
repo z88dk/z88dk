@@ -4,7 +4,7 @@
 	EXTERN	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.5 2015-02-01 19:42:55 aralbrec Exp $
+;	$Id: pixladdr.asm,v 1.6 2015-02-03 06:50:50 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -42,3 +42,4 @@
 				and	@00000111			; a = x mod 8
 				xor	@00000111			; a = 7 -	a
 				ret
+
