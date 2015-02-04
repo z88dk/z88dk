@@ -195,10 +195,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ace-byt.c"
-				>
-			</File>
-			<File
 				RelativePath=".\ace-tap.c"
 				>
 			</File>
@@ -219,6 +215,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\enterprise.c"
+				>
+			</File>
+			<File
+				RelativePath=".\extract.c"
+				>
+			</File>
+			<File
 				RelativePath=".\galaksija.c"
 				>
 			</File>
@@ -235,7 +239,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\m5.c"
+				>
+			</File>
+			<File
 				RelativePath=".\msx.c"
+				>
+			</File>
+			<File
+				RelativePath=".\mtx.c"
 				>
 			</File>
 			<File
@@ -247,6 +263,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\nec.c"
+				>
+			</File>
+			<File
 				RelativePath=".\newbrain.c"
 				>
 			</File>
@@ -255,11 +275,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\p2000.c"
+				>
+			</File>
+			<File
+				RelativePath=".\residos.c"
+				>
+			</File>
+			<File
 				RelativePath=".\rex6000.c"
 				>
 			</File>
 			<File
+				RelativePath=".\rom.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sc3000.c"
+				>
+			</File>
+			<File
 				RelativePath=".\sms.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sos.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sorcerer.c"
 				>
 			</File>
 			<File
@@ -272,6 +316,18 @@
 			</File>
 			<File
 				RelativePath=".\trs80.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vg5k.c"
+				>
+			</File>
+			<File
+				RelativePath=".\vz.c"
+				>
+			</File>
+			<File
+				RelativePath=".\x07.c"
 				>
 			</File>
 			<File

@@ -1,9 +1,9 @@
 @echo off
-rem $Id: vscmake.bat,v 1.2 2015-01-31 15:59:44 stefano Exp $
+rem $Id: vscmake.bat,v 1.3 2015-02-04 16:31:54 stefano Exp $
 
 echo ****************
 echo * Building zx7 *
 echo ****************
-cl /Fezx7 /Iregex *.c
+cl /Fezx7 *.c
 move zx7.exe ..\..\bin
 del *.obj

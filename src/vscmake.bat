@@ -1,6 +1,6 @@
 @echo off
 
-rem $Id: vscmake.bat,v 1.6 2015-01-31 15:40:28 stefano Exp $
+rem $Id: vscmake.bat,v 1.7 2015-02-04 16:31:54 stefano Exp $
 
 cl
 if %ERRORLEVEL% == 0 goto :build
@@ -37,9 +37,30 @@ cd ..
 cd zcc
 call vscmake
 cd ..
+cd scanner
+call vscmake
+cd ..
 cd zx7
 call vscmake
 cd ..
+echo **************************
+echo * Building support tools *
+echo **************************
+echo *
+cd ..
+cd support
+cd ar
+call vscmake
+cd ..
+rem cd graphics
+rem call vscmake
+rem cd ..
+echo *
+echo *******************
+echo * Compilation end *
+echo *******************
+cd ..
+cd src
 goto :end
 
 :nocompiler
@@ -49,7 +70,7 @@ echo * 'cl' not found
 echo *
 echo * Visual Studio is missing or environment isn't set correctly
 echo * please use the "Visual Studio command prompt" shortcut 
-echo * or execute vcvars32.bat
+echo * or execute vcvars32.bat / vcvarsall.bat
 echo *
 
 :end
