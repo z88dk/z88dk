@@ -1,8 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <string.h>
 
-#ifdef WIN32
+#if defined(_WIN32) || defined(WIN32)
 #define strcasecmp(a,b) stricmp(a,b)
 #endif
+
 
 #define LDRIM(r)                \
           st+= 7,               \
