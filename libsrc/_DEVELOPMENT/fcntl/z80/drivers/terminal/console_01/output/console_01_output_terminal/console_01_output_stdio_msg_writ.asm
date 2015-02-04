@@ -17,8 +17,9 @@ console_01_output_stdio_msg_writ:
    ; HL = number of bytes successfully output
    ; carry set if error
 
+   push hl                     ; num chars to output
+   
    exx
-   ld de,0
 
 writ_loop:
 
@@ -32,16 +33,14 @@ writ_loop:
    
    exx
    
-   inc de
-   
    cpi                         ; hl++, bc--
    jp pe, writ_loop
 
 writ_end:
 
-   push de
    exx
-   pop hl                      ; hl = num chars successfully output
+
+   pop hl                      ; hl = num chars to output
    
    or a
    ret
