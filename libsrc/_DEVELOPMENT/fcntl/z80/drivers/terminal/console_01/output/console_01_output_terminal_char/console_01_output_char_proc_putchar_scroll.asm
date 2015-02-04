@@ -28,12 +28,12 @@ console_01_output_char_proc_putchar_scroll:
    jr nc, pause_scroll         ; if scroll_amount >= scroll_limit
 
    neg
-   ld (ix+20),a
-
-   jr scroll_immediate
+   jr scroll_immediate_0
 
 pause_scroll:
 
+   ld b,a                      ; b = excess scroll amount
+   
    push bc
 
    ld a,ITERM_MSG_BELL
@@ -45,6 +45,13 @@ pause_scroll:
    call l_jpix
 
    pop bc
+   
+   ld a,(ix+20)
+   sub b
+
+scroll_immediate_0:
+
+   ld (ix+20),a                ; new scroll limit
 
 scroll_immediate:
 
