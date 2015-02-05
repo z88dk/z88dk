@@ -1,7 +1,7 @@
 /*
  * CPP main program.
  *
- * $Id: cpp1.c,v 1.3 2008-05-26 06:53:01 stefano Exp $
+ * $Id: cpp1.c,v 1.4 2015-02-05 20:17:27 stefano Exp $
  *
  *
  * Edit history
@@ -322,7 +322,7 @@ char		*argv[];
 }
 
 FILE_LOCAL
-cppmain()
+void cppmain()
 /*
  * Main process for cpp -- copies tokens from the current input
  * stream (main file, include file, or a macro) to the output
@@ -331,7 +331,6 @@ cppmain()
 {
 	register int		c;		/* Current character	*/
 	register int		counter;	/* newlines and spaces	*/
-	extern int		output();	/* Output one character	*/
 
 	/*
 	 * Explicitly output a #line at the start of cpp output so
@@ -453,7 +452,7 @@ end_line:   if (c == '\n') {			/* Compiling at EOL?	*/
 
 int join=0;
 
-output(c)
+void output(c)
 int		c;
 /*
  * Output one character to stdout -- output() is passed as an
@@ -482,7 +481,7 @@ int		c;
 static char	*sharpfilename = NULL;
 
 FILE_LOCAL
-sharp()
+void sharp()
 /*
  * Output a line number line.
  */

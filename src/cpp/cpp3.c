@@ -3,7 +3,7 @@
  *
  *		    File open and command line options
  *
- * $Id: cpp3.c,v 1.4 2008-05-26 06:53:01 stefano Exp $
+ * $Id: cpp3.c,v 1.5 2015-02-05 20:17:27 stefano Exp $
  *
  *
  * Edit history
@@ -47,7 +47,7 @@ char		*filename;
 	return (TRUE);
 }
 
-addfile(fp, filename)
+void addfile(fp, filename)
 FILE		*fp;			/* Open file pointer		*/
 char		*filename;		/* Name of the file		*/
 /*

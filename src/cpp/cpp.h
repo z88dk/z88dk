@@ -5,7 +5,7 @@
  * In general, definitions in this file should not be changed.
  *
  *
- * $Id: cpp.h,v 1.2 2008-05-26 06:53:01 stefano Exp $
+ * $Id: cpp.h,v 1.3 2015-02-05 20:17:26 stefano Exp $
  *
  */
 
@@ -122,7 +122,7 @@
 #define	T_UNSIGNED	128
 #define	T_PTR		256		/* Pointer			*/
 #define	T_FPTR		512		/* Pointer to functions		*/
-
+
 /*
  * The DEFBUF structure stores information about #defined
  * macros.  Note that the defbuf->repl information is always
@@ -130,10 +130,10 @@
  */
 
 typedef struct defbuf {
-	struct defbuf	*link;		/* Next define in chain	*/
+	struct defbuf	*link;	/* Next define in chain	*/
 	char		*repl;		/* -> replacement	*/
-	int		hash;		/* Symbol table hash	*/
-	int		nargs;		/* For define(args)	*/
+	int		hash;			/* Symbol table hash	*/
+	int		nargs;			/* For define(args)	*/
 	char		name[1];	/* #define name		*/
 } DEFBUF;
 
@@ -143,14 +143,14 @@ typedef struct defbuf {
  */
 
 typedef struct fileinfo {
-	char		*bptr;		/* Buffer pointer	*/
-	int		line;		/* for include or macro	*/
-	FILE		*fp;		/* File if non-null	*/
+	char		*bptr;			/* Buffer pointer	*/
+	int		line;				/* for include or macro	*/
+	FILE		*fp;			/* File if non-null	*/
 	struct fileinfo	*parent;	/* Link to includer	*/
-	char		*filename;	/* File/macro name	*/
-	char		*progname;	/* From #line statement	*/
+	char		*filename;		/* File/macro name	*/
+	char		*progname;		/* From #line statement	*/
 	unsigned int	unrecur;	/* For macro recursion	*/
-	char		buffer[1];	/* current input line	*/
+	char		buffer[1];		/* current input line	*/
 } FILEINFO;
 
 /*
@@ -198,35 +198,51 @@ typedef struct sizes {
  * Externs
  */
 
-extern int	line;			/* Current line number		*/
-extern int	wrongline;		/* Force #line to cc pass 1	*/
-extern char	type[];			/* Character classifier		*/
+extern int	line;				/* Current line number		*/
+extern int	wrongline;			/* Force #line to cc pass 1	*/
+extern char	type[];				/* Character classifier		*/
 extern char	token[IDMAX + 1];	/* Current input token		*/
-extern int	instring;		/* TRUE if scanning string	*/
-extern int	inmacro;		/* TRUE if scanning #define	*/
-extern int	errors;			/* Error counter		*/
-extern int	recursion;		/* Macro depth counter		*/
+extern int	instring;			/* TRUE if scanning string	*/
+extern int	inmacro;			/* TRUE if scanning #define	*/
+extern int	errors;				/* Error counter		*/
+extern int	recursion;			/* Macro depth counter		*/
 extern char	ifstack[BLK_NEST];	/* #if information		*/
 #define	compiling ifstack[0]
-extern char	*ifptr;			/* -> current ifstack item	*/
+extern char	*ifptr;				/* -> current ifstack item	*/
 extern char	*incdir[NINCLUDE];	/* -i directories		*/
-extern char	**incend;		/* -> active end of incdir	*/
-extern int	cflag;			/* -C option (keep comments)	*/
-extern int	eflag;			/* -E option (ignore errors)	*/
-extern int	nflag;			/* -N option (no pre-defines)	*/
-extern int	pflag;			/* -P option (no #line lines)	*/
+extern char	**incend;			/* -> active end of incdir	*/
+extern int	cflag;				/* -C option (keep comments)	*/
+extern int	eflag;				/* -E option (ignore errors)	*/
+extern int	nflag;				/* -N option (no pre-defines)	*/
+extern int	pflag;				/* -P option (no #line lines)	*/
 extern int	rec_recover;		/* unwind recursive macros	*/
-extern char	*preset[];		/* Standard predefined symbols	*/
-extern char	*magic[];		/* Magic predefined symbols	*/
+extern char	*preset[];			/* Standard predefined symbols	*/
+extern char	*magic[];			/* Magic predefined symbols	*/
 extern FILEINFO	*infile;		/* Current input file		*/
 extern char	work[NWORK + 1];	/* #define scratch		*/
-extern char	*workp;			/* Free space in work		*/
+extern char	*workp;				/* Free space in work		*/
 #if	DEBUG
-extern int	debug;			/* Debug level			*/
+extern int	debug;				/* Debug level			*/
 #endif
 extern int	keepcomments;		/* Don't remove comments if set	*/
-extern SIZES	size_table[];		/* For #if sizeof sizes		*/
-extern char	*getmem();		/* Get memory or die.		*/
+extern SIZES	size_table[];	/* For #if sizeof sizes		*/
+extern char	*getmem();			/* Get memory or die.		*/
 extern DEFBUF	*lookid();		/* Look for a #define'd thing	*/
-extern DEFBUF	*defendel();		/* Symbol table enter/delete	*/
+extern DEFBUF	*defendel();	/* Symbol table enter/delete	*/
 extern char	*savestring();		/* Stuff string in malloc mem.	*/
+
+void addfile(FILE *fp, char *filename);
+void textput(char *text);
+void output(int c);				/* Output one character	*/
+FILE_LOCAL void cppmain();
+FILE_LOCAL void sharp();
+FILE_LOCAL expstuff(DEFBUF *tokenp);	/* Current macro being expanded	*/
+
+
+/* Error message handling */
+void cierror(char *format, int narg);
+void cerror(char *format, char *sarg);
+void cfatal(char *format, char *sarg);
+void cwarn(char *format, char *sarg);
+void ciwarn(char *format, int narg);
+void domsg(char *severity, char *format, intptr_t arg);

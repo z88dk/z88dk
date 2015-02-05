@@ -2,7 +2,7 @@
  *			    C P P 4 . C
  *		M a c r o  D e f i n i t i o n s
  *
- * $Id: cpp4.c,v 1.5 2013-11-23 09:04:36 dom Exp $
+ * $Id: cpp4.c,v 1.6 2015-02-05 20:17:27 stefano Exp $
  *
  *
  * Edit History
@@ -340,7 +340,7 @@ doundef()
 	}
 }
 
-textput(text)
+void textput(text)
 char		*text;
 /*
  * Put the string in the parm[] buffer.
@@ -473,7 +473,7 @@ register DEFBUF	*tokenp;
 		if (debug)
 		    dumpparm("expand");
 #endif
-	    }				/* Collect arguments		*/
+	    }					/* Collect arguments		*/
 	case DEF_NOARGS:		/* No parameters just stuffs	*/
 	    expstuff(tokenp);		/* Do actual parameters		*/
 	}				/* nargs switch			*/

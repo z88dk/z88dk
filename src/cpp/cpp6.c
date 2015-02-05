@@ -2,7 +2,7 @@
  *			    C P P 6 . C
  *		S u p p o r t   R o u t i n e s
  *
- * $Id: cpp6.c,v 1.9 2013-11-24 18:01:28 dom Exp $
+ * $Id: cpp6.c,v 1.10 2015-02-05 20:17:27 stefano Exp $
  *
  *
  * Edit History
@@ -922,7 +922,7 @@ cget()
  * are shorter than  char *'s.
  */
 
-static void
+void
 domsg(severity, format, arg)
 char		*severity;		/* "Error", "Warning", "Fatal"	*/
 char		*format;		/* Format for the error message	*/
@@ -963,56 +963,56 @@ intptr_t arg;			/* Something for the message	*/
 	}
 }
 
-cerror(format, sarg)
+void cerror(format, sarg)
 char		*format;
 char		*sarg;		/* Single string argument		*/
 /*
  * Print a normal error message, string argument.
  */
 {
-	domsg("SError", format, sarg);
+	domsg("SError", format, (intptr_t)sarg);
 	errors++;
 }
 
-cierror(format, narg)
+void cierror(format, narg)
 char		*format;
 int		narg;		/* Single numeric argument		*/
 /*
  * Print a normal error message, numeric argument.
  */
 {
-	domsg("IError", format, narg);	// !!!
+	domsg("IError", format, (intptr_t)narg);	// !!!
 	errors++;
 }
 
-cfatal(format, sarg)
+void cfatal(format, sarg)
 char		*format;
 char		*sarg;			/* Single string argument	*/
 /*
  * A real disaster
  */
 {
-	domsg("SFatal error", format, sarg);
+	domsg("SFatal error", format, (intptr_t)sarg);
 	exit(IO_ERROR);
 }
 
-cwarn(format, sarg)
+void cwarn(format, sarg)
 char		*format;
 char		*sarg;			/* Single string argument	*/
 /*
  * A non-fatal error, string argument.
  */
 {
-	domsg("SWarning", format, sarg);
+	domsg("SWarning", format, (intptr_t)sarg);
 }
 
-ciwarn(format, narg)
+void ciwarn(format, narg)
 char		*format;
 int		narg;			/* Single numeric argument	*/
 /*
  * A non-fatal error, numeric argument.
  */
 {
-	domsg("IWarning", format, narg);	// !!!
+	domsg("IWarning", format, (intptr_t)narg);	// !!!
 }
 
