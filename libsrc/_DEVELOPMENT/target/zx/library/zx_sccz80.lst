@@ -6,6 +6,7 @@
 @error/error.lst
 @fcntl/fcntl_sccz80.lst
 @font/font_4x8/fonts.lst
+@font/font_8x8/fonts.lst
 @font/fzx/fzx_sccz80.lst
 @font/fzx/zx/zx_sccz80.lst
 @input/zx/input_sccz80.lst
