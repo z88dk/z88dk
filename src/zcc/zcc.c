@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.85 2015-02-01 21:05:09 aralbrec Exp $
+ *      $Id: zcc.c,v 1.86 2015-02-05 07:33:01 aralbrec Exp $
  */
 
 
@@ -665,8 +665,15 @@ int main(int argc, char **argv)
                 exit(0);
             }
         case PFILE:
-            if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES, NO))
-                exit(1);
+            if ( compiler_type == CC_SDCC) {
+               if (process(".i", ".asm2", c_compiler, comparg, compiler_style, i, YES, NO))
+                  exit(1);
+               if (process(".asm2", ".asm", "sed", "-r \"s/#/+/g\"", filter, i, YES, NO))
+                  exit(1);
+			} else {
+               if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES, NO))
+                   exit(1);
+			}
         case AFILE:
             switch (peepholeopt) {
             case 1:
@@ -1233,7 +1240,7 @@ static void configure_compiler()
         compiler_type = CC_SDCC;
         // snprintf(buf,sizeof(buf),"-mz80 --reserve-regs-iy --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
 		// move restriction on iy to target cfg
-        snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
+        snprintf(buf,sizeof(buf),"-mz80_z88dk --no-optsdcc-in-asm --c1mode --no-peep",sdcc_assemblernames[assembler_type]);
         add_option_to_compiler(buf);
         preprocarg = " -DZ88DK_USES_SDCC=1";
         BuildOptions(&cpparg, preprocarg);
