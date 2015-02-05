@@ -5,7 +5,7 @@
 
 SECTION code_math
 
-PUBLIC l_small_mul_64_32x32
+PUBLIC l_small_mul_64_32x32, l0_small_mul_64_32x32
 
 l_small_mul_64_32x32:
 
@@ -32,6 +32,8 @@ l_small_mul_64_32x32:
    ld h,a
    exx
    pop de
+
+l0_small_mul_64_32x32:
 
    ; bc'bc = 32-bit multiplicand
    ; de'de = 32-bit multiplicand
