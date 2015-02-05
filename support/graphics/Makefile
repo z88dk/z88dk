@@ -1,9 +1,12 @@
 
 OBJS = z80svg.o 
 
+
 INSTALL ?= install
-CFLAGS += `pkg-config libxml-2.0 --cflags`
-LIBS += `pkg-config libxml-2.0 --libs`
+
+XML2CONFIG ?= xml2-config
+LIBS += `$(XML2CONFIG) --libs`
+CFLAGS += `$(XML2CONFIG) --cflags`
 
 
 all: z80svg$(EXESUFFIX)
