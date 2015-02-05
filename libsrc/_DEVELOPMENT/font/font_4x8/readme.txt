@@ -11,6 +11,6 @@ pixel wide character is stored in a single byte with
 the first four bits repeated in the second four bits.
 This speeds up printing on some targets.
 
-* font_4x8_def.bin
+* font_4x8_default.bin
 
 The default 4x8 font by Dominic Morris.
