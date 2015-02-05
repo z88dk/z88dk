@@ -1,9 +1,9 @@
 @echo off
-rem $Id: vscmake.bat,v 1.1 2015-02-04 16:31:54 stefano Exp $
+rem $Id: vscmake.bat,v 1.2 2015-02-05 12:28:02 stefano Exp $
 
 echo ********************
 echo * Building zpragma *
 echo ********************
-cl /Fezcpp -D _CRT_SECURE_NO_DEPRECATE *.c
+cl /Fezpragma -D _CRT_SECURE_NO_DEPRECATE *.c
 move zpragma.exe ..\..\bin
 del *.obj
