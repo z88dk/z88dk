@@ -321,7 +321,7 @@ include "clib_target_constants.inc"
       
       EXTERN _font_4x8_default
       
-      defw _font_4x8_default
+      defw _font_4x8_default - 256
       defb 56
       defb 0
       defb 56

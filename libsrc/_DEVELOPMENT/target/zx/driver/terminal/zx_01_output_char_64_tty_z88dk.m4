@@ -153,7 +153,7 @@ define(`m4_zx_01_output_char_64_tty_z88dk',dnl
       
       EXTERN $10
       
-      defw $10
+      defw $10 - 256
       defb $11
       defb $12
       defb $13

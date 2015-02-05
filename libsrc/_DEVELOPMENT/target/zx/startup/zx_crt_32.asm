@@ -205,7 +205,7 @@ include "clib_target_constants.inc"
    ; cursor coord  : (0,0)
    ; window        : (0,32,0,24)
    ; scroll limit  : 0
-   ; font address  : _font_8x8_rom
+   ; font address  : _font_8x8_zx_system
    ; text colour   : 56
    ; text mask     : 0
    ; background    : 56
@@ -319,9 +319,9 @@ include "clib_target_constants.inc"
       ; text mask
       ; background colour
       
-      EXTERN _font_8x8_rom
+      EXTERN _font_8x8_zx_system
       
-      defw _font_8x8_rom
+      defw _font_8x8_zx_system - 256
       defb 56
       defb 0
       defb 56
