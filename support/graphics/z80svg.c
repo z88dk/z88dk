@@ -11,7 +11,7 @@
    MinGW
    gcc -Wall -O2 -o z80svg z80svg.c libxml2.dll
 
-   $Id: z80svg.c,v 1.16 2013-03-01 09:42:47 stefano Exp $
+   $Id: z80svg.c,v 1.17 2015-02-05 15:14:59 dom Exp $
  * ----------------------------------------------------------
 */
 
@@ -895,7 +895,7 @@ autoloop:
     {
 		fprintf(stderr,"Error, can't open the destination file   %s\n", Dummy);
 		xmlFreeDoc(doc);
-		(void)fcloseall();
+		// (void)fcloseall();
 		exit(16);
     }
 	fprintf(stderr,"\nOutput file is %s\n", Dummy);
@@ -906,7 +906,7 @@ autoloop:
 	if( ferror( dest ) ) {
 		fprintf(stderr, "Error writing on target file:  %s\n", dname );
 		xmlFreeDoc(doc);
-		(void)fcloseall();
+		// (void)fcloseall();
 		exit(17);
     }
 
@@ -1435,7 +1435,7 @@ autoloop:
 		fprintf(stderr,"\nbottom : %f",abm);
 	}
 
-    (void)fcloseall();
+    //(void)fcloseall();
 
 	fprintf(stderr,"\n\n");
 	if (autosize==1) {
@@ -1472,7 +1472,7 @@ autoloop:
 	fprintf(stderr,"\n\nConversion done.\n");
 
 	xmlFreeDoc(doc);
-	(void)fcloseall();
+	//(void)fcloseall();
 	return(0);
 }
 
