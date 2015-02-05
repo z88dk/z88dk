@@ -76,7 +76,8 @@ putchar_ok:
    
    ld e,(ix+14)
    ld d,(ix+15)
-      
+
+   ; b = parameter
    ; c = ascii code
    ; e = x coord
    ; d = y coord
@@ -98,15 +99,14 @@ x_ok:
 
    ; scroll upward
    
-   ld b,e
-   push bc                     ; save x, char
+   push bc                     ; save param, char
+   push de                     ; save x
    
    inc a
    call console_01_output_char_proc_putchar_scroll
    
-   pop bc                      ; b = x, c = char
-   
-   ld e,b
+   pop bc                      ; b = param, c = char
+   pop de                      ; e = x
    
    ld d,(ix+19)
    dec d                       ; d = y = window.height - 1
