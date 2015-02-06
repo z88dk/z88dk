@@ -106,7 +106,7 @@ struct sp1_ap {                       // "attribute pairs" - 2 bytes - A struct 
 struct sp1_tp {                       // "tile pairs" - 3 bytes - A struct to hold background colour and tile pairs
 
    uint8_t              attr;           // +0 colour
-   uint16_t               tile;           // +1 tile code
+   uint16_t             tile;           // +1 tile code
 
 };
 
@@ -176,7 +176,7 @@ extern void                  sp1_ChangeSprType(struct sp1_cs *c, void *drawf);
 extern void                  sp1_DeleteSpr(struct sp1_ss *s);   // only call after sprite is moved off screen
 
 extern void                  sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint16_t row, uint16_t col, uint16_t vrot, uint16_t hrot);
-extern void                  sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
+extern void                  sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, int rel_row, int rel_col, int rel_vrot, int rel_hrot);
 extern void                  sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint16_t x, uint16_t y);
 
 extern void                  sp1_IterateSprChar(struct sp1_ss *s, void *hook1);
@@ -279,52 +279,52 @@ extern struct sp1_ss  sp1_struct_ss_prototype;
 
 // draw functions for sprites with two-byte graphical definitions, ie (mask,graphic) pairs
 
-extern void  __LIB__  SP1_DRAW_MASK2(void);        // masked sprite 2-byte definition (mask,graph) pairs ; sw rotation will use MASK2_NR if no rotation necessary
-extern void  __LIB__  SP1_DRAW_MASK2NR(void);      // masked sprite 2-byte definition (mask,graph) pairs ; no rotation applied, graphic always drawn at exact tile boundary
-extern void  __LIB__  SP1_DRAW_MASK2LB(void);      // masked sprite 2-byte definition (mask,graph) pairs ; sw rotation as MASK2 but for left boundary of sprite only
-extern void  __LIB__  SP1_DRAW_MASK2RB(void);      // masked sprite 2-byte definition (mask,graph) pairs ; sw rotation as MASK2 but for right boundary of sprite only
+extern void           SP1_DRAW_MASK2(void);        // masked sprite 2-byte definition (mask,graph) pairs ; sw rotation will use MASK2_NR if no rotation necessary
+extern void           SP1_DRAW_MASK2NR(void);      // masked sprite 2-byte definition (mask,graph) pairs ; no rotation applied, graphic always drawn at exact tile boundary
+extern void           SP1_DRAW_MASK2LB(void);      // masked sprite 2-byte definition (mask,graph) pairs ; sw rotation as MASK2 but for left boundary of sprite only
+extern void           SP1_DRAW_MASK2RB(void);      // masked sprite 2-byte definition (mask,graph) pairs ; sw rotation as MASK2 but for right boundary of sprite only
 
-extern void  __LIB__  SP1_DRAW_LOAD2(void);        // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation will use LOAD2_NR if no rotation necessary
-extern void  __LIB__  SP1_DRAW_LOAD2NR(void);      // load sprite 2-byte definition (mask,graph) pairs mask ignored; no rotation applied, always drawn at exact tile boundary
-extern void  __LIB__  SP1_DRAW_LOAD2LB(void);      // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for left boundary of sprite only
-extern void  __LIB__  SP1_DRAW_LOAD2RB(void);      // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for right boundary of sprite only
+extern void           SP1_DRAW_LOAD2(void);        // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation will use LOAD2_NR if no rotation necessary
+extern void           SP1_DRAW_LOAD2NR(void);      // load sprite 2-byte definition (mask,graph) pairs mask ignored; no rotation applied, always drawn at exact tile boundary
+extern void           SP1_DRAW_LOAD2LB(void);      // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for left boundary of sprite only
+extern void           SP1_DRAW_LOAD2RB(void);      // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for right boundary of sprite only
 
-extern void  __LIB__  SP1_DRAW_OR2(void);          // or sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation will use OR2_NR if no rotation necessary
-extern void  __LIB__  SP1_DRAW_OR2NR(void);        // or sprite 2-byte definition (mask,graph) pairs mask ignored; no rotation applied, always drawn at exact tile boundary
-extern void  __LIB__  SP1_DRAW_OR2LB(void);        // or sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as OR2 but for left boundary of sprite only
-extern void  __LIB__  SP1_DRAW_OR2RB(void);        // or sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as OR2 but for right boundary of sprite only
+extern void           SP1_DRAW_OR2(void);          // or sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation will use OR2_NR if no rotation necessary
+extern void           SP1_DRAW_OR2NR(void);        // or sprite 2-byte definition (mask,graph) pairs mask ignored; no rotation applied, always drawn at exact tile boundary
+extern void           SP1_DRAW_OR2LB(void);        // or sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as OR2 but for left boundary of sprite only
+extern void           SP1_DRAW_OR2RB(void);        // or sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as OR2 but for right boundary of sprite only
 
-extern void  __LIB__  SP1_DRAW_XOR2(void);         // xor sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation will use XOR2_NR if no rotation necessary
-extern void  __LIB__  SP1_DRAW_XOR2NR(void);       // xor sprite 2-byte definition (mask,graph) pairs mask ignored; no rotation applied, always drawn at exact tile boundary
-extern void  __LIB__  SP1_DRAW_XOR2LB(void);       // xor sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as XOR2 but for left boundary of sprite only
-extern void  __LIB__  SP1_DRAW_XOR2RB(void);       // xor sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as XOR2 but for right boundary of sprite only
+extern void           SP1_DRAW_XOR2(void);         // xor sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation will use XOR2_NR if no rotation necessary
+extern void           SP1_DRAW_XOR2NR(void);       // xor sprite 2-byte definition (mask,graph) pairs mask ignored; no rotation applied, always drawn at exact tile boundary
+extern void           SP1_DRAW_XOR2LB(void);       // xor sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as XOR2 but for left boundary of sprite only
+extern void           SP1_DRAW_XOR2RB(void);       // xor sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as XOR2 but for right boundary of sprite only
 
-extern void  __LIB__  SP1_DRAW_LOAD2LBIM(void);    // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for left boundary of sprite w/ implied mask
-extern void  __LIB__  SP1_DRAW_LOAD2RBIM(void);    // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for right boundary of sprite w/ implied mask
+extern void           SP1_DRAW_LOAD2LBIM(void);    // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for left boundary of sprite w/ implied mask
+extern void           SP1_DRAW_LOAD2RBIM(void);    // load sprite 2-byte definition (mask,graph) pairs mask ignored; sw rotation as LOAD2 but for right boundary of sprite w/ implied mask
 
 // draw functions for sprites with one-byte graphical definitions, ie no mask just graphics
 
-extern void  __LIB__  SP1_DRAW_LOAD1(void);        // load sprite 1-byte definition graph only no mask; sw rotation will use LOAD1_NR if no rotation necessary
-extern void  __LIB__  SP1_DRAW_LOAD1NR(void);      // load sprite 1-byte definition graph only no mask; no rotation applied, always drawn at exact tile boundary
-extern void  __LIB__  SP1_DRAW_LOAD1LB(void);      // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for left boundary of sprite only
-extern void  __LIB__  SP1_DRAW_LOAD1RB(void);      // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for right boundary of sprite only
+extern void           SP1_DRAW_LOAD1(void);        // load sprite 1-byte definition graph only no mask; sw rotation will use LOAD1_NR if no rotation necessary
+extern void           SP1_DRAW_LOAD1NR(void);      // load sprite 1-byte definition graph only no mask; no rotation applied, always drawn at exact tile boundary
+extern void           SP1_DRAW_LOAD1LB(void);      // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for left boundary of sprite only
+extern void           SP1_DRAW_LOAD1RB(void);      // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for right boundary of sprite only
 
-extern void  __LIB__  SP1_DRAW_OR1(void);          // or sprite 1-byte definition graph only no mask; sw rotation will use OR1_NR if no rotation necessary
-extern void  __LIB__  SP1_DRAW_OR1NR(void);        // or sprite 1-byte definition graph only no mask; no rotation applied, always drawn at exact tile boundary
-extern void  __LIB__  SP1_DRAW_OR1LB(void);        // or sprite 1-byte definition graph only no mask; sw rotation as OR1 but for left boundary of sprite only
-extern void  __LIB__  SP1_DRAW_OR1RB(void);        // or sprite 1-byte definition graph only no mask; sw rotation as OR1 but for right boundary of sprite only
+extern void           SP1_DRAW_OR1(void);          // or sprite 1-byte definition graph only no mask; sw rotation will use OR1_NR if no rotation necessary
+extern void           SP1_DRAW_OR1NR(void);        // or sprite 1-byte definition graph only no mask; no rotation applied, always drawn at exact tile boundary
+extern void           SP1_DRAW_OR1LB(void);        // or sprite 1-byte definition graph only no mask; sw rotation as OR1 but for left boundary of sprite only
+extern void           SP1_DRAW_OR1RB(void);        // or sprite 1-byte definition graph only no mask; sw rotation as OR1 but for right boundary of sprite only
 
-extern void  __LIB__  SP1_DRAW_XOR1(void);         // xor sprite 1-byte definition graph only no mask; sw rotation will use XOR1_NR if no rotation necessary
-extern void  __LIB__  SP1_DRAW_XOR1NR(void);       // xor sprite 1-byte definition graph only no mask; no rotation applied, always drawn at exact tile boundary
-extern void  __LIB__  SP1_DRAW_XOR1LB(void);       // xor sprite 1-byte definition graph only no mask; sw rotation as XOR1 but for left boundary of sprite only
-extern void  __LIB__  SP1_DRAW_XOR1RB(void);       // xor sprite 1-byte definition graph only no mask; sw rotation as XOR1 but for right boundary of sprite only
+extern void           SP1_DRAW_XOR1(void);         // xor sprite 1-byte definition graph only no mask; sw rotation will use XOR1_NR if no rotation necessary
+extern void           SP1_DRAW_XOR1NR(void);       // xor sprite 1-byte definition graph only no mask; no rotation applied, always drawn at exact tile boundary
+extern void           SP1_DRAW_XOR1LB(void);       // xor sprite 1-byte definition graph only no mask; sw rotation as XOR1 but for left boundary of sprite only
+extern void           SP1_DRAW_XOR1RB(void);       // xor sprite 1-byte definition graph only no mask; sw rotation as XOR1 but for right boundary of sprite only
 
-extern void  __LIB__  SP1_DRAW_LOAD1LBIM(void);    // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for left boundary of sprite with implied mask
-extern void  __LIB__  SP1_DRAW_LOAD1RBIM(void);    // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for right boundary of sprite with implied mask
+extern void           SP1_DRAW_LOAD1LBIM(void);    // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for left boundary of sprite with implied mask
+extern void           SP1_DRAW_LOAD1RBIM(void);    // load sprite 1-byte definition graph only no mask; sw rotation as LOAD1 but for right boundary of sprite with implied mask
 
 // draw functions for sprites without graphics
 
-extern void  __LIB__  SP1_DRAW_ATTR(void);         // pixels are not drawn, only attributes
+extern void           SP1_DRAW_ATTR(void);         // pixels are not drawn, only attributes
 
 
 // void *hook1  <->  void [ __FASTCALL__ ] (*hook1)(uint16_t count, struct sp1_cs *c)      // if __FASTCALL__ only struct sp1_cs* passed
@@ -338,7 +338,7 @@ extern void               __LIB__   sp1_ChangeSprType(struct sp1_cs *c, void *dr
 extern void  __FASTCALL__ __LIB__   sp1_DeleteSpr(struct sp1_ss *s);   // only call after sprite is moved off screen
 
 extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint16_t row, uint16_t col, uint16_t vrot, uint16_t hrot);
-extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
+extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, int rel_row, int rel_col, int rel_vrot, int rel_hrot);
 extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint16_t x, uint16_t y);
 
 extern void               __LIB__   sp1_IterateSprChar(struct sp1_ss *s, void *hook1);
@@ -363,7 +363,7 @@ extern void  __FASTCALL__ __LIB__   sp1_RemoveCharStruct(struct sp1_cs *cs);
 extern struct sp1_ss __CALLEE__ __LIB__ *sp1_CreateSpr_callee(void *drawf, uint16_t type, uint16_t height, int graphic, uint16_t plane);
 extern uint16_t          __CALLEE__ __LIB__  sp1_AddColSpr_callee(struct sp1_ss *s, void *drawf, uint16_t type, int graphic, uint16_t plane);
 extern void          __CALLEE__ __LIB__  sp1_MoveSprAbs_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint16_t row, uint16_t col, uint16_t vrot, uint16_t hrot);
-extern void          __CALLEE__ __LIB__  sp1_MoveSprRel_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
+extern void          __CALLEE__ __LIB__  sp1_MoveSprRel_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, int rel_row, int rel_col, int rel_vrot, int rel_hrot);
 extern void          __CALLEE__ __LIB__  sp1_MoveSprPix_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint16_t x, uint16_t y);
 extern void          __CALLEE__ __LIB__  sp1_IterateSprChar_callee(struct sp1_ss *s, void *hook1);
 extern void          __CALLEE__ __LIB__  sp1_IterateUpdateSpr_callee(struct sp1_ss *s, void *hook2);
