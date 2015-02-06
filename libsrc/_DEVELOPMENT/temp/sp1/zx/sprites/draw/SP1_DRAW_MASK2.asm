@@ -7,16 +7,16 @@ INCLUDE "clib_target_cfg.asm"
 
 SECTION code_temp_sp1
 
-PUBLIC SP1_DRAW_MASK2
+PUBLIC _SP1_DRAW_MASK2
 
-EXTERN SP1_DRAW_MASK2NR
+EXTERN _SP1_DRAW_MASK2NR
 EXTERN SP1RETSPRDRAW
 
 ; following data segment copied into struct sp1_cs
 
    ld hl,0
    ld ix,0
-   call SP1_DRAW_MASK2
+   call _SP1_DRAW_MASK2
 
 ; following draw code called by way of SP1UpdateNow
 ;
@@ -27,10 +27,10 @@ EXTERN SP1RETSPRDRAW
 ;
 ; 51 + 146*8 - 6 + 10 = 1223 cycles
 
-.SP1_DRAW_MASK2
+_SP1_DRAW_MASK2:
 
    cp SP1V_ROTTBL/256
-   jp z, SP1_DRAW_MASK2NR
+   jp z, _SP1_DRAW_MASK2NR
 
    add hl,bc
    add ix,bc
@@ -41,7 +41,7 @@ EXTERN SP1RETSPRDRAW
    ; de = sprite def (mask,graph) pairs
    ; ix = left sprite def
 
-.SP1Mask2Rotate
+_SP1Mask2Rotate:
 
    ; 0
 

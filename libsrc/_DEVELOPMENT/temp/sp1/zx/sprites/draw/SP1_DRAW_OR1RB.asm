@@ -7,9 +7,9 @@ INCLUDE "clib_target_cfg.asm"
 
 SECTION code_temp_sp1
 
-PUBLIC SP1_DRAW_OR1RB
+PUBLIC _SP1_DRAW_OR1RB
 
-EXTERN SP1_DRAW_OR1LB
+EXTERN _SP1_DRAW_OR1LB
 EXTERN SP1RETSPRDRAW
 
 ; following data segment copied into struct sp1_cs
@@ -17,7 +17,7 @@ EXTERN SP1RETSPRDRAW
    ld de,0
    nop
    ld hl,0
-   call SP1_DRAW_OR1RB
+   call _SP1_DRAW_OR1RB
 
 ; following draw code called by way of SP1UpdateNow
 ;
@@ -28,7 +28,7 @@ EXTERN SP1RETSPRDRAW
 ;
 ; 42 + 94*4 - 6 + 10 = 422 cycles
 
-.SP1_DRAW_OR1RB
+_SP1_DRAW_OR1RB:
 
    cp SP1V_ROTTBL/256
    jp z, SP1RETSPRDRAW
@@ -40,6 +40,6 @@ EXTERN SP1RETSPRDRAW
    ;  d = shift table
    ; hl = left sprite def (graph only)
 
-.SP1Or1RBRotate
+_SP1Or1RBRotate:
 
-   jp SP1_DRAW_OR1LB + 7
+   jp _SP1_DRAW_OR1LB + 7

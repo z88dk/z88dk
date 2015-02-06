@@ -7,7 +7,7 @@ INCLUDE "clib_target_cfg.asm"
 
 SECTION code_temp_sp1
 
-PUBLIC SP1_DRAW_XOR2NR
+PUBLIC _SP1_DRAW_XOR2NR
 
 EXTERN SP1RETSPRDRAW
 
@@ -16,7 +16,7 @@ EXTERN SP1RETSPRDRAW
    ld hl,0
    nop
    ld de,0
-   call SP1_DRAW_XOR2NR
+   call _SP1_DRAW_XOR2NR
 
 ; following draw code called by way of SP1UpdateNow
 ;
@@ -27,7 +27,7 @@ EXTERN SP1RETSPRDRAW
 ;
 ; 21 + 39*8 - 12 + 10 = 331 cycles
 
-.SP1_DRAW_XOR2NR
+_SP1_DRAW_XOR2NR:
 
    add hl,bc
    ld de,SP1V_PIXELBUFFER

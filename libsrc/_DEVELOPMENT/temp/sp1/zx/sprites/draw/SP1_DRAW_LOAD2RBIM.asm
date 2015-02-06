@@ -7,9 +7,9 @@ INCLUDE "clib_target_cfg.asm"
 
 SECTION code_temp_sp1
 
-PUBLIC SP1_DRAW_LOAD2RBIM
+PUBLIC _SP1_DRAW_LOAD2RBIM
 
-EXTERN SP1_DRAW_LOAD2LBIM
+EXTERN _SP1_DRAW_LOAD2LBIM
 EXTERN SP1RETSPRDRAW
 
 ; following data segment copied into struct sp1_cs
@@ -17,7 +17,7 @@ EXTERN SP1RETSPRDRAW
    ld de,0
    nop
    ld hl,0
-   call SP1_DRAW_LOAD2RBIM
+   call _SP1_DRAW_LOAD2RBIM
    
 ; following draw code called by way of SP1UpdateNow
 ;
@@ -28,7 +28,7 @@ EXTERN SP1RETSPRDRAW
 ;
 ; 64 + 8*54 - 6 + 10 = 500 cycles
 
-.SP1_DRAW_LOAD2RBIM
+_SP1_DRAW_LOAD2RBIM:
 
    cp SP1V_ROTTBL/256
    jp z, SP1RETSPRDRAW
@@ -44,6 +44,6 @@ EXTERN SP1RETSPRDRAW
    ;  c = constant mask
    ; de = sprite def (graph only)
 
-.SP1Load2RBIMRotate
+_SP1Load2RBIMRotate:
 
-   jp SP1_DRAW_LOAD2LBIM + 13
+   jp _SP1_DRAW_LOAD2LBIM + 13
