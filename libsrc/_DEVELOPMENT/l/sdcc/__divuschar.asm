@@ -2,6 +2,7 @@
 SECTION code_l_sdcc
 
 PUBLIC __divuschar
+PUBLIC __divuschar_0
 
 EXTERN l_divs_16_16x16
 
@@ -18,6 +19,9 @@ __divuschar:
    ;       is unknown at this time whether sdcc expects 16-bit results     
 
    ld hl,3
+
+__divuschar_0:
+
    ld d,h                      ; d = 0
    add hl,sp
    

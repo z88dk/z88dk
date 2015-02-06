@@ -2,6 +2,7 @@
 SECTION code_l_sdcc
 
 PUBLIC __divsuchar
+PUBLIC __divsuchar_0
 
 EXTERN __divschar_1
    
@@ -18,6 +19,9 @@ __divsuchar:
    ;       is unknown at this time whether sdcc expects 16-bit results     
 
    ld hl,3
+
+__divsuchar_0:
+
    add hl,sp
    
    ld e,(hl)                   ; e = signed divisor
