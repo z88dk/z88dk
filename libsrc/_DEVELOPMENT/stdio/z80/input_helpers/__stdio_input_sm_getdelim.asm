@@ -5,16 +5,6 @@ PUBLIC __stdio_input_sm_getdelim
 
 EXTERN asm_b_vector_append_block
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-IF (ASMPC & $ff) = 1
-
-   defs 1
-
-ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 __stdio_input_sm_getdelim:
 
    ; GETDELIM STATE MACHINE

@@ -5,16 +5,6 @@ SECTION code_stdio
 
 PUBLIC __stdio_input_sm_gets
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-IF (ASMPC & $ff) = 1
-
-   defs 1
-
-ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 __stdio_input_sm_gets:
 
    ; GETS STATE MACHINE
