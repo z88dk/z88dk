@@ -14,7 +14,7 @@ SECTION code_stdlib
 
 PUBLIC asm_shellsort
 
-EXTERN l_mulu_16_16x16, asm0_memswap, l_jpix
+EXTERN l_mulu_16_16x16, asm0_memswap, l_compare_de_hl
 
 asm_shellsort:
 
@@ -117,40 +117,28 @@ asm_shellsort:
 
 	; for ..; j>0; ..
 	jp	m,i_6
-	
-	push ix
-	
-	; 1st arg:  base+j
-	ld	de,(__stdlib_shellsort_base)
-	;ld	hl,(__stdlib_shellsort_j)
-	push hl
-	add	hl,de
-	ex	(sp),hl	; j <--> base+j
-	
-	; 2nd arg: jd+j
-	ld	de,(__stdlib_shellsort_jd)
-	add	hl,de
-	push	hl
+ 
+        ; hl = j
+        
+        ld c,l
+        ld b,h                 ; bc = j
+        
+        ld hl,(__stdlib_shellsort_jd)
+        add hl,bc
+        
+        ex de,hl               ; de = jd + j
+        
+        ld hl,(__stdlib_shellsort_base)
+        add hl,bc              ; hl = base + j
 
-        call l_jpix
+        ; if ((*compar)(base+j, jd+j) <=0) break;
 
-	pop bc		; we're keeping the same args for the next call !
-	pop de
+        call l_compare_de_hl   ; compare(de = jd+j, hl = base+j)
+        jp p, i_6              ; if *(jd+j) >= *(base+j)
 
-        pop ix
-
-	; if ((*compar)(base+j, jd+j) <=0) break;
-	dec hl
-	bit 7,h
-	jr	nz,i_6	; Negative sign ?   exit loop
-
-	
-	; de = 1st arg
-	; bc = 2nd arg
-	; stack = width
-	
-	ld l,c
-	ld h,b
+        ; de = jd + j (2nd arg)
+        ; hl = base + j (1st arg)
+        ; stack = width
 	
 	pop bc
 	push bc
