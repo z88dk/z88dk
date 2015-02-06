@@ -5,9 +5,11 @@
  * In general, definitions in this file should not be changed.
  *
  *
- * $Id: cpp.h,v 1.3 2015-02-05 20:17:26 stefano Exp $
+ * $Id: cpp.h,v 1.4 2015-02-06 20:34:01 aralbrec Exp $
  *
  */
+
+#include <stdint.h>
 
 #ifndef	TRUE
 #define	TRUE		1
