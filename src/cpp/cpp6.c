@@ -2,7 +2,7 @@
  *			    C P P 6 . C
  *		S u p p o r t   R o u t i n e s
  *
- * $Id: cpp6.c,v 1.10 2015-02-05 20:17:27 stefano Exp $
+ * $Id: cpp6.c,v 1.11 2015-02-07 16:11:43 stefano Exp $
  *
  *
  * Edit History
@@ -127,7 +127,6 @@ OP_LPA,OP_RPA,OP_MUL,OP_ADD,   000,OP_SUB,   DOT,OP_DIV, /* 28 ()*+,-./	*/
 void unget();
 void save(register int	c);
 void ungetstring(char		*text);
-static void domsg(char *severity, char *format, intptr_t arg);
 
 void skipnl()
 /*

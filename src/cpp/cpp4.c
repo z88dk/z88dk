@@ -2,7 +2,7 @@
  *			    C P P 4 . C
  *		M a c r o  D e f i n i t i o n s
  *
- * $Id: cpp4.c,v 1.6 2015-02-05 20:17:27 stefano Exp $
+ * $Id: cpp4.c,v 1.7 2015-02-07 16:14:34 stefano Exp $
  *
  *
  * Edit History
@@ -543,7 +543,7 @@ expcollect()
 }
 
 FILE_LOCAL
-expstuff(tokenp)
+void expstuff(tokenp)
 DEFBUF		*tokenp;		/* Current macro being expanded	*/
 /*
  * Stuff the macro body, replacing formal parameters by actual parameters.

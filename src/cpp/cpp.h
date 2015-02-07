@@ -5,7 +5,7 @@
  * In general, definitions in this file should not be changed.
  *
  *
- * $Id: cpp.h,v 1.4 2015-02-06 20:34:01 aralbrec Exp $
+ * $Id: cpp.h,v 1.5 2015-02-07 16:14:34 stefano Exp $
  *
  */
 
@@ -238,7 +238,7 @@ void textput(char *text);
 void output(int c);				/* Output one character	*/
 FILE_LOCAL void cppmain();
 FILE_LOCAL void sharp();
-FILE_LOCAL expstuff(DEFBUF *tokenp);	/* Current macro being expanded	*/
+FILE_LOCAL void expstuff(DEFBUF *tokenp);	/* Current macro being expanded	*/
 
 
 /* Error message handling */
