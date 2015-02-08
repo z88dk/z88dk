@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.47 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.48 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -23,7 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.h,v 1.47 2015-01-26 23
 #include "xmalloc.h"   /* before any other include */
 
 #include "types.h"
-#include "list.h"
+#include "utarray.h"
 
 /*-----------------------------------------------------------------------------
 *   CPU type

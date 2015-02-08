@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.7 2015-02-01 18:18:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.8 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -17,6 +17,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.7 2015-02-01
 #include "list.h"
 #include "strutil.h"
 #include "types.h"
+#include "utarray.h"
 #include <stdio.h>
 
 /*-----------------------------------------------------------------------------
@@ -61,7 +62,7 @@ END_CLASS;
 /* Open the source file for reading, closing any previously open file.
    If dir_list is not NULL, calls search_file() to search the file in dir_list
    calls incl_recursion_err_cb pointed fucntion in case of recursive include */
-extern Bool SrcFile_open( SrcFile *self, char *filename, List *dir_list );
+extern Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list );
 
 /* get the next line of input, normalize end of line termination (i.e. convert
    "\r", "\r\n" and "\n\r" to "\n"

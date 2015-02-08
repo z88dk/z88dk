@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.25 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.26 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -623,11 +623,11 @@ char *path_dirname( char *filename )
 }
 
 /* search for a file on the given directory list, return full path name */
-void path_search( Str *dest, char *filename, List *dir_list )
+void path_search( Str *dest, char *filename, UT_array *dir_list )
 {
     DEFINE_FILE_STR( pathname );
     struct stat  sb;
-    ListElem	*iter;
+	char **pdir;
 	
     Str_set( dest, filename );		/* default return: input file name */
 
@@ -640,11 +640,9 @@ void path_search( Str *dest, char *filename, List *dir_list )
         return;
 
     /* search in dir_list */
-    for ( iter = List_first( dir_list ); iter != NULL; iter = List_next( iter ) )
+	for (pdir = NULL; (pdir = (char **)utarray_next(dir_list, pdir)) != NULL; )
     {
-        Str_set( pathname, iter->data );
-        Str_append_char( pathname, '/' );
-        Str_append( pathname, filename );
+		Str_sprintf(pathname, "%s/%s", *pdir, filename);
 
         if ( stat( pathname->str, &sb ) == 0 )
         {
@@ -657,7 +655,7 @@ void path_search( Str *dest, char *filename, List *dir_list )
     return;
 }
 
-char *search_file( char *filename, List *dir_list )
+char *search_file( char *filename, UT_array *dir_list )
 {
     DEFINE_FILE_STR( dest );
 	

@@ -14,16 +14,16 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle library file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.h,v 1.3 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.h,v 1.4 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"   /* before any other include */
 
-#include "list.h"
+#include "utarray.h"
 
 extern char Z80libhdr[];
 
 /* make library from list of files; convert each source to object file name */
-extern void make_library( char *lib_filename, List *src_files );
+extern void make_library(char *lib_filename, UT_array *src_files);

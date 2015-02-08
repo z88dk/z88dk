@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle library file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.7 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.8 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -48,13 +48,13 @@ static char *search_libfile( char *filename )
 /*-----------------------------------------------------------------------------
 *	make library from list of files; convert each source to object file name 
 *----------------------------------------------------------------------------*/
-void make_library( char *lib_filename, List *src_files )
+void make_library(char *lib_filename, UT_array *src_files)
 {
 	ByteArray *obj_file_data;
 	FILE	*lib_file;
 	char	*obj_filename;
 	size_t	 fptr, obj_size;
-	ListElem *iter, *last;
+	char **pfile;
 
 	lib_filename = search_libfile(lib_filename);
 	if ( lib_filename == NULL )
@@ -68,13 +68,12 @@ void make_library( char *lib_filename, List *src_files )
 	xfput_strz( lib_file, Z80libhdr );
 
 	/* write each object file */
-	last = List_last( src_files );
-	for ( iter = List_first( src_files ); iter != NULL ; iter = List_next( iter ) )
+	for (pfile = NULL; (pfile = (char **)utarray_next(src_files, pfile)) != NULL; )
 	{
 		fptr = ftell( lib_file );
 
 		/* read object file */
-		obj_filename  = get_obj_filename( iter->data );
+		obj_filename  = get_obj_filename( *pfile );
 		obj_file_data = read_obj_file_data( obj_filename );
 		if ( obj_file_data == NULL )
 		{
@@ -87,8 +86,8 @@ void make_library( char *lib_filename, List *src_files )
 
 		/* write file pointer of next file, or -1 if last */
 		obj_size = ByteArray_size( obj_file_data );
-        if ( iter == last )
-            xfput_uint32( lib_file, -1 );    
+		if (pfile == (char **)utarray_back(src_files))
+			xfput_uint32(lib_file, -1);
         else
             xfput_uint32( lib_file, fptr + 4 + 4 + obj_size ); 
 

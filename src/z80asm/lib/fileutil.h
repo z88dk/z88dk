@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.21 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.22 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -13,6 +13,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.21 2015-02-
 #include "list.h"
 #include "strutil.h"
 #include "types.h"
+#include "utarray.h"
 
 #include <stdio.h>
 
@@ -100,8 +101,8 @@ extern char *path_basename( char *filename );
 extern char *path_dirname( char *filename );
 
 /* search for a file on the given directory list, return full path name */
-extern void path_search( Str *dest, char *filename, List *dir_list );
-extern char *search_file( char *filename, List *dir_list );	/* returned string in strpool */
+extern void path_search( Str *dest, char *filename, UT_array *dir_list );
+extern char *search_file(char *filename, UT_array *dir_list);	/* returned string in strpool */
 
 /* return a temp file name based on the given file: dirname(file).TEMP.basename(file) 
    all files with these names are deleted on exit */

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.195 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.196 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -328,15 +328,15 @@ ReleaseLibraries( void )
  ***************************************************************************************************/
 int main( int argc, char *argv[] )
 {
-	ListElem *iter;
+	char **pfile;
 
 	model_init();						/* init global data */
 	libraryhdr = NULL;              /* initialise to no library files */
 
 	/* parse command line and call-back via assemble_file() */
 	parse_argv(argc, argv);
-	for (iter = List_first(opts.files); iter != NULL; iter = List_next(iter))
-		assemble_file(iter->data);
+	for (pfile = NULL; (pfile = (char**)utarray_next(opts.files, pfile)) != NULL; )
+		assemble_file(*pfile);
 
 	/* Create library */
 	if (!get_num_errors() && opts.lib_file)

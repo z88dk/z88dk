@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.28 2015-02-01 18:18:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.29 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #pragma once
@@ -25,6 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.28 2015-02-01 18:1
 #include "list.h"
 #include "module.h"
 #include "types.h"
+#include "utarray.h"
 
 /*-----------------------------------------------------------------------------
 *   Symbol type bitmasks - bits 3 to 6 same as Expression type bitmasks
@@ -65,7 +66,7 @@ extern void model_init(void);
 *----------------------------------------------------------------------------*/
 
 /* interface to SrcFile singleton */
-extern Bool  src_open( char *filename, List *dir_list );
+extern Bool  src_open( char *filename, UT_array *dir_list );
 extern char *src_getline( void );
 extern void  src_ungetline( char *lines );
 extern char *src_filename( void );

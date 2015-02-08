@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.17 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.18 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -138,7 +138,7 @@ static Bool check_recursive_include( SrcFile *self, char *filename )
 
 /* Open the source file for reading, closing any previously open file.
    If dir_list is not NULL, calls search_file() to search the file in dir_list */
-Bool SrcFile_open( SrcFile *self, char *filename, List *dir_list )
+Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
 {
     char *filename_path;
 	

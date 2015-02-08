@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.96 2015-02-01 18:18:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.97 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -30,6 +30,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.96 2015-02-01 18
 #include "strpool.h"
 #include "strutil.h"
 #include "symtab.h"
+#include "utarray.h"
 #include "z80asm.h"
 #include <assert.h>
 #include <ctype.h>
@@ -105,14 +106,22 @@ static OptsLU opts_lu[] =
 *----------------------------------------------------------------------------*/
 DEFINE_init()
 {
-    char *directory = getenv( "Z80_OZFILES" );
+	char *directory;
 
+	utarray_new(opts.inc_path, &ut_str_icd);
+	utarray_new(opts.lib_path, &ut_str_icd);
+	utarray_new(opts.files, &ut_str_icd);
+
+	directory = getenv("Z80_OZFILES");
     if ( directory )
-        List_push( &opts.inc_path, strpool_add( directory ) );
+		utarray_push_back(opts.inc_path, &directory);
 }
 
 DEFINE_fini()
 {
+	utarray_free(opts.inc_path);
+	utarray_free(opts.lib_path);
+	utarray_free(opts.files);
 }
 
 /*-----------------------------------------------------------------------------
@@ -163,22 +172,22 @@ static char *check_option( char *arg, char *opt )
 
 static void process_opt( int *parg, int argc, char *argv[] )
 {
-#define i (*parg)
+#define II (*parg)
     int		 j;
     char	*opt_arg_ptr;
 
     /* search opts_lu[] */
     for ( j = 0; j < NUM_ELEMS( opts_lu ); j++ )
     {
-        if ( ( opt_arg_ptr = check_option( argv[i], opts_lu[j].long_opt ) ) != NULL ||
-                ( opt_arg_ptr = check_option( argv[i], opts_lu[j].short_opt ) ) != NULL )
+        if ( ( opt_arg_ptr = check_option( argv[II], opts_lu[j].long_opt ) ) != NULL ||
+                ( opt_arg_ptr = check_option( argv[II], opts_lu[j].short_opt ) ) != NULL )
         {
             /* found option, opt_arg_ptr points to after option */
             switch ( opts_lu[j].type )
             {
             case OptClear:
                 if ( *opt_arg_ptr )
-                    error_illegal_option( argv[i] );
+                    error_illegal_option( argv[II] );
                 else
                     *( ( Bool * )( opts_lu[j].arg ) ) = FALSE;
 
@@ -186,7 +195,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 
             case OptSet:
                 if ( *opt_arg_ptr )
-                    error_illegal_option( argv[i] );
+                    error_illegal_option( argv[II] );
                 else
                     *( ( Bool * )( opts_lu[j].arg ) ) = TRUE;
 
@@ -194,7 +203,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 
             case OptCall:
                 if ( *opt_arg_ptr )
-                    error_illegal_option( argv[i] );
+                    error_illegal_option( argv[II] );
                 else
                     ( ( void ( * )( void ) )( opts_lu[j].arg ) )();
 
@@ -204,7 +213,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 if ( *opt_arg_ptr )
                     ( ( void ( * )( char * ) )( opts_lu[j].arg ) )( opt_arg_ptr );
                 else
-                    error_illegal_option( argv[i] );
+                    error_illegal_option( argv[II] );
 
                 break;
 
@@ -216,15 +225,18 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 if ( *opt_arg_ptr )
                     *( ( char ** )( opts_lu[j].arg ) ) = opt_arg_ptr;
                 else
-                    error_illegal_option( argv[i] );
+                    error_illegal_option( argv[II] );
 
                 break;
 
             case OptStringList:
-                if ( *opt_arg_ptr )
-                    List_push( ( List ** ) opts_lu[j].arg, strpool_add( opt_arg_ptr ) );
+				if (*opt_arg_ptr)
+				{
+					UT_array **p_path = (UT_array **)opts_lu[j].arg;
+					utarray_push_back(*p_path, &opt_arg_ptr);
+				}
                 else
-                    error_illegal_option( argv[i] );
+                    error_illegal_option( argv[II] );
 
                 break;
 
@@ -232,7 +244,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 if ( *opt_arg_ptr )
                     *opt_arg_ptr = '\0';		/* delete option argument for warning message */
 
-                warn_option_deprecated( argv[i] );
+                warn_option_deprecated( argv[II] );
                 break;
 
             default:
@@ -244,19 +256,19 @@ static void process_opt( int *parg, int argc, char *argv[] )
     }
 
     /* not found */
-    error_illegal_option( argv[i] );
+    error_illegal_option( argv[II] );
 
-#undef i
+#undef II
 }
 
 static void process_options( int *parg, int argc, char *argv[] )
 {
-#define i (*parg)
+#define II (*parg)
 
-    for ( i = 1; i < argc && argv[i][0] == '-'; i++ )
-        process_opt( &i, argc, argv );
+    for ( II = 1; II < argc && argv[II][0] == '-'; II++ )
+        process_opt( &II, argc, argv );
 
-#undef i
+#undef II
 }
 
 /*-----------------------------------------------------------------------------
@@ -294,7 +306,7 @@ static void process_file( char *filename )
 		break;
 
     default:
-        List_push( &opts.files, strpool_add(filename) );
+		utarray_push_back(opts.files, &filename);
     }
 }
 

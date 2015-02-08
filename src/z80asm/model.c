@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.13 2015-02-01 18:18:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.14 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -83,7 +83,7 @@ void model_init(void)
 /*-----------------------------------------------------------------------------
 *   interface to SrcFile singleton
 *----------------------------------------------------------------------------*/
-Bool src_open( char *filename, List *dir_list )
+Bool src_open(char *filename, UT_array *dir_list)
 {
 	init();
 	return SrcFile_open( g_src_input, filename, dir_list );

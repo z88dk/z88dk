@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.47 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options_def.h,v 1.48 2015-02-08 21:58:50 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -48,10 +48,10 @@ OPT_VAR( char *,	obj_ext,	( FILEEXT_OBJ ) + 1 )	/* skip "." */
 OPT_VAR( char *,	bin_file,	NULL	)	/* set by -o */
 OPT_VAR( char *,	lib_file,	NULL	)	/* set by -x */
 
-OPT_VAR( List *,	inc_path,	NULL )		/* path for include files */
-OPT_VAR( List *,	lib_path,	NULL )		/* path for library files */
+OPT_VAR(UT_array *,	inc_path,	NULL )		/* path for include files */
+OPT_VAR(UT_array *,	lib_path,	NULL )		/* path for library files */
 
-OPT_VAR( List *,	files,		NULL )		/* list of input files */
+OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 
 /*-----------------------------------------------------------------------------
 *   define help text
