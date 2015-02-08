@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.193 2015-02-01 23:52:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.194 2015-02-08 02:09:16 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -81,7 +81,7 @@ static void do_assemble( char *src_filename );
 *----------------------------------------------------------------------------*/
 void assemble_file( char *filename )
 {
-    char *src_filename;
+    char *src_filename, *err_filename;
 	Module *module;
 
     /* normal case - assemble a asm source file */
@@ -99,7 +99,14 @@ void assemble_file( char *filename )
 	module = set_cur_module( new_module() );
 	module->filename = strpool_add( src_filename );
 
-    query_assemble( src_filename );
+	/* delete any old error file */
+	err_filename = get_err_filename(src_filename);
+	remove(err_filename);
+
+	/* Create error file */
+	open_error_file(src_filename);
+
+	query_assemble(src_filename);
     set_error_null();           /* no more module in error messages */
 	opts.cur_list = FALSE;
 }
@@ -143,9 +150,6 @@ static void query_assemble( char *src_filename )
 static void do_assemble( char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
-
-	/* Create error file */
-	open_error_file(src_filename);
 
 	/* create list file or symtable */
 	if (opts.list)

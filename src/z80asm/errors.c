@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.52 2015-02-01 19:24:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.53 2015-02-08 02:09:15 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -30,6 +30,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.52 2015-02-01 19:
 #include "types.h"
 #include "init.h"
 #include <stdio.h>
+#include <sys/stat.h>
 
 static void file_error( char *filename, Bool writing );
 
@@ -51,7 +52,6 @@ typedef struct ErrorFile
 {
     FILE		*file;				/* currently open error file */
     char		*filename;			/* name of error file */
-    StrHash		*errors;			/* set if errors per file, do delete file if empty */
 } ErrorFile;
 
 static ErrorFile error_file;		/* currently open error file */
@@ -67,10 +67,6 @@ DEFINE_init()
     reset_error_count();			/* clear error count */
     set_error_null();               /* clear location of error messages */
 
-    /* init ErrorFile
-	   initialize, force StrHash to init before */
-    error_file.errors = OBJ_NEW( StrHash );	
-	
 	/* init file error handling */
 	set_ferr_callback( file_error );
 	set_incl_recursion_err_cb( error_include_recursion );
@@ -80,9 +76,6 @@ DEFINE_fini()
 {
     /* close error file, delete it if no errors */
     close_error_file();
-
-    /* delete hash table */
-    OBJ_DELETE( error_file.errors );
 }
 
 void errors_init( void ) 
@@ -148,12 +141,10 @@ int get_num_errors( void )
 
 /*-----------------------------------------------------------------------------
 *	Open file to receive all errors / warnings from now on
-*	File is created on first call and appended on second, to allow assemble
-*	and link errors to be joined in the same file.
+*	File is appended, to allow assemble	and link errors to be joined in the same file.
 *----------------------------------------------------------------------------*/
 void open_error_file( char *src_filename )
 {
-    char *mode;
 	char *filename = get_err_filename( src_filename );
 
     init();
@@ -162,31 +153,29 @@ void open_error_file( char *src_filename )
     close_error_file();
 
     error_file.filename = strpool_add( filename );
-
-    /* open new file for write or append depending on previous errors
-       written to file (BUG_0023, CH_0012) */
-    if ( StrHash_get( error_file.errors, error_file.filename ) )
-        mode = "a";
-    else
-        mode = "w";
-
-    error_file.file = xfopen( error_file.filename, mode );
+	error_file.file = xfopen(error_file.filename, "a");
 }
 
 void close_error_file( void )
 {
+	struct stat st;
+	int stat_res;
+
     init();
 
     /* close current file if any */
-    if ( error_file.file != NULL )
-        xfclose( error_file.file );
+	if (error_file.file != NULL)
+	{
+		xfclose(error_file.file);
 
-    /* delete file if no errors found */
-    if ( error_file.filename != NULL )
-    {
-        if ( ! StrHash_get( error_file.errors, error_file.filename ) )
-            remove( error_file.filename );
-    }
+		/* delete file if no errors found */
+		if (error_file.filename != NULL)
+		{
+			stat_res = stat(error_file.filename, &st);
+			if (stat_res == 0 && st.st_size == 0)
+				remove(error_file.filename);
+		}
+	}
 
     /* reset */
     error_file.file		= NULL;
@@ -198,15 +187,7 @@ static void puts_error_file( char *string )
     init();
 
     if ( error_file.file != NULL )
-    {
         fputs( string, error_file.file );
-
-        /* signal errors in file */
-        if ( error_file.filename != NULL )
-            StrHash_set( & error_file.errors,
-                         error_file.filename,	/* key */
-                         error_file.filename );	/* value */
-    }
 }
 
 /*-----------------------------------------------------------------------------
