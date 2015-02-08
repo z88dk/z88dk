@@ -22,12 +22,12 @@ stdlib/c/sdcc_ix/_div_
 stdlib/c/sdcc_ix/_insertion_sort_
 stdlib/c/sdcc_ix/_ldiv_
 stdlib/c/sdcc_ix/_quicksort_
+stdlib/c/sdcc_ix/_random_uniform_xor_8_
+stdlib/c/sdcc_ix/_random_uniform_xor_32_
 stdlib/c/sdcc_ix/_shellsort_
 stdlib/c/sdcc_ix/_strtoi_
 stdlib/c/sdcc_ix/_strtou_
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtou__
 stdlib/z80/__strtoul__
-stdlib/z80/random/asm_random_uniform_xor_8
-stdlib/z80/random/asm_random_uniform_xor_32
 stdlib/z80/sort/__sort_parameters

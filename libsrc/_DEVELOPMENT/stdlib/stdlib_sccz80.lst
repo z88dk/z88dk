@@ -34,6 +34,8 @@ stdlib/c/sccz80/_ldiv_
 stdlib/c/sccz80/_ldiv__callee
 stdlib/c/sccz80/_quicksort_
 stdlib/c/sccz80/_quicksort__callee
+stdlib/c/sccz80/_random_uniform_xor_8_
+stdlib/c/sccz80/_random_uniform_xor_32_
 stdlib/c/sccz80/_shellsort_
 stdlib/c/sccz80/_shellsort__callee
 stdlib/c/sccz80/_strtoi_

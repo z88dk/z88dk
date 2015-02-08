@@ -52,6 +52,11 @@ typedef struct
 
 extern void      _div_(div_t *d, int numer, int denom);
 extern void      _ldiv_(ldiv_t *ld, long numer, long denom);
+extern void      _insertion_sort_(void *base, size_t nmemb, size_t size, void *compar);
+extern void      _quicksort_(void *base, size_t nmemb, size_t size, void *compar);
+extern void      _shellsort_(void *base, size_t nmemb, size_t size, void *compar);
+extern uint32_t  _random_uniform_xor_32_(uint32_t seed);
+extern uint16_t  _random_uniform_xor_8_(uint32_t seed);
 extern int       _strtoi_(char *nptr, char **endptr, int base);
 extern uint16_t  _strtou_(char *nptr, char **endptr, int base);
 extern void      abort(void);
@@ -91,6 +96,11 @@ extern void  *realloc(void *p, size_t size);
 
 extern void      __LIB__               _div_(div_t *d, int numer, int denom);
 extern void      __LIB__               _ldiv_(ldiv_t *ld, long numer, long denom);
+extern void      __LIB__               _insertion_sort_(void *base, size_t nmemb, size_t size, void *compar);
+extern void      __LIB__               _quicksort_(void *base, size_t nmemb, size_t size, void *compar);
+extern void      __LIB__               _shellsort_(void *base, size_t nmemb, size_t size, void *compar);
+extern uint32_t  __LIB__ __FASTCALL__  _random_uniform_xor_32_(uint32_t seed);
+extern uint16_t  __LIB__ __FASTCALL__  _random_uniform_xor_8_(uint32_t seed);
 extern int       __LIB__               _strtoi_(char *nptr, char **endptr, int base);
 extern uint16_t  __LIB__               _strtou_(char *nptr, char **endptr, int base);
 extern void      __LIB__               abort(void);
@@ -128,6 +138,9 @@ extern void   __LIB__              *realloc(void *p, size_t size);
 
 extern void      __LIB__ __CALLEE__    _div__callee(div_t *d, int numer, int denom);
 extern void      __LIB__ __CALLEE__    _ldiv__callee(ldiv_t *ld, long numer, long denom);
+extern void      __LIB__ __CALLEE__    _insertion_sort__callee(void *base, size_t nmemb, size_t size, void *compar);
+extern void      __LIB__ __CALLEE__    _quicksort__callee(void *base, size_t nmemb, size_t size, void *compar);
+extern void      __LIB__ __CALLEE__    _shellsort__callee(void *base, size_t nmemb, size_t size, void *compar);
 extern int       __LIB__ __CALLEE__    _strtoi__callee(char *nptr, char **endptr, int base);
 extern uint16_t  __LIB__ __CALLEE__    _strtou__callee(char *nptr, char **endptr, int base);
 extern void      __LIB__ __CALLEE__    bsearch_callee(void *key, void *base, size_t nmemb, size_t size, void *compar);
@@ -151,6 +164,9 @@ extern void   __LIB__ __CALLEE__   *realloc_callee(void *p, size_t size);
 
 #define _div_(a,b,c)                _div__callee(a,b,c)
 #define _ldiv_(a,b,c)               _ldiv__callee(a,b,c)
+#define _insertion_sort_(a,b,c,d)   _insertion_sort__callee(a,b,c,d)
+#define _quicksort_(a,b,c,d)        _quicksort__callee(a,b,c,d)
+#define _shellsort_(a,b,c,d)        _shellsort__callee(a,b,c,d)
 #define _strtoi_(a,b,c)             _strtoi__callee(a,b,c)
 #define _strtou_(a,b,c)             _strtou__callee(a,b,c)
 #define bsearch(a,b,c,d,e)          bsearch_callee(a,b,c,d,e)
