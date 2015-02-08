@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.26 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.27 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -200,7 +200,7 @@ void ListFile_open( ListFile *self, char *list_file )
 
     /* open the file */
     self->filename	= strpool_add( list_file );
-    self->file		= xfopen( list_file, "w+" );
+    self->file		= myfopen( list_file, "w+" );
     self->source_list_ended = FALSE;
 
     /* output header */
@@ -228,7 +228,7 @@ void ListFile_close( ListFile *self, Bool keep_file )
         ListFile_end( self );
 
         fputc( '\f', self->file );     /* end listing with a FF */
-        xfclose( self->file );
+        myfclose( self->file );
 
         if ( ! keep_file )
             remove( self->filename );

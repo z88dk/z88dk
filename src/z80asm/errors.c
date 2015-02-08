@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.53 2015-02-08 02:09:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.54 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -153,7 +153,7 @@ void open_error_file( char *src_filename )
     close_error_file();
 
     error_file.filename = strpool_add( filename );
-	error_file.file = xfopen(error_file.filename, "a");
+	error_file.file = myfopen(error_file.filename, "a");
 }
 
 void close_error_file( void )
@@ -166,7 +166,7 @@ void close_error_file( void )
     /* close current file if any */
 	if (error_file.file != NULL)
 	{
-		xfclose(error_file.file);
+		myfclose(error_file.file);
 
 		/* delete file if no errors found */
 		if (error_file.filename != NULL)

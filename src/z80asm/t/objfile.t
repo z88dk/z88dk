@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.24 2015-02-01 23:52:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.25 2015-02-08 12:29:09 pauloscustodio Exp $
 #
 
 use strict;
@@ -4499,28 +4499,28 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj == NULL );
 
 	TITLE("Invalid short file, test mode");	
-	file = xfopen("test.obj", "wb");
-	xfclose(file);
+	file = myfopen("test.obj", "wb");
+	myfclose(file);
 	obj = OFile_test_file("test.obj");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid short file, read mode");	
-	file = xfopen("test.obj", "wb");
-	xfclose(file);
+	file = myfopen("test.obj", "wb");
+	myfclose(file);
 	obj = OFile_open_read("test.obj");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, test mode");	
-	file = xfopen("test.obj", "wb");
+	file = myfopen("test.obj", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
-	xfclose(file);
+	myfclose(file);
 	obj = OFile_test_file("test.obj");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, read mode");	
-	file = xfopen("test.obj", "wb");
+	file = myfopen("test.obj", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
-	xfclose(file);
+	myfclose(file);
 	obj = OFile_open_read("test.obj");
 	ASSERT( obj == NULL );
 	
@@ -4557,7 +4557,7 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj == NULL );
 	
 	TITLE("test1 Library file");
-	file = xfopen("test1.lib", "rb");
+	file = myfopen("test1.lib", "rb");
 	ASSERT( file != NULL );
 	obj = OFile_read_header(file, 16);	
 	ASSERT( obj != NULL );

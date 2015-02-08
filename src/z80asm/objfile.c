@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.44 2015-02-01 23:52:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.45 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -223,7 +223,7 @@ void write_obj_file( char *source_filename )
 
 	/* open file */
 	obj_filename = get_obj_filename( source_filename );
-	fp = xfopen_atomic( obj_filename, "w+b" );
+	fp = myfopen_atomic( obj_filename, "w+b" );
 
 	/* write header */
     xfput_strz( fp, Z80objhdr );
@@ -249,7 +249,7 @@ void write_obj_file( char *source_filename )
     xfput_uint32( fp, code_ptr );
 
 	/* close temp file and rename to object file */
-	xfclose( fp );
+	myfclose( fp );
 }
 
 
@@ -291,7 +291,7 @@ void OFile_fini( OFile *self )
     if ( self->file		 != NULL && 
 		 self->start_ptr == 0
 	   )
-        xfclose( self->file );
+        myfclose( self->file );
 
 	/* if writing but not closed, delete partialy created file */
     if ( self->writing && 
@@ -353,7 +353,7 @@ static OFile *_OFile_open_read( char *filename, Bool test_mode )
 	/* file exists? */
 	file = test_mode ? 
 			fopen(  filename, "rb" ) :	/* no exceptions if testing */
-			xfopen( filename, "rb" );
+			myfopen( filename, "rb" );
 	if ( file == NULL )
 		return NULL;
 
@@ -361,7 +361,7 @@ static OFile *_OFile_open_read( char *filename, Bool test_mode )
 	self = OFile_read_header( file, 0 );
 	if ( self == NULL )
 	{
-		xfclose( file );
+		myfclose( file );
 		
 		if ( ! test_mode )
 			error_not_obj_file( filename );
@@ -386,7 +386,7 @@ void OFile_close( OFile *self )
 {
 	if ( self != NULL && self->file != NULL )
 	{
-		xfclose( self->file );
+		myfclose( self->file );
 		self->file = NULL;
 	}
 }

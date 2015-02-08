@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.20 2015-02-01 18:18:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.21 2015-02-08 12:29:09 pauloscustodio Exp $
 
 */
 
@@ -75,7 +75,7 @@ void write_def_file( void )
     filename = get_def_filename( get_first_module( NULL )->filename ); /* set '.def' extension */
 
     /* Create DEF file */
-    file = xfopen( filename, "w" );           /* CH_0012 */
+    file = myfopen( filename, "w" );           
 	if (file)
 	{
 		if (opts.verbose)
@@ -90,6 +90,6 @@ void write_def_file( void )
 
 		OBJ_DELETE(def_symtab);
 
-		xfclose(file);
+		myfclose(file);
 	}
 }

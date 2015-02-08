@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.143 2015-02-01 19:24:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.144 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -249,7 +249,7 @@ static void read_module_exprs( ExprList *exprs )
         set_error_null();
 
         /* open relocatable file for reading */
-        file = xfopen( curlink->objfilename, "rb" );	/* CH_0012 */
+        file = myfopen( curlink->objfilename, "rb" );	
 		if (file)
 		{
 			fseek(file, fptr_base + 8, SEEK_SET);			/* point at module name  pointer   */
@@ -264,7 +264,7 @@ static void read_module_exprs( ExprList *exprs )
 				read_cur_module_exprs(exprs, file, curlink->objfilename);
 			}
 
-			xfclose(file);
+			myfclose(file);
 		}
 
         curlink = curlink->nextlink;
@@ -600,7 +600,7 @@ void link_modules( void )
 		obj_filename = get_obj_filename(CURRENTMODULE->filename);
 
 		/* open relocatable file for reading */
-		file = xfopen(obj_filename, "rb");           /* CH_0012 */
+		file = myfopen(obj_filename, "rb");           
 		if (file)
 		{
 			/* read first 8 chars from file into array */
@@ -611,11 +611,11 @@ void link_modules( void )
 			if (strcmp(fheader, Z80objhdr) != 0)
 			{
 				error_not_obj_file(obj_filename);  /* not a object     file */
-				xfclose(file);
+				myfclose(file);
 				break;
 			}
 
-			xfclose(file);
+			myfclose(file);
 
 			LinkModule(obj_filename, 0);       /* link code & read name definitions */
 		}
@@ -679,7 +679,7 @@ LinkModule( char *filename, long fptr_base )
 	INIT_OBJ( Str, &section_name );
 
     /* open object file for reading */
-    file = xfopen( filename, "rb" );           /* CH_0012 */
+    file = myfopen( filename, "rb" );           
 	if (file)
 	{
 		fseek(file, fptr_base + 8, SEEK_SET);
@@ -720,7 +720,7 @@ LinkModule( char *filename, long fptr_base )
 			ReadNames(filename, file);
 		}
 
-		xfclose(file);
+		myfclose(file);
 	}
 
     if ( fptr_libnmdecl != -1 )
@@ -750,14 +750,14 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
     do
     {
         /* open object file for reading */
-        file = xfopen( filename, "rb" );           /* CH_0012 */
+        file = myfopen( filename, "rb" );           
 		if (!file)
 			return 0;
 
 		fseek( file, fptr_base + nextname, SEEK_SET );	/* set file pointer to point at 
 														 * library name declarations */
         xfget_count_byte_Str( file, name );				/* read library reference name */
-        xfclose( file );
+        myfclose( file );
 
         nextname += 1 + name->len;	/* remember module pointer to next name in this object module */
 
@@ -811,7 +811,7 @@ SearchLibfile( struct libfile *curlib, char *modname )
     char *mname;
     FILE *file;
 
-    file = xfopen( curlib->libfilename, "rb" );           /* CH_0012 */
+    file = myfopen( curlib->libfilename, "rb" );           
 	if (!file)
 		return 0;
 
@@ -832,20 +832,20 @@ SearchLibfile( struct libfile *curlib, char *modname )
         {
             if ( ( mname = CheckIfModuleWanted( file, currentlibmodule, modname ) ) != NULL )
             {
-                xfclose( file );
+                myfclose( file );
                 return LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
             }
             else if ( opts.sdcc &&
                       modname[0] == '_' &&
                       ( mname = CheckIfModuleWanted( file, currentlibmodule, modname + 1 ) ) != NULL )
             {
-                xfclose( file );
+                myfclose( file );
                 return LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
             }
         }
     }
 
-    xfclose( file );
+    myfclose( file );
     return 0;
 }
 
@@ -951,7 +951,7 @@ CreateBinFile( void )
         filename = get_bin_filename( get_first_module(NULL)->filename );		/* add '.bin' extension */
 
     /* binary output to filename.bin */
-    binaryfile = xfopen( filename, "wb" );         /* CH_0012 */
+    binaryfile = myfopen( filename, "wb" );         
 	if (binaryfile)
 	{
 		if (is_relocatable)
@@ -971,7 +971,7 @@ CreateBinFile( void )
 		}
 
 		fwrite_codearea(filename, &binaryfile);		/* write code as one big chunk */
-		xfclose(binaryfile);
+		myfclose(binaryfile);
 	}
 
     if ( opts.verbose )

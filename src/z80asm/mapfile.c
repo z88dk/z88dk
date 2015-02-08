@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.26 2015-02-01 18:18:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.27 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 
@@ -79,7 +79,7 @@ void write_map_file( void )
     filename = get_map_filename( get_first_module( NULL )->filename ); /* set '.map' extension */
 
     /* Create MAP file */
-    file = xfopen( filename, "w" );           /* CH_0012 */
+    file = myfopen( filename, "w" );           
 	if (file)
 	{
 		if (opts.verbose)
@@ -107,6 +107,6 @@ void write_map_file( void )
 
 		OBJ_DELETE(map_symtab);
 
-		xfclose(file);
+		myfclose(file);
 	}
 }

@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.16 2015-02-01 18:18:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.17 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -32,7 +32,7 @@ static void free_file_stack_elem( void *_elem )
 	FileStackElem *elem = _elem;
 	
 	if ( elem->file != NULL )
-		xfclose( elem->file );
+		myfclose( elem->file );
 	xfree( elem );
 }
 
@@ -101,7 +101,7 @@ void SrcFile_copy( SrcFile *self, SrcFile *other )
 void SrcFile_fini( SrcFile *self )
 {
     if ( self->file != NULL )
-        xfclose( self->file );
+        myfclose( self->file );
 
     OBJ_DELETE( self->line );
     OBJ_DELETE( self->line_stack );
@@ -145,7 +145,7 @@ Bool SrcFile_open( SrcFile *self, char *filename, List *dir_list )
 	/* close last file */
 	if (self->file != NULL)
 	{
-		xfclose(self->file);
+		myfclose(self->file);
 		self->file = NULL;
 	}
 
@@ -159,7 +159,7 @@ Bool SrcFile_open( SrcFile *self, char *filename, List *dir_list )
 	self->filename = filename_path;
 
     /* open new file in binary mode, for cross-platform newline processing */
-    self->file = xfopen( self->filename, "rb" );
+    self->file = myfopen( self->filename, "rb" );
 
 	/* init current line */
     Str_clear( self->line );
@@ -251,7 +251,7 @@ char *SrcFile_getline( SrcFile *self )
     else
     {
         /* EOF - close file */
-        xfclose( self->file );				/* close input */
+        myfclose( self->file );				/* close input */
         self->file = NULL;
 
 //		call_new_line_cb( NULL, 0, NULL );
@@ -338,7 +338,7 @@ Bool SrcFile_pop( SrcFile *self )
 		return FALSE;
 		
 	if ( self->file != NULL )
-		xfclose( self->file );
+		myfclose( self->file );
 		
 	elem = List_pop( self->file_stack );
 	self->file		= elem->file;

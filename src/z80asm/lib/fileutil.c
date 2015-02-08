@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.24 2015-02-01 19:24:44 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.25 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -62,7 +62,7 @@ CLASS( OpenFile )
 	Bool	 is_open;				/* TRUE if fopen succeeded */
 	Bool	 is_writing;			/* TRUE if writing, FALSE if reading */
 	Bool	 is_atomic;				/* TRUE if writing a temp file to be
-									   renamed to filename at xfclose() */
+									   renamed to filename at myfclose() */
 END_CLASS;
 
 typedef struct OpenFileElem
@@ -149,7 +149,7 @@ void OpenFile_copy( OpenFile *self, OpenFile *other )
 void OpenFile_fini( OpenFile *self )
 {
 	if ( self->file != NULL && self->is_open )
-		fclose( self->file );		/* no xfclose for atomic to work */
+		fclose( self->file );		/* no myfclose for atomic to work */
 		
 	remove_open_file( self->file );
 }
@@ -284,22 +284,22 @@ static void fatal_ferr_write( FILE *file )
 /*-----------------------------------------------------------------------------
 *   File open and close
 *----------------------------------------------------------------------------*/
-FILE *xfopen( char *filename, char *mode )
+FILE *myfopen( char *filename, char *mode )
 {
 	return OpenFile_open( filename, mode, FALSE );
 }
 
-FILE *xfopen_atomic( char *filename, char *mode )
+FILE *myfopen_atomic( char *filename, char *mode )
 {
 	return OpenFile_open( filename, mode, TRUE );
 }
 
-void xfclose( FILE *file )
+void myfclose( FILE *file )
 {
     OpenFile_close( file );
 }
 
-void xfclose_remove( FILE *file )
+void myfclose_remove( FILE *file )
 {
     OpenFile *self;
 	char     *filename;
@@ -309,7 +309,7 @@ void xfclose_remove( FILE *file )
 	filename = self ? self->filename : NULL;	/* filename in strpool */
 	
 	/* close the file */
-    xfclose( file );
+    myfclose( file );
 	
 	/* delete file, if one was found */
 	if ( filename != NULL )

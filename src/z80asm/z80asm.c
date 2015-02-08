@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.194 2015-02-08 02:09:16 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.195 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -241,7 +241,7 @@ char *GetLibfile( char *filename )
 
     newlib->libfilename = xstrdup( found_libfilename );		/* freed when newlib is freed */
 
-    file = xfopen( found_libfilename, "rb" );           /* CH_0012 */
+    file = myfopen( found_libfilename, "rb" );           
 	if (!file)
 		return NULL;
 	else
@@ -259,7 +259,7 @@ char *GetLibfile( char *filename )
 			opts.library = TRUE;
 		}
 
-		xfclose(file);
+		myfclose(file);
 
 		return found_libfilename;
 	}

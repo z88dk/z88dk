@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.140 2015-02-01 23:52:11 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.141 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.140 2015-02-01 23:5
 
 /*
 * $Log: hist.c,v $
-* Revision 1.140  2015-02-01 23:52:11  pauloscustodio
+* Revision 1.141  2015-02-08 12:29:09  pauloscustodio
+* Rename xfopen and xfclose
+*
+* Revision 1.140  2015/02/01 23:52:11  pauloscustodio
 *  Removed legacy expression syntax support and got rid
 * of all the #ifdef __LEGACY_Z80ASM_SYNTAX.
 *
@@ -399,7 +402,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.140 2015-02-01 23:5
 *
 * Revision 1.69  2014/01/29 22:40:52  pauloscustodio
 * Mechanism for atomic file write - open a temp file for writing on
-* xfopen_atomic(), close and rename to final name on xfclose().
+* myfopen_atomic(), close and rename to final name on myfclose().
 * temp_filename() to generate a temporary file name that is
 * deleted atexit.
 *
@@ -1489,7 +1492,7 @@ Based on 1.0.31
 
     CH_0012 : wrappers on OS calls to raise fatal error
         Remove all the checks for failure after fopen(), localize the error
-        checking and fatal error in xfopen().
+        checking and fatal error in myfopen().
         Removed exception FileIOException and ERR_FILE_IO error.
 
     CH_0013 : new errors interface to decouple calling code from errors.c

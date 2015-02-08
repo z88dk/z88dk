@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.20 2015-02-01 18:18:02 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.21 2015-02-08 12:29:09 pauloscustodio Exp $
 */
 
 #pragma once
@@ -40,13 +40,13 @@ typedef void (*ferr_callback_t)(char *filename, Bool writing);
 extern ferr_callback_t set_ferr_callback( ferr_callback_t func );
 
 /* OS interface */
-extern FILE *xfopen( char *filename, char *mode );
-extern void  xfclose( FILE *file );
+extern FILE *myfopen( char *filename, char *mode );
+extern void  myfclose( FILE *file );
 
-/* open temp file for writing, rename to final name on xfclose()
-   delete temp file by xfclose_remove() or atexit if xflcose() not called  */
-extern FILE *xfopen_atomic( char *filename, char *mode );
-extern void  xfclose_remove( FILE *file );
+/* open temp file for writing, rename to final name on myfclose()
+   delete temp file by myfclose_remove() or atexit if xflcose() not called  */
+extern FILE *myfopen_atomic( char *filename, char *mode );
+extern void  myfclose_remove( FILE *file );
 
 /* read/write buffers */
 extern void xfwrite( void *buffer, size_t size, size_t count, FILE *file );

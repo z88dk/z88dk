@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.38 2015-02-01 23:52:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.39 2015-02-08 12:29:09 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -31,6 +31,7 @@ require 't/test_utils.pl';
 
 #------------------------------------------------------------------------------
 # error_read_file
+# CH_0012 : wrappers on OS calls to raise fatal error
 unlink_testfiles();
 t_z80asm_capture(asm_file(), "",
 		"Error: cannot read file '".asm_file()."'\n".
