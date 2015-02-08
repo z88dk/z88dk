@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.20 2015-02-01 19:24:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.21 2015-02-08 23:52:31 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -13,7 +13,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -Wno-overflow -otest test.c fileutil.c strutil.c xmalloc.c dlist.c class.c list.c strpool.c";
+my $compile = "cc -Wall -Wno-overflow -otest test.c fileutil.c strutil.c xmalloc.c dlist.c class.c list.c strpool.c dbg.c";
 
 #------------------------------------------------------------------------------
 # create directories and files
@@ -60,7 +60,7 @@ int main()
 {
 	DEFINE_FILE_STR( s );
 	char *p;
-	List *path = NULL;
+	UT_array *path = NULL;
 	
 	/* path_remove_ext */
 	T_REMOVE_EXT("abc", 			"abc");
@@ -108,9 +108,10 @@ int main()
 	T_DIRNAME("\\a\\b\\c\\abc",	"\\a\\b\\c\\");
 	
 	/* path_search */
-	List_push(&path, strpool_add("test.x1"));
-	List_push(&path, strpool_add("test.x2"));
-	List_push(&path, strpool_add("test.x3"));
+	utarray_new(path,&ut_str_icd);
+	p = "test.x1"; utarray_push_back(path, &p);
+	p = "test.x2"; utarray_push_back(path, &p);
+	p = "test.x3"; utarray_push_back(path, &p);
 	
 	T_SEARCH("test.f0", NULL, "test.f0");
 	T_SEARCH("test.f1", NULL, "test.f1");
@@ -122,6 +123,8 @@ int main()
 	T_SEARCH("test.f2", path, "test.x2/test.f2");
 	T_SEARCH("test.f3", path, "test.x3/test.f3");
 	T_SEARCH("test.f4", path, "test.f4");
+	
+	utarray_free(path);
 	
 	return 0;
 }
@@ -160,13 +163,13 @@ int main(int argc, char *argv[])
 
 	switch (*argv[1]) 
 	{
-		case '0':	xfopen("test.1xxxx.bin", 		"rb"); break;
-		case '1':	xfopen("x/x/x/x/test.1.bin", 	"wb"); break;
+		case '0':	myfopen("test.1xxxx.bin", 		"rb"); break;
+		case '1':	myfopen("x/x/x/x/test.1.bin", 	"wb"); break;
 		case '2': 	set_ferr_callback( null_error );
-					xfopen("test.1xxxx.bin",		"rb");
+					myfopen("test.1xxxx.bin",		"rb");
 					break;
 		case '3': 	set_ferr_callback( null_error );
-					xfopen("x/x/x/x/test.1.bin", "wb"); 
+					myfopen("x/x/x/x/test.1.bin", "wb"); 
 					break;
 	}
 							
@@ -210,30 +213,30 @@ int main(int argc, char *argv[])
 	
 	switch (*argv[1]) 
 	{
-		case '0':	xfopen("test.1xxxx.bin", "rb");
+		case '0':	myfopen("test.1xxxx.bin", "rb");
 					break;
 
-		case '1':	xfopen("x/x/x/x/test.1.bin", "wb"); 
+		case '1':	myfopen("x/x/x/x/test.1.bin", "wb"); 
 					break;
 		
-		case '2':	file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
-					xfclose(file);
+		case '2':	file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+					myfclose(file);
 					break;
 					
 		case '4':	Str_set( small, BIG_STR );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfwrite( small->str, sizeof(char), small->len, file );
-					xfclose(file);
+					myfclose(file);
 					break;
 					
 		case '5':	Str_set( small, BIG_STR );
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfwrite( small->str, sizeof(char), small->len, file );
 					break;
 
 		case '6':	Str_set( small, BIG_STR );
 					memset(buffer, 0, sizeof(buffer));
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfread( buffer, sizeof(char), small->len, file );
 					if (memcmp(buffer, small->str, small->len)) ERROR;
 					
@@ -242,66 +245,66 @@ int main(int argc, char *argv[])
 					break;
 		
 		case '7':	Str_set( small, BIG_STR );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_chars( file, small->str, small->len );
 					xfput_chars( file, small->str, small->len - 1 );
-					xfclose(file);
+					myfclose(file);
 					
 					memset(buffer, 0, sizeof(buffer));
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfget_chars( file, buffer, 4 );
 					xfget_chars( file, buffer+4, 3 );
-					xfclose(file);
+					myfclose(file);
 					if (memcmp(buffer, "1234123", 7)) ERROR;
 					break;
 					
 		case '8':	Str_set( small, BIG_STR );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_chars( file, small->str, small->len );
-					xfclose(file);
+					myfclose(file);
 					
 					memset(buffer, 0, sizeof(buffer));
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfget_chars( file, buffer, small->len+1 );
 					break;
 					
 		case '9':	Str_set( small, BIG_STR );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_Str(  file, small );
 					xfput_strz( file, "abc" );
-					xfclose(file);
+					myfclose(file);
 		
 					memset( large->str, 0, large->size );
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfget_Str( file, large, 7 );
-					xfclose(file);
+					myfclose(file);
 					if (large->len != 7) ERROR;
 					if (memcmp( large->str, "1234abc", 7)) ERROR;
 					break;
 					
 		case 'A':	Str_set( small, BIG_STR );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_Str( file, small );
-					xfclose(file);
+					myfclose(file);
 		
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfget_Str( file, large, small->len+1 );
 					break;
 					
 		case 'B':	Str_set_bytes( small, "\0\1\2\3", 4 );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_Str( file, small );
-					xfclose(file);
+					myfclose(file);
 		
 					memset( large->str, 0, large->size );
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					xfget_Str( file, large, small->len );
-					xfclose(file);
+					myfclose(file);
 					if (large->len != 4) ERROR;
 					if (memcmp( large->str, "\0\1\2\3", 4)) ERROR;
 					break;
 					
-		case 'C':	file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+		case 'C':	file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 		
 					Str_clear( small );			xfput_count_byte_Str( file, small );
 					Str_set( small, BIG_STR );	xfput_count_byte_Str( file, small );
@@ -309,9 +312,9 @@ int main(int argc, char *argv[])
 					Str_clear( large );			xfput_count_word_Str( file, large );
 					Str_set( large, BIG_STR );	xfput_count_word_Str( file, large );
 												xfput_count_word_strz( file, "hello world" );
-					xfclose(file);
+					myfclose(file);
 		
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					
 					memset( large->str, 0, large->size );
 					xfget_count_byte_Str( file, large );
@@ -343,11 +346,11 @@ int main(int argc, char *argv[])
 					if (large->len != 11) ERROR;
 					if (memcmp( large->str, "hello world", 11)) ERROR;
 					
-					xfclose(file);
+					myfclose(file);
 					break;
 
 		case 'D':	Str_set( large, BIG_STR );
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_count_byte_Str( file, large );
 					break;
 								
@@ -355,11 +358,11 @@ int main(int argc, char *argv[])
 					Str_reserve( huge, 0x10000 );
 					huge->len = 0x10000;
 					
-					file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_count_word_Str( file, huge );
 					break;
 
-		case 'F':	file = xfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
+		case 'F':	file = myfopen("test.1.bin", "wb"); if ( ! file ) ERROR;
 					xfput_int8(   file,        -128 );
 					xfput_uint8(  file,        -128 );
 					xfput_int8(   file,        -127 );
@@ -408,9 +411,9 @@ int main(int argc, char *argv[])
 					xfput_uint32( file,  0x80000000 ); /*  2,147,483,648 */
 					xfput_int32(  file,          -1 ); /*  4,294,967,295 */
 					xfput_uint32( file,  0xFFFFFFFF ); /*  4,294,967,295 */
-					xfclose(file);
+					myfclose(file);
 
-					file = xfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
+					file = myfopen("test.1.bin", "rb"); if ( ! file ) ERROR;
 					ivalue = xfget_int8(   file ); if ( ivalue !=        -128 ) ERROR;
 					uvalue = xfget_uint8(  file ); if ( uvalue !=         128 ) ERROR;
 					ivalue = xfget_int8(   file ); if ( ivalue !=        -127 ) ERROR;
@@ -465,14 +468,14 @@ int main(int argc, char *argv[])
 					ulvalue = xfget_uint32(file ); if (ulvalue !=  0x80000000 ) ERROR;
 					ilvalue = xfget_int32( file ); if (ilvalue !=          -1 ) ERROR;
 					ulvalue = xfget_uint32(file ); if (ulvalue !=  0xFFFFFFFF ) ERROR;
-					xfclose(file);
+					myfclose(file);
 					break;
 
 #define T_TEMP_FILENAME(name,temp) \
 					if (strcmp(temp, temp_filename(name))) ERROR;	\
-					file = xfopen(temp, "w"); if ( ! file ) ERROR;	\
+					file = myfopen(temp, "w"); if ( ! file ) ERROR;	\
 					fputs("hello", file);	\
-					xfclose(file);
+					myfclose(file);
 					
 		case 'G':	T_TEMP_FILENAME("test.1.c",		"~$1$test.1.c");
 					T_TEMP_FILENAME("test.1.c",		"~$2$test.1.c");
@@ -482,36 +485,36 @@ int main(int argc, char *argv[])
 
 		case 'H':	/* without existing target file */
 					remove("test.1.bin");
-					file = xfopen_atomic("test.1.bin", "wb"); 
+					file = myfopen_atomic("test.1.bin", "wb"); 
 					if ( ! file ) ERROR;
 					xfput_strz( file, "123" );
-					xfclose(file);
+					myfclose(file);
 
 					/* with existing target file */
-					file = xfopen_atomic("test.1.bin", "wb"); 
+					file = myfopen_atomic("test.1.bin", "wb"); 
 					if ( ! file ) ERROR;
 					xfput_strz( file, "123" );
-					xfclose(file);
+					myfclose(file);
 
 					memset(buffer, 0, sizeof(buffer));
-					file = xfopen_atomic("test.1.bin", "rb"); 
+					file = myfopen_atomic("test.1.bin", "rb"); 
 					if ( ! file ) ERROR;
 					xfget_chars( file, buffer, 3 );
-					xfclose(file);
+					myfclose(file);
 					if (memcmp(buffer, "123", 3)) ERROR;
 					break;
 					
 		case 'I':	remove("test.1.bin");
-					file = xfopen_atomic("test.1.bin", "wb"); 
+					file = myfopen_atomic("test.1.bin", "wb"); 
 					if ( ! file ) ERROR;
 					xfput_strz( file, "123" );
 					break;
 					
 		case 'J':	remove("test.1.bin");
-					file = xfopen_atomic("test.1.bin", "wb"); 
+					file = myfopen_atomic("test.1.bin", "wb"); 
 					if ( ! file ) ERROR;
 					xfput_strz( file, "123" );
-					xfclose_remove( file );
+					myfclose_remove( file );
 					break;
 					
 	}
@@ -587,14 +590,14 @@ DEFINE_init() { }
 DEFINE_fini() 
 {
 	assert(file);
-	xfclose(file);	/* dummy, file is closed by class atexit() */
+	myfclose(file);	/* dummy, file is closed by class atexit() */
 }
 
 int main()
 {
 	/* call main fini() after fileutil fini() */
 	init();	
-	file = xfopen("test.1.bin", "wb"); assert(file);
+	file = myfopen("test.1.bin", "wb"); assert(file);
 	
 	xfput_strz( file, "123" );
 	

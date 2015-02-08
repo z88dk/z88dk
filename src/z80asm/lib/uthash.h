@@ -24,6 +24,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UTHASH_H
 #define UTHASH_H
 
+#include "dbg.h"
 #include "xmalloc.h"   /* before any other include */
 
 #include <string.h>   /* memcmp,strlen */

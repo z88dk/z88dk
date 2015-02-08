@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.11 2015-01-26 23:46:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.12 2015-02-08 23:52:31 pauloscustodio Exp $
 #
 # Test strhash.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strhash.c class.c xmalloc.c dlist.c strpool.c strutil.c";
+my $compile = "cc -Wall -otest test.c strhash.c class.c xmalloc.c dlist.c strpool.c strutil.c dbg.c";
 
 write_file("test.c", <<'END');
 #include "strhash.h"

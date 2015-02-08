@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>  /* memset, etc */
 #include <stdlib.h>  /* exit */
 
+#include "dbg.h"
 #include "xmalloc.h"
 
 #define oom() die("Out of memory")

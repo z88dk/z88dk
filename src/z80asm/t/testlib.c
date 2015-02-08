@@ -3,10 +3,11 @@ Unit test library
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/testlib.c,v 1.2 2015-01-26 23:46:35 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/testlib.c,v 1.3 2015-02-08 23:52:31 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"				/* before any other include */
+#include "dbg.h"
 
 #include "testlib.h"
 #include <assert.h>

@@ -3,13 +3,14 @@ Macros to help define init() and fini() functions per module
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.8 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.9 2015-02-08 23:52:31 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "xmalloc.h"
 #include "types.h"
+#include "dbg.h"
 
 /*-----------------------------------------------------------------------------
 *   Usage:

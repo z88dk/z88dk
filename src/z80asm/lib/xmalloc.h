@@ -8,7 +8,7 @@ Includes debug macros inspired in the Learn C The Hard Way book
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.10 2015-01-26 23:46:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.h,v 1.11 2015-02-08 23:52:31 pauloscustodio Exp $
 */
 
 #pragma once
@@ -50,31 +50,3 @@ extern void _xfree( void *memptr, char *file, int lineno );
 /* to use when a function pointer compatible with malloc() and free() is expected */
 extern void *xmallocf( size_t size );
 extern void  xfreef( void *memptr );
-
-
-/* show errors on stderr, exit 1 */
-#define warn(message,...)      fprintf(stderr, message, ##__VA_ARGS__)
-#define die( message,...) do { fprintf(stderr, message, ##__VA_ARGS__); exit(1); } while (0)
-
-/* show errno */
-#define strerror_() (errno == 0 ? "None" : strerror(errno))
-
-/* show error, warning, info */
-#define log_(type, message, ...)  warn("[" #type "] (%s(%d) errno: %s) " message "\n", \
-									   __FILE__, __LINE__, strerror_(), ##__VA_ARGS__)
-#define log_err(message, ...)  log_(ERROR, message, ##__VA_ARGS__)
-#define log_warn(message, ...) log_(WARN,  message, ##__VA_ARGS__)
-#define log_info(message, ...) log_(INFO,  message, ##__VA_ARGS__)
-
-/* check condition and die if false */
-#define check_or_die(condition, message, ...) \
-				if ( ! (condition) ) { \
-					log_err(message, ##__VA_ARGS__); \
-					exit(1); \
-				} else
-
-/* sentinel: assert that line is not reached */
-#define sentinel_die(message, ...)	check_or_die(0, message, ##__VA_ARGS__)
-
-/* OS-interface - assert no error */
-#define xatexit(func)	check_or_die( atexit(func) == 0, "atexit failed")

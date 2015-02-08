@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.8 2015-01-26 23:46:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.9 2015-02-08 23:52:31 pauloscustodio Exp $
 #
 # Test list.c
 
@@ -12,10 +12,11 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c list.c class.c strpool.c xmalloc.c dlist.c";
+my $compile = "cc -Wall -otest test.c list.c class.c strpool.c xmalloc.c dlist.c dbg.c";
 
 write_file("test.c", <<'END');
 #include "list.h"
+#include "dbg.h"
 #include <stdarg.h>
 
 #define ERROR die("Test failed at line %d\n", __LINE__)

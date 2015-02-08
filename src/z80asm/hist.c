@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.141 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.142 2015-02-08 23:52:31 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.141 2015-02-08 12:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.141  2015-02-08 12:29:09  pauloscustodio
+* Revision 1.142  2015-02-08 23:52:31  pauloscustodio
+* Add debug macros and mini-unit test module
+*
+* Revision 1.141  2015/02/08 12:29:09  pauloscustodio
 * Rename xfopen and xfclose
 *
 * Revision 1.140  2015/02/01 23:52:11  pauloscustodio
@@ -2236,6 +2239,8 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 
 	- Added support for binary constants %0101 syntax.
 
+	- Added debug macros and unit test module.
+	
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
@@ -2272,7 +2277,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1d"
+#define VERSION     "2.7.1e"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

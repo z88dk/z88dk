@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.20 2015-01-26 23:46:23 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.21 2015-02-08 23:52:31 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strutil.c strpool.c class.c xmalloc.c dlist.c";
+my $compile = "cc -Wall -otest test.c strutil.c strpool.c class.c xmalloc.c dlist.c dbg.c";
 
 write_file("test.1.asm", {binmode => ':raw'}, "");
 write_file("test.2.asm", {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");
@@ -25,6 +25,7 @@ write_file("test.8.asm", {binmode => ':raw'}, "ABCDEFGHIJ\nabcdefghij\n");
 
 write_file("test.c", <<'END');
 #include "strutil.h"
+#include "dbg.h"
 #include <assert.h>
 
 #define ERROR die("Test failed at line %d\n", __LINE__)

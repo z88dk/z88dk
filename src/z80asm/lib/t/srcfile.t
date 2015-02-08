@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.9 2015-02-01 19:24:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.10 2015-02-08 23:52:31 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -25,7 +25,7 @@ use Capture::Tiny 'capture';
 use Test::Differences; 
 
 my $compile = "cc -Wall -Ilib -otest test.c srcfile.c ".
-			  "class.c xmalloc.c dlist.c strpool.c strutil.c fileutil.c list.c";
+			  "class.c xmalloc.c dlist.c strpool.c strutil.c fileutil.c list.c dbg.c";
 
 #------------------------------------------------------------------------------
 # create directories and files
@@ -39,6 +39,7 @@ write_binfile('test.x1/test.f3', 	"F2 x1\r\n");
 
 write_file("test.c", <<'END');
 #include "srcfile.h"
+#include "dbg.h"
 #include <string.h>
 #include <assert.h>
 
@@ -64,8 +65,12 @@ static void new_line_cb( char *filename, int line_nr, char *text )
 		 text ? text : "NULL");
 }
 
+UT_array *dirs = NULL;
+
 static void incl_recursion_err_cb( char *filename )
 {
+	if (dirs)
+		utarray_free(dirs);
 	die("Recursive include %s\n", filename ? filename : "NULL");
 }
 
@@ -73,10 +78,10 @@ static void incl_recursion_err_cb( char *filename )
 int main(int argc, char *argv[])
 {
 	SrcFile *file;
-	List *dirs = NULL;
 	char *str;
 	
-	List_push(&dirs, "test.x1");
+	utarray_new(dirs,&ut_str_icd);
+	str = "test.x1"; utarray_push_back(dirs, &str);
 	
 	switch (*argv[1]) 
 	{
@@ -206,6 +211,7 @@ int main(int argc, char *argv[])
 
 		assert(0); /* not reached */
 		
+		utarray_free(dirs);
 		return 0;
 	
 	case 'B':	
@@ -220,6 +226,8 @@ int main(int argc, char *argv[])
 		SrcFile_push( file );
 		SrcFile_open( file, "test.f3", dirs );
 		SrcFile_push( file );
+
+		utarray_free(dirs);
 		return 0;
 	
 	default:	

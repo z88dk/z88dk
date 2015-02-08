@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.39 2015-02-08 12:29:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.40 2015-02-08 23:52:31 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -566,7 +566,7 @@ t_z80asm_capture("-r0 -b -i".lib_file()." ".asm_file(), "",
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "errors.o scan.o lib/array.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o module.o sym.o symtab.o symref.o codearea.o expr.o listfile.o lib/srcfile.o hist.o";
+my $objs = "errors.o scan.o lib/array.o lib/class.o lib/strutil.o lib/strhash.o lib/list.o lib/fileutil.o options.o model.o module.o sym.o symtab.o symref.o codearea.o expr.o listfile.o lib/srcfile.o hist.o lib/dbg.o";
 
 # get init code except init() and main()
 my $init = <<'END';
