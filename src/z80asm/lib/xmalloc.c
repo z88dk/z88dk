@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.14 2015-01-26 23:46:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.15 2015-02-08 01:17:14 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -94,7 +94,7 @@ DEFINE_fini()
 
         /* free but do not report memory allocated with NULL file */
         if ( block->file != NULL ) {
-			log_warn("memory leak (%u bytes) allocated at %s(%d)",
+			log_warn("memory leak (%u bytes) allocated at %s:%d",
 					 block->client_size, block->file, block->lineno );
         }
 
@@ -115,7 +115,7 @@ static MemBlock *new_block( size_t client_size, char *file, int lineno )
 
     block = malloc( block_size );
 	check_or_die( block != NULL, 
-				  "memory alloc (%u bytes) failed at %s(%d)",
+				  "memory alloc (%u bytes) failed at %s:%d",
 				  block_size, file, lineno );
 
     /* init block */
@@ -143,7 +143,7 @@ static MemBlock *find_block( void *client_ptr, char *file, int lineno )
 
     block = BLOCK_PTR( client_ptr );
 	check_or_die( block->signature == MEMBLOCK_SIGN, 
-				  "block not found at %s(%d)", file, lineno );
+				  "block not found at %s:%d", file, lineno );
 
     return block;
 }
@@ -159,11 +159,11 @@ static void check_fences( MemBlock *block, char *file, int lineno )
 
     /* check fences */
 	check_or_die( memcmp( fence, START_FENCE_PTR( block ), FENCE_SIZE ) == 0,
-				  "buffer underflow, memory allocated at %s(%d)",
+				  "buffer underflow, memory allocated at %s:%d",
 				  block->file, block->lineno );
 
 	check_or_die( memcmp( fence, END_FENCE_PTR( block ), FENCE_SIZE ) == 0,
-				  "buffer overflow, memory allocated at %s(%d)",
+				  "buffer overflow, memory allocated at %s:%d",
 				  block->file, block->lineno );
 }
 
@@ -289,7 +289,7 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
 
     block = realloc( block, block_size );
 	check_or_die( block != NULL, 
-				  "memory alloc (%u bytes) failed at %s(%d)",
+				  "memory alloc (%u bytes) failed at %s:%d",
 				  block_size, file, lineno );
 
     client_ptr = CLIENT_PTR( block );
