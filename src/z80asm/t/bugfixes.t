@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.48 2015-01-26 23:46:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/bugfixes.t,v 1.49 2015-02-08 02:10:19 pauloscustodio Exp $
 #
 # Test bugfixes
 
@@ -23,6 +23,7 @@ use t::TestZ80asm;
 use t::Listfile;
 
 #------------------------------------------------------------------------------
+# CH_0001: Assembly error messages should appear on stderr
 # BUG_0001: Error in expression during link
 # BUG_0001(a): during correction of BUG_0001, new symbol 
 z80asm(
