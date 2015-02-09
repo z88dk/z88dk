@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.14 2015-02-08 21:58:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.c,v 1.15 2015-02-09 21:57:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -61,7 +61,7 @@ static void new_line_cb( char *filename, int line_nr, char *text )
 /*-----------------------------------------------------------------------------
 *   Initialize data structures
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+DEFINE_init_module()
 {
 	errors_init();						/* setup error handler */
 
@@ -70,14 +70,14 @@ DEFINE_init()
 	set_new_line_cb( new_line_cb );
 }
 
-DEFINE_fini()
+DEFINE_dtor_module()
 {
 	OBJ_DELETE( g_src_input );
 }
 
 void model_init(void) 
 { 
-	init(); 
+	init_module(); 
 }
 
 /*-----------------------------------------------------------------------------
@@ -85,42 +85,42 @@ void model_init(void)
 *----------------------------------------------------------------------------*/
 Bool src_open(char *filename, UT_array *dir_list)
 {
-	init();
+	init_module();
 	return SrcFile_open( g_src_input, filename, dir_list );
 }
 
 char *src_getline( void )
 {
-	init();
+	init_module();
 	return SrcFile_getline( g_src_input );
 }
 
 void src_ungetline( char *lines )
 {
-	init();
+	init_module();
 	SrcFile_ungetline( g_src_input, lines );
 }
 
 char *src_filename( void )
 {
-	init();
+	init_module();
 	return SrcFile_filename( g_src_input );
 }
 
 int src_line_nr( void )
 {
-	init();
+	init_module();
 	return SrcFile_line_nr( g_src_input );
 }
 
 void src_push( void )
 {
-	init();
+	init_module();
 	SrcFile_push( g_src_input );
 }
 
 Bool src_pop( void )
 {
-	init();
+	init_module();
 	return SrcFile_pop( g_src_input );
 }

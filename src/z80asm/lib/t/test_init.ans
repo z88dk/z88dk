@@ -1,0 +1,7 @@
+
+---------- Test: test_init ----------
+before init
+init called
+after init
+end
+fini called

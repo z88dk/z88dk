@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.17 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.18 2015-02-09 21:57:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -33,13 +33,13 @@ static Module			*g_cur_module;			/* current module being handled */
 /*-----------------------------------------------------------------------------
 *   Initialize data structures
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+DEFINE_init_module()
 {
 	/* setup module list */
 	g_module_list = OBJ_NEW( ModuleList );
 }
 
-DEFINE_fini()
+DEFINE_dtor_module()
 {
 	OBJ_DELETE( g_module_list );
 }
@@ -80,7 +80,7 @@ Module *new_module( void )
 {
 	Module *module;
 
-	init();
+	init_module();
 	module = OBJ_NEW( Module );
 	ModuleList_push( &g_module_list, module );
 	return module;
@@ -88,7 +88,7 @@ Module *new_module( void )
 
 void delete_modules( void )
 {
-	init();
+	init_module();
 	g_cur_module = NULL;
 	ModuleList_remove_all( g_module_list );
 }
@@ -98,7 +98,7 @@ void delete_modules( void )
 *----------------------------------------------------------------------------*/
 Module *set_cur_module( Module *module )
 {
-	init();
+	init_module();
 	set_cur_module_id( module->module_id );
 	set_cur_section( get_first_section(NULL) );
 	return (g_cur_module = module);		/* result result of assignment */
@@ -106,7 +106,7 @@ Module *set_cur_module( Module *module )
 
 Module *get_cur_module( void )
 {
-	init();
+	init_module();
 	return g_cur_module;
 }
 
@@ -118,7 +118,7 @@ Module *get_first_module( ModuleListElem **piter )
 {
 	ModuleListElem *iter;
 
-	init();
+	init_module();
 	if ( piter == NULL )
 		piter = &iter;		/* user does not need to iterate */
 
@@ -130,7 +130,7 @@ Module *get_last_module( ModuleListElem **piter )
 {
 	ModuleListElem *iter;
 
-	init();
+	init_module();
 	if ( piter == NULL )
 		piter = &iter;		/* user does not need to iterate */
 
@@ -140,7 +140,7 @@ Module *get_last_module( ModuleListElem **piter )
 
 Module *get_next_module( ModuleListElem **piter )
 {
-	init();
+	init_module();
 	*piter = ModuleList_next( *piter );
 	return *piter == NULL ? NULL : (Module *) (*piter)->obj;
 }

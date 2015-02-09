@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.27 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.28 2015-02-09 21:57:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -50,12 +50,12 @@ static void ExprOp_init_operator(   ExprOp *self, tokid_t tok, op_type_t op_type
 static void init_operator_hash(void);
 static void fini_operator_hash(void);
 
-DEFINE_init()
+DEFINE_init_module()
 {
 	init_operator_hash();
 }
 
-DEFINE_fini()
+DEFINE_dtor_module()
 {
 	fini_operator_hash();
 }
@@ -167,7 +167,7 @@ Operator *Operator_get( tokid_t tok, op_type_t op_type )
 {
 	char *key;
 
-	init();
+	init_module();
 	key = operator_hash_key( tok, op_type );
 	return (Operator *) StrHash_get( operator_hash, key );
 }

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.53 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.54 2015-02-09 21:57:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -43,12 +43,12 @@ static int			 g_cur_module;
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate module
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+DEFINE_init_module()
 {
     reset_codearea();	/* init default section */
 }
 
-DEFINE_fini()
+DEFINE_dtor_module()
 {
 	OBJ_DELETE( g_sections );
 	g_cur_section = g_default_section = g_last_section = NULL;
@@ -99,7 +99,7 @@ void Section_fini (Section *self)
 *----------------------------------------------------------------------------*/
 void reset_codearea( void )
 {
-    init();
+    init_module();
 	SectionHash_remove_all( g_sections );
 	g_cur_section = g_default_section = g_last_section = NULL;
 	new_section("");
@@ -110,7 +110,7 @@ void reset_codearea( void )
 *----------------------------------------------------------------------------*/
 UInt get_section_size( Section *section )
 {
-    init();
+    init_module();
     return ByteArray_size( section->bytes );
 }
 
@@ -140,7 +140,7 @@ Section *new_section( char *name )
 {
 	int last_id;
 
-	init();
+	init_module();
 	g_cur_section = SectionHash_get( g_sections, name );
 	if ( g_cur_section == NULL )
 	{
@@ -169,13 +169,13 @@ Section *new_section( char *name )
 *----------------------------------------------------------------------------*/
 Section *get_cur_section( void )
 {
-	init();
+	init_module();
 	return g_cur_section;
 }
 
 Section *set_cur_section( Section *section )
 {
-	init();
+	init_module();
 	return (g_cur_section = section);		/* assign and return */
 }
 
@@ -187,7 +187,7 @@ Section *get_first_section( SectionHashElem **piter )
 {
 	SectionHashElem *iter;
 
-	init();
+	init_module();
 	if ( piter == NULL )
 		piter = &iter;		/* user does not need to iterate */
 
@@ -197,13 +197,13 @@ Section *get_first_section( SectionHashElem **piter )
 
 Section *get_last_section( void )
 {
-	init();
+	init_module();
 	return g_last_section;
 }
 
 Section *get_next_section(  SectionHashElem **piter )
 {
-	init();
+	init_module();
 	*piter = SectionHash_next( *piter );
 	return (*piter == NULL) ? NULL : (Section *) (*piter)->value;
 }
@@ -213,19 +213,19 @@ Section *get_next_section(  SectionHashElem **piter )
 *----------------------------------------------------------------------------*/
 static int get_last_module_id( void )
 {
-	init();
+	init_module();
 	return UIntArray_size( g_default_section->module_start ) - 1;
 }
 
 int get_cur_module_id( void )
 {
-	init();
+	init_module();
 	return g_cur_module;
 }
 
 void set_cur_module_id( int module_id )
 {
-	init();
+	init_module();
 	assert( module_id >= 0 );
 	assert( module_id <= get_last_module_id() );
 	g_cur_module = module_id;
@@ -240,7 +240,7 @@ static UInt section_module_start( Section *section, int module_id )
 	int i;
 	int cur_size;
 	
-    init();
+    init_module();
 	cur_size = UIntArray_size( section->module_start );
 	if ( cur_size > module_id )
 		addr = *( UIntArray_item( section->module_start, module_id ) );
@@ -294,7 +294,7 @@ void sections_alloc_addr(void)
 	SectionHashElem *iter;
 	UInt addr;
 
-	init();
+	init_module();
 
 	/* allocate addr in sequence */
 	addr = 0;
@@ -319,7 +319,7 @@ int new_module_id( void )
 	SectionHashElem *iter;
 	int module_id;
 
-	init();
+	init_module();
 	module_id = get_last_module_id() + 1;
 
 	/* expand all sections this new ID */
@@ -345,14 +345,14 @@ int new_module_id( void )
 *----------------------------------------------------------------------------*/
 void set_PC( UInt addr )
 {
-    init();
+    init_module();
 	g_cur_section->asmpc = addr;
 	g_cur_section->opcode_size = 0;
 }
 
 UInt next_PC( void )
 {
-    init();
+    init_module();
 	g_cur_section->asmpc += g_cur_section->opcode_size;
 	g_cur_section->opcode_size = 0;
 	return g_cur_section->asmpc;
@@ -360,13 +360,13 @@ UInt next_PC( void )
 
 UInt get_PC( void )
 {
-    init();
+    init_module();
 	return g_cur_section->asmpc;
 }
 
 static void inc_PC( UInt num_bytes )
 {
-    init();
+    init_module();
     g_cur_section->opcode_size += num_bytes;
 }
 
@@ -375,7 +375,7 @@ static void inc_PC( UInt num_bytes )
 *----------------------------------------------------------------------------*/
 static void check_space( UInt addr, UInt num_bytes )
 {
-	init();
+	init_module();
 	if (addr + num_bytes > MAXCODESIZE && !g_cur_section->max_codesize_issued)
 	{
 		error_max_codesize((long)MAXCODESIZE);
@@ -391,7 +391,7 @@ static Byte *alloc_space( UInt addr, UInt num_bytes )
 	UInt old_size, new_size;
 	Byte *buffer;
 
-    init();
+    init_module();
 	base_addr = get_cur_module_start();
 	old_size  = get_cur_module_size();
 
@@ -427,7 +427,7 @@ void patch_value( UInt addr, UInt value, UInt num_bytes )
 {
 	Byte *buffer;
 
-    init();
+    init_module();
 	buffer = alloc_space( addr, num_bytes );
 	while ( num_bytes-- > 0 )
 	{
@@ -438,7 +438,7 @@ void patch_value( UInt addr, UInt value, UInt num_bytes )
 
 void append_value( UInt value, UInt num_bytes )
 {
-    init();
+    init_module();
 	patch_value(get_cur_module_size(), value, num_bytes);
 
 	if ( opts.list )
@@ -468,7 +468,7 @@ void append_defs(UInt num_bytes, Byte fill)
 /* advance code pointer reserving space, return address of start of buffer */
 Byte *append_reserve( UInt num_bytes )
 {
-    init();
+    init_module();
 	return alloc_space( get_cur_module_size(), num_bytes );
 }
 
@@ -478,7 +478,7 @@ void patch_file_contents( FILE *file, UInt addr, long num_bytes )
 	long start_ptr;
 	Byte *buffer;
 
-	init();
+	init_module();
 
 	/* get bin file size */
 	if ( num_bytes < 0 )
@@ -500,7 +500,7 @@ void patch_file_contents( FILE *file, UInt addr, long num_bytes )
 
 void append_file_contents( FILE *file, long num_bytes )
 {
-	init();
+	init_module();
 	patch_file_contents(file, get_cur_module_size(), num_bytes);
 }
 
@@ -514,7 +514,7 @@ UInt fwrite_module_code( FILE *file )
 	UInt code_size = 0;
 	UInt addr, size;
 
-	init();
+	init_module();
 	for ( section = get_first_section( &iter ) ; section != NULL ; 
 		  section = get_next_section( &iter ) )
 	{
@@ -554,7 +554,7 @@ void fwrite_codearea( char *filename, FILE **pfile )
 	UInt section_size;
 	Int  cur_addr;
 
-	init();
+	init_module();
 
 	cur_addr   = -1;
 	for ( section = get_first_section( &iter ) ; section != NULL ; 

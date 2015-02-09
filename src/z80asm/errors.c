@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.54 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.55 2015-02-09 21:57:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -59,7 +59,7 @@ static ErrorFile error_file;		/* currently open error file */
 /*-----------------------------------------------------------------------------
 *   Initialize and Terminate module
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+DEFINE_init_module()
 {
 	strpool_init();					/* make sure strpool is removed last */
 
@@ -72,7 +72,7 @@ DEFINE_init()
 	set_incl_recursion_err_cb( error_include_recursion );
 }
 
-DEFINE_fini()
+DEFINE_dtor_module()
 {
     /* close error file, delete it if no errors */
     close_error_file();
@@ -80,7 +80,7 @@ DEFINE_fini()
 
 void errors_init( void ) 
 {
-	init();
+	init_module();
 }
 
 /*-----------------------------------------------------------------------------
@@ -89,38 +89,38 @@ void errors_init( void )
 *----------------------------------------------------------------------------*/
 void set_error_null( void )
 {
-    init();
+    init_module();
     errors.filename = errors.module = NULL;
     errors.line = 0;
 }
 
 void set_error_file( char *filename )
 {
-    init();
+    init_module();
     errors.filename = strpool_add( filename );	/* may be NULL */
 }
 
 void set_error_module( char *modulename )
 {
-    init();
+    init_module();
     errors.module = strpool_add( modulename );	/* may be NULL */
 }
 
 void set_error_line( int lineno )
 {
-    init();
+    init_module();
     errors.line = lineno;
 }
 
 char *get_error_file(void)
 {
-	init();
+	init_module();
 	return errors.filename;
 }
 
 int get_error_line(void)
 {
-	init();
+	init_module();
 	return errors.line;
 }
 
@@ -129,13 +129,13 @@ int get_error_line(void)
 *----------------------------------------------------------------------------*/
 void reset_error_count( void )
 {
-    init();
+    init_module();
     errors.count = 0;
 }
 
 int get_num_errors( void )
 {
-    init();
+    init_module();
     return errors.count;
 }
 
@@ -147,7 +147,7 @@ void open_error_file( char *src_filename )
 {
 	char *filename = get_err_filename( src_filename );
 
-    init();
+    init_module();
 
     /* close current file if any */
     close_error_file();
@@ -161,7 +161,7 @@ void close_error_file( void )
 	struct stat st;
 	int stat_res;
 
-    init();
+    init_module();
 
     /* close current file if any */
 	if (error_file.file != NULL)
@@ -184,7 +184,7 @@ void close_error_file( void )
 
 static void puts_error_file( char *string )
 {
-    init();
+    init_module();
 
     if ( error_file.file != NULL )
         fputs( string, error_file.file );
@@ -198,7 +198,7 @@ static void do_error( enum ErrType err_type, char *message )
     DEFINE_STR( msg, MAXLINE );
     size_t len_at, len_prefix;
 
-    init();
+    init_module();
 
     /* init empty message */
     Str_clear( msg );
@@ -257,7 +257,7 @@ static void do_error( enum ErrType err_type, char *message )
 	{ \
 		DEFINE_STR( msg, MAXLINE ); \
 		\
-		init(); \
+		init_module(); \
 		Str_append_sprintf( msg, args ); \
 		do_error( err_type, msg->str ); \
 	}
@@ -269,7 +269,7 @@ static void do_error( enum ErrType err_type, char *message )
 *----------------------------------------------------------------------------*/
 static void file_error( char *filename, Bool writing )
 {
-	init();
+	init_module();
 	
 	if ( writing )
 		error_write_file( filename );

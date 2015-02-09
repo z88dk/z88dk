@@ -7,7 +7,7 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.10 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.11 2015-02-09 21:57:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -45,7 +45,7 @@ static Object *next_autodelete( ObjectList *headp )
 /*-----------------------------------------------------------------------------
 *   Initialize
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+DEFINE_init_module()
 {
 	/* make sure xmalloc and strpool are removed last */
     xmalloc_init();
@@ -59,7 +59,7 @@ DEFINE_init()
 /*-----------------------------------------------------------------------------
 *   Destruct all objects from the stack
 *----------------------------------------------------------------------------*/
-DEFINE_fini()
+DEFINE_dtor_module()
 {
     Object *obj;
 
@@ -86,7 +86,7 @@ void _register_obj( Object *obj,
                     void ( *delete_ptr )( Object * ),
                     char *name )
 {
-    init();
+    init_module();
 
     obj->_class.delete_ptr = delete_ptr;
     obj->_class.name       = name;
@@ -96,7 +96,7 @@ void _register_obj( Object *obj,
 
 void _update_register_obj( Object *obj )
 {
-    init();
+    init_module();
 
     LIST_INSERT_HEAD( &objects, obj, _class.entries );
 
@@ -110,7 +110,7 @@ void _update_register_obj( Object *obj )
 *----------------------------------------------------------------------------*/
 void _deregister_obj( Object *obj )
 {
-    init();
+    init_module();
 
     LIST_REMOVE( obj, _class.entries );
 

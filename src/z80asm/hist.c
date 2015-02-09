@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.142 2015-02-08 23:52:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.143 2015-02-09 21:57:42 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.142 2015-02-08 23:5
 
 /*
 * $Log: hist.c,v $
-* Revision 1.142  2015-02-08 23:52:31  pauloscustodio
+* Revision 1.143  2015-02-09 21:57:42  pauloscustodio
+* Rename init() macro to init_module()
+*
+* Revision 1.142  2015/02/08 23:52:31  pauloscustodio
 * Add debug macros and mini-unit test module
 *
 * Revision 1.141  2015/02/08 12:29:09  pauloscustodio
@@ -464,10 +467,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.142 2015-02-08 23:5
 * classring deleted, not used
 *
 * Revision 1.55  2013/12/15 23:31:04  pauloscustodio
-* Replace code-generation for init() functions by macros in init.h
-* to help define init() and fini() functions per module.
-* Code generation complicates maintenance, as all the modules with init()
-* functions are coupled together, and it may not be clear how the init()
+* Replace code-generation for init_module() functions by macros in init.h
+* to help define init_module() functions per module.
+* Code generation complicates maintenance, as all the modules with init_module()
+* functions are coupled together, and it may not be clear how the init_module()
 * module appears.
 *
 * Revision 1.54  2013/12/15 13:18:33  pauloscustodio
@@ -1850,10 +1853,10 @@ Based on 1.0.31
 	- Replaced strpool code by GLib String Chunks.
 	- New error module with one error function per error, no need for the error
 	  constants. Allows compiler to type-check error message arguments.
-	  Included the errors module in the init() mechanism, no need to call
+	  Included the errors module in the init_module() mechanism, no need to call
 	  error initialization from main(). Moved all error-testing scripts to
 	  one file errors.t.
-	- Integrate codearea in init() mechanism.
+	- Integrate codearea in init_module() mechanism.
 	- Create xfree() macro that NULLs the pointer after free, required
 	  by z80asm to find out if a pointer was already freed.
 
@@ -1904,10 +1907,10 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
 30.12.2013 [2.1.1] (pauloscustodio)
 -------------------------------------------------------------------------------
-	- Replace code-generation for init() functions by macros in init.h
-	  to help define init() and fini() functions per module.
-	  Code generation complicates maintenance, as all the modules with init()
-	  functions are coupled together, and it may not be clear how the init()
+	- Replace code-generation for init_module() functions by macros in init.h
+	  to help define init_module() functions per module.
+	  Code generation complicates maintenance, as all the modules with init_module()
+	  functions are coupled together, and it may not be clear how the init_module()
 	  module appears.
 	- Merge dynstr.c and safestr.c into lib/strutil.c; the new Str type
 	  handles both dynamically allocated strings and fixed-size strings.

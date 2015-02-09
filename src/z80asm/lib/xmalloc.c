@@ -6,7 +6,7 @@ Use MS Visual Studio malloc debug for any allocation not using xmalloc/xfree
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.16 2015-02-08 23:52:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/xmalloc.c,v 1.17 2015-02-09 21:57:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -60,7 +60,7 @@ static DList_def( mem_blocks );
 /*-----------------------------------------------------------------------------
 *   Initialize functions
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+DEFINE_init_module()
 {
 #ifdef _CRTDBG_MAP_ALLOC        /* MS Visual Studio malloc debug */
 #define REPORT_STDERR(reportType)   \
@@ -79,13 +79,13 @@ DEFINE_init()
 
 void xmalloc_init( void )
 {
-    init();
+    init_module();
 }
 
 /*-----------------------------------------------------------------------------
 *   Terminate function
 *----------------------------------------------------------------------------*/
-DEFINE_fini()
+DEFINE_dtor_module()
 {
     MemBlock *block;
 
@@ -174,7 +174,7 @@ void *_xmalloc( size_t client_size, char *file, int lineno )
 {
     MemBlock *block;
 
-    init();
+    init_module();
 
     block = new_block( client_size, file, lineno );
     return CLIENT_PTR( block );
@@ -194,7 +194,7 @@ void _xfree( void *client_ptr, char *file, int lineno )
 {
     MemBlock *block;
 
-    init();
+    init_module();
 
     /* if input is NULL, do nothing */
     if ( client_ptr == NULL )
@@ -228,7 +228,7 @@ void *_xcalloc( int num, size_t size, char *file, int lineno )
     size_t   client_size;
     void     *client_ptr;
 
-    init();
+    init_module();
 
     client_size = num * size;
     block       = new_block( client_size, file, lineno );
@@ -248,7 +248,7 @@ char *_xstrdup( char *source, char *file, int lineno )
     size_t   client_size;
     char	*client_ptr;
 
-    init();
+    init_module();
 
     client_size = strlen( source ) + 1;
     block       = new_block( client_size, file, lineno );
@@ -268,7 +268,7 @@ void *_xrealloc( void *client_ptr, size_t client_size, char *file, int lineno )
     MemBlock *block, *prev_block;
     size_t   block_size;
 
-    init();
+    init_module();
 
     /* if input is NULL, behave as malloc */
     if ( client_ptr == NULL )

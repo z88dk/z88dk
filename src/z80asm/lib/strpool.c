@@ -6,7 +6,7 @@ Strings with the same contents are reused.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.13 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.14 2015-02-09 21:57:46 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"
@@ -33,13 +33,13 @@ static Element *the_pool = NULL;		/* singleton */
 /*-----------------------------------------------------------------------------
 *   Init and Fini functions
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+DEFINE_init_module()
 {
     xmalloc_init();			/* force xmalloc to be terminated last */
     the_pool = NULL;
 }
 
-DEFINE_fini()
+DEFINE_dtor_module()
 {
     Element *elem, *tmp;
 
@@ -59,7 +59,7 @@ DEFINE_fini()
 *----------------------------------------------------------------------------*/
 void strpool_init( void )
 {
-    init();
+    init_module();
 }
 
 /*-----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ char *strpool_add( char *str )
     Element *elem;
     size_t num_chars;
 
-    init();
+    init_module();
 
     /* special case : NULL string */
     if ( str == NULL )

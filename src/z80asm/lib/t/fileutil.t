@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.21 2015-02-08 23:52:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.22 2015-02-09 21:57:46 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -586,8 +586,8 @@ write_file("test.c", <<'END');
 
 FILE *file;
 
-DEFINE_init() { }
-DEFINE_fini() 
+DEFINE_init_module() { }
+DEFINE_dtor_module() 
 {
 	assert(file);
 	myfclose(file);	/* dummy, file is closed by class atexit() */
@@ -596,7 +596,7 @@ DEFINE_fini()
 int main()
 {
 	/* call main fini() after fileutil fini() */
-	init();	
+	init_module();	
 	file = myfopen("test.1.bin", "wb"); assert(file);
 	
 	xfput_strz( file, "123" );

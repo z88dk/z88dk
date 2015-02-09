@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.71 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.72 2015-02-09 21:57:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -94,7 +94,7 @@ static void init_sym(void)
 /*-----------------------------------------------------------------------------
 *   Init functions
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+DEFINE_init_module()
 {
 	input_buf = OBJ_NEW(Str);
 	Str_set_alias( input_buf, &p );		/* Ragel pointer to current scan position */
@@ -106,7 +106,7 @@ DEFINE_init()
 	utarray_new(scan_state, &ut_scan_state_icd);
 }
 
-DEFINE_fini()
+DEFINE_dtor_module()
 {
 	OBJ_DELETE(input_buf);
 	OBJ_DELETE(input_stack);
@@ -120,7 +120,7 @@ void save_scan_state(void)
 {
 	ScanState save;
 
-	init();
+	init_module();
 
 	save.sym = sym;
 	save.input_buf = xstrdup(input_buf->str);
@@ -143,7 +143,7 @@ void restore_scan_state(void)
 {
 	ScanState *save;
 
-	init();
+	init_module();
 
 	save = (ScanState *)utarray_back(scan_state);
 	sym = save->sym;
@@ -165,14 +165,14 @@ void restore_scan_state(void)
 
 void drop_scan_state(void)
 {
-	init();
+	init_module();
 
 	utarray_pop_back(scan_state);
 }
 
 void scan_expect_opcode(void)
 {
-	init();
+	init_module();
 
 	expect_opcode = TRUE;
 
@@ -183,7 +183,7 @@ void scan_expect_opcode(void)
 
 void scan_expect_operands(void)
 {
-	init();
+	init_module();
 
 	expect_opcode = FALSE;
 
@@ -314,7 +314,7 @@ static void skip_to_newline( void )
 *----------------------------------------------------------------------------*/
 void Skipline( void )
 {
-	init();
+	init_module();
 
 	if ( ! EOL )
 	{
@@ -370,7 +370,7 @@ static Bool fill_buffer( void )
 *----------------------------------------------------------------------------*/
 tokid_t GetSym( void )
 {
-	init();
+	init_module();
 
 	init_sym();
 
@@ -409,7 +409,7 @@ tokid_t GetSym( void )
 /* get the next token, error if not the expected one */
 void GetSymExpect(tokid_t expected_tok)
 {
-	init();
+	init_module();
 
 	GetSym();
 	CurSymExpect(expected_tok);
@@ -419,7 +419,7 @@ void GetSymExpect(tokid_t expected_tok)
 /* check the current token, error if not the expected one */
 void CurSymExpect(tokid_t expected_tok)
 {
-	init();
+	init_module();
 
 	if (sym.tok != expected_tok)
 		error_syntax();
@@ -431,7 +431,7 @@ void CurSymExpect(tokid_t expected_tok)
 *----------------------------------------------------------------------------*/
 void SetTemporaryLine( char *line )
 {
-	init();
+	init_module();
 
 #if 0
 	if (*p != '\0')

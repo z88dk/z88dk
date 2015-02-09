@@ -3,57 +3,37 @@ Unit test for init.h
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/test_init.c,v 1.2 2015-01-26 23:46:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/test_init.c,v 1.3 2015-02-09 21:57:46 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"   /* before any other include */
-
+#include "minunit.h"
 #include "init.h"
-#include <assert.h>
 
-DEFINE_init()
+DEFINE_init_module()
 {
-	const char *function = __FUNCTION__;
-	init();			/* mistake, caught by setting initialized before running code */
-	init();			/* mistake, caught by setting initialized before running code */
-
-	warn("%s\n", function);
+	warn("init called\n");
 }
 
-DEFINE_fini()
+DEFINE_dtor_module()
 {
-	const char *function = __FUNCTION__;
-	init();			/* mistake, caught by setting initialized before running code */
-	init();			/* mistake, caught by setting initialized before running code */
-
-	warn("%s\n", function);
+	warn("fini called\n");
 }
 
-void func1(void)
+static int test_init(void)
 {
-	const char *function = __FUNCTION__;
-	init();
-	init();
+	warn("before init\n");
+	init_module();
+	warn("after init\n");
+	init_module();
+	warn("end\n");
 
-	warn("%s\n", function);
+	return MU_PASS;
 }
 	
-void func2(void)
-{
-	const char *function = __FUNCTION__;
-	init();
-	init();
-
-	warn("%s\n", function);
-}
 	
-int main()
+int main(int argc, char *argv[])
 {
-	warn("%s started\n", __FUNCTION__);
-	func1();
-	func2();
-	func1();
-	func2();
-	warn("%s finished\n", __FUNCTION__);
-	return 0;
+	mu_init(argc, argv);
+    mu_run_test(MU_PASS, test_init);
+	mu_fini();
 }

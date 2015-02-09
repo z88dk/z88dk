@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.97 2015-02-08 21:58:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.98 2015-02-09 21:57:42 pauloscustodio Exp $
 */
 
 #include "xmalloc.h"   /* before any other include */
@@ -104,7 +104,7 @@ static OptsLU opts_lu[] =
 /*-----------------------------------------------------------------------------
 *   Initialize module
 *----------------------------------------------------------------------------*/
-DEFINE_init()
+DEFINE_init_module()
 {
 	char *directory;
 
@@ -117,7 +117,7 @@ DEFINE_init()
 		utarray_push_back(opts.inc_path, &directory);
 }
 
-DEFINE_fini()
+DEFINE_dtor_module()
 {
 	utarray_free(opts.inc_path);
 	utarray_free(opts.lib_path);
@@ -132,7 +132,7 @@ void parse_argv( int argc, char *argv[] )
 {
     int arg;
 
-    init();
+    init_module();
 
     if ( argc == 1 )
         exit_copyright();				/* exit if no arguments */
@@ -509,7 +509,7 @@ static char *get_opts_ext_filename( char *filename, char *opts_ext )
 {
     DEFINE_FILE_STR( ext );
 
-    init();
+    init_module();
 
     Str_set( ext, FILEEXT_SEPARATOR );
     Str_append( ext, opts_ext );
@@ -518,43 +518,43 @@ static char *get_opts_ext_filename( char *filename, char *opts_ext )
 
 char *get_lst_filename( char *filename )
 {
-    init();
+    init_module();
 	return path_replace_ext( filename, FILEEXT_LST );
 }
 
 char *get_def_filename( char *filename )
 {
-    init();
+    init_module();
 	return path_replace_ext( filename, FILEEXT_DEF );
 }
 
 char *get_err_filename( char *filename )
 {
-    init();
+    init_module();
 	return path_replace_ext( filename, FILEEXT_ERR );
 }
 
 char *get_bin_filename( char *filename )
 {
-    init();
+    init_module();
 	return path_replace_ext( filename, FILEEXT_BIN );
 }
 
 char *get_lib_filename( char *filename )
 {
-    init();
+    init_module();
 	return path_replace_ext( filename, FILEEXT_LIB );
 }
 
 char *get_sym_filename( char *filename )
 {
-    init();
+    init_module();
 	return path_replace_ext( filename, FILEEXT_SYM );
 }
 
 char *get_map_filename( char *filename )
 {
-    init();
+    init_module();
 	return path_replace_ext( filename, FILEEXT_MAP );
 }
 

@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.191 2015-02-08 23:52:30 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.192 2015-02-09 21:57:42 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -312,7 +312,7 @@ parse.o: lib/dbg.h directives.h expr.h lib/classlist.h scan.h scan_tokens.h
 parse.o: opcodes.h errors.h errors_def.h options.h lib/utarray.h
 parse.o: options_def.h sym.h symref.h listfile.h model.h lib/list.h module.h
 parse.o: symtab.h parse.h lib/strpool.h parse_rules.h
-scan.o: lib/xmalloc.h errors.h errors_def.h lib/init.h lib/types.h lib/dbg.h
+scan.o: lib/xmalloc.h errors.h errors_def.h lib/init.h lib/dbg.h lib/types.h
 scan.o: lib/list.h lib/class.h lib/queue.h model.h module.h lib/classlist.h
 scan.o: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h lib/array.h
 scan.o: lib/strutil.h expr.h scan.h scan_tokens.h opcodes.h options.h
@@ -362,11 +362,11 @@ lib/srcfile.o: lib/types.h lib/list.h lib/strutil.h lib/utarray.h lib/dbg.h
 lib/srcfile.o: lib/fileutil.h lib/strpool.h
 lib/strhash.o: lib/xmalloc.h lib/strhash.h lib/types.h lib/class.h
 lib/strhash.o: lib/queue.h lib/uthash.h lib/dbg.h lib/strpool.h lib/strutil.h
-lib/strpool.o: lib/xmalloc.h lib/init.h lib/types.h lib/dbg.h lib/queue.h
+lib/strpool.o: lib/xmalloc.h lib/init.h lib/dbg.h lib/types.h lib/queue.h
 lib/strpool.o: lib/strpool.h lib/uthash.h
 lib/strutil.o: lib/xmalloc.h lib/strpool.h lib/strutil.h lib/class.h
 lib/strutil.o: lib/queue.h lib/types.h
-lib/xmalloc.o: lib/xmalloc.h lib/dlist.h lib/init.h lib/types.h lib/dbg.h
+lib/xmalloc.o: lib/xmalloc.h lib/dlist.h lib/init.h lib/dbg.h lib/types.h
 t/test_codearea.o: lib/xmalloc.h codearea.h lib/array.h lib/class.h
 t/test_codearea.o: lib/queue.h lib/types.h lib/strutil.h lib/classhash.h
 t/test_codearea.o: lib/strhash.h lib/uthash.h lib/dbg.h options.h
