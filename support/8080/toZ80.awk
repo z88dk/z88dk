@@ -7,7 +7,7 @@
 # Feb 2015: added partial support for the old style Z80
 # CP/M assemblers mnemonics, i.e. the Thechnical Design Lab one (TDL).
 #
-# $Id: toZ80.awk,v 1.5 2015-02-09 15:03:55 stefano Exp $
+# $Id: toZ80.awk,v 1.6 2015-02-09 21:03:27 stefano Exp $
 #
 
 
@@ -108,6 +108,27 @@ function sub_xy_idx() {
 
 ############ MAIN LOOP ############
 
+#### look for ".+" and ".-"
+    (/^[^;]*[ \t][.][\+\-]/) {
+        sub(/[\.][\+]/,"ASMPC+");
+        sub(/[\.][\-]/,"ASMPC-");
+    }
+
+#### .LOC to "ORG"
+    (/^[^; \t]*[ \t]+([.][L][O][C])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+        sub(/''/,"zpicettaz");
+
+	sub(/'/,"\"");
+	sub(/'/,"\"");
+        sub(/[.][L][O][C]/,"ORG");
+
+        sub("zpicettaz","'");
+        restore_label()
+        print $0
+        next
+    }
+
 #### Z80ASM label redefinition
 #### EQU to "DEFC"
     (/^[^;]*[ \t]+[eE][qQ][uU][ \t]/) {
@@ -154,6 +175,7 @@ function sub_xy_idx() {
 
         sub("zpicettaz","'");
         restore_label()
+
         print $0
         next
     }
@@ -170,6 +192,12 @@ function sub_xy_idx() {
 
         sub("zpicettaz","'");
         restore_label()
+		# [^H00] hex format (TDL SYNTAX)
+		if (match($0,/\[\^[Hh]/)) {
+			gsub(/\[\^[Hh]/,"$");
+			gsub(/\]/,",");
+		}
+		
         print $0
         next
     }
@@ -259,18 +287,11 @@ function sub_xy_idx() {
     }
 
 
-#### look for ".+" and ".-"
-    (/[\.][\-]/) {
-	print $0;
-        sub(/[\.][\+]/,"ASMPC+");
-        sub(/[\.][\-]/,"ASMPC-");
-    }
-
-
 #### look for "M,r"
     (/^[^; \t]*[ \t]+[^; \t]+[ \t]+[mM],[^; \t]+([; \t]|$)/) {
         sub(/[mM],/,"(HL),");
     }
+
 
 #### MOV
 ############################
@@ -401,7 +422,7 @@ function sub_xy_idx() {
         next
     }
 
-### LHLD word
+### LHLD word (TDL SYNTAX)
 ############################
     (/^[^; \t]*[ \t]+([Ll][Hh][Ll][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
@@ -417,7 +438,55 @@ function sub_xy_idx() {
         next
     }
 
-### LIXD word
+### LBCD word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ll][Bb][Cc][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+            wkg_str =  get_operand("[Ll][Bb][Cc][Dd]",4);
+
+            sub(/[Ll][Bb][Cc][Dd]/,temp_xyz);
+            sub(wkg_str,"BC,(" wkg_str ")" );
+            sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### LDED word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ll][Dd][Ee][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+            wkg_str =  get_operand("[Ll][Dd][Ee][Dd]",4);
+
+            sub(/[Ll][Dd][Ee][Dd]/,temp_xyz);
+            sub(wkg_str,"DE,(" wkg_str ")" );
+            sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+	
+### LSPD word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ll][Ss][Pp][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+            wkg_str =  get_operand("[Ll][Ss][Pp][Dd]",4);
+
+            sub(/[Ll][Ss][Pp][Dd]/,temp_xyz);
+            sub(wkg_str,"SP,(" wkg_str ")" );
+            sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### LIXD word (TDL SYNTAX)
 ############################
     (/^[^; \t]*[ \t]+([Ll][Ii][Xx][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
@@ -433,7 +502,23 @@ function sub_xy_idx() {
         next
     }
 
-### LIYD word
+### LXIX word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ll][Xx][Ii][Xx])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+            wkg_str =  get_operand("[Ll][Xx][Ii][Xx]",4);
+
+            sub(/[Ll][Xx][Ii][Xx]/,temp_xyz);
+            sub(wkg_str,"IX," wkg_str );
+            sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### LIYD word (TDL SYNTAX)
 ############################
     (/^[^; \t]*[ \t]+([Ll][Ii][Yy][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
@@ -449,8 +534,108 @@ function sub_xy_idx() {
         next
     }
 
+### LXIY word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ll][Xx][Ii][Yy])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
 
-### SHLD word
+            wkg_str =  get_operand("[Ll][Xx][Ii][Yy]",4);
+
+            sub(/[Ll][Xx][Ii][Yy]/,temp_xyz);
+            sub(wkg_str,"IY," wkg_str);
+            sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### SBCD word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ss][Bb][Cc][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+
+        wkg_str =  get_operand("[Ss][Bb][Cc][Dd]",4);
+
+        sub(/[Ss][Bb][Cc][Dd]/,temp_xyz);
+        sub(wkg_str,"(" wkg_str "),BC" );
+        sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### SDED word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ss][Dd][Ee][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+
+        wkg_str =  get_operand("[Ss][Dd][Ee][Dd]",4);
+
+        sub(/[Ss][Dd][Ee][Dd]/,temp_xyz);
+        sub(wkg_str,"(" wkg_str "),DE" );
+        sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### SSPD word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ss][Ss][Pp][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+
+        wkg_str =  get_operand("[Ss][Ss][Pp][Dd]",4);
+
+        sub(/[Ss][Ss][Pp][Dd]/,temp_xyz);
+        sub(wkg_str,"(" wkg_str "),SP" );
+        sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### SIXD word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ss][Ii][Xx][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+
+        wkg_str =  get_operand("[Ss][Ii][Xx][Dd]",4);
+
+        sub(/[Ss][Ii][Xx][Dd]/,temp_xyz);
+        sub(wkg_str,"(" wkg_str "),IX" );
+        sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### SIYD word (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ss][Ii][Yy][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+
+        wkg_str =  get_operand("[Ss][Ii][Yy][Dd]",4);
+
+        sub(/[Ss][Ii][Yy][Dd]/,temp_xyz);
+        sub(wkg_str,"(" wkg_str "),IY" );
+        sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### SHLD word (TDL SYNTAX)
 ############################
     (/^[^; \t]*[ \t]+([Ss][Hh][Ll][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
@@ -467,9 +652,48 @@ function sub_xy_idx() {
         next
     }
 
-
 #### Simple replacements (no operand)
 ############################
+
+###### INXIX (TDL SYNTAX)
+###########################
+    (/^[^; \t]*[ \t]+([Ii][Nn][Xx][Ii][Xx])([; \t]|$)/) {
+        save_label()
+        sub(/[Ii][Nn][Xx][Ii][Xx]/,"INC"instr_tabulator"IX");
+        restore_label()
+        print $0
+        next
+    }
+
+###### INXIY (TDL SYNTAX)
+###########################
+    (/^[^; \t]*[ \t]+([Ii][Nn][Xx][Ii][Yy])([; \t]|$)/) {
+        save_label()
+        sub(/[Ii][Nn][Xx][Ii][Yy]/,"INC"instr_tabulator"IY");
+        restore_label()
+        print $0
+        next
+    }
+
+###### DCXIX (TDL SYNTAX)
+###########################
+    (/^[^; \t]*[ \t]+([Dd][Cc][Xx][Ii][Xx])([; \t]|$)/) {
+        save_label()
+        sub(/[Dd][Cc][Xx][Ii][Xx]/,"DEC"instr_tabulator"IX");
+        restore_label()
+        print $0
+        next
+    }
+
+###### DCXIY (TDL SYNTAX)
+###########################
+    (/^[^; \t]*[ \t]+([Dd][Cc][Xx][Ii][Yy])([; \t]|$)/) {
+        save_label()
+        sub(/[Dd][Cc][Xx][Ii][Yy]/,"DEC"instr_tabulator"IY");
+        restore_label()
+        print $0
+        next
+    }
 
 
 ###### SPHL
@@ -616,6 +840,69 @@ function sub_xy_idx() {
         next
     }
 
+###### DADC (TDL SYNTAX)
+################################
+
+    (/^[^; \t]*[ \t]+([dD][aA][dD][cC])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        wkg_str =  get_operand("[dD][aA][dD][cC]",4);
+        sub(/[dD][aA][dD][cC]/,temp_xyz);
+        sub_bdh()
+        sub(temp_xyz,"ADC")
+        sub(/ADC[ \t]*/,"ADC"instr_tabulator"HL,")
+        restore_label()
+        print $0
+        next
+    }
+
+###### DSBC (TDL SYNTAX)
+################################
+
+    (/^[^; \t]*[ \t]+([dD][sS][bB][cC])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        wkg_str =  get_operand("[dD][sS][bB][cC]",4);
+        sub(/[dD][sS][bB][cC]/,temp_xyz);
+        sub_bdh()
+        sub(temp_xyz,"SBC")
+        sub(/SBC[ \t]*/,"SBC"instr_tabulator"HL,")
+        restore_label()
+        print $0
+        next
+    }
+
+###### DADX (TDL SYNTAX)
+################################
+
+    (/^[^; \t]*[ \t]+([dD][aA][dD][xX])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        wkg_str =  get_operand("[dD][aA][dD][xX]",4);
+        sub(/[dD][aA][dD][xX]/,temp_xyz);
+        sub_bdh()
+        sub(temp_xyz,"ADD")
+        sub(/ADD[ \t]*/,"ADD"instr_tabulator"IX,")
+        restore_label()
+        print $0
+        next
+    }
+
+###### DADY (TDL SYNTAX)
+################################
+
+    (/^[^; \t]*[ \t]+([dD][aA][dD][yY])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        wkg_str =  get_operand("[dD][aA][dD][yY]",4);
+        sub(/[dD][aA][dD][yY]/,temp_xyz);
+        sub_bdh()
+        sub(temp_xyz,"ADD")
+        sub(/ADD[ \t]*/,"ADD"instr_tabulator"IY,")
+        restore_label()
+        print $0
+        next
+    }
 
 ###### DAD
 ############################
@@ -902,6 +1189,20 @@ function sub_xy_idx() {
         }
         else if (match($0,/[Jj][Pp][Ee][ \t]+/)) {
             sub(/[Jj][Pp][Ee][ \t]+/,"JP"instr_tabulator"PE,");
+        }
+
+        restore_label()
+        print $0;
+        next
+    }
+
+###### JMPR (TDL SYNTAX)
+##############################
+    (/^[^; \t]*[ \t]+([Jj][Mm][Pp][Rr])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        if (match($0,/[Jj][Mm][Pp][Rr][ \t]+/)) {
+            sub(/[Jj][Mm][Pp][Rr][ \t]+/,"JR"instr_tabulator);
         }
 
         restore_label()
