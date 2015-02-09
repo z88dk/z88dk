@@ -4,13 +4,15 @@
 # All rights reserved world-wide
 #
 # Re-arranged for Z88DK by Stefano Bodrato
+# Feb 2015: added partial support for the old style Z80
+# CP/M assemblers mnemonics, i.e. the Thechnical Design Lab one (TDL).
 #
-# $Id: toZ80.awk,v 1.4 2008-10-29 18:39:40 stefano Exp $
+# $Id: toZ80.awk,v 1.5 2015-02-09 15:03:55 stefano Exp $
 #
 
 
 BEGIN {
- temp_xyz = "zyx"     # temporary replacement for Mnemonic
+ temp_xyz = "z_z"     # temporary replacement for Mnemonic
  temp_label = "zzz" # temporary replacement for ^LABEL
  label = "?"          # storage for label during conversion
  label_reg_exp = "^[^; \t]+"
@@ -65,7 +67,7 @@ function get_operand(op_regexp,op_len) {
 
 # Substitute BC for B, DE for D, or HL for H in operand field
 function sub_bdh() {
-    if (match(wkg_str,/[BbDdHh]/)) {
+    if (match(wkg_str,/[BbDdHhXxYy]/)) {
         if (match(wkg_str,/[Bb]/)) {
             sub(/[Bb]/,"BC");
         }
@@ -78,12 +80,54 @@ function sub_bdh() {
     }
 }
 
+# Substitute IX for X, IY for Y in operand field
+function sub_xy() {
+    if (match(wkg_str,/[XxYy]/)) {
+		if (match(wkg_str,/[Xx]/)) {
+            sub(/[Xx]/,"IX");
+        }
+        else if (match(wkg_str,/[Yy]/)) {
+            sub(/[Yy]/,"IY");
+        }
+    }
+}
+
+# Substitute (IX+n) for n(X), (IY+n) for n(Y) in operand field
+function sub_xy_idx() {
+    if (match(wkg_str,/[\(][XxYy][\)]/)) {
+		if (match(wkg_str,/[\(][Xx][\)]/)) {
+            sub(/[Xx]/,"");
+			wkg_str = "(IX+" + wkg_str + ")";
+        }
+        else if (match(wkg_str,/[\(][Yy][\)]/)) {
+            sub(/[Yy]/,"");
+			wkg_str = "(IY+" + wkg_str + ")";
+        }
+    }
+}
 
 ############ MAIN LOOP ############
 
 #### Z80ASM label redefinition
 #### EQU to "DEFC"
     (/^[^;]*[ \t]+[eE][qQ][uU][ \t]/) {
+    	#save_label()
+        #restore_label()
+        match_counter=match($0,/;/);
+        match_result="";
+        if (match_counter>0) match_result=substr($0,match_counter);
+        # get rid of terminating ":" if any
+        if (match($1,/:$/)) {
+          print "DEFC", substr($1,0,RSTART-1), " = " ,$3, match_result
+        }
+        else {
+          print "DEFC", $1, " = " ,$3, match_result
+        }
+        next
+    }
+
+#### = to "DEFC"
+    (/^[^;]*[ \t]+[=][ \t]/) {
     	#save_label()
         #restore_label()
         match_counter=match($0,/;/);
@@ -114,10 +158,59 @@ function sub_bdh() {
         next
     }
 
+#### .ASCII to "DEFM"
+#### db to "DEFM"
+    (/^[^; \t]*[ \t]+([.][A][S][C][I][I])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+        sub(/''/,"zpicettaz");
+
+	sub(/'/,"\"");
+	sub(/'/,"\"");
+        sub(/[.][A][S][C][I][I]/,"DEFM");
+
+        sub("zpicettaz","'");
+        restore_label()
+        print $0
+        next
+    }
+
+#### .BYTE to "DEFB"
+    (/^[^; \t]*[ \t]+([.][B][Y][T][E])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+        sub(/''/,"zpicettaz");
+
+	sub(/'/,"\"");
+	sub(/'/,"\"");
+        sub(/[.][B][Y][T][E]/,"DEFB");
+
+        sub("zpicettaz","'");
+        restore_label()
+        print $0
+        next
+    }
+
 #### ds to "DEFS"
     (/^[^; \t]*[ \t]+([Dd][Ss])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
         sub(/[Dd][Ss]/,"DEFS");
+        restore_label()
+        print $0
+        next
+    }
+
+#### .BLKB to "DEFS"
+    (/^[^; \t]*[ \t]+([.][B][L][K][B])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+        sub(/[.][B][L][K][B]/,"DEFS");
+        restore_label()
+        print $0
+        next
+    }
+
+#### .BLKW to "DEFS 2*"
+    (/^[^; \t]*[ \t]+([.][B][L][K][W])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+        sub(/[.][B][L][K][W]/,"DEFS"instr_tabulator"2*");
         restore_label()
         print $0
         next
@@ -132,13 +225,47 @@ function sub_bdh() {
         next
     }
 
+#### .WORD to "DEFW"
+    (/^[^; \t]*[ \t]+([.][W][O][R][D])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+        sub(/[.][W][O][R][D]/,"DEFW");
+        restore_label()
+        print $0
+        next
+    }
+
 #### Label section end
 
+#### look for n(X), n(Y) Z80 index registers
+    (/[^,; \t][\(][XxYy][\)]/) {
+		if (match($0,/[^,; \t][_0-f]*[\(][XxYy][\)]/)) {
+			label = substr($0,RSTART,RLENGTH);
+			tmp_str = substr($0,(RSTART),(RLENGTH)-3)
+
+			# Negative sign ?
+			if (tmp_str ~ /-/) {
+				sub(/[^,; \t][_0-f]*[\(][Xx][\)]/,"(IX" tmp_str ")");
+				sub(/[^,; \t][_0-f]*[\(][Yy][\)]/,"(IY" tmp_str ")");
+			} else {
+				sub(/[^,; \t][_0-f]*[\(][Xx][\)]/,"(IX+" tmp_str ")");
+				sub(/[^,; \t][_0-f]*[\(][Yy][\)]/,"(IY+" tmp_str ")");
+			}
+		}
+	}
 
 #### look for "r,M"
-    (/^[^; \t]*[ \t]+[^; \t]+[ \t]+[^; \t]+,[mM]/) {
+    (/^[^; \t]*[ \t]+[^; \t]+[ \t]+[^; \t]+,[mM]([; \t]|$)/) {
         sub(/,[mM]/,",(HL)");
     }
+
+
+#### look for ".+" and ".-"
+    (/[\.][\-]/) {
+	print $0;
+        sub(/[\.][\+]/,"ASMPC+");
+        sub(/[\.][\-]/,"ASMPC-");
+    }
+
 
 #### look for "M,r"
     (/^[^; \t]*[ \t]+[^; \t]+[ \t]+[mM],[^; \t]+([; \t]|$)/) {
@@ -267,6 +394,7 @@ function sub_bdh() {
         wkg_str =  get_operand("[Ll][Xx][Ii]",3);
         sub_bdh()
         sub(/[Ll][Xx][Ii]/,"LD");
+        sub_xy()
 
         restore_label()
         print $0
@@ -288,6 +416,39 @@ function sub_bdh() {
         print $0
         next
     }
+
+### LIXD word
+############################
+    (/^[^; \t]*[ \t]+([Ll][Ii][Xx][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+            wkg_str =  get_operand("[Ll][Ii][Xx][Dd]",4);
+
+            sub(/[Ll][Ii][Xx][Dd]/,temp_xyz);
+            sub(wkg_str,"IX,(" wkg_str ")" );
+            sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
+### LIYD word
+############################
+    (/^[^; \t]*[ \t]+([Ll][Ii][Yy][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+            wkg_str =  get_operand("[Ll][Ii][Yy][Dd]",4);
+
+            sub(/[Ll][Ii][Yy][Dd]/,temp_xyz);
+            sub(wkg_str,"IY,(" wkg_str ")" );
+            sub(temp_xyz,"LD")
+
+        restore_label()
+        print $0
+        next
+    }
+
 
 ### SHLD word
 ############################
@@ -506,11 +667,13 @@ function sub_bdh() {
             sub(/[Ii][Nn][Xx]/,temp_xyz);
             sub_bdh()
             sub(temp_xyz,"INC")
+            sub_xy()
         }
         else if (match($0,/[Dd][Cc][Xx]/)) {
             sub(/[Dd][Cc][Xx]/,temp_xyz);
             sub_bdh()
             sub(temp_xyz,"DEC")
+            sub_xy()
         }
 
         restore_label()
@@ -546,6 +709,44 @@ function sub_bdh() {
         sub(/[Cc][Mm][Cc]/,"CCF");
         restore_label()
         print $0
+        next
+    }
+
+###### SRAR SRLR RARR RALR 
+############################
+    (/^[^; \t]*[ \t]+([Ss][Rr][Aa][Rr]|[Ss][Rr][Ll][Rr]|[Rr][Aa][Rr][Rr]|[Rr][Aa][Ll][Rr])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        if (match($0,/[Ss][Rr][Aa][Rr]/)) {
+            sub(/[Ss][Rr][Aa][Rr]/,"SRA");
+        }
+        else if (match($0,/[Ss][Rr][Ll][Rr]/)) {
+            sub(/[Ss][Rr][Ll][Rr]/,"SLA");
+        }
+        else if (match($0,/[Rr][Aa][Rr][Rr]/)) {
+            sub(/[Rr][Aa][Rr][Rr]/,"RR");
+        }
+        else if (match($0,/[Rr][Aa][Ll][Rr]/)) {
+            sub(/[Rr][Aa][Ll][Rr]/,"RR");
+        }
+        restore_label()
+        print $0;
+        next
+    }
+
+###### RLCR RRCR
+############################
+    (/^[^; \t]*[ \t]+([Rr][Ll][Cc][Rr]|[Rr][Rr][Cc][Rr])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        if (match($0,/[Rr][Ll][Cc][Rr]/)) {
+            sub(/[Rr][Ll][Cc][Rr]/,"RLC");
+        }
+        else if (match($0,/[Rr][Rr][Cc][Rr]/)) {
+            sub(/[Rr][Rr][Cc][Rr]/,"RRC");
+        }
+        restore_label()
+        print $0;
         next
     }
 
@@ -663,6 +864,16 @@ function sub_bdh() {
         next
     }
 
+###### EXAF (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ee][Xx][Aa][Ff])([; \t]|$)/) {
+        save_label()
+        sub(/[Ee][Xx][Aa][Ff]/,"EX"instr_tabulator"AF,AF");
+        restore_label()
+        print $0
+        next
+    }
+
 ###### JMP
 ############################
     (/^[^; \t]*[ \t]+([Jj][Mm][Pp])[ \t]+[^ \t]+([; \t]|$)/) {
@@ -690,7 +901,24 @@ function sub_bdh() {
             sub(/[Jj][Pp][Oo][ \t]+/,"JP"instr_tabulator"PO,");
         }
         else if (match($0,/[Jj][Pp][Ee][ \t]+/)) {
-            sub(/[Jj][Pp][Ee][ \t]+/,"JP PE,");
+            sub(/[Jj][Pp][Ee][ \t]+/,"JP"instr_tabulator"PE,");
+        }
+
+        restore_label()
+        print $0;
+        next
+    }
+
+###### JRNZ JRNC (TDL SYNTAX)
+################################
+    (/^[^; \t]*[ \t]+[Jj]([Rr][Nn][Zz]|[Rr][Nn][Cc])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        if (match($0,/[Jj][Rr][Nn][Zz][ \t]+/)) {
+            sub(/[Jj][Rr][Nn][Zz][ \t]+/,"JR"instr_tabulator"NZ,");
+        }
+        else if (match($0,/[Jj][Rr][Nn][Cc][ \t]+/)) {
+            sub(/[Jj][Rr][Nn][Cc][ \t]+/,"JR"instr_tabulator"NC,");
         }
 
         restore_label()
@@ -721,6 +949,22 @@ function sub_bdh() {
         next
     }
 
+###### JRZ JRC (TDL SYNTAX)
+##############################
+    (/^[^; \t]*[ \t]+[Jj]([Rr][Zz]|[Rr][Cc])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        if (match($0,/[Jj][Rr][Zz][ \t]+/)) {
+            sub(/[Jj][Rr][Zz][ \t]+/,"JR"instr_tabulator"Z,");
+        }
+        else if (match($0,/[Jj][Rr][Cc][ \t]+/)) {
+            sub(/[Jj][Rr][Cc][ \t]+/,"JR"instr_tabulator"C,");
+        }
+
+        restore_label()
+        print $0;
+        next
+    }
 
 
 
@@ -862,6 +1106,7 @@ function sub_bdh() {
         wkg_str =  get_operand("[Pp][Uu][Ss][Hh]",4);
         sub(/[Pp][Uu][Ss][Hh]/,temp_xyz);
         sub_bdh()
+        sub_xy()
         if (match(wkg_str,/[Pp][Ss][Ww]/)) {
             sub(/[Pp][Ss][Ww]/,"AF");
         }
@@ -881,6 +1126,7 @@ function sub_bdh() {
         wkg_str =  get_operand("[Pp][Oo][Pp]",3);
         sub(/[Pp][Oo][Pp]/,temp_xyz);
         sub_bdh()
+        sub_xy()
         if (match(wkg_str,/[Pp][Ss][Ww]/)) {
             sub(/[Pp][Ss][Ww]/,"AF");
         }
