@@ -7,7 +7,7 @@
 # Feb 2015: added partial support for the old style Z80
 # CP/M assemblers mnemonics, i.e. the Thechnical Design Lab one (TDL).
 #
-# $Id: toZ80.awk,v 1.6 2015-02-09 21:03:27 stefano Exp $
+# $Id: toZ80.awk,v 1.7 2015-02-10 08:20:50 stefano Exp $
 #
 
 
@@ -264,22 +264,6 @@ function sub_xy_idx() {
 
 #### Label section end
 
-#### look for n(X), n(Y) Z80 index registers
-    (/[^,; \t][\(][XxYy][\)]/) {
-		if (match($0,/[^,; \t][_0-f]*[\(][XxYy][\)]/)) {
-			label = substr($0,RSTART,RLENGTH);
-			tmp_str = substr($0,(RSTART),(RLENGTH)-3)
-
-			# Negative sign ?
-			if (tmp_str ~ /-/) {
-				sub(/[^,; \t][_0-f]*[\(][Xx][\)]/,"(IX" tmp_str ")");
-				sub(/[^,; \t][_0-f]*[\(][Yy][\)]/,"(IY" tmp_str ")");
-			} else {
-				sub(/[^,; \t][_0-f]*[\(][Xx][\)]/,"(IX+" tmp_str ")");
-				sub(/[^,; \t][_0-f]*[\(][Yy][\)]/,"(IY+" tmp_str ")");
-			}
-		}
-	}
 
 #### look for "r,M"
     (/^[^; \t]*[ \t]+[^; \t]+[ \t]+[^; \t]+,[mM]([; \t]|$)/) {
@@ -292,6 +276,22 @@ function sub_xy_idx() {
         sub(/[mM],/,"(HL),");
     }
 
+#### look for n(X), n(Y) Z80 index registers
+    (/[^,; \t][\(][XxYy][\)]/) {
+		if (match($0,/[^,; \t][_0-f\+\-]*[\(][XxYy][\)]/)) {
+			label = substr($0,RSTART,RLENGTH);
+			tmp_str = substr($0,(RSTART),(RLENGTH)-3)
+
+			# Negative sign ?
+			if (tmp_str ~ /-/) {
+				sub(/[^,; \t][_0-f\+\-]*[\(][Xx][\)]/,"(IX" tmp_str ")");
+				sub(/[^,; \t][_0-f\+\-]*[\(][Yy][\)]/,"(IY" tmp_str ")");
+			} else {
+				sub(/[^,; \t][_0-f\+\-]*[\(][Xx][\)]/,"(IX+" tmp_str ")");
+				sub(/[^,; \t][_0-f\+\-]*[\(][Yy][\)]/,"(IY+" tmp_str ")");
+			}
+		}
+	}
 
 #### MOV
 ############################
@@ -786,7 +786,8 @@ function sub_xy_idx() {
     (/^[^; \t]*[ \t]+[sS][bB][bB][ \t]+[^ \t]+([; \t]|$)/) {
 
         wkg_str =  get_operand("([Ss][Bb][Bb])",3);
-        if (match(wkg_str,/^[^;]*[Mm]/)) {
+
+		if  ((wkg_str == "M")||(wkg_str == "m")) {
             sub(/[Mm]/,"(HL)");
         }
 
@@ -805,7 +806,8 @@ function sub_xy_idx() {
     (/^[^; \t]*[ \t]+[sS][uU][bB][ \t]+[^ \t]+([; \t]|$)/) {
 
         wkg_str =  get_operand("([Ss][Uu][Bb])",3);
-        if (match(wkg_str,/^[^;]*[Mm]/)) {
+
+		if  ((wkg_str == "M")||(wkg_str == "m")) {
             sub(/[Mm]/,"(HL)");
         }
 
@@ -831,7 +833,7 @@ function sub_xy_idx() {
             sub(temp_xyz,"ADC")
         }
 
-        if (match(wkg_str,/^[^;]*[Mm]/)) {
+		if  ((wkg_str == "M")||(wkg_str == "m")) {
             sub(/[Mm]/,"(HL)");
         }
 
@@ -927,7 +929,8 @@ function sub_xy_idx() {
         save_label()
 
         wkg_str =  get_operand("([Ii][Nn][Rr]|[Dd][Cc][Rr])",3);
-        if (match(wkg_str,/^[^;]*[Mm]/)) {
+
+		if  ((wkg_str == "M")||(wkg_str == "m")) {
             sub(/[Mm]/,"(HL)");
         }
 
@@ -999,16 +1002,19 @@ function sub_xy_idx() {
         next
     }
 
-###### SRAR SRLR RARR RALR 
-############################
-    (/^[^; \t]*[ \t]+([Ss][Rr][Aa][Rr]|[Ss][Rr][Ll][Rr]|[Rr][Aa][Rr][Rr]|[Rr][Aa][Ll][Rr])[ \t]+[^ \t]+([; \t]|$)/) {
+###### SRAR SLAR SRLR RARR RALR 
+#################################
+    (/^[^; \t]*[ \t]+([Ss][Rr][Aa][Rr]|[Ss][Ll][Aa][Rr]|[Ss][Rr][Ll][Rr]|[Rr][Aa][Rr][Rr]|[Rr][Aa][Ll][Rr])[ \t]+[^ \t]+([; \t]|$)/) {
         save_label()
 
         if (match($0,/[Ss][Rr][Aa][Rr]/)) {
             sub(/[Ss][Rr][Aa][Rr]/,"SRA");
         }
+        else if (match($0,/[Ss][Ll][Aa][Rr]/)) {
+            sub(/[Ss][Ll][Aa][Rr]/,"SLA");
+        }
         else if (match($0,/[Ss][Rr][Ll][Rr]/)) {
-            sub(/[Ss][Rr][Ll][Rr]/,"SLA");
+            sub(/[Ss][Rr][Ll][Rr]/,"SRL");
         }
         else if (match($0,/[Rr][Aa][Rr][Rr]/)) {
             sub(/[Rr][Aa][Rr][Rr]/,"RR");
@@ -1102,7 +1108,8 @@ function sub_xy_idx() {
         save_label()
 
         wkg_str =  get_operand("([Aa][Nn][Aa]|[Xx][Rr][Aa]|[Oo][Rr][Aa])",3);
-        if (match(wkg_str,/^[^;]*[Mm]/)) {
+
+		if  ((wkg_str == "M")||(wkg_str == "m")) {
             sub(/[Mm]/,"(HL)");
         }
 
@@ -1133,6 +1140,54 @@ function sub_xy_idx() {
         next
     }
 
+###### CCIR (TDL Syntax)
+############################
+    (/^[^; \t]*[ \t]+([Cc][Cc][Ii][Rr])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        sub(/[Cc][Cc][Ii][Rr]/,"CPIR");
+
+        restore_label()
+        print $0;
+        next
+    }
+
+###### CCDR (TDL Syntax)
+############################
+    (/^[^; \t]*[ \t]+([Cc][Cc][Dd][Rr])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        sub(/[Cc][Cc][Dd][Rr]/,"CPDR");
+
+        restore_label()
+        print $0;
+        next
+    }
+
+###### CCI (TDL Syntax)
+############################
+    (/^[^; \t]*[ \t]+([Cc][Cc][Ii])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        sub(/[Cc][Cc][Ii]/,"CPI");
+
+        restore_label()
+        print $0;
+        next
+    }
+
+###### CCD (TDL Syntax)
+############################
+    (/^[^; \t]*[ \t]+([Cc][Cc][Dd])[ \t]+[^ \t]+([; \t]|$)/) {
+        save_label()
+
+        sub(/[Cc][Cc][Dd]/,"CPD");
+
+        restore_label()
+        print $0;
+        next
+    }
+
 ###### CMP
 ############################
     (/^[^; \t]*[ \t]+([Cc][Mm][Pp])[ \t]/) {
@@ -1141,7 +1196,7 @@ function sub_xy_idx() {
         wkg_str =  get_operand("[Cc][Mm][Pp]",3);
 
         sub(/[Cc][Mm][Pp]/,temp_xyz);
-        if (match(wkg_str,/^[^;]*[Mm]/)) {
+		if  ((wkg_str == "M")||(wkg_str == "m")) {
             sub(/[Mm]/,"(HL)");
         }
         sub(temp_xyz,"CP")
