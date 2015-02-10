@@ -1,0 +1,194 @@
+	.module %0
+=
+	MODULE %0
+	
+	EXTERN __divschar
+	EXTERN __divsint
+	EXTERN __divslong
+	EXTERN __divslonglong
+	EXTERN __divsuchar
+	EXTERN __divuchar
+	EXTERN __divuint
+	EXTERN __divulong
+	EXTERN __divulonglong
+	EXTERN __divuschar
+	EXTERN __modschar
+	EXTERN __modsint
+	EXTERN __modslong
+	EXTERN __modslonglong
+	EXTERN __modsuchar
+	EXTERN __moduchar
+	EXTERN __moduint
+	EXTERN __modulong
+	EXTERN __modulonglong
+	EXTERN __moduschar
+	EXTERN __mulint
+	EXTERN __mullong
+	EXTERN __mullonglong
+	EXTERN __mulschar
+	EXTERN __mulsuchar
+	EXTERN __muluschar
+	EXTERN __rlslonglong
+	EXTERN __rlulonglong
+	EXTERN __rrslonglong
+	EXTERN __rrulonglong
+	EXTERN __sdcc_call_hl
+	EXTERN _banked_call
+	EXTERN _banked_ret
+	
+
+%0::
+=
+%0:
+
+%0$:
+=
+__local_%0:
+
+	%1, %0$
+=
+	%1, __local_%0
+
+	%0,%1$
+=
+	%0,__local_%1
+
+	%0	%1$
+=
+	%0	__local_%1
+
+	.area _XSEG
+=
+	SECTION IGNORE
+
+	.area _STACK
+=
+	SECTION IGNORE
+
+	.area _CODE_%0
+=
+	SECTION code_compiler_bank_%0
+
+	.area _CODE
+=
+	SECTION code_compiler
+
+	.area _DATA
+=
+	SECTION bss_compiler
+
+	.area _RSEG (ABS)
+=
+	SECTION IGNORE
+
+	.area _GSINIT
+=
+	SECTION code_crt_init
+
+	.area _GSFINAL
+=
+	SECTION code_crt_exit
+
+	.area _HOME
+=
+	SECTION IGNORE
+
+	.area _CABS (ABS)
+=
+	SECTION IGNORE
+
+	.area _DABS (ABS)
+=
+	SECTION IGNORE
+
+	.area _INITIALIZER
+=
+	SECTION data_compiler
+
+	.area _INITIALIZED
+=
+	SECTION IGNORE_SDCC
+
+	.area %0
+=
+	SECTION %0
+
+	.ascii %0
+=
+	DEFM %0
+
+	.ds %0
+=
+	DEFS %0
+
+	.db %0
+=
+	DEFB %0
+
+	.dw %0
+=
+	DEFW %0
+
+	%1#<(%0)
+=
+	%1#(%0 & 0xFF)
+
+	%1#>(%0)
+=
+	%1#(%0 / 256)
+
+	.globl %0
+=
+	GLOBAL %0
+
+	.org %0
+=
+	org %0
+
+	%0 = .
+=
+	%0:
+
+%0	=	%1
+=
+defc %0	= %1
+
+	%0,%1 (ix)
+=
+	%0,(ix+%1)
+
+	%0, %1 (ix)
+=
+	%0,(ix+%1)
+
+	%2	%1 (ix),%0
+=
+	%2	(ix+%1),%0
+
+	%2	%1 (ix)
+=
+	%2	(ix+%1)
+
+	%0,%1 (iy)
+=
+	%0,(iy+%1)
+
+	%0, %1 (iy)
+=
+	%0,(iy+%1)
+
+	%2	%1 (iy),%0
+=
+	%2	(iy+%1),%0
+
+	%2	%1 (iy)
+=
+	%2	(iy+%1)
+
+__xinit_%0
+=
+%0
+
+	%0#%1
+=
+	%0+%1
