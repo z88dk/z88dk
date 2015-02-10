@@ -7,7 +7,7 @@
 # Feb 2015: added partial support for the old style Z80
 # CP/M assemblers mnemonics, i.e. the Thechnical Design Lab one (TDL).
 #
-# $Id: toZ80.awk,v 1.7 2015-02-10 08:20:50 stefano Exp $
+# $Id: toZ80.awk,v 1.8 2015-02-10 09:10:51 stefano Exp $
 #
 
 
@@ -372,6 +372,45 @@ function sub_xy_idx() {
 
     }
 
+###### LDAR (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ll][Dd][Aa][Rr])([; \t]|$)/) {
+        save_label()
+        sub(/[Ll][Dd][Aa][Rr]/,"LD"instr_tabulator"A,R");
+        restore_label()
+        print $0
+        next
+    }
+
+###### LDAI (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ll][Dd][Aa][Ii])([; \t]|$)/) {
+        save_label()
+        sub(/[Ll][Dd][Aa][Ii]/,"LD"instr_tabulator"A,I");
+        restore_label()
+        print $0
+        next
+    }
+
+###### STAR (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ss][Tt][Aa][Rr])([; \t]|$)/) {
+        save_label()
+        sub(/[Ss][Tt][Aa][Rr]/,"LD"instr_tabulator"R,A");
+        restore_label()
+        print $0
+        next
+    }
+
+###### STAI (TDL SYNTAX)
+############################
+    (/^[^; \t]*[ \t]+([Ss][Tt][Aa][Ii])([; \t]|$)/) {
+        save_label()
+        sub(/[Ss][Tt][Aa][Ii]/,"LD"instr_tabulator"I,A");
+        restore_label()
+        print $0
+        next
+    }
 
 ### LDA word
 ############################
