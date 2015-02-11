@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.86 2015-02-05 07:33:01 aralbrec Exp $
+ *      $Id: zcc.c,v 1.87 2015-02-11 17:51:49 aralbrec Exp $
  */
 
 
@@ -208,6 +208,7 @@ static char  *c_incpath = NULL;
 static char  *c_coptrules1 = NULL;
 static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
+static char  *c_sdccrules1 = NULL;
 static char  *c_crt0 = NULL;
 static char  *c_linkopts = NULL;
 static char  *c_asmopts = NULL;
@@ -275,6 +276,7 @@ static arg_t  config[] = {
     {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "DESTDIR/lib/z80rules.1" },
     {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2"},
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
+	{"SDCCRULES1", 0, SetStringConfig, &c_sdccrules1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_rules.1"},
     {"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
 
     {"ALTMATHLIB", 0, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library"},
@@ -668,12 +670,14 @@ int main(int argc, char **argv)
             if ( compiler_type == CC_SDCC) {
                if (process(".i", ".asm2", c_compiler, comparg, compiler_style, i, YES, NO))
                   exit(1);
-               if (process(".asm2", ".asm", "sed", "-r \"s/#/+/g\"", filter, i, YES, NO))
+//               if (process(".asm2", ".asm", "sed", "-r \"s/#/+/g\"", filter, i, YES, NO))
+//                  exit(1);
+               if (process(".asm2", ".asm", c_copt_exe, c_sdccrules1, filter, i, YES, NO))
                   exit(1);
-			} else {
+            } else {
                if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES, NO))
                    exit(1);
-			}
+            }
         case AFILE:
             switch (peepholeopt) {
             case 1:
@@ -1240,7 +1244,8 @@ static void configure_compiler()
         compiler_type = CC_SDCC;
         // snprintf(buf,sizeof(buf),"-mz80 --reserve-regs-iy --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
 		// move restriction on iy to target cfg
-        snprintf(buf,sizeof(buf),"-mz80_z88dk --no-optsdcc-in-asm --c1mode --no-peep",sdcc_assemblernames[assembler_type]);
+        //snprintf(buf,sizeof(buf),"-mz80_z88dk --no-optsdcc-in-asm --c1mode --no-peep",sdcc_assemblernames[assembler_type]);
+		snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode",sdcc_assemblernames[assembler_type]);
         add_option_to_compiler(buf);
         preprocarg = " -DZ88DK_USES_SDCC=1";
         BuildOptions(&cpparg, preprocarg);
