@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.87 2015-02-11 17:51:49 aralbrec Exp $
+ *      $Id: zcc.c,v 1.88 2015-02-11 17:56:27 aralbrec Exp $
  */
 
 
@@ -276,7 +276,7 @@ static arg_t  config[] = {
     {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "DESTDIR/lib/z80rules.1" },
     {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2"},
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
-	{"SDCCRULES1", 0, SetStringConfig, &c_sdccrules1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_rules.1"},
+    {"SDCCRULES1", 0, SetStringConfig, &c_sdccrules1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_rules.1"},
     {"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
 
     {"ALTMATHLIB", 0, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library"},
