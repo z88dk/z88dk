@@ -11,7 +11,7 @@
    MinGW
    gcc -Wall -O2 -o z80svg z80svg.c libxml2.dll
 
-   $Id: z80svg.c,v 1.17 2015-02-05 15:14:59 dom Exp $
+   $Id: z80svg.c,v 1.18 2015-02-11 19:27:05 stefano Exp $
  * ----------------------------------------------------------
 */
 
@@ -1439,6 +1439,7 @@ autoloop:
 
 	fprintf(stderr,"\n\n");
 	if (autosize==1) {
+		fclose(dest);
 		autosize=2;
 		fprintf(stderr,"\n------\n------\n");
 		if ((arm-alm)>(abm-atm)) {
