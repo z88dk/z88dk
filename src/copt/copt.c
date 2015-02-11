@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define USE_REGEXP
+
 #ifdef USE_REGEXP
 	#include <sys/types.h>
 	#ifdef LOCAL_REGEXP
