@@ -36,27 +36,38 @@
 	EXTERN __sdcc_enter_ix
 	EXTERN _banked_call
 	EXTERN _banked_ret
-	
+
+;;
+;; global labels
+;;
 
 %0::
 =
 %0:
 
+;;
+;; labels
+;;
+
 %0$:
 =
-__local_%0:
+l_%0:
 
 	%1, %0$
 =
-	%1, __local_%0
+	%1, l_%0
 
 	%0,%1$
 =
-	%0,__local_%1
+	%0,l_%1
 
 	%0	%1$
 =
-	%0	__local_%1
+	%0	l_%1
+
+;;
+;; sections
+;;
 
 	.area _XSEG
 =
@@ -108,11 +119,34 @@ __local_%0:
 
 	.area _INITIALIZED
 =
-	SECTION IGNORE_SDCC
+	
+IF 0
+	
+; .area _INITIALIZED removed by z88dk
+	
+
+IF 0
+=
+%activate
+;--------------------------------------------------------
+; absolute external ram data
+;--------------------------------------------------------
+=
+%once
+	
+ENDIF
+	
+;--------------------------------------------------------
+; absolute external ram data
+;--------------------------------------------------------
 
 	.area %0
 =
 	SECTION %0
+
+;;
+;; assembler directives
+;;
 
 	.ascii %0
 =
@@ -130,14 +164,6 @@ __local_%0:
 =
 	DEFW %0
 
-	%1#<(%0)
-=
-	%1#(%0 & 0xFF)
-
-	%1#>(%0)
-=
-	%1#(%0 / 256)
-
 	.globl %0
 =
 	GLOBAL %0
@@ -146,13 +172,37 @@ __local_%0:
 =
 	org %0
 
+;;
+;; label = PC
+;;
+
 	%0 = .
 =
 	%0:
 
+;;
+;; define constants
+;;
+
 %0	=	%1
 =
 defc %0	= %1
+
+;;
+;; asxxx syntax for LSB / MSB
+;;
+
+	%1#<(%0)
+=
+	%1#(%0 & 0xFF)
+
+	%1#>(%0)
+=
+	%1#(%0 / 256)
+
+;;
+;; zilog syntax for index registers
+;;
 
 	%0,%1 (ix)
 =
@@ -186,10 +236,18 @@ defc %0	= %1
 =
 	%2	(iy+%1)
 
+;;
+;; _INITIALIZER variables made into actual variable names
+;;
+
 __xinit_%0
 =
 %0
 
-	%0#%1
+;;
+;; asxxx immediate operator #
+;;
+
+	%"[^\"'#;]*"0#%1
 =
 	%0+%1
