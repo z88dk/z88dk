@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.22 2015-02-09 21:57:46 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/fileutil.t,v 1.23 2015-02-13 00:31:59 pauloscustodio Exp $
 #
 # Test fileutil.c
 
@@ -13,7 +13,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -Wno-overflow -otest test.c fileutil.c strutil.c xmalloc.c dlist.c class.c list.c strpool.c dbg.c";
+my $compile = "cc -Wall -Wno-overflow -otest test.c fileutil.c strutil.c alloc.c class.c list.c strpool.c dbg.c";
 
 #------------------------------------------------------------------------------
 # create directories and files
@@ -581,6 +581,7 @@ t_capture("./test J", "", "", 0);
 write_file("test.c", <<'END');
 #include "fileutil.h"
 #include "init.h"
+#include <assert.h>
 
 #define ERROR die("Test failed at line %d\n", __LINE__)
 

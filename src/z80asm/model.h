@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Global data model.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.30 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.31 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 #pragma once
@@ -25,34 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/model.h,v 1.30 2015-02-13 00:0
 #include "types.h"
 #include "utarray.h"
 
-/*-----------------------------------------------------------------------------
-*   Symbol type bitmasks - bits 3 to 6 same as Expression type bitmasks
-*----------------------------------------------------------------------------*/
-#define SYM_DEFINED		1       	/* 00000001 symbol is defined */
-#define SYM_TOUCHED		2       	/* 00000010 symbol was used, e.g. returned by 
-									   a symbol table search */
 
-#define SYM_TYPE		120     	/* 01111000 */
-
-#define SYM_LOCAL		16      	/* 00010000 symbol is local */
-#define SYM_PUBLIC		32      	/* 00100000 symbol is PUBLIC */
-#define SYM_EXTERN		64      	/* 01000000 symbol is EXTERN */
-
-#define SYM_NOTDEFINED  0
-
-/*-----------------------------------------------------------------------------
-*   Expression expr_type_mask bitmasks - bits 3 to 6 same as Symbol type bitmasks
-*----------------------------------------------------------------------------*/
-#define EXPR_LOCAL		SYM_LOCAL  	/* 00010000 Expression contains local symbol */
-#define EXPR_PUBLIC		SYM_PUBLIC 	/* 00100000 Expression contains global symbol */
-#define EXPR_EXTERN		SYM_EXTERN	/* 01000000 Expression contains extern symbol */
-
-/*-----------------------------------------------------------------------------
-*   Special symbols
-*----------------------------------------------------------------------------*/
-#define ASMHEAD_KW	"ASMHEAD%s%s"
-#define ASMTAIL_KW	"ASMTAIL%s%s"
-#define ASMSIZE_KW	"ASMSIZE%s%s"
 
 /*-----------------------------------------------------------------------------
 *   Initialize data structures

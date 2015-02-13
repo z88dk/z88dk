@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.137 2015-02-13 00:05:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.138 2015-02-13 00:31:59 pauloscustodio Exp $
 */
 
 #include "directives.h"
@@ -91,7 +91,7 @@ Z80pass2( void )
 				do_patch = FALSE;
 			}
 		}
-		else if ( ( (expr->sym_type >= TYPE_ADDRESS) || expr->result.extern_symbol ) )
+		else if ( ( (expr->type >= TYPE_ADDRESS) || expr->result.extern_symbol ) )
 		{
 			do_patch = FALSE;
 			do_store = TRUE;            /* store expression in relocatable file */
@@ -263,14 +263,11 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
         if ( sym->module == CURRENTMODULE )
         {
             /* Write only symbols related to current module */
-            if ( ( sym->sym_type_mask & SYM_LOCAL ) || ( sym->sym_type_mask & SYM_PUBLIC ) )
-            {
-                if ( ( sym->sym_type_mask & SYM_TOUCHED ) )
-                {
-                    list_symbol( sym->name, sym->value, sym->references );
-                }
-            }
+			if (sym->is_touched && 
+			    (sym->scope == SCOPE_LOCAL || 
+ 				 sym->scope == SCOPE_PUBLIC || 
+				 (sym->scope == SCOPE_GLOBAL && sym->is_defined)))
+				list_symbol(sym->name, sym->value, sym->references);
         }
-
     }
 }

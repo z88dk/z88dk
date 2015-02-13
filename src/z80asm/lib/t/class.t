@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.11 2015-02-08 23:52:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/class.t,v 1.12 2015-02-13 00:31:59 pauloscustodio Exp $
 #
 # Test class.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -DCLASS_DEBUG -otest test.c class.c strpool.c xmalloc.c dlist.c dbg.c";
+my $compile = "cc -Wall -DCLASS_DEBUG -otest test.c class.c strpool.c alloc.c dbg.c";
 
 write_file("test.c", <<'END');
 #include "class.h"
@@ -26,19 +26,19 @@ DEF_CLASS(Name);
 void Name_init (Name *self)
 { 
 	fprintf(stderr, "Name_init\n");
-	self->str = xstrdup("John"); 
+	self->str = m_strdup("John"); 
 }
 
 void Name_copy (Name *self, Name *other) 	
 { 
 	fprintf(stderr, "Name_copy\n");
-	self->str = xstrdup(self->str); 
+	self->str = m_strdup(self->str); 
 }
 
 void Name_fini (Name *self) 	
 { 
 	fprintf(stderr, "Name_fini\n");
-	xfree(self->str); 
+	m_free(self->str); 
 }
 
 CLASS(Person)

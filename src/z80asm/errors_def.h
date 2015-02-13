@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.40 2015-02-01 18:18:01 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.41 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -66,9 +66,7 @@ ERR( ErrError,	error_symbol_redefined( char *symbol ),	"symbol '%s' already defi
 ERR( ErrError,	error_symbol_redefined_module( char *symbol, char *module ),
 														"symbol '%s' already defined in module '%s'" _C_ symbol _C_ module )
 ERR( ErrError,	error_symbol_decl_local( char *symbol ),"symbol '%s' already declared local" _C_ symbol )
-#if 0
 ERR( ErrError,	error_symbol_redecl( char *symbol ),	"re-declaration of '%s' not allowed" _C_ symbol )
-#endif
 
 /* link errors */
 ERR(ErrError, error_max_codesize(long size), "max. code size of %ld bytes reached" _C_ size)

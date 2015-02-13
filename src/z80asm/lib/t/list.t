@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.9 2015-02-08 23:52:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/list.t,v 1.10 2015-02-13 00:32:00 pauloscustodio Exp $
 #
 # Test list.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c list.c class.c strpool.c xmalloc.c dlist.c dbg.c";
+my $compile = "cc -Wall -otest test.c list.c class.c strpool.c alloc.c dbg.c";
 
 write_file("test.c", <<'END');
 #include "list.h"
@@ -332,11 +332,11 @@ int main()
 	OBJ_DELETE(list);
 	check_list(list, NULL);
 
-	List_push(&list, xstrdup("a"));
-	List_push(&list, xstrdup("b"));
-	List_push(&list, xstrdup("c"));
+	List_push(&list, m_strdup("a"));
+	List_push(&list, m_strdup("b"));
+	List_push(&list, m_strdup("c"));
 	check_list(list, "a", "b", "c", NULL);
-	list->free_data = xfreef;
+	list->free_data = m_free_compat;
 	
 	List_remove_all(list);
 	check_list(list, NULL);

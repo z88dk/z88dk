@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.12 2015-02-08 23:52:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/strhash.t,v 1.13 2015-02-13 00:32:00 pauloscustodio Exp $
 #
 # Test strhash.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strhash.c class.c xmalloc.c dlist.c strpool.c strutil.c dbg.c";
+my $compile = "cc -Wall -otest test.c strhash.c class.c alloc.c strpool.c strutil.c dbg.c";
 
 write_file("test.c", <<'END');
 #include "strhash.h"
@@ -341,18 +341,18 @@ int main()
 	/* free_data */
 	OBJ_DELETE(hash1);
 	hash1 = OBJ_NEW(StrHash);
-	hash1->free_data = xfreef;
+	hash1->free_data = m_free_compat;
 	
-	StrHash_set(&hash1, "abc", xstrdup("123"));
+	StrHash_set(&hash1, "abc", m_strdup("123"));
 	check_list(hash1, "abc 123");
 
-	StrHash_set(&hash1, "def", xstrdup("456"));
+	StrHash_set(&hash1, "def", m_strdup("456"));
 	check_list(hash1, "abc 123 def 456");
 
-	StrHash_set(&hash1, "abc", xstrdup("789"));
+	StrHash_set(&hash1, "abc", m_strdup("789"));
 	check_list(hash1, "abc 789 def 456");
 	
-	StrHash_set(&hash1, "ghi", xstrdup("012"));
+	StrHash_set(&hash1, "ghi", m_strdup("012"));
 	check_list(hash1, "abc 789 def 456 ghi 012");
 	
 	StrHash_remove(hash1, "ghi");

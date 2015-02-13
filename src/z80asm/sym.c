@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.26 2015-02-13 00:05:17 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.27 2015-02-13 00:31:59 pauloscustodio Exp $
 */
 
 #include "listfile.h"
@@ -50,17 +50,17 @@ void Symbol_fini( Symbol *self )
 *   create a new symbol, needs to be deleted by OBJ_DELETE()
 *	adds a reference to the page were referred to
 *----------------------------------------------------------------------------*/
-Symbol *Symbol_create( char *name, long value, sym_type_t sym_type, Byte type_mask, 
+Symbol *Symbol_create(char *name, long value, sym_type_t type, sym_scope_t scope,
 					   Module *module, Section *section )
 {
     Symbol *self 	= OBJ_NEW( Symbol );
 
-	self->name 		= strpool_add( name );			/* name in strpool, not freed */
-	self->value 	= value;
-	self->sym_type	= sym_type;
-	self->sym_type_mask	= type_mask;
-	self->module 	= module;
-	self->section	= section;
+	self->name = strpool_add(name);			/* name in strpool, not freed */
+	self->value = value;
+	self->type = type;
+	self->scope = scope;
+	self->module = module;
+	self->section = section;
 
     /* add reference */
     add_symbol_ref( self->references, list_get_page_nr(), FALSE );

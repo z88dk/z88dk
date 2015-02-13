@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.28 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.29 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 
@@ -52,7 +52,7 @@ static void write_map_syms( FILE *file, SymbolHash *symtab )
             fprintf( file, "= %04lX, ", sym->value );
         }
 
-        if ( sym->sym_type_mask & SYM_LOCAL )
+        if ( sym->scope == SCOPE_LOCAL )
             fputc( 'L', file );
         else
             fputc( 'G', file );

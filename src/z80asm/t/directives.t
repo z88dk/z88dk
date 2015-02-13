@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.16 2015-02-01 18:18:02 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.17 2015-02-13 00:32:00 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -636,6 +636,7 @@ z80asm(
 	asm		=> <<'END',
 		extern 				;; error: syntax error
 		public 				;; error: syntax error
+		global 				;; error: syntax error
 END
 );
 
@@ -644,18 +645,30 @@ z80asm(
 		public	p1,p2
 		xdef    p3			;; warn: 'XDEF' is deprecated, use 'PUBLIC' instead
 		xlib    p4			;; warn: 'XLIB' is deprecated, use 'PUBLIC' instead
+
+		global  g1, g2
+		defc g1 = 16, g3 = 48
+		global g3, g4
 		
 	p1:	defb ASMPC			;; 00
 	p2:	defb ASMPC			;; 01
 	p3:	defb ASMPC			;; 02
 	p4:	defb ASMPC			;; 03
+		defb g1, g2, g3, g4	;; 10 20 30 40
+
 END
 	asm1	=> <<'END',
 		extern p1,p2
 		xref   p3			;; warn: 'XREF' is deprecated, use 'EXTERN' instead
 		lib	   p4			;; warn: 'LIB' is deprecated, use 'EXTERN' instead
+
+		global  g1, g2
+		defc g2 = 32, g4 = 64
+		global g3, g4
 		
 		defb p1,p2,p3,p4	;; 00 01 02 03
+		defb g1, g2, g3, g4	;; 10 20 30 40
+		
 END
 );
 

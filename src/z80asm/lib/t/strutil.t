@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.21 2015-02-08 23:52:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strutil.t,v 1.22 2015-02-13 00:32:00 pauloscustodio Exp $
 #
 # Test strutil.c
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strutil.c strpool.c class.c xmalloc.c dlist.c dbg.c";
+my $compile = "cc -Wall -otest test.c strutil.c strpool.c class.c alloc.c dbg.c";
 
 write_file("test.1.asm", {binmode => ':raw'}, "");
 write_file("test.2.asm", {binmode => ':raw'}, "A\nB\rC\r\nD\n\rE");

@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.29 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.30 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 #include "array.h"
@@ -268,39 +268,38 @@ void ExprOp_compute( ExprOp *self, Expr *expr )
 	{
 	case SYMBOL_OP:
 		/* symbol was not defined */
-        if ( ! (self->d.symbol->sym_type_mask & SYM_DEFINED) )
+        if ( ! self->d.symbol->is_defined )
         {
 			expr->result.not_evaluable = TRUE;
 
-			if ( self->d.symbol->sym_type == TYPE_UNKNOWN )
-				expr->result.undefined_symbol = TRUE;
-
-			if ( self->d.symbol->sym_type_mask & SYM_EXTERN )
+			/* copy scope */
+			if (self->d.symbol->scope == SCOPE_EXTERN ||
+				(self->d.symbol->scope == SCOPE_GLOBAL && !self->d.symbol->is_defined))
 				expr->result.extern_symbol = TRUE;
-
-			Calc_push( 0 );
+			else if (self->d.symbol->type == TYPE_UNKNOWN)
+				expr->result.undefined_symbol = TRUE;
+			
+			Calc_push(0);
         }
 		else
 		{
 			Calc_push( self->d.symbol->value );
 		}
 
-		/* copy appropriate type bits */
-		expr->expr_type_mask |= ( self->d.symbol->sym_type_mask & SYM_TYPE );
-		expr->sym_type = MAX( expr->sym_type, self->d.symbol->sym_type );
+		expr->type = MAX( expr->type, self->d.symbol->type );
 
 		/* check if symbol is computable and was computed */
-		if ( self->d.symbol->sym_type == TYPE_COMPUTED && ! self->d.symbol->computed )
-			expr->computed = FALSE;
+		if (self->d.symbol->type == TYPE_COMPUTED && !self->d.symbol->is_computed)
+			expr->is_computed = FALSE;
 
 		break;
 		
 	case CONST_EXPR_OP:
-		expr->sym_type = TYPE_CONSTANT;		/* convert to constant expression */
+		expr->type = TYPE_CONSTANT;		/* convert to constant expression */
 		break;
 		
 	case ASMPC_OP:
-		expr->sym_type = MAX( expr->sym_type, TYPE_ADDRESS );
+		expr->type = MAX( expr->type, TYPE_ADDRESS );
 		Calc_push( get_PC() ); 
 		break;		
 
@@ -349,8 +348,7 @@ void Expr_init (Expr *self)
     self->text = OBJ_NEW( Str );
 	OBJ_AUTODELETE( self->text ) = FALSE;
 
-	self->sym_type	= TYPE_UNKNOWN;
-    self->expr_type_mask = 0;
+	self->type	= TYPE_UNKNOWN;
 	
 	self->target_name = NULL;
 
@@ -414,7 +412,7 @@ static Bool Expr_parse_factor( Expr *self )
     {
 	case TK_ASMPC:				/* BUG_0047 */
 		ExprOp_init_asmpc( ExprOpArray_push( self->rpn_ops ) );
-		self->sym_type = MAX( self->sym_type, TYPE_ADDRESS );
+		self->type = MAX( self->type, TYPE_ADDRESS );
 
 		Str_append_n(self->text, sym.tstart, sym.tlen);
 		
@@ -427,14 +425,14 @@ static Bool Expr_parse_factor( Expr *self )
 		ExprOp_init_symbol( ExprOpArray_push( self->rpn_ops ),
 							symptr );
 
-		/* copy appropriate type bits */
-		self->sym_type = MAX( self->sym_type, symptr->sym_type );
-        self->expr_type_mask |= ( symptr->sym_type_mask & SYM_TYPE );
-
-        if ( ! (symptr->sym_type_mask & SYM_DEFINED) )
+		/* copy type */
+		self->type = MAX( self->type, symptr->type );
+#if 0
+        if ( ! symptr->is_defined )
         {
 			self->result.not_evaluable		= TRUE;
         }
+#endif
 
         Str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
 
@@ -445,7 +443,7 @@ static Bool Expr_parse_factor( Expr *self )
 		Str_append_sprintf(self->text, "%ld", sym.number);
 		ExprOp_init_number( ExprOpArray_push( self->rpn_ops ),
 							sym.number );
-		self->sym_type = MAX( self->sym_type, TYPE_CONSTANT );
+		self->type = MAX( self->type, TYPE_CONSTANT );
         GetSym();
         break;
 
@@ -649,7 +647,7 @@ long Expr_eval( Expr *self )
 	self->result.undefined_symbol	= FALSE;
 	self->result.extern_symbol		= FALSE;
 
-	self->computed = TRUE;
+	self->is_computed = TRUE;
 
 	for ( i = 0; i < ExprOpArray_size( self->rpn_ops ); i++ )
 	{
@@ -659,9 +657,9 @@ long Expr_eval( Expr *self )
 	}
 
 	/* need to downgrade from COMPUTED if already computed */
-	if ( self->sym_type == TYPE_COMPUTED && self->computed )
+	if (self->type == TYPE_COMPUTED && self->is_computed)
 	{
-		sym_type_t sym_type = TYPE_CONSTANT;
+		sym_type_t type = TYPE_CONSTANT;
 
 		for ( i = 0; i < ExprOpArray_size( self->rpn_ops ); i++ )
 		{
@@ -669,14 +667,14 @@ long Expr_eval( Expr *self )
 
 			switch (expr_op->op_type)
 			{
-			case SYMBOL_OP:		sym_type = MAX( sym_type, expr_op->d.symbol->sym_type ); break;
-			case CONST_EXPR_OP:	sym_type = MAX( sym_type, TYPE_CONSTANT ); break;
-			case ASMPC_OP:		sym_type = MAX( sym_type, TYPE_ADDRESS ); break;
+			case SYMBOL_OP:		type = MAX( type, expr_op->d.symbol->type ); break;
+			case CONST_EXPR_OP:	type = MAX( type, TYPE_CONSTANT ); break;
+			case ASMPC_OP:		type = MAX( type, TYPE_ADDRESS ); break;
 			default:			; /* no change */
 			}
 		}
-		assert( sym_type != TYPE_COMPUTED );
-		self->sym_type = sym_type;
+		assert( type != TYPE_COMPUTED );
+		self->type = type;
 	}
 
     return Calc_pop();

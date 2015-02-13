@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.17 2015-02-08 23:52:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.18 2015-02-13 00:31:59 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -12,10 +12,10 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c array.c strutil.c strpool.c class.c xmalloc.c dlist.c dbg.c";
+my $compile = "cc -Wall -otest test.c array.c strutil.c strpool.c class.c alloc.c dbg.c";
 
 write_file("test.c", <<'END');
-#include "xmalloc.h"
+#include "alloc.h"
 #include "array.h"
 #include <assert.h>
 
@@ -28,7 +28,7 @@ typedef struct Point
 void Point_free(void *_point) 
 {
 	Point *point = _point;
-	xfree(point->name);
+	m_free(point->name);
 }
 
 ARRAY( Point );
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 	assert( p->x == 0 );
 	assert( p->y == 0 );
 	
-	p->name = xstrdup("hello");
+	p->name = m_strdup("hello");
 	p->x = 1;
 	p->y = 2;
 	
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 	assert( points->items->len == 11*sizeof(Point) );
 	assert( points->items->size == 11*sizeof(Point)+1 );
 
-	p->name = xstrdup("world");
+	p->name = m_strdup("world");
 	p->x = 3;
 	p->y = 4;
 	
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 	assert( points->items->len == 12*sizeof(Point) );
 	assert( points->items->size == 12*sizeof(Point)+1 );
 
-	p->name = xstrdup("hello again");
+	p->name = m_strdup("hello again");
 	p->x = 5;
 	p->y = 6;
 	
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 	assert( points->items->len == 2*sizeof(Point) );
 	assert( points->items->size == 2*sizeof(Point)+1 );
 	
-	p->name = xstrdup("new point");
+	p->name = m_strdup("new point");
 	p->x = 7;
 	p->y = 8;
 	

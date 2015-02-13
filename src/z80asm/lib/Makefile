@@ -2,7 +2,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Makefile,v 1.3 2015-02-08 23:52:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Makefile,v 1.4 2015-02-13 00:31:59 pauloscustodio Exp $
 
 TARGET	= libclibrary.a
 
@@ -15,8 +15,7 @@ INSTALL ?= install
 SOURCES	= $(wildcard *.c)
 OBJECTS	= $(patsubst %.c,%.o,$(SOURCES))
 
-TEST_SRC1= $(wildcard t/test_*.c) $(wildcard t/uthash/test*.c)
-TEST_SRC = $(TEST_SRC1:t/test_xmalloc.c=)
+TEST_SRC= $(wildcard t/test_*.c) $(wildcard t/uthash/test*.c)
 TESTS	= $(patsubst %.c,%,$(TEST_SRC))
 
 # The Target Build
@@ -65,22 +64,95 @@ depend:
 
 # DO NOT DELETE
 
-array.o: xmalloc.h array.h class.h queue.h types.h strutil.h
-class.o: xmalloc.h class.h queue.h types.h init.h dbg.h strpool.h
+alloc.o: alloc.h dbg.h types.h init.h utlist.h
+array.o: array.h class.h alloc.h dbg.h types.h queue.h strutil.h
+class.o: alloc.h dbg.h types.h class.h queue.h init.h strpool.h
 dbg.o: dbg.h
-dlist.o: xmalloc.h dlist.h
-fileutil.o: xmalloc.h fileutil.h list.h class.h queue.h types.h strutil.h
-fileutil.o: utarray.h dbg.h strpool.h uthash.h
-list.o: xmalloc.h list.h class.h queue.h types.h
+fileutil.o: alloc.h dbg.h types.h fileutil.h list.h class.h queue.h strutil.h
+fileutil.o: utarray.h strpool.h uthash.h
+list.o: alloc.h dbg.h types.h list.h class.h queue.h
 minunit.o: minunit.h dbg.h
-srcfile.o: xmalloc.h srcfile.h class.h queue.h types.h list.h strutil.h
-srcfile.o: utarray.h dbg.h fileutil.h strpool.h
-strhash.o: xmalloc.h strhash.h types.h class.h queue.h uthash.h dbg.h
-strhash.o: strpool.h strutil.h
-strpool.o: xmalloc.h init.h types.h dbg.h queue.h strpool.h uthash.h
-strutil.o: xmalloc.h strpool.h strutil.h class.h queue.h types.h
-xmalloc.o: xmalloc.h dlist.h init.h types.h dbg.h
+srcfile.o: alloc.h dbg.h types.h srcfile.h class.h queue.h list.h strutil.h
+srcfile.o: utarray.h fileutil.h strpool.h
+strhash.o: alloc.h dbg.h types.h strhash.h class.h queue.h uthash.h strpool.h
+strhash.o: strutil.h
+strpool.o: alloc.h dbg.h types.h init.h queue.h strpool.h uthash.h
+strutil.o: alloc.h dbg.h types.h strpool.h strutil.h class.h queue.h
+t/test_alloc.o: minunit.h dbg.h alloc.h types.h
 t/test_dbg.o: minunit.h dbg.h
-t/test_dlist.o: xmalloc.h dbg.h dlist.h
-t/test_init.o: xmalloc.h init.h types.h dbg.h
-t/test_xmalloc.o: xmalloc.h dbg.h
+t/test_init.o: minunit.h dbg.h init.h types.h
+t/uthash/test1.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test10.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test11.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test12.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test13.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test14.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test15.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test16.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test17.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test18.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test19.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test2.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test20.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test21.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test22.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test23.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test24.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test25.o: utlist.h
+t/uthash/test26.o: utlist.h
+t/uthash/test27.o: utlist.h
+t/uthash/test28.o: utlist.h
+t/uthash/test29.o: utlist.h
+t/uthash/test3.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test30.o: utlist.h
+t/uthash/test31.o: utlist.h
+t/uthash/test32.o: utlist.h
+t/uthash/test33.o: utlist.h
+t/uthash/test34.o: utlist.h
+t/uthash/test35.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test36.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test37.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test38.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test39.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test4.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test40.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test41.o: utlist.h
+t/uthash/test42.o: utlist.h
+t/uthash/test43.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test44.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test45.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test46.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test48.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test49.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test5.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test50.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test51.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test52.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test57.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test58.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test59.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test6.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test60.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test61.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test62.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test63.o: utlist.h
+t/uthash/test64.o: utlist.h
+t/uthash/test65.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test66.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test67.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test68.o: utlist.h
+t/uthash/test69.o: utlist.h
+t/uthash/test7.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test70.o: utlist.h
+t/uthash/test71.o: utlist.h
+t/uthash/test72.o: utlist.h
+t/uthash/test73.o: utlist.h
+t/uthash/test78.o: utlist.h
+t/uthash/test79.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test8.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test80.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test81.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test82.o: utarray.h dbg.h alloc.h types.h
+t/uthash/test83.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test84.o: uthash.h dbg.h alloc.h types.h
+t/uthash/test9.o: uthash.h dbg.h alloc.h types.h

@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.8 2015-02-13 00:05:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.9 2015-02-13 00:32:00 pauloscustodio Exp $
 */
 
 #include "listfile.h"
@@ -44,20 +44,30 @@ static void dump_SymbolRefList ( SymbolRefList *references )
 
 static void dump_Symbol ( Symbol *sym )
 {
-	warn("Symbol %s (%s) = %ld, type = 0x%02X [", 
-		 sym->name, Symbol_fullname(sym), sym->value, sym->sym_type_mask );
-	if (sym->sym_type_mask & SYM_DEFINED)	warn("DEFINED ");
-	if (sym->sym_type_mask & SYM_TOUCHED)	warn("TOUCHED ");
+	warn("Symbol %s (%s) = %ld, [", 
+		 sym->name, Symbol_fullname(sym), sym->value );
+	if (sym->is_defined)	warn("DEFINED ");
+	if (sym->is_touched)	warn("TOUCHED ");
+	if (sym->is_computed)	warn("COMPUTED ");
 
-	warn( sym->sym_type == TYPE_UNKNOWN		? "TYPE_UNKNOWN " :
-		  sym->sym_type == TYPE_CONSTANT	? "TYPE_CONSTANT " :
-		  sym->sym_type == TYPE_ADDRESS		? "TYPE_ADDRESS " :
-		  sym->sym_type == TYPE_COMPUTED	? "TYPE_COMPUTED " :
-											  "invalid-type " );
+	switch (sym->type)
+	{
+	case TYPE_UNKNOWN:	warn("TYPE_UNKNOWN "); break;
+	case TYPE_CONSTANT:	warn("TYPE_CONSTANT "); break;
+	case TYPE_ADDRESS:	warn("TYPE_ADDRESS "); break;
+	case TYPE_COMPUTED:	warn("TYPE_COMPUTED "); break;
+	default: 			warn("invalid-type"); break;
+	}
 
-	if (sym->sym_type_mask & SYM_LOCAL)		warn("LOCAL ");
-	if (sym->sym_type_mask & SYM_PUBLIC)	warn("GLOBAL ");
-	if (sym->sym_type_mask & SYM_EXTERN)	warn("EXTERN ");
+	switch (sym->scope)
+	{
+	case SCOPE_LOCAL:	warn("LOCAL ");  break;
+	case SCOPE_PUBLIC:	warn("PUBLIC "); break;
+	case SCOPE_EXTERN:	warn("EXTERN "); break;
+	case SCOPE_GLOBAL:	warn("GLOBAL "); break;
+	default: 			warn("invalid-scope"); break;
+	}
+	
 	warn("], ref = [");
 	dump_SymbolRefList(sym->references);
 	warn("], owner = %s\n", 
@@ -199,17 +209,18 @@ static void test_symtab( void )
 	find_symbol( S("PC"), global_symtab )->value += 3; inc_page_nr();
 	sym = get_used_symbol(S("NN")); inc_page_nr();
 	assert( sym != NULL );
-	assert( ! (sym->sym_type_mask & SYM_DEFINED) );
+	assert( ! sym->is_defined );
 	find_symbol( S("PC"), global_symtab )->value += 3; inc_page_nr();
 	sym = get_used_symbol(S("NN")); inc_page_nr();
 	assert( sym != NULL );
-	assert( ! (sym->sym_type_mask & SYM_DEFINED) );
+	assert( ! sym->is_defined );
 	find_symbol( S("PC"), global_symtab )->value += 3; inc_page_nr();
-	define_symbol(S("NN"), find_symbol( "PC", global_symtab )->value, TYPE_ADDRESS, SYM_TOUCHED ); 
+	sym = define_symbol(S("NN"), find_symbol( "PC", global_symtab )->value, TYPE_ADDRESS); 
+	sym->is_touched = TRUE;
 	sym = get_used_symbol(S("NN")); inc_page_nr();
 	assert( sym != NULL );
 	dump_Symbol(sym);
-	assert( sym->sym_type_mask & SYM_DEFINED );
+	assert( sym->is_defined );
 	
 	dump_symtab();
 

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.15 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.h,v 1.16 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 #pragma once
@@ -65,6 +65,7 @@ extern void asm_SECTION(char *name);
 extern void asm_MODULE_default(void);
 
 /* directives with list of names argument, function called for each argument */
+extern void asm_GLOBAL(char *name);
 extern void asm_EXTERN(char *name);
 extern void asm_XREF(char *name);
 extern void asm_LIB(char *name);

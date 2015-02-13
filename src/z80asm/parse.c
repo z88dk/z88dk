@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.33 2015-02-13 00:05:15 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.34 2015-02-13 00:30:31 pauloscustodio Exp $ 
 */
 
 #include "class.h"
@@ -330,11 +330,11 @@ static Bool check_ifdef_condition(char *name)
 	Symbol *symbol;
 
 	symbol = find_symbol(name, CURRENTMODULE->local_symtab);
-	if (symbol != NULL && ((symbol->sym_type_mask & SYM_DEFINED) || (symbol->sym_type_mask & SYM_EXTERN)))
+	if (symbol != NULL && (symbol->is_defined || (symbol->scope == SCOPE_EXTERN || symbol->scope == SCOPE_GLOBAL)))
 		return TRUE;
 
 	symbol = find_symbol(name, global_symtab);
-	if (symbol != NULL && ((symbol->sym_type_mask & SYM_DEFINED) || (symbol->sym_type_mask & SYM_EXTERN)))
+	if (symbol != NULL && (symbol->is_defined || (symbol->scope == SCOPE_EXTERN || symbol->scope == SCOPE_GLOBAL)))
 		return TRUE;
 
 	return FALSE;

@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.26 2015-02-13 00:05:17 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.27 2015-02-13 00:31:59 pauloscustodio Exp $
 */
 
 #pragma once
@@ -26,6 +26,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.h,v 1.26 2015-02-13 00:05:
 
 struct Module;
 struct Section;
+
+/*-----------------------------------------------------------------------------
+*   Special symbols
+*----------------------------------------------------------------------------*/
+#define ASMHEAD_KW	"ASMHEAD%s%s"
+#define ASMTAIL_KW	"ASMTAIL%s%s"
+#define ASMSIZE_KW	"ASMSIZE%s%s"
 
 /*-----------------------------------------------------------------------------
 *   Type of symbol
@@ -41,16 +48,29 @@ typedef enum {
 } sym_type_t;
 
 /*-----------------------------------------------------------------------------
+*   Scope of symbol
+*	Initially defined as LOCAL
+*----------------------------------------------------------------------------*/
+typedef enum {
+	SCOPE_LOCAL,
+	SCOPE_PUBLIC,						/* defined and exported */
+	SCOPE_EXTERN,						/* not defined and imported */
+	SCOPE_GLOBAL,						/* PUBLIC if defined, EXTERN if not defined */
+} sym_scope_t;
+
+/*-----------------------------------------------------------------------------
 *   Symbol
 *----------------------------------------------------------------------------*/
 CLASS( Symbol )
 	char		   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
-	sym_type_t		sym_type;			/* type of symbol */
-	Bool			computed;			/* TRUE if TYPE_COMPUTED or TYPE_ADDRESS 
-										   and value already known */
-
-	Byte			sym_type_mask;		/* type of symbol */
+	sym_type_t		type;				/* type of symbol */
+	sym_scope_t		scope;				/* scope of symbol definition */
+	Bool			is_computed : 1;	/* TRUE if TYPE_COMPUTED or TYPE_ADDRESS 
+										 * and value already known */
+	Bool			is_defined : 1;		/* TRUE if symbol was defined in the current module */
+	Bool			is_touched : 1;		/* TRUE if symbol was used, e.g. returned by 
+										 * a symbol table search */
 	struct Module  *module;				/* module which owns symbol (weak ref) */
 	struct Section *section;			/* section where expression is defined (weak ref) */
 	SymbolRefList  *references;			/* pointer to all found references of symbol */
@@ -62,7 +82,7 @@ END_CLASS;
 
 /* create a new symbol, needs to be deleted by OBJ_DELETE()
    adds a reference to the page were referred to */
-extern Symbol *Symbol_create( char *name, long value, sym_type_t sym_type, Byte type_mask, 
+extern Symbol *Symbol_create(char *name, long value, sym_type_t type, sym_scope_t scope,
 							  struct Module *module, struct Section *section );
 
 /* return full symbol name NAME@MODULE stored in strpool */

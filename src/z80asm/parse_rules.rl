@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.51 2015-02-01 23:52:12 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-13 00:31:55 pauloscustodio Exp $ 
 */
 
 #define NO_TOKEN_ENUM
@@ -344,15 +344,15 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.51 2015-02-
 	*   directives with list of names argument, function called for each 
 	*	argument
 	*--------------------------------------------------------------------*/
-#foreach <OP> in EXTERN, XREF, LIB, PUBLIC, XDEF, XLIB, DEFINE, UNDEFINE
+#foreach <OP> in GLOBAL, PUBLIC, EXTERN, XREF, LIB, XDEF, XLIB, DEFINE, UNDEFINE
 	action <OP>_action { asm_<OP>(name->str); }
 	
 	asm_<OP> = _TK_<OP> name @<OP>_action
 		    ( _TK_COMMA name @<OP>_action )*
 		    _TK_NEWLINE ;
 #endfor  <OP>
-	directives_names = asm_EXTERN | asm_XREF | asm_LIB |
-					   asm_PUBLIC | asm_XDEF | asm_XLIB |
+	directives_names = asm_GLOBAL | asm_PUBLIC | asm_EXTERN | 
+					   asm_XREF | asm_LIB | asm_XDEF | asm_XLIB |
 					   asm_DEFINE | asm_UNDEFINE;
 
 	/*---------------------------------------------------------------------

@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.10 2015-02-08 23:52:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.11 2015-02-13 00:32:00 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -25,7 +25,7 @@ use Capture::Tiny 'capture';
 use Test::Differences; 
 
 my $compile = "cc -Wall -Ilib -otest test.c srcfile.c ".
-			  "class.c xmalloc.c dlist.c strpool.c strutil.c fileutil.c list.c dbg.c";
+			  "class.c alloc.c strpool.c strutil.c fileutil.c list.c dbg.c";
 
 #------------------------------------------------------------------------------
 # create directories and files

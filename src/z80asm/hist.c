@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.144 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.145 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.144 2015-02-13 00:0
 
 /*
 * $Log: hist.c,v $
-* Revision 1.144  2015-02-13 00:05:13  pauloscustodio
+* Revision 1.145  2015-02-13 00:30:31  pauloscustodio
+* Added GLOBAL declaration: define a symbol EXTERN if not defined locally,
+* or PUBLIC if defined locally.
+*
+* Revision 1.144  2015/02/13 00:05:13  pauloscustodio
 * Added debug macros and unit test module. Replaced xmalloc.c by alloc.c,
 * which has the possibility of registering a destructor function for
 * each allocated memory block, to be called on free() of the memory block.
@@ -1759,7 +1763,7 @@ Based on 1.0.31
 		being defined. Consequence of removal of notdecl_tab symbol table.
 
 	CH_0023 : Remove notdecl_tab
-		Symbol is created in symbol table on first usage, SYM_DEFINED bit
+		Symbol is created in symbol table on first usage, is_defined
 		identifies if it was defined or not.
 
 -------------------------------------------------------------------------------
@@ -2251,6 +2255,9 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 	  which has the possibility of registering a destructor function for
 	  each allocated memory block, to be called on free() of the memory block.
 	
+	- Added GLOBAL declaration: define a symbol EXTERN if not defined locally,
+	  or PUBLIC if defined locally.
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
@@ -2285,7 +2292,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1f"
+#define VERSION     "2.7.1h"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

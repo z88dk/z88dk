@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define lexer tokens
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.52 2015-02-01 23:52:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan_def.h,v 1.53 2015-02-13 00:31:55 pauloscustodio Exp $
 */
 
 /*-----------------------------------------------------------------------------
@@ -204,7 +204,8 @@ TOKEN_OPCODE(DEFW		)
 TOKEN_OPCODE(ELSE		)
 TOKEN_OPCODE(ENDIF		)
 TOKEN_OPCODE(EXTERN		)
-TOKEN_OPCODE(IF			)
+TOKEN_OPCODE(GLOBAL     )
+TOKEN_OPCODE(IF         )
 TOKEN_OPCODE(IFDEF		)
 TOKEN_OPCODE(IFNDEF		)
 TOKEN_OPCODE(INCLUDE	)

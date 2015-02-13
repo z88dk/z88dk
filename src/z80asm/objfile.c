@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.46 2015-02-13 00:05:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.47 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 #include "class.h"
@@ -115,13 +115,14 @@ static int write_symbols_symtab( FILE *fp, SymbolHash *symtab )
         sym = ( Symbol * )iter->value;
 
 		/* scope */
-		scope = ( sym->sym_type_mask & SYM_PUBLIC ) ? 'G' :
-			    ( sym->sym_type_mask & SYM_LOCAL  ) ? 'L' : 0;
+		scope =
+			(sym->scope == SCOPE_PUBLIC || (sym->is_defined && sym->scope == SCOPE_GLOBAL)) ? 'G' :
+			(sym->scope == SCOPE_LOCAL) ? 'L' : 0;
 
-		if (scope != 0 && (sym->sym_type_mask & SYM_TOUCHED) && sym->sym_type != TYPE_UNKNOWN)
+		if (scope != 0 && sym->is_touched && sym->type != TYPE_UNKNOWN)
 		{
 			/* type */
-			switch (sym->sym_type)
+			switch (sym->type)
 			{
 			case TYPE_CONSTANT:	type = 'C'; break;
 			case TYPE_ADDRESS:	type = 'A'; break;
@@ -174,8 +175,8 @@ static long write_externsym( FILE *fp )
     {
         sym = ( Symbol * )iter->value;
 
-        if ( ( sym->sym_type_mask & SYM_EXTERN ) && 
-			 ( sym->sym_type_mask & SYM_TOUCHED ) )
+		if (sym->is_touched &&
+			(sym->scope == SCOPE_EXTERN || (!sym->is_defined && sym->scope == SCOPE_GLOBAL)))
 		{
 			xfput_count_byte_strz( fp, sym->name );
 			written++;

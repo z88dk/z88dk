@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.145 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.146 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 #include "alloc.h"
@@ -65,7 +65,7 @@ void
 ReadNames( char *filename, FILE *file )
 {
     int scope, symbol_char;
-	sym_type_t sym_type = TYPE_UNKNOWN;
+	sym_type_t type = TYPE_UNKNOWN;
     long value;
 	DEFINE_STR( section_name, MAXLINE );
 	DEFINE_STR( name, MAXLINE );
@@ -87,17 +87,17 @@ ReadNames( char *filename, FILE *file )
 
         switch ( symbol_char )
         {
-        case 'A': sym_type = TYPE_ADDRESS;  break;
-        case 'C': sym_type = TYPE_CONSTANT; break;
-        case '=': sym_type = TYPE_COMPUTED; break;
+        case 'A': type = TYPE_ADDRESS;  break;
+        case 'C': type = TYPE_CONSTANT; break;
+        case '=': type = TYPE_COMPUTED; break;
         default:
             error_not_obj_file( filename );
         }
 
         switch ( scope )
         {
-        case 'L': define_local_sym(  name->str, value, sym_type, 0 ); break;
-        case 'G': define_global_sym( name->str, value, sym_type, 0 ); break;
+		case 'L': define_local_sym(name->str, value, type); break;
+		case 'G': define_global_sym(name->str, value, type); break;
         default:
             error_not_obj_file( filename );
         }
@@ -303,7 +303,7 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error, Bool module
 				if ( show_error )
 					error_not_defined();
 			}
-			else if ( ! expr->computed )
+			else if (!expr->is_computed)
 			{
 				/* expression depends on other variables not yet computed */
 			}
@@ -311,7 +311,7 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error, Bool module
 			{
 				num_computed++;
 				computed = TRUE;
-				update_symbol( expr->target_name, value, expr->sym_type );
+				update_symbol( expr->target_name, value, expr->type );
 			}
 		}
 
@@ -395,7 +395,7 @@ static void patch_exprs( ExprList *exprs )
 
                 if ( opts.relocatable )
 				{
-                    if ( expr->sym_type == TYPE_ADDRESS )
+                    if ( expr->type == TYPE_ADDRESS )
                     {
                         /* Expression contains relocatable address */
 						UInt offset   = get_cur_module_start(); 
@@ -453,7 +453,7 @@ static void relocate_symbols_symtab( SymbolHash *symtab )
     for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
     {
         sym = (Symbol *) iter->value;
-		if ( sym->sym_type == TYPE_ADDRESS ) 
+		if ( sym->type == TYPE_ADDRESS ) 
 		{
 			assert( sym->module );				/* owner should exist except for -D defines */
 			
@@ -465,7 +465,7 @@ static void relocate_symbols_symtab( SymbolHash *symtab )
 			offset    = get_cur_module_start();
 
             sym->value += base_addr + offset;	/* Absolute address */
-			sym->computed = TRUE;
+			sym->is_computed = TRUE;
 		}
 	}
 }

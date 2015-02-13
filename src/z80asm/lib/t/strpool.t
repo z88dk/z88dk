@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.10 2015-02-08 23:52:31 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/Attic/strpool.t,v 1.11 2015-02-13 00:32:00 pauloscustodio Exp $
 #
 # Test strpool.c
 
@@ -12,10 +12,10 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -DSTRPOOL_DEBUG -otest test.c strpool.c xmalloc.c dlist.c dbg.c";
+my $compile = "cc -Wall -DSTRPOOL_DEBUG -otest test.c strpool.c alloc.c dbg.c";
 
 write_file("test.c", <<'END');
-#include "xmalloc.h"
+#include "alloc.h"
 #include "dbg.h"
 #include "strpool.h"
 #include <stdio.h>

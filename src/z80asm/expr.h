@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.31 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.32 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 #pragma once
@@ -105,8 +105,8 @@ extern int range_size( range_t range );
 *	Expression
 *----------------------------------------------------------------------------*/
 CLASS( Expr )
-	ExprOpArray	*rpn_ops;		/* list of operands / operators in reverse polish notation */
-	Str			*text;			/* expression in infix text */
+	ExprOpArray	*rpn_ops;			/* list of operands / operators in reverse polish notation */
+	Str			*text;				/* expression in infix text */
 	
 	/* flags set during eval */
 	struct {
@@ -117,26 +117,24 @@ CLASS( Expr )
 
 	range_t		 range;			/* range of expression result */
 
-	sym_type_t	 sym_type;		/* highest type of symbols used in expression */
-	Bool		 computed;		/* TRUE if all values in expression have been computed */
+	sym_type_t	 type;				/* highest type of symbols used in expression */
+	Bool		 is_computed : 1;	/* TRUE if all values in expression have been computed */
 
-	Byte		 expr_type_mask;/* range type of evaluated expression */
+	char		*target_name;		/* name of the symbol, stored in strpool, 
+								    * to receive the result value of the expression 
+								    * computation, NULL if not an EQU expression */
 
-	char		*target_name;	/* name of the symbol, stored in strpool, 
-								   to receive the result value of the expression 
-								   computation, NULL if not an EQU expression */
+	struct Module  *module;			/* module where expression is patched (weak ref) */
+	struct Section *section;		/* section where expression is patched (weak ref) */
+	UInt		 asmpc;				/* ASMPC value during linking */
+    UInt		 code_pos;			/* Address to patch expression value */
 
-	struct Module  *module;		/* module where expression is patched (weak ref) */
-	struct Section *section;	/* section where expression is patched (weak ref) */
-	UInt		 asmpc;			/* ASMPC value during linking */
-    UInt		 code_pos;		/* Address to patch expression value */
-
-	char		*filename;		/* file and line where expression defined, string in strpool */
-    int			 line_nr;		/* source line */
-    long		 listpos;		/* position in listing file to patch (in pass 2), -1 if not listing */
+	char		*filename;			/* file and line where expression defined, string in strpool */
+    int			 line_nr;			/* source line */
+    long		 listpos;			/* position in listing file to patch (in pass 2), -1 if not listing */
 END_CLASS;
 
-CLASS_LIST( Expr );				/* list of expressions */
+CLASS_LIST( Expr );					/* list of expressions */
 
 /* compute ExprOp using Calc_xxx functions */
 extern void ExprOp_compute( ExprOp *self, Expr *expr );

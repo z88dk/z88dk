@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.17 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.18 2015-02-13 00:30:31 pauloscustodio Exp $
 */
 
 #include "codearea.h"
@@ -36,7 +36,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.17 2015-02-13
 *----------------------------------------------------------------------------*/
 void asm_LABEL_offset(char *name, int offset)
 {
-	define_symbol(name, get_PC() + offset, TYPE_ADDRESS, SYM_TOUCHED);
+	Symbol *sym;
+
+	sym = define_symbol(name, get_PC() + offset, TYPE_ADDRESS);
+	sym->is_touched = TRUE;
 }
 
 void asm_LABEL(char *name)
@@ -63,8 +66,8 @@ void asm_DEFGROUP_define_const(char *name)
 	
 	if (DEFGROUP_PC > 0xFFFF || DEFGROUP_PC < -0x8000)
 		error_int_range(DEFGROUP_PC);
-	else 
-		define_symbol(name, DEFGROUP_PC, TYPE_CONSTANT, 0);
+	else
+		define_symbol(name, DEFGROUP_PC, TYPE_CONSTANT);
 	DEFGROUP_PC++;
 }
 
@@ -111,7 +114,7 @@ void asm_DEFVARS_define_const(char *name, int elem_size, int count)
 		error_int_range(next_pc);
 	else
 	{
-		define_symbol(name, *DEFVARS_PC, TYPE_CONSTANT, 0);
+		define_symbol(name, *DEFVARS_PC, TYPE_CONSTANT);
 		*DEFVARS_PC = next_pc;
 	}
 }
@@ -202,6 +205,11 @@ void asm_SECTION(char *name)
 /*-----------------------------------------------------------------------------
 *   directives with list of names argument, function called for each argument
 *----------------------------------------------------------------------------*/
+void asm_GLOBAL(char *name)
+{
+	declare_global_symbol(name);
+}
+
 void asm_EXTERN(char *name)
 {
 	declare_extern_symbol(name);
@@ -254,20 +262,20 @@ void asm_DEFC(char *name, Expr *expr)
 	int value; 
 
 	value = Expr_eval(expr);		/* DEFC constant expression */
-	if ((expr->result.not_evaluable) || (expr->sym_type >= TYPE_ADDRESS))
+	if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
 	{
 		/* store in object file to be computed at link time */
-		expr->expr_type_mask |= RANGE_WORD;
+		expr->range = RANGE_WORD;
 		expr->target_name = strpool_add(name);
 
 		ExprList_push(&CURRENTMODULE->exprs, expr);
 
 		/* create symbol */
-		define_symbol(expr->target_name, 0, TYPE_COMPUTED, 0);
+		define_symbol(expr->target_name, 0, TYPE_COMPUTED);
 	}
 	else
 	{
-		define_symbol(name, value, TYPE_CONSTANT, 0);
+		define_symbol(name, value, TYPE_CONSTANT);
 		OBJ_DELETE(expr);
 	}
 }
