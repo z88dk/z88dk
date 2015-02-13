@@ -16,12 +16,11 @@ Copyright (C) Paulo Custodio, 2011-2015
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.30 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.31 2015-02-13 00:05:13 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "xmalloc.h"   /* before any other include */
 #include "array.h"
 #include "class.h"
 #include "classlist.h"

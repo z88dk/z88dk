@@ -6,13 +6,11 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.18 2015-02-08 21:58:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.19 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"   /* before any other include */
-
+#include "alloc.h"
 #include "srcfile.h"
-
 #include "fileutil.h"
 #include "strpool.h"
 #include <assert.h>
@@ -33,7 +31,7 @@ static void free_file_stack_elem( void *_elem )
 	
 	if ( elem->file != NULL )
 		myfclose( elem->file );
-	xfree( elem );
+	m_free( elem );
 }
 
 /*-----------------------------------------------------------------------------
@@ -86,7 +84,7 @@ void SrcFile_init( SrcFile *self )
 
     self->line_stack = OBJ_NEW( List );
     OBJ_AUTODELETE( self->line_stack ) = FALSE;
-	self->line_stack->free_data = xfreef;
+	self->line_stack->free_data = m_free_compat;
 
     self->file_stack = OBJ_NEW( List );
     OBJ_AUTODELETE( self->file_stack ) = FALSE;
@@ -192,7 +190,7 @@ char *SrcFile_getline( SrcFile *self )
 
         /* we own the string now and need to release memory */
 		Str_set( self->line, line );
-        xfree( line );
+        m_free( line );
 
         /* dont increment line number as we are still on same file input line */
         return self->line->str;
@@ -295,7 +293,7 @@ void SrcFile_ungetline( SrcFile *self, char *lines )
 	if ( len > 0 && lines[ len - 1 ] == '\n' )
 		len--;							/* ignore newline */
 
-	line = xmalloc( len + 2 );			/* 2 bytes extra for '\n' and '\0' */
+	line = m_malloc( len + 2 );			/* 2 bytes extra for '\n' and '\0' */
 	strncpy( line, lines, len );
 	line[ len     ] = '\n';
 	line[ len + 1 ] = '\0';
@@ -314,7 +312,7 @@ int   SrcFile_line_nr(  SrcFile *self ) { return self->line_nr; }
    and updates current input */
 void SrcFile_push( SrcFile *self )
 {
-	FileStackElem *elem = xnew( FileStackElem );
+	FileStackElem *elem = m_new( FileStackElem );
 	
 	elem->file		= self->file;
 	elem->filename	= self->filename;
@@ -345,6 +343,6 @@ Bool SrcFile_pop( SrcFile *self )
 	self->filename	= elem->filename;
 	self->line_nr	= elem->line_nr;
 	
-	xfree( elem );
+	m_free( elem );
 	return TRUE;
 }

@@ -14,13 +14,11 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.22 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.23 2015-02-13 00:05:13 pauloscustodio Exp $
 
 */
 
 #pragma once
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "strutil.h"

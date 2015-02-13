@@ -14,12 +14,10 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.23 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.24 2015-02-13 00:05:15 pauloscustodio Exp $
 */
 
 #pragma once
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "classlist.h"

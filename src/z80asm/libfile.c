@@ -14,10 +14,8 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle library file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.8 2015-02-08 21:58:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/libfile.c,v 1.9 2015-02-13 00:05:13 pauloscustodio Exp $
 */
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "errors.h"
 #include "fileutil.h"

@@ -3,11 +3,10 @@ Utilities working on strings.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.20 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Attic/strutil.c,v 1.21 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"   /* before any other include */
-
+#include "alloc.h"
 #include "strpool.h"
 #include "strutil.h"
 #include <ctype.h>
@@ -191,7 +190,7 @@ void Str_init( Str *self )
 
 void Str_copy( Str *self, Str *other )
 {
-    char *data_copy = xnew_n( char, self->size );
+    char *data_copy = m_new_n( char, self->size );
     memcpy( data_copy, self->str, self->size );
     self->alloc_str = TRUE;
     self->str = data_copy;
@@ -201,7 +200,7 @@ void Str_copy( Str *self, Str *other )
 void Str_fini( Str *self )
 {
     if ( self->alloc_str )
-        xfree( self->str );
+        m_free( self->str );
 }
 
 /*-----------------------------------------------------------------------------
@@ -282,7 +281,7 @@ void Str_reserve( Str *self, size_t num_chars )
 				new_size += SIZE_MASK + 1;
 			}
 
-			self->str = ( char * ) xrealloc( self->str, new_size );
+			self->str = ( char * ) m_realloc( self->str, new_size );
 			self->size = new_size;
 		}
 	}
@@ -300,7 +299,7 @@ void Str_unreserve( Str *self )
     if ( self->alloc_str )
 	{
 		need_size = self->len + 1;
-		self->str = ( char * ) xrealloc( self->str, need_size );
+		self->str = ( char * ) m_realloc( self->str, need_size );
 		self->size = need_size;
 	}
 

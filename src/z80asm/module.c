@@ -14,10 +14,8 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.18 2015-02-09 21:57:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.c,v 1.19 2015-02-13 00:05:15 pauloscustodio Exp $
 */
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "codearea.h"
 #include "init.h"

@@ -14,12 +14,10 @@ Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.69 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.h,v 1.70 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
 #pragma once
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "types.h"
 #include "sym.h"

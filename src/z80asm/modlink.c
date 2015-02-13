@@ -13,11 +13,10 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.144 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.145 2015-02-13 00:05:13 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"   /* before any other include */
-
+#include "alloc.h"
 #include "codearea.h"
 #include "errors.h"
 #include "expr.h"
@@ -559,7 +558,7 @@ void link_modules( void )
 
     if ( opts.relocatable )
     {
-        reloctable = xnew_n( char, 32768U );
+        reloctable = m_new_n( char, 32768U );
         relocptr = reloctable;
         relocptr += 4;  /* point at first offset to store */
         totaladdr = 0;
@@ -988,14 +987,14 @@ LinkTracedModule( char *filename, long baseptr )
 
     if ( linkhdr == NULL )
     {
-        linkhdr = xnew( struct linklist );
+        linkhdr = m_new( struct linklist );
         linkhdr->firstlink = NULL;
         linkhdr->lastlink = NULL;       /* Library header initialised */
     }
 
-    fname = xstrdup( filename );        /* get a copy module file name */
+    fname = m_strdup( filename );        /* get a copy module file name */
 
-    newm = xnew( struct linkedmod );
+    newm = m_new( struct linkedmod );
     newm->nextlink = NULL;
     newm->objfilename = fname;
     newm->modulestart = baseptr;
@@ -1032,15 +1031,15 @@ ReleaseLinkInfo( void )
     {
         if ( m->objfilename != NULL )
         {
-            xfree( m->objfilename );
+            m_free( m->objfilename );
         }
 
         n = m->nextlink;
-        xfree( m );
+        m_free( m );
         m = n;
     }
 
-    xfree( linkhdr );
+    m_free( linkhdr );
 
     linkhdr = NULL;
 }

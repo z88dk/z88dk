@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>  /* exit */
 
 #include "dbg.h"
-#include "xmalloc.h"
+#include "alloc.h"
 
 #define oom() die("Out of memory")
 
@@ -71,25 +71,25 @@ typedef struct {
         (a)->icd.dtor(utarray_eltptr(a,_ut_i));                               \
       }                                                                       \
     }                                                                         \
-    xfree((a)->d);                                                           \
+    m_free((a)->d);                                                           \
   }                                                                           \
   (a)->n=0;                                                                   \
 } while(0)
 
 #define utarray_new(a,_icd) do {                                              \
-  a=(UT_array*)xmalloc(sizeof(UT_array));                                    \
+  a=(UT_array*)m_malloc(sizeof(UT_array));                                    \
   utarray_init(a,_icd);                                                       \
 } while(0)
 
 #define utarray_free(a) do {                                                  \
   utarray_done(a);                                                            \
-  xfree(a);                                                                  \
+  m_free(a);                                                                  \
 } while(0)
 
 #define utarray_reserve(a,by) do {                                            \
   if (((a)->i+by) > ((a)->n)) {                                               \
     while(((a)->i+by) > ((a)->n)) { (a)->n = ((a)->n ? (2*(a)->n) : 8); }     \
-    if ( ((a)->d=(char*)xrealloc((a)->d, (a)->n*(a)->icd.sz)) == NULL) oom();\
+    if ( ((a)->d=(char*)m_realloc((a)->d, (a)->n*(a)->icd.sz)) == NULL) oom();\
   }                                                                           \
 } while(0)
 
@@ -220,11 +220,11 @@ typedef struct {
 /* last we pre-define a few icd for common utarrays of ints and strings */
 static void utarray_str_cpy(void *dst, const void *src) {
   char **_src = (char**)src, **_dst = (char**)dst;
-  *_dst = (*_src == NULL) ? NULL : xstrdup(*_src);
+  *_dst = (*_src == NULL) ? NULL : m_strdup(*_src);
 }
 static void utarray_str_dtor(void *elt) {
   char **eltc = (char**)elt;
-  if (*eltc) xfree(*eltc);
+  if (*eltc) m_free(*eltc);
 }
 static const UT_icd ut_str_icd _UNUSED_ = {sizeof(char*),NULL,utarray_str_cpy,utarray_str_dtor};
 static const UT_icd ut_int_icd _UNUSED_ = {sizeof(int),NULL,NULL,NULL};

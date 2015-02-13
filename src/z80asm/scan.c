@@ -14,11 +14,10 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.72 2015-02-09 21:57:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.73 2015-02-13 00:05:15 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"   /* before any other include */
-
+#include "alloc.h"
 #include "errors.h"
 #include "init.h"
 #include "list.h"
@@ -68,8 +67,8 @@ typedef struct scan_state_t
 static void ut_scan_state_dtor(void *elt) 
 { 
 	ScanState *state = elt; 
-	xfree(state->input_buf); 
-//	xfree(state->sym_string);
+	m_free(state->input_buf); 
+//	m_free(state->sym_string);
 }
 static UT_array *scan_state;
 static UT_icd ut_scan_state_icd = { sizeof(ScanState), NULL, NULL, ut_scan_state_dtor };
@@ -100,7 +99,7 @@ DEFINE_init_module()
 	Str_set_alias( input_buf, &p );		/* Ragel pointer to current scan position */
 
 	input_stack	 = OBJ_NEW(List);
-	input_stack->free_data = xfreef;
+	input_stack->free_data = m_free_compat;
 
 	init_sym();
 	utarray_new(scan_state, &ut_scan_state_icd);
@@ -123,7 +122,7 @@ void save_scan_state(void)
 	init_module();
 
 	save.sym = sym;
-	save.input_buf = xstrdup(input_buf->str);
+	save.input_buf = m_strdup(input_buf->str);
 	save.at_bol = at_bol;
 	save.EOL = EOL;
 	save.cs = cs;
@@ -133,7 +132,7 @@ void save_scan_state(void)
 	save.eof = eof ? eof - input_buf->str : -1;
 	save.ts  = ts  ? ts  - input_buf->str : -1;
 	save.te  = te  ? te  - input_buf->str : -1;
-//	save.sym_string = xstrdup(sym_string->str);
+//	save.sym_string = m_strdup(sym_string->str);
 	save.expect_opcode = expect_opcode;
 
 	utarray_push_back(scan_state, &save);
@@ -348,7 +347,7 @@ static Bool fill_buffer( void )
 		if ( line != NULL )
 		{
 			set_scan_buf( line, FALSE );	/* read from stack - assume not at BOL */
-			xfree( line );
+			m_free( line );
 		}
 		else 
 		{
@@ -435,7 +434,7 @@ void SetTemporaryLine( char *line )
 
 #if 0
 	if (*p != '\0')
-		List_push(&input_stack, xstrdup(p));		/* save current input */
+		List_push(&input_stack, m_strdup(p));		/* save current input */
 #endif
 	set_scan_buf( line, FALSE );					/* assume not at BOL */
 }

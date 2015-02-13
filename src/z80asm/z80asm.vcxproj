@@ -16,6 +16,12 @@
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -39,7 +45,7 @@
     <ClCompile>
       <AdditionalOptions>/U "MSDOS" /wd4996 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRTDBG_MAP_ALLOC;MEMALLOC_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRTDBG_MAP_ALLOC;MEMALLOC_DEBUG;%(PreprocessorDefinitions);_CRT_NONSTDC_NO_DEPRECATE</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -47,7 +53,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;lib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -62,13 +68,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalOptions>/wd4996 %(AdditionalOptions)</AdditionalOptions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_NONSTDC_NO_DEPRECATE</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;lib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -89,16 +95,17 @@
     <ClInclude Include="expr.h" />
     <ClInclude Include="expr_def.h" />
     <ClInclude Include="hist.h" />
-    <ClInclude Include="legacy.h" />
     <ClInclude Include="libfile.h" />
+    <ClInclude Include="lib\alloc.h" />
     <ClInclude Include="lib\array.h" />
     <ClInclude Include="lib\class.h" />
     <ClInclude Include="lib\classhash.h" />
     <ClInclude Include="lib\classlist.h" />
-    <ClInclude Include="lib\dlist.h" />
+    <ClInclude Include="lib\dbg.h" />
     <ClInclude Include="lib\fileutil.h" />
     <ClInclude Include="lib\init.h" />
     <ClInclude Include="lib\list.h" />
+    <ClInclude Include="lib\minunit.h" />
     <ClInclude Include="lib\queue.h" />
     <ClInclude Include="lib\srcfile.h" />
     <ClInclude Include="lib\strhash.h" />
@@ -107,7 +114,7 @@
     <ClInclude Include="lib\types.h" />
     <ClInclude Include="lib\utarray.h" />
     <ClInclude Include="lib\uthash.h" />
-    <ClInclude Include="lib\xmalloc.h" />
+    <ClInclude Include="lib\utlist.h" />
     <ClInclude Include="listfile.h" />
     <ClInclude Include="mapfile.h" />
     <ClInclude Include="model.h" />
@@ -137,16 +144,17 @@
     <ClCompile Include="expr.c" />
     <ClCompile Include="hist.c" />
     <ClCompile Include="libfile.c" />
+    <ClCompile Include="lib\alloc.c" />
     <ClCompile Include="lib\array.c" />
     <ClCompile Include="lib\class.c" />
-    <ClCompile Include="lib\dlist.c" />
+    <ClCompile Include="lib\dbg.c" />
     <ClCompile Include="lib\fileutil.c" />
     <ClCompile Include="lib\list.c" />
+    <ClCompile Include="lib\minunit.c" />
     <ClCompile Include="lib\srcfile.c" />
     <ClCompile Include="lib\strhash.c" />
     <ClCompile Include="lib\strpool.c" />
     <ClCompile Include="lib\strutil.c" />
-    <ClCompile Include="lib\xmalloc.c" />
     <ClCompile Include="listfile.c" />
     <ClCompile Include="mapfile.c" />
     <ClCompile Include="model.c" />

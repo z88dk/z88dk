@@ -6,12 +6,10 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.8 2015-02-08 21:58:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.9 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
 #pragma once
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "list.h"
@@ -49,8 +47,8 @@ CLASS( SrcFile )
 	List	*line_stack;			/* stack of input lines to read by getline()
 									   before reading next line from the file.
 									   Next line read is on the top of the stack.
-									   Lines are created by xstrdup(), 
-									   removed by xfree() */
+									   Lines are created by m_strdup(), 
+									   removed by m_free() */
 	List	*file_stack;			/* stack of files opened before this one,
 									   to process recursive includes */
 END_CLASS;

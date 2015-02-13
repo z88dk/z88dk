@@ -15,10 +15,8 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.16 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.17 2015-02-13 00:05:13 pauloscustodio Exp $
 */
-
-#include "xmalloc.h"   /* before any other include to enable memory leak detection */
 
 #include "codearea.h"
 #include "directives.h"

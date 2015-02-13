@@ -18,10 +18,8 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.50 2015-01-27 21:48:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.51 2015-02-13 00:05:17 pauloscustodio Exp $
 */
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "errors.h"
 #include "listfile.h"

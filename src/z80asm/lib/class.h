@@ -7,12 +7,12 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.10 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.h,v 1.11 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "xmalloc.h"   /* before any other include */
+#include "alloc.h"
 #include "queue.h"
 #include "types.h"
 
@@ -31,10 +31,10 @@ END_CLASS;
 DEF_CLASS(T);
 
 // helper functions, need to be defined
-void T_init (T *self)   { self->string = xcalloc(1000,1); }
+void T_init (T *self)   { self->string = m_calloc(1000,1); }
 void T_copy (T *self, T *other)
-						{ self->string = xstrdup(other->string); }
-void T_fini (T *self)   { xfree(self->string); }
+						{ self->string = m_strdup(other->string); }
+void T_fini (T *self)   { m_free(self->string); }
 
 // usage of class
 T * obj1 = OBJ_NEW(T);  // same as T_new()
@@ -99,7 +99,7 @@ struct Object;
     /* constructor */                                                       \
     T * T##_new (void)                                                      \
     {                                                                       \
-        T * self = xnew(T);		            /* allocate object */           \
+        T * self = m_new(T);		            /* allocate object */           \
         OBJ_AUTODELETE(self) = TRUE;        /* auto delete by default */    \
         T##_init(self);                     /* call user initialization */  \
         _register_obj((struct Object *) self,                          		\
@@ -110,7 +110,7 @@ struct Object;
     /* copy-constructor */                                                  \
     T * T##_clone (T * other)                                               \
     {                                                                       \
-        T * self = xnew(T);					/* allocate object */           \
+        T * self = m_new(T);					/* allocate object */           \
         memcpy(self, other, sizeof(T));     /* byte copy */                 \
         T##_copy(self, other);              /* alloc memory if needed */    \
         _update_register_obj((struct Object *) self );						\
@@ -123,7 +123,7 @@ struct Object;
         _deregister_obj((struct Object *) self );							\
         /* remove from cleanup list */  									\
         T##_fini(self);                     /* call user cleanup */         \
-        xfree(self);                        /* reclaim memory */            \
+        m_free(self);                        /* reclaim memory */            \
     }
 
 /*-----------------------------------------------------------------------------

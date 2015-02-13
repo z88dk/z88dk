@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.54 2015-02-08 23:52:31 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.55 2015-02-13 00:05:13 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
@@ -27,10 +27,10 @@ gcc -Ilib -Wall -c -o symref.o               symref.c
 gcc -Ilib -Wall -c -o symtab.o               symtab.c
 gcc -Ilib -Wall -c -o z80asm.o               z80asm.c
 gcc -Ilib -Wall -c -o z80pass.o              z80pass.c
+gcc -Ilib -Wall -c -o lib/alloc.o            lib/alloc.c
 gcc -Ilib -Wall -c -o lib/array.o            lib/array.c
 gcc -Ilib -Wall -c -o lib/class.o            lib/class.c
 gcc -Ilib -Wall -c -o lib/dbg.o              lib/dbg.c
-gcc -Ilib -Wall -c -o lib/dlist.o            lib/dlist.c
 gcc -Ilib -Wall -c -o lib/fileutil.o         lib/fileutil.c
 gcc -Ilib -Wall -c -o lib/list.o             lib/list.c
 gcc -Ilib -Wall -c -o lib/minunit.o          lib/minunit.c
@@ -38,7 +38,6 @@ gcc -Ilib -Wall -c -o lib/srcfile.o          lib/srcfile.c
 gcc -Ilib -Wall -c -o lib/strhash.o          lib/strhash.c
 gcc -Ilib -Wall -c -o lib/strpool.o          lib/strpool.c
 gcc -Ilib -Wall -c -o lib/strutil.o          lib/strutil.c
-gcc -Ilib -Wall -c -o lib/xmalloc.o          lib/xmalloc.c
 gcc -o z80asm.exe *.o lib\*.o
 copy z80asm.exe ..\..\bin
 del z80asm.exe

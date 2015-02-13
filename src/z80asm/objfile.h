@@ -14,12 +14,10 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.33 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.h,v 1.34 2015-02-13 00:05:15 pauloscustodio Exp $
 */
 
 #pragma once
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "array.h"
 #include "class.h"

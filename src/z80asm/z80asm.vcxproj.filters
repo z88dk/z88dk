@@ -69,16 +69,10 @@
     <ClInclude Include="deffile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="legacy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="options_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\queue.h">
-      <Filter>Header Files\lib</Filter>
-    </ClInclude>
-    <ClInclude Include="lib\xmalloc.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
     <ClInclude Include="lib\uthash.h">
@@ -141,9 +135,6 @@
     <ClInclude Include="modlink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\dlist.h">
-      <Filter>Header Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="parse_rules.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -161,6 +152,18 @@
     </ClInclude>
     <ClInclude Include="directives.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\dbg.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\minunit.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\alloc.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\utlist.h">
+      <Filter>Header Files\lib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -212,9 +215,6 @@
     <ClCompile Include="deffile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lib\xmalloc.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\strpool.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -248,9 +248,6 @@
     <ClCompile Include="libfile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lib\dlist.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="parse.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -259,6 +256,15 @@
     </ClCompile>
     <ClCompile Include="directives.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\dbg.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\minunit.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\alloc.c">
+      <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

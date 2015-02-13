@@ -14,10 +14,8 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.45 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.46 2015-02-13 00:05:15 pauloscustodio Exp $
 */
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "codearea.h"

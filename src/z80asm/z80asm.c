@@ -13,11 +13,10 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.196 2015-02-08 21:58:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.197 2015-02-13 00:05:17 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"   /* before any other include */
-
+#include "alloc.h"
 #include "directives.h"
 #include "codearea.h"
 #include "deffile.h"
@@ -239,7 +238,7 @@ char *GetLibfile( char *filename )
         }
     }
 
-    newlib->libfilename = xstrdup( found_libfilename );		/* freed when newlib is freed */
+    newlib->libfilename = m_strdup( found_libfilename );		/* freed when newlib is freed */
 
     file = myfopen( found_libfilename, "rb" );           
 	if (!file)
@@ -274,12 +273,12 @@ NewLibrary( void )
 
     if ( libraryhdr == NULL )
     {
-        libraryhdr = xnew( struct liblist );
+        libraryhdr = m_new( struct liblist );
         libraryhdr->firstlib = NULL;
         libraryhdr->currlib = NULL;     /* Library header initialised */
     }
 
-    newl = xnew( struct libfile );
+    newl = m_new( struct libfile );
     newl->nextlib = NULL;
     newl->libfilename = NULL;
     newl->nextobjfile = -1;
@@ -311,15 +310,15 @@ ReleaseLibraries( void )
     {
         if ( curptr->libfilename != NULL )
         {
-            xfree( curptr->libfilename );
+            m_free( curptr->libfilename );
         }
 
         tmpptr = curptr;
         curptr = curptr->nextlib;
-        xfree( tmpptr );       /* release library */
+        m_free( tmpptr );       /* release library */
     }
 
-    xfree( libraryhdr );       /* Release library header */
+    m_free( libraryhdr );       /* Release library header */
 }
 
 
@@ -367,7 +366,7 @@ int main( int argc, char *argv[] )
 	if (opts.relocatable)
 	{
 		if (reloctable != NULL)
-			xfree(reloctable);
+			m_free(reloctable);
 	}
 
     if ( get_num_errors() )

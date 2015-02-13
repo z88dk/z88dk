@@ -14,11 +14,9 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.27 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.28 2015-02-13 00:05:13 pauloscustodio Exp $
 */
 
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "fileutil.h"
 #include "listfile.h"

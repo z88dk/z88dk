@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.76 2015-02-01 23:52:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_utils.pl,v 1.77 2015-02-13 00:05:20 pauloscustodio Exp $
 #
 # Common utils for tests
 
@@ -492,7 +492,7 @@ sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
 	# modules to include always
-	$compile_args .= " -DMEMALLOC_DEBUG lib/xmalloc.c lib/dlist.c lib/strpool.o";
+	$compile_args .= " -DMEMALLOC_DEBUG lib/alloc.c lib/strpool.o";
 	
 	# wait for previous run to finish
 	while (-f 'test.exe' && ! unlink('test.exe')) {

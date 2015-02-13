@@ -14,11 +14,9 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define file writing - list of all global address symbols after link phase in DEFC format
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.21 2015-02-08 12:29:09 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/deffile.c,v 1.22 2015-02-13 00:05:13 pauloscustodio Exp $
 
 */
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "deffile.h"
 #include "fileutil.h"

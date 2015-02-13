@@ -1,0 +1,68 @@
+
+---------- Test: test_no_allocation ----------
+
+---------- Test: test_no_leak ----------
+
+---------- Test: test_alloc_failed ----------
+[ERROR] (alloc.c:306 errno: Not enough space) memory realloc (1073741824 bytes) failed at t/test_alloc.c:47
+[ERROR] (t/test_alloc.c:47) Out of memory
+
+---------- Test: test_unmatched_block ----------
+[ERROR] (alloc.c:189) memory block not found at t/test_alloc.c:58
+[ERROR] (alloc.c:348) memory free at t/test_alloc.c:58 failed
+
+---------- Test: test_buffer_underflow ----------
+[ERROR] (alloc.c:208) buffer underflow, memory allocated at t/test_alloc.c:67
+[ERROR] (alloc.c:355) memory free at t/test_alloc.c:69 failed
+
+---------- Test: test_buffer_overflow ----------
+[ERROR] (alloc.c:211) buffer overflow, memory allocated at t/test_alloc.c:78
+[ERROR] (alloc.c:355) memory free at t/test_alloc.c:80 failed
+
+---------- Test: test_malloc ----------
+[WARN ] (alloc.c:119) memory leak (1 bytes) allocated at t/test_alloc.c:92
+[WARN ] (alloc.c:119) memory leak (0 bytes) allocated at alloc.c:250
+
+---------- Test: test_calloc ----------
+[WARN ] (alloc.c:119) memory leak (5 bytes) allocated at t/test_alloc.c:110
+[WARN ] (alloc.c:119) memory leak (5 bytes) allocated at alloc.c:260
+
+---------- Test: test_strdup ----------
+[WARN ] (alloc.c:119) memory leak (6 bytes) allocated at t/test_alloc.c:126
+[WARN ] (alloc.c:119) memory leak (6 bytes) allocated at alloc.c:270
+
+---------- Test: test_realloc ----------
+[WARN ] (alloc.c:119) memory leak (4 bytes) allocated at t/test_alloc.c:190
+[WARN ] (alloc.c:119) memory leak (3 bytes) allocated at t/test_alloc.c:148
+[WARN ] (alloc.c:119) memory leak (2 bytes) allocated at t/test_alloc.c:193
+[WARN ] (alloc.c:119) memory leak (1 bytes) allocated at alloc.c:330
+
+---------- Test: test_new ----------
+[WARN ] (alloc.c:119) memory leak (5 bytes) allocated at t/test_alloc.c:217
+[WARN ] (alloc.c:119) memory leak (5 bytes) allocated at t/test_alloc.c:214
+[WARN ] (alloc.c:119) memory leak (1 bytes) allocated at t/test_alloc.c:208
+[WARN ] (alloc.c:119) memory leak (1 bytes) allocated at t/test_alloc.c:205
+
+---------- Test: test_destructor ----------
+[ERROR] (alloc.c:189) memory block not found at t/test_alloc.c:300
+[ERROR] (alloc.c:406) m_destroy_atexit at t/test_alloc.c:300 failed
+[INFO ] (t/test_alloc.c:310) allocated hello, big and world
+[ERROR] (alloc.c:189) memory block not found at t/test_alloc.c:315
+[ERROR] (alloc.c:380) m_set_destructor at t/test_alloc.c:315 failed
+[ERROR] (alloc.c:189) memory block not found at t/test_alloc.c:322
+[ERROR] (alloc.c:393) m_set_in_collection at t/test_alloc.c:322 failed
+[ERROR] (alloc.c:189) memory block not found at t/test_alloc.c:325
+[ERROR] (alloc.c:393) m_clear_in_collection at t/test_alloc.c:325 failed
+[INFO ] (t/test_alloc.c:258) create John bottom-up to assure destruction order
+[INFO ] (t/test_alloc.c:283) create Person(John, 15)
+[INFO ] (t/test_alloc.c:266) create Fred top-down and use in_collection to assure destruction order
+[INFO ] (t/test_alloc.c:283) create Person(Fred, 16)
+[INFO ] (t/test_alloc.c:331) allocated John and Fred
+[WARN ] (alloc.c:119) memory leak (8 bytes) allocated at t/test_alloc.c:268
+[INFO ] (t/test_alloc.c:235) destroy Person(Fred, 16)
+[INFO ] (t/test_alloc.c:244) destroy string(Fred)
+[WARN ] (alloc.c:119) memory leak (8 bytes) allocated at t/test_alloc.c:261
+[INFO ] (t/test_alloc.c:235) destroy Person(John, 15)
+[INFO ] (t/test_alloc.c:244) destroy string(John)
+[INFO ] (t/test_alloc.c:244) destroy string(world)
+[INFO ] (t/test_alloc.c:244) destroy string(hello)

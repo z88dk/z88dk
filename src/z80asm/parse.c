@@ -14,10 +14,8 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.32 2015-02-01 23:52:11 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.33 2015-02-13 00:05:15 pauloscustodio Exp $ 
 */
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "codearea.h"
@@ -76,7 +74,7 @@ UT_icd ut_exprs_icd = { sizeof(Expr *), ut_exprs_init, NULL, ut_exprs_dtor };
 *----------------------------------------------------------------------------*/
 ParseCtx *ParseCtx_new(void)
 {
-	ParseCtx *ctx = xnew(ParseCtx);
+	ParseCtx *ctx = m_new(ParseCtx);
 
 	utarray_new(ctx->tokens, &ut_Sym_icd);
 	utarray_new(ctx->token_strings, &ut_str_icd);
@@ -94,7 +92,7 @@ void ParseCtx_delete(ParseCtx *ctx)
 	utarray_free(ctx->token_strings);
 	utarray_free(ctx->tokens);
 	utarray_free(ctx->open_structs);
-	xfree(ctx);
+	m_free(ctx);
 }
 
 /*-----------------------------------------------------------------------------

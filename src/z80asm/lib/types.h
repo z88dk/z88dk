@@ -3,12 +3,10 @@ Common types and macros
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.14 2015-01-26 23:46:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.15 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
 #pragma once
-
-#include "xmalloc.h"	/* before any other include */
 
 #include <stdio.h>		/* FILENAME_MAX */
 #include <stdint.h>

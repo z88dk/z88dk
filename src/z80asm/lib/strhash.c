@@ -6,10 +6,10 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.16 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.17 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"   /* before any other include */
+#include "alloc.h"
 #include "strhash.h"
 #include "strpool.h"
 #include "strutil.h"
@@ -114,7 +114,7 @@ void StrHash_remove_elem( StrHash *self, StrHashElem *elem )
     if ( self->free_data != NULL )
         self->free_data( elem->value );
 
-    xfree( elem );
+    m_free( elem );
 }
 
 /*-----------------------------------------------------------------------------
@@ -134,7 +134,7 @@ void StrHash_set( StrHash **pself, char *key, void *value )
     {
 		key = StrHash_norm_key( *pself, key );
         
-		elem = xnew( StrHashElem );
+		elem = m_new( StrHashElem );
         elem->key = strpool_add( key );
 
         /* add to hash, need to store elem->key instead of key, as it is invariant */

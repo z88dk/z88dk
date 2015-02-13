@@ -15,12 +15,10 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Cross reference list of symbol usage
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.9 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symref.h,v 1.10 2015-02-13 00:05:17 pauloscustodio Exp $
 */
 
 #pragma once
-
-#include "xmalloc.h"   /* before any other include */
 
 #include "class.h"
 #include "classlist.h"

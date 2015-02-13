@@ -15,12 +15,11 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.39 2015-01-31 18:44:58 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.40 2015-02-13 00:05:13 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "xmalloc.h"   /* before any other include */
 #include "array.h"
 #include "types.h"
 #include "class.h"

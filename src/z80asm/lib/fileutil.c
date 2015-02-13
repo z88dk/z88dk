@@ -3,13 +3,11 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.26 2015-02-08 21:58:50 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.27 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"   /* before any other include */
-
+#include "alloc.h"
 #include "fileutil.h"
-
 #include "strpool.h"
 #include "strutil.h"
 #include "uthash.h"
@@ -91,7 +89,7 @@ static void add_open_file( FILE *file, OpenFile *open_file )
 	HASH_FIND_PTR( open_files, &file, elem );
 	assert( elem == NULL );			/* make sure FILE* is unique */
 	
-	elem = xnew( OpenFileElem );
+	elem = m_new( OpenFileElem );
 	elem->file 		= file;
 	elem->open_file	= open_file;
 
@@ -124,7 +122,7 @@ static void remove_open_file( FILE *file )
 		if ( elem != NULL )
 		{
 			HASH_DEL( open_files, elem );
-			xfree( elem );
+			m_free( elem );
 		}
 	}
 }

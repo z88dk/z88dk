@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.143 2015-02-09 21:57:42 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.144 2015-02-13 00:05:13 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.143 2015-02-09 21:5
 
 /*
 * $Log: hist.c,v $
-* Revision 1.143  2015-02-09 21:57:42  pauloscustodio
+* Revision 1.144  2015-02-13 00:05:13  pauloscustodio
+* Added debug macros and unit test module. Replaced xmalloc.c by alloc.c,
+* which has the possibility of registering a destructor function for
+* each allocated memory block, to be called on free() of the memory block.
+*
+* Revision 1.143  2015/02/09 21:57:42  pauloscustodio
 * Rename init() macro to init_module()
 *
 * Revision 1.142  2015/02/08 23:52:31  pauloscustodio
@@ -308,7 +313,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.143 2015-02-09 21:5
 *   manipulating.
 * - Factor parsing and evaluating contants.
 * - Factor symbol-not-defined error during expression evaluation.
-* - Store module name in strpool instead of xstrdup/xfree.
+* - Store module name in strpool instead of m_strdup/m_free.
 *
 * Revision 1.88  2014/04/13 11:54:01  pauloscustodio
 * CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
@@ -474,7 +479,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.143 2015-02-09 21:5
 * module appears.
 *
 * Revision 1.54  2013/12/15 13:18:33  pauloscustodio
-* Move memory allocation routines to lib/xmalloc, instead of glib,
+* Move memory allocation routines to lib/m_malloc, instead of glib,
 * introduce memory leak report on exit and memory fence check.
 *
 * Revision 1.53  2013/11/26 22:59:08  pauloscustodio
@@ -487,7 +492,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.143 2015-02-09 21:5
 * Version 1.2.9
 *
 * Revision 1.50  2013/09/12 00:10:02  pauloscustodio
-* Create xfree() macro that NULLs the pointer after free, required
+* Create m_free() macro that NULLs the pointer after free, required
 * by z80asm to find out if a pointer was already freed.
 *
 * Revision 1.49  2013/09/01 00:18:28  pauloscustodio
@@ -1271,7 +1276,7 @@ Based on 1.0.31
         - Replaced all ERR_NO_MEMORY/return sequences by an exception,
           captured at main().
         - Replaced all the memory allocation functions malloc, calloc, ...
-          by corresponding macros xmalloc, xcalloc, ... that raise an exception
+          by corresponding macros m_malloc, m_calloc, ... that raise an exception
           if the memory cannot be allocated, removing all the test code after
           each memory allocation.
         - Replaced all functions that allocated memory structures by the new
@@ -1441,11 +1446,11 @@ Based on 1.0.31
 -------------------------------------------------------------------------------
     CH_0007 : Garbage collector
     - Added automatic garbage collection on exit and simple fence mechanism
-      to detect buffer underflow and overflow, to xmalloc functions.
+      to detect buffer underflow and overflow, to m_malloc functions.
       No longer needed to call init_malloc().
       No longer need to try/catch during creation of memory structures to
       free partially created data - all not freed data is freed atexit().
-      Renamed xfree0() to xfree().
+      Renamed xfree0() to m_free().
 
     CH_0008 : Safe strings
     - New type sstr_t to hold strings with size to prevent buffer overruns.
@@ -1837,18 +1842,18 @@ Based on 1.0.31
 12.09.2013 [1.2.8] (pauloscustodio)
 -------------------------------------------------------------------------------
 	- Included GLIB in the Makefile options. Setup GLib memory allocation
-	  functions to use xmalloc functions. Unified glib compilation options
+	  functions to use m_malloc functions. Unified glib compilation options
 	  between MinGW and Linux.
-	- Replaced xmalloc et al with glib functions
+	- Replaced m_malloc et al with glib functions
 	- Replaced e4c exception mechanism by a much simpler one based on a few
 	  macros. The former did not allow an exit(1) to be called within a
 	  try-catch block.
 	- Created a code-generation mechanism for automatic execution of initialize
 	  code before the main() function starts, and methods for struct malloc
 	  and free calling constructors and destructors.
-	- Force xmalloc to be the first include, to be able to use MSVC
+	- Force m_malloc to be the first include, to be able to use MSVC
 	  memory debug tools
-	- Removed xmalloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
+	- Removed m_malloc allocation checking code, use MSVC _CRTDBG_MAP_ALLOC instead.
 	  Dump memory usage statistics at the end if MEMALLOC_DEBUG defined.
 	- Replaced strpool code by GLib String Chunks.
 	- New error module with one error function per error, no need for the error
@@ -1857,7 +1862,7 @@ Based on 1.0.31
 	  error initialization from main(). Moved all error-testing scripts to
 	  one file errors.t.
 	- Integrate codearea in init_module() mechanism.
-	- Create xfree() macro that NULLs the pointer after free, required
+	- Create m_free() macro that NULLs the pointer after free, required
 	  by z80asm to find out if a pointer was already freed.
 
 -------------------------------------------------------------------------------
@@ -1901,7 +1906,7 @@ Based on 1.0.31
 		expression, the library is not pulled in and the symbol is not found.
 
 	- Move library modules independent from z80asm to the lib subdirectory.
-	- Move memory allocation routines to lib/xmalloc, instead of glib,
+	- Move memory allocation routines to lib/m_malloc, instead of glib,
 	  introduce memory leak report on exit and memory fence check.
 
 -------------------------------------------------------------------------------
@@ -2076,7 +2081,7 @@ Based on 1.0.31
 	  manipulating.
 	- Factor parsing and evaluating contants.
 	- Factor symbol-not-defined error during expression evaluation.
-	- Store module name in strpool instead of xstrdup/xfree.
+	- Store module name in strpool instead of m_strdup/m_free.
 	- Fix test scripts to run in UNIX.
 	- As inc_PC() is no longer needed, append_opcode() no longer makes sense.
 	  Removed append_opcode() and created a new helper append_2bytes().
@@ -2242,7 +2247,9 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 
 	- Added support for binary constants %0101 syntax.
 
-	- Added debug macros and unit test module.
+	- Added debug macros and unit test module. Replaced xmalloc.c by alloc.c,
+	  which has the possibility of registering a destructor function for
+	  each allocated memory block, to be called on free() of the memory block.
 	
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
@@ -2276,11 +2283,9 @@ FUTURE CHANGES
 
 */
 
-#include "xmalloc.h"   /* before any other include */
-
 #include "hist.h"
 
-#define VERSION     "2.7.1e"
+#define VERSION     "2.7.1f"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

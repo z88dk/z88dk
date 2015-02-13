@@ -6,10 +6,10 @@ Strings with the same contents are reused.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.14 2015-02-09 21:57:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.15 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"
+#include "alloc.h"
 #include "init.h"
 #include "queue.h"
 #include "strpool.h"
@@ -23,7 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.14 2015-02-0
 *----------------------------------------------------------------------------*/
 typedef struct Element
 {
-    char *str;							/* xstrdup */
+    char *str;							/* m_strdup */
 
     UT_hash_handle hh;      			/* hash table */
 } Element;
@@ -35,7 +35,7 @@ static Element *the_pool = NULL;		/* singleton */
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-    xmalloc_init();			/* force xmalloc to be terminated last */
+    m_alloc_init();			/* force m_malloc to be terminated last */
     the_pool = NULL;
 }
 
@@ -49,8 +49,8 @@ DEFINE_dtor_module()
         warn( "strpool: free %s\n", elem->str );
 #endif
         HASH_DEL( the_pool, elem );
-        xfree( elem->str );
-        xfree( elem );
+        m_free( elem->str );
+        m_free( elem );
     }
 }
 
@@ -84,8 +84,8 @@ char *strpool_add( char *str )
         return elem->str;    /* found */
 
     /* add to elem */
-    elem = xnew( Element );
-    elem->str = xstrdup( ( char * ) str ); /* alloc string */
+    elem = m_new( Element );
+    elem->str = m_strdup( ( char * ) str ); /* alloc string */
 
     HASH_ADD_KEYPTR( hh, the_pool, elem->str, num_chars, elem );
 

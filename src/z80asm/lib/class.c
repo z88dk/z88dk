@@ -7,10 +7,10 @@ each object, which in turn may call destructors of contained objects.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.11 2015-02-09 21:57:46 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/class.c,v 1.12 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"   /* before any other include */
+#include "alloc.h"
 #include "class.h"
 #include "init.h"
 #include "strpool.h"
@@ -47,8 +47,8 @@ static Object *next_autodelete( ObjectList *headp )
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	/* make sure xmalloc and strpool are removed last */
-    xmalloc_init();
+	/* make sure m_malloc and strpool are removed last */
+    m_alloc_init();
 	strpool_init();
 
 #ifdef CLASS_DEBUG

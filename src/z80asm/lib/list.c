@@ -4,11 +4,10 @@ Uses queue.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.7 2015-01-26 23:46:22 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/list.c,v 1.8 2015-02-13 00:05:18 pauloscustodio Exp $
 */
 
-#include "xmalloc.h"		/* before any other include */
-
+#include "alloc.h"
 #include "list.h"
 
 /*-----------------------------------------------------------------------------
@@ -51,7 +50,7 @@ static ListElem *List_new_elem( List **pself, void *data )
 
     INIT_OBJ( List, pself );			/* init object */
 
-    elem = xnew( ListElem );
+    elem = m_new( ListElem );
     elem->data = data;
 
     ( *pself )->count++;
@@ -71,7 +70,7 @@ static void *List_remove_elem( List *self, ListElem *elem )
     data = elem->data;
 
     TAILQ_REMOVE( &self->head, elem, entries );
-    xfree( elem );
+    m_free( elem );
 
     self->count--;
     return data;
