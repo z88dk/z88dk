@@ -1,0 +1,31 @@
+CDL macros
+c b a 
+count = 3
+advancing head pointer
+b a c 
+b a c b a c b a c b 
+b c a b c a b c a b 
+deleting b
+a c 
+deleting (a)
+c 
+deleting (c)
+
+DL macros
+a b c 
+count = 3
+deleting tail c
+a b 
+deleting head a
+b 
+deleting head b
+
+LL macros
+a b c 
+count = 3
+deleting tail c
+a b 
+deleting head a
+b 
+deleting head b
+
