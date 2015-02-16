@@ -1,9 +1,9 @@
 /*
-	$Id: sprite.c,v 1.2 2007-02-17 16:41:45 stefano Exp $
-	
+	$Id: sprite.c,v 1.3 2015-02-16 21:50:14 stefano Exp $
+
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
-	slightly improved by Stefano Bodrato
+	slightly improved and ported to Allegro 5 by Stefano Bodrato
 
 	Please send Daniel McKinnon your own updates to the code,
 	it can be anything!  Comments, GUI elements, Bug-Fixes,
@@ -15,25 +15,44 @@
 	P.S. Some of the comments are a little dodgy and could use some fixing up
 */
 
-//#include <allegro.h>
-//#include <winalleg.h>
-#include "allegro.h"
+
+#include <allegro5/allegro.h>
+#include <allegro5/drawing.h>
+#include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_font.h>
+//#include <allegro5/allegro_ttf.h>
+#include "allegro5/allegro_image.h"
+//#include <allegro5/mouse_cursor.h>
+//#include <allegro5/file.h>
 
 #include <stdio.h>
+
 
 #define MAX_SIZE_X		255
 #define MAX_SIZE_Y		255
 
 #define MAX_SPRITE		150
 
-#define DEFAULT_BLOCK_SIZE		32
-#define DEFAULT_SIZE_X			8
-#define DEFAULT_SIZE_Y			8
+#define DEFAULT_SIZE_X			16
+#define DEFAULT_SIZE_Y			16
 
 
 
-BITMAP *buffer;
 int bls;
+ALLEGRO_DISPLAY *display=NULL;
+ALLEGRO_BITMAP *screen=NULL;
+ALLEGRO_FONT *font=NULL;
+ALLEGRO_KEYBOARD_STATE pressed_keys;
+ALLEGRO_MOUSE_STATE moustate;
+ALLEGRO_EVENT e;
+ALLEGRO_EVENT_QUEUE *eventQueue;
+ALLEGRO_FILECHOOSER *file_dialog;
+ALLEGRO_PATH *path;
+
+const char sprPatterns[] = "*.*;*.csp";
+const char sprHeader[] =  "*.*;*.h;*.H";
+const char bmpPatterns[] = "*.bmp;*.BMP;*.lbm;*.LBM;*.pcx;*.PCX;*.tga;*.TGA";
 
 typedef struct spritetype
 {
@@ -46,23 +65,34 @@ int copied;			//Sprite selected as source for copying
 int num_sprites;
 spritetype sprite[ MAX_SPRITE + 1 ];
 
+
 char hexcode[ MAX_SIZE_X * MAX_SIZE_Y ];		//Generated C Code (called hexcode out of laziness)
 char *hexc = "0123456789ABCDEF";					//For converting integers (0-15) to Hex
 
+
 //Draws a button at (x, y) with width/height (w, h), displaying text *text, with colour
-void draw_button( int x, int y, int w, int h, char *text, int border_c, int fill_c, int text_c  )
+void draw_button( int x, int y, int w, int h, char *text, ALLEGRO_COLOR border_c, ALLEGRO_COLOR fill_c, ALLEGRO_COLOR text_c  )
 {
-	rect( buffer, x, y, x+w, y+h, border_c );			//Boder
-	rectfill( buffer, x+1, y+1, x+w-1, y+h-1,  fill_c );		//Fill
-	textout_centre( buffer, font, text, x+(w/2), y+(h/2) - 4, text_c ); //Text
+	//al_set_target_bitmap(screen);
+
+	//rect( screen, x, y, x+w, y+h, border_c );			//Boder
+	al_draw_filled_rectangle( x+1, y+1, x+w-1, y+h-1, fill_c );			//Boder
+	al_draw_rectangle( x, y, x+w, y+h, border_c, 1.6 );			//Boder
+	//rectfill( screen, x+1, y+1, x+w-1, y+h-1,  fill_c );		//Fill
+	//textout_centre( buffer, font, text, x+(w/2), y+(h/2) - 4, text_c ); //Text
+	//al_draw_text(font, al_map_rgba_f(1, 1, 1, 0.5), x+(w/2), y+(h/2) - 4, 0, text);
+	al_draw_text(font, text_c, x+(w/2), y+(h/2) - 4, ALLEGRO_ALIGN_CENTRE, text);
+
 }
 
 //Checks wheather mouse has been clicked within certain "button" boundries
 int button_pressed( int x, int y, int w, int h )
 {
-	if (  (mouse_x > x) && (mouse_x < (x+w) )
-	   && (mouse_y > y) && (mouse_y < (y+w) )
-	   && (mouse_b & 1) )
+	al_get_mouse_state(&moustate);
+	
+	if (  (moustate.x > x) && (moustate.x < (x+w) )
+	   && (moustate.y > y) && (moustate.y < (y+w) )
+	   && (moustate.buttons & 1) )
 		return 1;
 	else
 		return 0;
@@ -74,51 +104,56 @@ void update_screen()
 {
 	int x, y;
 
-	int c1, c2, c3;
+	ALLEGRO_COLOR c1, c2, c3;
 	char text[ 100 ];
+	//al_set_target_bitmap(screen);
 
-		show_mouse( buffer );
-	clear_to_color( buffer, makecol(210,240,210) );
+	//show_mouse( buffer );
+//	al_show_mouse_cursor( screen );
+	//clear_to_color( buffer, al_map_rgb(210,240,210) );
+	al_clear_to_color (al_map_rgb(220,240,220) );
+//	al_flip_display();
 
-
+	// +++
 	//Draw Big Sprite Block
 	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
 		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
 			if ( sprite[ on_sprite ].p[ x ][ y ] )
-				rectfill( buffer, x * bls, y * bls, (x * bls) + bls, (y * bls) + bls, 0 );
+				//rectfill( screen, x * bls, y * bls, (x * bls) + bls, (y * bls) + bls, 0 );
+				al_draw_filled_rectangle( x * bls, y * bls, (x * bls) + bls, (y * bls) + bls,  al_map_rgb(0, 0, 0) );
 	//Draw Border Around Sprite Block
-	rect( buffer, bls - 1, bls - 1, (sprite[ on_sprite ].size_x * bls) + bls + 1, (sprite[ on_sprite ].size_y * bls) + bls + 1, makecol(255,0,0)  );
+	//rect( screen, bls - 1, bls - 1, (sprite[ on_sprite ].size_x * bls) + bls + 1, (sprite[ on_sprite ].size_y * bls) + bls + 1, al_map_rgb(255,0,0)  );
+	al_draw_rectangle( bls - 1, bls - 1, (sprite[ on_sprite ].size_x * bls) + bls + 1, (sprite[ on_sprite ].size_y * bls) + bls + 1, al_map_rgb(255,0,0), 1.6  );
 
-
-	c1 = 0;
-	c2 = makecol( 200, 255, 200 );
-	c3 = 0;
+	c1 = al_map_rgb(0,0,0);
+	c2 = al_map_rgb( 230, 255, 230 );
+	c3 = al_map_rgb(0,0,0);
 	sprintf( text, "Sprite %i", on_sprite );
-	draw_button( 20, 435, 80, 23, text, c1, c2, c3 );
+	draw_button( 10, 465, 90, 39, text, c1, c2, c3 );
 
-	sprintf( text, "Width :%i", sprite[ on_sprite ].size_x );
-	draw_button( 220, 435, 80, 23, text, c1, c2, c3 );
+	sprintf( text, "Width %i", sprite[ on_sprite ].size_x );
+	draw_button( 210, 465, 90, 39, text, c1, c2, c3 );
 
-	sprintf( text, "Height: %i", sprite[ on_sprite ].size_y );
-	draw_button( 420, 435, 80, 23, text, c1, c2, c3 );
+	sprintf( text, "Height %i", sprite[ on_sprite ].size_y );
+	draw_button( 410, 465, 90, 39, text, c1, c2, c3 );
 
-	c1 = makecol( 255,255,0 );
-	c2 = makecol( 200, 100, 75 );
-	c3 = makecol( 255,255,255 );
-	draw_button( 101, 435, 50, 23, "Last", c1, c2, c3 );
-	draw_button( 151, 435, 50, 23, "Next", c1, c2, c3 );
+	c1 = al_map_rgb( 255,255,0 );
+	c2 = al_map_rgb( 200, 100, 75 );
+	c3 = al_map_rgb( 255,255,255 );
+	draw_button( 101, 465, 50, 39, "Last", c1, c2, c3 );
+	draw_button( 151, 465, 50, 39, "Next", c1, c2, c3 );
 
-	draw_button( 301, 435, 50, 23, "-1", c1, c2, c3 );
-	draw_button( 351, 435, 50, 23, "+1", c1, c2, c3 );
+	draw_button( 301, 465, 50, 39, "-1", c1, c2, c3 );
+	draw_button( 351, 465, 50, 39, "+1", c1, c2, c3 );
 
-	draw_button( 501, 435, 50, 23, "-1", c1, c2, c3 );
-	draw_button( 551, 435, 50, 23, "+1", c1, c2, c3 );
-
-
-	blit( buffer, screen, 0, 0, 0, 0, 640, 480 );
+	draw_button( 501, 465, 50, 39, "-1", c1, c2, c3 );
+	draw_button( 551, 465, 50, 39, "+1", c1, c2, c3 );
 
 
-	show_mouse( screen );
+	//blit( buffer, screen, 0, 0, 0, 0, 720, 520 );
+	al_flip_display();
+
+return;
 
 }
 
@@ -128,8 +163,9 @@ int mx, my;
 //Calculate which block the mouse is over top of
 void do_mouse_stuff()
 {
-	mx = ( mouse_x / bls );
-	my = ( mouse_y / bls );
+	al_get_mouse_state(&moustate);
+	mx = ( moustate.x / bls );
+	my = ( moustate.y / bls );
 	if ( mx > sprite[ on_sprite ].size_x )	mx = sprite[ on_sprite ].size_x;
 	if ( my > sprite[ on_sprite ].size_y )	my = sprite[ on_sprite ].size_y;
 	if ( mx < 1 )			mx = 1;
@@ -352,13 +388,20 @@ void chop_sprite( int src )
 
 void import_from_bitmap( char *file )
 {
-	BITMAP *temp;
+	ALLEGRO_BITMAP *temp=NULL;
 	int x, y;
+	unsigned char r = 0;
+	unsigned char g = 0;
+	unsigned char b = 0;
+	
+	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
+	temp = al_load_bitmap( file );
+	al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP);
+	if (!temp)
+		return;
 
-	temp = load_bitmap( file, 0 );
-
-	sprite[ on_sprite ].size_x = temp->w;
-	sprite[ on_sprite ].size_y = temp->h;
+	sprite[ on_sprite ].size_x = al_get_bitmap_width(temp);
+	sprite[ on_sprite ].size_y = al_get_bitmap_height(temp);
 	if ( sprite[ on_sprite ].size_x > MAX_SIZE_X )
 		sprite[ on_sprite ].size_x = MAX_SIZE_X;
 	if ( sprite[ on_sprite ].size_y > MAX_SIZE_Y )
@@ -366,39 +409,50 @@ void import_from_bitmap( char *file )
 
 	fit_sprite_on_screen();
 	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
-		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
-			sprite[ on_sprite ].p[ x ][ y ] = !(getpixel( temp, x - 1, y - 1 ) >= 1 );
+		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ ) {
+			//sprite[ on_sprite ].p[ x ][ y ] = !(getpixel( temp, x - 1, y - 1 ) >= 1 );
+			al_unmap_rgb(al_get_pixel( temp, x - 1, y - 1 ),&r ,&g ,&b);
+			sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 50 );
+		}
 
 	update_screen();
 }
 
 void do_import_bitmap()
 {
-	char file[ 255 ];
+	char *file;
 
-	sprintf( file, "./" );
-	if ( file_select_ex( "Import From Bitmap", file, "BMP;PCX", 255, 640, 480 ) )
-		import_from_bitmap( file );
+	file_dialog = al_create_native_file_dialog("./", "Load bitmap", bmpPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(NULL, file_dialog);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	//al_set_path_extension(path, ".bmp");
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog);
+
+	import_from_bitmap( file );
+
 }
-
-
 
 //Saves a header file with sprites 0-on_sprite for use with z88dk
 void save_code_file( char *file )
 {
-	FILE *f;
+	ALLEGRO_FILE *f;
 	int i;
 
-	f = fopen( file, "w" );
+	f = al_fopen( file, "w" );
+	if (!f) {
+		al_fclose( f );
+		return;
+	}
+	al_fputs( f, "// Generated by Daniel McKinnon's z88dk Sprite Editor\n" );
 
-	fputs( "// Generated by Daniel McKinnon's z88dk Sprite Editor\n", f );
 	for ( i = 0; i <= on_sprite; i++ )
 	{
 		generate_codes( i );
-		fputs( hexcode, f );
+		al_fputs( f, hexcode );
 	}
 
-	fclose( f );
+	al_fclose( f );
 
 }
 
@@ -406,23 +460,44 @@ void save_code_file( char *file )
 
 void save_sprite_file( char *file )
 {
+	ALLEGRO_FILE *f;
+
+	f = al_fopen( file, "wb" );
+	if (!f) {
+		al_fclose( f );
+		return;
+	}
+	al_fwrite( f, sprite, sizeof( sprite ) );
+	al_fclose( f );
+/*
 	PACKFILE *f;
 
 	f = pack_fopen( file, "pw+b" );
 	pack_fwrite( sprite, sizeof( sprite ), f );
 	pack_fclose( f );
+*/
 }
 
 void load_sprite_file( char *file )
 {
-	PACKFILE *f;
+	ALLEGRO_FILE *f;
 
+	f = al_fopen( file, "rb" );
+	if (!f) {
+		al_fclose( f );
+		return;
+	}
+	al_fread( f, &sprite, sizeof( sprite ) );
+	al_fclose( f );
+
+/*
 	if ( exists( file ) )
 	{
 		f = pack_fopen( file, "pr+b" );
 		pack_fread( &sprite, sizeof( sprite ), f );
 		pack_fclose( f );
 	}
+*/
 
 	update_screen();
 }
@@ -432,30 +507,50 @@ void load_sprite_file( char *file )
 //The file selector for saving code files
 void do_save_code()
 {
-	char file[ 255 ];
-	if ( file_select_ex( "Save To...", file, "h", 255, 640, 480 ) )
-		save_code_file( file );
+	char *file;
+
+	file_dialog = al_create_native_file_dialog("./", "Generate C header for sprites", sprHeader, ALLEGRO_FILECHOOSER_SAVE);
+	al_show_native_file_dialog(NULL, file_dialog);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	al_set_path_extension(path, ".h");
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog);
+
+	save_code_file( file );
 
 }
 
 //The file selector for saving sprite files
 void do_save_sprites()
 {
-	char file[ 255 ];
+	char *file;
 
-	if ( file_select_ex( "Save To...", file, "csp", 255, 640, 480 ) )
-		save_sprite_file( file );
+	file_dialog = al_create_native_file_dialog("./", "Save all editor memory", sprPatterns, ALLEGRO_FILECHOOSER_SAVE);
+	al_show_native_file_dialog(NULL, file_dialog);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	al_set_path_extension(path, ".csp");
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog);
+
+	save_sprite_file( file );
+
 }
 
 //The file selector for loading sprite files
 void do_load_sprites()
 {
-	char file[ 255 ];
+	char *file;
 
-	if ( file_select_ex( "Load File", file, "csp", 255, 640, 480 ) )
-		load_sprite_file( file );
+	file_dialog = al_create_native_file_dialog("./", "Load sprites", sprPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(NULL, file_dialog);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	al_set_path_extension(path, ".csp");
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog);
+
+	load_sprite_file( file );
+
 }
-
 
 //Resets all sprites to default size
 void reset_sprites()
@@ -569,157 +664,188 @@ void copy_sprite_mask( int src, int dest )
 	update_screen();
 }
 
+void do_help_page() {
+	al_clear_to_color (al_map_rgb(240,230,250) );
+	
+	al_draw_text(font, al_map_rgb(20,5,10), 8, 5, ALLEGRO_ALIGN_LEFT, "Image Editing");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 30, ALLEGRO_ALIGN_LEFT, "Up / Down.............Zoom In / Out");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 50, ALLEGRO_ALIGN_LEFT, "SHIFT + arrow keys....Scroll Sprite");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 70, ALLEGRO_ALIGN_LEFT, "H......................Flip sprite horizontally");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 90, ALLEGRO_ALIGN_LEFT, "V......................Flip sprite vertically");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 110, ALLEGRO_ALIGN_LEFT, "D......................Flip sprite diagonally");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 130, ALLEGRO_ALIGN_LEFT, "I......................Invert Sprite");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 150, ALLEGRO_ALIGN_LEFT, "L......................Import From BMP, LBM, PCX, or TGA");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "C......................Copy sprite in memory");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 190, ALLEGRO_ALIGN_LEFT, "P......................Paste sprite from memory");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 210, ALLEGRO_ALIGN_LEFT, "F......................Fit the zoom settings for the current sprite size");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 230, ALLEGRO_ALIGN_LEFT, "SHIFP + P.......Split the copied sprite into pieces as big as the current ");
+	al_draw_text(font, al_map_rgb(0,5,10), 140, 250, ALLEGRO_ALIGN_LEFT, "sprite and paste them starting from the current sprite position.");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 270, ALLEGRO_ALIGN_LEFT, "M......................Compute mask for copied sprite and paste to current sprite");
+	al_draw_text(font, al_map_rgb(20,5,10), 8, 300, ALLEGRO_ALIGN_LEFT, "Saving / Loading");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 320, ALLEGRO_ALIGN_LEFT, "F2.....................Saves all sprites (editor specific format)");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 350, ALLEGRO_ALIGN_LEFT, "F3.....................Load sprites (editor specific format)");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 370, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header file defining");
+	al_draw_text(font, al_map_rgb(0,5,10), 190, 390, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
 
-void do_gui_buttons()
-{
-	//Last Sprite
-	if ( button_pressed( 101, 435, 50, 23 ) )
-		if ( on_sprite > 0 )
-		{
-			on_sprite--;
-			update_screen();
-			while (mouse_b & 1);
-		}
+	al_flip_display();
 
-	//Next Sprite
-	if ( button_pressed( 151, 435, 50, 23 ) )
-		if ( on_sprite < MAX_SPRITE )
-		{
-			on_sprite++;
-			update_screen();
-			while (mouse_b & 1);
-		}
-
-	//Width -1
-	if ( button_pressed( 301, 435, 50, 23 ) )
-		if ( sprite[ on_sprite ].size_x > 1 )
-		{
-			sprite[ on_sprite ].size_x--;
-			update_screen();
-			while (mouse_b & 1);
-		}
-
-	//Width +1
-	if ( button_pressed( 351, 435, 50, 23 ) )
-		if ( sprite[ on_sprite ].size_x < MAX_SIZE_X )
-		{
-			sprite[ on_sprite ].size_x++;
-			update_screen();
-			while (mouse_b & 1);
-		}
-
-
-	//Height -1
-	if ( button_pressed( 501, 435, 50, 23 ) )
-		if ( sprite[ on_sprite ].size_y > 1 )
-		{
-			sprite[ on_sprite ].size_y--;
-			update_screen();
-			while (mouse_b & 1);
-		}
-
-	//Height +1
-	if ( button_pressed( 551, 435, 50, 23 ) )
-		if ( sprite[ on_sprite ].size_y < MAX_SIZE_Y )
-		{
-			sprite[ on_sprite ].size_y++;
-			update_screen();
-			while (mouse_b & 1);
-		}
+	do {
+	al_get_keyboard_state(&pressed_keys);
+	}	while (al_key_down(&pressed_keys, ALLEGRO_KEY_F1 ));
 
 }
 
 
+void do_gui_buttons()
+{
+	al_get_mouse_state(&moustate);
+	//Last Sprite
+	if ( button_pressed( 101, 465, 50, 39 ) )
+		if ( on_sprite > 0 )
+		{
+			on_sprite--;
+			update_screen();
+//			while (moustate.buttons & 1);
+		}
+
+	//Next Sprite
+	if ( button_pressed( 151, 465, 50, 39 ) )
+		if ( on_sprite < MAX_SPRITE )
+		{
+			on_sprite++;
+			update_screen();
+//			while (moustate.buttons & 1);
+		}
+
+	//Width -1
+	if ( button_pressed( 301, 465, 50, 39 ) )
+		if ( sprite[ on_sprite ].size_x > 1 )
+		{
+			sprite[ on_sprite ].size_x--;
+			update_screen();
+//			while (moustate.buttons & 1);
+		}
+
+	//Width +1
+	if ( button_pressed( 351, 465, 50, 39 ) )
+		if ( sprite[ on_sprite ].size_x < MAX_SIZE_X )
+		{
+			sprite[ on_sprite ].size_x++;
+			update_screen();
+//			while (moustate.buttons & 1);
+		}
+
+
+	//Height -1
+	if ( button_pressed( 501, 465, 50, 39 ) )
+		if ( sprite[ on_sprite ].size_y > 1 )
+		{
+			sprite[ on_sprite ].size_y--;
+			update_screen();
+//			while (moustate.buttons & 1);
+		}
+
+	//Height +1
+	if ( button_pressed( 551, 465, 50, 39 ) )
+		if ( sprite[ on_sprite ].size_y < MAX_SIZE_Y )
+		{
+			sprite[ on_sprite ].size_y++;
+			update_screen();
+//			while (moustate.buttons & 1);
+		}
+
+}
+
+void wkey_release(int keycode)
+{
+	while ( !al_key_down(&pressed_keys, keycode )) {al_get_keyboard_state(&pressed_keys);}
+}
+
 void do_keyboard_input()
 {
 	//Keyboard Input
-	if ( key[ KEY_L ] )
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F1 )) {
+		do_help_page();
+		update_screen();
+	}
+
+		//if (al_key_down(&key, ALLEGRO_KEY_L ] ))
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_L ))
 		do_import_bitmap();
 
-	if ( key[ KEY_I ] ) {
+	if ( al_key_down(&pressed_keys,ALLEGRO_KEY_I ) ) {
 		invert_sprite();
-		while ( key[ KEY_I ] );
 	}
 
-	if ( key[ KEY_H ] ) {
+	if ( al_key_down(&pressed_keys,ALLEGRO_KEY_H ) ) {
 		flip_sprite_h();
-		while ( key[ KEY_H ] );
 	}
 
-	if ( key[ KEY_V ] ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_V ) ) {
 		flip_sprite_v();
-		while ( key[ KEY_V ] );
 	}
 
-	if ( key[ KEY_D ] ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_D ) ) {
 		flip_sprite_d();
-		while ( key[ KEY_D ] );
 	}
 
-	if ( key[ KEY_LSHIFT ] && key[ KEY_LEFT ] ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && al_key_down(&pressed_keys, ALLEGRO_KEY_LEFT ) ) {
 		scroll_sprite_left();
-		while ( key[ KEY_LEFT ] );
 	}
 
-	if ( key[ KEY_LSHIFT ] && key[ KEY_RIGHT ] ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) && al_key_down(&pressed_keys, ALLEGRO_KEY_RIGHT ) ) {
 		scroll_sprite_right();
-		while ( key[ KEY_RIGHT ] );
 	}
 
-	if ( key[ KEY_LSHIFT ] && key[ KEY_UP ] ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) && al_key_down(&pressed_keys, ALLEGRO_KEY_UP ) ) {
 		scroll_sprite_up();
-		while ( key[ KEY_UP ] );
 	}
 
-	if ( key[ KEY_LSHIFT ] && key[ KEY_DOWN ] ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) && al_key_down(&pressed_keys, ALLEGRO_KEY_DOWN ) ) {
 		scroll_sprite_down();
-		while ( key[ KEY_DOWN ] );
 	}
 
-	if ( key[ KEY_UP ] && (bls < 64 ) )
+	if ( !al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && al_key_down(&pressed_keys, ALLEGRO_KEY_UP ) && (bls < 64 ) )
 	{
 		bls++;
 		update_screen();
-		while ( key[ KEY_UP ] );
 	}
 
-	if ( key[ KEY_DOWN ] && (bls > 1) )
+	if ( !al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && al_key_down(&pressed_keys, ALLEGRO_KEY_DOWN ) && (bls > 1) )
 	{
 		bls--;
 		update_screen();
-		while ( key[ KEY_DOWN ] );
 	}
 
 	//Copy/Paste
-	if ( key[ KEY_C ] )
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_C ) )
 		copied = on_sprite;
-	if ( key[ KEY_LSHIFT ] ) {
-	    if ( key[ KEY_P ] )
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) ) {
+	    if ( al_key_down(&pressed_keys, ALLEGRO_KEY_P ) )
 	        if (copied < on_sprite) {
 	        	chop_sprite( copied );
-	        	while ( key[ KEY_P ] );
+//	        	while ( al_key_down(&pressed_keys, ALLEGRO_KEY_P ) );
 	        }
 	}
 	else {
-	    if ( key[ KEY_P ] )
+	    if ( al_key_down(&pressed_keys, ALLEGRO_KEY_P ) )
 	        if (copied != on_sprite) copy_sprite( copied, on_sprite );
 	}
 	//Paste copied sprite's mask
-	if ( key[ KEY_M ] )
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_M ) )
 		if (copied != on_sprite) copy_sprite_mask( copied, on_sprite );
-		while ( key[ KEY_M ] );
 
 
 	// Save / Load / Generate Code
-	if ( key[ KEY_F2 ] )
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F2 ) )
 		do_save_sprites();
-	if ( key[ KEY_F3 ] )
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F3 ) )
 		do_load_sprites();
-	if ( key[ KEY_F5 ] )
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F5 ) )
 		do_save_code();
 
 
-	if ( key[ KEY_F ] )
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F ) )
 	{
 		fit_sprite_on_screen();
 		update_screen();
@@ -733,12 +859,13 @@ void do_sprite_drawing()
 	do_mouse_stuff();
 
 	//Draw on sprite if mouse is over the sprite feild
-	if ( ( mouse_b & 1 ) && (mouse_x > bls ) && (mouse_y > bls ) && (mouse_x < (sprite[ on_sprite ].size_x * bls) + bls) && (mouse_y < (sprite[ on_sprite ].size_y * bls) + bls) )
+	al_get_mouse_state(&moustate);
+	if ( ( moustate.buttons & 1 ) && (moustate.x > bls ) && (moustate.y > bls ) && (moustate.x < (sprite[ on_sprite ].size_x * bls) + bls) && (moustate.y < (sprite[ on_sprite ].size_y * bls) + bls) )
 	{
 		//If the player has clicked then select oposing colour of pixel that mouse is over
 		d = !sprite[ on_sprite ].p[ mx ][ my ];
 		//Continuousely draw pixel of previousely determined colour under mouse until mouse is unlclicked
-		while ( mouse_b & 1 )
+		while ( moustate.buttons & 1 )
 		{
 			do_mouse_stuff();
 			sprite[ on_sprite ].p[ mx ][ my ] = d;
@@ -751,28 +878,52 @@ void do_sprite_drawing()
 //**************************************************************************
 //                                     MAIN                                *
 //**************************************************************************
-int main( int argc, char *argv[] )
-{
+//public int main(int argc, char** argv)
 
+//int main( int argc, char *argv[] )
+int main()
+{
 	//Init system
-	allegro_init();
-	install_keyboard();
-	install_timer();
-	install_mouse();
+	al_init();
+	al_init_primitives_addon();
+	al_init_font_addon();
+//	al_init_ttf_addon();
+	al_init_image_addon();
+	al_init_native_dialog_addon();
+	al_install_keyboard();
+	//al_install_timer();
+	al_install_mouse();
+
+//	font = al_load_font("100.gif", 0, 0);
+	font = al_load_font("fixed_font.tga", 0, 0);
 
 	//Setup graphics
-	set_color_depth( 16 );
+	//set_color_depth( 16 );
 	//if ( set_gfx_mode(GFX_XWINDOWS, 640, 480, 0, 0 ) < 0 )
-	if ( set_gfx_mode(GFX_AUTODETECT_WINDOWED, 640, 480, 0, 0 ) < 0 )
+	//if ( set_gfx_mode(GFX_SAFE, 640, 480, 0, 0 ) < 0 )
+	//	exit( -1 );
+	//al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE);
+	al_set_new_display_flags(ALLEGRO_WINDOWED);
+	display = al_create_display(720, 520);
+	if ( display == NULL )
 		exit( -1 );
+
+	al_set_window_title(display, "z88dk Sprite Editor");
 
 	//Setup double buffer
-	buffer = create_bitmap( 640, 480 );
-	if ( buffer == NULL )
-		exit( -1 );
+	screen = al_create_bitmap( 720, 520 );
+	al_set_target_bitmap(screen);
+	al_set_target_backbuffer(display);
+	//screen = al_get_target_bitmap();
+
+
+	eventQueue = al_create_event_queue();
+	al_register_event_source(eventQueue, al_get_display_event_source(display));
+	al_register_event_source(eventQueue, al_get_keyboard_event_source());
+	al_register_event_source(eventQueue, al_get_mouse_event_source());
 
 	//Transparent background for text
-	text_mode( -1 );
+//	text_mode( -1 );
 
 	//Reset all sprite sizes
 	reset_sprites();
@@ -781,21 +932,43 @@ int main( int argc, char *argv[] )
 	fit_sprite_on_screen();
 
 
-
 	//------Main Program Loop----------
 	update_screen();
+	al_show_native_message_box(display, "Welcome", "Welcome to the z88dk Sprite Editor", "Keep 'F1' pressed to see the help page", NULL, 0);
+	//show_mouse( screen );
+	//al_show_mouse_cursor(screen);
 
-	while ( !key[ KEY_ESC ] )
-	{
+	//while ( !&pressed_keys[ ALLEGRO_KEY_ESCAPE ] )
+	
+	do {
+		while ( !al_key_down(&pressed_keys, ALLEGRO_KEY_ESCAPE) && (e.type != ALLEGRO_EVENT_DISPLAY_CLOSE))
+		{
+		al_get_keyboard_state(&pressed_keys);
 
-		do_gui_buttons();
-		do_sprite_drawing();
-		do_keyboard_input();
+		al_wait_for_event(eventQueue, &e);
+		al_flip_display();
 
-	}
+		if ((e.type == ALLEGRO_EVENT_MOUSE_AXES)||(e.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN))
+			do_gui_buttons();
+			do_sprite_drawing();
+		if (e.type == ALLEGRO_EVENT_KEY_CHAR)
+			do_keyboard_input();
 
+		}
+		al_wait_for_event(eventQueue, &e);
+		while (al_key_down(&pressed_keys, ALLEGRO_KEY_ESCAPE)){al_get_keyboard_state(&pressed_keys);};
+	} while (al_show_native_message_box(display, "Goodbye", "Exiting..", "Are you sure ?", NULL, ALLEGRO_MESSAGEBOX_YES_NO)!=1);
 
-	return 0;
-} END_OF_MAIN();
+	al_unregister_event_source(eventQueue, al_get_mouse_event_source());
+	al_unregister_event_source(eventQueue, al_get_keyboard_event_source());
+	al_unregister_event_source(eventQueue, al_get_display_event_source(display));
+	al_destroy_event_queue(eventQueue);
 
+	al_uninstall_keyboard();
+	al_uninstall_mouse();
+	al_destroy_bitmap(screen);
+	al_destroy_display(display);
+	return (0);
+	
+}
 
