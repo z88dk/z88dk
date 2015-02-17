@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.3 2015-02-16 21:50:14 stefano Exp $
+	$Id: sprite.c,v 1.4 2015-02-17 20:58:05 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -21,22 +21,20 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_font.h>
-//#include <allegro5/allegro_ttf.h>
+#include <zlib.h>
 #include "allegro5/allegro_image.h"
-//#include <allegro5/mouse_cursor.h>
-//#include <allegro5/file.h>
+
 
 #include <stdio.h>
 
 
-#define MAX_SIZE_X		255
+#define MAX_SIZE_X		254
 #define MAX_SIZE_Y		255
 
 #define MAX_SPRITE		150
 
 #define DEFAULT_SIZE_X			16
 #define DEFAULT_SIZE_Y			16
-
 
 
 int bls;
@@ -47,12 +45,11 @@ ALLEGRO_KEYBOARD_STATE pressed_keys;
 ALLEGRO_MOUSE_STATE moustate;
 ALLEGRO_EVENT e;
 ALLEGRO_EVENT_QUEUE *eventQueue;
-ALLEGRO_FILECHOOSER *file_dialog;
 ALLEGRO_PATH *path;
 
-const char sprPatterns[] = "*.*;*.csp";
-const char sprHeader[] =  "*.*;*.h;*.H";
-const char bmpPatterns[] = "*.bmp;*.BMP;*.lbm;*.LBM;*.pcx;*.PCX;*.tga;*.TGA";
+const char sprPatterns[] = "*.sgz";
+const char sprHeader[] =  "*.*;*.h";
+const char bmpPatterns[] = "*.*";
 
 typedef struct spritetype
 {
@@ -185,7 +182,7 @@ void generate_codes( int i )
 
 	int x, y;
 
-	sprintf( hexcode, "" );
+	//sprintf( hexcode, "" );
 
 	//Make the Binary String
 	p = 0;
@@ -386,7 +383,7 @@ void chop_sprite( int src )
 }
 
 
-void import_from_bitmap( char *file )
+void import_from_bitmap( const char *file )
 {
 	ALLEGRO_BITMAP *temp=NULL;
 	int x, y;
@@ -402,17 +399,17 @@ void import_from_bitmap( char *file )
 
 	sprite[ on_sprite ].size_x = al_get_bitmap_width(temp);
 	sprite[ on_sprite ].size_y = al_get_bitmap_height(temp);
-	if ( sprite[ on_sprite ].size_x > MAX_SIZE_X )
+	if ( sprite[ on_sprite ].size_x >= MAX_SIZE_X )
 		sprite[ on_sprite ].size_x = MAX_SIZE_X;
-	if ( sprite[ on_sprite ].size_y > MAX_SIZE_Y )
+	if ( sprite[ on_sprite ].size_y >= MAX_SIZE_Y )
 		sprite[ on_sprite ].size_y = MAX_SIZE_Y;
 
 	fit_sprite_on_screen();
-	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
-		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ ) {
+	for ( x = 0; x < sprite[ on_sprite ].size_x; x++ )
+		for ( y = 0; y < sprite[ on_sprite ].size_y; y++ ) {
 			//sprite[ on_sprite ].p[ x ][ y ] = !(getpixel( temp, x - 1, y - 1 ) >= 1 );
 			al_unmap_rgb(al_get_pixel( temp, x - 1, y - 1 ),&r ,&g ,&b);
-			sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 50 );
+			sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 300 );
 		}
 
 	update_screen();
@@ -420,7 +417,8 @@ void import_from_bitmap( char *file )
 
 void do_import_bitmap()
 {
-	char *file;
+	const char *file;
+	ALLEGRO_FILECHOOSER *file_dialog = NULL;
 
 	file_dialog = al_create_native_file_dialog("./", "Load bitmap", bmpPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
 	al_show_native_file_dialog(NULL, file_dialog);
@@ -434,7 +432,7 @@ void do_import_bitmap()
 }
 
 //Saves a header file with sprites 0-on_sprite for use with z88dk
-void save_code_file( char *file )
+void save_code_file( const char *file )
 {
 	ALLEGRO_FILE *f;
 	int i;
@@ -458,17 +456,31 @@ void save_code_file( char *file )
 
 
 
-void save_sprite_file( char *file )
+void save_sprite_file( const char *file )
 {
-	ALLEGRO_FILE *f;
+//	ALLEGRO_FILE *f;
+	gzFile *f;
+	int x,y,i;
 
-	f = al_fopen( file, "wb" );
+	//f = al_fopen( file, "wb" );
+	f = gzopen( file, "wb" );
 	if (!f) {
-		al_fclose( f );
+		//al_fclose( f );
 		return;
 	}
-	al_fwrite( f, sprite, sizeof( sprite ) );
-	al_fclose( f );
+
+	for ( i = 0; i <= MAX_SPRITE; i++ )
+	{
+		gzputc (f, sprite[ i ].size_x);
+		gzputc (f, sprite[ i ].size_y);
+		for ( x = 0; x < MAX_SIZE_X; x++ )
+			for ( y = 0; y < MAX_SIZE_Y; y++ ) {
+				gzputc (f, sprite[ i ].p[ x ][ y ]);
+			}
+	}
+	//al_fwrite( f, sprite, sizeof( sprite ) );
+	//al_fclose( f );
+	gzclose( f );
 /*
 	PACKFILE *f;
 
@@ -478,17 +490,30 @@ void save_sprite_file( char *file )
 */
 }
 
-void load_sprite_file( char *file )
+void load_sprite_file( const char *file )
 {
-	ALLEGRO_FILE *f;
+	gzFile *f;
+	int x,y,i;
 
-	f = al_fopen( file, "rb" );
+	//f = al_fopen( file, "wb" );
+	f = gzopen( file, "rb" );
 	if (!f) {
-		al_fclose( f );
+		//al_fclose( f );
 		return;
 	}
-	al_fread( f, &sprite, sizeof( sprite ) );
-	al_fclose( f );
+
+	for ( i = 0; i <= MAX_SPRITE; i++ )
+	{
+		sprite[ i ].size_x = gzgetc (f);
+		sprite[ i ].size_y = gzgetc (f);
+		for ( x = 0; x < MAX_SIZE_X; x++ )
+			for ( y = 0; y < MAX_SIZE_Y; y++ ) {
+				sprite[ i ].p[ x ][ y ] = gzgetc (f);
+			}
+	}
+	//al_fwrite( f, sprite, sizeof( sprite ) );
+	//al_fclose( f );
+	gzclose( f );
 
 /*
 	if ( exists( file ) )
@@ -507,7 +532,8 @@ void load_sprite_file( char *file )
 //The file selector for saving code files
 void do_save_code()
 {
-	char *file;
+	const char *file;
+	ALLEGRO_FILECHOOSER *file_dialog = NULL;
 
 	file_dialog = al_create_native_file_dialog("./", "Generate C header for sprites", sprHeader, ALLEGRO_FILECHOOSER_SAVE);
 	al_show_native_file_dialog(NULL, file_dialog);
@@ -523,12 +549,13 @@ void do_save_code()
 //The file selector for saving sprite files
 void do_save_sprites()
 {
-	char *file;
+	const char *file;
+	ALLEGRO_FILECHOOSER *file_dialog = NULL;
 
 	file_dialog = al_create_native_file_dialog("./", "Save all editor memory", sprPatterns, ALLEGRO_FILECHOOSER_SAVE);
 	al_show_native_file_dialog(NULL, file_dialog);
 	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
-	al_set_path_extension(path, ".csp");
+	al_set_path_extension(path, ".sgz");
 	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 	al_destroy_native_file_dialog(file_dialog);
 
@@ -539,12 +566,13 @@ void do_save_sprites()
 //The file selector for loading sprite files
 void do_load_sprites()
 {
-	char *file;
+	const char *file;
+	ALLEGRO_FILECHOOSER *file_dialog = NULL;
 
 	file_dialog = al_create_native_file_dialog("./", "Load sprites", sprPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
 	al_show_native_file_dialog(NULL, file_dialog);
 	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
-	al_set_path_extension(path, ".csp");
+	al_set_path_extension(path, ".sgz");
 	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 	al_destroy_native_file_dialog(file_dialog);
 

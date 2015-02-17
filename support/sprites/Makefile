@@ -11,6 +11,6 @@ OBJECTS = sprite.o
 all:    sprite
 
 sprite:	$(OBJECTS)
-	$(LD) $(LFLAGS) -o sprite $(OBJECTS) -lallegro -lallegro_primitives -lallegro_image -lallegro_font -lallegro_dialog
+	$(LD) $(LFLAGS) -o sprite $(OBJECTS) -lz -lallegro -lallegro_primitives -lallegro_image -lallegro_font -lallegro_dialog
 
 
