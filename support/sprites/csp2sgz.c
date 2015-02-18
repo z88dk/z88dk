@@ -1,8 +1,10 @@
 /*
-	$Id: csp2sgz.c,v 1.1 2015-02-18 20:56:16 stefano Exp $
+	$Id: csp2sgz.c,v 1.2 2015-02-18 21:41:20 stefano Exp $
 	
 	Support tool for the sprite editor by Daniel McKinnon
 	Convert the old ".csp" files to the new ".sgz" format
+	
+	Requires zlib and Allegro 4
 
 */
 
