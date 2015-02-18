@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.88 2015-02-11 17:56:27 aralbrec Exp $
+ *      $Id: zcc.c,v 1.89 2015-02-18 19:45:32 aralbrec Exp $
  */
 
 
@@ -670,8 +670,6 @@ int main(int argc, char **argv)
             if ( compiler_type == CC_SDCC) {
                if (process(".i", ".asm2", c_compiler, comparg, compiler_style, i, YES, NO))
                   exit(1);
-//               if (process(".asm2", ".asm", "sed", "-r \"s/#/+/g\"", filter, i, YES, NO))
-//                  exit(1);
                if (process(".asm2", ".asm", c_copt_exe, c_sdccrules1, filter, i, YES, NO))
                   exit(1);
             } else {
@@ -1245,7 +1243,7 @@ static void configure_compiler()
         // snprintf(buf,sizeof(buf),"-mz80 --reserve-regs-iy --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
 		// move restriction on iy to target cfg
         //snprintf(buf,sizeof(buf),"-mz80_z88dk --no-optsdcc-in-asm --c1mode --no-peep",sdcc_assemblernames[assembler_type]);
-		snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode",sdcc_assemblernames[assembler_type]);
+		snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode --emit-externs",sdcc_assemblernames[assembler_type]);
         add_option_to_compiler(buf);
         preprocarg = " -DZ88DK_USES_SDCC=1";
         BuildOptions(&cpparg, preprocarg);
