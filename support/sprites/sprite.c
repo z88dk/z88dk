@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.4 2015-02-17 20:58:05 stefano Exp $
+	$Id: sprite.c,v 1.5 2015-02-18 07:16:22 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -12,7 +12,6 @@
 	Send any updates, fixes, or support requests to:  stikmansoftware@yahoo.com
 	...and signal changes to the z88dk_devel list, too.
 
-	P.S. Some of the comments are a little dodgy and could use some fixing up
 */
 
 
@@ -70,16 +69,9 @@ char *hexc = "0123456789ABCDEF";					//For converting integers (0-15) to Hex
 //Draws a button at (x, y) with width/height (w, h), displaying text *text, with colour
 void draw_button( int x, int y, int w, int h, char *text, ALLEGRO_COLOR border_c, ALLEGRO_COLOR fill_c, ALLEGRO_COLOR text_c  )
 {
-	//al_set_target_bitmap(screen);
-
-	//rect( screen, x, y, x+w, y+h, border_c );			//Boder
 	al_draw_filled_rectangle( x+1, y+1, x+w-1, y+h-1, fill_c );			//Boder
 	al_draw_rectangle( x, y, x+w, y+h, border_c, 1.6 );			//Boder
-	//rectfill( screen, x+1, y+1, x+w-1, y+h-1,  fill_c );		//Fill
-	//textout_centre( buffer, font, text, x+(w/2), y+(h/2) - 4, text_c ); //Text
-	//al_draw_text(font, al_map_rgba_f(1, 1, 1, 0.5), x+(w/2), y+(h/2) - 4, 0, text);
 	al_draw_text(font, text_c, x+(w/2), y+(h/2) - 4, ALLEGRO_ALIGN_CENTRE, text);
-
 }
 
 //Checks wheather mouse has been clicked within certain "button" boundries
@@ -103,23 +95,16 @@ void update_screen()
 
 	ALLEGRO_COLOR c1, c2, c3;
 	char text[ 100 ];
-	//al_set_target_bitmap(screen);
 
-	//show_mouse( buffer );
-//	al_show_mouse_cursor( screen );
-	//clear_to_color( buffer, al_map_rgb(210,240,210) );
 	al_clear_to_color (al_map_rgb(220,240,220) );
-//	al_flip_display();
-
+	
 	// +++
 	//Draw Big Sprite Block
 	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
 		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
 			if ( sprite[ on_sprite ].p[ x ][ y ] )
-				//rectfill( screen, x * bls, y * bls, (x * bls) + bls, (y * bls) + bls, 0 );
 				al_draw_filled_rectangle( x * bls, y * bls, (x * bls) + bls, (y * bls) + bls,  al_map_rgb(0, 0, 0) );
 	//Draw Border Around Sprite Block
-	//rect( screen, bls - 1, bls - 1, (sprite[ on_sprite ].size_x * bls) + bls + 1, (sprite[ on_sprite ].size_y * bls) + bls + 1, al_map_rgb(255,0,0)  );
 	al_draw_rectangle( bls - 1, bls - 1, (sprite[ on_sprite ].size_x * bls) + bls + 1, (sprite[ on_sprite ].size_y * bls) + bls + 1, al_map_rgb(255,0,0), 1.6  );
 
 	c1 = al_map_rgb(0,0,0);
@@ -146,8 +131,6 @@ void update_screen()
 	draw_button( 501, 465, 50, 39, "-1", c1, c2, c3 );
 	draw_button( 551, 465, 50, 39, "+1", c1, c2, c3 );
 
-
-	//blit( buffer, screen, 0, 0, 0, 0, 720, 520 );
 	al_flip_display();
 
 return;
@@ -169,6 +152,7 @@ void do_mouse_stuff()
 	if ( my < 1 )			my = 1;
 
 }
+
 
 void generate_codes( int i )
 {
@@ -236,7 +220,7 @@ void generate_codes( int i )
 
 }
 
-//Fits a sprite to best fit on the screen
+// Resize the sprite view to best fit on the screen
 void fit_sprite_on_screen()
 {
 	//Calculate size of best fit
@@ -407,7 +391,6 @@ void import_from_bitmap( const char *file )
 	fit_sprite_on_screen();
 	for ( x = 0; x < sprite[ on_sprite ].size_x; x++ )
 		for ( y = 0; y < sprite[ on_sprite ].size_y; y++ ) {
-			//sprite[ on_sprite ].p[ x ][ y ] = !(getpixel( temp, x - 1, y - 1 ) >= 1 );
 			al_unmap_rgb(al_get_pixel( temp, x - 1, y - 1 ),&r ,&g ,&b);
 			sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 300 );
 		}
@@ -423,11 +406,11 @@ void do_import_bitmap()
 	file_dialog = al_create_native_file_dialog("./", "Load bitmap", bmpPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
 	al_show_native_file_dialog(NULL, file_dialog);
 	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
-	//al_set_path_extension(path, ".bmp");
 	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
 	al_destroy_native_file_dialog(file_dialog);
 
 	import_from_bitmap( file );
+	al_flush_event_queue(eventQueue);
 
 }
 
@@ -458,7 +441,6 @@ void save_code_file( const char *file )
 
 void save_sprite_file( const char *file )
 {
-//	ALLEGRO_FILE *f;
 	gzFile *f;
 	int x,y,i;
 
@@ -478,16 +460,7 @@ void save_sprite_file( const char *file )
 				gzputc (f, sprite[ i ].p[ x ][ y ]);
 			}
 	}
-	//al_fwrite( f, sprite, sizeof( sprite ) );
-	//al_fclose( f );
 	gzclose( f );
-/*
-	PACKFILE *f;
-
-	f = pack_fopen( file, "pw+b" );
-	pack_fwrite( sprite, sizeof( sprite ), f );
-	pack_fclose( f );
-*/
 }
 
 void load_sprite_file( const char *file )
@@ -495,10 +468,8 @@ void load_sprite_file( const char *file )
 	gzFile *f;
 	int x,y,i;
 
-	//f = al_fopen( file, "wb" );
 	f = gzopen( file, "rb" );
 	if (!f) {
-		//al_fclose( f );
 		return;
 	}
 
@@ -511,18 +482,8 @@ void load_sprite_file( const char *file )
 				sprite[ i ].p[ x ][ y ] = gzgetc (f);
 			}
 	}
-	//al_fwrite( f, sprite, sizeof( sprite ) );
-	//al_fclose( f );
-	gzclose( f );
 
-/*
-	if ( exists( file ) )
-	{
-		f = pack_fopen( file, "pr+b" );
-		pack_fread( &sprite, sizeof( sprite ), f );
-		pack_fclose( f );
-	}
-*/
+	gzclose( f );
 
 	update_screen();
 }
@@ -543,6 +504,7 @@ void do_save_code()
 	al_destroy_native_file_dialog(file_dialog);
 
 	save_code_file( file );
+	al_flush_event_queue(eventQueue);
 
 }
 
@@ -577,6 +539,7 @@ void do_load_sprites()
 	al_destroy_native_file_dialog(file_dialog);
 
 	load_sprite_file( file );
+	al_flush_event_queue(eventQueue);
 
 }
 
@@ -621,13 +584,6 @@ void copy_sprite_mask( int src, int dest )
 	//Copy sizes
 	sprite[ dest ].size_x = sprite[ src ].size_x;
 	sprite[ dest ].size_y = sprite[ src ].size_y;
-
-	/*  
-	//dst initialization shouldn't be necessary 
-	for ( x = 1; x <= sprite[ dest ].size_x; x++ )
-		for ( y = 1; y <= sprite[ dest ].size_y; y++ )
-			sprite[ dest ].p[ x ][ y ] = FALSE;
-	*/
 
 	//look for bytes to mask horizontally
 	for ( y = 1; y <= sprite[ src ].size_y; y++ ) {
@@ -733,7 +689,6 @@ void do_gui_buttons()
 		{
 			on_sprite--;
 			update_screen();
-//			while (moustate.buttons & 1);
 		}
 
 	//Next Sprite
@@ -742,7 +697,6 @@ void do_gui_buttons()
 		{
 			on_sprite++;
 			update_screen();
-//			while (moustate.buttons & 1);
 		}
 
 	//Width -1
@@ -751,7 +705,6 @@ void do_gui_buttons()
 		{
 			sprite[ on_sprite ].size_x--;
 			update_screen();
-//			while (moustate.buttons & 1);
 		}
 
 	//Width +1
@@ -760,7 +713,6 @@ void do_gui_buttons()
 		{
 			sprite[ on_sprite ].size_x++;
 			update_screen();
-//			while (moustate.buttons & 1);
 		}
 
 
@@ -770,7 +722,6 @@ void do_gui_buttons()
 		{
 			sprite[ on_sprite ].size_y--;
 			update_screen();
-//			while (moustate.buttons & 1);
 		}
 
 	//Height +1
@@ -779,7 +730,6 @@ void do_gui_buttons()
 		{
 			sprite[ on_sprite ].size_y++;
 			update_screen();
-//			while (moustate.buttons & 1);
 		}
 
 }
@@ -797,7 +747,6 @@ void do_keyboard_input()
 		update_screen();
 	}
 
-		//if (al_key_down(&key, ALLEGRO_KEY_L ] ))
 	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_L ))
 		do_import_bitmap();
 
@@ -852,7 +801,6 @@ void do_keyboard_input()
 	    if ( al_key_down(&pressed_keys, ALLEGRO_KEY_P ) )
 	        if (copied < on_sprite) {
 	        	chop_sprite( copied );
-//	        	while ( al_key_down(&pressed_keys, ALLEGRO_KEY_P ) );
 	        }
 	}
 	else {
@@ -915,22 +863,16 @@ int main()
 	al_init();
 	al_init_primitives_addon();
 	al_init_font_addon();
-//	al_init_ttf_addon();
+
 	al_init_image_addon();
 	al_init_native_dialog_addon();
 	al_install_keyboard();
-	//al_install_timer();
 	al_install_mouse();
 
-//	font = al_load_font("100.gif", 0, 0);
 	font = al_load_font("fixed_font.tga", 0, 0);
 
 	//Setup graphics
-	//set_color_depth( 16 );
-	//if ( set_gfx_mode(GFX_XWINDOWS, 640, 480, 0, 0 ) < 0 )
-	//if ( set_gfx_mode(GFX_SAFE, 640, 480, 0, 0 ) < 0 )
-	//	exit( -1 );
-	//al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE);
+
 	al_set_new_display_flags(ALLEGRO_WINDOWED);
 	display = al_create_display(720, 520);
 	if ( display == NULL )
@@ -963,10 +905,7 @@ int main()
 	//------Main Program Loop----------
 	update_screen();
 	al_show_native_message_box(display, "Welcome", "Welcome to the z88dk Sprite Editor", "Keep 'F1' pressed to see the help page", NULL, 0);
-	//show_mouse( screen );
-	//al_show_mouse_cursor(screen);
-
-	//while ( !&pressed_keys[ ALLEGRO_KEY_ESCAPE ] )
+	al_flush_event_queue(eventQueue);
 	
 	do {
 		while ( !al_key_down(&pressed_keys, ALLEGRO_KEY_ESCAPE) && (e.type != ALLEGRO_EVENT_DISPLAY_CLOSE))
@@ -985,6 +924,7 @@ int main()
 		}
 		al_wait_for_event(eventQueue, &e);
 		while (al_key_down(&pressed_keys, ALLEGRO_KEY_ESCAPE)){al_get_keyboard_state(&pressed_keys);};
+		al_flush_event_queue(eventQueue);
 	} while (al_show_native_message_box(display, "Goodbye", "Exiting..", "Are you sure ?", NULL, ALLEGRO_MESSAGEBOX_YES_NO)!=1);
 
 	al_unregister_event_source(eventQueue, al_get_mouse_event_source());
