@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.5 2015-02-18 07:16:22 stefano Exp $
+	$Id: sprite.c,v 1.6 2015-02-18 20:56:16 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 
-#define MAX_SIZE_X		254
+#define MAX_SIZE_X		255
 #define MAX_SIZE_Y		255
 
 #define MAX_SPRITE		150
