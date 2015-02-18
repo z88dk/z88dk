@@ -1,4 +1,6 @@
-THE Z80 CROSS ASSEMBLER, V1.0.16 (30th January 2000)
+THE Z80 CROSS ASSEMBLER
+
+Version: v1.2.6 (August 28th 2013)
 
 Thank you for purchasing a copy of this cross assembler. We have made an effort
 to program an easy user interface and efficient assembler source file compiling.
