@@ -9,14 +9,39 @@ programming with our assembler.
 We have made an effort to produce a fairly easy-to-understand documentation. If
 you have any comments or corrections, please don't hesitate to contact us:
 
-  Gunther Strube
-  Gl. Kongevej 37, 4.tv.
-  DK-1610 Kobenhavn V
-  Denmark
+    Gunther Strube
+    Gl. Kongevej 37, 4.tv.
+    DK-1610 Kobenhavn V
+    Denmark
 
-  e-mail [1]gbs@image.dk
+    e-mail [1]gbs@image.dk
 
-1.0 Running the assembler
+Index:
+
+  [2]Running the assembler
+
+  [3]An overview of assembler features and related files
+
+  [4]Executing the cross assembler and environment variables
+
+  [5]Z80 module assembler file types
+
+  [6]Compiling files
+
+  [7]Using expressions
+
+  [8]Directive reference
+
+  [9]Runtime error messages
+
+  [10]Compiling the Z80 Module Assembler ANSI C source files
+
+  [11]File formats
+
+
+
+Running the assembler
+=====================
 
 Since assemblers are developed for programmers the user interface have been
 implemented according to the standard command line environment (CLI) used in most
@@ -36,7 +61,7 @@ o The command line
 The syntax of the assembler parameters is a straightforward design. Filenames or
 a project file are always specified. The options may be left out:
 
-  z80asm [options] <filename {filename}> | <@modulesfile>
+    z80asm [options] <filename {filename}> | <@modulesfile>
 
 As seen above <options> must be specified first. Then you enter the names of all
 files to be assembled. You either choose to specify all file names or a
@@ -105,8 +130,8 @@ the filename of the listing and a page number.
 
 For each line of the source file the following information is written:
 
-  <source file line number><assembler address><machine code hex dump><source
-  line>
+    <source file line number><assembler address><machine code hex dump><source
+    line>
 
 The machine code and assembler address output are written in hexadecimal
 notation. If the machine code uses more the 4 bytes, the source file line is
@@ -230,7 +255,7 @@ the first object module file. You can override this by specifying an explicit
 address origin by entering the -r option followed by an address in hexadecimal
 notation at the command line, e.g.:
 
-  -r4000
+    -r4000
 
 which specifies that your code is to be relocated for address 4000h (16384)
 onwards.
@@ -301,8 +326,8 @@ your might then call a random address (on the basis of the random IY register).
 (of your code) in the main code and the relocated program. The following
 registers are affected by the initial relocation process:
 
-  AFBCDEHL/IXIY/........ same
-  ......../..../afbcdehl different
+    AFBCDEHL/IXIY/........ same
+    ......../..../afbcdehl different
 
 You still have all the main registers for parameter passing which is more than
 sufficient for average programming.
@@ -353,13 +378,13 @@ specification of parameters you specify either your source file modules or use a
 project file. The project file specification is of course much faster. An
 example:
 
-  z80asm -a main pass1 pass2 link asmdrctv z80instr
+    z80asm -a main pass1 pass2 link asmdrctv z80instr
 
 This command line will compile all specified module file names into a single
 executable file called 'main.bin'. However if a project file 'assembler' were
 created already containing the same file names, the command line would have been:
 
-   z80asm -a @assembler
+     z80asm -a @assembler
 
 - much easier!
 
@@ -368,9 +393,9 @@ character \n. The new line character may be different on various computer
 platforms - but the assembler interprets it correctly. The contents of a project
 file may look like this:
 
-  z80asm\n
-  z80pass1\nz80pass1\n
-  modlink\n
+    z80asm\n
+    z80pass1\nz80pass1\n
+    modlink\n
 
 The \n identifies a new line in the file (<CR><LF> in MSDOS or <LF> in LINUX).
 
@@ -436,7 +461,10 @@ You may redefine the tabulator distance by using the -t option immediately
 followed by a decimal number, e.g. -t4 for defining a tabulator distance of 4.
 The width of the first column will then be 4*4 = 16 'spaces'.
 
-2.0 An overview of assembler features and related files
+
+
+An overview of assembler features and related files
+===================================================
 
 o The Z88 operating system definition files
 
@@ -635,7 +663,10 @@ this documentation. At command line infinite number of libraries may be
 specified. All will be searched during linking of your object modules for
 referenced library routines.
 
-3.0 Executing the cross assembler and environment variables
+
+
+Executing the cross assembler and environment variables
+=======================================================
 
 The following text describes how to execute the assembler and defining the
 environment variables used by the assembler.
@@ -644,9 +675,9 @@ o The environment variables
 
 The assembler uses two environment variables:
 
-  "Z80_STDLIB" define the default filename of the standard library filename.
+    "Z80_STDLIB" define the default filename of the standard library filename.
 
-  "Z80_OZFILES" define the default path of the standard Z88 OZ system headers.
+    "Z80_OZFILES" define the default path of the standard Z88 OZ system headers.
 
 o Running in the QDOS/SMSQ operating system environment
 
@@ -656,17 +687,18 @@ system before using the assembler. It contains the environment variable facility
 integrated on UNIX, MS-DOS and many other operating systems. Include the
 following line into your BOOT upstart program:
 
-   LRESPR win1_ext_env_bin
+     LRESPR win1_ext_env_bin
 
 The device and path 'win1_ext_' is just an example of where to store your system
 extension file. You may have it on your BOOT disk as well. If you don't have
 ToolKit 2 on your system use the following line in your BOOT program:
 
-   envext = RESPR(1024): LBYTES win1_ext_env_bin, envext: CALL envext
+     envext = RESPR(1024): LBYTES win1_ext_env_bin, envext: CALL envext
 
 Use the following in your BOOT file to set the environment variables:
 
-  SETENV "Z80_OZFILES=win1_z80_src_oz_" SETENV "Z80_STDLIB=win1_z80_standard_lib"
+    SETENV "Z80_OZFILES=win1_z80_src_oz_"
+    SETENV "Z80_STDLIB=win1_z80_standard_lib"
 
 The example file names are only a demonstration. Change them as necessary.
 
@@ -700,14 +732,17 @@ Windows (here you need to specify compilation options o a console application).
 The environment variables are easily put into your AUTOEXEC.BAT file. Simply
 specify:
 
-  SET Z80_OZFILES=C:\Z80\OZ\ SET Z80_STDLIB=C:\Z80\STANDARD.LIB
+    SET Z80_OZFILES=C:\Z80\OZ\ SET Z80_STDLIB=C:\Z80\STANDARD.LIB
 
 Choose your own settings if you like.
 
 If you want the assembler to be accessible in any path, add the path location of
 the assembler in the PATH search line: ;C:\Z80
 
-4.0 Z80 module assembler file types
+
+
+Z80 module assembler file types
+===============================
 
 o The assembler file types and their extension names
 
@@ -796,7 +831,10 @@ Library files are identified with the 'lib' extension. Library files may be
 created using the -x option. Library may be included into application code during
 linking of object modules.
 
-5.0 Compiling files
+
+
+Compiling files
+===============
 
 o The assembler compiling process
 
@@ -864,13 +902,14 @@ o The standard platform identifier
 When the Z80 Module Assembler is running a standard platform identifier is made
 available. The identifier reflects the name of the platform:
 
-  "Z88" - the assembler is running on the Z88 portable computer.
+    "Z88" - the assembler is running on the Z88 portable computer.
 
-  "QDOS" - the assembler is running on the QDOS/SMSQ platform (QL & compatibles)
+    "QDOS" - the assembler is running on the QDOS/SMSQ platform (QL &
+    compatibles)
 
-  "MSDOS" - the assembler is running on the IBM MS-DOS platform of computers
+    "MSDOS" - the assembler is running on the IBM MS-DOS platform of computers
 
-  "UNIX" - the assembler is running on the LINUX/UNIX platform.
+    "UNIX" - the assembler is running on the LINUX/UNIX platform.
 
 The identifier might be very handy when you need to port your source files to
 different computer platforms. We use them in for loading header files. Have a
@@ -883,9 +922,9 @@ he chooses to place the source code on a text line has no effect of the parsing
 process of the assembler. The linefeed interpretation is also handled by z80asm -
 it understands the following formats:
 
-  <LF> (used by QDOS/SMSQ/UNIX/AMIGA),
-  <CR><LF> (used by MSDOS),
-  <CR> (used by Z88/MacIntosh).
+    <LF> (used by QDOS/SMSQ/UNIX/AMIGA),
+    <CR><LF> (used by MSDOS),
+    <CR> (used by Z88/MacIntosh).
 
 o Using local, global and external symbols
 
@@ -979,12 +1018,12 @@ places accept comments without a semicolon has been set - but don't rely on it.
 Better use a semicolon. The context is much more clear. The following is an
 example on how to use comments in Z80 source files:
 
-  ; **********************
-  ; main menu
-  ;
-  .mainmenu call window ; display menu
-   call getkey ; read keyboard
-   ret ; action in register A
+    ; **********************
+    ; main menu
+    ;
+    .mainmenu call window ; display menu
+     call getkey ; read keyboard
+     ret ; action in register A
 
 o Defining symbolic address labels
 
@@ -995,9 +1034,9 @@ an address label. An address label may be left as a single statement on a line -
 you may of course use comment after the label. The following is a label
 definition:
 
-  ; *****************
-  ; routine definition
-  .mainmenu call xxx ; mainmenu is the label preceded with '.'
+    ; *****************
+    ; routine definition
+    .mainmenu call xxx ; mainmenu is the label preceded with '.'
 
 It is not allowed to position two labels on the same line. However, you may place
 as many label after each other - even though no code is between them. They just
@@ -1008,9 +1047,9 @@ If you want to declare an address globally accessible to other modules, then use
 XDEF for the address label definition, otherwise the label definition will be
 interpreted as a local address label.
 
-  XDEF mainmenu
-  ...
-  .mainmenu ; this label is accessible from other modules with XREF
+    XDEF mainmenu
+    ...
+    .mainmenu ; this label is accessible from other modules with XREF
 
 You may use before or after the label - z80asm automatically handles the scope
 resolution as long as you use XDEF to define it as globally accessible.
@@ -1027,16 +1066,16 @@ choice. Only a few rules must be obeyed:
 
 A few examples which all are legal syntax:
 
-  Ld HL , 0
-  ld hl, $fFFF
-  caLL ttttt
+    Ld HL , 0
+    ld hl, $fFFF
+    caLL ttttt
 
 o Optional Z80 mnemonic instruction syntax
 
 We have added some syntactical option on a few Z80 mnemonics. They are:
 
-  DJNZ label (the comma is not needed)
-  IN F,(C) (special case instruction which only affects the flags)
+    DJNZ label (the comma is not needed)
+    IN F,(C) (special case instruction which only affects the flags)
 
 The instructions below allow additional specification of the accumulator
 register. Zilog standard convention is to only specify the source operand.
@@ -1044,11 +1083,11 @@ Sometimes it is better to specify the accumulator to make the instruction look
 more clear, and to avoid confusion. After all, they specified it for "add", "adc"
 and "sbc".
 
-  sub a,r
-  sub a,n
-  sub a,(hl)
-  sub a,(ix+0)
-  sub a,(iy+0)
+    sub a,r
+    sub a,n
+    sub a,(hl)
+    sub a,(ix+0)
+    sub a,(iy+0)
 
 this syntax applies also to "and", "or", "xor" & "cp"
 
@@ -1057,17 +1096,17 @@ o The undocumented Z80 instructions
 We have included the parsing and code generation of the undocumented Z80
 instructions. They are as follows:
 
-  LD r,IXL  r = A,B,C,D,E,IXL,IXH
-  LD r,IXH
-  LD IXL,n  n = 8-bit operand
-  LD IXH,n
+    LD r,IXL  r = A,B,C,D,E,IXL,IXH
+    LD r,IXH
+    LD IXL,n  n = 8-bit operand
+    LD IXH,n
 
-  ADC  A,IXL
-  ADC  A,IXH
-  ADD, AND, CP, DEC, INC, OR, SBC, SUB, XOR ...
+    ADC  A,IXL
+    ADC  A,IXH
+    ADD, AND, CP, DEC, INC, OR, SBC, SUB, XOR ...
 
-  SLL  A, B, C, D, E, H, L
-  SLL  (HL), (IX+d), (IY+d)
+    SLL  A, B, C, D, E, H, L
+    SLL  (HL), (IX+d), (IY+d)
 
 (SLL = [S]hift [L]ogical [L]eft).
 
@@ -1085,7 +1124,7 @@ two things; include a library file at the assembler command line with the -i
 option and refer to the library routine in your source file using the LIB
 directive followed by the name of the library routine, e.g.
 
-  LIB malloc, free
+    LIB malloc, free
 
 which will declare the two names "malloc" and "free" as external identifiers to
 the current source file module. Please note that you can declare the names before
@@ -1130,7 +1169,7 @@ If you don't specify a filename, the default standard filename is used (defined
 by the Z80_STDLIB environment variable). Then you need to specify your project
 filename preceded by @, for example:
 
-  Z80asm -xiofunctions @iofunctions
+    Z80asm -xiofunctions @iofunctions
 
 will create a library "iofunctions.lib" in the current directory (also containing
 all library source files). The project file is "iofunctions" also in the current
@@ -1188,7 +1227,10 @@ The solution was the -g option and cross referencing using XREF and an additiona
 source module (containing the XDEF declarations) that included the -g list file
 of the other project compilation.
 
-6.0 Using expressions
+
+
+Using expressions
+=================
 
 Expressions is almost unavoidable in source files. They define and explain things
 much clearer than just using a constant. The Z80 Module Assembler allows
@@ -1217,9 +1259,9 @@ Apart from specifying decimal integer numbers, you are allowed to use hexadecima
 constants, binary constants and ASCII characters. The following symbols are put
 in front of the constant to identify the type:
 
-  $  hexadecimal constant, e.g. $4000 (16384).
-  @  binary constant, e.g. @11000000 (192).
-  ' '  ASCII character, e.g. 'a'.
+    $  hexadecimal constant, e.g. $4000 (16384).
+    @  binary constant, e.g. @11000000 (192).
+    ' '  ASCII character, e.g. 'a'.
 
 o Arithmetic operators
 
@@ -1227,22 +1269,22 @@ All basic arithmetic operators are supported: addition, subtraction,
 multiplication, division and modulus. In addition binary logical operators are
 implemented: binary AND, OR and XOR.
 
-  + addition, e.g. 12+13
-  - unary minus, subtraction. E.g. -10, 12-45.
-  * multiplication, e.g. 45*2 (90).
-  / division, e.g. 256/8 (32).
-  % modulus, e.g. 256%8 (0).
-  ^ power, e.g. 2^7 (128).
-  ~ Binary AND, e.g. 255 ~ 7 (7).
-  | Binary OR, e.g. 128 | 64 (192).
-  : Binary XOR, e.g. 128 ~ 128 (0).
-  # Truncate expression as constant (remove relocatable address flag)
+    + addition, e.g. 12+13
+    - unary minus, subtraction. E.g. -10, 12-45.
+    * multiplication, e.g. 45*2 (90).
+    / division, e.g. 256/8 (32).
+    % modulus, e.g. 256%8 (0).
+    ^ power, e.g. 2^7 (128).
+    ~ Binary AND, e.g. 255 ~ 7 (7).
+    | Binary OR, e.g. 128 | 64 (192).
+    : Binary XOR, e.g. 128 ~ 128 (0).
+    # Truncate expression as constant (remove relocatable address flag)
 
 Arithmetic operators use the standard operator precedence, shown from highest to
 lowest:
 
-  $@' (constant identifiers)
-  () ^ */% +-~|:
+    $@' (constant identifiers)
+    () ^ */% +-~|:
 
 If you want to override the default operator precedence rules, use brackets ().
 
@@ -1263,8 +1305,8 @@ evaluated value of the expression. This is a perfectly correct handling in norma
 address references for relocatable code. However, since the assembler cannot see
 this as a constant expression, you have to force it as one.
 
-  LD BC, end_relocator-relocator ; the relocator will add an ORG constant
-  LD BC, #end_relocator-relocator ; the relocator sees a constant expression
+    LD BC, end_relocator-relocator ; the relocator will add an ORG constant
+    LD BC, #end_relocator-relocator ; the relocator sees a constant expression
 
 Normal executable code, compiled for a an absolute address, won't conflict with
 the above problem, since no constants are added to expressions. All address
@@ -1281,13 +1323,13 @@ value of a false expression is 0. These operators are quite handy when you need
 to perform complex logic for conditional assembly in IF-ELSE-ENDIF statements.
 The following relational operators are available:
 
-  = equal to
-  <>  not equal to
-  < less than
-  > larger than
-  <=  less than or equal to
-  >=  larger than or equal to
-  ! not
+    = equal to
+    <>  not equal to
+    < less than
+    > larger than
+    <=  less than or equal to
+    >=  larger than or equal to
+    ! not
 
 You may link several relational expressions with the binary operators AND, OR and
 XOR. You have all the possibilities available!
@@ -1295,7 +1337,7 @@ XOR. You have all the possibilities available!
 It is perfectly legal to use relational expressions in parameters requiring an
 arithmetic value. For example:
 
-  LD A, (USING_IBM = 1) | RTMFLAGS
+    LD A, (USING_IBM = 1) | RTMFLAGS
 
 o The ASMPC standard function
 
@@ -1303,9 +1345,9 @@ In occasional circumstances it may be necessary to use the current location of
 the assembler program counter in an expression e.g. calculating a relative
 distance. This may be done with the help of the ASMPC identifier. An example:
 
-  .errmsg0 DEFM errmsg1 - ASMPC - 1 & "File open error"
-  .errmsg1 DEFM errmsg2 - ASMPC - 1 & "Syntax error"
-  .errmsg2
+    .errmsg0 DEFM errmsg1 - ASMPC - 1 & "File open error"
+    .errmsg1 DEFM errmsg2 - ASMPC - 1 & "Syntax error"
+    .errmsg2
 
 Here, a length byte of the following string (excluding the length byte) is
 calculated by using the current ASMPC address value.
@@ -1331,7 +1373,10 @@ re-evaluate the failed expression in pass 2 of the parsing. If it still fails a
 symbol has not been found (XREF and LIB external symbols are handled during the
 linking phase).
 
-7.0 Directive reference
+
+
+Directive reference
+===================
 
 The Z80 Module Assembler directives are used to manipulate the Z80 assembler
 mnemonics and to generate data structures, variables and constants. You are even
@@ -1349,9 +1394,9 @@ Since the directives cover very different topics of assembler processing, each
 directive will be explained in detail, identified with a header description for
 each text section. The following syntax is used:
 
-  <> defines an entity, i.e. a number, character or string.
-  {} defines a an optional repetition of an entity.
-  [] defines an option that may be left out.
+    <> defines an entity, i.e. a number, character or string.
+    {} defines a an optional repetition of an entity.
+    [] defines an option that may be left out.
 
 BINARY "filename"
 
@@ -1367,13 +1412,13 @@ is an easy interface call to the Z88 operating system. This is an advanced RST
 20H instruction which automatically allocates space for the size of the specified
 parameter (either 8-bit or 16-bit). Code is internally generated as follows:
 
-  RST $20
-  DEFB x ; 8-bit parameter
+    RST $20
+    DEFB x ; 8-bit parameter
 
-or
+or  
 
-  RST $20
-  DEFW x ; 16-bit parameter
+    RST $20
+    DEFW x ; 16-bit parameter
 
 DEFB <8-bit expr>,{<8-bit expr>} (-128; 255)
 DEFW <16-bit expr>,{<16-bit expr>} (-32768; 65535)
@@ -1397,9 +1442,9 @@ operator. This is useful if control characters need to be a part of the string
 and cannot be typed from the keyboard.
 
 DEFGROUP
-'{'
+'{' 
 
-  name {',' name ['=' <8-bit expression>]}
+    name {',' name ['=' <8-bit expression>]}
 
 '}'
 
@@ -1412,19 +1457,19 @@ DEFGROUP is just a more easy way than:  DEFC name0 = 0, name1 = name0, ...
 
 The following example illustrates a useful example of defining symbol values:
 
-  DEFGROUP
+    DEFGROUP
 
-  { 
+    { 
 
-    sym_null, sym_dquote, sym_squote, sym_semicolon, sym_comma, sym_fullstop,
-    sym_lparen, sym_lcurly, sym_rcurly, sym_rparen, sym_plus, sym_minus,
-    sym_multiply, sym_divi, sym_mod, sym_power, sym_assign, sym_strconq, sym_and,
-    sym_or, sym_xor, sym_not sym_less, sym_greater, sym_constexpr, sym_newline,
-    sym_lf, sym_name, sym_number, sym_decmconst, sym_hexconst, sym_binconst,
-     sym_charconst, sym_lessequal, sym_greatequal, sym_notequal sym_negated,
-    sym_nil, sym_ifstatm, sym_elsestatm, sym_endifstatm
+      sym_null, sym_dquote, sym_squote, sym_semicolon, sym_comma, sym_fullstop,
+      sym_lparen, sym_lcurly, sym_rcurly, sym_rparen, sym_plus, sym_minus,
+      sym_multiply, sym_divi, sym_mod, sym_power, sym_assign, sym_strconq,
+      sym_and, sym_or, sym_xor, sym_not sym_less, sym_greater, sym_constexpr,
+      sym_newline, sym_lf, sym_name, sym_number, sym_decmconst, sym_hexconst,
+      sym_binconst,  sym_charconst, sym_lessequal, sym_greatequal, sym_notequal
+      sym_negated, sym_nil, sym_ifstatm, sym_elsestatm, sym_endifstatm
 
-  }
+    }
 
 DEFINE name,{name}
 
@@ -1438,10 +1483,10 @@ Allocates storage. The size of the area will be filled with zero bytes. The
 expression must be [1; 65535].
 
 DEFVARS <16-bit expression>
-'{'
+'{' 
 
-  [<name>] [<storage_size> <size_multiplier>]
-  { [<name>] [<storage_size> <size_multiplier>] }
+    [<name>] [<storage_size> <size_multiplier>]
+    { [<name>] [<storage_size> <size_multiplier>] }
 
 '}'
 
@@ -1456,32 +1501,32 @@ defining dynamic data structures in linked lists and binary search trees.
 Defining variable areas are only template definitions not allocations. An
 example:
 
-  DEFVARS Z80asm_vars
-  { 
+    DEFVARS Z80asm_vars
+    { 
 
-    RuntimeFlags1 ds.b 1 ; space for next variable is 1 byte
-    RuntimeFlags2 ds.b 1
-    RuntimeFlags3 ds.b 1
-    ds.w 1 ; space not defined
-    explicitORIG  ds.w 1 ; 2 bytes space
-    asmtime ds.b 3 ; 3 bytes space
-    datestamp_src ds.b 6 ; 6 bytes space
-    datestamp_obj ds.b 6
-    TOTALERRORS ds.l 1 ; 4 bytes space
+      RuntimeFlags1 ds.b 1 ; space for next variable is 1 byte
+      RuntimeFlags2 ds.b 1
+      RuntimeFlags3 ds.b 1
+      ds.w 1 ; space not defined
+      explicitORIG  ds.w 1 ; 2 bytes space
+      asmtime ds.b 3 ; 3 bytes space
+      datestamp_src ds.b 6 ; 6 bytes space
+      datestamp_obj ds.b 6
+      TOTALERRORS ds.l 1 ; 4 bytes space
 
-  }
+    }
 
 the following is useful for defining dynamic data structures:
 
-  DEFVARS 0
-  ; 'PfixStack' structure (used for postfix expressions):
-  { 
+    DEFVARS 0
+    ; 'PfixStack' structure (used for postfix expressions):
+    { 
 
-    pfixstack_const ds.l 1  ; The stack item value
-    pfixstack_previtem  ds.p 1  ; Pointer to previous element on stack
-    SIZEOF_pfixstack  ; total size of data structure
+      pfixstack_const ds.l 1  ; The stack item value
+      pfixstack_previtem  ds.p 1  ; Pointer to previous element on stack
+      SIZEOF_pfixstack  ; total size of data structure
 
-  }
+    }
 
 This type of variable declaration makes it very easy for modifications, e.g.
 deleting or inserting variable definitions.
@@ -1494,50 +1539,50 @@ This enables you to gradually build up a list of identifier name offsets across
 DEFVARS areas in different source files. The following example explains
 everything:
 
-  defvars $4000
+    defvars $4000
 
-  { 
+    { 
 
-    aaa ds.b 1
-    bbb ds.b 100
+      aaa ds.b 1
+      bbb ds.b 100
 
-  }
+    }
 
-  defvars -1
+    defvars -1
 
-  { 
+    { 
 
-    ccc ds.b 100
-    ddd ds.b 1
-    eee ds.b 10
+      ccc ds.b 100
+      ddd ds.b 1
+      eee ds.b 10
 
-  }
+    }
 
-  defvars 0
+    defvars 0
 
-  { 
+    { 
 
-    fff ds.p 1
-    ggg ds.b 1
-    hhh ds.w 1
-    iii ds.p 1
+      fff ds.p 1
+      ggg ds.b 1
+      hhh ds.w 1
+      iii ds.p 1
 
-  }
+    }
 
-  defvars -1
+    defvars -1
 
-  { 
+    { 
 
-    jjj ds.b 100
+      jjj ds.b 100
 
-  }
+    }
 
 Some of the symbols will look like this:
 
-  BBB                                = 00004001
-  CCC                                = 00004065
-  GGG                                = 00000003
-  JJJ                                = 000040D4
+    BBB                                = 00004001
+    CCC                                = 00004065
+    GGG                                = 00000003
+    JJJ                                = 000040D4
 
 FPP['('] <8-bit expression> [')']
 
@@ -1558,36 +1603,36 @@ which source lines will be assembled inside the directive construction. ELSE is
 optional. Infinite nesting of IF directives are allowed.  Each directive must be
 specified on separate lines. An example:
 
-  if QDOS
+    if QDOS
 
-    INCLUDE "defs_h"
-    INCLUDE "symbol_def"
-    INCLUDE "#stdio_def"
-    INCLUDE "#fileio_def"
-    INCLUDE "#memory_def"
+      INCLUDE "defs_h"
+      INCLUDE "symbol_def"
+      INCLUDE "#stdio_def"
+      INCLUDE "#fileio_def"
+      INCLUDE "#memory_def"
 
-  else
+    else
 
-    INCLUDE "defs.h"
-    INCLUDE "symbol.def"
+      INCLUDE "defs.h"
+      INCLUDE "symbol.def"
 
-    if MSDOS | UNIX
+      if MSDOS | UNIX
 
-      INCLUDE "#stdio.def"
-      INCLUDE "#fileio.def"
-      INCLUDE "#memory.def"
+        INCLUDE "#stdio.def"
+        INCLUDE "#fileio.def"
+        INCLUDE "#memory.def"
+
+      endif
+
+      if Z88
+
+        INCLUDE ":*//stdio.def"
+        INCLUDE ":*//fileio.def"
+        INCLUDE ":*//memory.def"
+
+      endif
 
     endif
-
-    if Z88
-
-      INCLUDE ":*//stdio.def"
-      INCLUDE ":*//fileio.def"
-      INCLUDE ":*//memory.def"
-
-    endif
-
-  endif
 
 INCLUDE "filename"
 
@@ -1679,7 +1724,10 @@ Declares symbol as external to the current module. The name must have been
 defined as XDEF in another module to let this module reach the value of the
 symbol during the linking phase.
 
-8.0 Runtime error messages
+
+
+Runtime error messages
+======================
 
 The following error messages will be written in corresponding error files
 (related to a source file). Each error message will contain the name of the
@@ -1854,7 +1902,10 @@ variables wasn't found in the operating system.
 A file was tried to be included which was already included at a previous include
 level. INCLUDE "a.h" cannot contain an INCLUDE "a.h"...
 
-9.0 Compiling the Z80 Module Assembler ANSI C source files
+
+
+Compiling the Z80 Module Assembler ANSI C source files
+======================================================
 
 If it is needed to re-compile the assembler for the current platform or compiling
 it for a new platform, two files must be stored together with the source files
@@ -1995,10 +2046,10 @@ the appropriate files. PLEASE SPECIFY WHERE YOU HAVE MADE THE CHANGES. We prefer
 MSDOS disks (since almost everybody can read/write them). If otherwise, please
 specify the format.  Send the discs to:
 
-  Gunther Strube
-  Gl. Kongevej 37, 4.tv.
-  DK-1610 Kobenhavn V
-  Denmark
+    Gunther Strube
+    Gl. Kongevej 37, 4.tv.
+    DK-1610 Kobenhavn V
+    Denmark
 
 I can also be reached by email: gbs@image.dk
 
@@ -2012,7 +2063,10 @@ compilers. We take NO responsibility for illegally distributed programs! The Z80
 Module Assembler is a GPL'ed program and should be kept that way to the benefit
 of all developers...
 
-10.0 File formats
+
+
+File formats
+============
 
 o Object file format documentation
 
@@ -2029,26 +2083,26 @@ simplicity and load efficiency during link processing.
 
 The format of the object file is as follows:
 
-0 
+0   
 
-  [ 'Z80RMF01' <ORG Address> ]
-  [ <F.ptr to Module Name> ]
-  [ <F.ptr to Expression Declarations> ]
-  [ <F.ptr to Name Declarations> ]
-  [ <F.ptr to Library Name Declarations> ]
-  [ <F.ptr to Machine Code Block> ]
+    [ 'Z80RMF01' <ORG Address> ]
+    [ <F.ptr to Module Name> ]
+    [ <F.ptr to Expression Declarations> ]
+    [ <F.ptr to Name Declarations> ]
+    [ <F.ptr to Library Name Declarations> ]
+    [ <F.ptr to Machine Code Block> ]
 
-  [ <Expression Declaration> ]
-  [ ... ]
+    [ <Expression Declaration> ]
+    [ ... ]
 
-  [ <Name Declaration> ]
-  [ ... ]
+    [ <Name Declaration> ]
+    [ ... ]
 
-  [ <Library Name Declaration> ]
-  [ ... ]
+    [ <Library Name Declaration> ]
+    [ ... ]
 
-  [ <Module Name> ]
-  [ <Machine Code> ]
+    [ <Module Name> ]
+    [ <Machine Code> ]
 
 n
 
@@ -2130,11 +2184,11 @@ o Library file format documentation
 
 The library file format is a sequence of object files with additional structures.
 
-0 
+0   
 
-  [ 'Z80LMF01' ]
-  [ <Object File Block> ]
-  [ ... ]
+    [ 'Z80LMF01' ]
+    [ <Object File Block> ]
+    [ ... ]
 
 n
 
@@ -2159,5 +2213,15 @@ has been marked "deleted" and will not be used.
 
 
 1. mailto:gbs@image.dk
+2. #h.nblzgdx05sk0
+3. #h.3umrs9snh1co
+4. #h.447fa65coun7
+5. #h.ehp52383w0ya
+6. #h.3jjuyl7czx2g
+7. #h.eyw8eca5z285
+8. #h.qmk5qen438yg
+9. #h.c79iahkre1ai
+10. #h.y0x7ycaf0y5b
+11. #h.stlz0oo2whj
 
 
