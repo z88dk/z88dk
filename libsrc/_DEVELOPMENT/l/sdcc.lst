@@ -1,3 +1,4 @@
+l/sdcc/___sdcc_enter_ix
 l/sdcc/__divschar
 l/sdcc/__divsint
 l/sdcc/__divslong
@@ -20,4 +21,3 @@ l/sdcc/__mulschar
 l/sdcc/__mulsuchar
 l/sdcc/__muluschar
 l/sdcc/__sdcc_call_hl
-l/sdcc/__sdcc_enter_ix

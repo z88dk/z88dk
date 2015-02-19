@@ -1,9 +1,9 @@
 
 SECTION code_l_sdcc
 
-PUBLIC __sdcc_enter_ix
+PUBLIC ___sdcc_enter_ix
 
-__sdcc_enter_ix:
+___sdcc_enter_ix:
 
    pop hl
 
