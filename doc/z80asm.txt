@@ -16,34 +16,34 @@ you have any comments or corrections, please don't hesitate to contact us:
     DK-1610 Kobenhavn V
     Denmark
 
-    e-mail [1]gbs@image.dk
+    e-mail gbs@image.dk
 
 Index:
 
-  [2]Running the assembler
+  1. Running the assembler
 
-  [3]An overview of assembler features and related files
+  2. An overview of assembler features and related files
 
-  [4]Executing the cross assembler and environment variables
+  3. Executing the cross assembler and environment variables
 
-  [5]Z80 module assembler file types
+  4. Z80 module assembler file types
 
-  [6]Compiling files
+  5. Compiling files
 
-  [7]Using expressions
+  6. Using expressions
 
-  [8]Directive reference
+  7. Directive reference
 
-  [9]Runtime error messages
+  8. Runtime error messages
 
-  [10]Compiling the Z80 Module Assembler ANSI C source files
+  9. Compiling the Z80 Module Assembler ANSI C source files
 
-  [11]File formats
+  10. File formats
 
 
 
-Running the assembler
-=====================
+1. Running the assembler
+========================
 
 Since assemblers are developed for programmers the user interface have been
 implemented according to the standard command line environment (CLI) used in most
@@ -457,8 +457,8 @@ The width of the first column will then be 4*4 = 16 'spaces'.
 
 
 
-An overview of assembler features and related files
-===================================================
+2. An overview of assembler features and related files
+======================================================
 
 o The Z88 operating system definition files
 
@@ -659,8 +659,8 @@ referenced library routines.
 
 
 
-Executing the cross assembler and environment variables
-=======================================================
+3. Executing the cross assembler and environment variables
+==========================================================
 
 The following text describes how to execute the assembler and defining the
 environment variables used by the assembler.
@@ -735,8 +735,8 @@ the assembler in the PATH search line: ;C:\Z80
 
 
 
-Z80 module assembler file types
-===============================
+4. Z80 module assembler file types
+==================================
 
 o The assembler file types and their extension names
 
@@ -827,8 +827,8 @@ linking of object modules.
 
 
 
-Compiling files
-===============
+5. Compiling files
+==================
 
 o The assembler compiling process
 
@@ -1223,8 +1223,8 @@ of the other project compilation.
 
 
 
-Using expressions
-=================
+6. Using expressions
+====================
 
 Expressions is almost unavoidable in source files. They define and explain things
 much clearer than just using a constant. The Z80 Module Assembler allows
@@ -1362,8 +1362,8 @@ linking phase).
 
 
 
-Directive reference
-===================
+7. Directive reference
+======================
 
 The Z80 Module Assembler directives are used to manipulate the Z80 assembler
 mnemonics and to generate data structures, variables and constants. You are even
@@ -1716,8 +1716,8 @@ symbol during the linking phase.
 
 
 
-Runtime error messages
-======================
+8. Runtime error messages
+=========================
 
 The following error messages will be written in corresponding error files
 (related to a source file). Each error message will contain the name of the
@@ -1894,8 +1894,8 @@ level. INCLUDE "a.h" cannot contain an INCLUDE "a.h"...
 
 
 
-Compiling the Z80 Module Assembler ANSI C source files
-======================================================
+9. Compiling the Z80 Module Assembler ANSI C source files
+=========================================================
 
 If it is needed to re-compile the assembler for the current platform or compiling
 it for a new platform, two files must be stored together with the source files
@@ -2055,8 +2055,8 @@ of all developers...
 
 
 
-File formats
-============
+10. File formats
+================
 
 o Object file format documentation
 
@@ -2199,19 +2199,3 @@ the last in the library file.
 
 If this integer is 0 then it is indicated that the current <Object File Block>
 has been marked "deleted" and will not be used.
-
-
-
-1. mailto:gbs@image.dk
-2. #h.nblzgdx05sk0
-3. #h.3umrs9snh1co
-4. #h.447fa65coun7
-5. #h.ehp52383w0ya
-6. #h.3jjuyl7czx2g
-7. #h.eyw8eca5z285
-8. #h.qmk5qen438yg
-9. #h.c79iahkre1ai
-10. #h.y0x7ycaf0y5b
-11. #h.stlz0oo2whj
-
-

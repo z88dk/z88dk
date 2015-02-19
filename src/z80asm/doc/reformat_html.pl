@@ -17,11 +17,10 @@
 # format to CVS-friendly HTML (Google exports one single text line for 
 # the whole document) and to .txt format
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/reformat_html.pl,v 1.1 2015-02-17 23:35:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/reformat_html.pl,v 1.2 2015-02-19 22:05:12 pauloscustodio Exp $
 
 use Modern::Perl;
 use HTML::Tree;
-use HTML::FormatText::WithLinks::AndTables;
 use File::Basename;
 use File::Copy;
 use File::Slurp;
@@ -38,6 +37,7 @@ my $tree = HTML::Tree->new_from_content($html_ori);
 
 my %left_margin = get_left_margin($tree);
 insert_indent($tree, %left_margin);
+add_chapter_numbers($tree);
 
 # beautify HTML
 my $html = $tree->as_HTML(undef, "  ", {});
@@ -53,15 +53,9 @@ my $text_file = $html_file;
 $text_file =~ s/\.html?$/.txt/ or die "$html_file not HTML\n";
 my $text_ori = read_file($text_file);
 
-# kludge - AndTables.pm is not calling FormatText configure
-my $formatter = HTML::FormatText::WithLinks::AndTables->new;
-HTML::FormatText::configure($formatter, {leftmargin => 0, rightmargin => 80});
-
+my $formatter = MyFormatter->new(leftmargin => 0, rightmargin => 80);
 my $text = $formatter->format($tree);
 $text = encode("iso-8859-1", $text);
-
-# kludge - WithLinks.pm inserts title of document as first line
-$text =~ s/^.*\n\n//;
 
 if ($text ne $text_ori) {
 	say "Write $text_file";
@@ -141,3 +135,92 @@ sub insert_indent {
 		}
 	}
 }
+
+# add chapter numbers to '#*' titles, add TOC to the end
+sub add_chapter_numbers {
+	my($tree) = @_;
+	my $ids = [];
+
+	my @headers = $tree->look_down(sub { $_[0]->tag =~ /^h\d$/ });
+	for my $header (@headers) {
+		my($level, $href_name, $title, $title_element);
+		
+		# search for all headers, add chapter number
+		$header->tag =~ /^h(\d+)/ and $level = 0+$1;
+		defined $level or next;
+		
+		my @content = $header->content_list;
+		for my $content (@content) {
+			if ($content->tag eq 'a') {
+				$href_name = $content->attr('name');
+			}
+			elsif ($content->tag eq 'span') {
+				$title_element = $content;
+				$title = $content->as_trimmed_text;
+			}
+		}
+		defined($level) && defined($title) or next;
+		
+		$title = chapter_title($level, $title, $ids);
+		$title_element->delete_content;
+		$title_element->push_content($title);
+		
+		# search for all <a href> pointing to this chaper, replace title
+		for my $ref ($tree->look_down(_tag => 'a', href => '#'.$href_name)) {
+			$ref->delete_content;
+			$ref->push_content($title);
+		}
+	}
+}
+
+sub chapter_title {
+	my($level, $title, $ids) = @_;
+	
+	$title =~ s/^\s*(\d+\.)*\s*//;
+	$title =~ s/\s+$//;
+	
+	if ($level > scalar(@$ids) + 1) {				# one level jumped
+		die "level too deep at @$ids";
+	}
+	elsif ($level == scalar(@$ids) + 1) {			# one sub-level
+		push @$ids, 1;
+	}
+	elsif ($level == scalar(@$ids)) {				# same sub-level
+		@$ids or die;
+		$ids->[-1]++;
+	}
+	else {								
+		while ($level < scalar(@$ids)) {			# drop all extra levels
+			pop @$ids;
+		}
+		@$ids or die;
+		$ids->[-1]++;
+	}
+	
+	$title = join(".", @$ids).". ".$title;
+
+	return $title;
+}
+
+
+# my HTML to TEXT formatter
+package MyFormatter;
+
+use Modern::Perl;
+use base 'HTML::FormatText';
+use HTML::FormatText::WithLinks::AndTables;
+
+sub parse {
+    my($self, $html) = @_;
+
+    return undef unless defined $html;
+    return '' if $html eq '';
+
+    my $tree = HTML::TreeBuilder->new->parse( $html );
+    return $self->_format_tables( $tree ); # we work our magic...
+}
+
+sub _format_tables { 
+	HTML::FormatText::WithLinks::AndTables::_format_tables(@_); 
+}
+
