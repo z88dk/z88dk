@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.6 2015-02-18 20:56:16 stefano Exp $
+	$Id: sprite.c,v 1.7 2015-02-19 12:37:51 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -166,7 +166,6 @@ void generate_codes( int i )
 
 	int x, y;
 
-	//sprintf( hexcode, "" );
 
 	//Make the Binary String
 	p = 0;
@@ -359,7 +358,6 @@ void chop_sprite( int src )
 		        sprite[ on_sprite ].p[ x ][ y ] = sprite[ src ].p[ x + x_offset ][ y + y_offset ];
 		on_sprite++;
 		x_offset = x_offset + save_x;
-		//update_screen();
 	    }
 	    y_offset = y_offset + save_y;
 	}
@@ -389,8 +387,8 @@ void import_from_bitmap( const char *file )
 		sprite[ on_sprite ].size_y = MAX_SIZE_Y;
 
 	fit_sprite_on_screen();
-	for ( x = 0; x < sprite[ on_sprite ].size_x; x++ )
-		for ( y = 0; y < sprite[ on_sprite ].size_y; y++ ) {
+	for ( x = 0; x <= sprite[ on_sprite ].size_x; x++ )
+		for ( y = 0; y <= sprite[ on_sprite ].size_y; y++ ) {
 			al_unmap_rgb(al_get_pixel( temp, x - 1, y - 1 ),&r ,&g ,&b);
 			sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 300 );
 		}
@@ -489,6 +487,54 @@ void load_sprite_file( const char *file )
 }
 
 
+void load_sevenup_file( const char *file )
+{
+	FILE *f;
+	int x,y,i,j,c;
+
+	f = fopen( file, "rb" );
+	if (!f) {
+		return;
+	}
+	
+	if (getc(f) != 'S') {
+		fclose( f );
+		return;
+	}
+	if (getc(f) != 'e') {
+		fclose( f );
+		return;
+	}
+	if (getc(f) != 'v') {
+		fclose( f );
+		return;
+	}
+	
+	for (i=0; i<7; i++) getc(f);
+	
+	sprite[ on_sprite ].size_x = getc(f);
+	getc(f);
+	sprite[ on_sprite ].size_y = getc(f);
+	getc(f);
+	
+	
+	for ( x = 0; x < (1 + (sprite[ on_sprite ].size_y-1) / 8); x++ )
+		for ( y = 0; y < (1 + (sprite[ on_sprite ].size_x-1) / 8); y++ ) {
+ 			for ( j = 0; j <= 8; j++ ) {
+				c = getc(f);
+				for ( i = 0; i <= 8; i++ ) {
+					sprite[ on_sprite ].p[ y*8+i+1 ][ x*8+j+1 ] = ((c & 128)!=0);
+					c <<= 1;
+				}
+			}
+		}
+
+	fclose( f );
+
+	fit_sprite_on_screen();
+	update_screen();
+}
+
 
 //The file selector for saving code files
 void do_save_code()
@@ -542,6 +588,25 @@ void do_load_sprites()
 	al_flush_event_queue(eventQueue);
 
 }
+
+//The file selector for loading SevenuP files
+void do_load_sevenup()
+{
+	const char *file;
+	ALLEGRO_FILECHOOSER *file_dialog = NULL;
+
+	file_dialog = al_create_native_file_dialog("./", "Load SevenuP sprite", "*.sev", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(NULL, file_dialog);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	al_set_path_extension(path, ".sev");
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog);
+
+	load_sevenup_file( file );
+	al_flush_event_queue(eventQueue);
+
+}
+
 
 //Resets all sprites to default size
 void reset_sprites()
@@ -668,8 +733,9 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(20,5,10), 8, 300, ALLEGRO_ALIGN_LEFT, "Saving / Loading");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 320, ALLEGRO_ALIGN_LEFT, "F2.....................Saves all sprites (editor specific format)");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 350, ALLEGRO_ALIGN_LEFT, "F3.....................Load sprites (editor specific format)");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 370, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header file defining");
-	al_draw_text(font, al_map_rgb(0,5,10), 190, 390, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 370, ALLEGRO_ALIGN_LEFT, "F4.....................Load SevenuP sprite at current position");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 390, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header file defining");
+	al_draw_text(font, al_map_rgb(0,5,10), 190, 410, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
 
 	al_flip_display();
 
@@ -817,6 +883,8 @@ void do_keyboard_input()
 		do_save_sprites();
 	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F3 ) )
 		do_load_sprites();
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F4 ) )
+		do_load_sevenup();
 	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F5 ) )
 		do_save_code();
 
@@ -910,19 +978,20 @@ int main()
 	do {
 		while ( !al_key_down(&pressed_keys, ALLEGRO_KEY_ESCAPE) && (e.type != ALLEGRO_EVENT_DISPLAY_CLOSE))
 		{
+		al_flip_display();
+		al_wait_for_event(eventQueue, &e);
 		al_get_keyboard_state(&pressed_keys);
 
-		al_wait_for_event(eventQueue, &e);
-		al_flip_display();
-
-		if ((e.type == ALLEGRO_EVENT_MOUSE_AXES)||(e.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN))
+		if ((e.type == ALLEGRO_EVENT_MOUSE_AXES)||(e.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)) {
 			do_gui_buttons();
 			do_sprite_drawing();
+		}
+
 		if (e.type == ALLEGRO_EVENT_KEY_CHAR)
 			do_keyboard_input();
-
 		}
-		al_wait_for_event(eventQueue, &e);
+		al_flush_event_queue(eventQueue);
+		//al_wait_for_event(eventQueue, &e);
 		while (al_key_down(&pressed_keys, ALLEGRO_KEY_ESCAPE)){al_get_keyboard_state(&pressed_keys);};
 		al_flush_event_queue(eventQueue);
 	} while (al_show_native_message_box(display, "Goodbye", "Exiting..", "Are you sure ?", NULL, ALLEGRO_MESSAGEBOX_YES_NO)!=1);
