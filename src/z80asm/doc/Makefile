@@ -11,7 +11,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/Makefile,v 1.7 2015-02-17 23:37:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/Makefile,v 1.8 2015-02-20 23:37:09 pauloscustodio Exp $
 
 DOC = ../../../doc
 
@@ -31,9 +31,8 @@ DOC = ../../../doc
 # https://docs.google.com/document/d/1BDmDaQKLT_538uPrsFTlDM-ChLSlaGcqaEVs8Px9ac0/pub
 # Converted to txt by reformat_html.pl
 
-all:	$(DOC)/z80asm.txt $(DOC)/z80asm.html
+all:	$(DOC)/z80asm.txt
 
-$(DOC)/z80asm.txt $(DOC)/z80asm.html : z80asm.txt z80asm.html reformat_html.pl
-	perl reformat_html.pl z80asm.html
-	cp z80asm.txt  $(DOC)/z80asm.txt
-	cp z80asm.html $(DOC)/z80asm.html
+$(DOC)/z80asm.txt : $(DOC)/z80asm.html reformat_html.pl
+	perl reformat_html.pl $(DOC)/z80asm.html
+	touch $(DOC)/z80asm.txt

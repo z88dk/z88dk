@@ -17,7 +17,7 @@
 # format to CVS-friendly HTML (Google exports one single text line for 
 # the whole document) and to .txt format
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/reformat_html.pl,v 1.2 2015-02-19 22:05:12 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/reformat_html.pl,v 1.3 2015-02-20 23:37:09 pauloscustodio Exp $
 
 use Modern::Perl;
 use HTML::Tree;
@@ -33,11 +33,7 @@ my $html_file = shift;
 -f $html_file or die "File $html_file: not found\n";
 
 my $html_ori = read_file($html_file);
-my $tree = HTML::Tree->new_from_content($html_ori);
-
-my %left_margin = get_left_margin($tree);
-insert_indent($tree, %left_margin);
-add_chapter_numbers($tree);
+my $tree = MyParser->new_from_content($html_ori);
 
 # beautify HTML
 my $html = $tree->as_HTML(undef, "  ", {});
@@ -63,8 +59,29 @@ if ($text ne $text_ori) {
 	write_file($text_file, $text);
 }
 
+#------------------------------------------------------------------------------
+# my HTML parser
+package MyParser;
+
+use Modern::Perl;
+use base 'HTML::TreeBuilder';
+use Text::Wrap;
+
+sub new_from_content {
+	my($class, $text) = @_;
+	
+	my $tree = $class->SUPER::new_from_content($text);
+
+	my %left_margin = $tree->_get_left_margin;
+	$tree->_insert_indent(%left_margin);
+	$tree->_add_chapter_numbers;
+	$tree->_separate_tags_text;
+
+	return $tree;
+}
+
 # Get list of styles with corresponding margin sizes
-sub get_left_margin {
+sub _get_left_margin {
 	my($tree) = @_;
 	my %left_margin;
 	my %margins;
@@ -101,7 +118,7 @@ sub get_left_margin {
 
 # insert <OL> </OL> around every <p> with an indented style
 # second run on the same file keeps content
-sub insert_indent {
+sub _insert_indent {
 	my($tree, %left_margin) = @_;
 	
 	while (my($style, $tabs) = each %left_margin) {
@@ -137,7 +154,7 @@ sub insert_indent {
 }
 
 # add chapter numbers to '#*' titles, add TOC to the end
-sub add_chapter_numbers {
+sub _add_chapter_numbers {
 	my($tree) = @_;
 	my $ids = [];
 
@@ -161,7 +178,7 @@ sub add_chapter_numbers {
 		}
 		defined($level) && defined($title) or next;
 		
-		$title = chapter_title($level, $title, $ids);
+		$title = _chapter_title($level, $title, $ids);
 		$title_element->delete_content;
 		$title_element->push_content($title);
 		
@@ -173,7 +190,7 @@ sub add_chapter_numbers {
 	}
 }
 
-sub chapter_title {
+sub _chapter_title {
 	my($level, $title, $ids) = @_;
 	
 	$title =~ s/^\s*(\d+\.)*\s*//;
@@ -202,25 +219,120 @@ sub chapter_title {
 	return $title;
 }
 
+# add a "\n" after each tag and before each closing tag to separate tags
+# from text
+sub _separate_tags_text {
+	my($tree) = @_;
 
+	for my $elem ($tree->look_down(sub{1})) {
+		next if $elem->tag eq 'style';
+		
+		# split all long lines
+		for my $i (0 .. scalar($elem->content_list) - 1) {
+			if (! ref($elem->content->[$i])) {
+				$elem->content->[$i] = Text::Wrap::wrap("", "", $elem->content->[$i]);
+				$elem->content->[$i] =~ s/^(\S+) (.+) (\S+)$/$1\n$2\n$3/s;
+			}
+		}
+	}
+}
+
+#------------------------------------------------------------------------------
 # my HTML to TEXT formatter
 package MyFormatter;
 
 use Modern::Perl;
 use base 'HTML::FormatText';
-use HTML::FormatText::WithLinks::AndTables;
+use Text::Table;
 
-sub parse {
-    my($self, $html) = @_;
+sub textflow {
+	my($self, $text) = @_;
+	
+	if ($self->{'table_stack'} && @{$self->{'table_stack'}}) {
+		return; # ignore text within table
+	}
+	else {	
+		return $self->SUPER::textflow($text);
+	}
+}	
 
-    return undef unless defined $html;
-    return '' if $html eq '';
-
-    my $tree = HTML::TreeBuilder->new->parse( $html );
-    return $self->_format_tables( $tree ); # we work our magic...
+sub table_start {
+	my($self, $node) = @_;
+	
+	# save current table
+	push @{$self->{'table_stack'}}, [$self->{'table_header'}, $self->{'table_data'}];
+	$self->{'table_header'} = [];
+	$self->{'table_data'} = [];
 }
 
-sub _format_tables { 
-	HTML::FormatText::WithLinks::AndTables::_format_tables(@_); 
+sub table_end {
+	my($self, $node) = @_;
+
+	# format table
+	my @header = @{$self->{'table_header'}};
+	my @data = @{$self->{'table_data'}};
+	
+	return unless @header || @data;
+	
+	if (! @header) {		# use first row as header
+		@header = @{shift @data};
+	}
+	
+	# add separators
+	my @sep_header = (\"|");
+	while (@header) {
+		push @sep_header, shift(@header), \"|";
+	}
+	
+	my $tb = Text::Table->new(@sep_header);
+	$tb->load(@data);
+	$self->pre_out($tb->rule('-', '+'));
+	$self->pre_out($tb->title);
+	$self->pre_out($tb->rule('-', '+'));
+	
+	my $last_row = $tb->body_height - 1;
+	for my $row (0 .. $last_row) {
+		$self->pre_out($tb->body($row));
+		if ($row == $last_row) {
+			$self->pre_out($tb->rule('-', '+'));
+		}
+		else {
+			$self->pre_out($tb->body_rule);
+		}
+	}
+	
+	# restore previous from stack
+	my($header, $data) = @{ pop @{$self->{'table_stack'}} };
+	$self->{'table_header'} = $header;
+	$self->{'table_data'} = $data;
 }
 
+sub th_start {
+	my($self, $node) = @_;
+
+	push @{ $self->{'table_header'} }, $node->as_trimmed_text;
+}
+
+sub th_end {
+	1;
+}
+
+sub tr_start {
+	my($self, $node) = @_;
+
+	push @{ $self->{'table_data'} }, [];
+}
+
+sub tr_end {
+	1;
+}
+
+sub td_start {
+	my($self, $node) = @_;
+
+	push @{ $self->{'table_data'}[-1] }, $node->as_trimmed_text;
+}
+
+sub td_end {
+	1;
+}
