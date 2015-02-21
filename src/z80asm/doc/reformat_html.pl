@@ -17,7 +17,7 @@
 # format to CVS-friendly HTML (Google exports one single text line for 
 # the whole document) and to .txt format
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/reformat_html.pl,v 1.3 2015-02-20 23:37:09 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/reformat_html.pl,v 1.4 2015-02-21 14:22:26 pauloscustodio Exp $
 
 use Modern::Perl;
 use HTML::Tree;
@@ -35,7 +35,7 @@ my $html_file = shift;
 my $html_ori = read_file($html_file);
 my $tree = MyParser->new_from_content($html_ori);
 
-# beautify HTML
+# beautify HTML - only write if changed to avoid make to call again
 my $html = $tree->as_HTML(undef, "  ", {});
 
 if ($html ne $html_ori) {
@@ -44,7 +44,7 @@ if ($html ne $html_ori) {
 	write_file($html_file, $html);
 }
 
-# generate TXT
+# generate TXT - always create file, to keep make happy
 my $text_file = $html_file; 
 $text_file =~ s/\.html?$/.txt/ or die "$html_file not HTML\n";
 my $text_ori = read_file($text_file);
@@ -56,8 +56,8 @@ $text = encode("iso-8859-1", $text);
 if ($text ne $text_ori) {
 	say "Write $text_file";
 	copy($text_file, "$text_file.bak");
-	write_file($text_file, $text);
 }
+write_file($text_file, $text);
 
 #------------------------------------------------------------------------------
 # my HTML parser
