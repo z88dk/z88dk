@@ -2069,99 +2069,79 @@ I have created the design structure of the object file format to be suitable for
 future expansion. The primary aim of the design has been to maintain structure
 simplicity and load efficiency during link processing.
 
+The figure below has deliberately been split into sections to clarify the file
+structure, although there is no actual physical separation between the sections
+in the file; each section is immediately followed by the next. 16-bit and 32-bit
+values are stored in low byte - high byte order (Little endian format - Z80/Intel
+notation).
+
 The format of the object file is as follows:
 
-0   
 
-    [ 'Z80RMF01' <ORG Address> ]
-    [ <F.ptr to Module Name> ]
-    [ <F.ptr to Expression Declarations> ]
-    [ <F.ptr to Name Declarations> ]
-    [ <F.ptr to Library Name Declarations> ]
-    [ <F.ptr to Machine Code Block> ]
++----+--------------------------------+-------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|Addr|Object                          |Type         |Description                                                                                                                                                                                                                                                                                                                                                                                                 |
++----+--------------------------------+-------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|    |                                |             |File header                                                                                                                                                                                                                                                                                                                                                                                                 |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 0  |'Z80RMF01'                      |8 chars      |File type identifier                                                                                                                                                                                                                                                                                                                                                                                        |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 8  |ORG Address                     |16-bit       |Contains the ORG address for the linked machine code or 0xFFFF for no ORG address defined.                                                                                                                                                                                                                                                                                                                  |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|10  |Module Name pointer             |32-bit       |Points to the Module Name section in the file.                                                                                                                                                                                                                                                                                                                                                              |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|14  |Expression Declaration pointer  |32-bit       |Points to the Expression Declaration section in the file, 0xFFFFFFFF if no expressions exist.                                                                                                                                                                                                                                                                                                               |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|18  |Name Declaration pointer        |32-bit       |Points to the Name Declaration section in the file, 0xFFFFFFFF if no symbols exist.                                                                                                                                                                                                                                                                                                                         |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|22  |Library Name Declaration pointer|32-bit       |Points to the Library Name Declaration section in the file, 0xFFFFFFFF if no library symbols imported.                                                                                                                                                                                                                                                                                                      |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|26  |Machine Code Block pointer      |32-bit       |Points to the Machine Code Block section in the file, 0xFFFFFFFF if no code block exists.                                                                                                                                                                                                                                                                                                                   |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |                                |             |Expression Declaration sectionDefines expressions that need to be computed at link time.The start of the Expression Declaration section is pointed by the address at location 14 in the object file.The end of the section is marked by the first defined pointer of the following list: Name Declaration pointer, Library Name Declaration pointer and Module Name pointer. The last one is always defined.|
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |type                            |char         |Type defines the resulting evaluation type range:'U': 8-bit integer (0 to 255)'S': 8-bit signed integer (-128 to 127)'C': 16-bit integer (-32768 to 65535)'L': 32-bit signed integer                                                                                                                                                                                                                        |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |patchptr                        |16-bit       |Defines the code patch pointer to store result, relative to the start of the code section.                                                                                                                                                                                                                                                                                                                  |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |length                          |byte         |Defines byte length of expression string.                                                                                                                                                                                                                                                                                                                                                                   |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |expression string               |length, chars|Contains the infix expression parsed from the source file.                                                                                                                                                                                                                                                                                                                                                  |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |end marker                      |byte         |Zero byte end marker.                                                                                                                                                                                                                                                                                                                                                                                       |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |...                             |...          |...                                                                                                                                                                                                                                                                                                                                                                                                         |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |                                |             |Name Declaration sectionDefines all the symbols defined in this module.The start of the Name Declaration section is pointed by the address at location 18 in the object file.The end of the section is marked by the first defined pointer of the following list: Library Name Declaration pointer and Module Name pointer. The last one is always defined.                                                 |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |scope                           |char         |Scope defines the scope of the name:'L' is local,'G' is global,'X' is global library                                                                                                                                                                                                                                                                                                                        |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |type                            |char         |Type defines whether it is a:'A' relocatable address,'C' a constant                                                                                                                                                                                                                                                                                                                                         |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |value                           |32-bit       |Value of the symbol in 32 bit, relative to the start of the code block for type 'A'.                                                                                                                                                                                                                                                                                                                        |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |length                          |byte         |Defines length byte of the following string.                                                                                                                                                                                                                                                                                                                                                                |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |name                            |length, chars|Name of the symbol.                                                                                                                                                                                                                                                                                                                                                                                         |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |...                             |...          |...                                                                                                                                                                                                                                                                                                                                                                                                         |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |                                |             |Library Name Declaration sectionDefines all the library reference names.The start of the Library Name Declaration section is pointed by the address at location 22 in the object file.The end of the section is marked by the Module Name pointer.                                                                                                                                                          |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |name                            |length, chars|Name of the symbol.                                                                                                                                                                                                                                                                                                                                                                                         |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |...                             |...          |...                                                                                                                                                                                                                                                                                                                                                                                                         |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |                                |             |Module Name sectionDefines the module name.The start of the Module Name Section is pointed by the address at location 10 of the object file.                                                                                                                                                                                                                                                                |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |name                            |length, chars|Name of the module.                                                                                                                                                                                                                                                                                                                                                                                         |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |                                |             |Machine Code sectionContains the binary image of the compiled code.The start of the Machine Code Section is pointed by the address at location 26 of the object file.                                                                                                                                                                                                                                       |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |length                          |16-bit       |Total length of the following machine code block, 0x0000 for a 64 KByte block. A zero-length block is not stored in the file, i.e. the Machine Code pointer in the header is set to 0xFFFFFFFF.                                                                                                                                                                                                             |
+|    |                                |             |                                                                                                                                                                                                                                                                                                                                                                                                            |
+|    |block                           |length bytes |Machine code block.                                                                                                                                                                                                                                                                                                                                                                                         |
++----+--------------------------------+-------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-    [ <Expression Declaration> ]
-    [ ... ]
-
-    [ <Name Declaration> ]
-    [ ... ]
-
-    [ <Library Name Declaration> ]
-    [ ... ]
-
-    [ <Module Name> ]
-    [ <Machine Code> ]
-
-n
-
-The 0 (null) - <n> defines start to <n> total of bytes file length. The above
-figure has deliberately been split into sections to clarify the file structure,
-although there is no actual physical separation between the sections in the file;
-each section is immediately followed by the next.
-
-The file pointers are 32-bit integers stored in low byte - high byte order
-(Little endian format - Z80/Intel notation).
-
-  * <ORG Address>
-    Contains the ORG address for the linked machine code or FFFFh for no ORG
-    address defined.
-
-  * <Expression Declaration>
-    Contains the following:
-    <type><patchptr><length><expression_string>
-
-  * <type> defines the resulting evaluation type range:
-
-  * 'U': 8-bit integer (0 to 255)
-
-  * 'S': 8-bit signed integer (-128 to 127)
-
-  * 'C': 16-bit integer (-32768 to 65535)
-
-  * 'L': 32-bit signed integer
-
-  * <patchptr> defines the 16-bit relative module code patch pointer to store
-    result.
-
-  * <length> defines byte length of expression string.
-
-  * <expression_string> contains the infix expression parsed from the source
-    file.
-
-  * <Name Declaration>
-    Contains the following:
-    <Scope><Type><Value><Length><Name>
-
-  * <Scope> defines the scope of the name:
-
-  * 'L' is local,
-
-  * 'G' is global,
-
-  * 'X' global library
-
-  * <Type> defines whether it is a:
-
-  * 'A' relocatable address,
-
-  * 'C' a constant'
-
-  * <Length> defines length byte of the following <Name> string.
-
-  * <Library Name Declaration>
-    Contains the following which defines library reference names:
-    <Length><Name>
-
-  * <Length> defines length byte of the following string.
-
-  * <Name> string
-
-  * <Module Name>
-    Contains a preceding byte identifying the length of the following string
-
-  * <Machine Code>
-    Contains a preceding 16-bit integer identifying the total length of the
-    following machine code block.
 
 
 9.2. Library file format documentation
@@ -2169,26 +2149,22 @@ The file pointers are 32-bit integers stored in low byte - high byte order
 
 The library file format is a sequence of object files with additional structures.
 
-0   
++----+------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
+|Addr|Object            |Type        |Description                                                                                                                                             |
++----+------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
+|    |                  |            |File header                                                                                                                                             |
+|    |                  |            |                                                                                                                                                        |
+|0   |'Z80LMF01'        |8 chars     |File type identifier                                                                                                                                    |
+|    |                  |            |                                                                                                                                                        |
+|    |                  |            |Object Modules section                                                                                                                                  |
+|    |                  |            |                                                                                                                                                        |
+|    |next object file  |32-bit      |File pointer to the next object file, 0xFFFFFFFF if the current Object File Block is the last in the library file.                                      |
+|    |                  |            |                                                                                                                                                        |
+|    |object file length|32-bit      |Length of the Object File.If this integer is 0 then it is indicated that the current <Object File Block> has been marked "deleted" and will not be used.|
+|    |                  |            |                                                                                                                                                        |
+|    |object file       |length bytes|'Z80RMF01' Object File                                                                                                                                  |
++----+------------------+------------+--------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-    [ 'Z80LMF01' ]
-    [ <Object File Block> ]
-    [ ... ]
-
-n 
-
-  * <Object File Block>
-    Contains the following:
-    <Next Object File><Object File Length><'Z80RMF01' Object File>
-
-  * <Next Object File> is a 32-bit integer file pointer to the next <Object File
-    Block>
-    If this file pointer is -1 (FFFFFFFFh) then the current <Object File Block>
-    is the last in the library file.
-
-  * <Object File Length> is 32-bit length integer of <'Z80RMF01' Object File>
-    If this integer is 0 then it is indicated that the current <Object File
-    Block> has been marked "deleted" and will not be used.
 
 Index
 
