@@ -34,11 +34,9 @@ to implement a different interface to the assembler. You have the opportunity!
 1.1. Help page
 --------------
 
-When executing the assembler from the command line without parameters, i.e.
-pressing <ENTER> after the assembler program name, a help page is automatically
-displayed whereafter control is returned to the operating system command line.
-The page shortly explains the syntax of parameter specification and which
-parameters are available.
+When executing the assembler from the command line with the -h option, a help
+page is displayed. The page shortly explains the syntax of parameter
+specification and which parameters are available.
 
 
 1.2. Command line
@@ -2007,11 +2005,9 @@ the source file and a line number where the error occurred in the file.
     You have used the MODULE directive more than once in your source file, or
     used both a MODULE and XLIB directive (library modules only need an XLIB).
 
-  * "Symbol already declared local" You have tried to declare a symbol as XREF,
-    but it was already defined local, eg. using a ".lbaddr" in your source.
-
-  * "Symbol already declared global"
-    You have two identical XDEF symbol declarations in your source file module.
+  * "Symbol already declared local"
+    You have tried to declare a symbol as XREF, but it was already defined local,
+    eg. using a ".lbaddr" in your source.
 
   * "Illegal source filename"
     You have tried to specify an option after having begun to specify filenames.
@@ -2046,8 +2042,8 @@ the source file and a line number where the error occurred in the file.
     The Z80 library file could also be corrupted (at least in the header).
 
   * "Environment variable not defined"
-    The assembler reports that either the "Z80_OZFILES" or "Z80_STDLIB"
-    environment variables wasn't found in the operating system.
+    The assembler reports either the "Z80_STDLIB" environment variable wasn't
+    found when used by options -x and -i.
 
   * "Cannot include file recursively"
     A file was tried to be included which was already included at a previous
