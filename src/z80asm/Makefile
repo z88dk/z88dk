@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.195 2015-02-22 02:44:33 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.196 2015-02-22 13:46:35 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -90,6 +90,7 @@ $(TARGET): $(OBJS)
 # developer generated source files, and test libs
 #------------------------------------------------------------------------------
 developer :
+	$(MAKE) depend
 	$(MAKE) -C doc
 	$(MAKE) -C lib
 	$(MAKE) -f dev/Makefile
@@ -113,6 +114,7 @@ clean::
 	$(RM) *.exe  $(LOCAL_LIB)/*.exe  $(LOCAL_LIB)/t/*.exe  $(LOCAL_LIB)/t/uthash/*.exe
 	$(RM) *.tmp  $(LOCAL_LIB)/*.tmp  $(LOCAL_LIB)/t/*.tmp  $(LOCAL_LIB)/t/uthash/*.tmp
 	$(RM) *.bak  $(LOCAL_LIB)/*.bak  $(LOCAL_LIB)/t/*.bak  $(LOCAL_LIB)/t/uthash/*.bak
+	$(RM) *.log  $(LOCAL_LIB)/*.log  $(LOCAL_LIB)/t/*.log  $(LOCAL_LIB)/t/uthash/*.log
 	$(RM) *~     $(LOCAL_LIB)/*~     $(LOCAL_LIB)/t/*~     $(LOCAL_LIB)/t/uthash/*~
 	$(RM) -rf Debug Release x1 x2 x3
 
@@ -366,8 +368,8 @@ lib/srcfile.o: lib/queue.h lib/list.h lib/strutil.h lib/utarray.h
 lib/srcfile.o: lib/fileutil.h lib/strpool.h
 lib/strhash.o: lib/alloc.h lib/dbg.h lib/types.h lib/strhash.h lib/class.h
 lib/strhash.o: lib/queue.h lib/uthash.h lib/strpool.h lib/strutil.h
-lib/strpool.o: lib/alloc.h lib/dbg.h lib/types.h lib/init.h lib/queue.h
-lib/strpool.o: lib/strpool.h lib/uthash.h
+lib/strpool.o: lib/alloc.h lib/dbg.h lib/types.h lib/init.h lib/strpool.h
+lib/strpool.o: lib/uthash.h
 lib/strutil.o: lib/alloc.h lib/dbg.h lib/types.h lib/strpool.h lib/strutil.h
 lib/strutil.o: lib/class.h lib/queue.h
 t/test_codearea.o: codearea.h lib/array.h lib/class.h lib/alloc.h lib/dbg.h

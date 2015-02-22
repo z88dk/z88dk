@@ -1,55 +1,44 @@
 /*
 Keep pool of strings for all duration of the program.
-Most keywords in input program are the same, no need to keep several copies
-and manage strdup/free for each token.
-Strings with the same contents are reused.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.15 2015-02-13 00:05:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.16 2015-02-22 13:46:35 pauloscustodio Exp $
 */
 
 #include "alloc.h"
 #include "init.h"
-#include "queue.h"
 #include "strpool.h"
 #include "types.h"
 #include "uthash.h"
-
 #include <stdio.h>
 
 /*-----------------------------------------------------------------------------
 *   String pool
 *----------------------------------------------------------------------------*/
-typedef struct Element
+typedef struct PoolStr
 {
-    char *str;							/* m_strdup */
-
     UT_hash_handle hh;      			/* hash table */
-} Element;
+    char str[1];						/* string extends from str */
+} PoolStr;
 
-static Element *the_pool = NULL;		/* singleton */
+static PoolStr *the_pool = NULL;		/* singleton */
 
 /*-----------------------------------------------------------------------------
 *   Init and Fini functions
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-    m_alloc_init();			/* force m_malloc to be terminated last */
-    the_pool = NULL;
+	m_alloc_init();						/* force alloc to be terminated last */
 }
 
 DEFINE_dtor_module()
 {
-    Element *elem, *tmp;
+    PoolStr *elem, *tmp;
 
     HASH_ITER( hh, the_pool, elem, tmp )
     {
-#ifdef STRPOOL_DEBUG
-        warn( "strpool: free %s\n", elem->str );
-#endif
         HASH_DEL( the_pool, elem );
-        m_free( elem->str );
         m_free( elem );
     }
 }
@@ -63,12 +52,31 @@ void strpool_init( void )
 }
 
 /*-----------------------------------------------------------------------------
+*   Check if string exists in pool
+*----------------------------------------------------------------------------*/
+char *strpool_exists(char *str)
+{
+	PoolStr *elem;
+
+	init_module();
+
+	/* special case : NULL string */
+	if (str == NULL)
+		return NULL;
+
+	/* check if string exists already */
+	HASH_FIND_STR(the_pool, str, elem);
+
+	return elem ? elem->str : NULL;			/* NULL if not found */
+}
+
+/*-----------------------------------------------------------------------------
 *   Add string to pool
 *----------------------------------------------------------------------------*/
 char *strpool_add( char *str )
 {
-    Element *elem;
-    size_t num_chars;
+    PoolStr *elem;
+	char *pool_str;
 
     init_module();
 
@@ -77,21 +85,15 @@ char *strpool_add( char *str )
         return NULL;
 
     /* check if string exists already */
-    num_chars = strlen( str );
-    HASH_FIND( hh, the_pool, str, num_chars, elem );
-
-    if ( elem )
-        return elem->str;    /* found */
+	pool_str = strpool_exists(str);
+    if ( pool_str )
+        return pool_str;		/* found */
 
     /* add to elem */
-    elem = m_new( Element );
-    elem->str = m_strdup( ( char * ) str ); /* alloc string */
+	elem = m_calloc(1, offsetof(PoolStr, str) + strlen(str) + 1);
+	strcpy(elem->str, str);
 
-    HASH_ADD_KEYPTR( hh, the_pool, elem->str, num_chars, elem );
-
-#ifdef STRPOOL_DEBUG
-    warn( "strpool: add %s\n", elem->str );
-#endif
+    HASH_ADD_STR(the_pool, str, elem );
 
     return elem->str;
 }
