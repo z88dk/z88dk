@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.89 2015-02-18 19:45:32 aralbrec Exp $
+ *      $Id: zcc.c,v 1.90 2015-02-22 06:15:58 aralbrec Exp $
  */
 
 
@@ -111,6 +111,7 @@ static int             verbose = 0;
 static int             peepholeopt = 0;
 static int             symbolson = 0;
 static int             mapon = 0;
+static int             globaldefon = 0;
 static int             preprocessonly = 0;
 static int             relocate = 0;
 static int             crtcopied = 0;    /* Copied the crt0 code over? */
@@ -338,6 +339,7 @@ static arg_t     myargs[] = {
     {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
     {"S", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
     {"m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable"},
+	{"g", AF_BOOL_TRUE, SetBoolean, &globaldefon, NULL, "Generate a global defs file of the final executable"},
     {"s", AF_BOOL_TRUE, SetBoolean, &symbolson, NULL, "Generate a symbol map of the final executable"},
     {"o", AF_MORE, SetString, &outputfile, NULL, "Set the output files"},
     {"nt", 0, AddAppmake, NULL, NULL, "Set notruncate on the appmake options"},
@@ -469,7 +471,7 @@ int linkthem(char *linker)
     }
 
     linkargs_mangle(linkargs);
-    len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s", 
+    len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s", 
             linker, 
             c_linkopts, 
             linker_output_separate_arg ? " " : "", 
@@ -478,6 +480,7 @@ int linkthem(char *linker)
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
             (relocate && z80verbose && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
             linkargs,
+			globaldefon ? "-g " : "",
             c_crt0,
             ext);
             
@@ -748,18 +751,32 @@ int main(int argc, char **argv)
             exit(1);
         }
     }
-    
-    if (mapon && usetemp) {
-        char           *oldptr;
+
+    if (usetemp) {
+
+        char *oldptr;
 
         strcpy(filenamebuf, outputfile);
         if ((oldptr = strrchr(filenamebuf, '.')))
             *oldptr = 0;
-        if (copy_file(c_crt0, ".map", filenamebuf, ".map")) {
+
+        if (mapon && copy_file(c_crt0, ".map", filenamebuf, ".map")) {
             fprintf(stderr, "Cannot copy map file\n");
             exit(1);
         }
+
+        if (symbolson && copy_file(c_crt0, ".sym", filenamebuf, ".sym")) {
+            fprintf(stderr, "Cannot copy map file\n");
+            exit(1);
+        }
+
+        if (globaldefon && copy_file(c_crt0, ".def", filenamebuf, ".def")) {
+            fprintf(stderr, "Cannot copy map file\n");
+            exit(1);
+        }
+
     }
+
     exit(0);
 }
 
@@ -1371,22 +1388,26 @@ void remove_temporary_files(void)
     if (cleanup && usetemp) {    /* Default is yes */
         for (j = 0; j < nfiles; j++) {
             remove_file_with_extension(filelist[j], ".i");
-            remove_file_with_extension(filelist[j], ".2");
+            remove_file_with_extension(filelist[j], ".i2");
             remove_file_with_extension(filelist[j], ".asm");
+            remove_file_with_extension(filelist[j], ".asm2");
             remove_file_with_extension(filelist[j], ".err");
             remove_file_with_extension(filelist[j], ".op1");
             remove_file_with_extension(filelist[j], ".op2");
             remove_file_with_extension(filelist[j], ".opt");
             if (c_extension) remove_file_with_extension(filelist[j], c_extension );
             remove_file_with_extension(filelist[j], ".sym");
+            remove_file_with_extension(filelist[j], ".def");
         }
         if (crtcopied != 0) {
             remove_file_with_extension(c_crt0, ".asm");
+            remove_file_with_extension(c_crt0, ".asm2");
             remove_file_with_extension(c_crt0, ".opt");
             remove_file_with_extension(c_crt0, ".err");
             if (c_extension) remove_file_with_extension(c_crt0, c_extension);
             remove_file_with_extension(c_crt0, ".map");
             remove_file_with_extension(c_crt0, ".sym");
+            remove_file_with_extension(c_crt0, ".def");
         }
     } else if (usetemp == NO) {
         /* Remove crt0.o file for -notemp compiles */
