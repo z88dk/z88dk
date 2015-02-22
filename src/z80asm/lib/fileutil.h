@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.23 2015-02-13 00:05:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.24 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #pragma once
@@ -70,20 +70,20 @@ extern void xfput_count_word_Str(  FILE *file, Str  *str );
 extern void xfget_count_word_Str(  FILE *file, Str  *str );
 
 /* read/write numbers */
-extern void    xfput_int8(  FILE *file, int8_t  value );
+extern void    xfput_int8(  FILE *file, int  value );
 extern void    xfput_uint8( FILE *file, Byte value );
-extern int8_t  xfget_int8(  FILE *file );
+extern int  xfget_int8(  FILE *file );
 extern Byte xfget_uint8( FILE *file );
 
-extern void     xfput_int16(  FILE *file, int16_t  value );
-extern void     xfput_uint16( FILE *file, uint16_t value );
-extern int16_t  xfget_int16(  FILE *file );
-extern uint16_t xfget_uint16( FILE *file );
+extern void     xfput_int16(  FILE *file, int  value );
+extern void     xfput_uint16( FILE *file, int value );
+extern int  xfget_int16(  FILE *file );
+extern int xfget_uint16( FILE *file );
 
-extern void     xfput_int32(  FILE *file, int32_t  value );
-extern void     xfput_uint32( FILE *file, uint32_t value );
-extern int32_t  xfget_int32(  FILE *file );
-extern uint32_t xfget_uint32( FILE *file );
+extern void     xfput_int32(  FILE *file, int  value );
+extern void     xfput_uint32(FILE *file, unsigned int value);
+extern int  xfget_int32(  FILE *file );
+extern unsigned int xfget_uint32( FILE *file );
 
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation

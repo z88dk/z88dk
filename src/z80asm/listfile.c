@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.28 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.29 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #include "listfile.h"
@@ -247,7 +247,7 @@ void list_close( Bool keep_file )
 /*-----------------------------------------------------------------------------
 *	start output of list line
 *----------------------------------------------------------------------------*/
-void ListFile_start_line( ListFile *self, UInt address,
+void ListFile_start_line( ListFile *self, int address,
                           char *source_file, int source_line_nr, char *line )
 {
     if ( self->file != NULL && ! self->source_list_ended )
@@ -274,7 +274,7 @@ void ListFile_start_line( ListFile *self, UInt address,
     }
 }
 
-void list_start_line( UInt address,
+void list_start_line( int address,
                       char *source_file, int source_line_nr, char *line )
 {
     if ( the_list != NULL )
@@ -287,7 +287,7 @@ void list_start_line( UInt address,
 /*-----------------------------------------------------------------------------
 *	append one byte / word / long to list line
 *----------------------------------------------------------------------------*/
-void ListFile_append( ListFile *self, long value, UInt num_bytes )
+void ListFile_append( ListFile *self, long value, int num_bytes )
 {
     Byte byte1;
 
@@ -317,7 +317,7 @@ void ListFile_append_long( ListFile *self, long dword )
     ListFile_append( self, dword, 4 );
 }
 
-void list_append( long value, UInt num_bytes )
+void list_append( long value, int num_bytes )
 {
     if ( the_list != NULL )
     {
@@ -462,7 +462,7 @@ void list_end( void )
 /*-----------------------------------------------------------------------------
 *	patch list file
 *----------------------------------------------------------------------------*/
-void ListFile_patch_data( ListFile *self, long patch_pos, long value, UInt num_bytes )
+void ListFile_patch_data( ListFile *self, long patch_pos, long value, int num_bytes )
 {
     if ( self->file != NULL && patch_pos >= 0 )
     {
@@ -478,7 +478,7 @@ void ListFile_patch_data( ListFile *self, long patch_pos, long value, UInt num_b
     }
 }
 
-void list_patch_data( long patch_pos, long value, UInt num_bytes )
+void list_patch_data( long patch_pos, long value, int num_bytes )
 {
     if ( the_list != NULL )
     {

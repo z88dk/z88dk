@@ -49,10 +49,10 @@ Error caught
 ---------- Test: test_stack ----------
 
 ---------- Test: test_stack_overflow ----------
-[ERROR] (lib/dbg.c:51) stack overflow
+[ERROR] (dbg.c:51) stack overflow
 
 ---------- Test: test_stack_underflow ----------
-[ERROR] (lib/dbg.c:53) stack underflow
+[ERROR] (dbg.c:53) stack underflow
 
 ---------- Test: test_xatexit ----------
 start at t/test_dbg.c:223

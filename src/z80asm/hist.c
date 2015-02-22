@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.145 2015-02-13 00:30:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.146 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.145 2015-02-13 00:3
 
 /*
 * $Log: hist.c,v $
-* Revision 1.145  2015-02-13 00:30:31  pauloscustodio
+* Revision 1.146  2015-02-22 02:44:33  pauloscustodio
+* Assume an at least 32-bit machine and use always int for integer types
+*
+* Revision 1.145  2015/02/13 00:30:31  pauloscustodio
 * Added GLOBAL declaration: define a symbol EXTERN if not defined locally,
 * or PUBLIC if defined locally.
 *
@@ -205,7 +208,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.145 2015-02-13 00:3
 * Extended codearea.c to support different sections of code.
 *
 * Revision 1.108  2014/06/09 13:15:26  pauloscustodio
-* Int and UInt types
 *
 * Revision 1.107  2014/06/03 22:53:14  pauloscustodio
 * Do not sort symbols before writing to object file. Not needed and
@@ -231,7 +233,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.145 2015-02-13 00:3
 * Link expressions to the section they refer to.
 *
 * Revision 1.102  2014/05/25 01:02:29  pauloscustodio
-* Byte, Int, UInt added
 *
 * Revision 1.101  2014/05/20 22:26:29  pauloscustodio
 * BUG_0051: DEFC and DEFVARS constants do not appear in map file
@@ -254,7 +255,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.145 2015-02-13 00:3
 * Made types all-caps to avoid conflicts with /usr/include/i386-linux-gnu/sys/types.h
 *
 * Revision 1.96  2014/05/02 21:34:58  pauloscustodio
-* byte_t and uint_t renamed to Byte, UInt
 *
 * Revision 1.95  2014/04/26 09:25:32  pauloscustodio
 * BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
@@ -404,7 +404,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.145 2015-02-13 00:3
 * breaks on a 64-bit architecture. Make the functions return the value instead
 * of being passed the pointer to the return value, so that the compiler
 * takes care of size convertions.
-* Create UInt, use UInt instead of size_t.
 *
 * Revision 1.71  2014/02/18 22:59:06  pauloscustodio
 * BUG_0040: Detect and report division by zero instead of crashing
@@ -1637,7 +1636,7 @@ Based on 1.0.31
 		Change page metrics variables into constants.
 
     Internal cleanup:
-	- Unified usage of integer types: int, char, Byte, UInt
+	- Unified usage of integer types: int, char, Byte
 	- New CLASS_LIST() to create lists of objects defined by CLASS()
 	- New CLASS_HASH() to create hash tables of objects defined by CLASS()
 
@@ -1954,7 +1953,6 @@ Based on 1.0.31
 		breaks on a 64-bit architecture. Make the functions return the value instead 
 		of being passed the pointer to the return value, so that the compiler
 		takes care of size convertions.
-		Create UInt, use UInt instead of size_t.
 		
 -------------------------------------------------------------------------------
 01.03.2014 [2.1.4] (pauloscustodio)
@@ -2258,6 +2256,8 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 	- Added GLOBAL declaration: define a symbol EXTERN if not defined locally,
 	  or PUBLIC if defined locally.
 
+	- Assume an at least 32-bit machine and use always int for integer types.
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
@@ -2292,7 +2292,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1h"
+#define VERSION     "2.7.1i"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

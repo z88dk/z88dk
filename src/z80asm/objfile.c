@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.47 2015-02-13 00:30:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.48 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #include "class.h"
@@ -199,7 +199,7 @@ static long write_modname( FILE *fp )
 static long write_code( FILE *fp )
 {
 	long code_ptr;
-	UInt code_size;
+	int code_size;
 	
 	code_ptr  = ftell( fp );
 	code_size = fwrite_module_code( fp );
@@ -439,7 +439,7 @@ ByteArray *read_obj_file_data( char *filename )
 Bool objmodule_loaded( char *src_filename )
 {
 	static Str *section_name;
-	Int code_size, origin;
+	int code_size, origin;
 	OFile *ofile;
 	Section *section;
 

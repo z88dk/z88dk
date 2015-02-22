@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.23 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.24 2015-02-22 02:44:33 pauloscustodio Exp $
 
 */
 
@@ -47,7 +47,7 @@ CLASS( ListFile )
 	/* current line being output */
 	Bool		 line_started;			/* true if a line was started but not ended */
 	long		 start_line_pos;		/* ftell() position at start of next list line */
-	UInt	 address;				/* address of start of line */
+	int	 address;				/* address of start of line */
 	Str			*bytes;					/* list of bytes output for this line */
 
 	char		*source_file;			/* source file, kept in strpool */
@@ -71,9 +71,9 @@ extern void ListFile_close( ListFile *self, Bool keep_file );
    2.1. append bytes, words, longs
    2.2. collect patch position in list file for expressions
    3. output the full line */
-extern void ListFile_start_line( ListFile *self, UInt address,
+extern void ListFile_start_line( ListFile *self, int address,
                                  char *source_file, int source_line_nr, char *line );
-extern void ListFile_append( ListFile *self, long value, UInt num_bytes );
+extern void ListFile_append( ListFile *self, long value, int num_bytes );
 extern void ListFile_append_byte( ListFile *self, Byte byte1 );
 extern void ListFile_append_word( ListFile *self, int word );
 extern void ListFile_append_long( ListFile *self, long dword );
@@ -84,7 +84,7 @@ extern void ListFile_end_line( ListFile *self );
 extern void ListFile_end( ListFile *self );
 
 /* patch the bytes at the given patch_pos returned by ListFile_patch_pos() */
-extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, UInt num_bytes );
+extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, int num_bytes );
 
 /* write the symbol table in two steps:
    1. start a new table, provide title
@@ -103,16 +103,16 @@ extern int ListFile_get_page_nr( ListFile *self );
 *----------------------------------------------------------------------------*/
 extern void list_open( char *list_file );
 extern void list_close( Bool keep_file );
-extern void list_start_line( UInt address,
+extern void list_start_line( int address,
                              char *source_file, int source_line_nr, char *line );
-extern void list_append( long value, UInt num_bytes );
+extern void list_append( long value, int num_bytes );
 extern void list_append_byte( Byte byte1 );
 extern void list_append_word( int word );
 extern void list_append_long( long dword );
 extern long list_patch_pos( int byte_offset );
 extern void list_end_line( void );
 extern void list_end( void );
-extern void list_patch_data( long patch_pos, long value, UInt num_bytes );
+extern void list_patch_data( long patch_pos, long value, int num_bytes );
 extern void list_start_table( char *title );
 extern void list_symbol( char *symbol_name, long symbol_value,
                          SymbolRefList *references );

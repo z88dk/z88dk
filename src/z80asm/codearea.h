@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.40 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.41 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #pragma once
@@ -45,7 +45,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.h,v 1.40 2015-02-13 0
 *----------------------------------------------------------------------------*/
 CLASS( Section )
 	char		*name;				/* name of section, kept in strpool */
-	UInt		 addr;				/* start address of this section,
+	int		 addr;				/* start address of this section,
 									*  computed by sections_alloc_addr() */
     int			 origin;			/* ORG address of section, -1 if not defined */
 	Bool		 origin_found : 1;	/* ORG already found in code */
@@ -55,14 +55,14 @@ CLASS( Section )
 									*  should be output to a new binary file */
 	Bool		 max_codesize_issued : 1;
 									/* error_max_codesize issued, ignore next calls */
-	UInt		 asmpc;				/* address of current opcode relative to start
+	int		 asmpc;				/* address of current opcode relative to start
 									*  of the current module, reset to 0 at start
 									*  of each module */
-	UInt		 opcode_size;		/* number of bytes added after last 
+	int		 opcode_size;		/* number of bytes added after last 
 									*  set_PC() or next_PC() */
 	ByteArray	*bytes;				/* binary code of section, used to compute 
 									*  current size */
-	UIntArray	*module_start;		/* at module_addr[ID] is the start offset from
+	intArray	*module_start;		/* at module_addr[ID] is the start offset from
 									*  addr of module ID */
 END_CLASS;
 
@@ -76,10 +76,10 @@ CLASS_HASH( Section );
 extern void reset_codearea( void );
 
 /* return size of current section */
-extern UInt get_section_size( Section *section );
+extern int get_section_size( Section *section );
 
 /* compute total size of all sections */
-extern UInt get_sections_size( void );
+extern int get_sections_size( void );
 
 /* get section by name, creates a new section if new name; make it the current section */
 extern Section *new_section( char *name );
@@ -115,8 +115,8 @@ extern int  get_cur_module_id( void );
 extern void set_cur_module_id( int module_id );
 
 /* return start and end offset for the current section and module id */
-extern UInt get_cur_module_start( void );
-extern UInt get_cur_module_size( void );
+extern int get_cur_module_start( void );
+extern int get_cur_module_size( void );
 
 /*-----------------------------------------------------------------------------
 *   Handle ASMPC
@@ -124,34 +124,34 @@ extern UInt get_cur_module_size( void );
 *	every byte added increments an offset but keeps ASMPC with start of opcode
 *	next_PC() moves to the next opcode
 *----------------------------------------------------------------------------*/
-extern void set_PC( UInt n );
-extern UInt next_PC( void );
-extern UInt get_PC( void );
+extern void set_PC( int n );
+extern int next_PC( void );
+extern int get_PC( void );
 
 /*-----------------------------------------------------------------------------
 *   patch a value at a position, or append to the end of the code area
 *	the patch address is relative to current module and current section
 *----------------------------------------------------------------------------*/
-extern void  patch_value( UInt addr, UInt value, UInt num_bytes );
-extern void append_value(            UInt value, UInt num_bytes );
+extern void  patch_value( int addr, int value, int num_bytes );
+extern void append_value(            int value, int num_bytes );
 
-extern void  patch_byte( UInt addr, Byte byte1 );		/* one byte */
+extern void  patch_byte( int addr, Byte byte1 );		/* one byte */
 extern void append_byte( Byte byte1 );
 extern void append_2bytes( Byte byte1, Byte byte2 );
 
-extern void  patch_word( UInt addr, int word );			/* 2-byte word */
+extern void  patch_word( int addr, int word );			/* 2-byte word */
 extern void append_word( int word );
 
-extern void  patch_long( UInt addr, long dword );		/* 4-byte long */
+extern void  patch_long( int addr, long dword );		/* 4-byte long */
 extern void append_long( long dword );
 
-extern void append_defs(UInt num_bytes, Byte fill);
+extern void append_defs(int num_bytes, Byte fill);
 
 /* advance code pointer reserving space, return address of start of buffer */
-extern Byte *append_reserve( UInt num_bytes );	
+extern Byte *append_reserve( int num_bytes );	
 
 /* patch/append binary contents of file, whole file if num_bytes < 0 */
-extern void  patch_file_contents( FILE *file, UInt addr, long num_bytes );	
+extern void  patch_file_contents( FILE *file, int addr, long num_bytes );	
 extern void append_file_contents( FILE *file,            long num_bytes );	
 
 /*-----------------------------------------------------------------------------
@@ -159,7 +159,7 @@ extern void append_file_contents( FILE *file,            long num_bytes );
 *----------------------------------------------------------------------------*/
 
 /* write object code of the current module, return total size written */
-extern UInt fwrite_module_code( FILE *file );	
+extern int fwrite_module_code( FILE *file );	
 
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file

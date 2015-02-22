@@ -4,7 +4,7 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.16 2015-02-13 00:05:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.17 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #pragma once
@@ -50,7 +50,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.16 2015-02-13 
 
 /* default types */
 ARRAY( Byte );
-ARRAY( UInt );
 ARRAY( int );
 ARRAY( long );
 

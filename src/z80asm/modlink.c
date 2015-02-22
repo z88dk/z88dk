@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.146 2015-02-13 00:30:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.147 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #include "alloc.h"
@@ -59,7 +59,7 @@ extern char *reloctable, *relocptr;
 
 struct linklist *linkhdr;
 struct libfile *CURRENTLIB;
-UInt totaladdr, curroffset;
+int totaladdr, curroffset;
 
 void
 ReadNames( char *filename, FILE *file )
@@ -107,10 +107,10 @@ ReadNames( char *filename, FILE *file )
 /* set environment to compute expression */
 static void set_asmpc_env( Module *module, char *section_name,
 						   char *filename, int line_nr,
-						   UInt asmpc, 
+						   int asmpc, 
 						   Bool module_relative_addr )
 {
-	UInt base_addr, offset;
+	int base_addr, offset;
 
 	/* point to current module */
 	set_cur_module( module );
@@ -153,7 +153,7 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
 	int line_nr;
 	int type;
     Expr *expr;
-    UInt asmpc, code_pos;
+    int asmpc, code_pos;
 
 	INIT_OBJ( Str, &expr_text );
 	INIT_OBJ( Str, &last_filename );
@@ -398,8 +398,8 @@ static void patch_exprs( ExprList *exprs )
                     if ( expr->type == TYPE_ADDRESS )
                     {
                         /* Expression contains relocatable address */
-						UInt offset   = get_cur_module_start(); 
-						UInt distance = expr->code_pos + offset - curroffset;
+						int offset   = get_cur_module_start(); 
+						int distance = expr->code_pos + offset - curroffset;
 
                         if ( distance >= 0 && distance <= 255 )
                         {
@@ -447,8 +447,8 @@ static void relocate_symbols_symtab( SymbolHash *symtab )
 {
     SymbolHashElem *iter;
     Symbol         *sym;
-	UInt			base_addr;
-	UInt			offset;
+	int			base_addr;
+	int			offset;
 
     for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
     {
@@ -491,7 +491,7 @@ static void define_location_symbols( void )
 	Section *section;
 	SectionHashElem *iter;
 	DEFINE_STR( name, MAXLINE );
-	UInt start_addr, end_addr;
+	int start_addr, end_addr;
 
 	/* global code size */
 	start_addr = get_first_section(NULL)->addr;
@@ -669,8 +669,8 @@ LinkModule( char *filename, long fptr_base )
 {
 	static Str *section_name;
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
-    Int code_size;
-    Int origin = -1;
+    int code_size;
+    int origin = -1;
     int flag = 0;
 	FILE *file;
 	Section *section;
@@ -958,10 +958,10 @@ CreateBinFile( void )
 			/* relocate routine */
 			xfput_chars(binaryfile, (char *)reloc_routine, sizeof_relocroutine);
 
-			*(reloctable + 0) = (UInt)totaladdr % 256U;
-			*(reloctable + 1) = (UInt)totaladdr / 256U;  /* total of relocation elements */
-			*(reloctable + 2) = (UInt)sizeof_reloctable % 256U;
-			*(reloctable + 3) = (UInt)sizeof_reloctable / 256U; /* total size of relocation table elements */
+			*(reloctable + 0) = (Byte)totaladdr % 256U;
+			*(reloctable + 1) = (Byte)totaladdr / 256U;  /* total of relocation elements */
+			*(reloctable + 2) = (Byte)sizeof_reloctable % 256U;
+			*(reloctable + 3) = (Byte)sizeof_reloctable / 256U; /* total size of relocation table elements */
 
 			/* write relocation table, inclusive 4 byte header */
 			xfput_chars(binaryfile, reloctable, sizeof_reloctable + 4);

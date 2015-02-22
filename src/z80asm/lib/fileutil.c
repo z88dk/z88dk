@@ -3,7 +3,7 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.27 2015-02-13 00:05:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.28 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #include "alloc.h"
@@ -434,7 +434,7 @@ void xfget_count_word_Str( FILE *file, Str *str )
 /*-----------------------------------------------------------------------------
 *   read/write numbers - 8 bit
 *----------------------------------------------------------------------------*/
-void xfput_int8( FILE *file, int8_t value )
+void xfput_int8( FILE *file, int value )
 {
 	xfput_uint8( file, (Byte) value );
 }
@@ -445,12 +445,12 @@ void xfput_uint8( FILE *file, Byte value )
         fatal_ferr_write( file );
 }
 
-int8_t xfget_int8(  FILE *file )
+int xfget_int8(  FILE *file )
 {
-	Byte value = xfget_uint8( file );
+	int value = (int)xfget_uint8( file );
     if ( value & 0x80 )
         value |= ~ 0xFF;				/* sign-extend above bit 7 */
-	return (int8_t) value;
+	return value;
 }
 
 Byte xfget_uint8( FILE *file )
@@ -464,12 +464,12 @@ Byte xfget_uint8( FILE *file )
 /*-----------------------------------------------------------------------------
 *   read/write numbers - 16 bit
 *----------------------------------------------------------------------------*/
-void xfput_int16( FILE *file, int16_t value )
+void xfput_int16( FILE *file, int value )
 {
-	xfput_uint16( file, (uint16_t) value );
+	xfput_uint16( file, (int) value );
 }
 
-void xfput_uint16( FILE *file, uint16_t value )
+void xfput_uint16( FILE *file, int value )
 {
     Byte buffer[2];
 
@@ -478,15 +478,15 @@ void xfput_uint16( FILE *file, uint16_t value )
     xfput_chars( file, (char *) buffer, sizeof(buffer) );
 }
 
-int16_t xfget_int16( FILE *file )
+int xfget_int16( FILE *file )
 {
-	int16_t value = (int16_t) xfget_uint16( file );
+	int value = (int) xfget_uint16( file );
     if ( value & 0x8000 )
         value |= ~ 0xFFFF;			/* sign-extend above bit 15 */
 	return value;
 }
 
-uint16_t xfget_uint16( FILE *file )
+int xfget_uint16( FILE *file )
 {
     Byte buffer[2];
 
@@ -499,12 +499,12 @@ uint16_t xfget_uint16( FILE *file )
 /*-----------------------------------------------------------------------------
 *   read/write numbers - 32 bit
 *----------------------------------------------------------------------------*/
-void xfput_int32( FILE *file, int32_t value )
+void xfput_int32( FILE *file, int value )
 {
-	xfput_uint32( file, (uint32_t) value );
+	xfput_uint32(file, (unsigned int)value);
 }
 
-void xfput_uint32( FILE *file, uint32_t value )
+void xfput_uint32(FILE *file, unsigned int value)
 {
     Byte buffer[4];
 
@@ -515,15 +515,15 @@ void xfput_uint32( FILE *file, uint32_t value )
     xfput_chars( file, (char *) buffer, sizeof(buffer) );
 }
 
-int32_t xfget_int32( FILE *file )
+int xfget_int32( FILE *file )
 {
-	int32_t value = (int32_t) xfget_uint32( file );
+	int value = (int) xfget_uint32( file );
     if ( value & 0x80000000L )
         value |= ~ 0xFFFFFFFFL;	/* sign-extend above bit 31; solve BUG_0021 */
 	return value;
 }
 
-uint32_t xfget_uint32( FILE *file )
+unsigned int xfget_uint32( FILE *file )
 {
     Byte buffer[4];
 

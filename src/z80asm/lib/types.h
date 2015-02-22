@@ -3,21 +3,21 @@ Common types and macros
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.15 2015-02-13 00:05:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/types.h,v 1.16 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include <stdio.h>		/* FILENAME_MAX */
-#include <stdint.h>
+#include <stdio.h>			/* FILENAME_MAX */
+
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#endif
 
 /* Integer types */
-typedef uint8_t  Byte;
-typedef uint32_t UInt;
-typedef int32_t  Int;
-
-/* Bool type and constants */
-typedef int Bool;
+typedef unsigned char Byte;
+typedef int 		  Bool;
 
 #ifndef	FALSE
 #define	FALSE	(0)
@@ -29,19 +29,20 @@ typedef int Bool;
 
 /* MIN, MAX, ABS, CLAMP */
 #undef	MIN
-#define MIN(a, b)  (((a) < (b)) ? (a) : (b))
+#define MIN(a, b)  		(((a) < (b)) ? (a) : (b))
 
 #undef	MAX
-#define MAX(a, b)  (((a) > (b)) ? (a) : (b))
+#define MAX(a, b)  		(((a) > (b)) ? (a) : (b))
 
 #undef	ABS
-#define ABS(a)	   (((a) < 0) ? -(a) : (a))
+#define ABS(a)	   		(((a) < 0) ? -(a) : (a))
 
 #undef	CLAMP
-#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+#define CLAMP(x, low, high)  \
+						(((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
 /* number of elements of array */
-#define NUM_ELEMS(a)		((int) (sizeof(a) / sizeof((a)[0])))
+#define NUM_ELEMS(a)	((int) (sizeof(a) / sizeof((a)[0])))
 
 /* maximum length of strings, must be at least FILENAME_MAX */
 #define MAXLINE			MAX( 1024, FILENAME_MAX )

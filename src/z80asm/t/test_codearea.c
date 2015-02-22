@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.13 2015-02-13 00:05:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_codearea.c,v 1.14 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #include "codearea.h"
@@ -18,10 +18,10 @@ static void dump_sections(char *title, int line)
 {
 	Section *section, *first_section, *last_section, *old_cur_section;
 	SectionHashElem *iter;
-	UInt addr, size, total_size;
-	UInt num_sections;
-	UInt num_modules;
-	UInt i, j;
+	int addr, size, total_size;
+	int num_sections;
+	int num_modules;
+	int i, j;
 	int old_cur_module_id;
 
 	num_sections = total_size = 0;
@@ -66,12 +66,12 @@ static void dump_sections(char *title, int line)
 					   j != 1 && (j % 16) == 1 ? "\n            " : " ",
 					   *ByteArray_item( section->bytes, j ) );
 		warn("\n    start =");
-		for ( j = 0; j < UIntArray_size( section->module_start ); j++ )
-			warn(" %3ld", (long) *UIntArray_item( section->module_start, j ) );
+		for ( j = 0; j < intArray_size( section->module_start ); j++ )
+			warn(" %3ld", (long) *intArray_item( section->module_start, j ) );
 		warn("\n");
 	}
 
-	num_modules = UIntArray_size( first_section->module_start );
+	num_modules = intArray_size( first_section->module_start );
 	warn("\nNumber of modules = %ld\n", 
 		       (long) num_modules );
 

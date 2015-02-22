@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.32 2015-02-13 00:30:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.33 2015-02-22 02:44:33 pauloscustodio Exp $
 */
 
 #pragma once
@@ -126,8 +126,8 @@ CLASS( Expr )
 
 	struct Module  *module;			/* module where expression is patched (weak ref) */
 	struct Section *section;		/* section where expression is patched (weak ref) */
-	UInt		 asmpc;				/* ASMPC value during linking */
-    UInt		 code_pos;			/* Address to patch expression value */
+	int		 asmpc;				/* ASMPC value during linking */
+    int		 code_pos;			/* Address to patch expression value */
 
 	char		*filename;			/* file and line where expression defined, string in strpool */
     int			 line_nr;			/* source line */
