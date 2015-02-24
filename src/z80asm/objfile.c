@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle object file contruction, reading and writing
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.48 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.49 2015-02-24 22:27:39 pauloscustodio Exp $
 */
 
 #include "class.h"
@@ -25,7 +25,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/objfile.c,v 1.48 2015-02-22 02
 #include "model.h"
 #include "objfile.h"
 #include "strpool.h"
-#include "strutil.h"
+#include "str.h"
 
 #include <assert.h>
 
@@ -41,13 +41,11 @@ char Z80objhdr[] 	= "Z80RMF" OBJ_VERSION;
 *----------------------------------------------------------------------------*/
 static long write_expr( FILE *fp )
 {
-	static Str *last_sourcefile = NULL;		/* keep last source file referred to in object */
+	STR_DEFINE(last_sourcefile, STR_SIZE);		/* keep last source file referred to in object */
 	ExprListElem *iter;
     Expr *expr;
 	char range, *target_name;
 	long expr_ptr;
-
-	INIT_OBJ( Str, &last_sourcefile );
 
 	if ( ExprList_empty( CURRENTMODULE->exprs ) )	/* no expressions */
 		return -1;
@@ -80,10 +78,10 @@ static long write_expr( FILE *fp )
 
 		/* store file name if different from last, folowed by source line number */
 		if ( expr->filename != NULL &&
-			 strcmp( last_sourcefile->str, expr->filename ) != 0 )
+			 strcmp( str_data(last_sourcefile), expr->filename ) != 0 )
 		{
 			xfput_count_word_strz( fp, expr->filename );
-			Str_set( last_sourcefile, expr->filename );
+			str_set( last_sourcefile, expr->filename );
 		}
 		else
 			xfput_count_word_strz( fp, "" );
@@ -95,10 +93,12 @@ static long write_expr( FILE *fp )
 		xfput_uint16( fp, expr->asmpc );				/* ASMPC */
 		xfput_uint16( fp, expr->code_pos );				/* patchptr */
 		xfput_count_byte_strz( fp, target_name );		/* target symbol for expression */
-		xfput_count_word_strz( fp, expr->text->str );	/* expression */
+		xfput_count_word_strz( fp, str_data(expr->text) );	/* expression */
 	}
 
 	xfput_uint8( fp, 0 );								/* terminator */
+
+	STR_DELETE(last_sourcefile);
 
 	return expr_ptr;
 }
@@ -309,8 +309,8 @@ void OFile_fini( OFile *self )
 *----------------------------------------------------------------------------*/
 OFile *OFile_read_header( FILE *file, size_t start_ptr )
 {
+	STR_DEFINE(buffer, STR_SIZE);
 	OFile *self;
-    DEFINE_STR( buffer, MAXLINE );
 
 	/* check file version */
     fseek( file, start_ptr, SEEK_SET );
@@ -333,7 +333,9 @@ OFile *OFile_read_header( FILE *file, size_t start_ptr )
     /* read module name */
     fseek( file, start_ptr + self->modname_ptr, SEEK_SET );
     xfget_count_byte_Str( file, buffer );
-    self->modname		= strpool_add( buffer->str );
+    self->modname		= strpool_add( str_data(buffer) );
+
+	STR_DELETE(buffer);
 
 	return self;
 }
@@ -436,14 +438,11 @@ ByteArray *read_obj_file_data( char *filename )
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-Bool objmodule_loaded( char *src_filename )
+static Bool objmodule_loaded_1( char *src_filename, Str *section_name )
 {
-	static Str *section_name;
 	int code_size, origin;
 	OFile *ofile;
 	Section *section;
-
-	INIT_OBJ( Str, &section_name );
 
 	ofile = OFile_test_file( get_obj_filename( src_filename ) );
     if ( ofile != NULL )
@@ -465,7 +464,7 @@ Bool objmodule_loaded( char *src_filename )
 				origin = xfget_int32( ofile->file );
 
 				/* reserve space in section */
-				section = new_section( section_name->str );
+				section = new_section( str_data(section_name) );
 				if ( origin >= 0 )
 					section->origin = origin;
 
@@ -482,4 +481,12 @@ Bool objmodule_loaded( char *src_filename )
     }
     else
         return FALSE;
+}
+
+Bool objmodule_loaded(char *src_filename)
+{
+	STR_DEFINE(section_name, STR_SIZE);
+	Bool ret = objmodule_loaded_1(src_filename, section_name);
+	STR_DELETE(section_name);
+	return ret;
 }

@@ -6,14 +6,14 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.9 2015-02-13 00:05:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.10 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
 #pragma once
 
 #include "class.h"
 #include "list.h"
-#include "strutil.h"
+#include "str.h"
 #include "types.h"
 #include "utarray.h"
 #include <stdio.h>

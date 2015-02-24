@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembled module, i.e. result of assembling a .asm file
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.24 2015-02-13 00:05:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.25 2015-02-24 22:27:39 pauloscustodio Exp $
 */
 
 #pragma once
@@ -24,7 +24,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/module.h,v 1.24 2015-02-13 00:
 #include "classhash.h"
 #include "codearea.h"
 #include "expr.h"
-#include "strutil.h"
 #include "symtab.h"
 #include "types.h"
 

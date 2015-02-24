@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Mapfile writing - list of all local and global address symbols after link phase
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.29 2015-02-13 00:30:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.30 2015-02-24 22:27:38 pauloscustodio Exp $
 */
 
 
@@ -23,7 +23,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/mapfile.c,v 1.29 2015-02-13 00
 #include "mapfile.h"
 #include "options.h"
 #include "strpool.h"
-#include "strutil.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "z80asm.h"

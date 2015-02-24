@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.29 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.30 2015-02-24 22:27:38 pauloscustodio Exp $
 */
 
 #include "listfile.h"
@@ -25,7 +25,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.c,v 1.29 2015-02-22 0
 #include "hist.h"
 #include "strpool.h"
 #include "types.h"
-#include "strutil.h"
 #include "codearea.h"
 
 #include <stdio.h>
@@ -54,11 +53,8 @@ DEF_CLASS( ListFile );
 *----------------------------------------------------------------------------*/
 void ListFile_init( ListFile *self )
 {
-    self->bytes = OBJ_NEW( Str );
-    OBJ_AUTODELETE( self->bytes ) = FALSE;
-
-    self->line  = OBJ_NEW( Str );
-    OBJ_AUTODELETE( self->line ) = FALSE;
+	self->bytes = str_new(STR_SIZE);
+	self->line = str_new(STR_SIZE);
 }
 
 void ListFile_copy( ListFile *self, ListFile *other )
@@ -76,8 +72,8 @@ void ListFile_fini( ListFile *self )
     /* delete file if object is garbage-collected - unexpected exit */
     ListFile_close( self, FALSE );
 
-    OBJ_DELETE( self->bytes );
-    OBJ_DELETE( self->line );
+	str_delete(self->bytes);
+	str_delete(self->line);
 }
 
 /*-----------------------------------------------------------------------------
@@ -86,18 +82,18 @@ void ListFile_fini( ListFile *self )
 static void ListFile_write_header( ListFile *self );
 static void ListFile_fprintf( ListFile *self, char *msg, ... )
 {
-    DEFINE_STR( str, MAXLINE );
+	STR_DEFINE(str, STR_SIZE);
     va_list argptr;
     char *p;
 
     if ( self->file != NULL )
     {
 	    va_start( argptr, msg );				/* BUG_0046 */
-        Str_vsprintf( str, msg, argptr );		/* ignore ret, as we dont retry */
+        str_vsprintf( str, msg, argptr );		/* ignore ret, as we dont retry */
 		va_end( argptr );
 
         /* output to list file, advance line if newline, insert header on new page */
-        for ( p = str->str ; *p ; p++ )
+        for ( p = str_data(str) ; *p ; p++ )
         {
             fputc( *p, self->file );
 
@@ -113,6 +109,8 @@ static void ListFile_fprintf( ListFile *self, char *msg, ... )
             }
         }
     }
+
+	STR_DELETE(str);
 }
 
 /*-----------------------------------------------------------------------------
@@ -262,15 +260,15 @@ void ListFile_start_line( ListFile *self, int address,
 
         /* init all line-related variables */
         self->address = address;
-        Str_clear( self->bytes );
+        str_clear( self->bytes );
 
         self->source_file = strpool_add( source_file );
         self->source_line_nr = source_line_nr;
 
         /* normalize the line end (BUG_0031) */
-        Str_set( self->line, line );
-        Str_chomp( self->line );
-        Str_append_char( self->line, '\n' );
+        str_set( self->line, line );
+        str_chomp( self->line );
+        str_append_char( self->line, '\n' );
     }
 }
 
@@ -296,7 +294,7 @@ void ListFile_append( ListFile *self, long value, int num_bytes )
         while ( num_bytes-- > 0 )
         {
             byte1 = value & 0xFF;
-            Str_append_char( self->bytes, byte1 );
+            str_append_char( self->bytes, byte1 );
             value >>= 8;
         }
     }
@@ -400,8 +398,8 @@ void ListFile_end_line( ListFile *self )
     if ( self->file != NULL && self->line_started && ! self->source_list_ended )
     {
         /* get length of hex dump and pointer to data bytes (BUG_0015) */
-        len     = self->bytes->len;
-        byteptr = (Byte *) self->bytes->str;
+        len     = str_len(self->bytes);
+        byteptr = (Byte *) str_data(self->bytes);
 
         /* output line number and address */
         ListFile_fprintf( self, "%-5d %04X  ", self->source_line_nr, self->address );
@@ -428,7 +426,7 @@ void ListFile_end_line( ListFile *self )
             ListFile_fprintf( self, "\n%*s", 5 + 1 + 4 + 2 + ( 4 * 3 ), "" );
         }
 
-        ListFile_fprintf( self, "%s", self->line->str );
+        ListFile_fprintf( self, "%s", str_data(self->line) );
 
         self->line_started = FALSE;				/* no longer in line */
     }

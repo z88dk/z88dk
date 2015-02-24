@@ -15,13 +15,13 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 One symbol from the assembly code - label or constant.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.27 2015-02-13 00:31:59 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/sym.c,v 1.28 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
 #include "listfile.h"
 #include "options.h"
 #include "strpool.h"
-#include "strutil.h"
+#include "str.h"
 #include "sym.h"
 #include "symbol.h"
 
@@ -73,15 +73,20 @@ Symbol *Symbol_create(char *name, long value, sym_type_t type, sym_scope_t scope
 *----------------------------------------------------------------------------*/
 char *Symbol_fullname( Symbol *sym )
 {
-    DEFINE_STR( name, MAXLINE );
+	STR_DEFINE(name, STR_SIZE);
+	char *ret;
 
-    Str_set( name, sym->name );
+    str_set( name, sym->name );
 
     if ( sym->module && sym->module->modname )
     {
-        Str_append_char( name, '@' );
-        Str_append( name, sym->module->modname );
+        str_append_char( name, '@' );
+        str_append( name, sym->module->modname );
     }
 
-    return strpool_add( name->str );
+    ret = strpool_add( str_data(name) );
+
+	STR_DELETE(name);
+
+	return ret;
 }

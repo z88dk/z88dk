@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.56 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.57 2015-02-24 22:27:38 pauloscustodio Exp $
 */
 
 #include "codearea.h"
@@ -546,7 +546,7 @@ int fwrite_module_code( FILE *file )
 *----------------------------------------------------------------------------*/
 void fwrite_codearea( char *filename, FILE **pfile )
 {
-	DEFINE_FILE_STR( new_name );
+	STR_DEFINE(new_name, FILENAME_MAX);
 	Section *section;
 	SectionHashElem *iter;
 	int section_size;
@@ -574,14 +574,14 @@ void fwrite_codearea( char *filename, FILE **pfile )
 					cur_addr != section->addr ||
 					(section != get_first_section(NULL) && section->origin >= 0))
 				{
-					Str_set(new_name, path_remove_ext(filename));	/* "test" */
-					Str_append_char(new_name, '_');
-					Str_append(new_name, section->name);
+					str_set(new_name, path_remove_ext(filename));	/* "test" */
+					str_append_char(new_name, '_');
+					str_append(new_name, section->name);
 
 					myfclose(*pfile);
-					*pfile = myfopen(get_bin_filename(new_name->str), "wb");         
+					*pfile = myfopen(get_bin_filename(str_data(new_name)), "wb");         
 					if (!*pfile)
-						return;
+						break;
 
 					cur_addr = section->addr;
 				}
@@ -592,6 +592,8 @@ void fwrite_codearea( char *filename, FILE **pfile )
 
 		cur_addr += section_size;
 	}
+
+	STR_DELETE(new_name);
 }
 
 /*-----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.18 2015-02-13 00:31:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.19 2015-02-24 22:27:45 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -12,7 +12,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c array.c strutil.c strpool.c class.c alloc.c dbg.c";
+my $compile = "cc -Wall -otest test.c array.c str.c strpool.c class.c alloc.c dbg.c";
 
 write_file("test.c", <<'END');
 #include "alloc.h"
@@ -51,21 +51,18 @@ int main(int argc, char *argv[])
 	points = OBJ_NEW( PointArray );
 	points->free_data = Point_free;
 	
-	PointArray_unreserve(points);
-	
 	assert( PointArray_size(points) == 0 );
-	assert( points->items->len == 0 );
-	assert( points->items->size == 1 );
+	assert( str_len(points->items) == 0 );
+	assert( str_size(points->items) == 0 );
 	
 	p = PointArray_item(points, 0);
-	assert( p == (Point*)points->items->str );
+	assert( p == (Point*)str_data(points->items) );
 	assert( PointArray_size(points) == 1 );
-	assert( points->items->len == sizeof(Point) );
-	assert( points->items->size >= sizeof(Point)+1 );
+	assert( str_len(points->items) == sizeof(Point) );
+	assert( str_size(points->items) >= sizeof(Point)+1 );
 
-	PointArray_unreserve(points);
-	assert( points->items->len == sizeof(Point) );
-	assert( points->items->size == sizeof(Point)+1 );
+	assert( str_len(points->items) == sizeof(Point) );
+	assert( str_size(points->items) >= sizeof(Point)+1 );
 	
 	assert( p->name == NULL );
 	assert( p->x == 0 );
@@ -76,11 +73,10 @@ int main(int argc, char *argv[])
 	p->y = 2;
 	
 	p = PointArray_item(points, 10);
-	PointArray_unreserve(points);
-	assert( p == (Point*)points->items->str + 10 );
-	assert( PointArray_size(points) == 11 );
-	assert( points->items->len == 11*sizeof(Point) );
-	assert( points->items->size == 11*sizeof(Point)+1 );
+	assert( p == (Point*)str_data(points->items) + 10 );
+	assert( PointArray_size(points) >= 11 );
+	assert( str_len(points->items) == 11*sizeof(Point) );
+	assert( str_size(points->items) >= 11*sizeof(Point)+1 );
 
 	p->name = m_strdup("world");
 	p->x = 3;
@@ -106,48 +102,43 @@ int main(int argc, char *argv[])
 	
 	/* grow */
 	PointArray_set_size(points, 12);
-	PointArray_unreserve(points);
 	assert( PointArray_size(points) == 12 );
-	assert( points->items->len == 12*sizeof(Point) );
-	assert( points->items->size == 12*sizeof(Point)+1 );
+	assert( str_len(points->items) == 12*sizeof(Point) );
+	assert( str_size(points->items) >= 12*sizeof(Point)+1 );
 
 	p = PointArray_item(points, 11);
-	PointArray_unreserve(points);
-	assert( p == (Point*)points->items->str + 11 );
+	assert( p == (Point*)str_data(points->items) + 11 );
 	assert( PointArray_size(points) == 12 );
-	assert( points->items->len == 12*sizeof(Point) );
-	assert( points->items->size == 12*sizeof(Point)+1 );
+	assert( str_len(points->items) == 12*sizeof(Point) );
+	assert( str_size(points->items) >= 12*sizeof(Point)+1 );
 
 	p->name = m_strdup("hello again");
 	p->x = 5;
 	p->y = 6;
 	
 	p = PointArray_item(points, 11);
-	PointArray_unreserve(points);
 	assert( strcmp(p->name, "hello again") == 0 );
 	assert( p->x == 5 );
 	assert( p->y == 6 );
 	
 	/* shrink */
 	PointArray_set_size(points, 1);
-	PointArray_unreserve(points);
 	assert( PointArray_size(points) == 1 );
-	assert( points->items->len == 1*sizeof(Point) );
-	assert( points->items->size == 1*sizeof(Point)+1 );
+	assert( str_len(points->items) == 1*sizeof(Point) );
+	assert( str_size(points->items) >= 1*sizeof(Point)+1 );
 
 	p = PointArray_item(points, 0);
-	assert( p == (Point*)points->items->str + 0 );
+	assert( p == (Point*)str_data(points->items) + 0 );
 	assert( strcmp(p->name, "hello") == 0 );
 	assert( p->x == 1 );
 	assert( p->y == 2 );
 	
 	/* push */
 	p = PointArray_push(points);
-	PointArray_unreserve(points);
-	assert( p == (Point*)points->items->str + 1 );
+	assert( p == (Point*)str_data(points->items) + 1 );
 	assert( PointArray_size(points) == 2 );
-	assert( points->items->len == 2*sizeof(Point) );
-	assert( points->items->size == 2*sizeof(Point)+1 );
+	assert( str_len(points->items) == 2*sizeof(Point) );
+	assert( str_size(points->items) >= 2*sizeof(Point)+1 );
 	
 	p->name = m_strdup("new point");
 	p->x = 7;
@@ -155,36 +146,31 @@ int main(int argc, char *argv[])
 	
 	/* top */
 	p = PointArray_top(points);
-	PointArray_unreserve(points);
-	assert( p == (Point*)points->items->str + 1 );
+	assert( p == (Point*)str_data(points->items) + 1 );
 	assert( strcmp(p->name, "new point") == 0 );
 	assert( p->x == 7 );
 	assert( p->y == 8 );
 	
 	/* pop */
 	PointArray_pop(points);
-	PointArray_unreserve(points);
 	assert( PointArray_size(points) == 1 );
-	assert( points->items->len == 1*sizeof(Point) );
-	assert( points->items->size == 1*sizeof(Point)+1 );
+	assert( str_len(points->items) == 1*sizeof(Point) );
+	assert( str_size(points->items) >= 1*sizeof(Point)+1 );
 	
 	/* top */
 	p = PointArray_top(points);
-	PointArray_unreserve(points);
-	assert( p == (Point*)points->items->str + 0 );
+	assert( p == (Point*)str_data(points->items) + 0 );
 	assert( strcmp(p->name, "hello") == 0 );
 	assert( p->x == 1 );
 	assert( p->y == 2 );
 	
 	PointArray_remove_all(points);
-	PointArray_unreserve(points);
 	assert( PointArray_size(points) == 0 );
-	assert( points->items->len == 0 );
-	assert( points->items->size == 1 );
+	assert( str_len(points->items) == 0 );
+	assert( str_size(points->items) >= 1 );
 	
 	/* top */
 	p = PointArray_top(points);
-	PointArray_unreserve(points);
 	assert( p == NULL );
 	
 	/* byte array */

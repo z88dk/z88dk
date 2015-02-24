@@ -6,13 +6,13 @@ Memory pointed by value of each hash entry must be managed by caller.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.17 2015-02-13 00:05:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.18 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
 #include "alloc.h"
 #include "strhash.h"
 #include "strpool.h"
-#include "strutil.h"
+#include "str.h"
 
 /*-----------------------------------------------------------------------------
 *   Define the class
@@ -68,15 +68,13 @@ void StrHash_remove_all( StrHash *self )
 *----------------------------------------------------------------------------*/
 static char *StrHash_norm_key( StrHash *self, char *key )
 {
-	static Str *KEY;			/* static object to keep upper case key */
+	static STR_DEFINE(KEY, STR_SIZE);		/* static object to keep upper case key */
 	
 	if ( self->ignore_case )
 	{
-		INIT_OBJ( Str, &KEY );	/* init before first use, will be reclaimed 
-								   by class.c */
-								   
-		Str_set( KEY, key );
-		return strtoupper( KEY->str );
+		str_set(KEY, key);
+		str_toupper(KEY);
+		return str_data(KEY);
 	}
 	else
 		return key;

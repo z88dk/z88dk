@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Parse command line options
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.99 2015-02-13 00:05:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.100 2015-02-24 22:27:39 pauloscustodio Exp $
 */
 
 #include "errors.h"
@@ -26,7 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/options.c,v 1.99 2015-02-13 00
 #include "options.h"
 #include "srcfile.h"
 #include "strpool.h"
-#include "strutil.h"
+#include "str.h"
 #include "symtab.h"
 #include "utarray.h"
 #include "z80asm.h"
@@ -333,7 +333,7 @@ static void process_files( int arg, int argc, char *argv[] )
 static void show_option( enum OptType type, Bool *pflag,
                          char *short_opt, char *long_opt, char *help_text, char *help_arg )
 {
-    DEFINE_STR( msg, MAXLINE );
+	STR_DEFINE(msg, STR_SIZE);
     int count_opts = 0;
 
     if ( type == OptDeprecated )
@@ -342,9 +342,9 @@ static void show_option( enum OptType type, Bool *pflag,
     /* show default option */
     if ( ( type == OptSet   &&   *pflag ) ||
             ( type == OptClear && ! *pflag ) )
-        Str_set( msg, "* " );
+        str_set( msg, "* " );
     else
-        Str_set( msg, "  " );
+        str_set( msg, "  " );
 
     if ( *short_opt )
     {
@@ -352,7 +352,7 @@ static void show_option( enum OptType type, Bool *pflag,
            e.g. -sdcc and --sdcc */
         if ( !( *long_opt && strcmp( short_opt, long_opt + 1 ) == 0 ) )
         {
-            Str_append_sprintf( msg, "%s", short_opt );
+            str_append_sprintf( msg, "%s", short_opt );
             count_opts++;
         }
     }
@@ -360,21 +360,23 @@ static void show_option( enum OptType type, Bool *pflag,
     if ( *long_opt )
     {
         if ( count_opts )
-            Str_append( msg, ", " );
+            str_append( msg, ", " );
 
-        Str_append_sprintf( msg, "%s", long_opt );
+        str_append_sprintf( msg, "%s", long_opt );
         count_opts++;
     }
 
     if ( *help_arg )
     {
-        Str_append_sprintf( msg, "=%s", help_arg );
+        str_append_sprintf( msg, "=%s", help_arg );
     }
 
-    if ( msg->len > ALIGN_HELP )
-        printf( "%s\n%-*s %s\n", msg->str, ALIGN_HELP, "",       help_text );
+    if ( str_len(msg) > ALIGN_HELP )
+        printf( "%s\n%-*s %s\n", str_data(msg), ALIGN_HELP, "",       help_text );
     else
-        printf( "%-*s %s\n",           ALIGN_HELP, msg->str, help_text );
+        printf( "%-*s %s\n",                    ALIGN_HELP, str_data(msg), help_text );
+
+	STR_DELETE(msg);
 }
 #undef ALIGN_HELP
 
@@ -505,13 +507,17 @@ static void option_cpu_RCM2000( void )
 
 static char *get_opts_ext_filename( char *filename, char *opts_ext )
 {
-    DEFINE_FILE_STR( ext );
+	STR_DEFINE(ext, FILENAME_MAX);
+	char *ret;
 
     init_module();
 
-    Str_set( ext, FILEEXT_SEPARATOR );
-    Str_append( ext, opts_ext );
-    return path_replace_ext( filename, ext->str );
+    str_set( ext, FILEEXT_SEPARATOR );
+    str_append( ext, opts_ext );
+	ret = path_replace_ext(filename, str_data(ext));
+
+	STR_DELETE(ext);
+	return ret;
 }
 
 char *get_lst_filename( char *filename )

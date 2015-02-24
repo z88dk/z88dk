@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-13 00:31:55 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.53 2015-02-24 22:27:40 pauloscustodio Exp $ 
 */
 
 #define NO_TOKEN_ENUM
@@ -26,9 +26,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 
 /* macros for actions - labels */
 #define DO_STMT_LABEL() \
-			if (stmt_label->len) { \
-				asm_LABEL(stmt_label->str); \
-				stmt_label->len = 0; \
+			if (str_len(stmt_label)) { \
+				asm_LABEL(str_data(stmt_label)); \
+				str_len(stmt_label) = 0; \
 			}
 
 /* macros for actions - statements */
@@ -83,9 +83,9 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 	variable eof ctx->eof;
 
 	/* label, name */
-	label  = _TK_LABEL  @{ Str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); };
-	name   = _TK_NAME   @{ Str_set_n(name, ctx->p->tstart, ctx->p->tlen); };
-	string = _TK_STRING @{ Str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); };
+	label  = _TK_LABEL  @{ str_set_n(stmt_label, ctx->p->tstart, ctx->p->tlen); };
+	name   = _TK_NAME   @{ str_set_n(name, ctx->p->tstart, ctx->p->tlen); };
+	string = _TK_STRING @{ str_set_bytes(name, ctx->p->tstart, ctx->p->tlen); };
 	
 	/*---------------------------------------------------------------------
 	*   assert we are on a Z80
@@ -156,8 +156,8 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 	*   IF, IFDEF, IFNDEF, ELSE, ENDIF
 	*--------------------------------------------------------------------*/
 	asm_IF = 	 _TK_IF     expr _TK_NEWLINE @{ asm_IF(ctx, pop_expr(ctx) ); };
-	asm_IFDEF =  _TK_IFDEF  name _TK_NEWLINE @{ asm_IFDEF(ctx, name->str ); };
-	asm_IFNDEF = _TK_IFNDEF name _TK_NEWLINE @{ asm_IFNDEF(ctx, name->str ); };
+	asm_IFDEF =  _TK_IFDEF  name _TK_NEWLINE @{ asm_IFDEF(ctx, str_data(name) ); };
+	asm_IFNDEF = _TK_IFNDEF name _TK_NEWLINE @{ asm_IFNDEF(ctx, str_data(name) ); };
 	asm_ELSE =	 _TK_ELSE        _TK_NEWLINE @{ asm_ELSE(ctx); };
 	asm_ENDIF =	 _TK_ENDIF       _TK_NEWLINE @{ asm_ENDIF(ctx); };
 	
@@ -186,12 +186,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 		  name _TK_EQUAL const_expr	
 		  %{ if (! expr_error) 
 				asm_DEFGROUP_start(expr_value);
-			 asm_DEFGROUP_define_const(name->str);
+			 asm_DEFGROUP_define_const(str_data(name));
 		  };
 	
 	defgroup_var_next =
 		  name
-		  %{ asm_DEFGROUP_define_const(name->str); }
+		  %{ asm_DEFGROUP_define_const(str_data(name)); }
 		;
 
 	defgroup_var = defgroup_var_value | defgroup_var_next;
@@ -236,11 +236,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 		| _TK_END 					@{ error_missing_close_block(); }
 		| _TK_RCURLY _TK_NEWLINE	@{ ctx->current_sm = SM_MAIN; }
 		| name _TK_NEWLINE
-		  @{ asm_DEFVARS_define_const( name->str, 0, 0 ); }
+		  @{ asm_DEFVARS_define_const( str_data(name), 0, 0 ); }
 #foreach <S> in B, W, P, L
 		| name _TK_DS_<S> const_expr _TK_NEWLINE
 		  @{ if (! expr_error) 
-				asm_DEFVARS_define_const( name->str, DEFVARS_SIZE_<S>, expr_value ); 
+				asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_<S>, expr_value ); 
 		  }
 #endfor  <S>
 		;
@@ -268,7 +268,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 			(
 				string (_TK_COMMA | _TK_NEWLINE)
 				@{	DO_STMT_LABEL();
-					asm_DEFB_str(name->str, name->len);
+					asm_DEFB_str(str_data(name), str_len(name));
 					if ( ctx->p->tok == TK_COMMA )
 						fgoto asm_DEFB_next;
 				}
@@ -327,7 +327,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 	*--------------------------------------------------------------------*/
 #foreach <OP> in INCLUDE, BINARY
 	asm_<OP> = _TK_<OP> string _TK_NEWLINE
-			@{ asm_<OP>(name->str); };
+			@{ asm_<OP>(str_data(name)); };
 #endfor  <OP>
 	directives_str = asm_INCLUDE | asm_BINARY;
 
@@ -336,7 +336,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 	*--------------------------------------------------------------------*/
 #foreach <OP> in MODULE, SECTION
 	asm_<OP> = _TK_<OP> name _TK_NEWLINE
-			@{ asm_<OP>(name->str); };
+			@{ asm_<OP>(str_data(name)); };
 #endfor  <OP>
 	directives_name = asm_MODULE | asm_SECTION;
 
@@ -345,7 +345,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 	*	argument
 	*--------------------------------------------------------------------*/
 #foreach <OP> in GLOBAL, PUBLIC, EXTERN, XREF, LIB, XDEF, XLIB, DEFINE, UNDEFINE
-	action <OP>_action { asm_<OP>(name->str); }
+	action <OP>_action { asm_<OP>(str_data(name)); }
 	
 	asm_<OP> = _TK_<OP> name @<OP>_action
 		    ( _TK_COMMA name @<OP>_action )*
@@ -362,7 +362,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.52 2015-02-
 	asm_<OP>_iter =
 			asm_<OP>_next: 
 				name _TK_EQUAL expr (_TK_COMMA | _TK_NEWLINE)
-				@{	asm_<OP>(name->str, pop_expr(ctx));
+				@{	asm_<OP>(str_data(name), pop_expr(ctx));
 					if ( ctx->p->tok == TK_COMMA )
 						fgoto asm_<OP>_next;
 				};
@@ -898,10 +898,8 @@ static int get_start_state(ParseCtx *ctx)
 	return 0;	/* not reached */
 }
 
-static Bool _parse_statement(ParseCtx *ctx)
+static Bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 {
-	static Str  *name = NULL;		/* identifier name */
-	static Str  *stmt_label = NULL;	/* statement label, NULL if none */
 	int  value1 = 0;
 	int  start_num_errors = get_num_errors();
 	int  expr_value = 0;			/* last computed expression value */
@@ -909,10 +907,8 @@ static Bool _parse_statement(ParseCtx *ctx)
 	Bool expr_in_parens = FALSE;	/* true if expression has enclosing parens */
 	int  expr_open_parens = 0;		/* number of open parens */
 
-	INIT_OBJ(Str, &name); 		Str_clear(name);
-	INIT_OBJ(Str, &stmt_label);	Str_clear(stmt_label);
-	
 	%%write init nocs;
+
 	ctx->cs = get_start_state(ctx);
 	ctx->p = ctx->pe = ctx->eof = ctx->expr_start = NULL;
 	
@@ -935,4 +931,17 @@ static Bool _parse_statement(ParseCtx *ctx)
 	}
 	
 	return FALSE;
+}
+
+static Bool _parse_statement(ParseCtx *ctx)
+{
+	STR_DEFINE(name, STR_SIZE);			/* identifier name */
+	STR_DEFINE(stmt_label, STR_SIZE);	/* statement label, NULL if none */
+	
+	Bool ret = _parse_statement_1(ctx, name, stmt_label);
+
+	STR_DELETE(name);
+	STR_DELETE(stmt_label);
+
+	return ret;
 }

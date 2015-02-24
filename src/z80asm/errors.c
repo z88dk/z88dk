@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.56 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.57 2015-02-24 22:27:38 pauloscustodio Exp $
 */
 
 #include "errors.h"
@@ -23,7 +23,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.56 2015-02-13 00:
 #include "options.h"
 #include "srcfile.h"
 #include "strpool.h"
-#include "strutil.h"
+#include "str.h"
 #include "strhash.h"
 #include "types.h"
 #include "init.h"
@@ -193,58 +193,60 @@ static void puts_error_file( char *string )
 *----------------------------------------------------------------------------*/
 static void do_error( enum ErrType err_type, char *message )
 {
-    DEFINE_STR( msg, MAXLINE );
+	STR_DEFINE(msg, STR_SIZE);
     size_t len_at, len_prefix;
 
     init_module();
 
     /* init empty message */
-    Str_clear( msg );
+    str_clear( msg );
 
     /* Information messages have no prefix */
     if ( err_type != ErrInfo )
     {
-        Str_append( msg, err_type == ErrWarn ? "Warning" : "Error" );
+        str_append( msg, err_type == ErrWarn ? "Warning" : "Error" );
 
         /* prepare to remove " at" if no prefix */
-        len_at = msg->len;
-        Str_append( msg, " at" );
-        len_prefix = msg->len;
+        len_at = str_len(msg);
+        str_append( msg, " at" );
+        len_prefix = str_len(msg);
 
         /* output filename */
         if ( errors.filename && *errors.filename )
-            Str_append_sprintf( msg, " file '%s'", errors.filename );
+            str_append_sprintf( msg, " file '%s'", errors.filename );
 
         /* output module */
         if ( errors.module != NULL && *errors.module )
-            Str_append_sprintf( msg, " module '%s'", errors.module );
+            str_append_sprintf( msg, " module '%s'", errors.module );
 
         /* output line number */
         if ( errors.line > 0 )
-            Str_append_sprintf( msg, " line %d", errors.line );
+            str_append_sprintf( msg, " line %d", errors.line );
 
         /* remove at if no prefix */
-        if ( len_prefix == msg->len )	/* no prefix loaded to string */
+        if ( len_prefix == str_len(msg) )	/* no prefix loaded to string */
         {
-            msg->str[ len_at ] = '\0';	/* go back 3 chars to before at */
-            Str_sync_len( msg );
+            str_data(msg)[ len_at ] = '\0';	/* go back 3 chars to before at */
+            str_sync_len( msg );
         }
 
-        Str_append( msg, ": " );
+        str_append( msg, ": " );
     }
 
     /* output error message */
-    Str_append( msg, message );
-    Str_append_char( msg, '\n' );
+    str_append( msg, message );
+    str_append_char( msg, '\n' );
 
     /* CH_0001 : Assembly error messages should appear on stderr */
-    fputs( msg->str, stderr );
+    fputs( str_data(msg), stderr );
 
     /* send to error file */
-    puts_error_file( msg->str );
+    puts_error_file( str_data(msg) );
 
     if ( err_type == ErrError )
         errors.count++;		/* count number of errors */
+
+	STR_DELETE(msg);
 }
 
 /*-----------------------------------------------------------------------------
@@ -253,11 +255,11 @@ static void do_error( enum ErrType err_type, char *message )
 #define ERR(err_type,func,args)	\
 	void func \
 	{ \
-		DEFINE_STR( msg, MAXLINE ); \
-		\
+		STR_DEFINE(msg, STR_SIZE); \
 		init_module(); \
-		Str_append_sprintf( msg, args ); \
-		do_error( err_type, msg->str ); \
+		str_append_sprintf( msg, args ); \
+		do_error( err_type, str_data(msg) ); \
+		STR_DELETE(msg); \
 	}
 #include "errors_def.h"
 #undef ERR

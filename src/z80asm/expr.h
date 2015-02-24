@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.33 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.34 2015-02-24 22:27:38 pauloscustodio Exp $
 */
 
 #pragma once
@@ -26,7 +26,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.33 2015-02-22 02:44
 #include "classlist.h"
 #include "scan.h"
 #include "sym.h"
-#include "strutil.h"
 
 struct Module;
 struct Section;

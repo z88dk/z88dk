@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.34 2015-02-13 00:30:31 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.35 2015-02-24 22:27:39 pauloscustodio Exp $ 
 */
 
 #include "class.h"
@@ -26,6 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.34 2015-02-13 00:3
 #include "opcodes.h"
 #include "parse.h"
 #include "scan.h"
+#include "str.h"
 #include "strpool.h"
 #include "sym.h"
 #include "symtab.h"
@@ -128,26 +129,24 @@ struct Expr *parse_expr(char *expr_text)
 /* push current expression */
 static void push_expr(ParseCtx *ctx)
 {
-	static Str *expr_text;
+	STR_DEFINE(expr_text, STR_SIZE);
 	Expr *expr;
 	Sym  *expr_p;
 	Bool  last_was_prefix;
 
-	INIT_OBJ(Str, &expr_text);
-
 	/* build expression text - split constant prefixes from numbers and names */
-	Str_clear(expr_text);
+	str_clear(expr_text);
 	last_was_prefix = FALSE;
 	for (expr_p = ctx->expr_start; expr_p < ctx->p; expr_p++)
 	{
 		if (last_was_prefix && expr_p->tlen > 0 &&
 			(isalnum(*expr_p->tstart) || *expr_p->tstart == '"'))
 		{
-			Str_append_char(expr_text, ' ');
+			str_append_char(expr_text, ' ');
 			last_was_prefix = FALSE;
 		}
 
-		Str_append_n(expr_text, expr_p->tstart, expr_p->tlen);
+		str_append_n(expr_text, expr_p->tstart, expr_p->tlen);
 
 		if (expr_p->tlen > 0)
 		{
@@ -166,10 +165,12 @@ static void push_expr(ParseCtx *ctx)
 	}
 	
 	/* parse expression */
-	expr = parse_expr(expr_text->str);
+	expr = parse_expr(str_data(expr_text));
 
 	/* push the new expression, or NULL on error */
 	utarray_push_back(ctx->exprs, &expr);
+
+	STR_DELETE(expr_text);
 }
 
 /*-----------------------------------------------------------------------------
@@ -219,13 +220,15 @@ static void pop_eval_expr(ParseCtx *ctx, int *pvalue, Bool *perror)
 *----------------------------------------------------------------------------*/
 char *autolabel(void)
 {
-	static Str *label;
+	STR_DEFINE(label, STR_SIZE);
 	static int n;
+	char *ret;
 
-	INIT_OBJ(Str, &label);
+	str_sprintf(label, "__autolabel_%04d", ++n);
+	ret = strpool_add(str_data(label));
 
-	Str_sprintf(label, "__autolabel_%04d", ++n);
-	return strpool_add(label->str);
+	STR_DELETE(label);
+	return ret;
 }
 
 /*-----------------------------------------------------------------------------
@@ -246,12 +249,10 @@ static char *token_strings_add(ParseCtx *ctx, char *str)
 *----------------------------------------------------------------------------*/
 static void read_token(ParseCtx *ctx)
 {
-	static Str *buffer;
+	STR_DEFINE(buffer, STR_SIZE);
 	Sym sym_copy;
 	int p_index;
 	int expr_start_index;
-
-	INIT_OBJ(Str, &buffer);
 
 	p_index = ctx->p ? ctx->p - (Sym *)utarray_front(ctx->tokens) : -1;
 	expr_start_index = ctx->expr_start ? ctx->expr_start - (Sym *)utarray_front(ctx->tokens) : -1;
@@ -262,9 +263,9 @@ static void read_token(ParseCtx *ctx)
 	switch (sym_copy.tok)
 	{
 	case TK_NUMBER:
-		Str_sprintf(buffer, "%d", sym_copy.number);
-		sym_copy.tstart = token_strings_add(ctx, buffer->str);
-		sym_copy.tlen = buffer->len;
+		str_sprintf(buffer, "%d", sym_copy.number);
+		sym_copy.tstart = token_strings_add(ctx, str_data(buffer));
+		sym_copy.tlen = str_len(buffer);
 		break;
 
 	case TK_NAME:
@@ -295,6 +296,8 @@ static void read_token(ParseCtx *ctx)
 	ctx->expr_start = expr_start_index >= 0 ? ((Sym *)utarray_front(ctx->tokens)) + expr_start_index : NULL;
 
 	GetSym();
+
+	STR_DELETE(buffer);
 }
 
 static void free_tokens(ParseCtx *ctx)

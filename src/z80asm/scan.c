@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.73 2015-02-13 00:05:15 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.74 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
 #include "alloc.h"
@@ -24,7 +24,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.73 2015-02-13 00:05
 #include "model.h"
 #include "options.h"
 #include "scan.h"
-#include "strutil.h"
+#include "str.h"
 #include "utarray.h"
 #include <assert.h>
 #include <ctype.h>
@@ -38,7 +38,7 @@ Bool EOL;
 /*-----------------------------------------------------------------------------
 * 	Static - current scan context
 *----------------------------------------------------------------------------*/
-static Str  *input_buf = NULL;			/* current input buffer */
+static Str	*input_buf;					/* current input buffer */
 static List *input_stack;				/* stack of previous contexts */
 
 static Bool	 at_bol;					/* true if at beginning of line */
@@ -46,7 +46,7 @@ static Bool	 at_bol;					/* true if at beginning of line */
 static int	 cs, act;					/* Ragel state variables */
 static char	*p, *pe, *eof, *ts, *te;	/* Ragel state variables */
 
-/* static DEFINE_STR(sym_string, MAXLINE); */
+/* static DEFINE_STR(sym_string, STR_SIZE); */
 
 static Bool	expect_opcode;				/* true to return opcodes as tokens, 
 										*  false to return as names */
@@ -95,8 +95,8 @@ static void init_sym(void)
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	input_buf = OBJ_NEW(Str);
-	Str_set_alias( input_buf, &p );		/* Ragel pointer to current scan position */
+	input_buf = str_new(STR_SIZE);
+	p = str_data(input_buf);
 
 	input_stack	 = OBJ_NEW(List);
 	input_stack->free_data = m_free_compat;
@@ -107,7 +107,7 @@ DEFINE_init_module()
 
 DEFINE_dtor_module()
 {
-	OBJ_DELETE(input_buf);
+	str_delete(input_buf);
 	OBJ_DELETE(input_stack);
 	utarray_free(scan_state);
 }
@@ -122,16 +122,16 @@ void save_scan_state(void)
 	init_module();
 
 	save.sym = sym;
-	save.input_buf = m_strdup(input_buf->str);
+	save.input_buf = m_strdup(str_data(input_buf));
 	save.at_bol = at_bol;
 	save.EOL = EOL;
 	save.cs = cs;
 	save.act = act;
-	save.p   = p   ? p   - input_buf->str : -1;
-	save.pe  = pe  ? pe  - input_buf->str : -1;
-	save.eof = eof ? eof - input_buf->str : -1;
-	save.ts  = ts  ? ts  - input_buf->str : -1;
-	save.te  = te  ? te  - input_buf->str : -1;
+	save.p   = p   ? p   - str_data(input_buf) : -1;
+	save.pe  = pe  ? pe  - str_data(input_buf) : -1;
+	save.eof = eof ? eof - str_data(input_buf) : -1;
+	save.ts  = ts  ? ts  - str_data(input_buf) : -1;
+	save.te  = te  ? te  - str_data(input_buf) : -1;
 //	save.sym_string = m_strdup(sym_string->str);
 	save.expect_opcode = expect_opcode;
 
@@ -146,17 +146,17 @@ void restore_scan_state(void)
 
 	save = (ScanState *)utarray_back(scan_state);
 	sym = save->sym;
-	Str_set(input_buf, save->input_buf);
+	str_set(input_buf, save->input_buf);
 	at_bol = save->at_bol;
 	EOL = save->EOL;
 	cs = save->cs;
 	act = save->act;
-	p   = save->p   >= 0 ? input_buf->str + save->p   : NULL;
-	pe  = save->pe  >= 0 ? input_buf->str + save->pe  : NULL;
-	eof = save->eof >= 0 ? input_buf->str + save->eof : NULL;
-	ts  = save->ts  >= 0 ? input_buf->str + save->ts  : NULL;
-	te  = save->te  >= 0 ? input_buf->str + save->te  : NULL;
-//	Str_set(sym_string, save->sym_string);
+	p   = save->p   >= 0 ? str_data(input_buf) + save->p   : NULL;
+	pe  = save->pe  >= 0 ? str_data(input_buf) + save->pe  : NULL;
+	eof = save->eof >= 0 ? str_data(input_buf) + save->eof : NULL;
+	ts  = save->ts  >= 0 ? str_data(input_buf) + save->ts  : NULL;
+	te  = save->te  >= 0 ? str_data(input_buf) + save->te  : NULL;
+//	str_set(sym_string, save->sym_string);
 	expect_opcode = save->expect_opcode;
 
 	utarray_pop_back(scan_state);
@@ -270,13 +270,13 @@ static Bool get_sym_string( void )
 		else if (*p == quote)
 		{
 			*p = '\0';					/* terminate string */
-			len = str_compress_escapes(ts);
+			len = compress_escapes(ts);
 			te = ts + len;
 			memset(te, ' ', p - te);	/* fill remaining chars with space */
 			*p = quote;					/* restore quote */
 
 //			te = p;
-//			Str_set_n(sym_string, ts, te - ts);
+//			str_set_n(sym_string, ts, te - ts);
 //			sym.string = sym_string->str;
 //			Str_compress_escapes(sym_string);
 
@@ -287,7 +287,7 @@ static Bool get_sym_string( void )
 			te = ts;
 			p--;						/* point to before separator */
 
-//			Str_clear(sym_string);
+//			str_clear(sym_string);
 //			sym.string = sym_string->str;
 
 			return FALSE;
@@ -445,9 +445,8 @@ void SetTemporaryLine( char *line )
 *----------------------------------------------------------------------------*/
 char *sym_text(Sym *sym)
 {
-	static Str *text;
+	static STR_DEFINE(text, STR_SIZE);
 
-	INIT_OBJ(Str, &text);
-	Str_set_bytes(text, sym->tstart, sym->tlen);
-	return text->str;
+	str_set_bytes(text, sym->tstart, sym->tlen);
+	return str_data(text);
 }

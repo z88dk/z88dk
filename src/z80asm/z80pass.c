@@ -13,32 +13,13 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.138 2015-02-13 00:31:59 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.139 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
-#include "directives.h"
-#include "codearea.h"
-#include "errors.h"
-#include "expr.h"
-#include "fileutil.h"
-#include "hist.h"
+#include "limits.h"
 #include "listfile.h"
-#include "model.h"
 #include "modlink.h"
-#include "options.h"
-#include "parse.h"
-#include "scan.h"
-#include "srcfile.h"
-#include "strutil.h"
-#include "sym.h"
 #include "symbol.h"
-#include "z80asm.h"
-#include <ctype.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 /* external functions */
 

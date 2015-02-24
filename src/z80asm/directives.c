@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.18 2015-02-13 00:30:31 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.19 2015-02-24 22:27:38 pauloscustodio Exp $
 */
 
 #include "codearea.h"
@@ -139,13 +139,15 @@ void asm_LSTOFF(void)
 *----------------------------------------------------------------------------*/
 void asm_LINE(int line_nr)
 {
-	DEFINE_STR(name, MAXLINE);
+	STR_DEFINE(name, STR_SIZE);
 
 	if (opts.line_mode)
 		set_error_line(line_nr);
 
-	Str_sprintf(name, "__C_LINE_%ld", line_nr);
-	asm_LABEL(name->str);
+	str_sprintf(name, "__C_LINE_%ld", line_nr);
+	asm_LABEL(str_data(name));
+
+	STR_DELETE(name);
 }
 
 void asm_ORG(int address)

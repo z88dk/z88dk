@@ -3,13 +3,15 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.28 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.c,v 1.29 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
 #include "alloc.h"
+#include "class.h"
 #include "fileutil.h"
+#include "init.h"
 #include "strpool.h"
-#include "strutil.h"
+#include "str.h"
 #include "uthash.h"
 
 #include <assert.h>
@@ -22,32 +24,51 @@ static void file_error_filename( char *filename, Bool is_writing );
 *	List to keep temporary file names that need to be deleted atexit
 *	Relies on class.c destruction of all created objects
 *----------------------------------------------------------------------------*/
-static List *temp_files = NULL;		/* keep list of temp files generated */
+static UT_array *temp_files;		/* keep list of temp files generated */
+
+/*-----------------------------------------------------------------------------
+*	Initialize and delete temp_files
+*----------------------------------------------------------------------------*/
+DEFINE_init_module()
+{
+	utarray_new(temp_files, &ut_str_icd);
+}
+
+DEFINE_dtor_module()
+{
+	char **p;
+
+	/* delete all temp files */
+	for (p = NULL; (p = (char**)utarray_prev(temp_files, p)) != NULL; ) 
+		remove(*p);
+
+	utarray_free(temp_files);
+}
 
 /* add temp file name to list of files to delete at exit */
 static char *add_temp_file( char *filename )
 {
-	char *temp;
-	
-	strpool_init();
-	temp = strpool_add(filename);
-	
-	List_push( &temp_files, temp );
-	temp_files->free_data = (void(*)(void*))remove;	/* call remove(file) atexit */
-	
-	return temp;
+	char **p;
+
+	init_module();
+	utarray_push_back(temp_files, &filename);		/* save string in heap */
+	p = (char **)utarray_back(temp_files);
+	return *p;										/* return address of saved string */
 }
 
 /* return temporary file name, schedules file to be removed atexit */
 char *temp_filename( char *filename )
 {
-	DEFINE_FILE_STR( temp );
+	STR_DEFINE(temp, FILENAME_MAX);
 	static int count;
-	
-	Str_sprintf( temp, "%s~$%d$%s", 
-				 path_dirname(filename), ++count, path_basename(filename) );
+	char *ret;
 
-	return add_temp_file( temp->str );
+	str_sprintf( temp, "%s~$%d$%s", 
+				 path_dirname(filename), ++count, path_basename(filename) );
+	ret = add_temp_file(str_data(temp));
+
+	STR_DELETE(temp);
+	return ret;
 }
 
 /*-----------------------------------------------------------------------------
@@ -157,6 +178,8 @@ static FILE *OpenFile_open( char *filename, char *mode, Bool is_atomic )
 {
 	OpenFile   *self;
 	char 	   *temp_name;
+
+	init_module();
 
 	/* init temp_files before OpenFile, to assure temp files are removed last */
 	strpool_init();
@@ -352,22 +375,22 @@ void xfput_strz( FILE *file, char *str )
 
 void xfput_Str( FILE *file, Str *str )
 {
-    xfput_chars( file, str->str, str->len );
+    xfput_chars( file, str_data(str), str_len(str) );
 }
 
 void xfget_Str( FILE *file, Str *str, size_t len )
 {
 	/* reserve space */
-	Str_clear( str );
-	Str_reserve( str, len );
+	str_clear( str );
+	str_reserve( str, len );
 
 	/* may fail if static string */
-    if ( len + 1 > str->size )
+    if ( (int)len + 1 > str->size )
         fatal_ferr_read( file ); 			/* too long */
 
-    xfget_chars( file, str->str, len );		/* characters */
-    str->str[len] = '\0';					/* terminate string */
-	str->len = len;							/* set lenght; Str_sync_len() only for
+    xfget_chars( file, str_data(str), len );		/* characters */
+    str_data(str)[len] = '\0';					/* terminate string */
+	str_len(str) = len;							/* set lenght; str_sync_len() only for
 											   strings not including nulls */
 }
 
@@ -390,7 +413,7 @@ void xfput_count_byte_strz( FILE *file, char *str )
 
 void xfput_count_byte_Str( FILE *file, Str *str )
 {
-	_xfput_count_byte_str( file, str->str, str->len );
+	_xfput_count_byte_str( file, str_data(str), str_len(str) );
 }
 
 void xfget_count_byte_Str( FILE *file, Str *str )
@@ -420,7 +443,7 @@ void xfput_count_word_strz( FILE *file, char *str )
 
 void xfput_count_word_Str( FILE *file, Str *str )
 {
-	_xfput_count_word_str( file, str->str, str->len );
+	_xfput_count_word_str( file, str_data(str), str_len(str) );
 }
 
 void xfget_count_word_Str( FILE *file, Str *str )
@@ -538,7 +561,7 @@ unsigned int xfget_uint32( FILE *file )
 /*-----------------------------------------------------------------------------
 *   Pathname manipulation
 *   All filenames are returned in fixed length Str defined by
-*	DEFINE_STR( dest, FILENAME_MAX ) or DEFINE_FILE_STR( dest )
+*	STR_DEFINE( dest, FILENAME_MAX )
 *	Input string is unchanged.
 *	Basename is file name removing all directories.
 *	Extension is the final "." followed by sequence of letters or digits
@@ -549,43 +572,51 @@ static void _path_remove_ext( Str *dest, char *filename )
 {
     char *dot_pos, *dir_pos_1, *dir_pos_2;
 	
-    Str_set( dest, filename );		/* make a copy */
+    str_set( dest, filename );		/* make a copy */
 
     /* BUG_0014 : need to ignore dot if before a directory separator */
-    dot_pos   = strrchr( dest->str, FILEEXT_SEPARATOR[0] );
-    dir_pos_1 = strrchr( dest->str, '/' );
+    dot_pos   = strrchr( str_data(dest), FILEEXT_SEPARATOR[0] );
+    dir_pos_1 = strrchr( str_data(dest), '/' );
 
-    if ( dir_pos_1 == NULL ) dir_pos_1 = dest->str;
+    if ( dir_pos_1 == NULL ) dir_pos_1 = str_data(dest);
 
-    dir_pos_2 = strrchr( dest->str, '\\' );
+    dir_pos_2 = strrchr( str_data(dest), '\\' );
 
-    if ( dir_pos_2 == NULL ) dir_pos_2 = dest->str;
+    if ( dir_pos_2 == NULL ) dir_pos_2 = str_data(dest);
 
     if ( dot_pos != NULL && dot_pos > dir_pos_1 && dot_pos > dir_pos_2 )
     {
         *dot_pos = '\0';                /* terminate the string */
-        Str_sync_len( dest );
+        str_sync_len( dest );
     }
 }
 
 char *path_remove_ext( char *filename )
 {
-	DEFINE_FILE_STR( dest );
+	STR_DEFINE(dest, FILENAME_MAX);
+	char *ret;
 
 	_path_remove_ext( dest, filename );
-	return strpool_add( dest->str );
+	ret = strpool_add(str_data(dest));
+
+	STR_DELETE(dest);
+	return ret;
 }
 
 /* make a copy of the file name in strpool, replacing the extension */
 char *path_replace_ext( char *filename, char *new_ext )
 {
-	DEFINE_FILE_STR( dest );
-	
+	STR_DEFINE(dest, FILENAME_MAX);
+	char *ret;
+
     _path_remove_ext( dest, filename );
 
     if ( new_ext != NULL )
-        Str_append( dest, new_ext );
-	return strpool_add( dest->str );
+        str_append( dest, new_ext );
+	ret = strpool_add(str_data(dest));
+
+	STR_DELETE(dest);
+	return ret;
 }
 
 /* return address of start of file basename after final slash, or start of string in none */
@@ -611,23 +642,26 @@ char *path_basename( char *filename )
 /* make a copy of the file dirname */
 char *path_dirname( char *filename )
 {
-	DEFINE_FILE_STR( dest );
+	STR_DEFINE(dest, FILENAME_MAX);
 	char *basename;
-	
-    Str_set( dest, filename );
-	basename = _start_basename( dest->str );
+	char *ret;
+
+    str_set( dest, filename );
+	basename = _start_basename( str_data(dest) );
 	*basename = '\0';		/* remove basename */
-	return strpool_add( dest->str );
+	ret = strpool_add(str_data(dest));
+
+	STR_DELETE(dest);
+	return ret;
 }
 
 /* search for a file on the given directory list, return full path name */
-void path_search( Str *dest, char *filename, UT_array *dir_list )
+static void path_search_1(Str *dest, char *filename, UT_array *dir_list, Str *pathname)
 {
-    DEFINE_FILE_STR( pathname );
-    struct stat  sb;
+	struct stat  sb;
 	char **pdir;
 	
-    Str_set( dest, filename );		/* default return: input file name */
+    str_set( dest, filename );		/* default return: input file name */
 
     /* if no dir_list, return file */
     if ( dir_list == NULL )
@@ -640,11 +674,11 @@ void path_search( Str *dest, char *filename, UT_array *dir_list )
     /* search in dir_list */
 	for (pdir = NULL; (pdir = (char **)utarray_next(dir_list, pdir)) != NULL; )
     {
-		Str_sprintf(pathname, "%s/%s", *pdir, filename);
+		str_sprintf(pathname, "%s/%s", *pdir, filename);
 
-        if ( stat( pathname->str, &sb ) == 0 )
+        if ( stat( str_data(pathname), &sb ) == 0 )
         {
-            Str_set( dest, pathname->str );
+            str_set( dest, str_data(pathname) );
             return;
         }
     }
@@ -653,10 +687,21 @@ void path_search( Str *dest, char *filename, UT_array *dir_list )
     return;
 }
 
+void path_search(Str *dest, char *filename, UT_array *dir_list)
+{
+	STR_DEFINE(pathname, FILENAME_MAX);
+	path_search_1(dest, filename, dir_list, pathname);
+	STR_DELETE(pathname);
+}
+
 char *search_file( char *filename, UT_array *dir_list )
 {
-    DEFINE_FILE_STR( dest );
-	
+	STR_DEFINE(dest, FILENAME_MAX);
+	char *ret;
+
     path_search( dest, filename, dir_list );
-    return strpool_add( dest->str );
+	ret = strpool_add(str_data(dest));
+
+	STR_DELETE(dest);
+	return ret;
 }

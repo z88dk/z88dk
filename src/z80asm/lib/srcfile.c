@@ -6,7 +6,7 @@ Call back interface to declare that a new line has been read.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.19 2015-02-13 00:05:18 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.c,v 1.20 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
 #include "alloc.h"
@@ -79,8 +79,7 @@ void SrcFile_init( SrcFile *self )
 	
     self->filename   = NULL;
 
-    self->line       = OBJ_NEW( Str );
-    OBJ_AUTODELETE( self->line ) = FALSE;
+	self->line = str_new(STR_SIZE);
 
     self->line_stack = OBJ_NEW( List );
     OBJ_AUTODELETE( self->line_stack ) = FALSE;
@@ -101,7 +100,7 @@ void SrcFile_fini( SrcFile *self )
     if ( self->file != NULL )
         myfclose( self->file );
 
-    OBJ_DELETE( self->line );
+	str_delete(self->line);
     OBJ_DELETE( self->line_stack );
     OBJ_DELETE( self->file_stack );
 }
@@ -160,7 +159,7 @@ Bool SrcFile_open( SrcFile *self, char *filename, UT_array *dir_list )
     self->file = myfopen( self->filename, "rb" );
 
 	/* init current line */
-    Str_clear( self->line );
+    str_clear( self->line );
     self->line_nr = 0;
 
 	if (self->file)
@@ -181,7 +180,7 @@ char *SrcFile_getline( SrcFile *self )
     char *line;
 
     /* clear result string */
-    Str_clear( self->line );
+    str_clear( self->line );
 
     /* check for line stack */
     if ( ! List_empty( self->line_stack ) )
@@ -189,11 +188,11 @@ char *SrcFile_getline( SrcFile *self )
         line = List_pop( self->line_stack );
 
         /* we own the string now and need to release memory */
-		Str_set( self->line, line );
+		str_set( self->line, line );
         m_free( line );
 
         /* dont increment line number as we are still on same file input line */
-        return self->line->str;
+        return str_data(self->line);
     }
 
     /* check for EOF condition */
@@ -228,23 +227,23 @@ char *SrcFile_getline( SrcFile *self )
             c = '\n';
 
         default:
-            Str_append_char( self->line, c );
+            str_append_char( self->line, c );
         }
     }
 
     /* terminate string if needed */
-    if ( self->line->len > 0 && ! found_newline )
-        Str_append_char( self->line, '\n' );
+    if ( str_len(self->line) > 0 && ! found_newline )
+        str_append_char( self->line, '\n' );
 
 	/* signal new line, even empty one, to show end line in list */
     self->line_nr++;
-	call_new_line_cb( self->filename, self->line_nr, self->line->str );
+	call_new_line_cb( self->filename, self->line_nr, str_data(self->line) );
 
 	/* check for end of file
 	   even if EOF found, we need to return any chars in line first */
-    if ( self->line->len > 0 )		
+    if ( str_len(self->line) > 0 )		
     {
-        return self->line->str;
+        return str_data(self->line);
     }
     else
     {

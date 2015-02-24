@@ -90,9 +90,6 @@
     <ClInclude Include="lib\class.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
-    <ClInclude Include="lib\strutil.h">
-      <Filter>Header Files\lib</Filter>
-    </ClInclude>
     <ClInclude Include="lib\strhash.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
@@ -165,6 +162,9 @@
     <ClInclude Include="lib\utlist.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="lib\str.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="hist.c">
@@ -221,9 +221,6 @@
     <ClCompile Include="lib\class.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\strutil.c">
-      <Filter>Source Files\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\strhash.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
@@ -264,6 +261,9 @@
       <Filter>Source Files\lib</Filter>
     </ClCompile>
     <ClCompile Include="lib\alloc.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\str.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
   </ItemGroup>

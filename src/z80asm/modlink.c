@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.147 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.148 2015-02-24 22:27:39 pauloscustodio Exp $
 */
 
 #include "alloc.h"
@@ -26,7 +26,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.147 2015-02-22 0
 #include "options.h"
 #include "scan.h"
 #include "strpool.h"
-#include "strutil.h"
+#include "str.h"
 #include "sym.h"
 #include "symbol.h"
 #include "z80asm.h"
@@ -61,14 +61,11 @@ struct linklist *linkhdr;
 struct libfile *CURRENTLIB;
 int totaladdr, curroffset;
 
-void
-ReadNames( char *filename, FILE *file )
+static void ReadNames_1(char *filename, FILE *file, Str *section_name, Str *name)
 {
     int scope, symbol_char;
 	sym_type_t type = TYPE_UNKNOWN;
     long value;
-	DEFINE_STR( section_name, MAXLINE );
-	DEFINE_STR( name, MAXLINE );
 
     while (TRUE)
     {
@@ -83,7 +80,7 @@ ReadNames( char *filename, FILE *file )
 		value		= xfget_int32( file );		/* read symbol (long) integer */
 		xfget_count_byte_Str( file, name );		/* read symbol name */
 
-		new_section( section_name->str );		/* define CURRENTSECTION */
+		new_section( str_data(section_name) );		/* define CURRENTSECTION */
 
         switch ( symbol_char )
         {
@@ -96,13 +93,25 @@ ReadNames( char *filename, FILE *file )
 
         switch ( scope )
         {
-		case 'L': define_local_sym(name->str, value, type); break;
-		case 'G': define_global_sym(name->str, value, type); break;
+		case 'L': define_local_sym(str_data(name), value, type); break;
+		case 'G': define_global_sym(str_data(name), value, type); break;
         default:
             error_not_obj_file( filename );
         }
     }
 }
+
+void ReadNames(char *filename, FILE *file)
+{
+	STR_DEFINE(section_name, STR_SIZE);
+	STR_DEFINE(name, STR_SIZE);
+
+	ReadNames_1(filename, file, section_name, name);
+
+	STR_DELETE(section_name);
+	STR_DELETE(name);
+}
+
 
 /* set environment to compute expression */
 static void set_asmpc_env( Module *module, char *section_name,
@@ -142,24 +151,13 @@ static void set_expr_env( Expr *expr, Bool module_relative_addr )
 }
 
 /* read the current modules' expressions to the given list */
-static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
+static void read_cur_module_exprs_1(ExprList *exprs, FILE *file, char *filename,
+	Str *expr_text, Str *last_filename, Str *source_filename, Str *section_name, Str *target_name)
 {
-	static Str *expr_text;
-	static Str *last_filename;
-	static Str *source_filename;
-	static Str *section_name;
-	static Str *target_name;
-
 	int line_nr;
 	int type;
     Expr *expr;
     int asmpc, code_pos;
-
-	INIT_OBJ( Str, &expr_text );
-	INIT_OBJ( Str, &last_filename );
-	INIT_OBJ( Str, &source_filename );
-	INIT_OBJ( Str, &section_name );
-	INIT_OBJ( Str, &target_name );
 
 	while (1) 
 	{
@@ -169,10 +167,10 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
 
 		/* source file and line number */
 		xfget_count_word_Str( file, source_filename );
-		if ( source_filename->len == 0 )
-			Str_set( source_filename, last_filename->str );
+		if ( str_len(source_filename) == 0 )
+			str_set( source_filename, str_data(last_filename) );
 		else
-			Str_set( last_filename, source_filename->str );
+			str_set( last_filename, str_data(source_filename) );
 
 		line_nr = xfget_int32( file );
 
@@ -186,8 +184,8 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
 		xfget_count_word_Str( file, expr_text );	/* get expression */
 
 		/* read expression followed by newline */
-		Str_append_char( expr_text, '\n');
-		SetTemporaryLine( expr_text->str );			/* read expression */
+		str_append_char( expr_text, '\n');
+		SetTemporaryLine( str_data(expr_text) );			/* read expression */
 
         EOL = FALSE;                /* reset end of line parsing flag - a line is to be parsed... */
 
@@ -195,8 +193,8 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
         GetSym();
 
 		/* parse and store expression in the list */
-		set_asmpc_env( CURRENTMODULE, section_name->str, 
-					   source_filename->str, line_nr, 
+		set_asmpc_env( CURRENTMODULE, str_data(section_name), 
+					   str_data(source_filename), line_nr, 
 					   asmpc,
 					   FALSE );
         if ( ( expr = expr_parse() ) != NULL )
@@ -209,8 +207,8 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
             case 'C': expr->range = RANGE_WORD;			break;
             case 'L': expr->range = RANGE_DWORD;		break;
 			case '=': expr->range = RANGE_WORD;
-					  assert( target_name->len > 0 );
-					  expr->target_name = strpool_add( target_name->str );	/* define expression as EQU */
+					  assert( str_len(target_name) > 0 );
+					  expr->target_name = strpool_add( str_data(target_name) );	/* define expression as EQU */
 					  break;
 			default:
 				error_not_obj_file( filename );
@@ -220,13 +218,32 @@ static void read_cur_module_exprs( ExprList *exprs, FILE *file, char *filename )
 			expr->section	= CURRENTSECTION;
 			expr->asmpc		= asmpc;
 			expr->code_pos	= code_pos;
-			expr->filename	= strpool_add( source_filename->str );
+			expr->filename	= strpool_add( str_data(source_filename) );
 			expr->line_nr	= line_nr;
 			expr->listpos	= -1;
 
 			ExprList_push( & exprs, expr );
 		}
     }
+}
+
+static void read_cur_module_exprs(ExprList *exprs, FILE *file, char *filename)
+{
+	STR_DEFINE(expr_text, STR_SIZE);
+	STR_DEFINE(last_filename, STR_SIZE);
+	STR_DEFINE(source_filename, STR_SIZE);
+	STR_DEFINE(section_name, STR_SIZE);
+	STR_DEFINE(target_name, STR_SIZE);
+
+	read_cur_module_exprs_1(exprs, file, filename, 
+		expr_text, last_filename, source_filename, section_name, target_name);
+
+	STR_DELETE(expr_text);
+	STR_DELETE(last_filename);
+	STR_DELETE(source_filename);
+	STR_DELETE(section_name);
+	STR_DELETE(target_name);
+
 }
 
 /* read all the modules' expressions to the given list */
@@ -490,7 +507,7 @@ static void define_location_symbols( void )
 {
 	Section *section;
 	SectionHashElem *iter;
-	DEFINE_STR( name, MAXLINE );
+	STR_DEFINE( name, STR_SIZE );
 	int start_addr, end_addr;
 
 	/* global code size */
@@ -502,14 +519,14 @@ static void define_location_symbols( void )
         printf("Code size of linked modules is %d bytes ($%04X to $%04X)\n",
 		       (int)(get_sections_size()), (int)start_addr, (int)end_addr-1 );
 
-	Str_sprintf( name, ASMHEAD_KW, "", "" ); 
-	define_global_def_sym( name->str, start_addr );
+	str_sprintf( name, ASMHEAD_KW, "", "" ); 
+	define_global_def_sym( str_data(name), start_addr );
 	
-	Str_sprintf( name, ASMTAIL_KW, "", "" ); 
-	define_global_def_sym( name->str, end_addr );
+	str_sprintf( name, ASMTAIL_KW, "", "" ); 
+	define_global_def_sym( str_data(name), end_addr );
 	
-	Str_sprintf( name, ASMSIZE_KW, "", "" ); 
-	define_global_def_sym( name->str, end_addr - start_addr );
+	str_sprintf( name, ASMSIZE_KW, "", "" ); 
+	define_global_def_sym( str_data(name), end_addr - start_addr );
 
 	/* size of each named section - skip "" section */
 	for ( section = get_first_section( &iter ) ; section != NULL ; 
@@ -525,16 +542,18 @@ static void define_location_symbols( void )
 					   section->name, (int)(end_addr - start_addr), 
 					   (unsigned int)start_addr, (unsigned int)end_addr-1 );
 
-			Str_sprintf( name, ASMHEAD_KW, "_", section->name ); 
-			define_global_def_sym( name->str, start_addr );
+			str_sprintf( name, ASMHEAD_KW, "_", section->name ); 
+			define_global_def_sym( str_data(name), start_addr );
 
-			Str_sprintf( name, ASMTAIL_KW, "_", section->name ); 
-			define_global_def_sym( name->str, end_addr );
+			str_sprintf( name, ASMTAIL_KW, "_", section->name ); 
+			define_global_def_sym( str_data(name), end_addr );
 
-			Str_sprintf( name, ASMSIZE_KW, "_", section->name ); 
-			define_global_def_sym( name->str, end_addr - start_addr );
+			str_sprintf( name, ASMSIZE_KW, "_", section->name ); 
+			define_global_def_sym( str_data(name), end_addr - start_addr );
 		}
 	}
+
+	STR_DELETE(name);
 }
 
 /*-----------------------------------------------------------------------------
@@ -664,18 +683,14 @@ void link_modules( void )
 
 
 
-int
-LinkModule( char *filename, long fptr_base )
+static int LinkModule_1(char *filename, long fptr_base, Str *section_name)
 {
-	static Str *section_name;
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     int code_size;
     int origin = -1;
     int flag = 0;
 	FILE *file;
 	Section *section;
-
-	INIT_OBJ( Str, &section_name );
 
     /* open object file for reading */
     file = myfopen( filename, "rb" );           
@@ -704,7 +719,7 @@ LinkModule( char *filename, long fptr_base )
 
 				/* load bytes to section */
 				/* BUG_0015: was reading at current position in code area, swaping order of modules */
-				section = new_section(section_name->str);
+				section = new_section(str_data(section_name));
 				if (origin >= 0)
 					section->origin = origin;
 
@@ -737,14 +752,19 @@ LinkModule( char *filename, long fptr_base )
     return LinkTracedModule( filename, fptr_base );       /* Remember module for pass2 */
 }
 
+int LinkModule(char *filename, long fptr_base)
+{
+	STR_DEFINE(section_name, STR_SIZE);
+	int ret = LinkModule_1(filename, fptr_base, section_name);
+	STR_DELETE(section_name);
+	return ret;
+}
 
 
 
-int
-LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
+static int LinkLibModules_1(char *filename, long fptr_base, long nextname, long endnames, Str *name)
 {
     FILE *file;
-	DEFINE_STR( name, MAXLINE );
 
     do
     {
@@ -758,17 +778,23 @@ LinkLibModules( char *filename, long fptr_base, long nextname, long endnames )
         xfget_count_byte_Str( file, name );				/* read library reference name */
         myfclose( file );
 
-        nextname += 1 + name->len;	/* remember module pointer to next name in this object module */
+        nextname += 1 + str_len(name);	/* remember module pointer to next name in this object module */
 
-        if ( find_global_symbol( name->str ) == NULL )
-            SearchLibraries( name->str );       /* search name in libraries */
+        if ( find_global_symbol( str_data(name) ) == NULL )
+            SearchLibraries( str_data(name) );       /* search name in libraries */
     }
     while ( nextname < endnames );
 
     return 1;
 }
 
-
+int LinkLibModules(char *filename, long fptr_base, long nextname, long endnames)
+{
+	STR_DEFINE(name, STR_SIZE);
+	int ret = LinkLibModules_1(filename, fptr_base, nextname, endnames, name);
+	STR_DELETE(name);
+	return ret;
+}
 
 
 void
@@ -856,14 +882,11 @@ SearchLibfile( struct libfile *curlib, char *modname )
  *  \param modname - Module/symbol to search for
 
  */
-static char *
-CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
+static char *CheckIfModuleWanted_1(FILE *file, long currentlibmodule, char *modname,
+	Str *got_modname, Str *symbol_name, Str *section_name)
 {
     long fptr_mname, fptr_name;
     enum flag found = OFF;
-	DEFINE_STR( got_modname, MAXLINE );
-	DEFINE_STR( symbol_name, MAXLINE );
-	DEFINE_STR( section_name, MAXLINE );
 
     /* found module name? */
     fseek( file, currentlibmodule + 4 + 4 + 8, SEEK_SET );     
@@ -876,7 +899,7 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 													/* point at module name  */
 	xfget_count_byte_Str( file, got_modname );		/* read module name */
 
-    if ( strcmp( got_modname->str, modname ) == 0 )
+    if ( strcmp( str_data(got_modname), modname ) == 0 )
     {
         found = ON;
     }
@@ -902,7 +925,7 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
 				xfget_count_byte_Str( file, symbol_name );
 
                 if ( ( scope == 'G' ) && 
-					 strcmp( symbol_name->str, modname ) == 0 )
+					 strcmp( str_data(symbol_name), modname ) == 0 )
                 {
                     found = ON;
                 }
@@ -910,7 +933,22 @@ CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname )
         }
     }
 
-    return found ? strpool_add( got_modname->str ) : NULL;
+    return found ? strpool_add( str_data(got_modname) ) : NULL;
+}
+
+static char *CheckIfModuleWanted(FILE *file, long currentlibmodule, char *modname)
+{
+	STR_DEFINE(got_modname, STR_SIZE);
+	STR_DEFINE(symbol_name, STR_SIZE);
+	STR_DEFINE(section_name, STR_SIZE);
+
+	char *ret = CheckIfModuleWanted_1(file, currentlibmodule, modname, got_modname, symbol_name, section_name);
+
+	STR_DELETE(got_modname);
+	STR_DELETE(symbol_name);
+	STR_DELETE(section_name);
+
+	return ret;
 }
 
 int

@@ -2,7 +2,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Makefile,v 1.4 2015-02-13 00:31:59 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Makefile,v 1.5 2015-02-24 22:27:40 pauloscustodio Exp $
 
 TARGET	= libclibrary.a
 
@@ -65,22 +65,23 @@ depend:
 # DO NOT DELETE
 
 alloc.o: alloc.h dbg.h types.h init.h utlist.h
-array.o: array.h class.h alloc.h dbg.h types.h queue.h strutil.h
+array.o: array.h class.h alloc.h dbg.h types.h queue.h
 class.o: alloc.h dbg.h types.h class.h queue.h init.h strpool.h
 dbg.o: dbg.h
-fileutil.o: alloc.h dbg.h types.h fileutil.h list.h class.h queue.h strutil.h
-fileutil.o: utarray.h strpool.h uthash.h
+fileutil.o: alloc.h dbg.h types.h fileutil.h list.h class.h queue.h utarray.h
+fileutil.o: strpool.h uthash.h
 list.o: alloc.h dbg.h types.h list.h class.h queue.h
 minunit.o: minunit.h dbg.h
-srcfile.o: alloc.h dbg.h types.h srcfile.h class.h queue.h list.h strutil.h
-srcfile.o: utarray.h fileutil.h strpool.h
-strhash.o: alloc.h dbg.h types.h strhash.h class.h queue.h uthash.h strpool.h
-strhash.o: strutil.h
-strpool.o: alloc.h dbg.h types.h init.h queue.h strpool.h uthash.h
-strutil.o: alloc.h dbg.h types.h strpool.h strutil.h class.h queue.h
+srcfile.o: alloc.h dbg.h types.h srcfile.h class.h queue.h list.h utarray.h
+srcfile.o: fileutil.h strpool.h
+str.o: str.h alloc.h dbg.h types.h
+strpool.o: alloc.h dbg.h types.h init.h strpool.h uthash.h
 t/test_alloc.o: minunit.h dbg.h alloc.h types.h
 t/test_dbg.o: minunit.h dbg.h
 t/test_init.o: minunit.h dbg.h init.h types.h
+t/test_str.o: minunit.h dbg.h str.h alloc.h types.h
+t/test_strpool.o: minunit.h dbg.h strpool.h
+t/test_types.o: minunit.h dbg.h types.h
 t/uthash/test1.o: uthash.h dbg.h alloc.h types.h
 t/uthash/test10.o: uthash.h dbg.h alloc.h types.h
 t/uthash/test11.o: uthash.h dbg.h alloc.h types.h

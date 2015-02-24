@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.53 2015-02-13 00:32:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/scan.t,v 1.54 2015-02-24 22:27:45 pauloscustodio Exp $
 #
 # Test scan.rl
 
@@ -25,7 +25,7 @@ require 't/test_utils.pl';
 
 my $objs = "scan.o errors.o model.o module.o codearea.o listfile.o ".
 		   "options.o hist.o sym.o symtab.o symref.o expr.o ".
-		   "lib/strutil.o lib/strhash.o lib/fileutil.o ".
+		   "lib/str.o lib/strhash.o lib/fileutil.o ".
 		   "lib/srcfile.o lib/class.o ".
 		   "lib/list.o lib/array.o lib/dbg.o";
 		   
@@ -150,11 +150,11 @@ char *GetLibfile( char *filename ) {return NULL;}
 
 #define T_OPCODE(opcode, _cpu)	\
 		strcpy(opcode_lcase, #opcode); \
-		strtolower(opcode_lcase); \
+		stolower(opcode_lcase); \
 		strcpy(string, #opcode " " #opcode); \
-		strtolower(string); \
+		stolower(string); \
 		T_OPCODE2(opcode, opcode_lcase, _cpu); \
-		strtoupper(string); \
+		stoupper(string); \
 		T_OPCODE2(opcode, #opcode, _cpu);
 
 END

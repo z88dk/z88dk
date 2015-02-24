@@ -13,36 +13,23 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.197 2015-02-13 00:05:17 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80asm.c,v 1.198 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
-#include "alloc.h"
-#include "directives.h"
-#include "codearea.h"
 #include "deffile.h"
 #include "directives.h"
-#include "errors.h"
-#include "expr.h"
 #include "fileutil.h"
-#include "hist.h"
 #include "libfile.h"
 #include "listfile.h"
 #include "mapfile.h"
 #include "modlink.h"
+#include "module.h"
 #include "objfile.h"
-#include "options.h"
 #include "parse.h"
-#include "scan.h"
+#include "types.h"
 #include "strpool.h"
-#include "strutil.h"
 #include "symbol.h"
-#include "z80asm.h"
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
-#include <time.h>
 
 /* external functions */
 void Z80pass2( void );

@@ -4,14 +4,15 @@ Uses strutil.h for implementation.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.17 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.18 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
 #pragma once
 
+#include "alloc.h"
 #include "class.h"
 #include "types.h"
-#include "strutil.h"
+#include "str.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -24,7 +25,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.17 2015-02-22 
 *	size_t TArray_size()		// return number of elements
 *	TArray_set_size(n)			// set number of elements, call free_data on dropped ones
 *	TArray_remove_all()			// free each element and colapse array
-*	TArray_unreserve()			// free all unused space of array
 *	T *TArray_push()			// add empty element to top, return address
 *	T *TArray_top()				// return pointer to top item, NULL if empty
 *	TArray_pop()				// drop top element
@@ -42,7 +42,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.17 2015-02-22 
 	extern void		T##Array_set_size(T##Array *self, size_t n);			\
 	extern T 	   *T##Array_item(T##Array *self, size_t n);				\
 	extern void		T##Array_remove_all(T##Array *self);					\
-	extern void		T##Array_unreserve(T##Array *self);						\
 	extern T	   *T##Array_push(T##Array *self);							\
 	extern T	   *T##Array_top(T##Array *self);							\
 	extern void		T##Array_pop(T##Array *self);							\
@@ -51,7 +50,7 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/array.h,v 1.17 2015-02-22 
 /* default types */
 ARRAY( Byte );
 ARRAY( int );
-ARRAY( long );
+ARRAY(long);
 
 /* define */
 #define DEF_ARRAY( T )														\
@@ -59,24 +58,24 @@ ARRAY( long );
 																			\
 	void T##Array_init (T##Array *self)										\
 	{ 																		\
-		self->items = OBJ_NEW( Str );										\
-		OBJ_AUTODELETE( self->items ) = FALSE;								\
+		self->items = str_new(STR_SIZE);									\
 	}																		\
 																			\
 	void T##Array_copy (T##Array *self, T##Array *other) 					\
 	{ 																		\
-		self->items = Str_clone( other->items );							\
+		self->items = str_new(str_size(other->items));						\
+		str_set_bytes(self->items, str_data(other->items), str_len(other->items)); \
 	}																		\
 																			\
 	void T##Array_fini (T##Array *self) 									\
 	{ 																		\
 		T##Array_remove_all(self);											\
-		OBJ_DELETE(self->items);											\
+		str_delete(self->items);											\
 	}																		\
 																			\
 	size_t T##Array_size(T##Array *self)									\
 	{																		\
-		return self->items->len / sizeof(T);								\
+		return str_len(self->items) / sizeof(T);								\
 	}																		\
 																			\
 	void T##Array_set_size(T##Array *self, size_t n)						\
@@ -95,8 +94,8 @@ ARRAY( long );
 		if ( n > 0 )														\
 			T##Array_item(self, n-1);										\
 		else 																\
-			Str_clear(self->items);											\
-		self->items->len = n * sizeof(T);									\
+			str_clear(self->items);											\
+		str_len(self->items) = n * sizeof(T);									\
 	}																		\
 																			\
 	T *T##Array_item(T##Array *self, size_t n)								\
@@ -110,23 +109,18 @@ ARRAY( long );
 		if ( new_size > old_size )											\
 		{																	\
 			new_bytes = (new_size - old_size) * sizeof(T);					\
-			Str_reserve(self->items, new_bytes );							\
-			self->items->len += new_bytes;									\
-			memset( (T *)self->items->str + old_size, 0, new_bytes );		\
+			str_reserve(self->items, new_bytes );							\
+			str_len(self->items) += new_bytes;									\
+			memset( (T *)str_data(self->items) + old_size, 0, new_bytes );		\
 		}																	\
 																			\
 		/* return address of n-item */										\
-		return (T *)self->items->str + n;									\
+		return (T *)str_data(self->items) + n;									\
 	}																		\
 																			\
 	void T##Array_remove_all(T##Array *self)								\
 	{																		\
 		T##Array_set_size(self, 0);											\
-	}																		\
-																			\
-	void T##Array_unreserve(T##Array *self)									\
-	{																		\
-		Str_unreserve(self->items);											\
 	}																		\
 																			\
 	T *T##Array_push(T##Array *self)										\

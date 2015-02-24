@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.146 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.147 2015-02-24 22:27:38 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,13 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.146 2015-02-22 02:4
 
 /*
 * $Log: hist.c,v $
-* Revision 1.146  2015-02-22 02:44:33  pauloscustodio
+* Revision 1.147  2015-02-24 22:27:38  pauloscustodio
+* Use new str.c library that alows the creation of expandable string buffers
+* as automatic variables in the stack - if the string grows beyond the
+* initial buffer size, a new buffer is allocated in the heap and
+* automatically freed atexit.
+*
+* Revision 1.146  2015/02/22 02:44:33  pauloscustodio
 * Assume an at least 32-bit machine and use always int for integer types
 *
 * Revision 1.145  2015/02/13 00:30:31  pauloscustodio
@@ -2258,6 +2264,11 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 
 	- Assume an at least 32-bit machine and use always int for integer types.
 
+	- Use new str.c library that alows the creation of expandable string buffers
+	  as automatic variables in the stack - if the string grows beyond the
+	  initial buffer size, a new buffer is allocated in the heap and 
+	  automatically freed atexit.
+	  
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
@@ -2292,7 +2303,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1i"
+#define VERSION     "2.7.1j"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

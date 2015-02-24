@@ -3,16 +3,14 @@ Utilities working files.
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.24 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.25 2015-02-24 22:27:40 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "list.h"
-#include "strutil.h"
 #include "types.h"
+#include "str.h"
 #include "utarray.h"
-
 #include <stdio.h>
 
 /* File name extension separator */
@@ -21,11 +19,6 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/fileutil.h,v 1.24 2015-02-
 #else
 #define FILEEXT_SEPARATOR "."
 #endif
-
-/*-----------------------------------------------------------------------------
-*   Define a Str to hold a filename
-*----------------------------------------------------------------------------*/
-#define DEFINE_FILE_STR( name )		DEFINE_STR( name, FILENAME_MAX )
 
 /*-----------------------------------------------------------------------------
 *   File input/output

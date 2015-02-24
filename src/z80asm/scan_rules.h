@@ -3,9 +3,10 @@ static const int lexer_error = 0;
 static const int lexer_en_main = 21;
 static void set_scan_buf( char *text, Bool _at_bol )
 {
- Str_set( input_buf, text );
+ str_set( input_buf, text );
+ p = str_data(input_buf);
  at_bol = _at_bol;
- pe = input_buf->str + input_buf->len;
+ pe = str_data(input_buf) + str_len(input_buf);
  eof = pe;
 	{
 	cs = lexer_start;

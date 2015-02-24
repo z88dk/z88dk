@@ -14,14 +14,14 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Handle assembly listing and symbol table listing.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.24 2015-02-22 02:44:33 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/listfile.h,v 1.25 2015-02-24 22:27:38 pauloscustodio Exp $
 
 */
 
 #pragma once
 
 #include "class.h"
-#include "strutil.h"
+#include "str.h"
 #include "symref.h"
 #include "types.h"
 

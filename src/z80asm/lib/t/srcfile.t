@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.11 2015-02-13 00:32:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/srcfile.t,v 1.12 2015-02-24 22:27:45 pauloscustodio Exp $
 #
 # Test srcfile
 
@@ -25,7 +25,7 @@ use Capture::Tiny 'capture';
 use Test::Differences; 
 
 my $compile = "cc -Wall -Ilib -otest test.c srcfile.c ".
-			  "class.c alloc.c strpool.c strutil.c fileutil.c list.c dbg.c";
+			  "class.c alloc.c strpool.c str.c fileutil.c list.c dbg.c";
 
 #------------------------------------------------------------------------------
 # create directories and files
@@ -51,7 +51,7 @@ write_file("test.c", <<'END');
 			assert( file->line_nr == _line_nr ); \
 			assert( SrcFile_line_nr(file) == _line_nr ); \
 			assert( strcmp( str, _expected ) == 0 ); \
-			assert( strcmp( file->line->str, _expected ) == 0 );
+			assert( strcmp( str_data(file->line), _expected ) == 0 );
 			
 #define T_GETLINE_END()	\
 			assert( SrcFile_getline( file ) == NULL ); \
