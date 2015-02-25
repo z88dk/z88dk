@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.90 2015-02-22 06:15:58 aralbrec Exp $
+ *      $Id: zcc.c,v 1.91 2015-02-25 23:04:21 pauloscustodio Exp $
  */
 
 
@@ -1200,9 +1200,6 @@ static void configure_assembler()
         type = ASM_Z80ASM;
         linker = c_z80asm_exe;
         assembler = c_z80asm_exe;
-        if ( makelib ) {
-            parse_cmdline_arg("-Ca-forcexlib");
-        }
     } else if (strcasecmp(name, "mpm") == 0) {
         type = ASM_Z80ASM;
         linker = c_mpm_exe;

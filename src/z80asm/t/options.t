@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.57 2015-01-26 23:46:35 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.58 2015-02-25 23:08:24 pauloscustodio Exp $
 #
 # Test options
 
@@ -103,7 +103,6 @@ Code Generation Options:
   --sdcc                 Assemble for Small Device C Compiler
   -plus, --ti83plus      Interpret 'Invoke' as RST 28h
   -IXIY, --swap-ix-iy    Swap IX and IY registers
-  --forcexlib            Force PUBLIC call on MODULE directive
   -C, --line-mode        Enable LINE directive
 
 Environment:
@@ -716,7 +715,6 @@ t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "--swap-ix-iy");
 #------------------------------------------------------------------------------
 
 # -C, --line-mode : tested in directives.t
-# -forcexlib, --forcexlib : tested in directives.t
 
 #------------------------------------------------------------------------------
 # -t (deprecated)

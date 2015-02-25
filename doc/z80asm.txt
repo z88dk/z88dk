@@ -518,11 +518,6 @@ Enable hacks to be able to use the assembler as the back-end for the Small Devic
 C Compiler (SDCC).
 
 
-1.3.27. -forcexlib : Force XLIB call on MODULE directive
-
-Changes the MODULE directive to do the same as the XLIB directive.
-
-
 
 2. An overview of assembler features and related files
 ======================================================
@@ -2228,8 +2223,6 @@ Index
       1.3.25. -C : Enable LINE directive
 
       1.3.26. -sdcc : Force SDCC hacks
-
-      1.3.27. -forcexlib : Force XLIB call on MODULE directive
 
   2. An overview of assembler features and related files
 

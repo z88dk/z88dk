@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Assembly directives.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.19 2015-02-24 22:27:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/directives.c,v 1.20 2015-02-25 23:08:23 pauloscustodio Exp $
 */
 
 #include "codearea.h"
@@ -185,12 +185,7 @@ void asm_MODULE(char *name)
 	if (CURRENTMODULE->modname)
 		error_module_redefined();
 	else
-	{
 		CURRENTMODULE->modname = strpool_add(name);
-
-		if (opts.force_xlib)
-			declare_public_symbol(name);
-	}
 }
 
 void asm_MODULE_default(void)

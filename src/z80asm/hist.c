@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.147 2015-02-24 22:27:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.148 2015-02-25 23:08:23 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,11 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.147 2015-02-24 22:2
 
 /*
 * $Log: hist.c,v $
-* Revision 1.147  2015-02-24 22:27:38  pauloscustodio
+* Revision 1.148  2015-02-25 23:08:23  pauloscustodio
+* Removed option -forcexlib to z80asm - no longer necessary, as the module name is no
+* longer used as the symbol to force the link of a library module.
+*
+* Revision 1.147  2015/02/24 22:27:38  pauloscustodio
 * Use new str.c library that alows the creation of expandable string buffers
 * as automatic variables in the stack - if the string grows beyond the
 * initial buffer size, a new buffer is allocated in the heap and
@@ -1177,7 +1181,7 @@ Based on 1.0.31
     Created HTML version of doc/z80asm.txt as doc/z80asm.html:
       - added table of contents to help looking up information
       - added documentation for options:
-             -RCMX000, -plus, -IXIY, -C, -h, -I, -L, -sdcc, -forcexlib
+             -RCMX000, -plus, -IXIY, -C, -h, -I, -L, -sdcc
       - added documentation for commands: INVOKE, LINE
       - added notes on deprecated error messages
     Started to build test suite in t/ *.t unsing Perl prove. Included test
@@ -2268,7 +2272,10 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 	  as automatic variables in the stack - if the string grows beyond the
 	  initial buffer size, a new buffer is allocated in the heap and 
 	  automatically freed atexit.
-	  
+	
+	- Removed option -forcexlib - no longer necessary, as the module name is no 
+	  longer used as the symbol to force the link of a library module.
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
@@ -2303,7 +2310,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1j"
+#define VERSION     "2.7.1k"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

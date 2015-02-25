@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.17 2015-02-13 00:32:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.18 2015-02-25 23:08:24 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -400,49 +400,6 @@ END
 #------------------------------------------------------------------------------
 # MODULE
 #------------------------------------------------------------------------------
-
-# -forcexlib, --forcexlib
-
-# OK
-unlink "test1.lib";
-z80asm(
-	asm		=> "public main \n main: ret",
-	options	=> "-xtest1.lib",
-	ok		=> 1,
-);
-ok -f "test1.lib";
-z80asm(
-	asm		=> "extern main \n call main ;; CD 03 00 C9",
-	options	=> "-b -itest1.lib",
-);
-
-# no PUBLIC, error
-unlink "test1.lib";
-z80asm(
-	asm		=> "module main \n main: ret",
-	options	=> "-xtest1.lib",
-	ok		=> 1,
-);
-ok -f "test1.lib";
-z80asm(
-	asm		=> "extern main \n call main ;; error: symbol not defined",
-	options	=> "-b -itest1.lib",
-);
-
-# -forcexlib - OK
-for my $options ('-forcexlib', '--forcexlib') {
-	unlink "test1.lib";
-	z80asm(
-		asm		=> "module main \n main: ret",
-		options	=> "-xtest1.lib $options",
-		ok		=> 1,
-	);
-	ok -f "test1.lib";
-	z80asm(
-		asm		=> "extern main \n call main ;; CD 03 00 C9",
-		options	=> "-b -itest1.lib",
-	);
-}
 
 # error_module_redefined
 z80asm(
