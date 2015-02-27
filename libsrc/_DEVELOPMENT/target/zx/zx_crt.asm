@@ -32,7 +32,7 @@ IF startup = 0
    ;
    ; stdin  = zx_01_input_kbd_inkey
    ; stdout = zx_01_output_char_32 full screen
-   ; stderr = dup(stdin)
+   ; stderr = dup(stdout)
 
    INCLUDE "startup/zx_crt_0.asm"
 
