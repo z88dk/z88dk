@@ -1,6 +1,6 @@
 
 CFLAGS  = -Wall -fomit-frame-pointer -O2 -DALLEGRO_STATICLINK -static
-LFLAGS  = -s
+LFLAGS  = -s -mwindows
 
 CC	= gcc 	# C compiler used
 LD	= gcc	# Linker used
