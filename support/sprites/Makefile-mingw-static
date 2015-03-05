@@ -1,0 +1,15 @@
+
+CFLAGS  = -Wall -fomit-frame-pointer -O2 -DALLEGRO_STATICLINK -static
+LFLAGS  = -s
+
+CC	= gcc 	# C compiler used
+LD	= gcc	# Linker used
+
+
+OBJECTS = sprite.o
+
+all:    sprite
+
+sprite:	$(OBJECTS)
+	$(LD) $(LFLAGS) -o sprite $(OBJECTS) -lz -lallegro -lallegro_primitives -lallegro_image -lallegro_font -lallegro_dialog -lwinmm -lshlwapi -lpsapi -lopengl32 -lgdi32 -lsupc++ -lole32 -lgdiplus -luuid -lcomdlg32
+

@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.7 2015-02-19 12:37:51 stefano Exp $
+	$Id: sprite.c,v 1.8 2015-03-05 06:53:18 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -45,6 +45,12 @@ ALLEGRO_MOUSE_STATE moustate;
 ALLEGRO_EVENT e;
 ALLEGRO_EVENT_QUEUE *eventQueue;
 ALLEGRO_PATH *path;
+
+ALLEGRO_FILECHOOSER *file_dialog_bmp = NULL;
+ALLEGRO_FILECHOOSER *file_dialog_sv = NULL;
+ALLEGRO_FILECHOOSER *file_dialog_svsp = NULL;
+ALLEGRO_FILECHOOSER *file_dialog_ldsp = NULL;
+ALLEGRO_FILECHOOSER *file_dialog_ldsev = NULL;
 
 const char sprPatterns[] = "*.sgz";
 const char sprHeader[] =  "*.*;*.h";
@@ -365,9 +371,17 @@ void chop_sprite( int src )
 }
 
 
+void wkey_release(int keycode)
+{
+	al_flush_event_queue(eventQueue);
+	while ( !al_key_down(&pressed_keys, keycode )) {al_get_keyboard_state(&pressed_keys);}
+	al_flush_event_queue(eventQueue);
+}
+
+
 void import_from_bitmap( const char *file )
 {
-	ALLEGRO_BITMAP *temp=NULL;
+	ALLEGRO_BITMAP *temp = NULL;
 	int x, y;
 	unsigned char r = 0;
 	unsigned char g = 0;
@@ -398,24 +412,25 @@ void import_from_bitmap( const char *file )
 
 void do_import_bitmap()
 {
-	const char *file;
-	ALLEGRO_FILECHOOSER *file_dialog = NULL;
+	const char *file = NULL;
 
-	file_dialog = al_create_native_file_dialog("./", "Load bitmap", bmpPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
-	al_show_native_file_dialog(NULL, file_dialog);
-	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	path=NULL;
+	file_dialog_bmp = al_create_native_file_dialog("./", "Load bitmap", bmpPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_bmp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_bmp, 0));
 	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
-	al_destroy_native_file_dialog(file_dialog);
+	al_destroy_native_file_dialog(file_dialog_bmp);
 
 	import_from_bitmap( file );
-	al_flush_event_queue(eventQueue);
-
+	al_destroy_path(path);
+	
+	wkey_release(ALLEGRO_KEY_L);
 }
 
 //Saves a header file with sprites 0-on_sprite for use with z88dk
 void save_code_file( const char *file )
 {
-	ALLEGRO_FILE *f;
+	ALLEGRO_FILE *f = NULL;
 	int i;
 
 	f = al_fopen( file, "w" );
@@ -439,7 +454,7 @@ void save_code_file( const char *file )
 
 void save_sprite_file( const char *file )
 {
-	gzFile *f;
+	gzFile *f = NULL;
 	int x,y,i;
 
 	//f = al_fopen( file, "wb" );
@@ -463,7 +478,7 @@ void save_sprite_file( const char *file )
 
 void load_sprite_file( const char *file )
 {
-	gzFile *f;
+	gzFile *f = NULL;
 	int x,y,i;
 
 	f = gzopen( file, "rb" );
@@ -489,7 +504,7 @@ void load_sprite_file( const char *file )
 
 void load_sevenup_file( const char *file )
 {
-	FILE *f;
+	FILE *f = NULL;
 	int x,y,i,j,c;
 
 	f = fopen( file, "rb" );
@@ -539,72 +554,77 @@ void load_sevenup_file( const char *file )
 //The file selector for saving code files
 void do_save_code()
 {
-	const char *file;
-	ALLEGRO_FILECHOOSER *file_dialog = NULL;
+	const char *file = NULL;
 
-	file_dialog = al_create_native_file_dialog("./", "Generate C header for sprites", sprHeader, ALLEGRO_FILECHOOSER_SAVE);
-	al_show_native_file_dialog(NULL, file_dialog);
-	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	path=NULL;
+	file_dialog_sv = al_create_native_file_dialog("./", "Generate C header for sprites", sprHeader, ALLEGRO_FILECHOOSER_SAVE);
+	al_show_native_file_dialog(display, file_dialog_sv);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_sv, 0));
 	al_set_path_extension(path, ".h");
+	al_destroy_native_file_dialog(file_dialog_sv);
 	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
-	al_destroy_native_file_dialog(file_dialog);
 
 	save_code_file( file );
-	al_flush_event_queue(eventQueue);
+	al_destroy_path(path);
 
+	wkey_release(ALLEGRO_KEY_F5);
 }
 
 //The file selector for saving sprite files
 void do_save_sprites()
 {
-	const char *file;
-	ALLEGRO_FILECHOOSER *file_dialog = NULL;
+	const char *file = NULL;
 
-	file_dialog = al_create_native_file_dialog("./", "Save all editor memory", sprPatterns, ALLEGRO_FILECHOOSER_SAVE);
-	al_show_native_file_dialog(NULL, file_dialog);
-	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	path=NULL;
+	file_dialog_svsp = al_create_native_file_dialog("./", "Save all editor memory", sprPatterns, ALLEGRO_FILECHOOSER_SAVE);
+	al_show_native_file_dialog(display, file_dialog_svsp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_svsp, 0));
 	al_set_path_extension(path, ".sgz");
+	al_destroy_native_file_dialog(file_dialog_svsp);
 	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
-	al_destroy_native_file_dialog(file_dialog);
 
 	save_sprite_file( file );
+	al_destroy_path(path);
 
+	wkey_release(ALLEGRO_KEY_F2);
 }
 
 //The file selector for loading sprite files
 void do_load_sprites()
 {
-	const char *file;
-	ALLEGRO_FILECHOOSER *file_dialog = NULL;
+	const char *file = NULL;
 
-	file_dialog = al_create_native_file_dialog("./", "Load sprites", sprPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
-	al_show_native_file_dialog(NULL, file_dialog);
-	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	path=NULL;
+	file_dialog_ldsp = al_create_native_file_dialog("./", "Load sprites", sprPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_ldsp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_ldsp, 0));
 	al_set_path_extension(path, ".sgz");
+	al_destroy_native_file_dialog(file_dialog_ldsp);
 	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
-	al_destroy_native_file_dialog(file_dialog);
 
 	load_sprite_file( file );
-	al_flush_event_queue(eventQueue);
+	al_destroy_path(path);
 
+	wkey_release(ALLEGRO_KEY_F3);
 }
 
 //The file selector for loading SevenuP files
 void do_load_sevenup()
 {
-	const char *file;
-	ALLEGRO_FILECHOOSER *file_dialog = NULL;
+	const char *file = NULL;
 
-	file_dialog = al_create_native_file_dialog("./", "Load SevenuP sprite", "*.sev", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
-	al_show_native_file_dialog(NULL, file_dialog);
-	path = al_create_path(al_get_native_file_dialog_path(file_dialog, 0));
+	path=NULL;
+	file_dialog_ldsev = al_create_native_file_dialog("./", "Load SevenuP sprite", "*.sev", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_ldsev);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_ldsev, 0));
 	al_set_path_extension(path, ".sev");
+	al_destroy_native_file_dialog(file_dialog_ldsev);
 	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
-	al_destroy_native_file_dialog(file_dialog);
 
 	load_sevenup_file( file );
-	al_flush_event_queue(eventQueue);
+	al_destroy_path(path);
 
+	wkey_release(ALLEGRO_KEY_F4);
 }
 
 
@@ -800,100 +820,93 @@ void do_gui_buttons()
 
 }
 
-void wkey_release(int keycode)
-{
-	while ( !al_key_down(&pressed_keys, keycode )) {al_get_keyboard_state(&pressed_keys);}
-}
-
-void do_keyboard_input()
+void do_keyboard_input(int keycode)
 {
 	//Keyboard Input
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F1 )) {
+	if ( keycode == ALLEGRO_KEY_F1 ) {
 		do_help_page();
 		update_screen();
 	}
 
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_L ))
-		do_import_bitmap();
-
-	if ( al_key_down(&pressed_keys,ALLEGRO_KEY_I ) ) {
+	if ( keycode == ALLEGRO_KEY_I ) {
 		invert_sprite();
 	}
 
-	if ( al_key_down(&pressed_keys,ALLEGRO_KEY_H ) ) {
+	if ( keycode == ALLEGRO_KEY_H ) {
 		flip_sprite_h();
 	}
 
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_V ) ) {
+	if ( keycode ==  ALLEGRO_KEY_V ) {
 		flip_sprite_v();
 	}
 
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_D ) ) {
+	if ( keycode ==  ALLEGRO_KEY_D ) {
 		flip_sprite_d();
 	}
 
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && al_key_down(&pressed_keys, ALLEGRO_KEY_LEFT ) ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && (keycode ==  ALLEGRO_KEY_LEFT ) ) {
 		scroll_sprite_left();
 	}
 
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) && al_key_down(&pressed_keys, ALLEGRO_KEY_RIGHT ) ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) && (keycode ==  ALLEGRO_KEY_RIGHT ) ) {
 		scroll_sprite_right();
 	}
 
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) && al_key_down(&pressed_keys, ALLEGRO_KEY_UP ) ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) && (keycode ==  ALLEGRO_KEY_UP ) ) {
 		scroll_sprite_up();
 	}
 
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) && al_key_down(&pressed_keys, ALLEGRO_KEY_DOWN ) ) {
+	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) && (keycode ==  ALLEGRO_KEY_DOWN ) ) {
 		scroll_sprite_down();
 	}
 
-	if ( !al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && al_key_down(&pressed_keys, ALLEGRO_KEY_UP ) && (bls < 64 ) )
+	if ( !al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && (keycode ==  ALLEGRO_KEY_UP ) && (bls < 64 ) )
 	{
 		bls++;
 		update_screen();
 	}
 
-	if ( !al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && al_key_down(&pressed_keys, ALLEGRO_KEY_DOWN ) && (bls > 1) )
+	if ( !al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && (keycode ==  ALLEGRO_KEY_DOWN ) && (bls > 1) )
 	{
 		bls--;
 		update_screen();
 	}
 
 	//Copy/Paste
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_C ) )
+	if ( keycode ==  ALLEGRO_KEY_C )
 		copied = on_sprite;
 	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) ) {
-	    if ( al_key_down(&pressed_keys, ALLEGRO_KEY_P ) )
+	    if ( keycode ==  ALLEGRO_KEY_P )
 	        if (copied < on_sprite) {
 	        	chop_sprite( copied );
 	        }
 	}
 	else {
-	    if ( al_key_down(&pressed_keys, ALLEGRO_KEY_P ) )
+	    if ( keycode ==  ALLEGRO_KEY_P )
 	        if (copied != on_sprite) copy_sprite( copied, on_sprite );
 	}
 	//Paste copied sprite's mask
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_M ) )
+	if ( keycode ==  ALLEGRO_KEY_M )
 		if (copied != on_sprite) copy_sprite_mask( copied, on_sprite );
 
-
-	// Save / Load / Generate Code
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F2 ) )
-		do_save_sprites();
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F3 ) )
-		do_load_sprites();
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F4 ) )
-		do_load_sevenup();
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F5 ) )
-		do_save_code();
-
-
-	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_F ) )
+	if ( keycode ==  ALLEGRO_KEY_F )
 	{
 		fit_sprite_on_screen();
 		update_screen();
 	}
+
+	// Save / Load / Generate Code
+	if ( keycode ==  ALLEGRO_KEY_F2 )
+		do_save_sprites();
+	else if ( keycode ==  ALLEGRO_KEY_F3 )
+		do_load_sprites();
+	else if ( keycode ==  ALLEGRO_KEY_F4 )
+		do_load_sevenup();
+	else if ( keycode ==  ALLEGRO_KEY_F5 )
+		do_save_code();
+	else if ( keycode ==  ALLEGRO_KEY_L )
+		do_import_bitmap();
+
 }
 
 void do_sprite_drawing()
@@ -987,8 +1000,8 @@ int main()
 			do_sprite_drawing();
 		}
 
-		if (e.type == ALLEGRO_EVENT_KEY_CHAR)
-			do_keyboard_input();
+		if (e.type == ALLEGRO_EVENT_KEY_DOWN)
+			do_keyboard_input(e.keyboard.keycode);
 		}
 		al_flush_event_queue(eventQueue);
 		//al_wait_for_event(eventQueue, &e);
