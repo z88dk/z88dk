@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.8 2015-03-05 06:53:18 stefano Exp $
+	$Id: sprite.c,v 1.9 2015-03-06 18:23:51 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -502,6 +502,32 @@ void load_sprite_file( const char *file )
 }
 
 
+void merge_sprite_file( const char *file )
+{
+	gzFile *f = NULL;
+	int x,y,i;
+
+	f = gzopen( file, "rb" );
+	if (!f) {
+		return;
+	}
+
+	for ( i = on_sprite; i <= MAX_SPRITE; i++ )
+	{
+		sprite[ i ].size_x = gzgetc (f);
+		sprite[ i ].size_y = gzgetc (f);
+		for ( x = 0; x < MAX_SIZE_X; x++ )
+			for ( y = 0; y < MAX_SIZE_Y; y++ ) {
+				sprite[ i ].p[ x ][ y ] = gzgetc (f);
+			}
+	}
+
+	gzclose( f );
+
+	update_screen();
+}
+
+
 void load_sevenup_file( const char *file )
 {
 	FILE *f = NULL;
@@ -606,6 +632,25 @@ void do_load_sprites()
 	al_destroy_path(path);
 
 	wkey_release(ALLEGRO_KEY_F3);
+}
+
+//The file selector for mergining sprite files
+void do_merge_sprites()
+{
+	const char *file = NULL;
+
+	path=NULL;
+	file_dialog_ldsp = al_create_native_file_dialog("./", "Merge sprites", sprPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_ldsp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_ldsp, 0));
+	al_set_path_extension(path, ".sgz");
+	al_destroy_native_file_dialog(file_dialog_ldsp);
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+
+	merge_sprite_file( file );
+	al_destroy_path(path);
+
+	wkey_release(ALLEGRO_KEY_F6);
 }
 
 //The file selector for loading SevenuP files
@@ -752,10 +797,10 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 270, ALLEGRO_ALIGN_LEFT, "M......................Compute mask for copied sprite and paste to current sprite");
 	al_draw_text(font, al_map_rgb(20,5,10), 8, 300, ALLEGRO_ALIGN_LEFT, "Saving / Loading");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 320, ALLEGRO_ALIGN_LEFT, "F2.....................Saves all sprites (editor specific format)");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 350, ALLEGRO_ALIGN_LEFT, "F3.....................Load sprites (editor specific format)");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 370, ALLEGRO_ALIGN_LEFT, "F4.....................Load SevenuP sprite at current position");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 390, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header file defining");
-	al_draw_text(font, al_map_rgb(0,5,10), 190, 410, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 340, ALLEGRO_ALIGN_LEFT, "F3/F6..................Load/Merge sprites (editor format), merge over current pos.");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 360, ALLEGRO_ALIGN_LEFT, "F4.....................Load SevenuP sprite at current position");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 380, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header file defining");
+	al_draw_text(font, al_map_rgb(0,5,10), 190, 400, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
 
 	al_flip_display();
 
@@ -904,6 +949,8 @@ void do_keyboard_input(int keycode)
 		do_load_sevenup();
 	else if ( keycode ==  ALLEGRO_KEY_F5 )
 		do_save_code();
+	else if ( keycode ==  ALLEGRO_KEY_F6 )
+		do_merge_sprites();
 	else if ( keycode ==  ALLEGRO_KEY_L )
 		do_import_bitmap();
 

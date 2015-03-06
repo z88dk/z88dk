@@ -1,10 +1,8 @@
 /*
-	$Id: csp2sgz.c,v 1.2 2015-02-18 21:41:20 stefano Exp $
+	$Id: csp2sgz.c,v 1.3 2015-03-06 18:23:51 stefano Exp $
 	
 	Support tool for the sprite editor by Daniel McKinnon
 	Convert the old ".csp" files to the new ".sgz" format
-	
-	Requires zlib and Allegro 4
 
 */
 
@@ -13,39 +11,55 @@
 //#include <allegro/allegro.h>
 
 #include <stdio.h>
+#include <fcntl.h>
 #include <string.h>
 #include <zlib.h>
-
-
-#define MAX_SIZE_X		255
-#define MAX_SIZE_Y		255
-
-#define MAX_SPRITE		150
-
 
 
 typedef struct spritetype
 {
 	int size_x, size_y;
-	int p[ MAX_SIZE_X ][ MAX_SIZE_Y ];
+	int p[ 255 ][ 255 ];
 } spritetype;
+
+typedef struct spritetype_old
+{
+	int size_x, size_y;
+	int p[ 97 ][ 65 ];
+} spritetype_old;
+
+
 
 int on_sprite;
 int copied;			//Sprite selected as source for copying
 int num_sprites;
-spritetype sprite[ MAX_SPRITE + 1 ];
+spritetype sprite_new[ 150 + 1 ];
+spritetype_old sprite_old[ 25 + 1 ];
 
 
 
 
-void load_sprite_file( char *file )
+void load_sprite_file_new( char *file )
 {
 	PACKFILE *f;
 
 	if ( exists( file ) )
 	{
 		f = pack_fopen( file, "pr+b" );
-		pack_fread( &sprite, sizeof( sprite ), f );
+		pack_fread( &sprite_new, sizeof( sprite_new ), f );
+		pack_fclose( f );
+	}
+
+}
+
+void load_sprite_file_old( char *file )
+{
+	PACKFILE *f;
+
+	if ( exists( file ) )
+	{
+		f = pack_fopen( file, "pr+b" );
+		pack_fread( &sprite_old, sizeof( sprite_old ), f );
 		pack_fclose( f );
 	}
 
@@ -53,8 +67,7 @@ void load_sprite_file( char *file )
 
 
 
-
-void save_sprite_file( const char *file )
+void save_sprite_file_old( const char *file )
 {
 	gzFile *f;
 	int x,y,i;
@@ -66,18 +79,50 @@ void save_sprite_file( const char *file )
 		return;
 	}
 
-	for ( i = 0; i <= MAX_SPRITE; i++ )
+	for ( i = 0; i <= 150; i++ )
 	{
-		gzputc (f, sprite[ i ].size_x);
-		gzputc (f, sprite[ i ].size_y);
-		for ( x = 0; x < MAX_SIZE_X; x++ )
-			for ( y = 0; y < MAX_SIZE_Y; y++ ) {
-				gzputc (f, sprite[ i ].p[ x ][ y ]);
+		if (i <= 25) {
+			gzputc (f, sprite_old[ i ].size_x);
+			gzputc (f, sprite_old[ i ].size_y);
+		} else {
+			gzputc (f, 16);
+			gzputc (f, 16);
+		}
+		for ( x = 0; x < 255; x++ )
+			for ( y = 0; y < 255; y++ ) {
+				if ((x < 97)&&(y < 65)&&(i <= 25)) {
+					gzputc (f, sprite_old[ i ].p[ x ][ y ]);
+				} else {
+					gzputc (f, 0);
+				}
 			}
 	}
 	gzclose( f );
 }
 
+void save_sprite_file_new( const char *file )
+{
+	gzFile *f;
+	int x,y,i;
+
+	//f = al_fopen( file, "wb" );
+	f = gzopen( file, "wb" );
+	if (!f) {
+		//al_fclose( f );
+		return;
+	}
+
+	for ( i = 0; i <= 150; i++ )
+	{
+		gzputc (f, sprite_new[ i ].size_x);
+		gzputc (f, sprite_new[ i ].size_y);
+		for ( x = 0; x < 255; x++ )
+			for ( y = 0; y < 255; y++ ) {
+				gzputc (f, sprite_new[ i ].p[ x ][ y ]);
+			}
+	}
+	gzclose( f );
+}
 
 
 //**************************************************************************
@@ -86,6 +131,8 @@ void save_sprite_file( const char *file )
 int main( int argc, char *argv[] )
 {
 	char fileout[ 255 ];
+	FILE *fpin;
+	long len;
 
 	if (argc != 2 ) {
 		printf("Usage: %s [code file]\n",argv[0]);
@@ -95,9 +142,41 @@ int main( int argc, char *argv[] )
     strcpy(fileout,argv[1]);
     strcat(fileout,".sgz");
 
+
+	if ( (fpin=fopen(argv[1],"rb") ) == NULL ) {
+		printf("Can't open input file\n");
+		exit(1);
+	}
+	
+	if  (getc(fpin)!='s') {
+		printf("This isn't a sprite file\n");
+		exit(1);
+	}
+
+	if  (getc(fpin)!='l') {
+		printf("This isn't a sprite file\n");
+		exit(1);
+	}
+
+	if	(fseek(fpin,0,SEEK_END)) {
+		printf("Couldn't determine size of file\n");
+		fclose(fpin);
+		exit(1);
+	}
+
+	len=ftell(fpin);
+	
+	fclose(fpin);
+
 	allegro_init();
-	load_sprite_file( argv[1] );
- 	save_sprite_file( fileout );
+	if (len < 100000) {
+		printf("Pre-2007 file version detected.  ");
+		load_sprite_file_old( argv[1] );
+		save_sprite_file_old( fileout );
+	} else {
+		load_sprite_file_new( argv[1] );
+		save_sprite_file_new( fileout );
+	}
 	
 	printf("'%s' created, conversion done.\n",fileout);
 
