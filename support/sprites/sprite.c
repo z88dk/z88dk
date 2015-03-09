@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.10 2015-03-09 17:54:08 stefano Exp $
+	$Id: sprite.c,v 1.11 2015-03-09 18:09:53 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -399,8 +399,8 @@ void import_from_bitmap( const char *file )
 			sprite[ on_sprite ].size_x = MAX_SIZE_X;
 		if ( sprite[ on_sprite ].size_y >= MAX_SIZE_Y )
 			sprite[ on_sprite ].size_y = MAX_SIZE_Y;
-		for ( x = 0; x <= sprite[ on_sprite ].size_x; x++ )
-			for ( y = 0; y <= sprite[ on_sprite ].size_y; y++ ) {
+		for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
+			for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ ) {
 				al_unmap_rgb(al_get_pixel( temp, x - 1, y - 1 ),&r ,&g ,&b);
 				sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 300 );
 			}
@@ -416,8 +416,8 @@ void import_from_bitmap( const char *file )
 		if ((len==6144)||(len==6912)) {
 			sprite[ on_sprite ].size_x = 255;
 			sprite[ on_sprite ].size_y = 191;
-			for ( y = 0; y <= sprite[ on_sprite ].size_y; y++ )
-				for ( x = 0; x <= sprite[ on_sprite ].size_x; x+=8 ) {
+			for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
+				for ( x = 1; x <= sprite[ on_sprite ].size_x; x+=8 ) {
 					b=getc(fpin);
 					for ( i = 0; i < 8; i++ ) {
 					sprite[ on_sprite ].p[ x+i ][ (64*(y/64)+8*(y&7)+((y&63)>>3)) ] = ((b&128) != 0);
@@ -435,9 +435,9 @@ void import_from_bitmap( const char *file )
 				sprite[ on_sprite ].size_y = 80;
 				for ( y = 0; y < 8; y++ )
 					for ( x = 0; x < 12; x++ )
-						for ( i = 0; i < 8; i++ ) {
+						for ( i = 1; i <= 8; i++ ) {
 							b=getc(fpin);
-							for ( j = 0; j <= 7; j++ ) {
+							for ( j = 1; j <= 8; j++ ) {
 								sprite[ on_sprite ].p[ x*8+j ][ y*8+i ] = ((b&128) != 0);
 								b<<=1;
 							}
@@ -451,9 +451,9 @@ void import_from_bitmap( const char *file )
 				sprite[ on_sprite ].size_y = 80;
 				for ( y = 8; y < 10; y++ )
 					for ( x = 0; x < 12; x++ )
-						for ( i = 0; i < 8; i++ ) {
+						for ( i = 1; i <= 8; i++ ) {
 							b=getc(fpin);
-							for ( j = 0; j <= 7; j++ ) {
+							for ( j = 1; j <= 8; j++ ) {
 								sprite[ on_sprite ].p[ x*8+j ][ y*8+i ] = ((b&128) != 0);
 								b<<=1;
 							}
