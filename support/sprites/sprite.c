@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.9 2015-03-06 18:23:51 stefano Exp $
+	$Id: sprite.c,v 1.10 2015-03-09 17:54:08 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -382,7 +382,9 @@ void wkey_release(int keycode)
 void import_from_bitmap( const char *file )
 {
 	ALLEGRO_BITMAP *temp = NULL;
-	int x, y;
+	FILE *fpin = NULL;
+	long len;
+	int x, y, i, j;
 	unsigned char r = 0;
 	unsigned char g = 0;
 	unsigned char b = 0;
@@ -390,23 +392,78 @@ void import_from_bitmap( const char *file )
 	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
 	temp = al_load_bitmap( file );
 	al_set_new_bitmap_flags(ALLEGRO_VIDEO_BITMAP);
-	if (!temp)
-		return;
-
-	sprite[ on_sprite ].size_x = al_get_bitmap_width(temp);
-	sprite[ on_sprite ].size_y = al_get_bitmap_height(temp);
-	if ( sprite[ on_sprite ].size_x >= MAX_SIZE_X )
-		sprite[ on_sprite ].size_x = MAX_SIZE_X;
-	if ( sprite[ on_sprite ].size_y >= MAX_SIZE_Y )
-		sprite[ on_sprite ].size_y = MAX_SIZE_Y;
-
-	fit_sprite_on_screen();
-	for ( x = 0; x <= sprite[ on_sprite ].size_x; x++ )
-		for ( y = 0; y <= sprite[ on_sprite ].size_y; y++ ) {
-			al_unmap_rgb(al_get_pixel( temp, x - 1, y - 1 ),&r ,&g ,&b);
-			sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 300 );
+	if (temp) {
+		sprite[ on_sprite ].size_x = al_get_bitmap_width(temp);
+		sprite[ on_sprite ].size_y = al_get_bitmap_height(temp);
+		if ( sprite[ on_sprite ].size_x >= MAX_SIZE_X )
+			sprite[ on_sprite ].size_x = MAX_SIZE_X;
+		if ( sprite[ on_sprite ].size_y >= MAX_SIZE_Y )
+			sprite[ on_sprite ].size_y = MAX_SIZE_Y;
+		for ( x = 0; x <= sprite[ on_sprite ].size_x; x++ )
+			for ( y = 0; y <= sprite[ on_sprite ].size_y; y++ ) {
+				al_unmap_rgb(al_get_pixel( temp, x - 1, y - 1 ),&r ,&g ,&b);
+				sprite[ on_sprite ].p[ x ][ y ] = ( (r+g+b) < 300 );
+			}
+	} else {
+		fpin = fopen( file, "rb" );
+		if (!fpin)
+			return;
+		if	(fseek(fpin,0,SEEK_END))
+			return;
+		len=ftell(fpin);
+		fseek(fpin,0L,SEEK_SET);
+		// ZX Spectrum Screen dump
+		if ((len==6144)||(len==6912)) {
+			sprite[ on_sprite ].size_x = 255;
+			sprite[ on_sprite ].size_y = 191;
+			for ( y = 0; y <= sprite[ on_sprite ].size_y; y++ )
+				for ( x = 0; x <= sprite[ on_sprite ].size_x; x+=8 ) {
+					b=getc(fpin);
+					for ( i = 0; i < 8; i++ ) {
+					sprite[ on_sprite ].p[ x+i ][ (64*(y/64)+8*(y&7)+((y&63)>>3)) ] = ((b&128) != 0);
+					b<<=1;
+					}
+				}
 		}
+		// Import font from ZX Spectrum Snapshot (a 27 bytes header with register values followed by the memory dump)
+		if ((len==49179)||(len==131103)) {
+			fseek(fpin,7249L,SEEK_SET);
+			i=256+getc(fpin)+256*getc(fpin)-16384+27;
+			if (i>0) { //&&(i<32700)) {
+				fseek(fpin,(long)i,SEEK_SET);
+				sprite[ on_sprite ].size_x = 96;
+				sprite[ on_sprite ].size_y = 80;
+				for ( y = 0; y < 8; y++ )
+					for ( x = 0; x < 12; x++ )
+						for ( i = 0; i < 8; i++ ) {
+							b=getc(fpin);
+							for ( j = 0; j <= 7; j++ ) {
+								sprite[ on_sprite ].p[ x*8+j ][ y*8+i ] = ((b&128) != 0);
+								b<<=1;
+							}
+						}
+			}
+			fseek(fpin,7318L,SEEK_SET);
+			i=getc(fpin)+256*getc(fpin)-16384+27;
+			if (i>0) { //&&(i<32750)) {
+				fseek(fpin,(long)i,SEEK_SET);
+				sprite[ on_sprite ].size_x = 96;
+				sprite[ on_sprite ].size_y = 80;
+				for ( y = 8; y < 10; y++ )
+					for ( x = 0; x < 12; x++ )
+						for ( i = 0; i < 8; i++ ) {
+							b=getc(fpin);
+							for ( j = 0; j <= 7; j++ ) {
+								sprite[ on_sprite ].p[ x*8+j ][ y*8+i ] = ((b&128) != 0);
+								b<<=1;
+							}
+						}
+			}
 
+		}
+		fclose(fpin);
+	}
+	fit_sprite_on_screen();
 	update_screen();
 }
 
@@ -788,7 +845,7 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 90, ALLEGRO_ALIGN_LEFT, "V......................Flip sprite vertically");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 110, ALLEGRO_ALIGN_LEFT, "D......................Flip sprite diagonally");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 130, ALLEGRO_ALIGN_LEFT, "I......................Invert Sprite");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 150, ALLEGRO_ALIGN_LEFT, "L......................Import From BMP, LBM, PCX, or TGA");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 150, ALLEGRO_ALIGN_LEFT, "L......................Import picture (BMP,GIF,JPG,LBM,PCX,PNG,SCR,SNA,TGA...");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "C......................Copy sprite in memory");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 190, ALLEGRO_ALIGN_LEFT, "P......................Paste sprite from memory");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 210, ALLEGRO_ALIGN_LEFT, "F......................Fit the zoom settings for the current sprite size");
