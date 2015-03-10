@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.11 2015-03-09 18:09:53 stefano Exp $
+	$Id: sprite.c,v 1.12 2015-03-10 08:31:42 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -759,6 +759,35 @@ void copy_sprite( int src, int dest )
 }
 
 
+void clear_sprite()
+{
+	int x, y;
+	//Copy Sprite data
+	for ( x = 0; x <= sprite[ on_sprite ].size_x; x++ )
+		for ( y = 0; y <= sprite[ on_sprite ].size_y; y++ )
+			sprite[ on_sprite ].p[ x ][ y ] = 0;
+	update_screen();
+}
+
+
+void insert_sprite()
+{
+int i;
+	for (i=MAX_SPRITE-1; i >= on_sprite; i--)
+		copy_sprite( i, i+1 );
+	clear_sprite();
+	wkey_release(ALLEGRO_KEY_INSERT);
+}
+
+void remove_sprite()
+{
+int i;
+	for (i=on_sprite; i <= MAX_SPRITE; i++)
+		copy_sprite( i+1, i );
+	update_screen();
+	wkey_release(ALLEGRO_KEY_DELETE);
+}
+
 //Compute the copied sprite's mask and paste it in a new one
 void copy_sprite_mask( int src, int dest )
 {
@@ -841,9 +870,9 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(20,5,10), 8, 5, ALLEGRO_ALIGN_LEFT, "Image Editing");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 30, ALLEGRO_ALIGN_LEFT, "Up / Down.............Zoom In / Out");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 50, ALLEGRO_ALIGN_LEFT, "SHIFT + arrow keys....Scroll Sprite");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 70, ALLEGRO_ALIGN_LEFT, "H......................Flip sprite horizontally");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 90, ALLEGRO_ALIGN_LEFT, "V......................Flip sprite vertically");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 110, ALLEGRO_ALIGN_LEFT, "D......................Flip sprite diagonally");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 70, ALLEGRO_ALIGN_LEFT, "H/V/D..................Flip sprite horizontally/vertically/diagonally");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 90, ALLEGRO_ALIGN_LEFT, "SHIFT + DEL............Remove sprite");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 110, ALLEGRO_ALIGN_LEFT, "INS / DEL..............Insert/Clear a sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 130, ALLEGRO_ALIGN_LEFT, "I......................Invert Sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 150, ALLEGRO_ALIGN_LEFT, "L......................Import picture (BMP,GIF,JPG,LBM,PCX,PNG,SCR,SNA,TGA...");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "C......................Copy sprite in memory");
@@ -853,11 +882,11 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 140, 250, ALLEGRO_ALIGN_LEFT, "sprite and paste them starting from the current sprite position.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 270, ALLEGRO_ALIGN_LEFT, "M......................Compute mask for copied sprite and paste to current sprite");
 	al_draw_text(font, al_map_rgb(20,5,10), 8, 300, ALLEGRO_ALIGN_LEFT, "Saving / Loading");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 320, ALLEGRO_ALIGN_LEFT, "F2.....................Saves all sprites (editor specific format)");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 340, ALLEGRO_ALIGN_LEFT, "F3/F6..................Load/Merge sprites (editor format), merge over current pos.");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 360, ALLEGRO_ALIGN_LEFT, "F4.....................Load SevenuP sprite at current position");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 380, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header file defining");
-	al_draw_text(font, al_map_rgb(0,5,10), 190, 400, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 325, ALLEGRO_ALIGN_LEFT, "F2.....................Saves all sprites (editor specific format)");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 345, ALLEGRO_ALIGN_LEFT, "F3/F6..................Load/Merge sprites (editor format), merge over current pos.");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 365, ALLEGRO_ALIGN_LEFT, "F4.....................Load SevenuP sprite at current position");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header file defining");
+	al_draw_text(font, al_map_rgb(0,5,10), 190, 405, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
 
 	al_flip_display();
 
@@ -946,6 +975,10 @@ void do_keyboard_input(int keycode)
 		flip_sprite_d();
 	}
 
+	if ( keycode == ALLEGRO_KEY_INSERT ) {
+		insert_sprite();
+	}
+
 	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT) && (keycode ==  ALLEGRO_KEY_LEFT ) ) {
 		scroll_sprite_left();
 	}
@@ -978,15 +1011,19 @@ void do_keyboard_input(int keycode)
 	if ( keycode ==  ALLEGRO_KEY_C )
 		copied = on_sprite;
 	if ( al_key_down(&pressed_keys, ALLEGRO_KEY_LSHIFT ) ) {
-	    if ( keycode ==  ALLEGRO_KEY_P )
+	    if ( keycode ==  ALLEGRO_KEY_P ) {
 	        if (copied < on_sprite) {
 	        	chop_sprite( copied );
 	        }
-	}
-	else {
-	    if ( keycode ==  ALLEGRO_KEY_P )
+		} else {
+			if ( keycode ==  ALLEGRO_KEY_DELETE )
+	        remove_sprite();
+		}
+	} else if ( keycode ==  ALLEGRO_KEY_DELETE )
+	        clear_sprite();
+	else if ( keycode ==  ALLEGRO_KEY_P )
 	        if (copied != on_sprite) copy_sprite( copied, on_sprite );
-	}
+
 	//Paste copied sprite's mask
 	if ( keycode ==  ALLEGRO_KEY_M )
 		if (copied != on_sprite) copy_sprite_mask( copied, on_sprite );
