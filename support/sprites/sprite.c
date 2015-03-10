@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.12 2015-03-10 08:31:42 stefano Exp $
+	$Id: sprite.c,v 1.13 2015-03-10 17:36:54 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -75,7 +75,7 @@ char *hexc = "0123456789ABCDEF";					//For converting integers (0-15) to Hex
 //Draws a button at (x, y) with width/height (w, h), displaying text *text, with colour
 void draw_button( int x, int y, int w, int h, char *text, ALLEGRO_COLOR border_c, ALLEGRO_COLOR fill_c, ALLEGRO_COLOR text_c  )
 {
-	al_draw_filled_rectangle( x+1, y+1, x+w-1, y+h-1, fill_c );			//Boder
+	al_draw_filled_rectangle( x+1, y+1, x+w-1, y+h-1, fill_c );
 	al_draw_rectangle( x, y, x+w, y+h, border_c, 1.6 );			//Boder
 	al_draw_text(font, text_c, x+(w/2), y+(h/2) - 4, ALLEGRO_ALIGN_CENTRE, text);
 }
@@ -104,7 +104,6 @@ void update_screen()
 
 	al_clear_to_color (al_map_rgb(220,240,220) );
 	
-	// +++
 	//Draw Big Sprite Block
 	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
 		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
@@ -1135,6 +1134,10 @@ int main()
 		al_flip_display();
 		al_wait_for_event(eventQueue, &e);
 		al_get_keyboard_state(&pressed_keys);
+		
+		// Repaint window if the display was suspended or locked
+		if (e.type == ALLEGRO_EVENT_DISPLAY_FOUND)
+			update_screen();
 
 		if ((e.type == ALLEGRO_EVENT_MOUSE_AXES)||(e.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)) {
 			do_gui_buttons();
