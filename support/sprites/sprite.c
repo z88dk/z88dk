@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.13 2015-03-10 17:36:54 stefano Exp $
+	$Id: sprite.c,v 1.14 2015-03-11 20:39:31 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -47,6 +47,7 @@ ALLEGRO_EVENT_QUEUE *eventQueue;
 ALLEGRO_PATH *path;
 
 ALLEGRO_FILECHOOSER *file_dialog_bmp = NULL;
+ALLEGRO_FILECHOOSER *file_dialog_shp = NULL;
 ALLEGRO_FILECHOOSER *file_dialog_sv = NULL;
 ALLEGRO_FILECHOOSER *file_dialog_svsp = NULL;
 ALLEGRO_FILECHOOSER *file_dialog_ldsp = NULL;
@@ -55,6 +56,7 @@ ALLEGRO_FILECHOOSER *file_dialog_ldsev = NULL;
 const char sprPatterns[] = "*.sgz";
 const char sprHeader[] =  "*.*;*.h";
 const char bmpPatterns[] = "*.*";
+const char shpPatterns[] = "*.shp";
 
 typedef struct spritetype
 {
@@ -228,7 +230,7 @@ void generate_codes( int i )
 void fit_sprite_on_screen()
 {
 	//Calculate size of best fit
-	if ( sprite[ on_sprite ].size_x > sprite[ on_sprite ].size_y )
+	if ( (sprite[ on_sprite ].size_x/2) > sprite[ on_sprite ].size_y )
 		bls = (int)(600 / (sprite[ on_sprite ].size_x + 10));
 	else
 		bls = (int)(440 / (sprite[ on_sprite ].size_y + 10));
@@ -241,6 +243,66 @@ void invert_sprite()
 	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
 		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ )
 			sprite[ on_sprite ].p[ x ][ y ] = !sprite[ on_sprite ].p[ x ][ y ];
+	update_screen();
+}
+
+
+void double_sprite_h()
+{
+	int x, y;
+	if ((sprite[ on_sprite ].size_x * 2) > MAX_SIZE_X)
+		return;
+	sprite[ on_sprite ].size_x = sprite[ on_sprite ].size_x * 2;
+
+	for ( x = sprite[ on_sprite ].size_x; x>0; x-=2 )
+		for ( y = 1; y <= sprite[ on_sprite ].size_y; y++ ) {
+			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ x/2 ][ y ];
+			sprite[ on_sprite ].p[ x-1 ][ y ] = sprite[ on_sprite ].p[ x/2 ][ y ];
+		}
+	update_screen();
+}
+
+
+void double_sprite_v()
+{
+	int x, y;
+	if ((sprite[ on_sprite ].size_y * 2) > MAX_SIZE_Y)
+		return;
+	sprite[ on_sprite ].size_y = sprite[ on_sprite ].size_y * 2;
+
+	for ( x = 1; x <= sprite[ on_sprite ].size_x; x++ )
+		for ( y = sprite[ on_sprite ].size_y; y>0 ; y-=2 ) {
+			sprite[ on_sprite ].p[ x ][ y ] = sprite[ on_sprite ].p[ x ][ y/2 ];
+			sprite[ on_sprite ].p[ x ][ y-1 ] = sprite[ on_sprite ].p[ x ][ y/2 ];
+		}
+	update_screen();
+}
+
+
+void reduce_sprite()
+{
+	int x, y, b;
+
+	for ( x = 1; x <= sprite[ on_sprite ].size_x; x+=2 )
+		for ( y = 1; y <= sprite[ on_sprite ].size_y; y+=2 ) {
+			b=0;
+			if (sprite[ on_sprite ].p[ x ][ y ]) b++;
+	//		if (sprite[ on_sprite ].p[ x-1 ][ y ]) b++;
+//			if (sprite[ on_sprite ].p[ x ][ y-1 ]) b++;
+			sprite[ on_sprite ].p[ x ][ y ] = 0;
+			sprite[ on_sprite ].p[ x ][ y ] = 0;
+			if (sprite[ on_sprite ].p[ x+1 ][ y ]) b++;
+			sprite[ on_sprite ].p[ x+1 ][ y ] = 0;
+			if (sprite[ on_sprite ].p[ x ][ y+1 ]) b++;
+			sprite[ on_sprite ].p[ x ][ y+1 ] = 0;
+			if (sprite[ on_sprite ].p[ x+1 ][ y+1 ]) b++;
+			sprite[ on_sprite ].p[ x+1 ][ y+1 ] = 0;
+			sprite[ on_sprite ].p[ x/2 ][ y/2 ] = (b>1);
+		}
+	sprite[ on_sprite ].size_x = sprite[ on_sprite ].size_x / 2;
+	sprite[ on_sprite ].size_y = sprite[ on_sprite ].size_y / 2;
+
+	fit_sprite_on_screen();
 	update_screen();
 }
 
@@ -411,6 +473,7 @@ void import_from_bitmap( const char *file )
 			return;
 		len=ftell(fpin);
 		fseek(fpin,0L,SEEK_SET);
+
 		// ZX Spectrum Screen dump
 		if ((len==6144)||(len==6912)) {
 			sprite[ on_sprite ].size_x = 255;
@@ -466,6 +529,54 @@ void import_from_bitmap( const char *file )
 	update_screen();
 }
 
+void import_from_printmaster( const char *file )
+{
+	FILE *fpin = NULL;
+	int x, y, i, spcount;
+	unsigned char b;
+	
+	fpin = fopen( file, "rb" );
+	if (!fpin)
+		return;
+
+	spcount = 0;	
+	while ((fgetc(fpin) != 0x1a) && !feof(fpin) && ((on_sprite+spcount)<150)) {
+
+//	x=fgetc(fpin);
+	/*
+	if ((x>200) || (x<8)) {
+		fclose(fpin);
+		return;
+	} */
+	y=fgetc(fpin); 
+	x=fgetc(fpin); /*
+	if ((y>200) || (y<8)) {
+		fclose(fpin);
+		return;
+	}
+	*/
+	fgetc(fpin);
+
+	sprite[ on_sprite+spcount ].size_x = x;
+	sprite[ on_sprite+spcount ].size_y = y;
+	for ( y = 1; y <= sprite[ on_sprite+spcount ].size_y; y++ )
+		for ( x = 1; x <= sprite[ on_sprite+spcount ].size_x; x+=8 ) {
+			b=getc(fpin);
+			for ( i = 0; i < 8; i++ ) {
+			sprite[ on_sprite+spcount ].p[ x+i ][ y ] = ((b&128) != 0);
+			b<<=1;
+			}
+		}
+	fgetc(fpin);
+	spcount++;
+	}
+
+	fclose(fpin);
+
+	fit_sprite_on_screen();
+	update_screen();
+}
+
 void do_import_bitmap()
 {
 	const char *file = NULL;
@@ -481,6 +592,23 @@ void do_import_bitmap()
 	al_destroy_path(path);
 	
 	wkey_release(ALLEGRO_KEY_L);
+}
+
+void do_import_printmaster()
+{
+	const char *file = NULL;
+
+	path=NULL;
+	file_dialog_shp = al_create_native_file_dialog("./", "Import Newsmaster/Printmaster pictures", shpPatterns, ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+	al_show_native_file_dialog(display, file_dialog_shp);
+	path = al_create_path(al_get_native_file_dialog_path(file_dialog_shp, 0));
+	file = al_path_cstr(path, ALLEGRO_NATIVE_PATH_SEP);
+	al_destroy_native_file_dialog(file_dialog_shp);
+
+	import_from_printmaster( file );
+	al_destroy_path(path);
+	
+	wkey_release(ALLEGRO_KEY_N);
 }
 
 //Saves a header file with sprites 0-on_sprite for use with z88dk
@@ -541,6 +669,8 @@ void load_sprite_file( const char *file )
 	if (!f) {
 		return;
 	}
+	
+	on_sprite=0;
 
 	for ( i = 0; i <= MAX_SPRITE; i++ )
 	{
@@ -554,6 +684,7 @@ void load_sprite_file( const char *file )
 
 	gzclose( f );
 
+	fit_sprite_on_screen();
 	update_screen();
 }
 
@@ -873,9 +1004,9 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 90, ALLEGRO_ALIGN_LEFT, "SHIFT + DEL............Remove sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 110, ALLEGRO_ALIGN_LEFT, "INS / DEL..............Insert/Clear a sprite");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 130, ALLEGRO_ALIGN_LEFT, "I......................Invert Sprite");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 150, ALLEGRO_ALIGN_LEFT, "L......................Import picture (BMP,GIF,JPG,LBM,PCX,PNG,SCR,SNA,TGA...");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "C......................Copy sprite in memory");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 190, ALLEGRO_ALIGN_LEFT, "P......................Paste sprite from memory");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 150, ALLEGRO_ALIGN_LEFT, "SHIFT + H/V............Double Width/Height");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 170, ALLEGRO_ALIGN_LEFT, "C/P....................Copy/Paste sprite");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 190, ALLEGRO_ALIGN_LEFT, "5......................Reduce sprite size at 50%");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 210, ALLEGRO_ALIGN_LEFT, "F......................Fit the zoom settings for the current sprite size");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 230, ALLEGRO_ALIGN_LEFT, "SHIFP + P.......Split the copied sprite into pieces as big as the current ");
 	al_draw_text(font, al_map_rgb(0,5,10), 140, 250, ALLEGRO_ALIGN_LEFT, "sprite and paste them starting from the current sprite position.");
@@ -884,8 +1015,10 @@ void do_help_page() {
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 325, ALLEGRO_ALIGN_LEFT, "F2.....................Saves all sprites (editor specific format)");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 345, ALLEGRO_ALIGN_LEFT, "F3/F6..................Load/Merge sprites (editor format), merge over current pos.");
 	al_draw_text(font, al_map_rgb(0,5,10), 8, 365, ALLEGRO_ALIGN_LEFT, "F4.....................Load SevenuP sprite at current position");
-	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header file defining");
-	al_draw_text(font, al_map_rgb(0,5,10), 190, 405, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 385, ALLEGRO_ALIGN_LEFT, "L......................Import picture (BMP,GIF,JPG,LBM,PCX,PNG,SCR,SNA,TGA...)");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 405, ALLEGRO_ALIGN_LEFT, "N......................Import pictures from a Printmaster/Newsmaster (MSDOS) lib.");
+	al_draw_text(font, al_map_rgb(0,5,10), 8, 425, ALLEGRO_ALIGN_LEFT, "F5.....................Generate a C language header definition for");
+	al_draw_text(font, al_map_rgb(0,5,10), 190, 445, ALLEGRO_ALIGN_LEFT, "all the sprites up to the current one");
 
 	al_flip_display();
 
@@ -962,16 +1095,12 @@ void do_keyboard_input(int keycode)
 		invert_sprite();
 	}
 
-	if ( keycode == ALLEGRO_KEY_H ) {
-		flip_sprite_h();
-	}
-
-	if ( keycode ==  ALLEGRO_KEY_V ) {
-		flip_sprite_v();
-	}
-
 	if ( keycode ==  ALLEGRO_KEY_D ) {
 		flip_sprite_d();
+	}
+
+	if ( keycode ==  ALLEGRO_KEY_5 ) {
+		reduce_sprite();
 	}
 
 	if ( keycode == ALLEGRO_KEY_INSERT ) {
@@ -1014,14 +1143,24 @@ void do_keyboard_input(int keycode)
 	        if (copied < on_sprite) {
 	        	chop_sprite( copied );
 	        }
-		} else {
-			if ( keycode ==  ALLEGRO_KEY_DELETE )
-	        remove_sprite();
 		}
-	} else if ( keycode ==  ALLEGRO_KEY_DELETE )
+		if ( keycode ==  ALLEGRO_KEY_DELETE )
+			remove_sprite();
+		if ( keycode == ALLEGRO_KEY_H )
+			double_sprite_h();
+		if ( keycode ==  ALLEGRO_KEY_V )
+			double_sprite_v();
+	} else {
+		if ( keycode ==  ALLEGRO_KEY_DELETE )
 	        clear_sprite();
-	else if ( keycode ==  ALLEGRO_KEY_P )
+		if ( keycode ==  ALLEGRO_KEY_P )
 	        if (copied != on_sprite) copy_sprite( copied, on_sprite );
+		if ( keycode == ALLEGRO_KEY_H )
+			flip_sprite_h();
+		if ( keycode ==  ALLEGRO_KEY_V )
+			flip_sprite_v();
+	}
+
 
 	//Paste copied sprite's mask
 	if ( keycode ==  ALLEGRO_KEY_M )
@@ -1046,6 +1185,8 @@ void do_keyboard_input(int keycode)
 		do_merge_sprites();
 	else if ( keycode ==  ALLEGRO_KEY_L )
 		do_import_bitmap();
+	else if ( keycode ==  ALLEGRO_KEY_N )
+		do_import_printmaster();
 
 }
 
