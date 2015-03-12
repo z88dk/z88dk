@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.14 2015-03-11 20:39:31 stefano Exp $
+	$Id: sprite.c,v 1.15 2015-03-12 20:23:49 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
@@ -63,6 +63,8 @@ typedef struct spritetype
 	int size_x, size_y;
 	int p[ MAX_SIZE_X ][ MAX_SIZE_Y ];
 } spritetype;
+
+int exit_requested;
 
 int on_sprite;
 int copied;			//Sprite selected as source for copying
@@ -287,9 +289,6 @@ void reduce_sprite()
 		for ( y = 1; y <= sprite[ on_sprite ].size_y; y+=2 ) {
 			b=0;
 			if (sprite[ on_sprite ].p[ x ][ y ]) b++;
-	//		if (sprite[ on_sprite ].p[ x-1 ][ y ]) b++;
-//			if (sprite[ on_sprite ].p[ x ][ y-1 ]) b++;
-			sprite[ on_sprite ].p[ x ][ y ] = 0;
 			sprite[ on_sprite ].p[ x ][ y ] = 0;
 			if (sprite[ on_sprite ].p[ x+1 ][ y ]) b++;
 			sprite[ on_sprite ].p[ x+1 ][ y ] = 0;
@@ -297,7 +296,7 @@ void reduce_sprite()
 			sprite[ on_sprite ].p[ x ][ y+1 ] = 0;
 			if (sprite[ on_sprite ].p[ x+1 ][ y+1 ]) b++;
 			sprite[ on_sprite ].p[ x+1 ][ y+1 ] = 0;
-			sprite[ on_sprite ].p[ x/2 ][ y/2 ] = (b>1);
+			sprite[ on_sprite ].p[ x/2+1 ][ y/2+1 ] = (b>1);
 		}
 	sprite[ on_sprite ].size_x = sprite[ on_sprite ].size_x / 2;
 	sprite[ on_sprite ].size_y = sprite[ on_sprite ].size_y / 2;
@@ -892,11 +891,23 @@ void copy_sprite( int src, int dest )
 void clear_sprite()
 {
 	int x, y;
-	//Copy Sprite data
+	//clear Sprite data
 	for ( x = 0; x <= sprite[ on_sprite ].size_x; x++ )
 		for ( y = 0; y <= sprite[ on_sprite ].size_y; y++ )
 			sprite[ on_sprite ].p[ x ][ y ] = 0;
 	update_screen();
+}
+
+
+void clean_sprites()
+{
+	int x, y, i;
+	//Clean out of bounds Sprite areas
+	for (i=0; i<MAX_SPRITE; i++)
+		for ( x = 1; x < MAX_SIZE_X; x++ )
+			for ( y = 1; y < MAX_SIZE_Y; y++ )
+				if (((x > sprite[ i ].size_x) || (y > sprite[ i ].size_y)) || (x==0) || (y==0))
+					sprite[ i ].p[ x ][ y ] = 0;
 }
 
 
@@ -912,7 +923,7 @@ int i;
 void remove_sprite()
 {
 int i;
-	for (i=on_sprite; i <= MAX_SPRITE; i++)
+	for (i=on_sprite; i < MAX_SPRITE; i++)
 		copy_sprite( i+1, i );
 	update_screen();
 	wkey_release(ALLEGRO_KEY_DELETE);
@@ -1086,6 +1097,12 @@ void do_gui_buttons()
 void do_keyboard_input(int keycode)
 {
 	//Keyboard Input
+	if ( keycode == ALLEGRO_KEY_ESCAPE ) {
+		exit_requested=1;
+		wkey_release(ALLEGRO_KEY_ESCAPE);
+		update_screen();
+	}
+
 	if ( keycode == ALLEGRO_KEY_F1 ) {
 		do_help_page();
 		update_screen();
@@ -1173,8 +1190,10 @@ void do_keyboard_input(int keycode)
 	}
 
 	// Save / Load / Generate Code
-	if ( keycode ==  ALLEGRO_KEY_F2 )
+	if ( keycode ==  ALLEGRO_KEY_F2 ) {
+		clean_sprites();
 		do_save_sprites();
+	}
 	else if ( keycode ==  ALLEGRO_KEY_F3 )
 		do_load_sprites();
 	else if ( keycode ==  ALLEGRO_KEY_F4 )
@@ -1232,6 +1251,7 @@ int main()
 	al_install_mouse();
 
 	font = al_load_font("fixed_font.tga", 0, 0);
+	exit_requested=0;
 
 	//Setup graphics
 
@@ -1269,13 +1289,15 @@ int main()
 	al_show_native_message_box(display, "Welcome", "Welcome to the z88dk Sprite Editor", "Keep 'F1' pressed to see the help page", NULL, 0);
 	al_flush_event_queue(eventQueue);
 	
-	do {
-		while ( !al_key_down(&pressed_keys, ALLEGRO_KEY_ESCAPE) && (e.type != ALLEGRO_EVENT_DISPLAY_CLOSE))
-		{
+	while (!exit_requested) {
+
 		al_flip_display();
 		al_wait_for_event(eventQueue, &e);
 		al_get_keyboard_state(&pressed_keys);
 		
+		if (e.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+			exit_requested=1;
+
 		// Repaint window if the display was suspended or locked
 		if (e.type == ALLEGRO_EVENT_DISPLAY_FOUND)
 			update_screen();
@@ -1287,12 +1309,14 @@ int main()
 
 		if (e.type == ALLEGRO_EVENT_KEY_DOWN)
 			do_keyboard_input(e.keyboard.keycode);
-		}
+
 		al_flush_event_queue(eventQueue);
 		//al_wait_for_event(eventQueue, &e);
-		while (al_key_down(&pressed_keys, ALLEGRO_KEY_ESCAPE)){al_get_keyboard_state(&pressed_keys);};
-		al_flush_event_queue(eventQueue);
-	} while (al_show_native_message_box(display, "Goodbye", "Exiting..", "Are you sure ?", NULL, ALLEGRO_MESSAGEBOX_YES_NO)!=1);
+		
+		if (exit_requested)
+			if (al_show_native_message_box(display, "Goodbye", "Exiting..", "Are you sure ?", NULL, ALLEGRO_MESSAGEBOX_YES_NO)!=1)
+				exit_requested=0;
+	}
 
 	al_unregister_event_source(eventQueue, al_get_mouse_event_source());
 	al_unregister_event_source(eventQueue, al_get_keyboard_event_source());
