@@ -4,7 +4,12 @@
 #include <ctype.h>
 #include <limits.h>
 #include <stdlib.h>
-#include <regex/regex.h>
+
+#ifdef LOCAL_REGEXP
+   #include "regex/regex.h"
+#else
+   #include <regex.h>
+#endif
 
 #include "utils.h"
 #include "regerror.h"

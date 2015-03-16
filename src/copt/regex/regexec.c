@@ -11,7 +11,12 @@
 #include <string.h>
 #include <limits.h>
 #include <ctype.h>
-#include <regex/regex.h>
+
+#ifdef LOCAL_REGEXP
+   #include "regex/regex.h"
+#else
+   #include <regex.h>
+#endif
 
 #include "utils.h"
 #include "regex2.h"

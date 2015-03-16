@@ -1,7 +1,12 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <regex/regex.h>
+
+#ifdef LOCAL_REGEXP
+   #include "regex/regex.h"
+#else
+   #include <regex.h>
+#endif
 
 #include "utils.h"
 #include "regex2.h"
