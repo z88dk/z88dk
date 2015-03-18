@@ -105,8 +105,8 @@ x_ok:
    inc a
    call console_01_output_char_proc_putchar_scroll
    
-   pop bc                      ; b = param, c = char
    pop de                      ; e = x
+   pop bc                      ; b = param, c = char
    
    ld d,(ix+19)
    dec d                       ; d = y = window.height - 1
