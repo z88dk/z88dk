@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.31 2015-02-24 22:27:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.c,v 1.32 2015-03-21 00:05:14 pauloscustodio Exp $
 */
 
 #include "array.h"
@@ -262,7 +262,7 @@ void ExprOp_init_operator( ExprOp *self, tokid_t tok, op_type_t op_type )
 }
 
 /* compute ExprOp using Calc_xxx functions */
-void ExprOp_compute( ExprOp *self, Expr *expr )
+void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
 {
 	switch (self->op_type)
 	{
@@ -275,9 +275,15 @@ void ExprOp_compute( ExprOp *self, Expr *expr )
 			/* copy scope */
 			if (self->d.symbol->scope == SCOPE_EXTERN ||
 				(self->d.symbol->scope == SCOPE_GLOBAL && !self->d.symbol->is_defined))
+			{
 				expr->result.extern_symbol = TRUE;
+			}
 			else if (self->d.symbol->type == TYPE_UNKNOWN)
+			{
 				expr->result.undefined_symbol = TRUE;
+				if (not_defined_error)
+					error_not_defined(self->d.symbol->name);
+			}
 			
 			Calc_push(0);
         }
@@ -639,7 +645,7 @@ Expr *expr_parse( void )
 *	evaluate expression if possible, set result.not_evaluable if failed
 *   e.g. symbol not defined
 *----------------------------------------------------------------------------*/
-long Expr_eval( Expr *self )
+long Expr_eval(Expr *self, Bool not_defined_error)
 {
 	size_t i;
 
@@ -653,7 +659,7 @@ long Expr_eval( Expr *self )
 	{
 		ExprOp *expr_op = ExprOpArray_item( self->rpn_ops, i );
 
-		ExprOp_compute( expr_op, self );
+		ExprOp_compute( expr_op, self, not_defined_error );
 	}
 
 	/* need to downgrade from COMPUTED if already computed */
@@ -695,20 +701,15 @@ static Bool _expr_parse_eval( long *presult, Bool not_defined_error )
 		return FALSE;				/* error output by expr_parse() */
 
 	/* eval and discard expression */
-	*presult = Expr_eval( expr );
+	*presult = Expr_eval(expr, not_defined_error);
 	failed   = (expr->result.not_evaluable);
 	OBJ_DELETE( expr );
 
 	/* check errors */
-	if ( failed )
-	{
-		if ( not_defined_error )
-			error_not_defined();	/* error unless evaluating IF, 
-									   where symbol not defined == 0 */
+	if (failed)
 		return FALSE;
-	}
-
-	return TRUE;
+	else
+		return TRUE;
 }
 
 Bool expr_parse_eval( long *presult )

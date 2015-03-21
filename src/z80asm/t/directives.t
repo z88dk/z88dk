@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.18 2015-02-25 23:08:24 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/directives.t,v 1.19 2015-03-21 00:05:14 pauloscustodio Exp $
 #
 # Test assembly directives
 
@@ -120,7 +120,7 @@ z80asm(
 		dg2	= 65536					;; error: integer '65536' out of range
 		dg3 = -32768
 		dg4 = -32769				;; error: integer '-32769' out of range
-		dg5 = undefined				;; error: symbol not defined
+		dg5 = undefined				;; error: symbol 'undefined' not defined
 	}
 END
 );
@@ -161,9 +161,9 @@ z80asm(asm => "UNDEFINE aa, 	;; error: syntax error");
 z80asm(asm => "DEFINE aa    \n DEFB aa 		;; 01 ");
 z80asm(asm => "DEFINE aa,bb \n DEFB aa,bb 	;; 01 01 ");
 z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa 		\n DEFB bb 	;; 01 ");
-z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa 		\n DEFB aa 	;; error: symbol not defined");
-z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB aa 	;; error: symbol not defined");
-z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB bb 	;; error: symbol not defined");
+z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa 		\n DEFB aa 	;; error: symbol 'aa' not defined");
+z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB aa 	;; error: symbol 'aa' not defined");
+z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB bb 	;; error: symbol 'bb' not defined");
 
 #------------------------------------------------------------------------------
 # DEFC
@@ -346,7 +346,7 @@ END
 
 z80asm(
 	asm 	=> <<END,
-	defvars undefined					;; error: symbol not defined
+	defvars undefined					;; error: symbol 'undefined' not defined
 	{
 		df2	ds.l 1
 	}
@@ -481,7 +481,7 @@ z80asm(
 
 # ORG not constant
 z80asm(
-	asm		=> "org start ;; error: symbol not defined",
+	asm		=> "org start ;; error: symbol 'start' not defined",
 );
 
 # -r, --origin

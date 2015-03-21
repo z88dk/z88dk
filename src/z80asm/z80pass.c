@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.139 2015-02-24 22:27:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/z80pass.c,v 1.140 2015-03-21 00:05:14 pauloscustodio Exp $
 */
 
 #include "limits.h"
@@ -53,7 +53,7 @@ Z80pass2( void )
 		set_PC( expr->asmpc );		
 
 		/* try to evaluate expression to detect missing symbols */
-		value = Expr_eval( expr );
+		value = Expr_eval(expr, TRUE);
 
 		/* check if expression is stored in object file or computed and patched */
 		do_patch = TRUE;
@@ -61,7 +61,6 @@ Z80pass2( void )
 
 		if ( expr->result.undefined_symbol ) 
 		{
-			error_not_defined();
 			do_patch = FALSE;
 		}
 		else if ( expr->range == RANGE_JR_OFFSET )
@@ -79,7 +78,6 @@ Z80pass2( void )
 		}
 		else if ( expr->result.not_evaluable )
 		{
-			error_not_defined();
 			do_patch = FALSE;
 		}
 

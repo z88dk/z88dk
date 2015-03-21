@@ -2499,7 +2499,7 @@ ENDIF
 IF      !RABBIT
         im   -1                         ;; error: integer '-1' out of range
         im   3                          ;; error: integer '3' out of range
-        im   undefined                  ;; error: symbol not defined
+        im   undefined                  ;; error: symbol 'undefined' not defined
 ELSE    
 ENDIF   
         bit  -1,a                       ;; error: integer '-1' out of range
@@ -2508,9 +2508,9 @@ ENDIF
         bit  8,a                        ;; error: integer '8' out of range
         res  8,a                        ;; error: integer '8' out of range
         set  8,a                        ;; error: integer '8' out of range
-        bit  undefined,a                ;; error: symbol not defined
-        res  undefined,a                ;; error: symbol not defined
-        set  undefined,a                ;; error: symbol not defined
+        bit  undefined,a                ;; error: symbol 'undefined' not defined
+        res  undefined,a                ;; error: symbol 'undefined' not defined
+        set  undefined,a                ;; error: symbol 'undefined' not defined
         djnz ASMPC-0x7F                 ;; error 2: integer '-129' out of range
         djnz ASMPC+0x82                 ;; error 2: integer '128' out of range
         jr   ASMPC-0x7F                 ;; error 2: integer '-129' out of range
@@ -2526,7 +2526,7 @@ ENDIF
 IF      !RABBIT
 ELSE    
 ENDIF   
-        rst  undefined                  ;; error: symbol not defined
+        rst  undefined                  ;; error: symbol 'undefined' not defined
         rst  -1                         ;; error: integer '-1' out of range
         rst  1                          ;; error: integer '1' out of range
         rst  7                          ;; error: integer '7' out of range
@@ -2546,11 +2546,11 @@ ENDIF
 IF      !RABBIT
 ELSE    
 ENDIF   
-ds:     defs not_defined                ;; error: symbol not defined
+ds:     defs not_defined                ;; error: symbol 'not_defined' not defined
                                         ; BUG_0007
         defs -1                         ;; error: integer '-1' out of range
         defs 65537                      ;; error: integer '65537' out of range
-        defs 2,not_defined              ;; error: symbol not defined
+        defs 2,not_defined              ;; error: symbol 'not_defined' not defined
         defs 2,-129                     ;; error: integer '-129' out of range
         defs 2,256                      ;; error: integer '256' out of range
 IF      !RABBIT
@@ -5051,9 +5051,9 @@ ENDIF
         bit  8,a                        ;; error: integer '8' out of range
         res  8,a                        ;; error: integer '8' out of range
         set  8,a                        ;; error: integer '8' out of range
-        bit  undefined,a                ;; error: symbol not defined
-        res  undefined,a                ;; error: symbol not defined
-        set  undefined,a                ;; error: symbol not defined
+        bit  undefined,a                ;; error: symbol 'undefined' not defined
+        res  undefined,a                ;; error: symbol 'undefined' not defined
+        set  undefined,a                ;; error: symbol 'undefined' not defined
         djnz ASMPC-0x7F                 ;; error 2: integer '-129' out of range
         djnz ASMPC+0x82                 ;; error 2: integer '128' out of range
         jr   ASMPC-0x7F                 ;; error 2: integer '-129' out of range
@@ -5073,7 +5073,7 @@ ELSE
         rst  08h                        ;; error: illegal identifier
         rst  30h                        ;; error: illegal identifier
 ENDIF   
-        rst  undefined                  ;; error: symbol not defined
+        rst  undefined                  ;; error: symbol 'undefined' not defined
         rst  -1                         ;; error: integer '-1' out of range
         rst  1                          ;; error: integer '1' out of range
         rst  7                          ;; error: integer '7' out of range
@@ -5117,11 +5117,11 @@ ELSE
         outd                            ;; error: illegal identifier
         otdr                            ;; error: illegal identifier
 ENDIF   
-ds:     defs not_defined                ;; error: symbol not defined
+ds:     defs not_defined                ;; error: symbol 'not_defined' not defined
                                         ; BUG_0007
         defs -1                         ;; error: integer '-1' out of range
         defs 65537                      ;; error: integer '65537' out of range
-        defs 2,not_defined              ;; error: symbol not defined
+        defs 2,not_defined              ;; error: symbol 'not_defined' not defined
         defs 2,-129                     ;; error: integer '-129' out of range
         defs 2,256                      ;; error: integer '256' out of range
 IF      !RABBIT

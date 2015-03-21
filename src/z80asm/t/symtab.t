@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.28 2015-02-13 00:32:00 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.29 2015-03-21 00:05:18 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -65,7 +65,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "undefine VAR : defb VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol not defined",
+	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' not defined",
 );
 
 t_z80asm(

@@ -14,7 +14,7 @@
 ;
 ; Copyright (C) Paulo Custodio, 2011-2015
 ;
-; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.24 2015-02-01 23:52:13 pauloscustodio Exp $
+; $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.asm,v 1.25 2015-03-21 00:05:14 pauloscustodio Exp $
 ;------------------------------------------------------------------------------
 
 	org	0100h
@@ -514,7 +514,7 @@ IF !RABBIT
 	im	2 	
 	
 	im 	{-1 3}							;; error: integer '{1}' out of range
-	im 	undefined						;; error: symbol not defined
+	im 	undefined						;; error: symbol 'undefined' not defined
 ELSE
 	{daa di ei halt}					;; error: illegal identifier
 	im {0 1 2} 							;; error: illegal identifier
@@ -527,7 +527,7 @@ ENDIF
 	{bit res set} {0 1 2 3 4 5 6 7},{b c d e h l a (hl) (ix+DIS) (iy+DIS)}
 	
 	{bit res set} {-1 8},a				;; error: integer '{2}' out of range
-	{bit res set} undefined,a			;; error: symbol not defined
+	{bit res set} undefined,a			;; error: symbol 'undefined' not defined
 	
 ;	{res set}     {0 1 2 3 4 5 6 7},(ix+DIS),{b c d e h l  a}	=} 0xDD 0xCB DIS {<0:6}+{<1:3}+{<3}
 ;	{res set}     {0 1 2 3 4 5 6 7},(iy+DIS),{b c d e h l  a}	=} 0xFD 0xCB DIS {<0:6}+{<1:3}+{<3}
@@ -614,7 +614,7 @@ ELSE
 	rst {00h 08h                 30h    } ;; error: illegal identifier
 ENDIF
 
-	rst	undefined		   								;; error: symbol not defined
+	rst	undefined		   								;; error: symbol 'undefined' not defined
 	rst {-1 1 7 9 15 17 23 25 31 33 39 41 47 49 55 57}	;; error: integer '{1}' out of range
 
 ;------------------------------------------------------------------------------
@@ -814,7 +814,7 @@ ENDIF
 ;------------------------------------------------------------------------------
 ; DEFS
 ;------------------------------------------------------------------------------
-ds:	defs not_defined	; BUG_0007		;; error: symbol not defined
+ds:	defs not_defined	; BUG_0007		;; error: symbol 'not_defined' not defined
 	defs -1								;; error: integer '-1' out of range
 	defs 0								;;
 	defs 1								;; defb 0
@@ -823,7 +823,7 @@ ds:	defs not_defined	; BUG_0007		;; error: symbol not defined
 	defs 4								;; defb 0,0,0,0
 	defs 65537							;; error: integer '65537' out of range
 	
-	defs 2,not_defined					;; error: symbol not defined
+	defs 2,not_defined					;; error: symbol 'not_defined' not defined
 	defs 2,-129							;; error: integer '-129' out of range
 	defs 2,-128							;; defb 80h,80h
 	defs 2,-127							;; defb 81h,81h

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.148 2015-02-25 23:08:23 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.149 2015-03-21 00:05:14 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.148 2015-02-25 23:0
 
 /*
 * $Log: hist.c,v $
-* Revision 1.148  2015-02-25 23:08:23  pauloscustodio
+* Revision 1.149  2015-03-21 00:05:14  pauloscustodio
+* Show symbol name "symbol not defined" in error message.
+*
+* Revision 1.148  2015/02/25 23:08:23  pauloscustodio
 * Removed option -forcexlib to z80asm - no longer necessary, as the module name is no
 * longer used as the symbol to force the link of a library module.
 *
@@ -2276,6 +2279,8 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 	- Removed option -forcexlib - no longer necessary, as the module name is no 
 	  longer used as the symbol to force the link of a library module.
 
+	- Show symbol name "symbol not defined" in error message.
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
@@ -2310,7 +2315,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1k"
+#define VERSION     "2.7.1m"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

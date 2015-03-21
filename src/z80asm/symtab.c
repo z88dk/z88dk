@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.52 2015-02-13 00:31:59 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.53 2015-03-21 00:05:14 pauloscustodio Exp $
 */
 
 #include "errors.h"
@@ -373,7 +373,7 @@ void update_symbol( char *name, long value, sym_type_t type )
 		sym = find_symbol( name, global_symtab );
 
     if ( sym == NULL )
-		error_not_defined();
+		error_not_defined(name);
 	else
 	{
 		sym->value = value;

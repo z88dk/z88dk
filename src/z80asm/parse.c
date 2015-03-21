@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.35 2015-02-24 22:27:39 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse.c,v 1.36 2015-03-21 00:05:14 pauloscustodio Exp $ 
 */
 
 #include "class.h"
@@ -206,13 +206,9 @@ static void pop_eval_expr(ParseCtx *ctx, int *pvalue, Bool *perror)
 	}
 
 	/* eval and discard expression */
-	*pvalue = Expr_eval(expr);
+	*pvalue = Expr_eval(expr, TRUE);
 	*perror = (expr->result.not_evaluable);
 	OBJ_DELETE(expr);
-
-	/* check errors */
-	if (*perror)
-		error_not_defined();
 }
 
 /*-----------------------------------------------------------------------------
@@ -349,7 +345,7 @@ static void asm_IF(ParseCtx *ctx, Expr *expr)
 	Bool condition;
 
 	/* eval and discard expression, ignore errors */
-	value = Expr_eval(expr);
+	value = Expr_eval(expr, FALSE);
 	if (value == 0)				/* ignore expr->result.not_evaluable, as undefined values result in 0 */
 		condition = FALSE;
 	else

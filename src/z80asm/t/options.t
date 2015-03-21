@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.58 2015-02-25 23:08:24 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/options.t,v 1.59 2015-03-21 00:05:18 pauloscustodio Exp $
 #
 # Test options
 
@@ -310,7 +310,7 @@ ERR
 #------------------------------------------------------------------------------
 unlink_testfiles();
 t_z80asm_error("defc main = 0x1234\ncall _main", 
-		"Error at file 'test.asm' line 2: symbol not defined");
+		"Error at file 'test.asm' line 2: symbol '_main' not defined");
 for my $options ('-sdcc', '--sdcc') {
 	t_z80asm(
 		options	=> $options,
@@ -806,7 +806,7 @@ unlink_testfiles($lib);
 $asm = "ld a,_value23";		# BUG_0045
 
 # no -D
-t_z80asm_error($asm, "Error at file 'test.asm' line 1: symbol not defined");
+t_z80asm_error($asm, "Error at file 'test.asm' line 1: symbol '_value23' not defined");
 
 # invalid -D
 for my $options ('-D23', '-Da*') {

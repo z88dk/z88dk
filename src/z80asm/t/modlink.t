@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.13 2015-01-26 23:46:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.14 2015-03-21 00:05:14 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -624,7 +624,7 @@ z80asm(
 				EXTERN	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
 
 			sd_write_sector:
-				jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE ;; error: symbol not defined
+				jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE ;; error: symbol 'sd_write_block_2gb' not defined
 ...
 	options	=> " ",
 );

@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.148 2015-02-24 22:27:39 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/modlink.c,v 1.149 2015-03-21 00:05:14 pauloscustodio Exp $
 */
 
 #include "alloc.h"
@@ -313,12 +313,10 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error, Bool module
 		if ( expr->target_name )
 		{
 			set_expr_env( expr, module_relative_addr );
-			value = Expr_eval( expr );
+			value = Expr_eval(expr, show_error);
 	        if ( expr->result.not_evaluable )		/* unresolved */
 			{
 				num_unresolved++;
-				if ( show_error )
-					error_not_defined();
 			}
 			else if (!expr->is_computed)
 			{
@@ -382,11 +380,9 @@ static void patch_exprs( ExprList *exprs )
 		assert( expr->target_name == NULL );		/* EQU expressions are already computed */
 
 		set_expr_env( expr, FALSE );
-		value = Expr_eval( expr );
+		value = Expr_eval(expr, TRUE);
 
-	    if ( expr->result.not_evaluable )		/* unresolved */
-			error_not_defined();
-		else
+		if (!expr->result.not_evaluable)			/* not unresolved */
 		{
             switch ( expr->range )
             {

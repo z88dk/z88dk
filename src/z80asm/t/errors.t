@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.41 2015-02-24 22:27:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/errors.t,v 1.42 2015-03-21 00:05:14 pauloscustodio Exp $
 #
 # Test error messages
 
@@ -351,7 +351,7 @@ t_z80asm_error("ld a,2*[1+2)", 	"Error at file 'test.asm' line 1: syntax error i
 #------------------------------------------------------------------------------
 # error_not_defined
 unlink_testfiles();
-t_z80asm_error("ld a,NOSYMBOL", "Error at file 'test.asm' line 1: symbol not defined");
+t_z80asm_error("ld a,NOSYMBOL", "Error at file 'test.asm' line 1: symbol 'NOSYMBOL' not defined");
 
 #------------------------------------------------------------------------------
 # error_not_defined_expr
@@ -362,7 +362,7 @@ t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 write_file(asm_file(), "EXTERN main \n call main");
 t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
-		"Error at file 'test.asm' line 2: symbol not defined\n".
+		"Error at file 'test.asm' line 2: symbol 'main' not defined\n".
 		"1 errors occurred during assembly\n", 
 		1);
 

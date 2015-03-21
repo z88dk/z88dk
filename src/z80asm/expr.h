@@ -16,7 +16,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 Expression parser based on the shunting-yard algoritm, 
 see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.34 2015-02-24 22:27:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/expr.h,v 1.35 2015-03-21 00:05:14 pauloscustodio Exp $
 */
 
 #pragma once
@@ -136,7 +136,7 @@ END_CLASS;
 CLASS_LIST( Expr );					/* list of expressions */
 
 /* compute ExprOp using Calc_xxx functions */
-extern void ExprOp_compute( ExprOp *self, Expr *expr );
+extern void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error);
 
 /* parse expression at current input, return new Expr object;
    return NULL and issue syntax error on error */
@@ -152,8 +152,8 @@ extern Bool expr_parse_eval( long *presult );
 extern long expr_parse_eval_if( void );
 
 /* evaluate expression if possible, set result.not_evaluable if failed
-   e.g. symbol not defined */
-extern long Expr_eval( Expr *self );
+   e.g. symbol not defined; show error messages if not_defined_error */
+extern long Expr_eval(Expr *self, Bool not_defined_error);
 
 /*-----------------------------------------------------------------------------
 *	Stack for calculator
