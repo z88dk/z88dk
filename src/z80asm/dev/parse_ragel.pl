@@ -15,9 +15,10 @@
 #
 # Preprocess file.rl and generate file.h
 # Needed to allow usage of #define macros and #include in ragel input files
-# Converts special tokens <NL> to "\n", <CAT> to "\t"; <CAT> concatenates.
+# Converts special tokens <NL> to "\n", <TAB> to "\t"; <CAT> concatenates.
+# Expands <MAP>(aa=>AA,bb=>BB,) .. using <A> and <B>
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/parse_ragel.pl,v 1.5 2015-01-26 23:46:22 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Attic/parse_ragel.pl,v 1.6 2015-03-21 21:26:11 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -47,6 +48,7 @@ push @TEMP, "$FILE.rl2";
 
 while (<$in>) {
 	s/^#.*//; 
+	s/<MAP>(.*)/expand_map($1)/ge;
 	s/^\"\".*//; 
 	s/\t+/ /g; 
 	s/ *<CAT> *//g; 
@@ -76,6 +78,46 @@ close($in) or die;
 unlink(@TEMP);
 exit 0;
 
+#-----------------------------------------------------------------------
+# Expand <MAP>
+#-----------------------------------------------------------------------
+sub expand_map {
+	my($text) = @_;
+	my @args;
+	my $ret = "";
+	
+	my $expr = qr/(?: "[^"]*" | '[^']*' | [^\),] )*/x;
+	
+	for ($text) {
+		/^\s*\(/gc or die "missing '(' after <MAP>";
+		my $found_end;
+		while (/\G\s*($expr)\s*([,\)])/gc) {
+			my $arg = $1;
+			my $end = $2;
+			if ($arg ne "") {
+				my @arg = split(/\s*=>\s*/, $arg);
+				push @args, \@arg;
+			}
+			if ($end eq ")") {
+				$found_end = 1;
+				last;
+			}
+		}
+		$found_end or die "missing ')' after <MAP>";
+		/\G\s*(.*)/gc;
+		my $macro = $1."\n";
+		
+		# expand macro for each @args
+		for (@args) {
+			my @values = @$_;
+			my $instance = $macro;
+			$instance =~ s/<([A-Z])>/ $values[ord($1)-ord('A')] || "" /ge;
+			$ret .= $instance;
+		}
+	}
+	return $ret;
+}
+		
 #-----------------------------------------------------------------------
 # Preprocess input file, expanding loops:
 #	#foreach VAR in A1, A2, \
