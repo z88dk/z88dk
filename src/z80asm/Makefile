@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.197 2015-02-24 22:27:38 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.198 2015-03-21 20:53:23 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -81,6 +81,7 @@ CFLAGS +=		-I. -I$(LOCAL_LIB) -It -Wall
 #------------------------------------------------------------------------------
 # main
 #------------------------------------------------------------------------------
+.PHONY: all
 all: $(TARGET) gccmake.bat
 
 $(TARGET): $(OBJS)
