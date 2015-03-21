@@ -3,7 +3,7 @@ Unit test for alloc.c
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/test_str.c,v 1.1 2015-02-24 22:27:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/test_str.c,v 1.2 2015-03-21 21:25:18 pauloscustodio Exp $
 */
 
 #include "minunit.h"
@@ -209,9 +209,9 @@ int test_str(void)
 	mu_assert_str( static_str(-1), ==, "7" );
 	mu_assert_str( static_str(-1), ==, "7" );
 
-	T_STR(s4, s4 = str_new(10));		/* alloc, keep memory leak */
+	T_STR(s4, s4 = str_new(6));		/* alloc, keep memory leak */
 
-	T_STR(s5, s5 = str_new(10));
+	T_STR(s5, s5 = str_new(6));
 	
 	/* expand */
 	T_STR(s3, str_clear(s3));

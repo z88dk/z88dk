@@ -2,7 +2,7 @@
 
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.19 2015-02-24 22:27:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/array.t,v 1.20 2015-03-21 21:25:18 pauloscustodio Exp $
 #
 # Test array.h
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	
 	assert( PointArray_size(points) == 0 );
 	assert( str_len(points->items) == 0 );
-	assert( str_size(points->items) == 0 );
+	assert( str_size(points->items) >= 0 );
 	
 	p = PointArray_item(points, 0);
 	assert( p == (Point*)str_data(points->items) );
