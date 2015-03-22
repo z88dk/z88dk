@@ -42,7 +42,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_asm.lib
    
-      z80asm -d -ns -nm -Mo -x%%t_asm @target/%%t/library/%%t_asm.lst
+      z80asm -ns -nm -Mo -x%%t_asm @target/%%t/library/%%t_asm.lst
       move /Y %%t_asm.lib lib
 
       del /S *.o > nul 2>&1
@@ -50,7 +50,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sccz80.lib
 
-      z80asm -d -ns -nm -Mo -x%%t_sccz80 @target/%%t/library/%%t_sccz80.lst
+      z80asm -ns -nm -Mo -x%%t_sccz80 @target/%%t/library/%%t_sccz80.lst
       move /Y %%t_sccz80.lib lib
 
       del /S *.o > nul 2>&1
@@ -58,7 +58,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sdcc_ix.lib
 
-      z80asm -d -ns -nm -Mo -x%%t_sdcc_ix -D__SDCC -D__SDCC_IX @target/%%t/library/%%t_sdcc_ix.lst
+      z80asm -ns -nm -Mo -x%%t_sdcc_ix -D__SDCC -D__SDCC_IX @target/%%t/library/%%t_sdcc_ix.lst
       move /Y %%t_sdcc_ix.lib lib
 
       del /S *.o > nul 2>&1
@@ -66,7 +66,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sdcc_iy.lib
    
-      z80asm -d -ns -nm -Mo -IXIY -x%%t_sdcc_iy -D__SDCC -D__SDCC_IY @target/%%t/library/%%t_sdcc_iy.lst
+      z80asm -ns -nm -Mo -IXIY -x%%t_sdcc_iy -D__SDCC -D__SDCC_IY @target/%%t/library/%%t_sdcc_iy.lst
       move /Y %%t_sdcc_iy.lib lib
 
       del /S *.o > nul 2>&1
