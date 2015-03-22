@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.16 2015-03-21 20:55:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.17 2015-03-22 00:37:44 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -32,8 +32,8 @@ ASTYLE = astyle \
 all : scan_rules.h
 
 scan_rules.h : scan_rules.rl scan_tokens.h scan_def.h \
-			   dev/parse_ragel.pl dev/Makefile
-	perl dev/parse_ragel.pl scan_rules.rl
+			   parse_ragel.pl dev/Makefile
+	perl parse_ragel.pl scan_rules.rl
 #	$(ASTYLE) scan_rules.h -- formatted file too big for debugger (> 65536 lines)
 
 scan_tokens.h : scan_def.h \
@@ -46,8 +46,8 @@ scan_tokens.h : scan_def.h \
 all : parse_rules.h
 
 parse_rules.h : parse_rules.rl scan_tokens.h scan_def.h \
-				dev/parse_ragel.pl dev/Makefile 
-	perl dev/parse_ragel.pl parse_rules.rl
+				parse_ragel.pl dev/Makefile 
+	perl parse_ragel.pl parse_rules.rl
 #	$(ASTYLE) parse_rules.h -- formatted file too big for debugger (> 65536 lines)
 	
 #------------------------------------------------------------------------------
