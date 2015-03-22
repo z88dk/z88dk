@@ -72,6 +72,9 @@ for %%t in (%targets%) do (
       del /S *.o > nul 2>&1
       del /S *.err > nul 2>&1
       
+      del clib_cfg.asm > nul 2>&1
+      del clib_target_cfg.asm > nul 2>&1
+      
    ) else (
 
       echo.
