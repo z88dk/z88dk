@@ -233,12 +233,11 @@ width_adequate:
    ex af,af'                   ; a = font height
    push af                     ; save font height
    
+   dec a
    add a,h
    jp c, y_too_large - 1       ; if glyph exceeds bottom edge of window
    
-   dec a
    cp (ix+15)
-   
    jr c, height_adequate
    
    ld a,(ix+16)
@@ -247,10 +246,13 @@ width_adequate:
 
 height_adequate:
    
-   pop af
-   ex af,af'                   ; a'= font height
+   pop af                      ; a = font height
+   pop de                      ; d = vertical shift
    
-   pop af                      ; a = vertical shift
+   sub d
+   ex af,af'                   ; a'= adjusted font height
+
+   ld a,d                      ; a = vertical shift
    
    add a,h                     ; + y coord
    add a,(ix+13)               ; + window.y
@@ -262,7 +264,7 @@ height_adequate:
    ;  c = width - 1
    ;  l = absolute x coord
    ;  h = absolute y coord
-   ;  a'= font height
+   ;  a'= adjusted font height
    ; stack = tracking, & bitmap
 
    ld a,(ix+23)
@@ -297,7 +299,7 @@ colour_rectangle:
    and $07
    ld d,a
    
-   ex af,af'                   ; a = font height
+   ex af,af'                   ; a = adjusted font height
    add a,d
    dec a
    rra
