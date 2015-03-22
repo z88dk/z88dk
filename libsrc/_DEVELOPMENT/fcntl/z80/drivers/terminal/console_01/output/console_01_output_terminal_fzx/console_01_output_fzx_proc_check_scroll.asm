@@ -22,10 +22,10 @@ console_01_output_fzx_proc_check_scroll:
    ld e,(ix+15)
    ld d,(ix+16)                ; de = paper.height
    
-   scf
-   sbc hl,de                   ; y - paper.height - 1
+   or a
+   sbc hl,de                   ; y - paper.height
    
-   ret c                       ; if y <= paper.height
+   ret c                       ; if y < paper.height
    
    inc hl                      ; hl = required scroll amount in pixels
    ret
