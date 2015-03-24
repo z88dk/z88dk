@@ -215,4 +215,16 @@ IF startup = 100
 
 ENDIF
 
+IF startup = 200
+
+   ; three terminal windows on screen
+   ;
+   ; stdin    = zx_01_input_kbd_inkey (connected to window_1)
+   ; window_1 = fzx terminal (font = Prefect)
+   ; window_2 = fzx terminal (font = RoundelSerif)
+   
+   INCLUDE "startup/zx_crt_200.asm"
+
+ENDIF
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

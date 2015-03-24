@@ -196,31 +196,38 @@ include "clib_target_constants.inc"
 
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE  : _stdout
+   ; FILE  : _window_1
    ;
-   ; driver: zx_01_output_char_64
+   ; driver: zx_01_output_fzx
    ; fd    : 1
    ; mode  : write only
    ; type  : 002 = output terminal
    ;
-   ; ioctl_flags   : 0x2370
-   ; cursor coord  : (0,0)
-   ; window        : (0,64,0,24)
+   ; ioctl_flags   : 0x2330
+   ; window        : (1,14,1,19)
    ; scroll limit  : 0
-   ; font address  : _font_4x8_default
-   ; text colour   : 56
+   ; paper         : (8,112,8,152)
+   ; cursor coord  : (0,0)
+   ;
+   ; font          : _ff_ao_Prefect
+   ; fzx draw mode : XOR
+   ; left margin   : 3
+   ; line spacing  : single
+   ; space expand  : 0
+   ;
+   ; text colour   : 14
    ; text mask     : 0
-   ; background    : 56
+   ; background    : 14
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+
       
    SECTION data_stdio
    
    ; FILE *
       
-   PUBLIC _stdout
+   PUBLIC _window_1
       
-   _stdout:  defw __i_stdio_file_1 + 2
+   _window_1:  defw __i_stdio_file_1 + 2
    
    ; FILE structure
    
@@ -264,14 +271,14 @@ include "clib_target_constants.inc"
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN zx_01_output_char_64
+   EXTERN zx_01_output_fzx
    
    __i_fcntl_heap_1:
    
       ; heap header
       
       defw __i_fcntl_heap_2
-      defw 35
+      defw 63
       defw __i_fcntl_heap_0
 
    __i_fcntl_fdstruct_1:
@@ -286,7 +293,7 @@ include "clib_target_constants.inc"
       ; jump to driver
       
       defb 195
-      defw zx_01_output_char_64
+      defw zx_01_output_fzx
       
       ; flags
       ; reference_count
@@ -298,7 +305,7 @@ include "clib_target_constants.inc"
       
       ; ioctl_flags
       
-      defw 0x2370
+      defw 0x2330
       
       ; mtx_plain
       
@@ -308,69 +315,114 @@ include "clib_target_constants.inc"
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
-      ; cursor coordinate
-      ; window rectangle
+      ; reserved
+      ; window
       ; scroll limit
-
-      defb 0, 0
-      defb 0, 64, 0, 24
+      ; line spacing
+      
+      defw 0
+      defb 1, 14, 1, 19
+      defb 0
       defb 0
       
-      ; font address
-      ; text colour
-      ; text mask
+      ; temporary storage while editing
+      
+      defs 8
+      
+      ; struct fzx_state   
+   
+      EXTERN __fzx_draw_xor
+      
+      defb 195
+      defw __fzx_draw_xor
+
+      ; font
+      ; cursor (x,y)
+
+      EXTERN _ff_ao_Prefect
+
+      defw _ff_ao_Prefect
+      defw 0, 0
+      
+      ; paper dimensions
+      
+      defw 8,112,8,152
+      
+      ; left margin
+      ; space expand
+      ; reserved
+      
+      defw 3
+      defb 0
+      defw 0
+      
+      ; foreground colour
+      ; foreground mask
       ; background colour
       
-      EXTERN _font_4x8_default
-      
-      defw _font_4x8_default - 256
-      defb 56
+      defb 14
       defb 0
-      defb 56
+      defb 14
 
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; DUPED FILE DESCRIPTOR
+   ; FILE  : _window_2
    ;
-   ; FILE  : _stderr
-   ; flags : 0x80
-   ;
+   ; driver: zx_01_output_fzx
    ; fd    : 2
-   ; dup fd: __i_fcntl_fdstruct_1
+   ; mode  : write only
+   ; type  : 002 = output terminal
+   ;
+   ; ioctl_flags   : 0x2330
+   ; window        : (16,14,3,19)
+   ; scroll limit  : 0
+   ; paper         : (128,112,24,152)
+   ; cursor coord  : (0,0)
+   ;
+   ; font          : _ff_ao_RoundelSerif
+   ; fzx draw mode : XOR
+   ; left margin   : 3
+   ; line spacing  : single
+   ; space expand  : 0
+   ;
+   ; text colour   : 26
+   ; text mask     : 0
+   ; background    : 26
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
    SECTION data_stdio
-      
+   
    ; FILE *
       
-   PUBLIC _stderr
+   PUBLIC _window_2
       
-   _stderr:  defw __i_stdio_file_2 + 2
-      
+   _window_2:  defw __i_stdio_file_2 + 2
+   
    ; FILE structure
-      
+   
    __i_stdio_file_2:
    
       ; open files link
       
       defw __i_stdio_file_1
       
-      ; jump to duped fd
+      ; jump to underlying fd
       
       defb 195
-      defw __i_fcntl_fdstruct_1
+      defw __i_fcntl_fdstruct_2
 
       ; state_flags_0
       ; state_flags_1
       ; conversion flags
       ; ungetc
 
-      defb 0x80
-      defb 0
+      defb 0x80         ; write + normal file type
+      defb 0            ; last operation was write
       defb 0
       defb 0
       
@@ -381,26 +433,112 @@ include "clib_target_constants.inc"
       defb 0         ; lock count = 0
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
-
+    
          
    ; fd table entry
    
    SECTION data_fcntl_fdtable_body
-   defw __i_fcntl_fdstruct_1
-   
+   defw __i_fcntl_fdstruct_2
+
    ; FDSTRUCT structure
    
-   defc __i_fcntl_fdstruct_2 = __i_fcntl_fdstruct_1
+   SECTION data_fcntl_stdio_heap_body
    
-   ; adjust reference count on duped FDSTRUCT
+   EXTERN console_01_output_terminal_fdriver
+   EXTERN zx_01_output_fzx
    
-   SECTION code_crt_init
+   __i_fcntl_heap_2:
    
-   ld hl,__i_fcntl_fdstruct_1 + 7     ; & FDSTRUCT.ref_count
-   inc (hl)
-   inc (hl)
-
+      ; heap header
       
+      defw __i_fcntl_heap_3
+      defw 63
+      defw __i_fcntl_heap_1
+
+   __i_fcntl_fdstruct_2:
+   
+      ; FDSTRUCT structure
+      
+      ; call to first entry to driver
+      
+      defb 205
+      defw console_01_output_terminal_fdriver
+      
+      ; jump to driver
+      
+      defb 195
+      defw zx_01_output_fzx
+      
+      ; flags
+      ; reference_count
+      ; mode_byte
+      
+      defb 0x02      ; type = output terminal
+      defb 2
+      defb 0x02      ; write only
+      
+      ; ioctl_flags
+      
+      defw 0x2330
+      
+      ; mtx_plain
+      
+      defb 0         ; thread owner = none
+      defb 0x01      ; mtx_plain
+      defb 0         ; lock count = 0
+      defb 0xfe      ; atomic spinlock
+      defw 0         ; list of blocked threads
+
+      ; reserved
+      ; window
+      ; scroll limit
+      ; line spacing
+      
+      defw 0
+      defb 16, 14, 3, 19
+      defb 0
+      defb 0
+      
+      ; temporary storage while editing
+      
+      defs 8
+      
+      ; struct fzx_state   
+   
+      EXTERN __fzx_draw_xor
+      
+      defb 195
+      defw __fzx_draw_xor
+
+      ; font
+      ; cursor (x,y)
+
+      EXTERN _ff_ao_RoundelSerif
+
+      defw _ff_ao_RoundelSerif
+      defw 0, 0
+      
+      ; paper dimensions
+      
+      defw 128,112,24,152
+      
+      ; left margin
+      ; space expand
+      ; reserved
+      
+      defw 3
+      defb 0
+      defw 0
+      
+      ; foreground colour
+      ; foreground mask
+      ; background colour
+      
+      defb 26
+      defb 0
+      defb 26
+
+         
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -558,11 +696,11 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 140  = byte size of static FDSTRUCTs
-   ; 2   = number of heap allocations
+   ; 231  = byte size of static FDSTRUCTs
+   ; 3   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 140 > 0
+   IF 231 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -582,24 +720,24 @@ include "clib_target_constants.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (140 + 14)
+      IF __clib_stdio_heap_size > (231 + 14)
       
          ; expand stdio heap to desired size
          
          SECTION data_fcntl_stdio_heap_body
          
-         __i_fcntl_heap_2:
+         __i_fcntl_heap_3:
           
-            defw __i_fcntl_heap_3
+            defw __i_fcntl_heap_4
             defw 0
-            defw __i_fcntl_heap_1
-            defs __clib_stdio_heap_size - 140 - 14
+            defw __i_fcntl_heap_2
+            defs __clib_stdio_heap_size - 231 - 14
          
          ; terminate stdio heap
          
          SECTION data_fcntl_stdio_heap_tail
          
-         __i_fcntl_heap_3:   defw 0
+         __i_fcntl_heap_4:   defw 0
       
       ELSE
       
@@ -607,7 +745,7 @@ include "clib_target_constants.inc"
       
          SECTION data_fcntl_stdio_heap_tail
       
-         __i_fcntl_heap_2:   defw 0
+         __i_fcntl_heap_3:   defw 0
       
       ENDIF
       
