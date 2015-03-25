@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.149 2015-03-21 00:05:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.150 2015-03-25 22:35:45 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,12 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.149 2015-03-21 00:0
 
 /*
 * $Log: hist.c,v $
-* Revision 1.149  2015-03-21 00:05:14  pauloscustodio
+* Revision 1.150  2015-03-25 22:35:45  pauloscustodio
+* Accept a GLOBAL declaration for a symbol already declared as PUBLIC or EXTERN.
+* Accept a PUBLIC declaration for a symbol already declared as GLOBAL or EXTERN.
+* Accept an EXTERN declaration for a symbol already declared as GLOBAL or PUBLIC.
+*
+* Revision 1.149  2015/03/21 00:05:14  pauloscustodio
 * Show symbol name "symbol not defined" in error message.
 *
 * Revision 1.148  2015/02/25 23:08:23  pauloscustodio
@@ -2280,6 +2285,10 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 	  longer used as the symbol to force the link of a library module.
 
 	- Show symbol name "symbol not defined" in error message.
+	
+	- Accept a GLOBAL declaration for a symbol already declared as PUBLIC or EXTERN.
+	  Accept a PUBLIC declaration for a symbol already declared as GLOBAL or EXTERN.
+	  Accept an EXTERN declaration for a symbol already declared as GLOBAL or PUBLIC.
 
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
@@ -2315,7 +2324,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1m"
+#define VERSION     "2.7.1n"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

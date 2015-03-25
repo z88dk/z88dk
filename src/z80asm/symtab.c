@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.53 2015-03-21 00:05:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.54 2015-03-25 22:35:45 pauloscustodio Exp $
 */
 
 #include "errors.h"
@@ -402,6 +402,10 @@ void declare_global_symbol(char *name)
 			sym = Symbol_create(name, 0, TYPE_UNKNOWN, SCOPE_GLOBAL, CURRENTMODULE, CURRENTSECTION);
 			SymbolHash_set(&global_symtab, name, sym);
 		}
+		else if (sym->module == CURRENTMODULE && (sym->scope == SCOPE_PUBLIC || sym->scope == SCOPE_EXTERN))
+		{
+			/* Aready declared PUBLIC or EXTERN, ignore GLOBAL declaration */
+		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_GLOBAL)
 		{
 			error_symbol_redecl(name);
@@ -440,22 +444,31 @@ void declare_global_symbol(char *name)
 /*-----------------------------------------------------------------------------
 *   declare a PUBLIC symbol
 *----------------------------------------------------------------------------*/
-void declare_public_symbol( char *name )
+void declare_public_symbol(char *name)
 {
-    Symbol     *sym, *global_sym;
+	Symbol     *sym, *global_sym;
 
-    sym = find_symbol( name, CURRENTMODULE->local_symtab );	/* search in local tab */
+	sym = find_symbol(name, CURRENTMODULE->local_symtab);	/* search in local tab */
 
-    if ( sym == NULL )
-    {
-        /* not local */
-        sym = find_symbol( name, global_symtab );			/* search in global tab */
+	if (sym == NULL)
+	{
+		/* not local */
+		sym = find_symbol(name, global_symtab);			/* search in global tab */
 
 		if (sym == NULL)
 		{
 			/* not local, not global -> declare symbol as global */
 			sym = Symbol_create(name, 0, TYPE_UNKNOWN, SCOPE_PUBLIC, CURRENTMODULE, CURRENTSECTION);
 			SymbolHash_set(&global_symtab, name, sym);
+		}
+		else if (sym->module == CURRENTMODULE && sym->scope == SCOPE_EXTERN)
+		{
+			/* Declared already EXTERN in the same module, change to PUBLIC */
+			sym->scope = SCOPE_PUBLIC;
+		}
+		else if (sym->module == CURRENTMODULE && sym->scope == SCOPE_GLOBAL)
+		{
+			/* Declared already GLOBAL in the same module, ignore */
 		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_PUBLIC)
 		{
@@ -465,53 +478,57 @@ void declare_public_symbol( char *name )
 		{
 			sym->scope = SCOPE_PUBLIC;
 		}
-    }
-    else
-    {
-        /* local */
-        global_sym = find_symbol( name, global_symtab );
+	}
+	else
+	{
+		/* local */
+		global_sym = find_symbol(name, global_symtab);
 
-        if ( global_sym == NULL )
-        {
-            /* local, not global */
-            /* If no global symbol of identical name has been created, 
+		if (global_sym == NULL)
+		{
+			/* local, not global */
+			/* If no global symbol of identical name has been created,
 			   then re-declare local symbol as global symbol */
 			sym->scope = SCOPE_PUBLIC;
 
-			global_sym = SymbolHash_extract( CURRENTMODULE->local_symtab, name );
+			global_sym = SymbolHash_extract(CURRENTMODULE->local_symtab, name);
 			assert(global_sym == sym);
 
-			SymbolHash_set( &global_symtab, name, sym );
-        }
-        else
-        {
-            /* local, global - no possible path, as if local & not global, 
+			SymbolHash_set(&global_symtab, name, sym);
+		}
+		else
+		{
+			/* local, global - no possible path, as if local & not global,
 			   symbol is moved local -> global */
-            assert(0);
-        }
-    }
+			assert(0);
+		}
+	}
 }
 
 /*-----------------------------------------------------------------------------
 *   declare an EXTERN symbol
 *----------------------------------------------------------------------------*/
-void declare_extern_symbol( char *name )
+void declare_extern_symbol(char *name)
 {
-    Symbol     *sym, *ext_sym;
+	Symbol     *sym, *ext_sym;
 
-    sym = find_symbol( name, CURRENTMODULE->local_symtab );	/* search in local tab */
+	sym = find_symbol(name, CURRENTMODULE->local_symtab);	/* search in local tab */
 
-    if ( sym == NULL )
-    {
-        /* not local */
-        sym = find_symbol( name, global_symtab );			/* search in global tab */
+	if (sym == NULL)
+	{
+		/* not local */
+		sym = find_symbol(name, global_symtab);			/* search in global tab */
 
-        if ( sym == NULL )
-        {
-            /* not local, not global -> declare symbol as extern */
+		if (sym == NULL)
+		{
+			/* not local, not global -> declare symbol as extern */
 			sym = Symbol_create(name, 0, TYPE_CONSTANT, SCOPE_EXTERN, CURRENTMODULE, CURRENTSECTION);
-            SymbolHash_set( &global_symtab, name, sym );
-        }
+			SymbolHash_set(&global_symtab, name, sym);
+		}
+		else if (sym->module == CURRENTMODULE && (sym->scope == SCOPE_PUBLIC || sym->scope == SCOPE_GLOBAL))
+		{
+			/* Declared already PUBLIC or GLOBAL in the same module, ignore EXTERN */
+		}
 		else if (sym->module != CURRENTMODULE || sym->scope != SCOPE_EXTERN)
 		{
 			error_symbol_redecl(name);

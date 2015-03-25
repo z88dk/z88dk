@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.29 2015-03-21 00:05:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.30 2015-03-25 22:35:45 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -173,19 +173,52 @@ t_z80asm(
 );
 
 t_z80asm(
-	asm		=> "PUBLIC VAR : EXTERN VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
+	asm		=> "PUBLIC VAR : EXTERN VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
+);
+
+t_z80asm(
+	asm		=> "PUBLIC VAR : GLOBAL VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
 );
 
 # EXTERN
 t_z80asm(
-	asm		=> "EXTERN VAR : PUBLIC VAR",
-	err		=> "Error at file 'test.asm' line 2: re-declaration of 'VAR' not allowed",
+	asm		=> "EXTERN VAR : PUBLIC VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
 );
 
 t_z80asm(
 	asm		=> "EXTERN VAR : EXTERN VAR : VAR: defb VAR",	# local hides global
 	bin		=> "\0",
+);
+
+t_z80asm(
+	asm		=> "EXTERN VAR : GLOBAL VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
+);
+
+# GLOBAL
+t_z80asm(
+	asm		=> "GLOBAL VAR : PUBLIC VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
+);
+
+t_z80asm(
+	asm		=> "GLOBAL VAR : EXTERN VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
+);
+
+t_z80asm(
+	asm		=> "GLOBAL VAR : GLOBAL VAR : DEFC VAR = 3 : defb VAR",
+	asm1	=> "EXTERN VAR : defb VAR",
+	bin		=> "\3\3",
 );
 
 # Symbol redefined
