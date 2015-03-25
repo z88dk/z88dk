@@ -271,7 +271,7 @@ include "clib_target_constants.inc"
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN zx_01_output_fzx
+   EXTERN zx_01_output_fzx_tty_z88dk
    
    __i_fcntl_heap_1:
    
@@ -293,7 +293,7 @@ include "clib_target_constants.inc"
       ; jump to driver
       
       defb 195
-      defw zx_01_output_fzx
+      defw zx_01_output_fzx_tty_z88dk
       
       ; flags
       ; reference_count
