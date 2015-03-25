@@ -1,3 +1,4 @@
+target/zx/driver/terminal/zx_01_output_fzx_tty_z88dk
 target/zx/driver/terminal/zx_01_output_fzx_tty_z88dk/zx_01_output_fzx_tty_z88dk_01_scroll
 target/zx/driver/terminal/zx_01_output_fzx_tty_z88dk/zx_01_output_fzx_tty_z88dk_02_font_address
 target/zx/driver/terminal/zx_01_output_fzx_tty_z88dk/zx_01_output_fzx_tty_z88dk_08_backspace
