@@ -1,5 +1,5 @@
 /*
-	$Id: sprite.c,v 1.15 2015-03-12 20:23:49 stefano Exp $
+	$Id: sprite.c,v 1.16 2015-03-25 11:07:37 stefano Exp $
 
 	A program to import / make sprites for use with z88dk
 	by Daniel McKinnon
