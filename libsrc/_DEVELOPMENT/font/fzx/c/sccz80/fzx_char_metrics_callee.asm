@@ -5,7 +5,7 @@ SECTION code_font_fzx
 
 PUBLIC fzx_char_metrics_callee, fzx0_char_metrics_callee
 
-fzx_char_metric_callee:
+fzx_char_metrics_callee:
 
    pop hl
    pop bc
