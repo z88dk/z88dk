@@ -6,7 +6,7 @@ PUBLIC zx_01_output_fzx_tty_z88dk_stdio_msg_ictl
 EXTERN asm_vioctl_driver, asm_tty_reset, l_offset_ix_de
 EXTERN zx_01_output_fzx_stdio_msg_ictl
 
-zx_01_output_char_32_tty_z88dk_stdio_msg_ictl:
+zx_01_output_fzx_tty_z88dk_stdio_msg_ictl:
 
    ; enter : de = request
    ;         bc = first parameter

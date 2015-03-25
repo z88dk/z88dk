@@ -6,7 +6,7 @@ PUBLIC zx_01_output_fzx_tty_z88dk_oterm_msg_tty
 EXTERN l_offset_ix_de, zx_tty_z88dk_state_table
 EXTERN asm_tty_execute_action, l_jphl
 
-zx_01_output_char_32_tty_z88dk_oterm_msg_tty:
+zx_01_output_fzx_tty_z88dk_oterm_msg_tty:
 
    ;   implement tty emulation
    ;
