@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.91 2015-02-25 23:04:21 pauloscustodio Exp $
+ *      $Id: zcc.c,v 1.92 2015-03-26 15:05:06 aralbrec Exp $
  */
 
 
@@ -766,12 +766,12 @@ int main(int argc, char **argv)
         }
 
         if (symbolson && copy_file(c_crt0, ".sym", filenamebuf, ".sym")) {
-            fprintf(stderr, "Cannot copy map file\n");
+            fprintf(stderr, "Cannot copy symbols file\n");
             exit(1);
         }
 
         if (globaldefon && copy_file(c_crt0, ".def", filenamebuf, ".def")) {
-            fprintf(stderr, "Cannot copy map file\n");
+            fprintf(stderr, "Cannot copy global defs file\n");
             exit(1);
         }
 
