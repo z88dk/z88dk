@@ -1,0 +1,122 @@
+CAPMUS LIsP (Lemon Version)
+Language Specification
+
+by Hirotsugu Kakugawa 
+
+
+
+1. The Interpreter
+
+  - dynamic binding 
+  - with garbage collector
+
+
+2. Syntax
+
+  - s-expression
+  - a semi-colon (;) begins comment (until line end)
+
+
+3. Data Type
+
+  - nil  (boolean false / empty list)
+  - t    (boolean true)
+  - integer
+  - symbol
+  - cons cell
+  - end-of-file
+
+
+4. Lisp Functions
+
+  - (read)         
+         Read an s-expression from terminal.
+  - (eval S)
+         Evaluate an s-expression S.
+  - (print S)
+         print an s expression S on terminal
+  - (terpri)
+         Print newline.
+  - (gc)
+         Collect garbages.
+  - (quit)
+         Finish the interpreter.
+
+  - (defun F (A1 A2 ...Ak) S1 S2 ... Sn)
+         Define a function F whose body is a sequence of expressions 
+         S1 S2 ... Sn with formal parameters A1 A2 ... Ak. Value of
+         Sn is the result of F. Special form.
+  - (quote S1 S2 ... Sn) 
+         Suppress evaluation of a list of (S1 S2 ... Sn). Special form.
+  - 'S
+         Same as (quote S)
+  - (setq V S)
+         Assign evaluated value of S to symbol V. Special form.
+  - (eq S1 S2)
+         Return t if and only if S1 is identical to S2.
+  - (cons S1 S2)
+         Construct a cons cell with S1 for Car part and S2 for Cdr part.
+  - (car S)
+         Return Car part of cons cell S. 
+  - (cdr S)
+         Return Cdr part of cons cell S. 
+  - (cond (P1 S11 S12 ...) (P2 S21 S22 ...) ... (Pn Sn1 Sn2 ...))
+         Conditional expression.
+  - (progn S1 S2 ... Sn)
+         Sequantially evaluate S1, S2, ... Sn. Return evaluated value of Sn.
+  - (rplaca S1 S2)
+         Replace Car part of cons cell S1 with S2. 
+  - (rplacd S1 S2)
+         Replace Cdr part of cons cell S1 with S2. 
+  - (null S)
+         Return t if S is nil; otherwise nil.
+  - (atom S)
+         Return t if S is not a cons cell; otherwise nil.
+  - (numberp S)
+         Return t if S is an integer; otherwise nil.
+  - (and S1 S2 ... )
+         Evaluate S1, S2, ... as long as evaluation result of Si is non-nil.
+         Special form.
+  - (or S1 S2 ... )
+         Evaluate S1, S2, ... as long as evaluation result of Si is nil.
+         Special form.
+  - (not S)
+         Return t if S is nil; otherwise return nil.
+  - (list S1 S2 ...)
+         Return a list (S1 S2 ...)
+  - (+ n1 n2 ...)
+         Return an integer n1 + n2 + ...
+  - (- n)
+         Return an integer -n.
+  - (- n1 n2 ...)
+         Return an integer n1 - n2 - ...
+  - (* n1 n2 ...)
+         Return an integer n1 * n2 * ...
+  - (/ n1 n2 ...)
+         Return an integer n1 / n2 / ...
+  - (divide n1 n2)
+         Return a cons cell (v1 . v2), where v1 = n1 / n2 and v2 = v1 mod v2.
+         (Car part is quotient, and Cdr part is remainder.)
+  - (/ n)
+         Return an integer 1/n.
+  - (> n1 n2)
+          Return t if n1 > n2; otherwise nil.
+
+Extra commands (excluded in "minimalistic mode")
+  - (>= n1 n2)
+          Return t if n1 >= n2; otherwise nil.
+  - (< n1 n2)
+          Return t if n1 < n2; otherwise nil.
+  - (<= n1 n2)
+          Return t if n1 <= n2; otherwise nil.
+  - (= n1 n2)
+          Return t if n1 = n2; otherwise nil.
+
+
+5. Restrictions
+
+  - no "lambda" expression
+
+
+
+<EOF>
