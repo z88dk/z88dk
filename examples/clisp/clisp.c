@@ -3,7 +3,7 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.1 2015-03-28 16:33:19 stefano Exp $  */
+/*  $Id: clisp.c,v 1.2 2015-03-31 13:50:44 stefano Exp $  */
 
 /*
 z88dk build hints
@@ -21,16 +21,19 @@ zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
 #endif
 
 /* Data Representation ('int' must be at least 32 bits) */
-//#typedef long    long;
-//#typedef int    long;
+/*
+#typedef long    long;
+#typedef int    long;
+*/
 #define D_MASK_DATA     0x0fffffffUL
 #define D_MASK_TAG      0x70000000UL
 #define D_GC_MARK       0x80000000UL
 #define D_TAG_BIT_POS   28UL
 #define D_INT_SIGN_BIT  0x08000000UL
-//#define D_GET_TAG(s)    (s & ~(D_GC_MARK | D_MASK_DATA))
-//#define D_GET_DATA(s)   (s & D_MASK_DATA)
-
+/*
+#define D_GET_TAG(s)    (s & ~(D_GC_MARK | D_MASK_DATA))
+#define D_GET_DATA(s)   (s & D_MASK_DATA)
+*/
 
 /* Data Tags */
 #define TAG_NIL     (0UL << D_TAG_BIT_POS)
@@ -77,9 +80,9 @@ long t_cons_cdr[NCONS];     /* "cdr" part of cell */
 
 char t_symb_free;           /* free slot */
 char *t_symb_pname[NSYMBS];  /* pointer to printable name */
-//#define t_symb_val		((long *)0x7e00)		/*long t_symb_val[NSYMBS];*/    /* symbol value */
+/* #define t_symb_val		((long *)0x7e00) */		/*long t_symb_val[NSYMBS];*/    /* symbol value */
 long t_symb_val[NSYMBS];
-//#define t_symb_fval		((long *)0x7efc)		/*long t_symb_fval[NSYMBS];*/   /* symbol function definition */
+/*#define t_symb_fval		((long *)0x7efc) */		/*long t_symb_fval[NSYMBS];*/   /* symbol function definition */
 long t_symb_fval[NSYMBS];
 int t_symb_ftype[NSYMBS];  /* function type */ 
 
@@ -126,7 +129,7 @@ enum Ftype {
 enum keywords {
   KW_READ,    KW_EVAL,    KW_GC,      KW_CONS,    KW_CAR,      KW_CDR,
   KW_QUIT,    KW_DEFUN,   KW_LAMBDA,  KW_QUOTE,   KW_SETQ,     KW_EQ, 
-  KW_NULL,    KW_ATOM,    KW_NUMBERP, KW_PRINT,   KW_TERPRI,   KW_RPLACA,
+  KW_NULL,    KW_ATOM,    KW_NUMBERP, KW_PRINC,   KW_TERPRI,   KW_RPLACA,
   KW_RPLACD,  KW_PROGN,   KW_COND,    KW_AND,     KW_OR,       KW_NOT,
   KW_LIST,    KW_ADD,     KW_SUB,     KW_TIMES,   KW_QUOTIENT, KW_DIVIDE,
   KW_GT,      KW_LT
@@ -170,10 +173,10 @@ struct s_keywords funcs[] = {
   { "atom",     FTYPE(FTYPE_SYS,     1),               KW_ATOM     },
 #ifdef SCHEME
   { "number?",  FTYPE(FTYPE_SYS,     1),               KW_NUMBERP  },
-  { "display",  FTYPE(FTYPE_SYS,     1),               KW_PRINT    },
+  { "display",  FTYPE(FTYPE_SYS,     1),               KW_PRINC    },
 #else
   { "numberp",  FTYPE(FTYPE_SYS,     1),               KW_NUMBERP  },
-  { "print",    FTYPE(FTYPE_SYS,     1),               KW_PRINT    },
+  { "princ",    FTYPE(FTYPE_SYS,     1),               KW_PRINC    },
 #endif
   { "terpri",   FTYPE(FTYPE_SYS,     0),               KW_TERPRI   },
   /* Common Lisp uses functions rplaca and rplacd to alter list structure
@@ -386,11 +389,9 @@ l_read(void)
 		ungetc(ch,stdin);
 		token[i] = '\0';
 		
-#ifndef MINIMALISTIC
+		/*  Changed to permint the definition of "1+" and "1-" */
 		if ((isdigit((char)token[0]) && (token[1] != '+') && (token[1] != '-'))
-#else
-		if (isdigit((char)token[0])
-#endif
+/*		if (isdigit((char)token[0]) */
 		    || ((token[0] == '-') && isdigit((char)token[1]))
 		    || ((token[0] == '+') && isdigit((char)token[1]))){   /* integer */
 		  s = int_make_l(atol(token));
@@ -619,7 +620,7 @@ special(long f, long a)
     if (list_len(a) < 2)
       return err_msg(errmsg_ill_syntax, 1, f);
 #ifdef SCHEME
-	// (define (func var1 varn) (func content))
+	/* (define (func var1 varn) (func content)) */
     v = l_car(a);            /* function name  */
     v = l_car(v);            /* list of function name, arg and function body */
     if (D_GET_TAG(v) != TAG_SYMB)
@@ -628,7 +629,7 @@ special(long f, long a)
     l = list_len(t);  /* #args */
 	a = l_cons(  v, l_cons(   l_cdr(l_car(a))  , l_cdr(a)));
 #endif
-	// (defun func (var1 varn) (func content))
+	/* (defun func (var1 varn) (func content)) */
     v = l_car(a);            /* function name  */
     if (D_GET_TAG(v) != TAG_SYMB)
       return err_msg(errmsg_ill_syntax, 1, f);
@@ -647,10 +648,6 @@ special(long f, long a)
     if ((v = l_eval(l_car(l_cdr(a)))) < 0)  /* value */
       return -1;
     t_symb_val[D_GET_DATA(t)] = v;
-    break;
-
-  case KW_COMMENT:
-    v = TAG_T;
     break;
 
   case KW_QUOTE:
@@ -703,6 +700,10 @@ special(long f, long a)
     break;
 
 #ifndef MINIMALISTIC
+  case KW_COMMENT:
+    v = TAG_T;
+    break;
+
   case KW_IF:
     if (D_GET_TAG(a) != TAG_CONS)
 	  return err_msg(errmsg_ill_syntax, 1, f);
@@ -828,12 +829,16 @@ fcall(long f, long av[2])  /*, int n*/
     break;
     
   case KW_EQ:
+#ifndef MINIMALISTIC
   case KW_EQMATH:
+#endif
     v = (av[0] == av[1]) ? TAG_T : TAG_NIL;
     break;
 
+#ifndef MINIMALISTIC
   case KW_EQUAL:
     return l_equal(av[0], av[1]);
+#endif
 
   case KW_CONS:
     v = l_cons(av[0], av[1]); 
@@ -859,9 +864,6 @@ fcall(long f, long av[2])  /*, int n*/
     v = (D_GET_TAG(av[0]) == TAG_NIL) ? TAG_T : TAG_NIL;
     break;
 
-  case KW_SYMBP:
-    return (D_GET_TAG(av[0]) == TAG_SYMB) ? TAG_T : TAG_NIL;
-
   case KW_ATOM:
     v = (D_GET_TAG(av[0]) != TAG_CONS) ? TAG_T : TAG_NIL;
     break;
@@ -886,13 +888,13 @@ fcall(long f, long av[2])  /*, int n*/
     v = l_eval(av[0]);
     break;
 
-  case KW_PRINT:
+  case KW_PRINC:
     v = l_print(av[0]);
     break;
 
   case KW_TERPRI:
     printf("\n");
-    v = TAG_T;
+    v = TAG_NIL;
     break;
 
   case KW_GC:
@@ -992,6 +994,9 @@ fcall(long f, long av[2])  /*, int n*/
   case KW_ZEROP:
     v = (int_get_c(av[0]) == 0) ? TAG_T : TAG_NIL;
     break;
+
+  case KW_SYMBP:
+    return (D_GET_TAG(av[0]) == TAG_SYMB) ? TAG_T : TAG_NIL;
 
   case KW_RAND:
     v = int_make_l(rand() % int_get_c(av[0]));
