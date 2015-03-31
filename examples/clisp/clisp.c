@@ -3,7 +3,7 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.3 2015-03-31 14:24:58 stefano Exp $  */
+/*  $Id: clisp.c,v 1.4 2015-03-31 20:55:07 stefano Exp $  */
 
 /*
 z88dk build hints

@@ -1,7 +1,7 @@
 ;;;; 
 ;;;; Campus LIsP function lib
 ;;;; 
-;;;; $Id: library.l,v 1.2 2015-03-31 14:24:58 stefano Exp $
+;;;; $Id: library.l,v 1.3 2015-03-31 20:55:08 stefano Exp $
 
 
 ; factorial example, for comparison to 'minimalistic'
@@ -154,4 +154,43 @@
           (cons (car x) (intersection (cdr x) y))
           (intersection (cdr x) y))
       '()))
+;;;;;;;;;;
+; copy list
+(defun copy-list (l)
+  (if (consp l)
+      (cons (car l) (copy-list (cdr l)))
+      l))
 
+; copy tree
+(defun copy-tree (x)
+  (if (consp x)
+      (cons (copy-tree (car x))
+            (copy-tree (cdr x)))
+      x))
+
+; subst - find and replace elements in a tree
+(defun subst (new old tree)
+  (if (consp tree)
+      (cons (subst new old (car tree))
+            (subst new old (cdr tree)))
+      (if (equal old tree)
+          new
+          tree)))
+
+; assv
+(defun assv (obj alist) 
+  (cond ((null alist) nil) 
+    ((equal (car (car alist)) obj) 
+        (car alist))
+    (t 
+        (assv obj (cdr alist))))) 
+
+
+; sublis - find and replace list
+(defun sublis (alist tree)
+  (if (consp tree)
+      (cons (sublis alist (car tree))
+            (sublis alist (cdr tree)))
+      (if (assv tree alist)
+          (cdr (assv tree alist))
+          tree)))
