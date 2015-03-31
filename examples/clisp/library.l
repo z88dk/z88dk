@@ -1,7 +1,7 @@
 ;;;; 
 ;;;; Campus LIsP function lib
 ;;;; 
-;;;; $Id: library.l,v 1.1 2015-03-31 13:50:44 stefano Exp $
+;;;; $Id: library.l,v 1.2 2015-03-31 14:24:58 stefano Exp $
 
 
 ; factorial example, for comparison to 'minimalistic'
@@ -126,10 +126,32 @@
         ((eq i (car x)) x)
         (t (memq i (cdr x)))))
 
+; see whether a previously 'qset' object is a member of list
+(defun member (i x)
+  (cond ((null x) nil)
+        ((equal i (car x)) x)
+        (t (member i (cdr x)))))
+
 ; list length
 (defun length (x) (_length 0 x))
 (defun _length (n l)
   (if (null l)
     n
     (_length (1+ n) (cdr l))))
+
+; list union, add items from list2 to list1 avoiding duplicates
+(defun union (x y)
+  (if (consp x)
+      (if (member (car x) y)
+          (union (cdr x) y)
+          (cons (car x) (union (cdr x) y)))
+      y))
+
+; list intersection
+(defun intersection (x y)
+  (if (consp x)
+      (if (member (car x) y)
+          (cons (car x) (intersection (cdr x) y))
+          (intersection (cdr x) y))
+      '()))
 

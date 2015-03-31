@@ -3,7 +3,7 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.2 2015-03-31 13:50:44 stefano Exp $  */
+/*  $Id: clisp.c,v 1.3 2015-03-31 14:24:58 stefano Exp $  */
 
 /*
 z88dk build hints
@@ -135,7 +135,7 @@ enum keywords {
   KW_GT,      KW_LT
 #ifndef MINIMALISTIC
   , KW_GTE,     KW_LTE,     KW_ISEVEN,   KW_ISODD,    KW_COMMENT,
-    KW_ZEROP,   KW_SYMBP,   KW_RAND,     KW_REM,      KW_IF,
+    KW_ZEROP,   KW_SYMBP,   KW_CONSP,    KW_RAND,     KW_REM,      KW_IF,
     KW_INCR,    KW_DECR,    KW_EQUAL,    KW_EQMATH
 #endif
 };
@@ -210,10 +210,13 @@ struct s_keywords funcs[] = {
   { "comment",  FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_COMMENT  },
 #ifdef SCHEME
   { "zero?",    FTYPE(FTYPE_SYS,     1),               KW_ZEROP    },
+  { "symbol?",  FTYPE(FTYPE_SYS,     1),               KW_SYMBP    },
+  { "pair?",    FTYPE(FTYPE_SYS,     1),               KW_CONSP    },
 #else
   { "zerop",    FTYPE(FTYPE_SYS,     1),               KW_ZEROP    },
-#endif
   { "symbp",    FTYPE(FTYPE_SYS,     1),               KW_SYMBP    },
+  { "consp",    FTYPE(FTYPE_SYS,     1),               KW_CONSP    },
+#endif
   { "random",   FTYPE(FTYPE_SYS,     1),               KW_RAND     },
   { "%",        FTYPE(FTYPE_SYS,     2),               KW_REM      },
   { "if",       FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_IF       },
@@ -997,6 +1000,9 @@ fcall(long f, long av[2])  /*, int n*/
 
   case KW_SYMBP:
     return (D_GET_TAG(av[0]) == TAG_SYMB) ? TAG_T : TAG_NIL;
+
+  case KW_CONSP:
+    return (D_GET_TAG(av[0]) == TAG_CONS) ? TAG_T : TAG_NIL;
 
   case KW_RAND:
     v = int_make_l(rand() % int_get_c(av[0]));
