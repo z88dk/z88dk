@@ -1,7 +1,7 @@
 ;;;; 
 ;;;; Campus LIsP function lib
 ;;;; 
-;;;; $Id: library.l,v 1.3 2015-03-31 20:55:08 stefano Exp $
+;;;; $Id: library.l,v 1.4 2015-04-01 13:11:32 stefano Exp $
 
 
 ; factorial example, for comparison to 'minimalistic'
@@ -74,6 +74,10 @@
   (if (null (cdr l))
   t nil))
 
+; car alias
+(defun first (x)
+  (car x))
+
 ; cdr alias
 (defun rest (x)
   (cdr x))
@@ -89,6 +93,22 @@
 ; cadr
 (defun cadr (x)
   (car (cdr x)))
+
+; cadr alias
+(defun second (x)
+  (car (cdr x)))
+
+; caddr
+(defun caddr (x)
+  (car (cdr (cdr x))))
+
+; caddr alias
+(defun third (x)
+  (car (cdr (cdr x))))
+
+; cadar
+(defun cadar (x)
+  (car (cdr (car x))))
 
 ; cadadr
 (defun cadadr (x)
@@ -106,6 +126,12 @@
   (if (null (nthcdr n list)) nil
   (car (nthcdr n list))))
 
+; last list element
+(defun last (l)
+  (cond ((null l) nil)
+        ((endp l) (car l))
+        (t (last (cdr l)))))
+
 ; reverse
 (defun reverse (s)
   (__reverse s nil))
@@ -120,6 +146,10 @@
     ls2
     (cons (car ls1) (append (cdr ls1) ls2))))
 
+; revappend
+(defun revappend (x y)
+  (append (reverse x) y))
+
 ; see whether a previously 'qset' object is a member of list
 (defun memq (i x)
   (cond ((null x) nil)
@@ -133,28 +163,23 @@
         (t (member i (cdr x)))))
 
 ; list length
-(defun length (x) (_length 0 x))
-(defun _length (n l)
-  (if (null l)
-    n
-    (_length (1+ n) (cdr l))))
+(defun length (l)
+  (if (null l) 0
+     (1+ (length (cdr l)))))
 
 ; list union, add items from list2 to list1 avoiding duplicates
 (defun union (x y)
-  (if (consp x)
-      (if (member (car x) y)
-          (union (cdr x) y)
-          (cons (car x) (union (cdr x) y)))
-      y))
+  (cond ((not (consp x)) y)
+        ((member (car x) y) (union (cdr x) y))
+        (t (cons (car x) (union (cdr x) y)))))
 
 ; list intersection
 (defun intersection (x y)
-  (if (consp x)
-      (if (member (car x) y)
-          (cons (car x) (intersection (cdr x) y))
-          (intersection (cdr x) y))
-      '()))
-;;;;;;;;;;
+  (cond ((not (consp x)) nil)
+        ((member (car x) y)
+            (cons (car x) (intersection (cdr x) y)))
+        (t (intersection (cdr x) y))))
+
 ; copy list
 (defun copy-list (l)
   (if (consp l)
@@ -170,12 +195,12 @@
 
 ; subst - find and replace elements in a tree
 (defun subst (new old tree)
-  (if (consp tree)
-      (cons (subst new old (car tree))
-            (subst new old (cdr tree)))
-      (if (equal old tree)
-          new
-          tree)))
+  (cond ((consp tree)
+            (cons (subst new old (car tree))
+            (subst new old (cdr tree))))
+        ((equal old tree)
+             new)
+        (t tree)))
 
 ; assv
 (defun assv (obj alist) 
@@ -186,11 +211,37 @@
         (assv obj (cdr alist))))) 
 
 
-; sublis - find and replace list
+; identify elements from first list not present in 2nd list
+(defun set-difference (x y)
+  (cond ((not (consp x)) nil)
+        ((member (car x) y) (set-difference (cdr x) y))
+         (t   (cons (car x) (set-difference (cdr x) y)))))
+
+; count the leaves
+(defun count-leaves (x)
+  (cond ((null x) 0)  
+        ((not (consp x)) 1)
+        (t (+ (count-leaves (car x))
+              (count-leaves (cdr x))))))
+
+;
+; association lists
+;
+
+(defun acons (x y a) 
+   (cons (cons x y) a))
+
+; sublis - find and replace an association list in a tree
 (defun sublis (alist tree)
-  (if (consp tree)
-      (cons (sublis alist (car tree))
-            (sublis alist (cdr tree)))
-      (if (assv tree alist)
-          (cdr (assv tree alist))
-          tree)))
+  (cond ((consp tree)  (cons (sublis alist (car tree))
+                       (sublis alist (cdr tree))))
+        ((assv tree alist)   (cdr (assv tree alist)))
+        (t tree)))
+
+; pairlis - get two pairs from an association list and associate their elements
+;    i.e. (pairlis '(one two three) '(1 2 3))
+;            =>((one 1) (two 2) (three 3))
+(defun pairlis (x y)
+  (if (null x) nil
+    (cons (cons (car x) (car y)) (pairlis (cdr x) (cdr y)))))
+
