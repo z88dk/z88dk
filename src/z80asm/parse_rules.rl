@@ -14,11 +14,11 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define rules for a ragel-based parser. 
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.53 2015-02-24 22:27:40 pauloscustodio Exp $ 
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_rules.rl,v 1.54 2015-04-02 20:00:19 pauloscustodio Exp $ 
 */
 
 #define NO_TOKEN_ENUM
-#include "scan_tokens.h"
+#include "tokens.h"
 
 /*-----------------------------------------------------------------------------
 *   Helper macros

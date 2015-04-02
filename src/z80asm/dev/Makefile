@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.17 2015-03-22 00:37:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.18 2015-04-02 20:00:21 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -25,27 +25,35 @@ ASTYLE = astyle \
 	--pad-oper --pad-paren-in --pad-header --unpad-paren \
 	--align-pointer=name \
 	--suffix=none
+FILEPP = perl -S filepp.pl
+
+#------------------------------------------------------------------------------
+# tokens
+#------------------------------------------------------------------------------
+all : tokens.h
+
+tokens.h : tokens.h.in tokens.def
+	$(FILEPP) tokens.h.in -o $@
+
+clean::
+	$(RM) *~
 
 #------------------------------------------------------------------------------
 # ragel lexer generator
 #------------------------------------------------------------------------------
 all : scan_rules.h
 
-scan_rules.h : scan_rules.rl scan_tokens.h scan_def.h \
+scan_rules.h : scan_rules.rl tokens.h scan_def.h \
 			   parse_ragel.pl dev/Makefile
 	perl parse_ragel.pl scan_rules.rl
 #	$(ASTYLE) scan_rules.h -- formatted file too big for debugger (> 65536 lines)
-
-scan_tokens.h : scan_def.h \
-				dev/build_tokens.pl dev/Makefile
-	perl dev/build_tokens.pl	
 
 #------------------------------------------------------------------------------
 # ragel parser generator
 #------------------------------------------------------------------------------
 all : parse_rules.h
 
-parse_rules.h : parse_rules.rl scan_tokens.h scan_def.h \
+parse_rules.h : parse_rules.rl tokens.h scan_def.h \
 				parse_ragel.pl dev/Makefile 
 	perl parse_ragel.pl parse_rules.rl
 #	$(ASTYLE) parse_rules.h -- formatted file too big for debugger (> 65536 lines)

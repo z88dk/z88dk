@@ -14,12 +14,12 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.52 2015-02-01 23:52:12 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.h,v 1.53 2015-04-02 20:00:19 pauloscustodio Exp $
 */
 
 #pragma once
 
-#include "scan_tokens.h"
+#include "tokens.h"
 #include "types.h"
 #include "opcodes.h"
 

@@ -1,0 +1,1836 @@
+Content-type: text/html
+
+<HTML><HEAD><TITLE>Manpage of FILEPP</TITLE>
+</HEAD><BODY>
+<H1>FILEPP</H1>
+Section: User Commands  (1)<BR>Updated: Feb 27 2007<BR><A HREF="#index">Index</A>
+<A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+filepp - A generic file preprocessor
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>filepp</B>
+
+[<I>options</I>]
+
+<I>filename(s)</I>
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<B>filepp</B> is a generic file preprocessor designed to allow the
+functionality provided by the C preprocessor <B><A HREF="http://localhost/cgi-bin/man/man2html?1+cpp">cpp</A></B>(1) to be used
+with any file type.  <B>filepp</B> is designed to be easily customised
+and extended.
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<B>filepp</B> accepts the following command line options:
+<DL COMPACT>
+<DT><B>-b</B>
+
+<DD>
+Suppress blank lines originating from include files (this has no
+effect on the top-level file).
+<DT><B>-c</B>
+
+<DD>
+Read input from STDIN instead of a file.  Note: if both <B>-c</B> and
+input files are specified, both are used as inputs in the order
+given.
+<DT><B>-D</B><I>macro</I>
+
+<DD>
+Predefine <I>macro</I> to have a definition of  `<B>1</B>'.
+<DT><B>-D</B><I>macro</I><B>=</B><I>defn</I>
+
+<DD>
+Predefine <I>macro</I> to have a definition of <I>defn</I>.
+<DT><B>-d</B>
+
+<DD>
+Output debugging information.
+<DT><B>-dd</B>
+
+<DD>
+Output verbose debugging information.  This option shows all normal
+debugging information, plus the full list of defined macros every time
+the list changes.
+<DT><B>-dl</B>
+
+<DD>
+Output light debugging information.  This option shows minimal
+debugging information.
+<DT><B>-dpre</B><I>char</I>
+
+<DD>
+Prefix all debugging information with <I>char</I> (can be character or
+string), can be used to make debugging easier to read.
+<DT><B>-dpost</B><I>char</I>
+
+<DD>
+Postfix all debugging information with <I>char</I> (can be character or
+string), this defaults to a newline.  If <I>char</I> does not contain a
+newline, then no newline will be printed after debugging messages.
+(Newlines can be put in <I>char</I> using the __NEWLINE__ macro.)
+<DT><B>-ds</B>
+
+<DD>
+Print debugging info on stdout rather than stderr.
+<DT><B>-e</B>
+
+<DD>
+Define all environment variables as macros with prefix <B>envchar</B>.
+<DT><B>-ec</B><I> char</I>
+
+<DD>
+Set <B>envchar</B> (prefix of environment variables defined as macros)
+to <I>char</I>, defaults to <B>$</B>. (Note: this option only takes
+effect at the time the environment variables are converted to
+macros).
+<DT><B>-ecn</B>
+
+<DD>
+Set <B>envchar</B> (prefix of environment variables defined as macros)
+to nothing (no prefix).
+<DT><B>-h</B>
+
+<DD>
+Show summary of options.
+<DT><B>-I</B><I>dir</I>
+
+<DD>
+Append directory <I>dir</I> to the list of directories searched for
+include files.
+<DT><B>-imacros</B><I> file</I>
+
+<DD>
+Reads in macros from <I>file</I>, but discards everything else in the
+file.
+<DT><B>-k</B>
+
+<DD>
+Turn off parsing of all keywords.  This is useful if you just want to
+use the macro expansion facilities of <B>filepp</B>.  With this option
+all keywords found will be ignored, <B>filepp</B> will just replace any
+macros specified with the <B>-D</B><I>macro</I>=<I>defn</I> option.
+<DT><B>-kc</B><I> char</I>
+
+<DD>
+Set keyword prefix character to <I>char</I> (can also be a string).
+All <B>filepp</B> keywords are prefixed with the character <B>#</B> by
+default.  This option allows the prefix to be changed to something
+else.
+<DT><B>-lc</B><I> char</I>
+
+<DD>
+Set line continuation character to <I>char</I> (can also be a string).
+When the line continuation character is found with a newline following
+it, it and the newline are replaced by the line continuation
+replacement character. Default is <B>\</B> (<B><A HREF="http://localhost/cgi-bin/man/man2html?1+cpp">cpp</A></B>(1) style).
+<DT><B>-lec</B><I> char</I>
+
+<DD>
+Set optional keyword line end character to <I>char</I> (can also be a string).
+This allows extra characters to be placed at the end of a line
+containing a keyword.  The extra characters will be ignored.  This is
+useful if keywords are to be embedded in HTML or C style
+comments.  For example, to embed keywords in an HTML comment the
+keyword prefix character could be set to <B>&lt;--!#</B> and the optional
+keyword line end character set to <B>--&gt;</B>.  An example keyword would
+then be:
+<P>
+<B>&lt;!--#include &quot;header.h&quot; --&gt;</B>
+<P>
+In the case the optional keyword line end characters <B>--&gt;</B> would be
+ignored.
+<DT><B>-lr</B><I> char</I>
+
+<DD>
+Set line continuation replacement character to <I>char</I> (can also be
+a string).  Default is a null string (<B><A HREF="http://localhost/cgi-bin/man/man2html?1+cpp">cpp</A></B>(1) style).
+<DT><B>-lrn</B>
+
+<DD>
+Set line continuation replacement character to be a newline.
+<DT><B>-m</B><I> module.pm</I>
+
+<DD>
+Load module <I>module.pm</I>.  <I>module.pm</I> is a <B><A HREF="http://localhost/cgi-bin/man/man2html?1+perl">perl</A></B>(1) module which
+can be used to extend or modify the behaviour of <B>filepp</B>.  See
+section <B>FILEPP MODULES</B> for details of modules included with
+filepp and <B>FILEPP MODULE API</B> for details on how to write
+your own modules.
+<DT><B>-M</B><I>dir</I>
+
+<DD>
+Append directory <I>dir</I> to the list of directories searched for
+filepp modules.  This list defaults to the directory the filepp
+modules are installed (if any) plus the default Perl module paths.
+(Note: this adds the directory to the Perl @INC list.)
+<DT><B>-mp</B><I> char</I>
+
+<DD>
+Prefix all macros with <I>char</I>.  Macros are defined in the normal
+way, but will only be replaced when found prefixed with <I>char</I>.
+For example, filepp macros will behave similar to Bourne shell (<B><A HREF="http://localhost/cgi-bin/man/man2html?1+sh">sh</A></B>(1))
+variables if <I>char</I> is set to <B>$</B>.
+<DT><B>-mpnk</B>
+
+<DD>
+Turns off macro prefixes within keywords.  When using a macro prefix
+character this option allows macros to be used without the prefix in
+keyword processing.  For example, if the macro prefix is <B>$</B> then
+and <B>#if</B> would be written as:
+<P>
+<B>#if $MACRO == 1</B>
+<P>
+Using the <B>mpnk</B> option allows the <B>#if</B> to be written as:
+<P>
+<B>#if MACRO == 1</B>
+<P>
+<DT><B>-o</B><I> name</I>
+
+<DD>
+Write output to <I>name</I> instead of STDOUT.  If there is only one
+input file and it has the same name as the output file, the original
+input file will be backed-up as <I>name~</I>.
+<DT><B>-ov</B>
+
+<DD>
+Overwrite mode, causes the output file to overwrite the input file.
+Useful when modifying a large number of files at once, eg:
+<P>
+<B>filepp</B> -ov -DTHIS=THAT *
+<P>
+The original input file(s) will be backed-up as <I>name~</I>.
+<DT><B>-ovc</B><I> </I><B>IN</B>=<B>OUT</B>
+
+<DD>
+Similar to overwrite mode, the difference is the output filename is
+input filename with <B>IN</B> part converted to <B>OUT</B>.  For
+example, to process a set of files all ending with .in and have the
+output files all ending in .out do:
+<P>
+<B>filepp</B> -ovc .in=.out *.in
+<P>
+In this case a file called <I>test.in</I> will be processed and the
+output file will be <I>test.out</I>.  Note: if the input file does not
+contain <B>IN</B> then the output file will have the same name as the
+input file and the original input file(s) will be backed-up as
+<I>name~</I>!
+<DT><B>-pb</B>
+
+<DD>
+Preserve blank lines.  Using this option attempts to keep as many
+lines in the output file as are in the input file, so all blank lines
+which normally would not get printed are printed.  Useful when
+comparing intput file with output.
+<DT><B>-re</B>
+
+<DD>
+Treat keyword and macro prefix characters and line continuation
+character as Perl regular expressions instead of normal strings.
+<DT><B>-s</B>
+
+<DD>
+Run <B>filepp</B> in safe mode.  This turns off the <B>pragma</B> keyword.
+<DT><B>-U</B><I>macro</I>
+
+<DD>
+Undefine previously defined <I>macro</I>.
+<DT><B>-u</B>
+
+<DD>
+Undefine all currently defined macros, including predefined ones.
+<DT><B>-v</B>
+
+<DD>
+Show version of program.
+<DT><B>-w</B>
+
+<DD>
+Turn on word boundaries when replacing macros.  When word boundaries
+are on, macros will only be replaced if the macro appears in the text
+as a word.  For example, by default <I>macro</I> would be replaced in
+both cases of the following text:
+<P>
+<I>macro as word, macroNOTaword</I>
+<P>
+but only the first occurrence would be replaced with the <B>-w</B>
+option.
+<P>
+With this option enabled <B>filepp</B> will only replace macros which
+contain alphanumeric characters.  International (non-ASCII) character
+sets can be supported using Perl's locale handling.
+<P>
+</DL>
+<A NAME="lbAF">&nbsp;</A>
+<H2>KEYWORDS</H2>
+
+<B>filepp</B> supports the following keywords:
+<DL COMPACT>
+<DT><B>#include</B> &lt;<I>FILE</I>&gt;
+
+<DD>
+Include a file in the file being processed.  This variant is used for
+&quot;system&quot; include files.  It searches for a file named <I>FILE</I> in a
+list of directories specified by you.  Directories are specified with
+the command option `-I'.  <B>filepp</B> does not predefine any system
+directories in which to search for files.
+<DT><B>#include</B> FILE
+
+<DD>
+Include a file in the file being processed.  This variant is used for
+include files of your own project.  It searches for a file named
+<I>FILE</I> first in the current directory, then in the list of
+directories specified with the command option `-I'.  The current
+directory is the directory the base input file is in.
+<DT><B>#define</B> <I>macro</I>
+
+<DD>
+Define the macro <I>macro</I> to have a definition of `1'.  <I>macro</I> can
+then be used with the keywords <B>#ifdef</B> and <B>#ifndef</B>.
+<DT><B>#define</B> <I>macro</I> <I>defn</I>
+
+<DD>
+Define the macro <I>macro</I> to have the value <I>defn</I>.
+<I>macro</I> can then be used with the keywords <B>#ifdef</B> and
+#ifndef.  Also, all instances of <I>macro</I> following the
+<B>#define</B> statement will be replaced with the string <I>defn</I>.
+The string <I>defn</I> is taken to be all the characters on the line
+following <I>macro</I>.
+<DT><B>#define</B> <I>macro(arg1, arg2, ...)</I> <I>defn</I>
+
+<DD>
+Define the macro <I>macro</I> to have the value <I>defn</I> with
+arguments <I>(arg1, arg2, ...)</I>.  <I>macro</I> can be used as
+follows:
+<P>
+<B>#define</B> <I>macro(foo)</I> defn with foo in
+<P>
+Now when replacing occurs:
+<P>
+<I>macro(bar)</I>
+<P>
+will become:
+<P>
+defn with bar in
+<P>
+Macros can have any number of comma separated arguments.
+<P>
+Macros can also have variable numbers of arguments if the final macro ends
+in ..., for example:
+<P>
+<B>#define</B> <I>error(string, args...)</I> fprintf(stderr, string, args);
+<P>
+Here the first argument given becomes <I>string</I> and all other
+arguments will become <I>args</I>. If called as:
+<I>error(&quot;%d,%s&quot;, i, string)</I> it will give
+<P>
+fprintf(stderr, &quot;%d,%s&quot;, i, string);
+<P>
+Also, if a macro with a variable number of arguments is passed no
+arguments for the variable argument, then commas can be optionally
+removed from the definition by preceding the definition with &quot;##&quot;.
+For example:
+<P>
+<B>#define</B> <I>error(string, args...)</I> fprintf(stderr, string, ##args);
+<P>
+If this is called as: <I>error(&quot;empty&quot;)</I> then result will be:
+<P>
+fprintf(stderr, &quot;empty&quot;);
+<P>
+The comma immediately before <I>##args</I> has been removed.
+<P>
+<DT><B>#if</B> <I>expr</I>
+
+<DD>
+A conditional statement, <I>expr</I> will be evaluated to true (1) or
+false (0).  If <I>expr</I> evaluates to true, the text between the
+<B>#if</B> and the next <B>#else</B> or <B>#endif</B> will be included.
+If <I>expr</I> evaluates to false, the text between the <B>#if</B> and
+the next <B>#else</B> or <B>#endif</B> will be ignored.  <I>expr</I> can
+use all the usual cpp style comparisons (==, !=, &lt;, &gt;, etc.).
+Multiple comparisons can be combined with and (&amp;&amp;) and or (||).  The
+<B>defined</B> keyword can also be used to check if macros are defined.
+For example:
+<P>
+<I>#if defined macro &amp;&amp; macro == defn</I>
+<P>
+Note: filepp's <B>#if</B> does not work in exactly the same way as
+<B><A HREF="http://localhost/cgi-bin/man/man2html?1+cpp">cpp</A></B>(1)'s <B>#if</B>.  <B><A HREF="http://localhost/cgi-bin/man/man2html?1+cpp">cpp</A></B>(1)'s <B>#if</B> only does numerical style
+comparisons.  Filepp's <B>#if</B> statement can also compare strings
+and regular expressions using <B><A HREF="http://localhost/cgi-bin/man/man2html?1+perl">perl</A></B>(1)'s full range of comaprison
+operations.  For example, to test if two strings are exactly equal
+use:
+<P>
+<I>#if &quot;MACRO&quot; eq &quot;string&quot;</I>
+<P>
+To test if strings are not equal use <I>ne</I> instead of <I>eq</I>.
+Regular expressions can also be tested, for example to test if a macro
+has any whitespace in it use:
+<P>
+<I>#if &quot;MACRO&quot; =~ /\s/</I>
+<P>
+To test if a macro does not have any whitespace in it <I>=~</I> can be
+replaced with <I>!~</I>.
+<P>
+Perl experts: <B>#if</B> works by first parsing <I>expr</I> for the
+<B>defined</B> keyword and checking if the macro it refers to is
+defined, replacing it with 1 if it is and 0 if it isn't.  It then
+checks <I>expr</I> for any other macros and replaces them with their
+definition.  Finally it passes <I>expr</I> through Perl's <B>eval</B>
+function, which returns true or false.
+<DT><B>#elif</B> <I>expr</I>
+
+<DD>
+<B>#elif</B> stands for &quot;else if&quot;.  Like <B>#else</B>, it goes in the
+middle of a <B>#if</B>[<B>n</B>][<B>def</B>]-<B>#endif</B> pair and
+subdivides it; it does not require a matching <B>#endif</B> of its own.
+Like <B>#if</B>, the <B>#elif</B> directive includes an expression to be
+tested.
+<DT><B>#ifdef</B> <I>macro</I>
+
+<DD>
+A conditional statement, if <I>macro</I> has been defined the text
+between the <B>#ifdef</B> and the next <B>#else</B> or <B>#endif</B> will
+be included.  If <I>macro</I> has not been defined the text between the
+<B>#ifdef</B> and the next <B>#else</B> or <B>#endif</B> will be ignored.
+<DT><B>#ifndef</B> <I>macro</I>
+
+<DD>
+The reverse case of the <B>#ifdef</B> conditional.
+<DT><B>#else</B>
+
+<DD>
+The <B>#else</B> directive can be added to a conditional to provide
+alternative text to be used if the condition is false.
+<DT><B>#endif</B>
+
+<DD>
+Used to terminate a conditional statement.  Normal processing resumes
+following the <B>#endif</B>.
+<DT><B>#undef</B> <I>macro</I>
+
+<DD>
+Undefine a previously defined macro.
+<DT><B>#error</B> <I>mesg</I>
+
+<DD>
+Causes <B>filepp</B> to exit with the error message <I>mesg</I>.
+<DT><B>#warning</B> <I>mesg</I>
+
+<DD>
+Causes <B>filepp</B> to issue the warning message <I>mesg</I>.
+<DT><B>#comment</B> <I>mesg</I>
+
+<DD>
+As <B>filepp</B> is supposed to be a generic file preprocessor, it
+cannot support any known comment styles, therefore it defines its own
+with this keyword.  All lines starting with <B>#comment</B> are treated
+as comments and removed by <B>filepp</B>.
+<DT><B>#pragma</B> <B>filepp</B> <I>function arg1, arg2, ...</I>
+
+<DD>
+The <B>#pragma</B> keyword immediately followed by the word
+<B>filepp</B> allows the user to execute a Perl function during
+parsing.  The word immediately following <B>filepp</B> is taken as the
+name of the function and the remainder of the line is taken to be a
+comma separated list of arguments to the function.  Any of the <B>filepp</B>
+internal functions (see section <B>FILEPP MODULE API</B>) can be called
+with the <B>#pragma</B> keyword.
+<P>
+<I>Warning:</I> There are obvious security risks with allowing
+arbitrary functions to be run, so the -s (safe mode) command line
+option has been added which turns the <B>#pragma</B> keyword off.
+<P>
+</DL>
+<A NAME="lbAG">&nbsp;</A>
+<H2>PREDEFINED MACROS</H2>
+
+<B>filepp</B> supports a set of predefined macros.  All the predefined
+macros are of the form <B>__MACRO__</B>, where <B>MACRO</B> is:
+<DL COMPACT>
+<DT><B>FILE</B>
+
+<DD>
+This macro expands to the name of the current input file.
+<DT><B>LINE</B>
+
+<DD>
+This macro expands to the current input line number.
+<DT><B>DATE</B>
+
+<DD>
+This macro expands to a string that describes the date on which the
+preprocessor is being run.  The string contains eleven characters and
+looks like &quot;Feb 27 2007&quot;.
+<DT><B>ISO_DATE</B>
+
+<DD>
+This macro expands to a string that describes the date on which the
+preprocessor is being run.  The string is in the format specified by
+ISO 8601 (YYYY-MM-DD) and looks like &quot;2007-02-27&quot;.
+<DT><B>TIME</B>
+
+<DD>
+This macro expands to a string that describes the time at which the
+preprocessor is being run.  The string contains eight characters and
+looks like &quot;20:02:16&quot;.
+<DT><B>BASE_FILE</B>
+
+<DD>
+This macro expands to the name of the main input file.
+<DT><B>INCLUDE_LEVEL</B>
+
+<DD>
+This macro expands to a decimal integer constant that represents the
+depth of nesting in include files.  The value of this macro is
+incremented on every <B>#include</B> directive and decremented at every
+end of file.
+<DT><B>NEWLINE</B>
+
+<DD>
+This macro expands to a newline.
+<DT><B>TAB</B>
+
+<DD>
+This macro expands to a tab.
+<DT><B>NULL</B>
+
+<DD>
+This macro expands to nothing.  It is useful if you want to define
+something to be nothing.
+<DT><B>VERSION</B>
+
+<DD>
+This macro expands to a string constant which describes the version
+number of <B>filepp</B>.  The string is a sequence of decimal numbers
+separated by periods and looks like &quot;1.8.0&quot;.
+<DT><B>FILEPP_INPUT</B>
+
+<DD>
+This macro expands to a string constant which says the file was
+generated automatically from the current <B>BASE_FILE</B> and looks
+like &quot;Generated automatically from ./filepp.1.in by filepp&quot;.
+<P>
+</DL>
+<A NAME="lbAH">&nbsp;</A>
+<H2>FILEPP MODULES</H2>
+
+The following modules are included with the main filepp distribution:
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>FOR MODULE - for.pm</H2>
+
+The for module implements a simple for loop. Its file name is
+<B>for.pm</B>.
+<P>
+
+The for loop is similar in functionality to that of other programming
+languages such as Perl or or C.  It has a single variable (a filepp
+macro) which is assigned a numerical value.  This numerical value
+changes by a set increment on each iteration through the loop.  The
+loop termiates when the value no longer passes a comparison test.
+<P>
+
+The for module implements the following keywords:
+<DL COMPACT>
+<DT><B>#for</B> <I>macro</I> <I>start</I> <I>compare</I> <I>end</I> <I>increment</I>
+
+<DD>
+The <B>#for</B> keyword is functionally equivalent to the following Perl
+or C style loop:
+<P>
+for(<I>macro</I>=<I>start</I>; <I>macro</I> <I>compare</I> <I>end</I>;
+<I>macro</I>+=<I>increment</I>)
+<P>
+The <B>#for</B> keyword requires the following space separated
+parameters:
+<P>
+<I>macro</I> : The name of the macro to which the for loop should
+assign its numerical value.
+<P>
+<I>start</I> : The value <I>macro</I> should be assigned at the start of
+the loop.  <I>start</I> should be a numerical value.
+<P>
+<I>compare</I> : The comparison to make between the current value of
+<I>macro</I> and the value <I>end</I> to determine when the loop should
+terminate.  Valid values for <I>compare</I> are &lt;, &gt;, &gt;=, &lt;=.
+<P>
+<I>end</I> : the for loop will terminate when the test 
+<P>
+<BR>&nbsp;<I>&nbsp;macro&nbsp;compare&nbsp;end&nbsp;</I>
+<P>
+fails.  <I>end</I> should be a numerical value.
+<P>
+<I>increment</I> : The value to increment <I>macro</I> on each iteration
+of the loop.  At the end of each iteration the value of
+<I>increment</I> is added to the current value of <I>macro</I>.
+<I>increment</I> should be a numerical value.
+<P>
+<DT><B>#endfor</B>
+
+<DD>
+The <B>#endfor</B> keyword is used to signify the end of the loop.
+Everything within the opening <B>#for</B> and the closing <B>#endfor</B>
+will be processed on each iteration of the loop.
+</DL>
+<P>
+
+<P>
+Example usage:
+<P>
+<B>#for</B> COUNTER 10 &gt; 1 -2.5
+<P>
+<BR>&nbsp;&nbsp;COUNTER
+<P>
+<B>#endfor</B>
+<P>
+In the above example COUNTER will be defined to have values 10, 7.5,
+5 and 2.5 for each successive iteration through the loop.
+<P>
+Nested loops are also possible, as is changing the value of the macro
+within the loop.  <I>start</I>, <I>end</I> and <I>increment</I> should
+all be numerical values, however it is possible to use macros instead
+provided the macros are defined to have numerical values.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAJ">&nbsp;</A>
+<H2>FOREACH MODULE - foreach.pm</H2>
+
+The foreach module implements a simple foreach loop. Its file name is
+<B>foreach.pm</B>.
+<P>
+
+The foreach loop is similar in functionality to that of other programming
+languages such as Perl.  It takes a list of values separated by a user
+definable delimiter (',' by default).  It then iterates through all
+values in the list, defining a macro to be each individual value for
+each iteration of the loop.  The loop terminates when all values have
+been used.
+<P>
+
+The foreach module implements the following keywords:
+<DL COMPACT>
+<DT><B>#foreach</B> <I>macro</I> <I>list</I>
+
+<DD>
+The <B>#foreach</B> keyword is functionally equivalent to the following Perl
+style loop:
+<P>
+foreach <I>macro</I> (split(/<I>delim</I>/, <I>list</I>))
+<P>
+The <B>#foreach</B> keyword requires the following space separated
+parameters:
+<P>
+<I>macro</I> : The name of the macro to which the foreach loop should
+assign the current list value.
+<P>
+<I>list</I> : The list of values, separated by <I>delim</I> (see
+<B>#foreachdelim</B> keyword for how to set <I>delim</I>). <I>list</I>
+can also be a macro or contain macros.
+<P>
+The loop will run from the <B>#foreach</B> keyword to the next
+<B>#endforeach</B> keyword.
+<P>
+<DT><B>#endforeach</B>
+
+<DD>
+The <B>#endforeach</B> keyword is used to signify the end of the loop.
+Everything within the opening <B>#foreach</B> and the closing <B>#endforeach</B>
+will be processed on each iteration of the loop.
+</DL>
+<P>
+
+<P>
+Example usage:
+<P>
+<B>#foreach</B> VALUE one, two, three, four
+<P>
+<BR>&nbsp;&nbsp;VALUE
+<P>
+<B>#endforeach</B>
+<P>
+In the above example VALUE will be defined to have values one, two,
+three and four for each successive iteration through the loop.
+<P>
+Nested loops are also possible.
+<P>
+<P>
+
+<DL COMPACT>
+<DT><B>#foreachdelim</B> /<I>delim</I>/
+
+<DD>
+The <B>#foreachdelim</B> keyword is used to set the delimiter used in
+each list.  The delimiter can be any character, string or regular
+expression.  The delimiter should be enclosed in forward slashes, in
+the same style as Perl regular expressions.   The default value for
+<I>delim</I> is ','.  To set the delimiter to be a single space do:
+<P>
+<B>#foreachdelim</B> / /
+<P>
+To set <I>delim</I> to be any amount of white space do:
+<P>
+<B>#foreachdelim</B> /\s+/
+<P>
+See the Perl documentation on regular expressions for more advanced
+uses.
+</DL>
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAK">&nbsp;</A>
+<H2>LITERAL MODULE - literal.pm</H2>
+
+The literal module prevents macros appearing in literal strings from
+being replaced.  A literal string is defined as having the form:
+<P>
+<I>&quot;literal string with</I> <B>macro</B> <I>in&quot;</I>
+<P>
+In the above example, <B>macro</B> will not be replaced.
+<P>
+The behaviour of the literal module can be reveresed by defining the
+macro <B>LITERAL_REVERSE</B> before loading the module, for example:
+<P>
+filepp -D<B>LITERAL_REVERSE</B> -m literal.pm <I>&lt;files&gt;</I>
+<P>
+This has the effect of only replacing macros which appear in strings.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAL">&nbsp;</A>
+<H2>TOUPPER MODULE - toupper.pm</H2>
+
+The toupper module converts all lowercase letters to uppercase.
+<A NAME="lbAM">&nbsp;</A>
+<H2>TOLOWER MODULE - tolower.pm</H2>
+
+The tolower module converts all uppercase letters to lowercase.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAN">&nbsp;</A>
+<H2>C/C++ COMMENT MODULE - c-comment.pm</H2>
+
+The c-comment module removes all C style:
+<P>
+<I>/* comment */</I>
+<P>
+and C++ style:
+<P>
+<I>// comment</I>
+<P>
+comments from a file.  C and C++ comments are removed after keywords
+have been processed.  If you wish to remove C and C++ comments before
+keywords are processed, define the macro <B>REMOVE_C_COMMENTS_FIRST</B>
+before loading the module, eg:
+<P>
+<B>filepp -DREMOVE_C_COMMENTS_FIRST -m c-comment.pm</B>
+<P>
+<A NAME="lbAO">&nbsp;</A>
+<H2>HASH COMMENT MODULE - hash-comment.pm</H2>
+
+The hash-comment module removes all comments of the style:
+<P>
+<I># comment</I>
+<P>
+from a file.  This is the commenting style used by Perl, Bourne Shell,
+C Shell and many other programs and configuration files.  Hash
+comments are removed after keywords have been processed.  If you wish
+to remove hash comments before keywords are processed, define the
+macro <B>REMOVE_HASH_COMMENTS_FIRST</B> before loading the module
+(Note: if you do this and also use # as the keyword character then the
+keywords will be removed BEFORE they are processed).
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAP">&nbsp;</A>
+<H2>FUNCTION MODULE - function.pm</H2>
+
+The function module allows the user write macros which call Perl functions.
+Its file name is <B>function.pm</B>.
+<P>
+
+The function module allows macros of the form:
+<P>
+<I>macro(arg1, arg2, arg3, ...)</I>
+<P>
+to be added to a file.  When the macro is found, it will run a
+function from a Perl module, with arguments <I>arg1</I>, <I>arg2</I>,
+<I>arg3</I>, <I>...</I> passed to the function.  The function must
+return a string.  The returned string will replace the call to the
+function in the output.  The function can have any number of
+arguments.  If the function has no arguments it should be called with
+an empty argument list:
+<P>
+<I>macro()</I>
+<P>
+If the word <I>macro</I> is found in the input file without being
+followed by a <I>(</I> it will be ignored.
+<P>
+
+To use the function module, the user must provide a Perl function
+which optionally takes in arguments and returns a string.  The
+function can either be one of filepp's internal functions or one of
+the user's own provided in a Perl module.  The function can be added
+in two ways.  The first way is through the <B>function</B> keyword:
+<DL COMPACT>
+<DT><B>#function</B> <I>macro</I> <I>function</I>
+
+<DD>
+<I>macro</I> is the name of the macro which is used to signify a call
+to the function in the input file and <I>function</I> is the name of
+the function to be called.
+</DL>
+<P>
+
+The second method of adding a function is to call the Perl function:
+<DL COMPACT>
+<DT><B>Function::AddFunction(</B><I>$macro</I>,<I>$function</I>)
+
+<DD>
+which has the same inputs as the <B>function</B> keyword.
+</DL>
+<P>
+
+Functions can be removed either through the keyword:
+<DL COMPACT>
+<DT><B>#rmfunction</B> <I>macro</I>
+
+<DD>
+or through the Perl function
+<DT><B>Function::RemoveFunction(</B><I>$macro</I>)
+
+<DD>
+</DL>
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAQ">&nbsp;</A>
+<H2>MATHS MODULE - maths.pm</H2>
+
+The module provides a set of macros which perform mathematical
+operations.  When the macros are encoutered in an input file, they are
+evaluated and the result is returned in the output.
+<P>
+
+The maths module includes the following macros:
+<DL COMPACT>
+<DT><B>add(a, b, c, ...)</B>
+
+<DD>
+Takes in any number of arguments and returns their sum: (a + b + c + ...)
+<DT><B>sub(a, b)</B>
+
+<DD>
+Returns a minus b: (a - b)
+<DT><B>mul(a, b, c, ...)</B>
+
+<DD>
+Takes in any number of arguments and returns their product:
+(a * b * c * ...)
+<DT><B>div(a, b)</B>
+
+<DD>
+Returns a over b: (a / b)
+<DT><B>abs(a)</B>
+
+<DD>
+Returns the absoulte value of a.
+<DT><B>atan2(a, b)</B>
+
+<DD>
+Returns the arctangent of a/b in the range -pi to pi.
+<DT><B>cos(a)</B>
+
+<DD>
+Returns the cosine of a in radians.
+<DT><B>exp(a)</B>
+
+<DD>
+Returns the e to the power of a.
+<DT><B>int(a)</B>
+
+<DD>
+Returns the integer portion of a.
+<DT><B>log(a)</B>
+
+<DD>
+Returns the natural logarithm (base e) of a.
+<DT><B>rand(a)</B>
+
+<DD>
+Returns a random fractional number between the range 0 and a.  If a is
+omitted, returns a value between 0 and 1.
+<DT><B>sin(a)</B>
+
+<DD>
+Returns the sine of a in radians.
+<DT><B>sqrt(a)</B>
+
+<DD>
+Returns the square root of a.
+<DT><B>srand(a)</B>
+
+<DD>
+Sets the random number seed for rand().
+</DL>
+<P>
+
+The maths module also defines pi as M_PI as e as M_E. 
+<P>
+
+The maths macros are implemented using the <B>function.pm</B> module.
+Nested macros are allowed, as is passing other macros with numerical
+defintions as arguments.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAR">&nbsp;</A>
+<H2>FORMAT MODULE - format.pm</H2>
+
+This module provides a set of macros for formating strings and
+numbers.
+<P>
+
+The format module provides the following macros:
+<DL COMPACT>
+<DT><B>printf(format, arg1, arg2, ...)</B>
+
+<DD>
+The <B>printf</B> macro behaves in the same way as the Perl/C function
+printf.  It takes in a format string followed by a list of arguments
+to print.  See the <B><A HREF="http://localhost/cgi-bin/man/man2html?3+printf">printf</A></B>(3) man page or Perl documentation for
+full details of the <B>printf</B> function.
+<DT><B>toupper(string)</B>
+
+<DD>
+Converts input string to upper case.
+<DT><B>toupperfirst(string)</B>
+
+<DD>
+Converts first character of input string to upper case.
+<DT><B>tolower(string)</B>
+
+<DD>
+Converts input string to lower case.
+<DT><B>tolowerfirst(string)</B>
+
+<DD>
+Converts first character of input string to lower case.
+<DT><B>substr(string, offset, length)</B>
+
+<DD>
+Extracts a substring from input <I>string</I>.  <B>substr</B> behaves in
+the same way as the Perl substr function.  <I>offset</I> is used to
+specifiy the first character of the string to output (negative for
+offset from end of string), <I>length</I> is the length of the string
+to output.  If length is omitted everything from the offset is
+returned.  For further information on <B>substr</B> see the Perl
+documentation.
+</DL>
+<P>
+
+The format macros are implemented using the <B>function.pm</B> module.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAS">&nbsp;</A>
+<H2>BIGDEF MODULE - bigdef.pm</H2>
+
+The bigdef module allows easy definition of multi-line macros. Its
+file name is <B>bigdef.pm</B>.
+<P>
+
+A multi-line macro is a macro which has a definition which spans more
+than one line.  The normal way to define these is to place a line
+continuation character at the end of each line in the definition.
+However, this can be annoying and unreadable for large multi-line
+macros.  The bigdef module tries to improve on this by providing two
+keywords:
+<DL COMPACT>
+<DT><B>#bigdef</B> <I>macro</I> <I>definition...</I>
+
+<DD>
+The <B>#bigdef</B> keyword has the same syntax as <B>#define</B>, the
+only difference being the macro definition is everything following the
+macro name including all following lines up to the next
+<B>#endbigdef</B> keyword.
+<DT><B>#endbigdef</B>
+
+<DD>
+Ends a bigdef.  Everything between this keyword and the last
+preceding <B>#bigdef</B> is included in the macro.
+</DL>
+<P>
+
+Any keywords found in the definition will be evaluated as normal AT
+THE TIME THE MACRO IS DEFINED and any output from these will be
+included in the definition.
+<P>
+Note: The difference between bigfunc and bigdef is the time keywords
+in the definition are evaluated.  Bigdef evaluates them as the macro
+is DEFINED, bigfunc evaluates them whenever the macro is REPLACED.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAT">&nbsp;</A>
+<H2>BIGFUNC MODULE - bigfunc.pm</H2>
+
+The bigfunc module allows easy definition of multi-line macros. Its
+file name is <B>bigfunc.pm</B>.
+<P>
+
+A multi-line macro is a macro which has a definition which spans more
+than one line.  The normal way to define these is to place a line
+continuation character at the end of each line in the definition.
+However, this can be annoying and unreadable for large multi-line
+macros.  The bigfunc module tries to improve on this by providing two
+keywords:
+<DL COMPACT>
+<DT><B>#bigfunc</B> <I>macro</I> <I>definition...</I>
+
+<DD>
+The <B>#bigfunc</B> keyword has the same syntax as <B>#define</B>, the
+only difference being the macro definition is everything following the
+macro name including all following lines up to the next
+<B>#endbigfunc</B> keyword.
+<DT><B>#endbigfunc</B>
+
+<DD>
+Ends a bigfunc.  Everything between this keyword and the last
+preceding <B>#bigfunc</B> is included in the macro.
+</DL>
+<P>
+
+Any keywords found in the definition will be evaluated as normal AT
+THE TIME THE MACRO IS REPLACED and any output from these will be
+included in the definition.
+<P>
+Note: The difference between bigfunc and bigdef is the time keywords
+in the definition are evaluated.  Bigdef evaluates them as the macro
+is DEFINED, bigfunc evaluates them whenever the macro is REPLACED.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAU">&nbsp;</A>
+<H2>DEFPLUS MODULE - defplus.pm</H2>
+
+The defplus module allows extra information to be appended to an
+existing macro. Its file name is <B>defplus.pm</B>.
+<P>
+
+The defplus module allows further things to be appended to existing
+macros. The module implements one keyword:
+<DL COMPACT>
+<DT><B>#defplus</B> <I>macro</I> <I>definition...</I>
+
+<DD>
+The <B>#defplus</B> keyword has the same syntax as <B>#define</B>, the
+only difference being if the macro is already defined then
+<I>definition</I> is appended to the existing definition of the macro.
+If the macro is undefined then <B>#defplus</B> behaves in exactly the
+same way as <B>#define</B>.
+</DL>
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAV">&nbsp;</A>
+<H2>REGEXP MODULE - regexp.pm</H2>
+
+The regexp module allows Perl regular expression replacement to be
+done with filepp. Its file name is <B>regexp.pm</B>.
+<P>
+
+Perl regular expression replacement allows a regular expression to be
+searched for and replaced with something else.  Regular expressions
+are defined as follows:
+<DL COMPACT>
+<DT><B>#regexp</B> /<I>regexp</I>/<I>replacement</I>/
+
+<DD>
+It is very similar to the Perl syntax and the following Perl code will
+be executed on each line of the input file:
+<DT><B>$line</B> =~ s/<I>regexp</I>/<I>replacement</I>/g
+
+<DD>
+For users who don't understand Perl, this means replace all
+occurrences of <I>regexp</I> in the current line with
+<I>replacement</I>.
+</DL>
+<P>
+
+A full description of regular expressions and possible replacements is
+beyond the scope of this man page.  More information can be found in
+the Perl documentation using the command:
+<DL COMPACT>
+<DT><B>perldoc</B> <B>perlre</B>
+
+<DD>
+</DL>
+<P>
+
+Any number of regular expressions can be defined.  Each regular
+expression is evaluated once for each line of the input file.  Regular
+expressions are evaluated in the order they are defined.
+<P>
+
+Regular expressions can be undefined in the following way:
+<DL COMPACT>
+<DT><B>#rmregexp</B> /<I>regexp</I>/<I>replacement</I>/
+
+<DD>
+This will remove the specified regular expression.
+</DL>
+<P>
+
+In debugging mode the current list of regular expressions can be
+viewed using the pragma keyword:
+<DL COMPACT>
+<DT><B>#pragma</B> <B>filepp</B> <I>ShowRegexp</I>
+
+<DD>
+When not in debugging mode, this will produce no output.
+</DL>
+<P>
+
+A single regular expression can also be defined on the command line
+using the <I>REGEXP</I> macro, for example:
+<P>
+
+filepp -D<I>REGEXP</I>=/<I>regexp</I>/<I>replacement</I>/ -m regexp.pm inputfile
+<P>
+
+Note: the <I>REGEXP</I> macro must be defined BEFORE the regexp module
+is loaded, putting -D<I>REGEXP</I>... after -m regexp.pm will not work.
+When using the command line approach, if the <I>REGEXP</I> macro is
+successfully parsed as a regular expression it will be undefined from
+the normal filepp macro list before processing starts.  Care should
+obviously be taken when escaping special characters in the shell with
+command line regexps.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAW">&nbsp;</A>
+<H2>BLC MODULE - blc.pm</H2>
+
+The Bracket Line Continuation module causes lines to be continued if
+they have more open brackets: &quot;(&quot; than close brackets: &quot;)&quot; on a line.
+The line will be continued until an equal number of open and close
+brackets are found.
+<P>
+Brackets can be prevented from being counted for line continuation by
+escaping them with a backslash: &quot;" and &quot;)&quot;.  Any brackets found
+with a preceding backslash will be ignored when deciding if line
+continuation should be done and then have the backslash removed once
+the full line has been found.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAX">&nbsp;</A>
+<H2>C MACROS MODULE - cmacros.pm</H2>
+
+The cmacros module causes the definition of the following predefined
+macros to be quoted: <B>DATE, TIME, VERSION, BASE_FILE, FILE,</B>
+(note: predefined macros are written as __MACRO__).
+<P>
+This makes the macros more &quot;C&quot; like, as the C preprocessor also puts
+quotes around these macros.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAY">&nbsp;</A>
+<H2>C MACROS MODULE - cpp.pm</H2>
+
+The cpp makes filepp behave in a similar manner to a C preprocessor <B><A HREF="http://localhost/cgi-bin/man/man2html?1+cpp">cpp</A></B>(1).
+<P>
+DISCLAIMER: filepp is not meant to be a drop in replacement for a C
+preprocessor even with this module.  I would not recommend using
+filepp as a C preprocessor unless you fully understand how it differs
+from a real C preprocessor.  The output from filepp with the cpp
+module will not be the same as a real C preprocessor.
+<P>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<A NAME="lbAZ">&nbsp;</A>
+<H2>GRAB MODULE - grab.pm</H2>
+
+The grab module is used to grab input before processing. Its file name
+is <B>grab.pm</B>. 
+<P>
+
+The grab module is mainly for use in other modules, such as for.pm and
+bigfunc.pm.  It grabs all input from a file before any processing is
+done on it.  This allows other modules to do processing on the
+original input data before the main processing is done.  For example,
+the for module will store the original input inside a loop and re-use
+it each time the loop is processed.
+<DL COMPACT>
+<DT><B>#grab</B> <I>macro</I> <I>definition...</I>
+
+<DD>
+The grab module will start grabbing of all input from the grab
+keyword, onwards.
+<DT><B>#endgrab</B>
+
+<DD>
+Ends a grab.  Everything between this keyword and the last
+preceding <B>#grab</B> will be grabbed and stored for use in other
+modules.
+</DL>
+<P>
+
+Grabs can be nested if required.
+<P>
+
+When calling grab from another module, use the following functions:
+<DL COMPACT>
+<DT><B>Grab::StartGrab(</B><I>$startkeyword</I>,<I>$endkeyword</I>)
+
+<DD>
+<I>$startkeyword</I> is the keyword that StartGrab is called from.
+<I>$endkeyword</I> is the keyword that grabbing should stop at. 
+<DT><B></B><I>@List</I>=<B>Grab::GetInput()</B>
+
+<DD>
+Returns a Perl list containing all input grabbed from when grab was last
+run.
+<DT><B></B><I>$line</I>=<B>Grab::GetInputLine()</B>
+
+<DD>
+Returns the line number of the input file where grabbing last started.
+<P>
+</DL>
+<P>
+
+<P>
+<P>
+<A NAME="lbBA">&nbsp;</A>
+<H2>FILEPP MODULE API</H2>
+
+The behaviour of <B>filepp</B> can be modified or extended through the use
+of modules.  <B>filepp</B> modules are in fact <B><A HREF="http://localhost/cgi-bin/man/man2html?1+perl">perl</A></B>(1) modules, and the rest
+of this section assumes the reader has a knowledge of Perl.
+<P>
+<B>filepp</B> modules are <B><A HREF="http://localhost/cgi-bin/man/man2html?1+perl">perl</A></B>(1) modules which extend or modify <B>filepp</B>'s
+behaviour by either calling or replacing <B>filepp</B>'s internal functions.
+<B>filepp</B> has the Perl package name <B>Filepp</B> so its internal
+functions can be called within modules either as
+<B>Filepp::function()</B> or just <B>function()</B>.  Any of <B>filepp</B>'s
+internal functions can be called or replaced from within a <B>filepp</B>
+module, the most useful ones are:
+<DL COMPACT>
+<DT><B>Debug(</B><I>$string</I>,<I>$number</I>)
+
+<DD>
+Print <I>$string</I> as debugging information if debugging is enabled.  <I>$number</I>
+is optional and can be used to set the debugging level at which <I>$string</I>
+should be printed, lower numbers being higher priority.  Command line
+option <B>d</B> prints all debugging info for 2 and below, option
+<B>dd</B> prints all debugging information for 3 and below and option
+<B>dl</B> prints all debugging information for 1 and below.  If <I>$number</I>
+is not provided, defaults to 1.
+<DT><B>AddProcessor(</B><I>$function</I>,<I>$pos</I>,<B></B><I>$type</I>)
+
+<DD>
+Allows the module to add a function named <I>$function</I> to <B>filepp</B>'s
+processing chain.  The processing chain is a set of functions which
+are run on each line of a file as it is processed.  The default
+functions in the processing chain are <B>ParseKeywords</B> which does
+keyword parsing and <B>ReplaceDefines</B> which does macro replacement.
+Further functions can be added to the chain, with each function taking
+a string (the current line) as input and returning the processed
+string as output.
+<P>
+By default, or if <I>$pos</I> is set to 0, the processor is added to the
+end of the processing chain.  If <I>$pos</I> is set to 1 the processor is
+added to the start of the processing chain.
+<P>
+<I>$type</I> controls what the processor is run on.  There are three options
+for this, 0 (default): the processor runs on everything passed to the
+processing chain; 1: the processor runs on full lines only; 2: the
+processor runs on part lines only (a part line is the text following a
+keyword such as <B>if</B> which needs to be parsed for macros).
+<P>
+Both <I>$pos</I> and <I>$type</I> are optional parameters.
+<DT><B>AddProcessorAfter(</B><I>$function</I>,<I>$existing</I>,<B></B><I>$type</I>)
+
+<DD>
+Adds function <I>$function</I> to the processing chain directly after existing
+processor <I>$existing</I>.  If <I>$existing</I> is not found then <I>$function</I> is added
+to the end of the processing chain.  Regular expression matching is
+used to compare <I>$existing</I> with the names of the functions in the
+processing chain.
+<P>
+<I>$type</I> is optional.
+<DT><B>AddProcessorBefore(</B><I>$function</I>,<I>$existing</I>,<B></B><I>$type</I>)
+
+<DD>
+Adds function <I>$function</I> to the processing chain directly before
+existing processor <I>$existing</I>.  If <I>$existing</I> is not found then <I>$function</I>
+is added to the start of the processing chain.  Regular expression
+matching is used to compare <I>$existing</I> with the names of the functions
+in the processing chain.
+<P>
+<I>$type</I> is optional.
+<DT><B>RemoveProcessor(</B><I>$function</I>)
+
+<DD>
+Removes the processor function <I>$function</I> from the processing chain.
+<DT><B></B><I>$string</I>=<B>ReplaceDefines(</B><I>$string</I>)
+
+<DD>
+Replaces all macros in <I>$string</I> with their definitions and returns the
+processed string.
+<DT><B>AddKeyword(</B><I>$string</I>,<I>$function</I>)
+
+<DD>
+Add the keyword named <I>$string</I>.  When the keyword is found in text
+processing the function named <I>$function</I> will be run with everything
+following the keyword passed as a single argument.
+<DT><B>RemoveKeyword(</B><I>$string</I>)
+
+<DD>
+Removes the keyword named <I>$string</I>.
+<DT><B>RemoveAllKeywords()</B>
+
+<DD>
+Removes all the keywords currently defined for <B>filepp</B> (used for the
+-k command line option).
+<DT><B>AddIfword(</B><I>$string</I>)
+
+<DD>
+Adds keyword named <I>$string</I> to Ifword list.  An Ifword takes in the
+string following the keyword and optionally parses it, returning a 1
+if the string parses to true and 0 for false.  The default Ifwords are
+<B>if</B>, <B>ifdef</B> and <B>ifndef</B>.
+<DT><B>RemoveIfword(</B><I>$string</I>)
+
+<DD>
+Removes keyword named <I>$string</I> from Ifword list (note: this does NOT
+remove the keyword, use <B>RemoveKeyword</B> for that).
+<DT><B>AddElseword(</B><I>$string</I>)
+
+<DD>
+Adds keyword named <I>$string</I> to Elseword list.  An Elseword takes in the
+string following the keyword and optionally parses it, returning a 1
+if the string parses to true and 0 for false.  The default Elsewords are
+<B>else</B> and <B>elif</B>.
+<DT><B>RemoveElseword(</B><I>$string</I>)
+
+<DD>
+Removes keyword named <I>$string</I> from Elseword list.
+<DT><B>AddEndifword(</B><I>$string</I>)
+
+<DD>
+Adds keyword named <I>$string</I> to Endifword list.  An Endifword should
+return a 1 to indicate successful termination of the if block.  If the
+Endifword returns 0 the Endifword is ignored and filepp assumes the
+current if block carries on after the Endifword.  The default
+Endifword is <B>endif</B>.
+<DT><B>RemoveEndifword(</B><I>$string</I>)
+
+<DD>
+Removes keyword named <I>$string</I> from Endifword list.
+<DT><B>AddIncludePath(</B><I>$string</I>)
+
+<DD>
+Adds the include path <I>$string</I> to the list of directories to search for
+include files (used for the -I command line option).
+<DT><B>AddModulePath(</B><I>$string</I>)
+
+<DD>
+Adds the path <I>$string</I> to the list of directories to search for filepp
+modules (used for the -M command line option).
+<DT><B>AddOpenInputFunc(</B><I>$function</I>)
+
+<DD>
+Adds a <I>$function</I> to a list of functions to be run each time a new base
+input file is opened.
+<DT><B>AddCloseInputFunc(</B><I>$function</I>)
+
+<DD>
+Adds a <I>$function</I> to a list of functions to be run each time a new base
+input file is closed.
+<DT><B>AddOpenOutputFunc(</B><I>$function</I>)
+
+<DD>
+Adds a <I>$function</I> to a list of functions to be run each time an output
+file is opened.
+<DT><B>AddCloseOutputFunc(</B><I>$function</I>)
+
+<DD>
+Adds a <I>$function</I> to a list of functions to be run each time an output
+file is closed.
+<DT><B>AddInputFile(</B><I>$string</I>)
+
+<DD>
+Adds another input file to the list of files to be processed (used for
+adding input files at the command line).
+<DT><B>ChangeOutputFile(</B><I>$string</I>)
+
+<DD>
+Closes the current output file and attempts to open a new one named
+<I>$string</I>.
+<DT><B>SetKeywordchar(</B><I>$string</I>)
+
+<DD>
+Set the initial keyword char to <I>$string</I> (used for the -kc command line
+option).
+<DT><B>SetContchar(</B><I>$string</I>)
+
+<DD>
+Set the line continuation char to <I>$string</I> (used for the -lc command
+line option).
+<DT><B>SetContrepchar(</B><I>$string</I>)
+
+<DD>
+Set the line continuation replacement char to <I>$string</I> (used for the -lr
+command line option).
+<DT><B>SetOptLineEndchar(</B><I>$string</I>)
+
+<DD>
+Set the optional keyword line end character to <I>$string</I> (used for the
+-lec command line option).
+<DT><B>SetBlankSupp(1/0)</B>
+
+<DD>
+Turns blank-line suppression on/off (1 = suppress, 0 = don't
+suppress).  When blank-line suppression is on, blank lines in input
+files will not be copied to the output.  Unlike the corresponding
+command-line option (-b), this function can also have effect in the
+top-level file.  The setting of blank-line suppression applies to the
+current file being processed and all files included in the current
+file.
+<DT><B>ResetBlankSupp()</B>
+
+<DD>
+Resets blank-line suppression to the command-line specified value.
+This only affects the output of blank lines from the current file
+being processed and all files included in the current file.  In the
+top-level file, this always turns blank-line suppression off.
+<DT><B>SetEatTrail(</B><I>$string</I>)
+
+<DD>
+If <I>$string</I> is a macro, whenever the macro is replaced all blank space
+between the macro's replacement and the next character on the line
+will be eaten.  For example, if macro <I>foo</I> is defined to
+<I>bar</I> and <I>foo</I> has been set to have it's trail eaten, the
+following:
+<P>
+<BR>&nbsp;eat&nbsp;my&nbsp;foo&nbsp;trail
+<P>
+is replaced with
+<P>
+<BR>&nbsp;eat&nbsp;my&nbsp;bartrail
+<P>
+<DT><B>CheckEatTrail(</B><I>$string</I>)
+
+<DD>
+Returns 1 if macro <I>$string</I> will have it's tail eaten, 0 otherwise.
+<DT><B>SetEnvchar(</B><I>$string</I>)
+
+<DD>
+Set the prefix of environment variables converted to macros
+(<B>envchar</B>) to <I>$string</I> (used for -ec and -ecn command line
+options).
+<DT><B>DefineEnv()</B>
+
+<DD>
+Define all environment variables as macros with prefix <B>envchar</B>
+(used for -e command line option).
+<DT><B>SetOutput(1/0)</B>
+
+<DD>
+Turns writing of parsed input file to output file on/off.  This takes
+either 1 (output on) or 0 (output off) as input.  When the output is
+turned off, the only output produced from <B>filepp</B> will be that
+generated by modules.
+<DT><B>SetWordBoundaries(1/0)</B>
+
+<DD>
+Turns <A HREF="http://localhost/cgi-bin/man/man2html?1+on">on</A>(1) or off(0) word boundary checking when replacing macros
+(used for the -w command line option).
+<DT><B>SetCharPerlre(1/0)</B>
+
+<DD>
+Turns <A HREF="http://localhost/cgi-bin/man/man2html?1+on">on</A>(1) or off(0) allowing of keyword prefix char and line
+continuation char to be Perl regular expressions (used for the -re
+command line option).
+<DT><B>UndefAll()</B>
+
+<DD>
+Undefines all currently defined macros, including predefined ones
+(used for the -u command line option).
+<DT><B>UseModule(</B><I>$string</I>)
+
+<DD>
+Loads a <B><A HREF="http://localhost/cgi-bin/man/man2html?1+perl">perl</A></B>(1) module named <I>$string</I> using the Perl command
+<B>require</B> (used for the -m command line option).
+<DT><B>SetParseLineEnd(</B><I>$function</I>)
+
+<DD>
+Sets the function to determine if line continuation should be done on
+current line to <I>$function</I>.
+<DT><B></B><I>$string</I>=<B>GetNextLine()</B>
+
+<DD>
+Returns the next line (after line continuation has been dealt with) of
+the input file currently being processed.  Returns NULL for end of
+file.
+<DT><B>Write(</B><I>$string</I>)
+
+<DD>
+Writes <I>$string</I> to the current output file.
+<DT><B>Output(</B><I>$string</I>)
+
+<DD>
+Conditionally writes <I>$string</I> to the current output file.  If output is
+turned on then writes <I>$string</I>.  Output is toggled off/on using
+SetOutput function.
+<P>
+</DL>
+<P>
+
+In addition all the standard <B>filepp</B> keywords have equivalent functions
+which optionally take a single argument.  The functions have the same
+name as the keyword, only with a capital first letter (eg:
+<B>#define</B> <I>string</I> calls the function
+<B>Define(</B><I>string</I><B>)</B>).
+<P>
+A full description of the <B>Parse</B> function and all the other
+<B>filepp</B> internal functions is beyond the scope of this man page.  The
+<B>filepp</B> script is well commented and hopefully readable by a Perl
+programmer, so use the source Luke!
+<P>
+<A NAME="lbBB">&nbsp;</A>
+<H2>BUGS</H2>
+
+<B>filepp</B> has no known bugs, only &quot;features&quot;.  If you find any
+&quot;features&quot;, please report them to the author.
+<A NAME="lbBC">&nbsp;</A>
+<H2>COPYING</H2>
+
+Copyright (C) 2000-2007 Darren Miller
+<P>
+
+<B>filepp</B> is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+<P>
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+<P>
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to
+the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+<A NAME="lbBD">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="http://localhost/cgi-bin/man/man2html?1+cpp">cpp</A></B>(1),
+
+<B><A HREF="http://localhost/cgi-bin/man/man2html?1+perl">perl</A></B>(1)
+
+<A NAME="lbBE">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Darren Miller &lt;<A HREF="mailto:darren@cabaret.demon.co.uk">darren@cabaret.demon.co.uk</A>&gt;.
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">OPTIONS</A><DD>
+<DT><A HREF="#lbAF">KEYWORDS</A><DD>
+<DT><A HREF="#lbAG">PREDEFINED MACROS</A><DD>
+<DT><A HREF="#lbAH">FILEPP MODULES</A><DD>
+<DT><A HREF="#lbAI">FOR MODULE - for.pm</A><DD>
+<DT><A HREF="#lbAJ">FOREACH MODULE - foreach.pm</A><DD>
+<DT><A HREF="#lbAK">LITERAL MODULE - literal.pm</A><DD>
+<DT><A HREF="#lbAL">TOUPPER MODULE - toupper.pm</A><DD>
+<DT><A HREF="#lbAM">TOLOWER MODULE - tolower.pm</A><DD>
+<DT><A HREF="#lbAN">C/C++ COMMENT MODULE - c-comment.pm</A><DD>
+<DT><A HREF="#lbAO">HASH COMMENT MODULE - hash-comment.pm</A><DD>
+<DT><A HREF="#lbAP">FUNCTION MODULE - function.pm</A><DD>
+<DT><A HREF="#lbAQ">MATHS MODULE - maths.pm</A><DD>
+<DT><A HREF="#lbAR">FORMAT MODULE - format.pm</A><DD>
+<DT><A HREF="#lbAS">BIGDEF MODULE - bigdef.pm</A><DD>
+<DT><A HREF="#lbAT">BIGFUNC MODULE - bigfunc.pm</A><DD>
+<DT><A HREF="#lbAU">DEFPLUS MODULE - defplus.pm</A><DD>
+<DT><A HREF="#lbAV">REGEXP MODULE - regexp.pm</A><DD>
+<DT><A HREF="#lbAW">BLC MODULE - blc.pm</A><DD>
+<DT><A HREF="#lbAX">C MACROS MODULE - cmacros.pm</A><DD>
+<DT><A HREF="#lbAY">C MACROS MODULE - cpp.pm</A><DD>
+<DT><A HREF="#lbAZ">GRAB MODULE - grab.pm</A><DD>
+<DT><A HREF="#lbBA">FILEPP MODULE API</A><DD>
+<DT><A HREF="#lbBB">BUGS</A><DD>
+<DT><A HREF="#lbBC">COPYING</A><DD>
+<DT><A HREF="#lbBD">SEE ALSO</A><DD>
+<DT><A HREF="#lbBE">AUTHOR</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 20:02:20 GMT, February 27, 2007
+</BODY>
+</HTML>

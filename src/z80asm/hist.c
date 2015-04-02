@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.150 2015-03-25 22:35:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.151 2015-04-02 20:00:18 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.150 2015-03-25 22:3
 
 /*
 * $Log: hist.c,v $
-* Revision 1.150  2015-03-25 22:35:45  pauloscustodio
+* Revision 1.151  2015-04-02 20:00:18  pauloscustodio
+* Use filepp to generate files: tokens.h tokens.h.in and tokens.def
+*
+* Revision 1.150  2015/03/25 22:35:45  pauloscustodio
 * Accept a GLOBAL declaration for a symbol already declared as PUBLIC or EXTERN.
 * Accept a PUBLIC declaration for a symbol already declared as GLOBAL or EXTERN.
 * Accept an EXTERN declaration for a symbol already declared as GLOBAL or PUBLIC.
@@ -2290,6 +2293,9 @@ xx.xx.2015 [2.7.1] (pauloscustodio)
 	  Accept a PUBLIC declaration for a symbol already declared as GLOBAL or EXTERN.
 	  Accept an EXTERN declaration for a symbol already declared as GLOBAL or PUBLIC.
 
+	- Use filepp to generate files: 
+	  tokens.h tokens.h.in and tokens.def;
+
 -------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
@@ -2324,7 +2330,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1n"
+#define VERSION     "2.7.1o"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS
