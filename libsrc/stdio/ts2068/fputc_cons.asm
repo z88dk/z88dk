@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.8 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.9 2015-04-07 20:47:35 stefano Exp $
 ;
 
 
@@ -111,7 +111,14 @@
 ;Get screen address in hl from
 ;64 column position in bc
           ld    bc,(chrloc)
-          srl   c  
+	ld	a,b
+	cp	24
+	jr	nz,noscroll
+	call	scrollup
+	ld	bc,23*256
+	ld  (chrloc),bc
+noscroll:
+          srl   c
           ex    af,af'  
           ld    a,b  
           and   248  
@@ -167,11 +174,11 @@
           jr    z,char4
 .cbak1    ld    l,0  
           inc   h  
-          ld	a,h
-          cp	24
-          jr	nz,char4
-          call	scrollup
-          ld	hl,23*256
+;          ld	a,h
+;          cp	24
+;          jr	nz,char4
+;          call	scrollup
+;          ld	hl,23*256
 .char4    ld    (chrloc),hl  
           ret   
 
@@ -191,7 +198,13 @@
           add	hl,bc	; HL now points to the current char shape
 .print32_entry
           ld    bc,(chrloc)
-
+	ld	a,b
+	cp	24
+	jr	nz,noscroll2
+	call	scrollup
+	ld	bc,23*256
+	ld  (chrloc),bc
+noscroll2:
           srl   c
           ex    af,af'
 
@@ -249,11 +262,13 @@
 ; We should scroll the screen up one character here
 ; Blanking the bottom row..
 .scrollup
+    push    hl
 	ld	    a,(hrgmode)
 	and     a
 	jr      nz,hrgscroll
 	call    call_rom3
 	defw	$939
+	pop     hl
 	ret
 
 .hrgscroll
@@ -315,6 +330,7 @@
 	inc	ix
 	dec	a
 	jr	nz,clear_loop
+	pop     hl
 	ret
 
 

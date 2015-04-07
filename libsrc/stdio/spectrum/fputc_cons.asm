@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.13 2015-04-07 16:47:03 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.14 2015-04-07 20:47:35 stefano Exp $
 ;
 
 
@@ -183,6 +183,13 @@ noscroll:
 	add	hl,bc
 .print32_entry
           ld    bc,(chrloc)  
+	ld	a,b
+	cp	24
+	jr	nz,noscroll2
+	call	scrollup
+	ld	bc,23*256
+	ld  (chrloc),bc
+noscroll2:
 	  srl   c  
           ex    af,af'  
           ld    a,b  
@@ -226,15 +233,18 @@ noscroll:
 ; We should scroll the screen up one character here
 ; Blanking the bottom row..
 .scrollup
+     push   hl
 	 ld		a,($dff)
 	 cp		$17
 	 jr		nz,ts2068_rom
-	 call    call_rom3
+	 call   call_rom3
 	 defw	3582	;scrollup
+     pop    hl
 	 ret
 .ts2068_rom
-	 call    call_rom3
+	 call   call_rom3
      defw	$939	; TS2068 scrollup
+     pop    hl
      ret
 
 ; This nastily inefficient table is the code table for the routines
