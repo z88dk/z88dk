@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.19 2015-01-21 07:05:01 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.20 2015-04-07 16:47:02 stefano Exp $
 ;
 
 
@@ -361,7 +361,6 @@ call_rom3:
 		out     ($f4),a
 		
         exx                      ; Use alternate registers
-ENDIF
 IF DEFINED_NEED_ZXMMC
 		xor		a                ; standard ROM
 		out		($7F),a          ; ZXMMC FASTPAGE

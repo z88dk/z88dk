@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.12 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.13 2015-04-07 16:47:03 stefano Exp $
 ;
 
 
@@ -96,7 +96,14 @@ defc attr = 23693
           exx   
 ;Get screen address in hl from
 ;64 column position in bc
-          ld    bc,(chrloc)  
+          ld    bc,(chrloc)
+	ld	a,b
+	cp	24
+	jr	nz,noscroll
+	call	scrollup
+	ld	bc,23*256
+	ld  (chrloc),bc
+noscroll:
 	  srl   c  
           ex    af,af'  
           ld    a,b  
@@ -153,11 +160,11 @@ defc attr = 23693
           jr    z,char4
 .cbak1    ld    l,0  
           inc   h  
-	ld	a,h
-	cp	24
-	jr	nz,char4
-	call	scrollup
-	ld	hl,23*256
+;	ld	a,h
+;	cp	24
+;	jr	nz,char4
+;	call	scrollup
+;	ld	hl,23*256
 .char4    ld    (chrloc),hl  
           ret   
 

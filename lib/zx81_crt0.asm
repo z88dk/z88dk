@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.45 2015-01-21 07:05:01 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.46 2015-04-07 16:47:03 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -170,8 +170,10 @@ ENDIF
 	; for high-resolution graphics.
 	
         ld      (start1+1),sp   ;Save entry stack
-        ;ld      hl,-64          ;Create an atexit() stack
-        ld      hl,0            ;Create an atexit() stack
+IF      STACKPTR
+        ld      sp,STACKPTR
+ENDIF
+		ld      hl,-8        ;Create an atexit() stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
