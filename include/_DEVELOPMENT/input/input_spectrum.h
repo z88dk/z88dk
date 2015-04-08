@@ -63,7 +63,7 @@ extern void     __LIB__   in_mouse_amx(uint8_t *buttons, uint16_t *x, uint16_t *
 extern uint16_t __LIB__   in_mouse_amx_wheel(void);
 extern int16_t  __LIB__   in_mouse_amx_wheel_delta(void);
 
-extern void               in_mouse_kempston_init(void);
+extern void     __LIB__   in_mouse_kempston_init(void);
 extern void     __LIB__   in_mouse_kempston_reset(void);
 extern void     __LIB__   in_mouse_kempston_setpos(uint16_t x, uint16_t y);
 extern void     __LIB__   in_mouse_kempston(uint8_t *buttons, uint16_t *x, uint16_t *y);
