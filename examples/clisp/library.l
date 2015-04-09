@@ -1,7 +1,7 @@
 ;;;; 
 ;;;; Campus LIsP function lib
 ;;;; 
-;;;; $Id: library.l,v 1.4 2015-04-01 13:11:32 stefano Exp $
+;;;; $Id: library.l,v 1.5 2015-04-09 19:08:47 stefano Exp $
 
 
 ; factorial example, for comparison to 'minimalistic'
@@ -74,6 +74,16 @@
   (if (null (cdr l))
   t nil))
 
+; check if the element is a list
+(defun listp (l)
+  (cond ((null l) t)
+		((consp l) t)
+		(t nil)))
+
+; check if the element is an atom
+(defun atom (l)
+  (if (not (consp l)) t nil))
+
 ; car alias
 (defun first (x)
   (car x))
@@ -122,6 +132,7 @@
 
 ; pick an element at a given position in a list
 ; Note that the elements are numbered from zero, not one.
+; elt works similarly
 (defun nth (n list)
   (if (null (nthcdr n list)) nil
   (car (nthcdr n list))))
@@ -131,6 +142,12 @@
   (cond ((null l) nil)
         ((endp l) (car l))
         (t (last (cdr l)))))
+
+; remove last list element
+(defun butlast (l)
+  (cond ((null l) nil)
+        ((endp l) nil)
+        (t (cons (car l) (butlast (cdr l))))))
 
 ; reverse
 (defun reverse (s)
@@ -163,9 +180,9 @@
         (t (member i (cdr x)))))
 
 ; list length
-(defun length (l)
+(defun list-length (l)
   (if (null l) 0
-     (1+ (length (cdr l)))))
+     (1+ (list-length (cdr l)))))
 
 ; list union, add items from list2 to list1 avoiding duplicates
 (defun union (x y)
@@ -179,6 +196,13 @@
         ((member (car x) y)
             (cons (car x) (intersection (cdr x) y)))
         (t (intersection (cdr x) y))))
+
+; Returns a list of elements of list1 that do not appear in list2.
+(defun set-difference (x y)
+(cond
+  ((null x) x)
+  ((member (car x) y) (set-difference (cdr x) y))
+  (t (cons (car x) (set-difference (cdr x) y)))))
 
 ; copy list
 (defun copy-list (l)

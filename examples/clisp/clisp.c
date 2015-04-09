@@ -3,11 +3,16 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.4 2015-03-31 20:55:07 stefano Exp $  */
+/*  $Id: clisp.c,v 1.5 2015-04-09 19:08:47 stefano Exp $  */
 
 /*
 z88dk build hints
+
+Spectrum
 zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
+
+zx81 32K exp (do not use LARGEMEM values bigger than 1200:
+  zcc +zx81 -O3 -create-app -DLARGEMEM=1200 clisp.c
 */
 
 
@@ -18,6 +23,10 @@ zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
 
 #ifndef MINIMALISTIC
 #include <time.h>
+#endif
+
+#ifdef ZX81
+#pragma output STACKPTR=49152
 #endif
 
 /* Data Representation ('int' must be at least 32 bits) */
@@ -63,9 +72,15 @@ zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
 #define NCONS   1024
 #endif
 #endif
+#ifndef ZX81
 int t_cons_free;           /* free list */
 long t_cons_car[NCONS];     /* "car" part of cell */
 long t_cons_cdr[NCONS];     /* "cdr" part of cell */
+#else
+int t_cons_free @0x9091;
+long t_cons_car[] @0x9093;
+long t_cons_cdr[] @0xA353;
+#endif
 
 /* Symbols */
 #ifdef TINYMEM
@@ -78,6 +93,7 @@ long t_cons_cdr[NCONS];     /* "cdr" part of cell */
 #endif
 #endif
 
+#ifndef ZX81
 char t_symb_free;           /* free slot */
 char *t_symb_pname[NSYMBS];  /* pointer to printable name */
 /* #define t_symb_val		((long *)0x7e00) */		/*long t_symb_val[NSYMBS];*/    /* symbol value */
@@ -85,6 +101,14 @@ long t_symb_val[NSYMBS];
 /*#define t_symb_fval		((long *)0x7efc) */		/*long t_symb_fval[NSYMBS];*/   /* symbol function definition */
 long t_symb_fval[NSYMBS];
 int t_symb_ftype[NSYMBS];  /* function type */ 
+#else
+char t_symb_free @0x8780;
+char *t_symb_pname[] @0xB77B;
+//char *t_symb_pname[NSYMBS];
+long t_symb_val[] @0x8000;
+long t_symb_fval[] @0x8781;
+int t_symb_ftype[] @0xB613;
+#endif
 
 /* Printable name */
 #ifdef TINYMEM
@@ -96,20 +120,31 @@ int t_symb_ftype[NSYMBS];  /* function type */
 #define PNAME_SIZE   512
 #endif
 #endif
+
+#ifndef ZX81
 int t_pnames_free;         /* free pointer */
 char  t_pnames[PNAME_SIZE];  /* names */ 
+#else
+int t_pnames_free @0xB8E3;
+char  t_pnames[] @0x82D0;
+#endif
 
 /* Stack */
 #ifdef TINYMEM
 #define STACK_SIZE   22
 #else
 #ifdef LARGEMEM
-#define STACK_SIZE   300
+#define STACK_SIZE   LARGEMEM/3
 #else
 #define STACK_SIZE   254
 #endif
 #endif
+
+#ifndef ZX81
 long t_stack[STACK_SIZE];   /* the stack */
+#else
+long t_stack[] @0x8A51;
+#endif
 unsigned int t_stack_ptr;           /* stack pointer */
 
 
@@ -146,6 +181,7 @@ struct s_keywords {
 };
 
 /* Built-in function table */
+#ifndef NOINIT
 struct s_keywords funcs[] = {
   { "read",     FTYPE(FTYPE_SYS,     0),               KW_READ     },
   { "eval",     FTYPE(FTYPE_SYS,     1),               KW_EVAL     },
@@ -218,7 +254,11 @@ struct s_keywords funcs[] = {
   { "consp",    FTYPE(FTYPE_SYS,     1),               KW_CONSP    },
 #endif
   { "random",   FTYPE(FTYPE_SYS,     1),               KW_RAND     },
+#ifdef ZX81
+  { "rem",      FTYPE(FTYPE_SYS,     2),               KW_REM      },
+#else
   { "%",        FTYPE(FTYPE_SYS,     2),               KW_REM      },
+#endif
   { "if",       FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_IF       },
   { "1+",       FTYPE(FTYPE_SYS,     1),               KW_INCR     },
   { "1-",       FTYPE(FTYPE_SYS,     1),               KW_DECR     },
@@ -231,6 +271,7 @@ struct s_keywords funcs[] = {
 #endif
   { NULL,       -1,                                    -1          }
 };
+#endif
 
 /* Error messages */
 char *errmsg_sym_undef  = "SYMBOL UNDEFINED: ";
@@ -277,6 +318,41 @@ long D_GET_DATA(long s) {
 		return (s & D_MASK_DATA);
 }
 
+#ifdef Z80
+
+#ifdef ZX81
+char buf[] @16444;
+#else
+char buf[120];
+#endif
+
+int cpt;
+char ug=13;
+
+char gchar() {
+	if (ug==13) {
+	  while (!gets(buf)) {};
+	  cpt=0;
+	}
+	if ((ug=buf[cpt++]) == 0)  ug=13;
+	return (ug);
+}
+
+void ugchar(char ch) {
+	cpt--;
+}
+#else
+
+char gchar() {
+	return (fgetc (stdin));
+}
+
+void ugchar(char ch) {
+	ungetc(ch,stdin);
+}
+
+#endif
+
 void
 main(void)
 {
@@ -303,7 +379,13 @@ init(void)
   /* Randomize */
   srand(time(NULL));
 #endif
+
+  /* stack */
+  t_stack_ptr = 0;
+
+#ifdef NOINIT
   
+#else
   /* cells */
   t_cons_free = 0;
 
@@ -320,18 +402,20 @@ init(void)
   /* print name (symbol name) */
   t_pnames_free = 0;
 
-  /* stack */
-  t_stack_ptr = 0;
-
   /* install built-in functions */
   for (i = 0; funcs[i].key != NULL; i++) {
     symb_make(funcs[i].key);
     t_symb_ftype[i] = funcs[i].ftype;
+#ifndef Z80
     if (i != funcs[i].i){
       printf("function install error: %s\n", funcs[i].key);
       quit();
     }
+#endif
   }
+
+#endif
+  
 }
 
 
@@ -372,10 +456,15 @@ l_read(void)
     return TAG_EOF; 
 
   } else if (ch == ';'){         /* comment */
-    while (fgetc(stdin) != '\n')
+    while (gchar() != '\n')
       ;
     return -1;
-  } else if (ch == '\''){        /* quote macro */
+  }
+#ifdef ZX81
+  else if (ch == '\"'){        /* quote macro */
+#else
+  else if (ch == '\''){        /* quote macro */
+#endif
     if ((t = l_read()) < 0)
       return -1;
     if (t == TAG_EOF)
@@ -386,10 +475,10 @@ l_read(void)
   } else if (ch != '('){         /* t, nil, symbol, or integer */
     token[0] = ch;
     for (i = 1; ; i++){
-      ch = fgetc(stdin);
+      ch = gchar();
       if (isspace(ch) || iscntrl(ch) || (ch < 0) 
 		  || (ch == ';') || (ch == '(') || (ch == ')')){
-		ungetc(ch,stdin);
+		ugchar(ch);
 		token[i] = '\0';
 		
 		/*  Changed to permint the definition of "1+" and "1-" */
@@ -423,7 +512,7 @@ l_read(void)
     } else if (ch == ')'){
       s = TAG_NIL;  /* "()" = nil */
     } else {
-      ungetc(ch,stdin);
+      ugchar(ch);
       if ((t = l_read()) < 0)
 		return err_msg(errmsg_eof, 0, 0);
       if (t == TAG_EOF)
@@ -437,7 +526,7 @@ l_read(void)
 		  return err_msg(errmsg_eof, 0, 0);
 		if (ch == ')')
 		  break;
-		ungetc(ch,stdin);
+		ugchar(ch);
 		if ((t = l_read()) < 0)
 		  return -1;
 		if (t == TAG_EOF)
@@ -460,7 +549,7 @@ skip_space(void)
   char ch;
 
   for (;;){
-    if ((ch = fgetc(stdin)) < 0)
+    if ((ch = gchar()) < 0)
       return -1;     /* end-of-file */
     if (!isspace(ch) && !iscntrl(ch))
       break;
