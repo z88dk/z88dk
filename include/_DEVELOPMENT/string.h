@@ -87,6 +87,38 @@ extern size_t  strxfrm(char *dst, char *src, size_t n);
 #define strchr(s, c)           __builtin_strchr(s, c)
 #define memset(dst, c, n)      __builtin_memset(dst, c, n)
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern char   *_strrstrip__fastcall(char *s) __z88dk_fastcall;
+extern int     ffs_fastcall(int i) __z88dk_fastcall;
+extern int     ffsl_fastcall(long i) __z88dk_fastcall;
+extern char   *strdup_fastcall(char *s) __z88dk_fastcall;
+extern char   *strerror_fastcall(int errnum) __z88dk_fastcall;
+extern size_t  strlen_fastcall(char *s) __z88dk_fastcall;
+extern char    strlwr_fastcall(char *s) __z88dk_fastcall;
+extern char   *strrev_fastcall(char *s) __z88dk_fastcall;
+extern char   *strrstrip_fastcall(char *s) __z88dk_fastcall;
+extern char   *strstrip_fastcall(char *s) __z88dk_fastcall;
+extern char    strupr_fastcall(char *s) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define _strrstrip_(a)               _strrstrip__fastcall(a)
+#define ffs(a)                       ffs_fastcall(a)
+#define ffsl(a)                      ffsl_fastcall(a)
+#define strdup(a)                    strdup_fastcall(a)
+#define strerror(a)                  strerror_fastcall(a)
+#define strlen(a)                    strlen_fastcall(a)
+#define strlwr(a)                    strlwr_fastcall(a)
+#define strrev(a)                    strrev_fastcall(a)
+#define strrstrip(a)                 strrstrip_fastcall(a)
+#define strstrip(a)                  strstrip_fastcall(a)
+#define strupr(a)                    strupr_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80 

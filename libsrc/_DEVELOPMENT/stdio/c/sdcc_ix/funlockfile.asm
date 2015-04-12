@@ -5,20 +5,14 @@ SECTION code_stdio
 
 PUBLIC _funlockfile
 
+EXTERN _funlockfile_fastcall
+
 _funlockfile:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
 
-   call asm_funlockfile
-   
-   pop ix
-   ret
-      
-   INCLUDE "stdio/z80/asm_funlockfile.asm"
+   jp _funlockfile_fastcall

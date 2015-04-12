@@ -5,20 +5,14 @@ SECTION code_stdio
 
 PUBLIC _fflush_unlocked
 
+EXTERN _fflush_unlocked_fastcall
+
 _fflush_unlocked:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_fflush_unlocked
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_fflush_unlocked.asm"
+
+   jp _fflush_unlocked_fastcall

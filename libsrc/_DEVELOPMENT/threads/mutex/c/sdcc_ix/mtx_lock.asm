@@ -5,6 +5,8 @@ SECTION code_threads_mutex
 
 PUBLIC _mtx_lock
 
+EXTERN asm_mtx_lock
+
 _mtx_lock:
 
    pop af
@@ -13,4 +15,4 @@ _mtx_lock:
    push hl
    push af
    
-   INCLUDE "threads/mutex/z80/asm_mtx_lock.asm"
+   jp asm_mtx_lock

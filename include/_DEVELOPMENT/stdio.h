@@ -146,6 +146,78 @@ extern int     vfscanf_unlocked(FILE *stream, char *format, void *arg);
 extern int     vprintf_unlocked(char *format, void *arg);
 extern int     vscanf_unlocked(char *format, void *arg);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void    clearerr_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     fclose_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     feof_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     ferror_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     fflush_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     fgetc_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     fileno_fastcall(FILE *stream) __z88dk_fastcall;
+extern void    flockfile_fastcall(FILE *stream) __z88dk_fastcall;
+extern uint32_t  ftell_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     ftrylockfile_fastcall(FILE *stream) __z88dk_fastcall;
+extern void    funlockfile_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     getc_fastcall(FILE *stream) __z88dk_fastcall;
+extern char    gets_fastcall(char *s) __z88dk_fastcall;
+extern void    perror_fastcall(char *s) __z88dk_fastcall;
+extern int     putchar_fastcall(int c) __z88dk_fastcall;
+extern int     puts_fastcall(char *s) __z88dk_fastcall;
+extern void    rewind_fastcall(FILE *stream) __z88dk_fastcall;
+
+extern void    clearerr_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     fclose_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     feof_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     ferror_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     fflush_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     fgetc_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     fileno_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+extern uint32_t  ftell_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+extern int     getc_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+extern char    gets_unlocked_fastcall(char *s) __z88dk_fastcall;
+extern int     putchar_unlocked_fastcall(int c) __z88dk_fastcall;
+extern int     puts_unlocked_fastcall(char *s) __z88dk_fastcall;
+extern void    rewind_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define clearerr(a)                 clearerr_fastcall(a)
+#define fclose(a)                   fclose_fastcall(a)
+#define feof(a)                     feof_fastcall(a)
+#define ferror(a)                   ferror_fastcall(a)
+#define fflush(a)                   fflush_fastcall(a)
+#define fgetc(a)                    fgetc_fastcall(a)
+#define fileno(a)                   fileno_fastcall(a)
+#define flockfile(a)                flockfile_fastcall(a)
+#define ftell(a)                    ftell_fastcall(a)
+#define ftrylockfile(a)             ftrylockfile_fastcall(a)
+#define funlockfile(a)              funlockfile_fastcall(a)
+#define getc(a)                     getc_fastcall(a)
+#define gets(a)                     gets_fastcall(a)
+#define perror(a)                   perror_fastcall(a)
+#define putchar(a)                  putchar_fastcall(a)
+#define puts(a)                     puts_fastcall(a)
+#define rewind(a)                   rewind_fastcall(a)
+
+#define clearerr_unlocked(a)        clearerr_unlocked_fastcall(a)
+#define fclose_unlocked(a)          fclose_unlocked_fastcall(a)
+#define feof_unlocked(a)            feof_unlocked_fastcall(a)
+#define ferror_unlocked(a)          ferror_unlocked_fastcall(a)
+#define fflush_unlocked(a)          fflush_unlocked_fastcall(a)
+#define fgetc_unlocked(a)           fgetc_unlocked_fastcall(a)
+#define fileno_unlocked(a)          fileno_unlocked_fastcall(a)
+#define ftell_unlocked(a)           ftell_unlocked_fastcall(a)
+#define getc_unlocked(a)            getc_unlocked_fastcall(a)
+#define gets_unlocked(a)            gets_unlocked_fastcall(a)
+#define putchar_unlocked(a)         putchar_unlocked_fastcall(a)
+#define puts_unlocked(a)            puts_unlocked_fastcall(a)
+#define rewind_unlocked(a)          rewind_unlocked_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

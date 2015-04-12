@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _atol
 
+EXTERN asm_atol
+
 _atol:
 
    pop af
@@ -13,4 +15,4 @@ _atol:
    push hl
    push af
 
-   INCLUDE "stdlib/z80/asm_atol.asm"
+   jp asm_atol

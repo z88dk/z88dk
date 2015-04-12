@@ -11,15 +11,17 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fflush
 
+EXTERN asm_fflush
+
 _fflush:
 
    pop af
    pop ix
    
-   push ix
+   push hl
    push af
 
-   INCLUDE "stdio/z80/asm_fflush.asm"
+   jp asm_fflush
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -30,8 +32,6 @@ PUBLIC _fflush
 EXTERN _fflush_unlocked
 
 defc _fflush = _fflush_unlocked
-   
-INCLUDE "stdio/z80/asm_fflush.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

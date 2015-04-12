@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _ffs
 
+EXTERN asm_ffs
+
 _ffs:
 
    pop af
@@ -13,4 +15,4 @@ _ffs:
    push hl
    push af
 
-   INCLUDE "string/z80/asm_ffs.asm"
+   jp asm_ffs

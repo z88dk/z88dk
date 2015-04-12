@@ -5,13 +5,11 @@ SECTION code_fcntl
 
 PUBLIC __exit
 
-EXTERN __Exit
+EXTERN __exit_fastcall
 
 __exit:
 
    pop hl
    pop hl
    
-   jp __Exit
-
-INCLUDE "fcntl/z80/asm__exit.asm"
+   jp __exit_fastcall

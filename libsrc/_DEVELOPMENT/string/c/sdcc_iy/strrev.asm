@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strrev
 
+EXTERN asm_strrev
+
 _strrev:
 
    pop af
@@ -13,4 +15,4 @@ _strrev:
    push hl
    push af
 
-   INCLUDE "string/z80/asm_strrev.asm"
+   jp asm_strrev

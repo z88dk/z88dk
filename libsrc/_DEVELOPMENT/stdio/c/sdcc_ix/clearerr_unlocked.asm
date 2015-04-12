@@ -5,20 +5,14 @@ SECTION code_stdio
 
 PUBLIC _clearerr_unlocked
 
+EXTERN _clearerr_unlocked_fastcall
+
 _clearerr_unlocked:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
    
-   push bc
-   ex (sp),ix
-   
-   call asm_clearerr_unlocked
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_clearerr_unlocked.asm"
+   jp _clearerr_unlocked_fastcall

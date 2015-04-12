@@ -5,20 +5,14 @@ SECTION code_stdio
 
 PUBLIC _flockfile
 
+EXTERN _flockfile_fastcall
+
 _flockfile:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_flockfile
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_flockfile.asm"
+
+   jp _flockfile_fastcall

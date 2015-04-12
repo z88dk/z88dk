@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _labs
 
+EXTERN asm_labs
+
 _labs:
 
    pop af
@@ -15,4 +17,4 @@ _labs:
    push hl
    push af
    
-   INCLUDE "stdlib/z80/asm_labs.asm"
+   jp asm_labs

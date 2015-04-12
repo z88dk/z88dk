@@ -5,6 +5,8 @@ SECTION code_z80
 
 PUBLIC _z80_set_int_state
 
+EXTERN asm_z80_set_int_state
+
 _z80_set_int_state:
 
    pop af
@@ -13,4 +15,4 @@ _z80_set_int_state:
    push hl
    push af
 
-   INCLUDE "z80/z80/asm_z80_set_int_state.asm"
+   jp asm_z80_set_int_state

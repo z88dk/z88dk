@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _system
 
+EXTERN _system_fastcall
+
 _system:
 
    pop af
@@ -12,12 +14,5 @@ _system:
    
    push hl
    push af
-   
-   push ix
-   
-   call asm_system
-   
-   pop ix
-   ret
 
-   INCLUDE "stdlib/z80/asm_system.asm"
+   jp _system_fastcall

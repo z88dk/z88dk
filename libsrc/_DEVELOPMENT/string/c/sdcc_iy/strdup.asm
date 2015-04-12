@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strdup
 
+EXTERN asm_strdup
+
 _strdup:
 
    pop af
@@ -13,4 +15,4 @@ _strdup:
    push hl
    push af
    
-   INCLUDE "string/z80/asm_strdup.asm"
+   jp asm_strdup

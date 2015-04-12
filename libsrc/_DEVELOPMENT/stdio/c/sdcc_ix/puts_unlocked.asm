@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _puts_unlocked
 
+EXTERN _puts_unlocked_fastcall
+
 _puts_unlocked:
 
    pop af
@@ -13,11 +15,4 @@ _puts_unlocked:
    push hl
    push af
 
-   push ix
-   
-   call asm_puts_unlocked
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_puts_unlocked.asm"
+   jp _puts_unlocked_fastcall

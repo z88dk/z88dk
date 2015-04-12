@@ -5,12 +5,14 @@ SECTION code_stdio
 
 PUBLIC _clearerr_unlocked
 
+EXTERN asm_clearerr_unlocked
+
 _clearerr_unlocked:
 
    pop af
    pop ix
    
-   push ix
+   push hl
    push af
    
-   INCLUDE "stdio/z80/asm_clearerr_unlocked.asm"
+   jp asm_clearerr_unlocked

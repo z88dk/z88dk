@@ -5,6 +5,8 @@ SECTION code_threads_mutex
 
 PUBLIC _mtx_trylock
 
+EXTERN asm_mtx_trylock
+
 _mtx_trylock:
 
    pop af
@@ -13,4 +15,4 @@ _mtx_trylock:
    push hl
    push af
 
-   INCLUDE "threads/mutex/z80/asm_mtx_trylock.asm"
+   jp asm_mtx_trylock

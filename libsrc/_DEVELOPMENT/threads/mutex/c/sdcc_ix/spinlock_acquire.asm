@@ -5,6 +5,8 @@ SECTION code_threads_mutex
 
 PUBLIC _spinlock_acquire
 
+EXTERN asm_spinlock_acquire
+
 _spinlock_acquire:
 
    pop af
@@ -13,4 +15,4 @@ _spinlock_acquire:
    push hl
    push af
    
-   INCLUDE "threads/mutex/z80/asm_spinlock_acquire.asm"
+   jp asm_spinlock_acquire

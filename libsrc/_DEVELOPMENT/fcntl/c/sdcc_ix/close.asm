@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _close
 
+EXTERN _close_fastcall
+
 _close:
 
    pop af
@@ -12,12 +14,5 @@ _close:
    
    push hl
    push af
-   
-   push ix
-   
-   call asm_close
-   
-   pop ix
-   ret
 
-   INCLUDE "fcntl/z80/asm_close.asm"
+   jp _close_fastcall

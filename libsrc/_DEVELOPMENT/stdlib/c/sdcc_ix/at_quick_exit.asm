@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _at_quick_exit
 
+EXTERN asm_at_quick_exit
+
 _at_quick_exit:
 
    pop af
@@ -13,4 +15,4 @@ _at_quick_exit:
    push hl
    push af
 
-   INCLUDE "stdlib/z80/asm_at_quick_exit.asm"
+   jp asm_at_quick_exit

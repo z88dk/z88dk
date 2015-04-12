@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _abs
 
+EXTERN asm_abs
+
 _abs:
 
    pop af
@@ -13,4 +15,4 @@ _abs:
    push hl
    push af
 
-   INCLUDE "stdlib/z80/asm_abs.asm"
+   jp asm_abs

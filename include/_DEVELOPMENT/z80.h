@@ -28,6 +28,26 @@ extern void       z80_outp(uint16_t port, uint16_t data);
 extern void      *z80_otir(void *src, uint16_t port);
 extern void      *z80_otdr(void *src, uint16_t port);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void       im2_init_fastcall(void *im2_table_address) __z88dk_fastcall;
+extern void       z80_delay_ms_fastcall(uint16_t ms) __z88dk_fastcall;
+extern void       z80_delay_tstate_fastcall(uint16_t tstates) __z88dk_fastcall;
+extern void       z80_set_int_state_fastcall(uint16_t state) __z88dk_fastcall;
+extern uint8_t    z80_inp_fastcall(uint16_t port) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define im2_init(a)                    im2_init_fastcall(a)
+#define z80_delay_ms(a)                z80_delay_ms_fastcall(a)
+#define z80_delay_tstate(a)            z80_delay_tstate_fastcall(a)
+#define z80_set_int_state(a)           z80_set_int_state_fastcall(a)
+#define z80_inp(a)                     z80_inp_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

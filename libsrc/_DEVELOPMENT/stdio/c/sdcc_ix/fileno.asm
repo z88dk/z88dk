@@ -11,23 +11,17 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fileno
 
+EXTERN _fileno_fastcall
+
 _fileno:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_fileno
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_fileno.asm"
+
+   jp _fileno_fastcall
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -38,8 +32,6 @@ PUBLIC _fileno
 EXTERN _fileno_unlocked
 
 defc _fileno = _fileno_unlocked
-
-INCLUDE "stdio/z80/asm_fileno.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

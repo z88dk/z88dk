@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _srand
 
+EXTERN asm_srand
+
 _srand:
 
    pop af
@@ -13,4 +15,4 @@ _srand:
    push hl
    push af
 
-   INCLUDE "stdlib/z80/asm_srand.asm"
+   jp asm_srand

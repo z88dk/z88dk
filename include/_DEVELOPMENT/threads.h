@@ -38,6 +38,30 @@ extern void   spinlock_acquire(char *spinlock);
 extern void   spinlock_release(char *spinlock);
 extern int    spinlock_tryacquire(char *spinlock);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void   mtx_destroy_fastcall(mtx_t *m) __z88dk_fastcall;
+extern int    mtx_lock_fastcall(mtx_t *m) __z88dk_fastcall;
+extern int    mtx_trylock_fastcall(mtx_t *m) __z88dk_fastcall;
+extern int    mtx_unlock_fastcall(mtx_t *m) __z88dk_fastcall;
+extern void   spinlock_acquire_fastcall(char *spinlock) __z88dk_fastcall;
+extern void   spinlock_release_fastcall(char *spinlock) __z88dk_fastcall;
+extern int    spinlock_tryacquire_fastcall(char *spinlock) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define mtx_destroy(a)           mtx_destroy_fastcall(a)
+#define mtx_lock(a)              mtx_lock_fastcall(a)
+#define mtx_trylock(a)           mtx_trylock_fastcall(a)
+#define mtx_unlock(a)            mtx_unlock_fastcall(a)
+#define spinlock_acquire(a)      spinlock_acquire_fastcall(a)
+#define spinlock_release(a)      spinlock_release_fastcall(a)
+#define spinlock_tryacquire(a)   spinlock_tryacquire_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

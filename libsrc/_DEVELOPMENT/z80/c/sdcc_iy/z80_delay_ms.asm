@@ -5,6 +5,8 @@ SECTION code_z80
 
 PUBLIC _z80_delay_ms
 
+EXTERN asm_z80_delay_ms
+
 _z80_delay_ms:
 
    pop af
@@ -13,4 +15,4 @@ _z80_delay_ms:
    push hl
    push af
 
-   INCLUDE "z80/z80/asm_z80_delay_ms.asm"
+   jp asm_z80_delay_ms

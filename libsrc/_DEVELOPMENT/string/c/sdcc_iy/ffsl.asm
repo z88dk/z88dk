@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _ffsl
 
+EXTERN asm_ffsl
+
 _ffsl:
 
    pop af
@@ -15,4 +17,4 @@ _ffsl:
    push hl
    push af
    
-   INCLUDE "string/z80/asm_ffsl.asm"
+   jp asm_ffsl

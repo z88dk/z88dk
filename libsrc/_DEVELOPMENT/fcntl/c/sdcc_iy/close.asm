@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _close
 
+EXTERN asm_close
+
 _close:
 
    pop af
@@ -13,4 +15,4 @@ _close:
    push hl
    push af
    
-   INCLUDE "fcntl/z80/asm_close.asm"
+   jp asm_close

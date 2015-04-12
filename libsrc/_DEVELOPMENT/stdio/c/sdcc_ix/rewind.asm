@@ -9,37 +9,29 @@ SECTION code_stdio
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC rewind
+PUBLIC _rewind
 
-rewind:
+EXTERN _rewind_fastcall
+
+_rewind:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_rewind
-   
-   pop ix
-   ret
 
-   INCLUDE "stdio/z80/asm_rewind.asm"
+   jp _rewind_fastcall
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC rewind
+PUBLIC _rewind
 
-EXTERN rewind_unlocked
+EXTERN _rewind_unlocked
 
-defc rewind = rewind_unlocked
-   
-INCLUDE "stdio/z80/asm_rewind.asm"
+defc _rewind = _rewind_unlocked
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _atoi
 
+EXTERN asm_atoi
+
 _atoi:
 
    pop af
@@ -13,4 +15,4 @@ _atoi:
    push hl
    push af
 
-   INCLUDE "stdlib/z80/asm_atoi.asm"
+   jp asm_atoi

@@ -5,12 +5,14 @@ SECTION code_stdio
 
 PUBLIC _fileno_unlocked
 
+EXTERN asm_fileno_unlocked
+
 _fileno_unlocked:
 
    pop af
    pop ix
    
-   push ix
+   push hl
    push af
    
-   INCLUDE "stdio/z80/asm_fileno_unlocked.asm"
+   jp asm_fileno_unlocked

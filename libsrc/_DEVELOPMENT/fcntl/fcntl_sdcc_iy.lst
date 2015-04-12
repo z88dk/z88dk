@@ -9,8 +9,10 @@ fcntl/z80/__fcntl_inc_refcount
 fcntl/z80/__fcntl_lock_fdtbl
 fcntl/z80/__fcntl_unlock_fdtbl
 fcntl/c/sdcc_iy/close
+fcntl/c/sdcc_iy/close_fastcall
 fcntl/c/sdcc_iy/creat
 fcntl/c/sdcc_iy/dup
+fcntl/c/sdcc_iy/dup_fastcall
 fcntl/c/sdcc_iy/dup2
 fcntl/c/sdcc_iy/ioctl
 fcntl/c/sdcc_iy/lseek

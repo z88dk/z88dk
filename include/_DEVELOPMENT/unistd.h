@@ -55,6 +55,22 @@ extern off_t             lseek(int fd, off_t offset, int whence);
 extern ssize_t           read(int fd, void *buf, size_t nbyte);
 extern ssize_t           write(int fd, const void *buf, size_t nbyte);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern int               close_fastcall(int fd) __z88dk_fastcall;
+extern int               dup_fastcall(int fd) __z88dk_fastcall;
+extern void              _exit_fastcall(int status) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define close(a)         close_fastcall(a)
+#define dup(a)           dup_fastcall(a)
+#define _exit(a)         _exit_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

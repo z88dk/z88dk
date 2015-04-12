@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __random_uniform_xor_32_
 
+EXTERN asm_random_uniform_xor_32
+
 __random_uniform_xor_32_:
 
    pop af
@@ -15,4 +17,4 @@ __random_uniform_xor_32_:
    push hl
    push af
 
-   INCLUDE "stdlib/z80/random/asm_random_uniform_xor_32.asm"
+   jp asm_random_uniform_xor_32

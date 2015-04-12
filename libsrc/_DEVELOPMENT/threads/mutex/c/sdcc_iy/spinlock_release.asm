@@ -5,6 +5,8 @@ SECTION code_threads_mutex
 
 PUBLIC _spinlock_release
 
+EXTERN asm_spinlock_release
+
 _spinlock_release:
 
    pop af
@@ -13,4 +15,4 @@ _spinlock_release:
    push hl
    push af
 
-   INCLUDE "threads/mutex/z80/asm_spinlock_release.asm"
+   jp asm_spinlock_release

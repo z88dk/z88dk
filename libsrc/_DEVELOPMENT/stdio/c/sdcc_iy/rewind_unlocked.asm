@@ -5,12 +5,14 @@ SECTION code_stdio
 
 PUBLIC rewind_unlocked
 
+EXTERN asm_rewind_unlocked
+
 rewind_unlocked:
 
    pop af
    pop ix
    
-   push ix
+   push hl
    push af
    
-   INCLUDE "stdio/z80/asm_rewind_unlocked.asm"
+   jp asm_rewind_unlocked

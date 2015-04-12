@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strupr
 
+EXTERN asm_strupr
+
 _strupr:
 
    pop af
@@ -13,4 +15,4 @@ _strupr:
    push hl
    push af
 
-   INCLUDE "string/z80/asm_strupr.asm"
+   jp asm_strupr

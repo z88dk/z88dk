@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _atexit
 
+EXTERN asm_atexit
+
 _atexit:
 
    pop af
@@ -13,4 +15,4 @@ _atexit:
    push hl
    push af
 
-   INCLUDE "stdlib/z80/asm_atexit.asm"
+   jp asm_atexit

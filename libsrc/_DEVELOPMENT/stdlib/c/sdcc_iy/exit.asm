@@ -5,12 +5,11 @@ SECTION code_stdlib
 
 PUBLIC _exit
 
+EXTERN asm_exit
+
 _exit:
 
    pop af
    pop hl
    
-   push hl
-   push af
-   
-   INCLUDE "stdlib/z80/asm_exit.asm"
+   jp asm_exit

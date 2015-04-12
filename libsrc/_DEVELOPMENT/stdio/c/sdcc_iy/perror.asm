@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _perror
 
+EXTERN asm_perror
+
 _perror:
 
    pop af
@@ -13,4 +15,4 @@ _perror:
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_perror.asm"
+   jp asm_perror

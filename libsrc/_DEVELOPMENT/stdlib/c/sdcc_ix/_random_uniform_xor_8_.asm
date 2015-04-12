@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __random_uniform_xor_8_
 
+EXTERN __random_uniform_xor_8__fastcall
+
 __random_uniform_xor_8_:
 
    pop af
@@ -15,11 +17,4 @@ __random_uniform_xor_8_:
    push hl
    push af
 
-   call asm_random_uniform_xor_8
-   
-   ld l,a
-   ld h,0
-   
-   ret
-
-   INCLUDE "stdlib/z80/random/asm_random_uniform_xor_8.asm"
+   jp __random_uniform_xor_8__fastcall

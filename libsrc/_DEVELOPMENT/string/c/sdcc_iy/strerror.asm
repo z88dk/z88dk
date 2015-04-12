@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strerror
 
+EXTERN asm_strerror
+
 _strerror:
 
    pop af
@@ -13,4 +15,4 @@ _strerror:
    push hl
    push af
    
-   INCLUDE "string/z80/asm_strerror.asm"
+   jp asm_strerror

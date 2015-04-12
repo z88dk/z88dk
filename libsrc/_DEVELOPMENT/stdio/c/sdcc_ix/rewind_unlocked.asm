@@ -3,22 +3,16 @@
 
 SECTION code_stdio
 
-PUBLIC rewind_unlocked
+PUBLIC _rewind_unlocked
 
-rewind_unlocked:
+EXTERN _rewind_unlocked_fastcall
+
+_rewind_unlocked:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_rewind_unlocked
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_rewind_unlocked.asm"
+
+   jp _rewind_unlocked_fastcall

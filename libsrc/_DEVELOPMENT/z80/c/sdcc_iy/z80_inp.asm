@@ -5,6 +5,8 @@ SECTION code_z80
 
 PUBLIC _z80_inp
 
+EXTERN asm_z80_inp
+
 _z80_inp:
 
    pop af
@@ -13,4 +15,4 @@ _z80_inp:
    push hl
    push af
    
-   INCLUDE "z80/z80/asm_z80_inp.asm"
+   jp asm_z80_inp

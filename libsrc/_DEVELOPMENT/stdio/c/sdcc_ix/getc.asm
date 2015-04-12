@@ -15,8 +15,6 @@ EXTERN _fgetc
 
 defc getc = _fgetc
 
-INCLUDE "stdio/z80/asm_getc.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,8 +24,6 @@ PUBLIC _getc
 EXTERN _getc_unlocked
 
 defc _getc = _getc_unlocked
-   
-INCLUDE "stdio/z80/asm_getc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

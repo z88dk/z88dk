@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strlwr
 
+EXTERN asm_strlwr
+
 _strlwr:
 
    pop af
@@ -13,4 +15,4 @@ _strlwr:
    push hl
    push af
 
-   INCLUDE "string/z80/asm_strlwr.asm"
+   jp asm_strlwr

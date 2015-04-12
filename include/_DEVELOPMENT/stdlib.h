@@ -90,6 +90,54 @@ extern void  *realloc(void *p, size_t size);
 
 #endif
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern uint32_t  _random_uniform_xor_32__fastcall(uint32_t seed) __z88dk_fastcall;
+extern uint16_t  _random_uniform_xor_8__fastcall(uint32_t seed) __z88dk_fastcall;
+extern int       abs_fastcall(int j) __z88dk_fastcall;
+extern int       at_quick_exit_fastcall(void *func) __z88dk_fastcall;
+extern int       atexit_fastcall(void *func) __z88dk_fastcall;
+extern int       atoi_fastcall(char *buf) __z88dk_fastcall;
+extern long      atol_fastcall(char *buf) __z88dk_fastcall;
+extern void      exit_fastcall(int status) __z88dk_fastcall;
+extern long      labs_fastcall(long j) __z88dk_fastcall;
+extern void      quick_exit_fastcall(int status) __z88dk_fastcall;
+extern void      srand_fastcall(uint16_t seed) __z88dk_fastcall;
+extern int       system_fastcall(char *s) __z88dk_fastcall;
+
+#ifndef _ALLOC_MALLOC_H
+
+extern void      free_fastcall(void *p) __z88dk_fastcall;
+extern void     *malloc_fastcall(size_t size) __z88dk_fastcall;
+
+#endif
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define _random_uniform_xor_32_(a)     _random_uniform_xor_32__fastcall(a)
+#define _random_uniform_xor_8_(a)      _random_uniform_xor_8__fastcall(a)
+#define abs(a)                         abs_fastcall(a)
+#define at_quick_exit(a)               at_quick_exit_fastcall(a)
+#define atexit(a)                      atexit_fastcall(a)
+#define atoi(a)                        atoi_fastcall(a)
+#define atol(a)                        atol_fastcall(a)
+#define exit(a)                        exit_fastcall(a)
+#define labs(a)                        labs_fastcall(a)
+#define quick_exit(a)                  quick_exit_fastcall(a)
+#define srand(a)                       srand_fastcall(a)
+#define system(a)                      system_fastcall(a)
+
+#ifndef _ALLOC_MALLOC_H
+
+#define free(a)                        free_fastcall(a)
+#define malloc(a)                      malloc_fastcall(a)
+
+#endif
+
+#endif
+
 #else
 
 // SCCZ80

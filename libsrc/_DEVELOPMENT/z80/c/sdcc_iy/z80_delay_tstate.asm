@@ -5,6 +5,8 @@ SECTION code_z80
 
 PUBLIC _z80_delay_tstate
 
+EXTERN asm_z80_delay_tstate
+
 _z80_delay_tstate:
 
    pop af
@@ -13,4 +15,4 @@ _z80_delay_tstate:
    push hl
    push af
 
-   INCLUDE "z80/z80/asm_z80_delay_tstate.asm"
+   jp asm_z80_delay_tstate

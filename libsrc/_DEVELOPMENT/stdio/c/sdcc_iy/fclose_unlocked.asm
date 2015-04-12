@@ -5,12 +5,14 @@ SECTION code_stdio
 
 PUBLIC _fclose_unlocked
 
+EXTERN asm_fclose_unlocked
+
 _fclose_unlocked:
 
    pop af
    pop ix
    
-   push ix
+   push hl
    push af
    
-   INCLUDE "stdio/z80/asm_fclose_unlocked.asm"
+   jp asm_fclose_unlocked

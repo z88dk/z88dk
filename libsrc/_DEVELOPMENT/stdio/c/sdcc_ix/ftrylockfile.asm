@@ -5,20 +5,14 @@ SECTION code_stdio
 
 PUBLIC _ftrylockfile
 
+EXTERN _ftrylockfile_fastcall
+
 _ftrylockfile:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_ftrylockfile
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_ftrylockfile.asm"
+
+   jp _ftrylockfile_fastcall

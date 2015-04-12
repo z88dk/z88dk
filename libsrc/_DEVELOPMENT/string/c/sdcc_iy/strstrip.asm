@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strstrip
 
+EXTERN asm_strstrip
+
 _strstrip:
 
    pop af
@@ -13,4 +15,4 @@ _strstrip:
    push hl
    push af
 
-   INCLUDE "string/z80/asm_strstrip.asm"
+   jp asm_strstrip

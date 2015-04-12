@@ -5,20 +5,14 @@ SECTION code_stdio
 
 PUBLIC _ferror_unlocked
 
+EXTERN _ferror_unlocked_fastcall
+
 _ferror_unlocked:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_ferror_unlocked
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_ferror_unlocked.asm"
+
+   jp _ferror_unlocked_fastcall

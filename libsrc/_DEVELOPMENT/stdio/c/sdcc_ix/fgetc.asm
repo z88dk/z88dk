@@ -11,23 +11,17 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fgetc
 
+EXTERN _fgetc_fastcall
+
 _fgetc:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
 
-   call asm_fgetc
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_fgetc.asm"
+   jp _fgetc_fastcall
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -38,8 +32,6 @@ PUBLIC _fgetc
 EXTERN _fgetc_unlocked
 
 defc _fgetc = _fgetc_unlocked
-   
-INCLUDE "stdio/z80/asm_fgetc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
