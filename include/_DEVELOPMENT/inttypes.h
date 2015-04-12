@@ -23,6 +23,18 @@ extern void                           _imaxdiv_(imaxdiv_t *md, intmax_t numer, i
 extern intmax_t                       strtoimax(const char *nptr, char **endptr, int base);
 extern uintmax_t                      strtoumax(const char *nptr, char **endptr, int base);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern intmax_t                       imaxabs_fastcall(intmax_t j) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define imaxabs(a)                    imaxabs_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80
