@@ -7,11 +7,12 @@
 
 #ifdef NDEBUG
 
-   #define assert(x)           ((void)0)
+   #define assert(exp)         ((void)0)
 
 #else
 
-   #define assert(x)           if (x == 0)  { fputs(stderr, __FILE__ " line " #__LINE__ ": assert(" #exp ") failed\n"); abort(); }
+   #define __assert_s(s)       #s
+   #define assert(exp)         if (!(exp))  { fputs(__FILE__ " line " __assert_s(__LINE__) ": assert(" __assert_s(exp) ") failed\n", stderr); abort(); }
 
 #endif
 
