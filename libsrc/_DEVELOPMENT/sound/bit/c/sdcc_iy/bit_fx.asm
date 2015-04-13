@@ -5,6 +5,8 @@ SECTION code_sound_bit
 
 PUBLIC _bit_fx
 
+EXTERN asm_bit_fx
+
 _bit_fx:
 
    pop af
@@ -13,4 +15,4 @@ _bit_fx:
    push hl
    push af
    
-   INCLUDE "sound/bit/z80/asm_bit_fx.asm"
+   jp asm_bit_fx

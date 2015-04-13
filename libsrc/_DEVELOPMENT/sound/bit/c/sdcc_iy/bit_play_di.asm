@@ -5,6 +5,8 @@ SECTION code_sound_bit
 
 PUBLIC _bit_play_di
 
+EXTERN asm_bit_play_di
+
 _bit_play_di:
 
    pop af
@@ -13,4 +15,4 @@ _bit_play_di:
    push hl
    push af
 
-   INCLUDE "sound/bit/z80/asm_bit_play_di.asm"
+   jp asm_bit_play_di

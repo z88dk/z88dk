@@ -5,6 +5,8 @@ SECTION code_sound_bit
 
 PUBLIC _bit_fx_di
 
+EXTERN _bit_fx_di_fastcall
+
 _bit_fx_di:
 
    pop af
@@ -12,12 +14,5 @@ _bit_fx_di:
    
    push hl
    push af
-   
-   push ix
-   
-   call asm_bit_fx_di
-   
-   pop ix
-   ret
 
-   INCLUDE "sound/bit/z80/asm_bit_fx_di.asm"
+   jp _bit_fx_di_fastcall

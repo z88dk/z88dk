@@ -5,20 +5,14 @@ SECTION code_sound_bit
 
 PUBLIC _bit_beepfx_di
 
+EXTERN _bit_beepfx_di_fastcall
+
 _bit_beepfx_di:
 
    pop af
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_bit_beepfx_di
-   
-   pop ix
-   ret
 
-   INCLUDE "sound/bit/z80/asm_bit_beepfx_di.asm"
+   jp _bit_beepfx_di_fastcall

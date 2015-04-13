@@ -5,6 +5,8 @@ SECTION smc_sound_bit
 
 PUBLIC _bit_play_tritone
 
+EXTERN asm_bit_play_tritone
+
 _bit_play_tritone:
 
    pop af
@@ -13,4 +15,4 @@ _bit_play_tritone:
    push hl
    push af
    
-   INCLUDE "sound/bit/z80/asm_bit_play_tritone.asm"
+   jp asm_bit_play_tritone

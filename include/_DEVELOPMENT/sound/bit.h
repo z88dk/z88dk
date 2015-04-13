@@ -129,6 +129,32 @@ extern char                      *bit_play_di(char *melody);
 extern void                      *bit_play_tritone_di(void *song);
 extern void                       bit_synth_di(uint16_t dur, uint16_t freq_1, uint16_t freq_2, uint16_t freq_3, uint16_t freq_4);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void                       bit_fx_fastcall(void (*bfx)(void)) __z88dk_fastcall;
+extern void                       bit_beepfx_fastcall(void *bfx) __z88dk_fastcall;
+extern char                      *bit_play_fastcall(char *melody) __z88dk_fastcall;
+extern void                      *bit_play_tritone_fastcall(void *song) __z88dk_fastcall;
+extern void                       bit_fx_di_fastcall(void (*bfx)(void)) __z88dk_fastcall;
+extern void                       bit_beepfx_di_fastcall(void *bfx) __z88dk_fastcall;
+extern char                      *bit_play_di_fastcall(char *melody) __z88dk_fastcall;
+extern void                      *bit_play_tritone_di_fastcall(void *song) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define bit_fx(a)                 bit_fx_fastcall(a)
+#define bit_beepfx(a)             bit_beepfx_fastcall(a)
+#define bit_play(a)               bit_play_fastcall(a)
+#define bit_play_tritone(a)       bit_play_tritone_fastcall(a)
+#define bit_fx_di(a)              bit_fx_di_fastcall(a)
+#define bit_beepfx_di(a)          bit_beepfx_di_fastcall(a)
+#define bit_play_di(a)            bit_play_di_fastcall(a)
+#define bit_play_tritone_di(a)    bit_play_tritone_di_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

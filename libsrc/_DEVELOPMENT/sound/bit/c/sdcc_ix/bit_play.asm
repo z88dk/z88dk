@@ -5,6 +5,8 @@ SECTION code_sound_bit
 
 PUBLIC _bit_play
 
+EXTERN _bit_play_fastcall
+
 _bit_play:
 
    pop af
@@ -13,11 +15,4 @@ _bit_play:
    push hl
    push af
    
-   push ix
-   
-   call asm_bit_play
-   
-   pop ix
-   ret
-
-   INCLUDE "sound/bit/z80/asm_bit_play.asm"
+   jp _bit_play_fastcall
