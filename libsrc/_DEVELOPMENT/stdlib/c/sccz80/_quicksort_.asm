@@ -18,7 +18,7 @@ _quicksort_:
    push bc
    push hl
    push de
-   push ix
+   push hl
    push af
    
    jp asm_quicksort

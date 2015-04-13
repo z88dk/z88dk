@@ -14,7 +14,7 @@ _ltoa:
    pop bc
    
    push bc
-   push ix
+   push hl
    push de
    push hl
    push af

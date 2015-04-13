@@ -13,7 +13,7 @@ _qsort:
    pop de
    pop ix
    
-   push ix
+   push hl
    push de
    push hl
    push bc

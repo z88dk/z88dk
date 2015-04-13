@@ -17,7 +17,7 @@ ultoa:
    
    push de
    push hl
-   push ix
+   push hl
    push bc
    push af
    

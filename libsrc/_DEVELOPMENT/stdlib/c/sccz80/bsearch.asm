@@ -24,7 +24,7 @@ bsearch:
    push bc
    push hl
    push de
-   push ix
+   push hl
    push af
    
    exx
