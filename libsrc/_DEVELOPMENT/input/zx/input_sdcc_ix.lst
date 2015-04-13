@@ -2,7 +2,9 @@ input/zx/z80/__amx_mouse_variables
 input/zx/z80/__kempston_mouse_variables
 input/zx/c/sdcc_ix/in_inkey
 input/zx/c/sdcc_ix/in_key_pressed
+input/zx/c/sdcc_ix/in_key_pressed_fastcall
 input/zx/c/sdcc_ix/in_key_scancode
+input/zx/c/sdcc_ix/in_key_scancode_fastcall
 input/zx/c/sdcc_ix/in_mouse_amx
 input/zx/c/sdcc_ix/in_mouse_amx_init
 input/zx/c/sdcc_ix/in_mouse_amx_reset
@@ -16,6 +18,7 @@ input/zx/c/sdcc_ix/in_mouse_kempston_setpos
 input/zx/c/sdcc_ix/in_mouse_kempston_wheel
 input/zx/c/sdcc_ix/in_mouse_kempston_wheel_delta
 input/zx/c/sdcc_ix/in_pause
+input/zx/c/sdcc_ix/in_pause_fastcall
 input/zx/c/sdcc_ix/in_stick_cursor
 input/zx/c/sdcc_ix/in_stick_fuller
 input/zx/c/sdcc_ix/in_stick_kempston

@@ -5,6 +5,8 @@ SECTION code_input
 
 PUBLIC _in_key_scancode
 
+EXTERN asm_in_key_scancode
+
 _in_key_scancode:
 
    pop af
@@ -13,4 +15,4 @@ _in_key_scancode:
    push hl
    push af
 
-   INCLUDE "input/zx/z80/asm_in_key_scancode.asm"
+   jp asm_in_key_scancode

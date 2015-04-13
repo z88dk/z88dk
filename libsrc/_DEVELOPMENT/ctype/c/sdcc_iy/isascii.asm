@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _isascii
 
-EXTERN error_znc
+EXTERN _isascii_fastcall
 
 _isascii:
 
@@ -15,14 +15,4 @@ _isascii:
    push hl
    push af
 
-   inc h
-   dec h
-   jp nz, error_znc
-
-   bit 7,l
-   
-   ld l,h
-   ret nz
-
-   inc l
-   ret
+   jp _isascii_fastcall

@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _isodigit
 
-EXTERN asm_isodigit, error_zc
+EXTERN _isodigit_fastcall
 
 _isodigit:
 
@@ -15,15 +15,4 @@ _isodigit:
    push hl
    push af
 
-   inc h
-   dec h
-   jp nz, error_zc
-
-   ld a,l
-   call asm_isodigit
-   
-   ld l,h
-   ret c
-   
-   inc l
-   ret
+   jp _isodigit_fastcall

@@ -25,6 +25,52 @@ extern int toascii(int);
 extern int tolower(int);
 extern int toupper(int);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern int isalnum_fastcall(int) __z88dk_fastcall;
+extern int isalpha_fastcall(int) __z88dk_fastcall;
+extern int isascii_fastcall(int) __z88dk_fastcall;
+extern int isbdigit_fastcall(int) __z88dk_fastcall;
+extern int isblank_fastcall(int) __z88dk_fastcall;
+extern int iscntrl_fastcall(int) __z88dk_fastcall;
+extern int isdigit_fastcall(int) __z88dk_fastcall;
+extern int isgraph_fastcall(int) __z88dk_fastcall;
+extern int islower_fastcall(int) __z88dk_fastcall;
+extern int isodigit_fastcall(int) __z88dk_fastcall;
+extern int isprint_fastcall(int) __z88dk_fastcall;
+extern int ispunct_fastcall(int) __z88dk_fastcall;
+extern int isspace_fastcall(int) __z88dk_fastcall;
+extern int isupper_fastcall(int) __z88dk_fastcall;
+extern int isxdigit_fastcall(int) __z88dk_fastcall;
+extern int toascii_fastcall(int) __z88dk_fastcall;
+extern int tolower_fastcall(int) __z88dk_fastcall;
+extern int toupper_fastcall(int) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define isalnum(a)              isalnum_fastcall(a)
+#define isalpha(a)              isalpha_fastcall(a)
+#define isascii(a)              isascii_fastcall(a)
+#define isbdigit(a)             isbdigit_fastcall(a)
+#define isblank(a)              isblank_fastcall(a)
+#define iscntrl(a)              iscntrl_fastcall(a)
+#define isdigit(a)              isdigit_fastcall(a)
+#define isgraph(a)              isgraph_fastcall(a)
+#define islower(a)              islower_fastcall(a)
+#define isodigit(a)             isodigit_fastcall(a)
+#define isprint(a)              isprint_fastcall(a)
+#define ispunct(a)              ispunct_fastcall(a)
+#define isspace(a)              isspace_fastcall(a)
+#define isupper(a)              isupper_fastcall(a)
+#define isxdigit(a)             isxdigit_fastcall(a)
+#define toascii(a)              toascii_fastcall(a)
+#define tolower(a)              tolower_fastcall(a)
+#define toupper(a)              toupper_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

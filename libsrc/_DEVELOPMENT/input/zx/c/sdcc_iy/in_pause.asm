@@ -5,6 +5,8 @@ SECTION code_input
 
 PUBLIC _in_pause
 
+EXTERN asm_in_pause
+
 _in_pause:
 
    pop af
@@ -13,4 +15,4 @@ _in_pause:
    push hl
    push af
 
-   INCLUDE "input/zx/z80/asm_in_pause.asm"
+   jp asm_in_pause

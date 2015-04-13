@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _iscntrl
 
-EXTERN asm_iscntrl, error_znc
+EXTERN _iscntrl_fastcall
 
 _iscntrl:
 
@@ -15,15 +15,4 @@ _iscntrl:
    push hl
    push af
 
-   inc h
-   dec h
-   jp nz, error_znc
-
-   ld a,l
-   call asm_iscntrl
-   
-   ld l,h
-   ret nc
-   
-   inc l
-   ret
+   jp _iscntrl_fastcall

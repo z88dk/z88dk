@@ -5,6 +5,8 @@ SECTION code_input
 
 PUBLIC _in_key_pressed
 
+EXTERN asm_in_key_pressed
+
 _in_key_pressed:
 
    pop af
@@ -13,4 +15,4 @@ _in_key_pressed:
    push hl
    push af
 
-   INCLUDE "input/zx/z80/asm_in_key_pressed.asm"
+   jp asm_in_key_pressed

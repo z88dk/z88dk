@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _tolower
 
-EXTERN asm_tolower
+EXTERN _tolower_fastcall
 
 _tolower:
 
@@ -15,12 +15,4 @@ _tolower:
    push hl
    push af
 
-   inc h
-   dec h
-   ret nz
-
-   ld a,l
-   call asm_tolower
-   
-   ld l,a
-   ret
+   jp _tolower_fastcall

@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _toupper
 
-EXTERN asm_toupper
+EXTERN _toupper_fastcall
 
 _toupper:
 
@@ -15,12 +15,4 @@ _toupper:
    push hl
    push af
 
-   inc h
-   dec h
-   ret nz
-
-   ld a,l
-   call asm_toupper
-   
-   ld l,a
-   ret
+   jp _toupper_fastcall

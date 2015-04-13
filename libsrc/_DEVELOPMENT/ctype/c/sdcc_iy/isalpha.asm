@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _isalpha
 
-EXTERN asm_isalpha, error_zc
+EXTERN _isalpha_fastcall
 
 _isalpha:
 
@@ -15,15 +15,4 @@ _isalpha:
    push hl
    push af
 
-   inc h
-   dec h
-   jp nz, error_zc
-
-   ld a,l
-   call asm_isalpha
-   
-   ld l,h
-   ret c
-   
-   inc l
-   ret
+   jp _isalpha_fastcall

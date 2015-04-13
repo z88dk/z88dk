@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _ispunct
 
-EXTERN asm_ispunct, error_zc
+EXTERN _ispunct_fastcall
 
 _ispunct:
 
@@ -15,15 +15,4 @@ _ispunct:
    push hl
    push af
 
-   inc h
-   dec h
-   jp nz, error_zc
-
-   ld a,l
-   call asm_ispunct
-   
-   ld l,h
-   ret c
-   
-   inc l
-   ret
+   jp _ispunct_fastcall

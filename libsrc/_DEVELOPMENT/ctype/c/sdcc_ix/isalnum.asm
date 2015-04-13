@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _isalnum
 
-EXTERN asm_isalnum, error_zc
+EXTERN _isalnum_fastcall
 
 _isalnum:
 
@@ -15,15 +15,4 @@ _isalnum:
    push hl
    push af
 
-   inc h
-   dec h
-   jp nz, error_zc
-
-   ld a,l
-   call asm_isalnum
-   
-   ld l,h
-   ret c
-   
-   inc l
-   ret
+   jp _isalnum_fastcall

@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _isupper
 
-EXTERN asm_isupper, error_zc
+EXTERN _isupper_fastcall
 
 _isupper:
 
@@ -15,15 +15,4 @@ _isupper:
    push hl
    push af
 
-   inc h
-   dec h
-   jp nz, error_zc
-
-   ld a,l
-   call asm_isupper
-   
-   ld l,h
-   ret c
-   
-   inc l
-   ret
+   jp _isupper_fastcall

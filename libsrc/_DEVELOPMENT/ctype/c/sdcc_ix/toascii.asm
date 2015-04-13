@@ -5,6 +5,8 @@ SECTION code_ctype
 
 PUBLIC _toascii
 
+EXTERN _toascii_fastcall
+
 _toascii:
 
    pop af
@@ -13,7 +15,4 @@ _toascii:
    push hl
    push af
 
-   ld h,0
-   res 7,l
-   
-   ret
+   jp _toascii_fastcall

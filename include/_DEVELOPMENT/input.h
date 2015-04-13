@@ -25,6 +25,22 @@ extern int                            in_test_key(void);
 extern void                           in_wait_key(void);
 extern void                           in_wait_nokey(void);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern int                            in_key_pressed_fastcall(uint16_t scancode) __z88dk_fastcall;
+extern uint16_t                       in_key_scancode_fastcall(int c) __z88dk_fastcall;
+extern uint16_t                       in_pause_fastcall(uint16_t dur_ms) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define in_key_pressed(a)             in_key_pressed_fastcall(a)
+#define in_key_scancode(a)            in_key_scancode_fastcall(a)
+#define in_pause(a)                   in_pause_fastcall(a)
+
+#endif
+
 #else
 
 // sccz80

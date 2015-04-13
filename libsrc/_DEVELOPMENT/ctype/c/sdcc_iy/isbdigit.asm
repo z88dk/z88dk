@@ -5,7 +5,7 @@ SECTION code_ctype
 
 PUBLIC _isbdigit
 
-EXTERN asm_isbdigit, error_znc
+EXTERN _isbdigit_fastcall
 
 _isbdigit:
 
@@ -15,15 +15,4 @@ _isbdigit:
    push hl
    push af
 
-   inc h
-   dec h
-   jp nz, error_znc
-
-   ld a,l
-   call asm_isbdigit
-   
-   ld l,h
-   ret nz
-   
-   inc l
-   ret
+   jp _isbdigit_fastcall
