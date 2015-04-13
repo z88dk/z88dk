@@ -22,7 +22,7 @@ getline:
    
    push hl
    push de
-   push ix
+   push hl
    push af
    
    jp asm_getline

@@ -14,7 +14,7 @@ _freopen_unlocked:
    
    push hl
    push de
-   push ix
+   push hl
    push af
    
    INCLUDE "stdio/z80/asm_freopen_unlocked.asm"

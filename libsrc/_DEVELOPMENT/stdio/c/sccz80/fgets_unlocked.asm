@@ -16,7 +16,7 @@ fgets_unlocked:
    
    push de
    push bc
-   push ix
+   push hl
    push af
    
    jp asm_fgets_unlocked

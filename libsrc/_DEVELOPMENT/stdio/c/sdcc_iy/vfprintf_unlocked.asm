@@ -14,7 +14,7 @@ _vfprintf_unlocked:
    
    push bc
    push de
-   push ix
+   push hl
    push af
    
    INCLUDE "stdio/z80/asm_vfprintf_unlocked.asm"

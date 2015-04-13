@@ -13,7 +13,7 @@ fsetpos_unlocked:
    pop hl
    pop ix
    
-   push ix
+   push hl
    push hl
    push af
    

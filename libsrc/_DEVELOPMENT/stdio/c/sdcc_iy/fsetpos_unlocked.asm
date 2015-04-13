@@ -12,7 +12,7 @@ _fsetpos_unlocked:
    pop hl
    
    push hl
-   push ix
+   push hl
    push af
    
    INCLUDE "stdio/z80/asm_fsetpos_unlocked.asm"

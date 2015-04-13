@@ -24,7 +24,7 @@ fwrite:
    push hl
    push bc
    push de
-   push ix
+   push hl
    push af
    
    jp asm_fwrite

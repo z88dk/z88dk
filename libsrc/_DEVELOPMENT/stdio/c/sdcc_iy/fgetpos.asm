@@ -18,7 +18,7 @@ _fgetpos:
    pop hl
    
    push hl
-   push ix
+   push hl
    push af
    
    INCLUDE "stdio/z80/asm_fgetpos.asm"

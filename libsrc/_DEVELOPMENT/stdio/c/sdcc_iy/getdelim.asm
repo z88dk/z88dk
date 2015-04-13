@@ -19,7 +19,7 @@ _getdelim:
    pop bc
    pop ix
    
-   push ix
+   push hl
    push bc
    push de
    push hl

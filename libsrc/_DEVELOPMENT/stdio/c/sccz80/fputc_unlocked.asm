@@ -14,7 +14,7 @@ fputc_unlocked:
    pop de
    
    push de
-   push ix
+   push hl
    push af
    
    jp asm_fputc_unlocked

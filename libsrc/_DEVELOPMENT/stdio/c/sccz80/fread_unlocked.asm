@@ -18,7 +18,7 @@ fread_unlocked:
    push de
    push bc
    push hl
-   push ix
+   push hl
    push af
    
    jp asm_fread_unlocked

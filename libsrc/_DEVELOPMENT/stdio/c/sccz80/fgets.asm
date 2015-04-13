@@ -22,7 +22,7 @@ fgets:
    
    push de
    push bc
-   push ix
+   push hl
    push af
    
    jp asm_fgets

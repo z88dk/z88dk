@@ -19,7 +19,7 @@ _fwrite:
    pop de
    pop ix
    
-   push ix
+   push hl
    push de
    push bc
    push hl

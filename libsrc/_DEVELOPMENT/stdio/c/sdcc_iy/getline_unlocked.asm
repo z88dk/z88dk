@@ -12,7 +12,7 @@ _getline_unlocked:
    pop de
    pop ix
    
-   push ix
+   push hl
    push de
    push hl
    push af

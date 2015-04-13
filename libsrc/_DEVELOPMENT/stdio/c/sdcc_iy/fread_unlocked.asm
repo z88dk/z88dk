@@ -13,7 +13,7 @@ _fread_unlocked:
    pop hl
    pop ix
    
-   push ix
+   push hl
    push hl
    push bc
    push de

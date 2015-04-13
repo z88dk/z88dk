@@ -18,7 +18,7 @@ getdelim_unlocked:
    push hl
    push de
    push bc
-   push ix
+   push hl
    push af
 
    jp asm_getdelim_unlocked

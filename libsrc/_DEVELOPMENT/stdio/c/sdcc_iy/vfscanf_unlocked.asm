@@ -14,7 +14,7 @@ _vfscanf_unlocked:
    
    push bc
    push de
-   push ix
+   push hl
    push af
    
    INCLUDE "stdio/z80/asm_vfscanf_unlocked.asm"

@@ -14,7 +14,7 @@ ungetc_unlocked:
    pop hl
    
    push hl
-   push ix
+   push hl
    push af
    
    jp asm_ungetc_unlocked

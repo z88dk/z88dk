@@ -20,7 +20,7 @@ _vfprintf:
    
    push bc
    push de
-   push ix
+   push hl
    push af
 
    INCLUDE "stdio/z80/asm_vfprintf.asm"
