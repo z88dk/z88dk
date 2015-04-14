@@ -3,7 +3,7 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.5 2015-04-09 19:08:47 stefano Exp $  */
+/*  $Id: clisp.c,v 1.6 2015-04-14 13:08:52 stefano Exp $  */
 
 /*
 z88dk build hints
@@ -104,7 +104,6 @@ int t_symb_ftype[NSYMBS];  /* function type */
 #else
 char t_symb_free @0x8780;
 char *t_symb_pname[] @0xB77B;
-//char *t_symb_pname[NSYMBS];
 long t_symb_val[] @0x8000;
 long t_symb_fval[] @0x8781;
 int t_symb_ftype[] @0xB613;
@@ -163,15 +162,16 @@ enum Ftype {
 /* Keywords */
 enum keywords {
   KW_READ,    KW_EVAL,    KW_GC,      KW_CONS,    KW_CAR,      KW_CDR,
-  KW_QUIT,    KW_DEFUN,   KW_LAMBDA,  KW_QUOTE,   KW_SETQ,     KW_EQ, 
-  KW_NULL,    KW_ATOM,    KW_NUMBERP, KW_PRINC,   KW_TERPRI,   KW_RPLACA,
-  KW_RPLACD,  KW_PROGN,   KW_COND,    KW_AND,     KW_OR,       KW_NOT,
-  KW_LIST,    KW_ADD,     KW_SUB,     KW_TIMES,   KW_QUOTIENT, KW_DIVIDE,
-  KW_GT,      KW_LT
+  KW_QUIT,    KW_DEFUN,   KW_QUOTE,   KW_SETQ,    KW_EQ, 
+  KW_NULL,    KW_CONSP,   KW_SYMBP,   KW_NUMBERP, KW_PRINC,    KW_TERPRI,   KW_RPLACA,
+  KW_RPLACD,  KW_PROGN,   KW_COND,    KW_OR,      KW_NOT,      KW_IF,
+  KW_LIST,    KW_ADD,     KW_SUB,     KW_TIMES,   KW_QUOTIENT, 
+  KW_GT
 #ifndef MINIMALISTIC
-  , KW_GTE,     KW_LTE,     KW_ISEVEN,   KW_ISODD,    KW_COMMENT,
-    KW_ZEROP,   KW_SYMBP,   KW_CONSP,    KW_RAND,     KW_REM,      KW_IF,
-    KW_INCR,    KW_DECR,    KW_EQUAL,    KW_EQMATH
+   ,KW_LT,      KW_AND,     KW_DIVIDE,  KW_LAMBDA,  
+    KW_WHILE,   KW_GTE,     KW_LTE,     KW_COMMENT,
+    KW_ZEROP,   KW_ATOM,    KW_RAND,    KW_REM,
+    KW_INCR,    KW_DECR,    KW_EQUAL,   KW_EQMATH
 #endif
 };
 struct s_keywords {
@@ -195,7 +195,6 @@ struct s_keywords funcs[] = {
 #else
   { "defun",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_DEFUN    },
 #endif
-  { "lambda",   FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_LAMBDA   },
   { "quote",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_QUOTE    },
 #ifdef SCHEME
   { "set!",     FTYPE(FTYPE_SPECIAL, 2),               KW_SETQ     },
@@ -206,16 +205,19 @@ struct s_keywords funcs[] = {
   { "eq",       FTYPE(FTYPE_SYS,     2),               KW_EQ       },
   { "null",     FTYPE(FTYPE_SYS,     1),               KW_NULL     },
 #endif
-  { "atom",     FTYPE(FTYPE_SYS,     1),               KW_ATOM     },
 #ifdef SCHEME
+  { "pair?",    FTYPE(FTYPE_SYS,     1),               KW_CONSP    },
+  { "symbol?",  FTYPE(FTYPE_SYS,     1),               KW_SYMBP    },
   { "number?",  FTYPE(FTYPE_SYS,     1),               KW_NUMBERP  },
   { "display",  FTYPE(FTYPE_SYS,     1),               KW_PRINC    },
 #else
+  { "consp",    FTYPE(FTYPE_SYS,     1),               KW_CONSP    },
+  { "symbolp",  FTYPE(FTYPE_SYS,     1),               KW_SYMBP    },
   { "numberp",  FTYPE(FTYPE_SYS,     1),               KW_NUMBERP  },
   { "princ",    FTYPE(FTYPE_SYS,     1),               KW_PRINC    },
 #endif
   { "terpri",   FTYPE(FTYPE_SYS,     0),               KW_TERPRI   },
-  /* Common Lisp uses functions rplaca and rplacd to alter list structure
+  /*    Lisp uses functions rplaca and rplacd to alter list structure
 		they change structure the same way as EMACS setcar and setcdr,
 		but the Common Lisp functions return the cons cell while
 		setcar and setcdr return the new car or cdr. */
@@ -227,39 +229,34 @@ struct s_keywords funcs[] = {
   { "progn",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_PROGN    },
 #endif
   { "cond",     FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_COND     },
-  { "and",      FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_AND      },
   { "or",       FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_OR       },
   { "not",      FTYPE(FTYPE_SYS,     1),               KW_NOT      },
+  { "if",       FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_IF       },
   { "list",     FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_LIST     },
   { "+",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_ADD      },
   { "-",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_SUB      },
   { "*",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_TIMES    },
   { "/",        FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_QUOTIENT },
-  { "divide",   FTYPE(FTYPE_SYS,     2),               KW_DIVIDE   },
   { ">",        FTYPE(FTYPE_SYS,     2),               KW_GT       },
-  { "<",        FTYPE(FTYPE_SYS,     2),               KW_LT       },
 #ifndef MINIMALISTIC
+  { "<",        FTYPE(FTYPE_SYS,     2),               KW_LT       },
+  { "and",      FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_AND      },
+  { "divide",   FTYPE(FTYPE_SYS,     2),               KW_DIVIDE   },
+  { "lambda",   FTYPE(FTYPE_SYS,     FTYPE_ANY_ARGS),  KW_LAMBDA   },
+  /* EMACS LISP while syntax */
+  { "while",    FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_WHILE    },
   { ">=",       FTYPE(FTYPE_SYS,     2),               KW_GTE      },
   { "<=",       FTYPE(FTYPE_SYS,     2),               KW_LTE      },
-  { "even?",    FTYPE(FTYPE_SYS,     1),               KW_ISEVEN   },
-  { "odd?",     FTYPE(FTYPE_SYS,     1),               KW_ISODD    },
   { "comment",  FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_COMMENT  },
 #ifdef SCHEME
   { "zero?",    FTYPE(FTYPE_SYS,     1),               KW_ZEROP    },
-  { "symbol?",  FTYPE(FTYPE_SYS,     1),               KW_SYMBP    },
-  { "pair?",    FTYPE(FTYPE_SYS,     1),               KW_CONSP    },
+  { "atom",     FTYPE(FTYPE_SYS,     1),               KW_ATOM     },
 #else
   { "zerop",    FTYPE(FTYPE_SYS,     1),               KW_ZEROP    },
-  { "symbp",    FTYPE(FTYPE_SYS,     1),               KW_SYMBP    },
-  { "consp",    FTYPE(FTYPE_SYS,     1),               KW_CONSP    },
+  { "atom",     FTYPE(FTYPE_SYS,     1),               KW_ATOM     },
 #endif
   { "random",   FTYPE(FTYPE_SYS,     1),               KW_RAND     },
-#ifdef ZX81
   { "rem",      FTYPE(FTYPE_SYS,     2),               KW_REM      },
-#else
-  { "%",        FTYPE(FTYPE_SYS,     2),               KW_REM      },
-#endif
-  { "if",       FTYPE(FTYPE_SPECIAL, FTYPE_ANY_ARGS),  KW_IF       },
   { "1+",       FTYPE(FTYPE_SYS,     1),               KW_INCR     },
   { "1-",       FTYPE(FTYPE_SYS,     1),               KW_DECR     },
 #ifdef SCHEME
@@ -667,12 +664,15 @@ l_eval(long s)
   case TAG_CONS:       /* cons ... function call */
     f = l_car(s);   /* function name or lambda exp */
     a = l_cdr(s);   /* actual argument list */
+#ifndef minimalistic
     if ((D_GET_TAG(f) == TAG_CONS) && (D_GET_TAG(l_car(f)) == TAG_SYMB) 
-		&& (D_GET_DATA(l_car(f)) == KW_LAMBDA)){   /* lambda exp */
+		&& ((D_GET_DATA(l_car(f)) == KW_LAMBDA))){   /* lambda exp */
       if (eval_args(f, a, av, FTYPE_ANY_ARGS) < 0)
 		return -1;
       v = apply(l_cdr(f), av[0], list_len(l_car(l_cdr(f))));
-    } else if (D_GET_TAG(f) == TAG_SYMB){
+    } else
+#endif
+	    if (D_GET_TAG(f) == TAG_SYMB){
       n = FTYPE_GET_NARGS(t_symb_ftype[D_GET_DATA(f)]);
       switch (FTYPE_GET_TYPE(t_symb_ftype[D_GET_DATA(f)])){
       case FTYPE_UNDEF:
@@ -753,14 +753,30 @@ special(long f, long a)
     }
     break;
 
+  case KW_WHILE:
+    if (D_GET_TAG(a) != TAG_CONS)
+	  return err_msg(errmsg_ill_syntax, 1, f);
+    if ((v = l_eval(l_car(a))) < 0)
+	  return -1;
+	while (D_GET_TAG(v) != TAG_NIL) {
+	  for (t = l_cdr(a); D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
+	    if ((v = l_eval(l_car(t))) < 0)
+		  return -1;
+	  }
+	  v = l_eval(l_car(a));
+	}
+	break;
+
+#ifndef MINIMALISTIC
   case KW_AND:
     for (v = TAG_T, t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
       if ((v = l_eval(l_car(t))) < 0)
 		return -1;
-      if (D_GET_TAG(v) == TAG_NIL)
+      if (D_GET_TAG(t) == TAG_NIL)
 		break;
     }
     break;
+#endif
 
   case KW_OR:
     for (v = TAG_NIL, t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
@@ -795,6 +811,7 @@ special(long f, long a)
   case KW_COMMENT:
     v = TAG_T;
     break;
+#endif
 
   case KW_IF:
     if (D_GET_TAG(a) != TAG_CONS)
@@ -810,10 +827,6 @@ special(long f, long a)
       return err_msg(errmsg_ill_syntax, 1, f);
     }
     break;
-
-
-    break;
-#endif
   }
   return v;
 }
@@ -889,8 +902,8 @@ fcall(long f, long av[2])  /*, int n*/
 				break;
 
 		case KW_GT:
-		case KW_LT:
 #ifndef MINIMALISTIC
+		case KW_LT:
 		case KW_GTE:
 		case KW_LTE:
 		case KW_REM:
@@ -899,8 +912,6 @@ fcall(long f, long av[2])  /*, int n*/
 				  return err_msg(errmsg_ill_type, 1, f);
 				break;
 #ifndef MINIMALISTIC
-		case KW_ISEVEN:
-		case KW_ISODD:
 		case KW_ZEROP:
 		case KW_RAND:
 		case KW_INCR:
@@ -913,8 +924,11 @@ fcall(long f, long av[2])  /*, int n*/
 
   switch (D_GET_DATA(f)){
 
+#ifndef MINIMALISTIC
   case KW_LAMBDA:
     return err_msg(errmsg_ill_call, 1, f);
+    break;
+#endif
 
   case KW_QUIT:
     quit();
@@ -956,9 +970,11 @@ fcall(long f, long av[2])  /*, int n*/
     v = (D_GET_TAG(av[0]) == TAG_NIL) ? TAG_T : TAG_NIL;
     break;
 
-  case KW_ATOM:
-    v = (D_GET_TAG(av[0]) != TAG_CONS) ? TAG_T : TAG_NIL;
-    break;
+  case KW_CONSP:
+    return (D_GET_TAG(av[0]) == TAG_CONS) ? TAG_T : TAG_NIL;
+
+  case KW_SYMBP:
+    return (D_GET_TAG(av[0]) == TAG_SYMB) ? TAG_T : TAG_NIL;
 
   case KW_NUMBERP:
     v = (D_GET_TAG(av[0]) == TAG_INT) ? TAG_T : TAG_NIL;
@@ -1051,6 +1067,13 @@ fcall(long f, long av[2])  /*, int n*/
     v = int_make_l(r);
     break;
 
+  case KW_GT:
+    v = (int_get_c(av[0]) > int_get_c(av[1])) ? TAG_T : TAG_NIL;
+    break;
+
+
+#ifndef MINIMALISTIC
+
   case KW_DIVIDE:
     r = int_get_c(av[0]);
     if ((d = int_get_c(av[1])) == 0)
@@ -1058,15 +1081,14 @@ fcall(long f, long av[2])  /*, int n*/
     v = l_cons(int_make_l(r / d), int_make_l(r % d));
     break;
 
-  case KW_GT:
-    v = (int_get_c(av[0]) > int_get_c(av[1])) ? TAG_T : TAG_NIL;
-    break;
-
   case KW_LT:
     v = (int_get_c(av[0]) < int_get_c(av[1])) ? TAG_T : TAG_NIL;
     break;
 
-#ifndef MINIMALISTIC
+  case KW_ATOM:
+    v = (D_GET_TAG(av[0]) != TAG_CONS) ? TAG_T : TAG_NIL;
+    break;
+
   case KW_GTE:
     v = (int_get_c(av[0]) >= int_get_c(av[1])) ? TAG_T : TAG_NIL;
     break;
@@ -1075,23 +1097,9 @@ fcall(long f, long av[2])  /*, int n*/
     v = (int_get_c(av[0]) <= int_get_c(av[1])) ? TAG_T : TAG_NIL;
     break;
 
-  case KW_ISEVEN:
-    v = (int_get_c(av[0]) & 1) ? TAG_NIL : TAG_T;
-    break;
-
-  case KW_ISODD:
-    v = (int_get_c(av[0]) & 1) ? TAG_T : TAG_NIL;
-    break;
-
   case KW_ZEROP:
     v = (int_get_c(av[0]) == 0) ? TAG_T : TAG_NIL;
     break;
-
-  case KW_SYMBP:
-    return (D_GET_TAG(av[0]) == TAG_SYMB) ? TAG_T : TAG_NIL;
-
-  case KW_CONSP:
-    return (D_GET_TAG(av[0]) == TAG_CONS) ? TAG_T : TAG_NIL;
 
   case KW_RAND:
     v = int_make_l(rand() % int_get_c(av[0]));
