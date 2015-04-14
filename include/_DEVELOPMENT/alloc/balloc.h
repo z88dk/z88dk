@@ -18,9 +18,9 @@ extern void    balloc_free(void *p);
 
 // SDCC FASTCALL LINKAGE
 
-extern void   *balloc_alloc_fastcall(int q) __z88dk_fastcall;
-extern size_t  balloc_blockcount_fastcall(int q) __z88dk_fastcall;
-extern void    balloc_free_fastcall(void *p) __z88dk_fastcall;
+extern void   *balloc_alloc_fastcall(int q);
+extern size_t  balloc_blockcount_fastcall(int q);
+extern void    balloc_free_fastcall(void *p);
 
 // SDCC MAKE FASTCALL LINKAGE THE DEFAULT
 
