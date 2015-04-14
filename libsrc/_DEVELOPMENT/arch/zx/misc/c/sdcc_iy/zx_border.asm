@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_border
 
+EXTERN asm_zx_border
+
 _zx_border:
 
    pop af
@@ -13,4 +15,4 @@ _zx_border:
    push hl
    push af
 
-   INCLUDE "arch/zx/misc/z80/asm_zx_border.asm"
+   jp asm_zx_border

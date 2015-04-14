@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_aaddrcup
 
+EXTERN asm_zx_aaddrcup
+
 _zx_aaddrcup:
 
    pop af
@@ -13,4 +15,4 @@ _zx_aaddrcup:
    push hl
    push af
 
-   INCLUDE "arch/zx/display/z80/asm_zx_aaddrcup.asm"
+   jp asm_zx_aaddrcup

@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_px2bitmask
 
+EXTERN asm_zx_px2bitmask
+
 _zx_px2bitmask:
 
    pop af
@@ -13,4 +15,4 @@ _zx_px2bitmask:
    push hl
    push af
 
-   INCLUDE "arch/zx/display/z80/asm_zx_px2bitmask.asm"
+   jp asm_zx_px2bitmask

@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_aaddr2cy
 
+EXTERN asm_zx_aaddr2cy
+
 _zx_aaddr2cy:
 
    pop af
@@ -13,4 +15,4 @@ _zx_aaddr2cy:
    push hl
    push af
 
-   INCLUDE "arch/zx/display/z80/asm_zx_aaddr2cy.asm"
+   jp asm_zx_aaddr2cy

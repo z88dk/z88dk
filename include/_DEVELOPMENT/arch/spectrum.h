@@ -107,6 +107,74 @@ extern void   *zx_saddrpup(void *saddr);
 
 extern int     zx_pattern_fill(int x, int y, void *pattern, int depth);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void    zx_border_fastcall(uint16_t colour) __z88dk_fastcall;
+extern void    zx_cls_fastcall(uint16_t attr) __z88dk_fastcall;
+
+extern int     zx_aaddr2cx_fastcall(void *aaddr) __z88dk_fastcall;
+extern int     zx_aaddr2cy_fastcall(void *aaddr) __z88dk_fastcall;
+extern int     zx_aaddr2px_fastcall(void *aaddr) __z88dk_fastcall;
+extern int     zx_aaddr2py_fastcall(void *aaddr) __z88dk_fastcall;
+extern void   *zx_aaddr2saddr_fastcall(void *aaddr) __z88dk_fastcall;
+extern void   *zx_aaddrcdown_fastcall(void *aaddr) __z88dk_fastcall;
+extern void   *zx_aaddrcleft_fastcall(void *aaddr) __z88dk_fastcall;
+extern void   *zx_aaddrcright_fastcall(void *aaddr) __z88dk_fastcall;
+extern void   *zx_aaddrcup_fastcall(void *aaddr) __z88dk_fastcall;
+extern int     zx_bitmask2px_fastcall(int bitmask) __z88dk_fastcall;
+extern void   *zx_cy2aaddr_fastcall(int row) __z88dk_fastcall;
+extern void   *zx_cy2saddr_fastcall(int row) __z88dk_fastcall;
+extern int     zx_px2bitmask_fastcall(int x) __z88dk_fastcall;
+extern void   *zx_py2aaddr_fastcall(int y) __z88dk_fastcall;
+extern void   *zx_py2saddr_fastcall(int y) __z88dk_fastcall;
+extern void   *zx_saddr2aaddr_fastcall(void *saddr) __z88dk_fastcall;
+extern int     zx_saddr2cx_fastcall(void *saddr) __z88dk_fastcall;
+extern int     zx_saddr2cy_fastcall(void *saddr) __z88dk_fastcall;
+extern int     zx_saddr2px_fastcall(void *saddr) __z88dk_fastcall;
+extern int     zx_saddr2py_fastcall(void *saddr) __z88dk_fastcall;
+extern void   *zx_saddrcdown_fastcall(void *saddr) __z88dk_fastcall;
+extern void   *zx_saddrcleft_fastcall(void *saddr) __z88dk_fastcall;
+extern void   *zx_saddrcright_fastcall(void *saddr) __z88dk_fastcall;
+extern void   *zx_saddrcup_fastcall(void *saddr) __z88dk_fastcall;
+extern void   *zx_saddrpdown_fastcall(void *saddr) __z88dk_fastcall;
+extern void   *zx_saddrpup_fastcall(void *saddr) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define zx_border(a)                zx_border_fastcall(a)
+#define zx_cls(a)                   zx_cls_fastcall(a)
+
+#define zx_aaddr2cx(a)              zx_aaddr2cx_fastcall(a)
+#define zx_aaddr2cy(a)              zx_aaddr2cy_fastcall(a)
+#define zx_aaddr2px(a)              zx_aaddr2px_fastcall(a)
+#define zx_aaddr2py(a)              zx_aaddr2py_fastcall(a)
+#define zx_aaddr2saddr(a)           zx_aaddr2saddr_fastcall(a)
+#define zx_aaddrcdown(a)            zx_aaddrcdown_fastcall(a)
+#define zx_aaddrcleft(a)            zx_aaddrcleft_fastcall(a)
+#define zx_aaddrcright(a)           zx_aaddrcright_fastcall(a)
+#define zx_aaddrcup(a)              zx_aaddrcup_fastcall(a)
+#define zx_bitmask2px(a)            zx_bitmask2px_fastcall(a)
+#define zx_cy2aaddr(a)              zx_cy2aaddr_fastcall(a)
+#define zx_cy2saddr(a)              zx_cy2saddr_fastcall(a)
+#define zx_px2bitmask(a)            zx_px2bitmask_fastcall(a)
+#define zx_py2aaddr(a)              zx_py2aaddr_fastcall(a)
+#define zx_py2saddr(a)              zx_py2saddr_fastcall(a)
+#define zx_saddr2aaddr(a)           zx_saddr2aaddr_fastcall(a)
+#define zx_saddr2cx(a)              zx_saddr2cx_fastcall(a)
+#define zx_saddr2cy(a)              zx_saddr2cy_fastcall(a)
+#define zx_saddr2px(a)              zx_saddr2px_fastcall(a)
+#define zx_saddr2py(a)              zx_saddr2py_fastcall(a)
+#define zx_saddrcdown(a)            zx_saddrcdown_fastcall(a)
+#define zx_saddrcleft(a)            zx_saddrcleft_fastcall(a)
+#define zx_saddrcright(a)           zx_saddrcright_fastcall(a)
+#define zx_saddrcup(a)              zx_saddrcup_fastcall(a)
+#define zx_saddrpdown(a)            zx_saddrpdown_fastcall(a)
+#define zx_saddrpup(a)              zx_saddrpup_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_saddr2px
 
+EXTERN asm_zx_saddr2px
+
 _zx_saddr2px:
 
    pop af
@@ -13,4 +15,4 @@ _zx_saddr2px:
    push hl
    push af
 
-   INCLUDE "arch/zx/display/z80/asm_zx_saddr2px.asm"
+   jp asm_zx_saddr2px

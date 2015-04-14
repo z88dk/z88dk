@@ -13,7 +13,7 @@ zx_cls_wc:
    pop hl
    pop ix
    
-   push ix
+   push hl
    push hl
    push af
    
