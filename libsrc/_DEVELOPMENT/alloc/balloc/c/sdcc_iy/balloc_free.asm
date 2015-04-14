@@ -5,6 +5,8 @@ SECTION code_alloc_balloc
 
 PUBLIC _balloc_free
 
+EXTERN asm_balloc_free
+
 _balloc_free:
 
    pop af
@@ -13,4 +15,4 @@ _balloc_free:
    push hl
    push af
 
-   INCLUDE "alloc/balloc/z80/asm_balloc_free.asm"
+   jp asm_balloc_free
