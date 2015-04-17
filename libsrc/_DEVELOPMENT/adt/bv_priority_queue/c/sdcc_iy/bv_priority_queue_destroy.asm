@@ -5,6 +5,8 @@ SECTION code_adt_bv_priority_queue
 
 PUBLIC _bv_priority_queue_destroy
 
+EXTERN asm_bv_priority_queue_destroy
+
 _bv_priority_queue_destroy:
 
    pop af
@@ -13,4 +15,4 @@ _bv_priority_queue_destroy:
    push hl
    push af
 
-   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_destroy.asm"
+   jp asm_bv_priority_queue_destroy

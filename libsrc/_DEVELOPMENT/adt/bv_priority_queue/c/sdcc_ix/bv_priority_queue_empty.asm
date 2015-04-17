@@ -8,5 +8,3 @@ PUBLIC _bv_priority_queue_empty
 EXTERN _ba_priority_queue_empty
 
 defc _bv_priority_queue_empty = _ba_priority_queue_empty
-
-INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_empty.asm"

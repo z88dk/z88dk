@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_destroy
 
+EXTERN asm_b_array_destroy
+
 _b_array_destroy:
 
    pop af
@@ -13,4 +15,4 @@ _b_array_destroy:
    push hl
    push af
    
-   INCLUDE "adt/b_array/z80/asm_b_array_destroy.asm"
+   jp asm_b_array_destroy

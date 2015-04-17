@@ -8,5 +8,3 @@ PUBLIC _ba_stack_clear
 EXTERN _b_array_clear
 
 defc _ba_stack_clear = _b_array_clear
-
-INCLUDE "adt/ba_stack/z80/asm_ba_stack_clear.asm"

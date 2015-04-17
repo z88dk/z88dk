@@ -5,6 +5,8 @@ SECTION code_adt_b_vector
 
 PUBLIC _b_vector_destroy
 
+EXTERN asm_b_vector_destroy
+
 _b_vector_destroy:
 
    pop af
@@ -13,4 +15,4 @@ _b_vector_destroy:
    push hl
    push af
    
-   INCLUDE "adt/b_vector/z80/asm_b_vector_destroy.asm"
+   jp asm_b_vector_destroy

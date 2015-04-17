@@ -5,6 +5,8 @@ SECTION code_adt_ba_priority_queue
 
 PUBLIC _ba_priority_queue_pop
 
+EXTERN asm_ba_priority_queue_pop
+
 _ba_priority_queue_pop:
 
    pop af
@@ -13,4 +15,4 @@ _ba_priority_queue_pop:
    push hl
    push af
    
-   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_pop.asm"
+   jp asm_ba_priority_queue_pop

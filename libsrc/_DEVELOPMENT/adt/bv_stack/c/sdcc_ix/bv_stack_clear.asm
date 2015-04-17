@@ -8,5 +8,3 @@ PUBLIC _bv_stack_clear
 EXTERN _b_vector_clear
 
 defc _bv_stack_clear = _b_vector_clear
-
-INCLUDE "adt/bv_stack/z80/asm_bv_stack_clear.asm"

@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_empty
 
+EXTERN asm_b_array_empty
+
 _b_array_empty:
 
    pop af
@@ -14,5 +16,3 @@ _b_array_empty:
    push af
    
    jp asm_b_array_empty
-   
-   INCLUDE "adt/b_array/z80/asm_b_array_empty.asm"

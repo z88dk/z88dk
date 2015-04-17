@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_capacity
 
+EXTERN asm_b_array_capacity
+
 _b_array_capacity:
 
    pop af
@@ -14,5 +16,3 @@ _b_array_capacity:
    push af
 
    jp asm_b_array_capacity
-
-   INCLUDE "adt/b_array/z80/asm_b_array_capacity.asm"

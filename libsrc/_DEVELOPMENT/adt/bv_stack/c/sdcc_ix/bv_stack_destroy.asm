@@ -8,5 +8,3 @@ PUBLIC _bv_stack_destroy
 EXTERN _b_vector_destroy
 
 defc _bv_stack_destroy = _b_vector_destroy
-
-INCLUDE "adt/bv_stack/z80/asm_bv_stack_destroy.asm"

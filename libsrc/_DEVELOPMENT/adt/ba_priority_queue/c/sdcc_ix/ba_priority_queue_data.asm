@@ -5,6 +5,8 @@ SECTION code_adt_ba_priority_queue
 
 PUBLIC _ba_priority_queue_data
 
+EXTERN asm_ba_priority_queue_data
+
 _ba_priority_queue_data:
 
    pop af
@@ -14,5 +16,3 @@ _ba_priority_queue_data:
    push af
 
    jp asm_ba_priority_queue_data
-
-   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_data.asm"

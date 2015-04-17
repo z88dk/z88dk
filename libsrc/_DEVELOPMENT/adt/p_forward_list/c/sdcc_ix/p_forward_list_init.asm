@@ -5,6 +5,8 @@ SECTION code_adt_p_forward_list
 
 PUBLIC _p_forward_list_init
 
+EXTERN asm_p_forward_list_init
+
 _p_forward_list_init:
 
    pop af
@@ -13,4 +15,4 @@ _p_forward_list_init:
    push hl
    push af
 
-   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_init.asm"
+   jp asm_p_forward_list_init
