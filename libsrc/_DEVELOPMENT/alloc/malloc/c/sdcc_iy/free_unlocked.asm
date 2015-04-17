@@ -5,8 +5,14 @@ SECTION code_alloc_malloc
 
 PUBLIC _free_unlocked
 
-EXTERN _heap_free_unlocked
+EXTERN asm_free_unlocked
 
-defc _free_unlocked = _heap_free_unlocked
+_free_unlocked:
 
-INCLUDE "alloc/malloc/z80/asm_free_unlocked.asm"
+   pop af
+   pop hl
+   
+   push hl
+   push af
+   
+   jp asm_free_unlocked

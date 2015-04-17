@@ -1,5 +1,5 @@
 
-; void heap_info(void *heap, void *callback)
+; void free_fastcall(void *p)
 
 INCLUDE "clib_cfg.asm"
 
@@ -9,31 +9,23 @@ SECTION code_alloc_malloc
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC heap_info
+PUBLIC _free_fastcall
 
-EXTERN asm_heap_info
+_free_fastcall:
 
-heap_info:
-
-   pop af
-   pop ix
-   pop de
-   
-   push de
-   push hl
-   push af
-   
-   jp asm_heap_info
+   INCLUDE "alloc/malloc/z80/asm_free.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC heap_info
+PUBLIC _free_fastcall
 
-EXTERN heap_info_unlocked
+EXTERN _free_unlocked_fastcall
 
-defc heap_info = heap_info_unlocked
+defc _free_fastcall = _free_unlocked_fastcall
+   
+INCLUDE "alloc/malloc/z80/asm_free.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

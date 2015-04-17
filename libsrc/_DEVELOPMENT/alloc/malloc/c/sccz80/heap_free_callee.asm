@@ -26,18 +26,11 @@ ELSE
 
 PUBLIC heap_free_callee
 
-EXTERN asm_heap_free_unlocked
+EXTERN heap_free_unlocked_callee
 
-heap_free_callee:
+defc heap_free_callee = heap_free_unlocked_callee
    
-   pop af
-   pop hl
-   pop de
-   push af
-   
-   jp asm_heap_free_unlocked
-   
-   INCLUDE "alloc/malloc/z80/asm_heap_free.asm"
+INCLUDE "alloc/malloc/z80/asm_heap_free.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

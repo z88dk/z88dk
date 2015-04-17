@@ -32,6 +32,32 @@ extern int                  ba_priority_queue_resize(ba_priority_queue_t *q, siz
 extern size_t               ba_priority_queue_size(ba_priority_queue_t *q);
 extern int                  ba_priority_queue_top(ba_priority_queue_t *q);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern size_t               ba_priority_queue_capacity_fastcall(ba_priority_queue_t *q) __z88dk_fastcall;
+extern void                 ba_priority_queue_clear_fastcall(ba_priority_queue_t *q) __z88dk_fastcall;
+extern void                *ba_priority_queue_data_fastcall(ba_priority_queue_t *q) __z88dk_fastcall;
+extern void                 ba_priority_queue_destroy_fastcall(ba_priority_queue_t *q) __z88dk_fastcall;
+extern int                  ba_priority_queue_empty_fastcall(ba_priority_queue_t *q) __z88dk_fastcall;
+extern int                  ba_priority_queue_pop_fastcall(ba_priority_queue_t *q) __z88dk_fastcall;
+extern size_t               ba_priority_queue_size_fastcall(ba_priority_queue_t *q) __z88dk_fastcall;
+extern int                  ba_priority_queue_top_fastcall(ba_priority_queue_t *q) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define ba_priority_queue_capacity(a)           ba_priority_queue_capacity_fastcall(a)
+#define ba_priority_queue_clear(a)              ba_priority_queue_clear_fastcall(a)
+#define ba_priority_queue_data(a)               ba_priority_queue_data_fastcall(a)
+#define ba_priority_queue_destroy(a)            ba_priority_queue_destroy_fastcall(a)
+#define ba_priority_queue_empty(a)              ba_priority_queue_empty_fastcall(a)
+#define ba_priority_queue_pop(a)                ba_priority_queue_pop_fastcall(a)
+#define ba_priority_queue_size(a)               ba_priority_queue_size_fastcall(a)
+#define ba_priority_queue_top(a)                ba_priority_queue_top_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

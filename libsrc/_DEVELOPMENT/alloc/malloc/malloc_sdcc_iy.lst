@@ -3,7 +3,9 @@ alloc/malloc/c/sdcc_iy/aligned_alloc_unlocked
 alloc/malloc/c/sdcc_iy/calloc
 alloc/malloc/c/sdcc_iy/calloc_unlocked
 alloc/malloc/c/sdcc_iy/free
+alloc/malloc/c/sdcc_iy/free_fastcall
 alloc/malloc/c/sdcc_iy/free_unlocked
+alloc/malloc/c/sdcc_iy/free_unlocked_fastcall
 alloc/malloc/c/sdcc_iy/heap_alloc
 alloc/malloc/c/sdcc_iy/heap_alloc_aligned
 alloc/malloc/c/sdcc_iy/heap_alloc_aligned_unlocked
@@ -13,6 +15,7 @@ alloc/malloc/c/sdcc_iy/heap_alloc_unlocked
 alloc/malloc/c/sdcc_iy/heap_calloc
 alloc/malloc/c/sdcc_iy/heap_calloc_unlocked
 alloc/malloc/c/sdcc_iy/heap_destroy
+alloc/malloc/c/sdcc_iy/heap_destroy_fastcall
 alloc/malloc/c/sdcc_iy/heap_free
 alloc/malloc/c/sdcc_iy/heap_free_unlocked
 alloc/malloc/c/sdcc_iy/heap_info
@@ -21,7 +24,9 @@ alloc/malloc/c/sdcc_iy/heap_init
 alloc/malloc/c/sdcc_iy/heap_realloc
 alloc/malloc/c/sdcc_iy/heap_realloc_unlocked
 alloc/malloc/c/sdcc_iy/malloc
+alloc/malloc/c/sdcc_iy/malloc_fastcall
 alloc/malloc/c/sdcc_iy/malloc_unlocked
+alloc/malloc/c/sdcc_iy/malloc_unlocked_fastcall
 alloc/malloc/c/sdcc_iy/memalign
 alloc/malloc/c/sdcc_iy/memalign_unlocked
 alloc/malloc/c/sdcc_iy/posix_memalign

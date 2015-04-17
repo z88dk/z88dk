@@ -3,7 +3,7 @@
 ; Dec 2013
 ; ===============================================================
 ; 
-; void heap_free_unlocked(void *p)
+; void heap_free_unlocked(void *heap, void *p)
 ;
 ; Deallocate memory previously allocated at p from the heap.
 ;
@@ -22,6 +22,7 @@ asm_heap_free_unlocked:
    ; Return the memory block to the heap for reuse without locking
    ;
    ; enter : hl = void *p
+   ;         de = void *heap (unused)
    ;
    ; exit  : carry reset
    ;

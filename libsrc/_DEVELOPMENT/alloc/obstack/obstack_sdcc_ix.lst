@@ -4,11 +4,13 @@ alloc/obstack/c/sdcc_ix/obstack_align_distance
 alloc/obstack/c/sdcc_ix/obstack_align_to
 alloc/obstack/c/sdcc_ix/obstack_alloc
 alloc/obstack/c/sdcc_ix/obstack_base
+alloc/obstack/c/sdcc_ix/obstack_base_fastcall
 alloc/obstack/c/sdcc_ix/obstack_blank
 alloc/obstack/c/sdcc_ix/obstack_blank_fast
 alloc/obstack/c/sdcc_ix/obstack_copy
 alloc/obstack/c/sdcc_ix/obstack_copy0
 alloc/obstack/c/sdcc_ix/obstack_finish
+alloc/obstack/c/sdcc_ix/obstack_finish_fastcall
 alloc/obstack/c/sdcc_ix/obstack_free
 alloc/obstack/c/sdcc_ix/obstack_grow
 alloc/obstack/c/sdcc_ix/obstack_grow0
@@ -16,5 +18,8 @@ alloc/obstack/c/sdcc_ix/obstack_init
 alloc/obstack/c/sdcc_ix/obstack_int_grow
 alloc/obstack/c/sdcc_ix/obstack_int_grow_fast
 alloc/obstack/c/sdcc_ix/obstack_next_free
+alloc/obstack/c/sdcc_ix/obstack_next_free_fastcall
 alloc/obstack/c/sdcc_ix/obstack_object_size
+alloc/obstack/c/sdcc_ix/obstack_object_size_fastcall
 alloc/obstack/c/sdcc_ix/obstack_room
+alloc/obstack/c/sdcc_ix/obstack_room_fastcall

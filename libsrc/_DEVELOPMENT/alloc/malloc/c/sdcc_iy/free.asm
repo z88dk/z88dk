@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC _free
 
+EXTERN asm_free
+
 _free:
 
    pop af
@@ -19,7 +21,7 @@ _free:
    push hl
    push af
 
-   INCLUDE "alloc/malloc/z80/asm_free.asm"
+   jp asm_free
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -30,8 +32,6 @@ PUBLIC _free
 EXTERN _free_unlocked
 
 defc _free = _free_unlocked
-   
-INCLUDE "alloc/malloc/z80/asm_free.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

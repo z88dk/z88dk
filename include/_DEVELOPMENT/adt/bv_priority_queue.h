@@ -36,6 +36,36 @@ extern int                  bv_priority_queue_shrink_to_fit(bv_priority_queue_t 
 extern size_t               bv_priority_queue_size(bv_priority_queue_t *q);
 extern int                  bv_priority_queue_top(bv_priority_queue_t *q);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern size_t               bv_priority_queue_capacity_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+extern void                 bv_priority_queue_clear_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+extern void                *bv_priority_queue_data_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+extern void                 bv_priority_queue_destroy_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+extern int                  bv_priority_queue_empty_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+extern size_t               bv_priority_queue_max_size_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+extern int                  bv_priority_queue_pop_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+extern int                  bv_priority_queue_shrink_to_fit_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+extern size_t               bv_priority_queue_size_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+extern int                  bv_priority_queue_top_fastcall(bv_priority_queue_t *q) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define bv_priority_queue_capacity(a)            bv_priority_queue_capacity_fastcall(a)
+#define bv_priority_queue_clear(a)               bv_priority_queue_clear_fastcall(a)
+#define bv_priority_queue_data(a)                bv_priority_queue_data_fastcall(a)
+#define bv_priority_queue_destroy(a)             bv_priority_queue_destroy_fastcall(a)
+#define bv_priority_queue_empty(a)               bv_priority_queue_empty_fastcall(a)
+#define bv_priority_queue_max_size(a)            bv_priority_queue_max_size_fastcall(a)
+#define bv_priority_queue_pop(a)                 bv_priority_queue_pop_fastcall(a)
+#define bv_priority_queue_shrink_to_fit(a)       bv_priority_queue_shrink_to_fit_fastcall(a)
+#define bv_priority_queue_size(a)                bv_priority_queue_size_fastcall(a)
+#define bv_priority_queue_top(a)                 bv_priority_queue_top_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

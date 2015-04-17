@@ -38,6 +38,26 @@ extern void   *obstack_next_free(struct obstack *ob);
 extern size_t  obstack_object_size(struct obstack *ob);
 extern size_t  obstack_room(struct obstack *ob);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void   *obstack_base_fastcall(struct obstack *ob) __z88dk_fastcall;
+extern void   *obstack_finish_fastcall(struct obstack *ob) __z88dk_fastcall;
+extern void   *obstack_next_free_fastcall(struct obstack *ob) __z88dk_fastcall;
+extern size_t  obstack_object_size_fastcall(struct obstack *ob) __z88dk_fastcall;
+extern size_t  obstack_room_fastcall(struct obstack *ob) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define obstack_base(a)             obstack_base_fastcall(a)
+#define obstack_finish(a)           obstack_finish_fastcall(a)
+#define obstack_next_free(a)        obstack_next_free_fastcall(a)
+#define obstack_object_size(a)      obstack_object_size_fastcall(a)
+#define obstack_room(a)             obstack_room_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

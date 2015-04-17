@@ -44,6 +44,34 @@ extern int       b_array_resize(b_array_t *a, size_t n);
 extern size_t    b_array_size(b_array_t *a);
 extern size_t    b_array_write_block(void *src, size_t n, b_array_t *a, size_t idx);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern int       b_array_back_fastcall(b_array_t *a) __z88dk_fastcall;
+extern size_t    b_array_capacity_fastcall(b_array_t *a) __z88dk_fastcall;
+extern void      b_array_clear_fastcall(b_array_t *a) __z88dk_fastcall;
+extern void     *b_array_data_fastcall(b_array_t *a) __z88dk_fastcall;
+extern void      b_array_destroy_fastcall(b_array_t *a) __z88dk_fastcall;
+extern int       b_array_empty_fastcall(b_array_t *a) __z88dk_fastcall;
+extern int       b_array_front_fastcall(b_array_t *a) __z88dk_fastcall;
+extern int       b_array_pop_back_fastcall(b_array_t *a) __z88dk_fastcall;
+extern size_t    b_array_size_fastcall(b_array_t *a) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define b_array_back(a)                b_array_back_fastcall(a)
+#define b_array_capacity(a)            b_array_capacity_fastcall(a)
+#define b_array_clear(a)               b_array_clear_fastcall(a)
+#define b_array_data(a)                b_array_data_fastcall(a)
+#define b_array_destroy(a)             b_array_destroy_fastcall(a)
+#define b_array_empty(a)               b_array_empty_fastcall(a)
+#define b_array_front(a)               b_array_front_fastcall(a)
+#define b_array_pop_back(a)            b_array_pop_back_fastcall(a)
+#define b_array_size(a)                b_array_size_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

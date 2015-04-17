@@ -29,6 +29,30 @@ extern int         ba_stack_push(ba_stack_t *s, int c);
 extern size_t      ba_stack_size(ba_stack_t *s);
 extern int         ba_stack_top(ba_stack_t *s);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern size_t      ba_stack_capacity_fastcall(ba_stack_t *s) __z88dk_fastcall;
+extern void        ba_stack_clear_fastcall(ba_stack_t *s) __z88dk_fastcall;
+extern void        ba_stack_destroy_fastcall(ba_stack_t *s) __z88dk_fastcall;
+extern int         ba_stack_empty_fastcall(ba_stack_t *s) __z88dk_fastcall;
+extern int         ba_stack_pop_fastcall(ba_stack_t *s) __z88dk_fastcall;
+extern size_t      ba_stack_size_fastcall(ba_stack_t *s) __z88dk_fastcall;
+extern int         ba_stack_top_fastcall(ba_stack_t *s) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define ba_stack_capacity(a)            ba_stack_capacity_fastcall(a)
+#define ba_stack_clear(a)               ba_stack_clear_fastcall(a)
+#define ba_stack_destroy(a)             ba_stack_destroy_fastcall(a)
+#define ba_stack_empty(a)               ba_stack_empty_fastcall(a)
+#define ba_stack_pop(a)                 ba_stack_pop_fastcall(a)
+#define ba_stack_size(a)                ba_stack_size_fastcall(a)
+#define ba_stack_top(a)                 ba_stack_top_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

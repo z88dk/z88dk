@@ -16,9 +16,10 @@ SECTION code_alloc_malloc
 
 PUBLIC asm_free_unlocked
 
+EXTERN __malloc_heap
 EXTERN asm_heap_free_unlocked
 
-defc asm_free_unlocked = asm_heap_free_unlocked
+asm_free_unlocked:
 
    ; Return the memory block to the heap for reuse without locking
    ;
@@ -27,3 +28,6 @@ defc asm_free_unlocked = asm_heap_free_unlocked
    ; exit  : carry reset
    ;
    ; uses  : af, de, hl
+
+   ld de,(__malloc_heap)
+   jp asm_heap_free_unlocked

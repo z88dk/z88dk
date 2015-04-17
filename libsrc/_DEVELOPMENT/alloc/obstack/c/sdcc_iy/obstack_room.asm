@@ -5,6 +5,8 @@ SECTION code_alloc_obstack
 
 PUBLIC _obstack_room
 
+EXTERN asm_obstack_room
+
 _obstack_room:
 
    pop af
@@ -13,4 +15,4 @@ _obstack_room:
    push hl
    push af
 
-   INCLUDE "alloc/obstack/z80/asm_obstack_room.asm"
+   jp asm_obstack_room
