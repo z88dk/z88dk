@@ -8,5 +8,3 @@ PUBLIC _p_stack_empty
 EXTERN _p_forward_list_empty
 
 defc _p_stack_empty = _p_forward_list_empty
-
-INCLUDE "adt/p_stack/z80/asm_p_stack_empty.asm"

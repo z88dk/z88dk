@@ -34,6 +34,34 @@ extern void       *p_forward_list_alt_remove(p_forward_list_alt_t *ls, void *ite
 extern void       *p_forward_list_alt_remove_after(p_forward_list_alt_t *ls, void *ls_item);
 extern size_t      p_forward_list_alt_size(p_forward_list_alt_t *ls);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void       *p_forward_list_alt_back_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern void        p_forward_list_alt_clear_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern int         p_forward_list_alt_empty_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern void       *p_forward_list_alt_front_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern void        p_forward_list_alt_init_fastcall(void *p) __z88dk_fastcall;
+extern void       *p_forward_list_alt_next_fastcall(void *item) __z88dk_fastcall;
+extern void       *p_forward_list_alt_pop_back_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern void       *p_forward_list_alt_pop_front_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern size_t      p_forward_list_alt_size_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define p_forward_list_alt_back(a)      p_forward_list_alt_back_fastcall(a)
+#define p_forward_list_alt_clear(a)     p_forward_list_alt_clear_fastcall(a)
+#define p_forward_list_alt_empty(a)     p_forward_list_alt_empty_fastcall(a)
+#define p_forward_list_alt_front(a)     p_forward_list_alt_front_fastcall(a)
+#define p_forward_list_alt_init(a)      p_forward_list_alt_init_fastcall(a)
+#define p_forward_list_alt_next(a)      p_forward_list_alt_next_fastcall(a)
+#define p_forward_list_alt_pop_back(a)  p_forward_list_alt_pop_back_fastcall(a)
+#define p_forward_list_alt_pop_front(a) p_forward_list_alt_pop_front_fastcall(a)
+#define p_forward_list_alt_size(a)      p_forward_list_alt_size_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

@@ -8,5 +8,3 @@ PUBLIC _p_queue_clear
 EXTERN _p_forward_list_alt_init
 
 defc _p_queue_clear = _p_forward_list_alt_init
-
-INCLUDE "adt/p_queue/z80/asm_p_queue_clear.asm"

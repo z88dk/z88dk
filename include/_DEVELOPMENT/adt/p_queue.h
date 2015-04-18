@@ -26,6 +26,30 @@ extern void       *p_queue_pop(p_queue_t *q);
 extern void        p_queue_push(p_queue_t *q, void *item);
 extern size_t      p_queue_size(p_queue_t *q);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void       *p_queue_back_fastcall(p_queue_t *q) __z88dk_fastcall;
+extern void        p_queue_clear_fastcall(p_queue_t *q) __z88dk_fastcall;
+extern int         p_queue_empty_fastcall(p_queue_t *q) __z88dk_fastcall;
+extern void       *p_queue_front_fastcall(p_queue_t *q) __z88dk_fastcall;
+extern void        p_queue_init_fastcall(void *p) __z88dk_fastcall;
+extern void       *p_queue_pop_fastcall(p_queue_t *q) __z88dk_fastcall;
+extern size_t      p_queue_size_fastcall(p_queue_t *q) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define p_queue_back(a)                 p_queue_back_fastcall(a)
+#define p_queue_clear(a)                p_queue_clear_fastcall(a)
+#define p_queue_empty(a)                p_queue_empty_fastcall(a)
+#define p_queue_front(a)                p_queue_front_fastcall(a)
+#define p_queue_init(a)                 p_queue_init_fastcall(a)
+#define p_queue_pop(a)                  p_queue_pop_fastcall(a)
+#define p_queue_size(a)                 p_queue_size_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

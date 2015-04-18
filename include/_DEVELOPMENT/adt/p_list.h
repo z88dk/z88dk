@@ -35,6 +35,36 @@ extern void       *p_list_remove(p_list_t *ls, void *item);
 extern void       *p_list_remove_after(p_list_t *ls, void *ls_item);
 extern size_t      p_list_size(p_list_t *ls);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void       *p_list_back_fastcall(p_list_t *ls) __z88dk_fastcall;
+extern void        p_list_clear_fastcall(p_list_t *ls) __z88dk_fastcall;
+extern int         p_list_empty_fastcall(p_list_t *ls) __z88dk_fastcall;
+extern void       *p_list_front_fastcall(p_list_t *ls) __z88dk_fastcall;
+extern void        p_list_init_fastcall(void *p) __z88dk_fastcall;
+extern void       *p_list_next_fastcall(void *item) __z88dk_fastcall;
+extern void       *p_list_pop_back_fastcall(p_list_t *ls) __z88dk_fastcall;
+extern void       *p_list_pop_front_fastcall(p_list_t *ls) __z88dk_fastcall;
+extern void       *p_list_prev_fastcall(void *item) __z88dk_fastcall;
+extern size_t      p_list_size_fastcall(p_list_t *ls) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define p_list_back(a)                  p_list_back_fastcall(a)
+#define p_list_clear(a)                 p_list_clear_fastcall(a)
+#define p_list_empty(a)                 p_list_empty_fastcall(a)
+#define p_list_front(a)                 p_list_front_fastcall(a)
+#define p_list_init(a)                  p_list_init_fastcall(a)
+#define p_list_next(a)                  p_list_next_fastcall(a)
+#define p_list_pop_back(a)              p_list_pop_back_fastcall(a)
+#define p_list_pop_front(a)             p_list_pop_front_fastcall(a)
+#define p_list_prev(a)                  p_list_prev_fastcall(a)
+#define p_list_size(a)                  p_list_size_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

@@ -20,6 +20,28 @@ extern void        p_stack_push(p_stack_t *s, void *item);
 extern size_t      p_stack_size(p_stack_t *s);
 extern void       *p_stack_top(p_stack_t *s);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void        p_stack_clear_fastcall(p_stack_t *s) __z88dk_fastcall;
+extern int         p_stack_empty_fastcall(p_stack_t *s) __z88dk_fastcall;
+extern void        p_stack_init_fastcall(void *p) __z88dk_fastcall;
+extern void       *p_stack_pop_fastcall(p_stack_t *s) __z88dk_fastcall;
+extern size_t      p_stack_size_fastcall(p_stack_t *s) __z88dk_fastcall;
+extern void       *p_stack_top_fastcall(p_stack_t *s) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define p_stack_clear(a)                p_stack_clear_fastcall(a)
+#define p_stack_empty(a)                p_stack_empty_fastcall(a)
+#define p_stack_init(a)                 p_stack_init_fastcall(a)
+#define p_stack_pop(a)                  p_stack_pop_fastcall(a)
+#define p_stack_size(a)                 p_stack_size_fastcall(a)
+#define p_stack_top(a)                  p_stack_top_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80
