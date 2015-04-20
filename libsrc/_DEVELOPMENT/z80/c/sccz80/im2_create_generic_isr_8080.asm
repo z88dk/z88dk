@@ -5,7 +5,7 @@ SECTION code_z80
 
 PUBLIC im2_create_generic_isr_8080
 
-EXTERN asm_im2_create_generic_isr_8080
+EXTERN l0_im2_create_generic_isr_8080_callee
 
 im2_create_generic_isr_8080:
 
@@ -17,5 +17,4 @@ im2_create_generic_isr_8080:
    push de
    push af
    
-   ld a,l
-   jp asm_im2_create_generic_isr_8080
+   jp l0_im2_create_generic_isr_8080_callee

@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _memchr
 
+EXTERN l0_memchr_callee
+
 _memchr:
 
    pop af
@@ -16,7 +18,5 @@ _memchr:
    push de
    push hl
    push af
-   
-   ld a,e
 
-   INCLUDE "string/z80/asm_memchr.asm"
+   jp l0_memchr_callee

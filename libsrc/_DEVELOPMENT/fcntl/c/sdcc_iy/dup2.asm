@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _dup2
 
+EXTERN asm_dup2
+
 _dup2:
 
    pop af
@@ -15,4 +17,4 @@ _dup2:
    push hl
    push af
    
-   INCLUDE "fcntl/z80/asm_dup2.asm"
+   jp asm_dup2

@@ -62,6 +62,22 @@ extern int    spinlock_tryacquire_fastcall(char *spinlock) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void   call_once_callee(once_flag *flag, void *func) __z88dk_callee;
+extern int    mtx_init_callee(mtx_t *m, int type) __z88dk_callee;
+extern int    mtx_timedlock_callee(mtx_t *m, struct timespec *ts) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define call_once(a,b)              call_once_callee(a,b)
+#define mtx_init(a,b)               mtx_init_callee(a,b)
+#define mtx_timedlock(a,b)          mtx_timedlock_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

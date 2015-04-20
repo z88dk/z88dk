@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strchrnul
 
+EXTERN asm_strchrnul
+
 _strchrnul:
 
    pop af
@@ -15,4 +17,4 @@ _strchrnul:
    push hl
    push af
    
-   INCLUDE "string/z80/asm_strchrnul.asm"
+   jp asm_strchrnul

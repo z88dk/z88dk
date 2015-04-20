@@ -8,5 +8,3 @@ PUBLIC _strnicmp
 EXTERN _strncasecmp
 
 defc _strnicmp = _strncasecmp
-
-INCLUDE "string/z80/asm_strnicmp.asm"

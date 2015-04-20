@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strcspn
 
+EXTERN asm_strcspn
+
 _strcspn:
 
    pop af
@@ -15,4 +17,4 @@ _strcspn:
    push hl
    push af
    
-   INCLUDE "string/z80/asm_strcspn.asm"
+   jp asm_strcspn

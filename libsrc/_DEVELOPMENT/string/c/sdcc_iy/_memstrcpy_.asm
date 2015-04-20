@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC __memstrcpy_
 
+EXTERN asm__memstrcpy
+
 __memstrcpy_:
 
    pop af
@@ -17,5 +19,4 @@ __memstrcpy_:
    push de
    push af
    
-   INCLUDE "string/z80/asm__memstrcpy.asm"
-
+   jp asm__memstrcpy

@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strnlen
 
+EXTERN asm_strnlen
+
 _strnlen:
 
    pop af
@@ -15,4 +17,4 @@ _strnlen:
    push hl
    push af
    
-   INCLUDE "string/z80/asm_strnlen.asm"
+   jp asm_strnlen

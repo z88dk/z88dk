@@ -9,5 +9,3 @@ PUBLIC _bcmp
 EXTERN _memcmp
 
 defc _bcmp = _memcmp
-
-INCLUDE "string/z80/asm_bcmp.asm"

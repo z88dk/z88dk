@@ -9,5 +9,3 @@ PUBLIC _index
 EXTERN _strchr
 
 defc _index = _strchr
-
-INCLUDE "string/z80/asm_index.asm"

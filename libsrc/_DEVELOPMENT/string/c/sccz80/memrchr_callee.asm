@@ -3,7 +3,7 @@
 
 SECTION code_string
 
-PUBLIC memrchr_callee
+PUBLIC memrchr_callee, l0_memrchr_callee
 
 memrchr_callee:
 
@@ -11,7 +11,9 @@ memrchr_callee:
    pop bc
    pop de
    ex (sp),hl
-   
+
+l0_memrchr_callee:
+
    ld a,e
    
    INCLUDE "string/z80/asm_memrchr.asm"

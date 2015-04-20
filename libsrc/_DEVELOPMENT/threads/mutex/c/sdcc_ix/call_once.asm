@@ -3,9 +3,11 @@
 
 SECTION code_threads_mutex
 
-PUBLIC call_once
+PUBLIC _call_once
 
-call_once:
+EXTERN l0_call_once_callee
+
+_call_once:
 
    pop af
    pop hl
@@ -14,12 +16,5 @@ call_once:
    push de
    push hl
    push af
-   
-   push ix
-   
-   call asm_call_once
-   
-   pop ix
-   ret
-   
-   INCLUDE "threads/mutex/z80/asm_call_once.asm"
+
+   jp l0_call_once_callee

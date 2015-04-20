@@ -5,6 +5,8 @@ SECTION code_threads_mutex
 
 PUBLIC _mtx_init
 
+EXTERN asm_mtx_init
+
 _mtx_init:
 
    pop af
@@ -15,4 +17,4 @@ _mtx_init:
    push hl
    push af
    
-   INCLUDE "threads/mutex/z80/asm_mtx_init.asm"
+   jp asm_mtx_init

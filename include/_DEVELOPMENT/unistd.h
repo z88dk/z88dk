@@ -71,6 +71,24 @@ extern void              _exit_fastcall(int status) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern int      dup2_callee(int fd, int fd2) __z88dk_callee;
+extern off_t    lseek_callee(int fd, off_t offset, int whence) __z88dk_callee;
+extern ssize_t  read_callee(int fd, void *buf, size_t nbyte) __z88dk_callee;
+extern ssize_t  write_callee(int fd, const void *buf, size_t nbyte) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define dup2(a,b)                    dup2_callee(a,b)
+#define lseek(a,b,c)                 lseek_callee(a,b,c)
+#define read(a,b,c)                  read_callee(a,b,c)
+#define write(a,b,c)                 write_callee(a,b,c)
+
+#endif
+
 #else
 
 // SCCZ80

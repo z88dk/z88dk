@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _memset
 
+EXTERN asm_memset
+
 _memset:
 
    pop af
@@ -17,4 +19,4 @@ _memset:
    push hl
    push af
    
-   INCLUDE "string/z80/asm_memset.asm"
+   jp asm_memset

@@ -1,0 +1,13 @@
+
+; BSD
+; char *index_callee(const char *s, int c)
+
+SECTION code_string
+
+PUBLIC _index_callee
+
+EXTERN _strchr_callee
+
+defc _index_callee = _strchr_callee
+
+INCLUDE "string/z80/asm_index.asm"

@@ -8,5 +8,3 @@ PUBLIC _stricmp
 EXTERN _strcasecmp
 
 defc _stricmp = _strcasecmp
-
-INCLUDE "string/z80/asm_stricmp.asm"

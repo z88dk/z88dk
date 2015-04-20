@@ -81,12 +81,6 @@ extern char   *strtok_r(char *s, char *delim, char **last_s);
 extern char    strupr(char *s);
 extern size_t  strxfrm(char *dst, char *src, size_t n);
 
-#define memcpy(dst, src, n)    __builtin_memcpy(dst, src, n)
-#define strcpy(dst, src)       __builtin_strcpy(dst, src)
-#define strncpy(dst, src, n)   __builtin_strncpy(dst, src, n)
-#define strchr(s, c)           __builtin_strchr(s, c)
-#define memset(dst, c, n)      __builtin_memset(dst, c, n)
-
 #ifdef __SDCC_ENABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
@@ -118,6 +112,132 @@ extern char    strupr_fastcall(char *s) __z88dk_fastcall;
 #define strupr(a)                    strupr_fastcall(a)
 
 #endif
+
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern int     bcmp_callee(void *b1, void *b2, size_t len) __z88dk_callee;
+extern void    bcopy_callee(const void *src, void *dst, size_t len) __z88dk_callee;
+extern void    bzero_callee(void *mem, size_t n) __z88dk_callee;
+extern char   *index_callee(char *s, int c) __z88dk_callee;
+extern char   *rindex_callee(char *s, int c) __z88dk_callee;
+extern char   *strset_callee(char *s, int c) __z88dk_callee;
+extern char   *strnset_callee(char *s, int c, size_t n) __z88dk_callee;
+extern void   *rawmemchr_callee(const void *mem, int c) __z88dk_callee;
+
+extern char   *_memlwr__callee(void *p, size_t n) __z88dk_callee;
+extern char   *_memstrcpy__callee(void *p, char *s, size_t n) __z88dk_callee;
+extern char   *_memupr__callee(void *p, size_t n) __z88dk_callee;
+extern void   *memccpy_callee(void *dst, void *src, int c, size_t n) __z88dk_callee;
+extern void   *memchr_callee(void *s, int c, size_t n) __z88dk_callee;
+extern int     memcmp_callee(void *s1, void *s2, size_t n) __z88dk_callee;
+extern void   *memcpy_callee(void *dst, void *src, size_t n) __z88dk_callee;
+extern void   *memmem_callee(void *haystack, size_t haystack_len, void *needle, size_t needle_len) __z88dk_callee;
+extern void   *memmove_callee(void *dst, void *src, size_t n) __z88dk_callee;
+extern void   *memrchr_callee(void *s, int c, size_t n) __z88dk_callee;
+extern void   *memset_callee(void *s, int c, size_t n) __z88dk_callee;
+extern void   *memswap_callee(void *s1, void *s2, size_t n) __z88dk_callee;
+extern char   *stpcpy_callee(char *dst, char *src) __z88dk_callee;
+extern char   *stpncpy_callee(char *dst, char *src, size_t n) __z88dk_callee;
+extern int     strcasecmp_callee(char *s1, char *s2) __z88dk_callee;
+extern char   *strcat_callee(char *dst, char *src) __z88dk_callee;
+extern char   *strchr_callee(char *s, int c) __z88dk_callee;
+extern char   *strchrnul_callee(char *s, int c) __z88dk_callee;
+extern int     strcmp_callee(char *s1, char *s2) __z88dk_callee;
+extern int     strcoll_callee(char *s1, char *s2) __z88dk_callee;
+extern char   *strcpy_callee(char *dst, char *src) __z88dk_callee;
+extern size_t  strcspn_callee(char *s, char *nspn) __z88dk_callee;
+extern int     stricmp_callee(char *s1, char *s2) __z88dk_callee;
+extern size_t  strlcat_callee(char *dst, char *src, size_t n) __z88dk_callee;
+extern size_t  strlcpy_callee(char *dst, char *src, size_t n) __z88dk_callee;
+extern int     strncasecmp_callee(char *s1, char *s2, size_t n) __z88dk_callee;
+extern char   *strncat_callee(char *dst, char *src, size_t n) __z88dk_callee;
+extern char   *strnchr_callee(char *s, size_t n, int c) __z88dk_callee;
+extern int     strncmp_callee(char *s1, char *s2, size_t n) __z88dk_callee;
+extern char   *strncpy_callee(char *dst, char *src, size_t n) __z88dk_callee;
+extern char   *strndup_callee(char *s, size_t n) __z88dk_callee;
+extern int     strnicmp_callee(char *s1, char *s2, size_t n) __z88dk_callee;
+extern size_t  strnlen_callee(char *s, size_t max_len) __z88dk_callee;
+extern char    strpbrk_callee(char *s, char *set) __z88dk_callee;
+extern char   *strrchr_callee(char *s, int c) __z88dk_callee;
+extern size_t  strrcspn_callee(char *s, char *set) __z88dk_callee;
+extern size_t  strrspn_callee(char *s, char *set) __z88dk_callee;
+extern char   *strsep_callee(char **s, char *delim) __z88dk_callee;
+extern size_t  strspn_callee(char *s, char *pfx) __z88dk_callee;
+extern char   *strstr_callee(char *s, char *subs) __z88dk_callee;
+extern char   *strtok_callee(char *s, char *delim) __z88dk_callee;
+extern char   *strtok_r_callee(char *s, char *delim, char **last_s) __z88dk_callee;
+extern size_t  strxfrm_callee(char *dst, char *src, size_t n) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define bcmp(a,b,c)                  bcmp_callee(a,b,c)
+#define bcopy(a,b,c)                 bcopy_callee(a,b,c)
+#define bzero(a,b)                   bzero_callee(a,b)
+#define index(a,b)                   index_callee(a,b)
+#define rindex(a,b)                  rindex_callee(a,b)
+#define strset(a,b)                  strset_callee(a,b)
+#define strnset(a,b,c)               strnset_callee(a,b,c)
+#define rawmemchr(a,b)               rawmemchr_callee(a,b)
+
+#define _memlwr_(a,b)                _memlwr__callee(a,b)
+#define _memstrcpy_(a,b,c)           _memstrcpy__callee(a,b,c)
+#define _memupr_(a,b)                _memupr__callee(a,b)
+#define memccpy(a,b,c,d)             memccpy_callee(a,b,c,d)
+#define memchr(a,b,c)                memchr_callee(a,b,c)
+#define memcmp(a,b,c)                memcmp_callee(a,b,c)
+#define memcpy(a,b,c)                memcpy_callee(a,b,c)
+#define memmem(a,b,c,d)              memmem_callee(a,b,c,d)
+#define memmove(a,b,c)               memmove_callee(a,b,c)
+#define memrchr(a,b,c)               memrchr_callee(a,b,c)
+#define memset(a,b,c)                memset_callee(a,b,c)
+#define memswap(a,b,c)               memswap_callee(a,b,c)
+#define stpcpy(a,b)                  stpcpy_callee(a,b)
+#define stpncpy(a,b,c)               stpncpy_callee(a,b,c)
+#define strcasecmp(a,b)              strcasecmp_callee(a,b)
+#define strcat(a,b)                  strcat_callee(a,b)
+#define strchr(a,b)                  strchr_callee(a,b)
+#define strchrnul(a,b)               strchrnul_callee(a,b)
+#define strcmp(a,b)                  strcmp_callee(a,b)
+#define strcoll(a,b)                 strcoll_callee(a,b)
+#define strcpy(a,b)                  strcpy_callee(a,b)
+#define strcspn(a,b)                 strcspn_callee(a,b)
+#define stricmp(a,b)                 stricmp_callee(a,b)
+#define strlcat(a,b,c)               strlcat_callee(a,b,c)
+#define strlcpy(a,b,c)               strlcpy_callee(a,b,c)
+#define strncasecmp(a,b,c)           strncasecmp_callee(a,b,c)
+#define strncat(a,b,c)               strncat_callee(a,b,c)
+#define strnchr(a,b,c)               strnchr_callee(a,b,c)
+#define strncmp(a,b,c)               strncmp_callee(a,b,c)
+#define strncpy(a,b,c)               strncpy_callee(a,b,c)
+#define strndup(a,b)                 strndup_callee(a,b)
+#define strnicmp(a,b,c)              strnicmp_callee(a,b,c)
+#define strnlen(a,b)                 strnlen_callee(a,b)
+#define strpbrk(a,b)                 strpbrk_callee(a,b)
+#define strrchr(a,b)                 strrchr_callee(a,b)
+#define strrcspn(a,b)                strrcspn_callee(a,b)
+#define strrspn(a,b)                 strrspn_callee(a,b)
+#define strsep(a,b)                  strsep_callee(a,b)
+#define strspn(a,b)                  strspn_callee(a,b)
+#define strstr(a,b)                  strstr_callee(a,b)
+#define strtok(a,b)                  strtok_callee(a,b)
+#define strtok_r(a,b,c)              strtok_r_callee(a,b,c)
+#define strxfrm(a,b,c)               strxfrm_callee(a,b,c)
+
+#endif
+
+#undef memcpy
+#undef strcpy
+#undef strncpy
+#undef strchr
+#undef memset
+
+#define memcpy(dst, src, n)          __builtin_memcpy(dst, src, n)
+#define strcpy(dst, src)             __builtin_strcpy(dst, src)
+#define strncpy(dst, src, n)         __builtin_strncpy(dst, src, n)
+#define strchr(s, c)                 __builtin_strchr(s, c)
+#define memset(dst, c, n)            __builtin_memset(dst, c, n)
 
 #else
 

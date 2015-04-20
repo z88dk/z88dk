@@ -3,7 +3,7 @@
 
 SECTION code_string
 
-PUBLIC memccpy_callee
+PUBLIC memccpy_callee, l0_memccpy_callee
 
 memccpy_callee:
 
@@ -13,7 +13,9 @@ memccpy_callee:
    pop hl
    pop de
    push af
-   
+
+l0_memccpy_callee:
+
    ld a,ixl
       
    INCLUDE "string/z80/asm_memccpy.asm"

@@ -5,7 +5,7 @@ SECTION code_string
 
 PUBLIC memccpy
 
-EXTERN asm_memccpy
+EXTERN l0_memccpy_callee
 
 memccpy:
 
@@ -20,6 +20,5 @@ memccpy:
    push ix
    push bc
    push af
-   
-   ld a,ixl
-   jp asm_memccpy
+
+   jp l0_memccpy_callee

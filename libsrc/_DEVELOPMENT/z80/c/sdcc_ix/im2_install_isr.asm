@@ -5,6 +5,8 @@ SECTION code_z80
 
 PUBLIC _im2_install_isr
 
+EXTERN asm_im2_install_isr
+
 _im2_install_isr:
 
    pop af
@@ -15,4 +17,4 @@ _im2_install_isr:
    push hl
    push af
    
-   INCLUDE "z80/z80/asm_im2_install_isr.asm"
+   jp asm_im2_install_isr

@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _write
 
+EXTERN l0_write_callee
+
 _write:
 
    pop af
@@ -16,12 +18,5 @@ _write:
    push de
    push hl
    push af
-   
-   push ix
-   
-   call asm_write
-   
-   pop ix
-   ret
-   
-   INCLUDE "fcntl/z80/asm_write.asm"
+
+   jp l0_write_callee

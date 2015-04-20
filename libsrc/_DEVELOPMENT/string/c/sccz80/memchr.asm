@@ -5,7 +5,7 @@ SECTION code_string
 
 PUBLIC memchr
 
-EXTERN asm_memchr
+EXTERN l0_memchr_callee
 
 memchr:
 
@@ -18,6 +18,5 @@ memchr:
    push de
    push bc
    push af
-   
-   ld a,e
-   jp asm_memchr
+
+   jp l0_memchr_callee

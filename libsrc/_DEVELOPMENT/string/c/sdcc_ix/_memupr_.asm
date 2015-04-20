@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC __memupr_
 
+EXTERN asm__memupr
+
 __memupr_:
 
    pop af
@@ -15,5 +17,4 @@ __memupr_:
    push hl
    push af
    
-   INCLUDE "string/z80/asm__memupr.asm"
-
+   jp asm__memupr

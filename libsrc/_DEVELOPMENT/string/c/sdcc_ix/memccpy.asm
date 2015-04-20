@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _memccpy
 
+EXTERN l0_memccpy_callee
+
 _memccpy:
 
    pop af
@@ -16,15 +18,9 @@ _memccpy:
    pop bc
    
    push bc
-   exx
    push bc
-   exx
    push hl
    push de
    push af
-   
-   exx
-   ld a,c
-   exx
-   
-   INCLUDE "string/z80/asm_memccpy.asm"
+
+   jp l0_memccpy_callee

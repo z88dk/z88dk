@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strncat
 
+EXTERN asm_strncat
+
 _strncat:
 
    pop af
@@ -17,4 +19,4 @@ _strncat:
    push de
    push af
    
-   INCLUDE "string/z80/asm_strncat.asm"
+   jp asm_strncat

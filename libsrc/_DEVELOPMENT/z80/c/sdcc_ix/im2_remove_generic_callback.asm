@@ -5,6 +5,8 @@ SECTION code_z80
 
 PUBLIC _im2_remove_generic_callback
 
+EXTERN asm_im2_remove_generic_callback
+
 _im2_remove_generic_callback:
 
    pop af
@@ -15,4 +17,4 @@ _im2_remove_generic_callback:
    push hl
    push af
    
-   INCLUDE "z80/z80/asm_im2_remove_generic_callback.asm"
+   jp asm_im2_remove_generic_callback

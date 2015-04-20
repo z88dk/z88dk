@@ -6,7 +6,7 @@ SECTION code_string
 
 PUBLIC rawmemchr
 
-EXTERN asm_rawmemchr
+EXTERN l0_rawmemchr_callee
 
 rawmemchr:
 
@@ -17,6 +17,5 @@ rawmemchr:
    push hl
    push bc
    push af
-   
-   ld a,c
-   jp asm_rawmemchr
+
+   jp l0_rawmemchr_callee

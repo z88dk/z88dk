@@ -3,7 +3,7 @@
 
 SECTION code_fcntl
 
-PUBLIC lseek_callee
+PUBLIC lseek_callee, l0_lseek_callee
 
 lseek_callee:
 
@@ -14,6 +14,9 @@ lseek_callee:
    pop hl
    pop de
    pop bc
+
+l0_lseek_callee:
+
    exx
    push bc
    exx

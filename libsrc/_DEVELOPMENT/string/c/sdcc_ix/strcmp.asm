@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strcmp
 
+EXTERN asm_strcmp
+
 _strcmp:
 
    pop af
@@ -15,4 +17,4 @@ _strcmp:
    push de
    push af
    
-   INCLUDE "string/z80/asm_strcmp.asm"
+   jp asm_strcmp

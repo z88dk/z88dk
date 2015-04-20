@@ -5,7 +5,7 @@ SECTION code_fcntl
 
 PUBLIC lseek
 
-EXTERN asm_lseek
+EXTERN l0_lseek_callee
 
 lseek:
 
@@ -21,8 +21,5 @@ lseek:
    push de
    push hl
    push bc
-   exx
-   push bc
    
-   exx
-   jp asm_lseek
+   jp l0_lseek_callee

@@ -6,6 +6,8 @@ SECTION code_string
 
 PUBLIC _bzero
 
+EXTERN asm_bzero
+
 _bzero:
 
    pop af
@@ -16,4 +18,4 @@ _bzero:
    push hl
    push af
    
-   INCLUDE "string/z80/asm_bzero.asm"
+   jp asm_bzero
