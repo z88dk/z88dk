@@ -5,6 +5,8 @@ SECTION code_adt_wv_priority_queue
 
 PUBLIC _wv_priority_queue_max_size
 
+EXTERN asm_wv_priority_queue_max_size
+
 _wv_priority_queue_max_size:
 
    pop af
@@ -14,5 +16,3 @@ _wv_priority_queue_max_size:
    push af
 
    jp asm_wv_priority_queue_max_size
-
-   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_max_size.asm"

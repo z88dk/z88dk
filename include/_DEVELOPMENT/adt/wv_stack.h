@@ -33,6 +33,34 @@ extern int         wv_stack_shrink_to_fit(wv_stack_t *s);
 extern size_t      wv_stack_size(wv_stack_t *s);
 extern void       *wv_stack_top(wv_stack_t *s);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern size_t      wv_stack_capacity_fastcall(wv_stack_t *s) __z88dk_fastcall;
+extern void        wv_stack_clear_fastcall(wv_stack_t *s) __z88dk_fastcall;
+extern void        wv_stack_destroy_fastcall(wv_stack_t *s) __z88dk_fastcall;
+extern int         wv_stack_empty_fastcall(wv_stack_t *s) __z88dk_fastcall;
+extern size_t      wv_stack_max_size_fastcall(wv_stack_t *s) __z88dk_fastcall;
+extern void       *wv_stack_pop_fastcall(wv_stack_t *s) __z88dk_fastcall;
+extern int         wv_stack_shrink_to_fit_fastcall(wv_stack_t *s) __z88dk_fastcall;
+extern size_t      wv_stack_size_fastcall(wv_stack_t *s) __z88dk_fastcall;
+extern void       *wv_stack_top_fastcall(wv_stack_t *s) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define wv_stack_capacity(a)            wv_stack_capacity_fastcall(a)
+#define wv_stack_clear(a)               wv_stack_clear_fastcall(a)
+#define wv_stack_destroy(a)             wv_stack_destroy_fastcall(a)
+#define wv_stack_empty(a)               wv_stack_empty_fastcall(a)
+#define wv_stack_max_size(a)            wv_stack_max_size_fastcall(a)
+#define wv_stack_pop(a)                 wv_stack_pop_fastcall(a)
+#define wv_stack_shrink_to_fit(a)       wv_stack_shrink_to_fit_fastcall(a)
+#define wv_stack_size(a)                wv_stack_stack_fastcall(a)
+#define wv_stack_top(a)                 wv_stack_top_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

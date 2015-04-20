@@ -43,6 +43,38 @@ extern int         w_vector_resize(w_vector_t *v, size_t n);
 extern int         w_vector_shrink_to_fit(w_vector_t *v);
 extern size_t      w_vector_size(w_vector_t *v);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern void       *w_vector_back_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern size_t      w_vector_capacity_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern void        w_vector_clear_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern void       *w_vector_data_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern void        w_vector_destroy_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern void        w_vector_empty_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern void       *w_vector_front_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern void       *w_vector_max_size_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern void       *w_vector_pop_back_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern int         w_vector_shrink_to_fit_fastcall(w_vector_t *v) __z88dk_fastcall;
+extern size_t      w_vector_size_fastcall(w_vector_t *v) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define w_vector_back(a)                w_vector_back_fastcall(a)
+#define w_vector_capacity(a)            w_vector_capacity_fastcall(a)
+#define w_vector_clear(a)               w_vector_clear_fastcall(a)
+#define w_vector_data(a)                w_vector_data_fastcall(a)
+#define w_vector_destroy(a)             w_vector_destroy_fastcall(a)
+#define w_vector_empty(a)               w_vector_empty_fastcall(a)
+#define w_vector_front(a)               w_vector_front_fastcall(a)
+#define w_vector_max_size(a)            w_vector_max_size_fastcall(a)
+#define w_vector_pop_back(a)            w_vector_pop_back_fastcall(a)
+#define w_vector_shrink_to_fit(a)       w_vector_shrink_to_fit_fastcall(a)
+#define w_vector_size(a)                w_vector_size_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

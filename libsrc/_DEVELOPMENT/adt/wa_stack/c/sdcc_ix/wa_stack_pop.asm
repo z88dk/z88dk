@@ -8,5 +8,3 @@ PUBLIC _wa_stack_pop
 EXTERN _w_array_pop_back
 
 defc _wa_stack_pop = _w_array_pop_back
-
-INCLUDE "adt/wa_stack/z80/asm_wa_stack_pop.asm"

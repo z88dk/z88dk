@@ -8,5 +8,3 @@ PUBLIC _wv_stack_top
 EXTERN _w_array_back
 
 defc _wv_stack_top = _w_array_back
-
-INCLUDE "adt/wv_stack/z80/asm_wv_stack_top.asm"

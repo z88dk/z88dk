@@ -8,5 +8,3 @@ PUBLIC _wa_stack_empty
 EXTERN _w_array_empty
 
 defc _wa_stack_empty = _w_array_empty
-
-INCLUDE "adt/wa_stack/z80/asm_wa_stack_empty.asm"

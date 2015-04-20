@@ -1,0 +1,10 @@
+
+; int wv_priority_queue_shrink_to_fit_fastcall(wv_priority_queue_t *q)
+
+SECTION code_adt_wv_priority_queue
+
+PUBLIC _wv_priority_queue_shrink_to_fit_fastcall
+
+defc _wv_priority_queue_shrink_to_fit_fastcall = asm_wv_priority_queue_shrink_to_fit
+
+INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_shrink_to_fit.asm"

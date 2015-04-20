@@ -3,6 +3,8 @@
 
 PUBLIC _w_array_size
 
+EXTERN asm_w_array_size
+
 _w_array_size:
 
    pop af
@@ -12,5 +14,3 @@ _w_array_size:
    push af
 
    jp asm_w_array_size
-
-   INCLUDE "adt/w_array/z80/asm_w_array_size.asm"

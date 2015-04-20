@@ -29,6 +29,30 @@ extern int         wa_stack_push(wa_stack_t *s, void *item);
 extern size_t      wa_stack_size(wa_stack_t *s);
 extern void       *wa_stack_top(wa_stack_t *s);
 
+#ifdef __SDCC_ENABLE_FASTCALL
+
+// SDCC FASTCALL LINKAGE
+
+extern size_t      wa_stack_capacity_fastcall(wa_stack_t *s) __z88dk_fastcall;
+extern void        wa_stack_clear_fastcall(wa_stack_t *s) __z88dk_fastcall;
+extern void        wa_stack_destroy_fastcall(wa_stack_t *s) __z88dk_fastcall;
+extern int         wa_stack_empty_fastcall(wa_stack_t *s) __z88dk_fastcall;
+extern void       *wa_stack_pop_fastcall(wa_stack_t *s) __z88dk_fastcall;
+extern size_t      wa_stack_size_fastcall(wa_stack_t *s) __z88dk_fastcall;
+extern void       *wa_stack_top_fastcall(wa_stack_t *s) __z88dk_fastcall;
+
+// SDCC MAKE FASTCALL LINKAGE THE DEFAULT
+
+#define wa_stack_capacity(a)            wa_stack_capacity_fastcall(a)
+#define wa_stack_clear(a)               wa_stack_clear_fastcall(a)
+#define wa_stack_destroy(a)             wa_stack_destroy_fastcall(a)
+#define wa_stack_empty(a)               wa_stack_empty_fastcall(a)
+#define wa_stack_pop(a)                 wa_stack_pop_fastcall(a)
+#define wa_stack_size(a)                wa_stack_size_fastcall(a)
+#define wa_stack_top(a)                 wa_stack_top_fastcall(a)
+
+#endif
+
 #else
 
 // SCCZ80

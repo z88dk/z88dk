@@ -5,6 +5,8 @@ SECTION code_adt_w_array
 
 PUBLIC _w_array_back
 
+EXTERN asm_w_array_back
+
 _w_array_back:
 
    pop af
@@ -13,4 +15,4 @@ _w_array_back:
    push hl
    push af
 
-   INCLUDE "adt/w_array/z80/asm_w_array_back.asm"
+   jp asm_w_array_back

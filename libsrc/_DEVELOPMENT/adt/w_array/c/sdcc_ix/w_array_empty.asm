@@ -8,5 +8,3 @@ PUBLIC _w_array_empty
 EXTERN _b_array_empty
 
 defc _w_array_empty = _b_array_empty
-
-INCLUDE "adt/w_array/z80/asm_w_array_empty.asm"

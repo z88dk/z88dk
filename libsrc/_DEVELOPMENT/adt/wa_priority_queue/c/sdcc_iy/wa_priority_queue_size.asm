@@ -5,6 +5,8 @@ SECTION code_adt_wa_priority_queue
 
 PUBLIC _wa_priority_queue_size
 
+EXTERN asm_wa_priority_queue_size
+
 _wa_priority_queue_size:
 
    pop af
@@ -14,5 +16,3 @@ _wa_priority_queue_size:
    push af
 
    jp asm_wa_priority_queue_size
-
-   INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_size.asm"

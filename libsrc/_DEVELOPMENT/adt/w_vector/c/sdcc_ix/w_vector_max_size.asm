@@ -5,6 +5,8 @@ SECTION code_adt_w_vector
 
 PUBLIC _w_vector_max_size
 
+EXTERN asm_w_vector_max_size
+
 _w_vector_max_size:
 
    pop af
@@ -14,5 +16,3 @@ _w_vector_max_size:
    push af
 
    jp asm_w_vector_max_size
-
-   INCLUDE "adt/w_vector/z80/asm_w_vector_max_size.asm"

@@ -8,5 +8,3 @@ PUBLIC _wv_priority_queue_shrink_to_fit
 EXTERN _bv_priority_queue_shrink_to_fit
 
 defc _wv_priority_queue_shrink_to_fit = _bv_priority_queue_shrink_to_fit
-
-INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_shrink_to_fit.asm"

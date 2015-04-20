@@ -8,5 +8,3 @@ PUBLIC _wv_stack_size
 EXTERN _w_vector_size
 
 defc _wv_stack_size = _w_vector_size
-
-INCLUDE "adt/wv_stack/z80/asm_wv_stack_size.asm"
