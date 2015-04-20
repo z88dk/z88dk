@@ -23,7 +23,7 @@ extern void                           _imaxdiv_(imaxdiv_t *md, intmax_t numer, i
 extern intmax_t                       strtoimax(const char *nptr, char **endptr, int base);
 extern uintmax_t                      strtoumax(const char *nptr, char **endptr, int base);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

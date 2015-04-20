@@ -129,7 +129,7 @@ extern char                      *bit_play_di(char *melody);
 extern void                      *bit_play_tritone_di(void *song);
 extern void                       bit_synth_di(uint16_t dur, uint16_t freq_1, uint16_t freq_2, uint16_t freq_3, uint16_t freq_4);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

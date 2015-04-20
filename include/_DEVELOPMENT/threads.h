@@ -38,7 +38,7 @@ extern void   spinlock_acquire(char *spinlock);
 extern void   spinlock_release(char *spinlock);
 extern int    spinlock_tryacquire(char *spinlock);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

@@ -20,7 +20,7 @@ extern void        p_stack_push(p_stack_t *s, void *item);
 extern size_t      p_stack_size(p_stack_t *s);
 extern void       *p_stack_top(p_stack_t *s);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

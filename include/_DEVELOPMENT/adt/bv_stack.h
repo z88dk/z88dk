@@ -33,7 +33,7 @@ extern int         bv_stack_shrink_to_fit(bv_stack_t *s);
 extern size_t      bv_stack_size(bv_stack_t *s);
 extern int         bv_stack_top(bv_stack_t *s);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

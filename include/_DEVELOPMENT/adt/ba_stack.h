@@ -29,7 +29,7 @@ extern int         ba_stack_push(ba_stack_t *s, int c);
 extern size_t      ba_stack_size(ba_stack_t *s);
 extern int         ba_stack_top(ba_stack_t *s);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

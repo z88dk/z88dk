@@ -26,7 +26,7 @@ extern void       *p_queue_pop(p_queue_t *q);
 extern void        p_queue_push(p_queue_t *q, void *item);
 extern size_t      p_queue_size(p_queue_t *q);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

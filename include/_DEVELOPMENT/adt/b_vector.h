@@ -48,7 +48,7 @@ extern int         b_vector_shrink_to_fit(b_vector_t *);
 extern size_t      b_vector_size(b_vector_t *v);
 extern size_t      b_vector_write_block(void *src, size_t n, b_vector_t *v, size_t idx);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

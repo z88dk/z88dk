@@ -34,7 +34,7 @@ extern void       *p_forward_list_alt_remove(p_forward_list_alt_t *ls, void *ite
 extern void       *p_forward_list_alt_remove_after(p_forward_list_alt_t *ls, void *ls_item);
 extern size_t      p_forward_list_alt_size(p_forward_list_alt_t *ls);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

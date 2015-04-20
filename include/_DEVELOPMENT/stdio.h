@@ -146,7 +146,7 @@ extern int     vfscanf_unlocked(FILE *stream, char *format, void *arg);
 extern int     vprintf_unlocked(char *format, void *arg);
 extern int     vscanf_unlocked(char *format, void *arg);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

@@ -38,7 +38,7 @@ extern void   *obstack_next_free(struct obstack *ob);
 extern size_t  obstack_object_size(struct obstack *ob);
 extern size_t  obstack_room(struct obstack *ob);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

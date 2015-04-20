@@ -25,7 +25,7 @@ extern int                            in_test_key(void);
 extern void                           in_wait_key(void);
 extern void                           in_wait_nokey(void);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

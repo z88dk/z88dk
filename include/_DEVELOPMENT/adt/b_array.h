@@ -44,7 +44,7 @@ extern int       b_array_resize(b_array_t *a, size_t n);
 extern size_t    b_array_size(b_array_t *a);
 extern size_t    b_array_write_block(void *src, size_t n, b_array_t *a, size_t idx);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

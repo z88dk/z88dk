@@ -28,7 +28,7 @@ extern void       *p_forward_list_remove(p_forward_list_t *ls, void *item);
 extern void       *p_forward_list_remove_after(void *ls_item);
 extern size_t      p_forward_list_size(p_forward_list_t *ls);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

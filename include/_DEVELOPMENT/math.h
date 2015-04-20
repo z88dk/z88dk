@@ -2,8 +2,8 @@
 #ifndef _MATH_H
 #define _MATH_H
 
-// Math.h contains a complete listing of C11 functions for float and double
-// types but the z80 math libraries will only implement a subset.
+// Math.h contains a nearly complete listing of C11 functions for float and double
+// types but the z80 math libraries only implement a subset.
 
 
 #ifdef __SDCC
@@ -63,7 +63,7 @@ extern float         log2f(float x);
 extern float         logbf(float x);
 
 extern float         scalbnf(float x, int n);
-extern float         scalblnf(float x, long int n);
+extern float         scalblnf(float x, long n);
 
 extern float         fabsf(float x);
 extern float         hypotf(float x, float y);
@@ -245,7 +245,7 @@ extern double __LIB__ log2(double x);
 extern double __LIB__ logb(double x);
 
 extern double __LIB__ scalbn(double x, int n);
-extern double __LIB__ scalbln(double x, long int n);
+extern double __LIB__ scalbln(double x, int n);
 
 extern double __LIB__ fabs(double x);
 extern double __LIB__ hypot(double x, double y);
@@ -402,7 +402,7 @@ extern double __LIB__ __CALLEE__ log2_callee(double x);
 extern double __LIB__ __CALLEE__ logb_callee(double x);
 
 extern double __LIB__ __CALLEE__ scalbn_callee(double x, int n);
-extern double __LIB__ __CALLEE__ scalbln_callee(double x, long int n);
+extern double __LIB__ __CALLEE__ scalbln_callee(double x, long n);
 
 extern double __LIB__ __CALLEE__ fabs_callee(double x);
 extern double __LIB__ __CALLEE__ hypot_callee(double x, double y);

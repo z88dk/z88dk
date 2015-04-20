@@ -36,7 +36,7 @@ extern int                  bv_priority_queue_shrink_to_fit(bv_priority_queue_t 
 extern size_t               bv_priority_queue_size(bv_priority_queue_t *q);
 extern int                  bv_priority_queue_top(bv_priority_queue_t *q);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

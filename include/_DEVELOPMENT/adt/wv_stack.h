@@ -33,7 +33,7 @@ extern int         wv_stack_shrink_to_fit(wv_stack_t *s);
 extern size_t      wv_stack_size(wv_stack_t *s);
 extern void       *wv_stack_top(wv_stack_t *s);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

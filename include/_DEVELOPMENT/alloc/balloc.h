@@ -14,13 +14,13 @@ extern size_t  balloc_blockcount(int q);
 extern void   *balloc_firstfit(int q, int numq);
 extern void    balloc_free(void *p);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 
-extern void   *balloc_alloc_fastcall(int q);
-extern size_t  balloc_blockcount_fastcall(int q);
-extern void    balloc_free_fastcall(void *p);
+extern void   *balloc_alloc_fastcall(int q) __z88dk_fastcall;
+extern size_t  balloc_blockcount_fastcall(int q) __z88dk_fastcall;
+extern void    balloc_free_fastcall(void *p) __z88dk_fastcall;
 
 // SDCC MAKE FASTCALL LINKAGE THE DEFAULT
 

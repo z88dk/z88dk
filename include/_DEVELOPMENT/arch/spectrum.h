@@ -107,7 +107,7 @@ extern void   *zx_saddrpup(void *saddr);
 
 extern int     zx_pattern_fill(int x, int y, void *pattern, int depth);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

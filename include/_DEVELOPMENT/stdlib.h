@@ -96,7 +96,7 @@ extern void   *realloc_unlocked(void *p, size_t size);
 
 #endif
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

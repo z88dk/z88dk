@@ -39,7 +39,7 @@ extern size_t      w_array_push_back(w_array_t *a, void *item);
 extern int         w_array_resize(w_array_t *a, size_t n);
 extern size_t      w_array_size(w_array_t *a);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

@@ -81,7 +81,7 @@ extern char   *strtok_r(char *s, char *delim, char **last_s);
 extern char    strupr(char *s);
 extern size_t  strxfrm(char *dst, char *src, size_t n);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

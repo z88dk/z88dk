@@ -25,7 +25,7 @@ extern int toascii(int);
 extern int tolower(int);
 extern int toupper(int);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

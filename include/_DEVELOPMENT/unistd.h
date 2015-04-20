@@ -55,7 +55,7 @@ extern off_t             lseek(int fd, off_t offset, int whence);
 extern ssize_t           read(int fd, void *buf, size_t nbyte);
 extern ssize_t           write(int fd, const void *buf, size_t nbyte);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

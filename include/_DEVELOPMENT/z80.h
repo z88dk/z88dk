@@ -28,7 +28,7 @@ extern void       z80_outp(uint16_t port, uint16_t data);
 extern void      *z80_otir(void *src, uint16_t port);
 extern void      *z80_otdr(void *src, uint16_t port);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

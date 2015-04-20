@@ -32,7 +32,7 @@ extern int                  ba_priority_queue_resize(ba_priority_queue_t *q, siz
 extern size_t               ba_priority_queue_size(ba_priority_queue_t *q);
 extern int                  ba_priority_queue_top(ba_priority_queue_t *q);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 

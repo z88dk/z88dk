@@ -29,7 +29,7 @@ extern int         wa_stack_push(wa_stack_t *s, void *item);
 extern size_t      wa_stack_size(wa_stack_t *s);
 extern void       *wa_stack_top(wa_stack_t *s);
 
-#ifdef __SDCC_ENABLE_FASTCALL
+#ifndef __SDCC_DISABLE_FASTCALL
 
 // SDCC FASTCALL LINKAGE
 
