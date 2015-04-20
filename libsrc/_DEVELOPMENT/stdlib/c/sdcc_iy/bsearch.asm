@@ -7,6 +7,8 @@ SECTION code_stdlib
 
 PUBLIC _bsearch
 
+EXTERN l0_bsearch_callee
+
 _bsearch:
 
    pop af
@@ -22,14 +24,7 @@ _bsearch:
    push de
    push hl
    push bc
-   exx
    push bc
-   exx
    push af
-   
-   exx
-   push bc
-   exx
-   pop af
 
-   INCLUDE "stdlib/z80/asm_bsearch.asm"
+   jp l0_bsearch_callee

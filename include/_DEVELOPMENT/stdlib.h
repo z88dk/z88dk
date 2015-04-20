@@ -150,6 +150,70 @@ extern void   *malloc_unlocked_fastcall(size_t size) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void      _div__callee(div_t *d, int numer, int denom) __z88dk_callee;
+extern void      _ldiv__callee(ldiv_t *ld, long numer, long denom) __z88dk_callee;
+extern void      _insertion_sort__callee(void *base, size_t nmemb, size_t size, void *compar) __z88dk_callee;
+extern void      _quicksort__callee(void *base, size_t nmemb, size_t size, void *compar) __z88dk_callee;
+extern void      _shellsort__callee(void *base, size_t nmemb, size_t size, void *compar) __z88dk_callee;
+extern int       _strtoi__callee(char *nptr, char **endptr, int base) __z88dk_callee;
+extern uint16_t  _strtou__callee(char *nptr, char **endptr, int base) __z88dk_callee;
+extern void      bsearch_callee(void *key, void *base, size_t nmemb, size_t size, void *compar) __z88dk_callee;
+extern char     *itoa_callee(int num, char *buf, int radix) __z88dk_callee;
+extern char     *ltoa_callee(long num, char *buf, int radix) __z88dk_callee;
+extern void      qsort_callee(void *base, size_t nmemb, size_t size, void *compar) __z88dk_callee;
+extern long      strtol_callee(char *nptr, char **endptr, int base) __z88dk_callee;
+extern uint32_t  strtoul_callee(char *nptr, char **endptr, int base) __z88dk_callee;
+extern char     *ultoa_callee(uint32_t num, char *buf, int radix) __z88dk_callee;
+extern char     *utoa_callee(uint16_t num, char *buf, int radix) __z88dk_callee;
+
+#ifndef _ALLOC_MALLOC_H
+
+extern void     *aligned_alloc_callee(size_t alignment, size_t size) __z88dk_callee;
+extern void     *calloc_callee(size_t nmemb, size_t size) __z88dk_callee;
+extern void     *realloc_callee(void *p, size_t size) __z88dk_callee;
+
+extern void     *aligned_alloc_unlocked_callee(size_t alignment, size_t size) __z88dk_callee;
+extern void     *calloc_unlocked_callee(size_t nmemb, size_t size) __z88dk_callee;
+extern void     *realloc_unlocked_callee(void *p, size_t size) __z88dk_callee;
+
+#endif
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define _div_(a,b,c)                _div__callee(a,b,c)
+#define _ldiv_(a,b,c)               _ldiv__callee(a,b,c)
+#define _insertion_sort_(a,b,c,d)   _insertion_sort__callee(a,b,c,d)
+#define _quicksort_(a,b,c,d)        _quicksort__callee(a,b,c,d)
+#define _shellsort_(a,b,c,d)        _shellsort__callee(a,b,c,d)
+#define _strtoi_(a,b,c)             _strtoi__callee(a,b,c)
+#define _strtou_(a,b,c)             _strtou__callee(a,b,c)
+#define bsearch(a,b,c,d,e)          bsearch_callee(a,b,c,d,e)
+#define itoa(a,b,c)                 itoa_callee(a,b,c)
+#define ltoa(a,b,c)                 ltoa_callee(a,b,c)
+#define qsort(a,b,c,d)              qsort_callee(a,b,c,d)
+#define strtol(a,b,c)               strtol_callee(a,b,c)
+#define strtoul(a,b,c)              strtoul_callee(a,b,c)
+#define ultoa(a,b,c)                ultoa_callee(a,b,c)
+#define utoa(a,b,c)                 utoa_callee(a,b,c)
+
+#ifndef _ALLOC_MALLOC_H
+
+#define aligned_alloc(a,b)          aligned_alloc_callee(a,b)
+#define calloc(a,b)                 calloc_callee(a,b)
+#define realloc(a,b)                realloc_callee(a,b)
+
+#define aligned_alloc_unlocked(a,b) aligned_alloc_unlocked_callee(a,b)
+#define calloc_unlocked(a,b)        calloc_unlocked_callee(a,b)
+#define realloc_unlocked(a,b)       realloc_unlocked_callee(a,b)
+
+#endif
+
+#endif
+
 #else
 
 // SCCZ80

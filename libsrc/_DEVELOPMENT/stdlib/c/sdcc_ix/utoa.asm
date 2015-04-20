@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _utoa
 
+EXTERN l0_utoa_callee
+
 _utoa:
 
    pop af
@@ -16,12 +18,5 @@ _utoa:
    push de
    push hl
    push af
-   
-   push ix
-   
-   call asm_utoa
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdlib/z80/asm_utoa.asm"
+
+   jp l0_utoa_callee

@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __quicksort_
 
+EXTERN l0__quicksort__callee
+
 __quicksort_:
 
    pop af
@@ -15,21 +17,9 @@ __quicksort_:
    pop bc
    
    push bc
-   exx
    push de
    push hl
    push bc
    push af
    
-   exx
-   push bc
-   exx
-   
-   ex (sp),ix
-   
-   call asm_quicksort
-   
-   pop ix
-   ret
-
-   INCLUDE "stdlib/z80/sort/asm_quicksort.asm"
+   jp l0__quicksort__callee

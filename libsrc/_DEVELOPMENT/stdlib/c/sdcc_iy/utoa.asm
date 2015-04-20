@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _utoa
 
+EXTERN asm_utoa
+
 _utoa:
 
    pop af
@@ -17,4 +19,4 @@ _utoa:
    push hl
    push af
    
-   INCLUDE "stdlib/z80/asm_utoa.asm"
+   jp asm_utoa

@@ -5,6 +5,8 @@ SECTION code_alloc_malloc
 
 PUBLIC __falloc__unlocked
 
+EXTERN asm__falloc_unlocked
+
 __falloc__unlocked:
 
    pop af
@@ -15,4 +17,4 @@ __falloc__unlocked:
    push bc
    push af
    
-   INCLUDE "alloc/malloc/z80/asm__falloc_unlocked.asm"
+   jp asm__falloc_unlocked

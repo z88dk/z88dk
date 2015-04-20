@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __shellsort_
 
+EXTERN l0__shellsort__callee
+
 __shellsort_:
 
    pop af
@@ -15,21 +17,9 @@ __shellsort_:
    pop bc
    
    push bc
-   exx
    push de
    push hl
    push bc
    push af
-   
-   exx
-   push bc
-   exx
-   
-   ex (sp),ix
-   
-   call asm_shellsort
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdlib/z80/sort/asm_shellsort.asm"
+
+   jp l0__shellsort__callee

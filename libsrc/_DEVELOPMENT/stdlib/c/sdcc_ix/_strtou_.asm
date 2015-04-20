@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __strtou_
 
+EXTERN asm__strtou
+
 __strtou_:
 
    pop af
@@ -17,4 +19,4 @@ __strtou_:
    push hl
    push af
    
-   INCLUDE "stdlib/z80/asm__strtou.asm"
+   jp asm__strtou

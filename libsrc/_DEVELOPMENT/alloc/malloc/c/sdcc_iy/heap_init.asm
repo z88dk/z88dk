@@ -5,6 +5,8 @@ SECTION code_alloc_malloc
 
 PUBLIC _heap_init
 
+EXTERN asm_heap_init
+
 _heap_init:
 
    pop af
@@ -15,4 +17,4 @@ _heap_init:
    push hl
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_heap_init.asm"
+   jp asm_heap_init

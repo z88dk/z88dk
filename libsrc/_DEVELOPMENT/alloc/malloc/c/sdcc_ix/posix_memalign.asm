@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC _posix_memalign
 
+EXTERN asm_posix_memalign
+
 _posix_memalign:
 
    pop af
@@ -23,7 +25,7 @@ _posix_memalign:
    push de
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_posix_memalign.asm"
+   jp asm_posix_memalign
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -35,8 +37,6 @@ EXTERN _posix_memalign_unlocked
 
 defc _posix_memalign = _posix_memalign_unlocked
    
-INCLUDE "alloc/malloc/z80/asm_posix_memalign.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

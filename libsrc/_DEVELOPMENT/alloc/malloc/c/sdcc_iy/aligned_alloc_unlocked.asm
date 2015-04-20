@@ -5,6 +5,8 @@ SECTION code_alloc_malloc
 
 PUBLIC _aligned_alloc_unlocked
 
+EXTERN asm_aligned_alloc_unlocked
+
 _aligned_alloc_unlocked:
 
    pop af
@@ -15,4 +17,4 @@ _aligned_alloc_unlocked:
    push bc
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_aligned_alloc_unlocked.asm"
+   jp asm_aligned_alloc_unlocked

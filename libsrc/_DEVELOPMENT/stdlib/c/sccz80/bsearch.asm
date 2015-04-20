@@ -20,16 +20,14 @@ bsearch:
    pop bc
    
    push bc
-   exx
    push bc
    push hl
    push de
    push hl
    push af
    
-   exx
    push bc
-   exx
    pop af
    
+   exx
    jp asm_bsearch

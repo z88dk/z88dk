@@ -5,6 +5,8 @@ SECTION code_alloc_malloc
 
 PUBLIC _posix_memalign_unlocked
 
+EXTERN asm_posix_memalign_unlocked
+
 _posix_memalign_unlocked:
 
    pop af
@@ -17,4 +19,4 @@ _posix_memalign_unlocked:
    push de
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_posix_memalign_unlocked.asm"
+   jp asm_posix_memalign_unlocked

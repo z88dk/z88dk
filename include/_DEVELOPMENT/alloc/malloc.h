@@ -92,6 +92,84 @@ extern void   *malloc_unlocked_fastcall(size_t size) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void   *_falloc__callee(void *p, size_t size) __z88dk_callee;
+extern void   *heap_alloc_callee(void *heap, size_t size) __z88dk_callee;
+extern void   *heap_alloc_aligned_callee(void *heap, size_t alignment, size_t size) __z88dk_callee;
+extern void   *heap_alloc_fixed_callee(void *heap, void *p, size_t size) __z88dk_callee;
+extern void   *heap_calloc_callee(void *heap, size_t nmemb, size_t size) __z88dk_callee;
+extern void    heap_free_callee(void *heap, void *p) __z88dk_callee;
+extern void    heap_info_callee(void *heap, void *callback) __z88dk_callee;
+extern void   *heap_init_callee(void *heap, size_t size) __z88dk_callee;
+extern void   *heap_realloc_callee(void *heap, void *p, size_t size) __z88dk_callee;
+extern void   *memalign_callee(size_t alignment, size_t size) __z88dk_callee;
+extern int     posix_memalign_callee(void **memptr, size_t alignment, size_t size) __z88dk_callee;
+
+extern void   *_falloc__unlocked_callee(void *p, size_t size) __z88dk_callee;
+extern void   *heap_alloc_unlocked_callee(void *heap, size_t size) __z88dk_callee;
+extern void   *heap_alloc_aligned_unlocked_callee(void *heap, size_t alignment, size_t size) __z88dk_callee;
+extern void   *heap_alloc_fixed_unlocked_callee(void *heap, void *p, size_t size) __z88dk_callee;
+extern void   *heap_calloc_unlocked_callee(void *heap, size_t nmemb, size_t size) __z88dk_callee;
+extern void    heap_free_unlocked_callee(void *heap, void *p) __z88dk_callee;
+extern void    heap_info_unlocked_callee(void *heap, void *callback) __z88dk_callee;
+extern void   *heap_realloc_unlocked_callee(void *heap, void *p, size_t size) __z88dk_callee;
+extern void   *memalign_unlocked_callee(size_t alignment, size_t size) __z88dk_callee;
+extern int     posix_memalign_unlocked_callee(void **memptr, size_t alignment, size_t size) __z88dk_callee;
+
+#ifndef _STDLIB_H
+
+extern void   *aligned_alloc_callee(size_t alignment, size_t size) __z88dk_callee;
+extern void   *calloc_callee(size_t nmemb, size_t size) __z88dk_callee;
+extern void   *realloc_callee(void *p, size_t size) __z88dk_callee;
+
+extern void   *aligned_alloc_unlocked_callee(size_t alignment, size_t size) __z88dk_callee;
+extern void   *calloc_unlocked_callee(size_t nmemb, size_t size) __z88dk_callee;
+extern void   *realloc_unlocked_callee(void *p, size_t size) __z88dk_callee;
+
+#endif
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define _falloc_(a,b)               _falloc__callee(a,b)
+#define heap_alloc(a,b)             heap_alloc_callee(a,b)
+#define heap_alloc_aligned(a,b,c)   heap_alloc_aligned_callee(a,b,c)
+#define heap_alloc_fixed(a,b,c)     heap_alloc_fixed_callee(a,b,c)
+#define heap_calloc(a,b,c)          heap_calloc_callee(a,b,c)
+#define heap_free(a,b)              heap_free_callee(a,b)
+#define heap_info(a,b)              heap_info_callee(a,b)
+#define heap_init(a,b)              heap_init_callee(a,b)
+#define heap_realloc(a,b,c)         heap_realloc_callee(a,b,c)
+#define memalign(a,b)               memalign_callee(a,b)
+#define posix_memalign(a,b,c)       posix_memalign_callee(a,b,c)
+
+#define _falloc__unlocked(a,b)               _falloc__unlocked_callee(a,b)
+#define heap_alloc_unlocked(a,b)             heap_alloc_unlocked_callee(a,b)
+#define heap_alloc_aligned_unlocked(a,b,c)   heap_alloc_aligned_unlocked_callee(a,b,c)
+#define heap_alloc_fixed_unlocked(a,b,c)     heap_alloc_fixed_unlocked_callee(a,b,c)
+#define heap_calloc_unlocked(a,b,c)          heap_calloc_unlocked_callee(a,b,c)
+#define heap_free_unlocked(a,b)              heap_free_unlocked_callee(a,b)
+#define heap_info_unlocked(a,b)              heap_info_unlocked_callee(a,b)
+#define heap_realloc_unlocked(a,b,c)         heap_realloc_unlocked_callee(a,b,c)
+#define memalign_unlocked(a,b)               memalign_unlocked_callee(a,b)
+#define posix_memalign_unlocked(a,b,c)       posix_memalign_unlocked_callee(a,b,c)
+
+#ifndef _STDLIB_H
+
+#define aligned_alloc(a,b)          aligned_alloc_callee(a,b)
+#define calloc(a,b)                 calloc_callee(a,b)
+#define realloc(a,b)                realloc_callee(a,b)
+
+#define aligned_alloc_unlocked(a,b) aligned_alloc_unlocked_callee(a,b)
+#define calloc_unlocked(a,b)        calloc_unlocked_callee(a,b)
+#define realloc_unlocked(a,b)       realloc_unlocked_callee(a,b)
+
+#endif
+
+#endif
+
 #else
 
 // SCCZ80

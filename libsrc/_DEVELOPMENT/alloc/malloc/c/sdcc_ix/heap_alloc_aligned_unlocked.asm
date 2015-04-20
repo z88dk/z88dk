@@ -5,6 +5,8 @@ SECTION code_alloc_malloc
 
 PUBLIC _heap_alloc_aligned_unlocked
 
+EXTERN asm_heap_alloc_aligned_unlocked
+
 _heap_alloc_aligned_unlocked:
 
    pop af
@@ -17,4 +19,4 @@ _heap_alloc_aligned_unlocked:
    push de
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_heap_alloc_aligned_unlocked.asm"
+   jp asm_heap_alloc_aligned_unlocked

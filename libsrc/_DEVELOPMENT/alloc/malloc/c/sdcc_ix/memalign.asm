@@ -15,8 +15,6 @@ EXTERN _aligned_alloc
 
 defc _memalign = _aligned_alloc
 
-INCLUDE "alloc/malloc/z80/asm_memalign.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -27,8 +25,6 @@ EXTERN _memalign_unlocked
 
 defc _memalign = _memalign_unlocked
    
-INCLUDE "alloc/malloc/z80/asm_memalign.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

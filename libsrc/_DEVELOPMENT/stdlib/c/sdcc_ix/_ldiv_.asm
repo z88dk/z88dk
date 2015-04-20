@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __ldiv_
 
+EXTERN l0__ldiv__callee
+
 __ldiv_:
 
    pop af
@@ -18,18 +20,9 @@ __ldiv_:
    
    push de
    push hl
-   exx
    push de
    push hl
-   exx
    push bc
    push af
-   
-   push ix
-   
-   call asm__ldiv
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdlib/z80/asm__ldiv.asm"
+
+   jp l0__ldiv__callee

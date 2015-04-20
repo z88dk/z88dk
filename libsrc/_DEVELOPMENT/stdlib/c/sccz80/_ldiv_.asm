@@ -19,10 +19,8 @@ _ldiv_:
    pop bc
    
    push bc
-   exx
    push de
    push hl
-   exx
    push de
    push hl
    push af

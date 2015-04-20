@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC _realloc
 
+EXTERN asm_realloc
+
 _realloc:
 
    pop af
@@ -21,7 +23,7 @@ _realloc:
    push hl
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_realloc.asm"
+   jp asm_realloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -33,8 +35,6 @@ EXTERN _realloc_unlocked
 
 defc _realloc = _realloc_unlocked
    
-INCLUDE "alloc/malloc/z80/asm_realloc.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

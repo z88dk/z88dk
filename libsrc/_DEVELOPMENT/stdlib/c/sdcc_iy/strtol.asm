@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _strtol
 
+EXTERN asm_strtol
+
 _strtol:
 
    pop af
@@ -17,4 +19,4 @@ _strtol:
    push hl
    push af
    
-   INCLUDE "stdlib/z80/asm_strtol.asm"
+   jp asm_strtol

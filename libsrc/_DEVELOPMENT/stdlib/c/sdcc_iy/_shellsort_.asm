@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __shellsort_
 
+EXTERN asm_shellsort
+
 __shellsort_:
 
    pop af
@@ -19,4 +21,4 @@ __shellsort_:
    push bc
    push af
    
-   INCLUDE "stdlib/z80/sort/asm_shellsort.asm"
+   jp asm_shellsort

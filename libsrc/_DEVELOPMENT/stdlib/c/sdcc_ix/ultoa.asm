@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _ultoa
 
+EXTERN l0_ultoa_callee
+
 _ultoa:
 
    pop af
@@ -16,22 +18,9 @@ _ultoa:
    pop bc
    
    push bc
-   exx
    push bc
-   exx
    push de
    push hl
    push af
-   
-   exx
-   push bc
-   exx
-   
-   ex (sp),ix
-   
-   call asm_ultoa
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdlib/z80/asm_ultoa.asm"
+
+   jp l0_ultoa_callee

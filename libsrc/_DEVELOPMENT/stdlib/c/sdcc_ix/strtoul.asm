@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _strtoul
 
+EXTERN l0_strtoul_callee
+
 _strtoul:
 
    pop af
@@ -16,12 +18,5 @@ _strtoul:
    push de
    push hl
    push af
-   
-   push ix
-   
-   call asm_strtoul
-   
-   pop ix
-   ret
 
-   INCLUDE "stdlib/z80/asm_strtoul.asm"
+   jp l0_strtoul_callee

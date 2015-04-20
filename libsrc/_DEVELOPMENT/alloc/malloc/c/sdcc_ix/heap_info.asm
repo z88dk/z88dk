@@ -9,9 +9,11 @@ SECTION code_alloc_malloc
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC heap_info
+PUBLIC _heap_info
 
-heap_info:
+EXTERN l0_heap_info_callee
+
+_heap_info:
 
    pop af
    pop de
@@ -21,28 +23,18 @@ heap_info:
    push de
    push af
    
-   push bc
-   ex (sp),ix
-   
-   call asm_heap_info
-   
-   pop ix
-   ret
-
-   INCLUDE "alloc/malloc/z80/asm_heap_info.asm"
+   jp l0_heap_info_callee
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-PUBLIC heap_info
+PUBLIC _heap_info
 
-EXTERN heap_info_unlocked
+EXTERN _heap_info_unlocked
 
-defc heap_info = heap_info_unlocked
+defc _heap_info = _heap_info_unlocked
    
-INCLUDE "alloc/malloc/z80/asm_heap_info.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
