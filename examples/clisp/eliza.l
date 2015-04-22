@@ -105,7 +105,7 @@
 	(t (match i (cdr l)))))
 
 (defun eliza ()
-(progn (setq ww 0) (setq wwc 0) (setw xx nil)
+(progn (setq ww 0) (setq wwc 0)
   (while  (setq s (youme (read)))
 	 (terpri)
 	 (cond
@@ -121,9 +121,8 @@
           ((match '(because) s) (setq b xx)
             (print-q '(is that really the reason)))
           ((match '(yes) s)
-		    (if (null xx)
-               (print-q (list '(how can you be so sure) b)))
-			   (print-q (list '(what do you mean by) xx)))
+            (print-q (list '(how can you be so sure)
+			  (if (match '(me are) b) (list '(i am) xx) b))))
           ((match '(me are) s)
             (print-q (list '(so you think) (setq b (list '(i am) xx)))))
           ((match '(because) s) (setq b xx)
