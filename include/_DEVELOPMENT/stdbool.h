@@ -14,7 +14,7 @@
 // SCCZ80
 // does not have a _Bool type
 
-typedef char _Bool;
+typedef unsigned char _Bool;
 
 #endif
 
