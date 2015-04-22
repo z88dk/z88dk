@@ -227,6 +227,8 @@ extern size_t  strxfrm_callee(char *dst, char *src, size_t n) __z88dk_callee;
 
 #endif
 
+#ifndef __SDCC_DISABLE_BUILTIN
+
 #undef memcpy
 #undef strcpy
 #undef strncpy
@@ -238,6 +240,8 @@ extern size_t  strxfrm_callee(char *dst, char *src, size_t n) __z88dk_callee;
 #define strncpy(dst, src, n)         __builtin_strncpy(dst, src, n)
 #define strchr(s, c)                 __builtin_strchr(s, c)
 #define memset(dst, c, n)            __builtin_memset(dst, c, n)
+
+#endif
 
 #else
 
