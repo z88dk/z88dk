@@ -3,16 +3,16 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.6 2015-04-14 13:08:52 stefano Exp $  */
+/*  $Id: clisp.c,v 1.7 2015-04-22 17:37:01 stefano Exp $  */
 
 /*
 z88dk build hints
 
-Spectrum
+Spectrum 
 zcc +zx -lndos -O3 -create-app -DLARGEMEM=1200 clisp.c
 
-zx81 32K exp (do not use LARGEMEM values bigger than 1200:
-  zcc +zx81 -O3 -create-app -DLARGEMEM=1200 clisp.c
+zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded)
+  zcc +zx81 -O3 -create-app -DLARGEMEM=900 clisp.c
 */
 
 
@@ -26,7 +26,8 @@ zx81 32K exp (do not use LARGEMEM values bigger than 1200:
 #endif
 
 #ifdef ZX81
-#pragma output STACKPTR=49152
+#pragma output STACKPTR=65535
+unsigned int _sp;
 #endif
 
 /* Data Representation ('int' must be at least 32 bits) */
@@ -77,9 +78,9 @@ int t_cons_free;           /* free list */
 long t_cons_car[NCONS];     /* "car" part of cell */
 long t_cons_cdr[NCONS];     /* "cdr" part of cell */
 #else
-int t_cons_free @0x9091;
-long t_cons_car[] @0x9093;
-long t_cons_cdr[] @0xA353;
+int t_cons_free @32768;
+long t_cons_car[] @32780;  /* 3600 bytes */
+long t_cons_cdr[] @36380;  /* 3600 bytes */
 #endif
 
 /* Symbols */
@@ -94,19 +95,19 @@ long t_cons_cdr[] @0xA353;
 #endif
 
 #ifndef ZX81
-char t_symb_free;           /* free slot */
+int t_symb_free;           /* free slot */
 char *t_symb_pname[NSYMBS];  /* pointer to printable name */
-/* #define t_symb_val		((long *)0x7e00) */		/*long t_symb_val[NSYMBS];*/    /* symbol value */
+/* #define t_symb_val        ((long *)0x7e00) */        /*long t_symb_val[NSYMBS];*/    /* symbol value */
 long t_symb_val[NSYMBS];
-/*#define t_symb_fval		((long *)0x7efc) */		/*long t_symb_fval[NSYMBS];*/   /* symbol function definition */
+/*#define t_symb_fval        ((long *)0x7efc) */        /*long t_symb_fval[NSYMBS];*/   /* symbol function definition */
 long t_symb_fval[NSYMBS];
 int t_symb_ftype[NSYMBS];  /* function type */ 
 #else
-char t_symb_free @0x8780;
-char *t_symb_pname[] @0xB77B;
-long t_symb_val[] @0x8000;
-long t_symb_fval[] @0x8781;
-int t_symb_ftype[] @0xB613;
+int t_symb_free @32770;
+char *t_symb_pname[] @39980;    /* 360 bytes */
+long t_symb_val[] @40340;    /* 720 bytes */
+long t_symb_fval[] @41060;    /* 720 bytes */
+int t_symb_ftype[] @41780;    /* 360 bytes */
 #endif
 
 /* Printable name */
@@ -124,29 +125,36 @@ int t_symb_ftype[] @0xB613;
 int t_pnames_free;         /* free pointer */
 char  t_pnames[PNAME_SIZE];  /* names */ 
 #else
-int t_pnames_free @0xB8E3;
-char  t_pnames[] @0x82D0;
+int t_pnames_free @32772;
+char  t_pnames[] @42140; /* 900 bytes */
 #endif
 
 /* Stack */
+/* every stack entry has an extra cost on che real CPU stack
+   the average cost is about 35 bytes (!) the best overflow protection
+   should be to trigger the SP and fire out the error condition when
+   a lower limit has been reached */
+
 #ifdef TINYMEM
 #define STACK_SIZE   22
 #else
 #ifdef LARGEMEM
-#define STACK_SIZE   LARGEMEM/3
+#define STACK_SIZE   LARGEMEM/9
 #else
-#define STACK_SIZE   254
+#define STACK_SIZE   200
 #endif
 #endif
 
 #ifndef ZX81
 long t_stack[STACK_SIZE];   /* the stack */
-#else
-long t_stack[] @0x8A51;
-#endif
 unsigned int t_stack_ptr;           /* stack pointer */
+#else
+long t_stack[] @43040;    /* up to 100 elements (400 bytes)
+                           but only 6112 bytes remaining for both SP and LISP STACK*/
+unsigned int t_stack_ptr @32774;           /* stack pointer */
+#endif
 
-
+    
 /* Function types */
 enum Ftype {
   FTYPE_UNDEF,
@@ -218,9 +226,9 @@ struct s_keywords funcs[] = {
 #endif
   { "terpri",   FTYPE(FTYPE_SYS,     0),               KW_TERPRI   },
   /*    Lisp uses functions rplaca and rplacd to alter list structure
-		they change structure the same way as EMACS setcar and setcdr,
-		but the Common Lisp functions return the cons cell while
-		setcar and setcdr return the new car or cdr. */
+        they change structure the same way as EMACS setcar and setcdr,
+        but the Common Lisp functions return the cons cell while
+        setcar and setcdr return the new car or cdr. */
   { "rplaca",   FTYPE(FTYPE_SYS,     2),               KW_RPLACA   },
   { "rplacd",   FTYPE(FTYPE_SYS,     2),               KW_RPLACD   },
 #ifdef SCHEME
@@ -308,44 +316,44 @@ void  gc_unprotect(long s);
 long  symb_make(char *p);
 
 long D_GET_TAG(long s) {
-		return (s & ~(D_GC_MARK | D_MASK_DATA));
+        return (s & ~(D_GC_MARK | D_MASK_DATA));
 }
 
 long D_GET_DATA(long s) {
-		return (s & D_MASK_DATA);
+        return (s & D_MASK_DATA);
 }
 
 #ifdef Z80
 
 #ifdef ZX81
-char buf[] @16444;
+char buf[] @43440   /* 43400+(STACK_SIZE*4); */
 #else
-char buf[120];
+char buf[180];
 #endif
 
 int cpt;
 char ug=13;
 
 char gchar() {
-	if (ug==13) {
-	  while (!gets(buf)) {};
-	  cpt=0;
-	}
-	if ((ug=buf[cpt++]) == 0)  ug=13;
-	return (ug);
+    if (ug==13) {
+      while (!gets(buf)) {};
+      cpt=0;
+    }
+    if ((ug=buf[cpt++]) == 0)  ug=13;
+    return (ug);
 }
 
 void ugchar(char ch) {
-	cpt--;
+    cpt--;
 }
 #else
 
 char gchar() {
-	return (fgetc (stdin));
+    return (fgetc (stdin));
 }
 
 void ugchar(char ch) {
-	ungetc(ch,stdin);
+    ungetc(ch,stdin);
 }
 
 #endif
@@ -434,7 +442,7 @@ toplevel(void)
     if ((v = l_eval(s)) < 0)    /* eval */
       continue;
     gc_unprotect(s);
-		printf("\n");
+        printf("\n");
     (void) l_print(v);          /* print */
   }
 }
@@ -474,31 +482,31 @@ l_read(void)
     for (i = 1; ; i++){
       ch = gchar();
       if (isspace(ch) || iscntrl(ch) || (ch < 0) 
-		  || (ch == ';') || (ch == '(') || (ch == ')')){
-		ugchar(ch);
-		token[i] = '\0';
-		
-		/*  Changed to permint the definition of "1+" and "1-" */
-		if ((isdigit((char)token[0]) && (token[1] != '+') && (token[1] != '-'))
-/*		if (isdigit((char)token[0]) */
-		    || ((token[0] == '-') && isdigit((char)token[1]))
-		    || ((token[0] == '+') && isdigit((char)token[1]))){   /* integer */
-		  s = int_make_l(atol(token));
+          || (ch == ';') || (ch == '(') || (ch == ')')){
+        ugchar(ch);
+        token[i] = '\0';
+        
+        /*  Changed to permint the definition of "1+" and "1-" */
+        if ((isdigit((char)token[0]) && (token[1] != '+') && (token[1] != '-'))
+/*        if (isdigit((char)token[0]) */
+            || ((token[0] == '-') && isdigit((char)token[1]))
+            || ((token[0] == '+') && isdigit((char)token[1]))){   /* integer */
+          s = int_make_l(atol(token));
 #ifdef SCHEME
-		} else if (strcmp(token, "#f") == 0){                   /* nil */ 
-		  s = TAG_NIL;
-		} else if (strcmp(token, "#t") == 0){                     /* t */
-		  s = TAG_T;
+        } else if (strcmp(token, "#f") == 0){                   /* nil */ 
+          s = TAG_NIL;
+        } else if (strcmp(token, "#t") == 0){                     /* t */
+          s = TAG_T;
 #else
-		} else if (strcmp(token, "nil") == 0){                   /* nil */ 
-		  s = TAG_NIL;
-		} else if (strcmp(token, "t") == 0){                     /* t */
-		  s = TAG_T;
+        } else if (strcmp(token, "nil") == 0){                   /* nil */ 
+          s = TAG_NIL;
+        } else if (strcmp(token, "t") == 0){                     /* t */
+          s = TAG_T;
 #endif
-		} else {                                                 /* symbol */
-		  s = TAG_SYMB | symb_make(token);
-		}
-		break;
+        } else {                                                 /* symbol */
+          s = TAG_SYMB | symb_make(token);
+        }
+        break;
       }
       token[i] = ch;
     }
@@ -511,27 +519,27 @@ l_read(void)
     } else {
       ugchar(ch);
       if ((t = l_read()) < 0)
-		return err_msg(errmsg_eof, 0, 0);
+        return err_msg(errmsg_eof, 0, 0);
       if (t == TAG_EOF)
-		return -1;
+        return -1;
       if ((s = v = l_cons(t, TAG_NIL)) < 0)
-		return -1;
+        return -1;
       if (gc_protect(s) < 0)
-		return -1;
+        return -1;
       for (;;){
-		if ((ch = skip_space()) < 0)  /* look ahead next char */
-		  return err_msg(errmsg_eof, 0, 0);
-		if (ch == ')')
-		  break;
-		ugchar(ch);
-		if ((t = l_read()) < 0)
-		  return -1;
-		if (t == TAG_EOF)
-		  return err_msg(errmsg_eof, 0, 0);
-		if ((t = l_cons(t, TAG_NIL)) < 0) 
-		  return -1;
-		rplacd(v, t);
-		v = l_cdr(v);
+        if ((ch = skip_space()) < 0)  /* look ahead next char */
+          return err_msg(errmsg_eof, 0, 0);
+        if (ch == ')')
+          break;
+        ugchar(ch);
+        if ((t = l_read()) < 0)
+          return -1;
+        if (t == TAG_EOF)
+          return err_msg(errmsg_eof, 0, 0);
+        if ((t = l_cons(t, TAG_NIL)) < 0) 
+          return -1;
+        rplacd(v, t);
+        v = l_cdr(v);
       }
       gc_unprotect(s);
     }
@@ -666,29 +674,29 @@ l_eval(long s)
     a = l_cdr(s);   /* actual argument list */
 #ifndef minimalistic
     if ((D_GET_TAG(f) == TAG_CONS) && (D_GET_TAG(l_car(f)) == TAG_SYMB) 
-		&& ((D_GET_DATA(l_car(f)) == KW_LAMBDA))){   /* lambda exp */
+        && ((D_GET_DATA(l_car(f)) == KW_LAMBDA))){   /* lambda exp */
       if (eval_args(f, a, av, FTYPE_ANY_ARGS) < 0)
-		return -1;
+        return -1;
       v = apply(l_cdr(f), av[0], list_len(l_car(l_cdr(f))));
     } else
 #endif
-	    if (D_GET_TAG(f) == TAG_SYMB){
+        if (D_GET_TAG(f) == TAG_SYMB){
       n = FTYPE_GET_NARGS(t_symb_ftype[D_GET_DATA(f)]);
       switch (FTYPE_GET_TYPE(t_symb_ftype[D_GET_DATA(f)])){
       case FTYPE_UNDEF:
-		return err_msg(errmsg_func_undef, 1, f);
+        return err_msg(errmsg_func_undef, 1, f);
       case FTYPE_SPECIAL:
-		v = special(f, a);
-		break;
+        v = special(f, a);
+        break;
       case FTYPE_SYS:
-		if (eval_args(f, a, av, n) < 0)
-		  return -1;
-		v = fcall(f, av/*, n*/);
-		break;
+        if (eval_args(f, a, av, n) < 0)
+          return -1;
+        v = fcall(f, av/*, n*/);
+        break;
       case FTYPE_USER:
-		if (eval_args(f, a, av, FTYPE_ANY_ARGS) < 0)
-		  return -1;
-		v = apply(f, av[0], n);
+        if (eval_args(f, a, av, FTYPE_ANY_ARGS) < 0)
+          return -1;
+        v = apply(f, av[0], n);
       }
     } else {
       return err_msg(errmsg_ill_call, 1, s);
@@ -712,16 +720,16 @@ special(long f, long a)
     if (list_len(a) < 2)
       return err_msg(errmsg_ill_syntax, 1, f);
 #ifdef SCHEME
-	/* (define (func var1 varn) (func content)) */
+    /* (define (func var1 varn) (func content)) */
     v = l_car(a);            /* function name  */
     v = l_car(v);            /* list of function name, arg and function body */
     if (D_GET_TAG(v) != TAG_SYMB)
       return err_msg(errmsg_ill_syntax, 1, f);
     t = l_cdr(v);   /* list of function args */
     l = list_len(t);  /* #args */
-	a = l_cons(  v, l_cons(   l_cdr(l_car(a))  , l_cdr(a)));
+    a = l_cons(  v, l_cons(   l_cdr(l_car(a))  , l_cdr(a)));
 #endif
-	/* (defun func (var1 varn) (func content)) */
+    /* (defun func (var1 varn) (func content)) */
     v = l_car(a);            /* function name  */
     if (D_GET_TAG(v) != TAG_SYMB)
       return err_msg(errmsg_ill_syntax, 1, f);
@@ -749,31 +757,31 @@ special(long f, long a)
   case KW_PROGN:
     for (v = TAG_NIL, t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
       if ((v = l_eval(l_car(t))) < 0)
-		return -1;
+        return -1;
     }
     break;
 
   case KW_WHILE:
     if (D_GET_TAG(a) != TAG_CONS)
-	  return err_msg(errmsg_ill_syntax, 1, f);
+      return err_msg(errmsg_ill_syntax, 1, f);
     if ((v = l_eval(l_car(a))) < 0)
-	  return -1;
-	while (D_GET_TAG(v) != TAG_NIL) {
-	  for (t = l_cdr(a); D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
-	    if ((v = l_eval(l_car(t))) < 0)
-		  return -1;
-	  }
-	  v = l_eval(l_car(a));
-	}
-	break;
+      return -1;
+    while (D_GET_TAG(v) != TAG_NIL) {
+      for (t = l_cdr(a); D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
+        if ((v = l_eval(l_car(t))) < 0)
+          return -1;
+      }
+      v = l_eval(l_car(a));
+    }
+    break;
 
 #ifndef MINIMALISTIC
   case KW_AND:
     for (v = TAG_T, t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
       if ((v = l_eval(l_car(t))) < 0)
-		return -1;
+        return -1;
       if (D_GET_TAG(t) == TAG_NIL)
-		break;
+        break;
     }
     break;
 #endif
@@ -781,9 +789,9 @@ special(long f, long a)
   case KW_OR:
     for (v = TAG_NIL, t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
       if ((v = l_eval(l_car(t))) < 0)
-		return -1;
+        return -1;
       if (D_GET_TAG(v) != TAG_NIL)
-		break;
+        break;
     }
     break; 
 
@@ -794,15 +802,15 @@ special(long f, long a)
     for (t = a; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
       u = l_car(t);
       if (D_GET_TAG(u) != TAG_CONS)
-		return err_msg(errmsg_ill_syntax, 1, f);
+        return err_msg(errmsg_ill_syntax, 1, f);
       if ((v = l_eval(l_car(u))) < 0)
-		return -1;
+        return -1;
       if (D_GET_TAG(v) != TAG_NIL){
-				for (u = l_cdr(u); D_GET_TAG(u) == TAG_CONS; u = l_cdr(u)){ 
-				  if ((v = l_eval(l_car(u))) < 0)
-						return -1;
-				}
-		break;
+                for (u = l_cdr(u); D_GET_TAG(u) == TAG_CONS; u = l_cdr(u)){ 
+                  if ((v = l_eval(l_car(u))) < 0)
+                        return -1;
+                }
+        break;
       }
     }
     break;
@@ -815,13 +823,13 @@ special(long f, long a)
 
   case KW_IF:
     if (D_GET_TAG(a) != TAG_CONS)
-	  return err_msg(errmsg_ill_syntax, 1, f);
+      return err_msg(errmsg_ill_syntax, 1, f);
     l = list_len(a);
     if ((l == 2) || (l == 3)){
       if ((v = l_eval(l_car(a))) < 0)
-	return -1;
+    return -1;
       if (D_GET_TAG(v) != TAG_NIL)
-	return l_eval(l_car(l_cdr(a)));
+    return l_eval(l_car(l_cdr(a)));
       return  (l == 2) ? TAG_NIL : l_eval(l_car(l_cdr(l_cdr(a))));
     } else {
       return err_msg(errmsg_ill_syntax, 1, f);
@@ -867,16 +875,16 @@ eval_args(long func, long arg, long av[2], int n)
       av[0] = TAG_NIL;
     } else {
       if ((x = l_eval(l_car(arg))) < 0)
-		return -1;
+        return -1;
       if ((av[0] = y = l_cons(x, TAG_NIL)) < 0)
-		return -1;
+        return -1;
       if (gc_protect(av[0]) < 0)
-		return -1;
+        return -1;
       for (arg = l_cdr(arg); D_GET_TAG(arg) == TAG_CONS; arg = l_cdr(arg)){
-		if ((x = l_eval(l_car(arg))) < 0)
-		  return -1;
-		rplacd(y, l_cons(x, TAG_NIL)); 
-		y = l_cdr(y);
+        if ((x = l_eval(l_car(arg))) < 0)
+          return -1;
+        rplacd(y, l_cons(x, TAG_NIL)); 
+        y = l_cdr(y);
       }
       gc_unprotect(av[0]);
     }
@@ -893,32 +901,32 @@ fcall(long f, long av[2])  /*, int n*/
   long  r, d;
 
   switch (D_GET_DATA(f)){
-		case KW_RPLACA:
-		case KW_RPLACD:
-		case KW_CAR:
-		case KW_CDR:
-				if (D_GET_TAG(av[0]) != TAG_CONS)
-				  return err_msg(errmsg_ill_type, 1, f);
-				break;
+        case KW_RPLACA:
+        case KW_RPLACD:
+        case KW_CAR:
+        case KW_CDR:
+                if (D_GET_TAG(av[0]) != TAG_CONS)
+                  return err_msg(errmsg_ill_type, 1, f);
+                break;
 
-		case KW_GT:
+        case KW_GT:
 #ifndef MINIMALISTIC
-		case KW_LT:
-		case KW_GTE:
-		case KW_LTE:
-		case KW_REM:
+        case KW_LT:
+        case KW_GTE:
+        case KW_LTE:
+        case KW_REM:
 #endif
-				if ((D_GET_TAG(av[0]) != TAG_INT) || (D_GET_TAG(av[1]) != TAG_INT))
-				  return err_msg(errmsg_ill_type, 1, f);
-				break;
+                if ((D_GET_TAG(av[0]) != TAG_INT) || (D_GET_TAG(av[1]) != TAG_INT))
+                  return err_msg(errmsg_ill_type, 1, f);
+                break;
 #ifndef MINIMALISTIC
-		case KW_ZEROP:
-		case KW_RAND:
-		case KW_INCR:
-		case KW_DECR:
-				if (D_GET_TAG(av[0]) != TAG_INT)
-				  return err_msg(errmsg_ill_type, 1, f);
-				break;
+        case KW_ZEROP:
+        case KW_RAND:
+        case KW_INCR:
+        case KW_DECR:
+                if (D_GET_TAG(av[0]) != TAG_INT)
+                  return err_msg(errmsg_ill_type, 1, f);
+                break;
 #endif
   }
 
@@ -1013,7 +1021,7 @@ fcall(long f, long av[2])  /*, int n*/
   case KW_ADD:
     for (r = 0, t = av[0]; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
       if (D_GET_TAG(l_car(t)) != TAG_INT)
-		return err_msg(errmsg_ill_type, 1, f);
+        return err_msg(errmsg_ill_type, 1, f);
       r = r + int_get_c(l_car(t));
     }
     v = int_make_l(r);
@@ -1022,7 +1030,7 @@ fcall(long f, long av[2])  /*, int n*/
   case KW_TIMES:
     for (r = 1, t = av[0]; D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
       if (D_GET_TAG(l_car(t)) != TAG_INT)
-		return err_msg(errmsg_ill_type, 1, f);
+        return err_msg(errmsg_ill_type, 1, f);
       r = r * int_get_c(l_car(t));
     }
     v = int_make_l(r);
@@ -1032,15 +1040,15 @@ fcall(long f, long av[2])  /*, int n*/
     if (D_GET_TAG(av[0]) == TAG_NIL){
       r = 0;
     } else if (D_GET_TAG(l_car(av[0])) != TAG_INT){
-		return err_msg(errmsg_ill_type, 1, f);
+        return err_msg(errmsg_ill_type, 1, f);
     } else if (D_GET_TAG(l_cdr(av[0])) == TAG_NIL){
       r = 0 - int_get_c(l_car(av[0]));
     } else {
       r = int_get_c(l_car(av[0]));
       for (t = l_cdr(av[0]); D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
-		if (D_GET_TAG(l_car(t)) != TAG_INT)
-		  return err_msg(errmsg_ill_type, 1, f);
-		r = r - int_get_c(l_car(t));
+        if (D_GET_TAG(l_car(t)) != TAG_INT)
+          return err_msg(errmsg_ill_type, 1, f);
+        r = r - int_get_c(l_car(t));
       }
     }
     v = int_make_l(r);
@@ -1050,18 +1058,18 @@ fcall(long f, long av[2])  /*, int n*/
     if (D_GET_TAG(av[0]) == TAG_NIL){
       r = 1;
     } else if (D_GET_TAG(l_car(av[0])) != TAG_INT){
-		return err_msg(errmsg_ill_type, 1, f);
+        return err_msg(errmsg_ill_type, 1, f);
     } else if ((d = int_get_c(l_car(av[0]))) == 0){
       return err_msg(errmsg_zero_div, 1, f);
     } if (D_GET_TAG(l_cdr(av[0])) == TAG_NIL){
       r = 1 / d;
     } else {
       for (r = d, t = l_cdr(av[0]); D_GET_TAG(t) == TAG_CONS; t = l_cdr(t)){
-		if (D_GET_TAG(l_car(t)) != TAG_INT)
-		  return err_msg(errmsg_ill_type, 1, f);
-		if ((d = int_get_c(l_car(t))) == 0)
-		  return err_msg(errmsg_zero_div, 1, f);
-		r = r / d;
+        if (D_GET_TAG(l_car(t)) != TAG_INT)
+          return err_msg(errmsg_ill_type, 1, f);
+        if ((d = int_get_c(l_car(t))) == 0)
+          return err_msg(errmsg_zero_div, 1, f);
+        r = r / d;
       }
     }
     v = int_make_l(r);
@@ -1135,8 +1143,21 @@ apply(long func, long aparams, int n)
   long   fdef, fbody, f, sym, a, v;
   int  i;
 
-  if (t_stack_ptr + n + 1 >= STACK_SIZE)   /* stack overflow */
+#ifdef ZX81
+/*
+..almost  useless, let's save space
+#asm
+    ld hl,0
+    add hl,sp
+    ld (__sp),hl
+#endasm
+    if (200 + &t_stack[t_stack_ptr]>=_sp)
+      return err_msg(errmsg_stack_of, 0, 0);
+*/
+#else
+  if (t_stack_ptr + n > STACK_SIZE)   /* stack overflow */
     return err_msg(errmsg_stack_of, 0, 0);
+#endif
 
   if (D_GET_TAG(func) == TAG_SYMB){         /* function symbol */
     fdef = t_symb_fval[D_GET_DATA(func)];
@@ -1284,9 +1305,9 @@ gcollect(void)
     if ((t_cons_car[i] & D_GC_MARK) == 0){  /* collect */
       n++;
       if (t_cons_free == -1){
-		t_cons_free = i;
+        t_cons_free = i;
       } else {
-		t_cons_car[p] = i; 
+        t_cons_car[p] = i; 
       }
       t_cons_car[i] = i; 
       p = i;
@@ -1316,10 +1337,22 @@ gc_mark(long s)
 char
 gc_protect(long s)
 {
+#ifdef ZX81
+#asm
+    ld hl,0
+    add hl,sp
+    ld (__sp),hl
+#endasm
+    if (200 + &t_stack[t_stack_ptr]>=_sp)     /* stack overflow */
+      return err_msg(errmsg_stack_of, 0, 0);
+  if (D_GET_TAG(s) == TAG_CONS){  /* save only cons cells */
+    t_stack[t_stack_ptr++] = (D_GC_MARK | s);
+#else
   if (D_GET_TAG(s) == TAG_CONS){  /* save only cons cells */
     if (t_stack_ptr >= STACK_SIZE)     /* stack overflow */
       return err_msg(errmsg_stack_of, 0, 0);
     t_stack[t_stack_ptr++] = (D_GC_MARK | s);  
+#endif
   }
   return 0;
 }
@@ -1328,7 +1361,7 @@ void
 gc_unprotect(long s)
 {
   if (D_GET_TAG(s) == TAG_CONS)
-    t_stack_ptr = t_stack_ptr - 1;
+      --t_stack_ptr;
 }
 
 
