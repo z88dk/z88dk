@@ -1,9 +1,11 @@
 
-; char *fgets(char *s, int n, FILE *stream)
+; char *fgets_unlocked(char *s, int n, FILE *stream)
 
 SECTION code_stdio
 
 PUBLIC _fgets_unlocked
+
+EXTERN l0_fgets_unlocked_callee
 
 _fgets_unlocked:
 
@@ -16,14 +18,5 @@ _fgets_unlocked:
    push bc
    push hl
    push af
-   
-   push de
-   ex (sp),ix
-   
-   ex de,hl
-   call asm_fgets_unlocked
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_fgets_unlocked.asm"
+
+   jp l0_fgets_unlocked_callee

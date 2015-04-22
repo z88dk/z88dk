@@ -8,5 +8,3 @@ PUBLIC _strtoimax
 EXTERN _strtol
 
 defc _strtoimax = _strtol
-
-INCLUDE "inttypes/z80/asm_strtoimax.asm"

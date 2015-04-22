@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fgets_unlocked
 
+EXTERN asm_fgets_unlocked
+
 _fgets_unlocked:
 
    pop af
@@ -17,4 +19,4 @@ _fgets_unlocked:
    push de
    push af
    
-   INCLUDE "stdio/z80/asm_fgets_unlocked.asm"
+   jp asm_fgets_unlocked

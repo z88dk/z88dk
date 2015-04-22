@@ -40,6 +40,20 @@ extern int                    creat(char *path, mode_t mode);
 extern int                    open(char *path, int oflag, ...);
 extern int                    vopen(char *path, int oflag, void *arg);
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern int                    creat_callee(char *path, mode_t mode) __z88dk_callee;
+extern int                    vopen_callee(char *path, int oflag, void *arg) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define creat(a,b)            creat_callee(a,b)
+#define vopen(a,b,c)          vopen_callee(a,b,c)
+
+#endif
+
 #else
 
 // SCCZ80

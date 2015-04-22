@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fputc
 
+EXTERN asm_fputc
+
 _fputc:
 
    pop af
@@ -21,7 +23,7 @@ _fputc:
    push de
    push af
    
-   INCLUDE "stdio/z80/asm_fputc.asm"
+   jp asm_fputc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -33,8 +35,6 @@ EXTERN _fputc_unlocked
 
 defc _fputc = _fputc_unlocked
    
-INCLUDE "stdio/z80/asm_fputc.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

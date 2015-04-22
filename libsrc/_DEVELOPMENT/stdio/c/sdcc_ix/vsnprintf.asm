@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _vsnprintf
 
+EXTERN l0_vsnprintf_callee
+
 _vsnprintf:
 
    pop af
@@ -17,17 +19,8 @@ _vsnprintf:
    
    push bc
    push de
-   exx
    push bc
    push de
-   exx
    push af
-   
-   push ix
-   
-   call asm_vsnprintf
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_vsnprintf.asm"
+
+   jp l0_vsnprintf_callee

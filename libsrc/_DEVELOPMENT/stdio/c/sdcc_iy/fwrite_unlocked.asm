@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fwrite_unlocked
 
+EXTERN asm_fwrite_unlocked
+
 _fwrite_unlocked:
 
    pop af
@@ -19,4 +21,4 @@ _fwrite_unlocked:
    push hl
    push af
 
-   INCLUDE "stdio/z80/asm_fwrite_unlocked.asm"
+   jp asm_fwrite_unlocked

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fputc_unlocked
 
+EXTERN asm_fputc_unlocked
+
 _fputc_unlocked:
 
    pop af
@@ -15,4 +17,4 @@ _fputc_unlocked:
    push de
    push af
    
-   INCLUDE "stdio/z80/asm_fputc_unlocked.asm"
+   jp asm_fputc_unlocked

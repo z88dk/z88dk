@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _ungetc_unlocked
 
+EXTERN asm_ungetc_unlocked
+
 _ungetc_unlocked:
 
    pop af
@@ -15,4 +17,4 @@ _ungetc_unlocked:
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_ungetc_unlocked.asm"
+   jp asm_ungetc_unlocked

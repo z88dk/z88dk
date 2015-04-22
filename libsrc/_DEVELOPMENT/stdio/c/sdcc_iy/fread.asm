@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fread
 
+EXTERN asm_fread
+
 _fread:
 
    pop af
@@ -25,7 +27,7 @@ _fread:
    push de
    push af
    
-   INCLUDE "stdio/z80/asm_fread.asm"
+   jp asm_fread
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -37,8 +39,6 @@ EXTERN _fread_unlocked
 
 defc _fread = _fread_unlocked
    
-INCLUDE "stdio/z80/asm_fread.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _vprintf
 
+EXTERN asm_vprintf
+
 _vprintf:
 
    pop af
@@ -21,7 +23,7 @@ _vprintf:
    push de
    push af
    
-   INCLUDE "stdio/z80/asm_vprintf.asm"
+   jp asm_vprintf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -32,8 +34,6 @@ PUBLIC _vprintf
 EXTERN _vprintf_unlocked
 
 defc _vprintf = _vprintf_unlocked
-   
-INCLUDE "stdio/z80/asm_vprintf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

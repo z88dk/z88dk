@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC __fmemopen_
 
+EXTERN l0__fmemopen__callee
+
 __fmemopen_:
 
    pop af
@@ -16,7 +18,5 @@ __fmemopen_:
    push bc
    push hl
    push af
-   
-   ld a,$0c
-   
-   INCLUDE "stdio/z80/asm__fmemopen.asm"
+
+   jp l0__fmemopen__callee

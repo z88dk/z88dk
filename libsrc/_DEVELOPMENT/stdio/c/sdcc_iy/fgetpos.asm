@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fgetpos
 
+EXTERN asm_fgetpos
+
 _fgetpos:
 
    pop af
@@ -21,7 +23,7 @@ _fgetpos:
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_fgetpos.asm"
+   jp asm_fgetpos
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -33,8 +35,6 @@ EXTERN _fgetpos_unlocked
 
 defc _fgetpos = _fgetpos_unlocked
    
-INCLUDE "stdio/z80/asm_fgetpos.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

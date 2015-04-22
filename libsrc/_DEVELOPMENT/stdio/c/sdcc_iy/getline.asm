@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _getline
 
+EXTERN asm_getline
+
 _getline:
 
    pop af
@@ -23,7 +25,7 @@ _getline:
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_getline.asm"
+   jp asm_getline
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -34,8 +36,6 @@ PUBLIC _getline
 EXTERN _getline_unlocked
 
 defc _getline = _getline_unlocked
-   
-INCLUDE "stdio/z80/asm_getline.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

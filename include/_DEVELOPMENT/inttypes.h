@@ -35,6 +35,22 @@ extern intmax_t                       imaxabs_fastcall(intmax_t j) __z88dk_fastc
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void                           _imaxdiv__callee(imaxdiv_t *md, intmax_t numer, intmax_t denom) __z88dk_callee;
+extern intmax_t                       strtoimax_callee(const char *nptr, char **endptr, int base) __z88dk_callee;
+extern uintmax_t                      strtoumax_callee(const char *nptr, char **endptr, int base) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define _imaxdiv_(a,b,c)              _imaxdiv__callee(a,b,c)
+#define strtoimax(a,b,c)              strtoimax_callee(a,b,c)
+#define strtoumax(a,b,c)              strtoumax_callee(a,b,c)
+
+#endif
+
 #else
 
 // SCCZ80

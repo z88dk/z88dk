@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _vsscanf
 
+EXTERN asm_vsscanf
+
 _vsscanf:
 
    pop af
@@ -17,4 +19,4 @@ _vsscanf:
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_vsscanf.asm"
+   jp asm_vsscanf

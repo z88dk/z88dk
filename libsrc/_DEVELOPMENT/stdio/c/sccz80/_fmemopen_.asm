@@ -5,7 +5,7 @@ SECTION code_stdio
 
 PUBLIC _fmemopen_
 
-EXTERN asm__fmemopen
+EXTERN l0_fmemopen__callee
 
 _fmemopen_:
 
@@ -19,5 +19,4 @@ _fmemopen_:
    push de
    push af
    
-   ld a,$0c
-   jp asm__fmemopen
+   jp l0_fmemopen__callee

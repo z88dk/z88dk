@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _vasprintf
 
+EXTERN asm_vasprintf
+
 _vasprintf:
 
    pop af
@@ -16,9 +18,7 @@ _vasprintf:
    
    push bc
    push de
-   exx
    push de
-   exx
    push af
    
-   INCLUDE "stdio/z80/asm_vasprintf.asm"
+   jp asm_vasprintf

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _obstack_vprintf
 
+EXTERN l0_obstack_vprintf_callee
+
 _obstack_vprintf:
 
    pop af
@@ -16,12 +18,5 @@ _obstack_vprintf:
    push de
    push hl
    push af
-   
-   push ix
-   
-   call asm_obstack_vprintf
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_obstack_vprintf.asm"
+
+   jp l0_obstack_vprintf_callee

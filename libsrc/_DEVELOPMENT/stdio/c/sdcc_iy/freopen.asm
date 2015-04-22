@@ -11,19 +11,21 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _freopen
 
+EXTERN asm_freopen
+
 _freopen:
 
    pop af
-   pop ix
-   pop de
    pop hl
+   pop de
+   pop ix
    
    push hl
    push de
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_freopen.asm"
+   jp asm_freopen
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -35,8 +37,6 @@ EXTERN _freopen_unlocked
 
 defc _freopen = _freopen_unlocked
    
-INCLUDE "stdio/z80/asm_freopen.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

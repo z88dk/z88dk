@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fopen
 
+EXTERN l0_fopen_callee
+
 _fopen:
 
    pop af
@@ -14,12 +16,5 @@ _fopen:
    push de
    push hl
    push af
-   
-   push ix
-   
-   call asm_fopen
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_fopen.asm"
+
+   jp l0_fopen_callee

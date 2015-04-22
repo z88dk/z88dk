@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fgets
 
+EXTERN asm_fgets
+
 _fgets:
 
    pop af
@@ -23,7 +25,7 @@ _fgets:
    push de
    push af
    
-   INCLUDE "stdio/z80/asm_fgets.asm"
+   jp asm_fgets
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -35,8 +37,6 @@ EXTERN _fgets_unlocked
 
 defc _fgets = _fgets_unlocked
    
-INCLUDE "stdio/z80/asm_fgets.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fputs_unlocked
 
+EXTERN l0_fputs_unlocked_callee
+
 _fputs_unlocked:
 
    pop af
@@ -15,12 +17,4 @@ _fputs_unlocked:
    push hl
    push af
 
-   push bc
-   ex (sp),ix
-   
-   call asm_fputs_unlocked
-   
-   pop ix
-   ret
-
-   INCLUDE "stdio/z80/asm_fputs_unlocked.asm"
+   jp l0_fputs_unlocked_callee

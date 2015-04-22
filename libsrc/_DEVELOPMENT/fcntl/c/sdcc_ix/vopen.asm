@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _vopen
 
+EXTERN l0_vopen_callee
+
 _vopen:
 
    pop af
@@ -16,12 +18,5 @@ _vopen:
    push bc
    push de
    push af
-   
-   push ix
-   
-   call asm_vopen
-   
-   pop ix
-   ret
-   
-   INCLUDE "fcntl/z80/asm_vopen.asm"
+
+   jp l0_vopen_callee

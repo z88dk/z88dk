@@ -5,22 +5,16 @@ SECTION code_stdio
 
 PUBLIC _fputc_unlocked
 
+EXTERN l0_fputc_unlocked_callee
+
 _fputc_unlocked:
 
    pop af
    pop de
-   pop bc
+   pop hl
    
-   push bc
+   push hl
    push de
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_fputc_unlocked
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_fputc_unlocked.asm"
+
+   jp l0_fputc_unlocked_callee

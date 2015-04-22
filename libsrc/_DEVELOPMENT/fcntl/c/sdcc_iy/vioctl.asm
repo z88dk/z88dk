@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _vioctl
 
+EXTERN asm_vioctl
+
 _vioctl:
 
    pop af
@@ -17,4 +19,5 @@ _vioctl:
    push hl
    push af
    
-   INCLUDE "fcntl/z80/asm_vioctl.asm"
+   jp asm_vioctl
+

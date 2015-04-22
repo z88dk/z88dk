@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fdopen
 
+EXTERN asm_fdopen
+
 _fdopen:
 
    pop af
@@ -15,4 +17,4 @@ _fdopen:
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_fdopen.asm"
+   jp asm_fdopen

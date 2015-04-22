@@ -11,32 +11,21 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _vfprintf
 
+EXTERN l0_vfprintf_callee
+
 _vfprintf:
 
    pop af
-   exx
-   pop bc
-   exx
+   pop hl
    pop de
    pop bc
    
    push bc
    push de
-   exx
-   push bc
+   push hl
    push af
    
-   push bc
-   exx
-
-   ex (sp),ix
-      
-   call asm_vfprintf
-   
-   pop ix
-   ret
-
-   INCLUDE "stdio/z80/asm_vfprintf.asm"
+   jp l0_vfprintf_callee
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -48,8 +37,6 @@ EXTERN _vfprintf_unlocked
 
 defc _vfprintf = _vfprintf_unlocked
    
-INCLUDE "stdio/z80/asm_vfprintf.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

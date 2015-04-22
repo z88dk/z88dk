@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _ungetc_unlocked
 
+EXTERN l0_ungetc_unlocked_callee
+
 _ungetc_unlocked:
 
    pop af
@@ -14,13 +16,5 @@ _ungetc_unlocked:
    push bc
    push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_ungetc_unlocked
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_ungetc_unlocked.asm"
+
+   jp l0_ungetc_unlocked_callee

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _open_memstream
 
+EXTERN l0_open_memstream_callee
+
 _open_memstream:
 
    pop af
@@ -14,12 +16,5 @@ _open_memstream:
    push hl
    push de
    push af
-   
-   push ix
-   
-   call asm_open_memstream
-   
-   pop ix
-   ret
-   
-   INCLUDE "stdio/z80/asm_open_memstream.asm"
+
+   jp l0_open_memstream_callee

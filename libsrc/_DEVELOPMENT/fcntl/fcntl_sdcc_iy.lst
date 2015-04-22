@@ -11,6 +11,7 @@ fcntl/z80/__fcntl_unlock_fdtbl
 fcntl/c/sdcc_iy/close
 fcntl/c/sdcc_iy/close_fastcall
 fcntl/c/sdcc_iy/creat
+fcntl/c/sdcc_iy/creat_callee
 fcntl/c/sdcc_iy/dup
 fcntl/c/sdcc_iy/dup_fastcall
 fcntl/c/sdcc_iy/dup2
@@ -20,4 +21,5 @@ fcntl/c/sdcc_iy/open
 fcntl/c/sdcc_iy/read
 fcntl/c/sdcc_iy/vioctl
 fcntl/c/sdcc_iy/vopen
+fcntl/c/sdcc_iy/vopen_callee
 fcntl/c/sdcc_iy/write

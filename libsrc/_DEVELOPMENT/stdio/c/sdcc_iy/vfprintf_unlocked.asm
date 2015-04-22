@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _vfprintf_unlocked
 
+EXTERN asm_vfprintf_unlocked
+
 _vfprintf_unlocked:
 
    pop af
@@ -17,4 +19,4 @@ _vfprintf_unlocked:
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_vfprintf_unlocked.asm"
+   jp asm_vfprintf_unlocked

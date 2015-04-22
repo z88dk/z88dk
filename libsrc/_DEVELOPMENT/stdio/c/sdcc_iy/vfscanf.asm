@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _vfscanf
 
+EXTERN asm_vfscanf
+
 _vfscanf:
 
    pop af
@@ -23,7 +25,7 @@ _vfscanf:
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_vfscanf.asm"
+   jp asm_vfscanf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -35,8 +37,6 @@ EXTERN _vfscanf_unlocked
 
 defc _vfscanf = _vfscanf_unlocked
    
-INCLUDE "stdio/z80/asm_vfscanf.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

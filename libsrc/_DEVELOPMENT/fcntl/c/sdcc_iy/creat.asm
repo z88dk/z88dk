@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _creat
 
+EXTERN asm_creat
+
 _creat:
 
    pop af
@@ -15,4 +17,4 @@ _creat:
    push de
    push af
 
-   INCLUDE "fcntl/z80/asm_creat.asm"
+   jp asm_creat

@@ -218,6 +218,106 @@ extern void    rewind_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern FILE   *_fmemopen__callee(void **bufp, size_t *sizep, char *mode) __z88dk_callee;
+extern FILE   *fdopen_callee(int fd, const char *mode) __z88dk_callee;
+extern int     fgetpos_callee(FILE *stream, fpos_t *pos) __z88dk_callee;
+extern char   *fgets_callee(char *s, int n, FILE *stream) __z88dk_callee;
+extern FILE   *fmemopen_callee(void *buf, size_t size, char *mode) __z88dk_callee;
+extern FILE   *fopen_callee(const char *filename, const char *mode) __z88dk_callee;
+extern int     fputc_callee(int c, FILE *stream) __z88dk_callee;
+extern int     fputs_callee(char *s, FILE *stream) __z88dk_callee;
+extern size_t  fread_callee(void *ptr, size_t size, size_t nmemb, FILE *stream) __z88dk_callee;
+extern FILE   *freopen_callee(char *filename, char *mode, FILE *stream) __z88dk_callee;
+extern int     fseek_callee(FILE *stream, long offset, int whence) __z88dk_callee;
+extern int     fsetpos_callee(FILE *stream, fpos_t *pos) __z88dk_callee;
+extern size_t  fwrite_callee(void *ptr, size_t size, size_t nmemb, FILE *stream) __z88dk_callee;
+extern int     getdelim_callee(char **lineptr, size_t *n, int delim, FILE *stream) __z88dk_callee;
+extern int     getline_callee(char **lineptr, size_t *n, FILE *stream) __z88dk_callee;
+extern int     obstack_vprintf_callee(struct obstack *ob, char *format, void *arg) __z88dk_callee;
+extern FILE   *open_memstream_callee(char **bufp, size_t *sizep) __z88dk_callee;
+extern int     putc_callee(int c, FILE *stream) __z88dk_callee;
+extern int     ungetc_callee(int c, FILE *stream) __z88dk_callee;
+extern int     vasprintf_callee(char **ptr, char *format, void *arg) __z88dk_callee;
+extern int     vfprintf_callee(FILE *stream, char *format, void *arg) __z88dk_callee;
+extern int     vfscanf_callee(FILE *stream, char *format, void *arg) __z88dk_callee;
+extern int     vprintf_callee(char *format, void *arg) __z88dk_callee;
+extern int     vscanf_callee(char *format, void *arg) __z88dk_callee;
+extern int     vsnprintf_callee(char *s, size_t n, char *format, void *arg) __z88dk_callee;
+extern int     vsprintf_callee(char *s, char *format, void *arg) __z88dk_callee;
+extern int     vsscanf_callee(char *s, char *format, void *arg) __z88dk_callee;
+
+extern int     fgetpos_unlocked_callee(FILE *stream, fpos_t *pos) __z88dk_callee;
+extern char   *fgets_unlocked_callee(char *s, int n, FILE *stream) __z88dk_callee;
+extern int     fputc_unlocked_callee(int c, FILE *stream) __z88dk_callee;
+extern int     fputs_unlocked_callee(char *s, FILE *stream) __z88dk_callee;
+extern size_t  fread_unlocked_callee(void *ptr, size_t size, size_t nmemb, FILE *stream) __z88dk_callee;
+extern FILE   *freopen_unlocked_callee(char *filename, char *mode, FILE *stream) __z88dk_callee;
+extern int     fseek_unlocked_callee(FILE *stream, long offset, int whence) __z88dk_callee;
+extern int     fsetpos_unlocked_callee(FILE *stream, fpos_t *pos) __z88dk_callee;
+extern size_t  fwrite_unlocked_callee(void *ptr, size_t size, size_t nmemb, FILE *stream) __z88dk_callee;
+extern size_t  getdelim_unlocked_callee(char **lineptr, size_t *n, int delim, FILE *stream) __z88dk_callee;
+extern size_t  getline_unlocked_callee(char **lineptr, size_t *n, FILE *stream) __z88dk_callee;
+extern int     putc_unlocked_callee(int c, FILE *stream) __z88dk_callee;
+extern int     ungetc_unlocked_callee(int c, FILE *stream) __z88dk_callee;
+extern int     vfprintf_unlocked_callee(FILE *stream, char *format, void *arg) __z88dk_callee;
+extern int     vfscanf_unlocked_callee(FILE *stream, char *format, void *arg) __z88dk_callee;
+extern int     vprintf_unlocked_callee(char *format, void *arg) __z88dk_callee;
+extern int     vscanf_unlocked_callee(char *format, void *arg) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define _fmemopen_(a,b,c)           _fmemopen__callee(a,b,c)
+#define fdopen(a,b)                 fdopen_callee(a,b)
+#define fgetpos(a,b)                fgetpos_callee(a,b)
+#define fgets(a,b,c)                fgets_callee(a,b,c)
+#define fmemopen(a,b,c)             fmemopen_callee(a,b,c)
+#define fopen(a,b)                  fopen_callee(a,b)
+#define fputc(a,b)                  fputc_callee(a,b)
+#define fputs(a,b)                  fputs_callee(a,b)
+#define fread(a,b,c,d)              fread_callee(a,b,c,d)
+#define freopen(a,b,c)              freopen_callee(a,b,c)
+#define fseek(a,b,c)                fseek_callee(a,b,c)
+#define fsetpos(a,b)                fsetpos_callee(a,b)
+#define fwrite(a,b,c,d)             fwrite_callee(a,b,c,d)
+#define getdelim(a,b,c,d)           getdelim_callee(a,b,c,d)
+#define getline(a,b,c)              getline_callee(a,b,c)
+#define obstack_vprintf(a,b,c)      obstack_vprintf_callee(a,b,c)
+#define open_memstream(a,b)         open_memstream_callee(a,b)
+#define putc(a,b)                   putc_callee(a,b)
+#define ungetc(a,b)                 ungetc_callee(a,b)
+#define vasprintf(a,b,c)            vasprintf_callee(a,b,c)
+#define vfprintf(a,b,c)             vfprintf_callee(a,b,c)
+#define vfscanf(a,b,c)              vfscanf_callee(a,b,c)
+#define vprintf(a,b)                vprintf_callee(a,b)
+#define vscanf(a,b)                 vscanf_callee(a,b)
+#define vsnprintf(a,b,c,d)          vsnprintf_callee(a,b,c,d)
+#define vsprintf(a,b,c)             vsprintf_callee(a,b,c)
+#define vsscanf(a,b,c)              vsscanf_callee(a,b,c)
+
+#define fgetpos_unlocked(a,b)       fgetpos_unlocked_callee(a,b)
+#define fgets_unlocked(a,b,c)       fgets_unlocked_callee(a,b,c)
+#define fputc_unlocked(a,b)         fputc_unlocked_callee(a,b)
+#define fputs_unlocked(a,b)         fputs_unlocked_callee(a,b)
+#define fread_unlocked(a,b,c,d)     fread_unlocked_callee(a,b,c,d)
+#define freopen_unlocked(a,b,c)     freopen_unlocked_callee(a,b,c)
+#define fseek_unlocked(a,b,c)       fseek_unlocked_callee(a,b,c)
+#define fsetpos_unlocked(a,b)       fsetpos_unlocked_callee(a,b)
+#define fwrite_unlocked(a,b,c,d)    fwrite_unlocked_callee(a,b,c,d)
+#define getdelim_unlocked(a,b,c,d)  getdelim_unlocked_callee(a,b,c,d)
+#define getline_unlocked(a,b,c)     getline_unlocked_callee(a,b,c)
+#define putc_unlocked(a,b)          putc_unlocked_callee(a,b)
+#define ungetc_unlocked(a,b)        ungetc_unlocked_callee(a,b)
+#define vfprintf_unlocked(a,b,c)    vfprintf_unlocked_callee(a,b,c)
+#define vfscanf_unlocked(a,b,c)     vfscanf_unlocked_callee(a,b,c)
+#define vprintf_unlocked(a,b)       vprintf_unlocked_callee(a,b)
+#define vscanf_unlocked(a,b)        vscanf_unlocked_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

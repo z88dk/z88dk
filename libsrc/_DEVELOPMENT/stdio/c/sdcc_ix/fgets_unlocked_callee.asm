@@ -1,0 +1,27 @@
+
+; char *fgets_unlocked_callee(char *s, int n, FILE *stream)
+
+SECTION code_stdio
+
+PUBLIC _fgets_unlocked_callee, l0_fgets_unlocked_callee
+
+_fgets_unlocked_callee:
+
+   pop af
+   pop hl
+   pop bc
+   pop de
+   push af
+
+l0_fgets_unlocked_callee:
+
+   push de
+   ex (sp),ix
+   
+   ex de,hl
+   call asm_fgets_unlocked
+   
+   pop ix
+   ret
+   
+   INCLUDE "stdio/z80/asm_fgets_unlocked.asm"
