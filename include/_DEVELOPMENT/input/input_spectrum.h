@@ -52,6 +52,28 @@ extern void               in_mouse_kempston(uint8_t *buttons, uint16_t *x, uint1
 extern uint16_t           in_mouse_kempston_wheel(void);
 extern int16_t            in_mouse_kempston_wheel_delta(void);
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void               in_mouse_amx_init_callee(uint16_t x_vector, uint16_t y_vector) __z88dk_callee;
+extern void               in_mouse_amx_setpos_callee(uint16_t x, uint16_t y) __z88dk_callee;
+extern void               in_mouse_amx_callee(uint8_t *buttons, uint16_t *x, uint16_t *y) __z88dk_callee;
+
+extern void               in_mouse_kempston_setpos_callee(uint16_t x, uint16_t y) __z88dk_callee;
+extern void               in_mouse_kempston_callee(uint8_t *buttons, uint16_t *x, uint16_t *y) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define in_mouse_amx_init(a,b)          in_mouse_amx_init_callee(a,b)
+#define in_mouse_amx_setpos(a,b)        in_mouse_amx_setpos_callee(a,b)
+#define in_mouse_amx(a,b,c)             in_mouse_amx_callee(a,b,c)
+
+#define in_mouse_kempston_setpos(a,b)   in_mouse_kempston_setpos_callee(a,b)
+#define in_mouse_kempston(a,b,c)        in_mouse_kempston_callee(a,b,c)
+
+#endif
+
 #else
 
 // sccz80

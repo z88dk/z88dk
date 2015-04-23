@@ -71,6 +71,18 @@
 extern int      ioctl(int fd, uint16_t request, ...);
 extern int      vioctl(int fd, uint16_t request, void *arg);
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern int                    vioctl_callee(int fd, uint16_t request, void *arg) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define vioctl(a,b,c)         vioctl_callee(a,b,c)
+
+#endif
+
 #else
 
 // SCCZ80

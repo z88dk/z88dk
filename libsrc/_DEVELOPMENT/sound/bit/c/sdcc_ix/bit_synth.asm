@@ -5,6 +5,8 @@ SECTION smc_sound_bit
 
 PUBLIC _bit_synth
 
+EXTERN l0_bit_synth_callee
+
 _bit_synth:
 
    pop af
@@ -22,7 +24,5 @@ _bit_synth:
    push bc
    push de
    push af
-   
-   ld a,c
-   
-   INCLUDE "sound/bit/z80/asm_bit_synth.asm"
+
+   jp l0_bit_synth_callee

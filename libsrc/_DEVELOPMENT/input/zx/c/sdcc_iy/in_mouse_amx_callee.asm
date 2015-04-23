@@ -1,18 +1,18 @@
 
-; void in_mouse_amx(uint8_t *buttons, uint16_t *x, uint16_t *y)
+; void in_mouse_amx_callee(uint8_t *buttons, uint16_t *x, uint16_t *y)
 
 SECTION code_input
 
-PUBLIC _in_mouse_amx
+PUBLIC _in_mouse_amx_callee
 
 EXTERN asm_in_mouse_amx
 
-_in_mouse_amx:
+_in_mouse_amx_callee:
 
    call asm_in_mouse_amx
 
    pop ix
-      
+   
    pop hl
    ld (hl),a
    
@@ -25,9 +25,5 @@ _in_mouse_amx:
    ld (hl),c
    inc hl
    ld (hl),b
-   
-   push hl
-   push hl
-   push hl
-   
+
    jp (ix)

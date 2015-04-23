@@ -5,6 +5,8 @@ SECTION code_sound_bit
 
 PUBLIC _bit_beep_di
 
+EXTERN l0_bit_beep_di_callee
+
 _bit_beep_di:
 
    pop af
@@ -14,12 +16,5 @@ _bit_beep_di:
    push de
    push hl
    push af
-   
-   push ix
-   
-   call asm_bit_beep_di
-   
-   pop ix
-   ret
-   
-   INCLUDE "sound/bit/z80/asm_bit_beep_di.asm"
+
+   jp l0_bit_beep_di_callee

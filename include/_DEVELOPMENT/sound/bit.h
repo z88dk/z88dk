@@ -155,6 +155,30 @@ extern void                      *bit_play_tritone_di_fastcall(void *song) __z88
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void                       bit_beep_callee(uint16_t dur_ms, uint16_t freq_hz) __z88dk_callee;
+extern void                       bit_beep_raw_callee(uint16_t cycles_num, uint16_t period_T) __z88dk_callee;
+extern void                       bit_synth_callee(uint16_t dur, uint16_t freq_1, uint16_t freq_2, uint16_t freq_3, uint16_t freq_4) __z88dk_callee;
+
+extern void                       bit_beep_di_callee(uint16_t dur_ms, uint16_t freq_hz) __z88dk_callee;
+extern void                       bit_beep_raw_di_callee(uint16_t cycles_num, uint16_t period_T) __z88dk_callee;
+extern void                       bit_synth_di_callee(uint16_t dur, uint16_t freq_1, uint16_t freq_2, uint16_t freq_3, uint16_t freq_4) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define bit_beep(a,b)             bit_beep_callee(a,b)
+#define bit_beep_raw(a,b)         bit_beep_raw_callee(a,b)
+#define bit_synth(a,b,c,d,e)      bit_synth_callee(a,b,c,d,e)
+
+#define bit_beep_di(a,b)          bit_beep_di_callee(a,b)
+#define bit_beep_raw_di(a,b)      bit_beep_raw_di_callee(a,b)
+#define bit_synth_di(a,b,c,d,e)   bit_synth_di_callee(a,b,c,d,e)
+
+#endif
+
 #else
 
 // SCCZ80

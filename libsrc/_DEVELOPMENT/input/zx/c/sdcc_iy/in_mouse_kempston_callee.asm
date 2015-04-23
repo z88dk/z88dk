@@ -1,13 +1,13 @@
 
-; void in_mouse_kempston(uint8_t *buttons, uint16_t *x, uint16_t *y)
+; void in_mouse_kempston_callee(uint8_t *buttons, uint16_t *x, uint16_t *y)
 
 SECTION code_input
 
-PUBLIC _in_mouse_kempston
+PUBLIC _in_mouse_kempston_callee
 
 EXTERN asm_in_mouse_kempston
 
-_in_mouse_kempston:
+_in_mouse_kempston_callee:
 
    call asm_in_mouse_kempston
 
@@ -25,9 +25,5 @@ _in_mouse_kempston:
    ld (hl),c
    inc hl
    ld (hl),b
-   
-   push hl
-   push hl
-   push hl
-   
+
    jp (ix)
