@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_pattern_fill
 
+EXTERN l0_zx_pattern_fill_callee
+
 _zx_pattern_fill:
 
    pop af
@@ -17,21 +19,8 @@ _zx_pattern_fill:
    
    push bc
    push de
-   exx
    push bc
-   exx
    push hl
    push af
-   
-   exx
-   ld a,c
-   exx
-   ld h,a
-   
-   push ix
-   call asm_zx_pattern_fill
-   pop ix
-   
-   ret
-   
-   INCLUDE "arch/zx/graphics/z80/asm_zx_pattern_fill.asm"
+
+   jp l0_zx_pattern_fill_callee

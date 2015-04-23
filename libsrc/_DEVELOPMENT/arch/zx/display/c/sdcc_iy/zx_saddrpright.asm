@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_saddrpright
 
+EXTERN asm_zx_saddrpright
+
 _zx_saddrpright:
 
    pop af
@@ -15,4 +17,4 @@ _zx_saddrpright:
    push hl
    push af
    
-   INCLUDE "arch/zx/display/z80/asm_zx_saddrpright.asm"
+   jp asm_zx_saddrpright

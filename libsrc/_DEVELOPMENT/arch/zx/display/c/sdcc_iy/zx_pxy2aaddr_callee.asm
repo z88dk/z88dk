@@ -3,13 +3,14 @@
 
 SECTION code_arch
 
-PUBLIC zx_pxy2aaddr_callee, l0_zx_pxy2aaddr_callee
+PUBLIC _zx_pxy2aaddr_callee, l0_zx_pxy2aaddr_callee
 
-zx_pxy2aaddr_callee:
+_zx_pxy2aaddr_callee:
 
+   pop af
    pop hl
    pop de
-   ex (sp),hl
+   push af
 
 l0_zx_pxy2aaddr_callee:
 

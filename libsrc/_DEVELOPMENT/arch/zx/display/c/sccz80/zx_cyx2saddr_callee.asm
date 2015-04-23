@@ -3,15 +3,17 @@
 
 SECTION code_arch
 
-PUBLIC zx_cyx2saddr_callee
+PUBLIC zx_cyx2saddr_callee, l0_zx_cyx2saddr_callee
 
 zx_cyx2saddr_callee:
 
+   pop af
    pop hl
    pop de
-   ex (sp),hl
-   
-   ld h,l
-   ld l,e
+   push af
+
+l0_zx_cyx2saddr_callee:
+
+   ld h,e
    
    INCLUDE "arch/zx/display/z80/asm_zx_cyx2saddr.asm"

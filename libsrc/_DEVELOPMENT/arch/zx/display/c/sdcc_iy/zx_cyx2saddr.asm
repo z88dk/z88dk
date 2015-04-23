@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_cyx2saddr
 
+EXTERN l0_zx_cyx2saddr_callee
+
 _zx_cyx2saddr:
 
    pop af
@@ -14,7 +16,5 @@ _zx_cyx2saddr:
    push hl
    push de
    push af
-   
-   ld h,e
-   
-   INCLUDE "arch/zx/display/z80/asm_zx_cyx2saddr.asm"
+
+   jp l0_zx_cyx2saddr_callee

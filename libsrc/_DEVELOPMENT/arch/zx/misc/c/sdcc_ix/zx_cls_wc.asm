@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_cls_wc
 
+EXTERN l0_zx_cls_wc_callee
+
 _zx_cls_wc:
 
    pop af
@@ -14,13 +16,5 @@ _zx_cls_wc:
    push hl
    push bc
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_zx_cls_wc
-   
-   pop ix
-   ret
-   
-   INCLUDE "arch/zx/misc/z80/asm_zx_cls_wc.asm"
+
+   jp l0_zx_cls_wc_callee

@@ -5,7 +5,7 @@ SECTION code_arch
 
 PUBLIC zx_pxy2saddr
 
-EXTERN asm_zx_pxy2saddr
+EXTERN l0_zx_pxy2saddr_callee
 
 zx_pxy2saddr:
 
@@ -17,5 +17,4 @@ zx_pxy2saddr:
    push de
    push af
    
-   ld h,e
-   jp asm_zx_pxy2saddr
+   jp l0_zx_pxy2saddr_callee

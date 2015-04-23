@@ -23,11 +23,15 @@ arch/zx/display/c/sdcc_iy/zx_cy2aaddr_fastcall
 arch/zx/display/c/sdcc_iy/zx_cy2saddr
 arch/zx/display/c/sdcc_iy/zx_cy2saddr_fastcall
 arch/zx/display/c/sdcc_iy/zx_cyx2aaddr
+arch/zx/display/c/sdcc_iy/zx_cyx2aaddr_callee
 arch/zx/display/c/sdcc_iy/zx_cyx2saddr
+arch/zx/display/c/sdcc_iy/zx_cyx2saddr_callee
 arch/zx/display/c/sdcc_iy/zx_px2bitmask
 arch/zx/display/c/sdcc_iy/zx_px2bitmask_fastcall
 arch/zx/display/c/sdcc_iy/zx_pxy2aaddr
+arch/zx/display/c/sdcc_iy/zx_pxy2aaddr_callee
 arch/zx/display/c/sdcc_iy/zx_pxy2saddr
+arch/zx/display/c/sdcc_iy/zx_pxy2saddr_callee
 arch/zx/display/c/sdcc_iy/zx_py2aaddr
 arch/zx/display/c/sdcc_iy/zx_py2aaddr_fastcall
 arch/zx/display/c/sdcc_iy/zx_py2saddr
@@ -53,6 +57,8 @@ arch/zx/display/c/sdcc_iy/zx_saddrcup_fastcall
 arch/zx/display/c/sdcc_iy/zx_saddrpdown
 arch/zx/display/c/sdcc_iy/zx_saddrpdown_fastcall
 arch/zx/display/c/sdcc_iy/zx_saddrpleft
+arch/zx/display/c/sdcc_iy/zx_saddrpleft_callee
 arch/zx/display/c/sdcc_iy/zx_saddrpright
+arch/zx/display/c/sdcc_iy/zx_saddrpright_callee
 arch/zx/display/c/sdcc_iy/zx_saddrpup
 arch/zx/display/c/sdcc_iy/zx_saddrpup_fastcall

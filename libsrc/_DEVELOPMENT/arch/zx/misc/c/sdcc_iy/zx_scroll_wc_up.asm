@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_scroll_wc_up
 
+EXTERN asm_zx_scroll_wc_up
+
 _zx_scroll_wc_up:
 
    pop af
@@ -14,7 +16,7 @@ _zx_scroll_wc_up:
    
    push hl
    push de
-   push ix
+   push hl
    push af
    
-   INCLUDE "arch/zx/misc/z80/asm_zx_scroll_wc_up.asm"
+   jp asm_zx_scroll_wc_up
