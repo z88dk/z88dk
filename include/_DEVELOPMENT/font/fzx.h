@@ -23,7 +23,7 @@ struct fzx_char
 
 struct fzx_cmetric
 {
-   uint8_t   kern;                     // num pixels to leftshift rendered char within string, 0-3
+   uint8_t   kern;                     // num pixels to leftshift rendered char, 0-3
    uint8_t   width;                    // width of glyph, 1-16
    uint8_t   shift;                    // num pixels to downshift rendered char from top of line, 0-15
    uint8_t  *bitmap;                   // address of glyph bitmap
@@ -84,6 +84,52 @@ extern int       fzx_puts_justified(struct fzx_state *fs, char *s, uint16_t allo
 
 extern int       fzx_write(struct fzx_state *fs, char *buf, uint16_t buflen);
 extern int       fzx_write_justified(struct fzx_state *fs, char *buf, uint16_t buflen, uint16_t allowed_width);
+
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void      fzx_state_init_callee(struct fzx_state *fs, struct fzx_font *ff, struct r_Rect16 *window) __z88dk_callee;
+
+extern void      fzx_at_callee(struct fzx_state *fs, uint16_t x, uint16_t y) __z88dk_callee;
+extern int       fzx_putc_callee(struct fzx_state *fs, int c) __z88dk_callee;
+
+extern char     *fzx_char_metrics_callee(struct fzx_font *ff, struct fzx_cmetric *fm, int c) __z88dk_callee;
+extern uint16_t  fzx_glyph_width_callee(struct fzx_font *ff, int c) __z88dk_callee;
+
+extern uint16_t  fzx_string_extent_callee(struct fzx_font *ff, char *s) __z88dk_callee;
+extern char     *fzx_string_partition_callee(struct fzx_font *ff, char *s, uint16_t allowed_width) __z88dk_callee;
+extern char     *fzx_string_partition_ww_callee(struct fzx_font *ff, char *s, uint16_t allowed_width) __z88dk_callee;
+
+extern uint16_t  fzx_buffer_extent_callee(struct fzx_font *ff, char *buf, uint16_t buflen) __z88dk_callee;
+extern char     *fzx_buffer_partition_callee(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width) __z88dk_callee;
+extern char     *fzx_buffer_partition_ww_callee(struct fzx_font *ff, char *buf, uint16_t buflen, uint16_t allowed_width) __z88dk_callee;
+
+extern int       fzx_puts_callee(struct fzx_state *fs, char *s) __z88dk_callee;
+extern int       fzx_puts_justified_callee(struct fzx_state *fs, char *s, uint16_t allowed_width) __z88dk_callee;
+
+extern int       fzx_write_callee(struct fzx_state *fs, char *buf, uint16_t buflen) __z88dk_callee;
+extern int       fzx_write_justified_callee(struct fzx_state *fs, char *buf, uint16_t buflen, uint16_t allowed_width) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define fzx_state_init(a,b,c)               fzx_state_init_callee(a,b,c)
+#define fzx_at(a,b,c)                       fzx_at_callee(a,b,c)
+#define fzx_putc(a,b)                       fzx_putc_callee(a,b)
+#define fzx_char_metrics(a,b,c)             fzx_char_metrics_callee(a,b,c)
+#define fzx_glyph_width(a,b)                fzx_glyph_width_callee(a,b)
+#define fzx_string_extent(a,b)              fzx_string_extent_callee(a,b)
+#define fzx_string_partition(a,b,c)         fzx_string_partition_callee(a,b,c)
+#define fzx_string_partition_ww(a,b,c)      fzx_string_partition_ww_callee(a,b,c)
+#define fzx_buffer_extent(a,b,c)            fzx_buffer_extent_callee(a,b,c)
+#define fzx_buffer_partition(a,b,c,d)       fzx_buffer_partition_callee(a,b,c,d)
+#define fzx_buffer_partition_ww(a,b,c,d)    fzx_buffer_partition_ww_callee(a,b,c,d)
+#define fzx_puts(a,b)                       fzx_puts_callee(a,b)
+#define fzx_puts_justified(a,b,c)           fzx_puts_justified_callee(a,b,c)
+#define fzx_write(a,b,c)                    fzx_write_callee(a,b,c)
+#define fzx_write_justified(a,b,c,d)        fzx_write_justified_callee(a,b,c,d)
+
+#endif
 
 #else
 

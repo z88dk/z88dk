@@ -14,7 +14,7 @@ fzx_string_partition_ww:
    pop de
    pop ix
    
-   push ix
+   push hl
    push de
    push hl
    push af

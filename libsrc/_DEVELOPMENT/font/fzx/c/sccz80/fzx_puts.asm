@@ -13,7 +13,7 @@ fzx_puts:
    pop de
    pop ix
    
-   push ix
+   push hl
    push de
    push af
    

@@ -15,7 +15,7 @@ fzx_buffer_partition:
    pop de
    pop ix
    
-   push ix
+   push hl
    push de
    push bc
    push hl

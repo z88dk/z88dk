@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_puts_justified
 
+EXTERN l0_fzx_puts_justified_callee
+
 _fzx_puts_justified:
 
    pop af
@@ -16,13 +18,5 @@ _fzx_puts_justified:
    push hl
    push de
    push af
-   
-   push de
-   ex (sp),ix
-   
-   call asm_fzx_puts_justified
-   
-   pop ix
-   ret
-   
-   INCLUDE "font/fzx/z80/asm_fzx_puts_justified.asm"
+
+   jp l0_fzx_puts_justified_callee

@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_at
 
+EXTERN l0_fzx_at_callee
+
 _fzx_at:
 
    pop af
@@ -16,13 +18,5 @@ _fzx_at:
    push hl
    push de
    push af
-   
-   push de
-   ex (sp),ix
-   
-   call asm_fzx_at
-   
-   pop ix
-   ret
-   
-   INCLUDE "font/fzx/z80/asm_fzx_at.asm"
+
+   jp l0_fzx_at_callee

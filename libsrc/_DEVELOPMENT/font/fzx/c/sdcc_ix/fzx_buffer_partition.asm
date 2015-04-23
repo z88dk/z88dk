@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_buffer_partition
 
+EXTERN l0_fzx_buffer_partition_callee
+
 _fzx_buffer_partition:
 
    pop af
@@ -20,15 +22,5 @@ _fzx_buffer_partition:
    push de
    push bc
    push af
-   
-   exx
-   push bc
-   exx
-   ex (sp),ix
-   
-   call asm_fzx_buffer_partition
-   
-   pop ix
-   ret
-   
-   INCLUDE "font/fzx/z80/asm_fzx_buffer_partition.asm"
+
+   jp l0_fzx_buffer_partition_callee

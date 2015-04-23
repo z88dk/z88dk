@@ -63,6 +63,28 @@ extern void                    dzx7_mega(void *src, void *dst);
 extern void                    dzx7_smart_rcs(void *src, void *dst);
 extern void                    dzx7_agile_rcs(void *src, void *dst);
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void                    dzx7_standard_callee(void *src, void *dst) __z88dk_callee;
+extern void                    dzx7_turbo_callee(void *src, void *dst) __z88dk_callee;
+extern void                    dzx7_mega_callee(void *src, void *dst) __z88dk_callee;
+
+extern void                    dzx7_smart_rcs_callee(void *src, void *dst) __z88dk_callee;
+extern void                    dzx7_agile_rcs_callee(void *src, void *dst) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define dzx7_standard(a,b)     dzx7_standard_callee(a,b)
+#define dzx7_turbo(a,b)        dzx7_turbo_callee(a,b)
+#define dzx7_mega(a,b)         dzx7_mega_callee(a,b)
+
+#define dzx7_smart_rcs(a,b)    dzx7_smart_rcs_callee(a,b)
+#define dzx7_agile_rcs(a,b)    dzx7_agile_rcs_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

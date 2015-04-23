@@ -5,6 +5,8 @@ SECTION code_compress_zx7
 
 PUBLIC _dzx7_agile_rcs
 
+EXTERN asm_dzx7_agile_rcs
+
 _dzx7_agile_rcs:
 
    pop af
@@ -15,4 +17,4 @@ _dzx7_agile_rcs:
    push hl
    push af
    
-   INCLUDE "compress/zx7/z80/asm_dzx7_agile_rcs.asm"
+   jp asm_dzx7_agile_rcs

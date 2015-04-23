@@ -5,7 +5,7 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_puts
 
-EXTERN l_neg_hl
+EXTERN l0_fzx_puts_callee
 
 _fzx_puts:
 
@@ -16,15 +16,5 @@ _fzx_puts:
    push de
    push hl
    push af
-   
-   push hl
-   ex (sp),ix
-   
-   call asm_fzx_puts
-   
-   pop ix
-   ret nc
-   
-   jp l_neg_hl
-   
-   INCLUDE "font/fzx/z80/asm_fzx_puts.asm"
+
+   jp l0_fzx_puts_callee

@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_state_init
 
+EXTERN asm_fzx_state_init
+
 _fzx_state_init:
 
    pop af
@@ -17,4 +19,4 @@ _fzx_state_init:
    push hl
    push af
 
-   INCLUDE "font/fzx/z80/asm_fzx_state_init.asm"
+   jp asm_fzx_state_init

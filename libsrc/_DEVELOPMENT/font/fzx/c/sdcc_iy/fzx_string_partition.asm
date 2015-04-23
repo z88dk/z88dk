@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_string_partition
 
+EXTERN asm_fzx_string_partition
+
 _fzx_string_partition:
 
    pop af
@@ -14,7 +16,7 @@ _fzx_string_partition:
    
    push hl
    push de
-   push ix
+   push hl
    push af
    
-   INCLUDE "font/fzx/z80/asm_fzx_string_partition.asm"
+   jp asm_fzx_string_partition

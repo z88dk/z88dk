@@ -14,7 +14,7 @@ fzx_at:
    pop hl
    pop ix
    
-   push ix
+   push hl
    push hl
    push bc
    push af

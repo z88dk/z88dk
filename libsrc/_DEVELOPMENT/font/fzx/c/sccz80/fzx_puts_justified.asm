@@ -14,7 +14,7 @@ fzx_puts_justified:
    pop hl
    pop ix
    
-   push ix
+   push hl
    push hl
    push bc
    push af

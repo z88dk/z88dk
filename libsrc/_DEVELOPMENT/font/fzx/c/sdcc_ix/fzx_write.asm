@@ -5,7 +5,7 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_write
 
-EXTERN l_neg_hl
+EXTERN l0_fzx_write_callee
 
 _fzx_write:
 
@@ -18,15 +18,5 @@ _fzx_write:
    push de
    push hl
    push af
-   
-   push hl
-   ex (sp),ix
-   
-   call asm_fzx_write
-   
-   pop ix
-   ret nc
-   
-   jp l_neg_hl
-   
-   INCLUDE "font/fzx/z80/asm_fzx_write.asm"
+
+   jp l0_fzx_write_callee

@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_buffer_extent
 
+EXTERN asm_fzx_buffer_extent
+
 _fzx_buffer_extent:
 
    pop af
@@ -17,4 +19,4 @@ _fzx_buffer_extent:
    push hl
    push af
    
-   INCLUDE "font/fzx/z80/asm_fzx_buffer_extent.asm"
+   jp asm_fzx_buffer_extent

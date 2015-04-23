@@ -13,7 +13,7 @@ fzx_putc:
    pop bc
    pop ix
 
-   push ix
+   push hl
    push bc
    push af
    
