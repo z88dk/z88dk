@@ -1,6 +1,7 @@
 
 ; Tiny ELIZA implementation
-; please 
+; please enter your sentences
+; (between parenthesis)
 
 
 (defun nthcdr (n l)
@@ -108,6 +109,7 @@
 (progn (setq ww 0) (setq wwc 0)
   (while  (setq s (youme (read)))
 	 (terpri)
+	 (gc)
 	 (cond
 		  ((match '(you are) s)
 			(setq b xx)
@@ -135,12 +137,6 @@
             (print-s (list '(i keep my opinion on) b '(for myself))))
           ((match '(do me think) s)
 			(print-s '(i think you should answer that yourself) ))
-		  ((member 'love s)
-			(print-s '(love is a delicate argument...) ))
-		  ((member 'no s)
-			(print-s '(dont be so negative) ))
-		  ((member 'maybe s)
-			(print-s '(be positive) ))
 		  (t (print-s (punt wwc)) )
 	  )
 	  (setq wwc (1+ wwc))
