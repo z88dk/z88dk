@@ -7,7 +7,7 @@
 // SDCC
 // r->l parameter passing means there are no issues
 
-*-------------------------------------------------------------------------
+/*-------------------------------------------------------------------------
    stdarg.h - ANSI macros for variable parameter list
 
    Copyright (C) 2000, Michael Hope
@@ -54,7 +54,7 @@ extern int __LIB__ getarg(void);
 
 #define va_list                 unsigned char *
 #define va_start(ap,last)       ap=(getarg()*2)+&last-2
-#define va_arg(ap,type)         *((type *)(ap-=sizeof(type)))
+#define va_arg(ap,type)         *((type*)(ap-=sizeof(type)))
 #define va_copy(dst, src)       dst = src
 #define va_end(ap)
 
