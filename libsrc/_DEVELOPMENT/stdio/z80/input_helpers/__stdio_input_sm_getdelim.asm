@@ -3,7 +3,7 @@ SECTION code_stdio
 
 PUBLIC __stdio_input_sm_getdelim
 
-EXTERN asm_b_vector_append_block
+EXTERN asm_b_vector_append
 
 __stdio_input_sm_getdelim:
 
@@ -26,13 +26,13 @@ state_0:
    push af                     ; save char
 
    ex de,hl
-   ld de,1                     ; grow vector by one byte
-   call asm_b_vector_append_block
+   call asm_b_vector_append    ; grow by one byte
    jr c, exit                  ; if failed to grow
 
    pop af                      ; a = char
    pop bc                      ; bc = delim_char
-   pop de                      ; de = vector *
+   pop hl
+   ex de,hl                    ; de = vector *
 
    ; hl = & last byte in vector (reserved for '\0')
    
