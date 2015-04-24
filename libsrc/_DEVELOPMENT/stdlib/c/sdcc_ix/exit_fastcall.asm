@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC _exit_fastcall
 
-_exit:
+_exit_fastcall:
    
    INCLUDE "stdlib/z80/asm_exit.asm"
