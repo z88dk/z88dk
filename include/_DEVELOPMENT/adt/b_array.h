@@ -72,6 +72,46 @@ extern size_t    b_array_size_fastcall(b_array_t *a) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern size_t                          b_array_append_callee(b_array_t *a, int c) __z88dk_callee;
+extern void                           *b_array_append_block_callee(b_array_t *a, size_t n) __z88dk_callee;
+extern size_t                          b_array_append_n_callee(b_array_t *a, size_t n, int c) __z88dk_callee;
+extern int                             b_array_at_callee(b_array_t *a, size_t idx) __z88dk_callee;
+extern size_t                          b_array_erase_callee(b_array_t *a, size_t idx) __z88dk_callee;
+extern size_t                          b_array_erase_block_callee(b_array_t *a, size_t idx, size_t n) __z88dk_callee;
+extern size_t                          b_array_erase_range_callee(b_array_t *a, size_t idx_first, size_t idx_last) __z88dk_callee;
+extern b_array_t                      *b_array_init_callee(void *p, void *data, size_t capacity) __z88dk_callee;
+extern size_t                          b_array_insert_callee(b_array_t *a, size_t idx, int c) __z88dk_callee;
+extern void                           *b_array_insert_block_callee(b_array_t *a, size_t idx, size_t n) __z88dk_callee;
+extern size_t                          b_array_insert_n_callee(b_array_t *a, size_t idx, size_t n, int c) __z88dk_callee;
+extern size_t                          b_array_push_back_callee(b_array_t *a, int c) __z88dk_callee;
+extern size_t                          b_array_read_block_callee(void *dst, size_t n, b_array_t *a, size_t idx) __z88dk_callee;
+extern int                             b_array_resize_callee(b_array_t *a, size_t n) __z88dk_callee;
+extern size_t                          b_array_write_block_callee(void *src, size_t n, b_array_t *a, size_t idx) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define b_array_append(a,b)                      b_array_append_callee(a,b)
+#define b_array_append_block(a,b)                b_array_append_block_callee(a,b)
+#define b_array_append_n(a,b,c)                  b_array_append_n_callee(a,b,c)
+#define b_array_at(a,b)                          b_array_at_callee(a,b)
+#define b_array_erase(a,b)                       b_array_erase_callee(a,b)
+#define b_array_erase_block(a,b,c)               b_array_erase_block_callee(a,b,c)
+#define b_array_erase_range(a,b,c)               b_array_erase_range_callee(a,b,c)
+#define b_array_init(a,b,c)                      b_array_init_callee(a,b,c)
+#define b_array_insert(a,b,c)                    b_array_insert_callee(a,b,c)
+#define b_array_insert_block(a,b,c)              b_array_insert_block_callee(a,b,c)
+#define b_array_insert_n(a,b,c,d)                b_array_insert_n_callee(a,b,c,d)
+#define b_array_push_back(a,b)                   b_array_push_back_callee(a,b)
+#define b_array_read_block(a,b,c,d)              b_array_read_block_callee(a,b,c,d)
+#define b_array_resize(a,b)                      b_array_resize_callee(a,b)
+#define b_array_write_block(a,b,c,d)             b_array_write_block_callee(a,b,c,d)
+
+#endif
+
 #else
 
 // SCCZ80
@@ -121,20 +161,21 @@ extern size_t    __LIB__ __CALLEE__    b_array_write_block_callee(void *src, siz
 
 // SCCZ80 MAKE CALLEE LINKAGE THE DEFAULT
 
-#define b_array_append(a,b)                      b_array_append_callee(a,b);
+#define b_array_append(a,b)                      b_array_append_callee(a,b)
 #define b_array_append_block(a,b)                b_array_append_block_callee(a,b)
-#define b_array_append_n(a,b,c)                  b_array_append_n_callee(a,b,c);
-#define b_array_at(a,b)                          b_array_at_callee(a,b);
-#define b_array_erase(a,b)                       b_array_erase_callee(a,b);
-#define b_array_erase_range(a,b,c)               b_array_erase_range_callee(a,b,c);
-#define b_array_init(a,b,c)                      b_array_init_callee(a,b,c);
-#define b_array_insert(a,b,c)                    b_array_insert_callee(a,b,c);
-#define b_array_insert_block(a,b,c)              b_array_insert_block_callee(a,b,c);
-#define b_array_insert_n(a,b,c,d)                b_array_insert_n_callee(a,b,c,d);
-#define b_array_push_back(a,b)                   b_array_push_back_callee(a,b);
-#define b_array_read_block(a,b,c,d)              b_array_read_block_callee(a,b,c,d);
-#define b_array_resize(a,b)                      b_array_resize_callee(a,b);
-#define b_array_write_block(a,b,c,d)             b_array_write_block_callee(a,b,c,d);
+#define b_array_append_n(a,b,c)                  b_array_append_n_callee(a,b,c)
+#define b_array_at(a,b)                          b_array_at_callee(a,b)
+#define b_array_erase(a,b)                       b_array_erase_callee(a,b)
+#define b_array_erase_block(a,b,c)               b_array_erase_block_callee(a,b,c)
+#define b_array_erase_range(a,b,c)               b_array_erase_range_callee(a,b,c)
+#define b_array_init(a,b,c)                      b_array_init_callee(a,b,c)
+#define b_array_insert(a,b,c)                    b_array_insert_callee(a,b,c)
+#define b_array_insert_block(a,b,c)              b_array_insert_block_callee(a,b,c)
+#define b_array_insert_n(a,b,c,d)                b_array_insert_n_callee(a,b,c,d)
+#define b_array_push_back(a,b)                   b_array_push_back_callee(a,b)
+#define b_array_read_block(a,b,c,d)              b_array_read_block_callee(a,b,c,d)
+#define b_array_resize(a,b)                      b_array_resize_callee(a,b)
+#define b_array_write_block(a,b,c,d)             b_array_write_block_callee(a,b,c,d)
 
 #endif
 

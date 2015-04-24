@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_append_n
 
+EXTERN asm_b_array_append_n
+
 _b_array_append_n:
 
    pop af
@@ -17,4 +19,4 @@ _b_array_append_n:
    push hl
    push af
    
-   INCLUDE "adt/b_array/z80/asm_b_array_append_n.asm"
+   jp asm_b_array_append_n

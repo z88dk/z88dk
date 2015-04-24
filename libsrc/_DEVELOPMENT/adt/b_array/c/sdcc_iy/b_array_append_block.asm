@@ -5,7 +5,7 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_append_block
 
-EXTERN error_zc
+EXTERN l0_b_array_append_block_callee
 
 _b_array_append_block:
 
@@ -16,11 +16,5 @@ _b_array_append_block:
    push de
    push hl
    push af
-   
-   call asm_b_array_append_block
-   ret nc
-   
-   jp error_zc
-   
-   INCLUDE "adt/b_array/z80/asm_b_array_append_block.asm"
 
+   jp l0_b_array_append_block_callee

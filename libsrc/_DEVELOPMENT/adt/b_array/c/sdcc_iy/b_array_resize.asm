@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_resize
 
+EXTERN asm_b_array_resize
+
 _b_array_resize:
 
    pop af
@@ -15,4 +17,4 @@ _b_array_resize:
    push hl
    push af
    
-   INCLUDE "adt/b_array/z80/asm_b_array_resize.asm"
+   jp asm_b_array_resize

@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_read_block
 
+EXTERN asm_b_array_read_block
+
 _b_array_read_block:
 
    pop af
@@ -18,9 +20,7 @@ _b_array_read_block:
    push bc
    push hl
    push de
-   exx
    push de
-   exx
    push af
 
-   INCLUDE "adt/b_array/z80/asm_b_array_read_block.asm"
+   jp asm_b_array_read_block

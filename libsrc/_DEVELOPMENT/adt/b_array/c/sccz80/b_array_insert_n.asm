@@ -18,7 +18,7 @@ b_array_insert_n:
    push hl
    push bc
    push de
-   push ix
+   push hl
    push af
    
    ld a,ixl

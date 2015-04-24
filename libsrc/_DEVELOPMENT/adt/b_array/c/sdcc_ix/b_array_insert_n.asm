@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_insert_n
 
+EXTERN l0_b_array_insert_n_callee
+
 _b_array_insert_n:
 
    pop af
@@ -15,14 +17,9 @@ _b_array_insert_n:
    pop bc
    
    push bc
-   exx
    push de
    push bc
    push hl
    push af
-   
-   exx
-   ld a,c
-   exx
-   
-   INCLUDE "adt/b_array/z80/asm_b_array_insert_n.asm"
+
+   jp l0_b_array_insert_n_callee
