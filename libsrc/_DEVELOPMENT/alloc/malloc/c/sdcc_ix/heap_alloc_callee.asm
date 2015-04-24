@@ -13,10 +13,9 @@ PUBLIC _heap_alloc_callee
 
 _heap_alloc_callee:
 
-   pop af
-   pop de
    pop hl
-   push af
+   pop de
+   ex (sp),hl
    
    INCLUDE "alloc/malloc/z80/asm_heap_alloc.asm"
 

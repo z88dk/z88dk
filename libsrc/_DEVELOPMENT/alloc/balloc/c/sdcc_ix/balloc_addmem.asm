@@ -5,6 +5,8 @@ SECTION code_alloc_balloc
 
 PUBLIC _balloc_addmem
 
+EXTERN l0_balloc_addmem_callee
+
 _balloc_addmem:
 
    pop af
@@ -18,11 +20,7 @@ _balloc_addmem:
    push de
    push hl
    push bc
-   exx
    push bc
    push af
    
-   ld a,c
-   exx
-
-   INCLUDE "alloc/balloc/z80/asm_balloc_addmem.asm"
+   jp l0_balloc_addmem_callee

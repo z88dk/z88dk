@@ -5,6 +5,8 @@ SECTION code_alloc_balloc
 
 PUBLIC _balloc_firstfit
 
+EXTERN l0_balloc_firstfit_callee
+
 _balloc_firstfit:
 
    pop af
@@ -15,6 +17,4 @@ _balloc_firstfit:
    push hl
    push af
    
-   ld a,c
-
-   INCLUDE "alloc/balloc/z80/asm_balloc_firstfit.asm"
+   jp l0_balloc_firstfit_callee

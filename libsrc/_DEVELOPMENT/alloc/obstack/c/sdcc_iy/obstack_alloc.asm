@@ -5,6 +5,8 @@ SECTION code_alloc_obstack
 
 PUBLIC _obstack_alloc
 
+EXTERN asm_obstack_alloc
+
 _obstack_alloc:
 
    pop af
@@ -15,4 +17,4 @@ _obstack_alloc:
    push hl
    push af
    
-   INCLUDE "alloc/obstack/z80/asm_obstack_alloc.asm"
+   jp asm_obstack_alloc

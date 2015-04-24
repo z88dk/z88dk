@@ -5,6 +5,8 @@ SECTION code_alloc_obstack
 
 PUBLIC _obstack_align_distance
 
+EXTERN asm_obstack_align_distance
+
 _obstack_align_distance:
 
    pop af
@@ -15,4 +17,4 @@ _obstack_align_distance:
    push hl
    push af
    
-   INCLUDE "alloc/obstack/z80/asm_obstack_align_distance.asm"
+   jp asm_obstack_align_distance

@@ -5,6 +5,8 @@ SECTION code_alloc_obstack
 
 PUBLIC _obstack_int_grow
 
+EXTERN asm_obstack_int_grow
+
 _obstack_int_grow:
 
    pop af
@@ -15,4 +17,4 @@ _obstack_int_grow:
    push hl
    push af
    
-   INCLUDE "alloc/obstack/z80/asm_obstack_int_grow.asm"
+   jp asm_obstack_int_grow

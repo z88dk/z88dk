@@ -3,14 +3,16 @@
 
 SECTION code_alloc_balloc
 
-PUBLIC balloc_firstfit_callee
+PUBLIC balloc_firstfit_callee, l0_balloc_firstfit_callee
 
 balloc_firstfit_callee:
 
    pop hl
    pop bc
    ex (sp),hl
-   
+
+l0_balloc_firstfit_callee:
+
    ld a,c
    
    INCLUDE "alloc/balloc/z80/asm_balloc_firstfit.asm"

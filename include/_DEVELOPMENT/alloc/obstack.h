@@ -58,6 +58,46 @@ extern size_t  obstack_room_fastcall(struct obstack *ob) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void                        *obstack_1grow_callee(struct obstack *ob, int c) __z88dk_callee;
+extern void                        *obstack_1grow_fast_callee(struct obstack *ob, int c) __z88dk_callee;
+extern size_t                       obstack_align_distance_callee(struct obstack *ob, size_t alignment) __z88dk_callee;
+extern int                          obstack_align_to_callee(struct obstack *ob, size_t alignment) __z88dk_callee;
+extern void                        *obstack_alloc_callee(struct obstack *ob, size_t size) __z88dk_callee;
+extern void                        *obstack_blank_callee(struct obstack *ob, int size) __z88dk_callee;
+extern void                        *obstack_blank_fast_callee(struct obstack *ob, int size) __z88dk_callee;
+extern void                        *obstack_copy_callee(struct obstack *ob, void *p, size_t size) __z88dk_callee;
+extern void                        *obstack_copy0_callee(struct obstack *ob, void *p, size_t size) __z88dk_callee;
+extern void                        *obstack_free_callee(struct obstack *ob, void *object) __z88dk_callee;
+extern int                          obstack_grow_callee(struct obstack *ob, void *data, size_t size) __z88dk_callee;
+extern int                          obstack_grow0_callee(struct obstack *ob, void *data, size_t size) __z88dk_callee;
+extern void                        *obstack_init_callee(struct obstack *ob, size_t size) __z88dk_callee;
+extern void                        *obstack_int_grow_callee(struct obstack *ob, int data) __z88dk_callee;
+extern void                        *obstack_int_grow_fast_callee(struct obstack *ob, int data) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define obstack_1grow(a,b)          obstack_1grow_callee(a,b)
+#define obstack_1grow_fast(a,b)     obstack_1grow_fast_callee(a,b)
+#define obstack_align_distance(a,b) obstack_align_distance_callee(a,b)
+#define obstack_align_to(a,b)       obstack_align_to_callee(a,b)
+#define obstack_alloc(a,b)          obstack_alloc_callee(a,b)
+#define obstack_blank(a,b)          obstack_blank_callee(a,b)
+#define obstack_blank_fast(a,b)     obstack_blank_fast_callee(a,b)
+#define obstack_copy(a,b,c)         obstack_copy_callee(a,b,c)
+#define obstack_copy0(a,b,c)        obstack_copy0_callee(a,b,c)
+#define obstack_free(a,b)           obstack_free_callee(a,b)
+#define obstack_grow(a,b,c)         obstack_grow_callee(a,b,c)
+#define obstack_grow0(a,b,c)        obstack_grow0_callee(a,b,c)
+#define obstack_init(a,b)           obstack_init_callee(a,b)
+#define obstack_int_grow(a,b)       obstack_int_grow_callee(a,b)
+#define obstack_int_grow_fast(a,b)  obstack_int_grow_fast_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

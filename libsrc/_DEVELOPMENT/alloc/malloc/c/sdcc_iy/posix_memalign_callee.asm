@@ -13,11 +13,10 @@ PUBLIC _posix_memalign_callee
 
 _posix_memalign:
 
-   pop af
+   pop hl
    pop de
    pop bc
-   pop hl
-   push af
+   ex (sp),hl
    
    INCLUDE "alloc/malloc/z80/asm_posix_memalign.asm"
 

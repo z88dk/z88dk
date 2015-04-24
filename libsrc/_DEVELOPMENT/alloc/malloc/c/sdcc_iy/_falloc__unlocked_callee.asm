@@ -7,9 +7,8 @@ PUBLIC __falloc__unlocked_callee
 
 __falloc__unlocked_callee:
 
-   pop af
-   pop bc
    pop hl
-   push af
+   pop bc
+   ex (sp),hl
    
    INCLUDE "alloc/malloc/z80/asm__falloc_unlocked.asm"

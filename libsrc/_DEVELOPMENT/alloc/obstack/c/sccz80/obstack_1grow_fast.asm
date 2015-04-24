@@ -5,7 +5,7 @@ SECTION code_alloc_obstack
 
 PUBLIC obstack_1grow_fast
 
-EXTERN asm_obstack_1grow_fast
+EXTERN l0_obstack_1grow_fast_callee
 
 obstack_1grow_fast:
 
@@ -17,5 +17,4 @@ obstack_1grow_fast:
    push de
    push af
    
-   ld a,e
-   jp asm_obstack_1grow_fast
+   jp l0_obstack_1grow_fast_callee

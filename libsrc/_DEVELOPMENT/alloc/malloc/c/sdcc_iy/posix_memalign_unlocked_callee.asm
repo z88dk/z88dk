@@ -7,10 +7,9 @@ PUBLIC _posix_memalign_unlocked_callee
 
 _posix_memalign_unlocked_callee:
 
-   pop af
+   pop hl
    pop de
    pop bc
-   pop hl
-   push af
+   ex (sp),hl
    
    INCLUDE "alloc/malloc/z80/asm_posix_memalign_unlocked.asm"

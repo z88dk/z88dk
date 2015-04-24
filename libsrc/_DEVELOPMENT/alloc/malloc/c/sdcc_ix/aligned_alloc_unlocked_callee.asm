@@ -7,9 +7,8 @@ PUBLIC _aligned_alloc_unlocked_callee
 
 _aligned_alloc_unlocked_callee:
 
-   pop af
-   pop bc
    pop hl
-   push af
+   pop bc
+   ex (sp),hl
    
    INCLUDE "alloc/malloc/z80/asm_aligned_alloc_unlocked.asm"

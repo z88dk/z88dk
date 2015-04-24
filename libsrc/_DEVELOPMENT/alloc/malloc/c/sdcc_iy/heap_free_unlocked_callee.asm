@@ -7,9 +7,8 @@ PUBLIC _heap_free_unlocked_callee
 
 _heap_free_unlocked_callee:
 
-   pop af
-   pop de
    pop hl
-   push af
+   pop de
+   ex (sp),hl
 
    INCLUDE "alloc/malloc/z80/asm_heap_free_unlocked.asm"

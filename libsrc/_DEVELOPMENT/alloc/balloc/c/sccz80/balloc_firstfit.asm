@@ -5,7 +5,7 @@ SECTION code_alloc_balloc
 
 PUBLIC balloc_firstfit
 
-EXTERN asm_balloc_firstfit
+EXTERN l0_balloc_firstfit_callee
 
 balloc_firstfit:
 
@@ -17,5 +17,4 @@ balloc_firstfit:
    push bc
    push af
    
-   ld a,c
-   jp asm_balloc_firstfit
+   jp l0_balloc_firstfit_callee

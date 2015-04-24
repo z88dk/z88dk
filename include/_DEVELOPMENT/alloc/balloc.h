@@ -30,6 +30,20 @@ extern void    balloc_free_fastcall(void *p) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void                        *balloc_addmem_callee(int q, size_t num, size_t size, void *p) __z88dk_callee;
+extern void                        *balloc_firstfit_callee(int q, int numq) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define balloc_addmem(a,b,c,d)      balloc_addmem_callee(a,b,c,d)
+#define balloc_firstfit(a,b)        balloc_firstfit_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

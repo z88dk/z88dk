@@ -13,11 +13,10 @@ PUBLIC _heap_alloc_fixed_callee
 
 _heap_alloc_fixed_callee:
 
-   pop af
+   pop hl
    pop de
    pop bc
-   pop hl
-   push af
+   ex (sp),hl
    
    INCLUDE "alloc/malloc/z80/asm_heap_alloc_fixed.asm"
 

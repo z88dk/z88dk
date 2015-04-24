@@ -13,10 +13,9 @@ PUBLIC __falloc__callee
 
 __falloc__callee:
 
-   pop af
-   pop bc
    pop hl
-   push af
+   pop bc
+   ex (sp),hl
    
    INCLUDE "alloc/malloc/z80/asm__falloc.asm"
 
