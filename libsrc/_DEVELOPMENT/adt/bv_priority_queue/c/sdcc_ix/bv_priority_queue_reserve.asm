@@ -5,6 +5,8 @@ SECTION code_adt_bv_priority_queue
 
 PUBLIC _bv_priority_queue_reserve
 
+EXTERN asm_bv_priority_queue_reserve
+
 _bv_priority_queue_reserve:
 
    pop af
@@ -15,4 +17,4 @@ _bv_priority_queue_reserve:
    push hl
    push af
 
-   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_reserve.asm"
+   jp asm_bv_priority_queue_reserve

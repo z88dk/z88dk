@@ -66,6 +66,24 @@ extern int                  bv_priority_queue_top_fastcall(bv_priority_queue_t *
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern bv_priority_queue_t                      *bv_priority_queue_init_callee(void *p, size_t capacity, size_t max_size, void *compar) __z88dk_callee;
+extern int                                       bv_priority_queue_push_callee(bv_priority_queue_t *q, int c) __z88dk_callee;
+extern int                                       bv_priority_queue_reserve_callee(bv_priority_queue_t *q, size_t n) __z88dk_callee;
+extern int                                       bv_priority_queue_resize_callee(bv_priority_queue_t *q, size_t n) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define bv_priority_queue_init(a,b,c,d)          bv_priority_queue_init_callee(a,b,c,d)
+#define bv_priority_queue_push(a,b)              bv_priority_queue_push_callee(a,b)
+#define bv_priority_queue_reserve(a,b)           bv_priority_queue_reserve_callee(a,b)
+#define bv_priority_queue_resize(a,b)            bv_priority_queue_resize_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

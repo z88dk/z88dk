@@ -5,6 +5,8 @@ SECTION code_adt_b_vector
 
 PUBLIC _b_vector_reserve
 
+EXTERN asm_b_vector_reserve
+
 _b_vector_reserve:
 
    pop af
@@ -15,4 +17,4 @@ _b_vector_reserve:
    push hl
    push af
    
-   INCLUDE "adt/b_vector/z80/asm_b_vector_reserve.asm"
+   jp asm_b_vector_reserve

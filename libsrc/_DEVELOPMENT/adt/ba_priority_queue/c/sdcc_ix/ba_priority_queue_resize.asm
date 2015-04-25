@@ -5,6 +5,8 @@ SECTION code_adt_ba_priority_queue
 
 PUBLIC _ba_priority_queue_resize
 
+EXTERN l0_ba_priority_queue_resize_callee
+
 _ba_priority_queue_resize:
 
    pop af
@@ -14,11 +16,5 @@ _ba_priority_queue_resize:
    push de
    push hl
    push af
-   
-   push ix
-   call asm_ba_priority_queue_resize
-   pop ix
-   
-   ret
-   
-   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_resize.asm"
+
+   jp l0_ba_priority_queue_resize_callee

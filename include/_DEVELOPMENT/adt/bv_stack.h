@@ -61,6 +61,22 @@ extern int         bv_stack_top_fastcall(bv_stack_t *s) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern bv_stack_t                      *bv_stack_init_callee(void *p, size_t capacity, size_t max_size) __z88dk_callee;
+extern int                              bv_stack_push_callee(bv_stack_t *s, int c) __z88dk_callee;
+extern int                              bv_stack_reserve_callee(bv_stack_t *s, size_t n) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define bv_stack_init(a,b,c)                     bv_stack_init_callee(a,b,c)
+#define bv_stack_push(a,b)                       bv_stack_push_callee(a,b)
+#define bv_stack_reserve(a,b)                    bv_stack_reserve_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

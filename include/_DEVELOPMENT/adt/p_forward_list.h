@@ -58,6 +58,26 @@ extern size_t      p_forward_list_size_fastcall(p_forward_list_t *ls) __z88dk_fa
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void                            *p_forward_list_insert_after_callee(void *ls_item, void *item) __z88dk_callee;
+extern void                            *p_forward_list_prev_callee(p_forward_list_t *ls, void *item) __z88dk_callee;
+extern void                             p_forward_list_push_back_callee(p_forward_list_t *ls, void *item) __z88dk_callee;
+extern void                             p_forward_list_push_front_callee(p_forward_list_t *ls, void *item) __z88dk_callee;
+extern void                            *p_forward_list_remove_callee(p_forward_list_t *ls, void *item) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define p_forward_list_insert_after(a,b)         p_forward_list_insert_after_callee(a,b)
+#define p_forward_list_prev(a,b)                 p_forward_list_prev_callee(a,b)
+#define p_forward_list_push_back(a,b)            p_forward_list_push_back_callee(a,b)
+#define p_forward_list_push_front(a,b)           p_forward_list_push_front_callee(a,b)
+#define p_forward_list_remove(a,b)               p_forward_list_remove_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

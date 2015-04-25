@@ -6,6 +6,8 @@ SECTION code_adt_bv_priority_queue
 
 PUBLIC _bv_priority_queue_init
 
+EXTERN asm_bv_priority_queue_init
+
 _bv_priority_queue_init:
 
    pop af
@@ -14,10 +16,10 @@ _bv_priority_queue_init:
    pop hl
    pop ix
    
-   push ix
+   push hl
    push hl
    push bc
    push de
    push af
 
-   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_init.asm"
+   jp asm_bv_priority_queue_init

@@ -5,6 +5,8 @@ SECTION code_adt_b_vector
 
 PUBLIC _b_vector_append_n
 
+EXTERN asm_b_vector_append_n
+
 _b_vector_append_n:
 
    pop af
@@ -17,4 +19,4 @@ _b_vector_append_n:
    push hl
    push af
    
-   INCLUDE "adt/b_vector/z80/asm_b_vector_append_n.asm"
+   jp asm_b_vector_append_n

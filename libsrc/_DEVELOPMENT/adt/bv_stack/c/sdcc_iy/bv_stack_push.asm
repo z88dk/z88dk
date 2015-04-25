@@ -8,5 +8,3 @@ PUBLIC _bv_stack_push
 EXTERN _b_vector_append
 
 defc _bv_stack_push = _b_vector_append
-
-INCLUDE "adt/bv_stack/z80/asm_bv_stack_push.asm"

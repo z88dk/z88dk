@@ -19,7 +19,7 @@ ba_priority_queue_init:
    push hl
    push de
    push bc
-   push ix
+   push hl
    push af
    
    jp asm_ba_priority_queue_init

@@ -7,12 +7,15 @@ adt/bv_stack/c/sdcc_iy/bv_stack_destroy_fastcall
 adt/bv_stack/c/sdcc_iy/bv_stack_empty
 adt/bv_stack/c/sdcc_iy/bv_stack_empty_fastcall
 adt/bv_stack/c/sdcc_iy/bv_stack_init
+adt/bv_stack/c/sdcc_iy/bv_stack_init_callee
 adt/bv_stack/c/sdcc_iy/bv_stack_max_size
 adt/bv_stack/c/sdcc_iy/bv_stack_max_size_fastcall
 adt/bv_stack/c/sdcc_iy/bv_stack_pop
 adt/bv_stack/c/sdcc_iy/bv_stack_pop_fastcall
 adt/bv_stack/c/sdcc_iy/bv_stack_push
+adt/bv_stack/c/sdcc_iy/bv_stack_push_callee
 adt/bv_stack/c/sdcc_iy/bv_stack_reserve
+adt/bv_stack/c/sdcc_iy/bv_stack_reserve_callee
 adt/bv_stack/c/sdcc_iy/bv_stack_shrink_to_fit
 adt/bv_stack/c/sdcc_iy/bv_stack_shrink_to_fit_fastcall
 adt/bv_stack/c/sdcc_iy/bv_stack_size

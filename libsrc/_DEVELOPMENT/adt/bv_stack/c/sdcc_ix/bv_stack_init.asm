@@ -8,5 +8,3 @@ PUBLIC _bv_stack_init
 EXTERN _b_vector_init
 
 defc _bv_stack_init = _b_vector_init
-
-INCLUDE "adt/bv_stack/z80/asm_bv_stack_init.asm"

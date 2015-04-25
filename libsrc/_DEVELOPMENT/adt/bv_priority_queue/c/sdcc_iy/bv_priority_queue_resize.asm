@@ -8,5 +8,3 @@ PUBLIC _bv_priority_queue_resize
 EXTERN _ba_priority_queue_resize
 
 defc _bv_priority_queue_resize = _ba_priority_queue_resize
-
-INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_resize.asm"
