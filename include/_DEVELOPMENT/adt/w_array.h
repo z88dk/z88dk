@@ -67,6 +67,36 @@ extern size_t      w_array_size_fastcall(w_array_t *a) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern size_t                           w_array_append_callee(w_array_t *a, void *item) __z88dk_callee;
+extern size_t                           w_array_append_n_callee(w_array_t *a, size_t n, void *item) __z88dk_callee;
+extern void                            *w_array_at_callee(w_array_t *a, size_t idx) __z88dk_callee;
+extern size_t                           w_array_erase_callee(w_array_t *a, size_t idx) __z88dk_callee;
+extern size_t                           w_array_erase_range_callee(w_array_t *a, size_t idx_first, size_t idx_last) __z88dk_callee;
+extern w_array_t                       *w_array_init_callee(void *p, void *data, size_t capacity) __z88dk_callee;
+extern size_t                           w_array_insert_callee(w_array_t *a, size_t idx, void *item) __z88dk_callee;
+extern size_t                           w_array_insert_n_callee(w_array_t *a, size_t idx, size_t n, void *item) __z88dk_callee;
+extern size_t                           w_array_push_back_callee(w_array_t *a, void *item) __z88dk_callee;
+extern int                              w_array_resize_callee(w_array_t *a, size_t n) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define w_array_append(a,b)                      w_array_append_callee(a,b)
+#define w_array_append_n(a,b,c)                  w_array_append_n_callee(a,b,c)
+#define w_array_at(a,b)                          w_array_at_callee(a,b)
+#define w_array_erase(a,b)                       w_array_erase_callee(a,b)
+#define w_array_erase_range(a,b,c)               w_array_erase_range_callee(a,b,c)
+#define w_array_init(a,b,c)                      w_array_init_callee(a,b,c)
+#define w_array_insert(a,b,c)                    w_array_insert_callee(a,b,c)
+#define w_array_insert_n(a,b,c,d)                w_array_insert_n_callee(a,b,c,d)
+#define w_array_push_back(a,b)                   w_array_push_back_callee(a,b)
+#define w_array_resize(a,b)                      w_array_resize_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

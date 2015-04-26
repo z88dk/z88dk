@@ -50,6 +50,18 @@ extern size_t      p_queue_size_fastcall(p_queue_t *q) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void                             p_queue_push_callee(p_queue_t *q, void *item) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define p_queue_push(a,b)               p_queue_push_callee(a,b)
+
+#endif 
+
 #else
 
 // SCCZ80

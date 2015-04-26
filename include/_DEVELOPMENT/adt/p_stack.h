@@ -42,6 +42,18 @@ extern void       *p_stack_top_fastcall(p_stack_t *s) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern void                             p_stack_push_callee(p_stack_t *s, void *item) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define p_stack_push(a,b)               p_stack_push_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80

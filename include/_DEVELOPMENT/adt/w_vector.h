@@ -75,6 +75,38 @@ extern size_t      w_vector_size_fastcall(w_vector_t *v) __z88dk_fastcall;
 
 #endif
 
+#ifndef __SDCC_DISABLE_CALLEE
+
+// SDCC CALLEE LINKAGE
+
+extern size_t                           w_vector_append_callee(w_vector_t *v, void *item) __z88dk_callee;
+extern size_t                           w_vector_append_n_callee(w_vector_t *v, size_t n, void *item) __z88dk_callee;
+extern void                             w_vector_at_callee(w_vector_t *v, size_t idx) __z88dk_callee;
+extern size_t                           w_vector_erase_callee(w_vector_t *v, size_t idx) __z88dk_callee;
+extern size_t                           w_vector_erase_range_callee(w_vector_t *v, size_t idx_first, size_t idx_last) __z88dk_callee;
+extern w_vector_t                      *w_vector_init_callee(void *p, size_t capacity, size_t max_size) __z88dk_callee;
+extern size_t                           w_vector_insert_callee(w_vector_t *v, size_t idx, void *item) __z88dk_callee;
+extern size_t                           w_vector_insert_n_callee(w_vector_t *v, size_t idx, size_t n, void *item) __z88dk_callee;
+extern size_t                           w_vector_push_back_callee(w_vector_t *v, void *item) __z88dk_callee;
+extern int                              w_vector_reserve_callee(w_vector_t *v, size_t n) __z88dk_callee;
+extern int                              w_vector_resize_callee(w_vector_t *v, size_t n) __z88dk_callee;
+
+// SDCC MAKE CALLEE LINKAGE THE DEFAULT
+
+#define w_vector_append(a,b)                     w_vector_append_callee(a,b)
+#define w_vector_append_n(a,b,c)                 w_vector_append_n_callee(a,b,c)
+#define w_vector_at(a,b)                         w_vector_at_callee(a,b)
+#define w_vector_erase(a,b)                      w_vector_erase_callee(a,b)
+#define w_vector_erase_range(a,b,c)              w_vector_erase_range_callee(a,b,c)
+#define w_vector_init(a,b,c)                     w_vector_init_callee(a,b,c)
+#define w_vector_insert(a,b,c)                   w_vector_insert_callee(a,b,c)
+#define w_vector_insert_n(a,b,c,d)               w_vector_insert_n_callee(a,b,c,d)
+#define w_vector_push_back(a,b)                  w_vector_push_back_callee(a,b)
+#define w_vector_reserve(a,b)                    w_vector_reserve_callee(a,b)
+#define w_vector_resize(a,b)                     w_vector_resize_callee(a,b)
+
+#endif
+
 #else
 
 // SCCZ80
