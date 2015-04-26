@@ -9,10 +9,13 @@ adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_destroy_fastcall
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_empty
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_empty_fastcall
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_init
+adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_init_callee
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_pop
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_pop_fastcall
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_push
+adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_push_callee
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_resize
+adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_resize_callee
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_size
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_size_fastcall
 adt/wa_priority_queue/c/sdcc_ix/wa_priority_queue_top

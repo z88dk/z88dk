@@ -5,6 +5,8 @@ SECTION code_adt_w_vector
 
 PUBLIC _w_vector_resize
 
+EXTERN asm_w_vector_resize
+
 _w_vector_resize:
 
    pop af
@@ -15,4 +17,4 @@ _w_vector_resize:
    push hl
    push af
    
-   INCLUDE "adt/w_vector/z80/asm_w_vector_resize.asm"
+   jp asm_w_vector_resize

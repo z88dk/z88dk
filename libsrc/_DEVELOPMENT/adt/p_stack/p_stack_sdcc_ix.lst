@@ -7,6 +7,7 @@ adt/p_stack/c/sdcc_ix/p_stack_init_fastcall
 adt/p_stack/c/sdcc_ix/p_stack_pop
 adt/p_stack/c/sdcc_ix/p_stack_pop_fastcall
 adt/p_stack/c/sdcc_ix/p_stack_push
+adt/p_stack/c/sdcc_ix/p_stack_push_callee
 adt/p_stack/c/sdcc_ix/p_stack_size
 adt/p_stack/c/sdcc_ix/p_stack_size_fastcall
 adt/p_stack/c/sdcc_ix/p_stack_top

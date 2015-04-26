@@ -9,13 +9,17 @@ adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_destroy_fastcall
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_empty
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_empty_fastcall
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_init
+adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_init_callee
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_max_size
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_max_size_fastcall
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_pop
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_pop_fastcall
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_push
+adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_push_callee
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_reserve
+adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_reserve_callee
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_resize
+adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_resize_callee
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_shrink_to_fit
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_shrink_to_fit_fastcall
 adt/wv_priority_queue/c/sdcc_iy/wv_priority_queue_size

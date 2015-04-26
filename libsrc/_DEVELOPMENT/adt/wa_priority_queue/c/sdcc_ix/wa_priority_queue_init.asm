@@ -6,6 +6,8 @@ SECTION code_adt_wa_priority_queue
 
 PUBLIC _wa_priority_queue_init
 
+EXTERN l0_wa_priority_queue_init_callee
+
 _wa_priority_queue_init:
 
    pop af
@@ -16,21 +18,9 @@ _wa_priority_queue_init:
    pop bc
    
    push bc
-   exx
    push bc
    push de
    push hl
    push af
-   
-   exx
-   push bc
-   exx
-   
-   ex (sp),ix
-   
-   call asm_wa_priority_queue_init
-   
-   pop ix
-   ret
-   
-   INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_init.asm"
+
+   jp l0_wa_priority_queue_init_callee

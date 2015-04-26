@@ -8,5 +8,3 @@ PUBLIC _wv_stack_init
 EXTERN _w_vector_init
 
 defc _wv_stack_init = _w_vector_init
-
-INCLUDE "adt/wv_stack/z80/asm_wv_stack_init.asm"

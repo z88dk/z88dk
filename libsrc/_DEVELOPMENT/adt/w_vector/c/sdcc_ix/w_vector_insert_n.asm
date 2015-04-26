@@ -5,6 +5,8 @@ SECTION code_adt_w_vector
 
 PUBLIC _w_vector_insert_n
 
+EXTERN l0_w_vector_insert_n_callee
+
 _w_vector_insert_n:
 
    exx
@@ -19,8 +21,5 @@ _w_vector_insert_n:
    push de
    push bc
    push hl
-   exx
-   push bc
-   exx
-   
-   INCLUDE "adt/w_vector/z80/asm_w_vector_insert_n.asm"
+
+   jp l0_w_vector_insert_n_callee

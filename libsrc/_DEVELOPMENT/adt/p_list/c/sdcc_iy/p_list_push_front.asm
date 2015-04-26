@@ -5,6 +5,8 @@ SECTION code_adt_p_list
 
 PUBLIC _p_list_push_front
 
+EXTERN asm_p_list_push_front
+
 _p_list_push_front:
 
    pop af
@@ -15,4 +17,4 @@ _p_list_push_front:
    push hl
    push af
 
-   INCLUDE "adt/p_list/z80/asm_p_list_push_front.asm"
+   jp asm_p_list_push_front

@@ -8,5 +8,3 @@ PUBLIC p_forward_list_alt_prev
 EXTERN p_forward_list_prev
 
 defc p_forward_list_alt_prev = p_forward_list_prev
-
-INCLUDE "adt/p_forward_list_alt/z80/asm_p_forward_list_alt_prev.asm"

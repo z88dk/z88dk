@@ -5,6 +5,8 @@ SECTION code_adt_w_vector
 
 PUBLIC _w_vector_insert_n
 
+EXTERN asm_w_vector_insert_n
+
 _w_vector_insert_n:
 
    pop ix
@@ -19,4 +21,4 @@ _w_vector_insert_n:
    push hl
    push ix
    
-   INCLUDE "adt/w_vector/z80/asm_w_vector_insert_n.asm"
+   jp asm_w_vector_insert_n

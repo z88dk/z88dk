@@ -8,5 +8,3 @@ PUBLIC _w_array_push_back
 EXTERN _w_array_append
 
 defc _w_array_push_back = _w_array_append
-
-INCLUDE "adt/w_array/z80/asm_w_array_push_back.asm"

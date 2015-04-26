@@ -5,6 +5,8 @@ SECTION code_adt_p_forward_list_alt
 
 PUBLIC _p_forward_list_alt_remove
 
+EXTERN asm_p_forward_list_alt_remove
+
 _p_forward_list_alt_remove:
 
    pop af
@@ -15,4 +17,4 @@ _p_forward_list_alt_remove:
    push hl
    push af
 
-   INCLUDE "adt/p_forward_list_alt/z80/asm_p_forward_list_alt_remove.asm"
+   jp asm_p_forward_list_alt_remove

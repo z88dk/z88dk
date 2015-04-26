@@ -5,6 +5,8 @@ SECTION code_adt_w_array
 
 PUBLIC _w_array_insert_n
 
+EXTERN l0_w_array_insert_n_callee
+
 _w_array_insert_n:
 
    exx
@@ -19,8 +21,5 @@ _w_array_insert_n:
    push de
    push bc
    push hl
-   exx
-   push bc
-   exx
-   
-   INCLUDE "adt/w_array/z80/asm_w_array_insert_n.asm"
+
+   jp l0_w_array_insert_n_callee

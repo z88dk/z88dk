@@ -11,5 +11,6 @@ adt/p_queue/c/sdcc_ix/p_queue_init_fastcall
 adt/p_queue/c/sdcc_ix/p_queue_pop
 adt/p_queue/c/sdcc_ix/p_queue_pop_fastcall
 adt/p_queue/c/sdcc_ix/p_queue_push
+adt/p_queue/c/sdcc_ix/p_queue_push_callee
 adt/p_queue/c/sdcc_ix/p_queue_size
 adt/p_queue/c/sdcc_ix/p_queue_size_fastcall

@@ -5,6 +5,8 @@ SECTION code_adt_w_array
 
 PUBLIC _w_array_erase_range
 
+EXTERN asm_w_array_erase_range
+
 _w_array_erase_range:
 
    pop af
@@ -17,4 +19,4 @@ _w_array_erase_range:
    push de
    push af
    
-   INCLUDE "adt/w_array/z80/asm_w_array_erase_range.asm"
+   jp asm_w_array_erase_range

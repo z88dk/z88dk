@@ -5,6 +5,8 @@ SECTION code_adt_w_array
 
 PUBLIC _w_array_append_n
 
+EXTERN asm_w_array_append_n
+
 _w_array_append_n:
 
    pop af
@@ -17,4 +19,4 @@ _w_array_append_n:
    push hl
    push af
    
-   INCLUDE "adt/w_array/z80/asm_w_array_append_n.asm"
+   jp asm_w_array_append_n

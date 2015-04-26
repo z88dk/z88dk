@@ -5,6 +5,8 @@ SECTION code_adt_p_list
 
 PUBLIC _p_list_remove
 
+EXTERN asm_p_list_remove
+
 _p_list_remove:
 
    pop af
@@ -15,4 +17,4 @@ _p_list_remove:
    push bc
    push af
    
-   INCLUDE "adt/p_list/z80/asm_p_list_remove.asm"
+   jp asm_p_list_remove
