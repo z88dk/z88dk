@@ -4,6 +4,7 @@
 ; ===============================================================
 ;
 ; Generates an 8-bit random number from a 32-bit seed.
+; Marsaglia xor generator.
 ; http://www.worldofspectrum.org/forums/showpost.php?p=583693&postcount=3
 ;
 ; ===============================================================
