@@ -44,6 +44,8 @@ stdlib/c/sdcc_iy/_ldiv_
 stdlib/c/sdcc_iy/_ldiv__callee
 stdlib/c/sdcc_iy/_quicksort_
 stdlib/c/sdcc_iy/_quicksort__callee
+stdlib/c/sdcc_iy/_random_uniform_cmwc_8_
+stdlib/c/sdcc_iy/_random_uniform_cmwc_8__fastcall
 stdlib/c/sdcc_iy/_random_uniform_xor_8_
 stdlib/c/sdcc_iy/_random_uniform_xor_8__fastcall
 stdlib/c/sdcc_iy/_random_uniform_xor_32_
