@@ -1,16 +1,14 @@
 
 ; =============================================================
 ; Jun 2012, May 2015 Patrik Rak
-;
+; =============================================================
 ; modified by aralbrec
 ; * removed self-modifying code
 ; * seed passed in as parameter
 ; =============================================================
-; 
 ; Generates an 8-bit random number from an 75-bit seed
 ; CMWC generator passes all diehard tests.
 ; http://www.worldofspectrum.org/forums/discussion/39632/cmwc-random-number-generator-for-z80
-; 
 ; =============================================================
 
 SECTION code_stdlib
@@ -26,55 +24,36 @@ asm_random_uniform_cmwc_8:
    ;
    ; uses  : af, bc, de, hl
 
-   ld a,(hl)
-   and 7                       ; a = rnd_i & 7
+   ld   a,(hl)                 ; i = ( i & 7 ) + 1
+   and  7
+   inc  a
+   ld   (hl),a
 
-   inc (hl)                    ; rnd_i++
-   inc hl                      ; hl = & rnd_cy
+   inc  hl                     ; hl = &cy
 
-   inc a
-   ld b,h
-   add a,l
-   ld c,a
-   jr nc, no_inc
-   inc b                       ; bc = & q[i]
+   ld   b,h                    ; bc = &q[i]
+   add  a,l
+   ld   c,a
+   jr   nc,ASMPC+3
+   inc  b
 
-no_inc:                        
+   ld   a,(bc)                 ; y = q[i]
+   ld   d,a
+   ld   e,a
+   ld   a,(hl)                 ; da = 256 * y + cy
 
-   ld a,(bc)                   ; a = q[i] = y
-   ld e,a
-   ld d,a
-   ld a,(hl)                   ; a = rnd_cy
-   
-   ; bc = & q[i]
-   ; hl = & rnd_cy
-   ; da = 256 * y + c
-   ;  e = y
+   sub  e                      ; da = 255 * y + cy
+   jr   nc,ASMPC+3
+   dec  d
+   sub  e                      ; da = 254 * y + cy
+   jr   nc,ASMPC+3
+   dec  d
+   sub  e                      ; da = 253 * y + cy
+   jr   nc,ASMPC+3
+   dec  d
 
-   sub e
-   jr nc, skip0
-   dec d                       ; da = 255 * y + c
-
-skip0:
-
-   sub e
-   jr nc, skip1
-   dec d                       ; da = 254 * y + c
-
-skip1:
-
-   sub e
-   jr nc, skip2
-   dec d                       ; da = 253 * y + c = t
-
-skip2:
-
-   ; bc = & q[i]
-   ; hl = & rnd_cy
-   ; da = t = 253 * y + c
-
-   ld (hl),d                   ; c = t >> 8
+   ld   (hl),d                 ; cy = da >> 8, x = da & 255
    cpl                         ; x = (b-1) - x = -x - 1 = ~x + 1 - 1 = ~x
+   ld   (bc),a                 ; q[i] = x
 
-   ld (bc),a                   ; q[i] = x
    ret
