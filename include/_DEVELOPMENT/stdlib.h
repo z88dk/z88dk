@@ -55,6 +55,7 @@ extern void      _ldiv_(ldiv_t *ld, long numer, long denom);
 extern void      _insertion_sort_(void *base, size_t nmemb, size_t size, void *compar);
 extern void      _quicksort_(void *base, size_t nmemb, size_t size, void *compar);
 extern void      _shellsort_(void *base, size_t nmemb, size_t size, void *compar);
+extern uint16_t  _random_uniform_cmwc_8_(void *seed);
 extern uint32_t  _random_uniform_xor_32_(uint32_t seed);
 extern uint16_t  _random_uniform_xor_8_(uint32_t seed);
 extern int       _strtoi_(char *nptr, char **endptr, int base);
@@ -100,6 +101,7 @@ extern void   *realloc_unlocked(void *p, size_t size);
 
 // SDCC FASTCALL LINKAGE
 
+extern uint16_t  _random_uniform_cmwc_8__fastcall(void *seed) __z88dk_fastcall;
 extern uint32_t  _random_uniform_xor_32__fastcall(uint32_t seed) __z88dk_fastcall;
 extern uint16_t  _random_uniform_xor_8__fastcall(uint32_t seed) __z88dk_fastcall;
 extern int       abs_fastcall(int j) __z88dk_fastcall;
@@ -125,6 +127,7 @@ extern void   *malloc_unlocked_fastcall(size_t size) __z88dk_fastcall;
 
 // SDCC MAKE FASTCALL LINKAGE THE DEFAULT
 
+#define _random_uniform_cmwc_8_(a)     _random_uniform_cmwc_8__fastcall(a)
 #define _random_uniform_xor_32_(a)     _random_uniform_xor_32__fastcall(a)
 #define _random_uniform_xor_8_(a)      _random_uniform_xor_8__fastcall(a)
 #define abs(a)                         abs_fastcall(a)
@@ -223,6 +226,7 @@ extern void      __LIB__               _ldiv_(ldiv_t *ld, long numer, long denom
 extern void      __LIB__               _insertion_sort_(void *base, size_t nmemb, size_t size, void *compar);
 extern void      __LIB__               _quicksort_(void *base, size_t nmemb, size_t size, void *compar);
 extern void      __LIB__               _shellsort_(void *base, size_t nmemb, size_t size, void *compar);
+extern uint16_t  __LIB__ __FASTCALL__  _random_uniform_cmwc_8_(void *seed);
 extern uint32_t  __LIB__ __FASTCALL__  _random_uniform_xor_32_(uint32_t seed);
 extern uint16_t  __LIB__ __FASTCALL__  _random_uniform_xor_8_(uint32_t seed);
 extern int       __LIB__               _strtoi_(char *nptr, char **endptr, int base);
