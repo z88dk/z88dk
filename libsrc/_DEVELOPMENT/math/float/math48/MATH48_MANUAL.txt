@@ -1,0 +1,2738 @@
+Translated by Thorleif Bundgaard <thorleif@fam-bundgaard.dk>
+OBS: (I dont know the translation of the Danish "Mantisse" !!)
+[It's "mantissa"]
+
+There seem to be someone wanting floating point out there, so let me tell a short story.
+Once upon a time - well actually it was in the old days, you know, before the days of IBM-PC, Microsoft and Borland.
+In those days, one wery popular computer, among a lot of other nice stuff, was the NASCOM. a Z80 based machine, I and my collegue build one of those for ourself, and eventually ended up, adding a homebuild floppy disk drive.
+- you could buy them but it was more fun doing it yourself. - Actually we also had to write the operating system ourself
+- well back to the issue -
+At that time I got into contact with a guy 'Anders Hejlsberg' later to be one of the founders of BORLAND.
+He had made the first real compiler for the NASCOM, called 'Blue Label Pascal'. In 1984 Anders gave me the source for the floating point routines used in this Pascal.
+The special thing about this is that it keeps all its computations on the stack, so you dont have to set aside some RAM areas.
+I also have a printed description that Anders made (In Danish) If there is a real need for it, I will be glad to translate it to English (But only if someone will use it)
+Most is just CALL descriptions, so I guess that anyone speaking English or German will understand our language well enough. So just ask, and I will send a copy by mail (it's 15 pages)
+
+http://www.fam-bundgaard.dk/DOWNLOAD/DOWNLOAD.HTM
+
+
+   ------------------------------------------------------------
+                  Floating Point Package Math48
+         Version 1.1 Revision 1 by Anders Hejlsberg 1718 Bytes
+   ============================================================
+
+     48 bit floating point mathematicspackage for Z-80 based microcomputers
+     Copyright (C) 1980 Blue Label Software (Later known as Borland)
+
+    Introduktion:
+   ============================================================
+     Math48 is a floating numbers mathematic package for Z-80 based
+     microcomputers. The program which occupy only 2.5 KByte, converts
+     6 of the Z-80 processors 16-bit registers to two floating numbers
+     accumulators, with 40 bits mantisse and 8 bits exponent. This
+     architecture makes it possible to perform very fast floating
+     number calculations with app. 11 significant digits.
+
+     Math48 contain 25 subroutines with these functions:
+
+       Addition, Subtraktion, Multiplikation, and Division
+       Modulus and Exponentiation
+       Square rooth computation
+       Trigonometric and inverse trigonometric functions
+       Log and Exponentiation functions
+       Whole numbers and fractional calculations
+       Convertion to and from 16-bits fixed number
+       convertion from tekststreng to floating point
+       Formatted printout in fixed figitpoint or exponential notation.
+
+     Math48 require no other workspace than the system stak,
+     This will make recursive programmering possible, at the same time as
+     it eases the programming, because a work space assignment to fixed
+     addresses is not needed.
+
+    Floating number format.
+   ============================================================
+
+     A floating number is made by the three 16-bit registers BC, DE and HL
+     (collectively called AC) or the corresponding alternative registers
+     BC', DE' og HL' (collectively called AC').
+
+     The five 8-bit registers B,C,D,E and H (Collectively called BCDEH) represent
+     in the mentioned succession the number mantisse in binary representation.
+     The binary decimal point is placed immediately in front of the B register.
+     In this way, the bit 7 of B tell the number of halves (2^-1) in the number,
+     bit 6 the number of quarters (2^-2) etc.
+     The value of the mantisse may also be aprehended as the binary integer
+     BCDEH divided by 2^40.
+
+     The L register contain the number exponent, that is the number 2 must be
+     raised to, to give the factor that the Mantisse shall be multiplied by.
+     The absolute value of the L register is the exponent plus
+     128 (80H). If for example L has the value 83H the exponent will be 3.
+     If L has the value 7DH the exponent is -3.
+     If L is zero it tells that the whole number is zero. In this way the
+     exponent may take any integer value between -127 (01H) and 127 (FFH).
+
+     Of this it is seen that the number in AC shall be comprehended in the
+     following way.
+
+         AC=(BCDEH/2^40)*2^(L-128)
+
+     Where BCDEH is a whole binary number.
+
+     As the exponent is the power that 2 shall be raised to, then it is given,
+     that the value of AC is doubled if one is added to the exponent, and
+     halved if one is subtracted from the exponent.
+     Likewise it is given that the number in BCDEH is doubled if it is shifted
+     one bit to the left and halved if it is shifted one bit to the right.
+     One may therefore, theoretically speaking, shift BCDEH to right or
+     left an arbitrary number of bits, as long as this number is added or
+     subtracted from the exponent.
+
+     The above stated is exploited in every calculation to normalize
+     the number in AC:
+     The mantisse (BCDEH) is repeatedly shifted one bit left untill the
+     most significant bit is set (bit 7 in B). Hereafter the number of shifts are
+     subtracted from the exponent.
+
+     This normalizing is done for two reasons: firstly is is
+     securing that the number has the maximum precision, as it
+     leaves the most significant bits in the mantisse.
+     Secondly it releases the most significant bit of the mantisse,
+     as this bit will always be set in a normalized number. The most
+     significant bit is in stead used as a sign indicator:
+     If it is set then the number is negative. If it is zero then the number
+     is positive. The absolute value of a number may thus be calculated
+     by simply resetting the bit 7 in the B register.
+
+     The construction of a floating number is compiled to:
+
+         Reg. Bit    Meaning
+
+          B    7     Sign. 0=Positive. 1=Negative.
+          B   6-0    Mantisse bit   38-32. Bit 39 always set.
+          C   7-0    Mantisse bit   31-24.
+          D   7-0    Mantisse bit   23-16.
+          E   7-0    hantisse bit   15-8.
+          H   7-0    hantisse bit   7-0.
+          L   7-0    L=0: the number is Zero.
+                     L>0: Exponent+128 (80H).
+
+     If a floating point number is zero (ie. if the L register is zero)
+     then it does'nt matter what is in the mantisse as long as the sign
+     bit is zero.
+
+     Examples of floating point numbers (BCDEH and L in hexnotation):
+
+      BCDEH       L   Value             Remarks
+
+      0000000000  00  0                 L er nul.
+      0000000000  81  1                 2^-1*2^1.
+      0000000000  82  2                 2^-1*2^2.
+      8000000000  82  -2                Negative as bit 7 in B is set.
+      7000000000  84  15                (2^-1+2^-2+2^-3+2^-4)*2^4.
+      4800000000  87  100               (2^-1+2^-2+2^-5)*2^7.
+      4CCCCCCCCD  7D  0.1               Not final
+      0000000000  01  2.938735877E-39   Smallest possible number.
+      7FFFFFFFFF  FF  1.701411835E+38   Largest possible number.
+     ===================================================================
+
+     Notice that the number 0.1 is NOT final. this proves, that a number
+     having a final number of digits in one number system (here the decimal system)
+     not necessarily has a finite number of digits in another
+     (here the binary number system)
+
+     The following method may be used to convert numbers from the decimal system
+     to floating point number format (in hex notation):
+
+     1)   Make the number positive. Take the binary logarithm of the number
+          (log2(x)=ln(x)/ln(2)), and round to the nearest integer
+          that is larger than the result. This is the exponent.
+
+     2)   Divide the number by 2 raised to the exponent. The number now
+          lies in the interval 1>X>=0.5, which means thet the number is
+          normalized
+
+     3)   Multiply by 16. The integer part of the result
+          (minus 8 if the number we convert was positive) is the
+          first hexdigit in the mantisse. that is. MSD in B register.
+
+     4)   Subtract the integer from the number, so that it now lies
+          in the interval 1>X>=0. Again multiply by 16. The integer part
+          of the result is the second hexdigit in the mantisse,
+          that is LSD in B register.
+
+          continue in this manner until the remaining 8 hex digits are
+          computed. if the 11.th. hex digit is larger than 7 the number
+          should be rounded by adding 1 to BCDEH.
+
+    Math48 SUBRUTINES
+   ============================================================
+     In the following we use these abbreviations:
+
+          AC   The floating number accumulator made by the 3
+               16-bit registers BC, DE and HL.
+          AC'   The floating number accumulator made by the 3
+               16-bit  alternative registers BC', DE' and HL'.
+          CF   Carry flag in the statusregister F.
+          ZF   Zero flag in the statusregister F.
+
+     By call of a MATH49 subroutine the following registers
+     are changed: AC, AF and AF'. The registers AC', IX and IY do
+     not change value.
+
+     In the description of each single subroutine, the following
+     data is given:
+
+     NAME:        Name of the Subroutine.
+     FUNCTION:    The function performed by the subroutinen.
+     OFFSET:      The hexnumber to be added to Math48 startaddress
+                  to get the subroutine startaddress.
+     INPUT:       If this field is shown it gives the parameters
+                  necessary for the subroutinen, except for AC
+                  and possibly AC'.
+     OUTPUT:      If this field is shown it gives the parameters
+                  returned by the subroutine, except for AC.
+     STAK:        The maximum number of bytes used on the stack
+                  except the 2 bytes used in the call.
+     EXAMPLE:     Possible number examples.
+
+     If a calculation gives an overflow (the absolute value of
+     AC would exceed 1.701411835E+38) then CF is set to 1. By
+     overflow the number in AC is undefined.
+     If a calculation gives an underflow (the absolute value of
+     AC would be less than 2.938735877E-39) then AC is set to 0.
+
+
+     FUNCTIONS WITH TWO ARGUMENTS
+   ============================================================
+
+     Addition
+     --------
+
+     NAME:      FPADD
+     FUNCTION:  AC=AC+AC'. The number in AC' is added to the
+                number in AC and the result is placed in AC.
+     OFFSET:    00H
+     OUTPUT:    CF=0: OK.
+                CF=1: Overflow.
+     STACK:     10 bytes.
+
+
+     Subtraktion
+     ------------
+
+     NAME:      FPSUB
+     FUNCTION:  AC=AC-AC'. The number in AC' is subtracted from
+                the number in AC and the result is placed in AC.
+     OFFSET:    03H
+     OUTPUT:    CF=0: OK.
+                CF=1: Overflow.
+     STACK:     12 bytes.
+
+
+     Multiplication
+     --------------
+
+     NAME:      FPMUL
+     FUNCTION:  AC=AC*AC'. The number in AC is multiplied by
+                the number in AC' and the result is placed in AC.
+     OFFSET:    06H
+     OUTPUT:    CF=0: OK.
+                CF=1: Overflow.
+     STACK:     16 bytes.
+
+
+     Division
+     --------
+
+     NAME:      FPDIV
+     FUNCTION:  AC=AC/AC'. The number in AC is divided by the
+                number in AC' and the result is placed in AC.
+     OFFSET:    09H
+     OUTPUT:    CF=0: OK.
+                CF=1: Overflow or AC' equal to 0.
+     STACK:     16 bytes.
+
+
+     Modulus
+     -------
+
+     NAME:      MOD
+     FUNCTION:  AC=AC MOD AC' or AC=FRAC(AC/AC')*AC'. AC is set
+                equal to the remainder of the division of AC by AC'.
+                The result has the same sign as AC.
+     OFFSET:    0CH
+     OUTPUT:    CF=0: OK.
+                CF=1: Division AC/AC' gives overflow, or
+                      AC' is 0.
+     STACK:     22 bytes.
+     Exponentiation
+     ----------------
+
+     NAME:      PWR
+     FUNKTZON:  AC=AC^AC' or AC=EXP(AC'*LN(AC)). AC is set equal
+                to AC raised to the exponent given in AC'.
+     OFFSET:    0FH
+     OUTPUT:    CF=0: OK.
+                CF=1:  Overflow.
+     STACK:     12 bytes.
+
+
+     Comparison
+     -------------
+
+     NAME:      CMP
+     FUNCTION:  Compare AC to AC'.
+     OFFSET:    12H
+     OUTPUT:    ZF=1:      AC-AC'.
+                ZF=0,CF=0: AC>AC'.
+                ZF=0,CF=1: AC<AC'.
+     STACK:     2 bytes
+
+
+
+
+    FUNCTIONS WITH ONE ARGUMENT
+   ============================================================
+
+     Square Root
+     -----------
+
+     NAME:      SQR
+     FUNCTION:  AC=SQR(AC). AC is set equal to the square root
+                of AC.
+     OFFSET:    15H
+     OUTPUT:    CF=0: OK.
+                CF=1: AC<0.
+     STACK:     31 bytes.
+
+
+     Natural logaritm
+     ----------------
+
+     NAME:      LN
+     FUNCTION:  AC=LN(AC). AC is set equal to the natural
+                logarithm of AC.
+     OFFSET:    18H
+     OUTPUT:    CF=0: OK.
+                CF=1: AC<=0.
+     STACK:     10 bytes.
+
+
+     Exponentiation
+     --------------
+
+     NAME:      EXP
+     FUNCTION:  AC=EXP(AC). AC is set equal to e raised to the
+                exponent given in AC, where e is the base number
+                for the natural logarithm.
+     OFFSET:    1BH
+     OUTPUT:    CF=0: OK.
+                CF=1: Overflow.
+     STACK:     40 bytes.
+
+
+     Ten's logarithm
+     ---------------
+
+     NAME:      LOG
+     FUNCTION:  AC=LOC(AC) or AC=LN(AC)/LN(10). AC is set equal
+                to the ten's logarithm of AC.
+     OFFSET:    1EH
+     OUTPUT:    CF=0: OK.
+                CF=1: AC<=0.
+     STACK:     42 bytes.
+
+
+     Sine
+     ----
+
+     NAME:      SIN
+     FUNCTION:  AC=SIN(AC). AC is set equal to sine of AC. If the
+                absolute value of AC is larger than 2*PI then AC is
+                set equal to AC MOD 2*PI before calculating the sine.
+     OFFSET:    21H
+     STACK:     10 bytes.
+
+     Cosine
+     -------
+
+     NAME:      COS
+     FUNCTION:  AC=COS(AC) or AC=SIN(PI/2-AC). AC is set equal to
+                the cosine of AC.
+     OFFSET:    24H
+     STACK:     10 bytes.
+
+
+     Tangent
+     -------
+
+     NAME:      TAN
+     FUNCTION:  AC=TAN(AC) eller AC=SIN(AC)/COS(AC). AC is set equal
+                to the tangent of AC.
+     OFFSET:    27H
+     OUTPUT:    CF=0: OK.
+                CF=1: Overflow of the division SIN(AC)/COS(AC), ie.
+                      AC has a value given by AC=PI/2+n*PI, where
+                      n is a whole number.
+     STACK:     12 bytes.
+
+
+     Arc tangent
+     -----------
+
+     NAME:      ATN
+     FUNCTION:  AC=ATN(AC). AC is set equal to the arc tangent of AC.
+                The returned values lies in the interval
+                PI/2 > ATN(AC) > -PI/2.
+     OFFSET:    2AH
+     STACK:     42 bytes.
+     EXAMPLE:   ATN( 1 )=PI/4
+                ATN(-1 )=-PI/4
+
+
+     Set AC equal to PI
+     ------------------
+
+     NAME:      ACPI
+     FUNCTION:  AC=PI. AC is set equal to 3.14159265359.
+     OFFSET:    2DH
+     STACK:     0 bytes.
+
+
+     Integer
+     -------
+
+     NAME:      INT
+     FUNCTION:  AC>=0: AC is set equal to the nearest integer that is
+                       less than or equal to the number in AC.
+                AC<0:  AC is set equal to the nearest integer that is
+                       larger than or equal to the number in AC.
+     OFFSET:    30H
+     STACK:     8 bytes.
+     EXAMPLE:   INT(3.7)=3
+                INT(-3.7)=-3
+
+     Fractional part
+     ----------------
+
+     NAME:      FRAC
+     FUNCTION:  AC=FRAC(AC) or AC=AC-INT(AC). AC is set equal to
+                the decimal part of AC with the same sign as AC.
+     OFFSET:    33H
+     STACK:     20 bytes.
+     EXAMPLE:   FRAC(3.7)=0.7
+                FRAC(-3.7)=-0.7
+
+
+     Set AC' equal to AC
+     -------------------
+
+     NAME:      EQUAL
+     FUNCTION:  AC'=AC. AC' is set equal to the number in AC.
+     OFFSET:    36H
+     STACK:     6 bytes.
+
+
+     Multiply AC by 10
+     -----------------
+
+     NAME:      MUL10
+     FUNCTION:  AC=ABS(AC)*10. AC is set equal to the absolute value
+                of AC multiplied by 10.
+     OFFSET:    39H
+     OUTPUT:    CF=0: OK.
+                CF=1: Overflow.
+     STACK:     6 bytes.
+
+
+     Convert floating point number to a 16-bit integer
+     -------------------------------------------------
+
+     NAME:      FIX.
+     FUNCTION:  HL=FIX(AC). convert the integer part of the floating
+                number in AC to a 16-bit 2's complement integer, and
+                save the result in the HL register.
+     OFFSET:    3CH
+     OUTPUT:    CF=0: OK.
+                CF=1: ABS(INT(AC)) > 32767
+     STACK:     2 bytes.
+     EXAMPLE:   FIX(1.5)=    1=  0001H
+                FIX(-1.5)=  -1=  FFFFH
+                FIX(0.5)=    0=  0000H
+
+
+     Convert 16-bit integer to a floating point number
+     -------------------------------------------------
+
+
+     NAME:      FLOAT
+     FUNCTION:  AC=FLOAT(HL). Convert the 16-bit 2's complement
+                integer in HL to floating point number format
+                and save the result in AC.
+     OFFSET:    3FH
+     STACK:     2 bytes.
+     EXAMPLE:   FLOAT(0001H)=1
+                FLOAT (FFFFH)=-1
+
+    INPUT/OUTPUT ROUTINES
+   ============================================================
+
+     Convert Floating point number to a textstring
+     ---------------------------------------------
+
+     NAME:      FSTRS
+     FUNCTION:  Convert the number in AC to a formatted textstring,
+                and save it in the buffer pointed at by IX.
+     OFFSET:    42H
+     STACK:     15 bytes.
+     INPUT:     FSTRS is called in the following way:
+
+                       CALL FSTRS
+                       DB   FLAGS
+                       DB   FIELDS  <<changed so IX points at end 00 byte >>
+
+                The textstring format is determined by the two bytes
+                following immediately after the call (here called FLAGS
+                and FIELDS). the format can be one of two possibilities.
+
+                     saaaaa.bbbbb       Fixed pint notation
+                     sa.bbbbbEtxx       Exponential notation
+
+                S    Sign.
+                aaa  Integer part (by exponential notation this part
+                     only has one digit).
+                bbb  Decimal part.
+                E    Indicates exponential notation.
+                t    the exponent sign (always "+" or "-").
+                xx   Two digit exponent.
+
+                The two following bytes has the following meaning:
+
+                FLAGS:   This byte determins the format type
+
+                Bit 0     Printing type
+                           0 - Fixed point notation
+                           1 - Exponential notation
+                Bit2-1    Sign format
+                           00 - No sign
+                           01 - AC>=0: No sign
+                                AC<0:  "-"
+                           10 - AC>=0: " "
+                                AC<0:  "-"
+                           11 - AC>=0: "+"
+                                AC<0:  "-"
+                Bit  3    Decimal part format
+                           0 - only significant digits
+                           1 - Write all digits
+                Bit  4    Integer part format
+                           0 - Only significant digits
+                           1 - Blanks before significant digits
+
+                FIELDS:   This byte contain the length of the integer
+                          and decimal fields.
+
+                Bit 3-0   Decimal field length (0-15). If the length
+                          is zero, no decimal point is written.
+                Bit 7-1   Integer field length (1-15). A length of zero
+                          will always result in an error, if fixed point
+                          notation is selected. If exponential notation
+                          is selected then the content of these 4 bits
+                          are irrelevant as only 1 digit is printed.
+             The user should make sure that the text buffer the IX
+             register points at, at least has the length of DF+HF+2 for
+             fixed point notation, and DF+8 for exponential notation,
+             where DF is the decimal field length and HF is the integer
+             field length.
+
+     OUTPUT: CF=0: The textbuffer contain the formatted number
+                   terminated by a byte with the value zero.
+             CF=1: The number cannot be converted in the specified
+                   format. the textbuffer is untouched.
+
+     EXAMPLE: 
+             In the following examples FLAGS is given in binary
+             notation, and FIELDS in hexnotation:
+
+             NUMBER    FLACS  FIELDS  TEXSTSTRENG
+
+             123.456   00010    FF    '123.456',00H
+             -78       00010    FF    '-78',00H
+             123.456   00100    FF    ' 123.456',00H
+             123.456   00110    FF    '+123.456',00H
+             123.456   00010    F2    '123.46',00H
+             0.5       00010    F2    '0.5',00H
+             -78       00010    F2    '-78',00H
+             123.456   01010    F2    '123.456',00H
+             0.5       01010    F2    '0.50',00H
+             -78       01010    F2    '-78.00',00H
+             123.456   10010    5F    '  123.456',00H
+             0.5       10010    5F    '    0.5',00H
+             -78       10010    5F    '  -78',00H
+             123.456   11010    52    '  123.46',00H
+             0.5       11010    52    '    0.50',00H
+             -78       11010    52    '  -78.00',00H
+             0         11010    52    '    0.00',00H
+             123.456   00101    0F    ' 1.23456E+02',00H
+             0.5       00101    0F    ' 5E-01',00H
+             -78       00101    0F    '-7.8E+01',00H
+             123.456   00101    03    ' 1.235E+02',00H
+             0.5       00101    03    ' 5E-01',00H
+             -78       00101    03    '-7.8E+01',00H
+             123.456   01101    03    ' 1.235E+02',00H
+             0.5       01101    03    ' 5.000E-01',00H
+             -78       01101    03    '-7.800E+01',00H
+             0         01101    03    ' 0.000E+00',00H
+
+     Convert Floating point number to a textstring
+     ---------------------------------------------
+
+     NAME:      FSTRR
+     FUNCTION:  As FSTRS.
+     OFFSET:    45H
+     STACK:     15 bytes.
+     INPUT:     The register HL' contain the format. L' represent
+                FLAGS and H' represent FIELDS. The meaning of these
+                are explained for FSTRS. A call could look like this:
+
+                     EXX
+                     LD   HL,(FORMAT)
+                     EXX
+                     CALL FSTRR
+
+     OUTPUT:    As FSTRS.
+
+     Convert a textstring to Floating point number
+     ---------------------------------------------
+
+     NAME:      CNVN
+     FUNCTION:  Convert the textstring that the IX register point
+                at, to a floating point number, and save the result
+                in AC.
+     OFFSET:    48H
+     STACK:     20 bytes.
+     INPUT:     IX register point to the first character in the
+                textstring. The textstring must have one of the
+                following formats:
+
+                1)   saaa.bbb
+
+                    s    Sign: If s is not present the number is assumed
+                         to be positive. If s is present it must be "+"
+                         or "-".
+                    aaa  Integer part (any number of digits).
+                    bbb  Decimal part (any number of digits).
+
+                2)   saaa.bbbEtxx
+
+                    E    Indicates that the number is followed by a 10's
+                         exponent.
+                    t    Exponent sign: If t is not present the exponent is
+                         assumed to be positive. If t is present then it
+                         must be "+" or "-".
+                    xx   Exponent in the range 37>=xx>=-37.
+
+                    The conversion stops at the first character that does
+                    Not fit in the format.
+
+     OUTPUT:    CF=0: AC contain the converted number.
+                      IX point at the character immediately after the
+                      number.
+                CF=1: Overflow.
+
+     EXAMPLE:   This program sets AC equal to 189.445:
+
+                START:   LD   IX,NUMBER   ;Point at textstring
+                         CALL CNVN        ;Convert
+                         :
+                         :
+                NUMBER:  DB  '189.445 '   ;The space character stops
+                                          ;the convertion
+
+     <<< Change to CONV 8 digit and accept leading ZERO or SPACE >>>
+
+
+     LNBR ADDR OBJ.CODE LABEL   MNEM OPERAND    COMMENT
+
+     0001 1000                  ORC  1000H
+     0002
+     0003               ;This program compute and print the values
+     0004               ;of sine and cosine for angles between 0 and
+     0005               ;360 deg in steps of 10 degrees. The numbers in
+     0006               ;the 4 columns have the following meaning:
+     0007
+     0008               ;1. Angle in degrees
+     0009               ;2. Angle in radians
+     0010               ;3. Sine to the angle
+     0011               ;4. Cosine to the angle
+     0012
+     0013 0000          MRET:   EQU  0000H      ;Monitor Warmstart
+     0014 0003          AOUT:   EQU  0003H      ;Printout the A register
+     0015
+     0016 8600          BASE:   EQU  8600H      ;Math4B startadresse
+     0017
+     0018 8600          FPADD:  EQU  BASE+00H
+     0019 8606          FPMUL:  EQU  BASE+06H
+     0020 8612          CMP:    EQU  BASE+12H
+     0021 8621          SIN:    EQU  BASE+21H
+     0022 8621          COS:    EQU  BASE+24H
+     0023 8636          EQUAL:  EQU  BASE+36H
+     0024 8612          FSTRS:  EQU  BASE+42H
+     0025
+     0026               ;Formatdefinitions
+     0027
+     0028 3012          FMT1:   EOU  30H*256+10010B
+     0029 3A1A          FMT2:   EOU  3AH*256+11010B
+     0030 4A1E          FMT3:   EOU  4AH*256+11110B
+     0031
+     0032
+     0033 1000 DD217910         LD   IX,NUMBUF  ;Point at numberbuffer
+     0031 1001 AF               XOR  A          ;Reset AC
+     0035 1005 47               LD   B,A
+     0036 1006 6F               LD   L,A
+     0037
+     0038 1007 CD4286   LOOP:   CALL FSTRS      ;Print angle in
+     0039 100A 1230             DW   FMT1       ;degrees
+     0040 100C CD6910           CALL PRNUM
+     0041 100F C5               PUSH BC         ;Save angle
+     0042 1010 D5               PUSH DE
+     0043 1011 E5               PUSH HL
+     0044 1012 D9               EXX             ;Exchange AC and AC'
+     0045 1013 01FA0E           LD   BC,00EFAH  ;Set AC equal to PI/180
+     0046 1016 111235           LD   DE,03512H
+     0047 1019 217B96           LD   HL,0967BH
+     0048 101C CD0686           CALL FPMUL      ;Recompute to radians
+     0049 101F CD3686           CALL EQUAL      ;Save in AC'
+     0050 1022 CD4286           CALL FSTRS      ;Print angle in
+     0051 1025 1A3A             DW   FMT2       ;radians
+     0052 1027 CD6910           CALL PRNUM
+     0053 102A CD2186           CALL SIN        ;Compute sine
+     0051 102D CD4286           CALL FSTRS      ;Print sine
+     0055 1030 1E4A             DW   FMT3
+     0056 1032 CD6910           CALL PRNUM
+     0057 1035 D9               EXX             ;Get angle
+     0058 1036 CD2486           CALL COS        ;Compute cosine
+     0059 1039 CD4286           CALL FSTRS      ;Print cosine
+     0060 103C 1E4A             DW   FMT3
+     LNBR ADDR OBJ.CODE LABEL   MNEM OPERAND    COMMENT
+
+     0061 103E CD6910           CALL PRNUM
+     0062 1041 3E0D             LD   A,l3       ;New line
+     0063 1043 CD0300           CALL AOUT
+     0064 1046 E1               POP  HL         ;Get angle in degrees
+     0065 1047 D1               POP  DE
+     0066 1048 C1               POP  BC
+     0067 1049 D9               EXX             ;Save in AC'
+     0068 104A 010020           LD   BC,02000H  ;Set AC equal to 10
+     0069 104D 110000           LD   DE,00000H
+     0070 1050 218400           LD   HL,00084H
+     0071 1053 CD0086           CALL FPADD      ;Add 10 to the angle
+     0072 1056 D9               EXX             ;Save in AC'
+     0073 1057 010034           LD   BC,03400H  ;set AC equal to 360
+     0074 105A 110000           LD   DE,00000H
+     0075 105D 218900           LD   HL,00089H
+     0076 1060 CD1286           CALL CMP        ;Is 360>AC?
+     0077 1063 D9               EXX             ;Get the angle
+     0078 1064 30A1             JR   NC,LOOP    ;Yes => LOOP
+     0079
+     0080 1066 C30000           JP   MRET       ;Jump to monitor
+     0081
+     0082               ;This subrutine prints the number in NUMBUF
+     0083
+     0084 1069 E5       PRNUM:  PUSH HL
+     0085 106A 217910           LD   HL,NUMBUF
+     0086 106D 7E       PR1:    LD   A,(HL)
+     0087 106E B7               OR   A
+     0088 106F 2806             JR   Z,PR2
+     0089 1071 CD0300           CALL AOUT
+     0090 1074 23               INC  HL
+     0091 1075 18F6             JR   PR1
+     0092 1077 E1       PR2:    POP  HL
+     0093 1078 C9               RET
+     0094
+     0095 000F          NUMBUF: DS   15
+     0096
+     0097 1088                 END
+
+                          SINUS & COSINUS
+   ============================================================
+
+            0  0.0000000000     +0.0000000000     +1.0000000000
+           10  0.1745329252     +0.1736481777     +0.9848077530
+           20  0.3490658504     +0.3420201433     +0.9396926208
+           30  0.5235987756     +0.5000000000     +0.8660254038
+           10  0.6981317008     +0.6127876097     +0.7660444431
+           50  0.8726646260     +0.7660444431     +0.6427876097
+           60  1.0471975512     +0.8660254038     +0.5000000000
+           70  1.2217304764     +0.9396926208     +0.3420201433
+           80  1.3962634016     +0.9848077530     +0.1736481777
+           90  1.5707963268     +1.0000000000     +0.0000000000
+          100  1 7453292520     +0.9848077530     -0.1736481777
+          110  1.9198621772     +0.9396926208     -0.3420201433
+          120  2.0943951024     +0.8660254038     -0.5000000000
+          130  2.2689280276     +0.7660444431     -0.6427876097
+          110  2.4434609528     +0.6427876097     -0.7660444431
+          150  2.6179938780     +0.5000000000     -0.8660254038
+          160  2.7925268032     +0.3420201433     -0.9396926208
+          170  2.9670597284     +0.1736481777     -0.9848077530
+          180  3.1415926536     +0.0000000000     -1.0000000000
+          190  3.3161255788     -0.1736481777     -0.9848077530
+          200  3.4906585040     -0.3420201433     -0.9396926208
+          210  3.6651914292     -0.5000000000     -0.8660254038
+          220  3.8397243544     -0.6427876097     -0.7660444431
+          230  4.0142572796     -0.7660444431     -0.6427876097
+          210  4.1887902048     -0.8660254038     -0.5000000000
+          250  4.3633231300     -0.9396926208     -0.3420201433
+          260  4.5378560552     -0.9848077530     -0.1736481777
+          270  4.7123889804     -1.0000000000     +0.0000000000
+          280  4.8869219056     -0.9848077530     +0.1736481777
+          290  5.0614548308     -0.9396926208     +0.3420201433
+          300  5.2359877560     -0.8660254038     +0.5000000000
+          310  5.4105206812     -0.7660444431     +0.6427876097
+          320  5.5850536064     -0.6427876097     +0.7660444431
+          330  5.7595865316     -0.5000000000     +0.8660254038
+          310  5.9341194568     -0.3120201433     +0.9396926208
+          350  6.1086523820     -0.1736481777     +0.9848077530
+          360  6.2831853072     +0.0000000000     +1.0000000000
+
+          -----------------------------------------------------------
+
+
+   Example of a number conversion
+  ;Temperature Y = A * X + B    
+  COMPU:   LD   HL,(TEMPERA)
+           CALL FLOAT          ;float 15 Bit(HL) BCDEHL=Float converted data
+           LD   BC,7000H       ;A = 15
+           LD   DE,0000H
+           LD   HL,0084H
+           CALL FPMUL          ;*
+           LD   BC,0000H       ;B = 2
+           LD   DE,0000H
+           LD   HL,0082H
+           CALL FPADD          ;+
+           CALL FIX            ;fix 1+15 Bit(HL)
+           LD   (CTEMP),HL     ;Temperature [øC]
+           :
+           :
+
+
+***** SOURCE CODE *************************************************************
+
+;       Math48 Floating Point Package
+;       Version 1.1 Revision 1
+;       by Anders Hejlsberg
+;       2532 Bytes
+
+;HOPTABEL
+
+        JP   FPADD
+        JP   FPSUB
+        JP   FPMUL
+        JP   FPDIV
+        JP   MOD
+        JP   PWR
+        JP   CMP
+
+        JP   SQR
+        JP   LN
+        JP   EXP
+        JP   LOG
+        JP   SIN
+        JP   COS
+        JP   TAN
+        JP   ATN
+        JP   ACPI
+        JP   INT
+        JP   FRAC
+
+        JP   EQUAL
+        JP   MUL10
+        JP   FIX
+        JP   FLOAT
+
+        JP   FSTRS
+        JP   FSTRR
+        JP   CNVN
+
+
+SIGN:   EQU  80H
+EXPN:   EQU  80H
+
+IWIDTH: EQU  0F0H
+FWIDTH: EQU  0FH
+
+
+;FLOATING POINT ADDITION.
+
+FPADD:  EXX             ;Er AC negativ?
+        BIT  7,B
+        EXX
+        JP   NZ,SUB1    ;Ja => SUB1
+
+ADD1:   EXX             ;Er AC' nul?
+        LD   A,L
+        OR   A
+        EXX
+        RET  Z          ;Ja => Returner
+
+        EXX             ;Gem AC'
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        EXX
+
+        LD   A,L        ;Er AC nul?
+        OR   A
+        JR   NZ,ADD2    ;Nej => ADD2
+        EXX             ;Returner AC'
+        RES  7,B        ;Positivt
+        JR   ADD10
+
+ADD2:   PUSH BC         ;Gem fortegn
+        SET  7,B        ;Saet MSB
+        XOR  A          ;Saet Z'
+        EX   AF,AF'
+        EXX
+        SET  7,B        ;Saet MSB'
+        LD   A,L        ;A=EXP'-EXP
+        EXX
+        SUB  L
+        JR   Z,ADD4     ;EXP=EXP' => ADD4
+        JR   NC,ADD3    ;EXP<EXP' => ADD3
+
+        NEG             ;Goer A positiv
+        EX   AF,AF'     ;Nulstil Z'
+        DEC  A
+        EX   AF,AF'
+        EXX             ;Juster AC'
+
+ADD3:   CALL SRIGHT     ;Skift til hoejre
+        INC  L          ;Er EXP=EXP'?
+        DEC  A
+        JR   NZ,ADD3    ;Nej => ADD3
+
+        EX   AF,AF'     ;Var det AC'?
+        JR   Z,ADD4     ;Nej => ADD4
+        EXX             ;Ja => Ombyt
+
+ADD4:   POP  AF         ;Hent AC fortegn
+        AND  SIGN       ;Negativt?
+        JR   NZ,ADD5    ;Ja => ADD5
+
+        CALL ADDAC      ;MANT=MANT+MANT'
+        JR   NC,ADD9    ;Ikke overflow => ADD9
+        CALL RIGHT      ;Roter til hoejre
+        OR   A
+        INC  L          ;Juster exponent
+        JR   NZ,ADD9
+        SCF
+        JR   ADD10
+
+ADD5:   CALL CMPAC      ;Sammenlign
+        CCF             ;Komplementer carry og
+        PUSH AF         ;gem som fortegn
+        JR   Z,ADDZ     ;AC=AC' => ADDZ
+        JR   C,ADD6     ;AC>AC' => ADD6
+        EXX             ;AC<AC' => Ombyt
+ADD6:   CALL SUBAC      ;MANT=MANT-MANT'
+ADD7:   BIT  7,B        ;Normaliseret?
+        JR   NZ,ADD8    ;Ja => ADD8
+        CALL SLEFT      ;Skift til venstre
+        INC  L          ;Er exponent -128?
+        DEC  L
+        JR   Z,ADDZ     ;Ja => AC lig nul
+        DEC  L          ;Traek 1 fra exponent
+        JR   ADD7
+
+ADDZ:   CALL ZERO
+
+ADD8:   POP  AF         ;Hent fortegn
+ADD9:   JR   C,ADD9A    ;Carry => negativt
+        RES  7,B
+ADD9A:  OR   A
+
+ADD10:  EXX             ;Hent AC'
+        POP  HL
+        POP  DE
+        POP  BC
+        EXX
+        RET
+
+
+;FLOATING POINT SUBTRAKTION
+
+FPSUB:  EXX             ;Er AC negativ?
+        BIT  7,B
+        EXX
+        JP   NZ,ADD1    ;Ja => ADD1
+
+SUB1:   CALL FPNEG      ;AC=-AC
+        CALL ADD1       ;Laeg AC' til AC
+
+FPNEG:  INC  L          ;Er AC nul?
+        DEC  L
+        RET  Z          ;Ja => Returner
+        EX   AF,AF'     ;Gem carry
+        LD   A,B        ;Komplementer fortegn
+        XOR  SIGN
+        LD   B,A
+        EX   AF,AF'     ;Hent carry
+        RET
+
+
+;FLOATING POINT DIVISION.
+
+FPDIV:  EXX             ;Er AC' nul?
+        INC  L
+        DEC  L
+        EXX
+        SCF
+        RET  Z          ;Ja => Overflow
+
+        LD   A,L        ;Er AC nul?
+        OR   A
+        RET  Z          ;Ja => Returner
+
+        EXX             ;Subtraher exponenter
+        SUB  L
+        EXX
+        CCF             ;Juster exponent og
+        CALL EXPSGN     ;udregn fortegn
+
+        PUSH HL         ;Opret 6 bytes work-
+        PUSH HL         ;space
+        PUSH HL
+        ADD  IX,SP
+
+        EXX             ;5 bytes
+        LD   L,5
+        EXX
+        LD   A,8        ;Med hver 8 bits
+
+DIVI1:  EX   AF,AF'     ;Gem taeller
+        CALL CMPAC      ;Er MANT>MANT'
+        JR   C,DIVI2    ;Nej => DIVI2
+        CALL SUBAC      ;Traek AC' fra AC
+
+DIVI2:  CCF             ;Komplementer carry
+        RL   L          ;Roter ind i resultat
+        EX   AF,AF'     ;Hent bittaeller
+        DEC  A          ;Byte faerdig?
+        JR   NZ,DIVI3   ;Nej => DIVI3
+
+        LD   (IX+5),L   ;Gem byte i buffer
+        DEC  IX         ;Peg til naeste
+        EXX             ;Er 5 bytes klaret?
+        DEC  L
+        EXX
+        JR   Z,DIVI4    ;Ja => DIVI4
+        LD   A,8        ;8 bits
+
+DIVI3:  CALL SLEFT      ;Skift AC til venstre
+        JR   NC,DIVI1   ;Ingen carry => DIVI1
+
+        EX   AF,AF'     ;Gem taeller
+        CALL SUBAC      ;MANT=MANT-MANT'
+        OR   A          ;Nulstil carry
+        JR   DIVI2
+
+DIVI4:  CALL SLEFT      ;Udregn afrundingsbit
+        JR   C,DIVI5
+        CALL CMPAC
+        CCF
+
+DIVI5:  POP  HL         ;Hent resultat
+        POP  DE
+        POP  BC
+        BIT  7,B        ;Normaliseret?
+        JR   NZ,DIVI6   ;Ja => DIVI6
+
+        CALL LEFT       ;Roter afrundingsbit
+        JR   MUL5       ;ind i resultatet
+
+DIVI6:  INC  L          ;Laeg 1 til exponent
+        JR   NZ,MUL5
+        DEC  L
+        SCF
+        JR   MUL5A
+
+
+;FLOATING POINT MULTIPLIKATION
+
+FPMUL:  EXX             ;Er AC' nul?
+        LD   A,L
+        OR   A
+        EXX
+        JP   Z,ZERO     ;Ja => Resultat 0
+
+        LD   A,L        ;Er AC nul?
+        OR   A
+        RET  Z          ;Ja => Retur
+
+        EXX             ;Adder exponenter
+        ADD  A,L
+        EXX             ;Juster exponent og
+        CALL EXPSGN     ;udregn fortegn
+
+        PUSH BC         ;Gem AC
+        PUSH DE
+        PUSH HL
+        ADD  IX,SP      ;Peg IX til AC
+
+        CALL ZERO       ;Nulstil resultat
+        EXX             ;5 bytes
+        LD   L,5
+        EXX
+
+MUL1:   LD   A,8        ;Bittaeller lig 8
+        INC  IX         ;Hent ny byte
+        LD   L,(IX+0)
+
+MUL2:   EX   AF,AF'     ;Gem taeller
+        RR   L          ;Roter byte til hoejre
+        JR   NC,MUL3    ;Hvis carry saa laeg
+        CALL ADDAC      ;AC' til resultatet
+
+MUL3:   CALL RIGHT      ;Roter res. til hoejre
+        EX   AF,AF'     ;Hent taeller
+        DEC  A          ;Byte faerdig?
+        JR   NZ,MUL2    ;Nej => MUL2
+        EXX             ;5 bytes klaret?
+        DEC  L
+        EXX
+        JR   NZ,MUL1    ;Nej => MUL1
+
+        LD   L,(IX-5)   ;Hent exponent
+        BIT  7,B        ;Normaliseret?
+        JR   NZ,MUL4    ;Ja => MUL4
+
+        EX   AF,AF'     ;Hent sidste carry
+        CALL LEFT       ;Roter res. til venstre
+        INC  L          ;Traek 1 fra exponent
+        DEC  L
+        JR   Z,MUL4
+        DEC  L
+
+MUL4:   POP  AF         ;Fjern workspace
+        POP  AF
+        POP  AF
+
+MUL5:   OR   A          ;Status = OK
+MUL5A:  EX   AF,AF'     ;Gem status
+        POP  AF         ;Hent res. fortegn
+        EXX
+        POP  BC         ;Hent AC' fortegn
+        POP  HL         ;Hent AC' exponent
+        EXX
+        POP  IX         ;Hent IX
+        RES  7,B        ;Erstat MSB i AC med
+        OR   B          ;fortegn
+        LD   B,A
+        EX   AF,AF'     ;Hent status
+        INC  L
+        DEC  L
+        CALL Z,ZERO
+        RET
+
+;Juster exponent og udregn fortegn.
+
+EXPSGN: JR   C,EXPS1    ;Carry => EXPS1
+        ADD  A,EXPN     ;Juster exponent
+        JR   C,EXPS2    ;Carry => EXPS2
+        JR   EXPS3      ;Underflow
+
+EXPS1:  ADD  A,EXPN     ;Juster exponent
+        JR   C,EXPS3    ;carry => Overflow
+
+EXPS2:  LD   L,A        ;Gem i exponent
+        EX   (SP),IX    ;Gem IX
+        EXX
+        PUSH HL         ;Gem AC' exponent
+        PUSH BC         ;Gem AC' fortegn
+        LD   A,B        ;Udregn nyt fortegn
+        SET  7,B
+        EXX
+        XOR  B
+        AND  SIGN
+        PUSH AF
+        SET  7,B
+        PUSH IX
+        LD   IX,0       ;Nulstil IX
+        RET
+
+EXPS3:  POP  HL         ;Juster stakken
+        RET  C          ;Carry => Returner
+
+;Nulstil AC.
+
+ZERO:   XOR  A          ;Nulstil carry, expo-
+        LD   L,A        ;nent og mantissa
+        LD   B,A
+        LD   C,A
+        LD   D,A
+        LD   E,A
+        LD   H,A
+        RET
+
+;Roter AC til hoejre.
+
+SRIGHT: OR   A
+RIGHT:  RR   B
+        RR   C
+        RR   D
+        RR   E
+        RR   H
+        RET
+
+;Roter AC til venstre.
+
+SLEFT:  OR   A
+LEFT:   RL   H
+        RL   E
+        RL   D
+        RL   C
+        RL   B
+        RET
+
+;Laeg AC' til AC.
+
+ADDAC:  LD   A,H
+        EXX
+        ADD  A,H
+AAC1:   EXX
+        LD   H,A
+        LD   A,E
+        EXX
+        ADC  A,E
+        EXX
+        LD   E,A
+        LD   A,D
+        EXX
+        ADC  A,D
+        EXX
+        LD   D,A
+        LD   A,C
+        EXX
+        ADC  A,C
+        EXX
+        LD   C,A
+        LD   A,B
+        EXX
+        ADC  A,B
+        EXX
+        LD   B,A
+        RET
+
+;Traek AC' fra AC.
+
+SUBAC:  LD   A,H
+        EXX
+        SUB  H
+SAC1:   EXX
+        LD   H,A
+        LD   A,E
+        EXX
+        SBC  A,E
+        EXX
+        LD   E,A
+        LD   A,D
+        EXX
+        SBC  A,D
+        EXX
+        LD   D,A
+        LD   A,C
+        EXX
+        SBC  A,C
+        EXX
+        LD   C,A
+        LD   A,B
+        EXX
+        SBC  A,B
+        EXX
+        LD   B,A
+        RET
+
+;Sammenlign AC med AC'.
+
+CMPAC:  LD   A,B
+        EXX
+        CP   B
+        EXX
+        RET  NZ
+        LD   A,C
+        EXX
+        CP   C
+        EXX
+        RET  NZ
+        LD   A,D
+        EXX
+        CP   D
+        EXX
+        RET  NZ
+        LD   A,E
+        EXX
+        CP   E
+        EXX
+        RET  NZ
+        LD   A,H
+        EXX
+        CP   H
+        EXX
+        RET
+
+
+;FLOATING POINT COMPARE.
+
+CMP:    EXX             ;Er fortegn ens?
+        LD   A,B
+        EXX
+        XOR  B
+        JP   P,CMP1     ;Ja => CMP1
+        LD   A,B        ;Fortegn fra AC til
+        RLA             ;carry
+        RET
+
+CMP1:   BIT  7,B        ;Negative tal?
+        JR   Z,CMP2     ;Nej => CMP2
+
+        CALL CMP2       ;Sammenlign abs.vaerdi
+        RET  Z          ;Ens => Returner
+        CCF             ;Complementer resultat
+        RET
+
+CMP2:   LD   A,L        ;Er exponenter ens?
+        EXX
+        CP   L
+        EXX
+        RET  NZ         ;Nej => Returner
+        OR   A          ;Er exponenter nul?
+        RET  Z          ;Ja => Returner
+        JP   CMPAC      ;Sammenlign AC med AC'
+
+
+;FLOATING POINT INTEGER.
+
+INT:    LD   A,L        ;Er exponent mindre
+        SUB  EXPN+1     ;end nul?
+        JP   C,ZERO     ;Ja => Resultat nul
+        INC  A
+
+        EXX             ;Gem AC'
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        EX   AF,AF'
+        CALL ZERO       ;Nulstil AC'
+        EX   AF,AF'
+
+INT1:   SCF             ;Saet alle bits der har
+        CALL RIGHT      ;en exponent stoerre
+        DEC  A          ;end eller lig nul
+        JR   NZ,INT1
+
+        EXX             ;Nulstil alle bits i AC
+        LD   A,H        ;der har en exponent
+        EXX             ;mindre end 0
+        AND  H
+        EXX
+        LD   H,A
+        LD   A,E
+        EXX
+        AND  E
+        EXX
+        LD   E,A
+        LD   A,D
+        EXX
+        AND  D
+        EXX
+        LD   D,A
+        LD   A,C
+        EXX
+        AND  C
+        EXX
+        LD   C,A
+        LD   A,B
+        EXX
+        AND  B
+        EXX
+        LD   B,A
+INT2:   JP   ADD10      ;Hent AC'
+
+
+;FLOATING POINT FRACTION.
+
+;FRAC(X) udregnes af X-INT(X).
+
+FRAC:   EXX
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        EXX
+
+        CALL EQUAL
+        EXX
+        CALL INT
+        EXX
+        CALL FPSUB
+        JR   INT2
+
+
+;MODULUS.
+
+;X MOD Y beregnes af FRAC(X/Y)*Y.
+
+MOD:    CALL FPDIV
+        RET  C
+        CALL FRAC
+        JP   FPMUL
+
+
+;KVADRATROD.
+
+;Kvadratroden beregnes med Newton-Raphson
+;iterationsmetoden. Et gaet udregnes ud fra
+;det foregaaende gaet efter formelen:
+;I(n+1)=(X/I(n)+I(n))/2.
+;Som foerste gaet halveres X's exponent.
+;Der fortsaettes indtil ABS(I(n+1)-I(n)) er
+;mindre end den halve exponent af X minus 20.
+
+SQR:    LD   A,L        ;Er AC nul?
+        OR   A
+        RET  Z          ;Ja => Returer
+
+        BIT  7,B        ;Er AC negativ?
+        SCF             ;Saet carry
+        RET  NZ         ;Ja => Returner
+
+        EXX             ;Gem AC'
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        EXX
+        CALL EQUAL      ;AC'=AC
+        LD   A,L        ;Foerste iteration:
+        ADD  A,EXPN     ;halver exponenten
+        SRA  A
+        ADD  A,EXPN
+        LD   L,A        ;Sammenligningsvaerdi
+        SUB  20         ;er den halve exponent
+        PUSH AF         ;Gem s.vaerdi
+        EXX
+
+SQR1:   PUSH BC         ;Gem tallet
+        PUSH DE
+        PUSH HL
+        CALL FPDIV      ;Divider med og adder
+        CALL FPADD      ;forrige gaet
+        DEC  L          ;Halver
+        PUSH BC         ;Gem dette gaet
+        PUSH DE
+        PUSH HL
+        CALL FPSUB      ;Udregn forskellen mel-
+        LD   A,L        ;lem de to gaet
+        POP  HL         ;Hent det nye gaet
+        POP  DE
+        POP  BC
+        EXX
+        POP  HL         ;Hent tallet
+        POP  DE
+        POP  BC
+        EX   (SP),HL    ;Hent s.vaerdi ind i H
+        CP   H
+        EX   (SP),HL    ;Fortsaet indtil forsk.
+        JR   NC,SQR1    ;er lille nok
+
+        POP  AF         ;Fjern s.vaerdi
+        EXX
+        OR   A          ;Nulstil carry
+SQR2:   JP   ADD10      ;Hent AC'
+
+
+;TANGENS.
+
+;TAN(X) beregnes af SIN(X)/COS(X)
+
+TAN:    EXX
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        EXX
+        CALL EQUAL
+        CALL COS
+        EXX
+        CALL SIN
+        CALL FPDIV
+        JR   SQR2
+
+
+;COSINUS.
+
+;COS(X) beregnes af SIN(PI/2-X)
+
+COS:    EXX
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        CALL ACPI
+        DEC  L
+        CALL FPSUB
+        EXX
+        JR   SINC
+
+
+;SINUS.
+
+;SIN(X) beregnes paa flg. maade:
+;Hvis ABS(X)>2*PI saa X=FRAC(X/(2*PI))*2*PI
+;Hvis X<0 saa X=X+2*PI
+;Hvis X>PI saa X=X-PI, fortegn -
+;Hvis X>PI/2 saa X=PI-X
+;Y=X/3, Z=Y^2
+;SIN(Y)=Y(((((Z+K1)Z+K2)Z+K3)Z+K4)Z+K5)/K5
+;K1=-110      K2=7920       K3=-332640
+;K4=6652800   K5=-39916800
+;SIN(X)=4(.75*SIN(Y)-SIN(Y)^3)
+
+SIN:    EXX             ;Gem AC'
+        PUSH BC
+        PUSH DE
+        PUSH HL
+SINC:   CALL ACPI       ;AC'=2PI
+        INC  L
+        EXX
+
+        LD   A,L        ;Hvis tallet er mindre
+        CP   EXPN-20    ;end 1E-7 saa returner
+        JP   C,SIN7
+
+        PUSH BC         ;Er ABS(AC)>2PI
+        RES  7,B
+        CALL CMP
+        POP  BC
+        CALL NC,MOD     ;Ja => AC=AC MOD 2PI
+
+SIN1A:  BIT  7,B        ;Hvis AC<0 saa laeg
+        JR   Z,SIN2     ;2PI til AC
+        CALL FPADD
+
+SIN2:   EXX             ;AC'=PI
+        DEC  L
+        EXX
+        CALL CMP        ;Er AC>PI?
+        PUSH AF         ;Gem flag som fortegn
+        JR   C,SIN3     ;Nej => SIN3
+        CALL FPSUB      ;AC=AC-PI
+
+SIN3:   EXX             ;AC'=PI/2
+        DEC  L
+        EXX
+        CALL CMP        ;Er AC>PI/2?
+        JR   C,SIN4     ;Nej => SIN4
+        EXX             ;AC=PI-AC
+        INC  L
+        CALL FPSUB
+
+SIN4:   LD   A,L        ;Hvis tallet er mindre
+        CP   EXPN-20    ;end 1E-7 saa returner
+        JR   C,SIN7A
+
+        EXX             ;AC=AC/3
+        LD   BC,02AAAH
+        LD   DE,0AAAAH
+        LD   HL,0AA7FH
+        CALL FPMUL
+
+        PUSH IX
+        LD   IX,SINK-6
+        LD   A,5
+        CALL COMSER
+        POP  IX
+
+        CALL EQUAL      ;Gem i AC'
+        CALL FPMUL      ;Udregn SIN(X)^3
+        CALL FPMUL
+        PUSH BC         ;Gem paa stakken
+        PUSH DE
+        PUSH HL
+        EXX
+        CALL EQUAL      ;Udregn .75*SIN(X)
+        DEC  L
+        DEC  L
+        EXX
+        DEC  L
+        CALL FPADD
+        EXX             ;Hent SIN(X)^3
+        POP  HL
+        POP  DE
+        POP  BC
+        EXX
+        CALL FPSUB      ;Traek det fra
+        INC  L          ;Gang med 4
+        INC  L
+
+SIN7A:  POP  AF         ;Indsaet fortegn
+        INC  L
+        DEC  L
+        JR   Z,SIN7
+        JR   C,SIN7
+        LD   A,B
+        XOR  SIGN
+        LD   B,A
+SIN7:   OR   A
+        JP   ADD10      ;Hent AC'
+
+;Konstanter for udregning af SINUS.
+
+SINK:   DW 0DC00H,00000H,00087H  ;K1
+
+        DW 07780H,00000H,0008DH  ;K2
+
+        DW 0A26CH,00000H,00093H  ;K3
+
+        DW 04B07H,00000H,00097H  ;K4
+
+        DW 09845H,04000H,0009AH  ;K5
+
+
+
+;TITALS LOGARITME.
+
+;LOG(X) beregnes af LN(X)/LN(10).
+
+LOG:    CALL LN
+        RET  C
+        EXX
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        LD   BC,05E5BH  ;1/LN(10)
+        LD   DE,0D8A9H
+        LD   HL,0367FH
+        CALL FPMUL
+        JP   ADD10
+
+
+;NATURLIGE LOGARITME.
+
+;LN(X) beregnes paa flg. maade:
+;X=Y*2^N, 1<=Y<2
+;Z=Y*SQR(2)/2
+;U=(Z-1)/(Z+1), V=U^2
+;R=U((((((V+K1)V+K2)V+K3)V+K4)V+K5)V+K6)/K6
+;Kn=13/(13-2n)
+;LN(X)=2*R+LN(2)/2+N*LN(2)
+
+LN:     INC  L          ;Er AC nul?
+        DEC  L
+        SCF             ;Indiker fejl
+        RET  Z          ;Ja => Returner
+        BIT  7,B        ;Negativ?
+        RET  NZ         ;Ja => Returner
+
+        EXX             ;Gem AC'
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        LD   BC,03504H  ;AC'=SQR(2)/2
+        LD   DE,0F333H
+        LD   HL,0FB80H
+        EXX
+
+        LD   A,L        ;Udregn N
+        LD   L,EXPN+1   ;Udregn Y
+        SUB  L
+        PUSH AF         ;Gem N
+
+        CALL FPMUL      ;Udregn Z
+        EXX             ;Udregn U
+        CALL AC1
+        EXX
+        CALL FPSUB
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        EXX
+        INC  L
+        CALL FPADD
+        EXX
+        POP  HL
+        POP  DE
+        POP  BC
+        CALL FPDIV
+
+        PUSH IX         ;Udregn LN(Z)
+        LD   IX,LNK-6
+        LD   A,6
+        CALL COMSER
+        POP  IX
+
+        INC  L          ;Laeg LN(2)/2 til
+        EXX
+        CALL ACLN2
+        DEC  L
+        EXX
+        CALL FPADD
+        POP  AF
+        PUSH BC         ;Gem resultat
+        PUSH DE
+        PUSH HL
+        LD   L,A        ;Udregn N*LN(2)
+        LD   H,0
+        JR   NC,LN1
+        DEC  H
+LN1:    CALL FLOAT
+        EXX
+        INC  L
+        CALL FPMUL
+        EXX
+        POP  HL         ;Hent resultat
+        POP  DE
+        POP  BC
+        CALL FPADD      ;Adder
+        LD   A,L
+        CP   EXPN-25    ;LN(X)<3E-8 => LN(X)=0
+        CALL C,ZERO
+        JP   ADD10      ;Hent AC'
+
+;Konstanter for udregning af LN.
+
+LNK:    DW 01745H,0D174H,05D81H  ;K1
+
+        DW 038E3H,08E38H,0E481H  ;K2
+
+        DW 06DB6H,0DB6DH,0B781H  ;K3
+
+        DW 02666H,06666H,06682H  ;K4
+
+        DW 00AAAH,0AAAAH,0AB83H  ;K5
+
+        DW 05000H,00000H,00084H  ;K6
+
+
+
+;POTENSOPLOEFTNING.
+
+;X^Y beregnes af EXP(Y*LN(X)).
+
+PWR:    LD   A,L
+        OR   A
+        RET  Z
+        CALL LN
+        RET  C
+        CALL FPMUL
+        RET  C
+
+
+;EXPONENTIALFUNKTIONEN.
+
+;Hvis X<0 saa udregnes EXP(X)=1/EXP(-X).
+;EXP(X) beregnes paa flg. maade:
+;EXP(X)=2^Y, Y=X/LN(2)
+;2^Y=2^INT(Y)*2^Z, Z=FRAC(Y)
+;2^Z udregnes af:
+;2^Z=(((((((Z+K1)*Z+K2)*Z)2+K3)....)*Z+K7)/K7
+;K1=6.6042604723   K2=62.027114868
+;K3=444.01034843   K4=2563.5667136
+;K5=11095.090786   K6=32013.685271
+;K7=46185.984492
+
+EXP:    EXX             ;Gem AC'
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        CALL ACLN2      ;AC'=LN(2)
+        EXX
+
+        OR   A          ;Gem fortegn
+        BIT  7,B
+        PUSH AF
+        RES  7,B        ;Goer positivt
+
+        CALL FPDIV      ;Udregn Y
+        LD   A,L        ;Er Y>128?
+        CP   EXPN+8
+        JP   NC,EXP4    ;Ja => EXP4
+
+        CALL EQUAL      ;AC'=Y
+        CALL FRAC       ;Udregn Z=FRAC(Y)
+        EXX             ;Udregn INT(Y)
+        CALL FIX
+        LD   A,L
+        PUSH AF         ;Gem INT(Y)
+        EXX
+
+EXP1:   PUSH IX         ;Udregn 2^Z
+        LD   IX,EXPK-6
+        LD   A,7
+        CALL CALCS
+        POP  IX
+
+EXP3:   POP  AF         ;Hent 2^INT(Y)
+        ADD  A,L        ;Udregn 2^Z*2^INT(Y)
+        LD   L,A
+        JR   NC,EXP6    ;Ikke overflow => EXP6
+
+EXP4:   POP  AF         ;Juster stakken
+        SCF             ;Indiker overflow
+EXP5:   JP   ADD10      ;Hent AC'
+
+EXP6:   POP  AF         ;Hent fortegn
+        JR   Z,EXP5     ;Positivt => EXP5
+        EXX             ;Tag den reciprokke
+        CALL AC1
+        CALL FPDIV
+        JR   EXP5
+
+;Konstanter for udregning af EXP.
+
+EXPK:   DW 05356H,01A0EH,0DE83H  ;K1
+
+        DW 0781BH,0C3FFH,0FB86H  ;K2
+
+        DW 05E01H,05318H,0F189H  ;K3
+
+        DW 02039H,01142H,0418CH  ;K4
+
+        DW 02D5CH,05CF6H,0DF8EH  ;K5
+
+        DW 07A1BH,05EDBH,0CD8FH  ;K6
+
+        DW 03469H,0FC07H,0E590H  ;K7
+
+
+;ARCCUS TANGENS.
+
+;Hvis X>1 udregnes ATN(X)=PI/2-ATN(1/X).
+;Til beregning af ATN(X) bruges:
+;Y=X^2, A=PI/24,
+;ATN(X)=X(((((Y+K1)*Y+K2)*Y+K3)*Y+K4)*Y+K5)/K5,
+;hvor 0<=X<A og
+;K1=-11/9  K2=11/7  K3=-11/5  K4=11/3  K5=-11
+;X bestemmes til at ligge i et af interv.:
+;1. X<TAN(A)
+;2. TAN(A)<=X<TAN(3*A)    ,K=2*A
+;3. TAN(3*A)<=X<TAN(5*A)  ,K=4*A
+;4. X>=TAN(5*A)           ,K=6*A
+;Hvis X er i foerste interv. bruges formelen
+;alene, men ellers bruges:
+;Y=(X-TAN(K))/(1+X*TAN(K))
+;ATN(X)=K+ATN(Y)
+
+ATN:    LD   A,L
+        OR   A
+        RET  Z
+        EXX             ;Gem AC'
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        PUSH IX
+        CALL AC1        ;AC'=1
+        EXX
+        XOR  A          ;Nulstil flagbyte
+        BIT  7,B        ;Er AC positiv?
+        JR   Z,ATN1     ;Ja => ATN1
+
+        INC  A          ;Saet negativflag
+        RES  7,B        ;AC=ABS(AC)
+
+ATN1:   PUSH AF         ;Gem flag
+        CALL CMP        ;Er AC>1
+        JR   C,ATN2     ;Ja => ATN2
+
+        EXX             ;AC=1/AC
+        CALL FPDIV
+        POP  AF         ;Saet reciprokflag
+        SET  7,A
+        PUSH AF
+
+ATN2:   EXX
+        LD   BC,006CFH
+        LD   DE,0E98EH
+        LD   HL,04A7EH
+        EXX
+        CALL CMP        ;Er AC<TAN(PI/24)?
+        JR   NC,ATN3    ;Nej => ATN3
+
+        CALL ARCTAN     ;Udregn ATN(X)
+        JR   ATN6
+
+ATN3:   LD   IX,ATNK-18 ;Peg IX til skalerings-
+        LD   A,2        ;konstanter
+
+ATN4:   EX   AF,AF'     ;Gem taeller
+        EXX
+        LD   DE,18      ;Peg til naeste saet
+        ADD  IX,DE
+        CALL GETCIX     ;Hent oeverste endepkt.
+        EXX
+        CALL CMP        ;Er X i dette interval?
+        JR   C,ATN5     ;Ja => ATN5
+        EX   AF,AF'     ;Hent taeller
+        DEC  A          ;Faerdig?
+        JR   NZ,ATN4    ;Nej => ATN4
+
+        EXX             ;Juster IX
+        LD   DE,12
+        ADD  IX,DE
+        EXX
+
+ATN5:   EXX
+        CALL GTNCIX     ;Hent TAN(K)
+        SET  7,B        ;Udregn X-TAN(K)
+        CALL FPADD
+        PUSH BC         ;Gem resultat
+        PUSH DE
+        PUSH HL
+        CALL GETCIX     ;Hent TAN(K)
+        CALL FPMUL      ;Udregn X*TAN(K)
+        EXX
+        CALL AC1        ;Laeg 1 til
+        CALL FPADD
+        EXX             ;Gem i AC'
+        POP  HL         ;Hent forrige resultat
+        POP  DE
+        POP  BC
+        CALL FPDIV      ;Udregn Y
+        PUSH IX         ;Udregn ATN(Y)
+        CALL ARCTAN
+        POP  IX
+        EXX
+        CALL GTNCIX     ;Hent K
+        CALL FPADD      ;Udregn K+ATN(Y)
+
+ATN6:   POP  AF         ;Hent flagbyte
+        RLA             ;Var X>1?
+        JR   NC,ATN7    ;Nej => ATN7
+
+        PUSH AF         ;Gem flagbyte
+        EXX             ;Udregn PI/2-ATN(X)
+        CALL ACPI
+        DEC  L
+        CALL FPSUB
+        POP  AF         ;Hent flagbyte
+
+ATN7:   POP  IX         ;Hent IX
+        BIT  1,A        ;Var X<0?
+        JR   Z,ATN8     ;Nej => ATN8
+        SET  7,B        ;Resultat negativt
+ATN8:   OR   A
+        JP   ADD10      ;Hent AC'
+
+;Konstanter til skalering af X under beregning
+;af ATN.
+
+ATNK:   DW 05413H,0CCCFH,0E77FH  ;TAN(3*A)
+
+        DW 00930H,0A2F4H,0F67FH  ;TAN(2*A)
+
+        DW 0060AH,091C1H,06A7FH  ;2*A
+
+        DW 0446FH,08A9EH,0B580H  ;TAN(5*A)
+
+        DW 013CDH,03A2CH,08280H  ;TAN(4*A)
+
+        DW 0060AH,091C1H,06A80H  ;4*A
+
+        DW 00000H,00000H,00081H  ;TAN(6*A)
+
+        DW 0490FH,0DAA2H,02180H  ;6*A
+
+
+;Konstanter for beregning af ATN.
+
+ARCTK:  DW 09C71H,0C71CH,07281H  ;K1
+
+        DW 04924H,09249H,02581H  ;K2
+
+        DW 08CCCH,0CCCCH,0CD82H  ;K3
+
+        DW 06AAAH,0AAAAH,0AB82H  ;K4
+
+        DW 0B000H,00000H,00084H  ;K5
+
+
+;Udregn taylorraekken for ARCCUS TANGENS.
+
+ARCTAN: LD   IX,ARCTK-6
+        LD   A,5
+
+;COMSER udregner en potensraekke af formen:
+;T=X*((((X^2+K1)*X^2+K2)....)*X^2+Kn)/Kn,
+;hvor X er i AC, n er i A, og adressen paa
+;konstanterne (minus 6) i IX.
+
+COMSER: PUSH BC         ;Gem X
+        PUSH DE
+        PUSH HL
+        PUSH AF         ;Gem laengde
+        CALL EQUAL      ;Udregn Z=X^2
+        CALL FPMUL
+        POP  AF         ;Hent laengde
+        CALL CALCS      ;Udregn raekken
+        EXX             ;Hent X
+        POP  HL
+        POP  DE
+        POP  BC
+        JP   FPMUL      ;Gang med X
+
+;CALCS udregner en potensraekke af formen:
+;U=(((((Z+K1)*Z+K2)*Z+K3)....)*Z+Kn)/Kn,
+;hvor Z er i AC, n er i A, og adressen paa
+;konstanterne (minus 6) i IX.
+
+CALCS:  EXX             ;Gem Z i AC'
+        CALL AC1        ;Start med resultat=1
+CALC1:  PUSH AF         ;Gang med Z
+        CALL FPMUL
+        POP  AF
+        PUSH AF
+        EXX
+        PUSH BC         ;Gem Z
+        PUSH DE
+        PUSH HL
+        CALL GTNCIX     ;Hent naeste konstant
+        CALL FPADD      ;Laeg til resultat
+        EXX             ;Hent Z
+        POP  HL
+        POP  DE
+        POP  BC
+        EXX
+        POP  AF         ;Faerdig?
+        DEC  A
+        JR   NZ,CALC1   ;Nej => CALC1
+        EXX
+        CALL GETCIX
+        EXX
+        JP   FPDIV
+
+;Saet AC lig den konstant IX peger paa.
+
+GTNCIX: LD   DE,6
+        ADD  IX,DE
+GETCIX: LD   C,(IX+0)
+        LD   B,(IX+1)
+        LD   E,(IX+2)
+        LD   D,(IX+3)
+        LD   L,(IX+4)
+        LD   H,(IX+5)
+        RET
+
+;Saet AC lig 2*PI.
+
+ACPI:   LD   BC,0490FH
+        LD   DE,0DAA2H
+        LD   HL,02182H
+        RET
+
+;Saet AC lig LN(2).
+
+ACLN2:  LD   BC,03172H
+        LD   DE,017F7H
+        LD   HL,0D280H
+        RET
+
+;FLOATING POINT EQUAL.
+
+EQUAL:  PUSH BC
+        PUSH DE
+        PUSH HL
+        EXX
+        POP  HL
+        POP  DE
+        POP  BC
+        RET
+
+;FLOATING POINT TIL 16-BIT INTEGER MED
+;2'S COMPLEMENT FORTEGN.
+
+FIX:    OR   A
+        BIT  7,L        ;Exponent<0?
+        JR   Z,FIX4     ;Ja => FIX4
+        BIT  7,B        ;Gem fortegn
+        EX   AF,AF'
+        SET  7,B        ;Saet MSB
+
+FIX1:   LD   A,EXPN+15  ;Test exponent
+        CP   L
+        RET  C          ;EXP>15 => overflow
+        JR   Z,FIX2     ;EXP=15 => FIX2
+        CALL SRIGHT     ;EXP<15 => roter til
+        INC  L          ;hoejre og laeg 1 til
+        JR   FIX1       ;exponent
+
+FIX2:   CALL SRIGHT     ;Roter til hoejre
+        EX   AF,AF'     ;Negativt fortegn?
+        JR   Z,FIX3     ;Nej => INT2
+        LD   HL,0       ;Tag 2's complement
+        SBC  HL,BC
+        OR   A          ;Nulstil carry
+        RET
+
+FIX3:   LD   H,B        ;Hent tallet
+        LD   L,C
+        RET
+
+FIX4:   LD   HL,0       ;Underflow
+        RET
+
+;16-BIT INTEGER MED 2'S COMPLEMENT FORTEGN
+;TIL FLOATING POINT.
+
+FLOAT:  LD   A,H        ;Er HL=0?
+        OR   L
+        JP   Z,ZERO     ;Ja => ZERO
+
+        BIT  7,H        ;Er HL negativ?
+        JR   Z,FLT1     ;Nej => FLT1
+
+        EX   DE,HL      ;Tag 2's complement
+        LD   HL,0
+        OR   A
+        SBC  HL,DE
+
+FLT1:   EX   AF,AF'     ;Gem fortegn i F'
+        LD   B,H        ;Saet mantissa
+        LD   C,L
+        LD   DE,0
+        LD   HL,EXPN+16 ;Saet exponent
+
+FLT2:   BIT  7,B        ;Normaliser
+        JR   NZ,FLT3
+        CALL SLEFT
+        DEC  L
+        JR   FLT2
+
+FLT3:   EX   AF,AF'     ;Negativt?
+        RET  C          ;Ja => Retur
+        RES  7,B        ;Positivt
+        RET
+
+
+;FLYDENDE TAL TIL TEKSTSTRENG.
+
+;Resultatet afleveres i den buffer IX peger
+;paa, og er afsluttet med et 0.
+;Udskriftens format afgoeres af H' og L'.
+
+;Register L':
+
+;Bit 0    Udskriftstype
+;           0 - Fastkomma notation
+;           1 - Exponentiel notation
+;Bit 2-1  Fortegnsformat
+;           00 - Intet fortegn
+;           01 - AC>=0: Intet fortegn
+;                AC<0:  "-"
+;           10 - AC>=0: " "
+;                AC<0:  "-"
+;           11 - AC>=0: "+"
+;                AC<0:  "-"
+;Bit 3    Decimaldelsformat
+;           0 - Kun betydende cifre
+;           1 - Skriv alle cifre
+;Bit 4    Heltalsdelformat
+;           0 - Kun betydende cifre
+;           1 - Blanktegn foer betydende cifre
+
+;Register H':
+
+;Bit 3-0  Decimalfeltets laengde (0-15)
+;Bit 7-4  Heltalsfeltets laengde (1-15)
+;         Bruges kun hvis bit 0 i L' er 0
+
+
+FSTRR:  EXX
+        LD   A,L        ;Gem format i A og A'
+        EX   AF,AF'
+        LD   A,H
+        EXX
+        JR   OUTN1
+
+;FLYDENDE TAL TIL TEKSTSTRENG.
+
+;Formatet efterfoelger kaldet som to bytes, der
+;har samme betydning som L' henholdsvis H' ved
+;kald af FSTRR.
+
+FSTRS:  EX   (SP),IX
+        LD   A,(IX+0)    ;Gem format i A og A'
+        INC  IX
+        EX   AF,AF'
+        LD   A,(IX+0)
+        INC  IX
+        EX   (SP),IX
+
+OUTN1:  PUSH IX         ;Gem IX,IY,AC,AC'
+        PUSH IY
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        EXX
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        EXX
+        LD   IY,-13     ;Opret en 13 bytes
+        ADD  IY,SP      ;buffer paa stakken
+        LD   SP,IY
+        EXX
+        LD   E,A        ;Gem formatet
+        EX   AF,AF'
+        LD   D,A
+        PUSH DE
+        EXX
+
+        INC  L          ;Er AC nul?
+        DEC  L
+        JR   NZ,DIGITS  ;Nej => DIGITS
+
+        POP  DE         ;Hent formatet
+DZERO:  LD   (IY+0),L   ;Marker bufferslut
+        JP   OUTM
+
+DIGITS: PUSH BC         ;Gem BC
+        RES  7,B        ;Goer AC positiv
+        LD   A,L        ;Hent exponent
+        EXX
+
+;Udregn titalsexponenten udfra totalsexponenten
+;paa foelgende maade:
+;E10=INT(E2*LOG(2))=INT((E2*77+5)/256)
+
+        LD   H,0        ;HL=toexponent
+        SUB  EXPN
+        JR   NC,SC1
+        DEC  H
+SC1:    LD   L,A
+        PUSH HL         ;HL=HL*77+5
+        ADD  HL,HL
+        ADD  HL,HL
+        PUSH HL
+        ADD  HL,HL
+        LD   D,H
+        LD   E,L
+        ADD  HL,HL
+        ADD  HL,HL
+        ADD  HL,HL
+        ADD  HL,DE
+        POP  DE
+        ADD  HL,DE
+        POP  DE
+        ADD  HL,DE
+        LD   DE,5
+        ADD  HL,DE
+        LD   A,H        ;A=INT(HL/256)
+        CP   -39
+        JR   NZ,SC2
+        INC  A
+SC2:    LD   (IY+0),A   ;Gem tiexponent
+        NEG             ;Multiplicer AC med
+        CALL TENF       ;10^-tiexponent
+        LD   A,L        ;Er AC<1?
+        CP   EXPN+1
+        JR   NC,SC3     ;Nej => SC3
+        DEC  (IY+0)     ;Tiexponent-1
+        CALL MUL10      ;AC=AC*10
+
+SC3:    SET  7,B
+        LD   A,EXPN+4
+        SUB  L
+        LD   L,0
+        JR   Z,DIGI1
+SC4:    CALL SRIGHT
+        RR   L
+        DEC  A
+        JR   NZ,SC4
+
+DIGI1:  LD   A,(IY+0)   ;Hent tiexp.
+        LD   (IY+0),0   ;Marker bufferstart
+        PUSH IY         ;Gem IY
+        PUSH AF         ;Gem tiexp.
+        LD   A,12       ;Udregn 12 cifre
+
+DIGI2:  EX   AF,AF'     ;Gem taeller
+        LD   A,B
+        RRA
+        RRA
+        RRA
+        RRA
+        AND  0FH
+        ADD  A,'0'
+        INC  IY
+        LD   (IY+0),A
+        LD   A,B
+        AND  0FH
+        LD   B,A
+
+        PUSH BC         ;Gang AC med 10
+        PUSH DE
+        PUSH HL
+        SLA  L
+        CALL LEFT
+        SLA  L
+        CALL LEFT
+        EX   DE,HL
+        EX   (SP),HL
+        ADD  HL,DE
+        POP  DE
+        EX   (SP),HL
+        ADC  HL,DE
+        EX   DE,HL
+        POP  HL
+        EX   (SP),HL
+        ADC  HL,BC
+        LD   B,H
+        LD   C,L
+        POP  HL
+        SLA  L
+        CALL LEFT
+
+        EX   AF,AF'     ;Hent taeller
+        DEC  A          ;Faerdig?
+        JR   NZ,DIGI2   ;Nej => DIGI2
+
+        POP  AF         ;Hent tiexp.
+        POP  IY         ;Hent IY,BC
+        POP  BC
+        INC  IY         ;Peg til foerste ciffer
+        LD   C,A        ;Gem titalsexp. i C
+
+ROUND:  POP  DE         ;Hent format
+        LD   A,E        ;Udregn nummeret paa
+        AND  FWIDTH     ;det ciffer der skal
+        INC  A          ;afrundes fra
+        BIT  0,D
+        JR   NZ,ROU1
+        ADD  A,C
+        JP   M,DZERO    ;Neg. => Udskriv 0
+
+ROU1:   CP   12         ;Max. nummer 11
+        JR   C,ROU2
+        LD   A,11
+
+ROU2:   PUSH IY         ;Udregn adressen paa
+        POP  HL         ;det ciffer der skal
+        ADD  A,L        ;afrundes
+        LD   L,A
+        JR   NC,ROU3
+        INC  H
+
+ROU3:   LD   A,(HL)     ;Hent ciffer
+        LD   (HL),0     ;Marker bufferslut
+        CP   '5'        ;Afrunding?
+        JR   C,ROU5     ;Nej => ROU5
+
+ROU4:   DEC  HL         ;Tag forrige ciffer
+        LD   A,(HL)
+        OR   A          ;Bufferstart?
+        JR   Z,ROU6     ;Ja => ROU6
+        INC  A          ;Laeg 1 til ciffer
+        LD   (HL),A
+        CP   '9'+1      ;Var ciffer '9'?
+        JR   C,OUTM     ;Nej => OUTM
+        LD   (HL),0     ;Marker bufferslut
+        JR   ROU4
+
+ROU5:   DEC  HL         ;Tag forrige ciffer
+        LD   A,(HL)
+        SUB  '0'        ;Er det '0'?
+        JR   NZ,OUTM    ;Nej => OUTM
+        LD   (HL),A     ;Marker bufferslut
+        JR   ROU5
+
+ROU6:   INC  HL         ;Tallet var 9999...
+        LD   (HL),'1'   ;Lav om til 10000...
+        INC  HL
+        LD   (HL),0
+        INC  C          ;Laeg 1 til tiexp.
+
+OUTM:   LD   A,(IY+0)   ;Er tallet 0?
+        OR   A
+        JR   NZ,OM1     ;Nej => OM1
+        LD   B,A        ;Positivt fortegn
+        LD   C,A        ;Tiexp = 0
+
+OM1:    BIT  0,D        ;Exponentielt?
+        JR   NZ,OM6     ;Ja => OM6
+
+        LD   A,E        ;Udregn det antal
+        AND  IWIDTH     ;blanktegn der skal
+        RRCA            ;udskrives inden tallet
+        RRCA
+        RRCA
+        RRCA
+        DEC  A
+        BIT  2,D
+        JR   NZ,OM2
+        BIT  1,D
+        JR   Z,OM3
+        BIT  7,B
+        JR   Z,OM3
+OM2:    DEC  A
+OM3:    BIT  7,C
+        JR   NZ,OM4
+        SUB  C
+OM4:    OR   A          ;Negativt?
+        SCF             ;Indiker fejl
+        JP   M,POPALL   ;Ja => POPALL
+
+        BIT  4,D        ;Blanktegn?
+        JR   Z,OM6      ;Nej => OM6
+
+        LD   H,A        ;Gem blanktegn
+        INC  H
+OM5:    DEC  H
+        JR   Z,OM6
+        LD   A,' '
+        CALL STOA
+        JR   OM5
+
+OM6:    BIT  7,B        ;Gem fortegn
+        JR   Z,OM7
+        LD   A,'-'
+        BIT  2,D
+        JR   NZ,OM8
+        BIT  1,D
+        JR   NZ,OM8
+        JR   OM9
+OM7:    BIT  2,D
+        JR   Z,OM9
+        LD   A,' '
+        BIT  1,D
+        JR   Z,OM8
+        LD   A,'+'
+OM8:    CALL STOA
+
+OM9:    BIT  0,D        ;Exponentielt?
+        JR   Z,OM10     ;Nej => OM10
+        LD   H,C        ;Gem tiexp. i H
+        LD   C,0        ;tiexp. = 0
+
+OM10:   BIT  7,C        ;Er tiexp.>=0?
+        JR   Z,OM11     ;Ja => OM11
+
+        CALL STOZ       ;Gem '0'
+        JR   OM12
+
+OM11:   CALL STODIG     ;Gem de cifre der
+        DEC  C          ;staar foer kommaet
+        JP   P,OM11
+
+OM12:   LD   A,E        ;Skal der cifre efter
+        AND  FWIDTH     ;kommaet?
+        JR   Z,OM15     ;Nej => OM15
+        LD   E,A
+        CALL MORED      ;Er der flere cifre?
+        JR   Z,OM15     ;Nej => OM15
+
+        LD   A,'.'      ;Gem '.'
+        CALL STOA
+
+OM13:   INC  C          ;Gem ubetydende nuller
+        JR   Z,OM14
+        CALL STOZ
+        DEC  E
+        JR   NZ,OM13
+
+OM14:   DEC  E          ;Gem betydende cifre
+        JP   M,OM15
+        CALL STODIG
+        CALL MORED
+        JR   NZ,OM14
+
+OM15:   BIT  0,D        ;Exponentielt?
+        JR   Z,POPA1    ;Nej => POPA1
+
+        LD   A,'E'      ;Gem 'E'
+        CALL STOA
+        LD   A,'+'      ;Gem fortegn
+        BIT  7,H
+        JR   Z,OEX1
+        LD   A,H
+        NEG
+        LD   H,A
+        LD   A,'-'
+OEX1:   CALL STOA
+        LD   A,H        ;Udregn 2-cifret exp.
+        LD   B,'0'-1
+OEX2:   INC  B
+        SUB  10
+        JR   NC,OEX2
+        ADD  A,10+'0'
+        LD   (IX+0),B   ;Gem exponent
+        INC  IX
+        CALL STOA
+
+POPA1:  OR   A          ;Nulstil carry
+POPALL: EX   AF,AF'     ;Gem status
+        LD   (IX+0),0   ;Marker bufferslut
+        LD   HL,13      ;Fjern talbuffer
+        ADD  HL,SP
+        LD   SP,HL
+        POP  HL         ;Hent AC',AC,IY,IX
+        POP  DE
+        POP  BC
+        EXX
+        POP  HL
+        POP  DE
+        POP  BC
+        POP  IY
+        POP  IX
+        EX   AF,AF'     ;Hent status
+        RET
+
+;Gem et ciffer i bufferen.
+
+STODIG: LD   A,(IY+0)   ;Hent ciffer
+        INC  IY
+        OR   A          ;Bufferslut?
+        JR   NZ,STOA    ;Nej => STOA
+        DEC  IY         ;Juster
+STOZ:   LD   A,'0'      ;Gem '0'
+STOA:   LD   (IX+0),A
+        INC  IX
+        RET
+
+;Undersoeg om der er flere cifre.
+
+MORED:  BIT  3,D
+        RET  NZ
+        LD   A,(IY+0)
+        OR   A
+        RET
+
+;Multiplicer AC med 10^A.
+
+TENF:   PUSH AF         ;Gem AF
+        OR   A          ;Positiv exponent?
+        JP   P,TF1      ;Ja => TF1
+        NEG             ;A=ABS(A)
+TF1:    PUSH AF         ;Gem flag
+        SRL  A          ;A=INT(A/4)
+        SRL  A
+        LD   HL,-6      ;Udregn offset til
+        LD   DE,6       ;konstant nummer A
+        INC  A
+TF2:    ADD  HL,DE
+        DEC  A
+        JR   NZ,TF2
+        EX   DE,HL
+        PUSH IX         ;Gem IX
+        LD   IX,CON10   ;Hent konstant
+        ADD  IX,DE
+        CALL GETCIX
+        POP  IX         ;Hent IX
+        POP  AF         ;Hent exponent
+        AND  3          ;Juster faktor
+TF3:    JR   Z,TF4
+        PUSH AF
+        CALL MUL10
+        POP  AF
+        DEC  A
+        JR   TF3
+TF4:    POP  AF         ;Hent exponent
+        OR   A          ;Positiv?
+        JP   P,FPMUL    ;Ja => Multipicer
+        EXX             ;Nej => Divider
+        JP   FPDIV
+
+;Tier potens konstanter for konvertering.
+
+CON10:  DW 00000H,00000H,00081H ;1E+00
+
+        DW 01C40H,00000H,0008EH ;1E+04
+
+        DW 03EBCH,02000H,0009BH ;1E+08
+
+        DW 0684DH,0A510H,000A8H ;1E+12
+
+        DW 00E1BH,0C9BFH,004B6H ;1E+16
+
+        DW 02D78H,0EBC5H,0ACC3H ;1E+20
+
+        DW 053C2H,01BCEH,0CDD0H ;1E+24
+
+        DW 0013FH,03978H,0F9DEH ;1E+28
+
+        DW 01DC5H,0ADA8H,02BEBH ;1E+32
+
+        DW 04097H,0CE7BH,0C9F8H ;1E+36
+
+
+
+;AC=ABS(AC)*10.
+
+MUL10:  LD   A,L
+        OR   A
+        RET  Z
+        SET  7,B
+        PUSH BC
+        PUSH DE
+        LD   A,H
+        CALL SRIGHT
+        CALL SRIGHT
+        ADD  A,H
+        LD   H,A
+        EX   (SP),HL
+        ADC  HL,DE
+        EX   DE,HL
+        POP  HL
+        EX   (SP),HL
+        ADC  HL,BC
+        LD   B,H
+        LD   C,L
+        POP  HL
+        JR   NC,M10A
+        CALL RIGHT
+        INC  L
+        SCF
+        RET  Z
+M10A:   LD   A,L
+        ADD  A,3
+        LD   L,A
+        RES  7,B
+        RET
+
+;ASCII TIL FLOATING POINT.
+
+CNVN:   EXX             ;Gem AC'
+        PUSH BC
+        PUSH DE
+        PUSH HL
+        LD   BC,0       ;Nulstil flag
+        EXX
+        CALL ZERO       ;Nulstil AC
+
+        LD   A,(IX+0)   ;Hent foerste karakter
+        CP   '+'        ;Plus?
+        JR   Z,CNV1     ;Ja => CNV1
+        DEC  IX
+        CP   '-'        ;Minus?
+        JR   NZ,CNV1    ;Nej => CNV1
+        EXX             ;Saet minusflag
+        SET  7,B
+        EXX
+        INC  IX
+
+CNV1:   INC  IX         ;Hent naeste karakter
+        LD   A,(IX+0)
+
+        CP   '.'        ;Decimalpunkt?
+        JR   NZ,CNV2    ;Nej => CNV2
+        EXX             ;Er det det foerste?
+        BIT  6,B
+        SCF
+        JP   NZ,CNV6    ;Nej => FEJL
+        SET  6,B        ;Ja => saet flag
+        EXX
+        JR   CNV1
+
+CNV2:   CP   'E'        ;Exponentnotation?
+        JR   Z,CNV4     ;Ja => CNV4
+
+        CALL DIGTST     ;Er det et ciffer?
+        JR   NC,CNV5    ;Nej => CNV5
+
+        EX   AF,AF'     ;Gang resultat med 10
+        CALL MUL10
+        JR   C,CNV6A
+        EX   AF,AF'
+        EXX             ;Laeg det nye ciffer
+        PUSH BC         ;til
+        LD   L,A
+        LD   H,0
+        CALL FLOAT
+        CALL FPADD
+        EXX
+        POP  BC
+        JR   C,CNV6A
+        BIT  6,B        ;Er decimalflag sat?
+        JR   Z,CNV3     ;Nej => CNV3
+        DEC  C          ;Traek 1 fra tiexp.
+CNV3:   EXX
+        JR   CNV1
+
+CNV4:   CALL MFACT      ;Gang med titalsfaktor
+        JR   C,CNV6     ;Overflow => CNV6
+        EXX
+        INC  IX         ;Hent naeste karakter
+        LD   A,(IX+0)
+        CP   '+'        ;Plus?
+        JR   Z,CNV4A    ;Ja => CNV4A
+        CP   '-'        ;Minus?
+        JR   NZ,CNV4B   ;Nej => CNV4B
+        SET  5,B        ;Saet minusflag
+CNV4A:  INC  IX
+
+CNV4B:  CALL GDTST      ;Er der et ciffer?
+        CCF             ;Saet carry hvis ikke
+CNV6A:  JR   C,CNV6     ;Nej => CNV6
+        LD   C,A        ;Gem i C
+        INC  IX         ;Er der et mere?
+        CALL GDTST
+        JR   NC,CNV4C   ;Nej => CNV4C
+
+        INC  IX         ;Gang forrige ciffer
+        LD   D,A        ;med 10 og laeg det
+        LD   A,C        ;nye til
+        ADD  A,A
+        ADD  A,A
+        ADD  A,C
+        ADD  A,A
+        ADD  A,D
+        LD   C,A
+
+CNV4C:  BIT  5,B        ;Negativt?
+        JR   Z,CNV4D    ;Nej => CNV4D
+        LD   A,C
+        NEG
+        LD   C,A
+CNV4D:  EXX
+
+CNV5:   CALL MFACT      ;Gang med titalsfaktor
+        JR   C,CNV6     ;Overflow => CNV6
+        EXX             ;Negativt?
+        BIT  7,B
+        EXX
+        JR   Z,CNV6     ;Nej => CNV6
+        SET  7,B        ;Saet minusflag i AC
+
+CNV6:   JP   ADD10      ;Hent AC'
+
+;Gang tallet i AC med 10^C'
+
+MFACT:  EXX
+        LD   A,C
+        ADD  A,EXPN
+        CP   -37+EXPN   ;Tiexp.<-37?
+        RET  C          ;Ja => Retur
+        CP   38+EXPN    ;Tiexp.>37?
+        CCF
+        RET  C          ;Ja => Retur
+
+        PUSH BC         ;Gem BC
+        LD   A,C        ;Hent tiexponent
+        CALL TENF       ;Mul. med 10^tiexp.
+        EXX             ;Hent BC
+        POP  BC
+        EXX
+        RET
+
+;Saet carry hvis karakteren i A er et ciffer.
+
+GDTST:  LD   A,(IX+0)
+DIGTST: SUB  '0'
+        CCF
+        RET  NC
+        CP   10
+        RET
+
+;Saet AC lig 1.
+
+AC1:    LD   BC,00000H
+        LD   DE,00000H
+        LD   HL,00081H
+        RET
+;------------END OF MATH48------------
