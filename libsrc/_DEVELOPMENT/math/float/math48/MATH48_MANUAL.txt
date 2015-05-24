@@ -1,17 +1,6 @@
+
 Translated by Thorleif Bundgaard <thorleif@fam-bundgaard.dk>
 OBS: (I dont know the translation of the Danish "Mantisse" !!)
-[It's "mantissa"]
-
-There seem to be someone wanting floating point out there, so let me tell a short story.
-Once upon a time - well actually it was in the old days, you know, before the days of IBM-PC, Microsoft and Borland.
-In those days, one wery popular computer, among a lot of other nice stuff, was the NASCOM. a Z80 based machine, I and my collegue build one of those for ourself, and eventually ended up, adding a homebuild floppy disk drive.
-- you could buy them but it was more fun doing it yourself. - Actually we also had to write the operating system ourself
-- well back to the issue -
-At that time I got into contact with a guy 'Anders Hejlsberg' later to be one of the founders of BORLAND.
-He had made the first real compiler for the NASCOM, called 'Blue Label Pascal'. In 1984 Anders gave me the source for the floating point routines used in this Pascal.
-The special thing about this is that it keeps all its computations on the stack, so you dont have to set aside some RAM areas.
-I also have a printed description that Anders made (In Danish) If there is a real need for it, I will be glad to translate it to English (But only if someone will use it)
-Most is just CALL descriptions, so I guess that anyone speaking English or German will understand our language well enough. So just ask, and I will send a copy by mail (it's 15 pages)
 
 http://www.fam-bundgaard.dk/DOWNLOAD/DOWNLOAD.HTM
 

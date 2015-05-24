@@ -11,7 +11,7 @@ Key features of the math48 float package:
 
 * The floating point accumulator and operand are held in registers rather than in memory.
 
-* The float format has a 40-bit mantissa and 8-bit exponent.
+* The float format has a 40-bit mantissa and 8-bit exponent with 128 bias.
 
 * Register use is limited to the main set, the exx set and one index register (ix by default).
 
@@ -35,12 +35,14 @@ Contains the math functions expected by the C11 standard.  These are implemented
 
 Contains the c compiler interface that calls into the assembly language implementation in the c_standard directory.  Float conversion between the math48 format and the format expected by the compilers is done here.
 
+* lm
+
+Glue that connects the compilers to the math48 library.  These functions make up the math library that is linked against on the compile line (as in "-lm").
+
 ===============================================================
 
 Thanks to Thorleif Bundgaard (see "MATH48_MANUAL.txt") for preserving this math package on the internet and for translating the documentation to make it so easy to use.
 
-And of course thank you to Anders Hejlsberg for writing the package in the first place.  The idea of using BCDEHL and BCDEHL' as floating point accumulators was a good one.  Who knew your work would find application 35 years later?
+Thanks to Anders Hejlsberg for writing the package in the first place.  The idea of using BCDEHL and BCDEHL' as floating point accumulators was a good one.  Who knew your work would find application 35 years later?
 
-We hope to contact Anders to get his permission to use this math package in z88dk.
-
--- aralbrec May 2015
+We hope to contact Anders to gain his permission to use this math package in z88dk.
