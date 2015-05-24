@@ -14,7 +14,7 @@
 @l/l.lst
 @l/sdcc.lst
 @locale/locale.lst
-@math/math.lst
+@math/math_integer.lst
 @setjmp/setjmp_sdcc_ix.lst
 @sound/sound_sdcc_ix.lst
 @stdio/stdio_sdcc_ix.lst

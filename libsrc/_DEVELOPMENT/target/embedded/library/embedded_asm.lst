@@ -7,7 +7,8 @@
 @inttypes/inttypes_asm.lst
 @l/l.lst
 @locale/locale.lst
-@math/math.lst
+@math/math_integer.lst
+@math/math_float_ix.lst
 @stdio/stdio_asm.lst
 @stdlib/stdlib_asm.lst
 @string/string_asm.lst
