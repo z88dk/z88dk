@@ -16,4 +16,4 @@ cm48_sccz80_isgreater:
    
    exx
    
-   jp isgreater
+   jp lm48_isgreater

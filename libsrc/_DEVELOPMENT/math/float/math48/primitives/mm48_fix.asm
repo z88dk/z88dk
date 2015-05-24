@@ -3,7 +3,7 @@ SECTION code_fp_math48
 
 PUBLIC mm48_fix
 
-EXTERN mm48__sright, mm48_error_erange_intc, error_znc
+EXTERN error_znc, mm48_error_erange_intc, l_lsr_hl, l_neg_hl
 
 mm48_fix:
 
@@ -27,43 +27,34 @@ mm48_fix:
    ;         FIX(-1.5)=  -1=  $FFFF
    ;         FIX(0.5)=    0=  $0000
    ;
-   ; uses  : af, bc, de, hl, af'
+   ; uses  : af, bc, de, hl, af', bc', de', hl'
 
    exx
    
-   ; AC' active
+   ; AC = x
 
+   ld a,l
    or a
-
-   bit 7,l                     ;is exponent < 0 ?
-   jp z, error_znc             ;if yes return zero
+   
+   jp z, error_znc             ; if x == 0, return 0
+   jp p, error_znc             ; if exponent < 0, return 0
 
    bit 7,b                     ;Gem fortegn
    ex af,af'
    set 7,b                     ;Saet MSB
 
-mm48__fix1:
-
-   ld a,$80 + 15               ;Test exponent
-   cp l
-   jp c, mm48_error_erange_intc - 1  ;EXP>15 => overflow
-   jr z, mm48__fix2            ;EXP=15 => FIX2
-   call mm48__sright           ;EXP<15 => roter til
-   inc l                       ;hoejre og laeg 1 til
-   jr mm48__fix1               ;exponent
-
-mm48__fix2:
-
-   call mm48__sright           ;Roter til hoejre
-   ex af,af'                   ;Negativt fortegn?
-   jr z, mm48__fix3            ;Nej => INT2
-   ld hl,0                     ;Tag 2's complement
-   sbc hl,bc
-   or a                        ;Nulstil carry
-   ret
-
-mm48__fix3:
-
-   ld h,b                      ;Hent tallet
+   ld a,$80 + 14
+   sub l
+   inc a                       ; a = amount to shift right
+   
+   jp c, mm48_error_erange_intc - 1  ; if number too large
+   
    ld l,c
-   ret
+   ld h,b                      ; hl = most significant bits
+   
+   call l_lsr_hl               ; logical shift right by amount a
+   
+   ex af,af'                   ; z flag set if positive
+   
+   ret z
+   jp l_neg_hl

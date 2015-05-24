@@ -3,7 +3,7 @@ SECTION code_fp_math48
 
 PUBLIC mm48_float
 
-EXTERN mm48__retzero, mm48__sleft
+EXTERN mm48_ufloat, l_neg_hl
 
 mm48_float:
 
@@ -16,41 +16,15 @@ mm48_float:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
    
-   ld a,h                      ;Er HL=0?
-   or l
-   jp z, mm48__retzero         ;Ja => ZERO
-
-   bit 7,h                     ;Er HL negativ?
-   jr z, mm48__flt1            ;Nej => FLT1
-
-   ex de,hl                    ;Tag 2's complement
-   ld hl,0
+   ld a,h
    or a
-   sbc hl,de
-
-mm48__flt1:
-
-   ex af,af'                   ;Gem fortegn i F'
-   ld b,h                      ;Saet mantissa
-   ld c,l
-   ld de,0
-   ld hl,$80 + 16              ;Saet exponent
-
-mm48__flt2:
-
-   bit 7,b                     ;Normaliser
-   jr nz, mm48__flt3
-   call mm48__sleft
-   dec l
-   jr mm48__flt2
-
-mm48__flt3:
-
-   ex af,af'                   ;Negativt?
-   jr c, exit                  ;if yes
-   res 7,b                     ;Positivt
+   jp p, mm48_ufloat           ; if n >= 0
    
-exit:
-
+   call l_neg_hl               ; n = |n|
+   call mm48_ufloat
+   
    exx
+   set 7,b
+   exx
+   
    ret
