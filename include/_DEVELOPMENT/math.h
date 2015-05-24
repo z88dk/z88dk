@@ -6,8 +6,8 @@
 
 // SCCZ80 ONLY AT THE MOMENT AND FUNCTION POINTERS NOT SUPPORTED YET
 
-typedef double float_t
-typedef double double_t
+typedef double float_t;
+typedef double double_t;
 
 #define FLT_EVAL_METHOD        1
 
