@@ -141,7 +141,7 @@ mm48__ln1:
    
    ld a,l
    cp $80 - 25                 ;LN(X)<3E-8 => LN(X)=0
-   call c, mm48_zero
+   call c, mm48__zero
 
    jp mm48__add10              ;Hent AC'
 

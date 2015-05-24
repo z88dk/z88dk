@@ -3,7 +3,7 @@ SECTION code_fp_math48
 
 PUBLIC mm48_int
 
-EXTERN mm48__retzero, mm48__right, mm48__add10
+EXTERN mm48__zero, mm48__retzero, mm48__right, mm48__add10
 
 mm48_int:
 

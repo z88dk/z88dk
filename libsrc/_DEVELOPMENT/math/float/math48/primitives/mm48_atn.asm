@@ -140,7 +140,7 @@ mm48__atn5:
 
    ; AC'= x
 
-   call mm48__gtncix           ;Hent TAN(K)
+   call mm48__getncix          ;Hent TAN(K)
    set 7,b                     ;Udregn X-TAN(K)
    
    exx
@@ -177,7 +177,7 @@ mm48__atn5:
    call mm48__arctan           ;AC'= atan(Y)
    pop ix
    
-   call mm48__gtncix           ;Hent K
+   call mm48__getncix          ;Hent K
    call mm48_fpadd             ;AC'= K+atan(Y)
 
 mm48__atn6:

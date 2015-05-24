@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC lm48_ldexp
 
-EXTERN mm48__zero, mm48_error_erange_infc
+EXTERN mm48__retzero, mm48_error_erange_infc
 
 lm48_ldexp:
 

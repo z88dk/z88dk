@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC lm48_acos
 
-EXTERN lm48_asin, mm48__acpi, mm48_fpsub
+EXTERN lm48_asin, mm48__acpi, mm48_fpsub, mm48__add10
 
 lm48_acos:
 

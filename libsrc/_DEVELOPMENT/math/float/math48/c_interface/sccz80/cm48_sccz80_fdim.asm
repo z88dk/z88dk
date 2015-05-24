@@ -3,9 +3,9 @@
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sccz80_fdim, cm48_sccz80p_collect_2
+PUBLIC cm48_sccz80_fdim
 
-EXTERN lm48_fdim
+EXTERN lm48_fdim, cm48_sccz80p_collect_2
 
 cm48_sccz80_fdim:
 

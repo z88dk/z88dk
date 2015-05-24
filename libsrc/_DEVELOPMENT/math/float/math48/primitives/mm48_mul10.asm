@@ -3,7 +3,7 @@ SECTION code_fp_math48
 
 PUBLIC mm48_mul10
 
-EXTERN mm48__sright, mm48__right, mm48_error_erange_pinfc
+EXTERN mm48__sright, mm48__right, mm48_error_erange_pinfc, mm48__retzero
 
 mm48_mul10:
 

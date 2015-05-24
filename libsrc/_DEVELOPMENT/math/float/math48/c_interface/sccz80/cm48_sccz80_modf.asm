@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sccz80_modf
 
-EXTEN lm48_modf, cm48_sccz80p_dstore
+EXTERN lm48_modf, cm48_sccz80p_dstore
 
 cm48_sccz80_modf:
 

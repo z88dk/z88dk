@@ -107,7 +107,7 @@ mm48__exp5:
 
    jp mm48__add10              ;Hent AC'
 
-mm48_exp6:
+mm48__exp6:
 
    ; AC = result
 
