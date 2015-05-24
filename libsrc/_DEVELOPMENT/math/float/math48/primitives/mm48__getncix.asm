@@ -1,9 +1,9 @@
 
 SECTION code_fp_math48
 
-PUBLIC mm48__gtncix, mm48__getcix
+PUBLIC mm48__getncix, mm48__getcix
 
-mm48__gtncix:
+mm48__getncix:
 
 ;Saet AC lig den konstant IX peger paa.
 

@@ -3,7 +3,7 @@ SECTION code_fp_math48
 
 PUBLIC mm48__calcs
 
-EXTERN mm48__ac1, mm48__gtncix, mm48__getcix
+EXTERN mm48__ac1, mm48__getncix, mm48__getcix
 EXTERN mm48_fpmul, mm48_fpadd, mm48_fpdiv
 
 mm48__calcs:
@@ -37,7 +37,7 @@ mm48__calc1:
    push de
    push hl
    
-   call mm48__gtncix           ;AC = next constant
+   call mm48__getncix          ;AC = next constant
    call mm48_fpadd             ;AC' += AC
    
    pop hl                      ;AC = Z
