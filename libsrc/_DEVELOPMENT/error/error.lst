@@ -34,6 +34,7 @@ error/z80/error_lznc
 error/z80/error_mc
 error/z80/error_mnc
 error/z80/error_mulu_overflow_mc
+error/z80/error_oc
 error/z80/error_onc
 error/z80/error_zc
 error/z80/error_znc
