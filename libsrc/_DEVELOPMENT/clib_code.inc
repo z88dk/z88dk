@@ -27,6 +27,8 @@ section code_ctype
 section code_error
 section code_fcntl
 section code_font_fzx
+section code_fp_genmath
+section code_fp_math48
 section code_input
 section code_inttypes
 section code_l
