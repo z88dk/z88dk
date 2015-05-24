@@ -9,7 +9,7 @@
 @l/sccz80.lst
 @locale/locale.lst
 @math/math_integer.lst
-@math/math_float_ix.lst
+@math/math_float_sccz80.lst
 @setjmp/setjmp_sccz80.lst
 @stdio/stdio_sccz80.lst
 @stdlib/stdlib_sccz80.lst

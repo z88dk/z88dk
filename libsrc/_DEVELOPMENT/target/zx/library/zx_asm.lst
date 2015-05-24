@@ -14,7 +14,7 @@
 @l/l.lst
 @locale/locale.lst
 @math/math_integer.lst
-@math/math_float_ix.lst
+@math/math_float_asm.lst
 @sound/sound_asm.lst
 @stdio/stdio_asm.lst
 @stdlib/stdlib_asm.lst
