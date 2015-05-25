@@ -11,7 +11,8 @@ cm48_sccz80_fmod:
 
    call cm48_sccz80p_collect_2
    
-   ; AC'= x
-   ; AC = y
+   ; AC'= y
+   ; AC = x
    
+   exx
    jp lm48_fmod

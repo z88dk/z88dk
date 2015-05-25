@@ -11,13 +11,15 @@ cm48_sccz80_scalbn:
 
    pop af
    
+   pop hl                      ; hl = n
+   
+   exx
+   
    pop hl                      ; AC'= x
    pop de
    pop bc
    
    exx
-   
-   pop hl                      ; hl = n
    
    push af
    

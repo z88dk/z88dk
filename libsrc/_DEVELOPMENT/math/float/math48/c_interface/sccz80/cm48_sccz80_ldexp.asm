@@ -11,13 +11,15 @@ cm48_sccz80_ldexp:
 
    pop af
    
+   pop hl                      ; hl = exp
+   
+   exx
+   
    pop hl                      ; AC'= x
    pop de
    pop bc
    
    exx
-   
-   pop hl                      ; hl = exp
    
    push af
    

@@ -11,9 +11,7 @@ cm48_sccz80_hypot:
 
    call cm48_sccz80p_collect_2
    
-   ; AC'= x
-   ; AC = y
-   
-   exx
+   ; AC'= y
+   ; AC = x
    
    jp lm48_hypot

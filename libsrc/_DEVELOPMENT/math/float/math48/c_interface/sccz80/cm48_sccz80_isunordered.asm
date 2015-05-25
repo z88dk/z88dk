@@ -11,7 +11,7 @@ cm48_sccz80_isunordered:
 
    call cm48_sccz80p_collect_2
    
-   ; AC'= x
-   ; AC = y
+   ; AC'= y
+   ; AC = x
    
    jp lm48_isunordered

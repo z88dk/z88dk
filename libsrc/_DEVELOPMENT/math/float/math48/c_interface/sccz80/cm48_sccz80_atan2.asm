@@ -11,7 +11,7 @@ cm48_sccz80_atan2:
 
    call cm48_sccz80p_collect_2
    
-   ; AC'= y
-   ; AC = x
+   ; AC'= x
+   ; AC = y
    
    jp lm48_atan2

@@ -11,7 +11,8 @@ cm48_sccz80_fdim:
 
    call cm48_sccz80p_collect_2
    
-   ; AC'= x
-   ; AC = y
-      
+   ; AC = x
+   ; AC'= y
+   
+   exx
    jp lm48_fdim

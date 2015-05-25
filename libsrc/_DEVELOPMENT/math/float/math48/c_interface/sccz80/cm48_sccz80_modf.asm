@@ -11,13 +11,15 @@ cm48_sccz80_modf:
 
    pop af
    
+   pop hl                      ; hl = iptr
+   
+   exx
+   
    pop hl                      ; AC'= value
    pop de
    pop bc
    
    exx
-   
-   pop hl
    
    push af
    
