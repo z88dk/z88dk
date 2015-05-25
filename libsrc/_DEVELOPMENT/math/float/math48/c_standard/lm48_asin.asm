@@ -6,7 +6,7 @@ SECTION code_fp_math48
 PUBLIC lm48_asin
 
 EXTERN mm48_equal, mm48_fpmul, mm48__ac1, mm48_fpadd
-EXTERN mm48_sqr, mm48_fpdiv, mm48_atan, mm48__add10
+EXTERN mm48_sqr, mm48_fpdiv, mm48_atn, mm48__add10
 
 lm48_asin:
 
@@ -61,6 +61,6 @@ lm48_asin:
    exx
    
    call mm48_fpdiv             ; AC'= x/sqrt(1-x*x)
-   call mm48_atan
+   call mm48_atn
    
    jp mm48__add10 + 1
