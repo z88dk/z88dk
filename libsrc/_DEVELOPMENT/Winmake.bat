@@ -3,7 +3,7 @@ setlocal
 setlocal ENABLEDELAYEDEXPANSION
 
 @rem must have leading and trailing space
-set alltargets= embedded zx 
+set alltargets= embedded m zx 
 
 if "%1" == "" (
    echo.
