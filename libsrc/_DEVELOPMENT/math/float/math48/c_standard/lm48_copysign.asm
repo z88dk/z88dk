@@ -9,10 +9,10 @@ lm48_copysign:
 
    ; Make sign of x the same as sign of y
    ;
-   ; enter : AC'(BCDEHL ) = double x
-   ;         AC (BCDEHL') = double y
+   ; enter : AC'(BCDEHL') = double x
+   ;         AC (BCDEHL ) = double y
    ;
-   ; exit  : AC'(BCDEHL)  = abs(x) * sgn(y)
+   ; exit  : AC'(BCDEHL') = abs(x) * sgn(y)
    ;
    ; uses  : af, b'
 
