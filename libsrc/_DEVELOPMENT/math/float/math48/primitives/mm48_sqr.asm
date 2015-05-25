@@ -51,7 +51,7 @@ mm48_sqr:
    push bc                     ; save AC
    push de
    push hl
-   
+
    exx
    
    call mm48_equal
@@ -108,6 +108,8 @@ mm48__sqr1:
    jr nc, mm48__sqr1           ;er lille nok
 
    ; AC'= result
+   
+   pop af
    
    or a
    jp mm48__add10 + 1
