@@ -45,6 +45,7 @@ mm48_fix:
 
    ld a,$80 + 14
    sub l
+   inc a
    inc a                       ; a = amount to shift right
    
    jp c, mm48_error_erange_intc - 1  ; if number too large
