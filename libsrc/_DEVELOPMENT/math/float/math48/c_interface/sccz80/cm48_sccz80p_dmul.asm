@@ -20,8 +20,8 @@ cm48_sccz80p_dmul:
    pop af
    
    pop hl                      ; AC = y
-   pop bc
    pop de
+   pop bc
 
    push af
    
