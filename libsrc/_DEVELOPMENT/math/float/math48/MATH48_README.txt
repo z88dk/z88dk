@@ -13,7 +13,7 @@ Key features of the math48 float package:
 
 * The float format has a 40-bit mantissa and 8-bit exponent with 128 bias.
 
-* Register use is limited to the main set, the exx set and one index register (ix by default).
+* Register use is limited to the main set, the exx set (incl af') and one index register (ix by default).
 
 ===============================================================
 
@@ -23,9 +23,11 @@ The directory structure is as follows:
 
 Contains the original math48 functions implementing the core of the float package.  Two changes have been made to the source:
 
-1- The primary floating point accumulator is now in the exchange set and the secondary floating point accumulator is in the main register set.  This is exactly opposite of the original math48 package.  Doing things this way makes interfacing with the C compiler much simpler.
+1- The primary floating point accumulator is now in the exchange set and the secondary floating point accumulator is in the main register set.  This is exactly opposite to the original math48 package.  Doing things this way makes interfacing with the C compiler much simpler.
 
 2- Errno is properly set when floating point errors occur.
+
+A few core functions have been added.
 
 * c_standard
 
