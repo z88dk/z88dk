@@ -35,8 +35,8 @@ lm48_fma:
    pop af
    
    pop hl                      ; AC = z
-   pop bc
    pop de
+   pop bc
    
    push af
    ex af,af'
