@@ -3,7 +3,7 @@ SECTION code_fp_math48
 
 PUBLIC mm48_sin, mm48__sinc
 
-EXTERN mm48__acpi, mm48_cmp, mm48_equal, mm48__comser
+EXTERN mm48__acpi, mm48_cmp, mm48_equal, mm48__comser, mm48__ac1_3
 EXTERN mm48_fpadd, mm48__add10, mm48_fpsub, mm48_fpmul, mm48_mod
 
 mm48_sin:
@@ -115,9 +115,7 @@ mm48__sin4:
 
    exx
    
-   ld bc,$2AAA                 ;AC = 1/3
-   ld de,$AAAA
-   ld hl,$AA7F
+   call mm48__ac1_3            ;AC = 1/3
    
    ; AC = 1/3
    ; AC'= x
@@ -133,7 +131,9 @@ mm48__sin4:
    
    pop ix
 
-   ; AC'= sin(x)
+   exx
+   
+   ; AC = sin(x)
 
    call mm48_equal             ;Gem i AC'
    call mm48_fpmul             ;AC'= SIN(X)^3
@@ -149,6 +149,7 @@ mm48__sin4:
    push hl
    
    exx
+   
    call mm48_equal
    
    ; AC = sin(x)
@@ -185,7 +186,7 @@ mm48__sin7a:
    dec l
    
    jr z, mm48__sin7
-   jr c, mm48__sin7
+   jr nc, mm48__sin7
    
    ld a,b
    xor $80
