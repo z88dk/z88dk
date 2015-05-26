@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC lm48_cbrt
 
-EXTERN mm48__ac1_3, mm48_pwr, mm48__add10, mm48__zero
+EXTERN mm48__ac1_3, mm48_pwr, mm48__add10
 
 lm48_cbrt:
 
