@@ -10,5 +10,5 @@ mm48__ac1_3:
    ld bc,$2aaa
    ld e,c
    ld d,c
-   ld hl,$aa81
+   ld hl,$aa7f
    ret
