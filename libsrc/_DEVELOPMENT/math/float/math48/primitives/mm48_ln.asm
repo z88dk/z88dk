@@ -66,11 +66,9 @@ mm48_ln:
    ld l,$80 + 1                ;Udregn Y
    sub l
    push af                     ;Gem N
-
-   exx
    
-   ; AC = SQR(2)/2
-   ; AC'= x
+   ; AC'= SQR(2)/2
+   ; AC = x
    
    call mm48_fpmul             ;Udregn Z
    call mm48__ac1
@@ -107,14 +105,17 @@ mm48_ln:
    
    call mm48__acln2
    dec l                       ;AC = ln(2)/2
+   
    call mm48_fpadd             ;AC'= z + ln(2)/2 = w
+   
    exx
+   
+   pop af
    
    push bc                     ; save w
    push de
    push hl
-   
-   pop af
+
    ld l,a
    ld h,0
    jr nc, mm48__ln1
