@@ -21,3 +21,4 @@ l/sdcc/__mulschar
 l/sdcc/__mulsuchar
 l/sdcc/__muluschar
 l/sdcc/__sdcc_call_hl
+l/sdcc/__sdcc_call_iy
