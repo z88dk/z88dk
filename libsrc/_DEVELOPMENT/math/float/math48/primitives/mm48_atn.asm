@@ -162,16 +162,19 @@ mm48__atn5:
    call mm48__getcix           ;Hent TAN(K)
    call mm48_fpmul             ;Udregn AC' = X*TAN(K)
 
+   call mm48__ac1              ;AC = 1
+   call mm48_fpadd
+
    pop hl                      ;Hent forrige resultat
    pop de
    pop bc
 
    exx
 
-   ; AC = x * tan(k)
+   ; AC = 1 + x * tan(k)
    ; AC'= x - tan(k)
 
-   call mm48_fpdiv             ;Udregn AC'= Y = (x - tan(k)) / (x * tan(k))
+   call mm48_fpdiv             ;Udregn AC'= Y = (x - tan(k)) / (1 + x * tan(k))
    
    push ix
    call mm48__arctan           ;AC'= atan(Y)
@@ -185,6 +188,7 @@ mm48__atn6:
    ; AC'= atan(x)
 
    pop af                      ;Hent flagbyte
+   
    rla                         ;Var X>1?
    jr nc, mm48__atn7           ;Nej => ATN7
 
