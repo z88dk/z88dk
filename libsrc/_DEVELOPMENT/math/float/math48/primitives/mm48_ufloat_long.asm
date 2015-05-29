@@ -11,7 +11,7 @@ mm48_ufloat_long:
    ;
    ; enter : DEHL = 32-bit unsigned long n
    ;
-   ; exit  : AC = AC' (AC' saved)
+   ; exit  : AC = AC' (exx set saved)
    ;         AC'= (float)(n)
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
@@ -27,17 +27,18 @@ mm48_ufloat_long:
    
    ld de,$80 + 32              ; e = exponent
 
+   add a,a                     ; a = MSB of n << 1
+   jr c, normalized
+
 normalize_loop:
 
-   bit 7,b
-   jr nz, normalized
-   
+   dec e
+
    add hl,hl
    rl c
    rl b
    
-   dec e
-   jr normalize_loop
+   jp p, normalize_loop
 
 normalized:
 
