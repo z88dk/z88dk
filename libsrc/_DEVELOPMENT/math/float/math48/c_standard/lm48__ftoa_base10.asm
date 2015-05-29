@@ -27,7 +27,7 @@ lm48__ftoa_base10:
    exx
    ld a,l
    exx
-   
+
    ;  A = n (binary exponent)
    ; AC'= x
 
