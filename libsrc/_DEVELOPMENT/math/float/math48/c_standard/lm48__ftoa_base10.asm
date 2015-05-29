@@ -1,0 +1,116 @@
+
+SECTION code_fp_math48
+
+PUBLIC lm48__ftoa_base10
+
+EXTERN mm48_tenf, mm48_mul10, mm48__right
+
+lm48__ftoa_base10:
+
+   ; convert float from standard form "a * 2^n"
+   ; to a form mulitplied by power of 10 "b * 10^e"
+   ; where 1 <= b < 10 with b in float format
+   ;
+   ; mainly original math48 code
+   ;
+   ; enter : AC'= float x, x positive
+   ;
+   ; exit  : AC'= b where 1 <= b < 10 all mantissa bits only
+   ;          C = max number of significant decimal digits (21)
+   ;          D = base 10 exponent e
+   ;
+   ; uses  : af, bc, de, hl, af', bc', de', hl'
+
+   ; x = a * 2^n = b * 10^e
+   ; e = n * log(2) = n * 0.301.. = n * 0.01001101...(base 2) = INT((n*77 + 5)/256)
+
+   exx
+   ld a,l
+   exx
+   
+   ;  A = n (binary exponent)
+   ; AC'= x
+
+   sub $80                     ; remove bias
+   ld l,a
+   sbc a,a
+   ld h,a                      ; hl = signed n
+   
+   push hl                     ; save n
+   add hl,hl
+   add hl,hl
+   push hl                     ; save 4*n
+   add hl,hl
+   ld c,l
+   ld b,h                      ; bc = 8*n
+   add hl,hl
+   add hl,hl
+   add hl,hl                   ; hl = 64*n
+   add hl,bc
+   pop bc
+   add hl,bc
+   pop bc
+   add hl,bc                   ; hl = 77*n
+   ld bc,5
+   add hl,de                   ; rounding fudge factor
+   
+   ld a,h                      ; a = INT((77*n+5)/256)
+   cp -39
+   jr nz, no_correction
+   inc a
+
+no_correction:
+
+   push af                     ; save exponent e
+   
+   neg
+   call mm48_tenf              ; x *= 10^-e
+   
+   pop de                      ; d = exponent e
+   
+   exx
+   
+   ; AC = b
+   ;  D'= exponent e
+
+   ld a,l
+   cp $80+1                    ; remaining fraction part < 1 ?
+   jr nc, align_digit          ; if no
+      
+   exx
+   
+   ; AC'= b
+   ;  D = exponent e
+
+   dec d                       ; e--   
+   call mm48_mul10             ; b *= 10
+
+   exx
+   
+align_digit:
+
+   ; AC = b, 1 < b < 10
+   ;  D'= exponent e
+   
+   ; there is one decimal digit in four bits of AC
+   ; align these bits so they are the first four in register B
+   
+   set 7,b                     ; restore mantissa bit
+
+   ld a,$80+4
+   sub l
+   ld l,0
+   jr z, output_digits         ; if exponent is 4
+
+digit_loop:
+
+   call mm48__right            ; shift mantissa bits right
+   rr l
+   
+   dec a
+   jr nz, digit_loop
+
+   exx
+   
+   ld c,21                     ; max number decimal digits in this float format
+   ret
