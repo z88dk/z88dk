@@ -1,7 +1,11 @@
+math/float/math48/lm/sccz80/__ftoa_base10
+math/float/math48/lm/sccz80/__ftoa_digits
+math/float/math48/lm/sccz80/__ftoa_sgnabs
 math/float/math48/lm/sccz80/acos
 math/float/math48/lm/sccz80/acosh
 math/float/math48/lm/sccz80/asin
 math/float/math48/lm/sccz80/asinh
+math/float/math48/lm/sccz80/asm_fpclassify
 math/float/math48/lm/sccz80/atan
 math/float/math48/lm/sccz80/atan2
 math/float/math48/lm/sccz80/atanh
