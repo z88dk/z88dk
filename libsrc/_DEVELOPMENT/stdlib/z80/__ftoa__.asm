@@ -3,14 +3,14 @@ SECTION code_stdlib
 
 PUBLIC __ftoa__
 
-EXTERN l_setmem_hl, asm_fpclassify
+EXTERN l_setmem_hl, asm_fpclassify, __ftoa_special_form, __ftoa_sgnabs
 EXTERN __ftoa_base10, __ftoa_digits, __ftoa_round, __ftoa_remove_zeroes
 
-; math library supplies asm_fpclassify, __ftoa_base10, __ftoa_digits
+; math library supplies asm_fpclassify, __ftoa_base10, __ftoa_digits, __ftoa_sgnabs
 
 __ftoa__:
 
-   ; enter :  c = flags (bit 4 = #) rest cleared
+   ; enter :  c = flags (bit 4=#, bits 7 and 0 will be modified)
    ;         de = precision (clipped at 255)
    ;         hl = buffer *
    ;         exx set contains *positive* float
@@ -20,29 +20,20 @@ __ftoa__:
    ;                d = base 10 exponent e
    ;                hl = buffer_dst * (address of next char to write)
    ;                ix = buffer * (start of decimal string)
-   ;            (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ;            (IX-4) = iz (number of zeroes to insert before .)
+   ;            (IX-5) = flags, bit 7='N', bit 4='#', bit 0=(precision==0), others unaffected
+   ;            (IX-4) = tz (number of zeroes to append)
    ;            (IX-3) = fz (number of zeroes to insert after .)
-   ;            (IX-2) = tz (number of zeroes to append)
+   ;            (IX-2) = iz (number of zeroes to insert before .)
    ;            (IX-1) = if not '0' must be included in decimal string
    ;
-   ;         if carry set, special form
-   ;
-   ;             a = 1 for zero, 2 for nan, 3 for inf
-   ;             all except af untouched
+   ;         if carry set, special form just output buffer with sign
    ;
    ; used  : af, bc, de, hl, ix, af', bc', de', hl'
 
-   call asm_fpclassify         ; supplied by math library
-
-   or a
-   scf
-   ret nz                      ; inf, nan or zero
-
    ld a,c
-   and $10
-   ld c,a                      ; keep # flag
-   
+   and $7e                     ; zero bits 7,0 of flags
+   ld c,a
+
    ld a,d
    or a
    jr z, check_prec
@@ -51,30 +42,18 @@ __ftoa__:
 check_prec:
 
    or e
-   jr nz, save_buffer
+   jr nz, init_buffer
    inc c                       ; indicate precision == 0
 
-save_buffer:
+init_buffer:
 
-   ld (hl),c                   ; save flags in buffer
+   ;   C = flags
+   ;   E = precision
+   ;  HL = buffer *
+   ; EXX = float x
+
+   ld (hl),c
    inc hl
-   ld (hl),e                   ; save precision in buffer
-   
-   push hl                     ; save buffer
-   
-   ; EXX   = float
-   ; STACK = buffer *
-   
-   call __ftoa_base10          ; supplied by math library
-
-   ;  C    = max number of significant decimal digits
-   ;  D    = base 10 exponent e
-   ; EXX   = float in form b(*10^e), 1 <= b < 10 mantissa only
-   ; STACK = buffer *
-
-   pop hl                      ; hl = buffer *
-   
-   ld e,(hl)                   ; e = precision
 
    xor a
    call l_setmem_hl - 6
@@ -84,6 +63,48 @@ save_buffer:
    
    push hl
    pop ix
+
+   ; determine sign of x
+
+   call __ftoa_sgnabs          ; supplied by math library
+   
+   rra                         ; sign bit to carry flag
+   jr nc, positive   
+   set 7,(ix-5)
+
+positive:
+
+   ; EXX    = float x
+   ;  E     = precision
+   ; HL     = buffer_dst *
+   ; IX     = buffer *
+   ; (IX-5) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-4) = tz (number of zeroes to append)
+   ; (IX-3) = fz (number of zeroes to insert after .)
+   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-1) = '0' marks start of buffer
+
+   call asm_fpclassify         ; supplied by math library
+
+   or a
+   jp nz, __ftoa_special_form  ; if inf, nan, zero
+   
+   ld (hl),e                   ; save precision
+   push hl                     ; save buffer *
+
+   ; EXX    = float x
+   ; IX     = buffer *
+   ; STACK  = buffer *
+   ; (IX-5) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-4) = tz (number of zeroes to append)
+   ; (IX-3) = fz (number of zeroes to insert after .)
+   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-1) = '0' marks start of buffer
+   
+   call __ftoa_base10          ; supplied by math library
+
+   pop hl                      ; hl = buffer *
+   ld e,(hl)                   ; e = precision
    
    ; EXX   = float in form b(*10^e), 1 <= b < 10 mantissa only
    ;  C    = remaining significant digits
@@ -92,9 +113,9 @@ save_buffer:
    ; HL    = buffer_dst *
    ; IX    = buffer *
    ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = iz (number of zeroes to insert before .)
+   ; (IX-4) = tz (number of zeroes to append)
    ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = tz (number of zeroes to append)
+   ; (IX-2) = iz (number of zeroes to insert before .)
    ; (IX-1) = '0' marks start of buffer
 
    ld a,d
@@ -117,7 +138,7 @@ integer_digits:
    inc hl
    
    dec b
-   ld (ix-4),b                 ; number of zeroes to insert before .
+   ld (ix-2),b                 ; number of zeroes to insert before .
 
 fraction_begin:
 
@@ -133,9 +154,9 @@ fraction_digits:
    ; HL     = buffer_dst *
    ; IX     = buffer *
    ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = iz (number of zeroes to insert before .)
+   ; (IX-4) = tz (number of zeroes to append)
    ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = tz (number of zeroes to append)
+   ; (IX-2) = iz (number of zeroes to insert before .)
    ; (IX-1) = '0' marks start of buffer
 
    ld b,e                      
@@ -145,7 +166,7 @@ fraction_digits:
    jp c, __ftoa_round          ; if all precision digits generated
    
    dec b
-   ld (ix-2),b                 ; add trailing zeroes
+   ld (ix-4),b                 ; add trailing zeroes
    
    jp __ftoa_remove_zeroes
 
@@ -160,9 +181,9 @@ fraction_only:
    ; HL     = buffer_dst *
    ; IX     = buffer *
    ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = iz (number of zeroes to insert before .)
+   ; (IX-4) = tz (number of zeroes to append)
    ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = tz (number of zeroes to append)
+   ; (IX-2) = iz (number of zeroes to insert before .)
    ; (IX-1) = '0' marks start of buffer
 
    ld (hl),'0'

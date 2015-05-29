@@ -8,9 +8,9 @@ __ftoa_round:
    ; HL     = buffer_dst *
    ; IX     = buffer *
    ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = iz (number of zeroes to insert before .)
+   ; (IX-4) = tz (number of zeroes to append)
    ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = tz (number of zeroes to append)
+   ; (IX-2) = iz (number of zeroes to insert before .)
    ; (IX-1) = '0' marks start of buffer
 
    ; exit with carry reset
@@ -47,15 +47,15 @@ __ftoa_remove_zeroes:
    ; HL     = buffer_dst *
    ; IX     = buffer *
    ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = iz (number of zeroes to insert before .)
+   ; (IX-4) = tz (number of zeroes to append)
    ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = tz (number of zeroes to append)
+   ; (IX-2) = iz (number of zeroes to insert before .)
    ; (IX-1) = '0' marks start of buffer
 
    bit 4,(ix-5)
    jr nz, exit_no_carry        ; if # flag
 
-   ld (ix-2),0                 ; eliminate trailing zeroes
+   ld (ix-4),0                 ; eliminate trailing zeroes
    ld a,'0'
 
 loop_zeroes:
@@ -74,7 +74,7 @@ loop_zeroes:
    ld (ix-3),0                 ; eliminate inserted fraction zeroes
 
    bit 0,(ix-5)
-   ret nz                      ; if precision != 0
+   jr nz, exit_no_carry        ; if precision != 0
 
    dec hl                      ; remove decimal point
 
