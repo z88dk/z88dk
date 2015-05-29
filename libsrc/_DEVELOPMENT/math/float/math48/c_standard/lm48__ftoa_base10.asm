@@ -100,7 +100,7 @@ align_digit:
    ld a,$80+4
    sub l
    ld l,0
-   jr z, output_digits         ; if exponent is 4
+   jr z, rotation_done         ; if exponent is 4
 
 digit_loop:
 
@@ -109,6 +109,8 @@ digit_loop:
    
    dec a
    jr nz, digit_loop
+
+rotation_done:
 
    exx
    
