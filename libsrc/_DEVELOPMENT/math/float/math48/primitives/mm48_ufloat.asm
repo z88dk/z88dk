@@ -11,7 +11,7 @@ mm48_ufloat:
    ;
    ; enter : HL = 16-bit unsigned integer n
    ;
-   ; exit  : AC = AC' (AC' saved)
+   ; exit  : AC = AC' (exx set saved)
    ;         AC'= (float)(n)
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'

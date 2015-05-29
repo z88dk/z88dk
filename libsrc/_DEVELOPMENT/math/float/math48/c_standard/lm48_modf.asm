@@ -14,7 +14,7 @@ lm48_modf:
    ; enter : AC'(BCDEHL') = double value
    ;
    ; exit  : AC'(BCDEHL ) = frac(value)
-   ;         AC (BCDEHL') = int(value)
+   ;         AC (BCDEHL ) = int(value)
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
 
