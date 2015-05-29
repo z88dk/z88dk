@@ -43,7 +43,9 @@ zero:
    ld (hl),'.'
    inc hl
    
+   ld d,0                      ; exponent = 0
    ld (ix-4),e                 ; number of trailing zeroes = precision
+
    jp __ftoa_remove_zeroes
 
 nan:
