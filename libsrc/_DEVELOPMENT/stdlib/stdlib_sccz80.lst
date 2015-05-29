@@ -43,6 +43,8 @@ stdlib/c/sccz80/_strtoi_
 stdlib/c/sccz80/_strtoi__callee
 stdlib/c/sccz80/_strtou_
 stdlib/c/sccz80/_strtou__callee
+stdlib/z80/__ftoa__
+stdlib/z80/__ftoa_round
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtou__
 stdlib/z80/__strtoul__
