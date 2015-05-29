@@ -58,6 +58,7 @@ stdlib/c/sdcc_iy/_strtou_
 stdlib/c/sdcc_iy/_strtou__callee
 stdlib/z80/__ftoa__
 stdlib/z80/__ftoa_round
+stdlib/z80/__ftoa_special_form
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtou__
 stdlib/z80/__strtoul__
