@@ -1,9 +1,9 @@
 
 SECTION code_fp_math48
 
-PUBLIC lm48__fta_sgnabs
+PUBLIC lm48__ftoa_sgnabs
 
-lm48__fta_sgnabs:
+lm48__ftoa_sgnabs:
 
    ; enter : EXX = float x
    ;
