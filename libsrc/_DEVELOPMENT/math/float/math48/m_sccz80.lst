@@ -15,6 +15,7 @@ math/float/math48/lm/sccz80/copysign
 math/float/math48/lm/sccz80/cos
 math/float/math48/lm/sccz80/cosh
 math/float/math48/lm/sccz80/dadd
+math/float/math48/lm/sccz80/dcollect1
 math/float/math48/lm/sccz80/ddiv
 math/float/math48/lm/sccz80/deq
 math/float/math48/lm/sccz80/dge
