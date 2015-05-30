@@ -17,7 +17,7 @@ __stdio_printf_sign:
    
    ld a,(ix+5)                 ; a = conversion flags "N+ #0-?P"
 
-__stdio_print_sign_0:
+__stdio_printf_sign_0:
 
    add a,a
    jr nc, not_negative
