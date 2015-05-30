@@ -1,7 +1,7 @@
 
 SECTION code_stdio
 
-PUBLIC __stdio_printf_sign
+PUBLIC __stdio_printf_sign, __stdio_printf_sign_0
 
 __stdio_printf_sign:
 
@@ -16,7 +16,9 @@ __stdio_printf_sign:
    ; uses  : af, hl
    
    ld a,(ix+5)                 ; a = conversion flags "N+ #0-?P"
-   
+
+__stdio_print_sign_0:
+
    add a,a
    jr nc, not_negative
    
