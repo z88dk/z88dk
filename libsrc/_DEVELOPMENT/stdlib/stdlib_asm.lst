@@ -6,6 +6,7 @@ stdlib/z80/asm_atol
 stdlib/z80/asm_at_quick_exit
 stdlib/z80/asm_bsearch
 stdlib/z80/asm_exit
+stdlib/z80/asm_ftoa
 stdlib/z80/asm_itoa
 stdlib/z80/asm_labs
 stdlib/z80/asm_ltoa
@@ -23,6 +24,7 @@ stdlib/z80/asm__ldiv
 stdlib/z80/asm__strtoi
 stdlib/z80/asm__strtou
 stdlib/z80/__ftoa__
+stdlib/z80/__ftoa_print_zeroes
 stdlib/z80/__ftoa_round
 stdlib/z80/__ftoa_special_form
 stdlib/z80/__stdlib_seed

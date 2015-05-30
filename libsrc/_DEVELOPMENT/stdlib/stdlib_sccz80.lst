@@ -7,6 +7,8 @@ stdlib/c/sccz80/at_quick_exit
 stdlib/c/sccz80/bsearch
 stdlib/c/sccz80/bsearch_callee
 stdlib/c/sccz80/exit
+stdlib/c/sccz80/ftoa
+stdlib/c/sccz80/ftoa_callee
 stdlib/c/sccz80/itoa
 stdlib/c/sccz80/itoa_callee
 stdlib/c/sccz80/labs
@@ -44,6 +46,7 @@ stdlib/c/sccz80/_strtoi__callee
 stdlib/c/sccz80/_strtou_
 stdlib/c/sccz80/_strtou__callee
 stdlib/z80/__ftoa__
+stdlib/z80/__ftoa_print_zeroes
 stdlib/z80/__ftoa_round
 stdlib/z80/__ftoa_special_form
 stdlib/z80/__stdlib_seed
