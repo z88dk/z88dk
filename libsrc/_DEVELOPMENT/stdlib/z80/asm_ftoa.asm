@@ -16,7 +16,7 @@ SECTION code_stdlib
 
 PUBLIC asm_ftoa
 
-EXTERN __ftoa__, __stdio_printf_sign, __ftoa_print_zeroes
+EXTERN __ftoa__, __stdio_printf_sign_0, __ftoa_print_zeroes
 
 asm_ftoa:
 
@@ -29,14 +29,18 @@ asm_ftoa:
    ;
    ; uses  : af, bc, de, hl, ix, af', bc', de', hl'
 
+   ld a,c
+
    ld c,l
    ld b,h
    
-   ld hl,-44
+   ld hl,-32
    add hl,sp
-   ld sp,hl                    ; create 44 bytes of workspace
+   ld sp,hl                    ; create 32 bytes of workspace
    
    push bc                     ; save buf
+   
+   ld c,a
    call __ftoa__
 
    ;                hl = buffer_dst * (address of next char to write)
@@ -57,10 +61,11 @@ asm_ftoa:
    push ix
    pop de                      ; de = buffer *
    
+   dec de
    ld a,(de)
    cp '0'
-   jr z, m0
-   dec de                      ; include carry digit
+   jr nz, m0
+   inc de                      ; exclude carry digit
 
 m0:
 
@@ -94,7 +99,7 @@ m0:
    ; 1. print sign
 
    ld a,(ix-5)                 ; a = printf flags byte
-   call __stdio_printf_sign
+   call __stdio_printf_sign_0
    
    ex af,af'
    jr c, special_form          ; if nan or inf
@@ -112,21 +117,27 @@ m1:
    ldi                         ; copy workspace digit
    jp pe, m1                   ; if workspace not exhausted
    
-   jr terminate
+   scf                         ; indicate workspace is exhausted
 
 m2:
 
    ; 3. print iz zeroes
    
+   ex af,af'
+   
    ex de,hl                    ; hl = buf_dst, de = workspace
    ld a,(ix-2)                 ; a = iz
    call __ftoa_print_zeroes
+   
+   ex af,af'
+
+   ex de,hl                    ; hl = workspace, de = buf_dst
+   jr c, terminate
 
    ; 4. print decimal point
    
-   ex de,hl                    ; hl = workspace, de = buf_dst
    ldi
-   jp po, terminate
+   jp po, trailing_zeroes
    
    ; 5. print fz zeroes
    
@@ -140,7 +151,9 @@ special_form:
    
    ex de,hl                    ; hl = workspace, de = buf_dst
    ldir
-   
+
+trailing_zeroes:
+
    ; 7. print trailing zeroes
    
    ex de,hl                    ; hl = buf_dst, de = workspace
@@ -183,7 +196,7 @@ count_only:
    ;            (IX-1) = if not '0' must be included in decimal string
 
    ld a,(ix-5)
-   and $e0
+   and $70
    jr z, c1
    inc bc                      ; sign will be present
 
@@ -193,6 +206,13 @@ c1:
    pop hl
    
    dec hl
+   ld a,(hl)
+   cp '0'
+   jr z, c2
+   inc bc
+
+c2:   
+   
    dec hl
    ld e,(hl)                   ; e = iz
    dec hl
