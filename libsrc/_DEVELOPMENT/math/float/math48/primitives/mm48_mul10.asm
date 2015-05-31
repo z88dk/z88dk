@@ -22,7 +22,7 @@ mm48_mul10:
    ;            AC'= double_max
    ;            carry set, errno set
    ;
-   ; uses  : af, af', bc', de', hl'
+   ; uses  : af, bc', de', hl'
 
    exx
    
