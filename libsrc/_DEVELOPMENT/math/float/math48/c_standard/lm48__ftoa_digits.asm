@@ -36,6 +36,17 @@ lm48__ftoa_digits:
    and $0f
    add a,'0'                   ; a = decimal digit
    
+   exx
+   
+   ld (hl),a                   ; write decimal digit
+   inc hl
+   
+   exx
+   
+   ld a,b
+   and $0f
+   ld b,a
+   
    push bc                     ; BCDEHL *= 10
    push de
    push hl
@@ -60,9 +71,6 @@ lm48__ftoa_digits:
    call mm48__left
 
    exx
-   
-   ld (hl),a                   ; write decimal digit
-   inc hl
    
    dec c                       ; significant digits --
    djnz lm48__ftoa_digits
