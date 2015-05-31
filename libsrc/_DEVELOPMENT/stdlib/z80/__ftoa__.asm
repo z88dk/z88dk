@@ -13,7 +13,7 @@ __ftoa__:
    ; enter :  c = flags (bit 4=#, bits 7 and 0 will be modified)
    ;         de = precision (clipped at 255)
    ;         hl = buffer *
-   ;         exx set contains *positive* float
+   ;         exx set contains float
    ;
    ; exit  : if carry reset
    ;

@@ -5,7 +5,7 @@ PUBLIC cm48_sccz80p_collect_1
 
 cm48_sccz80p_collect_1:
 
-   ; collect two double parameters from the stack.
+   ; collect one double parameter from the stack.
    ;
    ; enter : stack = double x, return_1, return_0
    ;
