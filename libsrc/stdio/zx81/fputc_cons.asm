@@ -5,7 +5,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: fputc_cons.asm,v 1.17 2015-01-19 01:33:22 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.18 2015-05-31 16:22:39 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -62,11 +62,12 @@ ENDIF
 	ld a,(ROW)
 	inc a
 	ld (ROW),a
-	cp ROWS		; Out of screen?
-	ret nz		; no, return
-	ld a,ROWS-1
-	ld (ROW),a
-	jp  scrolluptxt
+;	cp ROWS		; Out of screen?
+;	ret nz		; no, return
+;	ld a,ROWS-1
+;	ld (ROW),a
+;	jp  scrolluptxt
+	ret
 
 .NoLF
 
@@ -96,6 +97,17 @@ ENDIF
 
 .NoBS
 
+; ----  output character ----
+	push af
+	ld a,(ROW)
+	cp ROWS		; Out of screen?
+	jr nz, noscroll
+	ld a,ROWS-1
+	ld (ROW),a
+	call  scrolluptxt
+.noscroll
+	pop af
+	
 .charpos
 	ld	 hl,0
 	call asctozx81
