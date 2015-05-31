@@ -54,16 +54,18 @@ mm48__tf2:
    pop ix                      ;Hent IX
    pop af                      ;Hent exponent
    and 3                       ;Juster faktor
+   jr z, mm48__tf4
 
 mm48__tf3:
 
-   jr z, mm48__tf4
    push af
+   exx
    call mm48_mul10
-   jp c, l_inc_sp - 2          ;if overflow
+   exx
+   jp c, l_inc_sp - 4          ;if overflow
    pop af
    dec a
-   jr mm48__tf3
+   jr nz, mm48__tf3
 
 mm48__tf4:
 
