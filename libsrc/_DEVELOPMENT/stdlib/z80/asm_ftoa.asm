@@ -179,7 +179,7 @@ t2:
    ld e,l
    ld d,h                      ; de = length
 
-   ld hl,44
+   ld hl,32
    add hl,sp
    ld sp,hl                    ; restore stack
    
