@@ -52,7 +52,7 @@ lm48__ftoa_base10:
    pop bc
    add hl,bc                   ; hl = 77*n
    ld bc,5
-   add hl,de                   ; rounding fudge factor
+   add hl,bc                   ; rounding fudge factor
    
    ld a,h                      ; a = INT((77*n+5)/256)
    cp -39
@@ -64,7 +64,7 @@ no_correction:
    push af                     ; save exponent e
    
    neg
-   call mm48_tenf              ; x *= 10^-e
+   call nz, mm48_tenf          ; x *= 10^-e
    
    pop de                      ; d = exponent e
    
@@ -114,5 +114,5 @@ rotation_done:
 
    exx
    
-   ld c,21                     ; max number decimal digits in this float format
+   ld c,13                     ; max number decimal digits in this float format
    ret
