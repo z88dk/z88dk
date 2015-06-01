@@ -3,9 +3,9 @@
 ; May 2015
 ; =============================================================
 ;
-; size_t ftoa(float x, char *buf, uint16_t prec, uint16_t flag)
+; size_t ftoe(float x, char *buf, uint16_t prec, uint16_t flag)
 ;
-; (-ddd.ddd)
+; (-d.dddde+dd)
 ;
 ; Write zero-terminated floating point number to buffer and
 ; return number of characters written not including '\0'
@@ -16,11 +16,11 @@
 
 SECTION code_stdlib
 
-PUBLIC asm_ftoa
+PUBLIC asm_ftoe
 
-EXTERN __ftoa__, __ftoa_print, __ftoa_count, __ftoa_stack_restore
+EXTERN __ftoe__, __ftoa_print, __ftoa_count, __ftoa_stack_restore
 
-asm_ftoa:
+asm_ftoe:
 
    ; enter :  c = flag (bit 6='+', bit 5=' ', bit 4='#')
    ;         de = precision (clipped at 255)
@@ -44,7 +44,7 @@ asm_ftoa:
    push bc                     ; save buf
    
    ld c,a
-   call __ftoa__
+   call __ftoe__
 
    ;            bc = buffer length
    ;            de = buffer *

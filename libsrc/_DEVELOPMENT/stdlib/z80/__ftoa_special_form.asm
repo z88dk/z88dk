@@ -3,7 +3,7 @@ SECTION code_stdlib
 
 PUBLIC __ftoa_special_form
 
-EXTERN asm_strcpy, __ftoa_remove_zeroes
+EXTERN asm_strcpy
 
 __ftoa_special_form:
 
@@ -11,6 +11,8 @@ __ftoa_special_form:
    ;  E     = precision
    ; HL     = buffer_dst *
    ; IX     = buffer *
+   ; carry reset
+   ;
    ; (IX-5) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
    ; (IX-4) = tz (number of zeroes to append)
    ; (IX-3) = fz (number of zeroes to insert after .)
@@ -34,7 +36,7 @@ string:
    ex de,hl
    
    scf
-   ret
+   ret                         ; return with carry set to indicate string
 
 zero:
 
@@ -46,7 +48,7 @@ zero:
    ld d,0                      ; exponent = 0
    ld (ix-4),e                 ; number of trailing zeroes = precision
 
-   jp __ftoa_remove_zeroes
+   ret                         ; return with carry reset to indicate zero
 
 nan:
 

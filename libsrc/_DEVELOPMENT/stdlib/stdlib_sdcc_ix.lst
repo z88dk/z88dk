@@ -57,9 +57,16 @@ stdlib/c/sdcc_ix/_strtoi__callee
 stdlib/c/sdcc_ix/_strtou_
 stdlib/c/sdcc_ix/_strtou__callee
 stdlib/z80/__ftoa__
+stdlib/z80/__ftoa_count
+stdlib/z80/__ftoa_postamble
+stdlib/z80/__ftoa_preamble
+stdlib/z80/__ftoa_print
 stdlib/z80/__ftoa_print_zeroes
+stdlib/z80/__ftoa_remove_zeroes
 stdlib/z80/__ftoa_round
 stdlib/z80/__ftoa_special_form
+stdlib/z80/__ftoa_stack_restore
+stdlib/z80/__ftoe__
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtou__
 stdlib/z80/__strtoul__

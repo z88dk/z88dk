@@ -1,14 +1,14 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa__
+PUBLIC __ftoe__
 
 EXTERN __ftoa_preamble, asm_fpclassify, __ftoa_special_form, __ftoa_base10
 EXTERN __ftoa_digits, __ftoa_round, __ftoa_remove_zeroes, __ftoa_postamble
 
 ; math library supplies asm_fpclassify, __ftoa_base10, __ftoa_digits, __ftoa_sgnabs
 
-__ftoa__:
+__ftoe__:
 
    ; enter :  c = flags (bit 4=#, bits 7 and 0 will be modified)
    ;         de = precision (clipped at 255)
@@ -44,15 +44,15 @@ __ftoa__:
    call asm_fpclassify         ; supplied by math library
 
    or a
-   jr z, normal_form           ; if not inf, nan, zero
-   
+   jr z, normal_form           ; if not inf, nan or zero
+
    call __ftoa_special_form
 
    jr nc, prune                ; if zero
-   ret                         ; return with carry set if inf, nan
-
-normal_form:
+   ret                         ; return with carry set if inf or nan
    
+normal_form:
+
    ld (hl),e                   ; save precision
    push hl                     ; save buffer *
 
@@ -69,7 +69,7 @@ normal_form:
 
    pop hl                      ; hl = buffer *
    ld e,(hl)                   ; e = precision
-   
+
    ; EXX   = float in form b(*10^e), 1 <= b < 10 mantissa only
    ;  C    = remaining significant digits
    ;  D    = base 10 exponent e
@@ -82,110 +82,101 @@ normal_form:
    ; (IX-2) = iz (number of zeroes to insert before .)
    ; (IX-1) = '0' marks start of buffer
 
-   ld a,d
-   or a
-   jp m, fraction_only         ; if exponent < 0
+   ld b,1
+   call __ftoa_digits          ; single digit left of decimal
    
-integer_digits:
-
-   ; d.
-
-   inc a
-   ld b,a                      ; b = number of integer digits
-   
-   call __ftoa_digits          ; provided by math library
-   jr c, fraction_begin        ; if form ddd.ddd
-   
-   ; ddd000.
-   
-   ld (hl),'0'
-   inc hl
-   
-   dec b
-   ld (ix-2),b                 ; number of zeroes to insert before .
-
-fraction_begin:
-
    ld (hl),'.'
    inc hl
    
-fraction_digits:
-
-   ; EXX    = mantissa bits, most sig four bits contain decimal digit
-   ;  C     = remaining significant digits
-   ;  D     = exponent e
-   ;  E     = remaining precision
-   ; HL     = buffer_dst *
-   ; IX     = buffer *
-   ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
-   ; (IX-1) = '0' marks start of buffer
-
-   ld b,e                      
-   inc b                       ; generate precision + 1 digits
+   ld b,e
+   inc b
    
-   call __ftoa_digits          ; provided by math library
+   call __ftoa_digits          ; generate precision + 1 digits
    jr c, round                 ; if all precision digits generated
-   
+
    dec b
    ld (ix-4),b                 ; add trailing zeroes
-
+   
    jr prune
 
 round:
-
+   
    call __ftoa_round
+   
+   ld a,(ix-1)
+   cp '0'
+   jr z, prune                 ; if round did not affect carry digit
+   
+   ld a,(ix+0)                 ; move decimal point left
+   ld (ix+1),a
+   ld (ix+0),'.'
+
+   dec hl                      ; remove extra precision digit
 
 prune:
 
-   call __ftoa_remove_zeroes
-   jp __ftoa_postamble
-
-fraction_only:
-
-   ; 0.
-
-   ; EXX    = mantissa bits, most sig four bits contain decimal digit
-   ;  C     = remaining significant digits
-   ;  D=A   = exponent e < 0
-   ;  E     = precision
-   ; HL     = buffer_dst *
-   ; IX     = buffer *
+   call __ftoa_remove_zeroes   ; remove trailing zeroes
+   
+   ;  D    = base 10 exponent e
+   ; HL    = buffer_dst *
+   ; IX    = buffer *
    ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
    ; (IX-4) = tz (number of zeroes to append)
    ; (IX-3) = fz (number of zeroes to insert after .)
    ; (IX-2) = iz (number of zeroes to insert before .)
    ; (IX-1) = '0' marks start of buffer
 
-   ld (hl),'0'
+   ld (hl),'e'
    inc hl
-   ld (hl),'.'
-   inc hl
+   ld (hl),'+'
    
+   ld a,d                      ; a = exponent
+   or a
+   jp p, exponent_plus
+   
+   ld (hl),'-'
    neg
-   dec a
-   jr z, fraction_digits       ; if form 0.ddd
 
-   dec a
-   cp e
-   jr nc, precision_less       ; if precision < number of leading zeroes
+exponent_plus:
+
+   inc hl                      ; hl = buffer_dst *
    
-   ld (hl),'0'
+   cp 100
+   jr c, skip_100
+   
+   ld de,$6400 + '0' - 1
+   call exponent_digit         ; 100s
+
+skip_100:
+
+   ld de,$0a00 + '0' - 1
+   call exponent_digit         ; 10s
+   
+   add a,'0'                   ; 1s
+
+   ld (hl),a
    inc hl
 
-   ld (ix-3),a                 ; number of zeroes to insert after .
+   ; HL    = buffer_dst *
+   ; IX    = buffer *
+   ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
+   ; (IX-4) = tz (number of zeroes to append)
+   ; (IX-3) = fz = 0
+   ; (IX-2) = iz = 0
+   ; (IX-1) = '0' marks start of buffer
 
-   sub e
-   cpl
-   ld e,a                      ; e = remaining precision digits
+   jp __ftoa_postamble         ; return buffer pointer and length
 
-   jr fraction_digits
+exponent_digit:
 
-precision_less:
+   inc e
+   sub d
 
-   ; fraction part all zeroes
+   jr nc, exponent_digit
    
-   ld (ix-3),e                 ; number of zeroes to insert after .
-   jr prune
+   add a,d
+   
+   ld (hl),e
+   inc hl
+   
+   ret
