@@ -3,6 +3,8 @@ SECTION code_stdlib
 
 PUBLIC __ftoa_remove_zeroes
 
+__ftoa_remove_zeroes:
+
    ; HL     = buffer_dst *
    ; IX     = buffer *
    ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
