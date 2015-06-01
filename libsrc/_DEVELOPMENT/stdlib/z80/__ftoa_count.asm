@@ -16,7 +16,7 @@ __ftoa_count:
    ;        de = 0
 
    ld a,(ix-5)
-   and $70
+   and $e0                     ; 'N', '+', ' ' flags
    jr z, padding
    inc bc                      ; space for sign
 
