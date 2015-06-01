@@ -8,6 +8,7 @@ stdlib/z80/asm_bsearch
 stdlib/z80/asm_exit
 stdlib/z80/asm_ftoa
 stdlib/z80/asm_ftoe
+stdlib/z80/asm_ftog
 stdlib/z80/asm_itoa
 stdlib/z80/asm_labs
 stdlib/z80/asm_ltoa
@@ -35,6 +36,7 @@ stdlib/z80/__ftoa_round
 stdlib/z80/__ftoa_special_form
 stdlib/z80/__ftoa_stack_restore
 stdlib/z80/__ftoe__
+stdlib/z80/__ftog__
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtou__
 stdlib/z80/__strtoul__
