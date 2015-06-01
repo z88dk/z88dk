@@ -16,7 +16,8 @@ lm48__ftoa_base10:
    ; enter : AC'= float x, x positive
    ;
    ; exit  : AC'= b where 1 <= b < 10 all mantissa bits only
-   ;          C = max number of significant decimal digits (21)
+   ;          B = max number of significant hex digits (10)
+   ;          C = max number of significant decimal digits (13)
    ;          D = base 10 exponent e
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
@@ -114,5 +115,5 @@ rotation_done:
 
    exx
    
-   ld c,13                     ; max number decimal digits in this float format
+   ld bc,$0a0d                 ; max significant digits
    ret
