@@ -83,10 +83,18 @@ fz_zeroes:
    ld a,(ix-3)                 ; a = fz
    call __ftoa_print_zeroes
 
-   ;;;;; print remaining workspace (ftoa - no exponent present)
+   ;;;;; print workspace up to exponent
    
    ex de,hl                    ; hl = workspace *, de = buf_dst*
-   ldir
+   ld a,'e'
+
+fraction_part:
+      
+   cp (hl)
+   jr z, tze_zeroes            ; if exponent reached
+   
+   ldi                         ; copy workspace digit to destination
+   jp pe, fraction_part        ; if workspace not exhausted
 
    ;;;;; print trailing zeroes
 
