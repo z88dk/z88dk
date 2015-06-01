@@ -7,7 +7,7 @@ EXTERN __stdio_printf_sign_0, __ftoa_print_zeroes
 
 __ftoa_print:
 
-   push hl                     save buf_dst
+   push hl                     ; save buf_dst
 
    ;                bc = length of workspace
    ;                de = workspace *
