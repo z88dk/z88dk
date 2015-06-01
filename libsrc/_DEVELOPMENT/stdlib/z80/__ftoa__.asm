@@ -1,7 +1,7 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa__
+PUBLIC __ftoa__, __ftoa_join, __ftoa_prune
 
 EXTERN __ftoa_preamble, asm_fpclassify, __ftoa_special_form, __ftoa_base10
 EXTERN __ftoa_digits, __ftoa_round, __ftoa_remove_zeroes, __ftoa_postamble
@@ -48,7 +48,7 @@ __ftoa__:
    
    call __ftoa_special_form
 
-   jr nc, prune                ; if zero
+   jr nc, __ftoa_prune         ; if zero
    ret                         ; return with carry set if inf, nan
 
 normal_form:
@@ -69,7 +69,9 @@ normal_form:
 
    pop hl                      ; hl = buffer *
    ld e,(hl)                   ; e = precision
-   
+
+__ftoa_join:
+
    ; EXX   = float in form b(*10^e), 1 <= b < 10 mantissa only
    ;  C    = remaining significant digits
    ;  D    = base 10 exponent e
@@ -132,13 +134,13 @@ fraction_digits:
    dec b
    ld (ix-4),b                 ; add trailing zeroes
 
-   jr prune
+   jr __ftoa_prune
 
 round:
 
    call __ftoa_round
 
-prune:
+__ftoa_prune:
 
    call __ftoa_remove_zeroes
    jp __ftoa_postamble
@@ -188,4 +190,4 @@ precision_less:
    ; fraction part all zeroes
    
    ld (ix-3),e                 ; number of zeroes to insert after .
-   jr prune
+   jr __ftoa_prune

@@ -1,7 +1,7 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoe__
+PUBLIC __ftoe__, __ftoe_join
 
 EXTERN __ftoa_preamble, asm_fpclassify, __ftoa_special_form, __ftoa_base10
 EXTERN __ftoa_digits, __ftoa_round, __ftoa_remove_zeroes, __ftoa_postamble
@@ -69,6 +69,8 @@ normal_form:
 
    pop hl                      ; hl = buffer *
    ld e,(hl)                   ; e = precision
+
+__ftoe_join:
 
    ; EXX   = float in form b(*10^e), 1 <= b < 10 mantissa only
    ;  C    = remaining significant digits
