@@ -55,17 +55,10 @@ preamble:
    or a
    jr z, normal_form           ; if not inf, nan or zero
 
-   dec a
-   jr nz, special_form         ; if not zero
-
    dec e                       ; precision--
-
-special_form:
-
-   inc a
    call __ftoa_special_form
    
-   jp nc, __ftoa_prune         ; prune like ftoa()
+   jp nc, __ftoa_prune         ; if zero, prune like ftoa()
    ret                         ; return with carry set if inf or nan
    
 normal_form:
