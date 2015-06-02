@@ -45,7 +45,10 @@ integer_part:
    cp '.'
    jr z, iz_zeroes             ; if integer part done
    
-   cp 'e'
+   cp 'E'
+   jr z, tze_zeroes            ; if exponent reached
+   
+   cp 'P'
    jr z, tze_zeroes            ; if exponent reached
    
    ldi                         ; copy workspace digit to destination
@@ -86,11 +89,15 @@ fz_zeroes:
    ;;;;; print workspace up to exponent
    
    ex de,hl                    ; hl = workspace *, de = buf_dst*
-   ld a,'e'
 
 fraction_part:
-      
-   cp (hl)
+
+   ld a,(hl)
+   
+   cp 'E'
+   jr z, tze_zeroes            ; if exponent reached
+   
+   cp 'P'
    jr z, tze_zeroes            ; if exponent reached
    
    ldi                         ; copy workspace digit to destination
@@ -127,6 +134,7 @@ zero_terminate:
    
 tze_zeroes:
 
+   set 5,(hl)                  ; exponent to lower case
    ex de,hl                    ; hl = buf_dst *, de = workspace *
 
    ld a,(ix-4)
