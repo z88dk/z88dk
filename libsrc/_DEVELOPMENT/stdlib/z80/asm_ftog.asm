@@ -18,7 +18,7 @@ SECTION code_stdlib
 
 PUBLIC asm_ftog
 
-EXTERN __ftog__, __ftoa_print, __ftoa_count, __ftoa_stack_restore
+EXTERN __ftog__, __ftoa_asm_exit
 
 asm_ftog:
 
@@ -58,23 +58,4 @@ asm_ftog:
    ;
    ;            stack = char *buf
 
-   ex af,af'
-   
-   pop hl                      ; hl = char *buf
-   
-   ld a,h
-   or l
-   jr z, count_it
-
-print_it:
-
-   call __ftoa_print
-
-restore_it:
-
-   jp __ftoa_stack_restore
-   
-count_it:
-
-   call __ftoa_count
-   jr restore_it
+   jp __ftoa_asm_exit
