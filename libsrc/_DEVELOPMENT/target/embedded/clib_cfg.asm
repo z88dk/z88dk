@@ -246,32 +246,36 @@ defc CHAR_PASSWORD  = '*'
 
 defc __CLIB_OPT_PRINTF = $ffffffff
 
-; bit 0 =  $     01 = enable %d
-; bit 1 =  $     02 = enable %u
-; bit 2 =  $     04 = enable %x
-; bit 3 =  $     08 = enable %X
-; bit 4 =  $     10 = enable %o
-; bit 5 =  $     20 = enable %n
-; bit 6 =  $     40 = enable %i
-; bit 7 =  $     80 = enable %p
-; bit 8 =  $    100 = enable %B
-; bit 9 =  $    200 = enable %s
-; bit 10 = $    400 = enable %c
-; bit 11 = $    800 = enable %I
-; bit 12 = $   1000 = enable %ld
-; bit 13 = $   2000 = enable %lu
-; bit 14 = $   4000 = enable %lx
-; bit 15 = $   8000 = enable %lX
-; bit 16 = $  10000 = enable %lo
-; bit 17 = $  20000 = enable %ln
-; bit 18 = $  40000 = enable %li
-; bit 19 = $  80000 = enable %lp
-; bit 20 = $ 100000 = enable %lB
-; bit 21 = $ 200000 = ignored
-; bit 22 = $ 400000 = enable %a
-; bit 23 = $ 800000 = enable %e
-; bit 24 = $1000000 = enable %f
-; bit 25 = $2000000 = enable %g
+; bit 0 =  $      01 = enable %d
+; bit 1 =  $      02 = enable %u
+; bit 2 =  $      04 = enable %x
+; bit 3 =  $      08 = enable %X
+; bit 4 =  $      10 = enable %o
+; bit 5 =  $      20 = enable %n
+; bit 6 =  $      40 = enable %i
+; bit 7 =  $      80 = enable %p
+; bit 8 =  $     100 = enable %B
+; bit 9 =  $     200 = enable %s
+; bit 10 = $     400 = enable %c
+; bit 11 = $     800 = enable %I
+; bit 12 = $    1000 = enable %ld
+; bit 13 = $    2000 = enable %lu
+; bit 14 = $    4000 = enable %lx
+; bit 15 = $    8000 = enable %lX
+; bit 16 = $   10000 = enable %lo
+; bit 17 = $   20000 = enable %ln
+; bit 18 = $   40000 = enable %li
+; bit 19 = $   80000 = enable %lp
+; bit 20 = $  100000 = enable %lB
+; bit 21 = $  200000 = ignored
+; bit 22 = $  400000 = enable %a
+; bit 23 = $  800000 = enable %A
+; bit 24 = $ 1000000 = enable %e
+; bit 25 = $ 2000000 = enable %E
+; bit 26 = $ 4000000 = enable %f
+; bit 27 = $ 8000000 = enable %F
+; bit 28 = $10000000 = enable %g
+; bit 29 = $20000000 = enable %G
 ;
 ; Setting to zero will remove the % logic from printf
 ; entirely, meaning printf can only be used to output
