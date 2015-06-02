@@ -13,6 +13,8 @@ stdlib/c/sccz80/ftoe
 stdlib/c/sccz80/ftoe_callee
 stdlib/c/sccz80/ftog
 stdlib/c/sccz80/ftog_callee
+stdlib/c/sccz80/ftoh
+stdlib/c/sccz80/ftoh_callee
 stdlib/c/sccz80/itoa
 stdlib/c/sccz80/itoa_callee
 stdlib/c/sccz80/labs
@@ -50,7 +52,9 @@ stdlib/c/sccz80/_strtoi__callee
 stdlib/c/sccz80/_strtou_
 stdlib/c/sccz80/_strtou__callee
 stdlib/z80/__ftoa__
+stdlib/z80/__ftoa_asm_exit
 stdlib/z80/__ftoa_count
+stdlib/z80/__ftoa_exp_digit
 stdlib/z80/__ftoa_postamble
 stdlib/z80/__ftoa_preamble
 stdlib/z80/__ftoa_print
@@ -58,9 +62,9 @@ stdlib/z80/__ftoa_print_zeroes
 stdlib/z80/__ftoa_remove_zeroes
 stdlib/z80/__ftoa_round
 stdlib/z80/__ftoa_special_form
-stdlib/z80/__ftoa_stack_restore
 stdlib/z80/__ftoe__
 stdlib/z80/__ftog__
+stdlib/z80/__ftoh__
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtou__
 stdlib/z80/__strtoul__
