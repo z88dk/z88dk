@@ -246,6 +246,7 @@ extern void      __LIB__ __FASTCALL__  exit(int status);
 extern size_t    __LIB__               ftoa(double x, char *buf, uint16_t prec, uint16_t flags);
 extern size_t    __LIB__               ftoe(double x, char *buf, uint16_t prec, uint16_t flags);
 extern size_t    __LIB__               ftog(double x, char *buf, uint16_t prec, uint16_t flags);
+extern size_t    __LIB__               ftoh(double x, char *buf, uint16_t prec, uint16_t flags);
 extern char      __LIB__              *itoa(int num, char *buf, int radix);
 extern long      __LIB__ __FASTCALL__  labs(long j);
 extern char      __LIB__              *ltoa(long num, char *buf, int radix);
@@ -288,6 +289,7 @@ extern void      __LIB__ __CALLEE__    bsearch_callee(void *key, void *base, siz
 extern size_t    __LIB__ __CALLEE__    ftoa_callee(double x, char *buf, uint16_t prec, uint16_t flags);
 extern size_t    __LIB__ __CALLEE__    ftoe_callee(double x, char *buf, uint16_t prec, uint16_t flags);
 extern size_t    __LIB__ __CALLEE__    ftog_callee(double x, char *buf, uint16_t prec, uint16_t flags);
+extern size_t    __LIB__ __CALLEE__    ftoh_callee(double x, char *buf, uint16_t prec, uint16_t flags);
 extern char      __LIB__ __CALLEE__   *itoa_callee(int num, char *buf, int radix);
 extern char      __LIB__ __CALLEE__   *ltoa_callee(long num, char *buf, int radix);
 extern void      __LIB__ __CALLEE__    qsort_callee(void *base, size_t nmemb, size_t size, void *compar);
@@ -321,6 +323,7 @@ extern void   __LIB__ __CALLEE__   *realloc_unlocked_callee(void *p, size_t size
 #define ftoa(a,b,c,d)               ftoa_callee(a,b,c,d)
 #define ftoe(a,b,c,d)               ftoe_callee(a,b,c,d)
 #define ftog(a,b,c,d)               ftog_callee(a,b,c,d)
+#define ftoh(a,b,c,d)               ftoh_callee(a,b,c,d)
 #define itoa(a,b,c)                 itoa_callee(a,b,c)
 #define ltoa(a,b,c)                 ltoa_callee(a,b,c)
 #define qsort(a,b,c,d)              qsort_callee(a,b,c,d)
