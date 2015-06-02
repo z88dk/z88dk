@@ -77,6 +77,7 @@ math/float/math48/c_interface/sccz80/cm48_sccz80_tanh
 math/float/math48/c_interface/sccz80/cm48_sccz80_tgamma
 math/float/math48/c_interface/sccz80/cm48_sccz80_trunc
 math/float/math48/c_standard/lm48__ftoa_base10
+math/float/math48/c_standard/lm48__ftoa_base16
 math/float/math48/c_standard/lm48__ftoa_digits
 math/float/math48/c_standard/lm48__ftoa_sgnabs
 math/float/math48/c_standard/lm48_acos
