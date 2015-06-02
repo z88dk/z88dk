@@ -2,6 +2,7 @@
 SECTION code_l
 
 PUBLIC l_small_utoa
+PUBLIC l_utoa_lib
 
 l_small_utoa:
 
@@ -29,6 +30,15 @@ l_small_utoa:
    push bc
    
    ld bc,-10000
+
+l_utoa_lib:
+
+   ; hl = unsigned int
+   ; de = char *buffer
+   ; bc = first divisor
+   ; carry set for leading zeroes
+   ; stack = remaining divisors
+
    jr c, leading_zeroes
 
 no_leading_zeroes:

@@ -2,7 +2,7 @@
 SECTION code_l
 
 PUBLIC l_fast_utoa
-PUBLIC l0_fast_utoa
+PUBLIC l0_fast_utoa, l_utoa_lib
 
 l_fast_utoa:
 
@@ -35,7 +35,14 @@ l_fast_utoa:
    
    ld bc,-10000
 
+l_utoa_lib:
 l0_fast_utoa:
+
+   ; hl = unsigned int
+   ; de = char *buffer
+   ; bc = first divisor
+   ; carry set for leading zeroes
+   ; stack = remaining divisors
 
    jr c, leading_zeroes
 
