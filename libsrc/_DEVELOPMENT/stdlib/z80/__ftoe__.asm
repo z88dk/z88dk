@@ -4,7 +4,7 @@ SECTION code_stdlib
 PUBLIC __ftoe__, __ftoe_join
 
 EXTERN __ftoa_preamble, asm_fpclassify, __ftoa_special_form, __ftoa_base10
-EXTERN __ftoa_digits, __ftoa_round, __ftoa_remove_zeroes, __ftoa_postamble
+EXTERN __ftoa_digits, __ftoa_round, __ftoa_remove_zeroes, __ftoa_postamble, __ftoa_exp_digit
 
 ; math library supplies asm_fpclassify, __ftoa_base10, __ftoa_digits, __ftoa_sgnabs
 
@@ -128,7 +128,7 @@ prune:
    ; (IX-2) = iz (number of zeroes to insert before .)
    ; (IX-1) = '0' marks start of buffer
 
-   ld (hl),'e'
+   ld (hl),'E'
    inc hl
    ld (hl),'+'
    
@@ -147,12 +147,12 @@ exponent_plus:
    jr c, skip_100
    
    ld de,$6400 + '0' - 1
-   call exponent_digit         ; 100s
+   call __ftoa_exp_digit       ; 100s
 
 skip_100:
 
    ld de,$0a00 + '0' - 1
-   call exponent_digit         ; 10s
+   call __ftoa_exp_digit       ; 10s
    
    add a,'0'                   ; 1s
 
@@ -168,17 +168,3 @@ skip_100:
    ; (IX-1) = '0' marks start of buffer
 
    jp __ftoa_postamble         ; return buffer pointer and length
-
-exponent_digit:
-
-   inc e
-   sub d
-
-   jr nc, exponent_digit
-   
-   add a,d
-   
-   ld (hl),e
-   inc hl
-   
-   ret
