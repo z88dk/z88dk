@@ -1,6 +1,6 @@
 
-SECTION bss_sound_bit
+SECTION data_sound_bit
 
 PUBLIC __sound_bit_state
 
-__sound_bit_state:             defb 0
+__sound_bit_state:             defb 7
