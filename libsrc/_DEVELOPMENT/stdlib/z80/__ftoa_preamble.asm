@@ -38,7 +38,7 @@ init_buffer:
    inc hl
 
    xor a
-   call l_setmem_hl - 6
+   call l_setmem_hl - 8
    
    ld (hl),'0'
    inc hl
@@ -53,16 +53,17 @@ init_buffer:
    rra                         ; sign bit to carry flag
    ret nc   
 
-   set 7,(ix-5)                ; indicate float is negative
+   set 7,(ix-6)                ; indicate float is negative
 
    ; EXX    = float x
    ;  E     = precision
    ; HL     = buffer_dst *
    ; IX     = buffer *
-   ; (IX-5) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
    
    ret

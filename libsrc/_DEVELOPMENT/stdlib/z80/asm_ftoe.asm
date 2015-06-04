@@ -48,11 +48,12 @@ asm_ftoe:
 
    ;            bc = buffer length
    ;            de = buffer *
-   ;           (IX-5) = flags, bit 7='N', bit 4='#', bit 0=(precision==0), others unaffected
-   ;           (IX-4) = tz (number of zeroes to append)
-   ;           (IX-3) = fz (number of zeroes to insert after .)
-   ;           (IX-2) = iz (number of zeroes to insert before .)
-   ;           (IX-1) = ignore
+   ;        (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ;        (IX-5) = tz (number of zeroes to append)
+   ;        (IX-4) = fz (number of zeroes to insert after .)
+   ;        (IX-3) = iz (number of zeroes to insert before .)
+   ;        (IX-2) = ignore
+   ;        (IX-1) = '0' marks start of buffer
    ;
    ;         if carry set, special form just output buffer with sign
    ;

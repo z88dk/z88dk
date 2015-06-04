@@ -13,11 +13,12 @@ __ftoa_print:
    ;                de = workspace *
    ;                hl = char *buf_dst
    ;
-   ;            (IX-5) = flags, bit 7='N', bit 4='#', bit 0=(precision==0), others unaffected
-   ;            (IX-4) = tz (number of zeroes to append)
-   ;            (IX-3) = fz (number of zeroes to insert after .)
-   ;            (IX-2) = iz (number of zeroes to insert before .)
-   ;            (IX-1) = if not '0' must be included in decimal string
+   ;            (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ;            (IX-5) = iz (number of zeroes to insert before .)
+   ;            (IX-4) = fz (number of zeroes to insert after .)
+   ;            (IX-3) = tz (number of zeroes to append)
+   ;            (IX-2) = ignore
+   ;            (IX-1) = '0' marks start of buffer
    ;
    ;             stack = char *buf
    ;
@@ -28,7 +29,7 @@ __ftoa_print:
 
    ;;;;; print sign
 
-   ld a,(ix-5)                 ; a = printf flags byte
+   ld a,(ix-6)                 ; a = printf flags byte
    call __stdio_printf_sign_0
    
    ex af,af'
@@ -54,23 +55,20 @@ integer_part:
    ldi                         ; copy workspace digit to destination
    jp pe, integer_part         ; if workspace not exhausted
 
-   scf                         ; indicate workspace is exhausted
-
    ;;;;; print iz zeroes (zeroes trailing the integer part)
    
 iz_zeroes:
-
-   ex af,af'
    
    ex de,hl                    ; hl = buf_dst *, de = workspace *
 
-   ld a,(ix-2)                 ; a = iz
+   ld a,(ix-5)                 ; a = iz
    call __ftoa_print_zeroes
 
    ex de,hl                    ; hl = workspace *, de = buf_dst *
 
-   ex af,af'
-   jr c, zero_terminate        ; if workspace exhausted
+   ld a,b
+   or c
+   jr z, zero_terminate        ; if workspace exhausted
 
    ;;;;; print decimal point
    
@@ -83,7 +81,7 @@ fz_zeroes:
 
    ex de,hl                    ; hl = buf_dst *, de = workspace *
    
-   ld a,(ix-3)                 ; a = fz
+   ld a,(ix-4)                 ; a = fz
    call __ftoa_print_zeroes
 
    ;;;;; print workspace up to exponent
@@ -109,7 +107,7 @@ tz_zeroes:
 
    ex de,hl                    ; hl = buf_dst *, de = workspace *
 
-   ld a,(ix-4)
+   ld a,(ix-3)
    call __ftoa_print_zeroes
 
    ex de,hl
@@ -137,7 +135,7 @@ tze_zeroes:
    set 5,(hl)                  ; exponent to lower case
    ex de,hl                    ; hl = buf_dst *, de = workspace *
 
-   ld a,(ix-4)
+   ld a,(ix-3)
    call __ftoa_print_zeroes
 
    ;;;;; print remaining workspace (ftoe - exponent present)

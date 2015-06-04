@@ -19,11 +19,12 @@ __ftoh__:
    ;
    ;            bc = buffer length
    ;            de = buffer *
-   ;           (IX-5) = flags, bit 7='N', bit 4='#', bit 0=(precision==0), others unaffected
-   ;           (IX-4) = tz (number of zeroes to append)
-   ;           (IX-3) = fz (number of zeroes to insert after .)
-   ;           (IX-2) = iz (number of zeroes to insert before .)
-   ;           (IX-1) = ignore
+   ;        (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ;        (IX-5) = iz (number of zeroes to insert before .)
+   ;        (IX-4) = fz (number of zeroes to insert after .)
+   ;        (IX-3) = tz (number of zeroes to append)
+   ;        (IX-2) = ignore
+   ;        (IX-1) = '0' marks start of buffer
    ;
    ;         if carry set, special form just output buffer with sign
    ;
@@ -35,10 +36,11 @@ __ftoh__:
    ;  E     = precision
    ; HL     = buffer_dst *
    ; IX     = buffer *
-   ; (IX-5) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
 
    call asm_fpclassify         ; supplied by math library
@@ -71,10 +73,11 @@ p1:
    ; DE'    = stack adjust
    ; stack  = mantissa
    ;
-   ; (IX-5) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
 
    ld (hl),'0'
@@ -103,10 +106,11 @@ normal_form:
    ; DE'    = stack adjust
    ; stack  = mantissa
    ;
-   ; (IX-5) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
 
    ld b,e                      ; generate precision + 1 digits
@@ -116,7 +120,7 @@ normal_form:
    jr c, decimal_point         ; if all precision digits generated
    
    dec b
-   ld (ix-4),b                 ; add trailing zeroes
+   ld (ix-3),b                 ; add trailing zeroes
    
 decimal_point:
 
@@ -179,10 +183,11 @@ e_1:
    ; DE'    = stack adjust
    ; stack  = mantissa
    ;
-   ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz = 0
-   ; (IX-2) = iz = 0
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
 
    exx

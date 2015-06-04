@@ -19,11 +19,12 @@ __ftoa__:
    ;
    ;            bc = buffer length
    ;            de = buffer *
-   ;           (IX-5) = flags, bit 7='N', bit 4='#', bit 0=(precision==0), others unaffected
-   ;           (IX-4) = tz (number of zeroes to append)
-   ;           (IX-3) = fz (number of zeroes to insert after .)
-   ;           (IX-2) = iz (number of zeroes to insert before .)
-   ;           (IX-1) = ignore
+   ;        (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ;        (IX-5) = iz (number of zeroes to insert before .)
+   ;        (IX-4) = fz (number of zeroes to insert after .)
+   ;        (IX-3) = tz (number of zeroes to append)
+   ;        (IX-2) = ignore
+   ;        (IX-1) = '0' marks start of buffer
    ;
    ;         if carry set, special form just output buffer with sign
    ;
@@ -35,10 +36,11 @@ __ftoa__:
    ;  E     = precision
    ; HL     = buffer_dst *
    ; IX     = buffer *
-   ; (IX-5) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
 
    call asm_fpclassify         ; supplied by math library
@@ -59,10 +61,11 @@ normal_form:
    ; EXX    = float x
    ; IX     = buffer *
    ; STACK  = buffer *
-   ; (IX-5) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
    
    call __ftoa_base10          ; supplied by math library
@@ -78,10 +81,11 @@ __ftoa_join:
    ;  E    = remaining precision
    ; HL    = buffer_dst *
    ; IX    = buffer *
-   ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
 
    ld a,d
@@ -104,7 +108,7 @@ integer_digits:
    inc hl
    
    dec b
-   ld (ix-2),b                 ; number of zeroes to insert before .
+   ld (ix-5),b                 ; number of zeroes to insert before .
 
 fraction_begin:
 
@@ -119,10 +123,11 @@ fraction_digits:
    ;  E     = remaining precision
    ; HL     = buffer_dst *
    ; IX     = buffer *
-   ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
 
    ld b,e                      
@@ -132,7 +137,7 @@ fraction_digits:
    jr c, round                 ; if all precision digits generated
    
    dec b
-   ld (ix-4),b                 ; add trailing zeroes
+   ld (ix-3),b                 ; add trailing zeroes
 
    jr __ftoa_prune
 
@@ -155,10 +160,11 @@ fraction_only:
    ;  E     = precision
    ; HL     = buffer_dst *
    ; IX     = buffer *
-   ; (IX-5) = flags, bit 4 = '#', bit 0 = precision==0
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
 
    ld (hl),'0'
@@ -177,7 +183,7 @@ fraction_only:
    ld (hl),'0'
    inc hl
 
-   ld (ix-3),a                 ; number of zeroes to insert after .
+   ld (ix-4),a                 ; number of zeroes to insert after .
 
    sub e
    cpl
@@ -189,5 +195,5 @@ precision_less:
 
    ; fraction part all zeroes
    
-   ld (ix-3),e                 ; number of zeroes to insert after .
+   ld (ix-4),e                 ; number of zeroes to insert after .
    jr __ftoa_prune
