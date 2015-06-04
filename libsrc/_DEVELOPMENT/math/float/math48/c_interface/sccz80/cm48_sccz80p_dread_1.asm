@@ -1,7 +1,7 @@
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sccz80p_dread_1
+PUBLIC cm48_sccz80p_dread_1, cm48_sccz80p_dread_1b
 
 cm48_sccz80p_dread_1:
 
@@ -15,7 +15,9 @@ cm48_sccz80p_dread_1:
    
    ld bc,5
    add hl,bc
-   
+
+cm48_sccz80p_dread_1b:
+
    ld b,(hl)
    dec hl
    ld c,(hl)
