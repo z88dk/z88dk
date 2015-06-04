@@ -1,0 +1,4 @@
+math48 can be sped up:
+
+* fpadd: if difference in exponents > 40 bits, the add can be skipped
+* bitshifts: when the bitshift amount is known, can do a better job than shifting one bit at a time.
