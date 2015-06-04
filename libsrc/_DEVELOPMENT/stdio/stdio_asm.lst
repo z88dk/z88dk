@@ -157,9 +157,14 @@ stdio/z80/input_helpers/__stdio_scanf_sm_string
 stdio/z80/input_helpers/__stdio_scanf_sm_write
 stdio/z80/input_helpers/__stdio_scanf_u
 stdio/z80/input_helpers/__stdio_scanf_x
+stdio/z80/output_helpers/__stdio_printf_a
 stdio/z80/output_helpers/__stdio_printf_bb
 stdio/z80/output_helpers/__stdio_printf_c
 stdio/z80/output_helpers/__stdio_printf_d
+stdio/z80/output_helpers/__stdio_printf_e
+stdio/z80/output_helpers/__stdio_printf_f
+stdio/z80/output_helpers/__stdio_printf_float_tail
+stdio/z80/output_helpers/__stdio_printf_g
 stdio/z80/output_helpers/__stdio_printf_i
 stdio/z80/output_helpers/__stdio_printf_ii
 stdio/z80/output_helpers/__stdio_printf_lbb

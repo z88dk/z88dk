@@ -414,8 +414,8 @@ length_modifier:
 
 converter_specifier:
 
-   ; identify conversion "BcdinopsuxIX"
-   ; long modifies "BdinopuxX" not "csI"
+   ; identify conversion "aABcdeEfFgGinopsuxIX"
+   ; long modifies "BdinopuxX" not "aAceEfFgGsI"
    
    ; de = address of next format char to examine
    ;  c = length modifier id
@@ -434,7 +434,7 @@ converter_specifier:
 IF __CLIB_OPT_PRINTF & $01
 
    cp 'd'
-   jr z, _printf_d
+   jp z, _printf_d
 
 ENDIF
 
@@ -469,14 +469,14 @@ ENDIF
 IF __CLIB_OPT_PRINTF & $20
    
    cp 'n'
-   jr z, _printf_n
+   jp z, _printf_n
 
 ENDIF
 
 IF __CLIB_OPT_PRINTF & $40
    
    cp 'i'
-   jr z, _printf_d             ; %i is the same as %d 
+   jp z, _printf_d             ; %i is the same as %d 
 
 ENDIF
 
@@ -491,6 +491,62 @@ IF __CLIB_OPT_PRINTF & $100
    
    cp 'B'
    jr z, _printf_bb
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $10000000
+
+   cp 'g'
+   jp z, _printf_g
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $20000000
+
+   cp 'G'
+   jp z, _printf_gg
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $4000000
+
+   cp 'f'
+   jp z, _printf_f
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $8000000
+
+   cp 'F'
+   jp z, _printf_ff
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $1000000
+
+   cp 'e'
+   jp z, _printf_e
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $2000000
+
+   cp 'E'
+   jp z, _printf_ee
+   
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $400000
+
+   cp 'a'
+   jp z, _printf_a
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $800000
+
+   cp 'A'
+   jp z, _printf_aa
 
 ENDIF
 
@@ -614,9 +670,9 @@ ENDIF
    ;   4       2   void *stack_param
    ;   6       2   address of next format char
    ;   8       3   prefix buffer space for printf conversion
-   ;  11      33   void *buffer_digits (space for printf conversion)
+   ;  11      33   buffer_digits[] (space for printf conversion)
 
-   ; bcdinopsuxIX
+   ; bcdinopsuxXIaAeEfFgG
 
 IF __CLIB_OPT_PRINTF & $100
 
@@ -640,7 +696,7 @@ _printf_lbb:
    res 4,(ix+5)                ; base indicator off
    ld hl,__stdio_printf_lbb
 
-   jr printf_invoke_4 - 2
+   jp printf_invoke_4 - 2
 
 ENDIF
 
@@ -651,7 +707,7 @@ _printf_c:
    EXTERN __stdio_printf_c
 
    ld hl,__stdio_printf_c
-   jr printf_invoke_2 - 2
+   jp printf_invoke_2 - 2
 
 ENDIF
 
@@ -665,7 +721,7 @@ _printf_d:
    ld a,$c0                    ; signed & capitalize
 
    ld hl,__stdio_printf_d
-   jr printf_invoke_2
+   jp printf_invoke_2
 
 ENDIF
 
@@ -679,7 +735,7 @@ _printf_ld:
    ld a,$c0                    ; signed & capitalize
 
    ld hl,__stdio_printf_ld
-   jr printf_invoke_4
+   jp printf_invoke_4
 
 ENDIF
 
@@ -690,7 +746,7 @@ _printf_n:
    EXTERN __stdio_printf_n
 
    ld hl,__stdio_printf_n
-   jr printf_invoke_2 - 2
+   jp printf_invoke_2 - 2
 
 ENDIF
 
@@ -701,7 +757,7 @@ _printf_ln:
    EXTERN __stdio_printf_ln
 
    ld hl,__stdio_printf_ln
-   jr printf_invoke_4 - 2
+   jp printf_invoke_4 - 2
 
 ENDIF
 
@@ -846,7 +902,112 @@ _printf_I:
 
 ENDIF
 
+IF __CLIB_OPT_PRINTF & $400000
+
+_printf_a:
+
+   EXTERN __stdio_printf_a
+   
+   xor a                       ; no capitalize
+   ld hl,__stdio_printf_a
+   jr printf_invoke_6
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $800000
+
+_printf_aa:
+
+   EXTERN __stdio_printf_a
+   
+   ld hl,__stdio_printf_a
+   jr printf_invoke_6 - 2
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $1000000
+
+_printf_e:
+
+   EXTERN __stdio_printf_e
+   
+   xor a                       ; no capitalize
+   ld hl,__stdio_printf_e
+   jr printf_invoke_6
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $2000000
+
+_printf_ee:
+
+   EXTERN __stdio_printf_e
+   
+   ld hl,__stdio_printf_e
+   jr printf_invoke_6 - 2
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $4000000
+
+_printf_f:
+
+   EXTERN __stdio_printf_f
+   
+   xor a                       ; no capitalize
+   ld hl,__stdio_printf_f
+   jr printf_invoke_6
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $8000000
+
+_printf_ff:
+
+   EXTERN __stdio_printf_f
+   
+   ld hl,__stdio_printf_e
+   jr printf_invoke_6 - 2
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $10000000
+
+_printf_g:
+
+   EXTERN __stdio_printf_g
+   
+   xor a                       ; no capitalize
+   ld hl,__stdio_printf_g
+   jr printf_invoke_6
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $20000000
+
+_printf_gg:
+
+   EXTERN __stdio_printf_g
+   
+   ld hl,__stdio_printf_e
+   jr printf_invoke_6 - 2
+
+ENDIF
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __CLIB_OPT_PRINTF & $3fc00000
+
+   ; float converter enabled
+
+   ld a,$80                    ; capitalize by default
+
+printf_invoke_6:
+
+   ld bc,printf_return_6
+   jr printf_invoke
+
+ENDIF
 
    ld a,$80                    ; capitalize by default
 
@@ -914,20 +1075,24 @@ printf_invoke:
    ; ix = FILE *
    ; hl = void *stack_param
    ; de = void *buffer_digits
-   ; stack = WORKSPACE_42, buffer_digits, width, precision, & printf_conv
+   ; stack = WORKSPACE_42, return addr, buffer_digits, width, precision, & printf_conv
    
    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-printf_return_4:
+IF __CLIB_OPT_PRINTF & $3fc00000
 
-   ; printf converters that read four bytes from stack_param return here
+printf_return_6:
+
+   ; printf converters that read six bytes from stack_param return here
    ;
    ; carry set if error
    ; stack = WORKSPACE_36, char *format, void *stack_param
 
    pop bc
+
+_return_join_6:
 
 ;******************************
 IF __SDCC | __SDCC_IX | __SDCC_IY
@@ -947,7 +1112,40 @@ ELSE
 ENDIF
 ;******************************
 
-   jr _return_join
+   jr _return_join_4
+
+ENDIF
+
+printf_return_4:
+
+   ; printf converters that read four bytes from stack_param return here
+   ;
+   ; carry set if error
+   ; stack = WORKSPACE_36, char *format, void *stack_param
+
+   pop bc
+
+_return_join_4:
+
+;******************************
+IF __SDCC | __SDCC_IX | __SDCC_IY
+;******************************
+
+   inc bc
+   inc bc                      ; bc = stack_param += 2
+
+;******************************
+ELSE
+;******************************
+
+   dec bc
+   dec bc                      ; bc = stack_param += 2
+
+;******************************   
+ENDIF
+;******************************
+
+   jr _return_join_2
 
 printf_return_2:
 
@@ -958,7 +1156,7 @@ printf_return_2:
 
    pop bc
 
-_return_join:
+_return_join_2:
 
 ;******************************
 IF __SDCC | __SDCC_IX | __SDCC_IY

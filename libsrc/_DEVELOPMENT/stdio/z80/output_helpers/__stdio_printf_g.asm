@@ -3,7 +3,7 @@ SECTION code_stdio
 
 PUBLIC __stdio_printf_g
 
-EXTERN dread1, __ftog__, __stdio_printf_float_tail
+EXTERN dread1b, __ftog__, __stdio_printf_float_tail
 
 __stdio_printf_g:
 
@@ -20,19 +20,32 @@ __stdio_printf_g:
    ; NOTE: (buffer_digits - 3) points at buffer space of three free bytes
 
    ex (sp),hl                  ; hl = precision
-   
+
    exx
    
-   ex (sp),hl                  ; hl = void *stack_param, save tally
-   call dread1                 ; exx set = float x
+   pop de
+   pop bc
+   pop af
+   
+   push hl
+   
+   ld hl,-65
+   add hl,sp
+   ld sp,hl
+   
+   push ix
+   push bc
+   
+   ex de,hl                    ; hl = void *stack_param
+   call dread1b                ; exx set = float x
    
    ex de,hl                    ; hl = buffer *, de = precision
    
-   ;  ix = FILE *
    ;  de = precision
    ;  hl = buffer *
+   ;  ix = FILE *
    ; exx = float x
-   ; stack = buffer *, width, output_tally
+   ; stack = tally, BUFFER_65, FILE *, width
    
    ld c,(ix+5)                 ; c = printf flags
    
@@ -42,18 +55,18 @@ __stdio_printf_g:
 
 prec_defined:
 
-   push ix
    call __ftog__               ; generate hexadecimal string
    
-   ;     bc = buffer length
-   ;     de = buffer *
-   ;  stack = buffer *, width, output_tally, FILE *
+   ;     bc = workspace length
+   ;     de = workspace *
+   ; stack = tally, BUFFER_65, FILE *, width
    ;
-   ; (IX-5) = flags, bit 7='N', bit 4='#', bit 0=(precision==0), others unaffected
-   ; (IX-4) = tz (number of zeroes to append)
-   ; (IX-3) = fz (number of zeroes to insert after .)
-   ; (IX-2) = iz (number of zeroes to insert before .)
-   ; (IX-1) = ignore
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-5) = iz (number of zeroes to insert before .)
+   ; (IX-4) = fz (number of zeroes to insert after .)
+   ; (IX-3) = tz (number of zeroes to append)
+   ; (IX-2) = ignore
+   ; (IX-1) = '0' marks start of buffer
    ;
    ; carry set = special form just output buffer with sign
 
