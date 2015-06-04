@@ -5,13 +5,13 @@ SECTION code_stdlib
 
 PUBLIC ftog
 
-EXTERN asm_ftog, dread1
+EXTERN asm_ftog, dread1b
 
 ftog:
 
-   ld hl,8
+   ld hl,13
    add hl,sp
-   call dread1
+   call dread1b
 
    pop af
    pop bc

@@ -5,13 +5,13 @@ SECTION code_stdlib
 
 PUBLIC ftoe
 
-EXTERN asm_ftoe, dread1
+EXTERN asm_ftoe, dread1b
 
 ftoe:
 
-   ld hl,8
+   ld hl,13
    add hl,sp
-   call dread1
+   call dread1b
 
    pop af
    pop bc
