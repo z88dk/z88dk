@@ -421,161 +421,59 @@ converter_specifier:
    ;  c = length modifier id
    ; stack = WORKSPACE_44, width, precision, stack_param
 
-   ld a,c
-   and $30                     ; only pay attention to long modifier
-
    ld a,(de)                   ; a = specifier
    inc de
 
+IF __CLIB_OPT_PRINTF & $800
+
+   cp 'I'
+   jr z, printf_I              ; converter does not fit tables
+
+ENDIF
+
+   ld b,a                      ; b = specifier
+
+IF __CLIB_OPT_PRINTF & $600
+
+   ld hl,acon_tbl              ; converters independent of long spec
+
+ENDIF
+
+   ld a,c
+   and $30                     ; only pay attention to long modifier
+
+   ; carry must be reset here
+
    jr nz, long_spec            ; if long modifier selected
 
-   ; no long modifier
+   ;;; without long spec
 
-IF __CLIB_OPT_PRINTF & $01
+IF __CLIB_OPT_PRINTF & $600
 
-   cp 'd'
-   jp z, _printf_d
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $02
-
-   cp 'u'
-   jp z, _printf_u
+   call match_con
+   jr c, printf_return_is_2
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $04
+IF __CLIB_OPT_PRINTF & $1ff
 
-   cp 'x'
-   jp z, _printf_x
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $08
-   
-   cp 'X'
-   jp z, _printf_xx
+   ld hl,rcon_tbl              ; converters without long spec
+   call match_con
+   jr c, printf_return_is_2
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $10
-   
-   cp 'o'
-   jp z, _printf_o
+IF __CLIB_OPT_PRINTF & $3fc00000
 
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $20
-   
-   cp 'n'
-   jp z, _printf_n
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $40
-   
-   cp 'i'
-   jp z, _printf_d             ; %i is the same as %d 
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $80
-   
-   cp 'p'
-   jp z, _printf_p
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $100
-   
-   cp 'B'
-   jr z, _printf_bb
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $10000000
-
-   cp 'g'
-   jp z, _printf_g
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $20000000
-
-   cp 'G'
-   jp z, _printf_gg
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $4000000
-
-   cp 'f'
-   jp z, _printf_f
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $8000000
-
-   cp 'F'
-   jp z, _printf_ff
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $1000000
-
-   cp 'e'
-   jp z, _printf_e
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $2000000
-
-   cp 'E'
-   jp z, _printf_ee
-   
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $400000
-
-   cp 'a'
-   jp z, _printf_a
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $800000
-
-   cp 'A'
-   jp z, _printf_aa
-
-ENDIF
-
-more_spec:
-
-   ; converters unaffected by long modifier (in this implementation)
-
-IF __CLIB_OPT_PRINTF & $200
-
-   cp 's'
-   jp z, _printf_s
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $400
-   
-   cp 'c'
-   jr z, _printf_c
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $800
-   
-   cp 'I'
-   jp z, _printf_I
+   ld hl,fcon_tbl              ; float converters
+   call match_con
+   jr c, printf_return_is_6
 
 ENDIF
    
-error_spec_unknown:
+   ;;; converter unrecognized
+
+unrecognized:
 
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, width, precision, stack_param
@@ -585,446 +483,91 @@ error_spec_unknown:
    ld hl,50
    jp __error_stream
 
+   ;;; with long spec
+
 long_spec:
 
-IF __CLIB_OPT_PRINTF & $1000
+IF __CLIB_OPT_PRINTF & $600
 
-   cp 'd'
-   jr z, _printf_ld
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $2000
-
-   cp 'u'
-   jp z, _printf_lu
+   call match_con
+   jr c, printf_return_is_2
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $4000
+IF __CLIB_OPT_PRINTF & $1ff000
 
-   cp 'x'
-   jp z, _printf_lx
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $8000
-   
-   cp 'X'
-   jp z, _printf_lxx
+   ld hl,lcon_tbl              ; converters with long spec
+   call match_con
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $10000
-   
-   cp 'o'
-   jr z, _printf_lo
+   jr nc, unrecognized
 
-ENDIF
+   ;;; conversion matched
 
-IF __CLIB_OPT_PRINTF & $20000
-   
-   cp 'n'
-   jr z, _printf_ln
+IF __CLIB_OPT_PRINTF & $1ff800
 
-ENDIF
+printf_return_is_4:
 
-IF __CLIB_OPT_PRINTF & $40000
-   
-   cp 'i'
-   jr z, _printf_ld            ; %i is the same as %d
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $80000
-
-   cp 'p'
-   jr z, _printf_lp
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $100000
-   
-   cp 'B'
-   jr z, _printf_lbb
-
-ENDIF
-
-   jr more_spec
-
-;******************************
-; * PRINTF CONVERTERS *********
-
-   ; for all printf converter entry points
-   ;
-   ; de = address of next format char to examine
-   ;  c = length modifier id
-   ; stack = WORKSPACE_44, width, precision, stack_param
-
-   ; WORSPACE_44 low to high addresses
-   ;
-   ; offset  size  purpose
-   ;
-   ;   0       2   void *buffer_digits
-   ;   2       2   return address following printf conversion
-   ;   4       2   void *stack_param
-   ;   6       2   address of next format char
-   ;   8       3   prefix buffer space for printf conversion
-   ;  11      33   buffer_digits[] (space for printf conversion)
-
-   ; bcdinopsuxXIaAeEfFgG
-
-IF __CLIB_OPT_PRINTF & $100
-
-_printf_bb:
-
-   EXTERN __stdio_printf_bb
-   
-   res 4,(ix+5)                ; base indicator off
-   ld hl,__stdio_printf_bb
-   
-   jp printf_invoke_2 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $100000
-
-_printf_lbb:
-
-   EXTERN __stdio_printf_lbb
-
-   res 4,(ix+5)                ; base indicator off
-   ld hl,__stdio_printf_lbb
-
-   jp printf_invoke_4 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $400
-
-_printf_c:
-
-   EXTERN __stdio_printf_c
-
-   ld hl,__stdio_printf_c
-   jp printf_invoke_2 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $41
-
-_printf_d:
-
-   EXTERN __stdio_printf_d
-
-   res 4,(ix+5)                ; base indicator off
-   ld a,$c0                    ; signed & capitalize
-
-   ld hl,__stdio_printf_d
-   jp printf_invoke_2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $41000
-
-_printf_ld:
-
-   EXTERN __stdio_printf_ld
-
-   res 4,(ix+5)                ; base indicator off
-   ld a,$c0                    ; signed & capitalize
-
-   ld hl,__stdio_printf_ld
-   jp printf_invoke_4
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $20
-
-_printf_n:
-
-   EXTERN __stdio_printf_n
-
-   ld hl,__stdio_printf_n
-   jp printf_invoke_2 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $20000
-
-_printf_ln:
-
-   EXTERN __stdio_printf_ln
-
-   ld hl,__stdio_printf_ln
-   jp printf_invoke_4 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $10
-
-_printf_o:
-
-   EXTERN __stdio_printf_o
-
-   set 1,(ix+5)                ; octal base indicator
-   ld hl,__stdio_printf_o
-   
-   jr printf_invoke_2 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $10000
-
-_printf_lo:
-
-   EXTERN __stdio_printf_lo
-
-   set 1,(ix+5)                ; octal base indicator
-   ld hl,__stdio_printf_lo
-
-   jr printf_invoke_4 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $80
-
-_printf_p:
-
-   EXTERN __stdio_printf_p
-
-   ld hl,__stdio_printf_p
-   jr printf_invoke_2 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $80000
-
-_printf_lp:
-
-   EXTERN __stdio_printf_lp
-
-   ld hl,__stdio_printf_lp
-   jr printf_invoke_4 - 2
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $200
-
-_printf_s:
-
-   EXTERN __stdio_printf_s
- 
-   ld hl,__stdio_printf_s
-   jr printf_invoke_2 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $02
-
-_printf_u:
-
-   EXTERN __stdio_printf_u
-
-   res 4,(ix+5)                ; base indicator off
-   ld hl,__stdio_printf_u
-   
-   jr printf_invoke_2 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $2000
-
-_printf_lu:
-
-   EXTERN __stdio_printf_lu
-
-   res 4,(ix+5)                ; base indicator off
-   ld hl,__stdio_printf_lu
-   
-   jr printf_invoke_4 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $08
-
-_printf_xx:
-
-   EXTERN __stdio_printf_x
-
-   ld hl,__stdio_printf_x
-   jr printf_invoke_2 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $8000
-
-_printf_lxx:
-
-   EXTERN __stdio_printf_lx
-      
-   ld hl,__stdio_printf_lx
-   jr printf_invoke_4 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $04
-
-_printf_x:
-
-   EXTERN __stdio_printf_x
-
-   xor a                       ; no capitalize
-   ld hl,__stdio_printf_x
-   jr printf_invoke_2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $4000
-
-_printf_lx:
-
-   EXTERN __stdio_printf_lx
-   
-   xor a                       ; no capitalize
-   ld hl,__stdio_printf_lx
-   jr printf_invoke_4
+   ld bc,printf_return_4
+   jr printf_invoke_flags
 
 ENDIF
 
 IF __CLIB_OPT_PRINTF & $800
 
-_printf_I:
+printf_I:
 
    EXTERN __stdio_printf_ii
 
    ld hl,__stdio_printf_ii
-   jr printf_invoke_4 - 2
+   ld a,$80
+
+   jr printf_return_is_4
 
 ENDIF
-
-IF __CLIB_OPT_PRINTF & $400000
-
-_printf_a:
-
-   EXTERN __stdio_printf_a
-   
-   xor a                       ; no capitalize
-   ld hl,__stdio_printf_a
-   jr printf_invoke_6
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $800000
-
-_printf_aa:
-
-   EXTERN __stdio_printf_a
-   
-   ld hl,__stdio_printf_a
-   jr printf_invoke_6 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $1000000
-
-_printf_e:
-
-   EXTERN __stdio_printf_e
-   
-   xor a                       ; no capitalize
-   ld hl,__stdio_printf_e
-   jr printf_invoke_6
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $2000000
-
-_printf_ee:
-
-   EXTERN __stdio_printf_e
-   
-   ld hl,__stdio_printf_e
-   jr printf_invoke_6 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $4000000
-
-_printf_f:
-
-   EXTERN __stdio_printf_f
-   
-   xor a                       ; no capitalize
-   ld hl,__stdio_printf_f
-   jr printf_invoke_6
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $8000000
-
-_printf_ff:
-
-   EXTERN __stdio_printf_f
-   
-   ld hl,__stdio_printf_e
-   jr printf_invoke_6 - 2
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $10000000
-
-_printf_g:
-
-   EXTERN __stdio_printf_g
-   
-   xor a                       ; no capitalize
-   ld hl,__stdio_printf_g
-   jr printf_invoke_6
-
-ENDIF
-
-IF __CLIB_OPT_PRINTF & $20000000
-
-_printf_gg:
-
-   EXTERN __stdio_printf_g
-   
-   ld hl,__stdio_printf_e
-   jr printf_invoke_6 - 2
-
-ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 IF __CLIB_OPT_PRINTF & $3fc00000
 
-   ; float converter enabled
-
-   ld a,$80                    ; capitalize by default
-
-printf_invoke_6:
+printf_return_is_6:
 
    ld bc,printf_return_6
-   jr printf_invoke
+   jr printf_invoke_flags
 
 ENDIF
 
-   ld a,$80                    ; capitalize by default
+IF __CLIB_OPT_PRINTF & $7ff
 
-printf_invoke_4:
-
-   ld bc,printf_return_4
-   jr printf_invoke
-
-   ld a,$80                    ; capitalize by default
-
-printf_invoke_2:
+printf_return_is_2:
 
    ld bc,printf_return_2
 
-printf_invoke:
+ENDIF
 
-   ld (ix+4),a                 ; signed / unsigned / capitalize
+printf_invoke_flags:
+
+   ;  a = invoke flags
+   ; hl = & printf converter
+   ; bc = return address after conversion
+   ; de = address of next format char to examine
+   ; stack = WORKSPACE_44, width, precision, stack_param
+
+   bit 5,a
+   jr z, skip_00
+   set 1,(ix+5)                ; indicates octal conversion
+
+skip_00:
+
+   bit 4,a
+   jr z, skip_11
+   res 4,(ix+5)                ; suppress base indicator
+
+skip_11:
+
+   and $c0
+   ld (ix+4),a                 ; capitalize & signed conversion indicators
+
+printf_invoke:
 
    ; hl = & printf_converter
    ; de = address of next format char to examine
@@ -1076,10 +619,332 @@ printf_invoke:
    ; hl = void *stack_param
    ; de = void *buffer_digits
    ; stack = WORKSPACE_42, return addr, buffer_digits, width, precision, & printf_conv
+
+   ; WORSPACE_44 low to high addresses
+   ;
+   ; offset  size  purpose
+   ;
+   ;   0       2   void *buffer_digits
+   ;   2       2   return address following printf conversion
+   ;   4       2   void *stack_param
+   ;   6       2   address of next format char
+   ;   8       3   prefix buffer space for printf conversion
+   ;  11      33   buffer_digits[] (space for printf conversion)
    
    ret
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+match_con:
+
+   ; enter :   b = conversion specifier
+   ;          hl = conversion table
+   ;
+   ; exit  :   b = conversion specifier
+   ;
+   ;         if matched
+   ;
+   ;              a = flags
+   ;             hl = & printf converter
+   ;             carry set
+   ;
+   ;         if unmatched
+   ;
+   ;             carry reset
+
+   ld a,(hl)
+   inc hl
+   
+   or a
+   ret z
+   
+   cp b
+   jr z, match_ret
+
+   inc hl
+   inc hl
+   inc hl
+   
+   jr match_con
+
+match_ret:
+
+   ld a,(hl)                   ; a = flags
+   inc hl
+   
+   ld b,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,b                      ; hl = & printf converter
+   
+   scf
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __CLIB_OPT_PRINTF & $600
+
+acon_tbl:
+
+IF __CLIB_OPT_PRINTF & $200
+
+defb 's', $80
+EXTERN __stdio_printf_s
+defw __stdio_printf_s
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $400
+
+defb 'c', $80
+EXTERN __stdio_printf_c
+defw __stdio_printf_c
+
+ENDIF
+
+defb 0
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __CLIB_OPT_PRINTF & $1ff
+
+rcon_tbl:
+
+IF __CLIB_OPT_PRINTF & $01
+
+defb 'd', $d0
+EXTERN __stdio_printf_d
+defw __stdio_printf_d
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $02
+
+defb 'u', $90
+EXTERN __stdio_printf_u
+defw __stdio_printf_u
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $04
+
+defb 'x', $00
+EXTERN __stdio_printf_x
+defw __stdio_printf_x
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $08
+
+defb 'X', $80
+EXTERN __stdio_printf_x
+defw __stdio_printf_x
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $10
+
+defb 'o', $a0
+EXTERN __stdio_printf_o
+defw __stdio_printf_o
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $20
+
+defb 'n', $80
+EXTERN __stdio_printf_n
+defw __stdio_printf_n
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $40
+
+defb 'i', $d0
+EXTERN __stdio_printf_d
+defw __stdio_printf_d
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $80
+
+defb 'p', $80
+EXTERN __stdio_printf_p
+defw __stdio_printf_p
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $100
+
+defb 'B', $90
+EXTERN __stdio_printf_bb
+defw __stdio_printf_bb
+
+ENDIF
+
+defb 0
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __CLIB_OPT_PRINTF & $3fc00000
+
+fcon_tbl:
+
+IF __CLIB_OPT_PRINTF & $10000000
+
+defb 'g', $00
+EXTERN __stdio_printf_g
+defw __stdio_printf_g
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $20000000
+
+defb 'G', $80
+EXTERN __stdio_printf_g
+defw __stdio_printf_g
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $4000000
+
+defb 'f', $00
+EXTERN __stdio_printf_f
+defw __stdio_printf_f
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $8000000
+
+defb 'F', $80
+EXTERN __stdio_printf_f
+defw __stdio_printf_f
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $1000000
+
+defb 'e', $00
+EXTERN __stdio_printf_e
+defw __stdio_printf_e
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $2000000
+
+defb 'E', $80
+EXTERN __stdio_printf_e
+defw __stdio_printf_e
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $400000
+
+defb 'a', $00
+EXTERN __stdio_printf_a
+defw __stdio_printf_a
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $800000
+
+defb 'A', $80
+EXTERN __stdio_printf_a
+defw __stdio_printf_a
+
+ENDIF
+
+defb 0
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __CLIB_OPT_PRINTF & $1ff000
+
+lcon_tbl:
+
+IF __CLIB_OPT_PRINTF & $1000
+
+defb 'd', $d0
+EXTERN __stdio_printf_ld
+defw __stdio_printf_ld
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $2000
+
+defb 'u', $90
+EXTERN __stdio_printf_lu
+defw __stdio_printf_lu
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $4000
+
+defb 'x', $00
+EXTERN __stdio_printf_lx
+defw __stdio_printf_lx
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $8000
+
+defb 'X', $80
+EXTERN __stdio_printf_lx
+defw __stdio_printf_lx
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $10000
+
+defb 'o', $a0
+EXTERN __stdio_printf_lo
+defw __stdio_printf_lo
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $20000
+
+defb 'n', $80
+EXTERN __stdio_printf_ln
+defw __stdio_printf_ln
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $40000
+
+defb 'i', $d0
+EXTERN __stdio_printf_ld
+defw __stdio_printf_ld
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $80000
+
+defb 'p', $80
+EXTERN __stdio_printf_lp
+defw __stdio_printf_lp
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF & $100000
+
+defb 'B', $90
+EXTERN __stdio_printf_lbb
+defw __stdio_printf_lbb
+
+ENDIF
+
+defb 0
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 IF __CLIB_OPT_PRINTF & $3fc00000
 
@@ -1193,8 +1058,7 @@ ENDIF
 
    jp format_loop
 
-;******************************
-; * ERRORS ********************
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 error_format_precision:
 
