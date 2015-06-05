@@ -771,3 +771,42 @@ include "clib_target_variables.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../clib_stubs.inc"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; STDIO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifdef __SCCZ80
+
+   ; sccz80 scans printf format strings to determine
+   ; what sort of printf implementation is needed
+   
+   if (DEFINED_floatstdio | DEFINED_STDIO_ENABLE_FLOAT)
+   
+      ; float stdio
+   
+      PUBLIC asm_vfprintf_unlocked, asm0_vfprintf_unlocked, asm1_vfprintf_unlocked
+      EXTERN asm_vfprintf_unlocked_fp, asm0_vfprintf_unlocked_fp, asm1_vfprintf_unlocked_fp
+      
+      defc  asm_vfprintf_unlocked =  asm_vfprintf_unlocked_fp
+      defc asm0_vfprintf_unlocked = asm0_vfprintf_unlocked_fp
+      defc asm1_vfprintf_unlocked = asm1_vfprintf_unlocked_fp
+
+   else
+   
+      if (DEFINED_complexstdio | DEFINED_ministdio)
+      
+         ; integer stdio
+      
+         PUBLIC asm_vfprintf_unlocked, asm0_vfprintf_unlocked, asm1_vfprintf_unlocked
+         EXTERN asm_vfprintf_unlocked_int, asm0_vfprintf_unlocked_int, asm1_vfprintf_unlocked_int
+
+         defc  asm_vfprintf_unlocked =  asm_vfprintf_unlocked_int
+         defc asm0_vfprintf_unlocked = asm0_vfprintf_unlocked_int
+         defc asm1_vfprintf_unlocked = asm1_vfprintf_unlocked_int
+
+      endif
+   
+   endif
+
+endif
