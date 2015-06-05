@@ -9,6 +9,7 @@
 @l/sdcc.lst
 @locale/locale.lst
 @math/math_integer.lst
+@math/math_float_sccz80.lst
 @setjmp/setjmp_sdcc_iy.lst
 @stdio/stdio_sdcc_iy.lst
 @stdlib/stdlib_sdcc_iy.lst
