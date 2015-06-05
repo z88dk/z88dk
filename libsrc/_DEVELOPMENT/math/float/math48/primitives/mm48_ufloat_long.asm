@@ -27,8 +27,8 @@ mm48_ufloat_long:
    
    ld de,$80 + 32              ; e = exponent
 
-   add a,a                     ; a = MSB of n << 1
-   jr c, normalized
+   bit 7,b
+   jr nz, normalized
 
 normalize_loop:
 
