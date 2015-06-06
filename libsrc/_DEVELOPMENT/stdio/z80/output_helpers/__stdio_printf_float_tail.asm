@@ -11,7 +11,7 @@ __stdio_printf_float_tail:
 
    ;     bc = workspace length
    ;     de = workspace *
-   ;  stack = tally, BUFFER_65, FILE *, width
+   ;  stack = buffer_digits, tally, de', bc', BUFFER_65, FILE *, width
    ;
    ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
    ; (IX-5) = iz (number of zeroes to insert before .)
@@ -35,7 +35,7 @@ __stdio_printf_float_tail:
    ; de = num_chars
    ; exx = float x
    ; carry'= special form
-   ; stack = tally, BUFFER_65, FILE *, width, special form, workspace *
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, FILE *, width, workspace *
 
    ld hl,64                    ; max 64 byte buffer size
    
@@ -61,7 +61,7 @@ padding:
    ; de = num_chars
    ; exx = float x
    ; carry'= special form
-   ; stack = tally, BUFFER_65, FILE *, width
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, FILE *, width
 
    ; compute padding
    
@@ -79,7 +79,7 @@ print_float:
    ; hl = padding
    ; exx = float x
    ; carry'= special form
-   ; stack = tally, BUFFER_65, FILE *, workspace *
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, FILE *, workspace *
 
    ; write float to temporary buffer
    
@@ -102,11 +102,28 @@ print_float:
    ; hl = BUFFER_65 *
    ; de = output length
    ; carry'= special form
-   ; stack = tally, BUFFER_65, FILE *, padding
-   
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, FILE *, padding
+
    exx
-   ld l,(ix-19)
-   ld h,(ix-18)                ; hl'= tally
+   
+   ld hl,69
+   add hl,sp
+
+   ld c,(hl)
+   inc hl
+   ld b,(hl)                   ; bc' restored
+   inc hl
+
+   ld e,(hl)
+   inc hl
+   ld d,(hl)                   ; de' restored
+   inc hl
+
+   ld a,(hl)
+   inc hl
+   ld h,(hl)                   ; hl'= tally
+   ld l,a
+
    exx
    
    ; capitalize
@@ -132,7 +149,7 @@ justification:
    ; ix = FILE *
    ; hl'= tally
    ; carry'= special form
-   ; stack = tally, BUFFER_65, padding
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, padding
    
    ; determine justification
       
@@ -151,7 +168,7 @@ left_justify_zero_pad:
    ; ix = FILE *
    ; hl'= tally
    ; carry'= special form
-   ; stack = tally, BUFFER_65, padding
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, padding
 
    ex af,af'
    jr c, left_justify          ; if special form no zeroes
@@ -185,8 +202,7 @@ prefix_2:
    ; hl = new BUFFER_65 * (post prefix)
    ; ix = FILE *
    ; hl'= tally
-   ; carry'= special form
-   ; stack = tally, BUFFER_65, padding
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, padding
 
    push hl                     ; save new BUFFER_65 *
 
@@ -214,7 +230,7 @@ internal_zeroes:
    ; hl = new BUFFER_65 *
    ; hl'= output tally
    ; ix = FILE *
-   ; stack = tally, BUFFER_65, padding
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, padding
    
    ex (sp),hl                  ; hl = padding
    push bc                     ; save workspace length
@@ -245,7 +261,7 @@ left_justify:
    ; hl = BUFFER_65 *
    ; ix = FILE *
    ; hl'= tally
-   ; stack = tally, BUFFER_65, padding
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, padding
 
    call __stdio_send_output_buffer
    
@@ -262,7 +278,7 @@ right_justify:
    ; hl = BUFFER_65 *
    ; ix = FILE *
    ; hl'= tally
-   ; stack = tally, BUFFER_65, padding
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, padding
 
    ex (sp),hl                  ; hl = padding
    push bc                     ; save output length
@@ -278,9 +294,11 @@ right_justify_join:
    
 stack_restore:
 
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65
+   
    ex af,af'
 
-   ld hl,67
+   ld hl,73
    add hl,sp
    ld sp,hl
    

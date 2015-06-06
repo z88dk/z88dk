@@ -19,33 +19,42 @@ __stdio_printf_g:
    ;
    ; NOTE: (buffer_digits - 3) points at buffer space of three free bytes
 
-   ex (sp),hl                  ; hl = precision
+   ; snprintf requires bc',de' to be preserved
 
+   pop bc                      ; bc = precision
+   ex (sp),hl                  ; hl = width
+   
    exx
+
+   ex (sp),hl                  ; save tally, hl = stack_param *
+   push de                     ; save snprintf variable
+   push bc                     ; save snprintf variable
    
-   pop de
-   pop bc
-   pop af
-   
-   push hl
+   ex de,hl
    
    ld hl,-65
    add hl,sp
    ld sp,hl
    
+   ex de,hl
+   
    push ix
-   push bc
    
-   ex de,hl                    ; hl = void *stack_param
    call dread1b                ; exx set = float x
+
+   ; exx occurred
+
+   push hl                     ; save width
+   ex de,hl                    ; hl = void *buffer_digits
    
-   ex de,hl                    ; hl = buffer *, de = precision
+   ld e,c
+   ld d,b                      ; de = precision
    
    ;  de = precision
    ;  hl = buffer *
    ;  ix = FILE *
    ; exx = float x
-   ; stack = tally, BUFFER_65, FILE *, width
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, FILE *, width
    
    ld c,(ix+5)                 ; c = printf flags
    
@@ -59,7 +68,7 @@ prec_defined:
    
    ;     bc = workspace length
    ;     de = workspace *
-   ; stack = tally, BUFFER_65, FILE *, width
+   ; stack = buffer_digits, tally, de', bc', BUFFER_65, FILE *, width
    ;
    ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
    ; (IX-5) = iz (number of zeroes to insert before .)
