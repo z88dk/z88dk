@@ -433,12 +433,6 @@ ENDIF
 
    ld b,a                      ; b = specifier
 
-IF __CLIB_OPT_PRINTF & $600
-
-   ld hl,acon_tbl              ; converters independent of long spec
-
-ENDIF
-
    ld a,c
    and $30                     ; only pay attention to long modifier
 
@@ -448,13 +442,6 @@ ENDIF
 
    ;;; without long spec
 
-IF __CLIB_OPT_PRINTF & $600
-
-   call match_con
-   jr c, printf_return_is_2
-
-ENDIF
-
 IF __CLIB_OPT_PRINTF & $1ff
 
    ld hl,rcon_tbl              ; converters without long spec
@@ -463,9 +450,19 @@ IF __CLIB_OPT_PRINTF & $1ff
 
 ENDIF
 
+common_spec:
+
+IF __CLIB_OPT_PRINTF & $600
+
+   ld hl,acon_tbl              ; converters independent of long spec
+   call match_con
+   jr c, printf_return_is_2
+
+ENDIF
+
 IF __CLIB_OPT_PRINTF & $3fc00000
 
-   ld hl,fcon_tbl              ; float converters
+   ld hl,fcon_tbl              ; float converters are independent of long spec
    call match_con
    jr c, printf_return_is_6
 
@@ -487,13 +484,6 @@ unrecognized:
 
 long_spec:
 
-IF __CLIB_OPT_PRINTF & $600
-
-   call match_con
-   jr c, printf_return_is_2
-
-ENDIF
-
 IF __CLIB_OPT_PRINTF & $1ff000
 
    ld hl,lcon_tbl              ; converters with long spec
@@ -501,7 +491,7 @@ IF __CLIB_OPT_PRINTF & $1ff000
 
 ENDIF
 
-   jr nc, unrecognized
+   jr nc, common_spec
 
    ;;; conversion matched
 

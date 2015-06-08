@@ -13,8 +13,8 @@ INCLUDE "clib_cfg.asm"
 
 SECTION code_stdio
 
-PUBLIC asm_vfprintf_unlocked_fp
-PUBLIC asm0_vfprintf_unlocked_fp, asm1_vfprintf_unlocked_fp
+PUBLIC asm_vfprintf_unlocked
+PUBLIC asm0_vfprintf_unlocked, asm1_vfprintf_unlocked
 
 EXTERN __stdio_verify_output, asm_strchrnul, __stdio_send_output_buffer
 EXTERN l_utod_hl, l_neg_hl, error_einval_zc
@@ -27,7 +27,7 @@ EXTERN __stdio_nextarg_de, l_atou, __stdio_length_modifier, error_erange_zc
 ENDIF
 
 
-asm_vfprintf_unlocked_fp:
+asm_vfprintf_unlocked:
 
    ; enter : ix = FILE *
    ;         de = char *format
@@ -66,12 +66,12 @@ IF __CLIB_OPT_STDIO & $01
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-asm1_vfprintf_unlocked_fp:
+asm1_vfprintf_unlocked:
 
    call __stdio_verify_output  ; check that output on stream is ok
    ret c                       ; if output on stream not possible
 
-asm0_vfprintf_unlocked_fp:
+asm0_vfprintf_unlocked:
 
 IF __CLIB_OPT_PRINTF != 0
 
@@ -433,12 +433,6 @@ ENDIF
 
    ld b,a                      ; b = specifier
 
-IF __CLIB_OPT_PRINTF & $600
-
-   ld hl,acon_tbl              ; converters independent of long spec
-
-ENDIF
-
    ld a,c
    and $30                     ; only pay attention to long modifier
 
@@ -448,13 +442,6 @@ ENDIF
 
    ;;; without long spec
 
-IF __CLIB_OPT_PRINTF & $600
-
-   call match_con
-   jr c, printf_return_is_2
-
-ENDIF
-
 IF __CLIB_OPT_PRINTF & $1ff
 
    ld hl,rcon_tbl              ; converters without long spec
@@ -463,9 +450,19 @@ IF __CLIB_OPT_PRINTF & $1ff
 
 ENDIF
 
+common_spec:
+
+IF __CLIB_OPT_PRINTF & $600
+
+   ld hl,acon_tbl              ; converters independent of long spec
+   call match_con
+   jr c, printf_return_is_2
+
+ENDIF
+
 IF __CLIB_OPT_PRINTF & $3fc00000
 
-   ld hl,fcon_tbl              ; float converters
+   ld hl,fcon_tbl              ; float converters are independent of long spec
    call match_con
    jr c, printf_return_is_6
 
@@ -487,13 +484,6 @@ unrecognized:
 
 long_spec:
 
-IF __CLIB_OPT_PRINTF & $600
-
-   call match_con
-   jr c, printf_return_is_2
-
-ENDIF
-
 IF __CLIB_OPT_PRINTF & $1ff000
 
    ld hl,lcon_tbl              ; converters with long spec
@@ -501,7 +491,7 @@ IF __CLIB_OPT_PRINTF & $1ff000
 
 ENDIF
 
-   jr nc, unrecognized
+   jr nc, common_spec
 
    ;;; conversion matched
 
