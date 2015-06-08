@@ -66,7 +66,7 @@ zero_terminate:
    
    ld a,b
    or c
-   jr nz, no_chars
+   jr z, no_chars
    
    inc hl                      ; if at least one char consumed from stream, num items assigned++
 
