@@ -16,7 +16,7 @@ SECTION code_stdlib
 PUBLIC asm_strtod
 
 EXTERN l_eat_ws, l_eat_sign, asm_strcasecmp, asm_isdigit, l_eat_ddigits
-EXTERN minusfa, sigdig, ufloat, mul10, dpush, dadd, tenf
+EXTERN minusfa, sigdig, ufloat, mul10, dpush, dadd, tenf, asm_tolower
 EXTERN __ftoa_inf_s, __ftoa_infinity_s, __ftoa_nan_s, asm0_atoi
 EXTERN float_error_pinfnc, float_error_nannc, float_error_einval_zc
 
