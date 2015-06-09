@@ -3,7 +3,7 @@ SECTION code_stdlib
 
 PUBLIC __ftoa_special_form
 
-EXTERN asm_strcpy
+EXTERN asm_strcpy, __ftoa_nan_s, __ftoa_inf_s
 
 __ftoa_special_form:
 
@@ -23,12 +23,12 @@ __ftoa_special_form:
    dec a
    jr z, zero
    
-   ld de,nan
+   ld de,__ftoa_nan_s
    
    dec a
    jr z, string
    
-   ld de,inf
+   ld de,__ftoa_inf_s
 
 string:
 
@@ -50,13 +50,3 @@ zero:
    ld (ix-3),e                 ; number of trailing zeroes = precision
 
    ret                         ; return with carry reset to indicate zero
-
-nan:
-
-   defm "nan"
-   defb 0
-
-inf:
-
-   defm "inf"
-   defb 0
