@@ -96,3 +96,4 @@ math/float/math48/lm/sccz80/tenf
 math/float/math48/lm/sccz80/tgamma
 math/float/math48/lm/sccz80/trunc
 math/float/math48/lm/sccz80/ufloat
+math/float/math48/lm/sccz80/ufloat16

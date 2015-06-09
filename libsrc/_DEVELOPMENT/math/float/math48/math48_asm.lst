@@ -8,6 +8,7 @@ math/float/math48/c_standard/lm48__ftoa_sgnabs
 math/float/math48/c_standard/lm48__mul10
 math/float/math48/c_standard/lm48__sigdig
 math/float/math48/c_standard/lm48__tenf
+math/float/math48/c_standard/lm48__ufloat16
 math/float/math48/c_standard/lm48_acos
 math/float/math48/c_standard/lm48_add
 math/float/math48/c_standard/lm48_asin
