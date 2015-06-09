@@ -3,14 +3,15 @@ SECTION code_fp_math48
 
 PUBLIC mm48_tenf
 
-EXTERN mm48__getcix, mm48_mul10, mm48_fpmul, mm48_fpdiv, l_inc_sp
+EXTERN mm48__getcix, mm48_mul10, mm48_fpmul, mm48_fpdiv
+EXTERN l_inc_sp, mm48_erange_infc, mm48__retzero
 
 mm48_tenf:
 
    ; multiply by power of 10
    ; AC' = AC' * 10^A
    ;
-   ; enter :          A   = power of 10
+   ; enter :          A   = power of 10, |A| < 40
    ;         AC'(BCDEHL') = float x
    ;
    ; exit  : success
@@ -35,6 +36,10 @@ mm48_tenf:
 mm48__tf1:
 
    push af                     ;Gem flag
+
+   cp 40
+   jr nc, mm48__tenf_range     ;cannot multiply powers that high
+
    srl a                       ;A=INT(A/4)
    srl a
    ld hl,-6                    ;Udregn offset til
@@ -73,6 +78,14 @@ mm48__tf4:
    or a                        ;Positiv?
    jp p, mm48_fpmul            ;Ja => Multipicer
    jp mm48_fpdiv               ;Nej => Divider
+
+mm48__tenf_range:
+
+   pop af
+   pop bc
+   
+   jp m, mm48__retzero         ; if exp < 0 return 0   
+   jp mm48_erange_infc         ; if exp > 0 return infinity
 
 ;Tier potens konstanter for konvertering.
 
