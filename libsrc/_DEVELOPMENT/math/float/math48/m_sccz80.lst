@@ -41,6 +41,9 @@ math/float/math48/lm/sccz80/expm1
 math/float/math48/lm/sccz80/fabs
 math/float/math48/lm/sccz80/fdim
 math/float/math48/lm/sccz80/float
+math/float/math48/lm/sccz80/float_error_einval_zc
+math/float/math48/lm/sccz80/float_error_nannc
+math/float/math48/lm/sccz80/float_error_pinfnc
 math/float/math48/lm/sccz80/floor
 math/float/math48/lm/sccz80/fma
 math/float/math48/lm/sccz80/fmax
@@ -71,6 +74,7 @@ math/float/math48/lm/sccz80/lrint
 math/float/math48/lm/sccz80/lround
 math/float/math48/lm/sccz80/minusfa
 math/float/math48/lm/sccz80/modf
+math/float/math48/lm/sccz80/mul10
 math/float/math48/lm/sccz80/nan
 math/float/math48/lm/sccz80/nearbyint
 math/float/math48/lm/sccz80/nextafter
@@ -82,11 +86,13 @@ math/float/math48/lm/sccz80/rint
 math/float/math48/lm/sccz80/round
 math/float/math48/lm/sccz80/scalbln
 math/float/math48/lm/sccz80/scalbn
+math/float/math48/lm/sccz80/sigdig
 math/float/math48/lm/sccz80/sin
 math/float/math48/lm/sccz80/sinh
 math/float/math48/lm/sccz80/sqrt
 math/float/math48/lm/sccz80/tan
 math/float/math48/lm/sccz80/tanh
+math/float/math48/lm/sccz80/tenf
 math/float/math48/lm/sccz80/tgamma
 math/float/math48/lm/sccz80/trunc
 math/float/math48/lm/sccz80/ufloat
