@@ -12,7 +12,7 @@
 
 SECTION code_stdlib
 
-PUBLIC asm_atoi
+PUBLIC asm_atoi, asm0_atoi
 
 EXTERN l_eat_ws, l_eat_sign, l_neg_hl, l_atou
 
@@ -27,6 +27,9 @@ asm_atoi:
    ; uses  : af, bc, de, hl
 
    call l_eat_ws               ; skip over any initial whitespace
+
+asm0_atoi:
+
    call l_eat_sign             ; consume any leading sign
    jr nc, not_negative         ; if there was no minus sign
    
