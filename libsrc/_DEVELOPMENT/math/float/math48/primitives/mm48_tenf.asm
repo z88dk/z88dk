@@ -4,7 +4,7 @@ SECTION code_fp_math48
 PUBLIC mm48_tenf
 
 EXTERN mm48__getcix, mm48_mul10, mm48_fpmul, mm48_fpdiv
-EXTERN l_inc_sp, mm48_erange_infc, mm48__retzero
+EXTERN l_inc_sp, mm48_error_erange_infc, mm48__retzero
 
 mm48_tenf:
 
@@ -85,7 +85,7 @@ mm48__tenf_range:
    pop bc
    
    jp m, mm48__retzero         ; if exp < 0 return 0   
-   jp mm48_erange_infc         ; if exp > 0 return infinity
+   jp mm48_error_erange_infc   ; if exp > 0 return infinity
 
 ;Tier potens konstanter for konvertering.
 
