@@ -14,7 +14,7 @@ mm48_ufloat:
    ; exit  : AC = AC' (exx set saved)
    ;         AC'= (float)(n)
    ;
-   ; uses  : af, bc, de, hl, af', bc', de', hl'
+   ; uses  : af, bc, de, hl, bc', de', hl'
    
    ld a,h                      ;Er HL=0?
    or l
