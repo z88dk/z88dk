@@ -1,6 +1,7 @@
 stdlib/c/sccz80/abort
 stdlib/c/sccz80/abs
 stdlib/c/sccz80/atexit
+stdlib/c/sccz80/atof
 stdlib/c/sccz80/atoi
 stdlib/c/sccz80/atol
 stdlib/c/sccz80/at_quick_exit
@@ -25,6 +26,10 @@ stdlib/c/sccz80/qsort_callee
 stdlib/c/sccz80/quick_exit
 stdlib/c/sccz80/rand
 stdlib/c/sccz80/srand
+stdlib/c/sccz80/strtod
+stdlib/c/sccz80/strtod_callee
+stdlib/c/sccz80/strtof
+stdlib/c/sccz80/strtof_callee
 stdlib/c/sccz80/strtol
 stdlib/c/sccz80/strtol_callee
 stdlib/c/sccz80/strtoul
@@ -55,6 +60,9 @@ stdlib/z80/__ftoa__
 stdlib/z80/__ftoa_asm_exit
 stdlib/z80/__ftoa_count
 stdlib/z80/__ftoa_exp_digit
+stdlib/z80/__ftoa_inf_s
+stdlib/z80/__ftoa_infinity_s
+stdlib/z80/__ftoa_nan_s
 stdlib/z80/__ftoa_postamble
 stdlib/z80/__ftoa_preamble
 stdlib/z80/__ftoa_print

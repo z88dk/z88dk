@@ -60,6 +60,9 @@ stdlib/z80/__ftoa__
 stdlib/z80/__ftoa_asm_exit
 stdlib/z80/__ftoa_count
 stdlib/z80/__ftoa_exp_digit
+stdlib/z80/__ftoa_inf_s
+stdlib/z80/__ftoa_infinity_s
+stdlib/z80/__ftoa_nan_s
 stdlib/z80/__ftoa_postamble
 stdlib/z80/__ftoa_preamble
 stdlib/z80/__ftoa_print

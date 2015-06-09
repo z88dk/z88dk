@@ -1,6 +1,7 @@
 stdlib/z80/asm_abort
 stdlib/z80/asm_abs
 stdlib/z80/asm_atexit
+stdlib/z80/asm_atof
 stdlib/z80/asm_atoi
 stdlib/z80/asm_atol
 stdlib/z80/asm_at_quick_exit
@@ -17,6 +18,8 @@ stdlib/z80/asm_qsort
 stdlib/z80/asm_quick_exit
 stdlib/z80/asm_rand
 stdlib/z80/asm_srand
+stdlib/z80/asm_strtod
+stdlib/z80/asm_strtof
 stdlib/z80/asm_strtol
 stdlib/z80/asm_strtoul
 stdlib/z80/asm_system
@@ -30,6 +33,9 @@ stdlib/z80/__ftoa__
 stdlib/z80/__ftoa_asm_exit
 stdlib/z80/__ftoa_count
 stdlib/z80/__ftoa_exp_digit
+stdlib/z80/__ftoa_inf_s
+stdlib/z80/__ftoa_infinity_s
+stdlib/z80/__ftoa_nan_s
 stdlib/z80/__ftoa_postamble
 stdlib/z80/__ftoa_preamble
 stdlib/z80/__ftoa_print

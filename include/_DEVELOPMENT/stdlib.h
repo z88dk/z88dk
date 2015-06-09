@@ -239,6 +239,7 @@ extern void      __LIB__               abort(void);
 extern int       __LIB__ __FASTCALL__  abs(int j);
 extern int       __LIB__ __FASTCALL__  at_quick_exit(void *func);
 extern int       __LIB__ __FASTCALL__  atexit(void *func);
+extern double    __LIB__ __FASTCALL__  atof(char *nptr);
 extern int       __LIB__ __FASTCALL__  atoi(char *buf);
 extern long      __LIB__ __FASTCALL__  atol(char *buf);
 extern void      __LIB__               bsearch(void *key, void *base, size_t nmemb, size_t size, void *compar);
@@ -254,6 +255,8 @@ extern void      __LIB__               qsort(void *base, size_t nmemb, size_t si
 extern void      __LIB__ __FASTCALL__  quick_exit(int status);
 extern int       __LIB__               rand(void);
 extern void      __LIB__ __FASTCALL__  srand(uint16_t seed);
+extern double    __LIB__               strtof(char *nptr, char **endptr);
+extern double    __LIB__               strtod(char *nptr, char **endptr);
 extern long      __LIB__               strtol(char *nptr, char **endptr, int base);
 extern uint32_t  __LIB__               strtoul(char *nptr, char **endptr, int base);
 extern int       __LIB__ __FASTCALL__  system(char *s);
@@ -293,6 +296,8 @@ extern size_t    __LIB__ __CALLEE__    ftoh_callee(double x, void *buf, uint16_t
 extern char      __LIB__ __CALLEE__   *itoa_callee(int num, char *buf, int radix);
 extern char      __LIB__ __CALLEE__   *ltoa_callee(long num, char *buf, int radix);
 extern void      __LIB__ __CALLEE__    qsort_callee(void *base, size_t nmemb, size_t size, void *compar);
+extern double    __LIB__ __CALLEE__    strtof_callee(char *nptr, char **endptr);
+extern double    __LIB__ __CALLEE__    strtod_callee(char *nptr, char **endptr);
 extern long      __LIB__ __CALLEE__    strtol_callee(char *nptr, char **endptr, int base);
 extern uint32_t  __LIB__ __CALLEE__    strtoul_callee(char *nptr, char **endptr, int base);
 extern char      __LIB__ __CALLEE__   *ultoa_callee(uint32_t num, char *buf, int radix);
@@ -327,6 +332,8 @@ extern void   __LIB__ __CALLEE__   *realloc_unlocked_callee(void *p, size_t size
 #define itoa(a,b,c)                 itoa_callee(a,b,c)
 #define ltoa(a,b,c)                 ltoa_callee(a,b,c)
 #define qsort(a,b,c,d)              qsort_callee(a,b,c,d)
+#define strtod(a,b)                 strtod_callee(a,b)
+#define strtof(a,b)                 strtof_callee(a,b)
 #define strtol(a,b,c)               strtol_callee(a,b,c)
 #define strtoul(a,b,c)              strtoul_callee(a,b,c)
 #define ultoa(a,b,c)                ultoa_callee(a,b,c)
