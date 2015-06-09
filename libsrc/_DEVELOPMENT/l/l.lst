@@ -21,7 +21,9 @@ l/z80/l_testword_hl
 l/z80/l_zeroword_hl
 l/z80/ascii/l_char2num
 l/z80/ascii/l_eat_base_prefix
+l/z80/ascii/l_eat_ddigits
 l/z80/ascii/l_eat_digits
+l/z80/ascii/l_eat_hdigits
 l/z80/ascii/l_eat_sign
 l/z80/ascii/l_eat_ws
 l/z80/ascii/l_hex_nibble
