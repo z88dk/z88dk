@@ -21,6 +21,7 @@ math/float/math48/lm/sccz80/ddiv
 math/float/math48/lm/sccz80/deq
 math/float/math48/lm/sccz80/dge
 math/float/math48/lm/sccz80/dgt
+math/float/math48/lm/sccz80/dhexpop
 math/float/math48/lm/sccz80/dldpsh
 math/float/math48/lm/sccz80/dleq
 math/float/math48/lm/sccz80/dload
@@ -42,8 +43,10 @@ math/float/math48/lm/sccz80/fabs
 math/float/math48/lm/sccz80/fdim
 math/float/math48/lm/sccz80/float
 math/float/math48/lm/sccz80/float_error_einval_zc
+math/float/math48/lm/sccz80/float_error_erange_pinfc
 math/float/math48/lm/sccz80/float_error_nannc
 math/float/math48/lm/sccz80/float_error_pinfnc
+math/float/math48/lm/sccz80/float_error_znc
 math/float/math48/lm/sccz80/floor
 math/float/math48/lm/sccz80/fma
 math/float/math48/lm/sccz80/fmax
@@ -76,6 +79,7 @@ math/float/math48/lm/sccz80/minusfa
 math/float/math48/lm/sccz80/modf
 math/float/math48/lm/sccz80/mul10
 math/float/math48/lm/sccz80/nan
+math/float/math48/lm/sccz80/nan_b
 math/float/math48/lm/sccz80/nearbyint
 math/float/math48/lm/sccz80/nextafter
 math/float/math48/lm/sccz80/nexttoward
@@ -95,5 +99,6 @@ math/float/math48/lm/sccz80/tanh
 math/float/math48/lm/sccz80/tenf
 math/float/math48/lm/sccz80/tgamma
 math/float/math48/lm/sccz80/trunc
+math/float/math48/lm/sccz80/twof
 math/float/math48/lm/sccz80/ufloat
 math/float/math48/lm/sccz80/ufloat16
