@@ -21,20 +21,28 @@ lm48__twof:
    or a
    jr z, zero
    
-   add a,l
-   jp po, overflow
-   ld l,a
+   sub $80
    
-   ld a,h
-   adc a,0
-   ld h,a
+   push bc
    
+   ld c,a
+   add a,a
+   sbc a,a
+   ld b,a
+   
+   add hl,bc
+   
+   pop bc
+   
+   ld a,l
    add a,a
    sbc a,a
    xor h
    jr nz, overflow
    
    ld a,l
+   add a,$80
+   jr z, overflow
 
 zero:
 
