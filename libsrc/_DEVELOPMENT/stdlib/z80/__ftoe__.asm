@@ -116,7 +116,8 @@ round:
    ld a,(ix+0)                 ; move decimal point left
    ld (ix+1),a
    ld (ix+0),'.'
-
+   
+   inc d
    dec hl                      ; remove extra precision digit
 
 prune:
