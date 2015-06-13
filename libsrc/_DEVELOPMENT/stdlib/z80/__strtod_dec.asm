@@ -23,7 +23,7 @@ __strtod_dec_fp_only:
 
 decimal_fraction_join:
 
-   ld c,$ff                    ; indicate decimal point seen
+   ld c,$fe                    ; indicate decimal point seen
    
    ;; eliminate leading fraction zeroes
    
@@ -38,7 +38,7 @@ decimal_fz_loop:
    ld a,(hl)
    
    call asm_isdigit
-   jr nz, decimal_fz_loop      ; if another decimal digit
+   jr nc, decimal_fz_loop      ; if another decimal digit
 
 decimal_zero:
 
