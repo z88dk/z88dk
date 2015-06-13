@@ -18,8 +18,11 @@ lm48__twof:
    ld a,l
    ex (sp),hl
    
+   or a
+   jr z, zero
+   
    add a,l
-   jp pe, overflow
+   jp po, overflow
    ld l,a
    
    ld a,h
@@ -32,9 +35,12 @@ lm48__twof:
    jr nz, overflow
    
    ld a,l
+
+zero:
+
    pop hl
    ld l,a
-   
+
    exx
    ret
 
