@@ -3,7 +3,7 @@ SECTION code_fp_math48
 
 PUBLIC lm48__twof
 
-EXTERN lm48__error_erange_znc, lm48__error_erange_pinfc
+EXTERN lm48__float_error_znc, lm48__float_error_erange_pinfc
 
 lm48__twof:
 
@@ -45,5 +45,5 @@ overflow:
    
    exx
    
-   jp nz, lm48__error_erange_znc
-   jp lm48__error_erange_pinfc
+   jp nz, lm48__float_error_znc
+   jp lm48__float_error_erange_pinfc
