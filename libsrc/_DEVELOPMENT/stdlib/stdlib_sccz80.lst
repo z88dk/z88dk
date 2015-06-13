@@ -74,6 +74,11 @@ stdlib/z80/__ftoe__
 stdlib/z80/__ftog__
 stdlib/z80/__ftoh__
 stdlib/z80/__stdlib_seed
+stdlib/z80/__strtod_dec
+stdlib/z80/__strtod_exponent
+stdlib/z80/__strtod_hex
+stdlib/z80/__strtod_special_form
+stdlib/z80/__strtod_suffix
 stdlib/z80/__strtou__
 stdlib/z80/__strtoul__
 stdlib/z80/sort/__sort_parameters
