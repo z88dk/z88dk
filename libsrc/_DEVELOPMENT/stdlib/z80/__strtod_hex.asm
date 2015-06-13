@@ -124,6 +124,8 @@ hex_integer_join:
 hex_mantissa:
 
    srl b                       ; num sig digits /= 2
+   jr nc, hex_mantissa_loop
+   inc b                       ; if num sig digits was odd, round up
 
 hex_mantissa_loop:
 
