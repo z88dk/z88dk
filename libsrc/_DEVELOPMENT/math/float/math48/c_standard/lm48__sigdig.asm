@@ -10,5 +10,5 @@ lm48__sigdig:
    ;
    ; uses  : bc
 
-   ld bc,$0a0d
+   ld bc,$0a0b
    ret
