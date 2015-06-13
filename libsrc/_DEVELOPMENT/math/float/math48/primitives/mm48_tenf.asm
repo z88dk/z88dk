@@ -37,7 +37,7 @@ mm48__tf1:
 
    push af                     ;Gem flag
 
-   cp 40
+   cp 39
    jr nc, mm48__tenf_range     ;cannot multiply powers that high
 
    srl a                       ;A=INT(A/4)
@@ -82,7 +82,9 @@ mm48__tf4:
 mm48__tenf_range:
 
    pop af
-   pop bc
+   pop af
+   
+   or a
    
    jp m, mm48__retzero         ; if exp < 0 return 0   
    jp mm48_error_erange_infc   ; if exp > 0 return infinity
