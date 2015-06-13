@@ -47,7 +47,7 @@ hex_zero:
    call float_error_znc        ; exx = 0.0
 
    ld e,0                      ; no exponent adjust
-   jr hex_exponent             ; look for following exponent
+   jp hex_exponent             ; look for following exponent
 
 hex_return_zero_0:
 
