@@ -96,7 +96,7 @@ con10:
    defw $0000, $0000, $0081 ;1E+00
    defw $1C40, $0000, $008E ;1E+04
    defw $3EBC, $2000, $009B ;1E+08
-   defw $684D, $A510, $00A8 ;1E+12
+   defw $68D4, $A510, $00A8 ;1E+12  -- anders, transposition of digits here!!
    defw $0E1B, $C9BF, $04B6 ;1E+16
    defw $2D78, $EBC5, $ACC3 ;1E+20
    defw $53C2, $1BCE, $CDD0 ;1E+24
