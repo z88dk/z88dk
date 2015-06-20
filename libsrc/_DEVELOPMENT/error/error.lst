@@ -27,6 +27,7 @@ error/z80/error_enotsup_mc
 error/z80/error_enotsup_zc
 error/z80/error_eoverflow_mc
 error/z80/error_eoverflow_zc
+error/z80/error_erange_lmc
 error/z80/error_erange_mc
 error/z80/error_erange_zc
 error/z80/error_lzc
