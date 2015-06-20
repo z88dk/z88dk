@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC am48_log1p
 
-EXTERN am48_dconst_1, am48_dadd, am48_log
+EXTERN am48_dconst_1, am48_dadd, am48_log, am48_dpopret
 
 am48_log1p:
 

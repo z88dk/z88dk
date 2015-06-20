@@ -6,7 +6,7 @@ SECTION code_fp_math48
 PUBLIC am48_acosh
 
 EXTERN am48_dpush, am48_dconst_1, am48_dsub, am48_sqrt
-EXTERN am48_dadd, am48_dmul_s, am48_dadd_s, am48_log
+EXTERN am48_dadd, am48_dmul_s, am48_dadd_s, am48_log, am48_dpopret
 
 am48_acosh:
 

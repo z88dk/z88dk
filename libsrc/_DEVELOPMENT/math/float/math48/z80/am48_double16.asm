@@ -21,7 +21,7 @@ am48_double16:
    jp p, am48_double16u        ; if n >= 0
    
    call l_neg_hl               ; n = |n|
-   call am48_double16_u
+   call am48_double16u
    
    exx
    set 7,b

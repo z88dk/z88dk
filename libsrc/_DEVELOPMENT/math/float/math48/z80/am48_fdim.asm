@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC am48_fdim
 
-EXTERN am48_dcmp, am48_derror_znc
+EXTERN am48_dcmp, am48_dsub, am48_derror_znc
 
 am48_fdim:
 

@@ -23,8 +23,8 @@ mm48__exps3:
 
    ; AC' active
 
-   pop hl                            ;uster stakken
-   jp c, am48_derror_erange_infc - 1 ;if overflow
+   pop hl                             ;uster stakken
+   jp c, am48_derror_erange_infxc - 1 ;if overflow
 
 mm48__retzero:
 

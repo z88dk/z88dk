@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC am48_asinh
 
-EXTERN am48_equate, am48_dmul, am48_dconst_1
+EXTERN am48_dequate, am48_dmul, am48_dconst_1
 EXTERN am48_dadd, am48_sqrt, am48_log
 
 am48_asinh:
@@ -35,7 +35,7 @@ am48_asinh:
    
    exx
    
-   call am48_equate            ; AC = AC' = x  
+   call am48_dequate           ; AC = AC' = x  
    
    ld a,l
    cp $80 + 21

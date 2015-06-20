@@ -5,8 +5,6 @@ PUBLIC cm48_sccz80p_dlt
 
 EXTERN am48_dlt_s
 
-cm48_sccz80p_dlt:
-
    ; sccz80 float primitive
    ; left_op < right_op ?
    ;

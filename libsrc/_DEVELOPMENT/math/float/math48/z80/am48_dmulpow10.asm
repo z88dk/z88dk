@@ -22,7 +22,7 @@ EXTERN mm48_tenf
    ;            carry set, errno set
    ;
    ; note  : current implementation may limit power of ten
-   '         to max one-sided range (eg +-38)
+   ;         to max one-sided range (eg +-38)
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
    

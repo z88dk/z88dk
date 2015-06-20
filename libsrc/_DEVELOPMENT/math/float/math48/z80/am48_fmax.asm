@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC am48_fmax
 
-EXTERN amd48_dcmp
+EXTERN am48_dcmp
 
 am48_fmax:
 

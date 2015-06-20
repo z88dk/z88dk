@@ -7,8 +7,6 @@ PUBLIC am48_ldexp
 
 EXTERN am48_dmulpow2
 
-am48_ldexp:
-
    ; multiply AC' by power of two
    ;
    ; enter : AC' = double x
