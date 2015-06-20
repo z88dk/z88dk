@@ -19,7 +19,7 @@ Key features of the math48 float package:
 
 The directory structure is as follows:
 
-* primitives
+* z80/core
 
 Contains the original math48 functions implementing the core of the float package.  Two changes have been made to the source:
 
@@ -29,17 +29,17 @@ Contains the original math48 functions implementing the core of the float packag
 
 A few core functions have been added.
 
-* c_standard
+* z80
 
-Contains the math functions expected by the C11 standard.  These are implemented in terms of the math48 primitives and make up the assembly language interface to the library.
+Contains the assembly language interface to the math library.  This includes the math functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language.  These functions are implemented in terms of the core math48 functions.
 
-* c_interface
+* c/sccz80
 
-Contains the c compiler interface that calls into the assembly language implementation in the c_standard directory.  Float conversion between the math48 format and the format expected by the compilers is done here.
+Contains sccz80's C compiler interface and is implemented using the assembly language interface in the z80 directory.  Float conversion between the math48 format and the format expected by sccz80 occurs here.
 
 * lm
 
-Glue that connects the compilers to the math48 library.  These functions make up the math library that is linked against on the compile line (as in "-lm").
+Glue that connects the compilers and standard assembly interface to the math48 library.  The purpose is to define aliases that connect the standard names to the math48 specific names.  These functions make up the math library that is linked against on the compile line (as in "-lm").
 
 ===============================================================
 

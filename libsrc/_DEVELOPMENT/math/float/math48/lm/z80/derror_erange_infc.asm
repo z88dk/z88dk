@@ -1,0 +1,11 @@
+
+SECTION code_fp_math48
+
+PUBLIC derror_erange_infc, derror_erange_pinfc, derror_erange_minfc, derror_erange_infxc
+
+EXTERN am48_derror_erange_infc, am48_derror_erange_pinfc, am48_derror_erange_minfc, am48_derror_erange_infxc
+
+defc derror_erange_infc  = am48_derror_erange_infc
+defc derror_erange_pinfc = am48_derror_erange_pinfc
+defc derror_erange_minfc = am48_derror_erange_minfc
+defc derror_erange_infxc = am48_derror_erange_infxc
