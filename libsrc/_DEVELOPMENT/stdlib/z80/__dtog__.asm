@@ -1,14 +1,14 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftog__
+PUBLIC __dtog__
 
-EXTERN __ftoa_preamble, asm_fpclassify, __ftoa_special_form, __ftoa_prune
-EXTERN __ftoa_base10, __ftoa_join, __ftoe_join
+EXTERN __dtoa_preamble, asm_fpclassify, __dtoa_special_form, __dtoa_prune
+EXTERN __dtoa_base10, __dtoa_join, __dtoe_join
 
-; math library supplies asm_fpclassify, __ftoa_base10, __ftoa_digits, __ftoa_sgnabs
+; math library supplies asm_fpclassify, __dtoa_base10, __dtoa_digits, __dtoa_sgnabs
 
-__ftog__:
+__dtog__:
 
    ; enter :  c = flags (bit 4=#, bits 7 and 0 will be modified)
    ;         de = precision (clipped at 255)
@@ -38,7 +38,7 @@ __ftog__:
 
 preamble:
 
-   call __ftoa_preamble
+   call __dtoa_preamble
    set 0,(ix-6)                ; ensure trailing decimal point is removed
 
    ; EXX    = float x
@@ -58,9 +58,9 @@ preamble:
    jr z, normal_form           ; if not inf, nan or zero
 
    dec e                       ; precision--
-   call __ftoa_special_form
+   call __dtoa_special_form
    
-   jp nc, __ftoa_prune         ; if zero, prune like ftoa()
+   jp nc, __dtoa_prune         ; if zero, prune like ftoa()
    ret                         ; return with carry set if inf or nan
    
 normal_form:
@@ -68,7 +68,7 @@ normal_form:
    ld (hl),e                   ; save precision
    push hl                     ; save buffer *
 
-   ; EXX    = float x
+   ; EXX    = double x
    ; IX     = buffer *
    ; STACK  = buffer *
    ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
@@ -78,7 +78,7 @@ normal_form:
    ; (IX-2) = ignore
    ; (IX-1) = '0' marks start of buffer
    
-   call __ftoa_base10          ; supplied by math library
+   call __dtoa_base10          ; supplied by math library
 
    pop hl                      ; hl = buffer *
    ld e,(hl)                   ; e = precision
@@ -109,9 +109,9 @@ style_f:
    add a,e
    ld e,a                      ; precision -= (exponent + 1)
    
-   jp __ftoa_join
+   jp __dtoa_join
 
 style_e:
 
    dec e                       ; precision--
-   jp __ftoe_join
+   jp __dtoe_join

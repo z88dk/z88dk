@@ -3,9 +3,12 @@ SECTION code_stdlib
 
 PUBLIC __strtod_dec_ip, __strtod_dec_ip_lz, __strtod_dec_fp_only
 
-EXTERN ufloat16, mul10, dpush, dadd, tenf, l_eat_ddigits
+EXTERN asm_double16u, asm_dmul10a, asm_dadd, asm_dmulpow10, l_eat_ddigits
 EXTERN asm_isdigit, asm_tolower, __strtod_exponent, __strtod_suffix
-EXTERN float_error_einval_zc, float_error_znc, float_error_erange_pinfc
+EXTERN derror_einval_zc, derror_znc, derror_erange_pinfc
+
+; math library supplies:  asm_double16u, asm_dmul10a, asm_dadd
+;   asm_dmulpow10, derror_einval_zc, derror_znc, derror_erange_pinfc
 
 __strtod_dec_fp_only:
 
@@ -19,7 +22,7 @@ __strtod_dec_fp_only:
    ld a,(hl)
    
    call asm_isdigit
-   jp c, float_error_einval_zc ; reject lone decimal point
+   jp c, derror_einval_zc      ; reject lone decimal point
 
 decimal_fraction_join:
 
@@ -44,7 +47,7 @@ decimal_zero:
 
    ;; digit portion is all zeroes
    
-   call float_error_znc        ; exx = 0.0
+   call derror_znc             ; exx = 0.0
    
    ld bc,$00ff                 ; no exponent adjust
    jr decimal_exponent         ; look for following exponent
@@ -97,7 +100,7 @@ __strtod_dec:
    ld l,a
    ld h,0                      ; hl = integer digit
    
-   call ufloat16               ; exx = (float)(hl)
+   call asm_double16u          ; exx = (double)(hl)
    
    pop hl
    pop bc
@@ -109,7 +112,7 @@ decimal_mantissa:
    ;   b = remaining significant digits
    ;   c = if < 0, base 10 exponent adjust - 1
    ;  hl = char *
-   ; exx = float x
+   ; exx = double x
 
    ld a,(hl)
    
@@ -129,20 +132,20 @@ decimal_valid:
 
    push bc
    push hl
-   push af
-   
-   call mul10                  ; x *= 10
-   
-   pop af                      ; a = char digit
-   
-   call dpush                  ; push x
    
    sub '0'
    ld l,a
    ld h,0                      ; hl = integer digit
    
-   call ufloat16               ; exx = (float)(hl)
-   call dadd                   ; exx += x
+   call asm_double16u
+   
+   exx
+   
+   ; AC'= double x
+   ; AC = (double)(digit)
+   
+   call asm_dmul10a            ; x *= 10
+   call asm_dadd               ; x += digit
    
    pop hl                      ; hl = char *
    pop bc
@@ -160,7 +163,7 @@ decimal_exp_adjust:
 
    ;   c = if < 0, base 10 exponent adjust - 1
    ;  hl = char *
-   ; exx = float x
+   ; exx = double x
 
    ld b,0                      ; b = base 10 positive exp adjust
    
@@ -174,7 +177,7 @@ decimal_exp_adjust:
    ;   b = base 10 positibe exponent adjust
    ;   c = base 10 negative exponent adjust - 1
    ;  hl = char *
-   ; exx = float x
+   ; exx = double x
 
 decimal_consume_ip:
 
@@ -209,7 +212,7 @@ decimal_exponent:
    ;   c = base 10 negative exponent adjust - 1
    ;  hl = char *
    ;  de = 0
-   ; exx = float x
+   ; exx = double x
 
    ld a,(hl)
    call asm_tolower
@@ -227,7 +230,7 @@ decimal_read_exponent:
    ;   c = base 10 negative exponent adjust - 1
    ;  hl = char *
    ;  de = 0
-   ; exx = float x
+   ; exx = double x
 
    call __strtod_exponent
 
@@ -239,7 +242,7 @@ decimal_suffix:
    ;   c = base 10 negative exponent adjust - 1
    ;  hl = char *
    ;  de = exponent
-   ; exx = float x
+   ; exx = double x
 
    call __strtod_suffix
 
@@ -253,7 +256,7 @@ decimal_finalize:
    ;   c = base 10 negative exponent adjust - 1
    ;  de = char *
    ;  hl = exponent
-   ; exx = float x
+   ; exx = double x
 
    ld a,b
    ld b,$ff
@@ -282,7 +285,7 @@ decimal_pexp:
    ld a,l
    or a
    
-   call nz, tenf               ; x *= 10^A
+   call nz, asm_dmulpow10      ; x *= 10^A
    
    pop de
    ret
@@ -293,6 +296,6 @@ decimal_exp_error:
    ;  hl = exponent
 
    bit 7,h
-   jp nz, float_error_znc      ; if exponent << 0
+   jp nz, derror_znc           ; if exponent << 0
    
-   jp float_error_erange_pinfc
+   jp derror_erange_pinfc

@@ -1,9 +1,9 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_print_zeroes
+PUBLIC __dtoa_print_zeroes
 
-__ftoa_print_zeroes:
+__dtoa_print_zeroes:
 
    or a
    ret z
@@ -12,4 +12,4 @@ __ftoa_print_zeroes:
    inc hl
    
    dec a
-   jr __ftoa_print_zeroes
+   jr __dtoa_print_zeroes

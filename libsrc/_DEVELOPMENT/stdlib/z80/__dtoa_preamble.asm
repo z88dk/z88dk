@@ -1,16 +1,18 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_preamble
+PUBLIC __dtoa_preamble
 
-EXTERN l_setmem_hl, __ftoa_sgnabs
+EXTERN l_setmem_hl, __dtoa_sgnabs
 
-__ftoa_preamble:
+; math library supplies:  __dtoa_sgnabs
+
+__dtoa_preamble:
 
    ; enter :  c = flags (bit 4=#, bits 7 and 0 will be modified)
    ;         de = precision (clipped at 255)
    ;         hl = buffer *
-   ;         exx set contains float
+   ;         exx set contains double
 
    ld a,c
    and $7e                     ; zero bits 7,0 of flags
@@ -32,7 +34,7 @@ init_buffer:
    ;   C = flags
    ;   E = precision
    ;  HL = buffer *
-   ; EXX = float x
+   ; EXX = double x
 
    ld (hl),c
    inc hl
@@ -48,14 +50,14 @@ init_buffer:
 
    ; determine sign of x
 
-   call __ftoa_sgnabs          ; supplied by math library
+   call __dtoa_sgnabs          ; supplied by math library
    
    rra                         ; sign bit to carry flag
    ret nc   
 
    set 7,(ix-6)                ; indicate float is negative
 
-   ; EXX    = float x
+   ; EXX    = double x
    ;  E     = precision
    ; HL     = buffer_dst *
    ; IX     = buffer *

@@ -3,8 +3,10 @@ SECTION code_stdlib
 
 PUBLIC __strtod_hex
 
-EXTERN asm_isxdigit, asm_tolower, l_char2num, l_eat_hdigits, dhexpop, twof
-EXTERN float_error_znc, __strtod_exponent, __strtod_suffix
+EXTERN asm_isxdigit, asm_tolower, l_char2num, l_eat_hdigits, asm_dhexpop
+EXTERN derror_znc, __strtod_exponent, __strtod_suffix, asm_dmulpow2
+
+; supplied by math library:  asm_dhexpop, asm_dmulpow2, derror_znc
 
 hex_fraction_only:
 
@@ -44,7 +46,7 @@ hex_zero:
 
    ;; digit portion is all zeroes
    
-   call float_error_znc        ; exx = 0.0
+   call derror_znc             ; exx = 0.0
 
    ld e,0                      ; no exponent adjust
    jp hex_exponent             ; look for following exponent
@@ -62,7 +64,7 @@ hex_return_zero:
    dec hl
    ex de,hl                    ; de = char *
    
-   jp float_error_znc          ; return 0.0
+   jp derror_znc               ; return 0.0
 
 __strtod_hex:
 
@@ -245,12 +247,12 @@ hex_load:
    ; hl = char *
    ; stack = hex digits
 
-   call dhexpop
+   call asm_dhexpop
    
    ;   c = 0 / 1 (0 = decimal point seen)
    ;   e = exponent adjust / 4
    ;  hl = char *
-   ; exx = float x
+   ; exx = double x
 
    ;; consume extra digits
 
@@ -290,7 +292,7 @@ hex_exponent:
    ;   c = exponent adjust / 4
    ;  hl = char *
    ;  de = 0
-   ; exx = float x
+   ; exx = double x
 
    ld a,(hl)
    call asm_tolower
@@ -307,7 +309,7 @@ hex_read_exponent:
    ;   c = exponent adjust / 4
    ;  hl = char *
    ;  de = 0
-   ; exx = float x
+   ; exx = double x
 
    call __strtod_exponent
    
@@ -318,7 +320,7 @@ hex_suffix:
    ;   c = exponent adjust / 4
    ;  hl = char *
    ;  de = exponent
-   ; exx = float x
+   ; exx = double x
 
    call __strtod_suffix
 
@@ -331,7 +333,7 @@ hex_finalize:
    ;   c = exponent adjust / 4
    ;  de = char *
    ;  hl = exponent
-   ; exx = float x
+   ; exx = double x
 
    ld a,c
    add a,a
@@ -348,5 +350,5 @@ hex_finalize:
    ld a,h
    or l
    
-   jp nz, twof                 ; x *= 2^(HL)
+   jp nz, asm_dmulpow2         ; x *= 2^(HL)
    ret

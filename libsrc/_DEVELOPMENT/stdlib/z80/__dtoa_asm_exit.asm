@@ -1,11 +1,11 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_asm_exit
+PUBLIC __dtoa_asm_exit
 
-EXTERN __ftoa_print, __ftoa_count
+EXTERN __dtoa_print, __dtoa_count
 
-__ftoa_asm_exit:
+__dtoa_asm_exit:
 
    ;            bc = buffer length
    ;            de = buffer *
@@ -31,7 +31,7 @@ __ftoa_asm_exit:
 
 print_it:
 
-   call __ftoa_print
+   call __dtoa_print
 
 restore_it:
    
@@ -49,5 +49,5 @@ restore_it:
 
 count_it:
 
-   call __ftoa_count
+   call __dtoa_count
    jr restore_it

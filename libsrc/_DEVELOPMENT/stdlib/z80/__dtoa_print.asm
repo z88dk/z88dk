@@ -1,11 +1,11 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_print
+PUBLIC __dtoa_print
 
-EXTERN __stdio_printf_sign_0, __ftoa_print_zeroes
+EXTERN __stdio_printf_sign_0, __dtoa_print_zeroes
 
-__ftoa_print:
+__dtoa_print:
 
    push hl                     ; save buf_dst
 
@@ -62,7 +62,7 @@ iz_zeroes:
    ex de,hl                    ; hl = buf_dst *, de = workspace *
 
    ld a,(ix-5)                 ; a = iz
-   call __ftoa_print_zeroes
+   call __dtoa_print_zeroes
 
    ex de,hl                    ; hl = workspace *, de = buf_dst *
 
@@ -82,7 +82,7 @@ fz_zeroes:
    ex de,hl                    ; hl = buf_dst *, de = workspace *
    
    ld a,(ix-4)                 ; a = fz
-   call __ftoa_print_zeroes
+   call __dtoa_print_zeroes
 
    ;;;;; print workspace up to exponent
    
@@ -108,7 +108,7 @@ tz_zeroes:
    ex de,hl                    ; hl = buf_dst *, de = workspace *
 
    ld a,(ix-3)
-   call __ftoa_print_zeroes
+   call __dtoa_print_zeroes
 
    ex de,hl
 
@@ -136,7 +136,7 @@ tze_zeroes:
    ex de,hl                    ; hl = buf_dst *, de = workspace *
 
    ld a,(ix-3)
-   call __ftoa_print_zeroes
+   call __dtoa_print_zeroes
 
    ;;;;; print remaining workspace (ftoe - exponent present)
    

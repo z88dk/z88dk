@@ -1,14 +1,14 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoh__
+PUBLIC __dtoh__
 
-EXTERN __ftoa_preamble, asm_fpclassify, __ftoa_special_form, __ftoa_base16, asm_tolower
-EXTERN __ftoa_remove_zeroes, __ftoa_exp_digit, __ftoa_postamble, l_hex_nibble_hi, l_hex_nibble_lo
+EXTERN __dtoa_preamble, asm_fpclassify, __dtoa_special_form, __dtoa_base16, asm_tolower
+EXTERN __dtoa_remove_zeroes, __dtoa_exp_digit, __dtoa_postamble, l_hex_nibble_hi, l_hex_nibble_lo
 
-; math library supplies asm_fpclassify, __ftoa_sgnabs, __ftoa_base16
+; math library supplies asm_fpclassify, __dtoa_sgnabs, __dtoa_base16
 
-__ftoh__:
+__dtoh__:
 
    ; enter :  c = flags (bit 4=#, bits 7 and 0 will be modified)
    ;         de = precision (clipped at 255)
@@ -30,9 +30,9 @@ __ftoh__:
    ;
    ; used  : af, bc, de, hl, ix, af', bc', de', hl'
 
-   call __ftoa_preamble
+   call __dtoa_preamble
 
-   ; EXX    = float x
+   ; EXX    = double x
    ;  E     = precision
    ; HL     = buffer_dst *
    ; IX     = buffer *
@@ -46,11 +46,11 @@ __ftoh__:
    call asm_fpclassify         ; supplied by math library
 
    cp 2
-   jp nc, __ftoa_special_form  ; if inf or nan
+   jp nc, __dtoa_special_form  ; if inf or nan
 
    ex af,af'
    
-   call __ftoa_base16          ; supplied by math library
+   call __dtoa_base16          ; supplied by math library
    
    ld a,e
    inc a
@@ -88,7 +88,7 @@ p1:
    or a
    jr z, normal_form           ; if not zero
 
-   call __ftoa_special_form    ; write zero string
+   call __dtoa_special_form    ; write zero string
    
    ld d,4                      ; to make exponent print as zero
    jr prune_zeroes
@@ -116,7 +116,7 @@ normal_form:
    ld b,e                      ; generate precision + 1 digits
    inc b
    
-   call __ftoh_digits
+   call __dtoh_digits
    jr c, decimal_point         ; if all precision digits generated
    
    dec b
@@ -130,7 +130,7 @@ decimal_point:
 
 prune_zeroes:
 
-   call __ftoa_remove_zeroes   ; remove trailing zeroes
+   call __dtoa_remove_zeroes   ; remove trailing zeroes
 
    ld (hl),'P'                 ; exponent separator
    inc hl
@@ -164,12 +164,12 @@ exponent_plus:
 e_100:
 
    ld de,$6400 + '0' - 1
-   call __ftoa_exp_digit       ; 100s
+   call __dtoa_exp_digit       ; 100s
 
 e_10:
 
    ld de,$0a00 + '0' - 1
-   call __ftoa_exp_digit       ; 10s
+   call __dtoa_exp_digit       ; 10s
 
 e_1:
 
@@ -199,12 +199,12 @@ e_1:
    
    exx
 
-   jp __ftoa_postamble         ; return buffer pointer and length
+   jp __dtoa_postamble         ; return buffer pointer and length
 
 
 
 
-__ftoh_digits:
+__dtoh_digits:
 
    ;  B = number of digits to generate
    ;  C = number of significant hex digits

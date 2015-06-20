@@ -7,7 +7,8 @@
 ;
 ; Read float from string per C11.
 ;
-; An alias for strtod().
+; An alias for strtod() since the C compilers do not distinguish
+; between float and double currently.
 ;
 ; ===============================================================
 

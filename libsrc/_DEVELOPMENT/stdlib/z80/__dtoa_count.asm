@@ -1,9 +1,9 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_count
+PUBLIC __dtoa_count
 
-__ftoa_count:
+__dtoa_count:
 
    ;     bc = length of workspace
    ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0

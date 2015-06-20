@@ -1,9 +1,9 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_round
+PUBLIC __dtoa_round
 
-__ftoa_round:
+__dtoa_round:
 
    ; HL     = buffer_dst *
    ; IX     = buffer *

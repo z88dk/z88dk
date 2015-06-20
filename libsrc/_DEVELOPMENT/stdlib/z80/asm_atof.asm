@@ -24,7 +24,7 @@ asm_atof:
    ;
    ;         success
    ;
-   ;            exx = float x
+   ;            AC' = double x
    ;            carry reset
    ;
    ;         fail if range error

@@ -1,11 +1,11 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_special_form
+PUBLIC __dtoa_special_form
 
-EXTERN asm_strcpy, __ftoa_nan_s, __ftoa_inf_s
+EXTERN asm_strcpy, __dtoa_nan_s, __dtoa_inf_s
 
-__ftoa_special_form:
+__dtoa_special_form:
 
    ;  A     = fpclassify = 1 if zero, 2 if nan, 3 if inf
    ;  E     = precision
@@ -23,12 +23,12 @@ __ftoa_special_form:
    dec a
    jr z, zero
    
-   ld de,__ftoa_nan_s
+   ld de,__dtoa_nan_s
    
    dec a
    jr z, string
    
-   ld de,__ftoa_inf_s
+   ld de,__dtoa_inf_s
 
 string:
 

@@ -5,7 +5,7 @@
 ; 
 ; double strtod(const char *nptr, char **endptr)
 ;
-; Read float from string per C11.  Rounding is not applied.
+; Read double from string per C11.  Rounding is not applied.
 ;
 ; ===============================================================
 
@@ -13,13 +13,11 @@ SECTION code_stdlib
 
 PUBLIC asm_strtod
 
-EXTERN l_eat_ws, l_eat_sign, minusfa, sigdig, asm_tolower, asm_isdigit
+EXTERN l_eat_ws, l_eat_sign, asm_dneg, asm_dsigdig, asm_tolower, asm_isdigit
 EXTERN __strtod_hex, __strtod_dec_ip_lz, __strtod_dec_fp_only
 EXTERN __strtod_dec_ip, __strtod_special_form
 
-; supplied by math library: minusfa, sigdig, nan_b, ufloat16, mul10, dpush,
-;   dadd, tenf, dhexpop, twof, float_error_pinfnc, float_error_einval_zc, 
-;   float_error_znc, float_error_erange_pinfc
+; supplied by math library: asm_dneg, asm_dsigdig
 
 asm_strtod:
 
@@ -65,7 +63,7 @@ asm_strtod:
    ;; strtod() done, must write endp
    
    ;    de = char * (first uninterpretted char)
-   ;   exx = float x
+   ;   exx = double x
    ; carry = error
    ; stack = char **endp
 
@@ -95,19 +93,19 @@ endp_none:
    call positive
    
    ;    de = char * (first uninterpretted char)
-   ;   exx = float x
+   ;   exx = double x
    ; carry = error
 
    ex af,af'
 
-   call minusfa                ; x = -x
+   call asm_dneg               ; x = -x
    
    ex af,af'
    ret
 
 positive:
 
-   call sigdig                 ; inquire number of significant digits
+   call asm_dsigdig            ; inquire number of significant digits
 
    ;  b = num sig hex digits
    ;  c = num sig dec digits

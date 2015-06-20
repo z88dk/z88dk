@@ -1,9 +1,9 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_remove_zeroes
+PUBLIC __dtoa_remove_zeroes
 
-__ftoa_remove_zeroes:
+__dtoa_remove_zeroes:
 
    ; HL     = buffer_dst *
    ; IX     = buffer *

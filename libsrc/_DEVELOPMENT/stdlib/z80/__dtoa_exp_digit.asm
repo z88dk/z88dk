@@ -1,14 +1,14 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_exp_digit
+PUBLIC __dtoa_exp_digit
 
-__ftoa_exp_digit:
+__dtoa_exp_digit:
 
    inc e
    sub d
 
-   jr nc, __ftoa_exp_digit
+   jr nc, __dtoa_exp_digit
    
    add a,d
    

@@ -1,9 +1,9 @@
 
 SECTION code_stdlib
 
-PUBLIC __ftoa_postamble
+PUBLIC __dtoa_postamble
 
-__ftoa_postamble:
+__dtoa_postamble:
 
    ; HL     = buffer_dst *
    ; IX     = buffer *
