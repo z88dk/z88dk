@@ -1,8 +1,0 @@
-
-SECTION code_fp_math48
-
-PUBLIC lm48__float_error_erange_pinfc
-
-EXTERN mm48_error_erange_pinfc
-
-defc lm48__float_error_erange_pinfc = mm48_error_erange_pinfc
