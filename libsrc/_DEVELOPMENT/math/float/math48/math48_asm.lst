@@ -35,6 +35,7 @@ math/float/math48/z80/am48_derror_erange_intc
 math/float/math48/z80/am48_derror_erange_longc
 math/float/math48/z80/am48_derror_nanc
 math/float/math48/z80/am48_derror_nannc
+math/float/math48/z80/am48_derror_pinfnc
 math/float/math48/z80/am48_derror_zc
 math/float/math48/z80/am48_derror_znc
 math/float/math48/z80/am48_dfix16

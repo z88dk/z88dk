@@ -133,6 +133,7 @@ math/float/math48/lm/z80/derror_erange_intc
 math/float/math48/lm/z80/derror_erange_longc
 math/float/math48/lm/z80/derror_nanc
 math/float/math48/lm/z80/derror_nannc
+math/float/math48/lm/z80/derror_pinfnc
 math/float/math48/lm/z80/derror_zc
 math/float/math48/lm/z80/derror_znc
 math/float/math48/lm/z80/__dtoa_base10
