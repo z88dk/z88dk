@@ -7,13 +7,15 @@ cm48_sccz80p_dcallee1:
 
    ; collect one math48 double parameter from the stack.
    ;
-   ; enter : stack = double x, return
+   ; enter : stack = double x, return_0, return_1
    ;
-   ; exit  : AC'= x
+   ; exit  :    AC'= x
+   ;         stack = return_0
    ;
    ; uses  : ix, bc', de', hl'
    
    pop ix
+   pop af
    
    exx
    
@@ -23,4 +25,5 @@ cm48_sccz80p_dcallee1:
    
    exx
 
+   push af
    jp (ix)
