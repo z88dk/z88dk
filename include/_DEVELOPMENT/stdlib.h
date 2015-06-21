@@ -243,6 +243,10 @@ extern double    __LIB__ __FASTCALL__  atof(char *nptr);
 extern int       __LIB__ __FASTCALL__  atoi(char *buf);
 extern long      __LIB__ __FASTCALL__  atol(char *buf);
 extern void      __LIB__               bsearch(void *key, void *base, size_t nmemb, size_t size, void *compar);
+extern size_t    __LIB__               dtoa(double x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    __LIB__               dtoe(double x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    __LIB__               dtog(double x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    __LIB__               dtoh(double x, void *buf, uint16_t prec, uint16_t flags);
 extern void      __LIB__ __FASTCALL__  exit(int status);
 extern size_t    __LIB__               ftoa(double x, void *buf, uint16_t prec, uint16_t flags);
 extern size_t    __LIB__               ftoe(double x, void *buf, uint16_t prec, uint16_t flags);
@@ -288,6 +292,10 @@ extern void      __LIB__ __CALLEE__    _quicksort__callee(void *base, size_t nme
 extern void      __LIB__ __CALLEE__    _shellsort__callee(void *base, size_t nmemb, size_t size, void *compar);
 extern int       __LIB__ __CALLEE__    _strtoi__callee(char *nptr, char **endptr, int base);
 extern uint16_t  __LIB__ __CALLEE__    _strtou__callee(char *nptr, char **endptr, int base);
+extern size_t    __LIB__ __CALLEE__    dtoa_callee(double x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    __LIB__ __CALLEE__    dtoe_callee(double x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    __LIB__ __CALLEE__    dtog_callee(double x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    __LIB__ __CALLEE__    dtoh_callee(double x, void *buf, uint16_t prec, uint16_t flags);
 extern void      __LIB__ __CALLEE__    bsearch_callee(void *key, void *base, size_t nmemb, size_t size, void *compar);
 extern size_t    __LIB__ __CALLEE__    ftoa_callee(double x, void *buf, uint16_t prec, uint16_t flags);
 extern size_t    __LIB__ __CALLEE__    ftoe_callee(double x, void *buf, uint16_t prec, uint16_t flags);
@@ -324,6 +332,10 @@ extern void   __LIB__ __CALLEE__   *realloc_unlocked_callee(void *p, size_t size
 #define _shellsort_(a,b,c,d)        _shellsort__callee(a,b,c,d)
 #define _strtoi_(a,b,c)             _strtoi__callee(a,b,c)
 #define _strtou_(a,b,c)             _strtou__callee(a,b,c)
+#define dtoa(a,b,c,d)               dtoa_callee(a,b,c,d)
+#define dtoe(a,b,c,d)               dtoe_callee(a,b,c,d)
+#define dtog(a,b,c,d)               dtog_callee(a,b,c,d)
+#define dtoh(a,b,c,d)               dtoh_callee(a,b,c,d)
 #define bsearch(a,b,c,d,e)          bsearch_callee(a,b,c,d,e)
 #define ftoa(a,b,c,d)               ftoa_callee(a,b,c,d)
 #define ftoe(a,b,c,d)               ftoe_callee(a,b,c,d)
