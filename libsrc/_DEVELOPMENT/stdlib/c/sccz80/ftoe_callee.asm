@@ -5,16 +5,6 @@ SECTION code_stdlib
 
 PUBLIC ftoe_callee
 
-EXTERN dcollect1
+EXTERN dtoe_callee
 
-ftoe_callee:
-
-   pop af
-   pop bc
-   pop de
-   pop hl
-   push af
-   
-   call dcollect1
-   
-   INCLUDE "stdlib/z80/asm_ftoe.asm"
+defc ftoe_callee = dtoe_callee

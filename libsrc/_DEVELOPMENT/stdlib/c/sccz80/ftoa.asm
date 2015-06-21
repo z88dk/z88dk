@@ -5,22 +5,6 @@ SECTION code_stdlib
 
 PUBLIC ftoa
 
-EXTERN asm_ftoa, dread1b
+EXTERN dtoa
 
-ftoa:
-
-   ld hl,13
-   add hl,sp
-   call dread1b
-
-   pop af
-   pop bc
-   pop de
-   pop hl
-
-   push hl
-   push de
-   push bc
-   push af
-   
-   jp asm_ftoa
+defc ftoa = dtoa
