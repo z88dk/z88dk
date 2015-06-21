@@ -3,7 +3,7 @@ SECTION code_stdio
 
 PUBLIC __stdio_printf_e
 
-EXTERN dread1b, __ftoe__, __stdio_printf_float_tail
+EXTERN dread1b, __dtoe__, __stdio_printf_float_tail
 
 __stdio_printf_e:
 
@@ -53,7 +53,7 @@ __stdio_printf_e:
    ;  de = precision
    ;  hl = buffer *
    ;  ix = FILE *
-   ; exx = float x
+   ; exx = double x
    ; stack = buffer_digits, tally, de', bc', BUFFER_65, FILE *, width
    
    ld c,(ix+5)                 ; c = printf flags
@@ -64,7 +64,7 @@ __stdio_printf_e:
 
 prec_defined:
 
-   call __ftoe__               ; generate hexadecimal string
+   call __dtoe__               ; generate decimal string
    
    ;     bc = workspace length
    ;     de = workspace *

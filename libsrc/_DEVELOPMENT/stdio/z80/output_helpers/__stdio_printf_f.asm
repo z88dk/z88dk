@@ -3,7 +3,7 @@ SECTION code_stdio
 
 PUBLIC __stdio_printf_f
 
-EXTERN dread1b, __ftoa__, __stdio_printf_float_tail
+EXTERN dread1b, __dtoa__, __stdio_printf_float_tail
 
 __stdio_printf_f:
 
@@ -53,7 +53,7 @@ __stdio_printf_f:
    ;  de = precision
    ;  hl = buffer *
    ;  ix = FILE *
-   ; exx = float x
+   ; exx = double x
    ; stack = buffer_digits, tally, de', bc', BUFFER_65, FILE *, width
    
    ld c,(ix+5)                 ; c = printf flags
@@ -64,7 +64,7 @@ __stdio_printf_f:
 
 prec_defined:
 
-   call __ftoa__               ; generate hexadecimal string
+   call __dtoa__               ; generate decimal string
    
    ;     bc = workspace length
    ;     de = workspace *

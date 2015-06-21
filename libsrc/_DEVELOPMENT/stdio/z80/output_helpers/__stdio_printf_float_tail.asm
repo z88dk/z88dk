@@ -3,7 +3,7 @@ SECTION code_stdio
 
 PUBLIC __stdio_printf_float_tail
 
-EXTERN __ftoa_count, __ftoa_print, asm__memupr, asm_isdigit
+EXTERN __dtoa_count, __dtoa_print, asm__memupr, asm_isdigit
 EXTERN __stdio_send_output_buffer, __stdio_printf_padding_precision_hl
 EXTERN __stdio_printf_padding_width_bc, __stdio_printf_padding_width_hl
 
@@ -28,7 +28,7 @@ __stdio_printf_float_tail:
    
    push de                     ; save workspace *
 
-   call __ftoa_count           ; hl = num_chars
+   call __dtoa_count           ; hl = num_chars
    ex de,hl
    
    ; bc = workspace length
@@ -93,7 +93,7 @@ print_float:
    push af                     ; save carry'
    ex af,af'
    
-   call __ftoa_print
+   call __dtoa_print
    ex de,hl
    
    pop af
