@@ -52,7 +52,7 @@ am48_dfix32_0:
    or a                        ; clear carry
 
    bit 7,b
-   ex af,af'                   ; save sign
+   push af                     ; save sign
    set 7,b                     ; restore mantissa bit
    
    ld l,c
@@ -61,7 +61,7 @@ am48_dfix32_0:
    
    call l_lsr_dehl             ; logical shift right by amount A
    
-   ex af,af'                   ; z flag set if positive
+   pop af                      ; z flag reset if positive
    ret z
    
    jp l_neg_dehl
