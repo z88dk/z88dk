@@ -5,7 +5,7 @@ PUBLIC am48_derror_znc
 
 EXTERN am48_dconst_0
 
-asm48_derror_znc:
+am48_derror_znc:
 
    ; exit : AC'= 0
    ;        carry reset
