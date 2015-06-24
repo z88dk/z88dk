@@ -10,6 +10,12 @@ math/float/math48/lm/c/sdcc_ix/ceil
 math/float/math48/lm/c/sdcc_ix/copysign
 math/float/math48/lm/c/sdcc_ix/cos
 math/float/math48/lm/c/sdcc_ix/cosh
+math/float/math48/lm/c/sdcc_ix/d2mlib
+math/float/math48/lm/c/sdcc_ix/dcallee1
+math/float/math48/lm/c/sdcc_ix/dcallee2
+math/float/math48/lm/c/sdcc_ix/dload
+math/float/math48/lm/c/sdcc_ix/dread
+math/float/math48/lm/c/sdcc_ix/dstore
 math/float/math48/lm/c/sdcc_ix/erf
 math/float/math48/lm/c/sdcc_ix/erfc
 math/float/math48/lm/c/sdcc_ix/exp
@@ -42,6 +48,7 @@ math/float/math48/lm/c/sdcc_ix/log2
 math/float/math48/lm/c/sdcc_ix/logb
 math/float/math48/lm/c/sdcc_ix/lrint
 math/float/math48/lm/c/sdcc_ix/lround
+math/float/math48/lm/c/sdcc_ix/mlib2d
 math/float/math48/lm/c/sdcc_ix/modf
 math/float/math48/lm/c/sdcc_ix/nan
 math/float/math48/lm/c/sdcc_ix/nearbyint
