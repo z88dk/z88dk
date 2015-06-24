@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sdccixp_dssub
 
-EXTERN cm48_sdccixp_dread2, am48_dsub
+EXTERN cm48_sdccixp_dread2, am48_dsub, cm48_sdccixp_m482d
 
 cm48_sdccixp_dssub:
 
@@ -22,4 +22,6 @@ cm48_sdccixp_dssub:
    ; AC = right
    ; AC'= left
 
-   jp am48_dsub
+   call am48_dsub
+
+   jp cm48_sdccixp_m482d
