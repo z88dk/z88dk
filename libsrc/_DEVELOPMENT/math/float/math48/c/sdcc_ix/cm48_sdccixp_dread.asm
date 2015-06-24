@@ -29,9 +29,7 @@ cm48_sdccixp_dread1:
    ld hl,4
    add hl,sp
    
-   call cm48_sdccixp_dload
+   jp cm48_sdccixp_dload
 
    ; AC = right
    ; AC'= left
-   
-   ret
