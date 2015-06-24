@@ -29,6 +29,7 @@ math/float/math48/z80/am48_deq
 math/float/math48/z80/am48_dequate
 math/float/math48/z80/am48_deq_s
 math/float/math48/z80/am48_derror_edom_infc
+math/float/math48/z80/am48_derror_edom_zc
 math/float/math48/z80/am48_derror_einval_zc
 math/float/math48/z80/am48_derror_erange_infc
 math/float/math48/z80/am48_derror_erange_intc
