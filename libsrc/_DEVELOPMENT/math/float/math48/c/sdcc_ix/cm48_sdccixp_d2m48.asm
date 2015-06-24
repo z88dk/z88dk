@@ -20,9 +20,19 @@ cm48_sdccixp_d2m48:
    ;
    ; uses  : f, bc, de, hl, bc', de', hl'
 
+   ld a,d
+   or e
+   or h
+   or l
+   jr z, zero
+
    add hl,hl
    rr l
-   
+   inc h
+   inc h
+
+zero:
+
    ld c,d
    ld d,e
    ld b,l

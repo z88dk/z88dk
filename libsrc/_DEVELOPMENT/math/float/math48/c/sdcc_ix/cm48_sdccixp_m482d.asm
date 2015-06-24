@@ -23,9 +23,9 @@ cm48_sdccixp_m482d:
    push af
 
    ld a,l
-   or a
-   jr z, zero
-   
+   sub 2
+   jr c, zero
+      
    sla b
    rra
    rr b
