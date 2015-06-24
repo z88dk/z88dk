@@ -13,8 +13,8 @@ INCLUDE "clib_cfg.asm"
 
 SECTION code_stdio
 
-PUBLIC asm_vfprintf_unlocked
-PUBLIC asm0_vfprintf_unlocked, asm1_vfprintf_unlocked
+PUBLIC asm_vfprintf_unlocked_fp
+PUBLIC asm0_vfprintf_unlocked_fp, asm1_vfprintf_unlocked_fp
 
 EXTERN __stdio_verify_output, asm_strchrnul, __stdio_send_output_buffer
 EXTERN l_utod_hl, l_neg_hl, error_einval_zc
@@ -27,7 +27,7 @@ EXTERN __stdio_nextarg_de, l_atou, __stdio_length_modifier, error_erange_zc
 ENDIF
 
 
-asm_vfprintf_unlocked:
+asm_vfprintf_unlocked_fp:
 
    ; enter : ix = FILE *
    ;         de = char *format
@@ -66,12 +66,12 @@ IF __CLIB_OPT_STDIO & $01
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-asm1_vfprintf_unlocked:
+asm1_vfprintf_unlocked_fp:
 
    call __stdio_verify_output  ; check that output on stream is ok
    ret c                       ; if output on stream not possible
 
-asm0_vfprintf_unlocked:
+asm0_vfprintf_unlocked_fp:
 
 IF __CLIB_OPT_PRINTF != 0
 
@@ -464,8 +464,17 @@ IF __CLIB_OPT_PRINTF & $3fc00000
 
    ld hl,fcon_tbl              ; float converters are independent of long spec
    call match_con
-   jr c, printf_return_is_6
 
+   IF __SDCC | __SDCC_IX | __SDCC_IY
+   
+      jr c, printf_return_is_4
+   
+   ELSE
+   
+      jr c, printf_return_is_6
+
+   ENDIF
+   
 ENDIF
    
    ;;; converter unrecognized
@@ -517,7 +526,7 @@ printf_I:
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $3fc00000
+IF (__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)
 
 printf_return_is_6:
 
@@ -936,7 +945,7 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF & $3fc00000
+IF (__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)
 
 printf_return_6:
 

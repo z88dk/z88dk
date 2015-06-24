@@ -464,8 +464,17 @@ IF __CLIB_OPT_PRINTF & $3fc00000
 
    ld hl,fcon_tbl              ; float converters are independent of long spec
    call match_con
-   jr c, printf_return_is_6
 
+   IF __SDCC | __SDCC_IX | __SDCC_IY
+   
+      jr c, printf_return_is_4
+   
+   ELSE
+   
+      jr c, printf_return_is_6
+
+   ENDIF
+   
 ENDIF
    
    ;;; converter unrecognized
@@ -517,7 +526,7 @@ printf_I:
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $3fc00000
+IF (__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)
 
 printf_return_is_6:
 
@@ -936,7 +945,7 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF & $3fc00000
+IF (__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)
 
 printf_return_6:
 

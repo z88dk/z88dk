@@ -3,7 +3,7 @@ SECTION code_stdio
 
 PUBLIC __stdio_printf_f
 
-EXTERN dread1b, __dtoa__, __stdio_printf_float_tail
+EXTERN __dtoa__, __stdio_printf_float_tail
 
 __stdio_printf_f:
 
@@ -40,7 +40,17 @@ __stdio_printf_f:
    
    push ix
    
-   call dread1b                ; exx set = float x
+   IF __SDCC | __SDCC_IX | SDCC_IY
+   
+      EXTERN dload
+      call dload               ; exx set = double x
+   
+   ELSE
+   
+      EXTERN dread1b
+      call dread1b             ; exx set = double x
+
+   ENDIF
 
    ; exx occurred
 
