@@ -4,7 +4,107 @@
 
 // THE SELECTED FLOATING POINT PACKAGE MAY NOT SUPPORT ALL LISTED FUNCTIONS
 
-// SCCZ80 ONLY AT THE MOMENT AND FUNCTION POINTERS NOT SUPPORTED YET
+// FUNCTION POINTERS NOT SUPPORTED YET
+
+#ifdef __SDCC
+
+typedef float float_t;
+typedef float double_t;
+
+#define FLT_EVAL_METHOD        1
+
+#define HUGE_VAL               1.701411835E+38   //check
+#define HUGE_VALF              1.701411835E+38   //check
+
+#define INFINITY               1.701411835E+38   //check
+
+#define MATH_ERRNO             1
+#define MATH_ERREXCEPT         2
+#define math_errhandling       1
+
+extern double_t acos(double_t x) __z88dk_fastcall;
+extern double_t asin(double_t x) __z88dk_fastcall;
+extern double_t atan(double_t x) __z88dk_fastcall;
+extern double_t atan2(double_t y, double_t x) __z88dk_callee;
+
+extern double_t cos(double_t x) __z88dk_fastcall;
+extern double_t sin(double_t x) __z88dk_fastcall;
+extern double_t tan(double_t x) __z88dk_fastcall;
+
+extern double_t acosh(double_t x) __z88dk_fastcall;
+extern double_t asinh(double_t x) __z88dk_fastcall;
+extern double_t atanh(double_t x) __z88dk_fastcall;
+
+extern double_t cosh(double_t x) __z88dk_fastcall;
+extern double_t sinh(double_t x) __z88dk_fastcall;
+extern double_t tanh(double_t x) __z88dk_fastcall;
+
+extern double_t exp(double_t x) __z88dk_fastcall;
+extern double_t exp2(double_t x) __z88dk_fastcall;
+extern double_t expm1(double_t x) __z88dk_fastcall;
+extern double_t frexp(double_t value, int *exp) __z88dk_callee;
+extern int      ilogb(double_t x) __z88dk_fastcall;
+extern double_t ldexp(double_t x, int exp);
+
+extern double_t log(double_t x) __z88dk_fastcall;
+extern double_t log10(double_t x) __z88dk_fastcall;
+extern double_t log1p(double_t x) __z88dk_fastcall;
+extern double_t log2(double_t x) __z88dk_fastcall;
+extern double_t logb(double_t x) __z88dk_fastcall;
+
+extern double_t scalbn(double_t x, int n) __z88dk_callee;
+extern double_t scalbln(double_t x, int n) __z88dk_callee;
+
+extern double_t fabs(double_t x) __z88dk_fastcall;
+extern double_t hypot(double_t x, double_t y) __z88dk_callee;
+
+extern double_t pow(double_t x, double_t y) __z88dk_callee;
+extern double_t sqrt(double_t x) __z88dk_fastcall;
+extern double_t cbrt(double_t x) __z88dk_fastcall;
+
+extern double_t erf(double_t x) __z88dk_fastcall;
+extern double_t erfc(double_t x) __z88dk_fastcall;
+extern double_t lgamma(double_t x) __z88dk_fastcall;
+extern double_t tgamma(double_t x) __z88dk_fastcall;
+
+extern double_t ceil(double_t x) __z88dk_fastcall;
+extern double_t floor(double_t x) __z88dk_fastcall;
+extern double_t nearbyint(double_t x) __z88dk_fastcall;
+extern double_t rint(double_t x) __z88dk_fastcall;
+extern long     lrint(double_t x) __z88dk_fastcall;
+extern double_t round(double_t x) __z88dk_fastcall;
+extern long     lround(double_t x) __z88dk_fastcall;
+extern double_t trunc(double_t x) __z88dk_fastcall;
+
+extern double_t modf(double_t value, double_t *iptr) __z88dk_callee;
+extern double_t fmod(double_t x, double_t y) __z88dk_callee;
+extern double_t remainder(double_t x, double_t y) __z88dk_callee;
+extern double_t remquo(double_t x, double_t y, int *quo) __z88dk_callee;
+
+extern double_t copysign(double_t x, double_t y) __z88dk_callee;
+extern double_t nan(const char *tagp) __z88dk_fastcall;
+
+extern double_t nextafter(double_t x, double_t y) __z88dk_callee;
+extern double_t nexttoward(double_t x, double_t y) __z88dk_callee;
+
+extern double_t fdim(double_t x, double_t y) __z88dk_callee;
+
+extern double_t fmax(double_t x, double_t y) __z88dk_callee;
+extern double_t fmin(double_t x, double_t y) __z88dk_callee;
+
+extern double_t fma(double_t x, double_t y, double_t z) __z88dk_callee;
+
+extern int      isgreater(double_t x, double_t y) __z88dk_callee;
+extern int      isgreaterequal(double_t x, double_t y) __z88dk_callee;
+extern int      isless(double_t x, double_t y) __z88dk_callee;
+extern int      islessequal(double_t x, double_t y) __z88dk_callee;
+extern int      islessgreater(double_t x, double_t y) __z88dk_callee;
+extern int      isunordered(double_t x, double_t y) __z88dk_callee;
+
+
+#else
+
+// SCCZ80
 
 typedef double float_t;
 typedef double double_t;
@@ -99,6 +199,8 @@ extern int      __LIB__ __CALLEE__   islessequal(double_t x, double_t y);
 extern int      __LIB__ __CALLEE__   islessgreater(double_t x, double_t y);
 extern int      __LIB__ __CALLEE__   isunordered(double_t x, double_t y);
 
+#endif
+
 // NO DISTINCTION BETWEEN FLOAT AND DOUBLE
 
 #define acosf        acos
@@ -174,6 +276,5 @@ extern int      __LIB__ __CALLEE__   isunordered(double_t x, double_t y);
 #define fminf        fmin
 
 #define fmaf         fma
-
 
 #endif
