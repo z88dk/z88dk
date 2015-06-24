@@ -48,6 +48,10 @@ typedef struct
 #define FTOA_FLAG_SPACE 0x20
 #define FTOA_FLAG_HASH  0x10
 
+#define DTOA_FLAG_PLUS  0x40
+#define DTOA_FLAG_SPACE 0x20
+#define DTOA_FLAG_HASH  0x10
+
 // FUNCTIONS
 
 #ifdef __SDCC
@@ -68,10 +72,19 @@ extern void      abort(void);
 extern int       abs(int j);
 extern int       at_quick_exit(void *func);
 extern int       atexit(void *func);
+extern float     atof(char *nptr);
 extern int       atoi(char *buf);
 extern long      atol(char *buf);
 extern void      bsearch(void *key, void *base, size_t nmemb, size_t size, void *compar);
+extern size_t    dtoa(float x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    dtoe(float x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    dtog(float x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    dtoh(float x, void *buf, uint16_t prec, uint16_t flags);
 extern void      exit(int status);
+extern size_t    ftoa(float x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    ftoe(float x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    ftog(float x, void *buf, uint16_t prec, uint16_t flags);
+extern size_t    ftoh(float x, void *buf, uint16_t prec, uint16_t flags);
 extern char     *itoa(int num, char *buf, int radix);
 extern long      labs(long j);
 extern char     *ltoa(long num, char *buf, int radix);
@@ -79,6 +92,8 @@ extern void      qsort(void *base, size_t nmemb, size_t size, void *compar);
 extern void      quick_exit(int status);
 extern int       rand(void);
 extern void      srand(uint16_t seed);
+extern float     strtod(char *nptr, char **endptr);
+extern float     strtof(char *nptr, char **endptr);
 extern long      strtol(char *nptr, char **endptr, int base);
 extern uint32_t  strtoul(char *nptr, char **endptr, int base);
 extern int       system(char *s);
@@ -111,6 +126,7 @@ extern uint16_t  _random_uniform_xor_8__fastcall(uint32_t seed) __z88dk_fastcall
 extern int       abs_fastcall(int j) __z88dk_fastcall;
 extern int       at_quick_exit_fastcall(void *func) __z88dk_fastcall;
 extern int       atexit_fastcall(void *func) __z88dk_fastcall;
+extern float     atof_fastcall(char *nptr) __z88dk_fastcall;
 extern int       atoi_fastcall(char *buf) __z88dk_fastcall;
 extern long      atol_fastcall(char *buf) __z88dk_fastcall;
 extern void      exit_fastcall(int status) __z88dk_fastcall;
@@ -137,6 +153,7 @@ extern void   *malloc_unlocked_fastcall(size_t size) __z88dk_fastcall;
 #define abs(a)                         abs_fastcall(a)
 #define at_quick_exit(a)               at_quick_exit_fastcall(a)
 #define atexit(a)                      atexit_fastcall(a)
+#define atof(a)                        atof_fastcall(a)
 #define atoi(a)                        atoi_fastcall(a)
 #define atol(a)                        atol_fastcall(a)
 #define exit(a)                        exit_fastcall(a)
@@ -169,9 +186,19 @@ extern void      _shellsort__callee(void *base, size_t nmemb, size_t size, void 
 extern int       _strtoi__callee(char *nptr, char **endptr, int base) __z88dk_callee;
 extern uint16_t  _strtou__callee(char *nptr, char **endptr, int base) __z88dk_callee;
 extern void      bsearch_callee(void *key, void *base, size_t nmemb, size_t size, void *compar) __z88dk_callee;
+extern size_t    dtoa_callee(float x, void *buf, uint16_t prec, uint16_t flags) __z88dk_callee;
+extern size_t    dtoe_callee(float x, void *buf, uint16_t prec, uint16_t flags) __z88dk_callee;
+extern size_t    dtog_callee(float x, void *buf, uint16_t prec, uint16_t flags) __z88dk_callee;
+extern size_t    dtoh_callee(float x, void *buf, uint16_t prec, uint16_t flags) __z88dk_callee;
+extern size_t    ftoa_callee(float x, void *buf, uint16_t prec, uint16_t flags) __z88dk_callee;
+extern size_t    ftoe_callee(float x, void *buf, uint16_t prec, uint16_t flags) __z88dk_callee;
+extern size_t    ftog_callee(float x, void *buf, uint16_t prec, uint16_t flags) __z88dk_callee;
+extern size_t    ftoh_callee(float x, void *buf, uint16_t prec, uint16_t flags) __z88dk_callee;
 extern char     *itoa_callee(int num, char *buf, int radix) __z88dk_callee;
 extern char     *ltoa_callee(long num, char *buf, int radix) __z88dk_callee;
 extern void      qsort_callee(void *base, size_t nmemb, size_t size, void *compar) __z88dk_callee;
+extern float     strtod_callee(char *nptr, char **endptr) __z88dk_callee;
+extern float     strtof_callee(char *nptr, char **endptr) __z88dk_callee;
 extern long      strtol_callee(char *nptr, char **endptr, int base) __z88dk_callee;
 extern uint32_t  strtoul_callee(char *nptr, char **endptr, int base) __z88dk_callee;
 extern char     *ultoa_callee(uint32_t num, char *buf, int radix) __z88dk_callee;
@@ -199,9 +226,19 @@ extern void     *realloc_unlocked_callee(void *p, size_t size) __z88dk_callee;
 #define _strtoi_(a,b,c)             _strtoi__callee(a,b,c)
 #define _strtou_(a,b,c)             _strtou__callee(a,b,c)
 #define bsearch(a,b,c,d,e)          bsearch_callee(a,b,c,d,e)
+#define dtoa(a,b,c,d)               dtoa_callee(a,b,c,d)
+#define dtoe(a,b,c,d)               dtoe_callee(a,b,c,d)
+#define dtog(a,b,c,d)               dtog_callee(a,b,c,d)
+#define dtoh(a,b,c,d)               dtoh_callee(a,b,c,d)
+#define ftoa(a,b,c,d)               ftoa_callee(a,b,c,d)
+#define ftoe(a,b,c,d)               ftoe_callee(a,b,c,d)
+#define ftog(a,b,c,d)               ftog_callee(a,b,c,d)
+#define ftoh(a,b,c,d)               ftoh_callee(a,b,c,d)
 #define itoa(a,b,c)                 itoa_callee(a,b,c)
 #define ltoa(a,b,c)                 ltoa_callee(a,b,c)
 #define qsort(a,b,c,d)              qsort_callee(a,b,c,d)
+#define strtod(a,b)                 strtod_callee(a,b)
+#define strtof(a,b)                 strtof_callee(a,b)
 #define strtol(a,b,c)               strtol_callee(a,b,c)
 #define strtoul(a,b,c)              strtoul_callee(a,b,c)
 #define ultoa(a,b,c)                ultoa_callee(a,b,c)
