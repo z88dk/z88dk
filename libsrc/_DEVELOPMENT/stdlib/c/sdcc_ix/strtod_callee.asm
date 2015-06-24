@@ -1,0 +1,27 @@
+
+; double strtod(const char *nptr, char **endptr) __z88dk_callee
+
+SECTION code_stdlib
+
+PUBLIC _strtod_callee, l0_strtod_callee
+
+EXTERN mlib2d
+
+_strtod_callee:
+
+   pop af
+   pop hl
+   pop de
+   push af
+
+l0_strtod_callee:
+
+   push ix
+   
+   call asm_strtod
+   
+   pop ix
+   
+   jp mlib2d                   ; to sdcc_float
+
+   INCLUDE "stdlib/z80/asm_strtod.asm"
