@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sdcciyp_dssub
 
-EXTERN cm48_sdcciyp_dread2, am48_dsub, jp cm48_sdcciyp_m482d
+EXTERN cm48_sdcciyp_dread2, am48_dsub, cm48_sdcciyp_m482d
 
 cm48_sdcciyp_dssub:
 
