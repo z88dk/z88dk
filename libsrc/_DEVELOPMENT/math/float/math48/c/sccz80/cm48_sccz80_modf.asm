@@ -1,45 +1,25 @@
 
-; double __CALLEE__ modf(double value, double *iptr)
+; double modf(double value, double *iptr)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sccz80_modf
 
-EXTERN am48_modf, cm48_sccz80p_dstore
+EXTERN l0_cm48_sccz80_modf_callee
 
 cm48_sccz80_modf:
 
    pop af
-   
    pop hl                      ; hl = iptr
    
-   exx
-   
-   pop hl                      ; AC'= value
-   pop de
-   pop bc
-   
-   exx
-   
+   push hl
    push af
    
-   push hl                     ; save iptr
-
-   call am48_modf
-   
-   ; AC'= fraction
-   ; AC = integer
-   ; stack = iptr
-   
    exx
    
-   ex (sp),hl                  ; hl = iptr
-   call cm48_sccz80p_dstore    ; *iptr = integer
+   ld hl,9
+   add hl,sp
    
-   pop hl
+   call am48_dloadb
    
-   exx
-   
-   ; AC'= fraction
-   
-   ret
+   jp l0_cm48_sccz80_modf_callee

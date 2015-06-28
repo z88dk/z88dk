@@ -1,5 +1,5 @@
 
-; double __CALLEE__ frexp(double value, int *exp)
+; double frexp(double value, int *exp)
 
 SECTION code_fp_math48
 
@@ -10,17 +10,14 @@ EXTERN am48_frexp
 cm48_sccz80_frexp:
 
    pop af
-
-   pop hl                      ; hl = exp
+   pop hl
    
-   exx
-
-   pop hl                      ; AC'= value
-   pop de
-   pop bc
-   
-   exx
-   
+   push hl
    push af
+   
+   exx
+   
+   ld hl,9
+   call am48_dloadb
    
    jp am48_frexp

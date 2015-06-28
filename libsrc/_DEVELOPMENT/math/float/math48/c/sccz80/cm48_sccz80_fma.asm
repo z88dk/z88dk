@@ -1,32 +1,43 @@
 
-; double __CALLEE__ fma(double x, double y, double z)
+; double fma(double x, double y, double z)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sccz80_fma
 
-EXTERN am48_fma, cm48_sccz80p_dcallee2, asm0_memswap
+EXTERN am48_fma, am48_dloadb
 
 cm48_sccz80_fma:
 
-   ; swap x and z on stack
+   ; stack = x, y, z, ret
    
-   ld hl,2
+   ld hl,7
    add hl,sp
-   ex de,hl                    ; de = &z
    
-   ld hl,14
-   add hl,sp                   ; hl = &x
+   call am48_dloadb
    
-   ld bc,6
-   call asm0_memswap
-
-   ; collect params
-
-   call cm48_sccz80p_dcallee2
+   ; AC'= z
    
-   ; AC = x
+   ld hl,13
+   add hl,sp
+   
+   call am48_dloadb
+   
+   ; AC = z
    ; AC'= y
-   ; stack = z, ret
-
-   jp am48_fma
+   
+   push bc
+   push de
+   push hl
+   
+   ld hl,25
+   add hl,sp
+   
+   call am48_dloadb
+   
+   ; AC = y
+   ; AC'= x
+   ; stack = z
+   
+   call am48_fma
+   ret
