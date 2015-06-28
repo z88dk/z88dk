@@ -1,14 +1,18 @@
 
-; float nan(const char *tagp) __z88dk_fastcall
+; float nan(const char *tagp)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_nan
 
-EXTERN am48_nan, cm48_sdcciyp_m482d
+EXTERN cm48_sdcciy_nan_fastcall
 
 cm48_sdcciy_nan:
 
-   call am48_nan
+   pop af
+   pop hl
    
-   jp cm48_sdcciyp_m482d
+   push hl
+   push af
+   
+   jp cm48_sdcciy_nan_fastcall

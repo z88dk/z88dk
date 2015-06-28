@@ -1,16 +1,20 @@
 
-; float floor(float x) __z88dk_fastcall
+; float floor(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_floor
 
-EXTERN cm48_sdcciyp_dx2m48, am48_floor, cm48_sdcciyp_m482d
+EXTERN cm48_sdcciy_floor_fastcall
 
 cm48_sdcciy_floor:
 
-   call cm48_sdcciyp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   call am48_floor
+   push de
+   push hl
+   push af
    
-   jp cm48_sdcciyp_m482d
+   jp cm48_sdcciy_floor_fastcall

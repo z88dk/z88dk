@@ -1,11 +1,11 @@
 
-; float ldexp(float x, int exp) __z88dk_callee
+; float ldexp(float x, int exp)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_ldexp
 
-EXTERN cm48_sdcciyp_d2m48, am48_ldexp, cm48_sdcciyp_m482d
+EXTERN l0_cm48_sdcciy_ldexp_callee
 
 cm48_sdcciy_ldexp:
 
@@ -18,12 +18,11 @@ cm48_sdcciy_ldexp:
    
    pop hl                      ; hl = exp
    
+   push hl
+   
+   push hl
+   push de
+   
    push af
 
-   exx
-   
-   call cm48_sdcciyp_d2m48
-
-   call am48_ldexp
-   
-   jp cm48_sdcciyp_m482d
+   jp l0_cm48_sdcciy_ldexp_callee

@@ -1,16 +1,20 @@
 
-; float ceil(float x) __z88dk_fastcall
+; float ceil(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_ceil
 
-EXTERN cm48_sdcciyp_dx2m48, am48_ceil, cm48_sdcciyp_m482d
+EXTERN cm48_sdcciy_ceil_fastcall
 
 cm48_sdcciy_ceil:
 
-   call cm48_sdcciyp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   call am48_ceil
+   push de
+   push hl
+   push af
    
-   jp cm48_sdcciyp_m482d
+   jp cm48_sdcciy_ceil_fastcall

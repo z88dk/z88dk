@@ -1,16 +1,20 @@
 
-; float lgamma(float x) __z88dk_fastcall
+; float lgamma(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_lgamma
 
-EXTERN cm48_sdcciyp_dx2m48, am48_lgamma, cm48_sdcciyp_m482d
+EXTERN cm48_sdcciy_lgamma_fastcall
 
 cm48_sdcciy_lgamma:
 
-   call cm48_sdcciyp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   call am48_lgamma
+   push de
+   push hl
+   push af
    
-   jp cm48_sdcciyp_m482d
+   jp cm48_sdcciy_lgamma_fastcall

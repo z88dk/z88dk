@@ -1,16 +1,20 @@
 
-; float asinh(float x) __z88dk_fastcall
+; float asinh(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_asinh
 
-EXTERN cm48_sdccixp_dx2m48, am48_asinh, cm48_sdccixp_m482d
+EXTERN cm48_sdccix_asinh_fastcall
 
 cm48_sdccix_asinh:
 
-   call cm48_sdccixp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   call am48_asinh
+   push de
+   push hl
+   push af
    
-   jp cm48_sdccixp_m482d
+   jp cm48_sdccix_asinh_fastcall

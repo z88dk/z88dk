@@ -1,14 +1,20 @@
 
-; int ilogb(float x) __z88dk_fastcall
+; int ilogb(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_ilogb
 
-EXTERN cm48_sdcciyp_dx2m48, am48_ilogb
+EXTERN cm48_sdcciy_ilogb_fastcall
 
 cm48_sdcciy_ilogb:
 
-   call cm48_sdcciyp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   jp am48_ilogb
+   push de
+   push hl
+   push af
+   
+   jp cm48_sdcciy_ilogb_fastcall

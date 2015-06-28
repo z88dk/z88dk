@@ -1,16 +1,20 @@
 
-; float erfc(float x) __z88dk_fastcall
+; float erfc(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_erfc
 
-EXTERN cm48_sdccixp_dx2m48, am48_erfc, cm48_sdccixp_m482d
+EXTERN cm48_sdccix_erfc_fastcall
 
 cm48_sdccix_erfc:
 
-   call cm48_sdccixp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   call am48_erfc
-   
-   jp cm48_sdccixp_m482d
+   push de
+   push hl
+   push af
+
+   jp cm48_sdccix_erfc_fastcall

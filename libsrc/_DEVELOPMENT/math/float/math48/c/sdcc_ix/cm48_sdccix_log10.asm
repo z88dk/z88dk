@@ -1,16 +1,20 @@
 
-; float log10(float x) __z88dk_fastcall
+; float log10(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_log10
 
-EXTERN cm48_sdccixp_dx2m48, am48_log10, cm48_sdccixp_m482d
+EXTERN cm48_sdccix_log10_fastcall
 
 cm48_sdccix_log10:
 
-   call cm48_sdccixp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   call am48_log10
+   push de
+   push hl
+   push af
    
-   jp cm48_sdccixp_m482d
+   jp cm48_sdccix_log10_fastcall

@@ -1,16 +1,20 @@
 
-; float acos(float x) __z88dk_fastcall
+; float acos(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_acos
 
-EXTERN cm48_sdcciyp_dx2m48, am48_acos, cm48_sdcciyp_m482d
+EXTERN cm48_sdcciy_acos_fastcall
 
 cm48_sdcciy_acos:
 
-   call cm48_sdcciyp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   call am48_acos
-   
-   jp cm48_sdcciyp_m482d
+   push de
+   push hl
+   push af
+
+   jp cm48_sdcciy_acos_fastcall

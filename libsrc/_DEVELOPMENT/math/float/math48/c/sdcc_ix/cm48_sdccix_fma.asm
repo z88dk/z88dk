@@ -5,31 +5,27 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_fma
 
-EXTERN cm48_sdccixp_dcallee2, am48_dmul, cm48_sdccixp_m482d, cm48_sdccixp_d2m48, am48_dadd
+EXTERN cm48_sdccixp_dread2, am48_dmul, cm48_sdccixp_m482d, cm48_sdccixp_d2m48, am48_dadd
 
 cm48_sdccix_fma:
 
-   call cm48_sdccixp_dcallee2
+   call cm48_sdccixp_dread2
 
    ; AC'= y
    ; AC = x
-   ; stack = z, ret
+   ; stack = z, y, x, ret
 
    ; fma operation performed here since
    ; it is difficult to gather three params
 
    call am48_dmul
 
-   pop bc
-   
-   pop de
-   pop hl                      ; hlde = float z
-   
-   push bc
-   
    jp c, cm48_sdccixp_m482d    ; if overflow
+
+   ld hl,10
+   add hl,sp
    
-   call cm48_sdccixp_d2m48
+   call cm48_sdccixp_dload
    
    ; AC = x * y
    ; AC'= z

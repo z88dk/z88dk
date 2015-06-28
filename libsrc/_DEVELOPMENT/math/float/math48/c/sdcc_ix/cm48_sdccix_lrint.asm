@@ -1,14 +1,20 @@
 
-; long lrint(float x) __z88dk_fastcall
+; long lrint(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_lrint
 
-EXTERN cm48_sdccixp_dx2m48, am48_lrint
+EXTERN cm48_sdccix_lrint_fastcall
 
 cm48_sdccix_lrint:
 
-   call cm48_sdccixp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   jp am48_lrint
+   push de
+   push hl
+   push af
+   
+   jp cm48_sdccix_lrint_fastcall

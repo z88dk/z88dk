@@ -1,21 +1,17 @@
 
-; float pow(float x, float y) __z88dk_callee
+; float pow(float x, float y)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_pow
 
-EXTERN am48_pow, cm48_sdccixp_dcallee2, cm48_sdccixp_m482d
+EXTERN cm48_sdccixp_dread2, l0_cm48_sdccix_pow_callee
 
 cm48_sdccix_pow:
 
-   call cm48_sdccixp_dcallee2
+   call cm48_sdccixp_dread2
    
    ; AC'= y
    ; AC = x
-   
-   exx
-   
-   call am48_pow
 
-   jp cm48_sdccixp_m482d
+   jp l0_cm48_sdccix_pow_callee

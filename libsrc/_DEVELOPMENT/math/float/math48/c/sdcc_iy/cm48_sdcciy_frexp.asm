@@ -1,11 +1,11 @@
 
-; float frexp(float value, int *exp) __z88dk_callee
+; float frexp(float value, int *exp)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_frexp
 
-EXTERN cm48_sdcciyp_d2m48, am48_frexp, cm48_sdcciyp_m482d
+EXTERN l0_cm48_sdcciy_frexp_callee
 
 cm48_sdcciy_frexp:
 
@@ -18,15 +18,11 @@ cm48_sdcciy_frexp:
    
    pop hl                      ; hl = exp
    
+   push hl
+   
+   push hl
+   push de
+   
    push af
 
-   exx
-   
-   call cm48_sdcciyp_d2m48
-   
-   ; AC' = double value
-   ; hl  = exp
-   
-   call am48_frexp
-   
-   jp cm48_sdcciyp_m482d
+   jp l0_cm48_sdcciy_frexp_callee

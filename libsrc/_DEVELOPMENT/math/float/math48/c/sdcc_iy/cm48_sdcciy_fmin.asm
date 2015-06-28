@@ -1,19 +1,17 @@
 
-; float fmin(float x, float y) __z88dk_callee
+; float fmin(float x, float y)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_fmin
 
-EXTERN am48_fmin, cm48_sdcciyp_dcallee2, cm48_sdcciyp_m482d
+EXTERN cm48_sdcciyp_dread2, l0_cm48_sdcciy_fmin_callee
 
 cm48_sdcciy_fmin:
 
-   call cm48_sdcciyp_dcallee2
+   call cm48_sdcciyp_dread2
    
    ; AC'= y
    ; AC = x
-   
-   call am48_fmin
 
-   jp cm48_sdcciyp_m482d
+   jp l0_cm48_sdcciy_fmin_callee

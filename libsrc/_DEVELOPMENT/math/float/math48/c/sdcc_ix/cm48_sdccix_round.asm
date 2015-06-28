@@ -1,16 +1,20 @@
 
-; float round(float x) __z88dk_fastcall
+; float round(float x)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_round
 
-EXTERN cm48_sdccixp_dx2m48, am48_round, cm48_sdccixp_m482d
+EXTERNcm48_sdccix_round_fastcall
 
 cm48_sdccix_round:
 
-   call cm48_sdccixp_dx2m48
+   pop af
+   pop hl
+   pop de
    
-   call am48_round
+   push de
+   push hl
+   push af
    
-   jp cm48_sdccixp_m482d
+   jp cm48_sdccix_round_fastcall

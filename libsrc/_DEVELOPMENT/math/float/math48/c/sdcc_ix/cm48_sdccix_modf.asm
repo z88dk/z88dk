@@ -1,11 +1,11 @@
 
-; float modf(float value, float *iptr) __z88dk_callee
+; float modf(float value, float *iptr)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_modf
 
-EXTERN cm48_sdccixp_d2m48, am48_modf, cm48_sdccixp_dstore, cm48_sdccixp_m482d
+EXTERN l0_cm48_sdccix_modf_callee
 
 cm48_sdccix_modf:
 
@@ -15,27 +15,14 @@ cm48_sdccix_modf:
    pop hl                      ; hlde = float value
 
    pop bc
-   push af
+   
    push bc
    
-   ;  hlde = float value
-   ; stack = float *iptr
-
-   call cm48_sdccixp_d2m48     ; AC' = double value
+   push hl
+   push de
    
-   call am48_modf
-
-   ; AC'= fraction
-   ; AC = integer
-   ; stack = iptr
-
-   exx
+   push af
    
-   ex (sp),hl                  ; hl = iptr
-   call cm48_sdccixp_dstore    ; *iptr = integer   
+   push bc
 
-   pop hl
-   
-   ; AC = fraction
-   
-   jp cm48_sdccixp_m482d + 1
+   jp l0_cm48_sdccix_modf_callee

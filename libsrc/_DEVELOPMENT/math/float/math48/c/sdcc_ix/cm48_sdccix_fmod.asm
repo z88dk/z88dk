@@ -1,21 +1,17 @@
 
-; float fmod(float x, float y) __z88dk_callee
+; float fmod(float x, float y)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_fmod
 
-EXTERN am48_fmod, cm48_sdccixp_dcallee2, cm48_sdccixp_m482d
+EXTERN cm48_sdccixp_dread2, l0_cm48_sdccix_fmod_callee
 
 cm48_sdccix_fmod:
 
-   call cm48_sdccixp_dcallee2
+   call cm48_sdccixp_dread2
    
    ; AC'= y
    ; AC = x
-   
-   exx
-   
-   call am48_fmod
 
-   jp cm48_sdccixp_m482d
+   jp l0_cm48_sdccix_fmod_callee

@@ -1,15 +1,15 @@
 
-; int isless(float x, float y) __z88dk_callee
+; int isless(float x, float y)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_isless
 
-EXTERN am48_isless, cm48_sdccixp_dcallee2
+EXTERN am48_isless, cm48_sdccixp_dread2
 
 cm48_sdccix_isless:
 
-   call cm48_sdccixp_dcallee2
+   call cm48_sdccixp_dread2
    
    ; AC'= y
    ; AC = x

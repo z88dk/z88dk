@@ -1,11 +1,11 @@
 
-; float scalbn(float x, int n) __z88dk_callee
+; float scalbn(float x, int n)
 
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_scalbn
 
-EXTERN cm48_sdcciyp_d2m48, am48_scalbn, cm48_sdcciyp_m482d
+EXTERN l0_cm48_sdcciy_scalbn_callee
 
 cm48_sdcciy_scalbn:
 
@@ -18,15 +18,13 @@ cm48_sdcciy_scalbn:
    
    pop hl                      ; hl = int n
    
+   push hl
+   
    exx
    
+   push hl
+   push de
+   
    push af
-   
-   call cm48_sdcciyp_d2m48
-   
-   ; AC'= double x
-   ; hl = n
-   
-   call am48_scalbn
 
-   jp cm48_sdcciyp_m482d
+   jp l0_cm48_sdcciy_scalbn_callee
