@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_round
 
-EXTERNcm48_sdcciy_round_fastcall
+EXTERN cm48_sdcciy_round_fastcall
 
 cm48_sdcciy_round:
 

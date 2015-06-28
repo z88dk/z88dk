@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_fma
 
-EXTERN cm48_sdccixp_dread2, am48_dmul, cm48_sdccixp_m482d, cm48_sdccixp_d2m48, am48_dadd
+EXTERN cm48_sdccixp_dread2, am48_dmul, cm48_sdccixp_m482d, cm48_sdccixp_dload, cm48_sdccixp_d2m48, am48_dadd
 
 cm48_sdccix_fma:
 
