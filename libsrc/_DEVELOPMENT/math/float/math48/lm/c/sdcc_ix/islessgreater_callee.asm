@@ -1,0 +1,8 @@
+
+SECTION code_fp_math48
+
+PUBLIC _islessgreater_callee
+
+EXTERN cm48_sdccix_islessgreater_callee
+
+defc _islessgreater_callee = cm48_sdccix_islessgreater_callee
