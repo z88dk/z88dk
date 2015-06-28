@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sccz80_frexp
 
-EXTERN am48_frexp
+EXTERN am48_frexp, am48_dloadb
 
 cm48_sccz80_frexp:
 
