@@ -130,7 +130,7 @@ extern uint16_t __LIB__ __CALLEE__ _strtou__callee(char *nptr,char **endptr,int 
 #define _strtou_(a,b,c) _strtou__callee(a,b,c)
 
 
-extern void abort(void);
+extern void __LIB__ abort(void);
 
 
 extern int __LIB__ __FASTCALL__ abs(int j);
@@ -142,9 +142,7 @@ extern int __LIB__ __FASTCALL__ at_quick_exit(void *func);
 extern int __LIB__ __FASTCALL__ atexit(void *func);
 
 
-extern float_t __LIB__ atofchar *nptr();
-extern float_t __LIB__ __CALLEE__ atofchar *nptr_callee();
-#define char *nptr() char *nptr_callee()
+extern float_t __LIB__ __FASTCALL__ atof(char *nptr);
 
 
 extern int __LIB__ __FASTCALL__ atoi(char *buf);
@@ -222,7 +220,7 @@ extern void __LIB__ __CALLEE__ qsort_callee(void *base,size_t nmemb,size_t size,
 extern void __LIB__ __FASTCALL__ quick_exit(int status);
 
 
-extern int rand(void);
+extern int __LIB__ rand(void);
 
 
 extern void __LIB__ __FASTCALL__ srand(uint16_t seed);

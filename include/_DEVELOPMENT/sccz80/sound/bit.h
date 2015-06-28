@@ -119,7 +119,7 @@ extern void __LIB__ __CALLEE__ bit_beep_raw_callee(uint16_t cycles_num,uint16_t 
 #define bit_beep_raw(a,b) bit_beep_raw_callee(a,b)
 
 
-extern void bit_click(void);
+extern void __LIB__ bit_click(void);
 
 
 extern void __LIB__ __FASTCALL__ bit_fx(void *bfx);
@@ -150,7 +150,7 @@ extern void __LIB__ __CALLEE__ bit_beep_raw_di_callee(uint16_t cycles_num,uint16
 #define bit_beep_raw_di(a,b) bit_beep_raw_di_callee(a,b)
 
 
-extern void bit_click_di(void);
+extern void __LIB__ bit_click_di(void);
 
 
 extern void __LIB__ __FASTCALL__ bit_fx_di(void *bfx);

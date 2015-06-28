@@ -39,7 +39,7 @@ extern int __LIB__ __CALLEE__ creat_callee(char *path,mode_t mode);
 #define creat(a,b) creat_callee(a,b)
 
 
-extern int open(char *path,int oflag,...);
+extern int __LIB__ open(char *path,int oflag,...);
 
 
 extern int __LIB__ vopen(char *path,int oflag,void *arg);

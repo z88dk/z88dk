@@ -65,7 +65,7 @@
 #include <sys/ioctl_zx.h>
 #endif
 
-extern int ioctl(int fd,uint16_t request,...);
+extern int __LIB__ ioctl(int fd,uint16_t request,...);
 
 
 extern int __LIB__ vioctl(int fd,uint16_t request,void *arg);

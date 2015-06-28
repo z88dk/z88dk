@@ -58,7 +58,7 @@ extern FILE __LIB__ __CALLEE__ *_fmemopen__callee(void **bufp,size_t *sizep,char
 #define _fmemopen_(a,b,c) _fmemopen__callee(a,b,c)
 
 
-extern int asprintf(char **ptr,char *format,...);
+extern int __LIB__ asprintf(char **ptr,char *format,...);
 
 
 extern void __LIB__ __FASTCALL__ clearerr(FILE *stream);
@@ -110,7 +110,7 @@ extern FILE __LIB__ __CALLEE__ *fopen_callee(const char *filename,const char *mo
 #define fopen(a,b) fopen_callee(a,b)
 
 
-extern int fprintf(FILE *stream,char *format,...);
+extern int __LIB__ fprintf(FILE *stream,char *format,...);
 
 
 extern int __LIB__ fputc(int c,FILE *stream);
@@ -133,7 +133,7 @@ extern FILE __LIB__ __CALLEE__ *freopen_callee(char *filename,char *mode,FILE *s
 #define freopen(a,b,c) freopen_callee(a,b,c)
 
 
-extern int fscanf(FILE *stream,char *format,...);
+extern int __LIB__ fscanf(FILE *stream,char *format,...);
 
 
 extern int __LIB__ fseek(FILE *stream,long offset,int whence);
@@ -163,7 +163,7 @@ extern size_t __LIB__ __CALLEE__ fwrite_callee(void *ptr,size_t size,size_t nmem
 extern int __LIB__ __FASTCALL__ getc(FILE *stream);
 
 
-extern int getchar(void);
+extern int __LIB__ getchar(void);
 
 
 extern int __LIB__ getdelim(char **lineptr,size_t *n,int delim,FILE *stream);
@@ -179,7 +179,7 @@ extern int __LIB__ __CALLEE__ getline_callee(char **lineptr,size_t *n,FILE *stre
 extern char __LIB__ __FASTCALL__ gets(char *s);
 
 
-extern int obstack_printf(struct obstack *ob,char *format,...);
+extern int __LIB__ obstack_printf(struct obstack *ob,char *format,...);
 
 
 extern int __LIB__ obstack_vprintf(struct obstack *ob,char *format,void *arg);
@@ -195,7 +195,7 @@ extern FILE __LIB__ __CALLEE__ *open_memstream_callee(char **bufp,size_t *sizep)
 extern void __LIB__ __FASTCALL__ perror(char *s);
 
 
-extern int printf(char *format,...);
+extern int __LIB__ printf(char *format,...);
 
 
 extern int __LIB__ putc(int c,FILE *stream);
@@ -212,16 +212,16 @@ extern int __LIB__ __FASTCALL__ puts(char *s);
 extern void __LIB__ __FASTCALL__ rewind(FILE *stream);
 
 
-extern int scanf(char *format,...);
+extern int __LIB__ scanf(char *format,...);
 
 
-extern int snprintf(char *s,size_t n,char *format,...);
+extern int __LIB__ snprintf(char *s,size_t n,char *format,...);
 
 
-extern int sprintf(char *s,char *format,...);
+extern int __LIB__ sprintf(char *s,char *format,...);
 
 
-extern int sscanf(char *s,char *format,...);
+extern int __LIB__ sscanf(char *s,char *format,...);
 
 
 extern int __LIB__ ungetc(int c,FILE *stream);
@@ -301,7 +301,7 @@ extern char __LIB__ __CALLEE__ *fgets_unlocked_callee(char *s,int n,FILE *stream
 extern int __LIB__ __FASTCALL__ fileno_unlocked(FILE *stream);
 
 
-extern int fprintf_unlocked(FILE *stream,char *format,...);
+extern int __LIB__ fprintf_unlocked(FILE *stream,char *format,...);
 
 
 extern int __LIB__ fputc_unlocked(int c,FILE *stream);
@@ -324,7 +324,7 @@ extern FILE __LIB__ __CALLEE__ *freopen_unlocked_callee(char *filename,char *mod
 #define freopen_unlocked(a,b,c) freopen_unlocked_callee(a,b,c)
 
 
-extern int fscanf_unlocked(FILE *stream,char *format,...);
+extern int __LIB__ fscanf_unlocked(FILE *stream,char *format,...);
 
 
 extern int __LIB__ fseek_unlocked(FILE *stream,long offset,int whence);
@@ -348,7 +348,7 @@ extern size_t __LIB__ __CALLEE__ fwrite_unlocked_callee(void *ptr,size_t size,si
 extern int __LIB__ __FASTCALL__ getc_unlocked(FILE *stream);
 
 
-extern int getchar_unlocked(void);
+extern int __LIB__ getchar_unlocked(void);
 
 
 extern int __LIB__ getdelim_unlocked(char **lineptr,size_t *n,int delim,FILE *stream);
@@ -364,7 +364,7 @@ extern int __LIB__ __CALLEE__ getline_unlocked_callee(char **lineptr,size_t *n,F
 extern char __LIB__ __FASTCALL__ gets_unlocked(char *s);
 
 
-extern int printf_unlocked(char *format,...);
+extern int __LIB__ printf_unlocked(char *format,...);
 
 
 extern int __LIB__ putc_unlocked(int c,FILE *stream);
@@ -381,7 +381,7 @@ extern int __LIB__ __FASTCALL__ puts_unlocked(char *s);
 extern void __LIB__ __FASTCALL__ rewind_unlocked(FILE *stream);
 
 
-extern int scanf_unlocked(char *format,...);
+extern int __LIB__ scanf_unlocked(char *format,...);
 
 
 extern int __LIB__ ungetc_unlocked(int c,FILE *stream);

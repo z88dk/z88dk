@@ -348,7 +348,7 @@ extern void __LIB__ __CALLEE__ sp1_Initialize_callee(uint16_t iflag,uint16_t col
 #define sp1_Initialize(a,b,c) sp1_Initialize_callee(a,b,c)
 
 
-extern void sp1_UpdateNow(void);
+extern void __LIB__ sp1_UpdateNow(void);
 
 
 

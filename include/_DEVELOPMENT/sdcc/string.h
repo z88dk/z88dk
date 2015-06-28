@@ -146,9 +146,9 @@ extern int strcasecmp_callee(char *s1,char *s2) __z88dk_callee;
 #define strcasecmp(a,b) strcasecmp_callee(a,b)
 
 
-extern char *strcat(char *dst,,char *src);
-extern char *strcat_callee(char *dst,,char *src) __z88dk_callee;
-#define strcat(a,b,c) strcat_callee(a,b,c)
+extern char *strcat(char *dst,char *src);
+extern char *strcat_callee(char *dst,char *src) __z88dk_callee;
+#define strcat(a,b) strcat_callee(a,b)
 
 
 extern char *strchr(char *s,int c);

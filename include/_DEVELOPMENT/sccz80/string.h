@@ -140,9 +140,9 @@ extern int __LIB__ __CALLEE__ strcasecmp_callee(char *s1,char *s2);
 #define strcasecmp(a,b) strcasecmp_callee(a,b)
 
 
-extern char __LIB__ *strcat(char *dst,,char *src);
-extern char __LIB__ __CALLEE__ *strcat_callee(char *dst,,char *src);
-#define strcat(a,b,c) strcat_callee(a,b,c)
+extern char __LIB__ *strcat(char *dst,char *src);
+extern char __LIB__ __CALLEE__ *strcat_callee(char *dst,char *src);
+#define strcat(a,b) strcat_callee(a,b)
 
 
 extern char __LIB__ *strchr(char *s,int c);

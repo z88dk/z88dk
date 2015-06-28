@@ -32,10 +32,10 @@ typedef struct
 
 // must not use callee or fastcall linkage
 
-extern int l_setjmp(jmp_buf *env);
+extern int __LIB__ l_setjmp(jmp_buf *env);
 
 
-extern void l_longjmp(jmp_buf *env,int val);
+extern void __LIB__ l_longjmp(jmp_buf *env,int val);
 
 
 

@@ -154,9 +154,9 @@ extern int atexit_fastcall(void *func) __z88dk_fastcall;
 #define atexit(a) atexit_fastcall(a)
 
 
-extern float_t atofchar *nptr();
-extern float_t atofchar *nptr_callee() __z88dk_callee;
-#define char *nptr() char *nptr_callee()
+extern float_t atof(char *nptr);
+extern float_t atof_fastcall(char *nptr) __z88dk_fastcall;
+#define atof(a) atof_fastcall(a)
 
 
 extern int atoi(char *buf);
