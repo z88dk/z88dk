@@ -42,16 +42,30 @@ extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
 
 # ORDINARY PROTOTYPES (UNEMBELLISHED)
 
-define(`__OPROTO', extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
+define(`__OPROTO', `ifdef(`m4_SDCC',dnl
+extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
 
-)
+,`ifdef(`m4_SCCZ80',dnl
+extern `$1' __LIB__ `$2'``$3''`'(`shift(shift(shift($@)))');
+
+,dnl
+extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
+
+)')')
 
 
 # VARARG PROTOTYPES
 
-define(`__VPROTO', extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
+define(`__VPROTO', `ifdef(`m4_SDCC',dnl
+extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
 
-)
+,`ifdef(`m4_SCCZ80',dnl
+extern `$1' __LIB__ `$2'``$3''`'(`shift(shift(shift($@)))');
+
+,dnl
+extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
+
+)')')
 
 
 ###################################################################
