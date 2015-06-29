@@ -1,0 +1,27 @@
+
+; float __schar2fs_fastcall(signed char sc)
+
+SECTION code_fp_math48
+
+PUBLIC cm48_sdccixp_schar2ds_fastcall
+
+EXTERN am48_double8, cm48_sdccixp_m482d
+
+cm48_sdccixp_schar2ds_fastcall:
+
+   ; signed char to double
+   ;
+   ; enter : stack = signed char sc, ret
+   ;
+   ; exit  : dehl = sdcc_float(sc)
+   ;
+   ; uses  : af, bc, de, hl, bc', de', hl'
+
+   pop af
+   pop hl
+   dec sp
+   push af
+
+   call am48_double8
+   
+   jp cm48_sdccixp_m482d

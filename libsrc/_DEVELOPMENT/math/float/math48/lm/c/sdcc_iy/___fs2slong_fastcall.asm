@@ -1,0 +1,8 @@
+
+SECTION code_fp_math48
+
+PUBLIC ___fs2slong_fastcall
+
+EXTERN cm48_sdcciyp_ds2slong_fastcall
+
+defc ___fs2slong_fastcall = cm48_sdcciyp_ds2slong_fastcall

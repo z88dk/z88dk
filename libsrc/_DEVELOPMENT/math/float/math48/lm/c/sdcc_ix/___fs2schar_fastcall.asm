@@ -1,0 +1,8 @@
+
+SECTION code_fp_math48
+
+PUBLIC ___fs2schar_fastcall
+
+EXTERN cm48_sdccixp_ds2schar_fastcall
+
+defc ___fs2schar_fastcall = cm48_sdccixp_ds2schar_fastcall

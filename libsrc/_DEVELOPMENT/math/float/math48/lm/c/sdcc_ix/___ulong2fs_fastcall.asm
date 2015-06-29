@@ -1,0 +1,8 @@
+
+SECTION code_fp_math48
+
+PUBLIC ___ulong2fs_fastcall
+
+EXTERN cm48_sdccixp_ulong2ds_fastcall
+
+defc ___ulong2fs_fastcall = cm48_sdccixp_ulong2ds_fastcall
