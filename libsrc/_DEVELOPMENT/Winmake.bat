@@ -1,8 +1,10 @@
 @echo off
+
 setlocal
 setlocal ENABLEDELAYEDEXPANSION
 
 @rem must have leading and trailing space
+
 set alltargets= embedded m zx 
 
 if "%1" == "" (
