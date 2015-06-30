@@ -1,13 +1,13 @@
 
-; signed long __fs2ulong_fastcall(float f)
+; signed long __fs2ulong_callee(float f)
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sdccixp_ds2ulong_fastcall
+PUBLIC cm48_sdccixp_ds2ulong_callee
 
 EXTERN cm48_sdccixp_dcallee1, am48_dfix32u
 
-cm48_sdccixp_ds2ulong_fastcall:
+cm48_sdccixp_ds2ulong_callee:
 
    ; double to unsigned long
    ;

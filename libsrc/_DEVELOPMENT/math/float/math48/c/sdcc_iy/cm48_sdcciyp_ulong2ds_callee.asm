@@ -1,13 +1,13 @@
 
-; float __ulong2fs_fastcall(unsigned long ul)
+; float __ulong2fs_callee(unsigned long ul)
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sdcciyp_ulong2ds_fastcall
+PUBLIC cm48_sdcciyp_ulong2ds_callee
 
 EXTERN am48_double32u, cm48_sdcciyp_m482d
 
-cm48_sdcciyp_ulong2ds_fastcall:
+cm48_sdcciyp_ulong2ds_callee:
 
    ; unsigned long to double
    ;

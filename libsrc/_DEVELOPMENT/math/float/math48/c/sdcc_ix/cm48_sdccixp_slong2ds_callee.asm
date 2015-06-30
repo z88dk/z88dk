@@ -1,13 +1,13 @@
 
-; float __slong2fs_fastcall(signed long sl)
+; float __slong2fs_callee(signed long sl)
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sdccixp_slong2ds_fastcall
+PUBLIC cm48_sdccixp_slong2ds_callee
 
 EXTERN am48_double32, cm48_sdccixp_m482d
 
-cm48_sdccixp_slong2ds_fastcall:
+cm48_sdccixp_slong2ds_callee:
 
    ; signed long to double
    ;

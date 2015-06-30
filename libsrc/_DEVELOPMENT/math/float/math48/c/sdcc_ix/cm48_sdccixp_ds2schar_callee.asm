@@ -1,13 +1,13 @@
 
-; signed char __fs2schar_fastcall(float f)
+; signed char __fs2schar_callee(float f)
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sdccixp_ds2schar_fastcall
+PUBLIC cm48_sdccixp_ds2schar_callee
 
 EXTERN cm48_sdccixp_dcallee1, am48_dfix8
 
-cm48_sdccixp_ds2schar_fastcall:
+cm48_sdccixp_ds2schar_callee:
 
    ; double to signed char
    ;

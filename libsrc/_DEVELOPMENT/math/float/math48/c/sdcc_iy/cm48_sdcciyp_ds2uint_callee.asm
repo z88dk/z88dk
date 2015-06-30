@@ -1,13 +1,13 @@
 
-; signed int __fs2suint_fastcall(float f)
+; signed int __fs2suint_callee(float f)
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sdccixp_ds2uint_fastcall
+PUBLIC cm48_sdcciyp_ds2uint_callee
 
-EXTERN cm48_sdccixp_dcallee1, am48_dfix16u
+EXTERN cm48_sdcciyp_dcallee1, am48_dfix16u
 
-cm48_sdccixp_ds2uint_fastcall:
+cm48_sdcciyp_ds2uint_callee:
 
    ; double to unsigned int
    ;
@@ -17,6 +17,6 @@ cm48_sdccixp_ds2uint_fastcall:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
    
-   call cm48_sdccixp_dcallee1    ; AC'= math48(x)
+   call cm48_sdcciyp_dcallee1    ; AC'= math48(x)
 
    jp am48_dfix16u

@@ -1,13 +1,13 @@
 
-; float __uint2fs_fastcall(unsigned int ui)
+; float __uint2fs_callee(unsigned int ui)
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sdcciyp_uint2ds_fastcall
+PUBLIC cm48_sdcciyp_uint2ds_callee
 
 EXTERN am48_double16u, cm48_sdcciyp_m482d
 
-cm48_sdcciyp_uint2ds_fastcall:
+cm48_sdcciyp_uint2ds_callee:
 
    ; unsigned int to double
    ;

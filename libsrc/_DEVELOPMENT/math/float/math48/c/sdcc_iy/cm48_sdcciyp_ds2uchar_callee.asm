@@ -1,13 +1,13 @@
 
-; unsigned char __fs2uchar_fastcall(float f)
+; unsigned char __fs2uchar_callee(float f)
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sdcciyp_ds2uchar_fastcall
+PUBLIC cm48_sdcciyp_ds2uchar_callee
 
 EXTERN cm48_sdcciyp_dcallee1, am48_dfix8u
 
-cm48_sdcciyp_ds2uchar_fastcall:
+cm48_sdcciyp_ds2uchar_callee:
 
    ; double to unsigned char
    ;

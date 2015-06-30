@@ -1,13 +1,13 @@
 
-; float __sint2fs_fastcall(signed int si)
+; float __sint2fs_callee(signed int si)
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sdcciyp_sint2ds_fastcall
+PUBLIC cm48_sdcciyp_sint2ds_callee
 
 EXTERN am48_double16, cm48_sdcciyp_m482d
 
-cm48_sdcciyp_sint2ds_fastcall:
+cm48_sdcciyp_sint2ds_callee:
 
    ; signed int to double
    ;

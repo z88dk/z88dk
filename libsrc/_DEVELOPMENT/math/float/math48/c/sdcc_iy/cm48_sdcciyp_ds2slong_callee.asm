@@ -1,5 +1,5 @@
 
-; signed long __fs2slong_fastcall(float f)
+; signed long __fs2slong_callee(float f)
 
 SECTION code_fp_math48
 
@@ -7,7 +7,7 @@ PUBLIC cm48_sdcciyp_ds2slong
 
 EXTERN cm48_sdcciyp_dcallee1, am48_dfix32
 
-cm48_sdcciyp_ds2slong_fastcall:
+cm48_sdcciyp_ds2slong_callee:
 
    ; double to signed long
    ;
