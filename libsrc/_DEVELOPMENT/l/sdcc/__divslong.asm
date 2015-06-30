@@ -30,13 +30,13 @@ __divslong:
    push hl
    push af
 
-IF (__CLIB_OPT_IMATH <= 50) | __SDCC_IY
+IF (__CLIB_OPT_IMATH <= 50) || (__SDCC_IY)
 
    jp l_divs_32_32x32
 
 ENDIF
 
-IF (__CLIB_OPT_IMATH > 50) & __SDCC_IX
+IF (__CLIB_OPT_IMATH > 50) && (__SDCC_IX)
 
    push ix
    

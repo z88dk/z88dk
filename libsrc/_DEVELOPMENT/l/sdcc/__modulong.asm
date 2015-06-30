@@ -30,7 +30,7 @@ __modulong:
    push hl
    push af
 
-IF (__CLIB_OPT_IMATH <= 50) | __SDCC_IY
+IF (__CLIB_OPT_IMATH <= 50) || (__SDCC_IY)
 
    call l_divu_32_32x32
 
@@ -39,7 +39,7 @@ IF (__CLIB_OPT_IMATH <= 50) | __SDCC_IY
 
 ENDIF
 
-IF (__CLIB_OPT_IMATH > 50) & __SDCC_IX
+IF (__CLIB_OPT_IMATH > 50) && (__SDCC_IX)
 
    push ix
    

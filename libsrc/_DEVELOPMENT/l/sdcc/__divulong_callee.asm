@@ -3,11 +3,11 @@ INCLUDE "clib_cfg.asm"
 
 SECTION code_l_sdcc
 
-PUBLIC __divulong
+PUBLIC __divulong_callee
 
 EXTERN l_divu_32_32x32
 
-__divulong:
+__divulong_callee:
 
    ; unsigned 32-bit division
    ;
@@ -23,11 +23,6 @@ __divulong:
    exx
    pop hl
    pop de                      ; dehl  = divisor
-   
-   push de
-   push hl
-   push de
-   push hl
    push af
 
 IF (__CLIB_OPT_IMATH <= 50) || (__SDCC_IY)

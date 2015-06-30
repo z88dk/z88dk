@@ -3,9 +3,9 @@ INCLUDE "clib_cfg.asm"
 
 SECTION code_l_sdcc
 
-PUBLIC __mulschar
+PUBLIC __mulschar_callee
 
-__mulschar:
+__mulschar_callee:
 
    ; 8-bit signed multiply
    ;
@@ -13,12 +13,11 @@ __mulschar:
    ;
    ; exit  : hl = 16-bit product
    
-   ld hl,3
-   add hl,sp
-   
-   ld e,(hl)
-   dec hl
-   ld l,(hl)
+   pop af
+   pop hl
+   push af
+
+   ld e,h
    
 IF __CLIB_OPT_IMATH <= 50
 

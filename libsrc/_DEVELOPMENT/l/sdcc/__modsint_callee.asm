@@ -1,25 +1,25 @@
 
 SECTION code_l_sdcc
 
-PUBLIC __divuint
+PUBLIC __modsint_callee
 
-EXTERN l_divu_16_16x16
+EXTERN l_divs_16_16x16
 
-__divuint:
+__modsint_callee:
 
-   ; unsigned 16-bit division
+   ; signed 16-bit mode
    ;
    ; enter : stack = divisor, dividend, ret
    ;
-   ; exit  : hl = quotient
-   ;         de = remainder
+   ; exit  : hl = remainder
+   ;         de = quotient
    
    pop af
    pop hl                      ; hl = dividend
    pop de                      ; de = divisor
-   
-   push de
-   push hl
    push af
    
-   jp l_divu_16_16x16
+   call l_divs_16_16x16
+
+   ex de,hl
+   ret

@@ -3,27 +3,25 @@ INCLUDE "clib_cfg.asm"
 
 SECTION code_l_sdcc
 
-PUBLIC __mulsuchar
-PUBLIC __mulsuchar_0
+PUBLIC __mulsuchar_callee, __mulsuchar_callee_0
 
-__mulsuchar:
+__mulsuchar_callee:
 
    ; 8-bit mixed multiply
    ;
    ; enter : stack = multiplicand (signed byte), multiplicand (byte), ret
    ;
    ; exit  : hl = 16-bit product
+
+   pop af
+   pop hl
+   push af
    
-   ld hl,3
-   add hl,sp
-   
-   ld e,(hl)
-   dec hl
-   ld l,(hl)
+   ld e,h
    
    ; must promote to 16-bits
 
-__mulsuchar_0:
+__mulsuchar_callee_0:
 
    ld h,0
    

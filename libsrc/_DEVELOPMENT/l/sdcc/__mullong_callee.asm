@@ -3,11 +3,11 @@ INCLUDE "clib_cfg.asm"
 
 SECTION code_l_sdcc
 
-PUBLIC __mullong
+PUBLIC __mullong_callee
 
 EXTERN l_mulu_32_32x32
 
-__mullong:
+__mullong_callee:
 
    ; multiply two 32-bit multiplicands into a 32-bit product
    ;
@@ -22,11 +22,6 @@ __mullong:
    exx 
    pop hl
    pop de                      ; dehl = multiplicand
-   
-   push de
-   push hl
-   push de
-   push hl
    push af
    
 IF (__CLIB_OPT_IMATH <= 50) || (__SDCC_IY)

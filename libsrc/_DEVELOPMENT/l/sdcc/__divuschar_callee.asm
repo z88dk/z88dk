@@ -1,12 +1,12 @@
 
 SECTION code_l_sdcc
 
-PUBLIC __divuschar
-PUBLIC __divuschar_0
+PUBLIC __divuschar_callee
+PUBLIC __divuschar_callee_0
 
 EXTERN l_divs_16_16x16
 
-__divuschar:
+__divuschar_callee:
 
    ; mixed 8-bit division
    ;
@@ -18,18 +18,20 @@ __divuschar:
    ; note: the fast integer math library has a fast 8x8 divide but it
    ;       is unknown at this time whether sdcc expects 16-bit results     
 
-   ld hl,3
+   pop af
+   pop hl
+   push af
 
-__divuschar_0:
+__divuschar_callee_0:
 
-   ld d,h                      ; d = 0
-   add hl,sp
+   ld e,h
    
-   ld e,(hl)                   ; de = signed divisor (+ve)
-   dec hl
-   ld l,(hl)                   ; l = signed dividend
+   ; e = divisor
+   ; l = dividend
    
    ; must promote to 16-bits
+
+   ld d,0
    
    ld a,l
    add a,a

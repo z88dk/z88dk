@@ -1,12 +1,12 @@
 
 SECTION code_l_sdcc
 
-PUBLIC __divschar
-PUBLIC __divschar_0, __divschar_1
+PUBLIC __divschar_callee
+PUBLIC __divschar_callee_0, __divschar_callee_1
 
 EXTERN l_divs_16_16x16
 
-__divschar:
+__divschar_callee:
 
    ; signed 8-bit division
    ;
@@ -18,22 +18,23 @@ __divschar:
    ; note: the fast integer math library has a fast 8x8 divide but it
    ;       is unknown at this time whether sdcc expects 16-bit results     
    
-   ld hl,3
+   pop af
+   pop hl
+   push af
 
-__divschar_0:
+__divschar_callee_0:
 
-   add hl,sp
+   ld e,h
    
-   ld e,(hl)                   ; e = divisor
-   dec hl
-   ld l,(hl)                   ; l = dividend
-
+   ; e = divisor
+   ; l = dividend
+   
    ld a,l
    add a,a
    sbc a,a
    ld h,a                      ; hl = dividend
 
-__divschar_1:
+__divschar_callee_1:
 
    ld a,e
    add a,a

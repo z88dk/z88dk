@@ -3,18 +3,18 @@ INCLUDE "clib_cfg.asm"
 
 SECTION code_l_sdcc
 
-PUBLIC __divulong
+PUBLIC __modslong_callee
 
-EXTERN l_divu_32_32x32
+EXTERN l_divs_32_32x32
 
-__divulong:
+__modslong_callee:
 
-   ; unsigned 32-bit division
+   ; signed 32-bit mod
    ;
    ; enter : stack = divisor (32-bit), dividend (32-bit), ret
    ;
-   ; exit  : dehl = quotient
-   ;         dehl'= remainder
+   ; exit  : dehl = remainder
+   ;         dehl'= quotient
    
    pop af
    exx
@@ -23,16 +23,14 @@ __divulong:
    exx
    pop hl
    pop de                      ; dehl  = divisor
-   
-   push de
-   push hl
-   push de
-   push hl
    push af
 
 IF (__CLIB_OPT_IMATH <= 50) || (__SDCC_IY)
 
-   jp l_divu_32_32x32
+   call l_divs_32_32x32
+
+   exx
+   ret
 
 ENDIF
 
@@ -40,9 +38,11 @@ IF (__CLIB_OPT_IMATH > 50) && (__SDCC_IX)
 
    push ix
    
-   call l_divu_32_32x32
+   call l_divs_32_32x32
    
    pop ix
+   
+   exx
    ret
 
 ENDIF
