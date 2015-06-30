@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.93 2015-06-30 07:56:08 aralbrec Exp $
+ *      $Id: zcc.c,v 1.94 2015-06-30 16:08:59 aralbrec Exp $
  */
 
 
@@ -211,6 +211,7 @@ static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
 static char  *c_sdccrules1 = NULL;
 static char  *c_sdccopt1 = NULL;
+static char  *c_sdccopt3 = NULL;
 static char  *c_crt0 = NULL;
 static char  *c_linkopts = NULL;
 static char  *c_asmopts = NULL;
@@ -280,7 +281,8 @@ static arg_t  config[] = {
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
     {"SDCCRULES1", 0, SetStringConfig, &c_sdccrules1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_rules.1"},
     {"SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1"},
-    {"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
+    {"SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3"},
+	{"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
 
     {"ALTMATHLIB", 0, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library"},
     {"ALTMATHFLG", 0, SetStringConfig, &c_altmathflags, NULL, "Additional options for non-generic maths"},
@@ -686,8 +688,20 @@ int main(int argc, char **argv)
 			{
                if ( compiler_type == CC_SDCC )
                {
-                  if (process(".asm", ".opt", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
-                    exit(1);
+                  switch (peepholeopt)
+				  {
+				  case 1:
+				  case 2:
+                     if (process(".asm", ".opt", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+                       exit(1);
+                     break;
+				  case 3:
+                     if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+                       exit(1);
+                     if (process(".op1", ".opt", c_copt_exe, c_sdccopt3, filter, i, YES, NO))
+                       exit(1);
+                     break;
+				  }
                }
 			   else
 			   {
@@ -701,7 +715,6 @@ int main(int argc, char **argv)
                       /* Double optimization! */
                       if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES, NO))
                           exit(1);
-
                       if (process(".op1", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
                           exit(1);
                       break;
