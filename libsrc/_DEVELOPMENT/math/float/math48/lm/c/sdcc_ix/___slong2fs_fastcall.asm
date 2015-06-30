@@ -1,8 +1,0 @@
-
-SECTION code_fp_math48
-
-PUBLIC ___slong2fs_fastcall
-
-EXTERN cm48_sdccixp_slong2ds_fastcall
-
-defc ___slong2fs_fastcall = cm48_sdccixp_slong2ds_fastcall
