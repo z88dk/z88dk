@@ -23,5 +23,4 @@ cm48_sdccixp_dseq_callee:
    ; AC'= right
    ; AC = left
 
-   exx
    jp am48_deq
