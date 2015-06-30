@@ -1,0 +1,265 @@
+
+;;
+;; sdcc integer primitives made callee
+;;
+
+	call	__divschar
+	pop	af
+=
+	call	__divschar_callee
+
+	call	__divsint
+	pop	af
+	pop	af
+=
+	call	__divsint_callee
+
+	call	__divslong
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	__divslong_callee
+
+	call	__divsuchar
+	pop	af
+=
+	call	__divsuchar_callee
+
+	call	__divuchar
+	pop	af
+=
+	call	__divuchar_callee
+
+	call	__divuint
+	pop	af
+	pop	af
+=
+	call	__divuint_callee
+
+	call	__divulong
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	__divulong_callee
+
+	call	__divuschar
+	pop	af
+=
+	call	__divuschar_callee
+
+	call	__modschar
+	pop	af
+=
+	call	__modschar_callee
+
+	call	__modsint
+	pop	af
+	pop	af
+=
+	call	__modsint_callee
+
+	call	__modslong
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	__modslong_callee
+
+	call	__modsuchar
+	pop	af
+=
+	call	__modsuchar_callee
+
+	call	__moduchar
+	pop	af
+=
+	call	__moduchar_callee
+
+	call	__moduint
+	pop	af
+	pop	af
+=
+	call	__moduint_callee
+
+	call	__modulong
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	__modulong_callee
+
+	call	__moduschar
+	pop	af
+=
+	call	__moduschar_callee
+
+	call	__mulint
+	pop	af
+	pop	af
+=
+	call	__mulint_callee
+
+	call	__mullong
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	__mullong_callee
+
+	call	__mulschar
+	pop	af
+=
+	call	__mulschar_callee
+
+	call	__mulsuchar
+	pop	af
+=
+	call	__mulsuchar_callee
+
+	call	__muluschar
+	pop	af
+=
+	call	__muluschar_callee
+
+;;
+;; sdcc float primitives made callee
+;;
+
+	call	___fs2schar
+	pop	af
+	pop	af
+=
+	call	___fs2schar_callee
+
+	call	___fs2sint
+	pop	af
+	pop	af
+=
+	call	___fs2sint_callee
+
+	call	___fs2slong
+	pop	af
+	pop	af
+=
+	call	___fs2slong_callee
+
+	call	___fs2uchar
+	pop	af
+	pop	af
+=
+	call	___fs2uchar_callee
+
+	call	___fs2uint
+	pop	af
+	pop	af
+=
+	call	___fs2uint_callee
+
+	call	___fs2ulong
+	pop	af
+	pop	af
+=
+	call	___fs2ulong_callee
+
+	call	___fsadd
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fsadd_callee
+
+	call	___fsdiv
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fsdiv_callee
+
+	call	___fseq
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fseq_callee
+
+	call	___fsgt
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fsgt_callee
+
+	call	___fslt
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fslt_callee
+
+	call	___fsmul
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fsmul_callee
+
+	call	___fsneq
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fsneq_callee
+
+	call	___fssub
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fssub_callee
+
+	call	___schar2fs
+	inc	sp
+=
+	call	___schar2fs_callee
+
+	call	___sint2fs
+	pop	af
+=
+	call	___sint2fs_callee
+
+	call	___slong2fs
+	pop	af
+	pop	af
+=
+	call	___slong2fs_callee
+
+	call	___uchar2fs
+	inc	sp
+=
+	call	___uchar2fs_callee
+
+	call	___uint2fs
+	pop	af
+=
+	call	___uint2fs_callee
+
+	call	___ulong2fs
+	pop	af
+	pop	af
+=
+	call	___ulong2fs_callee
