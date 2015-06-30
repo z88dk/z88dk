@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.92 2015-03-26 15:05:06 aralbrec Exp $
+ *      $Id: zcc.c,v 1.93 2015-06-30 07:56:08 aralbrec Exp $
  */
 
 
@@ -210,6 +210,7 @@ static char  *c_coptrules1 = NULL;
 static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
 static char  *c_sdccrules1 = NULL;
+static char  *c_sdccopt1 = NULL;
 static char  *c_crt0 = NULL;
 static char  *c_linkopts = NULL;
 static char  *c_asmopts = NULL;
@@ -278,6 +279,7 @@ static arg_t  config[] = {
     {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2"},
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
     {"SDCCRULES1", 0, SetStringConfig, &c_sdccrules1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_rules.1"},
+    {"SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1"},
     {"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
 
     {"ALTMATHLIB", 0, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library"},
@@ -680,37 +682,51 @@ int main(int argc, char **argv)
                    exit(1);
             }
         case AFILE:
-            switch (peepholeopt) {
-            case 1:
-                if (process(".asm", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+            if (peepholeopt)
+			{
+               if ( compiler_type == CC_SDCC )
+               {
+                  if (process(".asm", ".opt", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                     exit(1);
-                break;
-            case 2:
-                /* Double optimization! */
-                if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES, NO))
-                    exit(1);
+               }
+			   else
+			   {
+                  switch (peepholeopt)
+                  {
+                  case 1:
+                      if (process(".asm", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+                          exit(1);
+                      break;
+                  case 2:
+                      /* Double optimization! */
+                      if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES, NO))
+                          exit(1);
 
-                if (process(".op1", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
-                    exit(1);
-                break;
-            case 3:
-                /*
-                 * Triple opt (last level adds routines but
-                 * can save space..)
-                 */
-                if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES, NO))
-                    exit(1);
-                if (process(".op1", ".op2",  c_copt_exe, c_coptrules1, filter, i, YES, NO))
-                    exit(1);
-                if (process(".op2", ".opt",  c_copt_exe, c_coptrules3, filter, i, YES, NO))
-                    exit(1);
-                break;
-            default:
+                      if (process(".op1", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+                          exit(1);
+                      break;
+                  default:
+                      /*
+                       * Triple opt (last level adds routines but
+                       * can save space..)
+                       */
+                      if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES, NO))
+                          exit(1);
+                      if (process(".op1", ".op2",  c_copt_exe, c_coptrules1, filter, i, YES, NO))
+                          exit(1);
+                      if (process(".op2", ".opt",  c_copt_exe, c_coptrules3, filter, i, YES, NO))
+                          exit(1);
+                      break;
+				  }
+               }
+			}
+			else
+			{
                 BuildAsmLine(asmarg, sizeof(asmarg), "-easm");
                 if (!assembleonly && !lateassemble)
                     if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                         exit(1);
-            }
+			}
         case OFILE:
             BuildAsmLine(asmarg, sizeof(asmarg), "-eopt");
             if (!assembleonly && !lateassemble)
