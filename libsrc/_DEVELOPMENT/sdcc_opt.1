@@ -1,265 +1,342 @@
+	.module %0
+=
+	EXTERN __divschar
+	EXTERN __divschar_callee
+	EXTERN __divsint
+	EXTERN __divsint_callee
+	EXTERN __divslong
+	EXTERN __divslong_callee
+	EXTERN __divslonglong
+	EXTERN __divslonglong_callee
+	EXTERN __divsuchar
+	EXTERN __divsuchar_callee
+	EXTERN __divuchar
+	EXTERN __divuchar_callee
+	EXTERN __divuint
+	EXTERN __divuint_callee
+	EXTERN __divulong
+	EXTERN __divulong_callee
+	EXTERN __divulonglong
+	EXTERN __divulonglong_callee
+	EXTERN __divuschar
+	EXTERN __divuschar_callee
+	EXTERN __modschar
+	EXTERN __modschar_callee
+	EXTERN __modsint
+	EXTERN __modsint_callee
+	EXTERN __modslong
+	EXTERN __modslong_callee
+	EXTERN __modslonglong
+	EXTERN __modslonglong_callee
+	EXTERN __modsuchar
+	EXTERN __modsuchar_callee
+	EXTERN __moduchar
+	EXTERN __moduchar_callee
+	EXTERN __moduint
+	EXTERN __moduint_callee
+	EXTERN __modulong
+	EXTERN __modulong_callee
+	EXTERN __modulonglong
+	EXTERN __modulonglong_callee
+	EXTERN __moduschar
+	EXTERN __moduschar_callee
+	EXTERN __mulint
+	EXTERN __mulint_callee
+	EXTERN __mullong
+	EXTERN __mullong_callee
+	EXTERN __mullonglong
+	EXTERN __mullonglong_callee
+	EXTERN __mulschar
+	EXTERN __mulschar_callee
+	EXTERN __mulsuchar
+	EXTERN __mulsuchar_callee
+	EXTERN __muluschar
+	EXTERN __muluschar_callee
+	EXTERN __rlslonglong
+	EXTERN __rlslonglong_callee
+	EXTERN __rlulonglong
+	EXTERN __rlulonglong_callee
+	EXTERN __rrslonglong
+	EXTERN __rrslonglong_callee
+	EXTERN __rrulonglong
+	EXTERN __rrulonglong_callee
+	EXTERN ___sdcc_call_hl
+	EXTERN ___sdcc_call_iy
+	EXTERN ___sdcc_enter_ix
+	EXTERN _banked_call
+	EXTERN _banked_ret
+	EXTERN ___fs2schar
+	EXTERN ___fs2schar_callee
+	EXTERN ___fs2sint
+	EXTERN ___fs2sint_callee
+	EXTERN ___fs2slong
+	EXTERN ___fs2slong_callee
+	EXTERN ___fs2uchar
+	EXTERN ___fs2uchar_callee
+	EXTERN ___fs2uint
+	EXTERN ___fs2uint_callee
+	EXTERN ___fs2ulong
+	EXTERN ___fs2ulong_callee
+	EXTERN ___fsadd
+	EXTERN ___fsadd_callee
+	EXTERN ___fsdiv
+	EXTERN ___fsdiv_callee
+	EXTERN ___fseq
+	EXTERN ___fseq_callee
+	EXTERN ___fsgt
+	EXTERN ___fsgt_callee
+	EXTERN ___fslt
+	EXTERN ___fslt_callee
+	EXTERN ___fsmul
+	EXTERN ___fsmul_callee
+	EXTERN ___fsneq
+	EXTERN ___fsneq_callee
+	EXTERN ___fssub
+	EXTERN ___fssub_callee
+	EXTERN ___schar2fs
+	EXTERN ___schar2fs_callee
+	EXTERN ___sint2fs
+	EXTERN ___sint2fs_callee
+	EXTERN ___slong2fs
+	EXTERN ___slong2fs_callee
+	EXTERN ___uchar2fs
+	EXTERN ___uchar2fs_callee
+	EXTERN ___uint2fs
+	EXTERN ___uint2fs_callee
+	EXTERN ___ulong2fs
+	EXTERN ___ulong2fs_callee
 
 ;;
-;; sdcc integer primitives made callee
+;; global labels
 ;;
 
-	call	__divschar
-	pop	af
+%0::
 =
-	call	__divschar_callee
-
-	call	__divsint
-	pop	af
-	pop	af
-=
-	call	__divsint_callee
-
-	call	__divslong
-	pop	af
-	pop	af
-	pop	af
-	pop	af
-=
-	call	__divslong_callee
-
-	call	__divsuchar
-	pop	af
-=
-	call	__divsuchar_callee
-
-	call	__divuchar
-	pop	af
-=
-	call	__divuchar_callee
-
-	call	__divuint
-	pop	af
-	pop	af
-=
-	call	__divuint_callee
-
-	call	__divulong
-	pop	af
-	pop	af
-	pop	af
-	pop	af
-=
-	call	__divulong_callee
-
-	call	__divuschar
-	pop	af
-=
-	call	__divuschar_callee
-
-	call	__modschar
-	pop	af
-=
-	call	__modschar_callee
-
-	call	__modsint
-	pop	af
-	pop	af
-=
-	call	__modsint_callee
-
-	call	__modslong
-	pop	af
-	pop	af
-	pop	af
-	pop	af
-=
-	call	__modslong_callee
-
-	call	__modsuchar
-	pop	af
-=
-	call	__modsuchar_callee
-
-	call	__moduchar
-	pop	af
-=
-	call	__moduchar_callee
-
-	call	__moduint
-	pop	af
-	pop	af
-=
-	call	__moduint_callee
-
-	call	__modulong
-	pop	af
-	pop	af
-	pop	af
-	pop	af
-=
-	call	__modulong_callee
-
-	call	__moduschar
-	pop	af
-=
-	call	__moduschar_callee
-
-	call	__mulint
-	pop	af
-	pop	af
-=
-	call	__mulint_callee
-
-	call	__mullong
-	pop	af
-	pop	af
-	pop	af
-	pop	af
-=
-	call	__mullong_callee
-
-	call	__mulschar
-	pop	af
-=
-	call	__mulschar_callee
-
-	call	__mulsuchar
-	pop	af
-=
-	call	__mulsuchar_callee
-
-	call	__muluschar
-	pop	af
-=
-	call	__muluschar_callee
+%0:
 
 ;;
-;; sdcc float primitives made callee
+;; labels
 ;;
 
-	call	___fs2schar
-	pop	af
-	pop	af
+%0$:
 =
-	call	___fs2schar_callee
+%0:
 
-	call	___fs2sint
-	pop	af
-	pop	af
+	%1, %0$
 =
-	call	___fs2sint_callee
+	%1, %0
 
-	call	___fs2slong
-	pop	af
-	pop	af
+	%0,%1$
 =
-	call	___fs2slong_callee
+	%0,%1
 
-	call	___fs2uchar
-	pop	af
-	pop	af
+	%0	%1$
 =
-	call	___fs2uchar_callee
+	%0	%1
 
-	call	___fs2uint
-	pop	af
-	pop	af
-=
-	call	___fs2uint_callee
+;;
+;; sections
+;;
 
-	call	___fs2ulong
-	pop	af
-	pop	af
+	.area _XSEG
 =
-	call	___fs2ulong_callee
+	SECTION IGNORE
 
-	call	___fsadd
-	pop	af
-	pop	af
-	pop	af
-	pop	af
+	.area _STACK
 =
-	call	___fsadd_callee
+	SECTION IGNORE
 
-	call	___fsdiv
-	pop	af
-	pop	af
-	pop	af
-	pop	af
+	.area _CODE_%0
 =
-	call	___fsdiv_callee
+	SECTION code_compiler_bank_%0
 
-	call	___fseq
-	pop	af
-	pop	af
-	pop	af
-	pop	af
+	.area _CODE
 =
-	call	___fseq_callee
+	SECTION code_compiler
 
-	call	___fsgt
-	pop	af
-	pop	af
-	pop	af
-	pop	af
+	.area _DATA
 =
-	call	___fsgt_callee
+	SECTION bss_compiler
 
-	call	___fslt
-	pop	af
-	pop	af
-	pop	af
-	pop	af
+	.area _RSEG (ABS)
 =
-	call	___fslt_callee
+	SECTION IGNORE
 
-	call	___fsmul
-	pop	af
-	pop	af
-	pop	af
-	pop	af
+	.area _GSINIT
 =
-	call	___fsmul_callee
+	SECTION code_crt_init
 
-	call	___fsneq
-	pop	af
-	pop	af
-	pop	af
-	pop	af
+	.area _GSFINAL
 =
-	call	___fsneq_callee
+	SECTION code_crt_exit
 
-	call	___fssub
-	pop	af
-	pop	af
-	pop	af
-	pop	af
+	.area _HOME
 =
-	call	___fssub_callee
+	SECTION IGNORE
 
-	call	___schar2fs
-	inc	sp
+	.area _CABS (ABS)
 =
-	call	___schar2fs_callee
+	SECTION IGNORE
 
-	call	___sint2fs
-	pop	af
+	.area _DABS (ABS)
 =
-	call	___sint2fs_callee
+	SECTION IGNORE
 
-	call	___slong2fs
-	pop	af
-	pop	af
+	.area _INITIALIZER
 =
-	call	___slong2fs_callee
+	SECTION data_compiler
 
-	call	___uchar2fs
-	inc	sp
+	.area _INITIALIZED
 =
-	call	___uchar2fs_callee
+	
+IF 0
+	
+; .area _INITIALIZED removed by z88dk
+	
 
-	call	___uint2fs
-	pop	af
+IF 0
 =
-	call	___uint2fs_callee
+%activate
+;--------------------------------------------------------
+; absolute external ram data
+;--------------------------------------------------------
+=
+%once
+	
+ENDIF
+	
+;--------------------------------------------------------
+; absolute external ram data
+;--------------------------------------------------------
 
-	call	___ulong2fs
-	pop	af
-	pop	af
+	.area %0
 =
-	call	___ulong2fs_callee
+	SECTION %0
+
+;;
+;; assembler directives
+;;
+
+	.ascii %0
+=
+	DEFM %0
+
+	.ds %0
+=
+	DEFS %0
+
+	.db %0
+=
+	DEFB %0
+
+	.byte %0
+=
+	DEFB %0
+
+	.dw %0
+=
+	DEFW %0
+
+	.globl %0
+=
+	GLOBAL %0
+
+	.org %0
+=
+	org %0
+
+;;
+;; label = PC
+;;
+
+	%0 = .
+=
+	%0:
+
+;;
+;; define constants
+;;
+
+%0	=	%1
+=
+defc %0	= %1
+
+;;
+;; asxxx syntax for LSB / MSB
+;;
+
+	%1#<(%0)
+=
+	%1#(%0 & 0xFF)
+
+	%1#>(%0)
+=
+	%1#(%0 / 256)
+
+;;
+;; zilog syntax for index registers
+;;
+
+	%0,%1 (ix)
+=
+	%0,(ix+%1)
+
+	%0, %1 (ix)
+=
+	%0,(ix+%1)
+
+	%2	%1 (ix),%0
+=
+	%2	(ix+%1),%0
+
+	%2	%1 (ix)
+=
+	%2	(ix+%1)
+
+	%0,%1 (iy)
+=
+	%0,(iy+%1)
+
+	%0, %1 (iy)
+=
+	%0,(iy+%1)
+
+	%2	%1 (iy),%0
+=
+	%2	(iy+%1),%0
+
+	%2	%1 (iy)
+=
+	%2	(iy+%1)
+
+;;
+;; _INITIALIZER variables made into actual variable names
+;;
+
+__xinit_%0
+=
+%0
+
+;;
+;; asxxx immediate operator #
+;;
+
+	%"[^\"'#;]*"0#%1
+=
+	%0+%1
+
+;;
+;; beautify
+;;
+
+%"[^\"';+]*"0+-%1
+=
+%0-%1
+
+%"[^\"';,]*"0,%"[ ]*"+%"[^(]"1%2
+=
+%0,%1%2
+
+%"[^\"';(]*"0(+%1
+=
+%0(%1
