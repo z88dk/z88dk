@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.94 2015-06-30 16:08:59 aralbrec Exp $
+ *      $Id: zcc.c,v 1.95 2015-07-01 01:10:16 aralbrec Exp $
  */
 
 
@@ -209,8 +209,8 @@ static char  *c_incpath = NULL;
 static char  *c_coptrules1 = NULL;
 static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
-static char  *c_sdccrules1 = NULL;
 static char  *c_sdccopt1 = NULL;
+static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
 static char  *c_crt0 = NULL;
 static char  *c_linkopts = NULL;
@@ -279,8 +279,8 @@ static arg_t  config[] = {
     {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "DESTDIR/lib/z80rules.1" },
     {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2"},
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
-    {"SDCCRULES1", 0, SetStringConfig, &c_sdccrules1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_rules.1"},
     {"SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1"},
+    {"SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2"},
     {"SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3"},
 	{"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
 
@@ -674,15 +674,8 @@ int main(int argc, char **argv)
                 exit(0);
             }
         case PFILE:
-            if ( compiler_type == CC_SDCC) {
-               if (process(".i", ".asm2", c_compiler, comparg, compiler_style, i, YES, NO))
-                  exit(1);
-               if (process(".asm2", ".asm", c_copt_exe, c_sdccrules1, filter, i, YES, NO))
-                  exit(1);
-            } else {
-               if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES, NO))
-                   exit(1);
-            }
+            if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES, NO))
+                exit(1);
         case AFILE:
             if (peepholeopt)
 			{
@@ -691,14 +684,21 @@ int main(int argc, char **argv)
                   switch (peepholeopt)
 				  {
 				  case 1:
-				  case 2:
                      if (process(".asm", ".opt", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+                        exit(1);
+                     break;
+				  case 2:
+                     if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+                        exit(1);
+                     if (process(".op1", ".opt", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
                        exit(1);
                      break;
-				  case 3:
+				  default:
                      if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                        exit(1);
-                     if (process(".op1", ".opt", c_copt_exe, c_sdccopt3, filter, i, YES, NO))
+                     if (process(".op1", ".op2", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
+                       exit(1);
+                     if (process(".op2", ".opt", c_copt_exe, c_sdccopt3, filter, i, YES, NO))
                        exit(1);
                      break;
 				  }
