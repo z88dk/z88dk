@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.95 2015-07-01 01:10:16 aralbrec Exp $
+ *      $Id: zcc.c,v 1.96 2015-07-02 02:16:40 aralbrec Exp $
  */
 
 
@@ -109,6 +109,7 @@ static int             assembleonly = 0;
 static int             compileonly = 0;
 static int             verbose = 0;
 static int             peepholeopt = 0;
+static int             sdccpeepopt = 0;
 static int             symbolson = 0;
 static int             mapon = 0;
 static int             globaldefon = 0;
@@ -212,6 +213,10 @@ static char  *c_coptrules3 = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
+static char  *c_sdccpeeph0 = NULL;
+static char  *c_sdccpeeph1 = NULL;
+static char  *c_sdccpeeph2 = NULL;
+static char  *c_sdccpeeph3 = NULL;
 static char  *c_crt0 = NULL;
 static char  *c_linkopts = NULL;
 static char  *c_asmopts = NULL;
@@ -282,6 +287,10 @@ static arg_t  config[] = {
     {"SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1"},
     {"SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2"},
     {"SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3"},
+    {"SDCCPEEP0", 0, SetStringConfig, &c_sdccpeeph0, NULL, "", " --no-peep"},
+    {"SDCCPEEP1", 0, SetStringConfig, &c_sdccpeeph1, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.1"},
+    {"SDCCPEEP2", 0, SetStringConfig, &c_sdccpeeph2, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.2"},
+    {"SDCCPEEP3", 0, SetStringConfig, &c_sdccpeeph3, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.3"},
 	{"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
 
     {"ALTMATHLIB", 0, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library"},
@@ -334,7 +343,8 @@ static arg_t     myargs[] = {
     {"I", AF_MORE, AddPreProc, NULL, NULL, "Add an include directory for the preprocessor"},
     {"L", AF_MORE, AddLinkOption, NULL, NULL, "Add a library search path"},
     {"l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library"},
-    {"O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting"},
+    {"O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting for copt"},
+    {"SO", AF_MORE, SetNumber, &sdccpeepopt, NULL, "Set the peephole optimiser setting for sdcc-peephole"},
     {"h", 0, print_help_config, NULL, NULL, "Display this text"},
     {"v", AF_BOOL_TRUE, SetBoolean, &verbose, NULL, "Output all commands that are run (-vn suppresses)"},
     {"bn", AF_MORE, SetString, &c_linker_output_file, NULL, "Set the output file for the linker stage"},
@@ -659,7 +669,7 @@ int main(int argc, char **argv)
     for (i = 0; i < nfiles; i++) {
         switch (get_filetype_by_suffix(filelist[i])) {
         case CFILE:
-            if ( compiler_type == CC_SDCC) {
+            if ( compiler_type == CC_SDCC ) {
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, "", filter, i, YES, NO))
@@ -674,8 +684,26 @@ int main(int argc, char **argv)
                 exit(0);
             }
         case PFILE:
+            if ( compiler_type == CC_SDCC )
+			{
+               switch (sdccpeepopt)
+               {
+               case 0:
+                  add_option_to_compiler(c_sdccpeeph0);
+                  break;
+               case 1:
+                  add_option_to_compiler(c_sdccpeeph1);
+                  break;
+               case 2:
+                  add_option_to_compiler(c_sdccpeeph2);
+                  break;
+               default:
+                  add_option_to_compiler(c_sdccpeeph3);
+                  break;
+               }
+            }
             if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES, NO))
-                exit(1);
+               exit(1);
         case AFILE:
             if (peepholeopt)
 			{
