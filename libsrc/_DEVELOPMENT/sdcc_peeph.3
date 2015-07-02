@@ -1992,6 +1992,8 @@ replace restart {
 	inc	hl
 	ld	d,(hl)
 } by {
+	ld	(#%1),hl
+	ld	(#%1 + 2),de
 	; peephole z88dk-bugfix-1
 }
 
