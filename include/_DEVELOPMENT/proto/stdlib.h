@@ -38,11 +38,11 @@ typedef unsigned char wchar_t;
 
    #ifdef __SDCC
    
-      typedef float double_t;
+   typedef float double_t;
    
    #else
    
-      typedef double double_t;
+   typedef double double_t;
    
    #endif
    
@@ -99,7 +99,7 @@ __OPROTO(void,,abort,void)
 __DPROTO(int,,abs,int j)
 __DPROTO(int,,at_quick_exit,void *func)
 __DPROTO(int,,atexit,void *func)
-__DPROTO(float_t,,atof,char *nptr)
+__DPROTO(double_t,,atof,char *nptr)
 __DPROTO(int,,atoi,char *buf)
 __DPROTO(long,,atol,char *buf)
 __DPROTO(void,,bsearch,void *key,void *base,size_t nmemb,size_t size,void *compar)
