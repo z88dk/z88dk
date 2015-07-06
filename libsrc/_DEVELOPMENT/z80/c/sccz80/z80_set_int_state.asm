@@ -5,6 +5,6 @@ SECTION code_z80
 
 PUBLIC z80_set_int_state
 
-z80_set_int_state:
+EXTERN asm_z80_set_int_state
 
-   INCLUDE "z80/z80/asm_z80_set_int_state.asm"
+defc z80_set_int_state = asm_z80_set_int_state

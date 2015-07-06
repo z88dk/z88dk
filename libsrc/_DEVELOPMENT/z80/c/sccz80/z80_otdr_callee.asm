@@ -5,10 +5,12 @@ SECTION code_z80
 
 PUBLIC z80_otdr_callee
 
+EXTERN asm_z80_otdr
+
 z80_otdr_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "z80/z80/asm_z80_otdr.asm"
+   jp asm_z80_otdr

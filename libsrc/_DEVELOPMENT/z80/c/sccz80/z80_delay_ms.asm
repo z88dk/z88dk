@@ -5,6 +5,6 @@ SECTION code_z80
 
 PUBLIC z80_delay_ms
 
-z80_delay_ms:
+EXTERN asm_z80_delay_ms
 
-   INCLUDE "z80/z80/asm_z80_delay_ms.asm"
+defc z80_delay_ms = asm_z80_delay_ms

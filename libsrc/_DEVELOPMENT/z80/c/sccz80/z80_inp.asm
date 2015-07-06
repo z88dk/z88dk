@@ -5,6 +5,6 @@ SECTION code_z80
 
 PUBLIC z80_inp
 
-z80_inp:
+EXTERN asm_z80_inp
 
-   INCLUDE "z80/z80/asm_z80_inp.asm"
+defc z80_inp = asm_z80_inp

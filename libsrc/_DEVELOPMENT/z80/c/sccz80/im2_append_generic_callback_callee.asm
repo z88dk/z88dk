@@ -5,10 +5,12 @@ SECTION code_z80
 
 PUBLIC im2_append_generic_callback_callee
 
+EXTERN asm_im2_append_generic_callback
+
 im2_append_generic_callback_callee:
 
    pop hl
    pop de
    ex (sp),hl
    
-   INCLUDE "z80/z80/asm_im2_append_generic_callback.asm"
+   jp asm_im2_append_generic_callback

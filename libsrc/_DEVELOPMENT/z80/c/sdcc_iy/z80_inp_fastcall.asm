@@ -5,6 +5,6 @@ SECTION code_z80
 
 PUBLIC _z80_inp_fastcall
 
-_z80_inp_fastcall:
-   
-   INCLUDE "z80/z80/asm_z80_inp.asm"
+EXTERN asm_z80_inp
+
+defc _z80_inp_fastcall = asm_z80_inp

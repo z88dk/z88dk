@@ -5,6 +5,6 @@ SECTION code_z80
 
 PUBLIC _z80_set_int_state_fastcall
 
-_z80_set_int_state_fastcall:
+EXTERN asm_z80_set_int_state
 
-   INCLUDE "z80/z80/asm_z80_set_int_state.asm"
+defc _z80_set_int_state_fastcall = asm_z80_set_int_state

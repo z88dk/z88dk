@@ -5,6 +5,8 @@ SECTION code_z80
 
 PUBLIC im2_create_generic_isr_8080_callee, l0_im2_create_generic_isr_8080_callee
 
+EXTERN asm_im2_create_generic_isr_8080
+
 im2_create_generic_isr_8080_callee:
 
    pop hl
@@ -15,4 +17,4 @@ l0_im2_create_generic_isr_8080_callee:
 
    ld a,l
    
-   INCLUDE "z80/z80/asm_im2_create_generic_isr_8080.asm"
+   jp asm_im2_create_generic_isr_8080

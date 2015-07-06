@@ -5,6 +5,6 @@ SECTION code_z80
 
 PUBLIC _z80_delay_tstate_fastcall
 
-_z80_delay_tstate_fastcall:
+EXTERN asm_z80_delay_tstate
 
-   INCLUDE "z80/z80/asm_z80_delay_tstate.asm"
+defc _z80_delay_tstate_fastcall = asm_z80_delay_tstate
