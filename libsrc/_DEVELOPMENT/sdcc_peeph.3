@@ -3436,6 +3436,17 @@ replace restart {
 } if notUsed('a'), notUsed('de'), notUsed('hl')
 //, notUsed('iy')
 
+replace restart {
+	ld	hl,%1 + %2
+	dec	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+} by {
+	ld	de,(%1 + %2 - 1)
+	; peephole z88dk-83
+} if notUsed('hl')
+
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
