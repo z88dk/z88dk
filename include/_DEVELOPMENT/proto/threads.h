@@ -24,7 +24,7 @@ typedef uint16_t       once_flag;
 
 // mutex
 
-__DPROTO(void,,call_once,once_flag *flag,void (*func)(void))
+__DPROTO(void,,call_once,once_flag *flag,void *func)
 __DPROTO(void..mtx_destroy,mtx_t *m)
 __DPROTO(int,,mtx_init,mtx_t *m,int type)
 __DPROTO(int,,mtx_lock,mtx_t *m)

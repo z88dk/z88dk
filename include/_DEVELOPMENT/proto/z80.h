@@ -6,12 +6,12 @@ include(__link__.m4)
 #include <stdint.h>
 
 __DPROTO(void,,im2_init,void *im2_table_address)
-__DPROTO(void,*,im2_install_isr,uint16_t vector,void (*isr)(void))
+__DPROTO(void,*,im2_install_isr,uint16_t vector,void *isr)
 __DPROTO(void,*,im2_create_generic_isr,uint16_t num_callbacks,void *address)
 __DPROTO(void,*,im2_create_generic_isr_8080,uint16_t num_callbacks,void *address)
-__DPROTO(void,,im2_append_generic_callback,uint16_t vector,void (*callback)(void))
-__DPROTO(void,,im2_prepend_generic_callback,uint16_t vector,void (*callback)(void))
-__DPROTO(int,,im2_remove_generic_callback,uint16_t vector,void (*callback)(void))
+__DPROTO(void,,im2_append_generic_callback,uint16_t vector,void *callback)
+__DPROTO(void,,im2_prepend_generic_callback,uint16_t vector,void *callback)
+__DPROTO(int,,im2_remove_generic_callback,uint16_t vector,void *callback)
 
 __DPROTO(void,,z80_delay_ms,uint16_t ms)
 __DPROTO(void,,z80_delay_tstate,uint16_t tstates)
