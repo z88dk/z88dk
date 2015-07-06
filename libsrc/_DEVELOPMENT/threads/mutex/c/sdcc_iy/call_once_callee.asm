@@ -5,6 +5,8 @@ SECTION code_threads_mutex
 
 PUBLIC _call_once_callee, l0_call_once_callee
 
+EXTERN asm_call_once
+
 _call_once_callee:
 
    pop af
@@ -20,5 +22,3 @@ l0_call_once_callee:
    
    pop iy
    ret
-   
-   INCLUDE "threads/mutex/z80/asm_call_once.asm"

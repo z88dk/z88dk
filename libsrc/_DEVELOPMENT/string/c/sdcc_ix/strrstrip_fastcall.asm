@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC _strrstrip_fastcall
 
-_strrstrip_fastcall:
+EXTERN asm_strrstrip
 
-   INCLUDE "string/z80/asm_strrstrip.asm"
+defc _strrstrip_fastcall = asm_strrstrip

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _putchar_unlocked_fastcall
 
+EXTERN asm_putchar_unlocked
+
 _putchar_unlocked_fastcall:
 
    push ix
@@ -13,5 +15,3 @@ _putchar_unlocked_fastcall:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_putchar_unlocked.asm"

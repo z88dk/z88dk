@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _getline_unlocked_callee
 
+EXTERN asm_getline_unlocked
+
 _getline_unlocked_callee:
 
    pop af
@@ -13,4 +15,4 @@ _getline_unlocked_callee:
    pop ix
    push af
    
-   INCLUDE "stdio/z80/asm_getline_unlocked.asm"
+   jp asm_getline_unlocked

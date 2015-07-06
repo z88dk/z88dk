@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC strupr
 
-strupr:
+EXTERN asm_strupr
 
-   INCLUDE "string/z80/asm_strupr.asm"
+defc strupr = asm_strupr

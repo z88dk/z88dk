@@ -23,7 +23,7 @@ _fsetpos:
    push hl
    push af
    
-   INCLUDE "stdio/z80/asm_fsetpos.asm"
+   jp asm_fsetpos
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

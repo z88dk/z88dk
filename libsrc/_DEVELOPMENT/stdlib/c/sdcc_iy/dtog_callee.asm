@@ -5,7 +5,7 @@ SECTION code_stdlib
 
 PUBLIC _dtog_callee
 
-EXTERN dcallee1
+EXTERN dcallee1, asm_dtog
 
 _dtog_callee:
 
@@ -17,4 +17,4 @@ _dtog_callee:
    pop bc
    push af
    
-   INCLUDE "stdlib/z80/asm_dtog.asm"
+   jp asm_dtog

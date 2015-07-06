@@ -8,5 +8,3 @@ PUBLIC _bcmp_callee
 EXTERN _memcmp_callee
 
 defc _bcmp_callee = _memcmp_callee
-
-INCLUDE "string/z80/asm_bcmp.asm"

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _printf_unlocked
 
+EXTERN asm_printf_unlocked
+
 _printf_unlocked:
 
    push ix
@@ -13,5 +15,3 @@ _printf_unlocked:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_printf_unlocked.asm"

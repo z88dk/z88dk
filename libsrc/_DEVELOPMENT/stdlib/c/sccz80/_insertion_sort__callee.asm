@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _insertion_sort__callee
 
+EXTERN asm_insertion_sort
+
 _insertion_sort__callee:
 
    pop af
@@ -14,4 +16,4 @@ _insertion_sort__callee:
    pop bc
    push af
    
-   INCLUDE "stdlib/z80/sort/asm_insertion_sort.asm"
+   jp asm_insertion_sort

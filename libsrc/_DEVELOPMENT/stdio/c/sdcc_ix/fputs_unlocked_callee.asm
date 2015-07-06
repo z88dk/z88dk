@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fputs_unlocked_callee, l0_fputs_unlocked_callee
 
+EXTERN asm_fputs_unlocked
+
 _fputs_unlocked_callee:
 
    pop af
@@ -21,5 +23,3 @@ l0_fputs_unlocked_callee:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_fputs_unlocked.asm"

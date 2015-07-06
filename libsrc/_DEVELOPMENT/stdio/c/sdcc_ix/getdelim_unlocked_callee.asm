@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _getdelim_unlocked_callee, l0_getdelim_unlocked_callee
 
+EXTERN asm_getdelim_unlocked
+
 _getdelim_unlocked_callee:
 
    pop af
@@ -26,5 +28,3 @@ l0_getdelim_unlocked_callee:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_getdelim_unlocked.asm"

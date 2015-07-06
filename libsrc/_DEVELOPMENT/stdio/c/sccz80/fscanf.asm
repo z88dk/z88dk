@@ -11,9 +11,9 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC fscanf
 
-fscanf:
+EXTERN asm_fscanf
 
-   INCLUDE "stdio/z80/asm_fscanf.asm"
+defc fscanf = asm_fscanf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -24,8 +24,6 @@ PUBLIC fscanf
 EXTERN fscanf_unlocked
 
 defc fscanf = fscanf_unlocked
-   
-INCLUDE "stdio/z80/asm_fscanf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

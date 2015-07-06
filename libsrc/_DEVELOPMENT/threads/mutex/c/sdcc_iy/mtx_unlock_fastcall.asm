@@ -5,6 +5,6 @@ SECTION code_threads_mutex
 
 PUBLIC _mtx_unlock_fastcall
 
-_mtx_unlock_fastcall:
+EXTERN asm_mtx_unlock
 
-   INCLUDE "threads/mutex/z80/asm_mtx_unlock.asm"
+defc _mtx_unlock_fastcall = asm_mtx_unlock

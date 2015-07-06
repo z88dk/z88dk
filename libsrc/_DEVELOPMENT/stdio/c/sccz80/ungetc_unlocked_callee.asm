@@ -5,10 +5,12 @@ SECTION code_stdio
 
 PUBLIC ungetc_unlocked_callee
 
+EXTERN asm_ungetc_unlocked
+
 ungetc_unlocked_callee:
 
    pop hl
    pop ix
    ex (sp),hl
    
-   INCLUDE "stdio/z80/asm_ungetc_unlocked.asm"
+   jp asm_ungetc_unlocked

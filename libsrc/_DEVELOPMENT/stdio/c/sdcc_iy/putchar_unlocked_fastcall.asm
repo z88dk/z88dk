@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC _putchar_unlocked_fastcall
 
-_putchar_unlocked_fastcall:
+EXTERN asm_putchar_unlocked
 
-   INCLUDE "stdio/z80/asm_putchar_unlocked.asm"
+defc _putchar_unlocked_fastcall = asm_putchar_unlocked

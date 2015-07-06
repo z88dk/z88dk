@@ -5,10 +5,12 @@ SECTION code_stdlib
 
 PUBLIC strtod_callee
 
+EXTERN asm_strtod
+
 strtod_callee:
 
    pop hl
    pop de
    ex (sp),hl
 
-   INCLUDE "stdlib/z80/asm_strtod.asm"
+   jp asm_strtod

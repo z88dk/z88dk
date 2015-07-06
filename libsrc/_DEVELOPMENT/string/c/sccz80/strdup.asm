@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC strdup
 
-strdup:
+EXTERN asm_strdup
 
-   INCLUDE "string/z80/asm_strdup.asm"
+defc strdup = asm_strdup

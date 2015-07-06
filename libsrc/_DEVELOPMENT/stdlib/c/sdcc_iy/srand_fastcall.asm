@@ -1,10 +1,10 @@
 
-; void srand_callee(unsigned int seed)
+; void srand_fastcall(unsigned int seed)
 
 SECTION code_stdlib
 
-PUBLIC _srand_callee
+PUBLIC _srand_fastcall
 
-_srand_callee:
+EXTERN asm_srand
 
-   INCLUDE "stdlib/z80/asm_srand.asm"
+defc _srand_fastcall = asm_srand

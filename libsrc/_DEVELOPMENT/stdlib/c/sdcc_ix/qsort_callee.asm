@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _qsort_callee, l0_qsort_callee
 
+EXTERN asm_qsort
+
 _qsort_callee:
 
    pop af
@@ -26,5 +28,3 @@ l0_qsort_callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdlib/z80/asm_qsort.asm"

@@ -9,5 +9,3 @@ PUBLIC rindex_callee
 EXTERN strrchr_callee
 
 defc rindex_callee = strrchr_callee
-
-INCLUDE "string/z80/asm_rindex.asm"

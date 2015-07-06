@@ -15,8 +15,6 @@ EXTERN _fgetc_fastcall
 
 defc getc_fastcall = _fgetc_fastcall
 
-INCLUDE "stdio/z80/asm_getc.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,8 +24,6 @@ PUBLIC _getc_fastcall
 EXTERN _getc_unlocked_fastcall
 
 defc _getc_fastcall = _getc_unlocked_fastcall
-   
-INCLUDE "stdio/z80/asm_getc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

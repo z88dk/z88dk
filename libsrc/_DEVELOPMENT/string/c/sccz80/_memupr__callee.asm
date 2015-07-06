@@ -5,10 +5,12 @@ SECTION code_string
 
 PUBLIC _memupr__callee
 
+EXTERN asm__memupr
+
 _memupr__callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "string/z80/asm__memupr.asm"
+   jp asm__memupr

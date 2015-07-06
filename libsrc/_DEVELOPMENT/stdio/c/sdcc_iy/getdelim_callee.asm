@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _getdelim_callee
 
+EXTERN asm_getdelim
+
 _getdelim_callee:
 
    pop af
@@ -20,7 +22,7 @@ _getdelim_callee:
    pop ix
    push af
 
-   INCLUDE "stdio/z80/asm_getdelim.asm"
+   jp asm_getdelim
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -31,8 +33,6 @@ PUBLIC _getdelim_callee
 EXTERN _getdelim_unlocked_callee
 
 defc _getdelim_callee = _getdelim_unlocked_callee
-   
-INCLUDE "stdio/z80/asm_getdelim.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

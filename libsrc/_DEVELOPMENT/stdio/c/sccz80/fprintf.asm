@@ -11,9 +11,9 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC fprintf
 
-fprintf:
+EXTERN asm_fprintf
 
-   INCLUDE "stdio/z80/asm_fprintf.asm"
+defc fprintf = asm_fprintf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -24,8 +24,6 @@ PUBLIC fprintf
 EXTERN fprintf_unlocked
 
 defc fprintf = fprintf_unlocked
-   
-INCLUDE "stdio/z80/asm_fprintf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

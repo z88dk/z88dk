@@ -11,12 +11,14 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC ftell
 
+EXTERN asm_ftell
+
 ftell:
 
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_ftell.asm"
+   jp asm_ftell
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -27,8 +29,6 @@ PUBLIC ftell
 EXTERN ftell_unlocked
 
 defc ftell = ftell_unlocked
-   
-INCLUDE "stdio/z80/asm_ftell.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

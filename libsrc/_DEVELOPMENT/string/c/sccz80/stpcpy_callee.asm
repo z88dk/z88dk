@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC stpcpy_callee
 
+EXTERN asm_stpcpy
+
 stpcpy_callee:
 
    pop af
@@ -12,4 +14,4 @@ stpcpy_callee:
    pop de
    push af
    
-   INCLUDE "string/z80/asm_stpcpy.asm"
+   jp asm_stpcpy

@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fputs_callee
 
+EXTERN asm_fputs
+
 _fputs_callee:
 
    pop af
@@ -18,7 +20,7 @@ _fputs_callee:
    pop ix
    push af
    
-   INCLUDE "stdio/z80/asm_fputs.asm"
+   jp asm_fputs
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -29,8 +31,6 @@ PUBLIC _fputs_callee
 EXTERN _fputs_unlocked_callee
 
 defc _fputs_callee = _fputs_unlocked_callee
-   
-INCLUDE "stdio/z80/asm_fputs.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

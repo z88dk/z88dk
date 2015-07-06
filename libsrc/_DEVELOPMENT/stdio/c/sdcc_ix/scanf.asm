@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _scanf
 
+EXTERN asm_scanf
+
 _scanf:
 
    push ix
@@ -19,8 +21,6 @@ _scanf:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_scanf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -31,8 +31,6 @@ PUBLIC _scanf
 EXTERN _scanf_unlocked
 
 defc _scanf = _scanf_unlocked
-   
-INCLUDE "stdio/z80/asm_scanf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

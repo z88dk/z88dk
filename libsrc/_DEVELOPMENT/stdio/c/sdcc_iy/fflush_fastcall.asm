@@ -11,12 +11,14 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fflush_fastcall
 
+EXTERN asm_fflush
+
 _fflush_fastcall:
 
    push hl
    pop ix
 
-   INCLUDE "stdio/z80/asm_fflush.asm"
+   jp asm_fflush
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -27,8 +29,6 @@ PUBLIC _fflush_fastcall
 EXTERN _fflush_unlocked_fastcall
 
 defc _fflush_fastcall = _fflush_unlocked_fastcall
-   
-INCLUDE "stdio/z80/asm_fflush.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

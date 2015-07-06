@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _ferror_fastcall
 
+EXTERN asm_ferror
+
 _ferror_fastcall:
    
    push hl
@@ -20,8 +22,6 @@ _ferror_fastcall:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_ferror.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -32,8 +32,6 @@ PUBLIC _ferror_fastcall
 EXTERN _ferror_unlocked_fastcall
 
 defc _ferror_fastcall = _ferror_unlocked_fastcall
-   
-INCLUDE "stdio/z80/asm_ferror.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC fsetpos_callee
 
+EXTERN asm_fsetpos
+
 fsetpos_callee:
 
    pop af
@@ -18,7 +20,7 @@ fsetpos_callee:
    pop ix
    push af
    
-   INCLUDE "stdio/z80/asm_fsetpos.asm"
+   jp asm_fsetpos
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -29,8 +31,6 @@ PUBLIC fsetpos_callee
 EXTERN fsetpos_unlocked_callee
 
 defc fsetpos_callee = fsetpos_unlocked_callee
-
-INCLUDE "stdio/z80/asm_fsetpos.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

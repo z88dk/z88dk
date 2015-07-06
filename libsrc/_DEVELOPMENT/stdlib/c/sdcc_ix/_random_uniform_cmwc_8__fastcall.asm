@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __random_uniform_cmwc_8__fastcall
 
+EXTERN asm_random_uniform_cmwc_8
+
 __random_uniform_cmwc_8__fastcall:
 
    call asm_random_uniform_cmwc_8
@@ -13,5 +15,3 @@ __random_uniform_cmwc_8__fastcall:
    ld h,0
    
    ret
-
-   INCLUDE "stdlib/z80/random/asm_random_uniform_cmwc_8.asm"

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _sprintf
 
+EXTERN asm_sprintf
+
 _sprintf:
 
    push ix
@@ -13,5 +15,3 @@ _sprintf:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_sprintf.asm"

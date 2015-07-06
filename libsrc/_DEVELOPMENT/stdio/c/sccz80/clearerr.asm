@@ -11,12 +11,14 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC clearerr
 
+EXTERN asm_clearerr
+
 clearerr:
 
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_clearerr.asm"
+   jp asm_clearerr
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -27,8 +29,6 @@ PUBLIC clearerr
 EXTERN clearerr_unlocked
 
 defc clearerr = clearerr_unlocked
-
-INCLUDE "stdio/z80/asm_clearerr.asm"
    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

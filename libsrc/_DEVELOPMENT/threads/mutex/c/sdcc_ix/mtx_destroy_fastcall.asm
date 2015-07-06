@@ -5,6 +5,6 @@ SECTION code_threads_mutex
 
 PUBLIC _mtx_destroy_fastcall
 
-_mtx_destroy_fastcall:
+EXTERN asm_mtx_destroy
 
-   INCLUDE "threads/mutex/z80/asm_mtx_destroy.asm"
+defc _mtx_destroy_fastcall = asm_mtx_destroy

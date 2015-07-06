@@ -15,8 +15,6 @@ EXTERN _fputc_callee
 
 defc _putc_callee = _fputc_callee
 
-INCLUDE "stdio/z80/asm_putc.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,8 +24,6 @@ PUBLIC _putc_callee
 EXTERN _putc_unlocked_callee
 
 defc _putc_callee = _putc_unlocked_callee
-   
-INCLUDE "stdio/z80/asm_putc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

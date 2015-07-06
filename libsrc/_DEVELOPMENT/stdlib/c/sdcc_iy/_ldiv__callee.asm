@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __ldiv__callee
 
+EXTERN asm__ldiv
+
 __ldiv__callee:
 
    pop af
@@ -17,4 +19,4 @@ __ldiv__callee:
    pop de
    push af
    
-   INCLUDE "stdlib/z80/asm__ldiv.asm"
+   jp asm__ldiv

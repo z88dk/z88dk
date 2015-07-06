@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _vsscanf_callee, l0_vsscanf_callee
 
+EXTERN asm_vsscanf
+
 _vsscanf_callee:
 
    pop af
@@ -21,5 +23,3 @@ l0_vsscanf_callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_vsscanf.asm"

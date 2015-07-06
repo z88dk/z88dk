@@ -5,9 +5,11 @@ SECTION code_stdio
 
 PUBLIC rewind_unlocked_fastcall
 
+EXTERN asm_rewind_unlocked
+
 rewind_unlocked_fastcall:
    
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_rewind_unlocked.asm"
+   jp asm_rewind_unlocked

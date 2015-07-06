@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC _getchar_unlocked
 
-_getchar_unlocked:
+EXTERN asm_getchar_unlocked
 
-   INCLUDE "stdio/z80/asm_getchar_unlocked.asm"
+defc _getchar_unlocked = asm_getchar_unlocked

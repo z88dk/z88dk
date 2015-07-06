@@ -5,6 +5,6 @@ SECTION code_threads_mutex
 
 PUBLIC mtx_trylock
 
-mtx_trylock:
+EXTERN asm_mtx_trylock
 
-   INCLUDE "threads/mutex/z80/asm_mtx_trylock.asm"
+defc mtx_trylock = asm_mtx_trylock

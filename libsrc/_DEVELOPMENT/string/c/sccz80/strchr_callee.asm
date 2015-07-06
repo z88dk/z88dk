@@ -5,10 +5,12 @@ SECTION code_string
 
 PUBLIC strchr_callee
 
+EXTERN asm_strchr
+
 strchr_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "string/z80/asm_strchr.asm"
+   jp asm_strchr

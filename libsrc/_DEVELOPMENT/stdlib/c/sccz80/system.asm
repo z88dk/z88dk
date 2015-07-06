@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC system
 
-system:
+EXTERN asm_system
 
-   INCLUDE "stdlib/z80/asm_system.asm"
+defc system = asm_system

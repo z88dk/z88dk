@@ -9,5 +9,3 @@ PUBLIC _index_callee
 EXTERN _strchr_callee
 
 defc _index_callee = _strchr_callee
-
-INCLUDE "string/z80/asm_index.asm"

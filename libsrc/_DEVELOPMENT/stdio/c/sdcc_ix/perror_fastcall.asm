@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _perror_fastcall
 
+EXTERN asm_perror
+
 _perror_fastcall:
 
    push ix
@@ -13,5 +15,3 @@ _perror_fastcall:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_perror.asm"

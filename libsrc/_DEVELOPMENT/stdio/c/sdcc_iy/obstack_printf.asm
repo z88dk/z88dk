@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC _obstack_printf
 
-_obstack_printf:
+EXTERN asm_obstack_printf
 
-   INCLUDE "stdio/z80/asm_obstack_printf.asm"
+defc _obstack_printf = asm_obstack_printf

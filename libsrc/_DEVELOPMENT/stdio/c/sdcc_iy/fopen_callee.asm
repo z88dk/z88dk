@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fopen_callee
 
+EXTERN asm_fopen
+
 _fopen_callee:
 
    pop af
@@ -12,4 +14,4 @@ _fopen_callee:
    pop de
    push af
    
-   INCLUDE "stdio/z80/asm_fopen.asm"
+   jp asm_fopen

@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _ungetc_callee
 
+EXTERN asm_ungetc
+
 _ungetc_callee:
 
    pop af
@@ -18,7 +20,7 @@ _ungetc_callee:
    pop ix
    push af
 
-   INCLUDE "stdio/z80/asm_ungetc.asm"
+   jp asm_ungetc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -29,8 +31,6 @@ PUBLIC _ungetc_callee
 EXTERN _ungetc_unlocked_callee
 
 defc _ungetc_callee = _ungetc_unlocked_callee
-   
-INCLUDE "stdio/z80/asm_ungetc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

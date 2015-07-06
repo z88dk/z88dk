@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC _at_quick_exit_fastcall
 
-_at_quick_exit_fastcall:
+EXTERN asm_at_quick_exit
 
-   INCLUDE "stdlib/z80/asm_at_quick_exit.asm"
+defc _at_quick_exit_fastcall = asm_at_quick_exit

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _ferror_unlocked_fastcall
 
+EXTERN asm_ferror_unlocked
+
 _ferror_unlocked_fastcall:
    
    push hl
@@ -14,5 +16,3 @@ _ferror_unlocked_fastcall:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_ferror_unlocked.asm"

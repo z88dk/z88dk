@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __insertion_sort__callee, l0__insertion_sort__callee
 
+EXTERN asm_insertion_sort
+
 __insertion_sort__callee:
 
    pop af
@@ -26,5 +28,3 @@ l0__insertion_sort__callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdlib/z80/sort/asm_insertion_sort.asm"

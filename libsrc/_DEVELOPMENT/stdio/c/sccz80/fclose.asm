@@ -11,12 +11,14 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC fclose
 
+EXTERN asm_fclose
+
 fclose:
 
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_fclose.asm"
+   jp asm_fclose
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -27,8 +29,6 @@ PUBLIC fclose
 EXTERN fclose_unlocked
 
 defc fclose = fclose_unlocked
-   
-INCLUDE "stdio/z80/asm_fclose.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

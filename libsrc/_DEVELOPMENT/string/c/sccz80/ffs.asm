@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC ffs
 
-ffs:
+EXTERN asm_ffs
 
-   INCLUDE "string/z80/asm_ffs.asm"
+defc ffs = asm_ffs

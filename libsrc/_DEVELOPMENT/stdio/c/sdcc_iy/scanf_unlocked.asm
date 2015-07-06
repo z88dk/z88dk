@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC _scanf_unlocked
 
-_scanf_unlocked:
+EXTERN asm_scanf_unlocked
 
-   INCLUDE "stdio/z80/asm_scanf_unlocked.asm"
+defc _scanf_unlocked = asm_scanf_unlocked

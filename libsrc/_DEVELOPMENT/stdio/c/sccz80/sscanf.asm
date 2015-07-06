@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC sscanf
 
-sscanf:
+EXTERN asm_sscanf
 
-   INCLUDE "stdio/z80/asm_sscanf.asm"
+defc sscanf = asm_sscanf

@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _random_uniform_xor_8_
 
+EXTERN asm_random_uniform_xor_8
+
 _random_uniform_xor_8_:
 
    call asm_random_uniform_xor_8
@@ -13,5 +15,3 @@ _random_uniform_xor_8_:
    ld h,0
    
    ret
-
-   INCLUDE "stdlib/z80/random/asm_random_uniform_xor_8.asm"

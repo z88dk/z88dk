@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC strerror
 
-strerror:
+EXTERN asm_strerror
 
-   INCLUDE "string/z80/asm_strerror.asm"
+defc strerror = asm_strerror

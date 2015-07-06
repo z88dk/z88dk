@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC strncasecmp_callee
 
+EXTERN asm_strncasecmp
+
 strncasecmp_callee:
 
    pop af
@@ -13,4 +15,4 @@ strncasecmp_callee:
    pop de
    push af
    
-   INCLUDE "string/z80/asm_strncasecmp.asm"
+   jp asm_strncasecmp

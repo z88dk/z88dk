@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC _atol_fastcall
 
-_atol_fastcall:
+EXTERN asm_atol
 
-   INCLUDE "stdlib/z80/asm_atol.asm"
+defc _atol_fastcall = asm_atol

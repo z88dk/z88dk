@@ -5,7 +5,7 @@ SECTION code_stdlib
 
 PUBLIC _strtod_callee, l0_strtod_callee
 
-EXTERN mlib2d
+EXTERN mlib2d, asm_strtod
 
 _strtod_callee:
 
@@ -23,5 +23,3 @@ l0_strtod_callee:
    pop ix
    
    jp mlib2d                   ; to sdcc_float
-
-   INCLUDE "stdlib/z80/asm_strtod.asm"

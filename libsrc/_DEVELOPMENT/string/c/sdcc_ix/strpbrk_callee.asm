@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strpbrk_callee
 
+EXTERN asm_strpbrk
+
 _strpbrk_callee:
 
    pop af
@@ -12,4 +14,4 @@ _strpbrk_callee:
    pop de
    push af
    
-   INCLUDE "string/z80/asm_strpbrk.asm"
+   jp asm_strpbrk

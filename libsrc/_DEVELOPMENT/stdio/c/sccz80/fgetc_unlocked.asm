@@ -5,9 +5,11 @@ SECTION code_stdio
 
 PUBLIC fgetc_unlocked
 
+EXTERN asm_fgetc_unlocked
+
 fgetc_unlocked:
 
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_fgetc_unlocked.asm"
+   jp asm_fgetc_unlocked

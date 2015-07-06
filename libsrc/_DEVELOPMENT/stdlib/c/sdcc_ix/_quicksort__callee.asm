@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __quicksort__callee, l0__quicksort__callee
 
+EXTERN asm_quicksort
+
 __quicksort__callee:
 
    pop af
@@ -26,5 +28,3 @@ l0__quicksort__callee:
    
    pop ix
    ret
-
-   INCLUDE "stdlib/z80/sort/asm_quicksort.asm"

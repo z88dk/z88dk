@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC ltoa_callee
 
+EXTERN asm_ltoa
+
 ltoa_callee:
 
    pop af
@@ -14,4 +16,4 @@ ltoa_callee:
    pop de
    push af
    
-   INCLUDE "stdlib/z80/asm_ltoa.asm"
+   jp asm_ltoa

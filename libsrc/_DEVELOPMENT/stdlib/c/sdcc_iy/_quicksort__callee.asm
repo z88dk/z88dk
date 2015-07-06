@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __quicksort__callee
 
+EXTERN asm_quicksort
+
 __quicksort__callee:
 
    pop af
@@ -14,4 +16,4 @@ __quicksort__callee:
    pop ix
    push af
 
-   INCLUDE "stdlib/z80/sort/asm_quicksort.asm"
+   jp asm_quicksort

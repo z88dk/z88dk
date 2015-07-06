@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC strtok_r_callee
 
+EXTERN asm_strtok_r
+
 strtok_r_callee:
 
    pop hl
@@ -12,4 +14,4 @@ strtok_r_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "string/z80/asm_strtok_r.asm"
+   jp asm_strtok_r

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _flockfile_fastcall
 
+EXTERN asm_flockfile
+
 _flockfile_fastcall:
 
    push hl
@@ -14,5 +16,3 @@ _flockfile_fastcall:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_flockfile.asm"

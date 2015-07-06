@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC strcasecmp_callee
 
+EXTERN asm_strcasecmp
+
 strcasecmp_callee:
 
    pop af
@@ -12,4 +14,4 @@ strcasecmp_callee:
    pop de
    push af
    
-   INCLUDE "string/z80/asm_strcasecmp.asm"
+   jp asm_strcasecmp

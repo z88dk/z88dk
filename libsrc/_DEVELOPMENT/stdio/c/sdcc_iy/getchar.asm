@@ -11,9 +11,9 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _getchar
 
-_getchar:
+EXTERN asm_getchar
 
-   INCLUDE "stdio/z80/asm_getchar.asm"
+defc _getchar = asm_getchar
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -24,8 +24,6 @@ PUBLIC _getchar
 EXTERN _getchar_unlocked
 
 defc _getchar = _getchar_unlocked
-   
-INCLUDE "stdio/z80/asm_getchar.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

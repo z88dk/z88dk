@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strxfrm_callee
 
+EXTERN asm_strxfrm
+
 _strxfrm_callee:
 
    pop af
@@ -13,4 +15,4 @@ _strxfrm_callee:
    pop bc
    push af
    
-   INCLUDE "string/z80/asm_strxfrm.asm"
+   jp asm_strxfrm

@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC utoa_callee
 
+EXTERN asm_utoa
+
 utoa_callee:
 
    pop hl
@@ -12,4 +14,4 @@ utoa_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "stdlib/z80/asm_utoa.asm"
+   jp asm_utoa

@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _gets_fastcall
 
+EXTERN asm_gets
+
 _gets_fastcall:
 
    push ix
@@ -19,8 +21,6 @@ _gets_fastcall:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_gets.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -31,8 +31,6 @@ PUBLIC _gets_fastcall
 EXTERN _gets_unlocked_fastcall
 
 defc _gets_fastcall = _gets_unlocked_fastcall
-   
-INCLUDE "stdio/z80/asm_gets.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC atol
 
-atol:
+EXTERN asm_atol
 
-   INCLUDE "stdlib/z80/asm_atol.asm"
+defc atol = asm_atol

@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fclose_fastcall
 
+EXTERN asm_fclose
+
 _fclose_fastcall:
 
    push hl
@@ -20,8 +22,6 @@ _fclose_fastcall:
    
    pop ix
    ret
-      
-   INCLUDE "stdio/z80/asm_fclose.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -32,8 +32,6 @@ PUBLIC _fclose_fastcall
 EXTERN _fclose_unlocked_fastcall
 
 defc _fclose_fastcall = _fclose_unlocked_fastcall
-   
-INCLUDE "stdio/z80/asm_fclose.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fgetc_unlocked_fastcall
 
+EXTERN asm_fgetc_unlocked
+
 _fgetc_unlocked_fastcall:
 
    push hl
@@ -14,5 +16,3 @@ _fgetc_unlocked_fastcall:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_fgetc_unlocked.asm"

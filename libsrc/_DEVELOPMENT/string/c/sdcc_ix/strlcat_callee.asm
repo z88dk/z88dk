@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _strlcat_callee
 
+EXTERN asm_strlcat
+
 _strlcat_callee:
 
    pop af
@@ -13,4 +15,4 @@ _strlcat_callee:
    pop bc
    push af
    
-   INCLUDE "string/z80/asm_strlcat.asm"
+   jp asm_strlcat

@@ -5,6 +5,6 @@ SECTION code_threads_mutex
 
 PUBLIC _spinlock_release_fastcall
 
-_spinlock_release_fastcall:
+EXTERN asm_spinlock_release
 
-   INCLUDE "threads/mutex/z80/asm_spinlock_release.asm"
+defc _spinlock_release_fastcall = asm_spinlock_release

@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC abort
 
-abort:
+EXTERN asm_abort
 
-   INCLUDE "stdlib/z80/asm_abort.asm"
+defc abort = asm_abort

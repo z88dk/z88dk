@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fread_callee, l0_fread_callee
 
+EXTERN asm_fread
+
 _fread_callee:
 
    pop af
@@ -32,8 +34,6 @@ l0_fread_callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_fread.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -44,8 +44,6 @@ PUBLIC _fread_callee
 EXTERN _fread_unlocked_callee
 
 defc _fread_callee = _fread_unlocked_callee
-   
-INCLUDE "stdio/z80/asm_fread.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC _strerror_fastcall
 
-_strerror_fastcall:
-   
-   INCLUDE "string/z80/asm_strerror.asm"
+EXTERN asm_strerror
+
+defc _strerror_fastcall = asm_strerror

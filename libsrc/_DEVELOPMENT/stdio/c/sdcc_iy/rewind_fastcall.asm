@@ -11,12 +11,14 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC rewind_fastcall
 
+EXTERN asm_rewind
+
 rewind_fastcall:
    
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_rewind.asm"
+   jp asm_rewind
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -27,8 +29,6 @@ PUBLIC rewind_fastcall
 EXTERN rewind_unlocked_fastcall
 
 defc rewind_fastcall = rewind_unlocked_fastcall
-   
-INCLUDE "stdio/z80/asm_rewind.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

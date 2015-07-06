@@ -18,3 +18,4 @@ threads/mutex/c/sdcc_ix/spinlock_release
 threads/mutex/c/sdcc_ix/spinlock_release_fastcall
 threads/mutex/c/sdcc_ix/spinlock_tryacquire
 threads/mutex/c/sdcc_ix/spinlock_tryacquire_fastcall
+@threads/mutex/mutex_asm.lst

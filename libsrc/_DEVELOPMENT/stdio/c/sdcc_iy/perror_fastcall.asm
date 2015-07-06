@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC _perror_fastcall
 
-_perror_fastcall:
-   
-   INCLUDE "stdio/z80/asm_perror.asm"
+EXTERN asm_perror
+
+defc _perror_fastcall = asm_perror

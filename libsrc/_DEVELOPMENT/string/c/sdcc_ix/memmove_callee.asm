@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _memmove_callee
 
+EXTERN asm_memmove
+
 _memmove_callee:
 
    pop af
@@ -13,4 +15,4 @@ _memmove_callee:
    pop bc
    push af
    
-   INCLUDE "string/z80/asm_memmove.asm"
+   jp asm_memmove

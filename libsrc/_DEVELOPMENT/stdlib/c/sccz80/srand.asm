@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC srand
 
-srand:
+EXTERN asm_srand
 
-   INCLUDE "stdlib/z80/asm_srand.asm"
+defc srand = asm_srand

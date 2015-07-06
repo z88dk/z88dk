@@ -11,9 +11,9 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC gets
 
-gets:
+EXTERN asm_gets
 
-   INCLUDE "stdio/z80/asm_gets.asm"
+defc gets = asm_gets
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -24,8 +24,6 @@ PUBLIC gets
 EXTERN gets_unlocked
 
 defc gets = gets_unlocked
-
-INCLUDE "stdio/z80/asm_gets.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

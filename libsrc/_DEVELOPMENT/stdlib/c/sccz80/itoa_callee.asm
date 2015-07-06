@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC itoa_callee
 
+EXTERN asm_itoa
+
 itoa_callee:
 
    pop hl
@@ -12,4 +14,4 @@ itoa_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "stdlib/z80/asm_itoa.asm"
+   jp asm_itoa

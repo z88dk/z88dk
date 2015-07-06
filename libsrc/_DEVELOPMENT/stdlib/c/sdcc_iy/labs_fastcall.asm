@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC _labs_fastcall
 
-_labs_fastcall:
-   
-   INCLUDE "stdlib/z80/asm_labs.asm"
+EXTERN asm_labs
+
+defc _labs_fastcall = asm_labs

@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC _gets_unlocked_fastcall
 
-_gets_unlocked_fastcall:
+EXTERN asm_gets_unlocked
 
-   INCLUDE "stdio/z80/asm_gets_unlocked.asm"
+defc _gets_unlocked_fastcall = asm_gets_unlocked

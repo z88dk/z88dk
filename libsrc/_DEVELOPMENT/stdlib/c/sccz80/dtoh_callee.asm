@@ -5,7 +5,7 @@ SECTION code_stdlib
 
 PUBLIC dtoh_callee
 
-EXTERN dcallee1
+EXTERN dcallee1, asm_dtoh
 
 dtoh_callee:
 
@@ -17,4 +17,4 @@ dtoh_callee:
    
    call dcallee1
    
-   INCLUDE "stdlib/z80/asm_dtoh.asm"
+   jp asm_dtoh

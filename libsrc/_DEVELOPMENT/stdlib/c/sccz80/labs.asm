@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC labs
 
-labs:
+EXTERN asm_labs
 
-   INCLUDE "stdlib/z80/asm_labs.asm"
+defc labs = asm_labs

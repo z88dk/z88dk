@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC _strlen_fastcall
 
-_strlen_fastcall:
-   
-   INCLUDE "string/z80/asm_strlen.asm"
+EXTERN asm_strlen
+
+defc _strlen_fastcall = asm_strlen

@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _clearerr_fastcall
 
+EXTERN asm_clearerr
+
 _clearerr_fastcall:
 
    push hl
@@ -21,8 +23,6 @@ _clearerr_fastcall:
    pop ix
    ret
 
-   INCLUDE "stdio/z80/asm_clearerr.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -32,8 +32,6 @@ PUBLIC _clearerr_fastcall
 EXTERN _clearerr_unlocked_fastcall
 
 defc _clearerr_fastcall = _clearerr_unlocked_fastcall
-
-INCLUDE "stdio/z80/asm_clearerr.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

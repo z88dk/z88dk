@@ -15,5 +15,3 @@ spinlock_tryacquire:
     
    dec l
    ret
-    
-   INCLUDE "threads/mutex/z80/asm_spinlock_tryacquire.asm"

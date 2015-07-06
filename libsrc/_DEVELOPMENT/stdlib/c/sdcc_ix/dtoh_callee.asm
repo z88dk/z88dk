@@ -5,7 +5,7 @@ SECTION code_stdlib
 
 PUBLIC _dtoh_callee, l0_dtoh_callee
 
-EXTERN dcallee1
+EXTERN dcallee1, asm_dtoh
 
 _dtoh_callee:
 
@@ -25,5 +25,3 @@ l0_dtoh_callee:
    
    pop ix
    ret
-
-   INCLUDE "stdlib/z80/asm_dtoh.asm"

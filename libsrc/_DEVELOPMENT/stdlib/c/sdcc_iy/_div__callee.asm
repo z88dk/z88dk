@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __div__callee
 
+EXTERN asm__div
+
 __div__callee:
 
    pop af
@@ -13,4 +15,4 @@ __div__callee:
    pop de
    push af
    
-   INCLUDE "stdlib/z80/asm__div.asm"
+   jp asm__div

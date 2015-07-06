@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC strlen
 
-strlen:
+EXTERN asm_strlen
 
-   INCLUDE "string/z80/asm_strlen.asm"
+defc strlen = asm_strlen

@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC _ffs_fastcall
 
-_ffs_fastcall:
+EXTERN asm_ffs
 
-   INCLUDE "string/z80/asm_ffs.asm"
+defc _ffs_fastcall = asm_ffs

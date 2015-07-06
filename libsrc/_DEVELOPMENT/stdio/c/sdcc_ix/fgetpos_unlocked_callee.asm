@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fgetpos_unlocked_callee, l0_fgetpos_unlocked_callee
 
+EXTERN asm_fgetpos_unlocked
+
 _fgetpos_unlocked_callee:
 
    pop hl
@@ -20,5 +22,3 @@ l0_fgetpos_unlocked_callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_fgetpos_unlocked.asm"

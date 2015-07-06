@@ -5,10 +5,12 @@ SECTION code_threads_mutex
 
 PUBLIC mtx_init_callee
 
+EXTERN asm_mtx_init
+
 mtx_init_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "threads/mutex/z80/asm_mtx_init.asm"
+   jp asm_mtx_init

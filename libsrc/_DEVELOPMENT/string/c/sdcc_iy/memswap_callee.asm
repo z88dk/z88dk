@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _memswap_callee
 
+EXTERN asm_memswap
+
 _memswap:
 
    pop af
@@ -13,4 +15,4 @@ _memswap:
    pop bc
    push af
    
-   INCLUDE "string/z80/asm_memswap.asm"
+   jp asm_memswap

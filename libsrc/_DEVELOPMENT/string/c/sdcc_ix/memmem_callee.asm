@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC _memmem_callee, l0_memmem_callee
 
+EXTERN asm_memmem
+
 _memmem_callee:
 
    pop af
@@ -28,5 +30,3 @@ l0_memmem_callee:
    
    pop ix
    ret
-
-   INCLUDE "string/z80/asm_memmem.asm"

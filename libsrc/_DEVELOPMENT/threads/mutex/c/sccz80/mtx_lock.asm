@@ -5,6 +5,6 @@ SECTION code_threads_mutex
 
 PUBLIC mtx_lock
 
-mtx_lock:
+EXTERN asm_mtx_lock
 
-   INCLUDE "threads/mutex/z80/asm_mtx_lock.asm"
+defc mtx_lock = asm_mtx_lock

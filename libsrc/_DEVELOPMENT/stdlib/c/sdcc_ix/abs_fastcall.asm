@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC _abs_fastcall
 
-_abs_fastcall:
+EXTERN asm_abs
 
-   INCLUDE "stdlib/z80/asm_abs.asm"
+defc _abs_fastcall = asm_abs

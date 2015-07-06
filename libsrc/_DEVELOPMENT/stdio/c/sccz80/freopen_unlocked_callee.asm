@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC freopen_unlocked_callee
 
+EXTERN asm_freopen_unlocked
+
 freopen_unlocked_callee:
 
    pop hl
@@ -12,4 +14,4 @@ freopen_unlocked_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "stdio/z80/asm_freopen_unlocked.asm"
+   jp asm_freopen_unlocked

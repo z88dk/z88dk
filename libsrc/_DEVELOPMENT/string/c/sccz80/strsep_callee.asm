@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC strsep_callee
 
+EXTERN asm_strsep
+
 strsep_callee:
 
    pop af
@@ -12,4 +14,4 @@ strsep_callee:
    pop bc
    push af
    
-   INCLUDE "string/z80/asm_strsep.asm"
+   jp asm_strsep

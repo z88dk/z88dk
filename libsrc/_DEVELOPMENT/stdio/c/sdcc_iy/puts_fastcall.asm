@@ -11,9 +11,9 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _puts_fastcall
 
-_puts_fastcall:
+EXTERN asm_puts
 
-   INCLUDE "stdio/z80/asm_puts.asm"
+defc _puts_fastcall = asm_puts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -24,8 +24,6 @@ PUBLIC _puts_fastcall
 EXTERN _puts_unlocked_fastcall
 
 defc _puts_fastcall = _puts_unlocked_fastcall
-   
-INCLUDE "stdio/z80/asm_puts.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

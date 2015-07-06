@@ -11,9 +11,9 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC puts
 
-puts:
+EXTERN asm_puts
 
-   INCLUDE "stdio/z80/asm_puts.asm"
+defc puts = asm_puts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -24,8 +24,6 @@ PUBLIC puts
 EXTERN puts_unlocked
 
 defc puts = puts_unlocked
-   
-INCLUDE "stdio/z80/asm_puts.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC _strrstrip_
 
-_strrstrip_:
+EXTERN asm__strrstrip
 
-   INCLUDE "string/z80/asm__strrstrip.asm"
+defc _strrstrip_ = asm__strrstrip

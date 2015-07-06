@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _printf
 
+EXTERN asm_printf
+
 _printf:
 
    push ix
@@ -19,8 +21,6 @@ _printf:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_printf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -31,8 +31,6 @@ PUBLIC _printf
 EXTERN _printf_unlocked
 
 defc _printf = _printf_unlocked
-   
-INCLUDE "stdio/z80/asm_printf.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

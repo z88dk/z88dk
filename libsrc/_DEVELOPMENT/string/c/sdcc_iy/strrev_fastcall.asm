@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC _strrev_fastcall
 
-_strrev_fastcall:
+EXTERN asm_strrev
 
-   INCLUDE "string/z80/asm_strrev.asm"
+defc _strrev_fastcall = asm_strrev

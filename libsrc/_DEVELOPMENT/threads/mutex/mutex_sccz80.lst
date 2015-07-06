@@ -11,3 +11,4 @@ threads/mutex/c/sccz80/mtx_unlock
 threads/mutex/c/sccz80/spinlock_acquire
 threads/mutex/c/sccz80/spinlock_release
 threads/mutex/c/sccz80/spinlock_tryacquire
+@threads/mutex/mutex_asm.lst

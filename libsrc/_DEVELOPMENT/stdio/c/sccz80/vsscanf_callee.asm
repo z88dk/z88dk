@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC vsscanf_callee
 
+EXTERN asm_vsscanf
+
 vsscanf_callee:
 
    pop hl
@@ -12,4 +14,4 @@ vsscanf_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "stdio/z80/asm_vsscanf.asm"
+   jp asm_vsscanf

@@ -11,12 +11,14 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC feof
 
+EXTERN asm_feof
+
 feof:
 
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_feof.asm"
+   jp asm_feof
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -27,8 +29,6 @@ PUBLIC feof
 EXTERN feof_unlocked
 
 defc feof = feof_unlocked
-
-INCLUDE "stdio/z80/asm_feof.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

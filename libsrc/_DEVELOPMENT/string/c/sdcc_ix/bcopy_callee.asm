@@ -6,6 +6,8 @@ SECTION code_string
 
 PUBLIC _bcopy_callee
 
+EXTERN asm_bcopy
+
 _bcopy_callee:
 
    pop af
@@ -15,5 +17,3 @@ _bcopy_callee:
    push af
    
    jp asm_bcopy
-
-INCLUDE "string/z80/asm_bcopy.asm"

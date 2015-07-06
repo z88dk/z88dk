@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC atof
 
-atof:
+EXTERN asm_atof
 
-   INCLUDE "stdlib/z80/asm_atof.asm"
+defc atof = asm_atof

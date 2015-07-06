@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC fseek_callee
 
+EXTERN asm_fseek
+
 fseek_callee:
 
    pop af
@@ -20,7 +22,7 @@ fseek_callee:
    pop ix
    push af
    
-   INCLUDE "stdio/z80/asm_fseek.asm"
+   jp asm_fseek
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -31,8 +33,6 @@ PUBLIC fseek_callee
 EXTERN fseek_unlocked_callee
 
 defc fseek_callee = fseek_unlocked_callee
-
-INCLUDE "stdio/z80/asm_fseek.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

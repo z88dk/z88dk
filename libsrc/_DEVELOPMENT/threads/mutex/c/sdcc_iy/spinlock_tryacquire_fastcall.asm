@@ -15,5 +15,3 @@ _spinlock_tryacquire_fastcall:
     
    dec l
    ret
-    
-   INCLUDE "threads/mutex/z80/asm_spinlock_tryacquire.asm"

@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC puts_unlocked
 
-puts_unlocked:
+EXTERN asm_puts_unlocked
 
-   INCLUDE "stdio/z80/asm_puts_unlocked.asm"
+defc puts_unlocked = asm_puts_unlocked

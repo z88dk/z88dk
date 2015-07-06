@@ -5,7 +5,7 @@ SECTION code_stdlib
 
 PUBLIC _dtoe_callee, l0_dtoe_callee
 
-EXTERN dcallee1
+EXTERN dcallee1, asm_dtoe
 
 _dtoe_callee:
 
@@ -25,5 +25,3 @@ l0_dtoe_callee:
    
    pop ix
    ret
-
-   INCLUDE "stdlib/z80/asm_dtoe.asm"

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _ungetc_unlocked_callee, l0_ungetc_unlocked_callee
 
+EXTERN asm_ungetc_unlocked
+
 _ungetc_unlocked_callee:
 
    pop af
@@ -21,5 +23,3 @@ l0_ungetc_unlocked_callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_ungetc_unlocked.asm"

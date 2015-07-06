@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC exit
 
-exit:
+EXTERN asm_exit
 
-   INCLUDE "stdlib/z80/asm_exit.asm"
+defc exit = asm_exit

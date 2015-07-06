@@ -6,6 +6,8 @@ SECTION code_string
 
 PUBLIC rawmemchr_callee, l0_rawmemchr_callee
 
+EXTERN asm_rawmemchr
+
 rawmemchr_callee:
 
    pop hl
@@ -16,4 +18,4 @@ l0_rawmemchr_callee:
 
    ld a,c
    
-   INCLUDE "string/z80/asm_rawmemchr.asm"
+   jp asm_rawmemchr

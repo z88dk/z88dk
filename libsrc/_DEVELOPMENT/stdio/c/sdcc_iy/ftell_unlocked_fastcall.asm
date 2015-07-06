@@ -5,9 +5,11 @@ SECTION code_stdio
 
 PUBLIC _ftell_unlocked_fastcall
 
+EXTERN asm_ftell_unlocked
+
 _ftell_unlocked_fastcall:
 
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_ftell_unlocked.asm"
+   jp asm_ftell_unlocked

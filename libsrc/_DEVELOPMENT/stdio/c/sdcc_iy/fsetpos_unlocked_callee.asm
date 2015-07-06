@@ -5,10 +5,12 @@ SECTION code_stdio
 
 PUBLIC _fsetpos_unlocked_callee
 
+EXTERN asm_fsetpos_unlocked
+
 _fsetpos_unlocked_callee:
 
    pop hl
    pop ix
    ex (sp),hl
    
-   INCLUDE "stdio/z80/asm_fsetpos_unlocked.asm"
+   jp asm_fsetpos_unlocked

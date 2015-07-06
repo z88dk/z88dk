@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _strtou__callee
 
+EXTERN asm__strtou
+
 _strtou__callee:
 
    pop hl
@@ -12,4 +14,4 @@ _strtou__callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "stdlib/z80/asm__strtou.asm"
+   jp asm__strtou

@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC abs
 
-abs:
+EXTERN asm_abs
 
-   INCLUDE "stdlib/z80/asm_abs.asm"
+defc abs = asm_abs

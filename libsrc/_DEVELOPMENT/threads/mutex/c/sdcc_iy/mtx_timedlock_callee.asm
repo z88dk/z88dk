@@ -5,6 +5,8 @@ SECTION code_threads_mutex
 
 PUBLIC _mtx_timedlock_callee
 
+EXTERN asm_mtx_timedlock
+
 _mtx_timedlock_callee:
 
    pop af
@@ -12,4 +14,4 @@ _mtx_timedlock_callee:
    pop bc
    push af
    
-   INCLUDE "threads/mutex/z80/asm_mtx_timedlock.asm"
+   jp asm_mtx_timedlock

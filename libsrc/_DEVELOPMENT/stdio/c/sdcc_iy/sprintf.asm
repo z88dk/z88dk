@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC _sprintf
 
-_sprintf:
+EXTERN asm_sprintf
 
-   INCLUDE "stdio/z80/asm_sprintf.asm"
+defc _sprintf = asm_sprintf

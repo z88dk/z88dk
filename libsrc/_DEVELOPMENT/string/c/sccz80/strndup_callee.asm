@@ -5,10 +5,12 @@ SECTION code_string
 
 PUBLIC strndup_callee
 
+EXTERN asm_strndup
+
 strndup_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "string/z80/asm_strndup.asm"
+   jp asm_strndup

@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __shellsort__callee, l0__shellsort__callee
 
+EXTERN asm_shellsort
+
 __shellsort__callee:
 
    pop af
@@ -26,5 +28,3 @@ l0__shellsort__callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdlib/z80/sort/asm_shellsort.asm"

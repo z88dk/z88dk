@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC _rand
 
-_rand:
+EXTERN asm_rand
 
-   INCLUDE "stdlib/z80/asm_rand.asm"
+defc _rand = asm_rand

@@ -1,9 +1,11 @@
 
 ; int fprintf_unlocked(FILE *stream, const char *format, ...)
 
+SECTION code_stdio
+
 PUBLIC _fprintf_unlocked
 
-SECTION code_stdio
+EXTERN asm_fprintf_unlocked
 
 _fprintf_unlocked:
 
@@ -13,5 +15,3 @@ _fprintf_unlocked:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_fprintf_unlocked.asm"

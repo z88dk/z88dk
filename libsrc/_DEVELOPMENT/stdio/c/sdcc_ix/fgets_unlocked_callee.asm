@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fgets_unlocked_callee, l0_fgets_unlocked_callee
 
+EXTERN asm_fgets_unlocked
+
 _fgets_unlocked_callee:
 
    pop af
@@ -23,5 +25,3 @@ l0_fgets_unlocked_callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_fgets_unlocked.asm"

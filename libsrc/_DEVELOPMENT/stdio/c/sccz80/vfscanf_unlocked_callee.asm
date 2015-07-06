@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC vfscanf_unlocked_callee
 
+EXTERN asm_vfscanf_unlocked
+
 vfscanf_unlocked_callee:
 
    pop af
@@ -13,4 +15,4 @@ vfscanf_unlocked_callee:
    pop ix
    push af
    
-   INCLUDE "stdio/z80/asm_vfscanf_unlocked.asm"
+   jp asm_vfscanf_unlocked

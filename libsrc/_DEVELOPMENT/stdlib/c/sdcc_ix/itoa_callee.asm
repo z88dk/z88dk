@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _itoa_callee, l0_itoa_callee
 
+EXTERN asm_itoa
+
 _itoa_callee:
 
    pop af
@@ -21,5 +23,3 @@ l0_itoa_callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdlib/z80/asm_itoa.asm"

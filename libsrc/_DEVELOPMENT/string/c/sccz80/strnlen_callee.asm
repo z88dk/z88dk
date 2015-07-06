@@ -5,10 +5,12 @@ SECTION code_string
 
 PUBLIC strnlen_callee
 
+EXTERN asm_strnlen
+
 strnlen_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "string/z80/asm_strnlen.asm"
+   jp asm_strnlen

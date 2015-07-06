@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _sscanf
 
+EXTERN asm_sscanf
+
 _sscanf:
 
    push ix
@@ -13,5 +15,3 @@ _sscanf:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_sscanf.asm"

@@ -5,12 +5,10 @@ SECTION code_stdlib
 
 PUBLIC _atof_fastcall
 
-EXTERN mlib2d
+EXTERN mlib2d, asm_atof
 
 _atof_fastcall:
    
    call asm_atof
    
    jp mlib2d                   ; to sdcc_float
-
-   INCLUDE "stdlib/z80/asm_atof.asm"

@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fgets_callee, l0_fgets_callee
 
+EXTERN asm_fgets
+
 _fgets_callee:
 
    pop af
@@ -29,8 +31,6 @@ l0_fgets_callee:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_fgets.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -41,8 +41,6 @@ PUBLIC _fgets_callee
 EXTERN _fgets_unlocked_callee
 
 defc _fgets_callee = _fgets_unlocked_callee
-   
-INCLUDE "stdio/z80/asm_fgets.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

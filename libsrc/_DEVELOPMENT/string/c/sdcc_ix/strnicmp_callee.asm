@@ -8,5 +8,3 @@ PUBLIC _strnicmp_callee
 EXTERN _strncasecmp_callee
 
 defc _strnicmp_callee = _strncasecmp_callee
-
-INCLUDE "string/z80/asm_strnicmp.asm"

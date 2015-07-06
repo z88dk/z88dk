@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fread_unlocked_callee
 
+EXTERN asm_fread_unlocked
+
 _fread_unlocked_callee:
 
    pop af
@@ -14,4 +16,4 @@ _fread_unlocked_callee:
    pop ix
    push af
    
-   INCLUDE "stdio/z80/asm_fread_unlocked.asm"
+   jp asm_fread_unlocked

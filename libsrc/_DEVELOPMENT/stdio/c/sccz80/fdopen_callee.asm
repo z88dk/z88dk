@@ -5,10 +5,12 @@ SECTION code_stdio
 
 PUBLIC fdopen_callee
 
+EXTERN asm_fdopen
+
 fdopen_callee:
 
    pop hl
    pop de
    ex (sp),hl
    
-   INCLUDE "stdio/z80/asm_fdopen.asm"
+   jp asm_fdopen

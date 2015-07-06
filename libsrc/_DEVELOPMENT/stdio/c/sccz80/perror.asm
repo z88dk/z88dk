@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC perror
 
-perror:
+EXTERN asm_perror
 
-   INCLUDE "stdio/z80/asm_perror.asm"
+defc perror = asm_perror

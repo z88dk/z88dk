@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fflush_unlocked_fastcall
 
+EXTERN asm_fflush_unlocked
+
 _fflush_unlocked_fastcall:
    
    push hl
@@ -14,5 +16,3 @@ _fflush_unlocked_fastcall:
    
    pop ix
    ret
-   
-   INCLUDE "stdio/z80/asm_fflush_unlocked.asm"

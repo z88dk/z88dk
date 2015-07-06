@@ -5,6 +5,6 @@ SECTION code_string
 
 PUBLIC strrev
 
-strrev:
+EXTERN asm_strrev
 
-   INCLUDE "string/z80/asm_strrev.asm"
+defc strrev = asm_strrev

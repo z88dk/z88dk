@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC _atoi_fastcall
 
-_atoi_fastcall:
+EXTERN asm_atoi
 
-   INCLUDE "stdlib/z80/asm_atoi.asm"
+defc _atoi_fastcall = asm_atoi

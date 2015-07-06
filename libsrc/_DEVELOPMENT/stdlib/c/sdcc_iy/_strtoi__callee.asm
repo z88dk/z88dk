@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC __strtoi__callee
 
+EXTERN asm__strtoi
+
 __strtoi__callee:
 
    pop af
@@ -13,4 +15,4 @@ __strtoi__callee:
    pop bc
    push af
    
-   INCLUDE "stdlib/z80/asm__strtoi.asm"
+   jp asm__strtoi

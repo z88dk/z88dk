@@ -5,6 +5,8 @@ SECTION code_stdlib
 
 PUBLIC _ultoa_callee
 
+EXTERN asm_ultoa
+
 _ultoa_callee:
 
    pop af
@@ -14,4 +16,4 @@ _ultoa_callee:
    pop bc
    push af
    
-   INCLUDE "stdlib/z80/asm_ultoa.asm"
+   jp asm_ultoa

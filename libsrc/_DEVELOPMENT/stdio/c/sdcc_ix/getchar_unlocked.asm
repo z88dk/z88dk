@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _getchar_unlocked
 
+EXTERN asm_getchar_unlocked
+
 _getchar_unlocked:
 
    push ix
@@ -13,5 +15,3 @@ _getchar_unlocked:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_getchar_unlocked.asm"

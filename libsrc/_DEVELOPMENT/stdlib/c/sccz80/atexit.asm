@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC atexit
 
-atexit:
+EXTERN asm_atexit
 
-   INCLUDE "stdlib/z80/asm_atexit.asm"
+defc atexit = asm_atexit

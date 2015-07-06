@@ -5,9 +5,11 @@ SECTION code_stdio
 
 PUBLIC flockfile
 
+EXTERN asm_flockfile
+
 flockfile:
 
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_flockfile.asm"
+   jp asm_flockfile

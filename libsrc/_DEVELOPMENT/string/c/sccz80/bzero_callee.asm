@@ -6,10 +6,12 @@ SECTION code_string
 
 PUBLIC bzero_callee
 
+EXTERN asm_bzero
+
 bzero_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "string/z80/asm_bzero.asm"
+   jp asm_bzero

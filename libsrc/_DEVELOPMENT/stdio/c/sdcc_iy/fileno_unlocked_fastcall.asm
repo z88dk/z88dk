@@ -5,9 +5,11 @@ SECTION code_stdio
 
 PUBLIC _fileno_unlocked_fastcall
 
+EXTERN asm_fileno_unlocked
+
 _fileno_unlocked_fastcall:
    
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_fileno_unlocked.asm"
+   jp asm_fileno_unlocked

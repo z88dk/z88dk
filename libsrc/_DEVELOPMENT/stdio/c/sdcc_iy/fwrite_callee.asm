@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC _fwrite_callee
 
+EXTERN asm_fwrite
+
 _fwrite_callee:
 
    pop af
@@ -20,7 +22,7 @@ _fwrite_callee:
    pop ix
    push af
 
-   INCLUDE "stdio/z80/asm_fwrite.asm"
+   jp asm_fwrite
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -31,8 +33,6 @@ PUBLIC _fwrite_callee
 EXTERN _fwrite_unlocked_callee
 
 defc _fwrite_callee = _fwrite_unlocked_callee
-   
-INCLUDE "stdio/z80/asm_fwrite.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -11,12 +11,14 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC fgetc
 
+EXTERN asm_fgetc
+
 fgetc:
 
    push hl
    pop ix
    
-   INCLUDE "stdio/z80/asm_fgetc.asm"
+   jp asm_fgetc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

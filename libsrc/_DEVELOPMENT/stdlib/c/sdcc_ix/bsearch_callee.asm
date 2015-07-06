@@ -7,6 +7,8 @@ SECTION code_stdlib
 
 PUBLIC _bsearch_callee, l0_bsearch_callee
 
+EXTERN asm_bsearch
+
 _bsearch_callee:
 
    pop af
@@ -34,5 +36,3 @@ l0_bsearch_callee:
    
    pop ix
    ret
-
-   INCLUDE "stdlib/z80/asm_bsearch.asm"

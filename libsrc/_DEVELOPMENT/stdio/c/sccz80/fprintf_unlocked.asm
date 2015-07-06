@@ -5,6 +5,6 @@ SECTION code_stdio
 
 PUBLIC fprintf_unlocked
 
-fprintf_unlocked:
+EXTERN asm_fprintf_unlocked
 
-   INCLUDE "stdio/z80/asm_fprintf_unlocked.asm"
+defc fprintf_unlocked = asm_fprintf_unlocked

@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $02
 
 PUBLIC fputc_callee
 
+EXTERN asm_fputc
+
 fputc_callee:
 
    pop af
@@ -18,7 +20,7 @@ fputc_callee:
    pop de
    push af
    
-   INCLUDE "stdio/z80/asm_fputc.asm"
+   jp asm_fputc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE

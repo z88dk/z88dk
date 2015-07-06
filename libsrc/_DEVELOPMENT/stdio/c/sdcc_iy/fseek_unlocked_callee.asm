@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fseek_unlocked_callee
 
+EXTERN asm_fseek_unlocked
+
 _fseek_unlocked_callee:
 
    pop af
@@ -14,4 +16,4 @@ _fseek_unlocked_callee:
    pop bc
    push af
    
-   INCLUDE "stdio/z80/asm_fseek_unlocked.asm"
+   jp asm_fseek_unlocked

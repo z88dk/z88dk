@@ -5,6 +5,6 @@ SECTION code_stdlib
 
 PUBLIC _atexit_fastcall
 
-_atexit_fastcall:
+EXTERN asm_atexit
 
-   INCLUDE "stdlib/z80/asm_atexit.asm"
+defc _atexit_fastcall = asm_atexit

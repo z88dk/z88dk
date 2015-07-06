@@ -5,6 +5,8 @@ SECTION code_string
 
 PUBLIC __memlwr__callee
 
+EXTERN asm__memlwr
+
 __memlwr_:
 
    pop af
@@ -12,4 +14,4 @@ __memlwr_:
    pop bc
    push af
       
-   INCLUDE "string/z80/asm__memlwr.asm"
+   jp asm__memlwr

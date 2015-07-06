@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fscanf_unlocked
 
+EXTERN asm_fscanf_unlocked
+
 _fscanf_unlocked:
 
    push ix
@@ -13,5 +15,3 @@ _fscanf_unlocked:
    
    pop ix
    ret
-
-   INCLUDE "stdio/z80/asm_fscanf_unlocked.asm"

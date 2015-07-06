@@ -5,6 +5,6 @@ SECTION code_threads_mutex
 
 PUBLIC _mtx_trylock_fastcall
 
-_mtx_trylock_fastcall:
+EXTERN asm_mtx_trylock
 
-   INCLUDE "threads/mutex/z80/asm_mtx_trylock.asm"
+defc _mtx_trylock_fastcall = asm_mtx_trylock

@@ -5,6 +5,8 @@ SECTION code_stdio
 
 PUBLIC _fmemopen__callee, l0_fmemopen__callee
 
+EXTERN asm__fmemopen
+
 _fmemopen__callee:
 
    pop hl
@@ -16,4 +18,4 @@ l0_fmemopen__callee:
 
    ld a,$0c                    ; only disallow undefined bits in mode
    
-   INCLUDE "stdio/z80/asm__fmemopen.asm"
+   jp asm__fmemopen

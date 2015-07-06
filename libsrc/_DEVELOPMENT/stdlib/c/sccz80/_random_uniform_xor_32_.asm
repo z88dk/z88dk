@@ -5,7 +5,6 @@ SECTION code_stdlib
 
 PUBLIC _random_uniform_xor_32_
 
-_random_uniform_xor_32_:
+EXTERN asm_random_uniform_xor_32
 
-   INCLUDE "stdlib/z80/random/asm_random_uniform_xor_32.asm"
-
+defc _random_uniform_xor_32_ = asm_random_uniform_xor_32
