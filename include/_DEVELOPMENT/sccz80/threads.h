@@ -26,8 +26,8 @@ typedef uint16_t       once_flag;
 
 // mutex
 
-extern void __LIB__ call_once(once_flag *flag,void (*func)(void));
-extern void __LIB__ __CALLEE__ call_once_callee(once_flag *flag,void (*func)(void));
+extern void __LIB__ call_once(once_flag *flag,void *func);
+extern void __LIB__ __CALLEE__ call_once_callee(once_flag *flag,void *func);
 #define call_once(a,b) call_once_callee(a,b)
 
 

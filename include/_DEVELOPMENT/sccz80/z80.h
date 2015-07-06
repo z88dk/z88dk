@@ -10,8 +10,8 @@
 extern void __LIB__ __FASTCALL__ im2_init(void *im2_table_address);
 
 
-extern void __LIB__ *im2_install_isr(uint16_t vector,void (*isr)(void));
-extern void __LIB__ __CALLEE__ *im2_install_isr_callee(uint16_t vector,void (*isr)(void));
+extern void __LIB__ *im2_install_isr(uint16_t vector,void *isr);
+extern void __LIB__ __CALLEE__ *im2_install_isr_callee(uint16_t vector,void *isr);
 #define im2_install_isr(a,b) im2_install_isr_callee(a,b)
 
 
@@ -25,18 +25,18 @@ extern void __LIB__ __CALLEE__ *im2_create_generic_isr_8080_callee(uint16_t num_
 #define im2_create_generic_isr_8080(a,b) im2_create_generic_isr_8080_callee(a,b)
 
 
-extern void __LIB__ im2_append_generic_callback(uint16_t vector,void (*callback)(void));
-extern void __LIB__ __CALLEE__ im2_append_generic_callback_callee(uint16_t vector,void (*callback)(void));
+extern void __LIB__ im2_append_generic_callback(uint16_t vector,void *callback);
+extern void __LIB__ __CALLEE__ im2_append_generic_callback_callee(uint16_t vector,void *callback);
 #define im2_append_generic_callback(a,b) im2_append_generic_callback_callee(a,b)
 
 
-extern void __LIB__ im2_prepend_generic_callback(uint16_t vector,void (*callback)(void));
-extern void __LIB__ __CALLEE__ im2_prepend_generic_callback_callee(uint16_t vector,void (*callback)(void));
+extern void __LIB__ im2_prepend_generic_callback(uint16_t vector,void *callback);
+extern void __LIB__ __CALLEE__ im2_prepend_generic_callback_callee(uint16_t vector,void *callback);
 #define im2_prepend_generic_callback(a,b) im2_prepend_generic_callback_callee(a,b)
 
 
-extern int __LIB__ im2_remove_generic_callback(uint16_t vector,void (*callback)(void));
-extern int __LIB__ __CALLEE__ im2_remove_generic_callback_callee(uint16_t vector,void (*callback)(void));
+extern int __LIB__ im2_remove_generic_callback(uint16_t vector,void *callback);
+extern int __LIB__ __CALLEE__ im2_remove_generic_callback_callee(uint16_t vector,void *callback);
 #define im2_remove_generic_callback(a,b) im2_remove_generic_callback_callee(a,b)
 
 
