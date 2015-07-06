@@ -15,7 +15,7 @@ __DPROTO(int,,im2_remove_generic_callback,uint16_t vector,void (*callback)(void)
 
 __DPROTO(void,,z80_delay_ms,uint16_t ms)
 __DPROTO(void,,z80_delay_tstate,uint16_t tstates)
-__DPROTO(uint16_t,,z80_get_int_state,void)
+__OPROTO(uint16_t,,z80_get_int_state,void)
 __DPROTO(void,,z80_set_int_state,uint16_t state)
 
 __DPROTO(uint8_t,,z80_inp,uint16_t port)
