@@ -30,7 +30,7 @@ val_ok:
    inc hl
    
    push de
-   pop iy
+   pop ix
    
    ld e,(hl)
    inc hl

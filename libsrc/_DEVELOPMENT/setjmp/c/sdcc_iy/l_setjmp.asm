@@ -20,7 +20,7 @@ _l_setjmp:
    ; hl = jmp_buf *env
    ; bc = return address
 
-   push iy
+   push ix
    pop de
    
    ld (hl),e
