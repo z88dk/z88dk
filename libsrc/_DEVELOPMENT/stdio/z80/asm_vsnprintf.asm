@@ -174,6 +174,32 @@ _putc:
    ;  e' = char
    ; bc' = number > 0
 
+   dec hl
+   
+   ld a,h
+   or l
+   
+   inc hl
+   
+   jr nz, _putc_many
+
+   ld a,b
+   or c
+   ret z
+   
+   dec bc
+   
+   exx
+   ld a,e
+   exx
+   
+   ld (de),a
+   inc de
+   
+   ret
+
+_putc_many:
+
    push hl                     ; save length
    
    call l_minu_bc_hl           ; hl = number of bytes to write to s

@@ -109,6 +109,26 @@ _putc:
    ;  e' = char
    ; bc' = number > 0
    
+   dec hl
+   
+   ld a,h
+   or l
+   
+   inc hl
+   
+   jr nz, _putc_many
+
+   exx
+   ld a,e
+   exx
+   
+   ld (de),a
+   inc de
+   
+   ret
+
+_putc_many:
+   
    push de
    exx
    pop hl
