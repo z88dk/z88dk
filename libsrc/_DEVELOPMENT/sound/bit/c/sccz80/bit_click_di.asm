@@ -5,6 +5,6 @@ SECTION code_sound_bit
 
 PUBLIC bit_click_di
 
-bit_click_di:
+EXTERN asm_bit_click_di
 
-   INCLUDE "sound/bit/z80/asm_bit_click_di.asm"
+defc bit_click_di = asm_bit_click_di

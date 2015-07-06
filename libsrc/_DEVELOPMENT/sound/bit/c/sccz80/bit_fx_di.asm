@@ -5,6 +5,6 @@ SECTION code_sound_bit
 
 PUBLIC bit_fx_di
 
-bit_fx_di:
+EXTERN asm_bit_fx_di
 
-   INCLUDE "sound/bit/z80/asm_bit_fx_di.asm"
+defc bit_fx_di = asm_bit_fx_di

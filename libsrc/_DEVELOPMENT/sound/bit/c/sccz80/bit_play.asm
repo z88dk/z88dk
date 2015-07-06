@@ -5,6 +5,6 @@ SECTION code_sound_bit
 
 PUBLIC bit_play
 
-bit_play:
+EXTERN asm_bit_play
 
-   INCLUDE "sound/bit/z80/asm_bit_play.asm"
+defc bit_play = asm_bit_play

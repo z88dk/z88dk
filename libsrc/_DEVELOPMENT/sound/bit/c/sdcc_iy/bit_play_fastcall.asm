@@ -5,6 +5,6 @@ SECTION code_sound_bit
 
 PUBLIC _bit_play_fastcall
 
-_bit_play_fastcall:
+EXTERN asm_bit_play
 
-   INCLUDE "sound/bit/z80/asm_bit_play.asm"
+defc _bit_play_fastcall = asm_bit_play
