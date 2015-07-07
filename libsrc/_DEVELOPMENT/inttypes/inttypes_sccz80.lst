@@ -5,3 +5,4 @@ inttypes/c/sccz80/strtoimax
 inttypes/c/sccz80/strtoimax_callee
 inttypes/c/sccz80/strtoumax
 inttypes/c/sccz80/strtoumax_callee
+@inttypes/inttypes_asm.lst

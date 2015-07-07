@@ -8,5 +8,3 @@ PUBLIC _imaxdiv__callee
 EXTERN _ldiv__callee
 
 defc _imaxdiv__callee = _ldiv__callee
-
-INCLUDE "inttypes/z80/asm__imaxdiv_.asm"
