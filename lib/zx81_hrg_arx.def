@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_hrg_arx.def,v 1.12 2015-01-23 07:30:51 stefano Exp $
+;       $Id: zx81_hrg_arx.def,v 1.13 2015-07-07 07:11:17 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -276,7 +276,7 @@ IF ((startup=13)|(startup=15))
         jr	z,nobrkk
         SCF
 nobrkk:
-ENDIF
+
 ELSE
 IF (startup=14)
         SCF
