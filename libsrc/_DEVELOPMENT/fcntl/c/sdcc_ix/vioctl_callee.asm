@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _vioctl_callee, l0_vioctl_callee
 
+EXTERN asm_vioctl
+
 _vioctl_callee:
 
    pop af
@@ -21,5 +23,3 @@ l0_vioctl_callee:
    
    pop ix
    ret
-   
-   INCLUDE "fcntl/z80/asm_vioctl.asm"

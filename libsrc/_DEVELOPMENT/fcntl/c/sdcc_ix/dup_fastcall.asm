@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _dup_fastcall
 
+EXTERN asm_dup
+
 _dup_fastcall:
    
    push ix
@@ -13,5 +15,3 @@ _dup_fastcall:
    
    pop ix
    ret
-
-   INCLUDE "fcntl/z80/asm_dup.asm"

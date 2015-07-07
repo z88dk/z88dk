@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _read_callee
 
+EXTERN asm_read
+
 _read_callee:
 
    pop af
@@ -13,4 +15,4 @@ _read_callee:
    pop bc
    push af
    
-   INCLUDE "fcntl/z80/asm_read.asm"
+   jp asm_read

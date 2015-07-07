@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC fzx_char_metrics_callee, fzx0_char_metrics_callee
 
+EXTERN asm_fzx_char_metrics
+
 fzx_char_metrics_callee:
 
    pop hl
@@ -35,5 +37,3 @@ fzx0_char_metrics_callee:
    
    ex de,hl                    ; return bitmap address
    ret
-
-   INCLUDE "font/fzx/z80/asm_fzx_char_metrics.asm"

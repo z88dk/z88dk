@@ -8,3 +8,4 @@ compress/zx7/c/sccz80/dzx7_standard
 compress/zx7/c/sccz80/dzx7_standard_callee
 compress/zx7/c/sccz80/dzx7_turbo
 compress/zx7/c/sccz80/dzx7_turbo_callee
+@compress/zx7/zx7_asm.lst

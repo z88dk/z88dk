@@ -5,6 +5,6 @@ SECTION code_input
 
 PUBLIC in_inkey
 
-in_inkey:
+EXTERN asm_in_inkey
 
-   INCLUDE "input/zx/z80/asm_in_inkey.asm"
+defc in_inkey = asm_in_inkey

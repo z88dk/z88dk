@@ -1,13 +1,3 @@
-@fcntl/z80/drivers/drivers.lst
-fcntl/z80/__fcntl_fd_from_fdstruct
-fcntl/z80/__fcntl_fdchain_descend
-fcntl/z80/__fcntl_fdstruct_from_fd_1
-fcntl/z80/__fcntl_fdstruct_from_fd_2
-fcntl/z80/__fcntl_fdtbl_lock
-fcntl/z80/__fcntl_first_available_fd
-fcntl/z80/__fcntl_inc_refcount
-fcntl/z80/__fcntl_lock_fdtbl
-fcntl/z80/__fcntl_unlock_fdtbl
 fcntl/c/sdcc_iy/close
 fcntl/c/sdcc_iy/close_fastcall
 fcntl/c/sdcc_iy/creat
@@ -28,3 +18,4 @@ fcntl/c/sdcc_iy/vopen
 fcntl/c/sdcc_iy/vopen_callee
 fcntl/c/sdcc_iy/write
 fcntl/c/sdcc_iy/write_callee
+@fcntl/fcntl_asm.lst

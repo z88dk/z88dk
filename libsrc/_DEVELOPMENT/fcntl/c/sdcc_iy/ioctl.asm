@@ -5,6 +5,6 @@ SECTION code_fcntl
 
 PUBLIC _ioctl
 
-_ioctl:
+EXTERN asm_ioctl
 
-   INCLUDE "fcntl/z80/asm_ioctl.asm"
+defc _ioctl = asm_ioctl

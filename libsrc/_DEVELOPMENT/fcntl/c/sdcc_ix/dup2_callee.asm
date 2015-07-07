@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _dup2_callee, l0_dup2_callee
 
+EXTERN asm_dup2
+
 _dup2_callee:
 
    pop af
@@ -20,5 +22,3 @@ l0_dup2_callee:
    
    pop ix
    ret
-   
-   INCLUDE "fcntl/z80/asm_dup2.asm"

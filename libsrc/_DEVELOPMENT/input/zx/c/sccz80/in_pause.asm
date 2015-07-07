@@ -5,6 +5,6 @@ SECTION code_input
 
 PUBLIC in_pause
 
-in_pause:
+EXTERN asm_in_pause
 
-   INCLUDE "input/zx/z80/asm_in_pause.asm"
+defc in_pause = asm_in_pause

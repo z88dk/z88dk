@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC fzx_state_init_callee
 
+EXTERN asm_fzx_state_init
+
 fzx_state_init_callee:
 
    pop hl
@@ -12,4 +14,4 @@ fzx_state_init_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "font/fzx/z80/asm_fzx_state_init.asm"
+   jp asm_fzx_state_init

@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _close_fastcall
 
+EXTERN asm_close
+
 _close_fastcall:
    
    push ix
@@ -13,5 +15,3 @@ _close_fastcall:
    
    pop ix
    ret
-
-   INCLUDE "fcntl/z80/asm_close.asm"

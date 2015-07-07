@@ -5,10 +5,12 @@ SECTION code_compress_zx7
 
 PUBLIC dzx7_agile_rcs_callee
 
+EXTERN asm_dzx7_agile_rcs
+
 dzx7_agile_rcs_callee:
 
    pop hl
    pop de
    ex (sp),hl
    
-   INCLUDE "compress/zx7/z80/asm_dzx7_agile_rcs.asm"
+   jp asm_dzx7_agile_rcs

@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_string_partition_ww_callee
 
+EXTERN asm_fzx_string_partition_ww
+
 _fzx_string_partition_ww_callee:
 
    pop hl
@@ -12,4 +14,4 @@ _fzx_string_partition_ww_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "font/fzx/z80/asm_fzx_string_partition_ww.asm"
+   jp asm_fzx_string_partition_ww

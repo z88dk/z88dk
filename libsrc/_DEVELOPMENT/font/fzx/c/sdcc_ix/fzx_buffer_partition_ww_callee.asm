@@ -3,9 +3,11 @@
 
 SECTION code_font_fzx
 
-PUBLIC _fzx_buffer_partition_ww, l0_fzx_buffer_partition_ww
+PUBLIC _fzx_buffer_partition_ww_callee, l0_fzx_buffer_partition_ww_callee
 
-_fzx_buffer_partition_ww:
+EXTERN asm_fzx_buffer_partition_ww
+
+_fzx_buffer_partition_ww_callee:
 
    pop hl
    exx
@@ -15,7 +17,7 @@ _fzx_buffer_partition_ww:
    pop bc
    ex (sp),hl
 
-l0_fzx_buffer_partition_ww:
+l0_fzx_buffer_partition_ww_callee:
 
    exx
    push bc
@@ -26,5 +28,3 @@ l0_fzx_buffer_partition_ww:
    
    pop ix
    ret
-   
-   INCLUDE "font/fzx/z80/asm_fzx_buffer_partition_ww.asm"

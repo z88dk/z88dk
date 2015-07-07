@@ -5,6 +5,6 @@ SECTION code_input
 
 PUBLIC in_stick_fuller
 
-in_stick_fuller:
+EXTERN asm_in_stick_fuller
 
-   INCLUDE "input/zx/z80/asm_in_stick_fuller.asm"
+defc in_stick_fuller = asm_in_stick_fuller

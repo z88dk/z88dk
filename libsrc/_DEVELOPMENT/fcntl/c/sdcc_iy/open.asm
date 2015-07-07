@@ -5,6 +5,6 @@ SECTION code_fcntl
 
 PUBLIC _open
 
-_open:
-   
-   INCLUDE "fcntl/z80/asm_open.asm"
+EXTERN asm_open
+
+defc _open = asm_open

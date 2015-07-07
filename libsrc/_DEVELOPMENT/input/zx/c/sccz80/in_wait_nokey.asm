@@ -5,6 +5,6 @@ SECTION code_input
 
 PUBLIC in_wait_nokey
 
-in_wait_nokey:
+EXTERN asm_in_wait_nokey
 
-   INCLUDE "input/zx/z80/asm_in_wait_nokey.asm"
+defc in_wait_nokey = asm_in_wait_nokey

@@ -1,5 +1,3 @@
-input/zx/z80/__amx_mouse_variables
-input/zx/z80/__kempston_mouse_variables
 input/zx/c/sdcc_iy/in_inkey
 input/zx/c/sdcc_iy/in_key_pressed
 input/zx/c/sdcc_iy/in_key_pressed_fastcall
@@ -31,7 +29,4 @@ input/zx/c/sdcc_iy/in_stick_sinclair2
 input/zx/c/sdcc_iy/in_test_key
 input/zx/c/sdcc_iy/in_wait_key
 input/zx/c/sdcc_iy/in_wait_nokey
-input/zx/z80/in_key_translation_table
-input/zx/z80/asm_in_mouse_amx
-input/zx/z80/asm_in_mouse_kempston
-input/zx/z80/asm_in_test_key
+@input/zx/input_asm.lst

@@ -5,6 +5,6 @@ SECTION code_input
 
 PUBLIC in_stick_keyboard
 
-in_stick_keyboard:
+EXTERN asm_in_stick_keyboard
 
-   INCLUDE "input/zx/z80/asm_in_stick_keyboard.asm"
+defc in_stick_keyboard = asm_in_stick_keyboard

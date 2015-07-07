@@ -5,6 +5,8 @@ SECTION code_input
 
 PUBLIC _in_mouse_amx_init_callee, l0_in_mouse_amx_init_callee
 
+EXTERN asm_in_mouse_amx_init
+
 _in_mouse_amx_init_callee:
 
    pop af
@@ -15,4 +17,4 @@ _in_mouse_amx_init_callee:
 l0_in_mouse_amx_init_callee:
 
    ld b,e
-   INCLUDE "input/zx/z80/asm_in_mouse_amx_init.asm"
+   jp asm_in_mouse_amx_init

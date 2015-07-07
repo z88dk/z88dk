@@ -5,6 +5,8 @@ SECTION code_compress_zx7
 
 PUBLIC _dzx7_mega_callee
 
+EXTERN asm_dzx7_mega
+
 _dzx7_mega_callee:
 
    pop af
@@ -12,4 +14,4 @@ _dzx7_mega_callee:
    pop de
    push af
    
-   INCLUDE "compress/zx7/z80/asm_dzx7_mega.asm"
+   jp asm_dzx7_mega

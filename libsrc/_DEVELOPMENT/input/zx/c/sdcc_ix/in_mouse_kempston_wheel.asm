@@ -5,6 +5,6 @@ SECTION code_input
 
 PUBLIC _in_mouse_kempston_wheel
 
-_in_mouse_kempston_wheel:
+EXTERN asm_in_mouse_kempston_wheel
 
-   INCLUDE "input/zx/z80/asm_in_mouse_kempston_wheel.asm"
+defc _in_mouse_kempston_wheel = asm_in_mouse_kempston_wheel

@@ -5,6 +5,6 @@ SECTION code_input
 
 PUBLIC _in_key_pressed_fastcall
 
-_in_key_pressed_fastcall:
+EXTERN asm_in_key_pressed
 
-   INCLUDE "input/zx/z80/asm_in_key_pressed.asm"
+defc _in_key_pressed_fastcall = asm_in_key_pressed

@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _open
 
+EXTERN asm_open
+
 _open:
 
    push ix
@@ -13,5 +15,3 @@ _open:
    
    pop ix
    ret
-   
-   INCLUDE "fcntl/z80/asm_open.asm"

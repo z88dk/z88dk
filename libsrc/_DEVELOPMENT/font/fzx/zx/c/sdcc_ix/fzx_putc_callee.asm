@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_putc_callee, l0_fzx_putc_callee
 
+EXTERN asm_fzx_putc
+
 _fzx_putc_callee:
 
    pop af
@@ -26,5 +28,3 @@ l0_fzx_putc_callee:
    ld h,0
    
    ret
-   
-   INCLUDE "font/fzx/zx/z80/asm_fzx_putc.asm"

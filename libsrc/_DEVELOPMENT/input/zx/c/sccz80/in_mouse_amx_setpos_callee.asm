@@ -5,6 +5,8 @@ SECTION code_input
 
 PUBLIC in_mouse_amx_setpos_callee
 
+EXTERN asm_in_mouse_amx_setpos
+
 in_mouse_amx_setpos_callee:
 
    pop af
@@ -12,4 +14,4 @@ in_mouse_amx_setpos_callee:
    pop de
    push af
    
-   INCLUDE "input/zx/z80/asm_in_mouse_amx_setpos.asm"
+   jp asm_in_mouse_amx_setpos

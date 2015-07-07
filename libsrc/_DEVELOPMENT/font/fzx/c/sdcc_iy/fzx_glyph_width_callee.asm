@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_glyph_width_callee, l0_fzx_glyph_width_callee
 
+EXTERN asm_fzx_glyph_width
+
 _fzx_glyph_width_callee:
 
    pop af
@@ -22,5 +24,3 @@ l0_fzx_glyph_width_callee:
    
    inc hl
    ret
-
-   INCLUDE "font/fzx/z80/asm_fzx_glyph_width.asm"

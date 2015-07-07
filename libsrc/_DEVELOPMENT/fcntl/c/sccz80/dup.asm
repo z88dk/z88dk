@@ -5,6 +5,6 @@ SECTION code_fcntl
 
 PUBLIC dup
 
-dup:
+EXTERN asm_dup
 
-   INCLUDE "fcntl/z80/asm_dup.asm"
+defc dup = asm_dup

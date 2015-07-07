@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_string_extent_callee
 
+EXTERN asm_fzx_string_extent
+
 _fzx_string_extent_callee:
 
    pop af
@@ -12,4 +14,4 @@ _fzx_string_extent_callee:
    pop de
    push af
    
-   INCLUDE "font/fzx/z80/asm_fzx_string_extent.asm"
+   jp asm_fzx_string_extent

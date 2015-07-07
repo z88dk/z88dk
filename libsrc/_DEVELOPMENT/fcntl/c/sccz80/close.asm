@@ -5,6 +5,6 @@ SECTION code_fcntl
 
 PUBLIC close
 
-close:
+EXTERN asm_close
 
-   INCLUDE "fcntl/z80/asm_close.asm"
+defc close = asm_close

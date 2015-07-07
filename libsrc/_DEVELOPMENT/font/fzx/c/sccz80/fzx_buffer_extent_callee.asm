@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC fzx_buffer_extent_callee
 
+EXTERN asm_fzx_buffer_extent
+
 fzx_buffer_extent_callee:
 
    pop hl
@@ -12,4 +14,4 @@ fzx_buffer_extent_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "font/fzx/z80/asm_fzx_buffer_extent.asm"
+   jp asm_fzx_buffer_extent

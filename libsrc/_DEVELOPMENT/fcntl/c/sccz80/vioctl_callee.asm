@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC vioctl_callee
 
+EXTERN asm_vioctl
+
 vioctl_callee:
 
    pop hl
@@ -12,4 +14,4 @@ vioctl_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "fcntl/z80/asm_vioctl.asm"
+   jp asm_vioctl

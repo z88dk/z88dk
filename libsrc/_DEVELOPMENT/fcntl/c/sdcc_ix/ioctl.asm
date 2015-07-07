@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _ioctl
 
+EXTERN asm_ioctl
+
 _ioctl:
 
    push ix
@@ -13,5 +15,3 @@ _ioctl:
    
    pop ix
    ret
-
-   INCLUDE "fcntl/z80/asm_ioctl.asm"

@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC lseek_callee, l0_lseek_callee
 
+EXTERN asm_lseek
+
 lseek_callee:
 
    pop bc
@@ -21,4 +23,4 @@ l0_lseek_callee:
    push bc
    exx
    
-   INCLUDE "fcntl/z80/asm_lseek.asm"
+   jp asm_lseek

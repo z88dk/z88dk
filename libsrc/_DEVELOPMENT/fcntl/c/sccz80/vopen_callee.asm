@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC vopen_callee
 
+EXTERN asm_vopen
+
 vopen_callee:
 
    pop af
@@ -13,4 +15,4 @@ vopen_callee:
    pop de
    push af
    
-   INCLUDE "fcntl/z80/asm_vopen.asm"
+   jp asm_vopen

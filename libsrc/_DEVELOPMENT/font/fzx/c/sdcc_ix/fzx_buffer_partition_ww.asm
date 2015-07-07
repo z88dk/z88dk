@@ -5,7 +5,7 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_buffer_partition_ww
 
-EXTERN l0_fzx_buffer_partition_ww
+EXTERN l0_fzx_buffer_partition_ww_callee
 
 _fzx_buffer_partition_ww:
 
@@ -23,4 +23,4 @@ _fzx_buffer_partition_ww:
    push bc
    push af
 
-   jp l0_fzx_buffer_partition_ww
+   jp l0_fzx_buffer_partition_ww_callee

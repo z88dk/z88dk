@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC fzx_buffer_partition_ww_callee
 
+EXTERN asm_fzx_buffer_partition_ww
+
 fzx_buffer_partition_ww_callee:
 
    pop af
@@ -14,4 +16,4 @@ fzx_buffer_partition_ww_callee:
    pop ix
    push af
    
-   INCLUDE "font/fzx/z80/asm_fzx_buffer_partition_ww.asm"
+   jp asm_fzx_buffer_partition_ww

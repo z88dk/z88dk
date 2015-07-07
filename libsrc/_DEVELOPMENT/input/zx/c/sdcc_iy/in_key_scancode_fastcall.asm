@@ -5,6 +5,6 @@ SECTION code_input
 
 PUBLIC _in_key_scancode_fastcall
 
-_in_key_scancode_fastcall:
+EXTERN asm_in_key_scancode
 
-   INCLUDE "input/zx/z80/asm_in_key_scancode.asm"
+defc _in_key_scancode_fastcall = asm_in_key_scancode

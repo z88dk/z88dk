@@ -5,6 +5,8 @@ SECTION code_fcntl
 
 PUBLIC _vopen_callee
 
+EXTERN asm_vopen
+
 _vopen_callee:
 
    pop hl
@@ -12,4 +14,4 @@ _vopen_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "fcntl/z80/asm_vopen.asm"
+   jp asm_vopen

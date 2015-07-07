@@ -5,6 +5,8 @@ SECTION code_font_fzx
 
 PUBLIC _fzx_buffer_partition_callee
 
+EXTERN asm_fzx_buffer_partition
+
 _fzx_buffer_partition_callee:
 
    pop hl
@@ -13,4 +15,4 @@ _fzx_buffer_partition_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "font/fzx/z80/asm_fzx_buffer_partition.asm"
+   jp asm_fzx_buffer_partition

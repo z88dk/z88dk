@@ -5,6 +5,6 @@ SECTION code_input
 
 PUBLIC _in_pause_fastcall
 
-_in_pause_fastcall:
+EXTERN asm_in_pause
 
-   INCLUDE "input/zx/z80/asm_in_pause.asm"
+defc _in_pause_fastcall = asm_in_pause

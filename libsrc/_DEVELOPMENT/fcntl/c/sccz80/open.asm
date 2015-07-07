@@ -5,6 +5,6 @@ SECTION code_fcntl
 
 PUBLIC open
 
-open:
+EXTERN asm_open
 
-   INCLUDE "fcntl/z80/asm_open.asm"
+defc open = asm_open

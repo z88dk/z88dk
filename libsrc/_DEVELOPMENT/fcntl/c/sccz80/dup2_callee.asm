@@ -5,10 +5,12 @@ SECTION code_fcntl
 
 PUBLIC dup2_callee
 
+EXTERN asm_dup2
+
 dup2_callee:
 
    pop hl
    pop de
    ex (sp),hl
    
-   INCLUDE "fcntl/z80/asm_dup2.asm"
+   jp asm_dup2
