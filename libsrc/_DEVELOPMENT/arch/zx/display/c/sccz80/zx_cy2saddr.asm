@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC zx_cy2saddr
 
-zx_cy2saddr:
+EXTERN asm_zx_cy2saddr
 
-   INCLUDE "arch/zx/display/z80/asm_zx_cy2saddr.asm"
+defc zx_cy2saddr = asm_zx_cy2saddr

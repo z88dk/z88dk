@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC _zx_cls_fastcall
 
-_zx_cls_fastcall:
-   
-   INCLUDE "arch/zx/misc/z80/asm_zx_cls.asm"
+EXTERN asm_zx_cls
+
+defc _zx_cls_fastcall = asm_zx_cls

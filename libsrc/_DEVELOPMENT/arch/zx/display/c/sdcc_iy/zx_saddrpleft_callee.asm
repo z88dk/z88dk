@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_saddrpleft_callee
 
+EXTERN asm_zx_saddrpleft
+
 _zx_saddrpleft_callee:
 
    pop af
@@ -12,4 +14,4 @@ _zx_saddrpleft_callee:
    pop de
    push af
    
-   INCLUDE "arch/zx/display/z80/asm_zx_saddrpleft.asm"
+   jp asm_zx_saddrpleft

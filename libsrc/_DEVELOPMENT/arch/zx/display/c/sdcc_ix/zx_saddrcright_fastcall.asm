@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC _zx_saddrcright_fastcall
 
-_zx_saddrcright_fastcall:
+EXTERN asm_zx_saddrcright
 
-   INCLUDE "arch/zx/display/z80/asm_zx_saddrcright.asm"
+defc _zx_saddrcright_fastcall = asm_zx_saddrcright

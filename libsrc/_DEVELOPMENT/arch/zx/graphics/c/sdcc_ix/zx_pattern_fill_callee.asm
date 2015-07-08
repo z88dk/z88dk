@@ -5,6 +5,8 @@ SECTION code_arch
 
 PUBLIC _zx_pattern_fill_callee, l0_zx_pattern_fill_callee
 
+EXTERN asm_zx_pattern_fill
+
 _zx_pattern_fill_callee:
 
    pop af
@@ -28,5 +30,3 @@ l0_zx_pattern_fill_callee:
    pop ix
    
    ret
-   
-   INCLUDE "arch/zx/graphics/z80/asm_zx_pattern_fill.asm"

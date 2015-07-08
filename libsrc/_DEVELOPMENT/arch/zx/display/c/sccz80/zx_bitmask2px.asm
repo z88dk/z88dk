@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC zx_bitmask2px
 
-zx_bitmask2px:
+EXTERN asm_zx_bitmask2px
 
-   INCLUDE "arch/zx/display/z80/asm_zx_bitmask2px.asm"
+defc zx_bitmask2px = asm_zx_bitmask2px

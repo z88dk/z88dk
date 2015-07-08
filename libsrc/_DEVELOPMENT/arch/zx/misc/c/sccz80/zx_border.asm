@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC zx_border
 
-zx_border:
+EXTERN asm_zx_border
 
-   INCLUDE "arch/zx/misc/z80/asm_zx_border.asm"
+defc zx_border = asm_zx_border

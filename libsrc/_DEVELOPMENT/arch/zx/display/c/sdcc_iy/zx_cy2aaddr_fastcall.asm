@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC _zx_cy2aaddr_fastcall
 
-_zx_cy2aaddr_fastcall:
+EXTERN asm_zx_cy2aaddr
 
-   INCLUDE "arch/zx/display/z80/asm_zx_cy2aaddr.asm"
+defc _zx_cy2aaddr_fastcall = asm_zx_cy2aaddr

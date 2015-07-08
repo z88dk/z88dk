@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC _zx_bitmask2px_fastcall
 
-_zx_bitmask2px_fastcall:
+EXTERN asm_zx_bitmask2px
 
-   INCLUDE "arch/zx/display/z80/asm_zx_bitmask2px.asm"
+defc _zx_bitmask2px_fastcall = asm_zx_bitmask2px

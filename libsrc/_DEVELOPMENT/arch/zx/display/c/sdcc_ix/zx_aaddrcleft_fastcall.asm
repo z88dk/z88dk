@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC _zx_aaddrcleft_fastcall
 
-_zx_aaddrcleft_fastcall:
+EXTERN asm_zx_aaddrcleft
 
-   INCLUDE "arch/zx/display/z80/asm_zx_aaddrcleft.asm"
+defc _zx_aaddrcleft_fastcall = asm_zx_aaddrcleft

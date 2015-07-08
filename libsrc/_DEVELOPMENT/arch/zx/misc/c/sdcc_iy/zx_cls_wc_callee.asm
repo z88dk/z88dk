@@ -5,10 +5,12 @@ SECTION code_arch
 
 PUBLIC _zx_cls_wc_callee
 
+EXTERN asm_zx_cls_wc
+
 _zx_cls_wc_callee:
 
    pop hl
    pop ix
    ex (sp),hl
    
-   INCLUDE "arch/zx/misc/z80/asm_zx_cls_wc.asm"
+   jp asm_zx_cls_wc

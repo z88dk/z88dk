@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC zx_saddrpdown
 
-zx_saddrpdown:
+EXTERN asm_zx_saddrpdown
 
-   INCLUDE "arch/zx/display/z80/asm_zx_saddrpdown.asm"
+defc zx_saddrpdown = asm_zx_saddrpdown

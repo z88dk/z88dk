@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC zx_cls
 
-zx_cls:
+EXTERN asm_zx_cls
 
-   INCLUDE "arch/zx/misc/z80/asm_zx_cls.asm"
+defc zx_cls = asm_zx_cls

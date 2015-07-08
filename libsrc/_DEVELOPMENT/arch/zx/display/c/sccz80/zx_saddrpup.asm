@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC zx_saddrpup
 
-zx_saddrpup:
+EXTERN asm_zx_saddrpup
 
-   INCLUDE "arch/zx/display/z80/asm_zx_saddrpup.asm"
+defc zx_saddrpup = asm_zx_saddrpup

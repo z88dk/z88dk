@@ -36,3 +36,4 @@ arch/zx/display/c/sccz80/zx_saddrpleft_callee
 arch/zx/display/c/sccz80/zx_saddrpright
 arch/zx/display/c/sccz80/zx_saddrpright_callee
 arch/zx/display/c/sccz80/zx_saddrpup
+@arch/zx/display/display_asm.lst

@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC zx_saddrcright
 
-zx_saddrcright:
+EXTERN asm_zx_saddrcright
 
-   INCLUDE "arch/zx/display/z80/asm_zx_saddrcright.asm"
+defc zx_saddrcright = asm_zx_saddrcright

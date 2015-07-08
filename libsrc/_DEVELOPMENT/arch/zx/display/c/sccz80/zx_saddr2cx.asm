@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC zx_saddr2cx
 
-zx_saddr2cx:
+EXTERN asm_zx_saddr2cx
 
-   INCLUDE "arch/zx/display/z80/asm_zx_saddr2cx.asm"
+defc zx_saddr2cx = asm_zx_saddr2cx

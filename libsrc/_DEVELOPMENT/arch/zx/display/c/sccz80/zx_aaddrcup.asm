@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC zx_aaddrcup
 
-zx_aaddrcup:
+EXTERN asm_zx_aaddrcup
 
-   INCLUDE "arch/zx/display/z80/asm_zx_aaddrcup.asm"
+defc zx_aaddrcup = asm_zx_aaddrcup

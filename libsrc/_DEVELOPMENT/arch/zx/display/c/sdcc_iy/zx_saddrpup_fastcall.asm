@@ -5,6 +5,6 @@ SECTION code_arch
 
 PUBLIC _zx_saddrpup_fastcall
 
-_zx_saddrpup_fastcall:
+EXTERN asm_zx_saddrpup
 
-   INCLUDE "arch/zx/display/z80/asm_zx_saddrpup.asm"
+defc _zx_saddrpup_fastcall = asm_zx_saddrpup

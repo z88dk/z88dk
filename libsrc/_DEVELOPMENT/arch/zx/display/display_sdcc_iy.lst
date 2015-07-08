@@ -62,3 +62,4 @@ arch/zx/display/c/sdcc_iy/zx_saddrpright
 arch/zx/display/c/sdcc_iy/zx_saddrpright_callee
 arch/zx/display/c/sdcc_iy/zx_saddrpup
 arch/zx/display/c/sdcc_iy/zx_saddrpup_fastcall
+@arch/zx/display/display_asm.lst
