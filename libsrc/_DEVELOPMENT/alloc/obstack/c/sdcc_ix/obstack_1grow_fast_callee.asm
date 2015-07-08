@@ -5,6 +5,8 @@ SECTION code_alloc_obstack
 
 PUBLIC _obstack_1grow_fast_callee, l0_obstack_1grow_fast_callee
 
+EXTERN asm_obstack_1grow_fast
+
 _obstack_1grow_fast_callee:
 
    pop af
@@ -16,4 +18,4 @@ l0_obstack_1grow_fast_callee:
 
    ld a,e
 
-   INCLUDE "alloc/obstack/z80/asm_obstack_1grow_fast.asm"
+   jp asm_obstack_1grow_fast

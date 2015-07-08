@@ -11,9 +11,9 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC _malloc_fastcall
 
-_malloc_fastcall:
+EXTERN asm_malloc
 
-   INCLUDE "alloc/malloc/z80/asm_malloc.asm"
+defc _malloc_fastcall = asm_malloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -24,8 +24,6 @@ PUBLIC _malloc_fastcall
 EXTERN _malloc_unlocked_fastcall
 
 defc _malloc_fastcall = _malloc_unlocked_fastcall
-   
-INCLUDE "alloc/malloc/z80/asm_malloc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

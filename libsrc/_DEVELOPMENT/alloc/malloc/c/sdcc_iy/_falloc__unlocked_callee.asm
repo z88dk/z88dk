@@ -5,10 +5,12 @@ SECTION code_alloc_malloc
 
 PUBLIC __falloc__unlocked_callee
 
+EXTERN asm__falloc_unlocked
+
 __falloc__unlocked_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "alloc/malloc/z80/asm__falloc_unlocked.asm"
+   jp asm__falloc_unlocked

@@ -5,6 +5,8 @@ SECTION code_alloc_malloc
 
 PUBLIC _calloc_unlocked_callee
 
+EXTERN asm_calloc_unlocked
+
 _calloc_unlocked_callee:
 
    pop af
@@ -12,4 +14,4 @@ _calloc_unlocked_callee:
    pop bc
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_calloc_unlocked.asm"
+   jp asm_calloc_unlocked

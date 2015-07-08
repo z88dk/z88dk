@@ -5,6 +5,8 @@ SECTION code_alloc_obstack
 
 PUBLIC _obstack_blank_fast_callee
 
+EXTERN asm_obstack_blank_fast
+
 _obstack_blank_fast_callee:
 
    pop af
@@ -12,4 +14,4 @@ _obstack_blank_fast_callee:
    pop bc
    push af
    
-   INCLUDE "alloc/obstack/z80/asm_obstack_blank_fast.asm"
+   jp asm_obstack_blank_fast

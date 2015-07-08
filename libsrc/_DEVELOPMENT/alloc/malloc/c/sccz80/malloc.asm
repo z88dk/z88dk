@@ -11,9 +11,9 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC malloc
 
-malloc:
+EXTERN asm_malloc
 
-   INCLUDE "alloc/malloc/z80/asm_malloc.asm"
+defc malloc = asm_malloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -24,8 +24,6 @@ PUBLIC malloc
 EXTERN malloc_unlocked
 
 defc malloc = malloc_unlocked
-   
-INCLUDE "alloc/malloc/z80/asm_malloc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

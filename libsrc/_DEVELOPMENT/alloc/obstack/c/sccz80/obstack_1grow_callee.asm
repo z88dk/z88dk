@@ -13,10 +13,12 @@ SECTION code_alloc_obstack
 
 PUBLIC obstack_1grow_callee
 
+EXTERN asm_obstack_1grow
+
 obstack_1grow_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "alloc/obstack/z80/asm_obstack_1grow.asm"
+   jp asm_obstack_1grow

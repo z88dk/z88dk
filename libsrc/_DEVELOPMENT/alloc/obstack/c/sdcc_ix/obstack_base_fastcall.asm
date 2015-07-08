@@ -5,6 +5,6 @@ SECTION code_alloc_obstack
 
 PUBLIC _obstack_base_fastcall
 
-_obstack_base_fastcall:
+EXTERN asm_obstack_base
 
-   INCLUDE "alloc/obstack/z80/asm_obstack_base.asm"
+defc _obstack_base_fastcall = asm_obstack_base

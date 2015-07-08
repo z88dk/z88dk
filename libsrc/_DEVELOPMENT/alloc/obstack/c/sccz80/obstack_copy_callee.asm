@@ -15,6 +15,8 @@ SECTION code_alloc_obstack
 
 PUBLIC obstack_copy_callee
 
+EXTERN asm_obstack_copy
+
 obstack_copy_callee:
 
    pop hl
@@ -22,4 +24,4 @@ obstack_copy_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "alloc/obstack/z80/asm_obstack_copy.asm"
+   jp asm_obstack_copy

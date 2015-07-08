@@ -13,6 +13,6 @@ SECTION code_alloc_obstack
 
 PUBLIC obstack_next_free
 
-obstack_next_free:
+EXTERN asm_obstack_next_free
 
-   INCLUDE "alloc/obstack/z80/asm_obstack_next_free.asm"
+defc obstack_next_free = asm_obstack_next_free

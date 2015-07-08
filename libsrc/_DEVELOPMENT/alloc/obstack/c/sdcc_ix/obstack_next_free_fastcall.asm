@@ -5,6 +5,6 @@ SECTION code_alloc_obstack
 
 PUBLIC _obstack_next_free_fastcall
 
-_obstack_next_free_fastcall:
+EXTERN asm_obstack_next_free
 
-   INCLUDE "alloc/obstack/z80/asm_obstack_next_free.asm"
+defc _obstack_next_free_fastcall = asm_obstack_next_free

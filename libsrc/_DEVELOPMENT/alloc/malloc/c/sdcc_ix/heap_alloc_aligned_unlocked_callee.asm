@@ -5,6 +5,8 @@ SECTION code_alloc_malloc
 
 PUBLIC _heap_alloc_aligned_unlocked_callee
 
+EXTERN asm_heap_alloc_aligned_unlocked
+
 _heap_alloc_aligned_unlocked_callee:
 
    pop hl
@@ -12,4 +14,4 @@ _heap_alloc_aligned_unlocked_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "alloc/malloc/z80/asm_heap_alloc_aligned_unlocked.asm"
+   jp asm_heap_alloc_aligned_unlocked

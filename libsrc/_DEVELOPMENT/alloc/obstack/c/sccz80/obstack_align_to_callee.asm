@@ -15,10 +15,12 @@ SECTION code_alloc_obstack
 
 PUBLIC obstack_align_to_callee
 
+EXTERN asm_obstack_align_to
+
 obstack_align_to_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "alloc/obstack/z80/asm_obstack_align_to.asm"
+   jp asm_obstack_align_to

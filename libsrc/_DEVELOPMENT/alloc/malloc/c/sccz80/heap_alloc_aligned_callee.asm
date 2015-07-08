@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC heap_alloc_aligned_callee
 
+EXTERN asm_heap_alloc_aligned
+
 heap_alloc_aligned_callee:
 
    pop af
@@ -19,7 +21,7 @@ heap_alloc_aligned_callee:
    pop de
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_heap_alloc_aligned.asm"
+   jp asm_heap_alloc_aligned
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -30,8 +32,6 @@ PUBLIC heap_alloc_aligned_callee
 EXTERN heap_alloc_aligned_unlocked_callee
 
 defc heap_alloc_aligned_callee = heap_alloc_aligned_unlocked_callee
-   
-INCLUDE "alloc/malloc/z80/asm_heap_alloc_aligned.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -13,6 +13,6 @@ SECTION code_alloc_obstack
 
 PUBLIC obstack_object_size
 
-obstack_object_size:
+EXTERN asm_obstack_object_size
 
-   INCLUDE "alloc/obstack/z80/asm_obstack_object_size.asm"
+defc obstack_object_size = asm_obstack_object_size

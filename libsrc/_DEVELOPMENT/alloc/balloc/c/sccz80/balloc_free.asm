@@ -5,6 +5,6 @@ SECTION code_alloc_balloc
 
 PUBLIC balloc_free
 
-balloc_free:
+EXTERN asm_balloc_free
 
-   INCLUDE "alloc/balloc/z80/asm_balloc_free.asm"
+defc balloc_free = asm_balloc_free

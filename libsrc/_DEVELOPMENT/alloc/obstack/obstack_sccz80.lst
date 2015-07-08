@@ -33,3 +33,4 @@ alloc/obstack/c/sccz80/obstack_int_grow_fast_callee
 alloc/obstack/c/sccz80/obstack_next_free
 alloc/obstack/c/sccz80/obstack_object_size
 alloc/obstack/c/sccz80/obstack_room
+@alloc/obstack/obstack_asm.lst

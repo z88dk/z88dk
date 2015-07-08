@@ -6,5 +6,3 @@ PUBLIC memalign_unlocked_callee
 EXTERN aligned_alloc_unlocked_callee
 
 defc memalign_unlocked_callee = aligned_alloc_unlocked_callee
-
-INCLUDE "alloc/malloc/z80/asm_memalign_unlocked.asm"

@@ -38,3 +38,4 @@ alloc/obstack/c/sdcc_iy/obstack_object_size
 alloc/obstack/c/sdcc_iy/obstack_object_size_fastcall
 alloc/obstack/c/sdcc_iy/obstack_room
 alloc/obstack/c/sdcc_iy/obstack_room_fastcall
+@alloc/obstack/obstack_asm.lst

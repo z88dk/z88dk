@@ -5,6 +5,8 @@ SECTION code_alloc_malloc
 
 PUBLIC posix_memalign_unlocked_callee
 
+EXTERN asm_posix_memalign_unlocked
+
 posix_memalign_unlocked_callee:
 
    pop af
@@ -13,4 +15,4 @@ posix_memalign_unlocked_callee:
    pop de
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_posix_memalign_unlocked.asm"
+   jp asm_posix_memalign_unlocked

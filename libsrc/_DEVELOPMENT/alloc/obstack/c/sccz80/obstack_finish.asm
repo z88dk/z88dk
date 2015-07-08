@@ -19,6 +19,6 @@ SECTION code_alloc_obstack
 
 PUBLIC obstack_finish
 
-obstack_finish:
+EXTERN asm_obstack_finish
 
-   INCLUDE "alloc/obstack/z80/asm_obstack_finish.asm"
+defc obstack_finish = asm_obstack_finish

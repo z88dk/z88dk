@@ -62,7 +62,4 @@ alloc/malloc/c/sdcc_ix/_falloc_
 alloc/malloc/c/sdcc_ix/_falloc__callee
 alloc/malloc/c/sdcc_ix/_falloc__unlocked
 alloc/malloc/c/sdcc_ix/_falloc__unlocked_callee
-alloc/malloc/z80/__heap_allocate_block
-alloc/malloc/z80/__heap_lock_acquire
-alloc/malloc/z80/__heap_lock_release
-alloc/malloc/z80/__heap_place_block
+@alloc/malloc/malloc_asm.lst

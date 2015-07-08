@@ -5,10 +5,12 @@ SECTION code_alloc_malloc
 
 PUBLIC heap_init_callee
 
+EXTERN asm_heap_init
+
 heap_init_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "alloc/malloc/z80/asm_heap_init.asm"
+   jp asm_heap_init

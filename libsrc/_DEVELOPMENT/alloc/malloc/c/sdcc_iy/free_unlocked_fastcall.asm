@@ -5,6 +5,6 @@ SECTION code_alloc_malloc
 
 PUBLIC _free_unlocked_fastcall
 
-_free_unlocked_fastcall:
+EXTERN asm_free_unlocked
 
-   INCLUDE "alloc/malloc/z80/asm_free_unlocked.asm"
+defc _free_unlocked_fastcall = asm_free_unlocked

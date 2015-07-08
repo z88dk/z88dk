@@ -5,10 +5,12 @@ SECTION code_alloc_malloc
 
 PUBLIC _heap_alloc_unlocked_callee
 
+EXTERN asm_heap_alloc_unlocked
+
 _heap_alloc_unlocked_callee:
 
    pop hl
    pop de
    ex (sp),hl
    
-   INCLUDE "alloc/malloc/z80/asm_heap_alloc_unlocked.asm"
+   jp asm_heap_alloc_unlocked

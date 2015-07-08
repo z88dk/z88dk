@@ -15,8 +15,6 @@ EXTERN aligned_alloc_callee
 
 defc memalign_callee = aligned_alloc_callee
 
-INCLUDE "alloc/malloc/z80/asm_memalign.asm"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -26,8 +24,6 @@ PUBLIC memalign_callee
 EXTERN memalign_unlocked_callee
 
 defc memalign_callee = memalign_unlocked_callee
-   
-INCLUDE "alloc/malloc/z80/asm_memalign.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

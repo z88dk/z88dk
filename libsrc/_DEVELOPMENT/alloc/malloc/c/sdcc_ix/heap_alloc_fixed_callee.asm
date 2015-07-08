@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC _heap_alloc_fixed_callee
 
+EXTERN asm_heap_alloc_fixed
+
 _heap_alloc_fixed_callee:
 
    pop hl
@@ -18,7 +20,7 @@ _heap_alloc_fixed_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "alloc/malloc/z80/asm_heap_alloc_fixed.asm"
+   jp asm_heap_alloc_fixed
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -29,8 +31,6 @@ PUBLIC _heap_alloc_fixed_callee
 EXTERN _heap_alloc_fixed_unlocked_callee
 
 defc _heap_alloc_fixed_callee = _heap_alloc_fixed_unlocked_callee
-   
-INCLUDE "alloc/malloc/z80/asm_heap_alloc_fixed.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

@@ -5,6 +5,6 @@ SECTION code_alloc_balloc
 
 PUBLIC _balloc_blockcount_fastcall
 
-_balloc_blockcount_fastcall:
+EXTERN asm_balloc_blockcount
 
-   INCLUDE "alloc/balloc/z80/asm_balloc_blockcount.asm"
+defc _balloc_blockcount_fastcall = asm_balloc_blockcount

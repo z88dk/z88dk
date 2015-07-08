@@ -14,6 +14,8 @@ SECTION code_alloc_obstack
 
 PUBLIC obstack_init_callee
 
+EXTERN asm_obstack_init
+
 obstack_init_callee:
 
    pop hl
@@ -21,4 +23,4 @@ obstack_init_callee:
    pop de
    push hl
    
-   INCLUDE "alloc/obstack/z80/asm_obstack_init.asm"
+   jp asm_obstack_init

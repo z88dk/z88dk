@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC heap_realloc_callee
 
+EXTERN asm_heap_realloc
+
 heap_realloc_callee:
 
    pop af
@@ -19,7 +21,7 @@ heap_realloc_callee:
    pop de
    push af
    
-   INCLUDE "alloc/malloc/z80/asm_heap_realloc.asm"
+   jp asm_heap_realloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -30,8 +32,6 @@ PUBLIC heap_realloc_callee
 EXTERN heap_realloc_unlocked_callee
 
 defc heap_realloc_callee = heap_realloc_unlocked_callee
-   
-INCLUDE "alloc/malloc/z80/asm_heap_realloc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

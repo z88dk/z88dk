@@ -5,6 +5,6 @@ SECTION code_alloc_balloc
 
 PUBLIC _balloc_alloc_fastcall
 
-_balloc_alloc_fastcall:
+EXTERN asm_balloc_alloc
 
-   INCLUDE "alloc/balloc/z80/asm_balloc_alloc.asm"
+defc _balloc_alloc_fastcall = asm_balloc_alloc

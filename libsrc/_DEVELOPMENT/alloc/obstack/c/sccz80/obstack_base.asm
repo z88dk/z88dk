@@ -13,6 +13,6 @@ SECTION code_alloc_obstack
 
 PUBLIC obstack_base
 
-obstack_base:
+EXTERN asm_obstack_base
 
-   INCLUDE "alloc/obstack/z80/asm_obstack_base.asm"
+defc obstack_base = asm_obstack_base

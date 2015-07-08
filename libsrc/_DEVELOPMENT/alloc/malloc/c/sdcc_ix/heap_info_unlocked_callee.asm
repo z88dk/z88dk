@@ -5,6 +5,8 @@ SECTION code_alloc_malloc
 
 PUBLIC _heap_info_unlocked_callee, l0_heap_info_unlocked_callee
 
+EXTERN asm_heap_info_unlocked
+
 _heap_info_unlocked_callee:
 
    pop af
@@ -21,5 +23,3 @@ l0_heap_info_unlocked_callee:
    
    pop ix
    ret
-   
-   INCLUDE "alloc/malloc/z80/asm_heap_info_unlocked.asm"

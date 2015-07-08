@@ -5,6 +5,8 @@ SECTION code_alloc_obstack
 
 PUBLIC _obstack_copy_callee
 
+EXTERN asm_obstack_copy
+
 _obstack_copy_callee:
 
    pop af
@@ -13,4 +15,4 @@ _obstack_copy_callee:
    pop bc
    push af
 
-   INCLUDE "alloc/obstack/z80/asm_obstack_copy.asm"
+   jp asm_obstack_copy

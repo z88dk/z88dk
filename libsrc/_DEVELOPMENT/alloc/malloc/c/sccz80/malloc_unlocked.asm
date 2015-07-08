@@ -5,6 +5,6 @@ SECTION code_alloc_malloc
 
 PUBLIC malloc_unlocked
 
-malloc_unlocked:
+EXTERN asm_malloc_unlocked
 
-   INCLUDE "alloc/malloc/z80/asm_malloc_unlocked.asm"
+defc malloc_unlocked = asm_malloc_unlocked

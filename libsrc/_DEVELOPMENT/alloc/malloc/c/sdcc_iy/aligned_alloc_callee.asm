@@ -11,13 +11,15 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC _aligned_alloc_callee
 
+EXTERN asm_aligned_alloc
+
 _aligned_alloc_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "alloc/malloc/z80/asm_aligned_alloc.asm"
+   jp asm_aligned_alloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -28,8 +30,6 @@ PUBLIC _aligned_alloc_callee
 EXTERN _aligned_alloc_unlocked_callee
 
 defc _aligned_alloc_callee = _aligned_alloc_unlocked_callee
-  
-INCLUDE "alloc/malloc/z80/asm_aligned_alloc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF

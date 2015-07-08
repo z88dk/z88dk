@@ -11,6 +11,8 @@ IF __CLIB_OPT_MULTITHREAD & $01
 
 PUBLIC _falloc__callee
 
+EXTERN asm__falloc
+
 _falloc__callee:
 
    pop af
@@ -18,7 +20,7 @@ _falloc__callee:
    pop bc
    push af
 
-   INCLUDE "alloc/malloc/z80/asm__falloc.asm"
+   jp asm__falloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -29,8 +31,6 @@ PUBLIC _falloc__callee
 EXTERN _falloc__unlocked_callee
 
 defc _falloc__callee = _falloc__unlocked_callee
-   
-INCLUDE "alloc/malloc/z80/asm__falloc.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
