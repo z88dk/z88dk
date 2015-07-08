@@ -5,16 +5,19 @@
 ;
 ;   Set TEXT mode
 ;
-;	$Id: mt_hrg_off.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: mt_hrg_off.asm,v 1.6 2015-07-08 05:57:53 stefano Exp $
 ;
 
 	PUBLIC	mt_hrg_off
+	PUBLIC	hrg_off
 
 	EXTERN	MTCH_P1
 	EXTERN	MTCH_P2
 	EXTERN	MTCH_P3
 
 .mt_hrg_off
+.hrg_off
+
 
 ; No need to patch the shadow ROM copy back to original values
 ; because it will be excluded by hardware, but our custom

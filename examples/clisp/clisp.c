@@ -3,7 +3,7 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.7 2015-04-22 17:37:01 stefano Exp $  */
+/*  $Id: clisp.c,v 1.8 2015-07-08 05:57:53 stefano Exp $  */
 
 /*
 z88dk build hints
@@ -26,7 +26,8 @@ zx81 32K exp (don't change LARGEMEM, space allocation is hardcoded)
 #endif
 
 #ifdef ZX81
-#pragma output STACKPTR=65535
+#pragma output STACKPTR=49152
+//#pragma output STACKPTR=65535
 unsigned int _sp;
 #endif
 
@@ -335,10 +336,16 @@ int cpt;
 char ug=13;
 
 char gchar() {
+#ifdef ZX81
+	zx_slow();
+#endif
     if (ug==13) {
       while (!gets(buf)) {};
       cpt=0;
     }
+#ifdef ZX81
+	zx_fast();
+#endif
     if ((ug=buf[cpt++]) == 0)  ug=13;
     return (ug);
 }
