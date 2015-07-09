@@ -5,6 +5,8 @@ SECTION code_adt_wa_priority_queue
 
 PUBLIC _wa_priority_queue_push_callee
 
+EXTERN asm_wa_priority_queue_push
+
 _wa_priority_queue_push_callee:
 
    pop af
@@ -12,4 +14,4 @@ _wa_priority_queue_push_callee:
    pop bc
    push af
    
-   INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_push.asm"
+   jp asm_wa_priority_queue_push

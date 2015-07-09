@@ -5,6 +5,6 @@ SECTION code_adt_wa_stack
 
 PUBLIC wa_stack_destroy
 
-defc wa_stack_destroy = asm_wa_stack_destroy
+EXTERN asm_wa_stack_destroy
 
-INCLUDE "adt/wa_stack/z80/asm_wa_stack_destroy.asm"
+defc wa_stack_destroy = asm_wa_stack_destroy

@@ -16,3 +16,4 @@ adt/wa_stack/c/sdcc_iy/wa_stack_size
 adt/wa_stack/c/sdcc_iy/wa_stack_size_fastcall
 adt/wa_stack/c/sdcc_iy/wa_stack_top
 adt/wa_stack/c/sdcc_iy/wa_stack_top_fastcall
+@adt/wa_stack/wa_stack_asm.lst

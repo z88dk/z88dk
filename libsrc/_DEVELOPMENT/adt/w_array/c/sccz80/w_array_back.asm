@@ -5,6 +5,6 @@ SECTION code_adt_w_array
 
 PUBLIC w_array_back
 
-w_array_back:
+EXTERN asm_w_array_back
 
-   INCLUDE "adt/w_array/z80/asm_w_array_back.asm"
+defc w_array_back = asm_w_array_back

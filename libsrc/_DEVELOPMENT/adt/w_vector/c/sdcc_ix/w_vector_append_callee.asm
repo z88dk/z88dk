@@ -5,6 +5,8 @@ SECTION code_adt_w_vector
 
 PUBLIC _w_vector_append_callee
 
+EXTERN asm_w_vector_append
+
 _w_vector_append_callee:
 
    pop af
@@ -12,4 +14,4 @@ _w_vector_append_callee:
    pop bc
    push af
    
-   INCLUDE "adt/w_vector/z80/asm_w_vector_append.asm"
+   jp asm_w_vector_append

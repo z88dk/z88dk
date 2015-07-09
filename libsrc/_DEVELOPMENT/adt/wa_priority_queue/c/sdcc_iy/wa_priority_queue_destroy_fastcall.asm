@@ -5,6 +5,6 @@ SECTION code_adt_wa_priority_queue
 
 PUBLIC _wa_priority_queue_destroy_fastcall
 
-defc _wa_priority_queue_destroy_fastcall = asm_wa_priority_queue_destroy
+EXTERN asm_wa_priority_queue_destroy
 
-INCLUDE "adt/wa_priority_queue/z80/asm_wa_priority_queue_destroy.asm"
+defc _wa_priority_queue_destroy_fastcall = asm_wa_priority_queue_destroy

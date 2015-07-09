@@ -5,6 +5,8 @@ SECTION code_adt_w_array
 
 PUBLIC _w_array_init_callee
 
+EXTERN asm_w_array_init
+
 _w_array_init_callee:
 
    pop af
@@ -13,4 +15,4 @@ _w_array_init_callee:
    pop bc
    push af
    
-   INCLUDE "adt/w_array/z80/asm_w_array_init.asm"
+   jp asm_w_array_init

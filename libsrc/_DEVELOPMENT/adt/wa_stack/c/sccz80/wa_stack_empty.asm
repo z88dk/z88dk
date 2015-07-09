@@ -5,6 +5,6 @@ SECTION code_adt_wa_stack
 
 PUBLIC wa_stack_empty
 
-defc wa_stack_empty = asm_wa_stack_empty
+EXTERN asm_wa_stack_empty
 
-INCLUDE "adt/wa_stack/z80/asm_wa_stack_empty.asm"
+defc wa_stack_empty = asm_wa_stack_empty

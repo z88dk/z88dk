@@ -5,6 +5,8 @@ SECTION code_adt_w_array
 
 PUBLIC _w_array_erase_range_callee
 
+EXTERN asm_w_array_erase_range
+
 _w_array_erase_range_callee:
 
    pop hl
@@ -12,4 +14,4 @@ _w_array_erase_range_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "adt/w_array/z80/asm_w_array_erase_range.asm"
+   jp asm_w_array_erase_range

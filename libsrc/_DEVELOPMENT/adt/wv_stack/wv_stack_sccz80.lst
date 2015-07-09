@@ -13,3 +13,4 @@ adt/wv_stack/c/sccz80/wv_stack_reserve_callee
 adt/wv_stack/c/sccz80/wv_stack_shrink_to_fit
 adt/wv_stack/c/sccz80/wv_stack_size
 adt/wv_stack/c/sccz80/wv_stack_top
+@adt/wv_stack/wv_stack_asm.lst

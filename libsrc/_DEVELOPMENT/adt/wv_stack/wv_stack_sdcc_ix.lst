@@ -22,3 +22,4 @@ adt/wv_stack/c/sdcc_ix/wv_stack_size
 adt/wv_stack/c/sdcc_ix/wv_stack_size_fastcall
 adt/wv_stack/c/sdcc_ix/wv_stack_top
 adt/wv_stack/c/sdcc_ix/wv_stack_top_fastcall
+@adt/wv_stack/wv_stack_asm.lst

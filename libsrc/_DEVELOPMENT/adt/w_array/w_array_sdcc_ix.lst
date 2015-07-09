@@ -36,4 +36,4 @@ adt/w_array/c/sdcc_ix/w_array_resize
 adt/w_array/c/sdcc_ix/w_array_resize_callee
 adt/w_array/c/sdcc_ix/w_array_size
 adt/w_array/c/sdcc_ix/w_array_size_fastcall
-adt/w_array/z80/__w_array_write_n
+@adt/w_array/w_array_asm.lst

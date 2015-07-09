@@ -26,3 +26,4 @@ adt/wv_priority_queue/c/sdcc_ix/wv_priority_queue_size
 adt/wv_priority_queue/c/sdcc_ix/wv_priority_queue_size_fastcall
 adt/wv_priority_queue/c/sdcc_ix/wv_priority_queue_top
 adt/wv_priority_queue/c/sdcc_ix/wv_priority_queue_top_fastcall
+@adt/wv_priority_queue/wv_priority_queue_asm.lst

@@ -5,6 +5,6 @@ SECTION code_adt_w_array
 
 PUBLIC w_array_clear
 
-defc w_array_clear = asm_w_array_clear
+EXTERN asm_w_array_clear
 
-INCLUDE "adt/w_array/z80/asm_w_array_clear.asm"
+defc w_array_clear = asm_w_array_clear

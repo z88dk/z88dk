@@ -42,3 +42,4 @@ adt/w_vector/c/sdcc_ix/w_vector_shrink_to_fit
 adt/w_vector/c/sdcc_ix/w_vector_shrink_to_fit_fastcall
 adt/w_vector/c/sdcc_ix/w_vector_size
 adt/w_vector/c/sdcc_ix/w_vector_size_fastcall
+@adt/w_vector/w_vector_asm.lst

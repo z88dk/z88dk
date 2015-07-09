@@ -5,6 +5,6 @@ SECTION code_adt_wv_stack
 
 PUBLIC wv_stack_pop
 
-defc wv_stack_pop = asm_wv_stack_pop
+EXTERN asm_wv_stack_pop
 
-INCLUDE "adt/wv_stack/z80/asm_wv_stack_pop.asm"
+defc wv_stack_pop = asm_wv_stack_pop

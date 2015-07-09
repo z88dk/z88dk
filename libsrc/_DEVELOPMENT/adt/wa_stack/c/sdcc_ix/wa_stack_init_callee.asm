@@ -8,5 +8,3 @@ PUBLIC _wa_stack_init_callee
 EXTERN _w_array_init_callee
 
 defc _wa_stack_init_callee = _w_array_init_callee
-
-INCLUDE "adt/wa_stack/z80/asm_wa_stack_init.asm"

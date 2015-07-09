@@ -5,10 +5,12 @@ SECTION code_adt_w_array
 
 PUBLIC w_array_erase_callee
 
+EXTERN asm_w_array_erase
+
 w_array_erase_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "adt/w_array/z80/asm_w_array_erase.asm"
+   jp asm_w_array_erase

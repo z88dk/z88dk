@@ -5,6 +5,8 @@ SECTION code_adt_wv_priority_queue
 
 PUBLIC _wv_priority_queue_push_callee, l0_wv_priority_queue_push_callee
 
+EXTERN asm_wv_priority_queue_push
+
 _wv_priority_queue_push_callee:
 
    pop af
@@ -19,5 +21,3 @@ l0_wv_priority_queue_push_callee:
    pop ix
    
    ret
-   
-   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_push.asm"

@@ -16,3 +16,4 @@ adt/wv_priority_queue/c/sccz80/wv_priority_queue_resize_callee
 adt/wv_priority_queue/c/sccz80/wv_priority_queue_shrink_to_fit
 adt/wv_priority_queue/c/sccz80/wv_priority_queue_size
 adt/wv_priority_queue/c/sccz80/wv_priority_queue_top
+@adt/wv_priority_queue/wv_priority_queue_asm.lst

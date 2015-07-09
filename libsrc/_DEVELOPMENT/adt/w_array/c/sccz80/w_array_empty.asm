@@ -5,6 +5,6 @@ SECTION code_adt_w_array
 
 PUBLIC w_array_empty
 
-defc w_array_empty = asm_w_array_empty
+EXTERN asm_w_array_empty
 
-INCLUDE "adt/w_array/z80/asm_w_array_empty.asm"
+defc w_array_empty = asm_w_array_empty

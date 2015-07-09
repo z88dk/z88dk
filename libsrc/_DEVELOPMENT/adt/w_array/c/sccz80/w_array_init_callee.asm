@@ -5,6 +5,8 @@ SECTION code_adt_w_array
 
 PUBLIC w_array_init_callee
 
+EXTERN asm_w_array_init
+
 w_array_init_callee:
 
    pop hl
@@ -12,4 +14,4 @@ w_array_init_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "adt/w_array/z80/asm_w_array_init.asm"
+   jp asm_w_array_init

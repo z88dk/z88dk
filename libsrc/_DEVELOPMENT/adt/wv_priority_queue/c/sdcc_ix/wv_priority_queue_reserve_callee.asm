@@ -5,6 +5,8 @@ SECTION code_adt_wv_priority_queue
 
 PUBLIC _wv_priority_queue_reserve_callee
 
+EXTERN asm_wv_priority_queue_reserve
+
 _wv_priority_queue_reserve_callee:
 
    pop af
@@ -12,4 +14,4 @@ _wv_priority_queue_reserve_callee:
    pop bc
    push af
    
-   INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_reserve.asm"
+   jp asm_wv_priority_queue_reserve

@@ -5,6 +5,6 @@ SECTION code_adt_w_vector
 
 PUBLIC _w_vector_pop_back_fastcall
 
-defc _w_vector_pop_back_fastcall = asm_w_vector_pop_back
+EXTERN asm_w_vector_pop_back
 
-INCLUDE "adt/w_vector/z80/asm_w_vector_pop_back.asm"
+defc _w_vector_pop_back_fastcall = asm_w_vector_pop_back

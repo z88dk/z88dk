@@ -5,6 +5,6 @@ SECTION code_adt_w_array
 
 PUBLIC w_array_capacity
 
-defc w_array_capacity = asm_w_array_capacity
+EXTERN asm_w_array_capacity
 
-INCLUDE "adt/w_array/z80/asm_w_array_capacity.asm"
+defc w_array_capacity = asm_w_array_capacity

@@ -5,10 +5,12 @@ SECTION code_adt_w_vector
 
 PUBLIC w_vector_reserve_callee
 
+EXTERN asm_w_vector_reserve
+
 w_vector_reserve_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "adt/w_vector/z80/asm_w_vector_reserve.asm"
+   jp asm_w_vector_reserve

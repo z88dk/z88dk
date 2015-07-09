@@ -8,5 +8,3 @@ PUBLIC _wa_stack_push_callee
 EXTERN _w_array_append_callee
 
 defc _wa_stack_push_callee = _w_array_append_callee
-
-INCLUDE "adt/wa_stack/z80/asm_wa_stack_push.asm"

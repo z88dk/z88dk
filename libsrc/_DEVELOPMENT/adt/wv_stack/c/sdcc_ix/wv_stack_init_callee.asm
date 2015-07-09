@@ -8,5 +8,3 @@ PUBLIC _wv_stack_init_callee
 EXTERN _w_vector_init_callee
 
 defc _wv_stack_init_callee = _w_vector_init_callee
-
-INCLUDE "adt/wv_stack/z80/asm_wv_stack_init.asm"

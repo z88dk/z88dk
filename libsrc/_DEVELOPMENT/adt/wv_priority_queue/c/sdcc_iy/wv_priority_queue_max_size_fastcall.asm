@@ -5,6 +5,6 @@ SECTION code_adt_wv_priority_queue
 
 PUBLIC _wv_priority_queue_max_size_fastcall
 
-defc _wv_priority_queue_max_size_fastcall = asm_wv_priority_queue_max_size
+EXTERN asm_wv_priority_queue_max_size
 
-INCLUDE "adt/wv_priority_queue/z80/asm_wv_priority_queue_max_size.asm"
+defc _wv_priority_queue_max_size_fastcall = asm_wv_priority_queue_max_size
