@@ -128,6 +128,7 @@ l/z80/long/l_long_load_mhl
 l/z80/long/l_long_sbc_mde_mhl
 l/z80/long/l_long_sbc_stack
 l/z80/long/l_long_sbcu_exx
+l/z80/long/l_long_store_mhl
 l/z80/long/l_lsl_dehl
 l/z80/long/l_lsr_dehl
 l/z80/long/l_minu_bc_dehl
