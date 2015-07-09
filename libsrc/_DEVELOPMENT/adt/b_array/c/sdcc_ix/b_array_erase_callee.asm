@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_erase_callee
 
+EXTERN asm_b_array_erase
+
 _b_array_erase_callee:
 
    pop af
@@ -12,4 +14,4 @@ _b_array_erase_callee:
    pop bc
    push af
    
-   INCLUDE "adt/b_array/z80/asm_b_array_erase.asm"
+   jp asm_b_array_erase

@@ -5,10 +5,12 @@ SECTION code_adt_b_array
 
 PUBLIC b_array_at_callee
 
+EXTERN asm_b_array_at
+
 b_array_at_callee:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "adt/b_array/z80/asm_b_array_at.asm"
+   jp asm_b_array_at

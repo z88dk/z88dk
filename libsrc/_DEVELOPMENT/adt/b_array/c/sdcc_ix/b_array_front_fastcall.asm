@@ -5,6 +5,6 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_front_fastcall
 
-_b_array_front_fastcall:
+EXTERN asm_b_array_front
 
-   INCLUDE "adt/b_array/z80/asm_b_array_front.asm"
+defc _b_array_front_fastcall = asm_b_array_front

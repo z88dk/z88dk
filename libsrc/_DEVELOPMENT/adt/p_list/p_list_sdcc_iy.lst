@@ -30,3 +30,4 @@ adt/p_list/c/sdcc_iy/p_list_remove_after
 adt/p_list/c/sdcc_iy/p_list_remove_after_callee
 adt/p_list/c/sdcc_iy/p_list_size
 adt/p_list/c/sdcc_iy/p_list_size_fastcall
+@adt/p_list/p_list_asm.lst

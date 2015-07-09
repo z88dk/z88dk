@@ -41,6 +41,4 @@ adt/b_vector/c/sccz80/b_vector_shrink_to_fit
 adt/b_vector/c/sccz80/b_vector_size
 adt/b_vector/c/sccz80/b_vector_write_block
 adt/b_vector/c/sccz80/b_vector_write_block_callee
-adt/b_vector/z80/__vector_make_room
-adt/b_vector/z80/__vector_make_room_best_effort
-adt/b_vector/z80/__vector_realloc_grow
+@adt/b_vector/b_vector_asm.lst

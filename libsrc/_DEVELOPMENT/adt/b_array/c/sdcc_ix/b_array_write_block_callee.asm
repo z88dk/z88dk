@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_write_block_callee
 
+EXTERN asm_b_array_write_block
+
 _b_array_write_block_callee:
 
    pop af
@@ -16,4 +18,4 @@ _b_array_write_block_callee:
    pop bc
    push af
    
-   INCLUDE "adt/b_array/z80/asm_b_array_write_block.asm"
+   jp asm_b_array_write_block

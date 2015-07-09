@@ -19,3 +19,4 @@ adt/p_forward_list_alt/c/sccz80/p_forward_list_alt_remove_after
 adt/p_forward_list_alt/c/sccz80/p_forward_list_alt_remove_after_callee
 adt/p_forward_list_alt/c/sccz80/p_forward_list_alt_remove_callee
 adt/p_forward_list_alt/c/sccz80/p_forward_list_alt_size
+@adt/p_forward_list_alt/p_forward_list_alt_asm.lst

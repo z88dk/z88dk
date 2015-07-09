@@ -5,10 +5,12 @@ SECTION code_adt_p_forward_list
 
 PUBLIC p_forward_list_push_back_callee
 
+EXTERN asm_p_forward_list_push_back
+
 p_forward_list_push_back_callee:
 
    pop hl
    pop de
    ex (sp),hl
    
-   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_push_back.asm"
+   jp asm_p_forward_list_push_back

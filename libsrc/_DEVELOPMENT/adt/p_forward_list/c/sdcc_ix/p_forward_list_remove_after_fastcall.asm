@@ -5,6 +5,6 @@ SECTION code_adt_p_forward_list
 
 PUBLIC _p_forward_list_remove_after_fastcall
 
-_p_forward_list_remove_after_fastcall:
-   
-   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_remove_after.asm"
+EXTERN asm_p_forward_list_remove_after
+
+defc _p_forward_list_remove_after_fastcall = asm_p_forward_list_remove_after

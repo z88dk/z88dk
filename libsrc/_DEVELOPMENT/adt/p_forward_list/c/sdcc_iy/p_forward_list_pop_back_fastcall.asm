@@ -5,6 +5,6 @@ SECTION code_adt_p_forward_list
 
 PUBLIC _p_forward_list_pop_back_fastcall
 
-_p_forward_list_pop_back_fastcall:
+EXTERN asm_p_forward_list_pop_back
 
-   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_pop_back.asm"
+defc _p_forward_list_pop_back_fastcall = asm_p_forward_list_pop_back

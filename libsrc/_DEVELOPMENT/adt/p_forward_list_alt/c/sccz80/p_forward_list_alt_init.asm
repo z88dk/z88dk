@@ -5,6 +5,6 @@ SECTION code_adt_p_forward_list_alt
 
 PUBLIC p_forward_list_alt_init
 
-p_forward_list_alt_init:
+EXTERN asm_p_forward_list_alt_init
 
-   INCLUDE "adt/p_forward_list_alt/z80/asm_p_forward_list_alt_init.asm"
+defc p_forward_list_alt_init = asm_p_forward_list_alt_init

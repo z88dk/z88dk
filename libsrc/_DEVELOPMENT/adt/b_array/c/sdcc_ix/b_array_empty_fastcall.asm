@@ -5,6 +5,6 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_empty_fastcall
 
+EXTERN asm_b_array_empty
+
 defc _b_array_empty_fastcall = asm_b_array_empty
-   
-INCLUDE "adt/b_array/z80/asm_b_array_empty.asm"

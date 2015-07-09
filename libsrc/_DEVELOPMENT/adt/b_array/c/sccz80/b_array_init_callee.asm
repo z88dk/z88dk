@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC b_array_init_callee
 
+EXTERN asm_b_array_init
+
 b_array_init_callee:
 
    pop hl
@@ -12,4 +14,4 @@ b_array_init_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "adt/b_array/z80/asm_b_array_init.asm"
+   jp asm_b_array_init

@@ -16,3 +16,4 @@ adt/ba_stack/c/sdcc_ix/ba_stack_size
 adt/ba_stack/c/sdcc_ix/ba_stack_size_fastcall
 adt/ba_stack/c/sdcc_ix/ba_stack_top
 adt/ba_stack/c/sdcc_ix/ba_stack_top_fastcall
+@adt/ba_stack/ba_stack_asm.lst

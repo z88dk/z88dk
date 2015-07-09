@@ -5,10 +5,12 @@ SECTION code_adt_p_list
 
 PUBLIC p_list_push_front_callee
 
+EXTERN asm_p_list_push_front
+
 p_list_push_front_callee:
 
    pop hl
    pop de
    ex (sp),hl
    
-   INCLUDE "adt/p_list/z80/asm_p_list_push_front.asm"
+   jp asm_p_list_push_front

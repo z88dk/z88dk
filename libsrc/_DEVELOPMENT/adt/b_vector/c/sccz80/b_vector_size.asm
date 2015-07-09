@@ -5,6 +5,6 @@ SECTION code_adt_b_vector
 
 PUBLIC b_vector_size
 
-defc b_vector_size = asm_b_vector_size
+EXTERN asm_b_vector_size
 
-INCLUDE "adt/b_vector/z80/asm_b_vector_size.asm"
+defc b_vector_size = asm_b_vector_size

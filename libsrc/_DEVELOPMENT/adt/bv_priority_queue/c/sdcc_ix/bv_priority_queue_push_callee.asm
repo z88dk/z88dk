@@ -5,6 +5,8 @@ SECTION code_adt_bv_priority_queue
 
 PUBLIC _bv_priority_queue_push_callee, l0_bv_priority_queue_push_callee
 
+EXTERN asm_bv_priority_queue_push
+
 _bv_priority_queue_push_callee:
 
    pop af
@@ -19,5 +21,3 @@ l0_bv_priority_queue_push_callee:
    pop ix
    
    ret
-   
-   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_push.asm"

@@ -37,8 +37,4 @@ adt/b_array/c/sccz80/b_array_resize_callee
 adt/b_array/c/sccz80/b_array_size
 adt/b_array/c/sccz80/b_array_write_block
 adt/b_array/c/sccz80/b_array_write_block_callee
-adt/b_array/z80/__array_at
-adt/b_array/z80/__array_expand
-adt/b_array/z80/__array_info
-adt/b_array/z80/__array_make_room
-adt/b_array/z80/__array_make_room_best_effort
+@adt/b_array/b_array_asm.lst

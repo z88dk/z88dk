@@ -6,3 +6,4 @@ adt/p_stack/c/sccz80/p_stack_push
 adt/p_stack/c/sccz80/p_stack_push_callee
 adt/p_stack/c/sccz80/p_stack_size
 adt/p_stack/c/sccz80/p_stack_top
+@adt/p_stack/p_stack_asm.lst

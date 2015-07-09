@@ -5,6 +5,8 @@ SECTION code_adt_b_vector
 
 PUBLIC b_vector_write_block_callee
 
+EXTERN asm_b_vector_write_block
+
 b_vector_write_block_callee:
 
    pop af
@@ -16,4 +18,4 @@ b_vector_write_block_callee:
    exx
    push af
    
-   INCLUDE "adt/b_vector/z80/asm_b_vector_write_block.asm"
+   jp asm_b_vector_write_block

@@ -5,10 +5,12 @@ SECTION code_adt_bv_priority_queue
 
 PUBLIC bv_priority_queue_push
 
+EXTERN asm_bv_priority_queue_push
+
 bv_priority_queue_push:
 
    pop hl
    pop bc
    ex (sp),hl
    
-   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_push.asm"
+   jp asm_bv_priority_queue_push

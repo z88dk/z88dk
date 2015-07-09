@@ -5,6 +5,6 @@ SECTION code_adt_b_vector
 
 PUBLIC _b_vector_shrink_to_fit_fastcall
 
-_b_vector_shrink_to_fit_fastcall:
+EXTERN asm_b_vector_shrink_to_fit
 
-   INCLUDE "adt/b_vector/z80/asm_b_vector_shrink_to_fit.asm"
+defc _b_vector_shrink_to_fit_fastcall = asm_b_vector_shrink_to_fit

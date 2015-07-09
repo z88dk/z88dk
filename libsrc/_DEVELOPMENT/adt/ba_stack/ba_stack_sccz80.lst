@@ -9,3 +9,4 @@ adt/ba_stack/c/sccz80/ba_stack_push
 adt/ba_stack/c/sccz80/ba_stack_push_callee
 adt/ba_stack/c/sccz80/ba_stack_size
 adt/ba_stack/c/sccz80/ba_stack_top
+@adt/ba_stack/ba_stack_asm.lst

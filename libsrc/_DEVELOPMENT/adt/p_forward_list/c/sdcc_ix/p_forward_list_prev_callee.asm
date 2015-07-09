@@ -5,6 +5,8 @@ SECTION code_adt_p_forward_list
 
 PUBLIC _p_forward_list_prev_callee
 
+EXTERN asm_p_forward_list_prev
+
 _p_forward_list_prev_callee:
 
    pop af
@@ -12,4 +14,4 @@ _p_forward_list_prev_callee:
    pop bc
    push af
    
-   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_prev.asm"
+   jp asm_p_forward_list_prev

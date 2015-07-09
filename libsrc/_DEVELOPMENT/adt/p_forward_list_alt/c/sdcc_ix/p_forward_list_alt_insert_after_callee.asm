@@ -5,6 +5,8 @@ SECTION code_adt_p_forward_list_alt
 
 PUBLIC _p_forward_list_alt_insert_after_callee
 
+EXTERN asm_p_forward_list_alt_insert_after
+
 _p_forward_list_alt_insert_after_callee:
 
    pop af
@@ -13,4 +15,4 @@ _p_forward_list_alt_insert_after_callee:
    pop de
    push af
 
-   INCLUDE "adt/p_forward_list_alt/z80/asm_p_forward_list_alt_insert_after.asm"
+   jp asm_p_forward_list_alt_insert_after

@@ -22,3 +22,4 @@ adt/bv_stack/c/sdcc_iy/bv_stack_size
 adt/bv_stack/c/sdcc_iy/bv_stack_size_fastcall
 adt/bv_stack/c/sdcc_iy/bv_stack_top
 adt/bv_stack/c/sdcc_iy/bv_stack_top_fastcall
+@adt/bv_stack/bv_stack_asm.lst

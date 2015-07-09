@@ -6,6 +6,8 @@ SECTION code_adt_ba_priority_queue
 
 PUBLIC ba_priority_queue_init_callee
 
+EXTERN asm_ba_priority_queue_init
+
 ba_priority_queue_init_callee:
 
    pop hl
@@ -14,4 +16,4 @@ ba_priority_queue_init_callee:
    pop de
    ex (sp),hl
    
-   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_init.asm"
+   jp asm_ba_priority_queue_init

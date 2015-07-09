@@ -5,6 +5,8 @@ SECTION code_adt_b_vector
 
 PUBLIC b_vector_init_callee
 
+EXTERN asm_b_vector_init
+
 b_vector_init_callee:
 
    pop af
@@ -13,4 +15,4 @@ b_vector_init_callee:
    pop de
    push af
    
-   INCLUDE "adt/b_vector/z80/asm_b_vector_init.asm"
+   jp asm_b_vector_init

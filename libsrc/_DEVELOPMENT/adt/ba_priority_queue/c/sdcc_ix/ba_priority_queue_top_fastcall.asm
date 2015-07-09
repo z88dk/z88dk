@@ -5,6 +5,6 @@ SECTION code_adt_ba_priority_queue
 
 PUBLIC _ba_priority_queue_top_fastcall
 
-_ba_priority_queue_top_fastcall:
+EXTERN asm_ba_priority_queue_top
 
-   INCLUDE "adt/ba_priority_queue/z80/asm_ba_priority_queue_top.asm"
+defc _ba_priority_queue_top_fastcall = asm_ba_priority_queue_top

@@ -5,6 +5,6 @@ SECTION code_adt_ba_stack
 
 PUBLIC ba_stack_capacity
 
-defc ba_stack_capacity = asm_ba_stack_capacity
+EXTERN asm_ba_stack_capacity
 
-INCLUDE "adt/ba_stack/z80/asm_ba_stack_capacity.asm"
+defc ba_stack_capacity = asm_ba_stack_capacity

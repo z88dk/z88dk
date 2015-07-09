@@ -13,3 +13,4 @@ adt/bv_stack/c/sccz80/bv_stack_reserve_callee
 adt/bv_stack/c/sccz80/bv_stack_shrink_to_fit
 adt/bv_stack/c/sccz80/bv_stack_size
 adt/bv_stack/c/sccz80/bv_stack_top
+@adt/bv_stack/bv_stack_asm.lst

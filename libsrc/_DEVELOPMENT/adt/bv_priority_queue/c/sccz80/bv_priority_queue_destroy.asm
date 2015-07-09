@@ -5,6 +5,6 @@ SECTION code_adt_bv_priority_queue
 
 PUBLIC bv_priority_queue_destroy
 
-bv_priority_queue_destroy:
+EXTERN asm_bv_priority_queue_destroy
 
-   INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_destroy.asm"
+defc bv_priority_queue_destroy = asm_bv_priority_queue_destroy

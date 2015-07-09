@@ -16,3 +16,4 @@ adt/bv_priority_queue/c/sccz80/bv_priority_queue_resize_callee
 adt/bv_priority_queue/c/sccz80/bv_priority_queue_shrink_to_fit
 adt/bv_priority_queue/c/sccz80/bv_priority_queue_size
 adt/bv_priority_queue/c/sccz80/bv_priority_queue_top
+@adt/bv_priority_queue/bv_priority_queue_asm.lst

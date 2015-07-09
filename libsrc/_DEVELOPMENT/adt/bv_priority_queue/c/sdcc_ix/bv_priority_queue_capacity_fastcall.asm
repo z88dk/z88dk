@@ -5,6 +5,6 @@ SECTION code_adt_bv_priority_queue
 
 PUBLIC _bv_priority_queue_capacity_fastcall
 
-defc _bv_priority_queue_capacity = asm_bv_priority_queue_capacity
+EXTERN asm_bv_priority_queue_capacity
 
-INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_capacity.asm"
+defc _bv_priority_queue_capacity = asm_bv_priority_queue_capacity

@@ -5,6 +5,8 @@ SECTION code_adt_b_array
 
 PUBLIC _b_array_insert_block_callee
 
+EXTERN asm_b_array_insert_block
+
 _b_array_insert_block_callee:
 
    pop af
@@ -13,4 +15,4 @@ _b_array_insert_block_callee:
    pop de
    push af
    
-   INCLUDE "adt/b_array/z80/asm_b_array_insert_block.asm"
+   jp asm_b_array_insert_block

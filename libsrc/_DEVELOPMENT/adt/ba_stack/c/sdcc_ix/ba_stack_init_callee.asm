@@ -8,5 +8,3 @@ PUBLIC _ba_stack_init_callee
 EXTERN _b_array_init_callee
 
 defc _ba_stack_init_callee = _b_array_init_callee
-
-INCLUDE "adt/ba_stack/z80/asm_ba_stack_init.asm"

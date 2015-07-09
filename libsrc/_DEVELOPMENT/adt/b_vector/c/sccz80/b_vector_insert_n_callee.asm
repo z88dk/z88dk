@@ -5,6 +5,8 @@ SECTION code_adt_b_vector
 
 PUBLIC b_vector_insert_n_callee
 
+EXTERN asm_b_vector_insert_n
+
 b_vector_insert_n_callee:
 
    pop hl
@@ -14,4 +16,4 @@ b_vector_insert_n_callee:
    pop bc
    ex (sp),hl
    
-   INCLUDE "adt/b_vector/z80/asm_b_vector_insert_n.asm"
+   jp asm_b_vector_insert_n

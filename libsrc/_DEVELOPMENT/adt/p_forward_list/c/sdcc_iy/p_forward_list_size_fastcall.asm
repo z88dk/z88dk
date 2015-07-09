@@ -5,6 +5,6 @@ SECTION code_adt_p_forward_list
 
 PUBLIC _p_forward_list_size_fastcall
 
-_p_forward_list_size_fastcall:
+EXTERN asm_p_forward_list_size
 
-   INCLUDE "adt/p_forward_list/z80/asm_p_forward_list_size.asm"
+defc _p_forward_list_size_fastcall = asm_p_forward_list_size

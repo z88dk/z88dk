@@ -5,6 +5,6 @@ SECTION code_adt_b_array
 
 PUBLIC b_array_destroy
 
-b_array_destroy:
+EXTERN asm_b_array_destroy
 
-   INCLUDE "adt/b_array/z80/asm_b_array_destroy.asm"
+defc b_array_destroy = asm_b_array_destroy

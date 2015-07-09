@@ -5,6 +5,6 @@ SECTION code_adt_bv_priority_queue
 
 PUBLIC bv_priority_queue_empty
 
-defc bv_priority_queue_empty = asm_bv_priority_queue_empty
+EXTERN asm_bv_priority_queue_empty
 
-INCLUDE "adt/bv_priority_queue/z80/asm_bv_priority_queue_empty.asm"
+defc bv_priority_queue_empty = asm_bv_priority_queue_empty

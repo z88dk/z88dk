@@ -5,6 +5,6 @@ SECTION code_adt_ba_stack
 
 PUBLIC _ba_stack_top_fastcall
 
-defc _ba_stack_top_fastcall = asm_ba_stack_top
+EXTERN asm_ba_stack_top
 
-INCLUDE "adt/ba_stack/z80/asm_ba_stack_top.asm"
+defc _ba_stack_top_fastcall = asm_ba_stack_top
