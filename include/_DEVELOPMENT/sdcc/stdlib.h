@@ -117,13 +117,13 @@ extern uint16_t _random_uniform_cmwc_8__fastcall(void *seed) __z88dk_fastcall;
 #define _random_uniform_cmwc_8_(a) _random_uniform_cmwc_8__fastcall(a)
 
 
-extern uint32_t _random_uniform_xor_32_(uint32_t seed);
-extern uint32_t _random_uniform_xor_32__fastcall(uint32_t seed) __z88dk_fastcall;
+extern uint32_t _random_uniform_xor_32_(uint32_t *seed);
+extern uint32_t _random_uniform_xor_32__fastcall(uint32_t *seed) __z88dk_fastcall;
 #define _random_uniform_xor_32_(a) _random_uniform_xor_32__fastcall(a)
 
 
-extern uint16_t _random_uniform_xor_8_(uint32_t seed);
-extern uint16_t _random_uniform_xor_8__fastcall(uint32_t seed) __z88dk_fastcall;
+extern uint16_t _random_uniform_xor_8_(uint32_t *seed);
+extern uint16_t _random_uniform_xor_8__fastcall(uint32_t *seed) __z88dk_fastcall;
 #define _random_uniform_xor_8_(a) _random_uniform_xor_8__fastcall(a)
 
 

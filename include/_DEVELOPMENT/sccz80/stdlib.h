@@ -115,10 +115,10 @@ extern void __LIB__ __CALLEE__ _shellsort__callee(void *base,size_t nmemb,size_t
 extern uint16_t __LIB__ __FASTCALL__ _random_uniform_cmwc_8_(void *seed);
 
 
-extern uint32_t __LIB__ __FASTCALL__ _random_uniform_xor_32_(uint32_t seed);
+extern uint32_t __LIB__ __FASTCALL__ _random_uniform_xor_32_(uint32_t *seed);
 
 
-extern uint16_t __LIB__ __FASTCALL__ _random_uniform_xor_8_(uint32_t seed);
+extern uint16_t __LIB__ __FASTCALL__ _random_uniform_xor_8_(uint32_t *seed);
 
 
 extern int __LIB__ _strtoi_(char *nptr,char **endptr,int base);
