@@ -13,7 +13,7 @@ _sp1_IterateSprChar_callee:
    pop bc
    push af
 
-_sp1_IterateSprChar_callee:
+l0_sp1_IterateSprChar_callee:
 
    push bc
    ex (sp),ix
