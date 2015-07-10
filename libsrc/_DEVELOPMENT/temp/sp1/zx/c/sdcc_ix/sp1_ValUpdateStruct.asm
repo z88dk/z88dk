@@ -5,6 +5,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_ValUpdateStruct
 
+EXTERN asm_sp1_ValUpdateStruct
+
 _sp1_ValUpdateStruct:
 
    pop af
@@ -13,4 +15,4 @@ _sp1_ValUpdateStruct:
    push hl
    push af
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_ValUpdateStruct.asm"
+   jp asm_sp1_ValUpdateStruct

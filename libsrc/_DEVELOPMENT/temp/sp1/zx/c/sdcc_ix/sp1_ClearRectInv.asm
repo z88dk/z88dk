@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_ClearRectInv
 
+EXTERN l0_sp1_ClearRectInv_callee
+
 _sp1_ClearRectInv:
 
    ld hl,2
@@ -41,11 +43,4 @@ _sp1_ClearRectInv:
    ld h,a
    ex af,af'
 
-   push ix
-   
-   call asm_sp1_ClearRectInv
-   
-   pop ix
-   ret
-
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_ClearRectInv.asm"
+   jp l0_sp1_ClearRectInv_callee

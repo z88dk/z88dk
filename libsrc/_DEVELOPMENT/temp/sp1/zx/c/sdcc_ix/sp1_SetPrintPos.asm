@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_SetPrintPos
 
+EXTERN asm_sp1_SetPrintPos
+
 _sp1_SetPrintPos:
 
    pop af
@@ -17,5 +19,4 @@ _sp1_SetPrintPos:
    push af
    
    ld d,c
-
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_SetPrintPos.asm"
+   jp asm_sp1_SetPrintPos

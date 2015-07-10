@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_GetSprClrAddr
 
+EXTERN l0_sp1_GetSprClrAddr_callee
+
 _sp1_GetSprClrAddr:
 
    pop af
@@ -14,11 +16,4 @@ _sp1_GetSprClrAddr:
    push hl
    push af
 
-   push ix
-   
-   call asm_sp1_GetSprClrAddr
-   
-   pop ix
-   ret
-
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_GetSprClrAddr.asm"
+   jp l0_sp1_GetSprClrAddr_callee

@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_PrintAt
 
+EXTERN asm_sp1_PrintAt
+
 _sp1_PrintAt:
 
    ld hl,2
@@ -22,4 +24,4 @@ _sp1_PrintAt:
    inc hl
    ld b,(hl)
 
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_PrintAt.asm"
+   jp asm_sp1_PrintAt

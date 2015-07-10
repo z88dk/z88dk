@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_PreShiftSpr
 
+EXTERN asm_sp1_PreShiftSpr
+
 _sp1_PreShiftSpr:
 
    ld hl,12
@@ -31,4 +33,4 @@ _sp1_PreShiftSpr:
    ld h,(hl)
    ld l,c
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_PreShiftSpr.asm"
+   jp asm_sp1_PreShiftSpr

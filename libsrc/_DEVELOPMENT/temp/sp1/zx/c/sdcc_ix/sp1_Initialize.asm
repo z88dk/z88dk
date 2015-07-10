@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_Initialize
 
+EXTERN asm_sp1_Initialize
+
 _sp1_Initialize:
 
    ld hl,2
@@ -18,4 +20,4 @@ _sp1_Initialize:
    ld e,(hl)
    ex de,hl
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_Initialize.asm"
+   jp asm_sp1_Initialize

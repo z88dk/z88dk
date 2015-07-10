@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_Invalidate
 
+EXTERN _sp1_Invalidate_fastcall
+
 _sp1_Invalidate:
 
    pop af
@@ -12,12 +14,4 @@ _sp1_Invalidate:
    push hl
    push af
 
-   ld d,(hl)
-   inc hl
-   ld e,(hl)
-   inc hl
-   ld b,(hl)
-   inc hl
-   ld c,(hl)
-
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_Invalidate.asm"
+   jp _sp1_Invalidate_fastcall

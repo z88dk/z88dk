@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_MoveSprRel
 
+EXTERN l0_sp1_MoveSprRel_callee
+
 _sp1_MoveSprRel:
 
    exx
@@ -28,18 +30,11 @@ _sp1_MoveSprRel:
    push de
    push hl
    exx
-   push iy
+   push de
    push de
    push bc
    
    push de
    exx
-   
-   ex (sp),ix
-   
-   call asm_sp1_MoveSprRel
-   
-   pop ix
-   ret
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_MoveSprRel.asm"
+   jp l0_sp1_MoveSprRel_callee

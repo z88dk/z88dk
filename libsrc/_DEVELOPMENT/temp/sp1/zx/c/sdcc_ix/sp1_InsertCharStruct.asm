@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_InsertCharStruct
 
+EXTERN asm_sp1_InsertCharStruct
+
 _sp1_InsertCharStruct:
 
    pop af
@@ -14,4 +16,4 @@ _sp1_InsertCharStruct:
    push de
    push af
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_InsertCharStruct.asm"
+   jp asm_sp1_InsertCharStruct

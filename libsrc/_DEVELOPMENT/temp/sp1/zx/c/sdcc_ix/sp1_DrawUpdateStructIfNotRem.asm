@@ -5,6 +5,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_DrawUpdateStructIfNotRem
 
+EXTERN _sp1_DrawUpdateStructIfNotRem_fastcall
+
 _sp1_DrawUpdateStructIfNotRem:
 
    pop af
@@ -13,11 +15,4 @@ _sp1_DrawUpdateStructIfNotRem:
    push hl
    push af
    
-   push ix
-   
-   call asm_sp1_DrawUpdateStructIfNotRem
-   
-   push ix
-   ret
-
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_DrawUpdateStructIfNotRem.asm"
+   jp _sp1_DrawUpdateStructIfNotRem_fastcall

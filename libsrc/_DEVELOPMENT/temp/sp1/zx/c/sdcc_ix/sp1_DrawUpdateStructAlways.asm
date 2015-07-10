@@ -5,6 +5,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_DrawUpdateStructAlways
 
+EXTERN _sp1_DrawUpdateStructAlways_fastcall
+
 _sp1_DrawUpdateStructAlways:
 
    pop af
@@ -13,11 +15,4 @@ _sp1_DrawUpdateStructAlways:
    push hl
    push af
    
-   push ix
-   
-   call asm_sp1_DrawUpdateStructAlways
-   
-   pop ix
-   ret
-
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_DrawUpdateStructAlways.asm"
+   jp _sp1_DrawUpdateStructAlways_fastcall

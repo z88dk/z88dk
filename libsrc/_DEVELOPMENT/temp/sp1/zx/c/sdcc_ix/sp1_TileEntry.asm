@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_TileEntry
 
+EXTERN asm_sp1_TileEntry
+
 _sp1_TileEntry:
 
    ld hl,2
@@ -16,4 +18,4 @@ _sp1_TileEntry:
    inc hl
    ld d,(hl)
 
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_TileEntry.asm"
+   jp asm_sp1_TileEntry

@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_IterateUpdateSpr
 
+EXTERN l0_sp1_IterateUpdateSpr
+
 _sp1_IterateUpdateSpr:
 
    pop af
@@ -13,13 +15,5 @@ _sp1_IterateUpdateSpr:
    push bc
    push hl
    push af
-   
-   push bc
-   ex (sp),ix
-   
-   call asm_sp1_IterateUpdateSpr
-   
-   pop ix
-   ret
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_IterateUpdateSpr.asm"
+   jp l0_sp1_IterateUpdateSpr

@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_MoveSprAbs
 
+EXTERN l0_sp1_MoveSprAbs_callee
+
 _sp1_MoveSprAbs:
 
    ld hl,2
@@ -37,11 +39,5 @@ _sp1_MoveSprAbs:
    
    pop hl
    pop iy
-   ex (sp),ix
-   
-   call asm_sp1_MoveSprAbs
-   
-   pop ix
-   ret
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_MoveSprAbs.asm"
+   jp l0_sp1_MoveSprAbs_callee

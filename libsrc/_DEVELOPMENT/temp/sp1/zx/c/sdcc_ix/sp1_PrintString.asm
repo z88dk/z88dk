@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_PrintString
 
+EXTERN l0_sp1_PrintString_callee
+
 _sp1_PrintString:
 
    pop af
@@ -14,11 +16,4 @@ _sp1_PrintString:
    push hl
    push af
 
-   push ix
-   
-   call asm_sp1_PrintString
-   
-   pop ix
-   ret
-
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_PrintString.asm"
+   jp l0_sp1_PrintString_callee

@@ -5,6 +5,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_RemoveCharStruct
 
+EXTERN asm_sp1_RemoveCharStruct
+
 _sp1_RemoveCharStruct:
 
    pop af
@@ -13,4 +15,4 @@ _sp1_RemoveCharStruct:
    push hl
    push af
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_RemoveCharStruct.asm"
+   jp asm_sp1_RemoveCharStruct
