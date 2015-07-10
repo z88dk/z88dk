@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_PreShiftSpr_callee
 
+EXTERN asm_sp1_PreShiftSpr
+
 sp1_PreShiftSpr_callee:
 
    pop af
@@ -21,4 +23,4 @@ sp1_PreShiftSpr_callee:
    ld h,a
    ld a,c
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_PreShiftSpr.asm"
+   jp asm_sp1_PreShiftSpr

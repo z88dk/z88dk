@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_Initialize_callee
 
+EXTERN asm_sp1_Initialize
+
 sp1_Initialize_callee:
 
    pop bc
@@ -16,4 +18,4 @@ sp1_Initialize_callee:
    ld a,e
    push bc
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_Initialize.asm"
+   jp asm_sp1_Initialize

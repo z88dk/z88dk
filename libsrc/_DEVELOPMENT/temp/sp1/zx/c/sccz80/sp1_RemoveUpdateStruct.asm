@@ -7,6 +7,6 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_RemoveUpdateStruct
 
-sp1_RemoveUpdateStruct:
+EXTERN asm_sp1_RemoveUpdateStruct
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_RemoveUpdateStruct.asm"
+defc sp1_RemoveUpdateStruct = asm_sp1_RemoveUpdateStruct

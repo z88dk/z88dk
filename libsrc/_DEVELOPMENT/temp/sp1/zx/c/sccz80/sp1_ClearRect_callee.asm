@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_ClearRect_callee
 
+EXTERN asm_sp1_ClearRect
+
 sp1_ClearRect_callee:
 
    pop af
@@ -26,4 +28,4 @@ sp1_ClearRect_callee:
    ld c,(hl)
    pop hl   
 
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_ClearRect.asm"
+   jp asm_sp1_ClearRect

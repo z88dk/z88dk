@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_ScreenStr_callee
 
+EXTERN asm_sp1_ScreenStr
+
 sp1_ScreenStr_callee:
 
    pop hl
@@ -13,4 +15,4 @@ sp1_ScreenStr_callee:
    ex (sp),hl
    ld d,l
 
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_ScreenStr.asm"
+   jp asm_sp1_ScreenStr

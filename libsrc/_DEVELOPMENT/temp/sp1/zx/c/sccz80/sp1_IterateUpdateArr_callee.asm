@@ -6,10 +6,12 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_IterateUpdateArr_callee
 
+EXTERN asm_sp1_IterateUpdateArr
+
 sp1_IterateUpdateArr_callee:
 
    pop hl
    pop ix
    ex (sp),hl
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_IterateUpdateArr.asm"
+   jp asm_sp1_IterateUpdateArr

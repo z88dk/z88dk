@@ -5,6 +5,6 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_DrawUpdateStructAlways
 
-sp1_DrawUpdateStructAlways:
+EXTERN asm_sp1_DrawUpdateStructAlways
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_DrawUpdateStructAlways.asm"
+defc sp1_DrawUpdateStructAlways = asm_sp1_DrawUpdateStructAlways

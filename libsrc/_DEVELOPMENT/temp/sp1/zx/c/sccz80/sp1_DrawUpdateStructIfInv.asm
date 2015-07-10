@@ -5,6 +5,6 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_DrawUpdateStructIfInv
 
-sp1_DrawUpdateStructIfInv:
+EXTERN asm_sp1_DrawUpdateStructIfInv
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_DrawUpdateStructIfInv.asm"
+defc sp1_DrawUpdateStructIfInv = asm_sp1_DrawUpdateStructIfInv

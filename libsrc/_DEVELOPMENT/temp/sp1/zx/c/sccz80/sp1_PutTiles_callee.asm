@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_PutTiles_callee
 
+EXTERN asm_sp1_PutTiles
+
 sp1_PutTiles_callee:
 
    pop af
@@ -21,4 +23,4 @@ sp1_PutTiles_callee:
    pop hl
    push af
 
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_PutTiles.asm"
+   jp asm_sp1_PutTiles

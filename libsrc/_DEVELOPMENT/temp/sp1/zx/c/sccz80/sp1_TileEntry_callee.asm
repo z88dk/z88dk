@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_TileEntry_callee
 
+EXTERN asm_sp1_TileEntry
+
 sp1_TileEntry_callee:
 
    pop hl
@@ -13,4 +15,4 @@ sp1_TileEntry_callee:
    pop bc
    push hl
 
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_TileEntry.asm"
+   jp asm_sp1_TileEntry

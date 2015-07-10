@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_Invalidate
 
+EXTERN asm_sp1_Invalidate
+
 sp1_Invalidate:
 
    ld d,(hl)
@@ -16,4 +18,4 @@ sp1_Invalidate:
    inc hl
    ld c,(hl)
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_Invalidate.asm"
+   jp asm_sp1_Invalidate

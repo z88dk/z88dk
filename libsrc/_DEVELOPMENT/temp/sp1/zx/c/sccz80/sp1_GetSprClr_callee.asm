@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_GetSprClr_callee
 
+EXTERN asm_sp1_GetSprClr
+
 sp1_GetSprClr_callee:
 
    pop hl
@@ -12,4 +14,4 @@ sp1_GetSprClr_callee:
    pop de
    ex (sp),hl
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_GetSprClr.asm"
+   jp asm_sp1_GetSprClr

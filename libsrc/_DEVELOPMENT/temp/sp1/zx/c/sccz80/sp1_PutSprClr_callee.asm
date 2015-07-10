@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_PutSprClr_callee
 
+EXTERN asm_sp1_PutSprClr
+
 sp1_PutSprClr_callee:
 
    pop hl
@@ -14,4 +16,4 @@ sp1_PutSprClr_callee:
    pop de
    ex (sp),hl
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_PutSprClr.asm"
+   jp asm_sp1_PutSprClr

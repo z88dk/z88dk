@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_MoveSprRel_callee
 
+EXTERN asm_sp1_MoveSprRel
+
 sp1_MoveSprRel_callee:
 
    pop af
@@ -20,4 +22,4 @@ sp1_MoveSprRel_callee:
    pop ix
    push af
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_MoveSprRel.asm"
+   jp asm_sp1_MoveSprRel

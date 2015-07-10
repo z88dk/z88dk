@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_CreateSpr_callee
 
+EXTERN asm_sp1_CreateSpr
+
 sp1_CreateSpr_callee:
 
    pop ix
@@ -18,4 +20,4 @@ sp1_CreateSpr_callee:
    pop de
    push ix
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_CreateSpr.asm"
+   jp asm_sp1_CreateSpr

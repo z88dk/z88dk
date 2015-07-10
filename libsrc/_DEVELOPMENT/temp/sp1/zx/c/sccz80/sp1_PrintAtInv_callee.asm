@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_PrintAtInv_callee
 
+EXTERN asm_sp1_PrintAtInv
+
 sp1_PrintAtInv_callee:
 
    pop af
@@ -18,4 +20,4 @@ sp1_PrintAtInv_callee:
    ld a,d
    ld d,l
 
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_PrintAtInv.asm"
+   jp asm_sp1_PrintAtInv

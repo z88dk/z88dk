@@ -7,6 +7,6 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_RemoveCharStruct
 
-sp1_RemoveCharStruct:
+EXTERN asm_sp1_RemoveCharStruct
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_RemoveCharStruct.asm"
+defc sp1_RemoveCharStruct = asm_sp1_RemoveCharStruct

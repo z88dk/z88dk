@@ -6,10 +6,12 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_PrintString_callee
 
+EXTERN asm_sp1_PrintString
+
 sp1_PrintString_callee:
 
    pop hl
    pop de
    ex (sp),hl
 
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_PrintString.asm"
+   jp asm_sp1_PrintString

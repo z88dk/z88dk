@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_Validate
 
+EXTERN asm_sp1_Validate
+
 sp1_Validate:
 
    ld d,(hl)
@@ -16,4 +18,4 @@ sp1_Validate:
    inc hl
    ld c,(hl)
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_Validate.asm"
+   jp asm_sp1_Validate

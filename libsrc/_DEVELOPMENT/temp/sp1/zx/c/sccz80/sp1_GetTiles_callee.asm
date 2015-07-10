@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_GetTiles_callee
 
+EXTERN asm_sp1_GetTiles
+
 sp1_GetTiles_callee:
 
    pop af
@@ -19,4 +21,4 @@ sp1_GetTiles_callee:
    pop hl
    push af
 
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_GetTiles.asm"
+   jp asm_sp1_GetTiles

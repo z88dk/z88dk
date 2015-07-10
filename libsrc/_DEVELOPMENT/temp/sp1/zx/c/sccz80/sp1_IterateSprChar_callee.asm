@@ -6,10 +6,12 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_IterateSprChar_callee
 
+EXTERN asm_sp1_IterateSprChar
+
 sp1_IterateSprChar_callee:
 
    pop hl
    pop ix
    ex (sp),hl
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_IterateSprChar.asm"
+   jp asm_sp1_IterateSprChar

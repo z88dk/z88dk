@@ -6,6 +6,8 @@ SECTION code_temp_sp1
 
 PUBLIC sp1_InitCharStruct_callee
 
+EXTERN asm_sp1_InitCharStruct
+
 sp1_InitCharStruct_callee:
 
    pop hl
@@ -18,4 +20,4 @@ sp1_InitCharStruct_callee:
    pop de
    ex (sp),hl
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_InitCharStruct.asm"
+   jp asm_sp1_InitCharStruct
