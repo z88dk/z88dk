@@ -6,7 +6,7 @@ PUBLIC _sp1_GetSprClr_callee
 
 EXTERN asm_sp1_GetSprClr
 
-_sp1_GetSprClr:
+_sp1_GetSprClr_callee:
 
    pop af
    pop hl
