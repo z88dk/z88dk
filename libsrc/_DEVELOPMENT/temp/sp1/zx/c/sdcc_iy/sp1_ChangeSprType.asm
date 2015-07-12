@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_ChangeSprType
 
+EXTERN asm_sp1_ChangeSprType
+
 _sp1_ChangeSprType:
 
    pop af
@@ -14,4 +16,4 @@ _sp1_ChangeSprType:
    push hl
    push af
    
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_ChangeSprType.asm"
+   jp asm_sp1_ChangeSprType

@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_CreateSpr
 
+EXTERN l0_sp1_CreateSpr_callee
+
 _sp1_CreateSpr:
 
    ld hl,2
@@ -27,12 +29,5 @@ _sp1_CreateSpr:
    ld c,(hl)
    pop hl
    ex de,hl
-   
-   push iy
-   
-   call asm_sp1_CreateSpr
-   
-   pop iy
-   ret
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_CreateSpr.asm"
+   jp l0_sp1_CreateSpr_callee

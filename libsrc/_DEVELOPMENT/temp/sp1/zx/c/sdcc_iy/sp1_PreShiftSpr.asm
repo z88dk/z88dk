@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_PreShiftSpr
 
+EXTERN l0_sp1_PreShiftSpr_callee
+
 _sp1_PreShiftSpr:
 
    ld hl,12
@@ -16,7 +18,7 @@ _sp1_PreShiftSpr:
    ld e,(hl)
    dec hl
    push de
-   pop iy
+   pop ix
    ld d,(hl)
    dec hl
    ld e,(hl)
@@ -31,11 +33,4 @@ _sp1_PreShiftSpr:
    ld h,(hl)
    ld l,c
 
-   push iy
-   
-   call asm_sp1_PreShiftSpr
-   
-   pop iy
-   ret
-   
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_PreShiftSpr.asm"
+   jp l0_sp1_PreShiftSpr_callee

@@ -5,6 +5,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_DrawUpdateStructIfInv
 
+EXTERN asm_sp1_DrawUpdateStructIfInv
+
 _sp1_DrawUpdateStructIfInv:
 
    pop af
@@ -13,4 +15,4 @@ _sp1_DrawUpdateStructIfInv:
    push hl
    push af
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_DrawUpdateStructIfInv.asm"
+   jp asm_sp1_DrawUpdateStructIfInv

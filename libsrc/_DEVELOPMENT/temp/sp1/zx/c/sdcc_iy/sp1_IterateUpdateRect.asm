@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_IterateUpdateRect
 
+EXTERN l0_sp1_IterateUpdateRect_callee
+
 _sp1_IterateUpdateRect:
 
    pop af
@@ -14,12 +16,4 @@ _sp1_IterateUpdateRect:
    push hl
    push af
 
-   ld d,(hl)
-   inc hl
-   ld e,(hl)
-   inc hl
-   ld b,(hl)
-   inc hl
-   ld c,(hl)
-
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_IterateUpdateRect.asm"
+   jp l0_sp1_IterateUpdateRect_callee

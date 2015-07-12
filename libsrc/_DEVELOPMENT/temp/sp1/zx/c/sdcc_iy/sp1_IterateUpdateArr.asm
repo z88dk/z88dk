@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_IterateUpdateArr
 
+EXTERN asm_sp1_IterateUpdateArr
+
 _sp1_IterateUpdateArr:
 
    pop af
@@ -14,4 +16,4 @@ _sp1_IterateUpdateArr:
    push hl
    push af
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_IterateUpdateArr.asm"
+   jp asm_sp1_IterateUpdateArr

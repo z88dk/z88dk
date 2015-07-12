@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_IterateSprChar
 
+EXTERN asm_sp1_IterateSprChar
+
 _sp1_IterateSprChar:
 
    pop af
@@ -14,4 +16,4 @@ _sp1_IterateSprChar:
    push hl
    push af
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_IterateSprChar.asm"
+   jp asm_sp1_IterateSprChar

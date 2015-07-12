@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_PutSprClr
 
+EXTERN asm_sp1_PutSprClr
+
 _sp1_PutSprClr:
 
    pop af
@@ -17,5 +19,5 @@ _sp1_PutSprClr:
    push af
    
    ld b,c
+   jp asm_sp1_PutSprClr
 
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_PutSprClr.asm"

@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_InitCharStruct
 
+EXTERN asm_sp1_InitCharStruct
+
 _sp1_InitCharStruct:
 
    ld hl,10
@@ -33,4 +35,4 @@ _sp1_InitCharStruct:
    push bc
    exx
    
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_InitCharStruct.asm"
+   jp asm_sp1_InitCharStruct

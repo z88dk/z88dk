@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_PutTiles
 
+EXTERN l0_sp1_PutTiles_callee
+
 _sp1_PutTiles:
 
    pop af
@@ -14,16 +16,4 @@ _sp1_PutTiles:
    push hl
    push af
    
-   push de
-
-   ld d,(hl)
-   inc hl
-   ld e,(hl)
-   inc hl
-   ld b,(hl)
-   inc hl
-   ld c,(hl)
-
-   pop hl
-
-   INCLUDE "temp/sp1/zx/tiles/asm_sp1_PutTiles.asm"
+   jp l0_sp1_PutTiles_callee

@@ -5,6 +5,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_RemoveUpdateStruct
 
+EXTERN asm_sp1_RemoveUpdateStruct
+
 _sp1_RemoveUpdateStruct:
 
    pop af
@@ -13,4 +15,4 @@ _sp1_RemoveUpdateStruct:
    push hl
    push af
 
-   INCLUDE "temp/sp1/zx/updater/asm_sp1_RemoveUpdateStruct.asm"
+   jp asm_sp1_RemoveUpdateStruct

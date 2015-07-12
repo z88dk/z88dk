@@ -4,6 +4,8 @@ SECTION code_temp_sp1
 
 PUBLIC _sp1_AddColSpr
 
+EXTERN l0_sp1_AddColSpr_callee
+
 _sp1_AddColSpr:
 
    exx
@@ -23,15 +25,5 @@ _sp1_AddColSpr:
    push hl
    push de
    push ix
-   exx
-   push bc
-   exx
 
-   push iy
-      
-   call asm_sp1_AddColSpr
-   
-   pop iy
-   ret
-
-   INCLUDE "temp/sp1/zx/sprites/asm_sp1_AddColSpr.asm"
+   jp l0_sp1_AddColSpr_callee
