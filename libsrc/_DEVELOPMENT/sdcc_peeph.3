@@ -3367,7 +3367,7 @@ replace restart {
 } by {
 	ld	hl,(#%1)
 	ld	a,h
-	or	l
+	or	a,l
 	; peephole z88dk-78
 } 
 //if notUsed('hl')
