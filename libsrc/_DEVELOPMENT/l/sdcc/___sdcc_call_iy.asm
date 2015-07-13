@@ -3,6 +3,16 @@ SECTION code_l_sdcc
 
 PUBLIC ___sdcc_call_iy
 
-EXTERN l_jpiy
+IF __SDCC_IX
 
-defc ___sdcc_call_iy = l_jpiy
+   EXTERN l_jpiy
+
+   defc ___sdcc_call_iy = l_jpiy
+
+ELSE
+
+   EXTERN l_jpix
+
+   defc ___sdcc_call_iy = l_jpix
+
+ENDIF
