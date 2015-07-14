@@ -59,10 +59,26 @@ typedef struct
 typedef struct
 {
 
+   unsigned int rem;
+   unsigned int quot;
+
+} divu_t;
+
+typedef struct
+{
+
    long quot;
    long rem;
 
 } ldiv_t;
+
+typedef struct
+{
+
+   unsigned long quot;
+   unsigned long rem;
+
+} ldivu_t;
 
 #ifndef NULL
 #define NULL            ((void*)(0))
@@ -86,7 +102,9 @@ typedef struct
 // FUNCTIONS
 
 __DPROTO(void,,_div_,div_t *d,int numer,int denom)
+__DPROTO(void,,_divu_,divu_t *d,unsigned int numer,unsigned int denom)
 __DPROTO(void,,_ldiv_,ldiv_t *ld,long numer,long denom)
+__DPROTO(void,,_ldivu_,ldivu_t *ld,unsigned long numer,unsigned long denom)
 __DPROTO(void,,_insertion_sort_,void *base,size_t nmemb,size_t size,void *compar)
 __DPROTO(void,,_quicksort_,void *base,size_t nmemb,size_t size,void *compar)
 __DPROTO(void,,_shellsort_,void *base,size_t nmemb,size_t size,void *compar)

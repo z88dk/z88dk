@@ -61,10 +61,26 @@ typedef struct
 typedef struct
 {
 
+   unsigned int rem;
+   unsigned int quot;
+
+} divu_t;
+
+typedef struct
+{
+
    long quot;
    long rem;
 
 } ldiv_t;
+
+typedef struct
+{
+
+   unsigned long quot;
+   unsigned long rem;
+
+} ldivu_t;
 
 #ifndef NULL
 #define NULL            ((void*)(0))
@@ -92,9 +108,19 @@ extern void _div__callee(div_t *d,int numer,int denom) __z88dk_callee;
 #define _div_(a,b,c) _div__callee(a,b,c)
 
 
+extern void _divu_(divu_t *d,unsigned int numer,unsigned int denom);
+extern void _divu__callee(divu_t *d,unsigned int numer,unsigned int denom) __z88dk_callee;
+#define _divu_(a,b,c) _divu__callee(a,b,c)
+
+
 extern void _ldiv_(ldiv_t *ld,long numer,long denom);
 extern void _ldiv__callee(ldiv_t *ld,long numer,long denom) __z88dk_callee;
 #define _ldiv_(a,b,c) _ldiv__callee(a,b,c)
+
+
+extern void _ldivu_(ldivu_t *ld,unsigned long numer,unsigned long denom);
+extern void _ldivu__callee(ldivu_t *ld,unsigned long numer,unsigned long denom) __z88dk_callee;
+#define _ldivu_(a,b,c) _ldivu__callee(a,b,c)
 
 
 extern void _insertion_sort_(void *base,size_t nmemb,size_t size,void *compar);
