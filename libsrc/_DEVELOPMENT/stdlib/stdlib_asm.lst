@@ -30,9 +30,12 @@ stdlib/z80/asm_system
 stdlib/z80/asm_ultoa
 stdlib/z80/asm_utoa
 stdlib/z80/asm__div
+stdlib/z80/asm__divu
 stdlib/z80/asm__ldiv
+stdlib/z80/asm__ldivu
 stdlib/z80/asm__strtoi
 stdlib/z80/asm__strtou
+stdlib/z80/__div_store
 stdlib/z80/__dtoa__
 stdlib/z80/__dtoa_asm_exit
 stdlib/z80/__dtoa_count
@@ -50,6 +53,7 @@ stdlib/z80/__dtoa_special_form
 stdlib/z80/__dtoe__
 stdlib/z80/__dtog__
 stdlib/z80/__dtoh__
+stdlib/z80/__ldiv_store
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtod_dec
 stdlib/z80/__strtod_exponent

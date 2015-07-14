@@ -60,10 +60,14 @@ stdlib/c/sdcc_iy/utoa
 stdlib/c/sdcc_iy/utoa_callee
 stdlib/c/sdcc_iy/_div_
 stdlib/c/sdcc_iy/_div__callee
+stdlib/c/sdcc_iy/_divu_
+stdlib/c/sdcc_iy/_divu__callee
 stdlib/c/sdcc_iy/_insertion_sort_
 stdlib/c/sdcc_iy/_insertion_sort__callee
 stdlib/c/sdcc_iy/_ldiv_
 stdlib/c/sdcc_iy/_ldiv__callee
+stdlib/c/sdcc_iy/_ldivu_
+stdlib/c/sdcc_iy/_ldivu__callee
 stdlib/c/sdcc_iy/_quicksort_
 stdlib/c/sdcc_iy/_quicksort__callee
 stdlib/c/sdcc_iy/_random_uniform_cmwc_8_

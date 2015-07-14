@@ -1,30 +1,30 @@
 
 ; ===============================================================
-; Dec 2013
+; Jul 2015
 ; ===============================================================
 ; 
-; void _ldiv(ldiv_t *ld, long numer, long denom)
+; void _ldivu(ldivu_t *ld, uint32_t numer, uint32_t denom)
 ;
-; Fill the ldiv_t struct with the results of long divide
+; Fill the ldivu_t struct with the results of long divide
 ; numer / denom.
 ;
-; struct ldiv_t
+; struct ldivu_t
 ; {
-;    long quot;
-;    long rem;
+;    uint32_t quot;
+;    uint32_t rem;
 ; };
 ;
 ; ===============================================================
 
 SECTION code_stdlib
 
-PUBLIC asm__ldiv
+PUBLIC asm__ldivu
 
-EXTERN l_divs_32_32x32, __ldiv_store
+EXTERN l_divu_32_32x32, __ldiv_store
 
-asm__ldiv:
+asm__ldivu:
 
-   ; enter :   bc  = ldiv_t * 
+   ; enter :   bc  = ldivu_t * 
    ;         dehl  = denom
    ;         dehl' = numer
    ;
@@ -36,12 +36,12 @@ asm__ldiv:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl', ixh
    
-   push bc                     ; save ldiv_t *
+   push bc                     ; save ldivu_t *
       
-   call l_divs_32_32x32
+   call l_divu_32_32x32
 
    ; dehl  = numer / denom
    ; dehl' = numer % denom
-   ; stack  = ldiv_t *
+   ; stack  = ldivu_t *
 
    jp __ldiv_store

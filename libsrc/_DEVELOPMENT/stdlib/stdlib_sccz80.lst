@@ -49,10 +49,14 @@ stdlib/c/sccz80/utoa
 stdlib/c/sccz80/utoa_callee
 stdlib/c/sccz80/_div_
 stdlib/c/sccz80/_div__callee
+stdlib/c/sccz80/_divu_
+stdlib/c/sccz80/_divu__callee
 stdlib/c/sccz80/_insertion_sort_
 stdlib/c/sccz80/_insertion_sort__callee
 stdlib/c/sccz80/_ldiv_
 stdlib/c/sccz80/_ldiv__callee
+stdlib/c/sccz80/_ldivu_
+stdlib/c/sccz80/_ldivu__callee
 stdlib/c/sccz80/_quicksort_
 stdlib/c/sccz80/_quicksort__callee
 stdlib/c/sccz80/_random_uniform_cmwc_8_
