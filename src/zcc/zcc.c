@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.96 2015-07-02 02:16:40 aralbrec Exp $
+ *      $Id: zcc.c,v 1.97 2015-08-01 04:41:44 aralbrec Exp $
  */
 
 
@@ -194,7 +194,7 @@ static char  *c_gnuld_exe = "z80-unknown-coff-ld";
 static char  *c_asz80_exe  = "asz80";
 static char  *c_aslink_exe = "aslink";
 
-static char  *c_sdcc_exe = "sdcc";
+static char  *c_sdcc_exe = "zsdcc";
 static char  *c_sccz80_exe = "sccz80";
 static char  *c_cpp_exe = "zcpp";
 static char  *c_zpragma_exe = "zpragma";
@@ -271,7 +271,7 @@ static arg_t  config[] = {
     
     {"COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, NULL, "Name of sccz80 binary (use SCCZ80EXE)"},
     {"SCCZ80EXE", 0, SetStringConfig, &c_sccz80_exe, NULL, "Name of sccz80 binary"},
-    {"SDCCEXE", 0, SetStringConfig, &c_sdcc_exe, NULL, "Name of the sdcc binary"},
+    {"ZSDCCEXE", 0, SetStringConfig, &c_sdcc_exe, NULL, "Name of the sdcc binary"},
     
     {"APPMAKEEXE", 0, SetStringConfig, &c_appmake_exe, NULL, ""},
     {"APPMAKER", AF_DEPRECATED, SetStringConfig, &c_appmake_exe, NULL, "Name of the applink binary (use APPMAKEEXE)"},
