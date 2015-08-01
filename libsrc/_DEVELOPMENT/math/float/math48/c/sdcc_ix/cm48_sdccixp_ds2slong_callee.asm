@@ -3,7 +3,7 @@
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sdccixp_ds2slong
+PUBLIC cm48_sdccixp_ds2slong_callee
 
 EXTERN cm48_sdccixp_dcallee1, am48_dfix32
 
