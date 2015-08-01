@@ -1587,11 +1587,23 @@ replace restart {
 } if notUsed('a')
 
 replace restart {
+	push	%1
+	call	%2
+	ret
+} by {
+	push	%1
+	call	%2
+	nop
+	ret
+	; peephole 114a prevent tail code optimization for functions taking parameters
+}
+
+replace restart {
 	call	%1
 	ret
 } by {
 	jp	%1
-	; peephole 114 replaced call at end of function by jump (tail call optimization).
+	; peephole 114b replaced call at end of function by jump (tail call optimization).
 }
 
 // Callee saves ix.
@@ -1971,6 +1983,21 @@ replace restart {
 	jp	NZ,%2
 	; peephole 145 removed redundant zeroing of a (which has just been tested to be #0x00).
 	jp	%3
+}
+
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+// POISON REMOVE
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+barrier
+
+replace {
+	nop
+} by {
+	; poison removal
 }
 
 

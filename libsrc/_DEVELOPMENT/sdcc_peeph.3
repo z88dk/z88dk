@@ -1587,11 +1587,23 @@ replace restart {
 } if notUsed('a')
 
 replace restart {
+	push	%1
+	call	%2
+	ret
+} by {
+	push	%1
+	call	%2
+	nop
+	ret
+	; peephole 114a prevent tail code optimization for functions taking parameters
+}
+
+replace restart {
 	call	%1
 	ret
 } by {
 	jp	%1
-	; peephole 114 replaced call at end of function by jump (tail call optimization).
+	; peephole 114b replaced call at end of function by jump (tail call optimization).
 }
 
 // Callee saves ix.
@@ -4436,8 +4448,192 @@ replace restart {
 	; peephole z88dk-142b
 } if notUsed('de')
 
+replace restart {
+;	---------------------------------
+; Function %1
+; ---------------------------------
+_%1::
+	jp	%2
+} by {
+_%1	=	%2
+	; peephole z88dk-143
+}
+
+replace restart {
+	ld	a,l
+	add	a,#0xFF
+	ld	-%1 (ix),a
+	ld	a,h
+	adc	a,#0xFF
+	ld	-%2 (ix),a
+} by {
+	dec	hl
+	ld	-%1 (ix),l	
+	ld	-%2 (ix),h
+	; peephole z88dk-144a
+} if notUsed('hl')
+//ifnotUsed('a')
+
+replace restart {
+	ld	a,l
+	add	a,#0xFF
+	ld	-%1 (ix),a
+	ld	a,h
+	adc	a,#0xFF
+	ld	-%2 (ix),a
+} by {
+	dec	hl
+	ld	-%1 (ix),l	
+	ld	-%2 (ix),h
+	inc	hl
+	; peephole z88dk-144b
+} 
+//ifnotUsed('a')
+
+replace restart {
+	ex	de,hl
+	pop	bc
+	ld	l, e
+	ld	h, d
+} by {
+	pop	bc
+	ld	e, l
+	ld	d, h
+	; peephole z88dk-145
+}
+
+replace restart {
+	ld	d,l
+	ld	e,h
+	ld	a,%1 (ix)
+	add	a, d
+	ld	d,a
+	ld	a,%2 (ix)
+	adc	a, e
+	ld	-%3 (ix), d
+	ld	-%4 (ix), a
+} by {
+	ld	e,%1 (ix)
+	ld	d,%2 (ix)
+	add	hl,de
+	ld	-%3 (ix), l
+	ld	-%4 (ix), h
+	; peephole z88dk-146a
+} if notUsed('hl')
+//, notUsed('de'), notUsed('a')
+
+replace restart {
+	ld	d,l
+	ld	e,h
+	ld	a,-%1 (ix)
+	add	a, d
+	ld	d,a
+	ld	a,-%2 (ix)
+	adc	a, e
+	ld	-%3 (ix), d
+	ld	-%4 (ix), a
+} by {
+	ld	e,-%1 (ix)
+	ld	d,-%2 (ix)
+	add	hl,de
+	ld	-%3 (ix), l
+	ld	-%4 (ix), h
+	; peephole z88dk-146b
+} if notUsed('hl')
+//, notUsed('de'), notUsed('a')
+
+replace restart {
+	ld	d,l
+	ld	b,h
+	ld	a,%1 (ix)
+	add	a, d
+	ld	e,a
+	ld	a,%2 (ix)
+	adc	a, b
+	ld	d,a
+} by {
+	ex	de,hl
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	add	hl,de
+	ex	de,hl
+	; peephole z88dk-147a
+} if notUsed('b'), notUsed('a')
+
+replace restart {
+	ld	d,l
+	ld	b,h
+	ld	a,-%1 (ix)
+	add	a, d
+	ld	e,a
+	ld	a,-%2 (ix)
+	adc	a, b
+	ld	d,a
+} by {
+	ex	de,hl
+	ld	l,-%1 (ix)
+	ld	h,-%2 (ix)
+	add	hl,de
+	ex	de,hl
+	; peephole z88dk-147b
+} if notUsed('b'), notUsed('a')
+
+replace restart {
+	pop	de
+	pop	%1
+	ex	de,hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+} by {
+	pop	hl
+	pop	%1
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	; peephole z88dk-148
+}
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	pop	de
+	push	bc
+} by {
+	pop	de
+	push	hl
+	; peephole z88dk-149
+} if notUsed('bc')
+
+replace restart {
+	ld	d,l
+	ld	e,h
+	pop	bc
+	ld	-%1 (ix),d
+	ld	-%2 (ix),e
+} by {
+	pop	bc
+	ld	-%1 (ix),l
+	ld	-%2 (ix),h
+	; peephole z88dk-150
+} if notUsed('d'), notUsed('e')
 
 
+
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+// POISON REMOVE
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+barrier
+
+replace {
+	nop
+} by {
+	; poison removal
+}
 
 
 ///////////////////////////////////////////////////////////////

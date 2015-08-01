@@ -1,0 +1,21 @@
+divert(-1)
+
+###################################
+# MARK HEADER FUNCTIONS FOR LISTING
+###################################
+
+undefine(`__DPROTO')
+undefine(`__OPROTO')
+undefine(`__VPROTO')
+
+define(`__DPROTO', ;;;;;;`$3'
+)
+
+define(`__OPROTO', ;;;;;;`$3'
+)
+
+define(`__VPROTO', ;;;;;;`$3'
+)
+
+###################################
+divert(0)
