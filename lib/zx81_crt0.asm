@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.46 2015-04-07 16:47:03 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.47 2015-08-01 09:14:43 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -77,7 +77,11 @@ ENDIF
         defc    _FRAMES = 16436	; Timer
 
         IF      !myzorg
+			IF LAMBDA
+                defc    myzorg  = 17307
+			ELSE
                 defc    myzorg  = 16514
+			ENDIF
         ENDIF
 
 
@@ -116,7 +120,11 @@ start:
 
 IF (!DEFINED_startup | (startup=1))
         ; FAST mode, safest way to use the special registers
+	IF LAMBDA
+		call	$D5E
+	ELSE
         call    $F23    ; FAST mode
+	ENDIF
         ;call   $2E7    ;setfast
         ;out ($fd),a  ; nmi off        
 ENDIF
@@ -227,7 +235,11 @@ IF (startup>=2)
  ENDIF
 ELSE
  IF (!DEFINED_startup | (startup=1))
+	IF LAMBDA
+		call	 $12A5
+	ELSE
         call    $F2B            ; SLOW mode
+	ENDIF
         ;call   $207    ;slowfast
  ENDIF
 ENDIF
