@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Manage the code area in memory
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.57 2015-02-24 22:27:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/codearea.c,v 1.58 2015-08-02 20:03:57 pauloscustodio Exp $
 */
 
 #include "codearea.h"
@@ -56,7 +56,7 @@ DEFINE_dtor_module()
 *   Named Section of code, introduced by "SECTION" keyword
 *----------------------------------------------------------------------------*/
 DEF_CLASS( Section );
-DEF_CLASS_HASH( Section, TRUE );
+DEF_CLASS_HASH( Section, FALSE );
 
 void Section_init (Section *self)   
 {

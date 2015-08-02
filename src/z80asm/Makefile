@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.199 2015-04-02 20:00:18 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.200 2015-08-02 20:03:57 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -90,7 +90,8 @@ $(TARGET): $(OBJS)
 #------------------------------------------------------------------------------
 # developer generated source files, and test libs
 #------------------------------------------------------------------------------
-developer :
+.PHONY: dev
+dev :
 	$(MAKE) depend
 	$(MAKE) -C doc
 	$(MAKE) -C lib
@@ -139,7 +140,7 @@ clean::
 	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXESUFFIX))
 
 test:
-	$(MAKE) developer
+	$(MAKE) dev
 	$(MAKE) prove_c
 	$(MAKE) prove_perl
 	$(MAKE) test_enigma

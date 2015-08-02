@@ -13,7 +13,7 @@
 Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.152 2015-08-02 19:01:20 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.153 2015-08-02 20:03:57 pauloscustodio Exp $
 */
 
 /*
@@ -24,7 +24,10 @@ $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/hist.c,v 1.152 2015-08-02 19:0
 
 /*
 * $Log: hist.c,v $
-* Revision 1.152  2015-08-02 19:01:20  pauloscustodio
+* Revision 1.153  2015-08-02 20:03:57  pauloscustodio
+* Make assembler case sensitive to be more C-code friendly
+*
+* Revision 1.152  2015/08/02 19:01:20  pauloscustodio
 * Make version 2.7.1 with changes since 26.01.2015 [2.7.0]
 *
 * Revision 1.151  2015/04/02 20:00:18  pauloscustodio
@@ -2300,6 +2303,11 @@ Based on 1.0.31
 	  tokens.h tokens.h.in and tokens.def;
 
 -------------------------------------------------------------------------------
+02.08.2015 [2.8.0] (pauloscustodio)
+-------------------------------------------------------------------------------
+	- Make assembler case sensitive to be more C-code friendly.
+
+-------------------------------------------------------------------------------
 FUTURE CHANGES 
 -------------------------------------------------------------------------------
 	- replace DEFL by DEFDW, to allow DEFL for variable labels
@@ -2333,7 +2341,7 @@ FUTURE CHANGES
 
 #include "hist.h"
 
-#define VERSION     "2.7.1"
+#define VERSION     "2.8.0"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

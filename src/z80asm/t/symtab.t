@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.30 2015-03-25 22:35:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/symtab.t,v 1.31 2015-08-02 20:03:57 pauloscustodio Exp $
 #
 
 use Modern::Perl;
@@ -235,17 +235,14 @@ t_z80asm(
 	linkerr	=> "Error at module 'test1': symbol 'VAR' already defined in module 'test'",
 );
 
-# CH_0024: Case-preserving, case-insensitive symbols
+# Case-sensitive symbols
 unlink_testfiles();
-write_file(asm_file(), "Defc Loc = 1 \n ld a, LOC \n PUBLIC Var \n defc VAR = 2");
-write_file(asm1_file(), "EXTERN var \n ld a, VAR");
-t_z80asm_capture("-l -b -r0 ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
-Warning at file 'test.asm' line 2: symbol 'Loc' used as 'LOC'
-Warning at file 'test.asm' line 4: symbol 'Var' used as 'VAR'
-Warning at file 'test1.asm' line 2: symbol 'var' used as 'VAR'
-Warning at file 'test1.asm' line 2: symbol 'Var' used as 'VAR'
-ERR
-t_binary(read_binfile(bin_file()), "\x3E\x01\x3E\x02");
+write_file(asm_file(), " Defc Loc = 1 \n DEFC LOC = 2 \n ".
+					   " Public Loc, LOC \n".
+					   " ld a, Loc \n ld a, LOC");
+write_file(asm1_file(), "EXTERN Loc, LOC \n ld a, Loc \n ld a, LOC");
+t_z80asm_capture("-l -b -r0 ".asm_file()." ".asm1_file(), "", "", 0);
+t_binary(read_binfile(bin_file()), "\x3E\x01\x3E\x02\x3E\x01\x3E\x02");
 
 # CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
 write_file(asm_file(), "

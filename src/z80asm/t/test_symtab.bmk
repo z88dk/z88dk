@@ -10,18 +10,12 @@ Symtab "static": EMPTY
 check case insensitive - CH_0024
 Symtab "tab1": 
   Symbol Var1 (Var1) = 1, [DEFINED TYPE_CONSTANT LOCAL ], ref = [1 ], owner = NULL
-  Symbol Var2 (Var2) = 2, [DEFINED TYPE_CONSTANT LOCAL ], ref = [2 ], owner = NULL
-  Symbol Var3 (Var3) = -3, [DEFINED TYPE_CONSTANT LOCAL ], ref = [3 ], owner = NULL
-Warning: symbol 'Var1' used as 'VAR1'
-Warning: symbol 'Var1' used as 'var1'
-Warning: symbol 'Var2' used as 'VAR2'
-Warning: symbol 'Var2' used as 'var2'
-Warning: symbol 'Var3' used as 'VAR3'
-Warning: symbol 'Var3' used as 'var3'
+  Symbol var1 (var1) = 2, [DEFINED TYPE_CONSTANT LOCAL ], ref = [2 ], owner = NULL
+  Symbol VAR1 (VAR1) = 3, [DEFINED TYPE_CONSTANT LOCAL ], ref = [3 ], owner = NULL
 Symtab "tab1": 
   Symbol Var1 (Var1) = 1, [DEFINED TOUCHED TYPE_CONSTANT LOCAL ], ref = [1 ], owner = NULL
-  Symbol Var2 (Var2) = 2, [DEFINED TOUCHED TYPE_CONSTANT LOCAL ], ref = [2 ], owner = NULL
-  Symbol Var3 (Var3) = -3, [DEFINED TOUCHED TYPE_CONSTANT LOCAL ], ref = [3 ], owner = NULL
+  Symbol var1 (var1) = 2, [DEFINED TOUCHED TYPE_CONSTANT LOCAL ], ref = [2 ], owner = NULL
+  Symbol VAR1 (VAR1) = 3, [DEFINED TOUCHED TYPE_CONSTANT LOCAL ], ref = [3 ], owner = NULL
 Concat symbol tables
 Symtab "tab1": 
   Symbol Var1 (Var1) = 1, [DEFINED TYPE_CONSTANT LOCAL ], ref = [4 ], owner = NULL

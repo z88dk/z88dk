@@ -3,7 +3,7 @@ Unit test for codearea.c
 
 Copyright (C) Paulo Custodio, 2011-2015
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.9 2015-02-13 00:32:00 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/test_symtab.c,v 1.10 2015-08-02 20:03:57 pauloscustodio Exp $
 */
 
 #include "listfile.h"
@@ -144,22 +144,14 @@ static void test_symtab( void )
 	warn("check case insensitive - CH_0024\n");
 	symtab = OBJ_NEW(SymbolHash);
 	assert( symtab );
-	_define_sym(S("Var1"),  1, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
-	_define_sym(S("Var2"),  2, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr(); 
-	_define_sym(S("Var3"), -3, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
+	_define_sym(S("Var1"), 1, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
+	_define_sym(S("var1"), 2, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr(); 
+	_define_sym(S("VAR1"), 3, TYPE_CONSTANT, 0, NULL, NULL, &symtab); inc_page_nr();
 	dump_SymbolHash(symtab, "tab1");
 	
-	assert( find_symbol(S("Var1"), symtab)->value ==  1 );
-	assert( find_symbol(S("VAR1"), symtab)->value ==  1 );
-	assert( find_symbol(S("var1"), symtab)->value ==  1 );
-
-	assert( find_symbol(S("Var2"), symtab)->value ==  2 );
-	assert( find_symbol(S("VAR2"), symtab)->value ==  2 );
-	assert( find_symbol(S("var2"), symtab)->value ==  2 );
-
-	assert( find_symbol(S("Var3"), symtab)->value == -3 );
-	assert( find_symbol(S("VAR3"), symtab)->value == -3 );
-	assert( find_symbol(S("var3"), symtab)->value == -3 );
+	assert( find_symbol(S("Var1"), symtab)->value == 1 );
+	assert( find_symbol(S("var1"), symtab)->value == 2 );
+	assert( find_symbol(S("VAR1"), symtab)->value == 3 );
 
 	dump_SymbolHash(symtab, "tab1");
 	

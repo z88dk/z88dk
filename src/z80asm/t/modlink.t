@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.14 2015-03-21 00:05:14 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/modlink.t,v 1.15 2015-08-02 20:03:57 pauloscustodio Exp $
 #
 # Test linking of modules
 
@@ -121,11 +121,11 @@ File test1.obj at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-a1                              = 1247, G: test
-a2                              = 1263, G: test1
 ASMHEAD                         = 1234, G: 
 ASMSIZE                         = 0038, G: 
 ASMTAIL                         = 126C, G: 
+a1                              = 1247, G: test
+a2                              = 1263, G: test1
 
 
 ASMSIZE                         = 0038, G: 

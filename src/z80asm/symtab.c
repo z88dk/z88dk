@@ -18,7 +18,7 @@ a) code simplicity
 b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM assembly,
    see t\developer\benchmark_symtab.t
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.54 2015-03-25 22:35:45 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/symtab.c,v 1.55 2015-08-02 20:03:57 pauloscustodio Exp $
 */
 
 #include "errors.h"
@@ -40,7 +40,7 @@ SymbolHash *static_symtab = NULL;
 /*-----------------------------------------------------------------------------
 *   Symbol Table
 *----------------------------------------------------------------------------*/
-DEF_CLASS_HASH( Symbol, TRUE );			/* defines SymbolHash */
+DEF_CLASS_HASH( Symbol, FALSE );			/* defines SymbolHash */
 
 /*-----------------------------------------------------------------------------
 *   join two symbol tables, adding all symbols from source to the target
@@ -77,7 +77,7 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
 	{
 		sym->is_touched = TRUE;
 		if ( strcmp( sym->name, name ) != 0 )
-			warn_symbol_diff_case( sym->name, name );
+			warn_symbol_different( sym->name, name );
 	}
 
     return sym;

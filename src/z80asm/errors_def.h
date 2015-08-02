@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Define error messages
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.42 2015-03-21 00:05:14 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Attic/errors_def.h,v 1.43 2015-08-02 20:03:57 pauloscustodio Exp $
 */
 
 #ifndef _C_
@@ -45,7 +45,7 @@ ERR(ErrError, error_illegal_src_filename( char *filename ),
     "illegal source filename '%s'" _C_ filename )
 
 /* warnings */
-ERR(ErrWarn, warn_symbol_diff_case( char *name, char *used ),
+ERR(ErrWarn, warn_symbol_different( char *name, char *used ),
 	"symbol '%s' used as '%s'" _C_ name _C_ used )
 ERR(ErrWarn,	warn_deprecated( char *old_stmt, char *new_stmt ),
 	"'%s' is deprecated, use '%s' instead" _C_ old_stmt _C_ new_stmt )
