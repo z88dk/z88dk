@@ -1,0 +1,201 @@
+#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
+#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
+#                ZZZZZ      888           888  0000         0000
+#              ZZZZZ        88888888888888888  0000         0000
+#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
+#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
+#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
+#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
+#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
+#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
+#
+# Copyright (C) Gunther Strube, InterLogic 1993-99
+# Copyright (C) Paulo Custodio, 2011-2015
+#
+# Define error messages
+#
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/tt/error_func.yaml,v 1.1 2015-08-03 23:08:13 pauloscustodio Exp $
+
+errors:
+  # Information
+  - type	: ErrInfo
+    func	: info_total_errors
+    args	: void
+    message	: '"%d errors occurred during assembly", get_num_errors()'
+	
+  # File errors
+  - type	: ErrError
+    func	: error_read_file
+    args	: char *filename
+    message	: "\"cannot read file '%s'\", filename"
+	
+  - type	: ErrError
+    func	: error_write_file
+    args	: char *filename
+    message	: "\"cannot write file '%s'\", filename"
+	
+  - type	: ErrError
+    func	: error_include_recursion
+    args	: char *filename
+    message	: "\"cannot include file '%s' recursively\", filename"
+	
+  # Command line parsing errors
+  - type	: ErrWarn
+    func	: warn_option_deprecated
+    args	: char *option
+    message	: "\"option '%s' is deprecated\", option"
+
+  - type	: ErrError
+    func	: error_no_src_file
+    args	: void
+    message	: '"source filename missing"'
+	
+  - type	: ErrError
+    func	: error_illegal_option
+    args	: char *option
+    message	: "\"illegal option '%s'\", option"
+	
+  - type	: ErrError
+    func	: error_illegal_src_filename
+    args	: char *filename
+    message	: "\"illegal source filename '%s'\", filename"
+	
+  # Warnings
+  - type	: ErrWarn
+    func	: warn_symbol_different
+    args	: 'char *name, char *used'
+    message	: "\"symbol '%s' used as '%s'\", name, used"
+	
+  - type	: ErrWarn
+    func	: warn_deprecated
+    args	: 'char *old_stmt, char *new_stmt'
+    message	: "\"'%s' is deprecated, use '%s' instead\", old_stmt, new_stmt"
+	
+  # Assembly errors
+  - type	: ErrError
+    func	: error_syntax
+    args	: void
+    message	: '"syntax error"'
+	
+  - type	: ErrError
+    func	: error_syntax_expr
+    args	: void
+    message	: '"syntax error in expression"'
+	
+  - type	: ErrError
+    func	: error_invalid_squoted_string
+    args	: void
+    message	: '"invalid single quoted character"'
+	
+  - type	: ErrError
+    func	: error_unclosed_string
+    args	: void
+    message	: '"unclosed quoted string"'
+	
+  - type	: ErrError
+    func	: error_divide_by_zero
+    args	: void
+    message	: '"division by zero"'
+	
+  - type	: ErrError
+    func	: error_missing_block
+    args	: void
+    message	: '"missing {} block"'
+	
+  - type	: ErrError
+    func	: error_missing_close_block
+    args	: void
+    message	: '"{} block not closed"'
+	
+  - type	: ErrError
+    func	: error_unbalanced_struct_at
+    args	: 'char *filename, int line_nr'
+    message	: "\"unbalanced control structure started at file '%s' line %d\", filename, line_nr"
+	
+  - type	: ErrError
+    func	: error_unbalanced_struct
+    args	: void
+    message	: '"unbalanced control structure"'
+	
+  - type	: ErrError
+    func	: error_not_defined
+    args	: char *name
+    message	: "\"symbol '%s' not defined\", name"
+	
+  - type	: ErrError
+    func	: error_illegal_ident
+    args	: void
+    message	: '"illegal identifier"'
+	
+  - type	: ErrError
+    func	: error_jr_not_local
+    args	: void
+    message	: '"relative jump address must be local"'
+	
+  # Symbol errors
+  - type	: ErrError
+    func	: error_symbol_redefined
+    args	: char *symbol
+    message	: "\"symbol '%s' already defined\", symbol"
+	
+  - type	: ErrError
+    func	: error_symbol_redefined_module
+    args	: 'char *symbol, char *module'
+    message	: "\"symbol '%s' already defined in module '%s'\", symbol, module"
+	
+  - type	: ErrError
+    func	: error_symbol_decl_local
+    args	: char *symbol
+    message	: "\"symbol '%s' already declared local\", symbol"
+	
+  - type	: ErrError
+    func	: error_symbol_redecl
+    args	: char *symbol
+    message	: "\"re-declaration of '%s' not allowed\", symbol"
+	
+  # Link errors
+  - type	: ErrError
+    func	: error_max_codesize
+    args	: long size
+    message	: '"max. code size of %ld bytes reached", size'
+	
+  - type	: ErrError
+    func	: error_module_redefined
+    args	: void
+    message	: '"module name already defined"'
+	
+  - type	: ErrError
+    func	: error_org_redefined
+    args	: void
+    message	: '"ORG redefined"'
+	
+  - type	: ErrError
+    func	: error_invalid_org_option
+    args	: char *org_hex
+    message	: "\"invalid ORG option '%s'\", org_hex"
+	
+  - type	: ErrError
+    func	: error_env_not_defined
+    args	: char *var
+    message	: "\"environment variable '%s' not defined\", var"
+	
+  - type	: ErrError
+    func	: error_not_obj_file
+    args	: char *filename
+    message	: "\"file '%s' not an object file\", filename"
+	
+  - type	: ErrError
+    func	: error_not_lib_file
+    args	: char *filename
+    message	: "\"file '%s' not a library file\", filename"
+	
+  # Range error or warning
+  - type	: ErrWarn
+    func	: warn_int_range
+    args	: long value
+    message	: "\"integer '%ld' out of range\", value"
+	
+  - type	: ErrError
+    func	: error_int_range
+    args	: long value
+    message	: "\"integer '%ld' out of range\", value"

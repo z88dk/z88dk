@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Header Files">
@@ -28,9 +28,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="errors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="errors_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hist.h">
@@ -165,6 +162,12 @@
     <ClInclude Include="lib\str.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="error_func.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tokens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="hist.c">
@@ -266,12 +269,24 @@
     <ClCompile Include="lib\str.c">
       <Filter>Source Files\lib</Filter>
     </ClCompile>
+    <ClCompile Include="error_func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="scan_rules.rl">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="parse_rules.rl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="tt\error_func.c.tt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="tt\error_func.h.tt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="tt\error_func.yaml">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

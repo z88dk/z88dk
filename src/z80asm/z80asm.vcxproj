@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -91,7 +91,7 @@
     <ClInclude Include="deffile.h" />
     <ClInclude Include="directives.h" />
     <ClInclude Include="errors.h" />
-    <ClInclude Include="errors_def.h" />
+    <ClInclude Include="error_func.h" />
     <ClInclude Include="expr.h" />
     <ClInclude Include="expr_def.h" />
     <ClInclude Include="hist.h" />
@@ -134,6 +134,7 @@
     <ClInclude Include="symbol.h" />
     <ClInclude Include="symref.h" />
     <ClInclude Include="symtab.h" />
+    <ClInclude Include="tokens.h" />
     <ClInclude Include="z80asm.h" />
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +142,7 @@
     <ClCompile Include="deffile.c" />
     <ClCompile Include="directives.c" />
     <ClCompile Include="errors.c" />
+    <ClCompile Include="error_func.c" />
     <ClCompile Include="expr.c" />
     <ClCompile Include="hist.c" />
     <ClCompile Include="libfile.c" />
@@ -174,6 +176,9 @@
   <ItemGroup>
     <None Include="parse_rules.rl" />
     <None Include="scan_rules.rl" />
+    <None Include="tt\error_func.c.tt" />
+    <None Include="tt\error_func.h.tt" />
+    <None Include="tt\error_func.yaml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

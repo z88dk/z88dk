@@ -15,7 +15,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.57 2015-02-24 22:27:38 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.c,v 1.58 2015-08-03 23:08:11 pauloscustodio Exp $
 */
 
 #include "errors.h"
@@ -191,7 +191,7 @@ static void puts_error_file( char *string )
 /*-----------------------------------------------------------------------------
 *   Output error message
 *----------------------------------------------------------------------------*/
-static void do_error( enum ErrType err_type, char *message )
+void do_error( enum ErrType err_type, char *message )
 {
 	STR_DEFINE(msg, STR_SIZE);
     size_t len_at, len_prefix;
@@ -248,21 +248,6 @@ static void do_error( enum ErrType err_type, char *message )
 
 	STR_DELETE(msg);
 }
-
-/*-----------------------------------------------------------------------------
-*   define error functions
-*----------------------------------------------------------------------------*/
-#define ERR(err_type,func,args)	\
-	void func \
-	{ \
-		STR_DEFINE(msg, STR_SIZE); \
-		init_module(); \
-		str_append_sprintf( msg, args ); \
-		do_error( err_type, str_data(msg) ); \
-		STR_DELETE(msg); \
-	}
-#include "errors_def.h"
-#undef ERR
 
 /*-----------------------------------------------------------------------------
 *   file error handling

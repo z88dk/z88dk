@@ -15,11 +15,12 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Error handling.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.33 2015-02-13 00:05:13 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/errors.h,v 1.34 2015-08-03 23:08:11 pauloscustodio Exp $
 */
 
 #pragma once
 
+#include "error_func.h"
 #include <stdio.h>
 
 enum ErrType { ErrInfo, ErrWarn, ErrError };
@@ -56,8 +57,6 @@ extern void open_error_file( char *src_filename );
 extern void close_error_file( void );   /* deletes the file if no errors */
 
 /*-----------------------------------------------------------------------------
-*   declare error functions
+*   Execute an error
 *----------------------------------------------------------------------------*/
-#define ERR(err_type,func,args)	extern void func;
-#include "errors_def.h"
-#undef ERR
+extern void do_error( enum ErrType err_type, char *message );

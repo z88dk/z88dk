@@ -15,7 +15,7 @@
 #
 # Test object file output from z80asm
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.27 2015-02-24 22:27:45 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.28 2015-08-03 23:08:13 pauloscustodio Exp $
 #
 
 use strict;
@@ -4462,7 +4462,7 @@ t_binary(read_binfile(bin_file()), "\xC3\x00\x00");
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "objfile.o lib/class.o lib/array.o errors.o lib/str.o lib/strhash.o lib/list.o lib/fileutil.o scan.o options.o model.o module.o sym.o symtab.o symref.o lib/srcfile.o hist.o expr.o listfile.o codearea.o lib/dbg.o";
+my $objs = "objfile.o lib/class.o lib/array.o errors.o error_func.o lib/str.o lib/strhash.o lib/list.o lib/fileutil.o scan.o options.o model.o module.o sym.o symtab.o symref.o lib/srcfile.o hist.o expr.o listfile.o codearea.o lib/dbg.o";
 
 # get init code except init() and main()
 my $init = <<'END';

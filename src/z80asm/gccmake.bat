@@ -1,5 +1,5 @@
 @echo off
-rem $Id: gccmake.bat,v 1.56 2015-02-24 22:27:38 pauloscustodio Exp $
+rem $Id: gccmake.bat,v 1.57 2015-08-03 23:08:11 pauloscustodio Exp $
 
 echo *******************
 echo * Building z80asm *
@@ -8,6 +8,7 @@ del *.o lib\*.o
 gcc -Ilib -Wall -c -o codearea.o             codearea.c
 gcc -Ilib -Wall -c -o deffile.o              deffile.c
 gcc -Ilib -Wall -c -o directives.o           directives.c
+gcc -Ilib -Wall -c -o error_func.o           error_func.c
 gcc -Ilib -Wall -c -o errors.o               errors.c
 gcc -Ilib -Wall -c -o expr.o                 expr.c
 gcc -Ilib -Wall -c -o hist.o                 hist.c
