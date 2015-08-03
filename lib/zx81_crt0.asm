@@ -8,7 +8,7 @@
 ;       The "startup=2" parameter forces the SLOW mode.
 ;       Values for "startup" from 3 to 6 activate the WRX HRG modes
 ;       Values between 13 and 17 activate the ARX HRG modes
-;
+;		LAMBDA 8300/POWER 3000 modes: startup=101 and startup=102
 ;
 ;       OPTIMIZATIONS:
 ;
@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.47 2015-08-01 09:14:43 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.48 2015-08-03 14:24:56 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -57,12 +57,17 @@
         PUBLIC    heaplast        ;Near malloc heap variables
         PUBLIC    heapblocks
 
+IF (startup>100)
+		; LAMBDA specific definitions (if any)
+ELSE
 IF (startup>=3)
         PUBLIC    hr_rows         ;Current number of text rows in graphics mode
         PUBLIC    _hr_rows        ;as above for C declarations
 
         PUBLIC    text_rows       ;as above for VT ANSI mode
 ENDIF
+ENDIF
+
         PUBLIC    base_graphics   ;Graphical variables
         PUBLIC    _base_graphics  ;as above for C declarations
         PUBLIC    coords          ;Current xy position
@@ -77,7 +82,8 @@ ENDIF
         defc    _FRAMES = 16436	; Timer
 
         IF      !myzorg
-			IF LAMBDA
+			IF (startup>100)
+				; ORG position for LAMBDA
                 defc    myzorg  = 17307
 			ELSE
                 defc    myzorg  = 16514
@@ -120,15 +126,21 @@ start:
 
 IF (!DEFINED_startup | (startup=1))
         ; FAST mode, safest way to use the special registers
-	IF LAMBDA
-		call	$D5E
-	ELSE
         call    $F23    ; FAST mode
-	ENDIF
         ;call   $2E7    ;setfast
         ;out ($fd),a  ; nmi off        
 ENDIF
 
+
+IF (startup>100)
+	IF (startup=101)
+		; FAST mode, safest way to use the special registers
+		call	$D5E
+	ENDIF
+	IF (startup=102)
+    ; call    altint_on
+	ENDIF
+ELSE
 IF (startup>=2)
  IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
         ld	a,1
@@ -145,7 +157,11 @@ IF (startup>=2)
         call    hrg_on
  ENDIF
 ENDIF
+ENDIF
 
+IF (startup>100)
+		; LAMBDA specific startup code (if any)
+ELSE
 IF (startup>=23)	; CHROMA 81
 	ld	a,32+16+7	; 32=colour enabled,  16="attribute file" mode, 7=white border
 	ld bc,7FEFh
@@ -171,6 +187,7 @@ IF (startup>=23)	; CHROMA 81
 	inc de
 	dec c
 	jr  nz,rowloop
+ENDIF
 ENDIF
 
 	; this must be after 'hrg_on', sometimes
@@ -222,6 +239,12 @@ ENDIF
 		; The BASIC USR call would restore IY on return, but it could not be enough
         call    restore81
 
+IF (startup>100)
+	IF (startup=101)
+		; LAMBDA specific exit resume code (if any)
+		call	 $12A5	; SLOW
+	ENDIF
+ELSE
 IF (startup>=2)
  IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
         xor	a
@@ -235,13 +258,10 @@ IF (startup>=2)
  ENDIF
 ELSE
  IF (!DEFINED_startup | (startup=1))
-	IF LAMBDA
-		call	 $12A5
-	ELSE
         call    $F2B            ; SLOW mode
-	ENDIF
         ;call   $207    ;slowfast
  ENDIF
+ENDIF
 ENDIF
 
         pop     bc		; return code (for BASIC)
@@ -252,7 +272,7 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 restore81:
-IF (!DEFINED_startup | (startup=1))
+IF (!DEFINED_startup | (startup=1) | (startup=101))
         ex      af,af
         ld      a,(a1save)
         ex      af,af
@@ -266,7 +286,7 @@ ENDIF
         ret
         
 save81:
-IF (!DEFINED_startup | (startup=1))
+IF (!DEFINED_startup | (startup=1) | (startup=101))
         ex      af,af
         ld      (a1save),a
         ex      af,af
@@ -278,7 +298,7 @@ ENDIF
         exx
         ret
 
-IF (!DEFINED_startup | (startup=1))
+IF (!DEFINED_startup | (startup=1) | (startup=101))
 a1save: 	defb    0
 ENDIF
 hl1save:	defw	0
@@ -321,6 +341,12 @@ ENDIF
 ; Modified IRQ handler
 ;---------------------------------------
 
+IF (startup>100)
+	; LAMBDA modes
+ELSE
+
+; +++++ non-LAMBDA section begin +++++
+
 IF (startup=2)
         INCLUDE "zx81_altint.def"
 ENDIF
@@ -362,6 +388,9 @@ _hr_rows:
  ELSE
 		defw	24	; Current number of text rows in graphics mode
  ENDIF
+ENDIF
+
+; +++++ non-LAMBDA section end +++++
 ENDIF
 
 coords:         defw    0       ; Current graphics xy coordinates
