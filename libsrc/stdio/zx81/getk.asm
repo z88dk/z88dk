@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - 8/5/2000
 ;
 ;
-;	$Id: getk.asm,v 1.5 2015-01-19 01:33:22 pauloscustodio Exp $
+;	$Id: getk.asm,v 1.6 2015-08-04 15:33:51 stefano Exp $
 ;
 
 	PUBLIC	getk
@@ -17,7 +17,11 @@
 .getk
 	call	restore81
 	
+IF FORlambda
+	call	3444
+ELSE
 	call	699
+ENDIF
 	ld	a,h
 	add	a,2
 
@@ -26,7 +30,11 @@
 
 	ld	a,0
 	jr	c,nokey
+IF FORlambda
+	call	6263
+ELSE
 	call	1981
+ENDIF
 
 	call	zx81toasc
 nokey:

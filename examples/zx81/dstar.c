@@ -15,6 +15,9 @@
  * 	Dk'Tronics without RAM expansion
  *    zcc +zx81 -startup=2 -create-app -DDKTRONICS dstar.c
  *
+ * 	LAMBDA 8300 / POWER 3000
+ *    zcc +lambda -create-app -DTEXT dstar.c
+ *
  * 	Standard Sinclair mode
  *    zcc +zx81 -startup=2 -create-app -DTEXT dstar.c
  *    zcc +zx80 -create-app -DTEXT dstar.c
@@ -95,6 +98,8 @@ void main()
 #ifdef __ZX80__
 	gen_tv_field_init(0);
 #endif
+
+#ifndef LAMBDA
 #ifdef DKTRONICS
 	#asm
 	ld	a,$2a
@@ -120,10 +125,19 @@ void main()
 	#endasm
 #endif
 #endif
+#endif
 
 	/* Interesting way to find the display file address ! */
 	/* (we're working in text mode, with redefinded font) */
 	display=d_file+1;
+
+#ifdef LAMBDA
+	#asm
+	ld   a,5	; Cyan border
+	call 06E7h
+	#endasm
+#endif
+
 #ifdef CHROMA81
 	display_attr=d_file+1+32768;
 	#asm
@@ -132,7 +146,7 @@ void main()
 	out (c),a
 	#endasm
 #endif
-	
+
 	DrawBoard();
 	
 	/* Loop keyhandler till you finished the game */
@@ -512,6 +526,41 @@ void putpic(int x, int y, int picture) {
 		break;
 	}
 #else
+#ifdef LAMBDA
+	switch(picture)
+	{
+	case WALL:
+		display[y*66+x*2]=8;
+		display[y*66+x*2+1]=8;
+		display[y*66+33+x*2]=8;
+		display[y*66+33+x*2+1]=8;
+		break;
+	case BUBB:
+		display[y*66+x*2]=137;
+		display[y*66+x*2+1]=138;		// 4
+		display[y*66+33+x*2]=10;		// 2
+		display[y*66+33+x*2+1]=9;	// 1
+		break;
+	case BALL:
+		display[y*66+x*2]=6;
+		display[y*66+x*2+1]=130;
+		display[y*66+33+x*2]=132;
+		display[y*66+33+x*2+1]=7;
+		break;
+	case BOX:
+		display[y*66+x*2]=12;
+		display[y*66+x*2+1]=12;
+		display[y*66+33+x*2]=12;
+		display[y*66+33+x*2+1]=12;
+		break;
+	case 0:
+		display[y*66+x*2]=0;
+		display[y*66+x*2+1]=0;
+		display[y*66+33+x*2]=0;
+		display[y*66+33+x*2+1]=0;
+		break;
+	}
+#else
 	switch(picture)
 	{
 	case WALL:
@@ -547,6 +596,8 @@ void putpic(int x, int y, int picture) {
 	}
 #endif
 #endif
+#endif
+
 #ifndef HAVEPICS
 	if (picture == 0) {
 		display[y*66+x*2]=0;
@@ -559,8 +610,9 @@ void putpic(int x, int y, int picture) {
 		display[y*66+33+x*2]=4*picture-2;
 		display[y*66+33+x*2+1]=4*picture;
 	}
+#endif
 
-#ifdef CHROMA81
+#if defined(CHROMA81) || defined(LAMBDA)
 	if (y>8) {
 		display_attr[y*66+x*2]=208;
 		display_attr[y*66+x*2+1]=208;
@@ -574,6 +626,5 @@ void putpic(int x, int y, int picture) {
 	}
 #endif
 
-#endif
 }
 

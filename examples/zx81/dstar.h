@@ -46,8 +46,17 @@ char *display;
 	char *display_attr;
 	char color[]={240,242,245,241,244}
 #endif
+#ifdef LAMBDA
+int d_file = 16509;
+char *display_attr = 8319;
+char color[]={240,242,245,241,244}
+#else
 extern int d_file @16396;
+#endif
 
+#ifdef LAMBDA
+#define HAVEPICS
+#endif
 
 #ifdef DKTRONICS
 #define HAVEPICS
