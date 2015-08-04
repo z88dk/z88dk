@@ -14,7 +14,7 @@
 #
 # Makefile to build Toolkit::Template generated files
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/tt/Makefile,v 1.1 2015-08-03 23:08:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/tt/Makefile,v 1.2 2015-08-04 22:30:06 pauloscustodio Exp $
 
 TPAGE = perl -S tpage --include_path=. 
 
@@ -23,7 +23,9 @@ all : $(patsubst %.tt, ../%, $(wildcard *.tt))
 ../%.c : %.c.tt %.yaml
 	$(TPAGE) $< > $@~
 	mv $@~ $@
+	dos2unix $@
 
 ../%.h : %.h.tt %.yaml
 	$(TPAGE) $< > $@~
 	mv $@~ $@
+	dos2unix $@
