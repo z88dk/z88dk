@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.18 2015-04-02 20:00:21 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.19 2015-08-04 22:47:16 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -25,18 +25,6 @@ ASTYLE = astyle \
 	--pad-oper --pad-paren-in --pad-header --unpad-paren \
 	--align-pointer=name \
 	--suffix=none
-FILEPP = perl -S filepp.pl
-
-#------------------------------------------------------------------------------
-# tokens
-#------------------------------------------------------------------------------
-all : tokens.h
-
-tokens.h : tokens.h.in tokens.def
-	$(FILEPP) tokens.h.in -o $@
-
-clean::
-	$(RM) *~
 
 #------------------------------------------------------------------------------
 # ragel lexer generator
