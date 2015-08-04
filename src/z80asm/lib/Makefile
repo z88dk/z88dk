@@ -2,7 +2,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Makefile,v 1.5 2015-02-24 22:27:40 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Makefile,v 1.6 2015-08-04 22:30:55 pauloscustodio Exp $
 
 TARGET	= libclibrary.a
 
@@ -19,7 +19,10 @@ TEST_SRC= $(wildcard t/test_*.c) $(wildcard t/uthash/test*.c)
 TESTS	= $(patsubst %.c,%,$(TEST_SRC))
 
 # The Target Build
-all: $(TARGET) tests
+all: $(TARGET)
+
+# The Test Build
+test: tests
 	perl -S prove t/*.t
 
 release:
