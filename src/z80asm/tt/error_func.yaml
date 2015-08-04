@@ -14,8 +14,9 @@
 #
 # Define error messages
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/tt/error_func.yaml,v 1.1 2015-08-03 23:08:13 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/tt/error_func.yaml,v 1.2 2015-08-04 22:32:44 pauloscustodio Exp $
 
+---
 errors:
   # Information
   - type	: ErrInfo
