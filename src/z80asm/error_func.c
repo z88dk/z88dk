@@ -15,7 +15,6 @@ void info_total_errors(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_read_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -25,7 +24,6 @@ void error_read_file(char *filename)
 	
 	STR_DELETE(msg);
 }
-
 void error_write_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -35,7 +33,6 @@ void error_write_file(char *filename)
 	
 	STR_DELETE(msg);
 }
-
 void error_include_recursion(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -45,7 +42,6 @@ void error_include_recursion(char *filename)
 	
 	STR_DELETE(msg);
 }
-
 void warn_option_deprecated(char *option)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -55,7 +51,6 @@ void warn_option_deprecated(char *option)
 	
 	STR_DELETE(msg);
 }
-
 void error_no_src_file(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -65,7 +60,6 @@ void error_no_src_file(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_illegal_option(char *option)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -75,7 +69,6 @@ void error_illegal_option(char *option)
 	
 	STR_DELETE(msg);
 }
-
 void error_illegal_src_filename(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -85,7 +78,6 @@ void error_illegal_src_filename(char *filename)
 	
 	STR_DELETE(msg);
 }
-
 void warn_symbol_different(char *name, char *used)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -95,7 +87,6 @@ void warn_symbol_different(char *name, char *used)
 	
 	STR_DELETE(msg);
 }
-
 void warn_deprecated(char *old_stmt, char *new_stmt)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -105,7 +96,6 @@ void warn_deprecated(char *old_stmt, char *new_stmt)
 	
 	STR_DELETE(msg);
 }
-
 void error_syntax(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -115,7 +105,6 @@ void error_syntax(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_syntax_expr(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -125,7 +114,6 @@ void error_syntax_expr(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_invalid_squoted_string(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -135,7 +123,6 @@ void error_invalid_squoted_string(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_unclosed_string(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -145,7 +132,6 @@ void error_unclosed_string(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_divide_by_zero(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -155,7 +141,6 @@ void error_divide_by_zero(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_missing_block(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -165,7 +150,6 @@ void error_missing_block(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_missing_close_block(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -175,7 +159,6 @@ void error_missing_close_block(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_unbalanced_struct_at(char *filename, int line_nr)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -185,7 +168,6 @@ void error_unbalanced_struct_at(char *filename, int line_nr)
 	
 	STR_DELETE(msg);
 }
-
 void error_unbalanced_struct(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -195,7 +177,6 @@ void error_unbalanced_struct(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_not_defined(char *name)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -205,7 +186,6 @@ void error_not_defined(char *name)
 	
 	STR_DELETE(msg);
 }
-
 void error_illegal_ident(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -215,7 +195,6 @@ void error_illegal_ident(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_jr_not_local(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -225,7 +204,6 @@ void error_jr_not_local(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_symbol_redefined(char *symbol)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -235,7 +213,6 @@ void error_symbol_redefined(char *symbol)
 	
 	STR_DELETE(msg);
 }
-
 void error_symbol_redefined_module(char *symbol, char *module)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -245,7 +222,6 @@ void error_symbol_redefined_module(char *symbol, char *module)
 	
 	STR_DELETE(msg);
 }
-
 void error_symbol_decl_local(char *symbol)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -255,7 +231,6 @@ void error_symbol_decl_local(char *symbol)
 	
 	STR_DELETE(msg);
 }
-
 void error_symbol_redecl(char *symbol)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -265,7 +240,6 @@ void error_symbol_redecl(char *symbol)
 	
 	STR_DELETE(msg);
 }
-
 void error_max_codesize(long size)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -275,7 +249,6 @@ void error_max_codesize(long size)
 	
 	STR_DELETE(msg);
 }
-
 void error_module_redefined(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -285,7 +258,6 @@ void error_module_redefined(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_org_redefined(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -295,7 +267,6 @@ void error_org_redefined(void)
 	
 	STR_DELETE(msg);
 }
-
 void error_invalid_org_option(char *org_hex)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -305,7 +276,6 @@ void error_invalid_org_option(char *org_hex)
 	
 	STR_DELETE(msg);
 }
-
 void error_env_not_defined(char *var)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -315,7 +285,6 @@ void error_env_not_defined(char *var)
 	
 	STR_DELETE(msg);
 }
-
 void error_not_obj_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -325,7 +294,6 @@ void error_not_obj_file(char *filename)
 	
 	STR_DELETE(msg);
 }
-
 void error_not_lib_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -335,7 +303,6 @@ void error_not_lib_file(char *filename)
 	
 	STR_DELETE(msg);
 }
-
 void warn_int_range(long value)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -345,7 +312,6 @@ void warn_int_range(long value)
 	
 	STR_DELETE(msg);
 }
-
 void error_int_range(long value)
 {
 	STR_DEFINE(msg, STR_SIZE);

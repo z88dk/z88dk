@@ -18,5 +18,4 @@ void [% func %]([% args %])
 	
 	STR_DELETE(msg);
 }
-
 %% END

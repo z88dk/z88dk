@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.13 2015-01-26 23:46:34 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.14 2015-08-04 22:28:57 pauloscustodio Exp $
 #
 # Assert that all source files are in UNIX line-ending format; fix if not
 
@@ -26,7 +26,7 @@ use File::Basename;
 
 find(sub {
 		return unless -f $_;
-		return unless /^Makefile$|\.(c|h|pl|t|asm|rl|bmk)$/i;
+		return unless /^Makefile$|\.(c|h|pl|t|asm|rl|bmk|def|yaml|in|tt|vcxproj.*)$/i;
 		dos2unix($_);
 	}, dirname($0)."/..");
 ok 1;
