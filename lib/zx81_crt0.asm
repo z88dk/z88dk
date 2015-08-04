@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.48 2015-08-03 14:24:56 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.49 2015-08-04 06:48:23 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -138,7 +138,7 @@ IF (startup>100)
 		call	$D5E
 	ENDIF
 	IF (startup=102)
-    ; call    altint_on
+      call    altint_on
 	ENDIF
 ELSE
 IF (startup>=2)
@@ -244,6 +244,9 @@ IF (startup>100)
 		; LAMBDA specific exit resume code (if any)
 		call	 $12A5	; SLOW
 	ENDIF
+	IF (startup=102)
+        call    altint_off
+	ENDIF
 ELSE
 IF (startup>=2)
  IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
@@ -272,7 +275,7 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
 restore81:
-IF (!DEFINED_startup | (startup=1) | (startup=101))
+IF (!DEFINED_startup | (startup=1))
         ex      af,af
         ld      a,(a1save)
         ex      af,af
@@ -286,7 +289,7 @@ ENDIF
         ret
         
 save81:
-IF (!DEFINED_startup | (startup=1) | (startup=101))
+IF (!DEFINED_startup | (startup=1))
         ex      af,af
         ld      (a1save),a
         ex      af,af
@@ -298,7 +301,7 @@ ENDIF
         exx
         ret
 
-IF (!DEFINED_startup | (startup=1) | (startup=101))
+IF (!DEFINED_startup | (startup=1))
 a1save: 	defb    0
 ENDIF
 hl1save:	defw	0
@@ -343,6 +346,11 @@ ENDIF
 
 IF (startup>100)
 	; LAMBDA modes
+	
+IF (startup=102)
+        INCLUDE "lambda_altint.def"
+ENDIF
+
 ELSE
 
 ; +++++ non-LAMBDA section begin +++++
