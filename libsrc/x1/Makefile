@@ -1,7 +1,7 @@
 #
 # Build the X1 target libraries
 #
-# $Id: Makefile,v 1.2 2013-11-12 13:50:15 stefano Exp $
+# $Id: Makefile,v 1.3 2015-08-05 05:54:01 pauloscustodio Exp $
 #
 
 include ../Make.config
