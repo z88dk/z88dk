@@ -1,7 +1,7 @@
 #
 # Amstrad CPC rs232 drivers for Z80 STI based controller
 #
-# $Id: Makefile,v 1.1 2008-07-18 07:51:12 stefano Exp $
+# $Id: Makefile,v 1.2 2015-08-05 07:24:24 pauloscustodio Exp $
 
 include ../../../Make.config
 
