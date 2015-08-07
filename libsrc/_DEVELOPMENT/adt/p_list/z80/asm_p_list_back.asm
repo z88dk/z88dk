@@ -26,7 +26,7 @@ asm_p_list_back:
    ;
    ; exit  : success
    ;
-   ;            hl = void *item (item at front)
+   ;            hl = void *item (item at back)
    ;            nz flag set
    ;
    ;         fail if list is empty

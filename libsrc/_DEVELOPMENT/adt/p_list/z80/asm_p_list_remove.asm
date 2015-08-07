@@ -78,7 +78,26 @@ item_at_front:
 
 item_at_end:
 
-   ld e,c
-   ld d,b
+   ld a,h
+   or l
+   jr z, no_adj
    
-   jr rejoin_1
+   dec hl
+   dec hl
+
+no_adj:
+
+   ex de,hl
+   
+   ld l,c
+   ld h,b
+   
+   inc hl
+   inc hl
+   
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   
+   pop hl
+   ret

@@ -61,10 +61,30 @@ tail_changed:
    ; de = void *list_item
    ; bc = p_list_t *list
    
-   ld e,c
-   ld d,b
+   inc bc
+   inc bc
+   
+   ld a,l
+   ld (bc),a
+   inc bc
+   ld a,h
+   ld (bc),a
+
+   dec bc
+   dec bc
+   dec bc
    
    inc hl
    inc hl
-
-   jr rejoin
+   
+   inc de
+   inc de
+   
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   
+   dec hl
+   dec hl
+   
+   ret

@@ -13,48 +13,26 @@ SECTION code_adt_p_list
 
 PUBLIC asm_p_list_push_back
 
-EXTERN asm_p_forward_list_push_front, asm_p_forward_list_insert_after
+EXTERN asm_p_list_back, asm_p_list_insert_after, __p_list_empty_add
 
 asm_p_list_push_back:
 
    ; enter : hl = p_list_t *list
    ;         de = void *item
    ;
-   ; exit  : hl = void *item
-   ;         z flag set if item is now sole occupant of list
+   ; exit  : bc = p_list_t *list
+   ;         hl = void *item
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, bc, de, hl
 
-   inc de
-   inc de                      ; de = & item->prev
+   ld c,l
+   ld b,h
    
-   inc hl
-   inc hl                      ; hl = & list->tail
+   call asm_p_list_back
    
-   call asm_p_forward_list_push_front
-   
-   ; hl = & item->prev
-   ; de = & list->tail
-   ; z flag set if list was empty
-   
-   jr z, list_empty
-   
-   ld e,(hl)
-   inc hl
-   ld d,(hl)
-   dec hl
+   ; bc = p_list_t *list
+   ; hl = void *item_back
+   ; de = void *item
 
-list_empty:
-
-   dec de
-   dec de
-   
-   dec hl
-   dec hl
-   
-   ex de,hl
-   
-   ; de = & item->next
-   ; hl = & item->prev->next or & list->head
-   
-   jp asm_p_forward_list_insert_after
+   jp nz, asm_p_list_insert_after   
+   jp __p_list_empty_add

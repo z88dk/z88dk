@@ -13,51 +13,58 @@ SECTION code_adt_p_list
 
 PUBLIC asm_p_list_push_front
 
-EXTERN asm_p_forward_list_push_front, asm_p_forward_list_insert_after
+EXTERN asm_p_list_front
 
 asm_p_list_push_front:
 
    ; enter : hl = p_list_t *list
    ;         de = void *item
    ;
-   ; exit  : hl = void *item
-   ;         z flag set if item is sole occupant of list
+   ; exit  : bc = p_list_t *list
+   ;         hl = void *item
    ;
-   ; uses  : af, de, hl
+   ; uses  : af, bc, de, hl
 
-   call asm_p_forward_list_push_front
+   ld c,l
+   ld b,h
+   
+   call asm_p_list_front
+   
+   ; bc = p_list_t *list
+   ; hl = void *item_front
+   ; de = void *item
 
-   ; hl = void *item
-   ; de = list *list
-   ; z flag set if list was empty
+   jp z, __p_list_empty_add
 
-   jr z, list_empty
-
-   ld e,(hl)
+   ld a,e
+   ld (bc),a
+   inc bc
+   ld a,d
+   ld (bc),a
+   dec bc
+   
    inc hl
-   ld d,(hl)
    inc hl
-
-rejoin:
-
-   inc de
-   inc de
-
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   dec hl
+   dec hl
+   dec hl
+   
    ex de,hl
-
-   ; de = & item->prev
-   ; hl = & item_next->prev or & list->prev
-
-   call asm_p_forward_list_insert_after
-
+   xor a
+   
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   inc hl
+   ld (hl),a
+   inc hl
+   ld (hl),a
+   
    dec hl
    dec hl
-
+   dec hl
+   
    ret
-
-list_empty:
-
-   inc hl
-   inc hl
-
-   jr rejoin
