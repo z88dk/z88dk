@@ -157,7 +157,9 @@ EXTERN asm_sp1_GetUpdateStruct, l_jpix
    push hl
    push de
    ex de,hl
+   push ix
    call l_jpix
+   pop ix
    pop de
    pop hl
    pop bc
