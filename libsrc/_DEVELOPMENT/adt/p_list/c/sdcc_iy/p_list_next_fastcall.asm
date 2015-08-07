@@ -7,4 +7,4 @@ PUBLIC _p_list_next_fastcall
 
 EXTERN asm_p_list_next
 
-defc p_list_next_fastcall = asm_p_list_next
+defc _p_list_next_fastcall = asm_p_list_next
