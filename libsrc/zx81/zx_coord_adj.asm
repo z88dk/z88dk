@@ -7,18 +7,18 @@
 ; wants it in the top-left
 ;----------------------------------------------------------------
 ;
-;  $Id: zx_coord_adj.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
+;  $Id: zx_coord_adj.asm,v 1.5 2015-08-07 06:23:58 stefano Exp $
 ;
 ;----------------------------------------------------------------
 
 	PUBLIC    zx_coord_adj
 
-IF FORzx81
-	DEFC    COLUMN=$4039    ; S_POSN_x
-	DEFC    ROW=$403A       ; S_POSN_y
-ELSE
+IF FORzx80
 	DEFC   COLUMN=$4024    ; S_POSN_x
 	DEFC   ROW=$4025       ; S_POSN_y
+ELSE
+	DEFC    COLUMN=$4039    ; S_POSN_x
+	DEFC    ROW=$403A       ; S_POSN_y
 ENDIF
 
 zx_coord_adj:          ; adjust coordinates from-to ZX81 ROM style

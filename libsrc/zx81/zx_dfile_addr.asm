@@ -7,29 +7,34 @@
 ; values for ROW and COLUMN
 ;----------------------------------------------------------------
 ;
-;  $Id: zx_dfile_addr.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
+;  $Id: zx_dfile_addr.asm,v 1.5 2015-08-07 06:23:58 stefano Exp $
 ;
 ;----------------------------------------------------------------
 
 	PUBLIC    zx_dfile_addr
 
-IF FORzx81
-	DEFC    COLUMN=$4039    ; S_POSN_x
-	DEFC    ROW=$403A       ; S_POSN_y
-ELSE
+IF FORzx80
 	DEFC   COLUMN=$4024    ; S_POSN_x
 	DEFC   ROW=$4025       ; S_POSN_y
+ELSE
+	DEFC    COLUMN=$4039    ; S_POSN_x
+	DEFC    ROW=$403A       ; S_POSN_y
 ENDIF
 
 zx_dfile_addr:
 	push	af
+IF FORlambda
+	ld	hl,16510
+ELSE
 	ld	hl,(16396)	; D_FILE
 	inc	hl
+ENDIF
+	
 	ld	a,(ROW)
 	and	a
 	jr	z,r_zero
 	ld	b,a
-	ld	de,33	; 32+1. Every text line ends with an HALT
+	ld	de,33		; 32+1. Every text line ends with an HALT
 .r_loop
 	add	hl,de
 	djnz	r_loop
@@ -38,7 +43,7 @@ zx_dfile_addr:
 	ld	d,0
 	ld	e,a
 	add	hl,de
-IF FORzx81
+IF !FORzx80
 	ld ($400E),hl	; DF_CC ..current ZX81 cursor position on display file
 ENDIF
 	pop	af

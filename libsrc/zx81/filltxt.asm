@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: filltxt.asm,v 1.7 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: filltxt.asm,v 1.8 2015-08-07 06:23:57 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -18,8 +18,12 @@ filltxt:
 	; __FASTCALL__ mode
 	ld	a,l
 	
-	ld	hl,(16396)
+IF FORlambda
+	ld	hl,16510
+ELSE
+	ld	hl,(16396)	; D_FILE
 	inc	hl			; skip the first 'halt' instruction in the D-FILE
+ENDIF
 
 	ld	b,24
 floop:

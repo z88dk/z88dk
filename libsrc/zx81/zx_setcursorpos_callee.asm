@@ -7,7 +7,7 @@
 ;	int __CALLEE__ zx_setstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_setcursorpos_callee.asm,v 1.6 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: zx_setcursorpos_callee.asm,v 1.7 2015-08-07 06:23:58 stefano Exp $
 ;
 
 PUBLIC	zx_setcursorpos_callee
@@ -16,10 +16,10 @@ PUBLIC	ASMDISP_ZX_SETCURSORPOS_CALLEE
 EXTERN     zx_dfile_addr
 EXTERN     zx_coord_adj
 
-IF FORzx81
-	DEFC    COLUMN=$4039    ; S_POSN_x
-ELSE
+IF FORzx80
 	DEFC   COLUMN=$4024    ; S_POSN_x
+ELSE
+	DEFC   COLUMN=$4039    ; S_POSN_x
 ENDIF
 
 

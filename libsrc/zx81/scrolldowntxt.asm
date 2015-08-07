@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-; $Id: scrolldowntxt.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
+; $Id: scrolldowntxt.asm,v 1.5 2015-08-07 06:23:57 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ; Text scrolldown.
@@ -13,9 +13,13 @@
     EXTERN    zx_topleft
 
 scrolldowntxt:
-	ld	hl,(16396)
+IF FORlambda
+	ld	hl,16509 + (33*24)
+ELSE
+	ld	hl,(16396)	; D_FILE
 	ld	bc,33*24
 	add	hl,bc
+ENDIF
 	ld	de,33
 	push hl
 	add hl,de

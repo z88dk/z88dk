@@ -5,7 +5,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: fputc_cons.asm,v 1.18 2015-05-31 16:22:39 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.19 2015-08-07 06:23:57 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -22,12 +22,12 @@
 	DEFC	ROWS=24
 	DEFC	COLUMNS=32
 
-IF FORzx81
-	DEFC	COLUMN=$4039    ; S_POSN_x
-	DEFC	ROW=$403A       ; S_POSN_y
+IF FORzx80
+	DEFC   COLUMN=$4024    ; S_POSN_x
+	DEFC   ROW=$4025       ; S_POSN_y
 ELSE
-	DEFC	COLUMN=$4024    ; S_POSN_x
-	DEFC	ROW=$4025       ; S_POSN_y
+	DEFC    COLUMN=$4039    ; S_POSN_x
+	DEFC    ROW=$403A       ; S_POSN_y
 ENDIF
 
 ;.ROW	defb	0
@@ -62,11 +62,6 @@ ENDIF
 	ld a,(ROW)
 	inc a
 	ld (ROW),a
-;	cp ROWS		; Out of screen?
-;	ret nz		; no, return
-;	ld a,ROWS-1
-;	ld (ROW),a
-;	jp  scrolluptxt
 	ret
 
 .NoLF

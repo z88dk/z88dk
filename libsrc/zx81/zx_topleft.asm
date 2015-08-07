@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: zx_topleft.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: zx_topleft.asm,v 1.5 2015-08-07 06:23:58 stefano Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -12,18 +12,23 @@
 ;----------------------------------------------------------------
 
 	PUBLIC   zx_topleft
+	EXTERN   zx_dfile_addr
 
-IF FORzx81
-	DEFC   COLUMN=$4039    ; S_POSN_x
-ELSE
+IF FORzx80
 	DEFC   COLUMN=$4024    ; S_POSN_x
+ELSE
+	DEFC   COLUMN=$4039    ; S_POSN_x
 ENDIF
 
 zx_topleft:
 	ld  hl,$1821	; (33,24) = top left screen posn
 	ld  (COLUMN),hl
+
+IF FORzx80
 	ld	hl,(16396)	; D_FILE
-IF FORzx81
-    ld  ($400E),hl	; DF_CC ..position ZX81 cursor at beginning of display file
-ENDIF
 	ret
+ELSE
+    ;ld  ($400E),hl	; DF_CC ..position ZX81 cursor at beginning of display file
+	jp	zx_dfile_addr
+ENDIF
+

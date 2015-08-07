@@ -4,7 +4,7 @@
 	EXTERN	coords
 
 ;
-;	$Id: plotpixl.asm,v 1.11 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: plotpixl.asm,v 1.12 2015-08-07 06:23:57 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -35,8 +35,12 @@
 				
 				srl	b
 				srl	c
-				ld	hl,(16396)
+IF FORlambda
+				ld	hl,16510
+ELSE
+				ld	hl,(16396)	; D_FILE
 				inc	hl
+ENDIF
 				ld	a,c
 				ld	c,b	; !!
 				ld	de,33	; 32+1. Every text line ends with an HALT

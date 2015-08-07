@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.219 2015-01-02 17:25:00 dom Exp $
+# $Id: Makefile,v 1.220 2015-08-07 06:23:54 stefano Exp $
 
 
 include Make.config
@@ -45,7 +45,7 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 
 zxlibs: ts2068_clib.lib ts2068an_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxan_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib zxfcntl zx232
 
-zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib
+zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib lambda_clib.lib
 
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
@@ -564,7 +564,7 @@ vzansi_clib.lib:
 	$(MAKE) -C games lvz
 	$(LIBLINKER) -DFORvz -x$(OUTPUT_DIRECTORY)/vzansi_clib @$(LISTFILE_DIRECTORY)/vzansi.lst
 
-# ZX81 lib - Stefano
+# ZX80 lib - Stefano
 zx80_clib.lib:
 	@echo ''
 	@echo '--- Building ZX80 Library ---'
@@ -619,6 +619,24 @@ zx81ansi_clib.lib:
 	$(LIBLINKER) -IXIY -DFORzx81 $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx81ansi_clib @$(LISTFILE_DIRECTORY)/zx81ansi.lst
 	$(MAKE) zx81deps
 
+# Lambda 8300 lib - Stefano
+lambda_clib.lib:
+	@echo ''
+	@echo '--- Building Lambda 8300 Library ---'
+	@echo ''
+	$(MAKE) zx81deps
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic_iy 
+	$(MAKE) -C printflike generic_iy
+	$(MAKE) -C setjmp generic_iy
+	$(MAKE) -C assert generic_iy
+	$(MAKE) gamesdeps
+	$(MAKE) -C games lzx81
+	$(MAKE) -C psg generic_iy
+	$(LIBLINKER) -IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(LISTFILE_DIRECTORY)/zx81.lst
+	$(MAKE) zzx81deps
+
 # ZX81 std graphics lib - Stefano
 gfx81.lib:
 	@echo ''
@@ -626,6 +644,15 @@ gfx81.lib:
 	@echo ''
 	$(MAKE) zx81deps
 	$(LIBLINKER) -IXIY -DFORzx81 -x$(OUTPUT_DIRECTORY)/gfx81 @$(LISTFILE_DIRECTORY)/gfx81.lst
+	$(MAKE) zx81deps
+
+# Lambda 8300 graphics lib - Stefano
+gfxlambda.lib:
+	@echo ''
+	@echo '--- Building Lambda 8300 Graphics Library ---'
+	@echo ''
+	$(MAKE) zx81deps
+	$(LIBLINKER) -IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/gfxlambda @$(LISTFILE_DIRECTORY)/gfx81.lst
 	$(MAKE) zx81deps
 
 # ZX81 UDG based graphics lib - Stefano

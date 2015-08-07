@@ -6,14 +6,18 @@
 ; Doesn't directly set the current cursor position
 ;--------------------------------------------------------------
 ;
-;       $Id: scrolluptxt.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
+;       $Id: scrolluptxt.asm,v 1.3 2015-08-07 06:23:58 stefano Exp $
 ;
 ;----------------------------------------------------------------
 
         PUBLIC    scrolluptxt
 
 scrolluptxt:
-	ld	hl,(16396)
+IF FORlambda
+	ld	hl,16509
+ELSE
+	ld	hl,(16396)	; D_FILE
+ENDIF
 	push hl
 	ld de,33
 	add hl,de

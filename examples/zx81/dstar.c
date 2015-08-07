@@ -530,10 +530,10 @@ void putpic(int x, int y, int picture) {
 	switch(picture)
 	{
 	case WALL:
-		display[y*66+x*2]=8;
-		display[y*66+x*2+1]=8;
-		display[y*66+33+x*2]=8;
-		display[y*66+33+x*2+1]=8;
+		display[y*66+x*2]=140;
+		display[y*66+x*2+1]=140;
+		display[y*66+33+x*2]=140;
+		display[y*66+33+x*2+1]=140;
 		break;
 	case BUBB:
 		display[y*66+x*2]=137;
@@ -548,10 +548,10 @@ void putpic(int x, int y, int picture) {
 		display[y*66+33+x*2+1]=7;
 		break;
 	case BOX:
-		display[y*66+x*2]=12;
-		display[y*66+x*2+1]=12;
-		display[y*66+33+x*2]=12;
-		display[y*66+33+x*2+1]=12;
+		display[y*66+x*2]=136;
+		display[y*66+x*2+1]=136;
+		display[y*66+33+x*2]=136;
+		display[y*66+33+x*2+1]=136;
 		break;
 	case 0:
 		display[y*66+x*2]=0;
