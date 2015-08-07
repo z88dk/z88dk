@@ -13,7 +13,7 @@ SECTION code_adt_p_list
 
 PUBLIC asm_p_list_push_front
 
-EXTERN asm_p_list_front
+EXTERN asm_p_list_front, __p_list_empty_add
 
 asm_p_list_push_front:
 
