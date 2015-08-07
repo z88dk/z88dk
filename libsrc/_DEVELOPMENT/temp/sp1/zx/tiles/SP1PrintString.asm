@@ -149,6 +149,7 @@ EXTERN asm_sp1_GetUpdateStruct, l_jpix
    cp (iy+3)
    jp nc, psloop
 
+   push ix
    push bc
    push de
    push hl
@@ -157,9 +158,7 @@ EXTERN asm_sp1_GetUpdateStruct, l_jpix
    push hl
    push de
    ex de,hl
-   push ix
    call l_jpix
-   pop ix
    pop de
    pop hl
    pop bc
@@ -167,6 +166,7 @@ EXTERN asm_sp1_GetUpdateStruct, l_jpix
    pop hl
    pop de
    pop bc
+   pop ix
    jp psloop
 
 .codeYWrap
