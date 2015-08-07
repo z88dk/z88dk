@@ -38,20 +38,12 @@ for %%t in (%targets%) do (
    
       echo.
       echo target = %%t
-   
+
       copy /Y target\%%t\clib_cfg.asm . 1> nul
       copy /Y target\%%t\clib_target_cfg.asm . 1> nul
 
-      echo   %%t_asm.lib
-   
-      z80asm -ns -nm -Mo -x%%t_asm -D__ASM @target/%%t/library/%%t_asm.lst
-      move /Y %%t_asm.lib lib
-
-      del /S *.o > nul 2>&1
-      del /S *.err > nul 2>&1
-
       echo   %%t_sccz80.lib
-
+      
       z80asm -ns -nm -Mo -x%%t_sccz80 -D__SCCZ80 @target/%%t/library/%%t_sccz80.lst
       move /Y %%t_sccz80.lib lib
 
