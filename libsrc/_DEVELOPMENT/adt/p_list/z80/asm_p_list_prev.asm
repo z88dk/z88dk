@@ -34,4 +34,10 @@ asm_p_list_prev:
    inc hl
    inc hl
    
-   jp asm_p_forward_list_next
+   call asm_p_forward_list_next
+   ret z
+   
+   dec hl
+   dec hl
+   
+   ret

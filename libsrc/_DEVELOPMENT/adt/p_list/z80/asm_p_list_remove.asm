@@ -34,10 +34,13 @@ asm_p_list_remove:
    ld a,(hl)
    inc hl
    ld h,(hl)
-   ld l,a                      ; hl = item_prev
+   ld l,a                      ; hl = item_prev->prev
    
    or h
    jr z, item_at_front
+
+   dec hl
+   dec hl
 
    ld (hl),e
    inc hl

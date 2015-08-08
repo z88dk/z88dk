@@ -42,16 +42,7 @@ asm_p_list_push_front:
    ld a,d
    ld (bc),a
    dec bc
-   
-   inc hl
-   inc hl
-   ld (hl),e
-   inc hl
-   ld (hl),d
-   dec hl
-   dec hl
-   dec hl
-   
+
    ex de,hl
    xor a
    
@@ -62,8 +53,22 @@ asm_p_list_push_front:
    ld (hl),a
    inc hl
    ld (hl),a
-   
    dec hl
+   
+   ; hl = & item.prev
+   ; de = & item_front
+   
+   inc de
+   inc de
+   
+   ex de,hl
+   
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   
+   ex de,hl
+   
    dec hl
    dec hl
    
