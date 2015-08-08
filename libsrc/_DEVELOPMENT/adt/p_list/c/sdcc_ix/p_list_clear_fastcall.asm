@@ -7,4 +7,4 @@ PUBLIC _p_list_clear_fastcall
 
 EXTERN asm_p_list_clear
 
-defc _p_list_clear = asm_p_list_clear
+defc _p_list_clear_fastcall = asm_p_list_clear
