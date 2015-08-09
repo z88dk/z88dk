@@ -1593,7 +1593,7 @@ replace restart {
 } by {
 	push	%1
 	call	%2
-	nop
+	__poison___
 	ret
 	; peephole 114a prevent tail code optimization for functions taking parameters
 }
@@ -1995,7 +1995,7 @@ replace restart {
 barrier
 
 replace {
-	nop
+	__poison___
 } by {
 	; poison removal
 }
