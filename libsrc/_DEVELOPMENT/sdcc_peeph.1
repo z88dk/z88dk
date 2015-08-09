@@ -1661,7 +1661,7 @@ replace restart {
 	ld	a, %2 (%3)
 	adc	a, #%4
 	; peephole 119 loaded %6 from a directly instead of going through %1.
-} if notUsed(%1)
+} if notUsed(%1), notSame(%6 'a')
 
 replace restart {
 	ld	%1, a
