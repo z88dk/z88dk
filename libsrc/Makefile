@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.220 2015-08-07 06:23:54 stefano Exp $
+# $Id: Makefile,v 1.221 2015-08-09 11:23:27 stefano Exp $
 
 
 include Make.config
@@ -635,7 +635,7 @@ lambda_clib.lib:
 	$(MAKE) -C games lzx81
 	$(MAKE) -C psg generic_iy
 	$(LIBLINKER) -IXIY -DFORlambda -x$(OUTPUT_DIRECTORY)/lambda_clib @$(LISTFILE_DIRECTORY)/zx81.lst
-	$(MAKE) zzx81deps
+	$(MAKE) zx81deps
 
 # ZX81 std graphics lib - Stefano
 gfx81.lib:
