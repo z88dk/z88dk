@@ -37,6 +37,9 @@
  *  ZX Spectrum 48K
  *     zcc +zx -lndos -create-app -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -zorg=24600 -O3 wall.c
  *
+ *  Lambda 8300
+ *     zcc +lambda -create-app -Dspritesize=2 wall.c
+ *
  *  ZX81
  *     zcc +zx81 -create-app -Dspritesize=2 -DBORDERS wall.c
  *
@@ -99,7 +102,7 @@
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.9 2015-01-29 16:10:42 stefano Exp $
+ *      $Id: wall.c,v 1.10 2015-08-10 12:09:42 stefano Exp $
  *
  * * * * * * *
  *
@@ -118,6 +121,10 @@
 #include <stdlib.h>
 #include <graphics.h>
 #include <time.h>
+
+#ifdef LAMBDA
+#include <zx81.h>
+#endif
 
 #ifdef SPECTRUM
 #ifdef ZX81
@@ -219,6 +226,10 @@ void destroy_brick() {
 	#endif
 	#endif
 	
+	#ifdef LAMBDA
+		*zx_cyx2aaddr(m,n) = 112;
+	#endif
+	
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
 	#if (spritesize == 8)
 		set_attr (m,n,0x1f);
@@ -237,6 +248,11 @@ void destroy_brick() {
 	#endif
 	#endif
 	#endif
+	
+	#ifdef LAMBDA
+		*zx_cyx2aaddr(m,n-1) = 112;
+	#endif
+	
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
 	#if (spritesize == 8)
 		set_attr (m,n-1,0x1F);
@@ -255,6 +271,11 @@ void destroy_brick() {
 	#endif
 	#endif
 	#endif
+	
+	#ifdef LAMBDA
+		*zx_cyx2aaddr(m,n+1) = 112;
+	#endif
+	
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
 	#if (spritesize == 8)
 		set_attr (m,n+1,0x1F);
@@ -486,6 +507,7 @@ restart:
 	zx_colour(112);
 #endif
 #endif
+
 	printf("%c",12);
 	  printf("\n  CHOOSE YOUR JOYSTICK INTERFACE\n\n");
 	for (k=0 ; k!=GAME_DEVICES; k++)
@@ -537,6 +559,12 @@ start_level:
 	clg();
 	hit_border();
 
+#ifdef LAMBDA
+	zx_border (INK_CYAN);
+	zx_colour(112);
+#endif
+
+
   for (m=1; m<=4; m+=2)
 	for (n=0; n<=30; n+=2) {
 		putsprite(spr_or,(n*spritesize),((m+3)*spritesizeh),brick_l);
@@ -558,6 +586,14 @@ start_level:
 	#endif
 	#endif
 	#endif
+	
+	#ifdef LAMBDA
+		*zx_cyx2aaddr(m+3,n) = m<<4;
+		*zx_cyx2aaddr(m+3,n+1) = m<<4;
+		*zx_cyx2aaddr(m+4,n) = (m+1)<<4;
+		*zx_cyx2aaddr(m+4,n+1) = (m+1)<<4;
+	#endif
+	
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
 	#if (spritesize == 8)
 		set_attr(m+3,n,((m+1)<<1)|0x10);
@@ -581,6 +617,12 @@ start_level:
 	#endif
 	#endif
 	#endif
+	
+	#ifdef LAMBDA
+		*zx_cyx2aaddr(m+3,n) = 6<<4;
+		*zx_cyx2aaddr(m+3,n+1) = 6<<4;
+	#endif
+	
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN)
 	#if (spritesize == 8)
 		set_attr(m+3,n,LIGHT_YELLOW|0x10);
@@ -697,6 +739,7 @@ start_level:
 #endif
   }
 
+
 #ifdef ZX81
 #if (spritesize == 2)
   #asm
@@ -729,7 +772,8 @@ start_level:
 #ifdef SOUND
 bit_fx2(5);
 #endif
-while (!(getk()>32)) {}
+while (getk()) {}
+while (!getk()) {}
 
 goto restart;
 
