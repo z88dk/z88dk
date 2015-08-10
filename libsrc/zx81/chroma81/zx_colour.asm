@@ -8,7 +8,7 @@ EXTERN HRG_LineStart
 .zx_colour
 		ld 	a,l
 IF FORlambda
-   ld hl,8320
+   ld hl,8319
 ELSE
    ld hl,HRG_LineStart+2+32768
 ENDIF

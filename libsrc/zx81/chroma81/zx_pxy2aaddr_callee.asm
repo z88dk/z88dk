@@ -32,7 +32,7 @@ EXTERN HRG_LineStart
    and $1f
    ld b,a
 IF FORlambda
-   ld hl,8320
+   ld hl,8319
 ELSE
    ld hl,HRG_LineStart+2+32768
 ENDIF
