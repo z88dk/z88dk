@@ -1587,24 +1587,12 @@ replace restart {
 } if notUsed('a')
 
 replace restart {
-	push	%1
-	call	%2
+	call    %1
 	ret
 } by {
-	push	%1
-	call	%2
-	__poison__
-	ret
-	; peephole 114a prevent tail code optimization for functions taking parameters
-}
-
-replace restart {
-	call	%1
-	ret
-} by {
-	jp	%1
-	; peephole 114b replaced call at end of function by jump (tail call optimization).
-}
+	jp  %1
+	; peephole 114 replaced call at end of function by jump (tail call optimization).
+} if symmParmStack(%1)
 
 // Callee saves ix.
 replace restart {
