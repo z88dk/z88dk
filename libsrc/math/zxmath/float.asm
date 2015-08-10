@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: float.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
+;       $Id: float.asm,v 1.5 2015-08-10 08:52:12 stefano Exp $
 ;
 
 
@@ -20,17 +20,23 @@
 
 ;
 ; For the Spectrum only a call to RESTACK will be used in stkequ for a real conversion
-; (otherwise the ROM keeps the number coded as a 2 bytes word to optimize for speed).
+; (otherwise the ROM would keep the number coded as a 2 bytes word to optimize for speed).
 
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
 ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
+ENDIF
 
-                PUBLIC	float
+
+		PUBLIC	float
 		EXTERN	stkequ
+		
 .float
 IF TINYMODE
 
@@ -43,8 +49,12 @@ IF TINYMODE
 	jr	z,nointneg
 
 	rst	ZXFP_BEGIN_CALC
+IF FORlambda
+	defb	ZXFP_NEGATE + 128
+ELSE
 	defb	ZXFP_NEGATE
 	defb	ZXFP_END_CALC
+ENDIF
 
 .nointneg
 	
@@ -71,15 +81,23 @@ ELSE
 	rst	ZXFP_BEGIN_CALC
 	defb	ZXFP_MULTIPLY
 	defb	ZXFP_MULTIPLY
+IF FORlambda
+	defb	ZXFP_ADDITION + 128
+ELSE
 	defb	ZXFP_ADDITION
 	defb	ZXFP_END_CALC
+ENDIF
 
 	pop	af
 	jr	z,nointneg
 
 	rst	ZXFP_BEGIN_CALC
+IF FORlambda
+	defb	ZXFP_NEGATE +128
+ELSE
 	defb	ZXFP_NEGATE
 	defb	ZXFP_END_CALC
+ENDIF
 
 .nointneg
 

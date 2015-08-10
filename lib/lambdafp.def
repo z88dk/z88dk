@@ -2,7 +2,7 @@ lstoff
 
 ; Lambda 8300 stack calculator functions (lambda variant of ZXFP and 81FP)
 
-; $Id: lambdafp.def,v 1.1 2015-08-01 09:15:53 stefano Exp $
+; $Id: lambdafp.def,v 1.2 2015-08-10 08:52:12 stefano Exp $
 
 ; function codes:
 

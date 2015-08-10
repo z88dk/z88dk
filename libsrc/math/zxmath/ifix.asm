@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: ifix.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
+;       $Id: ifix.asm,v 1.4 2015-08-10 08:52:13 stefano Exp $
 ;
 
 
@@ -14,8 +14,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
                 PUBLIC    ifix
@@ -25,7 +29,7 @@ ENDIF
 ; If you want to get rid of the long support, define "TINYMODE".
 ; I wouldn't suggest it if you have 16K it because only 
 ; 109 bytes with ifix and about the same with "float" are saved.
-; So I'll define this mode on the ZX81 only.
+
  
 IF TINYMODE
 

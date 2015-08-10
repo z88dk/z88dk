@@ -4,7 +4,7 @@
 ;
 ;       8/1/03 - Stefano Bodrato
 ;
-;       $Id: minusfa.asm,v 1.5 2015-01-21 10:56:30 stefano Exp $
+;       $Id: minusfa.asm,v 1.6 2015-08-10 08:52:13 stefano Exp $
 ;
 ;       Negate a floating point number
 ;
@@ -16,8 +16,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
 

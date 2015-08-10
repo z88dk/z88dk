@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.221 2015-08-09 11:23:27 stefano Exp $
+# $Id: Makefile,v 1.222 2015-08-10 08:52:12 stefano Exp $
 
 
 include Make.config
@@ -45,7 +45,7 @@ tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 
 zxlibs: ts2068_clib.lib ts2068an_clib.lib gfx2068hr.lib gfxspectrum.lib zx_clib.lib zxan_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib zxrom.lib zxfcntl zx232
 
-zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib lambda_clib.lib
+zx81libs: zx81_clib.lib zx81ansi_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib mlambda.lib mlambda_tiny.lib lambda_clib.lib
 
 # moving external shell scripts to makefile to make life easy on
 # the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
@@ -703,6 +703,19 @@ m81_tiny.lib:
 	@echo '--- Building ZX 81 Tiny Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/zxmath m81_tiny
+
+# Lambda 8300 maths library - Stefano
+mlambda.lib:
+	@echo ''
+	@echo '--- Building Lambda 8300 Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/zxmath mlambda
+
+mlambda_tiny.lib:
+	@echo ''
+	@echo '--- Building Lambda 8300 Tiny Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/zxmath mlambda_tiny
 
 # Texas Instrument's calculators: - stefano/henk
 # almost the same lib code with different -D flag set

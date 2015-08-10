@@ -4,7 +4,7 @@
 ;
 ;       10/12/02 - Stefano Bodrato
 ;
-;       $Id: sin.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
+;       $Id: sin.asm,v 1.4 2015-08-10 08:52:13 stefano Exp $
 ;
 
 
@@ -14,8 +14,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
                 PUBLIC    sin
@@ -25,7 +29,11 @@ ENDIF
 
 .sin
         call    fsetup1
+IF FORlambda
+	defb	ZXFP_SIN + 128
+ELSE
 	defb	ZXFP_SIN
 	defb	ZXFP_END_CALC
+ENDIF
         jp      stkequ
 

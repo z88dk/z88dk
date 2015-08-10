@@ -4,7 +4,7 @@
 ;
 ;       21/03/03 - Stefano Bodrato
 ;
-;       $Id: sinh.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
+;       $Id: sinh.asm,v 1.4 2015-08-10 08:52:13 stefano Exp $
 ;
 
 ;double sinh(double)
@@ -13,8 +13,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
                 PUBLIC    sinh
@@ -38,8 +42,11 @@ ENDIF
 	defb	ZXFP_STK_ONE
 	defb	ZXFP_ADDITION
 
+IF FORlambda
+	defb	ZXFP_DIVISION + 128
+ELSE
 	defb	ZXFP_DIVISION
-	
 	defb	ZXFP_END_CALC
+ENDIF
         jp      stkequ
 

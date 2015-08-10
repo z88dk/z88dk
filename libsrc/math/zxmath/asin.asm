@@ -4,7 +4,7 @@
 ;
 ;       7/12/02 - Stefano Bodrato
 ;
-;       $Id: asin.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
+;       $Id: asin.asm,v 1.4 2015-08-10 08:52:12 stefano Exp $
 ;
 
 
@@ -14,8 +14,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
                 PUBLIC    asin
@@ -25,6 +29,10 @@ ENDIF
 
 .asin
         call    fsetup1
+IF FORlambda
+	defb	ZXFP_ASN + 128
+ELSE
 	defb	ZXFP_ASN
 	defb	ZXFP_END_CALC
+ENDIF
         jp      stkequ

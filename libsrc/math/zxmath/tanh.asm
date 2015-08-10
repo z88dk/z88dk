@@ -5,7 +5,7 @@
 ;       21/03/03 - Stefano Bodrato
 ;
 ;
-;       $Id: tanh.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
+;       $Id: tanh.asm,v 1.4 2015-08-10 08:52:13 stefano Exp $
 ;
 
 ;double tanh(double)
@@ -15,8 +15,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
                 PUBLIC    tanh
@@ -48,9 +52,13 @@ ENDIF
 	
 	defb	ZXFP_EXCHANGE	; This might be slightly optimized, maybe, but watch out..
 				; test it deeply with positive and negative values !
+				
+IF FORlambda
+	defb	ZXFP_DIVISION + 128
+ELSE
 	defb	ZXFP_DIVISION
-	
 	defb	ZXFP_END_CALC
+ENDIF
 	
 	jp	stkequ
 

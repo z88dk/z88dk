@@ -4,7 +4,7 @@
 ;
 ;       10/12/02 - Stefano Bodrato
 ;
-;       $Id: log.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
+;       $Id: log.asm,v 1.4 2015-08-10 08:52:13 stefano Exp $
 ;
 
 
@@ -14,8 +14,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
                 PUBLIC    log
@@ -25,6 +29,10 @@ ENDIF
 
 .log
         call    fsetup1
+IF FORlambda
+	defb	ZXFP_LN + 128
+ELSE
 	defb	ZXFP_LN
 	defb	ZXFP_END_CALC
+ENDIF
         jp      stkequ

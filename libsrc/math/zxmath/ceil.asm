@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ceil.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
+;       $Id: ceil.asm,v 1.4 2015-08-10 08:52:12 stefano Exp $
 ;
 
 
@@ -16,8 +16,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
                 PUBLIC    ceil
@@ -29,6 +33,10 @@ ENDIF
         call    fsetup1
 	defb	ZXFP_NEGATE
 	defb	ZXFP_INT
+IF FORlambda
+	defb	ZXFP_NEGATE + 128
+ELSE
 	defb	ZXFP_NEGATE
 	defb	ZXFP_END_CALC
+ENDIF
         jp      stkequ

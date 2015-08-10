@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ftoa.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
+;       $Id: ftoa.asm,v 1.5 2015-08-10 08:52:13 stefano Exp $
 ;
 ;
 ;void ftoa(x,prec,str)   -> Convert double to string
@@ -17,8 +17,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
                 PUBLIC    ftoa
@@ -83,21 +87,32 @@ ELSE
 		defb	ZXFP_INT	; INT (x*(10^precision))
 		
 		defb	ZXFP_GET_MEM_0
+IF FORlambda
+		defb	ZXFP_DIVISION + 128	; total/(10^precision)
+ELSE
 		defb	ZXFP_DIVISION	; total/(10^precision)
 		defb	ZXFP_END_CALC
+ENDIF
 ENDIF
 
 		pop	af	; now, if needed, negate the nuber
 		jr	z,noneg
 		rst	ZXFP_BEGIN_CALC
+IF FORlambda
+		defb	ZXFP_NEGATE + 128
+ELSE
 		defb	ZXFP_NEGATE
 		defb	ZXFP_END_CALC
+ENDIF
 .noneg
 
 		rst	ZXFP_BEGIN_CALC	; Do the string conversion !
+IF FORlambda
+		defb	ZXFP_STRS + 128
+ELSE
 		defb	ZXFP_STRS
 		defb	ZXFP_END_CALC
-
+ENDIF
 		call	ZXFP_STK_FETCH
 
 		ex	de,hl

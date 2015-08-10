@@ -1,42 +1,63 @@
-;
-;
-;       Z88 Maths Routines
-;
-;       C Interface for Small C+ Compiler
-;
-;       7/12/98 djm
+;       Generic Small C+ Floating point library
+;       Converts integer in hl to fp number
 
-
-
-;Convert from integer to FP..
-;We could enter in here with a long in dehl, so, mod to compiler I think!
-
-                INCLUDE  "fpp.def"
 
                 PUBLIC    ufloat
-                EXTERN    fa
 
+                EXTERN    stkequ
+
+
+;
+;       convert the integer in hl to    (unsigned routine)
+;       a floating point number in FA
+;
+
+IF FORzx
+		INCLUDE  "zxfp.def"
+ENDIF
+IF FORzx81
+		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
+ENDIF
+
+
+		
 .ufloat
-        push    de      ;msb
-        exx
-        pop     hl
-        ld      c,0     ;no exponent
-        ld      a,h
-        push    af
-        res     7,h
-        fpp(FP_FLT)
-        pop     af
-        rlca
-        jr      nc,ufloat_out   ;no high bit
-;to multiply by two, increment the exponent
-        inc     c
-.ufloat_out
-        ld      (fa+3),hl
-        ld      a,c
-        ld      (fa+5),a
-        exx
-        ld      (fa+1),hl
-        xor     a
-        ld      (fa),a
-        ret
+IF TINYMODE
 
+	ld	b,h
+	ld	c,l
+	
+	call	ZXFP_STACK_BC 
+
+ELSE
+
+	ld	b,h
+	ld	c,l
+
+	push	de
+	call	ZXFP_STACK_BC	; LSW
+	pop		bc
+	call	ZXFP_STACK_BC	; MSW
+	ld		bc,256
+	push	bc
+	call	ZXFP_STACK_BC
+	pop		bc
+	call	ZXFP_STACK_BC
+
+	rst	ZXFP_BEGIN_CALC
+	defb	ZXFP_MULTIPLY
+	defb	ZXFP_MULTIPLY
+IF FORlambda
+	defb	ZXFP_ADDITION + 128
+ELSE
+	defb	ZXFP_ADDITION
+	defb	ZXFP_END_CALC
+ENDIF
+
+
+ENDIF
+
+	jp	stkequ

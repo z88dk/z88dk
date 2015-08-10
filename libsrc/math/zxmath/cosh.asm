@@ -4,7 +4,7 @@
 ;
 ;       21/03/03 - Stefano Bodrato
 ;
-;       $Id: cosh.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
+;       $Id: cosh.asm,v 1.4 2015-08-10 08:52:12 stefano Exp $
 ;
 ;
 ;double cosh(double)
@@ -16,8 +16,12 @@
 
 IF FORzx
 		INCLUDE  "zxfp.def"
-ELSE
+ENDIF
+IF FORzx81
 		INCLUDE  "81fp.def"
+ENDIF
+IF FORlambda
+		INCLUDE  "lambdafp.def"
 ENDIF
 
                 PUBLIC    cosh
@@ -35,7 +39,10 @@ ENDIF
 	defb	ZXFP_DIVISION		; 1/e 
 	defb	ZXFP_ADDITION
 	defb	ZXFP_STK_HALF
+IF FORlambda
+	defb	ZXFP_MULTIPLY + 128
+ELSE
 	defb	ZXFP_MULTIPLY
-	
 	defb	ZXFP_END_CALC
+ENDIF
         jp      stkequ
