@@ -7,7 +7,11 @@ EXTERN HRG_LineStart
 
 .zx_colour
 		ld 	a,l
-		ld	hl,HRG_LineStart+2+32768
+IF FORlambda
+   ld hl,8320
+ELSE
+   ld hl,HRG_LineStart+2+32768
+ENDIF
 
 		ld	c,24
 .rowloop
@@ -16,9 +20,13 @@ EXTERN HRG_LineStart
 		ld	(hl),a
 		inc hl
 		djnz rowattr
+IF FORlambda
+		inc	hl
+ELSE
 		inc	hl
 		inc	hl
 		inc	hl
+ENDIF
 		dec c
 		jr  nz,rowloop
 		ret

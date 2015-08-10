@@ -10,8 +10,11 @@ EXTERN HRG_LineStart
 ; exit  : hl = new attribute address down one character
 ;         TODO: carry set if off screen
 
-   ld de,HRG_LineStart+2+32768
-   ld hl,35
+IF FORlambda
+   ld de,33
+ELSE
+   ld de,35
+ENDIF
    add hl,de
 
    ret

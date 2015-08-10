@@ -12,9 +12,17 @@ EXTERN HRG_LineStart
    rra
    and $1f
    ld b,a
+IF FORlambda
+   ld hl,8320
+ELSE
    ld hl,HRG_LineStart+2+32768
+ENDIF
    jr z,zrow
+IF FORlambda
+   ld de,33
+ELSE
    ld de,35
+ENDIF
 .rloop
    add hl,de
    djnz rloop

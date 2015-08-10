@@ -7,10 +7,18 @@ EXTERN HRG_LineStart
 .zx_aaddr2py
 
    ld b,-1
-   ld de,HRG_LineStart+2+32768
+IF FORlambda
+   ld hl,8320
+ELSE
+   ld hl,HRG_LineStart+2+32768
+ENDIF
    and a
    sbc hl,de
+IF FORlambda
+   ld de,33
+ELSE
    ld de,35
+ENDIF
    and a
 .sbloop
    sbc hl,de

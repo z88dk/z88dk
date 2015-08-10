@@ -10,7 +10,7 @@ EXTERN HRG_LineStart
    ; exit  : hl = new attribute address left one character with line wrap
    ;         TODO: carry if off screen
    
-   ld hl,HRG_LineStart+2+32768
+
    dec hl
 ;   ld a,h
 ;   cp $58

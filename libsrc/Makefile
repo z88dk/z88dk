@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.222 2015-08-10 08:52:12 stefano Exp $
+# $Id: Makefile,v 1.223 2015-08-10 10:24:39 stefano Exp $
 
 
 include Make.config
@@ -112,6 +112,7 @@ zx81deps:
 	$(RM) -f zx81/*.o
 	$(RM) -f zx81/tape/*.o
 	$(RM) -f zx81/basic/*.o
+	$(RM) -f zx81/chroma81/*.o
 	$(RM) -f time/zx81/*.o
 	$(MAKE) -C psg clean
 
