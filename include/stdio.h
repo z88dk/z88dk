@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.30 2014-11-14 13:48:06 stefano Exp $ */
+/* $Id: stdio.h,v 1.31 2015-08-10 12:55:57 stefano Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -18,6 +18,10 @@
 
 #ifdef __SPECTRUM__
 #include <spectrum.h>
+#endif
+
+#ifdef __LAMBDA__
+#include <zx81.h>
 #endif
 
 #ifdef __ZX81__

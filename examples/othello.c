@@ -1,5 +1,5 @@
 /*
- *   $Id: othello.c,v 1.7 2012-12-31 10:38:23 stefano Exp $
+ *   $Id: othello.c,v 1.8 2015-08-10 12:55:57 stefano Exp $
  * 
  *   z88dk port of the 'historical' game by Leor Zolman
  *
@@ -10,19 +10,19 @@
  *   a lot of stack space, thus it could need to be properly located.
  * 
  *   Examples on how to compile in text mode:
- *   zcc +zxansi -lndos -O3 -create-app -zorg=50000 othello.c
- *   zcc +zx81 -startup=2 -O3 -create-app othello.c
+ *   zcc +zx -clib=ansi -lndos -O3 -create-app -zorg=50000 othello.c
+ *   zcc +zx81 -O3 -create-app othello.c
  *
  *   Examples on how to compile in graphics mode:
  *   zcc +zx -lndos -O3 -create-app -zorg=50000 -DGRAPHICS othello.c
- *   zcc +ts2068ansi -O3 -lgfx2068hr -lndos -create-app -zorg=45000 -DWIDEGRAPHICS othello.c
+ *   zcc +ts2068 -clib=ansi -O3 -lgfx2068hr -lndos -create-app -zorg=45000 -DWIDEGRAPHICS othello.c
  *   (16K, WRX HRG mode)
- *   zcc +zx81ansi -O3 -startup=6 -create-app -DSMALLGRAPHICS -lgfx81hr64 othello.c
+ *   zcc +zx81 -O3 -subtype=_wrx64 -clib=wrx64ansi -create-app -DSMALLGRAPHICS othello.c
  *   (32K + WRX HRG, add the '#pragma output hrgpage = 36096' line)
- *   zcc +zx81ansi -O3 -startup=4 -create-app -DGRAPHICS -lgfx81hr192 othello.c
+ *   zcc +zx81 -O3 -subtype=_wrx -clib=wrxansi -create-app -DSMALLGRAPHICS othello.c
  * 
  *   Examples on how to compile in redefinded font mode:
- *   zcc +zx81 -O3 -startup=2 -create-app -DREDEFINED_FONT -DZX81_FONT othello.c
+ *   zcc +zx81 -O3 -create-app -DREDEFINED_FONT -DZX81_FONT othello.c
  *   zcc +zx80 -O3 -create-app -DREDEFINED_FONT -DZX80_FONT othello.c
  *   zcc +ace -O3 -lndos -create-app -DREDEFINED_FONT othello.c
  *   zcc +srr -O3 -lndos -create-app -DREDEFINED_FONT othello.c
