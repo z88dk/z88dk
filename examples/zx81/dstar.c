@@ -9,17 +9,17 @@
  *  Build options:
  * 
  *  Various redefinable characters board
- *  (does something similar exist on the ZX80 ?)
- *    zcc +zx81 -startup=2 -create-app dstar.c
+ *  (does something similar exist on the ZX80 or the LAMBDA ?)
+ *    zcc +zx81 -create-app dstar.c
  *
  * 	Dk'Tronics without RAM expansion
- *    zcc +zx81 -startup=2 -create-app -DDKTRONICS dstar.c
+ *    zcc +zx81 -create-app -DDKTRONICS dstar.c
  *
  * 	LAMBDA 8300 / POWER 3000
  *    zcc +lambda -create-app -DTEXT dstar.c
  *
  * 	Standard Sinclair mode
- *    zcc +zx81 -startup=2 -create-app -DTEXT dstar.c
+ *    zcc +zx81 -create-app -DTEXT dstar.c
  *    zcc +zx80 -create-app -DTEXT dstar.c
  * 
  * * * * * * *
