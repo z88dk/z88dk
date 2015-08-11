@@ -6,7 +6,7 @@
 ; 
 ;	int __CALLEE__ zx_setint_callee(char *variable, int value); 
 ; 
-;	$Id: zx_setint_callee.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $ 
+;	$Id: zx_setint_callee.asm,v 1.5 2015-08-11 07:16:36 stefano Exp $ 
 ;  	
 
 PUBLIC	zx_setint_callee
@@ -14,7 +14,11 @@ PUBLIC 	ASMDISP_ZX_SETINT_CALLEE
 
 EXTERN	zx_locatenum
 
-INCLUDE  "81fp.def"
+IF FORlambda
+	INCLUDE  "lambdafp.def"
+ELSE
+	INCLUDE  "81fp.def"
+ENDIF
 
 zx_setint_callee:
 
@@ -56,9 +60,13 @@ vlcount:
 	ld	b,0
 	ld	hl,($4014)      ; E_LINE
 	dec	hl		; now HL points to end of VARS
+IF FORlambda
+	call	$1CB5
+ELSE
 	;;ld	hl,(16400)	; VARS
 	call	$099E		; MAKE-ROOM
 	;;call	$09A3		; MAKE-ROOM (no test on available space)
+ENDIF
 	inc	hl
 	
 	pop	de		; point to VAR name

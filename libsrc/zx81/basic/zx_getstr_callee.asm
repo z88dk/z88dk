@@ -7,7 +7,7 @@
 ;	int __CALLEE__ zx_getstr_callee(char variable, char *value); 
 ;
 ;
-;	$Id: zx_getstr_callee.asm,v 1.3 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: zx_getstr_callee.asm,v 1.4 2015-08-11 07:16:35 stefano Exp $
 ;
 
 PUBLIC	zx_getstr_callee
@@ -69,7 +69,11 @@ pointer:
 	ld	hl,0
 	ret
 nextvar:
+IF FORlambda
+	call	$1A13
+ELSE
 	call	$09F2			;get next variable start
+ENDIF
 	ex	de,hl
 	jr	loop
 

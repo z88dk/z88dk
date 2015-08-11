@@ -8,13 +8,17 @@
 ;	int __FASTCALL__ zx_getint(char *variable);
 ;
 ;
-;	$Id: zx_getint.asm,v 1.3 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: zx_getint.asm,v 1.4 2015-08-11 07:16:35 stefano Exp $
 ;	
 
 PUBLIC	zx_getint
 EXTERN	zx_locatenum
 
-INCLUDE  "81fp.def"
+IF FORlambda
+	INCLUDE  "lambdafp.def"
+ELSE
+	INCLUDE  "81fp.def"
+ENDIF
 
 ; hl = char *variable
 

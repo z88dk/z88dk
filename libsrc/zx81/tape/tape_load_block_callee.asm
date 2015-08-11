@@ -5,7 +5,7 @@
 ;      int __CALLEE__ tape_load_block_callee(void *addr, size_t len, unsigned char type)
 ;
 ;
-;	$Id: tape_load_block_callee.asm,v 1.5 2015-01-19 01:33:27 pauloscustodio Exp $
+;	$Id: tape_load_block_callee.asm,v 1.6 2015-08-11 07:16:36 stefano Exp $
 ;
 
 
@@ -66,7 +66,11 @@ EXTERN  musamy_load
 .rethere
 		push hl
 		call zx_slow
-		call $f46	; BREAK-1
+IF FORlambda
+		call $1C28	; BREAK-1 on Lambda
+ELSE
+		call $f46	; BREAK-1 on ZX81
+ENDIF
 		pop hl
 		pop de
 		ret nc	; if BREAK is pressed, return; timeout error code is valid for BREAK too

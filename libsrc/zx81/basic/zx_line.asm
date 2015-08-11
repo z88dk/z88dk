@@ -8,7 +8,7 @@
 ;	Returns with BASIC error code.
 ;	0=OK,... -1=no program lines found
 ;
-;	$Id: zx_line.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: zx_line.asm,v 1.3 2015-08-11 07:16:35 stefano Exp $
 ;
 
 PUBLIC	zx_line
@@ -17,7 +17,11 @@ EXTERN	restore81
 ; enter : hl = line number
 
 zx_line:
-        call    $09D8           ; routine LINE-ADDR
+IF FORlambda
+        call    $0B36           ; routine LINE-ADDR (LAMBDA)
+ELSE
+        call    $09D8           ; routine LINE-ADDR (ZX81)
+ENDIF
 
 	cp	118
 	jr	nz,havelines
@@ -38,11 +42,22 @@ havelines:
 	ld	bc,return
 	push	bc
 	ld	($4002),sp	; update error handling routine
-        
+IF FORlambda
+        jp	$088
+ELSE
         jp	$cc1	; single line
-
+ENDIF
 
 return:
+IF FORlambda
+	ld	h,0
+	ld	a,($4007)
+	ld	l,a		; error code (hope so !)
+	ld	a,255
+	ld	($4007),a	; reset ERR_NR
+
+	inc	l		; return with error code (0=OK, etc..)
+ELSE
 	ld	h,0
 	ld	a,($4000)
 	ld	l,a		; error code (hope so !)
@@ -50,6 +65,7 @@ return:
 	ld	($4000),a	; reset ERR_NR
 
 	inc	l		; return with error code (0=OK, etc..)
+ENDIF
 
 exitgoto:
 	pop	bc

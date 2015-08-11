@@ -8,7 +8,7 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: zx_locatenum.asm,v 1.5 2015-08-11 07:16:35 stefano Exp $
 ;
 
 	PUBLIC	zx_locatenum
@@ -52,7 +52,11 @@ vp:	ld	a,(hl)
 	ld	a,(hl)
 	
 v1:	push	bc
-	call	$09f2		; find next variable
+IF FORlambda
+	call	$1A13
+ELSE
+	call	$09F2			; find next variable
+ENDIF
 	pop	bc
 	ex	de,hl
 	jr	vp
