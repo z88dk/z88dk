@@ -2051,7 +2051,7 @@ replace restart {
 	push	hl
 	ld	de,#%2
 	ld	bc,#%3
-	; peephole z88dk-1
+	; peephole z88dk-1  Replace monolithic block: store 2x16bit statics, push statics, load constants
 } 
 //if notUsed('a')
 
@@ -2081,7 +2081,7 @@ replace restart {
 	ld	(#%1 + 2),de
 	push	de
 	push	hl
-	; peephole z88dk-2
+	; peephole z88dk-2  Replace monolithic block: store 2x16bit statics, push statics
 } 
 //if notUsed('bc'), notUsed('hl')
 
@@ -2116,7 +2116,7 @@ replace restart {
 	push	hl
 	ld	de,#%2
 	push	de
-	; peephole z88dk-3
+	; peephole z88dk-3  Replace monolithic block: store 2x16bit statics, push statics, load const, push const
 } 
 //if notUsed('bc')
 
@@ -2135,7 +2135,7 @@ replace restart {
 	ld	(#%1),hl
 	ld	hl,#0x%3%2
 	ld	(#%1 + 2),hl
-	; peephole z88dk-4
+	; peephole z88dk-4  Store 2x16bit statics using 16bit stores
 } 
 //if notUsed('a'), notUsed('hl')
 
@@ -2148,7 +2148,7 @@ replace restart {
 } by {
 	ld	hl,(#%1)
 	push	hl
-	; peephole z88dk-5
+	; peephole z88dk-5  Load 16bit static using 16bit load, push
 } 
 //if notUsed('bc'), notUsed('hl')
 
@@ -2160,7 +2160,7 @@ replace restart {
 	ld	l,a
 } by {
 	ld	hl,(#%1)
-	; peephole z88dk-6
+	; peephole z88dk-6  Load 16bit static using 16bit load
 } 
 //if notUsed('a')
 
@@ -2172,7 +2172,7 @@ replace restart {
 	ld	l,a
 } by {
 	ld	hl,(#%1 + %2)
-	; peephole z88dk-7
+	; peephole z88dk-7  Load 16bit static using 16bit load
 } 
 //if notUsed('a')
 
@@ -2194,7 +2194,7 @@ replace restart {
 	ld	hl,(#%1 + 2)
 	ld	(#%2 + 2),hl
 	pop	hl
-	; peephole z88dk-8
+	; peephole z88dk-8  Use 16bit operations to copy 16bit statics
 } 
 //if notUsed('a')
 
@@ -2213,7 +2213,7 @@ replace restart {
 } by {
 	ld	(#%1),hl
 	push	hl
-	; peephole z88dk-9
+	; peephole z88dk-9  Store 16bit static using 16bit store 
 } 
 //if notUsed('bc'), notUsed('de'), notUsed('hl')
 
@@ -2240,7 +2240,7 @@ replace restart {
 	ld	(#%1 + 2),de
 	push	de
 	push	hl
-	; peephole z88dk-10
+	; peephole z88dk-10  Store 2x16bit statics using 16bit stores, push
 } 
 //if notUsed('bc'), notUsed('hl')
 
@@ -2258,7 +2258,7 @@ replace restart {
 } by {
 	ld	(#%1),hl
 	ld	(#%1 + 2),de
-	; peephole z88dk-11
+	; peephole z88dk-11  Store 2x16bit statics using 16bit stores
 } 
 //if notUsed('bc'), notUsed('hl')
 
@@ -2279,6 +2279,7 @@ replace restart {
 	ld	(#%1),hl
 	push	hl
 	ld	de,#%2
+	; peephole z88dk-11.5  Use 16bit ops to store static, push, load const
 } 
 //if notUsed('bc'), notUsed('hl')
 
@@ -2291,7 +2292,7 @@ replace restart {
 	ld	(hl),e
 } by {
 	ld	(#%1),hl
-	; peephole z88dk-12
+	; peephole z88dk-12  Store 16bit static with 16bit store
 } 
 //if notUsed('de'), notUsed('hl')
 
@@ -2309,7 +2310,7 @@ replace restart {
 	ld	(#%1),hl
 	ld	hl,#0x%5%4
 	ld	(#%1 + 2),hl
-	; peephole z88dk-13
+	; peephole z88dk-13  Write 16bit statics using 16bit stores
 } 
 //if notUsed('hl')
 
@@ -2321,7 +2322,7 @@ replace restart {
 } by {
 	ld	hl,#0x%3%2
 	ld	(#%1),hl
-	; peephole z88dk-14
+	; peephole z88dk-14  Write 16bit static using 16bit store
 } 
 //if notUsed('hl')
 
@@ -2332,7 +2333,7 @@ replace restart {
 } by {
 	push	de
 	push	hl
-	; peephole z88dk-15
+	; peephole z88dk-15  Eliminate unnecessary 'ex de,hl'
 } 
 //if notUsed('de'), notUsed('hl')
 
@@ -2351,7 +2352,7 @@ replace restart {
 } by {
 	ld	(#%1),hl
 	ld	(#%1 + 2),de
-	; peephole z88dk-16
+	; peephole z88dk-16  Write long static using 16bit stores instead of iy indexing
 } 
 //if notUsed('bc'), notUsed('de'), notUsed('hl')
 
@@ -2368,7 +2369,7 @@ replace restart {
 	ld	(#%1 + 2),de
 	push	de
 	push	hl
-	; peephole z88dk-17
+	; peephole z88dk-17  Replace ldir of long from top of stack with 16bit stores
 } 
 //if notUsed('bc'), notUsed('de'), notUsed('hl')
 
@@ -2382,7 +2383,7 @@ replace restart {
 	ld	(#%1),hl
 	ld	hl,(#%2 + 2)
 	ld	(#%1 + 2),hl
-	; peephole z88dk-18
+	; peephole z88dk-18  Replace ldir used to copy long with 16bit loads and stores
 } 
 //if notUsed('bc'), notUsed('de'), notUsed('hl')
 
@@ -2400,7 +2401,7 @@ replace restart {
 } by {
 	ld	(#%1),hl
 	ld	(#%1 + 2),de
-	; peephole z88dk-19
+	; peephole z88dk-19  Write long static using 16bit stores
 } 
 //if notUsed('bc'), notUsed('hl')
 
@@ -2413,7 +2414,7 @@ replace restart {
 	ld	bc,#%1
 	push	de
 	push	hl
-	; peephole z88dk-20
+	; peephole z88dk-20  Eliminate unnecessary 'ex de,hl'
 } 
 //if notUsed('de'), notUsed('hl')
 
@@ -2424,7 +2425,7 @@ replace restart {
 } by {
 	ld	bc,#%0
 	push	hl
-	; peephole z88dk-21
+	; peephole z88dk-21  Eliminate unnecessary 'ex de,hl'
 } 
 //if notUsed('de'), notUsed('hl')
 
@@ -2442,7 +2443,7 @@ replace restart {
 } by {
 	ld	(#%1),hl
 	ld	(#%1 + 2),de
-	; peephole z88dk-22
+	; peephole z88dk-22  Write long static using 16bit stores instead of ix indexing
 }
 
 replace restart {
@@ -2451,7 +2452,7 @@ replace restart {
 	ld	(#%1),hl
 } by {
 	ld	(#%1),bc
-	; peephole z88dk-23
+	; peephole z88dk-23  Write bc to memory directly rather than first loading into hl
 } 
 //if notUsed('hl')
 
@@ -2469,7 +2470,7 @@ replace restart {
 	ld	(#%1),hl
 	ld	hl,#0x%5%4
 	ld	(#%1 + 2),hl
-	; peephole z88dk-24
+	; peephole z88dk-24  Write 32bit const using 16bit stores
 } 
 //if notUsed('hl')
 
@@ -2481,7 +2482,7 @@ replace restart {
 } by {
 	ld	hl,#0x%3%2
 	ld	(#%1),hl
-	; peephole z88dk-25
+	; peephole z88dk-25  Write 16bit const using 16bit store
 } 
 //if notUsed('hl')
 
@@ -2493,7 +2494,7 @@ replace restart {
 } by {
 	ld	de,#%1
 	push	hl
-	; peephole z88dk-26
+	; peephole z88dk-26  Eliminate unnecessary load of hl into bc
 } 
 //if notUsed('bc')
 
@@ -2512,7 +2513,7 @@ replace restart {
 	ld	hl,#0
 	ld	(#%1),hl
 	ld	(#%1 + 2),hl
-	; peephole z88dk-27
+	; peephole z88dk-27  Write 0s using 16bit stores
 } 
 //if notUsed('a'), notUsed('hl')
 
@@ -2525,7 +2526,7 @@ replace restart {
 } by {
 	ld	hl,#0
 	ld	(#%1),hl
-	; peephole z88dk-28
+	; peephole z88dk-28  Write 0 using 16bit store
 } 
 //if notUsed('a'), notUsed('hl')
 
@@ -2539,7 +2540,7 @@ replace restart {
 	push	hl
 	ld	bc,#%1
 	push	bc
-	; peephole z88dk-29
+	; peephole z88dk-29  Eliminate unnecessary load of hl into de
 } 
 //if notUsed('de')
 
@@ -4605,8 +4606,6 @@ replace restart {
 	ld	-%2 (ix),h
 	; peephole z88dk-150
 } if notUsed('d'), notUsed('e')
-
-
 
 
 ///////////////////////////////////////////////////////////////
