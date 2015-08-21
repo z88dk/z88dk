@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.97 2015-08-01 04:41:44 aralbrec Exp $
+ *      $Id: zcc.c,v 1.98 2015-08-21 02:08:35 aralbrec Exp $
  */
 
 
@@ -613,11 +613,12 @@ int main(int argc, char **argv)
         exit(1);
     }
     
-    
     configure_assembler();
     configure_compiler();
     configure_misc_options();
-    configure_maths_library();
+
+    /* Do not apply special math lib treatment to the new c library */
+    if (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc")) configure_maths_library();
     
     if ( c_nostdlib == 0 ) {
         /* Add the startup library to the linker arguments */
