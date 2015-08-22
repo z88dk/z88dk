@@ -3730,8 +3730,7 @@ replace restart {
 } by {
 	ld	de,(#%1 + %2 - 1)
 	; peephole z88dk-97
-} 
-//if notUsed('hl')
+} if notUsed('hl')
 
 replace restart {
 	ld	de, (#%1 + %2)
@@ -4606,6 +4605,24 @@ replace restart {
 	ld	-%2 (ix),h
 	; peephole z88dk-150
 } if notUsed('d'), notUsed('e')
+
+replace restart {
+	ld	hl,#%1
+	dec	hl
+} by {
+	ld	hl,#%1 - 1
+	; peephole z88dk-151a
+}
+
+replace restart {
+	ld	hl,#%1 + %2
+	dec	hl
+} by {
+	ld	hl,#%1 + %2 - 1
+	; peephole z88dk-151b
+}
+
+
 
 
 ///////////////////////////////////////////////////////////////
