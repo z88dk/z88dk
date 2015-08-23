@@ -92,5 +92,7 @@ extern void *z80_otdr_callee(void *src,uint16_t port) __z88dk_callee;
 #define z80_otdr(a,b) z80_otdr_callee(a,b)
 
 
+#define z80_bpoke(a,b)  (*(unsigned char *)(a) = b)
+#define z80_wpoke(a,b)  (*(unsigned int *)(a) = b)
 
 #endif

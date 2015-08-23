@@ -25,4 +25,7 @@ __DPROTO(void,,z80_outp,uint16_t port,uint16_t data)
 __DPROTO(void,*,z80_otir,void *src,uint16_t port)
 __DPROTO(void,*,z80_otdr,void *src,uint16_t port)
 
+#define z80_bpoke(a,b)  (*(unsigned char *)(a) = b)
+#define z80_wpoke(a,b)  (*(unsigned int *)(a) = b)
+
 #endif
