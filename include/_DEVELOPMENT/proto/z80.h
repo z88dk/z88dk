@@ -27,8 +27,10 @@ __DPROTO(void,*,z80_otdr,void *src,uint16_t port)
 
 #define z80_bpoke(a,b)  (*(unsigned char *)(a) = b)
 #define z80_wpoke(a,b)  (*(unsigned int *)(a) = b)
+#define z80_lpoke(a,b)  (*(unsigned long *)(a) = b)
 
 #define z80_bpeek(a) (*(unsigned char *)(a))
 #define z80_wpeek(a) (*(unsigned int *)(a))
+#define z80_lpeek(a) (*(unsigned long *)(a))
 
 #endif
