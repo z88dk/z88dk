@@ -85,4 +85,7 @@ extern void __LIB__ __CALLEE__ *z80_otdr_callee(void *src,uint16_t port);
 #define z80_bpoke(a,b)  (*(unsigned char *)(a) = b)
 #define z80_wpoke(a,b)  (*(unsigned int *)(a) = b)
 
+#define z80_bpeek(a) (*(unsigned char *)(a))
+#define z80_wpeek(a) (*(unsigned int *)(a))
+
 #endif
