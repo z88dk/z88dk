@@ -111,21 +111,20 @@ compute_lp:
    ; stack = list of digits
 
    push ix
-   pop de
+   pop hl
 
 write_lp:
 
    pop af
    
-   ld (de),a
-   inc de
+   ld (hl),a
+   inc hl
    
    jr c, write_lp
    
    ; last write above was NUL and carry is reset
    
-   dec de
-   ex de,hl
+   dec hl
    ret
 
 asm2_ultoa:
