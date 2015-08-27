@@ -137,41 +137,37 @@ prune_zeroes:
    ld (hl),'+'
 
    ld a,d                      ; a = exponent
-   cp 4
+   sub 4
+   
+   jp pe, exponent_minus       ; if negative underflow
    jp p, exponent_plus
 
 exponent_minus:
 
    ld (hl),'-'
-
-   sub 4
    neg
-   add a,4
 
 exponent_plus:
 
-   sub 4
    inc hl
 
    cp 100
-   jr nc, e_100
+   jr c, skip_100
    
+   sub 100
+   
+   ld (hl),'1'
+   inc hl
+
+skip_100:
+
    cp 10
-   jr nc, e_10
-
-   jr e_1
-
-e_100:
-
-   ld de,$6400 + '0' - 1
-   call __dtoa_exp_digit       ; 100s
-
-e_10:
-
+   jr c, skip_10
+   
    ld de,$0a00 + '0' - 1
    call __dtoa_exp_digit       ; 10s
 
-e_1:
+skip_10:   
 
    add a,'0'
    
