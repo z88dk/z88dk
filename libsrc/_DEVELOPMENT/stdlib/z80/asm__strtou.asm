@@ -16,7 +16,7 @@ SECTION code_stdlib
 
 PUBLIC asm__strtou
 
-EXTERN __strtou__, error_erange_mc, error_erange_zc, error_einval_zc
+EXTERN __strtou__, error_erange_mc, error_einval_zc
 
 asm__strtou:
 
@@ -43,7 +43,7 @@ asm__strtou:
    ;
    ;           carry set
    ;             de = char *nptr (& next unconsumed char following oversized number)
-   ;             hl = $ffff (UINT_MAX) or $8000 (INT_MIN)
+   ;             hl = $ffff (UINT_MAX)
    ;           errno set to ERANGE
    ;
    ; uses  : af, bc, de, hl
@@ -54,11 +54,12 @@ asm__strtou:
    ; what kind of error was it
 
    dec a
-   jp m, error_einval_zc       ; on invalid base or invalid string
-   jp nz, error_erange_mc      ; on unsigned overflow hl = $ffff = UINT_MAX
-
-   ; signed overflow
    
-   call error_erange_zc
-   ld h,$80                    ; hl = $8000 = INT_MIN
-   ret
+   or a
+   ret z                       ; signed underflow is not an error
+      
+   jp m, error_einval_zc       ; on invalid base or invalid string
+
+   ; unsigned overflow
+   
+   jp error_erange_mc          ; hl = $ffff = UINT_MAX

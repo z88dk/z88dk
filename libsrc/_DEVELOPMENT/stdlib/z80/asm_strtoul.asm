@@ -16,7 +16,7 @@ SECTION code_stdlib
 
 PUBLIC asm_strtoul
 
-EXTERN __strtoul__, error_einval_zc, error_erange_mc, error_erange_zc
+EXTERN __strtoul__, error_einval_zc, error_erange_mc
 
 asm_strtoul:
 
@@ -46,7 +46,7 @@ asm_strtoul:
    ;            carry set
    ;             bc = char *nptr (& next unconsumed char following oversized number)
    ;            ixl = base
-   ;           dehl = $ffffffff (ULONG_MAX) or $80000000 (LONG_MIN)
+   ;           dehl = $ffffffff (ULONG_MAX)
    ;           errno set to ERANGE
    ;
    ; uses  : af, bc, de, hl, ix
@@ -57,15 +57,13 @@ asm_strtoul:
    ; what kind of error was it
    
    dec a
+   
+   or a
+   ret z                       ; signed underflow is not an error
+   
    jp m, error_einval_zc       ; on invalid base or invalid string
-   jr z, signed_overflow
    
 unsigned_overflow:
    
    ld de,$ffff
    jp error_erange_mc          ; dehl = $ffffffff = ULONG_MAX
-
-signed_overflow:
-
-   ld de,$8000
-   jp error_erange_zc          ; dehl = $800000000 = LONG_MIN

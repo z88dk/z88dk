@@ -28,6 +28,9 @@ __strtou__:
    ;             hl = 0
    ;             de = original char *
    ;
+   ;              a = 3 indicates negate on unsigned overflow
+   ;             de = char * (& next unconsumed char following number)
+   ;
    ;              a = 2 indicates unsigned overflow
    ;             de = char * (& next unconsumed char following number)
    ;
@@ -92,23 +95,19 @@ valid_base:
    ; hl = result
    ;  a = error code
    ; carry set = overflow or error
-   
-   dec a                       ; indicate negate applied (if error occurred)
-   ret c                       ; return if error
-   
+
+   inc a                       ; indicate negate applied
+   ret c                       ; return if unsigned overflow
+
    ; successful conversion, check for signed overflow
    
-   bit 7,h
-   jr nz, signed_overflow
+   ld c,h                      ; save bit 7 of result
    
    call l_neg_hl
+   
+   sla c                       ; if bit 7 was set, indicate signed underflow
+      
    ld a,1
-   ret
-
-signed_overflow:
-
-   ld a,1                      ; indicate signed overflow
-   scf
    ret
 
 positive:

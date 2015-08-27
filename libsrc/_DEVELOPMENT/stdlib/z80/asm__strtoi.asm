@@ -75,7 +75,8 @@ check_errors:
 
    ; overflow occurred
    
-   jr nz, positive_overflow
+   dec a
+   jr z, positive_overflow
 
    call error_erange_zc
    ld h,$80                    ; hl = $8000 = INT_MIN

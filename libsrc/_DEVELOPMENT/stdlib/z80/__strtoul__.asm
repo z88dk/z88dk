@@ -30,6 +30,10 @@ __strtoul__:
    ;            ixl = base
    ;             bc = original char *
    ;
+   ;              a = 3 indicates negate on unsigned overflow
+   ;            ixl = base
+   ;             bc = char * (& next unconsumed char following number)
+   ;
    ;              a = 2 indicates unsigned overflow
    ;            ixl = base
    ;             bc = char * (& next unconsumed char following number)
@@ -97,22 +101,20 @@ valid_base:
    ;    a = error code (if carry set)
    ; carry set = overflow or error
 
-   dec a                       ; indicate negate applied (if error occurred)
+   inc a                       ; indicate negate applied
    ret c                       ; return if error
    
    ; successful conversion, check for signed overflow
+
+   ld a,d
+   push af
    
-   bit 7,d
-   jr nz, signed_overflow
-
    call l_neg_dehl
+   
+   pop af   
+   add a,a                     ; carry set if signed overflow
+
    ld a,1
-   ret
-
-signed_overflow:
-
-   ld a,1                      ; indicate signed overflow
-   scf                         ; indicate error
    ret
 
 positive:

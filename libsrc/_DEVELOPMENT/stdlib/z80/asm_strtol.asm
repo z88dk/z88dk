@@ -77,7 +77,8 @@ check_errors:
 
    ; overflow occurred
    
-   jr nz, positive_overflow
+   dec a
+   jr z, positive_overflow
       
    ld de,$8000
    jp error_erange_zc          ; dehl = $80000000 = LONG_MIN
