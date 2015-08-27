@@ -152,8 +152,10 @@ exponent_plus:
    cp 100
    jr c, skip_100
    
-   ld de,$6400 + '0' - 1
-   call __dtoa_exp_digit       ; 100s
+   sub 100
+   
+   ld (hl),'1'
+   inc hl
 
 skip_100:
 
