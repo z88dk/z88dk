@@ -32,12 +32,16 @@ asm_in_key_pressed:
    ;
    ; uses  : af, bc, hl
    
+   ld a,h
+   and $c0
+   jr z, check_key
+   
    ; check caps shift
 
 caps_shift:
    
-   bit 7,h
-   jr z, check_symshift
+   add a,a
+   jr nc, check_symshift
 
    ld a,$fe
    in a,($fe)
