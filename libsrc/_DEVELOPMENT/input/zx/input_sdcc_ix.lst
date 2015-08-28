@@ -26,6 +26,7 @@ input/zx/c/sdcc_ix/in_stick_cursor
 input/zx/c/sdcc_ix/in_stick_fuller
 input/zx/c/sdcc_ix/in_stick_kempston
 input/zx/c/sdcc_ix/in_stick_keyboard
+input/zx/c/sdcc_ix/in_stick_keyboard_fastcall
 input/zx/c/sdcc_ix/in_stick_sinclair1
 input/zx/c/sdcc_ix/in_stick_sinclair2
 input/zx/c/sdcc_ix/in_test_key
