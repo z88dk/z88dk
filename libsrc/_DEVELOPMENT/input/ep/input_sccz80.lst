@@ -1,0 +1,12 @@
+input/ep/c/sccz80/in_inkey
+input/ep/c/sccz80/in_key_pressed
+input/ep/c/sccz80/in_key_scancode
+input/ep/c/sccz80/in_pause
+input/ep/c/sccz80/in_stick_ext1
+input/ep/c/sccz80/in_stick_ext2
+input/ep/c/sccz80/in_stick_int
+input/ep/c/sccz80/in_stick_keyboard
+input/ep/c/sccz80/in_test_key
+input/ep/c/sccz80/in_wait_key
+input/ep/c/sccz80/in_wait_nokey
+@input/ep/input_asm.lst

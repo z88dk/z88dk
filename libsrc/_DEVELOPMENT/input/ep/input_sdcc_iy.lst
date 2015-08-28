@@ -1,0 +1,16 @@
+input/ep/c/sdcc_iy/in_inkey
+input/ep/c/sdcc_iy/in_key_pressed
+input/ep/c/sdcc_iy/in_key_pressed_fastcall
+input/ep/c/sdcc_iy/in_key_scancode
+input/ep/c/sdcc_iy/in_key_scancode_fastcall
+input/ep/c/sdcc_iy/in_pause
+input/ep/c/sdcc_iy/in_pause_fastcall
+input/ep/c/sdcc_iy/in_stick_ext1
+input/ep/c/sdcc_iy/in_stick_ext2
+input/ep/c/sdcc_iy/in_stick_int
+input/ep/c/sdcc_iy/in_stick_keyboard
+input/ep/c/sdcc_iy/in_stick_keyboard_fastcall
+input/ep/c/sdcc_iy/in_test_key
+input/ep/c/sdcc_iy/in_wait_key
+input/ep/c/sdcc_iy/in_wait_nokey
+@input/ep/input_asm.lst
