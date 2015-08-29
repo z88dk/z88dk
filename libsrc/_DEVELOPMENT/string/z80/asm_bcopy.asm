@@ -6,9 +6,9 @@ SECTION code_string
 
 PUBLIC asm_bcopy
 
-EXTERN asm_memcpy
+EXTERN asm_memmove
 
-defc asm_bcopy = asm_memcpy
+defc asm_bcopy = asm_memmove
 
    ; enter : bc = size_t len
    ;         hl = void *s2 = src
