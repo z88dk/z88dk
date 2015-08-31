@@ -71,6 +71,10 @@ loop:
    ; see if current char from string is in cset
    
    ld c,(hl)
+   
+   ld l,e
+   ld h,d
+   
    call asm_strchr             ; carry reset if in cset
    
    pop hl
