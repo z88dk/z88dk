@@ -1,10 +1,11 @@
 @echo off
-rem $Id: gccmake.bat,v 1.2 2015-01-31 15:59:44 stefano Exp $
+rem $Id: gccmake.bat,v 1.3 2015-09-02 03:57:18 aralbrec Exp $
 
 echo ****************
 echo * Building zx7 *
 echo ****************
-gcc -o zx7 *.c
+gcc -o zx7 zx7.c compress.c optimize.c
+gcc -o dzx7 dzx7.c
 @rem gcc -ozx7 *.c
-copy zx7.exe ..\..\bin
-del zx7.exe
+copy *.exe ..\..\bin
+del *.exe

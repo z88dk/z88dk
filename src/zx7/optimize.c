@@ -46,10 +46,10 @@ int count_bits(int offset, int len) {
 Optimal* optimize(unsigned char *input_data, size_t input_size) {
     size_t *min;
     size_t *max;
-    Match *matches;
-    Match *match_slots;
+    size_t *matches;
+    size_t *match_slots;
     Optimal *optimal;
-    Match *match;
+    size_t *match;
     int match_index;
     int offset;
     size_t len;
@@ -60,8 +60,8 @@ Optimal* optimize(unsigned char *input_data, size_t input_size) {
     /* allocate all data structures at once */
     min = (size_t *)calloc(MAX_OFFSET+1, sizeof(size_t));
     max = (size_t *)calloc(MAX_OFFSET+1, sizeof(size_t));
-    matches = (Match *)calloc(256*256, sizeof(Match));
-    match_slots = (Match *)calloc(input_size, sizeof(Match));
+    matches = (size_t *)calloc(256*256, sizeof(size_t));
+    match_slots = (size_t *)calloc(input_size, sizeof(size_t));
     optimal = (Optimal *)calloc(input_size, sizeof(Optimal));
 
     if (!min || !max || !matches || !match_slots || !optimal) {
@@ -78,10 +78,10 @@ Optimal* optimize(unsigned char *input_data, size_t input_size) {
         optimal[i].bits = optimal[i-1].bits + 9;
         match_index = input_data[i-1] << 8 | input_data[i];
         best_len = 1;
-        for (match = &matches[match_index]; match->next != NULL && best_len < MAX_LEN; match = match->next) {
-            offset = i - match->next->index;
+        for (match = &matches[match_index]; *match != 0 && best_len < MAX_LEN; match = &match_slots[*match]) {
+            offset = i - *match;
             if (offset > MAX_OFFSET) {
-                match->next = NULL;
+                *match = 0;
                 break;
             }
 
@@ -94,7 +94,7 @@ Optimal* optimize(unsigned char *input_data, size_t input_size) {
                         optimal[i].offset = offset;
                         optimal[i].len = len;
                     }
-                } else if (i+1 == max[offset]+len && max[offset] != 0) {
+                } else if (max[offset] != 0 && i+1 == max[offset]+len) {
                     len = i-min[offset];
                     if (len > best_len) {
                         len = best_len;
@@ -107,9 +107,8 @@ Optimal* optimize(unsigned char *input_data, size_t input_size) {
             min[offset] = i+1-len;
             max[offset] = i;
         }
-        match_slots[i].index = i;
-        match_slots[i].next = matches[match_index].next;
-        matches[match_index].next = &match_slots[i];
+        match_slots[i] = matches[match_index];
+        matches[match_index] = i;
     }
 
     /* save time by releasing the largest block only, the O.S. will clean everything else later */
@@ -117,4 +116,3 @@ Optimal* optimize(unsigned char *input_data, size_t input_size) {
 
     return optimal;
 }
-

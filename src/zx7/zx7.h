@@ -26,11 +26,6 @@
 #define MAX_OFFSET  2176  /* range 1..2176 */
 #define MAX_LEN    65536  /* range 2..65536 */
 
-typedef struct match_t {
-    size_t index;
-    struct match_t *next;
-} Match;
-
 typedef struct optimal_t {
     size_t bits;
     int offset;
@@ -39,4 +34,4 @@ typedef struct optimal_t {
 
 Optimal *optimize(unsigned char *input_data, size_t input_size);
 
-unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t input_size, size_t *output_size);
+unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t input_size, size_t *output_size, long *delta);

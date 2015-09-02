@@ -32,9 +32,17 @@ unsigned char* output_data;
 size_t output_index;
 size_t bit_index;
 int bit_mask;
+long diff;
+
+void read_bytes(int n, long *delta) {
+   diff += n;
+   if (diff > *delta)
+       *delta = diff;
+}
 
 void write_byte(int value) {
     output_data[output_index++] = value;
+    diff--;
 }
 
 void write_bit(int value) {
@@ -60,7 +68,7 @@ void write_elias_gamma(int value) {
     }
 }
 
-unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t input_size, size_t *output_size) {
+unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t input_size, size_t *output_size, long *delta) {
     size_t input_index;
     size_t input_prev;
     int offset1;
@@ -76,6 +84,10 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
          exit(1);
     }
 
+    /* initialize delta */
+    diff = *output_size - input_size;
+    *delta = 0;
+
     /* un-reverse optimal sequence */
     optimal[input_index].bits = 0;
     while (input_index > 0) {
@@ -89,6 +101,7 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
 
     /* first byte is always literal */
     write_byte(input_data[0]);
+    read_bytes(1, delta);
 
     /* process remaining bytes */
     while ((input_index = optimal[input_index].bits) > 0) {
@@ -99,6 +112,7 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
 
             /* literal value */
             write_byte(input_data[input_index]);
+            read_bytes(1, delta);
 
         } else {
 
@@ -119,6 +133,7 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
                     write_bit(offset1 & mask);
                 }
             }
+            read_bytes(optimal[input_index].len, delta);
         }
     }
 

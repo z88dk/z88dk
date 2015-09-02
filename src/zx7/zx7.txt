@@ -77,6 +77,10 @@ HISTORY
 2013-02-25: Further improvements in the "Turbo" Z80 routine, released libraries
             for z88dk and Boriel's ZX BASIC.
 
+2015-09-01: Implemented C decompressor, and updated compressor to calculate and
+            display "delta" (if decompressed area will partially overlap
+            compressed area, then last address of compressed area must be at
+            least "delta" bytes higher than last address of decompressed area)
 
 =======
 CREDITS
