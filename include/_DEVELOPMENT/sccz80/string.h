@@ -200,7 +200,7 @@ extern size_t __LIB__ __CALLEE__ strlcpy_callee(char *dst,char *src,size_t n);
 extern size_t __LIB__ __FASTCALL__ strlen(char *s);
 
 
-extern char __LIB__ __FASTCALL__ strlwr(char *s);
+extern char __LIB__ __FASTCALL__ *strlwr(char *s);
 
 
 extern int __LIB__ strncasecmp(char *s1,char *s2,size_t n);
@@ -297,7 +297,7 @@ extern char __LIB__ __CALLEE__ *strtok_r_callee(char *s,char *delim,char **last_
 #define strtok_r(a,b,c) strtok_r_callee(a,b,c)
 
 
-extern char __LIB__ __FASTCALL__ strupr(char *s);
+extern char __LIB__ __FASTCALL__ *strupr(char *s);
 
 
 extern size_t __LIB__ strxfrm(char *dst,char *src,size_t n);

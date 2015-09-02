@@ -212,8 +212,8 @@ extern size_t strlen_fastcall(char *s) __z88dk_fastcall;
 #define strlen(a) strlen_fastcall(a)
 
 
-extern char strlwr(char *s);
-extern char strlwr_fastcall(char *s) __z88dk_fastcall;
+extern char *strlwr(char *s);
+extern char *strlwr_fastcall(char *s) __z88dk_fastcall;
 #define strlwr(a) strlwr_fastcall(a)
 
 
@@ -317,8 +317,8 @@ extern char *strtok_r_callee(char *s,char *delim,char **last_s) __z88dk_callee;
 #define strtok_r(a,b,c) strtok_r_callee(a,b,c)
 
 
-extern char strupr(char *s);
-extern char strupr_fastcall(char *s) __z88dk_fastcall;
+extern char *strupr(char *s);
+extern char *strupr_fastcall(char *s) __z88dk_fastcall;
 #define strupr(a) strupr_fastcall(a)
 
 

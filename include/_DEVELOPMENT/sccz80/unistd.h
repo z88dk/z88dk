@@ -37,7 +37,7 @@ typedef unsigned int           ssize_t;
 
 #ifndef _OFF_T_DEFINED
 #define _OFF_T_DEFINED
-typedef unsigned long          off_t;
+typedef long                   off_t;
 #endif
 
 #ifndef _INTPTR_T_DEFINED
