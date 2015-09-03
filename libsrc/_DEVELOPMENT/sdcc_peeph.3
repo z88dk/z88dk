@@ -3302,7 +3302,7 @@ replace restart {
 	push	%1
 	pop	%1
 } by {
-	; peephole z88dk-73
+	; peephole z88dk-73 Remove push %1 / pop %1 pair
 }
 
 replace restart {
@@ -4325,7 +4325,7 @@ replace restart {
 	ld	hl,(#%1)
 } by {
 	ld	(#%1),hl
-	; peephole z88dk-135
+	; peephole z88dk-135 Remove redundant load
 } if notVolatile(%1)
 
 replace restart {
@@ -4622,6 +4622,31 @@ replace restart {
 	; peephole z88dk-151b
 }
 
+replace restart {
+	ld	hl,#%1
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	ld	l, d
+	ld	h, e
+} by {
+	ld	hl,(#%1)
+	; peephole z88dk-152a
+} if notUsed('de')
+
+replace restart {
+	ld	hl,#%1
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	ld	l, d
+	ld	h, e
+} by {
+	ld	hl,(#%1)
+	ld	e, h
+	ld	d, l
+	; peephole z88dk-152b
+}
 
 
 
