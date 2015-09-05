@@ -4738,29 +4738,53 @@ replace restart {
 
 replace restart {
 	ld	hl,#%1
-	ld	%3,(hl)
-	ld	%4,#%2
-	ld	l, %3
-	ld	h, %4
+	ld	e,(hl)
+	ld	d,#%2
+	ld	l, e
+	ld	h, d
 } by {
 
-	ld	%4%3,(#%1)
-	ld	%4,#%2
-	ld	l, %3
-	ld	h, %4
-	; peephole z88dk-157
+	ld	de,(#%1)
+	ld	d,#%2
+	ld	l, e
+	ld	h, d
+	; peephole z88dk-157a
 }
 
 replace restart {
 	ld	hl,#%1
-	ld	%2,(hl)
-	ld	%3,#%4
+	ld	c,(hl)
+	ld	b,#%2
+	ld	l, c
+	ld	h, b
 } by {
-	ld	%3%2,(#%1)
-	ld	%3,#%4
-	; peephole z88dk-158
+
+	ld	bc,(#%1)
+	ld	b,#%2
+	ld	l, c
+	ld	h, b
+	; peephole z88dk-157b
+}
+
+replace restart {
+	ld	hl,#%1
+	ld	c,(hl)
+	ld	b,#%4
+} by {
+	ld	bc,(#%1)
+	ld	b,#%4
+	; peephole z88dk-158a
 } if notUsed('hl')
 
+replace restart {
+	ld	hl,#%1
+	ld	e,(hl)
+	ld	d,#%4
+} by {
+	ld	de,(#%1)
+	ld	d,#%4
+	; peephole z88dk-158b
+} if notUsed('hl')
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
