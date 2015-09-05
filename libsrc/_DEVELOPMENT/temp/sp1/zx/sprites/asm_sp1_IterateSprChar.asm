@@ -31,10 +31,36 @@ iterloop:
    inc hl
    ld l,(hl)
    ld h,a                 ; hl = & next struct sp1_cs
+
+   push ix
+   
+IFDEF __SDCC
+
+   push hl
+   push bc
+
+ELSE
+
    push bc
    push hl
+
+ENDIF
+
    call l_jpix            ; call userfunc(uint count, struct sp1_cs *c)
+
+IFDEF __SDCC
+
+   pop bc
+   pop hl
+
+ELSE
+
    pop hl
    pop bc
+
+ENDIF
+
+   pop ix
+
    inc bc
    jp iterloop

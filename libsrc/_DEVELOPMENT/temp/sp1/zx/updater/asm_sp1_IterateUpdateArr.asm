@@ -27,11 +27,13 @@ asm_sp1_IterateUpdateArr:
    ret z
 
    inc hl
+   push ix
    push hl
    push de
    ex de,hl
    call l_jpix           ; call function with hl = struct sp1_update *
    pop de
    pop hl
+   pop ix
 
    jp asm_sp1_IterateUpdateArr

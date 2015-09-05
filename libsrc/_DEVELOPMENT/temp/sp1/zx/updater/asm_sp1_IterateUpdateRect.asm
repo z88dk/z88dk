@@ -33,6 +33,7 @@ asm_sp1_IterateUpdateRect:
 
 .colloop
 
+   push ix
    push bc
    push hl
    call l_jpix
@@ -40,6 +41,7 @@ asm_sp1_IterateUpdateRect:
    ld bc,10
    add hl,bc
    pop bc
+   pop ix
    djnz colloop
 
    pop hl                        ; hl = & struct sp1_update same row leftmost column

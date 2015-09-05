@@ -43,13 +43,37 @@ iterloop:
    inc hl
    ld l,(hl)
    ld h,a                 ; hl = struct sp1_update*
-   
+
+   push ix
+
+IFDEF __SDCC
+
+   push hl
+   push bc
+
+ELSE
+
    push bc
    push hl
+
+ENDIF
+
    call l_jpix            ; call userfunc(uint count, struct sp1_update *u)
+
+IFDEF __SDCC
+
+   pop bc
+   pop hl
+
+ELSE
+
    pop hl
    pop bc
-   
+
+ENDIF
+
+   pop ix
+
 skipit:
 
    pop hl
