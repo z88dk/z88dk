@@ -3,7 +3,7 @@
 ;       Joaopa Jun. 2014
 ;       Stefano Bodrato Lug. 2014
 ;
-;       $Id: vg5k_crt0.asm,v 1.4 2015-01-21 07:05:01 stefano Exp $
+;       $Id: vg5k_crt0.asm,v 1.5 2015-09-06 20:32:12 aralbrec Exp $
 ;
 
 
@@ -46,8 +46,6 @@
         IF      !myzorg
                 defc    myzorg  = 20480
         ENDIF   
-                org     myzorg
-
 
         org     myzorg
 
