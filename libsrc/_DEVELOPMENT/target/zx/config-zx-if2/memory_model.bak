@@ -14,9 +14,13 @@ section code_crt_init
 section code_crt_main
 section code_crt_exit
 section code_crt_return
+section code_crt_common
 
 include "../../clib_code.inc"
 include "../../clib_rodata.inc"
+
+section code_lib
+section rodata_lib
 
 section code_compiler
 section rodata_compiler
@@ -48,10 +52,12 @@ defb 0
 
 include "../../clib_smc.inc"
 section smc_compiler
+section smc_lib
 section smc_user
 
 include "../../clib_data.inc"
 section data_compiler
+section data_lib
 section data_user
 
 SECTION DATA_END
@@ -79,6 +85,7 @@ defb 0
 section BSS_UNINITIALIZED
 include "../../clib_bss.inc"
 section bss_compiler
+section bss_lib
 section bss_user
 
 SECTION BSS_END
