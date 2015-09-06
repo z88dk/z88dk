@@ -4786,6 +4786,41 @@ replace restart {
 	; peephole z88dk-158b
 } if notUsed('hl')
 
+replace restart {
+	ld	c,l
+	ld	b,h
+	ld	a,(#%1)
+	ld	(bc),a
+} by {
+	ld	a,(#%1)
+	ld	(hl),a
+	; peephole z88dk-159a
+} if notUsed('bc')
+
+replace restart {
+	ld	e,l
+	ld	d,h
+	ld	a,(#%1)
+	ld	(de),a
+} by {
+	ld	a,(#%1)
+	ld	(hl),a
+	; peephole z88dk-159b
+} if notUsed('de')
+
+replace restart {
+	ex	de,hl
+	ld	a,(#%1)
+	ld	(de),a
+} by {
+	ld	a,(#%1)
+	ld	(hl),a
+	; peephole z88dk-159c
+} if notUsed('de'), notUsed('hl')
+
+
+
+
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 // POISON REMOVE
