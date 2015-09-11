@@ -13,8 +13,6 @@ dnl############################################################
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-define CONFIG_ZX_IF2
-
 include "../crt_defaults.inc"
 include "crt_target_defaults.inc"
 include "../crt_rules.inc"
@@ -70,7 +68,7 @@ dnl#; Some default fonts:
 dnl#;
 dnl#; _font_8x8_zx_system
 dnl#; _font_4x8_default
-dnl#; _ff_ao_Soxz
+dnl#; _ff_ind_Termino
 
 include(../../clib_instantiate_begin.m4)
 include(../../clib_instantiate_end.m4)

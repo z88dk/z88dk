@@ -10,8 +10,6 @@
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-define CONFIG_ZX_IF2
-
 include "../crt_defaults.inc"
 include "crt_target_defaults.inc"
 include "../crt_rules.inc"
@@ -209,7 +207,7 @@ include "clib_target_constants.inc"
    ; paper         : (0,256,0,192)
    ; cursor coord  : (0,0)
    ;
-   ; font          : _ff_ao_Soxz
+   ; font          : _ff_ind_Termino
    ; fzx draw mode : XOR
    ; left margin   : 3
    ; line spacing  : single
@@ -339,9 +337,9 @@ include "clib_target_constants.inc"
       ; font
       ; cursor (x,y)
 
-      EXTERN _ff_ao_Soxz
+      EXTERN _ff_ind_Termino
 
-      defw _ff_ao_Soxz
+      defw _ff_ind_Termino
       defw 0, 0
       
       ; paper dimensions

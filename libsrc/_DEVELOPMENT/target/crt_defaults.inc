@@ -5,22 +5,22 @@
 
    ; crt configuration
 
-   defc DEF__crt_org_code = 0
-   defc DEF__crt_org_data = 0
-   defc DEF__crt_org_bss  = 0
+   defc DEF__crt_org_code              = 0
+   defc DEF__crt_org_data              = 0
+   defc DEF__crt_org_bss               = 0
 
-   defc DEF__crt_model    = 2     ; compressed rom model
+   defc DEF__crt_model                 = 0
    
-   defc DEF__register_sp  = 0     ; top of memory
+   defc DEF__register_sp               = 0
    
-   defc DEF__crt_initialize_bss     = 1
+   defc DEF__crt_initialize_bss        = 0
    
-   defc DEF__crt_enable_commandline = 1
-   defc DEF__crt_enable_restart     = 1
-   defc DEF__crt_enable_close       = 1
+   defc DEF__crt_enable_commandline    = 1
+   defc DEF__crt_enable_restart        = 0
+   defc DEF__crt_enable_close          = 1
    
-   defc DEF__crt_enable_rst         = 0   ; one bit per z80 rst
-   defc DEF__crt_enable_nmi         = 0
+   defc DEF__crt_enable_rst            = 0
+   defc DEF__crt_enable_nmi            = 0
    
    ; clib defaults
    

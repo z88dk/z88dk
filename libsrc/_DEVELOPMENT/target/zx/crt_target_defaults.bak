@@ -1,12 +1,92 @@
 
-IFDEF CONFIG_ZX
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; crt target defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   INCLUDE "config-zx/crt_target_defaults.inc"
+IF __CRTDEF = -1
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; user supplied crt defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   
+   INCLUDE "crtdef.inc"
 
 ENDIF
 
-IFDEF CONFIG_ZX_IF2
+IF __CRTDEF = 0
 
-   INCLUDE "config-zx-if2/crt_target_defaults.inc"
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; zx48 ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   defc TAR__crt_org_code              = 32768
+   defc TAR__crt_org_data              = 0
+   defc TAR__crt_org_bss               = 0
+
+   defc TAR__crt_model                 = 0
+   
+   defc TAR__register_sp               = -1
+   
+   defc TAR__crt_initialize_bss        = 0
+   
+   defc TAR__crt_enable_commandline    = 0
+   defc TAR__crt_enable_restart        = 0
+   defc TAR__crt_enable_close          = 1
+   
+   defc TAR__crt_enable_rst            = 0
+   defc TAR__crt_enable_nmi            = 0
+   
+   ; clib defaults
+   
+   defc TAR__clib_exit_stack_size      = 2
+   defc TAR__clib_quickexit_stack_size = 0
+   
+   defc TAR__clib_malloc_heap_size     = 1024
+   defc TAR__clib_stdio_heap_size      = 128
+   
+   defc TAR__clib_balloc_table_size    = 0
+   
+   defc TAR__clib_fopen_max            = 0
+   defc TAR__clib_open_max             = 0
 
 ENDIF
+
+IF __CRTDEF = 1
+
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; if2 cartridge ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   defc TAR__crt_org_code              = 0
+   defc TAR__crt_org_data              = 32768
+   defc TAR__crt_org_bss               = -1
+
+   defc TAR__crt_model                 = 2
+   
+   defc TAR__register_sp               = 0
+   
+   defc TAR__crt_initialize_bss        = 0
+   
+   defc TAR__crt_enable_commandline    = 0
+   defc TAR__crt_enable_restart        = 1
+   defc TAR__crt_enable_close          = 1
+   
+   defc TAR__crt_enable_rst            = 0
+   defc TAR__crt_enable_nmi            = 0
+   
+   ; clib defaults
+   
+   defc TAR__clib_exit_stack_size      = 2
+   defc TAR__clib_quickexit_stack_size = 0
+   
+   defc TAR__clib_malloc_heap_size     = 1024
+   defc TAR__clib_stdio_heap_size      = 128
+   
+   defc TAR__clib_balloc_table_size    = 0
+   
+   defc TAR__clib_fopen_max            = 0
+   defc TAR__clib_open_max             = 0
+
+ENDIF
+
+;; end crt target defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

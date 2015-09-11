@@ -13,8 +13,6 @@ dnl############################################################
 ;; CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-define CONFIG_ZX
-
 include "../crt_defaults.inc"
 include "crt_target_defaults.inc"
 include "../crt_rules.inc"
@@ -70,19 +68,9 @@ dnl#; Some default fonts:
 dnl#;
 dnl#; _font_8x8_rom
 dnl#; _font_4x8_default
-dnl#; _ff_ao_Soxz
+dnl#; _ff_ind_Termino
 
 include(../../clib_instantiate_begin.m4)
-
-include(../driver/terminal/zx_01_input_kbd_inkey.m4)dnl
-m4_zx_01_input_kbd_inkey(_stdin, __i_fcntl_fdstruct_1, 0x03b0, 64, 1, 500, 15)dnl
-
-include(../driver/terminal/zx_01_output_fzx.m4)dnl
-m4_zx_01_output_fzx(_window_1, 0x2330, 0, 0, 1, 14, 1, 19, 0, _ff_ao_Prefect, 14, 0, 14, 8, 112, 8, 152, 1, 0, 3, 0)dnl
-
-include(../driver/terminal/zx_01_output_fzx.m4)dnl
-m4_zx_01_output_fzx(_window_2, 0x2330, 0, 0, 16, 14, 3, 19, 0, _ff_ao_RoundelSerif, 26, 0, 26, 128, 112, 24, 152, 1, 0, 3, 0)dnl
-
 include(../../clib_instantiate_end.m4)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
