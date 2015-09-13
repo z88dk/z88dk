@@ -4,6 +4,8 @@
 @ctype/ctype_sccz80.lst
 @error/error.lst
 @fcntl/fcntl_sccz80.lst
+@font/font_4x8/fonts.lst
+@font/font_8x8/fonts.lst
 @inttypes/inttypes_sccz80.lst
 @l/l.lst
 @l/sccz80.lst
