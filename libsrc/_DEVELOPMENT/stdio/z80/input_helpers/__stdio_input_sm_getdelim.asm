@@ -64,11 +64,10 @@ exit:
 
    ; vector cannot grow so reject
    
-   ; hl = 0
+   ; hl = -1, carry set
 
    pop af
    pop bc
    pop de
-   
-   scf                         ; reject the char
+
    ret
