@@ -13,7 +13,7 @@
 #
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.16 2015-08-05 06:57:28 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/eol_format.t,v 1.17 2015-09-13 19:21:28 pauloscustodio Exp $
 #
 # Assert that all source files are in UNIX line-ending format; fix if not
 
@@ -26,8 +26,8 @@ use File::Basename;
 
 find(sub {
 		return unless -f $_;
-		return unless /^Makefile$|\.(c|h|pl|pm|t|asm|rl|bmk|def|yaml|in|tt)$/i;
-		dos2unix($_);
+		dos2unix($_) if /^Makefile$|\.(c|h|pl|pm|t|asm|rl|bmk|def|yaml|in|tt)$/i;
+		unix2dos($_) if /\.(bat|vcxproj(\.filters)?)$/i;
 	}, dirname($0)."/..");
 ok 1;
 
@@ -49,17 +49,14 @@ if (0) {
 
 done_testing;
 
-
-sub dos2unix {
-	my($file) = @_;
-
+sub filter {
+	my($file, $sub) = @_;
+	
 	# read file
 	my $text = read_file($file, binmode => ':raw');
 
 	# check format
-	my $new_text = $text;
-	$new_text =~ s/([^\r\n]*)(\r\n|\r|\n)/$1\n/g;
-	$new_text =~ s/([^\n])\z/$1\n/;
+	my $new_text = $sub->($text);
 	my $ok = $text eq $new_text;
 
 	if (! $ok) {
@@ -69,3 +66,24 @@ sub dos2unix {
 
 	return $ok;
 }
+
+sub dos2unix {
+	my($file) = @_;
+
+	return filter($file, sub { local $_ = shift; 
+						s/([^\r\n]*)(\r\n|\r|\n)/$1\n/g;
+						s/([^\n])\z/$1\n/;
+						$_;
+		});
+}
+
+sub unix2dos {
+	my($file) = @_;
+
+	return filter($file, sub { local $_ = shift; 
+						s/([^\r\n]*)(\r\n|\r|\n)/$1\r\n/g;
+						s/([^\r][^\n])\z/$1\r\n/;
+						$_;
+		});
+}
+

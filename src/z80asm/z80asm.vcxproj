@@ -175,12 +175,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="parse_rules.rl" />
-    <None Include="scan_rules.rl" />
     <None Include="tt\error_func.c.tt" />
     <None Include="tt\error_func.h.tt" />
     <None Include="tt\error_func.yaml" />
+    <None Include="tt\error_func.yaml.tt" />
+    <None Include="tt\scan_rules.rl" />
+    <None Include="tt\scan_rules.rl.tt" />
     <None Include="tt\tokens.h.tt" />
     <None Include="tt\tokens.yaml" />
+    <None Include="tt\tokens.yaml.tt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -274,9 +274,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="scan_rules.rl">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="parse_rules.rl">
       <Filter>Resource Files</Filter>
     </None>
@@ -293,6 +290,18 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="tt\tokens.yaml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="tt\error_func.yaml.tt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="tt\scan_rules.rl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="tt\scan_rules.rl.tt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="tt\tokens.yaml.tt">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

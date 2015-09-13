@@ -14,7 +14,7 @@
 #
 # Makefile to generate C files, to be called from the .. directory
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.19 2015-08-04 22:47:16 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/Makefile,v 1.20 2015-09-13 19:21:28 pauloscustodio Exp $
 
 ASTYLE = astyle \
 	--mode=c \
@@ -25,16 +25,6 @@ ASTYLE = astyle \
 	--pad-oper --pad-paren-in --pad-header --unpad-paren \
 	--align-pointer=name \
 	--suffix=none
-
-#------------------------------------------------------------------------------
-# ragel lexer generator
-#------------------------------------------------------------------------------
-all : scan_rules.h
-
-scan_rules.h : scan_rules.rl tokens.h scan_def.h \
-			   parse_ragel.pl dev/Makefile
-	perl parse_ragel.pl scan_rules.rl
-#	$(ASTYLE) scan_rules.h -- formatted file too big for debugger (> 65536 lines)
 
 #------------------------------------------------------------------------------
 # ragel parser generator

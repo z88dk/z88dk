@@ -18,7 +18,7 @@
 # Converts special tokens <NL> to "\n", <TAB> to "\t"; <CAT> concatenates.
 # Expands <MAP>(aa=>AA,bb=>BB,) .. using <A> and <B>
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_ragel.pl,v 1.1 2015-03-22 00:37:44 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_ragel.pl,v 1.2 2015-09-13 19:21:23 pauloscustodio Exp $
 
 use strict;
 use warnings;
@@ -74,6 +74,10 @@ while (<$in>) {
 }
 close($out) or die;
 close($in) or die;
+
+# convert to UNIX LF
+$cmd = "dos2unix $FILE.h";
+system($cmd) and die "'$cmd' failed: $!\n";
 
 unlink(@TEMP);
 exit 0;

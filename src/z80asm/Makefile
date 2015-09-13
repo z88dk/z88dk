@@ -12,7 +12,7 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
 
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.202 2015-08-04 22:30:55 pauloscustodio Exp $
+# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/Makefile,v 1.203 2015-09-13 19:21:23 pauloscustodio Exp $
 
 #------------------------------------------------------------------------------
 # EXESUFFIX needs to be defined as .exe for windows
@@ -82,7 +82,7 @@ CFLAGS +=		-I. -I$(LOCAL_LIB) -It -Wall
 # main
 #------------------------------------------------------------------------------
 .PHONY: all
-all: $(TARGET) gccmake.bat
+all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
@@ -184,45 +184,6 @@ $(MSVC_TARGET) : $(wildcard *.c) $(wildcard *.h)
 	@echo Build z80asm inside Microsoft Visual C++ 2010 Express
 	@exit 1
 
-#------------------------------------------------------------------------------
-# gccmake.bat - work arround impossibility of writing a '$' in the perl code
-#------------------------------------------------------------------------------
-gccmake.bat : Makefile
-	@perl -e " \
-			print \
-				'@echo off', qq(\n); \
-			@printed = (); \
-			open(F, 'gccmake.bat'); \
-			while (<F>) { \
-				next unless /^rem.*Id/; \
-				push @printed, 1; \
-				print; \
-				last; \
-			} \
-			close(F); \
-			@printed or print 'rem ','$$','Id','$$',qq(\n); \
-			print \
-				qq(\n), \
-				'echo *******************', qq(\n), \
-				'echo * Building z80asm *', qq(\n), \
-				'echo *******************', qq(\n), \
-				'del *.o $(LOCAL_LIB)\\*.o', qq(\n); \
-			for (@ARGV) { \
-				s/\.o$$//; \
-				print 'gcc -Ilib -Wall -c -o '; \
-				print; \
-				print '.o ', ' ' x (20 - length); \
-				print; \
-				print '.c'; \
-				print qq(\n); \
-			} \
-			print \
-				'gcc -o z80asm.exe *.o $(LOCAL_LIB)\\*.o', qq(\n), \
-				'copy z80asm.exe ..\\..\\bin', qq(\n), \
-				'del z80asm.exe', qq(\n); \
-		" $(OBJS) > gccmake.bat.new
-	@mv gccmake.bat.new gccmake.bat
-	
 #------------------------------------------------------------------------------
 # Dependencies
 #------------------------------------------------------------------------------

@@ -14,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Scanner. Scanning engine is built by ragel from scan_rules.rl.
 
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.74 2015-02-24 22:27:40 pauloscustodio Exp $
+$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/scan.c,v 1.75 2015-09-13 19:21:24 pauloscustodio Exp $
 */
 
 #include "alloc.h"
@@ -189,6 +189,22 @@ void scan_expect_operands(void)
 	/* convert current symbol */
 	if (sym.tok_opcode)
 		sym.tok = TK_NAME;
+}
+
+/*-----------------------------------------------------------------------------
+*	scan a keyword, define as opcode or name depending on expect_opcode
+*----------------------------------------------------------------------------*/
+static void set_tok_opcode( tokid_t id )
+{
+	if (expect_opcode) {
+		sym.tok = id;
+		sym.tok_opcode = id;
+		expect_opcode = FALSE;
+	}
+	else {
+		sym.tok = TK_NAME;
+		sym.tok_opcode = id;
+	}
 }
 
 /*-----------------------------------------------------------------------------
