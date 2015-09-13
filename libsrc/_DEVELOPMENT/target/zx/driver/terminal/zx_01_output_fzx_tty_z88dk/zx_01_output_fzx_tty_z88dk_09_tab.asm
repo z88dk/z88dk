@@ -27,6 +27,10 @@ zx_01_output_fzx_tty_z88dk_09_tab:
    
    cp (ix+41)
    ret c                       ; if x < width
+   
+   ld a,(ix+42)
+   or a
+   ret nz
 
 linefeed:
 
