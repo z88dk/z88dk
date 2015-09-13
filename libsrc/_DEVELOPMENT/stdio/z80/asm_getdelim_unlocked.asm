@@ -89,21 +89,15 @@ asm0_getdelim_unlocked:
    
    ; if char *line == 0, make sure the size is 0 too
    
-   pop hl
-   pop de                      ; de = size_t *n
+   ; hl = size_t *n
+   ; de = 0
    
-   ld (de),a
-   inc de
-   ld (de),a                   ; *n = 0, to prevent leaks
-   dec de
-   
-   push de
-   push hl
+   ld (hl),a
+   inc hl
+   ld (hl),a                   ; *n = 0, to prevent leaks
    
    ld l,a
    ld h,a
-   ld e,a
-   ld d,a
    
    jr create_vector
 
@@ -129,7 +123,7 @@ create_vector:
    
    ld hl,0
    add hl,sp                   ; hl = vector *
-   
+
    push bc                     ; save delim_char
    
    ld de,1
