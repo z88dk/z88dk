@@ -504,7 +504,7 @@ ENDIF
 
    ;;; conversion matched
 
-IF __CLIB_OPT_PRINTF & $1ff800
+IF (__CLIB_OPT_PRINTF & $1ff800) || ((__SDCC) && (__CLIB_OPT_PRINTF & $3fc00000))
 
 printf_return_is_4:
 
