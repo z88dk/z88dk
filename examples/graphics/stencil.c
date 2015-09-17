@@ -2,9 +2,9 @@
 
 Demonstration on how to use the 'stencil' object.
 
-zcc +zx -lndos -create-app -llib3d stencil.c
+zcc +zx -vn -lndos -create-app -llib3d stencil.c -o stencil
 	
-$Id: stencil.c,v 1.1 2013-05-20 10:30:48 stefano Exp $
+$Id: stencil.c,v 1.2 2015-09-17 20:36:24 aralbrec Exp $
 
 =========================================================================*/
 

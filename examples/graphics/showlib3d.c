@@ -12,11 +12,13 @@ use keys 1 and 2 to enlarge/reduce the cube
 
 */
 
+// zcc +zx -vn showlib3d.c -o showlib3d -lndos -llib3d -create-app
+
 //#include <oz.h>
-#include "lib3d.h"
-#include "graphics.h"
-#include "stdio.h"
-#include "stdlib.h"
+#include <lib3d.h>
+#include <graphics.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 //#define TIMING
 
