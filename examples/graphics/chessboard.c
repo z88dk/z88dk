@@ -2,14 +2,25 @@
    Chessboard lib demo/test program
    By Stefano Bodrato - 13/08/2001
    
-   $Id: chessboard.c,v 1.3 2014-05-02 12:35:11 stefano Exp $
+   $Id: chessboard.c,v 1.4 2015-09-17 20:36:52 aralbrec Exp $
    
 */
 
-#if defined __TI85__ || defined __TI86__ || defined __Z88__ || defined __VZ200__
-#include <ti_chessboard.h>
+// zcc +zx -vn chessboard.c -o chessboard -lndos -create-app
+// optional: -DMIDSIZE, -DFANCY
+
+#ifdef MIDSIZE
+   #include <chessb16.h>
 #else
-#include <chessboard.h>
+   #ifdef FANCY
+      #include <fancychess.h>
+   #else
+      #if defined __TI85__ || defined __TI86__ || defined __Z88__ || defined __VZ200__
+         #include <ti_chessboard.h>
+      #else
+         #include <chessboard.h>
+      #endif
+   #endif
 #endif
 
 main()
