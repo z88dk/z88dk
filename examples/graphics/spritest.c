@@ -6,8 +6,10 @@
    so we reduce the flicker, and being the mask just "a border",
    it is put faster. */
 
-#include "stdio.h"
-#include "games.h"
+// zcc +zx -vn spritest.c -o spritest -lndos -create-app
+
+#include <stdio.h>
+#include <games.h>
 #include <ctype.h>
 
 char bullet[] = 
@@ -134,7 +136,7 @@ char *ptr;
 	                	x--;
 	                	flag=1;
 	                        break;
-	                case 13:
+	                case 32:
 	                        flag=2;
 	                        break;
 	                default:
