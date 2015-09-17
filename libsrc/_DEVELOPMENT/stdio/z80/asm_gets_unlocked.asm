@@ -74,8 +74,7 @@ asm0_gets_unlocked:
 
    ex de,hl                    ; de = char *s
 
-;;   ld bc,$ffff                 ; read as many chars as we can
-;;   unneeded as the gets state machine will not stop until delim char seen
+   ld bc,$ffff                 ; read as many chars as we can
 
    ld hl,__stdio_input_sm_gets ; qualify function for gets
    jp asm0_fgets_unlocked
