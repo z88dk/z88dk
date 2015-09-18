@@ -83,9 +83,10 @@ behllp:
    
    ld a,d
    or e
+   
+   ld a,c
    jr z, be_end
 
-   ld a,c
    ld c,l
    
    dec de
@@ -100,5 +101,4 @@ be_again:
 
 be_end:
 
-   ld a,c
    jp asm_bit_close
