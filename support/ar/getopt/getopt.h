@@ -1,6 +1,5 @@
 /*****************************************************************************
 * getopt.h - competent and free getopt library.
-* $Header: /home/dom/z88dk-git/cvs/z88dk/support/ar/getopt/getopt.h,v 1.1 2007-06-24 15:54:35 dom Exp $
 *
 * Copyright (c)2002-2003 Mark K. Kim
 * All rights reserved.

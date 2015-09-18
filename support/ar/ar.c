@@ -5,8 +5,6 @@
  *
  *	Prints the contents of a z80asm library file including local symbols
  *	and dependencies of a particular library
- *
- *  $Id: ar.c,v 1.21 2014-09-22 22:46:22 pauloscustodio Exp $
  */
 
 

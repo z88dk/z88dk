@@ -1,5 +1,4 @@
 ##############################################################################
-# $Header: /home/dom/z88dk-git/cvs/z88dk/support/ar/getopt/Makefile,v 1.1 2007-06-24 15:54:35 dom Exp $
 
 CC=gcc
 OBJECTS=getopt.o
