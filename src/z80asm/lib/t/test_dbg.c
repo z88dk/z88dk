@@ -1,11 +1,14 @@
 /*
+Z88DK Z80 Macro Assembler
+
 Unit test for dbg.h
 
 Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardway.org/book/)
 
+Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
-
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/test_dbg.c,v 1.1 2015-02-08 23:52:31 pauloscustodio Exp $
+License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #include "minunit.h"

@@ -1,12 +1,15 @@
 /*
+Z88DK Z80 Macro Assembler
+
 Hash of strings to void* including doubly-linked list of all strings to be
 able to retrieve in the order added.
 Keys are kept in strpool, no need to release memory.
 Memory pointed by value of each hash entry must be managed by caller.
 
+Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
-
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strhash.c,v 1.18 2015-02-24 22:27:40 pauloscustodio Exp $
+License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #include "alloc.h"

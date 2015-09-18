@@ -1,22 +1,13 @@
 #!/usr/bin/perl
 
-#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-#                ZZZZZ      888           888  0000         0000
-#              ZZZZZ        88888888888888888  0000         0000
-#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
+# Z88DK Z80 Macro Assembler
 #
+# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
 # Test object file output from z80asm
-
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/objfile.t,v 1.28 2015-08-03 23:08:13 pauloscustodio Exp $
-#
 
 use strict;
 use warnings;
@@ -25,16 +16,18 @@ use Test::Differences;
 use Capture::Tiny::Extended 'capture';
 require 't/test_utils.pl';
 
+our $AR = -d "ar" ? "ar" : "../../support/ar";
+
 #------------------------------------------------------------------------------
 # test with z80nm
 #------------------------------------------------------------------------------
-system("make -C ../../support/ar") and die;
+system("make -C $AR") and die;
 sub t_z80nm {
 	my($obj_file, $expected_out) = @_;
 
 	my $line = "[line ".((caller)[2])."]";
 	my($stdout, $stderr, $return) = capture {
-		system "../../support/ar/z80nm -a $obj_file";
+		system "$AR/z80nm -a $obj_file";
 	};
 	eq_or_diff_text $stdout, $expected_out, "$line stdout";
 	eq_or_diff_text $stderr, "", "$line stderr";

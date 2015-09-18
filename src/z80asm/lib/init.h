@@ -1,9 +1,12 @@
 /*
+Z88DK Z80 Macro Assembler
+
 Macros to help define init_module() functions per module
 
+Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
-
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/init.h,v 1.10 2015-02-09 21:57:46 pauloscustodio Exp $
+License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #pragma once

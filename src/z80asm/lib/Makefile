@@ -1,8 +1,11 @@
+# Z88DK Z80 Macro Assembler
+#
 # Collection of C library functions to be used in my C projects.
 #
+# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
-#
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/Makefile,v 1.6 2015-08-04 22:30:55 pauloscustodio Exp $
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 TARGET	= libclibrary.a
 

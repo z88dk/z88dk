@@ -1,9 +1,9 @@
 /*
+Z88DK Z80 Macro Assembler
+
 Debug macros.
 
 Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardway.org/book/)
-
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/dbg.h,v 1.1 2015-02-08 23:52:31 pauloscustodio Exp $
 */
 
 #pragma once

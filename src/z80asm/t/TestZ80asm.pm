@@ -1,21 +1,13 @@
 #!/usr/bin/perl
 
-#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-#                ZZZZZ      888           888  0000         0000
-#              ZZZZZ        88888888888888888  0000         0000
-#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
+# Z88DK Z80 Macro Assembler
 #
+# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
 # Library of test utilities to test z80asm
-#
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/t/TestZ80asm.pm,v 1.16 2015-02-01 23:52:13 pauloscustodio Exp $
 
 use Modern::Perl;
 use Exporter 'import';
@@ -31,6 +23,8 @@ our @EXPORT = qw( z80asm z80emu z80nm
 
 our $KEEP_FILES;
 our $Z80ASM = $ENV{Z80ASM} || "./z80asm";
+
+our $AR = -d "ar" ? "ar" : "../../support/ar";
 
 #------------------------------------------------------------------------------
 # startup and cleanup
@@ -206,7 +200,7 @@ sub unlink_temp {
 #------------------------------------------------------------------------------
 sub z80emu {
 	our $done_z80emu;	# only once per session
-	my $z80emu_dir = '../../libsrc/z80_crt0s/z80_emu';
+	my $z80emu_dir = 'z80lib';
 	my $z80emu = $z80emu_dir.'/z80mu.lib';
 
 	if ( ! $done_z80emu ) {
@@ -259,11 +253,11 @@ sub test_binfile {
 sub z80nm {
 	my($obj_file, $expected_out) = @_;
 
-	system("make -C ../../support/ar") and die;
+	system("make -C $AR") and die;
 
 	my $line = "[line ".((caller)[2])."]";
 	my($stdout, $stderr, $return) = capture {
-		system "../../support/ar/z80nm -a $obj_file";
+		system "$AR/z80nm -a $obj_file";
 	};
 	eq_or_diff_text $stdout, $expected_out, "$line stdout";
 	eq_or_diff_text $stderr, "", "$line stderr";

@@ -1,24 +1,16 @@
 #!/usr/bin/perl
 
-#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-#                ZZZZZ      888           888  0000         0000
-#              ZZZZZ        88888888888888888  0000         0000
-#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
+# Z88-DK Z80ASM - Z80 Assembler
 #
+# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
 # Preprocess file.rl and generate file.h
 # Needed to allow usage of #define macros and #include in ragel input files
 # Converts special tokens <NL> to "\n", <TAB> to "\t"; <CAT> concatenates.
 # Expands <MAP>(aa=>AA,bb=>BB,) .. using <A> and <B>
-#
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/parse_ragel.pl,v 1.2 2015-09-13 19:21:23 pauloscustodio Exp $
 
 use strict;
 use warnings;

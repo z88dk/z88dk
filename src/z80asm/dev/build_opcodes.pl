@@ -1,21 +1,13 @@
 #!/usr/bin/perl
 
-#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-#                ZZZZZ      888           888  0000         0000
-#              ZZZZZ        88888888888888888  0000         0000
-#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
+# Z88DK Z80 Macro Assembler
 #
+# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
 # Build opcodes.t test code, using Udo Munk's z80pack assembler as a reference implementation
-#
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/dev/build_opcodes.pl,v 1.7 2015-01-31 08:55:14 pauloscustodio Exp $
 
 use Modern::Perl;
 use File::Basename;
@@ -29,7 +21,7 @@ our $KEEP_FILES;
 $KEEP_FILES	 = grep {/-keep/} @ARGV; 
 
 my $UDOMUNK_ASM = "dev/z80pack-1.21/z80asm/z80asm.exe";
-my $Z80EMU_SRCDIR = '../../libsrc/z80_crt0s/z80_emu';
+my $Z80EMU_SRCDIR = 'z80lib';
 my @Z80EMU = qw(
 		rcmx_cpi
 		rcmx_cpir

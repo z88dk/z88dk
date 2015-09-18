@@ -1,8 +1,11 @@
 #!/usr/bin/perl
 
-# Copyright (C) Paulo Custodio, 2011-2015
+# Z88DK Z80 Macro Assembler
 #
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/classlist.t,v 1.11 2015-02-13 00:31:59 pauloscustodio Exp $
+# Copyright (C) Gunther Strube, InterLogic 1993-99
+# Copyright (C) Paulo Custodio, 2011-2015
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
 # Test classlist.c
 

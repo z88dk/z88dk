@@ -1,12 +1,15 @@
 /*
+Z88DK Z80 Macro Assembler
+
 Handle reading of source files, normalizing newline sequences, and allowing recursive
 includes.
 Allows pushing back of lines, for example to expand macros.
 Call back interface to declare that a new line has been read.
 
+Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
-
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/srcfile.h,v 1.10 2015-02-24 22:27:40 pauloscustodio Exp $
+License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #pragma once

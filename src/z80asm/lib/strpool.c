@@ -1,9 +1,12 @@
 /*
+Z88DK Z80 Macro Assembler
+
 Keep pool of strings for all duration of the program.
 
+Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
-
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.c,v 1.16 2015-02-22 13:46:35 pauloscustodio Exp $
+License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #include "alloc.h"

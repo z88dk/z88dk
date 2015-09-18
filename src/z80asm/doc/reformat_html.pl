@@ -1,23 +1,15 @@
 #!/usr/bin/perl
 
-#     ZZZZZZZZZZZZZZZZZZZZ    8888888888888       00000000000
-#   ZZZZZZZZZZZZZZZZZZZZ    88888888888888888    0000000000000
-#                ZZZZZ      888           888  0000         0000
-#              ZZZZZ        88888888888888888  0000         0000
-#            ZZZZZ            8888888888888    0000         0000       AAAAAA         SSSSSSSSSSS   MMMM       MMMM
-#          ZZZZZ            88888888888888888  0000         0000      AAAAAAAA      SSSS            MMMMMM   MMMMMM
-#        ZZZZZ              8888         8888  0000         0000     AAAA  AAAA     SSSSSSSSSSS     MMMMMMMMMMMMMMM
-#      ZZZZZ                8888         8888  0000         0000    AAAAAAAAAAAA      SSSSSSSSSSS   MMMM MMMMM MMMM
-#    ZZZZZZZZZZZZZZZZZZZZZ  88888888888888888    0000000000000     AAAA      AAAA           SSSSS   MMMM       MMMM
-#  ZZZZZZZZZZZZZZZZZZZZZ      8888888888888       00000000000     AAAA        AAAA  SSSSSSSSSSS     MMMM       MMMM
+# Z88DK Z80 Macro Assembler
 #
+# Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
+# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+# Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
 # Convert z80asm manual from the format exported by Google Docs HTML
 # format to CVS-friendly HTML (Google exports one single text line for 
 # the whole document) and to .txt format
-#
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/doc/reformat_html.pl,v 1.4 2015-02-21 14:22:26 pauloscustodio Exp $
 
 use Modern::Perl;
 use HTML::Tree;

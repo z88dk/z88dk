@@ -1,11 +1,14 @@
 /*
+Z88DK Z80 Macro Assembler
+
 Keep pool of strings for all duration of the program.
 Strings with the same contents are reused, and hash tables can use string address
 as key instead of whole string - quicker for long strings.
 
+Copyright (C) Gunther Strube, InterLogic 1993-99
 Copyright (C) Paulo Custodio, 2011-2015
-
-$Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/strpool.h,v 1.6 2015-02-22 13:46:35 pauloscustodio Exp $
+License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
 #pragma once

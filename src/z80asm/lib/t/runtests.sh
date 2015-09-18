@@ -1,5 +1,6 @@
 #!/bin/sh
-# $Header: /home/dom/z88dk-git/cvs/z88dk/src/z80asm/lib/t/runtests.sh,v 1.1 2015-02-08 23:52:31 pauloscustodio Exp $
+
+# Z88DK Z80 Macro Assembler
 
 #set -x
 tests_log=t/tests.log

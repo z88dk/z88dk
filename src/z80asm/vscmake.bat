@@ -1,5 +1,4 @@
 @echo off
-rem $Id: vscmake.bat,v 1.4 2015-02-02 18:18:12 stefano Exp $
 
 echo *******************
 echo * Building z80asm *
