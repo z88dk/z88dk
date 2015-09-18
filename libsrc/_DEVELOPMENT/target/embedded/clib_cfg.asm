@@ -324,7 +324,15 @@ defc __CLIB_OPT_SCANF = $ffffffff
 ; -- stdlib options -------------------------------------------
 ; -------------------------------------------------------------
 
-; You can select which sorting algorithm is used by qsort()
+; Select whether strtod() and atof() include code to parse
+; hex floats and nan/inf strings.
+
+defc __CLIB_OPT_STRTOD = $00
+
+; bit 0 = $01 = enable parsing of nan/inf strings
+; bit 1 = $02 = enable parsing of hex floats
+
+; Select which sorting algorithm is used by qsort()
 
 defc __CLIB_OPT_SORT = 1
 

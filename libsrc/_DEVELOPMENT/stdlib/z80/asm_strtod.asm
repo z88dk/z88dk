@@ -9,13 +9,15 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 SECTION code_stdlib
 
 PUBLIC asm_strtod
 
 EXTERN l_eat_ws, l_eat_sign, asm_dneg, asm_dsigdig, asm_tolower, asm_isdigit
 EXTERN __strtod_hex, __strtod_dec_ip_lz, __strtod_dec_fp_only
-EXTERN __strtod_dec_ip, __strtod_special_form
+EXTERN __strtod_dec_ip, __strtod_special_form, derror_einval_zc
 
 ; supplied by math library: asm_dneg, asm_dsigdig
 
@@ -114,6 +116,9 @@ positive:
 
    ;; classify as decimal string, hex string or special form
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF (__CLIB_OPT_STRTOD & $02)
+
 check_dhs:
 
    ld a,(hl)
@@ -146,5 +151,31 @@ check_ds:
    
    call asm_isdigit
    jp nc, __strtod_dec_ip      ; enter at decimal integer part
+
+ELSE
+
+   ld b,c                      ; b = number of significant decimal digits
+   dec b
+
+   ld a,(hl)
+
+   call asm_isdigit
+   jp nc, __strtod_dec_ip_lz   ; enter at decimal integer part leading zeroes
    
+   cp '.'
+   jp z, __strtod_dec_fp_only  ; enter at decimal fraction part only
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF (__CLIB_OPT_STRTOD & $01)
+
    jp __strtod_special_form    ; numerical string ruled out
+
+ELSE
+
+   jp derror_einval_zc
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
