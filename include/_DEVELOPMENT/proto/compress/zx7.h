@@ -53,11 +53,11 @@ include(__link__.m4)
 
 */
 
-__DPROTO(void,,dzx7_standard,void *src,void *dst)
-__DPROTO(void,,dzx7_turbo,void *src,void *dst)
-__DPROTO(void,,dzx7_mega,void *src,void *dst)
+__DPROTO(unsigned char,*,dzx7_standard,void *src,void *dst)
+__DPROTO(unsigned char,*,dzx7_turbo,void *src,void *dst)
+__DPROTO(unsigned char,*,dzx7_mega,void *src,void *dst)
 
-__DPROTO(void,,dzx7_smart_rcs,void *src,void *dst)
-__DPROTO(void,,dzx7_agile_rcs,void *src,void *dst)
+__DPROTO(unsigned char,*,dzx7_smart_rcs,void *src,void *dst)
+__DPROTO(unsigned char,*,dzx7_agile_rcs,void *src,void *dst)
 
 #endif
