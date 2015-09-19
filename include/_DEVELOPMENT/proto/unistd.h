@@ -46,7 +46,11 @@ typedef int                    intptr_t;
 __DPROTO(int,,close,int fd)
 __DPROTO(int,,dup,int fd)
 __DPROTO(int,,dup2,int fd,int fd2)
+
+#ifndef __SDCC
 __DPROTO(void,,_exit,int status)
+#endif
+
 __DPROTO(off_t,,lseek,int fd,off_t offset,int whence)
 __DPROTO(ssize_t,,read,int fd,void *buf,size_t nbyte)
 __DPROTO(ssize_t,,write,int fd,const void *buf,size_t nbyte)
