@@ -2293,8 +2293,7 @@ replace restart {
 } by {
 	ld	(#%1),hl
 	; peephole z88dk-12a  Store 16bit static with 16bit store
-} if notUsed('hl')
-//if notUsed('de')
+} if notUsed('de'), notUsed('hl')
 
 replace restart {
 	ld	d,l
@@ -2307,8 +2306,36 @@ replace restart {
 	ld	(#%1),hl
 	ld	hl,#%1 + 1
 	; peephole z88dk-12b  Store 16bit static with 16bit store
+} if notUsed('de')
+
+replace restart {
+	ld	d,l
+	ld	e,h
+	ld	hl,#%1
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+} by {
+	ld	(#%1),hl
+	ld	d,l
+	ld	e,h
+	; peephole z88dk-12c  Store 16bit static with 16bit store
+} if notUsed('hl')
+
+replace restart {
+	ld	d,l
+	ld	e,h
+	ld	hl,#%1
+	ld	(hl),d
+	inc	hl
+	ld	(hl),e
+} by {
+	ld	(#%1),hl
+	ld	d,l
+	ld	e,h
+	ld	hl,#%1 + 1
+	; peephole z88dk-12d  Store 16bit static with 16bit store
 }
-//if notUsed('de')
 
 replace restart {
 	ld	hl,#%1 + 0
@@ -5548,6 +5575,88 @@ replace restart {
 	ld	%1,(#%2)
 	; peephole z88dk-176b
 } if notVolatile(%2)
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
+	push	hl
+	push	bc
+} by {
+	ld	c,%1 (%3)
+	ld	b,%2 (%3)
+	push	bc
+	push	hl
+	; peephole z88dk-177a
+} if notUsed('bc'), notUsed('hl')
+
+replace restart {
+	ld	e,l
+	ld	d,h
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
+	push	hl
+	push	de
+} by {
+	ld	e,%1 (%3)
+	ld	d,%2 (%3)
+	push	de
+	push	hl
+	; peephole z88dk-177b
+} if notUsed('de'), notUsed('hl')
+
+replace restart {
+	ld	e,l
+	ld	d,h
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
+	push	hl
+	push	de
+} by {
+	ld	e,%1 (%3)
+	ld	d,%2 (%3)
+	ex	de,hl
+	push	hl
+	push	de
+	; peephole z88dk-177c
+} 
+
+replace restart {
+	ld	b,l
+	ld	c,h
+	pop	de
+	ld	a,b
+	sub	a, e
+	ld	l,a
+	ld	a,c
+	sbc	a, d
+	ld	h,a
+} by {
+	pop	de
+	or	a,a
+	sbc	hl,de
+	; peephole z88dk-178a
+} if notUsed('bc')
+
+replace restart {
+	ld	b,l
+	ld	c,h
+	pop	de
+	ld	a,b
+	sub	a, e
+	ld	l,a
+	ld	a,c
+	sbc	a, d
+	ld	h,a
+} by {
+	ld	b,l
+	ld	c,h
+	pop	de
+	or	a,a
+	sbc	hl,de
+	; peephole z88dk-178b
+}
 
 
 
