@@ -56,8 +56,12 @@ extern int __LIB__ __CALLEE__ dup2_callee(int fd,int fd2);
 #define dup2(a,b) dup2_callee(a,b)
 
 
+
+#ifndef __SDCC
 extern void __LIB__ __FASTCALL__ _exit(int status);
 
+
+#endif
 
 extern off_t __LIB__ lseek(int fd,off_t offset,int whence);
 extern off_t __LIB__ __CALLEE__ lseek_callee(int fd,off_t offset,int whence);

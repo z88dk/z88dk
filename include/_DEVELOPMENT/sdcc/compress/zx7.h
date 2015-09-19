@@ -55,29 +55,29 @@
 
 */
 
-extern void dzx7_standard(void *src,void *dst);
-extern void dzx7_standard_callee(void *src,void *dst) __z88dk_callee;
+extern unsigned char *dzx7_standard(void *src,void *dst);
+extern unsigned char *dzx7_standard_callee(void *src,void *dst) __z88dk_callee;
 #define dzx7_standard(a,b) dzx7_standard_callee(a,b)
 
 
-extern void dzx7_turbo(void *src,void *dst);
-extern void dzx7_turbo_callee(void *src,void *dst) __z88dk_callee;
+extern unsigned char *dzx7_turbo(void *src,void *dst);
+extern unsigned char *dzx7_turbo_callee(void *src,void *dst) __z88dk_callee;
 #define dzx7_turbo(a,b) dzx7_turbo_callee(a,b)
 
 
-extern void dzx7_mega(void *src,void *dst);
-extern void dzx7_mega_callee(void *src,void *dst) __z88dk_callee;
+extern unsigned char *dzx7_mega(void *src,void *dst);
+extern unsigned char *dzx7_mega_callee(void *src,void *dst) __z88dk_callee;
 #define dzx7_mega(a,b) dzx7_mega_callee(a,b)
 
 
 
-extern void dzx7_smart_rcs(void *src,void *dst);
-extern void dzx7_smart_rcs_callee(void *src,void *dst) __z88dk_callee;
+extern unsigned char *dzx7_smart_rcs(void *src,void *dst);
+extern unsigned char *dzx7_smart_rcs_callee(void *src,void *dst) __z88dk_callee;
 #define dzx7_smart_rcs(a,b) dzx7_smart_rcs_callee(a,b)
 
 
-extern void dzx7_agile_rcs(void *src,void *dst);
-extern void dzx7_agile_rcs_callee(void *src,void *dst) __z88dk_callee;
+extern unsigned char *dzx7_agile_rcs(void *src,void *dst);
+extern unsigned char *dzx7_agile_rcs_callee(void *src,void *dst) __z88dk_callee;
 #define dzx7_agile_rcs(a,b) dzx7_agile_rcs_callee(a,b)
 
 
