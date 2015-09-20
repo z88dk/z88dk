@@ -16,10 +16,14 @@ SECTION code_compress_zx7
 
 PUBLIC asm_dzx7_smart_rcs
 
+EXTERN l_ret
+
 asm_dzx7_smart_rcs:
 
    ; enter : hl = void *src
    ;         de = void *dst
+   ;
+   ; exit  : hl = & following uncompressed block
    ;
    ; uses  : af, bc, de, hl
 
@@ -53,7 +57,8 @@ dzx7r_len_value_loop:
         call    nc, dzx7r_next_bit
         rl      c
         rl      b
-        jr      c, dzx7r_exit           ; check end marker
+;;        jr      c, dzx7r_exit           ; check end marker
+        jp      c, l_ret - 1
         dec     d
         jr      nz, dzx7r_len_value_loop
         inc     bc                      ; adjust length

@@ -16,10 +16,14 @@ SECTION code_compress_zx7
 
 PUBLIC asm_dzx7_standard
 
+EXTERN l_ret
+
 asm_dzx7_standard:
 
    ; enter : hl = void *src
    ;         de = void *dst
+   ;
+   ; exit  : hl = & following uncompressed block
    ;
    ; uses  : af, bc, de, hl
 
@@ -53,7 +57,8 @@ dzx7s_len_value_loop:
         call    nc, dzx7s_next_bit
         rl      c
         rl      b
-        jr      c, dzx7s_exit           ; check end marker
+;;        jr      c, dzx7s_exit           ; check end marker
+        jp      c, l_ret - 1
         dec     d
         jr      nz, dzx7s_len_value_loop
         inc     bc                      ; adjust length
@@ -96,7 +101,7 @@ dzx7s_offset_end:
         sbc     hl, de                  ; HL = destination - offset - 1
         pop     de                      ; DE = destination
         ldir
-        
+
 dzx7s_exit:
 
         pop     hl                      ; restore source address (compressed data)

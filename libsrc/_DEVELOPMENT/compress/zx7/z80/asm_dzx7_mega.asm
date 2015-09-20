@@ -16,10 +16,14 @@ SECTION code_compress_zx7
 
 PUBLIC asm_dzx7_mega
 
+EXTERN l_ret
+
 asm_dzx7_mega:
 
    ; enter : hl = void *src
    ;         de = void *dst
+   ;
+   ; exit  : hl = & following uncompressed block
    ;
    ; uses  : af, bc, de, hl
 
@@ -84,8 +88,10 @@ dzx7m_len_value_loop_ev:
         jr      z, dzx7m_load_bits3_ev  ; no more bits left?
         rl      c
         rl      b
-        jr      c, dzx7m_exit_ev        ; check end marker
-        
+;;        jr      c, dzx7m_exit_ev        ; check end marker
+        jp      c, l_ret - 1
+
+
 dzx7m_len_value_start_ev:
 
         dec     d
@@ -209,7 +215,8 @@ dzx7m_len_value_loop_od:
         jr      z, dzx7m_load_bits3_od  ; no more bits left?
         rl      c
         rl      b
-        jr      c, dzx7m_exit_od        ; check end marker
+;;        jr      c, dzx7m_exit_od        ; check end marker
+        jp      c, l_ret - 1
         
 dzx7m_len_value_start_od:
 
