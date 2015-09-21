@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.99 2015-08-21 04:02:08 aralbrec Exp $
+ *      $Id: zcc.c,v 1.100 2015-09-21 04:17:37 aralbrec Exp $
  */
 
 
@@ -1549,8 +1549,8 @@ ShowErrors(char *filen, char *orig)
                     for (j = 1; j < linepos; j++)
                         fgets(buffer2, LINEMAX, fp2);
                     fprintf(stderr, "                   ^ ---- %s",fgets(buffer2, LINEMAX, fp2));
+                    fclose(fp2);
                 }
-                fclose(fp2);
             }
 
         }
