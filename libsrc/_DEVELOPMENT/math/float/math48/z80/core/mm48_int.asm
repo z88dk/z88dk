@@ -36,6 +36,9 @@ mm48_int:
 
    exx
    
+   cp 40
+   ret nc                      ; if shifts >= 40, all integer
+   
    ; AC' = x
    
    push bc                     ;save AC
