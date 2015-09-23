@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.40 2015-08-10 08:52:12 stefano Exp $
+;	$Id: grafix.inc,v 1.41 2015-09-23 17:03:25 stefano Exp $
 ;
 
 
@@ -199,6 +199,12 @@ IF FORgfx2068hr
 	DEFINE gotgfx
 	defc maxx       = 512
 	defc maxy       = 192
+ENDIF
+
+IF FORtiki100
+	DEFINE gotgfx
+	defc maxx       = 1024
+	defc maxy       = 256
 ENDIF
 
 IF FORenterprise

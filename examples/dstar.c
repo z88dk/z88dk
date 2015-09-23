@@ -1,5 +1,5 @@
-/* 
- *  Ported to the Ti82/83/83+ (rest will follow) by Henk Poley
+/*
+ * Ported to the Ti82/83/83+ (rest will follow) by Henk Poley
  * Extended with different sprite sizes and sound by Stefano Bodrato
  *
  * * * * * * *
@@ -76,7 +76,13 @@
  *   
  *      To get a VZ200 version:
  *      zcc +vz -Dspritesize=7 -DSOUND -odztar.vz dstar.c
- *   
+ *
+ *      TIKI1-100
+ *      add the following two lines on top of this file:
+ *         #pragma output nogfxglobals
+ *         char foo [28000]
+ *      zcc +cpm -ltiki100 -o dstar.com -Dspritesize=28 dstar.c
+ *
  *      MSXDOS:
  *      zcc +msx -Dspritesize=16 -DSOUND -startup=2 dstar.c
  *
@@ -105,7 +111,6 @@
  *      d. <djm@jb.man.ac.uk> 1/12/98
  *
  * * * * * * *
- 
  */
 
 #include <stdio.h>
@@ -117,6 +122,8 @@
 #include <sound.h>
 #endif
 
+
+
 /* #define spritesize 4   -->  minimalistic, 64x36 pixels  */
 /* #define spritesize 5   -->  very low resolutions, 80x45 pixels  */
 /* #define spritesize 6   -->  TI mode, 96x54  */
@@ -124,6 +131,7 @@
 /* #define spritesize 8   -->  128x72 pixels   */
 /* #define spritesize 16  -->  Big screen mode 256x144  */
 /* #define spritesize 21  -->  Wide screen mode 512x192 */
+/* #define spritesize 28  -->  Extra wide screen mode 1024x256 */
 
 #ifndef spritesize
 #define spritesize 6
@@ -135,6 +143,11 @@
 #endif
 #if (spritesize == 21)
   #define spritemem 90
+  #define xsize 32
+#endif
+#if (spritesize == 28)
+  #define spritemem 226
+  #define xsize 64
 #endif
 #ifndef spritemem
   #define spritemem (spritesize+2)
@@ -142,7 +155,7 @@
 
 
 #include "dstar.h"
-
+ 
 void main()
 {
 	Level = (STARTLEV-1);
@@ -261,8 +274,8 @@ void DrawBoard(void)
 	{
 		for (x=0 ; x!=16 ; x++)
 		{
-#if (spritesize == 21)
-			putsprite(spr_or,(x*32),(y*spritesize),sprites + (spritemem * (*ptr++)));
+#if (spritesize > 20)
+			putsprite(spr_or,(x*xsize),(y*spritesize),sprites + (spritemem * (*ptr++)));
 #else
 			putsprite(spr_or,(x*spritesize),(y*spritesize),sprites + (spritemem * (*ptr++)));
 #endif
@@ -323,8 +336,8 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		if(TestNextPosIsStop(*(locn+temp2))) return; /* till edge */
 
 		y = (*(ptr) / 16);
-#if (spritesize == 21)
-		x = (*(ptr) - (y * 16)) * 32;
+#if (spritesize >= 21)
+		x = (*(ptr) - (y * 16)) * xsize;
 #else
 		x = (*(ptr) - (y * 16)) * spritesize;
 #endif
@@ -332,8 +345,8 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		
 		if(*(locn+temp2)==BUBB)
 		{
-#if (spritesize == 21)
-			putsprite(spr_xor,x+(plusx*32),y+(plusy*spritesize),sprites + (spritemem * BUBB));
+#if (spritesize >= 21)
+			putsprite(spr_xor,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
 #else
 			putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
 #endif
@@ -349,8 +362,8 @@ void MovePiece(char *ptr, char plusx, char plusy)
  		/* remove old */
 		putsprite(spr_xor,x,y,sprites + (spritemem * temp));
 		/* put new */
-#if (spritesize == 21)
-		putsprite(spr_xor,x+(plusx*32),y+(plusy*spritesize),sprites + (spritemem * temp));
+#if (spritesize >= 21)
+		putsprite(spr_xor,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * temp));
 #else
 		putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * temp));
 #endif
