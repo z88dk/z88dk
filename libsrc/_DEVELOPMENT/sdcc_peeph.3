@@ -2834,9 +2834,28 @@ replace restart {
 	ld	de,(#%2)
 	add	hl,de
 	ex	de,hl
-	; peephole z88dk-46
-} 
-//if notUsed('a'), notUsed('hl')
+	; peephole z88dk-46a
+} if notUsed('hl')
+//, notUsed('a')
+
+replace restart {
+	ld	a,(#%1)
+	ld	hl,#%2
+	add	a, (hl)
+	ld	e,a
+	ld	a,(#%1 + 1)
+	ld	hl,#%2 + 1
+	adc	a, (hl)
+	ld	d,a
+} by {
+	ld	hl,(#%1)
+	ld	de,(#%2)
+	add	hl,de
+	ex	de,hl
+	ld	hl,#%2 + 1
+	; peephole z88dk-46b
+}
+//, notUsed('a')
 
 replace restart {
 	ld	a,(#%1)
@@ -3484,9 +3503,24 @@ replace restart {
 	ld	hl,(#%1 + %2 - 1)
 	add	hl,hl
 	ex	de,hl
-	; peephole z88dk-79
-} 
-//if notUsed('hl')
+	; peephole z88dk-79a
+} if notUsed('hl')
+
+replace restart {
+	ld	hl,#%1 + %2
+	dec	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	sla	e
+	rl	d
+} by {
+	ld	hl,(#%1 + %2 - 1)
+	add	hl,hl
+	ex	de,hl
+	ld	hl,#%1 + %2
+	; peephole z88dk-79b
+}
 
 replace restart {
 	ld	a,(#%1)
@@ -3797,17 +3831,24 @@ replace restart {
 } if notUsed('a'), notUsed('bc')
 
 replace restart {
-	ld	de,(#%1 + 1 - 1)
+	ld	de,(#%1 + %2 - %2)
 } by {
 	ld	de,(#%1)
 	; peephole z88dk-95a
 }
 
 replace restart {
-	ld	hl,(#%1 + 1 - 1)
+	ld	hl,(#%1 + %2 - %2)
 } by {
 	ld	hl,(#%1)
 	; peephole z88dk-95b
+}
+
+replace restart {
+	ld	bc,(#%1 + %2 - %2)
+} by {
+	ld	bc,(#%1)
+	; peephole z88dk-95c
 }
 
 replace restart {
@@ -6487,6 +6528,339 @@ replace restart {
 	ld	(%2 + 2),hl
 	; peephole z88dk-201
 } if notUsed('hl')
+
+replace restart {
+	ld	a,(%1)
+	ld	hl,%2
+	sub	a, (hl)
+	ld	e,a
+	ld	a,(%1 + 1)
+	ld	hl,%2 + 1
+	sbc	a, (hl)
+	ld	d,a
+} by {
+	ld	hl,(%1)
+	ld	de,(%2)
+	or	a,a
+	sbc	hl,de
+	ex	de,hl
+	; peephole z88dk-202a
+} if notUsed('hl')
+
+replace restart {
+	ld	a,(%1)
+	ld	hl,%2
+	sub	a, (hl)
+	ld	e,a
+	ld	a,(%1 + 1)
+	ld	hl,%2 + 1
+	sbc	a, (hl)
+	ld	d,a
+} by {
+	ld	hl,(%1)
+	ld	de,(%2)
+	or	a,a
+	sbc	hl,de
+	ex	de,hl
+	ld	hl,%2 + 1
+	; peephole z88dk-202b
+}
+
+replace restart {
+	ld	a,(%1)
+	ld	hl,%2
+	sub	a, (hl)
+	ld	c,a
+	ld	a,(%1 + 1)
+	ld	hl,%2 + 1
+	sbc	a, (hl)
+	ld	b,a
+} by {
+	ld	hl,(%1)
+	ld	bc,(%2)
+	or	a,a
+	sbc	hl,bc
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-202c
+} if notUsed('hl')
+
+replace restart {
+	ld	a,(%1)
+	ld	hl,%2
+	sub	a, (hl)
+	ld	c,a
+	ld	a,(%1 + 1)
+	ld	hl,%2 + 1
+	sbc	a, (hl)
+	ld	b,a
+} by {
+	ld	hl,(%1)
+	ld	bc,(%2)
+	or	a,a
+	sbc	hl,bc
+	ld	c,l
+	ld	b,h
+	ld	hl,%2 + 1
+	; peephole z88dk-202d
+}
+
+replace restart {
+	ex	de,hl
+	push	de
+} by {
+	push	hl
+	; peephole z88dk-203a
+} if notUsed('de'), notUsed('hl')
+
+replace restart {
+	ex	de,hl
+	push	de
+} by {
+	push	hl
+	ex	de,hl
+	; peephole z88dk-203b
+}
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	push	bc
+} by {
+	push	hl
+	; peephole z88dk-203c
+} if notUsed('bc')
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	push	bc
+} by {
+	push	hl
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-203d
+}
+
+replace restart {
+	ld	e,l
+	ld	d,h
+	push	de
+} by {
+	push	hl
+	; peephole z88dk-203e
+} if notUsed('de')
+
+replace restart {
+	ld	e,l
+	ld	d,h
+	push	de
+} by {
+	push	hl
+	ld	e,l
+	ld	d,h
+	; peephole z88dk-203f
+}
+
+replace restart {
+	ld	a,e
+	ld	hl,%1
+	add	a, (hl)
+	ld	e,a
+	ld	a,d
+	inc	hl
+	adc	a, (hl)
+	ld	d,a
+} by {
+	ld	hl,(%1)
+	add	hl,de
+	ex	de,hl
+	; peephole z88dk-204a
+} if notUsed('hl')
+
+replace restart {
+	ld	a,e
+	ld	hl,%1
+	add	a, (hl)
+	ld	e,a
+	ld	a,d
+	inc	hl
+	adc	a, (hl)
+	ld	d,a
+} by {
+	ld	hl,(%1)
+	add	hl,de
+	ex	de,hl
+	ld	hl,%1 + 1
+	; peephole z88dk-204b
+}
+
+replace restart {
+	ld	a,c
+	ld	hl,%1
+	add	a, (hl)
+	ld	c,a
+	ld	a,b
+	inc	hl
+	adc	a, (hl)
+	ld	b,a
+} by {
+	ld	hl,(%1)
+	add	hl,bc
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-204c
+} if notUsed('hl')
+
+replace restart {
+	ld	a,c
+	ld	hl,%1
+	add	a, (hl)
+	ld	c,a
+	ld	a,b
+	inc	hl
+	adc	a, (hl)
+	ld	b,a
+} by {
+	ld	hl,(%1)
+	add	hl,bc
+	ld	c,l
+	ld	b,h
+	ld	hl,%1 + 1
+	; peephole z88dk-204d
+}
+
+replace restart {
+	ld	a,(%1)
+	ld	hl,%2
+	add	a, (hl)
+	ld	hl,%1
+	ld	(hl),a
+	inc	hl
+	ld	a,(hl)
+	ld	hl,%2 + 1
+	adc	a, (hl)
+	ld	hl,%1 + 1
+	ld	(hl),a
+} by {
+	ld	hl,(%1)
+	ld	bc,(%1)
+	add	hl,bc
+	ld	(%1),hl
+	; peephole z88dk-205a
+} if notUsed('bc'), notUsed('hl')
+
+replace restart {
+	ld	a,(%1)
+	ld	hl,%2
+	add	a, (hl)
+	ld	hl,%1
+	ld	(hl),a
+	inc	hl
+	ld	a,(hl)
+	ld	hl,%2 + 1
+	adc	a, (hl)
+	ld	hl,%1 + 1
+	ld	(hl),a
+} by {
+	ld	hl,(%1)
+	ld	de,(%1)
+	add	hl,de
+	ld	(%1),hl
+	; peephole z88dk-205b
+} if notUsed('de'), notUsed('hl')
+
+replace restart {
+	ld	a,(%1)
+	ld	hl,%2
+	add	a, (hl)
+	ld	hl,%1
+	ld	(hl),a
+	inc	hl
+	ld	a,(hl)
+	ld	hl,%2 + 1
+	adc	a, (hl)
+	ld	hl,%1 + 1
+	ld	(hl),a
+} by {
+	ld	hl,(%1)
+	ld	bc,(%1)
+	add	hl,bc
+	ld	(%1),hl
+	ld	hl,%1 + 1
+	; peephole z88dk-205c
+} if notUsed('bc')
+
+replace restart {
+	ld	a,(%1)
+	ld	hl,%2
+	add	a, (hl)
+	ld	hl,%1
+	ld	(hl),a
+	inc	hl
+	ld	a,(hl)
+	ld	hl,%2 + 1
+	adc	a, (hl)
+	ld	hl,%1 + 1
+	ld	(hl),a
+} by {
+	ld	hl,(%1)
+	ld	de,(%1)
+	add	hl,de
+	ld	(%1),hl
+	ld	hl,%1 + 1
+	; peephole z88dk-205d
+} if notUsed('de')
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	sla	c
+	rl	b
+} by {
+	add	hl,hl
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-206a
+} if notUsed('hl')
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	sla	c
+	rl	b
+	sla	c
+	rl	b
+} by {
+	add	hl,hl
+	add	hl,hl
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-206b
+} if notUsed('hl')
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	ld	hl,%1
+	add	hl,bc
+} by {
+	ld	bc,%1
+	add	hl,bc
+	; peephole z88dk-207a
+} if notUsed('bc')
+
+replace restart {
+	ld	e,l
+	ld	d,h
+	ld	hl,%1
+	add	hl,de
+} by {
+	ld	de,%1
+	add	hl,de
+	; peephole z88dk-207b
+} if notUsed('de')
+
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
