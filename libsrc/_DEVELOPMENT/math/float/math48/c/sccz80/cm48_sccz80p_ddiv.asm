@@ -3,27 +3,22 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sccz80p_ddiv
 
-EXTERN am48_ddiv
+EXTERN cm48_sccz80p_dcallee1_0, am48_ddiv
 
 cm48_sccz80p_ddiv:
 
    ; sccz80 float primitive
-   ; divide math48 doubles
    ;
-   ; enter : AC'(BCDEHL') = divisor = double x
-   ;              stack   = dividend y, ret
+   ; enter : AC'(BCDEHL') = divisor = double x (math48)
+   ;              stack   = dividend y (sccz80), ret
    ;
    ; exit  : AC'(BCDEHL') = y/x
    ;
-   ; uses  : AF, BC, DE, HL, AF', BC', DE', HL'
+   ; uses  : all except iy
 
-   pop af
+   call cm48_sccz80p_dcallee1_0
    
-   pop hl                      ; AC = y
-   pop de
-   pop bc
+   ; AC = divisor (x)
+   ; AC'= dividend (y)
    
-   push af
-   
-   exx
-   jp am48_ddiv
+   jp am48_ddiv                ; AC'= AC'/AC

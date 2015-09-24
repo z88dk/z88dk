@@ -8,13 +8,13 @@ math/float/math48/c/sccz80/cm48_sccz80p_dgt
 math/float/math48/c/sccz80/cm48_sccz80p_dldpsh
 math/float/math48/c/sccz80/cm48_sccz80p_dleq
 math/float/math48/c/sccz80/cm48_sccz80p_dload
+math/float/math48/c/sccz80/cm48_sccz80p_dloadb
 math/float/math48/c/sccz80/cm48_sccz80p_dlt
 math/float/math48/c/sccz80/cm48_sccz80p_dmul
 math/float/math48/c/sccz80/cm48_sccz80p_dne
-math/float/math48/c/sccz80/cm48_sccz80p_dparam2
 math/float/math48/c/sccz80/cm48_sccz80p_dpush
 math/float/math48/c/sccz80/cm48_sccz80p_dpush2
-math/float/math48/c/sccz80/cm48_sccz80p_dread1
+math/float/math48/c/sccz80/cm48_sccz80p_dread
 math/float/math48/c/sccz80/cm48_sccz80p_dstore
 math/float/math48/c/sccz80/cm48_sccz80p_dsub
 math/float/math48/c/sccz80/cm48_sccz80p_dswap

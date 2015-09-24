@@ -3,16 +3,23 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sccz80p_dmul
 
-EXTERN am48_dmul_s
+EXTERN cm48_sccz80p_dcallee1_0, am48_dmul
+
+cm48_sccz80p_dmul:
 
    ; sccz80 float primitive
    ; Multiply two math48 floats.
    ;
-   ; enter : AC'(BCDEHL') = double x
-   ;              stack   = double y, ret
+   ; enter : AC'(BCDEHL') = double x (math48)
+   ;              stack   = double y (sccz80), ret
    ;
    ; exit  : AC'(BCDEHL') = x * y
    ;
-   ; uses  : AF, BC, DE, HL, AF', BC', DE', HL'
+   ; uses  : all except iy
 
-defc cm48_sccz80p_dmul = am48_dmul_s
+   call cm48_sccz80p_dcallee1_0
+   
+   ; AC = x
+   ; AC'= y
+   
+   jp am48_dmul

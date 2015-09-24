@@ -5,13 +5,13 @@ SECTION code_stdlib
 
 PUBLIC dtoh
 
-EXTERN asm_dtoh, dread1b
+EXTERN asm_dtoh, dload
 
 dtoh:
 
-   ld hl,13
+   ld hl,8
    add hl,sp
-   call dread1b
+   call dload
 
    pop af
    pop bc

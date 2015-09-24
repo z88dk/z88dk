@@ -8,32 +8,29 @@ cm48_sccz80p_dldpsh:
    ; sccz80 float primitive
    ; Push float pointed to by HL onto stack.
    ;
-   ; Convert from sccz80 float format to math48 float format.
-   ;
    ; enter : HL = double * (sccz80 format)
    ;
-   ; exit  : AC     = double (math48 format)
-   ;         stack  = double (math48 format)
+   ; exit  : stack  = double (sccz80 format)
    ;
-   ; uses  : A, BC, DE, HL, IX
+   ; uses  : a, bc, de, hl, ix
 
-   ld a,(hl)
+   ld c,(hl)
+   inc hl
+   ld b,(hl)
    inc hl
    ld e,(hl)
    inc hl
    ld d,(hl)
    inc hl
-   ld c,(hl)
+   ld a,(hl)
    inc hl
-   ld b,(hl)
-   inc hl
-   ld l,(hl)
-   ld h,a
+   ld h,(hl)
+   ld l,a                      ; hldebc = six bytes sccz80 float
 
    pop ix
-   
-   push bc
-   push de
+
    push hl
+   push de
+   push bc
    
    jp (ix)

@@ -5,13 +5,13 @@ SECTION code_stdlib
 
 PUBLIC dtog
 
-EXTERN asm_dtog, dread1b
+EXTERN asm_dtog, dload
 
 dtog:
 
-   ld hl,13
+   ld hl,8
    add hl,sp
-   call dread1b
+   call dload
 
    pop af
    pop bc

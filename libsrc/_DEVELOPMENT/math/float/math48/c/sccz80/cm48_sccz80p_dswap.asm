@@ -3,17 +3,25 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sccz80p_dswap
 
-EXTERN am48_dswap
+EXTERN cm48_sccz80p_dcallee1_0, cm48_sccz80p_dpush_0
+
+cm48_sccz80p_dswap:
 
    ; sccz80 float primitive
-   ; Swap two math48 floats.
+   ; Swap two floats.
    ;
-   ; enter : AC'(BCDEHL') = double x
-   ;              stack   = double y, ret
+   ; enter : AC'(BCDEHL') = double x (math48)
+   ;              stack   = double y (sccz80), ret
    ;
-   ; exit  : AC'(BCDEHL') = y
-   ;              stack   = x
+   ; exit  : AC'(BCDEHL') = y (math48)
+   ;         AC (BCDEHL ) = x (math48)
+   ;              stack   = x (sccz80)
    ;
-   ; uses  : AF, BC, DE, HL, BC', DE', HL'
+   ; uses  : all except iy
 
-defc cm48_sccz80p_dswap = am48_dswap
+   call cm48_sccz80p_dcallee1_0
+
+   ; AC'= y
+   ; AC = x
+   
+   jp cm48_sccz80p_dpush_0

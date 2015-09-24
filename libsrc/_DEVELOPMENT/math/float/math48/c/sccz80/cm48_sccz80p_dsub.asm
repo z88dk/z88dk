@@ -3,7 +3,7 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sccz80p_dsub
 
-EXTERN am48_dsub
+EXTERN cm48_sccz80p_dcallee1_0, am48_dsub
 
 cm48_sccz80p_dsub:
 
@@ -15,15 +15,11 @@ cm48_sccz80p_dsub:
    ;
    ; exit  : AC'(BCDEHL') = left_op - right_op
    ;
-   ; uses  : AF, BC, DE, HL, AF', BC', DE', HL'
-   
-   pop af
-   
-   pop hl                      ; AC = y
-   pop de
-   pop bc
+   ; uses  : all except iy
 
-   push af
+   call cm48_sccz80p_dcallee1_0
+
+   ; AC = right_op
+   ; AC'= left_op
    
-   exx
    jp am48_dsub

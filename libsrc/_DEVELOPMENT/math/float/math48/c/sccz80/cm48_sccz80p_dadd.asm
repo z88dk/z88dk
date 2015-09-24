@@ -3,16 +3,22 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sccz80p_dadd
 
-EXTERN am48_dadd_s
+EXTERN cm48_sccz80p_dcallee1_0, am48_dadd
+
+cm48_sccz80p_dadd:
 
    ; sccz80 float primitive
-   ; Add two math48 floats.
    ;
-   ; enter : AC'(BCDEHL') = double x
-   ;              stack   = double y, ret
+   ; enter : AC'(BCDEHL') = double x (math48)
+   ;              stack   = double y (sccz80), ret
    ;
    ; exit  : AC'(BCDEHL') = x + y
    ;
-   ; uses  : AF, BC, DE, HL, AF', BC', DE', HL'
+   ; uses  : all except iy
 
-defc cm48_sccz80p_dadd = am48_dadd_s
+   call cm48_sccz80p_dcallee1_0
+   
+   ; AC = x
+   ; AC'= y
+   
+   jp am48_dadd

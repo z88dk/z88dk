@@ -47,8 +47,8 @@ __stdio_printf_e:
    
    ELSE
    
-      EXTERN dread1b
-      call dread1b             ; exx set = double x
+      EXTERN dloadb
+      call dloadb              ; exx set = double x
 
    ENDIF
 

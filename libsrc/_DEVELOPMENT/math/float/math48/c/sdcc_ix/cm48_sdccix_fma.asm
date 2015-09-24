@@ -19,7 +19,6 @@ cm48_sdccix_fma:
    ; it is difficult to gather three params
 
    call am48_dmul
-
    jp c, cm48_sdccixp_m482d    ; if overflow
 
    ld hl,10

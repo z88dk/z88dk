@@ -5,13 +5,13 @@ SECTION code_stdlib
 
 PUBLIC dtoa
 
-EXTERN asm_dtoa, dread1b
+EXTERN asm_dtoa, dload
 
 dtoa:
 
-   ld hl,13
+   ld hl,8
    add hl,sp
-   call dread1b
+   call dload
 
    pop af
    pop bc

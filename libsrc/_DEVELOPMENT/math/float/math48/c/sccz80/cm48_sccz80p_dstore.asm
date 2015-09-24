@@ -8,17 +8,15 @@ cm48_sccz80p_dstore:
    ; sccz80 float primitive
    ; Write float in AC' to memory pointed at by HL.
    ;
-   ; Convert from math48 format to sccz80 format.
-   ;
    ; enter :         HL   = double * (sccz80 format)
    ;         AC'(BCDEHL') = double (math48 format)
    ;
-   ; uses  : A
+   ; uses  : a
 
    push hl
    
    exx
-   
+
    ld a,h
    ex (sp),hl
    

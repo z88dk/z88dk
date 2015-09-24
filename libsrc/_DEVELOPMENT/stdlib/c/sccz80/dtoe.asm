@@ -5,13 +5,13 @@ SECTION code_stdlib
 
 PUBLIC dtoe
 
-EXTERN asm_dtoe, dread1b
+EXTERN asm_dtoe, dload
 
 dtoe:
 
-   ld hl,13
+   ld hl,8
    add hl,sp
-   call dread1b
+   call dload
 
    pop af
    pop bc

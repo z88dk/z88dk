@@ -22,13 +22,13 @@ math/float/math48/lm/c/sccz80/dgt
 math/float/math48/lm/c/sccz80/dldpsh
 math/float/math48/lm/c/sccz80/dleq
 math/float/math48/lm/c/sccz80/dload
+math/float/math48/lm/c/sccz80/dloadb
 math/float/math48/lm/c/sccz80/dlt
 math/float/math48/lm/c/sccz80/dmul
 math/float/math48/lm/c/sccz80/dne
-math/float/math48/lm/c/sccz80/dparam2
 math/float/math48/lm/c/sccz80/dpush
 math/float/math48/lm/c/sccz80/dpush2
-math/float/math48/lm/c/sccz80/dread1
+math/float/math48/lm/c/sccz80/dread
 math/float/math48/lm/c/sccz80/dstore
 math/float/math48/lm/c/sccz80/dsub
 math/float/math48/lm/c/sccz80/dswap

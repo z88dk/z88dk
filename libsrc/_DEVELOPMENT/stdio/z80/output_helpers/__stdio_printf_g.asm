@@ -39,7 +39,7 @@ __stdio_printf_g:
    ex de,hl
    
    push ix
-   
+
    IF __SDCC | __SDCC_IX | SDCC_IY
    
       EXTERN dload
@@ -47,8 +47,8 @@ __stdio_printf_g:
    
    ELSE
    
-      EXTERN dread1b
-      call dread1b             ; exx set = double x
+      EXTERN dloadb
+      call dloadb              ; exx set = double x
 
    ENDIF
 

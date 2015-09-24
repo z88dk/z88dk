@@ -5,7 +5,7 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sccz80_scalbn
 
-EXTERN am48_scalbn, am48_dloadb
+EXTERN am48_scalbn, cm48_sccz80p_dload
 
 cm48_sccz80_scalbn:
 
@@ -17,9 +17,9 @@ cm48_sccz80_scalbn:
    
    exx
    
-   ld hl,9
+   ld hl,4
    add hl,sp
    
-   call am48_dloadb
+   call cm48_sccz80p_dload
    
    jp am48_scalbn

@@ -5,22 +5,14 @@ SECTION code_fp_math48
 
 PUBLIC cm48_sccz80_scalbn_callee
 
-EXTERN am48_scalbn
+EXTERN cm48_sccz80p_dcallee1, am48_scalbn
 
 cm48_sccz80_scalbn_callee:
 
    pop af
-   
    pop hl                      ; hl = n
-   
-   exx
-   
-   pop hl                      ; AC'= x
-   pop de
-   pop bc
-   
-   exx
-   
    push af
+   
+   call cm48_sccz80p_dcallee1  ; AC'= x
    
    jp am48_scalbn

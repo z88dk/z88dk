@@ -1,20 +1,33 @@
 
 SECTION code_fp_math48
 
-PUBLIC cm48_sccz80p_dpush
+PUBLIC cm48_sccz80p_dpush, cm48_sccz80p_dpush_0
 
-EXTERN am48_dpush
+cm48_sccz80p_dpush:
 
    ; sccz80 float primitive
    ; Push float in AC' onto the stack.
    ;
-   ; Float is in math48 format.
+   ; enter : AC'   = double (math48)
+   ;         stack = ret
    ;
-   ; enter : AC'   = double (math48 format)
-   ;         stack = return
+   ; exit  : stack = double (sccz80)
    ;
-   ; exit  : stack = double (math48 format)
-   ;
-   ; uses  : AF
+   ; uses  : a, ix
+   
+   exx
 
-defc cm48_sccz80p_dpush = am48_dpush
+cm48_sccz80p_dpush_0:
+
+   pop ix
+   
+   ld a,l
+   push af
+   inc sp
+   push bc
+   push de
+   push hl
+   inc sp
+   
+   exx
+   jp (ix)
