@@ -7386,6 +7386,13 @@ replace restart {
 	; peephole z88dk-211f
 } if notUsed('a')
 
+replace restart
+{
+	ex	de,hl
+} by {
+	; peephole z88dk-212
+} if notUsed('de'), notUsed('hl')
+
 
 
 ///////////////////////////////////////////////////////////////
