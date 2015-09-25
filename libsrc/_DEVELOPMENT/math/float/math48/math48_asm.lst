@@ -6,6 +6,7 @@ math/float/math48/z80/am48_atan
 math/float/math48/z80/am48_atan2
 math/float/math48/z80/am48_atanh
 math/float/math48/z80/am48_cbrt
+math/float/math48/z80/am48_ceil
 math/float/math48/z80/am48_copysign
 math/float/math48/z80/am48_cos
 math/float/math48/z80/am48_cosh
@@ -89,6 +90,7 @@ math/float/math48/z80/am48_exp2
 math/float/math48/z80/am48_expm1
 math/float/math48/z80/am48_fabs
 math/float/math48/z80/am48_fdim
+math/float/math48/z80/am48_floor
 math/float/math48/z80/am48_fma
 math/float/math48/z80/am48_fmax
 math/float/math48/z80/am48_fmin
