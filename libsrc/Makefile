@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.223 2015-08-10 10:24:39 stefano Exp $
+# $Id: Makefile,v 1.224 2015-09-25 14:56:01 stefano Exp $
 
 
 include Make.config
@@ -22,7 +22,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib p2000_clib.lib p2000ansi_clib.lib \
 	pc6001_clib.lib pc6001ansi_clib.lib pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
-	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib  sos_clib.lib\
+	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib  sos_clib.lib tiki100.lib\
 	trs80_clib.lib vg5k_clib.lib vg5kansi_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
 	embedded_clib.lib test_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
@@ -442,7 +442,6 @@ p2000_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	$(MAKE) -C psg
 	$(MAKE) -C games lp2000
 	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000_clib @$(LISTFILE_DIRECTORY)/p2000.lst
 
@@ -459,7 +458,6 @@ p2000ansi_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
-	$(MAKE) -C psg
 	$(MAKE) -C games lp2000
 	$(LIBLINKER) -DFORp2000 -x$(OUTPUT_DIRECTORY)/p2000ansi_clib @$(LISTFILE_DIRECTORY)/p2000ansi.lst
 
@@ -1398,6 +1396,15 @@ newbrain_clib.lib:
 	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
 	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
 
+# TIKI-100 library - Stefano
+tiki100.lib:
+	@echo ''
+	@echo '--- Building TIKI-100 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) -C psg
+	$(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(LISTFILE_DIRECTORY)/tiki100.lst
+	
 # RCM2/3000 lib
 rcmx000_clib.lib:
 	@echo ''
@@ -1710,6 +1717,7 @@ clean:
 	$(MAKE) -C psg clean
 	$(RM) newbrain/*.o
 	$(RM) ts2068/*.o
+	$(RM) tiki100/*.o
 	$(RM) vz/*.o
 	$(MAKE) -C zx81 clean
 	$(RM) cpc/*.o

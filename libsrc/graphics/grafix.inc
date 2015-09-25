@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.41 2015-09-23 17:03:25 stefano Exp $
+;	$Id: grafix.inc,v 1.42 2015-09-25 14:56:01 stefano Exp $
 ;
 
 

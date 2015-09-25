@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.23 2015-01-21 07:05:00 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.24 2015-09-25 14:56:01 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -18,6 +18,7 @@
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
 ;	#pragma output noredir   - do not insert the file redirection option while parsing the
 ;	                           command line arguments (useless if "nostreams" is set)
+;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on the TIKI-100)
 ;
 ;	These can cut down the size of the resultant executable
 
@@ -54,13 +55,14 @@
 ; Target specific labels
 ;-----------------------
 
-	PUBLIC    _vdcDispMem	; pointer to disp. memory for C128
 	PUBLIC	snd_tick	; for sound code, if any
 	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
+IF !DEFINED_nogfxglobals
+	PUBLIC    _vdcDispMem	; pointer to disp. memory for C128
 	PUBLIC	RG0SAV		; keeping track of VDP register values (Einstein)
 	PUBLIC	pixelbyte	; VDP gfx driver, byte temp storage
 	PUBLIC	coords
-
+ENDIF
 
 
         org     $100
@@ -342,9 +344,11 @@ _vdcDispMem:				; Label used by "c128cpm.lib" only
 base_graphics:				; various gfx drivers
          	defm  	"Small C+ CP/M"
 end:		defb	0		; null file name
+IF !DEFINED_nogfxglobals
 RG0SAV:		defb	0		; VDP graphics driver (Einstein)
 pixelbyte:	defb	0		; temp byte storage for VDP driver
 coords:		defw    0       ; Current graphics xy coordinates
+ENDIF
 
 
 ;----------------------------------------------
