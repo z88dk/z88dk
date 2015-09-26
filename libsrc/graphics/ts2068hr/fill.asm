@@ -1,12 +1,12 @@
 	INCLUDE "graphics/grafix.inc"
 	PUBLIC	fill
 	EXTERN	w_pixeladdress
-	EXTERN	l_cmp
+;	EXTERN	l_cmp
 
 .ws1	defw 0
 .index	defw 0
-.sline	defs 512 * 2 * 3
-.sline2	defs 512 * 2 * 3
+;.sline	defs 512 * 2 * 3
+;.sline2	defs 512 * 2 * 3
 
 .fill
 		pop bc
@@ -29,7 +29,18 @@
 		rlca
 		djnz loop3
 .cont
-		ld hl,sline
+;		ld hl,sline
+
+        ld      hl,-maxx * 2 * 3    ; create buffer 2 on stack
+        add     hl,sp               ; The stack size depends on the display height.
+        ld      (sl2ptr+1),hl       ; We don't undersize it because we have lots of RAM
+        ld      sp,hl
+
+        ld      hl,-maxx * 2 * 3	; create buffer 1 on stack
+        add     hl,sp
+        ld      sp,hl
+		ld      (w_sline+3),hl
+
 		ld (ws1),hl
 		ld b,a
 		set 2,c ; semafor = 1
@@ -48,12 +59,15 @@
 		bit 2,c
 		jr z,w_sline
 		res 2,c
-		ld hl,sline2
+.sl2ptr
+;		ld hl,sline2
+		ld hl,0
 		ld (ws1),hl
 		jr inner_loop
 .w_sline
 		set 2,c
-		ld hl,sline
+;		ld hl,sline
+		ld hl,0
 		ld (ws1),hl
 
 .inner_loop
