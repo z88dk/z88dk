@@ -6,7 +6,7 @@ SECTION code_fp_math48
 PUBLIC am48_hypot
 
 EXTERN am48_fabs, am48_dequate, am48_dmul, am48_dadd, am48_sqrt
-EXTERN am48_dpopret, am48_dconst_1, am48_ddiv
+EXTERN am48_dconst_1, am48_ddiv
 
 am48_hypot:
 
@@ -60,28 +60,29 @@ cmp_mag:
    cp 21
    ret nc                      ; if |y| << |x| return |x|
 
-   ; sqrt(x*x+y*y) = y*sqrt(x*x/(y*y)+1)
+   exx
 
-   call am48_ddiv              ; AC'= x/y
-   ret c                       ; if overflow
+   ; AC = largest magnitude x
+   ; AC'= y
+
+   ; sqrt(x*x+y*y) = x*sqrt(y*y/(x*x)+1)
+
+   call am48_ddiv              ; AC'= y/x
    
    push bc
    push de
-   push hl                     ; push y
+   push hl                     ; push x
    
    exx
    
-   call am48_dequate           ; AC = AC'= x/y
-   
-   call am48_dmul              ; AC'= (x/y)*(x/y)
-   jp c, am48_dpopret          ; if overflow
-
+   call am48_dequate           ; AC = AC'= y/x
+   call am48_dmul              ; AC'= (y/x)*(y/x)
    call am48_dconst_1          ; AC = 1
-   call am48_dadd              ; AC'= x*x/(y*y)+1
+   call am48_dadd              ; AC'= y*y/(x*x)+1
    call am48_sqrt              ; AC'= sqrt(...)
    
    pop hl
    pop de
-   pop bc                      ; AC = y
+   pop bc                      ; AC = x
 
    jp am48_dmul
