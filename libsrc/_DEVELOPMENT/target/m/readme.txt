@@ -1,6 +1,4 @@
 
-Generates the floating point library "m"
+Generates the floating point library "m" using math48.
 
--lm
-
-Connects the compilers to the math48 float package.
+On the compile line "-lm" will connect the compilers to math48.
