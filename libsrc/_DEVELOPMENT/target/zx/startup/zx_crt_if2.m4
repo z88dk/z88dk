@@ -365,9 +365,21 @@ SECTION code_crt_return
    
    include "../clib_close.inc"
 
-   ; restart program
+   ; terminate
+   
+IF __crt_enable_restart
+
+   ; restart the program
    
    jp __Start
+
+ELSE
+
+   ; loop forever
+   
+   jr ASMPC
+
+ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
