@@ -214,19 +214,23 @@ SECTION code_fcntl
 
 PUBLIC zx_01_output_fzx
 
-EXTERN ITERM_MSG_BELL, STDIO_MSG_ICTL, OTERM_MSG_PSCROLL
+EXTERN ITERM_MSG_BELL, STDIO_MSG_ICTL, OTERM_MSG_PSCROLL, ITERM_MSG_READLINE_END
 EXTERN OTERM_MSG_CLS, OTERM_MSG_PAUSE, OTERM_MSG_BELL, OTERM_MSG_SCROLL
 
 EXTERN console_01_output_terminal_fzx, zx_01_output_fzx_oterm_msg_scroll
 EXTERN zx_01_output_char_32_iterm_msg_bell, zx_01_output_fzx_stdio_msg_ictl
 EXTERN zx_01_output_fzx_oterm_msg_pscroll, zx_01_output_fzx_oterm_msg_cls
 EXTERN zx_01_output_char_32_oterm_msg_pause, zx_01_output_char_32_oterm_msg_bell
+EXTERN zx_01_output_fzx_iterm_msg_readline_end
 
 zx_01_output_fzx:
 
    cp ITERM_MSG_BELL
    jp z, zx_01_output_char_32_iterm_msg_bell
    
+   cp ITERM_MSG_READLINE_END
+   jp z, zx_01_output_fzx_iterm_msg_readline_end
+
    cp STDIO_MSG_ICTL
    jp z, zx_01_output_fzx_stdio_msg_ictl
 
