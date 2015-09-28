@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.24 2015-09-25 14:56:01 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.25 2015-09-28 09:25:25 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -65,7 +65,11 @@ IF !DEFINED_nogfxglobals
 ENDIF
 
 
+IF (startup=2)
+        org     32768
+ELSE
         org     $100
+ENDIF
 
 ;----------------------
 ; Execution starts here
@@ -74,7 +78,7 @@ start:
 IF !DEFINED_noprotectmsdos
 	defb	$eb,$04		;DOS protection... JMPS LABE
 	ex	de,hl
-	jp	begin
+	jp	begin-start+$100
 	defb	$b4,$09		;DOS protection... MOV AH,9
 	defb	$ba
 	defw	dosmessage	;DOS protection... MOV DX,OFFSET dosmessage
@@ -87,6 +91,20 @@ dosmessage:
 
 begin:
 ENDIF
+
+IF (startup=2)
+	EXTERN ASMTAIL
+		ld	hl,$100
+		ld  de,32768
+		ld  bc,ASMTAIL-32768
+		ldir
+IF !DEFINED_noprotectmsdos
+		jp  32768+14
+ELSE
+		jp  32768+14-start+begin
+ENDIF
+ENDIF
+
 	ld      (start1+1),sp	;Save entry stack
 	ld	a,($80)		;byte count of length of args
 	inc	a		;we can use this since args are space separated
