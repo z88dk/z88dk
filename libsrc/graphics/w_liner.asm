@@ -8,7 +8,7 @@
         EXTERN    coords
 
 ;
-;       $Id: w_liner.asm,v 1.6 2015-09-29 12:20:34 stefano Exp $
+;       $Id: w_liner.asm,v 1.7 2015-09-29 15:36:04 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -106,10 +106,14 @@
                         jr     nz,noteq
                         ld     a,l
                         cp     e
-						jr      z, exit_draw        ; if x+y = 0 then return
+;						jr      z, exit_draw        ; if x+y = 0 then return
 .noteq
                         jr      c, x_smaller_y         ; if x > y
-                                
+								ld a,d
+								or e
+								or h
+								or l
+								jr      z, exit_draw        ; if x+y = 0 then return	                                
                                                             ;       else
                                 exx
                                 ld      b,d                     ;       ddx = direc_x
