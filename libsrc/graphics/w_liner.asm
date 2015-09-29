@@ -3,12 +3,12 @@
         PUBLIC    w_line_r
         
         EXTERN     line
-        EXTERN     l_cmp
+        ;EXTERN     l_cmp
 
         EXTERN    coords
 
 ;
-;       $Id: w_liner.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
+;       $Id: w_liner.asm,v 1.6 2015-09-29 12:20:34 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -21,8 +21,8 @@
 ;       Design & programming by Gunther Strube, Copyright (C) InterLogic 1995
 ;
 ;
-;       The (COORDS+0)  pointer contains the current y coordinate, (COORDS+2) the
-;       current x coordinate. The main program should reset the (COORDS) variables
+;       The (COORDS+0)  pointer contains the current x coordinate, (COORDS+2) the
+;       current y coordinate. The main program should set the (COORDS) variables
 ;       before using line drawing.
 ;
 ;       The routine checks the range of specified coordinates which is the
@@ -95,9 +95,9 @@
                 pop     de                      ; DE = absolute y distance
                 pop     hl                      ; HL = absolute x distance
 
-                        ;call    l_cmp           ; CMP HL,DE  [carry set => DE < HL]
-                        
-                        ld	a,d
+                        ;call    l_cmp           ; CMP HL,DE  [carry set if DE < HL]
+
+                        ld	a,d					; CMP DE,HL  [carry set if HL < DE]
                         add	$80
                         ld	b,a
                         ld	a,h
@@ -106,17 +106,10 @@
                         jr     nz,noteq
                         ld     a,l
                         cp     e
+						jr      z, exit_draw        ; if x+y = 0 then return
 .noteq
                         jr      c, x_smaller_y         ; if x > y
                                 
-                                ld	b,h
-                                ld	c,l
-                                add     hl,de
-                                ld	a,h
-                                or	l
-                                ld	h,b
-                                ld	l,c
-                                jr      z, exit_draw        ; if x+y = 0 then return
                                                             ;       else
                                 exx
                                 ld      b,d                     ;       ddx = direc_x
@@ -146,61 +139,33 @@
 
                         add     iy,de                   ; i = i + DE
                         
-                        push   iy
-                        pop    bc
-                        
-                        ; add b,$80
-                        
-                        ld a,b
-                        add a,$80
-                        ld b,a
-                        
-                        ld     a,h		; cmp hl,iy
-                        add    $80
-                        cp     b
-                        jp     nz,noteq2
-                        ld     a,l
-                        cp     c
-
-                        ;push	hl
-                        ;push	iy
-                        ;pop	bc
-                        ;or	a
-                        ;sbc	hl,bc	; is carry set ?
-                        ;pop	hl
-                        
+                        ; cmp hl,iy						
+						ld	a,iyh
+						add	$80
+						ld	b,a
+						ld	a,h
+						add	$80
+						cp	b
+						ret	nz
+						ld	a,l
+						cp	iyl
 
 .noteq2
-                        jp      nc, i_greater           ;       if i < HL
+                        jp      c, i_greater           ;       if i < HL
 
                                 exx
                                 push    bc                      ;       inx = ddx: iny = ddy
                                 exx
                                 jp      check_plot      ;       else
 .i_greater
-                                push	hl	; (IY)  i = i - HL
-                                ld	b,h
-                                ld	c,l
-                                xor	a
-                                ld	h,a
-                                ld	l,a
-                                sbc	hl,bc	; hl=-hl
-                                ld	b,h
-                                ld	c,l
-                                add	iy,bc	; IY=IY+(-HL)
-                                pop	hl
-
-                                ;push	hl
-                                ;push	iy
-                                ;pop	hl
-                                ;pop	bc
-                                ;push	bc
-                                ;and	a
-                                ;sbc	hl,bc
-                                ;push	hl
-                                ;pop	iy
-                                ;pop	hl
-
+								
+								ld a,iyl                        ; (IY)  i = i - HL
+								sub   l
+								ld iyl,a
+								ld a,iyh
+								sbc	a,h
+								ld iyh,a
+								
                                 exx
                                 push    de                      ;       inx = direc_x: iny = direc_y
                                 exx                     ;       endif
