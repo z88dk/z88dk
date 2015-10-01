@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.100 2015-09-21 04:17:37 aralbrec Exp $
+ *      $Id: zcc.c,v 1.101 2015-10-01 23:47:08 aralbrec Exp $
  */
 
 
@@ -487,7 +487,7 @@ int linkthem(char *linker)
     linkargs_mangle(linkargs);
     len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s", 
             linker, 
-            c_linkopts, 
+            (c_nostdlib == 0) ? c_linkopts : " -a -m -Mo ", 
             linker_output_separate_arg ? " " : "", 
             outputfile,
             lateassemble ? asmline : "",
