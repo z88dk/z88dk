@@ -17,7 +17,7 @@ PUBLIC asm_close, asm0_close
 
 EXTERN __fcntl_fdstruct_from_fd_2, __fcntl_fdchain_descend
 EXTERN error_mc, error_znc, __stdio_heap, asm_heap_free
-EXTERN STDIO_MSG_CLOS, l_jpix
+EXTERN STDIO_MSG_CLOS, STDIO_MSG_FLSH, l_jpix
 
 asm_close:
 
@@ -132,7 +132,10 @@ close_fdstruct:
    ;  c = ref_count_adj
    
    push bc                     ; save ref_count_adj
-      
+
+   ld a,STDIO_MSG_FLSH
+   call l_jpix
+
    ld a,STDIO_MSG_CLOS
    call l_jpix
    
