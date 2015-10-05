@@ -8,20 +8,20 @@
  *	Some more floating point routines..I can't remember
  *	why these are separated out..
  *
- *	$Id: float.h,v 1.11 2013-05-01 08:22:56 stefano Exp $
+ *	$Id: float.h,v 1.12 2015-10-05 05:46:39 stefano Exp $
  */
 
 
 
-extern double __LIB__ fmod(double,double);
-extern double __LIB__ amax(double,double);
-extern double __LIB__ fabs(double);
-extern double __LIB__ amin(double,double);
-extern double __LIB__ floor(double);
-extern double __LIB__ ceil(double);
-extern double __LIB__ fprand(void); /* Generic only */
+extern double __LIB__ fmod(double,double) __SMALLCDECL;
+extern double __LIB__ amax(double,double) __SMALLCDECL;
+extern double __LIB__ fabs(double) __SMALLCDECL;
+extern double __LIB__ amin(double,double) __SMALLCDECL;
+extern double __LIB__ floor(double) __SMALLCDECL;
+extern double __LIB__ ceil(double) __SMALLCDECL;
+extern double __LIB__ fprand(void) __SMALLCDECL; /* Generic only */
 extern double __LIB__ __FASTCALL__ zfloat(int);
-extern int __LIB__ fpseed(double);    /* Seed random number */
+extern int __LIB__ fpseed(double) __SMALLCDECL;    /* Seed random number */
 
 
 #define fmax(x,y) amax(x,y)
@@ -37,15 +37,15 @@ extern int __LIB__ fpseed(double);    /* Seed random number */
 
 #ifndef _HAVE_ATOF_
 #define _HAVE_ATOF_
-extern double __LIB__ atof(char *);
+extern double __LIB__ atof(char *) __SMALLCDECL;
 #endif
 
 
 /*
  * Some support routines for floating point printf
  */
-extern void __LIB__ ftoa(double, int, char *);
-extern void __LIB__ ftoe(double, int, char *);
+extern void __LIB__ ftoa(double, int, char *) __SMALLCDECL;
+extern void __LIB__ ftoe(double, int, char *) __SMALLCDECL;
 
 /* 
  * Some constant nicked from /usr/include/math.h

@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.22 2015-01-26 19:17:46 dom Exp $
+ *      $Id: primary.c,v 1.23 2015-10-05 05:46:39 stefano Exp $
  */
 
 
@@ -780,7 +780,8 @@ int docast(LVALUE *lval,char df)
         default:
             debug(DBG_CAST2,"Converting %d to %d",lval->ptr_type,lval->c_vtype);
             lval->ptr_type=lval->c_vtype;
-	    if (lval->symbol == NULL ) 
+	    /* commented out, it broke the "*(double *)var" recasting in vfprintf_fp 
+		if (lval->symbol == NULL )  */
               lval->symbol=dummy_sym[(int)lval->c_vtype];
             temp_type=( ( lval->c_flags&FARPTR ) ? CPTR : CINT );
             if (df) force(temp_type,lval->val_type,0,0,0);
