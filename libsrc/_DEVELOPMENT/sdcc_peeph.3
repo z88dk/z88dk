@@ -7919,6 +7919,292 @@ replace restart {
 	; peephole z88dk-225b
 } if notUsed('bc'), notUsed('hl'), notUsed('a')
 
+replace restart {
+	ld	hl,#%1
+	ld	a,(hl)
+	ld	(#%2 + 0),a
+	inc	hl
+	ld	a,(hl)
+	ld	(#%2 + 1),a
+	inc	hl
+	ld	a,(hl)
+	ld	(#%2 + 2),a
+	inc	hl
+	ld	a,(hl)
+	ld	(#%2 + 3),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	hl,(#%1 + 2)
+	ld	(#%2 + 2),hl
+	; peephole z88dk-226a
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	ld	hl,#%1
+	ld	a,(hl)
+	ld	(#%2 + 0),a
+	inc	hl
+	ld	a,(hl)
+	ld	(#%2 + 1),a
+	inc	hl
+	ld	a,(hl)
+	ld	(#%2 + 2),a
+	inc	hl
+	ld	a,(hl)
+	ld	(#%2 + 3),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	hl,(#%1 + 2)
+	ld	(#%2 + 2),hl
+	ld	hl,#%1 + 3
+	; peephole z88dk-226b
+} if notUsed('a')
+
+replace restart {
+	ld	hl,#%1
+	ld	a,(hl)
+	ld	(#%2 + 0),a
+	inc	hl
+	ld	a,(hl)
+	ld	(#%2 + 1),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	; peephole z88dk-226c
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	ld	hl,#%1
+	ld	a,(hl)
+	ld	(#%2 + 0),a
+	inc	hl
+	ld	a,(hl)
+	ld	(#%2 + 1),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	hl,#%1 + 1
+	; peephole z88dk-226d
+} if notUsed('a')
+
+replace restart {
+	ld	de,#%1
+	ld	a,(de)
+	ld	hl,#%2
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	hl,(#%1 + 2)
+	ld	(#%2 + 2),hl
+	; peephole z88dk-227a
+} if notUsed('a'), notUsed('de'), notUsed('hl')
+
+replace restart {
+	ld	de,#%1
+	ld	a,(de)
+	ld	hl,#%2
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	hl,(#%1 + 2)
+	ld	(#%2 + 2),hl
+	ld	hl,#%2 + 3
+	; peephole z88dk-227b
+} if notUsed('a'), notUsed('de')
+
+replace restart {
+	ld	de,#%1
+	ld	a,(de)
+	ld	hl,#%2
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	hl,(#%1 + 2)
+	ld	(#%2 + 2),hl
+	ld	de,#%1 + 3
+	; peephole z88dk-227c
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	ld	de,#%1
+	ld	a,(de)
+	ld	hl,#%2
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	hl,(#%1 + 2)
+	ld	(#%2 + 2),hl
+	ld	de,#%1 + 3
+	ld	hl,#%2 + 3
+	; peephole z88dk-227d
+} if notUsed('a')
+
+replace restart {
+	ld	de,#%1
+	ld	a,(de)
+	ld	hl,#%2
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	; peephole z88dk-227e
+} if notUsed('a'), notUsed('de'), notUsed('hl')
+
+replace restart {
+	ld	de,#%1
+	ld	a,(de)
+	ld	hl,#%2
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	hl,#%2 + 1
+	; peephole z88dk-227f
+} if notUsed('a'), notUsed('de')
+
+replace restart {
+	ld	de,#%1
+	ld	a,(de)
+	ld	hl,#%2
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	de,#%1 + 1
+	; peephole z88dk-227g
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	ld	de,#%1
+	ld	a,(de)
+	ld	hl,#%2
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+	ld	(hl),a
+} by {
+	ld	hl,(#%1)
+	ld	(#%2),hl
+	ld	de,#%1 + 1
+	ld	hl,#%2 + 1
+	; peephole z88dk-227h
+} if notUsed('a')
+
+replace restart {
+	ld	hl,#%1
+	ld	(hl),a
+} by {
+	ld	(#%1),a
+	; peephole z88dk-227i
+} if notUsed('hl')
+
+replace restart {
+	ld	bc,(#%1)
+	ld	b,%2
+} by {
+	ld	a,(#%1)
+	ld	c,a
+	ld	b,%2
+	; peephole z88dk-228a
+} if notUsed('a')
+
+replace restart {
+	ld	de,(#%1)
+	ld	d,%2
+} by {
+	ld	a,(#%1)
+	ld	e,a
+	ld	d,%2
+	; peephole z88dk-228b
+} if notUsed('a')
+
+replace restart {
+	ld	a,#<(%1)
+	ld	hl,#%2
+	add	a, (hl)
+	ld	%3,a
+	ld	a,#>(%1)
+	adc	a, #0x00
+	ld	%4,a
+} by {
+	ld	a,(#%2)
+	add	a,#<(%1)
+	ld	%3,a
+	ld	a,#>(%1)
+	adc	a, #0x00
+	ld	%4,a
+	; peephole z88dk-229
+} if notUsed('hl')
+
+
+
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
