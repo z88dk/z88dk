@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ftoa.asm,v 1.5 2015-08-10 08:52:13 stefano Exp $
+;       $Id: ftoa.asm,v 1.6 2015-10-05 16:10:38 stefano Exp $
 ;
 ;
 ;void ftoa(x,prec,str)   -> Convert double to string
@@ -34,14 +34,17 @@ ENDIF
 		inc	hl
 		ld	d,(hl)
 
+
+if TINYMODE
+		; we cut away the precision handling
+		inc	hl
+		inc	hl
+ELSE
 		inc	hl
 		ld	c,(hl)		; precision
 		inc	hl
 		ld	b,(hl)
-
-if TINYMODE
-		; we cut away the precision handling
-ELSE
+		
 		push	hl
 		push	de
 		call	ZXFP_STACK_BC	; put precision on stack
