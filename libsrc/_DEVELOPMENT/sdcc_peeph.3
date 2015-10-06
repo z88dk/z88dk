@@ -8191,14 +8191,14 @@ replace restart {
 	add	a, (hl)
 	ld	%3,a
 	ld	a,#>(%1)
-	adc	a, #0x00
+	adc	a, %5
 	ld	%4,a
 } by {
 	ld	a,(#%2)
 	add	a,#<(%1)
 	ld	%3,a
 	ld	a,#>(%1)
-	adc	a, #0x00
+	adc	a, %5
 	ld	%4,a
 	; peephole z88dk-229
 } if notUsed('hl')
