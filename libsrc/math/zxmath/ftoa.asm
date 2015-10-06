@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ftoa.asm,v 1.6 2015-10-05 16:10:38 stefano Exp $
+;       $Id: ftoa.asm,v 1.7 2015-10-06 06:34:14 stefano Exp $
 ;
 ;
 ;void ftoa(x,prec,str)   -> Convert double to string
@@ -35,8 +35,9 @@ ENDIF
 		ld	d,(hl)
 
 
-if TINYMODE
+IF TINYMODE
 		; we cut away the precision handling
+		ld iy,$4000		; STACK-BC would fix IY already
 		inc	hl
 		inc	hl
 ELSE
@@ -47,6 +48,9 @@ ELSE
 		
 		push	hl
 		push	de
+IF FORlambda
+		ld iy,$4000
+ENDIF
 		call	ZXFP_STACK_BC	; put precision on stack
 		pop	de
 		pop	hl
@@ -73,7 +77,7 @@ ENDIF
 		; load in the FP calculator stack	
 		call	ZXFP_STK_STORE
 
-if TINYMODE
+IF TINYMODE
 		; we cut away the precision handling
 ELSE
 		rst	ZXFP_BEGIN_CALC	; truncating stuff...
@@ -83,13 +87,12 @@ ELSE
 		defb	ZXFP_EXCHANGE
 		defb	ZXFP_TO_POWER
 
-		defb	ZXFP_ST_MEM_0
+		defb	ZXFP_ST_MEM_1
 		
-		defb	ZXFP_EXCHANGE
-		defb	ZXFP_MULTIPLY	; 
+		defb	ZXFP_MULTIPLY
 		defb	ZXFP_INT	; INT (x*(10^precision))
 		
-		defb	ZXFP_GET_MEM_0
+		defb	ZXFP_GET_MEM_1
 IF FORlambda
 		defb	ZXFP_DIVISION + 128	; total/(10^precision)
 ELSE
@@ -112,11 +115,12 @@ ENDIF
 		rst	ZXFP_BEGIN_CALC	; Do the string conversion !
 IF FORlambda
 		defb	ZXFP_STRS + 128
+		rst	ZXFP_STK_FETCH
 ELSE
 		defb	ZXFP_STRS
 		defb	ZXFP_END_CALC
-ENDIF
 		call	ZXFP_STK_FETCH
+ENDIF
 
 		ex	de,hl
 		pop	de
@@ -130,8 +134,8 @@ ELSE
 
 .nloop
 		ld	a,(hl)
-		cp	$76
-		jr	nz,fcont
+		cp	$40			; printable char or end of string ?
+		jr	c,fcont
 		xor	a
 		ld	(de),a
 		ret
