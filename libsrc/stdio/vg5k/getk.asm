@@ -6,12 +6,12 @@
 ;    Jun 2014 - Joaopa
 ;
 ;
-;    $Id: getk.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
+;    $Id: getk.asm,v 1.4 2015-10-08 17:12:22 stefano Exp $
 ;
     PUBLIC    getk
 	ld	ix,$47FA
 .getk
-	call	12983
+	call $aa
 
 	ld	l,a
 	ld	h,0

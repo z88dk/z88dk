@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.30 2014-12-17 07:08:35 dom Exp $
+# $Id: Makefile,v 1.31 2015-10-08 17:12:22 stefano Exp $
 
 include	../Make.config
 
@@ -51,7 +51,7 @@ lvg5k:
 	zcc +test	$(CFLAGS) -DVZ bit_frequency.c
 	zcc +test	$(CFLAGS) -DVZ bit_play.c
 
-	# This piezo speaker has to be accessed	in its own way
+# This piezo speaker has to be accessed	in its own way
 lvz:
 	zcc +test	$(CFLAGS) -DVZ bit_frequency.c
 	zcc +test	$(CFLAGS) -DVZ bit_play.c

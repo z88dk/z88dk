@@ -6,7 +6,7 @@
 ;    Jun. 2014 -Joaopa, Stefano Bodrato
 ;
 ;
-;    $Id: fputc_cons.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
+;    $Id: fputc_cons.asm,v 1.4 2015-10-08 17:12:22 stefano Exp $
 ;
 
     PUBLIC  fputc_cons
@@ -18,8 +18,8 @@
 	DEFC	COLUMNS=40
 
 
-	.ROW	defb	0
-.COLUMN	defb	0
+defc ROW	= $4805
+defc COLUMN	= $4806
 
 
 .fputc_cons
@@ -32,26 +32,25 @@
 
 	cp	12		; CLS
 	jr	nz,nocls
-	
 	ld  hl,0
 	ld  (ROW),hl
+	ld  bc,ROWS*COLUMNS
+.cls
 	push hl
 	ld	a,32
 	ld	(charput+1),a
-	ld  bc,ROWS*COLUMNS
 .clsloop
 	push bc
 	call	charput
 	pop bc
 	dec bc
-	ld	a,b
+	ld  a,b
 	or  c
-	jr nz,clsloop
+	jr  nz,clsloop
 	pop hl
 	ld  (ROW),hl
+	ret
 .nocls
-
-
 
 .doput
 	cp  13		; CR?
@@ -101,7 +100,7 @@
 
 .charput
 	ld	 a,0
-	
+
 	
 	push af
 	ld	 a,(COLUMN)
@@ -113,16 +112,28 @@
 	
 	ld	e,7		; white on black
 	
-	ld	 a,(ROW)
-	and  a
-	jr   z,zrow
-	add  7
-.zrow
-	ld   h,a
 	ld	 a,(COLUMN)
 	ld   l,a
-
-	call   $92
+	ld	 a,(ROW)
+	ld   h,a
+	push hl
+	and  a
+	jr   z,zrow
+	add  7		; bias the default scroll register settings and so on..
+.zrow
+	ld   h,a
+	push de
+	ld   a,64
+	or   e
+	ld   e,a
+	call   $92		; direct video access
+	pop de
+	pop  hl
+	push de
+	call   $a7		; video buffer access (keep a copy to scroll)
+	pop  de
+	ld   a,d
+	ld   (hl),a
 
 	ld	 a,(COLUMN)
 	inc	 a
@@ -133,4 +144,46 @@
 
 
 scrolluptxt:
-	ret
+	ld  hl,0
+	ld  (ROW),hl
+	ld  bc,ROWS*COLUMNS-COLUMNS
+.scloop
+	ld	 a,(COLUMN)
+	ld   l,a
+	ld	 a,(ROW)
+	inc  a
+	ld   h,a
+	push bc
+	call   $a7
+	ld  a,(hl)
+	ld	(charput+1),a
+	call	charput
+	pop bc
+	dec bc
+	ld	a,b
+	or  c
+	jr nz,scloop
+	ld bc,COLUMNS-1
+	ld hl,(ROW)
+	jp cls
+
+
+;	cp	12		; CLS
+;	jp  z,$9e
+
+;	ld  hl,charput
+;	call  $36aa
+
+
+;sync:
+;	ei
+;	rst 38h
+;	rst 38h
+;	rst 38h
+;	rst 38h
+;	rst 38h
+;	rst 38h
+;	rst 38h
+;	rst 38h
+;	di
+;	ret

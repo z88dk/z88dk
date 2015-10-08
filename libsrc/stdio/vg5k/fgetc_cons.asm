@@ -3,27 +3,22 @@
 ;
 ;    getkey() Wait for keypress
 ;
-;    Jun 2014 - Joaopa
+;    Jun 2014 - Joaopa + Stefano Bodrato
 ;
 ;
-;    $Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
+;    $Id: fgetc_cons.asm,v 1.4 2015-10-08 17:12:22 stefano Exp $
 ;
     PUBLIC    fgetc_cons
 	ld	ix,$47FA
 .fgetc_cons
-;	push	bc
-;	push	de
-;	push	af
+	call $aa
+	and a
+	jr nz,fgetc_cons
+
 .wait_for_a_press
-	call	12983
-;	ld	(hl), a
-	;jr	c, wait_for_a_press
+	call $aa
 	and	a
 	jr	z, wait_for_a_press	
-
-;	pop	af
-;	pop	de
-;	pop	bc
 
 	ld	l,a
 	ld	h,0
