@@ -536,7 +536,7 @@ EXTERN SP1V_TEMP_IX, SP1V_TEMP_AF
 .inybounds
 
    exx
-   ld a,-SP1V_DISPWIDTH*9
+   ld a,#(-SP1V_DISPWIDTH*9) & 0xff
    add a,e
    ld e,a
 

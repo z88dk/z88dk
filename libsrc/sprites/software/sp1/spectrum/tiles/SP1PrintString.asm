@@ -663,7 +663,7 @@ EXTERN SP1V_UPDATELISTT, SP1V_DISPWIDTH
 .inybounds
 
    exx
-   ld a,-SP1V_DISPWIDTH*10
+   ld a,#(-SP1V_DISPWIDTH*10) & 0xff
    add a,e
    ld e,a
    ld a,-SP1V_DISPWIDTH*10/256
