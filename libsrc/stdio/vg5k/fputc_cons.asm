@@ -6,7 +6,7 @@
 ;    Jun. 2014 -Joaopa, Stefano Bodrato
 ;
 ;
-;    $Id: fputc_cons.asm,v 1.4 2015-10-08 17:12:22 stefano Exp $
+;    $Id: fputc_cons.asm,v 1.5 2015-10-09 13:02:43 stefano Exp $
 ;
 
     PUBLIC  fputc_cons
@@ -123,7 +123,7 @@ defc COLUMN	= $4806
 .zrow
 	ld   h,a
 	push de
-	ld   a,64
+	ld   a,64+128
 	or   e
 	ld   e,a
 	call   $92		; direct video access

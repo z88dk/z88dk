@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.224 2015-09-25 14:56:01 stefano Exp $
+# $Id: Makefile,v 1.225 2015-10-09 13:02:42 stefano Exp $
 
 
 include Make.config
@@ -1561,6 +1561,7 @@ vg5k_clib.lib:
 	@echo ''
 	@echo '--- Building Philips VG5000 Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
@@ -1576,6 +1577,7 @@ vg5kansi_clib.lib:
 	@echo ''
 	@echo '--- Building Philips VG5000 ANSI Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
