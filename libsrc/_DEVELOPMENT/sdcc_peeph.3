@@ -8235,7 +8235,48 @@ replace restart {
 	; peephole z88dk-230b
 } if notUsed('hl')
 
+replace restart {
+	ld	%2,l
+	ld	%3,h
+	ld	hl,#%1
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%3
+} by {
+	ld	(#%1),hl
+	; peephole z88dk-231a
+} if notUsed(%2), notUsed(%3), notUsed('hl')
 
+replace restart {
+	ld	%2,l
+	ld	%3,h
+	ld	hl,#%1
+	ld	(hl),%2
+	inc	hl
+	ld	(hl),%3
+} by {
+	ld	(#%1),hl
+	ld	hl,#%1 + 1
+	; peephole z88dk-231b
+} if notUsed(%2), notUsed(%3)
+
+replace restart {
+	ld	hl,#%1
+	ld	de,#%2
+} by {
+	ld	de,#%2
+	ld	hl,#%1
+	; peephole z88dk-500a
+}
+
+replace restart {
+	ld	hl,#%1 + %3
+	ld	de,#%2
+} by {
+	ld	de,#%2
+	ld	hl,#%1 + %3
+	; peephole z88dk-500b
+}
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
