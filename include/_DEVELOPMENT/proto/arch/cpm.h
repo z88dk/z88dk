@@ -42,7 +42,7 @@ include(__link__.m4)
 
 // CPM FILE CONTROL BLOCK (FCB)
 
-struct fcb
+struct cpm_fcb
 {
     unsigned char    drive;        // drive code
     unsigned char    name[8];      // file name
@@ -58,13 +58,13 @@ struct fcb
     unsigned char    uid;          // user id belonging to this file
 };
 
-__DPROTO(int,,bdos,unsigned int func,unsigned int arg)
-__DPROTO(int,,bdos_hl,unsigned int func,unsigned int arg)
+__DPROTO(int,,cpm_bdos,unsigned int func,unsigned int arg)
+__DPROTO(int,,cpm_bdos_hl,unsigned int func,unsigned int arg)
 
-#define getuid()   bdos_hl(CPM_SUID, 0xFF)
-#define setuid(u)  bdos(CPM_SUID, u)
+#define getuid()   cpm_bdos_hl(CPM_SUID, 0xFF)
+#define setuid(u)  cpm_bdos(CPM_SUID, u)
 
-__DPROTO(unsigned long,,_get_offset_,void *p)
-__DPROTO(void,,_set_offset_,void *p,unsigned long offset)
+__DPROTO(unsigned long,,cpm_get_offset,void *p)
+__DPROTO(void,,cpm_set_offset,void *p,unsigned long offset)
 
 #endif

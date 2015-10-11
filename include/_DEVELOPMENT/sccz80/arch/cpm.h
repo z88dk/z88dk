@@ -44,7 +44,7 @@
 
 // CPM FILE CONTROL BLOCK (FCB)
 
-struct fcb
+struct cpm_fcb
 {
     unsigned char    drive;        // drive code
     unsigned char    name[8];      // file name
@@ -60,26 +60,26 @@ struct fcb
     unsigned char    uid;          // user id belonging to this file
 };
 
-extern int __LIB__ bdos(unsigned int func,unsigned int arg);
-extern int __LIB__ __CALLEE__ bdos_callee(unsigned int func,unsigned int arg);
-#define bdos(a,b) bdos_callee(a,b)
+extern int __LIB__ cpm_bdos(unsigned int func,unsigned int arg);
+extern int __LIB__ __CALLEE__ cpm_bdos_callee(unsigned int func,unsigned int arg);
+#define cpm_bdos(a,b) cpm_bdos_callee(a,b)
 
 
-extern int __LIB__ bdoshl(unsigned int func,unsigned int arg);
-extern int __LIB__ __CALLEE__ bdoshl_callee(unsigned int func,unsigned int arg);
-#define bdoshl(a,b) bdoshl_callee(a,b)
+extern int __LIB__ cpm_bdos_hl(unsigned int func,unsigned int arg);
+extern int __LIB__ __CALLEE__ cpm_bdos_hl_callee(unsigned int func,unsigned int arg);
+#define cpm_bdos_hl(a,b) cpm_bdos_hl_callee(a,b)
 
 
 
-#define getuid()   bdoshl(CPM_SUID, 0xFF)
-#define setuid(u)  bdoshl(CPM_SUID, u)
+#define getuid()   cpm_bdos_hl(CPM_SUID, 0xFF)
+#define setuid(u)  cpm_bdos(CPM_SUID, u)
 
-extern unsigned long __LIB__ __FASTCALL__ _get_offset_(void *p);
+extern unsigned long __LIB__ __FASTCALL__ cpm_get_offset(void *p);
 
 
-extern void __LIB__ _set_offset_(void *p,unsigned long offset);
-extern void __LIB__ __CALLEE__ _set_offset__callee(void *p,unsigned long offset);
-#define _set_offset_(a,b) _set_offset__callee(a,b)
+extern void __LIB__ cpm_set_offset(void *p,unsigned long offset);
+extern void __LIB__ __CALLEE__ cpm_set_offset_callee(void *p,unsigned long offset);
+#define cpm_set_offset(a,b) cpm_set_offset_callee(a,b)
 
 
 
