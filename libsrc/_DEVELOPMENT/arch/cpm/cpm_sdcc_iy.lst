@@ -1,0 +1,9 @@
+@arch/cpm/cpm_asm.lst
+arch/cpm/c/sdcc_iy/cpm_bdos
+arch/cpm/c/sdcc_iy/cpm_bdos_callee
+arch/cpm/c/sdcc_iy/cpm_bdos_hl
+arch/cpm/c/sdcc_iy/cpm_bdos_hl_callee
+arch/cpm/c/sdcc_iy/cpm_get_offset
+arch/cpm/c/sdcc_iy/cpm_get_offset_fastcall
+arch/cpm/c/sdcc_iy/cpm_set_offset
+arch/cpm/c/sdcc_iy/cpm_set_offset_callee
