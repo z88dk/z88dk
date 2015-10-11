@@ -59,10 +59,10 @@ struct fcb
 };
 
 __DPROTO(int,,bdos,unsigned int func,unsigned int arg)
-__DPROTO(int,,bdoshl,unsigned int func,unsigned int arg)
+__DPROTO(int,,bdos_hl,unsigned int func,unsigned int arg)
 
-#define getuid()   bdoshl(CPM_SUID, 0xFF)
-#define setuid(u)  bdoshl(CPM_SUID, u)
+#define getuid()   bdos_hl(CPM_SUID, 0xFF)
+#define setuid(u)  bdos(CPM_SUID, u)
 
 __DPROTO(unsigned long,,_get_offset_,void *p)
 __DPROTO(void,,_set_offset_,void *p,unsigned long offset)
