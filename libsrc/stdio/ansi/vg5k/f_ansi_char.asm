@@ -11,7 +11,7 @@
 ;	Stefano Bodrato - 2014
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2015-10-12 19:47:47 stefano Exp $
 ;
 
 	PUBLIC	ansi_CHAR
@@ -30,18 +30,33 @@
 
 .ansi_CHAR
 
-	ld	 d,a
+	ld    d,a
 	
-	ld	a,(vg5k_attr)
-	ld	e,a		; white on black
+	ld    a,(vg5k_attr)
+	ld    e,a		; white on black
 	
-	ld	 a,(ansi_ROW)
-	and  a
-	jr   z,zrow
-	add  7
+	ld    a,(ansi_COLUMN)
+	ld    l,a
+	ld    a,(ansi_ROW)	
+	ld    h,a
+	push  hl
+	and   a
+	jr    z,zrow
+	add   7
 .zrow
-	ld   h,a
-	ld	 a,(ansi_COLUMN)
-	ld   l,a
-
-	jp   $92
+	ld    h,a
+	push  de
+	call  $92
+	pop   de
+	pop   hl
+	
+	push  de
+	call  $a7		; video buffer access (keep a copy to scroll)
+	pop   de
+	
+	ld   a,d
+	ld   (hl),a
+	inc  hl
+	ld   a,e
+	ld   (hl),a
+	ret
