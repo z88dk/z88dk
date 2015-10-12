@@ -1,0 +1,6 @@
+@input/cpm/input_asm.lst
+input/cpm/c/sccz80/in_inkey
+input/cpm/c/sccz80/in_pause
+input/cpm/c/sccz80/in_test_key
+input/cpm/c/sccz80/in_wait_key
+input/cpm/c/sccz80/in_wait_nokey

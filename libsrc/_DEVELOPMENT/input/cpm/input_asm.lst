@@ -1,0 +1,5 @@
+input/cpm/z80/asm_in_inkey
+input/cpm/z80/asm_in_pause
+input/cpm/z80/asm_in_test_key
+input/cpm/z80/asm_in_wait_key
+input/cpm/z80/asm_in_wait_nokey

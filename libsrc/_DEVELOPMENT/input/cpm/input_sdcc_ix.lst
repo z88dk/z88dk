@@ -1,0 +1,7 @@
+@input/cpm/input_asm.lst
+input/cpm/c/sdcc_ix/in_inkey
+input/cpm/c/sdcc_ix/in_pause
+input/cpm/c/sdcc_ix/in_pause_fastcall
+input/cpm/c/sdcc_ix/in_test_key
+input/cpm/c/sdcc_ix/in_wait_key
+input/cpm/c/sdcc_ix/in_wait_nokey
