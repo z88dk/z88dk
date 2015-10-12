@@ -16,6 +16,7 @@ SECTION code_input
 
 PUBLIC asm_in_inkey
 
+EXTERN __CPM_DCIO, __CPM_ICON
 EXTERN asm_cpm_bdos, error_znc
 
 asm_in_inkey:
@@ -37,13 +38,13 @@ asm_in_inkey:
    ;
    ; uses : potentially all (ix, iy saved for sdcc)
 
-   ld c,0x0b                   ; get console status
+   ld c,__CPM_ICON             ; get console status
    call asm_cpm_bdos
 
    or a
    jp z, error_znc             ; if no key is ready
    
-   ld c,0x06                   ; direct console i/o
+   ld c,__CPM_DCIO             ; direct console i/o
    ld e,0xff                   ; input
    call asm_cpm_bdos
    

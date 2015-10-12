@@ -13,6 +13,7 @@ SECTION code_input
 
 PUBLIC asm_in_test_key
 
+EXTERN __CPM_ICON
 EXTERN asm_cpm_bdos
 
 asm_in_test_key:
@@ -22,7 +23,7 @@ asm_in_test_key:
    ;
    ; uses : potentially all (ix, iy saved for sdcc)
    
-   ld c,0x0b                   ; get console status
+   ld c,__CPM_ICON             ; get console status
    call asm_cpm_bdos
    
    or a
