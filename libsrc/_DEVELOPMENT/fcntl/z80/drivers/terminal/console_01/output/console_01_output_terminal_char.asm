@@ -71,7 +71,7 @@
 ;
 ;   * OTERM_MSG_PRINTC
 ;
-;     enter  :  c = ascii code >= 32
+;     enter  :  c = ascii code
 ;               b = 255 if not supplied by iterm
 ;               l = absolute x coordinate
 ;               h = absolute y coordinate

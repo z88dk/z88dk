@@ -65,10 +65,7 @@ console_01_output_char_oterm_msg_putc_raw:
    cp CHAR_LF
    jp z, console_01_output_char_proc_linefeed
 
-   cp 32
-   jr nc, putchar_ok           ; if printable
-
-   ld c,'?'
+   ; do not check for control chars here
 
 putchar_ok:
    
@@ -130,7 +127,7 @@ y_ok:
    add hl,de                   ; hl = absolute character coords
    
    ; b = parameter
-   ; c = ascii code >= 32
+   ; c = ascii code
    ; l = absolute x coord
    ; h = absolute y coord
    
