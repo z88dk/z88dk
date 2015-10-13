@@ -453,7 +453,14 @@ device_ok:
 state_machine_2:
 
    cp CHAR_CR
-   jr z, sm_crlf               ; possible crlf
+   jr nz, not_cr
+
+   bit 0,(ix+7)
+   ret z                       ; if not doing crlf conversion
+
+   jr state_machine_1          ; reject CR
+
+not_cr:
    
    or a                        ; indicate no error
    
@@ -475,30 +482,6 @@ sm_cook:
 
    or a                        ; indicate no error
    ret
-
-sm_crlf:
-
-   bit 0,(ix+7)
-   ret z                       ; if not doing crlf conversion
-   
-   ld a,ITERM_MSG_GETC
-   call l_jpix                 ; get char from device
-   
-   jr c, sm_crlf_exit          ; if device error
-
-   cp CHAR_LF
-   ret z                       ; crlf sequence seen, return lf
-   
-   or a                        ; indicate no error
-   call sm_exit                ; store this char as pending char
-   
-   ld a,CHAR_CR                ; output solo cr
-   ret
-
-sm_crlf_exit:
-
-   ld a,CHAR_CR                ; store CR as pending char
-   jr sm_exit
 
 sm_capslock:
 
