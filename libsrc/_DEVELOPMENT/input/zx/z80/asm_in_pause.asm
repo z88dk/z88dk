@@ -42,23 +42,25 @@ asm_in_pause:
       
 pause_loop:
 
-   ; wait for one millisecond then sample the keyboard
+   ; sample keyboard
    
-   ld hl,+(__clock_freq / 1000) - 72 - 27
+   call asm_in_test_key
+   
+   scf
+   jr nz, exit                 ; if key is pressed
+
+   ; wait for one millisecond
+   
+   ld hl,+(__clock_freq / 1000) - 74 - 29
    call asm_z80_delay_tstate
    
    dec de
    
    ld a,d
    or e
-   jr z, exit                  ; if time is up
-
-   call asm_in_test_key
-   jr z, pause_loop
+   jr nz, pause_loop
    
-   ; key is pressed
-   
-   scf                         ; indicate early exit
+   ; time is up
 
 exit:
 
