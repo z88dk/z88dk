@@ -8,37 +8,26 @@
 ; (1 = BW mode, 2 = four color mode, 3 = 16 color mode)
 ;
 ;
-;	$Id: gr_defmod.asm,v 1.1 2015-09-25 14:56:02 stefano Exp $
+;	$Id: gr_defmod.asm,v 1.2 2015-10-13 19:56:30 stefano Exp $
 ;
 
 PUBLIC gr_defmod
+PUBLIC gr_currentmode
 
+gr_currentmode:
+		defb 16
 
 gr_defmod:
-	LD A,L
-	LD D,0
-	LD E,A
-	ADD A
-	ADD A
-	ADD A
-	ADD A
+	ld a,l
+	and 3
+	sla a
+	sla a
+	sla a
+	sla a
+	ld (gr_currentmode),a
+	
+	DI
 	LD ($F04D),A	; Video port: copy of the value sent to the video port address 0CH
-	OUT ($0C),A		; graphics mode
-	LD HL,$FF87
-	ADD HL,DE
-	LD A,(HL)
-	LD ($FF82),A
-	LD A,($F050)	; Left Margin width
-	LD HL,($F04E)	; Maximum number of points on a line
-	DEC E
-	JR NZ,3
-	ADD A
-	ADD HL,HL
-	INC E
-	DEC E
-	JR NZ,2
-	ADD A
-	ADD HL,HL
-	LD ($FF72),A
-	LD ($FF70),HL
+	OUT   ($0C),A		; set graphics mode
+	EI
 	RET

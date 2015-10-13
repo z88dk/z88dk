@@ -17,3 +17,5 @@ graphics/tiki100/w_putsprite
 graphics/tiki100/w_stencil_render
 graphics/draw_profile
 graphics/w_pointxy
+tiki100/gr_setpalette
+tiki100/gr_defmod
