@@ -39,13 +39,21 @@
 ;   Read the keyboard device and return the char read.
 ;
 ;   enter:  ix = & FDSTRUCT.JP
-; 
 ;    exit:  a = char after character set translation
 ;           carry set on error with hl=0 (err) or -1 (eof)
-;
 ; can use:  af, bc, de, hl
 ;
 ; If this message is implemented, the driver is complete.
+;
+; * ITERM_MSG_INTERRUPT
+;
+;   Indicate whether character should interrupt line editing.
+;
+;   enter:  c = ascii code
+;    exit:  carry reset indicates line editing should terminate
+; can use:  af, bc, de, hl
+;
+; Default is to return with carry set.
 ;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; MESSAGES GENERATED FOR CONSOLE_01_OUTPUT_TERMINAL
@@ -178,17 +186,20 @@ PUBLIC console_01_input_terminal
 
 EXTERN STDIO_MSG_GETC, STDIO_MSG_EATC, STDIO_MSG_READ
 EXTERN STDIO_MSG_SEEK, STDIO_MSG_FLSH, STDIO_MSG_ICTL
-EXTERN STDIO_MSG_CLOS
+EXTERN STDIO_MSG_CLOS, ITERM_MSG_INTERRUPT
 
 EXTERN console_01_input_stdio_msg_getc, console_01_input_stdio_msg_eatc
 EXTERN console_01_input_stdio_msg_read, console_01_input_stdio_msg_seek
 EXTERN console_01_input_stdio_msg_flsh, console_01_input_stdio_msg_ictl
-EXTERN error_znc, error_enotsup_zc
+EXTERN error_zc, error_znc, error_enotsup_zc
 
 console_01_input_terminal:
 
    cp STDIO_MSG_GETC
    jp z, console_01_input_stdio_msg_getc
+   
+   cp ITERM_MSG_INTERRUPT
+   jp z, error_zc              ; line editing is not interrupted
    
    cp STDIO_MSG_EATC
    jp z, console_01_input_stdio_msg_eatc
