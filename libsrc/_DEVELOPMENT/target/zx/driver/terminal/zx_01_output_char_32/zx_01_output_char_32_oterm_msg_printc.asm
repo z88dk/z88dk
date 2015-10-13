@@ -7,11 +7,19 @@ EXTERN asm_zx_cyx2saddr, asm_zx_saddr2aaddr
 
 zx_01_output_char_32_oterm_msg_printc:
 
-   ;   enter  :  c = ascii code >= 32
+   ;   enter  :  c = ascii code
    ;             b = parameter (foreground colour, 255 if none specified)
    ;             l = absolute x coordinate
    ;             h = absolute y coordinate
    ;   can use:  af, bc, de, hl
+
+   ld a,c
+   cp 32
+   jr nc, code_ok
+   
+   ld c,'?'
+
+code_ok:
 
    call asm_zx_cyx2saddr
    ex de,hl                    ; de = screen address

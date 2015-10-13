@@ -7,7 +7,7 @@ EXTERN asm_zx_cyx2saddr, asm_zx_saddr2aaddr
 
 zx_01_output_char_64_oterm_msg_printc:
 
-   ;   enter  :  c = ascii code >= 32
+   ;   enter  :  c = ascii code
    ;             b = parameter (currently unused)
    ;             l = absolute x coordinate
    ;             h = absolute y coordinate
@@ -15,7 +15,15 @@ zx_01_output_char_64_oterm_msg_printc:
 
    ;  djm 3/3/2000
    ;  adapted aralbrec 12/2014
+
+   ld a,c
+   cp 32
+   jr nc, code_ok
    
+   ld c,'?'
+
+code_ok:
+
    srl l                       ; column /= 2
    
    ld b,$0f
