@@ -25,7 +25,7 @@ IF __CRTDEF = 0
 
    defc TAR__crt_model                 = 0
    
-   defc TAR__register_sp               = 0
+   defc TAR__register_sp               = -1
    
    defc TAR__crt_initialize_bss        = 0
    
