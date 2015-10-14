@@ -135,13 +135,16 @@ cpm_01_output_dcio:
    jp z, cpm_01_output_dcio_iterm_msg_bs
    
    cp ITERM_MSG_PRINT_CURSOR
-   jp z, cpm_01_output_dcio_iterm_msg_putc
-   
+   ret z
+;;;   jp z, cpm_01_output_dcio_iterm_msg_putc
+
    cp ITERM_MSG_ERASE_CURSOR
-   jp z, cpm_01_output_dcio_iterm_msg_bs
+   ret z
+;;;   jp z, cpm_01_output_dcio_iterm_msg_bs
 
    cp ITERM_MSG_ERASE_CURSOR_PWD
-   jp z, cpm_01_output_dcio_iterm_msg_bs
+   ret z
+;;;   jp z, cpm_01_output_dcio_iterm_msg_bs
 
    cp OTERM_MSG_BELL
    jp z, cpm_01_output_dcio_oterm_msg_bell
