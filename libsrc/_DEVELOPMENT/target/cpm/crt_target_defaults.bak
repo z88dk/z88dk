@@ -21,13 +21,13 @@ IF __CRTDEF = 0
 
    defc TAR__crt_org_code              = 256
    defc TAR__crt_org_data              = 0
-   defc TAR__crt_org_bss               = 0
+   defc TAR__crt_org_bss               = -1
 
    defc TAR__crt_model                 = 0
    
    defc TAR__register_sp               = -1
    
-   defc TAR__crt_initialize_bss        = 0
+   defc TAR__crt_initialize_bss        = 1
    
    defc TAR__crt_enable_commandline    = 1
    defc TAR__crt_enable_restart        = 0
