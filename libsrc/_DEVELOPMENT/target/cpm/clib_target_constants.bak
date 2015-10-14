@@ -24,6 +24,7 @@
    defc __CPM_DCIO = 6               ; direct console I/O
    defc __CPM_GIOB = 7               ; get I/O byte
    defc __CPM_SIOB = 8               ; set I/O byte
+   defc __CPM_PRST = 9               ; print string
    defc __CPM_RCOB = 10              ; read console buffered
    defc __CPM_ICON = 11              ; interrogate console ready
    defc __CPM_VERS = 12              ; return version number
