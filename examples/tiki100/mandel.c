@@ -20,17 +20,20 @@ int xmax,ymax;
 int k;
 float l,m,n,o,p;
 
-char palette[]={2,5,8,12,17,22,32,45,67,134,178,210,220,240,245,248};
+char palette[]={0,0x25,0x4a,0x6f,0x24,0x48,0x6c,0x90,0xb4,0xd8,0xfc,3,0x1c,0xE0};
 
 void main()
 {
-
-	//	Initialize the 16 color video mode and its palette
+	//  The standard clg() will set to 1024 pixel mode and BW palette, but we can change it
+	clg();
+	//	Set the 16 color 256 pixel video mode
 	gr_defmod(3);
+	// The default palette is 4 colors only, but we can wait the cycling effect to show a full palette
 	gr_setpalette(16,palette);
 
 	xmax=255;
 	ymax=255;
+
 	
 	a=-2.0; b=2.0;
 	c=a; d=b;
@@ -54,31 +57,32 @@ l110:	     k++;
 			m=2.0*l*m+j;
 			l=p;
 			n=l*l; o=m*m;
-
-			//printf ("%f ",e);
 			
 			if ((n+o)<e) goto l110;
 
-				if (k&0)
-					plot(x*4,y);
+				/* Trick to plot in color with the BW function */
 				if (k&1)
-					plot(x*4+1,y);
+					plot(x*4,y);
 				if (k&2)
-					plot(x*4+2,y);
+					plot(x*4+1,y);
 				if (k&4)
+					plot(x*4+2,y);
+				if (k&8)
 					plot(x*4+3,y);
 
 	     }
 	  }
 	}
-
-	/* color cycling until RETURN is pressed */
+	  
+	/* Color cycling until RETURN is pressed */
+	k=0;
 	while (getk()!=13) {
 		x=palette[0];
-		for (k=0; k<15; k++)
-			palette[k]=palette[k+1];
-		palette[15]=x;
-		gr_setpalette(16,palette);
+		for (x=0; x<16; x++)
+			palette[x]=x+k;
+		for (y=0; y<20; y++)
+			gr_setpalette(16,palette);
+		k++;
 	}
 
 }
