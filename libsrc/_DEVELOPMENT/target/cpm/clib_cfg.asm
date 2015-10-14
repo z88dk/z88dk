@@ -227,7 +227,7 @@ ENDIF
 
 defc CHAR_BS     = 8
 defc CHAR_ESC    = 27
-defc CHAR_CAPS   = 255
+defc CHAR_CAPS   = 6
 defc CHAR_BELL   = 7
 defc CHAR_CTRL_C = 3
 defc CHAR_CTRL_D = 4
@@ -248,6 +248,7 @@ defc CHAR_PASSWORD  = '*'
 ; Note the bit assignments are the same as for scanf.
 
 defc __CLIB_OPT_PRINTF = $3fffff
+;;defc __CLIB_OPT_PRINTF = $4000201
 
 ; bit 0 =  $      01 = enable %d
 ; bit 1 =  $      02 = enable %u
