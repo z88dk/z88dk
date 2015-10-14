@@ -87,7 +87,7 @@ define(`m4_cpm_01_input_kbd_dcio',dnl
       ; heap header
       
       defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
-      defw `eval($4 + 41)'
+      defw `eval($4 + 34)'
       defw ifelse(__I_FCNTL_NUM_HEAP,0,0,__i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP))
    
    __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
