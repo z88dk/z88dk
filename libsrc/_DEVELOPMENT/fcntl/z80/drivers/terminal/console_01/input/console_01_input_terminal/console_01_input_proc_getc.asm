@@ -340,7 +340,7 @@ put_raw:
    call l_jpix
 
    pop bc
-   jr nc, readline_done        ; if interrupting char received
+   jr nc, interrupt_received
 
    ld a,b
    push af
@@ -375,6 +375,11 @@ readline_error:
    
    pop hl                      ; hl = 0 or -1
    ret
+
+interrupt_received:
+
+   set 0,(ix+6)                ; place device in error state
+   jr readline_done
 
 edit_buff_params:
 
