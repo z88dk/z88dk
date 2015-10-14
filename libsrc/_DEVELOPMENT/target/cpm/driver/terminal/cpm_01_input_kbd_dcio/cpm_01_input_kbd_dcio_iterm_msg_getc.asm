@@ -5,6 +5,7 @@ SECTION code_fcntl
 
 PUBLIC cpm_01_input_kbd_dcio_iterm_msg_getc
 
+EXTERN __CPM_DCIO
 EXTERN asm_cpm_bdos_alt, error_mc
 
 cpm_01_input_kbd_dcio_iterm_msg_getc:
@@ -16,7 +17,7 @@ cpm_01_input_kbd_dcio_iterm_msg_getc:
    ;
    ;  can use : af, bc, de, hl
 
-   ld c,0x06                   ; direct console i/o
+   ld c,__CPM_DCIO             ; direct console i/o
    ld e,0xff                   ; input
    
    call asm_cpm_bdos_alt       ; exx and ix/iy preserved

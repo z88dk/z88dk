@@ -6,6 +6,7 @@ SECTION code_fcntl
 PUBLIC cpm_01_output_dcio_oterm_msg_putc
 PUBLIC cpm_01_output_dcio_oterm_msg_putc_raw
 
+EXTERN __CPM_DCIO
 EXTERN l_jpix, asm_cpm_bdos_alt
 EXTERN OTERM_MSG_TTY, OTERM_MSG_BELL
 
@@ -54,7 +55,7 @@ cpm_01_output_dcio_oterm_msg_putc_raw:
 
    ; send cr+lf
    
-   ld c,0x06                   ; bdos direct i/o
+   ld c,__CPM_DCIO             ; bdos direct i/o
    ld e,13
    call asm_cpm_bdos_alt
    
@@ -65,5 +66,5 @@ crlf_done:
    ; c = ascii code
 
    ld e,c
-   ld c,0x06                   ; bdos direct i/o
+   ld c,__CPM_DCIO             ; bdos direct i/o
    jp asm_cpm_bdos_alt
