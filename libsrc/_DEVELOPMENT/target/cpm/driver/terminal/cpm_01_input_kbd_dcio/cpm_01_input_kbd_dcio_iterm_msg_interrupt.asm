@@ -5,7 +5,7 @@ SECTION code_fcntl
 
 PUBLIC cpm_01_input_kbd_dcio_iterm_msg_interrupt
 
-EXTERN error_znc
+EXTERN asm_exit
 
 cpm_01_input_kbd_dcio_iterm_msg_interrupt:
 
@@ -18,7 +18,12 @@ cpm_01_input_kbd_dcio_iterm_msg_interrupt:
    ld a,c
    
    cp CHAR_CTRL_C
-   jp z, error_znc             ; ctrl-c causes early exit
    
    scf
-   ret
+   ret nz                      ; continue editing if not ctrl-c
+   
+   ; users expect ctrl-c to terminate the program
+   ; terminating the edit would return with carry reset
+   
+   ld hl,-1                    ; return status
+   jp asm_exit                 ; will also close files
