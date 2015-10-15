@@ -41,8 +41,6 @@ l_command_line_parse:
    ld c,a
    ld b,a                      ; bc'= chars remaining in command line
    
-   push hl                     ; command line on stack is zero terminated
-   
    exx
 
    ex de,hl
@@ -158,6 +156,8 @@ generate_argv:
    ld l,b
    ld h,b                      ; hl = 0
    
+   push hl                     ; argv[argc] = NULL
+   
    ld a,c
    or a
    jr z, push_argc_argv        ; if argc == 0
@@ -165,7 +165,9 @@ generate_argv:
    add hl,sp
 
    ld e,l
-   ld d,h                      ; de = & first word
+   ld d,h
+   inc de
+   inc de                      ; de = & first word
    
    sbc hl,bc
    sbc hl,bc                   ; hl = char **argv
