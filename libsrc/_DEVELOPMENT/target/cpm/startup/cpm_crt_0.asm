@@ -608,9 +608,28 @@ SECTION CODE
 
 PUBLIC __Start, __Exit
 
-EXTERN _main
+EXTERN _main, asm_cpm_bdos
 
 __Start:
+
+   ; disqualify 8080
+   
+   ld a,2
+   inc a
+   jp po, z80_present
+
+   ld c,__CPM_PRST
+   ld de,disqualify_s
+   
+   call asm_cpm_bdos
+   rst 0
+
+disqualify_s:
+
+   defm "z80 only"
+   defb 13,10,'$'
+
+z80_present:
 
    ; locate stack
 
@@ -628,19 +647,27 @@ __Start:
    
    IF __crt_enable_commandline = 1
       
-      IF __SDCC | __SDCC_IX | __SDCC_IY
-      
-         ld hl,0
-         push hl               ; char *argv[]
-         push hl               ; int argc
+      ; copy command line words from default dma buffer to stack
+      ; must do this as the default dma buffer may be used by the cpm program
 
-      ELSE
-            
-         ld hl,0
-         push hl               ; int argc
-         push hl               ; char *argv[]
-   
-      ENDIF
+      EXTERN l_command_line_parse
+
+      ld hl,0x0080             ; default dma buffer
+
+      ld c,(hl)
+      ld b,h                   ; bc = length of command line
+
+      inc l
+      ex de,hl
+
+      call l_command_line_parse
+      
+      ;; when file io is ready
+      ;;
+      ;; exx
+      ;; ld a,b
+      ;; or c
+      ;; call nz, l_command_line_redirect
    
    ENDIF
    
