@@ -1,9 +1,9 @@
 /*
- *      Short program to create a C128 header
+ *      Short program to adjust a filename
  *
  *      This simply adds in the length of the program
  *      
- *      $Id: newext.c,v 1.1 2014-09-19 16:12:01 stefano Exp $
+ *      $Id: newext.c,v 1.2 2015-10-16 13:55:25 stefano Exp $
  */
 
 
@@ -14,15 +14,17 @@
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char             *extfile      = ".COM";
+static char             *suffixchar   = ".";
 static char              help         = 0;
 
 
 /* Options that are available for this module */
 option_t newext_options[] = {
-    { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
-    { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
-    { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
-    { 'e', "ext",      "Extension of output file",   OPT_STR,   &extfile },
+    { 'h', "help",      "Display this help",          OPT_BOOL,  &help},
+    { 'b', "binfile",   "Linked binary file",         OPT_STR,   &binname },
+    { 'o', "output",    "Name of output file",        OPT_STR,   &outfile },
+    { 'e', "ext",       "Extension of output file",   OPT_STR,   &extfile },
+    { 's', "delimiter", "Suffix delimiter, '.' by default.",   OPT_STR,   &suffixchar },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -48,9 +50,14 @@ int newext_exec(char *target)
         return -1;
     }
 
+    if ( strlen(suffixchar) != 1 ) {
+        fprintf(stderr,"Wrong value for suffix delimiter.\n");
+        myexit(NULL,1);
+    }
+
     if ( outfile == NULL ) {
         strcpy(filename,binname);
-        suffix_change(filename,extfile);
+        any_suffix_change(filename, extfile, suffixchar[0]);
     } else {
         strcpy(filename,outfile);
     }

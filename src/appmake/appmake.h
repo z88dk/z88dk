@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.46 2015-01-28 04:32:59 aralbrec Exp $
+ *   $Id: appmake.h,v 1.47 2015-10-16 13:55:25 stefano Exp $
  */
 
 
@@ -250,6 +250,10 @@ struct {
       "Philips P2000 MicroCassette to CAS format conversion",
       NULL,
       p2000_exec,    &p2000_options },
+/*    { "bin7420",   "c7420",    "(C) 2015 Stefano Bodrato",
+      "Philips Videopac C7420 cassette format conversion",
+      NULL,
+      c7420_exec,    &c7420_options },*/
     { "bin2pkg",    "residos",       "(C) 2014 Dominic Morris",
       "Create the header for a Residos package",
       NULL,
@@ -360,6 +364,7 @@ struct {
 extern void         exit_log(int code, char *fmt, ...);
 extern long         parameter_search(char *filen, char *ext,char *target);
 extern void         suffix_change(char *name, char *suffix);
+extern void         any_suffix_change(char *name, char *suffix, char schar);
 
 extern void         writebyte(unsigned char c, FILE *fp);
 extern void         writeword(unsigned int i, FILE *fp);

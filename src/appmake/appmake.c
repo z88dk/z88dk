@@ -12,7 +12,7 @@
 
  * 
 
- *   $Id: appmake.c,v 1.26 2015-01-28 04:32:59 aralbrec Exp $
+ *   $Id: appmake.c,v 1.27 2015-10-16 13:55:25 stefano Exp $
 
  */
 
@@ -382,6 +382,31 @@ void suffix_change(char *name, char *suffix)
 
 }
 
+/* Variant for the eneric change suffix routine */
+
+void any_suffix_change(char *name, char *suffix, char suffix_delimiter)
+
+{
+
+    int     j;
+
+    j = strlen(name)-1;
+
+    while ( j && name[j-1] != suffix_delimiter ) 
+
+        j--;
+
+
+
+    if ( j)
+
+        name[j-1]='\0';
+
+
+
+    strcat(name,suffix);
+
+}
 
 
 /* Print the overall usage information */
