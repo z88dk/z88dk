@@ -9,14 +9,16 @@ l_command_line_parse:
    
    ; * parse command line into words
    ; * copy words to stack
-   ; * create argc, argv on the stack
+   ; * return argc and argv
    ; * return pointer to redirector string if '>' or '<' found
    ; * command line length capped at 128 chars
    ;
    ; enter : de = & command line
    ;         bc = number of chars in command line
    ;
-   ; exit  : stack = int argc, char *argv[]
+   ; exit  : bc    = int argc
+   ;         hl    = char *argv[]
+   ;         de    = address of empty string
    ;         hl'   = & redirector in command line (0 if none)
    ;         bc'   = num chars remaining in redirector (0 if none)
    ;
@@ -158,37 +160,26 @@ generate_argv:
    
    push hl                     ; argv[argc] = NULL
    
-   ld a,c
-   or a
-   jr z, push_argc_argv        ; if argc == 0
-   
-   add hl,sp
+   add hl,sp                   ; hl = & argv[argc]
 
    ld e,l
    ld d,h
-   inc de
-   inc de                      ; de = & first word
+
+   ld a,c
+   or a
+   jp z, l_jpix                ; if argc == 0 return
    
    sbc hl,bc
    sbc hl,bc                   ; hl = char **argv
    
    ld sp,hl                    ; make space for char **argv
-   
-push_argc_argv:
 
-   IF __SDCC | __SDCC_IX | __SDCC_IY
-   
-      push hl                  ; char *argv[]
-      push bc                  ; int argc
-   
-   ELSE
-   
-      push bc                  ; int argc
-      push hl                  ; char *argv[]
-   
-   ENDIF
-   
-   jp z, l_jpix                ; return if argc == 0
+   push bc                     ; save argc
+   push de                     ; save address empty string
+   push hl                     ; save argv
+
+   inc de
+   inc de                      ; de = & first word
 
    ; fill in char *argv[]
 
@@ -207,7 +198,15 @@ store_argv:
    inc hl
    
    dec c
-   jp z, l_jpix                ; return if no more words
+   jr nz, next_word_loop       ; if more words
+
+done:
+
+   pop hl                      ; hl = char **argv
+   pop de                      ; de = address empty string
+   pop bc                      ; bc = int argc
+   
+   jp (ix)                     ; return
    
 next_word_loop:
 
