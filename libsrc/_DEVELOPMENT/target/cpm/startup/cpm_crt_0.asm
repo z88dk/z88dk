@@ -662,6 +662,34 @@ z80_present:
 
       call l_command_line_parse
       
+      ; cpm does not supply program name in command line
+      ; so place empty string in argv[0] instead
+      
+      ; bc = int argc
+      ; hl = char *argv[]
+      ; de = & empty string
+      ; bc'= num chars in redirector
+      ; hl'= char *redirector
+      
+      push de                  ; empty string added to front of argv[]
+      
+      dec hl
+      dec hl                   ; char *argv[] adjusted to include empty string at index 0
+      
+      inc c                    ; argc++
+      
+      IF __SDCC | __SDCC_IX | __SDCC_IY
+      
+         push hl               ; argv
+         push bc               ; argc
+      
+      ELSE
+      
+         push bc               ; argc
+         push hl               ; argv
+      
+      ENDIF
+
       ;; when file io is ready
       ;;
       ;; exx
