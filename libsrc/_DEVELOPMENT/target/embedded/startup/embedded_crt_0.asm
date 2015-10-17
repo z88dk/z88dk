@@ -497,19 +497,25 @@ __Start:
    ; commandline
    
    IF __crt_enable_commandline = 1
+   
+      ld hl,0
+      push hl                  ; argv[argc] = NULL
+      add hl,sp
+      push hl                  ; argv[0] = ""
+      dec hl
+      dec hl                   ; hl = argv
+      ld bc,1                  ; bc = argc = 1
       
       IF __SDCC | __SDCC_IX | __SDCC_IY
-      
-         ld hl,0
-         push hl               ; char *argv[]
-         push hl               ; int argc
 
+         push hl               ; argv
+         push bc               ; argc
+      
       ELSE
-            
-         ld hl,0
-         push hl               ; int argc
-         push hl               ; char *argv[]
-   
+      
+         push bc               ; argc
+         push hl               ; argv
+
       ENDIF
    
    ENDIF
