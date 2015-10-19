@@ -1,0 +1,6 @@
+fcntl/z80/drivers/character/character_00/input/character_00_input
+fcntl/z80/drivers/character/character_00/input/character_00_input/character_00_input_stdio_msg_eatc
+fcntl/z80/drivers/character/character_00/input/character_00_input/character_00_input_stdio_msg_read
+fcntl/z80/drivers/character/character_00/input/character_00_input/character_00_input_stdio_msg_seek
+fcntl/z80/drivers/character/character_00/input/character_00_input_bin
+fcntl/z80/drivers/character/character_00/input/character_00_input_bin/character_00_input_bin_stdio_msg_read

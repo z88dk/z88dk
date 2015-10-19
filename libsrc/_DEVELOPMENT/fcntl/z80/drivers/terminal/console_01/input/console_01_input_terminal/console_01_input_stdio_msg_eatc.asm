@@ -3,9 +3,9 @@ SECTION code_fcntl
 
 PUBLIC console_01_input_stdio_msg_eatc
 
-EXTERN console_01_input_proc_getc, l_jphl
+EXTERN character_00_input_stdio_msg_eatc
 
-console_01_input_stdio_msg_eatc:
+defc console_01_input_stdio_msg_eatc = character_00_input_stdio_msg_eatc
 
    ; intended only to be called by stdio
    ; as the disqualified char is ungot at FILE* level
@@ -25,42 +25,3 @@ console_01_input_stdio_msg_eatc:
    ; HL'= unchanged by driver
    ; 
    ; carry set on error or eof: if HL=0 stream error, HL=-1 on eof
-
-   ld c,l
-   ld b,h                      ; bc = max number of chars to consume
-   
-   ld de,-1                    ; de = num chars consumed - 1
-
-eatc_loop:
-
-   inc de                      ; de = num chars consumed thus far
-   
-   ; bc = max number of chars to consume
-   ; de = number of chars consumed thus far
-   
-   call console_01_input_proc_getc  ; a = hl = char
-   jr c, eatc_exit                  ; if driver error
-   
-   ld a,b
-   or c
-   jr z, eatc_exit             ; if max num chars reached
-
-   dec bc                      ; num chars remaining -= 1
-   
-   ld a,l                      ; a = char
-   exx
-   call l_jphl                 ; qualify(a)
-   exx
-
-   jr nc, eatc_loop            ; if char was accepted by state machine
-   ccf                         ; rejection by state machine is not an error
-
-eatc_exit:
-
-   ; de = number of chars consumed from the stream
-   ; hl = next unconsumed char
-   
-   ld c,e
-   ld b,d                      ; bc = num chars consumed
-   
-   ret
