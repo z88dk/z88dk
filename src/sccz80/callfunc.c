@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.8 2015-06-24 23:07:28 aralbrec Exp $
+ *      $Id: callfunc.c,v 1.9 2015-10-20 23:53:39 aralbrec Exp $
  */
 
 /*
@@ -193,7 +193,7 @@ void callfunction(SYMBOL *ptr)
 			Zsp+=nargs;
 		} else
 #endif
-            Zsp=modstk(Zsp+nargs,ptr->type != DOUBLE,preserve);      /* clean up arguments - we know what type is MOOK */
+            Zsp = modstk(Zsp+nargs, ptr ? (ptr->type != DOUBLE) : YES, preserve);      /* clean up arguments - we know what type is MOOK */
 	}
 }
 
