@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\c7420.c"
+				>
+			</File>
+			<File
 				RelativePath=".\cpc.c"
 				>
 			</File>

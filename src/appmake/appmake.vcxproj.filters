@@ -35,6 +35,9 @@
     <ClCompile Include="c128.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="c7420.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="cpc.c">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -91,6 +91,7 @@
     <ClCompile Include="appmake.c" />
     <ClCompile Include="aquarius.c" />
     <ClCompile Include="c128.c" />
+    <ClCompile Include="c7420.c" />
     <ClCompile Include="cpc.c" />
     <ClCompile Include="enterprise.c" />
     <ClCompile Include="extract.c" />

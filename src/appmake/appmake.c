@@ -12,7 +12,7 @@
 
  * 
 
- *   $Id: appmake.c,v 1.27 2015-10-16 13:55:25 stefano Exp $
+ *   $Id: appmake.c,v 1.28 2015-10-20 16:48:10 stefano Exp $
 
  */
 
@@ -846,6 +846,24 @@ void writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum)
     writebyte_cksum(i%256,fp,cksum);
 
     writebyte_cksum(i/256,fp,cksum);
+
+}
+
+
+
+void writestring_cksum(char *mystring, FILE *fp, unsigned long *cksum)
+
+{
+
+	int  c;
+
+	
+
+	for (c=0; c < strlen(mystring); c++) {
+
+		writebyte_cksum(mystring[c],fp,cksum);
+
+	}
 
 }
 

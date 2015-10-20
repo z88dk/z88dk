@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.47 2015-10-16 13:55:25 stefano Exp $
+ *   $Id: appmake.h,v 1.48 2015-10-20 16:48:10 stefano Exp $
  */
 
 
@@ -50,6 +50,9 @@ extern option_t  aquarius_options;
 
 extern int       c128_exec(char *target);
 extern option_t  c128_options;
+
+extern int       c7420_exec(char *target);
+extern option_t  c7420_options;
 
 extern int       cpc_exec(char *target);
 extern option_t  cpc_options;
@@ -152,7 +155,6 @@ extern option_t  z88shell_options;
 extern int       zx_exec(char *target);
 extern option_t  zx_options;
 
-
 extern int       zxvgs_exec(char *target);
 extern option_t  zxvgs_options;
 
@@ -250,10 +252,10 @@ struct {
       "Philips P2000 MicroCassette to CAS format conversion",
       NULL,
       p2000_exec,    &p2000_options },
-/*    { "bin7420",   "c7420",    "(C) 2015 Stefano Bodrato",
+    { "bin7420",   "c7420",    "(C) 2015 Stefano Bodrato",
       "Philips Videopac C7420 cassette format conversion",
       NULL,
-      c7420_exec,    &c7420_options },*/
+      c7420_exec,    &c7420_options },
     { "bin2pkg",    "residos",       "(C) 2014 Dominic Morris",
       "Create the header for a Residos package",
       NULL,
@@ -370,14 +372,17 @@ extern void         writebyte(unsigned char c, FILE *fp);
 extern void         writeword(unsigned int i, FILE *fp);
 extern void         writelong(unsigned long i, FILE *fp);
 extern void         writestring(char *mystring, FILE *fp);
+
 extern void         writeword_p(unsigned int i, FILE *fp,unsigned char *p);
 extern void         writebyte_p(unsigned char c, FILE *fp,unsigned char *p);
+
 extern void         writeword_pk(unsigned int i, FILE *fp,unsigned char *p);
 extern void         writebyte_pk(unsigned char c, FILE *fp,unsigned char *p);
 extern void         writestring_pk(char *mystring, FILE *fp,unsigned char *p);
 
 extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *cksum);
 extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);
+extern void         writestring_cksum(char *mystring, FILE *fp, unsigned long *cksum);
 
 extern void			raw2wav(char *rawfilename);
 
