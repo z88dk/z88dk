@@ -8,13 +8,13 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.25 2015-09-28 09:25:25 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.26 2015-10-20 16:51:33 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
 ;
 ;	#pragma output nostreams - No stdio disc files
-;	#pragma output nofileio  - No fileio at all
+;	#pragma output nofileio  - No fileio at all, use in conjunction to "-lndos"
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
 ;	#pragma output noredir   - do not insert the file redirection option while parsing the
 ;	                           command line arguments (useless if "nostreams" is set)
