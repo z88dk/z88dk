@@ -7,6 +7,7 @@ PUBLIC console_01_input_stdio_msg_ictl_0
 EXTERN asm_vioctl_driver, error_einval_zc
 EXTERN l_offset_ix_de, l_setmem_hl
 EXTERN console_01_input_stdio_msg_flsh
+EXTERN console_01_input_proc_reset
 
 console_01_input_stdio_msg_ictl:
 
@@ -69,7 +70,7 @@ console_01_input_stdio_msg_ictl_0:
    ld a,d
    
    dec a
-   jp z, console_01_input_stdio_msg_flsh   ; reset == flush ??
+   jp z, console_01_input_proc_reset   ; clear error and eof
    
    dec a
    jr z, _ioctl_tie

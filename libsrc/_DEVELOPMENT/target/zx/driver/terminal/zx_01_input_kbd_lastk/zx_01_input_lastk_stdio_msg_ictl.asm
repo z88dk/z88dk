@@ -4,7 +4,7 @@ SECTION code_fcntl
 PUBLIC zx_01_input_lastk_stdio_msg_ictl
 
 EXTERN console_01_input_stdio_msg_ictl, console_01_input_stdio_msg_ictl_0
-EXTERN zx_01_input_lastk_proc_lastk_address, zx_01_input_lastk_stdio_msg_flsh
+EXTERN zx_01_input_lastk_proc_lastk_address, console_01_input_proc_reset
 EXTERN error_einval_zc
 
 zx_01_input_lastk_stdio_msg_ictl:
@@ -45,7 +45,7 @@ zx_01_input_lastk_stdio_msg_ictl:
    ld a,d
    
    dec a
-   jp z, zx_01_input_lastk_stdio_msg_flsh
+   jp z, console_01_input_proc_reset
    
    cp $11 - 1
    jp nz, console_01_input_stdio_msg_ictl_0
