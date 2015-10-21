@@ -11,7 +11,7 @@ zx_01_input_lastk_stdio_msg_ictl:
 
    ; ioctl messages understood:
    ;
-   ; defc IOCTL_ITERM_RESET      = $0101
+   ; defc IOCTL_RESET            = $0000
    ; defc IOCTL_ITERM_LASTK      = $1101
    ;
    ; in addition to flags managed by stdio
@@ -33,9 +33,12 @@ zx_01_input_lastk_stdio_msg_ictl:
    or l
    jp z, console_01_input_stdio_msg_ictl
    
+   ld a,e
+   or d
+   jp z, console_01_input_proc_reset   ; if IOCTL_RESET
+   
    ; check the message is specifically for an input terminal
    
-   ld a,e
    and $07
    cp $01                      ; input terminals are type $01
    jp nz, error_einval_zc
@@ -44,10 +47,7 @@ zx_01_input_lastk_stdio_msg_ictl:
    
    ld a,d
    
-   dec a
-   jp z, console_01_input_proc_reset
-   
-   cp $11 - 1
+   cp $11
    jp nz, console_01_input_stdio_msg_ictl_0
    
 _ioctl_iterm_lastk:

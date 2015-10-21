@@ -11,7 +11,7 @@ zx_01_input_inkey_stdio_msg_ictl:
 
    ; ioctl messages understood:
    ;
-   ; defc IOCTL_ITERM_RESET      = $0101
+   ; defc IOCTL_RESET            = $0000
    ; defc IOCTL_ITERM_GET_DELAY  = $1081
    ; defc IOCTL_ITERM_SET_DELAY  = $1001
    ;
@@ -34,9 +34,12 @@ zx_01_input_inkey_stdio_msg_ictl:
    or l
    jp z, console_01_input_stdio_msg_ictl
    
+   ld a,e
+   or d
+   jp z, console_01_input_proc_reset   ; if IOCTL_RESET
+   
    ; check the message is specifically for an input terminal
    
-   ld a,e
    and $07
    cp $01                      ; input terminals are type $01
    jp nz, error_einval_zc
@@ -44,11 +47,8 @@ zx_01_input_inkey_stdio_msg_ictl:
    ; interpret ioctl messages
    
    ld a,d
-   
-   dec a
-   jp z, console_01_input_proc_reset
-   
-   cp $10 - 1
+      
+   cp $10
    jp nz, console_01_input_stdio_msg_ictl_0
    
 _ioctl_getset_delay:
