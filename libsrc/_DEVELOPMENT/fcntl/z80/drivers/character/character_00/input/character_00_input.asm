@@ -17,30 +17,40 @@
 ; MESSAGES CONSUMED FROM STDIO
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
+; * STDIO_MSG_GETC
 ; * STDIO_MSG_EATC
 ; * STDIO_MSG_READ   ;; change to character-at-a-time input
 ; * STDIO_MSG_SEEK   ;; seek forward only else no error
 ; * STDIO_MSG_FLSH   ;; do nothing, return no error
-; * STDIO_MSG_ICTL   ;; do nothing, return enotsup error
+; * STDIO_MSG_ICTL
 ; * STDIO_MSG_CLOS   ;; do nothing, return no error
 ;
 ; Others result in enotsup_zc.
 ;
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; MESSAGES IMPLEMENTED BY DERIVED DRIVERS
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MESSAGES GENERATED FOR DERIVED DRIVERS
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-; * STDIO_MSG_GETC
+; * ICHAR_MSG_GETC
 ;
 ;   Return one character from the input device.
 ;
 ;   enter:  ix = & FDSTRUCT.JP
-;    exit:  hl = char after character set translation
+;    exit:  a = char after character set translation
 ;           carry set on error with hl=0 (err) or -1 (eof)
 ; can use:  af, bc, de, hl
 ;
 ; If this message is implemented, the driver is complete.
 ;
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; IOCTLs UNDERSTOOD BY THIS DRIVER
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; * IOCTL_RESET
+;
+; * IOCTL_ICHAR_CRLF
+;   enable / disable crlf processing
+; 
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -54,13 +64,17 @@ SECTION code_fcntl
 PUBLIC character_00_input
 
 EXTERN STDIO_MSG_EATC, STDIO_MSG_READ, STDIO_MSG_SEEK
-EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS
+EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS, STDIO_MSG_GETC
+EXTERN STDIO_MSG_ICTL
 
-EXTERN character_00_input_stdio_msg_eatc
+EXTERN character_00_input_stdio_msg_getc, character_00_input_stdio_msg_eatc
 EXTERN character_00_input_stdio_msg_read, character_00_input_stdio_msg_seek
-EXTERN error_znc, error_enotsup_zc
+EXTERN character_00_input_stdio_msg_ictl, error_znc, error_enotsup_zc
 
 character_00_input:
+
+   cp STDIO_MSG_GETC
+   jp z, character_00_input_stdio_msg_getc
 
    cp STDIO_MSG_EATC
    jp z, character_00_input_stdio_msg_eatc
@@ -73,6 +87,9 @@ character_00_input:
 
    cp STDIO_MSG_FLSH
    jp z, error_znc             ; do nothing and report no error
+   
+   cp STDIO_MSG_ICTL
+   jp z, character_00_input_stdio_msg_ictl
    
    cp STDIO_MSG_CLOS
    jp z, error_znc             ; do nothing and report no error
