@@ -137,11 +137,14 @@
    
    }
 
-   ; character input messages
+   ; serial character i/o messages
    
    PUBLIC ICHAR_MSG_GETC
+   PUBLIC OCHAR_MSG_PUTC_BIN, OCHAR_MSG_PUTC
    
-   defc ICHAR_MSG_GETC = ITERM_MSG_GETC
+   defc ICHAR_MSG_GETC     = ITERM_MSG_GETC
+   defc OCHAR_MSG_PUTC_BIN = OTERM_MSG_PUTC
+   defc OCHAR_MSG_PUTC     = OTERM_MSG_PRINTC
    
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -230,5 +233,10 @@
    
    defc IOCTL_ICHAR_CRLF = $c103
    
+   ; character_00_output, FILE type = $04
+   
+   PUBLIC IOCTL_OCHAR_CRLF
+   
+   defc IOCTL_OCHAR_CRLF = $c014
 
 ;; end library constants ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
