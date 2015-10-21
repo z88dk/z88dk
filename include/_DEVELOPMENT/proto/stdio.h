@@ -50,13 +50,13 @@ extern FILE *stdin;
 extern FILE *stdout;
 extern FILE *stderr;
 
-IFDEF __CPM
+#ifdef __CPM
 
    extern FILE *stdrdr;
    extern FILE *stdpun;
    extern FILE *stdlst;
 
-ENDIF
+#endif
 
 // FUNCTIONS
 
