@@ -8,3 +8,8 @@ fcntl/z80/drivers/character/character_00/input/character_00_input_bin
 fcntl/z80/drivers/character/character_00/input/character_00_input_bin/character_00_input_bin_stdio_msg_getc
 fcntl/z80/drivers/character/character_00/input/character_00_input_bin/character_00_input_bin_stdio_msg_ictl
 fcntl/z80/drivers/character/character_00/input/character_00_input_bin/character_00_input_bin_stdio_msg_read
+fcntl/z80/drivers/character/character_00/output/character_00_output
+fcntl/z80/drivers/character/character_00/output/character_00_output/character_00_output_ochar_putc_bin
+fcntl/z80/drivers/character/character_00/output/character_00_output/character_00_output_stdio_msg_ictl
+fcntl/z80/drivers/character/character_00/output/character_00_output/character_00_output_stdio_msg_putc
+fcntl/z80/drivers/character/character_00/output/character_00_output/character_00_output_stdio_msg_writ
