@@ -72,13 +72,13 @@ EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS, STDIO_MSG_ICTL
 EXTERN OCHAR_MSG_PUTC_BIN
 
 EXTERN character_00_output_stdio_msg_writ, character_00_output_stdio_msg_putc
-EXTERN character_00_output_ochar_putc_bin, character_00_output_stdio_msg_ictl
+EXTERN character_00_output_ochar_msg_putc_bin, character_00_output_stdio_msg_ictl
 EXTERN error_znc, error_lznc, error_enotsup_zc
 
 character_00_output:
 
    cp OCHAR_MSG_PUTC_BIN
-   jp z, character_00_output_ochar_putc_bin
+   jp z, character_00_output_ochar_msg_putc_bin
 
    cp STDIO_MSG_WRIT
    jp z, character_00_output_stdio_msg_writ
