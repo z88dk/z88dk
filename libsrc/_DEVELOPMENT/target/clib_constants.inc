@@ -137,11 +137,24 @@
    
    }
 
+   ; character input messages
+   
+   PUBLIC ICHAR_MSG_GETC
+   
+   defc ICHAR_MSG_GETC = ITERM_MSG_GETC
+   
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; ioctls
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; bit patterns are significant, consistent with "ioctl.h"
+   
+   ; all devices, FILE type = $00
+   
+   PUBLIC IOCTL_RESET
+   
+   defc IOCTL_RESET = $0000
    
    ; console_01_input_terminal, FILE type = $01
    
@@ -157,10 +170,8 @@
    defc IOCTL_ITERM_CRLF = $c101
    defc IOCTL_ITERM_CURS = $c201
    
-   PUBLIC IOCTL_ITERM_RESET
    PUBLIC IOCTL_ITERM_TIE, IOCTL_ITERM_GET_EDITBUF, IOCTL_ITERM_SET_EDITBUF
    
-   defc IOCTL_ITERM_RESET       = $0101
    defc IOCTL_ITERM_TIE         = $0201
    defc IOCTL_ITERM_GET_EDITBUF = $0381
    defc IOCTL_ITERM_SET_EDITBUF = $0301
@@ -212,5 +223,12 @@
    defc IOCTL_OTERM_FZX_SPACE_EXPAND    = $0e02
    defc IOCTL_OTERM_FZX_GET_FZX_STATE   = $0f82
    defc IOCTL_OTERM_FZX_SET_FZX_STATE   = $0f02
+
+   ; character_00_input, FILE type = $03
+   
+   PUBLIC IOCTL_ICHAR_CRLF
+   
+   defc IOCTL_ICHAR_CRLF = $c103
+   
 
 ;; end library constants ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
