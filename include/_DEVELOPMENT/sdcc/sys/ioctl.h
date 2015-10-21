@@ -7,6 +7,10 @@
 
 #include <stdint.h>
 
+// GENERAL FOR ALL DEVICES
+
+#define IOCTL_RESET                    0x0000
+
 // IOCTL FOR CONSOLE_01 INPUT TERMINALS
 
 #define IOCTL_ITERM_ECHO               0xc081
@@ -17,7 +21,6 @@
 #define IOCTL_ITERM_CRLF               0xc101
 #define IOCTL_ITERM_CURS               0xc201
 
-#define IOCTL_ITERM_RESET              0x0101
 #define IOCTL_ITERM_TIE                0x0201
 #define IOCTL_ITERM_GET_EDITBUF        0x0381
 #define IOCTL_ITERM_SET_EDITBUF        0x0301
@@ -59,6 +62,10 @@
 #define IOCTL_OTERM_FZX_SPACE_EXPAND      0x0e02
 #define IOCTL_OTERM_FZX_GET_FZX_STATE     0x0f82
 #define IOCTL_OTERM_FZX_SET_FZX_STATE     0x0f02
+
+// IOCTL FOR CHARACTER_00 SERIAL INPUT
+
+#define IOCTL_ICHAR_CRLF                  0xc103
 
 // PLATFORM IOCTL
 
