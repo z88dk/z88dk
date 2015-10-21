@@ -39,8 +39,8 @@ qualify:
    ; de = affected flag bits
    ;    = accept $0010, $0020, $0100, $0200
 
-   inc e
-   dec e
+   ld a,e
+   or a
    jr nz, part_2
 
 part_1:
@@ -62,10 +62,10 @@ part_2:
    dec d
    jr nz, reject
    
-   dec d
+   cp $10
    ret z
    
-   dec d
+   cp $20
    ret z
    
    jr reject
