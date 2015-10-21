@@ -38,7 +38,12 @@ reject_cr:
    ld h,0
 
    cp CHAR_CR
-   ret nz
+   jr z, cr
+
+   or a
+   ret
+
+cr:
 
    bit 0,(ix+7)
    ret z                       ; if not doing crlf conversion

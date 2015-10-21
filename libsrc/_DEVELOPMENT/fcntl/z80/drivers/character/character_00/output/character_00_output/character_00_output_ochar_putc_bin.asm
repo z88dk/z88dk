@@ -29,7 +29,9 @@ character_00_output_ochar_msg_putc_bin:
    ; send cr+lf
    
    ld c,13
+   
    call putchar
+   ret c
    
    ld c,10
 
