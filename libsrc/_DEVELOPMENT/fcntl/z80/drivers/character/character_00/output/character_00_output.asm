@@ -48,6 +48,13 @@
 ; If one of these messages are implemented,
 ; the driver is complete.
 ;
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; IOCTLs UNDERSTOOD BY THIS DRIVER
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+; * IOCTL_OCHAR_CRLF
+;   enable / disable crlf processing
+;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
