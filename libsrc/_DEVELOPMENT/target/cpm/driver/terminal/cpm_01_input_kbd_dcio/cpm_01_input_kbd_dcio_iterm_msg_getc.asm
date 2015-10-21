@@ -26,7 +26,7 @@ cpm_01_input_kbd_dcio_iterm_msg_getc:
    jr z, cpm_01_input_kbd_dcio_iterm_msg_getc
    
    ; A = ascii code
-   
+
    cp CHAR_CTRL_Z
    jp z, error_mc              ; generate EOF
 
@@ -50,3 +50,4 @@ change_lf_to_cr:
 
    ld a,CHAR_CR
    ret
+
