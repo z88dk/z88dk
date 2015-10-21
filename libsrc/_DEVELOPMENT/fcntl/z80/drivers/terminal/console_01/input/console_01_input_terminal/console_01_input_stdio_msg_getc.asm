@@ -11,7 +11,7 @@ defc console_01_input_stdio_msg_getc = console_01_input_proc_getc
    ;
    ; exit  : success
    ;
-   ;            hl = char
+   ;            a = hl = char
    ;            carry reset
    ;
    ;         fail
