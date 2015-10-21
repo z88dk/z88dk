@@ -65,6 +65,10 @@ include(__link__.m4)
 
 #define IOCTL_ICHAR_CRLF                  0xc103
 
+// IOCTL FOR CHARACTER_00 SERIAL OUTPUT
+
+#define IOCTL_OCHAR_CRLF                  0xc014
+
 // PLATFORM IOCTL
 
 #ifdef __SPECTRUM
