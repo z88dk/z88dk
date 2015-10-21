@@ -52,6 +52,14 @@ extern FILE *stdin;
 extern FILE *stdout;
 extern FILE *stderr;
 
+IFDEF __CPM
+
+   extern FILE *stdrdr;
+   extern FILE *stdpun;
+   extern FILE *stdlst;
+
+ENDIF
+
 // FUNCTIONS
 
 extern FILE *_fmemopen_(void **bufp,size_t *sizep,char *mode);
