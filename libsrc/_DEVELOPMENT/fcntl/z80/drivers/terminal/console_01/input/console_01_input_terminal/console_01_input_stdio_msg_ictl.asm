@@ -13,7 +13,7 @@ console_01_input_stdio_msg_ictl:
 
    ; ioctl messages understood:
    ;
-   ; defc IOCTL_ITERM_RESET       = $0101
+   ; defc IOCTL_RESET             = $0000
    ; defc IOCTL_ITERM_TIE         = $0201
    ; defc IOCTL_ITERM_GET_EDITBUF = $0381
    ; defc IOCTL_ITERM_SET_EDITBUF = $0301
@@ -56,9 +56,12 @@ console_01_input_stdio_msg_ictl:
 
 _ictl_messages:
 
+   ld a,e
+   or d
+   jp z, console_01_input_proc_reset   ; if IOCTL_RESET
+
    ; check the message is specifically for an input terminal
    
-   ld a,e
    and $07
    cp $01                      ; input terminals are type $01
    jp nz, error_einval_zc
@@ -70,8 +73,6 @@ console_01_input_stdio_msg_ictl_0:
    ld a,d
    
    dec a
-   jp z, console_01_input_proc_reset   ; clear error and eof
-   
    dec a
    jr z, _ioctl_tie
    

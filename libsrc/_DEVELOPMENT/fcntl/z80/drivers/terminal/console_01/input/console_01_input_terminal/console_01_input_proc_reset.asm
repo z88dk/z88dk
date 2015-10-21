@@ -3,12 +3,6 @@ SECTION code_fcntl
 
 PUBLIC console_01_input_proc_reset
 
-console_01_input_proc_reset:
+EXTERN device_reset_error
 
-   ; clear error and eof state bits
-   
-   ld a,(ix+6)
-   and $fc
-   ld (ix+6),a
-   
-   ret
+defc console_01_input_proc_reset = device_reset_error

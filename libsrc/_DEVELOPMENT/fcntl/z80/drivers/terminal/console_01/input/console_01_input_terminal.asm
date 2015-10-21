@@ -136,7 +136,7 @@
 ; IOCTLs UNDERSTOOD BY THIS DRIVER
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;
-; * IOCTL_ITERM_RESET
+; * IOCTL_RESET
 ;
 ; * IOCTL_ITERM_TIE
 ;   Attach input device to a different output terminal (0 to disconnect)
