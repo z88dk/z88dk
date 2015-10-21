@@ -13,6 +13,7 @@ EXTERN ITERM_MSG_INTERRUPT
 EXTERN console_01_input_proc_echo, l_setmem_hl, asm_b_array_clear
 EXTERN console_01_input_proc_oterm, l_inc_sp, l_jpix, l_offset_ix_de
 EXTERN asm_b_array_push_back, asm_b_array_at, asm_toupper, error_zc, error_mc
+EXTERN device_return_error, device_set_error
 
 console_01_input_proc_getc:
 
@@ -446,26 +447,11 @@ state_machine_1:
 
    ld a,(ix+6)
    and $03                     ; check device state
-   jr z, device_ok
-
-   dec a
-   jp z, error_zc              ; indicate error
-   jp error_mc                 ; indicate eof
-
-device_ok:
+   jp nz, device_return_error
 
    ld a,ITERM_MSG_GETC
    call l_jpix                 ; get char from device
-   jr nc, state_machine_2      ; if no error
-
-   ld a,l
-   and $03
-   xor $01
-   or (ix+6)
-   ld (ix+6),a
-   
-   scf
-   ret
+   jp c, device_set_error
 
 state_machine_2:
 
