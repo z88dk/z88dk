@@ -4,7 +4,7 @@ SECTION code_fcntl
 PUBLIC character_00_input_bin_stdio_msg_getc
 
 EXTERN ICHAR_MSG_GETC
-EXTERN device_return_error, device_set_error
+EXTERN device_return_error, device_set_error, l_jpix
 
 character_00_input_bin_stdio_msg_getc:
 

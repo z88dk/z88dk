@@ -3,7 +3,7 @@ SECTION code_fcntl
 
 PUBLIC character_00_input_stdio_msg_ictl
 
-EXTERN device_reset_error
+EXTERN device_reset_error, asm_vioctl_driver
 
 character_00_input_stdio_msg_ictl:
 
