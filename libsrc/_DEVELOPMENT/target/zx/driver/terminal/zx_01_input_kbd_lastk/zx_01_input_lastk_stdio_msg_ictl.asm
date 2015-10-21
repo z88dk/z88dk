@@ -39,6 +39,7 @@ zx_01_input_lastk_stdio_msg_ictl:
    
    ; check the message is specifically for an input terminal
    
+   ld a,e
    and $07
    cp $01                      ; input terminals are type $01
    jp nz, error_einval_zc
