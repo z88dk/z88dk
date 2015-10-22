@@ -55,9 +55,8 @@ cpm_01_output_dcio_oterm_msg_putc_raw:
 
    ; send cr+lf
    
-   ld c,__CPM_DCIO             ; bdos direct i/o
-   ld e,13
-   call asm_cpm_bdos_alt
+   ld c,13
+   call crlf_done              ; send cr
    
    ld c,10
 
