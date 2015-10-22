@@ -117,7 +117,10 @@ cpm_01_output_dcio:
 
    cp OTERM_MSG_PUTC
    jp z, cpm_01_output_dcio_oterm_msg_putc
-   
+
+cp OTERM_MSG_TTY   ;; prevent error generation for unimplemented message
+jp z, error_zc     ;; placed further up to speed up putchar
+
    cp STDIO_MSG_ICTL
    jp z, cpm_01_output_dcio_stdio_msg_ictl
    
@@ -135,15 +138,12 @@ cpm_01_output_dcio:
    jp z, cpm_01_output_dcio_iterm_msg_bs
    
    cp ITERM_MSG_PRINT_CURSOR
-;;;   ret z
    jp z, cpm_01_output_dcio_iterm_msg_putc
 
    cp ITERM_MSG_ERASE_CURSOR
-;;;   ret z
    jp z, cpm_01_output_dcio_iterm_msg_bs
 
    cp ITERM_MSG_ERASE_CURSOR_PWD
-;;;   ret z
    jp z, cpm_01_output_dcio_iterm_msg_bs
 
    cp OTERM_MSG_BELL
@@ -154,8 +154,8 @@ cpm_01_output_dcio:
 
    ; prevent error generation for unimplemented optional messages
    
-   cp OTERM_MSG_TTY
-   jp z, error_zc
+;; cp OTERM_MSG_TTY   ;; moved further up because it's a commonly issued message
+;; jp z, error_zc
 
    cp ITERM_MSG_READLINE_BEGIN
    ret z

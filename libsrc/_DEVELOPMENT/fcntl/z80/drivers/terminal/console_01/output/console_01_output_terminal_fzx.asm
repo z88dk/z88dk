@@ -241,7 +241,10 @@ console_01_output_terminal_fzx:
 
    cp OTERM_MSG_PUTC
    jp z, console_01_output_fzx_oterm_msg_putc
-   
+
+cp OTERM_MSG_TTY   ;; prevent error generation for unimplemented message
+jp z, error_zc     ;; placed further up to speed up putchar
+
    cp STDIO_MSG_ICTL
    jp z, console_01_output_fzx_stdio_msg_ictl
    
@@ -275,8 +278,8 @@ console_01_output_terminal_fzx:
    
    ; prevent error generation for unimplemented optional messages
    
-   cp OTERM_MSG_TTY
-   jp z, error_zc
+;; cp OTERM_MSG_TTY   ;; moved further up because it's a commonly issued message
+;; jp z, error_zc
    
    cp OTERM_MSG_BELL
    jp z, error_zc

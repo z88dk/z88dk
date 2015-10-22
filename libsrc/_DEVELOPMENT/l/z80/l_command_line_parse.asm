@@ -190,6 +190,8 @@ generate_argv:
    ; bc'= num chars remaining in redirector
    ; ix = return address
 
+   ld b,c
+
 store_argv:
 
    ld (hl),e
@@ -197,8 +199,7 @@ store_argv:
    ld (hl),d
    inc hl
    
-   dec c
-   jr nz, next_word_loop       ; if more words
+   djnz next_word_loop         ; if more words
 
 done:
 
