@@ -1,9 +1,12 @@
 
 SECTION code_l
 
-PUBLIC l_fast_ldir
+PUBLIC l_fast_ldir, l_fast_ldir_0
 
-loop:
+; call to this subroutine is faster
+; than ldir if number of loops >= 8
+
+l_fast_ldir_0:
 
    ldi
    ldi
@@ -15,7 +18,17 @@ loop:
    ldi
    ldi
 
-   jp pe, loop
+   ldi
+   ldi
+   ldi
+   ldi
+   
+   ldi
+   ldi
+   ldi
+   ldi
+
+   jp pe, l_fast_ldir_0
 
 l_fast_ldir:
 
