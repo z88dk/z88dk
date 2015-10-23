@@ -6,7 +6,8 @@ PUBLIC l_fast_memcpy
 EXTERN l_fast_ldir_0
 
 ; call to this subroutine is faster
-; than memcpy if number of loops >= 38
+; than ldir if number of loops >= 38
+; than asm_memcpy if number of loops >= 23
 
 l_fast_memcpy:
 
