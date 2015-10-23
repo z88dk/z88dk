@@ -22,6 +22,9 @@
  *    zcc +zx81 -create-app -DTEXT dstar.c
  *    zcc +zx80 -create-app -DTEXT dstar.c
  * 
+ * 	CHROMA81 expansion
+ *    zcc +zx81 -create-app -DCHROMA81 dstar.c
+ *
  * * * * * * *
  *
  *      dstar.c
@@ -113,16 +116,24 @@ void main()
 	/* ROM position */
 	memcpy(0x1e00, sprites, 136);
 	/* Others */
+	memcpy(0x2000, sprites, 136);
 	memcpy(0x8e00, sprites, 136);
 	memcpy(0x9e00, sprites, 136);
 	memcpy(0x2e00, sprites, 136);
 	/* dk'tronics (quick board test: PEEK 11905 must give 32)*/
 	memcpy(0x3000, sprites, 136);
 	memcpy(0x3200, sprites, 136);
-	#asm
-	ld	a,$30
-	ld	i,a
-	#endasm
+	#ifdef CHROMA81
+		#asm
+		ld	a,$20
+		ld	i,a
+		#endasm
+	#else
+		#asm
+		ld	a,$30
+		ld	i,a
+		#endasm
+	#endif
 #endif
 #endif
 #endif
@@ -142,8 +153,10 @@ void main()
 	display_attr=d_file+1+32768;
 	#asm
 	ld bc,7FEFh
-	ld a,16+8+5  ; 8="attribute file" mode, (border 7)
+	ld a,32+16+8+5  ; 8="attribute file" mode, (border 7)
 	out (c),a
+;	ld	a,$84
+;	ld	i,a
 	#endasm
 #endif
 
@@ -206,6 +219,12 @@ void Gamekeys(void)
 		case '6':
 			#asm
 			ld	a,$32
+			ld	i,a
+			#endasm
+			break;
+		case '7':
+			#asm
+			ld	a,$20
 			ld	i,a
 			#endasm
 			break;
