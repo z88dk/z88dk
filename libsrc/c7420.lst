@@ -1,0 +1,5 @@
+stdio/c7420/fgetc_cons
+stdio/c7420/getk
+stdio/c7420/fputc_cons
+stdio/puts_cons
+@z80.lst

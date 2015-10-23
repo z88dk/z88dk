@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.225 2015-10-09 13:02:42 stefano Exp $
+# $Id: Makefile,v 1.226 2015-10-23 20:34:50 stefano Exp $
 
 
 include Make.config
@@ -15,7 +15,7 @@ include Make.config
 
 all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	abc80_clib.lib abc80ansi_clib.lib abc800_clib.lib \
-	ace_clib.lib aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib \
+	ace_clib.lib aceansi_clib.lib aquarius_clib.lib aquansi_clib.lib c7420_clib.lib\
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib mc1000ansi_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
@@ -1053,6 +1053,20 @@ aquansi_clib.lib:
 	$(MAKE) -C psg
 	$(MAKE) -C games laquarius
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquansi_clib.lib @$(LISTFILE_DIRECTORY)/aquansi.lst
+	
+# Philips Videopac C7420 library - Stefano
+c7420_clib.lib:
+	@echo ''
+	@echo '--- Building Philips Videopac C7420 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) -C strings
+	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdio generic
+	$(MAKE) -C printflike
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(LIBLINKER) -DFORc7420 -x$(OUTPUT_DIRECTORY)/c7420_clib.lib @$(LISTFILE_DIRECTORY)/c7420.lst
 
 # Xircom REX 6000 library - Dominic
 rex_clib.lib:

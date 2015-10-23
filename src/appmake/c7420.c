@@ -1,10 +1,11 @@
 /*
  *   Philips Videopac C7420
  *   This tool creates a BASIC loader file and a binary block file
+ *   If origin is set to 35055 a special mode is entered, creating a single block.
  *
  *   Stefano Bodrato - 2015
  *
- *   $Id: c7420.c,v 1.1 2015-10-20 16:48:11 stefano Exp $
+ *   $Id: c7420.c,v 1.2 2015-10-23 20:34:51 stefano Exp $
  */
 
 #include "appmake.h"
@@ -48,8 +49,7 @@ int c7420_exec(char *target)
 
     strcpy(ldr_name,"_");
 
-
-    if ( (binname == NULL) && (crtfile == NULL) && (origin == -1) ) {
+    if ( (binname == NULL) && (crtfile == NULL) ) {
         return -1;
     }
 
@@ -98,7 +98,84 @@ int c7420_exec(char *target)
 	fseek(fpin,0L,SEEK_SET);
 
 
+ if (pos == 35055) {
+/****************************/
+/* Single BASIC + M/C block */
+/****************************/
+	strcat(ldr_name,filename);
+	
+	if ( (fpout=fopen(ldr_name,"wb") ) == NULL ) {
+		printf("Can't create the loader file\n");
+		exit(1);
+	}
 
+/* Write out the loader header  */
+	for	(i=1;i<=256;i++)
+		writebyte(255,fpout);
+	for	(i=1;i<=10;i++)
+		writebyte(0xD3,fpout);
+	writebyte(' ',fpout);		/* File type ' ', BASIC program. */
+	if (strlen(blockname) >= 6 ) {
+		strncpy(name,blockname,6);
+	} else {
+		strcpy(name,blockname);
+		strncat(name,"      ",6-strlen(blockname));
+	}
+	writestring(name,fpout);
+	writebyte(0,fpout);
+	writebyte('1',fpout);        /* Autorun (line 10) */
+	writebyte('0',fpout);
+	writebyte(0,fpout);
+	writebyte(0,fpout);
+	writebyte(0,fpout);
+	writebyte(0,fpout);
+	writebyte(0,fpout);
+	writebyte(0,fpout);
+
+	location=0x88c1;
+	writeword(location,fpout);   /* BASIC program location */
+	writeword(28+13+5+len,fpout);     /* block length */
+	writeword(0,fpout);			 /* checksum, offset=286 ..we'll update it at the end */
+
+
+/* BASIC code */
+	checksum=0;
+	for	(i=1;i<=128;i++)
+		writebyte(255,fpout);
+	writebyte(0,fpout);
+	
+	location+=28;
+	writeword_cksum(location,fpout,&checksum);
+	writeword_cksum(10,fpout,&checksum);     /* 10   */
+	writebyte_cksum(0x93,fpout,&checksum);   /* POKE */
+	writebyte_cksum(0xB6,fpout,&checksum);   /* '-' */
+	writestring_cksum("30757,239:",fpout,&checksum);
+	writebyte_cksum(0x93,fpout,&checksum);   /* POKE */
+	writebyte_cksum(0xB6,fpout,&checksum);   /* '-' */
+	writestring_cksum("30756,136",fpout,&checksum);
+	writebyte_cksum(0,fpout,&checksum);
+	
+	location+=13;
+	writeword_cksum(location,fpout,&checksum);
+	writeword_cksum(20,fpout,&checksum);     /* 20  */
+	writebyte_cksum('R',fpout,&checksum);    /* R   */
+	writebyte_cksum(0xBD,fpout,&checksum);   /* '=' */
+	writebyte_cksum(0xC2,fpout,&checksum);   /* USR */
+	writestring_cksum("(0):",fpout,&checksum);
+	writebyte_cksum(0x9D,fpout,&checksum);   /* SCREEN */
+	writebyte_cksum(0,fpout,&checksum);
+	
+	location+=5+len;
+	writeword_cksum(location,fpout,&checksum);
+	writeword_cksum(30,fpout,&checksum);     /*  30  */
+	writebyte_cksum(0x8E,fpout,&checksum);   /* REM  */
+	
+//	writebyte_cksum(0,fpout,&checksum);
+	
+	/* the code tail will append the binary block and update the checksum */
+
+ } else {
+ 
 /****************/
 /* BASIC loader */
 /****************/
@@ -235,7 +312,9 @@ int c7420_exec(char *target)
 	for	(i=1;i<=128;i++)
 		writebyte(255,fpout);
 	
-/* We append the binary file */
+ } /* Same ending for 'single block' and 'loader' modes */
+
+ /* We append the binary file */
 
 	for (i=0; i<len;i++) {
 		c=getc(fpin);
@@ -244,8 +323,8 @@ int c7420_exec(char *target)
 
 /* Now let's append zeroes, update checksum and close */
 
-	for	(i=1;i<=12;i++)
-		writebyte(0,fpout);
+//	for	(i=1;i<=12;i++)
+//		writebyte(0,fpout);
 	
 	fseek(fpout,286L,SEEK_SET);
 	writeword((checksum%65536),fpout);
