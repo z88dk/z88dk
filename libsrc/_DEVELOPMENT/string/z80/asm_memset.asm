@@ -13,6 +13,8 @@ SECTION code_string
 
 PUBLIC asm_memset
 
+EXTERN l_fast_memcpy
+
 asm_memset:
 
    ; enter : hl = void *s
@@ -37,14 +39,30 @@ asm_memset:
 
    ld (hl),a
    inc de
-   
    dec bc
-   ld a,b
+
+   ld a,c
+   and $e0
+   or b
+   jr z, slow_memset
+
+fast_memset:
+
+   push hl
+   
+   call l_fast_memcpy
+   
+   pop hl
+   ret
+
+slow_memset:
+
    or c
    ret z
 
    push hl
+   
    ldir
+   
    pop hl
-
    ret

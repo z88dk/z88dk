@@ -14,6 +14,8 @@ SECTION code_string
 PUBLIC asm_memcpy
 PUBLIC asm0_memcpy, asm1_memcpy
 
+EXTERN l_fast_memcpy
+
 asm_memcpy:
 
    ; enter : bc = size_t n
@@ -34,9 +36,24 @@ asm_memcpy:
 asm0_memcpy:
 
    push de
-   ldir
-   pop hl
    
+   ld a,c
+   and $e0
+   or b
+   jr z, slow_memcpy
+
+fast_memcpy:
+
+   call l_fast_memcpy
+   
+   pop hl
+   ret
+
+slow_memcpy:
+   
+   ldir
+   
+   pop hl
    ret
 
 asm1_memcpy:
