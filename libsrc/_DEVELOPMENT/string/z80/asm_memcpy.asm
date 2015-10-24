@@ -9,12 +9,12 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 SECTION code_string
 
 PUBLIC asm_memcpy
 PUBLIC asm0_memcpy, asm1_memcpy
-
-EXTERN l_fast_memcpy
 
 asm_memcpy:
 
@@ -36,20 +36,25 @@ asm_memcpy:
 asm0_memcpy:
 
    push de
-   
+
+IF __CLIB_OPT_FASTCOPY & $01
+
    ld a,c
-   and $e0
+   and $f0
    or b
    jr z, slow_memcpy
 
 fast_memcpy:
 
+   EXTERN l_fast_memcpy
    call l_fast_memcpy
    
    pop hl
    ret
 
 slow_memcpy:
+
+ENDIF
    
    ldir
    

@@ -9,11 +9,11 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 SECTION code_string
 
 PUBLIC asm_memset
-
-EXTERN l_fast_memcpy
 
 asm_memset:
 
@@ -41,21 +41,30 @@ asm_memset:
    inc de
    dec bc
 
+IF __CLIB_OPT_FASTCOPY & $02
+
    ld a,c
-   and $e0
+   and $f0
    or b
    jr z, slow_memset
 
 fast_memset:
 
    push hl
-   
+
+   EXTERN l_fast_memcpy
    call l_fast_memcpy
    
    pop hl
    ret
 
 slow_memset:
+
+ELSE
+
+   ld a,b
+
+ENDIF
 
    or c
    ret z
