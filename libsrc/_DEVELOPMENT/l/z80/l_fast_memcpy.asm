@@ -20,30 +20,49 @@ l_fast_memcpy:
    ;         bc = 0
    ;
    ; uses  : af, bc, de, hl
-   
-   push hl
-   
-   ld a,$10
-   sub c
-   and $0f
-   add a,a
-   
-   add a,l_fast_ldir_0 % 256
-   ld l,a
-   adc a,l_fast_ldir_0 / 256
-   ld h,a
 
-   ex (sp),hl
-   
    ld a,c
-   srl b
-   rra
-   srl b
-   rra
-   srl b
-   rra
-   srl b
-   rra
-   ld c,a
+   and $0f
+
+try_8:
+
+   cp 8
+   jr c, try_4
+   sub 8
    
-   ret
+   ldi
+   ldi
+   ldi
+   ldi
+   
+   ldi
+   ldi
+   ldi
+   ldi
+
+try_4:
+
+   cp 4
+   jr c, try_2
+   sub 4
+   
+   ldi
+   ldi
+   ldi
+   ldi
+
+try_2:
+
+   cp 2
+   jr c, try_1
+   sub 2
+   
+   ldi
+   ldi
+
+try_1:
+
+   jp z, l_fast_ldir_0
+   
+   ldi
+   jp l_fast_ldir_0
