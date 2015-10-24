@@ -25,6 +25,7 @@ defc __CLIB_OPT_MULTITHREAD = $00
 ; bit 1 = $02 = enable recursive locks on FILEs
 ; bit 2 = $04 = enable stdio lock on lists of FILEs
 ; bit 3 = $08 = enable fcntl lock on fd_table
+; bit 4 = $10 = enable fdstruct locks
 
 ; Set to zero if you are making traditional single-threaded
 ; programs.  Setting to zero will reduce code size and
@@ -325,6 +326,15 @@ defc __CLIB_OPT_SCANF = $ffffffff
 ; -------------------------------------------------------------
 ; -- stdlib options -------------------------------------------
 ; -------------------------------------------------------------
+
+; Select whether fast memset and fast memcpy are enabled.
+; For copies of minimum size unrolled loops will be used.
+
+defc __CLIB_OPT_FASTCOPY = $00
+
+; bit 0 = $01 = enable fast memcpy
+; bit 1 = $02 = enable fast memset
+; bit 7 = $80 = enable fast ldir for library functions
 
 ; Select whether strtod() and atof() include code to parse
 ; hex floats and nan/inf strings.

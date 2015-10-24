@@ -244,6 +244,7 @@ defc CHAR_PASSWORD  = '*'
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for scanf.
 
+;;defc __CLIB_OPT_PRINTF = $5001001
 ;;defc __CLIB_OPT_PRINTF = $4000201
 defc __CLIB_OPT_PRINTF = $3fffff
 ;;defc __CLIB_OPT_PRINTF = $ffffffff
@@ -325,6 +326,15 @@ defc __CLIB_OPT_SCANF = $ffffffff
 ; -------------------------------------------------------------
 ; -- stdlib options -------------------------------------------
 ; -------------------------------------------------------------
+
+; Select whether fast memset and fast memcpy are enabled.
+; For copies of minimum size unrolled loops will be used.
+
+defc __CLIB_OPT_FASTCOPY = $00
+
+; bit 0 = $01 = enable fast memcpy
+; bit 1 = $02 = enable fast memset
+; bit 7 = $80 = enable fast ldir for library functions
 
 ; Select whether strtod() and atof() include code to parse
 ; hex floats and nan/inf strings.
