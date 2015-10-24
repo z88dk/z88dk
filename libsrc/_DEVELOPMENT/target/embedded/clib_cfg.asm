@@ -331,7 +331,11 @@ defc __CLIB_OPT_FASTCOPY = $00
 
 ; bit 0 = $01 = enable fast memcpy
 ; bit 1 = $02 = enable fast memset
-; bit 7 = $80 = enable fast ldir for library functions
+; bit 5 = $20 = enable fast ldir for library functions
+; bit 6 = $40 = enable self-modifying code
+;         (faster but makes code non-reentrant)
+; bit 7 = $80 = self-modifying l_fast_memcpy_smc made available
+;         (library does not use self-modifying code; bit 6 set has same effect)
 
 ; Select whether strtod() and atof() include code to parse
 ; hex floats and nan/inf strings.
