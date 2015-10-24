@@ -9,11 +9,11 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 SECTION code_arch
 
 PUBLIC asm_zx_cls
-
-EXTERN asm_memset
 
 asm_zx_cls:
 
@@ -22,17 +22,54 @@ asm_zx_cls:
    ; uses  : af, bc, de, hl
  
    ; attributes
+
+IF __CLIB_OPT_FASTCOPY & $80
+
+   EXTERN l_fast_ldir_0
+
+   ld a,l
+   
+   ld hl,$5800
+   ld (hl),a
+   
+   ld e,$01
+   ld d,h
+   
+   ld bc,768/16
+   call l_fast_ldir_0 + 2
+
+ELSE
+
+   EXTERN asm_memset
    
    ld e,l
+   
    ld hl,$5800
    ld bc,768
    
    call asm_memset
 
+ENDIF
+
    ; pixels
-   
-   ld e,0
+
+IF __CLIB_OPT_FASTCOPY & $80
+
    ld hl,$4000
+   ld (hl),l
+   
+   ld e,$01
+   ld d,h
+   
+   ld bc,6144/16
+   jp l_fast_ldir_0 + 2
+
+ELSE
+
+   ld hl,$4000
+   ld e,l
    ld bc,6144
    
    jp asm_memset
+
+ENDIF

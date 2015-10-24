@@ -10,11 +10,13 @@
 ;
 ; ===============================================================
 
+INCLUDE "clib_cfg.asm"
+
 SECTION code_arch
 
 PUBLIC asm_zx_scroll_up
 
-EXTERN asm_zx_cls, asm_memset
+EXTERN asm_zx_cls
 EXTERN asm_zx_cy2saddr, asm_zx_cy2aaddr, asm0_zx_saddrpdown
 
 asm_zx_scroll_up:
@@ -67,10 +69,21 @@ copy_up_loop_0:
    ; copy row of attributes
    
    exx
-   
+
+IF __CLIB_OPT_FASTCOPY & $80
+
+   EXTERN l_fast_ldir_0
+
+   ld bc,32/16
+   call l_fast_ldir_0
+
+ELSE
+
    ld bc,32
    ldir
-   
+
+ENDIF
+
    exx
    
    ; copy row of pixels
@@ -81,13 +94,21 @@ copy_up_loop_1:
 
    push bc
    
-   ld bc,32
-   
    push de
    push hl
-   
+
+IF __CLIB_OPT_FASTCOPY & $80
+
+   ld bc,32/16
+   call l_fast_ldir_0
+
+ELSE
+
+   ld bc,32
    ldir
-   
+
+ENDIF
+
    pop hl
    pop de
    
@@ -122,10 +143,28 @@ vacate_loop_0:
    
    pop de
    push de                     ; e = attr
+
+IF __CLIB_OPT_FASTCOPY & $80
+
+   ld (hl),e
+   
+   ld e,l
+   ld d,h
+   
+   inc de
+   
+   ld bc,32/16
+   call l_fast_ldir_0 + 2
+
+ELSE
+
+   EXTERN asm_memset
    
    ld bc,32
    call asm_memset
-   
+
+ENDIF
+
    ex de,hl
    
    exx
@@ -137,11 +176,29 @@ vacate_loop_0:
 vacate_loop_1:
 
    push bc
+   push hl
+
+IF __CLIB_OPT_FASTCOPY & $80
+
+   ld (hl),0
    
+   ld e,l
+   ld d,h
+   
+   inc de
+   
+   ld bc,32/16
+   call l_fast_ldir_0 + 2
+
+ELSE
+
    ld e,0
    ld bc,32
    call asm_memset
-   
+
+ENDIF
+
+   pop hl
    inc h
    
    pop bc
