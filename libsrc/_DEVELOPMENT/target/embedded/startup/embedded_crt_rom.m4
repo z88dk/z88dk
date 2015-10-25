@@ -219,12 +219,14 @@ ENDIF
 IF (__crt_enable_rst & $80)
 
    EXTERN _z80_rst_38h
-   call _z80_rst_38h
+   jp _z80_rst_38h
 
-ENDIF
+ELSE
 
    ei
    reti
+
+ENDIF
 
 ;**************************************************************
 ENDIF
@@ -277,9 +279,9 @@ __Start:
    ENDIF
 
    ; initialize sections
-   
-   include "../clib_init_bss.inc"
+
    include "../clib_init_data.inc"
+   include "../clib_init_bss.inc"
 
 ;**************************************************************
 IF __crt_org_code = 0
@@ -298,11 +300,13 @@ IF __crt_org_code = 0
 IF __crt_enable_nmi
 
    EXTERN _z80_nmi
-   call _z80_nmi
+   jp _z80_nmi
 
-ENDIF
+ELSE
 
    retn
+
+ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; crt startup part 2 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
