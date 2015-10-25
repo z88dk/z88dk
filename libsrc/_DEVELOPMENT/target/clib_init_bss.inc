@@ -1,16 +1,27 @@
 
    ; initialize bss section
 
-   IF (__crt_model | __crt_initialize_bss)
+   EXTERN ASMTAIL_BSS_UNINITIALIZED, ASMHEAD_BSS_END
 
-      EXTERN ASMTAIL_BSS_UNINITIALIZED, ASMHEAD_BSS_END
+   IF (__crt_model | __crt_initialize_bss) && ((ASMHEAD_BSS_END - ASMTAIL_BSS_UNINITIALIZED) > 0)
 
-      ld hl,ASMTAIL_BSS_UNINITIALIZED
-      ld bc,ASMHEAD_BSS_END - ASMTAIL_BSS_UNINITIALIZED
+      IF ((ASMHEAD_BSS_END - ASMTAIL_BSS_UNINITIALIZED) = 1)
+
+         xor a
+         ld (ASMTAIL_BSS_UNINITIALIZED),a
+      
+      ELSE
+
+         ld hl,ASMTAIL_BSS_UNINITIALIZED
+         ld bc,ASMHEAD_BSS_END - ASMTAIL_BSS_UNINITIALIZED
    
-      ld e,0
-   
-      EXTERN asm_memset
-      call asm_memset
+         ld (hl),0
+         
+         ld e,l
+         ld d,h
+         
+         inc de
+
+         ldir
 
    ENDIF
