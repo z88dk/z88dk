@@ -182,9 +182,9 @@ z80_present:
    ENDIF
    
    ; initialize sections
-   
-   include "../clib_init_bss.inc"
+
    include "../clib_init_data.inc"
+   include "../clib_init_bss.inc"
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
