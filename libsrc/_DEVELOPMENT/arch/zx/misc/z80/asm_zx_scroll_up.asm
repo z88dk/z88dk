@@ -70,11 +70,11 @@ copy_up_loop_0:
    
    exx
 
-IF __CLIB_OPT_FASTCOPY & $80
+IF __CLIB_OPT_FASTCOPY & $20
 
    EXTERN l_fast_ldir_0
 
-   ld bc,32/16
+   ld bc,32
    call l_fast_ldir_0
 
 ELSE
@@ -97,9 +97,9 @@ copy_up_loop_1:
    push de
    push hl
 
-IF __CLIB_OPT_FASTCOPY & $80
+IF __CLIB_OPT_FASTCOPY & $20
 
-   ld bc,32/16
+   ld bc,32
    call l_fast_ldir_0
 
 ELSE
@@ -144,7 +144,7 @@ vacate_loop_0:
    pop de
    push de                     ; e = attr
 
-IF __CLIB_OPT_FASTCOPY & $80
+IF __CLIB_OPT_FASTCOPY & $20
 
    ld (hl),e
    
@@ -153,7 +153,7 @@ IF __CLIB_OPT_FASTCOPY & $80
    
    inc de
    
-   ld bc,32/16
+   ld bc,31
    call l_fast_ldir_0 + 2
 
 ELSE
@@ -178,7 +178,7 @@ vacate_loop_1:
    push bc
    push hl
 
-IF __CLIB_OPT_FASTCOPY & $80
+IF __CLIB_OPT_FASTCOPY & $20
 
    ld (hl),0
    
@@ -187,7 +187,7 @@ IF __CLIB_OPT_FASTCOPY & $80
    
    inc de
    
-   ld bc,32/16
+   ld bc,31
    call l_fast_ldir_0 + 2
 
 ELSE

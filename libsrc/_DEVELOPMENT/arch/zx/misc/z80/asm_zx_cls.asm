@@ -23,7 +23,7 @@ asm_zx_cls:
  
    ; attributes
 
-IF __CLIB_OPT_FASTCOPY & $80
+IF __CLIB_OPT_FASTCOPY & $20
 
    EXTERN l_fast_ldir_0
 
@@ -32,10 +32,9 @@ IF __CLIB_OPT_FASTCOPY & $80
    ld hl,$5800
    ld (hl),a
    
-   ld e,$01
-   ld d,h
+   ld de,$5801
+   ld bc,767
    
-   ld bc,768/16
    call l_fast_ldir_0 + 2
 
 ELSE
@@ -53,15 +52,14 @@ ENDIF
 
    ; pixels
 
-IF __CLIB_OPT_FASTCOPY & $80
+IF __CLIB_OPT_FASTCOPY & $20
 
    ld hl,$4000
    ld (hl),l
    
-   ld e,$01
-   ld d,h
+   ld de,$4001
+   ld bc,6143
    
-   ld bc,6144/16
    jp l_fast_ldir_0 + 2
 
 ELSE
