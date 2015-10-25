@@ -46,8 +46,11 @@ IF __clib_malloc_heap_size = -1
    
    jp c, __Exit                ; if no room for heap, this is a fatal error
    
+   ld bc,15
+   add hl,bc
+   
    ld c,l
-   ld b,h                      ; bc = available heap size (with 15 byte margin)
+   ld b,h                      ; bc = available heap size
    
    ex de,hl                    ; hl = ASMHEAD_BSS_END = start of heap
    
