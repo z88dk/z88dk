@@ -59,6 +59,24 @@
    
    ENDIF
    
+   IFDEF CRT_STACK_SIZE
+   
+      defc __crt_stack_size = CRT_STACK_SIZE
+   
+   ELSE
+   
+      IFDEF TAR__crt_stack_size
+      
+         defc __crt_stack_size = TAR__crt_stack_size
+      
+      ELSE
+      
+         defc __crt_stack_size = DEF__crt_stack_size
+      
+      ENDIF
+   
+   ENDIF
+   
       
    IFDEF CRT_ORG_DATA
    

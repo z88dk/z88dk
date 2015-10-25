@@ -19,9 +19,44 @@ IF __clib_balloc_table_size > 0
 
 ENDIF
 
+IF __clib_malloc_heap_size = -1
+
+   ; place malloc heap between bss section and bottom of the stack
+   
+   SECTION data_alloc_malloc
+   
+   PUBLIC __malloc_heap
+   
+   __malloc_heap:              defw ASMHEAD_BSS_END
+   
+   SECTION code_crt_init
+   
+   ld hl,0
+   add hl,sp                   ; hl = top of the stack
+   
+   ld de,ASMHEAD_BSS_END
+   sbc hl,de                   ; hl = space between top of stack and end of bss
+
+   jp c, __Exit                ; if stack overlaps bss, this is a fatal error
+   
+   ld bc,__crt_stack_size + 15 ; amount of space reserved by stack + minimum heap size
+   sbc hl,bc                   ; hl = max heap size - 15
+   
+   jp c, __Exit                ; if no room for heap, this is a fatal error
+   
+   ld c,l
+   ld b,h                      ; bc = available heap size (with 15 byte margin)
+   
+   ex de,hl                    ; hl = ASMHEAD_BSS_END = start of heap
+   
+   EXTERN asm_heap_init
+   call asm_heap_init
+
+ENDIF
+
 IF __clib_malloc_heap_size > 14
 
-   ; create implied user heap
+   ; create malloc heap in bss section
    
    SECTION data_alloc_malloc
    
