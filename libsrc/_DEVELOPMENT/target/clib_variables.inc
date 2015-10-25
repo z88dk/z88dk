@@ -31,6 +31,8 @@ IF __clib_malloc_heap_size = -1
    
    SECTION code_crt_init
    
+   EXTERN ASMHEAD_BSS_END
+   
    ld hl,0
    add hl,sp                   ; hl = top of the stack
    
