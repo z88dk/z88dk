@@ -1,21 +1,20 @@
 
    ; initialize bss section
 
-   EXTERN ASMTAIL_BSS_UNINITIALIZED, ASMHEAD_BSS_END
+   IF (__crt_model | __crt_initialize_bss)
 
-   IF (__crt_model | __crt_initialize_bss) && ((ASMHEAD_BSS_END - ASMTAIL_BSS_UNINITIALIZED) > 0)
+         ; bss section is always at least one byte
 
-      IF ((ASMHEAD_BSS_END - ASMTAIL_BSS_UNINITIALIZED) = 1)
-
-         xor a
-         ld (ASMTAIL_BSS_UNINITIALIZED),a
-      
-      ELSE
+         EXTERN ASMTAIL_BSS_UNINITIALIZED, ASMHEAD_BSS_END
 
          ld hl,ASMTAIL_BSS_UNINITIALIZED
-         ld bc,ASMHEAD_BSS_END - ASMTAIL_BSS_UNINITIALIZED
+         ld bc,ASMHEAD_BSS_END - ASMTAIL_BSS_UNINITIALIZED - 1
    
          ld (hl),0
+         
+         ld a,b
+         or c
+         jr z, bss_init_done
          
          ld e,l
          ld d,h
@@ -23,5 +22,7 @@
          inc de
 
          ldir
+
+      bss_init_done:
 
    ENDIF
