@@ -3,7 +3,7 @@
 
    IF (__crt_model | __crt_initialize_bss)
 
-         ; bss section is always at least one byte
+         ; bss section is always at least two bytes
 
          EXTERN ASMTAIL_BSS_UNINITIALIZED, ASMHEAD_BSS_END
 
@@ -12,17 +12,11 @@
    
          ld (hl),0
          
-         ld a,b
-         or c
-         jr z, bss_init_done
-         
          ld e,l
          ld d,h
          
          inc de
 
          ldir
-
-      bss_init_done:
 
    ENDIF
