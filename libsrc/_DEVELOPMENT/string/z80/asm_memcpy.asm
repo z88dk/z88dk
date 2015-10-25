@@ -37,12 +37,27 @@ asm0_memcpy:
 
    push de
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_FASTCOPY & $01
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ld a,b
+   or a
+   jr nz, fast_memcpy
+   
    ld a,c
-   and $f0
-   or b
-   jr z, slow_memcpy
+
+IF __CLIB_OPT_FASTCOPY & $40
+
+   cp 19                       ; self-modifying code break even
+
+ELSE
+
+   cp 25                       ; break even
+
+ENDIF
+
+   jr c, slow_memcpy
 
 fast_memcpy:
 
@@ -50,15 +65,21 @@ fast_memcpy:
    call l_fast_memcpy
    
    pop hl
+   
+   or a
    ret
 
 slow_memcpy:
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ldir
    
    pop hl
+   
+   or a
    ret
 
 asm1_memcpy:

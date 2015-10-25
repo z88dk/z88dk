@@ -41,12 +41,27 @@ asm_memset:
    inc de
    dec bc
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_FASTCOPY & $02
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ld a,b
+   or a
+   jr nz, fast_memset
+   
    ld a,c
-   and $f0
-   or b
-   jr z, slow_memset
+
+IF __CLIB_OPT_FASTCOPY & $40
+
+   cp 19                       ; self-modifying code break even
+
+ELSE
+
+   cp 25                       ; break even
+
+ENDIF
+
+   jr c, slow_memset
 
 fast_memset:
 
@@ -56,17 +71,25 @@ fast_memset:
    call l_fast_memcpy
    
    pop hl
+   
+   or a
    ret
 
 slow_memset:
 
+   or a
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ld a,b
-
-ENDIF
-
    or c
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    ret z
 
    push hl
