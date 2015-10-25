@@ -46,7 +46,6 @@ l_fast_memcpy_smc:
    ld a,$10
    sub c
    and $0f
-   inc a
    add a,a
    ld (joffset+1),a
 
@@ -178,7 +177,7 @@ l_fast_memcpy_smc:
    sub c
    and $0f
    add a,a
-   sub 47
+   sub 49
    ld (joffset+1),a
 
 joffset:
