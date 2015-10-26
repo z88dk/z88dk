@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - Apr.2008
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.3 2015-10-26 18:34:51 stefano Exp $
 ;
 
 
@@ -17,10 +17,10 @@
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
-	cp	12
-	jr	nz,nocls
-
-.nocls
+;	cp	12
+;	jr	nz,nocls
+;
+;.nocls
 
 	; Some undercase text?  Transform in UPPER !
 	cp	97

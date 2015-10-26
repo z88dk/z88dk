@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.10 2015-01-21 07:05:00 stefano Exp $
+;       $Id: trs80_crt0.asm,v 1.11 2015-10-26 18:34:51 stefano Exp $
 ;
 
 
@@ -135,7 +135,12 @@ ENDIF
 ; Now some variables
 ;-----------
 coords:         defw    0       ; Current graphics xy coordinates
+IF (startup=2)
+base_graphics:  defw    $4400   ; Address of the Graphics map   COLOUR GENIE - text map
+;base_graphics:  defw    $F000   ; Address of the Graphics map   COLOUR GENIE - text attributes map ?
+ELSE
 base_graphics:  defw    $3c00   ; Address of the Graphics map
+ENDIF
 
 IF !DEFINED_HAVESEED
                 PUBLIC    _std_seed        ;Integer rand() seed

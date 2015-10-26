@@ -9,7 +9,7 @@
  *        When the program is in memory, type '/'.
  *
  *
- *        $Id: trs80.c,v 1.6 2014-08-01 07:07:50 stefano Exp $
+ *        $Id: trs80.c,v 1.7 2015-10-26 18:34:51 stefano Exp $
  */
 
 #include "appmake.h"
@@ -17,11 +17,11 @@
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
-static int               origin       = 0;
+static int               origin       = -1;
 static char              cmd          = 0;
 static int               blocksz      = 256;
 static char              audio        = 0;
-static char              fast         = 1;
+static char              fast         = 0;
 static char              dumb         = 0;
 static char              loud         = 0;
 static char              help         = 0;
