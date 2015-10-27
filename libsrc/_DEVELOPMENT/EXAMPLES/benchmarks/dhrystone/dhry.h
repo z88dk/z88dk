@@ -349,23 +349,34 @@
  ** Z88DK NOTES *******************************************************
  **********************************************************************
 
--DNOPRINTF
-Messages are not printed.
+ Simple compile notes until a readme.txt is available.
+  
+ (sccz80) Unable to compile at the moment because of 2D array.
+ (sdcc  ) zcc +cpm -vn -SO3 -DNOTIMER -DNOSTRUCTASSIGN -DNOREGISTER -clib=sdcc_iy --max-allocs-per-node200000 dhry_1.c dhry_2.c -o dhry
+ 
+ Classic C library:
+ 
+ (sccz80) Unable to compile at the moment because of 2D array.
 
--DNOTIMER
-Timer functions are not available.
+ **********************************************************************
 
--DNOSTRUCTASSIGN
-Define if the compiler does not support struct assignments.
+ -DNOPRINTF
+ Messages are not printed.
 
--DNOENUM
-Define if the compiler does not support enum.
+ -DNOTIMER
+ Timer functions are not available.
 
--DNOREGISTER
-Define if the compiler does not support the 'register' keyword.
+ -DNOSTRUCTASSIGN
+ Define if the compiler does not support struct assignments.
 
--DNOSTATIC
-Define if unsupported register keyword should not be changed to static.
+ -DNOENUM
+ Define if the compiler does not support enum.
+
+ -DNOREGISTER
+ Define if the compiler does not support the 'register' keyword.
+
+ -DNOSTATIC
+ Define if unsupported register keyword should not be changed to static.
 
  **********************************************************************
 */

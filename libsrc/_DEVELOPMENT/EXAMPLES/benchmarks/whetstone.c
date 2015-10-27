@@ -55,19 +55,31 @@ C**********************************************************************
  ** Z88DK NOTES *******************************************************
  **********************************************************************
 
-Printf converters %ld %d %e %f must be enabled.
+ Printf converters %ld %d %e %f must be enabled.
 
--DNOPRINTF
-Messages are not printed.
+ Simple compile notes until a readme.txt is available.
+  
+ (sccz80) zcc +cpm -vn -DNOTIMER -clib=new whetstone.c -o whetdc -lm
+ (sdcc  ) zcc +cpm -vn -SO3 -DNOTIMER -clib=sdcc_iy --max-allocs-per-node200000 whetstone.c -o whetdc -lm
+ 
+ Classic C library:
+ 
+ (sccz80) zcc +cpm -vn -DNOTIMER whetstone.c -o whetdc -lndos -lm
+          (add "typedef double double_t;")
 
--DNOTIMER
-Timer functions are not available.
+ **********************************************************************
 
--DNOCOMMAND
-Command line is not parsed.
+ -DNOPRINTF
+ Messages are not printed.
 
--DNOSTATIC
-Local variables are not made static.
+ -DNOTIMER
+ Timer functions are not available.
+
+ -DNOCOMMAND
+ Command line is not parsed.
+
+ -DNOSTATIC
+ Local variables are not made static.
 
  **********************************************************************
 */

@@ -1,10 +1,26 @@
 
-/*
--DNOPRINTF
-No printing.
+/**********************************************************************
+ ** Z88DK NOTES *******************************************************
+ **********************************************************************
 
--DNOSTATIC
-Locals are not made static variables.
+ Simple compile notes until a readme.txt is available.
+  
+ (sccz80) zcc +cpm -vn -clib=new sieve.c -o sieve
+ (sdcc  ) zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 sieve.c -o sieve
+ 
+ Classic C library:
+ 
+ (sccz80) zcc +cpm -vn sieve.c -o sieve -lndos
+
+ **********************************************************************
+ 
+ -DNOPRINTF
+ No printing.
+
+ -DNOSTATIC
+ Locals are not made static variables.
+
+ **********************************************************************
 */
 
 #include <stdio.h>
