@@ -66,7 +66,7 @@ Timer functions are not available.
 -DNOCOMMAND
 Command line is not parsed.
 
--DNOREGISTER
+-DNOSTATIC
 Local variables are not made static.
 
  **********************************************************************
@@ -79,10 +79,10 @@ Local variables are not made static.
    extern long time_end(void);
 #endif
 
-#ifndef NOREGISTER
-   #define REGISTER static
+#ifndef NOSTATIC
+   #define STATIC static
 #else
-   #define REGISTER
+   #define STATIC
 #endif
 
 /* standard C library headers required */
@@ -120,18 +120,18 @@ main(int argc, char *argv[])
 {
 	/* used in the FORTRAN version */
 	
-	REGISTER long I;
-	REGISTER long N1, N2, N3, N4, N6, N7, N8, N9, N10, N11;
-	REGISTER double_t X1,X2,X3,X4,X,Y,Z;
-	REGISTER long LOOP;
-	REGISTER int II, JJ;
+	STATIC long I;
+	STATIC long N1, N2, N3, N4, N6, N7, N8, N9, N10, N11;
+	STATIC double_t X1,X2,X3,X4,X,Y,Z;
+	STATIC long LOOP;
+	STATIC int II, JJ;
 
 	/* added for this version */
 	
-	REGISTER long loopstart;
-	REGISTER long startsec, finisec;
-	REGISTER double_t KIPS;
-	REGISTER int continuous;
+	STATIC long loopstart;
+	STATIC long startsec, finisec;
+	STATIC double_t KIPS;
+	STATIC int continuous;
 
 	loopstart = 10;		/* see the note about LOOP below */
 	continuous = 0;
@@ -470,7 +470,7 @@ P0(void)
 void
 P3(double_t X, double_t Y, double_t *Z)
 {
-	REGISTER double_t X1, Y1;
+	STATIC double_t X1, Y1;
 
 	X1 = X;
 	Y1 = Y;

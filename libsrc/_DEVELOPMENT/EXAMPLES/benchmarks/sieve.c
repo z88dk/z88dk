@@ -1,9 +1,10 @@
 
 /*
-
 -DNOPRINTF
 No printing.
 
+-DNOSTATIC
+Locals are not made static variables.
 */
 
 #include <stdio.h>
@@ -17,7 +18,11 @@ unsigned char flags[SIZE];
 
 main()
 {
+#ifndef NOSTATIC
    static unsigned int i, i_sq, k, count;
+#else
+   unsigned int i, i_sq, k, count;
+#endif
 
    // some compilers do not initialize properly
 
