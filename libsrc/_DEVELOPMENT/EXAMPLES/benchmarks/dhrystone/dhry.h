@@ -361,8 +361,11 @@ Define if the compiler does not support struct assignments.
 -DNOENUM
 Define if the compiler does not support enum.
 
--DREGISTER
-Define if the compiler supports the 'register' keyword.
+-DNOREGISTER
+Define if the compiler does not support the 'register' keyword.
+
+-DNOSTATIC
+Define if unsupported register keyword should not be changed to static.
 
  **********************************************************************
 */

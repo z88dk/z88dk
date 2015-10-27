@@ -17,14 +17,18 @@
 
 #include "dhry.h"
 
-#ifndef REGISTER
-        Boolean Reg = false;
-        #define REGISTER
-        /* REG becomes blank */
-#else
+#ifndef NOREGISTER
         Boolean Reg = true;
         #undef REGISTER
         #define REGISTER register
+#else
+        Boolean Reg = false;
+        #ifndef NOSTATIC
+           #define REGISTER static
+        #else
+           #define REGISTER
+        #endif
+        /* REG becomes blank */
 #endif
 
 #ifndef NOTIMER
@@ -273,8 +277,13 @@ void Proc_1 (REGISTER Rec_Pointer Ptr_Val_Par)
 
     /* executed once */
 {
+#ifndef NOSTATIC
+  REGISTER Rec_Pointer Next_Record;
+  Next_Record = Ptr_Val_Par->Ptr_Comp;
+#else
   REGISTER Rec_Pointer Next_Record = Ptr_Val_Par->Ptr_Comp;  
                                         /* == Ptr_Glob_Next */
+#endif
   /* Local variable, initialized with Ptr_Val_Par->Ptr_Comp,    */
   /* corresponds to "rename" in Ada, "with" in Pascal           */
   

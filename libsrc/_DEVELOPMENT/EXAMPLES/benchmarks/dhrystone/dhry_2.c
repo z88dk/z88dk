@@ -17,12 +17,16 @@
 
 #include "dhry.h"
 
-#ifndef REGISTER
-        #define REGISTER
-        /* REG becomes blank */
-#else
+#ifndef NOREGISTER
         #undef REGISTER
         #define REGISTER register
+#else
+        #ifndef NOSTATIC
+           #define REGISTER static
+        #else
+           #define REGISTER
+        #endif
+        /* REG becomes blank */
 #endif
 
 extern  int     Int_Glob;
