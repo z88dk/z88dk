@@ -28,9 +28,9 @@ ticks_begin:
 #endasm
 
    count = SIZE - 2;
-   i_sq = 4;
    
-   for (i=2; (i<256) && (i<SIZE); ++i)
+   i_sq = 4;
+   for (i=2; i_sq<SIZE; ++i)
    {
       if (!flags[i])
       {
@@ -40,7 +40,6 @@ ticks_begin:
             flags[k]=1;
          }
       }
-
       i_sq += i+i+1;  // (n+1)^2 = n^2 + 2n + 1
    }
 
