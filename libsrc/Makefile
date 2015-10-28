@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.226 2015-10-23 20:34:50 stefano Exp $
+# $Id: Makefile,v 1.227 2015-10-28 07:18:48 stefano Exp $
 
 
 include Make.config
@@ -1530,7 +1530,6 @@ trs80_clib.lib:
 	@echo ''
 	@echo '--- Building TRS 80 Library ---'
 	@echo ''
-	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
@@ -1539,7 +1538,15 @@ trs80_clib.lib:
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games ltrs80
+	$(MAKE) -C psg
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
+	@echo ''
+	@echo '--- Building TRS 80 GFX libraires ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(LISTFILE_DIRECTORY)/gfxtrs80.lst
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/gfxeg2000.lst
 
 # Canon X-07 lib - Stefano
 x07_clib.lib:

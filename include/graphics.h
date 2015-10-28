@@ -10,13 +10,17 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.13 2012-11-23 17:13:50 stefano Exp $
+ *	$Id: graphics.h,v 1.14 2015-10-28 07:18:48 stefano Exp $
  */
 
 #ifndef __GFX_H__
 #define __GFX_H__
 
 #include <sys/compiler.h>
+
+#ifdef __TIKI100__
+#include <tiki100.h>
+#endif
 
 
 /* Structure to use when opening a window - as per usual, if graph <> 0

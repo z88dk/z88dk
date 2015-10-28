@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.37 2015-10-09 13:02:42 stefano Exp $
+# $Id: Makefile,v 1.38 2015-10-28 07:18:49 stefano Exp $
 
 
 lx11:
@@ -28,6 +28,7 @@ clean:
 	$(RM) cpc/*.o
 	cd enterprise ; $(MAKE) clean ; cd ..
 	cd enterprise_hr ; $(MAKE) clean ; cd ..
+	$(RM) eg2000/*.o
 	$(RM) gal/*.o
 	$(RM) gray/*.o
 	$(RM) gray/ticalc/*.o

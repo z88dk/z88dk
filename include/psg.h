@@ -2,7 +2,7 @@
  * Universal library for Yamaha Programmable Sound Generator
  * and similar chips
  *
- * $Id: psg.h,v 1.11 2013-11-22 07:40:38 stefano Exp $
+ * $Id: psg.h,v 1.12 2015-10-28 07:18:48 stefano Exp $
  *
  */
 
@@ -33,14 +33,14 @@
 #define psgT(hz)		((int)(111760.0 / (hz)))
 #endif
 
-#ifdef __SVI__
-#include <msx.h>
-#define psgT(hz)		((int)(111760.0 / (hz)))
-#endif
-
 #ifdef __PC6001__
 // 3.8 Mhz on earlier models, 4Mhz on next ones
 #define psgT(hz)		((int)(118750.0 / (hz)))
+#endif
+
+#ifdef __SVI__
+#include <msx.h>
+#define psgT(hz)		((int)(111760.0 / (hz)))
 #endif
 
 #ifdef __SPECTRUM__
@@ -52,6 +52,11 @@
 // The PPS Sprinter PSG lib is totally untested, let's assume it is connected
 // and clocked as for a Spectrum, but probably we're wrong
 #define psgT(hz)		((int)(110837.5 / (hz)))
+#endif
+
+#ifdef __TRS80__
+// EACA Colour Genie EG2000 sound
+#define psgT(hz)		((int)(138550.0 / (hz)))
 #endif
 
 #ifdef __CPC__

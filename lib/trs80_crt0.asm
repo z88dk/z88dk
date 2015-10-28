@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.11 2015-10-26 18:34:51 stefano Exp $
+;       $Id: trs80_crt0.asm,v 1.12 2015-10-28 07:18:48 stefano Exp $
 ;
 
 
@@ -45,7 +45,11 @@
 ;--------
 
         IF      !myzorg
+			IF (startup=2)
+                defc    myzorg  = 22500
+			ELSE
                 defc    myzorg  = $5200
+			ENDIF
         ENDIF
                 org     myzorg
 
@@ -136,8 +140,7 @@ ENDIF
 ;-----------
 coords:         defw    0       ; Current graphics xy coordinates
 IF (startup=2)
-base_graphics:  defw    $4400   ; Address of the Graphics map   COLOUR GENIE - text map
-;base_graphics:  defw    $F000   ; Address of the Graphics map   COLOUR GENIE - text attributes map ?
+base_graphics:  defw    $4800   ; Address of the Graphics map   COLOUR GENIE
 ELSE
 base_graphics:  defw    $3c00   ; Address of the Graphics map
 ENDIF

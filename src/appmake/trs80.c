@@ -9,7 +9,7 @@
  *        When the program is in memory, type '/'.
  *
  *
- *        $Id: trs80.c,v 1.7 2015-10-26 18:34:51 stefano Exp $
+ *        $Id: trs80.c,v 1.8 2015-10-28 07:18:50 stefano Exp $
  */
 
 #include "appmake.h"
@@ -206,8 +206,8 @@ int trs80_exec()
 				for (i=0; i<256; i++)
 					fputc( 0, fpout);
 
-				fputc( 0xA5, fpout );
-				fputc( 0x55, fpout );
+				fputc( 0xA5, fpout ); /* sync byte */
+				fputc( 0x55, fpout ); /* system type filename header identifier */
 
 			/* Deal with the filename */
 				if (strlen(binname) >= 6 ) {
@@ -231,7 +231,7 @@ int trs80_exec()
 				if ( cmd )
 					writebyte (1,fpout);       /* Block signature byte in CMD mode */
 				else
-					writebyte (0x3c,fpout);    /* Escape char for block signature in CAS mode */
+					writebyte (0x3c,fpout);    /* Escape char for data block signature in CAS mode */
 
 				if ( (i+blocksz) > len )
 					if ( cmd )

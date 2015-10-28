@@ -1,3 +1,8 @@
+psg/trs80/set_psg
+psg/trs80/set_psg_callee
+psg/trs80/get_psg
+psg/trs80/psg_init
+@psg/psg.lst
 stdio/trs80/fgetc_cons
 stdio/trs80/fputc_cons
 stdio/trs80/getk

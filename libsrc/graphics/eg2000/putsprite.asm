@@ -3,10 +3,10 @@
 ; original code by Patrick Davidson (TI 85)
 ; modified by Stefano Bodrato - Jan 2001
 ;
-; VZ200/300 version
+;       Colour Genie EG2000 version
 ;
 ;
-; $Id: putsprite.asm,v 1.6 2015-10-28 07:18:50 stefano Exp $
+; $Id: putsprite.asm,v 1.1 2015-10-28 07:18:50 stefano Exp $
 ;
 
 	PUBLIC    putsprite
@@ -90,7 +90,7 @@
          inc      hl                ;Go to next byte
 ._notedge djnz     _iloop
          pop      hl                ;Restore address
-         ld       bc,32      ;Go to next line
+         ld       bc,40      ;Go to next line
          add      hl,bc
          pop      bc                ;Restore data
          djnz     _oloop
@@ -133,7 +133,7 @@
          djnz     wiloop
          pop	de
          pop      hl                ;Restore address
-         ld       bc,32		;Go to next line
+         ld       bc,40		;Go to next line
          add      hl,bc
          pop      bc                ;Restore data
          djnz     woloop
@@ -145,7 +145,7 @@
          djnz     wiloop
          dec      ix
          pop      hl
-         ld       bc,32
+         ld       bc,40
          add      hl,bc
          pop      bc
          djnz     woloop

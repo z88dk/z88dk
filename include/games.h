@@ -3,13 +3,17 @@
 
 #include <sys/compiler.h>
 
+#ifdef __TIKI100__
+#include <tiki100.h>
+#endif
+
 
 /*
  *	Videogames support code
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.21 2014-12-10 07:51:31 stefano Exp $
+ *	$Id: games.h,v 1.22 2015-10-28 07:18:48 stefano Exp $
  *
  */
 

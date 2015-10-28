@@ -5,7 +5,7 @@
 
 
 ;
-;	$Id: pixladdr.asm,v 1.6 2015-10-28 07:18:50 stefano Exp $
+;	$Id: pixladdr.asm,v 1.1 2015-10-28 07:18:49 stefano Exp $
 ;
 
 ; ******************************************************************
@@ -16,10 +16,10 @@
 ;
 ; ******************************************************************
 ;
-; VZ200/300 version By Stefano Bodrato
+;	 Colour Genie EG2000 version By Stefano Bodrato
 ;
-; The VZ screen size is 128x64
-; We draw blue dots over green display (UGH!)
+; The EG2000 screen size is 160x100
+; We draw red dots (UGH!)
 ;
 ;
 .pixeladdress
@@ -38,11 +38,10 @@
 				xor a
 				or  b
 				jr	z,zeroline
-				ld	de,32
+				ld	de,40
 .adder				add	hl,de
 				djnz	adder
 .zeroline
-
 
 				ld	d,h
 				ld	e,l
