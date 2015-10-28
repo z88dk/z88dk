@@ -5035,9 +5035,37 @@ replace restart {
 	add	hl,hl
 	ld	de,#%4
 	add	hl,de
-	; peephole z88dk-161a
-} 
-//if notUsed('de')
+	; peephole z88dk-161a1
+} if notUsed('de')
+
+replace restart {
+	ld	e,%1 (%3)
+	ld	d,%2 (%3)
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	ld	hl,#%4
+	add	hl,de
+} by {
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ex	de,hl
+	ld	hl,#%4
+	add	hl,de
+	; peephole z88dk-161a2
+}
 
 replace restart {
 	ld	e,%1 (%3)
@@ -5061,9 +5089,34 @@ replace restart {
 	add	hl,hl
 	ld	de,#%4
 	add	hl,de
-	; peephole z88dk-161b
-} 
-//if notUsed('de')
+	; peephole z88dk-161b1
+} if notUsed('de')
+
+replace restart {
+	ld	e,%1 (%3)
+	ld	d,%2 (%3)
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	ld	hl,#%4
+	add	hl,de
+} by {
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ex	de,hl
+	ld	hl,#%4
+	add	hl,de
+	; peephole z88dk-161b2
+}
 
 replace restart {
 	ld	e,%1 (%3)
@@ -5084,9 +5137,31 @@ replace restart {
 	add	hl,hl
 	ld	de,#%4
 	add	hl,de
-	; peephole z88dk-161c
-} 
-//if notUsed('de')
+	; peephole z88dk-161c1
+} if notUsed('de')
+
+replace restart {
+	ld	e,%1 (%3)
+	ld	d,%2 (%3)
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	ld	hl,#%4
+	add	hl,de
+} by {
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	ex	de,hl
+	ld	hl,#%4
+	add	hl,de
+	; peephole z88dk-161c2
+}
 
 replace restart {
 	ld	e,%1 (%3)
@@ -5104,9 +5179,28 @@ replace restart {
 	add	hl,hl
 	ld	de,#%4
 	add	hl,de
-	; peephole z88dk-161d
-} 
-//if notUsed('de')
+	; peephole z88dk-161d1
+} if notUsed('de')
+
+replace restart {
+	ld	e,%1 (%3)
+	ld	d,%2 (%3)
+	sla	e
+	rl	d
+	sla	e
+	rl	d
+	ld	hl,#%4
+	add	hl,de
+} by {
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
+	add	hl,hl
+	add	hl,hl
+	ex	de,hl
+	ld	hl,#%4
+	add	hl,de
+	; peephole z88dk-161d2
+}
 
 replace restart {
 	ld	e,%1 (%3)
@@ -5121,9 +5215,25 @@ replace restart {
 	add	hl,hl
 	ld	de,#%4
 	add	hl,de
-	; peephole z88dk-161e
-} 
-//if notUsed('de')
+	; peephole z88dk-161e1
+} if notUsed('de')
+
+replace restart {
+	ld	e,%1 (%3)
+	ld	d,%2 (%3)
+	sla	e
+	rl	d
+	ld	hl,#%4
+	add	hl,de
+} by {
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
+	add	hl,hl
+	ex	de,hl
+	ld	hl,#%4
+	add	hl,de
+	; peephole z88dk-161e1
+} if notUsed('de')
 
 replace restart {
 	ld	%1,%2 + %3 - %3
