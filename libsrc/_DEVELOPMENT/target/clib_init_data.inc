@@ -6,6 +6,9 @@
    
       ; rom model + data section is not compressed
 
+      EXTERN ASMHEAD_CODE_END
+      EXTERN ASMHEAD_DATA, ASMHEAD_DATA_END
+
       ld hl,ASMHEAD_CODE_END
       ld de,ASMHEAD_DATA
       ld bc,ASMHEAD_DATA_END - ASMHEAD_DATA
@@ -17,6 +20,9 @@
    IF (__crt_model = 2)
    
       ; rom model + data section is compressed
+      
+      EXTERN ASMHEAD_CODE_END
+      EXTERN ASMHEAD_DATA
       
       ld hl,ASMHEAD_CODE_END
       ld de,ASMHEAD_DATA
