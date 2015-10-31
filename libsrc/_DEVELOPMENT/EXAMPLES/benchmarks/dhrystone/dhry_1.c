@@ -271,9 +271,13 @@ ticks_end:
 }
 
 
+#ifndef NOREGISTER
 void Proc_1 (REGISTER Rec_Pointer Ptr_Val_Par)
-/******************/
+#else
+void Proc_1 (Rec_Pointer Ptr_Val_Par)
+#endif
 
+/******************/
 
     /* executed once */
 {
