@@ -1,14 +1,14 @@
 
-TARGETS = embedded zx m cpm
-TARGETS = cpm
+TARGET ?= embedded zx m cpm
 
-jobs := $(foreach target,$(TARGETS),job-$(target))
-cleans := $(foreach target,$(TARGETS),clean-$(target))
+jobs := $(foreach target,$(TARGET),job-$(target))
+cleans := $(foreach target,$(TARGET),clean-$(target))
 
 .PHONY: all
 all: ${jobs} 
 
 target = $(firstword $(subst -, ,$*))
+
 
 .PHONY: ${jobs}
 ${jobs}: job-%:
