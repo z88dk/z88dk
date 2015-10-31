@@ -1,4 +1,24 @@
 
+object oriented block device driver
+
+finalize sdcc peephole rules
+
+O_NONBLOCK returns file in error state
+SIGINT can be enabled in key scan like CTRL-C in cpm target
+
+
+bad int state code in clg() -classic c lib (wos, einar)
+sections done wrong
+
+
+method to use different tty terminals at target using -lcpm/vt100 (eg)
+
+
+
+copt limit on matching string length
+memstream attached to fd
+
+
 TODO:
 
 [
@@ -13,8 +33,6 @@ TODO:
 
 * known issue: in password mode output terminals display '*' when enter typed
 
-* known issue: fzx output terminal scroll limit seems off
-
 * zx scroll reexamined
 
 * change 4x8 font to use only nibbles in font definitions
@@ -26,7 +44,7 @@ MEDIUM TERM:
 
 * make some library options compile time rather than library build time
 
-* low level fzx print functions with embedded sequences
+* low level fzx print functions with embedded control sequences
 
 
 LONG TERM:
@@ -46,9 +64,17 @@ LONG TERM TENTATIVE:
 
 ]
 
-* target open
 
-* check constraints on code location in some stdio state machines
 
-* create library functions to load from fixed offset from ix
-should save dozens of bytes
+sccz80 deficiency:
+
+// mutiple function definitions with same return type
+// int fa(int), fb(int);
+
+// static initialization of double
+// double c = 1.0;
+
+// backslash escape that isn't followed by lf
+//int a[] = { 0, 0, 0, 0, \ 
+//1, 1, 1, 1,  /* comment */
+//2, 2, 2, 2};
