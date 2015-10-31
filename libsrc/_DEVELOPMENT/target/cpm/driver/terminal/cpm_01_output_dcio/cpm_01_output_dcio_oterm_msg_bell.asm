@@ -19,5 +19,5 @@ cpm_01_output_dcio_oterm_msg_bell:
 cpm_01_output_dcio_oterm_msg_bell_0:
 
    ld c,__CPM_DCIO             ; bdos direct console i/o
-   ld e,CHAR_CTRL_G
+   ld e,7
    jp asm_cpm_bdos_alt
