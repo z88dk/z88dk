@@ -33,15 +33,19 @@ IF __clib_malloc_heap_size = -1
    
    EXTERN ASMHEAD_BSS_END
    
+   dec sp                      ; ensure sp == 0 is accepted
+   
    ld hl,0
    add hl,sp                   ; hl = top of the stack
    
+   inc sp
+   
    ld de,ASMHEAD_BSS_END
-   sbc hl,de                   ; hl = space between top of stack and end of bss
+   sbc hl,de                   ; hl = space between top of stack and end of bss - 1
 
    jp c, __Exit                ; if stack overlaps bss, this is a fatal error
    
-   ld bc,__crt_stack_size + 15 ; amount of space reserved by stack + minimum heap size
+   ld bc,__crt_stack_size + 14 ; amount of space reserved by stack + minimum heap size - 1
    sbc hl,bc                   ; hl = max heap size - 15
    
    jp c, __Exit                ; if no room for heap, this is a fatal error
@@ -56,7 +60,7 @@ IF __clib_malloc_heap_size = -1
    
    EXTERN asm_heap_init
    call asm_heap_init
-
+   
 ENDIF
 
 IF __clib_malloc_heap_size > 14
