@@ -114,6 +114,7 @@
  * IBM PC/XT	8088-4.77Mhz	COHERENT 2.3.43	Mark Wiiliams	 259	 275
  * -		8086-8Mhz	RMX86 V6	Intel C-86 V2.0	 287	 304 ??
  * Fortune 32:16 68000-6Mhz	V7+sys3+4.1BSD  cc		 360	 346
+ * -            Z80-4MHz        None            Z88DK_SDCC 2015  365     281 (reg means static)
  * PDP-11/34A	w/FP-11C	UNIX V7m	cc		 406	 449
  * Macintosh512	68000-7.7Mhz	Mac ROM O/S	DeSmet(C ware)	 625	 625
  * VAX-11/750	w/FPA		UNIX 4.2BSD	cc		 831	 852
@@ -144,6 +145,7 @@
  * TYPE				SYSTEM				NO REG	REGS
  * --------------------------	------------	-----------	---------------
  * Commodore 64	6510-1MHz	C64 ROM		C Power 2.8	  36	  36
+ * -            Z80-4MHz        None            Z88DK_SDCC 2015  402     301 (reg means static)
  * HP-110	8086-5.33Mhz	MSDOS 2.11	Lattice 2.14	 284	 284
  * IBM PC/XT	8088-4.77Mhz	PC/IX		cc		 271	 294
  * CCC 3205	-		Xelos(SVR2) 	cc		 558	 592
@@ -408,9 +410,14 @@
  *  If time subroutines are not supplied rely on external measurement.
  *
  */
- 
+
+#pragma output CLIB_EXIT_STACK_SIZE = 0
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+#pragma output CLIB_STDIO_HEAP_SIZE = 0
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Accuracy of timings and human fatigue controlled by next two lines */
 #define LOOPS	5000		/* Use this for slow or 16 bit machines */
@@ -469,6 +476,7 @@ typedef struct Record 	RecordType;
 typedef RecordType *	RecordPtr;
 typedef int		boolean;
 
+#undef NULL
 #define	NULL		0
 #define	TRUE		1
 #define	FALSE		0
@@ -476,11 +484,8 @@ typedef int		boolean;
 #ifndef NOREG
 #define	REG		static
 #else
-#undef REG
+#define REG
 #endif
-
-extern Enumeration	Func1(void);
-extern boolean		Func2(void);
 
 #ifndef NOTIMER
 extern unsigned long	time_begin(void);
@@ -515,10 +520,10 @@ Enumeration	Func1(CapitalLetter CharPar1, CapitalLetter CharPar2);
 boolean		Func2(String30 StrParI1, String30 StrParI2);
 boolean		Func3(Enumeration EnumParIn);
 
-main()
+int main()
 {
 	Proc0();
-	exit(0);
+	return 0;
 }
 
 void Proc0(void)
@@ -583,7 +588,7 @@ void Proc0(void)
 
 	PtrGlbNext = (RecordPtr) malloc(sizeof(RecordType));
 	PtrGlb = (RecordPtr) malloc(sizeof(RecordType));
-/*
+*/
 	PtrGlbNext = &ra;
 	PtrGlb = &rb;
 	PtrGlb->PtrComp = PtrGlbNext;
@@ -710,7 +715,7 @@ void Proc1(RecordPtr PtrParIn)
 	PtrParIn->IntComp = 5;
 	NextRecord.IntComp = PtrParIn->IntComp;
 	NextRecord.PtrComp = PtrParIn->PtrComp;
-	Proc3(NextRecord.PtrComp);
+	Proc3(&NextRecord.PtrComp);
 	if (NextRecord.Discr == Ident1)
 	{
 		NextRecord.IntComp = 6;
