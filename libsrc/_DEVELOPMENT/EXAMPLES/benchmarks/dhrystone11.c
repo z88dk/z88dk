@@ -114,7 +114,7 @@
  * IBM PC/XT	8088-4.77Mhz	COHERENT 2.3.43	Mark Wiiliams	 259	 275
  * -		8086-8Mhz	RMX86 V6	Intel C-86 V2.0	 287	 304 ??
  * Fortune 32:16 68000-6Mhz	V7+sys3+4.1BSD  cc		 360	 346
- * -            Z80-4MHz        -               Z88DK_SDCC 2015  365     281 (reg means static)
+ * -            Z80-4MHz        -               Z88DK_SDCC 2015  365     365
  * PDP-11/34A	w/FP-11C	UNIX V7m	cc		 406	 449
  * Macintosh512	68000-7.7Mhz	Mac ROM O/S	DeSmet(C ware)	 625	 625
  * VAX-11/750	w/FPA		UNIX 4.2BSD	cc		 831	 852
@@ -159,7 +159,7 @@
  * PC/XT        8088-4.77Mhz    Venix/86 SYS V  cc               339     377
  * IBM PC	8088-4.77Mhz	MSDOS 2.0	CI-C86 2.20M	 390	 390
  * IBM PC/XT	8088-4.77Mhz	PCDOS 2.1	Wizard 2.1	 367	 403
- * -            Z80-4MHz        -               Z88DK_SDCC 2015  402     301 (reg means static)
+ * -            Z80-4MHz        -               Z88DK_SDCC 2015  402     402
  * IBM PC/XT	8088-4.77Mhz	PCDOS 3.1	Lattice 2.15	 403	 403 @
  * Colex DM-6	68010-8Mhz	Unisoft SYSV	cc		 378	 410
  * IBM PC	8088-4.77Mhz	PCDOS 3.1	Datalight 1.10	 416	 416
@@ -405,7 +405,7 @@
  * Home Brew    Z80-4.00Mhz     CPM-80          Hisoft C++          53        53    v1.1  #####
  * Home Brew    Z80-2.5Mhz	CPM-80 v2.2	Aztec CII v1.05g    91        91    v1.1  #########
  * Commodore128 8502-2Mhz       C128 ROM        cc65 2.12.9        100       105    v1.1  ##########
- * -            Z80-4MHz        -               Z88DK_SDCC 10.2015 365       281    v1.1 (reg means static)
+ * -            Z80-4MHz        -               Z88DK_SDCC 10.2015 365       281    v1.1  ####################################]
  */
 
 /*
