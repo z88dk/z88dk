@@ -114,7 +114,7 @@
  * IBM PC/XT	8088-4.77Mhz	COHERENT 2.3.43	Mark Wiiliams	 259	 275
  * -		8086-8Mhz	RMX86 V6	Intel C-86 V2.0	 287	 304 ??
  * Fortune 32:16 68000-6Mhz	V7+sys3+4.1BSD  cc		 360	 346
- * -            Z80-4MHz        None            Z88DK_SDCC 2015  365     281 (reg means static)
+ * -            Z80-4MHz        -               Z88DK_SDCC 2015  365     281 (reg means static)
  * PDP-11/34A	w/FP-11C	UNIX V7m	cc		 406	 449
  * Macintosh512	68000-7.7Mhz	Mac ROM O/S	DeSmet(C ware)	 625	 625
  * VAX-11/750	w/FPA		UNIX 4.2BSD	cc		 831	 852
@@ -145,7 +145,6 @@
  * TYPE				SYSTEM				NO REG	REGS
  * --------------------------	------------	-----------	---------------
  * Commodore 64	6510-1MHz	C64 ROM		C Power 2.8	  36	  36
- * -            Z80-4MHz        None            Z88DK_SDCC 2015  402     301 (reg means static)
  * HP-110	8086-5.33Mhz	MSDOS 2.11	Lattice 2.14	 284	 284
  * IBM PC/XT	8088-4.77Mhz	PC/IX		cc		 271	 294
  * CCC 3205	-		Xelos(SVR2) 	cc		 558	 592
@@ -160,6 +159,7 @@
  * PC/XT        8088-4.77Mhz    Venix/86 SYS V  cc               339     377
  * IBM PC	8088-4.77Mhz	MSDOS 2.0	CI-C86 2.20M	 390	 390
  * IBM PC/XT	8088-4.77Mhz	PCDOS 2.1	Wizard 2.1	 367	 403
+ * -            Z80-4MHz        -               Z88DK_SDCC 2015  402     301 (reg means static)
  * IBM PC/XT	8088-4.77Mhz	PCDOS 3.1	Lattice 2.15	 403	 403 @
  * Colex DM-6	68010-8Mhz	Unisoft SYSV	cc		 378	 410
  * IBM PC	8088-4.77Mhz	PCDOS 3.1	Datalight 1.10	 416	 416
@@ -392,7 +392,48 @@
  */
 
 /*
+ * FROM CC65
+ *
+ * MACHINE	MICROPROCESSOR	OPERATING	COMPILER	   DHRYSTONES/SEC.
+ * TYPE				SYSTEM				   NO REG    REGS
+ * --------------------------	------------	-----------	   ---------------
+ * Commodore 64 6510-1Mhz       C64 ROM         C Power 2.9 trim    19        34    v1.1  ##
+ * Commodore 64	6510-1MHz	C64 ROM		C Power 2.8	    36	      36    v1.0  ###]
+ * Apple IIe	65C02-1.02Mhz	DOS 3.3		Aztec CII v1.05i    37	      37    v1.1  ###]
+ * Commodore128 8502-2Mhz       C128 ROM        C Power 128  trim   43        68    v1.1  ####
+ * Commodore 64	6510-0.98MHz	C64 ROM		cc65 2.12.9	    50        52    v1.1  #####
+ * Home Brew    Z80-4.00Mhz     CPM-80          Hisoft C++          53        53    v1.1  #####
+ * Home Brew    Z80-2.5Mhz	CPM-80 v2.2	Aztec CII v1.05g    91        91    v1.1  #########
+ * Commodore128 8502-2Mhz       C128 ROM        cc65 2.12.9        100       105    v1.1  ##########
+ * -            Z80-4MHz        -               Z88DK_SDCC 10.2015 365       281    v1.1 (reg means static)
+ */
+
+/*
  *  Z88DK NOTES
+ *
+ *  After all these years it turns out Dhrystone1.0/1.1 had a bug in it.  It
+ *  has been fixed without affecting execution time to allow compiling with
+ *  present day compilers.  Search for "BUG" below.
+ *
+ *  The original did a malloc to obtain memory before entering the timing
+ *  loop.  This has been replaced with taking the address of some static
+ *  memory in order to increase compatibility with legacy compilers that
+ *  did not supply a malloc library (!).  Search for "MALLOC" below.
+ *
+ *  All vestiges of non-ansi C have been removed.
+ *
+ *  The tables ask that two runs be made: one with 'register' and one without.
+ *
+ *  - without:  use -DNOREG on the compile line.
+ *  - with 'register':  use -DNOSTAT on the compile line.
+ *  - with 'static' instead of 'register':  no special defines
+ *
+ *  The extra 'static' option is present because none of the z80 compilers
+ *  pay attention to the 'register' keyword however some of them will
+ *  generate better code when using static variables.  So we take 'register'
+ *  to mean 'static' for the REG performance column and this allows
+ *  the performance to be more in-line with C code written for the z80
+ *  where one of the main performance enhancers is to replace locals with statics.
  *
  * -DNOENUM
  *  If the compiler does not support enum.
@@ -401,7 +442,10 @@
  *  If the compiler does not do structure assignment.
  *
  * -DNOREG
- *  If register should not be used (code uses 'static' instead of 'register').
+ *  If register should not be used.
+ *
+ * -DNOSTAT
+ *  If 'register' keyword should not be replaced by 'static'.
  *
  * -DGOOF
  *  Enable to run v1.0 otherwise v1.1 is run.
@@ -410,10 +454,6 @@
  *  If time subroutines are not supplied rely on external measurement.
  *
  */
-
-#pragma output CLIB_EXIT_STACK_SIZE = 0
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0
-#pragma output CLIB_STDIO_HEAP_SIZE = 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -482,9 +522,13 @@ typedef int		boolean;
 #define	FALSE		0
 
 #ifndef NOREG
-#define	REG		static
+   #ifndef NOSTAT
+      #define REG	static
+   #else
+      #define REG	register
+   #endif
 #else
-#define REG
+   #define REG
 #endif
 
 #ifndef NOTIMER
@@ -605,10 +649,6 @@ void Proc0(void)
 -- Start Timer --
 *****************/
 
-#asm
-ticks_begin:
-#endasm
-
 /*
 #ifdef TIME
 	starttime = time( (long *) 0);
@@ -625,9 +665,12 @@ ticks_begin:
 	starttime = time_begin();
 #endif
 
+#asm
+ticks_begin:
+#endasm
+
 	for (i = 0; i < LOOPS; ++i)
 	{
-
 		Proc5();
 		Proc4();
 		IntLoc1 = 2;
@@ -707,7 +750,15 @@ ticks_end:
 #endif
 }
 
+#ifndef NOREG
+#ifndef NOSTAT
 void Proc1(RecordPtr PtrParIn)
+#else
+void Proc1(REG RecordPtr PtrParIn)
+#endif
+#else
+void Proc1(RecordPtr PtrParIn)
+#endif
 {
 #define	NextRecord	(*(PtrParIn->PtrComp))
 
@@ -715,6 +766,11 @@ void Proc1(RecordPtr PtrParIn)
 	PtrParIn->IntComp = 5;
 	NextRecord.IntComp = PtrParIn->IntComp;
 	NextRecord.PtrComp = PtrParIn->PtrComp;
+/*
+	THIS IS A BUG IN DHRYSTONE
+	Proc3(NextRecord.PtrComp);
+	CORRECT CODE HAS SAME EXEC TIME
+*/
 	Proc3(&NextRecord.PtrComp);
 	if (NextRecord.Discr == Ident1)
 	{
@@ -772,7 +828,15 @@ void Proc5(void)
 	BoolGlob = FALSE;
 }
 
+#ifndef NOREG
+#ifndef NOSTAT
 void Proc6(Enumeration EnumParIn, Enumeration *EnumParOut)
+#else
+void Proc6(REG Enumeration EnumParIn, REG Enumeration *EnumParOut)
+#endif
+#else
+void Proc6(Enumeration EnumParIn, Enumeration *EnumParOut)
+#endif
 {
 	*EnumParOut = EnumParIn;
 	if (! Func3(EnumParIn) )
@@ -854,7 +918,15 @@ boolean Func2(String30 StrParI1, String30 StrParI2)
 	}
 }
 
+#ifndef NOREG
+#ifndef NOSTAT
 boolean Func3(Enumeration EnumParIn)
+#else
+boolean Func3(REG Enumeration EnumParIn)
+#endif
+#else
+boolean Func3(Enumeration EnumParIn)
+#endif
 {
 	REG Enumeration	EnumLoc;
 
