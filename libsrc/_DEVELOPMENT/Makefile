@@ -16,7 +16,7 @@ ${jobs}: job-%:
 	cp target/$(target)/clib_target_cfg.asm .
 	z80asm -ns -nm -Mo -xlib/sccz80/$(target) @target/$(target)/library/$(target)_sccz80.lst
 	z80asm -ns -nm -Mo -xlib/sdcc_ix/$(target) -D__SDCC -D__SDCC_IX @target/$(target)/library/$(target)_sdcc_ix.lst
-	z80asm -ns -nm -Mo -xlib/sdcc_iy/$(target) -D__SDCC -D__SDCC_IY @target/$(target)/library/$(target)_sdcc_iy.lst
+	z80asm -ns -nm -Mo -IXIY -xlib/sdcc_iy/$(target) -D__SDCC -D__SDCC_IY @target/$(target)/library/$(target)_sdcc_iy.lst
 
 .PHONY: ${cleans}
 ${cleans}: clean-%:
