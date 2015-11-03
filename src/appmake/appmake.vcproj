@@ -283,6 +283,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\px.c"
+				>
+			</File>
+			<File
 				RelativePath=".\residos.c"
 				>
 			</File>

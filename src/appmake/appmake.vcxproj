@@ -109,6 +109,7 @@
     <ClCompile Include="newbrain.c" />
     <ClCompile Include="newext.c" />
     <ClCompile Include="p2000.c" />
+    <ClCompile Include="px.c" />
     <ClCompile Include="residos.c" />
     <ClCompile Include="rex6000.c" />
     <ClCompile Include="rom.c" />

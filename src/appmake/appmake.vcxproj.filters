@@ -68,6 +68,9 @@
     <ClCompile Include="p2000.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="px.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="rex6000.c">
       <Filter>Source Files</Filter>
     </ClCompile>

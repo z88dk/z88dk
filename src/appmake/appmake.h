@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.48 2015-10-20 16:48:10 stefano Exp $
+ *   $Id: appmake.h,v 1.49 2015-11-03 20:27:14 stefano Exp $
  */
 
 
@@ -100,6 +100,9 @@ extern option_t  nec_options;
 
 extern int       p2000_exec(char *target);
 extern option_t  p2000_options;
+
+extern int       px_exec(char *target);
+extern option_t  px_options;
 
 extern int       sorcerer_exec(char *target);
 extern option_t  sorcerer_options;
@@ -248,6 +251,10 @@ struct {
       "PC-6001 (and others) CAS format conversion utility",
       NULL,
       nec_exec,    &nec_options },
+    { "px2rom",   "px",       "(C) 2015 Stefano Bodrato",
+      "Create an epson PX(HC) family compatible EPROM image",
+      NULL,
+      px_exec,   &px_options },
     { "mc2cas",   "p2000",      "(C) 2014 Stefano Bodrato",
       "Philips P2000 MicroCassette to CAS format conversion",
       NULL,
