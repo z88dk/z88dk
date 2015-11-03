@@ -3,7 +3,7 @@
  *      This tool handles only the compact format (similar to the one used by BASIC)
  *      to reduce the directory size at most and leave space for our executable.
  *
- *      $Id: px.c,v 1.1 2015-11-03 20:30:04 stefano Exp $
+ *      $Id: px.c,v 1.2 2015-11-03 20:32:30 stefano Exp $
  */
 
 
@@ -177,19 +177,6 @@ int px_exec(char *target)
 		blk++;
 		romimg[b-1]+=8;
 	}
-	
-
-		
-/*	
-1430:4000  E5 37 20 0F FF 48 38 30-42 41 53 49 43 20 20 20   .7 ..H80BASIC
-1430:4010  20 20 20 20 20 20 04 56-31 30 30 39 31 36 38 33         .V10091683
-1430:4020  00 42 41 53 49 43 20 20-20 43 4F 4D 00 00 00 80   .BASIC   COM....
-1430:4030  01 02 03 04 05 06 07 08-09 0A 0B 0C 0D 0E 0F 10   ................
-1430:4040  00 42 41 53 49 43 20 20-20 43 4F 4D 01 00 00 78   .BASIC   COM...x
-1430:4050  11 12 13 14 15 16 17 18-19 1A 1B 1C 1D 1E 1F 00   ................
-1430:4060  E5 E5 E5 E5 E5 E5 E5 E5-E5 E5 E5 E5 E5 E5 E5 E5   ................
-1430:4070  E5 E5 E5 E5 E5 E5 E5 E5-E5 E5 E5 E5 E5 E5 E5 E5   ................
-*/
 	
 	/* Load program data.. on the Epson PX the 27256 eprom halves are inverted, 
 	   so let's begin at 0x4000 + the rom header and directory */
