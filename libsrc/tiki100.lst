@@ -19,3 +19,4 @@ graphics/draw_profile
 graphics/w_pointxy
 tiki100/gr_setpalette
 tiki100/gr_defmod
+tiki100/gr_scroll

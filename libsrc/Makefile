@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.227 2015-10-28 07:18:48 stefano Exp $
+# $Id: Makefile,v 1.228 2015-11-03 20:03:37 stefano Exp $
 
 
 include Make.config
@@ -23,7 +23,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	pc6001_clib.lib pc6001ansi_clib.lib pps_clib.lib ppsansi_clib.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib  sos_clib.lib tiki100.lib\
-	trs80_clib.lib vg5k_clib.lib vg5kansi_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
+	trslibs vg5k_clib.lib vg5kansi_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
 	embedded_clib.lib test_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
 
@@ -35,6 +35,8 @@ c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib
 eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 
 cpclibs: cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib
+
+trslibs: trs80_clib.lib gfxeg2000.lib gfxtrs80.lib
 
 z88libs: z88_math.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
 	 z88ansi_clib.lib gfx.lib 
@@ -1540,11 +1542,20 @@ trs80_clib.lib:
 	$(MAKE) -C games ltrs80
 	$(MAKE) -C psg
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
+
+# TRS 80 pseudo graphics - stefano
+gfxtrs80.lib:
 	@echo ''
-	@echo '--- Building TRS 80 GFX libraires ---'
+	@echo '--- Building TRS 80 GFX library ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(LISTFILE_DIRECTORY)/gfxtrs80.lst
+
+# TRS 80 pseudo graphics - stefano
+gfxeg2000.lib:
+	@echo ''
+	@echo '--- Building Video Genie EG2000 GFX library ---'
+	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/gfxeg2000.lst
 

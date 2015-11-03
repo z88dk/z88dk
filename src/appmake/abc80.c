@@ -4,7 +4,7 @@
  *
  *        WAV conversion taken from ABCcas - by Robert Juhasz, 2008
  *
- *        $Id: abc80.c,v 1.6 2014-10-01 13:15:31 stefano Exp $
+ *        $Id: abc80.c,v 1.7 2015-11-03 20:03:37 stefano Exp $
  */
 
 #include "appmake.h"
@@ -156,7 +156,7 @@ void wavheaderout(FILE *f,int numsamp)
 
 void writeword(unsigned int, FILE *);
 
-int abc80_exec()
+int abc80_exec(char *target)
 {
     char       filename[FILENAME_MAX+1];
     char       wavfile[FILENAME_MAX+1];

@@ -9,7 +9,7 @@
  *        When the program is in memory, type '/'.
  *
  *
- *        $Id: trs80.c,v 1.8 2015-10-28 07:18:50 stefano Exp $
+ *        $Id: trs80.c,v 1.9 2015-11-03 20:03:37 stefano Exp $
  */
 
 #include "appmake.h"
@@ -122,7 +122,7 @@ void trs80_rawout (FILE *fpout, unsigned char b)
 }
 
 
-int trs80_exec()
+int trs80_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
     char    wavfile[FILENAME_MAX+1];

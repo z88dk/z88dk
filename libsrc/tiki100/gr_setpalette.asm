@@ -2,73 +2,96 @@
 ;	TIKI-100 graphics routines
 ;	by Stefano Bodrato, Fall 2015
 ;
+;	Edited by Frode van der Meeren
+;
 ;   Palette is always 16 colors long, 'len' is the number
 ;   of colors being passed, which will be copied many times
 ;
 ; void __FASTCALL__ gr_setpalette(int len, char *palette)
 ;
+;	Changelog:
 ;
-;	$Id: gr_setpalette.asm,v 1.1 2015-10-13 19:56:30 stefano Exp $
+;	v1.2 - FrodeM
+;	   * Made sure no palette writes take place when palette register is updated
+;	   * Palette register is only written to once per entry in char palette
+;	   * Use address $F04D to store graphics mode instead of dedicated byte
+;
+;	$Id: gr_setpalette.asm,v 1.2 2015-11-03 20:03:37 stefano Exp $
 ;
 
 PUBLIC gr_setpalette
 
-EXTERN gr_currentmode
-
 gr_setpalette:
-	pop bc
-	pop hl
-	pop de
-	push de
-	push hl
-	push bc
-	
-	ld  d,e		; len
-	ld b,0
+	pop	bc
+	pop	hl		; *palette
+	pop	de		; len
+	push	de
+	push	hl
+	push	bc
+
+	ld	b,e
+	ld	d,0
 set_loop:
-	ld a,(hl)
-	push hl
-	push bc
-	push de
-	call do_set
-	pop de
-	pop bc
-	pop hl
-	inc hl
-	inc b
-	dec d
-	jr nz,set_loop
-	
+	ld	a,(hl)
+	inc	hl
+	push	bc
+	push	de
+	push	hl
+	call	do_set
+	pop	hl
+	pop	de
+	pop	bc
+	inc	d
+	djnz	set_loop
+
 	ret
 	
-	
+
+;
+; Writes a single palette color from a palette of a given size,
+; where the palette is looping through all 16 palette entries.
+; Size 2, 4 and 16 makes sense, and no other values for size
+; should be used.
+;
+;
+; Input:
+; 	A = Palette
+; 	D = Position
+; 	E = Size
+;
 .do_set
-	XOR 255		; complement color value
-	LD E,A
-;	LD D,2		; total colors (2 for BW palette)
+	ld	hl,($F04D)
+	cpl				; complement color value
+	ld	c,a
+	di
+	LD	A,(hl)			; Make sure it's not writing to palette when the palette is updated, just in case
+	and	$7F
+	OUT	($0C),A
+	ld	b,$20			; Wait a bit
+.wait_loop2
+	djnz	wait_loop2
+	ld	a,c			; Store palette to be written
+	ld	(hl),a
+	OUT	($14),A
+	ei
 .palette_loop
-	PUSH DE
-	LD A,E
 	DI
-	OUT ($14),A		; Palette register (prepare the color to be loaded)
-	OUT ($14),A		; Palette register (do it again to be sure)
-	LD 	A,(gr_currentmode)		; register value for current graphics mode
-	ADD B			; palette position
-	AND $3F
-	LD D,A
-	ADD $80
-	OUT ($0C),A		; set graphics mode enabling graphics
-	LD C,0
+	LD	a,(hl)			; Prepare graphics port
+	and	$30
+	or	b			; palette position
+	ld	c,a
+	or	$80
+	OUT	($0C),A			; Enable writing to palette at end of this scanline
+	LD	b,$20			; wait for HBLANK to get the color copied in the requested palette position
 .wait_loop
-	DEC C
-	JP NZ,wait_loop		; wait for HBLANK to get the color copied in the requested palette position
-	LD A,D
-	OUT ($0C),A			; set graphics mode
+	djnz	wait_loop
+	ld	a,c
+	LD	(hl),a			; graphics port might have changed, so update corresponding data in RAM
+	OUT	($0C),A			; disable writes to the palette
 	EI
-	POP DE
-	LD A,B
-	ADD D			; move to next palette position
-	LD B,A
-	CP 16
-	JR C,palette_loop
+	ld	a,d			; move to next palette position for this color and palette size
+	add	a,e
+	ld	d,a
+	CP	16
+	JR	C,palette_loop
 	RET
