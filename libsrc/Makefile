@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.228 2015-11-03 20:03:37 stefano Exp $
+# $Id: Makefile,v 1.229 2015-11-04 07:30:01 stefano Exp $
 
 
 include Make.config
@@ -20,10 +20,10 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	msx_clib.lib mtx_clib.lib mz_clib.lib mzansi_clib.lib \
 	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
 	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib p2000_clib.lib p2000ansi_clib.lib \
-	pc6001_clib.lib pc6001ansi_clib.lib pps_clib.lib ppsansi_clib.lib \
+	pc6001_clib.lib pc6001ansi_clib.lib pps_clib.lib ppsansi_clib.lib px4.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib  sos_clib.lib tiki100.lib\
-	trslibs vg5k_clib.lib vg5kansi_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
+	trs80_clib.lib vg5k_clib.lib vg5kansi_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
 	embedded_clib.lib test_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
 
@@ -35,8 +35,6 @@ c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib
 eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 
 cpclibs: cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib
-
-trslibs: trs80_clib.lib gfxeg2000.lib gfxtrs80.lib
 
 z88libs: z88_math.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
 	 z88ansi_clib.lib gfx.lib 
@@ -532,6 +530,12 @@ ppsansi_clib.lib:
 	$(MAKE) -C psg
 	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/ppsansi_clib @$(LISTFILE_DIRECTORY)/ppsansi.lst
+	
+px4.lib:
+	@echo ''
+	@echo '--- Building PX-4/HC-40 Library ---'
+	@echo ''
+	$(LIBLINKER) -DFORpx4 -x$(OUTPUT_DIRECTORY)/px4 @$(LISTFILE_DIRECTORY)/px4.lst
 
 # VZ200/300 lib - Stefano
 vz_clib.lib:
@@ -1542,20 +1546,11 @@ trs80_clib.lib:
 	$(MAKE) -C games ltrs80
 	$(MAKE) -C psg
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
-
-# TRS 80 pseudo graphics - stefano
-gfxtrs80.lib:
 	@echo ''
-	@echo '--- Building TRS 80 GFX library ---'
+	@echo '--- Building TRS 80 GFX libraires ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/gfxtrs80 @$(LISTFILE_DIRECTORY)/gfxtrs80.lst
-
-# TRS 80 pseudo graphics - stefano
-gfxeg2000.lib:
-	@echo ''
-	@echo '--- Building Video Genie EG2000 GFX library ---'
-	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/gfxeg2000.lst
 
