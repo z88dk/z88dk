@@ -3,7 +3,7 @@
 ;   Stefano - Nov 2015
 ;
 ;
-;	$Id: clg.asm,v 1.1 2015-11-04 07:30:02 stefano Exp $
+;	$Id: clg.asm,v 1.2 2015-11-05 16:08:04 stefano Exp $
 ;
 
         PUBLIC    clg

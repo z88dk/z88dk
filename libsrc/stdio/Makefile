@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.47 2015-08-05 05:28:30 pauloscustodio Exp $
+# $Id: Makefile,v 1.48 2015-11-05 16:08:04 stefano Exp $
 #
 
 include ../Make.config
@@ -133,6 +133,7 @@ clean:
 	$(RM) ansi/osca/*.o
 	$(RM) ansi/p2000/*.o
 	$(RM) ansi/pc6001/*.o
+	$(RM) ansi/px4/*.o
 	$(RM) ansi/sam/*.o
 	$(RM) ansi/sharp-mz/*.o
 	$(RM) ansi/spectrum/*.o
@@ -148,6 +149,7 @@ clean:
 	$(RM) ace/*.o
 	$(RM) aquarius/*.o
 	$(RM) c128/*.o
+	$(RM) c7420/*.o
 	$(RM) cpc/*.o
 	$(RM) cpm/*.o
 	$(RM) enterprise/*.o

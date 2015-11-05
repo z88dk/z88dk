@@ -3,7 +3,7 @@
  *      This tool handles only the compact format (similar to the one used by BASIC)
  *      to reduce the directory size at most and leave space for our executable.
  *
- *      $Id: px.c,v 1.2 2015-11-03 20:32:30 stefano Exp $
+ *      $Id: px.c,v 1.3 2015-11-05 16:08:04 stefano Exp $
  */
 
 
@@ -17,6 +17,7 @@ static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char              help         = 0;
+static char              fullsize     = 0;
 
 
 /* Options that are available for this module */
@@ -25,6 +26,7 @@ option_t px_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0,  "32k",     "Force the 32K ROM format",  OPT_BOOL,  &fullsize},
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -90,8 +92,8 @@ int px_exec(char *target)
 	
 	fseek(fpin,0L,SEEK_SET);
 	
-    if (len>(32768-180)) {
-        fprintf(stderr,"Program is too big\n");
+    if (len>(32768-180-16384)) {
+        fprintf(stderr,"Program is too big (32K not yet supported)\n");
         fclose(fpin);
         myexit(NULL,1);
     }
@@ -118,7 +120,7 @@ int px_exec(char *target)
 
 	romimg[b++]=0x0F;
 	romimg[b++]=0xFF;
-	
+
 	memcpy (romimg+b, header, 27);
 	
 	b=0x4000+0x21;
@@ -126,6 +128,7 @@ int px_exec(char *target)
     suffix_change(filename,"");
 	i=0;
 	while ((i<8) && (filename[i])) {
+		romimg[i+0x400e]=toupper(filename[i]);
         romimg[b++]=toupper(filename[i]);
 		i++;
     }
@@ -150,12 +153,10 @@ int px_exec(char *target)
     }
 	
 	len2=len;
-	romimg[b-1]=7;
+	romimg[b-1]=0;
 	blk=0;
 	while (len2 > 0) {
 		if (blk==16) {
-			romimg[b-1]=128;
-			blk=0;
 			b=0x4040;
 			memcpy (romimg+b, entry_skeleton, 16);
 			romimg[b++]=0;
@@ -165,17 +166,22 @@ int px_exec(char *target)
 				i++;
 			}
 			b=0x4050;
+			romimg[b-1]=0;
 			for ( i = b+1; i < b+16; i++) {
 				romimg[i]=0;
 			}
 		}
-		romimg[b+blk]=blk+1;
-		if (len2==0)
+		romimg[b+(blk%16)]=blk+1;
+		if (len2==len) {
 			len2-=896;
-		else
+			romimg[b-1]+=7;
+		} else {
 			len2-=1024;
+			romimg[b-1]+=8;
+		}
 		blk++;
-		romimg[b-1]+=8;
+		if (blk==16)
+			romimg[b-1]=128;
 	}
 	
 	/* Load program data.. on the Epson PX the 27256 eprom halves are inverted, 
@@ -187,10 +193,25 @@ int px_exec(char *target)
 		if (b>0x8000) b=0;
     }
 
+	if ( (len > 16256) || (fullsize) ) {
+		printf ("\nPreaparing a 32K ROM image (27256 EPROM)\n\n");
+		for ( i = 0; i < 0x8000; i++) {
+			writebyte(romimg[i],fpout);
+		}
+	} else {
+		if (len > 8064) {
+			printf ("\nProgram fits in a 16K EPROM (27128)\n\n");
+			for ( i = 0x4000; i < 0x8000; i++) {
+				writebyte(romimg[i],fpout);
+			}
+		} else {
+			printf ("\nProgram fits in an 8K EPROM (2764)\n\n");
+			for ( i = 0x4000; i < 0x6000; i++) {
+				writebyte(romimg[i],fpout);
+			}
+		}
+	}
 
-    for ( i = 0; i < 0x8000; i++) {
-        writebyte(romimg[i],fpout);
-    }
 
     fclose(fpin);
     fclose(fpout);
