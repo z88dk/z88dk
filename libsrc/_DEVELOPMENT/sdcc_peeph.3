@@ -9462,6 +9462,43 @@ replace restart {
 }
 // labelRefCount
 
+replace restart {
+	ex	de,hl
+	ld	hl,#%1
+	add	hl,de
+} by {
+	ld	de,#%1
+	add	hl,de
+	; peephole z88dk-308a
+} if notUsed('de')
+
+replace restart {
+	ex	de,hl
+	ld	hl,#%1 + %2
+	add	hl,de
+} by {
+	ld	de,#%1 + %2
+	add	hl,de
+	; peephole z88dk-308b
+} if notUsed('de')
+
+replace restart {
+	ex	de,hl
+	ld	hl,#%1
+	ex	de,hl
+} by {
+	ld	de,#%1
+	; peephole z88dk-309a
+}
+
+replace restart {
+	ex	de,hl
+	ld	hl,#%1 + %2
+	ex	de,hl
+} by {
+	ld	de,#%1 + %2
+	; peephole z88dk-309b
+}
 
 
 
