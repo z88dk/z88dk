@@ -87,18 +87,33 @@ __Start:
 
    IF __crt_enable_restart = 0
    
-      ; save state required for successful return to basic
+      ; returning to basic
       
       push iy
       exx
       push hl
+      
+   ENDIF
+
+   ; set stack address
+   
+   IF (__register_sp = -1) || (__crt_enable_restart = 0)
+   
+      ; save current sp if sp not supplied or returning to basic
+      
+      ld (__sp),sp
    
    ENDIF
 
-   ; save stack address for safe exit
+__Restart:
+
+   IF __register_sp != -1
    
-   ld (__sp),sp
-   include "../clib_init_sp.inc"
+      ; crt supplies sp
+   
+      ld sp,__register_sp
+
+   ENDIF
 
    ; parse command line
    
@@ -151,7 +166,7 @@ __Exit:
 
    IF __crt_enable_restart = 0
    
-      ; returning to caller
+      ; returning to basic
 
       push hl                  ; save return status
    
@@ -185,10 +200,17 @@ SECTION code_crt_return
    
    ELSE
    
-      ; restarting program
+      ; restart program
       
-      ld sp,(__sp)             ; reset stack location
-      jp __Start
+      IF __register_sp = -1
+   
+         ; restore sp
+   
+         ld sp,(__sp)
+   
+      ENDIF
+      
+      jp __Restart
    
    ENDIF
 
@@ -196,9 +218,12 @@ SECTION code_crt_return
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION BSS_UNINITIALIZED
+IF (__register_sp = -1) || (__crt_enable_restart = 0)
 
-__sp:  defw 0
+   SECTION BSS_UNINITIALIZED
+   __sp:  defw 0
+
+ENDIF
 
 include "../clib_variables.inc"
 include "clib_target_variables.inc"

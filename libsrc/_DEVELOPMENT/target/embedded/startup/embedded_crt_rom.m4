@@ -238,11 +238,25 @@ ENDIF
 
 __Start:
 
-   di                          ; if warm reset
-
    ; set stack address
    
-   include "../clib_init_sp.inc"
+   IF (__register_sp = -1) || (__crt_enable_restart = 0)
+   
+      ; save current sp if sp not supplied or returning to host
+      
+      ld (__sp),sp
+   
+   ENDIF
+
+__Restart:
+
+   IF __register_sp != -1
+   
+      ; crt supplies sp
+   
+      ld sp,__register_sp
+
+   ENDIF
    
    ; commandline
    
@@ -270,10 +284,9 @@ __Start:
    
    ENDIF
 
-   ; initialize sections
+   ; initialize data section
 
    include "../clib_init_data.inc"
-   include "../clib_init_bss.inc"
 
 ;**************************************************************
 IF __crt_org_code = 0
@@ -310,6 +323,10 @@ __Start_2:
 ENDIF
 ;**************************************************************
 
+   ; initialize bss section
+
+   include "../clib_init_bss.inc"
+
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
@@ -328,6 +345,14 @@ SECTION code_crt_main
 
 __Exit:
 
+   IF __crt_enable_restart = 0
+   
+      ; returning to host
+      
+      push hl                  ; save return status
+   
+   ENDIF
+
 SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
 
@@ -337,23 +362,55 @@ SECTION code_crt_return
 
    ; terminate
    
-IF __crt_enable_restart
+   IF __crt_enable_restart
 
-   ; restart the program
+      ; restart the program
    
-   jp __Start
-
-ELSE
-
-   ; loop forever
+      IF __register_sp = -1
    
-   jr ASMPC
+         ; restore sp
+   
+         ld sp,(__sp)
+   
+      ENDIF
+      
+      IF __crt_org_code = 0
+      
+         di
+      
+      ENDIF
+      
+      jp __Restart
 
-ENDIF
+   ELSE
+
+      ; exit program
+
+      pop hl                   ; hl = return status
+
+      IF __crt_org_code = 0
+      
+         jr ASMPC              ; loop forever
+
+      ELSE
+
+         ld sp,(__sp)
+         ret                   ; return to host
+   
+      ENDIF
+      
+   ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF (__register_sp = -1) || (__crt_enable_restart = 0)
+
+   SECTION BSS_UNINITIALIZED
+   __sp:  defw 0
+
+ENDIF
 
 include "../clib_variables.inc"
 include "clib_target_variables.inc"

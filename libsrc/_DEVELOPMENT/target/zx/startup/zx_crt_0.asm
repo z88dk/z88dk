@@ -402,6 +402,9 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+
+
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; create open and closed FILE lists
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -654,43 +657,64 @@ __Start:
 
    IF __crt_enable_restart = 0
    
-      ; save state required for successful return to basic
+      ; returning to basic
       
       push iy
       exx
       push hl
+      
+   ENDIF
+
+   ; set stack address
+   
+   IF (__register_sp = -1) || (__crt_enable_restart = 0)
+   
+      ; save current sp if sp not supplied or returning to basic
+      
+      ld (__sp),sp
    
    ENDIF
 
-   ; save stack address for safe exit
+__Restart:
+
+   IF __register_sp != -1
    
-   ld (__sp),sp
-   include "../clib_init_sp.inc"
+      ; crt supplies sp
+   
+      ld sp,__register_sp
+
+   ENDIF
 
    ; parse command line
    
    IF __crt_enable_commandline = 1
+   
+      ld hl,0
+      push hl                  ; argv[argc] = NULL
+      add hl,sp
+      push hl                  ; argv[0] = ""
+      dec hl
+      dec hl                   ; hl = argv
+      ld bc,1                  ; bc = argc = 1
       
       IF __SDCC | __SDCC_IX | __SDCC_IY
-      
-         ld hl,0
-         push hl               ; char *argv[]
-         push hl               ; int argc
 
+         push hl               ; argv
+         push bc               ; argc
+      
       ELSE
-            
-         ld hl,0
-         push hl               ; int argc
-         push hl               ; char *argv[]
-   
+      
+         push bc               ; argc
+         push hl               ; argv
+
       ENDIF
    
    ENDIF
    
    ; initialize sections
-   
-   include "../clib_init_bss.inc"
+
    include "../clib_init_data.inc"
+   include "../clib_init_bss.inc"
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
@@ -712,7 +736,7 @@ __Exit:
 
    IF __crt_enable_restart = 0
    
-      ; returning to caller
+      ; returning to basic
 
       push hl                  ; save return status
    
@@ -746,10 +770,17 @@ SECTION code_crt_return
    
    ELSE
    
-      ; restarting program
+      ; restart program
       
-      ld sp,(__sp)             ; reset stack location
-      jp __Start
+      IF __register_sp = -1
+   
+         ; restore sp
+   
+         ld sp,(__sp)
+   
+      ENDIF
+      
+      jp __Restart
    
    ENDIF
 
@@ -757,9 +788,12 @@ SECTION code_crt_return
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION BSS_UNINITIALIZED
+IF (__register_sp = -1) || (__crt_enable_restart = 0)
 
-__sp:  defw 0
+   SECTION BSS_UNINITIALIZED
+   __sp:  defw 0
+
+ENDIF
 
 include "../clib_variables.inc"
 include "clib_target_variables.inc"
