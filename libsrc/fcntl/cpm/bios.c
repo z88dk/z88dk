@@ -1,7 +1,7 @@
 /*
  *	Call a CPM BDOS routine
  *
- *	$Id: bios.c,v 1.1 2014-05-27 14:20:49 stefano Exp $
+ *	$Id: bios.c,v 1.2 2015-11-09 07:16:57 stefano Exp $
  */
 
 #include <cpm.h>
@@ -23,6 +23,17 @@ int bios(int func,int arg,int arg2)
 	ld	a,(hl)  ; get function number (1-85)
 	
 	ld hl,(1)   ; base+1 = addr of jump table + 3
+	
+	; Epson PX4 ?
+	ld a,3
+	cp l
+	jr nz,nopx
+	ld a,$cb
+	cp h
+	jr nz,nopx
+	ld h,$eb		;WBOOT is $EB03 on Epson PX
+	
+.nopx
 	dec hl
 	dec hl
 	dec hl

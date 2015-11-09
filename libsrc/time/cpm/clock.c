@@ -17,10 +17,11 @@
  *	CPM 3.x  (aka "CPM+")
  *	MP/M 2.x and higher
  *	TurboDOS 1.2x, 1.3x, and, presumably, higher
+ *  Epson PX4/PX8 (direct BIOS access)
  *	Not (of course) CPM 1.x and 2.x, which have no real-time functions
  *
  * --------
- * $Id: clock.c,v 1.1 2014-06-04 20:37:27 stefano Exp $
+ * $Id: clock.c,v 1.2 2015-11-09 07:16:57 stefano Exp $
  *
  */
 
@@ -33,15 +34,40 @@
 clock_t clock()
 {
 #asm
+		
+.notimdat
+        ld      hl,0eb4eh   ; probe the Epson PX4 BIOS
+        ld      a,(hl)
+        cp      0cdh
+        jr      nz,nopx4    ; no "jp" found for entry
+		ld		c,0
+		ld		de,year_px
+        call    0eb4eh
+        jr      nompmii
+		
+nopx4:
+		ld		hl,(1)
+		ld		de,$4b
+		add		hl,de
+		ld		a,$3c
+		cp		(hl)
+		jr		nz,notdbios
+		ld		de,nompmii
+		push	de
+		ld		c,0
+		ld		de,year_px
+		jp		(hl)
+
+notdbios:
         ld      de,jdate    ; pointer to date/time bufr
         ld      c,105       ; C=return date/time function
         call    5           ; get date/time
 
         push    af
-        
         ld      c,12
         call    5           ; check version
         pop     af
+
         ld      c,a
         ld      a,l
         cp      02Fh        ; MP/M II or later (cpm3..) ?
@@ -76,10 +102,15 @@ nompmii:
         call    l_long_add
         ret
 
+; 'px' suffixed data spaces and jdate are only placeholders
+year_px:	defs	1
 jdate:	defs	2           ; Day count, starting on 1st January 1978 (add 2922 days to move epoch to 1970)
+
 hours:	defs	1
 mins:	defs	1
 secs:	defs	1
+
+weekday_px:  defs 1
 
 unbcd:
 	push	bc
