@@ -21,7 +21,7 @@
  *	Not (of course) CPM 1.x and 2.x, which have no real-time functions
  *
  * --------
- * $Id: clock.c,v 1.2 2015-11-09 07:16:57 stefano Exp $
+ * $Id: clock.c,v 1.3 2015-11-09 12:13:47 stefano Exp $
  *
  */
 
@@ -34,8 +34,6 @@
 clock_t clock()
 {
 #asm
-		
-.notimdat
         ld      hl,0eb4eh   ; probe the Epson PX4 BIOS
         ld      a,(hl)
         cp      0cdh
@@ -51,14 +49,14 @@ nopx4:
 		add		hl,de
 		ld		a,$3c
 		cp		(hl)
-		jr		nz,notdbios
+		jr		nz,nodtbios
 		ld		de,nompmii
 		push	de
 		ld		c,0
 		ld		de,year_px
 		jp		(hl)
 
-notdbios:
+nodtbios:
         ld      de,jdate    ; pointer to date/time bufr
         ld      c,105       ; C=return date/time function
         call    5           ; get date/time
