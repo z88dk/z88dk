@@ -9500,6 +9500,76 @@ replace restart {
 	; peephole z88dk-309b
 }
 
+replace restart {
+	ld	(#%1),hl
+	ld	hl,#%1 + 1
+	ld	a,(hl)
+	dec	hl
+	or	a,(hl)
+} by {
+	ld	(#%1),hl
+	ld	a,h
+	or	a,l
+	ld	hl,#%1
+	; peephole z88dk-310a
+}
+// if notVolatile
+
+replace restart {
+	ld	(#%1),hl
+	ld	hl,#%1
+	ld	a,(hl)
+	inc	hl
+	or	a,(hl)
+} by {
+	ld	(#%1),hl
+	ld	a,l
+	or	a,h
+	ld	hl,#%1 + 1
+	; peephole z88dk-310b
+}
+// if notVolatile
+
+replace restart {
+	ld	hl,#0xFFFF
+	add	hl,de
+} by {
+	ld	l,e
+	ld	h,d
+	dec	hl
+	; peephole z88dk-311a
+}
+
+replace restart {
+	ld	hl,#0xFFFF
+	add	hl,bc
+} by {
+	ld	l,c
+	ld	h,b
+	dec	hl
+	; peephole z88dk-311b
+}
+
+replace restart {
+	ld	hl,#0x0001
+	add	hl,de
+} by {
+	ld	l,e
+	ld	h,d
+	inc	hl
+	; peephole z88dk-311c
+}
+
+replace restart {
+	ld	hl,#0x0001
+	add	hl,bc
+} by {
+	ld	l,c
+	ld	h,b
+	inc	hl
+	; peephole z88dk-311d
+}
+
 
 
 
