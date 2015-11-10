@@ -16,8 +16,10 @@
  *	TurboDOS 1.2x, 1.3x, and, presumably, higher
  *	Not (of course) CPM 1.x and 2.x, which have no real-time functions
  *
+ *	TODO: 
+ *
  * --------
- * $Id: time.c,v 1.3 2015-11-09 12:13:47 stefano Exp $
+ * $Id: time.c,v 1.4 2015-11-10 17:42:45 stefano Exp $
  */
 
 
@@ -39,27 +41,27 @@ time_t time(time_t *store)
 haveparm:
         push    hl
 
-        ld      hl,0eb4eh   ; probe the Epson PX4 BIOS
-        ld      a,(hl)
-        cp      0cdh
-        jr      nz,nopx4    ; no "jp" found for entry
-		ld		c,0
-		ld		de,year_px
-        call    0eb4eh
-		jp		mkjdate
-		
-nopx4:
 		ld		hl,(1)
-		ld		de,$4b
+		ld		de,04bh		; TIME BIOS entry (CP/M 3 but present also elsewhere)
 		add		hl,de
-		ld		a,$3c
-		cp		(hl)
+		ld		a,(hl)
+		cp      0cdh		; call instruction (Epson PX4 BIOS)?
+		jr		z,px4bios
+		cp		0x3c		; jp instruction (existing BIOS entry)?
 		jr		nz,nodtbios
-		ld		de,mkjdate
+px4bios:
+		ld		de,timegot
 		push	de
 		ld		c,0
-		ld		de,year_px
 		jp		(hl)
+timegot:
+		ld		hl,(1)
+		ld		de,(-0ch)	; System Control Block
+		add		hl,de
+		ld		de,jdate
+		ld		bc,5
+		ldir
+		jr		nompii
 
 nodtbios:
         ld      de,jdate    ; pointer to date/time bufr
@@ -133,16 +135,6 @@ nompmii:
         ret
 
 
-mkjdate:
-	; The BIOS funcions put a value in year_px and put month+day in place of jdate
-	; TODO: we need to build jdate
-	
-    ld      a,(jdate+1)
-    call    unbcd       ; decode days and put in HL
-	push    hl
-	ld		(jdate),hl	; at the moment we set jdate with "days" only
-	jr      nompmii
-
 unbcd:
 	push	bc
 	ld	c,a
@@ -161,15 +153,11 @@ unbcd:
 	ld  h,0
 	ret
 
-; 'px' suffixed data spaces and jdate are only placeholders
-year_px:	defs	1
 jdate:	defs	2           ; Day count, starting on 1st January 1978 (add 2922 days to move epoch to 1970)
 
 hours:	defs	1
 mins:	defs	1
 secs:	defs	1
-
-weekday_px:  defs 1
 
 
 
