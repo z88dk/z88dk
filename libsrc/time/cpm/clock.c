@@ -21,7 +21,7 @@
  *	Not (of course) CPM 1.x and 2.x, which have no real-time functions
  *
  * --------
- * $Id: clock.c,v 1.4 2015-11-10 17:42:45 stefano Exp $
+ * $Id: clock.c,v 1.5 2015-11-10 18:33:19 stefano Exp $
  *
  */
 
@@ -38,11 +38,8 @@ clock_t clock()
 		ld		de,04bh		; TIME BIOS entry (CP/M 3 but present also elsewhere)
 		add		hl,de
 		ld		a,(hl)
-		cp      0cdh		; call instruction (Epson PX4 BIOS)?
-		jr		z,px4bios
 		cp		0x3c		; jp instruction (existing BIOS entry)?
 		jr		nz,nodtbios
-px4bios:
 		ld		de,timegot
 		push	de
 		ld		c,0
@@ -54,7 +51,7 @@ timegot:
 		ld		de,jdate
 		ld		bc,5
 		ldir
-		jr		nompii
+		jr		nompmii
 
 nodtbios:
         ld      de,jdate    ; pointer to date/time bufr
