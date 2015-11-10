@@ -3,7 +3,7 @@
  ** Z88DK NOTES *******************************************************
  **********************************************************************
 
- Simple compile notes until a readme.txt is available.
+ New C library:
   
  (sccz80) zcc +cpm -vn -clib=new sieve.c -o sieve
  (sdcc  ) zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 sieve.c -o sieve
@@ -17,7 +17,7 @@
  -DNOPRINTF
  No printing.
 
- -DNOSTATIC
+ -DNOSTAT
  Locals are not made static variables.
 
  **********************************************************************
@@ -34,7 +34,7 @@ unsigned char flags[SIZE];
 
 main()
 {
-#ifndef NOSTATIC
+#ifndef NOSTAT
    static unsigned int i, i_sq, k, count;
 #else
    unsigned int i, i_sq, k, count;
