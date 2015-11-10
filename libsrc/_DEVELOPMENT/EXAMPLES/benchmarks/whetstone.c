@@ -56,16 +56,9 @@ C**********************************************************************
  **********************************************************************
 
  Printf converters %ld %d %e %f must be enabled.
-
- Simple compile notes until a readme.txt is available.
   
  (sccz80) zcc +cpm -vn -DNOTIMER -clib=new whetstone.c -o whetdc -lm
  (sdcc  ) zcc +cpm -vn -SO3 -DNOTIMER -clib=sdcc_iy --max-allocs-per-node200000 whetstone.c -o whetdc -lm
- 
- Classic C library:
- 
- (sccz80) zcc +cpm -vn -DNOTIMER whetstone.c -o whetdc -lndos -lm
-          (add "typedef double double_t;")
 
  **********************************************************************
 
@@ -78,7 +71,7 @@ C**********************************************************************
  -DNOCOMMAND
  Command line is not parsed.
 
- -DNOSTATIC
+ -DNOSTAT
  Local variables are not made static.
 
  **********************************************************************
@@ -91,10 +84,10 @@ C**********************************************************************
    extern long time_end(void);
 #endif
 
-#ifndef NOSTATIC
-   #define STATIC static
+#ifndef NOSTAT
+   #define STAT static
 #else
-   #define STATIC
+   #define STAT
 #endif
 
 /* standard C library headers required */
@@ -132,18 +125,18 @@ main(int argc, char *argv[])
 {
 	/* used in the FORTRAN version */
 	
-	STATIC long I;
-	STATIC long N1, N2, N3, N4, N6, N7, N8, N9, N10, N11;
-	STATIC double_t X1,X2,X3,X4,X,Y,Z;
-	STATIC long LOOP;
-	STATIC int II, JJ;
+	STAT long I;
+	STAT long N1, N2, N3, N4, N6, N7, N8, N9, N10, N11;
+	STAT double_t X1,X2,X3,X4,X,Y,Z;
+	STAT long LOOP;
+	STAT int II, JJ;
 
 	/* added for this version */
 	
-	STATIC long loopstart;
-	STATIC long startsec, finisec;
-	STATIC double_t KIPS;
-	STATIC int continuous;
+	STAT long loopstart;
+	STAT long startsec, finisec;
+	STAT double_t KIPS;
+	STAT int continuous;
 
 	loopstart = 10;		/* see the note about LOOP below */
 	continuous = 0;
@@ -482,7 +475,7 @@ P0(void)
 void
 P3(double_t X, double_t Y, double_t *Z)
 {
-	STATIC double_t X1, Y1;
+	STAT double_t X1, Y1;
 
 	X1 = X;
 	Y1 = Y;
