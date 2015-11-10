@@ -405,15 +405,14 @@
  * Home Brew    Z80-4.00Mhz     CPM-80          Hisoft C++          53        53    v1.1  #####
  * Home Brew    Z80-2.5Mhz	CPM-80 v2.2	Aztec CII v1.05g    91        91    v1.1  #########
  * Commodore128 8502-2Mhz       C128 ROM        cc65 2.12.9        100       105    v1.1  ##########
- * -            Z80-4MHz        -               Z88DK_SDCC 10.2015 365       281    v1.1  ####################################]
+ * -            Z80-4MHz        -               Z88DK_SDCC 10.2015 365       365    v1.1  ####################################]
  */
 
 /*
  *  Z88DK NOTES
  *
- *  After all these years it turns out Dhrystone1.0/1.1 had a bug in it.  It
- *  has been fixed without affecting execution time to allow compiling with
- *  present day compilers.  Search for "BUG" below.
+ *  Dhrystone 1.0/1.1 contains a bug that has been fixed without affecting
+ *  execution time.  Search for "BUG" below.
  *
  *  The original did a malloc to obtain memory before entering the timing
  *  loop.  This has been replaced with taking the address of some static
@@ -433,7 +432,8 @@
  *  generate better code when using static variables.  So we take 'register'
  *  to mean 'static' for the REG performance column and this allows
  *  the performance to be more in-line with C code written for the z80
- *  where one of the main performance enhancers is to replace locals with statics.
+ *  where one of the main performance enhancer steps taken is to replace
+ *  locals with statics.
  *
  * -DNOENUM
  *  If the compiler does not support enum.
@@ -453,6 +453,10 @@
  * -DNOTIMER
  *  If time subroutines are not supplied rely on external measurement.
  *
+ *  Sample compile:
+ *
+ *  (sdcc ) zcc +cpm -vn -SO3 -DNOSTRUCTASSIGN -DNOREG -DNOTIMER -clib=sdcc_iy --max-allocs-per-node200000 dhrystone11.c -o dhry11
+ *  (there is no text output without timer enabled)
  */
 
 #include <stdio.h>
