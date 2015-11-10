@@ -9,17 +9,17 @@
  *	CPM+ and MPM have BDOS function #105 to get time/date, it looks this function
  *	sometimes shortcuts to the hardware directly, no BIOS implementation
  *
- *	this module should work at least with the following operating systems:
+ * this module should work with the following operating systems:
  *
  *	CPM 3.x  (aka "CPM+")
  *	MP/M 2.x and higher
  *	TurboDOS 1.2x, 1.3x, and, presumably, higher
+ *  Epson PX4/PX8 (direct BIOS access) and all the CP/M 3 - like BIOSes
  *	Not (of course) CPM 1.x and 2.x, which have no real-time functions
- *
- *	TODO: 
+ *  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  *
  * --------
- * $Id: time.c,v 1.5 2015-11-10 18:33:19 stefano Exp $
+ * $Id: time.c,v 1.6 2015-11-10 21:33:02 stefano Exp $
  */
 
 
@@ -45,11 +45,12 @@ haveparm:
 		ld		de,04bh		; TIME BIOS entry (CP/M 3 but present also elsewhere)
 		add		hl,de
 		ld		a,(hl)
-		cp		0x3c		; jp instruction (existing BIOS entry)?
+		cp		0xc3		; jp instruction (existing BIOS entry)?
 		jr		nz,nodtbios
 		ld		de,timegot
 		push	de
 		ld		c,0
+		ld		de,foomem
 		jp		(hl)
 timegot:
 		ld		hl,(1)
@@ -156,6 +157,7 @@ hours:	defs	1
 mins:	defs	1
 secs:	defs	1
 
+foomem: defs 20
 
 
 #endasm
