@@ -19,7 +19,7 @@
  *  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  *
  * --------
- * $Id: time.c,v 1.6 2015-11-10 21:33:02 stefano Exp $
+ * $Id: time.c,v 1.7 2015-11-11 18:40:54 stefano Exp $
  */
 
 
@@ -49,10 +49,80 @@ haveparm:
 		jr		nz,nodtbios
 		ld		de,timegot
 		push	de
-		ld		c,0
-		ld		de,foomem
+		ld		de,px_year
+		xor		a
+		ld		(de),a
+		ld		c,a
 		jp		(hl)
 timegot:
+		ld		a,(px_year)
+		and		a
+		jr		z,cpm3_bios
+		
+		; We found a value in px_year, so it is not a CP/M 3 BIOS entry.
+		; We need to mix Year, Month and Day to make jdate
+		call    unbcd       ; decode year and put in HL
+		ld		a,l
+		and		3			; leap year ?
+		jr      nz,noleapsmc
+		ld		(february),a	; SMC patch for leap year: replace DEC HL w/NOP
+noleapsmc:
+		ld		b,l			; 1 byte is enough (max year count is 99)
+		ld		de,365
+		ld		hl,8035		; Days between [01/01/2000] and [01/01/1978]
+yrloop:		
+		ld		a,b
+		and		3			; leap year ?
+		jr		nz,noleap
+		inc		hl
+noleap:
+		add		hl,de
+		djnz    yrloop
+		push	hl
+		; months
+		ld		a,(jdate)		; Month
+		push	af
+		call    unbcd
+		; (TODO: at the moment all months are considered 32 days long)
+		ld	b,l
+		xor a
+		ld	h,a
+		ld	l,a
+		ld	de,31
+		add	hl,de
+		inc a
+		cp  l	; Jan ?	.. 32 days
+		jr  z,month_done
+		inc	a
+		cp  l	; Feb ? .. 28 days
+		jr	z,february
+		; remaining days per month: 31,30,31,30,31,31,30,31,30,31
+		cp  6
+		jr  nc,pre_aug
+		dec a
+pre_aug:
+		and 1
+		jr	z,month_done	; 31 days if odd number (removing August)
+		jr  days30
+february:
+		dec		hl
+		dec		hl
+days30:
+		dec		hl
+month_done:
+		pop		de
+		add		hl,de
+		push	hl
+		;
+		ld		a,(jdate+1)		; Day in the month
+		call    unbcd
+		pop		de
+		add		hl,de
+		ld		(jdate),hl
+		jr		nompmii
+		
+cpm3_bios:
+		; It is a true CP/M 3 BIOS, so pick the resulting clock data and copy to jdate
 		ld		hl,(1)
 		ld		de,(-0ch)	; System Control Block
 		add		hl,de
@@ -60,7 +130,7 @@ timegot:
 		ld		bc,5
 		ldir
 		jr		nompmii
-
+		
 nodtbios:
         ld      de,jdate    ; pointer to date/time bufr
         ld      c,105       ; C=return date/time function
@@ -151,14 +221,14 @@ unbcd:
 	ld  h,0
 	ret
 
-jdate:	defs	2           ; Day count, starting on 1st January 1978 (add 2922 days to move epoch to 1970)
+px_year: defb	0			; Epson PX BIOSes load it with the current year
 
+jdate:	defs	2           ; Day count, starting on 1st January 1978 (add 2922 days to move epoch to 1970)
 hours:	defs	1
 mins:	defs	1
 secs:	defs	1
 
-foomem: defs 20
-
+jdatepx2: defs 6			; safety margin 
 
 #endasm
 }

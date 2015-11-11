@@ -23,7 +23,7 @@
  *  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  *
  * --------
- * $Id: clock.c,v 1.6 2015-11-10 21:33:01 stefano Exp $
+ * $Id: clock.c,v 1.7 2015-11-11 18:40:54 stefano Exp $
  *
  */
 
@@ -44,10 +44,25 @@ clock_t clock()
 		jr		nz,nodtbios
 		ld		de,timegot
 		push	de
-		ld		c,0
-		ld		de,foomem
+		ld		de,px_year
+		xor		a
+		ld		(de),a
+		ld		c,a
 		jp		(hl)
 timegot:
+		ld		a,(px_year)
+		and		a
+		jr		z,cpm3_bios
+
+		; We found a value in px_year, so it is not a CP/M 3 BIOS entry.
+		;	Current day is more than enough for clock(), we leave refinements to time()
+		ld		a,(jdate+1)		; Day in the month
+		call    unbcd 
+		ld		(jdate),hl
+		jr		nompmii
+		
+cpm3_bios:
+		; It is a true CP/M 3 BIOS, so pick the resulting clock data and copy to jdate
 		ld		hl,(1)
 		ld		de,(-0ch)	; System Control Block
 		add		hl,de
@@ -100,13 +115,14 @@ nompmii:
         call    l_long_add
         ret
 
+px_year: defb	0			; Epson PX BIOSes load it with the current year
 
 jdate:	defs	2           ; Day count, starting on 1st January 1978 (add 2922 days to move epoch to 1970)
 hours:	defs	1
 mins:	defs	1
 secs:	defs	1
 
-foomem: defs 20
+jdatepx2: defs 6			; safety margin 
 
 unbcd:
 	push	bc
