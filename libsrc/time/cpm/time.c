@@ -19,7 +19,7 @@
  *  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  *
  * --------
- * $Id: time.c,v 1.7 2015-11-11 18:40:54 stefano Exp $
+ * $Id: time.c,v 1.8 2015-11-12 16:49:52 stefano Exp $
  */
 
 
@@ -59,10 +59,11 @@ timegot:
 		and		a
 		jr		z,cpm3_bios
 		
-		; We found a value in px_year, so it is not a CP/M 3 BIOS entry.
+		; We found a value in px_year, so it is not a CP/M 3 BIOS entry, but an Epson laptop variant.
 		; We need to mix Year, Month and Day to make jdate
 		call    unbcd       ; decode year and put in HL
-		ld		a,l
+		;ld		a,l
+		; TODO:  Leap year every 4 years only, needs refinement ..
 		and		3			; leap year ?
 		jr      nz,noleapsmc
 		ld		(february),a	; SMC patch for leap year: replace DEC HL w/NOP
@@ -70,7 +71,7 @@ noleapsmc:
 		ld		b,l			; 1 byte is enough (max year count is 99)
 		ld		de,365
 		ld		hl,8035		; Days between [01/01/2000] and [01/01/1978]
-yrloop:		
+yrloop:
 		ld		a,b
 		and		3			; leap year ?
 		jr		nz,noleap
@@ -80,34 +81,26 @@ noleap:
 		djnz    yrloop
 		push	hl
 		; months
+		; TODO:  1 month shift compared to the correct Unix epoch !
+		;  I can't understand why..
 		ld		a,(jdate)		; Month
-		push	af
 		call    unbcd
-		; (TODO: at the moment all months are considered 32 days long)
-		ld	b,l
-		xor a
-		ld	h,a
-		ld	l,a
-		ld	de,31
-		add	hl,de
-		inc a
-		cp  l	; Jan ?	.. 32 days
-		jr  z,month_done
-		inc	a
-		cp  l	; Feb ? .. 28 days
-		jr	z,february
-		; remaining days per month: 31,30,31,30,31,31,30,31,30,31
-		cp  6
-		jr  nc,pre_aug
-		dec a
-pre_aug:
-		and 1
-		jr	z,month_done	; 31 days if odd number (removing August)
-		jr  days30
+		dec		a
+		jr		z,month_done
+		dec		a
+		jr		nz,month_next
+		ld		l,31
+		jr		month_done
+month_next:
+		ld		de,mdays
+		ld		l,a
+		add		hl,hl
+		add		hl,de
+		ld		a,(hl)
+		inc		hl
+		ld		h,(hl)
+		ld		l,a
 february:
-		dec		hl
-		dec		hl
-days30:
 		dec		hl
 month_done:
 		pop		de
@@ -229,6 +222,11 @@ mins:	defs	1
 secs:	defs	1
 
 jdatepx2: defs 6			; safety margin 
+
+mdays: defw 31+29, 31+29+31, 31+29+31+30, 31+29+31+30+31
+       defw 31+29+31+30+31+30, 31+29+31+30+31+30+31, 31+29+31+30+31+30+31+31
+	   defw 31+29+31+30+31+30+31+31+30, 31+29+31+30+31+30+31+31+30+31
+	   defw 31+29+31+30+31+30+31+31+30+31+30
 
 #endasm
 }
