@@ -3542,7 +3542,7 @@ replace restart {
 } by {
 	ld	hl,(#%1)
 	ld	de,(#%2)
-	or	a,a
+	xor	a,a
 	sbc	hl,de
 	jp	Z,%4
 %3:
@@ -3571,7 +3571,7 @@ replace restart {
 } by {
 	ld	hl,(#%1)
 	ld	de,(#%2)
-	or	a,a
+	xor	a,a
 	sbc	hl,de
 	jp	Z,%4
 %3:
@@ -10319,6 +10319,113 @@ replace restart {
 	ex	de,hl
 	; peephole z88dk-335b
 } if notUsed('de')
+
+replace restart {
+	ld	%1, a
+	%2	%1
+	ld	a,%3 (%4)
+	add	a, %1
+} by {
+	%2	a
+	add	a,%3 (%4)
+	; peephole z88dk-336
+} if notSame(%1 '(hl)'), notUsed(%1)
+
+replace restart {
+	ld	a,%1 (%2)
+	or	a, a
+	jp	%3,%4
+	ld	a,%1 (%2)
+} by {
+	ld	a,%1 (%2)
+	or	a, a
+	jp	%3,%4
+	; peephole z88dk-337a
+}
+// if notVolatile
+
+replace restart {
+	ld	a,%1
+	or	a, a
+	jp	%3,%4
+	ld	a,%1
+} by {
+	ld	a,%1
+	or	a, a
+	jp	%3,%4
+	; peephole z88dk-337b
+}
+// if notVolatile
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	ld	a,(de)
+	ld	(bc),a
+} by {
+	ld	a,(de)
+	ld	(hl),a
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-338
+}
+
+replace restart {
+	ld	hl,#%1
+	ld	%3,%4
+} by {
+	ld	%3,%4
+	ld	hl,#%1
+	; peephole z88dk-339a
+} if notSame(%3 'l' 'h' 'hl' '(hl)'), notSame(%4 'l' 'h' 'hl' '(hl)')
+
+replace restart {
+	ld	hl,#%1 + %2
+	ld	%3,%4
+} by {
+	ld	%3,%4
+	ld	hl,#%1 + %2
+	; peephole z88dk-339b
+} if notSame(%3 'l' 'h' 'hl' '(hl)'), notSame(%4 'l' 'h' 'hl' '(hl)')
+
+replace restart {
+	ld	hl,#%1
+	xor	a,%3
+} by {
+	xor	a,%3
+	ld	hl,#%1
+	; peephole z88dk-339c
+} if notSame(%3 'l' 'h')
+
+replace restart {
+	ld	hl,#%1 + %4
+	xor	a,%3
+} by {
+	xor	a,%3
+	ld	hl,#%1 + %4
+	; peephole z88dk-339d
+} if notSame(%3 'l' 'h')
+
+replace restart {
+	ex	de,hl
+	xor	a,a
+} by {
+	xor	a,a
+	ex	de,hl
+	; peephole z88dk-340a
+}
+
+replace restart {
+	ex	de,hl
+	ld	(de),a
+} by {
+	ld	(hl),a
+	ex	de,hl
+	; peephole z88dk-340b
+}
+
+
+
 
 
 
