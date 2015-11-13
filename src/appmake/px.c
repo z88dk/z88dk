@@ -3,7 +3,7 @@
  *      This tool handles only the compact format (similar to the one used by BASIC)
  *      to reduce the directory size at most and leave space for our executable.
  *
- *      $Id: px.c,v 1.3 2015-11-05 16:08:04 stefano Exp $
+ *      $Id: px.c,v 1.4 2015-11-13 06:47:21 stefano Exp $
  */
 
 
@@ -92,8 +92,8 @@ int px_exec(char *target)
 	
 	fseek(fpin,0L,SEEK_SET);
 	
-    if (len>(32768-180-16384)) {
-        fprintf(stderr,"Program is too big (32K not yet supported)\n");
+    if (len>(32768-180)) {
+        fprintf(stderr,"Program is too big\n");
         fclose(fpin);
         myexit(NULL,1);
     }
@@ -108,18 +108,18 @@ int px_exec(char *target)
         romimg[i]=0xff;
     }
     for ( i = 0x4000; i < 0x4080; i++) {
-        romimg[i]=0xe5;
+        romimg[i]=0xe5;	/* E5 = invalid directory entry */
     }
 	
 	b=0x4000;
 	
 	/* PROM header */
 	romimg[b++]=0xe5;
-	romimg[b++]=0x37;
-	romimg[b++]=0x20;
+	romimg[b++]=0x37;	/* Identify the MAPLE format */
+	romimg[b++]=32;  	/* 32K ROM capacity */
 
-	romimg[b++]=0x0F;
-	romimg[b++]=0xFF;
+	romimg[b++]=0;  	/* checksum (system does not need it!) */
+	romimg[b++]=0;
 
 	memcpy (romimg+b, header, 27);
 	
@@ -133,12 +133,13 @@ int px_exec(char *target)
 		i++;
     }
 	
-	romimg[0x4000+22]=4;		/* directory type (4 = 0x80 bytes, 8 = 0x200 bytes) */
+	/* set the number of directory entries */
+	/* the count progression for entries is: ((entries/4)+1)*4    */
+	romimg[0x4000+22]=4;
 	
 	/* Create the directory entry */
 	b=0x4000+0x20;
 	memcpy (romimg+b, entry_skeleton, 16);
-	
 	romimg[b++]=0;
 	
 	i=0;
@@ -165,23 +166,18 @@ int px_exec(char *target)
 				romimg[b++]=toupper(filename[i]);
 				i++;
 			}
+
 			b=0x4050;
 			romimg[b-1]=0;
+			romimg[b-4]=1;
 			for ( i = b+1; i < b+16; i++) {
 				romimg[i]=0;
 			}
 		}
 		romimg[b+(blk%16)]=blk+1;
-		if (len2==len) {
-			len2-=896;
-			romimg[b-1]+=7;
-		} else {
-			len2-=1024;
-			romimg[b-1]+=8;
-		}
+		len2-=1024;
+		romimg[b-1]+=8;
 		blk++;
-		if (blk==16)
-			romimg[b-1]=128;
 	}
 	
 	/* Load program data.. on the Epson PX the 27256 eprom halves are inverted, 
@@ -190,7 +186,7 @@ int px_exec(char *target)
     for ( i = 0; i < len; i++) {
         c = getc(fpin);
         romimg[b++]=c;
-		if (b>0x8000) b=0;
+		if (b>=0x8000) b=0;
     }
 
 	if ( (len > 16256) || (fullsize) ) {
@@ -201,11 +197,13 @@ int px_exec(char *target)
 	} else {
 		if (len > 8064) {
 			printf ("\nProgram fits in a 16K EPROM (27128)\n\n");
+			romimg[0x4002]=16;
 			for ( i = 0x4000; i < 0x8000; i++) {
 				writebyte(romimg[i],fpout);
 			}
 		} else {
 			printf ("\nProgram fits in an 8K EPROM (2764)\n\n");
+			romimg[0x4002]=8;
 			for ( i = 0x4000; i < 0x6000; i++) {
 				writebyte(romimg[i],fpout);
 			}
