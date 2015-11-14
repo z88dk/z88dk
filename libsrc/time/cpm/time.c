@@ -19,7 +19,7 @@
  *  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  *
  * --------
- * $Id: time.c,v 1.8 2015-11-12 16:49:52 stefano Exp $
+ * $Id: time.c,v 1.9 2015-11-14 18:10:09 dom Exp $
  */
 
 
@@ -82,7 +82,7 @@ noleap:
 		push	hl
 		; months
 		; TODO:  1 month shift compared to the correct Unix epoch !
-		;  I can't understand why..
+		;  I cant understand why..
 		ld		a,(jdate)		; Month
 		call    unbcd
 		dec		a
