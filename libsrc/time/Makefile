@@ -1,11 +1,11 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.27 2014-12-17 07:08:35 dom Exp $
+# $Id: Makefile,v 1.28 2015-11-15 03:30:56 aralbrec Exp $
 
 include ../Make.config
 
-lcpm: time cpm_time
+lcpm: time
 
 lz88: time z88_time
 
