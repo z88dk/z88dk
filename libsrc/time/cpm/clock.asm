@@ -23,12 +23,14 @@
  ;  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  ;
  ; --------
- ; $Id: clock.asm,v 1.1 2015-11-13 22:57:12 aralbrec Exp $
+ ; $Id: clock.asm,v 1.2 2015-11-15 03:30:19 aralbrec Exp $
  ;
  ;
 
 
 PUBLIC clock
+
+EXTERN l_mult, l_long_mult, l_long_add
 
 clock:
 

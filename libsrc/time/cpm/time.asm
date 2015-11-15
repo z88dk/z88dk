@@ -19,11 +19,13 @@
  ;  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  ;
  ; --------
- ; $Id: time.asm,v 1.1 2015-11-13 22:57:12 aralbrec Exp $
+ ; $Id: time.asm,v 1.2 2015-11-15 03:30:19 aralbrec Exp $
  ;
 
 
 PUBLIC time
+
+EXTERN l_mult, l_long_mult, l_long_add
 
 time:
 
@@ -80,7 +82,7 @@ noleap:
 		push	hl
 		; months
 		; TODO:  1 month shift compared to the correct Unix epoch !
-		;  I can't understand why..
+		;  I cant understand why..
 		ld		a,(jdate)		; Month
 		call    unbcd
 		dec		a
