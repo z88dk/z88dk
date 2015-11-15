@@ -20,7 +20,7 @@ unsigned char* getInput()
 	putchar('?');
 	putchar(' ');
 
-	fgets(result, sizeof result, stdin);
+	fgets(result, sizeof(result), stdin);
 	result[strlen(result) - 1] = '\0';
 
 	return result;
@@ -74,7 +74,7 @@ char *replace(
 }
 
 // Keyword Data
-#define KEYWORDS_LENGTH 36u
+#define KEYWORDS_LENGTH 36U
 unsigned char* keywords[] = {
 	"can you", "can i", "you are", "you're", "i don't", "i feel",
 	"why don't you", "why can't i", "are you", "i can't", "i am", "i'm",
@@ -84,7 +84,7 @@ unsigned char* keywords[] = {
 	"computer", "nokeyfound" };
 
 // Conjugation Data
-#define CONJUGATIONS_LENGTH 14u
+#define CONJUGATIONS_LENGTH 14U
 unsigned char* conjugations[] = {
 	" are", " am ", "were ", "was ", " you ", " I ", "your ", "my ",
 	" I've ", " you've ", " I'm ", " you're ", " me ", " !you " };
@@ -103,7 +103,7 @@ unsigned char lookup[] = {
 // on select responses.  The commented number is the
 // line number of the data statement for the response
 // in the original BASIC listing.
-#define RESPONSE_LENGTH 112u
+#define RESPONSE_LENGTH 112U
 unsigned char* responses[] = {
 	"Don't you believe that I can%s",	//1330
 	"Perhaps you would like to be able to%s", //1340
