@@ -3,7 +3,9 @@
 /*  z88dk variant (SCHEME compatible mode, etc) by Stefano Bodrato     */
 /*  This is a free software. See "COPYING" for detail.                 */
 
-/*  $Id: clisp.c,v 1.1 2015-11-16 01:02:09 aralbrec Exp $  */
+/*  $Id: clisp.c,v 1.2 2015-11-16 02:38:44 aralbrec Exp $  */
+
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 clisp.c -o clisp
 
 /*
 #define SCHEME chooses scheme variant
