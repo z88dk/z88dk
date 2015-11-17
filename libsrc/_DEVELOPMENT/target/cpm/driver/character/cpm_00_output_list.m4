@@ -14,7 +14,7 @@ define(`m4_cpm_00_output_list',dnl
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: cpm_01_output_list
+   ; driver: cpm_00_output_list
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : write only
    ; type  : 004 = character output

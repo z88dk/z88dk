@@ -14,7 +14,7 @@ define(`m4_cpm_00_output_punch',dnl
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : `ifelse($1,0,`(none)',$1)'
    ;
-   ; driver: cpm_01_output_punch
+   ; driver: cpm_00_output_punch
    ; fd    : __I_FCNTL_NUM_FD
    ; mode  : write only
    ; type  : 004 = character output
