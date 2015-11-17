@@ -166,6 +166,11 @@ errors:
     args	: char *org_hex
     message	: "\"invalid ORG option '%s'\", org_hex"
 	
+  - type	: ErrWarn
+    func	: warn_org_ignored
+    args	: 'char *filename, char *section_name'
+    message	: "\"--relocatable ignores ORG at file '%s', section '%s'\", filename, section_name"
+	
   - type	: ErrError
     func	: error_env_not_defined
     args	: char *var

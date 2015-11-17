@@ -12,6 +12,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "array.h"
 
-DEF_ARRAY( Byte );
-DEF_ARRAY( int );
-DEF_ARRAY( long );
+DEF_ARRAY(Byte);
+DEF_ARRAY(Word);
+DEF_ARRAY(int);
+DEF_ARRAY(long);

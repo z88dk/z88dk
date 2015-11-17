@@ -4,6 +4,15 @@ Z88DK Z80 Macro Assembler Change Log
 2015
 ----
 
+- v **2.8.2**, 2015-11-17, pauloscustodio
+	Create relocation file for each section
+
+	Create a file.reloc file for each file.bin section binary with a list 
+	of 16-bit addresses of locations in the file.bin that need to be relocated.
+
+	When --relocatable is used, create single-section binaries and 
+	ignore ORG statements.
+
 - v **2.8.1**, 2015-09-18, pauloscustodio  
 	Maintenance release for C version. C++ version under development in 
 	<https://github.com/pauloscustodio/z88dk-z80asm>

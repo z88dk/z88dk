@@ -12,6 +12,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #pragma once
 
 #include <stdio.h>			/* FILENAME_MAX */
+#include <stdint.h>
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -19,8 +20,9 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #endif
 
 /* Integer types */
-typedef unsigned char Byte;
-typedef int 		  Bool;
+typedef uint8_t		Byte;
+typedef uint16_t	Word;
+typedef int 		Bool;
 
 #ifndef	FALSE
 #define	FALSE	(0)

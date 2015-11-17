@@ -20,6 +20,7 @@ my $patched_src = "zx48.asm";
 my $err = 	  "zx48.err";
 my $obj = 	  "zx48.obj";
 my $bin = 	  "zx48.bin";
+my $reloc =	  "zx48.reloc";
 my $map = 	  "zx48.map";
 my $sym = 	  "zx48.sym";
 my $project =	  "t/data/zx48_01.prj";
@@ -30,10 +31,11 @@ my @prj_err = @prj_src; for (@prj_err) { s/\.asm$/.err/i }
 my @prj_obj = @prj_src; for (@prj_obj) { s/\.asm$/.obj/i }
 my @prj_sym = @prj_src; for (@prj_sym) { s/\.asm$/.sym/i }
 my $prj_bin = $prj_src[0]; $prj_bin =~ s/\.asm$/.bin/i;
+my $prj_reloc = $prj_src[0]; $prj_reloc =~ s/\.asm$/.reloc/i;
 my $prj_map = $prj_src[0]; $prj_map =~ s/\.asm$/.map/i;
 
-my @testfiles = ($patched_src, $err, $obj, $bin, $map, $sym,
-		 @prj_err, @prj_obj, @prj_sym, $prj_bin, $prj_map);
+my @testfiles = ($patched_src, $err, $obj, $bin, $reloc, $map, $sym,
+		 @prj_err, @prj_obj, @prj_sym, $prj_bin, $prj_reloc, $prj_map);
 unlink_testfiles(@testfiles);
 
 # patch original source to comply with z80asm syntax

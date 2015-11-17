@@ -9,7 +9,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 #include "hist.h"
 
-#define VERSION     "2.8.0"
+#define VERSION     "2.8.2"
 #define COPYRIGHT   "InterLogic 1993-2009, Paulo Custodio 2011-2015"
 
 #ifdef QDOS

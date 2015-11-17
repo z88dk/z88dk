@@ -37,6 +37,7 @@ Parse command line options
 #define FILEEXT_LIB     FILEEXT_SEPARATOR "lib"    /* ".lib" / "_lib" */
 #define FILEEXT_SYM     FILEEXT_SEPARATOR "sym"    /* ".sym" / "_sym" */
 #define FILEEXT_MAP     FILEEXT_SEPARATOR "map"    /* ".map" / "_map" */
+#define FILEEXT_RELOC   FILEEXT_SEPARATOR "reloc"  /* ".reloc" / "_reloc" */
 
 /* types */
 enum OptType
@@ -396,7 +397,8 @@ static void exit_help( void )
     printf( "    %s = Z80 binary file\n", FILEEXT_BIN );
     printf( "    %s = symbols file\n", FILEEXT_SYM );
     printf( "    %s = map file\n", FILEEXT_MAP );
-    printf( "    %s = global address definition file\n", FILEEXT_DEF );
+	printf( "    %s = reloc file\n", FILEEXT_RELOC);
+	printf( "    %s = global address definition file\n", FILEEXT_DEF);
     printf( "    %s = error file\n", FILEEXT_ERR );
 
 #include "options_def.h"
@@ -547,13 +549,19 @@ char *get_sym_filename( char *filename )
 	return path_replace_ext( filename, FILEEXT_SYM );
 }
 
-char *get_map_filename( char *filename )
+char *get_map_filename(char *filename)
 {
-    init_module();
-	return path_replace_ext( filename, FILEEXT_MAP );
+	init_module();
+	return path_replace_ext(filename, FILEEXT_MAP);
 }
 
-char *get_asm_filename( char *filename )
+char *get_reloc_filename(char *filename)
+{
+	init_module();
+	return path_replace_ext(filename, FILEEXT_RELOC);
+}
+
+char *get_asm_filename(char *filename)
 {
     return get_opts_ext_filename( filename, opts.asm_ext );
 }

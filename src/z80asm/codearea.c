@@ -60,23 +60,28 @@ void Section_init (Section *self)
 	self->asmpc	= 0;
 	self->opcode_size = 0;
 	
-	self->bytes	= OBJ_NEW( ByteArray );
-	OBJ_AUTODELETE( self->bytes ) = FALSE;
-	
-	self->module_start = OBJ_NEW( intArray );
+	self->bytes = OBJ_NEW(ByteArray);
+	OBJ_AUTODELETE(self->bytes) = FALSE;
+
+	self->reloc = OBJ_NEW(intArray);
+	OBJ_AUTODELETE(self->reloc) = FALSE;
+
+	self->module_start = OBJ_NEW(intArray);
 	OBJ_AUTODELETE( self->module_start ) = FALSE;
 }
 
 void Section_copy (Section *self, Section *other)	
 { 
-	self->bytes		   = ByteArray_clone( other->bytes );
-	self->module_start = intArray_clone( other->module_start );
+	self->bytes = ByteArray_clone(other->bytes);
+	self->reloc = intArray_clone(other->reloc);
+	self->module_start = intArray_clone(other->module_start);
 }
 
 void Section_fini (Section *self)
 {
-	OBJ_DELETE( self->bytes );
-	OBJ_DELETE( self->module_start );
+	OBJ_DELETE(self->bytes);
+	OBJ_DELETE(self->reloc);
+	OBJ_DELETE(self->module_start);
 }
 
 /*-----------------------------------------------------------------------------
@@ -560,7 +565,7 @@ void fwrite_codearea( char *filename, FILE **pfile )
 			if (section->name && *section->name)					/* only if section name not empty */
 			{
 				/* change current file if address changed, or option --split-bin, or section_split */
-				if (opts.split_bin || 
+				if ((!opts.relocatable && opts.split_bin) ||
 					section->section_split ||
 					cur_addr != section->addr ||
 					(section != get_first_section(NULL) && section->origin >= 0))

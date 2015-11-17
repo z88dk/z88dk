@@ -36,7 +36,7 @@ Manage the code area in memory
 *----------------------------------------------------------------------------*/
 CLASS( Section )
 	char		*name;				/* name of section, kept in strpool */
-	int		 addr;				/* start address of this section,
+	int			 addr;				/* start address of this section,
 									*  computed by sections_alloc_addr() */
     int			 origin;			/* ORG address of section, -1 if not defined */
 	Bool		 origin_found : 1;	/* ORG already found in code */
@@ -46,13 +46,14 @@ CLASS( Section )
 									*  should be output to a new binary file */
 	Bool		 max_codesize_issued : 1;
 									/* error_max_codesize issued, ignore next calls */
-	int		 asmpc;				/* address of current opcode relative to start
+	int			 asmpc;				/* address of current opcode relative to start
 									*  of the current module, reset to 0 at start
 									*  of each module */
-	int		 opcode_size;		/* number of bytes added after last 
+	int			 opcode_size;		/* number of bytes added after last 
 									*  set_PC() or next_PC() */
 	ByteArray	*bytes;				/* binary code of section, used to compute 
 									*  current size */
+	intArray	*reloc;				/* list of addresses in module containg relocable addreses */
 	intArray	*module_start;		/* at module_addr[ID] is the start offset from
 									*  addr of module ID */
 END_CLASS;

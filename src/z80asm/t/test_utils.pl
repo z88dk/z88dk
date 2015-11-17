@@ -24,7 +24,7 @@ my $test	 = "test";
 sub z80asm	 { $ENV{Z80ASM} || "./z80asm" }
 
 my @TEST_EXT = (qw( asm lst inc bin map obj lib sym def err 
-					exe c o asmlst prj i ));
+					exe c o asmlst prj i reloc ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
 my @IDS = ("", 0 .. 20);
@@ -58,7 +58,7 @@ sub unlink_testfiles {
 		diag "$line -keep : kept test files";
 	}
 	else {
-		_unlink_files($line, @TEST_FILES, @additional_files);
+		_unlink_files($line, @TEST_FILES, @additional_files, <test*.bin>, <test*.reloc>);
 	}
 }
 

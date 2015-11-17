@@ -51,8 +51,9 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 
 /* default types */
-ARRAY( Byte );
-ARRAY( int );
+ARRAY(Byte);
+ARRAY(Word);
+ARRAY(int);
 ARRAY(long);
 
 /* define */

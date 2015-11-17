@@ -276,6 +276,15 @@ void error_invalid_org_option(char *org_hex)
 	
 	STR_DELETE(msg);
 }
+void warn_org_ignored(char *filename, char *section_name)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	str_append_sprintf( msg, "--relocatable ignores ORG at file '%s', section '%s'", filename, section_name );
+	do_error( ErrWarn, str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_env_not_defined(char *var)
 {
 	STR_DEFINE(msg, STR_SIZE);

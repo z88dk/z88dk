@@ -57,4 +57,5 @@ extern char *get_err_filename( char *filename );
 extern char *get_bin_filename( char *filename );
 extern char *get_lib_filename( char *filename );
 extern char *get_sym_filename( char *filename );
-extern char *get_map_filename( char *filename );
+extern char *get_map_filename(char *filename);
+extern char *get_reloc_filename(char *filename);
