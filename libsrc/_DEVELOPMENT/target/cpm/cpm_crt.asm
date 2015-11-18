@@ -77,6 +77,6 @@ IF startup = 4
    ; stdpun = cpm_00_output_punch (bdos function 4)
    ; stdlst = cpm_00_output_list (bdos function 5)
 
-   INCLUDE "startup/cpm_crt_1.asm"
+   INCLUDE "startup/cpm_crt_4.asm"
 
 ENDIF
