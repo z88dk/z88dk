@@ -1,3 +1,4 @@
+@target/cpm/driver/terminal/cpm_00_input_cons.lst
 @target/cpm/driver/terminal/cpm_00_output_cons.lst
 @target/cpm/driver/terminal/cpm_01_input_kbd_dcio.lst
 @target/cpm/driver/terminal/cpm_01_output_dcio.lst
