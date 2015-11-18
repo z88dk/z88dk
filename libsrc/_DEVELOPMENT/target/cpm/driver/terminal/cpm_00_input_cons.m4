@@ -21,7 +21,7 @@ define(`m4_cpm_00_input_cons',dnl
    ; type  : 001 = input terminal
    ;
    ; ioctl_flags   : $2
-   ; buffer size   : $3 bytes (max 255)
+   ; buffer size   : $3 + 1 bytes (max 255)
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    `ifelse($1,0,,dnl
@@ -85,7 +85,7 @@ define(`m4_cpm_00_input_cons',dnl
       ; heap header
       
       defw __i_fcntl_heap_`'incr(__I_FCNTL_NUM_HEAP)
-      defw `eval($3 + 28)'
+      defw `eval($3 + 29)'
       defw ifelse(__I_FCNTL_NUM_HEAP,0,0,__i_fcntl_heap_`'decr(__I_FCNTL_NUM_HEAP))
    
    __i_fcntl_fdstruct_`'__I_FCNTL_NUM_FD:
@@ -132,10 +132,10 @@ define(`m4_cpm_00_input_cons',dnl
       
       ; buffer
       
-      defs $3
+      defs `eval($3 + 1)'
 
    `define(`__I_FCNTL_NUM_FD', incr(__I_FCNTL_NUM_FD))'dnl
-   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $3 + 28))'dnl
+   `define(`__I_FCNTL_HEAP_SIZE', eval(__I_FCNTL_HEAP_SIZE + $3 + 29))'dnl
    `define(`__I_FCNTL_NUM_HEAP', incr(__I_FCNTL_NUM_HEAP))'dnl
    
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
