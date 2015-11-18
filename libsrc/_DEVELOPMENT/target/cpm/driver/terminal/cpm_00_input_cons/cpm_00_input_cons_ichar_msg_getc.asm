@@ -21,7 +21,9 @@ cpm_00_input_cons_ichar_msg_getc:
    call l_offset_ix_de         ; hl = & index
    
    ld a,(hl)                   ; a = index
-   
+
+rejoin:
+
    ld e,l
    ld d,h                      ; de = &index
    
@@ -46,37 +48,37 @@ cpm_00_input_cons_ichar_msg_getc:
 
    ex de,hl                    ; hl = &index
    inc (hl)                    ; ++index
-
-   ; for cpm swap CR/LF since return key only generates CR
-
-   cp 13
-   jr z, change_cr_to_lf
-   
-   cp 10
-   jr z, change_lf_to_cr
    
    or a
-   ret
-
-change_cr_to_lf:
-
-   ld a,CHAR_LF
-   ret
-
-change_lf_to_cr:
-
-   ld a,CHAR_CR
    ret
 
 
 read_line:
 
-   xor a
-   
-   ld (de),a                   ; index = 0   
+   push de                     ; save &index
    inc de                      ; de = &max
    
    ld c,__CPM_RCOB             ; read console buffered (edit line)
    call asm_cpm_bdos_alt       ; exx and ix/iy preserved
+
+   pop hl                      ; hl = &index
    
-   jr cpm_00_input_cons_ichar_msg_getc
+   xor a
+   ld (hl),a                   ; index = 0
+   
+   ld e,l
+   ld d,h                      ; de = &index
+   
+   inc hl
+   inc hl                      ; hl = &len
+   
+   inc (hl)                    ; make space for terminator
+   
+   ld c,(hl)
+   ld b,a                      ; bc = len + 1
+   add hl,bc
+
+   ld (hl),CHAR_LF             ; terminate buffer
+   
+   ex de,hl
+   jr rejoin
