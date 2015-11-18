@@ -38,11 +38,13 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
+dnl#include(../driver/terminal/cpm_00_input_cons.m4)
 dnl#include(../driver/terminal/cpm_01_input_kbd_dcio.m4)
 dnl#include(../driver/character/cpm_00_input_reader.m4)
 dnl
 dnl## output terminals
 dnl
+dnl#include(../driver/terminal/cpm_00_output_cons.m4)
 dnl#include(../driver/terminal/cpm_01_output_dcio.m4)
 dnl#include(../driver/character/cpm_00_output_list.m4)
 dnl#include(../driver/character/cpm_00_output_punch.m4)
@@ -62,11 +64,11 @@ dnl
 
 include(../../clib_instantiate_begin.m4)
 
-include(../driver/terminal/cpm_01_input_kbd_dcio.m4)
-m4_cpm_01_input_kbd_dcio(_stdin, __i_fcntl_fdstruct_1, 0x03b0, 64)
+include(../driver/terminal/cpm_00_input_cons.m4)
+m4_cpm_00_input_cons(_stdin, 0x0100, 64)
 
-include(../driver/terminal/cpm_01_output_dcio.m4)
-m4_cpm_01_output_dcio(_stdout, 0x2370)
+include(../driver/terminal/cpm_00_output_cons.m4)
+m4_cpm_00_output_cons(_stdout, 0x0010)
 
 include(../../m4_file_dup.m4)dnl
 m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
@@ -98,7 +100,7 @@ __Start:
    
    ld a,2
    inc a
-   jp po, z80_present
+   jp po, __Restart
 
    ld c,__CPM_PRST
    ld de,disqualify_s
@@ -111,7 +113,7 @@ disqualify_s:
    defm "z80 only"
    defb 13,10,'$'
 
-z80_present:
+__Restart:
 
    ; locate stack
 
@@ -232,7 +234,16 @@ SECTION code_crt_return
    
       ; restarting program
       
-      jp __Start
+      IF __crt_enable_commandline = 1
+      
+         ; nerf command line for restarts
+         
+         ld hl,0
+         ld (0x0080),hl
+
+      ENDIF
+      
+      jp __Restart
    
    ENDIF
 

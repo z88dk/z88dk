@@ -47,13 +47,14 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
-   ; driver: cpm_00_input_cons
+   ; driver: cpm_01_input_kbd_dcio
    ; fd    : 0
    ; mode  : read only
    ; type  : 001 = input terminal
+   ; tie   : __i_fcntl_fdstruct_1
    ;
-   ; ioctl_flags   : 0x0100
-   ; buffer size   : 64 bytes (max 255)
+   ; ioctl_flags   : 0x03b0
+   ; buffer size   : 64 bytes
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -107,14 +108,14 @@ include "clib_target_constants.inc"
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_input_terminal_fdriver
-   EXTERN cpm_00_input_cons
+   EXTERN cpm_01_input_kbd_dcio
    
    __i_fcntl_heap_0:
    
       ; heap header
       
       defw __i_fcntl_heap_1
-      defw 92
+      defw 98
       defw 0
    
    __i_fcntl_fdstruct_0:
@@ -129,7 +130,7 @@ include "clib_target_constants.inc"
       ; jump to driver
       
       defb 195
-      defw cpm_00_input_cons
+      defw cpm_01_input_kbd_dcio
       
       ; flags
       ; reference_count
@@ -141,7 +142,7 @@ include "clib_target_constants.inc"
       
       ; ioctl_flags
       
-      defw 0x0100
+      defw 0x03b0
       
       ; mtx_plain
       
@@ -151,17 +152,25 @@ include "clib_target_constants.inc"
       defb 0xfe      ; atomic spinlock
       defw 0         ; list of blocked threads
 
-      ; index
-      ; max_size
-      ; len
-
-      defb 255
-      defb 64
+      ; tied output terminal
+      ; pending_char
+      ; read_index
+      
+      defw __i_fcntl_fdstruct_1
       defb 0
+      defw 0
       
-      ; buffer
+      ; b_array_t edit_buffer
       
-      defs 64
+      defw __edit_buffer_0
+      defw 0
+      defw 64
+      
+            
+      ; reserve space for edit buffer
+      
+      __edit_buffer_0:   defs 64
+      
 
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -173,12 +182,12 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
-   ; driver: cpm_00_output_cons
+   ; driver: cpm_01_output_dcio
    ; fd    : 1
    ; mode  : write only
    ; type  : 002 = output terminal
    ;
-   ; ioctl_flags   : 0x0010
+   ; ioctl_flags   : 0x2370
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
       
@@ -232,7 +241,7 @@ include "clib_target_constants.inc"
    SECTION data_fcntl_stdio_heap_body
    
    EXTERN console_01_output_terminal_fdriver
-   EXTERN cpm_00_output_cons
+   EXTERN cpm_01_output_dcio
    
    __i_fcntl_heap_1:
    
@@ -254,7 +263,7 @@ include "clib_target_constants.inc"
       ; jump to driver
       
       defb 195
-      defw cpm_00_output_cons
+      defw cpm_01_output_dcio
       
       ; flags
       ; reference_count
@@ -266,7 +275,7 @@ include "clib_target_constants.inc"
       
       ; ioctl_flags
       
-      defw 0x0010
+      defw 0x2370
       
       ; mtx_plain
       
@@ -846,11 +855,11 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 184  = byte size of static FDSTRUCTs
+   ; 190  = byte size of static FDSTRUCTs
    ; 5   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 184 > 0
+   IF 190 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -870,7 +879,7 @@ include "clib_target_constants.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (184 + 14)
+      IF __clib_stdio_heap_size > (190 + 14)
       
          ; expand stdio heap to desired size
          
@@ -881,7 +890,7 @@ include "clib_target_constants.inc"
             defw __i_fcntl_heap_6
             defw 0
             defw __i_fcntl_heap_4
-            defs __clib_stdio_heap_size - 184 - 14
+            defs __clib_stdio_heap_size - 190 - 14
          
          ; terminate stdio heap
          
