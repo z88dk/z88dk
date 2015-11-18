@@ -32,15 +32,13 @@ IF __clib_malloc_heap_size = -1
    SECTION code_crt_init
    
    EXTERN ASMHEAD_BSS_END
-   
-   dec sp                      ; ensure sp == 0 is accepted
-   
-   ld hl,0
+      
+   ld hl,-1                    ; ensure sp == 0 is accepted
    add hl,sp                   ; hl = top of the stack
    
-   inc sp
-   
    ld de,ASMHEAD_BSS_END
+   
+   xor a
    sbc hl,de                   ; hl = space between top of stack and end of bss - 1
 
    jp c, __Exit                ; if stack overlaps bss, this is a fatal error
