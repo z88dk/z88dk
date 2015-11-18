@@ -53,7 +53,7 @@ include "clib_target_constants.inc"
    ; type  : 001 = input terminal
    ;
    ; ioctl_flags   : 0x0100
-   ; buffer size   : 64 bytes (max 255)
+   ; buffer size   : 64 + 1 bytes (max 255)
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
@@ -114,7 +114,7 @@ include "clib_target_constants.inc"
       ; heap header
       
       defw __i_fcntl_heap_1
-      defw 92
+      defw 93
       defw 0
    
    __i_fcntl_fdstruct_0:
@@ -161,7 +161,7 @@ include "clib_target_constants.inc"
       
       ; buffer
       
-      defs 64
+      defs 65
 
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -846,11 +846,11 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_stdio_heap_size  = desired stdio heap size in bytes
-   ; 184  = byte size of static FDSTRUCTs
+   ; 185  = byte size of static FDSTRUCTs
    ; 5   = number of heap allocations
    ; __i_fcntl_heap_n     = address of allocation #n on heap (0..__I_FCNTL_NUM_HEAP-1)
 
-   IF 184 > 0
+   IF 185 > 0
    
       ; static FDSTRUCTs have been allocated in the heap
       
@@ -870,7 +870,7 @@ include "clib_target_constants.inc"
          defb 0xfe             ; spinlock (unlocked)
          defw 0                ; list of threads blocked on mutex
       
-      IF __clib_stdio_heap_size > (184 + 14)
+      IF __clib_stdio_heap_size > (185 + 14)
       
          ; expand stdio heap to desired size
          
@@ -881,7 +881,7 @@ include "clib_target_constants.inc"
             defw __i_fcntl_heap_6
             defw 0
             defw __i_fcntl_heap_4
-            defs __clib_stdio_heap_size - 184 - 14
+            defs __clib_stdio_heap_size - 185 - 14
          
          ; terminate stdio heap
          
