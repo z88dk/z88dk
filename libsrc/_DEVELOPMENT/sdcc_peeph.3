@@ -2156,8 +2156,9 @@ replace restart {
 } by {
 	ld	hl,(#%1)
 	push	hl
+	ld	hl,#%1 + 1
 	; peephole z88dk-5a  Use hl to load parameter from memory
-} if notUsed('bc'), notUsed('hl')
+} if notUsed('bc')
 
 replace restart {
 	ld	hl,#%1
@@ -2168,8 +2169,9 @@ replace restart {
 } by {
 	ld	hl,(#%1)
 	push	hl
+	ld	hl,#%1 + 1
 	; peephole z88dk-5b  Use hl to load parameter from memory
-} if notUsed('de'), notUsed('hl')
+} if notUsed('de')
 
 replace restart {
 	ld	hl,#%1
@@ -2938,101 +2940,33 @@ replace restart {
 	ld	%4 (ix), l
 	ld	c,e
 	ld	b,d
-	ex	de,hl
-	bit	7,b
-	; peephole z88dk-49a
-} if notUsed('hl')
-// notVolatile
-
-replace restart {
-	ld	%1 (ix),d
-	ld	%2 (ix),e
-	ld	%3 (ix),h
-	ld	%4 (ix), l
-	ld	e, l
-	ld	d,%3 (ix)
-	ld	c,%2 (ix)
-	ld	b,%1 (ix)
-	bit	7, %1 (ix)
-} by {
-	ld	%1 (ix),d
-	ld	%2 (ix),e
-	ld	%3 (ix),h
-	ld	%4 (ix), l
-	ld	c,e
-	ld	b,d
 	ld	e,l
 	ld	d,h
 	bit	7,b
-	; peephole z88dk-49b
+	; peephole z88dk-49
 } 
 // if notVolatile
 
 replace restart {
-	ld	-%1 (ix),d
-	ld	-%2 (ix),e
-	ld	-%3 (ix),h
-	ld	-%4 (ix), l
-	ld	e, l
-	ld	d,-%3 (ix)
-	ld	c,-%2 (ix)
-	ld	b,-%1 (ix)
-	bit	7, -%1 (ix)
-} by {
-	ld	-%1 (ix),d
-	ld	-%2 (ix),e
-	ld	-%3 (ix),h
-	ld	-%4 (ix), l
-	ld	c,e
-	ld	b,d
-	ex	de,hl
-	bit	7,b
-	; peephole z88dk-50a
-} if notUsed('hl')
-
-replace restart {
-	ld	-%1 (ix),d
-	ld	-%2 (ix),e
-	ld	-%3 (ix),h
-	ld	-%4 (ix), l
-	ld	e, l
-	ld	d,-%3 (ix)
-	ld	c,-%2 (ix)
-	ld	b,-%1 (ix)
-	bit	7, -%1 (ix)
-} by {
-	ld	-%1 (ix),d
-	ld	-%2 (ix),e
-	ld	-%3 (ix),h
-	ld	-%4 (ix), l
-	ld	c,e
-	ld	b,d
-	ld	e,l
-	ld	d,h
-	bit	7,b
-	; peephole z88dk-50b
-}
-
-replace restart {
-	ld	-%1 (ix),d
-	ld	-%2 (ix),e
-	ld	-%3 (ix),b
+	ld	%1 (ix),d
+	ld	%2 (ix),e
+	ld	%3 (ix),b
 	ld	a,c
 	and	a, #%4
-	ld	-%5 (ix),a
+	ld	%5 (ix),a
 	ld	a,#%6
-	cp	a, -%1 (ix)
+	cp	a, %1 (ix)
 	ld	a,#%7
-	sbc	a, -%2 (ix)
+	sbc	a, %2 (ix)
 	ld	a,#%8
-	sbc	a, -%3 (ix)
+	sbc	a, %3 (ix)
 } by {
-	ld	-%1 (ix),d
-	ld	-%2 (ix),e
-	ld	-%3 (ix),b
+	ld	%1 (ix),d
+	ld	%2 (ix),e
+	ld	%3 (ix),b
 	ld	a,c
 	and	a, #%4
-	ld	-%5 (ix),a
+	ld	%5 (ix),a
 	ld	a,#%6
 	cp	a, d
 	ld	a,#%7
@@ -3049,121 +2983,100 @@ replace restart {
 	ld	de, #%7
 	add	hl, de
 	ld	a,(hl)
-	ld	-%1 (ix),a
+	ld	%1 (ix),a
 	inc	hl
 	ld	a,(hl)
-	ld	-%2 (ix),a
+	ld	%2 (ix),a
 	inc	hl
 	ld	a,(hl)
-	ld	-%3 (ix),a
+	ld	%3 (ix),a
 	inc	hl
 	ld	a,(hl)
-	ld	-%4 (ix),a
+	ld	%4 (ix),a
 } by {
 	push	ix
 	pop	hl
-	ld	de,-%1
+	ld	de,#%1
 	add	hl,de
 	ex	de,hl
 	ld	l, %5 (ix)
 	ld	h, %6 (ix)
-	ld	bc, #%7
+	ld	bc,#%7
 	add	hl,bc
-	ld	bc, 0x0004
+	ld	bc,#0x0004
 	ldir
-	; peephole z88dk-52
-} if notUsed('bc'), notUsed('de')
+	dec	hl
+	; peephole z88dk-52  Warning may lead to incorrect code
+} if notUsed('bc'), notUsed('de'), notUsed('a')
 
 replace restart {
 	ld	b,l
 	ld	c,h
-	ld	a,-%1 (ix)
+	ld	a,%1 (ix)
 	add	a, b
-	ld	-%1 (ix),a
-	ld	a,-%2 (ix)
+	ld	%1 (ix),a
+	ld	a,%2 (ix)
 	adc	a, c
-	ld	-%2 (ix),a
-	ld	a,-%3 (ix)
+	ld	%2 (ix),a
+	ld	a,%3 (ix)
 	adc	a, e
-	ld	-%3 (ix),a
-	ld	a,-%4 (ix)
+	ld	%3 (ix),a
+	ld	a,%4 (ix)
 	adc	a, d
-	ld	-%4 (ix),a
+	ld	%4 (ix),a
 } by {
-	ld	c,-%1 (ix)
-	ld	b,-%2 (ix)
+	ld	c,%1 (ix)
+	ld	b,%2 (ix)
 	add	hl,bc
-	ld	-%1 (ix),l
-	ld	-%2 (ix),h
-	ld	l,-%3 (ix)
-	ld	h,-%4 (ix)
+	ld	%1 (ix),l
+	ld	%2 (ix),h
+	ld	l,%3 (ix)
+	ld	h,%4 (ix)
 	adc	hl,de
-	ld	-%3 (ix),l
-	ld	-%4 (ix),h
+	ld	%3 (ix),l
+	ld	%4 (ix),h
 	ld	a,h
 	; peephole z88dk-53
 } if notUsed('bc'), notUsed('hl')
 
 replace restart {
-	ld	-%1 (ix),l
-	ld	-%2 (ix),h
-	ld	l,-%1 (ix)
-	ld	h,-%2 (ix)
+	ld	%1 (ix),%3
+	ld	%2 (ix),%4
+	ld	%3,%1 (ix)
+	ld	%4,%2 (ix)
 } by {
-	ld	-%1 (ix),l
-	ld	-%2 (ix),h
-	; peephole z88dk-54
+	ld	%1 (ix),%3
+	ld	%2 (ix),%4
+	; peephole z88dk-55
 }
 // if notVolatile
 
 replace restart {
-	ld	%1 (ix),l
-	ld	%2 (ix),h
-	ld	l,%1 (ix)
-	ld	h,%2 (ix)
-} by {
-	ld	%1 (ix),l
-	ld	%2 (ix),h
-	; peephole z88dk-55
-}
-
-replace restart {
-	ld	-%5 (ix), l
-	ld	-%6 (ix), h
-	ld	-%7 (ix),e
-	ld	-%8 (ix),d
-	bit	7, d
+	ld	%5 (ix), l
+	ld	%6 (ix), h
+	ld	%7 (ix),e
+	ld	%8 (ix),d
+	bit	%2, %3
 	jp	NZ,%1
-	ld	h,-%5 (ix)
-	ld	l,-%6 (ix)
-	ld	d,-%7 (ix)
-	ld	e,-%8 (ix)
+	ld	h,%5 (ix)
+	ld	l,%6 (ix)
+	ld	d,%7 (ix)
+	ld	e,%8 (ix)
+} by {
+	ld	%5 (ix),l
+	ld	%6 (ix),h
+	ld	%7 (ix),e
+	ld	%8 (ix),d
+	bit	%2, %3
+	jp	NZ,%1
 	ld	a,h
-	or	a,a
-	jp	NZ,%2
-	or	a,l
-	jp	NZ,%3
-	or	a,d
-	jp	NZ,%4
-	ld	a,e
-} by {
-	ld	-%5 (ix), l
-	ld	-%6 (ix), h
-	ld	-%7 (ix),e
-	ld	-%8 (ix),d
-	bit	7, d
-	jp	NZ,%1
-	ld	a,l
-	or	a,a
-	jp	NZ,%2
-	or	a,h
-	jp	NZ,%3
-	or	a,e
-	jp	NZ,%4
+	ld	h,l
+	ld	l,a
 	ld	a,d
-	; peephole z88dk-56  Warning may lead to incorrect code
+	ld	d,e
+	ld	e,a
+	; peephole z88dk-56
 } 
-// if notUsed('de'), notUsed('hl'), notVolatile
 
 replace restart {
 	ld	b,l
@@ -3173,32 +3086,14 @@ replace restart {
 	or	a,b
 	jp	NZ,%1
 } by {
+	ld	b,l
+	ld	c,h
 	pop	de
 	ld	a,h
 	or	a,l
 	jp	NZ,%1
-	; peephole z88dk-57  Warning may lead to incorrect code
-} if notUsed('bc')
-
-replace restart {
-	ld	-%1 (ix),h
-	ld	-%2 (ix),l
-	pop	de
-	pop	bc
-	ld	a,-%1 (ix)
-	or	a,-%2 (ix)
-	jp	NZ,%3
-} by {
-	ld	-%1 (ix),h
-	ld	-%2 (ix),l
-	pop	de
-	pop	bc
-	ld	a,h
-	or	a,l
-	jp	NZ,%3
-	; peephole z88dk-58
+	; peephole z88dk-57
 }
-// if notVolatile
 
 replace restart {
 	ld	%1 (ix),h
@@ -3218,15 +3113,6 @@ replace restart {
 	jp	NZ,%3
 	; peephole z88dk-59
 }
-
-replace restart {
-	ld	%1,-%3 (ix)
-	ld	%2,-%3 (ix)
-} by {
-	ld	%1,-%3 (ix)
-	ld	%2,%1
-	; peephole z88dk-60
-}
 // if notVolatile
 
 replace restart {
@@ -3238,30 +3124,6 @@ replace restart {
 	; peephole z88dk-61
 }
 // if notVolatile
-
-replace restart {
-	ld	-%1 (ix),#0x00
-	ld	-%2 (ix),#0x00
-	ld	-%3 (ix),#0x00
-} by {
-	xor	a, a
-	ld	-%1 (ix),a
-	ld	-%2 (ix),a
-	ld	-%3 (ix),a
-	; peephole z88dk-62
-} if notUsed('a')
-
-replace restart {
-	ld	%1 (ix),#0x00
-	ld	%2 (ix),#0x00
-	ld	%3 (ix),#0x00
-} by {
-	xor	a, a
-	ld	%1 (ix),a
-	ld	%2 (ix),a
-	ld	%3 (ix),a
-	; peephole z88dk-63
-} if notUsed('a')
 
 replace restart {
 	ld	d,a
@@ -3276,21 +3138,6 @@ replace restart {
 	or	a, e
 	; peephole z88dk-64
 }
-
-replace restart {
-	ld	b,l
-	ld	c,h
-	ld	-%1 (ix),b
-	ld	-%2 (ix),c
-	ld	-%3 (ix),e
-	ld	-%4 (ix),d
-} by {
-	ld	-%1 (ix),l
-	ld	-%2 (ix),h
-	ld	-%3 (ix),e
-	ld	-%4 (ix),d
-	; peephole z88dk-65
-} if notUsed('bc')
 
 replace restart {
 	ld	b,l
@@ -3330,53 +3177,25 @@ replace restart {
 } 
 
 replace restart {
-	ld	-%4 (ix),l
-	ld	-%3 (ix),h
-	ld	-%2 (ix),e
-	ld	-%1 (ix),d
-	ld	l,-%2 (ix)
-	ld	h,-%1 (ix)
+	ld	%4 (ix),l
+	ld	%3 (ix),h
+	ld	%2 (ix),e
+	ld	%1 (ix),d
+	ld	l,%2 (ix)
+	ld	h,%1 (ix)
 	push	hl
-	ld	l,-%4 (ix)
-	ld	h,-%3 (ix)
+	ld	l,%4 (ix)
+	ld	h,%3 (ix)
 	push	hl
 } by {
-	ld	-%4 (ix),l
-	ld	-%3 (ix),h
-	ld	-%2 (ix),e
-	ld	-%1 (ix),d
+	ld	%4 (ix),l
+	ld	%3 (ix),h
+	ld	%2 (ix),e
+	ld	%1 (ix),d
 	push	de
 	push	hl
 	; peephole z88dk-68
 } 
-// if notVolatile
-
-replace restart {
-	ld	-%4 (ix),c
-	ld	-%3 (ix),b
-	ld	-%2 (ix),e
-	ld	-%1 (ix),d
-	push	af
-	ld	a,-%4 (ix)
-	ld	-%8 (ix),a
-	ld	a,-%3 (ix)
-	ld	-%7 (ix),a
-	ld	a,-%2 (ix)
-	ld	-%6 (ix),a
-	ld	a,-%1 (ix)
-	ld	-%5 (ix),a
-	pop	af
-} by {
-	ld	-%4 (ix),c
-	ld	-%3 (ix),b
-	ld	-%2 (ix),e
-	ld	-%1 (ix),d
-	ld	-%8 (ix),c
-	ld	-%7 (ix),b
-	ld	-%6 (ix),e
-	ld	-%5 (ix),d
-	; peephole z88dk-69
-}
 // if notVolatile
 
 replace restart {
@@ -3403,7 +3222,7 @@ replace restart {
 	ld	%7 (ix),b
 	ld	%6 (ix),e
 	ld	%5 (ix),d
-	; peephole z88dk-70
+	; peephole z88dk-69
 }
 // if notVolatile
 
@@ -3447,25 +3266,13 @@ replace restart {
 }
 
 replace restart {
-	ld	-%1 (ix),a
-	ld	l,-%2 (ix)
-	ld	h,-%1 (ix)
-} by {
-	ld	-%1 (ix),a
-	ld	l,-%2 (ix)
-	ld	h,a
-	; peephole z88dk-74
-} 
-// if notVolatile
-
-replace restart {
-	ld	%1 (ix),a
+	ld	%1 (ix),%3
 	ld	l,%2 (ix)
 	ld	h,%1 (ix)
 } by {
-	ld	%1 (ix),a
+	ld	%1 (ix),%3
 	ld	l,%2 (ix)
-	ld	h,a
+	ld	h,%3
 	; peephole z88dk-75
 } 
 // if notVolatile
@@ -3658,46 +3465,6 @@ replace restart {
 	jp	P,%2
 	; peephole z88dk-89b
 }
-
-replace restart {
-	ld	a,(#%1)
-	ld	hl,#%2
-	sub	a, (hl)
-	ld	-%3 (ix),a
-	ld	a,(#%1 + 1)
-	ld	hl,#%2 + 1
-	sbc	a, (hl)
-	ld	-%4 (ix),a
-} by {
-	ld	hl,(#%1)
-	ld	de,(#%2)
-	xor	a,a
-	sbc	hl,de
-	ld	-%3 (ix),l
-	ld	-%4 (ix),h
-	ld	a,h
-	; peephole z88dk-90a
-} if notUsed('de'), notUsed('hl')
-
-replace restart {
-	ld	hl,#%1
-	ld	a,(#%2 + 0)
-	sub	a, (hl)
-	ld	-%3 (ix),a
-	ld	a,(#%2 + 1)
-	inc	hl
-	sbc	a, (hl)
-	ld	-%4 (ix),a
-} by {
-	ld	hl,(#%2)
-	ld	de,(#%1)
-	xor	a,a
-	sbc	hl,de
-	ld	-%3 (ix),l
-	ld	-%4 (ix),h
-	ld	a,h
-	; peephole z88dk-90b
-} if notUsed('de'), notUsed('hl')
 
 replace restart {
 	ld	a,(#%1)
@@ -4591,14 +4358,14 @@ _%1	=	%2
 replace restart {
 	ld	a,l
 	add	a,#0xFF
-	ld	-%1 (ix),a
+	ld	%1 (ix),a
 	ld	a,h
 	adc	a,#0xFF
-	ld	-%2 (ix),a
+	ld	%2 (ix),a
 } by {
 	dec	hl
-	ld	-%1 (ix),l	
-	ld	-%2 (ix),h
+	ld	%1 (ix),l	
+	ld	%2 (ix),h
 	ld	a,h
 	; peephole z88dk-144a
 } if notUsed('hl')
@@ -4606,14 +4373,14 @@ replace restart {
 replace restart {
 	ld	a,l
 	add	a,#0xFF
-	ld	-%1 (ix),a
+	ld	%1 (ix),a
 	ld	a,h
 	adc	a,#0xFF
-	ld	-%2 (ix),a
+	ld	%2 (ix),a
 } by {
 	dec	hl
-	ld	-%1 (ix),l	
-	ld	-%2 (ix),h
+	ld	%1 (ix),l	
+	ld	%2 (ix),h
 	ld	a,h
 	inc	hl
 	; peephole z88dk-144b
@@ -4639,36 +4406,16 @@ replace restart {
 	ld	d,a
 	ld	a,%2 (ix)
 	adc	a, e
-	ld	-%3 (ix), d
-	ld	-%4 (ix), a
+	ld	%3 (ix), d
+	ld	%4 (ix), a
 } by {
 	ld	e,%1 (ix)
 	ld	d,%2 (ix)
 	add	hl,de
-	ld	-%3 (ix), l
-	ld	-%4 (ix), h
+	ld	%3 (ix), l
+	ld	%4 (ix), h
 	ld	a,h
 	; peephole z88dk-146a
-} if notUsed('de'), notUsed('hl')
-
-replace restart {
-	ld	d,l
-	ld	e,h
-	ld	a,-%1 (ix)
-	add	a, d
-	ld	d,a
-	ld	a,-%2 (ix)
-	adc	a, e
-	ld	-%3 (ix), d
-	ld	-%4 (ix), a
-} by {
-	ld	e,-%1 (ix)
-	ld	d,-%2 (ix)
-	add	hl,de
-	ld	-%3 (ix), l
-	ld	-%4 (ix), h
-	ld	a,h
-	; peephole z88dk-146b
 } if notUsed('de'), notUsed('hl')
 
 replace restart {
@@ -4687,27 +4434,9 @@ replace restart {
 	add	hl,de
 	ex	de,hl
 	ld	a,d
-	; peephole z88dk-147a
-} if notUsed('b')
-
-replace restart {
-	ld	d,l
 	ld	b,h
-	ld	a,-%1 (ix)
-	add	a, d
-	ld	e,a
-	ld	a,-%2 (ix)
-	adc	a, b
-	ld	d,a
-} by {
-	ex	de,hl
-	ld	l,-%1 (ix)
-	ld	h,-%2 (ix)
-	add	hl,de
-	ex	de,hl
-	ld	a,d
-	; peephole z88dk-147b
-} if notUsed('b')
+	; peephole z88dk-147
+}
 
 replace restart {
 	pop	de
@@ -4740,12 +4469,12 @@ replace restart {
 	ld	d,l
 	ld	e,h
 	pop	bc
-	ld	-%1 (ix),d
-	ld	-%2 (ix),e
+	ld	%1 (ix),d
+	ld	%2 (ix),e
 } by {
 	pop	bc
-	ld	-%1 (ix),l
-	ld	-%2 (ix),h
+	ld	%1 (ix),l
+	ld	%2 (ix),h
 	; peephole z88dk-150
 } if notUsed('de')
 
@@ -5114,30 +4843,30 @@ replace restart {
 replace restart {
 	ld	de,(#%1)
 	dec	de
-	ld	(ix-%2),e
-	ld	(ix-%3),d
+	ld	%2 (ix),e
+	ld	%3 (ix),d
 	ld	l, e
 	ld	h, d
 } by {
 	ld	hl,(#%1)
 	dec	hl
-	ld	(ix-%2),l
-	ld	(ix-%3),h
-	ld	e, l
-	ld	d, h
+	ld	%2 (ix),l
+	ld	%3 (ix),h
+	ld	e,l
+	ld	d,h
 	; peephole z88dk-167a
 }
 
 replace restart {
 	ld	de,(#%1)
 	dec	de
-	ld	(ix-%2),e
-	ld	(ix-%3),d
+	ld	%2 (ix),e
+	ld	%2 (ix),d
 } by {
 	ld	hl,(#%1)
 	dec	hl
-	ld	(ix-%2),l
-	ld	(ix-%3),h
+	ld	%2 (ix),l
+	ld	%3 (ix),h
 	; peephole z88dk-167b
 } if notUsed('de'), notUsed('hl')
 
@@ -5253,23 +4982,23 @@ replace restart {
 replace restart {
 	ld	hl,#%1
 	ld	a,(hl)
-	ld	-%3 (%2),a
+	ld	%3 (%2),a
 	inc	hl
 	ld	a,(hl)
-	ld	-%4 (%2),a
+	ld	%4 (%2),a
 	inc	hl
 	ld	a,(hl)
-	ld	-%5 (%2),a
+	ld	%5 (%2),a
 	inc	hl
 	ld	a,(hl)
-	ld	-%6 (%2),a
+	ld	%6 (%2),a
 } by {
 	ld	hl,(#%1)
-	ld	-%3 (%2),l
-	ld	-%4 (%2),h
+	ld	%3 (%2),l
+	ld	%4 (%2),h
 	ld	hl,(#%1 + 2)
-	ld	-%5 (%2),l
-	ld	-%6 (%2),h
+	ld	%5 (%2),l
+	ld	%6 (%2),h
 	ld	a,h
 	ld	hl,#%1 + 3
 	; peephole z88dk-174a
@@ -5278,38 +5007,38 @@ replace restart {
 replace restart {
 	ld	hl,#%1
 	ld	a,(hl)
-	ld	-%3 (%2),a
+	ld	%3 (%2),a
 	inc	hl
 	ld	a,(hl)
-	ld	-%4 (%2),a
+	ld	%4 (%2),a
 } by {
 	ld	hl,(#%1)
-	ld	-%3 (%2),l
-	ld	-%4 (%2),h
+	ld	%3 (%2),l
+	ld	%4 (%2),h
 	ld	a,h
 	ld	hl,#%1 + 1
 	; peephole z88dk-174b
 }
 
 replace restart {
-	ld	a, -%3 (%2)
+	ld	a, %3 (%2)
 	ld	hl,#%1
 	ld	(hl),a
-	ld	a, -%4 (%2)
+	ld	a, %4 (%2)
 	inc	hl
 	ld	(hl),a
-	ld	a, -%5 (%2)
+	ld	a, %5 (%2)
 	inc	hl
 	ld	(hl),a
-	ld	a, -%6 (%2)
+	ld	a, %6 (%2)
 	inc	hl
 	ld	(hl),a
 } by {
-	ld	l, -%3 (%2)
-	ld	h, -%4 (%2)
+	ld	l,%3 (%2)
+	ld	h,%4 (%2)
 	ld	(#%1),hl
-	ld	l, -%5 (%2)
-	ld	h, -%6 (%2)
+	ld	l,%5 (%2)
+	ld	h,%6 (%2)
 	ld	(#%1 + 2),hl
 	ld	a,h
 	ld	hl,#%1 + 3
@@ -5317,15 +5046,15 @@ replace restart {
 }
 
 replace restart {
-	ld	a, -%3 (%2)
+	ld	a, %3 (%2)
 	ld	hl,#%1
 	ld	(hl),a
-	ld	a, -%4 (%2)
+	ld	a, %4 (%2)
 	inc	hl
 	ld	(hl),a
 } by {
-	ld	l, -%3 (%2)
-	ld	h, -%4 (%2)
+	ld	l,%3 (%2)
+	ld	h,%4 (%2)
 	ld	(#%1),hl
 	ld	a,h
 	ld	hl,#%1 + 1
@@ -5727,28 +5456,6 @@ replace restart {
 } if notVolatile(%1), operandsNotRelated(%3 %1), operandsNotRelated(%5 %1)
 
 replace restart {
-	ld	-%1 (%5),d
-	ld	-%2 (%5),e
-	ld	-%3 (%5),h
-	ld	-%4 (%5),l
-	ld	l,-%2 (%5)
-	ld	h,-%1 (%5)
-	push	hl
-	ld	l,-%4 (%5)
-	ld	h,-%3 (%5)
-	push	hl
-} by {
-	ld	-%1 (%5),d
-	ld	-%2 (%5),e
-	ld	-%3 (%5),h
-	ld	-%4 (%5),l
-	push	de
-	push	hl
-	; peephole z88dk-181a
-}
-// if notVolatile
-
-replace restart {
 	ld	%1 (%5),d
 	ld	%2 (%5),e
 	ld	%3 (%5),h
@@ -5771,26 +5478,6 @@ replace restart {
 // if notVolatile
 
 replace restart {
-	ld	l,-%1 (%3)
-	ld	h,-%2 (%3)
-	inc	hl
-	inc	hl
-	ld	(hl),%4
-	ld	l,-%1 (%3)
-	ld	h,-%2 (%3)
-} by {
-	ld	l,-%1 (%3)
-	ld	h,-%2 (%3)
-	inc	hl
-	inc	hl
-	ld	(hl),%4
-	dec	hl
-	dec	hl
-	; peephole z88dk-182e
-}
-// if notVolatile()
-
-replace restart {
 	ld	l,%1 (%3)
 	ld	h,%2 (%3)
 	inc	hl
@@ -5811,23 +5498,6 @@ replace restart {
 // if notVolatile()
 
 replace restart {
-	ld	l,-%1 (%3)
-	ld	h,-%2 (%3)
-	inc	hl
-	ld	(hl),%4
-	ld	l,-%1 (%3)
-	ld	h,-%2 (%3)
-} by {
-	ld	l,-%1 (%3)
-	ld	h,-%2 (%3)
-	inc	hl
-	ld	(hl),%4
-	dec	hl
-	; peephole z88dk-182c
-}
-// if notVolatile()
-
-replace restart {
 	ld	l,%1 (%3)
 	ld	h,%2 (%3)
 	inc	hl
@@ -5841,20 +5511,6 @@ replace restart {
 	ld	(hl),%4
 	dec	hl
 	; peephole z88dk-182d
-}
-// if notVolatile()
-
-replace restart {
-	ld	-%1 (%3),l
-	ld	-%2 (%3),h
-	ld	(hl),%4
-	ld	l,-%1 (%3)
-	ld	h,-%2 (%3)
-} by {
-	ld	-%1 (%3),l
-	ld	-%2 (%3),h
-	ld	(hl),%4
-	; peephole z88dk-182a
 }
 // if notVolatile()
 
@@ -5931,27 +5587,27 @@ replace restart {
 } if notUsed('bc')
 
 replace restart {
-	ld	e,-%1 (%3)
-	ld	d,-%2 (%3)
+	ld	e,%1 (%3)
+	ld	d,%2 (%3)
 	sla	e
 	rl	d
 } by {
-	ld	l,-%1 (%3)
-	ld	h,-%2 (%3)
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
 	add	hl,hl
 	ex	de,hl
 	; peephole z88dk-185a
 } if notUsed('hl')
 
 replace restart {
-	ld	e,-%1 (%3)
-	ld	d,-%2 (%3)
+	ld	e,%1 (%3)
+	ld	d,%2 (%3)
 	sla	e
 	rl	d
 } by {
 	ex	de,hl
-	ld	l,-%1 (%3)
-	ld	h,-%2 (%3)
+	ld	l,%1 (%3)
+	ld	h,%2 (%3)
 	add	hl,hl
 	ex	de,hl
 	; peephole z88dk-185b
@@ -6124,22 +5780,6 @@ replace restart {
 }
 
 replace restart {
-	ld	-%1 (%5),%3
-	ld	-%2 (%5),%4
-	sla	-%1 (%5)
-	rl	-%2 (%5)
-	ld	l,-%1 (%5)
-	ld	h,-%2 (%5)
-} by {
-	ld	l,%3
-	ld	h,%4
-	add	hl,hl
-	ld	-%1 (%5),l
-	ld	-%2 (%5),h
-	; peephole z88dk-192a
-}
-
-replace restart {
 	ld	%1 (%5),%3
 	ld	%2 (%5),%4
 	sla	%1 (%5)
@@ -6180,34 +5820,6 @@ replace restart {
 	ld	%1 (%5),l
 	ld	%2 (%5),h
 	; peephole z88dk-192d
-}
-// if notVolatile
-
-replace restart {
-	sla	-%1 (%5)
-	rl	-%2 (%5)
-	ld	l,-%1 (%5)
-	ld	h,-%2 (%5)
-} by {
-	ld	l,-%1 (%5)
-	ld	h,-%2 (%5)
-	add	hl,hl
-	ld	-%1 (%5),l
-	ld	-%2 (%5),h
-	; peephole z88dk-192e
-}
-
-replace restart {
-	ld	-%1 (%5),%3
-	ld	-%2 (%5),%4
-	ld	l,-%1 (%5)
-	ld	h,-%2 (%5)
-} by {
-	ld	l,%3
-	ld	h,%4
-	ld	-%1 (%5),l
-	ld	-%2 (%5),h
-	; peephole z88dk-192f
 }
 // if notVolatile
 
@@ -10618,6 +10230,15 @@ replace restart {
 } if notSame(%1 'l' 'h' 'e' 'd')
 
 replace restart {
+	ld	%1,l
+	ex	de,hl
+} by {
+	ex	de,hl
+	ld	%1,e
+	; peephole z88dk-340f
+} if notSame(%1 'l' 'h' 'e' 'd')
+
+replace restart {
 	ld	a,#<(%1)
 	ld	hl,#%2
 	add	a, (hl)
@@ -11055,7 +10676,142 @@ replace restart {
 	; peephole z88dk-357b
 } 
 
+replace restart {
+	ld	%1,%3 (%4)
+	ld	%2,%1
+} by {
+	ld	%2,%3 (%4)
+	; peephole z88dk-358
+} if notUsed(%1), canAssign(%2 %3 %4)
 
+replace restart {
+	ex	de,hl
+	ld	hl,#%1
+	add	hl,de
+} by {
+	ld	de,#%1
+	add	hl,de
+	; peephole z88dk-359
+} if notUsed('de')
+
+replace restart {
+	ld	a,#<(%1)
+	ld	hl,#%2
+	add	a, (hl)
+	ld	b,a
+	ld	a,#>(%1)
+	inc	hl
+	adc	a, (hl)
+	ld	c,a
+} by {
+	ld	bc,#%1
+	ld	hl,(#%2)
+	add	hl,bc
+	ld	a,h
+	ld	b,l
+	ld	c,h
+	ld	hl,#%2 + 1
+	; peephole z88dk-360
+}
+
+replace restart {
+	ld	hl,#%1
+	ld	a,(hl)
+	sub	a, e
+	ld	e,a
+	inc	hl
+	ld	a,(hl)
+	sbc	a, d
+	ld	d,a
+} by {
+	ld	hl,(#%1)
+	xor	a,a
+	sbc	hl,de
+	ld	a,h
+	ex	de,hl
+	ld	hl,#%1 + 1
+	; peephole z88dk-361
+}
+
+replace restart {
+	ld	a,#<(%1)
+	add	a, l
+	ld	%2 (%4),a
+	ld	a,#>(%1)
+	adc	a, h
+	ld	%3 (%4),a
+} by {
+	ld	bc,#%1
+	add	hl,bc
+	ld	%2 (%4),l
+	ld	%3 (%4),h
+	ld	a,h
+	; peephole z88dk-362a
+} if notUsed('bc'), notUsed('hl')
+
+replace restart {
+	ld	a,#<(%1)
+	add	a, l
+	ld	%2 (%4),a
+	ld	a,#>(%1)
+	adc	a, h
+	ld	%3 (%4),a
+} by {
+	ld	de,#%1
+	add	hl,de
+	ld	%2 (%4),l
+	ld	%3 (%4),h
+	ld	a,h
+	; peephole z88dk-362b
+} if notUsed('de'), notUsed('hl')
+
+replace restart {
+	ld	a,e
+	add	a,#0xFF
+	ld	%1 (%3),a
+	ld	a,d
+	adc	a,#0xFF
+	ld	%2 (%3),a
+} by {
+	dec	de
+	ld	%1 (%3),e
+	ld	%2 (%3),d
+	ld	a,d
+	inc	de
+	; peephole z88dk-363a
+}
+
+replace restart {
+	ld	a,c
+	add	a,#0xFF
+	ld	%1 (%3),a
+	ld	a,b
+	adc	a,#0xFF
+	ld	%2 (%3),a
+} by {
+	dec	bc
+	ld	%1 (%3),c
+	ld	%2 (%3),b
+	ld	a,b
+	inc	bc
+	; peephole z88dk-363b
+}
+
+replace restart {
+	ld	a,l
+	add	a,#0xFF
+	ld	%1 (%3),a
+	ld	a,h
+	adc	a,#0xFF
+	ld	%2 (%3),a
+} by {
+	dec	hl
+	ld	%1 (%3),l
+	ld	%2 (%3),h
+	ld	a,h
+	inc	hl
+	; peephole z88dk-363c
+}
 
 
 
@@ -11612,8 +11368,6 @@ replace restart {
 	; peephole z88dk-600f
 }
 
-
-
 replace restart {
 	ld	l,e
 	ld	h,d
@@ -11915,7 +11669,17 @@ replace restart {
 } by {
 	ld	hl,(#%1)
 	ld	de,#%2 + %3
-	; peephole z88dk-608
+	; peephole z88dk-608a
+}
+
+replace restart {
+	ld	de,%1
+	ld	hl,%2
+	ex	de,hl
+} by {
+	ld	de,%2
+	ld	hl,%1
+	; peephole z88dk-608b
 }
 
 replace restart {
@@ -12231,7 +11995,7 @@ replace restart {
 
 barrier
 
-replace {
+replace restart {
 	z88dk_poison
 } by {
 	; poison removal
@@ -12304,7 +12068,7 @@ replace restart {
 // Ensure that all rules above see only jp, not jr.
 barrier
 
-replace {
+replace restart {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12324,7 +12088,7 @@ replace {
 %2:
 } if labelJTInRange
 
-replace {
+replace restart {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12342,7 +12106,7 @@ replace {
 %2:
 } if labelJTInRange
 
-replace {
+replace restart {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12364,7 +12128,7 @@ replace {
 %2:
 } if labelJTInRange
 
-replace {
+replace restart {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12384,7 +12148,7 @@ replace {
 %2:
 } if labelJTInRange
 
-replace {
+replace restart {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12408,7 +12172,7 @@ replace {
 %2:
 } if labelJTInRange
 
-replace {
+replace restart {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12430,7 +12194,7 @@ replace {
 %2:
 } if labelJTInRange
 
-replace {
+replace restart {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12456,7 +12220,7 @@ replace {
 %2:
 } if labelJTInRange
 
-replace {
+replace restart {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12480,7 +12244,7 @@ replace {
 %2:
 } if labelJTInRange
 
-replace {
+replace restart {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12508,7 +12272,7 @@ replace {
 %2:
 } if labelJTInRange
 
-replace {
+replace restart {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12555,42 +12319,42 @@ replace restart {
 // Replace jp by ret before replacing jp by jr outside of jump tables, since using ret can reduce the number of references to jump labels.
 barrier
 
-replace {
+replace restart {
 	jp	%5
 } by {
 	jr	%5
 	; peephole 153 changed absolute to relative unconditional jump.
 } if labelInRange(%5)
 
-replace {
+replace restart {
 	jp	Z,%5
 } by {
 	jr	Z,%5
 	; peephole 154 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
-replace {
+replace restart {
 	jp	NZ,%5
 } by {
 	jr	NZ,%5
 	; peephole 155 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
-replace {
+replace restart {
 	jp	C,%5
 } by {
 	jr	C,%5
 	; peephole 156 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
-replace {
+replace restart {
 	jp	NC,%5
 } by {
 	jr	NC,%5
 	; peephole 157 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
-replace {
+replace restart {
 	dec b
 	jr	NZ,	%5	
 } by {
