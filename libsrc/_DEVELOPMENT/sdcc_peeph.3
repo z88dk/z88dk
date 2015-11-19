@@ -2937,7 +2937,7 @@ replace restart {
 	ld	%1 (ix),d
 	ld	%2 (ix),e
 	ld	%3 (ix),h
-	ld	%4 (ix), l
+	ld	%4 (ix),l
 	ld	c,e
 	ld	b,d
 	ld	e,l
@@ -3057,7 +3057,7 @@ replace restart {
 	ld	%7 (ix),e
 	ld	%8 (ix),d
 	bit	%2, %3
-	jp	NZ,%1
+	jp	%4,%1
 	ld	h,%5 (ix)
 	ld	l,%6 (ix)
 	ld	d,%7 (ix)
@@ -3068,7 +3068,7 @@ replace restart {
 	ld	%7 (ix),e
 	ld	%8 (ix),d
 	bit	%2, %3
-	jp	NZ,%1
+	jp	%4,%1
 	ld	a,h
 	ld	h,l
 	ld	l,a
@@ -3084,14 +3084,14 @@ replace restart {
 	pop	de
 	ld	a,c
 	or	a,b
-	jp	NZ,%1
+	jp	%2,%1
 } by {
 	ld	b,l
 	ld	c,h
 	pop	de
 	ld	a,h
 	or	a,l
-	jp	NZ,%1
+	jp	%2,%1
 	; peephole z88dk-57
 }
 
@@ -3102,7 +3102,7 @@ replace restart {
 	pop	bc
 	ld	a,%1 (ix)
 	or	a,%2 (ix)
-	jp	NZ,%3
+	jp	%4,%3
 } by {
 	ld	%1 (ix),h
 	ld	%2 (ix),l
@@ -3110,7 +3110,7 @@ replace restart {
 	pop	bc
 	ld	a,h
 	or	a,l
-	jp	NZ,%3
+	jp	%4,%3
 	; peephole z88dk-59
 }
 // if notVolatile
@@ -3147,12 +3147,14 @@ replace restart {
 	ld	%3 (ix),e
 	ld	%4 (ix),d
 } by {
+	ld	b,l
+	ld	c,h
 	ld	%1 (ix),l
 	ld	%2 (ix),h
 	ld	%3 (ix),e
 	ld	%4 (ix),d
 	; peephole z88dk-66
-} if notUsed('bc')
+}
 
 replace restart {
 	ld	c,l
@@ -4367,23 +4369,8 @@ replace restart {
 	ld	%1 (ix),l	
 	ld	%2 (ix),h
 	ld	a,h
-	; peephole z88dk-144a
-} if notUsed('hl')
-
-replace restart {
-	ld	a,l
-	add	a,#0xFF
-	ld	%1 (ix),a
-	ld	a,h
-	adc	a,#0xFF
-	ld	%2 (ix),a
-} by {
-	dec	hl
-	ld	%1 (ix),l	
-	ld	%2 (ix),h
-	ld	a,h
 	inc	hl
-	; peephole z88dk-144b
+	; peephole z88dk-144
 }
 
 replace restart {
@@ -4393,8 +4380,8 @@ replace restart {
 	ld	h, d
 } by {
 	pop	bc
-	ld	e, l
-	ld	d, h
+	ld	e,l
+	ld	d,h
 	; peephole z88dk-145
 }
 
@@ -4415,7 +4402,7 @@ replace restart {
 	ld	%3 (ix), l
 	ld	%4 (ix), h
 	ld	a,h
-	; peephole z88dk-146a
+	; peephole z88dk-146
 } if notUsed('de'), notUsed('hl')
 
 replace restart {
@@ -4572,22 +4559,22 @@ replace restart {
 
 replace restart {
 	ld	iy,#%1
+	ld	%2 (iy),a
+} by {
+	ld	(#%1 + %2),a
+	ld	iy,#%1
+	; peephole z88dk-156a
+}
+
+replace restart {
+	ld	iy,#%1
 	ld	%2 (iy),#%3
 } by {
 	ld	a,#%3
 	ld	(#%1 + %2),a
 	ld	iy,#%1
-	; peephole z88dk-156
+	; peephole z88dk-156b
 } if notUsed('a')
-
-replace restart {
-	ld	iy,#%1
-	ld	%2 (iy),a
-} by {
-	ld	(#%1 + %2),a
-	ld	iy,#%1
-	; peephole z88dk-156d
-}
 
 replace restart {
 	ld	hl,#%1
@@ -5473,7 +5460,7 @@ replace restart {
 	ld	%4 (%5),l
 	push	de
 	push	hl
-	; peephole z88dk-181b
+	; peephole z88dk-181
 }
 // if notVolatile
 
@@ -9285,7 +9272,7 @@ replace restart {
 
 replace restart {
 	ld	de,#0xFFFF
-	add	hl,bc
+	add	hl,de
 } by {
 	ld	de,#0xFFFF
 	dec	hl
@@ -9303,7 +9290,7 @@ replace restart {
 
 replace restart {
 	ld	de,#0x0001
-	add	hl,bc
+	add	hl,de
 } by {
 	ld	de,#0x0001
 	inc	hl
@@ -10659,22 +10646,22 @@ replace restart {
 
 replace restart {
 	ld	%3,#%1
+	ld	a,%2 (%3)
+} by {
+	ld	a,(#%1 + %2)
+	ld	%3,#%1
+	; peephole z88dk-357a
+} 
+
+replace restart {
+	ld	%3,#%1
 	ld	%4,%2 (%3)
 } by {
 	ld	a,(#%1 + %2)
 	ld	%4,a
 	ld	%3,#%1
-	; peephole z88dk-357a
-} if notSame(%4 'a'), notUsed('a')
-
-replace restart {
-	ld	%3,#%1
-	ld	a,%2 (%3)
-} by {
-	ld	a,(#%1 + %2)
-	ld	%3,#%1
 	; peephole z88dk-357b
-} 
+} if notSame(%4 'a'), notUsed('a')
 
 replace restart {
 	ld	%1,%3 (%4)
@@ -11152,9 +11139,6 @@ replace restart {
 	; peephole z88dk-503c
 } if notUsed('a')
 
-
-
-
 replace restart {
 	sra	h
 	rr	l
@@ -11229,8 +11213,12 @@ replace restart {
 	rr	%2
 	sra	%1
 	rr	%2
+	sra	%1
+	rr	%2
 } by {
 	ld	a,%2
+	sra	%1
+	rra
 	sra	%1
 	rra
 	sra	%1
@@ -11255,8 +11243,12 @@ replace restart {
 	rr	%2
 	srl	%1
 	rr	%2
+	srl	%1
+	rr	%2
 } by {
 	ld	a,%2
+	srl	%1
+	rra
 	srl	%1
 	rra
 	srl	%1
@@ -11289,8 +11281,12 @@ replace restart {
 	rl	%2
 	sla	%1
 	rl	%2
+	sla	%1
+	rl	%2
 } by {
 	ld	a,%2
+	sla	%1
+	rla
 	sla	%1
 	rla
 	sla	%1
@@ -11995,7 +11991,7 @@ replace restart {
 
 barrier
 
-replace restart {
+replace {
 	z88dk_poison
 } by {
 	; poison removal
@@ -12068,7 +12064,7 @@ replace restart {
 // Ensure that all rules above see only jp, not jr.
 barrier
 
-replace restart {
+replace {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12088,7 +12084,7 @@ replace restart {
 %2:
 } if labelJTInRange
 
-replace restart {
+replace {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12106,7 +12102,7 @@ replace restart {
 %2:
 } if labelJTInRange
 
-replace restart {
+replace {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12128,7 +12124,7 @@ replace restart {
 %2:
 } if labelJTInRange
 
-replace restart {
+replace {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12148,7 +12144,7 @@ replace restart {
 %2:
 } if labelJTInRange
 
-replace restart {
+replace {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12172,7 +12168,7 @@ replace restart {
 %2:
 } if labelJTInRange
 
-replace restart {
+replace {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12194,7 +12190,7 @@ replace restart {
 %2:
 } if labelJTInRange
 
-replace restart {
+replace {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12220,7 +12216,7 @@ replace restart {
 %2:
 } if labelJTInRange
 
-replace restart {
+replace {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12244,7 +12240,7 @@ replace restart {
 %2:
 } if labelJTInRange
 
-replace restart {
+replace {
 	add	hl,de
 	pop	de
 	jp	(hl)
@@ -12272,7 +12268,7 @@ replace restart {
 %2:
 } if labelJTInRange
 
-replace restart {
+replace {
 	add	hl,de
 	jp	(hl)
 %1:
@@ -12319,42 +12315,42 @@ replace restart {
 // Replace jp by ret before replacing jp by jr outside of jump tables, since using ret can reduce the number of references to jump labels.
 barrier
 
-replace restart {
+replace {
 	jp	%5
 } by {
 	jr	%5
 	; peephole 153 changed absolute to relative unconditional jump.
 } if labelInRange(%5)
 
-replace restart {
+replace {
 	jp	Z,%5
 } by {
 	jr	Z,%5
 	; peephole 154 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
-replace restart {
+replace {
 	jp	NZ,%5
 } by {
 	jr	NZ,%5
 	; peephole 155 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
-replace restart {
+replace {
 	jp	C,%5
 } by {
 	jr	C,%5
 	; peephole 156 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
-replace restart {
+replace {
 	jp	NC,%5
 } by {
 	jr	NC,%5
 	; peephole 157 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
-replace restart {
+replace {
 	dec b
 	jr	NZ,	%5	
 } by {
