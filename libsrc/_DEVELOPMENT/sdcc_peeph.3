@@ -3006,8 +3006,9 @@ replace restart {
 	ld	bc,#0x0004
 	ldir
 	dec	hl
+	ld	a,(hl)
 	; peephole z88dk-52  Warning may lead to incorrect code
-} if notUsed('bc'), notUsed('de'), notUsed('a')
+} if notUsed('bc'), notUsed('de')
 
 replace restart {
 	ld	b,l
@@ -3268,16 +3269,34 @@ replace restart {
 }
 
 replace restart {
-	ld	%1 (ix),%3
-	ld	l,%2 (ix)
-	ld	h,%1 (ix)
+	ld	%1,%2 (%3)
+	ld	%2 (%3),%1
 } by {
-	ld	%1 (ix),%3
-	ld	l,%2 (ix)
-	ld	h,%3
-	; peephole z88dk-75
-} 
+	ld	%1,%2 (%3)
+	; peephole z88dk-75a
+}
 // if notVolatile
+
+replace restart {
+	ld	%1 (%6),%3
+	ld	%4,%2 (%6)
+	ld	%5,%1 (%6)
+} by {
+	ld	%4,%2 (%6)
+	ld	%1 (%6),%3
+	ld	%5,%3
+	; peephole z88dk-75b
+} if notSame(%1 %2), notSame(%3 %4)
+// notVolatile
+
+replace restart {
+	ld	a,%2 (%4)
+	ld	%1,%3 (%4)
+} by {
+	ld	%1,%3 (%4)
+	ld	a,%2 (%4)
+	; peephole z88dk-75c
+} if notSame(%1 'a')
 
 replace restart {
 	ld	iy,#%1
@@ -9220,81 +9239,36 @@ replace restart {
 }
 // if notVolatile
 
-replace restart {
-	ld	hl,#0xFFFF
-	add	hl,de
-} by {
-	ld	l,e
-	ld	h,d
-	dec	hl
-	; peephole z88dk-311a
-}
-// **** carry flag
+//replace restart {
+//	ld	bc,#0xFFFF
+//	add	hl,bc
+//	ex	de,hl
+//	ld	bc,#0xFFFF
+//	adc	hl,bc
+//} by {
+//	ex	de,hl
+//	ld	a,d
+//	or	a,e
+//	dec	de
+//	jr	NZ,#0x01
+//	dec	hl
+//	ld	bc,#0xFFFF
+//	; peephole z88dk-311a  INCORRECT IF FLAGS USED
+//}
+// jr is unsafe
 
 replace restart {
-	ld	hl,#0xFFFF
+	ld	bc,#0xFFFF
 	add	hl,bc
+	ex	de,hl
+	ld	bc,#0xFFFF
+	adc	hl,bc
 } by {
-	ld	l,c
-	ld	h,b
-	dec	hl
+	ld	bc,#0xFFFF
+	add	hl,bc
+	ex	de,hl
+	adc	hl,bc
 	; peephole z88dk-311b
-}
-
-replace restart {
-	ld	hl,#0x0001
-	add	hl,de
-} by {
-	ld	l,e
-	ld	h,d
-	inc	hl
-	; peephole z88dk-311c
-}
-
-replace restart {
-	ld	hl,#0x0001
-	add	hl,bc
-} by {
-	ld	l,c
-	ld	h,b
-	inc	hl
-	; peephole z88dk-311d
-}
-
-replace restart {
-	ld	bc,#0xFFFF
-	add	hl,bc
-} by {
-	ld	bc,#0xFFFF
-	dec	hl
-	; peephole z88dk-311e
-}
-
-replace restart {
-	ld	de,#0xFFFF
-	add	hl,de
-} by {
-	ld	de,#0xFFFF
-	dec	hl
-	; peephole z88dk-311f
-}
-
-replace restart {
-	ld	bc,#0x0001
-	add	hl,bc
-} by {
-	ld	bc,#0x0001
-	inc	hl
-	; peephole z88dk-311g
-}
-
-replace restart {
-	ld	de,#0x0001
-	add	hl,de
-} by {
-	ld	de,#0x0001
-	inc	hl
-	; peephole z88dk-311h
 }
 
 replace restart {
@@ -10555,7 +10529,7 @@ replace restart {
 	ld	d,a
 } by {
 	ld	hl,#0x%2%1
-	add	hl,de
+	adc	hl,de
 	ld	a,h
 	ex	de,hl
 	; peephole z88dk-353b
@@ -10571,7 +10545,7 @@ replace restart {
 } by {
 	ex	de,hl
 	ld	bc,#0x%2%1
-	add	hl,bc
+	adc	hl,bc
 	ld	a,h
 	ex	de,hl
 	; peephole z88dk-353c
@@ -10799,6 +10773,49 @@ replace restart {
 	inc	hl
 	; peephole z88dk-363c
 }
+
+replace restart {
+	ld	%1,%2 (%3)
+	bit	%4, %2 (%3)
+} by {
+	ld	%1,%2 (%3)
+	bit	%4,%1
+	; peephole z88dk-364a
+}
+// if notVolatile
+
+replace restart {
+	ld	%1,%2 (%3)
+	set	%4, %2 (%3)
+} by {
+	ld	%1,%2 (%3)
+	set	%4,%1
+	; peephole z88dk-364b
+}
+// if notVolatile
+
+replace restart {
+	ld	%1,%2 (%3)
+	res	%4, %2 (%3)
+} by {
+	ld	%1,%2 (%3)
+	res	%4,%1
+	; peephole z88dk-364c
+}
+// if notVolatile
+
+replace restart {
+	ld	%3 (%4), %1
+	ld	%2, %1
+	ld	%3 (%4), %2
+} by {
+	ld	%3 (%4), %1
+	ld	%2, %1
+	; peephole z88dk-365
+}
+// if notVolatile
+
+
 
 
 
@@ -11781,6 +11798,85 @@ replace restart {
 	or	a,%1
 	; peephole z88dk-613b
 } if notVolatile(%1)
+
+replace restart {
+	ld	hl,#0xFFFF
+	add	hl,de
+} by {
+	ld	l,e
+	ld	h,d
+	dec	hl
+	; peephole z88dk-614a  INCORRECT IF FLAGS USED
+}
+
+replace restart {
+	ld	hl,#0xFFFF
+	add	hl,bc
+} by {
+	ld	l,c
+	ld	h,b
+	dec	hl
+	; peephole z88dk-614b  INCORRECT IF FLAGS USED
+}
+
+replace restart {
+	ld	hl,#0x0001
+	add	hl,de
+} by {
+	ld	l,e
+	ld	h,d
+	inc	hl
+	; peephole z88dk-614c  INCORRECT IF FLAGS USED
+}
+
+replace restart {
+	ld	hl,#0x0001
+	add	hl,bc
+} by {
+	ld	l,c
+	ld	h,b
+	inc	hl
+	; peephole z88dk-614d  INCORRECT IF FLAGS USED
+}
+
+//replace restart {
+//	ld	bc,#0xFFFF
+//	add	hl,bc
+//} by {
+//	ld	bc,#0xFFFF
+//	dec	hl
+//	; peephole z88dk-614e  INCORRECT IF FLAGS USED
+//}
+// trashes 32-bit math
+
+//replace restart {
+//	ld	de,#0xFFFF
+//	add	hl,de
+//} by {
+//	ld	de,#0xFFFF
+//	dec	hl
+//	; peephole z88dk-614f  INCORRECT IF FLAGS USED
+//}
+
+//replace restart {
+//	ld	bc,#0x0001
+//	add	hl,bc
+//} by {
+//	ld	bc,#0x0001
+//	inc	hl
+//	; peephole z88dk-614g  INCORRECT IF FLAGS USED
+//}
+
+//replace restart {
+//	ld	de,#0x0001
+//	add	hl,de
+//} by {
+//	ld	de,#0x0001
+//	inc	hl
+//	; peephole z88dk-614h  INCORRECT IF FLAGS USED
+//}
+
+
 
 
 
