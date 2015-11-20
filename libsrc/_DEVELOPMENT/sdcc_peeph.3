@@ -10815,6 +10815,143 @@ replace restart {
 }
 // if notVolatile
 
+replace restart {
+	ld	%1,#%2
+} by {
+	; peephole z88dk-366
+} if notUsed(%1), notVolatile(%1)
+
+replace restart {
+	ld	a,(#%1)
+	ld	l,a
+} by {
+	ld	hl,(#%1)
+	; peephole z88dk-367
+} if notUsed('h'), notUsed('a')
+
+replace restart {
+	ld	%1,#%2
+	sla	%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	sla	%4 (%1)
+	; peephole z88dk-368a
+}
+
+replace restart {
+	ld	%1,#%2
+	sra	%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	sra	%4 (%1)
+	; peephole z88dk-368b
+}
+
+replace restart {
+	ld	%1,#%2
+	rl	%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	rl	%4 (%1)
+	; peephole z88dk-368c
+}
+
+replace restart {
+	ld	%1,#%2
+	rr	%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	rr	%4 (%1)
+	; peephole z88dk-368d
+}
+
+replace restart {
+	ld	%1,#%2
+	srl	%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	srl	%4 (%1)
+	; peephole z88dk-368e
+}
+
+replace restart {
+	ld	%1,#%2
+	rrc	%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	rrc	%4 (%1)
+	; peephole z88dk-368f
+}
+
+replace restart {
+	ld	%1,#%2
+	rlc	%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	rlc	%4 (%1)
+	; peephole z88dk-368g
+}
+
+replace restart {
+	ld	%1,#%2
+	inc	%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	inc	%4 (%1)
+	; peephole z88dk-368h
+}
+
+replace restart {
+	ld	%1,#%2
+	dec	%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	dec	%4 (%1)
+	; peephole z88dk-368i
+}
+
+replace restart {
+	ld	%1,#%2
+	ld	%3,%4 (%1)
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	ld	%3,%4 (%1)
+	; peephole z88dk-368y
+}
+
+replace restart {
+	ld	%1,#%2
+	ld	%4 (%1),%3
+	ld	%1,#%2
+} by {
+	ld	%1,#%2
+	ld	%4 (%1),%3
+	; peephole z88dk-368z
+}
+
+replace restart {
+	ld	hl,#%1
+	bit	%2, (hl)
+} by {
+	ld	a,(#%1)
+	bit	%2,a
+	; peephole z88dk-369
+} if notUsed('a'), notUsed('hl')
+
+
+
+
+
 
 
 
@@ -11875,6 +12012,20 @@ replace restart {
 //	inc	hl
 //	; peephole z88dk-614h  INCORRECT IF FLAGS USED
 //}
+
+replace restart {
+	ld	a,%1
+	add	a,#0xFF
+	ld	%1,a
+} by {
+	dec	%1
+	ld	a,%1
+	; peephole z88dk-615  INCORRECT IF FLAGS USED
+} if canAssign(%1 '#0xFF')
+
+
+
+
 
 
 
