@@ -11,8 +11,10 @@
 
 use strict;
 use warnings;
+use CPU::Z80::Assembler (); #$CPU::Z80::Assembler::verbose = 1;
 use Test::Differences; 
 use Test::More;
+use Data::Dump 'dump';
 require 't/test_utils.pl';
 
 # copied from z80asm.c:
@@ -28,44 +30,45 @@ my $reloc_routine =
 # -R, --relocatable
 #------------------------------------------------------------------------------
 
-t_reloc("start: jp start", 
-		pack("C*", 0xC3, 0, 0),
-		1);
-t_reloc("start: defw start,start,start", 
-		pack("v*", 0, 0, 0),
-		0, 2, 4);
-t_reloc("start: defs 255, 0\ndefw start,start,start", 
-		pack("C*", (0) x 255, 0,0, 0,0, 0,0),
-		255, 257, 259);
-t_reloc("start: defs 256, 0\ndefw start,start,start", 
-		pack("C*", (0) x 256, 0,0, 0,0, 0,0),
-		256, 258, 260);
+t_reloc("start: jp start");
+t_reloc("start: defw start,start,start");
+for (253..257) {
+	t_reloc("start: defb 0".(",0" x $_)."\ndefw start,start,start");
+}
 
+#------------------------------------------------------------------------------
 # test reloc with sections
-my $asm = <<'...';
-	section code
-	org 0x1080
-	start:
-		ld hl, string	; 21 80 20
-	loop:
-		ld a,(hl)		; 7E
-		inc hl			; 23
-		and a			; A7
-		jp nz, loop		; C2 83 10
-		jp start		; C3 80 10
-		
-	section data
-	org 0x2080
-	string: defb "hello", 0
-			defw start, loop, string	; 80 10 83 10 80 20
+#------------------------------------------------------------------------------
+sub code_asm {
+	my($n) = @_;
+	return <<"...";
+	start$n:
+		ld bc,string
+		ld de,string1
+		ld hl,string2
+		call start
+		call start1
+		call start2
 ...
-my @code_reloc = (1, 7, 10);
-my @data_reloc = (6, 8, 10);
-my @reloc; 
-push @reloc, @code_reloc;
-push @reloc, map {$_ + 12} @data_reloc;
+}
+sub data_asm {
+	my($n) = @_;
+	return <<"...";
+	string$n:
+		defm "hello${n}world"
+...
+}
 
-# without --relocatable
+# without --relocatable, one module
+my $code_addr = 0x1020;
+my $data_addr = 0x3040;
+my $asm = "section code\norg $code_addr\n".code_asm("").
+		  "section data\norg $data_addr\n".data_asm("").
+		  "section code\n".code_asm("1").
+		  "section data\n".data_asm("1").
+		  "section code\n".code_asm("2").
+		  "section data\n".data_asm("2");
+
 unlink_testfiles();
 write_file("test.asm", $asm);
 t_z80asm_capture("-b test.asm", "", "", 0);
@@ -74,108 +77,110 @@ t_binary(read_binfile("test.bin"), "");
 t_binary(read_binfile("test.reloc"), "");
 
 t_binary(read_binfile("test_code.bin"), 
-	pack("C*", 
-		0x21, 0x80, 0x20,
-		0x7E,
-		0x23,
-		0xA7,
-		0xC2, 0x83, 0x10,
-		0xC3, 0x80, 0x10));
-t_binary(read_binfile("test_code.reloc"), pack("v*", @code_reloc));
-
+		CPU::Z80::Assembler::z80asm("org $code_addr\n".
+									"string  equ $data_addr\n".
+									"string1 equ ".($data_addr + 10)."\n".
+									"string2 equ ".($data_addr + 10 + 11)."\n".
+									code_asm("").code_asm("1").code_asm("2")));
+t_binary(read_binfile("test_code.reloc"), 
+		pack("v*", reloc_addrs(code_asm("").code_asm("1").code_asm("2").
+							   "string:\nstring1:\nstring2:\n")));
+							   
 t_binary(read_binfile("test_data.bin"), 
-	"hello\0".
-	pack("C*", 
-		0x80, 0x10,
-		0x83, 0x10,
-		0x80, 0x20));
-t_binary(read_binfile("test_data.reloc"), pack("v*", @data_reloc));
+		CPU::Z80::Assembler::z80asm(data_asm("").data_asm("1").data_asm("2")));
+t_binary(read_binfile("test_data.reloc"), "");
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
 ASMHEAD                         = 0000, G: 
-ASMHEAD_code                    = 1080, G: 
-ASMHEAD_data                    = 2080, G: 
-ASMSIZE                         = 208C, G: 
-ASMSIZE_code                    = 000C, G: 
-ASMSIZE_data                    = 000C, G: 
-ASMTAIL                         = 208C, G: 
-ASMTAIL_code                    = 108C, G: 
-ASMTAIL_data                    = 208C, G: 
-loop                            = 1083, L: test
-start                           = 1080, L: test
-string                          = 2080, L: test
+ASMHEAD_code                    = 1020, G: 
+ASMHEAD_data                    = 3040, G: 
+ASMSIZE                         = 3060, G: 
+ASMSIZE_code                    = 0036, G: 
+ASMSIZE_data                    = 0020, G: 
+ASMTAIL                         = 3060, G: 
+ASMTAIL_code                    = 1056, G: 
+ASMTAIL_data                    = 3060, G: 
+start1                          = 1032, L: test
+start2                          = 1044, L: test
+start                           = 1020, L: test
+string1                         = 304A, L: test
+string2                         = 3055, L: test
+string                          = 3040, L: test
 
 
 ASMHEAD                         = 0000, G: 
-ASMSIZE_code                    = 000C, G: 
-ASMSIZE_data                    = 000C, G: 
-ASMHEAD_code                    = 1080, G: 
-start                           = 1080, L: test
-loop                            = 1083, L: test
-ASMTAIL_code                    = 108C, G: 
-ASMHEAD_data                    = 2080, G: 
-string                          = 2080, L: test
-ASMSIZE                         = 208C, G: 
-ASMTAIL                         = 208C, G: 
-ASMTAIL_data                    = 208C, G: 
+ASMSIZE_data                    = 0020, G: 
+ASMSIZE_code                    = 0036, G: 
+ASMHEAD_code                    = 1020, G: 
+start                           = 1020, L: test
+start1                          = 1032, L: test
+start2                          = 1044, L: test
+ASMTAIL_code                    = 1056, G: 
+ASMHEAD_data                    = 3040, G: 
+string                          = 3040, L: test
+string1                         = 304A, L: test
+string2                         = 3055, L: test
+ASMSIZE                         = 3060, G: 
+ASMTAIL                         = 3060, G: 
+ASMTAIL_data                    = 3060, G: 
 ...
 
-# with --relocatable
-my $reloc_header = reloc_header(@reloc);
-
+# with --relocatable, one module
 unlink_testfiles();
 write_file("test.asm", $asm);
+
+$asm = code_asm("").code_asm("1").code_asm("2").
+	   data_asm("").data_asm("1").data_asm("2");
+my @reloc = reloc_addrs($asm);
+my $reloc_header = reloc_header(@reloc);
+
 t_z80asm_capture("-b --relocatable test.asm", 
-	"Relocation header is ".length($reloc_header)." bytes.\n", 
-	"Warning at module 'test': --relocatable ignores ORG at file 'test.obj', section 'code'\n".
-	"Warning at module 'test': --relocatable ignores ORG at file 'test.obj', section 'data'\n",
-	0);
+				 "Relocation header is ".length($reloc_header)." bytes.\n", <<'ERR', 0);
+Warning at module 'test': --relocatable ignores ORG at file 'test.obj', section 'code'
+Warning at module 'test': --relocatable ignores ORG at file 'test.obj', section 'data'
+ERR
+
+t_binary(read_binfile("test.bin"), $reloc_header.CPU::Z80::Assembler::z80asm("org 0\n".$asm));
 ok ! -f "test.reloc";
+
+ok ! -f "test_code.bin";
 ok ! -f "test_code.reloc";
+ok ! -f "test_data.bin";
 ok ! -f "test_data.reloc";
 
-t_binary(read_binfile("test.bin"), 
-	$reloc_header.
-	pack("C*", 
-		0x21, 0x0C, 0x00,
-		0x7E,
-		0x23,
-		0xA7,
-		0xC2, 0x03, 0x00,
-		0xC3, 0x00, 0x00).
-	"hello\0".
-	pack("C*", 
-		0x00, 0x00,
-		0x03, 0x00,
-		0x0C, 0x00));
-
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = 0053, G: 
-ASMHEAD_code                    = 0053, G: 
-ASMHEAD_data                    = 005F, G: 
-ASMSIZE                         = 006B, G: 
-ASMSIZE_code                    = 005F, G: 
-ASMSIZE_data                    = 005F, G: 
-ASMTAIL                         = 006B, G: 
-ASMTAIL_code                    = 005F, G: 
-ASMTAIL_data                    = 006B, G: 
-loop                            = 0056, L: test
-start                           = 0053, L: test
-string                          = 005F, L: test
+ASMHEAD                         = 005F, G: 
+ASMHEAD_code                    = 005F, G: 
+ASMHEAD_data                    = 0095, G: 
+ASMSIZE                         = 00B5, G: 
+ASMSIZE_code                    = 0095, G: 
+ASMSIZE_data                    = 007F, G: 
+ASMTAIL                         = 00B5, G: 
+ASMTAIL_code                    = 0095, G: 
+ASMTAIL_data                    = 00B5, G: 
+start1                          = 0071, L: test
+start2                          = 0083, L: test
+start                           = 005F, L: test
+string1                         = 009F, L: test
+string2                         = 00AA, L: test
+string                          = 0095, L: test
 
 
-ASMHEAD                         = 0053, G: 
-ASMHEAD_code                    = 0053, G: 
-start                           = 0053, L: test
-loop                            = 0056, L: test
-ASMHEAD_data                    = 005F, G: 
-ASMSIZE_code                    = 005F, G: 
-ASMSIZE_data                    = 005F, G: 
-ASMTAIL_code                    = 005F, G: 
-string                          = 005F, L: test
-ASMSIZE                         = 006B, G: 
-ASMTAIL                         = 006B, G: 
-ASMTAIL_data                    = 006B, G: 
+ASMHEAD                         = 005F, G: 
+ASMHEAD_code                    = 005F, G: 
+start                           = 005F, L: test
+start1                          = 0071, L: test
+ASMSIZE_data                    = 007F, G: 
+start2                          = 0083, L: test
+ASMHEAD_data                    = 0095, G: 
+ASMSIZE_code                    = 0095, G: 
+ASMTAIL_code                    = 0095, G: 
+string                          = 0095, L: test
+string1                         = 009F, L: test
+string2                         = 00AA, L: test
+ASMSIZE                         = 00B5, G: 
+ASMTAIL                         = 00B5, G: 
+ASMTAIL_data                    = 00B5, G: 
 ...
 
 unlink_testfiles();
@@ -211,13 +216,39 @@ sub reloc_header {
 }
 
 #------------------------------------------------------------------------------
+# compute reloc addresses for the given code
+#------------------------------------------------------------------------------
+sub reloc_addrs {
+	my($asm) = @_;
+	
+	# identify reloc addresses
+	my $bin0 = CPU::Z80::Assembler::z80asm("org 0\n".$asm);
+	my $bin1 = CPU::Z80::Assembler::z80asm("org 1\n".$asm);
+	
+	my @addrs;
+	for (my $addr = 0; $addr < length($bin0)-1; $addr++) {
+		if (substr($bin0, $addr, 1) ne substr($bin1, $addr, 1)) {
+			push @addrs, $addr;
+			$addr++;
+		}
+	}
+	
+	return @addrs;
+}
+
+#------------------------------------------------------------------------------
 # test with and without -R
 #------------------------------------------------------------------------------
 sub t_reloc {
-	my($asm, $bin, @reloc) = @_;
-	
+	my($asm) = @_;
+
 	ok 1, "line ".(caller)[2];
 	
+	my @reloc = reloc_addrs($asm);
+	
+	my $bin0 = CPU::Z80::Assembler::z80asm("org 0\n".$asm);
+	my $bin1 = CPU::Z80::Assembler::z80asm("org 1\n".$asm);
+
 	my $reloc_header = reloc_header(@reloc);
 	
 	# -R
@@ -228,15 +259,16 @@ sub t_reloc {
 		t_z80asm_capture("-b $options test.asm", 
 						 "Relocation header is ".length($reloc_header)." bytes.\n", "", 0);
 						 
-		t_binary(read_binfile("test.bin"), $reloc_header.$bin);
+		t_binary(read_binfile("test.bin"), $reloc_header.$bin0);
 		ok ! -f "test.reloc";
 	}
 
 	# not -R
 	unlink_testfiles();
-	write_file("test.asm", $asm);
+	write_file("test.asm", "org 1\n".$asm);
 	
 	t_z80asm_capture("-b test.asm", "", "", 0);
-	t_binary(read_file("test.bin", binmode => ':raw'), $bin);
+	t_binary(read_binfile("test.bin"), $bin1);
 	t_binary(read_binfile("test.reloc"), pack("v*", @reloc));
-}
+}	
+
