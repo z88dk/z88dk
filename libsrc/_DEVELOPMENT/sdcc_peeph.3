@@ -8237,14 +8237,14 @@ replace restart {
 	; peephole z88dk-271
 } if notUsed('hl')
 
-replace restart {
-	ld	hl,#%1
-	ld	(hl),#%2
-} by {
-	ld	a,#%2
-	ld	(#%1),a
-	; peephole z88dk-273
-} if notUsed('a'), notUsed('hl')
+//replace restart {
+//	ld	hl,#%1
+//	ld	(hl),#%2
+//} by {
+//	ld	a,#%2
+//	ld	(#%1),a
+//	; peephole z88dk-273
+//} if notUsed('a'), notUsed('hl')
 
 replace restart {
 	ld	hl,#%3
@@ -10938,17 +10938,6 @@ replace restart {
 	ld	%4 (%1),%3
 	; peephole z88dk-368z
 }
-
-replace restart {
-	ld	hl,#%1
-	bit	%2, (hl)
-} by {
-	ld	a,(#%1)
-	bit	%2,a
-	; peephole z88dk-369
-} if notUsed('a'), notUsed('hl')
-
-
 
 
 
