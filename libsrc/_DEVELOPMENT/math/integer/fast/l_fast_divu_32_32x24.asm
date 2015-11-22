@@ -361,8 +361,11 @@ loop_7:
 
 loop_8:
 
-   djnz loop_0
-   
+;;   djnz loop_0
+
+   dec b
+   jp nz, loop_0
+ 
    ;   hl'=~quotient with one more shift
    ;  ahl = remainder
 
