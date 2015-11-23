@@ -156,7 +156,7 @@ extern int fwrite_module_code( FILE *file );
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
-extern void fwrite_codearea( char *filename, FILE **pfile );
+extern void fwrite_codearea( char *filename, FILE **pbinfile, FILE **prelocfile );
 
 /*-----------------------------------------------------------------------------
 *   Assembly directives

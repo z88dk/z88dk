@@ -38,7 +38,6 @@ int SearchLibfile( struct libfile *curlib, char *modname );
 char *ReadName( FILE *file );
 void SearchLibraries( char *modname );
 void CreateBinFile(void);
-void CreateRelocFile(void);
 void ReadNames(char *filename, FILE *file);
 void ReleaseLinkInfo( void );
 static char *CheckIfModuleWanted( FILE *file, long currentlibmodule, char *modname );
@@ -977,8 +976,9 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
 void
 CreateBinFile( void )
 {
-    FILE *binaryfile;
-    char *filename;
+	FILE *binaryfile;
+	FILE *relocfile;
+	char *filename;
 	Bool is_relocatable = ( opts.relocatable && totaladdr != 0 );
 
     if ( opts.bin_file )        /* use predined output filename from command line */
@@ -987,7 +987,8 @@ CreateBinFile( void )
         filename = get_bin_filename( get_first_module(NULL)->filename );		/* add '.bin' extension */
 
     /* binary output to filename.bin */
-    binaryfile = myfopen( filename, "wb" );         
+    binaryfile = myfopen( filename, "wb" );
+	relocfile = opts.relocatable ? NULL : myfopen(get_reloc_filename(filename), "wb");
 	if (binaryfile)
 	{
 		if (is_relocatable)
@@ -1006,53 +1007,14 @@ CreateBinFile( void )
 			printf("Relocation header is %d bytes.\n", (int)(sizeof_relocroutine + sizeof_reloctable + 4));
 		}
 
-		fwrite_codearea(filename, &binaryfile);		/* write code as one big chunk */
+		fwrite_codearea(filename, &binaryfile, &relocfile);		/* write code as one big chunk */
 		myfclose(binaryfile);
+		if (relocfile != NULL)
+			myfclose(relocfile);
 	}
 
     if ( opts.verbose )
         puts( "Code generation completed." );
-}
-
-
-
-void
-CreateRelocFile(void)
-{
-	STR_DEFINE(filename, FILENAME_MAX);
-	Section *section;
-	SectionHashElem *iter;
-	FILE *fp;
-	char *basename;
-	int reloc_size;
-	int i;
-
-	if (!opts.relocatable){
-		if (opts.bin_file)        /* use predined output filename from command line */
-			basename = opts.bin_file;
-		else						/* create output filename, based on project filename */
-			basename = get_first_module(NULL)->filename;
-
-		/* reloc output to filename.reloc */
-		for (section = get_first_section(&iter); section != NULL;
-			section = get_next_section(&iter))
-		{
-			str_set(filename, path_remove_ext(basename));	/* "test" */
-			if (section->name && *section->name) {			/* if section name not empty */
-				str_append_char(filename, '_');
-				str_append(filename, section->name);
-			}
-
-			fp = myfopen(get_reloc_filename(str_data(filename)), "wb");
-			if (fp) {
-				reloc_size = intArray_size(section->reloc);
-				for (i = 0; i < reloc_size; i++)
-					xfput_uint16(fp, *(intArray_item(section->reloc, i)));
-
-				myfclose(fp);
-			}
-		}
-	}
 }
 
 

@@ -4,6 +4,10 @@ Z88DK Z80 Macro Assembler Change Log
 2015
 ----
 
+- v **2.8.3**, 2015-11-23, pauloscustodio
+	When several sections are packed into one binary file, pack the 
+	corresponding reloc files.
+
 - v **2.8.2**, 2015-11-17, pauloscustodio
 	Create relocation file for each section
 

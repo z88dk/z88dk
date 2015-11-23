@@ -137,6 +137,7 @@ static void test_sections( void )
 	Section *section_blank, *section_code, *section_data;
 	int module_id;
 	FILE *file;
+	FILE *reloc = NULL;
 	Byte *p;
 
 	T( reset_codearea() );
@@ -294,7 +295,7 @@ static void test_sections( void )
 
 	/* write whole code area */
 	assert( (file = fopen("test.bin", "wb")) != NULL ); 
-	fwrite_codearea( "test.bin", &file ); 
+	fwrite_codearea( "test.bin", &file, &reloc ); 
 	fclose( file );
 	dump_file("code area ");
 
@@ -335,7 +336,7 @@ static void test_sections( void )
 
 	/* write bin file */
 	assert( (file = fopen("test.bin", "wb")) != NULL ); 
-	fwrite_codearea( "test.bin", &file ); 
+	fwrite_codearea( "test.bin", &file, &reloc ); 
 	fclose( file );
 	dump_file("code area ");
 }

@@ -492,7 +492,7 @@ void patch_file_contents( FILE *file, int addr, long num_bytes )
 	}
 }
 
-void append_file_contents( FILE *file, long num_bytes )
+void append_file_contents(FILE *file, long num_bytes)
 {
 	init_module();
 	patch_file_contents(file, get_cur_module_size(), num_bytes);
@@ -501,7 +501,7 @@ void append_file_contents( FILE *file, long num_bytes )
 /*-----------------------------------------------------------------------------
 *   read/write current module to an open file
 *----------------------------------------------------------------------------*/
-int fwrite_module_code( FILE *file )
+int fwrite_module_code(FILE *file)
 {
 	Section *section;
 	SectionHashElem *iter;
@@ -509,30 +509,30 @@ int fwrite_module_code( FILE *file )
 	int addr, size;
 
 	init_module();
-	for ( section = get_first_section( &iter ) ; section != NULL ; 
-		  section = get_next_section( &iter ) )
+	for (section = get_first_section(&iter); section != NULL;
+		section = get_next_section(&iter))
 	{
-		addr = section_module_start( section, g_cur_module );
-		size = section_module_size(  section, g_cur_module );
+		addr = section_module_start(section, g_cur_module);
+		size = section_module_size(section, g_cur_module);
 
-		/* write all sections, even empty ones, to allow user to define sections list by 
+		/* write all sections, even empty ones, to allow user to define sections list by
 		   a sequence of SECTION statements
 		   exception: empty section, as it is the first one anyway, if no ORG is defined */
-		if ( size > 0 || section != get_first_section(NULL) || section->origin >= 0 )
+		if (size > 0 || section != get_first_section(NULL) || section->origin >= 0)
 		{
-			xfput_int32( file, size );
-			xfput_count_byte_strz( file, section->name );
-			xfput_int32( file, section->origin );
+			xfput_int32(file, size);
+			xfput_count_byte_strz(file, section->name);
+			xfput_int32(file, section->origin);
 
-			if ( size > 0 )		/* ByteArray_item(bytes,0) creates item[0]!! */
-				xfput_chars( file, (char *) ByteArray_item( section->bytes, addr ), size );
+			if (size > 0)		/* ByteArray_item(bytes,0) creates item[0]!! */
+				xfput_chars(file, (char *)ByteArray_item(section->bytes, addr), size);
 
 			code_size += size;
 		}
 	}
 
-	if ( code_size > 0 )
-		xfput_int32( file, -1 );		/* end marker */
+	if (code_size > 0)
+		xfput_int32(file, -1);		/* end marker */
 
 	return code_size;
 }
@@ -540,27 +540,29 @@ int fwrite_module_code( FILE *file )
 /*-----------------------------------------------------------------------------
 *   read/write whole code area to an open file
 *----------------------------------------------------------------------------*/
-void fwrite_codearea( char *filename, FILE **pfile )
+void fwrite_codearea(char *filename, FILE **pbinfile, FILE **prelocfile)
 {
 	STR_DEFINE(new_name, FILENAME_MAX);
 	Section *section;
 	SectionHashElem *iter;
 	int section_size;
-	int  cur_addr;
+	int cur_section_block_size;
+	int cur_addr;
 
 	init_module();
 
-	cur_addr   = -1;
-	for ( section = get_first_section( &iter ) ; section != NULL ; 
-		  section = get_next_section( &iter ) )
+	cur_addr = -1;
+	cur_section_block_size = 0;
+	for (section = get_first_section(&iter); section != NULL;
+		section = get_next_section(&iter))
 	{
-		section_size = get_section_size( section );
+		section_size = get_section_size(section);
 
-		if ( cur_addr < 0 )
+		if (cur_addr < 0)
 			cur_addr = section->addr;
 
 		/* bytes from this section */
-		if ( section_size > 0 )
+		if (section_size > 0)
 		{
 			if (section->name && *section->name)					/* only if section name not empty */
 			{
@@ -574,16 +576,31 @@ void fwrite_codearea( char *filename, FILE **pfile )
 					str_append_char(new_name, '_');
 					str_append(new_name, section->name);
 
-					myfclose(*pfile);
-					*pfile = myfopen(get_bin_filename(str_data(new_name)), "wb");         
-					if (!*pfile)
+					myfclose(*pbinfile);
+					*pbinfile = myfopen(get_bin_filename(str_data(new_name)), "wb");
+					if (!*pbinfile)
 						break;
+
+					if (*prelocfile) {
+						myfclose(*prelocfile);
+						*prelocfile = myfopen(get_reloc_filename(str_data(new_name)), "wb");
+						cur_section_block_size = 0;
+					}
 
 					cur_addr = section->addr;
 				}
 			}
 
-			xfput_chars( *pfile, (char *) ByteArray_item( section->bytes, 0 ), section_size );
+			xfput_chars(*pbinfile, (char *)ByteArray_item(section->bytes, 0), section_size);
+
+			if (*prelocfile) {
+				unsigned i;
+				for (i = 0; i < intArray_size(section->reloc); i++) {
+					xfput_uint16(*prelocfile, *(intArray_item(section->reloc, i)) + cur_section_block_size);
+				}
+			}
+
+			cur_section_block_size += section_size;
 		}
 
 		cur_addr += section_size;

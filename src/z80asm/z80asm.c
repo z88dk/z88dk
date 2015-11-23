@@ -25,7 +25,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 /* external functions */
 void Z80pass2( void );
 void CreateBinFile( void );
-void CreateRelocFile(void);
 
 
 /* local functions */
@@ -332,7 +331,6 @@ int main( int argc, char *argv[] )
 			write_def_file();
 
 		CreateBinFile();
-		CreateRelocFile();
 	}
 
 	set_error_null();
