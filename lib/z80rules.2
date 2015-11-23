@@ -1112,10 +1112,16 @@
 	ei
 .%2
 
-	ld	hl,%1	;const
-	call	l_gint	;%9
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	pop	de
+	call	l_eq
 =
-	ld	hl,(%1)
+	call	l_gint	;
+	ld	d,h
+	ld	e,l
+	or	h
+	dec	a
 
 	ld	hl,%1	;const
 	call	l_gintspsp	;
@@ -1303,3 +1309,21 @@
 	ld	a,#(%1 % 256)
 	ld	(de),a
 	ld	h%3
+
+	ld	hl,0	;const
+	pop	de
+	call	l_ge
+=
+	pop	hl
+	rl	h
+	ccf
+
+	ld	hl,0	;const
+	pop	de
+	call	l_ne
+=
+	pop	hl
+	ld	a,h
+	or	l
+	dec a
+	ccf
