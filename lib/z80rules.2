@@ -1112,32 +1112,10 @@
 	ei
 .%2
 
-	call	l_gintspsp	;
-	ld	hl,0	;const
-	pop	de
-	call	l_eq
+	ld	hl,%1	;const
+	call	l_gint	;%9
 =
-	call	l_gint	;
-	ld	d,h
-	ld	e,l
-	or	h
-	dec	a
-
-	ld	hl,%1	;const
-	call	l_gintspsp	;
-	ld	hl,%1	;const
-	call	l_gintspsp	;
-=
-	ld	hl,%1	;const
-	call	l_g2intspsp
-
-	ld	hl,%1	;const
-	call	l_gcharspsp	;
-	ld	hl,%1	;const
-	call	l_gcharspsp	;
-=
-	ld	hl,%1	;const
-	call	l_g2charspsp
+	ld	hl,(%1)
 
 	exx
 	ld	hl,%1	;const
@@ -1229,16 +1207,6 @@
 
 	ld	hl,%1	;const
 	add	hl,sp
-	call	l_gint	;
-	push	hl
-	call	%2
-=
-	ld	hl,%1	;const
-	call	l_gintspsp	;
-	call	%2
-
-	ld	hl,%1	;const
-	add	hl,sp
 	call	l_gchar
 	push	hl
 	ld	hl,%2	;const
@@ -1246,16 +1214,6 @@
 	ld	hl,%1	;const
 	call	l_gcharspsp	;
 	ld	hl,%2	;const
-
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_gchar
-	push	hl
-	call	%2
-=
-	ld	hl,%1	;const
-	call	l_gcharspsp	;
-	call	%2
 
 	call	l_gint	;
 	ld	b,h
@@ -1309,21 +1267,3 @@
 	ld	a,#(%1 % 256)
 	ld	(de),a
 	ld	h%3
-
-	ld	hl,0	;const
-	pop	de
-	call	l_ge
-=
-	pop	hl
-	rl	h
-	ccf
-
-	ld	hl,0	;const
-	pop	de
-	call	l_ne
-=
-	pop	hl
-	ld	a,h
-	or	l
-	dec a
-	ccf
