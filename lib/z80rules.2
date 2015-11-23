@@ -1117,6 +1117,22 @@
 =
 	ld	hl,(%1)
 
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+=
+	ld	hl,%1	;const
+	call	l_g2intspsp
+
+	ld	hl,%1	;const
+	call	l_gcharspsp	;
+	ld	hl,%1	;const
+	call	l_gcharspsp	;
+=
+	ld	hl,%1	;const
+	call	l_g2charspsp
+
 	exx
 	ld	hl,%1	;const
 	add	hl,sp
@@ -1207,6 +1223,16 @@
 
 	ld	hl,%1	;const
 	add	hl,sp
+	call	l_gint	;
+	push	hl
+	call	%2
+=
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+	call	%2
+
+	ld	hl,%1	;const
+	add	hl,sp
 	call	l_gchar
 	push	hl
 	ld	hl,%2	;const
@@ -1214,6 +1240,16 @@
 	ld	hl,%1	;const
 	call	l_gcharspsp	;
 	ld	hl,%2	;const
+
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gchar
+	push	hl
+	call	%2
+=
+	ld	hl,%1	;const
+	call	l_gcharspsp	;
+	call	%2
 
 	call	l_gint	;
 	ld	b,h

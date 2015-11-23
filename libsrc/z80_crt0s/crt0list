@@ -18,12 +18,14 @@ crt0/l_eq
 crt0/l_gchar
 crt0/l_gcharsp
 crt0/l_gcharspsp
+crt0/l_g2charspsp
 crt0/l_ge
 crt0/l_getptr
 crt0/l_gint
 crt0/l_gint7de
 crt0/l_gintsp
 crt0/l_gintspsp
+crt0/l_g2intspsp
 crt0/l_gint_eq
 crt0/l_ghtonsint
 crt0/l_glong

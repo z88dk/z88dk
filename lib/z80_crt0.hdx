@@ -12,7 +12,7 @@
 ;
 ;	(Used by asxxx)
 ;
-;	$Id: z80_crt0.hdx,v 1.5 2010-11-30 16:23:12 stefano Exp $
+;	$Id: z80_crt0.hdx,v 1.6 2015-11-23 08:35:39 stefano Exp $
 
 	.globl    base_graphics	; Address of graphics screen
 
@@ -33,10 +33,13 @@
 	.globl    l_getptr		;Get 3 byte pointer
 	.globl    l_putptr		;Put 3 byte pointer
 	.globl    l_gchar		;Get signed char
-	.globl    l_gcharsp		;Get signed char
+	.globl    l_gcharsp		;Get signed char and push on stack
+	.globl    l_g2charsp	;Get 2 signed chars and push on stack
 	.globl    l_sxt		;Sign extend char
 	.globl    l_gint		;Get int
 	.globl    l_gintsp		;Get int
+	.globl    l_gintspsp	;Get int and push on stack
+	.globl    l_g2intspsp	;Get 2 int and push on stack
 	.globl    l_gint_eq	;Get int and test == 0
 	.globl    l_ghtonsint	;Get reverse order int
 	.globl    l_pint		;Put int
