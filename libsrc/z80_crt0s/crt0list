@@ -24,6 +24,7 @@ crt0/l_getptr
 crt0/l_gint
 crt0/l_gint7de
 crt0/l_gintsp
+crt0/l_gintspchar
 crt0/l_gintspsp
 crt0/l_g2intspsp
 crt0/l_gint_eq

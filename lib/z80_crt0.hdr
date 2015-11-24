@@ -10,7 +10,7 @@
 ;       routines in different modules, we have got rid of
 ;       the conditional assembly around the float routines
 ;
-;	$Id: z80_crt0.hdr,v 1.11 2015-11-23 08:35:39 stefano Exp $
+;	$Id: z80_crt0.hdr,v 1.12 2015-11-24 06:47:17 stefano Exp $
 
 	EXTERN    base_graphics	; Address of graphics screen
 
@@ -39,6 +39,7 @@
 	EXTERN    l_sxt		;Sign extend char
 	EXTERN    l_gint		;Get int
 	EXTERN    l_gintsp		;Get int (peephole opt)
+	EXTERN    l_gintspchar	;Get int,char (peephole opt)
 	EXTERN    l_gintspsp	;Get int and push (peephole opt)
 	EXTERN    l_g2intspsp	;Get 2 int and push (peephole opt)
 	EXTERN    l_gint7de	;Get int, multiply by 7 and add from SP by de

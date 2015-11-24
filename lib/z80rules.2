@@ -1215,6 +1215,22 @@
 	call	l_gcharspsp	;
 	ld	hl,%2	;const
 
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+=
+	ld	hl,%1	;const
+	call	l_g2intspsp	;
+
+	ld	hl,%1	;const
+	call	l_gcharspsp	;
+	ld	hl,%1	;const
+	call	l_gcharspsp	;
+=
+	ld	hl,%1	;const
+	call	l_g2charspsp	;
+
 	call	l_gint	;
 	ld	b,h
 	ld	c,l
@@ -1267,3 +1283,28 @@
 	ld	a,#(%1 % 256)
 	ld	(de),a
 	ld	h%3
+
+	ld	hl,0	;const
+	pop	de
+	call	l_ge
+=
+	pop	hl
+	rl	h
+	ccf
+
+	ld	hl,0	;const
+	pop	de
+	call	l_ne
+=
+	pop	hl
+	ld	a,h
+	or	l
+	dec a
+	ccf
+
+	call	l_neg
+	pop	de
+	call	l_lt
+=
+	pop	de
+	call	l_ge

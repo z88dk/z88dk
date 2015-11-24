@@ -1,3 +1,8 @@
+	call	l_gintsp	;
+	call	l_gchar
+=
+	call	l_gintspchar	;
+
 	ld	hl,(%1)
 	inc	hl
 	ld	(%1),hl

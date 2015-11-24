@@ -12,7 +12,7 @@
 ;
 ;	(Used by asxxx)
 ;
-;	$Id: z80_crt0.hdx,v 1.6 2015-11-23 08:35:39 stefano Exp $
+;	$Id: z80_crt0.hdx,v 1.7 2015-11-24 06:47:17 stefano Exp $
 
 	.globl    base_graphics	; Address of graphics screen
 
@@ -38,6 +38,7 @@
 	.globl    l_sxt		;Sign extend char
 	.globl    l_gint		;Get int
 	.globl    l_gintsp		;Get int
+	.globl    l_gintspchar		;Get int, char
 	.globl    l_gintspsp	;Get int and push on stack
 	.globl    l_g2intspsp	;Get 2 int and push on stack
 	.globl    l_gint_eq	;Get int and test == 0
