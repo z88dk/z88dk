@@ -26,12 +26,12 @@ IF __clib_malloc_heap_size = -1
    SECTION data_alloc_malloc
    
    PUBLIC __malloc_heap
-   
+
+   EXTERN ASMHEAD_BSS_END
+
    __malloc_heap:              defw ASMHEAD_BSS_END
    
    SECTION code_crt_init
-   
-   EXTERN ASMHEAD_BSS_END
       
    ld hl,-1                    ; ensure sp == 0 is accepted
    add hl,sp                   ; hl = top of the stack
