@@ -3,8 +3,6 @@ SECTION code_math
 
 PUBLIC l_small_mul_40_32x8
 
-EXTERN l_small_mul_32_32x32, l_small_mul_16_16x8
-
 l_small_mul_40_32x8:
 
    ; multiplication of a 32-bit number and an 8-bit number into 40-bit result
@@ -17,44 +15,50 @@ l_small_mul_40_32x8:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
-   ; split into two multiplications and add
-   
-   ld c,a
-   ld b,d
-   
-   push bc                     ; save DA
+   push hl
+   ld hl,0
    
    exx
    
-   ld l,a
-   xor a
-   ld h,a
-   ld e,a
-   ld d,a
-   
-   exx
-   
-   ld d,a
-   call l_small_mul_32_32x32   ; dehl = EHL * A
+   pop de
+   ld hl,0
 
-   ex (sp),hl                  ; hl = DA
-   push de                     ; stack = hlde
+   ;  de'de = 32-bit multiplicand
+   ;      a = 8-bit multiplicand
+   ;  hl'hl = 0
+
+   ld bc,0x0800
+
+   add a,a
+   jr loop_enter
    
-   ld e,h
-   xor a
-   ld h,a
-   ld d,a
+loop:
+
+   add hl,hl
+   exx
+   adc hl,hl
+   exx
+   adc a,a
+
+loop_enter:
+
+   jr nc, loop_end
    
-   call l_small_mul_16_16x8    ; hl = D * A
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   adc a,c
+
+loop_end:
+
+   djnz loop
+
+   ; ahl'hl = product
+
+   push hl
+   exx
+   pop de
    
-   pop de                      ; de = MSW(EHL * A)
-   
-   ld a,d
-   add a,l
-   ld d,a
-   
-   ld a,h
-   adc a,0
-   
-   pop hl                      ; adehl = 40-bit result
+   ex de,hl
    ret

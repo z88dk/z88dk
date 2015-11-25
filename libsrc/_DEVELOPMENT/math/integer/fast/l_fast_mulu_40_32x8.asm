@@ -1,9 +1,11 @@
 
+INCLUDE "clib_cfg.asm"
+
 SECTION code_math
 
 PUBLIC l_fast_mulu_40_32x8, l0_fast_mulu_40_32x8
 
-EXTERN l0_fast_mulu_32_24x8, l_fast_mulu_16_8x8
+EXTERN l0_fast_mulu_32_24x8, error_lznc
 
 l_fast_mulu_40_32x8:
 
@@ -25,29 +27,243 @@ l0_fast_mulu_40_32x8:
 
    ; two full size multiplicands
 
-   ; split into two multiplications and add
+   push hl
    
-   ld c,a
-   ld b,d
+   ld l,e
+   ld h,d
    
-   push bc                     ; save DA
+   exx
    
-   call l0_fast_mulu_32_24x8        ; dehl = EHL * A
+   pop de
+
+   ld l,e
+   ld h,d
+
+   ;  de'de = 32-bit multiplicand
+   ;      a = 8-bit multiplicand
+   ;  hl'hl = 32-bit multiplicand
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF __CLIB_OPT_IMATH_FAST & $04
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ENABLE LOOP UNROLLING ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ld c,0
+
+   ; eliminate leading zeroes
+
+loop_00:
+
+   add a,a
+   jr c, loop11
+
+   add a,a
+   jr c, loop12
    
-   ex (sp),hl                  ; hl = DA
-   push de                     ; stack = hlde
+   add a,a
+   jr c, loop13
    
-   ld e,h
-   call l_fast_mulu_16_8x8          ; hl = D * A
+   add a,a
+   jr c, loop14
+
+   add a,a
+   jr c, loop15
    
-   pop de                      ; de = MSW(EHL * A)
+   add a,a
+   jr c, loop16
    
-   ld a,d
-   add a,l
-   ld d,a
+   add a,a
+   jr c, loop17
+
+   add a,a
+   ccf
+   jr nz, loop_exit
    
-   ld a,h
-   adc a,0
+   xor a
+   jp error_lznc
+
+   ; general multiplication loop
+
+loop11:
+
+   add hl,hl
+   exx
+   adc hl,hl
+   exx
+   adc a,a
+
+   jr nc, loop12
+
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   adc a,c
+
+loop12:
+
+   add hl,hl
+   exx
+   adc hl,hl
+   exx
+   adc a,a
+
+   jr nc, loop13
+
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   adc a,c
+
+loop13:
+
+   add hl,hl
+   exx
+   adc hl,hl
+   exx
+   adc a,a
+
+   jr nc, loop14
+
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   adc a,c
+
+loop14:
+
+   add hl,hl
+   exx
+   adc hl,hl
+   exx
+   adc a,a
+
+   jr nc, loop15
+
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   adc a,c
+
+loop15:
+
+   add hl,hl
+   exx
+   adc hl,hl
+   exx
+   adc a,a
+
+   jr nc, loop16
+
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   adc a,c
+
+loop16:
+
+   add hl,hl
+   exx
+   adc hl,hl
+   exx
+   adc a,a
+
+   jr nc, loop17
+
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   adc a,c
+
+loop17:
+
+   add hl,hl
+   exx
+   adc hl,hl
+   exx
+   adc a,a
+
+   jr nc, loop_exit
+
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   adc a,c
+
+loop_exit:
+
+   ; ahl'hl = product
+
+   push hl
+   exx
+   pop de
    
-   pop hl                      ; adehl = 40-bit result
+   ex de,hl
    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DISABLE LOOP UNROLLING
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ld bc,0x0700
+
+   ; eliminate leading zeroes
+
+loop_00:
+
+   add a,a
+   jr c, loop
+   djnz loop_00   
+
+   add a,a
+   ccf
+   jr nc, loop_exit
+
+   xor a
+   jp error_lznc
+
+   ; general multiply loop
+
+loop:
+
+   add hl,hl
+   exx
+   adc hl,hl
+   exx
+   adc a,a
+
+   jr nc, loop_end
+   
+   add hl,de
+   exx
+   adc hl,de
+   exx
+   adc a,c
+
+loop_end:
+
+   djnz loop
+
+loop_exit:
+
+   ; ahl'hl = product
+
+   push hl
+   exx
+   pop de
+   
+   ex de,hl
+   ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
