@@ -4,7 +4,7 @@
  *
  *        WAV conversion taken from ABCcas - by Robert Juhasz, 2008
  *
- *        $Id: abc80.c,v 1.7 2015-11-03 20:03:37 stefano Exp $
+ *        $Id: abc80.c,v 1.8 2015-11-26 02:23:06 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -33,7 +33,7 @@ option_t abc80_options[] = {
 
 
 unsigned char buffer[256];
-char name[8]="Z88DK   ";
+char name[9]="Z88DK   ";
 char ext[3]="BAC";
 static int outbit=150;
 
