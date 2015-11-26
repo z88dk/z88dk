@@ -1295,12 +1295,22 @@
 	ld	hl,0	;const
 	pop	de
 	call	l_ne
+	jp	nc,%2
 =
 	pop	hl
 	ld	a,h
 	or	l
-	dec a
-	ccf
+	jp	z,%2
+
+	ld	hl,0	;const
+	pop	de
+	call	l_ne
+	jp	c,%2
+=
+	pop	hl
+	ld	a,h
+	or	l
+	jp	nz,%2
 
 	call	l_neg
 	pop	de
