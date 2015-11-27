@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.9 2015-01-21 07:05:01 stefano Exp $
+; $Id: z88_crt0.asm,v 1.10 2015-11-27 23:18:25 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -86,8 +86,6 @@ IF DEFINED_startup
 	IF (startup=5)
 		INCLUDE "z88s_crt0.asm"
 	ENDIF
-
-ELSE 
 
 ELSE 
         IF NEED_appstartup
