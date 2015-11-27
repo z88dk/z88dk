@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.230 2015-11-05 16:08:03 stefano Exp $
+# $Id: Makefile,v 1.231 2015-11-27 23:21:17 dom Exp $
 
 
 include Make.config
@@ -247,6 +247,7 @@ z88_clib.lib:
 	$(MAKE) -C stdio lz88 
 	$(MAKE) -C stdlib lz88 
 	$(MAKE) -C strings 
+	$(MAKE) -C regex
 	$(MAKE) -C printflike
 	$(MAKE) -C time lz88
 	$(MAKE) -C rs232 lz88
@@ -265,6 +266,7 @@ z88ansi_clib.lib:
 	$(MAKE) -C stdio lz88 
 	$(MAKE) -C stdlib lz88 
 	$(MAKE) -C strings 
+	$(MAKE) -C regex
 	$(MAKE) -C printflike
 	$(MAKE) -C time lz88
 	$(MAKE) -C rs232 lz88
@@ -283,6 +285,7 @@ z88net_clib.lib:
 	$(MAKE) -C stdio lz88net
 	$(MAKE) -C stdlib lz88 
 	$(MAKE) -C strings 
+	$(MAKE) -C regex
 	$(MAKE) -C printflike
 	$(MAKE) -C time lz88
 	$(MAKE) -C rs232 lz88
@@ -306,6 +309,7 @@ zx_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -327,6 +331,7 @@ zxan_clib.lib:
 	$(RM) stdio/ansi/spectrum/f_ansi_char.o
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -349,6 +354,7 @@ ts2068_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -371,6 +377,7 @@ ts2068an_clib.lib:
 	$(RM) stdio/ansi/ts2068/f_ansi_*.o
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -436,6 +443,7 @@ p2000_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -452,6 +460,7 @@ p2000ansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -468,6 +477,7 @@ pc6001_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -483,6 +493,7 @@ pc6001ansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -498,6 +509,7 @@ pps_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx
 	$(MAKE) -C stdio generic
 	$(MAKE) -C fcntl lpps
@@ -518,6 +530,7 @@ ppsansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx
 	$(MAKE) -C stdio generic
 	$(MAKE) -C fcntl lpps
@@ -554,6 +567,7 @@ vz_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -570,6 +584,7 @@ vzansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -586,6 +601,7 @@ zx80_clib.lib:
 	@echo ''
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx80
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -604,6 +620,7 @@ zx81_clib.lib:
 	@echo ''
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic_iy 
 	$(MAKE) -C printflike generic_iy
@@ -623,6 +640,7 @@ zx81ansi_clib.lib:
 	$(MAKE) zx81deps
 	$(RM) stdio/ansi/zx81/f_ansi_char.o
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic_iy 
 	$(MAKE) -C printflike generic_iy
@@ -641,6 +659,7 @@ lambda_clib.lib:
 	@echo ''
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic_iy 
 	$(MAKE) -C printflike generic_iy
@@ -741,6 +760,7 @@ ti82ansi_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -756,6 +776,7 @@ ti82_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -771,6 +792,7 @@ ti83ansi_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -786,6 +808,7 @@ ti83_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -801,6 +824,7 @@ ti83pansi_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -816,6 +840,7 @@ ti83p_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -831,6 +856,7 @@ ti85ansi_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -846,6 +872,7 @@ ti85_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -861,6 +888,7 @@ ti86ansi_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -876,6 +904,7 @@ ti86_clib.lib:
 	@echo ''
 	$(MAKE) tideps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -894,6 +923,7 @@ ozansi_clib.lib:
 	$(RM) -f stdio/ansi/oz/f_ansi_char.o
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -911,6 +941,7 @@ cpm_clib.lib:
 	@echo ''
 	$(MAKE) -C fcntl lcpm
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio lcpm
 	$(MAKE) -C printflike
@@ -925,6 +956,7 @@ sorcerer_clib.lib:
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -939,6 +971,7 @@ mz_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -953,6 +986,7 @@ mzansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -967,6 +1001,7 @@ abc80_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -981,6 +1016,7 @@ abc80ansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -995,6 +1031,7 @@ abc800_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1009,6 +1046,7 @@ ace_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1026,6 +1064,7 @@ aceansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1043,6 +1082,7 @@ aquarius_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1060,6 +1100,7 @@ aquansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1077,6 +1118,7 @@ c7420_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1090,6 +1132,7 @@ rex_clib.lib:
 	@echo '--- Building Xircom Rex Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C setjmp
 	$(MAKE) -C rex
@@ -1102,6 +1145,7 @@ sam_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1119,6 +1163,7 @@ samansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1136,6 +1181,7 @@ svi_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1154,6 +1200,7 @@ msx_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C fcntl lcpm
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio lcpm
 	$(MAKE) -C printflike
@@ -1171,6 +1218,7 @@ mtx_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1188,6 +1236,7 @@ enterprise_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1235,6 +1284,7 @@ m5_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(MAKE) -C strings 
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1251,6 +1301,7 @@ mc1000_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lmc1000
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1269,6 +1320,7 @@ mc1000ansi_clib.lib:
 	$(RM) stdio/ansi/mc1000/f_ansi_char.o
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lmc1000
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1286,6 +1338,7 @@ nascom_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1299,6 +1352,7 @@ nasansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1312,6 +1366,7 @@ nc_clib.lib:
 	@echo '--- Building Amstrad NC100 Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C fcntl lnc
@@ -1327,6 +1382,7 @@ cpc_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1343,6 +1399,7 @@ cpcansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1372,6 +1429,7 @@ c128ansi_clib.lib:
 	@echo '--- Building Commodore 128 ANSI Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1416,6 +1474,7 @@ newbrain_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C fcntl lnewbrain
@@ -1444,6 +1503,7 @@ rcmx000_clib.lib:
 	@echo ''
 	$(MAKE) -C stdlib clean
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1457,6 +1517,7 @@ embedded_clib.lib:
 	@echo '--- Building Embedded (ns16450) Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio gen
 	$(MAKE) -C printflike
@@ -1471,6 +1532,7 @@ gal_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1487,6 +1549,7 @@ lynx_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1503,6 +1566,7 @@ sms_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1519,6 +1583,7 @@ sc3000_clib.lib:
 	@echo ''
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1534,6 +1599,7 @@ test_clib.lib:
 	@echo '--- Building Test System Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1547,6 +1613,7 @@ trs80_clib.lib:
 	@echo '--- Building TRS 80 Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1570,6 +1637,7 @@ x07_clib.lib:
 	@echo '--- Building Canon X-07 Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1583,6 +1651,7 @@ x1ansi_clib.lib:
 	@echo '--- Building Sharp X1 ANSI Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib lx1
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1600,6 +1669,7 @@ vg5k_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1616,6 +1686,7 @@ vg5kansi_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
@@ -1631,6 +1702,7 @@ sos_clib.lib:
 	@echo '--- Building S-OS (The Sentinel) Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio lcpm
 	$(MAKE) -C printflike
@@ -1645,6 +1717,7 @@ osca_clib.lib:
 	@echo '--- Building Old School Computer Architecture Library ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib losca
 	$(MAKE) -C stdio lcpm
 	$(MAKE) -C printflike
@@ -1660,6 +1733,7 @@ oscaansi_clib.lib:
 	@echo '--- Building OSCA Library ANSI VT version ---'
 	@echo ''
 	$(MAKE) -C strings
+	$(MAKE) -C regex
 	$(MAKE) -C stdlib losca
 	$(MAKE) -C stdio lcpm
 	$(MAKE) -C rs232 losca
@@ -1735,6 +1809,7 @@ clean:
 	$(MAKE) -C stdio clean
 	$(MAKE) -C stdlib clean
 	$(MAKE) -C strings clean
+	$(MAKE) -C regex clean
 	$(MAKE) -C time clean
 	$(MAKE) -C z80_crt0s clean
 	$(MAKE) -C z88 clean

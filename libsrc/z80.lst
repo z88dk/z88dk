@@ -53,3 +53,4 @@ stdio_new/general/stdio_atou
 stdio_new/general/stdio_ultoa_any
 stdio_new/general/stdio_utoa_any
 @strings/string.lst
+@regex/regex.lst
