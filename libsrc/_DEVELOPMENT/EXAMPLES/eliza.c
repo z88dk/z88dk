@@ -4,6 +4,7 @@
 // http://csdb.dk/release/?id=95792
 
 // bugfix applied:  result[] in getInput() must be static
+// bugfix applied:  fixed memory leaks caused by use of replace()
 // changed spacing as terminal resolution varies in z88dk
 
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 eliza.c -o eliza
@@ -230,6 +231,7 @@ void main(void)
 	static unsigned char replyStart;		// Index of the first valid reply for the keywrod
 	static unsigned char replyLength;		// Number of possible replies for the keyword
 	static unsigned char nextReplyIndex[KEYWORDS_LENGTH];	// List of current reply in the rotation per keyword
+	static          char *tmp;
 
 	// Initialize the array of current replies.
 	for(counter = 0; counter < KEYWORDS_LENGTH; ++counter)
@@ -305,13 +307,15 @@ void main(void)
 				if(strstr(input, conjugations[counter]) != NULL)
 				{
 					// Yes, Swap words
-					strcpy(conjugated, replace(conjugated, conjugations[counter], conjugations[counter + 1]));
+					strcpy(conjugated, tmp = replace(conjugated, conjugations[counter], conjugations[counter + 1]));
+					free(tmp);
 					break;
 				}
 				else if(strstr(input, conjugations[counter + 1]) != NULL)
 				{
 					// Yes, Swap words
-					strcpy(conjugated, replace(conjugated, conjugations[counter + 1], conjugations[counter]));
+					strcpy(conjugated, tmp = replace(conjugated, conjugations[counter + 1], conjugations[counter]));
+					free(tmp);
 					break;
 				}
 			}
@@ -321,7 +325,8 @@ void main(void)
 			// author knows....
 			while(strchr(conjugated, '!') != NULL)
 			{
-				strcpy(conjugated, replace(conjugated, "!", ""));
+				strcpy(conjugated, tmp = replace(conjugated, "!", ""));
+				free(tmp);
 			}
 
 			// Get the starting response
