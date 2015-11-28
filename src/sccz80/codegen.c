@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.34 2015-03-24 21:24:12 stefano Exp $
+ *      $Id: codegen.c,v 1.35 2015-11-28 00:05:37 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -1549,6 +1549,8 @@ void le0(LVALUE *lval, int label)
 void gt0(LVALUE *lval,int label)
 {
     ge0(lval,label) ;
+    if (lval->oldval_type==LONG) { ol("or\th"); ol("or\te"); }
+    if (lval->oldval_type==CPTR) { ol("or\th"); }
     ol("or\tl");
     opjump("z,",label);
 }
