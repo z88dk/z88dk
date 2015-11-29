@@ -1,11 +1,6 @@
 Z88DK Z80 Macro Assembler
 =========================
 
-Rewrite of z88dk z80asm in C++ to allow feature extension.
-Keep backwards compatibility with z88dk-z80asm.
-Releases are checked-in manually back to z88dk.cvs.sourceforge.net:/cvsroot/z88dk
-to keep compatibility of z88dk build tool chain.
-
 Copyright
 ---------
 Original z80asm module assembler was written by Gunther Strube. 
@@ -19,7 +14,7 @@ Copyright (C) Paulo Custodio, 2011-2015
 
 Repository
 ----------
-Repository: <https://github.com/pauloscustodio/z88dk-z80asm>
+Repository: <z88dk.cvs.sourceforge.net:/cvsroot/z88dk>
 
 License
 -------
@@ -27,6 +22,8 @@ Artistic License 2.0 <http://www.perlfoundation.org/artistic_license_2_0>
 
 TODO List
 ---------
+- Implement recursive includes in Coco/R parser/scanner
+- Separate standard Z80 assembly from extensions; add macro files for extensions.
 - Port to C++
 - Parse command line
 - Input source
