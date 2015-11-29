@@ -231,7 +231,7 @@ void main(void)
 	static unsigned char replyStart;		// Index of the first valid reply for the keywrod
 	static unsigned char replyLength;		// Number of possible replies for the keyword
 	static unsigned char nextReplyIndex[KEYWORDS_LENGTH];	// List of current reply in the rotation per keyword
-	static          char *tmp;
+	static unsigned char *tmp;
 
 	// Initialize the array of current replies.
 	for(counter = 0; counter < KEYWORDS_LENGTH; ++counter)
