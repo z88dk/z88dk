@@ -156,7 +156,8 @@
 ;   24                      text colour mask (set bits = keep bgnd)
 ;   25                      background colour (cls colour)
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC zx_01_output_char_32
 

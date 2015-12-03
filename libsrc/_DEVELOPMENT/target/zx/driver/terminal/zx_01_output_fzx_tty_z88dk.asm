@@ -143,7 +143,7 @@
 ;     set paper size
 ;
 ;   * IOCTL_OTERM_FZX_LEFT_MARGIN
-;;
+;
 ;   * IOCTL_OTERM_FZX_LINE_SPACING
 ;
 ;   * IOCTL_OTERM_FZX_SPACE_EXPAND
@@ -199,7 +199,8 @@
 ;   59                      tty_z88dk.param_1
 ;   60                      tty_z88dk.param_2
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC zx_01_output_fzx_tty_z88dk
 

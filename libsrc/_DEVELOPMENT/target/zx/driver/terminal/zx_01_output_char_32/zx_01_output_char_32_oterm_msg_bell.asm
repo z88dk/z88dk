@@ -1,7 +1,8 @@
 
 INCLUDE "clib_target_cfg.asm"
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC zx_01_output_char_32_oterm_msg_bell
 

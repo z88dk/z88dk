@@ -151,7 +151,8 @@
 ;   30                      tty_z88dk.param_1
 ;   31                      tty_z88dk.param_2
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC zx_01_output_char_32_tty_z88dk
 

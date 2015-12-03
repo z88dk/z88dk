@@ -124,7 +124,8 @@
 ;   19..24                  b_array (manages edit buffer)
 ;   25..26                  LASTK address
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_input
 
 PUBLIC zx_01_input_kbd_lastk
 

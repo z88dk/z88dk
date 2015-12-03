@@ -115,7 +115,8 @@
 ;   28..29                  getk_repeatbegin_ms
 ;   30..31                  getk_repeatperiod_ms
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_input
 
 PUBLIC zx_01_input_kbd_inkey
 

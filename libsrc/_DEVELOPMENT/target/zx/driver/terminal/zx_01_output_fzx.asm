@@ -159,7 +159,7 @@
 ;     set paper size
 ;
 ;   * IOCTL_OTERM_FZX_LEFT_MARGIN
-;;
+;
 ;   * IOCTL_OTERM_FZX_LINE_SPACING
 ;
 ;   * IOCTL_OTERM_FZX_SPACE_EXPAND
@@ -173,7 +173,7 @@
 ;   * IOCTL_OTERM_FCOLOR
 ;
 ;   * IOCTL_OTERM_FMASK
-
+;
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BYTES RESERVED IN FDSTRUCT
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -210,7 +210,8 @@
 ;   53                      text colour mask (set bits = keep bgnd)
 ;   54                      background colour (cls colour)
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC zx_01_output_fzx
 

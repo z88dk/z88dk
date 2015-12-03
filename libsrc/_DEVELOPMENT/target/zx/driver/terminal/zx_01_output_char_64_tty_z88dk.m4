@@ -42,6 +42,7 @@ define(`m4_zx_01_output_char_64_tty_z88dk',dnl
    
    `ifelse($1,0,,dnl   
    
+   SECTION data_clib
    SECTION data_stdio
    
    ; FILE *

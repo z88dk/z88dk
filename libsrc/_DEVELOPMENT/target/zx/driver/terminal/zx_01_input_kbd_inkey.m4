@@ -34,6 +34,7 @@ define(`m4_zx_01_input_kbd_inkey',dnl
 
    `ifelse($1,0,,dnl
    
+   SECTION data_clib
    SECTION data_stdio
    
    ; FILE *
