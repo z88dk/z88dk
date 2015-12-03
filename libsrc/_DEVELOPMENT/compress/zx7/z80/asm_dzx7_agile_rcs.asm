@@ -29,15 +29,17 @@ asm_dzx7_agile_rcs:
    ; uses  : af, bc, de, hl
 
         ld      a, $80
-        
+
 dzx7a_copy_byte_loop1:
 
-        push af
+        push af ; ex      af, af'
+
         call    dzx7a_copy_byte         ; copy literal byte
-        
+
 dzx7a_main_loop1:
 
-        pop af
+        pop af ; ex      af, af'
+
         add     a, a                    ; check next bit
         call    z, dzx7a_load_bits      ; no more bits left?
         jr      nc, dzx7a_copy_byte_loop1 ; next bit indicates either literal or sequence
@@ -46,7 +48,7 @@ dzx7a_main_loop1:
 dzx7a_copy_byte_loop:
 
         ldi                             ; copy literal byte
-        
+
 dzx7a_main_loop:
 
         add     a, a                    ; check next bit
@@ -60,7 +62,7 @@ dzx7a_len_size_start:
         push    de
         ld      bc, 1
         ld      d, b
-        
+
 dzx7a_len_size_loop:
 
         inc     d
@@ -79,7 +81,7 @@ dzx7a_len_value_loop:
         rl      b
 ;;        jr      c, dzx7a_exit           ; check end marker
         jp      c, l_ret - 1
-       
+
 dzx7a_len_value_start:
 
         dec     d
@@ -101,7 +103,7 @@ ELSE
         inc e
 
 ENDIF
-        
+
         jr      nc, dzx7a_offset_end    ; if offset flag is set, load 4 extra bits
         add     a, a                    ; check next bit
         call    z, dzx7a_load_bits      ; no more bits left?
@@ -117,7 +119,7 @@ ENDIF
         ccf
         jr      c, dzx7a_offset_end
         inc     d                       ; equivalent to adding 128 to DE
-        
+
 dzx7a_offset_end:
 
         rr      e                       ; insert inverted fourth bit into E
@@ -128,13 +130,17 @@ dzx7a_offset_end:
         push    hl                      ; store destination
         sbc     hl, de                  ; HL = destination - offset - 1
         pop     de                      ; DE = destination
-        push af
+        
+        push af  ; ex      af, af'
+        
         ld      a, h                    ; A = 010RRccc
         cp      $58
         jr      c, dzx7a_copy_bytes
         ldir
+
+        pop af  ; ex      af, af'
+
         pop     hl                      ; restore source address (compressed data)
-        pop af
         jp      dzx7a_main_loop
 
 dzx7a_copy_bytes:
@@ -147,8 +153,12 @@ dzx7a_copy_bytes:
         pop     hl
         inc     hl
         jp      pe, dzx7a_copy_bytes
+
+        pop af  ;
+
         pop     hl                      ; restore source address (compressed data)
-        jr      dzx7a_main_loop1
+;;        jr      dzx7a_main_loop1
+        jr      dzx7a_main_loop1+1
 
 dzx7a_load_bits:
 
@@ -170,7 +180,6 @@ dzx7a_exit:
         ret
 
 ; Convert an RCS address 010RRccc ccrrrppp to screen address 010RRppp rrrccccc
-; (Note: replace both EX AF,AF' with PUSH AF/POP AF if you want to preserve AF')
 
 dzx7a_convert:
 
