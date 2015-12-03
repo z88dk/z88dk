@@ -1,6 +1,7 @@
 
 ; int vsnprintf(char *s, size_t n, const char *format, void *arg)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC vsnprintf

@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_w_vector
 
 PUBLIC asm_w_vector_at
@@ -26,8 +27,10 @@ defc asm_w_vector_at = asm_w_array_at
    ;
    ;         success
    ;
-   ;            de = & vector.data[idx]
-   ;            hl = vector.data[idx]
+   ;            de = & vector.data[idx
+
+   ;            hl = vector.data[idx
+
    ;            carry reset
    ;
    ;         fail if idx out of range

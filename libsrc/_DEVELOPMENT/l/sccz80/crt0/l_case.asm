@@ -2,6 +2,7 @@
 ;       The new case statement..maybe things will work now!
 ;       13/10/98
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_case

@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sccz80p_dread1, cm48_sccz80p_dread2

@@ -1,6 +1,7 @@
 
 ; void in_wait_nokey(void)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC in_wait_nokey

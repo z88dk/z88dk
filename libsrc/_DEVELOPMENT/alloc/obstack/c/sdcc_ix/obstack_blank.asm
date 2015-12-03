@@ -1,6 +1,7 @@
 
 ; void *obstack_blank(struct obstack *ob, int size)
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC _obstack_blank

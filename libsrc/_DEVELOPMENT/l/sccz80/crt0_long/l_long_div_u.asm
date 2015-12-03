@@ -12,6 +12,7 @@
 ;
 ;       Replaced use of ix with bcbc'
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_long_div_u

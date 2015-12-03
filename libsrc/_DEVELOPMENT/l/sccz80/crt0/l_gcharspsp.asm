@@ -2,6 +2,7 @@
 ;       l_gchar variant to be used sometimes by the peephole optimizer
 ;
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_gcharspsp

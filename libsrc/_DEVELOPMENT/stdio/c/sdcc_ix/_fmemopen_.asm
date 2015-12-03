@@ -1,6 +1,7 @@
 
 ; FILE *_fmemopen_(void **bufp, size_t *sizep, const char *mode)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC __fmemopen_

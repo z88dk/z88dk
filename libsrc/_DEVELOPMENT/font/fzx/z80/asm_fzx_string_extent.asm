@@ -1,6 +1,7 @@
 
 ; uint16_t fzx_string_extent(struct fzx_font *ff, char *s)
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_string_extent

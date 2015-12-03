@@ -1,6 +1,7 @@
 
 ; void in_wait_key(void)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC _in_wait_key

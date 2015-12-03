@@ -1,6 +1,7 @@
 
 ; void perror(const char *s)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _perror

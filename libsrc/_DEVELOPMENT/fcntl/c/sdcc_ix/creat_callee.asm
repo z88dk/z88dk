@@ -1,6 +1,7 @@
 
 ; int creat_callee(const char *path, mode_t mode)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC _creat_callee, l0_creat_callee

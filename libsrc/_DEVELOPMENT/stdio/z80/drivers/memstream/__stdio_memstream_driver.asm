@@ -3,7 +3,8 @@
 ; Feb 2014
 ; ===============================================================
 
-SECTION code_stdio
+SECTION code_driver
+SECTION code_driver_memstream
 
 PUBLIC __stdio_memstream_driver
 
@@ -80,12 +81,14 @@ EATC:
    jr c, _eatc_at_eof
 
    ; hl'= qualify function
-   ; hl = & vector.array[fp_idx]
+   ; hl = & vector.array[fp_idx
+
    ; de = vector.size
    ; bc = fp_idx
    ; stack = fp_idx_old, length
 
-   ex de,hl                    ; hl = vector.size, de = & vector[fp_idx]
+   ex de,hl                    ; hl = vector.size, de = & vector[fp_idx
+
    sbc hl,bc                   ; hl = num bytes avail in vector
 
    pop bc                      ; bc = length
@@ -278,7 +281,8 @@ WRIT:
    jp c, error_efbig_zc        ; if error prevented any bytes from being written
 
    ; hl'= void *buffer + num
-   ; de'= & vector.array[idx+num]
+   ; de'= & vector.array[idx+num
+
    ; hl = num bytes written
    ; bc = idx
    ; a = realloc_status = 0 if realloc was performed, -1 if could not write all bytes
@@ -372,7 +376,8 @@ PUTC:
    jp c, error_efbig_zc - 1    ; idx out of range should not happen
 
    ; bc = num bytes available at idx
-   ; hl = & vector.array[idx]
+   ; hl = & vector.array[idx
+
    ;  a = realloc_status = 0 if realloc performed, -1 if num bytes < n
    ; stack = idx
 
@@ -578,7 +583,8 @@ _flush_terminate:
    ; zero terminate
    
    ex de,hl                    ; hl = vector.size
-   add hl,bc                   ; hl = & vector.array[size]
+   add hl,bc                   ; hl = & vector.array[size
+
    
    ld (hl),0                   ; zero terminate the buffer
    ret

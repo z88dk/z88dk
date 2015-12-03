@@ -1,5 +1,6 @@
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_tty
 
 PUBLIC tty_z88dk_state_table
 

@@ -1,6 +1,7 @@
 
 ; void *obstack_1grow_fast(struct obstack *ob, char c)
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC obstack_1grow_fast

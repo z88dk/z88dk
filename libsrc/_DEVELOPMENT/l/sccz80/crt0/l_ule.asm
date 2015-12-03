@@ -4,13 +4,15 @@
 ;
 ;       6/9/98  djm
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_ule
 
 l_ule:
 
-   ; DE <= HL [unsigned]
+   ; DE <= HL [unsigned
+
    ; set carry if true
 
    ld a,h

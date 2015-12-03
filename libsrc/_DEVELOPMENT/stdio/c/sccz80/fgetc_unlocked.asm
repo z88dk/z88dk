@@ -1,6 +1,7 @@
 
 ; int fgetc_unlocked(FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC fgetc_unlocked

@@ -1,6 +1,7 @@
 
 ; size_t wa_stack_capacity_fastcall(wa_stack_t *s)
 
+SECTION code_clib
 SECTION code_adt_wa_stack
 
 PUBLIC _wa_stack_capacity_fastcall

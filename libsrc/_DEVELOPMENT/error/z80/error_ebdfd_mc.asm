@@ -7,6 +7,7 @@ IF __CLIB_OPT_ERROR
 
    ; verbose mode
 
+   SECTION code_clib
    SECTION code_error
    
    PUBLIC error_ebdfd_mc
@@ -26,6 +27,7 @@ IF __CLIB_OPT_ERROR
       jp errno_mc
    
    
+   SECTION rodata_clib
    SECTION rodata_error_strings
 
    IF __CLIB_OPT_ERROR & $02
@@ -46,6 +48,7 @@ IF __CLIB_OPT_ERROR
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   SECTION code_clib
    SECTION code_error
    
    PUBLIC error_ebdfd_mc

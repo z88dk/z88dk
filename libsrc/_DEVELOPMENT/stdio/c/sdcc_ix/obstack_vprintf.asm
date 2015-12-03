@@ -1,6 +1,7 @@
 
 ; int obstack_vprintf(struct obstack *obstack, const char *format, void *arg)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _obstack_vprintf

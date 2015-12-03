@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC obstack_grow0_callee

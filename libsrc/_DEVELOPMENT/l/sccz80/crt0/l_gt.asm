@@ -4,13 +4,15 @@
 ;
 ;       6/9/98  djm
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_gt
 
 l_gt:
 
-   ; DE > HL [signed]
+   ; DE > HL [signed
+
    ; set carry if true
 
    ld a,d

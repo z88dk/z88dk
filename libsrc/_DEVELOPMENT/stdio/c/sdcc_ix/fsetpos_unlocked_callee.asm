@@ -1,6 +1,7 @@
 
 ; int fsetpos_unlocked_callee(FILE *stream, const fpos_t *pos)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _fsetpos_unlocked_callee, l0_fsetpos_unlocked_callee

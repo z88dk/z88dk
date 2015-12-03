@@ -1,6 +1,7 @@
 
 ; float __schar2fs (signed char sc)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciyp_schar2ds

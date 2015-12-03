@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_l
 
 PUBLIC l_command_line_parse
@@ -41,7 +42,7 @@ l_command_line_parse:
    ld l,a
    ld h,a                      ; hl'= & redirector in command line
    ld c,a
-   ld b,a                      ; bc'= chars remaining in command line
+   ld b,a                      ; bc'= chars remaining in redirector
    
    exx
 

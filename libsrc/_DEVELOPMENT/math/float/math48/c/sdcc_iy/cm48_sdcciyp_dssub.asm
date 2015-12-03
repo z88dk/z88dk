@@ -1,6 +1,7 @@
 
 ; float __fssub (float left, float right)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciyp_dssub

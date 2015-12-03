@@ -12,6 +12,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC asm_in_pause

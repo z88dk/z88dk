@@ -1,6 +1,7 @@
 
 ; void *zx_saddrcleft_fastcall(void *saddr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_saddrcleft_fastcall

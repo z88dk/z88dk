@@ -1,6 +1,7 @@
 
 ; int vsprintf(char *s, const char *format, void *arg)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC vsprintf_callee

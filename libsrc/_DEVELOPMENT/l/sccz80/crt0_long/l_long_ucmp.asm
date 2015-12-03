@@ -11,10 +11,12 @@
 ;
 ; Exit:           z = numbers the same
 ;                nz = numbers different
-;              c/nc = sign of difference [set if secondary > primary]
+;              c/nc = sign of difference [set if secondary > primary
+
 ;
 ;                hl = 1
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_long_ucmp

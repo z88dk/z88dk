@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zx_aaddrcdown

@@ -1,6 +1,7 @@
 
 ; FILE *fdopen(int fd, const char *mode)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC fdopen

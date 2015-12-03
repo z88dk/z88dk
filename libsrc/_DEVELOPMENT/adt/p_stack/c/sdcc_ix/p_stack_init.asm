@@ -1,6 +1,7 @@
 
 ; void p_stack_init(void *p)
 
+SECTION code_clib
 SECTION code_adt_p_stack
 
 PUBLIC _p_stack_init

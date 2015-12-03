@@ -1,6 +1,7 @@
 
 ; int isgreater(double x, double y)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sccz80_isgreater

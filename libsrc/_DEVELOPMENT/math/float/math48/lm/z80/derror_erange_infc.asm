@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC derror_erange_infc, derror_erange_pinfc, derror_erange_minfc, derror_erange_infxc

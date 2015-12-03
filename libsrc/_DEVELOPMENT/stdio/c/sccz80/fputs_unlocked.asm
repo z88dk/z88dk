@@ -1,6 +1,7 @@
 
 ; int fputs_unlocked(const char *s, FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC fputs_unlocked

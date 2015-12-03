@@ -1,6 +1,7 @@
 
 ; float fma(float x, float y, float z) __z88dk_callee
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_fma_callee

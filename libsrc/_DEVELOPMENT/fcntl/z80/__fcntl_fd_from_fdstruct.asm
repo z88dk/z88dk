@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC __fcntl_fd_from_fdstruct
@@ -15,7 +16,7 @@ __fcntl_fd_from_fdstruct:
    ; exit  : success
    ;
    ;            b = fdtbl_size - fd
-   ;           hl = & fdtbl[fd] + 1
+   ;           hl = & fdtbl[fd] + 1b
    ;           carry reset
    ;
    ;         fail if not found

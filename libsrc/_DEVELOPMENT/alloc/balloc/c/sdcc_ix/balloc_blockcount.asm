@@ -1,6 +1,7 @@
 
 ; size_t balloc_blockcount(unsigned int queue)
 
+SECTION code_clib
 SECTION code_alloc_balloc
 
 PUBLIC _balloc_blockcount

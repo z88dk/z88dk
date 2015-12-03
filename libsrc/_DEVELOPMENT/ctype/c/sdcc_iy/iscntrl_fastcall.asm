@@ -1,6 +1,7 @@
 
 ; int iscntrl_fastcall(int c)
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC _iscntrl_fastcall

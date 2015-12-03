@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_adt_wa_priority_queue
 
 PUBLIC __w_heap_sift_down
@@ -51,17 +52,20 @@ while:
    ; choose smallest child
    
    ; hl = child_index (*2)
-   ; de = & array[parent_index]
+   ; de = & array[parent_index
+
    ; bc = array
    ; stack = n (*2), & array[parent_index], child_index (*2)
    
    add hl,bc
    
    ld e,l
-   ld d,h                      ; de = & array[left_child]
+   ld d,h                      ; de = & array[left_child
+
    
    inc hl
-   inc hl                      ; hl = & array[right_child]
+   inc hl                      ; hl = & array[right_child
+
    
    call l_compare_de_hl        ; (compar)(de = void *left_child, hl = void *right_child)
    
@@ -72,15 +76,18 @@ while:
    inc hl                      ; hl = right_child_index (*2)
    
    inc de
-   inc de                      ; de = & array[right_child]
+   inc de                      ; de = & array[right_child
+
 
 small_child_found:
 
    ex (sp),hl
 
    ; bc = array
-   ; hl = & array[parent_index]
-   ; de = & array[child_index]
+   ; hl = & array[parent_index
+
+   ; de = & array[child_index
+
    ; stack = n (*2), child_index (*2)
    
    ; find out if parent needs to be pushed further down
@@ -99,7 +106,8 @@ small_child_found:
    
    call __w_heap_swap
    
-   ex de,hl                    ; de = & array[child]
+   ex de,hl                    ; de = & array[child
+
    pop bc                      ; bc = array
    pop hl                      ; hl = child_index (*2)
 
@@ -108,7 +116,8 @@ small_child_found:
    add hl,hl                   ; hl = new child_index (*2) = old_child_index (*2) * 2
    jp c, error_znc - 1
    
-   ; de = & array[parent]
+   ; de = & array[parent
+
    ; bc = array
    ; hl = child_index (*2)
    ; stack = n (*2)

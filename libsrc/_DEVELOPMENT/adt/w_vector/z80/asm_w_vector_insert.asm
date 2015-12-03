@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_w_vector
 
 PUBLIC asm_w_vector_insert
@@ -24,7 +25,8 @@ asm_w_vector_insert:
    ;
    ; exit  : success
    ;
-   ;            de = & vector.data[idx]
+   ;            de = & vector.data[idx
+
    ;            hl = idx of word inserted
    ;            carry reset
    ;

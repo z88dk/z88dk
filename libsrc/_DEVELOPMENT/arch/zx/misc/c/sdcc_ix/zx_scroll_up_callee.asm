@@ -1,6 +1,7 @@
 
 ; void zx_scroll_up_callee(uchar rows, uchar attr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_scroll_up_callee

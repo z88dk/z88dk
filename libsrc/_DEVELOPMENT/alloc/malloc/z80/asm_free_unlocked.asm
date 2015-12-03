@@ -12,6 +12,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC asm_free_unlocked

@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_adt_wa_priority_queue
 
 PUBLIC __w_heap_sift_up
@@ -48,7 +49,8 @@ __w_heap_sift_up:
    pop bc                      ; bc = array
    pop de                      ; de = parent_index
    
-   ; hl = & array[parent]
+   ; hl = & array[parent
+
    ; de = parent_index
    ; bc = array
    

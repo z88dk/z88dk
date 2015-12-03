@@ -11,6 +11,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC asm_obstack_copy0

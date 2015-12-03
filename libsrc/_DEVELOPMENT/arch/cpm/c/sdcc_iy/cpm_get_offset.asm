@@ -1,6 +1,7 @@
 
 ; unsigned long cpm_get_offset(void *p)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _cpm_get_offset

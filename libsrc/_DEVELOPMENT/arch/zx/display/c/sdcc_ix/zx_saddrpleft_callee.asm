@@ -1,6 +1,7 @@
 
 ; void *zx_saddrpleft_callee(void *saddr, uchar bitmask)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_saddrpleft_callee

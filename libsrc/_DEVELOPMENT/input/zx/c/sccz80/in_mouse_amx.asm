@@ -1,6 +1,7 @@
 
 ; void in_mouse_amx(uint8_t *buttons, uint16_t *x, uint16_t *y)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC in_mouse_amx

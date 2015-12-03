@@ -1,6 +1,7 @@
 
 ; void free_unlocked_fastcall(void *p)
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC _free_unlocked_fastcall

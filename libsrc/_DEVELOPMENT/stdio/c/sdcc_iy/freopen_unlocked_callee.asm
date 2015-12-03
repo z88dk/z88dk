@@ -1,6 +1,7 @@
 
 ; FILE *freopen_unlocked_callee(char *filename, char *mode, FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _freopen_unlocked_callee

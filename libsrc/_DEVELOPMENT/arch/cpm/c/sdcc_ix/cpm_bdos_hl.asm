@@ -1,6 +1,7 @@
 
 ; int cpm_bdos_hl(unsigned int func,unsigned int arg)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _cpm_bdos_hl

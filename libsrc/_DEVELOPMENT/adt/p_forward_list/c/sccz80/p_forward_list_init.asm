@@ -1,6 +1,7 @@
 
 ; void p_forward_list_init(void *p)
 
+SECTION code_clib
 SECTION code_adt_p_forward_list
 
 PUBLIC p_forward_list_init

@@ -1,4 +1,4 @@
-
+SECTION code_clib
 SECTION code_adt_w_array
 
 PUBLIC __w_array_write_n

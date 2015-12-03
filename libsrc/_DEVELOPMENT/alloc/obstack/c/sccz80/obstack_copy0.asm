@@ -1,6 +1,7 @@
 
 ; void *obstack_copy0(struct obstack *ob, void *address, size_t size)
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC obstack_copy0

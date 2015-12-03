@@ -1,4 +1,5 @@
 
+SECTION data_clib
 SECTION data_fcntl
 
 PUBLIC __fcntl_fdtbl_lock

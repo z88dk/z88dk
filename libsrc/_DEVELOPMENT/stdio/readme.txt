@@ -30,7 +30,7 @@ bit   name    purpose
  5    D       if set indicates the driver handles ungetc for eatc message
  4    eof     if set the input stream reached eof
  3    err     if set the stream encountered an error
-210   type    stdio structure type (000 = FILE, 001 = INPUT_TERM, 010 = OUTPUT_TERM, 111 = MEMSTREAM)
+210   type    stdio structure type (000 = FILE, 111 = MEMSTREAM)
             
 * state_flags_1
 
@@ -142,7 +142,7 @@ input:
 
 return:
 
-HL = char
+A = HL = char
 carry set on error or eof: if HL=0 stream error, HL=-1 on eof
 
 ****************

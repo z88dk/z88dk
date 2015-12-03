@@ -5,6 +5,7 @@
 ;
 ;       djm 24/4/99
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC htonl

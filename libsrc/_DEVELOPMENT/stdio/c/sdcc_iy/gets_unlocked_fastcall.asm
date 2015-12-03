@@ -1,6 +1,7 @@
 
 ; char *gets_unlocked_fastcall(char *s)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _gets_unlocked_fastcall

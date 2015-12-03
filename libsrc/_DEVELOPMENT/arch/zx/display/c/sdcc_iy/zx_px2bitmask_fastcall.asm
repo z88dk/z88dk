@@ -1,6 +1,7 @@
 
 ; uint zx_px2bitmask_fastcall(uchar x)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_px2bitmask_fastcall

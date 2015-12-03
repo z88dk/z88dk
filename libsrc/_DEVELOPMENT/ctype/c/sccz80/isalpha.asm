@@ -1,6 +1,7 @@
 
 ; int isalpha(int c)
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC isalpha

@@ -1,6 +1,7 @@
 
 ; void *malloc_unlocked_fastcall(size_t size)
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC _malloc_unlocked_fastcall

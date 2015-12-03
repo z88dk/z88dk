@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_sound_bit
 
 PUBLIC asm_bit_beepfx_di

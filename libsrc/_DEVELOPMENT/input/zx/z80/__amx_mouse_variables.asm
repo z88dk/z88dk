@@ -1,4 +1,5 @@
 
+SECTION bss_clib
 SECTION bss_input
 
 PUBLIC __input_amx_mouse_x

@@ -1,6 +1,7 @@
 
 ; float __sint2fs (signed int si)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciyp_sint2ds

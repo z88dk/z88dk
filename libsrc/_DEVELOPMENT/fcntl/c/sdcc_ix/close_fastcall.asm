@@ -1,6 +1,7 @@
 
 ; int close_fastcall(int fd)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC _close_fastcall

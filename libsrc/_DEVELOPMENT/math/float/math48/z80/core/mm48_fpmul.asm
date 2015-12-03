@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC mm48_fpmul, mm48__mul5, mm48__mul5a

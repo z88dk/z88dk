@@ -1,6 +1,7 @@
 
 ; int vsnprintf_callee(char *s, size_t n, const char *format, void *arg)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _vsnprintf_callee, l0_vsnprintf_callee

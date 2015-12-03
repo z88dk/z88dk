@@ -2,6 +2,7 @@
 ; int cpm_bdos_hl(unsigned int func,unsigned int arg)
 ; callee
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC cpm_bdos_hl_callee

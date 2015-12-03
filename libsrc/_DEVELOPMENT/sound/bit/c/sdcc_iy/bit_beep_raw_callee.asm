@@ -1,6 +1,7 @@
 
 ; void bit_beep_raw_callee(uint16_t num_cycles, uint16_t tone_period_T)
 
+SECTION code_clib
 SECTION code_sound_bit
 
 PUBLIC _bit_beep_raw_callee

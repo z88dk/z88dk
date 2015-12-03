@@ -1,6 +1,7 @@
 
 ; void in_mouse_kempston_reset(void)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC in_mouse_kempston_reset

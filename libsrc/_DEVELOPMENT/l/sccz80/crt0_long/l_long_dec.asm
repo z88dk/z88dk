@@ -5,6 +5,7 @@
 ;
 ;       djm 26/2/2000
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_long_dec

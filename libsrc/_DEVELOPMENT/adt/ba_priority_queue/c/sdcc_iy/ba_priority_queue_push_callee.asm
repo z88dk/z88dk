@@ -1,6 +1,7 @@
 
 ; int ba_priority_queue_push_callee(ba_priority_queue_t *q, int c)
 
+SECTION code_clib
 SECTION code_adt_ba_priority_queue
 
 PUBLIC _ba_priority_queue_push_callee

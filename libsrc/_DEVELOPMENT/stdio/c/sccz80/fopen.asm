@@ -1,6 +1,7 @@
 
 ; FILE *fopen(const char *filename, const char *mode)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC fopen

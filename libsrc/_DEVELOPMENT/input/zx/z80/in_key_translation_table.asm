@@ -4,7 +4,8 @@
 ; to emulate a PC keyboard with the 'CTRL' key represented
 ; by CAPS SHIFT + SYM SHIFT.
 
-SECTION code_input
+SECTION rodata_clib
+SECTION rodata_input
 
 PUBLIC in_key_translation_table
 

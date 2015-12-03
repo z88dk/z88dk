@@ -1,6 +1,7 @@
 
 ; int toupper(int c)
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC _toupper

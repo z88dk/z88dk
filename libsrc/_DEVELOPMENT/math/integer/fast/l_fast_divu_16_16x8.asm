@@ -1,6 +1,7 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
 SECTION code_math
 
 PUBLIC l_fast_divu_16_16x8, l0_fast_divu_16_16x8

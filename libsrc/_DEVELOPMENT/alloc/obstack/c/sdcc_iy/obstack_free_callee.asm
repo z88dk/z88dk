@@ -1,6 +1,7 @@
 
 ; void *obstack_free_callee(struct obstack *ob, void *object)
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC _obstack_free_callee

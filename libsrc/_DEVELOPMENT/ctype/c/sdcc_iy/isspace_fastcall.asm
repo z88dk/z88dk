@@ -1,6 +1,7 @@
 
 ; int isspace_fastcall(int c)
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC _isspace_fastcall

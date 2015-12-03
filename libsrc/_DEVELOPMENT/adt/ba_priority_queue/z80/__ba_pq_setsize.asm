@@ -1,4 +1,4 @@
-
+SECTION code_clib
 SECTION code_adt_ba_priority_queue
 
 PUBLIC __ba_pq_setsize

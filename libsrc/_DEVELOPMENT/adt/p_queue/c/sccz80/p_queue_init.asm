@@ -1,6 +1,7 @@
 
 ; void p_queue_init(void *p)
 
+SECTION code_clib
 SECTION code_adt_p_queue
 
 PUBLIC p_queue_init

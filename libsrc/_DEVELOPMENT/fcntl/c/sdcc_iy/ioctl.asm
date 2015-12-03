@@ -1,6 +1,7 @@
 
 ; int ioctl(int fildes, int request, ...)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC _ioctl

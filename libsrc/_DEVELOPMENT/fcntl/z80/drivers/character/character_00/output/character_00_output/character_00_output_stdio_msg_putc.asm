@@ -1,5 +1,6 @@
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_character_output
 
 PUBLIC character_00_output_stdio_msg_putc
 

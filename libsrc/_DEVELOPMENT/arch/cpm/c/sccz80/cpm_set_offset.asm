@@ -1,6 +1,7 @@
 
 ; void cpm_set_offset(void *p, unsigned long offset)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC cpm_set_offset

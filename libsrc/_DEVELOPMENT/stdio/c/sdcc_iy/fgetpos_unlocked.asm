@@ -1,6 +1,7 @@
 
 ; int fgetpos_unlocked(FILE *stream, fpos_t *pos)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _fgetpos_unlocked

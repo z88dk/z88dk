@@ -1,6 +1,7 @@
 
 ; double __CALLEE__ modf(double value, double *iptr)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sccz80_modf_callee, l0_cm48_sccz80_modf_callee

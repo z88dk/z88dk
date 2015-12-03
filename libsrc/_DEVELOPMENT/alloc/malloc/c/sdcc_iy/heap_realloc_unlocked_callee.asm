@@ -1,6 +1,7 @@
 
 ; void *heap_realloc_unlocked_callee(void *heap, void *p, size_t size)
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC _heap_realloc_unlocked_callee

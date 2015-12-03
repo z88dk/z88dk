@@ -1,7 +1,8 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_character_input
 
 PUBLIC character_00_input_bin_stdio_msg_read
 

@@ -1,6 +1,7 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC __stdio_input_sm_fgets

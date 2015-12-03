@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_w_vector
 
 PUBLIC asm_w_vector_append_n
@@ -25,7 +26,8 @@ asm_w_vector_append_n:
    ; exit  : success
    ;
    ;            hl = idx of words appended
-   ;            de = & vector.data[idx]
+   ;            de = & vector.data[idx
+
    ;            carry reset
    ;
    ;         fail

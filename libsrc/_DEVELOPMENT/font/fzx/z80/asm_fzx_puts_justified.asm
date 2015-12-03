@@ -1,6 +1,7 @@
 
 ; int fzx_puts_justified(struct fzx_state *fs, char *s, uint16_t allowed_width)
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_puts_justified

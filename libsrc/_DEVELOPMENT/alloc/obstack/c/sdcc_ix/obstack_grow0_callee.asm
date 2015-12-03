@@ -1,6 +1,7 @@
 
 ; int obstack_grow0_callee(struct obstack *ob, void *data, size_t size)
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC _obstack_grow0_callee

@@ -1,6 +1,7 @@
 
 ; int creat(const char *path, mode_t mode)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC _creat

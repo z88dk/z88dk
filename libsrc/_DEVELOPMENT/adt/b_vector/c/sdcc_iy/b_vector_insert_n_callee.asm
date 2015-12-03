@@ -1,6 +1,7 @@
 
 ; size_t b_vector_insert_n_callee(b_vector_t *v, size_t idx, size_t n, int c)
 
+SECTION code_clib
 SECTION code_adt_b_vector
 
 PUBLIC _b_vector_insert_n_callee, l0_b_vector_insert_n_callee

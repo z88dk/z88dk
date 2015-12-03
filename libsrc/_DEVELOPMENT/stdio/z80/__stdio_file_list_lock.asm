@@ -1,4 +1,5 @@
 
+SECTION data_clib
 SECTION data_stdio
 
 PUBLIC __stdio_file_list_lock

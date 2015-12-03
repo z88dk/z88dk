@@ -1,6 +1,7 @@
 
 ; size_t fwrite_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC fwrite_unlocked_callee

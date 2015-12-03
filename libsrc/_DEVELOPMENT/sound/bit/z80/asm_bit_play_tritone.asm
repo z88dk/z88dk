@@ -27,6 +27,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION smc_clib
 SECTION smc_sound_bit
 
 PUBLIC asm_bit_play_tritone

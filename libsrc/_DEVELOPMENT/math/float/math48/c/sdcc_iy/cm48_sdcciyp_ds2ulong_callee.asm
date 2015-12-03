@@ -1,6 +1,7 @@
 
 ; signed long __fs2ulong_callee(float f)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciyp_ds2ulong_callee

@@ -1,6 +1,7 @@
 
 ; int vasprintf(char **ptr, const char *format, void *arg)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC vasprintf_callee

@@ -1,6 +1,7 @@
 
 ; void *obstack_finish(struct obstack *ob)
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC _obstack_finish

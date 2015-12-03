@@ -7,6 +7,7 @@ IF __CLIB_OPT_ERROR
 
    ; verbose mode
 
+   SECTION code_clib
    SECTION code_error
    
    PUBLIC error_erange_zc
@@ -30,6 +31,7 @@ IF __CLIB_OPT_ERROR
 ELSE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   SECTION code_clib
    SECTION code_error
    
    PUBLIC error_erange_zc

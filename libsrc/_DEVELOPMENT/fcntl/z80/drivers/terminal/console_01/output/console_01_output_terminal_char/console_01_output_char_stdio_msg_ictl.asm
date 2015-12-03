@@ -1,5 +1,6 @@
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC console_01_output_char_stdio_msg_ictl
 PUBLIC console_01_output_char_stdio_msg_ictl_0

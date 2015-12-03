@@ -1,4 +1,4 @@
-
+SECTION code_clib
 SECTION code_adt_b_vector
 
 PUBLIC __vector_make_room

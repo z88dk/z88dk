@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC asm_dconst_inf, asm_dconst_pinf, asm_dconst_minf

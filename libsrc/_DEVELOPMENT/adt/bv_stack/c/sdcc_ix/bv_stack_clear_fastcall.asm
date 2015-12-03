@@ -1,6 +1,7 @@
 
 ; void bv_stack_clear_fastcall(bv_stack_t *s)
 
+SECTION code_clib
 SECTION code_adt_bv_stack
 
 PUBLIC _bv_stack_clear_fastcall

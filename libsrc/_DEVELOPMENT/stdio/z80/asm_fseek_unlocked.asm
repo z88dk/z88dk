@@ -18,6 +18,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC asm_fseek_unlocked

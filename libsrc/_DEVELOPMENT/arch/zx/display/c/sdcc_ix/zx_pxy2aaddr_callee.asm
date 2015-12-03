@@ -1,6 +1,7 @@
 
 ; void *zx_pxy2aaddr_callee(uchar x, uchar y)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_pxy2aaddr_callee, l0_zx_pxy2aaddr_callee

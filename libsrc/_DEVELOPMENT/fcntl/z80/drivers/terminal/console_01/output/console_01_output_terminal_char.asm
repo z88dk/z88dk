@@ -180,7 +180,8 @@
 ;   19                      window.height
 ;   20                      scroll_limit
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC console_01_output_terminal_char
 

@@ -18,6 +18,7 @@
 ; * made fields 16-bit for hi-res
 ; ===============================================================
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_putc

@@ -1,6 +1,7 @@
 
 ; float atan2(float y, float x) __z88dk_callee
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_atan2_callee, l0_cm48_sdccix_atan2_callee

@@ -1,6 +1,7 @@
 
 ; ssize_t read_callee(int fd, void *buf, size_t nbyte)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC _read_callee

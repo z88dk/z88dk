@@ -1,6 +1,7 @@
 
 ; int16_t in_mouse_kempston_wheel_delta(void)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC _in_mouse_kempston_wheel_delta

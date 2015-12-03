@@ -1,6 +1,7 @@
 
 ; float __fsdiv_callee(float dividend, float divisor)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccixp_dsdiv_callee

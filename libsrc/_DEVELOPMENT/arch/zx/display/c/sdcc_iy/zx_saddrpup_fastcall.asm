@@ -1,6 +1,7 @@
 
 ; void *zx_saddrpup_fastcall(void *saddr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_saddrpup_fastcall

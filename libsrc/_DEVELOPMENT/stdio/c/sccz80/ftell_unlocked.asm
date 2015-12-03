@@ -1,6 +1,7 @@
 
 ; unsigned long ftell_unlocked(FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC ftell_unlocked

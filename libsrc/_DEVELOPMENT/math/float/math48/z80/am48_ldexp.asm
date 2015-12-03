@@ -1,6 +1,7 @@
 
 ; double ldexp(double x, int exp)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC am48_ldexp

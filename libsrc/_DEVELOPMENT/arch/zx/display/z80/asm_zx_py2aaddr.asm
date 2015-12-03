@@ -8,6 +8,7 @@
 ; Attribute address corresponding to pixel coordinate x = 0, y.
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_zx_py2aaddr

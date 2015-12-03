@@ -1,6 +1,7 @@
 
 ; void *obstack_int_grow(struct obstack *ob, int data)
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC obstack_int_grow

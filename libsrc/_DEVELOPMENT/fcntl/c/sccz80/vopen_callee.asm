@@ -1,6 +1,7 @@
 
 ; int vopen(const char *path, int oflag, void *arg)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC vopen_callee

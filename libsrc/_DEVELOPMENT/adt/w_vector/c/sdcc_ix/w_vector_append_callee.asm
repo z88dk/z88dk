@@ -1,6 +1,7 @@
 
 ; size_t w_vector_append_callee(b_vector_t *v, void *item)
 
+SECTION code_clib
 SECTION code_adt_w_vector
 
 PUBLIC _w_vector_append_callee

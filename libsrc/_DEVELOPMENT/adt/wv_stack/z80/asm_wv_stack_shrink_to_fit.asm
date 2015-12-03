@@ -11,6 +11,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_wv_stack
 
 PUBLIC asm_wv_stack_shrink_to_fit

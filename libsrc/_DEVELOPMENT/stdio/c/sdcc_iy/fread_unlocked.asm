@@ -1,6 +1,7 @@
 
 ; size_t fread_unlocked(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _fread_unlocked

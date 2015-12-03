@@ -1,6 +1,7 @@
 
 ; int fzx_write_justified(struct fzx_state *fs, char *buf, uint16_t buflen, uint16_t allowed_width)
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_write_justified

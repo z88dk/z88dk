@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_w_vector
 
 PUBLIC asm_w_vector_push_back
@@ -24,7 +25,8 @@ defc asm_w_vector_push_back = asm_w_vector_append
    ;
    ;         success
    ;
-   ;            de = & vector.data[idx]
+   ;            de = & vector.data[idx
+
    ;            hl = idx of appended char
    ;            carry reset
    ;

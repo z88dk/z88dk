@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC asm_toascii

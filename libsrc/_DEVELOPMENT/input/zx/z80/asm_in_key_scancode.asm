@@ -11,6 +11,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC asm_in_key_scancode

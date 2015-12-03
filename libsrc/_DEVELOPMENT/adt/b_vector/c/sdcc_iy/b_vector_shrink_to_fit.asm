@@ -1,6 +1,7 @@
 
 ; int b_vector_shrink_to_fit(b_vector_t *v)
 
+SECTION code_clib
 SECTION code_adt_b_vector
 
 PUBLIC _b_vector_shrink_to_fit

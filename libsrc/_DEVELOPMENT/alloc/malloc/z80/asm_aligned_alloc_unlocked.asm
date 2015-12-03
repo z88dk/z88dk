@@ -16,6 +16,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC asm_aligned_alloc_unlocked

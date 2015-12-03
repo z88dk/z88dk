@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_l
 
 PUBLIC l_small_utoh

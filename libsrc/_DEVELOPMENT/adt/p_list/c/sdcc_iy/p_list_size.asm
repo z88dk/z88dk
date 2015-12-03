@@ -1,6 +1,7 @@
 
 ; size_t p_list_size(p_list_t *list)
 
+SECTION code_clib
 SECTION code_adt_p_list
 
 PUBLIC _p_list_size

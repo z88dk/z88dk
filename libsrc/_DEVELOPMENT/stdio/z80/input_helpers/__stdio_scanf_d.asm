@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC __stdio_scanf_d

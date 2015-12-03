@@ -1,6 +1,7 @@
 
 ; float trunc(float x) __z88dk_fastcall
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_trunc_fastcall

@@ -3,6 +3,7 @@
 ;
 ; Multiply two 16 bit numbers hl=hl*de ((un)signed)
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_mult

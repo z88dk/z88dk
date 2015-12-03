@@ -1,6 +1,7 @@
 
 ; void *p_list_insert(p_list_t *list, void *list_item, void *item)
 
+SECTION code_clib
 SECTION code_adt_p_list
 
 PUBLIC p_list_insert_callee

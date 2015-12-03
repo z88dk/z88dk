@@ -1,6 +1,7 @@
 
 ; void *heap_destroy(void *heap)
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC heap_destroy

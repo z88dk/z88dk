@@ -1,7 +1,8 @@
 
 ; This table translates key presses into ascii codes.
 
-SECTION code_input
+SECTION rodata_clib
+SECTION rodata_input
 
 PUBLIC in_key_translation_table
 
@@ -16,7 +17,8 @@ in_key_translation_table:
    ; 3     ESC     2     3     5     4     6     1     7
    ; 4      F1    F2    F7    F5    F6    F3    F8    F4
    ; 5         ERASE     ^     0     -     9           8
-   ; 6             ]     :     L     ;     K           J
+   ; 6             
+     :     L     ;     K           J
    ; 7     ALT ENTER   LEFT  HOLD   UP   RIGHT DOWN  STOP
    ; 8     INS SPACE R.SH.     .     /     ,   DEL     M
    ; 9                   [     P     @     O           I
@@ -29,7 +31,8 @@ in_key_translation_table:
    defb '7', '1', '6', '4', '5', '3', '2', 27      ; row 3
    defb ?, ?, ?, ?, ?, ?, ?, ?                     ; row 4
    defb '8', 255, '9', '-', '0', '^', 12, 255      ; row 5
-   defb 'j', 255, 'k', ';', 'l', ':', ']', 255     ; row 6
+   defb 'j', 255, 'k', ';', 'l', ':', '
+', 255     ; row 6
    defb 3, 10, 9, 11, ?, 8, 13, 255                ; row 7
    defb 'm', 127, ',', '/', '.', 255, ' ', ?       ; row 8
    defb 'i', 255, 'o', '@', 'p', '[', 255, 255     ; row 9

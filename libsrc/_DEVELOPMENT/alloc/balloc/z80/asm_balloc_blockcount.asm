@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_alloc_balloc
 
 PUBLIC asm_balloc_blockcount

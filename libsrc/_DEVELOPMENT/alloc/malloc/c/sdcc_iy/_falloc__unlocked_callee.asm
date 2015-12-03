@@ -1,6 +1,7 @@
 
 ; void *_falloc__unlocked_callee(void *p, size_t size)
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC __falloc__unlocked_callee

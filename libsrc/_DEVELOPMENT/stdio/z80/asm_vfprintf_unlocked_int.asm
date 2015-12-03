@@ -11,6 +11,7 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC asm_vfprintf_unlocked_int
@@ -602,7 +603,8 @@ printf_invoke:
    ;   4       2   void *stack_param
    ;   6       2   address of next format char
    ;   8       3   prefix buffer space for printf conversion
-   ;  11      33   buffer_digits[] (space for printf conversion)
+   ;  11      33   buffer_digits[
+ (space for printf conversion)
    
    ret
 

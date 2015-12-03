@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC asm_heap_info_unlocked
@@ -63,7 +64,8 @@ block_loop:
    
    inc hl
    inc hl
-   inc hl                      ; hl = hdr->mem[]
+   inc hl                      ; hl = hdr->mem[
+
    
    pop bc
    
@@ -73,7 +75,8 @@ block_loop:
    
    push bc
    
-   ; hl = hdr->mem[]
+   ; hl = hdr->mem[
+
    ; de = hdr->committed
    ; stack = hdr->next, hdr->next, hdr
    
@@ -152,7 +155,8 @@ allocated:
    ; ALLOCATED BLOCK
    
    ; hl = allocated size
-   ; de = hdr->mem[]
+   ; de = hdr->mem[
+
    
    ld bc,1
 

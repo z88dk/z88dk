@@ -1,6 +1,7 @@
 
 ; double nan(const char *tagp)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC am48_nan

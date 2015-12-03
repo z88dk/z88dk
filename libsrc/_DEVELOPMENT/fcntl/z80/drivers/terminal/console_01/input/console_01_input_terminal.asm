@@ -180,7 +180,8 @@
 ;   17..18                  read_index (index of next char to read from edit buffer)
 ;   19..24                  b_array (manages edit buffer)
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_input
 
 PUBLIC console_01_input_terminal
 

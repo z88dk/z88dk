@@ -1,6 +1,7 @@
 
 ; float atan2(float y, float x)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_atan2

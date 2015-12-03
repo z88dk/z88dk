@@ -1,6 +1,7 @@
 
 ; void *p_list_back(p_list_t *list)
 
+SECTION code_clib
 SECTION code_adt_p_list
 
 PUBLIC _p_list_back

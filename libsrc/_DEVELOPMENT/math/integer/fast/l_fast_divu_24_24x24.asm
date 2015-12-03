@@ -1,6 +1,7 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
 SECTION code_math
 
 PUBLIC l_fast_divu_24_24x24, l0_fast_divu_24_24x24
@@ -341,7 +342,8 @@ loop_7:
 
 exit_loop:
 
-   ; quotient  = ~e[hl']
+   ; quotient  = ~e[hl'
+
    ; remainder =  ahl
    ; one more shift left on quotient
 
@@ -415,7 +417,8 @@ loop_02:
    dec ixh
    jp nz, loop_11
 
-   ; quotient  = ~e[hl']
+   ; quotient  = ~e[hl'
+
    ; remainder =  ahl
    ; one more shift left on quotient
    

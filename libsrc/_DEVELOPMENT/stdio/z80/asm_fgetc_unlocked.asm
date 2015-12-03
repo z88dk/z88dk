@@ -11,6 +11,7 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC asm_fgetc_unlocked

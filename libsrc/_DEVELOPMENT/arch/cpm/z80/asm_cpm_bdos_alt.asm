@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC asm_cpm_bdos_alt

@@ -1,6 +1,7 @@
 
 ; int vfprintf_unlocked_callee(FILE *stream, const char *format, void *arg)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _vfprintf_unlocked_callee

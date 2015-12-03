@@ -1,7 +1,8 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_input
 
 PUBLIC console_01_input_proc_getc
 

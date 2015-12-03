@@ -1,6 +1,7 @@
 
 ; float scalbn(float x, int n) __z88dk_callee
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccix_scalbn_callee, l0_cm48_sdccix_scalbn_callee

@@ -1,6 +1,7 @@
 
 ; void dzx7_turbo(void *src, void *dst)
 
+SECTION code_clib
 SECTION code_compress_zx7
 
 PUBLIC _dzx7_turbo

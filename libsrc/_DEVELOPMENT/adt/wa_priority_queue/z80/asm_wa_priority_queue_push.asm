@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_wa_priority_queue
 
 PUBLIC asm_wa_priority_queue_push, asm0_wa_priority_queue_push
@@ -45,7 +46,8 @@ asm0_wa_priority_queue_push:
    add hl,hl
    ex de,hl
    
-  ; hl = & queue.data[last_item]
+  ; hl = & queue.data[last_item
+
   ; de = index of last item in bytes
   ; stack = queue*
    
@@ -63,10 +65,12 @@ asm0_wa_priority_queue_push:
    inc hl
    ld b,(hl)                   ; bc = queue.data
    
-   pop hl                      ; hl = & queue.data[last_item]
+   pop hl                      ; hl = & queue.data[last_item
+
 
    ; de = index of last_item in bytes
-   ; hl = & queue.data[last_item]
+   ; hl = & queue.data[last_item
+
    ; bc = queue.data
    ; ix = compare
 

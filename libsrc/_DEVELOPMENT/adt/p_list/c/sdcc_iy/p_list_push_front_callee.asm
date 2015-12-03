@@ -1,6 +1,7 @@
 
 ; void *p_list_push_front_callee(p_list_t *list, void *item)
 
+SECTION code_clib
 SECTION code_adt_p_list
 
 PUBLIC _p_list_push_front_callee

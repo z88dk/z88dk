@@ -1,6 +1,7 @@
 
 ; void free_unlocked(void *p)
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC free_unlocked

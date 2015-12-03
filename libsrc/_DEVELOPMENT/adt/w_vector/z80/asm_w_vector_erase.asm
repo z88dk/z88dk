@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_w_vector
 
 PUBLIC asm_w_vector_erase
@@ -23,7 +24,8 @@ defc asm_w_vector_erase = asm_w_array_erase
    ;
    ; exit  : success
    ;
-   ;            de = & vector.data[idx]
+   ;            de = & vector.data[idx
+
    ;            hl = idx = idx of word following the one removed
    ;            carry reset
    ;

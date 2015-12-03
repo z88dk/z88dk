@@ -1,6 +1,7 @@
 
 ; intmax_t imaxabs_fastcall(intmax_t j)
 
+SECTION code_clib
 SECTION code_inttypes
 
 PUBLIC _imaxabs_fastcall

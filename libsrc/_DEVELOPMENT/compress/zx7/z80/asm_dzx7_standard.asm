@@ -12,6 +12,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION code_clib
 SECTION code_compress_zx7
 
 PUBLIC asm_dzx7_standard

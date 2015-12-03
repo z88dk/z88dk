@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_ba_stack
 
 PUBLIC asm_ba_stack_clear

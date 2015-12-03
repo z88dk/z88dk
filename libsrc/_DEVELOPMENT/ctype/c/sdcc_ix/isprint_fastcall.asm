@@ -1,6 +1,7 @@
 
 ; int isprint_fastcall(int c)
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC _isprint_fastcall

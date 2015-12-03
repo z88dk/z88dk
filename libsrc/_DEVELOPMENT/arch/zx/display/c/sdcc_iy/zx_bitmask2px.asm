@@ -1,6 +1,7 @@
 
 ; uint zx_bitmask2px(uchar bitmask)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_bitmask2px

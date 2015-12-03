@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_math
 
 PUBLIC l_small_mul_40_32x8

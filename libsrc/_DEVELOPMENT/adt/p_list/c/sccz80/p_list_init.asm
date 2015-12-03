@@ -1,6 +1,7 @@
 
 ; void p_list_init(void *p)
 
+SECTION code_clib
 SECTION code_adt_p_list
 
 PUBLIC p_list_init

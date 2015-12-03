@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_p_forward_list_alt
 
 PUBLIC asm_p_forward_list_alt_front

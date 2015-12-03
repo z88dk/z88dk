@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC asm_in_inkey
@@ -44,7 +45,8 @@ asm_in_inkey:
    ; 3     ESC     2     3     5     4     6     1     7
    ; 4      F1    F2    F7    F5    F6    F3    F8    F4
    ; 5         ERASE     ^     0     -     9           8
-   ; 6             ]     :     L     ;     K           J
+   ; 6             
+     :     L     ;     K           J
    ; 7     ALT ENTER   LEFT  HOLD   UP   RIGHT DOWN  STOP
    ; 8     INS SPACE R.SH.     .     /     ,   DEL     M
    ; 9                   [     P     @     0           I

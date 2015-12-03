@@ -1,6 +1,7 @@
 
 ; void *fzx_string_partition_ww(struct fzx_font *ff, char *s, uint16_t allowed_width)
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_string_partition_ww

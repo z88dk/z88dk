@@ -1,6 +1,7 @@
 
 ; uint zx_saddr2py(void *saddr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC zx_saddr2py

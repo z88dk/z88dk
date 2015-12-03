@@ -1,6 +1,7 @@
 
 ; int isgraph(int c)
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC isgraph

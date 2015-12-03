@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_math
 
 PUBLIC l_fast_mulu_32_16x16

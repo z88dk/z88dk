@@ -1,6 +1,7 @@
 
 ; uint16_t in_stick_ext2(void)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC _in_stick_ext2

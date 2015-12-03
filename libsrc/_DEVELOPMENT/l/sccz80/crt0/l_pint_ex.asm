@@ -4,6 +4,7 @@
 ;
 ;       23/1/2001  djm
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_pint_ex

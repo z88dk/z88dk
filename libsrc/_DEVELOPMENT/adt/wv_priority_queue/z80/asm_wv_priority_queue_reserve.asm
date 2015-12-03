@@ -11,6 +11,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_wv_priority_queue
 
 PUBLIC asm_wv_priority_queue_reserve

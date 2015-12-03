@@ -1,6 +1,7 @@
 
 ; int fgetc_unlocked_fastcall(FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _fgetc_unlocked_fastcall

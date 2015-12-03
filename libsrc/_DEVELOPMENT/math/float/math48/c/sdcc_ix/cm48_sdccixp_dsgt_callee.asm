@@ -1,6 +1,7 @@
 
 ; char __fsgt_callee(float left, float right)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccixp_dsgt_callee

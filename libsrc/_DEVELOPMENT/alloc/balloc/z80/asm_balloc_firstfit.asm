@@ -5,11 +5,13 @@
 ; 
 ; void *balloc_firstfit(unsigned int queue, unsigned char num)
 ;
-; Allocate a block from the first queue in [queue, queue+num-1]
+; Allocate a block from the first queue in [queue, queue+num-1
+
 ; that has a block available.
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_alloc_balloc
 
 PUBLIC asm_balloc_firstfit

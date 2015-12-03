@@ -1,6 +1,7 @@
 
 ; void funlockfile(FILE *file)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC funlockfile

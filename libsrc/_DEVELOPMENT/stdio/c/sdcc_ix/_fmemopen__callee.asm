@@ -1,6 +1,7 @@
 
 ; FILE *_fmemopen__callee(void **bufp, size_t *sizep, const char *mode)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC __fmemopen__callee, l0__fmemopen__callee

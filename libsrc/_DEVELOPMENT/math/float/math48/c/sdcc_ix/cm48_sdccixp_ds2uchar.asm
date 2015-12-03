@@ -1,6 +1,7 @@
 
 ; unsigned char __fs2uchar (float f)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccixp_ds2uchar

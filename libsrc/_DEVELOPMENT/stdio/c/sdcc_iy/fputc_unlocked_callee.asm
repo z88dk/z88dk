@@ -1,6 +1,7 @@
 
 ; int fputc_unlocked_callee(int c, FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _fputc_unlocked_callee

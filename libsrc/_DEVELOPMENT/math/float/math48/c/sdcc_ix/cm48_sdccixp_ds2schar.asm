@@ -1,6 +1,7 @@
 
 ; signed char __fs2schar (float f)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccixp_ds2schar

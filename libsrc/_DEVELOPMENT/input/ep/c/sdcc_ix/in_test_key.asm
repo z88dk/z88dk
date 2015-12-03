@@ -1,6 +1,7 @@
 
 ; int in_test_key(void)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC _in_test_key

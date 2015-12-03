@@ -3,6 +3,7 @@
 ;       Convert signed long to int
 ;       NB. This routine will only work if long < +/-32767ish (obvious)
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_long2int_s

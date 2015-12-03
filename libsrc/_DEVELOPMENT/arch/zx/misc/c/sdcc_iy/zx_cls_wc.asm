@@ -1,6 +1,7 @@
 
 ; void zx_cls_wc(struct r_Rect8 *r, uchar attr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_cls_wc

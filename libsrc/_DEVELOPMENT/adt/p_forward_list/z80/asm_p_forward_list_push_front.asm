@@ -11,6 +11,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_p_forward_list
 
 PUBLIC asm_p_forward_list_push_front

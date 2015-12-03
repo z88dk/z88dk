@@ -1,6 +1,7 @@
 
 ; int16_t in_mouse_amx_wheel_delta(void)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC in_mouse_amx_wheel_delta

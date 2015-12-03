@@ -1,5 +1,5 @@
 
-
+SECTION code_clib
 SECTION code_adt_b_array
 
 PUBLIC __array_at

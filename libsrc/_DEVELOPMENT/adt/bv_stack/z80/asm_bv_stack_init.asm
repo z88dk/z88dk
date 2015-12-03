@@ -13,6 +13,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_bv_stack
 
 PUBLIC asm_bv_stack_init

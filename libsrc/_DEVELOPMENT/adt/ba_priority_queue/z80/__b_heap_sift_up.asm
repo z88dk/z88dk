@@ -1,4 +1,4 @@
-
+SECTION code_clib
 SECTION code_adt_ba_priority_queue
 
 PUBLIC __b_heap_sift_up

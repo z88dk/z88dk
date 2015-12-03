@@ -1,6 +1,7 @@
 
 ; void bv_stack_destroy(bv_stack_t *s)
 
+SECTION code_clib
 SECTION code_adt_bv_stack
 
 PUBLIC bv_stack_destroy

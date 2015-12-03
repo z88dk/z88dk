@@ -1,4 +1,5 @@
 
+SECTION smc_clib
 SECTION smc_sound_bit
 
 PUBLIC _bitfx_13

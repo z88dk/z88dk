@@ -1,4 +1,5 @@
 
+SECTION rodata_font
 SECTION rodata_font_8x8
 
 PUBLIC _font_8x8_zx_system

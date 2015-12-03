@@ -1,6 +1,7 @@
 
 ; float __fsadd (float a1, float a2)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciyp_dsadd

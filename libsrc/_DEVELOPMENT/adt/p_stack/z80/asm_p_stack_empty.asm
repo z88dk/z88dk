@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_p_stack
 
 PUBLIC asm_p_stack_empty

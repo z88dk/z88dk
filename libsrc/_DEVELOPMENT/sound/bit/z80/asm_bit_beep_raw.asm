@@ -12,6 +12,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION code_clib
 SECTION code_sound_bit
 
 PUBLIC asm_bit_beep_raw

@@ -17,6 +17,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC asm_heap_alloc_aligned_unlocked
@@ -125,7 +126,8 @@ block_loop:
    
    inc hl
    inc hl
-   inc hl                      ; hl = & block.mem[]
+   inc hl                      ; hl = & block.mem[
+
    
    ; check if memory address is aligned
    

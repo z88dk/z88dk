@@ -1,6 +1,7 @@
 
 ; void *aligned_alloc_unlocked(size_t alignment, size_t size)
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC aligned_alloc_unlocked

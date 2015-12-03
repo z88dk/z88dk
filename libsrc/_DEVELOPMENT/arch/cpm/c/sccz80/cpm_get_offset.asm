@@ -2,6 +2,7 @@
 ; unsigned long cpm_get_offset(void *p)
 ; fastcall
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC cpm_get_offset

@@ -1,6 +1,7 @@
 
 ; void *zx_saddrpdown_fastcall(void *saddr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_saddrpdown_fastcall

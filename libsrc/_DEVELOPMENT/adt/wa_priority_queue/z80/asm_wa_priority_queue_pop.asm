@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_wa_priority_queue
 
 PUBLIC asm_wa_priority_queue_pop
@@ -66,7 +67,8 @@ asm_wa_priority_queue_pop:
    ld e,l
    ld d,h                      ; de = queue.data
    
-   add hl,bc                   ; hl = & queue.data[last_item]
+   add hl,bc                   ; hl = & queue.data[last_item
+
    
    ex de,hl
    call __w_heap_swap          ; swap(first_item, last_item)

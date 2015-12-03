@@ -1,6 +1,7 @@
 
 ; int in_key_pressed_fastcall(uint16_t scancode)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC _in_key_pressed_fastcall

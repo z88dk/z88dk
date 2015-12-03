@@ -1,6 +1,7 @@
 
 ; size_t getline_unlocked_callee(char **lineptr, size_t *n, FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _getline_unlocked_callee

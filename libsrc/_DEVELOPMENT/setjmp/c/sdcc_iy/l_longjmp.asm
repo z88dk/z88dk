@@ -3,6 +3,7 @@
 
 ; void l_longjmp(jmp_buf *env, int val)
 
+SECTION code_clib
 SECTION code_setjmp
 
 PUBLIC _l_longjmp

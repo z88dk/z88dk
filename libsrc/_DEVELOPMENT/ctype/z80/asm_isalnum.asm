@@ -1,11 +1,13 @@
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC asm_isalnum
 
 asm_isalnum:
 
-   ; determine if char is in [0-9A-Za-z]
+   ; determine if char is in [0-9A-Za-z
+
    
    ; enter : a = char
    ; exit  : carry set if not alphanumeric

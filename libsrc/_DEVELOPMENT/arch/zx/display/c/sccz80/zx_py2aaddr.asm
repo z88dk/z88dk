@@ -1,6 +1,7 @@
 
 ; void *zx_py2aaddr(uchar y)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC zx_py2aaddr

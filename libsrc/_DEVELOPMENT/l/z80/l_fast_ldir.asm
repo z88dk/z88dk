@@ -3,11 +3,13 @@ INCLUDE "clib_cfg.asm"
 
 IF __CLIB_OPT_FASTCOPY & $c0
 
-   SECTION smc_l
+   SECTION code_clib
+SECTION smc_l
 
 ELSE
 
-   SECTION code_l
+   SECTION code_clib
+SECTION code_l
 
 ENDIF
 

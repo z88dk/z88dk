@@ -1,5 +1,6 @@
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_tty
 
 PUBLIC asm_tty_reset, asm0_tty_reset
 

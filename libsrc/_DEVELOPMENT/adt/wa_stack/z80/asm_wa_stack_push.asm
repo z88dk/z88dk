@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_wa_stack
 
 PUBLIC asm_wa_stack_push
@@ -24,7 +25,8 @@ defc asm_wa_stack_push = asm_w_array_append
    ;
    ;         success
    ;
-   ;            de = & stack.data[idx]
+   ;            de = & stack.data[idx
+
    ;            hl = idx of appended word
    ;            carry reset
    ;

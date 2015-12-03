@@ -1,6 +1,7 @@
 
 ; int printf_unlocked(const char *format, ...)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _printf_unlocked

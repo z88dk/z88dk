@@ -1,6 +1,7 @@
 
 ; void *zx_cy2aaddr(uchar row)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_cy2aaddr

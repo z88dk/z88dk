@@ -1,6 +1,7 @@
 
 ; uint16_t in_pause(uint16_t dur_ms)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC _in_pause

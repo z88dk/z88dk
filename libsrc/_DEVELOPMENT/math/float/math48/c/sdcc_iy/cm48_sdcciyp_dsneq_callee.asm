@@ -1,6 +1,7 @@
 
 ; char __fsneq_callee(float left, float right)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciyp_dsneq_callee

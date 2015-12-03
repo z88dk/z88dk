@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_bv_priority_queue
 
 PUBLIC asm_bv_priority_queue_push

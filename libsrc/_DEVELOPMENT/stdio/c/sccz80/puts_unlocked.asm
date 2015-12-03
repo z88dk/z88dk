@@ -1,6 +1,7 @@
 
 ; int puts_unlocked(const char *s)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC puts_unlocked

@@ -1,6 +1,7 @@
 
 ; int fseek_unlocked(FILE *stream, long offset, int whence)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC fseek_unlocked

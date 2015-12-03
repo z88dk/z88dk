@@ -1,6 +1,7 @@
 
 ; void bit_beepfx_fastcall(void *effect)
 
+SECTION code_clib
 SECTION code_sound_bit
 
 PUBLIC _bit_beepfx_fastcall

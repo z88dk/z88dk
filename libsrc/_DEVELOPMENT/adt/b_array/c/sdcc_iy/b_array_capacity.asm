@@ -1,6 +1,7 @@
 
 ; size_t b_array_capacity(b_array_t *a)
 
+SECTION code_clib
 SECTION code_adt_b_array
 
 PUBLIC _b_array_capacity

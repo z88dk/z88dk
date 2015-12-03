@@ -1,6 +1,7 @@
 
 ; int ferror_unlocked(FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC ferror_unlocked

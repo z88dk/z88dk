@@ -1,6 +1,7 @@
 
 ; void *obstack_copy_callee(struct obstack *ob, void *address, size_t size)
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC _obstack_copy_callee

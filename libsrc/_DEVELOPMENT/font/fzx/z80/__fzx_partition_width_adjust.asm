@@ -1,4 +1,5 @@
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC __fzx_partition_width_adjust

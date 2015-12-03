@@ -1,6 +1,7 @@
 
 ; size_t w_array_capacity(w_array_t *a)
 
+SECTION code_clib
 SECTION code_adt_w_array
 
 PUBLIC _w_array_capacity

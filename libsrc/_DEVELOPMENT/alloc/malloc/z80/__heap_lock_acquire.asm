@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC __heap_lock_acquire

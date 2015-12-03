@@ -1,6 +1,7 @@
 
 ; void balloc_free(void *m)
 
+SECTION code_clib
 SECTION code_alloc_balloc
 
 PUBLIC _balloc_free

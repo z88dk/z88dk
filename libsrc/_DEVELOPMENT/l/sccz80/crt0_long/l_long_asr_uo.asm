@@ -11,6 +11,7 @@
 ;
 ;       aralbrec 01/2007 Sped up, would be better with a or b = counter
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_long_asr_uo

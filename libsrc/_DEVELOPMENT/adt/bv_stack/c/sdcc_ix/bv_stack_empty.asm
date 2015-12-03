@@ -1,6 +1,7 @@
 
 ; int bv_stack_empty(bv_stack_t *s)
 
+SECTION code_clib
 SECTION code_adt_bv_stack
 
 PUBLIC _bv_stack_empty

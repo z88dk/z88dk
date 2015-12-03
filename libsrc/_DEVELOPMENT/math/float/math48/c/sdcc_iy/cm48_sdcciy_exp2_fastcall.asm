@@ -1,6 +1,7 @@
 
 ; float exp2(float x) __z88dk_fastcall
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciy_exp2_fastcall

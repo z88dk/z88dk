@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC derror_edom_infc, derror_edom_pinfc, derror_edom_minfc

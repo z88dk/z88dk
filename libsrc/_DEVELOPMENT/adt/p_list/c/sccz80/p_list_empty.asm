@@ -1,6 +1,7 @@
 
 ; int p_list_empty(p_list_t *list)
 
+SECTION code_clib
 SECTION code_adt_p_list
 
 PUBLIC p_list_empty

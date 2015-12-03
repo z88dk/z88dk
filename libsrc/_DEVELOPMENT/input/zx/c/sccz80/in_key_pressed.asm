@@ -1,6 +1,7 @@
 
 ; int in_key_pressed(uint16_t scancode)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC in_key_pressed

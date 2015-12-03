@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_wa_stack
 
 PUBLIC asm_wa_stack_init

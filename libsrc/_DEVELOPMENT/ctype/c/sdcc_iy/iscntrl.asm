@@ -1,6 +1,7 @@
 
 ; int iscntrl(int c)
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC _iscntrl

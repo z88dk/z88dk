@@ -6,6 +6,7 @@
 ;
 ;       22/3/99 djm Rewritten to be shorter.. unsigned version
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_asr_u

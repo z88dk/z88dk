@@ -1,6 +1,7 @@
 
 ; int wv_priority_queue_reserve_callee(wv_priority_queue_t *q, size_t n)
 
+SECTION code_clib
 SECTION code_adt_wv_priority_queue
 
 PUBLIC _wv_priority_queue_reserve_callee

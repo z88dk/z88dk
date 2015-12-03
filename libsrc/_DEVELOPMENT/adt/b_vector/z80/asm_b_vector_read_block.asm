@@ -12,6 +12,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_b_vector
 
 PUBLIC asm_b_vector_read_block

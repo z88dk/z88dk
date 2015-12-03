@@ -1,11 +1,13 @@
 
+SECTION code_clib
 SECTION code_l
 
 PUBLIC l_valid_base
 
 l_valid_base:
 
-   ; check if base is in [2-36]
+   ; check if base is in [2-36
+
    ;
    ; enter : bc = base
    ;

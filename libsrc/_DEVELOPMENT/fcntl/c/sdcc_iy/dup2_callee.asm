@@ -1,6 +1,7 @@
 
 ; int dup2_callee(int fd, int fd2)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC _dup2_callee

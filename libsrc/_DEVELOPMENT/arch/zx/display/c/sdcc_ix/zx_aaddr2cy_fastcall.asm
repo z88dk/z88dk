@@ -1,6 +1,7 @@
 
 ; uint zx_aaddr2cy_fastcall(void *attraddr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_aaddr2cy_fastcall

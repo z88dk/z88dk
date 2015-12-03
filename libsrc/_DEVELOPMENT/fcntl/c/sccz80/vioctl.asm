@@ -1,6 +1,7 @@
 
 ; int vioctl(int fd, uint16_t request, void *arg)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC vioctl

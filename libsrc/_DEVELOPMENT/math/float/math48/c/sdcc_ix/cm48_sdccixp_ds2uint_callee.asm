@@ -1,6 +1,7 @@
 
 ; signed int __fs2suint_callee(float f)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccixp_ds2uint_callee

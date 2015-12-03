@@ -1,6 +1,7 @@
 
 ; void rewind_unlocked(FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _rewind_unlocked

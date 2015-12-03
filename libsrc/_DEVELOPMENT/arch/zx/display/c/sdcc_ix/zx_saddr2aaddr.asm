@@ -1,6 +1,7 @@
 
 ; void *zx_saddr2aaddr(void *saddr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_saddr2aaddr

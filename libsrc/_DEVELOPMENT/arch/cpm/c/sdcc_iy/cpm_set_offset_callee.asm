@@ -2,6 +2,7 @@
 ; void cpm_set_offset(void *p, unsigned long offset)
 ; callee
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _cpm_set_offset_callee

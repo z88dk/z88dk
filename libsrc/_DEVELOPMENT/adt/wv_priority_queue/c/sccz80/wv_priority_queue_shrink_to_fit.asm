@@ -1,6 +1,7 @@
 
 ; int wv_priority_queue_shrink_to_fit(wv_priority_queue_t *q)
 
+SECTION code_clib
 SECTION code_adt_wv_priority_queue
 
 PUBLIC wv_priority_queue_shrink_to_fit

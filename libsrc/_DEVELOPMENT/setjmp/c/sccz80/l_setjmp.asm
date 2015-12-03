@@ -3,6 +3,7 @@
 
 ; int l_setjmp(jmp_buf *env)
 
+SECTION code_clib
 SECTION code_setjmp
 
 PUBLIC l_setjmp

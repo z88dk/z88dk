@@ -1,6 +1,7 @@
 
 ; void zx_border(uchar colour)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC zx_border

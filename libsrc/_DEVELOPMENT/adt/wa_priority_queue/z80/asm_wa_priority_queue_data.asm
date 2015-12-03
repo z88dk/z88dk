@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_wa_priority_queue
 
 PUBLIC asm_wa_priority_queue_data

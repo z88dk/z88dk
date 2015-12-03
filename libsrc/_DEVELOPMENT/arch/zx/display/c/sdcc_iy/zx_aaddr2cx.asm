@@ -1,6 +1,7 @@
 
 ; uint zx_aaddr2cx(void *attraddr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_aaddr2cx

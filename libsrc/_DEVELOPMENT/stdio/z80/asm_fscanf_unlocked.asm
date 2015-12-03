@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC asm_fscanf_unlocked

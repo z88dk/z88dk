@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_math
 
 PUBLIC l_small_divs_16_16x16, l0_small_divs_16_16x16

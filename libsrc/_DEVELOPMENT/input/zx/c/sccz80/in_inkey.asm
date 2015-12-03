@@ -1,6 +1,7 @@
 
 ; int in_inkey(void)
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC in_inkey

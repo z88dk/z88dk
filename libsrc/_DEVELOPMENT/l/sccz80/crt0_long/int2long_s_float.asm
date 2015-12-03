@@ -2,6 +2,7 @@
 ;
 ;       Convert signed int to long
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_int2long_s_float

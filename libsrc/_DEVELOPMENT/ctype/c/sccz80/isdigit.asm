@@ -1,6 +1,7 @@
 
 ; int isdigit(int c)
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC isdigit

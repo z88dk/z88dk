@@ -1,6 +1,7 @@
 
 ; int dup2(int fd, int fd2)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC dup2

@@ -1,6 +1,7 @@
 
 ; void *zx_aaddrcdown(void *attraddr)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC zx_aaddrcdown

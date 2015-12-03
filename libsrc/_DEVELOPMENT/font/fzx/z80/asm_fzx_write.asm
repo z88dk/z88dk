@@ -3,6 +3,7 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC asm_fzx_write

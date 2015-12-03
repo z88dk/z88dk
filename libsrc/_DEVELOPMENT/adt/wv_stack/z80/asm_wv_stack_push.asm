@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_wv_stack
 
 PUBLIC asm_wv_stack_push
@@ -24,7 +25,8 @@ defc asm_wv_stack_push = asm_w_vector_append
    ;
    ;         success
    ;
-   ;            de = & stack.data[idx]
+   ;            de = & stack.data[idx
+
    ;            hl = idx of appended char
    ;            carry reset
    ;

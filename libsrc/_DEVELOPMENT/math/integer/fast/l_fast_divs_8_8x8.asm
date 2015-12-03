@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_math
 
 PUBLIC l_fast_divs_8_8x8, l0_fast_divs_8_8x8

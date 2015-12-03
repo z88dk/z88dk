@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_adt_w_vector
 
 PUBLIC asm_w_vector_erase_range
@@ -23,7 +24,8 @@ defc asm_w_vector_erase_range = asm_w_array_erase_range
    ;
    ; exit  : success
    ;
-   ;            de = & vector.data[idx]
+   ;            de = & vector.data[idx
+
    ;            hl = idx_first = idx of first word following erased
    ;            carry reset
    ;

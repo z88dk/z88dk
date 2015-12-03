@@ -8,6 +8,7 @@
 ;       aralbrec 01/2007
 ;       sped up some more
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_long_asr

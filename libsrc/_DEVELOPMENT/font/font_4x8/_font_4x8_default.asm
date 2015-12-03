@@ -1,4 +1,5 @@
 
+SECTION rodata_font
 SECTION rodata_font_4x8
 
 PUBLIC _font_4x8_default

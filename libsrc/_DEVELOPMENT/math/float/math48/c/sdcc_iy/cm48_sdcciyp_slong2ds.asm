@@ -1,6 +1,7 @@
 
 ; float __slong2fs (signed long sl)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdcciyp_slong2ds

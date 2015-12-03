@@ -1,6 +1,7 @@
 
 ; void *heap_alloc_fixed_unlocked(void *heap, void *p, size_t size)
 
+SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC heap_alloc_fixed_unlocked

@@ -1,6 +1,7 @@
 
 ; int tolower(int c)
 
+SECTION code_clib
 SECTION code_ctype
 
 PUBLIC tolower

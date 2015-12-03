@@ -1,6 +1,7 @@
 
 ; float __uchar2fs_callee(unsigned char uc)
 
+SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC cm48_sdccixp_uchar2ds_callee

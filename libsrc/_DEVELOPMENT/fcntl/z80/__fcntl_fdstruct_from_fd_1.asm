@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC __fcntl_fdstruct_from_fd_1

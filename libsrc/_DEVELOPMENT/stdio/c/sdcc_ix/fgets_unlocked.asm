@@ -1,6 +1,7 @@
 
 ; char *fgets_unlocked(char *s, int n, FILE *stream)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC _fgets_unlocked

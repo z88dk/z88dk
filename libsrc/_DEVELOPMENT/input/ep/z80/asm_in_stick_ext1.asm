@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_input
 
 PUBLIC asm_in_stick_ext1, asm_in_stick_ext1_0

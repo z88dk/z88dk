@@ -5,6 +5,7 @@
 ;
 ; This is the unsigned routine...disregards signs and just does it..
 
+SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_div_u

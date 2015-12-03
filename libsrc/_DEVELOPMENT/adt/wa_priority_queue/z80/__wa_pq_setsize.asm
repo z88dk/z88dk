@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_adt_wa_priority_queue
 
 PUBLIC __wa_pq_setsize

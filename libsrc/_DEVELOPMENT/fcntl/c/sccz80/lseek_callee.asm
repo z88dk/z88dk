@@ -1,6 +1,7 @@
 
 ; off_t lseek(int fd, off_t offset, int whence)
 
+SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC lseek_callee, l0_lseek_callee

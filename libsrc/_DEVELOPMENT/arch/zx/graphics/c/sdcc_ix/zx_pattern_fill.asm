@@ -1,6 +1,7 @@
 
 ; int zx_pattern_fill(uint x, uint y, void *pattern, uint depth)
 
+SECTION code_clib
 SECTION code_arch
 
 PUBLIC _zx_pattern_fill

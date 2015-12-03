@@ -1,6 +1,7 @@
 
 ; int vfscanf_unlocked(FILE *stream, const char *format, void *arg)
 
+SECTION code_clib
 SECTION code_stdio
 
 PUBLIC vfscanf_unlocked_callee

@@ -12,6 +12,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_alloc_obstack
 
 PUBLIC obstack_blank_fast_callee

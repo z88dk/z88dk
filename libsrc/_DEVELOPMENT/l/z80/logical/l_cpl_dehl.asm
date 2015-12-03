@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_l
 
 PUBLIC l_cpl_dehl, l_cpl_dehl_hl
