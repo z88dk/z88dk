@@ -111,7 +111,6 @@ ELSE
 
 ENDIF
 
-   defm "2.0a"
    defs 0x0010 - ASMPC
 
    ; address = 0x0010
@@ -128,7 +127,6 @@ ELSE
 
 ENDIF
 
-   defm "zxsp"
    defs 0x0018 - ASMPC
 
    ; address = 0x0018
@@ -144,7 +142,6 @@ ELSE
 
 ENDIF
 
-   defm "if 2"
    defs 0x0020 - ASMPC
 
    ; address = 0x0020
@@ -160,7 +157,6 @@ ELSE
 
 ENDIF
 
-   defm "2015"
    defs 0x0028 - ASMPC
 
    ; address = 0x0028
@@ -286,7 +282,7 @@ __Start:
    
    ; commandline
    
-   IF __crt_enable_commandline = 1
+   IF __crt_enable_commandline
    
       ld hl,0
       push hl                  ; argv[argc] = NULL

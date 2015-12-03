@@ -117,7 +117,7 @@ __Restart:
 
    ; parse command line
    
-   IF __crt_enable_commandline = 1
+   IF __crt_enable_commandline
    
       ld hl,0
       push hl                  ; argv[argc] = NULL

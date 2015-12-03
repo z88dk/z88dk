@@ -45,8 +45,6 @@ include "clib_target_constants.inc"
 
 
 
-
-
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
@@ -64,6 +62,7 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
+   SECTION data_clib
    SECTION data_stdio
    
    ; FILE *
@@ -221,6 +220,7 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
+   SECTION data_clib
    SECTION data_stdio
    
    ; FILE *
@@ -379,6 +379,7 @@ include "clib_target_constants.inc"
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
       
+   SECTION data_clib
    SECTION data_stdio
       
    ; FILE *
@@ -448,9 +449,10 @@ include "clib_target_constants.inc"
    ; 3 = number of static FILEs instantiated in crt
    ; __i_stdio_file_n   = address of static FILE structure #n (0..I_STDIO_FILE_NUM-1)
 
+   SECTION data_clib
    SECTION data_stdio
 
-   IF (__clib_fopen_max > 0) | (3 > 0)
+   IF (__clib_fopen_max > 0) || (3 > 0)
 
       ; number of FILEs > 0
 
@@ -460,6 +462,7 @@ include "clib_target_constants.inc"
    
          ; number of FILEs statically generated > 0
       
+         SECTION data_clib
          SECTION data_stdio
       
          PUBLIC __stdio_open_file_list
@@ -470,6 +473,7 @@ include "clib_target_constants.inc"
    
          ; number of FILEs statically generated = 0
    
+         SECTION bss_clib
          SECTION bss_stdio
       
          PUBLIC __stdio_open_file_list
@@ -480,6 +484,7 @@ include "clib_target_constants.inc"
    
       ; construct list of closed / available FILEs
    
+      SECTION data_clib
       SECTION data_stdio
   
       PUBLIC __stdio_closed_file_list
@@ -490,6 +495,7 @@ include "clib_target_constants.inc"
 
          ; create extra FILE structures
      
+         SECTION bss_clib
          SECTION bss_stdio
       
          __stdio_file_extra:      defs (__clib_fopen_max - 3) * 15
@@ -520,15 +526,19 @@ include "clib_target_constants.inc"
 
    ENDIF
 
-   IF (__clib_fopen_max = 0) & (3 = 0)
+   IF (__clib_fopen_max = 0) && (3 = 0)
    
       ; create empty file lists
       
+      SECTION bss_clib
       SECTION bss_stdio
+      
       PUBLIC __stdio_open_file_list
       __stdio_open_file_list:  defw 0
       
+      SECTION data_clib
       SECTION data_stdio
+      
       PUBLIC __stdio_closed_file_list
       __stdio_closed_file_list:   defw 0, __stdio_closed_file_list
 
@@ -573,6 +583,7 @@ include "clib_target_constants.inc"
    
          ; create fd table in bss segment
 
+         SECTION bss_clib
          SECTION bss_fcntl
          
          __fcntl_fdtbl:        defs __clib_open_max * 2
@@ -602,6 +613,7 @@ include "clib_target_constants.inc"
    
       ; static FDSTRUCTs have been allocated in the heap
       
+      SECTION data_clib
       SECTION data_fcntl
 
       PUBLIC __stdio_heap
@@ -653,12 +665,14 @@ include "clib_target_constants.inc"
       
       IF __clib_stdio_heap_size > 14
       
+         SECTION data_clib
          SECTION data_fcntl
          
          PUBLIC __stdio_heap
          
          __stdio_heap:         defw __stdio_block
          
+         SECTION bss_clib
          SECTION bss_fcntl
          
          PUBLIC __stdio_block
@@ -722,7 +736,7 @@ __Restart:
 
    ; parse command line
    
-   IF __crt_enable_commandline = 1
+   IF __crt_enable_commandline
    
       ld hl,0
       push hl                  ; argv[argc] = NULL
