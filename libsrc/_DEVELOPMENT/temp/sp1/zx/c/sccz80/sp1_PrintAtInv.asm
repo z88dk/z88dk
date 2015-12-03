@@ -1,6 +1,7 @@
 ; void sp1_PrintAtInv(uchar row, uchar col, uchar colour, uint tile)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC sp1_PrintAtInv

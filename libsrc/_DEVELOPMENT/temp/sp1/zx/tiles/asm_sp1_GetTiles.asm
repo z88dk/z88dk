@@ -4,6 +4,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC asm_sp1_GetTiles

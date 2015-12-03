@@ -1,5 +1,6 @@
 ; void sp1_Initialize(uchar iflag, uchar colour, uchar tile)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_Initialize

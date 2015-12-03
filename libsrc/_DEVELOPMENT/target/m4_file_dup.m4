@@ -24,6 +24,7 @@ define(`m4_file_dup',dnl
 
    `ifelse($1,0,,dnl
    
+   SECTION data_clib
    SECTION data_stdio
       
    ; FILE *

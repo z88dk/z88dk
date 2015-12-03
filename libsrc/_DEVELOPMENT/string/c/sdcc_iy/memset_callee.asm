@@ -1,6 +1,7 @@
 
 ; void *memset_callee(void *s, int c, size_t n)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _memset_callee

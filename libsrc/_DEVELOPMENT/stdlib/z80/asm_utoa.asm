@@ -12,6 +12,7 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC asm_utoa
@@ -22,7 +23,8 @@ EXTERN error_zc, l_valid_base, error_einval_zc, l0_divu_16_16x8, l_num2char
 asm_utoa:
 
    ; enter : hl = uint num
-   ;         bc = int radix [2,36]
+   ;         bc = int radix [2,36
+
    ;         de = char *buf
    ;
    ; exit  : hl = address of terminating 0 in buf

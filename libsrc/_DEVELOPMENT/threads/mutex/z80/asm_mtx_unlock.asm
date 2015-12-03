@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_threads_mutex
 
 PUBLIC asm_mtx_unlock

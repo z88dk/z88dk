@@ -3,7 +3,6 @@
 ;; memory model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 SECTION CODE
@@ -16,16 +15,23 @@ section code_crt_exit
 section code_crt_return
 section code_crt_common
 
-include "../../clib_code.inc"
-include "../../clib_rodata.inc"
-
+section code_driver
+section code_font
+section code_clib
+  include "../../clib_code.inc"
 section code_lib
-section rodata_lib
-
 section code_compiler
-section rodata_compiler
-
 section code_user
+
+section rodata_driver
+section rodata_font
+section rodata_clib
+  include "../../clib_rodata.inc"
+  ;;section rodata_error_strings
+  ;;section rodata_error_string_end
+  ;;defb 0
+section rodata_lib
+section rodata_compiler
 section rodata_user
 
 SECTION CODE_END
@@ -50,14 +56,24 @@ ENDIF
 
 defb 0
 
-include "../../clib_smc.inc"
-section smc_compiler
+section smc_driver
+section smc_font
+section smc_clib
+  include "../../clib_smc.inc"
 section smc_lib
+section smc_compiler
 section smc_user
 
-include "../../clib_data.inc"
-section data_compiler
+section data_driver
+section data_font
+section data_clib
+  include "../../clib_data.inc"
+  ;;section data_fcntl_stdio_heap_head
+  ;;section data_fcntl_stdio_heap_body
+  ;;section data_fcntl_stdio_heap_tail
+  ;;section data_fcntl_fdtable_body
 section data_lib
+section data_compiler
 section data_user
 
 SECTION DATA_END
@@ -83,12 +99,15 @@ ENDIF
 defb 0
 
 section BSS_UNINITIALIZED
-include "../../clib_bss.inc"
-section bss_compiler
+
+section bss_driver
+section bss_font
+section bss_clib
+  include "../../clib_bss.inc"
 section bss_lib
+section bss_compiler
 section bss_user
 
 SECTION BSS_END
-
 
 ;; end memory model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

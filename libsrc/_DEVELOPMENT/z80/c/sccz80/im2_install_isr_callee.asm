@@ -1,6 +1,7 @@
 
 ; void im2_install_isr_callee(uint8_t vector, void *isr)
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC im2_install_isr_callee

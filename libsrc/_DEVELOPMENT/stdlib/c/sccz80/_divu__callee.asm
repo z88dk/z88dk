@@ -1,6 +1,7 @@
 
 ; void _divu_(divu_t *d, unsigned int numer, unsigned int denom)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC _divu__callee

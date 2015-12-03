@@ -1,6 +1,7 @@
 
 ; char *_strrstrip_(const char *s)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC __strrstrip_

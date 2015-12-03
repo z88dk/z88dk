@@ -1,5 +1,6 @@
 ; void sp1_GetSprClrAddr(struct sp1_ss *s, uchar **sprdest)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_GetSprClrAddr

@@ -1,6 +1,7 @@
 
 ; sp1_RemoveUpdateStruct
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_RemoveUpdateStruct

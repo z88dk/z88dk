@@ -1,6 +1,7 @@
 
 ; char *strrev(char *s)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strrev

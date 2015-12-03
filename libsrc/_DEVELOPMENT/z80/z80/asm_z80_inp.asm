@@ -9,6 +9,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC asm_z80_inp

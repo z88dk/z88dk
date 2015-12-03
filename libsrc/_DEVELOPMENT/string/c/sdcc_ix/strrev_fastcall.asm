@@ -1,6 +1,7 @@
 
 ; char *strrev_fastcall(char *s)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strrev_fastcall

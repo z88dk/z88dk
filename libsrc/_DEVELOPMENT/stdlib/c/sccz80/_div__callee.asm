@@ -1,6 +1,7 @@
 
 ; void _div_(div_t *d, int numer, int denom)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC _div__callee

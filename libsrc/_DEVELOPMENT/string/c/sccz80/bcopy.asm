@@ -2,6 +2,7 @@
 ; BSD
 ; void bcopy(const void *src, void *dst, size_t len)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC bcopy

@@ -1,6 +1,7 @@
 
 ; char *strrstrip_fastcall(char *s)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strrstrip_fastcall

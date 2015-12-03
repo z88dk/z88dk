@@ -1,6 +1,7 @@
 
 ; void srand_fastcall(unsigned int seed)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC _srand_fastcall

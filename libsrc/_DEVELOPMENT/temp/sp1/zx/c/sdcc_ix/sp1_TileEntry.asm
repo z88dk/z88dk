@@ -1,5 +1,6 @@
 ; void *sp1_TileEntry(uchar c, void *def)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_TileEntry

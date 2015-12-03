@@ -2,6 +2,7 @@
 ; 02.2008 aralbrec
 ; sinclair spectrum version
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC SP1PSPUSH

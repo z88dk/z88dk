@@ -1,6 +1,7 @@
 
 ; char *strnchr(const char *s, size_t n, int c)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC strnchr

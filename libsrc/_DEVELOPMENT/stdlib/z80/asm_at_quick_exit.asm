@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC asm_at_quick_exit

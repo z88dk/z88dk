@@ -1,6 +1,7 @@
 
 ; void *memmove(void *s1, const void *s2, size_t n)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC memmove_callee

@@ -1,6 +1,7 @@
 
 ; char *strerror_fastcall(int errnum)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strerror_fastcall

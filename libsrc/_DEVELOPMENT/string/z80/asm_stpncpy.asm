@@ -15,6 +15,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC asm_stpncpy
@@ -25,7 +26,8 @@ asm_stpncpy:
    ;         hl = char *s2 = src
    ;         bc = size_t n
    ;
-   ; exit  : hl = address in s1 of first NUL written or &s1[n]
+   ; exit  : hl = address in s1 of first NUL written or &s1[n
+
    ;         bc = 0
    ;         z flag set if NUL was written to s1
    ;

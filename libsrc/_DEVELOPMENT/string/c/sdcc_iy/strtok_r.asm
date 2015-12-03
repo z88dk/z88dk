@@ -1,6 +1,7 @@
 
 ; char *strtok_r(char * restrict s, const char * restrict sep, char ** restrict lasts)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strtok_r

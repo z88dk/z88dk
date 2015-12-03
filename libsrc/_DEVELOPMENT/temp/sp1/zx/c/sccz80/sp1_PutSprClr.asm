@@ -1,6 +1,7 @@
 ; void sp1_PutSprClr(uchar **sprdest, struct sp1_ap *src, uchar n)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC sp1_PutSprClr

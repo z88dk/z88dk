@@ -2,6 +2,7 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC asm_sp1_IterateUpdateArr

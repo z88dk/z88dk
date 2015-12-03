@@ -1,6 +1,7 @@
 
 ; int spinlock_tryacquire(char *spinlock)
 
+SECTION code_clib
 SECTION code_threads_mutex
 
 PUBLIC spinlock_tryacquire

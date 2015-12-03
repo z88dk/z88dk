@@ -1,5 +1,6 @@
 ; void __CALLEE__ sp1_ChangeSprType_callee(struct sp1_cs *c, void *drawf)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC sp1_ChangeSprType_callee

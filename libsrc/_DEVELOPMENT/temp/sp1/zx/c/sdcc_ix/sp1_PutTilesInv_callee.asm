@@ -1,5 +1,6 @@
 ; void sp1_PutTilesInv(struct sp1_Rect *r, struct sp1_tp *src)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_PutTilesInv_callee, l0_sp1_PutTilesInv_callee

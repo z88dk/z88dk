@@ -1,6 +1,7 @@
 
 ; void *memmem_callee(const void *big, size_t big_len, const void *little, size_t little_len)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _memmem_callee, l0_memmem_callee

@@ -1,6 +1,7 @@
 
 ; int atoi(const char *buf)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC atoi

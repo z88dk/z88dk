@@ -1,6 +1,7 @@
 
 ; char *strupr_fastcall(char *s)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strupr_fastcall

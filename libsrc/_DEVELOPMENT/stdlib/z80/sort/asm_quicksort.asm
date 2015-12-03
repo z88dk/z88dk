@@ -49,6 +49,7 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC asm_quicksort
@@ -155,7 +156,8 @@ IF (__CLIB_OPT_SORT_QSORT & $03) = 0
    ; bc = size
    ; carry reset
 
-   ; compute the address of the middle item k in the interval [i,j]
+   ; compute the address of the middle item k in the interval [i,j
+
    ; k = (i+j)/2 - ((j-i)/2)%size
    ;   = i + (j-i)/2 - ((j-i)/2)%size  (-- Einar Saukas)
 
@@ -345,7 +347,8 @@ left_squeeze_0:
 
 left_squeeze_1:
 
-   ; investigating [i,j]
+   ; investigating [i,j
+
    ; items before i are <= pivot and items after j are >= pivot
    
    ; de = i

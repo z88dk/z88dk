@@ -1,5 +1,6 @@
 ; uint sp1_ScreenStr(uchar row, uchar col)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_ScreenStr_callee

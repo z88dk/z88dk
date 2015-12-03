@@ -2,6 +2,7 @@
 ; 02.2008 aralbrec, Sprite Pack v3.0
 ; zxz81 hi-res version
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC sp1_PrintString_callee

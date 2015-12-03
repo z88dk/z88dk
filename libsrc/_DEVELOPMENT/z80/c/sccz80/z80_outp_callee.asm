@@ -1,6 +1,7 @@
 
 ; void z80_outp(uint16_t port, uint8_t data)
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC z80_outp_callee

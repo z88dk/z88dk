@@ -4,6 +4,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC asm_sp1_PutTilesInv
@@ -54,7 +55,8 @@ asm_sp1_PutTilesInv:
 .skipinval
 
    inc de
-   ldi                                ; copy colour and tile from struct sp1_tp[]
+   ldi                                ; copy colour and tile from struct sp1_tp[
+
    ldi                                ; into struct sp1_update
    ldi
    ld a,6
@@ -71,7 +73,8 @@ asm_sp1_PutTilesInv:
    ld bc,10*SP1V_DISPWIDTH
    add hl,bc                          ; hl = struct sp1_update * one row down leftmost column
    pop de
-   ex de,hl                           ; de = struct sp1_update * down one row, hl = struct sp1_tp[]
+   ex de,hl                           ; de = struct sp1_update * down one row, hl = struct sp1_tp[
+
    pop bc                             ; b = width
 
    ex af,af                           ; a = height

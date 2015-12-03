@@ -1,6 +1,7 @@
 
 ; void *im2_create_generic_isr_8080_callee(uint8_t num_callback, void *address)
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC _im2_create_generic_isr_8080_callee, l_im2_create_generic_isr_8080_callee

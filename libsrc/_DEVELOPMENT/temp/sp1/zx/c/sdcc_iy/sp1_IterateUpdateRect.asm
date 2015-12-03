@@ -1,5 +1,6 @@
 ; void sp1_IterateUpdateRect(struct sp1_Rect *r, void *hook)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_IterateUpdateRect

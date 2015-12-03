@@ -12,6 +12,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC asm_strstrip

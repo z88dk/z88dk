@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC __str_locate_nul

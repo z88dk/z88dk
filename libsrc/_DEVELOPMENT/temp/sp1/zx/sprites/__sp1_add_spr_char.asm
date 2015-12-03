@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC __sp1_add_spr_char

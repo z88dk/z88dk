@@ -1,6 +1,7 @@
 
 ; void im2_init_fastcall(void *im2_table)
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC _im2_init_fastcall

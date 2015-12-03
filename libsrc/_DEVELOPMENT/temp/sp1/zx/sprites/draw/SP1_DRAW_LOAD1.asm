@@ -5,6 +5,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _SP1_DRAW_LOAD1

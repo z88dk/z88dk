@@ -1,6 +1,7 @@
 
 ; _Noreturn void exit(int status)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC _exit

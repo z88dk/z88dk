@@ -1,6 +1,7 @@
 
 ; int atexit(void (*func)(void))
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC atexit

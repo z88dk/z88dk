@@ -1,5 +1,6 @@
 ; void __CALLEE__ sp1_GetTiles_callee(struct sp1_Rect *r, struct sp1_tp *dest)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC sp1_GetTiles_callee

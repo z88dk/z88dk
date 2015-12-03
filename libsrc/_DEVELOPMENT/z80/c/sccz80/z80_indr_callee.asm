@@ -1,6 +1,7 @@
 
 ; void *z80_indr(void *dst, uint16_t port)
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC z80_indr_callee

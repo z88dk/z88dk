@@ -1,6 +1,7 @@
 
 ; void z80_set_int_state(uint state)
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC z80_set_int_state

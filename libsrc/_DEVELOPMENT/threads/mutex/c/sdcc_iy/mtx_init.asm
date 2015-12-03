@@ -1,6 +1,7 @@
 
 ; int mtx_init(mtx_t *mtx, int type)
 
+SECTION code_clib
 SECTION code_threads_mutex
 
 PUBLIC _mtx_init

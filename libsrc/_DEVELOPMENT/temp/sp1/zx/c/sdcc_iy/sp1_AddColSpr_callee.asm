@@ -1,5 +1,6 @@
 ; uint sp1_AddColSpr(struct sp1_ss *s, void *drawf, uchar type, int graphic, uchar plane)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_AddColSpr_callee, l0_sp1_AddColSpr_callee

@@ -1,6 +1,7 @@
 
 ; int ffs_fastcall(int i)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _ffs_fastcall

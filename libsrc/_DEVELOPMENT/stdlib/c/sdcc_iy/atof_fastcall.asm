@@ -1,6 +1,7 @@
 
 ; float atof(const char *nptr) __z88dk_fastcall
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC _atof_fastcall

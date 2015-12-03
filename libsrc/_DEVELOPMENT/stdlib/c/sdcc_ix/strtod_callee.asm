@@ -1,6 +1,7 @@
 
 ; double strtod(const char *nptr, char **endptr) __z88dk_callee
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC _strtod_callee, l0_strtod_callee

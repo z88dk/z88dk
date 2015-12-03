@@ -1,6 +1,7 @@
 
 ; double atof(const char *nptr)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC atof

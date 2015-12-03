@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC __generic_isr_locate_callbacks

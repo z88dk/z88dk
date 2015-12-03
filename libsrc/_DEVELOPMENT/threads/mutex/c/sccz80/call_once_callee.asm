@@ -1,6 +1,7 @@
 
 ; void call_once_callee(once_flag *flag, void (*func)(void))
 
+SECTION code_clib
 SECTION code_threads_mutex
 
 PUBLIC call_once_callee

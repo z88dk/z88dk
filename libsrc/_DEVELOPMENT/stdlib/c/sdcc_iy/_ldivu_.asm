@@ -1,6 +1,7 @@
 
 ; void _ldivu_(ldivu_t *ld, unsigned long numer, unsigned long denom)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC __ldivu_

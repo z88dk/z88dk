@@ -1,6 +1,7 @@
 
 ; size_t dtog(double x, char *buf, uint16_t prec, uint16_t flag) __z88dk_callee
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC _dtog_callee

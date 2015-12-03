@@ -2,6 +2,7 @@
 ; BSD
 ; void *rawmemchr(const void *mem, int c)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC rawmemchr

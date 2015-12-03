@@ -2,6 +2,7 @@
 ; BSD
 ; void bzero(void *mem, int bytes)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _bzero

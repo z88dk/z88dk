@@ -2,6 +2,7 @@
 ; BSD
 ; char *rindex(const char *s, int c)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC asm_rindex

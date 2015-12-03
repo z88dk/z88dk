@@ -24,6 +24,12 @@ section code_alloc_obstack
 section code_arch
 section code_compress_zx7
 section code_ctype
+section code_driver_general
+section code_driver_character_input
+section code_driver_character_output
+section code_driver_terminal_input
+section code_driver_terminal_output
+section code_driver_tty
 section code_error
 section code_fcntl
 section code_font_fzx
@@ -36,6 +42,7 @@ section code_l_sccz80
 section code_l_sdcc
 section code_locale
 section code_math
+section code_nirvanap
 section code_setjmp
 section code_sound_bit
 section code_stdio

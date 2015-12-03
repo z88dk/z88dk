@@ -1,6 +1,7 @@
 
 ; void *memccpy_callee(void * restrict s1, const void * restrict s2, int c, size_t n)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _memccpy_callee, l0_memccpy_callee

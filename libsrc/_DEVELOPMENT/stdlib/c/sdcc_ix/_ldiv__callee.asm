@@ -1,6 +1,7 @@
 
 ; void _ldiv__callee(ldiv_t *ld, long numer, long denom)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC __ldiv__callee, l0__ldiv__callee

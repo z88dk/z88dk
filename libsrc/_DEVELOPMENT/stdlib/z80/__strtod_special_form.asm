@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC __strtod_special_form

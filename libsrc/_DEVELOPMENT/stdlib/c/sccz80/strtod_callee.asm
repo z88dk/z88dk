@@ -1,6 +1,7 @@
 
 ; double strtod(const char *nptr, char **endptr)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC strtod_callee

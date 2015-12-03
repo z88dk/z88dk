@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC asm_im2_create_generic_isr_8080

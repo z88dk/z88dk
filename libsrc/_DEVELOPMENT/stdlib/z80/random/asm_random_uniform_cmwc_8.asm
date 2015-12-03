@@ -11,6 +11,7 @@
 ; http://www.worldofspectrum.org/forums/discussion/39632/cmwc-random-number-generator-for-z80
 ; =============================================================
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC asm_random_uniform_cmwc_8

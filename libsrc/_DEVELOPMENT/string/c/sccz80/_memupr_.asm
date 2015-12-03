@@ -1,6 +1,7 @@
 
 ; char *_memupr_(void *p, size_t n)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _memupr_

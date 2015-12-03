@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC __dtoa__, __dtoa_join, __dtoa_prune

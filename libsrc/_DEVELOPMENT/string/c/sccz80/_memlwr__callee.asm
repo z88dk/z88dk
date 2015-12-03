@@ -1,6 +1,7 @@
 
 ; char *_memlwr_(void *p, size_t n)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _memlwr__callee

@@ -1,6 +1,7 @@
 
 ; char *strerror(int errnum)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strerror

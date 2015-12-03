@@ -15,6 +15,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC asm_random_uniform_xor_32
@@ -24,7 +25,8 @@ asm_random_uniform_xor_32:
    ; XorShift RNG using triple (8,9,23)
    ;
    ; enter: dehl = seed (0 is invalid input)
-   ; exit : dehl = next number in sequence [1..ULONG_MAX]
+   ; exit : dehl = next number in sequence [1..ULONG_MAX
+
    ;
    ; uses : af, de, hl
 

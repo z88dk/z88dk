@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC __strtod_dec_ip, __strtod_dec_ip_lz, __strtod_dec_fp_only

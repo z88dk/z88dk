@@ -1,6 +1,7 @@
 ; void sp1_PutTilesInv(struct sp1_Rect *r, struct sp1_tp *src)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC sp1_PutTilesInv

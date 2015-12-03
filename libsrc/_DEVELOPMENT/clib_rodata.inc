@@ -8,6 +8,7 @@ section rodata_fcntl
 section rodata_font_4x8
 section rodata_font_8x8
 section rodata_font_fzx
+section rodata_input
 section rodata_sound_bit
 section rodata_stdlib
 

@@ -1,6 +1,7 @@
 
 ; char *strchr_callee(const char *s, int c)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strchr_callee

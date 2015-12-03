@@ -1,6 +1,7 @@
 
 ; size_t strlen(const char *s)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strlen

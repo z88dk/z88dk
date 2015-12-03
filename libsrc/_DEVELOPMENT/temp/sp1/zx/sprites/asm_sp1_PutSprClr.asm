@@ -2,6 +2,7 @@
 ; 02.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC asm_sp1_PutSprClr
@@ -27,7 +28,8 @@ asm_sp1_PutSprClr:
    inc hl
    ld d,(hl)              ; de = & sp1_cs.attr_mask
    inc hl
-   ex (sp),hl             ; hl = struct sp1_ap[]
+   ex (sp),hl             ; hl = struct sp1_ap[
+
    ldi                    ; copy mask and attribute into struct sp1_cs
    ldi
    pop de                 ; de = array of sprite colour addresses advanced one entry

@@ -1,6 +1,7 @@
 
 ; int im2_remove_generic_callback_callee(uint8_t vector, void *callback)
 
+SECTION code_clib
 SECTION code_z80
 
 PUBLIC im2_remove_generic_callback_callee

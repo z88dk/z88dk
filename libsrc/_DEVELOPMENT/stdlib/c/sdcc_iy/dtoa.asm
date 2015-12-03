@@ -1,6 +1,7 @@
 
 ; size_t dtoa(double x, char *buf, uint16_t prec, uint16_t flag)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC _dtoa

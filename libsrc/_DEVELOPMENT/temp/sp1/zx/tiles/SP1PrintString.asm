@@ -4,6 +4,7 @@
 
 INCLUDE "clib_target_cfg.asm"
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC SP1PrintString
@@ -112,7 +113,8 @@ EXTERN asm_sp1_GetUpdateStruct, l_jpix
    cp 32
    jp nc, printable
 
-   ; here we have a special code [1,31]
+   ; here we have a special code [1,31
+
 
    push hl
    ld d,a

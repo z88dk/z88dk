@@ -10,6 +10,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC asm_shellsort
@@ -151,6 +152,7 @@ asm_shellsort:
 	jr	i_11
 
 
+SECTION bss_clib
 SECTION bss_stdlib
 
 __stdlib_shellsort_i:          defw 0

@@ -2,6 +2,7 @@
 ; BSD
 ; void *rawmemchr_callee(const void *mem, int c)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _rawmemchr_callee, l0_rawmemchr_callee

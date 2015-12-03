@@ -1,6 +1,7 @@
 
 ; void srand(unsigned int seed)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC srand

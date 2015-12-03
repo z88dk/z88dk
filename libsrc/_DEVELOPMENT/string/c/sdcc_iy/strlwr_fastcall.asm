@@ -1,6 +1,7 @@
 
 ; char *strlwr_fastcall(char *s)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strlwr_fastcall

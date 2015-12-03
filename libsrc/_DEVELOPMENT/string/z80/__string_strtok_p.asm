@@ -1,4 +1,5 @@
 
+SECTION bss_clib
 SECTION bss_string
 
 PUBLIC __string_strtok_p

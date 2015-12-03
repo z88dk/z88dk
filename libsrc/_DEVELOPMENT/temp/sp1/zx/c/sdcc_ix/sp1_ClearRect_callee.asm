@@ -1,5 +1,6 @@
 ; void sp1_ClearRect(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_ClearRect_callee, l0_sp1_ClearRect_callee

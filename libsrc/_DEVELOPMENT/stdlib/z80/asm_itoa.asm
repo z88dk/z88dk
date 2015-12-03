@@ -13,6 +13,7 @@
 ;
 ; ===============================================================
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC asm_itoa
@@ -23,7 +24,8 @@ EXTERN error_zc, l_valid_base, error_einval_zc, asm1_utoa, l_neg_hl
 asm_itoa:
 
    ; enter : hl = uint num
-   ;         bc = int radix [2,36]
+   ;         bc = int radix [2,36
+
    ;         de = char *buf
    ;
    ; exit  : hl = address of terminating 0 in buf

@@ -1,6 +1,7 @@
 ; void *sp1_TileEntry(uchar c, void *def)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC sp1_TileEntry

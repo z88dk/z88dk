@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION rodata_stdlib
 
 PUBLIC __dtoa_nan_s

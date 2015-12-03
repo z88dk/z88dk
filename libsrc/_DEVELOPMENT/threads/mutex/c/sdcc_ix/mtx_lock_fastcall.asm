@@ -1,6 +1,7 @@
 
 ; int mtx_lock_fastcall(mtx_t *m)
 
+SECTION code_clib
 SECTION code_threads_mutex
 
 PUBLIC _mtx_lock_fastcall

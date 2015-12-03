@@ -1,5 +1,6 @@
 ; void __FASTCALL__ sp1_Invalidate(struct sp1_Rect *r)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_Invalidate

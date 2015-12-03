@@ -1,5 +1,6 @@
 ; void sp1_GetSprClr(uchar **sprsrc, struct sp1_ap *dest, uchar n)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC sp1_GetSprClr

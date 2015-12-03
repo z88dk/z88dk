@@ -1,6 +1,7 @@
 
 ; char *strndup_callee(const char *s, size_t n)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _strndup_callee

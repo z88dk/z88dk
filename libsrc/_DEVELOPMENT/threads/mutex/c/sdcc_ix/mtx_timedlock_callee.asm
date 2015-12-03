@@ -1,6 +1,7 @@
 
 ; int mtx_timedlock_callee(mtx_t *m, struct timespec *ts)
 
+SECTION code_clib
 SECTION code_threads_mutex
 
 PUBLIC _mtx_timedlock_callee

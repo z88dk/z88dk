@@ -1,6 +1,7 @@
 
 ; void _ldivu__callee(ldivu_t *ld, unsigned long numer, unsigned long denom)
 
+SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC __ldivu__callee, l0__ldivu__callee

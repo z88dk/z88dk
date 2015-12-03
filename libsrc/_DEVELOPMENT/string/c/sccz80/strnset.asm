@@ -1,6 +1,7 @@
 
 ; char *strnset(char *s, int c, size_t n)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC strnset

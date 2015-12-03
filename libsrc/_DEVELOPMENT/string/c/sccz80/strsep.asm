@@ -1,6 +1,7 @@
 
 ; char *strsep(char ** restrict stringp, const char * restrict delim)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC strsep

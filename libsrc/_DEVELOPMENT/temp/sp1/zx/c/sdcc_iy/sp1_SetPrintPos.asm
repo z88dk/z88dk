@@ -1,5 +1,6 @@
 ; void sp1_SetPrintPos(struct sp1_pss *ps, uchar row, uchar col)
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC _sp1_SetPrintPos

@@ -2,6 +2,7 @@
 ; 03.2006 aralbrec, Sprite Pack v3.0
 ; sinclair zx version
 
+SECTION code_clib
 SECTION code_temp_sp1
 
 PUBLIC sp1_IterateUpdateRect_callee, asm0_sp1_IterateUpdateRect

@@ -1,6 +1,7 @@
 
 ; void *memswap_callee(void *s1, void *s2, size_t n)
 
+SECTION code_clib
 SECTION code_string
 
 PUBLIC _memswap_callee
