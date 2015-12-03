@@ -1,5 +1,6 @@
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC cpm_01_output_dcio_stdio_msg_ictl
 

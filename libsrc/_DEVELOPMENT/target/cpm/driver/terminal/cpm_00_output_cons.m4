@@ -24,6 +24,7 @@ define(`m4_cpm_00_output_cons',dnl
    
    `ifelse($1,0,,dnl   
    
+   SECTION data_clib
    SECTION data_stdio
    
    ; FILE *

@@ -54,7 +54,8 @@
 ;     16                    occupied "len"gth of buffer
 ;   17..17+max              buffer
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_input
 
 PUBLIC cpm_00_input_cons
 

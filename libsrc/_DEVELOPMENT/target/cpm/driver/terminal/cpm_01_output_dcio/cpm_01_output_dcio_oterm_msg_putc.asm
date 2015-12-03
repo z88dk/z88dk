@@ -1,7 +1,8 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC cpm_01_output_dcio_oterm_msg_putc
 PUBLIC cpm_01_output_dcio_oterm_msg_putc_raw

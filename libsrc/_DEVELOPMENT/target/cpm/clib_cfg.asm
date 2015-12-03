@@ -247,9 +247,12 @@ defc CHAR_PASSWORD  = '*'
 ; the library.  Omitting unused ones can reduce code size.
 ; Note the bit assignments are the same as for scanf.
 
+;;defc __CLIB_OPT_PRINTF = $15000201
+;;defc __CLIB_OPT_PRINTF = $5001001
 defc __CLIB_OPT_PRINTF = $3fffff
 ;;defc __CLIB_OPT_PRINTF = $4000201
-;;defc __CLIB_OPT_PRINTF = $201
+;;defc __CLIB_OPT_PRINTF = $1200
+;;defc __CLIB_OPT_PRINTF = $ffffffff
 
 ; bit 0 =  $      01 = enable %d
 ; bit 1 =  $      02 = enable %u

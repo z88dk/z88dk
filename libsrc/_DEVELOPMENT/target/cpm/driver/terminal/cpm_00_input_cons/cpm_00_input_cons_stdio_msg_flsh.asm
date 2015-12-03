@@ -1,5 +1,6 @@
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_input
 
 PUBLIC cpm_00_input_cons_stdio_msg_flsh
 

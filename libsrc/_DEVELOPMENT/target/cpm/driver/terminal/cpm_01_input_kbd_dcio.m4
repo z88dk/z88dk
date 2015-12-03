@@ -28,6 +28,7 @@ define(`m4_cpm_01_input_kbd_dcio',dnl
 
    `ifelse($1,0,,dnl
    
+   SECTION data_clib
    SECTION data_stdio
    
    ; FILE *

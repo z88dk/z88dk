@@ -1,5 +1,6 @@
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC cpm_00_output_cons_ochar_msg_putc
 

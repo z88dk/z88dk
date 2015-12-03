@@ -1,7 +1,8 @@
 
 INCLUDE "clib_cfg.asm"
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_input
 
 PUBLIC cpm_01_input_kbd_dcio_iterm_msg_getc
 

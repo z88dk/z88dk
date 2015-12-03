@@ -63,25 +63,6 @@ dnl############################################################
 dnl
 
 include(../../clib_instantiate_begin.m4)
-
-include(../driver/terminal/cpm_00_input_cons.m4)
-m4_cpm_00_input_cons(_stdin, 0x0100, 64)
-
-include(../driver/terminal/cpm_00_output_cons.m4)
-m4_cpm_00_output_cons(_stdout, 0x0010)
-
-include(../../m4_file_dup.m4)dnl
-m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
-
-include(../driver/character/cpm_00_input_reader.m4)
-m4_cpm_00_input_reader(_stdrdr, 0x0100)
-
-include(../driver/character/cpm_00_output_punch.m4)
-m4_cpm_00_output_punch(_stdpun, 0x0010)
-
-include(../driver/character/cpm_00_output_list.m4)
-m4_cpm_00_output_list(_stdlst, 0x0010)
-
 include(../../clib_instantiate_end.m4)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -98,8 +79,7 @@ __Start:
 
    ; disqualify 8080
    
-   ld a,2
-   inc a
+   sub a
    jp po, __Restart
 
    ld c,__CPM_PRST
@@ -185,7 +165,7 @@ __Restart:
    
    ; initialize sections
 
-   include "../clib_init_data.inc"
+   ;;include "../clib_init_data.inc"
    include "../clib_init_bss.inc"
 
 SECTION code_crt_init          ; user and library initialization
@@ -206,13 +186,7 @@ SECTION code_crt_main
 
 __Exit:
 
-   IF __crt_enable_restart = 0
-   
-      ; returning to caller
-
-      push hl                  ; save return status
-   
-   ENDIF
+   push hl                     ; save return status
    
 SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
@@ -222,30 +196,9 @@ SECTION code_crt_return
    include "../clib_close.inc"
 
    ; exit program
-   
-   IF __crt_enable_restart = 0
-   
-      ; returning to cpm
-      
-      pop hl
-      rst 0
-         
-   ELSE
-   
-      ; restarting program
-      
-      IF __crt_enable_commandline = 1
-      
-         ; nerf command line for restarts
-         
-         ld hl,0
-         ld (0x0080),hl
-
-      ENDIF
-      
-      jp __Restart
-   
-   ENDIF
+       
+   pop hl                      ; hl = return status
+   rst 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
