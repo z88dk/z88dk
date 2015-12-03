@@ -1,0 +1,9 @@
+
+SECTION code_driver
+SECTION code_driver_terminal_output
+
+PUBLIC console_01_output_terminal_fdriver
+
+EXTERN console_01_input_terminal_fdriver
+
+defc console_01_output_terminal_fdriver = console_01_input_terminal_fdriver

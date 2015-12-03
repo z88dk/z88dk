@@ -1,0 +1,9 @@
+
+SECTION code_driver
+SECTION code_driver_terminal_input
+
+PUBLIC console_01_input_proc_reset
+
+EXTERN device_reset_error
+
+defc console_01_input_proc_reset = device_reset_error
