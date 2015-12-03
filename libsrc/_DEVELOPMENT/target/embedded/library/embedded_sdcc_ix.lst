@@ -2,6 +2,7 @@
 @alloc/alloc_sdcc_ix.lst
 @compress/compress_sdcc_ix.lst
 @ctype/ctype_sdcc_ix.lst
+@drivers/drivers.lst
 @error/error.lst
 @fcntl/fcntl_sdcc_ix.lst
 @inttypes/inttypes_sdcc_ix.lst

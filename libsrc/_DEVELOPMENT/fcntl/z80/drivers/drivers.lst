@@ -1,7 +1,0 @@
-@fcntl/z80/drivers/character/character_00.lst
-@fcntl/z80/drivers/terminal/console_01.lst
-@fcntl/z80/drivers/terminal/tty.lst
-fcntl/z80/drivers/z80/device_reset_error
-fcntl/z80/drivers/z80/device_return_error
-fcntl/z80/drivers/z80/device_set_error
-fcntl/z80/drivers/z80/driver_error_enolck_zc
