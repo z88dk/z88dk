@@ -245,6 +245,7 @@ defc CHAR_PASSWORD  = '*'
 ; Note the bit assignments are the same as for scanf.
 
 defc __CLIB_OPT_PRINTF = $3fffff
+;;defc __CLIB_OPT_PRINTF = $5001001
 
 ; bit 0 =  $      01 = enable %d
 ; bit 1 =  $      02 = enable %u

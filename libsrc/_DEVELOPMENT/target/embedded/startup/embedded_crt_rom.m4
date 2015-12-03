@@ -80,7 +80,6 @@ ELSE
 
 ENDIF
 
-   defm "2.0a"
    defs 0x0010 - ASMPC
 
    ; address = 0x0010
@@ -96,7 +95,6 @@ ELSE
 
 ENDIF
 
-   defm "embe"
    defs 0x0018 - ASMPC
 
    ; address = 0x0018
@@ -112,7 +110,6 @@ ELSE
 
 ENDIF
 
-   defm "dded"
    defs 0x0020 - ASMPC
 
    ; address = 0x0020
@@ -128,7 +125,6 @@ ELSE
 
 ENDIF
 
-   defm "2015"
    defs 0x0028 - ASMPC
 
    ; address = 0x0028
@@ -390,6 +386,7 @@ SECTION code_crt_return
 
       IF __crt_org_code = 0
       
+         halt                  ; some tools like to see this
          jr ASMPC              ; loop forever
 
       ELSE
