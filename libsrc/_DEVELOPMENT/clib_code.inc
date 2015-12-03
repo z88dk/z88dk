@@ -27,6 +27,7 @@ section code_ctype
 section code_driver_general
 section code_driver_character_input
 section code_driver_character_output
+section code_driver_memstream
 section code_driver_terminal_input
 section code_driver_terminal_output
 section code_driver_tty
