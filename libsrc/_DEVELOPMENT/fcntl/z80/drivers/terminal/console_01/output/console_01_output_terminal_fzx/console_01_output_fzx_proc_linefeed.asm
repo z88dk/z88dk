@@ -1,5 +1,6 @@
 
-SECTION code_fcntl
+SECTION code_driver
+SECTION code_driver_terminal_output
 
 PUBLIC console_01_output_fzx_proc_linefeed
 PUBLIC console_01_output_fzx_proc_linefeed_check_scroll
