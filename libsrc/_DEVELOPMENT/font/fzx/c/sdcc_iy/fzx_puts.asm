@@ -1,6 +1,7 @@
 
 ; int fzx_puts(struct fzx_state *fs, char *s)
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC _fzx_puts

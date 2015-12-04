@@ -1,6 +1,7 @@
 
 ; char *fzx_char_metrics_callee(struct fzx_font *ff, struct fzx_cmetric *fm, int c)
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC _fzx_char_metrics_callee, l0_fzx_char_metrics_callee

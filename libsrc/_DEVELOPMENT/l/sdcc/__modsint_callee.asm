@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_l_sdcc
 
 PUBLIC __modsint_callee

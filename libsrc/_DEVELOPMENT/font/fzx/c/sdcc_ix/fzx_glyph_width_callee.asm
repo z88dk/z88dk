@@ -1,6 +1,7 @@
 
 ; uint16_t fzx_glyph_width_callee(struct fzx_font *ff, int c)
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC _fzx_glyph_width_callee, l0_fzx_glyph_width_callee

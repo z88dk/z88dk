@@ -1,6 +1,7 @@
 
 ; int fzx_write_callee(struct fzx_state *fs, char *buf, uint16_t buflen)
 
+SECTION code_font
 SECTION code_font_fzx
 
 PUBLIC _fzx_write_callee, l0_fzx_write_callee

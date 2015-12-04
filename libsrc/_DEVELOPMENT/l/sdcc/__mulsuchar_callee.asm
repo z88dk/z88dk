@@ -1,6 +1,7 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
 SECTION code_l_sdcc
 
 PUBLIC __mulsuchar_callee, __mulsuchar_callee_0
