@@ -21,9 +21,10 @@ unsigned char* getInput()
 	putchar('?');
 	putchar(' ');
 
-	fgets(result, sizeof(result), stdin);
-	result[strlen(result) - 1] = '\0';
+	if (!fgets(result, sizeof(result), stdin))
+	   exit(1);
 
+	result[strlen(result) - 1] = '\0';
 	return result;
 }
 
