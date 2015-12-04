@@ -73,25 +73,24 @@ EXTERN ASMHEAD_AREA_TRANSFER_RESERVED_END, ASMHEAD_AREA_TRANSFER_RESERVED
 defw ASMHEAD_AREA_CODE_END - ASMHEAD_AREA_CODE                             ;; length of the code area
 defw ASMHEAD_AREA_DATA_END - ASMHEAD_AREA_DATA                             ;; length of the data area
 defw ASMHEAD_AREA_TRANSFER_END - ASMHEAD_AREA_TRANSFER                     ;; length of the transfer area
-defw 256                                                                   ;; original ORG of assembler code
+defw 0                                                                     ;; original ORG of assembler code
 defw 0                                                                     ;; number of entries in the relocator table
 defw __crt_stack_size                                                      ;; size of stack in bytes
 defw 0                                                                     ;; length of crunched data      **NOT SUPPORTED YET**
 defb 0                                                                     ;; cruncher type (0=uncrunched) **NOT SUPPORTED YET**
-defm "Z88DK APPLICATION"                                                   ;; application name
-defs 15
+defm "Z88DK APPLICATION               "                                    ;; application name (32 bytes)
 defb 0                                                                     ;; zero terminator
 defm "SymExe10"                                                            ;; SymbOS executable identification
 defw ASMHEAD_AREA_CODE_RESERVED_END - ASMHEAD_AREA_CODE_RESERVED           ;; length of reserved code memory
 defw ASMHEAD_AREA_DATA_RESERVED_END - ASMHEAD_AREA_DATA_RESERVED           ;; length of reserved data memory
 defw ASMHEAD_AREA_TRANSFER_RESERVED_END - ASMHEAD_AREA_TRANSFER_RESERVED   ;; length of reserved transfer memory
 defs 26                                                                    ;; *RESERVED* (must be 0)
-defb 0,0                                                                   ;; minimum OS version (minor,major)
+defb 0,2                                                                   ;; minimum OS version (minor,major)
 defs 19                                                                    ;; application icon (small), 8x8 pixel symbos format
 defs 147                                                                   ;; application icon (large), 24x24 pixel symbos format
 
 IF ASMPC != 0x100
-   "error symbos header size incorrect"
+   "error: symbos header size incorrect"
 ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -100,7 +99,14 @@ ENDIF
 
 SECTION AREA_TRANSFER
 
-defs __crt_stack_size   ;; stack must appear first in transfer area
+PUBLIC __symbos_proc_id, __symbos_message_buffer
+
+   defs __crt_stack_size   ;; stack must appear first in transfer area
+   defs 6*2                ;; register pre-definition
+   defw __Start            ;; start address
+
+__symbos_proc_id        :  defb 0   ;; process id
+__symbos_message_buffer :  defs 14  ;; message buffer
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STARTUP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -114,16 +120,63 @@ EXTERN _main
 
 __Start:
 
-   ... place hooks into OS entry points to
-   ... preserve EXX set as required by SymbOS
+   di
+   
+   ; preserve exx set for symbos
+   
+   exx
+   
+   ld (symbos_exx_bc),bc
+   ld (symbos_exx_de),de
+   ld (symbos_exx_hl),hl
+   push af
+   pop hl
+   ld (symbos_exx_af),hl
+   
+   exx
+
+   ; place hooks into OS entry points
+
+
+
+
+   ei
 
    ; parse command line
    
    IF __crt_enable_commandline
    
-      EXTERN l_command_line_parse_inplace
+      EXTERN ASMHEAD_CODE_END, ASMHEAD_CODE
+      EXTERN ASMHEAD_AREA_CODE_RESERVED_END, ASMHEAD_AREA_CODE_RESERVED
       
-      ...
+      EXTERN l_command_line_parse_in_place, asm_strnlen
+      
+      ld hl,(__symbos_code)
+      ld bc,ASMHEAD_CODE_END - ASMHEAD_CODE + ASMHEAD_AREA_CODE_RESERVED_END - ASMHEAD_AREA_CODE_RESERVED
+      
+      add hl,bc                ; hl = & command line at end of static code area
+
+      ld bc,255                ; bc = max len of command line
+      call asm_strnlen
+
+      ld c,l
+      ld b,h                   ; bc = length of command line
+      
+      ex de,hl                 ; hl = & command line
+      
+      call l_command_line_parse_in_place
+      
+      exx
+      
+      ld a,h
+      or l
+      jr z, cl_skip_terminate
+   
+      ld (hl),0
+   
+   cl_skip_terminate:
+      
+      exx
       
       ; bc = int argc
       ; hl = char *argv[]
@@ -189,9 +242,17 @@ EXTERN ASMHEAD_AREA_HEADER, ASMHEAD_AREA_CODE_END
 EXTERN ASMHEAD_AREA_DATA_END, ASMHEAD_AREA_TRANSFER_END
 
 __symbos_header           :  defw ASMHEAD_AREA_HEADER
+__symbos_code             :  defw ASMHEAD_AREA_CODE
 __symbos_code_reserved    :  defw ASMHEAD_AREA_CODE_END
 __symbos_data_reserved    :  defw ASMHEAD_AREA_DATA_END
 __symbos_transfer_reserved:  defw ASMHEAD_AREA_TRANSFER_END
+
+PUBLIC symbos_exx_af, symbos_exx_bc, symbos_exx_de, symbos_exx_hl
+
+symbos_exx_af             :  defs 2
+symbos_exx_bc             :  defs 2
+symbos_exx_de             :  defs 2
+symbos_exx_hl             :  defs 2
 
 include "../clib_variables.inc"
 include "clib_target_variables.inc"
