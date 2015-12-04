@@ -1,6 +1,6 @@
 
-SECTION code_clib
-SECTION data_stdio
+SECTION rodata_clib
+SECTION rodata_stdio
 
 PUBLIC __stdio_file_list_lock
 
