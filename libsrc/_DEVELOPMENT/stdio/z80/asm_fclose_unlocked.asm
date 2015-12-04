@@ -11,6 +11,9 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
+SECTION code_stdio
+
 PUBLIC asm_fclose_unlocked, asm0_fclose_unlocked, asm1_fclose_unlocked
 
 EXTERN __stdio_open_file_list, asm_p_forward_list_remove, error_ebadf_mc

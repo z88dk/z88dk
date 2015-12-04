@@ -11,6 +11,9 @@
 
 INCLUDE "clib_cfg.asm"
 
+SECTION code_clib
+SECTION code_stdio
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $02
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
