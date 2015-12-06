@@ -7531,7 +7531,7 @@ replace restart {
 	rr	d
 	rr	e
 	dec	a
-	jp	NZ,%1
+	%2	NZ,%1
 } by {
 	ld	d,c
 	ld	e,b
@@ -7556,7 +7556,48 @@ replace restart {
 	sbc	a,a
 	ld	e,a
 	ld	d,a
-	; peephole z88dk-243b
+	ld	b,#0x00
+	; peephole z88dk-243b1
+} if notUsed('a')
+
+replace restart {
+	ld	b,#0x0F
+%1:
+	sra	d
+	rr	e
+	rr	h
+	rr	l
+	djnz	%1
+} by {
+	ld	b,a
+	rl	h
+	ex	de,hl
+	adc	hl,hl
+	sbc	a,a
+	ld	e,a
+	ld	d,a
+	ld	a,b
+	ld	b,#0x00
+	; peephole z88dk-243b2
+}
+
+replace restart {
+	ld	b,#0x0F
+%1:
+	srl	d
+	rr	e
+	rr	h
+	rr	l
+	djnz	%1
+} by {
+	rl	h
+	ex	de,hl
+	adc	hl,hl
+	ld	e,#0x00
+	ld	d,e
+	ld	b,e
+	rl	e
+	; peephole z88dk-244
 }
 
 replace restart {
@@ -9157,7 +9198,6 @@ replace restart {
 	rr	%5
 	djnz	%1
 } by {
-%1:
 	rl	%4
 	rl	%3
 	rl	%2
@@ -10524,13 +10564,28 @@ replace restart {
 	rr	%4
 	djnz	%2
 } by {
-%2:
 	ld	%3,h
 	ld	%4,l
-	ld	b,#0x00
-	ld	l,b
-	ld	h,b
-	; peephole z88dk-349
+	ld	l,#0x00
+	ld	h,l
+	ld	b,l
+	; peephole z88dk-349a
+}
+
+replace restart {
+	ld	b,#0x10
+%1:
+	srl	d
+	rr	e
+	rr	h
+	rr	l
+	djnz	%1
+} by {
+	ex	de,hl
+	ld	e,#0x00
+	ld	d,e
+	ld	b,e
+	; peephole z88dk-349b
 }
 
 replace restart {
@@ -11876,9 +11931,59 @@ replace restart {
 	ld	%2,%1
 } by {
 	ld	%1,%2
-	; peephole z88dk-606a
+	; peephole z88dk-606a1
 } if notSame(%1 %2)
 // notVolatile
+
+replace restart {
+	ld	a,h
+	ld	d,a
+} by {
+	ld	a,h
+	ld	d,h
+	; peephole z88dk-606a2
+}
+// more general slows peephole considerably
+
+replace restart {
+	ld	b,h
+	ld	a,b
+} by {
+	ld	b,h
+	ld	a,h
+	; peephole z88dk-606a3
+}
+
+replace restart {
+	ld	a,c
+	ld	d,a
+} by {
+	ld	a,c
+	ld	d,c
+	; peephole z88dk-606a4
+}
+
+replace restart {
+	ld	b,l
+	ld	c,%1
+	ld	e,b
+} by {
+	ld	b,l
+	ld	c,%1
+	ld	e,l
+	; peephole z88dk-606a5
+}
+
+replace restart {
+	ld	c,h
+	ld	e,%1
+	ld	a,c
+} by {
+	ld	c,h
+	ld	e,%1
+	ld	a,h
+	; peephole z88dk-606a6
+}
 
 replace restart {
 	ld	d,l
