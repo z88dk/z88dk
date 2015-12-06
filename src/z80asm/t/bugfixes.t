@@ -589,10 +589,12 @@ z80asm(
 );
 
 #------------------------------------------------------------------------------
-# Mail: 
+# Bug report:
 # alvin (alvin_albrecht@hotmail.com) <lists@suborbital.org.uk> Fri, Dec 4, 2015 at 3:11 AM 
 # To: z88dk-developers@lists.sourceforge.net 
 # The two labels are not equal despite the defc.
+# When the expression to be computed is based on symbols from different sections
+# or modules, the evaluation needs to be postponed to the link phase.
 z80asm(
 	asm => <<'...',
 		SECTION AAA
