@@ -714,3 +714,36 @@ long expr_parse_eval_if( void )
 	_expr_parse_eval( &result, FALSE );
 	return result;
 }
+
+/* check if all variables used in an expression are local to the same module
+and section; if yes, the expression can be computed in phase 2 of the compile,
+if not the expression must be passed to the link phase */
+Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section)
+{
+	size_t i;
+
+	for (i = 0; i < ExprOpArray_size(self->rpn_ops); i++)
+	{
+		ExprOp *expr_op = ExprOpArray_item(self->rpn_ops, i);
+
+		switch (expr_op->op_type)
+		{
+		case SYMBOL_OP:
+			if (expr_op->d.symbol->module != module || expr_op->d.symbol->section != section)
+				return FALSE;
+			break;
+
+		case CONST_EXPR_OP:
+		case ASMPC_OP:
+		case NUMBER_OP:
+		case UNARY_OP:	
+		case BINARY_OP:	
+		case TERNARY_OP:
+			break;
+
+		default:
+			assert(0);
+		}
+	}
+	return TRUE;
+}

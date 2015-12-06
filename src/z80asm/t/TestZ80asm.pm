@@ -51,6 +51,7 @@ END {
 #		ok => 1 - needed if no binary file is generated (i.e. -x)
 #		error - additional error messages not in asm source files
 #		bin - result binary code
+# 		bin_file - name of minary file
 #------------------------------------------------------------------------------
 sub z80asm {
 	my(%args) = @_;
@@ -59,7 +60,7 @@ sub z80asm {
 	
 	# test files
 	my @asm_files;
-	my $bin_file;
+	my $bin_file = $args{bin_file};
 	my $bin = $args{bin} || "";
 	my $err_text = "";
 	my @err_text;	# error text for each pass
@@ -72,7 +73,8 @@ sub z80asm {
 			unlink("test$id.err", "test$id.obj", 
 			       "test$id.map", "test$id.syn", 
 				   "test$id.lst", "test$id.def", 
-				   <test$id*.bin>);
+				   <test$id*.bin>,
+				   <test$id*.reloc>);
 			
 			$bin_file ||=    "test$id.bin";
 			push @asm_files, "test$id.asm"
@@ -171,6 +173,7 @@ sub unlink_temp {
 								lst |
 								inc |
 								bin |
+								reloc |
 								bn\d+ |
 								map |
 								obj |

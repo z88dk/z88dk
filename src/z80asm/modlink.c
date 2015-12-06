@@ -303,21 +303,26 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error, Bool module
 
 		if ( expr->target_name )
 		{
-			set_expr_env( expr, module_relative_addr );
-			value = Expr_eval(expr, show_error);
-	        if ( expr->result.not_evaluable )		/* unresolved */
+			/* expressions with symbols from other sections need to be passed to the link phase */
+			if (Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) ||
+				!module_relative_addr)			/* or in link phase */
 			{
-				num_unresolved++;
-			}
-			else if (!expr->is_computed)
-			{
-				/* expression depends on other variables not yet computed */
-			}
-			else
-			{
-				num_computed++;
-				computed = TRUE;
-				update_symbol( expr->target_name, value, expr->type );
+				set_expr_env(expr, module_relative_addr);
+				value = Expr_eval(expr, show_error);
+				if (expr->result.not_evaluable)		/* unresolved */
+				{
+					num_unresolved++;
+				}
+				else if (!expr->is_computed)
+				{
+					/* expression depends on other variables not yet computed */
+				}
+				else
+				{
+					num_computed++;
+					computed = TRUE;
+					update_symbol(expr->target_name, value, expr->type);
+				}
 			}
 		}
 

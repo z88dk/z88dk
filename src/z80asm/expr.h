@@ -146,6 +146,11 @@ extern long expr_parse_eval_if( void );
    e.g. symbol not defined; show error messages if not_defined_error */
 extern long Expr_eval(Expr *self, Bool not_defined_error);
 
+/* check if all variables used in an expression are local to the same module
+   and section; if yes, the expression can be computed in phase 2 of the compile,
+   if not the expression must be passed to the link phase */
+extern Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section);
+
 /*-----------------------------------------------------------------------------
 *	Stack for calculator
 *----------------------------------------------------------------------------*/
