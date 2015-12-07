@@ -612,7 +612,7 @@ z80asm(
 		defb 205			;; CD
 
 		SECTION CCC
-		defw var_1, var_2	;; 02 00 02 00	
+		defw var_1			;; 02 00	
 
 		defc var_2 = var_1
 ...
@@ -623,14 +623,14 @@ ASMHEAD                         = 0000, G:
 ASMHEAD_AAA                     = 0000, G: 
 ASMHEAD_BBB                     = 0002, G: 
 ASMHEAD_CCC                     = 0003, G: 
-ASMSIZE                         = 0007, G: 
+ASMSIZE                         = 0005, G: 
 ASMSIZE_AAA                     = 0002, G: 
 ASMSIZE_BBB                     = 0001, G: 
-ASMSIZE_CCC                     = 0004, G: 
-ASMTAIL                         = 0007, G: 
+ASMSIZE_CCC                     = 0002, G: 
+ASMTAIL                         = 0005, G: 
 ASMTAIL_AAA                     = 0002, G: 
 ASMTAIL_BBB                     = 0003, G: 
-ASMTAIL_CCC                     = 0007, G: 
+ASMTAIL_CCC                     = 0005, G: 
 var_1                           = 0002, L: test
 var_2                           = 0002, L: test
 
@@ -640,15 +640,15 @@ ASMHEAD_AAA                     = 0000, G:
 ASMSIZE_BBB                     = 0001, G: 
 ASMHEAD_BBB                     = 0002, G: 
 ASMSIZE_AAA                     = 0002, G: 
+ASMSIZE_CCC                     = 0002, G: 
 ASMTAIL_AAA                     = 0002, G: 
 var_1                           = 0002, L: test
 var_2                           = 0002, L: test
 ASMHEAD_CCC                     = 0003, G: 
 ASMTAIL_BBB                     = 0003, G: 
-ASMSIZE_CCC                     = 0004, G: 
-ASMSIZE                         = 0007, G: 
-ASMTAIL                         = 0007, G: 
-ASMTAIL_CCC                     = 0007, G: 
+ASMSIZE                         = 0005, G: 
+ASMTAIL                         = 0005, G: 
+ASMTAIL_CCC                     = 0005, G: 
 ...
 
 z80asm(
@@ -668,7 +668,7 @@ z80asm(
 		defb 205			;; CD
 
 		SECTION CCC
-		defw var_1, var_2	;; 02 00 02 00	
+		defw var_1			;; 02 00
 
 		SECTION BBB
 		defc var_2 = var_1
@@ -680,14 +680,14 @@ ASMHEAD                         = 0000, G:
 ASMHEAD_AAA                     = 0000, G: 
 ASMHEAD_BBB                     = 0002, G: 
 ASMHEAD_CCC                     = 0003, G: 
-ASMSIZE                         = 0007, G: 
+ASMSIZE                         = 0005, G: 
 ASMSIZE_AAA                     = 0002, G: 
 ASMSIZE_BBB                     = 0001, G: 
-ASMSIZE_CCC                     = 0004, G: 
-ASMTAIL                         = 0007, G: 
+ASMSIZE_CCC                     = 0002, G: 
+ASMTAIL                         = 0005, G: 
 ASMTAIL_AAA                     = 0002, G: 
 ASMTAIL_BBB                     = 0003, G: 
-ASMTAIL_CCC                     = 0007, G: 
+ASMTAIL_CCC                     = 0005, G: 
 var_1                           = 0002, L: test
 var_2                           = 0002, L: test
 
@@ -697,13 +697,13 @@ ASMHEAD_AAA                     = 0000, G:
 ASMSIZE_BBB                     = 0001, G: 
 ASMHEAD_BBB                     = 0002, G: 
 ASMSIZE_AAA                     = 0002, G: 
+ASMSIZE_CCC                     = 0002, G: 
 ASMTAIL_AAA                     = 0002, G: 
 var_1                           = 0002, L: test
 var_2                           = 0002, L: test
 ASMHEAD_CCC                     = 0003, G: 
 ASMTAIL_BBB                     = 0003, G: 
-ASMSIZE_CCC                     = 0004, G: 
-ASMSIZE                         = 0007, G: 
-ASMTAIL                         = 0007, G: 
-ASMTAIL_CCC                     = 0007, G: 
+ASMSIZE                         = 0005, G: 
+ASMTAIL                         = 0005, G: 
+ASMTAIL_CCC                     = 0005, G: 
 ...

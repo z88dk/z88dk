@@ -303,9 +303,14 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error, Bool module
 
 		if ( expr->target_name )
 		{
+			/* touch symbol so that it ends in object file */
+			Symbol *sym = get_used_symbol(expr->target_name);
+			sym->is_touched = TRUE;
+
 			/* expressions with symbols from other sections need to be passed to the link phase */
-			if (Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) ||
-				!module_relative_addr)			/* or in link phase */
+			if (!module_relative_addr || /* link phase */
+				Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) /* or symbols from other sections */
+				)
 			{
 				set_expr_env(expr, module_relative_addr);
 				value = Expr_eval(expr, show_error);
