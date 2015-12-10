@@ -11140,9 +11140,54 @@ replace restart {
 	; peephole z88dk-370b
 }
 
+replace restart {
+	ld	a,%1
+	cp	a,a
+} by {
+	xor	a,a
+	ld	a,%1
+	; peephole z88dk-371
+}
 
+replace restart {
+	ld	h,%1
+	ld	l,%2
+	ld	a,e
+	sub	a, h
+	ld	e,a
+	ld	a,d
+	sbc	a, l
+	ld	d,a
+} by {
+	ld	l,%1
+	ld	h,%2
+	ex	de,hl
+	xor	a,a
+	sbc	hl,de
+	ld	a,h
+	ex	de,hl
+	; peephole z88dk-372a
+}
 
-
+replace restart {
+	ld	b,l
+	ld	c,h
+	ld	a,e
+	sub	a, b
+	ld	e,a
+	ld	a,d
+	sbc	a, c
+	ld	d,a
+} by {
+	ld	b,l
+	ld	c,h
+	ex	de,hl
+	xor	a,a
+	sbc	hl,de
+	ld	a,h
+	ex	de,hl
+	; peephole z88dk-372b
+}
 
 
 
@@ -12344,9 +12389,50 @@ replace restart {
 	; peephole z88dk-618d
 } if notUsed('de'), notUsed('hl')
 
+replace restart {
+	ex	de,hl
+	srl	d
+	rr	e
+} by {
+	srl	h
+	rr	l
+	ex	de,hl
+	; peephole z88dk-619a
+}
 
+replace restart {
+	ex	de,hl
+	sra	d
+	rr	e
+} by {
+	sra	h
+	rr	l
+	ex	de,hl
+	; peephole z88dk-619b
+}
 
+replace restart {
+	ex	de,hl
+	sla	e
+	rl	d
+} by {
+	add	hl,hl
+	ex	de,hl
+	; peephole z88dk-619c
+}
 
+replace restart {
+	ld	h,%1
+	ld	l,%2
+	ld	a,h
+	ld	h,l
+	ld	l,a
+} by {
+	ld	l,%1
+	ld	h,%2
+	ld	a,l
+	; peephole z88dk-620a
+}
 
 
 
