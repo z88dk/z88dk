@@ -14,5 +14,7 @@ arch/zx/nirvanap/c/sccz80/NIRVANA_printC
 arch/zx/nirvanap/c/sccz80/NIRVANA_printC_callee
 arch/zx/nirvanap/c/sccz80/NIRVANA_spriteT
 arch/zx/nirvanap/c/sccz80/NIRVANA_spriteT_callee
+arch/zx/nirvanap/c/sccz80/NIRVANA_start
+arch/zx/nirvanap/c/sccz80/NIRVANA_stop
 arch/zx/nirvanap/c/sccz80/NIRVANA_tiles
 arch/zx/nirvanap/c/sccz80/NIRVANA_wides

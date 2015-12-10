@@ -17,29 +17,17 @@
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-#ifdef __SDCC
+extern void __LIB__ NIRVANA_start(void);
 
-#define NIRVANA_start()  __asm__("call    64995  ; NIRVANA_start()\n")
 
-#else
-
-#define NIRVANA_start()  asm("call    64995  ; NIRVANA_start()\n")
-
-#endif
 
 // ----------------------------------------------------------------
 // Deactivate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-#ifdef __SDCC
+extern void __LIB__ NIRVANA_stop(void);
 
-#define NIRVANA_stop()  __asm__("call     65012  ; NIRVANA_stop()\n")
 
-#else
-
-#define NIRVANA_stop()  asm("call     65012  ; NIRVANA_stop()\n")
-
-#endif
 
 // ----------------------------------------------------------------
 // Execute HALT (wait for next frame).

@@ -6,5 +6,7 @@ arch/zx/nirvanap/z80/asm_NIRVANA_fillT
 arch/zx/nirvanap/z80/asm_NIRVANA_paintC
 arch/zx/nirvanap/z80/asm_NIRVANA_printC
 arch/zx/nirvanap/z80/asm_NIRVANA_spriteT
+arch/zx/nirvanap/z80/asm_NIRVANA_start
+arch/zx/nirvanap/z80/asm_NIRVANA_stop
 arch/zx/nirvanap/z80/asm_NIRVANA_tiles
 arch/zx/nirvanap/z80/asm_NIRVANA_wides
