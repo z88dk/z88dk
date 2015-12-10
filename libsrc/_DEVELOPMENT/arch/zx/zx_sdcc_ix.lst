@@ -1,3 +1,4 @@
 @arch/zx/display/display_sdcc_ix.lst
 @arch/zx/graphics/graphics_sdcc_ix.lst
 @arch/zx/misc/misc_sdcc_ix.lst
+@arch/zx/nirvanap/nirvanap_sdcc.lst

@@ -1,3 +1,4 @@
 @arch/zx/display/display_asm.lst
 @arch/zx/graphics/graphics_asm.lst
 @arch/zx/misc/misc_asm.lst
+@arch/zx/nirvanap/nirvanap_asm.lst

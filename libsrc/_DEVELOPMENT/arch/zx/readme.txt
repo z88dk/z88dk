@@ -31,3 +31,9 @@ MISC
 ====
 
 Uncategorized functions.
+
+========
+NIRVANAP
+========
+
+Multicolour background and sprites by Einar Saukas.
