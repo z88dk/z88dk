@@ -10,7 +10,6 @@
 @font/font_8x8/fonts.lst
 @font/fzx/fzx_sdcc_iy.lst
 @font/fzx/zx/zx_sdcc_iy.lst
-@games/zx/games_sdcc_iy.lst
 @input/zx/input_sdcc_iy.lst
 @inttypes/inttypes_sdcc_iy.lst
 @l/l.lst
