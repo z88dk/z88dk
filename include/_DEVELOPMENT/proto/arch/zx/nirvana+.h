@@ -15,29 +15,13 @@ include(__link__.m4)
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-#ifdef __SDCC
-
-#define NIRVANA_start()  __asm__("call    64995  ; NIRVANA_start()\n")
-
-#else
-
-#define NIRVANA_start()  asm("call    64995  ; NIRVANA_start()\n")
-
-#endif
+__OPROTO(void,,NIRVANA_start,void)
 
 // ----------------------------------------------------------------
 // Deactivate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-#ifdef __SDCC
-
-#define NIRVANA_stop()  __asm__("call     65012  ; NIRVANA_stop()\n")
-
-#else
-
-#define NIRVANA_stop()  asm("call     65012  ; NIRVANA_stop()\n")
-
-#endif
+__OPROTO(void,,NIRVANA_stop,void)
 
 // ----------------------------------------------------------------
 // Execute HALT (wait for next frame).
