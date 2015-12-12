@@ -5,7 +5,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: fputc_cons.asm,v 1.19 2015-08-07 06:23:57 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.20 2015-12-12 03:21:44 aralbrec Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -62,7 +62,11 @@ ENDIF
 	ld a,(ROW)
 	inc a
 	ld (ROW),a
-	ret
+	cp ROWS         ; out of screen?
+	ret nz
+	dec a
+	ld (ROW),a
+	jp  scrolluptxt
 
 .NoLF
 
