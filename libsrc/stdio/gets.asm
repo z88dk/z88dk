@@ -4,13 +4,15 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.8 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: gets.asm,v 1.9 2015-12-12 03:13:11 aralbrec Exp $
 ;
 
 
 		PUBLIC  gets
 		EXTERN   fgetc_cons
 		EXTERN   fputc_cons
+		EXTERN asm_toupper
+		EXTERN __cons_state
 
 DEFINE EMULATECURSOR
 
@@ -69,6 +71,22 @@ ENDIF
 	jr		z,getloop
 	cp		13
 	jr		z,getend
+	cp		6
+	jr		nz,nocapslock
+	ld		a,(__cons_state)
+	or		a
+	inc		a
+	jr		z,setcapslock
+	xor		a
+.setcapslock
+	ld		(__cons_state),a
+	jr		getloop
+.nocapslock
+	ld		c,a
+	ld		a,(__cons_state)
+	or		a
+	ld		a,c
+	call		nz, asm_toupper
 	ld		(hl),a
 	inc		hl
 	call	conout
