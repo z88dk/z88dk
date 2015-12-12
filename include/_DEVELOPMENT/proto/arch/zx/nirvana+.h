@@ -1,5 +1,8 @@
 include(__link__.m4)
 
+#ifndef __NIRVANA_PLUS_H__
+#define __NIRVANA_PLUS_H__
+
 /* ----------------------------------------------------------------
  * Z88DK INTERFACE LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
  *
@@ -8,8 +11,6 @@ include(__link__.m4)
  * see file "nirvanadem.c".
  * ----------------------------------------------------------------
  */
-#ifndef __NIRVANA_PLUS_H__
-#define __NIRVANA_PLUS_H__
 
 // ----------------------------------------------------------------
 // Activate NIRVANA ENGINE
