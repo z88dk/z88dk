@@ -1,10 +1,12 @@
 @arch/zx/bifrost_h/bifrost_h_asm.lst
+arch/zx/bifrost_h/c/sdcc/BIFROSTH_disableSprites
 arch/zx/bifrost_h/c/sdcc/BIFROSTH_drawBackTilesH
 arch/zx/bifrost_h/c/sdcc/BIFROSTH_drawBackTilesH_callee
 arch/zx/bifrost_h/c/sdcc/BIFROSTH_drawTileH
 arch/zx/bifrost_h/c/sdcc/BIFROSTH_drawTileH_callee
 arch/zx/bifrost_h/c/sdcc/BIFROSTH_drawTilePosH
 arch/zx/bifrost_h/c/sdcc/BIFROSTH_drawTilePosH_callee
+arch/zx/bifrost_h/c/sdcc/BIFROSTH_enableSprites
 arch/zx/bifrost_h/c/sdcc/BIFROSTH_fillTileAttrH
 arch/zx/bifrost_h/c/sdcc/BIFROSTH_fillTileAttrH_callee
 arch/zx/bifrost_h/c/sdcc/BIFROSTH_findAttrH
