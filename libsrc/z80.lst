@@ -18,6 +18,7 @@ printflike/vsprintf
 printflike/vsscanf
 setjmp/longjmp
 setjmp/setjmp
+stdio/__cons_state
 stdio/closeall
 stdio/fabandon
 stdio/fchkstd
