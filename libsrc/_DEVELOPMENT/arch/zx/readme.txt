@@ -1,4 +1,10 @@
 
+=========
+BIFROST_H
+=========
+
+Multicolour background and sprites engine by Einar Saukas.
+
 =======
 DISPLAY
 =======
@@ -36,4 +42,4 @@ Uncategorized functions.
 NIRVANAP
 ========
 
-Multicolour background and sprites by Einar Saukas.
+Multicolour background and sprites engine by Einar Saukas.

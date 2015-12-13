@@ -1,3 +1,4 @@
+@arch/zx/bifrost_h/bifrost_h_asm.lst
 @arch/zx/display/display_asm.lst
 @arch/zx/graphics/graphics_asm.lst
 @arch/zx/misc/misc_asm.lst

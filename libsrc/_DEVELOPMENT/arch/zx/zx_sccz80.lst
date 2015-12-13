@@ -1,3 +1,4 @@
+@arch/zx/bifrost_h/bifrost_h_sccz80.lst
 @arch/zx/display/display_sccz80.lst
 @arch/zx/graphics/graphics_sccz80.lst
 @arch/zx/misc/misc_sccz80.lst
