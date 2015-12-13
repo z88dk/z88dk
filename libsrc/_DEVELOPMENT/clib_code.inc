@@ -22,6 +22,8 @@ section code_alloc_balloc
 section code_alloc_malloc
 section code_alloc_obstack
 section code_arch
+section code_bifrost_h
+section code_bifrost_l
 section code_compress_zx7
 section code_ctype
 section code_driver_general
