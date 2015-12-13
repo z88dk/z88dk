@@ -18,4 +18,4 @@ BIFROSTH_getTile_callee:
         pop bc          ; BC=py
         ex (sp),hl      ; HL=px
 
-        INCLUDE "../../z80/asm_BIFROSTH_getTile.asm"
+        INCLUDE "arch/zx/bifrost_h/z80/asm_BIFROSTH_getTile.asm"

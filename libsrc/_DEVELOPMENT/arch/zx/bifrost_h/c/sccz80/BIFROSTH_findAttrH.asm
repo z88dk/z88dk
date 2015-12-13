@@ -24,4 +24,4 @@ BIFROSTH_findAttrH:
         ld l,(hl)       ; HL=lin
         ld h,b
 
-   	jp asm_BIFROST_findAttrH
+   	jp asm_BIFROSTH_findAttrH

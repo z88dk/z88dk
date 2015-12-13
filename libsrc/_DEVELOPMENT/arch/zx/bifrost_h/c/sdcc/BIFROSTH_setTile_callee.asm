@@ -20,4 +20,4 @@ _BIFROSTH_setTile_callee:
         pop de          ; E=tile
         push af
 
-        INCLUDE "../../z80/asm_BIFROST_setTile.asm"
+        INCLUDE "arch/zx/bifrost_h/z80/asm_BIFROSTH_setTile.asm"

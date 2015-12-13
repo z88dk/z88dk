@@ -18,4 +18,4 @@ BIFROSTH_findAttrH_callee:
         pop bc          ; BC=col
         ex (sp),hl      ; HL=lin
 
-        INCLUDE "../../z80/asm_BIFROSTH_findAttrH.asm"
+        INCLUDE "arch/zx/bifrost_h/z80/asm_BIFROSTH_findAttrH.asm"

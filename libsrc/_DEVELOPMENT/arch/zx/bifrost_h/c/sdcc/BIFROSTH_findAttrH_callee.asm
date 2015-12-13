@@ -19,4 +19,4 @@ _BIFROST_findAttrH_callee:
         pop bc          ; BC=col
         push de
 
-        INCLUDE "../../z80/asm_BIFROSTH_findAttrH.asm"
+        INCLUDE "arch/zx/bifrost_h/z80/asm_BIFROSTH_findAttrH.asm"
