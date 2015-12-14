@@ -4,7 +4,7 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.9 2015-12-12 03:13:11 aralbrec Exp $
+;	$Id: gets.asm,v 1.10 2015-12-14 18:30:34 aralbrec Exp $
 ;
 
 
@@ -67,15 +67,13 @@ ELSE
 ENDIF
 	jr		getloop
 .nobs
-	cp		12
-	jr		z,getloop
 	cp		13
 	jr		z,getend
 	cp		6
 	jr		nz,nocapslock
 	ld		a,(__cons_state)
 	or		a
-	inc		a
+	ld		a,1
 	jr		z,setcapslock
 	xor		a
 .setcapslock
