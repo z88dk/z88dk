@@ -1,0 +1,11 @@
+arch/zx/bifrost_l/z80/_BIFROSTL_tilemap
+arch/zx/bifrost_l/z80/asm_BIFROSTL_drawTileL
+arch/zx/bifrost_l/z80/asm_BIFROSTL_fillTileAttrL
+arch/zx/bifrost_l/z80/asm_BIFROSTL_getAnimGroup
+arch/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim2Frames
+arch/zx/bifrost_l/z80/asm_BIFROSTL_resetAnim4Frames
+arch/zx/bifrost_l/z80/asm_BIFROSTL_resetTileImages
+arch/zx/bifrost_l/z80/asm_BIFROSTL_showNextTile
+arch/zx/bifrost_l/z80/asm_BIFROSTL_showTilePosL
+arch/zx/bifrost_l/z80/asm_BIFROSTL_start
+arch/zx/bifrost_l/z80/asm_BIFROSTL_stop
