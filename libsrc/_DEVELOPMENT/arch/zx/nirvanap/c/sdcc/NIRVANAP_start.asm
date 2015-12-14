@@ -13,4 +13,4 @@ PUBLIC _NIRVANAP_start
 
 EXTERN asm_NIRVANAP_start
 
-defc _NIRVANAP_start = asm_NIRVANA_start
+defc _NIRVANAP_start = asm_NIRVANAP_start
