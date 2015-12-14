@@ -12,6 +12,8 @@ SECTION code_bifrost_l
 
 PUBLIC BIFROSTL_drawTileL_callee
 
+EXTERN asm_BIFROSTL_drawTileL
+
 BIFROSTL_drawTileL_callee:
 
         pop hl          ; RET address

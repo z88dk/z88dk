@@ -11,6 +11,8 @@ SECTION code_bifrost_l
 
 PUBLIC BIFROSTL_drawTileL
 
+EXTERN asm_BIFROSTL_drawTileL
+
 BIFROSTL_drawTileL:
 
    	ld hl,2
