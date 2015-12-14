@@ -1,7 +1,7 @@
 include(__link__.m4)
 
-#ifndef _SP1_H
-#define _SP1_H
+#ifndef _SP1_ZX_H
+#define _SP1_ZX_H
 
 ///////////////////////////////////////////////////////////
 //                  SPRITE PACK v3.0                     //
