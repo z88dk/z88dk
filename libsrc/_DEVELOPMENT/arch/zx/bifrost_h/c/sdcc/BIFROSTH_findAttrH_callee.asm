@@ -12,7 +12,7 @@ SECTION code_bifrost_h
 
 PUBLIC _BIFROSTH_findAttrH_callee
 
-_BIFROST_findAttrH_callee:
+_BIFROSTH_findAttrH_callee:
 
         pop de          ; RET address
         pop hl          ; HL=lin
