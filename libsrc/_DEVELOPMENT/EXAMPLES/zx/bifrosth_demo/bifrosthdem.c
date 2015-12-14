@@ -41,6 +41,9 @@
 #include <arch/zx.h>
 #include <arch/zx/bifrost_h.h>
 
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0   // no heap
+#pragma output REGISTER_SP = -1            // do not change sp
+
 #define printInk(k)          printf("\x10%c", '0'+k)
 #define printPaper(k)        printf("\x11%c", '0'+k)
 #define printAt(row, col)    printf("\x16%c%c", (col), (row))
