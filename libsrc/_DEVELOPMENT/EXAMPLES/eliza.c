@@ -7,7 +7,12 @@
 // bugfix applied:  fixed memory leaks caused by use of replace()
 // changed spacing as terminal resolution varies in z88dk
 
+// zcc +cpm -vn -O3 -clib=new eliza.c -o eliza
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 eliza.c -o eliza
+
+// zcc +zx -vn -O3 -startup=8 -clib=new eliza.c -o eliza
+// zcc +zx -vn -SO3 -startup=8 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 eliza.c -o eliza
+// appmake +zx -b eliza_CODE.bin -o eliza.tap --org 32768 --blockname eliza
 
 #include <stdlib.h>
 #include <stdio.h>
