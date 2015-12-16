@@ -1,0 +1,15 @@
+============================
+"Ticks" - by Antonio villena
+============================
+
+Ticks is a commandline z80 emulator that counts execution time of code fragments
+in z80 clock cycles.
+
+Entering "ticks" on its own prints a help page.
+
+=======
+LICENSE
+=======
+
+Antonio owns copyright and grants z88dk the right to distribute as part
+of its package.
