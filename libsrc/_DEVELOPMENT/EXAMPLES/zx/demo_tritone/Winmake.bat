@@ -10,8 +10,8 @@ z80asm -b -o=MUSIC m_super70s.asm
 zx7 MUSIC_SUPER70S.bin
 z80asm -b -o=MUSIC m_triceropop.asm
 zx7 MUSIC_TRICEROPOP.bin
-zcc +zx -vn -O3 -clib=new tritone.c songs.asm -o tritone
-appmake +zx -b tritone_CODE.bin -o tritone.tap --org 40000 --blockname tritone
-appmake +zx -b tritone_LOWMEM.bin -o songs.tap --org 29000 --blockname songs
+zcc +zx -vn -O3 -startup=8 -clib=new tritone.c songs.asm -o tritone
+appmake +zx -b tritone_CODE.bin -o tritone.tap --org 40000 --blockname tritone --noloader
+appmake +zx -b tritone_LOWMEM.bin -o songs.tap --org 27000 --blockname songs --noloader
 copy /B loader.tap+tritone.tap+songs.tap demo.tap
-del *.reloc *.bin *.map *.obj *.sym *.zx7 *.def MUSIC demo tritone.tap songs.tap
+del *.reloc *.bin *.map *.obj *.sym *.zx7 *.def MUSIC demo tritone tritone.tap songs.tap

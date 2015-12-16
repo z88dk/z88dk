@@ -67,7 +67,7 @@ main()
       // Song List
       
       for (i = 0; i != sizeof(song_list) / sizeof(struct songs); ++i)
-         printf("\t%u. %s\n", i+1, song_list[i].name);
+         printf("   %u. %s\n", i+1, song_list[i].name);
 
       // Gather Song Selection
       
@@ -82,14 +82,14 @@ main()
          {            
             // Decompress into Workspace
             
-            printf("\n\tDecompressing \"%s\"\n", song_list[--i].name);
+            printf("\n   Decompressing \"%s\"\n", song_list[--i].name);
             dzx7_standard(song_list[i].start, WORKSPACE);
             
             // Play Song Until Keypress
             
             in_wait_nokey();
             
-            printf("\tNow playing \"%s\"\n", song_list[i].name);
+            printf("   Now playing \"%s\"\n", song_list[i].name);
             for (s = WORKSPACE; s && (in_test_key() == 0); s = bit_play_tritone(s))
             {
                // could do things here while song plays
