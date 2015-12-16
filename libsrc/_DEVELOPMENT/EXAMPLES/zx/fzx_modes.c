@@ -1,6 +1,7 @@
 
 // zcc +zx -vn -startup=31 -O3 -clib=new fzx_modes.c -o fzx_modes
 // zcc +zx -vn -startup=31 -SO3 -clib=sdcc_ix --reserve-regs-iy --max-reallocs-per-node200000 fzx_modes.c -o fzx_modes
+// appmake +zx -b fzx_modes_CODE.bin -o fzx_modes.tap --org 32768 --blockname modes
 
 #include <font/fzx.h>
 #include <rect.h>
@@ -11,6 +12,7 @@
 
 #pragma output CLIB_EXIT_STACK_SIZE = 0   // no exit stack
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0  // no user heap
+#pragma output REGISTER_SP = -1           // do not change sp
 #pragma output CLIB_STDIO_HEAP_SIZE = 0   // no stdio heap for fd structures
 #pragma output CLIB_FOPEN_MAX = 0         // no allocated FILE structures
 #pragma output CLIB_OPEN_MAX = 0          // no fd table

@@ -4,6 +4,7 @@
 
 // zcc +zx -vn -startup=8 -O3 -clib=new password.c -o password
 // zcc +zx -vn -startup=8 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 password.c -o password
+// appmake +zx -b password_CODE.bin -o password.tap --org 32768 --blockname password
 
 #include <stdio.h>
 #include <stropts.h>
