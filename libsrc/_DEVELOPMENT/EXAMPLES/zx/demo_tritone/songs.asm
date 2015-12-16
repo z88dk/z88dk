@@ -1,6 +1,6 @@
 
 SECTION LOWMEM
-org 23296
+org 29000
 
 PUBLIC _zx7_darklight
 PUBLIC _zx7_journey
