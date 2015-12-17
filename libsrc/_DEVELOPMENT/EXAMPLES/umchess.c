@@ -1,9 +1,9 @@
 
 // http://home.hccnet.nl/h.g.muller/max-src2.html
 
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 umchess.c -o umchess
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 umchess.c -o umchess -lm
 
-// zcc +zx -vn -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 umchess.c -o umchess
+// zcc +zx -vn -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 umchess.c -o umchess -lm
 // appmake +zx -b umchess_CODE.bin -o umchess.tap --org 32768 --blockname umchess
 
 /***************************************************************************/
@@ -113,6 +113,12 @@ C:if(m>I-M|m<M-I)d=98;
 main()
 {
  long k=8;
+
+#ifdef __SPECTRUM
+ #asm
+ di   ;; local var space large so sdcc uses iy despite being told not to
+ #endasm
+#endif
 
  K=8;W(K--)
  {b[K]=(b[K+112]=o[K+24]+8)+8;b[K+16]=18;b[K+96]=9;
