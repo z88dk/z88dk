@@ -12368,15 +12368,15 @@ replace restart {
 //	; peephole z88dk-614h  INCORRECT IF FLAGS USED
 //}
 
-replace restart {
-	ld	a,%1
-	add	a,#0xFF
-	ld	%1,a
-} by {
-	dec	%1
-	ld	a,%1
-	; peephole z88dk-615  INCORRECT IF FLAGS USED
-} if canAssign(%1 '#0xFF')
+//replace restart {
+//	ld	a,%1
+//	add	a,#0xFF
+//	ld	%1,a
+//} by {
+//	dec	%1
+//	ld	a,%1
+//	; peephole z88dk-615  INCORRECT IF FLAGS USED
+//} if canAssign(%1 '#0xFF')
 
 replace restart {
 	ld	%1,#%2 + 1 - 1
