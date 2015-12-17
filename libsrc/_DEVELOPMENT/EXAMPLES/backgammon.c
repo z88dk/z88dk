@@ -2,11 +2,9 @@
 /* ANSIfied and some PDP11isms and bugs fixed for FUZIX */
 /* Borrowed from FUZIX project */
 
-// zcc +cpm -vn -O3 -clib=new backgammon.c -o backg
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 backgammon.c -o backg
 
-// zcc +zx -vn -O3 -startup=4 -clib=new backgammon.c -o backg
-// zcc +zx -vn -SO3 -clib-sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 backgammon.c -o backg
+// zcc +zx -vn -SO3 -startup=4 -clib-sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 backgammon.c -o backg
 // appmake +zx -b backg_CODE.bin -o backg.tap --org 30000 --blockname backg
 
 #ifdef __SPECTRUM
@@ -614,9 +612,9 @@ int main(int argc, char *argv[])
 	/* Set the randomness depending upon the user keyboard time */
 
         printf("\nAny key to continue...\n\n");
-        in_wait_no_key();
+        in_wait_nokey();
         for (t=0; !in_test_key(); ++t) ;
-        in_wait_no_key();
+        in_wait_nokey();
         srand(t);
 //	srand(((uint16_t) time(NULL)) ^ getpid());
 
