@@ -23,7 +23,7 @@ _zx7_madashell:
 
 _zx7_super70s:
 
-   BINARY "MUSIC_SUPER70s.bin.zx7"
+   BINARY "MUSIC_SUPER70S.bin.zx7"
 
 _zx7_triceropop:
 
