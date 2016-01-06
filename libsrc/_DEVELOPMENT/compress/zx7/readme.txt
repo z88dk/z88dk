@@ -1,4 +1,3 @@
-
 =======================
 "ZX7" - by Einar Saukas
 =======================
@@ -45,6 +44,38 @@ screen, execute the following code:
     CALL  65000      ; decompress routine compiled at this address
 
 
+=====
+NOTES
+=====
+
+For simplicity, this implementation of ZX7 compressor (in C) will load all data 
+into memory at once, process everything, then write the output file directly.
+If you want to compress a very large file (over 1Gb), it will take just a few
+seconds (only a few times more than the time it takes to load the file itself
+from disk), but this will need a modern computer with lots of memory. More
+specifically, compressing n bytes of data requires approximately 17n bytes of
+free memory (plus a small constant overhead). Technically it means compressing
+within asymptotically optimal space and time O(n) only.
+
+The provided ZX7 decompressor (in C) works even better. It writes the output
+file while reading the compressed file, without keeping it in memory. Therefore
+it always use the same amount of memory, regardless of file size. Thus even very
+large compressed files (over 1Gb) can always be decompressed using very small
+computers with limited memory, even if it took a lot of memory to compress it
+originally. It also means decompressing within asymptotically optimal space and
+time O(n) only, although in this case it means storage space O(n) for input and
+output files, and constant small memory space O(1) for processing.
+
+As a matter of fact, it would be trivial to modify the ZX7 compressor to operate
+with limited memory too. Theoretically, the ZX7 algorithm only requires optimal
+memory space O(1), optimal storage space O(n), and optimal processing time O(n)
+for both compressing and decompression n bytes of data. However, such compressor
+implementation would have to write and read intermediate files twice. Since
+current ZX7 data format is focused on Z80 machines using small data blocks
+(typically under 64Kb), modifying the ZX7 compressor to generate intermediate
+files is simply not worth it.
+
+
 =======
 LICENSE
 =======
@@ -55,8 +86,9 @@ the compressor within your own products. Otherwise, if you just execute it to
 compress files, you can simply ignore these conditions.
 
 The Z80 assembly decompressors can be used freely within your own ZX-Spectrum
-programs, even for commercial releases. The only condition is that you must
-indicate somehow in your documentation that you have used "ZX7".
+programs (or any other Z80 platform), even for commercial releases. The only
+condition is that you must indicate somehow in your documentation that you have
+used "ZX7".
 
 
 =======
@@ -75,6 +107,13 @@ HISTORY
 2013-01-05: Further improvements in the "Standard" Z80 routine (thanks to
             Metalbrain!)
 
+2013-02-25: Further improvements in the "Turbo" Z80 routine, released libraries
+            for z88dk and Boriel's ZX BASIC.
+
+2015-09-01: Implemented C decompressor, and updated compressor to calculate and
+            display "delta" (if decompressed area will partially overlap
+            compressed area, then last address of compressed area must be at
+            least "delta" bytes higher than last address of decompressed area)
 
 =======
 CREDITS
