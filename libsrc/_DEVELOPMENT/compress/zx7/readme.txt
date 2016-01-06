@@ -64,11 +64,12 @@ large compressed files (over 1Gb) can always be decompressed using very small
 computers with limited memory, even if it took a lot of memory to compress it
 originally. It also means decompressing within asymptotically optimal space and
 time O(n) only, although in this case it means storage space O(n) for input and
-output files, and constant small memory space O(1) for processing.
+output files, and much smaller memory space O(w) for processing, where w is the
+sliding compress window size (about 2Kb only in ZX7, regardless of file size).
 
 As a matter of fact, it would be trivial to modify the ZX7 compressor to operate
 with limited memory too. Theoretically, the ZX7 algorithm only requires optimal
-memory space O(1), optimal storage space O(n), and optimal processing time O(n)
+memory space O(w), optimal storage space O(n), and optimal processing time O(n)
 for both compressing and decompression n bytes of data. However, such compressor
 implementation would have to write and read intermediate files twice. Since
 current ZX7 data format is focused on Z80 machines using small data blocks
@@ -114,6 +115,9 @@ HISTORY
             display "delta" (if decompressed area will partially overlap
             compressed area, then last address of compressed area must be at
             least "delta" bytes higher than last address of decompressed area)
+
+2016-01-06: Improved documentation.
+
 
 =======
 CREDITS
