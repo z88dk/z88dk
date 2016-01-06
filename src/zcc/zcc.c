@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.102 2015-12-14 22:00:40 aralbrec Exp $
+ *      $Id: zcc.c,v 1.103 2016-01-06 20:49:28 aralbrec Exp $
  */
 
 
@@ -69,7 +69,7 @@ static void            BuildAsmLine(char *, size_t, char *);
 static void            parse_cmdline_arg(char *option);
 static void            BuildOptions(char **, char *);
 static void            BuildOptions_start(char **, char *);
-static void            copy_output_files_to_destdir(char *suffix);
+static void            copy_output_files_to_destdir(char *suffix, int die_on_fail);
 static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
 static int             add_variant_args(char *wanted, int num_choices, char **choices);
@@ -111,6 +111,7 @@ static int             verbose = 0;
 static int             peepholeopt = 0;
 static int             sdccpeepopt = 0;
 static int             symbolson = 0;
+static int             lston = 0;
 static int             mapon = 0;
 static int             globaldefon = 0;
 static int             preprocessonly = 0;
@@ -355,6 +356,7 @@ static arg_t     myargs[] = {
     {"m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable"},
 	{"g", AF_BOOL_TRUE, SetBoolean, &globaldefon, NULL, "Generate a global defs file of the final executable"},
     {"s", AF_BOOL_TRUE, SetBoolean, &symbolson, NULL, "Generate a symbol map of the final executable"},
+	{"-list", AF_BOOL_TRUE, SetBoolean, &lston, NULL, "Generate list files"},
     {"o", AF_MORE, SetString, &outputfile, NULL, "Set the output files"},
     {"nt", 0, AddAppmake, NULL, NULL, "Set notruncate on the appmake options"},
     {"M",  AF_MORE, SetString, &c_extension_config, NULL, "Define the suffix of the object files (eg -Mo)"},
@@ -629,7 +631,13 @@ int main(int argc, char **argv)
             BuildOptions(&cpparg, c_incpath);
         }
     }
-    
+
+    if (lston) {
+        /* list on so add list options to assembler and linker */
+        snprintf(buffer, sizeof(buffer), "--list ");
+        BuildOptions(&asmargs, buffer);
+        BuildOptions(&linkargs, buffer);
+    }
 
     if (preserve == NO) {
         if ((fp = fopen(DEFFILE, "w")) != NULL) {
@@ -681,7 +689,7 @@ int main(int argc, char **argv)
             }
             if (preprocessonly) {
                 if (usetemp)
-                    copy_output_files_to_destdir(".i");
+                    copy_output_files_to_destdir(".i", 1);
                 exit(0);
             }
         case PFILE:
@@ -777,14 +785,21 @@ int main(int argc, char **argv)
             break;
         }
     }
-    
-    if (compileonly || assembleonly) {
+
+    if (lston && usetemp) {
+        char *tempofile = outputfile;
+        outputfile = NULL;
+        copy_output_files_to_destdir(".lst", 0);
+        outputfile = tempofile;
+	}
+
+	if (compileonly || assembleonly) {
         if (compileonly && !assembleonly) {
             if (usetemp)
-                copy_output_files_to_destdir(c_extension);
+                copy_output_files_to_destdir(c_extension, 1);
         } else {
             if (usetemp)
-                copy_output_files_to_destdir(peepholeopt ? ".opt" : ".asm");
+                copy_output_files_to_destdir(peepholeopt ? ".opt" : ".asm", 1);
         }
         exit(0);
     }
@@ -833,6 +848,10 @@ int main(int argc, char **argv)
             exit(1);
         }
 
+        if (lston && copy_file(c_crt0, ".lst", "crt0", ".lst")) {
+            fprintf(stderr, "Cannot copy crt0 list file\n");
+            exit(1);
+		}
     }
 
     exit(0);
@@ -1404,7 +1423,7 @@ void KillEOL(char *str)
 
 /** \brief Copy any generated output files, back to the directory they came from
  */
-void copy_output_files_to_destdir(char *suffix)
+void copy_output_files_to_destdir(char *suffix, int die_on_fail)
 {
     int             j, k;
     char           *ptr1, *ptr2;
@@ -1421,7 +1440,7 @@ void copy_output_files_to_destdir(char *suffix)
         free(ptr2);
         if (k) {
             fprintf(stderr, "Couldn't copy output files\n");
-            exit(1);
+            if (die_on_fail) exit(1);
         }
     }
 }
@@ -1709,8 +1728,8 @@ void linkargs_mangle(char *linkargs)
     char           *ptr = linkargs;
 
     if (IS_ASM(ASM_Z80ASM) ) {
-        while ((ptr = strstr(linkargs, "-l")) != NULL) {
-            ptr[1] = 'i';
+        while ((ptr = strstr(linkargs, " -l")) != NULL) {
+            ptr[2] = 'i';
         }
     }
 }
