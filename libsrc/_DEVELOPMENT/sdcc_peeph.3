@@ -11378,6 +11378,64 @@ replace restart {
 	; peephole z88dk-380a
 }
 
+replace restart {
+	inc	de
+} by {
+	; peephole z88dk-381b removed dead increment of de.
+} if notUsed('de')
+
+replace restart {
+	inc	bc
+} by {
+	; peephole z88dk-381c removed dead increment of bc.
+} if notUsed('bc')
+
+replace restart {
+	inc	ix
+} by {
+	; peephole z88dk-381d removed dead increment of ix.
+} if notUsed('ix')
+
+replace restart {
+	inc	iy
+} by {
+	; peephole z88dk-381e removed dead increment of iy.
+} if notUsed('iy')
+
+replace restart {
+	dec	de
+} by {
+	; peephole z88dk-382b removed dead decrement of de.
+} if notUsed('de')
+
+replace restart {
+	dec	bc
+} by {
+	; peephole z88dk-382c removed dead decrement of bc.
+} if notUsed('bc')
+
+replace restart {
+	dec	ix
+} by {
+	; peephole z88dk-382d removed dead decrement of ix.
+} if notUsed('ix')
+
+replace restart {
+	dec	iy
+} by {
+	; peephole z88dk-382e removed dead decrement of iy.
+} if notUsed('iy')
+
+replace restart {
+	ld	%2,%3
+	ld	hl,%1
+	ld	(hl),%2
+} by {
+	ld	%2,%3
+	ld	hl,%1
+	ld	(hl),%3
+	; peephole z88dk-383
+} if canAssign('(hl)' %3)
 
 
 
@@ -12295,6 +12353,26 @@ replace restart {
 	ld	b,h
 	ld	a,(hl)
 	; peephole z88dk-606g
+}
+
+replace restart {
+	ld	b,l
+	ld	c,h
+	ld	a,b
+} by {
+	ld	b,l
+	ld	c,h
+	ld	a,l
+	; peephole z88dk-606h
+}
+
+replace restart {
+	ld	c,h
+	ld	a,c
+} by {
+	ld	c,h
+	ld	a,h
+	; peephole z88dk-606i
 }
 
 replace restart {
