@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.103 2016-01-06 20:49:28 aralbrec Exp $
+ *      $Id: zcc.c,v 1.104 2016-01-20 01:41:58 aralbrec Exp $
  */
 
 
@@ -1728,6 +1728,7 @@ void linkargs_mangle(char *linkargs)
     char           *ptr = linkargs;
 
     if (IS_ASM(ASM_Z80ASM) ) {
+        if (strncmp(linkargs, "-l", 2) == 0) linkargs[1]='i';
         while ((ptr = strstr(linkargs, " -l")) != NULL) {
             ptr[2] = 'i';
         }
