@@ -8,8 +8,7 @@ ZX-Spectrum.
 Available implementations of standard LZ77/LZSS compression algorithm use either
 a "greedy" or "flexible parsing" strategy, that cannot always guarantee the best
 possible encoding. In comparison, "ZX7" provides a highly efficient compression
-algorithm that always generate perfectly optimal LZ77/LZSS encoding. Technically
-it means compressing within space and time O(n) only.
+algorithm that always generate perfectly optimal LZ77/LZSS encoding.
 
 
 =====
@@ -48,33 +47,33 @@ screen, execute the following code:
 NOTES
 =====
 
-For simplicity, this implementation of ZX7 compressor (in C) will load all data 
-into memory at once, process everything, then write the output file directly.
-If you want to compress a very large file (over 1Gb), it will take just a few
+For simplicity, provided implementation of ZX7 compressor (in C) will load all
+data in memory at once, process everything, then write the output file directly.
+If you want to compress a very large file (over 1Gb), it should take just a few
 seconds (only a few times more than the time it takes to load the file itself
-from disk), but this will need a modern computer with lots of memory. More
+from disk), but it will need a modern computer with lots of memory. More
 specifically, compressing n bytes of data requires approximately 17n bytes of
 free memory (plus a small constant overhead). Technically it means compressing
-within asymptotically optimal space and time O(n) only.
+within asymptotically optimal space O(n), asymptotically optimal expected time
+O(n), and asymptotically optimal worst case time O(n*w) only.
 
 The provided ZX7 decompressor (in C) works even better. It writes the output
 file while reading the compressed file, without keeping it in memory. Therefore
 it always use the same amount of memory, regardless of file size. Thus even very
 large compressed files (over 1Gb) can always be decompressed using very small
 computers with limited memory, even if it took a lot of memory to compress it
-originally. It also means decompressing within asymptotically optimal space and
-time O(n) only, although in this case it means storage space O(n) for input and
-output files, and much smaller memory space O(w) for processing, where w is the
-sliding compress window size (about 2Kb only in ZX7, regardless of file size).
+originally. It means decompressing within asymptotically optimal space and time
+O(n) only, although in this case it means storage space O(n) for input and
+output files, and much smaller memory space O(w) for processing.
 
 As a matter of fact, it would be trivial to modify the ZX7 compressor to operate
 with limited memory too. Theoretically, the ZX7 algorithm only requires optimal
-memory space O(w), optimal storage space O(n), and optimal processing time O(n)
-for both compressing and decompression n bytes of data. However, such compressor
-implementation would have to write and read intermediate files twice. Since
-current ZX7 data format is focused on Z80 machines using small data blocks
-(typically under 64Kb), modifying the ZX7 compressor to generate intermediate
-files is simply not worth it.
+memory space O(w) and optimal storage space O(n) for both compressing and
+decompression n bytes of data with a sliding window of w bytes. However, such
+compressor implementation would have to write and read intermediate files twice.
+Since current ZX7 data format is focused on 8-bits Z80 machines using small data
+blocks (typically under 64Kb), modifying the ZX7 compressor to generate
+intermediate files is simply not worth it.
 
 
 =======
@@ -116,7 +115,7 @@ HISTORY
             compressed area, then last address of compressed area must be at
             least "delta" bytes higher than last address of decompressed area)
 
-2016-01-06: Improved documentation.
+2016-01-21: Improved documentation.
 
 
 =======
