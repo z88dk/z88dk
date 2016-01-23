@@ -1,6 +1,64 @@
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
+// Z88DK BUGFIXES APPLIED TO SDCC FOR #9477
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+replace restart {
+	ld	(#%1),hl
+	ld	(#%1 + 2),de
+	ld	hl,#%1
+	ld	l,(hl)
+	ld	hl,#%1 + 1
+	ld	h,(hl)
+	ld	hl,#%1 + 2
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+} by {
+	ld	(#%1),hl
+	ld	(#%1 + 2),de
+	; peephole z88dk-bugfix-1
+}
+
+replace restart {
+	ld	hl,#%1
+	ld	l,(hl)
+	ld	hl,#%1 + 1
+	ld	h,(hl)
+	ld	hl,#%1 + 2
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+} by {
+	ld	hl,(#%1)
+	ld	de,(#%1 + 2)
+	; peephole z88dk-bugfix-2
+}
+
+replace restart {
+	ld	hl,#%1
+	ld	hl,#%2
+	ld	a,(hl)
+	ld	(hl),a
+	inc	hl
+	ld	a,(hl)
+	ld	(hl),a
+} by {
+	ld	hl,#%1
+	ld	a,(#%2)
+	ld	(hl),a
+	inc	hl
+	ld	a,(#%2 + 1)
+	ld	(hl),a
+	ld	hl,#%2 + 1
+	; peephole z88dk-bugfix-3
+}
+
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
 // SDCC PEEPHOLE RULES EXCEPT JP->JR FROM #9477
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
@@ -1971,64 +2029,6 @@ replace restart {
 	jp	NZ,%2
 	; peephole 145 removed redundant zeroing of a (which has just been tested to be #0x00).
 	jp	%3
-}
-
-
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
-// Z88DK BUGFIXES APPLIED TO SDCC FOR #9477
-///////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////
-
-replace restart {
-	ld	(#%1),hl
-	ld	(#%1 + 2),de
-	ld	hl,#%1
-	ld	l,(hl)
-	ld	hl,#%1 + 1
-	ld	h,(hl)
-	ld	hl,#%1 + 2
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-} by {
-	ld	(#%1),hl
-	ld	(#%1 + 2),de
-	; peephole z88dk-bugfix-1
-}
-
-replace restart {
-	ld	hl,#%1
-	ld	l,(hl)
-	ld	hl,#%1 + 1
-	ld	h,(hl)
-	ld	hl,#%1 + 2
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-} by {
-	ld	hl,(#%1)
-	ld	de,(#%1 + 2)
-	; peephole z88dk-bugfix-2
-}
-
-replace restart {
-	ld	hl,#%1
-	ld	hl,#%2
-	ld	a,(hl)
-	ld	(hl),a
-	inc	hl
-	ld	a,(hl)
-	ld	(hl),a
-} by {
-	ld	hl,#%1
-	ld	a,(#%2)
-	ld	(hl),a
-	inc	hl
-	ld	a,(#%2 + 1)
-	ld	(hl),a
-	ld	hl,#%2 + 1
-	; peephole z88dk-bugfix-3
 }
 
 
