@@ -36,13 +36,11 @@ extern unsigned char BIFROSTL_tilemap[81];
 extern void BIFROSTL_start(void);
 
 
-
 // ----------------------------------------------------------------
 // Deactivate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
 extern void BIFROSTL_stop(void);
-
 
 
 // ----------------------------------------------------------------
@@ -175,13 +173,11 @@ extern void BIFROSTL_resetTileImages_fastcall(void *addr) __z88dk_fastcall;
 extern void BIFROSTL_resetAnim2Frames(void);
 
 
-
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to use 4 frames per animation group
 // ----------------------------------------------------------------
 
 extern void BIFROSTL_resetAnim4Frames(void);
-
 
 
 // ----------------------------------------------------------------
@@ -250,7 +246,6 @@ extern void BIFROSTL_showTilePosL_callee(unsigned int row,unsigned int col) __z8
 // ----------------------------------------------------------------
 
 extern void BIFROSTL_showNextTile(void);
-
 
 
 // ----------------------------------------------------------------

@@ -122,7 +122,6 @@ extern void bit_beep_raw_callee(uint16_t cycles_num,uint16_t period_T) __z88dk_c
 
 extern void bit_click(void);
 
-
 extern void bit_fx(void *bfx);
 extern void bit_fx_fastcall(void *bfx) __z88dk_fastcall;
 #define bit_fx(a) bit_fx_fastcall(a)
@@ -160,7 +159,6 @@ extern void bit_beep_raw_di_callee(uint16_t cycles_num,uint16_t period_T) __z88d
 
 
 extern void bit_click_di(void);
-
 
 extern void bit_fx_di(void *bfx);
 extern void bit_fx_di_fastcall(void *bfx) __z88dk_fastcall;

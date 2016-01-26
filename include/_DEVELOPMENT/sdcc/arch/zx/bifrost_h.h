@@ -36,13 +36,11 @@ extern unsigned char BIFROSTH_tilemap[81];
 extern void BIFROSTH_start(void);
 
 
-
 // ----------------------------------------------------------------
 // Deactivate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
 extern void BIFROSTH_stop(void);
-
 
 
 // ----------------------------------------------------------------
@@ -175,13 +173,11 @@ extern void BIFROSTH_resetTileImages_fastcall(void *addr) __z88dk_fastcall;
 extern void BIFROSTH_resetAnim2Frames(void);
 
 
-
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to use 4 frames per animation group
 // ----------------------------------------------------------------
 
 extern void BIFROSTH_resetAnim4Frames(void);
-
 
 
 // ----------------------------------------------------------------
@@ -252,7 +248,6 @@ extern void BIFROSTH_showTilePosH_callee(unsigned int lin,unsigned int col) __z8
 extern void BIFROSTH_showNextTile(void);
 
 
-
 // ----------------------------------------------------------------
 // Instantly change the attributes in a tile area (16x16 pixels) to
 // the specified value (use the same INK and PAPER values to "erase"
@@ -295,7 +290,6 @@ extern void BIFROSTH_fillTileAttrH_callee(unsigned int lin,unsigned int col,unsi
 extern void BIFROSTH_enableSprites(void);
 
 
-
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to stop drawing sprites
 // ----------------------------------------------------------------
@@ -303,7 +297,6 @@ extern void BIFROSTH_enableSprites(void);
 //#define BIFROSTH_disableSprites()   *((unsigned int*)59040)=58636
 
 extern void BIFROSTH_disableSprites(void);
-
 
 
 // ----------------------------------------------------------------

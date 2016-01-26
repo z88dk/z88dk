@@ -31,7 +31,7 @@ typedef struct
 
 // must not use callee or fastcall linkage
 
-__OPROTO(int,,l_setjmp,jmp_buf *env)
-__OPROTO(void,,l_longjmp,jmp_buf *env,int val)
+__OPROTO(,,int,,l_setjmp,jmp_buf *env)
+__OPROTO(,,void,,l_longjmp,jmp_buf *env,int val)
 
 #endif

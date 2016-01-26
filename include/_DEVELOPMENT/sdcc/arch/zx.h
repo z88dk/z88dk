@@ -89,23 +89,23 @@ extern void zx_scroll_wc_up_callee(struct r_Rect8 *r,uint16_t rows,uint16_t attr
 // wiki documentation or the asm source files to see which functions support this.  If
 // comments in the asm source file do not mention this, it is not supported.
 
-extern int zx_aaddr2cx(void *aaddr);
-extern int zx_aaddr2cx_fastcall(void *aaddr) __z88dk_fastcall;
+extern unsigned int zx_aaddr2cx(void *aaddr);
+extern unsigned int zx_aaddr2cx_fastcall(void *aaddr) __z88dk_fastcall;
 #define zx_aaddr2cx(a) zx_aaddr2cx_fastcall(a)
 
 
-extern int zx_aaddr2cy(void *aaddr);
-extern int zx_aaddr2cy_fastcall(void *aaddr) __z88dk_fastcall;
+extern unsigned int zx_aaddr2cy(void *aaddr);
+extern unsigned int zx_aaddr2cy_fastcall(void *aaddr) __z88dk_fastcall;
 #define zx_aaddr2cy(a) zx_aaddr2cy_fastcall(a)
 
 
-extern int zx_aaddr2px(void *aaddr);
-extern int zx_aaddr2px_fastcall(void *aaddr) __z88dk_fastcall;
+extern unsigned int zx_aaddr2px(void *aaddr);
+extern unsigned int zx_aaddr2px_fastcall(void *aaddr) __z88dk_fastcall;
 #define zx_aaddr2px(a) zx_aaddr2px_fastcall(a)
 
 
-extern int zx_aaddr2py(void *aaddr);
-extern int zx_aaddr2py_fastcall(void *aaddr) __z88dk_fastcall;
+extern unsigned int zx_aaddr2py(void *aaddr);
+extern unsigned int zx_aaddr2py_fastcall(void *aaddr) __z88dk_fastcall;
 #define zx_aaddr2py(a) zx_aaddr2py_fastcall(a)
 
 
@@ -134,8 +134,8 @@ extern void *zx_aaddrcup_fastcall(void *aaddr) __z88dk_fastcall;
 #define zx_aaddrcup(a) zx_aaddrcup_fastcall(a)
 
 
-extern int zx_bitmask2px(int bitmask);
-extern int zx_bitmask2px_fastcall(int bitmask) __z88dk_fastcall;
+extern unsigned int zx_bitmask2px(int bitmask);
+extern unsigned int zx_bitmask2px_fastcall(int bitmask) __z88dk_fastcall;
 #define zx_bitmask2px(a) zx_bitmask2px_fastcall(a)
 
 
@@ -159,8 +159,8 @@ extern void *zx_cyx2saddr_callee(int row,int col) __z88dk_callee;
 #define zx_cyx2saddr(a,b) zx_cyx2saddr_callee(a,b)
 
 
-extern int zx_px2bitmask(int x);
-extern int zx_px2bitmask_fastcall(int x) __z88dk_fastcall;
+extern unsigned int zx_px2bitmask(int x);
+extern unsigned int zx_px2bitmask_fastcall(int x) __z88dk_fastcall;
 #define zx_px2bitmask(a) zx_px2bitmask_fastcall(a)
 
 
@@ -189,23 +189,23 @@ extern void *zx_saddr2aaddr_fastcall(void *saddr) __z88dk_fastcall;
 #define zx_saddr2aaddr(a) zx_saddr2aaddr_fastcall(a)
 
 
-extern int zx_saddr2cx(void *saddr);
-extern int zx_saddr2cx_fastcall(void *saddr) __z88dk_fastcall;
+extern unsigned int zx_saddr2cx(void *saddr);
+extern unsigned int zx_saddr2cx_fastcall(void *saddr) __z88dk_fastcall;
 #define zx_saddr2cx(a) zx_saddr2cx_fastcall(a)
 
 
-extern int zx_saddr2cy(void *saddr);
-extern int zx_saddr2cy_fastcall(void *saddr) __z88dk_fastcall;
+extern unsigned int zx_saddr2cy(void *saddr);
+extern unsigned int zx_saddr2cy_fastcall(void *saddr) __z88dk_fastcall;
 #define zx_saddr2cy(a) zx_saddr2cy_fastcall(a)
 
 
-extern int zx_saddr2px(void *saddr);
-extern int zx_saddr2px_fastcall(void *saddr) __z88dk_fastcall;
+extern unsigned int zx_saddr2px(void *saddr);
+extern unsigned int zx_saddr2px_fastcall(void *saddr) __z88dk_fastcall;
 #define zx_saddr2px(a) zx_saddr2px_fastcall(a)
 
 
-extern int zx_saddr2py(void *saddr);
-extern int zx_saddr2py_fastcall(void *saddr) __z88dk_fastcall;
+extern unsigned int zx_saddr2py(void *saddr);
+extern unsigned int zx_saddr2py_fastcall(void *saddr) __z88dk_fastcall;
 #define zx_saddr2py(a) zx_saddr2py_fastcall(a)
 
 
@@ -252,8 +252,8 @@ extern void *zx_saddrpup_fastcall(void *saddr) __z88dk_fastcall;
 
 // graphics
 
-extern int zx_pattern_fill(int x,int y,void *pattern,int depth);
-extern int zx_pattern_fill_callee(int x,int y,void *pattern,int depth) __z88dk_callee;
+extern int zx_pattern_fill(int x,int y,void *pattern,unsigned int depth);
+extern int zx_pattern_fill_callee(int x,int y,void *pattern,unsigned int depth) __z88dk_callee;
 #define zx_pattern_fill(a,b,c,d) zx_pattern_fill_callee(a,b,c,d)
 
 

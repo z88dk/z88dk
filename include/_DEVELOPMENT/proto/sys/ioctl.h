@@ -75,7 +75,7 @@ include(__link__.m4)
 #include <sys/ioctl_zx.h>
 #endif
 
-__VPROTO(int,,ioctl,int fd,uint16_t request,...)
-__DPROTO(int,,vioctl,int fd,uint16_t request,void *arg)
+__VPROTO(,,int,,ioctl,int fd,uint16_t request,...)
+__DPROTO(,,int,,vioctl,int fd,uint16_t request,void *arg)
 
 #endif

@@ -55,7 +55,6 @@ extern void z80_delay_tstate_fastcall(uint16_t tstates) __z88dk_fastcall;
 
 extern uint16_t z80_get_int_state(void);
 
-
 extern void z80_set_int_state(uint16_t state);
 extern void z80_set_int_state_fastcall(uint16_t state) __z88dk_fastcall;
 #define z80_set_int_state(a) z80_set_int_state_fastcall(a)

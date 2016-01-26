@@ -179,27 +179,27 @@ extern void    SP1_DRAW_LOAD2RBIM(void);    // load sprite 2-byte definition (ma
 extern void    SP1_DRAW_ATTR(void);         // pixels are not drawn, only attributes
 
 
-__DPROTO(struct sp1_ss,*,sp1_CreateSpr,void *drawf,uint16_t type,uint16_t height,int graphic,uint16_t plane)
-__DPROTO(uint16_t,,sp1_AddColSpr,struct sp1_ss *s,void *drawf,uint16_t type,int graphic,uint16_t plane)
-__DPROTO(void,,sp1_ChangeSprType,struct sp1_cs *c,void *drawf)
-__DPROTO(void,,sp1_DeleteSpr,struct sp1_ss *s)// only call after sprite is removed from screen
+__DPROTO(,,struct sp1_ss,*,sp1_CreateSpr,void *drawf,uint16_t type,uint16_t height,int graphic,uint16_t plane)
+__DPROTO(,,uint16_t,,sp1_AddColSpr,struct sp1_ss *s,void *drawf,uint16_t type,int graphic,uint16_t plane)
+__DPROTO(,,void,,sp1_ChangeSprType,struct sp1_cs *c,void *drawf)
+__DPROTO(,,void,,sp1_DeleteSpr,struct sp1_ss *s)// only call after sprite is removed from screen
 
-__DPROTO(void,,sp1_MoveSprAbs,struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t row,uint16_t col,uint16_t vrot,uint16_t hrot)
-__DPROTO(void,,sp1_MoveSprRel,struct sp1_ss *s,struct sp1_Rect *clip,void *frame,int rel_row,int rel_col,int rel_vrot,int rel_hrot)
-__DPROTO(void,,sp1_MoveSprPix,struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t x,uint16_t y)
+__DPROTO(,,void,,sp1_MoveSprAbs,struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t row,uint16_t col,uint16_t vrot,uint16_t hrot)
+__DPROTO(,,void,,sp1_MoveSprRel,struct sp1_ss *s,struct sp1_Rect *clip,void *frame,int rel_row,int rel_col,int rel_vrot,int rel_hrot)
+__DPROTO(,,void,,sp1_MoveSprPix,struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t x,uint16_t y)
 
-__DPROTO(void,,sp1_IterateSprChar,struct sp1_ss *s,void *hook1)
-__DPROTO(void,,sp1_IterateUpdateSpr,struct sp1_ss *s,void *hook2)
+__DPROTO(,,void,,sp1_IterateSprChar,struct sp1_ss *s,void *hook1)
+__DPROTO(,,void,,sp1_IterateUpdateSpr,struct sp1_ss *s,void *hook2)
 
-__DPROTO(void,,sp1_GetSprClrAddr,struct sp1_ss *s,uint8_t **sprdest)
-__DPROTO(void,,sp1_PutSprClr,uint8_t **sprdest,struct sp1_ap *src,uint16_t n)
-__DPROTO(void,,sp1_GetSprClr,uint8_t **sprsrc,struct sp1_ap *dest,uint16_t n)
+__DPROTO(,,void,,sp1_GetSprClrAddr,struct sp1_ss *s,uint8_t **sprdest)
+__DPROTO(,,void,,sp1_PutSprClr,uint8_t **sprdest,struct sp1_ap *src,uint16_t n)
+__DPROTO(,,void,,sp1_GetSprClr,uint8_t **sprsrc,struct sp1_ap *dest,uint16_t n)
 
-__DPROTO(void,*,sp1_PreShiftSpr,uint16_t flag,uint16_t height,uint16_t width,void *srcframe,void *destframe,uint16_t rshift)
+__DPROTO(,,void,*,sp1_PreShiftSpr,uint16_t flag,uint16_t height,uint16_t width,void *srcframe,void *destframe,uint16_t rshift)
 
-__DPROTO(void,,sp1_InitCharStruct,struct sp1_cs *cs,void *drawf,uint16_t type,void *graphic,uint16_t plane)
-__DPROTO(void,,sp1_InsertCharStruct,struct sp1_update *u,struct sp1_cs *cs)
-__DPROTO(void,,sp1_RemoveCharStruct,struct sp1_cs *cs)
+__DPROTO(,,void,,sp1_InitCharStruct,struct sp1_cs *cs,void *drawf,uint16_t type,void *graphic,uint16_t plane)
+__DPROTO(,,void,,sp1_InsertCharStruct,struct sp1_update *u,struct sp1_cs *cs)
+__DPROTO(,,void,,sp1_RemoveCharStruct,struct sp1_cs *cs)
 
 ///////////////////////////////////////////////////////////
 //                       TILES                           //
@@ -214,22 +214,22 @@ __DPROTO(void,,sp1_RemoveCharStruct,struct sp1_cs *cs)
 #define SP1_PSSFLAG_YINC        0x04
 #define SP1_PSSFLAG_YWRAP       0x08
 
-__DPROTO(void,*,sp1_TileEntry,uint16_t c,void *def)
+__DPROTO(,,void,*,sp1_TileEntry,uint16_t c,void *def)
 
-__DPROTO(void,,sp1_PrintAt,uint16_t row,uint16_t col,uint16_t colour,uint16_t tile)
-__DPROTO(void,,sp1_PrintAtInv,uint16_t row,uint16_t col,uint16_t colour,uint16_t tile)
-__DPROTO(uint16_t,,sp1_ScreenStr,uint16_t row,uint16_t col)
-__DPROTO(uint16_t,,sp1_ScreenAttr,uint16_t row,uint16_t col)
+__DPROTO(,,void,,sp1_PrintAt,uint16_t row,uint16_t col,uint16_t colour,uint16_t tile)
+__DPROTO(,,void,,sp1_PrintAtInv,uint16_t row,uint16_t col,uint16_t colour,uint16_t tile)
+__DPROTO(,,uint16_t,,sp1_ScreenStr,uint16_t row,uint16_t col)
+__DPROTO(,,uint16_t,,sp1_ScreenAttr,uint16_t row,uint16_t col)
 
-__DPROTO(void,,sp1_PrintString,struct sp1_pss *ps,uint8_t *s)
-__DPROTO(void,,sp1_SetPrintPos,struct sp1_pss *ps,uint16_t row,uint16_t col)
+__DPROTO(,,void,,sp1_PrintString,struct sp1_pss *ps,uint8_t *s)
+__DPROTO(,,void,,sp1_SetPrintPos,struct sp1_pss *ps,uint16_t row,uint16_t col)
 
-__DPROTO(void,,sp1_GetTiles,struct sp1_Rect *r,struct sp1_tp *dest)
-__DPROTO(void,,sp1_PutTiles,struct sp1_Rect *r,struct sp1_tp *src)
-__DPROTO(void,,sp1_PutTilesInv,struct sp1_Rect *r,struct sp1_tp *src)
+__DPROTO(,,void,,sp1_GetTiles,struct sp1_Rect *r,struct sp1_tp *dest)
+__DPROTO(,,void,,sp1_PutTiles,struct sp1_Rect *r,struct sp1_tp *src)
+__DPROTO(,,void,,sp1_PutTilesInv,struct sp1_Rect *r,struct sp1_tp *src)
 
-__DPROTO(void,,sp1_ClearRect,struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag)
-__DPROTO(void,,sp1_ClearRectInv,struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag)
+__DPROTO(,,void,,sp1_ClearRect,struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag)
+__DPROTO(,,void,,sp1_ClearRectInv,struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag)
 
 ///////////////////////////////////////////////////////////
 //                      UPDATER                          //
@@ -241,25 +241,25 @@ __DPROTO(void,,sp1_ClearRectInv,struct sp1_Rect *r,uint16_t colour,uint16_t tile
 
 // void *hook  <->  void [ __FASTCALL__ ] (*hook)(struct sp1_update *u)
 
-__DPROTO(void,,sp1_Initialize,uint16_t iflag,uint16_t colour,uint16_t tile)
-__OPROTO(void,,sp1_UpdateNow,void)
+__DPROTO(,,void,,sp1_Initialize,uint16_t iflag,uint16_t colour,uint16_t tile)
+__OPROTO(,,void,,sp1_UpdateNow,void)
 
-__DPROTO(struct sp1_update,*,sp1_GetUpdateStruct,uint16_t row,uint16_t col)
-__DPROTO(void,,sp1_IterateUpdateArr,struct sp1_update **ua,void *hook)// zero terminated array
-__DPROTO(void,,sp1_IterateUpdateRect,struct sp1_Rect *r,void *hook)
+__DPROTO(,,struct sp1_update,*,sp1_GetUpdateStruct,uint16_t row,uint16_t col)
+__DPROTO(,,void,,sp1_IterateUpdateArr,struct sp1_update **ua,void *hook)// zero terminated array
+__DPROTO(,,void,,sp1_IterateUpdateRect,struct sp1_Rect *r,void *hook)
 
-__DPROTO(void,,sp1_InvUpdateStruct,struct sp1_update *u)
-__DPROTO(void,,sp1_ValUpdateStruct,struct sp1_update *u)
+__DPROTO(,,void,,sp1_InvUpdateStruct,struct sp1_update *u)
+__DPROTO(,,void,,sp1_ValUpdateStruct,struct sp1_update *u)
 
-__DPROTO(void,,sp1_DrawUpdateStructIfInv,struct sp1_update *u)
-__DPROTO(void,,sp1_DrawUpdateStructIfVal,struct sp1_update *u)
-__DPROTO(void,,sp1_DrawUpdateStructIfNotRem,struct sp1_update *u)
-__DPROTO(void,,sp1_DrawUpdateStructAlways,struct sp1_update *u)
+__DPROTO(,,void,,sp1_DrawUpdateStructIfInv,struct sp1_update *u)
+__DPROTO(,,void,,sp1_DrawUpdateStructIfVal,struct sp1_update *u)
+__DPROTO(,,void,,sp1_DrawUpdateStructIfNotRem,struct sp1_update *u)
+__DPROTO(,,void,,sp1_DrawUpdateStructAlways,struct sp1_update *u)
 
-__DPROTO(void,,sp1_RemoveUpdateStruct,struct sp1_update *u)
-__DPROTO(void,,sp1_RestoreUpdateStruct,struct sp1_update *u)
+__DPROTO(,,void,,sp1_RemoveUpdateStruct,struct sp1_update *u)
+__DPROTO(,,void,,sp1_RestoreUpdateStruct,struct sp1_update *u)
 
-__DPROTO(void,,sp1_Invalidate,struct sp1_Rect *r)
-__DPROTO(void,,sp1_Validate,struct sp1_Rect *r)
+__DPROTO(,,void,,sp1_Invalidate,struct sp1_Rect *r)
+__DPROTO(,,void,,sp1_Validate,struct sp1_Rect *r)
 
 #endif

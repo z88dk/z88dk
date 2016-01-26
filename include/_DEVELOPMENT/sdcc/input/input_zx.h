@@ -13,18 +13,13 @@
 
 extern uint16_t in_stick_cursor(void);
 
-
 extern uint16_t in_stick_fuller(void);
-
 
 extern uint16_t in_stick_kempston(void);
 
-
 extern uint16_t in_stick_sinclair1(void);
 
-
 extern uint16_t in_stick_sinclair2(void);
-
 
 
 ////////
@@ -38,7 +33,6 @@ extern void in_mouse_amx_init_callee(uint16_t x_vector,uint16_t y_vector) __z88d
 
 extern void in_mouse_amx_reset(void);
 
-
 extern void in_mouse_amx_setpos(uint16_t x,uint16_t y);
 extern void in_mouse_amx_setpos_callee(uint16_t x,uint16_t y) __z88dk_callee;
 #define in_mouse_amx_setpos(a,b) in_mouse_amx_setpos_callee(a,b)
@@ -51,16 +45,12 @@ extern void in_mouse_amx_callee(uint8_t *buttons,uint16_t *x,uint16_t *y) __z88d
 
 extern uint16_t in_mouse_amx_wheel(void);
 
-
 extern int16_t in_mouse_amx_wheel_delta(void);
-
 
 
 extern void in_mouse_kempston_init(void);
 
-
 extern void in_mouse_kempston_reset(void);
-
 
 extern void in_mouse_kempston_setpos(uint16_t x,uint16_t y);
 extern void in_mouse_kempston_setpos_callee(uint16_t x,uint16_t y) __z88dk_callee;
@@ -74,9 +64,7 @@ extern void in_mouse_kempston_callee(uint8_t *buttons,uint16_t *x,uint16_t *y) _
 
 extern uint16_t in_mouse_kempston_wheel(void);
 
-
 extern int16_t in_mouse_kempston_wheel_delta(void);
-
 
 
 #endif

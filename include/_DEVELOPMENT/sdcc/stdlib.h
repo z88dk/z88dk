@@ -165,7 +165,6 @@ extern uint16_t _strtou__callee(char *nptr,char **endptr,int base) __z88dk_calle
 
 extern void abort(void);
 
-
 extern int abs(int j);
 extern int abs_fastcall(int j) __z88dk_fastcall;
 #define abs(a) abs_fastcall(a)
@@ -272,7 +271,6 @@ extern void quick_exit_fastcall(int status) __z88dk_fastcall;
 
 
 extern int rand(void);
-
 
 extern void srand(uint16_t seed);
 extern void srand_fastcall(uint16_t seed) __z88dk_fastcall;

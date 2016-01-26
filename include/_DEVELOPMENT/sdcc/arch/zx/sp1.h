@@ -363,7 +363,6 @@ extern void sp1_Initialize_callee(uint16_t iflag,uint16_t colour,uint16_t tile) 
 extern void sp1_UpdateNow(void);
 
 
-
 extern struct sp1_update *sp1_GetUpdateStruct(uint16_t row,uint16_t col);
 extern struct sp1_update *sp1_GetUpdateStruct_callee(uint16_t row,uint16_t col) __z88dk_callee;
 #define sp1_GetUpdateStruct(a,b) sp1_GetUpdateStruct_callee(a,b)

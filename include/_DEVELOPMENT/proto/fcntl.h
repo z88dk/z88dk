@@ -33,8 +33,8 @@ typedef unsigned long off_t;
 #define SEEK_END        2
 #endif
 
-__DPROTO(int,,creat,char *path,mode_t mode)
-__VPROTO(int,,open,char *path,int oflag,...)
-__DPROTO(int,,vopen,char *path,int oflag,void *arg)
+__DPROTO(,,int,,creat,char *path,mode_t mode)
+__VPROTO(,,int,,open,char *path,int oflag,...)
+__DPROTO(,,int,,vopen,char *path,int oflag,void *arg)
 
 #endif

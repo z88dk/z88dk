@@ -15,10 +15,10 @@ typedef struct imaxdiv_s
 
 } imaxdiv_t;
 
-__DPROTO(intmax_t,,imaxabs,intmax_t j)
-__DPROTO(void,,_imaxdiv_,imaxdiv_t *md,intmax_t numer,intmax_t denom)
-__DPROTO(intmax_t,,strtoimax,const char *nptr,char **endptr,int base)
-__DPROTO(uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
+__DPROTO(,,intmax_t,,imaxabs,intmax_t j)
+__DPROTO(,,void,,_imaxdiv_,imaxdiv_t *md,intmax_t numer,intmax_t denom)
+__DPROTO(,,intmax_t,,strtoimax,const char *nptr,char **endptr,int base)
+__DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 
 // PRINTF FORMAT SPECIFIERS
 

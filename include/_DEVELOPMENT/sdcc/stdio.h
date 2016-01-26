@@ -198,7 +198,6 @@ extern int getc_fastcall(FILE *stream) __z88dk_fastcall;
 
 extern int getchar(void);
 
-
 extern int getdelim(char **lineptr,size_t *n,int delim,FILE *stream);
 extern int getdelim_callee(char **lineptr,size_t *n,int delim,FILE *stream) __z88dk_callee;
 #define getdelim(a,b,c,d) getdelim_callee(a,b,c,d)
@@ -410,7 +409,6 @@ extern int getc_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
 
 
 extern int getchar_unlocked(void);
-
 
 extern int getdelim_unlocked(char **lineptr,size_t *n,int delim,FILE *stream);
 extern int getdelim_unlocked_callee(char **lineptr,size_t *n,int delim,FILE *stream) __z88dk_callee;

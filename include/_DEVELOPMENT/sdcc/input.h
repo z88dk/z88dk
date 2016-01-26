@@ -17,7 +17,6 @@
 
 extern int in_inkey(void);
 
-
 extern int in_key_pressed(uint16_t scancode);
 extern int in_key_pressed_fastcall(uint16_t scancode) __z88dk_fastcall;
 #define in_key_pressed(a) in_key_pressed_fastcall(a)
@@ -36,12 +35,9 @@ extern uint16_t in_pause_fastcall(uint16_t dur_ms) __z88dk_fastcall;
 
 extern int in_test_key(void);
 
-
 extern void in_wait_key(void);
 
-
 extern void in_wait_nokey(void);
-
 
 
 ////////////

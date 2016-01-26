@@ -85,16 +85,16 @@ extern void __LIB__ __CALLEE__ zx_scroll_wc_up_callee(struct r_Rect8 *r,uint16_t
 // wiki documentation or the asm source files to see which functions support this.  If
 // comments in the asm source file do not mention this, it is not supported.
 
-extern int __LIB__ __FASTCALL__ zx_aaddr2cx(void *aaddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2cx(void *aaddr);
 
 
-extern int __LIB__ __FASTCALL__ zx_aaddr2cy(void *aaddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2cy(void *aaddr);
 
 
-extern int __LIB__ __FASTCALL__ zx_aaddr2px(void *aaddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2px(void *aaddr);
 
 
-extern int __LIB__ __FASTCALL__ zx_aaddr2py(void *aaddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_aaddr2py(void *aaddr);
 
 
 extern void __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *aaddr);
@@ -112,7 +112,7 @@ extern void __LIB__ __FASTCALL__ *zx_aaddrcright(void *aaddr);
 extern void __LIB__ __FASTCALL__ *zx_aaddrcup(void *aaddr);
 
 
-extern int __LIB__ __FASTCALL__ zx_bitmask2px(int bitmask);
+extern unsigned int __LIB__ __FASTCALL__ zx_bitmask2px(int bitmask);
 
 
 extern void __LIB__ __FASTCALL__ *zx_cy2aaddr(int row);
@@ -131,7 +131,7 @@ extern void __LIB__ __CALLEE__ *zx_cyx2saddr_callee(int row,int col);
 #define zx_cyx2saddr(a,b) zx_cyx2saddr_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ zx_px2bitmask(int x);
+extern unsigned int __LIB__ __FASTCALL__ zx_px2bitmask(int x);
 
 
 extern void __LIB__ *zx_pxy2aaddr(int x,int y);
@@ -153,16 +153,16 @@ extern void __LIB__ __FASTCALL__ *zx_py2saddr(int y);
 extern void __LIB__ __FASTCALL__ *zx_saddr2aaddr(void *saddr);
 
 
-extern int __LIB__ __FASTCALL__ zx_saddr2cx(void *saddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2cx(void *saddr);
 
 
-extern int __LIB__ __FASTCALL__ zx_saddr2cy(void *saddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2cy(void *saddr);
 
 
-extern int __LIB__ __FASTCALL__ zx_saddr2px(void *saddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2px(void *saddr);
 
 
-extern int __LIB__ __FASTCALL__ zx_saddr2py(void *saddr);
+extern unsigned int __LIB__ __FASTCALL__ zx_saddr2py(void *saddr);
 
 
 extern void __LIB__ __FASTCALL__ *zx_saddrcdown(void *saddr);
@@ -196,8 +196,8 @@ extern void __LIB__ __FASTCALL__ *zx_saddrpup(void *saddr);
 
 // graphics
 
-extern int __LIB__ zx_pattern_fill(int x,int y,void *pattern,int depth);
-extern int __LIB__ __CALLEE__ zx_pattern_fill_callee(int x,int y,void *pattern,int depth);
+extern int __LIB__ zx_pattern_fill(int x,int y,void *pattern,unsigned int depth);
+extern int __LIB__ __CALLEE__ zx_pattern_fill_callee(int x,int y,void *pattern,unsigned int depth);
 #define zx_pattern_fill(a,b,c,d) zx_pattern_fill_callee(a,b,c,d)
 
 

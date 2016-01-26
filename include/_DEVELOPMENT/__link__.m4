@@ -11,31 +11,45 @@ undefine(`__VPROTO')
 # DECORATED PROTOTYPES (FASTCALL & CALLEE)
 
 define(`__DPROTO', `ifdef(`m4_SDCC',dnl
-`ifelse(eval($# == 4),1,dnl
+`ifelse(eval($# == 6),1,dnl
 dnl
-extern `$1' `$2'``$3''`'(`$4');
-extern `$1' `$2'`$3'_fastcall`'(`$4') __z88dk_fastcall;
-`#define' `$3'`'(a) `$3'_fastcall`'(a)
+ifelse(`$1',,dnl
+extern `$3' `$4'```$5'''`'(`$6');
+extern `$3' `$4'```$5'''_fastcall`'(`$6') __z88dk_fastcall;
+,dnl
+ifelse(`$2',,dnl
+extern `$3' `$4'```$5'''`'(`$6');
+,dnl
+extern `$3' `$4'```$5'''`'(`$6') __preserves_regs(`$2');
+)dnl
+extern `$3' `$4'``$5''_fastcall`'(`$6')  __z88dk_fastcall __preserves_regs(`$1');
+)dnl
+`#define' `$5'`'(a) `$5'_fastcall`'(a)
 
 ,dnl
 dnl
-extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
-extern `$1' `$2'`$3'_callee`'(`shift(shift(shift($@)))') __z88dk_callee;
-`#define' `$3'`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-7))) `$3'_callee`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-7)))
+ifelse(`$2',,dnl
+extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))');
+extern `$3' `$4'```$5'''_callee`'(`shift(shift(shift(shift(shift($@)))))') __z88dk_callee;
+,dnl
+extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))') __preserves_regs(`$2');
+extern `$3' `$4'```$5'''_callee`'(`shift(shift(shift(shift(shift($@)))))')  __preserves_regs(`$2') __z88dk_callee;
+)dnl
+`#define' `$5'`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-11))) `$5'_callee`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-11)))
 
 )',`ifdef(`m4_SCCZ80',dnl
 dnl
-`ifelse(eval($# == 4),1,dnl
+`ifelse(eval($# == 6),1,dnl
 dnl
-extern `$1' __LIB__ __FASTCALL__ `$2'``$3''`'(`$4');
+extern `$3' __LIB__ __FASTCALL__ `$4'``$5''`'(`$6');
 
 ,dnl
-extern `$1' __LIB__ `$2'``$3''`'(`shift(shift(shift($@)))');
-extern `$1' __LIB__ __CALLEE__ `$2'`$3'_callee`'(`shift(shift(shift($@)))');
-`#define' `$3'`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-7))) `$3'_callee`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-7)))
+extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
+extern `$3' __LIB__ __CALLEE__ `$4'``$5''_callee`'(`shift(shift(shift(shift(shift($@)))))');
+`#define' `$5'`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-11))) `$5'_callee`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-11)))
 
 )',dnl
-extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
+extern `$3' `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
 
 )')')
 
@@ -43,13 +57,17 @@ extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
 # ORDINARY PROTOTYPES (UNEMBELLISHED)
 
 define(`__OPROTO', `ifdef(`m4_SDCC',dnl
-extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
-
-,`ifdef(`m4_SCCZ80',dnl
-extern `$1' __LIB__ `$2'``$3''`'(`shift(shift(shift($@)))');
+ifelse(`$2',,dnl
+extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))');
+,dnl
+extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))') __preserves_regs(`$2');
+)dnl
+,dnl
+`ifdef(`m4_SCCZ80',dnl
+extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
 
 ,dnl
-extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
+extern `$3' `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
 
 )')')
 
@@ -57,13 +75,17 @@ extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
 # VARARG PROTOTYPES
 
 define(`__VPROTO', `ifdef(`m4_SDCC',dnl
-extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
+ifelse(`$2',,dnl
+extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))');
+,dnl
+extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))') __preserves_regs(`$2');
+)dnl
 
 ,`ifdef(`m4_SCCZ80',dnl
-extern `$1' __LIB__ `$2'``$3''`'(`shift(shift(shift($@)))');
+extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
 
 ,dnl
-extern `$1' `$2'``$3''`'(`shift(shift(shift($@)))');
+extern `$3' `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
 
 )')')
 

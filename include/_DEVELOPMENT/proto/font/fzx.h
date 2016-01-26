@@ -60,27 +60,27 @@ extern void _fzx_draw_xor(void);       // XOR fzx pixels into display
 
 // FUNCTIONS
 
-__DPROTO(void,,fzx_state_init,struct fzx_state *fs,struct fzx_font *ff,struct r_Rect16 *window)
+__DPROTO(,,void,,fzx_state_init,struct fzx_state *fs,struct fzx_font *ff,struct r_Rect16 *window)
 
-__DPROTO(void,,fzx_at,struct fzx_state *fs,uint16_t x,uint16_t y)
-__DPROTO(int,,fzx_putc,struct fzx_state *fs,int c)
+__DPROTO(,,void,,fzx_at,struct fzx_state *fs,uint16_t x,uint16_t y)
+__DPROTO(,,int,,fzx_putc,struct fzx_state *fs,int c)
 
-__DPROTO(char,*,fzx_char_metrics,struct fzx_font *ff,struct fzx_cmetric *fm,int c)
-__DPROTO(uint16_t,,fzx_glyph_width,struct fzx_font *ff,int c)
+__DPROTO(,,char,*,fzx_char_metrics,struct fzx_font *ff,struct fzx_cmetric *fm,int c)
+__DPROTO(,,uint16_t,,fzx_glyph_width,struct fzx_font *ff,int c)
 
-__DPROTO(uint16_t,,fzx_string_extent,struct fzx_font *ff,char *s)
-__DPROTO(char,*,fzx_string_partition,struct fzx_font *ff,char *s,uint16_t allowed_width)
-__DPROTO(char,*,fzx_string_partition_ww,struct fzx_font *ff,char *s,uint16_t allowed_width)
+__DPROTO(,,uint16_t,,fzx_string_extent,struct fzx_font *ff,char *s)
+__DPROTO(,,char,*,fzx_string_partition,struct fzx_font *ff,char *s,uint16_t allowed_width)
+__DPROTO(,,char,*,fzx_string_partition_ww,struct fzx_font *ff,char *s,uint16_t allowed_width)
 
-__DPROTO(uint16_t,,fzx_buffer_extent,struct fzx_font *ff,char *buf,uint16_t buflen)
-__DPROTO(char,*,fzx_buffer_partition,struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width)
-__DPROTO(char,*,fzx_buffer_partition_ww,struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width)
+__DPROTO(,,uint16_t,,fzx_buffer_extent,struct fzx_font *ff,char *buf,uint16_t buflen)
+__DPROTO(,,char,*,fzx_buffer_partition,struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width)
+__DPROTO(,,char,*,fzx_buffer_partition_ww,struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width)
 
-__DPROTO(int,,fzx_puts,struct fzx_state *fs,char *s)
-__DPROTO(int,,fzx_puts_justified,struct fzx_state *fs,char *s,uint16_t allowed_width)
+__DPROTO(,,int,,fzx_puts,struct fzx_state *fs,char *s)
+__DPROTO(,,int,,fzx_puts_justified,struct fzx_state *fs,char *s,uint16_t allowed_width)
 
-__DPROTO(int,,fzx_write,struct fzx_state *fs,char *buf,uint16_t buflen)
-__DPROTO(int,,fzx_write_justified,struct fzx_state *fs,char *buf,uint16_t buflen,uint16_t allowed_width)
+__DPROTO(,,int,,fzx_write,struct fzx_state *fs,char *buf,uint16_t buflen)
+__DPROTO(,,int,,fzx_write_justified,struct fzx_state *fs,char *buf,uint16_t buflen,uint16_t allowed_width)
 
 // FZX FONTS BY ANDREW OWEN, LATIN VARIANTS BY TK90X
 

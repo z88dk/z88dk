@@ -35,9 +35,7 @@ typedef struct
 
 extern int l_setjmp(jmp_buf *env);
 
-
 extern void l_longjmp(jmp_buf *env,int val);
-
 
 
 #endif
