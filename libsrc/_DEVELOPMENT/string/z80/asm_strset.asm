@@ -23,7 +23,7 @@ asm_strset:
    ;
    ; exit  : hl = char *s
    ;
-   ; uses  : af, hl
+   ; uses  : af
    
    push hl
    xor a

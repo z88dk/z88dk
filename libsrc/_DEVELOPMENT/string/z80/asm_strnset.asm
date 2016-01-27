@@ -23,7 +23,7 @@ asm_strnset:
    ; exit  : hl = char *s
    ;         bc = remaining n
    ;
-   ; uses  : af, bc, hl
+   ; uses  : af, bc
    
    ld a,b
    or c
