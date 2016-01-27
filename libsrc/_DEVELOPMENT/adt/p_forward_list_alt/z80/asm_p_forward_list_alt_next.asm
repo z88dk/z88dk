@@ -30,4 +30,4 @@ defc asm_p_forward_list_alt_next = asm_p_forward_list_next
    ;           hl = 0
    ;           z flag set
    ;
-   ; uses  : af, hl
+   ; uses  : af, de, hl
