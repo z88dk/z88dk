@@ -31,7 +31,7 @@ asm_p_forward_list_prev:
    ;           hl = 0
    ;           carry set
    ;
-   ; uses  : af, hl
+   ; uses  : af, de, hl
 
    call __p_forward_list_locate_item
    jp c, error_zc
