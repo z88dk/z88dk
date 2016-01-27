@@ -33,8 +33,8 @@
 
 // misc
 
-extern void zx_border(uint16_t colour);
-extern void zx_border_fastcall(uint16_t colour) __z88dk_fastcall;
+extern void zx_border(uint16_t colour) __preserves_regs(b,c,d,e);
+extern void zx_border_fastcall(uint16_t colour)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_border(a) zx_border_fastcall(a)
 
 
@@ -89,163 +89,163 @@ extern void zx_scroll_wc_up_callee(struct r_Rect8 *r,uint16_t rows,uint16_t attr
 // wiki documentation or the asm source files to see which functions support this.  If
 // comments in the asm source file do not mention this, it is not supported.
 
-extern unsigned int zx_aaddr2cx(void *aaddr);
-extern unsigned int zx_aaddr2cx_fastcall(void *aaddr) __z88dk_fastcall;
+extern unsigned int zx_aaddr2cx(void *aaddr) __preserves_regs(b,c,d,e);
+extern unsigned int zx_aaddr2cx_fastcall(void *aaddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_aaddr2cx(a) zx_aaddr2cx_fastcall(a)
 
 
-extern unsigned int zx_aaddr2cy(void *aaddr);
-extern unsigned int zx_aaddr2cy_fastcall(void *aaddr) __z88dk_fastcall;
+extern unsigned int zx_aaddr2cy(void *aaddr) __preserves_regs(b,c,d,e);
+extern unsigned int zx_aaddr2cy_fastcall(void *aaddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_aaddr2cy(a) zx_aaddr2cy_fastcall(a)
 
 
-extern unsigned int zx_aaddr2px(void *aaddr);
-extern unsigned int zx_aaddr2px_fastcall(void *aaddr) __z88dk_fastcall;
+extern unsigned int zx_aaddr2px(void *aaddr) __preserves_regs(b,c,d,e);
+extern unsigned int zx_aaddr2px_fastcall(void *aaddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_aaddr2px(a) zx_aaddr2px_fastcall(a)
 
 
-extern unsigned int zx_aaddr2py(void *aaddr);
-extern unsigned int zx_aaddr2py_fastcall(void *aaddr) __z88dk_fastcall;
+extern unsigned int zx_aaddr2py(void *aaddr) __preserves_regs(b,c,d,e);
+extern unsigned int zx_aaddr2py_fastcall(void *aaddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_aaddr2py(a) zx_aaddr2py_fastcall(a)
 
 
-extern void *zx_aaddr2saddr(void *aaddr);
-extern void *zx_aaddr2saddr_fastcall(void *aaddr) __z88dk_fastcall;
+extern void *zx_aaddr2saddr(void *aaddr) __preserves_regs(b,c,d,e);
+extern void *zx_aaddr2saddr_fastcall(void *aaddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_aaddr2saddr(a) zx_aaddr2saddr_fastcall(a)
 
 
-extern void *zx_aaddrcdown(void *aaddr);
-extern void *zx_aaddrcdown_fastcall(void *aaddr) __z88dk_fastcall;
+extern void *zx_aaddrcdown(void *aaddr) __preserves_regs(b,c,d,e);
+extern void *zx_aaddrcdown_fastcall(void *aaddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_aaddrcdown(a) zx_aaddrcdown_fastcall(a)
 
 
-extern void *zx_aaddrcleft(void *aaddr);
-extern void *zx_aaddrcleft_fastcall(void *aaddr) __z88dk_fastcall;
+extern void *zx_aaddrcleft(void *aaddr) __preserves_regs(b,c,d,e);
+extern void *zx_aaddrcleft_fastcall(void *aaddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_aaddrcleft(a) zx_aaddrcleft_fastcall(a)
 
 
-extern void *zx_aaddrcright(void *aaddr);
-extern void *zx_aaddrcright_fastcall(void *aaddr) __z88dk_fastcall;
+extern void *zx_aaddrcright(void *aaddr) __preserves_regs(b,c,d,e);
+extern void *zx_aaddrcright_fastcall(void *aaddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_aaddrcright(a) zx_aaddrcright_fastcall(a)
 
 
-extern void *zx_aaddrcup(void *aaddr);
-extern void *zx_aaddrcup_fastcall(void *aaddr) __z88dk_fastcall;
+extern void *zx_aaddrcup(void *aaddr) __preserves_regs(b,c,d,e);
+extern void *zx_aaddrcup_fastcall(void *aaddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_aaddrcup(a) zx_aaddrcup_fastcall(a)
 
 
-extern unsigned int zx_bitmask2px(int bitmask);
-extern unsigned int zx_bitmask2px_fastcall(int bitmask) __z88dk_fastcall;
+extern unsigned int zx_bitmask2px(int bitmask) __preserves_regs(b,c,d,e);
+extern unsigned int zx_bitmask2px_fastcall(int bitmask)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_bitmask2px(a) zx_bitmask2px_fastcall(a)
 
 
-extern void *zx_cy2aaddr(int row);
-extern void *zx_cy2aaddr_fastcall(int row) __z88dk_fastcall;
+extern void *zx_cy2aaddr(int row) __preserves_regs(b,c,d,e);
+extern void *zx_cy2aaddr_fastcall(int row)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_cy2aaddr(a) zx_cy2aaddr_fastcall(a)
 
 
-extern void *zx_cy2saddr(int row);
-extern void *zx_cy2saddr_fastcall(int row) __z88dk_fastcall;
+extern void *zx_cy2saddr(int row) __preserves_regs(b,c,d,e);
+extern void *zx_cy2saddr_fastcall(int row)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_cy2saddr(a) zx_cy2saddr_fastcall(a)
 
 
-extern void *zx_cyx2aaddr(int row,int col);
-extern void *zx_cyx2aaddr_callee(int row,int col) __z88dk_callee;
+extern void *zx_cyx2aaddr(int row,int col) __preserves_regs(b,c);
+extern void *zx_cyx2aaddr_callee(int row,int col)  __preserves_regs(b,c) __z88dk_callee;
 #define zx_cyx2aaddr(a,b) zx_cyx2aaddr_callee(a,b)
 
 
-extern void *zx_cyx2saddr(int row,int col);
-extern void *zx_cyx2saddr_callee(int row,int col) __z88dk_callee;
+extern void *zx_cyx2saddr(int row,int col) __preserves_regs(b,c);
+extern void *zx_cyx2saddr_callee(int row,int col)  __preserves_regs(b,c) __z88dk_callee;
 #define zx_cyx2saddr(a,b) zx_cyx2saddr_callee(a,b)
 
 
-extern unsigned int zx_px2bitmask(int x);
-extern unsigned int zx_px2bitmask_fastcall(int x) __z88dk_fastcall;
+extern unsigned int zx_px2bitmask(int x) __preserves_regs(c,d,e);
+extern unsigned int zx_px2bitmask_fastcall(int x)  __z88dk_fastcall __preserves_regs(c,d,e);
 #define zx_px2bitmask(a) zx_px2bitmask_fastcall(a)
 
 
-extern void *zx_pxy2aaddr(int x,int y);
-extern void *zx_pxy2aaddr_callee(int x,int y) __z88dk_callee;
+extern void *zx_pxy2aaddr(int x,int y) __preserves_regs(b,c);
+extern void *zx_pxy2aaddr_callee(int x,int y)  __preserves_regs(b,c) __z88dk_callee;
 #define zx_pxy2aaddr(a,b) zx_pxy2aaddr_callee(a,b)
 
 
-extern void *zx_pxy2saddr(int x,int y);
-extern void *zx_pxy2saddr_callee(int x,int y) __z88dk_callee;
+extern void *zx_pxy2saddr(int x,int y) __preserves_regs(b,c);
+extern void *zx_pxy2saddr_callee(int x,int y)  __preserves_regs(b,c) __z88dk_callee;
 #define zx_pxy2saddr(a,b) zx_pxy2saddr_callee(a,b)
 
 
-extern void *zx_py2aaddr(int y);
-extern void *zx_py2aaddr_fastcall(int y) __z88dk_fastcall;
+extern void *zx_py2aaddr(int y) __preserves_regs(b,c,d,e);
+extern void *zx_py2aaddr_fastcall(int y)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_py2aaddr(a) zx_py2aaddr_fastcall(a)
 
 
-extern void *zx_py2saddr(int y);
-extern void *zx_py2saddr_fastcall(int y) __z88dk_fastcall;
+extern void *zx_py2saddr(int y) __preserves_regs(b,c,d,e);
+extern void *zx_py2saddr_fastcall(int y)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_py2saddr(a) zx_py2saddr_fastcall(a)
 
 
-extern void *zx_saddr2aaddr(void *saddr);
-extern void *zx_saddr2aaddr_fastcall(void *saddr) __z88dk_fastcall;
+extern void *zx_saddr2aaddr(void *saddr) __preserves_regs(b,c,d,e);
+extern void *zx_saddr2aaddr_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e,l);
 #define zx_saddr2aaddr(a) zx_saddr2aaddr_fastcall(a)
 
 
-extern unsigned int zx_saddr2cx(void *saddr);
-extern unsigned int zx_saddr2cx_fastcall(void *saddr) __z88dk_fastcall;
+extern unsigned int zx_saddr2cx(void *saddr) __preserves_regs(b,c,d,e);
+extern unsigned int zx_saddr2cx_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddr2cx(a) zx_saddr2cx_fastcall(a)
 
 
-extern unsigned int zx_saddr2cy(void *saddr);
-extern unsigned int zx_saddr2cy_fastcall(void *saddr) __z88dk_fastcall;
+extern unsigned int zx_saddr2cy(void *saddr) __preserves_regs(b,c,d,e);
+extern unsigned int zx_saddr2cy_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddr2cy(a) zx_saddr2cy_fastcall(a)
 
 
-extern unsigned int zx_saddr2px(void *saddr);
-extern unsigned int zx_saddr2px_fastcall(void *saddr) __z88dk_fastcall;
+extern unsigned int zx_saddr2px(void *saddr) __preserves_regs(b,c,d,e);
+extern unsigned int zx_saddr2px_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddr2px(a) zx_saddr2px_fastcall(a)
 
 
-extern unsigned int zx_saddr2py(void *saddr);
-extern unsigned int zx_saddr2py_fastcall(void *saddr) __z88dk_fastcall;
+extern unsigned int zx_saddr2py(void *saddr) __preserves_regs(b,c,d,e);
+extern unsigned int zx_saddr2py_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddr2py(a) zx_saddr2py_fastcall(a)
 
 
-extern void *zx_saddrcdown(void *saddr);
-extern void *zx_saddrcdown_fastcall(void *saddr) __z88dk_fastcall;
+extern void *zx_saddrcdown(void *saddr) __preserves_regs(b,c,d,e);
+extern void *zx_saddrcdown_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddrcdown(a) zx_saddrcdown_fastcall(a)
 
 
-extern void *zx_saddrcleft(void *saddr);
-extern void *zx_saddrcleft_fastcall(void *saddr) __z88dk_fastcall;
+extern void *zx_saddrcleft(void *saddr) __preserves_regs(b,c,d,e);
+extern void *zx_saddrcleft_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddrcleft(a) zx_saddrcleft_fastcall(a)
 
 
-extern void *zx_saddrcright(void *saddr);
-extern void *zx_saddrcright_fastcall(void *saddr) __z88dk_fastcall;
+extern void *zx_saddrcright(void *saddr) __preserves_regs(b,c,d,e);
+extern void *zx_saddrcright_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddrcright(a) zx_saddrcright_fastcall(a)
 
 
-extern void *zx_saddrcup(void *saddr);
-extern void *zx_saddrcup_fastcall(void *saddr) __z88dk_fastcall;
+extern void *zx_saddrcup(void *saddr) __preserves_regs(b,c,d,e);
+extern void *zx_saddrcup_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddrcup(a) zx_saddrcup_fastcall(a)
 
 
-extern void *zx_saddrpdown(void *saddr);
-extern void *zx_saddrpdown_fastcall(void *saddr) __z88dk_fastcall;
+extern void *zx_saddrpdown(void *saddr) __preserves_regs(b,c,d,e);
+extern void *zx_saddrpdown_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddrpdown(a) zx_saddrpdown_fastcall(a)
 
 
-extern void *zx_saddrpleft(void *saddr,int bitmask);
-extern void *zx_saddrpleft_callee(void *saddr,int bitmask) __z88dk_callee;
+extern void *zx_saddrpleft(void *saddr,int bitmask) __preserves_regs(b,c);
+extern void *zx_saddrpleft_callee(void *saddr,int bitmask)  __preserves_regs(b,c) __z88dk_callee;
 #define zx_saddrpleft(a,b) zx_saddrpleft_callee(a,b)
 
 
-extern void *zx_saddrpright(void *saddr,int bitmask);
-extern void *zx_saddrpright_callee(void *saddr,int bitmask) __z88dk_callee;
+extern void *zx_saddrpright(void *saddr,int bitmask) __preserves_regs(b,c);
+extern void *zx_saddrpright_callee(void *saddr,int bitmask)  __preserves_regs(b,c) __z88dk_callee;
 #define zx_saddrpright(a,b) zx_saddrpright_callee(a,b)
 
 
-extern void *zx_saddrpup(void *saddr);
-extern void *zx_saddrpup_fastcall(void *saddr) __z88dk_fastcall;
+extern void *zx_saddrpup(void *saddr) __preserves_regs(b,c,d,e);
+extern void *zx_saddrpup_fastcall(void *saddr)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define zx_saddrpup(a) zx_saddrpup_fastcall(a)
 
 

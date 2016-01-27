@@ -14,13 +14,13 @@ typedef struct p_queue_s
 
 } p_queue_t;
 
-__DPROTO(,,void,*,p_queue_back,p_queue_t *q)
-__DPROTO(,,void,,p_queue_clear,p_queue_t *q)
-__DPROTO(,,int,,p_queue_empty,p_queue_t *q)
-__DPROTO(,,void,*,p_queue_front,p_queue_t *q)
-__DPROTO(,,void,,p_queue_init,void *p)
+__DPROTO(`b,c,d,e',`b,c,d,e',void,*,p_queue_back,p_queue_t *q)
+__DPROTO(`b,c',`b,c',void,,p_queue_clear,p_queue_t *q)
+__DPROTO(`b,c,d,e',`b,c,d,e',int,,p_queue_empty,p_queue_t *q)
+__DPROTO(`b,c,d,e',`b,c,d,e',void,*,p_queue_front,p_queue_t *q)
+__DPROTO(`b,c',`b,c',void,,p_queue_init,void *p)
 __DPROTO(,,void,*,p_queue_pop,p_queue_t *q)
 __DPROTO(,,void,,p_queue_push,p_queue_t *q,void *item)
-__DPROTO(,,size_t,,p_queue_size,p_queue_t *q)
+__DPROTO(`b,c',`b,c',size_t,,p_queue_size,p_queue_t *q)
 
 #endif

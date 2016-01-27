@@ -43,28 +43,28 @@ extern int b_array_back_fastcall(b_array_t *a) __z88dk_fastcall;
 #define b_array_back(a) b_array_back_fastcall(a)
 
 
-extern size_t b_array_capacity(b_array_t *a);
-extern size_t b_array_capacity_fastcall(b_array_t *a) __z88dk_fastcall;
+extern size_t b_array_capacity(b_array_t *a) __preserves_regs(b,c,d,e);
+extern size_t b_array_capacity_fastcall(b_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define b_array_capacity(a) b_array_capacity_fastcall(a)
 
 
-extern void b_array_clear(b_array_t *a);
-extern void b_array_clear_fastcall(b_array_t *a) __z88dk_fastcall;
+extern void b_array_clear(b_array_t *a) __preserves_regs(b,c,d,e);
+extern void b_array_clear_fastcall(b_array_t *a)  __z88dk_fastcall __preserves_regs(a,b,c,d,e);
 #define b_array_clear(a) b_array_clear_fastcall(a)
 
 
-extern void *b_array_data(b_array_t *a);
-extern void *b_array_data_fastcall(b_array_t *a) __z88dk_fastcall;
+extern void *b_array_data(b_array_t *a) __preserves_regs(b,c,d,e);
+extern void *b_array_data_fastcall(b_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define b_array_data(a) b_array_data_fastcall(a)
 
 
-extern void b_array_destroy(b_array_t *a);
-extern void b_array_destroy_fastcall(b_array_t *a) __z88dk_fastcall;
+extern void b_array_destroy(b_array_t *a) __preserves_regs(b,c,d,e);
+extern void b_array_destroy_fastcall(b_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define b_array_destroy(a) b_array_destroy_fastcall(a)
 
 
-extern int b_array_empty(b_array_t *a);
-extern int b_array_empty_fastcall(b_array_t *a) __z88dk_fastcall;
+extern int b_array_empty(b_array_t *a) __preserves_regs(b,c,d,e);
+extern int b_array_empty_fastcall(b_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define b_array_empty(a) b_array_empty_fastcall(a)
 
 
@@ -128,8 +128,8 @@ extern int b_array_resize_callee(b_array_t *a,size_t n) __z88dk_callee;
 #define b_array_resize(a,b) b_array_resize_callee(a,b)
 
 
-extern size_t b_array_size(b_array_t *a);
-extern size_t b_array_size_fastcall(b_array_t *a) __z88dk_fastcall;
+extern size_t b_array_size(b_array_t *a) __preserves_regs(b,c,d,e);
+extern size_t b_array_size_fastcall(b_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define b_array_size(a) b_array_size_fastcall(a)
 
 

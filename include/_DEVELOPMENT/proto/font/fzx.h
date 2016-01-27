@@ -66,7 +66,7 @@ __DPROTO(,,void,,fzx_at,struct fzx_state *fs,uint16_t x,uint16_t y)
 __DPROTO(,,int,,fzx_putc,struct fzx_state *fs,int c)
 
 __DPROTO(,,char,*,fzx_char_metrics,struct fzx_font *ff,struct fzx_cmetric *fm,int c)
-__DPROTO(,,uint16_t,,fzx_glyph_width,struct fzx_font *ff,int c)
+__DPROTO(`d,e',`d,e',uint16_t,,fzx_glyph_width,struct fzx_font *ff,int c)
 
 __DPROTO(,,uint16_t,,fzx_string_extent,struct fzx_font *ff,char *s)
 __DPROTO(,,char,*,fzx_string_partition,struct fzx_font *ff,char *s,uint16_t allowed_width)

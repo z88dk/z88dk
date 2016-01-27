@@ -25,14 +25,14 @@ typedef uint16_t       once_flag;
 // mutex
 
 __DPROTO(,,void,,call_once,once_flag *flag,void *func)
-__DPROTO(,,void..mtx_destroy,mtx_t *m)
-__DPROTO(,,int,,mtx_init,mtx_t *m,int type)
+__DPROTO(`b,c,d,e',`b,c,d,e',void,,mtx_destroy,mtx_t *m)
+__DPROTO(`d,e',`d,e',int,,mtx_init,mtx_t *m,int type)
 __DPROTO(,,int,,mtx_lock,mtx_t *m)
 __DPROTO(,,int,,mtx_timedlock,mtx_t *m,struct timespec *ts)
-__DPROTO(,,int,,mtx_trylock,mtx_t *m)
+__DPROTO(`b,c,d,e',`b,c,d,e',int,,mtx_trylock,mtx_t *m)
 __DPROTO(,,int,,mtx_unlock,mtx_t *m)
-__DPROTO(,,void,,spinlock_acquire,char *spinlock)
-__DPROTO(,,void,,spinlock_release,char *spinlock)
-__DPROTO(,,int,,spinlock_tryacquire,char *spinlock)
+__DPROTO(`a,b,c,d,e,h,l',`b,c,d,e',void,,spinlock_acquire,char *spinlock)
+__DPROTO(`a,b,c,d,e,h,l',`b,c,d,e',void,,spinlock_release,char *spinlock)
+__DPROTO(`a,b,c,d,e',`b,c,d,e',int,,spinlock_tryacquire,char *spinlock)
 
 #endif

@@ -11,38 +11,38 @@
 
 typedef void* p_stack_t;
 
-extern void p_stack_clear(p_stack_t *s);
-extern void p_stack_clear_fastcall(p_stack_t *s) __z88dk_fastcall;
+extern void p_stack_clear(p_stack_t *s) __preserves_regs(b,c);
+extern void p_stack_clear_fastcall(p_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c);
 #define p_stack_clear(a) p_stack_clear_fastcall(a)
 
 
-extern int p_stack_empty(p_stack_t *s);
-extern int p_stack_empty_fastcall(p_stack_t *s) __z88dk_fastcall;
+extern int p_stack_empty(p_stack_t *s) __preserves_regs(b,c,d,e);
+extern int p_stack_empty_fastcall(p_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define p_stack_empty(a) p_stack_empty_fastcall(a)
 
 
-extern void p_stack_init(void *p);
-extern void p_stack_init_fastcall(void *p) __z88dk_fastcall;
+extern void p_stack_init(void *p) __preserves_regs(b,c);
+extern void p_stack_init_fastcall(void *p)  __z88dk_fastcall __preserves_regs(b,c);
 #define p_stack_init(a) p_stack_init_fastcall(a)
 
 
-extern void *p_stack_pop(p_stack_t *s);
-extern void *p_stack_pop_fastcall(p_stack_t *s) __z88dk_fastcall;
+extern void *p_stack_pop(p_stack_t *s) __preserves_regs(b,c);
+extern void *p_stack_pop_fastcall(p_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c);
 #define p_stack_pop(a) p_stack_pop_fastcall(a)
 
 
-extern void p_stack_push(p_stack_t *s,void *item);
-extern void p_stack_push_callee(p_stack_t *s,void *item) __z88dk_callee;
+extern void p_stack_push(p_stack_t *s,void *item) __preserves_regs(b,c);
+extern void p_stack_push_callee(p_stack_t *s,void *item)  __preserves_regs(b,c) __z88dk_callee;
 #define p_stack_push(a,b) p_stack_push_callee(a,b)
 
 
-extern size_t p_stack_size(p_stack_t *s);
-extern size_t p_stack_size_fastcall(p_stack_t *s) __z88dk_fastcall;
+extern size_t p_stack_size(p_stack_t *s) __preserves_regs(b,c);
+extern size_t p_stack_size_fastcall(p_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c);
 #define p_stack_size(a) p_stack_size_fastcall(a)
 
 
-extern void *p_stack_top(p_stack_t *s);
-extern void *p_stack_top_fastcall(p_stack_t *s) __z88dk_fastcall;
+extern void *p_stack_top(p_stack_t *s) __preserves_regs(b,c,d,e);
+extern void *p_stack_top_fastcall(p_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define p_stack_top(a) p_stack_top_fastcall(a)
 
 

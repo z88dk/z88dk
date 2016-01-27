@@ -296,13 +296,13 @@ extern void sp1_PrintAtInv_callee(uint16_t row,uint16_t col,uint16_t colour,uint
 #define sp1_PrintAtInv(a,b,c,d) sp1_PrintAtInv_callee(a,b,c,d)
 
 
-extern uint16_t sp1_ScreenStr(uint16_t row,uint16_t col);
-extern uint16_t sp1_ScreenStr_callee(uint16_t row,uint16_t col) __z88dk_callee;
+extern uint16_t sp1_ScreenStr(uint16_t row,uint16_t col) __preserves_regs(b,c);
+extern uint16_t sp1_ScreenStr_callee(uint16_t row,uint16_t col)  __preserves_regs(b,c) __z88dk_callee;
 #define sp1_ScreenStr(a,b) sp1_ScreenStr_callee(a,b)
 
 
-extern uint16_t sp1_ScreenAttr(uint16_t row,uint16_t col);
-extern uint16_t sp1_ScreenAttr_callee(uint16_t row,uint16_t col) __z88dk_callee;
+extern uint16_t sp1_ScreenAttr(uint16_t row,uint16_t col) __preserves_regs(b,c);
+extern uint16_t sp1_ScreenAttr_callee(uint16_t row,uint16_t col)  __preserves_regs(b,c) __z88dk_callee;
 #define sp1_ScreenAttr(a,b) sp1_ScreenAttr_callee(a,b)
 
 
@@ -363,8 +363,8 @@ extern void sp1_Initialize_callee(uint16_t iflag,uint16_t colour,uint16_t tile) 
 extern void sp1_UpdateNow(void);
 
 
-extern struct sp1_update *sp1_GetUpdateStruct(uint16_t row,uint16_t col);
-extern struct sp1_update *sp1_GetUpdateStruct_callee(uint16_t row,uint16_t col) __z88dk_callee;
+extern struct sp1_update *sp1_GetUpdateStruct(uint16_t row,uint16_t col) __preserves_regs(b,c);
+extern struct sp1_update *sp1_GetUpdateStruct_callee(uint16_t row,uint16_t col)  __preserves_regs(b,c) __z88dk_callee;
 #define sp1_GetUpdateStruct(a,b) sp1_GetUpdateStruct_callee(a,b)
 
 
@@ -384,8 +384,8 @@ extern void sp1_InvUpdateStruct_fastcall(struct sp1_update *u) __z88dk_fastcall;
 #define sp1_InvUpdateStruct(a) sp1_InvUpdateStruct_fastcall(a)
 
 
-extern void sp1_ValUpdateStruct(struct sp1_update *u);
-extern void sp1_ValUpdateStruct_fastcall(struct sp1_update *u) __z88dk_fastcall;
+extern void sp1_ValUpdateStruct(struct sp1_update *u) __preserves_regs(b,c,d,e);
+extern void sp1_ValUpdateStruct_fastcall(struct sp1_update *u)  __z88dk_fastcall __preserves_regs(a,b,c,d,e,h,l);
 #define sp1_ValUpdateStruct(a) sp1_ValUpdateStruct_fastcall(a)
 
 
@@ -411,13 +411,13 @@ extern void sp1_DrawUpdateStructAlways_fastcall(struct sp1_update *u) __z88dk_fa
 
 
 
-extern void sp1_RemoveUpdateStruct(struct sp1_update *u);
-extern void sp1_RemoveUpdateStruct_fastcall(struct sp1_update *u) __z88dk_fastcall;
+extern void sp1_RemoveUpdateStruct(struct sp1_update *u) __preserves_regs(b,c);
+extern void sp1_RemoveUpdateStruct_fastcall(struct sp1_update *u)  __z88dk_fastcall __preserves_regs(b,c);
 #define sp1_RemoveUpdateStruct(a) sp1_RemoveUpdateStruct_fastcall(a)
 
 
-extern void sp1_RestoreUpdateStruct(struct sp1_update *u);
-extern void sp1_RestoreUpdateStruct_fastcall(struct sp1_update *u) __z88dk_fastcall;
+extern void sp1_RestoreUpdateStruct(struct sp1_update *u) __preserves_regs(b,c,d,e);
+extern void sp1_RestoreUpdateStruct_fastcall(struct sp1_update *u)  __z88dk_fastcall __preserves_regs(a,b,c,d,e,h,l);
 #define sp1_RestoreUpdateStruct(a) sp1_RestoreUpdateStruct_fastcall(a)
 
 

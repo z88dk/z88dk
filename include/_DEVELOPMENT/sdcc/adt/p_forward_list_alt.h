@@ -17,28 +17,28 @@ typedef struct p_forward_list_alt_s
 
 } p_forward_list_alt_t;
 
-extern void *p_forward_list_alt_back(p_forward_list_alt_t *ls);
-extern void *p_forward_list_alt_back_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern void *p_forward_list_alt_back(p_forward_list_alt_t *ls) __preserves_regs(b,c,d,e);
+extern void *p_forward_list_alt_back_fastcall(p_forward_list_alt_t *ls)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define p_forward_list_alt_back(a) p_forward_list_alt_back_fastcall(a)
 
 
-extern void p_forward_list_alt_clear(p_forward_list_alt_t *ls);
-extern void p_forward_list_alt_clear_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern void p_forward_list_alt_clear(p_forward_list_alt_t *ls) __preserves_regs(b,c);
+extern void p_forward_list_alt_clear_fastcall(p_forward_list_alt_t *ls)  __z88dk_fastcall __preserves_regs(b,c);
 #define p_forward_list_alt_clear(a) p_forward_list_alt_clear_fastcall(a)
 
 
-extern int p_forward_list_alt_empty(p_forward_list_alt_t *ls);
-extern int p_forward_list_alt_empty_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern int p_forward_list_alt_empty(p_forward_list_alt_t *ls) __preserves_regs(b,c,d,e);
+extern int p_forward_list_alt_empty_fastcall(p_forward_list_alt_t *ls)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define p_forward_list_alt_empty(a) p_forward_list_alt_empty_fastcall(a)
 
 
-extern void *p_forward_list_alt_front(p_forward_list_alt_t *ls);
-extern void *p_forward_list_alt_front_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern void *p_forward_list_alt_front(p_forward_list_alt_t *ls) __preserves_regs(b,c,d,e);
+extern void *p_forward_list_alt_front_fastcall(p_forward_list_alt_t *ls)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define p_forward_list_alt_front(a) p_forward_list_alt_front_fastcall(a)
 
 
-extern void p_forward_list_alt_init(void *p);
-extern void p_forward_list_alt_init_fastcall(void *p) __z88dk_fastcall;
+extern void p_forward_list_alt_init(void *p) __preserves_regs(b,c);
+extern void p_forward_list_alt_init_fastcall(void *p)  __z88dk_fastcall __preserves_regs(b,c);
 #define p_forward_list_alt_init(a) p_forward_list_alt_init_fastcall(a)
 
 
@@ -47,8 +47,8 @@ extern void *p_forward_list_alt_insert_after_callee(p_forward_list_alt_t *ls,voi
 #define p_forward_list_alt_insert_after(a,b,c) p_forward_list_alt_insert_after_callee(a,b,c)
 
 
-extern void *p_forward_list_alt_next(void *item);
-extern void *p_forward_list_alt_next_fastcall(void *item) __z88dk_fastcall;
+extern void *p_forward_list_alt_next(void *item) __preserves_regs(b,c);
+extern void *p_forward_list_alt_next_fastcall(void *item)  __z88dk_fastcall __preserves_regs(b,c);
 #define p_forward_list_alt_next(a) p_forward_list_alt_next_fastcall(a)
 
 
@@ -87,8 +87,8 @@ extern void *p_forward_list_alt_remove_after_callee(p_forward_list_alt_t *ls,voi
 #define p_forward_list_alt_remove_after(a,b) p_forward_list_alt_remove_after_callee(a,b)
 
 
-extern size_t p_forward_list_alt_size(p_forward_list_alt_t *ls);
-extern size_t p_forward_list_alt_size_fastcall(p_forward_list_alt_t *ls) __z88dk_fastcall;
+extern size_t p_forward_list_alt_size(p_forward_list_alt_t *ls) __preserves_regs(b,c);
+extern size_t p_forward_list_alt_size_fastcall(p_forward_list_alt_t *ls)  __z88dk_fastcall __preserves_regs(b,c);
 #define p_forward_list_alt_size(a) p_forward_list_alt_size_fastcall(a)
 
 

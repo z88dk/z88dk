@@ -15,26 +15,26 @@
 // keyboard
 ///////////
 
-extern int __LIB__ in_inkey(void);
+//extern int __LIB__ in_inkey(void);
 
 
-extern int __LIB__ __FASTCALL__ in_key_pressed(uint16_t scancode);
+//extern int __LIB__ __FASTCALL__ in_key_pressed(uint16_t scancode);
 
 
-extern uint16_t __LIB__ __FASTCALL__ in_key_scancode(int c);
+//extern uint16_t __LIB__ __FASTCALL__ in_key_scancode(int c);
 
 
-
-extern uint16_t __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms);
-
-
-extern int __LIB__ in_test_key(void);
+//
+//extern uint16_t __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms);
 
 
-extern void __LIB__ in_wait_key(void);
+//extern int __LIB__ in_test_key(void);
 
 
-extern void __LIB__ in_wait_nokey(void);
+//extern void __LIB__ in_wait_key(void);
+
+
+//extern void __LIB__ in_wait_nokey(void);
 
 
 
@@ -66,7 +66,7 @@ typedef struct udk_s
 #define IN_STICK_LEFT    0x04
 #define IN_STICK_RIGHT   0x08
 
-extern uint16_t __LIB__ __FASTCALL__ in_stick_keyboard(udk_t *u);
+//extern uint16_t __LIB__ __FASTCALL__ in_stick_keyboard(udk_t *u);
 
 
 
@@ -87,6 +87,10 @@ extern uint16_t __LIB__ __FASTCALL__ in_stick_keyboard(udk_t *u);
 ////////////////////////////////////
 // PLATFORM SPECIFIC INPUT FUNCTIONS
 ////////////////////////////////////
+
+#ifdef __CPM
+#include <input/input_cpm.h>
+#endif
 
 #ifdef __SPECTRUM
 #include <input/input_zx.h>

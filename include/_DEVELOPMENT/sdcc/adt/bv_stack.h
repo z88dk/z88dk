@@ -19,23 +19,23 @@ typedef struct bv_stack_s
 
 } bv_stack_t;
 
-extern size_t bv_stack_capacity(bv_stack_t *s);
-extern size_t bv_stack_capacity_fastcall(bv_stack_t *s) __z88dk_fastcall;
+extern size_t bv_stack_capacity(bv_stack_t *s) __preserves_regs(b,c,d,e);
+extern size_t bv_stack_capacity_fastcall(bv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define bv_stack_capacity(a) bv_stack_capacity_fastcall(a)
 
 
-extern void bv_stack_clear(bv_stack_t *s);
-extern void bv_stack_clear_fastcall(bv_stack_t *s) __z88dk_fastcall;
+extern void bv_stack_clear(bv_stack_t *s) __preserves_regs(b,c,d,e);
+extern void bv_stack_clear_fastcall(bv_stack_t *s)  __z88dk_fastcall __preserves_regs(a,b,c,d,e);
 #define bv_stack_clear(a) bv_stack_clear_fastcall(a)
 
 
-extern void bv_stack_destroy(bv_stack_t *s);
-extern void bv_stack_destroy_fastcall(bv_stack_t *s) __z88dk_fastcall;
+extern void bv_stack_destroy(bv_stack_t *s) __preserves_regs(b,c);
+extern void bv_stack_destroy_fastcall(bv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c);
 #define bv_stack_destroy(a) bv_stack_destroy_fastcall(a)
 
 
-extern int bv_stack_empty(bv_stack_t *s);
-extern int bv_stack_empty_fastcall(bv_stack_t *s) __z88dk_fastcall;
+extern int bv_stack_empty(bv_stack_t *s) __preserves_regs(b,c,d,e);
+extern int bv_stack_empty_fastcall(bv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define bv_stack_empty(a) bv_stack_empty_fastcall(a)
 
 
@@ -44,8 +44,8 @@ extern bv_stack_t *bv_stack_init_callee(void *p,size_t capacity,size_t max_size)
 #define bv_stack_init(a,b,c) bv_stack_init_callee(a,b,c)
 
 
-extern size_t bv_stack_max_size(bv_stack_t *s);
-extern size_t bv_stack_max_size_fastcall(bv_stack_t *s) __z88dk_fastcall;
+extern size_t bv_stack_max_size(bv_stack_t *s) __preserves_regs(b,c,d,e);
+extern size_t bv_stack_max_size_fastcall(bv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define bv_stack_max_size(a) bv_stack_max_size_fastcall(a)
 
 
@@ -69,8 +69,8 @@ extern int bv_stack_shrink_to_fit_fastcall(bv_stack_t *s) __z88dk_fastcall;
 #define bv_stack_shrink_to_fit(a) bv_stack_shrink_to_fit_fastcall(a)
 
 
-extern size_t bv_stack_size(bv_stack_t *s);
-extern size_t bv_stack_size_fastcall(bv_stack_t *s) __z88dk_fastcall;
+extern size_t bv_stack_size(bv_stack_t *s) __preserves_regs(b,c,d,e);
+extern size_t bv_stack_size_fastcall(bv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define bv_stack_size(a) bv_stack_size_fastcall(a)
 
 

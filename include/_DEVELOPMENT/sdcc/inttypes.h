@@ -17,8 +17,8 @@ typedef struct imaxdiv_s
 
 } imaxdiv_t;
 
-extern intmax_t imaxabs(intmax_t j);
-extern intmax_t imaxabs_fastcall(intmax_t j) __z88dk_fastcall;
+extern intmax_t imaxabs(intmax_t j) __preserves_regs(b,c);
+extern intmax_t imaxabs_fastcall(intmax_t j)  __z88dk_fastcall __preserves_regs(b,c);
 #define imaxabs(a) imaxabs_fastcall(a)
 
 

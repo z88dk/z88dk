@@ -16,14 +16,14 @@ typedef struct ba_stack_s
 
 } ba_stack_t;
 
-__DPROTO(,,size_t,,ba_stack_capacity,ba_stack_t *s)
-__DPROTO(,,void,,ba_stack_clear,ba_stack_t *s)
-__DPROTO(,,void,,ba_stack_destroy,ba_stack_t *s)
-__DPROTO(,,int,,ba_stack_empty,ba_stack_t *s)
+__DPROTO(`b,c,d,e',`b,c,d,e',size_t,,ba_stack_capacity,ba_stack_t *s)
+__DPROTO(`a,b,c,d,e',`b,c,d,e',void,,ba_stack_clear,ba_stack_t *s)
+__DPROTO(`b,c,d,e',`b,c,d,e',void,,ba_stack_destroy,ba_stack_t *s)
+__DPROTO(`b,c,d,e',`b,c,d,e',int,,ba_stack_empty,ba_stack_t *s)
 __DPROTO(,,ba_stack_t,*,ba_stack_init,void *p,void *data,size_t capacity)
 __DPROTO(,,int,,ba_stack_pop,ba_stack_t *s)
 __DPROTO(,,int,,ba_stack_push,ba_stack_t *s,int c)
-__DPROTO(,,size_t,,ba_stack_size,ba_stack_t *s)
+__DPROTO(`b,c,d,e',`b,c,d,e',size_t,,ba_stack_size,ba_stack_t *s)
 __DPROTO(,,int,,ba_stack_top,ba_stack_t *s)
 
 #endif

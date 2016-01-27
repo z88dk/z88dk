@@ -60,14 +60,10 @@ extern int dup2_callee(int fd,int fd2) __z88dk_callee;
 #define dup2(a,b) dup2_callee(a,b)
 
 
-
-#ifndef __SDCC
-extern void _exit(int status);
-extern void _exit_fastcall(int status) __z88dk_fastcall;
+extern void _exit(int status) __preserves_regs(a,b,c,d,e,h,l);
+extern void _exit_fastcall(int status)  __z88dk_fastcall __preserves_regs(a,b,c,d,e,h,l);
 #define _exit(a) _exit_fastcall(a)
 
-
-#endif
 
 extern off_t lseek(int fd,off_t offset,int whence);
 extern off_t lseek_callee(int fd,off_t offset,int whence) __z88dk_callee;

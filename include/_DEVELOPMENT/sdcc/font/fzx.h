@@ -84,8 +84,8 @@ extern char *fzx_char_metrics_callee(struct fzx_font *ff,struct fzx_cmetric *fm,
 #define fzx_char_metrics(a,b,c) fzx_char_metrics_callee(a,b,c)
 
 
-extern uint16_t fzx_glyph_width(struct fzx_font *ff,int c);
-extern uint16_t fzx_glyph_width_callee(struct fzx_font *ff,int c) __z88dk_callee;
+extern uint16_t fzx_glyph_width(struct fzx_font *ff,int c) __preserves_regs(d,e);
+extern uint16_t fzx_glyph_width_callee(struct fzx_font *ff,int c)  __preserves_regs(d,e) __z88dk_callee;
 #define fzx_glyph_width(a,b) fzx_glyph_width_callee(a,b)
 
 

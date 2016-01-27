@@ -163,10 +163,10 @@ extern uint16_t _strtou__callee(char *nptr,char **endptr,int base) __z88dk_calle
 #define _strtou_(a,b,c) _strtou__callee(a,b,c)
 
 
-extern void abort(void);
+extern void abort(void) __preserves_regs(a,b,c,d,e,h,l);
 
-extern int abs(int j);
-extern int abs_fastcall(int j) __z88dk_fastcall;
+extern int abs(int j) __preserves_regs(b,c,d,e);
+extern int abs_fastcall(int j)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define abs(a) abs_fastcall(a)
 
 
@@ -220,8 +220,8 @@ extern size_t dtoh_callee(double_t x,void *buf,uint16_t prec,uint16_t flags) __z
 #define dtoh(a,b,c,d) dtoh_callee(a,b,c,d)
 
 
-extern void exit(int status);
-extern void exit_fastcall(int status) __z88dk_fastcall;
+extern void exit(int status) __preserves_regs(a,b,c,d,e,h,l);
+extern void exit_fastcall(int status)  __z88dk_fastcall __preserves_regs(a,b,c,d,e,h,l);
 #define exit(a) exit_fastcall(a)
 
 
@@ -250,8 +250,8 @@ extern char *itoa_callee(int num,char *buf,int radix) __z88dk_callee;
 #define itoa(a,b,c) itoa_callee(a,b,c)
 
 
-extern long labs(long j);
-extern long labs_fastcall(long j) __z88dk_fastcall;
+extern long labs(long j) __preserves_regs(b,c);
+extern long labs_fastcall(long j)  __z88dk_fastcall __preserves_regs(b,c);
 #define labs(a) labs_fastcall(a)
 
 
@@ -265,15 +265,15 @@ extern void qsort_callee(void *base,size_t nmemb,size_t size,void *compar) __z88
 #define qsort(a,b,c,d) qsort_callee(a,b,c,d)
 
 
-extern void quick_exit(int status);
-extern void quick_exit_fastcall(int status) __z88dk_fastcall;
+extern void quick_exit(int status) __preserves_regs(a,b,c,d,e,h,l);
+extern void quick_exit_fastcall(int status)  __z88dk_fastcall __preserves_regs(a,b,c,d,e,h,l);
 #define quick_exit(a) quick_exit_fastcall(a)
 
 
 extern int rand(void);
 
-extern void srand(uint16_t seed);
-extern void srand_fastcall(uint16_t seed) __z88dk_fastcall;
+extern void srand(uint16_t seed) __preserves_regs(b,c,d,e);
+extern void srand_fastcall(uint16_t seed)  __z88dk_fastcall __preserves_regs(b,c,d,e,h,l);
 #define srand(a) srand_fastcall(a)
 
 
@@ -325,8 +325,8 @@ extern void *calloc_callee(size_t nmemb,size_t size) __z88dk_callee;
 #define calloc(a,b) calloc_callee(a,b)
 
 
-extern void free(void *p);
-extern void free_fastcall(void *p) __z88dk_fastcall;
+extern void free(void *p) __preserves_regs(b,c);
+extern void free_fastcall(void *p)  __z88dk_fastcall __preserves_regs(b,c);
 #define free(a) free_fastcall(a)
 
 
@@ -351,8 +351,8 @@ extern void *calloc_unlocked_callee(size_t nmemb,size_t size) __z88dk_callee;
 #define calloc_unlocked(a,b) calloc_unlocked_callee(a,b)
 
 
-extern void free_unlocked(void *p);
-extern void free_unlocked_fastcall(void *p) __z88dk_fastcall;
+extern void free_unlocked(void *p) __preserves_regs(b,c);
+extern void free_unlocked_fastcall(void *p)  __z88dk_fastcall __preserves_regs(b,c);
 #define free_unlocked(a) free_unlocked_fastcall(a)
 
 

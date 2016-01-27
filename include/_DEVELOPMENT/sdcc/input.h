@@ -15,29 +15,29 @@
 // keyboard
 ///////////
 
-extern int in_inkey(void);
+//extern int in_inkey(void);
 
-extern int in_key_pressed(uint16_t scancode);
+//extern int in_key_pressed(uint16_t scancode);
 extern int in_key_pressed_fastcall(uint16_t scancode) __z88dk_fastcall;
 #define in_key_pressed(a) in_key_pressed_fastcall(a)
 
 
-extern uint16_t in_key_scancode(int c);
+//extern uint16_t in_key_scancode(int c);
 extern uint16_t in_key_scancode_fastcall(int c) __z88dk_fastcall;
 #define in_key_scancode(a) in_key_scancode_fastcall(a)
 
 
-
-extern uint16_t in_pause(uint16_t dur_ms);
+//
+//extern uint16_t in_pause(uint16_t dur_ms);
 extern uint16_t in_pause_fastcall(uint16_t dur_ms) __z88dk_fastcall;
 #define in_pause(a) in_pause_fastcall(a)
 
 
-extern int in_test_key(void);
+//extern int in_test_key(void);
 
-extern void in_wait_key(void);
+//extern void in_wait_key(void);
 
-extern void in_wait_nokey(void);
+//extern void in_wait_nokey(void);
 
 
 ////////////
@@ -68,7 +68,7 @@ typedef struct udk_s
 #define IN_STICK_LEFT    0x04
 #define IN_STICK_RIGHT   0x08
 
-extern uint16_t in_stick_keyboard(udk_t *u);
+//extern uint16_t in_stick_keyboard(udk_t *u);
 extern uint16_t in_stick_keyboard_fastcall(udk_t *u) __z88dk_fastcall;
 #define in_stick_keyboard(a) in_stick_keyboard_fastcall(a)
 
@@ -91,6 +91,10 @@ extern uint16_t in_stick_keyboard_fastcall(udk_t *u) __z88dk_fastcall;
 ////////////////////////////////////
 // PLATFORM SPECIFIC INPUT FUNCTIONS
 ////////////////////////////////////
+
+#ifdef __CPM
+#include <input/input_cpm.h>
+#endif
 
 #ifdef __SPECTRUM
 #include <input/input_zx.h>

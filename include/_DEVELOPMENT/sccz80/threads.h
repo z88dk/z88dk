@@ -31,9 +31,7 @@ extern void __LIB__ __CALLEE__ call_once_callee(once_flag *flag,void *func);
 #define call_once(a,b) call_once_callee(a,b)
 
 
-extern void..mtx_destroy __LIB__ mtx_t *m();
-extern void..mtx_destroy __LIB__ __CALLEE__ mtx_t *m_callee();
-#define () _callee()
+extern void __LIB__ __FASTCALL__ mtx_destroy(mtx_t *m);
 
 
 extern int __LIB__ mtx_init(mtx_t *m,int type);

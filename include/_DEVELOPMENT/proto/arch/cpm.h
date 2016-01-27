@@ -64,7 +64,7 @@ __DPROTO(,,int,,cpm_bdos_hl,unsigned int func,unsigned int arg)
 #define getuid()   cpm_bdos_hl(CPM_SUID, 0xFF)
 #define setuid(u)  cpm_bdos(CPM_SUID, u)
 
-__DPROTO(,,unsigned long,,cpm_get_offset,void *p)
+__DPROTO(`a,b,c',`b,c',unsigned long,,cpm_get_offset,void *p)
 __DPROTO(,,void,,cpm_set_offset,void *p,unsigned long offset)
 
 #endif

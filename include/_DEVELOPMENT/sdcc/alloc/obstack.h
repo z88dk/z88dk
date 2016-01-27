@@ -21,8 +21,8 @@ extern void *obstack_1grow_callee(struct obstack *ob,int c) __z88dk_callee;
 #define obstack_1grow(a,b) obstack_1grow_callee(a,b)
 
 
-extern void *obstack_1grow_fast(struct obstack *ob,int c);
-extern void *obstack_1grow_fast_callee(struct obstack *ob,int c) __z88dk_callee;
+extern void *obstack_1grow_fast(struct obstack *ob,int c) __preserves_regs(b,c);
+extern void *obstack_1grow_fast_callee(struct obstack *ob,int c)  __preserves_regs(b,c) __z88dk_callee;
 #define obstack_1grow_fast(a,b) obstack_1grow_fast_callee(a,b)
 
 
@@ -41,8 +41,8 @@ extern void *obstack_alloc_callee(struct obstack *ob,size_t size) __z88dk_callee
 #define obstack_alloc(a,b) obstack_alloc_callee(a,b)
 
 
-extern void *obstack_base(struct obstack *ob);
-extern void *obstack_base_fastcall(struct obstack *ob) __z88dk_fastcall;
+extern void *obstack_base(struct obstack *ob) __preserves_regs(b,c,d,e);
+extern void *obstack_base_fastcall(struct obstack *ob)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define obstack_base(a) obstack_base_fastcall(a)
 
 
@@ -67,7 +67,7 @@ extern void *obstack_copy0_callee(struct obstack *ob,void *p,size_t size) __z88d
 
 
 extern void *obstack_finish(struct obstack *ob);
-extern void *obstack_finish_fastcall(struct obstack *ob) __z88dk_fastcall;
+extern void *obstack_finish_fastcall(struct obstack *ob)  __z88dk_fastcall __preserves_regs(a);
 #define obstack_finish(a) obstack_finish_fastcall(a)
 
 
@@ -101,18 +101,18 @@ extern void *obstack_int_grow_fast_callee(struct obstack *ob,int data) __z88dk_c
 #define obstack_int_grow_fast(a,b) obstack_int_grow_fast_callee(a,b)
 
 
-extern void *obstack_next_free(struct obstack *ob);
-extern void *obstack_next_free_fastcall(struct obstack *ob) __z88dk_fastcall;
+extern void *obstack_next_free(struct obstack *ob) __preserves_regs(b,c,d,e);
+extern void *obstack_next_free_fastcall(struct obstack *ob)  __z88dk_fastcall __preserves_regs(b,c,d,e);
 #define obstack_next_free(a) obstack_next_free_fastcall(a)
 
 
-extern size_t obstack_object_size(struct obstack *ob);
-extern size_t obstack_object_size_fastcall(struct obstack *ob) __z88dk_fastcall;
+extern size_t obstack_object_size(struct obstack *ob) __preserves_regs(b,c);
+extern size_t obstack_object_size_fastcall(struct obstack *ob)  __z88dk_fastcall __preserves_regs(b,c);
 #define obstack_object_size(a) obstack_object_size_fastcall(a)
 
 
-extern size_t obstack_room(struct obstack *ob);
-extern size_t obstack_room_fastcall(struct obstack *ob) __z88dk_fastcall;
+extern size_t obstack_room(struct obstack *ob) __preserves_regs(b,c);
+extern size_t obstack_room_fastcall(struct obstack *ob)  __z88dk_fastcall __preserves_regs(b,c);
 #define obstack_room(a) obstack_room_fastcall(a)
 
 
