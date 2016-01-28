@@ -1,5 +1,3 @@
-fcntl/c/sdcc_ix/_exit
-fcntl/c/sdcc_ix/_exit_fastcall
 fcntl/c/sdcc_ix/close
 fcntl/c/sdcc_ix/close_fastcall
 fcntl/c/sdcc_ix/creat
