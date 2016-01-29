@@ -35,14 +35,14 @@ extern unsigned char BIFROSTH_tilemap[81];
 // Activate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_start(void);
+extern void BIFROSTH_start(void) __preserves_regs(b,c,d,e,h,l);
 
 
 // ----------------------------------------------------------------
 // Deactivate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_stop(void);
+extern void BIFROSTH_stop(void) __preserves_regs(b,c,d,e,h,l);
 
 
 // ----------------------------------------------------------------
@@ -58,7 +58,7 @@ extern void BIFROSTH_stop(void);
 // interruption.
 // ----------------------------------------------------------------
 
-#define NIRVANAP_halt()  intrinsic_halt()
+#define BIFROSTH_halt()  intrinsic_halt()
 
 // ----------------------------------------------------------------
 // Place a multicolor tile index into the tile map. Add value
@@ -93,8 +93,8 @@ extern void BIFROSTH_setTile_callee(unsigned int px,unsigned int py,unsigned int
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-extern unsigned char BIFROSTH_getTile(unsigned int px,unsigned int py);
-extern unsigned char BIFROSTH_getTile_callee(unsigned int px,unsigned int py) __z88dk_callee;
+extern unsigned char BIFROSTH_getTile(unsigned int px,unsigned int py) __preserves_regs(d,e);
+extern unsigned char BIFROSTH_getTile_callee(unsigned int px,unsigned int py) __preserves_regs(d,e) __z88dk_callee;
 #define BIFROSTH_getTile(a,b) BIFROSTH_getTile_callee(a,b)
 
 
@@ -111,8 +111,8 @@ extern unsigned char BIFROSTH_getTile_callee(unsigned int px,unsigned int py) __
 //     Animation group for animated tile, otherwise the same tile index
 // ----------------------------------------------------------------
 
-extern unsigned char BIFROSTH_getAnimGroup(unsigned int tile);
-extern unsigned char BIFROSTH_getAnimGroup_fastcall(unsigned int tile) __z88dk_fastcall;
+extern unsigned char BIFROSTH_getAnimGroup(unsigned int tile) __preserves_regs(b,c,d,e);
+extern unsigned char BIFROSTH_getAnimGroup_fastcall(unsigned int tile) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define BIFROSTH_getAnimGroup(a) BIFROSTH_getAnimGroup_fastcall(a)
 
 
@@ -129,8 +129,8 @@ extern unsigned char BIFROSTH_getAnimGroup_fastcall(unsigned int tile) __z88dk_f
 //     Memory address of the multicolor attribute
 // ----------------------------------------------------------------
 
-extern unsigned char *BIFROSTH_findAttrH(unsigned int lin,unsigned int col);
-extern unsigned char *BIFROSTH_findAttrH_callee(unsigned int lin,unsigned int col) __z88dk_callee;
+extern unsigned char *BIFROSTH_findAttrH(unsigned int lin,unsigned int col) __preserves_regs(a);
+extern unsigned char *BIFROSTH_findAttrH_callee(unsigned int lin,unsigned int col) __preserves_regs(a) __z88dk_callee;
 #define BIFROSTH_findAttrH(a,b) BIFROSTH_findAttrH_callee(a,b)
 
 
@@ -142,8 +142,8 @@ extern unsigned char *BIFROSTH_findAttrH_callee(unsigned int lin,unsigned int co
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_resetTileImages(void *addr);
-extern void BIFROSTH_resetTileImages_fastcall(void *addr) __z88dk_fastcall;
+extern void BIFROSTH_resetTileImages(void *addr) __preserves_regs(b,c,d,e);
+extern void BIFROSTH_resetTileImages_fastcall(void *addr) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define BIFROSTH_resetTileImages(a) BIFROSTH_resetTileImages_fastcall(a)
 
 
@@ -164,14 +164,14 @@ extern void BIFROSTH_resetTileImages_fastcall(void *addr) __z88dk_fastcall;
 // Reconfigure BIFROST* ENGINE to use 2 frames per animation group
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_resetAnim2Frames(void);
+extern void BIFROSTH_resetAnim2Frames(void) __preserves_regs(b,c,d,e);
 
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to use 4 frames per animation group
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_resetAnim4Frames(void);
+extern void BIFROSTH_resetAnim4Frames(void) __preserves_regs(b,c,d,e);
 
 
 // ----------------------------------------------------------------
@@ -281,7 +281,7 @@ extern void BIFROSTH_fillTileAttrH_callee(unsigned int lin,unsigned int col,unsi
 
 //#define BIFROSTH_enableSprites()   *((unsigned int*)59040)=58054
 
-extern void BIFROSTH_enableSprites(void);
+extern void BIFROSTH_enableSprites(void) __preserves_regs(a,b,c,d,e);
 
 
 // ----------------------------------------------------------------
@@ -290,7 +290,7 @@ extern void BIFROSTH_enableSprites(void);
 
 //#define BIFROSTH_disableSprites()   *((unsigned int*)59040)=58636
 
-extern void BIFROSTH_disableSprites(void);
+extern void BIFROSTH_disableSprites(void) __preserves_regs(a,b,c,d,e);
 
 
 // ----------------------------------------------------------------

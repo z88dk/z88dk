@@ -60,7 +60,7 @@ extern void __LIB__ BIFROSTL_stop(void);
 // interruption.
 // ----------------------------------------------------------------
 
-#define NIRVANAP_halt()  intrinsic_halt()
+#define BIFROSTL_halt()  intrinsic_halt()
 
 // ----------------------------------------------------------------
 // Place a multicolor tile index into the tile map. Add value
