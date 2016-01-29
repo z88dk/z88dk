@@ -11,7 +11,61 @@ extern void __LIB__ intrinsic_di(void);
 extern void __LIB__ intrinsic_ei(void);
 
 
+extern void __LIB__ intrinsic_ei_reti(void);
+
+
 extern void __LIB__ intrinsic_halt(void);
+
+
+extern void __LIB__ intrinsic_retn(void);
+
+
+extern void __LIB__ intrinsic_im_0(void);
+
+
+extern void __LIB__ intrinsic_im_1(void);
+
+
+extern void __LIB__ intrinsic_im_2(void);
+
+
+extern void __LIB__ intrinsic_push_af(void);
+
+
+extern void __LIB__ intrinsic_push_bc(void);
+
+
+extern void __LIB__ intrinsic_push_de(void);
+
+
+extern void __LIB__ intrinsic_push_hl(void);
+
+
+extern void __LIB__ intrinsic_push_ix(void);
+
+
+extern void __LIB__ intrinsic_push_iy(void);
+
+
+extern void __LIB__ intrinsic_pop_af(void);
+
+
+extern void __LIB__ intrinsic_pop_bc(void);
+
+
+extern void __LIB__ intrinsic_pop_de(void);
+
+
+extern void __LIB__ intrinsic_pop_hl(void);
+
+
+extern void __LIB__ intrinsic_pop_ix(void);
+
+
+extern void __LIB__ intrinsic_pop_iy(void);
+
+
+extern void __LIB__ intrinsic_exx(void);
 
 
 
