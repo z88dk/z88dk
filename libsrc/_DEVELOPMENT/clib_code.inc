@@ -45,6 +45,7 @@ section code_l_sccz80
 section code_l_sdcc
 section code_locale
 section code_math
+section code_nirvanam
 section code_nirvanap
 section code_setjmp
 section code_sound_bit
