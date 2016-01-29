@@ -16,13 +16,13 @@ include(__link__.m4)
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO(,,void,,NIRVANAP_start,void)
+__OPROTO('b,c,d,e,h,l','b,c,d,e,h,l',void,,NIRVANAP_start,void)
 
 // ----------------------------------------------------------------
 // Deactivate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO(,,void,,NIRVANAP_stop,void)
+__OPROTO('b,c,d,e,h,l','b,c,d,e,h,l',void,,NIRVANAP_stop,void)
 
 // ----------------------------------------------------------------
 // Execute HALT (wait for next frame).
@@ -60,7 +60,7 @@ __OPROTO(,,void,,NIRVANAP_stop,void)
 //          occurs, program may crash!!! (see NIRVANAP_halt)
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_drawT,unsigned int tile, unsigned int lin, unsigned int col)
+__DPROTO(,,void,,NIRVANAP_drawT,unsigned int tile,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Instantly change the attributes in a tile area (16x16 pixels) to
@@ -76,7 +76,7 @@ __DPROTO(,,void,,NIRVANAP_drawT,unsigned int tile, unsigned int lin, unsigned in
 //          occurs, program may crash!!! (see NIRVANAhalt)
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_fillT,unsigned int attr, unsigned int lin, unsigned int col)
+__DPROTO(,,void,,NIRVANAP_fillT,unsigned int attr,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Instantly print a 8x8 character at specified position, afterwards
@@ -89,7 +89,7 @@ __DPROTO(,,void,,NIRVANAP_fillT,unsigned int attr, unsigned int lin, unsigned in
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_printC,unsigned int ch, unsigned char *attrs, unsigned int lin, unsigned int col)
+__DPROTO(,,void,,NIRVANAP_printC,unsigned int ch,unsigned char *attrs,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Instantly paint a 8x8 character at specified position with a
@@ -101,7 +101,7 @@ __DPROTO(,,void,,NIRVANAP_printC,unsigned int ch, unsigned char *attrs, unsigned
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_paintC,unsigned char *attrs, unsigned int lin, unsigned int col)
+__DPROTO(,,void,,NIRVANAP_paintC,unsigned char *attrs,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Instantly change attributes in 8x8 character area to the
@@ -114,7 +114,7 @@ __DPROTO(,,void,,NIRVANAP_paintC,unsigned char *attrs, unsigned int lin, unsigne
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_fillC,unsigned int attr, unsigned int lin, unsigned int col)
+__DPROTO('b','b',void,,NIRVANAP_fillC,unsigned int attr,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Update sprite information, so the specified tile will automatically
@@ -141,7 +141,7 @@ __DPROTO(,,void,,NIRVANAP_fillC,unsigned int attr, unsigned int lin, unsigned in
 //          NIRVANAhalt)
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_spriteT,unsigned int sprite, unsigned int tile, unsigned int lin, unsigned int col)
+__DPROTO(,,void,,NIRVANAP_spriteT,unsigned int sprite,unsigned int tile,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Instantly draw wide tile (24x16 pixels) at specified position
@@ -157,7 +157,7 @@ __DPROTO(,,void,,NIRVANAP_spriteT,unsigned int sprite, unsigned int tile, unsign
 // WARNING: Only use this routine if NIRVANA_drawW was enabled!!!
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_drawW,unsigned int tile, unsigned int lin, unsigned int col)
+__DPROTO(,,void,,NIRVANAP_drawW,unsigned int tile,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Reconfigure NIRVANA ENGINE to read bicolor tiles (16x16 pixels)
@@ -167,10 +167,10 @@ __DPROTO(,,void,,NIRVANAP_drawW,unsigned int tile, unsigned int lin, unsigned in
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_tiles,unsigned char *addr)
+__DPROTO('a,b,c,d,e','b,c,d,e',void,,NIRVANAP_tiles,unsigned char *addr)
 
 // ----------------------------------------------------------------
-// Reconfigure NIRVANA ENGINE to read wide bicolor tiles (24x16 
+// Reconfigure NIRVANA ENGINE to read wide bicolor tiles (24x16
 // pixels) from another address (default value is 54000).
 //
 // Parameters:
@@ -179,7 +179,7 @@ __DPROTO(,,void,,NIRVANAP_tiles,unsigned char *addr)
 // WARNING: Only use this routine if NIRVANAP_drawW was enabled!!!
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_wides,unsigned char *addr)
+__DPROTO('a,b,c,d,e','b,c,d,e',void,,NIRVANAP_wides,unsigned char *addr)
 
 // ----------------------------------------------------------------
 // Reconfigure NIRVANA ENGINE to read character table from another
@@ -190,7 +190,7 @@ __DPROTO(,,void,,NIRVANAP_wides,unsigned char *addr)
 //     addr: New character table address
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,NIRVANAP_chars,unsigned char *addr)
+__DPROTO('a,b,c,d,e','b,c,d,e',void,,NIRVANAP_chars,unsigned char *addr)
 
 // ----------------------------------------------------------------
 // Advanced conversions
