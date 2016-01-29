@@ -6,9 +6,82 @@
 =
 	ei
 
+	call	intrinsic_ei_reti
+=
+	ei
+	reti
+
 	call	intrinsic_halt
 =
 	halt
+
+	call	intrinsic_retn
+=
+	retn
+
+	call	intrinsic_im_0
+=
+	im 0
+
+	call	intrinsic_im_1
+=
+	im 1
+
+	call	intrinsic_im_2
+=
+	im 2
+
+	call	intrinsic_push_af
+=
+	push af
+
+	call	intrinsic_push_bc
+=
+	push bc
+
+	call	intrinsic_push_de
+=
+	push de
+
+	call	intrinsic_push_hl
+=
+	push hl
+
+	call	intrinsic_push_ix
+=
+	push ix
+
+	call	intrinsic_push_iy
+=
+	push iy
+
+	call	intrinsic_pop_af
+=
+	pop af
+
+	call	intrinsic_pop_bc
+=
+	pop bc
+
+	call	intrinsic_pop_de
+=
+	pop de
+
+	call	intrinsic_pop_hl
+=
+	pop hl
+
+	call	intrinsic_pop_ix
+=
+	pop ix
+
+	call	intrinsic_pop_iy
+=
+	pop iy
+
+	call	intrinsic_exx
+=
+	exx
 
 	call	l_gintsp	;
 	call	l_gchar
