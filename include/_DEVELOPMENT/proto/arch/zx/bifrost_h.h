@@ -3,6 +3,8 @@ include(__link__.m4)
 #ifndef __BIFROST_H_H__
 #define __BIFROST_H_H__
 
+#include <intrinsic.h>
+
 /* ----------------------------------------------------------------
  * Z88DK INTERFACE LIBRARY FOR THE BIFROST* ENGINE - RELEASE 1.2/H
  *
@@ -52,15 +54,7 @@ __OPROTO(,,void,,BIFROSTH_stop,void)
 // interruption.
 // ----------------------------------------------------------------
 
-#ifdef __SDCC
-
-#define BIFROSTH_halt()  __asm__("halt\n")
-
-#else
-
-#define BIFROSTH_halt()  asm("halt\n")
-
-#endif
+#define NIRVANAP_halt()  intrinsic_halt()
 
 // ----------------------------------------------------------------
 // Place a multicolor tile index into the tile map. Add value

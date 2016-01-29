@@ -5,6 +5,8 @@
 #ifndef __NIRVANA_PLUS_H__
 #define __NIRVANA_PLUS_H__
 
+#include <intrinsic.h>
+
 /* ----------------------------------------------------------------
  * Z88DK INTERFACE LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
  *
@@ -42,15 +44,7 @@ extern void NIRVANAP_stop(void) __preserves_regs(b,c,d,e,h,l);
 // interruption.
 // ----------------------------------------------------------------
 
-#ifdef __SDCC
-
-#define NIRVANAP_halt()  __asm__("halt\n")
-
-#else
-
-#define NIRVANAP_halt()  asm("halt\n")
-
-#endif
+#define NIRVANAP_halt()  intrinsic_halt()
 
 // ----------------------------------------------------------------
 // Instantly draw tile (16x16 pixels) at specified position
