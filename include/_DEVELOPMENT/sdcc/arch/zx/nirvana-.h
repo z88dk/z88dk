@@ -193,9 +193,9 @@ extern void NIRVANAM_drawW_callee(unsigned int tile,unsigned int lin,unsigned in
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-extern  void(NIRVANAM_tiles,unsigned char *addr) __preserves_regs(b,c,d,e);
-extern  void_callee(NIRVANAM_tiles,unsigned char *addr) __preserves_regs(a,b,c,d,e) __z88dk_callee;
-#define (a,b) _callee(a,b)
+extern void NIRVANAM_tiles(unsigned char *addr) __preserves_regs(b,c,d,e);
+extern void NIRVANAM_tiles_fastcall(unsigned char *addr) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
+#define NIRVANAM_tiles(a) NIRVANAM_tiles_fastcall(a)
 
 
 

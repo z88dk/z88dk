@@ -195,9 +195,7 @@ extern void __LIB__ __CALLEE__ NIRVANAM_drawW_callee(unsigned int tile,unsigned 
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-extern  __LIB__ void(NIRVANAM_tiles,unsigned char *addr);
-extern  __LIB__ __CALLEE__ void_callee(NIRVANAM_tiles,unsigned char *addr);
-#define (a,b) _callee(a,b)
+extern void __LIB__ __FASTCALL__ NIRVANAM_tiles(unsigned char *addr);
 
 
 
