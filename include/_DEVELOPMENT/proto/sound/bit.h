@@ -110,7 +110,7 @@ include(__link__.m4)
 
 __DPROTO(,,void,,bit_beep,uint16_t dur_ms,uint16_t freq_hz)
 __DPROTO(,,void,,bit_beep_raw,uint16_t cycles_num,uint16_t period_T)
-__OPROTO(,,void,,bit_click,void)
+__OPROTO(`d,e,h,l',`d,e,h,l',void,,bit_click,void)
 __DPROTO(,,void,,bit_fx,void *bfx)
 __DPROTO(,,void,,bit_beepfx,void *bfx)
 __DPROTO(,,char,*,bit_play,char *melody)
@@ -119,7 +119,7 @@ __DPROTO(,,void,,bit_synth,uint16_t dur,uint16_t freq_1,uint16_t freq_2,uint16_t
 
 __DPROTO(,,void,,bit_beep_di,uint16_t dur_ms,uint16_t freq_hz)
 __DPROTO(,,void,,bit_beep_raw_di,uint16_t cycles_num,uint16_t period_T)
-__OPROTO(,,void,,bit_click_di,void)
+__OPROTO(`d,e,h,l',`d,e,h,l',void,,bit_click_di,void)
 __DPROTO(,,void,,bit_fx_di,void *bfx)
 __DPROTO(,,void,,bit_beepfx_di,void *bfx)
 __DPROTO(,,char,*,bit_play_di,char *melody)
