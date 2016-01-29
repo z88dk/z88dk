@@ -1,0 +1,12 @@
+arch/zx/nirvanam/z80/asm_NIRVANAM_chars
+arch/zx/nirvanam/z80/asm_NIRVANAM_drawT
+arch/zx/nirvanam/z80/asm_NIRVANAM_drawW
+arch/zx/nirvanam/z80/asm_NIRVANAM_fillC
+arch/zx/nirvanam/z80/asm_NIRVANAM_fillT
+arch/zx/nirvanam/z80/asm_NIRVANAM_paintC
+arch/zx/nirvanam/z80/asm_NIRVANAM_printC
+arch/zx/nirvanam/z80/asm_NIRVANAM_spriteT
+arch/zx/nirvanam/z80/asm_NIRVANAM_start
+arch/zx/nirvanam/z80/asm_NIRVANAM_stop
+arch/zx/nirvanam/z80/asm_NIRVANAM_tiles
+arch/zx/nirvanam/z80/asm_NIRVANAM_wides
