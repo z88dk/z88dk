@@ -16,13 +16,13 @@ include(__link__.m4)
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO('b,c,d,e,h,l','b,c,d,e,h,l',void,,NIRVANAP_start,void)
+__OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAP_start,void)
 
 // ----------------------------------------------------------------
 // Deactivate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-__OPROTO('b,c,d,e,h,l','b,c,d,e,h,l',void,,NIRVANAP_stop,void)
+__OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAP_stop,void)
 
 // ----------------------------------------------------------------
 // Execute HALT (wait for next frame).
@@ -114,7 +114,7 @@ __DPROTO(,,void,,NIRVANAP_paintC,unsigned char *attrs,unsigned int lin,unsigned 
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-__DPROTO(,'b',void,,NIRVANAP_fillC,unsigned int attr,unsigned int lin,unsigned int col)
+__DPROTO(,`b',void,,NIRVANAP_fillC,unsigned int attr,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Update sprite information, so the specified tile will automatically
@@ -167,7 +167,7 @@ __DPROTO(,,void,,NIRVANAP_drawW,unsigned int tile,unsigned int lin,unsigned int 
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-__DPROTO('a,b,c,d,e','b,c,d,e',void,,NIRVANAP_tiles,unsigned char *addr)
+__DPROTO(`a,b,c,d,e',`b,c,d,e',void,,NIRVANAP_tiles,unsigned char *addr)
 
 // ----------------------------------------------------------------
 // Reconfigure NIRVANA ENGINE to read wide bicolor tiles (24x16
@@ -179,7 +179,7 @@ __DPROTO('a,b,c,d,e','b,c,d,e',void,,NIRVANAP_tiles,unsigned char *addr)
 // WARNING: Only use this routine if NIRVANAP_drawW was enabled!!!
 // ----------------------------------------------------------------
 
-__DPROTO('a,b,c,d,e','b,c,d,e',void,,NIRVANAP_wides,unsigned char *addr)
+__DPROTO(`a,b,c,d,e',`b,c,d,e',void,,NIRVANAP_wides,unsigned char *addr)
 
 // ----------------------------------------------------------------
 // Reconfigure NIRVANA ENGINE to read character table from another
@@ -190,7 +190,7 @@ __DPROTO('a,b,c,d,e','b,c,d,e',void,,NIRVANAP_wides,unsigned char *addr)
 //     addr: New character table address
 // ----------------------------------------------------------------
 
-__DPROTO('a,b,c,d,e','b,c,d,e',void,,NIRVANAP_chars,unsigned char *addr)
+__DPROTO(`a,b,c,d,e',`b,c,d,e',void,,NIRVANAP_chars,unsigned char *addr)
 
 // ----------------------------------------------------------------
 // Advanced conversions
