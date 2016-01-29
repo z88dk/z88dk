@@ -371,13 +371,28 @@ __xinit_%0
 =
 	di
 
+	jp	_intrinsic_di
+=
+	di
+	ret
+
 	call	_intrinsic_ei
 =
 	ei
 
+	jp	_intrinsic_ei
+=
+	ei
+	reti
+
 	call	_intrinsic_halt
 =
 	halt
+
+	jp	_intrinsic_halt
+=
+	halt
+	ret
 
 ;;
 ;; beautify
