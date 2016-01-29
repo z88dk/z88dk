@@ -1,3 +1,156 @@
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+// Z88DK INTRINSICS
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+replace restart {
+	call	_intrinsic_di
+} by {
+	di
+	; peephole z88dk-intrinsic-di
+}
+
+replace restart {
+	call	_intrinsic_ei
+} by {
+	ei
+	; peephole z88dk-intrinsic-ei
+}
+
+replace restart {
+	call	_intrinsic_ei_reti
+} by {
+	ei
+	reti
+	; peephole z88dk-intrinsic-ei-reti
+}
+
+replace restart {
+	call	_intrinsic_halt
+} by {
+	halt
+	; peephole z88dk-intrinsic-halt
+}
+
+replace restart {
+	call	_intrinsic_retn
+} by {
+	retn
+	; peephole z88dk-intrinsic-retn
+}
+
+replace restart {
+	call	_intrinsic_im_0
+} by {
+	im	0
+	; peephole z88dk-intrinsic-im-0
+}
+
+replace restart {
+	call	_intrinsic_im_1
+} by {
+	im	1
+	; peephole z88dk-intrinsic-im-1
+}
+
+replace restart {
+	call	_intrinsic_im_2
+} by {
+	im	2
+	; peephole z88dk-intrinsic-im-2
+}
+
+replace restart {
+	call	_intrinsic_push_af
+} by {
+	push	af
+	; peephole z88dk-intrinsic-push-af
+}
+
+replace restart {
+	call	_intrinsic_push_bc
+} by {
+	push	bc
+	; peephole z88dk-intrinsic-push-bc
+}
+
+replace restart {
+	call	_intrinsic_push_de
+} by {
+	push	de
+	; peephole z88dk-intrinsic-push-de
+}
+
+replace restart {
+	call	_intrinsic_push_hl
+} by {
+	push	hl
+	; peephole z88dk-intrinsic-push-hl
+}
+
+replace restart {
+	call	_intrinsic_push_ix
+} by {
+	push	ix
+	; peephole z88dk-intrinsic-push-ix
+}
+
+replace restart {
+	call	_intrinsic_push_iy
+} by {
+	push	iy
+	; peephole z88dk-intrinsic-push-iy
+}
+
+replace restart {
+	call	_intrinsic_pop_af
+} by {
+	pop	af
+	; peephole z88dk-intrinsic-pop-af
+}
+
+replace restart {
+	call	_intrinsic_pop_bc
+} by {
+	pop	bc
+	; peephole z88dk-intrinsic-pop-bc
+}
+
+replace restart {
+	call	_intrinsic_pop_de
+} by {
+	pop	de
+	; peephole z88dk-intrinsic-pop-de
+}
+
+replace restart {
+	call	_intrinsic_pop_hl
+} by {
+	pop	hl
+	; peephole z88dk-intrinsic-pop-hl
+}
+
+replace restart {
+	call	_intrinsic_pop_ix
+} by {
+	pop	ix
+	; peephole z88dk-intrinsic-pop-ix
+}
+
+replace restart {
+	call	_intrinsic_pop_iy
+} by {
+	pop	iy
+	; peephole z88dk-intrinsic-pop-iy
+}
+
+replace restart {
+	call	_intrinsic_exx
+} by {
+	exx
+	; peephole z88dk-intrinsic-exx
+}
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
