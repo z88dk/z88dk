@@ -206,7 +206,7 @@ extern void __LIB__ __FASTCALL__ NIRVANAP_tiles(unsigned char *addr);
 
 
 // ----------------------------------------------------------------
-// Reconfigure NIRVANA ENGINE to read wide bicolor tiles (24x16 
+// Reconfigure NIRVANA ENGINE to read wide bicolor tiles (24x16
 // pixels) from another address (default value is 54000).
 //
 // Parameters:
