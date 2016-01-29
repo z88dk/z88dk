@@ -161,7 +161,7 @@ __DPROTO(,,void,,NIRVANAM_drawW,unsigned int tile,unsigned int lin,unsigned int 
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-__DPROTO(`a,b,c,d,e',`b,c,d,e',,void,,NIRVANAM_tiles,unsigned char *addr)
+__DPROTO(`a,b,c,d,e',`b,c,d,e',void,,NIRVANAM_tiles,unsigned char *addr)
 
 // ----------------------------------------------------------------
 // Reconfigure NIRVANA ENGINE to read wide bicolor tiles (24x16
