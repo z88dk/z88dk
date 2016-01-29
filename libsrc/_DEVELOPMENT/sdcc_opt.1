@@ -364,6 +364,22 @@ __xinit_%0
 	%0+%1
 
 ;;
+;; intrinsics
+;;
+
+	call	_intrinsic_di
+=
+	di
+
+	call	_intrinsic_ei
+=
+	ei
+
+	call	_intrinsic_halt
+=
+	halt
+
+;;
 ;; beautify
 ;;
 

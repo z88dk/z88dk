@@ -1,3 +1,15 @@
+	call	intrinsic_di
+=
+	di
+
+	call	intrinsic_ei
+=
+	ei
+
+	call	intrinsic_halt
+=
+	halt
+
 	call	l_gintsp	;
 	call	l_gchar
 =
