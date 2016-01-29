@@ -16693,20 +16693,24 @@ replace restart {
 } if operandsNotRelated(%1 'hl'), notSame(%2 'l')
 
 replace restart {
-	inc	%1
-	ld	%2,%1
+	ld	%1,%2
+	dec	%1
+	ld	%3,%1
 } by {
-	inc	%2
+	ld	%3,%2
+	dec	%3
 	; peephole z88dk-437e
-} if notUsed(%1), canAssign(%2 '(hl)')
+} if notUsed(%1), canAssign(%1 '(hl)'), canAssign(%2 '(hl)'), canAssign(%3 '(hl)')
 
 replace restart {
-	dec	%1
-	ld	%2,%1
+	ld	%1,%2
+	inc	%1
+	ld	%3,%1
 } by {
-	dec	%2
+	ld	%3,%2
+	inc	%3
 	; peephole z88dk-437f
-} if notUsed(%1), canAssign(%2 '(hl)')
+} if notUsed(%1), canAssign(%1 '(hl)'), canAssign(%2 '(hl)'), canAssign(%3 '(hl)')
 
 replace restart {
 	ld	hl,#%1 + 2
@@ -16755,8 +16759,6 @@ replace restart {
 	ld	a,(hl)
 	; peephole z88dk-438c
 }
-
-
 
 
 
