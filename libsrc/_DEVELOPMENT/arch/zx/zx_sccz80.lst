@@ -3,5 +3,5 @@
 @arch/zx/display/display_sccz80.lst
 @arch/zx/graphics/graphics_sccz80.lst
 @arch/zx/misc/misc_sccz80.lst
-@arch/zx/nirvanap/nirvanam_sccz80.lst
+@arch/zx/nirvanam/nirvanam_sccz80.lst
 @arch/zx/nirvanap/nirvanap_sccz80.lst
