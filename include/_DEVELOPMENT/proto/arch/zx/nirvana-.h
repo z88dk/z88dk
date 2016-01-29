@@ -40,7 +40,7 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAM_stop,void)
 // interruption.
 // ----------------------------------------------------------------
 
-#define NIRVANAP_halt()  intrinsic_halt()
+#define NIRVANAM_halt()  intrinsic_halt()
 
 // ----------------------------------------------------------------
 // Instantly draw tile (16x16 pixels) at specified position

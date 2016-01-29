@@ -44,7 +44,7 @@ extern void NIRVANAM_stop(void) __preserves_regs(b,c,d,e,h,l);
 // interruption.
 // ----------------------------------------------------------------
 
-#define NIRVANAP_halt()  intrinsic_halt()
+#define NIRVANAM_halt()  intrinsic_halt()
 
 // ----------------------------------------------------------------
 // Instantly draw tile (16x16 pixels) at specified position
