@@ -18,10 +18,10 @@ _BIFROSTL_getTile:
    	ld hl,2
    	ld b,h          ; B=0
    	add hl,sp
-   	ld e,(hl)       ; E=px
+   	ld a,(hl)       ; A=px
    	inc hl
    	inc hl
    	ld c,(hl)       ; BC=py
-   	ld l,e          ; L=px
+   	ld l,a          ; L=px
 
    	jp asm_BIFROSTL_getTile
