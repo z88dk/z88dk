@@ -114,7 +114,7 @@ __DPROTO(,,void,,NIRVANAP_paintC,unsigned char *attrs,unsigned int lin,unsigned 
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-__DPROTO('b','b',void,,NIRVANAP_fillC,unsigned int attr,unsigned int lin,unsigned int col)
+__DPROTO(,'b',void,,NIRVANAP_fillC,unsigned int attr,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Update sprite information, so the specified tile will automatically
