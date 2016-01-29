@@ -39,27 +39,27 @@ extern void *w_array_back_fastcall(w_array_t *a) __z88dk_fastcall;
 
 
 extern size_t w_array_capacity(w_array_t *a) __preserves_regs(b,c,d,e);
-extern size_t w_array_capacity_fastcall(w_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t w_array_capacity_fastcall(w_array_t *a) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_array_capacity(a) w_array_capacity_fastcall(a)
 
 
 extern void w_array_clear(w_array_t *a) __preserves_regs(b,c,d,e);
-extern void w_array_clear_fastcall(w_array_t *a)  __z88dk_fastcall __preserves_regs(a,b,c,d,e);
+extern void w_array_clear_fastcall(w_array_t *a) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define w_array_clear(a) w_array_clear_fastcall(a)
 
 
 extern void *w_array_data(w_array_t *a) __preserves_regs(b,c,d,e);
-extern void *w_array_data_fastcall(w_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void *w_array_data_fastcall(w_array_t *a) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_array_data(a) w_array_data_fastcall(a)
 
 
 extern void w_array_destroy(w_array_t *a) __preserves_regs(b,c,d,e);
-extern void w_array_destroy_fastcall(w_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void w_array_destroy_fastcall(w_array_t *a) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_array_destroy(a) w_array_destroy_fastcall(a)
 
 
 extern int w_array_empty(w_array_t *a) __preserves_regs(b,c,d,e);
-extern int w_array_empty_fastcall(w_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int w_array_empty_fastcall(w_array_t *a) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_array_empty(a) w_array_empty_fastcall(a)
 
 
@@ -109,7 +109,7 @@ extern int w_array_resize_callee(w_array_t *a,size_t n) __z88dk_callee;
 
 
 extern size_t w_array_size(w_array_t *a) __preserves_regs(b,c,d,e);
-extern size_t w_array_size_fastcall(w_array_t *a)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t w_array_size_fastcall(w_array_t *a) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_array_size(a) w_array_size_fastcall(a)
 
 

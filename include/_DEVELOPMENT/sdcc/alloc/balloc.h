@@ -13,12 +13,12 @@ extern void *balloc_addmem_callee(int q,size_t num,size_t size,void *p) __z88dk_
 
 
 extern void *balloc_alloc(int q) __preserves_regs(b,c);
-extern void *balloc_alloc_fastcall(int q)  __z88dk_fastcall __preserves_regs(b,c);
+extern void *balloc_alloc_fastcall(int q) __preserves_regs(b,c) __z88dk_fastcall;
 #define balloc_alloc(a) balloc_alloc_fastcall(a)
 
 
 extern size_t balloc_blockcount(int q) __preserves_regs(b,c);
-extern size_t balloc_blockcount_fastcall(int q)  __z88dk_fastcall __preserves_regs(b,c);
+extern size_t balloc_blockcount_fastcall(int q) __preserves_regs(b,c) __z88dk_fastcall;
 #define balloc_blockcount(a) balloc_blockcount_fastcall(a)
 
 

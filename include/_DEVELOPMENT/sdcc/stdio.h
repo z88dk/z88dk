@@ -313,7 +313,7 @@ extern int vsscanf_callee(char *s,char *format,void *arg) __z88dk_callee;
 
 
 extern void clearerr_unlocked(FILE *stream) __preserves_regs(b,c,d,e);
-extern void clearerr_unlocked_fastcall(FILE *stream)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void clearerr_unlocked_fastcall(FILE *stream) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define clearerr_unlocked(a) clearerr_unlocked_fastcall(a)
 
 
@@ -323,12 +323,12 @@ extern int fclose_unlocked_fastcall(FILE *stream) __z88dk_fastcall;
 
 
 extern int feof_unlocked(FILE *stream) __preserves_regs(b,c,d,e);
-extern int feof_unlocked_fastcall(FILE *stream)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int feof_unlocked_fastcall(FILE *stream) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define feof_unlocked(a) feof_unlocked_fastcall(a)
 
 
 extern int ferror_unlocked(FILE *stream) __preserves_regs(b,c,d,e);
-extern int ferror_unlocked_fastcall(FILE *stream)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int ferror_unlocked_fastcall(FILE *stream) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define ferror_unlocked(a) ferror_unlocked_fastcall(a)
 
 

@@ -17,27 +17,27 @@ typedef struct p_queue_s
 } p_queue_t;
 
 extern void *p_queue_back(p_queue_t *q) __preserves_regs(b,c,d,e);
-extern void *p_queue_back_fastcall(p_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void *p_queue_back_fastcall(p_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define p_queue_back(a) p_queue_back_fastcall(a)
 
 
 extern void p_queue_clear(p_queue_t *q) __preserves_regs(b,c);
-extern void p_queue_clear_fastcall(p_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c);
+extern void p_queue_clear_fastcall(p_queue_t *q) __preserves_regs(b,c) __z88dk_fastcall;
 #define p_queue_clear(a) p_queue_clear_fastcall(a)
 
 
 extern int p_queue_empty(p_queue_t *q) __preserves_regs(b,c,d,e);
-extern int p_queue_empty_fastcall(p_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int p_queue_empty_fastcall(p_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define p_queue_empty(a) p_queue_empty_fastcall(a)
 
 
 extern void *p_queue_front(p_queue_t *q) __preserves_regs(b,c,d,e);
-extern void *p_queue_front_fastcall(p_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void *p_queue_front_fastcall(p_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define p_queue_front(a) p_queue_front_fastcall(a)
 
 
 extern void p_queue_init(void *p) __preserves_regs(b,c);
-extern void p_queue_init_fastcall(void *p)  __z88dk_fastcall __preserves_regs(b,c);
+extern void p_queue_init_fastcall(void *p) __preserves_regs(b,c) __z88dk_fastcall;
 #define p_queue_init(a) p_queue_init_fastcall(a)
 
 
@@ -52,7 +52,7 @@ extern void p_queue_push_callee(p_queue_t *q,void *item) __z88dk_callee;
 
 
 extern size_t p_queue_size(p_queue_t *q) __preserves_regs(b,c);
-extern size_t p_queue_size_fastcall(p_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c);
+extern size_t p_queue_size_fastcall(p_queue_t *q) __preserves_regs(b,c) __z88dk_fastcall;
 #define p_queue_size(a) p_queue_size_fastcall(a)
 
 

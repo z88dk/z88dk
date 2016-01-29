@@ -40,27 +40,27 @@ extern void *w_vector_back_fastcall(w_vector_t *v) __z88dk_fastcall;
 
 
 extern size_t w_vector_capacity(w_vector_t *v) __preserves_regs(b,c,d,e);
-extern size_t w_vector_capacity_fastcall(w_vector_t *v)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t w_vector_capacity_fastcall(w_vector_t *v) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_vector_capacity(a) w_vector_capacity_fastcall(a)
 
 
 extern void w_vector_clear(w_vector_t *v) __preserves_regs(b,c,d,e);
-extern void w_vector_clear_fastcall(w_vector_t *v)  __z88dk_fastcall __preserves_regs(a,b,c,d,e);
+extern void w_vector_clear_fastcall(w_vector_t *v) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define w_vector_clear(a) w_vector_clear_fastcall(a)
 
 
 extern void *w_vector_data(w_vector_t *v) __preserves_regs(b,c,d,e);
-extern void *w_vector_data_fastcall(w_vector_t *v)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void *w_vector_data_fastcall(w_vector_t *v) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_vector_data(a) w_vector_data_fastcall(a)
 
 
 extern void w_vector_destroy(w_vector_t *v) __preserves_regs(b,c);
-extern void w_vector_destroy_fastcall(w_vector_t *v)  __z88dk_fastcall __preserves_regs(b,c);
+extern void w_vector_destroy_fastcall(w_vector_t *v) __preserves_regs(b,c) __z88dk_fastcall;
 #define w_vector_destroy(a) w_vector_destroy_fastcall(a)
 
 
 extern void w_vector_empty(w_vector_t *v) __preserves_regs(b,c,d,e);
-extern void w_vector_empty_fastcall(w_vector_t *v)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void w_vector_empty_fastcall(w_vector_t *v) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_vector_empty(a) w_vector_empty_fastcall(a)
 
 
@@ -95,7 +95,7 @@ extern size_t w_vector_insert_n_callee(w_vector_t *v,size_t idx,size_t n,void *i
 
 
 extern void *w_vector_max_size(w_vector_t *v) __preserves_regs(b,c,d,e);
-extern void *w_vector_max_size_fastcall(w_vector_t *v)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void *w_vector_max_size_fastcall(w_vector_t *v) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_vector_max_size(a) w_vector_max_size_fastcall(a)
 
 
@@ -125,7 +125,7 @@ extern int w_vector_shrink_to_fit_fastcall(w_vector_t *v) __z88dk_fastcall;
 
 
 extern size_t w_vector_size(w_vector_t *v) __preserves_regs(b,c,d,e);
-extern size_t w_vector_size_fastcall(w_vector_t *v)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t w_vector_size_fastcall(w_vector_t *v) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define w_vector_size(a) w_vector_size_fastcall(a)
 
 

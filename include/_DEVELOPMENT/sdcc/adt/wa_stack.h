@@ -19,22 +19,22 @@ typedef struct wa_stack_s
 } wa_stack_t;
 
 extern size_t wa_stack_capacity(wa_stack_t *s) __preserves_regs(b,c,d,e);
-extern size_t wa_stack_capacity_fastcall(wa_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t wa_stack_capacity_fastcall(wa_stack_t *s) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wa_stack_capacity(a) wa_stack_capacity_fastcall(a)
 
 
 extern void wa_stack_clear(wa_stack_t *s) __preserves_regs(b,c,d,e);
-extern void wa_stack_clear_fastcall(wa_stack_t *s)  __z88dk_fastcall __preserves_regs(a,b,c,d,e);
+extern void wa_stack_clear_fastcall(wa_stack_t *s) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define wa_stack_clear(a) wa_stack_clear_fastcall(a)
 
 
 extern void wa_stack_destroy(wa_stack_t *s) __preserves_regs(b,c,d,e);
-extern void wa_stack_destroy_fastcall(wa_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void wa_stack_destroy_fastcall(wa_stack_t *s) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wa_stack_destroy(a) wa_stack_destroy_fastcall(a)
 
 
 extern int wa_stack_empty(wa_stack_t *s) __preserves_regs(b,c,d,e);
-extern int wa_stack_empty_fastcall(wa_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int wa_stack_empty_fastcall(wa_stack_t *s) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wa_stack_empty(a) wa_stack_empty_fastcall(a)
 
 
@@ -54,7 +54,7 @@ extern int wa_stack_push_callee(wa_stack_t *s,void *item) __z88dk_callee;
 
 
 extern size_t wa_stack_size(wa_stack_t *s) __preserves_regs(b,c,d,e);
-extern size_t wa_stack_size_fastcall(wa_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t wa_stack_size_fastcall(wa_stack_t *s) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wa_stack_size(a) wa_stack_size_fastcall(a)
 
 

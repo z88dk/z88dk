@@ -61,7 +61,7 @@ extern int dup2_callee(int fd,int fd2) __z88dk_callee;
 
 
 extern void _exit(int status) __preserves_regs(a,b,c,d,e,h,l);
-extern void _exit_fastcall(int status)  __z88dk_fastcall __preserves_regs(a,b,c,d,e,h,l);
+extern void _exit_fastcall(int status) __preserves_regs(a,b,c,d,e,h,l) __z88dk_fastcall;
 #define _exit(a) _exit_fastcall(a)
 
 

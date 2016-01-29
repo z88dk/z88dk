@@ -21,27 +21,27 @@ typedef struct bv_priority_queue_s
 } bv_priority_queue_t;
 
 extern size_t bv_priority_queue_capacity(bv_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern size_t bv_priority_queue_capacity_fastcall(bv_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t bv_priority_queue_capacity_fastcall(bv_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define bv_priority_queue_capacity(a) bv_priority_queue_capacity_fastcall(a)
 
 
 extern void bv_priority_queue_clear(bv_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern void bv_priority_queue_clear_fastcall(bv_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(a,b,c,d,e);
+extern void bv_priority_queue_clear_fastcall(bv_priority_queue_t *q) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define bv_priority_queue_clear(a) bv_priority_queue_clear_fastcall(a)
 
 
 extern void *bv_priority_queue_data(bv_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern void *bv_priority_queue_data_fastcall(bv_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void *bv_priority_queue_data_fastcall(bv_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define bv_priority_queue_data(a) bv_priority_queue_data_fastcall(a)
 
 
 extern void bv_priority_queue_destroy(bv_priority_queue_t *q) __preserves_regs(b,c);
-extern void bv_priority_queue_destroy_fastcall(bv_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c);
+extern void bv_priority_queue_destroy_fastcall(bv_priority_queue_t *q) __preserves_regs(b,c) __z88dk_fastcall;
 #define bv_priority_queue_destroy(a) bv_priority_queue_destroy_fastcall(a)
 
 
 extern int bv_priority_queue_empty(bv_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern int bv_priority_queue_empty_fastcall(bv_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int bv_priority_queue_empty_fastcall(bv_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define bv_priority_queue_empty(a) bv_priority_queue_empty_fastcall(a)
 
 
@@ -51,7 +51,7 @@ extern bv_priority_queue_t *bv_priority_queue_init_callee(void *p,size_t capacit
 
 
 extern size_t bv_priority_queue_max_size(bv_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern size_t bv_priority_queue_max_size_fastcall(bv_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t bv_priority_queue_max_size_fastcall(bv_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define bv_priority_queue_max_size(a) bv_priority_queue_max_size_fastcall(a)
 
 
@@ -81,7 +81,7 @@ extern int bv_priority_queue_shrink_to_fit_fastcall(bv_priority_queue_t *q) __z8
 
 
 extern size_t bv_priority_queue_size(bv_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern size_t bv_priority_queue_size_fastcall(bv_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t bv_priority_queue_size_fastcall(bv_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define bv_priority_queue_size(a) bv_priority_queue_size_fastcall(a)
 
 

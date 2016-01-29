@@ -32,12 +32,12 @@ extern void call_once_callee(once_flag *flag,void *func) __z88dk_callee;
 
 
 extern void mtx_destroy(mtx_t *m) __preserves_regs(b,c,d,e);
-extern void mtx_destroy_fastcall(mtx_t *m)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void mtx_destroy_fastcall(mtx_t *m) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define mtx_destroy(a) mtx_destroy_fastcall(a)
 
 
 extern int mtx_init(mtx_t *m,int type) __preserves_regs(d,e);
-extern int mtx_init_callee(mtx_t *m,int type)  __preserves_regs(d,e) __z88dk_callee;
+extern int mtx_init_callee(mtx_t *m,int type) __preserves_regs(d,e) __z88dk_callee;
 #define mtx_init(a,b) mtx_init_callee(a,b)
 
 
@@ -52,7 +52,7 @@ extern int mtx_timedlock_callee(mtx_t *m,struct timespec *ts) __z88dk_callee;
 
 
 extern int mtx_trylock(mtx_t *m) __preserves_regs(b,c,d,e);
-extern int mtx_trylock_fastcall(mtx_t *m)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int mtx_trylock_fastcall(mtx_t *m) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define mtx_trylock(a) mtx_trylock_fastcall(a)
 
 
@@ -62,17 +62,17 @@ extern int mtx_unlock_fastcall(mtx_t *m) __z88dk_fastcall;
 
 
 extern void spinlock_acquire(char *spinlock) __preserves_regs(b,c,d,e);
-extern void spinlock_acquire_fastcall(char *spinlock)  __z88dk_fastcall __preserves_regs(a,b,c,d,e,h,l);
+extern void spinlock_acquire_fastcall(char *spinlock) __preserves_regs(a,b,c,d,e,h,l) __z88dk_fastcall;
 #define spinlock_acquire(a) spinlock_acquire_fastcall(a)
 
 
 extern void spinlock_release(char *spinlock) __preserves_regs(b,c,d,e);
-extern void spinlock_release_fastcall(char *spinlock)  __z88dk_fastcall __preserves_regs(a,b,c,d,e,h,l);
+extern void spinlock_release_fastcall(char *spinlock) __preserves_regs(a,b,c,d,e,h,l) __z88dk_fastcall;
 #define spinlock_release(a) spinlock_release_fastcall(a)
 
 
 extern int spinlock_tryacquire(char *spinlock) __preserves_regs(b,c,d,e);
-extern int spinlock_tryacquire_fastcall(char *spinlock)  __z88dk_fastcall __preserves_regs(a,b,c,d,e);
+extern int spinlock_tryacquire_fastcall(char *spinlock) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define spinlock_tryacquire(a) spinlock_tryacquire_fastcall(a)
 
 

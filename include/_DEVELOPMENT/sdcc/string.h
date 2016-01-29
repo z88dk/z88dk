@@ -32,17 +32,17 @@ extern void bzero_callee(void *mem,size_t n) __z88dk_callee;
 
 
 extern char *index(char *s,int c) __preserves_regs(d,e);
-extern char *index_callee(char *s,int c)  __preserves_regs(d,e) __z88dk_callee;
+extern char *index_callee(char *s,int c) __preserves_regs(d,e) __z88dk_callee;
 #define index(a,b) index_callee(a,b)
 
 
 extern char *rindex(char *s,int c) __preserves_regs(d);
-extern char *rindex_callee(char *s,int c)  __preserves_regs(d) __z88dk_callee;
+extern char *rindex_callee(char *s,int c) __preserves_regs(d) __z88dk_callee;
 #define rindex(a,b) rindex_callee(a,b)
 
 
 extern char *strset(char *s,int c) __preserves_regs(b,c);
-extern char *strset_callee(char *s,int c)  __preserves_regs(b,c) __z88dk_callee;
+extern char *strset_callee(char *s,int c) __preserves_regs(b,c) __z88dk_callee;
 #define strset(a,b) strset_callee(a,b)
 
 
@@ -52,13 +52,13 @@ extern char *strnset_callee(char *s,int c,size_t n) __z88dk_callee;
 
 
 extern void *rawmemchr(const void *mem,int c) __preserves_regs(d,e);
-extern void *rawmemchr_callee(const void *mem,int c)  __preserves_regs(d,e) __z88dk_callee;
+extern void *rawmemchr_callee(const void *mem,int c) __preserves_regs(d,e) __z88dk_callee;
 #define rawmemchr(a,b) rawmemchr_callee(a,b)
 
 
 
 extern char *_memlwr_(void *p,size_t n) __preserves_regs(d,e);
-extern char *_memlwr__callee(void *p,size_t n)  __preserves_regs(d,e) __z88dk_callee;
+extern char *_memlwr__callee(void *p,size_t n) __preserves_regs(d,e) __z88dk_callee;
 #define _memlwr_(a,b) _memlwr__callee(a,b)
 
 
@@ -68,7 +68,7 @@ extern char *_memstrcpy__callee(void *p,char *s,size_t n) __z88dk_callee;
 
 
 extern char *_memupr_(void *p,size_t n) __preserves_regs(d,e);
-extern char *_memupr__callee(void *p,size_t n)  __preserves_regs(d,e) __z88dk_callee;
+extern char *_memupr__callee(void *p,size_t n) __preserves_regs(d,e) __z88dk_callee;
 #define _memupr_(a,b) _memupr__callee(a,b)
 
 
@@ -78,12 +78,12 @@ extern char *_strrstrip__fastcall(char *s) __z88dk_fastcall;
 
 
 extern int ffs(int i) __preserves_regs(b,c,d,e);
-extern int ffs_fastcall(int i)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int ffs_fastcall(int i) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define ffs(a) ffs_fastcall(a)
 
 
 extern int ffsl(long i) __preserves_regs(b,c);
-extern int ffsl_fastcall(long i)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int ffsl_fastcall(long i) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define ffsl(a) ffsl_fastcall(a)
 
 
@@ -143,7 +143,7 @@ extern char *stpncpy_callee(char *dst,char *src,size_t n) __z88dk_callee;
 
 
 extern int strcasecmp(char *s1,char *s2) __preserves_regs(b);
-extern int strcasecmp_callee(char *s1,char *s2)  __preserves_regs(b) __z88dk_callee;
+extern int strcasecmp_callee(char *s1,char *s2) __preserves_regs(b) __z88dk_callee;
 #define strcasecmp(a,b) strcasecmp_callee(a,b)
 
 
@@ -153,12 +153,12 @@ extern char *strcat_callee(char *dst,char *src) __z88dk_callee;
 
 
 extern char *strchr(char *s,int c) __preserves_regs(d,e);
-extern char *strchr_callee(char *s,int c)  __preserves_regs(d,e) __z88dk_callee;
+extern char *strchr_callee(char *s,int c) __preserves_regs(d,e) __z88dk_callee;
 #define strchr(a,b) strchr_callee(a,b)
 
 
 extern char *strchrnul(char *s,int c) __preserves_regs(d,e);
-extern char *strchrnul_callee(char *s,int c)  __preserves_regs(d,e) __z88dk_callee;
+extern char *strchrnul_callee(char *s,int c) __preserves_regs(d,e) __z88dk_callee;
 #define strchrnul(a,b) strchrnul_callee(a,b)
 
 
@@ -188,12 +188,12 @@ extern char *strdup_fastcall(char *s) __z88dk_fastcall;
 
 
 extern char *strerror(int errnum) __preserves_regs(d);
-extern char *strerror_fastcall(int errnum)  __z88dk_fastcall __preserves_regs(d);
+extern char *strerror_fastcall(int errnum) __preserves_regs(d) __z88dk_fastcall;
 #define strerror(a) strerror_fastcall(a)
 
 
 extern int stricmp(char *s1,char *s2) __preserves_regs(b);
-extern int stricmp_callee(char *s1,char *s2)  __preserves_regs(b) __z88dk_callee;
+extern int stricmp_callee(char *s1,char *s2) __preserves_regs(b) __z88dk_callee;
 #define stricmp(a,b) stricmp_callee(a,b)
 
 
@@ -208,12 +208,12 @@ extern size_t strlcpy_callee(char *dst,char *src,size_t n) __z88dk_callee;
 
 
 extern size_t strlen(char *s) __preserves_regs(d,e);
-extern size_t strlen_fastcall(char *s)  __z88dk_fastcall __preserves_regs(d,e);
+extern size_t strlen_fastcall(char *s) __preserves_regs(d,e) __z88dk_fastcall;
 #define strlen(a) strlen_fastcall(a)
 
 
 extern char *strlwr(char *s) __preserves_regs(b,c,d,e);
-extern char *strlwr_fastcall(char *s)  __z88dk_fastcall __preserves_regs(b,c,d,e,h,l);
+extern char *strlwr_fastcall(char *s) __preserves_regs(b,c,d,e,h,l) __z88dk_fastcall;
 #define strlwr(a) strlwr_fastcall(a)
 
 
@@ -258,12 +258,12 @@ extern size_t strnlen_callee(char *s,size_t max_len) __z88dk_callee;
 
 
 extern char strpbrk(char *s,char *set) __preserves_regs(b);
-extern char strpbrk_callee(char *s,char *set)  __preserves_regs(b) __z88dk_callee;
+extern char strpbrk_callee(char *s,char *set) __preserves_regs(b) __z88dk_callee;
 #define strpbrk(a,b) strpbrk_callee(a,b)
 
 
 extern char *strrchr(char *s,int c) __preserves_regs(d);
-extern char *strrchr_callee(char *s,int c)  __preserves_regs(d) __z88dk_callee;
+extern char *strrchr_callee(char *s,int c) __preserves_regs(d) __z88dk_callee;
 #define strrchr(a,b) strrchr_callee(a,b)
 
 
@@ -273,7 +273,7 @@ extern size_t strrcspn_callee(char *s,char *set) __z88dk_callee;
 
 
 extern char *strrev(char *s);
-extern char *strrev_fastcall(char *s)  __z88dk_fastcall __preserves_regs(h,l);
+extern char *strrev_fastcall(char *s) __preserves_regs(h,l) __z88dk_fastcall;
 #define strrev(a) strrev_fastcall(a)
 
 
@@ -283,7 +283,7 @@ extern size_t strrspn_callee(char *s,char *set) __z88dk_callee;
 
 
 extern char *strrstrip(char *s);
-extern char *strrstrip_fastcall(char *s)  __z88dk_fastcall __preserves_regs(h,l);
+extern char *strrstrip_fastcall(char *s) __preserves_regs(h,l) __z88dk_fastcall;
 #define strrstrip(a) strrstrip_fastcall(a)
 
 
@@ -298,12 +298,12 @@ extern size_t strspn_callee(char *s,char *pfx) __z88dk_callee;
 
 
 extern char *strstr(char *s,char *subs) __preserves_regs(b,c);
-extern char *strstr_callee(char *s,char *subs)  __preserves_regs(b,c) __z88dk_callee;
+extern char *strstr_callee(char *s,char *subs) __preserves_regs(b,c) __z88dk_callee;
 #define strstr(a,b) strstr_callee(a,b)
 
 
 extern char *strstrip(char *s) __preserves_regs(b,c,d,e);
-extern char *strstrip_fastcall(char *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern char *strstrip_fastcall(char *s) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define strstrip(a) strstrip_fastcall(a)
 
 
@@ -318,7 +318,7 @@ extern char *strtok_r_callee(char *s,char *delim,char **last_s) __z88dk_callee;
 
 
 extern char *strupr(char *s) __preserves_regs(b,c,d,e);
-extern char *strupr_fastcall(char *s)  __z88dk_fastcall __preserves_regs(b,c,d,e,h,l);
+extern char *strupr_fastcall(char *s) __preserves_regs(b,c,d,e,h,l) __z88dk_fastcall;
 #define strupr(a) strupr_fastcall(a)
 
 

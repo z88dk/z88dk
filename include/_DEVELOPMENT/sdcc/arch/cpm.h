@@ -75,7 +75,7 @@ extern int cpm_bdos_hl_callee(unsigned int func,unsigned int arg) __z88dk_callee
 #define setuid(u)  cpm_bdos(CPM_SUID, u)
 
 extern unsigned long cpm_get_offset(void *p) __preserves_regs(b,c);
-extern unsigned long cpm_get_offset_fastcall(void *p)  __z88dk_fastcall __preserves_regs(a,b,c);
+extern unsigned long cpm_get_offset_fastcall(void *p) __preserves_regs(a,b,c) __z88dk_fastcall;
 #define cpm_get_offset(a) cpm_get_offset_fastcall(a)
 
 

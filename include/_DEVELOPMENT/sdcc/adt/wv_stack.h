@@ -20,22 +20,22 @@ typedef struct wv_stack_s
 } wv_stack_t;
 
 extern size_t wv_stack_capacity(wv_stack_t *s) __preserves_regs(b,c,d,e);
-extern size_t wv_stack_capacity_fastcall(wv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t wv_stack_capacity_fastcall(wv_stack_t *s) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wv_stack_capacity(a) wv_stack_capacity_fastcall(a)
 
 
 extern void wv_stack_clear(wv_stack_t *s) __preserves_regs(b,c,d,e);
-extern void wv_stack_clear_fastcall(wv_stack_t *s)  __z88dk_fastcall __preserves_regs(a,b,c,d,e);
+extern void wv_stack_clear_fastcall(wv_stack_t *s) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define wv_stack_clear(a) wv_stack_clear_fastcall(a)
 
 
 extern void wv_stack_destroy(wv_stack_t *s) __preserves_regs(b,c);
-extern void wv_stack_destroy_fastcall(wv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c);
+extern void wv_stack_destroy_fastcall(wv_stack_t *s) __preserves_regs(b,c) __z88dk_fastcall;
 #define wv_stack_destroy(a) wv_stack_destroy_fastcall(a)
 
 
 extern int wv_stack_empty(wv_stack_t *s) __preserves_regs(b,c,d,e);
-extern int wv_stack_empty_fastcall(wv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int wv_stack_empty_fastcall(wv_stack_t *s) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wv_stack_empty(a) wv_stack_empty_fastcall(a)
 
 
@@ -45,7 +45,7 @@ extern wv_stack_t *wv_stack_init_callee(void *p,size_t capacity,size_t max_size)
 
 
 extern size_t wv_stack_max_size(wv_stack_t *s) __preserves_regs(b,c,d,e);
-extern size_t wv_stack_max_size_fastcall(wv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t wv_stack_max_size_fastcall(wv_stack_t *s) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wv_stack_max_size(a) wv_stack_max_size_fastcall(a)
 
 
@@ -70,7 +70,7 @@ extern int wv_stack_shrink_to_fit_fastcall(wv_stack_t *s) __z88dk_fastcall;
 
 
 extern size_t wv_stack_size(wv_stack_t *s) __preserves_regs(b,c,d,e);
-extern size_t wv_stack_size_fastcall(wv_stack_t *s)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t wv_stack_size_fastcall(wv_stack_t *s) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wv_stack_size(a) wv_stack_size_fastcall(a)
 
 

@@ -20,27 +20,27 @@ typedef struct wa_priority_queue_s
 } wa_priority_queue_t;
 
 extern size_t wa_priority_queue_capacity(wa_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern size_t wa_priority_queue_capacity_fastcall(wa_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t wa_priority_queue_capacity_fastcall(wa_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wa_priority_queue_capacity(a) wa_priority_queue_capacity_fastcall(a)
 
 
 extern void wa_priority_queue_clear(wa_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern void wa_priority_queue_clear_fastcall(wa_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(a,b,c,d,e);
+extern void wa_priority_queue_clear_fastcall(wa_priority_queue_t *q) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define wa_priority_queue_clear(a) wa_priority_queue_clear_fastcall(a)
 
 
 extern void *wa_priority_queue_data(wa_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern void *wa_priority_queue_data_fastcall(wa_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void *wa_priority_queue_data_fastcall(wa_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wa_priority_queue_data(a) wa_priority_queue_data_fastcall(a)
 
 
 extern void wa_priority_queue_destroy(wa_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern void wa_priority_queue_destroy_fastcall(wa_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern void wa_priority_queue_destroy_fastcall(wa_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wa_priority_queue_destroy(a) wa_priority_queue_destroy_fastcall(a)
 
 
 extern int wa_priority_queue_empty(wa_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern int wa_priority_queue_empty_fastcall(wa_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern int wa_priority_queue_empty_fastcall(wa_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wa_priority_queue_empty(a) wa_priority_queue_empty_fastcall(a)
 
 
@@ -65,7 +65,7 @@ extern int wa_priority_queue_resize_callee(wa_priority_queue_t *q,size_t n) __z8
 
 
 extern size_t wa_priority_queue_size(wa_priority_queue_t *q) __preserves_regs(b,c,d,e);
-extern size_t wa_priority_queue_size_fastcall(wa_priority_queue_t *q)  __z88dk_fastcall __preserves_regs(b,c,d,e);
+extern size_t wa_priority_queue_size_fastcall(wa_priority_queue_t *q) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define wa_priority_queue_size(a) wa_priority_queue_size_fastcall(a)
 
 

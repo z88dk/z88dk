@@ -14,7 +14,7 @@
 extern int in_inkey(void);
 
 extern int in_key_pressed(uint16_t scancode) __preserves_regs(d,e);
-extern int in_key_pressed_fastcall(uint16_t scancode)  __z88dk_fastcall __preserves_regs(d,e);
+extern int in_key_pressed_fastcall(uint16_t scancode) __preserves_regs(d,e) __z88dk_fastcall;
 #define in_key_pressed(a) in_key_pressed_fastcall(a)
 
 
@@ -41,7 +41,7 @@ extern void in_wait_nokey(void) __preserves_regs(b,c,d,e,h,l);
 ////////////
 
 extern uint16_t in_stick_keyboard(udk_t *u) __preserves_regs(b,c);
-extern uint16_t in_stick_keyboard_fastcall(udk_t *u)  __z88dk_fastcall __preserves_regs(b,c);
+extern uint16_t in_stick_keyboard_fastcall(udk_t *u) __preserves_regs(b,c) __z88dk_fastcall;
 #define in_stick_keyboard(a) in_stick_keyboard_fastcall(a)
 
 
@@ -69,7 +69,7 @@ extern void in_mouse_amx_init_callee(uint16_t x_vector,uint16_t y_vector) __z88d
 extern void in_mouse_amx_reset(void);
 
 extern void in_mouse_amx_setpos(uint16_t x,uint16_t y) __preserves_regs(h,l);
-extern void in_mouse_amx_setpos_callee(uint16_t x,uint16_t y)  __preserves_regs(h,l) __z88dk_callee;
+extern void in_mouse_amx_setpos_callee(uint16_t x,uint16_t y) __preserves_regs(h,l) __z88dk_callee;
 #define in_mouse_amx_setpos(a,b) in_mouse_amx_setpos_callee(a,b)
 
 
@@ -88,7 +88,7 @@ extern void in_mouse_kempston_init(void);
 extern void in_mouse_kempston_reset(void);
 
 extern void in_mouse_kempston_setpos(uint16_t x,uint16_t y) __preserves_regs(h,l);
-extern void in_mouse_kempston_setpos_callee(uint16_t x,uint16_t y)  __preserves_regs(h,l) __z88dk_callee;
+extern void in_mouse_kempston_setpos_callee(uint16_t x,uint16_t y) __preserves_regs(h,l) __z88dk_callee;
 #define in_mouse_kempston_setpos(a,b) in_mouse_kempston_setpos_callee(a,b)
 
 

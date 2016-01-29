@@ -49,7 +49,7 @@ extern void *heap_destroy_fastcall(void *heap) __z88dk_fastcall;
 
 
 extern void heap_free(void *heap,void *p) __preserves_regs(b,c);
-extern void heap_free_callee(void *heap,void *p)  __preserves_regs(b,c) __z88dk_callee;
+extern void heap_free_callee(void *heap,void *p) __preserves_regs(b,c) __z88dk_callee;
 #define heap_free(a,b) heap_free_callee(a,b)
 
 
@@ -105,7 +105,7 @@ extern void *heap_calloc_unlocked_callee(void *heap,size_t nmemb,size_t size) __
 
 
 extern void heap_free_unlocked(void *heap,void *p) __preserves_regs(b,c);
-extern void heap_free_unlocked_callee(void *heap,void *p)  __preserves_regs(b,c) __z88dk_callee;
+extern void heap_free_unlocked_callee(void *heap,void *p) __preserves_regs(b,c) __z88dk_callee;
 #define heap_free_unlocked(a,b) heap_free_unlocked_callee(a,b)
 
 
@@ -143,7 +143,7 @@ extern void *calloc_callee(size_t nmemb,size_t size) __z88dk_callee;
 
 
 extern void free(void *p) __preserves_regs(b,c);
-extern void free_fastcall(void *p)  __z88dk_fastcall __preserves_regs(b,c);
+extern void free_fastcall(void *p) __preserves_regs(b,c) __z88dk_fastcall;
 #define free(a) free_fastcall(a)
 
 
@@ -169,7 +169,7 @@ extern void *calloc_unlocked_callee(size_t nmemb,size_t size) __z88dk_callee;
 
 
 extern void free_unlocked(void *p) __preserves_regs(b,c);
-extern void free_unlocked_fastcall(void *p)  __z88dk_fastcall __preserves_regs(b,c);
+extern void free_unlocked_fastcall(void *p) __preserves_regs(b,c) __z88dk_fastcall;
 #define free_unlocked(a) free_unlocked_fastcall(a)
 
 

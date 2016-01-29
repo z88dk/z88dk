@@ -18,14 +18,14 @@
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_start(void);
+extern void NIRVANAP_start(void) __preserves_regs(b,c,d,e,h,l);
 
 
 // ----------------------------------------------------------------
 // Deactivate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_stop(void);
+extern void NIRVANAP_stop(void) __preserves_regs(b,c,d,e,h,l);
 
 
 // ----------------------------------------------------------------
@@ -134,7 +134,7 @@ extern void NIRVANAP_paintC_callee(unsigned char *attrs,unsigned int lin,unsigne
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_fillC(unsigned int attr,unsigned int lin,unsigned int col);
+extern void NIRVANAP_fillC(unsigned int attr,unsigned int lin,unsigned int col) __preserves_regs(b);
 extern void NIRVANAP_fillC_callee(unsigned int attr,unsigned int lin,unsigned int col) __z88dk_callee;
 #define NIRVANAP_fillC(a,b,c) NIRVANAP_fillC_callee(a,b,c)
 
@@ -199,14 +199,14 @@ extern void NIRVANAP_drawW_callee(unsigned int tile,unsigned int lin,unsigned in
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_tiles(unsigned char *addr);
-extern void NIRVANAP_tiles_fastcall(unsigned char *addr) __z88dk_fastcall;
+extern void NIRVANAP_tiles(unsigned char *addr) __preserves_regs(b,c,d,e);
+extern void NIRVANAP_tiles_fastcall(unsigned char *addr) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define NIRVANAP_tiles(a) NIRVANAP_tiles_fastcall(a)
 
 
 
 // ----------------------------------------------------------------
-// Reconfigure NIRVANA ENGINE to read wide bicolor tiles (24x16 
+// Reconfigure NIRVANA ENGINE to read wide bicolor tiles (24x16
 // pixels) from another address (default value is 54000).
 //
 // Parameters:
@@ -215,8 +215,8 @@ extern void NIRVANAP_tiles_fastcall(unsigned char *addr) __z88dk_fastcall;
 // WARNING: Only use this routine if NIRVANAP_drawW was enabled!!!
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_wides(unsigned char *addr);
-extern void NIRVANAP_wides_fastcall(unsigned char *addr) __z88dk_fastcall;
+extern void NIRVANAP_wides(unsigned char *addr) __preserves_regs(b,c,d,e);
+extern void NIRVANAP_wides_fastcall(unsigned char *addr) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define NIRVANAP_wides(a) NIRVANAP_wides_fastcall(a)
 
 
@@ -230,8 +230,8 @@ extern void NIRVANAP_wides_fastcall(unsigned char *addr) __z88dk_fastcall;
 //     addr: New character table address
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_chars(unsigned char *addr);
-extern void NIRVANAP_chars_fastcall(unsigned char *addr) __z88dk_fastcall;
+extern void NIRVANAP_chars(unsigned char *addr) __preserves_regs(b,c,d,e);
+extern void NIRVANAP_chars_fastcall(unsigned char *addr) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
 #define NIRVANAP_chars(a) NIRVANAP_chars_fastcall(a)
 
 
