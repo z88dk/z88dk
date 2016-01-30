@@ -1,4 +1,4 @@
-@arch/zx/nirvanam/NIRVANAM_asm.lst
+@arch/zx/nirvanam/nirvanam_asm.lst
 arch/zx/nirvanam/c/sdcc/NIRVANAM_chars
 arch/zx/nirvanam/c/sdcc/NIRVANAM_chars_fastcall
 arch/zx/nirvanam/c/sdcc/NIRVANAM_drawT
