@@ -35,6 +35,7 @@ float
 floor
 fmod
 fmul_noaf
+fprand
 fradd
 fsub
 ftoa.c
@@ -60,7 +61,6 @@ pack2
 poly
 pow
 pushfa
-rand
 rshift_noaf
 seed
 sgn
