@@ -9,9 +9,9 @@ extern void intrinsic_di(void) __preserves_regs(a,b,c,d,e,h,l);
 
 extern void intrinsic_ei(void) __preserves_regs(a,b,c,d,e,h,l);
 
-extern void intrinsic_ei_reti(void) __preserves_regs(a,b,c,d,e,h,l);
-
 extern void intrinsic_halt(void) __preserves_regs(a,b,c,d,e,h,l);
+
+extern void intrinsic_reti(void) __preserves_regs(a,b,c,d,e,h,l);
 
 extern void intrinsic_retn(void) __preserves_regs(a,b,c,d,e,h,l);
 

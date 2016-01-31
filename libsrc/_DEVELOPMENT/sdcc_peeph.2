@@ -19,18 +19,17 @@ replace restart {
 }
 
 replace restart {
-	call	_intrinsic_ei_reti
-} by {
-	ei
-	reti
-	; peephole z88dk-intrinsic-ei-reti
-}
-
-replace restart {
 	call	_intrinsic_halt
 } by {
 	halt
 	; peephole z88dk-intrinsic-halt
+}
+
+replace restart {
+	call	_intrinsic_reti
+} by {
+	reti
+	; peephole z88dk-intrinsic-reti
 }
 
 replace restart {

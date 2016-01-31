@@ -11,10 +11,10 @@ extern void __LIB__ intrinsic_di(void);
 extern void __LIB__ intrinsic_ei(void);
 
 
-extern void __LIB__ intrinsic_ei_reti(void);
-
-
 extern void __LIB__ intrinsic_halt(void);
+
+
+extern void __LIB__ intrinsic_reti(void);
 
 
 extern void __LIB__ intrinsic_retn(void);

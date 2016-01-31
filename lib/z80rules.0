@@ -6,14 +6,13 @@
 =
 	ei
 
-	call	intrinsic_ei_reti
-=
-	ei
-	reti
-
 	call	intrinsic_halt
 =
 	halt
+
+	call	intrinsic_reti
+=
+	reti
 
 	call	intrinsic_retn
 =
