@@ -10,6 +10,16 @@
 =
 	halt
 
+	call	_intrinsic_load16_%1
+=
+	ld	hl,(%1)
+
+	call	_intrinsic_store16_address_%1
+	call	_intrinsic_store16_value_%2
+=
+	ld	hl,%2
+	ld	(%1),hl
+
 	call	intrinsic_reti
 =
 	reti

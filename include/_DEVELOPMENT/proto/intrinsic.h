@@ -3,6 +3,20 @@ include(__link__.m4)
 #ifndef _INTRINSIC_H
 #define _INTRINSIC_H
 
+#ifdef __SDCC
+
+#define intrinsic_label(name)  { extern void intrinsic_label_##name(void) __preserves_regs(a,b,c,d,e,h,l); intrinsic_label_##name(); }
+#define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
+#define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
+
+#else
+
+#define intrinsic_label(name)  asm("name:");
+#define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
+#define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
+
+#endif
+
 __OPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',void,,intrinsic_di,void)
 __OPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',void,,intrinsic_ei,void)
 __OPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',void,,intrinsic_halt,void)
