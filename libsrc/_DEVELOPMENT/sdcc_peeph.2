@@ -26,6 +26,29 @@ replace restart {
 }
 
 replace restart {
+	call	_intrinsic_label_%1
+} by {
+%1::
+	; peephole z88dk-intrinsic-label %1
+}
+
+replace restart {
+	call	_intrinsic_load16_%1
+} by {
+	ld	hl,(#%1)
+	; peephole z88dk-intrinsic-load (%1)
+}
+
+replace restart {
+	call	_intrinsic_store16_address_%1
+	call	_intrinsic_store16_value_%2
+} by {
+	ld	hl,#%2
+	ld	(#%1),hl
+	; peephole z88dk-intrinsic-store (%1),%2
+} 
+
+replace restart {
 	call	_intrinsic_reti
 } by {
 	reti
