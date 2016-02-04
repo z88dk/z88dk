@@ -279,19 +279,19 @@ extern void BIFROSTH_fillTileAttrH_callee(unsigned int lin,unsigned int col,unsi
 // second (slow)
 // ----------------------------------------------------------------
 
-//#define BIFROSTH_enableSprites()   *((unsigned int*)59040)=58054
-
 extern void BIFROSTH_enableSprites(void) __preserves_regs(a,b,c,d,e);
 
+
+#define BIFROSTH_enableSprites()  intrinsic_store16(59040,58054)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to stop drawing sprites
 // ----------------------------------------------------------------
 
-//#define BIFROSTH_disableSprites()   *((unsigned int*)59040)=58636
-
 extern void BIFROSTH_disableSprites(void) __preserves_regs(a,b,c,d,e);
 
+
+#define BIFROSTH_disableSprites()  intrinsic_store16(59040,58636)
 
 // ----------------------------------------------------------------
 // Instantly redraw all multicolor tiles stored in tile map positions
