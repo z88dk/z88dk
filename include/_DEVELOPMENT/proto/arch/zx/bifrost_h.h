@@ -240,17 +240,17 @@ __DPROTO(,,void,,BIFROSTH_fillTileAttrH,unsigned int lin, unsigned int col, unsi
 // second (slow)
 // ----------------------------------------------------------------
 
-//#define BIFROSTH_enableSprites()   *((unsigned int*)59040)=58054
-
 __OPROTO(`a,b,c,d,e',`a,b,c,d,e',void,,BIFROSTH_enableSprites,void)
+
+#define BIFROSTH_enableSprites()  intrinsic_store16(59040,58054)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to stop drawing sprites
 // ----------------------------------------------------------------
 
-//#define BIFROSTH_disableSprites()   *((unsigned int*)59040)=58636
-
 __OPROTO(`a,b,c,d,e',`a,b,c,d,e',void,,BIFROSTH_disableSprites,void)
+
+#define BIFROSTH_disableSprites()  intrinsic_store16(59040,58636)
 
 // ----------------------------------------------------------------
 // Instantly redraw all multicolor tiles stored in tile map positions
