@@ -11,11 +11,21 @@
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
 #define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
 
+#define intrinsic_in8(port)  ((unsigned char)intrinsic_in8_port_##port())
+#define intrinsic_out8(port,value)  ((unsigned char)(intrinsic_out8_port_##port(),intrinsic_out8_value_##value()))
+#define intrinsic_in16(port)  ((unsigned char)intrinsic_in16_port_##port())
+#define intrinsic_out16(port,value)  ((unsigned char)(intrinsic_out16_port_##port(),intrinsic_out16_value_##value()))
+
 #else
 
 #define intrinsic_label(name)  asm("name:");
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
 #define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
+
+#define intrinsic_in8(port)  ((unsigned char)intrinsic_in8_port_##port())
+#define intrinsic_out8(port,value)  ((unsigned char)(intrinsic_out8_port_##port(),intrinsic_out8_value_##value()))
+#define intrinsic_in16(port)  ((unsigned char)intrinsic_in16_port_##port())
+#define intrinsic_out16(port,value)  ((unsigned char)(intrinsic_out16_port_##port(),intrinsic_out16_value_##value()))
 
 #endif
 
@@ -41,6 +51,9 @@ extern void __LIB__ intrinsic_im_1(void);
 
 
 extern void __LIB__ intrinsic_im_2(void);
+
+
+extern void __LIB__ intrinsic_nop(void);
 
 
 extern void __LIB__ intrinsic_push_af(void);
