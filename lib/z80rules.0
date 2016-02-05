@@ -10,6 +10,30 @@
 =
 	halt
 
+	call	_intrinsic_in8_port_%1
+=
+	in	a,(%1)
+	ld	l,a
+
+	call	_intrinsic_out8_port_%1
+	call	_intrinsic_out8_value_%2
+=
+	ld	a,%2
+	out	(%1),a
+	ld	l,a
+
+	call	_intrinsic_in16_port_%1
+=
+	ld	bc,%1
+	in	l,(c)
+
+	call	_intrinsic_out16_port_%1
+	call	_intrinsic_out16_value_%2
+=
+	ld	l,%2
+	ld	bc,%1
+	out	(c),l
+
 	call	_intrinsic_load16_%1
 =
 	ld	hl,(%1)
@@ -39,6 +63,10 @@
 	call	intrinsic_im_2
 =
 	im 2
+
+	call	intrinsic_nop
+=
+	nop
 
 	call	intrinsic_push_af
 =

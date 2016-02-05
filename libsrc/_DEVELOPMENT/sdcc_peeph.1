@@ -26,6 +26,42 @@ replace restart {
 }
 
 replace restart {
+	call	_intrinsic_in8_port_%1
+} by {
+	in	a,(#%1)
+	ld	l,a
+	; peephole z88dk-intrinsic-in8 %1
+}
+
+replace restart {
+	call	_intrinsic_out8_port_%1
+	call	_intrinsic_out8_value_%2
+} by {
+	ld	a,#%2
+	out	(#%1),a
+	ld	l,a
+	; peephole z88dk-intrinsic-out8 %1,%2
+}
+
+replace restart {
+	call	_intrinsic_in16_port_%1
+} by {
+	ld	bc,#%1
+	in	l,(c)
+	; peephole z88dk-intrinsic-in16 %1
+}
+
+replace restart {
+	call	_intrinsic_out16_port_%1
+	call	_intrinsic_out16_value_%2
+} by {
+	ld	l,#%2
+	ld	bc,#%1
+	out	(c),l
+	; peephole z88dk-intrinsic-out16 %1,%2
+}
+
+replace restart {
 	call	_intrinsic_label_%1
 } by {
 %1::
@@ -81,6 +117,13 @@ replace restart {
 } by {
 	im	2
 	; peephole z88dk-intrinsic-im-2
+}
+
+replace restart {
+	call	_intrinsic_nop
+} by {
+	nop
+	; peephole z88dk-intrinsic-nop
 }
 
 replace restart {
