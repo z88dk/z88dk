@@ -551,6 +551,102 @@
 	push	hl
 
 ;;
+;; sdcc failed built-ins made callee
+;;
+
+	call	_memcpy
+	pop	af
+	pop	af
+	pop	af
+=
+	call	_memcpy_callee
+
+	call	_memcpy
+	pop	af
+	pop	af
+	ex	(sp),hl
+=
+	call	_memcpy_callee
+	push	hl
+
+	call	_memcpy
+	ld	hl,6
+	add	hl,sp
+	ld	sp,hl
+=
+	call	_memcpy_callee
+
+	call	_strcpy
+	pop	af
+	pop	af
+=
+	call	_strcpy_callee
+
+	call	_strcpy
+	pop	af
+	ex	(sp),hl
+=
+	call	_strcpy_callee
+	push	hl
+
+	call	_strncpy
+	pop	af
+	pop	af
+	pop	af
+=
+	call	_strncpy_callee
+
+	call	_strncpy
+	pop	af
+	pop	af
+	ex	(sp),hl
+=
+	call	_strncpy_callee
+	push	hl
+
+	call	_strncpy
+	ld	hl,6
+	add	hl,sp
+	ld	sp,hl
+=
+	call	_strncpy_callee
+
+	call	_strchr
+	pop	af
+	pop	af
+=
+	call	_strchr_callee
+
+	call	_strchr
+	pop	af
+	ex	(sp),hl
+=
+	call	_strchr_callee
+	push	hl
+
+	call	_memset
+	pop	af
+	pop	af
+	pop	af
+=
+	call	_memset_callee
+
+	call	_memset
+	pop	af
+	pop	af
+	ex	(sp),hl
+=
+	call	_memset_callee
+	push	hl
+
+	call	_memset
+	ld	hl,6
+	add	hl,sp
+	ld	sp,hl
+=
+	call	_memset_callee
+
+;;
 ;; reduce size of function stubs
 ;;
 
