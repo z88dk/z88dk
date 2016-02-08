@@ -19,6 +19,18 @@ ENDIF
 
 IF startup = -1
 
+   IFNDEF __CRTDEF
+   
+      defc __CRTDEF = 0
+   
+   ENDIF
+   
+   IFNDEF __MMAP
+   
+      defc __MMAP = 0
+   
+   ENDIF
+   
    INCLUDE "crt.asm"
 
 ENDIF
