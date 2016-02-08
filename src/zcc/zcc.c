@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.104 2016-01-20 01:41:58 aralbrec Exp $
+ *      $Id: zcc.c,v 1.105 2016-02-08 06:29:47 aralbrec Exp $
  */
 
 
@@ -135,7 +135,7 @@ static char           *appmakeargs;
 static char           *zccopt = NULL;   /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
-static int             c_startup = -1;
+static int             c_startup = -2;
 static int             c_nostdlib = 0;
 
 
@@ -1223,7 +1223,8 @@ static void configure_misc_options()
         compileonly = YES;
     }
 
-    if ( c_startup != -1 ) {
+    // the new c lib uses startup=-1 to mean user supplies the crt
+    if ( c_startup >= -1 ) {
         write_zcc_defined("startup", c_startup);
     }
     
