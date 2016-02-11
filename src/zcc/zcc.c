@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.105 2016-02-08 06:29:47 aralbrec Exp $
+ *      $Id: zcc.c,v 1.106 2016-02-11 02:43:11 aralbrec Exp $
  */
 
 
@@ -782,6 +782,9 @@ int main(int argc, char **argv)
             if (!assembleonly && !lateassemble)
                 if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                     exit(1);
+            break;
+		default:
+            fprintf(stderr, "Filetype in \"%s\" unrecognized, ignoring file\n", original_filenames[i]);
             break;
         }
     }
