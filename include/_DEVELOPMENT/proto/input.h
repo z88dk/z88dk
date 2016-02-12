@@ -13,14 +13,14 @@ include(__link__.m4)
 // keyboard
 ///////////
 
-//__OPROTO(,,int,,in_inkey,void)
-//__DPROTO(,,int,,in_key_pressed,uint16_t scancode)
-//__DPROTO(,,uint16_t,,in_key_scancode,int c)
-//
-//__DPROTO(,,uint16_t,,in_pause,uint16_t dur_ms)
-//__OPROTO(,,int,,in_test_key,void)
-//__OPROTO(,,void,,in_wait_key,void)
-//__OPROTO(,,void,,in_wait_nokey,void)
+dnl#__OPROTO(,,int,,in_inkey,void)
+dnl#__DPROTO(,,int,,in_key_pressed,uint16_t scancode)
+dnl#__DPROTO(,,uint16_t,,in_key_scancode,int c)
+dnl#
+dnl#__DPROTO(,,uint16_t,,in_pause,uint16_t dur_ms)
+dnl#__OPROTO(,,int,,in_test_key,void)
+dnl#__OPROTO(,,void,,in_wait_key,void)
+dnl#__OPROTO(,,void,,in_wait_nokey,void)
 
 ////////////
 // joysticks
@@ -50,7 +50,7 @@ typedef struct udk_s
 #define IN_STICK_LEFT    0x04
 #define IN_STICK_RIGHT   0x08
 
-//__DPROTO(,,uint16_t,,in_stick_keyboard,udk_t *u)
+dnl#__DPROTO(,,uint16_t,,in_stick_keyboard,udk_t *u)
 
 ////////
 // mouse
