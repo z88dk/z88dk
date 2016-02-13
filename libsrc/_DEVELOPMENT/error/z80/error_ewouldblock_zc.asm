@@ -32,7 +32,7 @@ IF __CLIB_OPT_ERROR
    IF __CLIB_OPT_ERROR & $02
 
       defb __EWOULDBLOCK
-      defm "EWOULDBLOCK - Driver not ready"
+      defm "EWOULDBLOCK - Operation would block"
       defb 0
 
    ELSE
