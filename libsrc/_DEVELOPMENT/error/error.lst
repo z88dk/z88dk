@@ -30,6 +30,8 @@ error/z80/error_eoverflow_zc
 error/z80/error_erange_lmc
 error/z80/error_erange_mc
 error/z80/error_erange_zc
+error/z80/error_estat_zc
+error/z80/error_ewouldblock_zc
 error/z80/error_lzc
 error/z80/error_lznc
 error/z80/error_mc
