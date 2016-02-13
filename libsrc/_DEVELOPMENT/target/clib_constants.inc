@@ -13,7 +13,8 @@
    PUBLIC __EBDFD, __EDOM, __EFBIG
    PUBLIC __EINVAL, __EMFILE, __ENFILE
    PUBLIC __ENOLCK, __ENOMEM, __ENOTSUP
-   PUBLIC __EOVERFLOW, __ERANGE
+   PUBLIC __EOVERFLOW, __ERANGE, __ESTAT
+   PUBLIC __EWOULDBLOCK, __EAGAIN
    
    defgroup
    {
@@ -31,6 +32,9 @@
       __ENOTSUP,
       __EOVERFLOW,
       __ERANGE,
+      __ESTAT,
+      __EWOULDBLOCK,
+      __EAGAIN = __EWOULDBLOCK,
       
       ; define next error number for targets
       
