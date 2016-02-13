@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2012 by Einar Saukas. All rights reserved.
+ * (c) Copyright 2012-2016 by Einar Saukas. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,6 +32,6 @@ typedef struct optimal_t {
     int len;
 } Optimal;
 
-Optimal *optimize(unsigned char *input_data, size_t input_size);
+Optimal *optimize(unsigned char *input_data, size_t input_size, long skip);
 
-unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t input_size, size_t *output_size, long *delta);
+unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t input_size, long skip, size_t *output_size, long *delta);

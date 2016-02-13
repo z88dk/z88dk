@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2012 by Einar Saukas. All rights reserved.
+ * (c) Copyright 2012-2016 by Einar Saukas. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -26,8 +26,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include "zx7.h"
+
+long parse_long(char *str) {
+    long value;
+
+    errno = 0;
+    value = strtol(str, NULL, 10);
+    return !errno ? value : LONG_MIN;
+}
+
+void reverse(unsigned char *first, unsigned char *last) {
+    unsigned char c;
+
+    while (first < last) {
+        c = *first;
+        *first++ = *last;
+        *last-- = c;
+    }
+}
 
 int main(int argc, char *argv[]) {
     FILE *ifp;
@@ -40,23 +59,38 @@ int main(int argc, char *argv[]) {
     size_t total_counter;
     char *output_name;
     long delta;
+    long skip;
+    char backwards;
+    int i;
+
+    /* process hidden optional parameters */
+    skip = 0;
+    backwards = 0;
+    for (i = 1; i < argc && (*argv[i] == '-' || *argv[i] == '+'); i++) {
+        if (!strcmp(argv[i], "-b")) {
+            backwards = 1;
+        } else if ((skip = parse_long(argv[i])) <= 0) {
+            fprintf(stderr, "Error: Invalid parameter %s\n", argv[i]);
+            exit(1);
+        }
+    }
 
     /* determine output filename */
-    if (argc == 2) {
-        output_name = (char *)malloc(strlen(argv[1])+5);
-        strcpy(output_name, argv[1]);
+    if (argc == i+1) {
+        output_name = (char *)malloc(strlen(argv[i])+5);
+        strcpy(output_name, argv[i]);
         strcat(output_name, ".zx7");
-    } else if (argc == 3) {
-        output_name = argv[2];
+    } else if (argc == i+2) {
+        output_name = argv[i+1];
     } else {
         fprintf(stderr, "Usage: %s input [output.zx7]\n", argv[0]);
         exit(1);
     }
 
     /* open input file */
-    ifp = fopen(argv[1], "rb");
+    ifp = fopen(argv[i], "rb");
     if (!ifp) {
-        fprintf(stderr, "Error: Cannot access input file %s\n", argv[1]);
+        fprintf(stderr, "Error: Cannot access input file %s\n", argv[i]);
         exit(1);
     }
 
@@ -65,7 +99,13 @@ int main(int argc, char *argv[]) {
     input_size = ftell(ifp);
     fseek(ifp, 0L, SEEK_SET);
     if (!input_size) {
-        fprintf(stderr, "Error: Empty input file %s\n", argv[1]);
+        fprintf(stderr, "Error: Empty input file %s\n", argv[i]);
+        exit(1);
+    }
+
+    /* validate skip against input size */
+    if (skip >= input_size) {
+        fprintf(stderr, "Error: Skipping entire input file %s\n", argv[i]);
         exit(1);
     }
 
@@ -84,7 +124,7 @@ int main(int argc, char *argv[]) {
     } while (partial_counter > 0);
 
     if (total_counter != input_size) {
-        fprintf(stderr, "Error: Cannot read input file %s\n", argv[1]);
+        fprintf(stderr, "Error: Cannot read input file %s\n", argv[i]);
         exit(1);
     }
 
@@ -104,8 +144,18 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    /* conditionally reverse input file */
+    if (backwards) {
+        reverse(input_data, input_data+input_size-1);
+    }
+
     /* generate output file */
-    output_data = compress(optimize(input_data, input_size), input_data, input_size, &output_size, &delta);
+    output_data = compress(optimize(input_data, input_size, skip), input_data, input_size, skip, &output_size, &delta);
+
+    /* conditionally reverse output file */
+    if (backwards) {
+        reverse(output_data, output_data+output_size-1);
+    }
 
     /* write output file */
     if (fwrite(output_data, sizeof(char), output_size, ofp) != output_size) {
@@ -117,8 +167,8 @@ int main(int argc, char *argv[]) {
     fclose(ofp);
 
     /* done! */
-    printf("Optimal LZ77/LZSS compression by Einar Saukas\nFile converted from %lu to %lu bytes! (delta %ld)\n",
-        (unsigned long)input_size, (unsigned long)output_size, delta);
+    printf("Optimal LZ77/LZSS compression by Einar Saukas\nFile%s converted%s from %lu to %lu bytes! (delta %ld)\n",
+        (skip ? " partially" : ""), (backwards ? " backwards" : ""), (unsigned long)(input_size-skip), (unsigned long)output_size, delta);
 
     return 0;
 }

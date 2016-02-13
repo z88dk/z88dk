@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2012 by Einar Saukas. All rights reserved.
+ * (c) Copyright 2012-2016 by Einar Saukas. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -68,7 +68,7 @@ void write_elias_gamma(int value) {
     }
 }
 
-unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t input_size, size_t *output_size, long *delta) {
+unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t input_size, long skip, size_t *output_size, long *delta) {
     size_t input_index;
     size_t input_prev;
     int offset1;
@@ -85,12 +85,12 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
     }
 
     /* initialize delta */
-    diff = *output_size - input_size;
+    diff = *output_size - input_size + skip;
     *delta = 0;
 
     /* un-reverse optimal sequence */
     optimal[input_index].bits = 0;
-    while (input_index > 0) {
+    while (input_index != skip) {
         input_prev = input_index - (optimal[input_index].len > 0 ? optimal[input_index].len : 1);
         optimal[input_prev].bits = input_index;
         input_index = input_prev;
@@ -100,7 +100,7 @@ unsigned char *compress(Optimal *optimal, unsigned char *input_data, size_t inpu
     bit_mask = 0;
 
     /* first byte is always literal */
-    write_byte(input_data[0]);
+    write_byte(input_data[input_index]);
     read_bytes(1, delta);
 
     /* process remaining bytes */

@@ -60,14 +60,29 @@ extern unsigned char __LIB__ __CALLEE__ *dzx7_standard_callee(void *src,void *ds
 #define dzx7_standard(a,b) dzx7_standard_callee(a,b)
 
 
+extern unsigned char __LIB__ *dzx7_standard_back(void *src,void *dst);
+extern unsigned char __LIB__ __CALLEE__ *dzx7_standard_back_callee(void *src,void *dst);
+#define dzx7_standard_back(a,b) dzx7_standard_back_callee(a,b)
+
+
 extern unsigned char __LIB__ *dzx7_turbo(void *src,void *dst);
 extern unsigned char __LIB__ __CALLEE__ *dzx7_turbo_callee(void *src,void *dst);
 #define dzx7_turbo(a,b) dzx7_turbo_callee(a,b)
 
 
+extern unsigned char __LIB__ *dzx7_turbo_back(void *src,void *dst);
+extern unsigned char __LIB__ __CALLEE__ *dzx7_turbo_back_callee(void *src,void *dst);
+#define dzx7_turbo_back(a,b) dzx7_turbo_back_callee(a,b)
+
+
 extern unsigned char __LIB__ *dzx7_mega(void *src,void *dst);
 extern unsigned char __LIB__ __CALLEE__ *dzx7_mega_callee(void *src,void *dst);
 #define dzx7_mega(a,b) dzx7_mega_callee(a,b)
+
+
+extern unsigned char __LIB__ *dzx7_mega_back(void *src,void *dst);
+extern unsigned char __LIB__ __CALLEE__ *dzx7_mega_back_callee(void *src,void *dst);
+#define dzx7_mega_back(a,b) dzx7_mega_back_callee(a,b)
 
 
 
@@ -76,9 +91,19 @@ extern unsigned char __LIB__ __CALLEE__ *dzx7_smart_rcs_callee(void *src,void *d
 #define dzx7_smart_rcs(a,b) dzx7_smart_rcs_callee(a,b)
 
 
+extern unsigned char __LIB__ *dzx7_smart_rcs_back(void *src,void *dst);
+extern unsigned char __LIB__ __CALLEE__ *dzx7_smart_rcs_back_callee(void *src,void *dst);
+#define dzx7_smart_rcs_back(a,b) dzx7_smart_rcs_back_callee(a,b)
+
+
 extern unsigned char __LIB__ *dzx7_agile_rcs(void *src,void *dst);
 extern unsigned char __LIB__ __CALLEE__ *dzx7_agile_rcs_callee(void *src,void *dst);
 #define dzx7_agile_rcs(a,b) dzx7_agile_rcs_callee(a,b)
+
+
+extern unsigned char __LIB__ *dzx7_agile_rcs_back(void *src,void *dst);
+extern unsigned char __LIB__ __CALLEE__ *dzx7_agile_rcs_back_callee(void *src,void *dst);
+#define dzx7_agile_rcs_back(a,b) dzx7_agile_rcs_back_callee(a,b)
 
 
 
