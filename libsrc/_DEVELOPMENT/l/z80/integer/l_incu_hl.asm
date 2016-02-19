@@ -6,15 +6,14 @@ PUBLIC l_incu_hl
 
 l_incu_hl:
 
-   ; uses : af, hl
-   ; carry set on overflow
+   ; uses : hl
+   ; z set on overflow
 
-   inc hl
-   
-   ld a,h
-   or l
+   inc l
    ret nz
    
-   ld hl,$ffff
-   scf
+   inc h
+   ret nz
+   
+   dec hl
    ret

@@ -6,15 +6,14 @@ PUBLIC l_incu_bc
 
 l_incu_bc:
 
-   ; uses : af, bc
-   ; carry set on overflow
+   ; uses : bc
+   ; z set on overflow
 
-   inc bc
-   
-   ld a,b
-   or c
+   inc c
    ret nz
    
-   ld bc,$ffff
-   scf
+   inc b
+   ret nz
+   
+   dec bc
    ret
