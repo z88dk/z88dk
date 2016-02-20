@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.21 2011-06-25 22:59:16 dom Exp $
+ *      $Id: declvar.c,v 1.22 2016-02-20 15:49:58 aralbrec Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -146,7 +146,7 @@ void defenum(char *sname, char storage)
         ptr->size=value;
         value++;
 
-    } while (cmatch(','));
+	} while (cmatch(',') && !rcmatch('}'));
     needchar('}');
 }
 
