@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.15 2014-12-19 05:21:23 aralbrec Exp $
+ *      $Id: declfunc.c,v 1.16 2016-02-21 06:12:17 aralbrec Exp $
  */
 
 #include "ccdefs.h"
@@ -119,6 +119,8 @@ int32_t *addr)
         return(0);
     } else {
         StoreFunctionSignature(ptr);
+        /* function prototypes always have extern linkage by default */
+        currfn->storage=EXTERNAL;
     }
     return(0);
 
