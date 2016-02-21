@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.106 2016-02-11 02:43:11 aralbrec Exp $
+ *      $Id: zcc.c,v 1.107 2016-02-21 21:35:09 aralbrec Exp $
  */
 
 
@@ -107,6 +107,7 @@ static int             z80verbose = 0;
 static int             cleanup = 1;
 static int             assembleonly = 0;
 static int             compileonly = 0;
+static int             c_code_in_asm = 0;
 static int             verbose = 0;
 static int             peepholeopt = 0;
 static int             sdccpeepopt = 0;
@@ -353,6 +354,7 @@ static arg_t     myargs[] = {
     {"c", AF_BOOL_TRUE, SetBoolean, &compileonly, NULL, "Only compile the .c files to .o files"},
     {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
     {"S", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
+	{"-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm/.opt files (sdcc only)"},
     {"m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable"},
 	{"g", AF_BOOL_TRUE, SetBoolean, &globaldefon, NULL, "Generate a global defs file of the final executable"},
     {"s", AF_BOOL_TRUE, SetBoolean, &symbolson, NULL, "Generate a symbol map of the final executable"},
@@ -1336,9 +1338,8 @@ static void configure_compiler()
     if ( strcmp(c_compiler_type,"sdcc") == 0 ) {
         compiler_type = CC_SDCC;
         // snprintf(buf,sizeof(buf),"-mz80 --reserve-regs-iy --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
-		// move restriction on iy to target cfg
-        //snprintf(buf,sizeof(buf),"-mz80_z88dk --no-optsdcc-in-asm --c1mode --no-peep",sdcc_assemblernames[assembler_type]);
-		snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode --emit-externs --no-c-code-in-asm",sdcc_assemblernames[assembler_type]);
+		// move restriction on iy to target cfg, always used asz80 with sdcc
+		snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode --emit-externs %s",c_code_in_asm ? "" : "--no-c-code-in-asm");
         add_option_to_compiler(buf);
         preprocarg = " -DZ88DK_USES_SDCC=1";
         BuildOptions(&cpparg, preprocarg);
