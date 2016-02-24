@@ -49,21 +49,6 @@ TODO List
 - add high level constructs (IF flag / ELSE / ENDIF, 
   DO WHILE flag, ...)
 - add a rule based optimizer based on RAGEL as a state machine generator
-- BUG_0038: library modules not loaded in sequence  
-  The library modules loaded to the linked binary file should respect
-  the order given on the command line.  
-```
-    "z80asm -ilib1 -ilib2 obj1.o obj2.o"
-```
-  should load obj1, obj2, objects from lib1, objects from lib2 in this
-  order.  
-  The load order is today: obj1, obj2, and then all library modules
-  required by obj1, and then library modules required by obj2,
-  independently of the -i sequence.  
-  This poses problems when trying to keep all data at the end of the
-  binary code by defining a library with all the data and linking it
-  last in the command line - the -i sequence is not respected and the
-  data appears in the middle of other library modules.
 
 Differences to z88dk-z80asm
 ---------------------------

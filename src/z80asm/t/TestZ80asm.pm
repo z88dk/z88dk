@@ -203,12 +203,12 @@ sub unlink_temp {
 #------------------------------------------------------------------------------
 sub z80emu {
 	our $done_z80emu;	# only once per session
-	my $z80emu_dir = 'z80lib';
-	my $z80emu = $z80emu_dir.'/z80mu.lib';
+	my $z80emu_dir = '../../libsrc/z80_crt0s/z80_emu';
+	my $z80emu = $z80emu_dir.'/z80emu.lib';
 
 	if ( ! $done_z80emu ) {
 		z80asm(
-			options	=> '-x'.$z80emu.' -Mo -ns '.join(' ', <$z80emu_dir/*.asm>),
+			options	=> '-x'.$z80emu.' -Mo -ns '.join(' ', sort(<$z80emu_dir/*.asm>)),
 			ok		=> 1,
 		);
 		$done_z80emu++;

@@ -840,10 +840,7 @@ for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
 		jp one
 	", "\xC3\x03\x00\x3E\x01\xC9", $options);
 }
-
 unlink_testfiles($lib);
-
-SKIP: { skip "BUG_0038";
 
 # test BUG_0038: library modules not loaded in sequence
 # obj1 requires libobj7 and obj3;
@@ -881,7 +878,25 @@ t_binary(read_binfile(bin_file()),
 				7,  9,
 			));
 
-};
+unlink_testfiles();
+write_file(asm_file(),  " EXTERN abs \n call abs\n");	
+write_file(asm2_file(), " PUBLIC abs \nabs: ld a,1\n ret\n");
+
+write_file(asm5_file(), " PUBLIC abs \nabs: ld a,2\n ret\n");
+
+t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
+ok -f lib5_file();
+
+t_z80asm_capture("-l -m -b -r0 -i".lib5_file()." ".asm_file()." ".asm2_file(), "", "", 0);
+ok -f bin_file();
+t_binary(read_binfile(bin_file()), 
+		pack("C*",
+				0xCD, 3, 0,
+				0x3E, 1,
+				0xC9
+			));
+unlink_testfiles();
+
 
 # test BUG_0039: library not pulled in if PUBLIC symbol not referenced in expression
 unlink_testfiles();

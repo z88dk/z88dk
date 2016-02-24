@@ -21,12 +21,12 @@ our $KEEP_FILES;
 $KEEP_FILES	 = grep {/-keep/} @ARGV; 
 
 my $UDOMUNK_ASM = "dev/z80pack-1.21/z80asm/z80asm.exe";
-my $Z80EMU_SRCDIR = 'z80lib';
+my $Z80EMU_SRCDIR = '../../libsrc/z80_crt0s/z80_emu';
 my @Z80EMU = qw(
-		rcmx_cpi
-		rcmx_cpir
 		rcmx_cpd
 		rcmx_cpdr
+		rcmx_cpi
+		rcmx_cpir
 		rcmx_rld
 		rcmx_rrd
 );

@@ -30,13 +30,15 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 struct libfile *NewLibrary( void );
 
 /* local functions */
-int LinkModule( char *filename, long fptr_base );
+int LinkModule(char *filename, long fptr_base, StrHash *extern_syms);
 int LinkTracedModule( char *filename, long baseptr );
-int LinkLibModules( char *objfilename, long fptr_base, long startnames, long endnames );
-int LinkLibModule( struct libfile *library, long curmodule, char *modname );
-int SearchLibfile( struct libfile *curlib, char *modname );
+int LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHash *extern_syms);
+int SearchLibfile(struct libfile *curlib, char *modname, StrHash *extern_syms);
 char *ReadName( FILE *file );
-void SearchLibraries( char *modname );
+#if 0
+int LinkLibModules(char *objfilename, long fptr_base, long startnames, long endnames, StrHash *extern_syms);
+void SearchLibraries(char *modname, StrHash *extern_syms);
+#endif
 void CreateBinFile(void);
 void ReadNames(char *filename, FILE *file);
 void ReleaseLinkInfo( void );
@@ -558,6 +560,127 @@ static void define_location_symbols( void )
 }
 
 /*-----------------------------------------------------------------------------
+*   link used libraries
+*----------------------------------------------------------------------------*/
+
+/* check if there are symbols not yet linked */
+static Bool pending_syms(StrHash *extern_syms)
+{
+	StrHashElem *elem, *next;
+
+	/* delete defined symbols */
+	for (elem = StrHash_first(extern_syms); elem != NULL; elem = next) {
+		next = StrHash_next(elem);
+		if (find_global_symbol(elem->key) != NULL) {		/* symbol defined */
+			StrHash_remove_elem(extern_syms, elem);
+		}
+	}
+
+	if (StrHash_empty(extern_syms))
+		return FALSE;
+	else
+		return TRUE;
+}
+
+/* search one module for unresolved symbols and link if needed */
+/* ignore module name - check only symbols */
+static Bool linked_module(struct libfile *lib, FILE *file, long obj_fpos, StrHash *extern_syms)
+{
+	long names_fpos, modname_fpos;
+	Bool linked = FALSE;
+	Bool found_symbol;
+	STR_DEFINE(module_name, STR_SIZE);
+	STR_DEFINE(symbol_name, STR_SIZE);
+	STR_DEFINE(section_name, STR_SIZE);
+
+	/* read module name */
+	fseek(file, obj_fpos + 8, SEEK_SET);
+	modname_fpos = xfget_int32(file);
+	fseek(file, obj_fpos + modname_fpos, SEEK_SET);
+	xfget_count_byte_Str(file, module_name);
+
+	/* names section */
+	fseek(file, obj_fpos + 8 + 4 + 4, SEEK_SET);
+	names_fpos = xfget_int32(file);
+
+	if (names_fpos != -1) {
+		fseek(file, obj_fpos + names_fpos, SEEK_SET);
+
+		/* search list of defined symbols */
+		for (found_symbol = FALSE; !found_symbol;) {
+			int scope;
+
+			scope = xfget_int8(file);
+			if (scope == 0)
+				break;
+
+			xfget_int8(file);			/* type */
+			xfget_count_byte_Str(file, section_name);
+			xfget_int32(file);			/* value */
+			xfget_count_byte_Str(file, symbol_name);
+
+			if (scope == 'G' && StrHash_exists(extern_syms, str_data(symbol_name)))
+				found_symbol = TRUE;
+		}
+
+		/* link module if found one needed symbol */
+		if (found_symbol) {
+			LinkLibModule(lib, obj_fpos, str_data(module_name), extern_syms);
+			linked = TRUE;
+		}
+	}
+
+	STR_DELETE(module_name);
+	STR_DELETE(symbol_name);
+	STR_DELETE(section_name);
+
+	return linked;
+}
+
+/* search chain of libraries for modules that resolve any of the pending syms, break search after first found module */
+static Bool linked_libraries(StrHash *extern_syms)
+{
+	Bool linked = FALSE;
+	struct libfile *lib;
+	FILE *file;
+	long obj_fpos, obj_next_fpos, module_size;
+
+	/* search library chain */
+	for (lib = libraryhdr->firstlib; !linked && lib != NULL; lib = lib->nextlib) {
+		
+		file = myfopen(lib->libfilename, "rb");
+		if (!file)
+			continue;									/* error issued by myfopen */
+
+		/* search object module chain */
+		for (obj_fpos = 8; !linked && obj_fpos != -1; obj_fpos = obj_next_fpos) {
+			fseek(file, obj_fpos, SEEK_SET);			/* point at beginning of a module */
+			obj_next_fpos = xfget_int32(file);			/* get file pointer to next module in library */
+			module_size = xfget_int32(file);			/* get size of current module */
+
+			if (module_size == 0)
+				continue;								/* deleted module */
+
+			if (linked_module(lib, file, obj_fpos + 4 + 4, extern_syms))
+				linked = TRUE;
+		}
+
+		myfclose(file);
+	}
+
+	return linked;
+}
+
+/* link libraries in the order given in the command line */
+static void link_libraries(StrHash *extern_syms)
+{
+	/* while symbols to resolve and new module pulled in */
+	while (pending_syms(extern_syms) && linked_libraries(extern_syms)) {
+		/* loop */
+	}
+}
+
+/*-----------------------------------------------------------------------------
 *   link
 *----------------------------------------------------------------------------*/
 void link_modules( void )
@@ -569,6 +692,7 @@ void link_modules( void )
     char *obj_filename;
 	ExprList *exprs = NULL;
 	FILE *file;
+	StrHash *extern_syms = OBJ_NEW(StrHash);
 
     opts.symtable = opts.cur_list = FALSE;
     linkhdr = NULL;
@@ -608,18 +732,20 @@ void link_modules( void )
 		set_error_null();
 		set_error_module(CURRENTMODULE->modname);
 
+#if 0
 		if (opts.library)
 		{
 			CURRENTLIB = libraryhdr->firstlib;      /* begin library search  from first library for each
 													* module */
 			CURRENTLIB->nextobjfile = 8;            /* point at first library module (past header) */
 		}
+#endif
 
 		/* overwrite '.asm' extension with * '.obj' */
 		obj_filename = get_obj_filename(CURRENTMODULE->filename);
 
 		/* open relocatable file for reading */
-		file = myfopen(obj_filename, "rb");           
+		file = myfopen(obj_filename, "rb");
 		if (file)
 		{
 			/* read first 8 chars from file into array */
@@ -636,7 +762,7 @@ void link_modules( void )
 
 			myfclose(file);
 
-			LinkModule(obj_filename, 0);       /* link code & read name definitions */
+			LinkModule(obj_filename, 0, extern_syms);       /* link code & read name definitions */
 		}
 
 		/* parse only object modules, not added library modules */
@@ -644,6 +770,10 @@ void link_modules( void )
 			saw_last_obj_module = TRUE;
 
 	}
+
+	/* link libraries */
+	if (opts.library)
+		link_libraries(extern_syms);
 
 	set_error_null();
 
@@ -679,17 +809,18 @@ void link_modules( void )
 	ReleaseLinkInfo();              /* Release module link information */
 
 	close_error_file();
+
+	OBJ_DELETE(extern_syms);
 }
 
 
 
 
-static int LinkModule_1(char *filename, long fptr_base, Str *section_name)
+static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHash *extern_syms)
 {
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     int code_size;
     int origin = -1;
-    int flag = 0;
 	FILE *file;
 	Section *section;
 
@@ -742,35 +873,56 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name)
 			ReadNames(filename, file);
 		}
 
+		// collect list of external symbols
+		if (fptr_libnmdecl != -1)
+		{
+			STR_DEFINE(name, STR_SIZE);
+			char *name_p;
+			long p;
+
+			for (p = fptr_libnmdecl; p < fptr_modname;) {
+				fseek(file, fptr_base + p, SEEK_SET);			/* set file pointer to point at external name declaration */
+				xfget_count_byte_Str(file, name);				/* read library reference name */
+				p += 1 + str_len(name);							/* point to next name */
+				name_p = strpool_add(str_data(name));
+				StrHash_set(&extern_syms, name_p, name_p);		/* remember all extern references */
+			}
+			STR_DELETE(name);
+		}
+
 		myfclose(file);
 	}
 
+#if 0
     if ( fptr_libnmdecl != -1 )
     {
         if ( opts.library )
         {
-            /* search in libraries, if present */
-            flag = LinkLibModules( filename, fptr_base, fptr_libnmdecl, fptr_modname );   /* link library modules */
+			int flag;
+			
+			/* search in libraries, if present */
+			flag = LinkLibModules(filename, fptr_base, fptr_libnmdecl, fptr_modname, extern_syms);   /* link library modules */
 
             if ( !flag )
                 return 0;
         }
     }
+#endif
 
     return LinkTracedModule( filename, fptr_base );       /* Remember module for pass2 */
 }
 
-int LinkModule(char *filename, long fptr_base)
+int LinkModule(char *filename, long fptr_base, StrHash *extern_syms)
 {
 	STR_DEFINE(section_name, STR_SIZE);
-	int ret = LinkModule_1(filename, fptr_base, section_name);
+	int ret = LinkModule_1(filename, fptr_base, section_name, extern_syms);
 	STR_DELETE(section_name);
 	return ret;
 }
 
 
-
-static int LinkLibModules_1(char *filename, long fptr_base, long nextname, long endnames, Str *name)
+#if 0
+static int LinkLibModules_1(char *filename, long fptr_base, long nextname, long endnames, Str *name, StrHash *extern_syms)
 {
     FILE *file;
 
@@ -788,25 +940,25 @@ static int LinkLibModules_1(char *filename, long fptr_base, long nextname, long 
 
         nextname += 1 + str_len(name);	/* remember module pointer to next name in this object module */
 
-        if ( find_global_symbol( str_data(name) ) == NULL )
-            SearchLibraries( str_data(name) );       /* search name in libraries */
+		if (find_global_symbol(str_data(name)) == NULL)
+			SearchLibraries(str_data(name), extern_syms);       /* search name in libraries */
     }
     while ( nextname < endnames );
 
     return 1;
 }
 
-int LinkLibModules(char *filename, long fptr_base, long nextname, long endnames)
+int LinkLibModules(char *filename, long fptr_base, long nextname, long endnames, StrHash *extern_syms)
 {
 	STR_DEFINE(name, STR_SIZE);
-	int ret = LinkLibModules_1(filename, fptr_base, nextname, endnames, name);
+	int ret = LinkLibModules_1(filename, fptr_base, nextname, endnames, name, extern_syms);
 	STR_DELETE(name);
 	return ret;
 }
 
 
 void
-SearchLibraries( char *modname )
+SearchLibraries(char *modname, StrHash *extern_syms)
 {
     int i;
 
@@ -815,7 +967,7 @@ SearchLibraries( char *modname )
         /* Libraries searched in max. 2 passes */
         while ( CURRENTLIB != NULL )
         {
-            if ( SearchLibfile( CURRENTLIB, modname ) )
+			if (SearchLibfile(CURRENTLIB, modname, extern_syms))
             {
                 return;
             }
@@ -834,11 +986,11 @@ SearchLibraries( char *modname )
         CURRENTLIB->nextobjfile = 8;              /* in the first library */
     }
 }
-
+#endif
 
 
 int
-SearchLibfile( struct libfile *curlib, char *modname )
+SearchLibfile(struct libfile *curlib, char *modname, StrHash *extern_syms)
 {
     long currentlibmodule, modulesize;
     char *mname;
@@ -866,14 +1018,14 @@ SearchLibfile( struct libfile *curlib, char *modname )
             if ( ( mname = CheckIfModuleWanted( file, currentlibmodule, modname ) ) != NULL )
             {
                 myfclose( file );
-                return LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
+				return LinkLibModule(curlib, currentlibmodule + 4 + 4, mname, extern_syms);
             }
             else if ( opts.sdcc &&
                       modname[0] == '_' &&
                       ( mname = CheckIfModuleWanted( file, currentlibmodule, modname + 1 ) ) != NULL )
             {
                 myfclose( file );
-                return LinkLibModule( curlib, currentlibmodule + 4 + 4, mname );
+				return LinkLibModule(curlib, currentlibmodule + 4 + 4, mname, extern_syms);
             }
         }
     }
@@ -960,7 +1112,7 @@ static char *CheckIfModuleWanted(FILE *file, long currentlibmodule, char *modnam
 }
 
 int
-LinkLibModule( struct libfile *library, long curmodule, char *modname )
+LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHash *extern_syms)
 {
     Module *tmpmodule, *lib_module;
     int flag;
@@ -976,7 +1128,7 @@ LinkLibModule( struct libfile *library, long curmodule, char *modname )
         printf( "Linking library module <%s>\n", modname );
     }
 
-    flag = LinkModule( library->libfilename, curmodule );       /* link module & read names */
+	flag = LinkModule(library->libfilename, curmodule, extern_syms);       /* link module & read names */
 
     set_cur_module( tmpmodule );		/* restore previous current module */
     return flag;

@@ -1,6 +1,20 @@
 Z88DK Z80 Macro Assembler Change Log
 ====================================
 
+2016
+----
+
+- v **2.8.4**, 2016-02-24, pauloscustodio
+
+  BUG_0038: library modules not loaded in sequence  
+  The library modules are now loaded in the sequence given on the command line.  
+```
+    "z80asm -ilib1 -ilib2 obj1.o obj2.o"
+```
+  now loads obj1, obj2, objects from lib1, objects from lib2 in this
+  order.
+
+
 2015
 ----
 
@@ -19,7 +33,7 @@ Z88DK Z80 Macro Assembler Change Log
 
 - v **2.8.1**, 2015-09-18, pauloscustodio  
 	Maintenance release for C version. C++ version under development in 
-	<https://github.com/pauloscustodio/z88dk-z80asm>
+	<https://github.com/pauloscustodio/z80masm>
 
 - 2015-08-04, pauloscustodio  
 	Use Template::Toolkit to generate files from templates - tokens.h
