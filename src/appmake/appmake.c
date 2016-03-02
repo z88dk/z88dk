@@ -12,7 +12,7 @@
 
  * 
 
- *   $Id: appmake.c,v 1.28 2015-10-20 16:48:10 stefano Exp $
+ *   $Id: appmake.c,v 1.29 2016-03-02 02:17:52 aralbrec Exp $
 
  */
 
@@ -21,6 +21,7 @@
 #define MAIN_C
 
 #include "appmake.h"
+#include <stdlib.h>
 
 
 
@@ -122,11 +123,12 @@ int main(int argc, char *argv[])
 
                 execute_command(target, ac, av, 1);
 
+                ac = 0;
+                memset(av, 0, argc * sizeof(char*));
+
             }
 
             target = &argv[i][1];
-
-            ac = 0;
 
         } else {
 
