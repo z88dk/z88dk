@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.107 2016-02-21 21:35:09 aralbrec Exp $
+ *      $Id: zcc.c,v 1.108 2016-03-02 01:39:09 aralbrec Exp $
  */
 
 
@@ -212,6 +212,7 @@ static char  *c_incpath = NULL;
 static char  *c_coptrules1 = NULL;
 static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
+static char  *c_coptrules9 = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
@@ -286,6 +287,7 @@ static arg_t  config[] = {
     {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "DESTDIR/lib/z80rules.1" },
     {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2"},
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
+	{"COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "DESTDIR/lib/z80rules.9"},
     {"SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1"},
     {"SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2"},
     {"SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3"},
@@ -716,69 +718,76 @@ int main(int argc, char **argv)
             if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES, NO))
                exit(1);
         case AFILE:
-            if (peepholeopt)
-			{
-               if ( compiler_type == CC_SDCC )
+            if ( compiler_type == CC_SDCC )
+            {
+               switch (peepholeopt)
                {
-                  switch (peepholeopt)
-				  {
-				  case 1:
-                     if (process(".asm", ".opt", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
-                        exit(1);
-                     break;
-				  case 2:
-                     if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
-                        exit(1);
-                     if (process(".op1", ".opt", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
+			   case 0:
+                   BuildAsmLine(asmarg, sizeof(asmarg), "-easm");
+                   if (!assembleonly && !lateassemble)
+                       if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
+                           exit(1);
+                   break;
+               case 1:
+                   if (process(".asm", ".opt", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                        exit(1);
-                     break;
-				  default:
-                     if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+                   break;
+               case 2:
+                   if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                        exit(1);
-                     if (process(".op1", ".op2", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
+                   if (process(".op1", ".opt", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
                        exit(1);
-                     if (process(".op2", ".opt", c_copt_exe, c_sdccopt3, filter, i, YES, NO))
-                       exit(1);
-                     break;
-				  }
+                   break;
+               default:
+                   if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+                     exit(1);
+                   if (process(".op1", ".op2", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
+                     exit(1);
+                   if (process(".op2", ".opt", c_copt_exe, c_sdccopt3, filter, i, YES, NO))
+                     exit(1);
+                   break;
                }
-			   else
-			   {
-                  switch (peepholeopt)
-                  {
-                  case 1:
-                      if (process(".asm", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
-                          exit(1);
-                      break;
-                  case 2:
-                      /* Double optimization! */
-                      if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES, NO))
-                          exit(1);
-                      if (process(".op1", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
-                          exit(1);
-                      break;
-                  default:
-                      /*
-                       * Triple opt (last level adds routines but
-                       * can save space..)
-                       */
-                      if (process(".asm", ".op1", c_copt_exe, c_coptrules2, filter, i, YES, NO))
-                          exit(1);
-                      if (process(".op1", ".op2",  c_copt_exe, c_coptrules1, filter, i, YES, NO))
-                          exit(1);
-                      if (process(".op2", ".opt",  c_copt_exe, c_coptrules3, filter, i, YES, NO))
-                          exit(1);
-                      break;
-				  }
+            }
+            else
+            {
+               /* z80rules.9 implements intrinsics and should be applied to every sccz80 compile */
+               switch (peepholeopt)
+               {
+               case 0:
+                   if (process(".asm", ".opt", c_copt_exe, c_coptrules9, filter, i, YES, NO))
+                       exit(1);
+                   break;
+               case 1:
+                   if (process(".asm", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
+                       exit(1);
+                   if (process(".op1", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+                       exit(1);
+                   break;
+               case 2:
+                   /* Double optimization! */
+                   if (process(".asm", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
+                       exit(1);
+                   if (process(".op1", ".op2", c_copt_exe, c_coptrules2, filter, i, YES, NO))
+                       exit(1);
+                   if (process(".op2", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+                       exit(1);
+                   break;
+               default:
+                   /*
+                    * Triple opt (last level adds routines but
+                    * can save space..)
+                    */
+                   if (process(".asm", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
+                       exit(1);
+                   if (process(".op1", ".op2", c_copt_exe, c_coptrules2, filter, i, YES, NO))
+                       exit(1);
+                   if (process(".op2", ".op3", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+                       exit(1);
+                   if (process(".op3", ".opt", c_copt_exe, c_coptrules3, filter, i, YES, NO))
+                       exit(1);
+                   break;
                }
-			}
-			else
-			{
-                BuildAsmLine(asmarg, sizeof(asmarg), "-easm");
-                if (!assembleonly && !lateassemble)
-                    if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
-                        exit(1);
-			}
+            }
         case OFILE:
             BuildAsmLine(asmarg, sizeof(asmarg), "-eopt");
             if (!assembleonly && !lateassemble)
