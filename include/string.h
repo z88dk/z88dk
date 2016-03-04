@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.24 2013-12-11 12:03:23 dom Exp $
+ *	$Id: string.h,v 1.25 2016-03-04 10:50:58 dom Exp $
  */
 
 #include <sys/compiler.h>
@@ -64,40 +64,40 @@ extern char __LIB__ __FASTCALL__ *strdup(char *);
 
 // And now a list of the same non-FASTCALL functions using CALLEE linkage
 
-extern char __LIB__ __CALLEE__   *strcat_callee(char *, char *) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    strcmp_callee(char *, char *) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strcpy_callee(char *, char *) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strncat_callee(char *, char *, uint) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    strncmp_callee(char *, char *, uint) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strncpy_callee(char *, char *, uint) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strchr_callee(unsigned char *, unsigned char) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strchrnul_callee(unsigned char *, unsigned char) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strrchr_callee(unsigned char *, unsigned char) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strrstrip_callee(char *, char) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strstrip_callee(char *, uint) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strstr_callee(char *, char *) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strrstr_callee(char *, char *) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strtok_callee(char *, char *) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strtok_r_callee(char *, char *, char **) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strsep_callee(char **, char *) __SMALLCDECL;
-extern char __LIB__ __CALLEE__   *strpbrk_callee(char *, char *) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    strpos_callee(char *, uint) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    strcspn_callee(char *, char *) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    strspn_callee(char *, char *) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    stricmp_callee(char *, char *) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    strnicmp_callee(char *, char *, uint) __SMALLCDECL;
-extern uint __LIB__ __CALLEE__    strlcat_callee(char *, char *, uint) __SMALLCDECL;
-extern uint __LIB__ __CALLEE__    strlcpy_callee(char *, char *, uint) __SMALLCDECL;
+extern char __LIB__ __CALLEE__   *strcat_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__ __CALLEE__    strcmp_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strcpy_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strncat_callee(char *, char *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__ __CALLEE__    strncmp_callee(char *, char *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strncpy_callee(char *, char *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strchr_callee(unsigned char *, unsigned char) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strchrnul_callee(unsigned char *, unsigned char) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strrchr_callee(unsigned char *, unsigned char) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strrstrip_callee(char *, char) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strstrip_callee(char *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strstr_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strrstr_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strtok_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strtok_r_callee(char *, char *, char **) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strsep_callee(char **, char *) __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__ __CALLEE__   *strpbrk_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__ __CALLEE__    strpos_callee(char *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__ __CALLEE__    strcspn_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__ __CALLEE__    strspn_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__ __CALLEE__    stricmp_callee(char *, char *) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__ __CALLEE__    strnicmp_callee(char *, char *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern uint __LIB__ __CALLEE__    strlcat_callee(char *, char *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern uint __LIB__ __CALLEE__    strlcpy_callee(char *, char *, uint) __SMALLCDECL __SMALLCCALLEE;
 
-extern void __LIB__ __CALLEE__   *memset_callee(void *, unsigned char, uint) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *memcpy_callee(void *, void *,uint) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *memmove_callee(void *, void *, uint) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *memchr_callee(void *, unsigned char, uint) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *memrchr_callee(void *, unsigned char, uint) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *memswap_callee(void *, void *, uint) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *memopi_callee(void *, void *, uint, uint) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *memset_callee(void *, unsigned char, uint) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   *memcpy_callee(void *, void *,uint) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   *memmove_callee(void *, void *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   *memchr_callee(void *, unsigned char, uint) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   *memrchr_callee(void *, unsigned char, uint) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__ __CALLEE__    memcmp_callee(void *, void *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   *memswap_callee(void *, void *, uint) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   *memopi_callee(void *, void *, uint, uint) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   *memopd_callee(void *, void *, uint, uint) __SMALLCDECL __SMALLCCALLEE;
 
 
 // And now we make CALLEE linkage default to make compiled progs shorter and faster

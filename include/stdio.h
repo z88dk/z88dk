@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.31 2015-08-10 12:55:57 stefano Exp $ */
+/* $Id: stdio.h,v 1.32 2016-03-04 10:50:58 dom Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -198,8 +198,8 @@ extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp) __SMALLCDECL;
 extern int __LIB__ fputs(unsigned char *s,  FILE *fp) __SMALLCDECL;
 extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
 
-extern int __LIB__ __CALLEE__ fputs_callee(unsigned char *s,  FILE *fp) __SMALLCDECL;
-extern int __LIB__ __CALLEE__ fputc_callee(int c, FILE *fp) __SMALLCDECL;
+extern int __LIB__ __CALLEE__ fputs_callee(unsigned char *s,  FILE *fp) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__ __CALLEE__ fputc_callee(int c, FILE *fp) __SMALLCDECL __SMALLCCALLEE;
 extern int __LIB__ fgetc(FILE *fp);
 
 #define getc(f) fgetc(f)
@@ -254,7 +254,7 @@ extern int __LIB__ vfprintf_mini(FILE *, unsigned char *, void *) __SMALLCDECL;
 extern int __LIB__ vfprintf_comp(FILE *, unsigned char *, void *) __SMALLCDECL;
 extern int __LIB__ vfprintf_fp(FILE *, unsigned char *, void *) __SMALLCDECL;
 
-extern __LIB__ printn(int number, int radix,FILE *file) __SMALLCDECL;
+extern void __LIB__ printn(int number, int radix,FILE *file) __SMALLCDECL;
 extern int __LIB__ ltoa_any(long in,unsigned  char *str, int sz, unsigned int radix, int signflag) __SMALLCDECL;
 
 

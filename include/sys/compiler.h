@@ -9,11 +9,13 @@
 #ifdef Z88DK_USES_SDCC
 #define __FASTCALL__
 #define __CALLEE__
+#define __SMALLCCALLEE __z88dk_callee
 #define __LIB__
 #define __SMALLCDECL __smallc
 #define far
 #else
 #define __SMALLCDECL
+#define __SMALLCCALLEE
 #endif
 
 #endif
