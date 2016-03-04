@@ -4,10 +4,12 @@
                 INCLUDE "stdio.def"
 
                 PUBLIC    fdputs    ;Print string
+                PUBLIC    _fdputs    ;Print string
                 EXTERN     putconsole
 
 
 .fdputs
+._fdputs
         pop     de      ;return address
         pop     hl      ;address of string..
         push    hl

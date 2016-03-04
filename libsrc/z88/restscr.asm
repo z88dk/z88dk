@@ -16,10 +16,12 @@
 
 
                PUBLIC    restscr
+               PUBLIC    _restscr
 
                 INCLUDE "saverst.def"
 
 .restscr
+._restscr
         pop     bc
         pop     ix
         push    ix

@@ -16,10 +16,12 @@
 
 
                PUBLIC    savescr
+               PUBLIC    _savescr
 
                 INCLUDE "saverst.def"
 
 .savescr
+._savescr
         ld      a,SR_SUS
         call_oz(os_sr)
         ld      hl,0

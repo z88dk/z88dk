@@ -16,10 +16,12 @@
 
 
                 PUBLIC    sendmail
+                PUBLIC    _sendmail
 
                 INCLUDE "saverst.def"
 
 .sendmail
+._sendmail
         ld      hl,2
         add     hl,sp   ;point to length parameter
         ld      c,(hl)

@@ -18,6 +18,7 @@
 
 
                 PUBLIC    fdfgetc
+                PUBLIC    _fdfgetc
 		EXTERN	fgetc_cons
                 EXTERN     fhand_ck
 
@@ -31,6 +32,7 @@
 ;fgetc - read byte from file - also handles stdin
 
 .fdfgetc
+._fdfgetc
         ld      hl,2
         add     hl,sp
         ld      e,(hl)

@@ -16,10 +16,12 @@
 
 
                PUBLIC    freescr
+               PUBLIC    _freescr
 
                 INCLUDE "saverst.def"
 
 .freescr
+._freescr
         pop     bc
         pop     ix
         push    ix

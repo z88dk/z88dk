@@ -12,10 +12,11 @@
 
 
                PUBLIC    di
+               PUBLIC    _di
 
                 INCLUDE "interrpt.def"
 
-.di
+._di
         call    oz_di
         push    af
         pop     hl

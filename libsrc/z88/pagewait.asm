@@ -16,10 +16,12 @@
 
 
                PUBLIC    pagewait
+               PUBLIC    _pagewait
 
                 INCLUDE "saverst.def"
 
 .pagewait
+._pagewait
         ld      a,SR_PWT
         call_oz(os_sr)
         ld      l,a

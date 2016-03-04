@@ -12,6 +12,7 @@
                 INCLUDE "libdefs.def"
 
                 PUBLIC    fdfgets
+                PUBLIC    _fdfgets
                 EXTERN    processcmd
 
 ;char *fgets(s1,n,fp)
@@ -25,6 +26,7 @@
 ;these routines should check for stdin/out/err
 
 .fdfgets
+._fdfgets
         ld      hl,2
         add     hl,sp
         ld      e,(hl)

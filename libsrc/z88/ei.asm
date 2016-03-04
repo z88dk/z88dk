@@ -12,10 +12,11 @@
 
 
                PUBLIC    ei
+               PUBLIC    _ei
 
                 INCLUDE "interrpt.def"
 
-.ei
+._ei
         pop     bc
         pop     af
         push    af

@@ -11,6 +11,7 @@
                 INCLUDE "fileio.def"
 
                 PUBLIC    fdfeof
+                PUBLIC    _fdfeof
                 EXTERN     fhand_ck
 
 ;*feof(fp)
@@ -21,6 +22,7 @@
 
 
 .fdfeof
+._fdfeof
         ld      hl,2
         add     hl,sp
         ld      e,(hl)

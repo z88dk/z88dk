@@ -15,6 +15,7 @@
 
 
                 PUBLIC    fdfputc
+                PUBLIC    _fdfputc
 
 ;*fputc(n,fp)
 ;int n int fp
@@ -28,6 +29,7 @@
 ;        If we come across a \n for stdout/err we call gn_nln
 
 .fdfputc
+._fdfputc
         ld      hl,2
         add     hl,sp
         ld      e,(hl)  ;filehandle

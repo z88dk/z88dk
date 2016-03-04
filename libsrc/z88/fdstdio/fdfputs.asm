@@ -12,6 +12,7 @@
                 INCLUDE "libdefs.def"
 
                 PUBLIC    fdfputs
+                PUBLIC    _fdfputs
                 EXTERN     putconsole
 
 ;*fputs(s1,fp)
@@ -25,6 +26,7 @@
 ;these routines should check for stdin/out/err
 
 .fdfputs
+._fdfputs
         ld      hl,2
         add     hl,sp
         ld      e,(hl)

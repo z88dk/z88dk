@@ -16,10 +16,12 @@
 
 
                 PUBLIC    readmail
+                PUBLIC    _readmail
 
                 INCLUDE "saverst.def"
 
 .readmail
+._readmail
         ld      hl,2
         add     hl,sp   ;point to length parameter
         ld      c,(hl)

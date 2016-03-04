@@ -3,10 +3,12 @@
 
                 INCLUDE "stdio.def"
 
-                PUBLIC    setxy   ;Set xy position in window
+                PUBLIC    settxy   ;Set xy position in window
+                PUBLIC    _seattxy   ;Set xy position in window
 
 
-.setxy
+.settxy
+._settxy
         ld      hl,2
         add     hl,sp
         ld      a,1

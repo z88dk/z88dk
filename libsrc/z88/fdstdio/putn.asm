@@ -4,11 +4,13 @@
                 INCLUDE "stdio.def"
 
                 PUBLIC    putn    ;Display integer
+                PUBLIC    _putn    ;Display integer
 
 
 ;Display an integer on screen..
 
 .putn
+._putn
         ld      hl,2
         add     hl,sp
         ld      a,(hl)
