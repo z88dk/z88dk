@@ -4,12 +4,14 @@
 ; redone to be more in line with modern versions of this function
 
 PUBLIC utoa_callee
+PUBLIC _utoa_callee
 PUBLIC ASMDISP_UTOA_CALLEE
 
 EXTERN itoa_callee, stdio_error_zc
 EXTERN LIBDISP_ITOA_CALLEE
 
 .utoa_callee
+._utoa_callee
 
    pop af
    pop bc

@@ -11,16 +11,18 @@
 ;
 ;
 ; -----
-; $Id: getcwd.asm,v 1.9 2015-01-19 01:33:22 pauloscustodio Exp $
+; $Id: getcwd.asm,v 1.10 2016-03-04 23:48:13 dom Exp $
 
                 INCLUDE "syspar.def"
                 INCLUDE	"memory.def"
 
                 PUBLIC    getcwd
+                PUBLIC    _getcwd
                 EXTERN    readbyte        ;standard.EXTERN
                 PUBLIC ASMDISP_GETCWD
 
 .getcwd
+._getcwd
 
         pop hl
         pop bc

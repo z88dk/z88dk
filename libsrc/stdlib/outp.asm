@@ -1,10 +1,11 @@
 ; CALLER linkage for function pointers
 
 PUBLIC outp
+PUBLIC _outp
 EXTERN outp_callee
 EXTERN ASMDISP_OUTP_CALLEE
 
-.outp
+._outp
 
    pop af
    pop de

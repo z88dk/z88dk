@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC strtol
+PUBLIC _strtol
 EXTERN strtol_callee
 EXTERN ASMDISP_STRTOL_CALLEE
 
 .strtol
+._strtol
 
    pop af
    pop bc

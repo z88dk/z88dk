@@ -5,7 +5,7 @@
 ; *
 ; *	djm 25/2/2001
 ; *
-; *	$Id: atol.asm,v 1.4 2015-01-19 01:33:22 pauloscustodio Exp $
+; *	$Id: atol.asm,v 1.5 2016-03-04 23:48:13 dom Exp $
 ; */
 
 ; Removed C front end to make FASTCALL, consistent with
@@ -13,9 +13,11 @@
 ; 12.2006 aralbrec
 
 PUBLIC atol
+PUBLIC _atol
 PUBLIC ASMDISP_ATOL
 
 .atol
+._atol
 
    INCLUDE "integer.def"
    

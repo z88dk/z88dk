@@ -3,7 +3,7 @@
 ; QSORT - compiled, then hand-adjusted
 ; Stefano, 29/10/2010
 ;
-; $Id: qsort_callee.asm,v 1.3 2015-01-19 01:33:22 pauloscustodio Exp $
+; $Id: qsort_callee.asm,v 1.4 2016-03-04 23:48:13 dom Exp $
 ;
 ; Original code taken from the BDS C by Leor Zolman
 ;
@@ -27,6 +27,7 @@
 
 
 PUBLIC qsort_callee
+PUBLIC _qsort_callee
 PUBLIC ASMDISP_QSORT_CALLEE
 
 
@@ -36,6 +37,7 @@ EXTERN memswap_callee
 
 
 .qsort_callee
+._qsort_callee
 	pop	af
 	pop	ix	; *compar
 	pop	hl	; width

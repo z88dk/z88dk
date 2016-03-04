@@ -2,8 +2,10 @@
 ; 04.2006 aralbrec
 
 PUBLIC swapendian
+PUBLIC _swapendian
 
 .swapendian
+._swapendian
 
    ld a,l
    ld l,h

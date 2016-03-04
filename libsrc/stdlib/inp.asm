@@ -2,8 +2,10 @@
 ; 09.2005 aralbrec
 
 PUBLIC inp
+PUBLIC _inp
 
 .inp
+._inp
 
 IF FORrcmx000
 

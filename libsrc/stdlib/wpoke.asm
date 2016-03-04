@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC wpoke
+PUBLIC _wpoke
 EXTERN wpoke_callee
 EXTERN ASMDISP_WPOKE_CALLEE
 
 .wpoke
+._wpoke
 
    pop af
    pop de

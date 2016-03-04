@@ -1,11 +1,13 @@
 ; CALLER linkage for function pointers
 
 PUBLIC ultoa
+PUBLIC _ultoa
 
 EXTERN ultoa_callee
 EXTERN ASMDISP_ULTOA_CALLEE
 
 .ultoa
+._ultoa
 
    pop af
    pop bc

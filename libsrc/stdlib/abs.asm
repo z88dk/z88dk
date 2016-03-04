@@ -6,14 +6,16 @@
 ; version would do..
 ;
 ; -----
-; $Id: abs.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
+; $Id: abs.asm,v 1.7 2016-03-04 23:48:12 dom Exp $
 
 PUBLIC abs
+PUBLIC _abs
 EXTERN l_neg
 
 ; FASTCALL
 
 .abs
+._abs
 
    bit 7,h
    ret z

@@ -3,12 +3,14 @@
 ; 04.2007 aralbrec
 
 PUBLIC ultoa_callee
+PUBLIC _ultoa_callee
 PUBLIC ASMDISP_ULTOA_CALLEE
 
 EXTERN ltoa_callee, stdio_error_zc
 EXTERN LIBDISP_LTOA_CALLEE
 
 .ultoa_callee
+._ultoa_callee
 
    pop af
    pop bc

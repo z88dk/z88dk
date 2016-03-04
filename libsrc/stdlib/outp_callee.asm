@@ -2,9 +2,11 @@
 ; 09.2005 aralbrec
 
 PUBLIC outp_callee
+PUBLIC _outp_callee
 PUBLIC ASMDISP_OUTP_CALLEE
 
 .outp_callee
+._outp_callee
 
    pop af
    pop de

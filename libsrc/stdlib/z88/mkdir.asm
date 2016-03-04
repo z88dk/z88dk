@@ -8,7 +8,7 @@
 ; This doesn't check for validity of filename at all.
 ;
 ; -----
-; $Id: mkdir.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
+; $Id: mkdir.asm,v 1.7 2016-03-04 23:48:13 dom Exp $
 
                 INCLUDE "fileio.def"
                 INCLUDE "stdio.def"
@@ -16,6 +16,7 @@
                 INCLUDE "error.def"
 
                 PUBLIC    mkdir
+                PUBLIC    _mkdir
 
 ;int mkdir(char *s1,int mode)
 ;on stack:
@@ -23,6 +24,7 @@
 ;s1=filename of directory to make
 
 .mkdir
+._mkdir
 ;Repeating stuff from fopen, very bad but...
         ld      d,OP_DIR        ;make directory
 ;Try to open the file

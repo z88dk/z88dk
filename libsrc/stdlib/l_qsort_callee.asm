@@ -2,10 +2,12 @@
 ; 01.2007 aralbrec
 
 PUBLIC l_qsort_callee
+PUBLIC _l_qsort_callee
 PUBLIC ASMDISP_L_QSORT_CALLEE
 EXTERN Lqsort, l_jpiy
 
 .l_qsort_callee
+._l_qsort_callee
 
    pop de
    pop iy

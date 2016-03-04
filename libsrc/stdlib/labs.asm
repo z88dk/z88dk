@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC labs
+PUBLIC _labs
 EXTERN labs_callee
 EXTERN ASMDISP_LABS_CALLEE
 
 .labs
+._labs
 
    pop af
    pop hl

@@ -4,6 +4,7 @@
 ; redone to be more in line with modern versions of this function
 
 PUBLIC ltoa_callee
+PUBLIC _ltoa_callee
 PUBLIC ASMDISP_LTOA_CALLEE
 PUBLIC LIBDISP_LTOA_CALLEE
 
@@ -11,6 +12,7 @@ EXTERN l_long_neg, l_long_div_u, strrev
 EXTERN stdio_basechar, stdio_error_zc
 
 .ltoa_callee
+._ltoa_callee
 
    pop af
    pop bc

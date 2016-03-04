@@ -2,8 +2,10 @@
 ; 11.2006 aralbrec
 
 PUBLIC wpeek
+PUBLIC _wpeek
 
 .wpeek
+._wpeek
 
    ld a,(hl)
    inc hl

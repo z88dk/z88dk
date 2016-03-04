@@ -2,10 +2,12 @@
 ; 01.2007 aralbrec
 
 PUBLIC l_bsearch_callee
+PUBLIC _l_bsearch_callee
 PUBLIC ASMDISP_L_BSEARCH_CALLEE
 EXTERN Lbsearch, l_jpiy
 
 .l_bsearch_callee
+._l_bsearch_callee
 
    pop af
    pop iy

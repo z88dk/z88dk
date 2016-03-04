@@ -6,9 +6,10 @@
 ;       void srand(int) - seed "random" number
 ;
 ; -----
-; $Id: srand.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
+; $Id: srand.asm,v 1.7 2016-03-04 23:48:13 dom Exp $
 
 PUBLIC srand
+PUBLIC _srand
 EXTERN _std_seed
 PUBLIC ASMDISP_SRAND
 
@@ -20,6 +21,7 @@ PUBLIC ASMDISP_SRAND
 ; int std_seed;
 
 .srand
+._srand
 
    ld (_std_seed),hl
    ret

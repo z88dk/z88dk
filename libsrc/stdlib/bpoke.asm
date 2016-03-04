@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC bpoke
+PUBLIC _bpoke
 EXTERN bpoke_callee
 EXTERN ASMDISP_BPOKE_CALLEE
 
 .bpoke
+._bpoke
 
    pop af
    pop de

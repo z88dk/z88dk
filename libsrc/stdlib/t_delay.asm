@@ -1,6 +1,7 @@
 ; void __FASTCALL__ t_delay(unsigned int tstates)
 
 PUBLIC t_delay
+PUBLIC _t_delay
 
 ; Z80 delay routine
 ; by Jan Bobrowski, license GPL
@@ -8,6 +9,7 @@ PUBLIC t_delay
 ; destroys: af, bc, hl
 
 .t_delay
+._t_delay
 
         ld      bc,-141
         add     hl,bc

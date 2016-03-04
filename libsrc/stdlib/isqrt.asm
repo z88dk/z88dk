@@ -7,10 +7,12 @@
 ;*****************************************************
 
 PUBLIC isqrt
+PUBLIC _isqrt
 
 ; ----- uint __FASTCALL__ isqrt(uint val)
 
 .isqrt
+._isqrt
 
    ld b,l                    ; b = LSB of val
    ld l,h                    ; l = MSB of val

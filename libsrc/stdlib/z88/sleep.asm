@@ -10,12 +10,13 @@
 ;		 - Return number of seconds left
 ;
 ; -----
-; $Id: sleep.asm,v 1.6 2015-01-21 08:09:27 stefano Exp $
+; $Id: sleep.asm,v 1.7 2016-03-04 23:48:13 dom Exp $
 
 
 		INCLUDE "time.def"
 
 		PUBLIC    sleep
+		PUBLIC    _sleep
 		EXTERN	l_mult
 		EXTERN	l_div_u
 		PUBLIC ASMDISP_SLEEP
@@ -24,6 +25,7 @@
 
 
 .sleep
+._sleep
         pop     hl
         pop     de      ;number of seconds..
         push    de

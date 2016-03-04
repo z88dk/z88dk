@@ -1,14 +1,16 @@
 
 ;
-; $Id: qsort.asm,v 1.3 2015-01-19 01:33:22 pauloscustodio Exp $
+; $Id: qsort.asm,v 1.4 2016-03-04 23:48:13 dom Exp $
 ;
 
 
 PUBLIC qsort
+PUBLIC _qsort
 EXTERN qsort_callee
 EXTERN ASMDISP_QSORT_CALLEE
 
 .qsort
+._qsort
 	pop	af
 	pop	ix	; *compar
 	pop	hl	; width

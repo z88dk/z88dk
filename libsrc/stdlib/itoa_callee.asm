@@ -4,6 +4,7 @@
 ; redone to be more in line with modern versions of this function
 
 PUBLIC itoa_callee
+PUBLIC _itoa_callee
 PUBLIC ASMDISP_ITOA_CALLEE
 PUBLIC LIBDISP_ITOA_CALLEE
 
@@ -11,6 +12,7 @@ EXTERN l_deneg, l_div_u, strrev
 EXTERN stdio_basechar, stdio_error_zc
 
 .itoa_callee
+._itoa_callee
 
    pop af
    pop bc

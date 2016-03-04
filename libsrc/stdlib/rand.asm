@@ -8,7 +8,7 @@
 ;       Liberated from ticalc.org, mods to standard z80 by djm 11/4/99
 ;
 ; -----
-; $Id: rand.asm,v 1.8 2015-01-19 01:33:22 pauloscustodio Exp $
+; $Id: rand.asm,v 1.9 2016-03-04 23:48:13 dom Exp $
 
 ; you must declare an integer C variable "std_seed" to hold the
 ; 16-bit seed in your main.c file
@@ -16,6 +16,7 @@
 ; int std_seed;
 
 PUBLIC rand
+PUBLIC _rand
 EXTERN _std_seed
 
 ;       My contribution to randon number generators     (by Risto Jrvinen)
@@ -45,6 +46,7 @@ EXTERN _std_seed
 ;  Read and cut the result out of variable seed.
 
 .rand
+._rand
 
    ld   hl,(_std_seed)
    ld   a,h

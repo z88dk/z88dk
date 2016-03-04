@@ -2,6 +2,7 @@
 ; 12.2006 aralbrec
 
 PUBLIC atol
+PUBLIC _atol
 EXTERN l_long_neg, asm_isspace
 
 ; FASTCALL
@@ -11,6 +12,7 @@ EXTERN l_long_neg, asm_isspace
 ;         bc = & next char to interpret in char*
 
 .atol
+._atol
 
    ld a,(hl)                 ; eat whitespace
    inc hl

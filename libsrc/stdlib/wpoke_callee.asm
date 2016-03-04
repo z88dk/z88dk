@@ -2,9 +2,11 @@
 ; 11.2006 aralbrec
 
 PUBLIC wpoke_callee
+PUBLIC _wpoke_callee
 PUBLIC ASMDISP_WPOKE_CALLEE
 
 .wpoke_callee
+._wpoke_callee
 
    pop hl
    pop de

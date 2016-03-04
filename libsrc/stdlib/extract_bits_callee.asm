@@ -7,10 +7,12 @@
 ;
 
 PUBLIC extract_bits_callee
+PUBLIC _extract_bits_callee
 PUBLIC ASMDISP_EXTRACT_BITS_CALLEE
 EXTERN  extract_bits_sub
 
 .extract_bits_callee
+._extract_bits_callee
 
    pop hl
    pop bc

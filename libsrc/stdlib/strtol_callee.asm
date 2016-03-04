@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.10 2015-01-19 01:33:22 pauloscustodio Exp $
+; * $Id: strtol_callee.asm,v 1.11 2016-03-04 23:48:13 dom Exp $
 ; *
 ; */
 ;
@@ -17,10 +17,12 @@
 ; long result in dehl
 
 PUBLIC strtol_callee
+PUBLIC _strtol_callee
 EXTERN l_long_neg, l_long_mult, asm_isspace
 PUBLIC ASMDISP_STRTOL_CALLEE
 
 .strtol_callee
+._strtol_callee
 
    pop hl
    pop bc

@@ -10,12 +10,13 @@
 ; If we can't have usleep we'll have csleep instead!
 ;
 ; -----
-; $Id: csleep.asm,v 1.6 2015-01-21 08:09:27 stefano Exp $
+; $Id: csleep.asm,v 1.7 2016-03-04 23:48:13 dom Exp $
 
 
                 INCLUDE "time.def"
 
                 PUBLIC    csleep
+                PUBLIC    _csleep
                 PUBLIC    ASMDISP_CSLEEP
 
 
@@ -23,6 +24,7 @@
 
 
 .csleep
+._csleep
         pop     hl
         pop     bc      ;number of centi-seconds..
         push    bc

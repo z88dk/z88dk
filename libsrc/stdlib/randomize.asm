@@ -7,9 +7,10 @@
 ;       void randomize() - randomize the seed for rand()
 ;
 ; -----
-; $Id: randomize.asm,v 1.4 2015-01-19 01:33:22 pauloscustodio Exp $
+; $Id: randomize.asm,v 1.5 2016-03-04 23:48:13 dom Exp $
 
 PUBLIC randomize
+PUBLIC _randomize
 EXTERN _std_seed
 EXTERN cleanup
 
@@ -19,6 +20,7 @@ EXTERN cleanup
 ; int std_seed;
 
 .randomize
+._randomize
 
    ld	hl,0
    add	hl,sp

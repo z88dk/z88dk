@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC l_bsearch
+PUBLIC _l_bsearch
 EXTERN l_bsearch_callee
 EXTERN ASMDISP_L_BSEARCH_CALLEE
 
 .l_bsearch
+._l_bsearch
 
    pop af
    pop iy
