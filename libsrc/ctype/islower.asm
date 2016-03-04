@@ -5,14 +5,16 @@
 ;
 ;	17/2/99 djm Rewritten to remove the jp and thus be shorter
 ;
-;	$Id: islower.asm,v 1.5 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: islower.asm,v 1.6 2016-03-04 23:10:02 dom Exp $
 ;
 
+PUBLIC _islower
 PUBLIC islower
 EXTERN asm_islower
 
 ; FASTCALL
 
+._islower
 .islower
 
    ld a,l

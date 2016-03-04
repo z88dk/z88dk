@@ -1,10 +1,12 @@
 ; isodigit
 
+PUBLIC _isodigit
 PUBLIC isodigit
 EXTERN asm_isodigit
 
 ; FASTCALL
 
+._isodigit
 .isodigit
 
    ld a,l

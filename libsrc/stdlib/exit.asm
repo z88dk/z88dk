@@ -10,9 +10,10 @@
 ;though...
 ;
 ; -----
-; $Id: exit.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
+; $Id: exit.asm,v 1.7 2016-03-04 23:10:03 dom Exp $
 
 PUBLIC exit
+PUBLIC _exit
 
 EXTERN cleanup, exitsp, exitcount
 
@@ -26,6 +27,7 @@ PUBLIC ASMDISP_EXIT
 ;or whatever... - no parameters are passed into it...
 
 .exit
+._exit
 
    push hl                   ; save exit value
    

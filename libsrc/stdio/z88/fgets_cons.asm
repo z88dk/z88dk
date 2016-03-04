@@ -12,19 +12,21 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: fgets_cons.asm,v 1.6 2015-01-19 01:33:22 pauloscustodio Exp $
+;	$Id: fgets_cons.asm,v 1.7 2016-03-04 23:10:03 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
                 INCLUDE	"syspar.def"
 
                 PUBLIC    fgets_cons
+                PUBLIC    _fgets_cons
                 EXTERN    processcmd
 
 ;
 ; Read a string from the console
 ;
 .fgets_cons
+._fgets_cons
 	xor	a
 	ld	bc,nq_wcur
 	call_oz(os_nq)		;gives x in c, y in b

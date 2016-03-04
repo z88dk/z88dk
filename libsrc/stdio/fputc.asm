@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC fputc
-EXTERN fputc_callee
+PUBLIC _fputc
+EXTERN _fputc_callee
 EXTERN ASMDISP_FPUTC_CALLEE
 
 .fputc
+._fputc
 
 	pop de
 	pop	ix	;fp
@@ -13,5 +15,5 @@ EXTERN ASMDISP_FPUTC_CALLEE
 	push	ix
 	push de
    
-   jp fputc_callee + ASMDISP_FPUTC_CALLEE
+   jp _fputc_callee + ASMDISP_FPUTC_CALLEE
 

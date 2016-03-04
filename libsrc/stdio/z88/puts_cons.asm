@@ -8,15 +8,17 @@
 ;       djm 2/4/99
 ;
 ;
-;	$Id: puts_cons.asm,v 1.4 2015-01-19 01:33:22 pauloscustodio Exp $
+;	$Id: puts_cons.asm,v 1.5 2016-03-04 23:10:03 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
 
                 PUBLIC    puts_cons
+                PUBLIC    _puts_cons
 
 
 .puts_cons
+._puts_cons
 	pop	bc
 	pop	hl
 	push	hl

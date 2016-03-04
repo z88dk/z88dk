@@ -4,17 +4,19 @@
 ;	puts(char *s) - put string to screen
 ;
 ;
-;	$Id: puts_cons.asm,v 1.2 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: puts_cons.asm,v 1.3 2016-03-04 23:10:03 dom Exp $
 ;
 
 
 		PUBLIC	puts_cons
+		PUBLIC	_puts_cons
 		EXTERN	fputc_cons
 
 
 ; Enter in with hl holding the address of string to print
 
 .puts_cons
+._puts_cons
 	pop	bc
 	pop	hl
 	push	hl

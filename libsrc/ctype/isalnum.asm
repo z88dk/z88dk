@@ -6,14 +6,16 @@
 ;
 ;	This routine is a little bit unwieldy to say the least
 ;
-;	$Id: isalnum.asm,v 1.5 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: isalnum.asm,v 1.6 2016-03-04 23:10:02 dom Exp $
 ;
 
+PUBLIC _isalnum
 PUBLIC isalnum
 EXTERN asm_isalnum
 
 ; FASTCALL
 
+._isalnum
 .isalnum
 
    ld a,l

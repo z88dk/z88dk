@@ -9,14 +9,16 @@
 ;
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.4 2015-01-19 01:33:22 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.5 2016-03-04 23:10:03 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
 
                 PUBLIC    fputc_cons	;Print char
+                PUBLIC    _fputc_cons	;Print char
 
 .fputc_cons
+._fputc_cons
         ld      hl,2
         add     hl,sp
         ld      a,(hl)

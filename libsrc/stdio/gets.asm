@@ -4,11 +4,12 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.10 2015-12-14 18:30:34 aralbrec Exp $
+;	$Id: gets.asm,v 1.11 2016-03-04 23:10:03 dom Exp $
 ;
 
 
 		PUBLIC  gets
+		PUBLIC  _gets
 		EXTERN   fgetc_cons
 		EXTERN   fputc_cons
 		EXTERN asm_toupper
@@ -19,6 +20,7 @@ DEFINE EMULATECURSOR
 ; Enter in with hl holding the address of string to print
 
 .gets
+._gets
 	; we don't __FASTCALL__, z88 version of gets needs parameters
 	pop	bc
 	pop hl

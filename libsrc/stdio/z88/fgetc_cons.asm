@@ -6,16 +6,18 @@
 ;1/4/2000  - Renamed to fgetc_cons
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.4 2015-01-19 01:33:22 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.5 2016-03-04 23:10:03 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
 
                 PUBLIC    fgetc_cons
+                PUBLIC    _fgetc_cons
                 EXTERN     getcmd  ;process command sequence
 
 
 .fgetc_cons
+._fgetc_cons
 .gkloop
         call_oz(os_in)
         jr      c,gkloop

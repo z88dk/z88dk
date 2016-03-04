@@ -12,19 +12,21 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: gets.asm,v 1.4 2015-01-19 01:33:22 pauloscustodio Exp $
+;	$Id: gets.asm,v 1.5 2016-03-04 23:10:03 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
                 INCLUDE	"syspar.def"
 
                 PUBLIC    gets
+                PUBLIC    _gets
                 EXTERN    processcmd
 
 ;
 ; Read a string from the console - this is limited to 255 characters
 ;
 .gets
+._gets
 	xor	a
 	ld	bc,nq_wcur
 	call_oz(os_nq)		;gives x in c, y in b

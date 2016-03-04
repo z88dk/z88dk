@@ -6,13 +6,15 @@
 ;
 ;       djm 1/3/99
 ;
-;	$Id: toascii.asm,v 1.4 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: toascii.asm,v 1.5 2016-03-04 23:10:03 dom Exp $
 ;
 
+PUBLIC _toascii
 PUBLIC toascii
 
 ; FASTCALL
 
+._toascii
 .toascii
 
    res 7,l

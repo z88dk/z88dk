@@ -1,10 +1,12 @@
 ; isbdigit
 
+PUBLIC _isbdigit
 PUBLIC isbdigit
 EXTERN asm_isbdigit
 
 ; FASTCALL
 
+._isbdigit
 .isbdigit
 
    ld a,l
