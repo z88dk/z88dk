@@ -40,8 +40,8 @@ main()
  * Function called when we need to redraw the screen
  */
 
-
-void __APPFUNC__ redrawscreen(void)
+#pragma output redrawscreen
+void redrawscreen(void)
 {
 /*
  * Clear the whole screen
@@ -59,7 +59,8 @@ void __APPFUNC__ redrawscreen(void)
  *      This function handles menu codes
  */
 
-void __APPFUNC__ handlecmds(int cmd)
+#pragma output handlecmds
+void  handlecmds(int cmd)
 {
         fputs("So you want to....",stdout);
         switch(cmd) {
