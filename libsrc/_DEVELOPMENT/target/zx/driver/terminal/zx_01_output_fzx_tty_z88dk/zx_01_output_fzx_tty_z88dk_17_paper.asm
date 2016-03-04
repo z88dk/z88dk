@@ -18,7 +18,7 @@ zx_01_output_fzx_tty_z88dk_17_paper:
    ld e,a
    
    ld a,(ix+52)                ; a = foreground colour
-   and $c3
+   and $c7
    
    or e
    ld (ix+52),a
