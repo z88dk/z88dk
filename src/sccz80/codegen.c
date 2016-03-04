@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.35 2015-11-28 00:05:37 dom Exp $
+ *      $Id: codegen.c,v 1.36 2016-03-04 23:07:10 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -88,27 +88,27 @@ void header(void)
 void DoLibHeader(void)
 {
     char    filen[FILENAME_LEN+1];
-	char	*incdir;	
-	char	*segment;
+    char    *incdir;    
+    char    *segment;
 
     if (donelibheader) return;
-/*
- * Copy filename over (obtained by preprocessor), carefully skipping
- * over the quotes!
- */
+    /*
+     * Copy filename over (obtained by preprocessor), carefully skipping
+     * over the quotes!
+     */
     strncpy(filen,Filename+1,strlen(Filename)-2);
     filen[strlen(Filename)-1]='\0';
     if (makelib==0) {
-/* Compiling a program */
-		if (ISASM(ASM_ASXX)) {
-			outstr("\n\t.module\t");
-		} else if ( ISASM(ASM_Z80ASM) ) {
+        /* Compiling a program */
+        if (ISASM(ASM_ASXX)) {
+            outstr("\n\t.module\t");
+        } else if ( ISASM(ASM_Z80ASM) ) {
         /*    outstr ("\n\tMODULE\t"); */
             outstr ("\n\t; MODULE\t");
         } else {
             outstr("\n;\t module\t");
         }
-		if (strlen (filen) && strncmp(filen,"<stdin>",7) ) {
+        if (strlen (filen) && strncmp(filen,"<stdin>",7) ) {
             changesuffix(filen,".c");
             if ( (segment=strrchr(filen,'/')) ) /* Unix */
                 ++segment;
@@ -118,9 +118,9 @@ void DoLibHeader(void)
                 segment++;
             else segment=filen;
             outstr(segment);
-		} else {
-/* This handles files produced by a filter cpp */
-			strcpy(filen,Filenorig);
+        } else {
+            /* This handles files produced by a filter cpp */
+            strcpy(filen,Filenorig);
             if ( (segment=strrchr(filen,'/')) ) /* Unix */
                 ++segment;
             else if ( (segment=strrchr(filen,'\\')) ) /*DOG*/
@@ -128,48 +128,58 @@ void DoLibHeader(void)
             else if ( (segment=strrchr(filen,':')) )/*Amiga*/
                 segment++;
             else segment=filen;
-			changesuffix(filen,".c");
+            changesuffix(filen,".c");
             outstr("scp_");  /* alpha id incase tmpfile is numeric */
-			outstr(segment);
-		}
+            outstr(segment);
+        }
         nl();
     } else {
-/* Library function */
+        /* Library function */
         outstr("\n;\tSmall C+ Library Function\n");
         changesuffix(filen,"");
         if (ISASM(ASM_ASXX)) {
-			outstr("\n\t.globl\t");
-		} else if (ISASM(ASM_Z80ASM) ) {
-			outstr("\n\tPUBLIC\t");
+            outstr("\n\t.globl\t");
+        } else if (ISASM(ASM_Z80ASM) ) {
+            outstr("\n\tPUBLIC\t");
         } else if ( ISASM(ASM_VASM) ) {
             outstr("\n\tGLOBAL\t");
         } else if ( ISASM(ASM_GNU) ) {
             outstr("\n\t.global\t");
         }
         outstr(filen);
+        if (ISASM(ASM_ASXX)) {
+            outstr("\n\t.globl\t_");
+        } else if (ISASM(ASM_Z80ASM) ) {
+            outstr("\n\tPUBLIC\t_");
+        } else if ( ISASM(ASM_VASM) ) {
+            outstr("\n\tGLOBAL\t_");
+        } else if ( ISASM(ASM_GNU) ) {
+            outstr("\n\t.global\t_");
+        }
+        outstr(filen);
     }
-	if (ISASM(ASM_ASXX)) {
-		incdir=getenv("Z80_OZFILES");
-		outstr("\n\n\t.include \"");
-		if (incdir) outstr(incdir);
-		outstr("z80_crt0.hdx\"\n\n");
-		ol(".area _CODE\n");
-		ol(".radix d\n");
-		if ( noaltreg ) {
-		    ol(".globl\tsaved_hl");
-		    ol(".globl\tsaved_de");
-		}
+    if (ISASM(ASM_ASXX)) {
+        incdir=getenv("Z80_OZFILES");
+        outstr("\n\n\t.include \"");
+        if (incdir) outstr(incdir);
+        outstr("z80_crt0.hdx\"\n\n");
+        ol(".area _CODE\n");
+        ol(".radix d\n");
+        if ( noaltreg ) {
+            ol(".globl\tsaved_hl");
+            ol(".globl\tsaved_de");
+        }
     } else if (ISASM(ASM_GNU) ) {
 
-	} else {
+    } else {
         outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
-		if ( noaltreg ) {
-/*		    ol("XREF\tsaved_hl");
-		    ol("XREF\tsaved_de"); */
-		    ol("EXTERN\tsaved_hl");
-		    ol("EXTERN\tsaved_de");
-		}
-	}
+        if ( noaltreg ) {
+/*          ol("XREF\tsaved_hl");
+            ol("XREF\tsaved_de"); */
+            ol("EXTERN\tsaved_hl");
+            ol("EXTERN\tsaved_de");
+        }
+    }
     donelibheader=1;
 }
 
@@ -763,6 +773,7 @@ void zcallop(void)
 
 char dopref(SYMBOL *sym)
 {
+//  return 1;
 	if (sym->flags&LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) return(0);
 	if ( sym->storage == LIBOVER )
 		return(0);

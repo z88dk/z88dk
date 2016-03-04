@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.16 2016-02-21 06:12:17 aralbrec Exp $
+ *      $Id: declfunc.c,v 1.17 2016-03-04 23:07:11 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -367,7 +367,11 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
 
     output_section("code_compiler");  // output_section("code");
 
-    nl();prefix();outname(currfn->name,dopref(currfn));col();nl();  /* print function name */
+    nl();prefix();outname(currfn->name,dopref(currfn));col();  /* print function name */
+    if ( dopref(currfn) == NO ) {
+        nl();prefix();outname(currfn->name,YES);col();;  /* print function name */
+    }
+    nl();
 
     infunc=1;       /* In a function for sure! */
     copyarg=prevarg;
