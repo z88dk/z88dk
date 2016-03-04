@@ -10,12 +10,14 @@
 #define __FASTCALL__
 #define __CALLEE__
 #define __SMALLCCALLEE __z88dk_callee
+#define __SMALLCFASTCALL __z88dk_fastcall
 #define __LIB__
 #define __SMALLCDECL __smallc
 #define far
 #else
 #define __SMALLCDECL
 #define __SMALLCCALLEE
+#define __SMALLCFASTCALL
 #endif
 
 #endif

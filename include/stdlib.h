@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.48 2016-03-04 10:50:58 dom Exp $
+ * $Id: stdlib.h,v 1.49 2016-03-04 11:04:20 dom Exp $
  */
 
 #include <sys/compiler.h>
@@ -24,8 +24,8 @@
 
 // double atof(char *s);                    /* check math library for availability */
 
-extern int  __LIB__ __FASTCALL__  atoi(char *s);
-extern long __LIB__ __FASTCALL__  atol(char *s);
+extern int  __LIB__ __FASTCALL__  atoi(char *s) __SMALLCFASTCALL;
+extern long __LIB__ __FASTCALL__  atol(char *s) __SMALLCFASTCALL;
 
 extern int  __LIB__               itoa(int n, char *s, uchar radix) __SMALLCDECL;
 extern int  __LIB__ __CALLEE__    itoa_callee(int n, char *s, uchar radix) __SMALLCDECL __SMALLCCALLEE;
@@ -68,7 +68,7 @@ extern int std_seed;
 
 extern int  __LIB__              rand(void);
 extern void __LIB__              randomize(void);
-extern void __LIB__ __FASTCALL__ srand(unsigned int seed);
+extern void __LIB__ __FASTCALL__ srand(unsigned int seed) __SMALLCFASTCALL;
 
 // Not sure why Rex has it's own rand() routine using different seed?
 
@@ -95,8 +95,8 @@ extern void __LIB__ __FASTCALL__ srand(unsigned int seed);
 #define EXIT_FAILURE   1
 #define EXIT_SUCCESS   0
 
-extern void __LIB__ __FASTCALL__ exit(int status);
-extern int  __LIB__ __FASTCALL__ atexit(void *fcn);
+extern void __LIB__ __FASTCALL__ exit(int status) __SMALLCFASTCALL;
+extern int  __LIB__ __FASTCALL__ atexit(void *fcn) __SMALLCFASTCALL;
 
 // int system(char *s);                     /* might be implemented in target's library but doubtful */
 // char *getenv(char *name);                /* might be implemented in target's library but doubtful */
@@ -141,13 +141,13 @@ extern void __LIB__ __CALLEE__ qsort_callee(char *base, unsigned int nel, unsign
 //// Misc Number Functions
 //////////////////////////
 
-extern int  __LIB__ __FASTCALL__ abs(int n);
+extern int  __LIB__ __FASTCALL__ abs(int n) __SMALLCFASTCALL;
 extern long __LIB__              labs(long n);
 extern long __LIB__ __CALLEE__   labs_callee(long n) __SMALLCCALLEE;
 
 #define labs(a) labs_callee(a)
 
-extern uint __LIB__ __FASTCALL__ isqrt(uint n);
+extern uint __LIB__ __FASTCALL__ isqrt(uint n) __SMALLCFASTCALL;
 
 
 /******************************************************/
@@ -162,7 +162,7 @@ extern uint __LIB__ __FASTCALL__ isqrt(uint n);
 // For accessing 16-bit i/o ports from C.  The macros can be
 // used to inline code if the parameters resolve to constants.
 
-extern unsigned int  __LIB__ __FASTCALL__ inp(unsigned int port);
+extern unsigned int  __LIB__ __FASTCALL__ inp(unsigned int port) __SMALLCFASTCALL;
 extern void          __LIB__              outp(unsigned int port, unsigned char byte) __SMALLCDECL;
 extern void          __LIB__ __CALLEE__   outp_callee(unsigned int port, unsigned char byte) __SMALLCDECL __SMALLCCALLEE;
 
@@ -177,7 +177,7 @@ extern void          __LIB__ __CALLEE__   outp_callee(unsigned int port, unsigne
 //// Direct Memory Manipulation
 ///////////////////////////////
 
-extern void __LIB__ __FASTCALL__ *swapendian(void *addr);
+extern void __LIB__ __FASTCALL__ *swapendian(void *addr) __SMALLCFASTCALL;
 
 // The macros can be used to inline code if the parameters resolve to constants
 
@@ -185,8 +185,8 @@ extern void          __LIB__              bpoke(void *addr, unsigned char byte) 
 extern void          __LIB__ __CALLEE__   bpoke_callee(void *addr, unsigned char byte) __SMALLCDECL __SMALLCCALLEE;
 extern void          __LIB__              wpoke(void *addr, unsigned int word) __SMALLCDECL;
 extern void          __LIB__ __CALLEE__   wpoke_callee(void *addr, unsigned int word) __SMALLCDECL __SMALLCCALLEE;
-extern unsigned char __LIB__ __FASTCALL__ bpeek(void *addr);
-extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr);
+extern unsigned char __LIB__ __FASTCALL__ bpeek(void *addr) __SMALLCFASTCALL;
+extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr) __SMALLCFASTCALL;
 
 #define bpoke(a,b) bpoke_callee(a,b)
 #define wpoke(a,b) wpoke_callee(a,b)
@@ -201,12 +201,12 @@ extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr);
 //////////////////////////////////////////////////
 
 // ACCURATE T-STATE DELAY
-extern void   __LIB__ __FASTCALL__   t_delay(unsigned int tstates);   // at least 141 T
+extern void   __LIB__ __FASTCALL__   t_delay(unsigned int tstates) __SMALLCFASTCALL;   // at least 141 T
 
+extern void   __LIB__  __FASTCALL__   sleep (int secs) __SMALLCFASTCALL;
 /* Very non standard! sleep for centisecs! (z88 and others)*/
-extern void   __LIB__  __FASTCALL__   sleep (int secs);
-extern void   __LIB__  __FASTCALL__   csleep(unsigned int centiseconds);
-extern void   __LIB__  __FASTCALL__   delay (long milliseconds);
+extern void   __LIB__  __FASTCALL__   csleep(unsigned int centiseconds) __SMALLCFASTCALL;
+extern void   __LIB__  __FASTCALL__   delay (long milliseconds) __SMALLCFASTCALL;
 
 
 

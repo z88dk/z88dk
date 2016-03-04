@@ -10,7 +10,7 @@
  *
  *	BSDisms are catered for by #defines..
  *
- *	$Id: string.h,v 1.25 2016-03-04 10:50:58 dom Exp $
+ *	$Id: string.h,v 1.26 2016-03-04 11:04:20 dom Exp $
  */
 
 #include <sys/compiler.h>
@@ -18,14 +18,14 @@
 
 // First a list of functions using CALLER and FASTCALL linkage
 
-extern int  __LIB__ __FASTCALL__  strlen(char *);
+extern int  __LIB__ __FASTCALL__  strlen(char *) __SMALLCFASTCALL;
 extern char __LIB__              *strcat(char *, char *) __SMALLCDECL;
 extern int  __LIB__               strcmp(char *, char *) __SMALLCDECL;
 extern char __LIB__              *strcpy(char *, char *) __SMALLCDECL;
 extern char __LIB__              *strncat(char *, char *, uint) __SMALLCDECL;
 extern int  __LIB__               strncmp(char *, char *, uint) __SMALLCDECL;
 extern char __LIB__              *strncpy(char *, char *, uint) __SMALLCDECL;
-extern char __LIB__ __FASTCALL__ *strrev(char *);
+extern char __LIB__ __FASTCALL__ *strrev(char *) __SMALLCFASTCALL;
 extern char __LIB__              *strchr(unsigned char *, unsigned char) __SMALLCDECL;
 extern char __LIB__              *strchrnul(unsigned char *, unsigned char) __SMALLCDECL;
 extern char __LIB__              *strrchr(unsigned char *, unsigned char) __SMALLCDECL;
@@ -45,8 +45,8 @@ extern int  __LIB__               stricmp(char *, char *) __SMALLCDECL;
 extern int  __LIB__               strcasecmp(char *, char *) __SMALLCDECL;
 extern int  __LIB__               strnicmp(char *, char *, uint) __SMALLCDECL;
 extern int  __LIB__               strncasecmp(char *, char *, uint) __SMALLCDECL;
-extern char __LIB__ __FASTCALL__ *strlwr(char *);
-extern char __LIB__ __FASTCALL__ *strupr(char *);
+extern char __LIB__ __FASTCALL__ *strlwr(char *) __SMALLCFASTCALL;
+extern char __LIB__ __FASTCALL__ *strupr(char *) __SMALLCFASTCALL;
 extern uint __LIB__               strlcat(char *, char *, uint) __SMALLCDECL;
 extern uint __LIB__               strlcpy(char *, char *, uint) __SMALLCDECL;
 
@@ -60,7 +60,7 @@ extern void __LIB__              *memswap(void *, void *, uint) __SMALLCDECL;
 extern void __LIB__              *memopi(void *, void *, uint, uint) __SMALLCDECL;
 extern void __LIB__              *memopd(void *, void *, uint, uint) __SMALLCDECL;
 
-extern char __LIB__ __FASTCALL__ *strdup(char *);
+extern char __LIB__ __FASTCALL__ *strdup(char *) __SMALLCFASTCALL;
 
 // And now a list of the same non-FASTCALL functions using CALLEE linkage
 
