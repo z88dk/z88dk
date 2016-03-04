@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.108 2016-03-02 01:39:09 aralbrec Exp $
+ *      $Id: zcc.c,v 1.109 2016-03-04 11:45:43 dom Exp $
  */
 
 
@@ -1357,6 +1357,7 @@ static void configure_compiler()
         }
         c_compiler = c_sdcc_exe;
         compiler_style = filter_outspecified_flag;
+        write_zcc_defined("Z88DK_USES_SDCC", 1);
     } else {
         preprocarg = " -DSCCZ80 -DSMALL_C";
         BuildOptions(&cpparg, preprocarg);
