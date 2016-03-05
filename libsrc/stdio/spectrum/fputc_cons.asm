@@ -12,11 +12,12 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.14 2015-04-07 20:47:35 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.15 2016-03-05 00:55:18 dom Exp $
 ;
 
 
           PUBLIC  fputc_cons
+          PUBLIC  _fputc_cons
 
 
 	  EXTERN  call_rom3
@@ -27,6 +28,7 @@
 defc attr = 23693
 
 .fputc_cons
+._fputc_cons
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)

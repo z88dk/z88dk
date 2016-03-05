@@ -9,13 +9,15 @@
 ;	1/4/2000  djm Rechristened fgetc_cons
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2016-03-05 00:55:18 dom Exp $
 ;
 
 
 		PUBLIC	fgetc_cons
+		PUBLIC	_fgetc_cons
 
 .fgetc_cons
+._fgetc_cons
 	xor	a
 	ld	(23560),a
 .getkey1
