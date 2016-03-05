@@ -16,6 +16,7 @@
 
                 INCLUDE "interrpt.def"
 
+.di
 ._di
         call    oz_di
         push    af

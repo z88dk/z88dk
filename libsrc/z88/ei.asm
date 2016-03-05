@@ -16,6 +16,7 @@
 
                 INCLUDE "interrpt.def"
 
+.ei
 ._ei
         pop     bc
         pop     af

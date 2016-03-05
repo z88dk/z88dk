@@ -23,16 +23,18 @@
  ;  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  ;
  ; --------
- ; $Id: clock.asm,v 1.2 2015-11-15 03:30:19 aralbrec Exp $
+ ; $Id: clock.asm,v 1.3 2016-03-05 00:07:01 dom Exp $
  ;
  ;
 
 
 PUBLIC clock
+PUBLIC _clock
 
 EXTERN l_mult, l_long_mult, l_long_add
 
 clock:
+_clock:
 
 		ld		hl,(1)
 		ld		de,04bh		; TIME BIOS entry (CP/M 3 but present also elsewhere)

@@ -6,12 +6,14 @@
 ;	djm 12/1/2000
 ;
 ; ------
-; $Id: clock.asm,v 1.3 2015-01-19 01:33:25 pauloscustodio Exp $
+; $Id: clock.asm,v 1.4 2016-03-05 00:07:01 dom Exp $
 ;
 
 	PUBLIC	clock
+	PUBLIC	_clock
 
 .clock
+._clock
 	ld	hl,(23672)
 	ld	a,(23674)
 	ld	e,a

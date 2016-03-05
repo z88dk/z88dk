@@ -19,15 +19,17 @@
  ;  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  ;
  ; --------
- ; $Id: time.asm,v 1.2 2015-11-15 03:30:19 aralbrec Exp $
+ ; $Id: time.asm,v 1.3 2016-03-05 00:07:01 dom Exp $
  ;
 
 
 PUBLIC time
+PUBLIC _time
 
 EXTERN l_mult, l_long_mult, l_long_add
 
 time:
+_time:
 
         pop     de
         pop     hl
