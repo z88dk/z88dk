@@ -12,17 +12,19 @@
 ; 15/4/2000 Takes a near again (can change but effort!)
 ;
 ;
-;	$Id: remove.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: remove.asm,v 1.4 2016-03-05 00:13:02 dom Exp $
 ;
 
                 INCLUDE "fileio.def"
                 INCLUDE "stdio.def"
 
                 PUBLIC    remove
+                PUBLIC    _remove
 
 ;int remove(char *name)
 
 .remove
+._remove
         pop     de
         pop     hl      ;dest filename
         push    hl

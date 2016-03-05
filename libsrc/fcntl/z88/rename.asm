@@ -8,13 +8,14 @@
 ; This doesn't check for validity of filename at all.
 
 ;
-;	$Id: rename.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: rename.asm,v 1.4 2016-03-05 00:13:02 dom Exp $
 ;
 
                 INCLUDE "fileio.def"
                 INCLUDE "stdio.def"
 
                 PUBLIC    rename
+                PUBLIC    _rename
 
 ;int rename(char *s1,char *s2)
 ;on stack:
@@ -22,6 +23,7 @@
 ;s1=orig filename, s2=dest filename
 
 .rename
+._rename
         pop     bc
         pop     de      ;dest filename
         pop     hl      ;orig filename

@@ -5,12 +5,13 @@
 ; 11/3/99 djm ***UNTESTED***
 ;
 ;
-;	$Id: fdgetpos.asm,v 1.5 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: fdgetpos.asm,v 1.6 2016-03-05 00:13:02 dom Exp $
 ;
 
                 INCLUDE "fileio.def"
 
                 PUBLIC    fdgetpos
+                PUBLIC    _fdgetpos
 
 ;int fgetpos(int fd, long *dump)
 ;
@@ -18,6 +19,7 @@
 
 
 .fdgetpos
+._fdgetpos
 	pop	bc
 	pop	de	;dump
 	pop	ix	;fd
