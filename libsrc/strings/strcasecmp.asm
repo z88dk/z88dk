@@ -1,9 +1,11 @@
 ; CALLER linkage for function pointers
 
 PUBLIC strcasecmp
+PUBLIC _strcasecmp
 EXTERN stricmp1
 
 .strcasecmp
+._strcasecmp
 
    pop bc
    pop de

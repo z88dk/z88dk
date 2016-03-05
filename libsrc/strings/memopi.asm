@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC memopi
+PUBLIC _memopi
 EXTERN memopi_callee
 EXTERN ASMDISP_MEMOPI_CALLEE
 
 .memopi
+._memopi
 
    pop af
    pop ix

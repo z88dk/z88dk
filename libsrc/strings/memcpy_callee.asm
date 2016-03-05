@@ -3,9 +3,11 @@
 ; 11.1999 djm
 
 PUBLIC memcpy_callee
+PUBLIC _memcpy_callee
 PUBLIC ASMDISP_MEMCPY_CALLEE
 
 .memcpy_callee
+._memcpy_callee
 
    pop hl
    pop bc

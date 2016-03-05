@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC memcpy
+PUBLIC _memcpy
 EXTERN memcpy_callee
 EXTERN ASMDISP_MEMCPY_CALLEE
 
 .memcpy
+._memcpy
 
    pop af
    pop bc

@@ -3,9 +3,11 @@
 ; 01.2007 aralbrec
 
 PUBLIC strpos_callee
+PUBLIC _strpos_callee
 PUBLIC ASMDISP_STRPOS_CALLEE
 
 .strpos_callee
+._strpos_callee
 
    pop hl
    pop de

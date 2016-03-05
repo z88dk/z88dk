@@ -3,9 +3,11 @@
 ; 03.1999 djm, 12.2006 aralbrec
 
 PUBLIC strcpy_callee
+PUBLIC _strcpy_callee
 PUBLIC ASMDISP_STRCPY_CALLEE
 
 .strcpy_callee
+._strcpy_callee
 
    pop hl
    pop de

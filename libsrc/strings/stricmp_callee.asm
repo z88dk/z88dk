@@ -3,11 +3,13 @@
 ; 12.2006 aralbrec
 
 PUBLIC stricmp_callee
+PUBLIC _stricmp_callee
 PUBLIC stricmp1
 
 EXTERN asm_tolower
 
 .stricmp_callee
+._stricmp_callee
 
    pop hl
    pop de

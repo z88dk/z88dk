@@ -3,12 +3,14 @@
 ; 01.2007 aralbrec
 
 PUBLIC strspn_callee
+PUBLIC _strspn_callee
 PUBLIC ASMDISP_STRSPN_CALLEE
 
 EXTERN strchr_callee
 EXTERN ASMDISP_STRCHR_CALLEE
 
 .strspn_callee
+._strspn_callee
 
    pop hl
    pop de

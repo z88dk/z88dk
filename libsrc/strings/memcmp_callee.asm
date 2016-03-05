@@ -3,11 +3,13 @@
 ; 11.1999 djm, 12.2006 aralbrec
 
 PUBLIC memcmp_callee
+PUBLIC _memcmp_callee
 PUBLIC ASMDISP_MEMCMP_CALLEE
 EXTERN     rcmx_cpi
 
 
 .memcmp_callee
+._memcmp_callee
 
    pop hl
    pop bc

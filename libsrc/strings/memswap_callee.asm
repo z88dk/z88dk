@@ -3,9 +3,11 @@
 ; 01.2007 aralbrec
 
 PUBLIC memswap_callee
+PUBLIC _memswap_callee
 PUBLIC ASMDISP_MEMSWAP_CALLEE
 
 .memswap_callee
+._memswap_callee
 
    pop hl
    pop bc

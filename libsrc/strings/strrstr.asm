@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC strrstr
+PUBLIC _strrstr
 EXTERN strrstr_callee
 EXTERN ASMDISP_STRRSTR_CALLEE
 
 .strrstr
+._strrstr
 
    pop bc
    pop de

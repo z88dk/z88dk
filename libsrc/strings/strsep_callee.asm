@@ -3,6 +3,7 @@
 ; 01.2007 aralbrec
 
 PUBLIC strsep_callee
+PUBLIC _strsep_callee
 PUBLIC ASMDISP_STRSEP_CALLEE
 
 EXTERN strchr_callee
@@ -11,6 +12,7 @@ EXTERN ASMDISP_STRCHR_CALLEE
 ; 
 
 .strsep_callee
+._strsep_callee
 
    pop hl     ; ret addr
    pop de     ; *delim

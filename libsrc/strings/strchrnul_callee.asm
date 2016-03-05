@@ -3,9 +3,11 @@
 ; 04.2001 dom, 04.2012 stefano
 
 PUBLIC strchrnul_callee
+PUBLIC _strchrnul_callee
 PUBLIC ASMDISP_STRCHRNUL_CALLEE
 
 .strchrnul_callee
+._strchrnul_callee
 
    pop hl
    pop bc

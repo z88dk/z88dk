@@ -2,8 +2,10 @@
 ; 06.2007 aralbrec
 
 PUBLIC memops
+PUBLIC _memops
 
 .memops
+._memops
 .opload
 
    nop

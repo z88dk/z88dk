@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC memset
+PUBLIC _memset
 EXTERN memset_callee
 EXTERN ASMDISP_MEMSET_CALLEE
 
 .memset
+._memset
 
    pop af
    pop bc

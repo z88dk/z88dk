@@ -7,11 +7,13 @@
 ; uses : af
 
 PUBLIC strlwr
+PUBLIC _strlwr
 PUBLIC ASMDISP_STRLWR
 
 EXTERN asm_tolower
 
 .strlwr
+._strlwr
 
    push hl
    dec hl

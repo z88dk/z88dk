@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC memchr
+PUBLIC _memchr
 EXTERN memchr_callee
 EXTERN ASMDISP_MEMCHR_CALLEE
 
 .memchr
+._memchr
 
    pop af
    pop bc

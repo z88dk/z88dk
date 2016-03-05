@@ -3,12 +3,14 @@
 ; 12.2006 aralbrec
 
 PUBLIC strlen
+PUBLIC _strlen
 
 ; enter: hl = char *s
 ; exit : hl = length, z flag set if 0 length
 ; uses : af, bc, hl
 
 .strlen
+._strlen
 
 
 IF FORrcmx000

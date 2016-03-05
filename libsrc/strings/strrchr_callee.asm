@@ -3,9 +3,11 @@
 ; 04.2001 dom, 01.2007 aralbrec
 
 PUBLIC strrchr_callee
+PUBLIC _strrchr_callee
 PUBLIC ASMDISP_STRRCHR_CALLEE
 
 .strrchr_callee
+._strrchr_callee
 
    pop hl
    pop bc

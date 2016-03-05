@@ -3,11 +3,13 @@
 ; 12.2006 aralbrec
 
 PUBLIC strcat_callee
+PUBLIC _strcat_callee
 PUBLIC ASMDISP_STRCAT_CALLEE
 EXTERN     rcmx_cpir
 
 
 .strcat_callee
+._strcat_callee
 
    pop hl
    pop de

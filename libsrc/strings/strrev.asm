@@ -7,11 +7,13 @@
 ; uses : af, bc, de
 
 PUBLIC strrev
+PUBLIC _strrev
 PUBLIC ASMDISP_STRREV
 EXTERN     rcmx_cpir
 
 
 .strrev
+._strrev
 
    xor a
    ld c,a

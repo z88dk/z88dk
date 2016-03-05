@@ -2,6 +2,7 @@
 ; 06.2008 aralbrec
 
 PUBLIC strlcat_callee
+PUBLIC _strlcat_callee
 PUBLIC ASMDISP_STRLCAT_CALLEE
 
 IF FORrcmx000
@@ -15,6 +16,7 @@ ENDIF
 ; much more sense and the information more useful.
 
 .strlcat_callee
+._strlcat_callee
 
    pop hl
    pop bc

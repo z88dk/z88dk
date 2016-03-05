@@ -1,11 +1,13 @@
 ; CALLER linkage for function pointers
 
 PUBLIC strlcat
+PUBLIC _strlcat
 
 EXTERN strlcat_callee
 EXTERN ASMDISP_STRLCAT_CALLEE
 
 .strlcat
+._strlcat
 
    pop af
    pop bc

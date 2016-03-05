@@ -18,9 +18,11 @@
 ;  is slower than cp (hl) + inc hl combination!
 
 PUBLIC strcmp_callee
+PUBLIC _strcmp_callee
 PUBLIC strcmp1
 
 .strcmp_callee
+._strcmp_callee
 
    pop hl
    pop de

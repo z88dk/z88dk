@@ -3,11 +3,13 @@
 ; 04.2001 dom, 12.2006 aralbrec
 
 PUBLIC strncat_callee
+PUBLIC _strncat_callee
 PUBLIC ASMDISP_STRNCAT_CALLEE
 
 EXTERN  rcmx_cpir
 
 .strncat_callee
+._strncat_callee
 
    pop hl
    pop bc

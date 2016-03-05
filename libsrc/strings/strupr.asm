@@ -7,11 +7,13 @@
 ; uses : af
 
 PUBLIC strupr
+PUBLIC _strupr
 PUBLIC ASMDISP_STRUPR
 
 EXTERN asm_toupper
 
 .strupr
+._strupr
 
    push hl
 

@@ -3,9 +3,11 @@
 ; 04.2001 dom
 
 PUBLIC strchr_callee
+PUBLIC _strchr_callee
 PUBLIC ASMDISP_STRCHR_CALLEE
 
 .strchr_callee
+._strchr_callee
 
    pop hl
    pop bc

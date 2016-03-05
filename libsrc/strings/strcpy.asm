@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC strcpy
+PUBLIC _strcpy
 EXTERN strcpy_callee
 EXTERN ASMDISP_STRCPY_CALLEE
 
 .strcpy
+._strcpy
 
    pop bc
    pop hl

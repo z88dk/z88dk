@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC rindex
+PUBLIC _rindex
 EXTERN strrchr_callee
 EXTERN ASMDISP_STRRCHR_CALLEE
 
 .rindex
+._rindex
 
    pop hl
    pop bc

@@ -3,9 +3,11 @@
 ; 04.2001 djm, 12.2006 aralbrec
 
 PUBLIC memset_callee
+PUBLIC _memset_callee
 PUBLIC ASMDISP_MEMSET_CALLEE
 
 .memset_callee
+._memset_callee
 
    pop hl
    pop bc

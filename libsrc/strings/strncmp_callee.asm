@@ -3,11 +3,13 @@
 ; 05.2002 dom, 12.2006 aralbrec
 
 PUBLIC strncmp_callee
+PUBLIC _strncmp_callee
 PUBLIC ASMDISP_STRNCMP_CALLEE
 EXTERN     rcmx_cpi
 
 
 .strncmp_callee
+._strncmp_callee
 
    pop hl
    pop bc

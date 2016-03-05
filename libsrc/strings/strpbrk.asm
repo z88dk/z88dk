@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC strpbrk
+PUBLIC _strpbrk
 EXTERN strpbrk_callee
 EXTERN ASMDISP_STRPBRK_CALLEE
 
 .strpbrk
+._strpbrk
 
    pop bc
    pop de

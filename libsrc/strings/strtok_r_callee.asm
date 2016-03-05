@@ -3,6 +3,7 @@
 ; 01.2007 aralbrec
 
 PUBLIC strtok_r_callee
+PUBLIC _strtok_r_callee
 PUBLIC ASMDISP_STRTOK_R_CALLEE
 
 EXTERN strchr_callee
@@ -11,6 +12,7 @@ EXTERN ASMDISP_STRCHR_CALLEE
 ; static data stored here, not ROMable
 
 .strtok_r_callee
+._strtok_r_callee
 
    pop hl     ; ret addr
    pop bc     ; **lasts

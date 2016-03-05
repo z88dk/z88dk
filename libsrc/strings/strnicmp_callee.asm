@@ -3,11 +3,13 @@
 ; 12.2006 aralbrec
 
 PUBLIC strnicmp_callee
+PUBLIC _strnicmp_callee
 PUBLIC ASMDISP_STRNICMP_CALLEE
 
 EXTERN asm_tolower
 
 .strnicmp_callee
+._strnicmp_callee
 
    pop hl
    pop bc

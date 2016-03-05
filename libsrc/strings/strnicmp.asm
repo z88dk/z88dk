@@ -1,10 +1,12 @@
 ; CALLER linkage for function pointers
 
 PUBLIC strnicmp
+PUBLIC _strnicmp
 EXTERN strnicmp_callee
 EXTERN ASMDISP_STRNICMP_CALLEE
 
 .strnicmp
+._strnicmp
 
    pop af
    pop bc

@@ -3,9 +3,11 @@
 ; 01.2007 aralbrec
 
 PUBLIC memmove_callee
+PUBLIC _memmove_callee
 PUBLIC ASMDISP_MEMMOVE_CALLEE
 
 .memmove_callee
+._memmove_callee
 
    pop hl
    pop bc

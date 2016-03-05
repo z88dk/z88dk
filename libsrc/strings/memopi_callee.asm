@@ -4,11 +4,13 @@
 ; 05.2007 aralbrec
 
 PUBLIC memopi_callee
+PUBLIC _memopi_callee
 PUBLIC ASMDISP_MEMOPI_CALLEE
 
 EXTERN l_jpix, memops
 
 .memopi_callee
+._memopi_callee
 
    pop hl
    pop ix
