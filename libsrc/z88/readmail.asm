@@ -14,6 +14,7 @@
 ;       Returns 0 on failure, 1 on success
 
 
+        SECTION code_clib
 
                 PUBLIC    readmail
                 PUBLIC    _readmail

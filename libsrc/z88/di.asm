@@ -11,10 +11,12 @@
 ;       int di(void)
 
 
-               PUBLIC    di
-               PUBLIC    _di
+        SECTION code_clib
 
-                INCLUDE "interrpt.def"
+	PUBLIC    di
+	PUBLIC    _di
+
+	INCLUDE "interrpt.def"
 
 .di
 ._di

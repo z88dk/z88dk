@@ -1,6 +1,9 @@
 ; Internal library routine for openwindow, opentitled & openpopup
 ; 26/3/00 GWL
 
+
+        SECTION code_clib
+
 	PUBLIC	opwin
 	include	"stdio.def"
 

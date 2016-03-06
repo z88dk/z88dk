@@ -13,7 +13,7 @@ void nameapp(char *name)
 	pop	hl
 	push	hl
 	push	bc
-	call_oz(dc_nam)
+	call_oz(dc_nam)	;preserves ix
 #endasm
 }
 

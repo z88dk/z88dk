@@ -25,7 +25,7 @@ int exec_cli_i(char *str, size_t len)
 	push	hl
 	push	bc
 	push	de
-	call_oz(dc_icl)
+	call_oz(dc_icl)		;preserves ix
 	ld	hl,0
 	ret	nc
 	dec	hl	;-1 - FAIL

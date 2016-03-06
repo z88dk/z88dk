@@ -14,6 +14,7 @@
 ;       Returns 0 on failure, or 1 on success
 
 
+        SECTION code_clib
 
                PUBLIC    restscr
                PUBLIC    _restscr
@@ -23,11 +24,15 @@
 .restscr
 ._restscr
         pop     bc
-        pop     ix
-        push    ix
+        pop     hl
+        push    hl
         push    bc
+	push	ix
+	push	hl
+	pop	ix
         ld      a,SR_RUS
         call_oz(os_sr)
+	pop	ix
         ld      hl,0
         ret     c
         ld      hl,1

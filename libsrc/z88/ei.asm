@@ -11,6 +11,8 @@
 ;       void ei(int)
 
 
+        SECTION code_clib
+
                PUBLIC    ei
                PUBLIC    _ei
 

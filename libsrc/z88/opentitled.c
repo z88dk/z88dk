@@ -21,8 +21,8 @@ void opentitled(int wid,int tlx,int tly,int width,int height,char *name)
 #asm
 	include	"stdio.def"
 	EXTERN	opwin
-
-	ld	ix,2		; IX points to name
+	push	ix
+	ld	ix,4		; IX points to name
 	add	ix,sp
 	ld	b,131		; with shelf brackets
 	call	opwin
@@ -40,6 +40,7 @@ void opentitled(int wid,int tlx,int tly,int width,int height,char *name)
 	dec	(ix+2)		; decrement height
 	ld	b,129		; left/right bars only
 	call	opwin		; re-define
+	pop	ix
 
 #endasm
 }

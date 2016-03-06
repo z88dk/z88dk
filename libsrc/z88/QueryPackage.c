@@ -12,7 +12,7 @@ bool_t QueryPackage(char which, char major,char minor)
 {
 #pragma asm
 	INCLUDE "packages.def"
-	call_pkg(pkg_ayt)
+	call_pkg(pkg_ayt)		;preserves ix
 	jr	c,openfail
 	ld	hl,6
 	add	hl,sp	;points to library number

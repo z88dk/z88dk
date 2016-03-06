@@ -14,6 +14,7 @@
 ;       Returns 0 on failure, number of bytes present on success
 
 
+        SECTION code_clib
 
                 PUBLIC    sendmail
                 PUBLIC    _sendmail

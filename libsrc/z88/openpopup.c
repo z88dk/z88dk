@@ -26,8 +26,8 @@ void openpopup(int wid,int tlx,int tly,int width,int height,char *name)
 #asm
 	EXTERN	opwin
 	include	"stdio.def"
-
-	ld	ix,2		; IX points to name
+	push	ix
+	ld	ix,4		; IX points to name
 	add	ix,sp
 	dec	(ix+6)		; decrement start row
 	dec	(ix+8)		; & left

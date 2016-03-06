@@ -14,6 +14,7 @@
 ;       Returns with key pressed
 
 
+        SECTION code_clib
 
                PUBLIC    pagewait
                PUBLIC    _pagewait

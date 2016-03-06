@@ -11,7 +11,8 @@ char *fnexpand(far char *string, char *buffer, size_t size)
 {
 #asm
 	INCLUDE	"fileio.def"
-	ld	ix,0
+	push	ix
+	ld	ix,2
 	add	ix,sp
 	ld	l,(ix+6)	;filename
 	ld	h,(ix+7)
@@ -26,10 +27,12 @@ char *fnexpand(far char *string, char *buffer, size_t size)
 	ld	c,(ix+2)	;max size
 	call_oz(gn_fex)
 	ld	hl,0	;NULL - error
-	ret	c
+	jr	c,fnexpand_exit
 	xor	a	;terminate just in case
 	ld	(de),a
 	ld	l,(ix+4)	;where we expanded it to
 	ld	h,(ix+5)
+fnexpand_exit:
+	pop	ix
 #endasm
 }

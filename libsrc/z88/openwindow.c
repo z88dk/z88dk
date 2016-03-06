@@ -12,10 +12,12 @@ void openwindow(int wid,int tlx,int tly,int width,int height)
 #asm
 	EXTERN	opwin
 
-	ld	ix,0
+	push	ix
+	ld	ix,2
 	add	ix,sp
 	ld	b,129		; left & right bars
 	call	opwin
+	pop	ix
 #endasm
 }
 

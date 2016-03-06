@@ -14,6 +14,7 @@
 ;       Returns 0 on failure, or handle on success
 
 
+        SECTION code_clib
 
                PUBLIC    savescr
                PUBLIC    _savescr
@@ -22,11 +23,13 @@
 
 .savescr
 ._savescr
+	push	ix
         ld      a,SR_SUS
         call_oz(os_sr)
-        ld      hl,0
-        ret     c
         push    ix
-        pop     hl
+        pop     de
+	pop	ix
+	ret	nc
+        ld      hl,0
         ret
         

@@ -17,7 +17,7 @@ int RegisterInt(func,type,tick)
 #pragma asm
 	INCLUDE	"packages.def"
 ; First of all check that package system is there
-	call_pkg(pkg_ayt)
+	call_pkg(pkg_ayt)		;preserves ix
 	ld	hl,0	;Failure
 	ret	c	;We failed
 ; Aha..we packages are there...good...
@@ -32,7 +32,7 @@ int RegisterInt(func,type,tick)
 	ld	b,(ix+4)	;type
 	ld	hl,introut
 	ld	a,int_prc
-	call_pkg(pkg_intr)
+	call_pkg(pkg_intr)		;preserves ix
 	ld	hl,1
 	ret	nc	;Success
 	dec	hl
