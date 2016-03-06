@@ -3,7 +3,7 @@
  *
  *	Routines for dealing with longjmps
  *
- *	$Id: setjmp.h,v 1.5 2010-09-19 00:24:08 dom Exp $
+ *	$Id: setjmp.h,v 1.6 2016-03-06 21:38:22 dom Exp $
  */
 
 
@@ -14,10 +14,11 @@
 
 /*
  * We have no register variables so we just need to
- * save sp and pc
+ * save sp and pc (and ix to cope with sdcc)
  */
 
 typedef struct {
+	int	ix
 	int	sp;
 	int	pc;
 } jmp_buf;

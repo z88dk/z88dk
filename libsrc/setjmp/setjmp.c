@@ -15,10 +15,16 @@ int setjmp(jmp_buf env)
 {
 #pragma asm
 	pop	bc	;return address
-	pop	de	;&env
+	pop	hl	;&env
+	push	ix
+	pop	de	;de=ix, hl=&env
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ex	de,hl	;de=&env, hl=scratch
 	ld	hl,0
 	add	hl,sp	;stack pointer
-	ex	de,hl
+	ex	de,hl	;hl=env+2, de=sp
 	ld	(hl),e	;sp
 	inc	hl
 	ld	(hl),d
