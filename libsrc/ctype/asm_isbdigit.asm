@@ -1,5 +1,7 @@
 ; asm_isbdigit
 
+        SECTION code_clib
+
 PUBLIC asm_isbdigit
 
 ; determine whether ascii char is a binary digit

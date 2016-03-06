@@ -1,4 +1,6 @@
 
+        SECTION code_clib
+
 PUBLIC _isgraph
 PUBLIC isgraph
 EXTERN asm_isgraph

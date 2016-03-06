@@ -1,5 +1,7 @@
 ; asm_iscntrl
 
+        SECTION code_clib
+
 PUBLIC asm_iscntrl
 
 ; determine if the char is in [A-Za-z]

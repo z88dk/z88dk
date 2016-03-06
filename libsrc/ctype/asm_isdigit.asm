@@ -1,5 +1,7 @@
 ; asm_isdigit
 
+        SECTION code_clib
+
 PUBLIC asm_isdigit
 
 ; determine whether ascii char is a decimal digit

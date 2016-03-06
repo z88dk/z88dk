@@ -1,5 +1,7 @@
 ; asm_isalnum
 
+	SECTION	code_clib
+
 PUBLIC asm_isalnum
 
 ; determine if the char is in [0-9A-Za-z]

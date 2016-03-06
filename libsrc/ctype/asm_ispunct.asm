@@ -1,5 +1,7 @@
 ; asm_ispunct
 
+        SECTION code_clib
+
 PUBLIC asm_ispunct
 
 IF FORrcmx000

@@ -1,5 +1,7 @@
 ; asm_isgraph
 
+        SECTION code_clib
+
 PUBLIC asm_isgraph
 
 ; called by asm_isprint

@@ -6,8 +6,10 @@
 ;
 ;	Hurrah, this is our first table for our isxxx routines!
 ;
-;	$Id: ispunct.asm,v 1.6 2016-03-04 23:10:02 dom Exp $
+;	$Id: ispunct.asm,v 1.7 2016-03-06 21:41:15 dom Exp $
 ;
+
+        SECTION code_clib
 
 PUBLIC _ispunct
 PUBLIC ispunct

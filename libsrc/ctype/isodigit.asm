@@ -1,5 +1,7 @@
 ; isodigit
 
+        SECTION code_clib
+
 PUBLIC _isodigit
 PUBLIC isodigit
 EXTERN asm_isodigit

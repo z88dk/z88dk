@@ -4,8 +4,9 @@
 ;
 ;	1/3/99 djm
 ;
-;	$Id: isxdigit.asm,v 1.6 2016-03-04 23:10:03 dom Exp $
+;	$Id: isxdigit.asm,v 1.7 2016-03-06 21:41:15 dom Exp $
 ;
+        SECTION code_clib
 
 PUBLIC _isxdigit
 PUBLIC isxdigit

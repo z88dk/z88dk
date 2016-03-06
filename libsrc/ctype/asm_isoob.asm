@@ -1,6 +1,8 @@
 ; asm_isoob
 ; 08.2009 aralbrec
 
+        SECTION code_clib
+
 PUBLIC asm_isoob
 
 ; Used by tty drivers to identify out-of-band characters

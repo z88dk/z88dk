@@ -1,5 +1,7 @@
 ; asm_islower
 
+        SECTION code_clib
+
 PUBLIC asm_islower
 
 ; determine if the char is in [a-z]

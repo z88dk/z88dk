@@ -1,5 +1,7 @@
 ; asm_isprint
 
+        SECTION code_clib
+
 PUBLIC asm_isprint
 EXTERN asm_isgraph
 

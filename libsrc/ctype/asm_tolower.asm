@@ -1,5 +1,7 @@
 ; asm_tolower
 
+        SECTION code_clib
+
 PUBLIC asm_tolower
 
 ; if the char is in [A-Z], make it lower case

@@ -1,5 +1,7 @@
 ; asm_toupper
 
+        SECTION code_clib
+
 PUBLIC asm_toupper
 
 ; if the char is in [a-z], make it upper case

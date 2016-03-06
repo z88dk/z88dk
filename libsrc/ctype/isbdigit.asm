@@ -1,5 +1,7 @@
 ; isbdigit
 
+        SECTION code_clib
+
 PUBLIC _isbdigit
 PUBLIC isbdigit
 EXTERN asm_isbdigit

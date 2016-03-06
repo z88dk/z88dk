@@ -6,8 +6,10 @@
 ;
 ;	Stylish, this returned the wrong way! (djm 17/5/99)
 ;
-;	$Id: iscntrl.asm,v 1.6 2016-03-04 23:10:02 dom Exp $
+;	$Id: iscntrl.asm,v 1.7 2016-03-06 21:41:15 dom Exp $
 ;
+
+        SECTION code_clib
 
 PUBLIC _iscntrl
 PUBLIC iscntrl

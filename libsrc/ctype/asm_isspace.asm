@@ -1,5 +1,7 @@
 ; asm_isspace
 
+        SECTION code_clib
+
 PUBLIC asm_isspace
 
 ; determine whether ascii char is a whitespace char

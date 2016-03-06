@@ -1,6 +1,8 @@
 ; int isoob(int)
 ; 08.2009 aralbrec
 
+        SECTION code_clib
+
 PUBLIC _isoob
 PUBLIC isoob
 EXTERN asm_isoob

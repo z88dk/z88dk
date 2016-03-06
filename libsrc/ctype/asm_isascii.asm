@@ -1,5 +1,7 @@
 ; asm_isascii
 
+        SECTION code_clib
+
 PUBLIC asm_isascii
 
 ; determine if the char is an ascii char
