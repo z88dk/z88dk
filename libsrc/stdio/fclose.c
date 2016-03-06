@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fclose.c,v 1.3 2016-03-06 21:36:52 dom Exp $
+ * $Id: fclose.c,v 1.4 2016-03-06 21:55:07 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -48,7 +48,7 @@ fclose_inuse:
 	push	de
 	push	hl
 	call	closenet
-	jr	fclose_check_closed
+	jr	fclose_check_success
 fclose_no_net:
 #endif
 	ld	a,(hl)
