@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.16 2014-01-20 09:15:30 stefano Exp $
+ *	$Id: fcntl.h,v 1.17 2016-03-06 21:39:17 dom Exp $
  */
 
 
@@ -40,7 +40,7 @@ extern int __LIB__ creat(far char *name, mode_t mode) __SMALLCDECL;
 extern int __LIB__ close(int fd);
 extern size_t __LIB__ read(int fd, void *ptr, size_t len) __SMALLCDECL;
 extern size_t __LIB__ write(int fd, void *ptr, size_t len) __SMALLCDECL;
-extern long __LIB__ lseek(int fd,long posn, int whence) __SMALLCDECL;
+extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __SMALLCDECL;
 
 extern int __LIB__ __FASTCALL__ readbyte(int fd);
 extern int __LIB__ writebyte(int fd, int c);

@@ -12,6 +12,7 @@
 #define __SMALLCCALLEE __z88dk_callee
 #define __SMALLCFASTCALL __z88dk_fastcall
 #define __LIB__
+#define __SAVEFRAME__
 #define __SMALLCDECL __smallc
 #define far
 #else

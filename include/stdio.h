@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.32 2016-03-04 10:50:58 dom Exp $ */
+/* $Id: stdio.h,v 1.33 2016-03-06 21:39:17 dom Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -224,10 +224,10 @@ extern fpos_t __LIB__ ftell(FILE *fp);
 extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __SMALLCDECL;
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
-extern int __LIB__ fseek(FILE *fp, fpos_t offset, int whence) __SMALLCDECL;
+extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __SMALLCDECL;
 
 /* Block read/writing */
-extern int __LIB__ fread(void *ptr, int size, int num, FILE *) __SMALLCDECL;
+extern int __LIB__ __SAVEFRAME__ fread(void *ptr, int size, int num, FILE *) __SMALLCDECL;
 extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *) __SMALLCDECL;
 
 

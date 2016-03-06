@@ -9,7 +9,7 @@
  *	We try to be good and emulate as much a possible
  *	Hence all these silly defs!
  *
- *	$Id: stat.h,v 1.4 2012-10-15 10:40:46 stefano Exp $
+ *	$Id: stat.h,v 1.5 2016-03-06 21:39:17 dom Exp $
  */
 
 struct stat {
@@ -30,7 +30,7 @@ struct stat {
 	int	st_rdev;	/* ? */
 };
 
-extern int __LIB__ stat(char *filename, struct stat *buf);
+extern int __LIB__ __SAVEFRAME__ stat(char *filename, struct stat *buf);
 
 extern int __LIB__ __FASTCALL__ mkdir(char *dirname);
 #define mkdir(a,b) mkdir(a)
