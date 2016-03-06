@@ -1,6 +1,7 @@
 ; uchar __FASTCALL__ inp(uint port)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC inp
 PUBLIC _inp
 

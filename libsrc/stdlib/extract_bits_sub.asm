@@ -9,6 +9,7 @@
 ;	DE = bit position (0..65535)
 ;	BC = size in bits
 
+SECTION code_clib
 PUBLIC extract_bits_sub
 
 .extract_bits_sub

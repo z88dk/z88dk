@@ -12,10 +12,11 @@
 ; *	djm 5/1/2000
 ; *
 ; * -----
-; * $Id: atoi.asm,v 1.9 2016-03-04 23:48:12 dom Exp $
+; * $Id: atoi.asm,v 1.10 2016-03-06 22:03:07 dom Exp $
 ; *
 ; */
 
+SECTION code_clib
 PUBLIC atoi
 PUBLIC _atoi
 EXTERN l_neg, stdio_atou, asm_isspace

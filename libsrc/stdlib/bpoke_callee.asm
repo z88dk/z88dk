@@ -1,6 +1,7 @@
 ; void __CALLEE__ bpoke_callee(void *addr, uchar byte)
 ; 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC bpoke_callee
 PUBLIC _bpoke_callee
 PUBLIC ASMDISP_BPOKE_CALLEE

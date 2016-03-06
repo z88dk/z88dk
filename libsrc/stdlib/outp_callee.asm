@@ -1,6 +1,7 @@
 ; void outp_callee(uint port, uchar byte)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC outp_callee
 PUBLIC _outp_callee
 PUBLIC ASMDISP_OUTP_CALLEE

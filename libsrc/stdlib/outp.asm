@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC outp
 PUBLIC _outp
 EXTERN outp_callee

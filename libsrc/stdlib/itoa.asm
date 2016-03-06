@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC itoa
 PUBLIC _itoa
 EXTERN itoa_callee

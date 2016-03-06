@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC wpoke
 PUBLIC _wpoke
 EXTERN wpoke_callee

@@ -8,13 +8,14 @@
 ;       Liberated from ticalc.org, mods to standard z80 by djm 11/4/99
 ;
 ; -----
-; $Id: rand.asm,v 1.9 2016-03-04 23:48:13 dom Exp $
+; $Id: rand.asm,v 1.10 2016-03-06 22:03:07 dom Exp $
 
 ; you must declare an integer C variable "std_seed" to hold the
 ; 16-bit seed in your main.c file
 ;
 ; int std_seed;
 
+SECTION code_clib
 PUBLIC rand
 PUBLIC _rand
 EXTERN _std_seed

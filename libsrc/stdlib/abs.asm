@@ -6,8 +6,9 @@
 ; version would do..
 ;
 ; -----
-; $Id: abs.asm,v 1.7 2016-03-04 23:48:12 dom Exp $
+; $Id: abs.asm,v 1.8 2016-03-06 22:03:07 dom Exp $
 
+	SECTION		code_clib
 PUBLIC abs
 PUBLIC _abs
 EXTERN l_neg

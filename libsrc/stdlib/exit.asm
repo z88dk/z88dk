@@ -10,8 +10,9 @@
 ;though...
 ;
 ; -----
-; $Id: exit.asm,v 1.7 2016-03-04 23:10:03 dom Exp $
+; $Id: exit.asm,v 1.8 2016-03-06 22:03:07 dom Exp $
 
+SECTION code_clib
 PUBLIC exit
 PUBLIC _exit
 

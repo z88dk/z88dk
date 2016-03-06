@@ -6,6 +6,7 @@
 ; unsigned long extract_bits(unsigned char *resp, unsigned int start, unsigned int size)
 ;
 
+SECTION code_clib
 PUBLIC extract_bits_callee
 PUBLIC _extract_bits_callee
 PUBLIC ASMDISP_EXTRACT_BITS_CALLEE

@@ -6,8 +6,9 @@
 ;       void srand(int) - seed "random" number
 ;
 ; -----
-; $Id: srand.asm,v 1.7 2016-03-04 23:48:13 dom Exp $
+; $Id: srand.asm,v 1.8 2016-03-06 22:03:07 dom Exp $
 
+SECTION code_clib
 PUBLIC srand
 PUBLIC _srand
 EXTERN _std_seed

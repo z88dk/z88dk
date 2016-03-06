@@ -6,11 +6,12 @@
 ;       27/11/98 djm - allows upto 32 levels of exit routines
 ;
 ; -----
-; $Id: atexit.asm,v 1.7 2016-03-04 23:48:12 dom Exp $
+; $Id: atexit.asm,v 1.8 2016-03-06 22:03:07 dom Exp $
 
 ; int atexit((void *)(void))
 ; FASTCALL
 
+SECTION code_clib
 PUBLIC atexit
 PUBLIC _atexit
 EXTERN exitsp, exitcount

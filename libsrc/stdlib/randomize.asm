@@ -7,8 +7,9 @@
 ;       void randomize() - randomize the seed for rand()
 ;
 ; -----
-; $Id: randomize.asm,v 1.5 2016-03-04 23:48:13 dom Exp $
+; $Id: randomize.asm,v 1.6 2016-03-06 22:03:07 dom Exp $
 
+SECTION code_clib
 PUBLIC randomize
 PUBLIC _randomize
 EXTERN _std_seed

@@ -6,6 +6,7 @@
 ;
 ;*****************************************************
 
+SECTION code_clib
 PUBLIC isqrt
 PUBLIC _isqrt
 

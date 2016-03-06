@@ -1,6 +1,7 @@
 ; unsigned long UNSTUFF_BITS(unsigned char *resp, unsigned int start, unsigned int size)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC extract_bits
 PUBLIC _extract_bits
 
