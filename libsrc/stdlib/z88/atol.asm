@@ -5,13 +5,14 @@
 ; *
 ; *	djm 25/2/2001
 ; *
-; *	$Id: atol.asm,v 1.5 2016-03-04 23:48:13 dom Exp $
+; *	$Id: atol.asm,v 1.6 2016-03-06 21:56:32 dom Exp $
 ; */
 
 ; Removed C front end to make FASTCALL, consistent with
 ; all other targets.  Was atol.c, that file now removed.
 ; 12.2006 aralbrec
 
+SECTION		code_clib
 PUBLIC atol
 PUBLIC _atol
 PUBLIC ASMDISP_ATOL
@@ -28,7 +29,7 @@ PUBLIC ASMDISP_ATOL
    add hl,sp
    ex de,hl                  ; hl = char*, de = & long
    ld b,254
-   call_oz(gn_gdn)
+   call_oz(gn_gdn)	     ; preserves ix
    pop hl
    pop de
    ret z                     ; was a number

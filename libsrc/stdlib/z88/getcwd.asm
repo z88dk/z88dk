@@ -11,11 +11,12 @@
 ;
 ;
 ; -----
-; $Id: getcwd.asm,v 1.10 2016-03-04 23:48:13 dom Exp $
+; $Id: getcwd.asm,v 1.11 2016-03-06 21:56:32 dom Exp $
 
                 INCLUDE "syspar.def"
                 INCLUDE	"memory.def"
 
+		SECTION	  code_clib
                 PUBLIC    getcwd
                 PUBLIC    _getcwd
                 EXTERN    readbyte        ;standard.EXTERN
@@ -39,7 +40,7 @@
         push    de
         push    bc
         ld      bc,nq_dir       ;ask for current directory
-        call_oz(os_nq)
+        call_oz(os_nq)		;preserves ix
         exx
         pop     bc              ;max len
         pop     de              ;buffer
@@ -53,7 +54,7 @@
         or      b
         ret     z               ;we've filled our buffer
         exx
-	call_oz(gn_rbe)
+	call_oz(gn_rbe)		;preserves ix
         inc     hl
         exx
         ld      (de),a

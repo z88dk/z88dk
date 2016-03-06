@@ -10,9 +10,10 @@
 ; If we can't have usleep we'll have csleep instead!
 ;
 ; -----
-; $Id: csleep.asm,v 1.7 2016-03-04 23:48:13 dom Exp $
+; $Id: csleep.asm,v 1.8 2016-03-06 21:56:32 dom Exp $
 
 
+		SECTION	code_clib
                 INCLUDE "time.def"
 
                 PUBLIC    csleep
@@ -35,7 +36,7 @@
         ld      a,b
         or      c
         jr      z,csleep1
-        call_oz(os_dly)
+        call_oz(os_dly)		;preserves ix
         ld      hl,1
         ret     c
 .csleep1

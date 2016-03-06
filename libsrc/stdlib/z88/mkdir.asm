@@ -8,13 +8,14 @@
 ; This doesn't check for validity of filename at all.
 ;
 ; -----
-; $Id: mkdir.asm,v 1.7 2016-03-04 23:48:13 dom Exp $
+; $Id: mkdir.asm,v 1.8 2016-03-06 21:56:32 dom Exp $
 
                 INCLUDE "fileio.def"
                 INCLUDE "stdio.def"
                 INCLUDE "dor.def"
                 INCLUDE "error.def"
 
+		SECTION	  code_clib
                 PUBLIC    mkdir
                 PUBLIC    _mkdir
 
@@ -26,6 +27,7 @@
 .mkdir
 ._mkdir
 ;Repeating stuff from fopen, very bad but...
+	push	ix		;save callers ix
         ld      d,OP_DIR        ;make directory
 ;Try to open the file
 ;d=access mode..
@@ -39,7 +41,7 @@
         ex      de,hl   ;put this in final place
         ld      c,8     ;max chars to expand..
 ;Now, find the filename!
-        ld      hl,4+10
+        ld      hl,4+10+2
         add     hl,sp
         ld      a,(hl)
         inc     hl
@@ -55,11 +57,13 @@
         ex      af,af'
 ;ix is our dor handle
         ld      hl,1
-        ret     c
+        jr	c,mkdir_exit	;failed to create
 ;Now we have to free the directory dor
         ld      a,dr_fre
         call_oz(os_dor)
-        ld      hl,0            ;NULL
+        ld      hl,0            ;success
+mkdir_exit:
+	pop	ix		;restore callers ix
         ret
 
 

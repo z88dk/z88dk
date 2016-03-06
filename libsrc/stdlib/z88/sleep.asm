@@ -10,11 +10,12 @@
 ;		 - Return number of seconds left
 ;
 ; -----
-; $Id: sleep.asm,v 1.7 2016-03-04 23:48:13 dom Exp $
+; $Id: sleep.asm,v 1.8 2016-03-06 21:56:32 dom Exp $
 
 
 		INCLUDE "time.def"
 
+		SECTION	  code_clib
 		PUBLIC    sleep
 		PUBLIC    _sleep
 		EXTERN	l_mult
