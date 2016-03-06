@@ -5,6 +5,7 @@
 ;       The old routine is fubarred! Written a new one now..but
 ;       I'm mystified!
 
+                SECTION   code_crt0_sccz80
 PUBLIC    l_long_sub
 
 ; dehl = primary

@@ -11,6 +11,7 @@
 ;       aralbrec 01/2007
 ;       Sped up, would be better with counter in a or b
 
+                SECTION   code_crt0_sccz80
 PUBLIC    l_long_asro
 
 ; Shift primary (on stack) right by secondary, 

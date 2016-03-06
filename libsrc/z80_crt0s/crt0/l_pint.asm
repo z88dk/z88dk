@@ -4,6 +4,7 @@
 ;
 ;       6/9/98  djm
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_pint
 
 ; store int from HL into (DE)

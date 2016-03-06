@@ -2,6 +2,7 @@
 ;
 ;       Get Long Pointer from Near Memory
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_getptr
 
 

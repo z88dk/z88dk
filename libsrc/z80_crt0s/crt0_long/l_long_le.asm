@@ -2,6 +2,7 @@
 ;       Long functions
 ;
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_long_le
                 EXTERN     l_long_cmp
 

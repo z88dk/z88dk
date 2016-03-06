@@ -8,6 +8,7 @@
 ;       shifts are faster than doubling and ex with de/hl
 
 
+                SECTION   code_crt0_sccz80
 PUBLIC l_long_asl
 
 

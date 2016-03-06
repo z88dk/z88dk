@@ -2,6 +2,7 @@
 ;       l_gchar variant to be used sometimes by the peephole optimizer
 ;
 
+                SECTION   code_crt0_sccz80
 PUBLIC l_g2charspsp
 .l_g2charspsp
 	add	hl,sp

@@ -5,6 +5,7 @@
 ;
 ; This is the unsigned routine...disregards signs and just does it..
 
+                SECTION   code_crt0_sccz80
 PUBLIC     l_div_u
 PUBLIC     L_DIVENTRY
                 

@@ -6,6 +6,7 @@
 ;       djm 24/4/99
 
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    htonl
 
 .htonl

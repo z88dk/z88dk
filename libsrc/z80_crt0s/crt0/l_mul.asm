@@ -3,6 +3,7 @@
 ;
 ; Multiply two 16 bit numbers hl=hl*de ((un)signed)
 
+                SECTION   code_crt0_sccz80
                 PUBLIC     l_mult
 
 ;New version 15/11/98  based on Spectrum ROM routine

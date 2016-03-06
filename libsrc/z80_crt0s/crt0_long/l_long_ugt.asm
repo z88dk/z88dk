@@ -3,6 +3,7 @@
 ;       Long library functions
 ;
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_long_ugt
                 EXTERN     l_long_ucmp
 

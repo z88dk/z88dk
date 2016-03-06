@@ -7,6 +7,7 @@
 ;       out which one was larger
 ;
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_long_ucmp
 
 

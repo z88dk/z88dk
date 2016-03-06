@@ -5,6 +5,7 @@
 ;
 ;       djm 26/2/2000
 
+                SECTION   code_crt0_sccz80
 PUBLIC    l_long_dec
 
 .l_long_dec

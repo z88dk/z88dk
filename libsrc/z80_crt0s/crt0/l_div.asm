@@ -4,6 +4,7 @@
 ; Moved from z88_crt0.asm to library function
 ;
 
+                SECTION   code_crt0_sccz80
 PUBLIC l_div
 
 EXTERN l_div_u

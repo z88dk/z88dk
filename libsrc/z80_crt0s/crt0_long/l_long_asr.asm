@@ -9,6 +9,7 @@
 ;       sped up some more
 
 
+                SECTION   code_crt0_sccz80
 PUBLIC    l_long_asr
 
 ; Shift primary (on stack) right by secondary, 

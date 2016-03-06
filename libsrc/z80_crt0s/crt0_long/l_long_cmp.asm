@@ -26,6 +26,7 @@
 ;                nc=number is positive
 
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_long_cmp
 
 

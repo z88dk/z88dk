@@ -2,6 +2,7 @@
 ;       l_gint variant to be used sometimes by the peephole optimizer
 ;
 
+                SECTION   code_crt0_sccz80
 PUBLIC l_g2intspsp
 .l_g2intspsp
 	add	hl,sp

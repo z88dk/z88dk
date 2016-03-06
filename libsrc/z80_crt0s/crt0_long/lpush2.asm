@@ -13,6 +13,7 @@
 
 ; actually use of ix saves us 4T
 
+                SECTION   code_crt0_sccz80
 PUBLIC    lpush2
 
 .lpush2

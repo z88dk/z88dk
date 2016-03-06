@@ -4,6 +4,7 @@
 ;
 ;	Quicky to make network progs quicker
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_ghtonsint
 
 

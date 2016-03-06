@@ -3,9 +3,10 @@
 ;
 ;	Signed integer compare
 ;
-;	$Id: l_cmp.asm,v 1.8 2015-01-19 01:33:25 pauloscustodio Exp $:
+;	$Id: l_cmp.asm,v 1.9 2016-03-06 21:35:27 dom Exp $:
 
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_cmp
 
 ; signed compare of DE and HL

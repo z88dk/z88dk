@@ -4,6 +4,7 @@
 ;
 ;       23/1/2001  djm
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_pint_pop
 		EXTERN	l_pint
 

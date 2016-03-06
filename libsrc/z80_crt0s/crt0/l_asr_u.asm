@@ -6,7 +6,7 @@
 ;
 ;       22/3/99 djm Rewritten to be shorter.. unsigned version
 
-
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_asr_u
 
 .l_asr_u

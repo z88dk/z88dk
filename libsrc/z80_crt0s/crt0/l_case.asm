@@ -2,6 +2,8 @@
 ;       The new case statement..maybe things will work now!
 ;       13/10/98
 
+
+                SECTION   code_crt0_sccz80
         PUBLIC    l_case
 
 

@@ -6,6 +6,7 @@
 ;
 ;	Optimization...check for equality
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_pint_eq
 
 ; store int from HL into (DE)

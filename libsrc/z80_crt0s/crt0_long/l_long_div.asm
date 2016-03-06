@@ -10,6 +10,7 @@
 ;
 ;       Replaced use of ix with bcbc'
 
+                SECTION   code_crt0_sccz80
 PUBLIC    l_long_div
 
 EXTERN     l_long_div_u, l_long_neg

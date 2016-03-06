@@ -12,6 +12,7 @@
 ;
 ;       Replaced use of ix with bcbc'
 
+                SECTION   code_crt0_sccz80
 PUBLIC    l_long_div_u
 PUBLIC    L_LONG_DIVIDE0, L_LONG_DIVENTRY
 

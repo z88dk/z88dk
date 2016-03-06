@@ -5,6 +5,8 @@
 ;       This routine is needed by printf & scanf etc
 ;       Added   10/10/98 djm
 
+
+		SECTION	  code_crt0_sccz80
                 PUBLIC    getarg
                 EXTERN     l_sxt
 

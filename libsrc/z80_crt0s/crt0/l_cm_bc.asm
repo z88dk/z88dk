@@ -4,6 +4,7 @@
 ;
 ;       6/9/98  djm
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_cm_bc
 
 .l_cm_bc

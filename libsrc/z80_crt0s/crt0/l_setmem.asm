@@ -1,5 +1,6 @@
 ; 01.2007 aralbrec
 
+                SECTION   code_crt0_sccz80
 PUBLIC l_setmem
 
 ; Many places in the library have functions
