@@ -18,14 +18,12 @@ u8_t rs232_get(i8_t *char)
 	INCLUDE	"serintfc.def"
 	ld	l,SI_GBT
 	ld	bc,0	;timeout
-	call_oz(os_si)
+	call_oz(os_si)	;preserves ix
 	pop	de
 	ld	hl,RS_ERR_NO_DATA
 	ret	c
 	ld	(de),a
 	ld	hl,RS_ERR_OK
-	ret
-	;push	bc		;any rubbish will do
 #endasm
 }
 
