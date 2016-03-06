@@ -8,10 +8,12 @@
 ;       djm 2/4/99
 ;
 ;
-;	$Id: puts_cons.asm,v 1.5 2016-03-04 23:10:03 dom Exp $
+;	$Id: puts_cons.asm,v 1.6 2016-03-06 21:36:52 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
+
+		SECTION	  code_clib
 
                 PUBLIC    puts_cons
                 PUBLIC    _puts_cons
@@ -29,14 +31,14 @@
         jr      z,putconsole_out
         cp      13
         jr      z,putconsole_nl
-        call_oz(os_out)
+        call_oz(os_out)		;preserves ix
 .putconsole_lp
         inc     hl
         jr      putconsole0
 .putconsole_out
-        call_oz(gn_nln)
+        call_oz(gn_nln)		;preserves ix
         ret
 .putconsole_nl
-        call_oz(gn_nln)
+        call_oz(gn_nln)		;preserves ix
         jr      putconsole_lp
                 

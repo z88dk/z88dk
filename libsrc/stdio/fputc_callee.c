@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputc_callee.c,v 1.4 2015-01-21 13:27:16 stefano Exp $
+ * $Id: fputc_callee.c,v 1.5 2016-03-06 21:36:52 dom Exp $
  */
 
 
@@ -25,10 +25,18 @@ int fputc_callee(int c,FILE *fp)
 #asm
 
 	pop	de
-	pop	ix	;fp
+	pop	hl	;fp
 	pop	bc	;c
+	push 	de
 
-	push de
+        push	ix
+
+	push	hl
+	pop	ix
+	call	asmentry
+
+	pop	ix	
+	ret
 
 .asmentry
 

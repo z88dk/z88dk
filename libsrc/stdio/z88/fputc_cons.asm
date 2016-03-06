@@ -9,10 +9,12 @@
 ;
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.5 2016-03-04 23:10:03 dom Exp $
+;	$Id: fputc_cons.asm,v 1.6 2016-03-06 21:36:52 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
+
+		SECTION	  code_clib
 
                 PUBLIC    fputc_cons	;Print char
                 PUBLIC    _fputc_cons	;Print char
@@ -24,12 +26,12 @@
         ld      a,(hl)
         cp      13
         jr      z,putchar1
-        call_oz(os_out)
+        call_oz(os_out)		;preserves ix
 	ld	l,a
 	ld	h,0
         ret
 .putchar1
-        call_oz(gn_nln)
+        call_oz(gn_nln)		;preserves ix
 	ld	hl,13
 	ret
 

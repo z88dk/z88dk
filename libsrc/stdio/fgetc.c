@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fgetc.c,v 1.12 2013-06-11 13:06:37 stefano Exp $
+ * $Id: fgetc.c,v 1.13 2016-03-06 21:36:52 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -29,23 +29,26 @@ int fgetc(FILE *fp)
 //#ifdef Z80
 #asm
 	pop	bc
-	pop	ix	;fp
-	push	ix
+	pop	hl	;fp
+	push	hl
 	push	bc
+        push    ix      ; callers ix
+        push    hl
+        pop     ix
 
 	ld	hl,-1	;EOF
 	ld	a,(ix+fp_flags)	;get flags
 	and	a
-	ret	z
+	jp	z, fgetc_end
 	and	_IOWRITE | _IOEOF	;check we`re not write/EOF
-	ret	nz
+	jp      nz, fgetc_end
 	ld	a,(ix+fp_ungetc)	;check for ungot char
 	and	a
 	jr	z,no_ungetc
 	ld	l,a
 	ld	h,0
 	ld	(ix+fp_ungetc),h
-	ret
+        jr      fgetc_end
 .no_ungetc
 ; Now do strings
 	ld	a,(ix+fp_flags)
@@ -59,10 +62,10 @@ int fgetc(FILE *fp)
 	ld	(ix+fp_desc+1),d
 	ld	hl,-1	;EOF
 	and	a	;test for zero
-	ret	z	;return EOF if so
+	jr      z,fgetc_end	;return EOF if so
 	ld	l,a	;else return character
 	ld	h,0
-	ret
+        jr      fgetc_end
 .no_string
 #ifdef NET_STDIO
 	ld	a,(ix+fp_flags)
@@ -75,7 +78,7 @@ int fgetc(FILE *fp)
 	call	fgetc_net
 	pop	bc
 	pop	ix
-	ret	nc
+	jr      nc, fgetc_end
 	jr	seteof	;EOF reached (sock closed?)
 .no_net
 #endif
@@ -92,7 +95,7 @@ int fgetc(FILE *fp)
 	push    hl
 	call    fputc_cons
 	pop     hl
-	ret			; always succeeds - never EOF when EOF has not been defined.
+        jr      fgetc_end ; always succeeds - never EOF when EOF has not been defined.
 .no_stdin
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
@@ -129,13 +132,13 @@ int fgetc(FILE *fp)
 #ifdef __STDIO_BINARY
 	ld	a,_IOTEXT	;check for text mode
 	and	(ix+fp_flags)
-	ret	z
+	jr      z,fgetc_end
 	ld	a,l		;load bytes
 	sub	__STDIO_EOFMARKER	;compare with the EOF marker
 	and	a		;reset carry
-	ret	nz
+        jr      nz,fgetc_end
 #else
-	ret	nc		;no error so return (make sure other
+	jr      nc,fgetc_end		;no error so return (make sure other
 				;implementations respect this!)
 #endif
 .is_eof
@@ -144,6 +147,8 @@ int fgetc(FILE *fp)
 	ld	a,(ix+fp_flags)
 	or	_IOEOF
 	ld	(ix+fp_flags),a	;set EOF, return with EOF
+.fgetc_end
+        pop     ix
 #endasm
 /*
 #else

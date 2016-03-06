@@ -12,11 +12,13 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: gets.asm,v 1.5 2016-03-04 23:10:03 dom Exp $
+;	$Id: gets.asm,v 1.6 2016-03-06 21:36:52 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
                 INCLUDE	"syspar.def"
+
+		SECTION   code_clib
 
                 PUBLIC    gets
                 PUBLIC    _gets
@@ -29,7 +31,7 @@
 ._gets
 	xor	a
 	ld	bc,nq_wcur
-	call_oz(os_nq)		;gives x in c, y in b
+	call_oz(os_nq)		;gives x in c, y in b, preserves ix
 	push	bc		;keep it
         ld      hl,4
         add     hl,sp
@@ -41,7 +43,7 @@
 	ld	b,255		;max length we can read
 .loopyloo
         push    de              ;preserve buffer
-        call_oz(gn_sip)
+        call_oz(gn_sip)		;preserves ix
         pop     hl
         push    af
         cp      $80
@@ -72,13 +74,13 @@
 	push	hl	;preserve stuff
 	push	bc
 	ld	hl,xystr
-	call_oz(gn_sop)
+	call_oz(gn_sop)		;preserves ix
 	ld	a,e
 	add	a,32
-	call_oz(os_out)
+	call_oz(os_out)		;preserves ix
 	ld	a,d
 	add	a,32
-	call_oz(os_out)
+	call_oz(os_out)		;preserves ix
 	pop	bc
 	pop	hl
 	push	de	;keep xy posn on the stack once more
@@ -89,5 +91,6 @@
 	ld	a,8 | 1	;return ctrl + buffer got data
 	jr	loopyloo
 
+	SECTION	rodata_clib
 .xystr
 	defb	1,'3','@',0

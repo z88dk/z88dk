@@ -2,6 +2,8 @@
 	PUBLIC	fabandon
 	PUBLIC	_fabandon
 
+	SECTION	code_clib
+
 fabandon:
 _fabandon:
         pop     de

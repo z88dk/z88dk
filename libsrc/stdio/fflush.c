@@ -4,7 +4,7 @@
  *	Only really valid for TCP net connections
  *
  * --------
- * $Id: fflush.c,v 1.3 2001-04-13 14:13:58 stefano Exp $
+ * $Id: fflush.c,v 1.4 2016-03-06 21:36:52 dom Exp $
  */
 
 #ifdef Z80
@@ -20,22 +20,23 @@ int fflush(FILE *fp)
 #asm
 #ifdef NET_STDIO
 	pop	bc
-	pop	ix
-	push	ix
-	push	bc
-	ld	hl,-1	;EOF
-	ld	a,(ix+fp_flags)
-	ld	c,a
-	and	_IOUSE
-	ret	z	;not used
-	ld	a,c
-	and	_IONETWORK
-	ret	z	;not network
-	ld	l,(ix+fp_desc)
-	ld	h,(ix+fp_desc+1)
+	pop	hl
 	push	hl
+	push	bc
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	a,(hl)
+	and	_IOUSE|_IONETWORK
+	jr	z,fflush_error 	;not used
+	push	de
 	call	fflush_net
 	pop	bc
+        ret
+.fflush_error
+	ld	hl,-1	; EOF
+	ret
 #else
 	ld	hl,0
 #endif

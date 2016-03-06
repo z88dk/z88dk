@@ -12,11 +12,13 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: fgets_cons.asm,v 1.7 2016-03-04 23:10:03 dom Exp $
+;	$Id: fgets_cons.asm,v 1.8 2016-03-06 21:36:52 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
                 INCLUDE	"syspar.def"
+
+		SECTION	  code_clib
 
                 PUBLIC    fgets_cons
                 PUBLIC    _fgets_cons
@@ -29,7 +31,7 @@
 ._fgets_cons
 	xor	a
 	ld	bc,nq_wcur
-	call_oz(os_nq)		;gives x in c, y in b
+	call_oz(os_nq)		;gives x in c, y in b, preserves ix
 	push	bc		;keep it
         ld      hl,4
         add     hl,sp
@@ -47,7 +49,7 @@
 	dec	b		;decrement count so we can put in a \n
 .loopyloo
         push    de              ;preserve buffer
-        call_oz(gn_sip)
+        call_oz(gn_sip)		;preserves ix
         pop     hl
         push    af
         cp      $80
@@ -90,10 +92,10 @@
 	push	hl	;preserve stuff
 	push	bc
 	ld	hl,xystr
-	call_oz(gn_sop)
+	call_oz(gn_sop)		;preserves ix
 	ld	a,e
 	add	a,32
-	call_oz(os_out)
+	call_oz(os_out)		;preserves ix
 	ld	a,d
 	add	a,32
 	call_oz(os_out)
@@ -106,6 +108,8 @@
 	ld	b,(hl)	;max length of buffer
 	ld	a,8 | 1	;return ctrl + buffer got data
 	jr	loopyloo
+
+	SECTION	rodata_clib
 
 .xystr
 	defb	1,'3','@',0

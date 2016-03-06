@@ -1,14 +1,13 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.48 2015-11-05 16:08:04 stefano Exp $
+# $Id: Makefile,v 1.49 2016-03-06 21:36:52 dom Exp $
 #
 
 include ../Make.config
 
 STDCFILES = \
 	closeall.c \
-	fabandon.c \
 	fchkstd.c \
 	fdopen.c \
 	feof.c \

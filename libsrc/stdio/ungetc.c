@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: ungetc.c,v 1.3 2003-10-01 20:00:16 dom Exp $
+ * $Id: ungetc.c,v 1.4 2016-03-06 21:36:52 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -17,24 +17,28 @@ int ungetc(int c, FILE *fp)
 {
 #ifdef Z80
 #asm
-	pop	de	;ret
-	pop	ix	;fp
+	pop	hl	;ret
+	pop	de      ;fp
 	pop	bc	;c
 	push	bc
-	push	ix
 	push	de
+	push	hl
 	ld	hl,-1	;EOF
-	ld	a,(ix+fp_flags)
+	inc	de
+	inc	de	;now on flags
+	ld	a,(de)
 	ld	b,a
 	and	_IOUSE
 	ret	z	;not being used
 	ld	a,b
 	and	_IOEOF |_IOWRITE
 	ret	nz	;cant push back after EOF (or for write stream)
-	ld	a,(ix+fp_ungetc)
+	inc	de	;now on ungetc
+	ld	a,(de)
 	and	a
 	ret	nz
-	ld	(ix+fp_ungetc),c	;store the char
+        ex	de,hl
+	ld	(hl),c	;store the char
 	ld	l,c			;return it
 	ld	h,0
 #endasm

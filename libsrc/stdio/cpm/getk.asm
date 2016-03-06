@@ -7,9 +7,10 @@
 ;	Stefano Bodrato - Mar. 2004 - fixed
 ;
 ;
-;	$Id: getk.asm,v 1.6 2016-03-05 00:30:16 dom Exp $
+;	$Id: getk.asm,v 1.7 2016-03-06 21:36:52 dom Exp $
 ;
 
+	SECTION	code_clib
 	PUBLIC	getk
 	PUBLIC	_getk
 

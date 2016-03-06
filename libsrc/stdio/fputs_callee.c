@@ -6,7 +6,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fputs_callee.c,v 1.4 2015-01-21 13:27:16 stefano Exp $
+ * $Id: fputs_callee.c,v 1.5 2016-03-06 21:36:52 dom Exp $
  */
 
 
@@ -20,11 +20,17 @@ int fputs_callee(unsigned char *s,FILE *fp)
 //#ifdef Z80
 #asm
 
-	pop	hl	;ret
-	pop	ix	;fp
+	pop	bc	;ret
+	pop	hl	;fp
 	pop	de	;s
 
-	push hl
+	push 	bc	;ret address
+	push	ix	;save callers ix
+	push	hl
+	pop	ix
+	call	asmentry
+	pop	ix
+	ret
 
 .asmentry
 

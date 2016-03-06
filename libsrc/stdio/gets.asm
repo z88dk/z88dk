@@ -4,10 +4,11 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.11 2016-03-04 23:10:03 dom Exp $
+;	$Id: gets.asm,v 1.12 2016-03-06 21:36:52 dom Exp $
 ;
 
 
+		SECTION	code_clib
 		PUBLIC  gets
 		PUBLIC  _gets
 		EXTERN   fgetc_cons

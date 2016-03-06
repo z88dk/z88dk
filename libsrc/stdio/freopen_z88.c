@@ -9,7 +9,7 @@
  *	djm 1/4/2000 Modified to enable file structures
  *
  * --------
- * $Id: freopen_z88.c,v 1.8 2012-06-13 11:04:30 stefano Exp $
+ * $Id: freopen_z88.c,v 1.9 2016-03-06 21:36:52 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -25,7 +25,6 @@ FILE *freopen_z88(far char *name, unsigned char *mode, FILE *fp, char *explicit,
 	int	flags;
 	int fd;
 	FILE *fp2;
-	
 	switch (*(unsigned char *)mode) {
 		case 'r':
 			access=O_RDONLY;

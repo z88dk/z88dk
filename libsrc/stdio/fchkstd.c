@@ -8,7 +8,7 @@
  *		 1 = input, nc
  *		-1 = output, nc
  * --------
- * $Id: fchkstd.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
+ * $Id: fchkstd.c,v 1.3 2016-03-06 21:36:52 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -24,17 +24,19 @@ int fchkstd(FILE *fp)
 {
 #ifdef Z80
 #asm
+	pop	af
 	pop	de
-	pop	ix
-	push	ix
 	push	de
+	push	af
 	ld	hl,0
-	ld	a,(ix+fp_flags)
+	inc	de
+	inc	de	; points to +fp_flags
+	ld	a,(de)
 	and	_IOSYSTEM
 	scf
 	ret	z	;non system return 0
 	dec	hl	;-1
-	ld	a,(ix+fp_flags)
+	ld	a,(de)
 	and	_IOREAD
 	and	a	;don`t think this is necessary
 	ret	nz

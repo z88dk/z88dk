@@ -6,10 +6,12 @@
 ;1/4/2000  - Renamed to fgetc_cons
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.5 2016-03-04 23:10:03 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.6 2016-03-06 21:36:52 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
+
+		SECTION	  code_clib
 
                 PUBLIC    fgetc_cons
                 PUBLIC    _fgetc_cons
@@ -19,7 +21,7 @@
 .fgetc_cons
 ._fgetc_cons
 .gkloop
-        call_oz(os_in)
+        call_oz(os_in)		;preserves ix
         jr      c,gkloop
         and     a
         jp      z,getcmd

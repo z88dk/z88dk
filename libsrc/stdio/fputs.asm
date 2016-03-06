@@ -1,17 +1,24 @@
 ; CALLER linkage for function pointers
 
+
+SECTION code_clib
 PUBLIC fputs
 EXTERN fputs_callee
 EXTERN ASMDISP_FPUTS_CALLEE
 
 .fputs
 
-	pop	hl	;ret
-	pop	ix	;fp
+	pop	bc	;ret
+	pop	hl	;fp
 	pop	de	;s
 	push	de
-	push	ix
 	push	hl
-   
-   jp fputs_callee + ASMDISP_FPUTS_CALLEE
+	push	bc
+
+        push    ix  ; callers ix
+        push    hl
+        pop     ix
+   	call	fputs_callee + ASMDISP_FPUTS_CALLEE
+	pop	ix	
+	ret
 

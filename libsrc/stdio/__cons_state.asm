@@ -1,4 +1,7 @@
 
+
+SECTION bss_clib
+
 PUBLIC __cons_state
 
 __cons_state:

@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fclose.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
+ * $Id: fclose.c,v 1.3 2016-03-06 21:36:52 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -23,49 +23,55 @@ int __FASTCALL__ fclose(FILE *fp)
 #ifdef Z80
 #asm
 	pop	de
-	pop	ix
-	push	ix
+	pop	hl
+	push	hl
 	push	de
-	ld	hl,-1	;EOF
-	ld	a,(ix+fp_flags)
-	ld	c,a
-	and	_IOUSE	;is it defined
-	ret	z	;no
-	ld	a,c
-	and	_IOSTRING	;string?
-	jr	nz,is_closed	;yes
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	a,(hl)
+	and	_IOUSE		;inuse?
+	jr	nz, fclose_inuse
+fclose_error:
+	ld	hl,-1		;EOF
+	ret
+fclose_inuse:
+	ld	a,(hl)
+	and	_IOSTRING
+	jr	nz,fclose_success
 #ifdef NET_STDIO
-	ld	a,c
+	ld	a,(hl)
 	and	_IONETWORK
-	jr	z,no_net
-	ld	l,(ix+fp_desc)
-	ld	h,(ix+fp_desc+1)
-	push	ix
+	jr	z,fclose_no_net
+
+	push	de
 	push	hl
 	call	closenet
-	jr	ckclosed
-.no_net
+	jr	fclose_check_closed
+fclose_no_net:
 #endif
-	push	ix
-	call	fchkstd
-	pop	ix
-	jr	nc,is_closed	;was std* (def setup)
-	ld	l,(ix+fp_desc)
-	ld	h,(ix+fp_desc+1)
-	push	ix
-	push	hl
+	ld	a,(hl)
+	and	_IOSYSTEM
+	jr	nz, fclose_success
+
+	push	hl	; points to flags
+	push	de
 	call	close
-.ckclosed
-	pop	bc
-	pop	ix
-	ld	a,h
+fclose_check_success:
+	pop	bc	;fd
+	pop	de	;flags pointer
+	ld	a,h	; an error
 	or	l
 	ret	nz
-.is_closed
+	ex	de,hl
+fclose_success:
+	ld	(hl),0	;flags
+	dec	hl
+	ld	(hl),0	;descriptor + 1
+	dec	hl
+	ld	(hl),0
 	ld	hl,0
-	ld	(ix+fp_flags),l
-	ld	(ix+fp_desc),l
-	ld	(ix+fp_desc+1),h
 #endasm
 #else
         if ( (fp->flags&_IOUSE ==0 )  ||  (fp->flags&_IOSTRING) )  return(EOF);
