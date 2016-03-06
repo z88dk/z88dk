@@ -8,7 +8,7 @@
  *	djm 1/4/2000
  *
  * --------
- * $Id: fseek.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
+ * $Id: fseek.c,v 1.3 2016-03-06 12:12:57 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -23,8 +23,10 @@
 int fseek(FILE *fp, fpos_t posn, int whence)
 {
 	if ( fp->flags&_IOUSE && fchkstd(fp)== 0 ) {
-		if (lseek(fp->fd,posn,whence) != -1L )
+		if (lseek(fp->fd,posn,whence) != -1L ) {
+                        fp->flags &= ~_IOEOF;
 			return 0;
+                }
 	}
 	return 1;
 }
