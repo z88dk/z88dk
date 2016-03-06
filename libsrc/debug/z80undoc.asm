@@ -6,13 +6,16 @@
 ; *	TRUE if Z80 supports undocumented instructions.
 ; *	extern int  __LIB__ z80undoc(void);
 ; *
-; *	$Id: z80undoc.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
+; *	$Id: z80undoc.asm,v 1.3 2016-03-06 21:45:13 dom Exp $
 ; *
 
+	SECTION	code_clib
 	PUBLIC	z80undoc
+	PUBLIC	_z80undoc
 
 
 z80undoc:
+_z80undoc:
 	;xor	a
 	;ld	h,a
 	;push	hl	; protect stack in case we have a Rabbit
@@ -23,7 +26,8 @@ z80undoc:
 	;nop
 	;pop	hl
 	;jr	nz,notgenuine
-	
+
+	push	ix	;save callers ix	
 	xor	a
 	ld	h,a
 	ld	ix,$0101
@@ -35,6 +39,7 @@ z80undoc:
 	nop	; this could help z80 clones not to hurt too much
 	nop
 	
+	pop	ix	; restore callers ix
 	ld	l,a	; true (1)
 	ld	h,0
 	dec	a

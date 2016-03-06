@@ -1,6 +1,8 @@
 
 
+	SECTION	code_clib
 	PUBLIC	disz80
+	PUBLIC	_disz80
 	EXTERN	fputc_cons
 
 
@@ -8,12 +10,14 @@
 
 
 .disz80
+._disz80
 	pop	hl
 	pop	bc
 	pop	de
 	push	de
 	push	bc
 	push	hl
+	push	ix	;save callers ix
 	
 	ld	a,d
 	and	e
@@ -37,6 +41,7 @@
 	jr	nz,dizloop
 	ld	h,d
 	ld	l,e
+	pop	ix	;restore callers ix
 	ret
 
 ; ====================

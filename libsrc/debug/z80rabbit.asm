@@ -6,12 +6,15 @@
 ; *	TRUE if we're running on a rabbit.
 ; *	extern int  __LIB__ z80rabbit(void);
 ; *
-; *	$Id: z80rabbit.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
+; *	$Id: z80rabbit.asm,v 1.3 2016-03-06 21:45:13 dom Exp $
 ; *
 
+	SECTION	code_clib
 	PUBLIC	z80rabbit
+	PUBLIC	_z80rabbit
 
 z80rabbit:
+_z80rabbit:
 	ld	hl,0
 	ld	de,1
 	push	de

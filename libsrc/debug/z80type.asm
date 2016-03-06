@@ -15,13 +15,16 @@
 ; *	*** 7 - ? S1MP3 ?
 ; *	*** 8 - ? EZ80 ?
 ; *
-; *	$Id: z80type.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
+; *	$Id: z80type.asm,v 1.3 2016-03-06 21:45:13 dom Exp $
 ; *
 
+	SECTION	code_clib
 	PUBLIC	z80type
+	PUBLIC	_z80type
 
 
 z80type:
+_z80type:
 	ld	hl,0
 	ld	de,1
 	push	de
