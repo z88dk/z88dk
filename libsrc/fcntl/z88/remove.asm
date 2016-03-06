@@ -12,11 +12,13 @@
 ; 15/4/2000 Takes a near again (can change but effort!)
 ;
 ;
-;	$Id: remove.asm,v 1.4 2016-03-05 00:13:02 dom Exp $
+;	$Id: remove.asm,v 1.5 2016-03-06 20:36:13 dom Exp $
 ;
 
                 INCLUDE "fileio.def"
                 INCLUDE "stdio.def"
+
+                SECTION   code_clib
 
                 PUBLIC    remove
                 PUBLIC    _remove
@@ -30,7 +32,7 @@
         push    hl
         push    de
 	ld	b,0
-        call_oz(gn_del)
+        call_oz(gn_del)	;ix preserved
         ld      hl,0
         ret     nc
         dec     hl      ;=1

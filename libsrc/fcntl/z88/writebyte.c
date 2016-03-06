@@ -6,7 +6,7 @@
  * 	djm 4/5/99
  *
  * -----
- * $Id: writebyte.c,v 1.4 2013-03-03 23:51:11 pauloscustodio Exp $
+ * $Id: writebyte.c,v 1.5 2016-03-06 20:36:13 dom Exp $
  */
 
 
@@ -21,15 +21,20 @@ int writebyte(int fd, int byte)
         INCLUDE "fileio.def"
 	pop	bc
 	pop	hl	;byte
-	pop	ix	;file handle
-	push	ix
+	pop	de	;file handle
+	push	de
 	push	hl
 	push	bc
+
+        push    ix
+        push    de
+        pop     ix
 	ld	a,l
 
 	push	af
         call_oz(os_pb)
 	pop	af
+        pop     ix
         ld      hl,-1	;EOF
         ret     c
         ld      l,a

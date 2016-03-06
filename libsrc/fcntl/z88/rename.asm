@@ -8,11 +8,13 @@
 ; This doesn't check for validity of filename at all.
 
 ;
-;	$Id: rename.asm,v 1.4 2016-03-05 00:13:02 dom Exp $
+;	$Id: rename.asm,v 1.5 2016-03-06 20:36:13 dom Exp $
 ;
 
                 INCLUDE "fileio.def"
                 INCLUDE "stdio.def"
+
+                SECTION   code_clib
 
                 PUBLIC    rename
                 PUBLIC    _rename
@@ -30,7 +32,7 @@
         push    hl
         push    de
         push    bc
-        call_oz(gn_ren)
+        call_oz(gn_ren)	;ix preserved
         ld      hl,0
         ret     nc
         dec     hl      ;=1

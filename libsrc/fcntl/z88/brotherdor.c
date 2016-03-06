@@ -8,7 +8,7 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: brotherdor.c,v 1.4 2014-04-11 11:14:00 stefano Exp $
+ * $Id: brotherdor.c,v 1.5 2016-03-06 20:36:12 dom Exp $
  */
 
 #include <z88.h>
@@ -18,9 +18,12 @@ int brotherdor(int handle, char *type)
 #asm
 	INCLUDE	"dor.def"
 	pop	de
-	pop	ix
-	push	ix
+	pop	hl
+	push	hl
 	push	de
+	push	ix	;callers ix
+	push	hl
+	pop	ix
 	ld	a,dr_sib
 	call_oz(os_dor)
 	pop	de
@@ -30,6 +33,7 @@ int brotherdor(int handle, char *type)
 	push	de
 	push	ix
 	pop	hl	;return SON dor
+	pop	ix	;callers ix
 #endasm
 }
 

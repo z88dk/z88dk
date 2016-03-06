@@ -9,7 +9,7 @@
  *      fclose from the other stuff
  *
  * -----
- * $Id: close.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
+ * $Id: close.c,v 1.4 2016-03-06 20:36:12 dom Exp $
  */
 
 
@@ -31,9 +31,11 @@ int close(int fd)
         ld      hl,-1
         ret
 .l_close1
+	push	ix	;save callers ix
         push    hl
         pop     ix
         call_oz(gn_cl)
+	pop	ix
         jr      c,l_close0
         ld      hl,0
 #endasm

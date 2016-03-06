@@ -5,10 +5,12 @@
 ; 11/3/99 djm ***UNTESTED***
 ;
 ;
-;	$Id: fdgetpos.asm,v 1.6 2016-03-05 00:13:02 dom Exp $
+;	$Id: fdgetpos.asm,v 1.7 2016-03-06 20:36:12 dom Exp $
 ;
 
                 INCLUDE "fileio.def"
+
+		SECTION	  code_clib
 
                 PUBLIC    fdgetpos
                 PUBLIC    _fdgetpos
@@ -22,10 +24,14 @@
 ._fdgetpos
 	pop	bc
 	pop	de	;dump
-	pop	ix	;fd
-	push	ix
+	pop	hl	;fd
+	push	hl
 	push	de
 	push	bc
+	push	ix	;save callers ix
+	push	hl	;get file descriptor into right reg
+	pop	ix
+
         push    de              ;store dumping place
         ld      a,FA_PTR
         call_oz(os_frm)
@@ -38,9 +44,11 @@
         ld      (hl),e
         inc     hl
         ld      (hl),d
+	pop	ix
         ld      hl,0            ;no errors
         ret
 .fdgetpos_error
+        pop	ix		;callers
 	ld	hl,-1
 	ret
 

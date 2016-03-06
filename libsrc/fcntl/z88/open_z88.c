@@ -16,7 +16,7 @@
  *	djm 24/3/2000 - Takes a buffer for expanded filename
  *
  * -----
- * $Id: open_z88.c,v 1.3 2013-03-03 23:51:11 pauloscustodio Exp $
+ * $Id: open_z88.c,v 1.4 2016-03-06 20:36:13 dom Exp $
  */
 
 
@@ -26,8 +26,8 @@ int open_z88(far char *name, int flags, mode_t mode, char *buf, size_t len)
 {
 #asm
         INCLUDE "fileio.def"
-        
-        ld      ix,0
+       	push	ix		;save callers 
+        ld      ix,2
         add     ix,sp
         ld      l,(ix+10)        ;lower 16 of filename
         ld      h,(ix+11)
@@ -50,10 +50,12 @@ int open_z88(far char *name, int flags, mode_t mode, char *buf, size_t len)
 	ld	d,(ix+5)
         ld      c,(ix+2)        ;maximum length of expanded filename
         call_oz(gn_opf)
+        push    ix              ;get filedescriptor in ix into hl
+        pop     de
+	pop	ix		;restore callers
         ld      hl,-1
         ret     c               ;open error
-        push    ix              ;get filedescriptor in ix into hl
-        pop     hl
+	ex	de,hl		;hl=file descriptor
 #endasm
 }
 

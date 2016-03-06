@@ -8,7 +8,7 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: sondor.c,v 1.4 2014-04-11 11:14:00 stefano Exp $
+ * $Id: sondor.c,v 1.5 2016-03-06 20:36:13 dom Exp $
  */
 
 
@@ -19,18 +19,24 @@ int sondor(int handle, char *type)
 #asm
 	INCLUDE	"dor.def"
 	pop	de
-	pop	ix
-	push	ix
+	pop	hl
+	push	hl
 	push	de
+	push	ix		;save caller
+	push	hl
+	pop	ix
 	ld	a,dr_son
 	call_oz(os_dor)
+	pop	bc	
 	pop	de
 	pop	hl
 	ld	(hl),a	;store minor type
 	push	hl
 	push	de
+	push	bc
 	push	ix
 	pop	hl	;return SON dor
+	pop	ix	;old ix
 #endasm
 }
 

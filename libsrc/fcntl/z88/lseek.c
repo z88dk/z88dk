@@ -12,7 +12,7 @@
  *   2  SEEK_END from end of file (always -ve)
  *
  * -----
- * $Id: lseek.c,v 1.4 2014-04-11 11:14:00 stefano Exp $
+ * $Id: lseek.c,v 1.5 2016-03-06 20:36:12 dom Exp $
  */
 
 
@@ -22,8 +22,8 @@ long lseek(int fd, long posn, int whence)
 {
 #asm
         INCLUDE "fileio.def"
-        
-        ld      ix,0    
+        push	ix		;save callers 
+        ld      ix,2    
         add     ix,sp
         ld      a,(ix+2)        ;whence
         ld      e,(ix+8)
@@ -40,12 +40,14 @@ long lseek(int fd, long posn, int whence)
 .l_exit
         ld      hl,-1           ;load hlde with -1L
         ld      de,-1
-        ret     c               ;error
+        jr	c,l_exit_final               ;error
 ; Get the position of the file, use frm to do it
         ld      a,FA_PTR
         call_oz(os_frm)         ;must succeed if we get this far!
         ld      l,c             ;hl=bc
         ld      h,b
+l_exit_final:
+	pop	ix		;restore callers ix
         ret
 
 

@@ -4,7 +4,7 @@
  *	djm 13/3/2000 - Hacked from fopen
  *
  * -----
- * $Id: opendor.c,v 1.3 2013-03-03 23:51:11 pauloscustodio Exp $
+ * $Id: opendor.c,v 1.4 2016-03-06 20:36:13 dom Exp $
  */
 
 
@@ -19,6 +19,7 @@ int opendor(char *filename)
 	pop	de	;filename
 	push	de
 	push	bc
+	push	ix	;callers ix
         ld      hl,-10
         add     hl,sp
         ld      sp,hl
@@ -33,6 +34,7 @@ int opendor(char *filename)
         ld      sp,hl   ;restore our stack (we did nothing to it!)
 	push	ix
 	pop	hl
+	pop	ix	;restore callers ix
         ex      af,af	;exit we carry set for failure
 	ret	nc
 	ld	hl,0

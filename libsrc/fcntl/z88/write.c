@@ -9,7 +9,7 @@
  *      fclose from the other stuff
  *
  * -----
- * $Id: write.c,v 1.3 2013-03-03 23:51:11 pauloscustodio Exp $
+ * $Id: write.c,v 1.4 2016-03-06 20:36:13 dom Exp $
  */
 
 
@@ -22,7 +22,8 @@ size_t write(int fd, void *ptr, size_t len)
 #asm
         INCLUDE         "fileio.def"
 
-        ld      ix,2
+        push	ix
+        ld      ix,4
         add     ix,sp
         ld      c,(ix+0)        ;len
         ld      b,(ix+1)
@@ -38,5 +39,6 @@ size_t write(int fd, void *ptr, size_t len)
         pop     hl
         and     a
         sbc     hl,bc
+        pop     ix
 #endasm
 }

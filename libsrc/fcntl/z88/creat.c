@@ -6,7 +6,7 @@
  *      djm 27/4/99
  *
  * -----
- * $Id: creat.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
+ * $Id: creat.c,v 1.4 2016-03-06 20:36:12 dom Exp $
  */
 
 
@@ -16,8 +16,8 @@ int creat(far char *name, mode_t mode)
 {
 #asm
         INCLUDE "fileio.def"
-        
-        ld      ix,0
+        push	ix 		;save callers
+        ld      ix,2
         add     ix,sp
         ld      e,(ix+4)        ;lower 16 of filename
         ld      d,(ix+5)
@@ -29,15 +29,17 @@ int creat(far char *name, mode_t mode)
         ex      de,hl           ;swap where to expand and filename over
         ld      c,10            ;maximum length of expanded filename
         call_oz(gn_opf)
-        ex      af,af
+        ex      af,af		;save result flags
         ld      hl,10
         add     hl,sp
         ld      sp,hl           ;restore our stack (we did nothing to it!)
-        ex      af,af
+        push    ix              ;get filedescriptor in ix into de
+        pop     de		;
+	pop	ix		;restore callers ix
         ld      hl,-1
+        ex      af,af		;result flags
         ret     c               ;open error
-        push    ix              ;get filedescriptor in ix into hl
-        pop     hl
+	ex	de,hl
 #endasm
 }
 
