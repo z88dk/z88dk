@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.27 2015-01-07 05:33:54 aralbrec Exp $
+ *      $Id: main.c,v 1.28 2016-03-06 20:33:26 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -164,10 +164,8 @@ int main(int argc, char **argv)
    farheapsz=-1;         /* Size of far heap */
     assemtype = ASM_Z80ASM;
    printflevel=0;
-#ifdef USEFRAME
    indexix=YES;
    useframe=NO;
-#endif
 
         /*
          *      compiler body

@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.17 2016-03-04 23:07:11 dom Exp $
+ *      $Id: declfunc.c,v 1.18 2016-03-06 20:33:26 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -384,9 +384,7 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
     /* If we use frame pointer we preserve previous framepointer on entry
      * to each function
      */
-#ifdef USEFRAME
-	if (useframe) where+=2;
-#endif
+    if (useframe || (currfn->flags&SAVEFRAME) ) where+=2;
     while ( prevarg ) {
         lgh = 2 ;      /* Default length */
         /* This is strange, previously double check for ->type */
@@ -435,10 +433,8 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
         *iptr = where ;                                         /* insert offset */
         where += lgh ;                                          /* calculate next offset */
     }
-#ifdef USEFRAME
-	pushframe();
-#endif
-	currfn->handled=YES;
+    pushframe();
+    currfn->handled=YES;
     if (currfn->prototyped==1 && (currfn->flags&REGCALL) ) {
         /*
          * Fast call routine..

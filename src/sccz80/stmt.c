@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.19 2014-12-27 17:51:42 dom Exp $
+ *      $Id: stmt.c,v 1.20 2016-03-06 20:33:26 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -550,9 +550,7 @@ void leave(int vartype,char type)
         }
         Zsp=savesp;
     }
-#ifdef USEFRAME
     popframe();        /* Restore previous frame pointer */
-#endif
     if ( noaltreg && vartype == LONG )
         restorehl();
     if (type) setcond(type);

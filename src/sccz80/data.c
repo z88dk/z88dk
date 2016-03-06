@@ -6,7 +6,7 @@
  *      I'm starting to split these up once more and stick them in
  *      the relevant files..
  *
- *      $Id: data.c,v 1.38 2014-06-24 19:56:44 dom Exp $
+ *      $Id: data.c,v 1.39 2016-03-06 20:33:26 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -177,9 +177,7 @@ int doublestrings;
 /*
  *	Framepointer stuff - tis broken!
  */
-#ifdef USEFRAME
 int	useframe;
 int	indexix;
-#endif
 
 int     z80asm_sections;

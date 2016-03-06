@@ -8,7 +8,7 @@
  *
  *      Split into parts djm 3/3/99
  *
- *      $Id: declvar.c,v 1.22 2016-02-20 15:49:58 aralbrec Exp $
+ *      $Id: declvar.c,v 1.23 2016-03-06 20:33:26 dom Exp $
  *
  *      The Declaration Routines
  *      (Oh they're so much fun!!)
@@ -200,7 +200,8 @@ char zfar )                      /* TRUE if far */
     int size, ident, more, itag, type, size_st;
     int32_t addr = -1;
     char    flagdef,match,ptrtofn;
-    char    libdef,fastcall,callee;
+    char    fastcall,callee;
+    unsigned int libdef;
     SYMBOL *myptr ;
 
     do {
@@ -211,6 +212,7 @@ char zfar )                      /* TRUE if far */
         more =                                  /* assume dummy symbol not required */
             itag = 0 ;                              /* just for tidiness */
         flagdef=libdef=fastcall=callee=NO;
+        libdef=0;
 
 
 		match=ptrtofn=NO;
@@ -221,9 +223,10 @@ char zfar )                      /* TRUE if far */
             if (amatch("__LIB__") /* && libdef==0 */) {match=YES; libdef|=LIBRARY; }
             if (amatch("__FASTCALL__") ) {match=YES; fastcall=REGCALL; }
             if (amatch("__SHARED__") ) {match=YES; libdef|=SHARED; }
-			if (amatch("__SHAREDC__") ) {match=YES; libdef|=SHAREDC; }
-			if (amatch("__CALLEE__") ) {match=YES; callee=CALLEE; }
-			if (match ==NO )break;
+	    if (amatch("__SHAREDC__") ) {match=YES; libdef|=SHAREDC; }
+	    if (amatch("__CALLEE__") ) {match=YES; callee=CALLEE; }
+            if (amatch("__SAVEFRAME__") ) {match=YES; libdef|=SAVEFRAME; }
+	    if (match ==NO )break;
         }
 
         ident = get_ident() ;

@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.36 2016-03-04 23:07:10 dom Exp $
+ *      $Id: codegen.c,v 1.37 2016-03-06 20:33:26 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -2193,26 +2193,6 @@ void RestoreSP(char saveaf)
 	if (saveaf) doexaf();
 }
 
-void pushframe(void)
-{
-#ifdef USEFRAME
-	if (!useframe) return;
-	ot("push\t");
-	FrameP();
-	nl();
-#endif
-}
-
-void popframe(void)
-{
-#ifdef USEFRAME
-	if (!useframe) return;
-	ot("pop\t");
-	FrameP();
-	nl();
-#endif
-}
-
 void setframe(void)
 {
 #ifdef USEFRAME
@@ -2227,15 +2207,32 @@ void setframe(void)
 }
 
 
-void FrameP(void)
-{
-	if (indexix)
-		outstr("ix");
-	else
-		outstr("iy");
-}
 
 #endif
+
+void FrameP(void)
+{
+    outstr( indexix ? "ix" : "iy");
+}
+
+void pushframe(void)
+{
+    if ( useframe || (currfn->flags&SAVEFRAME) ) {
+	ot("push\t");
+	FrameP();
+	nl();
+    }
+}
+
+void popframe(void)
+{
+    if ( useframe || (currfn->flags&SAVEFRAME) ) {
+	ot("pop\t");
+	FrameP();
+	nl();
+    }
+}
+
 
 /*
  * Local Variables:

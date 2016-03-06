@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.15 2016-02-21 06:16:38 aralbrec Exp $
+ * $Id: define.h,v 1.16 2016-03-06 20:33:26 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -165,6 +165,7 @@ SYMBOL {
 #define SHAREDC 32	/* Call via rst (library is C code) */
 #define CALLEE  64	/* Called function pops regs */
 #define LIBRARY 128	/* Lib routine */
+#define SAVEFRAME 256     /* Save framepointer */
 
 /*
  * MKDEF is for masking unsigned and far
