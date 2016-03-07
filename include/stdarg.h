@@ -16,25 +16,35 @@
  *	I've only tested this with 2 byte arguments but it 
  *	seems to work...
  *
- *	$Id: stdarg.h,v 1.3 2001-10-16 18:30:32 dom Exp $
+ *	$Id: stdarg.h,v 1.4 2016-03-07 20:25:48 dom Exp $
  */
 
 #ifndef __STDARG_H__
 #define __STDARG_H__
 
+
+
+
+#ifdef Z88DK_USES_SDCC
+
+/* sdcc is a lot more standard */
+
+typedef unsigned char * va_list;
+#define va_start(marker, last)  { marker = (va_list)&last + sizeof(last); }
+#define va_arg(marker, type)    *((type *)((marker += sizeof(type)) - sizeof(type)))
+#define va_copy(dest, src)      { dest = src; }
+#define va_end(marker)          { marker = (va_list) 0; };
+#else
+
+/* sccz80 variant*/
 #ifndef DEF_GETARG
 #define DEF_GETARG
 extern int __LIB__ getarg(void);
 #endif
 
-
-
 #define va_list unsigned char *
-
 #define va_start(ap,last) ap=(getarg()*2)+&last-2
-
 #define va_arg(ap,type) (type *)*(ap-=sizeof(type))
-
 #define va_end(ap)
 
 /*
@@ -42,6 +52,7 @@ extern int __LIB__ getarg(void);
  * with a similar setup to the library printf routines
  */
 #define va_addr(ap,type) (ap-=sizeof(type))
+#endif
 
 
 #endif /* _STDARG_H */
