@@ -1,6 +1,7 @@
 ; void __CALLEE__ *ba_BestFit_callee(uchar q, uchar numq)
 ; 04.2004 aralbrec
 
+SECTION code_clib
 PUBLIC ba_BestFit_callee
 EXTERN BABestFit
 

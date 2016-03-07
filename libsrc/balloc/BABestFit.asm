@@ -1,5 +1,6 @@
 ; 04.2004 aralbrec
 
+SECTION code_clib
 PUBLIC BABestFit
 EXTERN _ba_qtbl
 
