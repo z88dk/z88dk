@@ -1,6 +1,7 @@
 ; void __CALLEE__ *calloc_callee(unsigned int nobj, unsigned int size) 
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC calloc_callee
 EXTERN ASMDISP_CALLOC_CALLEE
 

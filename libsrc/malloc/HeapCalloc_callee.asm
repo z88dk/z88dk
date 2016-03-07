@@ -1,6 +1,7 @@
 ; void __CALLEE__ *HeapCalloc_callee(void *heap, unsigned int nobj, unsigned int size)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC HeapCalloc_callee
 PUBLIC ASMDISP_HEAPCALLOC_CALLEE
 

@@ -1,6 +1,7 @@
 ; void __CALLEE__ HeapFree_callee(void *heap, void *addr)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC HeapFree_callee
 PUBLIC ASMDISP_HEAPFREE_CALLEE
 

@@ -1,6 +1,7 @@
 ; void __FASTCALL__ *malloc(unsigned int size)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC malloc
 
 EXTERN HeapAlloc_callee

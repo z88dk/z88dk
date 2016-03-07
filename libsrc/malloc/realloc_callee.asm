@@ -1,6 +1,7 @@
 ; void __CALLEE__ *realloc_callee(void *p, unsigned int size)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC realloc_callee
 PUBLIC ASMDISP_REALLOC_CALLEE
 

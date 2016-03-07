@@ -1,6 +1,7 @@
 ; void __CALLEE__ HeapRealloc_callee(void *heap, void *p, unsigned int size)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC HeapRealloc_callee
 PUBLIC ASMDISP_HEAPREALLOC_CALLEE
 

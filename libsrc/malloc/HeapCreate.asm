@@ -1,6 +1,7 @@
 ; void __FASTCALL__ HeapCreate(void *heap)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC HeapCreate
 EXTERN l_setmem
 

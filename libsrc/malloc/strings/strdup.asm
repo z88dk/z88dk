@@ -10,6 +10,7 @@
 ; char __FASTCALL *strdup(char *orig)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC strdup
 
 EXTERN HeapAlloc_callee

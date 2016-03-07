@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC HeapFree
 
 EXTERN HeapFree_callee

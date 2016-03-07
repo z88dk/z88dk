@@ -1,6 +1,7 @@
 ; void __CALLEE__ sbrk_callee(void *addr, unsigned int size)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC sbrk_callee
 PUBLIC ASMDISP_SBRK_CALLEE
 

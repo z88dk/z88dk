@@ -1,5 +1,6 @@
 ; CALLEE linkage for function pointers
 
+SECTION code_clib
 PUBLIC calloc
 
 EXTERN HeapCalloc_callee

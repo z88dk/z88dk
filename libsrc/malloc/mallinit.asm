@@ -1,6 +1,7 @@
 ; void mallinit(void)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC mallinit
 
 EXTERN l_setmem

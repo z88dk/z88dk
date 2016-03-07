@@ -1,6 +1,7 @@
 ; void __CALLEE__ HeapSbrk_callee(void *heap, void *addr, unsigned int size)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC HeapSbrk_callee
 PUBLIC ASMDISP_HEAPSBRK_CALLEE
 

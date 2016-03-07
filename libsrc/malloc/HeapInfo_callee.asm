@@ -1,6 +1,7 @@
 ; void __CALLEE__ HeapInfo_callee(unsigned int *total, unsigned int *largest, void *heap)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC HeapInfo_callee
 EXTERN MAHeapInfo
 

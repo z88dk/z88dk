@@ -1,6 +1,7 @@
 ; void __FASTCALL__ free(void *addr)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC free
 
 EXTERN HeapFree_callee
