@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.49 2016-03-04 11:04:20 dom Exp $
+ * $Id: stdlib.h,v 1.50 2016-03-07 13:55:55 dom Exp $
  */
 
 #include <sys/compiler.h>
@@ -205,7 +205,7 @@ extern void   __LIB__ __FASTCALL__   t_delay(unsigned int tstates) __SMALLCFASTC
 
 extern void   __LIB__  __FASTCALL__   sleep (int secs) __SMALLCFASTCALL;
 /* Very non standard! sleep for centisecs! (z88 and others)*/
-extern void   __LIB__  __FASTCALL__   csleep(unsigned int centiseconds) __SMALLCFASTCALL;
+extern void   __LIB__  __FASTCALL__  __SAVEFRAME__  csleep(unsigned int centiseconds) __SMALLCFASTCALL;
 extern void   __LIB__  __FASTCALL__   delay (long milliseconds) __SMALLCFASTCALL;
 
 
