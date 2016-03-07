@@ -512,13 +512,6 @@ Enables the LINE directive to synchronize error message line numbers with the
 line numbers from the source file.
 
 
-1.3.26. -sdcc : Force SDCC hacks
-
-Enable hacks to be able to use the assembler as the back-end for the Small Device
-C Compiler (SDCC).
-
-
-
 2. An overview of assembler features and related files
 ======================================================
 
@@ -2221,8 +2214,6 @@ Index
       1.3.24. -IXIY : Swap IX and IY registers
 
       1.3.25. -C : Enable LINE directive
-
-      1.3.26. -sdcc : Force SDCC hacks
 
   2. An overview of assembler features and related files
 

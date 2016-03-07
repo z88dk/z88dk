@@ -4,6 +4,11 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- v **2.8.5**, 2016-03-07, pauloscustodio
+
+  --sdcc option (SDCC hack) removed. It was used to search library symbols
+  with an underscore prefix after a lookup failure.
+
 - v **2.8.4**, 2016-02-24, pauloscustodio
 
   BUG_0038: library modules not loaded in sequence  

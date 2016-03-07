@@ -21,7 +21,8 @@
 # https://docs.google.com/document/d/1BDmDaQKLT_538uPrsFTlDM-ChLSlaGcqaEVs8Px9ac0/pub
 # Converted to txt by reformat_html.pl
 
-all:	z80asm.txt
-
-z80asm.txt : z80asm.html reformat_html.pl
-	perl reformat_html.pl z80asm.html
+all:	
+#z80asm.txt
+#
+#z80asm.txt : z80asm.html reformat_html.pl
+#	perl reformat_html.pl z80asm.html

@@ -60,11 +60,6 @@ Symbol *find_symbol( char *name, SymbolHash *symtab )
     Symbol *sym;
 
     sym = SymbolHash_get( symtab, name );
-
-	/* Bodge for handling underscores (sdcc hack) */
-    if ( sym == NULL && opts.sdcc && name[0] == '_' )
-        sym = SymbolHash_get( symtab, name + 1 );
-
 	if ( sym != NULL )
 	{
 		sym->is_touched = TRUE;

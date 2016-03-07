@@ -93,7 +93,6 @@ Input / Output File Options:
 
 Code Generation Options:
   --RCMX000              Assemble for RCM2000/RCM3000 series of Z80-like CPU
-  --sdcc                 Assemble for Small Device C Compiler
   -plus, --ti83plus      Interpret 'Invoke' as RST 28h
   -IXIY, --swap-ix-iy    Swap IX and IY registers
   -C, --line-mode        Enable LINE directive
@@ -297,21 +296,6 @@ Error: illegal option '--obj-ext'
 Error: source filename missing
 2 errors occurred during assembly
 ERR
-
-#------------------------------------------------------------------------------
-# -sdcc
-#------------------------------------------------------------------------------
-unlink_testfiles();
-t_z80asm_error("defc main = 0x1234\ncall _main", 
-		"Error at file 'test.asm' line 2: symbol '_main' not defined");
-for my $options ('-sdcc', '--sdcc') {
-	t_z80asm(
-		options	=> $options,
-		asm		=> "defc main = 0x1234\ncall _main",
-		bin		=> "\xCD\x34\x12", 
-		err		=> "Warning at file 'test.asm' line 2: symbol 'main' used as '_main'",
-	);
-}
 
 #------------------------------------------------------------------------------
 # -s, --symtable, -ns, --no-symtable, -l, --list, -nl, --no-list
@@ -945,7 +929,7 @@ t_binary($binary, pack("C*",
 						7, 8, 9, 1, 2, 3, 4, 5, 6,
 						));
 
-# PUBLIC and EXTERN, without -sdcc
+# PUBLIC and EXTERN
 unlink_testfiles();
 
 write_file(asm1_file(), "
@@ -971,35 +955,6 @@ t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 # link library files
 t_z80asm_capture("-x".lib1_file()." ".asm1_file(), "", "", 0);
 t_z80asm_capture("-r0 -b -i".lib1_file()." ".asm2_file(), "", "", 0);
-t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
-
-
-# PUBLIC and EXTERN, with -sdcc
-unlink_testfiles();
-
-write_file(asm1_file(), "
-	PUBLIC func_1
-	PUBLIC func_2
-func_1:
-	ld a,1
-func_2:
-	ld a,2
-	ret
-");
-
-write_file(asm2_file(), "
-	EXTERN func_2
-	call func_2
-	ret
-");
-
-# link object files
-t_z80asm_capture("-r0 -b ".asm2_file()." ".asm1_file(), "", "", 0);
-t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
-
-# link library files
-t_z80asm_capture("-x".lib1_file()." ".asm1_file(), "", "", 0);
-t_z80asm_capture("-sdcc -r0 -b -i".lib1_file()." ".asm2_file(), "", "", 0);
 t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 #------------------------------------------------------------------------------

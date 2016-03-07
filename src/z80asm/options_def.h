@@ -21,7 +21,6 @@ OPT_VAR( Bool,		symtable,	TRUE	)
 OPT_VAR( Bool,		list,		FALSE	)	/* -l flag */
 OPT_VAR( Bool,		cur_list,	FALSE	)	/* current LSTON/LSTOFF status */
 OPT_VAR( Bool,		map,		TRUE	)
-OPT_VAR( Bool,		sdcc,		FALSE	)
 OPT_VAR( Bool,		ti83plus,	FALSE	)
 OPT_VAR( Bool,		swap_ix_iy,	FALSE	)
 OPT_VAR( Bool,		line_mode,	FALSE	)
@@ -56,7 +55,6 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 #define OPT_HELP_BIN_FILE		"Output binary file"
 
 #define OPT_HELP_CPU_RCM2000	"Assemble for RCM2000/RCM3000 series of Z80-like CPU"
-#define OPT_HELP_SDCC			"Assemble for Small Device C Compiler"
 #define OPT_HELP_TI83PLUS		"Interpret 'Invoke' as RST 28h"
 #define OPT_HELP_SWAP_IX_IY		"Swap IX and IY registers"
 #define OPT_HELP_LINE_MODE		"Enable LINE directive"
@@ -118,7 +116,6 @@ OPT( OptString,	&opts.bin_file,	"-o", 	"--output", 		OPT_HELP_BIN_FILE, "FILE" )
 OPT_TITLE(	"Code Generation Options:" )
 OPT( OptCall,	option_cpu_RCM2000,
      "-RCMX000", "--RCMX000",	OPT_HELP_CPU_RCM2000, "" )
-OPT( OptSet,	&opts.sdcc,		"-sdcc", "--sdcc",			OPT_HELP_SDCC, "" )
 OPT( OptSet,	&opts.ti83plus,	"-plus", "--ti83plus",		OPT_HELP_TI83PLUS, "" )
 OPT( OptSet,	&opts.swap_ix_iy,
      "-IXIY", "--swap-ix-iy",		OPT_HELP_SWAP_IX_IY, "" )
