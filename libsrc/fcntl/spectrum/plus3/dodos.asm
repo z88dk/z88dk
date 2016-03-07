@@ -7,9 +7,9 @@
 ;
 ;	djm 17/3/2000 (after the manual!)
 ;
-;	$Id: dodos.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
+;	$Id: dodos.asm,v 1.3 2016-03-07 13:44:48 dom Exp $
 
-
+	SECTION	code_clib
 	PUBLIC	dodos
 
 .dodos
@@ -23,7 +23,9 @@
 	ei
 	pop	bc
 	pop	af
+	push	ix		;save ix
 	call	cjumpiy
+	pop	ix
 	push	af
 	push	bc
 	ld	a,16

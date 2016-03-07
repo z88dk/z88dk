@@ -5,8 +5,10 @@
 ;
 ; This returns longs even though there's no real need to do so
 ;
-; $Id: fdgetpos.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
+; $Id: fdgetpos.asm,v 1.5 2016-03-07 13:44:48 dom Exp $
 
+
+		SECTION	code_clib
 		PUBLIC	fdgetpos
 
 		INCLUDE "p3dos.def"

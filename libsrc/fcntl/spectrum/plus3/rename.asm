@@ -6,9 +6,10 @@
 ;
 ;	int rename(char *source, char *dest)
 ;
-;	$Id: rename.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
+;	$Id: rename.asm,v 1.5 2016-03-07 13:44:48 dom Exp $
 
 
+		SECTION	code_clib
 		PUBLIC	rename
 		EXTERN	dodos
 

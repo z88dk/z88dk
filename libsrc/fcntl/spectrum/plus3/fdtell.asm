@@ -5,8 +5,9 @@
 ;
 ; Not written as yet!
 ;
-; $Id: fdtell.asm,v 1.6 2015-01-21 15:38:59 stefano Exp $
+; $Id: fdtell.asm,v 1.7 2016-03-07 13:44:48 dom Exp $
 
+		SECTION	code_clib
 		PUBLIC	fdtell
 
 	        INCLUDE "p3dos.def"
@@ -18,9 +19,11 @@
 	pop	bc	;lower 8 is file handle
 	push	bc
 	push	hl
+	push	ix
 	ld	b,c
-	ld	iy,DOS_GET_POSITION
+	ld	iy,DOS_GET_POSITION	;corrupts ix
 	call	dodos
+	pop	ix
 	ld	d,0
 	ret	c
 	ld	hl,-1

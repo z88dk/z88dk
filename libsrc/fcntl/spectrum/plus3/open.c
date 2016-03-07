@@ -14,7 +14,7 @@
  *	Open a file for writing - e=4, d=2 (creat)
  *	Open a file for append  - e=2, d=2
  *
- *	$Id: open.c,v 1.6 2015-01-21 08:27:13 stefano Exp $
+ *	$Id: open.c,v 1.7 2016-03-07 13:44:48 dom Exp $
  */
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
@@ -25,7 +25,8 @@ int open(far char *name, int flags, mode_t mode)
 #asm
 	INCLUDE	"p3dos.def"
 	EXTERN	dodos
-	ld	ix,2
+	push	ix
+	ld	ix,4
 	add	ix,sp
 	ld	a,(ix+3)	;flags high
 	and	a
@@ -38,6 +39,7 @@ int open(far char *name, int flags, mode_t mode)
 	dec	a
 	jr	z,open_it
 .open_abort
+	pop	ix
 	ld	hl,-1		;invalid mode
 	scf
 	ret
@@ -89,6 +91,7 @@ int open(far char *name, int flags, mode_t mode)
 	ex	af,af
 	pop	hl		;file number back
 	jr	nc,open_abort	;error
+	pop	ix
 #endasm
 }
 

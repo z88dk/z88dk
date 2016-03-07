@@ -7,7 +7,7 @@
  *
  *	Enter with de = filehandle
  *
- *	$Id: readbyte.c,v 1.6 2015-01-21 08:27:13 stefano Exp $
+ *	$Id: readbyte.c,v 1.7 2016-03-07 13:44:48 dom Exp $
  */
 
 #include <fcntl.h>
@@ -20,7 +20,7 @@ int __FASTCALL__ readbyte(int handle)
 	pop	bc	;for FASTCALL parameter is pushed on entry
 	push	bc
 	ld	b,c	;file handle
-	ld	iy,DOS_BYTE_READ
+	ld	iy,DOS_BYTE_READ	
 	call	dodos
 	ld	hl,-1	;EOF
 	ccf
