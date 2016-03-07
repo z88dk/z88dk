@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC bcopy
 PUBLIC _bcopy
 EXTERN memcpy_callee

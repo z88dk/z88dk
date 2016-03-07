@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC memswap
 PUBLIC _memswap
 EXTERN memswap_callee

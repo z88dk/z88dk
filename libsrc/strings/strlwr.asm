@@ -6,6 +6,7 @@
 ; exit : hl = char *s
 ; uses : af
 
+SECTION code_clib
 PUBLIC strlwr
 PUBLIC _strlwr
 PUBLIC ASMDISP_STRLWR

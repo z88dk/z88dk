@@ -6,6 +6,7 @@
 ; exit : hl = char *s
 ; uses : af
 
+SECTION code_clib
 PUBLIC strupr
 PUBLIC _strupr
 PUBLIC ASMDISP_STRUPR

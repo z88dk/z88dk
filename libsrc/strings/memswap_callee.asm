@@ -2,6 +2,7 @@
 ; swap N bytes in the two memory regions
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC memswap_callee
 PUBLIC _memswap_callee
 PUBLIC ASMDISP_MEMSWAP_CALLEE

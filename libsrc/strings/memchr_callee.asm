@@ -2,6 +2,7 @@
 ; return ptr to first occurence of c in s
 ; 12.1999 djm, 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC memchr_callee
 PUBLIC _memchr_callee
 PUBLIC ASMDISP_MEMCHR_CALLEE

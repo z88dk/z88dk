@@ -2,6 +2,7 @@
 ; copy src to end of dst
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC strcat_callee
 PUBLIC _strcat_callee
 PUBLIC ASMDISP_STRCAT_CALLEE

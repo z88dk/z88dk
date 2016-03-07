@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC strcasecmp
 PUBLIC _strcasecmp
 EXTERN stricmp1

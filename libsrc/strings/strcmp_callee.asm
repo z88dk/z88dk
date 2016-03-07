@@ -17,6 +17,7 @@
 ; Dec 30 2006 aralbrec - Stop using cpi as that
 ;  is slower than cp (hl) + inc hl combination!
 
+SECTION code_clib
 PUBLIC strcmp_callee
 PUBLIC _strcmp_callee
 PUBLIC strcmp1

@@ -2,6 +2,7 @@
 ; compare first n chars of s1 and s2
 ; 11.1999 djm, 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC memcmp_callee
 PUBLIC _memcmp_callee
 PUBLIC ASMDISP_MEMCMP_CALLEE

@@ -2,6 +2,7 @@
 ; remove any occurrences of c at the end of s
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strrstrip_callee
 PUBLIC _strrstrip_callee
 PUBLIC ASMDISP_STRRSTRIP_CALLEE

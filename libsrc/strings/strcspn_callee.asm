@@ -2,6 +2,7 @@
 ; return length of prefix of s1 NOT containing chars in s2
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strcspn_callee
 PUBLIC _strcspn_callee
 PUBLIC ASMDISP_STRCSPN_CALLEE

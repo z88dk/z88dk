@@ -2,6 +2,7 @@
 ; remove occurences of leading char c from string s
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strstrip_callee
 PUBLIC _strstrip_callee
 PUBLIC ASMDISP_STRSTRIP_CALLEE

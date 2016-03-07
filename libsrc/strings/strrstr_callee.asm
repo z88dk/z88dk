@@ -2,6 +2,7 @@
 ; return ptr to last occurrence of string w in s
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strrstr_callee
 PUBLIC _strrstr_callee
 PUBLIC ASMDISP_STRRSTR_CALLEE

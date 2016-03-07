@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC strstr
 PUBLIC _strstr
 EXTERN strstr_callee

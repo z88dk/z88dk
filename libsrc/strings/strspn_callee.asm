@@ -2,6 +2,7 @@
 ; return length of prefix in s1 containing chars in s2
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strspn_callee
 PUBLIC _strspn_callee
 PUBLIC ASMDISP_STRSPN_CALLEE

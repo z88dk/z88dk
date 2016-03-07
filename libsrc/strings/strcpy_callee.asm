@@ -2,6 +2,7 @@
 ; copy src to dst including '\0'
 ; 03.1999 djm, 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC strcpy_callee
 PUBLIC _strcpy_callee
 PUBLIC ASMDISP_STRCPY_CALLEE

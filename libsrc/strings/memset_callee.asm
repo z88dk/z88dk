@@ -2,6 +2,7 @@
 ; write c into first n chars of s
 ; 04.2001 djm, 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC memset_callee
 PUBLIC _memset_callee
 PUBLIC ASMDISP_MEMSET_CALLEE

@@ -2,6 +2,7 @@
 ; compare at most n chars of string s1 to string s2
 ; 05.2002 dom, 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC strncmp_callee
 PUBLIC _strncmp_callee
 PUBLIC ASMDISP_STRNCMP_CALLEE

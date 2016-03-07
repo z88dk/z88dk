@@ -2,6 +2,7 @@
 ; a caseless string comparison
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC stricmp_callee
 PUBLIC _stricmp_callee
 PUBLIC stricmp1

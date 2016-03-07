@@ -1,6 +1,7 @@
 ; uint __CALLEE__ strlcpy_callee(char *dst, char *src, uint size)
 ; 06.2008 aralbrec
 
+SECTION code_clib
 PUBLIC strlcpy_callee
 PUBLIC _strlcpy_callee
 PUBLIC ASMDISP_STRLCPY_CALLEE

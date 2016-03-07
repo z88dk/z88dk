@@ -2,6 +2,7 @@
 ; copy src to dst but no more than n chars, add '\0'
 ; 04.2001 dom, 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC strncat_callee
 PUBLIC _strncat_callee
 PUBLIC ASMDISP_STRNCAT_CALLEE

@@ -2,6 +2,7 @@
 ; return ptr to first occurrence of c in s
 ; 04.2001 dom
 
+SECTION code_clib
 PUBLIC strchr_callee
 PUBLIC _strchr_callee
 PUBLIC ASMDISP_STRCHR_CALLEE

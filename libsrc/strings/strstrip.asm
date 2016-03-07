@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC strstrip
 PUBLIC _strstrip
 EXTERN strstrip_callee

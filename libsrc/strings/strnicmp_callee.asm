@@ -2,6 +2,7 @@
 ; caseless compare
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC strnicmp_callee
 PUBLIC _strnicmp_callee
 PUBLIC ASMDISP_STRNICMP_CALLEE

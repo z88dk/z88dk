@@ -2,6 +2,7 @@
 ; find index of first occurrence of c in s
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strpos_callee
 PUBLIC _strpos_callee
 PUBLIC ASMDISP_STRPOS_CALLEE

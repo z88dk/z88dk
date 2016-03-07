@@ -2,6 +2,7 @@
 ; on each call, return next token in s using delimiters from string delim
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strtok_r_callee
 PUBLIC _strtok_r_callee
 PUBLIC ASMDISP_STRTOK_R_CALLEE

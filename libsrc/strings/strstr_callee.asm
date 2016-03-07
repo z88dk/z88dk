@@ -2,6 +2,7 @@
 ; return ptr to first occurrence of string w in s
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strstr_callee
 PUBLIC _strstr_callee
 PUBLIC ASMDISP_STRSTR_CALLEE

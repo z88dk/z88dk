@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC strchrnul
 PUBLIC _strchrnul
 EXTERN strchrnul_callee

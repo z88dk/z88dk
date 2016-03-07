@@ -2,6 +2,7 @@
 ; return ptr to first occurrence in s1 of any char in match
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strpbrk_callee
 PUBLIC _strpbrk_callee
 PUBLIC ASMDISP_STRPBRK_CALLEE

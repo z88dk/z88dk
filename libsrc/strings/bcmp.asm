@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC bcmp
 PUBLIC _bcmp
 EXTERN memcmp_callee

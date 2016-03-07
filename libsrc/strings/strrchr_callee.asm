@@ -2,6 +2,7 @@
 ; return ptr to last occurrence of c in s
 ; 04.2001 dom, 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC strrchr_callee
 PUBLIC _strrchr_callee
 PUBLIC ASMDISP_STRRCHR_CALLEE

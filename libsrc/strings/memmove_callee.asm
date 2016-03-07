@@ -2,6 +2,7 @@
 ; copy n chars from s2 to s1, overlap safe
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC memmove_callee
 PUBLIC _memmove_callee
 PUBLIC ASMDISP_MEMMOVE_CALLEE

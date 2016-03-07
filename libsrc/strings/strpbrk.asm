@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC strpbrk
 PUBLIC _strpbrk
 EXTERN strpbrk_callee

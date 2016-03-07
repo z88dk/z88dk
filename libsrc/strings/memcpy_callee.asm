@@ -2,6 +2,7 @@
 ; copy n chars from s2 to s1
 ; 11.1999 djm
 
+SECTION code_clib
 PUBLIC memcpy_callee
 PUBLIC _memcpy_callee
 PUBLIC ASMDISP_MEMCPY_CALLEE
