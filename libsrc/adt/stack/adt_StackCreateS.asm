@@ -1,6 +1,7 @@
 ; void __FASTCALL__ adt_StackCreateS(struct adt_Stack *s)
 ; 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC adt_StackCreateS
 EXTERN l_setmem
 

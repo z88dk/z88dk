@@ -1,6 +1,7 @@
 ; void __CALLEE__ adt_StackDeleteS_callee(struct adt_Stack *s, void *delete)
 ; 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC adt_StackDeleteS_callee
 PUBLIC ASMDISP_ADT_STACKDELETES_CALLEE
 
@@ -30,7 +31,7 @@ EXTERN _u_free
    ld de,justret
    
 .notzero
-
+   push  ix				;save callers ix
    ld ixl,e
    ld ixh,d
 
@@ -45,7 +46,7 @@ EXTERN _u_free
 
    ld a,h
    or l
-   ret z
+   jr z,popandexit
    
    push hl                             ; save node address
    ld c,(hl)
@@ -69,6 +70,8 @@ EXTERN _u_free
    pop hl                              ; do it all again for next node
    jp loop
 
+.popandexit
+   pop ix
 .justret
 
    ret

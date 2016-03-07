@@ -1,6 +1,7 @@
 ; int __CALLEE__ adt_StackPush_callee(struct adt_Stack *s, void *item)
 ; 09.2005, 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC adt_StackPush_callee
 PUBLIC ASMDISP_ADT_STACKPUSH_CALLEE
 

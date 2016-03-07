@@ -1,6 +1,7 @@
 ; struct adt_Stack *adt_StackCreate(void)
 ; 09.2005, 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC adt_StackCreate
 
 EXTERN l_setmem

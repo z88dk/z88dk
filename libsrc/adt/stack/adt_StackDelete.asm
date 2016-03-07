@@ -1,6 +1,7 @@
 ; void adt_StackDelete(struct adt_Stack *s, void *delete)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_StackDelete
 
 EXTERN adt_StackDelete_callee

@@ -1,6 +1,7 @@
 ; int adt_StackPush(struct adt_Stack *s, void *item)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_StackPush
 
 EXTERN adt_StackPush_callee
