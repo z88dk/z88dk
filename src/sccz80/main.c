@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.28 2016-03-06 20:33:26 dom Exp $
+ *      $Id: main.c,v 1.29 2016-03-08 23:13:55 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -494,7 +494,7 @@ dumpfns()
         fprintf(fp,"\tdefc myzorg = %u\n",zorg);
         fprintf(fp,"ENDIF");
     }
-    if (appz88) {
+    if (1) {
         int k,value=0;
         fprintf(fp,"\nIF !NEED_appstartup\n");
         fprintf(fp,"\tDEFINE\tNEED_appstartup\n");
