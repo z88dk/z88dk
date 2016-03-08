@@ -19,7 +19,7 @@
  *
  *	Packages are now supported (work for 16k packages)
  *
- *	$Id: application.h,v 1.7 2016-03-04 11:38:35 dom Exp $
+ *	$Id: application.h,v 1.8 2016-03-08 21:27:16 dom Exp $
  */
 
 #ifndef HELP1
@@ -86,7 +86,7 @@
 
 void application_dor(void)
 {
-#asm
+#pragma asm
 ; Here we go, with lots of assembler!
         INCLUDE "dor.def"
         INCLUDE "zcc_opt.def"   ; The universal saviour file!
@@ -247,7 +247,7 @@ ENDIF
 #include <oz/help7.h>
 .applname
         APPLNAME(APP_INFO)
-#endasm
+#pragma endasm
 }
 
 
