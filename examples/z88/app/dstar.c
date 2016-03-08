@@ -56,7 +56,6 @@
  */
 #pragma -expandz88
 #pragma -reqpag=5
-#pragma -make-app
 
 
 /* Call up the required header files */
