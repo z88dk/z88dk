@@ -130,26 +130,41 @@ unsigned char windclr[]= {
 struct window graphics;
 
 /* prototype to stop barfing */
-
+void myexit();
+void playgame();
+void setupgame();
+void gamekeys();
+void left(unsigned char *ptr);
+void right(unsigned char *ptr);
+void down(unsigned char *ptr);
+void up(unsigned char *ptr);
+int standardmiddle(unsigned char nextpos);
+void setuplevel();
 void redrawscreen(void);
+void puttiblock(unsigned char spr,int x, int y);
+void drawboard();
+void doozcopyasm();
+int checkfinish();
 
-main()
+
+
+int main()
 {
         gameon=0;
         redrawscreen();         /* Define the windows */
         playgame();     /* Play the game */
         myexit();       /* Clean up after ourselves */
-
+	return 0;
 }
 
-myexit()
+void myexit()
 {
-        closegfx(graphics);     /* Close the Map window */
+        closegfx(&graphics);     /* Close the Map window */
         exit(0);                /* Get outta here! */
 }
 
 
-playgame()
+void playgame()
 {
         setupgame();            /* Set level to 1, get level etc */
 /* Loop while checkfinish() says we haven't finished! */
@@ -162,7 +177,7 @@ playgame()
 
 /* Set some variables up at the start.. */
 
-setupgame()
+void setupgame()
 {
         ballorbox=NO;
         level=STARTLEV;
@@ -170,7 +185,7 @@ setupgame()
 }
 
 
-gamekeys()
+void gamekeys()
 {
         unsigned char *charptr;
 
@@ -209,7 +224,7 @@ gamekeys()
  * happening though
  */
 
-left(unsigned char *ptr)
+void left(unsigned char *ptr)
 {
         unsigned char *locn;
 
@@ -224,7 +239,7 @@ left(unsigned char *ptr)
 }
 
 
-right(unsigned char *ptr)
+void right(unsigned char *ptr)
 {
         unsigned char *locn;
 
@@ -238,7 +253,7 @@ right(unsigned char *ptr)
         }
 }
 
-down(unsigned char *ptr)
+void down(unsigned char *ptr)
 {
         unsigned char *locn;
 
@@ -252,7 +267,7 @@ down(unsigned char *ptr)
         }
 }
 
-up(unsigned char *ptr)
+void up(unsigned char *ptr)
 {
         unsigned char *locn;
 
@@ -272,7 +287,7 @@ up(unsigned char *ptr)
  * hit anything except for bubble we wanna stop
  */
 
-standardmiddle(unsigned char nextpos)
+int standardmiddle(unsigned char nextpos)
 {
         if (ballorbox)
                 return (nextpos);       /* For box */
@@ -288,7 +303,7 @@ standardmiddle(unsigned char nextpos)
  * </<= - this is quicker to execute on the Z80!
  */
 
-checkfinish()
+int checkfinish()
 {
         unsigned char *ptr;
         int i;
@@ -311,7 +326,7 @@ checkfinish()
  * picked up byte round to get it
  */
 
-setuplevel()
+void setuplevel()
 {
         int y,x;
         unsigned char *ptr,*ptr2;
@@ -346,7 +361,8 @@ setuplevel()
  * If can't open graphics window then exit gracefully
  */
 
-void __APPFUNC__ redrawscreen(void)
+#pragma output redrawscreen
+void redrawscreen(void)
 {
         struct window text;
 /*
@@ -356,27 +372,27 @@ void __APPFUNC__ redrawscreen(void)
 /* Define and open a text window with title and other embellishments
  * strings are at top for clearing, position etc
  */
-        text->number='3';
-        text->x=32+7;
-        text->y=32+1;
-        text->width=32+34;
-        text->depth=32+7;
-        text->type=131;
-        text->graph=0;
-        window(text);
+        text.number='3';
+        text.x=32+7;
+        text.y=32+1;
+        text.width=32+34;
+        text.depth=32+7;
+        text.type=131;
+        text.graph=0;
+        window(&text);
         fputs(windtitle,stdout);
-        text->x=32+8;
-        text->y=32+3;
-        text->width=32+32;
-        text->depth=32+5;
-        text->type=128;
-        window(text);
+        text.x=32+8;
+        text.y=32+3;
+        text.width=32+32;
+        text.depth=32+5;
+        text.type=128;
+        window(&text);
         fputs(windclr,stdout);
-/* Now, try to open a map window.. */
-        graphics->graph=1;
-        graphics->width=128;
-        graphics->number='4';
-        if (window(graphics)) {
+        /* Now, try to open a map window.. */
+        graphics.graph=1;
+        graphics.width=128;
+        graphics.number='4';
+        if (window(&graphics)) {
                 puts("Sorry, Can't Open Map");
                 sleep(5);
                 exit(0);
@@ -393,7 +409,7 @@ void __APPFUNC__ redrawscreen(void)
  * of a performance hit when it was converted over from asm
  */
 
-drawboard()
+void drawboard()
 {
         int x,y;
         unsigned char *ptr;
@@ -422,10 +438,7 @@ drawboard()
  * So for each y we have to step down by 112.
  * The increment between rows is 16.
  */
- 
-
-
-puttiblock(unsigned char spr,int x, int y)
+void puttiblock(unsigned char spr,int x, int y)
 {
         unsigned char *ptr2,*ptr;
         int i;
@@ -455,15 +468,17 @@ puttiblock(unsigned char spr,int x, int y)
  */
 
 
-doozcopyasm()
+void doozcopyasm()
 {
-#asm
+#pragma asm
 
-        LIB     swapgfxbk
+        EXTERN	swapgfxbk
 
         call    swapgfxbk
         call    ozscrcpy
         jp      swapgfxbk
+
+	EXTERN	base_graphics
 
 .ozscrcpy
         ld      de,(base_graphics)
@@ -500,7 +515,7 @@ doozcopyasm()
 /* Every function always has a ret at the end! So don't need one of
  * our own!!
  */
-#endasm
+#pragma endasm
 }
 
 /*
@@ -512,7 +527,8 @@ doozcopyasm()
  *      This function handles menu codes
  */
 
-void __APPFUNC__ handlecmds(int cmd)
+#pragma output handlecmds
+void  handlecmds(int cmd)
 {
         switch(cmd) {
                 case 0x82:
@@ -555,7 +571,7 @@ void __APPFUNC__ handlecmds(int cmd)
 #define TOPIC1_2ATTR     MN_Help
 
 #define TOPIC1_2HELP1    "Use this to quit the game"
-#define TOPIc1_2HELP2    "Not that you'll ever get bored of the game!"
+#define TOPIC1_2HELP2    "Not that you'll ever get bored of the game!"
 
 #include <application.h>
 
