@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.109 2016-03-04 11:45:43 dom Exp $
+ *      $Id: zcc.c,v 1.110 2016-03-08 19:42:47 dom Exp $
  */
 
 
@@ -199,6 +199,7 @@ static char  *c_aslink_exe = "aslink";
 static char  *c_sdcc_exe = "zsdcc";
 static char  *c_sccz80_exe = "sccz80";
 static char  *c_cpp_exe = "zcpp";
+static char  *c_sdcc_preproc_exe = "sdcpp";
 static char  *c_zpragma_exe = "zpragma";
 static char  *c_copt_exe = "copt";
 static char  *c_appmake_exe = "appmake";
@@ -265,6 +266,7 @@ static arg_t  config[] = {
     {"ASLINKOPTS", 0, SetStringConfig, &c_aslinkopts, NULL, ""},
     
     {"CPP", 0, SetStringConfig, &c_cpp_exe, NULL, "Name of the cpp binary" },
+    {"SDCPP", 0, SetStringConfig, &c_sdcc_preproc_exe, NULL, "Name of the SDCC cpp binary" },
     {"STYLECPP", 0, SetNumber, &c_stylecpp, NULL, ""},
     {"ZPRAGMAEXE", 0, SetStringConfig, &c_zpragma_exe, NULL, "Name of the zpragma binary"},
 
@@ -1356,6 +1358,7 @@ static void configure_compiler()
             parse_cmdline_arg("-Ca-sdcc");
         }
         c_compiler = c_sdcc_exe;
+        c_cpp_exe = c_sdcc_preproc_exe;
         compiler_style = filter_outspecified_flag;
         write_zcc_defined("Z88DK_USES_SDCC", 1);
     } else {
