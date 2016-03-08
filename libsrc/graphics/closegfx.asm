@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: closegfx.asm,v 1.6 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: closegfx.asm,v 1.7 2016-03-08 23:09:57 dom Exp $
 ;
 
 
@@ -18,24 +18,25 @@
                 INCLUDE "graphics/grafix.inc"    ; Contains fn defs
                 INCLUDE "map.def"
 
-                PUBLIC    closegfx
+		SECTION	code_clib
 
- ;               XREF    oldozbank
+                PUBLIC    closegfx
+                PUBLIC    _closegfx
+
 
 
 
 .closegfx
+._closegfx
+		push	ix
                 pop     bc
                 pop     ix      ;y
                 push    ix
                 push    bc
-;Restore old bindings
-;                ld      a,(oldozbank)
-;                ld      (map_bk),a
-;                out     (map_bk-$400),a
                 ld      a,(ix+windnum)
                 ld      bc,mp_del
                 call_oz(os_map)
                 ld      hl,0            ;NULL=success
+		pop	ix
                 ret
 

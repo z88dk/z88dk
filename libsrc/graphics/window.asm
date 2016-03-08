@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: window.asm,v 1.6 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: window.asm,v 1.7 2016-03-08 23:09:57 dom Exp $
 ;
 
 ;       This function will open a window of any type (graphics/text)
@@ -35,17 +35,23 @@
                 INCLUDE "map.def"
                 INCLUDE "screen.def"
 
+		SECTION	code_clib
 
                 PUBLIC    window
+                PUBLIC    _window
                 
                 EXTERN    base_graphics
                 EXTERN    gfx_bank
 
 .window
+._window
                 pop     bc
-                pop     ix
-                push    ix
+                pop     hl
+                push    hl
                 push    bc
+		push	ix	;save ix
+		push	hl
+		pop	ix
 ;ix is address of struct..
                 ld      a,(ix+graph)
                 and     a
@@ -57,9 +63,9 @@
                 pop     hl
                 call_oz(gn_sop)
                 ld      hl,0            ;All good, return NULL
+		pop	ix
                 ret
 
-.initwind       defb    1,'7','#',0
 
 
 .opengfx
@@ -74,7 +80,7 @@
 .opengfx1
                 call_oz(os_map)         ;opened the window
                 ld      hl,1
-                ret     c               ;error, return TRUE
+                jr	c,opengfx_exit               ;error, return TRUE
 ;Now get the address of the map
                 ld   b,0
                 ld   hl,0               ; dummy address
@@ -86,18 +92,17 @@
                 pop  hl
                 pop  bc
 ;Page in the map page so it's always there..errkk!
-;                ld      a,(map_bk)
-;                ld      (oldozbank),a
                 ld      a,b
                 ld      (gfx_bank),a
-;                ld      (map_bk),a
-;                out     (map_bk-$400),a
-
                 ld   a,h
                 and  63                 ;mask to bank
                 or   map_seg            ;mask to segment map_seg
                 ld      h,a
                 ld      (base_graphics),hl
                 ld      hl,0            ;NULL=good
+.opengfx_exit
+		pop	ix
                 ret
 
+		SECTION	rodata_clib
+.initwind       defb    1,'7','#',0
