@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.22 2014-06-04 20:34:56 stefano Exp $
+ *	$Id: time.h,v 1.23 2016-03-08 10:13:15 dom Exp $
  */
 
 
@@ -63,9 +63,9 @@ struct tm {
  * of timezones
  */
 
-extern struct tm __LIB__ *gmtime(time_t *t);
-extern struct tm __LIB__ *localtime(time_t *t);
-extern time_t __LIB__ mktime(struct tm *tp);
+extern struct tm __LIB__ __SAVEFRAME__ *gmtime(time_t *t);
+extern struct tm __LIB__  __SAVEFRAME__*localtime(time_t *t);
+extern time_t __LIB__  __SAVEFRAME__ mktime(struct tm *tp);
 
 
 
