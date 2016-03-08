@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.12 2015-01-21 07:05:00 stefano Exp $
+;	$Id: app_crt0.asm,v 1.13 2016-03-08 23:13:08 dom Exp $
 
 
 ;--------
@@ -139,21 +139,8 @@ init_continue:			;We had enough memory
 ;--------
 ; Now, set up some very nice variables - stream ids for std*
 ;--------
-IF DEFINED_ANSIstdio
-	ld	hl,sgoprotos
-	ld	de,__sgoioblk
-	ld	bc,4*10		;4*10 FILES
-	ldir
-ELSE
-        ld      hl,-10
-        ld      (__sgoioblk+4),hl
-        dec     hl
-        ld      (__sgoioblk),hl
-        dec     hl
-        ld      (__sgoioblk+2),hl
-ENDIF
-        ld      hl,$8080	;Initialise floating point seed
-        ld      (fp_seed),hl
+	call	crt0_init_data
+
         xor     a		;Reset atexit() count
         ld      (exitcount),a
         ld      hl,-64		;Setup atexit() stack
@@ -348,47 +335,6 @@ sgoprotos:
 	INCLUDE	"stdio_fp.asm"
 ENDIF
 
-;--------
-; Variables need by crt0 code and some lib routines are kept in safe workspace
-;--------
-IF !DEFINED_sysdefvarsaddr
-	defc sysdefvarsaddr = $1ffD-100-safedata
-ENDIF
-DEFVARS sysdefvarsaddr
-{
-__sgoioblk	ds.b	40	;stdio control block
-l_erraddr	ds.w	1	;Not sure if these are used...
-l_errlevel	ds.b	1
-coords		ds.w	1	;Graphics xy coordinates
-base_graphics	ds.w	1	;Address of graphics map
-gfx_bank	ds.b	1	;Bank that this is in
-_std_seed	ds.w	1	;Integer seed
-exitsp		ds.w	1	;atexit() stack
-exitcount	ds.b	1	;Number of atexit() routines
-fp_seed		ds.w	3	;Floating point seed (not used ATM)
-extra		ds.w	3	;Floating point spare register
-fa		ds.w	3	;Floating point accumulator
-fasign		ds.b	1	;Floating point variable
-packintrout	ds.w	1	;User interrupt handler
-snd_asave	ds.b	1	;Sound
-snd_tick	ds.b	1	;Sound
-bit_irqstatus	ds.w	1	;current irq status when DI is necessary
-}
-
-;--------
-; If the user doesn't care where the heap variables go, dump them in safe space
-;--------
-IF !userheapvar
-	defc userheapvar = 0
-ENDIF
-
-IF userheapvar = 0 
-DEFVARS -1
-{
-heapblocks	ds.w	1	;Number of free blocks
-heaplast	ds.w	1	;Pointer to linked blocks
-}
-ENDIF
 
 
 ;--------
@@ -398,33 +344,92 @@ IF NEED_floatpack
         INCLUDE "float.asm"
 ENDIF
 
-;-------
-; If we have no safedata then set up defvars addr to point to bad memory
-; If we use safedata then we can't have far memory
-; We try to follow on from whereever the system data has been placed
-;-------
 
+
+; Memory map
+SECTION code_crt_init
+	; Setup std* streams
+crt0_init_data:
+        ld      hl,$8080	;Initialise floating point seed
+        ld      (fp_seed),hl
+IF DEFINED_ANSIstdio
+        ld      hl,sgoprotos
+        ld      de,__sgoioblk
+        ld      bc,4*10         ;4*10 FILES
+        ldir
+ELSE
+        ld      hl,-10
+        ld      (__sgoioblk+4),hl
+        dec     hl
+        ld      (__sgoioblk),hl
+        dec     hl
+        ld      (__sgoioblk+2),hl
+ENDIF
+SECTION code_crt_exit
+
+	ret
+SECTION code_compiler
+SECTION code_clib
+SECTION code_crt0_sccz80
+SECTION code_l_sdcc
+SECTION data_compiler
+SECTION rodata_compiler
+SECTION rodata_clib
+
+; Now the magic for z88 apps, BSS goes into low memory
+SECTION bss_crt
+; Variables need by crt0 code and some lib routines are kept in safe workspace
+IF !DEFINED_sysdefvarsaddr
+	defc sysdefvarsaddr = $1ffD-100-safedata
+ENDIF
+	org	sysdefvarsaddr
+
+__sgoioblk:      defs    40      ;stdio control block
+l_erraddr:       defw    0       ;Not sure if these are used...
+l_errlevel:      defb    0
+coords:          defw    0       ;Graphics xy coordinates
+base_graphics:   defw    0       ;Address of graphics map
+gfx_bank:        defb    0       ;Bank that this is in
+_std_seed:       defw    0       ;Integer seed
+exitsp:          defw    0       ;atexit() stack
+exitcount:       defb    0       ;Number of atexit() routines
+fp_seed:         defs    6       ;Floating point seed (not used ATM)
+extra:           defs    6       ;Floating point spare register
+fa:              defs    6       ;Floating point accumulator
+fasign:          defb    0       ;Floating point variable
+packintrout:     defw    0       ;User interrupt handler
+snd_asave:       defb    0       ;Sound
+snd_tick:        defb    0       ;Sound
+bit_irqstatus:   defw    0       ;current irq status when DI is necessary
+; If the user doesn't care where the heap variables go, dump them in safe space
+IF !userheapvar
+        defc userheapvar = 0
+ENDIF
+IF userheapvar = 1
+heapblocks:	defw	0	;Number of free blocks
+heaplast:	defw	0 	;Pointer to linked blocks
+ENDIF
+
+SECTION bss_fardata
+; If we use safedata then we can't have far memory
 IF !safedata
         IF !DEFINED_defvarsaddr
                 DEFINE DEFINED_defvarsaddr
                 defc defvarsaddr = 8192
         ENDIF
-
-        DEFVARS defvarsaddr
-        {
-        dummydummy        ds.b    1 
-        }
-
-        IF DEFINED_farheapsz
-                INCLUDE         "app_crt0.as1"
-        ENDIF
+	org	defvarsaddr
+	IF DEFINED_farheapsz
+	pool_table:     defs    224
+	malloc_table:	defw	0
+	farpages:	defww	1
+	farmemspec:	defb	1
+	copybuff:	defs	258
+	actual_malloc_table: defs ((farheapsz/256)+1)*2
+	ENDIF
 ENDIF
+SECTION bss_compiler
 
 
-IF userheapvar = 1
-DEFVARS -1
-{
-heapblocks	ds.w	1	;Number of free blocks
-heaplast	ds.w	1	;Pointer to linked blocks
-}
-ENDIF
+
+
+SECTION bss_clib
