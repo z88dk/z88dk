@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.110 2016-03-08 19:42:47 dom Exp $
+ *      $Id: zcc.c,v 1.111 2016-03-08 23:11:33 dom Exp $
  */
 
 
@@ -1367,6 +1367,10 @@ static void configure_compiler()
         /* Indicate to sccz80 what assembler we want */
         snprintf(buf,sizeof(buf),"-asm=%s",c_assembler_type);
         add_option_to_compiler(buf);
+        if ( assembler_type == ASM_Z80ASM ) {
+            snprintf(buf,sizeof(buf),"-z80asm-sections");
+            add_option_to_compiler(buf);
+        }
         if ( makelib ) {
             add_option_to_compiler("-make-lib");
         }
@@ -1486,6 +1490,7 @@ void remove_temporary_files(void)
             remove_file_with_extension(filelist[j], ".err");
             remove_file_with_extension(filelist[j], ".op1");
             remove_file_with_extension(filelist[j], ".op2");
+            remove_file_with_extension(filelist[j], ".op3");
             remove_file_with_extension(filelist[j], ".opt");
             if (c_extension) remove_file_with_extension(filelist[j], c_extension );
             remove_file_with_extension(filelist[j], ".sym");
