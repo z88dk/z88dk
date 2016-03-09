@@ -1,8 +1,11 @@
 
+SECTION code_clib
 PUBLIC IM2CreateCommon
+PUBLIC _IM2CreateCommon
 PUBLIC _im2_hookDisp
 
 .IM2CreateCommon
+._IM2CreateCommon
 
    ld bc,_im2_hookDisp
    ldir

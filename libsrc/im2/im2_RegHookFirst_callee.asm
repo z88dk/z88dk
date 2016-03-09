@@ -1,11 +1,14 @@
 ; void __CALLEE__ im2_RegHookFirst_callee(uchar vector, void *hook)
 ; 04.2004 aralbrec
 
+SECTION code_clib
 PUBLIC im2_RegHookFirst_callee
+PUBLIC _im2_RegHookFirst_callee
 PUBLIC ASMDISP_IM2_REGHOOKFIRST_CALLEE
 EXTERN _im2_hookDisp
 
 .im2_RegHookFirst_callee
+._im2_RegHookFirst_callee
 
    pop hl
    pop de

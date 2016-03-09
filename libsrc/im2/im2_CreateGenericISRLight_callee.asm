@@ -1,12 +1,15 @@
 ; void __CALLEE__ *im2_CreateGenericISRLight_callee(uchar numhooks, void *addr)
 ; 10.2005 aralbrec
 
+SECTION code_clib
 PUBLIC im2_CreateGenericISRLight_callee
+PUBLIC _im2_CreateGenericISRLight_callee
 PUBLIC ASMDISP_IM2_CREATEGENERICISRLIGHT_CALLEE
 
 EXTERN IM2CreateCommon
 
 .im2_CreateGenericISRLight_callee
+._im2_CreateGenericISRLight_callee
 
    pop hl
    pop de

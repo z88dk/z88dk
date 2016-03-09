@@ -1,8 +1,10 @@
 
 ; 04.2004 aralbrec
 
-XLIB IM2RemoveHook
-XREF _im2_hookDisp
+SECTION code_clib
+PUBLIC IM2RemoveHook
+PUBLIC _IM2RemoveHook
+EXTERN _im2_hookDisp
 
 ; enter: de = address of hook (subroutine)
 ;         l = interrupt vector where Generic ISR is installed
@@ -11,6 +13,7 @@ XREF _im2_hookDisp
 ;        no carry = hook not found
 
 .IM2RemoveHook
+._IM2RemoveHook
 
    ld a,i
    ld h,a
