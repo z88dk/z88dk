@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.113 2016-03-09 20:31:37 dom Exp $
+ *      $Id: zcc.c,v 1.114 2016-03-09 21:31:13 dom Exp $
  */
 
 
@@ -322,7 +322,6 @@ static arg_t     myargs[] = {
     {"no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup, NULL, "Don't cleanup temporary files"},
     {"make-lib", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Compile as if to make a library"},
     {"preserve", AF_BOOL_TRUE, SetBoolean, &preserve, NULL, "Don't remove zcc_opt.def at start of run"},
-    {"make-app", AF_BOOL_TRUE|AF_DEPRECATED, SetBoolean, &defer_assembly, NULL, "Use defer-assembly"},
     {"defer-assembly", AF_BOOL_TRUE, SetBoolean, &defer_assembly, NULL, "Defer assembly until link time" },
     {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file"},
     {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, NULL, "(default) Use the temporary directory for intermediate files"},
@@ -1367,15 +1366,8 @@ static void configure_compiler()
         /* Indicate to sccz80 what assembler we want */
         snprintf(buf,sizeof(buf),"-asm=%s",c_assembler_type);
         add_option_to_compiler(buf);
-        if ( assembler_type == ASM_Z80ASM ) {
-            snprintf(buf,sizeof(buf),"-z80asm-sections");
-            add_option_to_compiler(buf);
-        }
         if ( makelib ) {
             add_option_to_compiler("-make-lib");
-        }
-        if ( defer_assembly ) {
-            add_option_to_compiler("-make-app");
         }
         c_compiler = c_sccz80_exe;
         compiler_style = outimplied;

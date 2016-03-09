@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.38 2016-03-08 21:04:40 dom Exp $
+ *      $Id: codegen.c,v 1.39 2016-03-09 21:31:13 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -958,11 +958,7 @@ void defstorage(void)
 	if (ISASM(ASM_ASXX))
 		ot(".ds\t");
 	else if ( ISASM(ASM_Z80ASM) ) {
-        if ( strstr(current_section,"bss") != NULL && appz88 ) {
-            outstr("\tds.b\t");
-        } else {
             ot("defs\t");
-        }
     } else {
         ot("defs\t");
     }
@@ -2079,10 +2075,8 @@ void restorede(void)
 void prefix()
 {
 	if (ISASM(ASM_Z80ASM)) {
-        if ( !(strstr(current_section,"bss") != NULL && appz88) ) {
             outbyte('.');
         }
-    }
 }
 
 /* Print specified number as label */
@@ -2124,18 +2118,7 @@ void output_section(char *section_name)
     if ( ISASM(ASM_ASXX) ) {
         outfmt("\t.area\t%s\n\n",section_name);
     } else if ( ISASM(ASM_Z80ASM) ) {
-        /* For z80asm we have to map bss into defvars if we're in appz88 mode */
-        if ( strstr(current_section,"bss") != NULL && appz88 ) {
-            outstr("}\n");
-        }
-
-        if ( strstr(section_name,"bss") != NULL && appz88 ) {
-            outstr("DEFVARS\t-1\n{\n");
-        } else {
-            if (z80asm_sections) {
-                outfmt("\tSECTION\t%s\n\n",section_name);
-            }
-        }
+        outfmt("\tSECTION\t%s\n\n",section_name);
     } else if ( ISASM(ASM_VASM) ) {
         outfmt("\tSECTION\t%s\n",section_name);
     } else if ( ISASM(ASM_GNU) ) {

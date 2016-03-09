@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.29 2016-03-08 23:13:55 dom Exp $
+ *      $Id: main.c,v 1.30 2016-03-09 21:31:13 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -145,7 +145,7 @@ int main(int argc, char **argv)
         currfn = NULL_SYM ;             /* no function yet */
         macptr = cmode = 1 ;    /* clear macro pool and enable preprocessing */
         ncomp=doinline=mathz88 = incfloat= compactcode =0;
-        intuition=zorg=lpointer=cppcom=appz88=0;
+        intuition=zorg=lpointer=cppcom=0;
         dosigned=NO;
         makelib=useshare=makeshare=sharedfile=NO;
         smartprintf=expanded=YES;
@@ -398,6 +398,7 @@ dumpfns()
     int ident,type,storage;
     SYMBOL *ptr;
     FILE    *fp;
+    int k,value=0;
 
 #ifdef HEADERFILE
     outstr(";\tHeader file for file:\t");
@@ -494,41 +495,36 @@ dumpfns()
         fprintf(fp,"\tdefc myzorg = %u\n",zorg);
         fprintf(fp,"ENDIF");
     }
-    if (1) {
-        int k,value=0;
-        fprintf(fp,"\nIF !NEED_appstartup\n");
-        fprintf(fp,"\tDEFINE\tNEED_appstartup\n");
-        if (safedata != -1 )
-            fprintf(fp,"\tdefc safedata = %d\n",safedata);
-        if (intuition)
-            fprintf(fp,"\tdefc intuition = 1\n");
-        if (farheapsz != -1) {
-            fprintf(fp,"\tDEFINE DEFINED_farheapsz\n");
-            fprintf(fp,"\tdefc farheapsz = %d\n",farheapsz);
-        }
+    fprintf(fp,"\nIF !NEED_appstartup\n");
+    fprintf(fp,"\tDEFINE\tNEED_appstartup\n");
+    if (safedata != -1 )
+        fprintf(fp,"\tdefc safedata = %d\n",safedata);
+    if (intuition)
+        fprintf(fp,"\tdefc intuition = 1\n");
+    if (farheapsz != -1) {
+        fprintf(fp,"\tDEFINE DEFINED_farheapsz\n");
+        fprintf(fp,"\tdefc farheapsz = %d\n",farheapsz);
+    }
  
-        if (reqpag != -1 ) {
-            fprintf(fp,"\tdefc reqpag = %d\n",reqpag);
-            value=reqpag;
-        }
-        else {
+    if (reqpag != -1 ) {
+        fprintf(fp,"\tdefc reqpag = %d\n",reqpag);
+        value=reqpag;
+    } else {
 /*
  * Consider the malloc pool as well, if defined we need 32 (standard) +
  * size of malloc - this is a little kludgy, hence the tuning command
  * line option
  */
-            if ( (k=findmac("HEAPSIZE"))) {
-                sscanf(&macq[k],"%d",&value);
-                if (value != 0 ) value/=256;
-            }
-            value+=32;
-            fprintf(fp,"\tdefc reqpag = %d\n",value);
+        if ( (k=findmac("HEAPSIZE"))) {
+            sscanf(&macq[k],"%d",&value);
+            if (value != 0 ) value/=256;
         }
-        if (value > 32) expanded=YES;
-        fprintf(fp,"\tdefc NEED_expanded = %d\n",expanded);
-        fprintf(fp,"ENDIF\n\n");
-
+        value+=32;
+        fprintf(fp,"\tdefc reqpag = %d\n",value);
     }
+    if (value > 32) expanded=YES;
+    fprintf(fp,"\tdefc NEED_expanded = %d\n",expanded);
+    fprintf(fp,"ENDIF\n\n");
     if (incfloat) {
         fprintf(fp,"\nIF !NEED_floatpack\n");
         fprintf(fp,"\tDEFINE\tNEED_floatpack\n");
@@ -997,7 +993,6 @@ struct args myargs[]= {
     {"math-z88",NO,SetMathZ88, "Enable machine native maths mode" },
     {"unsigned",NO,SetUnsigned, "Make all types unsigned" },
     {"//",NO,SetCppComm, "Accept C++ style // comments" },
-    {"make-app",NO,SetMakeApp, "Turn on ROMable code mode" },
     {"do-inline",NO,SetDoInline, "Inline certain common functions" },
     {"stop-error",NO,SetStopError, "Stop when an error is received" },
     {"far-pointers",NO,SetFarPtrs, NULL},   /* Obsolete..but maybe useful*/
@@ -1040,17 +1035,12 @@ struct args myargs[]= {
    {"frameiy",NO,SetFrameIY},
    {"noframe",NO,SetNoFrame},
 #endif
-   {"z80asm-sections",NO,SetZ80asmSections,"Use sections for z80asm"},
 /* Compatibility Modes.. */
     {"f",NO,SetUnsigned, NULL},
     {"l",NO,SetFarPtrs, NULL},
     {"",0, NULL, NULL}
 };
 
-void SetZ80asmSections(char *arg)
-{
-  z80asm_sections =YES;
-}
 
 #ifdef USEFRAME
 void SetNoFrame(char *arg)
@@ -1132,9 +1122,6 @@ void SetStartUp(char *arg)
         num=0;
         sscanf(arg+8,"%d",&num);
                 startup=num;
-#if 0
-        if (startup==2) appz88=YES; /* Flag that we want app startup gunk*/
-#endif
 }
 
 
@@ -1232,9 +1219,6 @@ void SetOrg(char *arg)
 {
         unsigned int    num;
         num=0;
-#if 0
-        appz88=1;
-#endif
         sscanf(arg+5,"%u",&num);
         if    (num>=0 && num <= 65535U )
                 zorg=num;
@@ -1247,9 +1231,6 @@ void SetReqPag(char *arg)
 {
         int    num;
         num=-1;
-#if 0
-        appz88=1;
-#endif
         sscanf(arg+7,"%d",&num);
         if    (num >= 0 && num <= 160) 
                 reqpag=num;
@@ -1289,10 +1270,6 @@ void SetCppComm(char *arg)
         cppcom=YES;
 }
 
-void SetMakeApp(char *arg)
-{
-        appz88=YES;
-}
 
 void SetDoInline(char *arg)
 {

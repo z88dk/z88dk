@@ -1,7 +1,7 @@
 #
 # Makefile for sccz80
 #
-# $Id: Makefile,v 1.12 2013-09-10 23:47:51 dom Exp $
+# $Id: Makefile,v 1.13 2016-03-09 21:31:13 dom Exp $
 #
 
 INSTALL ?= install
@@ -29,6 +29,8 @@ OBJS =	callfunc.o     	\
 	while.o
 
 all: sccz80$(EXESUFFIX)
+
+CFLAGS += 
 
 sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS)
