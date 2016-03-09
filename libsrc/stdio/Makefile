@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.50 2016-03-06 21:55:07 dom Exp $
+# $Id: Makefile,v 1.51 2016-03-09 22:25:54 dom Exp $
 #
 
 include ../Make.config
@@ -21,7 +21,7 @@ STDCFILES = \
 	fseek.c \
 	ftell.c \
 	fwrite.c \
-	printk.c \
+	printk1.c \
 	printn.c \
 	puts.c \
 	ungetc.c \

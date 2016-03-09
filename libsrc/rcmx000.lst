@@ -18,6 +18,7 @@ stdio/fwrite
 stdio/gets
 stdio/8080/vfprintf_mini
 stdio/printk
+stdio/printk1
 stdio/printn
 stdio/puts
 stdio/8080/ungetc

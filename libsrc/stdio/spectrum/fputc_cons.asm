@@ -12,10 +12,11 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.15 2016-03-05 00:55:18 dom Exp $
+;	$Id: fputc_cons.asm,v 1.16 2016-03-09 22:25:54 dom Exp $
 ;
 
 
+	SECTION	code_clib
           PUBLIC  fputc_cons
           PUBLIC  _fputc_cons
 
@@ -523,7 +524,7 @@ noscroll2:
 
 
 
-
+	SECTION	bss_clib
 ; Variables
 ; Because we're on a Spectrum we can scatter statics all over the place!
 
@@ -548,7 +549,7 @@ noscroll2:
         defs    5
 
 
-
+	SECTION	rodata_clib
 ; The font
 
 .font

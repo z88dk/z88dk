@@ -9,10 +9,11 @@
 ;	1/4/2000  djm Rechristened fgetc_cons
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.4 2016-03-05 00:55:18 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.5 2016-03-09 22:25:54 dom Exp $
 ;
 
 
+		SECTION	code_clib
 		PUBLIC	fgetc_cons
 		PUBLIC	_fgetc_cons
 

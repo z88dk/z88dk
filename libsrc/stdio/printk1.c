@@ -5,23 +5,33 @@
  * djm 24/4/2000
  *
  * --------
- * $Id: printk.c,v 1.2 2001-04-13 14:13:58 stefano Exp $
+ * $Id: printk1.c,v 1.1 2016-03-09 22:25:54 dom Exp $
  */
 
 #include <stdio.h>
 
+extern __LIB__ printk1(int (*delta)(),  unsigned char *fmt,void *ap);
 
 /*
  * Cheating somewhat, this will cause a barf in the compiler...bigtime..
  * nevermind...
  */
 
+void sccz80_delta(int x)
+{
+     return -x;
+}
+
+void sdcc_delta(int x)
+{
+     return x;
+}
 void printk(char *fmt,...)
 {
         int  *ct;
         ct= (getarg()*2)+&fmt-4;
 
-        printk1(*ct,ct-1);
+        printk1(sccz80_delta, *ct,ct-1);
 }
 
 /*
@@ -33,12 +43,11 @@ void printk(char *fmt,...)
 
 static void miniprintn(long number,unsigned char flag);
 
-int printk1(unsigned char *fmt,void *ap)
+int printk1(int (*delta_fn)(), unsigned char *fmt,void *ap)
 {
         unsigned char c;
         unsigned char k;
         unsigned char   *s;
-
 
         while ((c = *fmt++) != '\0') {
                 if (c != '%') 
@@ -51,32 +60,32 @@ int printk1(unsigned char *fmt,void *ap)
 				switch (c) {
 					case 'd':
 					case 'u':
-						ap-=sizeof(int);
+                                                ap += delta_fn(sizeof(int));
                                 		miniprintn((long)*(long *)ap,c=='d');
-                                		ap -= sizeof(int);
+                                                ap += delta_fn(sizeof(int));
 						break;
 				}
 				break;
 
                         case 'd':
                                 miniprintn((long)*(int *)ap,1);
-                                ap -= sizeof(int);
+                                ap += delta_fn(sizeof(int));
                                 break;
 			case 'u':
                                 miniprintn((unsigned long)*(unsigned int *)ap,0);
-                                ap -= sizeof(int);
+                                ap += delta_fn(sizeof(int));
                                 break;
 
                         case 's':
                                 s = *(char **)ap;
                                 while ((k = *s++) != '\0')
                                         fputc_cons(k);
-                                ap -= sizeof(char *);
+                                ap += delta_fn(sizeof(char *));
                                 break;
 
                         case 'c':
                                 fputc_cons(*(int *)ap);
-                                ap -= sizeof(int);
+                                ap += delta_fn(sizeof(int));
                                 break;
 
                         default:

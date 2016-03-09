@@ -43,6 +43,7 @@ stdio/ftell
 stdio/fwrite
 stdio/gets
 stdio/printk
+stdio/printk1
 stdio/printn
 stdio/puts
 stdio/ungetc
