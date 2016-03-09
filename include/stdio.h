@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.33 2016-03-06 21:39:17 dom Exp $ */
+/* $Id: stdio.h,v 1.34 2016-03-09 22:36:00 dom Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -318,7 +318,7 @@ extern int __LIB__ remove(char *name);
 extern int __LIB__ getk();
 #define getkey() fgetc_cons()
 extern void __LIB__ puts_cons(char *message);
-extern void __LIB__ printk(char *fmt,...) __SMALLCDECL;
+extern void __LIB__ printk(char *fmt,...);
 
 
 /*
