@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.51 2016-03-09 22:25:54 dom Exp $
+# $Id: Makefile,v 1.52 2016-03-09 22:34:47 dom Exp $
 #
 
 include ../Make.config
@@ -98,7 +98,7 @@ generic_iy:
 	zcc +test $(CFLAGS) -Ca-IXIY fseek.c
 	zcc +test $(CFLAGS) -Ca-IXIY ftell.c
 	zcc +test $(CFLAGS) -Ca-IXIY fwrite.c
-	zcc +test $(CFLAGS) -Ca-IXIY printk.c
+	zcc +test $(CFLAGS) -Ca-IXIY printk1.c
 	zcc +test $(CFLAGS) -Ca-IXIY printn.c
 	zcc +test $(CFLAGS) -Ca-IXIY puts.c
 	zcc +test $(CFLAGS) -Ca-IXIY ungetc.c
