@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.112 2016-03-09 17:48:04 aralbrec Exp $
+ *      $Id: zcc.c,v 1.113 2016-03-09 20:31:37 dom Exp $
  */
 
 
@@ -199,7 +199,7 @@ static char  *c_aslink_exe = "aslink";
 static char  *c_sdcc_exe = "zsdcc";
 static char  *c_sccz80_exe = "sccz80";
 static char  *c_cpp_exe = "zcpp";
-static char  *c_sdcc_preproc_exe = "sdcpp";
+static char  *c_sdcc_preproc_exe = "zsdcpp";
 static char  *c_zpragma_exe = "zpragma";
 static char  *c_copt_exe = "copt";
 static char  *c_appmake_exe = "appmake";
