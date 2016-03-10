@@ -10,10 +10,6 @@
 
 
 
-sccz80_delta:
-	call	l_neg
-sdcc_delta:
-	ret
 
 ; sccz80 version
 ;void printk(char *fmt,...)
@@ -29,7 +25,7 @@ printk:
         add     hl,hl
 	add	hl,sp
 
-	ld	bc,sccz80_delta
+	ld	bc,l_neg		; sccz80 delta
 	push	bc
 	ld	e,(hl)
 	inc	hl
@@ -67,5 +63,6 @@ _printk:
 	pop	bc
 	pop	bc	
 	pop	ix	;restore ix
+sdcc_delta:
 	ret
 
