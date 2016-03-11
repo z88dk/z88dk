@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.7 2016-03-11 11:19:10 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.8 2016-03-11 13:14:24 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -54,23 +54,7 @@ start:
 	ld	(hl),0
 	ldir
 	ld      (exitsp),sp
-
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
-
-	ld      hl,$8080
-	ld      (fp_seed),hl
-	xor     a
-	ld      (exitcount),a
+	call	crt0_init_data
 
 ; Entry to the user code
 	call    _main
@@ -111,25 +95,52 @@ ELSE
 	ENDIF
 ENDIF
 
-; Static variables kept in safe workspace
-
-DEFVARS RAM_Start
-{
-__sgoioblk      ds.b    40      ;stdio control block
-exitsp          ds.w    1       ;atexit() stack
-exitcount       ds.b    1       ;Number of atexit() routines
-fp_seed         ds.w    3       ;Floating point seed (not used ATM)
-extra           ds.w    3       ;Floating point spare register
-fa              ds.w    3       ;Floating point accumulator
-fasign          ds.b    1       ;Floating point variable
-heapblocks      ds.w    1       ;Number of free blocks
-heaplast        ds.w    1       ;Pointer to linked blocks
-}
-
-
 ;--------
 ; Now, include the math routines if needed..
 ;--------
 IF NEED_floatpack
         INCLUDE "float.asm"
 ENDIF
+
+SECTION code_crt_init
+crt0_init_data:
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+; Set up the std* stuff so we can be called again
+        ld      hl,__sgoioblk+2
+        ld      (hl),19 ;stdin
+        ld      hl,__sgoioblk+6
+        ld      (hl),21 ;stdout
+        ld      hl,__sgoioblk+10
+        ld      (hl),21 ;stderr
+ENDIF
+ENDIF
+        ld      hl,$8080
+        ld      (fp_seed),hl
+        xor     a
+        ld      (exitcount),a
+SECTION code_crt_exit
+        ret
+SECTION code_compiler
+SECTION code_clib
+SECTION code_crt0_sccz80
+SECTION code_l_sdcc
+SECTION data_compiler
+SECTION rodata_compiler
+SECTION rodata_clib
+
+SECTION bss_crt
+	org	RAM_Start
+__sgoioblk:             defs    40      ;stdio control block
+exitsp:                 defw    0       ;atexit() stack
+exitcount:              defb    0       ;Number of atexit() routines
+fp_seed:                defs    6       ;Floating point seed (not used ATM)
+extra:                  defs    6       ;Floating point spare register
+fa:                     defs    6       ;Floating point accumulator
+fasign:                 defb    0       ;Floating point variable
+heapblocks:             defw    0       ;Number of free blocks
+heaplast:               defw    0       ;Pointer to linked blocks
+SECTION bss_clib
+SECTION bss_compiler
+
+
