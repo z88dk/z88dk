@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.37 2015-01-21 07:05:00 stefano Exp $
+;       $Id: spec_crt0.asm,v 1.38 2016-03-11 11:19:11 dom Exp $
 ;
 
 
@@ -456,9 +456,6 @@ IF DEFINED_NEED_ZXMMC
       PUBLIC card_select
 ENDIF
 
-IF !DEFINED_HAVESEED
-      PUBLIC    _std_seed         ; Integer rand() seed
-ENDIF
 
 
 IF !DEFINED_sysdefvarsaddr
@@ -478,9 +475,6 @@ DEFVARS sysdefvarsaddr
 __sgoioblk      ds.b    40      ; stdio control block
 coords          ds.w    1       ; Graphics xy coordinates
 base_graphics   ds.w    1       ; Address of graphics map
-IF !DEFINED_HAVESEED
-  _std_seed     ds.w    1       ; Integer seed
-ENDIF
 exitsp          ds.w    1       ; atexit() stack
 exitcount       ds.b    1       ; Number of atexit() routines
 fp_seed         ds.w    3       ; Floating point seed (not used ATM)

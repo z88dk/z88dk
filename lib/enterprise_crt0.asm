@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.14 2015-01-21 07:05:00 stefano Exp $
+;	$Id: enterprise_crt0.asm,v 1.15 2016-03-11 11:19:10 dom Exp $
 ;
 
 
@@ -35,7 +35,6 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
-        PUBLIC    _std_seed
 
         PUBLIC	snd_tick	; Sound variable
         PUBLIC	bit_irqstatus	; current irq status when DI is necessary
@@ -273,11 +272,6 @@ snd_tick:       defb	0	; Sound variable
 bit_irqstatus:	defw	0
 ENDIF
 
-;Seed for integer rand() routines
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:       defw    0       ; Seed for integer rand() routines
-ENDIF
 
 ;Atexit routine
 

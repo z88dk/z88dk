@@ -15,7 +15,6 @@
 	PUBLIC	cleanup		; used by exit()
 	PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
 
-	PUBLIC	_std_seed	; Integer rnd seed
 
 	PUBLIC	_vfprintf	; vprintf is internal to this file so we
 				;  only ever include one of the set of
@@ -252,8 +251,6 @@ gfx_bank
 snd_tick
         ds.b    1	;  2 bytes
 bit_irqstatus
-        ds.w    1	;  2 bytes
-_std_seed
         ds.w    1	;  2 bytes
 exitsp
         ds.w    1	;  2 bytes

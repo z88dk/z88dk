@@ -15,7 +15,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.27 2015-01-21 07:05:00 stefano Exp $
+;	$Id: osca_crt0.asm,v 1.28 2016-03-11 11:19:11 dom Exp $
 ;
 
 
@@ -43,9 +43,6 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
-; Integer rnd seed
-
-        PUBLIC    _std_seed
 
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
@@ -480,8 +477,6 @@ ELSE
 ENDIF
 
 
-;Seed for integer rand() routines
-_std_seed:       defw    0
 
 ;Atexit routine
 exitsp:          defw    0

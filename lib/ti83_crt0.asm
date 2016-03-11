@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.25 2015-01-21 07:05:00 stefano Exp $
+;	$Id: ti83_crt0.asm,v 1.26 2016-03-11 11:19:11 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -379,11 +379,6 @@ ELSE
 ENDIF
 
 
-;Seed for integer rand() routines
-IF !DEFINED_HAVESEED
-                PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
 
 ;Atexit routine
 exitsp:		defw	0

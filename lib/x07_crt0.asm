@@ -1,7 +1,7 @@
 ;
 ;       Startup for Canon X-07
 ;
-;       $Id: x07_crt0.asm,v 1.4 2015-01-21 07:05:01 stefano Exp $
+;       $Id: x07_crt0.asm,v 1.5 2016-03-11 11:19:11 dom Exp $
 ;
 
 	MODULE  x07_crt0
@@ -157,10 +157,6 @@ _heap:
                 defw 0
 ENDIF
 
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:       defw    0      ; Seed for integer rand() routines
-ENDIF
 
 IF DEFINED_NEED1bitsound
 snd_tick:       defb	0	; Sound variable

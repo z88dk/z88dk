@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.26 2015-01-21 07:05:00 stefano Exp $
+;	$Id: ti83p_crt0.asm,v 1.27 2016-03-11 11:19:11 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -266,11 +266,6 @@ ELSE
 ENDIF
 
 
-;Seed for integer rand() routines
-IF !DEFINED_HAVESEED
-                PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
 
 ;Atexit routine
 exitsp:		defw	0

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.12 2015-10-28 07:18:48 stefano Exp $
+;       $Id: trs80_crt0.asm,v 1.13 2016-03-11 11:19:11 dom Exp $
 ;
 
 
@@ -145,10 +145,6 @@ ELSE
 base_graphics:  defw    $3c00   ; Address of the Graphics map
 ENDIF
 
-IF !DEFINED_HAVESEED
-                PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:       defw    0       ; Seed for integer rand() routines
-ENDIF
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack

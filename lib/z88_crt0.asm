@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.10 2015-11-27 23:18:25 dom Exp $
+; $Id: z88_crt0.asm,v 1.11 2016-03-11 11:19:11 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -41,8 +41,6 @@
 	PUBLIC    coords		;Current graphics xy coords
 	PUBLIC    base_graphics	;Address of graphics map
 	PUBLIC    gfx_bank	;Bank for this
-
-	PUBLIC    _std_seed	;Integer rand() seed
 
 
 	PUBLIC    exitsp		;Pointer to atexit() stack

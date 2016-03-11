@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.19 2015-01-21 07:05:00 stefano Exp $
+;       $Id: rex_crt0.asm,v 1.20 2016-03-11 11:19:11 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -19,7 +19,6 @@ IF (startup=2)                 ; Library ?
 	EXTERN	_LibMain
 ENDIF
 	
-	PUBLIC	_std_seed	;integer rand() seed
 	PUBLIC	exitsp		;atexit() variables
 	PUBLIC	exitcount
 	PUBLIC	heapblocks	;malloc() variables

@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.49 2015-08-04 06:48:23 stefano Exp $
+;       $Id: zx81_crt0.asm,v 1.50 2016-03-11 11:19:11 dom Exp $
 ;
 ; - - - - - - -
 
@@ -403,10 +403,6 @@ ENDIF
 
 coords:         defw    0       ; Current graphics xy coordinates
 
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack

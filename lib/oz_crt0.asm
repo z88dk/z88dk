@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.12 2015-01-21 07:05:00 stefano Exp $
+;       $Id: oz_crt0.asm,v 1.13 2016-03-11 11:19:11 dom Exp $
 ;
 ; - - - - - - -
 
@@ -528,7 +528,6 @@ ozactivepage:	defw 0400h	; Page number for the graph map (0400h for 0A000h)
 ozmodel:	defb    -1	; Set with "ozdetectmodel" (see libraries)
 s_filetypetable: defw    0c089h
 
-_std_seed:      defw    0       ; Seed for integer rand() routines
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack

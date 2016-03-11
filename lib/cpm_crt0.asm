@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.26 2015-10-20 16:51:33 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.27 2016-03-11 11:19:10 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -345,10 +345,6 @@ IF !DEFINED_nofileio
 __fcb:		defs	420,0	;file control block (10 files) (MAXFILE)
 ENDIF
 
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:       defw    0      ; Seed for integer rand() routines
-ENDIF
 
 IF DEFINED_NEED1bitsound
 snd_tick:       defb	0	; Sound variable

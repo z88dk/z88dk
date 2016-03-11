@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.18 2015-01-21 07:05:00 stefano Exp $
+;	$Id: c128_crt0.asm,v 1.19 2016-03-11 11:19:10 dom Exp $
 ;
 
 
@@ -167,10 +167,6 @@ ELSE
 ENDIF
 
 
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
 
 
 ;Atexit routine

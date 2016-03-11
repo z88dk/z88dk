@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: pc6001_crt0.asm,v 1.3 2015-01-21 07:05:00 stefano Exp $
+;       $Id: pc6001_crt0.asm,v 1.4 2016-03-11 11:19:11 dom Exp $
 ;
 
 
@@ -188,10 +188,6 @@ coords:         defw    0       ; Current graphics xy coordinates
 base_graphics:  defw    0       ; Address of the Graphics map
 ;gfx_bank:       defb    0
 
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 

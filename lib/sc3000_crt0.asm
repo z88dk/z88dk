@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.8 2015-01-21 07:05:00 stefano Exp $
+;	$Id: sc3000_crt0.asm,v 1.9 2016-03-11 11:19:11 dom Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -34,8 +34,6 @@
 		PUBLIC    cleanup
 		PUBLIC    l_dcal
 
-; Integer rnd seed
-		PUBLIC    _std_seed
 
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
@@ -312,7 +310,6 @@ IF (startup=2)
 	DEFVARS RAM_Start
 	{
 	__sgoioblk      	ds.b    40      ;stdio control block
-	_std_seed        	ds.w    1       ;Integer seed
 	exitsp          	ds.w    1       ;atexit() stack
 	exitcount       	ds.b    1       ;Number of atexit() routines
 	pixelbyte           ds.w    1

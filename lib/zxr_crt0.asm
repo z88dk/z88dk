@@ -1,7 +1,7 @@
 ;
 ; Startup for Residos packages
 ;
-; $Id: zxr_crt0.asm,v 1.5 2013-10-21 14:23:44 stefano Exp $
+; $Id: zxr_crt0.asm,v 1.6 2016-03-11 11:19:11 dom Exp $
 ;
 
         MODULE	zxs_crt0
@@ -163,7 +163,6 @@ ENDIF
 coords:         defw    0       ; Current graphics xy coordinates
 base_graphics:  defw    0       ; Address of the Graphics map
 
-_std_seed:      defw    0       ; Seed for integer rand() routines
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack

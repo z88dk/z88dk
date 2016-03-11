@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.11 2015-01-21 07:05:00 stefano Exp $
+;       $Id: nc100_crt0.asm,v 1.12 2016-03-11 11:19:11 dom Exp $
 ;
 
 
@@ -30,7 +30,6 @@
 		PUBLIC    cleanup		;jp'd to by exit()
 		PUBLIC    l_dcal		;jp(hl)
 
-		PUBLIC    _std_seed	;Integer rand() seed
 
 		PUBLIC	_vfprintf	;jp to the printf() core
 
@@ -170,7 +169,6 @@ ENDIF
 ; Some variables
 ;-------
 
-_std_seed:       defw    0	;Integer rand() seed
 
 ;Atexit routine
 

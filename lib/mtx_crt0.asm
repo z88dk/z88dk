@@ -1,6 +1,6 @@
 ;       Memotech MTX CRT0 stub
 ;
-;       $Id: mtx_crt0.asm,v 1.6 2015-01-21 07:05:00 stefano Exp $
+;       $Id: mtx_crt0.asm,v 1.7 2016-03-11 11:19:11 dom Exp $
 ;
 
 
@@ -194,10 +194,6 @@ RG6SAV:		defb	0
 RG7SAV:		defb	0
 
 
-IF !DEFINED_HAVESEED
-                PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack

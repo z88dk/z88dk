@@ -1,7 +1,7 @@
 ;
 ;       Startup for Sorcerer Exidy
 ;
-;       $Id: sorcerer_crt0.asm,v 1.6 2015-01-21 07:05:00 stefano Exp $
+;       $Id: sorcerer_crt0.asm,v 1.7 2016-03-11 11:19:11 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -163,10 +163,6 @@ _heap:
                 defw 0
 ENDIF
 
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:       defw    0      ; Seed for integer rand() routines
-ENDIF
 
 IF DEFINED_NEED1bitsound
 snd_tick:       defb	0	; Sound variable

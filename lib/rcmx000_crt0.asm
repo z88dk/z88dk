@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: rcmx000_crt0.asm,v 1.8 2015-01-21 07:05:00 stefano Exp $
+;       $Id: rcmx000_crt0.asm,v 1.9 2016-03-11 11:19:11 dom Exp $
 ;
 ; - - - - - - -
 
@@ -41,7 +41,6 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-        PUBLIC    _std_seed        ;Integer rand() seed
 
         PUBLIC    _vfprintf       ;jp to the printf() core
 
@@ -137,8 +136,6 @@ ENDIF
 	; Here is a great place to store temp variables and stuff!!
 acme:	defw 4711 			; useless arbitrarily choosen number
 	defm  "Small C+ RCM2/3000",0	;Unnecessary file signature
-_std_seed:
-	defw 0          		; Needed for rand and srand
 
 ;-----------------------
 ; Floating point support

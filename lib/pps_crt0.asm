@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.11 2015-01-21 07:05:00 stefano Exp $
+;       $Id: pps_crt0.asm,v 1.12 2016-03-11 11:19:11 dom Exp $
 ;
 
 
@@ -23,7 +23,6 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-        PUBLIC    _std_seed        ;Integer rand() seed
 
         PUBLIC    _vfprintf       ;jp to the printf() core
 
@@ -277,7 +276,6 @@ ENDIF
 coords:         defw    0       ; Current graphics xy coordinates
 base_graphics:  defw    0       ; Address of the Graphics map
 
-_std_seed:      defw    0       ; Seed for integer rand() routines
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.20 2015-01-21 07:05:00 stefano Exp $
+;       $Id: cpc_crt0.asm,v 1.21 2016-03-11 11:19:10 dom Exp $
 ;
 
         MODULE  cpc_crt0
@@ -169,10 +169,6 @@ ELSE
 ENDIF
 
         
-IF !DEFINED_HAVESEED
-                PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:       defw    0       ; Seed for integer rand() routines
-ENDIF
 
 exitsp:         defw    0       ;  atexit       
 exitcount:      defb    0

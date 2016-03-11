@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.11 2015-01-21 07:05:00 stefano Exp $
+;       $Id: mc1000_crt0.asm,v 1.12 2016-03-11 11:19:11 dom Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -594,10 +594,6 @@ coords:         defw    0       ; Current graphics xy coordinates
 ;base_graphics:  defw    0       ; Address of the Graphics map
 ;gfx_bank:       defb    0
 
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack

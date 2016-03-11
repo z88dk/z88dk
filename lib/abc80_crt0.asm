@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato May 2000
 ;
-;       $Id: abc80_crt0.asm,v 1.11 2015-01-21 07:04:59 stefano Exp $
+;       $Id: abc80_crt0.asm,v 1.12 2016-03-11 11:19:10 dom Exp $
 ;
 
                 MODULE  abc80_crt0
@@ -26,9 +26,6 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
-; Integer rnd seed
-
-        PUBLIC    _std_seed
 
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
@@ -139,9 +136,6 @@ ELSE
 ENDIF
 
 
-;Seed for integer rand() routines
-
-_std_seed:      defw    0
 
 ;Atexit routine
 

@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.13 2016-03-08 23:13:08 dom Exp $
+;	$Id: app_crt0.asm,v 1.14 2016-03-11 11:19:10 dom Exp $
 
 
 ;--------
@@ -178,7 +178,9 @@ l_dcal:	jp	(hl)		;Used by various things
 ;-------
 processcmd:
 IF DEFINED_handlecmds
+IF !DEFINED_Z88DK_USES_SDCC
         EXTERN    _handlecmds
+ENDIF
         ld      l,a
         ld      h,0
         push    hl
@@ -194,7 +196,9 @@ ENDIF
 ;--------
 errhan:	ret	z		;Fatal error - far mem probs?
 IF DEFINED_redrawscreen
+IF !DEFINED_Z88DK_USES_SDCC
         EXTERN    _redrawscreen
+ENDIF
         cp      RC_Draw		;(Rc_susp for BASIC!)
         jr      nz,errhan2
         push    af		;Call users screen redraw fn if defined
@@ -205,7 +209,9 @@ errhan2:
         cp      RC_Quit		;they don't like us!
         jr      nz,keine_error
 IF DEFINED_applicationquit
+IF !DEFINED_Z88DK_USES_SDCC
 	EXTERN	_applicationquit	;Call users routine if defined
+ENDIF
 	call	_applicationquit
 ENDIF
         xor     a		;Standard cleanup
@@ -390,7 +396,6 @@ l_errlevel:      defb    0
 coords:          defw    0       ;Graphics xy coordinates
 base_graphics:   defw    0       ;Address of graphics map
 gfx_bank:        defb    0       ;Bank that this is in
-_std_seed:       defw    0       ;Integer seed
 exitsp:          defw    0       ;atexit() stack
 exitcount:       defb    0       ;Number of atexit() routines
 fp_seed:         defs    6       ;Floating point seed (not used ATM)

@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: sam_crt0.asm,v 1.13 2015-01-21 07:05:00 stefano Exp $
+;       $Id: sam_crt0.asm,v 1.14 2016-03-11 11:19:11 dom Exp $
 ;
 
 
@@ -29,9 +29,6 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
-; Integer rnd seed
-
-        PUBLIC    _std_seed
 
 ; vprintf is internal to this file so we only ever include one of the set
 ; of routines
@@ -184,7 +181,6 @@ ENDIF
 
 ;Seed for integer rand() routines
 
-_std_seed:       defw    0
 
 ;Atexit routine
 

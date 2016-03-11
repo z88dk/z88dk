@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.20 2015-04-07 16:47:02 stefano Exp $
+;       $Id: ts2068_crt0.asm,v 1.21 2016-03-11 11:19:11 dom Exp $
 ;
 
 
@@ -413,10 +413,6 @@ base_graphics:  defw    0       ; Address of the Graphics map
                                 ; probably unusef, but we keep it to extend
                                 ; COORDS for the 'wide' mode
 
-IF !DEFINED_HAVESEED
-                PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack

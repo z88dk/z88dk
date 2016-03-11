@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.35 2015-10-20 16:51:33 stefano Exp $
+;	$Id: msx_crt0.asm,v 1.36 2016-03-11 11:19:11 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -40,7 +40,6 @@ IF startup != 3
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
-        PUBLIC    _std_seed
 
         PUBLIC	snd_tick	; Sound variable
         PUBLIC	bit_irqstatus	; current irq status when DI is necessary
@@ -360,11 +359,6 @@ snd_tick:       defb	0	; Sound variable
 bit_irqstatus:	defw	0
 ENDIF
 
-;Seed for integer rand() routines
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:       defw    0       ; Seed for integer rand() routines
-ENDIF
 
 IF (startup=2)
   IF !DEFINED_nofileio
@@ -510,10 +504,6 @@ ENDIF
 	ld hl, $8080
 	ld (fp_seed),hl
 
-; init int seed
-
-        ld hl,1
-        ld (_std_seed),hl
 
 ; init heap
 

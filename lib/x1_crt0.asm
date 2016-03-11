@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.7 2015-01-21 07:05:01 stefano Exp $
+;    $Id: x1_crt0.asm,v 1.8 2016-03-11 11:19:11 dom Exp $
 ;
 
 	MODULE x1_crt0
@@ -23,7 +23,6 @@
 
         PUBLIC    cleanup 
         PUBLIC    l_dcal
-        PUBLIC    _std_seed
         PUBLIC    _vfprintf
 
         PUBLIC    exitsp
@@ -245,11 +244,6 @@ ELSE
         ENDIF
 ENDIF
 
-;Seed for integer rand() routines
-IF !DEFINED_HAVESEED
-		PUBLIC    _std_seed        ; Integer rand() seed
-_std_seed:      defw    0                ; Seed for integer rand() routines
-ENDIF
 
 exitsp:    defw    $FDFF
 exitcount: defb    0

@@ -1,7 +1,7 @@
 ;
 ;	Startup for test emulator
 ;
-;	$Id: test_crt0.asm,v 1.4 2015-01-21 07:05:00 stefano Exp $
+;	$Id: test_crt0.asm,v 1.5 2016-03-11 11:19:11 dom Exp $
 
 
     module test_crt0
@@ -150,10 +150,6 @@ ENDIF
 coords:         defw    0       ; Current graphics xy coordinates
 base_graphics:  defw    0       ; Address of the Graphics map
 
-IF !DEFINED_HAVESEED
-                PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
 
 exitsp:         defw    0       ; Address of where the atexit() stack is
 exitcount:      defb    0       ; How many routines on the atexit() stack
