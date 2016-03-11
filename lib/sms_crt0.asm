@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.9 2016-03-11 11:19:11 dom Exp $
+;	$Id: sms_crt0.asm,v 1.10 2016-03-11 11:59:42 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -161,22 +161,7 @@ start:
 	ldir
 	ld      (exitsp),sp
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
-
-	ld      hl,$8080
-	ld      (fp_seed),hl
-	xor     a
-	ld      (exitcount),a
+	call	crt0_init_data
 	
 	call	DefaultInitialiseVDP
 	
@@ -270,56 +255,77 @@ ELSE
 		ENDIF
 	ENDIF
 ENDIF
-
-; Static variables kept in safe workspace
-
-IF !DEFINED_sysdefvarsaddr
-		defc sysdefvarsaddr = RAM_Start+1024
-ENDIF
-
-DEFVARS RAM_Start
-{
-__sgoioblk      	ds.b    40      ;stdio control block
-exitsp          	ds.w    1       ;atexit() stack
-exitcount       	ds.b    1       ;Number of atexit() routines
-fp_seed         	ds.w    3       ;Floating point seed (not used ATM)
-extra           	ds.w    3       ;Floating point spare register
-fa              	ds.w    3       ;Floating point accumulator
-fasign          	ds.b    1       ;Floating point variable
-heapblocks      	ds.w    1       ;Number of free blocks
-heaplast        	ds.w    1       ;Pointer to linked blocks
-fputc_vdp_offs		ds.w	1	;Current character pointer
-aPLibMemory_bits	ds.b	1	;apLib support variable
-aPLibMemory_byte	ds.b	1	;apLib support variable
-aPLibMemory_LWM		ds.b	1	;apLib support variable
-aPLibMemory_R0		ds.w	1	;apLib support variable
-raster_procs		ds.w	8	;Raster interrupt handlers
-pause_procs		ds.w	8	;Pause interrupt handlers
-timer			ds.w	1	;This is incremented every time a VBL/HBL interrupt happens
-_pause_flag		ds.b	1	;This alternates between 0 and 1 every time pause is pressed
-RG0SAV			ds.b	1	;keeping track of VDP register values
-RG1SAV			ds.b	1
-RG2SAV			ds.b	1
-RG3SAV			ds.b	1
-RG4SAV			ds.b	1
-RG5SAV			ds.b	1
-RG6SAV			ds.b	1
-RG7SAV			ds.b	1
-}
-
-IF !DEFINED_defvarsaddr
-		defc defvarsaddr = RAM_Start+1024+256
-ENDIF
-
-DEFVARS defvarsaddr
-{
-dummydummy        ds.b    1 
-}
-
-
 ;--------
 ; Now, include the math routines if needed..
 ;--------
 IF NEED_floatpack
 ;        INCLUDE "float.asm"
 ENDIF
+
+SECTION code_crt_init
+crt0_init_data:
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+; Set up the std* stuff so we can be called again
+        ld      hl,__sgoioblk+2
+        ld      (hl),19 ;stdin
+        ld      hl,__sgoioblk+6
+        ld      (hl),21 ;stdout
+        ld      hl,__sgoioblk+10
+        ld      (hl),21 ;stderr
+ENDIF
+ENDIF
+        ld      hl,$8080
+        ld      (fp_seed),hl
+        xor     a
+        ld      (exitcount),a
+SECTION code_crt_exit
+        ret
+SECTION code_compiler
+SECTION code_clib
+SECTION code_crt0_sccz80
+SECTION code_l_sdcc
+SECTION data_compiler
+SECTION rodata_compiler
+SECTION rodata_clib
+
+SECTION bss_crt
+	org	RAM_Start
+__sgoioblk:      	defs    40      ;stdio control block
+exitsp:          	defw    0       ;atexit() stack
+exitcount:       	defb    0       ;Number of atexit() routines
+fp_seed:         	defs    6       ;Floating point seed (not used ATM)
+extra:           	defs    6       ;Floating point spare register
+fa:              	defs    6       ;Floating point accumulator
+fasign:          	defb    0       ;Floating point variable
+heapblocks:      	defw    0       ;Number of free blocks
+heaplast:        	defw    0       ;Pointer to linked blocks
+fputc_vdp_offs:		defw	0	;Current character pointer
+aPLibMemory_bits:	defb	0	;apLib support variable
+aPLibMemory_byte:	defb	0	;apLib support variable
+aPLibMemory_LWM:	defb	0	;apLib support variable
+aPLibMemory_R0:		defw	0	;apLib support variable
+raster_procs:		defs	16	;Raster interrupt handlers
+pause_procs:		defs	16	;Pause interrupt handlers
+timer:			defw	0	;This is incremented every time a VBL/HBL interrupt happens
+_pause_flag:		defb	0	;This alternates between 0 and 1 every time pause is pressed
+RG0SAV:			defb	0	;keeping track of VDP register values
+RG1SAV:			defb	0
+RG2SAV:			defb	0
+RG3SAV:			defb	0
+RG4SAV:			defb	0
+RG5SAV:			defb	0
+RG6SAV:			defb	0
+RG7SAV:			defb	0
+
+SECTION bss_clib
+IF DEFINED_defvarsaddr
+	org	defvarsaddr
+ENDIF
+SECTION bss_compiler
+
+
+
+
+
+
