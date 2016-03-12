@@ -4,9 +4,10 @@
 	PUBLIC	printk
 	PUBLIC	_printk
 
-	EXTERN	l_neg
 	EXTERN	l_gint
 	EXTERN	printk1
+	EXTERN	asm_vfprintf1
+	EXTERN	fputc_cons
 
 
 
@@ -17,7 +18,7 @@
 ;        int  *ct;
 ;        ct= (getarg()*2)+&fmt-4;
 ;
-;        printk1(sccz80_delta, *ct,ct-1);
+;        printk1(fp, print_func, sccz80_delta, *ct,ct-1);
 ;}
 printk:
 	ld	l,a
@@ -25,7 +26,11 @@ printk:
         add     hl,hl
 	add	hl,sp
 
-	ld	bc,l_neg		; sccz80 delta
+	ld	bc,0	
+	push	bc
+	ld	bc,printk_outc
+	push	bc
+	ld	bc,1
 	push	bc
 	ld	e,(hl)
 	inc	hl
@@ -35,14 +40,25 @@ printk:
 	dec	hl
 	dec	hl
 	push	hl
-	call	printk1
+	call	asm_vfprintf1
 	pop	bc
 	pop	bc	
 	pop	bc	
+	pop	bc
+	pop	bc
 	ret
 
 
-
+printk_outc:
+	pop	bc
+	pop	de	
+	pop	hl
+	push	bc
+	push	hl
+	call	fputc_cons
+	pop	hl
+	ret
+	
 
 ;sdcc version
 _printk:
@@ -53,16 +69,20 @@ _printk:
 	push	de
 	push	bc
 	push	ix	;save ix
-
-	ld	bc,sdcc_delta
+	ld	bc,0	;file
+	push	bc
+	ld	bc,printk_outc
+	push	bc
+	ld	bc,0	;flag
 	push	bc
 	push	de	;fmt
 	push	hl	;argument
-	call	printk1
+	call	asm_vfprintf1
 	pop	bc
 	pop	bc
 	pop	bc	
+	pop	bc
+	pop	bc
 	pop	ix	;restore ix
-sdcc_delta:
 	ret
 
