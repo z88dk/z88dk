@@ -4,7 +4,7 @@
  *      djm 4/5/99
  *
  * --------
- * $Id: fclose.c,v 1.4 2016-03-06 21:55:07 dom Exp $
+ * $Id: fclose.c,v 1.5 2016-03-13 22:22:39 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -66,12 +66,13 @@ fclose_check_success:
 	ret	nz
 	ex	de,hl
 fclose_success:
-	ld	(hl),0	;flags
+	ld	de,0
+	ld	(hl),e	;flags
 	dec	hl
-	ld	(hl),0	;descriptor + 1
+	ld	(hl),e	;descriptor + 1
 	dec	hl
-	ld	(hl),0
-	ld	hl,0
+	ld	(hl),e
+	ex	de,hl
 #endasm
 #else
         if ( (fp->flags&_IOUSE ==0 )  ||  (fp->flags&_IOSTRING) )  return(EOF);

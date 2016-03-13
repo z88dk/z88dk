@@ -22,7 +22,7 @@ stdio/vfprintf1
 stdio/printn
 stdio/puts
 stdio/8080/ungetc
-stdio/8080/fabandon
+stdio/fabandon
 stdio/rcmx000/fgetc_cons
 stdio/rcmx000/cnvtab
 stdio/fgets_cons
