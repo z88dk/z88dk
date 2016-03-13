@@ -9,7 +9,7 @@
  *      fclose from the other stuff
  *
  * -----
- * $Id: write.c,v 1.2 2013-03-03 23:51:10 pauloscustodio Exp $
+ * $Id: write.c,v 1.3 2016-03-13 18:14:13 dom Exp $
  */
 
 
@@ -22,7 +22,8 @@ size_t write(int fd, void *ptr, size_t len)
 #asm
         INCLUDE         "fileio.def"
 
-        ld      ix,2
+	push	ix
+        ld      ix,4
         add     ix,sp
         ld      e,(ix+0)        ;len
         ld      d,(ix+1)
@@ -33,6 +34,7 @@ size_t write(int fd, void *ptr, size_t len)
 	; Making the same assumptions as read()
 	rst	$10
 	ex	de,hl
+	pop	ix
 	ret	nc
 	ld	hl,-1
 #endasm

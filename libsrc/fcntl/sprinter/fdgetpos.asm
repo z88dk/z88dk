@@ -1,9 +1,10 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: fdgetpos.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
+;	$Id: fdgetpos.asm,v 1.3 2016-03-13 18:14:13 dom Exp $
 ;
 
 
+		SECTION	  code_clib
                 PUBLIC    fdgetpos
 
 ;int fgetpos(int fd, long *dump)
@@ -18,6 +19,7 @@
 	push	hl
 	push	de
 	push	bc
+	push	ix	;save callers
 	push	de	;save it for later
 	ld	a,l
 	ld	hl,0
@@ -28,6 +30,7 @@
 	pop	de	;where to store it
 	jr	nc,fdgetpos_ret
 	ld	hl,-1
+	pop	ix
 	ret
 .fdgetpos_ret
 	ex	de,hl
@@ -41,5 +44,6 @@
 	inc	hl
 	ld	(hl),d
 	ld	hl,0	;all ok
+	pop	ix
 	ret
 

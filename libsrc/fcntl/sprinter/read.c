@@ -9,7 +9,7 @@
  *      fclose from the other stuff
  *
  * -----
- * $Id: read.c,v 1.1 2002-10-03 20:07:20 dom Exp $
+ * $Id: read.c,v 1.2 2016-03-13 18:14:13 dom Exp $
  */
 
 
@@ -20,7 +20,8 @@
 size_t read(int fd, void *ptr, size_t len)
 {
 #asm
-        ld      ix,2
+	push	ix
+        ld      ix,4
         add     ix,sp
         ld      e,(ix+0)        ;len
         ld      d,(ix+1)
@@ -32,6 +33,7 @@ size_t read(int fd, void *ptr, size_t len)
 	; number of bytes read
 	ld	c,$13		;READ
 	rst	$10
+	pop	ix
 	ex	de,hl
 	ret	nc		;we did some reading
 	ld	hl,-1		;error

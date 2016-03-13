@@ -4,7 +4,7 @@
  *      readbyte(fd) - Read byte from file
  *
  * -----
- * $Id: readbyte.c,v 1.2 2003-09-10 20:22:52 dom Exp $
+ * $Id: readbyte.c,v 1.3 2016-03-13 18:14:13 dom Exp $
  */
 
 
@@ -16,8 +16,8 @@
 int __FASTCALL__ readbyte(int fd)
 {
 #asm
-	pop	de	;get fd
-	push	de	;restore fd
+	push	ix	;save callers
+	ex	de,hl	;de = fd
 	push	de	;make somespace
 	ld	hl,0
 	add	hl,sp
@@ -27,6 +27,7 @@ int __FASTCALL__ readbyte(int fd)
 	rst	$10
 	pop	de	;e holds the read value
 	ld	hl,-1
+	pop	ix
 	ret	c	;error, return EOF
 	ld	l,e
 	ld	h,0

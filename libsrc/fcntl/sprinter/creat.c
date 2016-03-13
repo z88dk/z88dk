@@ -6,7 +6,7 @@
  *      djm 27/4/99
  *
  * -----
- * $Id: creat.c,v 1.1 2002-10-03 20:07:19 dom Exp $
+ * $Id: creat.c,v 1.2 2016-03-13 18:14:13 dom Exp $
  */
 
 
@@ -15,7 +15,8 @@
 int creat(far char *name, mode_t mode)
 {
 #asm
-        ld      ix,0
+	push	ix
+        ld      ix,2
         add     ix,sp
         ld      l,(ix+4)        ;lower 16 of filename
         ld      h,(ix+5)
@@ -23,6 +24,7 @@ int creat(far char *name, mode_t mode)
 	ld	c,$0b		;CREAT NEW FILE
 	rst	$10
 	ld	hl,-1
+	pop	ix
 	ret	c
 	ld	a,l
 	ld	h,0

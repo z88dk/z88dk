@@ -4,7 +4,7 @@
  *      writebyte(int fd, int c) - Read byte from file
  *
  * -----
- * $Id: writebyte.c,v 1.2 2003-09-10 20:22:52 dom Exp $
+ * $Id: writebyte.c,v 1.3 2016-03-13 18:14:13 dom Exp $
  */
 
 
@@ -16,7 +16,8 @@
 int writebyte(int fd, int byte)
 {
 #asm
-        ld      ix,2
+	push	ix	
+        ld      ix,4
         add     ix,sp
         ld      a,(ix+2)        ;fd
 	push	ix
@@ -28,6 +29,7 @@ int writebyte(int fd, int byte)
 	pop	hl
 	ld	hl,-1
 	pop	de
+	pop	ix
 	ret	c		;error!
 	ld	a,(de)		;success, return with value written
 	ld	l,a

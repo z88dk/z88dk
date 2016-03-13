@@ -1,9 +1,9 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: fdtell.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
+;	$Id: fdtell.asm,v 1.3 2016-03-13 18:14:13 dom Exp $
 ;
 
-
+		SECTION	  code_clib
                 PUBLIC    fdtell
 
 ;int fdtell(int fd)
@@ -16,6 +16,7 @@
 	pop	hl	;fd
 	push	hl
 	push	bc
+	push	ix
 	ld	a,l
 	ld	hl,0
 	ld	ix,0
@@ -24,6 +25,7 @@
 	rst	$10
 	push	ix
 	pop	de
+	pop	ix	;get back callers
 	ret	nc	;was ok
 	ld	hl,-1
 	ld	de,-1

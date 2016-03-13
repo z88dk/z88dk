@@ -9,7 +9,7 @@
  *      fclose from the other stuff
  *
  * -----
- * $Id: close.c,v 1.1 2002-10-03 20:07:19 dom Exp $
+ * $Id: close.c,v 1.2 2016-03-13 18:14:13 dom Exp $
  */
 
 
@@ -23,9 +23,11 @@ int close(int fd)
         pop     hl
         push    hl
         push    bc
+	push	ix
 	ld	a,l
 	ld	c,$12	;CLOSE
 	rst	$10
+	pop	ix
 	ld	hl,0
 	ret	nc
 	dec	hl

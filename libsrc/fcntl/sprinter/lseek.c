@@ -12,7 +12,7 @@
  *   2  SEEK_END from end of file (always -ve)
  *
  * -----
- * $Id: lseek.c,v 1.3 2013-03-03 23:51:10 pauloscustodio Exp $
+ * $Id: lseek.c,v 1.4 2016-03-13 18:14:13 dom Exp $
  */
 
 
@@ -22,8 +22,8 @@ long lseek(int fd, long posn, int whence)
 {
 #asm
         INCLUDE "fileio.def"
-        
-        ld      ix,0    
+       	push	ix 
+        ld      ix,2    
         add     ix,sp
         ld      b,(ix+2)        ;whence
 	ld	e,(ix+4)	;file position
@@ -36,12 +36,14 @@ long lseek(int fd, long posn, int whence)
 	ld	c,$15		;MOVE_FP
 	rst	$10
 	jr	nc,lseek_ret
+	pop	ix
 	ld	hl,-1
 	ld	de,-1
 	ret
 .lseek_ret
 	push	ix
 	pop	de
+	pop	ix
 #endasm
 }
 
