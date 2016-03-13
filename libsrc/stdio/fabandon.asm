@@ -11,11 +11,11 @@ _fabandon:
         push    hl
         push    de
         xor     a
-        ld      (hl),0
+        ld      (hl),a
         inc     hl
-        ld      (hl),0
+        ld      (hl),a
         inc     hl
-        ld      (hl),0
+        ld      (hl),a
         inc     hl
-        ld      (hl),0
+        ld      (hl),a
 	ret
