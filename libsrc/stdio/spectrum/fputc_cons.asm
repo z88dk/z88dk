@@ -12,7 +12,7 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.16 2016-03-09 22:25:54 dom Exp $
+;	$Id: fputc_cons.asm,v 1.17 2016-03-20 19:08:24 dom Exp $
 ;
 
 
@@ -102,7 +102,7 @@ defc attr = 23693
           ld    bc,(chrloc)
 	ld	a,b
 	cp	24
-	jr	nz,noscroll
+	jr	c,noscroll
 	call	scrollup
 	ld	bc,23*256
 	ld  (chrloc),bc
@@ -188,13 +188,12 @@ noscroll:
           ld    bc,(chrloc)  
 	ld	a,b
 	cp	24
-	jr	nz,noscroll2
+	jr	c,noscroll2
 	call	scrollup
 	ld	bc,23*256
 	ld  (chrloc),bc
 noscroll2:
 	  srl   c  
-          ex    af,af'  
           ld    a,b  
           and   248  
           add   a,64  
@@ -205,9 +204,7 @@ noscroll2:
           rrca  
           rrca  
           add   a,c  
-          ld	e,a
-; Screen posn in de, now get font
-          ex	af,af
+          ld	e,a		;de = screen posn, hl = character
 
           ld	b,8
 .loop32
@@ -236,14 +233,14 @@ noscroll2:
 ; We should scroll the screen up one character here
 ; Blanking the bottom row..
 .scrollup
-     push   hl
-	 ld		a,($dff)
-	 cp		$17
-	 jr		nz,ts2068_rom
-	 call   call_rom3
-	 defw	3582	;scrollup
-     pop    hl
-	 ret
+ 	push   hl
+	ld	a,($dff)
+	cp	$17
+	jr	nz,ts2068_rom
+	call   call_rom3
+	defw	3582	;scrollup
+     	pop    hl
+	ret
 .ts2068_rom
 	 call   call_rom3
      defw	$939	; TS2068 scrollup
