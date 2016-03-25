@@ -3,7 +3,7 @@
  *
  *	Routines for dealing with longjmps
  *
- *	$Id: setjmp.h,v 1.6 2016-03-06 21:38:22 dom Exp $
+ *	$Id: setjmp.h,v 1.7 2016-03-25 22:10:53 dom Exp $
  */
 
 
@@ -18,13 +18,13 @@
  */
 
 typedef struct {
-	int	ix
+	int	ix;
 	int	sp;
 	int	pc;
 } jmp_buf;
 
 
-extern int __LIB__ setjmp(jmp_buf env);
-extern void __LIB__ longjmp(jmp_buf env, int val);
+extern int __LIB__ setjmp(jmp_buf *env);
+extern void __LIB__ longjmp(jmp_buf *env, int val);
 
 #endif /* _SETJMP_H */

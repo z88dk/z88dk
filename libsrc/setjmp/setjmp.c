@@ -21,6 +21,7 @@ int setjmp(jmp_buf env)
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
+	inc	hl
 	ex	de,hl	;de=&env, hl=scratch
 	ld	hl,0
 	add	hl,sp	;stack pointer
