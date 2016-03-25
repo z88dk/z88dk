@@ -27,7 +27,7 @@ ENDIF
 
 .punc_tbl
 
-   defm "!$%^&*()_-+={[]}#~'`@;:/?.>,<\|"
+   defm "!$%^&*()_-+={[]}#~'`@;:/?.>,<\\|/"
    defb 34,34		; quote (pound isn't punctuation)
 
 .punc_end
