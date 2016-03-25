@@ -359,7 +359,7 @@ diff -wu Z80.orig/Z80.c Z80/Z80.c
 +/** We need this in order to not reset the ioi / ioe flags
 + *  when fetching instructions
 + */
-+INLINE byte OpZ80(word A) {
++byte OpZ80(word A) {
 +  return RAM[A]; 
 +}
 +
