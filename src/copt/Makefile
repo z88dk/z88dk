@@ -21,7 +21,7 @@ install:
 	$(INSTALL) copt$(EXESUFFIX) $(PREFIX)/bin
 
 clean:
-	$(RM) copt$(EXESUFFIX) copt.o core$(EXESUFFIX)
+	$(RM) copt$(EXESUFFIX) copt.o core$(EXESUFFIX) regex/*.o
 	$(RM) -rf Debug Release
 
 

@@ -259,13 +259,8 @@ int match(char *ins, char *pat, char **vars)
 				else
 					var = 0;
 				if (var && vars[var-'0'] != 0) {
-					fprintf(stderr,
-					"warning: variable %%%c has already a value in \"%s\"\n",
-						p[1], start);
-					fprintf(stderr,
-					"please use REGEXP only on the last occurance of a variable\
- in the input pattern\n",
-						p[1], start);
+					fprintf(stderr, "warning: variable %%%c has already a value in \"%s\"\n", p[1], start);
+					fprintf(stderr, "please use REGEXP only on the last occurance of a variable in the input pattern\n");
 					goto l_fallthrough;
 				}
 				strncpy(re, pat + 2, p - pat - 2);
@@ -509,12 +504,12 @@ struct lnode *opt(struct lnode *r)
 		/* check for activation rules */
 		if (o->o_new && strcmp(o->o_new->l_text, "%activate\n") == 0) {
 			/* we have to prevent repeated activation of rules */
-			char signature[160];
+			char signature[300];
 			struct lnode *lnp;
 			struct onode *nn, *last;
 			int skip = 0;
 			/* since we 'install()' strings, we can compare pointers */
-			sprintf(signature, "%s%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x\n",
+			sprintf(signature, "%s%p%p%p%p%p%p%p%p%p%p\n",
 				activated,
 				vars[0], vars[1], vars[2], vars[3], vars[4],
 				vars[5], vars[6], vars[7], vars[8], vars[9]);
@@ -579,7 +574,7 @@ struct lnode *opt(struct lnode *r)
 /* #define _TESTING */
 
 /* main - peephole optimizer */
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	FILE *fp;
 #ifdef _TESTING
