@@ -3,7 +3,7 @@
  *
  *      The rather simple preprocessor is here
  *
- *      $Id: preproc.c,v 1.3 2004-03-26 22:06:09 denniz Exp $
+ *      $Id: preproc.c,v 1.4 2016-03-29 13:39:44 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -197,8 +197,10 @@ void keepch(char c)
 */
 void preprocess()
 {
+#if 0
         char c,sname[NAMESIZE];
         int k;
+#endif
 
         ifline() ;
 	return;

@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.30 2016-03-09 21:31:13 dom Exp $
+ *      $Id: main.c,v 1.31 2016-03-29 13:39:44 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -59,7 +59,6 @@ void    UnSetExpand(char *);
 void    SetMakeShared(char *);
 void    SetUseShared(char *);
 void SetAssembler(char *arg);
-static void SetZ80asmSections(char *);
 
 
 /*
@@ -1220,7 +1219,7 @@ void SetOrg(char *arg)
         unsigned int    num;
         num=0;
         sscanf(arg+5,"%u",&num);
-        if    (num>=0 && num <= 65535U )
+        if    (num <= 65535U )
                 zorg=num;
 }
 

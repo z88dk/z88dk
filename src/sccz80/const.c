@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.20 2013-11-10 21:53:50 dom Exp $
+ *      $Id: const.c,v 1.21 2016-03-29 13:39:44 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -235,7 +235,7 @@ int stash_double_str(char *start, char *end)
 {
     int  len;
     int32_t val;
-    unsigned char  *buf;
+    char  *buf;
 
     len = end-start;
 
@@ -248,7 +248,7 @@ int stash_double_str(char *start, char *end)
     }
     strncpy(buf,start,len);
     *(buf+len)=0;
-    storeq(len+1,buf,&val);
+    storeq(len+1,(unsigned char *)buf,&val);
     free(buf);
     return(val);
 }
@@ -428,7 +428,7 @@ int storeq(int length, unsigned char *queue,int32_t *val)
                          * correctly
                          */
         while (len >= j) {
-                if (strncmp(queue,litq+j,k) == 0) {*val=j-1; return(1);} /*success!*/
+                if (strncmp((char *)queue,(char *)litq+j,k) == 0) {*val=j-1; return(1);} /*success!*/
                 j++;
         }
 /* If we get here, then dump it in the queue as per normal... */
@@ -447,7 +447,6 @@ int storeq(int length, unsigned char *queue,int32_t *val)
 
 int qstr(int32_t *val)
 {
-    int c;
     int cnt=0;
 
     if ( cmatch('"') == 0 ) 

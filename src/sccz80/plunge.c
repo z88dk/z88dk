@@ -3,7 +3,7 @@
  *
  *      Plunging routines
  *
- *      $Id: plunge.c,v 1.11 2014-03-18 23:15:30 dom Exp $
+ *      $Id: plunge.c,v 1.12 2016-03-29 13:39:44 dom Exp $
  *
  *      Altogether now...arse! My cunning scheme to use c as an
  *      indicator flops badly due to logical conditions, I just
@@ -57,7 +57,6 @@ int skim(char *opstr, void (*testfuncz)(), void (*testfuncq)(), int dropval, int
  */
 void dropout(int k, void (*testfuncz)(), void (*testfuncq)(), int exit1, LVALUE *lval)
 {
-    int temp;
         if ( k )
                 rvalue(lval) ;
         else if ( lval->is_const ) {

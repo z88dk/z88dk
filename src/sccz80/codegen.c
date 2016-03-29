@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.39 2016-03-09 21:31:13 dom Exp $
+ *      $Id: codegen.c,v 1.40 2016-03-29 13:39:44 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -1007,9 +1007,8 @@ int modstk(int newsp,int save,int saveaf)
     k = newsp - Zsp ;
 
     if ( k == 0 ) return newsp ;
-	/* Yes this goto could be an if but this is a dev compiler! */
 #ifdef USEFRAME
-	if (useframe) goto modstkcht;
+    if (useframe) goto modstkcht;
 #endif
     if ( k > 0 ) {
         if ( k < 11 ) {
@@ -1040,10 +1039,12 @@ int modstk(int newsp,int save,int saveaf)
         }
     }
 /*
- * These doexx() where swap() but if we return a long then we've fubarred
+ * These doexx() here swap() but if we return a long then we've fubarred
  * up!
  */
+#ifdef USEFRAME
 modstkcht:
+#endif
 	if (saveaf) {
 	    if ( noaltreg ) {
             zpushflags();

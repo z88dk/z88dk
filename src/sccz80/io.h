@@ -30,13 +30,15 @@ extern void outdec(long number);
 extern void outd2(long n);
 extern void queuelabel(int);
 
-typedef struct {
-	struct t_buffer *before;
+typedef struct t_buffer_s t_buffer;
+
+struct t_buffer_s {
+	t_buffer *before;
 	size_t size;
 	char *start;
 	char *end;
 	char *next;
-} t_buffer;
+};
 
 extern t_buffer * startbuffer(int blocks);
 extern void clearbuffer(t_buffer *buf);

@@ -8,7 +8,7 @@
  *
  *      Started djm 22/4/99
  *
- *      $Id: goto.c,v 1.2 2004-03-26 22:06:09 denniz Exp $
+ *      $Id: goto.c,v 1.3 2016-03-29 13:39:44 dom Exp $
  *
  *      The scheme is:
  *
@@ -107,7 +107,8 @@ void dogoto()
 /* Not defined, add into the goto queue */
                         label=AddGoto(ptr);
 		}
-        } else if ( (ptr=addgotosym(sname) ) ) {
+        } else {
+		ptr=addgotosym(sname);
 		debug(DBG_GOTO,"Adding symbol to table\n");
                 ptr->offset.i=0;
                 label=AddGoto(ptr);

@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.24 2015-10-27 18:30:48 aralbrec Exp $
+ *      $Id: primary.c,v 1.25 2016-03-29 13:39:44 dom Exp $
  */
 
 
@@ -180,7 +180,7 @@ void dcerror(LVALUE *lval)
  */
 int calc(
 	 int left,
-	 void (*oper)(void),
+	 void (*oper)(struct lvalue *),
 	 int right)
 {
         if (oper == zdiv)      return (left / right );
@@ -195,7 +195,7 @@ int calc(
 
 int calcun(
 	   unsigned int left,
-	   void (*oper)(void),
+	   void (*oper)(struct lvalue *),
 	   unsigned int right)
 {
         if (oper == zdiv)      return (left / right );
@@ -214,7 +214,7 @@ int calcun(
 
 int CalcStand(
 	      int left,
-	      void (*oper)(void),
+	      void (*oper)(struct lvalue *),
 	      int right)
 {
         if (oper == zor)        return (left | right) ;

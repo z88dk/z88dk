@@ -2,7 +2,7 @@
  * cc4.c - fourth part of Small-C/Plus compiler
  *         routines for recursive descent
  *
- * $Id: expr.c,v 1.12 2004-03-26 22:06:09 denniz Exp $
+ * $Id: expr.c,v 1.13 2016-03-29 13:39:44 dom Exp $
  *
  */
 
@@ -62,7 +62,7 @@ int heir1(LVALUE *lval)
 {
     char *before, *start ;
     LVALUE lval2, lval3 ;
-    void (*oper)(), (*doper)(), (*uoper)() ;
+    void (*oper)(), (*doper)();
     int k;
 
     ClearCast(&lval2); ClearCast(&lval3);
@@ -549,7 +549,7 @@ int heira(LVALUE *lval)
         else if (cmatch('-')) {
                 if (heira(lval)) rvalue(lval);
                 neg(lval);
-                if (lval->val_type !=DOUBLE ) lval->const_val =- lval->const_val;
+                if (lval->val_type !=DOUBLE ) lval->const_val = -lval->const_val;
                 lval->stage_add = NULL_CHAR ;
                 return 0 ;
         }

@@ -1,9 +1,9 @@
 /* primary.c */
 extern int primary(LVALUE *lval);
 extern void dcerror(LVALUE *lval);
-extern int calc(int left, void (*oper)(void), int right);
-extern int calcun(unsigned int left, void (*oper)(void),unsigned int right);
-extern int CalcStand(int left, void (*oper)(void), int right);
+extern int calc(int left, void (*oper)(struct lvalue *), int right);
+extern int calcun(unsigned int left, void (*oper)(struct lvalue *),unsigned int right);
+extern int CalcStand(int left, void (*oper)(struct lvalue *), int right);
 extern void intcheck(LVALUE *lval, LVALUE *lval2);
 extern void force(int t1, int t2, char sign1, char sign2, int lconst);
 extern int widen(LVALUE *lval, LVALUE *lval2);
