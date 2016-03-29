@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.114 2016-03-09 21:31:13 dom Exp $
+ *      $Id: zcc.c,v 1.115 2016-03-29 11:46:38 dom Exp $
  */
 
 
@@ -1003,13 +1003,13 @@ static char *expand_macros(char *arg)
             char  *end = strchr(ptr+1,'}');
             
             if ( end != NULL ) {
-                snprintf(varname, sizeof(varname), "%.*s", ( end - ptr - 2 ), ptr + 2);
+                snprintf(varname, sizeof(varname), "%.*s", (int)( end - ptr - 2 ), ptr + 2);
                 rep = getenv(varname);
                 if ( rep == NULL ) {
                     rep = "";
                 }
                 
-                snprintf(varname, sizeof(varname), "%.*s", end - ptr + 1, ptr);
+                snprintf(varname, sizeof(varname), "%.*s", (int)(end - ptr + 1), ptr);
                 nval = replace_str(value, varname, rep);
                 free(value);
                 value = nval;
@@ -1284,7 +1284,6 @@ static void configure_assembler()
 {
     char           *assembler = NULL;
     char           *linker = NULL;
-    char           *ptr;
     int             type = ASM_Z80ASM;
     enum iostyle    style = outimplied;
     char           *name = c_assembler_type;
@@ -1556,7 +1555,7 @@ ShowErrors(char *filen, char *orig)
     char            buffer[LINEMAX + 1];
     char            buffer2[LINEMAX + 1];
     char            filenamebuf[LINEMAX + 1];
-    int             j,linepos,fnpos,fnlen;
+    int             j,linepos;
     FILE           *fp, *fp2;
 
     temp = changesuffix(filen, ".err");
