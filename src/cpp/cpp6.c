@@ -2,7 +2,7 @@
  *			    C P P 6 . C
  *		S u p p o r t   R o u t i n e s
  *
- * $Id: cpp6.c,v 1.11 2015-02-07 16:11:43 stefano Exp $
+ * $Id: cpp6.c,v 1.12 2016-03-29 11:44:18 dom Exp $
  *
  *
  * Edit History
@@ -273,7 +273,7 @@ catenate()
 int
 scanstring(delim, outfun)
 register int	delim;			/* ' or "			*/
-int		(*outfun)();		/* Output function		*/
+void (*outfun)(int);		/* Output function		*/
 /*
  * Scan off a string.  Warning if terminated by newline or EOF.
  * outfun() outputs the character -- to a buffer if in a macro.
@@ -307,7 +307,7 @@ int		(*outfun)();		/* Output function		*/
 
 void scannumber(c, outfun)
 register int	c;				/* First char of number	*/
-register int	(*outfun)();			/* Output/store func	*/
+register void (*outfun)(int);			/* Output/store func	*/
 /*
  * Process a number.  We know that c is from 0 to 9 or dot.
  * Algorithm from Dave Conroy's Decus C.
@@ -937,7 +937,7 @@ intptr_t arg;			/* Something for the message	*/
 	if (*severity == 'S')
 	    fprintf(stderr, format, arg);
 	else
-	    fprintf(stderr, format, (int) arg);     // !!!
+	    fprintf(stderr, format, (int) arg);     /* !!! */
 	putc('\n', stderr);
 	if ((file = infile) == NULL)
 	    return;				/* At end of file	*/
@@ -980,7 +980,7 @@ int		narg;		/* Single numeric argument		*/
  * Print a normal error message, numeric argument.
  */
 {
-	domsg("IError", format, (intptr_t)narg);	// !!!
+	domsg("IError", format, (intptr_t)narg);	/* !!! */
 	errors++;
 }
 
@@ -1012,6 +1012,6 @@ int		narg;			/* Single numeric argument	*/
  * A non-fatal error, numeric argument.
  */
 {
-	domsg("IWarning", format, (intptr_t)narg);	// !!!
+	domsg("IWarning", format, (intptr_t)narg);	/* !!! */
 }
 

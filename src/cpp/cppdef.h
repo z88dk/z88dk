@@ -1,4 +1,4 @@
-/*  $Id: cppdef.h,v 1.5 2016-02-04 01:24:07 aralbrec Exp $  */
+/*  $Id: cppdef.h,v 1.6 2016-03-29 11:44:18 dom Exp $  */
 
 #define	TRUE			1
 #define	FALSE			0
@@ -16,7 +16,7 @@
 #define TARGET			SYS_UNIX
 #define LINE_PREFIX		""
 #define MSG_PREFIX		"cpp: "
-#define FILE_LOCAL
+#define FILE_LOCAL		static
 #define OK_DOLLAR		FALSE
 #define OK_CONCAT		TRUE
 

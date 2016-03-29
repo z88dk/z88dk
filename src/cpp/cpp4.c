@@ -2,7 +2,7 @@
  *			    C P P 4 . C
  *		M a c r o  D e f i n i t i o n s
  *
- * $Id: cpp4.c,v 1.7 2015-02-07 16:14:34 stefano Exp $
+ * $Id: cpp4.c,v 1.8 2016-03-29 11:44:18 dom Exp $
  *
  *
  * Edit History
@@ -33,8 +33,11 @@ static char	*parmp;			/* Free space in parm		*/
 static char	*parlist[LASTPARM];	/* -> start of each parameter	*/
 static int	nargs;			/* Parameters for this macro	*/
 
-void stparmscan(int delim);
-void checkparm(register int	c, DEFBUF *dp);
+FILE_LOCAL void stparmscan(int delim);
+FILE_LOCAL void checkparm(register int	c, DEFBUF *dp);
+FILE_LOCAL void charput(int c);
+FILE_LOCAL int expcollect();
+FILE_LOCAL void expstuff(DEFBUF *tokenp);	/* Current macro being expanded	*/
 
 void dodefine()
 /*
@@ -79,7 +82,6 @@ void dodefine()
 	register DEFBUF		*dp;		/* -> new definition	*/
 	int			isredefine;	/* TRUE if redefined	*/
 	char			*old;		/* Remember redefined	*/
-	extern int		save();		/* Save char in work[]	*/
 
 	if (type[(c = skipws())] != LET)
 	    goto bad_define;
@@ -131,7 +133,7 @@ void dodefine()
 	        int q;
 
 	        if (get()=='#') q=0; else { q=1; unget(); }
-		while (workp > work && type[workp[-1]] == SPA)
+		while (workp > work && type[(int)workp[-1]] == SPA)
 		    --workp;			/* Erase leading spaces	*/
 		if (q) save(TOK_QUOTE); else save(TOK_SEP);	/* Stuff a delimiter	*/
 		c = skipws();			/* Eat whitespace	*/
@@ -300,7 +302,6 @@ int		delim;
 {
 	register char		*wp;
 	register int		i;
-	extern int		save();
 
 	wp = workp;			/* Here's where it starts	*/
 	if (!scanstring(delim, save))
@@ -320,7 +321,7 @@ int		delim;
 }
 #endif
 
-doundef()
+void doundef()
 /*
  * Remove the symbol from the defined list.
  * Called from the #control processor.
@@ -357,7 +358,7 @@ char		*text;
 	}
 }
 
-charput(c)
+void charput(c)
 register int	c;
 /*
  * Put the byte in the parm[] buffer.
@@ -487,7 +488,6 @@ expcollect()
 {
 	register int	c;
 	register int	paren;			/* For embedded ()'s	*/
-	extern int	charput();
 
 	for (;;) {
 	    paren = 0;				/* Collect next arg.	*/

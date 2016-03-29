@@ -3,7 +3,7 @@
  *
  *                         Process #control lines
  *
- * $Id: cpp2.c,v 1.5 2014-02-22 19:58:50 dom Exp $
+ * $Id: cpp2.c,v 1.6 2016-03-29 11:44:18 dom Exp $
  *
  *
  * Edit history
@@ -56,6 +56,8 @@
 
 FILE_LOCAL void doif(int hash);
 FILE_LOCAL void doinclude(void);
+FILE_LOCAL int openinclude(char *filename, int searchlocal);
+FILE_LOCAL int hasdirectory(char *source, char *result);
 
 int
 control(counter)
@@ -162,7 +164,7 @@ dump_line:      skipnl();                       /* Ignore rest of line  */
              * We subtract 1 as we want the number of the next line.
              */
             line = atoi(work) - 1;              /* Reset line number    */
-            for (tp = work; isdigit(*tp) || type[*tp] == SPA; tp++)
+            for (tp = work; isdigit(*tp) || type[(int)*tp] == SPA; tp++)
                 ;                               /* Skip over digits     */
             if (*tp != EOS) {                   /* Got a filename, so:  */
                 if (*tp == '"' && (ep = strrchr(tp + 1, '"')) != NULL) {

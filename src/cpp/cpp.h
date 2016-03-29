@@ -5,7 +5,7 @@
  * In general, definitions in this file should not be changed.
  *
  *
- * $Id: cpp.h,v 1.5 2015-02-07 16:14:34 stefano Exp $
+ * $Id: cpp.h,v 1.6 2016-03-29 11:44:18 dom Exp $
  *
  */
 
@@ -236,9 +236,6 @@ extern char	*savestring();		/* Stuff string in malloc mem.	*/
 void addfile(FILE *fp, char *filename);
 void textput(char *text);
 void output(int c);				/* Output one character	*/
-FILE_LOCAL void cppmain();
-FILE_LOCAL void sharp();
-FILE_LOCAL void expstuff(DEFBUF *tokenp);	/* Current macro being expanded	*/
 
 
 /* Error message handling */
@@ -248,3 +245,26 @@ void cfatal(char *format, char *sarg);
 void cwarn(char *format, char *sarg);
 void ciwarn(char *format, int narg);
 void domsg(char *severity, char *format, intptr_t arg);
+
+void save(register int  c);
+int dooptions(int argc, char *argv[]);
+void initdefines();
+void setincdirs();
+
+int control(int counter);
+int skipws();
+int get();
+void expand(register DEFBUF *tokenp);
+int cget();
+int catenate();
+int macroid(register int c);
+void unget();
+void skipnl();
+void ungetstring(char		*text);
+void dodefine();
+void doundef();
+void scanid(register int c);
+int scanstring(register int delim, void (*outfun)(int)); 
+void scannumber(register int c, register void (*outfun)(int));
+int openfile(char *filename);
+int eval();

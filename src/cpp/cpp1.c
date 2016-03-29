@@ -1,7 +1,7 @@
 /*
  * CPP main program.
  *
- * $Id: cpp1.c,v 1.4 2015-02-05 20:17:27 stefano Exp $
+ * $Id: cpp1.c,v 1.5 2016-03-29 11:44:18 dom Exp $
  *
  *
  * Edit history
@@ -240,7 +240,10 @@ char	*magic[] = {			/* Note: order is important	*/
 	NULL				/* Must be last			*/
 };
 
-main(argc, argv)
+FILE_LOCAL void cppmain();
+FILE_LOCAL void sharp();
+
+int main(argc, argv)
 int		argc;
 char		*argv[];
 {
@@ -403,7 +406,7 @@ void cppmain()
 	    unget();				/* Reread the char.	*/
 	    for (;;) {				/* For the whole line,	*/
 		do {				/* Token concat. loop	*/
-		    for (counter = 0; (type[(c = get())] == SPA);) {
+		    for (counter = 0; type[(c = get())] == SPA;) {
 			if (pflag) output(c);
 			else {
 #if COMMENT_INVISIBLE
@@ -459,7 +462,7 @@ int		c;
  * argument to scanstring()
  */
 {
- 	static quote_quote=0;
+ 	static int quote_quote=0;
  	
 	if (c == DBL_QUOTE)
 	    { if (join) { putchar('\\'); join=0; } putchar('"'); quote_quote=!quote_quote; }
@@ -496,7 +499,7 @@ void sharp()
 	        name = (infile->progname != NULL)
 		    ? infile->progname : infile->filename;
 	        if (sharpfilename == NULL
-	        || sharpfilename != NULL && !streq(name, sharpfilename)) {
+	        || (sharpfilename != NULL && !streq(name, sharpfilename))) {
 		    if (sharpfilename != NULL)
 		        free(sharpfilename);
 		    sharpfilename = savestring(name);

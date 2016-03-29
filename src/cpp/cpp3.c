@@ -3,7 +3,7 @@
  *
  *		    File open and command line options
  *
- * $Id: cpp3.c,v 1.5 2015-02-05 20:17:27 stefano Exp $
+ * $Id: cpp3.c,v 1.6 2016-03-29 11:44:18 dom Exp $
  *
  *
  * Edit history
@@ -68,7 +68,7 @@ char		*filename;		/* Name of the file		*/
 	wrongline = TRUE;		/* Force out initial #line	*/
 }
 
-setincdirs()
+void setincdirs()
 /*
  * Append system-specific directories to the include directory list.
  * Called only when cpp is started.
@@ -214,7 +214,7 @@ char		*argv[];
 
 		case 'S':
 		    sizp = size_table;
-		    if (isdatum = (*ap != '*'))	/* If it's just -S,	*/
+		    if ( (isdatum = (*ap != '*')) != 0  )	/* If it's just -S,	*/
 			endtest = T_FPTR;	/* Stop here		*/
 		    else {			/* But if it's -S*	*/
 			ap++;			/* Step over '*'	*/
@@ -306,7 +306,7 @@ register char	*ap;
 }
 #endif
 
-initdefines()
+void initdefines()
 /*
  * Initialize the built-in #define's.  There are two flavors:
  * 	#define decus	1		(static definitions)

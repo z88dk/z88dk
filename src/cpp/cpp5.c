@@ -2,7 +2,7 @@
  *			    C P P 5 . C
  *		E x p r e s s i o n   E v a l u a t i o n
  *
- * $Id: cpp5.c,v 1.2 2008-05-26 06:53:01 stefano Exp $
+ * $Id: cpp5.c,v 1.3 2016-03-29 11:44:18 dom Exp $
  *
  *
  * Edit History
@@ -160,15 +160,15 @@ typedef struct types {
 } TYPES;
 
 static TYPES basic_types[] = {
-	 T_CHAR,	"char",		
-	 T_INT,	"int",		
-	 T_FLOAT,	"float",	
-	 T_DOUBLE,	"double",	
-	 T_SHORT,	"short",	
-	 T_LONG,	"long",		
-	 T_SIGNED,	"signed",	
-	 T_UNSIGNED,	"unsigned",	
-	 0,		NULL,			/* Signal end		*/
+	 { T_CHAR,	"char"},		
+	 { T_INT,	"int"},		
+	 { T_FLOAT,	"float"},	
+	 { T_DOUBLE,	"double"},	
+	 { T_SHORT,	"short"},	
+	 { T_LONG,	"long"},		
+	 { T_SIGNED,	"signed"},	
+	 { T_UNSIGNED,	"unsigned"},	
+	 { 0,		NULL},			/* Signal end		*/
 };
 
 /*
@@ -198,6 +198,13 @@ SIZES size_table[] = {
     { T_FPTR,	0,		S_PFPTR		},	/* int (*()) 	*/
     { 0,	0,		0		},	/* End of table	*/
 };
+
+FILE_LOCAL int dosizeof();
+FILE_LOCAL int evallex(int skip);
+FILE_LOCAL int *evaleval(register int *valp, int op, int skip);
+FILE_LOCAL int evalchar(int skip);
+FILE_LOCAL int evalnum(register int c);
+FILE_LOCAL int bittest(int value);
 
 int
 eval()
@@ -347,7 +354,7 @@ again:	;
 		opp--;				/* Unstack :		*/
 		if (opp->op != OP_QUE) {	/* Matches ? on stack?	*/
 		    cerror("Misplaced '?' or ':', previous operator is %s",
-			opname[opp->op]);
+			opname[(int)opp->op]);
 		    return (1);
 		}
 		/*
