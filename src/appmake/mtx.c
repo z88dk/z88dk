@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.9 2014-09-19 16:12:01 stefano Exp $
+ *      $Id: mtx.c,v 1.10 2016-03-29 12:49:17 dom Exp $
  */
 
 
@@ -120,7 +120,7 @@ int mtx_exec(char *target)
     if ( help )
         return -1;
 
-    if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1) ) ) {
         return -1;
     }
 

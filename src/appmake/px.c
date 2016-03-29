@@ -3,7 +3,7 @@
  *      This tool handles only the compact format (similar to the one used by BASIC)
  *      to reduce the directory size at most and leave space for our executable.
  *
- *      $Id: px.c,v 1.4 2015-11-13 06:47:21 stefano Exp $
+ *      $Id: px.c,v 1.5 2016-03-29 12:49:17 dom Exp $
  */
 
 
@@ -42,7 +42,6 @@ int px_exec(char *target)
     char    filename[FILENAME_MAX+1];
     FILE   *fpin;
     FILE   *fpout;
-    char    mybuf[20];
     char    romimg[32768];
     int     len,len2,namelen;
     int     c,i;

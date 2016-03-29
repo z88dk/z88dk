@@ -3,7 +3,7 @@
  *      Philips VG-5000 application packager
  * 		(c) 2014 Stefano Bodrato, part of the z88dk kit
  *      
- *      $Id: vg5k.c,v 1.2 2014-07-23 06:31:57 stefano Exp $
+ *      $Id: vg5k.c,v 1.3 2016-03-29 12:49:17 dom Exp $
  */
 
 
@@ -50,7 +50,7 @@ option_t vg5k_options[] = {
 
 void vg_bit (FILE *fpout, unsigned char bit)
 {
-	int i, j, period0, period1;
+	int i,  period0, period1;
 
 	if ( fast ) {
 		period1 = 9;
@@ -137,7 +137,7 @@ int vg5k_exec(char *target)
     if ( help )
         return -1;
 
-    if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
     }
 

@@ -14,7 +14,7 @@
 
  *
 
- *        $Id: nec.c,v 1.5 2015-01-28 04:32:59 aralbrec Exp $
+ *        $Id: nec.c,v 1.6 2016-03-29 12:49:17 dom Exp $
 
  */
 
@@ -429,8 +429,6 @@ int nec_exec(char *target)
     char       filename[FILENAME_MAX+1];
 
     char       wavfile[FILENAME_MAX+1];
-
-    char       name[12];
 
     FILE       *fpin, *fpout;
 

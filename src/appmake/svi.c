@@ -12,7 +12,7 @@
 
  *
 
- *	$Id: svi.c,v 1.6 2015-01-28 04:32:59 aralbrec Exp $
+ *	$Id: svi.c,v 1.7 2016-03-29 12:49:17 dom Exp $
 
  */
 
@@ -90,7 +90,7 @@ void sv_bit (FILE *fpout, int bit, char tweak)
 
 {
 
-	int i, j, period0, period1, period1lo;
+	int i, period0, period1, period1lo;
 
 
 
@@ -272,10 +272,8 @@ int svi_exec(char *target)
 
 
 
-    if ( binname == NULL || !dumb  && ( crtfile == NULL ) ) {
-
+    if ( binname == NULL || (!dumb && ( crtfile == NULL )) ) {
         return -1;
-
     }
 
 

@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.13 2014-04-15 19:53:07 dom Exp $
+ *        $Id: mz.c,v 1.14 2016-03-29 12:49:17 dom Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -47,7 +47,6 @@ static unsigned char     mz_h_lvl;
 static unsigned char     mz_l_lvl;
 
 static FILE *rawout;
-static FILE *mzfout;
 
 static int  LONG_UP    = 0,   /* These variables define the long wave */
             LONG_DOWN  = 0,
@@ -670,7 +669,7 @@ int mz_exec(char *target)
     if ( help )
         return -1;
 
-    if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1) ) ) {
         return -1;
     }
 

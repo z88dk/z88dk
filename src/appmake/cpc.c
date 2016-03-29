@@ -184,10 +184,12 @@ unsigned int CRCupdate(unsigned int CRC, unsigned char new)
  int i;
 
  for(i=0; i<8; i++)
-   if (aux & 0x8000)
-       aux = (aux <<= 1) ^ kCRCpoly;
-     else
+   if (aux & 0x8000) {
        aux <<= 1;
+       aux ^= kCRCpoly;
+     } else {
+       aux <<= 1;
+     }
 
  return(aux);
 }
@@ -255,7 +257,6 @@ int cpc_exec(char *target)
 	unsigned char      header[256];
 	unsigned char      srchead[128];
 	unsigned char      srcdata[2048];
-	unsigned char      data[256];
 	unsigned long int  filesize=0;
 	unsigned int       size;
 	unsigned int       blocks;

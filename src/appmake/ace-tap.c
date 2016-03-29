@@ -14,7 +14,7 @@
 
  *
 
- *	$Id: ace-tap.c,v 1.11 2015-01-28 04:32:59 aralbrec Exp $
+ *	$Id: ace-tap.c,v 1.12 2016-03-29 12:49:16 dom Exp $
 
  */
 
@@ -122,7 +122,7 @@ int acetap_exec(char *target)
 
 
 
-    if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
 
         return -1;
 

@@ -14,7 +14,7 @@
 
  *
 
- *        $Id: x07.c,v 1.5 2015-01-28 04:32:59 aralbrec Exp $
+ *        $Id: x07.c,v 1.6 2016-03-29 12:49:17 dom Exp $
 
  */
 
@@ -197,42 +197,22 @@ void x07_rawout (FILE *fpout, unsigned char b)
 
 
 int x07_exec(char *target)
-
 {
-
     char       filename[FILENAME_MAX+1];
-
     char       filename2[FILENAME_MAX+1];
-
     char       wavfile[FILENAME_MAX+1];
-
     char       name[7];
-
     char       addr[7];
-
     FILE       *fpin, *fpout;
-
-    long       pos, value;
-
-    int        c, i, len, blocklen;
-
-	int        screen_size;
-
-
+    long       pos;
+    int        c, i, len;
 
     if ( help )
-
         return -1;
 
-
-
-    if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
-
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
-
     }
-
-
 
 	if (loud) {
 
@@ -448,7 +428,7 @@ int x07_exec(char *target)
 
 			writestring("50,",fpout);
 
-			sprintf(addr,"&H%04x",pos-1);
+			sprintf(addr,"&H%04x",(int)pos-1);
 
 			writestring(addr,fpout);
 
@@ -500,13 +480,13 @@ int x07_exec(char *target)
 
 			writebyte(0xDD,fpout);       /* = */
 
-			sprintf(addr,"&H%04x",pos);
+			sprintf(addr,"&H%04x",(int)pos);
 
 			writestring(addr,fpout);
 
 			writebyte(0xBB,fpout);       /* TO */
 
-			sprintf(addr,"&H%04x",pos+len);
+			sprintf(addr,"&H%04x",(int)pos+len);
 
 			writestring(addr,fpout);
 
@@ -556,7 +536,7 @@ int x07_exec(char *target)
 
 			writebyte(0xA8,fpout);       /* EXEC */
 
-			sprintf(addr,"&H%04x",pos);
+			sprintf(addr,"&H%04x",(int)pos);
 
 			writestring(addr,fpout);
 

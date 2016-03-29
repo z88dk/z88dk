@@ -3,7 +3,7 @@
  *
  *      This simply adds in the length of the program
  *      
- *      $Id: sos.c,v 1.2 2014-04-15 19:53:07 dom Exp $
+ *      $Id: sos.c,v 1.3 2016-03-29 12:49:17 dom Exp $
  */
 
 
@@ -86,7 +86,7 @@ int sos_exec(char *target)
         myexit("Can't open output file\n",1);
     }
 
-	fprintf(fpout,"_SOS 01 %4X %4X%c",pos,pos,10);
+	fprintf(fpout,"_SOS 01 %4X %4X%c",(int)pos,(int)pos,10);
 
     for ( i = 0; i < len; i++) {
         c = getc(fpin);

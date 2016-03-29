@@ -9,7 +9,7 @@
  *        When the program is in memory, type '/'.
  *
  *
- *        $Id: trs80.c,v 1.9 2015-11-03 20:03:37 stefano Exp $
+ *        $Id: trs80.c,v 1.10 2016-03-29 12:49:17 dom Exp $
  */
 
 #include "appmake.h"
@@ -135,7 +135,7 @@ int trs80_exec(char *target)
 	unsigned char cksum;
 	char	ckflag;
     
-    if ( help || binname == NULL || !dumb  && ( crtfile == NULL ) ) {
+    if ( help || binname == NULL || (!dumb  && ( crtfile == NULL ) ) ) {
         return -1;
     }
 

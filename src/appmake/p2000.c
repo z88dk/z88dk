@@ -9,7 +9,7 @@
  *
  *   Stefano Bodrato - April 2014
  *
- *   $Id: p2000.c,v 1.1 2014-04-16 20:21:39 stefano Exp $
+ *   $Id: p2000.c,v 1.2 2016-03-29 12:49:17 dom Exp $
  */
 
 #include "appmake.h"
@@ -36,7 +36,6 @@ option_t p2000_options[] = {
 int p2000_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-	char	mybuf[20];
     char    name[9];
 	FILE	*fpin, *fpout;
 	int	c;

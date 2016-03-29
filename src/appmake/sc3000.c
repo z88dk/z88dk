@@ -12,7 +12,7 @@
 
  *
 
- *        $Id: sc3000.c,v 1.4 2015-01-28 04:32:59 aralbrec Exp $
+ *        $Id: sc3000.c,v 1.5 2016-03-29 12:49:17 dom Exp $
 
  */
 
@@ -230,11 +230,10 @@ int sc3000_exec(char *target)
 
     FILE       *fpin, *fpout;
 
-    long       pos, value;
+    long       pos, blocklen;
 
-    int        c, i, len, blocklen;
+    int        c, i, len;
 
-	int        screen_size;
 
 
 

@@ -3,7 +3,7 @@
  *
  *        Based on the original "bin2gtp" program by Tomaz Solc
  *
- *        $Id: galaksija.c,v 1.4 2014-07-24 16:35:18 stefano Exp $
+ *        $Id: galaksija.c,v 1.5 2016-03-29 12:49:16 dom Exp $
  */
 
 #include "appmake.h"
@@ -48,7 +48,7 @@ option_t gal_options[] = {
 
 void gal_bit (FILE *fpout, unsigned char bit)
 {
-	int i, j, period0, period1, pulse_width;
+	int i, period0, period1, pulse_width;
 
 	if ( fast ) {
 		period1 = 58;
@@ -133,7 +133,7 @@ int gal_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
     char    wavfile[FILENAME_MAX+1];
-    int     c,i,j;
+    int     c,i;
     int     len;
 
     unsigned long   checksum;
@@ -147,7 +147,7 @@ int gal_exec(char *target)
     if ( help )
         return -1;
 
-    if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
     }
 

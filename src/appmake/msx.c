@@ -9,7 +9,7 @@
  *
  *        By Stefano Bodrato
  *
- *        $Id: msx.c,v 1.4 2014-07-28 06:34:49 stefano Exp $
+ *        $Id: msx.c,v 1.5 2016-03-29 12:49:16 dom Exp $
  */
 
 
@@ -54,7 +54,7 @@ option_t msx_options[] = {
 
 void msx_bit (FILE *fpout, unsigned char bit)
 {
-	int i, j, period0, period1;
+	int i, period0, period1;
 
 	if ( fast ) {
 		period1 = 6;
@@ -127,7 +127,7 @@ int msx_exec(char *target)
     if ( help )
         return -1;
 
-    if ( binname == NULL || !dumb  && ( crtfile == NULL ) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL )) ) {
         return -1;
     }
 

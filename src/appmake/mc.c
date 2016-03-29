@@ -4,7 +4,7 @@
 
  *
 
- *        $Id: mc.c,v 1.6 2015-01-28 04:32:59 aralbrec Exp $
+ *        $Id: mc.c,v 1.7 2016-03-29 12:49:16 dom Exp $
 
  */
 
@@ -167,8 +167,6 @@ int mc_exec(char *target)
     char    name[18];
 
     FILE    *fpin, *fpout;
-
-    long    pos;
 
     int     c;
 

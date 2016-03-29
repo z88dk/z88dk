@@ -3,7 +3,7 @@
  *      Sorcerer Exidy application packager
  * 		Kansas City Standard
  *      
- *      $Id: sorcerer.c,v 1.3 2014-04-15 19:53:07 dom Exp $
+ *      $Id: sorcerer.c,v 1.4 2016-03-29 12:49:17 dom Exp $
  */
 
 
@@ -149,7 +149,7 @@ int sorcerer_exec(char *target)
     if ( help )
         return -1;
 
-    if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
     }
 

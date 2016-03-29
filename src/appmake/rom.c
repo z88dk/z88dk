@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.5 2014-05-05 07:26:37 stefano Exp $
+ *      $Id: rom.c,v 1.6 2016-03-29 12:49:17 dom Exp $
  */
 
 
@@ -56,6 +56,7 @@ int rom_exec(char *target)
         fillsize = size;
     } else {
         myexit("ROM block size not specified (use -s)\n",1);
+	return -1;
     }
 
 	if ( (ihex) && (origin == -1 )) {
@@ -91,12 +92,14 @@ int rom_exec(char *target)
     {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
+	return -1;
     }
     else if (fseek(fpin,0,SEEK_END))
     {
         fprintf(stderr,"Couldn't determine size of file\n");
         fclose(fpin);
         myexit(NULL,1);
+	return -1;
     }
     else
     {

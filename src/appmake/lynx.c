@@ -3,7 +3,7 @@
  *      Camputers Lynx application packager
  * 		(c) 2014 Stefano Bodrato, part of the z88dk kit
  *      
- *      $Id: lynx.c,v 1.1 2014-07-23 06:35:26 stefano Exp $
+ *      $Id: lynx.c,v 1.2 2016-03-29 12:49:16 dom Exp $
  */
 
 
@@ -18,11 +18,6 @@ static char             *blockname    = NULL;
 static int               origin       = -1;
 static char              help         = 0;
 
-static char              bit_state    = 0;
-static char              h_lvl;
-static char              l_lvl;
-static char              ly_h_lvl;
-static char              ly_l_lvl;
 
 
 
@@ -46,13 +41,12 @@ option_t lynx_options[] = {
 int lynx_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-    char    wavfile[FILENAME_MAX+1];
     FILE   *fpin;
     FILE   *fpout;
     int     len;
     long    pos;
 	unsigned long checksum;
-    int     c,i,j;
+    int     c,i;
 
 
     if ( help )

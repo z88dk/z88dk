@@ -6,7 +6,7 @@
 
  *
 
- *        $Id: vz.c,v 1.4 2015-01-28 04:32:59 aralbrec Exp $
+ *        $Id: vz.c,v 1.5 2016-03-29 12:49:17 dom Exp $
 
  */
 
@@ -167,8 +167,6 @@ int vz_exec(char *target)
     char    name[18];
 
     FILE    *fpin, *fpout;
-
-    long    pos;
 
     int     c;
 

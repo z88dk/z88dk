@@ -5,7 +5,7 @@
  *
  *   Stefano Bodrato - 2015
  *
- *   $Id: c7420.c,v 1.2 2015-10-23 20:34:51 stefano Exp $
+ *   $Id: c7420.c,v 1.3 2016-03-29 12:49:16 dom Exp $
  */
 
 #include "appmake.h"
@@ -179,8 +179,8 @@ int c7420_exec(char *target)
 /****************/
 /* BASIC loader */
 /****************/
-	sprintf(lsbbuf,"%i",pos%256);	/* no more than 3 characters long */
-	sprintf(msbbuf,"%i",pos/256);	/* no more than 3 characters long */
+	sprintf(lsbbuf,"%i",(int)pos%256);	/* no more than 3 characters long */
+	sprintf(msbbuf,"%i",(int)pos/256);	/* no more than 3 characters long */
 
 	strcat(ldr_name,filename);
 	
@@ -228,7 +228,7 @@ int c7420_exec(char *target)
 	writebyte_cksum('0',fpout,&checksum);
 	writebyte_cksum(',',fpout,&checksum);
 	writebyte_cksum(0xB6,fpout,&checksum);     /*  negative value ('-' sign) */
-	sprintf(mybuf,"%i",(0x10000-pos-2));	/* always 5 characters long */
+	sprintf(mybuf,"%i",(int)(0x10000-pos-2));	/* always 5 characters long */
 	writestring_cksum(mybuf,fpout,&checksum);
 	writebyte_cksum(':',fpout,&checksum);      /* : */
 	writebyte_cksum(0x99,fpout,&checksum);   /* CLOAD */

@@ -80,7 +80,7 @@
 
  *
 
- *        $Id: zx.c,v 1.22 2015-01-28 04:32:59 aralbrec Exp $
+ *        $Id: zx.c,v 1.23 2016-03-29 12:49:17 dom Exp $
 
  */
 
@@ -131,8 +131,6 @@ static char              noloader     = 0;
 static unsigned char     parity = 0;
 
 
-
-static int               zx_bitpos     = TRUE;
 
 
 
@@ -350,7 +348,7 @@ void turbo_rawout (FILE *fpout, unsigned char b)
 
   static unsigned char c[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 
-  int i,period;
+  int i;
 
 
 
@@ -424,7 +422,6 @@ int zx_exec(char *target)
 
     int		blockcount;
 
-    int		period;
 
     
 
@@ -440,7 +437,7 @@ int zx_exec(char *target)
 
 
 
-    if ( binname == NULL || !dumb && ( crtfile == NULL && origin == -1 ) ) {
+    if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
 
         return -1;
 
@@ -626,7 +623,7 @@ int zx_exec(char *target)
 
 			if (pos<33000) 
 
-				printf("\nInfo: Position %u is too low, not relocating TS2068 BASIC.", pos);
+				printf("\nInfo: Position %u is too low, not relocating TS2068 BASIC.", (int)pos);
 
 			else
 
@@ -872,7 +869,7 @@ int zx_exec(char *target)
 
 
 
-					if (screen && !turbo)  mlen+=5;			/* Add the space count for -- LOAD "" SCREEN$:
+					if (screen && !turbo)  mlen+=5;			/* Add the space count for -- LOAD "" SCREEN$: */
 
 
 

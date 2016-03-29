@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.49 2015-11-03 20:27:14 stefano Exp $
+ *   $Id: appmake.h,v 1.50 2016-03-29 12:49:16 dom Exp $
  */
 
 
@@ -382,6 +382,7 @@ extern void         writestring(char *mystring, FILE *fp);
 
 extern void         writeword_p(unsigned int i, FILE *fp,unsigned char *p);
 extern void         writebyte_p(unsigned char c, FILE *fp,unsigned char *p);
+extern void         writestring_p(char *mystring, FILE *fp,unsigned char *p);
 
 extern void         writeword_pk(unsigned int i, FILE *fp,unsigned char *p);
 extern void         writebyte_pk(unsigned char c, FILE *fp,unsigned char *p);
