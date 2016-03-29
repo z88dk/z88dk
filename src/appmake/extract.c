@@ -31,7 +31,6 @@ option_t extract_options[] = {
 
 int extract_exec(char *target)
 {
-    char    filename[FILENAME_MAX+1];
     FILE   *fpin;
     FILE   *fpout;
     int     c;
