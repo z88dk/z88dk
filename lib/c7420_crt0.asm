@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2015
 ;
-;       $Id: c7420_crt0.asm,v 1.2 2016-03-11 11:19:10 dom Exp $
+;       $Id: c7420_crt0.asm,v 1.3 2016-03-30 09:19:58 dom Exp $
 ;
 
 
@@ -22,8 +22,6 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-
-        PUBLIC    _vfprintf       ;jp to the printf() core
 
         PUBLIC    exitsp          ;atexit() variables
         PUBLIC    exitcount
@@ -125,19 +123,17 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN	vfprintf_fp
-	jp	vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
 

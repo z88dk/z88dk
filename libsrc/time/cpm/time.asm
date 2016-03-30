@@ -19,10 +19,11 @@
  ;  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  ;
  ; --------
- ; $Id: time.asm,v 1.3 2016-03-05 00:07:01 dom Exp $
+ ; $Id: time.asm,v 1.4 2016-03-30 09:19:59 dom Exp $
  ;
 
 
+SECTION code_clib
 PUBLIC time
 PUBLIC _time
 
@@ -35,6 +36,7 @@ _time:
         pop     hl
         push    hl
         push    de
+	push	ix		;save callers ix
         
         ld      a,h
         or      l
@@ -194,7 +196,7 @@ nompmii:
         ld      (ix+1),h
         ld      (ix+2),e
         ld      (ix+3),d
-
+	pop	ix	;restore callers ix
         ret
 
 
@@ -216,6 +218,8 @@ unbcd:
 	ld  h,0
 	ret
 
+	SECTION	bss_clib
+
 px_year: defb	0			; Epson PX BIOSes load it with the current year
 
 jdate:	defs	2           ; Day count, starting on 1st January 1978 (add 2922 days to move epoch to 1970)
@@ -224,6 +228,8 @@ mins:	defs	1
 secs:	defs	1
 
 jdatepx2: defs 6			; safety margin 
+
+	SECTION rodata_clib
 
 mdays: defw 31+29, 31+29+31, 31+29+31+30, 31+29+31+30+31
        defw 31+29+31+30+31+30, 31+29+31+30+31+30+31, 31+29+31+30+31+30+31+31

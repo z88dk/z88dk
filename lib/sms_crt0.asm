@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.10 2016-03-11 11:59:42 dom Exp $
+;	$Id: sms_crt0.asm,v 1.11 2016-03-30 09:19:58 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -38,7 +38,6 @@
         PUBLIC    heaplast        ;Near malloc heap variables
         PUBLIC    heapblocks      ;
 
-        PUBLIC    _vfprintf       ;jp to printf() core routine
         
         PUBLIC	fputc_vdp_offs	;Current character pointer
         
@@ -240,21 +239,20 @@ _End:
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN 	vfprintf_fp
-	jp	vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN 	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN 	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
+
 ;--------
 ; Now, include the math routines if needed..
 ;--------

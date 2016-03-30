@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.15 2016-03-11 11:19:11 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.16 2016-03-30 09:19:58 dom Exp $
 
 
 
@@ -186,19 +186,17 @@ errescpressed:
 ;-----------
 ; Select which vfprintf routine is needed
 ;-----------
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN	vfprintf_fp
-	jp	vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
 

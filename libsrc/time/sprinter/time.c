@@ -6,7 +6,7 @@
  *	Our epoch is the UNIX epoch of 00:00:00 1/1/1970
  *
  * --------
- * $Id: time.c,v 1.2 2002-11-21 10:44:24 dom Exp $
+ * $Id: time.c,v 1.3 2016-03-30 09:20:00 dom Exp $
  */
 
 
@@ -36,6 +36,7 @@ static void gettm(struct tm *tp)
 	pop	de	
 	push	de
 	push	bc
+	push	ix	;save callers
 	push	de
 	ld	c,$21	;SYSTIME
 	rst	$10
@@ -65,6 +66,7 @@ static void gettm(struct tm *tp)
 .skip
 	ld	(iy+12),c
 	ld	(iy+13),0
+	pop	ix		;restore callers
 #endasm
 }
 

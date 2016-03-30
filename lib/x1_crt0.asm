@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.8 2016-03-11 11:19:11 dom Exp $
+;    $Id: x1_crt0.asm,v 1.9 2016-03-30 09:19:58 dom Exp $
 ;
 
 	MODULE x1_crt0
@@ -23,7 +23,6 @@
 
         PUBLIC    cleanup 
         PUBLIC    l_dcal
-        PUBLIC    _vfprintf
 
         PUBLIC    exitsp
         PUBLIC    exitcount
@@ -228,20 +227,18 @@ ELSE
 ENDIF
 
 ; Now, which of the vfprintf routines do we need?
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-        EXTERN     vfprintf_fp
-        jp      vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
-        IF DEFINED_complexstdio
-                EXTERN     vfprintf_comp
-                jp      vfprintf_comp
-        ELSE
-                IF DEFINED_ministdio
-                        EXTERN     vfprintf_mini
-                        jp      vfprintf_mini
-                ENDIF
-        ENDIF
+	IF DEFINED_complexstdio
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
+	ELSE
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
+	ENDIF
 ENDIF
 
 

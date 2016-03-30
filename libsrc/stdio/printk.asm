@@ -2,12 +2,9 @@
 	SECTION	code_clib
 
 	PUBLIC	printk
-	PUBLIC	_printk
 
-	EXTERN	l_gint
-	EXTERN	printk1
-	EXTERN	asm_vfprintf1
-	EXTERN	fputc_cons
+	EXTERN	asm_vfprintf
+	EXTERN	printk_outc
 
 
 
@@ -24,10 +21,10 @@ printk:
 	ld	l,a
 	ld	h,0
         add     hl,hl
-	add	hl,sp
+	add	hl,sp		;&fmt
 
-	ld	bc,0	
-	push	bc
+	push	ix
+	push	bc		;fp (we don't care about the fp)
 	ld	bc,printk_outc
 	push	bc
 	ld	bc,1
@@ -40,49 +37,12 @@ printk:
 	dec	hl
 	dec	hl
 	push	hl
-	call	asm_vfprintf1
+	call	asm_vfprintf
 	pop	bc
 	pop	bc	
 	pop	bc	
 	pop	bc
 	pop	bc
-	ret
-
-
-printk_outc:
-	pop	bc
-	pop	de	
-	pop	hl
-	push	bc
-	push	hl
-	call	fputc_cons
-	pop	hl
-	ret
-	
-
-;sdcc version
-_printk:
-	ld	hl,4
-	add	hl,sp	;points to first argument
-	pop	bc	;ret address
-	pop	de	;fmt
-	push	de
-	push	bc
-	push	ix	;save ix
-	ld	bc,0	;file
-	push	bc
-	ld	bc,printk_outc
-	push	bc
-	ld	bc,0	;flag
-	push	bc
-	push	de	;fmt
-	push	hl	;argument
-	call	asm_vfprintf1
-	pop	bc
-	pop	bc
-	pop	bc	
-	pop	bc
-	pop	bc
-	pop	ix	;restore ix
+	pop	ix
 	ret
 

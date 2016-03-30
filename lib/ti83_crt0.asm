@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.26 2016-03-11 11:19:11 dom Exp $
+;	$Id: ti83_crt0.asm,v 1.27 2016-03-30 09:19:58 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -32,10 +32,6 @@
 
 	PUBLIC	cleanup		; used by exit()
 	PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
-
-	PUBLIC	_vfprintf	; vprintf is internal to this file so we
-				;  only ever include one of the set of
-				;  routines
 
 	PUBLIC	exitsp		; Exit variables
 	PUBLIC	exitcount	;
@@ -362,20 +358,18 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-        EXTERN     vfprintf_fp
-        jp      vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
-        IF DEFINED_complexstdio
-                EXTERN     vfprintf_comp
-                jp      vfprintf_comp
-        ELSE
-                IF DEFINED_ministdio
-                        EXTERN     vfprintf_mini
-                        jp      vfprintf_mini
-                ENDIF
-        ENDIF
+	IF DEFINED_complexstdio
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
+	ELSE
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
+	ENDIF
 ENDIF
 
 

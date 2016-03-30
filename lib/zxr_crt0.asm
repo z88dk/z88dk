@@ -1,7 +1,7 @@
 ;
 ; Startup for Residos packages
 ;
-; $Id: zxr_crt0.asm,v 1.6 2016-03-11 11:19:11 dom Exp $
+; $Id: zxr_crt0.asm,v 1.7 2016-03-30 09:19:58 dom Exp $
 ;
 
         MODULE	zxs_crt0
@@ -141,20 +141,18 @@ ENDIF
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-        LIB     vfprintf_fp
-        jp      vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
-        IF DEFINED_complexstdio
-                LIB     vfprintf_comp
-                jp      vfprintf_comp
-        ELSE
-                IF DEFINED_ministdio
-                        LIB     vfprintf_mini
-                        jp      vfprintf_mini
-                ENDIF
-        ENDIF
+	IF DEFINED_complexstdio
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
+	ELSE
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
+	ENDIF
 ENDIF
 
 ;-----------

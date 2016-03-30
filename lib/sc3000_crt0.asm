@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.9 2016-03-11 11:19:11 dom Exp $
+;	$Id: sc3000_crt0.asm,v 1.10 2016-03-30 09:19:58 dom Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -34,10 +34,6 @@
 		PUBLIC    cleanup
 		PUBLIC    l_dcal
 
-
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-		PUBLIC	_vfprintf
 
 ;Exit variables
 		PUBLIC    exitsp
@@ -278,23 +274,20 @@ l_dcal:
 
 
 ; Now, which of the vfprintf routines do we need?
-
-
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN 	vfprintf_fp
-	jp	vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN 	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN 	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
+
 
 ; ---------------
 ; MSX specific stuff

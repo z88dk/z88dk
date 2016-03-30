@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.15 2016-03-11 11:19:10 dom Exp $
+;	$Id: ace_crt0.asm,v 1.16 2016-03-30 09:19:58 dom Exp $
 ;
 
 
@@ -31,10 +31,6 @@
 
 
 
-; vprintf is internal to this file so we only ever include one of the set
-; of routines
-
-        PUBLIC	_vfprintf
 
 ;Exit variables
 
@@ -183,19 +179,17 @@ l_dcal:
 
 
 ; Now, which of the vfprintf routines do we need?
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN	vfprintf_fp
-	jp	vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
 

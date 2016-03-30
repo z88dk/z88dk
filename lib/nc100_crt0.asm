@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.12 2016-03-11 11:19:11 dom Exp $
+;       $Id: nc100_crt0.asm,v 1.13 2016-03-30 09:19:58 dom Exp $
 ;
 
 
@@ -31,7 +31,6 @@
 		PUBLIC    l_dcal		;jp(hl)
 
 
-		PUBLIC	_vfprintf	;jp to the printf() core
 
 		PUBLIC    exitsp		;atexit() variables
 		PUBLIC    exitcount
@@ -148,19 +147,17 @@ ENDIF
 ;-------
 ; Now, which of the vfprintf routines do we need?
 ;-------
-_vfprintf:
-IF DEFINFED_floatstdio
-	EXTERN	vfprintf_fp
-	jp	vfprintf_fp
+	PUBLIC	asm_vfprintf
+IF DEFINED_floatstdio
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
 

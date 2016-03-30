@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.27 2016-03-11 11:19:10 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.28 2016-03-30 09:19:58 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -39,7 +39,6 @@
 	PUBLIC    cleanup		;jp'd to by exit()
 	PUBLIC    l_dcal		;jp(hl)
 
-	PUBLIC	_vfprintf	;jp to printf core routine
 
 	PUBLIC    exitsp		;atexit() variables
 	PUBLIC    exitcount
@@ -106,6 +105,7 @@ ENDIF
 ENDIF
 
 	ld      (start1+1),sp	;Save entry stack
+        call    crt_init_start  ;Initialise any data setup by sdcc
 	ld	a,($80)		;byte count of length of args
 	inc	a		;we can use this since args are space separated
 	neg
@@ -303,19 +303,17 @@ ENDIF
 ;----------------------------------------
 ; Work out which vfprintf routine we need
 ;----------------------------------------
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN	vfprintf_fp
-	jp	vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
 
@@ -390,4 +388,20 @@ redir_fopen_flagr:
 ENDIF
 ENDIF
 ENDIF
+
+
+    SECTION code_crt_init
+crt_init_start:
+    ;; Code gets placed in this section
+    SECTION code_crt_exit
+    ret
+
+    SECTION code_compiler
+    SECTION code_clib
+    SECTION data_compiler
+    SECTION data_clib
+    SECTION rodata_compiler
+    SECTION smc_clib
+    SECTION bss_compiler
+    SECTION bss_clib
 

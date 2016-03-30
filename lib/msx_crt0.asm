@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.36 2016-03-11 11:19:11 dom Exp $
+;	$Id: msx_crt0.asm,v 1.37 2016-03-30 09:19:58 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -43,8 +43,6 @@ IF startup != 3
 
         PUBLIC	snd_tick	; Sound variable
         PUBLIC	bit_irqstatus	; current irq status when DI is necessary
-
-        PUBLIC	_vfprintf
 
         PUBLIC    exitsp
         PUBLIC    exitcount
@@ -312,23 +310,20 @@ ENDIF
 
 
 ; Now, which of the vfprintf routines do we need?
-
-
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN	vfprintf_fp
-	jp	vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
+
 
 ; ---------------
 ; MSX specific stuff
@@ -561,28 +556,25 @@ PUBLIC snd_tick
 PUBLIC bit_irqstatus
 PUBLIC CRT_AVAILABLE_MEMORY
 
-PUBLIC _vfprintf
 PUBLIC msxbios
 
 ; Now, which of the vfprintf routines do we need?
 
 
-_vfprintf:
+
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN	vfprintf_fp
-	jp	vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
-
 
 ; Safe BIOS call
 msxbios:

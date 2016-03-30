@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.8 2016-03-11 13:14:24 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.9 2016-03-30 09:19:58 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -37,7 +37,6 @@
         PUBLIC    heaplast        ;Near malloc heap variables
         PUBLIC    heapblocks      ;
 
-        PUBLIC    _vfprintf       ;jp to printf() core routine
 
 
 	org    ROM_Start
@@ -79,19 +78,17 @@ l_dcal:
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-_vfprintf:
+	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN	vfprintf_fp
-	jp	vfprintf_fp
+	EXTERN	asm_vfprintf_level3
+	defc	asm_vfprintf = asm_vfprintf_level3
 ELSE
 	IF DEFINED_complexstdio
-		EXTERN	vfprintf_comp
-		jp	vfprintf_comp
+	        EXTERN	asm_vfprintf_level2
+		defc	asm_vfprintf = asm_vfprintf_level2
 	ELSE
-		IF DEFINED_ministdio
-			EXTERN	vfprintf_mini
-			jp	vfprintf_mini
-		ENDIF
+	       	EXTERN	asm_vfprintf_level1
+		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
 

@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.11 2016-03-11 11:19:11 dom Exp $
+; $Id: z88_crt0.asm,v 1.12 2016-03-30 09:19:58 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -55,7 +55,6 @@
 
 	PUBLIC	_cpfar2near	;Conversion of far to near data
 
-	PUBLIC	_vfprintf	;jp to printf() core routine
 
 	PUBLIC	snd_asave	;sound
 	PUBLIC	snd_tick	;sound

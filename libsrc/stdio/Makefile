@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.53 2016-03-13 10:10:48 dom Exp $
+# $Id: Makefile,v 1.54 2016-03-30 09:19:58 dom Exp $
 #
 
 include ../Make.config
@@ -23,8 +23,7 @@ STDCFILES = \
 	fwrite.c \
 	printn.c \
 	puts.c \
-	ungetc.c \
-	vfprintf_mini.c
+	ungetc.c
 
 GENCFILES = \
 	fclose.c \
@@ -100,7 +99,6 @@ generic_iy:
 	zcc +test $(CFLAGS) -Ca-IXIY printn.c
 	zcc +test $(CFLAGS) -Ca-IXIY puts.c
 	zcc +test $(CFLAGS) -Ca-IXIY ungetc.c
-	zcc +test $(CFLAGS) -Ca-IXIY vfprintf_mini.c
 #gen
 	zcc +test $(CFLAGS) -Ca-IXIY fclose.c
 	zcc +test $(CFLAGS) -Ca-IXIY fgetc.c
