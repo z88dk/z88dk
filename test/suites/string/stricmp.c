@@ -5,7 +5,11 @@
 
 #include "string_tests.h"
 
+#ifdef SCCZ80
 static int (*func)();
+#else
+static int (*func)(char *x, char *y);
+#endif
 
 void stricmp_equal_lower()
 {
