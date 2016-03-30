@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.21 2016-03-29 13:39:44 dom Exp $
+ *      $Id: const.c,v 1.22 2016-03-30 21:22:52 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -502,7 +502,7 @@ unsigned char litchar()
 	return 9;
     case 'r':  /* LF */
 	++lptr;
-	return 10;
+        return standard_escapes ? 13 : 10;
     case 'v':  /* VT */
 	++lptr;
 	return 11;
@@ -511,7 +511,7 @@ unsigned char litchar()
 	return 12;
     case 'n':  /* CR */
 	++lptr; 
-	return 13;
+        return standard_escapes ? 10 : 13;
     case '\"' :  /* " */
 	++lptr; 
 	return 34;

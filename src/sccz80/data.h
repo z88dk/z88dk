@@ -102,3 +102,4 @@ extern int printflevel;
 extern int doublestrings;
 extern int usempm;
 extern int z80asm_sections;
+extern int standard_escapes;

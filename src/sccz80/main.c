@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.31 2016-03-29 13:39:44 dom Exp $
+ *      $Id: main.c,v 1.32 2016-03-30 21:22:52 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -40,6 +40,7 @@ int   sharedfile;   /* File contains routines which are to be
           */
 
 int     noaltreg;       /* No alternate registers */
+int     standard_escapes = 0; /* \n = 10, \r = 13 */
 
 /*
  * Some external data
@@ -1034,6 +1035,7 @@ struct args myargs[]= {
    {"frameiy",NO,SetFrameIY},
    {"noframe",NO,SetNoFrame},
 #endif
+   {"standard-escape-chars",NO,SetStandardEscape, "Use standard mappings for escape codes"},
 /* Compatibility Modes.. */
     {"f",NO,SetUnsigned, NULL},
     {"l",NO,SetFarPtrs, NULL},
@@ -1062,6 +1064,10 @@ void SetFrameIY(char *arg)
 }
 #endif
 
+void SetStandardEscape(char *arg)
+{
+    standard_escapes = YES;
+}
 
 void SetDoubleStrings(char *arg)
 {
@@ -1354,7 +1360,7 @@ void DispInfo(char *arg)
 
     while ( cur->setfunc ) {
         if ( cur->help ) {
-            fprintf(stderr, "-%-15s %s\n",cur->name, cur->help);
+            fprintf(stderr, "-%-25s %s\n",cur->name, cur->help);
         }
         cur++;
     }

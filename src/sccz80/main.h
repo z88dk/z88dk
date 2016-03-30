@@ -59,6 +59,7 @@ extern void SetDebug(char *);
 extern void SetASXX(char *);
 extern void SetFrameIX(char *);
 extern void SetFrameIY(char *);
+extern void SetStandardEscape(char *);
 extern void SetNoFrame(char *);
 extern void OutOfMem(void);
 extern void SetFarHeap(char *);
