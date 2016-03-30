@@ -13,7 +13,7 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: swapgfxbk.asm,v 1.4 2016-03-30 19:20:19 stefano Exp $
 ;
 
 ;    INCLUDE "flos.def"
@@ -22,27 +22,32 @@
 		PUBLIC    swapgfxbk
 		PUBLIC	swapgfxbk1
 
-
+.asave
+		defb 0
 
 .swapgfxbk
 		;call kjt_wait_vrt		; wait for last line of display
 		;call kjt_page_in_video	; page video RAM in at $2000-$3fff
-		;di
+		
+		di
+		ld	 (asave),a
 		in a,(sys_mem_select)	
 		or $40
 		out (sys_mem_select),a	; page in video RAM
+		ld a,(asave)
 		ret
 
 .swapgfxbk1
+		ld	 (asave),a
 		in a,(sys_mem_select)	; page in video RAM
 		and $bf
 		out (sys_mem_select),a
 		;call kjt_page_out_video	; page video RAM out of $2000-$3fff
-		;ei
+
+        ld		a,@10000011                     ; Enable keyboard and mouse interrupts only
+        out		(sys_irq_enable),a
+		ld a,(asave)
+        ei
+
 		ret
-
-
-
-
-
 
