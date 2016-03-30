@@ -34,7 +34,7 @@ void Assert_real(int result, char *file, int line, char *message)
             failed_line = line;
             failed_message = message;
         }
-        longjmp(jmpbuf, 1);
+        longjmp(&jmpbuf, 1);
     }
 }
 
@@ -49,7 +49,7 @@ int suite_run()
     printf("Starting suite %s (%d tests)\n",suite.name, suite.num_tests);
 
     for ( i = 0; i < suite.num_tests; i++ ) {
-        if ( setjmp(jmpbuf) == 0 ) {
+        if ( setjmp(&jmpbuf) == 0 ) {
 #ifndef NO_LOG_RUNNING
             printf("Running test %s..",suite.testnames[i]);
 #endif
@@ -80,8 +80,8 @@ int suite_run()
                 /* Fall through */
             case 1:
                 /* Protect ourselves against teardown failing */
-                if ( setjmp(jmpbuf) == 0 ) {
-                    if ( suite.teardown() ) {
+                if ( setjmp(&jmpbuf) == 0 ) {
+                    if ( suite.teardown != NULL ) {
                         suite.teardown();
                     }
                 } else {
