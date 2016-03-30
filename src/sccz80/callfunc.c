@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.9 2015-10-20 23:53:39 aralbrec Exp $
+ *      $Id: callfunc.c,v 1.10 2016-03-30 09:38:12 dom Exp $
  */
 
 /*
@@ -204,6 +204,7 @@ void callfunction(SYMBOL *ptr)
 static int SetWatch(char *sym)
 {
         if ( strcmp(sym,"printf") == 0 ) return 1;
+        if ( strcmp(sym,"printk") == 0 ) return 1;
         if ( strcmp(sym,"fprintf") == 0 ) return 2;
         if ( strcmp(sym,"sprintf") == 0 ) return 2;
         if ( strcmp(sym,"vprintf") == 0 ) return 1;
