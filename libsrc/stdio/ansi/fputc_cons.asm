@@ -6,7 +6,7 @@
 ;
 ;	Stefano Bodrato - 21/4/2000
 ;
-;	$Id: fputc_cons.asm,v 1.4 2016-03-05 00:53:27 dom Exp $
+;	$Id: fputc_cons.asm,v 1.5 2016-03-30 10:28:01 dom Exp $
 ;
 
           PUBLIC  fputc_cons
@@ -22,4 +22,3 @@
 	add     hl,sp
 	ld      de,1	; one char buffer (!)
 	jp      f_ansi
-	ret
