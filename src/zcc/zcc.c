@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.115 2016-03-29 11:46:38 dom Exp $
+ *      $Id: zcc.c,v 1.116 2016-03-31 10:52:38 dom Exp $
  */
 
 
@@ -53,6 +53,7 @@ static void            print_help_config(arg_t *arg,char *);
 static void            print_help_text();
 static void            SetString(arg_t *arg,char *);
 static void            PragmaDefine(arg_t *arg,char *);
+static void            PragmaRedirect(arg_t *arg,char *);
 static void            PragmaNeed(arg_t *arg,char *);
 static void            PragmaBytes(arg_t *arg,char *);
 static void            AddArray(arg_t *arg,char *);
@@ -133,6 +134,8 @@ static char           *comparg;
 static char           *linkargs;
 static char           *asmargs;
 static char           *appmakeargs;
+static char           *sccz80arg = NULL;
+static char           *sdccarg = NULL;
 static char           *zccopt = NULL;   /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
@@ -330,6 +333,7 @@ static arg_t     myargs[] = {
     {"asm", AF_MORE, SetString, &c_assembler_type, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)"},
     {"compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)"},
     {"crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
+    {"pragma-redirect",AF_MORE,PragmaRedirect,NULL, NULL, "Redirect a function" },
     {"pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
     {"pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
     {"pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
@@ -341,6 +345,9 @@ static arg_t     myargs[] = {
     {"Ca", AF_MORE, AddToArgs, &asmargs, NULL, "Add an option to the assembler"},
     {"Cl", AF_MORE, AddToArgs, &linkargs, NULL, "Add an option to the linker"},
     {"Cz", AF_MORE, AddToArgs, &appmakeargs, NULL, "Add an option to appmake"},
+    {"Cc", AF_MORE, AddToArgs, &sccz80arg, NULL, "Add an option to sccz80"},
+    {"Cs", AF_MORE, AddToArgs, &sdccarg, NULL, "Add an option to sdcc"},
+
     {"E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, NULL, "Only preprocess files"},
     {"R", AF_BOOL_TRUE, SetBoolean, &relocate, NULL, "Generate relocatable code"},
     {"D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option"},
@@ -1350,6 +1357,9 @@ static void configure_compiler()
 		// move restriction on iy to target cfg, always used asz80 with sdcc
 		snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode --emit-externs %s",c_code_in_asm ? "" : "--no-c-code-in-asm");
         add_option_to_compiler(buf);
+        if ( sdccarg ) {
+            add_option_to_compiler(sdccarg);
+        }
         preprocarg = " -DZ88DK_USES_SDCC=1";
         BuildOptions(&cpparg, preprocarg);
         //if ( assembler_type == ASM_Z80ASM ) {
@@ -1365,6 +1375,9 @@ static void configure_compiler()
         /* Indicate to sccz80 what assembler we want */
         snprintf(buf,sizeof(buf),"-asm=%s",c_assembler_type);
         add_option_to_compiler(buf);
+        if ( sccz80arg ) {
+            add_option_to_compiler(sccz80arg);
+        }
         if ( makelib ) {
             add_option_to_compiler("-make-lib");
         }
@@ -1374,6 +1387,25 @@ static void configure_compiler()
 }
 
 
+void PragmaRedirect(arg_t *arg,char *val)
+{
+    char *ptr = val + strlen(arg->name) + 2;
+    char *value = "";;
+    char *eql;
+
+    if ( (eql = strchr(ptr,'=') ) != NULL ) {
+        *eql = 0;
+         value = eql+1;
+    }
+    if ( strlen(value) ) {
+        add_zccopt("\nIF !DEFINED_%s\n",ptr);
+        add_zccopt("\tPUBLIC %s\n",ptr);
+        add_zccopt("\tEXTERN %s\n",value);
+        add_zccopt("\tdefc\tDEFINED_%s = 1\n",ptr);
+        add_zccopt("\tdefc %s = %s\n",ptr,value);
+        add_zccopt("ENDIF\n\n");
+    }
+}
 
 void PragmaDefine(arg_t *arg,char *val)
 {
@@ -1392,7 +1424,7 @@ void write_zcc_defined(char *name, int value)
 {
     add_zccopt("\nIF !DEFINED_%s\n",name);
     add_zccopt("\tdefc\tDEFINED_%s = 1\n",name);
-	add_zccopt("\tdefc %s = %d\n",name,value);
+    add_zccopt("\tdefc %s = %d\n",name,value);
     add_zccopt("ENDIF\n\n");
 }
 
