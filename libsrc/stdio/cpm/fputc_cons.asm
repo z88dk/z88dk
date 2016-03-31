@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.6 2016-03-06 21:36:52 dom Exp $
+;	$Id: fputc_cons.asm,v 1.7 2016-03-31 13:50:49 dom Exp $
 ;
 
 	SECTION	code_clib
@@ -20,19 +20,17 @@
 ._fputc_cons
 	ld      hl,2
 	add     hl,sp
+	ld	d,0
 	ld	a,(hl)
+	ld	e,a
 	cp	12	; FF (CLS) ?
 	jr	z,docls
-	cp	13	; CR ?
+	cp	10	; CR ?
 	jr	nz,nocrlf
-	ld	de,10	; Add a LineFeed
 	ld	c,2
-	push	af
 	call	5
-	pop	af
+	ld	de,13
 .nocrlf
-	ld	e,a	; Send the character
-	ld	d,0
 	ld      c,2
 	jp	5
 .docls
