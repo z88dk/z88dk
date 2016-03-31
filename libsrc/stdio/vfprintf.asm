@@ -3,10 +3,9 @@
 ; int vfprintf(FILE *fp, unsigned char *fmt,void *ap)
 
 		PUBLIC	vfprintf
-		PUBLIC	_vfprintf
 
 		EXTERN	fputc_callee
-		EXTERN  vfprintf_core
+		EXTERN  asm_vfprintf
 
 ; Cores have signature (in __smallc)
 ; int vfprintf1(FILE *fp, void (*output_fn)(FILE *fp,int c), int sccz80, unsigned char *fmt,void *ap)
