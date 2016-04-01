@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.232 2016-04-01 09:36:47 dom Exp $
+# $Id: Makefile,v 1.233 2016-04-01 21:33:20 dom Exp $
 
 
 include Make.config
@@ -249,7 +249,7 @@ z88_clib.lib:
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C printflike
-	$(MAKE) -C time lz88
+	$(MAKE) -C time
 	$(MAKE) -C rs232 lz88
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert 
@@ -268,7 +268,7 @@ z88ansi_clib.lib:
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C printflike
-	$(MAKE) -C time lz88
+	$(MAKE) -C time 
 	$(MAKE) -C rs232 lz88
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert 
@@ -287,7 +287,7 @@ z88net_clib.lib:
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C printflike
-	$(MAKE) -C time lz88
+	$(MAKE) -C time
 	$(MAKE) -C rs232 lz88
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert 
@@ -360,7 +360,7 @@ ts2068_clib.lib:
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C time lzx
+	$(MAKE) -C time 
 	$(MAKE) gamesdeps
 	$(MAKE) -C spectrum
 	$(MAKE) -C psg
@@ -383,7 +383,7 @@ ts2068an_clib.lib:
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C time lzx
+	$(MAKE) -C time 
 	$(MAKE) gamesdeps
 	$(MAKE) -C spectrum
 	$(MAKE) -C psg
@@ -516,7 +516,7 @@ pps_clib.lib:
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C time lpps
+	$(MAKE) -C time 
 	$(MAKE) gamesdeps
 	$(MAKE) -C spectrum 
 	$(MAKE) -C psg
@@ -537,7 +537,7 @@ ppsansi_clib.lib:
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C time lpps
+	$(MAKE) -C time 
 	$(MAKE) gamesdeps
 	$(MAKE) -C spectrum 
 	$(MAKE) -C psg
@@ -945,7 +945,7 @@ cpm_clib.lib:
 	$(MAKE) -C stdlib generic
 	$(MAKE) -C stdio lcpm
 	$(MAKE) -C printflike
-	$(MAKE) -C time lcpm
+	$(MAKE) -C time 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
@@ -1151,7 +1151,7 @@ sam_clib.lib:
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C time lzx
+	$(MAKE) -C time 
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
@@ -1169,7 +1169,7 @@ samansi_clib.lib:
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(MAKE) -C time lzx
+	$(MAKE) -C time 
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORsam -x$(OUTPUT_DIRECTORY)/samansi_clib @$(LISTFILE_DIRECTORY)/samansi.lst
@@ -1241,7 +1241,7 @@ enterprise_clib.lib:
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
-	$(MAKE) -C time lenterprise
+	$(MAKE) -C time 
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lenterprise
@@ -1480,7 +1480,7 @@ newbrain_clib.lib:
 	$(MAKE) -C fcntl lnewbrain
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
-	$(MAKE) -C time lnewbrain
+	$(MAKE) -C time 
 	$(MAKE) -C assert
 	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/newbrain_clib @$(LISTFILE_DIRECTORY)/newbrain.lst
 	$(LIBLINKER) -DFORnewbrain -x$(OUTPUT_DIRECTORY)/nbcpm_clib @$(LISTFILE_DIRECTORY)/nbcpm.lst
@@ -1655,7 +1655,7 @@ x1ansi_clib.lib:
 	$(MAKE) -C stdlib lx1
 	$(MAKE) -C stdio generic
 	$(MAKE) -C printflike
-	$(MAKE) -C time lx1
+	$(MAKE) -C time 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C psg

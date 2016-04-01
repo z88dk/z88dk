@@ -1,65 +1,28 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.28 2015-11-15 03:30:56 aralbrec Exp $
+# $Id: Makefile,v 1.29 2016-04-01 21:33:20 dom Exp $
 
 include ../Make.config
 
-lcpm: time
+CFILES = $(wildcard *.c) $(wildcard */*.c)
 
-lz88: time z88_time
+OBJECTS = $(CFILES:.c=.o)
 
-lpps: time pps_time
+all: $(OBJECTS)
 
-lzx: spectrum_time
+z88/%.o: z88/%.c
+	cd $(<D) ; zcc +z88 $(CFLAGS) $(<F) -o $(@F)
 
-lnewbrain: newbrain_time
+sprinter/%.o: sprinter/%.c
+	cd $(<D) ; zcc +test $(CFLAGS) $(<F) -o $(@F)
 
-lenterprise: enterprise_time
+x1/%.o: x1/%.c
+	cd $(<D) ; zcc +test $(CFLAGS) $(<F) -o $(@F)
 
-lx1: time x1_time
-
-time: gmtime.o localtime.o mktime.o
-
-.c.o:
-	zcc +test $(CFLAGS) $*.c
-
-pps_time:
-	cd sprinter ; $(MAKE) ; cd ..
-
-z88_time:
-	cd z88 ; $(MAKE) ; cd ..
-
-spectrum_time:
-	$(RM) time.o
-	#zcc +test -D__SPECTRUM__ $(CFLAGS) time.c
-	cd spectrum ; $(MAKE) ; cd ..
-
-newbrain_time:
-	cd newbrain ; $(MAKE) ; cd ..
-
-enterprise_time:
-	cd enterprise ; $(MAKE) ; cd ..
-
-cpm_time:
-	cd cpm ; $(MAKE) ; cd ..
-
-x1_time:
-	cd x1 ; $(MAKE) ; cd ..
+%.o: %.c
+	zcc +test $(CFLAGS) $^ -o $@
 
 clean:
-	$(RM) *.o* *.i *.sym *.map zcc_opt.def
-	$(RM) zx81/*.o*
-	$(RM) abc80/*.o*
-	$(RM) ace/*.o*
-	$(RM) cpm/*.o*
-	$(RM) enterprise/*.o*
-	$(RM) newbrain/*.o*
-	$(RM) osca/*.o*
-	$(RM) p2000/*.o*
-	$(RM) rcmx000/*.o*
-	$(RM) mc1000/*.o*
-	cd x1 ; $(MAKE) clean ; cd ..
-	cd z88 ; $(MAKE) clean ; cd ..
-	cd spectrum ; $(MAKE) clean ; cd ..
-	cd sprinter ; $(MAKE) clean ; cd ..
+	$(RM) *.o zcc_opt.def
+	$(RM) */*.o */zcc_opt.def
