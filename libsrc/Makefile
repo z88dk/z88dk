@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.231 2015-11-27 23:21:17 dom Exp $
+# $Id: Makefile,v 1.232 2016-04-01 09:36:47 dom Exp $
 
 
 include Make.config
@@ -21,7 +21,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	nascom_clib.lib nasansi_clib.lib newbrain_clib.lib nc_clib.lib \
 	osca_clib.lib oscaansi_clib.lib ozansi_clib.lib p2000_clib.lib p2000ansi_clib.lib \
 	pc6001_clib.lib pc6001ansi_clib.lib pps_clib.lib ppsansi_clib.lib px4.lib px4ansi.lib\
-	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib \
+	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib samansi_clib.lib sorcerer_clib.lib  sos_clib.lib tiki100.lib\
 	trs80_clib.lib vg5k_clib.lib vg5kansi_clib.lib vz_clib.lib vzansi_clib.lib x07_clib.lib \
 	embedded_clib.lib test_clib.lib \
