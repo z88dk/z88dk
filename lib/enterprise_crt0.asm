@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.16 2016-03-30 09:19:58 dom Exp $
+;	$Id: enterprise_crt0.asm,v 1.17 2016-04-01 09:38:14 dom Exp $
 ;
 
 
@@ -424,7 +424,7 @@ _esccmd_f:
         defb  0
 
 
-__videoVariables:
+__VideoVariables:
         defb  22, 0                     ; MODE_VID	- hw text mode
         defb  23, 0                     ; COLR_VID	- mono
         defb  24, 40                    ; X_SIZ_VID
