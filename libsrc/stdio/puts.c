@@ -6,7 +6,7 @@
  *	djm 2/4/2000
  *
  * --------
- * $Id: puts.c,v 1.3 2016-04-01 10:38:37 dom Exp $
+ * $Id: puts.c,v 1.4 2016-04-01 10:39:41 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -15,6 +15,6 @@
 int puts(char *s)
 {
 	fputs(s,stdout);
-	fputs("\r\n",stdout);
+	fputs("\n",stdout);
 }
 
