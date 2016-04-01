@@ -4,7 +4,7 @@ lstoff
 ;
 ; Jul 2011
 ;
-; $Id: flos.def,v 1.2 2013-04-11 16:44:55 stefano Exp $
+; $Id: flos.def,v 1.3 2016-04-01 19:08:30 stefano Exp $
 ;
 
 defc FLOS_location = $1000
@@ -71,16 +71,16 @@ defc kjt_get_pen              = $10be ; (added in v544)
 defc kjt_scroll_up            = $10c1 ; ("")
 defc kjt_flos_display         = $10c4 ; (added in v547)
 defc kjt_get_dir_name         = $10c7 ; (added in v555)
-defc kjt_get_key_mod_flags    = $10ca ; (added in v555)
+defc kjt_get_key_mod_flags    = $10ca ; ("")
 defc kjt_get_display_size     = $10cd ; (added in v559)
-defc kjt_timer_wait           = $10d0 ; (added in v559)
-defc kjt_get_charmap_addr_xy  = $10d3 ; (added in v559)
+defc kjt_timer_wait           = $10d0 ; ("")
+defc kjt_get_charmap_addr_xy  = $10d3 ; ("")
 defc kjt_store_dir_position   = $10d6 ; (added in v560)
-defc kjt_restore_dir_position = $10d9 ; (added in v560)
+defc kjt_restore_dir_position = $10d9 ; ("")
 defc kjt_mount_volumes        = $10dc ; (added in v562)
 defc kjt_get_device_info      = $10df ; (added in v565)
 defc kjt_read_sysram_flat     = $10e2 ; (added in v570)
-defc kjt_write_sysram_flat    = $10e5 ; (added in v570)
+defc kjt_write_sysram_flat    = $10e5 ; ("")
 defc kjt_get_mouse_disp       = $10e8 ; (added in v571)
 defc kjt_get_dir_cluster      = $10eb ; (added in v572)
 defc kjt_set_dir_cluster      = $10ee ; (added in v572)
@@ -90,5 +90,14 @@ defc kjt_get_envar            = $10f7 ; (added in v572)
 defc kjt_delete_envar         = $10fa ; (added in v572)
 defc kjt_file_sector_list     = $10fd ; (added in v575)
 defc kjt_mouse_irq_code	      = $1100 ; (added in v579)
-
-lston
+defc kjt_get_sector_read_addr = $1103 ; (added in v588)
+defc kjt_get_key_buffer       = $1106 ; (added in v591)
+defc kjt_get_colours          = $1109 ; (added in v593)
+defc kjt_set_colours          = $110c ; ("")
+defc kjt_patch_font           = $110f ; (added in v595)
+defc kjt_get_fs_vars_location = $1112 ; (added in v599)
+defc kjt_continue_file_read   = $1115 ; ("")
+defc kjt_set_load_address     = $1118 ; ("")
+defc kjt_write_baddr          = $111b ; (added in v603)
+defc kjt_parse_path           = $111e ; (added in v607)
+defc kjt_ascii_to_hex32       = $1121 ; (added in v608)
