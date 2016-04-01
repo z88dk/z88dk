@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.54 2016-03-30 09:19:58 dom Exp $
+# $Id: Makefile,v 1.55 2016-04-01 21:00:11 dom Exp $
 #
 
 include ../Make.config
@@ -68,6 +68,7 @@ cpm:	$(GENCOBJECTS)
 	zcc +test $(CFLAGS) -D__CPM__ fputc_callee.c
 	zcc +test $(CFLAGS) -D__CPM__ freopen_z88.c
 	zcc +test $(CFLAGS) -D__CPM__ fread.c
+	zcc +test $(CFLAGS) -D__CPM__ -Cc-standard-escape-chars puts.c
 
 
 gen:
@@ -76,6 +77,7 @@ gen:
 	zcc +test $(CFLAGS) fputc_callee.c
 	zcc +test $(CFLAGS) freopen_z88.c
 	zcc +test $(CFLAGS) fread.c
+	zcc +test $(CFLAGS) puts.c
 	cd 8080; $(MAKE) ; cd ..
 
 std:    $(STDOBJECTS)
