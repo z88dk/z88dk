@@ -1,5 +1,6 @@
 @arch/zx/bifrost_h/bifrost_h_sdcc.lst
 @arch/zx/bifrost_l/bifrost_l_sdcc.lst
+@arch/zx/bifrost2/bifrost2_sdcc.lst
 @arch/zx/display/display_sdcc_ix.lst
 @arch/zx/graphics/graphics_sdcc_ix.lst
 @arch/zx/misc/misc_sdcc_ix.lst
