@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: float.asm,v 1.5 2015-08-10 08:52:12 stefano Exp $
+;       $Id: float.asm,v 1.6 2016-04-01 09:59:13 dom Exp $
 ;
 
 
@@ -36,6 +36,7 @@ ENDIF
 
 		PUBLIC	float
 		EXTERN	stkequ
+		EXTERN	l_long_neg
 		
 .float
 IF TINYMODE
@@ -60,14 +61,11 @@ ENDIF
 	
 
 ELSE
-
+	bit	7,d
+	push	af
+	call	nz,l_long_neg
 	ld	b,h
 	ld	c,l
-	bit	7,d		; is it	negative ?
-	push	af
-	ld	a,127
-	and	d
-	ld	d,a
 	push	de
 	call	ZXFP_STACK_BC	; LSW
 	pop	bc
