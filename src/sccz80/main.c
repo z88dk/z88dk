@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.32 2016-03-30 21:22:52 dom Exp $
+ *      $Id: main.c,v 1.33 2016-04-02 16:14:34 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -793,7 +793,7 @@ void dumplits(
                 }
             }
         }
-        output_section("code_compiler"); // output_section("code");
+        //output_section("code_compiler"); // output_section("code");
     }
     nl();
 }
