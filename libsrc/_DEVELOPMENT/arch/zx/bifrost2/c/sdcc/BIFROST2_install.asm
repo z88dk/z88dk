@@ -9,8 +9,8 @@
 SECTION code_clib
 SECTION code_bifrost2
 
-PUBLIC _BIFROST2_start
+PUBLIC _BIFROST2_install
 
-EXTERN asm_BIFROST2_start
+EXTERN asm_BIFROST2_install
 
-defc _BIFROST2_start = asm_BIFROST2_start
+defc _BIFROST2_install = asm_BIFROST2_install
