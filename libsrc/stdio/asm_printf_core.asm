@@ -11,6 +11,8 @@ EXTERN	l_glong
 EXTERN	l_int2long_s
 EXTERN l_long_neg
 EXTERN l_long_div_u
+EXTERN l_div_u
+EXTERN l_neg
 EXTERN	atoi
 EXTERN	l_ge
 EXTERN	strlen
@@ -168,6 +170,7 @@ save_precision:
 	pop	de		;restore ap
 ENDIF
 no_precision:
+IF handlelong
 	cp	'l'
 	jr	nz,no_long_qualifier
 
@@ -204,15 +207,11 @@ ENDIF
 
 printlong:
 	ld	a,c
-IF printflevel >= 2
-	jp	_miniprintn
-ELSE
 	call	_miniprintn	;And print it (callee)
 	; On stack, ap (pointing to next), fmt
 	pop	de
 	pop	hl
 	jp	fmtloop
-ENDIF
 
 pickuplong_sccz80:
 	ex	de,hl
@@ -230,6 +229,7 @@ pickuplong_sccz80:
 	ld	h,b
 	ld	l,a
 	jr	printlong
+ENDIF
 
 no_long_qualifier:
 	call	parse_number_format
@@ -237,11 +237,20 @@ no_long_qualifier:
 	push	hl		; Save fmt
 	call	get_16bit_ap_parameter	;de = new ap, hl = number to print
 	push	de		; save ap
+IF handlelong
 	ld	de,0		;make it a long
 	ld	a,c		;signed?
 	and	a
 	call	nz,l_int2long_s	;extend it out
 	jr	printlong
+ELSE
+	ld	a,c
+	call	_miniprintn	;And print it (callee)
+	; On stack, ap (pointing to next), fmt
+	pop	de
+	pop	hl
+	jp	fmtloop
+ENDIF
 
 check_s_fmt:
 	cp	's'
@@ -458,23 +467,32 @@ change_ap_decrement:
 ; 		dehl =  number
 _miniprintn:
 	ld	b,a
+IF handlelong
 	ld	a,d
+ELSE
+	ld	a,h
+ENDIF
 	rlca
 	and	1
 	and	b
 	jr	z,noneg
+IF handlelong
 	call	l_long_neg
+ELSE
+	call	l_neg
+ENDIF
 	ld	a,'-'
 printsign:
 IF printflevel >= 2
 	call	print_to_buf
 ELSE
-	call	doprint ; awful trick to save few bytes
+	call	doprint 
 ENDIF
 IF printflevel >= 2
 	jr	miniprintn_start_process
-
+ENDIF
 noneg:
+IF printflevel >= 2
 	ld	a,' '
 	bit	3,(ix-4)
 	jr	nz,printsign
@@ -495,8 +513,6 @@ noneg:
 	ld	a,'x'
 	add	(ix-3)
 	call	print_to_buf
-ELSE
-noneg:
 ENDIF
 
 miniprintn_start_process:
@@ -504,6 +520,7 @@ miniprintn_start_process:
 	push	af	; set terminator
 
 .divloop
+IF handlelong
 	push	de	; number MSW
 	push	hl	; number LSW
 	ld	l,(ix-9)	;base
@@ -511,15 +528,27 @@ miniprintn_start_process:
 	ld	d,h
 	ld	e,h
 	call	l_long_div_u
+
 	exx
 	ld	a,l
 	cp	255  ; force flag to non-zero
 	push	af	; save reminder as a digit in stack
 	exx
+ELSE
+	ld	e,(ix-9)	;base
+	ld	d,0
+	ex	de,hl
+	call	l_div_u		;hl=de/hl de=de%hl
+	ld	a,e
+	cp	255
+	push	af
+ENDIF
 
 	ld	a,h
+IF handlelong
 	or	d
 	or	e
+ENDIF
 	or	l			; is integer part of last division  zero ?
 	jr	nz,divloop	; not still ?.. loop
 	
@@ -555,6 +584,8 @@ ENDIF
 parse_number_format:
 	ld	c,1	; flag set
 	cp	'd'
+	ret	z
+	cp	'i'
 	ret	z
         dec	c	;reset flag
 	cp	'u'

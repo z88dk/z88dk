@@ -2,6 +2,9 @@ stdio/asm_printf_core
 stdio/asm_vfprintf_level1
 stdio/asm_vfprintf_level2
 stdio/asm_vfprintf_level3
+stdio/asm_vfprintf_nolong_level1
+stdio/asm_vfprintf_nolong_level2
+stdio/asm_vfprintf_nolong_level3
 stdio/printk
 stdio/printf
 stdio/_printf
