@@ -1,8 +1,6 @@
 @arch/zx/bifrost2/bifrost2_asm.lst
 arch/zx/bifrost2/c/sdcc/BIFROST2_drawTileH
 arch/zx/bifrost2/c/sdcc/BIFROST2_drawTileH_callee
-arch/zx/bifrost2/c/sdcc/BIFROST2_drawTilePosH
-arch/zx/bifrost2/c/sdcc/BIFROST2_drawTilePosH_callee
 arch/zx/bifrost2/c/sdcc/BIFROST2_fillTileAttrH
 arch/zx/bifrost2/c/sdcc/BIFROST2_fillTileAttrH_callee
 arch/zx/bifrost2/c/sdcc/BIFROST2_findAttrH
