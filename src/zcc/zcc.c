@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.116 2016-03-31 10:52:38 dom Exp $
+ *      $Id: zcc.c,v 1.117 2016-04-02 01:02:50 aralbrec Exp $
  */
 
 
@@ -1389,9 +1389,9 @@ static void configure_compiler()
 
 void PragmaRedirect(arg_t *arg,char *val)
 {
-    char *ptr = val + strlen(arg->name) + 2;
-    char *value = "";;
     char *eql;
+    char *ptr = val + strlen(arg->name) + 2;
+    char *value = "";
 
     if ( (eql = strchr(ptr,'=') ) != NULL ) {
         *eql = 0;
