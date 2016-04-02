@@ -11,7 +11,7 @@ EXTERN	l_glong
 EXTERN	l_int2long_s
 EXTERN l_long_neg
 EXTERN l_long_div_u
-EXTERN l_div_u
+EXTERN	l_div_u
 EXTERN l_neg
 EXTERN	atoi
 EXTERN	l_ge
@@ -170,7 +170,6 @@ save_precision:
 	pop	de		;restore ap
 ENDIF
 no_precision:
-IF handlelong
 	cp	'l'
 	jr	nz,no_long_qualifier
 
@@ -207,11 +206,15 @@ ENDIF
 
 printlong:
 	ld	a,c
+IF printflevel >= 2
+	jp	_miniprintn
+ELSE
 	call	_miniprintn	;And print it (callee)
 	; On stack, ap (pointing to next), fmt
 	pop	de
 	pop	hl
 	jp	fmtloop
+ENDIF
 
 pickuplong_sccz80:
 	ex	de,hl
@@ -229,7 +232,6 @@ pickuplong_sccz80:
 	ld	h,b
 	ld	l,a
 	jr	printlong
-ENDIF
 
 no_long_qualifier:
 	call	parse_number_format
@@ -237,20 +239,11 @@ no_long_qualifier:
 	push	hl		; Save fmt
 	call	get_16bit_ap_parameter	;de = new ap, hl = number to print
 	push	de		; save ap
-IF handlelong
 	ld	de,0		;make it a long
 	ld	a,c		;signed?
 	and	a
 	call	nz,l_int2long_s	;extend it out
 	jr	printlong
-ELSE
-	ld	a,c
-	call	_miniprintn	;And print it (callee)
-	; On stack, ap (pointing to next), fmt
-	pop	de
-	pop	hl
-	jp	fmtloop
-ENDIF
 
 check_s_fmt:
 	cp	's'
@@ -486,13 +479,12 @@ printsign:
 IF printflevel >= 2
 	call	print_to_buf
 ELSE
-	call	doprint 
+	call	doprint ; awful trick to save few bytes
 ENDIF
 IF printflevel >= 2
 	jr	miniprintn_start_process
-ENDIF
+
 noneg:
-IF printflevel >= 2
 	ld	a,' '
 	bit	3,(ix-4)
 	jr	nz,printsign
@@ -513,6 +505,8 @@ IF printflevel >= 2
 	ld	a,'x'
 	add	(ix-3)
 	call	print_to_buf
+ELSE
+noneg:
 ENDIF
 
 miniprintn_start_process:
@@ -528,20 +522,19 @@ IF handlelong
 	ld	d,h
 	ld	e,h
 	call	l_long_div_u
-
 	exx
 	ld	a,l
 	cp	255  ; force flag to non-zero
 	push	af	; save reminder as a digit in stack
 	exx
 ELSE
-	ld	e,(ix-9)	;base
-	ld	d,0
-	ex	de,hl
-	call	l_div_u		;hl=de/hl de=de%hl
-	ld	a,e
-	cp	255
-	push	af
+ 	ld	e,(ix-9)	;base
+ 	ld	d,0
+ 	ex	de,hl
+ 	call	l_div_u		;hl=de/hl de=de%hl
+ 	ld	a,e
+	cp	255  ; force flag to non-zero
+	push	af	; save reminder as a digit in stack
 ENDIF
 
 	ld	a,h
@@ -584,8 +577,6 @@ ENDIF
 parse_number_format:
 	ld	c,1	; flag set
 	cp	'd'
-	ret	z
-	cp	'i'
 	ret	z
         dec	c	;reset flag
 	cp	'u'
