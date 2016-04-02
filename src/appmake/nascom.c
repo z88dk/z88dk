@@ -4,7 +4,7 @@
  *
  *	Stefano Bodrato 30/5/2003
  *
- *	$Id: nascom.c,v 1.1 2003-06-18 08:59:59 dom Exp $
+ *	$Id: nascom.c,v 1.2 2016-04-02 22:31:58 dom Exp $
  */
 
 
@@ -53,7 +53,7 @@ int nascom_exec(char *target)
     }
 
     if ( origin == -1 ) {
-        origin = 0xc80;
+        origin = 0x1000;
     }
 
 
