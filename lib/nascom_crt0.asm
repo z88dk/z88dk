@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.12 2016-03-30 09:19:58 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.13 2016-04-02 17:44:20 dom Exp $
 ;
 ; - - - - - - -
 
@@ -63,7 +63,6 @@ stackloop:
 	cp	(hl)
 	dec	hl
 	jr	nz,stackloop
-
 	ld      sp,hl
 	ld      (exitsp),sp
 
@@ -136,15 +135,15 @@ ENDIF
 ;---------------------------------
 	PUBLIC	asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
+	EXTERN	asm_vfprintf_nolong_level3
+	defc	asm_vfprintf = asm_vfprintf_nolong_level3
 ELSE
 	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
+	        EXTERN	asm_vfprintf_nolong_level2
+		defc	asm_vfprintf = asm_vfprintf_nolong_level2
 	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
+	       	EXTERN	asm_vfprintf_nolong_level1
+		defc	asm_vfprintf = asm_vfprintf_nolong_level1
 	ENDIF
 ENDIF
 
