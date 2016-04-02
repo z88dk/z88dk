@@ -8,14 +8,17 @@
 ;		At C source level:
 ;       #pragma output osca_bank=(0..14) set the memory bank for locations > 32768 before loading program
 ;		#pragma output osca_stack=<value> put the stack in a differen place, i.e. 32767
-;		#pragma output nostreams - No stdio disc files
-;		#pragma output noredir   - do not insert the file redirection option while parsing the
-;		                           command line arguments (useless if "nostreams" is set)
+;		#pragma output nostreams       - No stdio disc files
+;		#pragma output noredir         - do not insert the file redirection option while parsing the
+;		                                 command line arguments (useless if "nostreams" is set)
+;		#pragma output osca_notimer    - Save very few bytes and excludes the clock handling, 
+;                                        thus disabling those functions connected to time.h
+;		#pragma output osca_restoretxt - works only with FLOS > v547, restores the text mode on program exit
 ;
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.29 2016-03-30 09:19:58 dom Exp $
+;	$Id: osca_crt0.asm,v 1.30 2016-04-02 20:16:44 stefano Exp $
 ;
 
 
@@ -356,7 +359,9 @@ ENDIF
 		; kjt_flos_display restores the text mode but makes the screen flicker
 		; if it is in text mode already
 		;
-        ;call	$10c4 ; kjt_flos_display (added in v547)
+IF (DEFINED_osca_restoretxt)
+        call	$10c4 ; kjt_flos_display (added in v547)
+ENDIF
 IF (!DEFINED_osca_notimer)
         di
         ld		hl,(original_irq_vector)
