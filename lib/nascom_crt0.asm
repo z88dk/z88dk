@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.14 2016-04-02 22:31:58 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.15 2016-04-03 13:28:36 dom Exp $
 ;
 ; - - - - - - -
 
@@ -68,6 +68,8 @@ stackloop:
 	ld      sp,hl
 	ld      (exitsp),sp
 
+        call    crt_init_start  ;Initialise any data setup by sdcc
+
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
@@ -75,17 +77,6 @@ stackloop:
 		INCLUDE "amalloc.def"
 	ENDIF
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
 
 	call    _main	;Call user program
 
@@ -120,17 +111,8 @@ montest: ld	a,(1)	; "T" monitor or NAS-SYS?
          ret
 
 
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
-
+         defm  "Small C+ NASCOM"	;Unnecessary file signature
+         defb	0
 
 ;---------------------------------
 ; Select which printf core we want
@@ -148,6 +130,46 @@ ELSE
 		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
+
+
+    SECTION code_crt_init
+crt_init_start:
+IF !DEFINED_nostreams
+IF DEFINED_ANSIstdio
+; Set up the std* stuff so we can be called again
+	ld	hl,__sgoioblk+2
+	ld	(hl),19	;stdin
+	ld	hl,__sgoioblk+6
+	ld	(hl),21	;stdout
+	ld	hl,__sgoioblk+10
+	ld	(hl),21	;stderr
+ENDIF
+ENDIF
+	xor	a
+	ld	(exitcount),a
+    ;; Code gets placed in this section
+    SECTION code_crt_exit
+    	ret
+
+    SECTION code_compiler
+    SECTION code_clib
+    SECTION code_crt0_sccz80
+    SECTION code_l_sdcc
+    SECTION code_math
+    SECTION code_error
+    SECTION data_compiler
+    SECTION data_clib
+    SECTION rodata_compiler
+    SECTION smc_clib
+    SECTION bss_crt
+
+
+;-----------
+; Define the file table
+;-----------
+__sgoioblk:
+	INCLUDE	"stdio_fp.asm"
+
 
 ;-----------
 ; Now some variables
@@ -174,8 +196,6 @@ _heap:
                 defw 0
 ENDIF
 
-                defm  "Small C+ NASCOM"	;Unnecessary file signature
-                defb	0
 
 ;-----------------------
 ; Floating point support
@@ -187,4 +207,8 @@ extra:          defs    6               ;FP register
 fa:             defs    6               ;FP Accumulator
 fasign:         defb    0               ;FP register
 ENDIF
+
+    SECTION bss_error
+    SECTION bss_compiler
+    SECTION bss_clib
 

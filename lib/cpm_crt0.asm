@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.28 2016-03-30 09:19:58 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.29 2016-04-03 13:28:36 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -123,21 +123,8 @@ ENDIF
 IF DEFINED_USING_amalloc
     INCLUDE "amalloc.def"
 ENDIF
+	call	crt_init_start
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
-	ld	c,25		;Set the default disc
-	call	5
-	ld	(defltdsk),a
 
 ; Push pointers to argv[n] onto the stack now
 ; We must start from the end 
@@ -169,8 +156,6 @@ argv_loop_2:
 
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-
 		EXTERN freopen
 		xor a
 		add b
@@ -230,8 +215,6 @@ no_redir_stdout:
 		dec hl
 		jr	argv_zloop
 no_redir_stdin:
-
-ENDIF
 ENDIF
 ENDIF
 
@@ -278,10 +261,8 @@ argv_done:
 cleanup:
 	push	hl		;Save return value
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall	;Close any opened files
 	call	closeall
-ENDIF
 ENDIF
 	pop	bc		;Get exit() value into bc
 start1:	ld      sp,0		;Pick up entry sp
@@ -289,16 +270,10 @@ start1:	ld      sp,0		;Pick up entry sp
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
-;------------------------
-; The stdio control block
-;------------------------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10	;Dummy values (unused by CPM port?)
+IF NEED_floatpack
+        INCLUDE         "float.asm"
 ENDIF
-
+         	defm  	"Small C+ CP/M"
 
 ;----------------------------------------
 ; Work out which vfprintf routine we need
@@ -316,6 +291,45 @@ ELSE
 		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
+
+    SECTION code_crt_init
+crt_init_start:
+IF !DEFINED_nostreams
+; Set up the std* stuff so we can be called again
+	ld	hl,__sgoioblk+2
+	ld	(hl),19	;stdin
+	ld	hl,__sgoioblk+6
+	ld	(hl),21	;stdout
+	ld	hl,__sgoioblk+10
+	ld	(hl),21	;stderr
+	ld	c,25
+	call	5
+	ld	(defltdsk),a
+ENDIF
+    ;; Code gets placed in this section
+    SECTION code_crt_exit
+    ret
+
+    SECTION code_compiler
+    SECTION code_clib
+    SECTION code_crt0_sccz80
+    SECTION code_l_sdcc
+    SECTION code_math
+    SECTION code_error
+    SECTION data_compiler
+    SECTION data_clib
+    SECTION rodata_compiler
+    SECTION smc_clib
+    SECTION bss_crt
+
+;------------------------
+; The stdio control block
+;------------------------
+IF !DEFINED_nostreams
+__sgoioblk:
+	INCLUDE	"stdio_fp.asm"
+ENDIF
+
 
 
 ;-----------------------
@@ -354,7 +368,6 @@ ENDIF
 ;-----------------------------------------------------
 _vdcDispMem:				; Label used by "c128cpm.lib" only
 base_graphics:				; various gfx drivers
-         	defm  	"Small C+ CP/M"
 end:		defb	0		; null file name
 IF !DEFINED_nogfxglobals
 RG0SAV:		defb	0		; VDP graphics driver (Einstein)
@@ -367,8 +380,6 @@ ENDIF
 ; Floating point support routines and variables
 ;----------------------------------------------
 IF NEED_floatpack
-        INCLUDE         "float.asm"
-
 fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
 extra:          defs    6		; FP spare register
 fa:             defs    6		; FP accumulator
@@ -378,7 +389,6 @@ ENDIF
 
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 redir_fopen_flag:
 				defb 'w'
 				defb 0
@@ -387,21 +397,11 @@ redir_fopen_flagr:
 				defb 0
 ENDIF
 ENDIF
-ENDIF
 
 
-    SECTION code_crt_init
-crt_init_start:
-    ;; Code gets placed in this section
-    SECTION code_crt_exit
-    ret
 
-    SECTION code_compiler
-    SECTION code_clib
-    SECTION data_compiler
-    SECTION data_clib
-    SECTION rodata_compiler
-    SECTION smc_clib
+
     SECTION bss_compiler
     SECTION bss_clib
+    SECTION bss_error
 

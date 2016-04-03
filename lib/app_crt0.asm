@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.15 2016-03-30 09:19:58 dom Exp $
+;	$Id: app_crt0.asm,v 1.16 2016-04-03 13:28:36 dom Exp $
 
 
 ;--------
@@ -376,6 +376,8 @@ SECTION code_compiler
 SECTION code_clib
 SECTION code_crt0_sccz80
 SECTION code_l_sdcc
+SECTION code_math
+SECTION code_error
 SECTION data_compiler
 SECTION rodata_compiler
 SECTION rodata_clib
@@ -436,3 +438,4 @@ SECTION bss_compiler
 
 
 SECTION bss_clib
+SECTION bss_error
