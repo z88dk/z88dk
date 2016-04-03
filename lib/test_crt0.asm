@@ -1,7 +1,7 @@
 ;
 ;	Startup for test emulator
 ;
-;	$Id: test_crt0.asm,v 1.6 2016-03-30 09:19:58 dom Exp $
+;	$Id: test_crt0.asm,v 1.7 2016-04-03 13:53:07 dom Exp $
 
 
     module test_crt0
@@ -101,7 +101,8 @@ program:
 	add	hl,sp
 	ld	sp,hl
 	ld	(exitsp),sp
-    ei
+    	ei
+	call    crt_init_start
 	call	_main
 cleanup:
 	ld	a,CMD_EXIT	;exit
@@ -110,16 +111,8 @@ cleanup:
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-        INCLUDE "stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
+IF NEED_floatpack
+        INCLUDE         "float.asm"
 ENDIF
 
 ;---------------------------------
@@ -138,7 +131,42 @@ ELSE
 		defc	asm_vfprintf = asm_vfprintf_level1
 	ENDIF
 ENDIF
-        
+       
+
+
+    SECTION code_crt_init
+crt_init_start:
+	; TODO: Clear down bss
+IF !DEFINED_nostreams
+; Set up the std* stuff so we can be called again
+        ld      hl,__sgoioblk+2
+        ld      (hl),19 ;stdin
+        ld      hl,__sgoioblk+6
+        ld      (hl),21 ;stdout
+        ld      hl,__sgoioblk+10
+        ld      (hl),21 ;stderr
+ENDIF
+    ;; Code gets placed in this section
+    SECTION code_crt_exit
+    	ret
+
+    SECTION code_compiler
+    SECTION code_clib
+    SECTION code_crt0_sccz80
+    SECTION code_l_sdcc
+    SECTION code_math
+    SECTION code_error
+    SECTION data_compiler
+    SECTION data_clib
+    SECTION rodata_compiler
+    SECTION smc_clib
+    SECTION bss_crt
+;-----------
+; Define the stdin/out/err area. For the z88 we have two models - the
+;-----------
+__sgoioblk:	defs	40
+
+ 
 
 ;-----------
 ; Now some variables
@@ -161,7 +189,6 @@ heapblocks:     defw    0       ; Number of blocks
 ; Floating point support
 ;-----------------------
 IF NEED_floatpack
-        INCLUDE         "float.asm"
 fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
 extra:          defs    6               ;FP register
 fa:             defs    6               ;FP Accumulator
@@ -169,3 +196,6 @@ fasign:         defb    0               ;FP register
 
 ENDIF
 
+    SECTION bss_compiler
+    SECTION bss_clib
+    SECTION bss_error
