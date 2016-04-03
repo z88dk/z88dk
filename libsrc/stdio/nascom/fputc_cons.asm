@@ -2,9 +2,10 @@
 ;	ROM Console routine for the NASCOM1/2
 ;	By Stefano Bodrato - 19/6/2003
 ;
-;	$Id: fputc_cons.asm,v 1.3 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.4 2016-04-03 13:10:24 dom Exp $
 ;
 
+	SECTION	code_clib
 	PUBLIC	fputc_cons
 	EXTERN	montest
 
