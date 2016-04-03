@@ -2,7 +2,7 @@
 graphics/dcircle
 graphics/clg
 graphics/clsgraph
-graphics/closegfx
+graphics/z88/closegfx
 graphics/z88/clrarea
 graphics/lftscrol
 graphics/plotpixl
@@ -19,4 +19,4 @@ graphics/bkrestore
 graphics/z88/pixladdr
 graphics/z88/swapgfxbk
 graphics/stencil_render
-graphics/window
+graphics/z88/window
