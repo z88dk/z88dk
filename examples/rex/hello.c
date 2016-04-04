@@ -19,7 +19,6 @@ int main()
 	DsDialogTextButton(90, 80, 60, 20, 61, "Exit");
 
 	/*Wait for event*/
-	test();
 
 	while (flag) {
 	  DsEventMessageGet(&msg);
