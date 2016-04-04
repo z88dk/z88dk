@@ -9,8 +9,8 @@
 #define FARDATA 1
 
 /* sccz80 magic, make application and far heapsize is 16384 */
-#pragma -make-app
 #pragma -farheap=16384
+#pragma -reqpag=3
 
 #include <stdio.h>
 #include <ctype.h>

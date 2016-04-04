@@ -7,7 +7,7 @@ info:
 	@echo Building Far Malloc example..
 
 test:
-	zcc -vn -create-app test.c -lfarz88 -o test.bin
+	zcc +z88 -subtype=app -vn -create-app test.c -lfarz88 -o test.bin
 
 
 clean:
