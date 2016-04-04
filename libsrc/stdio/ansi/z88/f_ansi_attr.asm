@@ -12,9 +12,10 @@
 ;	djm 6/6/2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_attr.asm,v 1.6 2016-04-04 18:31:23 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ansi_attr
 
 	EXTERN	invrs

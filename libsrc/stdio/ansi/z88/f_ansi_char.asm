@@ -7,9 +7,10 @@
 ;	This ain't pretty..we do far too many calls to oz for my liking..
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_char.asm,v 1.6 2016-04-04 18:31:23 dom Exp $
 ;
 
+		SECTION	code_clib
 		PUBLIC ansi_char
 
 		INCLUDE	"stdio.def"

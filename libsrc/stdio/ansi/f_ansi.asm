@@ -18,9 +18,9 @@
 ;       M - Delete lines: to be completed
 ;
 ;
-;       $Id: f_ansi.asm,v 1.14 2015-01-19 01:33:18 pauloscustodio Exp $
+;       $Id: f_ansi.asm,v 1.15 2016-04-04 18:31:22 dom Exp $
 ;
-
+	SECTION	  code_clib
         PUBLIC    f_ansi
         EXTERN     ansi_putc
         EXTERN     ansi_attr
@@ -31,8 +31,6 @@
         EXTERN     ansi_BEL
         EXTERN     ansi_del_line
 
-        PUBLIC    ansi_COLUMN
-        PUBLIC    ansi_ROW
 
         EXTERN    text_cols
         EXTERN    text_rows
@@ -42,9 +40,6 @@
 ;---------------------------------------------------
 ;  Fire out all the buffer (pointed by HL; len DE)
 ;---------------------------------------------------
-
-.ansi_COLUMN    defb    0
-.ansi_ROW       defb    0
 
 .f_ansi
         ld     a,d
@@ -231,17 +226,6 @@
 ;  DE holds the length remaining in the incoming string.
 ;  BC is the (incrementing) pointer to param_buffer
 
-;-----------------------------------------
-; Variables declaration
-;-----------------------------------------
-
-.escvector      defw 0
-.cur_parm_ptr   defw 0
-.eat_key        defb 0
-.string_term    defb 0
-
-.param_buffer   defs 40
-.param_end      defw 0
 
 .f_ANSI_exit
         ld     bc,0
@@ -668,8 +652,6 @@ push de
         ld      a,(ansi_ROW)
         ld      (scp_y),a
         jp      f_cmd_exit
-.scp_x  defb 0
-.scp_y  defb 0
 .no_s
 
 
@@ -972,3 +954,22 @@ push de
         jp      f_ANSI_exit
 
 
+;-----------------------------------------
+; Variables declaration
+;-----------------------------------------
+	SECTION		bss_clib
+        PUBLIC    	ansi_COLUMN
+        PUBLIC    	ansi_ROW
+
+.ansi_COLUMN    defb    0
+.ansi_ROW       defb    0
+
+.scp_x  defb 0
+.scp_y  defb 0
+.escvector      defw 0
+.cur_parm_ptr   defw 0
+.eat_key        defb 0
+.string_term    defb 0
+
+.param_buffer   defs 40
+.param_end      defw 0

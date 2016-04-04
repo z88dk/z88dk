@@ -6,9 +6,10 @@
 ;
 ;	Stefano Bodrato - 21/4/2000
 ;
-;	$Id: fputc_cons.asm,v 1.5 2016-03-30 10:28:01 dom Exp $
+;	$Id: fputc_cons.asm,v 1.6 2016-04-04 18:31:22 dom Exp $
 ;
 
+	SECTION		code_clib
           PUBLIC  fputc_cons
           PUBLIC  _fputc_cons
 	  EXTERN	f_ansi

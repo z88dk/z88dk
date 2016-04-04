@@ -10,14 +10,14 @@
 ;	Stefano Bodrato - Feb. 2001
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.5 2015-01-19 01:33:18 pauloscustodio Exp $
+;	$Id: f_ansi_attr.asm,v 1.6 2016-04-04 18:31:22 dom Exp $
 ;
 
+        SECTION  code_clib
 	PUBLIC	ansi_attr
 
 	PUBLIC	ace_inverse
 	
-.ace_inverse	defb 0
 
 .ansi_attr
         and     a
@@ -105,3 +105,6 @@
         ld      (ace_inverse),a
 .noback
         ret
+
+	SECTION  bss_clib
+.ace_inverse	defb 0

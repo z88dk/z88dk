@@ -10,9 +10,10 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.3 2015-01-21 08:09:27 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.4 2016-04-04 18:31:22 dom Exp $
 ;
 
+        SECTION  code_clib
 	PUBLIC	ansi_del_line
 
 

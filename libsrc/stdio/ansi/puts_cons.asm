@@ -6,10 +6,10 @@
 ;
 ;	Stefano Bodrato - 3/4/2001
 ;
-;	$Id: puts_cons.asm,v 1.4 2016-03-05 00:53:27 dom Exp $
+;	$Id: puts_cons.asm,v 1.5 2016-04-04 18:31:22 dom Exp $
 ;
 
-
+		SECTION	code_clib
 		PUBLIC	puts_cons
 		PUBLIC	_puts_cons
 		EXTERN	f_ansi

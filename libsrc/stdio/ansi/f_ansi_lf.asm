@@ -7,9 +7,10 @@
 ;
 ;	Stefano Bodrato - 21/4/2000
 ;
-;	$Id: f_ansi_lf.asm,v 1.3 2015-01-19 01:33:18 pauloscustodio Exp $
+;	$Id: f_ansi_lf.asm,v 1.4 2016-04-04 18:31:22 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ansi_LF
 	
 	EXTERN	ansi_ROW
