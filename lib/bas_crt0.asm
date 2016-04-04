@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.14 2016-03-30 09:19:58 dom Exp $
+;	$Id: bas_crt0.asm,v 1.15 2016-04-04 18:03:07 dom Exp $
 
 
 ;-----------
@@ -13,6 +13,13 @@
 	INCLUDE "error.def"
 	INCLUDE "stdio.def"
 
+;--------
+; Define the graphics map and segment for basic
+;--------
+        EXTERN  z88_map_bank
+        EXTERN  z88_map_segment
+        defc    z88_map_bank = $4D3
+        defc    z88_map_segment = 192
 
         org $2300
 

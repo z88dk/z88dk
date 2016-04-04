@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.17 2016-04-04 17:09:25 dom Exp $
+;	$Id: app_crt0.asm,v 1.18 2016-04-04 18:03:07 dom Exp $
 
 
 ;--------
@@ -59,6 +59,15 @@
         ELSE 
                 defc    reqpag  = $20
         ENDIF
+
+;--------
+; Define the graphics map and segment for apps
+;--------
+	EXTERN	z88_map_bank
+	EXTERN	z88_map_segment
+	defc	z88_map_bank = $4D1
+	defc	z88_map_segment = 64
+
 
 ;--------
 ; We need a safedata def. So if not defined set to 0
