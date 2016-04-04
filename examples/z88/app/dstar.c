@@ -43,7 +43,7 @@
  *
  *      This is the application version of the program, compile with:
  *
- *      This example demonstrates the redrawscreen function which allows
+ *      This example demonstrates the dstar_redrawscreen function which allows
  *      you to supply a routine to redraw the screen and take the load
  *      off of OZ. This is a bad app out of necessity really, you can
  *      write good ones! - Have a look at the file doc/apps.html for
@@ -56,6 +56,8 @@
  */
 #pragma -expandz88
 #pragma -reqpag=5
+#pragma redirect redrawscreen = _dstar_redrawscreen
+#pragma redirect handlecmds =  _dstar_handlecmds
 
 
 /* Call up the required header files */
@@ -99,7 +101,7 @@ unsigned char balloffset;        /* Ball position */
 unsigned char boxoffset;         /* Box position */
 unsigned char ballorbox;         /* 1 if box, 0 if ball */
 unsigned char level;             /* Take a guess! */
-unsigned char gameon;            /* Flag for redrawscreen */
+unsigned char gameon;            /* Flag for dstar_redrawscreen */
 
 unsigned char board[144];        /* Level internal map thing */
 unsigned char tiscr[1024];       /* Our very own TI86 screen! */
@@ -139,7 +141,7 @@ void down(unsigned char *ptr);
 void up(unsigned char *ptr);
 int standardmiddle(unsigned char nextpos);
 void setuplevel();
-void redrawscreen(void);
+void dstar_redrawscreen(void);
 void puttiblock(unsigned char spr,int x, int y);
 void drawboard();
 void doozcopyasm();
@@ -150,7 +152,7 @@ int checkfinish();
 int main()
 {
         gameon=0;
-        redrawscreen();         /* Define the windows */
+        dstar_redrawscreen();         /* Define the windows */
         playgame();     /* Play the game */
         myexit();       /* Clean up after ourselves */
 	return 0;
@@ -360,8 +362,7 @@ void setuplevel()
  * If can't open graphics window then exit gracefully
  */
 
-#pragma output redrawscreen
-void redrawscreen(void)
+void dstar_redrawscreen(void)
 {
         struct window text;
 /*
@@ -526,8 +527,7 @@ void doozcopyasm()
  *      This function handles menu codes
  */
 
-#pragma output handlecmds
-void  handlecmds(int cmd)
+void  dstar_handlecmds(int cmd)
 {
         switch(cmd) {
                 case 0x82:

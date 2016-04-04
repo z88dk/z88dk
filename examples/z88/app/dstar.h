@@ -9,10 +9,12 @@
 extern char levels[];
 extern char sprites[];
 
-#asm
+void data_container()
+{
+#pragma asm
 
 
-.smc_sprites
+._sprites
                         ;1=edge, 2=clear ball 3=moveable ball 4=moveable block
  defb    @00000000
  defb    @00000000
@@ -60,12 +62,7 @@ extern char sprites[];
  defb    @00000000
  defb    0
 
-#endasm
-
-
-#asm
-
-.smc_levels
+._levels
  defb    17,30                           ;ball offset, box offset
  defb    @01010101,@01010101,@01010101,@01010101
  defb    @01000101,@00000000,@00000000,@10010001
@@ -341,4 +338,5 @@ extern char sprites[];
  defb    @01010101,@01010101,@01010101,@01010101
  defb    @00000000,@00000000,@00000000,@00000000
 
-#endasm
+#pragma endasm
+}

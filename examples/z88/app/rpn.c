@@ -24,9 +24,9 @@
 
 /* Compiler directives, no bad space, not expanded */
 
-#pragma -make-app
 #pragma -reqpag=1
 #pragma -no-expandz88
+#pragma redirect handlecmds = _rpn_handlecmds
 
 
 
@@ -110,7 +110,7 @@ void main()
   sp = 0;
   pos = 0;
 
-  while((type = read_op(s)) != 0) {
+  while((type = read_op()) != 0) {
     switch(type) {
     case NUMBER:
       push(n);
@@ -141,7 +141,7 @@ void main()
   }
 }
 
-void __APPFUNC__ handlecmds(int cmd)
+void rpn_handlecmds(int cmd)
 {
         switch(cmd) {
                 case 0x81:
@@ -156,7 +156,7 @@ void __APPFUNC__ handlecmds(int cmd)
 #define HELP2   "Liberated from the GBDK. Original author is probably"
 #define HELP3   "probably Pascal Felber, minor change for the Z88 made"
 #define HELP4   "by Dominic Morris - This one is for you Garry <grin>"
-#define HELP5   "Contact: djm@jb.man.ac.uk - 5/5/99 (v2.1)"
+#define HELP5   "Contact  djm@jb.man.ac.uk - 5/5/99 (v2.1)"
 
 #define APP_INFO "Made by z88dk"
 #define APP_KEY  'R'

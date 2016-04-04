@@ -8,9 +8,12 @@
 
 /* Compiler directives, no bad space, not expanded */
 
-#pragma -make-app
 #pragma -reqpag=0
 #pragma -no-expandz88
+
+/* Redirect OZ required callbacks to our functions */
+#pragma redirect handlecmds=_handlecmds
+#pragma redirect redrawscreen=_redrawscreen
 
 
 
@@ -40,7 +43,6 @@ main()
  * Function called when we need to redraw the screen
  */
 
-#pragma output redrawscreen
 void redrawscreen(void)
 {
 /*
@@ -59,7 +61,6 @@ void redrawscreen(void)
  *      This function handles menu codes
  */
 
-#pragma output handlecmds
 void  handlecmds(int cmd)
 {
         fputs("So you want to....",stdout);

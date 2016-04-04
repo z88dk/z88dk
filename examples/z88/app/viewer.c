@@ -11,7 +11,6 @@
 
 /* Compiler directives, no bad space, not expanded */
 
-#pragma -make-app
 #pragma -reqpag=0
 #pragma -no-expandz88
 
