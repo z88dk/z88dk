@@ -5,17 +5,17 @@
 #ifndef _SYSTEMCALL_
 #define _SYSTEMCALL_
 
-extern int __LIB__ SYSCALL0(int);
-extern int __LIB__ SYSCALL1(int,...);
-extern int __LIB__ SYSCALL1P(int,...);
-extern int __LIB__ SYSCALL2(int,...);
-extern int __LIB__ SYSCALL3(int,...);
-extern int __LIB__ SYSCALL4(int,...);
-extern int __LIB__ SYSCALL4D(int,...);
-extern int __LIB__ SYSCALL5(int,...);
-extern int __LIB__ SYSCALL5P(int,...);
-extern int __LIB__ SYSCALL6(int,...);
-extern int __LIB__ SYSCALL6P(int,...);
+extern int __LIB__ syscall0(int);
+extern int __LIB__ syscall1(int,...);
+extern int __LIB__ syscall1p(int,...);
+extern int __LIB__ syscall2(int,...);
+extern int __LIB__ syscall3(int,...);
+extern int __LIB__ syscall4(int,...);
+extern int __LIB__ syscall4d(int,...);
+extern int __LIB__ syscall5(int,...);
+extern int __LIB__ syscall5p(int,...);
+extern int __LIB__ syscall6(int,...);
+extern int __LIB__ syscall6p(int,...);
 
 
 #define DS_TIME_GET				0x00
@@ -140,179 +140,179 @@ extern int __LIB__ SYSCALL6P(int,...);
 
 
 
-#define DsTimeGet( arg1, arg2 )			SYSCALL2( DS_TIME_GET, arg1, arg2 )
-#define DsTimeSet( arg1, arg2 )			SYSCALL2( DS_TIME_SET, arg1, arg2 )
-#define DsLocalTimeGet( arg1, arg2, arg3 )	SYSCALL3( DS_LOCAL_TIME_GET, (int)arg1, (int)arg2, arg3 )
-#define	DsTime24Get()				SYSCALL0( DS_TIME_24_GET )
-#define	DsTime24Set( arg1 )			SYSCALL1( DS_TIME_24_SET, arg1 )
-#define DsTimeSummerGet( arg1 )			SYSCALL1( DS_TIME_SUMMER_GET, arg1 )
-#define	DsTimeSummerSet( arg1, arg2 ) 		SYSCALL2( DS_TIME_SUMMER_SET, arg1, arg2 )
-#define	DsMonthPeriodGet( arg1 )		SYSCALL1( DS_MONTH_PERIOD_GET, arg1 )
-#define	DsHomeCityGet()				SYSCALL0( DS_HOME_CITY_GET )
-#define	DsHomeCitySet( arg1 )			SYSCALL1( DS_HOME_CITY_SET, arg1 )
-#define DsTimeFormatGet()			SYSCALL0( DS_TIME_FORMAT_GET )
-#define DsTimeFormatSet( arg1 )			SYSCALL1( DS_TIME_FORMAT_SET, arg1 )
-#define DsTravelTimeGet( arg1, arg2 ) 		SYSCALL2( DS_TRAVEL_TIME_GET, arg1, arg2 )
-#define DsTravelTimeSet( arg1, arg2 ) 		SYSCALL2( DS_TRAVEL_TIME_SET, arg1, arg2 )
-#define DsTravelCityGet()			SYSCALL0( DS_TRAVEL_CITY_GET )
-#define DsTravelCitySet( arg1 )			SYSCALL1( DS_TRAVEL_CITY_SET, arg1 )
+#define DsTimeGet( arg1, arg2 )			syscall2( DS_TIME_GET, arg1, arg2 )
+#define DsTimeSet( arg1, arg2 )			syscall2( DS_TIME_SET, arg1, arg2 )
+#define DsLocalTimeGet( arg1, arg2, arg3 )	syscall3( DS_LOCAL_TIME_GET, (int)arg1, (int)arg2, arg3 )
+#define	DsTime24Get()				syscall0( DS_TIME_24_GET )
+#define	DsTime24Set( arg1 )			syscall1( DS_TIME_24_SET, arg1 )
+#define DsTimeSummerGet( arg1 )			syscall1( DS_TIME_SUMMER_GET, arg1 )
+#define	DsTimeSummerSet( arg1, arg2 ) 		syscall2( DS_TIME_SUMMER_SET, arg1, arg2 )
+#define	DsMonthPeriodGet( arg1 )		syscall1( DS_MONTH_PERIOD_GET, arg1 )
+#define	DsHomeCityGet()				syscall0( DS_HOME_CITY_GET )
+#define	DsHomeCitySet( arg1 )			syscall1( DS_HOME_CITY_SET, arg1 )
+#define DsTimeFormatGet()			syscall0( DS_TIME_FORMAT_GET )
+#define DsTimeFormatSet( arg1 )			syscall1( DS_TIME_FORMAT_SET, arg1 )
+#define DsTravelTimeGet( arg1, arg2 ) 		syscall2( DS_TRAVEL_TIME_GET, arg1, arg2 )
+#define DsTravelTimeSet( arg1, arg2 ) 		syscall2( DS_TRAVEL_TIME_SET, arg1, arg2 )
+#define DsTravelCityGet()			syscall0( DS_TRAVEL_CITY_GET )
+#define DsTravelCitySet( arg1 )			syscall1( DS_TRAVEL_CITY_SET, arg1 )
 
-#define	DsAlarmTimeGet( arg1 ) 			SYSCALL1( DS_ALARM_TIME_GET, arg1 )
-#define	DsAlarmTimeSet( arg1 ) 			SYSCALL1( DS_ALARM_TIME_SET, arg1 )
+#define	DsAlarmTimeGet( arg1 ) 			syscall1( DS_ALARM_TIME_GET, arg1 )
+#define	DsAlarmTimeSet( arg1 ) 			syscall1( DS_ALARM_TIME_SET, arg1 )
 
-#define DsAlarmEnable( arg1 )			SYSCALL1( DS_ALARM_ENABLE, arg1 )
-#define DsAlarmSet( arg1 )			SYSCALL1( DS_ALARM_SET, arg1 )
-#define DsBeepOn( arg1 )			SYSCALL1( DS_BEEP_ON, arg1 )
-#define DsBeepSet( arg1 )			SYSCALL1( DS_BEEP_SET, arg1 )
-#define DsShellRefreshTopMode()			SYSCALL0( DS_SHELL_REFRESH_TOP )
-#define DsProgramTerminate( arg1 )		SYSCALL1( DS_SHELL_PROGRAM_TERM, arg1 )
-#define DsProgramExecute( arg1 )		SYSCALL1( DS_SHELL_PROGRAM_EXEC, arg1 )
-#define DsEventMessageGet( arg1 )		SYSCALL1( DS_EVENT_MESSAGE_GET, arg1 )
-#define DsReadMessage( arg1, arg2 )		SYSCALL2( DS_READ_MESSAGE, arg1, arg2 )
-#define DsReadLastMessage( arg1 )		SYSCALL1( DS_READ_LAST_MESSAGE, arg1 )
+#define DsAlarmEnable( arg1 )			syscall1( DS_ALARM_ENABLE, arg1 )
+#define DsAlarmSet( arg1 )			syscall1( DS_ALARM_SET, arg1 )
+#define DsBeepOn( arg1 )			syscall1( DS_BEEP_ON, arg1 )
+#define DsBeepSet( arg1 )			syscall1( DS_BEEP_SET, arg1 )
+#define DsShellRefreshTopMode()			syscall0( DS_SHELL_REFRESH_TOP )
+#define DsProgramTerminate( arg1 )		syscall1( DS_SHELL_PROGRAM_TERM, arg1 )
+#define DsProgramExecute( arg1 )		syscall1( DS_SHELL_PROGRAM_EXEC, arg1 )
+#define DsEventMessageGet( arg1 )		syscall1( DS_EVENT_MESSAGE_GET, arg1 )
+#define DsReadMessage( arg1, arg2 )		syscall2( DS_READ_MESSAGE, arg1, arg2 )
+#define DsReadLastMessage( arg1 )		syscall1( DS_READ_LAST_MESSAGE, arg1 )
 
 #define DsEventAdd( arg1, arg2, arg3, arg4, arg5, arg6 ) \
-					SYSCALL6( DS_EVENT_ADD, arg1, arg2, arg3, arg4, arg5, arg6 )
+					syscall6( DS_EVENT_ADD, arg1, arg2, arg3, arg4, arg5, arg6 )
 					
-#define DsEventDelete(  )			SYSCALL0( DS_EVENT_DELETE )
-#define DsEventClear( ) 			SYSCALL0( DS_EVENT_CLEAR )
-#define DsEventEnable( arg1 )			SYSCALL1( DS_EVENT_ENABLE, arg1 )
-#define DsEventDisable( arg1 )			SYSCALL1( DS_EVENT_DISABLE, arg1 )
-#define DsEventStatusGet( arg1 )		SYSCALL1( DS_EVENT_STATUS_GET, arg1 )
-#define DsEventPriorityGet()			SYSCALL0( DS_EVENT_PRIORITY_GET )
+#define DsEventDelete(  )			syscall0( DS_EVENT_DELETE )
+#define DsEventClear( ) 			syscall0( DS_EVENT_CLEAR )
+#define DsEventEnable( arg1 )			syscall1( DS_EVENT_ENABLE, arg1 )
+#define DsEventDisable( arg1 )			syscall1( DS_EVENT_DISABLE, arg1 )
+#define DsEventStatusGet( arg1 )		syscall1( DS_EVENT_STATUS_GET, arg1 )
+#define DsEventPriorityGet()			syscall0( DS_EVENT_PRIORITY_GET )
 
-#define DsAddinExecute( arg1 )			SYSCALL1( DS_ADDIN_EXECUTE, arg1 )
-#define DsAddinTerminate()			SYSCALL0( DS_ADDIN_TERMINATE )
+#define DsAddinExecute( arg1 )			syscall1( DS_ADDIN_EXECUTE, arg1 )
+#define DsAddinTerminate()			syscall0( DS_ADDIN_TERMINATE )
 
 
 
-#define DsDisplayComponent( arg1, arg2, arg3 )	SYSCALL3( DS_DISPLAY_COMPONENT, arg1, arg2, arg3 )
-#define DsSetScrollSize( arg1 )			SYSCALL1( DS_SET_SCROLL_SIZE, arg1 )
-#define DsDialogScrollThumbSet( arg1 )		SYSCALL1( DS_DIALOG_SCROLL_THUMB_SET, arg1 )
+#define DsDisplayComponent( arg1, arg2, arg3 )	syscall3( DS_DISPLAY_COMPONENT, arg1, arg2, arg3 )
+#define DsSetScrollSize( arg1 )			syscall1( DS_SET_SCROLL_SIZE, arg1 )
+#define DsDialogScrollThumbSet( arg1 )		syscall1( DS_DIALOG_SCROLL_THUMB_SET, arg1 )
 
 #define DsDisplayLine( arg1, arg2, arg3, arg4, arg5 ) \
-					SYSCALL5( DS_DISP_LINE, arg1, arg2, arg3, arg4, arg5 )
+					syscall5( DS_DISP_LINE, arg1, arg2, arg3, arg4, arg5 )
 					
-#define DsDisplayPointGet( arg1, arg2 ) 	SYSCALL2( DS_DISP_POINT_GET, arg1, arg2 )
-#define DsDisplayPointSet( arg1, arg2, arg3 ) 	SYSCALL3( DS_DISP_POINT_SET, arg1, arg2, arg3 )
+#define DsDisplayPointGet( arg1, arg2 ) 	syscall2( DS_DISP_POINT_GET, arg1, arg2 )
+#define DsDisplayPointSet( arg1, arg2, arg3 ) 	syscall3( DS_DISP_POINT_SET, arg1, arg2, arg3 )
 
 #if 0
-#define DsDisplayCircle( arg1, arg2, arg3, arg4, arg5 )	SYSCALL5( DS_DISP_CIRCLE, arg1, arg2, arg3, arg4, arg5 )
+#define DsDisplayCircle( arg1, arg2, arg3, arg4, arg5 )	syscall5( DS_DISP_CIRCLE, arg1, arg2, arg3, arg4, arg5 )
 #endif
 
 #define DsDisplayBlockClear( arg1, arg2, arg3, arg4 ) \
-					SYSCALL4( DS_DISP_BLOCK_CLEAR, arg1, arg2, arg3, arg4 )
+					syscall4( DS_DISP_BLOCK_CLEAR, arg1, arg2, arg3, arg4 )
 					
 #if 0
-#define DsClearScreen() 			SYSCALL4( DS_DISP_BLOCK_CLEAR, 0, 0, 240, 120 )
+#define DsClearScreen() 			syscall4( DS_DISP_BLOCK_CLEAR, 0, 0, 240, 120 )
 #endif
 					
 #define DsDisplayBlockReverse( arg1, arg2, arg3, arg4, arg5 ) \
-					SYSCALL5( DS_DISP_BLOCK_REV, arg1, arg2, arg3, arg4, arg5 )
+					syscall5( DS_DISP_BLOCK_REV, arg1, arg2, arg3, arg4, arg5 )
 					
 #define DsDisplayBlock( arg1, arg2, arg3, arg4, arg5 ) \
-					SYSCALL5( DS_DISP_BLOCK, arg1, arg2, arg3, arg4, arg5 )
+					syscall5( DS_DISP_BLOCK, arg1, arg2, arg3, arg4, arg5 )
 					
 #define DsDisplayBlockStore( arg1, arg2, arg3, arg4, arg5 ) \
-					SYSCALL5( DS_DISP_BLOCK_STORE, arg1, arg2, arg3, arg4, arg5 )
+					syscall5( DS_DISP_BLOCK_STORE, arg1, arg2, arg3, arg4, arg5 )
 					
-#define DsDisplayBlockRestore( arg1, arg2 ) 	SYSCALL2( DS_DISP_BLOCK_RESTORE, arg1, arg2 )
-#define DsDisplayImageDrawOr()			SYSCALL0( DS_DISP_IMAGE_OR )
-#define DsDisplayWaitIconDraw( arg1 ) 		SYSCALL1( DS_DISP_WAIT_ICON_DRAW, arg1 )
+#define DsDisplayBlockRestore( arg1, arg2 ) 	syscall2( DS_DISP_BLOCK_RESTORE, arg1, arg2 )
+#define DsDisplayImageDrawOr()			syscall0( DS_DISP_IMAGE_OR )
+#define DsDisplayWaitIconDraw( arg1 ) 		syscall1( DS_DISP_WAIT_ICON_DRAW, arg1 )
 
 #define DsTextOut( arg1, arg2, arg3, arg4, arg5 ) \
-					SYSCALL5P( DS_TEXT_OUT, arg1, arg2, arg3, arg4, arg5 )
+					syscall5p( DS_TEXT_OUT, arg1, arg2, arg3, arg4, arg5 )
 					
 #define DsDisplayBitmapDraw( arg1, arg2, arg3, arg4 ) \
-					SYSCALL4D( DS_DISPLAY_BITMAP_DRAW, arg1, arg2, arg3, arg4 )					
+					syscall4d( DS_DISPLAY_BITMAP_DRAW, arg1, arg2, arg3, arg4 )					
 
-#define DsDialogEditShow( arg1 )		SYSCALL1( DS_DIALOG_EDIT_SHOW, arg1 )
+#define DsDialogEditShow( arg1 )		syscall1( DS_DIALOG_EDIT_SHOW, arg1 )
 
 #define DsDialogScrollBarDraw( arg1, arg2, arg3, arg4 ) \
-					SYSCALL4( DS_DIALOG_SCROLL_DRAW, arg1, arg2, arg3, arg4 )
+					syscall4( DS_DIALOG_SCROLL_DRAW, arg1, arg2, arg3, arg4 )
 					
 #define DsDialogEventSet( arg1, arg2, arg3, arg4, arg5 ) \
-					SYSCALL5( DS_DIALOG_EVENT_SET, arg1, arg2, arg3, arg4, arg5 )
+					syscall5( DS_DIALOG_EVENT_SET, arg1, arg2, arg3, arg4, arg5 )
 					
 #define DsDialogEventDraw( arg1, arg2, arg3, arg4 )	\
-					SYSCALL4D( DS_DIALOG_EVENT_DRAW, arg1, arg2, arg3, arg4 )
+					syscall4d( DS_DIALOG_EVENT_DRAW, arg1, arg2, arg3, arg4 )
 					
 #define DsDialogCheckBoxSet( arg1, arg2, arg3, arg4 ) \
-					SYSCALL4( DS_DIALOG_CHECK_BOX_SET, arg1, arg2, arg3, arg4 )
+					syscall4( DS_DIALOG_CHECK_BOX_SET, arg1, arg2, arg3, arg4 )
 					
 #define DsDialogCheckBoxDraw( arg1, arg2, arg3, arg4 ) \
-					SYSCALL4( DS_DIALOG_CHECK_BOX_DRAW, arg1, arg2, arg3, arg4 )
+					syscall4( DS_DIALOG_CHECK_BOX_DRAW, arg1, arg2, arg3, arg4 )
 					
 #define DsDialogComponentDraw( arg1, arg2, arg3, arg4 ) \
-					SYSCALL4( DS_DIALOG_COMPONENT_DRAW, arg1, arg2, arg3, arg4 )
+					syscall4( DS_DIALOG_COMPONENT_DRAW, arg1, arg2, arg3, arg4 )
 					
-#define DsResourceGet( arg1 )			SYSCALL1( DS_RESOURCE_GET, arg1 )
-#define DsResourceChange( arg1 )		SYSCALL1( DS_RESOURCE_CHANGE, arg1 )
-#define DsIconDraw( arg1, arg2, arg3, arg4 ) 	SYSCALL4D( DS_ICON_DRAW, arg1, arg2, arg3, arg4 )
-#define DsIconMove( arg1, arg2, arg3, arg4 ) 	SYSCALL4( DS_ICON_MOVE, arg1, arg2, arg3, arg4 )
-#define DsIConReverse( arg1 )			SYSCALL1( DS_ICON_REVERSE, arg1 )
+#define DsResourceGet( arg1 )			syscall1( DS_RESOURCE_GET, arg1 )
+#define DsResourceChange( arg1 )		syscall1( DS_RESOURCE_CHANGE, arg1 )
+#define DsIconDraw( arg1, arg2, arg3, arg4 ) 	syscall4d( DS_ICON_DRAW, arg1, arg2, arg3, arg4 )
+#define DsIconMove( arg1, arg2, arg3, arg4 ) 	syscall4( DS_ICON_MOVE, arg1, arg2, arg3, arg4 )
+#define DsIConReverse( arg1 )			syscall1( DS_ICON_REVERSE, arg1 )
 
 #define DsDialogTextButton( arg1, arg2, arg3, arg4, arg5, arg6 ) \
-					SYSCALL6P( DS_DIALOG_TEXT_BUTTON, arg1, arg2, arg3, arg4, arg5, arg6 )
+					syscall6p( DS_DIALOG_TEXT_BUTTON, arg1, arg2, arg3, arg4, arg5, arg6 )
 
 
 
-#define DsPowerIdleModeEntry()			SYSCALL0( DS_POWER_IDLE_MODE_ENTRY )
-#define DsPowerStopModeEntry()			SYSCALL0( DS_POWER_STOP_MODE_ENTRY )
-#define DsPowerModeGet()			SYSCALL0( DS_POWER_MODE_GET )
-#define DsPowerModeSet()			SYSCALL0( DS_POWER_MODE_SET	)
-#define DsPowerBatteryInfoGet()			SYSCALL0( DS_POWER_BAT_INFO	)
-#define DsPowerLineCheck()			SYSCALL0( DS_POWER_LINE_CHECK )
-#define DsPowerOffTimeSet( arg1 )		SYSCALL1( DS_POWER_OFF_TIME_SET, arg1 )
-#define DsPowerHaltEnable()			SYSCALL0( DS_POWER_HALT_ENABLE )
+#define DsPowerIdleModeEntry()			syscall0( DS_POWER_IDLE_MODE_ENTRY )
+#define DsPowerStopModeEntry()			syscall0( DS_POWER_STOP_MODE_ENTRY )
+#define DsPowerModeGet()			syscall0( DS_POWER_MODE_GET )
+#define DsPowerModeSet()			syscall0( DS_POWER_MODE_SET	)
+#define DsPowerBatteryInfoGet()			syscall0( DS_POWER_BAT_INFO	)
+#define DsPowerLineCheck()			syscall0( DS_POWER_LINE_CHECK )
+#define DsPowerOffTimeSet( arg1 )		syscall1( DS_POWER_OFF_TIME_SET, arg1 )
+#define DsPowerHaltEnable()			syscall0( DS_POWER_HALT_ENABLE )
 
 
 
-#define DsKeyCodeGet()				SYSCALL0( DS_KEY_CODE_GET )
-#define DsKeyRepeatSet( arg1 )			SYSCALL1( DS_KEY_REPEAT_SET, arg1 )
-#define DsKeyClickSet( arg1 )			SYSCALL1( DS_KEY_CLICK_SET, arg1 )
-#define DsSoftKeyClose()			SYSCALL0( DS_SOFT_KEY_CLOSE	)
-#define DsTouchCalibration( arg1 )		SYSCALL1( DS_TOUCH_CALIBRATION, arg1 )
-#define DsTouchClickSet( arg1 )			SYSCALL1( DS_TOUCH_CLICK_SET, arg1 )
-#define DsTouchDataGet( arg1 )			SYSCALL1P( DS_TOUCH_DATA_GET, arg1 )
+#define DsKeyCodeGet()				syscall0( DS_KEY_CODE_GET )
+#define DsKeyRepeatSet( arg1 )			syscall1( DS_KEY_REPEAT_SET, arg1 )
+#define DsKeyClickSet( arg1 )			syscall1( DS_KEY_CLICK_SET, arg1 )
+#define DsSoftKeyClose()			syscall0( DS_SOFT_KEY_CLOSE	)
+#define DsTouchCalibration( arg1 )		syscall1( DS_TOUCH_CALIBRATION, arg1 )
+#define DsTouchClickSet( arg1 )			syscall1( DS_TOUCH_CLICK_SET, arg1 )
+#define DsTouchDataGet( arg1 )			syscall1p( DS_TOUCH_DATA_GET, arg1 )
 
 
-#define DsFepExecute()				SYSCALL0( DS_FEP_EXECUTE )
+#define DsFepExecute()				syscall0( DS_FEP_EXECUTE )
 
 
 #define DsJStrCmp( arg1, arg2, arg3, arg4, arg5 ) \
-					SYSCALL5C( DS_JSTR_CMP, arg1, arg2, arg3, arg4, arg5 )
+					syscall5C( DS_JSTR_CMP, arg1, arg2, arg3, arg4, arg5 )
 					
-#define DsMalloc( arg1 )			(void *)SYSCALL1( DS_MALLOC, arg1 )
-#define DsRealloc( arg1, arg2 )			(void *)SYSCALL2( DS_REALLOC, arg1, arg2 )
-#define DsFree( arg1 )				SYSCALL1( DS_FREE, arg1 )
+#define DsMalloc( arg1 )			(void *)syscall1( DS_MALLOC, arg1 )
+#define DsRealloc( arg1, arg2 )			(void *)syscall2( DS_REALLOC, arg1, arg2 )
+#define DsFree( arg1 )				syscall1( DS_FREE, arg1 )
 
 
-#define DsVersionGet()				SYSCALL0( DS_VERSION_GET )
+#define DsVersionGet()				syscall0( DS_VERSION_GET )
 
 
-#define DsAddinPrevGet()			SYSCALL0( DS_ADDIN_PREV_GET )
-#define DsAddinPrevSet( arg1 )			SYSCALL1( DS_ADDIN_PREV_SET, arg1 )
+#define DsAddinPrevGet()			syscall0( DS_ADDIN_PREV_GET )
+#define DsAddinPrevSet( arg1 )			syscall1( DS_ADDIN_PREV_SET, arg1 )
 
 
-#define DsDbInitialize( )			SYSCALL0( DS_DB_INITIALIZE )
-#define DsDbCreate( arg1, arg2, arg3 ) 		SYSCALL3( DS_DB_CREATE, arg1, arg2, arg3 )
-#define DsDbOpen( arg1 )			SYSCALL1( DS_DB_OPEN, arg1 )
-#define DsDbClose( arg1 )			SYSCALL1( DS_DB_CLOSE, arg1 )
-#define DsDbInsertRecord( arg1, arg2 ) 		SYSCALL2( DS_DB_INSERT_RECORD, arg1, arg2 )
-#define DsDbDeleteRecord( arg1 )		SYSCALL1( DS_DB_DELETE_RECORD, arg1 )
-#define DsDbReadRecord( arg1, arg2 ) 		SYSCALL2( DS_DB_READ_RECORD, arg1, arg2 )
-#define DsDbReadField( arg1, arg2, arg3 ) 	SYSCALL3( DS_DB_READ_FIELD, arg1, arg2, arg3 )
+#define DsDbInitialize( )			syscall0( DS_DB_INITIALIZE )
+#define DsDbCreate( arg1, arg2, arg3 ) 		syscall3( DS_DB_CREATE, arg1, arg2, arg3 )
+#define DsDbOpen( arg1 )			syscall1( DS_DB_OPEN, arg1 )
+#define DsDbClose( arg1 )			syscall1( DS_DB_CLOSE, arg1 )
+#define DsDbInsertRecord( arg1, arg2 ) 		syscall2( DS_DB_INSERT_RECORD, arg1, arg2 )
+#define DsDbDeleteRecord( arg1 )		syscall1( DS_DB_DELETE_RECORD, arg1 )
+#define DsDbReadRecord( arg1, arg2 ) 		syscall2( DS_DB_READ_RECORD, arg1, arg2 )
+#define DsDbReadField( arg1, arg2, arg3 ) 	syscall3( DS_DB_READ_FIELD, arg1, arg2, arg3 )
 
 #define DsDbFindRecord( arg1, arg2, arg3, arg4 ) \
-					SYSCALL4( DS_DB_FIND_RECORD, arg1, arg2, arg3, arg4 )
+					syscall4( DS_DB_FIND_RECORD, arg1, arg2, arg3, arg4 )
 					
-#define DsDbNextRecord( arg1 )			SYSCALL1( DS_DB_NEXT_RECORD, arg1 )
-#define DsDbPreviousRecord( arg1 )		SYSCALL1( DS_DB_PREVIOUS_RECORD, arg1 )
-#define DsDbUpdateRecord( arg1, arg2 ) 		SYSCALL2( DS_DB_UPDATE_RECORD, arg1, arg2 )
-#define DsDbUpdateField( arg1, arg2, arg3 ) 	SYSCALL3( DS_DB_UPDATE_FIELD, arg1, arg2, arg3 )
-#define DsDbTextOp()				SYSCALL0( DS_DB_TEXT_OP )
-#define DsDbFlush()				SYSCALL0( DS_DB_FLUSH )
+#define DsDbNextRecord( arg1 )			syscall1( DS_DB_NEXT_RECORD, arg1 )
+#define DsDbPreviousRecord( arg1 )		syscall1( DS_DB_PREVIOUS_RECORD, arg1 )
+#define DsDbUpdateRecord( arg1, arg2 ) 		syscall2( DS_DB_UPDATE_RECORD, arg1, arg2 )
+#define DsDbUpdateField( arg1, arg2, arg3 ) 	syscall3( DS_DB_UPDATE_FIELD, arg1, arg2, arg3 )
+#define DsDbTextOp()				syscall0( DS_DB_TEXT_OP )
+#define DsDbFlush()				syscall0( DS_DB_FLUSH )
 
 
 

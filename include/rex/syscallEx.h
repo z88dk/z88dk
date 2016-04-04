@@ -7,8 +7,8 @@
 #define _SYSTEMCALLEX_
 
 
-extern int __LIB__ SYSCALLEX(int,...);
-extern int __LIB__ SYSCALLEXL(int,...);
+extern int __LIB__ syscallex(int,...);
+extern int __LIB__ syscallexL(int,...);
 
 
 #define DS_TEXT_OUT_24				0x0001
@@ -62,86 +62,86 @@ extern int __LIB__ SYSCALLEXL(int,...);
 
 
 #define DsTextOut24( arg1, arg2, arg3, arg4, arg5 ) \
-						SYSCALLEX( DS_TEXT_OUT_24, arg1, arg2, arg3, arg4, arg5 )
+						syscallex( DS_TEXT_OUT_24, arg1, arg2, arg3, arg4, arg5 )
 						
 #define DsTextOut24A( arg1, arg2, arg3, arg4, arg5 ) \
-						SYSCALLEX( DS_TEXT_OUT_24, arg1, arg2, arg3, arg4, address_24_of(arg5) )
+						syscallex( DS_TEXT_OUT_24, arg1, arg2, arg3, arg4, address_24_of(arg5) )
 						
-#define DsTextWidth( arg1 )			SYSCALLEX( DS_TEXT_WIDTH, arg1 )
-#define IsZenkaku( arg1 )			SYSCALLEX( DS_IS_ZENKAKU, arg1 )
+#define DsTextWidth( arg1 )			syscallex( DS_TEXT_WIDTH, arg1 )
+#define IsZenkaku( arg1 )			syscallex( DS_IS_ZENKAKU, arg1 )
 
 #define DsVScrollArea( arg1, arg2, arg3, arg4, arg5 ) \
-						SYSCALLEX( DS_VSCROLL_AREA, arg1, arg2, arg3, arg4, arg5 )
+						syscallex( DS_VSCROLL_AREA, arg1, arg2, arg3, arg4, arg5 )
 						
-#define DsGetByteByPixel( arg1, arg2 ) 		SYSCALLEX( DS_GET_BYTE_BY_PIXEL, arg1, arg2 )
-#define DsGetPixelByByte( arg1, arg2 ) 		SYSCALLEX( DS_GET_PIXEL_BY_BYTE, arg1, arg2 )
+#define DsGetByteByPixel( arg1, arg2 ) 		syscallex( DS_GET_BYTE_BY_PIXEL, arg1, arg2 )
+#define DsGetPixelByByte( arg1, arg2 ) 		syscallex( DS_GET_PIXEL_BY_BYTE, arg1, arg2 )
 						
 									
-#define DsStrCpy( arg1, arg2 )			SYSCALLEX( DS_STRCPY, arg1, arg2 )
-#define DsStrCpyA( arg1, arg2 )			SYSCALLEX( DS_STRCPY, arg1, address_24_of(arg2) )
-#define DsMemCpy( arg1, arg2, arg3 ) 		SYSCALLEX( DS_MEMCPY, arg1, arg2, arg3 )
-#define DsMemCpyA( arg1, arg2, arg3 ) 		SYSCALLEX( DS_MEMCPY, arg1, arg2, address_24_of(arg3) )
+#define DsStrCpy( arg1, arg2 )			syscallex( DS_STRCPY, arg1, arg2 )
+#define DsStrCpyA( arg1, arg2 )			syscallex( DS_STRCPY, arg1, address_24_of(arg2) )
+#define DsMemCpy( arg1, arg2, arg3 ) 		syscallex( DS_MEMCPY, arg1, arg2, arg3 )
+#define DsMemCpyA( arg1, arg2, arg3 ) 		syscallex( DS_MEMCPY, arg1, arg2, address_24_of(arg3) )
 
-#define DsCalCurrentTime( arg1, arg2 ) 		SYSCALLEX( DS_CAL_CURRENT_TIME, arg1, arg2 )
-#define DsCalDateTime( arg1 )			SYSCALLEXL( DS_CAL_DATE_TIME, arg1 )
-#define DsCalTimeDate( arg1, arg2 )		SYSCALLEX( DS_CAL_TIME_DATE, arg1, arg2 )
-#define DsCalDayOfWeekD( arg1 )			SYSCALLEX( DS_CAL_DAY_OF_WEEK_D, arg1 )
-#define DsCalDayOfWeek( arg1 )			SYSCALLEX( DS_CAL_DAY_OF_WEEK, arg1 )
+#define DsCalCurrentTime( arg1, arg2 ) 		syscallex( DS_CAL_CURRENT_TIME, arg1, arg2 )
+#define DsCalDateTime( arg1 )			syscallexL( DS_CAL_DATE_TIME, arg1 )
+#define DsCalTimeDate( arg1, arg2 )		syscallex( DS_CAL_TIME_DATE, arg1, arg2 )
+#define DsCalDayOfWeekD( arg1 )			syscallex( DS_CAL_DAY_OF_WEEK_D, arg1 )
+#define DsCalDayOfWeek( arg1 )			syscallex( DS_CAL_DAY_OF_WEEK, arg1 )
 
 #define DsCalStrFTime( arg1, arg2, arg3, arg4, arg5 ) \
-						SYSCALLEX( DS_CAL_STRFTIME, arg1, arg2, arg3, arg4, arg5 )
+						syscallex( DS_CAL_STRFTIME, arg1, arg2, arg3, arg4, arg5 )
 									
-#define DsCalDayAdd( arg1, arg2 )		SYSCALLEX( DS_CAL_DAY_ADD, arg1, arg2 )
-#define DsCalMonthAdd( arg1, arg2 )		SYSCALLEX( DS_CAL_MONTH_ADD, arg1, arg2 )
-#define DsCalMaxDayOfMonth( arg1 )		SYSCALLEX( DS_CAL_MAX_DAY_OF_MONTH, arg1 )
+#define DsCalDayAdd( arg1, arg2 )		syscallex( DS_CAL_DAY_ADD, arg1, arg2 )
+#define DsCalMonthAdd( arg1, arg2 )		syscallex( DS_CAL_MONTH_ADD, arg1, arg2 )
+#define DsCalMaxDayOfMonth( arg1 )		syscallex( DS_CAL_MAX_DAY_OF_MONTH, arg1 )
 
 #define DsCalNthXdayInMonth( arg1, arg2, arg3, arg4) \
-						SYSCALLEX( DS_CAL_NTH_XDAY_IN_MONTH, arg1, arg2, arg3, arg4 )
+						syscallex( DS_CAL_NTH_XDAY_IN_MONTH, arg1, arg2, arg3, arg4 )
 						
-#define DsCalIntToStr( arg1, arg2, arg3, arg4 )	SYSCALLEX( DS_CAL_INT_TO_STR, arg1, arg2, arg3, arg4 )
-#define DsCalDayToStr( arg1, arg2 )		SYSCALLEX( DS_CAL_DAY_TO_STR, arg1, arg2 )
+#define DsCalIntToStr( arg1, arg2, arg3, arg4 )	syscallex( DS_CAL_INT_TO_STR, arg1, arg2, arg3, arg4 )
+#define DsCalDayToStr( arg1, arg2 )		syscallex( DS_CAL_DAY_TO_STR, arg1, arg2 )
 
 #define DsCalStrFTime24( arg1, arg2, arg3, arg4, arg5 ) \
-						SYSCALLEX( DS_CAL_STRFTIME_24, arg1, arg2, arg3, arg4, arg5 )
+						syscallex( DS_CAL_STRFTIME_24, arg1, arg2, arg3, arg4, arg5 )
 						
 #define DsCalStrFTime24A( arg1, arg2, arg3, arg4, arg5 ) \
-						SYSCALLEX( DS_CAL_STRFTIME_24, arg1, arg2, address_24_of(arg3), arg4, arg5 )
+						syscallex( DS_CAL_STRFTIME_24, arg1, arg2, address_24_of(arg3), arg4, arg5 )
 						
-#define DsCalDayToStrE( arg1, arg2 ) 		SYSCALLEX( DS_CAL_DAY_TO_STR_E, arg1, arg2 )
-#define DsCalDateToStr( arg1, arg2, arg3 ) 	SYSCALLEX( DS_CAL_DATE_TO_STR, arg1, arg2, arg3 )
-#define DsCalWeekOfYear( arg1, arg2 ) 		SYSCALLEX( DS_CAL_WEEK_OF_YEAR, arg1, arg2 )
-#define DsCalMinuteAdd( arg1, arg2, arg3 ) 	SYSCALLEX( DS_CAL_MINUTE_ADD, arg1, arg2, arg3 )
+#define DsCalDayToStrE( arg1, arg2 ) 		syscallex( DS_CAL_DAY_TO_STR_E, arg1, arg2 )
+#define DsCalDateToStr( arg1, arg2, arg3 ) 	syscallex( DS_CAL_DATE_TO_STR, arg1, arg2, arg3 )
+#define DsCalWeekOfYear( arg1, arg2 ) 		syscallex( DS_CAL_WEEK_OF_YEAR, arg1, arg2 )
+#define DsCalMinuteAdd( arg1, arg2, arg3 ) 	syscallex( DS_CAL_MINUTE_ADD, arg1, arg2, arg3 )
 
 
-#define DsSleep( arg1 )				SYSCALLEX( DS_SLEEP, arg1 )
-#define DsSynchronize(  )			SYSCALLEX( DS_SYNCHRONIZE )
-#define DsSetupInfoSet(  )			SYSCALLEX( DS_SETUP_INFO_SET )
-#define DsPasswdEnable( arg1 )			SYSCALLEX( DS_PASSWD_ENABLE, arg1 )
-#define DsPasswdSet( arg1 )			SYSCALLEX( DS_PASSWD_SET, arg1 )
-#define DsPasswdGet( arg1 )			SYSCALLEX( DS_PASSWD_GET, arg1 )
-#define DsUserInfoGet( arg1, arg2, arg3, arg4 ) SYSCALLEX( DS_USER_INFO_GET, arg1, arg2, arg3, arg4 )
-#define DsAlarmUpdate(  )			SYSCALLEX( DS_ALARM_UPDATE )
-#define DsFlashWriteStart(  ) 			SYSCALLEX( DS_FLASH_WRITE_START )
-#define DsFlashWriteEnd(  ) 			SYSCALLEX( DS_FLASH_WRITE_END )
-#define DsSystemErrorSet( arg1, arg2, arg3 ) 	SYSCALLEX( DS_SYSTEM_ERROR_SET, arg1, arg2, arg3 )
-#define DsSystemErrorGet( arg1, arg2 ) 		SYSCALLEX( DS_SYSTEM_ERROR_GET, arg1, arg2 )
-#define DsShortcutMask( arg1 ) 			SYSCALLEX( DS_SHORTCUT_MASK, arg1 )
-#define DsPowerOffCountClear()			SYSCALLEX( DS_POWER_OFF_COUNT_CLEAR )
+#define DsSleep( arg1 )				syscallex( DS_SLEEP, arg1 )
+#define DsSynchronize(  )			syscallex( DS_SYNCHRONIZE )
+#define DsSetupInfoSet(  )			syscallex( DS_SETUP_INFO_SET )
+#define DsPasswdEnable( arg1 )			syscallex( DS_PASSWD_ENABLE, arg1 )
+#define DsPasswdSet( arg1 )			syscallex( DS_PASSWD_SET, arg1 )
+#define DsPasswdGet( arg1 )			syscallex( DS_PASSWD_GET, arg1 )
+#define DsUserInfoGet( arg1, arg2, arg3, arg4 ) syscallex( DS_USER_INFO_GET, arg1, arg2, arg3, arg4 )
+#define DsAlarmUpdate(  )			syscallex( DS_ALARM_UPDATE )
+#define DsFlashWriteStart(  ) 			syscallex( DS_FLASH_WRITE_START )
+#define DsFlashWriteEnd(  ) 			syscallex( DS_FLASH_WRITE_END )
+#define DsSystemErrorSet( arg1, arg2, arg3 ) 	syscallex( DS_SYSTEM_ERROR_SET, arg1, arg2, arg3 )
+#define DsSystemErrorGet( arg1, arg2 ) 		syscallex( DS_SYSTEM_ERROR_GET, arg1, arg2 )
+#define DsShortcutMask( arg1 ) 			syscallex( DS_SHORTCUT_MASK, arg1 )
+#define DsPowerOffCountClear()			syscallex( DS_POWER_OFF_COUNT_CLEAR )
 
 
-#define DsSoftwareKeyboard( arg1, arg2 )	SYSCALLEX( DS_SOFTWARE_KEYBOARD, arg1, arg2 )
+#define DsSoftwareKeyboard( arg1, arg2 )	syscallex( DS_SOFTWARE_KEYBOARD, arg1, arg2 )
 
 #define DsSoftwareKeyboardSetInputMode( arg1, arg2, arg3 ) \
-						SYSCALLEX( DS_SOFTWARE_KEYBOARD_SET_INPUT_MODE, arg1, arg2, arg3 )
+						syscallex( DS_SOFTWARE_KEYBOARD_SET_INPUT_MODE, arg1, arg2, arg3 )
 						
 #define DsSoftwareKeyboardWithYomi( arg1, arg2, arg3 ) \
-						SYSCALLEX( DS_SOFTWARE_KEYBOARD_WITH_YOMI, arg1, arg2, arg3 )
+						syscallex( DS_SOFTWARE_KEYBOARD_WITH_YOMI, arg1, arg2, arg3 )
 						
 #define DsDialogWindow( arg1, arg2, arg3, arg4 ) \
-						SYSCALLEX( DS_DIALOG_WINDOW, arg1, arg2, arg3, arg4 )
+						syscallex( DS_DIALOG_WINDOW, arg1, arg2, arg3, arg4 )
 						
 #define DsDisplayTab( arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 ) \
-						SYSCALLEX( DS_DISPLAY_DAB, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 )
+						syscallex( DS_DISPLAY_DAB, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 )
 
 #endif /* _SYSTEMCALLEX_ */
 

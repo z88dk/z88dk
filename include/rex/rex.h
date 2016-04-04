@@ -49,7 +49,7 @@ extern int __LIB__ findlib(unsigned char*);
 
 extern int __LIB__ DsTrace(char*, ... );
 
-#define DsDisplayBitmapDrawFar( arg1, arg2, arg3, arg4, arg5 ) SYSCALL5( DS_DISPLAY_BITMAP_DRAW, arg1, arg2, arg3, arg4, arg5 )
+#define DsDisplayBitmapDrawFar( arg1, arg2, arg3, arg4, arg5 ) syscall5( DS_DISPLAY_BITMAP_DRAW, arg1, arg2, arg3, arg4, arg5 )
 
 
 #define FindLibrary( arg1 )			findlib( arg1 )

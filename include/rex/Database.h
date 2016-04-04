@@ -131,22 +131,22 @@ extern unsigned int __LIB__	DbDeleteText(int, ... );
  * Functions via SYSCALLx
 */
 
-#define DbInitialize( )                                 SYSCALL0( DS_DB_INITIALIZE )
-#define DbCreate( arg1, arg2, arg3 )                    SYSCALL3( DS_DB_CREATE, arg1, arg2, arg3 )
-#define DbOpen( arg1 )                                  SYSCALL1( DS_DB_OPEN, arg1 )
-#define DbClose( arg1 )                                 SYSCALL1( DS_DB_CLOSE, arg1 )
-#define DbDeleteRecord( arg1 )                          SYSCALL1( DS_DB_DELETE_RECORD, arg1 )
-#define DbDestroy( arg1 )                               SYSCALL1( DS_DB_DESTROY, arg1 )
-#define DbNextRecord( arg1 )                            SYSCALL1( DS_DB_NEXT_RECORD, arg1 )
-#define DbPreviousRecord( arg1 )                        SYSCALL1( DS_DB_PREVIOUS_RECORD, arg1 )
-#define DbFlush( )                                      SYSCALL0( DS_DB_FLUSH )
-#define DbOpenSession( )                                SYSCALL1( DS_DB_OPEN_SESSION, 0 )
-#define DbGetFieldSize( arg1, arg2, arg3 )              SYSCALL4( DS_DB_MISC, 0x03, arg1, arg2, arg3 )
-#define DbBeginTransaction( )                           SYSCALL1( DS_DB_MISC, 0x07 )
-#define DbCommitTransaction( )                          SYSCALL1( DS_DB_MISC, 0x08 )
-#define DbRollbackTransaction( )                        SYSCALL1( DS_DB_MISC, 0x09 )
-#define DbGetTransactionError( )                        SYSCALL1( DS_DB_MISC, 0x0A )
-#define DbEndTransaction( arg1, arg2 )                  SYSCALL3( DS_DB_MISC, 0x0B, arg1 , arg2 )
+#define DbInitialize( )                                 syscall0( DS_DB_INITIALIZE )
+#define DbCreate( arg1, arg2, arg3 )                    syscall3( DS_DB_CREATE, arg1, arg2, arg3 )
+#define DbOpen( arg1 )                                  syscall1( DS_DB_OPEN, arg1 )
+#define DbClose( arg1 )                                 syscall1( DS_DB_CLOSE, arg1 )
+#define DbDeleteRecord( arg1 )                          syscall1( DS_DB_DELETE_RECORD, arg1 )
+#define DbDestroy( arg1 )                               syscall1( DS_DB_DESTROY, arg1 )
+#define DbNextRecord( arg1 )                            syscall1( DS_DB_NEXT_RECORD, arg1 )
+#define DbPreviousRecord( arg1 )                        syscall1( DS_DB_PREVIOUS_RECORD, arg1 )
+#define DbFlush( )                                      syscall0( DS_DB_FLUSH )
+#define DbOpenSession( )                                syscall1( DS_DB_OPEN_SESSION, 0 )
+#define DbGetFieldSize( arg1, arg2, arg3 )              syscall4( DS_DB_MISC, 0x03, arg1, arg2, arg3 )
+#define DbBeginTransaction( )                           syscall1( DS_DB_MISC, 0x07 )
+#define DbCommitTransaction( )                          syscall1( DS_DB_MISC, 0x08 )
+#define DbRollbackTransaction( )                        syscall1( DS_DB_MISC, 0x09 )
+#define DbGetTransactionError( )                        syscall1( DS_DB_MISC, 0x0A )
+#define DbEndTransaction( arg1, arg2 )                  syscall3( DS_DB_MISC, 0x0B, arg1 , arg2 )
 
 
 #endif
