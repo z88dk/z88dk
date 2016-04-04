@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.16 2016-04-03 13:28:36 dom Exp $
+;	$Id: app_crt0.asm,v 1.17 2016-04-04 17:09:25 dom Exp $
 
 
 ;--------
@@ -43,7 +43,7 @@
 ;--------
 ; Set an origin for the application (-zorg=) default to 49152
 ;--------
-        
+
         IF      !myzorg
                 defc    myzorg  = 49152
         ENDIF
@@ -178,13 +178,10 @@ l_dcal:	jp	(hl)		;Used by various things
 ;-------
 processcmd:
 IF DEFINED_handlecmds
-IF !DEFINED_Z88DK_USES_SDCC
-        EXTERN    _handlecmds
-ENDIF
         ld      l,a
         ld      h,0
         push    hl
-        call    _handlecmds
+        call    handlecmds
         pop     bc
 ENDIF
         ld      hl,0		;dummy return value
@@ -196,28 +193,21 @@ ENDIF
 ;--------
 errhan:	ret	z		;Fatal error - far mem probs?
 IF DEFINED_redrawscreen
-IF !DEFINED_Z88DK_USES_SDCC
-        EXTERN    _redrawscreen
-ENDIF
         cp      RC_Draw		;(Rc_susp for BASIC!)
         jr      nz,errhan2
         push    af		;Call users screen redraw fn if defined
-        call    _redrawscreen
+        call    redrawscreen
         pop     af
 ENDIF
 errhan2:
         cp      RC_Quit		;they don't like us!
-        jr      nz,keine_error
+        jr      nz,not_quit
 IF DEFINED_applicationquit
-IF !DEFINED_Z88DK_USES_SDCC
-	EXTERN	_applicationquit	;Call users routine if defined
-ENDIF
-	call	_applicationquit
+	call	applicationquit
 ENDIF
         xor     a		;Standard cleanup
         jr      cleanup
-
-keine_error:
+not_quit:
         xor     a
         ret
 
@@ -426,7 +416,7 @@ IF !safedata
 	IF DEFINED_farheapsz
 	pool_table:     defs    224
 	malloc_table:	defw	0
-	farpages:	defww	1
+	farpages:	defw	1
 	farmemspec:	defb	1
 	copybuff:	defs	258
 	actual_malloc_table: defs ((farheapsz/256)+1)*2

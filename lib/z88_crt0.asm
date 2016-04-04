@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.12 2016-03-30 09:19:58 dom Exp $
+; $Id: z88_crt0.asm,v 1.13 2016-04-04 17:09:25 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -27,6 +27,7 @@
 ; Include zcc_opt.def to find out information about us
 ;-------
 
+	defc	crt0 = 1
 	INCLUDE "zcc_opt.def"
 
 
