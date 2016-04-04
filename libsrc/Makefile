@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.233 2016-04-01 21:33:20 dom Exp $
+# $Id: Makefile,v 1.234 2016-04-04 18:02:35 dom Exp $
 
 
 include Make.config
@@ -37,7 +37,7 @@ eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 cpclibs: cpc_clib.lib cpcansi_clib.lib cpcfs.lib cpc_math.lib
 
 z88libs: z88_math.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib \
-	 z88ansi_clib.lib gfx.lib 
+	 z88ansi_clib.lib 
 
 tilibs: ti82ansi_clib.lib ti82_clib.lib ti83ansi_clib.lib ti83_clib.lib \
 	ti83pansi_clib.lib ti83p_clib.lib ti85ansi_clib.lib ti85_clib.lib \
@@ -172,16 +172,6 @@ z88_math.lib:
 	@echo ''
 	$(MAKE) -C math/z88math
 
-# Graphics library (for both app and basic - diff libs though!) - dom
-gfx.lib:
-	@echo ''
-	@echo '--- Building Z88 BASIC gfx Library ---'
-	@echo ''
-	$(MAKE) gfxdeps
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gfx -DFORz88 @$(LISTFILE_DIRECTORY)/z88gfx.lst
-	$(MAKE) gfxdeps
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gfxapp -DAPPZ88 -DFORz88 @$(LISTFILE_DIRECTORY)/z88gfx.lst
-
 # Fast vector 3D library - stefano
 lib3d.lib:
 	@echo ''
@@ -239,7 +229,7 @@ net.lib:
 	$(MAKE) -C net 
 
 # z88 library - dom
-z88_clib.lib:
+z88_clib.lib: gfxdeps
 	@echo ''
 	@echo '--- Building Z88 Library ---'
 	@echo ''
@@ -258,7 +248,7 @@ z88_clib.lib:
 	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # z88 ansi library - dom
-z88ansi_clib.lib:
+z88ansi_clib.lib: gfxdeps
 	@echo ''
 	@echo '--- Building Z88 ANSI Library ---'
 	@echo ''
@@ -277,7 +267,7 @@ z88ansi_clib.lib:
 	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88ansi_clib @$(LISTFILE_DIRECTORY)/z88ansi.lst
 
 # Network stdio - dom
-z88net_clib.lib:
+z88net_clib.lib: gfxdeps
 	@echo ''
 	@echo '--- Building Z88 Network Aware Library ---'
 	@echo ''

@@ -10,13 +10,15 @@
 ;       Simply does a swap...
 
 ;
-;	$Id: swapgfxbk.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: swapgfxbk.asm,v 1.6 2016-04-04 18:02:35 dom Exp $
 ;
 
 
                 PUBLIC    swapgfxbk
 
                 EXTERN    gfx_bank
+		EXTERN	  z88_map_bank
+
 		PUBLIC	swapgfxbk1
 
 
@@ -26,11 +28,11 @@
 .swapgfxbk1
                 push    hl
                 push    de
-                ld      hl,map_bk       ;$4Dx
+                ld      hl,z88_map_bank       ;$4Dx
                 ld      e,(hl)
                 ld      a,(gfx_bank)    ;in crt0
                 ld      (hl),a
-                out     (map_bk-$400),a
+                out     (z88_map_bank-$400),a
                 ld      a,e
                 ld      (gfx_bank),a
                 pop     de

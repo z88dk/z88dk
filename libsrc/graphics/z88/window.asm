@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: window.asm,v 1.1 2016-04-03 20:04:32 dom Exp $
+;	$Id: window.asm,v 1.2 2016-04-04 18:02:35 dom Exp $
 ;
 
 ;       This function will open a window of any type (graphics/text)
@@ -42,6 +42,7 @@
                 
                 EXTERN    base_graphics
                 EXTERN    gfx_bank
+		EXTERN	  z88_map_segment
 
 .window
 ._window
@@ -96,7 +97,7 @@
                 ld      (gfx_bank),a
                 ld   a,h
                 and  63                 ;mask to bank
-                or   map_seg            ;mask to segment map_seg
+                or   z88_map_segment            ;mask to segment map_seg
                 ld      h,a
                 ld      (base_graphics),hl
                 ld      hl,0            ;NULL=good
