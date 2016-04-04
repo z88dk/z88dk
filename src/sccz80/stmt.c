@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.20 2016-03-06 20:33:26 dom Exp $
+ *      $Id: stmt.c,v 1.21 2016-04-04 17:25:08 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -735,22 +735,10 @@ void dopragma()
    else if ( amatch("unset") ) delmac();
    else if ( amatch("asm") ) doasm();
    else if ( amatch("endasm") ) endasm=1; 
-   else if ( amatch("output") ) {
-        char *ptr;
-        int   value = 0;
-        if ( (ptr = strchr(line+lptr+1,'=') ) != NULL  ) {
-        value = atoi(ptr+1);
-        *ptr = 0;
-        }
-        WriteDefined(line+lptr+1,value);
-    } else if ( amatch("string") ) PragmaOutput(line+lptr+1);
-    else if ( amatch("data") ) PragmaBytes(1);
-    else if ( amatch("byte") ) PragmaBytes(0);
    else if ( rcmatch('-') ) ParseArgs(line+lptr+1);
    else {
-       warning(W_PRAGMA);
-       junk();
-       vinline();
+	warning(W_PRAGMA);
+	clear();
    }
 }
 

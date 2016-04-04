@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.33 2016-04-02 16:14:34 dom Exp $
+ *      $Id: main.c,v 1.34 2016-04-04 17:25:08 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -21,17 +21,7 @@ extern unsigned _stklen=8192U; /* Default stack size 4096 bytes is too small. */
 char Filenorig[FILENAME_LEN+1];
 unsigned int zorg;      /* Origin for applications */
 
-int     reqpag;         /* required bad pages */
-int     defvars;
-int     safedata;       /* amount of safe workspace required */
-int     intuition;      /* Intuitiono to debug?!?!? */
 int     smartprintf;    /* Map printf -> miniprintf */
-int     expanded;       /* Do we need expanded Z88? */
-int     startup;        /* Which startup to we want? app has it's own
-                           but by using -startup= we can switch
-                           between "BASIC" startups, eg for shell
-                           etc..
-                         */
 int     makeshare;      /* Do we want to make a shared library? */
 int     useshare;      /* Use shared lib routines? */
 int   sharedfile;   /* File contains routines which are to be
@@ -55,8 +45,6 @@ void    DispVersion(char *);
 void    SetMPM(char *);
 void    SetSmart(char *);
 void    UnSetSmart(char *);
-void    SetExpand(char *);
-void    UnSetExpand(char *);
 void    SetMakeShared(char *);
 void    SetUseShared(char *);
 void SetAssembler(char *arg);
@@ -145,11 +133,10 @@ int main(int argc, char **argv)
         currfn = NULL_SYM ;             /* no function yet */
         macptr = cmode = 1 ;    /* clear macro pool and enable preprocessing */
         ncomp=doinline=mathz88 = incfloat= compactcode =0;
-        intuition=zorg=lpointer=cppcom=0;
+        lpointer=cppcom=0;
         dosigned=NO;
         makelib=useshare=makeshare=sharedfile=NO;
-        smartprintf=expanded=YES;
-        startup=0;                      /* Which startup do we want? */
+        smartprintf=YES;
         nxtlab =                        /* start numbers at lowest possible */
         ctext =                         /* don't include the C text as comments */
         errstop =                       /* don't stop after errors */
@@ -158,10 +145,8 @@ int main(int argc, char **argv)
    defdenums=0;
    doublestrings = 0;
    noaltreg = NO;
-        safedata=reqpag = -1;
    shareoffset=SHAREOFFSET;   /* Offset for shared libs */
    debuglevel=NO;
-   farheapsz=-1;         /* Size of far heap */
     assemtype = ASM_Z80ASM;
    printflevel=0;
    indexix=YES;
@@ -398,16 +383,9 @@ dumpfns()
     int ident,type,storage;
     SYMBOL *ptr;
     FILE    *fp;
-    int k,value=0;
 
-#ifdef HEADERFILE
-    outstr(";\tHeader file for file:\t");
-    outstr(Filename);
-    outstr("\n;\n;\tEven if empty do not delete!!!\n");
-    outstr(";\n;\t***START OF HEADER DEFNS***\n\n");
-#else
     outstr("\n\n; --- Start of Scope Defns ---\n\n");
-#endif
+
     if (!glbcnt)
         return;
 
@@ -488,43 +466,7 @@ dumpfns()
     if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
         error(E_ZCCOPT);
     }
-/* Now output the org */
-    if (zorg) {
-        fprintf(fp,"\nIF !DEFINED_myzorg\n");
-        fprintf(fp,"\tDEFINE DEFINED_myzorg\n");
-        fprintf(fp,"\tdefc myzorg = %u\n",zorg);
-        fprintf(fp,"ENDIF");
-    }
-    fprintf(fp,"\nIF !NEED_appstartup\n");
-    fprintf(fp,"\tDEFINE\tNEED_appstartup\n");
-    if (safedata != -1 )
-        fprintf(fp,"\tdefc safedata = %d\n",safedata);
-    if (intuition)
-        fprintf(fp,"\tdefc intuition = 1\n");
-    if (farheapsz != -1) {
-        fprintf(fp,"\tDEFINE DEFINED_farheapsz\n");
-        fprintf(fp,"\tdefc farheapsz = %d\n",farheapsz);
-    }
- 
-    if (reqpag != -1 ) {
-        fprintf(fp,"\tdefc reqpag = %d\n",reqpag);
-        value=reqpag;
-    } else {
-/*
- * Consider the malloc pool as well, if defined we need 32 (standard) +
- * size of malloc - this is a little kludgy, hence the tuning command
- * line option
- */
-        if ( (k=findmac("HEAPSIZE"))) {
-            sscanf(&macq[k],"%d",&value);
-            if (value != 0 ) value/=256;
-        }
-        value+=32;
-        fprintf(fp,"\tdefc reqpag = %d\n",value);
-    }
-    if (value > 32) expanded=YES;
-    fprintf(fp,"\tdefc NEED_expanded = %d\n",expanded);
-    fprintf(fp,"ENDIF\n\n");
+
     if (incfloat) {
         fprintf(fp,"\nIF !NEED_floatpack\n");
         fprintf(fp,"\tDEFINE\tNEED_floatpack\n");
@@ -538,12 +480,6 @@ dumpfns()
     if (lpointer) {
         fprintf(fp,"\nIF !NEED_farpointer\n");
         fprintf(fp,"\tDEFINE NEED_farpointer\n");
-        fprintf(fp,"ENDIF\n\n");
-    }
-    if (startup) {
-        fprintf(fp,"\nIF !DEFINED_startup\n");
-        fprintf(fp,"\tDEFINE DEFINED_startup\n");
-        fprintf(fp,"\tdefc startup=%d\n",startup);
         fprintf(fp,"ENDIF\n\n");
     }
 /*
@@ -562,9 +498,6 @@ dumpfns()
 
     fclose(fp);
 
-   if ( defvars != 0 )
-      WriteDefined("defvarsaddr",defvars);
-
    switch(printflevel) {
     case 1:  
         WriteDefined("ministdio",0);
@@ -576,86 +509,9 @@ dumpfns()
         WriteDefined("floatstdio",0);
         break;
    }
- 
 
-/*
- * DO_inline is obsolete, but it may have a use sometime..
- */
-    if (doinline)
-        outstr("\tDEFINE\tDO_inline\n");
     outstr("\n\n; --- End of Scope Defns ---\n\n");
 }
-
-/*
- * Dump some text into the zcc_opt.def, this allows us to define some
- * things that the startup code might need
- */
-
-void PragmaOutput(char *ptr)
-{
-        char *text;
-        FILE *fp;
-
-        text = strchr(ptr,' ');
-        if ( text == NULL ) text = strchr(ptr,'\t');
-
-        if ( text != NULL ) {
-                *text = 0;
-                text++;
-                if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
-                        error(E_ZCCOPT);
-                }
-                fprintf(fp,"\nIF NEED_%s\n",ptr);
-                fprintf(fp,"\tdefm\t\"%s\"\n",text);
-      fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",ptr);
-                fprintf(fp,"ENDIF\n\n");
-                fclose(fp);
-        }
-}
-
-/* Dump some bytes into the zcc_opt.def file */
-
-void PragmaBytes(int flag)
-{
-    FILE   *fp;
-    char   sname[NAMESIZE];
-    int32_t value;
-    int     count;
-
-    if ( symname(sname) ) {
-   if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
-       error(E_ZCCOPT);
-   }
-   fprintf(fp,"\nIF NEED_%s\n",sname);
-   if ( flag ) 
-       fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",sname);
-
-   /* Now, do the numbers */
-   count=0;
-   while ( !cmatch(';') ) {
-       if ( count == 0 )
-      fprintf(fp,"\n\tdefb\t");
-       else
-      fprintf(fp,",");
-       if ( number(&value) ) {
-      fprintf(fp,"%d",value);
-       } else {
-      warning(W_EXPARG);
-       }
-       if ( rcmatch(';') ) {
-      break;
-       }
-       needchar(',');
-       count++;
-       if ( count == 9 ) count=0;
-   }
-   fprintf(fp,"\nENDIF\n");
-   fclose(fp);
-   needchar(';');
-    }
-}   
-
-
 
 
 
@@ -681,17 +537,9 @@ void WriteDefined(char *sname, int value)
 }
 
 
-
-
 /*
- * Dump the DEFVAR statement out - will also be for DEFDATA..eventually!
  */
-
-#ifndef SMALL_C
-void
-#endif
-
-dumpvars()
+void dumpvars()
 {
     int ident,type,storage;
     SYMBOL *ptr;
@@ -699,17 +547,11 @@ dumpvars()
     if (!glbcnt)
         return;
 
-/* Start at the start! */
+    /* Start at the start! */
     glbptr=STARTGLB;
     outstr("; --- Start of Static Variables ---\n\n");
-/* Two different handlings, if an application then use defvars construct
- * if not, then just drop em using defs!
- *
- * Even more handlings...if asz80 used we dump into data sectio
- */
 
     output_section("bss_compiler");  // output_section("bss");
-
 
     ptr=STARTGLB;
     while (ptr < ENDGLB)
@@ -741,8 +583,6 @@ dumpvars()
  *      Modified by djm to be able to input which queue should be
  *      dumped..
  */
-
-
 void dumplits(
     int size, int pr_label ,
     int queueptr,int queuelab,
@@ -1011,20 +851,11 @@ struct args myargs[]= {
     {"Wall",NO,SetAllWarn, "Enable all warnings" },
     {"Wn",YES,UnSetWarning, "Unset a warning"},
     {"W",YES,SetWarning, "Set a warning"},
-    {"zorg=",YES,SetOrg, "Set the origin for this program" },
-    {"reqpag=",YES,SetReqPag, "Define the number of safe pages required (z88)" },
-    {"defvars=",YES,SetDefVar, "Assign all initialised statics to this address" },
-    {"safedata=",YES,SetSafeData, "Amount of safedata (z88)" },
-    {"startup=",YES,SetStartUp, "Switch between startups" },
     {"shareoffset=",YES,SetShareOffset, "Define the shared offset (use with -make-shared" },
     {"version",NO,DispVersion, "Display the version of sccz80"},
-    {"intuition",NO,SetIntuition, "Enable intuition debugging (z88)" },
     {"smartpf",NO,SetSmart, "Enable smart printf format handling" },
     {"no-smartpf",NO,UnSetSmart, "Disable smart printf format handling" },
     {"pflevel",YES,SetPfLevel, "Set the manual printf level" },
-    {"expandz88",NO,SetExpand, "Enable use only on expanded z88" },
-    {"no-expandz88",NO,UnSetExpand, "Enable use on non-expanded z88"},
-   {"farheap=",YES,SetFarHeap, "Set the size of the far heap (z88)"},
    {"debug=",YES,SetDebug, "Enable some extra logging" },
    {"asm=",YES,SetAssembler, "Set the assembler mode to use" },
    {"asxx",NO,SetASXX, "Use asxx as the output format"},
@@ -1084,16 +915,6 @@ void SetASXX(char *arg)
     assemtype = ASM_ASXX;
 }
 
-/* farheap= */
-
-void SetFarHeap(char *arg)
-{
-        int    num;
-        num=0;
-        sscanf(arg+8,"%d",&num);
-        if    (num!=0) 
-                farheapsz=num;
-}
 
 /* debug= */
 
@@ -1119,31 +940,7 @@ void SetShareOffset(char *arg)
 }
 
 
-/* startup= */
 
-void SetStartUp(char *arg)
-{
-        int    num;
-        num=0;
-        sscanf(arg+8,"%d",&num);
-                startup=num;
-}
-
-
-
-
-/* Do we need an expanded Z88? */
- 
-
-void UnSetExpand(char *arg)
-{
-        expanded=NO;
-}
-
-void SetExpand(char *arg)
-{
-        expanded=YES;
-}
 
 
 /* Flag whether we want to do "smart" mapping of printf -> miniprintf */
@@ -1170,12 +967,6 @@ void SetPfLevel(char *arg)
 }
 
 
-/* Flag out that we want some debugging boy! */
-
-void SetIntuition(char *arg)
-{
-        intuition=YES;
-}
 
 
 void UnSetWarning(char *arg)
@@ -1187,28 +978,6 @@ void UnSetWarning(char *arg)
                 mywarn[num].suppress=1;
 }
 
-/* defvars= */
-
-void SetDefVar(char *arg)
-{
-        int    num;
-        num=0;
-        sscanf(arg+8,"%d",&num);
-        if    (num!=0) 
-                defvars=num;
-}
-
-/* safedata= */
-
-void SetSafeData(char *arg)
-{
-        int    num;
-        num=0;
-        sscanf(arg+9,"%d",&num);
-        if    (num!=0) 
-                safedata=num;
-}
-
 void SetWarning(char *arg)
 {
         int    num;
@@ -1217,31 +986,6 @@ void SetWarning(char *arg)
         if    (num<W_MAXIMUM) 
                 mywarn[num].suppress=0;
 }
-
-/* zorg= */
-
-void SetOrg(char *arg)
-{
-        unsigned int    num;
-        num=0;
-        sscanf(arg+5,"%u",&num);
-        if    (num <= 65535U )
-                zorg=num;
-}
-
-/* reqpag= */
-
-
-void SetReqPag(char *arg)
-{
-        int    num;
-        num=-1;
-        sscanf(arg+7,"%d",&num);
-        if    (num >= 0 && num <= 160) 
-                reqpag=num;
-}
-
-
 
 void SetMathZ88(char *arg)
 {
