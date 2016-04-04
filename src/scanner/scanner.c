@@ -10,6 +10,7 @@ static char buf[65536];
 
 static char filename[FILENAME_MAX+1];
 static int  lineno = 0;
+static int  sccz80_mode = 0;
 
 
 char *skip_ws(char *ptr)
@@ -38,6 +39,8 @@ void write_pragma_string(char *ptr)
     char *text;
     FILE *fp;
 
+    ptr = skip_ws(ptr);
+    strip_nl(ptr);
     text = strchr(ptr,' ');
     if ( text == NULL ) text = strchr(ptr,'\t');
 
@@ -48,9 +51,10 @@ void write_pragma_string(char *ptr)
             fprintf(stderr,"%s:%d Cannot open zcc_opt.def file\n", filename, lineno);
             exit(1);
         }
+        text = skip_ws(text);
         fprintf(fp,"\nIF NEED_%s\n",ptr);
         fprintf(fp,"\tdefm\t\"%s\"\n",text);
-		fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",ptr);
+	fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",ptr);
         fprintf(fp,"ENDIF\n\n");
         fclose(fp);
     }
@@ -152,11 +156,37 @@ void write_need(char *sname, int value)
     fclose(fp);
 }
 
+void write_redirect(char *sname, char *value)
+{
+    FILE *fp;
+
+    strip_nl(sname);
+    value = skip_ws(value);
+    strip_nl(value);
+    if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+        fprintf(stderr,"%s:%d Cannot open zcc_opt.def file\n", filename, lineno);
+        exit(1);
+    }
+    fprintf(fp,"\nIF !DEFINED_%s\n",sname);
+    fprintf(fp,"\tIF crt0\n");
+    fprintf(fp,"\tPUBLIC %s\n",sname);
+    fprintf(fp,"\tEXTERN %s\n",value);
+    fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
+    fprintf(fp,"\tdefc %s = %s\n",sname,value);
+    fprintf(fp,"\tENDIF\n");
+    fprintf(fp,"ENDIF\n\n");
+    fclose(fp);
+}
 
 
-int main()
+
+int main(int argc, char **argv)
 {
     char   *ptr;
+
+    if ( argc == 2 && strcmp(argv[1],"-sccz80") == 0 ) {
+         sccz80_mode = 1;
+    }
 
     strcpy(filename,"<stdin>");
     lineno = 0;
@@ -164,7 +194,6 @@ int main()
     while ( fgets(buf, sizeof(buf) - 1, stdin) != NULL ) {
         lineno++;
         ptr = skip_ws(buf);
-
         if ( strncmp(ptr,"#pragma", 7) == 0 ) {
             int  ol = 1;
             ptr = skip_ws(ptr + 7);
@@ -178,16 +207,25 @@ int main()
                     *offs = 0;
                 }
                 write_defined(ptr,value);
+            } else if ( strncmp(ptr, "redirect",8) == 0 ) {
+                char *offs;
+                char *value = "0";
+                ptr = skip_ws(ptr+8);
+                if ( (offs = strchr(ptr+1,'=') ) != NULL  ) {
+                    value = offs + 1;
+                    *offs = 0;
+                }
+                write_redirect(ptr,value);
             } else if ( strncmp(ptr,"string",6) == 0 ) {
                 write_pragma_string(ptr + 6);
             } else if ( strncmp(ptr, "data", 4) == 0 ) {
                 write_bytes(ptr + 4, 1);
             } else if ( strncmp(ptr, "byte", 4) == 0 ) {
                 write_bytes(ptr + 4, 0);
-            } else if ( strncmp(ptr, "asm", 3) == 0 ) {
+            } else if ( sccz80_mode == 0 && strncmp(ptr, "asm", 3) == 0 ) {
                 fputs("__asm\n",stdout);
                 ol = 0;
-            } else if ( strncmp(ptr, "endasm", 6) == 0 ) {
+            } else if ( sccz80_mode == 0 && strncmp(ptr, "endasm", 6) == 0 ) {
                 fputs("__endasm;\n",stdout);
                 ol = 0;
             } else if (strncmp(ptr, "-zorg=", 6) == 0 ) {
@@ -209,14 +247,20 @@ int main()
                 write_need("expanded", 1);
             } else if ( strncmp(ptr, "-no-expandz88", 9) == 0 ) {
                 write_need("expanded", 0);
+            } else {
+                printf("%s\n",buf);
             }
             if ( ol ) {
                 fputs("\n",stdout);
             }
-        } else if ( strncmp(ptr, "#asm", 4) == 0 ) {
+        } else if ( sccz80_mode == 0 && strncmp(ptr, "#asm", 4) == 0 ) {
             fputs("__asm\n",stdout);
-        } else if ( strncmp(ptr, "#endasm", 7) == 0 ) {
+        } else if ( sccz80_mode == 0 && strncmp(ptr, "#endasm", 7) == 0 ) {
             fputs("__endasm;\n",stdout);
+        } else if ( sccz80_mode == 1 && strncmp(ptr, "__asm", 5) == 0 ) {
+            fputs("#asm\n",stdout);
+        } else if ( sccz80_mode == 1 && strncmp(ptr, "__endasm", 8) == 0 ) {
+            fputs("#endasm;\n",stdout);
         } else {
             int skip = 0;
             if ( (skip=2, strncmp(ptr,"# ",2) == 0)  || ( skip=5, strncmp(ptr,"#line",5) == 0) ) {
