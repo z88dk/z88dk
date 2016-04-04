@@ -13,16 +13,16 @@ anstst16:
 	- zcc +z88 -lz88ans~1 ansitest.c -o ansitest.bas
 
 cube:
-	- zcc +z88 -lm -lgfx cube.c -o cube.bas
+	- zcc +z88 -lm cube.c -o cube.bas
 
 cubez88:
-	- zcc +z88 -lmz -lgfx cube.c -o cubez88.bas
+	- zcc +z88 -lmz cube.c -o cubez88.bas
 
 dstar:
-	- zcc +z88 -lgfx dstar.c -o dstar.bas
+	- zcc +z88 dstar.c -o dstar.bas
 
 gfx:
-	- zcc +z88 -lgfx gfx.c -o gfx.bas
+	- zcc +z88 gfx.c -o gfx.bas
 
 clean:
 	$(RM) ansitest.bas cube.bas cubez88.bas dstar.bas gfx.bas 

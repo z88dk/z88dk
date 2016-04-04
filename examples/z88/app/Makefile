@@ -19,7 +19,7 @@ viewer:
 	zcc +z88 -subtype=app -vn -create-app viewer.c -lz88 -o viewer.bin
 
 dstar:
-	zcc +z88 -subtype=app -vn -create-app dstar.c -lgfxapp -o dstar.bin
+	zcc +z88 -subtype=app -vn -create-app dstar.c -o dstar.bin
 
 clean:
 	$(RM) rpn.bin useless.bin wc.bin view.bin dstar.bin
