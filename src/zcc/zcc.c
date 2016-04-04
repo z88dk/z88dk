@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.117 2016-04-02 01:02:50 aralbrec Exp $
+ *      $Id: zcc.c,v 1.118 2016-04-04 17:06:31 dom Exp $
  */
 
 
@@ -120,6 +120,7 @@ static int             preprocessonly = 0;
 static int             relocate = 0;
 static int             crtcopied = 0;    /* Copied the crt0 code over? */
 static int             c_print_specs = 0;
+static int             c_zorg = -1;
 static int             max_argc;
 static int             gargc;
 static char          **gargv;
@@ -340,6 +341,7 @@ static arg_t     myargs[] = {
     {"subtype", AF_MORE, SetString, &c_subtype, NULL, "Set the target subtype" }, 
     {"clib", AF_MORE, SetString, &c_clib, NULL, "Set the target clib type" }, 
     {"startup", AF_MORE, SetNumber, &c_startup, NULL, "Set the startup type" },
+    {"zorg", AF_MORE, SetNumber, &c_zorg, NULL, "Set the origin (only certain targets)" },
     {"nostdlib", AF_BOOL_TRUE, SetBoolean, &c_nostdlib, NULL, "If set ignore INCPATH, STARTUPLIB" },
     {"Cp", AF_MORE, AddToArgs, &cpparg, NULL, "Add an option to the preprocessor"},
     {"Ca", AF_MORE, AddToArgs, &asmargs, NULL, "Add an option to the assembler"},
@@ -664,6 +666,10 @@ int main(int argc, char **argv)
         }
     }
 
+    if ( c_zorg != -1 ) {
+         write_zcc_defined("myzorg", c_zorg);
+    }
+
 
     if ((fp = fopen(DEFFILE, "a")) != NULL) {
         fprintf(fp,"%s", zccopt ? zccopt : "");
@@ -696,7 +702,9 @@ int main(int argc, char **argv)
                 if (process(".i2", ".i", c_zpragma_exe, "", filter, i, YES, NO))
                     exit(1);
             } else {
-                if (process(".c", ".i", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
+                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
+                    exit(1);
+                if (process(".i2", ".i", c_zpragma_exe, "-sccz80", filter, i, YES, NO))
                     exit(1);
             }
             if (preprocessonly) {
@@ -1399,10 +1407,12 @@ void PragmaRedirect(arg_t *arg,char *val)
     }
     if ( strlen(value) ) {
         add_zccopt("\nIF !DEFINED_%s\n",ptr);
+        add_zccopt("\nIF crt0\n");
         add_zccopt("\tPUBLIC %s\n",ptr);
         add_zccopt("\tEXTERN %s\n",value);
         add_zccopt("\tdefc\tDEFINED_%s = 1\n",ptr);
         add_zccopt("\tdefc %s = %s\n",ptr,value);
+        add_zccopt("ENDIF\n\n");
         add_zccopt("ENDIF\n\n");
     }
 }

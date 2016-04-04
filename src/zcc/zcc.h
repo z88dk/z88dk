@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.31 2014-02-22 21:03:10 dom Exp $
+ * $Id: zcc.h,v 1.32 2016-04-04 17:06:31 dom Exp $
  */
 
 /* Very contrived, if not a Windows target then include the config file */
@@ -19,7 +19,7 @@ char *version = "v3.00 (C) 1998-2004 D.J.Morris\n";
 
 
 
-#if defined(__MSDOS__) && defined(__TURBOC__)
+#if defined(MSDOS)
 /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
 #define PREFIX "c:\\z88dk"
 #include <stdarg.h>
