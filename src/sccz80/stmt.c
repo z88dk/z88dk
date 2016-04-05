@@ -4,7 +4,7 @@
  *
  *      This part deals with statements
  *
- *      $Id: stmt.c,v 1.21 2016-04-04 17:25:08 dom Exp $
+ *      $Id: stmt.c,v 1.22 2016-04-05 20:23:34 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -706,7 +706,6 @@ void doasm()
             
             if (lab) {
                 /* ATP Got assembler label, now check to see if defined as extern.. */
-                printf("Looking for label %s\n",label);
                 if ( (myptr=findglb(label)) ) {
                     /* Have matched it to an extern, so now change type... */
                     if (myptr->storage == EXTERNAL)

@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.40 2016-03-29 13:39:44 dom Exp $
+ *      $Id: codegen.c,v 1.41 2016-04-05 20:23:34 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -98,18 +98,29 @@ void DoLibHeader(void)
      */
     strncpy(filen,Filename+1,strlen(Filename)-2);
     filen[strlen(Filename)-1]='\0';
-    if (makelib==0) {
+    changesuffix(filen,"");
+    if ( 1 ) { 
+	char *ptr = filen;
+        if ( !isalpha(*ptr) && *ptr != '_' ) {
+	     memmove(ptr+1,ptr,strlen(ptr));
+             *ptr = 'X';
+        }
+	while ( *ptr ) {
+            if (!isalnum(*ptr) ) {
+                *ptr = '_';
+            }
+            ptr++;
+        }
         /* Compiling a program */
         if (ISASM(ASM_ASXX)) {
             outstr("\n\t.module\t");
         } else if ( ISASM(ASM_Z80ASM) ) {
-        /*    outstr ("\n\tMODULE\t"); */
-            outstr ("\n\t; MODULE\t");
+            outstr ("\n\tMODULE\t"); 
+//            outstr ("\n\t; MODULE\t");
         } else {
             outstr("\n;\t module\t");
         }
         if (strlen (filen) && strncmp(filen,"<stdin>",7) ) {
-            changesuffix(filen,".c");
             if ( (segment=strrchr(filen,'/')) ) /* Unix */
                 ++segment;
             else if ( (segment=strrchr(filen,'\\')) ) /*DOG*/
@@ -133,7 +144,8 @@ void DoLibHeader(void)
             outstr(segment);
         }
         nl();
-    } else {
+    } 
+    if ( makelib ) {
         /* Library function */
         outstr("\n;\tSmall C+ Library Function\n");
         changesuffix(filen,"");
