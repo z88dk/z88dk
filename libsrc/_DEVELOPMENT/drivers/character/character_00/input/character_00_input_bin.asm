@@ -59,7 +59,7 @@
 SECTION code_driver
 SECTION code_driver_character_input
 
-PUBLIC character_00_input_binary
+PUBLIC character_00_input_bin
 
 EXTERN STDIO_MSG_EATC, STDIO_MSG_READ, STDIO_MSG_SEEK
 EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS, STDIO_MSG_GETC
