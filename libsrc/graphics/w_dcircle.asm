@@ -3,10 +3,11 @@
 ;       Adapted from my Spectrum Routine
 ;       (C) 1995-1998 D.J.Morris
 ;
-;	$Id: w_dcircle.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_dcircle.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
 ;
 
 
+        SECTION code_clib
 	PUBLIC w_draw_circle
 	EXTERN l_cmp
 

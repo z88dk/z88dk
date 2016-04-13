@@ -13,16 +13,16 @@
 ;   IT DOESN'T MAKE USE OF ALTERNATE REGISTERS
 ;   IT IS BASED ON "pointxy" and "plotpixel"
 ;
-;	$Id: dfill2.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: dfill2.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
 ;
 
 	INCLUDE	"graphics/grafix.inc"
 
+                SECTION         code_clib
         PUBLIC    do_fill
         EXTERN   pointxy
         EXTERN   plotpixel
 
-.spsave	defw 0
 
 ;ix points to the table on stack (above)
 
@@ -177,3 +177,6 @@
 	xor	a
 
 	ret
+
+                SECTION         bss_clib
+.spsave	defw 0

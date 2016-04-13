@@ -1,5 +1,6 @@
 	INCLUDE	"graphics/grafix.inc"
 
+        SECTION code_clib
 	PUBLIC	w_pointxy
 	EXTERN		l_cmp
 
@@ -7,7 +8,7 @@
 	EXTERN	w_pixeladdress
 
 ;
-;	$Id: w_pointxy.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_pointxy.asm,v 1.5 2016-04-13 21:09:09 dom Exp $
 ;
 
 ; ******************************************************************

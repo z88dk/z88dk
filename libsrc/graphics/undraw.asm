@@ -6,11 +6,12 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undraw.asm,v 1.6 2016-04-13 20:16:59 dom Exp $
+;	$Id: undraw.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
 ;
 
 
 
+        SECTION code_clib
                 PUBLIC    undraw
                 PUBLIC    _undraw
                 EXTERN     swapgfxbk

@@ -1,11 +1,12 @@
 	INCLUDE	"graphics/grafix.inc"
 
+        SECTION code_clib
 	PUBLIC	Line_r
 
 	EXTERN	coords
 
 ;
-;	$Id: liner2.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: liner2.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
 ;
 
 ;	...SLLLOOOW Variant by Stefano Bodrato
@@ -338,5 +339,6 @@
 				pop	de
 				ret
 
+	        SECTION bss_clib
 .bc1save defw	0
 .de1save defw	0

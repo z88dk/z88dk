@@ -3,18 +3,20 @@
 ;
 ;	ZX Spectrum version (speeded up with a row table)
 ;
-;	$Id: bkrestore.asm,v 1.4 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: bkrestore.asm,v 1.5 2016-04-13 21:09:09 dom Exp $
 ;
 
-
+	SECTION	  code_clib
 	PUBLIC    bkrestore
+	PUBLIC    _bkrestore
 	EXTERN	zx_rowtab
 
 
 .bkrestore
+._bkrestore
 
 ; __FASTCALL__ : sprite ptr in HL
-	
+	push	ix
 	push	hl
 	pop	ix
 	
@@ -87,4 +89,5 @@
 	pop	bc
 	djnz	bkrestores
 	ei
+	pop	ix
 	ret

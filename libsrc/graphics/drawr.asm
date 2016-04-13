@@ -6,13 +6,14 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawr.asm,v 1.7 2016-04-13 20:16:59 dom Exp $
+;	$Id: drawr.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
 ;
 
 
 ;Usage: drawr(struct *pixels)
 
 
+                SECTION         code_clib
                 PUBLIC    drawr
                 PUBLIC    _drawr
                 EXTERN     swapgfxbk

@@ -7,7 +7,7 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_point.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_point.asm,v 1.3 2016-04-13 21:09:09 dom Exp $
 ;
 
 
@@ -15,6 +15,7 @@
 ;Result is true/false
 
 
+        SECTION code_clib
                 PUBLIC    point
 
                 EXTERN     w_pointxy
@@ -23,6 +24,7 @@
 
 
 .point
+._point
 		pop	bc
 		pop	de
 		pop	hl

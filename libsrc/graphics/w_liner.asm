@@ -1,5 +1,6 @@
         INCLUDE "graphics/grafix.inc"
 
+        SECTION code_clib
         PUBLIC    w_line_r
         
         EXTERN     line
@@ -8,7 +9,7 @@
         EXTERN    coords
 
 ;
-;       $Id: w_liner.asm,v 1.7 2015-09-29 15:36:04 stefano Exp $
+;       $Id: w_liner.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
 ;
 
 ; ******************************************************************************

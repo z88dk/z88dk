@@ -6,13 +6,15 @@
 ; Generic version (just a bit slow)
 ;
 ;
-; $Id: putsprite.asm,v 1.7 2015-01-19 01:32:46 pauloscustodio Exp $
+; $Id: putsprite.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC    putsprite
+	PUBLIC    _putsprite
 	EXTERN	pixeladdress
 	EXTERN     swapgfxbk
-        EXTERN	swapgfxbk1
+        EXTERN	__graphics_end
 
 	INCLUDE	"graphics/grafix.inc"
 
@@ -23,13 +25,12 @@
 .offsets_table
          defb	1,2,4,8,16,32,64,128
 
-.actcoord
-	 defw	0
 
 
 .putsprite
-	
-        ld      hl,2   
+._putsprite
+	push	ix	
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -113,7 +114,7 @@
 
          pop      bc                ;Restore data
          djnz     _oloop
-	 jp       swapgfxbk1
+	 jp       __graphics_end
 
 
 .putspritew
@@ -155,7 +156,7 @@
 
          pop      bc                ;Restore data
          djnz     woloop
-	 jp       swapgfxbk1
+	 jp       __graphics_end
 	
 
 .wover_1 ld       c,(ix+2)
@@ -176,4 +177,8 @@
 
          pop      bc
          djnz     woloop
-	 jp       swapgfxbk1
+	 jp       __graphics_end
+
+	SECTION bss_clib
+.actcoord
+	 defw	0

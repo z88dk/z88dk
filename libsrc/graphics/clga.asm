@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: clga.asm,v 1.6 2016-04-13 20:16:59 dom Exp $
+;	$Id: clga.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
 ;
 
 
@@ -14,6 +14,7 @@
 
 
 
+                SECTION         code_clib
                 PUBLIC    clga
                 PUBLIC    _clga
                 EXTERN     swapgfxbk

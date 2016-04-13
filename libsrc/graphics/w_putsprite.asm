@@ -6,9 +6,10 @@
 ; TS2068 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
+; $Id: w_putsprite.asm,v 1.3 2016-04-13 21:09:09 dom Exp $
 ;
 
+        SECTION code_clib
         PUBLIC    putsprite
         EXTERN    w_pixeladdress
 
@@ -23,13 +24,6 @@
 
 .offsets_table
          defb   1,2,4,8,16,32,64,128
-
-.oldx
-         defw   0
-.curx
-         defw   0
-.cury
-         defw   0
 
 
 .putsprite
@@ -235,4 +229,12 @@
          pop      bc
          djnz     woloop
          jp       swapgfxbk1
+
+	SECTION  bss_clib
+.oldx
+         defw   0
+.curx
+         defw   0
+.cury
+         defw   0
 

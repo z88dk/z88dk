@@ -4,7 +4,7 @@
 ;       Stefano Bodrato 19/7/2007
 ;
 ;
-;       $Id: multipoint.asm,v 1.3 2016-04-13 20:16:59 dom Exp $
+;       $Id: multipoint.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
 ;
 
 
@@ -12,6 +12,7 @@
 ;pick a vertical or horizontal bit bar, up to 16 bits long
 
 
+        SECTION code_clib
                 PUBLIC    multipoint
                 PUBLIC    _multipoint
 

@@ -5,7 +5,7 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;       $Id: w_multipoint.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
+;       $Id: w_multipoint.asm,v 1.3 2016-04-13 21:09:09 dom Exp $
 ;
 
 
@@ -13,7 +13,9 @@
 ;pick a vertical or horizontal bit bar, up to 16 bits long
 
 
+        SECTION code_clib
                 PUBLIC    multipoint
+                PUBLIC    _multipoint
 
                 EXTERN     w_pointxy
                 EXTERN     swapgfxbk
@@ -21,7 +23,9 @@
 
 
 .multipoint
-                ld      ix,0
+._multipoint
+		push	ix
+                ld      ix,2
                 add     ix,sp
                 ld      e,(ix+2)
                 ld      d,(ix+3)
@@ -71,7 +75,7 @@
                 jr	nz,horizontal
 .exit
                 call    swapgfxbk1
-
+		pop	ix
                 ld      h,b
                 ld      l,c
                 ret

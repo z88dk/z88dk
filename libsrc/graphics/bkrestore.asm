@@ -3,16 +3,17 @@
 ;
 ;	Generic version (just a bit slow)
 ;
-;	$Id: bkrestore.asm,v 1.7 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: bkrestore.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
 ;
 
-
+	SECTION	 code_clib
 	PUBLIC    bkrestore
+	PUBLIC    _bkrestore
 	EXTERN	pixeladdress
 
 
 .bkrestore
-
+	push	ix
 ; __FASTCALL__ : sprite ptr in HL
 	
 	push	hl
@@ -54,4 +55,5 @@
 	
 	pop	bc
 	djnz	bkrestores
+	pop	ix
 	ret

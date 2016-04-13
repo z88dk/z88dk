@@ -1,8 +1,9 @@
 
+        SECTION code_clib
 	PUBLIC	rightbitmask
 
 ;
-;	$Id: rbitmask.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: rbitmask.asm,v 1.5 2016-04-13 21:09:09 dom Exp $
 ;
 
 ; ************************************************************************

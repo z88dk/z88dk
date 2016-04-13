@@ -7,20 +7,23 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_plot.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_plot.asm,v 1.3 2016-04-13 21:09:09 dom Exp $
 ;
 
 ;Usage: plot(int x, int y)
 
 
 
+        SECTION code_clib
                 PUBLIC    plot
+                PUBLIC    _plot
                 EXTERN     swapgfxbk
                 EXTERN    swapgfxbk1
 
                 EXTERN     w_plotpixel
 
 .plot
+._plot
 		pop	bc
 		pop	de
 		pop	hl

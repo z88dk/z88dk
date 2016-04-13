@@ -9,11 +9,13 @@
 ; Uses plotpixel, respixel and xorpixel
 ;
 ;
-; $Id: putsprite2.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
+; $Id: putsprite2.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
 ;
 
 
+        SECTION code_clib
 	PUBLIC    putsprite
+	PUBLIC    _putsprite
 
 	EXTERN	plotpixel
 	EXTERN	respixel
@@ -23,7 +25,8 @@
 ; sprite: (ix)
 
 .putsprite
-
+._putsprite
+	push	ix
         ld      hl,2   
         add     hl,sp
         ld      e,(hl)
@@ -121,6 +124,7 @@
 	pop	af
 	pop	bc		;Restore data
 	djnz	oloopx
+	pop	ix
 	ret
 
 
@@ -190,6 +194,7 @@
 	pop	af
         pop	bc		;Restore data
         djnz    oloopa
+	pop	ix
         ret
 
 
@@ -261,5 +266,6 @@
 	pop	af
 	pop	bc		;Restore data
 	djnz	oloopo
+	pop	ix
 	ret
 

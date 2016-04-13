@@ -3,21 +3,20 @@
 ;
 ;	ZX Spectrum version (speeded up with a row table)
 ;
-;	$Id: bksave.asm,v 1.3 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: bksave.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
 ;
 
-
+	SECTION	  code_clib
 	PUBLIC    bksave
+	PUBLIC    _bksave
 	EXTERN	zx_rowtab
 
 
-.actrow  defw 0
-.actcol  defw 0
-
 
 .bksave
-
-        ld      hl,2   
+._bksave
+	push	ix
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -96,4 +95,9 @@
 	pop	bc
 	
 	djnz	bksaves
+	pop	ix
 	ret
+
+	SECTION	bss_clib
+.actrow  defw 0
+.actcol  defw 0

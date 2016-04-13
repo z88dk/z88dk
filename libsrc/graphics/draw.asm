@@ -6,10 +6,11 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: draw.asm,v 1.9 2016-04-13 20:16:59 dom Exp $
+;	$Id: draw.asm,v 1.10 2016-04-13 21:09:09 dom Exp $
 ;
 
 
+                SECTION         code_clib
                 PUBLIC    draw
 		PUBLIC	  _draw
                 EXTERN     swapgfxbk

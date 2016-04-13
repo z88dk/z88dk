@@ -4,13 +4,14 @@
 ;       Fill stub - Stefano Bodrato 11/6/2000
 ;
 ;
-;	$Id: fill.asm,v 1.4 2016-04-13 20:16:59 dom Exp $
+;	$Id: fill.asm,v 1.5 2016-04-13 21:09:09 dom Exp $
 ;
 
 
 ;Usage: fill(struct *pixel)
 
 
+                SECTION         code_clib
                 PUBLIC    fill
                 PUBLIC    _fill
 
