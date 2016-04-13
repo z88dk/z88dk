@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: w_drawto.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_drawto.asm,v 1.3 2016-04-13 20:16:59 dom Exp $
 ;
 
 
@@ -14,15 +14,18 @@
 
 
                 PUBLIC    drawto
+                PUBLIC    _drawto
                 EXTERN     swapgfxbk
-                EXTERN	swapgfxbk1
+                EXTERN	__graphics_end
 
                 EXTERN     w_line
                 EXTERN     w_plotpixel
 
 
 .drawto
-		ld	ix,2
+._drawto
+		push	ix
+		ld	ix,4
 		add	ix,sp
 		ld	l,(ix+2)
 		ld	h,(ix+3)
@@ -31,5 +34,5 @@
                 call    swapgfxbk
                 ld      ix,w_plotpixel
                 call    w_line
-                jp      swapgfxbk1
+                jp      __graphics_end
 

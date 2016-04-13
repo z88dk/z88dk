@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;       $Id: point.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
+;       $Id: point.asm,v 1.6 2016-04-13 20:16:59 dom Exp $
 ;
 
 
@@ -15,6 +15,7 @@
 
 
                 PUBLIC    point
+                PUBLIC    _point
 
                 EXTERN     pointxy
                 EXTERN     swapgfxbk
@@ -22,7 +23,9 @@
 
 
 .point
-                ld      ix,0
+._point
+		push	ix
+                ld      ix,2
                 add     ix,sp
                 ld      l,(ix+2)
                 ld      h,(ix+4)
@@ -31,6 +34,7 @@
                 push    af
                 call    swapgfxbk1
                 pop     af
+		pop	ix
                 ld      hl,1
                 ret     nz       ;pixel set
                 dec     hl

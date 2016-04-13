@@ -6,21 +6,24 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: w_circle.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_circle.asm,v 1.3 2016-04-13 20:16:59 dom Exp $
 ;
 
 
 ;Usage: circle(struct *pixels)
 
 	PUBLIC    circle
+	PUBLIC    _circle
 	EXTERN     w_draw_circle
 	EXTERN     w_plotpixel
 	EXTERN     swapgfxbk
-	EXTERN	swapgfxbk1
+	EXTERN     __graphics_end	
 
 
 .circle
-		ld ix,0
+._circle
+		push	ix
+		ld ix,2
 		add ix,sp
 
 ;       de = x0, hl = y0, bc = radius, a = scale factor
@@ -35,5 +38,5 @@
 		ld ix,w_plotpixel
 		call swapgfxbk
 		call w_draw_circle
-		jp swapgfxbk1
+		jp	__graphics_end
 

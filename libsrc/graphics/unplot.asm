@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: unplot.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: unplot.asm,v 1.6 2016-04-13 20:16:59 dom Exp $
 ;
 
 
@@ -15,19 +15,22 @@
 
 
                 PUBLIC    unplot
+                PUBLIC    _unplot
                 EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
+                EXTERN    __graphics_end
 
                 EXTERN     respixel
 
 
 
 .unplot
-		ld	ix,0
+._unplot
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	l,(ix+2)
 		ld	h,(ix+4)
                 call    swapgfxbk
                 call    respixel
-                jp      swapgfxbk1
+                jp      __graphics_end
 

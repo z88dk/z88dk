@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: plot.asm,v 1.6 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: plot.asm,v 1.7 2016-04-13 20:16:59 dom Exp $
 ;
 
 ;Usage: plot(struct *pixel)
@@ -14,17 +14,20 @@
 
 
                 PUBLIC    plot
+                PUBLIC    _plot
                 EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
+                EXTERN    __graphics_end
 
                 EXTERN     plotpixel
 
 .plot
-		ld	ix,0
+._plot
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	l,(ix+2)
 		ld	h,(ix+4)
                 call    swapgfxbk
                 call    plotpixel
-                jp      swapgfxbk1
+                jp      __graphics_end
 

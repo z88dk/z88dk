@@ -1,10 +1,10 @@
 	PUBLIC	xorborder
 	EXTERN	xorpixel
         EXTERN     swapgfxbk
-	EXTERN	swapgfxbk1
+	EXTERN	__graphics_end
 
 ;
-;	$Id: xorborder.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: xorborder.asm,v 1.5 2016-04-13 20:16:59 dom Exp $
 ;
 
 ; ***********************************************************************
@@ -20,9 +20,10 @@
 ;
 
 .xorborder
+		push	ix
 		call	swapgfxbk
 		
-		ld	ix,0
+		ld	ix,2
 		add	ix,sp
 		ld	c,(ix+2)
 		ld	b,(ix+4)
@@ -63,7 +64,7 @@
 		push	hl
 		ld	a,l
 		add	a,c
-		ret	c	; overflow ?
+		;ret	c	; overflow ?
 		dec	a
 		ld	l,a
 		pop	de
@@ -84,4 +85,4 @@
 		
 		djnz	vrowloop
 		
-		jp	swapgfxbk1
+		jp	__graphics_end

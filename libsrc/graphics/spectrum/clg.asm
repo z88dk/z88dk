@@ -3,12 +3,14 @@
 ;       Stefano - 10/1/2007
 ;
 ;
-;	$Id: clg.asm,v 1.4 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: clg.asm,v 1.5 2016-04-13 20:16:59 dom Exp $
 ;
 
         PUBLIC    clg
+        PUBLIC    _clg
 
 .clg
+._clg
         ld a,i
         push af
         di

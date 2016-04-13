@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawr.asm,v 1.6 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: drawr.asm,v 1.7 2016-04-13 20:16:59 dom Exp $
 ;
 
 
@@ -14,8 +14,9 @@
 
 
                 PUBLIC    drawr
+                PUBLIC    _drawr
                 EXTERN     swapgfxbk
-                EXTERN	swapgfxbk1
+                EXTERN        __graphics_end
 
                 EXTERN     Line_r
                 EXTERN     plotpixel
@@ -23,7 +24,9 @@
 
 
 .drawr
-		ld	ix,0
+._drawr
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	e,(ix+2)	;py
 		ld	d,(ix+3)
@@ -33,5 +36,5 @@
                 call    swapgfxbk
                 ld      ix,plotpixel
                 call    Line_r
-                jp      swapgfxbk1
+                jp      __graphics_end
 

@@ -6,20 +6,23 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: draw.asm,v 1.8 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: draw.asm,v 1.9 2016-04-13 20:16:59 dom Exp $
 ;
 
 
                 PUBLIC    draw
+		PUBLIC	  _draw
                 EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
+		EXTERN        __graphics_end
 
                 EXTERN     Line
                 EXTERN     plotpixel
 
 
 .draw
-		ld	ix,0
+._draw
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	l,(ix+6)	;y0
 		ld	h,(ix+8)	;x0
@@ -33,4 +36,5 @@
 		pop	hl
                 ld      ix,plotpixel
                 call    Line
-                jp      swapgfxbk1
+		jp	__graphics_end
+

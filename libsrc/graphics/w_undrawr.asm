@@ -7,20 +7,23 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_undrawr.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_undrawr.asm,v 1.4 2016-04-13 20:16:59 dom Exp $
 ;
 
 
                 PUBLIC    undrawr
+                PUBLIC    _undrawr
                 EXTERN     swapgfxbk
-                EXTERN	swapgfxbk1
+                EXTERN __graphics_end
 
                 EXTERN     w_line_r
                 EXTERN     w_respixel
 
 
 .undrawr
-		ld	ix,0
+._undrawr
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	e,(ix+2)
 		ld	d,(ix+3)
@@ -29,5 +32,5 @@
                 call    swapgfxbk
                 ld      ix,w_respixel
                 call    w_line_r
-                jp      swapgfxbk1
+                jp      __graphics_end
 

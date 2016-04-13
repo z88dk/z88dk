@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: clga.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: clga.asm,v 1.6 2016-04-13 20:16:59 dom Exp $
 ;
 
 
@@ -15,13 +15,16 @@
 
 
                 PUBLIC    clga
+                PUBLIC    _clga
                 EXTERN     swapgfxbk
-		EXTERN	swapgfxbk1
+		EXTERN	  __graphics_end
                 EXTERN     cleararea
 
 
 .clga
-		ld	ix,0
+._clga
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	c,(ix+2)
 		ld	b,(ix+4)
@@ -29,5 +32,5 @@
 		ld	h,(ix+8)
                 call    swapgfxbk
                 call    cleararea
-                jp      swapgfxbk1
+                jp      __graphics_end
 

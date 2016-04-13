@@ -4,7 +4,7 @@
 ;       Stefano Bodrato 19/7/2007
 ;
 ;
-;       $Id: multipoint.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
+;       $Id: multipoint.asm,v 1.3 2016-04-13 20:16:59 dom Exp $
 ;
 
 
@@ -13,6 +13,7 @@
 
 
                 PUBLIC    multipoint
+                PUBLIC    _multipoint
 
                 EXTERN     pointxy
                 EXTERN     swapgfxbk
@@ -20,7 +21,9 @@
 
 
 .multipoint
-                ld      ix,0
+._multipoint
+		push	ix
+                ld      ix,2
                 add     ix,sp
                 ld      l,(ix+2)
                 ld      h,(ix+4)
@@ -52,7 +55,7 @@
                 djnz    horizontal
 .exit
                 call    swapgfxbk1
-
+		pop	ix
                 ld      h,d
                 ld      l,e
                 ret

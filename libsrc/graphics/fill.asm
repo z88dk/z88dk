@@ -4,7 +4,7 @@
 ;       Fill stub - Stefano Bodrato 11/6/2000
 ;
 ;
-;	$Id: fill.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: fill.asm,v 1.4 2016-04-13 20:16:59 dom Exp $
 ;
 
 
@@ -12,17 +12,20 @@
 
 
                 PUBLIC    fill
+                PUBLIC    _fill
 
                 EXTERN     do_fill
                 EXTERN     swapgfxbk
-		EXTERN	swapgfxbk1
+		EXTERN	   __graphics_end
 
 .fill
-		ld	ix,0
+._fill
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	d,(ix+2)	;y
 		ld	e,(ix+4)	;x
                 call    swapgfxbk
                 call    do_fill
-                jp      swapgfxbk1
+                jp      __graphics_end
 

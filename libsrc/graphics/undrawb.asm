@@ -6,21 +6,24 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undrawb.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: undrawb.asm,v 1.5 2016-04-13 20:16:59 dom Exp $
 ;
 
 
 
                 PUBLIC    undrawb
+                PUBLIC    _undrawb
 
                 EXTERN     drawbox
                 EXTERN     respixel
                 EXTERN     swapgfxbk
-                EXTERN	swapgfxbk1
+                EXTERN	__graphics_end
 
 
 .undrawb
-		ld	ix,0
+._undrawb
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	b,(ix+2)
 		ld	c,(ix+4)
@@ -29,5 +32,5 @@
                 ld      ix,respixel
                 call    swapgfxbk
                 call    drawbox
-                jp      swapgfxbk1
+                jp      __graphics_end
 

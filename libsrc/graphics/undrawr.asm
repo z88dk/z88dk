@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: undrawr.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: undrawr.asm,v 1.6 2016-04-13 20:16:59 dom Exp $
 ;
 
 
@@ -15,8 +15,9 @@
 
 
                 PUBLIC    undrawr
+                PUBLIC    _undrawr
                 EXTERN     swapgfxbk
-                EXTERN	swapgfxbk1
+                EXTERN	__graphics_end
 
 
                 EXTERN     Line_r
@@ -25,7 +26,9 @@
 
 
 .undrawr
-		ld	ix,0
+._undrawr
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	e,(ix+2)
 		ld	d,(ix+3)
@@ -34,5 +37,5 @@
                 ld      ix,respixel
                 call    swapgfxbk
                 call    Line_r
-                jp      swapgfxbk1
+                jp      __graphics_end
 
