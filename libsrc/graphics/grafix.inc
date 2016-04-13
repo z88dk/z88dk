@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.46 2015-11-05 16:08:04 stefano Exp $
+;	$Id: grafix.inc,v 1.47 2016-04-13 19:44:14 dom Exp $
 ;
 
 
@@ -223,13 +223,6 @@ IF FORz88
 	DEFINE gotgfx
 	defc	maxx	= 256
 	defc	maxy 	= 64
-   IF !APPZ88
-        defc    map_seg	= 192
-        defc    map_bk	= $4D3
-   ELSE
-        defc    map_seg	= 64     
-        defc    map_bk	= $4D1
-   ENDIF
 ENDIF
 
 
