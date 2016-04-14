@@ -9,7 +9,7 @@
 ; Uses plotpixel, respixel and xorpixel
 ;
 ;
-; $Id: putsprite2.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
+; $Id: putsprite2.asm,v 1.7 2016-04-14 09:13:08 dom Exp $
 ;
 
 
@@ -53,7 +53,7 @@
 	jr	z,doand
 
 	cp	182	; or(hl) opcode
-	jr	z,door
+	jp	z,door
 
 	; 182 - or
 	; 174 - xor

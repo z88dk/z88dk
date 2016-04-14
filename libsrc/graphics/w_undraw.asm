@@ -7,13 +7,14 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_undraw.asm,v 1.3 2016-04-13 20:16:59 dom Exp $
+;	$Id: w_undraw.asm,v 1.4 2016-04-14 09:13:08 dom Exp $
 ;
 
 
                 PUBLIC    undraw
                 PUBLIC   _undraw
                 EXTERN     swapgfxbk
+                EXTERN     swapgfxbk1
                 EXTERN __graphics_end
 
                 EXTERN     w_line

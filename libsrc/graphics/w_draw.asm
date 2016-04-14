@@ -7,7 +7,7 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_draw.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
+;	$Id: w_draw.asm,v 1.5 2016-04-14 09:13:08 dom Exp $
 ;
 
 
@@ -15,6 +15,7 @@
                 PUBLIC    draw
                 PUBLIC    _draw
                 EXTERN     swapgfxbk
+                EXTERN     swapgfxbk1
                 EXTERN	__graphics_end
 
                 EXTERN     w_line
