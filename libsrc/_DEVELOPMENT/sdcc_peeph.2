@@ -553,13 +553,31 @@ replace restart {
 	ld	c,l
 	ld	b,h
 	ld	a,#%1
-	ld	(bc),a
 } by {
+	ld	a,#%1
 	ld	c,l
 	ld	b,h
-	ld	(hl),#%1
-	; peephole 25 loaded #%1 into (hl) instead of (bc).
+	; peephole 25a delay copy of hl into bc
 }
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	ld	(bc),a
+} by {
+	ld	(hl),a
+	ld	c,l
+	ld	b,h
+	; peephole 25b loaded a into (hl) instead of (bc)
+}
+
+replace restart {
+	ld	a,#%1
+	ld	(hl),a
+} by {
+	ld	(hl),#%1
+	; peephole 25c loaded #%1 into (hl) directly
+} if notUsed('a')
 
 replace restart {
 	ex	de, hl
