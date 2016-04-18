@@ -219,7 +219,7 @@ replace restart {
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
-// SDCC PEEPHOLE RULES EXCEPT JP->JR FROM #9277
+// SDCC PEEPHOLE RULES EXCEPT JP->JR FROM #9570
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 
@@ -1193,7 +1193,27 @@ replace restart {
 	ld	%1, #0x01
 	; peephole 65d removed impossible jump to %2.
 } if labelRefCountChange(%2 -1)
-	
+
+replace restart {
+	rlca
+	and	a, #0x01
+	jp	Z, %1
+} by {
+	rlca
+	; peephole 65e removed and by changing jump condition.
+	jp	NC, %1
+} if notUsed('a'), notUsedFrom(%1 'a')
+
+replace restart {
+	rlca
+	and	a, #0x01
+	jp	NZ, %1
+} by {
+	rlca
+	; peephole 65f removed and by changing jump condition.
+	jp	C, %1
+} if notUsed('a'), notUsedFrom(%1 'a')
+
 replace restart {
 	xor	a,a
 	ld	a,#0x00
@@ -2209,7 +2229,7 @@ replace {
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
-// SDCC PEEPHOLE RULES JP->JR ONLY FROM #9277
+// SDCC PEEPHOLE RULES JP->JR ONLY FROM #9570
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 
