@@ -9,23 +9,27 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: stencil_add_side.asm,v 1.6 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: stencil_add_side.asm,v 1.7 2016-04-22 20:29:52 dom Exp $
 ;
 
 ;; void stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil)
 
 
-
+		SECTION	  code_clib
                 PUBLIC    stencil_add_side
+                PUBLIC    _stencil_add_side
 
                 EXTERN     Line
                 EXTERN	stencil_add_pixel 
                 EXTERN     swapgfxbk
                 EXTERN    swapgfxbk1
+		EXTERN	  __graphics_end
                 EXTERN	stencil_ptr
 
 .stencil_add_side
-		ld	ix,0
+._stencil_add_side
+		push	ix
+		ld	ix,2
 		add	ix,sp
 
 		ld	l,(ix+2)	;pointer to stencil
@@ -40,6 +44,6 @@
 				call	swapgfxbk
                 ld      ix,stencil_add_pixel
                 call    Line
-                jp      swapgfxbk1
+                jp      __graphics_end
 
 

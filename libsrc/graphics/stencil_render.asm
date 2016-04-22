@@ -13,24 +13,29 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
+        SECTION code_clib
 	PUBLIC	stencil_render
+	PUBLIC	_stencil_render
 	EXTERN	dither_pattern
 
 	EXTERN swapgfxbk
 	EXTERN pixeladdress
 	EXTERN leftbitmask, rightbitmask
 	EXTERN swapgfxbk1
+	EXTERN __graphics_end
 
 ;	
-;	$Id: stencil_render.asm,v 1.7 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: stencil_render.asm,v 1.8 2016-04-22 20:29:52 dom Exp $
 ;
 
 .stencil_render
-		ld	ix,2
+._stencil_render
+		push	ix
+		ld	ix,4
 		add	ix,sp
 
 		call	swapgfxbk
-		ld	bc,swapgfxbk1
+		ld	bc,__graphics_end
 		push bc
 
 		ld	c,maxy

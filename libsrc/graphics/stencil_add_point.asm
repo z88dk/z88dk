@@ -8,14 +8,15 @@
 ;       Stefano Bodrato - 08/10/2009
 ;
 ;
-;	$Id: stencil_add_point.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
+;	$Id: stencil_add_point.asm,v 1.5 2016-04-22 20:29:51 dom Exp $
 ;
 
 ;; void stencil_add_point(int x, int y, unsigned char *stencil)
 
 
-
+		SECTION   code_clib
                 PUBLIC    stencil_add_point
+                PUBLIC    _stencil_add_point
 
                 EXTERN     line
                 EXTERN     stencil_add_pixel
@@ -26,7 +27,9 @@
                 EXTERN    stencil_ptr
 
 .stencil_add_point
-		ld	ix,0
+._stencil_add_point
+		push	ix
+		ld	ix,2
 		add	ix,sp
 
 		ld	l,(ix+2)	;pointer to stencil
@@ -40,9 +43,7 @@
 		ld	l,(ix+4)	;y0
 		ld	h,(ix+6)	;x0
 
-		; call    swapgfxbk
-		
+		pop	ix	
 		jp	stencil_add_pixel
 		
-        ; jp      swapgfxbk1
 

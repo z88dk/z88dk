@@ -11,7 +11,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: stencil_add_pixel.asm,v 1.4 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: stencil_add_pixel.asm,v 1.5 2016-04-22 20:29:51 dom Exp $
 ;
 
 ; registers changed after return:
@@ -20,15 +20,15 @@
 
 
 	INCLUDE	"graphics/grafix.inc"
-
+		SECTION	  code_clib
                 PUBLIC    stencil_add_pixel
+                PUBLIC    _stencil_add_pixel
                 PUBLIC	stencil_ptr
                 EXTERN	coords
 
-.stencil_ptr	defw	0
-
 
 .stencil_add_pixel
+._stencil_add_pixel
 		ld	(coords),hl	; update plot coordinates
 		ld	d,0
 		ld	e,l
@@ -48,3 +48,5 @@
 		ld	(hl),a
 		ret
 
+		SECTION   bss_clib
+.stencil_ptr	defw	0
