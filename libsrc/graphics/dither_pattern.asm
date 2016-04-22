@@ -6,9 +6,10 @@
 ;
 ;	Stefano Bodrato, 18/3/2009
 ;
-;	$Id: dither_pattern.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: dither_pattern.asm,v 1.3 2016-04-22 20:17:17 dom Exp $
 ;
 
+	SECTION  code_clib
 	PUBLIC	dither_pattern
 	
 .dither_pattern
@@ -33,6 +34,7 @@
 		ld	a,(hl)
 		ret
 
+	SECTION		data_clib
 _dithpat:
 	
 	defb	@00000010	; 1

@@ -1,12 +1,13 @@
 	INCLUDE	"graphics/grafix.inc"
 
+	SECTION  code_clib
 	PUBLIC	xorpixel
 
 	EXTERN pixeladdress
 	EXTERN	coords
 
 ;
-;	$Id: xorpixl.asm,v 1.6 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: xorpixl.asm,v 1.7 2016-04-22 20:17:17 dom Exp $
 ;
 
 ; ******************************************************************

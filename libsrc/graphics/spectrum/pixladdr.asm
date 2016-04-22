@@ -1,4 +1,5 @@
 
+	SECTION	code_clib
 	PUBLIC	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
@@ -6,7 +7,7 @@
 	EXTERN	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.8 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: pixladdr.asm,v 1.9 2016-04-22 20:17:17 dom Exp $
 ;
 
 ; ******************************************************************

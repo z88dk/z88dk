@@ -1,4 +1,5 @@
 
+	SECTION	code_clib
 	PUBLIC	pixeladdress
 	
 	EXTERN	zx_rowtab
@@ -6,7 +7,7 @@
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: pixladdr2.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
+;	$Id: pixladdr2.asm,v 1.5 2016-04-22 20:17:17 dom Exp $
 ;
 ;
 ; ******************************************************************

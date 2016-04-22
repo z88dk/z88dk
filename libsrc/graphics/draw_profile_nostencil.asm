@@ -5,13 +5,15 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile_nostencil.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
+;	$Id: draw_profile_nostencil.asm,v 1.3 2016-04-22 20:17:17 dom Exp $
 ;
 
 
 	INCLUDE	"graphics/grafix.inc"
 
+		SECTION	  code_clib
                 PUBLIC    draw_profile
+                PUBLIC    _draw_profile
 
                 ;EXTERN     stencil_init
                 ;EXTERN     stencil_render
@@ -28,34 +30,6 @@
                 EXTERN		l_mult
                 EXTERN		l_div
 
-;
-; DE > HL [unsigned]
-; set carry if true
-;
-;.l_ugt
-                ;;EXTERN    COORDS
-
-_areaptr:	defw	0
-
-_percent:	defw	0
-_cmd:		defb	0
-_dith:		defw	0
-_vx:		defw	0
-_vy:		defw	0
-
-_cx:		defw	0
-_cy:		defw	0
-_cx1:		defw	0
-_cy1:		defw	0
-
-_pic:		defw	0
-
-repcmd:		defb	0
-repcnt:		defb	0
-
-; moved into stack
-;;_stencil:	defs	maxy*2
-;_stencil:	defw	0
 
 getbyte:
 	ld	hl,(_pic)
@@ -101,7 +75,9 @@ getparm:		;cx=vx+percent*pic[x++]/100;
 ; *************************
 
 draw_profile:
-	ld	ix,0
+_draw_profile:
+	push	ix
+	ld	ix,2
 	add ix,sp
 	ld	l,(ix+2)
 	ld	h,(ix+3)
@@ -137,6 +113,7 @@ norepeat:
 	;ld      hl,maxy*2	; release the stack space for _stencil
 	;add     hl,sp
 	;ld      sp,hl
+	pop	ix
 	ret
 
 noend:
@@ -463,3 +440,23 @@ is_areamode:
 	cp	(hl)
 	pop	hl
 	ret
+
+	SECTION		bss_clib
+_areaptr:	defw	0
+
+_percent:	defw	0
+_cmd:		defb	0
+_dith:		defw	0
+_vx:		defw	0
+_vy:		defw	0
+
+_cx:		defw	0
+_cy:		defw	0
+_cx1:		defw	0
+_cy1:		defw	0
+
+_pic:		defw	0
+
+repcmd:		defb	0
+repcnt:		defb	0
+
