@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.118 2016-04-04 17:06:31 dom Exp $
+ *      $Id: zcc.c,v 1.119 2016-04-23 18:16:20 dom Exp $
  */
 
 
@@ -101,7 +101,6 @@ static int             zcc_asprintf(char **s, const char *fmt, ...);
 static int             usetemp = 1;
 static int             preserve = 0;    /* don't destroy zcc_opt */
 static int             createapp = 0;    /* Go the next stage and create the app */
-static int             makelib = 0;
 static int             lateassemble = 0;
 static int             defer_assembly = 0;
 static int             z80verbose = 0;
@@ -324,7 +323,6 @@ static arg_t     myargs[] = {
     {"z80-verb", AF_BOOL_TRUE, SetBoolean, &z80verbose, NULL, "Make the assembler more verbose"},
     {"cleanup",  AF_BOOL_TRUE, SetBoolean, &cleanup, NULL,    "(default) Cleanup temporary files"},
     {"no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup, NULL, "Don't cleanup temporary files"},
-    {"make-lib", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Compile as if to make a library"},
     {"preserve", AF_BOOL_TRUE, SetBoolean, &preserve, NULL, "Don't remove zcc_opt.def at start of run"},
     {"defer-assembly", AF_BOOL_TRUE, SetBoolean, &defer_assembly, NULL, "Defer assembly until link time" },
     {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file"},
@@ -810,8 +808,8 @@ int main(int argc, char **argv)
                 if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                     exit(1);
             break;
-		default:
-            fprintf(stderr, "Filetype in \"%s\" unrecognized, ignoring file\n", original_filenames[i]);
+	default:
+            //fprintf(stderr, "Filetype in \"%s\" unrecognized, ignoring file\n", original_filenames[i]);
             break;
         }
     }
@@ -1249,20 +1247,12 @@ static void configure_misc_options()
     snprintf(buf,sizeof(buf),".%s",c_extension_config && strlen(c_extension_config) ? c_extension_config : "o");
     c_extension = strdup(buf);
     
-    if ( makelib ) {
-        compileonly = YES;
-    }
 
     // the new c lib uses startup=-1 to mean user supplies the crt
     if ( c_startup >= -1 ) {
         write_zcc_defined("startup", c_startup);
     }
     
-    /* We can't create an app and make a library.... */
-    if (createapp && makelib) {
-        createapp = NO;
-    }
-
     /* We only have to do a late assembly hack for z80asm family */
     if (createapp && defer_assembly && IS_ASM(ASM_Z80ASM)) {
         lateassemble = YES;
@@ -1385,9 +1375,6 @@ static void configure_compiler()
         add_option_to_compiler(buf);
         if ( sccz80arg ) {
             add_option_to_compiler(sccz80arg);
-        }
-        if ( makelib ) {
-            add_option_to_compiler("-make-lib");
         }
         c_compiler = c_sccz80_exe;
         compiler_style = outimplied;
