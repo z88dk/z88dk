@@ -1,4 +1,4 @@
-; $Id: bit_click.asm,v 1.4 2015-01-19 01:32:44 pauloscustodio Exp $
+; $Id: bit_click.asm,v 1.5 2016-04-23 21:06:32 dom Exp $
 ;
 ; Generic 1 bit sound functions
 ;
@@ -7,12 +7,15 @@
 ; Stefano Bodrato - 2/10/2001
 ;
 
+    SECTION    code_clib
     PUBLIC     bit_click
+    PUBLIC     _bit_click
     INCLUDE  "games/games.inc"
 
     EXTERN     snd_tick
 
 .bit_click
+._bit_click
 
           ld   a,(snd_tick)
           xor  sndbit_mask

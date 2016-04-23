@@ -1,9 +1,11 @@
-; $Id: beeper.asm,v 1.4 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: beeper.asm,v 1.5 2016-04-23 21:06:32 dom Exp $
 ;
 ; Z88 1 bit sound functions
 ;
 
+    SECTION    code_clib
     PUBLIC     beeper
+    PUBLIC     _beeper
     INCLUDE  "interrpt.def"
 
 ;
@@ -15,6 +17,8 @@
 
 
 .beeper
+._beeper
+	push	ix
           call oz_di
           push af
           ld   a,l
@@ -61,4 +65,5 @@
           jp   (ix)
 .be_end
           pop  af
+	pop	ix
           jp   oz_ei

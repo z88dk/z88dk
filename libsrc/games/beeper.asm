@@ -1,9 +1,11 @@
-; $Id: beeper.asm,v 1.5 2015-01-19 01:32:44 pauloscustodio Exp $
+; $Id: beeper.asm,v 1.6 2016-04-23 21:06:31 dom Exp $
 ;
 ; Generic 1 bit sound functions
 ;
 
+    SECTION    code_clib
     PUBLIC     beeper
+    PUBLIC     _beeper
     INCLUDE  "games/games.inc"
 
     EXTERN      bit_open_di
@@ -20,6 +22,8 @@
 
 
 .beeper
+._beeper
+	push	ix
         IF sndbit_port >= 256
           exx
           ld   bc,sndbit_port
@@ -72,7 +76,7 @@
           inc  c
           jp   (ix)
 .be_end
-
+	pop	ix
           call   bit_close_ei
           ret
 

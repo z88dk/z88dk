@@ -2,14 +2,16 @@
 ;	Generic game device library
 ;	Stefano Bodrato - 20/8/2001
 ;
-;	$Id: joystick.asm,v 1.4 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: joystick.asm,v 1.5 2016-04-23 21:06:32 dom Exp $
 ;
 
-
+	SECTION   code_clib
         PUBLIC    joystick
+        PUBLIC    _joystick
 	EXTERN	getk
 
 .joystick
+._joystick
 	;__FASTALL__ : joystick no. in HL
 		
 	ld	a,l

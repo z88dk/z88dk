@@ -1,11 +1,12 @@
-; $Id: bit_beep.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
+; $Id: bit_beep.asm,v 1.4 2016-04-23 21:06:32 dom Exp $
 ;
 ; 1 bit sound functions
 ;
 ; void bit_beep(int duration, int period);
 ;
-
+    SECTION    code_clib
     PUBLIC     bit_beep
+    PUBLIC     _bit_beep
     EXTERN      beeper
 
 ;
@@ -14,6 +15,7 @@
 
 
 .bit_beep
+._bit_beep
           pop bc
           pop hl
           pop de

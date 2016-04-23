@@ -1,4 +1,4 @@
-; $Id: bit_fx4_mwr.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
+; $Id: bit_fx4_mwr.asm,v 1.4 2016-04-23 21:06:32 dom Exp $
 ;
 ; 1 bit sound library - version for "memory write" I/O architectures
 ; sound effects module.
@@ -6,8 +6,9 @@
 ; Library #4 by Stefano Bodrato
 ;
 
-
+          SECTION    code_clib
           PUBLIC     bit_fx4
+          PUBLIC     _bit_fx4
           INCLUDE  "games/games.inc"
 
           EXTERN      beeper
@@ -21,6 +22,7 @@
 
 
 .bit_fx4
+._bit_fx4
           pop  bc
           pop  de
           push de

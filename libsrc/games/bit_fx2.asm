@@ -1,11 +1,12 @@
-; $Id: bit_fx2.asm,v 1.4 2015-01-19 01:32:44 pauloscustodio Exp $
+; $Id: bit_fx2.asm,v 1.5 2016-04-23 21:06:32 dom Exp $
 ;
 ; Generic platform sound effects module.
 ; Alternate sound library by Stefano Bodrato
 ;
 
-
+          SECTION    code_clib
           PUBLIC     bit_fx2
+          PUBLIC     _bit_fx2
           INCLUDE  "games/games.inc"
 
           EXTERN      bit_open
@@ -15,6 +16,7 @@
 
 
 .bit_fx2
+._bit_fx2
           pop  bc
           pop  de
           push de

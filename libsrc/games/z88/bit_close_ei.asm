@@ -1,4 +1,4 @@
-; $Id: bit_close_ei.asm,v 1.6 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: bit_close_ei.asm,v 1.7 2016-04-23 21:06:32 dom Exp $
 ;
 ; Z88 1 bit sound functions
 ;
@@ -8,7 +8,9 @@
 ; Based on the Dominic Morris' code
 ;
 
+    SECTION   code_clib
     PUBLIC     bit_close_ei
+    PUBLIC     _bit_close_ei
     INCLUDE  "interrpt.def"
 
     EXTERN     bit_irqstatus
@@ -16,6 +18,7 @@
     EXTERN     snd_asave
 
 .bit_close_ei
+._bit_close_ei
 
 	push hl
 	ld	hl,(bit_irqstatus)
@@ -26,7 +29,6 @@
 
 	ret po
 
-	call oz_ei
-	ret
+	jp  oz_ei
 
 
