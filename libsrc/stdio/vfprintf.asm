@@ -2,6 +2,7 @@
 
 ; int vfprintf(FILE *fp, unsigned char *fmt,void *ap)
 
+		SECTION	code_clib
 		PUBLIC	vfprintf
 
 		EXTERN	fputc_callee

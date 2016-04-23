@@ -4,8 +4,9 @@
 ; Return absolute value of long
 ;
 ; -----
-; $Id: labs_callee.asm,v 1.4 2016-03-04 23:48:12 dom Exp $
+; $Id: labs_callee.asm,v 1.5 2016-04-23 19:43:57 dom Exp $
 
+SECTION code_clib
 PUBLIC labs_callee
 PUBLIC _labs_callee
 EXTERN l_long_neg

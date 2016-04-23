@@ -1,6 +1,7 @@
 ; long __FASTCALL__ atol(char *s)
 ; 12.2006 aralbrec
 
+SECTION code_clib
 PUBLIC atol
 PUBLIC _atol
 EXTERN l_long_neg, asm_isspace

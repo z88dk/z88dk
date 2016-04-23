@@ -23,11 +23,11 @@
  ;  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  ;
  ; --------
- ; $Id: clock.asm,v 1.3 2016-03-05 00:07:01 dom Exp $
+ ; $Id: clock.asm,v 1.4 2016-04-23 19:43:57 dom Exp $
  ;
  ;
 
-
+	SECTION		code_clib
 PUBLIC clock
 PUBLIC _clock
 
