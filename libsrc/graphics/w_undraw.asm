@@ -7,10 +7,11 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_undraw.asm,v 1.4 2016-04-14 09:13:08 dom Exp $
+;	$Id: w_undraw.asm,v 1.5 2016-04-23 20:37:40 dom Exp $
 ;
 
 
+	SECTION   code_clib
                 PUBLIC    undraw
                 PUBLIC   _undraw
                 EXTERN     swapgfxbk

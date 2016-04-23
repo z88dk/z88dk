@@ -6,12 +6,13 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: w_uncircle.asm,v 1.3 2016-04-13 20:16:59 dom Exp $
+;	$Id: w_uncircle.asm,v 1.4 2016-04-23 20:37:40 dom Exp $
 ;
 
 
 ;Usage: uncircle(struct *pixels)
 
+	SECTION   code_clib
 	PUBLIC    uncircle
 	PUBLIC    _uncircle
 	EXTERN     w_draw_circle

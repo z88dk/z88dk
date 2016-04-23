@@ -7,10 +7,11 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_undrawr.asm,v 1.4 2016-04-13 20:16:59 dom Exp $
+;	$Id: w_undrawr.asm,v 1.5 2016-04-23 20:37:40 dom Exp $
 ;
 
 
+	SECTION   code_clib
                 PUBLIC    undrawr
                 PUBLIC    _undrawr
                 EXTERN     swapgfxbk

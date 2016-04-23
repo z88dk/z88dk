@@ -9,18 +9,22 @@
 ;	hline_dither(int x1, int y1, int x2, unsigned char intensity)
 ;
 
+	SECTION  code_clib
 	PUBLIC	surface_hline_dither
+	PUBLIC	_surface_hline_dither
 	EXTERN	base_graphics
 
 	EXTERN surface_pixeladdress
 	EXTERN leftbitmask, rightbitmask
 
 ;	
-;	$Id: hline_dither.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
+;	$Id: hline_dither.asm,v 1.3 2016-04-23 20:37:40 dom Exp $
 ;
 
 .surface_hline_dither
-		ld	ix,0
+._surface_hline_dither
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		
 		ld	l,(ix+10)	; surface struct
@@ -132,7 +136,8 @@
 ;			jr	nz, clear_height
 ;			pop	bc
 
-.end_cleararea		ret
+.end_cleararea		pop	ix
+			ret
 
 
 

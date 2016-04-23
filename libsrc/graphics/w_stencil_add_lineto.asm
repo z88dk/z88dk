@@ -8,14 +8,15 @@
 ;       Stefano Bodrato - 08/10/2009
 ;
 ;
-;	$Id: w_stencil_add_lineto.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_stencil_add_lineto.asm,v 1.4 2016-04-23 20:37:40 dom Exp $
 ;
 
 ;; void stencil_add_lineto(int x, int y, unsigned char *stencil)
 
 
-
+		SECTION   code_clib
                 PUBLIC    stencil_add_lineto
+                PUBLIC    _stencil_add_lineto
 
                 EXTERN     w_line
                 EXTERN     stencil_add_pixel 
@@ -24,9 +25,12 @@
                 EXTERN    swapgfxbk1
 
                 EXTERN    stencil_ptr
+		EXTERN    __graphics_end
 
 .stencil_add_lineto
-		ld	ix,0
+._stencil_add_lineto
+		push	ix
+		ld	ix,2
 		add	ix,sp
 
 		ld	l,(ix+2)	;pointer to stencil
@@ -43,5 +47,5 @@
                 ld      ix,stencil_add_pixel
                 call      w_line
                 
-                jp      swapgfxbk1
+                jp      __graphics_end
 

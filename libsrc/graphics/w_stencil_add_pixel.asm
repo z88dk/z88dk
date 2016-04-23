@@ -11,7 +11,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: w_stencil_add_pixel.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_stencil_add_pixel.asm,v 1.4 2016-04-23 20:37:40 dom Exp $
 ;
 
 ; registers changed after return:
@@ -20,17 +20,18 @@
 
 
 	INCLUDE	"graphics/grafix.inc"
-
+		SECTION   code_clib
                 PUBLIC    stencil_add_pixel
+                PUBLIC    _stencil_add_pixel
                 PUBLIC	stencil_ptr
                 EXTERN	coords
                 
                 EXTERN		l_cmp
 
-.stencil_ptr	defw	0
 
 
 .stencil_add_pixel
+._stencil_add_pixel
 		push    hl
 		ld      hl,maxy
 		call    l_cmp
@@ -82,3 +83,6 @@
 		inc	hl
 		ld	(hl),d
 		ret
+
+		SECTION  bss_clib
+.stencil_ptr	defw	0
