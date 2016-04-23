@@ -10,10 +10,10 @@
 ;       Simply does a swap...
 
 ;
-;	$Id: swapgfxbk.asm,v 1.6 2016-04-04 18:02:35 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.7 2016-04-23 21:05:46 dom Exp $
 ;
 
-
+		SECTION   code_clib
                 PUBLIC    swapgfxbk
 
                 EXTERN    gfx_bank

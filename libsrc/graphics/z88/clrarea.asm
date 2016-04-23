@@ -1,10 +1,11 @@
+	SECTION code_clib
 	PUBLIC	cleararea
 
 	EXTERN pixeladdress
 	EXTERN leftbitmask, rightbitmask
 
 ;
-;	$Id: clrarea.asm,v 1.3 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: clrarea.asm,v 1.4 2016-04-23 21:05:46 dom Exp $
 ;
 
 ; ***********************************************************************

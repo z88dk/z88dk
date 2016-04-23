@@ -1,10 +1,10 @@
-
+        SECTION code_clib
 	PUBLIC	pixeladdress
 
 	EXTERN	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.6 2015-02-03 06:50:50 stefano Exp $
+;	$Id: pixladdr.asm,v 1.7 2016-04-23 21:05:46 dom Exp $
 ;
 
 ; ******************************************************************

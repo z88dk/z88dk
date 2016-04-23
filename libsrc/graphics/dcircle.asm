@@ -3,10 +3,10 @@
 ;       Adapted from my Spectrum Routine
 ;       (C) 1995-1998 D.J.Morris
 ;
-;	$Id: dcircle.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: dcircle.asm,v 1.4 2016-04-23 21:05:46 dom Exp $
 ;
 
-
+		SECTION   code_clib
                 PUBLIC    draw_circle
 
 DEFVARS 0
