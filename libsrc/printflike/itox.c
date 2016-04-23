@@ -14,7 +14,7 @@ extern int itox(int nbr, char str[], int sz);
 #pragma unproto HDRPRTYPE
 
 
-itox(nbr, str, sz)
+int itox(nbr, str, sz)
 int nbr ;
 char str[] ;
 int sz ;

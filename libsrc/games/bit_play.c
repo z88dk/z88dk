@@ -1,5 +1,5 @@
 /*
-; $Id: bit_play.c,v 1.3 2002-04-17 21:30:23 dom Exp $
+; $Id: bit_play.c,v 1.4 2016-04-23 08:05:41 dom Exp $
 ;
 ; Generic 1 bit sound functions
 ; play a melody (integer approx to optimize speed and size)
@@ -20,7 +20,7 @@
 
 #include <sound.h>
 
-bit_play(unsigned char melody[])
+void bit_play(unsigned char melody[])
 {
 int sound;
 int duration=2;

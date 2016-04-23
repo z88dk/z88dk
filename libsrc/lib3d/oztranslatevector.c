@@ -9,7 +9,7 @@ Copyright© 2002, Mark Hamilton
 
 #include "lib3d.h"
 
-oztranslatevector(Vector_t *v, Vector_t *offset)
+void oztranslatevector(Vector_t *v, Vector_t *offset)
 {
 	v->x += offset->x;
 	v->y += offset->y;

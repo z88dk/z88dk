@@ -18,7 +18,7 @@ extern int __LIB__ itou(unsigned int nbr, char str[], int sz);
 
 
 
-itou(nbr, str, sz)
+int itou(nbr, str, sz)
 unsigned int nbr ;
 unsigned char str[] ;
 int sz ;

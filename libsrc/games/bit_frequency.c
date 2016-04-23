@@ -1,5 +1,5 @@
 /*
-; $Id: bit_frequency.c,v 1.2 2002-04-17 21:30:23 dom Exp $
+; $Id: bit_frequency.c,v 1.3 2016-04-23 08:05:41 dom Exp $
 ;
 ; Generic 1 bit sound functions
 ; Beeps the right frequency
@@ -24,7 +24,7 @@
 
 #include <sound.h>
 
-bit_frequency(float duration, float frequency)
+void bit_frequency(float duration, float frequency)
 {
 
   bit_beep ( (int) (frequency*duration), (int) ((BEEP_TSTATES/frequency)-29.5) );

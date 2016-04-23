@@ -9,7 +9,7 @@ Copyright© 2002, Mark Hamilton
 
 #include "lib3d.h"
 
-ozplotpointcam(Vector_t *v, Cam_t *c, Point_t *p)
+void ozplotpointcam(Vector_t *v, Cam_t *c, Point_t *p)
 {
     static Vector_t temp;
     static Vector_t offset;

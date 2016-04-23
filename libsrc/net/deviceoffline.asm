@@ -8,14 +8,14 @@
 ;	ZSock Lib function: device_offline
 
 
-	PUBLIC 	deviceoffline	
+	PUBLIC 	DeviceOffline	
 
 	EXTERN	no_zsock
 
 	INCLUDE	"packages.def"
 	INCLUDE	"zsock.def"
 
-.deviceoffline
+.DeviceOffline
 	call_pkg(tcp_offline)
 	ret	nc
 ; We failed..are we installed?
@@ -23,5 +23,5 @@
 	scf		;signal error
 	ret	nz	;Internal error
 	call_pkg(tcp_ayt)
-	jr	nc,deviceoffline
+	jr	nc,DeviceOffline
 	jp	no_zsock

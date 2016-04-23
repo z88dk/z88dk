@@ -9,7 +9,7 @@ Copyright© 2002, Mark Hamilton
 
 #include <lib3d.h>
 
-ozrotatepointx(Vector_t *v, int rot)
+void ozrotatepointx(Vector_t *v, int rot)
 {
     static long y, z;
 	y = v->y;

@@ -9,7 +9,7 @@ Copyright© 2002, Mark Hamilton
 
 #include "lib3d.h"
 
-ozplotpoint(Vector_t *v, Point_t *p)
+void ozplotpoint(Vector_t *v, Point_t *p)
 {
 	Vector_t temp;
 

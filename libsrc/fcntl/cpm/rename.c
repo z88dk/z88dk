@@ -3,7 +3,7 @@
  *
  *	 Stefano Bodrato - Oct. 2004
  *
- *   $Id: rename.c,v 1.1 2012-06-15 07:46:52 stefano Exp $
+ *   $Id: rename.c,v 1.2 2016-04-23 08:05:41 dom Exp $
  */
 
 #include <cpm.h>
@@ -15,7 +15,7 @@
 
 char buff[60];
 
-rename(char *old, char *new)
+int rename(char *old, char *new)
 {
 	
 	int       retval;
