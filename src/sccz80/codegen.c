@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.41 2016-04-05 20:23:34 dom Exp $
+ *      $Id: codegen.c,v 1.42 2016-04-23 18:15:58 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -60,7 +60,7 @@ void header(void)
     comment();      outstr(Banner);         nl();
     comment();      outstr(Version);        nl();
     comment();                              nl();
-	if (ISASM(ASM_ASXX)) {
+    if (ISASM(ASM_ASXX)) {
         assembler = "asxx";
     } else if ( ISASM(ASM_VASM) ) {
         assembler = "vasm";
@@ -100,23 +100,22 @@ void DoLibHeader(void)
     filen[strlen(Filename)-1]='\0';
     changesuffix(filen,"");
     if ( 1 ) { 
-	char *ptr = filen;
+    char *ptr = filen;
         if ( !isalpha(*ptr) && *ptr != '_' ) {
-	     memmove(ptr+1,ptr,strlen(ptr));
+         memmove(ptr+1,ptr,strlen(ptr));
              *ptr = 'X';
         }
-	while ( *ptr ) {
-            if (!isalnum(*ptr) ) {
-                *ptr = '_';
-            }
-            ptr++;
+    while ( *ptr ) {
+        if (!isalnum(*ptr) ) {
+            *ptr = '_';
+        }
+        ptr++;
         }
         /* Compiling a program */
         if (ISASM(ASM_ASXX)) {
             outstr("\n\t.module\t");
         } else if ( ISASM(ASM_Z80ASM) ) {
             outstr ("\n\tMODULE\t"); 
-//            outstr ("\n\t; MODULE\t");
         } else {
             outstr("\n;\t module\t");
         }
@@ -145,31 +144,6 @@ void DoLibHeader(void)
         }
         nl();
     } 
-    if ( makelib ) {
-        /* Library function */
-        outstr("\n;\tSmall C+ Library Function\n");
-        changesuffix(filen,"");
-        if (ISASM(ASM_ASXX)) {
-            outstr("\n\t.globl\t");
-        } else if (ISASM(ASM_Z80ASM) ) {
-            outstr("\n\tPUBLIC\t");
-        } else if ( ISASM(ASM_VASM) ) {
-            outstr("\n\tGLOBAL\t");
-        } else if ( ISASM(ASM_GNU) ) {
-            outstr("\n\t.global\t");
-        }
-        outstr(filen);
-        if (ISASM(ASM_ASXX)) {
-            outstr("\n\t.globl\t_");
-        } else if (ISASM(ASM_Z80ASM) ) {
-            outstr("\n\tPUBLIC\t_");
-        } else if ( ISASM(ASM_VASM) ) {
-            outstr("\n\tGLOBAL\t_");
-        } else if ( ISASM(ASM_GNU) ) {
-            outstr("\n\t.global\t_");
-        }
-        outstr(filen);
-    }
     if (ISASM(ASM_ASXX)) {
         incdir=getenv("Z80_OZFILES");
         outstr("\n\n\t.include \"");
@@ -211,8 +185,8 @@ void outname(char *sname,char pref)
     int i ;
 
     if (pref) {
-		outstr(Z80ASM_PREFIX);
-	}
+        outstr(Z80ASM_PREFIX);
+    }
     if ( strlen(sname) > ASMLEN ) {
         i = ASMLEN;
         while ( i-- )
@@ -239,8 +213,8 @@ void getmem(SYMBOL *sym)
             callrts("l_sxt");
 #else
             ot("ld\thl,"); outname(sym->name,dopref(sym));
-			nl();
-			callrts("l_gchar");
+            nl();
+            callrts("l_gchar");
 #endif
 
         } else {
@@ -282,11 +256,11 @@ void getmem(SYMBOL *sym)
  */
 int getloc(SYMBOL *sym, int off)
 {
-	int	offs;
-	offs=sym->offset.i-Zsp+off;
+    int offs;
+    offs=sym->offset.i-Zsp+off;
     vconst(offs);
     ol("add\thl,sp");
-	return (offs);
+    return (offs);
 
 }
 
@@ -325,12 +299,12 @@ void putmem(SYMBOL *sym)
 }
 
 /*
- *	Store type at TOS - used for initialising auto vars
+ *  Store type at TOS - used for initialising auto vars
  */
 
 void StoreTOS(char typeobj)
 {
-	switch (typeobj) {
+    switch (typeobj) {
     case LONG:
         lpush();
         return;
@@ -349,7 +323,7 @@ void StoreTOS(char typeobj)
     case CPTR:
         ol("dec\tsp");
         ol("ld\ta,e");
-        zpop();	/* pop de */
+        zpop(); /* pop de */
         ol("ld\te,a");
         zpushde();
         zpush();
@@ -358,10 +332,10 @@ void StoreTOS(char typeobj)
     default:
         zpush();
         return;
-			
-	}
-}	
-			
+            
+    }
+}   
+            
 /*
  * Store the object at the frame position marked by offset
  * We already know that it's in range
@@ -372,9 +346,9 @@ void StoreTOS(char typeobj)
 void PutFrame(char typeobj, int offset)
 {
     SYMBOL *ptr;
-	char	flags;
-	ptr=retrstk(&flags);	/* Not needed but.. */
-	switch(typeobj) {
+    char    flags;
+    ptr=retrstk(&flags);    /* Not needed but.. */
+    switch(typeobj) {
     case CCHAR:
         ot("ld\t");
         OutIndex(offset);
@@ -404,7 +378,7 @@ void PutFrame(char typeobj, int offset)
             OutIndex(offset+3);
             outstr(",d\n");
         }
-	}
+    }
 }
 #endif
 
@@ -476,15 +450,15 @@ void putstk(char typeobj)
 void puttos(void)
 {
 #ifdef USEFRAME
-	if (useframe) {
-		ot("ld\t");
-		OutIndex(0);
-		outstr(",l\n");
-		ot("ld\t");
-		OutIndex(1);
-		outstr(",h\n");
-		return;
-	}
+    if (useframe) {
+        ot("ld\t");
+        OutIndex(0);
+        outstr(",l\n");
+        ot("ld\t");
+        OutIndex(1);
+        outstr(",h\n");
+        return;
+    }
 #endif
     ol("pop\tbc");
     ol("push\thl");
@@ -494,15 +468,15 @@ void puttos(void)
 void put2tos(void)
 {
 #ifdef USEFRAME
-	if (useframe) {
-		ot("ld\t");
-		OutIndex(2);
-		outstr(",l\n");
-		ot("ld\t");
-		OutIndex(3);
-		outstr(",h\n");
-		return;
-	}
+    if (useframe) {
+        ot("ld\t");
+        OutIndex(2);
+        outstr(",l\n");
+        ot("ld\t");
+        OutIndex(3);
+        outstr(",h\n");
+        return;
+    }
 #endif
     ol("pop\tde");
     puttos();
@@ -531,14 +505,14 @@ void loadargc(int n)
 void indirect(LVALUE *lval)
 {
     char     sign;
-	char	typeobj, flags;
+    char    typeobj, flags;
 
-	typeobj=lval->indirect;
-	flags=lval->flags;
+    typeobj=lval->indirect;
+    flags=lval->flags;
 
     sign=flags&UNSIGNED;
 
-	/* Fetch from far pointer */
+    /* Fetch from far pointer */
     if (flags&FARACC) {             /* Access via far method */
         switch(typeobj) {
         case CCHAR :
@@ -570,12 +544,12 @@ void indirect(LVALUE *lval)
             ol("ld\ta,(hl)");
             callrts("l_sxt");
 #else
-			callrts("l_gchar");
+            callrts("l_gchar");
 #endif
         } else {
             ol("ld\tl,(hl)");
             ol("ld\th,0");
-		}
+        }
         break ;
     case CPTR :
         callrts("l_getptr");
@@ -593,14 +567,14 @@ void indirect(LVALUE *lval)
             ol("ld\th,(hl)");
             ol("ld\tl,a");
         } else {
-			ot("call\tl_gint\t;");
+            ot("call\tl_gint\t;");
 #ifdef USEFRAME
-			if (useframe && CheckOffset(lval->offset)) {
-				OutIndex(lval->offset);
-			}
+            if (useframe && CheckOffset(lval->offset)) {
+                OutIndex(lval->offset);
+            }
 #endif
-			nl();
-		}
+            nl();
+        }
     }
 }
 
@@ -614,20 +588,20 @@ void swap(void)
 /*      into the primary register */
 void immed(void)
 {
-	if (ISASM(ASM_ASXX)) 
+    if (ISASM(ASM_ASXX)) 
         ot("ld\thl,#");
-	else
-		ot("ld\thl,");
+    else
+        ot("ld\thl,");
 }
 
 /* Print partial instruction to get an immediate value */
 /*      into the secondary register */
 void immed2(void)
 {
-	if (ISASM(ASM_ASXX))
+    if (ISASM(ASM_ASXX))
         ot("ld\tde,#");
-	else
-		ot("ld\tde,");
+    else
+        ot("ld\tde,");
 }
 
 /* Partial instruction to access literal */
@@ -728,7 +702,7 @@ void zpopbc(void)
 
 void doexaf(void)
 {
-	ol("ex\taf,af");
+    ol("ex\taf,af");
 }
 
 /* Swap between the sets of registers */
@@ -758,10 +732,10 @@ void sw(char type)
 
 void zclibcallop()
 {
-	ol("rst\t8");
-	defword();
+    ol("rst\t8");
+    defword();
 }
-	
+    
 
 /* Call the specified subroutine name */
 void zcall(SYMBOL *sname)
@@ -785,10 +759,7 @@ void zcallop(void)
 
 char dopref(SYMBOL *sym)
 {
-//  return 1;
-	if (sym->flags&LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) return(0);
-	if ( sym->storage == LIBOVER )
-		return(0);
+    if (sym->flags&LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) return(0);
     return(1);
 }
 
@@ -837,7 +808,7 @@ void callstk(int n)
 
 void jump0(LVALUE *lval,int label)
 {
-	opjump("",label);
+    opjump("",label);
 }
 
 
@@ -898,10 +869,10 @@ void testjump(LVALUE *lval,int label)
     int type;
     ol("ld\ta,h");
     ol("or\tl");
-	if ( lval->oldval_type == LONG ) {
+    if ( lval->oldval_type == LONG ) {
     ol("or\td");
     ol("or\te");
-	}
+    }
     type = lval->oldval_type;
     if ( lval->binop == NULL )
         type = lval->val_type;
@@ -958,18 +929,18 @@ void zerojump(
 /* Print pseudo-op to define a byte */
 void defbyte(void)
 {
-	if (ISASM(ASM_ASXX))
-		ot(".db\t");
-	else
+    if (ISASM(ASM_ASXX))
+        ot(".db\t");
+    else
         ot("defb\t");
 }
 
 /*Print pseudo-op to define storage */
 void defstorage(void)
 {
-	if (ISASM(ASM_ASXX))
-		ot(".ds\t");
-	else if ( ISASM(ASM_Z80ASM) ) {
+    if (ISASM(ASM_ASXX))
+        ot(".ds\t");
+    else if ( ISASM(ASM_Z80ASM) ) {
             ot("defs\t");
     } else {
         ot("defs\t");
@@ -980,9 +951,9 @@ void defstorage(void)
 /* Print pseudo-op to define a word */
 void defword(void)
 {
-	if (ISASM(ASM_ASXX))
-		ot(".dw\t");
-	else
+    if (ISASM(ASM_ASXX))
+        ot(".dw\t");
+    else
         ot("defw\t");
 }
 
@@ -995,24 +966,24 @@ void deflong(void)
 /* Print pseudo-op to define a string */
 void defmesg(void)
 {
-	if (ISASM(ASM_ASXX) || ISASM(ASM_GNU))
-		ot(".ascii\t\"");
-	else
+    if (ISASM(ASM_ASXX) || ISASM(ASM_GNU))
+        ot(".ascii\t\"");
+    else
         ot("defm\t\"");
 }
 
 /* Point to following object */
 void point(void)
 {
-	if (ISASM(ASM_ASXX))
-	    ol(".dw\t.+2");
-	else
+    if (ISASM(ASM_ASXX))
+        ol(".dw\t.+2");
+    else
         ol("defw\tASMPC+2");
 }
 
 /* Modify the stack pointer to the new value indicated */
 int modstk(int newsp,int save,int saveaf)
-/*  newsp - if true save hl;  save - preserve contents of af */	
+/*  newsp - if true save hl;  save - preserve contents of af */ 
 {
     int k,flag=NO;
 
@@ -1038,14 +1009,14 @@ int modstk(int newsp,int save,int saveaf)
     if ( k < 0 ) {
         if ( k > -11 ) {
             if ( k & 1 ) {
-				flag=YES;
+                flag=YES;
                 ++k ;
             }
             while ( k ) {
                 ol("push\tbc");
                 k += 2 ;
             }
-			if (flag)
+            if (flag)
                 ol("dec\tsp") ;
             return newsp;
         }
@@ -1057,28 +1028,28 @@ int modstk(int newsp,int save,int saveaf)
 #ifdef USEFRAME
 modstkcht:
 #endif
-	if (saveaf) {
-	    if ( noaltreg ) {
+    if (saveaf) {
+        if ( noaltreg ) {
             zpushflags();
             zpopbc();
-	    } else {
+        } else {
             doexaf();
-	    }
-	}
+        }
+    }
 #ifdef USEFRAME
-	if (useframe) {
-		ot("ld\t"); FrameP(); outstr(","); outdec(k); nl();
-		ot("add\t");
-		FrameP();
-		outstr(",sp\n");
-		RestoreSP(NO);
-	} else {		
+    if (useframe) {
+        ot("ld\t"); FrameP(); outstr(","); outdec(k); nl();
+        ot("add\t");
+        FrameP();
+        outstr(",sp\n");
+        RestoreSP(NO);
+    } else {        
         if ( save ) doexx() ;
         vconst(k) ;
         ol("add\thl,sp");
         ol("ld\tsp,hl");
         if ( save ) doexx() ;
-	}
+    }
 #else
     if ( save ) doexx() ;
     vconst(k) ;
@@ -1086,15 +1057,15 @@ modstkcht:
     ol("ld\tsp,hl");
     if ( save ) doexx() ;
 #endif
-	if (saveaf) {
-	    if ( noaltreg ) {
+    if (saveaf) {
+        if ( noaltreg ) {
             ol("push\tbc");
             Zsp -= 2;
             zpopflags();
-	    } else {
+        } else {
             doexaf();
-	    }
-	}
+        }
+    }
     return newsp ;
 }
 
@@ -1580,7 +1551,7 @@ void gt0(LVALUE *lval,int label)
 void ge0(LVALUE *lval, int label)
 {
     ol("xor\ta") ;
-	switch(lval->oldval_type) {
+    switch(lval->oldval_type) {
     case LONG:
         ol("or\td");
         break;
@@ -1589,7 +1560,7 @@ void ge0(LVALUE *lval, int label)
         break;
     default:
         ol("or\th");
-	}
+    }
     opjump("m,",label);
 }
 
@@ -1795,7 +1766,7 @@ void zgt(LVALUE *lval)
                 ol("xor\te");
                 ol("xor\tl");
                 ol("rlca");
-                ccf();	
+                ccf();  
             }
             lval->val_type = CARRY;
             break;
@@ -1872,15 +1843,15 @@ void zcarryconv(void)
 
 void convUint2char(void)
 {
-	ol("ld\th,0");
+    ol("ld\th,0");
 }
 
 void convSint2char(void)
 {
-	ol("ld\ta,l");
-	callrts("l_sxt");
+    ol("ld\ta,l");
+    callrts("l_sxt");
 }
-	
+    
 
 /* Unsigned int to long */
 void convUint2long(void)
@@ -1963,8 +1934,8 @@ void vlongconst_noalt(uint32_t val)
  */
 void vconst(int32_t val)
 {
-	if ( val < 0 )
-		val += 65536;
+    if ( val < 0 )
+        val += 65536;
     immed();
     outdec(val%65536);
     ot(";const\n");
@@ -1975,8 +1946,8 @@ void vconst(int32_t val)
  */
 void const2(int32_t val)
 {
-	if ( val < 0 )
-		val += 65536;
+    if ( val < 0 )
+        val += 65536;
     immed2();
     outdec(val);
     nl();
@@ -1984,9 +1955,9 @@ void const2(int32_t val)
 
 void constbc(int32_t val)
 {
-	if ( val < 0 )
-		val += 65536;
-	ot("ld\tbc,");
+    if ( val < 0 )
+        val += 65536;
+    ot("ld\tbc,");
     outdec(val);
     nl();
 }
@@ -2021,10 +1992,10 @@ void CpCharVal(int val)
 
 void GlobalPrefix(char type)
 {
-	if (ISASM(ASM_ASXX)) {
-		ot(".globl\t");
-		return;
-	} else if ( ISASM(ASM_VASM) ) {
+    if (ISASM(ASM_ASXX)) {
+        ot(".globl\t");
+        return;
+    } else if ( ISASM(ASM_VASM) ) {
         ot("GLOBAL\t");
         return;
     } else if ( ISASM(ASM_GNU) ) {
@@ -2048,17 +2019,17 @@ void GlobalPrefix(char type)
 }
 
 /*
- *	Emit a LINE opcode for assembler
- *	error reporting
+ *  Emit a LINE opcode for assembler
+ *  error reporting
  */
 
 void EmitLine(int line)
 {
-	if (ISASM(ASM_Z80ASM) && ctext ) {
-		ot("LINE\t");
-		outdec(line);
-		nl();
-	}
+    if (ISASM(ASM_Z80ASM) && ctext ) {
+        ot("LINE\t");
+        outdec(line);
+        nl();
+    }
 }
 
 /* These routines save and restore hl/de from special places */
@@ -2087,7 +2058,7 @@ void restorede(void)
 
 void prefix()
 {
-	if (ISASM(ASM_Z80ASM)) {
+    if (ISASM(ASM_Z80ASM)) {
             outbyte('.');
         }
 }
@@ -2095,31 +2066,31 @@ void prefix()
 /* Print specified number as label */
 void printlabel(int label)
 {
-	if (ISASM(ASM_ASXX)) {
-		outdec(label);
-		outstr("$");
-	} else {
+    if (ISASM(ASM_ASXX)) {
+        outdec(label);
+        outstr("$");
+    } else {
         outstr("i_");
         outdec(label);
-	}
+    }
 }
 
 /* Print a label suffix */
 void col()
 {
-	if (!ISASM(ASM_Z80ASM))
+    if (!ISASM(ASM_Z80ASM))
         outbyte(58);
 }
 
 void function_appendix(SYMBOL *func)
 {
     /* Asz80 needs a label at the end to sort out local symbols */
-	if (ISASM(ASM_ASXX)) {
+    if (ISASM(ASM_ASXX)) {
         nl();prefix();
-		outstr("smce_");
-		outname(func->name,NO);
-		col();nl();
-	}
+        outstr("smce_");
+        outname(func->name,NO);
+        col();nl();
+    }
 }
 
 void output_section(char *section_name)
@@ -2144,61 +2115,61 @@ void output_section(char *section_name)
 /*
  * Check offset is within range for frame pointer
  */
-		
+        
 int CheckOffset(int val)
 {
-	if (val>=-126 && val<=127 ) return 1;
-	return 0;
+    if (val>=-126 && val<=127 ) return 1;
+    return 0;
 }
 
 
 /*
- *	Output offset to index register
+ *  Output offset to index register
  *
- *	FRAME POINTER STUFF IS BROKEN - DO NOT USE!!!
+ *  FRAME POINTER STUFF IS BROKEN - DO NOT USE!!!
  */
 
 void OutIndex(int val)
 {
-	if	(ISASM(ASM_ASXX))) {
-		outdec(val);
-		if (indexix)
-			outstr("(ix)");
-		else
-			outstr("(iy)");
-	} else {
-		outstr("(");
-		if (indexix)
-			outstr("ix ");
-		else
-			outstr("iy ");
-		if (val >= 0 )
-			outstr("+");
-		outdec(val);
-		outstr(")");
-	}
+    if  (ISASM(ASM_ASXX))) {
+        outdec(val);
+        if (indexix)
+            outstr("(ix)");
+        else
+            outstr("(iy)");
+    } else {
+        outstr("(");
+        if (indexix)
+            outstr("ix ");
+        else
+            outstr("iy ");
+        if (val >= 0 )
+            outstr("+");
+        outdec(val);
+        outstr(")");
+    }
 }
 
 
 void RestoreSP(char saveaf)
 {
-	if (saveaf) doexaf();
-	ot("ld\tsp,");
-	FrameP();
-	nl();
-	if (saveaf) doexaf();
+    if (saveaf) doexaf();
+    ot("ld\tsp,");
+    FrameP();
+    nl();
+    if (saveaf) doexaf();
 }
 
 void setframe(void)
 {
 #ifdef USEFRAME
-	if (!useframe) return;
-	ot("ld\t");
-	FrameP();
-	outstr(",0\n");
-	ot("add\t");
-	FrameP();
-	outstr(",sp\n");
+    if (!useframe) return;
+    ot("ld\t");
+    FrameP();
+    outstr(",0\n");
+    ot("add\t");
+    FrameP();
+    outstr(",sp\n");
 #endif
 }
 
@@ -2214,18 +2185,18 @@ void FrameP(void)
 void pushframe(void)
 {
     if ( useframe || (currfn->flags&SAVEFRAME) ) {
-	ot("push\t");
-	FrameP();
-	nl();
+    ot("push\t");
+    FrameP();
+    nl();
     }
 }
 
 void popframe(void)
 {
     if ( useframe || (currfn->flags&SAVEFRAME) ) {
-	ot("pop\t");
-	FrameP();
-	nl();
+    ot("pop\t");
+    FrameP();
+    nl();
     }
 }
 

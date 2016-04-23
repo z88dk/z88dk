@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.34 2016-04-04 17:25:08 dom Exp $
+ *      $Id: main.c,v 1.35 2016-04-23 18:15:58 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -63,151 +63,134 @@ void SetAssembler(char *arg);
  */
 int main(int argc, char **argv)
 {
-        int     n;      /* Loop counter */
-        gargc = argc ;
-        gargv = argv ;
-/*
- * Empty our mem ptrs
- */
+    int     n;      /* Loop counter */
+    gargc = argc ;
+    gargv = argv ;
 
-        litq=dubq=tempq=glbq=0;
-        symtab=loctab=0;
-        wqueue=0;membptr=0;tagptr=0;swnext=0;stage=0;
-        gotoq=0;
+    /* allocate space for arrays */
+    litq = mymalloc(FNLITQ) ;         /* literals, these 2 dumped end */
+    dubq = mymalloc(FNLITQ) ;         /* Doubles */
+    tempq = mymalloc(LITABSZ) ;        /* Temp strings... */
+    glbq  = mymalloc(LITABSZ) ;        /* Used for glb lits, dumped now */
+    symtab = SYM_CAST mymalloc(NUMGLBS*sizeof(SYMBOL)) ;
+    loctab = SYM_CAST mymalloc(NUMLOC*sizeof(SYMBOL)) ;
+    wqueue = WQ_CAST mymalloc(NUMWHILE*sizeof(WHILE_TAB)) ;
+    gotoq= (GOTO_TAB *)calloc(NUMGOTO,sizeof(GOTO_TAB));
+    if (gotoq==NULL) OutOfMem();
 
-        /* allocate space for arrays */
-        litq = mymalloc(FNLITQ) ;         /* literals, these 2 dumped end */
-        dubq = mymalloc(FNLITQ) ;         /* Doubles */
-        tempq = mymalloc(LITABSZ) ;        /* Temp strings... */
-        glbq  = mymalloc(LITABSZ) ;        /* Used for glb lits, dumped now */
-        symtab = SYM_CAST mymalloc(NUMGLBS*sizeof(SYMBOL)) ;
-        loctab = SYM_CAST mymalloc(NUMLOC*sizeof(SYMBOL)) ;
-        wqueue = WQ_CAST mymalloc(NUMWHILE*sizeof(WHILE_TAB)) ;
-        gotoq= (GOTO_TAB *)calloc(NUMGOTO,sizeof(GOTO_TAB));
-   if (gotoq==NULL) OutOfMem();
+    tagptr = tagtab = TAG_CAST mymalloc(NUMTAG*sizeof(TAG_SYMBOL)) ;
+    membptr = membtab = SYM_CAST mymalloc(NUMMEMB*sizeof(SYMBOL)) ;
 
-        tagptr = tagtab = TAG_CAST mymalloc(NUMTAG*sizeof(TAG_SYMBOL)) ;
-        membptr = membtab = SYM_CAST mymalloc(NUMMEMB*sizeof(SYMBOL)) ;
+    swnext = SW_CAST mymalloc(NUMCASE*sizeof(SW_TAB)) ;
+    swend = swnext + (NUMCASE-1) ;
 
-        swnext = SW_CAST mymalloc(NUMCASE*sizeof(SW_TAB)) ;
-        swend = swnext + (NUMCASE-1) ;
+    stage = mymalloc(STAGESIZE) ;
+    stagelast = stage+STAGELIMIT ;
 
-        stage = mymalloc(STAGESIZE) ;
-        stagelast = stage+STAGELIMIT ;
+    /* empty symbol table */
+    glbptr = STARTGLB;
+    while ( glbptr < ENDGLB ) {
+            glbptr->name[0] = 0 ;
+            ++glbptr ;
+    }
 
-        /* empty symbol table */
-        glbptr = STARTGLB;
-        while ( glbptr < ENDGLB ) {
-                glbptr->name[0] = 0 ;
-                ++glbptr ;
-        }
+    glbcnt = 0 ;                    /* clear global symbols */
+    locptr = STARTLOC ;             /* clear local symbols */
+    wqptr = wqueue ;                /* clear while queue */
+    gltptr=dubptr=0 ;               /* clear literal pools */
+    *litq=0;         /* First entry in literal queue is zero */
+    litptr=1;       /* So miniprintf search works */
 
-        glbcnt = 0 ;                    /* clear global symbols */
-        locptr = STARTLOC ;             /* clear local symbols */
-        wqptr = wqueue ;                /* clear while queue */
-        gltptr=dubptr=0 ;               /* clear literal pools */
-        *litq=0;         /* First entry in literal queue is zero */
-        litptr=1;       /* So miniprintf search works */
+    Zsp =                   /* stack ptr (relative) */
+    errcnt =                /* no errors */
+    errstop =               /* keep going after an error */
+    eof =                   /* not eof yet */
+    swactive =              /* not in switch */
+    skiplevel =             /* #if not encountered */
+    iflevel =               /* #if nesting level = 0 */
+    ncmp =                  /* no open compound states */
+    lastst =                /* not first file to asm */
+    fnstart =               /* current "function" started at line 0 */
+    lineno =                /* no lines read from file */
+    infunc =                /* not in function now */
+                    0 ;             /*  ...all set to zero.... */
 
-        Zsp =                   /* stack ptr (relative) */
-        errcnt =                /* no errors */
-        errstop =               /* keep going after an error */
-        eof =                   /* not eof yet */
-        swactive =              /* not in switch */
-        skiplevel =             /* #if not encountered */
-        iflevel =               /* #if nesting level = 0 */
-        ncmp =                  /* no open compound states */
-        lastst =                /* not first file to asm */
-        fnstart =               /* current "function" started at line 0 */
-        lineno =                /* no lines read from file */
-        infunc =                /* not in function now */
-                        0 ;             /*  ...all set to zero.... */
+    stagenext = NULL_CHAR ; /* direct output mode */
 
-        stagenext = NULL_CHAR ; /* direct output mode */
+    input =                                 /* no input file */
+    inpt2 =                                 /* or include file */
+    saveout =                               /* no diverted output */
+    output = NULL_FD ;              /* no open units */
 
-        input =                                 /* no input file */
-        inpt2 =                                 /* or include file */
-        saveout =                               /* no diverted output */
-        output = NULL_FD ;              /* no open units */
-
-        currfn = NULL_SYM ;             /* no function yet */
-        macptr = cmode = 1 ;    /* clear macro pool and enable preprocessing */
-        ncomp=doinline=mathz88 = incfloat= compactcode =0;
-        lpointer=cppcom=0;
-        dosigned=NO;
-        makelib=useshare=makeshare=sharedfile=NO;
-        smartprintf=YES;
-        nxtlab =                        /* start numbers at lowest possible */
-        ctext =                         /* don't include the C text as comments */
-        errstop =                       /* don't stop after errors */
-        verbose = 0;
-        gotocnt=0;
-   defdenums=0;
-   doublestrings = 0;
-   noaltreg = NO;
-   shareoffset=SHAREOFFSET;   /* Offset for shared libs */
-   debuglevel=NO;
+    currfn = NULL_SYM ;             /* no function yet */
+    macptr = cmode = 1 ;    /* clear macro pool and enable preprocessing */
+    ncomp=doinline=mathz88 = incfloat= compactcode =0;
+    lpointer=cppcom=0;
+    dosigned=NO;
+    useshare=makeshare=sharedfile=NO;
+    smartprintf=YES;
+    nxtlab =                        /* start numbers at lowest possible */
+    ctext =                         /* don't include the C text as comments */
+    errstop =                       /* don't stop after errors */
+    verbose = 0;
+    gotocnt=0;
+    defdenums=0;
+    doublestrings = 0;
+    noaltreg = NO;
+    shareoffset=SHAREOFFSET;   /* Offset for shared libs */
+    debuglevel=NO;
     assemtype = ASM_Z80ASM;
-   printflevel=0;
-   indexix=YES;
-   useframe=NO;
+    printflevel=0;
+    indexix=YES;
+    useframe=NO;
 
-        /*
-         *      compiler body
-         */
-        setup_sym() ;   /* define some symbols */
-/* Parse the command line options */
-        atexit(MemCleanup);     /* To free everything */
-        clear();
-        filenum=0;
-        for (n=1;n<argc;n++) {
-                if (argv[n][0]=='-') ParseArgs(1+argv[n]);
-                else {filenum=n; break;}
-        }
-        clear();
+    setup_sym() ;   /* define some symbols */
+    /* Parse the command line options */
+    atexit(MemCleanup);     /* To free everything */
+    clear();
+    filenum=0;
+    for (n=1;n<argc;n++) {
+        if (argv[n][0]=='-') ParseArgs(1+argv[n]);
+        else {filenum=n; break;}
+    }
+    clear();
 
-        if (filenum == 0)
-        {
-                info();
-                exit(1);
-        }
-        litlab=getlabel();              /* Get labels for function lits*/
-        dublab=getlabel();              /* and fn doubles*/
-        openout();              /* get the output file */
-        openin();               /* and initial input file */
-        header();               /* intro code */
-        parse();                /* process ALL input */
-        /* dump literal queues, with label */
-        /* litq starts from 1, so literp has to be -1 */
-        dumplits(0, YES,litptr-1,litlab,litq+1) ;
-        dumplits(1, YES,dubptr,dublab,dubq) ;
-        dumpvars();
-        dumpfns();
-        trailer();              /* follow-up code */
-        closeout();
-        errsummary();   /* summarize errors */
-        if (errcnt) exit(1);
-        exit(0);
+    if (filenum == 0) {
+        info();
+        exit(1);
+    }
+    litlab=getlabel();              /* Get labels for function lits*/
+    dublab=getlabel();              /* and fn doubles*/
+    openout();              /* get the output file */
+    openin();               /* and initial input file */
+    header();               /* intro code */
+    parse();                /* process ALL input */
+    /* dump literal queues, with label */
+    /* litq starts from 1, so literp has to be -1 */
+    dumplits(0, YES,litptr-1,litlab,litq+1) ;
+    dumplits(1, YES,dubptr,dublab,dubq) ;
+    dumpvars();
+    dumpfns();
+    trailer();              /* follow-up code */
+    closeout();
+    errsummary();   /* summarize errors */
+    if (errcnt) exit(1);
+    exit(0);
 }
 
 
 /*
  *      Abort compilation
  */
-
-#ifndef SMALL_C
-void 
-#endif
-
-ccabort()
+void ccabort()
 {
-        if ( inpt2 != NULL_FD )
-                endinclude();
-        if ( input != NULL_FD )
-                fclose(input);
-        closeout();
-        fprintf(stderr,"Compilation aborted\n");
-        exit(1);
+    if ( inpt2 != NULL_FD )
+            endinclude();
+    if ( input != NULL_FD )
+            fclose(input);
+    closeout();
+    fprintf(stderr,"Compilation aborted\n");
+    exit(1);
 }
 
 /*
@@ -217,31 +200,33 @@ ccabort()
  * defines, includes, and function
  * definitions are legal...
  */
-
-
 void parse()
 {
-        while ( eof == 0 ) {            /* do until no more input */
-                if ( amatch("extern") )
-                        dodeclare(EXTERNAL, NULL_TAG, 0) ;
-                else if (amatch("static"))
-                        dodeclare(LSTATIC, NULL_TAG, 0) ;
-                else if (amatch("typedef"))
-                        dodeclare(TYPDEF,NULL_TAG,0) ;
-                else if (dodeclare(STATIK, NULL_TAG, 0) ) ;
-                else if ( ch() == '#' ) {
-                        if (match("#asm")) doasm();
-                        else if (match("#include")) doinclude() ;
-                        else if (match("#define") ) addmac() ;
-                        else 
-                        {
-                                clear();
-                                blanks();
-                        }
-                }
-                else newfunc();
-                blanks();       /* force eof if pending */
+    while ( eof == 0 ) {            /* do until no more input */
+        if ( amatch("extern") ) {
+                dodeclare(EXTERNAL, NULL_TAG, 0) ;
+        } else if (amatch("static")) {
+                dodeclare(LSTATIC, NULL_TAG, 0) ;
+        } else if (amatch("typedef")) {
+                dodeclare(TYPDEF,NULL_TAG,0) ;
+        } else if (dodeclare(STATIK, NULL_TAG, 0) ) {
+            ;
+        } else if ( ch() == '#' ) {
+            if (match("#asm")) {
+                doasm();
+            } else if (match("#include")) {
+                doinclude() ;
+            } else if (match("#define") ) {
+                addmac() ;
+            } else {
+                clear();
+                blanks();
+            }
+        } else {
+            newfunc();
         }
+        blanks();       /* force eof if pending */
+    }
 }
 
 
@@ -256,15 +241,17 @@ void
 
 errsummary()
 {
-        /* see if anything left hanging... */
-        if (ncmp) { error(E_BRACKET); nl(); }
-                /* open compound statement ... */
-        if (verbose){
-                printf("Symbol table usage: %d\n",glbcnt);
-                printf("Structures defined: %ld\n",(long)(tagptr-tagtab));
-                printf("Members defined:    %ld\n",(long)(membptr-membtab));
-                printf("There %s %d %s in compilation.\n", (errcnt==1 ? "was" : "were"),errcnt, (errcnt==1 ? "error" : "errors") );
-        }
+    /* see if anything left hanging... */
+    if (ncmp) { 
+        error(E_BRACKET); 
+        nl(); 
+    }
+    if (verbose) {
+        printf("Symbol table usage: %d\n",glbcnt);
+        printf("Structures defined: %ld\n",(long)(tagptr-tagtab));
+        printf("Members defined:    %ld\n",(long)(membptr-membtab));
+        printf("There %s %d %s in compilation.\n", (errcnt==1 ? "was" : "were"),errcnt, (errcnt==1 ? "error" : "errors") );
+    }
 }
 
 
@@ -280,17 +267,17 @@ char *
 
 nextarg(int n, char *s, int size)
 {
-        char *str;
-        char *str2;
-        int i;
+    char *str;
+    char *str2;
+    int i;
 
-        if ( n < 1 || n >= gargc ) return NULL_CHAR ;
-        i = 0 ;
-        str = str2 =gargv[n] ;
-        while ( ++i < size && (*s++ = *str++) )
-                ;
-        if (*str2 == '\0' ) return NULL_CHAR;
-        return s ;
+    if ( n < 1 || n >= gargc ) return NULL_CHAR ;
+    i = 0 ;
+    str = str2 =gargv[n] ;
+    while ( ++i < size && (*s++ = *str++) )
+            ;
+    if (*str2 == '\0' ) return NULL_CHAR;
+    return s ;
 }
 
 
@@ -304,17 +291,17 @@ void
 
 setup_sym()
 {
-        defmac("Z80") ;
-        defmac("SMALL_C") ;
-        /* dummy symbols for pointers to char, int, double */
-        /* note that the symbol names are not valid C variables */
-        dummy_sym[0] = 0 ;
-        dummy_sym[CCHAR] = addglb("0ch", POINTER, CCHAR, 0, STATIK, 0,0) ;
-        dummy_sym[CINT] = addglb("0int", POINTER, CINT, 0, STATIK, 0,0) ;
-        dummy_sym[DOUBLE] = addglb("0dbl", POINTER,DOUBLE,0,STATIK, 0,0) ;
-        dummy_sym[LONG] = addglb("0lng", POINTER, LONG, 0, STATIK, 0,0) ;
-        dummy_sym[CPTR] = addglb("0cpt", POINTER, CPTR, 0, STATIK, 0,0) ;
-        dummy_sym[VOID] = addglb("0vd", POINTER, VOID, 0 , STATIK, 0,0) ;
+    defmac("Z80") ;
+    defmac("SMALL_C") ;
+    /* dummy symbols for pointers to char, int, double */
+    /* note that the symbol names are not valid C variables */
+    dummy_sym[0] = 0 ;
+    dummy_sym[CCHAR] = addglb("0ch", POINTER, CCHAR, 0, STATIK, 0,0) ;
+    dummy_sym[CINT] = addglb("0int", POINTER, CINT, 0, STATIK, 0,0) ;
+    dummy_sym[DOUBLE] = addglb("0dbl", POINTER,DOUBLE,0,STATIK, 0,0) ;
+    dummy_sym[LONG] = addglb("0lng", POINTER, LONG, 0, STATIK, 0,0) ;
+    dummy_sym[CPTR] = addglb("0cpt", POINTER, CPTR, 0, STATIK, 0,0) ;
+    dummy_sym[VOID] = addglb("0vd", POINTER, VOID, 0 , STATIK, 0,0) ;
 }
 
 #ifndef SMALL_C
@@ -323,10 +310,10 @@ void
 
 info()
 {
-        fputs(titlec,stderr);
-        fputs(Version,stderr);
-        fputs("\n(C) 1980-2004 Cain, Van Zandt, Hendrix, Yorston, Morris\n",stderr);
-        fprintf(stderr,"Usage: %s [flags] [file]\n",gargv[0]);
+    fputs(titlec,stderr);
+    fputs(Version,stderr);
+    fputs("\n(C) 1980-2004 Cain, Van Zandt, Hendrix, Yorston, Morris\n",stderr);
+    fprintf(stderr,"Usage: %s [flags] [file]\n",gargv[0]);
         
 }
 
@@ -343,42 +330,9 @@ info()
  */
 
 
-/*
- *      Write out the header file! - djm
- */
-
-#ifdef HEADFILE
-void dohdrfi()
-{
-        char file2[FILENAME_LEN+1];
-        char    *file3;
-        if (verbose)
-                fputs("Writing header file\n",stderr);
-        clear();
-        strcpy(file2,Filenorig);
-        changesuffix(file2,".hdr");
-        file3=file2;
-        while (*file3=='"') file3++;
-        if ((output=fopen(file3,"w")) != NULL )
-        {
-                dumpfns();
-                fclose(output);
-                output=0;
-        }
-        else {
-                fprintf(stderr,"Cannot open output file: %s\n",file3);
-        }
-}
-#endif
 
 
-/* djm write out the header file */
-
-#ifndef SMALL_C
-void 
-#endif
-
-dumpfns()
+void dumpfns()
 {
     int ident,type,storage;
     SYMBOL *ptr;
@@ -389,7 +343,7 @@ dumpfns()
     if (!glbcnt)
         return;
 
-/* Start at the start! */
+    /* Start at the start! */
     glbptr=STARTGLB;
 
     ptr=STARTGLB;
@@ -400,11 +354,7 @@ dumpfns()
             type =ptr->type;
             storage=ptr->storage;
             if ( ident == FUNCTION && ptr->size != 0 ) {
-                outstr("\tdefc\t");
-                outname(ptr->name,1);
-                ot("=\t");
-                outdec(ptr->size);
-                nl();
+                outfmt("\tdefc\t_%s=\t%d\n",ptr->name, ptr->size);
             } else {
                 if (ident == FUNCTION && storage!=LSTATIC ) {
                     if (storage==EXTERNAL) {
@@ -418,9 +368,14 @@ dumpfns()
                             GlobalPrefix(XREF);
                         }
                     } else {
-                        if (ptr->offset.i == FUNCTION || ptr->storage==DECLEXTN )
+                        if (ptr->offset.i == FUNCTION || ptr->storage==DECLEXTN ) {
+                            if ( ptr->flags & LIBRARY ) {
+                                GlobalPrefix(XDEF);
+                                outname(ptr->name,1);
+                                nl();
+                            }
                             GlobalPrefix(XDEF);
-                        else
+                         } else
                             GlobalPrefix(XREF);
                     }
                     outname(ptr->name,dopref(ptr));
@@ -448,20 +403,6 @@ dumpfns()
         }
         ++ptr;
     }
-/*
- *      If a module requires floating point then previously we wrote
- *      it out to the header file. However, if the module didn't
- *      contain main() then important routines wouldn't be included.
- *      So, if main didn't need float, but ours did we couldn't
- *      compile correctly.
- *
- *      The solution was to separate startup code, and then define
- *      a new file to which all the math type headers would be
- *      appended.
- *
- *      This file is zcc_opt.def in the source code directory.
- *
- */
 
     if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
         error(E_ZCCOPT);
@@ -482,14 +423,14 @@ dumpfns()
         fprintf(fp,"\tDEFINE NEED_farpointer\n");
         fprintf(fp,"ENDIF\n\n");
     }
-/*
- * Now, we're gonna use #pragma define _FAR_PTR to indicate whether we need
- * far stuff - this has to go with a -D_FAR_PTR from the compile line
- * as well for everything to work just right, so if we find this then
- * we can indicate to the startup code via zcc_opt.def what the scam
- * is - this could be used for eg. to allocate space for file structures
- * etc
- */
+    /*
+     * Now, we're gonna use #pragma define _FAR_PTR to indicate whether we need
+     * far stuff - this has to go with a -D_FAR_PTR from the compile line
+     * as well for everything to work just right, so if we find this then
+     * we can indicate to the startup code via zcc_opt.def what the scam
+     * is - this could be used for eg. to allocate space for file structures
+     * etc
+     */
     if ( (ptr=findglb("_FAR_PTR")) && ptr->ident==MACRO ) {
         fprintf(fp,"\nIF !NEED_farstartup\n");
         fprintf(fp,"\tDEFINE NEED_farstartup\n");
@@ -524,16 +465,16 @@ dumpfns()
 
 void WriteDefined(char *sname, int value)
 {
-        FILE *fp;
+    FILE *fp;
 
-        if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
-                error(E_ZCCOPT);
-        }
-        fprintf(fp,"\nIF !DEFINED_%s\n",sname);
-        fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
-		fprintf(fp,"\tdefc %s = %d\n",sname,value);
-        fprintf(fp,"ENDIF\n\n");
-        fclose(fp);
+    if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+            error(E_ZCCOPT);
+    }
+    fprintf(fp,"\nIF !DEFINED_%s\n",sname);
+    fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
+    fprintf(fp,"\tdefc %s = %d\n",sname,value);
+    fprintf(fp,"ENDIF\n\n");
+    fclose(fp);
 }
 
 
@@ -554,15 +495,12 @@ void dumpvars()
     output_section("bss_compiler");  // output_section("bss");
 
     ptr=STARTGLB;
-    while (ptr < ENDGLB)
-    {
-        if (ptr->name[0] != 0 && ptr->name[0] != '0' )
-        {
+    while (ptr < ENDGLB) {
+        if (ptr->name[0] != 0 && ptr->name[0] != '0' ) {
             ident=ptr->ident;
             type =ptr->type;
             storage=ptr->storage;
-            if (ident !=ENUM && type !=ENUM && ident != MACRO && ident != FUNCTION && storage != EXTERNAL && storage != DECLEXTN && storage != EXTERNP && storage != LSTKEXT && storage!=TYPDEF )
-            {
+            if (ident !=ENUM && type !=ENUM && ident != MACRO && ident != FUNCTION && storage != EXTERNAL && storage != DECLEXTN && storage != EXTERNP && storage != LSTKEXT && storage!=TYPDEF ) {
                 prefix();
                 outname(ptr->name,1);
                 col();
@@ -646,12 +584,11 @@ void dumplits(
  */
 int dumpzero(int size, int count)
 {
-        if (count <= 0) return (0);
-        defstorage() ;
-        outdec(size*count) ;
-/*        outstr("dumpzero"); */
-        nl();
-        return(size*count);
+    if (count <= 0) return (0);
+    defstorage() ;
+    outdec(size*count) ;
+    nl();
+    return(size*count);
 }
 
 
@@ -669,30 +606,27 @@ int dumpzero(int size, int count)
  */
 void openout()
 {
-        char filen2[FILENAME_LEN+1];
-        FILE *fp;
-        clear() ;               /* erase line */
-        output = 0 ;    /* start with none */
-        if ( nextarg(filenum, filen2, FILENAME_LEN) == NULL_CHAR ) return ;
-/* For weird reasons, output is opened before input, so have to check
- * input exists beforehand..
- */
-        if ( ( fp=fopen(filen2,"r")) == NULL )
-                {
-                fprintf(stderr,"Cannot open source file: %s\n",filen2);
-                exit(1);
-                }
-        fclose(fp);     /* Close it again... */
+    char filen2[FILENAME_LEN+1];
+    FILE *fp;
+    clear() ;               /* erase line */
+    output = 0 ;    /* start with none */
+    if ( nextarg(filenum, filen2, FILENAME_LEN) == NULL_CHAR ) return ;
+    if ( ( fp=fopen(filen2,"r")) == NULL )
+            {
+            fprintf(stderr,"Cannot open source file: %s\n",filen2);
+            exit(1);
+            }
+    fclose(fp);     /* Close it again... */
 
-        /* copy file name to string */
-        strcpy(Filename,filen2) ;
-        strcpy(Filenorig,filen2);
-        changesuffix(filen2,".asm"); /* Change appendix to .asm */
-        if ( (output=fopen(filen2, "w")) == NULL && (!eof) ) {
-                fprintf(stderr,"Cannot open output file: %s\n",line);
-                exit(1);
-        }
-        clear() ;                       /* erase line */
+    /* copy file name to string */
+    strcpy(Filename,filen2) ;
+    strcpy(Filenorig,filen2);
+    changesuffix(filen2,".asm"); /* Change appendix to .asm */
+    if ( (output=fopen(filen2, "w")) == NULL && (!eof) ) {
+            fprintf(stderr,"Cannot open output file: %s\n",line);
+            exit(1);
+    }
+    clear() ;                       /* erase line */
 }
 
 /*
@@ -700,28 +634,26 @@ void openout()
  */
 void openin()
 {
-        input = 0 ;                             /* none to start with */
-        while ( input == 0 ) {  /* any above 1 allowed */
-                clear() ;                       /* clear line */
-                if ( eof ) break ;      /* if user said none */
-/* Deleted hopefully irrelevant code */
-                if (Filename[0] == '-')
-                {
-                        if (ncomp==0)
-                                info();
-                        exit(1);
-                }
-                if ( (input=fopen(Filename,"r")) == NULL ) {
-                        fprintf(stderr,"Can't open: %s\n",Filename);                         exit(1);
-                }
-                else {
-                        if (verbose)
-                           fprintf(stderr,"Compiling: %s\n",Filename);
-                        ncomp++;
-                        newfile() ;
-                }
+    input = 0 ;                             /* none to start with */
+    while ( input == 0 ) {  /* any above 1 allowed */
+        clear() ;                       /* clear line */
+        if ( eof ) break ;      /* if user said none */
+        /* Deleted hopefully irrelevant code */
+        if (Filename[0] == '-') {
+            if (ncomp==0)
+                    info();
+            exit(1);
         }
-        clear();                /* erase line */
+        if ( (input=fopen(Filename,"r")) == NULL ) {
+                fprintf(stderr,"Can't open: %s\n",Filename);                         exit(1);
+        } else {
+            if (verbose)
+               fprintf(stderr,"Compiling: %s\n",Filename);
+            ncomp++;
+            newfile() ;
+        }
+    }
+    clear();                /* erase line */
 }
 
 /*
@@ -729,10 +661,10 @@ void openin()
  */
 void newfile()
 {
-        lineno  =                               /* no lines read */
-        fnstart =                               /* no fn. start yet. */
-        infunc  = 0 ;                   /* therefore not in fn. */
-        currfn  = NULL ;                /* no fn. yet */
+    lineno  =                               /* no lines read */
+    fnstart =                               /* no fn. start yet. */
+    infunc  = 0 ;                   /* therefore not in fn. */
+    currfn  = NULL ;                /* no fn. yet */
 }
 
 /*
@@ -740,42 +672,40 @@ void newfile()
  */
 void doinclude()
 {
-        char name[FILENAME_LEN+1], *cp ;
+    char name[FILENAME_LEN+1], *cp ;
 
-        blanks();       /* skip over to name */
-        if (verbose)
-        {
+    blanks();       /* skip over to name */
+    if (verbose) {
         toconsole();
         outstr(line); nl();
         tofile();
-        }
+    }
 
-        if ( inpt2 )
-                error(E_NEST);
-        else {
-                /* ignore quotes or angle brackets round file name */
-                strcpy(name, line+lptr) ;
-                cp = name ;
-                if ( *cp == '"' || *cp == '<' ) {
-                        name[strlen(name)-1] = '\0' ;
-                        ++cp ;
-                }
-                if ( (inpt2=fopen(cp, "r") ) == NULL ) {
-                        error(E_INCLUDE) ;
-                        closeout();
-                        exit(1);
-                }
-                else {
-                        saveline = lineno ;
-                        savecurr = currfn ;
-                        saveinfn = infunc ;
-                        savestart = fnstart ;
-                        newfile() ;
-                }
+    if ( inpt2 ) {
+        error(E_NEST);
+    } else {
+        /* ignore quotes or angle brackets round file name */
+        strcpy(name, line+lptr) ;
+        cp = name ;
+        if ( *cp == '"' || *cp == '<' ) {
+            name[strlen(name)-1] = '\0' ;
+            ++cp ;
         }
-        clear();                /* clear rest of line */
-                                /* so next read will come from */
-                                /* new file (if open) */
+        if ( (inpt2=fopen(cp, "r") ) == NULL ) {
+            error(E_INCLUDE) ;
+            closeout();
+            exit(1);
+        } else {
+            saveline = lineno ;
+            savecurr = currfn ;
+            saveinfn = infunc ;
+            savestart = fnstart ;
+            newfile() ;
+        }
+    }
+    clear();                /* clear rest of line */
+                            /* so next read will come from */
+                            /* new file (if open) */
 }
 
 /*
@@ -783,17 +713,17 @@ void doinclude()
  */
 void endinclude()
 {
-        if (verbose) {
-                toconsole();
-                outstr("#end include\n");
-                tofile();
-        }
+    if (verbose) {
+        toconsole();
+        outstr("#end include\n");
+        tofile();
+    }
 
-        inpt2  = 0 ;
-        lineno  = saveline ;
-        currfn  = savecurr ;
-        infunc  = saveinfn ;
-        fnstart = savestart ;
+    inpt2  = 0 ;
+    lineno  = saveline ;
+    currfn  = savecurr ;
+    infunc  = saveinfn ;
+    fnstart = savestart ;
 }
 
 /*
@@ -801,23 +731,13 @@ void endinclude()
  */
 void closeout()
 {
-        tofile() ;      /* if diverted, return to file */
-        if ( output ) {
-                /* if open, close it */
-                fclose(output) ;
-        }
-        output = 0 ;            /* mark as closed */
+    tofile() ;      /* if diverted, return to file */
+    if ( output ) {
+        /* if open, close it */
+        fclose(output) ;
+    }
+    output = 0 ;            /* mark as closed */
 }
-
-/*      
- *      Deals With parsing of command line options
- *
- *      djm 3/12/98
- *
- */
-
-
-
 
 
 
@@ -836,7 +756,6 @@ struct args myargs[]= {
     {"do-inline",NO,SetDoInline, "Inline certain common functions" },
     {"stop-error",NO,SetStopError, "Stop when an error is received" },
     {"far-pointers",NO,SetFarPtrs, NULL},   /* Obsolete..but maybe useful*/
-    {"make-lib",NO,SetNoHeader, "Turn on Library code mode" },
     {"make-shared",NO,SetMakeShared, "This Library file is shared" },
     {"shared-file",NO,SetSharedFile, "All functions within this file are shared" },
     {"use-shared",NO,SetUseShared, "Used shared library functions" },
@@ -920,11 +839,11 @@ void SetASXX(char *arg)
 
 void SetDebug(char *arg)
 {
-        int    num;
-        num=0;
-        sscanf(arg+6,"%d",&num);
-        if    (num!=0) 
-                debuglevel=num;
+    int    num;
+    num=0;
+    sscanf(arg+6,"%d",&num);
+    if    (num!=0) 
+        debuglevel=num;
 }
 
 
@@ -1049,12 +968,6 @@ void SetSharedFile(char *arg)
 void SetMakeShared(char *arg)
 {
         makeshare=YES;
-        makelib=YES;
-}
-
-void SetNoHeader(char *arg)
-{
-        makelib=YES;
 }
 
 void SetCompactCode(char *arg)
@@ -1165,18 +1078,18 @@ void ParseArgs(char *arg)
 
 void MemCleanup()
 {
-        if (litq) { free(litq); litq=0; }
-        if (dubq) { free(dubq); dubq=0;}
-        if (tempq) { free(tempq); tempq=0;}
-        if (glbq) { free(glbq); glbq=0; }
-        if (symtab) { free(symtab); symtab=0; }
-        if (loctab) { free(loctab); loctab=0; }
-        if (wqueue) { free(wqueue); wqueue=0; }
-        if (tagtab) { free(tagtab); tagtab=0; }
-        if (membtab) { free(membtab); membtab=0; }
-        if (swnext) { free(swnext); swnext=0; }
-        if (stage) { free(stage); stage=0; }
-        if (gotoq) { free(gotoq); gotoq=0; }
+    if (litq) { free(litq); litq=0; }
+    if (dubq) { free(dubq); dubq=0;}
+    if (tempq) { free(tempq); tempq=0;}
+    if (glbq) { free(glbq); glbq=0; }
+    if (symtab) { free(symtab); symtab=0; }
+    if (loctab) { free(loctab); loctab=0; }
+    if (wqueue) { free(wqueue); wqueue=0; }
+    if (tagtab) { free(tagtab); tagtab=0; }
+    if (membtab) { free(membtab); membtab=0; }
+    if (swnext) { free(swnext); swnext=0; }
+    if (stage) { free(stage); stage=0; }
+    if (gotoq) { free(gotoq); gotoq=0; }
 }
 
 /*

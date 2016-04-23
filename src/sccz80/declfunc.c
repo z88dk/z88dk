@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.18 2016-03-06 20:33:26 dom Exp $
+ *      $Id: declfunc.c,v 1.19 2016-04-23 18:15:58 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -188,15 +188,7 @@ AddFuncCode(char *n, char type, char ident, char sign,char zfar, int storage, in
             /* we have what was earlier assumed to be a function */
 
             if (currfn->storage == EXTERNAL && currfn->flags&LIBRARY ) {
-                /* Overwriting a lib function, is that what you wanted?!? Handy for
-                 * compiling the library though!! Change type to local static to prevent
-                 * being dumped in the scope list..
-                 */
-				if (makelib || storage == LSTATIC ) {
-                    currfn->storage=LSTATIC;
-				} else {
-					currfn->storage=LIBOVER;
-				} 
+                /* Overwriting a library function */
                 currfn->offset.i=FUNCTION;
             } else {
                 /*
