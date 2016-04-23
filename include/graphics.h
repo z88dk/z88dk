@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.15 2016-03-08 21:26:35 dom Exp $
+ *	$Id: graphics.h,v 1.16 2016-04-23 08:00:38 dom Exp $
  */
 
 #ifndef __GFX_H__
@@ -117,6 +117,7 @@ extern void __LIB__ lscroll(int x, int y, int width, int height, int pixels) __S
 extern void __LIB__ rscroll(int x, int y, int width, int height, int pixels) __SMALLCDECL;
 /* Close the map */
 extern void __LIB__ closegfx(struct window *) __SMALLCDECL;
+#endif
 
 /* Colour graphics, only few targets are supported */
 /* ZX Spectrum has its own implementation aside */
@@ -130,7 +131,6 @@ extern void __LIB__ cdraw(int x1, int y1, int x2, int y2, int color) __SMALLCDEC
 extern void __LIB__ ccircle(int x, int y, int radius, int skip, int color) __SMALLCDECL;
 /* Relative draw */
 extern void __LIB__ cdrawr(int px, int py, int color) __SMALLCDECL;
-#endif
 
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.34 2016-03-09 22:36:00 dom Exp $ */
+/* $Id: stdio.h,v 1.35 2016-04-23 08:00:38 dom Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -235,25 +235,17 @@ extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *) __SMALLCDECL;
 extern char __LIB__ *gets(char *s);
 
 
-/*
- * Yes! vfprintf is deliberately without a __LIB__ cos
- * a jp to the real routine is in the startup code
- */
-
-extern int __LIB__ printf(char *,...) __SMALLCDECL;
-extern int __LIB__ fprintf(FILE *,char *,...) __SMALLCDECL;
-extern int __LIB__ sprintf(char *,char *,...) __SMALLCDECL;
-extern int  vfprintf(FILE *,unsigned char *fmt,void *ap) __SMALLCDECL;
-extern int __LIB__ vsprintf(char *str,unsigned char *fmt,void *ap) __SMALLCDECL;
+extern int __LIB__ printf(char *,...);
+extern int __LIB__ fprintf(FILE *,char *,...);
+extern int __LIB__ sprintf(char *,char *,...);
+extern int __LIB__ snprintf(char *,size_t,char *,...);
+extern int __LIB__ vfprintf(FILE *,unsigned char *fmt,void *ap);
+extern int __LIB__ vsnprintf(char *str,size_t,unsigned char *fmt,void *ap);
 
 #define vprintf(ctl,arg) vfprintf(stdout,ctl,arg)
+#define vsprintf(buf,ctl,arg) vsnprintf(buf,65535,ctl,arg)
 
-/* real printf cores */
-
-extern int __LIB__ vfprintf_mini(FILE *, unsigned char *, void *) __SMALLCDECL;
-extern int __LIB__ vfprintf_comp(FILE *, unsigned char *, void *) __SMALLCDECL;
-extern int __LIB__ vfprintf_fp(FILE *, unsigned char *, void *) __SMALLCDECL;
-
+/* Routines used by the old printf - will be removed soon */
 extern void __LIB__ printn(int number, int radix,FILE *file) __SMALLCDECL;
 extern int __LIB__ ltoa_any(long in,unsigned  char *str, int sz, unsigned int radix, int signflag) __SMALLCDECL;
 
@@ -318,7 +310,7 @@ extern int __LIB__ remove(char *name);
 extern int __LIB__ getk();
 #define getkey() fgetc_cons()
 extern void __LIB__ puts_cons(char *message);
-extern void __LIB__ printk(char *fmt,...);
+extern int __LIB__ printk(char *fmt,...);
 
 
 /*

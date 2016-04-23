@@ -5,7 +5,7 @@
  *
  *	djm 9/2/2000
  *
- *	$Id: package.h,v 1.4 2013-08-30 01:16:39 pauloscustodio Exp $
+ *	$Id: package.h,v 1.5 2016-04-23 08:00:38 dom Exp $
  */
 
 #ifdef MAKE_PACKAGE
@@ -40,7 +40,7 @@ typedef struct  {
 	cp	exp_boot	;Fc=0 if so, we want to autoboot
 	ret	z
 #endif
-	ld	a,RC_UNK
+	ld	a,RC_Unk
 	scf
 	ret
 

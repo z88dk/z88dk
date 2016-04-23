@@ -6,7 +6,7 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.18 2014-04-18 07:38:58 stefano Exp $
+ *	$Id: sound.h,v 1.19 2016-04-23 08:00:38 dom Exp $
  */
 
 
@@ -14,27 +14,27 @@
 
 #pragma output NEED1bitsound
 
-extern __LIB__ bit_open();
-extern __LIB__ bit_close();
-extern __LIB__ bit_click();
+extern void  __LIB__ bit_open();
+extern void __LIB__ bit_close();
+extern void __LIB__ bit_click();
 
 /* Sound effects; every library contains 8 different sounds (effect no. 0..7) */
-extern __LIB__ bit_fx(int effect);
-extern __LIB__ bit_fx2(int effect);
-extern __LIB__ bit_fx3(int effect);
-extern __LIB__ bit_fx4(int effect);
+extern void __LIB__ bit_fx(int effect);
+extern void __LIB__ bit_fx2(int effect);
+extern void __LIB__ bit_fx3(int effect);
+extern void __LIB__ bit_fx4(int effect);
 
 /* 1 BIT SYNTH - Polyphony and multitimbric effects */
-extern __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4);
+extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4);
 
 /* "period": the higher value, the lower tone ! */
-extern __LIB__ bit_beep(int duration, int period);
+extern void __LIB__ bit_beep(int duration, int period);
 
 /* Real frequency !  Duration is in ms */
-extern __LIB__ bit_frequency(float duration, float frequency);
+extern void __LIB__ bit_frequency(float duration, float frequency);
 
 /* Play a song (example: "2A--A-B-CDEFGAB5C+") */
-extern __LIB__ bit_play(unsigned char melody[]);
+extern void __LIB__ bit_play(unsigned char melody[]);
 
 
 /* Platform specific parameters (mainly timing stuff) 

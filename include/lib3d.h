@@ -82,13 +82,13 @@ typedef struct {
 
 
 /* protos */
-extern __LIB__ ozrotatepointx(Vector_t *v, int rot);
-extern __LIB__ ozrotatepointy(Vector_t *v, int rot);
-extern __LIB__ ozrotatepointz(Vector_t *v, int rot);
-extern __LIB__ ozplotpointcam(Vector_t *v, Cam_t *c, Point_t *p);
-extern __LIB__ ozplotpoint(Vector_t *v, Point_t *p);
-extern __LIB__ ozcopyvector(Vector_t *dest, Vector_t *src);
-extern __LIB__ oztranslatevector(Vector_t *v, Vector_t *offset);
+extern void __LIB__ ozrotatepointx(Vector_t *v, int rot);
+extern void __LIB__ ozrotatepointy(Vector_t *v, int rot);
+extern void __LIB__ ozrotatepointz(Vector_t *v, int rot);
+extern void __LIB__ ozplotpointcam(Vector_t *v, Cam_t *c, Point_t *p);
+extern void __LIB__ ozplotpoint(Vector_t *v, Point_t *p);
+extern void __LIB__ ozcopyvector(Vector_t *dest, Vector_t *src);
+extern void __LIB__ oztranslatevector(Vector_t *v, Vector_t *offset);
 
 
 /* protos from MSX GFX lib */

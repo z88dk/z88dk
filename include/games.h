@@ -13,19 +13,19 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.22 2015-10-28 07:18:48 stefano Exp $
+ *	$Id: games.h,v 1.23 2016-04-23 08:00:38 dom Exp $
  *
  */
 
 /* save the sprite background in another sprite */
-extern __LIB__ bksave(int x, int y, void *sprite);
-extern __LIB__ __FASTCALL__ bkrestore(void *sprite);
+extern void __LIB__ bksave(int x, int y, void *sprite) __SMALLCDECL;
+extern void __LIB__ __FASTCALL__ bkrestore(void *sprite) __SMALLCFASTCALL;
 
 /* pick up a sprite directly from the screen */
-extern __LIB__ getsprite(int x, int y, void *sprite); // This isn't still finished
+extern void __LIB__ getsprite(int x, int y, void *sprite) __SMALLCDECL; // This isn't still finished
 
 /* draw a sprite of variable size */
-extern __LIB__ putsprite(int ortype, int x, int y, void *sprite);
+extern void __LIB__ putsprite(int ortype, int x, int y, void *sprite) __SMALLCDECL;
 
 #define spr_and  166+47*256 // CPL - AND (HL)
 #define spr_or   182 // OR (HL)
@@ -39,7 +39,7 @@ extern __LIB__ putsprite(int ortype, int x, int y, void *sprite);
 
 
 /* Joystick (or whatever game device) control function */
-extern __LIB__ __FASTCALL__ joystick(int game_device);
+extern unsigned int __LIB__ __FASTCALL__ joystick(int game_device);
 
 #define MOVE_RIGHT 1
 #define MOVE_LEFT  2

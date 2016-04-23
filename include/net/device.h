@@ -3,7 +3,7 @@
  *
  *	djm 25/1/2000
  *
- *	$Id: device.h,v 1.8 2010-09-19 00:24:08 dom Exp $
+ *	$Id: device.h,v 1.9 2016-04-23 08:00:38 dom Exp $
  */
 
 #ifndef __NET_DEVICE_H__
@@ -29,7 +29,7 @@ struct pktdrive {
         int     (*readfn)();	/* Read packet from dev */
 	void	(*onlinefn)();  /* Turn device online */
 	void	(*offlinefn)();	/* Turn device offline (supply 1 for hangup, 0 for not hangup */
-	void	(*statusfn)();
+	int     (*statusfn)();
 };
 #else
 struct pktdrive {
