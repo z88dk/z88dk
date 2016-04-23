@@ -24,7 +24,7 @@ unsigned char str[] ;
 int sz ;
 {
         if ( sz > 0 )
-                str[--sz] = NULL ;
+                str[--sz] = 0;
         else if ( sz < 0 )
                         sz = -sz ;
                 else
