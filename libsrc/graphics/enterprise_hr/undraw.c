@@ -5,14 +5,14 @@
  *
  *	Stefano Bodrato - March 2011
  *
- *	$Id: undraw.c,v 1.1 2011-04-01 06:50:45 stefano Exp $
+ *	$Id: undraw.c,v 1.2 2016-04-23 08:30:28 dom Exp $
  */
 
 #include <enterprise.h>
 #include <graphics.h>
 
 
-int undraw(int x1,int y1,int x2,int y2)
+void undraw(int x1,int y1,int x2,int y2)
 {
 	esccmd_cmd='I';	// INK colour
 	esccmd_x=0;

@@ -5,14 +5,14 @@
  *
  *	Stefano Bodrato - March 2011
  *
- *	$Id: drawto.c,v 1.1 2011-04-01 06:50:45 stefano Exp $
+ *	$Id: drawto.c,v 1.2 2016-04-23 08:30:28 dom Exp $
  */
 
 #include <enterprise.h>
 #include <graphics.h>
 
 
-int drawto(int x,int y)
+void drawto(int x,int y)
 {
 	esccmd_cmd='I';	// INK colour
 	esccmd_x=1;

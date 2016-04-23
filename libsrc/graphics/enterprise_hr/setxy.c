@@ -5,14 +5,14 @@
  *
  *	Stefano Bodrato - March 2011
  *
- *	$Id: setxy.c,v 1.1 2011-04-01 06:50:45 stefano Exp $
+ *	$Id: setxy.c,v 1.2 2016-04-23 08:30:28 dom Exp $
  */
 
 #include <enterprise.h>
 #include <graphics.h>
 
 
-int setxy(int x, int y)
+void setxy(int x, int y)
 {
 	esccmd_cmd='s'; // set beam off
 	exos_write_block(DEFAULT_VIDEO, 2, esccmd);
