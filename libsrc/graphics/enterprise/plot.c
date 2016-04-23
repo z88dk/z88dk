@@ -5,14 +5,14 @@
  *
  *	Stefano Bodrato - March 2011
  *
- *	$Id: plot.c,v 1.1 2011-04-01 06:50:45 stefano Exp $
+ *	$Id: plot.c,v 1.2 2016-04-23 08:20:39 dom Exp $
  */
 
 #include <enterprise.h>
 #include <graphics.h>
 
 
-int plot(int x, int y)
+void plot(int x, int y)
 {
 	esccmd_cmd='I';	// INK colour
 	esccmd_x=1;

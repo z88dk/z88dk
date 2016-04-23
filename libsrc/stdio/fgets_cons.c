@@ -8,7 +8,7 @@
  *	which takes a length argument..
  *
  * --------
- * $Id: fgets_cons.c,v 1.9 2015-12-12 03:13:11 aralbrec Exp $
+ * $Id: fgets_cons.c,v 1.10 2016-04-23 08:21:02 dom Exp $
  */
 
 #include <stdio.h>
@@ -16,7 +16,7 @@
 
 extern unsigned char _cons_state;
 
-int fgets_cons(unsigned char *str, int max)
+char *fgets_cons(unsigned char *str, int max)
 {   
    unsigned char c;
    int ptr;

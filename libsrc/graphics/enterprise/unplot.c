@@ -5,14 +5,14 @@
  *
  *	Stefano Bodrato - March 2011
  *
- *	$Id: unplot.c,v 1.1 2011-04-01 06:50:45 stefano Exp $
+ *	$Id: unplot.c,v 1.2 2016-04-23 08:20:39 dom Exp $
  */
 
 #include <enterprise.h>
 #include <graphics.h>
 
 
-int unplot(int x, int y)
+void unplot(int x, int y)
 {
 	esccmd_cmd='s'; // set beam off
 	exos_write_block(DEFAULT_VIDEO, 2, esccmd);

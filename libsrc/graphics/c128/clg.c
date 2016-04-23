@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: clg.c,v 1.1 2008-07-17 15:39:56 stefano Exp $
+$Id: clg.c,v 1.2 2016-04-23 08:20:39 dom Exp $
 
 */
 
@@ -15,7 +15,7 @@ extern ushort    vdcAttrMem;
 
 /* Clear Graphics */
 
-int clg()
+void clg()
 {
   //vdcBitMapMemSize = 16000;
   mapvdc();

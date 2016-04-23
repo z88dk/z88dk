@@ -5,14 +5,14 @@
  *
  *	Stefano Bodrato - March 2011
  *
- *	$Id: draw.c,v 1.1 2011-04-01 06:50:45 stefano Exp $
+ *	$Id: draw.c,v 1.2 2016-04-23 08:20:39 dom Exp $
  */
 
 #include <enterprise.h>
 #include <graphics.h>
 
 
-int draw(int x1,int y1,int x2,int y2)
+void draw(int x1,int y1,int x2,int y2)
 {
 	esccmd_cmd='I';	// INK colour
 	esccmd_x=1;
