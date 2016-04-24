@@ -3,19 +3,14 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.32 2016-04-04 17:06:31 dom Exp $
+ * $Id: zcc.h,v 1.33 2016-04-24 08:14:27 dom Exp $
  */
 
-/* Very contrived, if not a Windows target then include the config file */
-#if !defined(__MSDOS__) && !defined(__TURBOC__)
-#ifndef _WIN32
 #include "../config.h"
-#endif
-#endif
 
 /* Some machine specific definitions (paths etc!) */
 
-char *version = "v3.00 (C) 1998-2004 D.J.Morris\n";
+char *version = "v" Z88DK_VERSION " (C) 1998-2016 D.J.Morris\n";
 
 
 

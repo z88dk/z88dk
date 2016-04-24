@@ -3,10 +3,11 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.35 2016-04-23 18:15:58 dom Exp $
+ *      $Id: main.c,v 1.36 2016-04-24 08:14:27 dom Exp $
  */
 
 #include "ccdefs.h"
+#include "../config.h"
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
 extern unsigned _stklen=8192U; /* Default stack size 4096 bytes is too small. */
@@ -312,7 +313,7 @@ info()
 {
     fputs(titlec,stderr);
     fputs(Version,stderr);
-    fputs("\n(C) 1980-2004 Cain, Van Zandt, Hendrix, Yorston, Morris\n",stderr);
+    fputs("\n(C) 1980-2016 Cain, Van Zandt, Hendrix, Yorston, Morris\n",stderr);
     fprintf(stderr,"Usage: %s [flags] [file]\n",gargv[0]);
         
 }
