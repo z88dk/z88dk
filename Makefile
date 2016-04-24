@@ -2,13 +2,14 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.47 2015-02-05 16:07:08 dom Exp $
+#	$Id: Makefile,v 1.48 2016-04-24 08:13:44 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
 
 prefix = /usr/local
 prefix_share = $(prefix)/share
+version := $(shell date +%Y%m%d)
 
 # The default machine, the lib/config/DEFAULT.cfg file is copied to zcc.cfg
 DEFAULT = z88
@@ -20,6 +21,7 @@ all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg co
 setup:
 	echo '#define PREFIX "${prefix}$"/lib/z88dk"' > src/config.h
 	echo '#define UNIX 1' >> src/config.h
+	echo '#define Z88DK_VERSION "${version}"' >> src/config.h
 
 appmake:
 	$(MAKE) -C src/appmake
