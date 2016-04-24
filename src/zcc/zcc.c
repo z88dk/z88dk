@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.119 2016-04-23 18:16:20 dom Exp $
+ *      $Id: zcc.c,v 1.120 2016-04-24 07:26:50 dom Exp $
  */
 
 
@@ -101,8 +101,6 @@ static int             zcc_asprintf(char **s, const char *fmt, ...);
 static int             usetemp = 1;
 static int             preserve = 0;    /* don't destroy zcc_opt */
 static int             createapp = 0;    /* Go the next stage and create the app */
-static int             lateassemble = 0;
-static int             defer_assembly = 0;
 static int             z80verbose = 0;
 static int             cleanup = 1;
 static int             assembleonly = 0;
@@ -324,7 +322,6 @@ static arg_t     myargs[] = {
     {"cleanup",  AF_BOOL_TRUE, SetBoolean, &cleanup, NULL,    "(default) Cleanup temporary files"},
     {"no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup, NULL, "Don't cleanup temporary files"},
     {"preserve", AF_BOOL_TRUE, SetBoolean, &preserve, NULL, "Don't remove zcc_opt.def at start of run"},
-    {"defer-assembly", AF_BOOL_TRUE, SetBoolean, &defer_assembly, NULL, "Defer assembly until link time" },
     {"create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file"},
     {"usetemp", AF_BOOL_TRUE, SetBoolean, &usetemp, NULL, "(default) Use the temporary directory for intermediate files"},
     {"notemp", AF_BOOL_FALSE, SetBoolean, &usetemp, NULL, "Don't use the temporary directory for intermediate files"},
@@ -504,7 +501,7 @@ int linkthem(char *linker)
             (c_nostdlib == 0) ? c_linkopts : " -a -m -Mo ", 
             linker_output_separate_arg ? " " : "", 
             outputfile,
-            lateassemble ? asmline : "",
+            "",
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
             (relocate && z80verbose && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
             linkargs,
@@ -522,7 +519,7 @@ int linkthem(char *linker)
     strcpy(cmdline, temp);
             
     for (i = 0; i < nfiles; ++i) {
-        if ((!lateassemble && hassuffix(filelist[i], c_extension)) || lateassemble) {
+        if (hassuffix(filelist[i], c_extension)) {
             offs += snprintf(cmdline + offs, len - offs," %s", filelist[i]);
         }
     }
@@ -738,7 +735,7 @@ int main(int argc, char **argv)
                {
 			   case 0:
                    BuildAsmLine(asmarg, sizeof(asmarg), "-easm");
-                   if (!assembleonly && !lateassemble)
+                   if ( !assembleonly )
                        if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                            exit(1);
                    break;
@@ -804,7 +801,7 @@ int main(int argc, char **argv)
             }
         case OFILE:
             BuildAsmLine(asmarg, sizeof(asmarg), "-eopt");
-            if (!assembleonly && !lateassemble)
+            if ( !assembleonly )
                 if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                     exit(1);
             break;
@@ -1253,11 +1250,6 @@ static void configure_misc_options()
         write_zcc_defined("startup", c_startup);
     }
     
-    /* We only have to do a late assembly hack for z80asm family */
-    if (createapp && defer_assembly && IS_ASM(ASM_Z80ASM)) {
-        lateassemble = YES;
-    }
-
     if ( linkargs == NULL ) {
         linkargs = strdup("");
     }
