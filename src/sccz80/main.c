@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.37 2016-04-25 09:07:04 dom Exp $
+ *      $Id: main.c,v 1.38 2016-04-25 09:10:18 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -760,7 +760,7 @@ struct args myargs[]= {
     {"verbose",NO,SetVerbose, "Be more verbose"},
     {"D",YES,SetDefine, "Define a preprocessor directive"},
     {"U",YES,SetUndefine, "Undefine a preprocessor directive"},
-    {"h",NO,DispInfo, "Displace this text"},
+    {"h",NO,DispInfo, "Displays this text"},
     {"v",NO,SetVerbose, "Be more verbose"},
     {"Wall",NO,SetAllWarn, "Enable all warnings" },
     {"Wn",YES,UnSetWarning, "Unset a warning"},
