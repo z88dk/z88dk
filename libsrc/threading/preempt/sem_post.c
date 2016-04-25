@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: sem_post.c,v 1.3 2016-04-25 17:09:41 dom Exp $
+ * $Id: sem_post.c,v 1.4 2016-04-25 20:11:47 dom Exp $
  */
 
 #include <threading/semaphore.h>
@@ -23,10 +23,12 @@ int sem_post(sem_t *sem)
 	inc	hl		; TODO: overflow
 	ld	(ix+semaphore_value),l
 	ld	(ix+semaphore_value + 1),h
-	ld	a,h
-	or	l
-	jr	nz,sem_out
-; Weve reach 0, lets wake up one of the threads
+;	bit 	7,h		;greater than or equal to 0
+;	jr	nz,sem_out
+;	ld	a,h
+;	or	l
+;	jr	z,sem_out
+	; Wake up a waiter since we have incremented the semaphore
 	ld	a,(ix + semaphore_waiters_num)
 	and	a
 	jr	z,sem_out		; No waiters
