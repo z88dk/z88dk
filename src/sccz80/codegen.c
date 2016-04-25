@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.42 2016-04-23 18:15:58 dom Exp $
+ *      $Id: codegen.c,v 1.43 2016-04-25 09:07:04 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -246,7 +246,7 @@ void getmem(SYMBOL *sym)
     }
     else {
 /* this is for CINT and get pointer..will need to change! */
-        ot("ld\thl,("); outname(sym->name,dopref(sym)); outstr(")\n");
+        ot("ld\thl,("); outname(sym->name,dopref(sym)); outstr(")\n"); 
 /* For long pointers...load de with name+2, then d,0 */
         if (sym->type==CPTR || (sym->ident==POINTER && sym->flags&FARPTR)) { ot("ld\tde,("); outname(sym->name,dopref(sym)); outstr("+2)\n\tld\td,0\n"); }
     }

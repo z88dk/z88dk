@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.36 2016-04-24 08:14:27 dom Exp $
+ *      $Id: main.c,v 1.37 2016-04-25 09:07:04 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
     currfn = NULL_SYM ;             /* no function yet */
     macptr = cmode = 1 ;    /* clear macro pool and enable preprocessing */
     ncomp=doinline=mathz88 = incfloat= compactcode =0;
-    lpointer=cppcom=0;
+    cppcom=0;
     dosigned=NO;
     useshare=makeshare=sharedfile=NO;
     smartprintf=YES;
@@ -417,11 +417,6 @@ void dumpfns()
     if (mathz88) {
         fprintf(fp,"\nIF !NEED_mathz88\n");
         fprintf(fp,"\tDEFINE\tNEED_mathz88\n");
-        fprintf(fp,"ENDIF\n\n");
-    }
-    if (lpointer) {
-        fprintf(fp,"\nIF !NEED_farpointer\n");
-        fprintf(fp,"\tDEFINE NEED_farpointer\n");
         fprintf(fp,"ENDIF\n\n");
     }
     /*
@@ -756,7 +751,6 @@ struct args myargs[]= {
     {"//",NO,SetCppComm, "Accept C++ style // comments" },
     {"do-inline",NO,SetDoInline, "Inline certain common functions" },
     {"stop-error",NO,SetStopError, "Stop when an error is received" },
-    {"far-pointers",NO,SetFarPtrs, NULL},   /* Obsolete..but maybe useful*/
     {"make-shared",NO,SetMakeShared, "This Library file is shared" },
     {"shared-file",NO,SetSharedFile, "All functions within this file are shared" },
     {"use-shared",NO,SetUseShared, "Used shared library functions" },
@@ -789,7 +783,6 @@ struct args myargs[]= {
    {"standard-escape-chars",NO,SetStandardEscape, "Use standard mappings for escape codes"},
 /* Compatibility Modes.. */
     {"f",NO,SetUnsigned, NULL},
-    {"l",NO,SetFarPtrs, NULL},
     {"",0, NULL, NULL}
 };
 
@@ -950,11 +943,6 @@ void SetStopError(char *arg)
         errstop=YES;
 }
 
-void SetFarPtrs(char *arg)
-{
-        ShowNotFunc(arg);
-        lpointer=YES;
-}
 
 void SetUseShared(char *arg)
 {

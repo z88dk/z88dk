@@ -6,7 +6,7 @@
  *      I'm starting to split these up once more and stick them in
  *      the relevant files..
  *
- *      $Id: data.c,v 1.41 2016-04-24 08:14:27 dom Exp $
+ *      $Id: data.c,v 1.42 2016-04-25 09:07:04 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -67,7 +67,7 @@ int     incfloat, cppcom, doinline,ncomp;
 
 int     stackargs;
 
-int     lpointer, defstatic, appz88,filenum;        /* next argument to be used */
+int     defstatic, appz88,filenum;        /* next argument to be used */
 
 char    dosigned, makelib,fnflags,mathz88,compactcode;
 

@@ -2,7 +2,7 @@
  *      Routines to declare a function
  *      Split from decl.c 11/3/98 djm
  *
- *      $Id: declfunc.c,v 1.19 2016-04-23 18:15:58 dom Exp $
+ *      $Id: declfunc.c,v 1.20 2016-04-25 09:07:04 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -390,15 +390,6 @@ void setlocvar(SYMBOL *prevarg,SYMBOL *currfn)
 		if ( (prevarg->flags&FARPTR)==FARPTR && prevarg->ident == POINTER)
 			lgh=4;
         prevarg->size=lgh;
-#ifdef CODSWALLOP
-        /* All pointers are pushed onto the stack for functions as 4 bytes, if
-         * needed, near pointers are padded out to compensate for this by dummy
-         * loading with zero, this allows us to have one set of routines to
-         * cope with this and hence solve a lot of duplication
-         */
-        if (prevarg->ident == POINTER && lpointer) lgh=4;
-        prevarg->size=lgh;
-#endif
         /*
          * Check the definition against prototypes here...
          */

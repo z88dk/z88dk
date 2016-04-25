@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.10 2016-03-30 09:38:12 dom Exp $
+ *      $Id: callfunc.c,v 1.11 2016-04-25 09:07:04 dom Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ void callfunction(SYMBOL *ptr)
                     nargs += 6;
                 }
 /* Longs and (ahem) long pointers! */
-                else if (expr == LONG || expr == CPTR || (expr==POINTER && lpointer)) {
+                else if (expr == LONG || expr == CPTR ) {
                     if (!(fnflags&FARPTR) && expr != LONG ) const2(0);
                     lpush();
 
@@ -115,7 +115,7 @@ void callfunction(SYMBOL *ptr)
 			    zcarryconv();
 			    expr = CINT;
 			}
-            if (expr == LONG || expr == CPTR || (expr==POINTER && lpointer) ) {
+            if (expr == LONG || expr == CPTR ) {
 			    swap();       /* MSW -> hl */
 			    swapstk();    /* MSW -> stack, addr -> hl */
 			    zpushde();    /* LSW -> stack, addr = hl */	

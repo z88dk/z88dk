@@ -40,7 +40,6 @@ extern int cppcom;
 extern int doinline;
 extern int ncomp;
 extern int stackargs;
-extern int lpointer;
 extern int defstatic;
 extern int appz88;
 extern int filenum;
