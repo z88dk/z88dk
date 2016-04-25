@@ -6,7 +6,7 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.19 2016-04-23 08:00:38 dom Exp $
+ *	$Id: sound.h,v 1.20 2016-04-25 16:23:04 dom Exp $
  */
 
 
@@ -25,10 +25,10 @@ extern void __LIB__ bit_fx3(int effect);
 extern void __LIB__ bit_fx4(int effect);
 
 /* 1 BIT SYNTH - Polyphony and multitimbric effects */
-extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4);
+extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4) __SMALLCDECL;
 
 /* "period": the higher value, the lower tone ! */
-extern void __LIB__ bit_beep(int duration, int period);
+extern void __LIB__ bit_beep(int duration, int period) __SMALLCDECL;
 
 /* Real frequency !  Duration is in ms */
 extern void __LIB__ bit_frequency(float duration, float frequency);
