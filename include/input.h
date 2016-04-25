@@ -293,12 +293,12 @@ struct in_UDM {              /* user defined mouse structure                    
 };
 
 extern void __LIB__ in_MouseSimInit(struct in_UDM *u);
-extern void __LIB__ in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord);
-extern void __LIB__ in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord);
+extern void __LIB__ in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL;
+extern void __LIB__ in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord) __SMALLCDECL;
 
 extern void __LIB__ __FASTCALL__ in_MouseSimInit_fastcall(struct in_UDM *u);
-extern void __LIB__ __CALLEE__ in_MouseSim_callee(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord);
-extern void __LIB__ __CALLEE__ in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uint ycoord);
+extern void __LIB__ __CALLEE__ in_MouseSim_callee(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__ in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uint ycoord) __SMALLCDECL __SMALLCCALLEE;
 
 #define in_MouseSimInit(a)        in_MouseSimInit_fastcall(a)
 #define in_MouseSim(a,b,c,d)      in_MouseSim_callee(a,b,c,d)

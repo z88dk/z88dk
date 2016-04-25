@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.33 2014-12-05 17:35:50 stefano Exp $
+ * $Id: zx81.h,v 1.34 2016-04-25 13:13:00 dom Exp $
  */
 
 #ifndef __ZX81_H__
@@ -269,7 +269,7 @@ extern void  __LIB__ __FASTCALL__ zx_border(uchar colour);
 extern void  __LIB__ __FASTCALL__ zx_colour(uchar colour);
 // Get color attribute at given position
 extern uint  __LIB__              zx_attr(uchar row, uchar col) __SMALLCDECL;
-extern uint  __LIB__ __CALLEE__   zx_attr_callee(uchar row, uchar col) __SMALLCDECL;
+extern uint  __LIB__ __CALLEE__   zx_attr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
 #define zx_attr(a,b)              zx_attr_callee(a,b)
 
 
@@ -295,8 +295,8 @@ extern uchar __LIB__ __FASTCALL__ *zx_aaddrcleft(void *attraddr);
 extern uchar __LIB__ __FASTCALL__ *zx_aaddrcright(void *attraddr);
 extern uchar __LIB__ __FASTCALL__ *zx_aaddrcup(void *attraddr);
 
-extern uchar __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(uchar row, uchar col) __SMALLCDECL;
-extern uchar __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __SMALLCDECL;
+extern uchar __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
+extern uchar __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __SMALLCDECL __SMALLCCALLEE;
 
 #define zx_cyx2aaddr(a,b)          zx_cyx2aaddr_callee(a,b)
 #define zx_pxy2aaddr(a,b)          zx_pxy2aaddr_callee(a,b)
