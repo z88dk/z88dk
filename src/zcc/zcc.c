@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.120 2016-04-24 07:26:50 dom Exp $
+ *      $Id: zcc.c,v 1.121 2016-04-25 08:57:02 dom Exp $
  */
 
 
@@ -361,7 +361,7 @@ static arg_t     myargs[] = {
     {"c", AF_BOOL_TRUE, SetBoolean, &compileonly, NULL, "Only compile the .c files to .o files"},
     {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
     {"S", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
-	{"-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm/.opt files (sdcc only)"},
+    {"-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm/.opt files"},
     {"m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable"},
 	{"g", AF_BOOL_TRUE, SetBoolean, &globaldefon, NULL, "Generate a global defs file of the final executable"},
     {"s", AF_BOOL_TRUE, SetBoolean, &symbolson, NULL, "Generate a symbol map of the final executable"},
@@ -1367,6 +1367,9 @@ static void configure_compiler()
         add_option_to_compiler(buf);
         if ( sccz80arg ) {
             add_option_to_compiler(sccz80arg);
+        }
+        if ( c_code_in_asm ) {
+            add_option_to_compiler("-cc");
         }
         c_compiler = c_sccz80_exe;
         compiler_style = outimplied;
