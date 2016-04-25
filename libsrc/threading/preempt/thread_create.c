@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: thread_create.c,v 1.3 2009-09-30 23:03:03 dom Exp $
+ * $Id: thread_create.c,v 1.4 2016-04-25 17:09:41 dom Exp $
  */
  
 #include <threading/preempt.h>
@@ -10,6 +10,7 @@
 thread_t *thread_create(void (*entry)(), void *stack, int priority)
 {
 #asm
+    push	ix
     di
 ; sp + 2 = prio
 ; sp + 4 = stack
@@ -26,7 +27,9 @@ thread_t *thread_create(void (*entry)(), void *stack, int priority)
     add         ix,de
     inc         a
     djnz        find_task_loop
+    ei
     ld          hl,0                    ; No free slots, return
+    pop		ix
     ret
 .found_slot
     push        ix
@@ -76,5 +79,6 @@ thread_t *thread_create(void (*entry)(), void *stack, int priority)
     push	ix
     pop		hl
     ei                                  ; Allow manager to carry on
+    pop		ix
 #endasm          
 }

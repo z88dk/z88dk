@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: sem_post.c,v 1.2 2009-09-30 23:03:03 dom Exp $
+ * $Id: sem_post.c,v 1.3 2016-04-25 17:09:41 dom Exp $
  */
 
 #include <threading/semaphore.h>
@@ -11,9 +11,13 @@ int sem_post(sem_t *sem)
 #asm
 	di
 	pop	hl
-	pop	ix
-	push	ix
+	pop	de
+	push	de
 	push	hl
+	push	ix
+
+	push	de
+	pop	ix
 	ld	l,(ix+semaphore_value)
 	ld	h,(ix+semaphore_value + 1)
 	inc	hl		; TODO: overflow
@@ -45,5 +49,6 @@ int sem_post(sem_t *sem)
 .sem_out
 	ld	hl,0
 	ei
+        pop     ix
 #endasm
 }

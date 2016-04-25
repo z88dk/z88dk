@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: sem_wait.c,v 1.3 2011-08-12 18:56:06 pauloscustodio Exp $
+ * $Id: sem_wait.c,v 1.4 2016-04-25 17:09:41 dom Exp $
  */
 
 #include <threading/semaphore.h>
@@ -10,11 +10,14 @@
 int sem_wait(sem_t *sem)
 {
 #asm
+	di
 	pop     de
-	pop     ix
-	push    ix
+	pop     hl
+	push    hl
 	push    de
-	di      
+	push	ix
+	push	hl
+	pop	ix
 	ld      l,(ix+semaphore_value)
 	ld      h,(ix+semaphore_value+1)
 	bit     7,h		; Is it negative
@@ -25,6 +28,7 @@ int sem_wait(sem_t *sem)
 	ld      (ix+semaphore_value+1),h
 	ei      
 	ld      hl,0
+	pop	ix
 	ret     
 .wait_for_semaphore
 	push    ix
