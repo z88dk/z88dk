@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: sem_post.c,v 1.4 2016-04-25 20:11:47 dom Exp $
+ * $Id: sem_post.c,v 1.5 2016-04-25 20:17:04 dom Exp $
  */
 
 #include <threading/semaphore.h>
@@ -32,22 +32,21 @@ int sem_post(sem_t *sem)
 	ld	a,(ix + semaphore_waiters_num)
 	and	a
 	jr	z,sem_out		; No waiters
-	dec	(ix + semaphore_waiters_num)
-	ld	e,(ix + semaphore_waiters)
-	ld	d,(ix + semaphore_waiters + 1)
-	push	de		; This is the first waiting thread
 	push	ix
-	pop	hl		; Copy the queue down
-	ld	de,semaphore_waiters + 2
+	pop	hl
+	ld	de,#semaphore_waiters
 	add	hl,de
-	ld	d,h
-	ld	e,l
-	dec	de
-	dec	de
-	ld	bc,#(MAX_THREADS * 2) - 2
-	ldir
-	pop	ix		; Now we have the thread to wake up ready
+	ld	b,(ix+semaphore_waiters_num)
+	ld	(ix+semaphore_waiters_num),0
+.wake_loop
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	push	de
+	pop	ix
 	res	0,(ix+ thread_flags)	; Wake the thread
+	djnz	wake_loop
 .sem_out
 	ld	hl,0
 	ei
