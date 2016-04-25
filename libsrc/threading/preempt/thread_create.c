@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- * $Id: thread_create.c,v 1.4 2016-04-25 17:09:41 dom Exp $
+ * $Id: thread_create.c,v 1.5 2016-04-25 17:33:05 dom Exp $
  */
  
 #include <threading/preempt.h>
@@ -42,7 +42,7 @@ thread_t *thread_create(void (*entry)(), void *stack, int priority)
     ld          (ix+thread_pid),a       ; save thread id
     
     ld          (_threadbase + temp_sp),sp  ; Store our current stack
-    ld          hl,2
+    ld          hl,4
     add         hl,sp
     ld          a,(hl)                  ; Priority
     ld          (ix + thread_priority),a        
