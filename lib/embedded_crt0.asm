@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.10 2016-04-03 13:42:45 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.11 2016-04-25 12:58:31 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -124,6 +124,7 @@ SECTION code_crt0_sccz80
 SECTION code_l_sdcc
 SECTION code_error
 SECTION data_compiler
+SECTION data_clib
 SECTION rodata_compiler
 SECTION rodata_clib
 

@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.11 2016-03-30 09:19:58 dom Exp $
+;	$Id: sms_crt0.asm,v 1.12 2016-04-25 12:58:31 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -284,6 +284,7 @@ SECTION code_clib
 SECTION code_crt0_sccz80
 SECTION code_l_sdcc
 SECTION data_compiler
+SECTION data_clib
 SECTION rodata_compiler
 SECTION rodata_clib
 

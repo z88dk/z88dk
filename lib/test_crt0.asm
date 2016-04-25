@@ -1,7 +1,7 @@
 ;
 ;	Startup for test emulator
 ;
-;	$Id: test_crt0.asm,v 1.7 2016-04-03 13:53:07 dom Exp $
+;	$Id: test_crt0.asm,v 1.8 2016-04-25 12:58:31 dom Exp $
 
 
     module test_crt0
@@ -159,6 +159,7 @@ ENDIF
     SECTION data_compiler
     SECTION data_clib
     SECTION rodata_compiler
+    SECTION rodata_clib
     SECTION smc_clib
     SECTION bss_crt
 ;-----------

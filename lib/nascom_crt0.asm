@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.15 2016-04-03 13:28:36 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.16 2016-04-25 12:58:31 dom Exp $
 ;
 ; - - - - - - -
 
@@ -160,6 +160,7 @@ ENDIF
     SECTION data_compiler
     SECTION data_clib
     SECTION rodata_compiler
+    SECTION rodata_clib
     SECTION smc_clib
     SECTION bss_crt
 

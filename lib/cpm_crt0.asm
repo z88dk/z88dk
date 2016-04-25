@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.29 2016-04-03 13:28:36 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.30 2016-04-25 12:58:31 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -319,6 +319,7 @@ ENDIF
     SECTION data_compiler
     SECTION data_clib
     SECTION rodata_compiler
+    SECTION rodata_clib
     SECTION smc_clib
     SECTION bss_crt
 
