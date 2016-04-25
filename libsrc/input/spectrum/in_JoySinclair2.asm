@@ -1,12 +1,15 @@
 ; uint in_JoySinclair2(void)
 ; 2002 aralbrec
 
+SECTION code_clib
 PUBLIC in_JoySinclair2
+PUBLIC _in_JoySinclair2
 
 ; exit : HL = F000RLDU active high
 ; uses : AF,DE,HL
 
 .in_JoySinclair2
+._in_JoySinclair2
    ld a,$f7
    in a,($fe)
    and $1f

@@ -1,7 +1,9 @@
 ; void in_Wait(uint ticks)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC in_Wait
+PUBLIC _in_Wait
 EXTERN t_delay
 
 ; Waits a period of time measured in milliseconds.
@@ -10,6 +12,7 @@ EXTERN t_delay
 ; used  : AF,BC,DE,HL
 
 .in_Wait
+._in_Wait
 
 ; wait 1ms in loop controlled by HL
 ; at 3.5MHz, 1ms = 3500 T states

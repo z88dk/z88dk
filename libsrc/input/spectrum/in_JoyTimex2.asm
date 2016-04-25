@@ -1,7 +1,9 @@
 ; uint in_JoyTimex2(void)
 ; 2002 aralbrec
 
+SECTION code_clib
 PUBLIC in_JoyTimex2
+PUBLIC _in_JoyTimex2
 
 ; exit : A = HL = F000RLDU active high
 ; uses : AF,HL
@@ -16,6 +18,7 @@ PUBLIC in_JoyTimex2
 ;   into the interrupt routine.
 
 .in_JoyTimex2
+._in_JoyTimex2
    ld a,7
    out ($f5),a         ; select R7 on AY chip
    in a,($f6)          ; read R7

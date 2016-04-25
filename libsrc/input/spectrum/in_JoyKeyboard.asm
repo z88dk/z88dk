@@ -1,9 +1,12 @@
 ; uint __FASTCALL__ in_JoyKeyboard(struct in_UDK *)
 ; 2002 aralbrec
 
+SECTION code_clib
 PUBLIC in_JoyKeyboard
+PUBLIC _in_JoyKeyboard
 
 .in_JoyKeyboard
+._in_JoyKeyboard
 
 ; enter : HL = struct in_UDK *, a 10-byte table containing 5 scan
 ;              codes for fire,right,left,down,up in that order

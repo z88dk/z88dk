@@ -41,7 +41,9 @@
 ; joystick interface ($1f), the Disciple disk interface ($1f) and
 ; the Multiface ($3f).
 
+SECTION code_clib
 PUBLIC in_MouseAMXInit_callee
+PUBLIC _in_MouseAMXInit_callee
 PUBLIC ASMDISP_IN_MOUSEAMXINIT_CALLEE
 
 EXTERN im2_InstallISR_callee
@@ -51,6 +53,7 @@ EXTERN _in_AMXdeltaX, _in_AMXdeltaY
 EXTERN _in_AMXcoordX, _in_AMXcoordY
 
 .in_MouseAMXInit_callee
+._in_MouseAMXInit_callee
 
    pop hl
    pop bc

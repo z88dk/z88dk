@@ -1,7 +1,9 @@
 ; uint in_Pause(uint ticks)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC in_Pause
+PUBLIC _in_Pause
 EXTERN in_WaitForNoKey, in_WaitForKey, t_delay
 
 ; Waits a period of time measured in milliseconds and exits
@@ -13,6 +15,7 @@ EXTERN in_WaitForNoKey, in_WaitForKey, t_delay
 ; uses : AF,BC,DE,HL
 
 .in_Pause
+._in_Pause
 
    ld a,h
    or l

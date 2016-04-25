@@ -1,7 +1,9 @@
 ; uint in_LookupKey(uchar c)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC in_LookupKey
+PUBLIC _in_LookupKey
 EXTERN in_keytranstbl
 
 ; Given the ascii code of a character, returns the scan row and mask
@@ -30,6 +32,7 @@ EXTERN in_keytranstbl
 ; in_KeyPressed.
 
 .in_LookupKey
+._in_LookupKey
    ld a,l
    ld hl,in_keytranstbl
    ld bc,160

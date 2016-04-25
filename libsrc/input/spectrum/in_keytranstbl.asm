@@ -4,6 +4,7 @@
 ; this key translation table to emulate a PC keyboard with the 'CTRL'
 ; key represented by CAPS SHIFT + SYM SHIFT.
 
+SECTION rodata_clib
 PUBLIC in_keytranstbl
 
 .in_keytranstbl

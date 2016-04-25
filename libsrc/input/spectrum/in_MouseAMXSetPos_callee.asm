@@ -1,13 +1,16 @@
 ; void __CALLEE__ in_MouseAMXSetPos_callee(uint xcoord, uint ycoord)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC in_MouseAMXSetPos_callee
+PUBLIC _in_MouseAMXSetPos_callee
 PUBLIC ASMDISP_IN_MOUSEAMXSETPOS_CALLEE
 PUBLIC CDISP_IN_MOUSEAMXSETPOS_CALLEE
 
 EXTERN _in_AMXcoordX, _in_AMXcoordY
 
 .in_MouseAMXSetPos_callee
+._in_MouseAMXSetPos_callee
 
    pop hl
    pop bc

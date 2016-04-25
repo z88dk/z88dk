@@ -1,7 +1,9 @@
 ; Read AMX Mouse
 ; 08.2003 aralbrec
 
+SECTION code_clib
 PUBLIC INMouseAMX
+PUBLIC _INMouseAMX
 EXTERN _in_AMXcoordX, _in_AMXcoordY
 
 ; exit : C = button state 00000MRL active high
@@ -10,6 +12,7 @@ EXTERN _in_AMXcoordX, _in_AMXcoordY
 ; uses : AF,BC,HL
 
 .INMouseAMX
+._INMouseAMX
    ld c,$1f
    in a,($df)      ; mouse button state will randomly
    or c            ; fluctuate except when the mouse

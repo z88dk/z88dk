@@ -1,7 +1,9 @@
 ; void __CALLEE__ in_MouseKempSetPos_callee(uint xcoord, uint ycoord)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC in_MouseKempSetPos_callee
+PUBLIC _in_MouseKempSetPos_callee
 PUBLIC ASMDISP_IN_MOUSEKEMPSETPOS_CALLEE
 PUBLIC CDISP_IN_MOUSEKEMPSETPOS_CALLEE
 
@@ -9,6 +11,7 @@ EXTERN INMouseKemp
 EXTERN _in_KempcoordX, _in_KempcoordY
 
 .in_MouseKempSetPos_callee
+._in_MouseKempSetPos_callee
 
    pop hl
    pop bc

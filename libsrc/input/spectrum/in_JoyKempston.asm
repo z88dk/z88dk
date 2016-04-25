@@ -1,12 +1,15 @@
 ; uint in_JoyKempston(void)
 ; 2002 aralbrec
 
+SECTION code_clib
 PUBLIC in_JoyKempston
+PUBLIC _in_JoyKempston
 
 ; exit : HL = F000RLDU active high
 ; uses : AF,DE,HL
 
 .in_JoyKempston
+._in_JoyKempston
 
    in a,($1f)
    and $1f

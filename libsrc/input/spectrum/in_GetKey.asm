@@ -12,7 +12,9 @@
 ; state machine returns to the debounce state.  Time intervals
 ; depend on how often GetKey is called.
 
+SECTION code_clib
 PUBLIC in_GetKey
+PUBLIC _in_GetKey
 EXTERN in_Inkey, in_GetKeyReset
 EXTERN _in_KeyDebounce, _in_KeyStartRepeat, _in_KeyRepeatPeriod
 EXTERN _in_KbdState
@@ -22,6 +24,7 @@ EXTERN _in_KbdState
 ; uses : AF,BC,DE,HL
 
 .in_GetKey
+._in_GetKey
 
    call in_Inkey              ; hl = ascii code & carry if no key
    jp c, in_GetKeyReset

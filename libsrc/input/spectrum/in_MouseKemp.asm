@@ -1,10 +1,13 @@
 ; void in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC in_MouseKemp
+PUBLIC _in_MouseKemp
 EXTERN INMouseKemp
 
 .in_MouseKemp
+._in_MouseKemp
 
    call INMouseKemp
    

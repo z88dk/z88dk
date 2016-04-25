@@ -3,7 +3,9 @@
 
 ; mainly for symmetry with AMX mouse functions
 
+SECTION code_clib
 PUBLIC in_MouseKempInit
+PUBLIC _in_MouseKempInit
 
 EXTERN INMouseKemp
 EXTERN _in_KempcoordX, _in_KempcoordY
@@ -12,6 +14,7 @@ EXTERN _in_KempcoordX, _in_KempcoordY
 ; uses : AF
 
 .in_MouseKempInit
+._in_MouseKempInit
 
    call INMouseKemp          ; to zero out current delta
    

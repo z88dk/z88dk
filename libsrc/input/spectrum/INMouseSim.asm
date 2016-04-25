@@ -1,7 +1,9 @@
 ; Simulates a Mouse using Joystick Functions
 ; 06.2003, 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC INMouseSim
+PUBLIC _INMouseSim
 EXTERN l_jpix
 
 ; enter: HL = struct in_UDM *
@@ -12,7 +14,8 @@ EXTERN l_jpix
 ; note : last maxcount in struct in_UDM must be 255
 
 .INMouseSim
-
+._INMouseSim
+   push ix
    ld e,(hl)
    inc hl
    ld d,(hl)               ; DE = struct in_UDK *
@@ -165,6 +168,7 @@ EXTERN l_jpix
 .nofire                     ; C = mouse button state
 
    ld a,(hl)                ; A = y coord 0..191
+   pop ix
    ret
 
 .nomovement
@@ -195,4 +199,5 @@ EXTERN l_jpix
    inc hl
    inc hl
    ld b,(hl)                ; B = x coord
+   pop ix
    ret

@@ -4,7 +4,9 @@
 ; based on Chris Cowley's Kempston Mouse
 ; driver for Spectrum Basic (2003)
 
+SECTION code_clib
 PUBLIC INMouseKemp
+PUBLIC _INMouseKemp
 EXTERN _in_KempcoordX, _in_KempcoordY
 EXTERN _in_KemprawX, _in_KemprawY
 
@@ -14,6 +16,7 @@ EXTERN _in_KemprawX, _in_KemprawY
 ; uses : AF,BC,E
 
 .INMouseKemp
+._INMouseKemp
 
    ld a,(_in_KempcoordX)
    ld b,a                      ; b = current x coordinate
