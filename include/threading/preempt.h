@@ -1,7 +1,7 @@
 /*
  *  z88dk z80 multi-task library
  *
- *  $Id: preempt.h,v 1.7 2010-09-19 00:24:08 dom Exp $
+ *  $Id: preempt.h,v 1.8 2016-04-25 20:56:36 dom Exp $
  */
 
 
@@ -112,7 +112,7 @@ extern void __LIB__ thread_manager_init_real(scheduler_t *scheduler);
  *  \param stack - Address of the stack (will grow down)
  *  \param priority - Task priority
  */
-extern thread_t __LIB__ *thread_create(void (*entry)(), void *stack, int priority);
+extern thread_t __LIB__ *thread_create(void (*entry)(), void *stack, int priority) __SMALLCDECL;
 
 /** \brief Start the thread manager 
  *
