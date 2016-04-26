@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.39 2016-03-30 09:19:58 dom Exp $
+;       $Id: spec_crt0.asm,v 1.40 2016-04-26 21:19:20 dom Exp $
 ;
 
 
@@ -39,14 +39,14 @@
         PUBLIC    coords          ; Current xy position
 
         PUBLIC    snd_tick        ; Sound variable
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
+        PUBLIC    bit_irqstatus   ; current irq status when DI is necessary
 
-        PUBLIC	_RND_BLOCKSIZE;
+        PUBLIC    _RND_BLOCKSIZE;
 
         PUBLIC    call_rom3       ; Interposer
        
         PUBLIC    _FRAMES
-        defc    _FRAMES = 23672	; Timer
+        defc      _FRAMES = 23672 ; Timer
 
 ;--------
 ; Set an origin for the application (-zorg=) default to 32768
@@ -81,11 +81,15 @@ start:
 
 IF (startup=2)
 
-        di			; put hardware in a stable state
+        di          ; put hardware in a stable state
         ld      a,$3F
         ld      i,a
         jr      init            ; go over rst 8, bypass shadow ROM
-        nop			; (probably not necessary)
+
+        defs    $0008-ASMPC
+if (ASMPC<>$0008)
+        defs    CODE_ALIGNMENT_ERROR
+endif
 
         ; --- rst 8 ---
         ld      hl,($5c5d)      ; It was the address reached by CH-ADD.
@@ -101,7 +105,7 @@ init:
         ld      (hl),0
         ld      bc,42239
         ldir
-        call	zx_internal_init
+        call    zx_internal_init
         ei
 ELSE
 
@@ -119,29 +123,28 @@ ELSE
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
-
 ; Optional definition for auto MALLOC init; it takes
 ; all the space between the end of the program and UDG
 IF DEFINED_USING_amalloc
-		ld	hl,_heap
-		ld	c,(hl)
-		inc	hl
-		ld	b,(hl)
-		inc bc
-		; compact way to do "mallinit()"
-		xor	a
-		ld	(hl),a
-		dec hl
-		ld	(hl),a
+        ld  hl,_heap
+        ld  c,(hl)
+        inc hl
+        ld  b,(hl)
+        inc bc
+        ; compact way to do "mallinit()"
+        xor a
+        ld  (hl),a
+        dec hl
+        ld  (hl),a
 
-		;  Stack is somewhere else, no need to reduce the size for malloc
-		ld	hl,65535-168 ; Preserve UDG
-		sbc hl,bc	; hl = total free memory
+        ;  Stack is somewhere else, no need to reduce the size for malloc
+        ld  hl,65535-168 ; Preserve UDG
+        sbc hl,bc   ; hl = total free memory
 
-		push bc ; main address for malloc area
-		push hl	; area size
-		EXTERN sbrk_callee
-		call	sbrk_callee
+        push bc ; main address for malloc area
+        push hl ; area size
+        EXTERN sbrk_callee
+        call    sbrk_callee
 ENDIF
 
   IF DEFINED_ZXVGS
@@ -156,22 +159,11 @@ ENDIF
 ENDIF
 
 
-
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-        ld      hl,__sgoioblk+2
-        ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
-        ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
-        ld      (hl),21 ;stderr
-ENDIF
-ENDIF
 IF DEFINED_NEEDresidos
         call    residos_detect
         jp      c,cleanup_exit
 ENDIF
+	call	crt0_init_data
         call    _main           ; Call user program
 cleanup:
 ;
@@ -254,18 +246,18 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 ;---------------------------------
 ; Select which printf core we want
 ;---------------------------------
-	PUBLIC	asm_vfprintf
+    PUBLIC  asm_vfprintf
 IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
+    EXTERN  asm_vfprintf_level3
+    defc    asm_vfprintf = asm_vfprintf_level3
 ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
+    IF DEFINED_complexstdio
+            EXTERN  asm_vfprintf_level2
+        defc    asm_vfprintf = asm_vfprintf_level2
+    ELSE
+            EXTERN  asm_vfprintf_level1
+        defc    asm_vfprintf = asm_vfprintf_level1
+    ENDIF
 ENDIF
 
 ;---------------------------------------------
@@ -381,39 +373,16 @@ cjumpiy:
         jp      (iy)
 ENDIF
 
-IF 0
-;       Short routine to set up a +3 DOS header so files
-;       Can be accessed from BASIC, we set to type code
-;       load address 0 and length supplied
-;
-;       Entry:  b = file handle
-;              hl = file length
-
-setheader:
-        ld      iy,setheader_r
-        call    dodos
-        ret
-setheader_r:
-        push    hl
-        call    271     ;DOS_RED_HEAD
-        pop     hl
-        ld      (ix+0),3        ;CODE
-        ld      (ix+1),l        ;Length
-        ld      (ix+2),h
-        ld      (ix+3),0        ;Load address
-        ld      (ix+4),0
-        ret
-ENDIF
 
 ; Call a routine in the spectrum ROM
 ; The routine to call is stored in the two bytes following
 call_rom3:
         exx                      ; Use alternate registers
 IF DEFINED_NEED_ZXMMC
-		push	af
-		xor		a                ; standard ROM
-		out		($7F),a          ; ZXMMC FASTPAGE
-		pop		af
+        push    af
+        xor     a                ; standard ROM
+        out     ($7F),a          ; ZXMMC FASTPAGE
+        pop     af
 ENDIF
         ex      (sp),hl          ; get return address
         ld      c,(hl)
@@ -425,83 +394,68 @@ ENDIF
         exx                      ; Back to the regular set
         ret
         
+IF NEED_floatpack
+      INCLUDE   "float.asm"
+ENDIF
 
+        defm    "Small C+ ZX"   ;Unnecessary file signature
+        defb    0
 
 ;--------
 ; Variables: we have two options, to keep them in the program block or to
 ; locate such stuff somewhere else in RAM (to make ROMable code).
 ;--------
 
-;---------------------------------------------------------------------------
-IF (startup=2) | (startup=3) ; ROM or moved system variables
-;---------------------------------------------------------------------------
-
-        PUBLIC    romsvc		; service space for ROM
-
-;; ;## Bypass to prevent an accidental insertion of the Interface 1 ##
-;; ;## Requires a manual tuning, so it is commented out by default  ##
-;; ;## Note that the original Interface II hardware should anyway   ##
-;; ;## protect the Interface 1 from inserting anyway.. tuning could ##
-;; ;## be useful in few special cases only.                         ##
-;;
-;; .shadow_protect_filler
-;; defs    $1708-shadow_protect_filler
-;; defw    0
-
-IF DEFINED_NEED_ZXMMC
-      PUBLIC card_select
-ENDIF
-
-
-
-IF !DEFINED_sysdefvarsaddr
-      defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
-ENDIF
-
-IF NEED_floatpack
-      INCLUDE   "float.asm"
-ENDIF
-
+    SECTION code_crt_init
+        ; Setup std* streams
+crt0_init_data:
+        ; TODO: Reset the bss section
+        ld      hl,$8080        ;Initialise floating point seed
+        ld      (fp_seed),hl
 IF DEFINED_ANSIstdio
-      INCLUDE   "stdio_fp.asm"
+        ld      hl,__sgoioblk
+        ld      de,__sgoioblk+1
+        ld      bc,39
+        ld      (hl),0
+        ldir
+        ld      hl,__sgoioblk+2
+        ld      (hl),19 ;stdin
+        ld      hl,__sgoioblk+6
+        ld      (hl),21 ;stdout
+        ld      hl,__sgoioblk+10
+        ld      (hl),21 ;stderr
 ENDIF
-
-DEFVARS sysdefvarsaddr
-{
-__sgoioblk      ds.b    40      ; stdio control block
-coords          ds.w    1       ; Graphics xy coordinates
-base_graphics   ds.w    1       ; Address of graphics map
-exitsp          ds.w    1       ; atexit() stack
-exitcount       ds.b    1       ; Number of atexit() routines
-fp_seed         ds.w    3       ; Floating point seed (not used ATM)
-extra           ds.w    3       ; Floating point spare register
-fa              ds.w    3       ; Floating point accumulator
-fasign          ds.b    1       ; Floating point variable
-snd_tick        ds.b    1       ; Sound
-bit_irqstatus   ds.w    1       ; used to save the current IRQ status
-heaplast        ds.w    1       ; Address of last block on heap
-heapblocks      ds.w    1       ; Number of blocks
-card_select		ds.b	1		; Currently selected MMC/SD slot for ZXMMC
-_RND_BLOCKSIZE  ds.w    1       ; RND file block size
-romsvc          ds.b	1	; Pointer to the end of the sysdefvars
-				; used by the ROM version of some library
-}
-
-
-IF !DEFINED_defvarsaddr
-        defc defvarsaddr = 24576
+IF DEFINED_USING_amalloc
+        EXTERN ASMTAIL
+	ld	(_heap),ASMTAIL
 ENDIF
+    ; SDCC initialisation code gets placed here
+    SECTION code_crt_exit
 
-DEFVARS defvarsaddr
-{
-dummydummy        ds.b    1 
-}
+        ret
+    SECTION code_compiler
+    SECTION code_clib
+    SECTION code_crt0_sccz80
+    SECTION code_l_sdcc
+    SECTION code_math
+    SECTION code_error
+    SECTION data_compiler
+    SECTION rodata_compiler
+    SECTION rodata_clib
 
-
-;---------------------------------------------------------------------------
+    SECTION bss_crt
+    ; Variables need by crt0 code and some lib routines can be kept separately
+IF (startup=2) | (startup=3) ; ROM or moved system variables
+        IF !DEFINED_sysdefvarsaddr
+             defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
+        ENDIF
+        org sysdefvarsaddr
 ELSE
-;---------------------------------------------------------------------------
-
+        ; For non-ROM startup move all variables together
+        IF DEFINED_defvarsaddr
+            org defvarsaddr
+        ENDIF
+ENDIF
 coords:         defw    0       ; Current graphics xy coordinates
 base_graphics:  defw    0       ; Address of the Graphics map
 
@@ -519,24 +473,24 @@ heapblocks:     defw    0       ; Number of blocks
 
 
 IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
+                EXTERN ASMTAIL
 PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
 ; will be kept for sbrk() to setup the malloc area
 _heap:
-                defw ASMTAIL	; Location of the last program byte
+                defw 0		; Initialised by code_crt_init - location of the last program byte
                 defw 0
 ENDIF
 
 IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
+snd_tick:       defb    0   ; Sound variable
+bit_irqstatus:  defw    0
 ENDIF
 
 ; ZXMMC SD/MMC interface
 IF DEFINED_NEED_ZXMMC
-	PUBLIC card_select
+    PUBLIC card_select
 card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
 
@@ -547,35 +501,39 @@ ENDIF
 ; Current block size is kept in a control block (just a structure saved
 ; in a separate file, so changing this value
 ; at runtime before creating a file is perfectly legal.
-_RND_BLOCKSIZE:	defw	1000
+_RND_BLOCKSIZE: defw    1000
 
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-       INCLUDE "stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
+; std* streams
+__sgoioblk:     defs    40
 
 ;-----------------------
 ; Floating point support
 ;-----------------------
 IF NEED_floatpack
-        INCLUDE         "float.asm"
 fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
 extra:          defs    6               ;FP register
 fa:             defs    6               ;FP Accumulator
 fasign:         defb    0               ;FP register
-
 ENDIF
 
-;---------------------------------------------------------------------------
+IF startup=2
+                PUBLIC  romsvc
+romsvc:         defs    10  ; Pointer to the end of the sysdefvars
+                            ; used by the ROM version of some library
 ENDIF
-;---------------------------------------------------------------------------
 
-                defm    "Small C+ ZX"   ;Unnecessary file signature
-                defb    0
+    SECTION bss_compiler
+IF (startup=2) | (startup=3) ; ROM or moved system variables
+        IF !DEFINED_defvarsaddr
+             defc defvarsaddr = 24576   ; Just before the ZX system variables
+        ENDIF
+        org defvarsaddr
+ENDIF
+
+    SECTION bss_clib
+    SECTION bss_error
+
+
+
+
 
