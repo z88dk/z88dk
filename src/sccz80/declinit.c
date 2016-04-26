@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.16 2014-12-23 21:16:40 aralbrec Exp $
+ *      $Id: declinit.c,v 1.17 2016-04-26 20:01:17 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -327,13 +327,13 @@ void init(int size, int ident, int *dim, int more, int dump, int is_struct)
                 if (size == 4) {
 /* there appears to be a bug in z80asm regarding defl */
                     defbyte();
-                    outdec((value % 65536UL) % 256);
+                    outdec(((uint32_t)value % 65536UL) % 256);
                     outbyte(',');
-                    outdec((value % 65536UL) / 256);
+                    outdec(((uint32_t)value % 65536UL) / 256);
                     outbyte(',');
-                    outdec((value / 65536UL) % 256);
+                    outdec(((uint32_t)value / 65536UL) % 256);
                     outbyte(',');
-                    outdec((value / 65536UL) / 256);
+                    outdec(((uint32_t)value / 65536UL) / 256);
                 } else {
                     if (size == 1)
                         defbyte();
