@@ -6,7 +6,7 @@
 ; *      Added to Small C+ 27/4/99 djm
 ; *
 ; * -----
-; * $Id: strtol_callee.asm,v 1.11 2016-03-04 23:48:13 dom Exp $
+; * $Id: strtol_callee.asm,v 1.12 2016-04-26 20:15:18 dom Exp $
 ; *
 ; */
 ;
@@ -16,6 +16,7 @@
 ; Uses all registers except iy, afp
 ; long result in dehl
 
+SECTION code_clib
 PUBLIC strtol_callee
 PUBLIC _strtol_callee
 EXTERN l_long_neg, l_long_mult, asm_isspace
@@ -34,11 +35,7 @@ PUBLIC ASMDISP_STRTOL_CALLEE
    ; hl = char *s
 
 .asmentry
-
-   ld a,d
-   or e
-   jr z, noendp
-   
+   push ix
    push de                   ; push char **endp parameter for writeendp
    call noendp               ; do strtol but return here to write endp
 
@@ -49,10 +46,15 @@ PUBLIC ASMDISP_STRTOL_CALLEE
    ; stack = char **endp
 
    ex (sp),hl                ; hl = char **endp
+   ld a,h
+   or l
+   jr z,final_return
    ld (hl),c                 ; write last string position
    inc hl                    ; into endp
    ld (hl),b
    pop hl
+.final_return
+   pop ix
    ret
    
 .noendp
