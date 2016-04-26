@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
     res += test_abs();
     res += test_isqrt();
     res += test_isqrt2();
+    res += test_strtol();
 
     return res;
 }

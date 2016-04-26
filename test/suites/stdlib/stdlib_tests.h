@@ -10,6 +10,7 @@
 extern int test_abs();
 extern int test_isqrt();
 extern int test_isqrt2();
+extern int test_strtol();
 
 
 #endif

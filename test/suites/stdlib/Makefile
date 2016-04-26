@@ -9,6 +9,8 @@ CFLAGS += -DMAX_TESTS=300 -DNO_LOG_RUNNING -DNO_LOG_PASSED
 all:	test.bin run
 
 
+%.opt: %.c
+	zcc +test -vn $(CFLAGS) $^ -o $@ -a
 
 test.bin: $(SOURCES)
 	zcc +test -vn $(CFLAGS) $(SOURCES) -o $@ -lndos
