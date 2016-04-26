@@ -4,10 +4,10 @@
 ;	puts(char *s) - put string to screen
 ;
 ;
-;	$Id: puts_cons.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
+;	$Id: puts_cons.asm,v 1.3 2016-04-26 20:16:40 dom Exp $
 ;
 
-
+                SECTION code_clib
 		PUBLIC	puts_cons
 		EXTERN	fputc_cons
 

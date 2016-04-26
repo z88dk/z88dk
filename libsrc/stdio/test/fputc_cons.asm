@@ -4,10 +4,10 @@
 ;	fputc_cons(char c)
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.4 2016-04-26 20:16:40 dom Exp $
 ;
 
-
+                SECTION code_clib
 		PUBLIC	fputc_cons
 
 		INCLUDE	"test_cmds.def"
