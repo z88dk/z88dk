@@ -217,6 +217,30 @@ replace restart {
 	; peephole z88dk-intrinsic-exx
 }
 
+replace restart {
+	call	_intrinsic_ex_de_hl
+} by {
+	ex	de,hl
+	; peephole z88dk-intrinsic-ex-de-hl
+}
+
+replace restart {
+	call	_intrinsic_swap_endian_16
+} by {
+	ld	a,l
+	ld	l,h
+	ld	h,a
+	; peephole z88dk-intrinsic-swap-endian-16
+}
+
+replace restart {
+	call	_intrinsic_swap_endian_32
+} by {
+	ex	de,hl
+	; peephole z88dk-intrinsic-swap_endian-32
+}
+
+
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 // Z88DK BUGFIXES APPLIED TO SDCC FOR #9570
@@ -11895,8 +11919,19 @@ replace restart {
 } by {
 	ld	%1,%2
 	bit	%3,%2
-	; peephole z88dk-386
+	; peephole z88dk-386a
 } if notVolatile(%1), canAssign(%2 '(hl)')
+
+replace restart {
+	ld	%1,%2
+	ld	%4,%5
+	bit	%3,%1
+} by {
+	ld	%1,%2
+	ld	%4,%5
+	bit	%3,%2
+	; peephole z88dk-386b
+} if notVolatile(%1), canAssign(%2 '(hl)'), notSame(%4 %2), notSame(%4 %1)
 
 replace restart {
 	ld	%2,#0
@@ -14117,6 +14152,38 @@ replace restart {
 	; peephole z88dk-393ag2
 } if notUsed('bc')
 
+replace restart {
+	ld	a,%1 (%2)
+	add	a,#0x%3
+	ld	l,a
+	ld	a,%4 (%5)
+	adc	a,#0x%6
+	ld	h,a
+} by {
+	ld	l,%1 (%2)
+	ld	h,%4 (%5)
+	ld	de,#0x%6%3
+	add	hl,de
+	; peephole z88dk-393ah1
+} if notUsed('de'), notUsed('a')
+
+replace restart {
+	ld	a,%1 (%2)
+	add	a,#0x%3
+	ld	l,a
+	ld	a,%4 (%5)
+	adc	a,#0x%6
+	ld	h,a
+} by {
+	ld	l,%1 (%2)
+	ld	h,%4 (%5)
+	ld	bc,#0x%6%3
+	add	hl,bc
+	; peephole z88dk-393ah2
+} if notUsed('bc'), notUsed('a')
+
+
+
 
 
 
@@ -14818,6 +14885,21 @@ replace restart {
 	add	hl,de
 	; peephole z88dk-407e
 }
+
+replace restart {
+	push	%2
+	ld	%2,#%1
+	add	hl,%2
+	pop	%2
+} by {
+	ld	a,#<(%1)
+	add	a,l
+	ld	l,a
+	ld	a,#>(%1)
+	adc	a,h
+	ld	h,a
+	; peephole z88dk-407f
+} if notUsed('a')
 
 replace restart {
 	ld	c,(hl)
@@ -15969,9 +16051,98 @@ replace restart {
 	; peephole z88dk-411aj
 } if notVolatile(%3)
 
+replace restart {
+	ld	c,l
+	ld	b,h
+%1:
+	sla	c
+	rl	b
+	rl	e
+	rl	d
+	dec	a
+	%2	NZ,%1
+} by {
+	ld	b,a
+%1:
+	add	hl,hl
+	rl	e
+	rl	d
+	djnz	%1
+	ld	a,b
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-411ak
+} if notUsed('hl')
 
+replace restart {
+	ld	a,#%1
+%2:
+	add	hl,hl
+	rl	e
+	rl	d
+	dec	a
+	%3	NZ,%2
+} by {
+	ld	b,#%1
+%2:
+	add	hl,hl
+	rl	e
+	rl	d
+	djnz	%2
+	ld	a,b
+	; peephole z88dk-411al
+} if notUsed('b')
 
+replace restart {
+	ld	c,l
+	ld	b,h
+	ld	l,e
+	ld	h,d
+	ld	a,#%1
+%2:
+	sla	c
+	rl	b
+	adc	hl,hl
+	dec	a
+	%3	NZ,%2
+} by {
+	ld	b,#%1
+%2:
+	add	hl,hl
+	rl	e
+	rl	d
+	djnz	%2
+	ld	a,b
+	ld	c,l
+	ld	b,h
+	ex	de,hl
+	; peephole z88dk-411am
+} if notUsed('de')
 
+replace restart {
+	ld	a,#%1
+	ex	de,hl
+	ld	c,e
+	ld	b,d
+%2:
+	sla	c
+	rl	b
+	adc	hl,hl
+	dec	a
+	%3	NZ,%2
+} by {
+	ld	b,#%1
+%2:
+	add	hl,hl
+	rl	e
+	rl	d
+	djnz	%2
+	ld	a,b
+	ex	de,hl
+	ld	c,e
+	ld	b,d
+	; peephole z88dk-411an
+} if notUsed('de')
 
 
 
@@ -17669,6 +17840,15 @@ replace restart {
 	ld	%9,#%1 + %4
 	; peephole z88dk-425b2
 } if notUsedFrom(%3 %9)
+
+replace restart {
+	ld	%1,%2
+	jp	%3,%4
+} by {
+	jp	%3,%4
+	ld	%1,%2
+	; peephole z88dk-425b3
+} if canAssign(%1 '(hl)'), notUsedFrom(%4 %1)
 
 replace restart {
 	ld	%9,#%1
@@ -19777,6 +19957,322 @@ replace restart {
 	push	hl
 	; peephole z88dk-459d
 } if notUsed('bc'), notUsed('hl')
+
+replace restart {
+	ld	b,h
+	%1	e
+} by {
+	%1	e
+	ld	b,h
+	; peephole z88dk-459e1
+}
+
+replace restart {
+	ld	b,h
+	%1	d
+} by {
+	%1	d
+	ld	b,h
+	; peephole z88dk-459e2
+}
+
+replace restart {
+	ld	c,l
+	%1	e
+} by {
+	%1	e
+	ld	c,l
+	; peephole z88dk-459e3
+}
+
+replace restart {
+	ld	c,l
+	%1	d
+} by {
+	%1	d
+	ld	c,l
+	; peephole z88dk-459e4
+}
+
+replace restart {
+	ld	b,h
+	%1	a,c
+} by {
+	%1	a,c
+	ld	b,h
+	; peephole z88dk-459e5
+}
+
+replace restart {
+	ld	b,h
+	%1	a,b
+} by {
+	%1	a,h
+	ld	b,h
+	; peephole z88dk-459e6
+}
+
+replace	restart {
+	ld	c,l
+	%1	a,c
+} by {
+	%1	a,l
+	ld	c,l
+	; peephole z88dk-459e7
+}
+
+replace restart {
+	ld	c,l
+	%1	a,b
+} by {
+	%1	a,b
+	ld	c,l
+	; peephole z88dk-459e8
+}
+	
+replace restart {
+	ld	b,h
+	ld	a,%1
+} by {
+	ld	a,%1
+	ld	b,h
+	; peephole z88dk-459e9
+} if notSame(%1 'b')
+
+replace restart {
+	ld	c,l
+	ld	a,%1
+} by {
+	ld	a,%1
+	ld	c,l
+	; peephole z88dk-459e10
+} if notSame(%1 'c')
+
+replace restart {
+	ld	b,h
+	%1	a,%2
+} by {
+	%1	a,%2
+	ld	b,h
+	; peephole z88dk-459e11
+} if notSame(%2 'b')
+
+replace restart {
+	ld	c,l
+	%1	a,%2
+} by {
+	%1	a,%2
+	ld	c,l
+	; peephole z88dk-459e12
+} if notSame(%2 'c')
+
+replace restart {
+	ld	b,h
+	rla
+} by {
+	rla
+	ld	b,h
+	; peephole z88dk-459e13
+}
+
+replace restart {
+	ld	c,l
+	rla
+} by {
+	rla
+	ld	c,l
+	; peephole z88dk-459e14
+}
+
+replace restart {
+	ld	b,h
+	ld	%1 (%2),%3
+} by {
+	ld	%1 (%2),%3
+	ld	b,h
+	; peephole z88dk-459e15
+} if notSame(%3 'b')
+
+replace restart {
+	ld	c,l
+	ld	%1 (%2),%3
+} by {
+	ld	%1 (%2),%3
+	ld	c,l
+	; peephole z88dk-459e16
+} if notSame(%3 'c')
+
+replace restart {
+	ld	b,h
+	ld	%3,%1 (%2)
+} by {
+	ld	%3,%1 (%2)
+	ld	b,h
+	; peephole z88dk-459e17a
+} if notSame(%3 'b'), notSame(%3 'h')
+
+replace restart {
+	ld	c,l
+	ld	%3,%1 (%2)
+} by {
+	ld	%3,%1 (%2)
+	ld	c,l
+	; peephole z88dk-459e18a
+} if notSame(%3 'c'), notSame(%3 'l')
+
+replace restart {
+	ld	b,h
+	add	%3,%1 (%2)
+} by {
+	add	%3,%1 (%2)
+	ld	b,h
+	; peephole z88dk-459e17b
+} if notSame(%3 'b'), notSame(%3 'h')
+
+replace restart {
+	ld	c,l
+	add	%3,%1 (%2)
+} by {
+	add	%3,%1 (%2)
+	ld	c,l
+	; peephole z88dk-459e18b
+} if notSame(%3 'c'), notSame(%3 'l')
+
+replace restart {
+	ld	b,h
+	sub	%3,%1 (%2)
+} by {
+	sub	%3,%1 (%2)
+	ld	b,h
+	; peephole z88dk-459e17c
+} if notSame(%3 'b'), notSame(%3 'h')
+
+replace restart {
+	ld	c,l
+	sub	%3,%1 (%2)
+} by {
+	sub	%3,%1 (%2)
+	ld	c,l
+	; peephole z88dk-459e18d
+} if notSame(%3 'c'), notSame(%3 'l')
+
+replace restart {
+	ld	b,h
+	adc	%3,%1 (%2)
+} by {
+	adc	%3,%1 (%2)
+	ld	b,h
+	; peephole z88dk-459e17e
+} if notSame(%3 'b'), notSame(%3 'h')
+
+replace restart {
+	ld	c,l
+	adc	%3,%1 (%2)
+} by {
+	adc	%3,%1 (%2)
+	ld	c,l
+	; peephole z88dk-459e18f
+} if notSame(%3 'c'), notSame(%3 'l')
+
+replace restart {
+	ld	b,h
+	sbc	%3,%1 (%2)
+} by {
+	sbc	%3,%1 (%2)
+	ld	b,h
+	; peephole z88dk-459e17g
+} if notSame(%3 'b'), notSame(%3 'h')
+
+replace restart {
+	ld	c,l
+	sbc	%3,%1 (%2)
+} by {
+	sbc	%3,%1 (%2)
+	ld	c,l
+	; peephole z88dk-459e18h
+} if notSame(%3 'c'), notSame(%3 'l')
+
+replace restart {
+	ld	b,h
+	ld	c,l
+} by {
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-459e19
+}
+
+
+
+
+
+
+
+
+replace restart {
+	ld	%1 (%2),#%9
+	ld	%3 (%4),#%9
+	ld	%5 (%6),#%9
+	ld	%7 (%8),#%9
+} by {
+	ld	a,#%9
+	ld	%1 (%2),a
+	ld	%3 (%4),a
+	ld	%5 (%6),a
+	ld	%7 (%8),a
+	; peephole z88dk-460a
+} if notUsed('a')
+
+replace restart {
+	ld	%1 (%2),#%9
+	ld	%3 (%4),#%9
+	ld	%5 (%6),#%9
+} by {
+	ld	a,#%9
+	ld	%1 (%2),a
+	ld	%3 (%4),a
+	ld	%5 (%6),a
+	; peephole z88dk-460b
+} if notUsed('a')
+
+replace restart {
+	ld	%1 (%2),#%9
+	ld	%3 (%4),#%9
+} by {
+	ld	a,#%9
+	ld	%1 (%2),a
+	ld	%3 (%4),a
+	; peephole z88dk-460c
+} if notUsed('a')
+
+replace restart {
+	ld	l,e
+	ld	h,d
+	%1	de
+	ld	a,h
+	or	a,l
+} by {
+	ld	a,d
+	or	a,e
+	ld	l,e
+	ld	h,d
+	%1	de
+	; peephole z88dk-461a
+}
+
+replace restart {
+	ld	l,c
+	ld	h,b
+	%1	bc
+	ld	a,h
+	or	a,l
+} by {
+	ld	a,b
+	or	a,c
+	ld	l,c
+	ld	h,b
+	%1	bc
+	; peephole z88dk-461b
+}
 
 
 
