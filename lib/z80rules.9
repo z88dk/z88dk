@@ -119,3 +119,17 @@
 	call	intrinsic_exx
 =
 	exx
+
+	call	intrinsic_ex_de_hl
+=
+	ex	de,hl
+
+	call	intrinsic_swap_endian_16
+=
+	ld	a,l
+	ld	l,h
+	ld	h,a
+
+	call	intrinsic_swap_endian_32
+=
+	ex	de,hl

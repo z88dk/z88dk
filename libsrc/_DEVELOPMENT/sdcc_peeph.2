@@ -217,6 +217,30 @@ replace restart {
 	; peephole z88dk-intrinsic-exx
 }
 
+replace restart {
+	call	_intrinsic_ex_de_hl
+} by {
+	ex	de,hl
+	; peephole z88dk-intrinsic-ex-de-hl
+}
+
+replace restart {
+	call	_intrinsic_swap_endian_16
+} by {
+	ld	a,l
+	ld	l,h
+	ld	h,a
+	; peephole z88dk-intrinsic-swap-endian-16
+}
+
+replace restart {
+	call	_intrinsic_swap_endian_32
+} by {
+	ex	de,hl
+	; peephole z88dk-intrinsic-swap_endian-32
+}
+
+
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 // Z88DK BUGFIXES APPLIED TO SDCC FOR #9570
