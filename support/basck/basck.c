@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.2 2016-04-27 15:09:13 stefano Exp $
+ *   $Id: basck.c,v 1.3 2016-04-28 15:11:00 stefano Exp $
  */
 
 unsigned char *img;
@@ -82,6 +82,11 @@ int tkzx128_skel[]={15, 0xD8, 0x06, 0xF9, 0x11, SKIP, SKIP , 0x21, CATCH, CATCH,
 int zxerr_skel[]={16, 0xFE, 0x0A, 0x38, 2, 0xC6, 7, 0xCD, SKIP, SKIP, 0X3E, 0x20, SKIP, 0x78, 0x11,  CATCH, CATCH};
 int zxfpmod_skel[]={10, 0x1A, 0xA7, 0x20, SKIP, 0xD9, 0x23, 0xD9, 0xC9, 0xEF, ADDR};
 int zxfpmod_skel2[]={11, 0xD9, 0x23, 0xD9, 0xC9, 0xF1, 0xD9, 0xE3, 0xD9, 0xC9, 0xEF, ADDR};
+
+
+
+/* ZX Spectrum Shadow ROM detection (ATM only Disciple and IF1 are known) */
+int zxshadow_end[]={26, ADDR, 33, 0x38, 0x00, 0x22, 0x8D, 0x5C, 0x22, 0x8F, 0x5C, 0xFD, 0x75, 0x0E, 0xFD, 0x74, 0x57, 0x3E, 7, 0xD3, 254, SKIP_CALL, SKIP, SKIP, 0xC3, CATCH, CATCH };
 
 
 
@@ -224,8 +229,6 @@ int mldebc_skel[]={9, ADDR, 33, 0, 0, 0x78, 0xB1, 0xC8, 0x3E, 0x10};
 
 int intmul_skel[]={17, ADDR, 0x7C, 0xB5, 0xCA, SKIP, SKIP, 0xE5, 0xD5, SKIP_CALL, 0xC5, 0x44, 0x4D, 33, 0, 0, 0x3E, 0x10};
 
-
-
 int asctfp_skel[]={10, ADDR, 0xFE, '-', 0xF5, 0xCA, SKIP, SKIP, 0xFE, '+', 0xCA};
 int asctfp_skel2[]={9, ADDR, 0xFE, '-', 0xF5, 0x28, SKIP, 0xFE, '+', 0x28};
 
@@ -312,9 +315,12 @@ int tkmsbasic_msx_skel[]={12, SKIP_CALL, 33, CATCH, CATCH, 0x47, 0x0e, 0x40, 0x0
 int tkmsbasic_code_skel[]={12, 0xD5, 17, SKIP, SKIP, 0xC5, 1, SKIP, SKIP, 0xC5, 0x06, CATCH, 0x7E};
 int jptab_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 9, 0x4E};
 int fnctab_msbasic_skel[]={10, 0xD5, 1, CATCH, CATCH, 9, 0x4E, 0x23, 0x66, 0x69, 0xE9};
+int fnctab_msbasic_skel2[]={9,       1, CATCH, CATCH, 9, 0x4E, 0x23, 0x66, 0x69, 0xE9};
+
+
 
 int pc6001_60_page[]={12, 33, CATCH, CATCH, 17, 0 ,0xFA, 1, SKIP, SKIP, 0xED, 0xB0, 17};
-int pc6001_page[]={11, 33, CATCH, CATCH, 17, 0 ,0xFA, 1, SKIP, SKIP, 0xED, 0xB0};
+//int pc6001_page[]={11, 33, CATCH, CATCH, 17, 0 ,0xFA, 1, SKIP, SKIP, 0xED, 0xB0};
 
 
 
@@ -611,17 +617,17 @@ int main(int argc, char *argv[])
 			res=find_skel(last_fpreg_skel2);
 		if (res>0)
 			printf("LAST_FPREG  = $%04X  ; Last byte in Single Precision FP Register (+sign bit)\n",res);
-
-		res=find_skel(dblfpreg_skel);
-		if (res>0)
-			printf("DBL_FPREG  = $%04X  ; Double Precision Floating Point Register\n",res);
-
 		
 		res=find_skel(fpexp_skel);
 		if (res<0)
 			res=find_skel(fpexp_skel2);
 		if (res>0)
 			printf("FPEXP  = $%04X  ; Floating Point Exponent\n",res);
+
+
+		res=find_skel(dblfpreg_skel);
+		if (res>0)
+			printf("DBL_FPREG  = $%04X  ; Double Precision Floating Point Register\n",res);
 
 		res=find_skel(dbllast_fpreg_skel);
 		if (res>0)
@@ -1079,6 +1085,8 @@ int main(int argc, char *argv[])
 				}
 				if ((c == '<') && ((img[i-2] != '=') || (img[i-2] != ('='+0x80)))) {
 					jptab=find_skel(fnctab_msbasic_skel);
+					if (jptab<0)
+						jptab=find_skel(fnctab_msbasic_skel2);
 					if (jptab>0) {
 						printf("\n\nJP table for functions = $%04X\n",jptab);
 						res=find_skel(pc6001_60_page);
@@ -1381,6 +1389,15 @@ int main(int argc, char *argv[])
 	}
 
 	
+	res=find_skel(zxshadow_end);
+	
+	if (res>0) {
+		printf("\nShadow memory for ZX Spectrum ROM found\n");
+		
+		printf("\n\tZX_SHADOW_END  =  $%04X    ; Return to the BASIC interpreter\n",res);
+		
+	}
+
 	printf("\n\n");
 
 	fclose(fpin);
