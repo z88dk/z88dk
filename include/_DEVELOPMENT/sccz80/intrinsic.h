@@ -106,5 +106,8 @@ extern unsigned int __LIB__ __FASTCALL__ intrinsic_swap_endian_16(unsigned int n
 extern unsigned long __LIB__ __FASTCALL__ intrinsic_swap_endian_32(unsigned long n);
 
 
+extern unsigned long __LIB__ __FASTCALL__ intrinsic_swap_word_32(unsigned long n);
+
+
 
 #endif

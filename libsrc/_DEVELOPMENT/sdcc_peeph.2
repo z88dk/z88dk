@@ -225,7 +225,7 @@ replace restart {
 }
 
 replace restart {
-	call	_intrinsic_swap_endian_16
+	call	_intrinsic_swap_endian_16_fastcall
 } by {
 	ld	a,l
 	ld	l,h
@@ -234,10 +234,22 @@ replace restart {
 }
 
 replace restart {
-	call	_intrinsic_swap_endian_32
+	call	_intrinsic_swap_endian_32_fastcall
+} by {
+	ld	a,d
+	ld	d,l
+	ld	l,a
+	ld	a,e
+	ld	e,h
+	ld	h,a
+	; peephole z88dk-intrinsic-swap-endian-32
+}
+
+replace restart {
+	call	_intrinsic_swap_word_32_fastcall
 } by {
 	ex	de,hl
-	; peephole z88dk-intrinsic-swap_endian-32
+	; peephole z88dk-intrinsic-swap-word-32
 }
 
 

@@ -53,6 +53,7 @@ __OPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',void,,intrinsic_ex_de_hl,void)
 __OPROTO(`a',`a',void,,intrinsic_exx,void)
 
 __DPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',unsigned int,,intrinsic_swap_endian_16,unsigned int n)
-__DPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',unsigned long,,intrinsic_swap_endian_32,unsigned long n)
+__DPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',unsigned long,,intrinsic_swap_endian_32,unsigned long n)
+__DPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',unsigned long,,intrinsic_swap_word_32,unsigned long n)
 
 #endif

@@ -132,4 +132,13 @@
 
 	call	intrinsic_swap_endian_32
 =
+	ld	a,l
+	ld	l,d
+	ld	d,a
+	ld	a,h
+	ld	h,e
+	ld	e,a
+
+	call	intrinsic_swap_word_32
+=
 	ex	de,hl
