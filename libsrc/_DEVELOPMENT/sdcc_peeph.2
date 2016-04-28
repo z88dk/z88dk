@@ -275,6 +275,7 @@ replace restart {
 	ld	(#%1 + 2),de
 	; peephole z88dk-bugfix-1
 }
+// if notVolatile
 
 replace restart {
 	ld	hl,#%1
@@ -308,6 +309,39 @@ replace restart {
 	ld	(hl),a
 	ld	hl,#%2 + 1
 	; peephole z88dk-bugfix-3
+}
+
+replace restart {
+	ld	a,i
+	di
+	push	af
+} by {
+	call	asm_z80_push_di
+	; peephole z88dk-bugfix-4a-critical-open
+}
+
+replace restart {
+	pop	af
+	jp	PO,%1
+	ei
+%1:
+	ret
+} by {
+	call	asm_z80_pop_ei
+	nop
+	ret
+	; peephole z88dk-bugfix-4b-critical-close-1
+}
+
+replace restart {
+	pop	af
+	jp	PO,%1
+	ei
+%1:
+} by {
+	call	asm_z80_pop_ei
+%1:
+	; peephole z88dk-bugfix-4c-critical-close-2
 }
 
 
