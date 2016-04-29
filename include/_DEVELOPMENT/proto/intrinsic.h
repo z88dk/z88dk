@@ -49,11 +49,11 @@ __OPROTO(`a,b,c,d,e',`a,b,c,d,e',void,,intrinsic_pop_hl,void)
 __OPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',void,,intrinsic_pop_ix,void)
 __OPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',void,,intrinsic_pop_iy,void)
 
-__OPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',void,,intrinsic_ex_de_hl,void)
+__OPROTO(`a,b,c',`a,b,c',void,,intrinsic_ex_de_hl,void)
 __OPROTO(`a',`a',void,,intrinsic_exx,void)
 
-__DPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',unsigned int,,intrinsic_swap_endian_16,unsigned int n)
-__DPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',unsigned long,,intrinsic_swap_endian_32,unsigned long n)
-__DPROTO(`a,b,c,d,e,h,l',`a,b,c,d,e,h,l',unsigned long,,intrinsic_swap_word_32,unsigned long n)
+__DPROTO(`b,c,d,e',`b,c,d,e',unsigned int,,intrinsic_swap_endian_16,unsigned int n)
+__DPROTO(`b,c',`b,c',unsigned long,,intrinsic_swap_endian_32,unsigned long n)
+__DPROTO(`a,b,c',`a,b,c',unsigned long,,intrinsic_swap_word_32,unsigned long n)
 
 #endif

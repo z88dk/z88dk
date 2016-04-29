@@ -72,23 +72,23 @@ extern void intrinsic_pop_ix(void) __preserves_regs(a,b,c,d,e,h,l);
 extern void intrinsic_pop_iy(void) __preserves_regs(a,b,c,d,e,h,l);
 
 
-extern void intrinsic_ex_de_hl(void) __preserves_regs(a,b,c,d,e,h,l);
+extern void intrinsic_ex_de_hl(void) __preserves_regs(a,b,c);
 
 extern void intrinsic_exx(void) __preserves_regs(a);
 
 
-extern unsigned int intrinsic_swap_endian_16(unsigned int n) __preserves_regs(b,c,d,e,h,l);
-extern unsigned int intrinsic_swap_endian_16_fastcall(unsigned int n) __preserves_regs(b,c,d,e,h,l) __z88dk_fastcall;
+extern unsigned int intrinsic_swap_endian_16(unsigned int n) __preserves_regs(b,c,d,e);
+extern unsigned int intrinsic_swap_endian_16_fastcall(unsigned int n) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define intrinsic_swap_endian_16(a) intrinsic_swap_endian_16_fastcall(a)
 
 
-extern unsigned long intrinsic_swap_endian_32(unsigned long n) __preserves_regs(b,c,d,e,h,l);
-extern unsigned long intrinsic_swap_endian_32_fastcall(unsigned long n) __preserves_regs(b,c,d,e,h,l) __z88dk_fastcall;
+extern unsigned long intrinsic_swap_endian_32(unsigned long n) __preserves_regs(b,c);
+extern unsigned long intrinsic_swap_endian_32_fastcall(unsigned long n) __preserves_regs(b,c) __z88dk_fastcall;
 #define intrinsic_swap_endian_32(a) intrinsic_swap_endian_32_fastcall(a)
 
 
-extern unsigned long intrinsic_swap_word_32(unsigned long n) __preserves_regs(a,b,c,d,e,h,l);
-extern unsigned long intrinsic_swap_word_32_fastcall(unsigned long n) __preserves_regs(a,b,c,d,e,h,l) __z88dk_fastcall;
+extern unsigned long intrinsic_swap_word_32(unsigned long n) __preserves_regs(a,b,c);
+extern unsigned long intrinsic_swap_word_32_fastcall(unsigned long n) __preserves_regs(a,b,c) __z88dk_fastcall;
 #define intrinsic_swap_word_32(a) intrinsic_swap_word_32_fastcall(a)
 
 
