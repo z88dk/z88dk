@@ -4,7 +4,7 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.12 2016-03-06 21:36:52 dom Exp $
+;	$Id: gets.asm,v 1.13 2016-04-29 20:35:38 dom Exp $
 ;
 
 
@@ -70,7 +70,11 @@ ELSE
 ENDIF
 	jr		getloop
 .nobs
+IF STANDARDESCAPECHARS
+	cp		10
+ELSE
 	cp		13
+ENDIF
 	jr		z,getend
 	cp		6
 	jr		nz,nocapslock

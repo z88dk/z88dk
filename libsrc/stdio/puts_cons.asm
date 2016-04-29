@@ -4,7 +4,7 @@
 ;	puts(char *s) - put string to screen
 ;
 ;
-;	$Id: puts_cons.asm,v 1.4 2016-03-06 21:36:52 dom Exp $
+;	$Id: puts_cons.asm,v 1.5 2016-04-29 20:35:38 dom Exp $
 ;
 
 
@@ -35,7 +35,11 @@
 	inc	hl
 	jr	puts0
 .puts1
+IF STANDARDESCAPECHARS
+	ld	e,10
+ELSE
 	ld	e,13
+ENDIF
 	push	de
 	call	fputc_cons
 	pop	de

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.55 2016-04-01 21:00:11 dom Exp $
+# $Id: Makefile,v 1.56 2016-04-29 20:35:38 dom Exp $
 #
 
 include ../Make.config
@@ -51,6 +51,7 @@ lz88net: std net z88_x
 
 
 net:
+	$(RM) gets.o putc_cons.o
 	zcc +z88 $(CFLAGS) -DNET_STDIO fclose.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO fgetc.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO fputc_callee.c
@@ -63,6 +64,7 @@ net:
 # It can't be +cpm, otherwise the bin output filename
 # could be forced to 'a.com' !!
 cpm:	$(GENCOBJECTS)
+	$(RM) gets.o putc_cons.o
 	zcc +test $(CFLAGS) -D__CPM__ fclose.c
 	zcc +test $(CFLAGS) -D__CPM__ fgetc.c
 	zcc +test $(CFLAGS) -D__CPM__ fputc_callee.c
@@ -72,6 +74,7 @@ cpm:	$(GENCOBJECTS)
 
 
 gen:
+	$(RM) gets.o putc_cons.o
 	zcc +test $(CFLAGS) fclose.c
 	zcc +test $(CFLAGS) fgetc.c
 	zcc +test $(CFLAGS) fputc_callee.c
@@ -84,6 +87,7 @@ std:    $(STDOBJECTS)
 
 generic_iy:
 #stdc
+	$(RM) gets.o putc_cons.o
 	zcc +test $(CFLAGS) -Ca-IXIY closeall.c
 	zcc +test $(CFLAGS) -Ca-IXIY fchkstd.c
 	zcc +test $(CFLAGS) -Ca-IXIY fdopen.c
