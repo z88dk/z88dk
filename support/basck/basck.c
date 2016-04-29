@@ -7,11 +7,11 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.3 2016-04-28 15:11:00 stefano Exp $
+ *   $Id: basck.c,v 1.4 2016-04-29 14:12:54 stefano Exp $
  */
 
 unsigned char *img;
-int	len, pos;
+int	len, pos, pos2;
 int jptab;
 int l;
 
@@ -95,6 +95,8 @@ int zxshadow_end[]={26, ADDR, 33, 0x38, 0x00, 0x22, 0x8D, 0x5C, 0x22, 0x8F, 0x5C
 int restore_skel[]={14, 0xEB, 0x2A, CATCH, CATCH, 0x28, 0x0E, 0xEB, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2};
 int microsoft_skel[]={9, CATCH, 'i', 'c', 'r', 'o', 's', 'o', 'f', 't'};
 int bastxt_skel[]={8, 0x2A, CATCH, CATCH, 0x44, 0x4D, 0x7E, 0x23, 0xB6, 0x2B, 0xC8, 0x23, 0x23, 0x7E, 0x23, 0x66};
+int bastxt_skel2[]={13, 0xC3, SKIP, SKIP, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22 };
+int bastxt_skel3[]={12, 0x18, SKIP, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22 };
 
 int microsoft_extended_skel[]={11, ADDR, 0xFE, '%', 0xC8, 0x14, 0xFE, '$', 0xC8, 0x14, 0xFE, '!'};
 int microsoft_defdbl_skel[]={7, ADDR, 'D', 'E', 'F', 'D', 'B', 'L'};
@@ -105,6 +107,8 @@ int microsoft_defdbl_skel3[]={6, ADDR, 'E', 'F', 'D', 'B', 'L'+0x80};
 /* Microsoft BASIC code inspection */
 int ulerr_skel[]={9, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2, CATCH, CATCH};
 int prognd_skel[]={8, 0xEB, 0x2A, CATCH, CATCH, 0x1A, 0x02, 0x03, 0x13};
+int prognd_skel2[]={15, 0xC3, SKIP, SKIP, 0xC0, 0x2A, SKIP, SKIP, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22, CATCH, CATCH };
+int prognd_skel3[]={14, 0x18, SKIP, 0xC0, 0x2A, SKIP, SKIP, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22, CATCH, CATCH };
 int errtab_skel[]={11, ADDR, 0x1E, 2, 1, 0x1E, SKIP, 1, 0x1E, SKIP, 1, 0x1E}; 
 
 int cmpnum_skel[]={7, 1, 0x74, 0x94, 17, SKIP, SKIP, CATCH_CALL}; 
@@ -127,7 +131,12 @@ int nxtopr_skel2[]={8, 0x16,  0x7D, SKIP_CALL, 0x2A,  CATCH, CATCH, 0xE5, 0xCD};
 
 /* chkstk_skel checked in OPNPAR first */
 int chkstk_skel2[]={10, ADDR, 0xE5, 0x2A,  SKIP, SKIP, 6, 0, 9, 9, 0x3E};
-int arrend_skel[]={9, 0xE5, 0x2A,  CATCH, CATCH, 6, 0, 9, 9, 0x3E};
+int arrend_skel3[]={9, 0xE5, 0x2A,  CATCH, CATCH, 6, 0, 9, 9, 0x3E};
+
+int arrend_skel[]={13, 0x22, CATCH, CATCH, 0x60, 0x69, 0x22, SKIP, SKIP, 6, 6, 0x2B, 0x36, 0};
+int varend_skel[]={13, 0x22, SKIP, SKIP, 0x60, 0x69, 0x22, CATCH, CATCH, 6, 6, 0x2B, 0x36, 0};
+int arrend_skel2[]={13, 0xE1, 0x22, CATCH, CATCH, 0x60, 0x69, 0x22, SKIP, SKIP, 0x2B, 0x36, 0, SKIP_CALL};
+int varend_skel2[]={13, 0xE1, 0x22, SKIP, SKIP, 0x60, 0x69, 0x22, CATCH, CATCH, 0x2B, 0x36, 0, SKIP_CALL};
 
 int fpadd_skel[]={12, ADDR, 0x3A,  SKIP, SKIP, 0xB7, 0xC8, 0x3A,  SKIP, SKIP, 0x18, 1, 0x2F};
 
@@ -191,6 +200,9 @@ int unity_skel[]={13, SKIP_CALL, 0xC1, 0xD1, 0x04, SKIP_CALL, 33, CATCH, CATCH, 
 int subphl_skel[]={13, SKIP_CALL, 0xC1, 0xD1, 0x04, SKIP_CALL, 33, SKIP, SKIP, CATCH_CALL, 33, SKIP, SKIP, 0xCD};
 int logtab_skel[]={13, SKIP_CALL, 0xC1, 0xD1, 0x04, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 33, CATCH, CATCH, 0xCD};
 int sumser_skel[]={13, SKIP_CALL, 0xC1, 0xD1, 0x04, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 33, SKIP, SKIP, CATCH_CALL};
+
+int dvbcde_org_skel[]={13, ADDR, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 1, 0x38, 0x81, 17, SKIP, SKIP, SKIP_CALL, 33};
+
 
 int tan_skel[]={10, ADDR, SKIP_CALL, SKIP_CALL, 0xC1, 0xE1, SKIP_CALL, 0xEB, SKIP_CALL, SKIP_CALL, 0xC3};
 int sin_skel2[]={9, SKIP_CALL, CATCH_CALL, 0xC1, 0xE1, SKIP_CALL, 0xEB, SKIP_CALL, SKIP_CALL, 0xC3};
@@ -306,11 +318,15 @@ int datsnr_skel[]={15, ADDR, 0x2A, SKIP, SKIP, 0x22, SKIP, SKIP, 0x1E, 2, 1, 0x1
 int tkmsbasic_skel[]={12, 17, CATCH, CATCH, 0x1A, 0x13, 0xB7, 0xF2, SKIP, SKIP, 0x0D, 0x20, 0xF7};
 int tkmsbasic_skel2[]={15, 33, CATCH, CATCH, 0x7E, 0xB7, 0x23, 0xF2, SKIP, SKIP, 0x1D, 0xC2, SKIP, SKIP, 0xA6, 0x7F};
 int tkmsbasic_skel3[]={12, 0xD5, 17, CATCH, CATCH, 0xC5, 1, SKIP, SKIP, 0xC5, 0x06, SKIP, 0x7E};
+/* Last resort attempt, we look for the text ! */
+int tkmsbasic_old_skel[]={8, ADDR, 'E', 'N', 0xC4, 'F', 'O', 0xd2, 'N'};
 
-/* odd MSX/Spectravideo tokens*/
-int tkmsbasic_msx_skel[]={12, SKIP_CALL, 33, CATCH, CATCH, 0x47, 0x0e, 0x40, 0x0C, 0x23, 0x54, 0x5D, 0x7E};
+/* Odd extended BASIC (i.e. MSX) tokens*/
+int tkmsbasic_ex_skel[]={11, 33, CATCH, CATCH, 0x47, 0x0e, 0x40, 0x0C, 0x23, 0x54, 0x5D, 0x7E};
 
-
+/*
+	TODO: Decoding tokens in modern mode (i.e. MSX machines)
+*/
 
 int tkmsbasic_code_skel[]={12, 0xD5, 17, SKIP, SKIP, 0xC5, 1, SKIP, SKIP, 0xC5, 0x06, CATCH, 0x7E};
 int jptab_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 9, 0x4E};
@@ -485,6 +501,10 @@ int main(int argc, char *argv[])
 	res=find_skel(restore_skel);
 	if (res<0)
 		res=find_skel(bastxt_skel);
+	if (res<0)
+		res=find_skel(bastxt_skel2);
+	if (res<0)
+		res=find_skel(bastxt_skel3);
 	if (res<0) {
 		res=find_skel(errtab_skel);
 		if (res>0) res =0xFFFF;
@@ -520,25 +540,33 @@ int main(int argc, char *argv[])
 
 		printf("\n");
 
-		pos=find_skel(cpdehl_skel)+1;
-		if (pos>0)
+		pos=find_skel(cpdehl_skel);
+		if (pos>0) {
 			printf("CPDEHL = $%04X  ; compare DE and HL",pos);
-		
-		res=find_skel(cpdehl_loc_skel);
-		if (res<0)
-			res=find_skel(cpdehl_loc_skel2);
-		if (res>0) {
-			pos=res-pos;
-			if (pos>0)
-				printf("\n    (Detected position for ORG:  $%04X)",pos);
-			else pos=0;
-		} else pos=0;
+			res=find_skel(cpdehl_loc_skel);
+			if (res<0)
+				res=find_skel(cpdehl_loc_skel2);
+			if (res>0) {
+				pos=res-pos-1;
+				if (pos>0)
+					printf("\n    (Detected position for ORG:  $%04X)",pos);
+				else pos=0;
+			} else pos=0;
+		}
 
-		
+		res=find_skel(dvbcde_skel);
+		pos2=find_skel(dvbcde_org_skel);
+		if ((res>0) && (pos2>0)) {
+			pos=pos2-res+1;
+			printf("\n    (Detected position for ORG:  $%04X)",pos);
+		}
+
+
 		
 		printf("\n\n");
 
-		
+
+
 		res=find_skel(buffer_loc_skel);
 		if (res<0)
 			res=find_skel(buffer_loc_skel2);
@@ -571,10 +599,24 @@ int main(int argc, char *argv[])
 
 
 		res=find_skel(prognd_skel);
+		if (res<0)
+			res=find_skel(prognd_skel2);
+		if (res<0)
+			res=find_skel(prognd_skel3);
 		if (res>0)
 			printf("PROGND = $%04X  ; BASIC program end ptr\n",res);
 
+		res=find_skel(varend_skel);
+		if (res<0)
+			res=find_skel(varend_skel2);
+		if (res>0)
+			printf("VAREND = $%04X  ; End of variables\n",res);
+
 		res=find_skel(arrend_skel);
+		if (res<0)
+			res=find_skel(arrend_skel2);
+		if (res<0)
+			res=find_skel(arrend_skel3);
 		if (res>0)
 			printf("ARREND = $%04X  ; End of arrays (lowest free mem)\n",res);
 
@@ -809,10 +851,20 @@ int main(int argc, char *argv[])
 			printf("DIV    = $%04X  ; Divide FP by number on stack\n",res);
 			res +=2;
 		}
+		
+		res=find_skel(dvbcde_org_skel);
+		if (res>0)
+			printf("DVBCDE = $%04X  ; Divide FP by BCDE\n",res+pos+1);
 		if (res <0)
 			res=find_skel(dvbcde_skel);
 		if (res>0)
 			printf("DVBCDE = $%04X  ; Divide FP by BCDE\n",res);
+		else {
+			res=find_skel(dvbcde_org_skel);
+			if (res>0)
+				printf("DVBCDE = $%04X  ; Divide FP by BCDE\n",res+pos+1);
+		}
+
 
 		res=find_skel(dcbde_skel);
 		if (res>0)
@@ -1062,52 +1114,107 @@ int main(int argc, char *argv[])
 				jptab=0x134+0x61;
 		}
 
-		res=find_skel(tkmsbasic_msx_skel);
-		if (res>0)
-			printf("\nTOKEN table position = $%04X\n",res);
-
-		res=find_skel(tkmsbasic_skel)-1;
-		if (res<0)
-			res=find_skel(tkmsbasic_skel2);
-		if (res<0)
-			res=find_skel(tkmsbasic_skel3);
+		res=find_skel(tkmsbasic_ex_skel);
 		if (res>0) {
-			res=res+1-pos;
-			printf("\n\n\nTOKEN table position = $%04X\n",res+pos);
-			new_tk_found=0;
-			printf("\n-- STATEMENTS --\n");
-			printf("\n\t ---  ");
-			chr=find_skel(tkmsbasic_code_skel)+1;;
-			for (i=res; img[i]!=128; i++) {
-				if ((c == 'W') && (img[i-2] == 'E') && ((img[i-3] == 'N') || (img[i-3] == ('N'+0x80)))) {
-					new_tk_found=1;
-					printf("\n\n-- OPERATORS & extras --\n");
-				}
-				if ((c == '<') && ((img[i-2] != '=') || (img[i-2] != ('='+0x80)))) {
-					jptab=find_skel(fnctab_msbasic_skel);
-					if (jptab<0)
-						jptab=find_skel(fnctab_msbasic_skel2);
-					if (jptab>0) {
-						printf("\n\nJP table for functions = $%04X\n",jptab);
-						res=find_skel(pc6001_60_page);
-						if (res>0)
-							jptab=0x134+0xB7;
+			
+			printf("\nTOKEN table position = $%04X, word list in modern encoding mode.\n",res);
+
+		} else {
+			res=find_skel(tkmsbasic_skel)-1;
+			if (res<0)
+				res=find_skel(tkmsbasic_skel2);
+			if (res<0)
+				res=find_skel(tkmsbasic_skel3);
+			if (res>0) {
+				res=res+1-pos;
+				printf("\n\n\nTOKEN table position = $%04X, word list in classic encoding mode\n",res+pos);
+				new_tk_found=0;
+				printf("\n-- STATEMENTS --\n");
+				printf("\n\t ---  ");
+				chr=find_skel(tkmsbasic_code_skel)+1;;
+				for (i=res; img[i]!=128; i++) {
+					if ((c == 'W') && (img[i-2] == 'E') && ((img[i-3] == 'N') || (img[i-3] == ('N'+0x80)))) {
+						new_tk_found=1;
+						printf("\n\n-- OPERATORS & extras --\n");
 					}
+					if ((c == '<') && ((img[i-2] != '=') || (img[i-2] != ('='+0x80)))) {
+						jptab=find_skel(fnctab_msbasic_skel);
+						if (jptab<0)
+							jptab=find_skel(fnctab_msbasic_skel2);
+						if (jptab>0) {
+							printf("\n\nJP table for functions = $%04X\n",jptab);
+							res=find_skel(pc6001_60_page);
+							if (res>0)
+								jptab=0x134+0xB7;
+						}
+						new_tk_found=0;
+						printf("\n-- FUNCTIONS --\n");
+					}
+					c=img[i];
+					if (c>=128) {
+						c-=128; 
+						if ((jptab>0) && !(new_tk_found)) {
+							printf("\n$%04X - [%d] ", img[jptab-pos]+256*img[jptab-pos+1], chr);
+							jptab+=2;
+						} else
+							printf("\n\t %d  ",chr);
+						chr++;
+					}
+					printf("%c",c);
+				}		
+			} else {
+				res=find_skel(tkmsbasic_old_skel);
+				if (res>0) {
+					res=res+1;
+					printf("\n\n\nTOKEN table position = $%04X, word list in earlier encoding mode.\n",res+pos);
 					new_tk_found=0;
-					printf("\n-- FUNCTIONS --\n");
+					printf("\n-- STATEMENTS --\n");
+					printf("\n\t ---  ");
+					chr=128;
+					
+					if (jptab>0) {
+							printf("\n$%04X - [%d] ", img[jptab-pos]+256*img[jptab-pos+1], chr);
+							jptab+=2;
+					}
+					else
+							printf("\n\t %d  ",chr);
+						
+					for (i=res; ((img[i]!=128)&&(img[i]!=0)); i++) {
+						c=img[i];
+						if (c>=128) c-=128;
+						if (!new_tk_found && ((img[i+1]  == '@') || ((img[i+1]  == 'T') && (img[i+2] == 'A') && ((img[i+3] == 'B') || (img[i+3] == ('B'+0x80)))))) {
+							printf("%c",c);
+							new_tk_found=1;
+							printf("\n\n-- OPERATORS & extras --\n");
+						} else {
+							if ((img[i+1]  == 'S') && (img[i+2] == 'G') && ((img[i+3] == 'N') || (img[i+3] == ('N'+0x80)))) {
+								printf("%c",c);
+								jptab=find_skel(fnctab_msbasic_skel);
+								if (jptab<0)
+									jptab=find_skel(fnctab_msbasic_skel2);
+								if (jptab>0) {
+									printf("\n\nJP table for functions = $%04X\n",jptab);
+									res=find_skel(pc6001_60_page);
+									if (res>0)
+										jptab=0x134+0xB7;
+								}
+								new_tk_found=0;
+								printf("\n-- FUNCTIONS --\n");
+							} else	printf("%c",c);
+						}
+						if (img[i]>=128) {
+							if ((jptab>0) && !(new_tk_found)) {
+								printf("\n$%04X - [%d] ", img[jptab-pos]+256*img[jptab-pos+1], chr);
+								jptab+=2;
+							} else
+								printf("\n\t %d  ",chr);
+							chr++;
+						}
+
+					}
 				}
-				c=img[i];
-				if (c>=128) {
-					c-=128; 
-					if ((jptab>0) && !(new_tk_found)) {
-						printf("\n$%04X - [%d] ", img[jptab-pos]+256*img[jptab-pos+1], chr);
-						jptab+=2;
-					} else
-						printf("\n\t %d  ",chr);
-					chr++;
-				}
-				printf("%c",c);
-			}		
+			
+			}	
 		}
 	}
 
@@ -1381,7 +1488,7 @@ int main(int argc, char *argv[])
 							if (c>=128) { c-=128; printf("%c\n\t    ",c); }
 							else printf("%c",c);
 						}
-					}			
+					}
 				}
 				break;
 		}
