@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.7 2016-03-31 13:50:49 dom Exp $
+;	$Id: fputc_cons.asm,v 1.8 2016-04-29 20:37:26 dom Exp $
 ;
 
 	SECTION	code_clib
@@ -25,11 +25,19 @@
 	ld	e,a
 	cp	12	; FF (CLS) ?
 	jr	z,docls
+IF STANDARDESCAPECHARS
 	cp	10	; CR ?
 	jr	nz,nocrlf
 	ld	c,2
 	call	5
 	ld	de,13
+ELSE
+        cp      13      ; CR ?
+        jr      nz,nocrlf
+        ld      c,2
+        call    5
+        ld      de,10
+ENDIF
 .nocrlf
 	ld      c,2
 	jp	5
