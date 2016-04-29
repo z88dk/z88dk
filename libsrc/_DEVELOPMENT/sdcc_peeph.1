@@ -225,6 +225,22 @@ replace restart {
 }
 
 replace restart {
+	call	_intrinsic_return_bc
+} by {
+	ld	l,c
+	ld	h,b
+	; peephole z88dk-intrinsic-return-bc
+}
+
+replace restart {
+	call	_intrinsic_return_de
+} by {
+	ld	l,e
+	ld	h,d
+	; peephole z88dk-intrinsic-return-de
+}
+
+replace restart {
 	call	_intrinsic_swap_endian_16_fastcall
 } by {
 	ld	a,l

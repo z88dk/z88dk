@@ -124,6 +124,15 @@
 =
 	ex	de,hl
 
+	call	intrinsic_return_bc
+=
+	ld	l,c
+	ld	h,b
+
+	call	intrinsic_return_de
+=
+	ex	de,hl
+
 	call	intrinsic_swap_endian_16
 =
 	ld	a,l
