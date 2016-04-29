@@ -9,7 +9,7 @@
 ;
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.6 2016-03-06 21:36:52 dom Exp $
+;	$Id: fputc_cons.asm,v 1.7 2016-04-29 20:35:11 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
@@ -24,7 +24,11 @@
         ld      hl,2
         add     hl,sp
         ld      a,(hl)
+IF STANDARDESCAPECHARS
+	cp      10
+ELSE
         cp      13
+ENDIF
         jr      z,putchar1
         call_oz(os_out)		;preserves ix
 	ld	l,a
@@ -32,6 +36,10 @@
         ret
 .putchar1
         call_oz(gn_nln)		;preserves ix
+IF STANDARDESCAPECHARS
+	ld	hl,10
+ELSE
 	ld	hl,13
+ENDIF
 	ret
 

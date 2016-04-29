@@ -4,7 +4,7 @@
 ;11/3/99 djm Saved two bytes by removing useless ld h,0
 ;
 ;
-;	$Id: getk.asm,v 1.6 2016-03-06 21:36:52 dom Exp $
+;	$Id: getk.asm,v 1.7 2016-04-29 20:35:11 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
@@ -25,5 +25,11 @@
         ret     c
         and     a
         jp      z,getcmd
+IF STANDARDESCAPECHARS
+        cp      13
+        jr      nz,not_nln
+        ld      a,10
+.not_nln
+ENDIF
         ld      l,a
         ret
