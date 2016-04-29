@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.234 2016-04-04 18:02:35 dom Exp $
+# $Id: Makefile,v 1.235 2016-04-29 20:51:15 dom Exp $
 
 
 include Make.config
@@ -938,7 +938,7 @@ cpm_clib.lib:
 	$(MAKE) -C time 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
+	$(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
 
 # Sorcerer Exidy lib - Stefano
 sorcerer_clib.lib:
