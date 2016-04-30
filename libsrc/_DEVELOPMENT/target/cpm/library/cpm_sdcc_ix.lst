@@ -15,6 +15,7 @@
 @locale/locale.lst
 @math/math_integer.lst
 @math/math_float_sdcc_ix.lst
+@network/network_sdcc_ix.lst
 @setjmp/setjmp_sdcc_ix.lst
 @stdio/stdio_sdcc_ix.lst
 @stdlib/stdlib_sdcc_ix.lst
