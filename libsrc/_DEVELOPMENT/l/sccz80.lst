@@ -1,5 +1,4 @@
 l/sccz80/crt0/getarg
-l/sccz80/crt0/htons
 l/sccz80/crt0/l_and
 l/sccz80/crt0/l_asl
 l/sccz80/crt0/l_asr
@@ -53,7 +52,6 @@ l/sccz80/crt0/l_ugt
 l/sccz80/crt0/l_ule
 l/sccz80/crt0/l_ult
 l/sccz80/crt0/l_xor
-l/sccz80/crt0_long/htonl
 l/sccz80/crt0_long/int2long_s
 l/sccz80/crt0_long/int2long_s_float
 l/sccz80/crt0_long/l_declong
