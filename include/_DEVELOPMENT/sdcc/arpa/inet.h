@@ -8,6 +8,15 @@
 #include <intrinsic.h>
 #include <netinet/in.h>
 
+extern unsigned long htonl(unsigned long) __preserves_regs(b,c);
+
+extern unsigned int htons(unsigned int) __preserves_regs(b,c,d,e);
+
+extern unsigned long ntohl(unsigned long) __preserves_regs(b,c);
+
+extern unsigned int ntohs(unsigned int) __preserves_regs(b,c,d,e);
+
+
 #define htonl(a) intrinsic_swap_endian_32(a)
 #define htons(a) intrinsic_swap_endian_16(a)
 #define ntohl(a) intrinsic_swap_endian_32(a)

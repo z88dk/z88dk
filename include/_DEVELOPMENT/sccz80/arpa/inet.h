@@ -8,6 +8,19 @@
 #include <intrinsic.h>
 #include <netinet/in.h>
 
+extern unsigned long __LIB__ htonl(unsigned long);
+
+
+extern unsigned int __LIB__ htons(unsigned int);
+
+
+extern unsigned long __LIB__ ntohl(unsigned long);
+
+
+extern unsigned int __LIB__ ntohs(unsigned int);
+
+
+
 #define htonl(a) intrinsic_swap_endian_32(a)
 #define htons(a) intrinsic_swap_endian_16(a)
 #define ntohl(a) intrinsic_swap_endian_32(a)

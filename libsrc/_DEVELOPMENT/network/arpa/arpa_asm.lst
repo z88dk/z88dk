@@ -1,0 +1,4 @@
+network/arpa/z80/asm_htonl
+network/arpa/z80/asm_htons
+network/arpa/z80/asm_ntohl
+network/arpa/z80/asm_ntohs
