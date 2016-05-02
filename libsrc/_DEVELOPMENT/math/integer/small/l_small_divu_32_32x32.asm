@@ -5,7 +5,8 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC l_small_divu_32_32x32, l0_small_divu_32_32x32
+PUBLIC l_small_divu_32_32x32
+PUBLIC l0_small_divu_32_32x32,  l1_small_divu_32_32x32
 
 EXTERN error_divide_by_zero_mc
 
@@ -57,6 +58,8 @@ l0_small_divu_32_32x32:
    ld l,a
    ld h,a
 
+ l1_small_divu_32_32x32:
+   
    ; dede' = 32-bit divisor
    ; bcbc' = 32-bit dividend
    ; hlhl' = 0
