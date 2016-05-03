@@ -70,14 +70,14 @@ l_small_divu_64_64x64:
    or (ix+5)
    or (ix+4)
    
-   jr z, m_32_bit              ; if MS32(dividend) == 0
+   jp z, m_32_bit              ; if MS32(dividend) == 0
    
    ld a,(ix+11)
    or (ix+10)
    or (ix+9)
    or (ix+8)
    
-   jr z, divide_by_zero        ; if divisor == 0
+   jp z, divide_by_zero        ; if divisor == 0
    
 m_64_bit:
 
