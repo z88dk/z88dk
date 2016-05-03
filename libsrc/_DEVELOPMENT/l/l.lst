@@ -141,3 +141,7 @@ l/z80/long/fast/l_fast_lsr_dehl
 l/z80/long/small/l_small_asr_dehl
 l/z80/long/small/l_small_lsl_dehl
 l/z80/long/small/l_small_lsr_dehl
+l/z80/longlong/l_cpl_64_dehldehl
+l/z80/longlong/l_cpl_64_mhl
+l/z80/longlong/l_neg_64_dehldehl
+l/z80/longlong/l_neg_64_mhl
