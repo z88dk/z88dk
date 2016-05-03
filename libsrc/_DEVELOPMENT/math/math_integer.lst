@@ -25,12 +25,15 @@ math/integer/fast/l_fast_mulu_32_32x32
 math/integer/fast/l_fast_mulu_40_32x8
 math/integer/small/l_small_divs_16_16x16
 math/integer/small/l_small_divs_32_32x32
+math/integer/small/l_small_divs_64_64x64
 math/integer/small/l_small_divu_16_16x16
 math/integer/small/l_small_divu_32_32x32
+math/integer/small/l_small_divu_64_64x64
 math/integer/small/l_small_mul_16_16x16
 math/integer/small/l_small_mul_32_32x32
 math/integer/small/l_small_mul_40_32x8
 math/integer/small/l_small_mul_64_32x32
+math/integer/small/l_small_mul_64_64x64
 math/integer/l_divs_16_16x16
 math/integer/l_divs_32_32x32
 math/integer/l_divu_16_16x8
