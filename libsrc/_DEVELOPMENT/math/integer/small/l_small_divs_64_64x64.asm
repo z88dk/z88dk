@@ -6,7 +6,7 @@ SECTION code_math
 
 PUBLIC l_small_divs_64_64x64
 
-EXTERN error_divide_by_zero_mc
+EXTERN error_divide_by_zero_mc, l_offset_ix_de
 EXTERN l_neg_64_mhl, l_neg_64_dehldehl
 EXTERN l_small_divu_64_64x64, l_setmem_hl
 
