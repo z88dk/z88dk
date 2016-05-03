@@ -35,7 +35,7 @@ l_small_divu_64_64x64:
    ;                 | + 0
    ;                 +------------------------
    ;
-   ;            dehl dehl' = remainder
+   ;            dehl' dehl = remainder
    ;            carry reset
    ;
    ;         divide by zero
@@ -50,7 +50,7 @@ l_small_divu_64_64x64:
    ;                 | + 0  0xffffffff
    ;                 +------------------------
    ;
-   ;            dehl dehl' = dividend
+   ;            dehl' dehl = dividend
    ;            carry set, errno set
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
@@ -193,8 +193,6 @@ loop_1:
    rl (ix+6)
    rl (ix+7)
  
-   exx
- 
    or a
    ret
 
@@ -252,6 +250,7 @@ m_32_bit:
    ld e,a
    ld d,a
    
+   exx
    ret
   
 divide_by_zero:
