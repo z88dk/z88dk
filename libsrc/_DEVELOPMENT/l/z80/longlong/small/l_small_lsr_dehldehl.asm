@@ -9,9 +9,9 @@ EXTERN error_llznc, error_lznc
 
 l_small_lsr_dehldehl:
 
-   ; logical shift right 32-bit unsigned long
+   ; logical shift right 64-bit unsigned long
    ;
-   ; enter : dehl'dehl = 32-bit number
+   ; enter : dehl'dehl = 64-bit number
    ;                 a = shift amount
    ;
    ; exit  : dehl'dehl = dehl'dehl >> a
