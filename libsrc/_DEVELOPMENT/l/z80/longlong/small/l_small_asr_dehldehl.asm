@@ -5,7 +5,7 @@ SECTION code_l
 PUBLIC l_small_asr_dehldehl
 
 EXTERN l_asr_dehl
-EXTERN error_llznc
+EXTERN error_llmnc, error_llznc
 
 l_small_asr_dehldehl:
 
@@ -22,7 +22,7 @@ l_small_asr_dehldehl:
    ret z
    
    cp 64
-   jp nc, error_llznc
+   jr nc, shift_infinite
 
    cp 32
    jr c, shift
@@ -74,3 +74,12 @@ shift_loop:
    
    ld e,a
    ret
+
+shift_infinite:
+
+   exx
+   bit 7,d
+   exx
+   
+   jp z, error_llznc
+   jp error_llmnc

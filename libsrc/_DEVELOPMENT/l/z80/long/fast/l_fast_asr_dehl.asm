@@ -5,6 +5,7 @@ SECTION code_l
 PUBLIC l_fast_asr_dehl
 
 EXTERN l0_fast_asr_hl
+EXTERN error_lznc, error_lmnc
 
 l_fast_asr_dehl:
 
@@ -19,9 +20,13 @@ l_fast_asr_dehl:
    
    or a
    ret z
-   ld c,8
    
+   cp 32
+   jr nc, shift_infinite
+   
+   ld c,8
    sub c
+   
    jr c, fine_shift
 
    ld l,h
@@ -72,3 +77,10 @@ fine_shift_loop:
    
    ld e,a
    ret
+
+shift_infinite:
+
+   bit 7,d
+   
+   jp z, error_lznc
+   jp error_lmnc

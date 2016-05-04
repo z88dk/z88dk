@@ -2,7 +2,10 @@
 SECTION code_clib
 SECTION code_l
 
-PUBLIC l_fast_asr_hl, l0_fast_asr_hl
+PUBLIC l_fast_asr_hl
+PUBLIC l0_fast_asr_hl
+
+EXTERN error_znc, error_mnc
 
 l_fast_asr_hl:
 
@@ -18,9 +21,12 @@ l_fast_asr_hl:
    or a
    ret z
    
-   ld c,8
+   cp 16
+   jr nc, shift_infinite
    
+   ld c,8
    sub c
+   
    jr c, fine_shift
    
    ld l,h
@@ -55,3 +61,10 @@ fine_shift_loop:
    
    ld l,a
    ret
+
+shift_infinite:
+
+   bit 7,h
+   
+   jp z, error_znc
+   jp error_mnc

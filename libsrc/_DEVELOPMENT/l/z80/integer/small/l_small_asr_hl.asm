@@ -3,7 +3,7 @@ SECTION code_clib
 SECTION code_l
 
 PUBLIC l_small_asr_hl
-EXTERN error_znc
+EXTERN error_znc, error_mnc
 
 l_small_asr_hl:
 
@@ -20,7 +20,7 @@ l_small_asr_hl:
    ret z
    
    cp 16
-   jp nc, error_znc
+   jr nc, shift_infinite
    
    ld b,a
    ld a,l
@@ -34,3 +34,10 @@ shift_loop:
    
    ld l,a
    ret
+
+shift_infinite:
+
+   bit 7,h
+   
+   jp z, error_znc
+   jp error_mnc

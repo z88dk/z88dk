@@ -4,7 +4,7 @@ SECTION code_l
 
 PUBLIC l_small_asr_dehl
 
-EXTERN error_lznc
+EXTERN error_lznc, error_mnc
 
 l_small_asr_dehl:
 
@@ -21,7 +21,7 @@ l_small_asr_dehl:
    ret z
    
    cp 32
-   jp nc, error_lznc
+   jr nc, shift_infinite
    
    ld b,a
    ld a,e
@@ -37,3 +37,10 @@ shift_loop:
    
    ld e,a
    ret
+
+shift_infinite:
+
+   bit 7,d
+
+   jp z, error_lznc
+   jp error_lmnc
