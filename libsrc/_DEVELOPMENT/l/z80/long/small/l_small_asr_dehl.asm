@@ -4,7 +4,7 @@ SECTION code_l
 
 PUBLIC l_small_asr_dehl
 
-EXTERN error_lznc, error_mnc
+EXTERN error_lznc, error_lmnc
 
 l_small_asr_dehl:
 
