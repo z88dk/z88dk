@@ -145,3 +145,4 @@ l/z80/longlong/l_cpl_64_dehldehl
 l/z80/longlong/l_cpl_64_mhl
 l/z80/longlong/l_neg_64_dehldehl
 l/z80/longlong/l_neg_64_mhl
+l/z80/longlong/l_store_64_dehldehl_mbc
