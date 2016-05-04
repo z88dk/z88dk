@@ -44,6 +44,13 @@
 	call	__divslong_callee
 	push	hl
 
+	call	__divslonglong
+	ld	hl,18
+	add	hl,sp
+	ld	sp,hl
+=
+	call	__divslonglong_callee
+
 	call	__divsuchar
 	pop	af
 =
@@ -95,6 +102,13 @@
 =
 	call	__divulong_callee
 	push	hl
+
+	call	__divulonglong
+	ld	hl,18
+	add	hl,sp
+	ld	sp,hl
+=
+	call	__divulonglong_callee
 
 	call	__divuschar
 	pop	af
@@ -148,6 +162,13 @@
 	call	__modslong_callee
 	push	hl
 
+	call	__modslonglong
+	ld	hl,18
+	add	hl,sp
+	ld	sp,hl
+=
+	call	__modslonglong_callee
+
 	call	__modsuchar
 	pop	af
 =
@@ -198,7 +219,14 @@
 	ex	(sp),hl
 =
 	call	__modulong_callee
-	puah	hl
+	push	hl
+
+	call	__modulonglong
+	ld	hl,18
+	add	hl,sp
+	ld	sp,hl
+=
+	call	__modulonglong_callee
 
 	call	__moduschar
 	pop	af
@@ -240,6 +268,13 @@
 =
 	call	__mullong_callee
 	push	hl
+
+	call	__mullonglong
+	ld	hl,18
+	add	hl,sp
+	ld	sp,hl
+=
+	call	__mullonglong_callee
 
 	call	__mulschar
 	pop	af
