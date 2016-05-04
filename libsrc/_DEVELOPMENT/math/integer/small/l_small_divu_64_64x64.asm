@@ -234,16 +234,12 @@ m_32_bit:
    ; dehl = quotient
    ; dehl'= remainder
    
-   xor a
-   
    ld (ix+0),l
    ld (ix+1),h
    ld (ix+2),e
    ld (ix+3),d
-   ld (ix+4),a
-   ld (ix+5),a
-   ld (ix+6),a
-   ld (ix+7),a
+
+   xor a
    
    ld l,a
    ld h,a
