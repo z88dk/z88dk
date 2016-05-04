@@ -53,6 +53,14 @@ l/sdcc/__mulsuchar
 l/sdcc/__mulsuchar_callee
 l/sdcc/__muluschar
 l/sdcc/__muluschar_callee
+l/sdcc/__rlslonglong
+l/sdcc/__rlslonglong_callee
+l/sdcc/__rlulonglong
+l/sdcc/__rlulonglong_callee
+l/sdcc/__rrslonglong
+l/sdcc/__rrslonglong_callee
+l/sdcc/__rrulonglong
+l/sdcc/__rrulonglong_callee
 l/sdcc/__sdcc_exit_div_64
 l/sdcc/__sdcc_exit_div_64_callee
 l/sdcc/__sdcc_exit_mod_64
