@@ -309,6 +309,34 @@
 	call	__muluschar_callee
 	push	hl
 
+	call	__rlslonglong
+	ld	hl,11
+	add	hl,sp
+	ld	sp,hl
+=
+	call	__rlslonglong_callee
+
+	call	__rlulonglong
+	ld	hl,11
+	add	hl,sp
+	ld	sp,hl
+=
+	call	__rlulonglong_callee
+
+	call	__rrslonglong
+	ld	hl,11
+	add	hl,sp
+	ld	sp,hl
+=
+	call	__rrslonglong_callee
+
+	call	__rrulonglong
+	ld	hl,11
+	add	hl,sp
+	ld	sp,hl
+=
+	call	__rrulonglong_callee
+
 ;;
 ;; sdcc float primitives made callee
 ;;
