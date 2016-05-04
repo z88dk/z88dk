@@ -4,7 +4,7 @@ SECTION code_l
 
 PUBLIC l_cpl_64_dehldehl
    
-l_cpl_64_dehl_dehl:
+l_cpl_64_dehldehl:
 
    ; complement dehl'dehl
    ;
