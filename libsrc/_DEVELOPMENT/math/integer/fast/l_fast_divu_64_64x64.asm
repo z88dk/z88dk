@@ -7,7 +7,7 @@ SECTION code_math
 PUBLIC l_small_divu_64_64x64
 
 EXTERN l_setmem_hl, error_divide_by_zero_mc
-EXTERN l1_small_divu_32_32x32
+EXTERN l0_fast_divu_32_32x32
 
 l_small_divu_64_64x64:
 
