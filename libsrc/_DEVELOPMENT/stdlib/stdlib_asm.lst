@@ -60,6 +60,7 @@ stdlib/z80/__dtog__
 stdlib/z80/__dtoh__
 stdlib/z80/__ldiv_store
 stdlib/z80/__lldiv_store
+stdlib/z80/__lldiv_store_callee
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtod_dec
 stdlib/z80/__strtod_exponent
