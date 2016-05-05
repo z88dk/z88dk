@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.6 2016-05-04 15:47:54 stefano Exp $
+ *   $Id: basck.c,v 1.7 2016-05-05 10:11:23 stefano Exp $
  */
 
 unsigned char  *img;
@@ -376,6 +376,12 @@ int numasc_skel[]={15, SKIP_CALL, CATCH_CALL, SKIP_CALL, SKIP_CALL, 1, SKIP, SKI
 int fpsint_skel[]={12, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xFA, SKIP, SKIP, 0x3A, SKIP, SKIP, 0xFE, 0x91};
 int fpsint_skel2[]={12, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xFC, SKIP, SKIP, 0x3A, SKIP, SKIP, 0xFE, 0x91};
 
+int abpass_skel[]={11, ADDR, 0x50, 0x1E, 0, 33, SKIP, SKIP, 0x73, 6, 0x90, 0xC3};
+int abpass_skel2[]={8, 0x47, ADDR, 0x50, 0x1E, 0, 6, 0x90, 0xC3};
+
+int hlpass_skel[]={8, ADDR, 0x7C, 0x55, 0x1E, 0, 6, 0x90, 0xC3};
+
+
 int atoh_skel[]={12, ADDR, 0x2B, 17, 0, 0, SKIP_CALL, 0xD0, 0xE5, 0xF5, 33, 0x98, 0x19};
 int atoh_skel2[]={10, ADDR, 0x2B, 0xC5, SKIP_CALL, 0xC1, 0xD0, SKIP_CALL, 17, 0, 0};
 
@@ -411,21 +417,6 @@ int tkmsbasic_code_skel[]={12, 0xD5, 17, SKIP, SKIP, 0xC5, 1, SKIP, SKIP, 0xC5, 
 int jptab_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 9, 0x4E};
 int jptab_msbasic_skel3[]={11, 17, CATCH, CATCH, 0xD4, SKIP,SKIP, 7, 0x4f, 6, 0, 0xEB};
 int jptab_msbasic_skel2[]={12, 17, CATCH, CATCH, 0x07, 0x4F, 6, 0, 0xEB, 0x09, 0x4E, 0x23, 0x46};
-/*
-00000F3A:	LD DE,03B4h
-00000F3D:	RLCA
-00000F3E:	LD C,A
-00000F3F:	LD B,00h
-00000F41:	EX DE,HL
-00000F42:	ADD HL,BC
-00000F43:	LD C,(HL)
-00000F44:	INC HL
-00000F45:	LD B,(HL)
-00000F46:	PUSH BC
-00000F47:	EX DE,HL
-00000F48:	INC HL
-00000F49:	LD A,(HL)
-*/
 
 
 int fnctab_msbasic_skel[]={10, 0xD5, 1, CATCH, CATCH, 9, 0x4E, 0x23, 0x66, 0x69, 0xE9};
@@ -873,9 +864,19 @@ int main(int argc, char *argv[])
 		if (res>0) {
 			printf("FPSINT = $%04X  ; Get subscript (0-32767)\n",res+pos+1);
 			printf("POSINT = $%04X  ; Get integer 0 to 32767\n",res+pos+4);
-			printf("DEINT  = $%04X  ; Get integer (-32768 to 32767) to DE\n",res+pos+13);
+			printf("DEINT  = $%04X  ; Get integer variable (-32768 to 32767) to DE\n",res+pos+13);
 		}
 		
+		res=find_skel(abpass_skel);
+		if (res<0)
+			res=find_skel(abpass_skel2);
+		if (res>0)
+			printf("ABPASS = $%04X  ; Get back from function passing an INT value in A+B registers\n",res+pos+2);
+		
+		res=find_skel(hlpass_skel);
+		if (res>0)
+			printf("HLPASS = $%04X  ; Get back from function passing an INT value HL\n",res+pos+1);
+
 
 		res=find_skel(midnum_skel);
 		if (res>0)
@@ -1271,13 +1272,16 @@ int main(int argc, char *argv[])
 		res=find_skel(tstopl_skel);
 		if (res<0)
 			res=find_skel(tstopl_skel2);
-		if (res<0)
-			res=find_skel(tstopl_skel3);
-		if (res<0)
-			res=find_skel(tstopl_skel4);
 		if (res>0)
 			printf("TSTOPL = $%04X  ; Temporary string to pool\n",res+pos+1);
-
+		else {
+			res=find_skel(tstopl_skel3);
+			if (res<0)
+				res=find_skel(tstopl_skel4);
+			if (res>0)
+				printf("TSTOPL = $%04X  ; Temporary string to pool\n",res);
+		}
+		
 		res=find_skel(opnpar_skel);
 		if (res>0)
 			printf("OPNPAR = $%04X  ; Chk Syntax make sure '(' follows\n",res+pos+1);
