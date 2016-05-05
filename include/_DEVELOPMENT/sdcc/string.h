@@ -330,9 +330,9 @@ extern size_t strxfrm_callee(char *dst,char *src,size_t n) __z88dk_callee;
 
 #ifdef __SDCC
 
-extern int ffsll(long long i) __preserves_regs(b,c);
-extern int ffsll_callee(long long i) __preserves_regs(b,c) __z88dk_callee;
-#define ffsll(a) ffsll_callee(a)
+   extern int ffsll(long long i) __preserves_regs(b,c);
+   extern int ffsll_callee(long long i) __preserves_regs(b,c) __z88dk_callee;
+   #define ffsll(a) ffsll_callee(a)
 
    #ifndef __SDCC_DISABLE_BUILTIN
 
