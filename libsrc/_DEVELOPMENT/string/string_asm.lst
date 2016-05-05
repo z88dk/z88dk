@@ -3,6 +3,7 @@ string/z80/asm_bcopy
 string/z80/asm_bzero
 string/z80/asm_ffs
 string/z80/asm_ffsl
+string/z80/asm_ffsll
 string/z80/asm_index
 string/z80/asm_memccpy
 string/z80/asm_memchr

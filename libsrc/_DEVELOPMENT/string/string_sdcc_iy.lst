@@ -8,6 +8,8 @@ string/c/sdcc_iy/ffs
 string/c/sdcc_iy/ffs_fastcall
 string/c/sdcc_iy/ffsl
 string/c/sdcc_iy/ffsl_fastcall
+string/c/sdcc_iy/ffsll
+string/c/sdcc_iy/ffsll_callee
 string/c/sdcc_iy/index
 string/c/sdcc_iy/index_callee
 string/c/sdcc_iy/memccpy
