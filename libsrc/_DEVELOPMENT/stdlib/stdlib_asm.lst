@@ -17,6 +17,8 @@ stdlib/z80/asm_ftog
 stdlib/z80/asm_ftoh
 stdlib/z80/asm_itoa
 stdlib/z80/asm_labs
+stdlib/z80/asm_llabs
+stdlib/z80/asm_lltoa
 stdlib/z80/asm_ltoa
 stdlib/z80/asm_qsort
 stdlib/z80/asm_quick_exit
@@ -27,12 +29,15 @@ stdlib/z80/asm_strtof
 stdlib/z80/asm_strtol
 stdlib/z80/asm_strtoul
 stdlib/z80/asm_system
+stdlib/z80/asm_ulltoa
 stdlib/z80/asm_ultoa
 stdlib/z80/asm_utoa
 stdlib/z80/asm__div
 stdlib/z80/asm__divu
 stdlib/z80/asm__ldiv
 stdlib/z80/asm__ldivu
+stdlib/z80/asm__lldiv
+stdlib/z80/asm__lldivu
 stdlib/z80/asm__strtoi
 stdlib/z80/asm__strtou
 stdlib/z80/__div_store
@@ -54,6 +59,7 @@ stdlib/z80/__dtoe__
 stdlib/z80/__dtog__
 stdlib/z80/__dtoh__
 stdlib/z80/__ldiv_store
+stdlib/z80/__lldiv_store
 stdlib/z80/__stdlib_seed
 stdlib/z80/__strtod_dec
 stdlib/z80/__strtod_exponent
