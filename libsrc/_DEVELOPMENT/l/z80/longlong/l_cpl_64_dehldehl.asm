@@ -13,24 +13,10 @@ l_cpl_64_dehldehl:
    ; exit  : dehl'dehl = complement longlong
    ;
    ; uses  : af, de, hl, de', hl', carry unaffected
+
+   call again
    
-   ld a,l
-   cpl
-   ld l,a
-   
-   ld a,h
-   cpl
-   ld h,a
-   
-   ld a,e
-   cpl
-   ld e,a
-   
-   ld a,d
-   cpl
-   ld d,a
-   
-   exx
+again:
 
    ld a,l
    cpl

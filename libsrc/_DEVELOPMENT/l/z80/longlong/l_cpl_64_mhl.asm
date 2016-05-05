@@ -13,11 +13,10 @@ l_cpl_64_mhl:
    ; exit  : *longlong = ~longlong
    ;
    ; uses  : af, hl, carry unaffected
-   
-   ld a,(hl)
-   cpl
-   ld (hl),a
-   inc hl
+
+   call again
+
+again:
 
    ld a,(hl)
    cpl
@@ -38,19 +37,5 @@ l_cpl_64_mhl:
    cpl
    ld (hl),a
    inc hl
-
-   ld a,(hl)
-   cpl
-   ld (hl),a
-   inc hl
-
-   ld a,(hl)
-   cpl
-   ld (hl),a
-   inc hl
-
-   ld a,(hl)
-   cpl
-   ld (hl),a
 
    ret
