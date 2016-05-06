@@ -26,6 +26,5 @@ __lldiv_store:
    
    ld bc,8
    ldir                        ; store quotient
-   
-   pop ix
+
    ret
