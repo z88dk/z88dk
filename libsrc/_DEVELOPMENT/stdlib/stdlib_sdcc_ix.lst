@@ -37,6 +37,8 @@ stdlib/c/sdcc_ix/labs
 stdlib/c/sdcc_ix/labs_fastcall
 stdlib/c/sdcc_ix/llabs
 stdlib/c/sdcc_ix/llabs_callee
+stdlib/c/sdcc_ix/lltoa
+stdlib/c/sdcc_ix/lltoa_callee
 stdlib/c/sdcc_ix/ltoa
 stdlib/c/sdcc_ix/ltoa_callee
 stdlib/c/sdcc_ix/qsort
@@ -56,6 +58,8 @@ stdlib/c/sdcc_ix/strtoul
 stdlib/c/sdcc_ix/strtoul_callee
 stdlib/c/sdcc_ix/system
 stdlib/c/sdcc_ix/system_fastcall
+stdlib/c/sdcc_ix/ulltoa
+stdlib/c/sdcc_ix/ulltoa_callee
 stdlib/c/sdcc_ix/ultoa
 stdlib/c/sdcc_ix/ultoa_callee
 stdlib/c/sdcc_ix/utoa
