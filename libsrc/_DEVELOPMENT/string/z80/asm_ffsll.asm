@@ -32,7 +32,7 @@ asm_ffsll:
    or h
    or l
    
-   jp z, asm_ffsl
+   jp nz, asm_ffsl
    
    exx
    
