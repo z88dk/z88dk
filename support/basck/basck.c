@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.7 2016-05-05 10:11:23 stefano Exp $
+ *   $Id: basck.c,v 1.8 2016-05-06 14:08:30 stefano Exp $
  */
 
 unsigned char  *img;
@@ -25,6 +25,7 @@ int  l;
 #define ADDR -3
 #define CATCH_CALL -4
 #define SKIP_CALL -5
+#define SKIP_JP_RET -6
 
 #define ZX80     1
 #define ZX81     2
@@ -92,11 +93,10 @@ int zxshadow_end[]={26, ADDR, 33, 0x38, 0x00, 0x22, 0x8D, 0x5C, 0x22, 0x8F, 0x5C
 
 
 /* Microsoft BASIC detection */
-int restore_skel[]={14, 0xEB, 0x2A, CATCH, CATCH, 0x28, 0x0E, 0xEB, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2};
+int restore_bastxt_skel[]={14, 0xEB, 0x2A, CATCH, CATCH, 0x28, 0x0E, 0xEB, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2};
 int microsoft_skel[]={9, CATCH, 'i', 'c', 'r', 'o', 's', 'o', 'f', 't'};
 int bastxt_skel[]={8, 0x2A, CATCH, CATCH, 0x44, 0x4D, 0x7E, 0x23, 0xB6, 0x2B, 0xC8, 0x23, 0x23, 0x7E, 0x23, 0x66};
-int bastxt_skel2[]={13, 0xC3, SKIP, SKIP, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22 };
-int bastxt_skel3[]={12, 0x18, SKIP, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22 };
+int bastxt_skel2[]={11, SKIP_JP_RET, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22 };
 
 int microsoft_extended_skel[]={11, ADDR, 0xFE, '%', 0xC8, 0x14, 0xFE, '$', 0xC8, 0x14, 0xFE, '!'};
 int microsoft_defdbl_skel[]={7, ADDR, 'D', 'E', 'F', 'D', 'B', 'L'};
@@ -107,8 +107,7 @@ int microsoft_defdbl_skel3[]={6, ADDR, 'E', 'F', 'D', 'B', 'L'+0x80};
 /* Microsoft BASIC code inspection */
 int ulerr_skel[]={9, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2, CATCH, CATCH};
 int prognd_skel[]={8, 0xEB, 0x2A, CATCH, CATCH, 0x1A, 0x02, 0x03, 0x13};
-int prognd_skel2[]={15, 0xC3, SKIP, SKIP, 0xC0, 0x2A, SKIP, SKIP, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22, CATCH, CATCH };
-int prognd_skel3[]={14, 0x18, SKIP, 0xC0, 0x2A, SKIP, SKIP, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22, CATCH, CATCH };
+int prognd_skel2[]={13, SKIP_JP_RET, 0xC0, 0x2A, SKIP, SKIP, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22, CATCH, CATCH };
 int errtab_skel[]={11, ADDR, 0x1E, 2, 1, 0x1E, SKIP, 1, 0x1E, SKIP, 1, 0x1E}; 
 
 int cmpnum_skel[]={7, 1, 0x74, 0x94, 17, SKIP, SKIP, CATCH_CALL}; 
@@ -161,7 +160,20 @@ int getchr_skel[]={12, ADDR, 0x23, 0x7E, 0xFE, ':', 0xD0, 0xFE, ' ', 0xCA, SKIP,
 int getchr_skel2[]={11, ADDR, 0x23, 0x7E, 0xFE, ':', 0xD0, 0xFE, ' ', 0x28, SKIP, 0xFE};
 int getchr_skel3[]={10, ADDR, 0x23, 0x7E, 0xFE, ' ', 0x28, SKIP, 0xFE, ':', 0xD0};
 int getchr_skel4[]={7, CATCH_CALL, 0xD0, 0xE5, 0xF5, 0x21, 0x98, 0x19};
-
+/*
+GETCHR:
+00000858:	INC HL
+00000859:	LD A,(HL)
+0000085A:	CP 20h			; ' '
+0000085C:	JR Z,-06h
+0000085E:	CP 3Ah			; ':'
+00000860:	RET NC
+00000861:	CP 30h			; '0'
+00000863:	CCF
+00000864:	INC A
+00000865:	DEC A
+00000866:	RET
+*/
 int getk_skel[]={12, CATCH_CALL, 0x2A, SKIP, SKIP, 0xC5, SKIP_CALL, 0xC1, 0xC0, 0x2A, SKIP, SKIP, 0x85};
 int rinput_skel[]={9, 0x3E, '?', SKIP_CALL, 0x3E, ' ', SKIP_CALL, 0xC3, CATCH, CATCH};
 int rinput_skel2[]={7, 0x3E, '?', SKIP_CALL, 0x3E, ' ', SKIP_CALL, CATCH_CALL};
@@ -246,7 +258,7 @@ int fpbcde_skel4[]={11, SKIP_CALL, SKIP_CALL, 0xC1, 0xDD, 0xE1, 0xD1, SKIP_CALL,
 
 int phltfp_skel[]={9, SKIP_CALL, 33, SKIP, SKIP, CATCH_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
 int phltfp_skel2[]={12, SKIP_CALL, 33, SKIP, SKIP, CATCH_CALL, 0x18, 3, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
-int phltfp_skel3[]={13, SKIP_CALL, 33, SKIP, SKIP, CATCH_CALL, 0xc3, SKIP, SKIP, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
+int phltfp_skel3[]={13, SKIP_CALL, 33, SKIP, SKIP, CATCH_CALL, 0xC3, SKIP, SKIP, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
 int phltfp_skel4[]={11, SKIP_CALL, 33, SKIP, SKIP, CATCH_CALL, 0xC1, 0xD1, SKIP_CALL, 0x28, SKIP, 0x78};
 int phltfp_skel5[]={15, SKIP_CALL, 33, SKIP, SKIP, 0xFA, SKIP, SKIP, 33, SKIP, SKIP, CATCH_CALL, 33, SKIP, SKIP, 0xC8};
 int phltfp_skel6[]={10, SKIP_CALL, 0xFA, SKIP, SKIP, 33, SKIP, SKIP, CATCH_CALL, 0xC8, 1};
@@ -259,12 +271,12 @@ int div10_skel5[]={13, ADDR, SKIP_CALL, 1, 0x20, 0x84, 0xDD, 0x21, 0, 0, 17, 0, 
 
 int sqr_skel[]={10, ADDR, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
 int sqr_skel2[]={13, ADDR, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 0x18, 3, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
-int sqr_skel3[]={14, ADDR, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 0xc3, SKIP, SKIP, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
+int sqr_skel3[]={14, ADDR, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 0xC3, SKIP, SKIP, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
 int sqr_skel4[]={12, ADDR, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x28, SKIP, 0x78};
 
 int power_skel[]={11, SKIP_CALL, 33, SKIP, SKIP, 0xCD, SKIP, ADDR, 0xC1, 0xD1, SKIP_CALL, 0x78};
 int power_skel2[]={12, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 0x18, ADDR, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
-int power_skel3[]={13, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 0xc3, SKIP, ADDR, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
+int power_skel3[]={13, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 0xC3, SKIP, ADDR, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
 int power_skel4[]={13, SKIP_CALL, 33, SKIP, SKIP, 0xCD, SKIP, ADDR, 0xC1, 0xD1, SKIP_CALL, 0x28, SKIP, 0x78};
 int half_skel[]={9, SKIP_CALL, 33, CATCH, CATCH, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
 int half_skel2[]={12, SKIP_CALL, 33, CATCH, CATCH, SKIP_CALL, 0x18, 3, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
@@ -273,6 +285,26 @@ int half_skel4[]={11, SKIP_CALL, 33, CATCH, CATCH, SKIP_CALL, 0xC1, 0xD1, SKIP_C
 
 
 int fpthl_skel[]={10, ADDR, 17, SKIP, SKIP, 6, 4, 0x1A, 0x77, 0x13, 0x23};
+
+/* connected to 'ASCTFP' */
+int fpthl_skel2[]={9, SKIP_JP_RET, SKIP_CALL, SKIP_CALL, 0xE3, CATCH_CALL, 0xE1, 0xDD, 0xE1, SKIP_CALL};
+int fpthl_skel3[]={12, SKIP_JP_RET, SKIP_CALL, SKIP_CALL, 0xE3, CATCH_CALL, 0xE1, 0x25, SKIP_CALL, 0xCA, SKIP, SKIP, 0xE3};
+
+int for_skel[]={10, ADDR, 62, 0x64, 0x32, SKIP, SKIP, SKIP_CALL, 0xE3, SKIP_CALL, 0xD1};
+int for_skel2[]={10, ADDR, 62, 0x64, 0x32, SKIP, SKIP, SKIP_CALL, 0xE3, 0xD1, 0xC2};
+int for_skel3[]={12, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xED, 0x53, SKIP, SKIP, 0xE3, SKIP_CALL, 0xD1, 0x20};
+int for_skel4[]={10, ADDR, 62, 0x64, 0x32, SKIP, SKIP, SKIP_CALL, 0xC1, 0xE5, SKIP_CALL};
+
+int fdtlp_skel[]={10, ADDR, SKIP_CALL, 0xB7, 0xC2, SKIP, SKIP, 0x23, 0x7E, 0x23, 0xB6, 0x5E};
+int fdtlp_skel2[]={9, ADDR, SKIP_CALL, 0xB7, 0x20, SKIP, 0x23, 0x7E, 0x23, 0xB6, 0x5E};
+int fdtlp_skel3[]={9, ADDR, SKIP_CALL, 0xB7, 0xC2, SKIP, SKIP, 0x23, SKIP_CALL, 0x79, 0xB0};
+
+int data_skel[]={9, CATCH_CALL, 0xB7, 0xC2, SKIP, SKIP, 0x23, 0x7E, 0x23, 0xB6, 0x5E};
+int data_skel2[]={8, CATCH_CALL, 0xB7, 0x20, SKIP, 0x23, 0x7E, 0x23, 0xB6, 0x5E};
+int data_skel3[]={9, CATCH_CALL, 0xB7, 0xC2, SKIP, SKIP, 0x23, SKIP_CALL, 0x79, 0xB0};
+
+int restore_skel[]={14, ADDR, 0xEB, 0x2A, SKIP, SKIP, 0x28, 0x0E, 0xEB, SKIP_CALL, 0xE5, SKIP_CALL, 0x60, 0x69, 0xD1, 0xD2};
+
 int dcbde_skel[]={8, ADDR, 0x1B, 0x7A, 0xA3, 0x3C, 0xC0, 0x0B, 0xC9};
 int dblint_skel[]={9, ADDR, SKIP, 0xF8, 0x30, SKIP, 0x28, SKIP, SKIP_CALL, 33, SKIP, SKIP, 0x7E, 0xFE, 0x98}; 
 int dblint_skel2[]={16, ADDR, SKIP_CALL, 0xF8, 0xD2, SKIP, SKIP, 0xCA, SKIP, SKIP, SKIP_CALL, 33, SKIP, SKIP, 0x7E, 0xFE, 0x98}; 
@@ -295,6 +327,10 @@ int intmul_skel[]={17, ADDR, 0x7C, 0xB5, 0xCA, SKIP, SKIP, 0xE5, 0xD5, SKIP_CALL
 
 int asctfp_skel[]={10, ADDR, 0xFE, '-', 0xF5, 0xCA, SKIP, SKIP, 0xFE, '+', 0xCA};
 int asctfp_skel2[]={9, ADDR, 0xFE, '-', 0xF5, 0x28, SKIP, 0xFE, '+', 0x28};
+
+int hex_asctfp_skel[]={15, ADDR, 0XFE, '&', 0xCA, SKIP, SKIP, 0xFE, '-', 0xF5, 0xCA, SKIP, SKIP, 0xFE, '+', 0xCA};
+int hex_asctfp_skel2[]={4, ADDR, 0XFE, '&', 0xCA, SKIP, SKIP, 0xFE, '-', 0xF5, 0x28,       SKIP, 0xFE, '+', 0x28};
+
 
 int dblasctfp_skel[]={11, ADDR, SKIP_CALL, SKIP_CALL, 0xF6, 0xAF, 0xEB, 1, 255, 0, 0x60, 0x68};
 
@@ -478,8 +514,18 @@ int find_in_skel (int *skel, int p) {
 							default:
 								return (-1);
 								break;
-					}
-					else if (img[j+i] != skel[j]) return (-1);
+					} else if (skel[j] == SKIP_JP_RET)
+						switch (img[j+i]) {
+							case 0xC9:		/* RET */
+								break;
+							case 0xC3:		/* JP nn */
+								i++;
+								i++;
+								break;
+							case 0x18:		/* JR n */
+								i++;
+								break;
+					} else if (img[j+i] != skel[j]) return (-1);
 		}
 	}
 	return (retval);
@@ -586,13 +632,11 @@ int main(int argc, char *argv[])
 	/***********************************/
 	/* Microsoft BASIC related section */
 	/***********************************/
-	res=find_skel(restore_skel);
+	res=find_skel(restore_bastxt_skel);
 	if (res<0)
 		res=find_skel(bastxt_skel);
 	if (res<0)
 		res=find_skel(bastxt_skel2);
-	if (res<0)
-		res=find_skel(bastxt_skel3);
 	if (res<0) {
 		res=find_skel(errtab_skel);
 		if (res>0) res =0xFFFF;
@@ -650,12 +694,6 @@ int main(int argc, char *argv[])
 			}
 		}
  
-		res=find_skel(dvbcde_skel);
-		pos2=find_skel(dvbcde_org_skel);
-		if ((res>0) && (pos2>0)) {
-			pos=pos2-res+1;
-			printf("\n    (Detected position basing on DVBCDE:  $%04X)",pos);
-		}
 		
 /*
 		res=find_skel(tstsgn_skel);
@@ -686,6 +724,13 @@ int main(int argc, char *argv[])
 			pos=pos2-res-1;
 			printf("\n    (Detected position basing on TSTSGN:  $%04X)",pos);
 			//pos=-pos;
+		}
+		
+		res=find_skel(dvbcde_skel);
+		pos2=find_skel(dvbcde_org_skel);
+		if ((res>0) && (pos2>0)) {
+			pos=pos2-res+1;
+			printf("\n    (Detected position basing on DVBCDE:  $%04X)",pos);
 		}
 		
 		if (pos==-1) pos=0;
@@ -744,8 +789,6 @@ int main(int argc, char *argv[])
 		res=find_skel(prognd_skel);
 		if (res<0)
 			res=find_skel(prognd_skel2);
-		if (res<0)
-			res=find_skel(prognd_skel3);
 		if (res>0)
 			printf("PROGND = $%04X  ; BASIC program end ptr\n",res);
 
@@ -1016,6 +1059,13 @@ int main(int argc, char *argv[])
 		res=find_skel(fpthl_skel);
 		if (res>0)
 			printf("FPTHL  = $%04X  ; Copy number in FPREG to HL ptr\n",res+pos+1);
+		else {
+			res=find_skel(fpthl_skel2);
+			if (res<0)
+				res=find_skel(fpthl_skel3);
+			if (res>0)
+			printf("FPTHL  = $%04X  ; Copy number in FPREG to HL ptr\n",res);
+		}
 		
 		res=find_skel(fpbcde_skel);
 		if (res>0) {
@@ -1174,6 +1224,12 @@ int main(int argc, char *argv[])
 		if (res>0)
 			printf("ASCTFP = $%04X  ; ASCII to FP number\n",res+pos+1);
 
+		res=find_skel(hex_asctfp_skel);
+		if (res<0)
+			res=find_skel(hex_asctfp_skel2);
+		if (res>0)
+			printf("_ASCTFP = $%04X  ; ASCII to FP number (also '&' prefixes)\n",res+pos+1);
+
 		res=find_skel(dblasctfp_skel);
 		if (res>0) {
 			printf("ASCTFP = $%04X  ; ASCII to FP number (New version)\n",res+pos+8);
@@ -1234,14 +1290,45 @@ int main(int argc, char *argv[])
 			}
 		}
 
+		res=find_skel(for_skel);
+		if (res<0)
+			res=find_skel(for_skel2);
+		if (res<0)
+			res=find_skel(for_skel3);
+		if (res<0)
+			res=find_skel(for_skel4);
+		if (res>0)
+			printf("FOR    = $%04X  ; 'FOR' stmt\n",res+pos+1);
+
+		
+		res=find_skel(fdtlp_skel);
+		if (res<0)
+			res=find_skel(fdtlp_skel2);
+		if (res<0)
+			res=find_skel(fdtlp_skel3);
+		if (res>0)
+			printf("FDTLP  = $%04X  ; Find next DATA statement\n",res+pos+1);
+		
+		res=find_skel(data_skel);
+		if (res<0)
+			res=find_skel(data_skel2);
+		if (res<0)
+			res=find_skel(data_skel3);
+		if (res>0)
+			printf("DATA   = $%04X  ; DATA statement: find next DATA program line..\n",res);
+
+		res=find_skel(restore_skel);
+		if (res>0)
+			printf("RESTOR = $%04X  ; 'RESTORE' stmt, init ptr to DATA program line..\n",res+pos+1);
+
 		res=find_skel(new_skel);
 		if (res<0)
 			res=find_skel(new_skel2);
 		if (res<0)
 			res=find_skel(new_skel3);
 		if (res>0)
-			printf("NEW    = $%04X  ; NEW statement \n",res+pos+1);
-		
+			printf("NEW    = $%04X  ; 'NEW' statement\n",res+pos+1);
+
 		res=find_skel(chr_skel);
 		if (res>0)
 			printf("CHR    = $%04X  ; CHR$ \n",res+pos+1);
@@ -1291,8 +1378,11 @@ int main(int argc, char *argv[])
 			printf("EVAL   = $%04X  ; Evaluate expression\n",res+pos+1);
 
 		res=find_skel(crtst_skel);
-		if (res>0)
+		if (res>0) {
 			printf("CRTST  = $%04X  ; Create String\n",res+pos+1);
+			printf("QTSTR  = $%04X  ; Create quote terminated String\n",res+pos+2);
+			printf("DTSTR  = $%04X  ; Create String, termination char in D\n",res+pos+5);
+		}
 		
 		res=find_skel(baktmp_skel);
 		if (res<0)
@@ -1416,8 +1506,27 @@ int main(int argc, char *argv[])
 		res=find_skel(tkmsbasic_ex_skel);
 		
 		if (res>0) {
+			res+=1;
+			//chr=find_skel(tkmsbasic_code_skel)+1;
 			
 			printf("\nTOKEN table position = $%04X, word list in modern encoding mode.\n",res);
+			printf("\n-- STATEMENTS --\n");
+			chr='A';
+			printf("\n\t - %c", chr);
+			
+
+			for (i=res; img[i+1]!='<'; i++) {
+				if ((img[i-1]==0)&&(img[i]==0)) {chr++; i++;}
+				if (img[i-1]==0) {chr++;  printf("\t - %c", chr);}
+				c=img[i];
+				if (c>=128)	{
+					c-=128;
+					printf("%c",c);
+					i++;
+					printf("   \t[%d]\n",img[i]);
+					if (img[i+1]!=0) {printf("\t - %c", chr);}
+				} else printf("%c",c);
+			}
 
 		} else {
 			res=find_skel(tkmsbasic_skel)-1;
@@ -1431,7 +1540,7 @@ int main(int argc, char *argv[])
 				new_tk_found=0;
 				printf("\n-- STATEMENTS --\n");
 				printf("\n\t ---  ");
-				chr=find_skel(tkmsbasic_code_skel)+1;;
+				chr=find_skel(tkmsbasic_code_skel)+1;
 				for (i=res; img[i]!=128; i++) {
 					
 					if ((new_tk_found!=1) && (((c == 'W') && (img[i-2] == 'E') && ((img[i-3] == 'N') || (img[i-3] == ('N'+0x80)))) && (img[i+1] != 'L'))) {
@@ -1757,7 +1866,7 @@ int main(int argc, char *argv[])
 					printf("\n\t--- ");
 					chr=192;
 					for (i=res; (img[i]!=0x23)!=0; i++) {
-						c=img[i] & 0xBF;;
+						c=img[i] & 0xBF;
 						if (chr==256) chr=64;
 						if (c>=128) { c-=128; printf("%c \n\t%d ",zx81char(c), chr++); }
 						else printf("%c",zx81char(c));
