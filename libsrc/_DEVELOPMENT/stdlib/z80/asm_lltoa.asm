@@ -23,25 +23,16 @@ EXTERN l_neg_64_mhl, l_valid_base, asm1_ulltoa
 
 asm_lltoa:
 
-   ; enter :         +------------------------
-   ;                 | +9
-   ;                 | ...  num (8 bytes)
-   ;                 | +2
-   ;                 |------------------------
-   ;                 | +1
-   ;         stack = | +0   return address
-   ;                 +------------------------
+   ; enter :      +------------------------
+   ;              | +7
+   ;              | ...  num (8 bytes)
+   ;         ix = | +0
+   ;              +------------------------
    ;
    ;         bc = int radix [2,36]
    ;         de = char *buf
    ;
-   ; exit  :         +------------------------
-   ;                 | +7
-   ;                 | ...  abs(num) (8 bytes)
-   ;         stack = | +0
-   ;                 +------------------------
-   ;
-   ;         hl = address of terminating 0 in buf
+   ; exit  : hl = address of terminating 0 in buf
    ;         carry reset no errors
    ;
    ; error : (*) if buf == 0
@@ -65,15 +56,12 @@ asm0_lltoa:                    ; bypasses NULL check on buf
    
    cp 10
    jp nz, asm1_ulltoa          ; if not base 10
-
-   ld hl,9
-   add hl,sp                   ; hl = & MSB(num)
    
-   bit 7,(hl)
+   bit 7,(ix+7)
    jp z, asm1_ulltoa           ; if num is positive
    
-   ld hl,2
-   add hl,sp                   ; hl = & num
+   push ix
+   pop hl                      ; hl = & num
    
    call l_neg_64_mhl           ; num = abs(num)
    

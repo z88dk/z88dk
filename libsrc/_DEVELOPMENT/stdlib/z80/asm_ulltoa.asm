@@ -21,25 +21,16 @@ EXTERN error_zc, l_valid_base, error_einval_zc, l_num2char
 
 asm_ulltoa:
 
-   ; enter :         +------------------------
-   ;                 | +9
-   ;                 | ...  num (8 bytes)
-   ;                 | +2
-   ;                 |------------------------
-   ;                 | +1
-   ;         stack = | +0   return address
-   ;                 +------------------------
+   ; enter :      +------------------------
+   ;              | +7
+   ;              | ...  num (8 bytes)
+   ;         ix = | +0
+   ;              +------------------------
    ;
    ;         bc = int radix [2,36]
    ;         de = char *buf
    ;
-   ; exit  :         +------------------------
-   ;                 | +7
-   ;                 | ...  num (8 bytes)
-   ;         stack = | +0
-   ;                 +------------------------
-   ;
-   ;         hl = address of terminating 0 in buf
+   ; exit  : hl = address of terminating 0 in buf
    ;         carry reset no errors
    ;
    ; error : (*) if buf == 0
@@ -74,13 +65,13 @@ asm1_ulltoa:                   ; entry for lltoa()
    ld hl,-8
    add hl,sp
    ld sp,hl                    ; make space for (uint64_t)(num copy)
-   
-   push hl
-   pop ix                      ; ix = & num copy
-   ex de,hl                    ; de = & num copy
 
-   ld hl,22
-   add hl,sp                   ; hl = & num
+   ld e,l
+   ld d,h                      ; de = & num copy
+   
+   push ix
+   ex (sp),hl                  ; hl = & num
+   pop ix                      ; ix = & num copy
    
    ld bc,8
    ldir                        ; num copy = num
@@ -88,10 +79,6 @@ asm1_ulltoa:                   ; entry for lltoa()
    ; use generic radix method
    
    ;      +------------------------
-   ;      | +29
-   ;      | ...  num (8 bytes)
-   ;      | +22
-   ;      |------------------------
    ;      | +21
    ;      | +20  return address
    ;      |------------------------
@@ -113,7 +100,7 @@ asm1_ulltoa:                   ; entry for lltoa()
    ; stack = same address as ix
    
    ; generate digits onto stack in reverse order
-   ; max stack depth is 34 bytes for base 2
+   ; max stack depth is 130 bytes for base 2
 
    xor a                       ; end of digits marked by carry reset
    push af
