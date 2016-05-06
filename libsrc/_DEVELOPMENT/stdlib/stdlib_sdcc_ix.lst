@@ -70,10 +70,10 @@ stdlib/c/sdcc_ix/_ldiv_
 stdlib/c/sdcc_ix/_ldiv__callee
 stdlib/c/sdcc_ix/_ldivu_
 stdlib/c/sdcc_ix/_ldivu__callee
-stdlib/c/sdcc_ix/_lldiv
-stdlib/c/sdcc_ix/_lldiv_callee
-stdlib/c/sdcc_ix/_lldivu
-stdlib/c/sdcc_ix/_lldivu_callee
+stdlib/c/sdcc_ix/_lldiv_
+stdlib/c/sdcc_ix/_lldiv__callee
+stdlib/c/sdcc_ix/_lldivu_
+stdlib/c/sdcc_ix/_lldivu__callee
 stdlib/c/sdcc_ix/_quicksort_
 stdlib/c/sdcc_ix/_quicksort__callee
 stdlib/c/sdcc_ix/_random_uniform_cmwc_8_
