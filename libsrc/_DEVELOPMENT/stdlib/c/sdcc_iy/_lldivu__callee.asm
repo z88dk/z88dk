@@ -10,7 +10,7 @@ EXTERN asm__lldivu
 
 __lldivu__callee:
    
-   ld ix,6
+   ld ix,4
    add ix,sp
    
    call asm__lldivu
