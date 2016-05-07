@@ -6,7 +6,7 @@ SECTION code_stdlib
 
 PUBLIC __strtoul__
 
-EXTERN l_valid_base, l_eat_ws, l_eat_sign, l_eat_digits
+EXTERN l_valid_base, l_eat_ws, l_eat_sign, l_eat_digits, error_lzc
 EXTERN l_neg_dehl, l_char2num, l_mulu_40_32x8, l_eat_base_prefix
 
 __strtoul__:
@@ -275,18 +275,13 @@ invalid_input:
    ;  bc = original char*
 
    xor a
-   ld e,a
-   ld d,a
-   ld l,a
-   ld h,a   
-   scf
    
    ;   bc = original char *
    ; dehl = 0
    ;    a = 0 (error invalid input string)
    ; carry set for error
    
-   ret
+   jp error_lzc
 
 number_complete:
 
