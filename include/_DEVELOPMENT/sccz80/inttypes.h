@@ -31,8 +31,19 @@
 
 #endif
 
+#ifdef __SDCC
+
+extern intmax_t imaxabs(intmax_t j);
+extern intmax_t imaxabs_callee(intmax_t j) __z88dk_callee;
+#define imaxabs(a) imaxabs_callee(a)
+
+#else
+
 extern intmax_t __LIB__ __FASTCALL__ imaxabs(intmax_t j);
 
+
+
+#endif
 
 extern void __LIB__ _imaxdiv_(imaxdiv_t *md,intmax_t numer,intmax_t denom);
 extern void __LIB__ __CALLEE__ _imaxdiv__callee(imaxdiv_t *md,intmax_t numer,intmax_t denom);

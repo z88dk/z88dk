@@ -29,7 +29,18 @@ include(__link__.m4)
 
 #endif
 
+#ifdef __SDCC
+
+extern intmax_t imaxabs(intmax_t j);
+extern intmax_t imaxabs_callee(intmax_t j) __z88dk_callee;
+#define imaxabs(a) imaxabs_callee(a)
+
+#else
+
 __DPROTO(`b,c',`b,c',intmax_t,,imaxabs,intmax_t j)
+
+#endif
+
 __DPROTO(,,void,,_imaxdiv_,imaxdiv_t *md,intmax_t numer,intmax_t denom)
 __DPROTO(,,intmax_t,,strtoimax,const char *nptr,char **endptr,int base)
 __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
