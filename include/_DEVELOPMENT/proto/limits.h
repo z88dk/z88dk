@@ -21,4 +21,12 @@ include(__link__.m4)
 #define LONG_MAX       2147483647L
 #define ULONG_MAX      4294967295UL
 
+#ifdef __SDCC
+
+#define LLONG_MIN     -9223372036854775808LL
+#define LLONG_MAX      9223372036854775807LL
+#define ULLONG_MAX     18446744073709551615ULL
+
+#endif
+
 #endif
