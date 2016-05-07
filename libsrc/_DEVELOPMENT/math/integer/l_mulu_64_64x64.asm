@@ -22,7 +22,7 @@ PUBLIC l_mulu_64_64x64
    ;         dehl' dehl = 64-bit product
    ;         carry set if overflow
    ;
-   ; uses  : af, bc, de, hl, bc', de', hl'
+   ; uses  : af, bc, de, hl, af', bc', de', hl'
    
 IF __CLIB_OPT_IMATH <= 50
 
