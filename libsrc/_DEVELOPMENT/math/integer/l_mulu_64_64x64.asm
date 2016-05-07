@@ -20,7 +20,7 @@ PUBLIC l_mulu_64_64x64
    ;
    ; exit  : ix structure unchanged
    ;         dehl' dehl = 64-bit product
-   ;         carry reset
+   ;         carry set if overflow
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
    
