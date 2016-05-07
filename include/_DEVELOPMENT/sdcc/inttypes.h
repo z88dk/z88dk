@@ -9,13 +9,27 @@
 
 // DATA STRUCTURES
 
-typedef struct imaxdiv_s
-{
+#ifdef __SDCC
 
-   long quot;
-   long rem;
+   typedef struct imaxdiv_s
+   {
 
-} imaxdiv_t;
+      long long rem;
+      long long quot;
+
+   } imaxdiv_t;
+
+#else
+
+   typedef struct imaxdiv_s
+   {
+
+      long quot;
+      long rem;
+
+   } imaxdiv_t;
+
+#endif
 
 extern intmax_t imaxabs(intmax_t j) __preserves_regs(b,c);
 extern intmax_t imaxabs_fastcall(intmax_t j) __preserves_regs(b,c) __z88dk_fastcall;
@@ -64,8 +78,28 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define PRIiFAST16     "%i"
 #define PRIiFAST32     "%li"
 
+#ifdef __SDCC
+
+#define PRId64         "%lld"
+#define PRIi64         "%lli"
+#define PRIdLEAST64    "%lld"
+#define PRIiLEAST64    "%lli"
+#define PRIdFAST64     "%lld"
+#define PRIiFAST64     "%lli"
+
+#endif
+
+#ifdef __SDCC
+
+#define PRIdMAX        "%lld"
+#define PRIiMAX        "%lli"
+
+#else
+
 #define PRIdMAX        "%ld"
 #define PRIiMAX        "%li"
+
+#endif
 
 #define PRIdPTR        "%d"
 #define PRIiPTR        "%i"
@@ -86,6 +120,15 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define PRIX16         "%X"
 #define PRIX32         "%lX"
 
+#ifdef __SDCC
+
+#define PRIo64         "%llo"
+#define PRIu64         "%llu"
+#define PRIx64         "%llx"
+#define PRIX64         "%llX"
+
+#endif
+
 #define PRIoLEAST8     "%o"
 #define PRIoLEAST16    "%o"
 #define PRIoLEAST32    "%lo"
@@ -101,6 +144,15 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define PRIXLEAST8     "%X"
 #define PRIXLEAST16    "%X"
 #define PRIXLEAST32    "%lX"
+
+#ifdef __SDCC
+
+#define PRIoLEAST64    "%llo"
+#define PRIuLEAST64    "%llu"
+#define PRIxLEAST64    "%llx"
+#define PRIXLEAST64    "%llX"
+
+#endif
 
 #define PRIoFAST8      "%o"
 #define PRIoFAST16     "%o"
@@ -118,10 +170,30 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define PRIXFAST16     "%X"
 #define PRIXFAST32     "%lX"
 
+#ifdef __SDCC
+
+#define PRIoFAST64     "%llo"
+#define PRIuFAST64     "%llu"
+#define PRIxFAST64     "%llx"
+#define PRIXFAST64     "%llX"
+
+#endif
+
+#ifdef __SDCC
+
+#define PRIoMAX        "%llo"
+#define PRIuMAX        "%llu"
+#define PRIxMAX        "%llx"
+#define PRIXMAX        "%llX"
+
+#else
+
 #define PRIoMAX        "%lo"
 #define PRIuMAX        "%lu"
 #define PRIxMAX        "%lx"
 #define PRIXMAX        "%lX"
+
+#endif
 
 #define PRIoPTR        "%o"
 #define PRIuPTR        "%u"
@@ -154,8 +226,28 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define SCNiFAST16     "%i"
 #define SCNiFAST32     "%li"
 
+#ifdef __SDCC
+
+#define SCNd64         "%lld"
+#define SCNi64         "%lli"
+#define SCNdLEAST64    "%lld"
+#define SCNiLEAST64    "%lli"
+#define SCNdFAST64     "%lld"
+#define SCNiFAST64     "%lli"
+
+#endif
+
+#ifdef __SDCC
+
+#define SCNdMAX        "%lld"
+#define SCNiMAX        "%lli"
+
+#else
+
 #define SCNdMAX        "%ld"
 #define SCNiMAX        "%li"
+
+#endif
 
 #define SCNdPTR        "%d"
 #define SCNiPTR        "%i"
@@ -172,6 +264,14 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define SCNx16         "%x"
 #define SCNx32         "%lx"
 
+#ifdef __SDCC
+
+#define SCNo64         "%llo"
+#define SCNu64         "%llu"
+#define SCNx64         "%llx"
+
+#endif
+
 #define SCNoLEAST8     "%o"
 #define SCNoLEAST16    "%o"
 #define SCNoLEAST32    "%lo"
@@ -183,6 +283,14 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define SCNxLEAST8     "%x"
 #define SCNxLEAST16    "%x"
 #define SCNxLEAST32    "%lx"
+
+#ifdef __SDCC
+
+#define SCNoLEAST64    "%llo"
+#define SCNuLEAST64    "%llu"
+#define SCNxLEAST64    "%llx"
+
+#endif
 
 #define SCNoFAST8      "%o"
 #define SCNoFAST16     "%o"
@@ -196,9 +304,27 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define SCNxFAST16     "%x"
 #define SCNxFAST32     "%lx"
 
+#ifdef __SDCC
+
+#define SCNoFAST64     "%llo"
+#define SCNuFAST64     "%llu"
+#define SCNxFAST64     "%llx"
+
+#endif
+
+#ifdef __SDCC
+
+#define SCNoMAX        "%llo"
+#define SCNuMAX        "%llu"
+#define SCNxMAX        "%llx"
+
+#else
+
 #define SCNoMAX        "%lo"
 #define SCNuMAX        "%lu"
 #define SCNxMAX        "%lx"
+
+#endif
 
 #define SCNoPTR        "%o"
 #define SCNuPTR        "%u"
