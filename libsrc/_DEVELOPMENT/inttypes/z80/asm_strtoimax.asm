@@ -6,6 +6,14 @@ SECTION code_inttypes
 
 PUBLIC asm_strtoimax
 
-EXTERN asm_strtol
+IFDEF __SDCC
 
-defc asm_strtoimax = asm_strtol
+   EXTERN asm_strtoll
+   defc asm_strtoimax = asm_strtoll
+
+ELSE
+
+   EXTERN asm_strtol
+   defc asm_strtoimax = asm_strtol
+
+ENDIF

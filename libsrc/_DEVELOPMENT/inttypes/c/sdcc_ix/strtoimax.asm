@@ -6,6 +6,6 @@ SECTION code_inttypes
 
 PUBLIC _strtoimax
 
-EXTERN _strtol
+EXTERN _strtoll
 
-defc _strtoimax = _strtol
+defc _strtoimax = _strtoll

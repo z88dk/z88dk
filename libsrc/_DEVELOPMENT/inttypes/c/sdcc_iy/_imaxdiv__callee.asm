@@ -6,6 +6,6 @@ SECTION code_inttypes
 
 PUBLIC __imaxdiv__callee
 
-EXTERN __ldiv__callee
+EXTERN __lldiv__callee
 
-defc __imaxdiv__callee = __ldiv__callee
+defc __imaxdiv__callee = __lldiv__callee

@@ -6,6 +6,6 @@ SECTION code_inttypes
 
 PUBLIC _strtoumax_callee
 
-EXTERN _strtoul_callee
+EXTERN _strtoull_callee
 
-defc _strtoumax_callee = _strtoul_callee
+defc _strtoumax_callee = _strtoull_callee

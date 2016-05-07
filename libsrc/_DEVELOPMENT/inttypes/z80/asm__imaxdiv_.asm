@@ -6,6 +6,14 @@ SECTION code_inttypes
 
 PUBLIC asm__imaxdiv_
 
-EXTERN asm__ldiv
+IFDEF __SDCC
 
-defc asm__imaxdiv_ = asm__ldiv
+   EXTERN asm__lldiv
+   defc asm__imaxdiv_ = asm__lldiv
+
+ELSE
+
+   EXTERN asm__ldiv
+   defc asm__imaxdiv_ = asm__ldiv
+
+ENDIF

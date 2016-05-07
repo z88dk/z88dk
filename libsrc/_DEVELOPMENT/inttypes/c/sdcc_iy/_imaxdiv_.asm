@@ -6,6 +6,6 @@ SECTION code_inttypes
 
 PUBLIC __imaxdiv_
 
-EXTERN __ldiv_
+EXTERN __lldiv_
 
-defc __imaxdiv_ = __ldiv_
+defc __imaxdiv_ = __lldiv_

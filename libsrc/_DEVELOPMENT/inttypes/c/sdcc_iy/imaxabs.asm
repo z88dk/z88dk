@@ -6,6 +6,6 @@ SECTION code_inttypes
 
 PUBLIC _imaxabs
 
-EXTERN _labs
+EXTERN _llabs
 
-defc _imaxabs = _labs
+defc _imaxabs = _llabs

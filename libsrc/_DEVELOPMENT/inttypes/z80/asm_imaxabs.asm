@@ -6,6 +6,14 @@ SECTION code_inttypes
 
 PUBLIC asm_imaxabs
 
-EXTERN asm_labs
+IFDEF __SDCC
 
-defc asm_imaxabs = asm_labs
+   EXTERN asm_llabs
+   defc asm_imaxabs = asm_llabs
+
+ELSE
+
+   EXTERN asm_labs
+   defc asm_imaxabs = asm_labs
+
+ENDIF
