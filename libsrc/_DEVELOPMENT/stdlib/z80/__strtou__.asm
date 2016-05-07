@@ -102,11 +102,10 @@ valid_base:
 
    ; successful conversion, check for signed overflow
    
-   ld c,h                      ; save bit 7 of result
+   ld a,h
+   add a,a                     ; carry set if signed overflow
    
-   call l_neg_hl
-   
-   sla c                       ; if bit 7 was set, indicate signed underflow
+   call l_neg_hl               ; negate, carry unaffected
       
    ld a,1
    ret

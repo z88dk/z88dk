@@ -108,12 +108,9 @@ valid_base:
    ; successful conversion, check for signed overflow
 
    ld a,d
-   push af
-   
-   call l_neg_dehl
-   
-   pop af   
    add a,a                     ; carry set if signed overflow
+   
+   call l_neg_dehl             ; negate, carry unaffected
 
    ld a,1
    ret
