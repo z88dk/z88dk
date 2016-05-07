@@ -17,30 +17,4 @@ l_neg_64_dehldehl:
    ; uses  : af, de, hl, de', hl', carry unaffected
    
    call l_cpl_64_dehldehl
-   
-   inc l
-   ret nz
-   
-   inc h
-   ret nz
-   
-   inc e
-   ret nz
-   
-   inc d
-   ret nz
-   
-   exx
-   
-   inc l
-   jr nz, exx_ret
-   
-   inc h
-   jr nz, exx_ret
-   
-   inc de
-
-exx_ret:
-
-   exx
-   ret
+   jp l_inc_64_dehldehl
