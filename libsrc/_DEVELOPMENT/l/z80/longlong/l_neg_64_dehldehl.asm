@@ -4,7 +4,7 @@ SECTION code_l
 
 PUBLIC l_neg_64_dehldehl
 
-EXTERN l_cpl_64_dehldehl
+EXTERN l_cpl_64_dehldehl, l_inc_64_dehldehl
    
 l_neg_64_dehldehl:
 
