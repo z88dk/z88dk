@@ -9,6 +9,8 @@ stdlib/c/sdcc_ix/atoi
 stdlib/c/sdcc_ix/atoi_fastcall
 stdlib/c/sdcc_ix/atol
 stdlib/c/sdcc_ix/atol_fastcall
+stdlib/c/sdcc_ix/atoll
+stdlib/c/sdcc_ix/atoll_callee
 stdlib/c/sdcc_ix/at_quick_exit
 stdlib/c/sdcc_ix/at_quick_exit_fastcall
 stdlib/c/sdcc_ix/bsearch
@@ -54,8 +56,12 @@ stdlib/c/sdcc_ix/strtof
 stdlib/c/sdcc_ix/strtof_callee
 stdlib/c/sdcc_ix/strtol
 stdlib/c/sdcc_ix/strtol_callee
+stdlib/c/sdcc_ix/strtoll
+stdlib/c/sdcc_ix/strtoll_callee
 stdlib/c/sdcc_ix/strtoul
 stdlib/c/sdcc_ix/strtoul_callee
+stdlib/c/sdcc_ix/strtoull
+stdlib/c/sdcc_ix/strtoull_callee
 stdlib/c/sdcc_ix/system
 stdlib/c/sdcc_ix/system_fastcall
 stdlib/c/sdcc_ix/ulltoa
