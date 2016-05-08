@@ -8,7 +8,7 @@ EXTERN error_lzc
 
    pop hl
 
-error_llznc:
+error_llzc:
 
    ; set dehl'dehl = 0
    ; set carry flag

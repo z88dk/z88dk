@@ -2,7 +2,7 @@
 SECTION code_clib
 SECTION code_l
 
-PUBLIC l_inc_64_dehldehl, l0_inc_64_dehldel
+PUBLIC l_inc_64_dehldehl, l0_inc_64_dehldehl
 
 l_inc_64_dehldehl:
 
