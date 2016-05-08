@@ -355,8 +355,9 @@ extern void __LIB__ __CALLEE__ *realloc_unlocked_callee(void *p,size_t size);
 
 #ifdef __SDCC
 
-extern long long __LIB__ __FASTCALL__ atoll(char *buf);
-
+extern long long atoll(char *buf);
+extern long long atoll_callee(char *buf) __z88dk_callee;
+#define atoll(a) atoll_callee(a)
 
 extern void __LIB__ _lldiv_(lldiv_t *ld,long long numer,long long denom);
 extern void __LIB__ __CALLEE__ _lldiv__callee(lldiv_t *ld,long long numer,long long denom);

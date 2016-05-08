@@ -390,9 +390,8 @@ extern void *realloc_unlocked_callee(void *p,size_t size) __z88dk_callee;
 #ifdef __SDCC
 
 extern long long atoll(char *buf);
-extern long long atoll_fastcall(char *buf) __z88dk_fastcall;
-#define atoll(a) atoll_fastcall(a)
-
+extern long long atoll_callee(char *buf) __z88dk_callee;
+#define atoll(a) atoll_callee(a)
 
 extern void _lldiv_(lldiv_t *ld,long long numer,long long denom);
 extern void _lldiv__callee(lldiv_t *ld,long long numer,long long denom) __z88dk_callee;

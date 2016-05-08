@@ -181,7 +181,10 @@ __DPROTO(,,void,*,realloc_unlocked,void *p,size_t size)
 
 #ifdef __SDCC
 
-__DPROTO(,,long long,,atoll,char *buf)
+extern long long atoll(char *buf);
+extern long long atoll_callee(char *buf) __z88dk_callee;
+#define atoll(a) atoll_callee(a)
+
 __DPROTO(,,void,,_lldiv_,lldiv_t *ld,long long numer,long long denom)
 __DPROTO(,,void,,_lldivu_,lldivu_t *ld,unsigned long long numer,unsigned long long denom)
 
