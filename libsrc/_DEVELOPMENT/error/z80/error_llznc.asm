@@ -13,6 +13,7 @@ error_llznc:
    ; set dehl'dehl = 0
    ; reset carry flag
 
+   exx
    call error_lznc
    exx
    jp error_lznc
