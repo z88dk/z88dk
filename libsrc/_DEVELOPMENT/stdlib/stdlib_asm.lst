@@ -4,6 +4,7 @@ stdlib/z80/asm_atexit
 stdlib/z80/asm_atof
 stdlib/z80/asm_atoi
 stdlib/z80/asm_atol
+stdlib/z80/asm_atoll
 stdlib/z80/asm_at_quick_exit
 stdlib/z80/asm_bsearch
 stdlib/z80/asm_dtoa
@@ -27,7 +28,9 @@ stdlib/z80/asm_srand
 stdlib/z80/asm_strtod
 stdlib/z80/asm_strtof
 stdlib/z80/asm_strtol
+stdlib/z80/asm_strtoll
 stdlib/z80/asm_strtoul
+stdlib/z80/asm_strtoull
 stdlib/z80/asm_system
 stdlib/z80/asm_ulltoa
 stdlib/z80/asm_ultoa
@@ -68,6 +71,7 @@ stdlib/z80/__strtod_special_form
 stdlib/z80/__strtod_suffix
 stdlib/z80/__strtou__
 stdlib/z80/__strtoul__
+stdlib/z80/__strtoull__
 stdlib/z80/random/asm_random_uniform_cmwc_8
 stdlib/z80/random/asm_random_uniform_xor_8
 stdlib/z80/random/asm_random_uniform_xor_32
