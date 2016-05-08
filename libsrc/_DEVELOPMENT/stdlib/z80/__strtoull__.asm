@@ -72,7 +72,7 @@ no_endp:
    ld b,h                      ; bc = original char *
    
    jr z, valid_base            ; accept base == 0
-   jr nc, invalid_base
+   jp nc, invalid_base
 
 valid_base:
 
