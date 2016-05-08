@@ -3,7 +3,7 @@
 ; May 2016
 ; ===============================================================
 ; 
-; unsigned long strtoull(const char * restrict nptr, char ** restrict endptr, int base)
+; unsigned long long strtoull(const char * restrict nptr, char ** restrict endptr, int base)
 ;
 ; Read number encoded in given radix from string; if base == 0,
 ; radix is auto-detected as decimal, octal or hex.
