@@ -389,25 +389,46 @@ extern void *realloc_unlocked_callee(void *p,size_t size) __z88dk_callee;
 
 #ifdef __SDCC
 
-   extern void _lldiv_(lldiv_t *ld, long long numer, long long denom);
-   extern void _lldiv__callee(lldiv_t *ld, long long numer, long long denom) __z88dk_callee;
-   #define _lldiv_(a,b,c) _lldiv__callee(a,b,c)
+extern long long atoll(char *buf);
+extern long long atoll_fastcall(char *buf) __z88dk_fastcall;
+#define atoll(a) atoll_fastcall(a)
 
-   extern void _lldivu_(lldivu_t *ld, unsigned long long numer, unsigned long long denom);
-   extern void _lldivu__callee(lldivu_t *ld, unsigned long long numer, unsigned long long denom) __z88dk_callee;
-   #define _lldivu_(a,b,c) _lldivu__callee(a,b,c)
 
-   extern long long llabs(long long i);
-   extern long long llabs_callee(long long i) __z88dk_callee;
-   #define llabs(a) llabs_callee(a)
+extern void _lldiv_(lldiv_t *ld,long long numer,long long denom);
+extern void _lldiv__callee(lldiv_t *ld,long long numer,long long denom) __z88dk_callee;
+#define _lldiv_(a,b,c) _lldiv__callee(a,b,c)
+
+
+extern void _lldivu_(lldivu_t *ld,unsigned long long numer,unsigned long long denom);
+extern void _lldivu__callee(lldivu_t *ld,unsigned long long numer,unsigned long long denom) __z88dk_callee;
+#define _lldivu_(a,b,c) _lldivu__callee(a,b,c)
+
+
+
+extern long long llabs(long long i);
+extern long long llabs_callee(long long i) __z88dk_callee;
+#define llabs(a) llabs_callee(a)
    
-   extern char *lltoa(long long num, char *buf, int radix);
-   extern char *lltoa_callee(long long num, char *buf, int radix) __z88dk_callee;
-   #define lltoa(a,b,c) lltoa_callee(a,b,c)
-   
-   extern char *ulltoa(unsigned long long num, char *buf, int radix);
-   extern char *ulltoa_callee(unsigned long long num, char *buf, int radix) __z88dk_callee;
-   #define ulltoa(a,b,c) ulltoa_callee(a,b,c)
+extern char *lltoa(long long num,char *buf,int radix);
+extern char *lltoa_callee(long long num,char *buf,int radix) __z88dk_callee;
+#define lltoa(a,b,c) lltoa_callee(a,b,c)
+
+
+extern long long strtoll(char *nptr,char **endptr,int base);
+extern long long strtoll_callee(char *nptr,char **endptr,int base) __z88dk_callee;
+#define strtoll(a,b,c) strtoll_callee(a,b,c)
+
+
+extern unsigned long long strtoull(char *nptr,char **endptr,int base);
+extern unsigned long long strtoull_callee(char *nptr,char **endptr,int base) __z88dk_callee;
+#define strtoull(a,b,c) strtoull_callee(a,b,c)
+
+
+extern char *ulltoa(unsigned long long num,char *buf,int radix);
+extern char *ulltoa_callee(unsigned long long num,char *buf,int radix) __z88dk_callee;
+#define ulltoa(a,b,c) ulltoa_callee(a,b,c)
+
+
 
 #endif
 

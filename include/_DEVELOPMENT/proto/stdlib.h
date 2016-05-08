@@ -181,25 +181,18 @@ __DPROTO(,,void,*,realloc_unlocked,void *p,size_t size)
 
 #ifdef __SDCC
 
-   extern void _lldiv_(lldiv_t *ld, long long numer, long long denom);
-   extern void _lldiv__callee(lldiv_t *ld, long long numer, long long denom) __z88dk_callee;
-   #define _lldiv_(a,b,c) _lldiv__callee(a,b,c)
+__DPROTO(,,long long,,atoll,char *buf)
+__DPROTO(,,void,,_lldiv_,lldiv_t *ld,long long numer,long long denom)
+__DPROTO(,,void,,_lldivu_,lldivu_t *ld,unsigned long long numer,unsigned long long denom)
 
-   extern void _lldivu_(lldivu_t *ld, unsigned long long numer, unsigned long long denom);
-   extern void _lldivu__callee(lldivu_t *ld, unsigned long long numer, unsigned long long denom) __z88dk_callee;
-   #define _lldivu_(a,b,c) _lldivu__callee(a,b,c)
-
-   extern long long llabs(long long i);
-   extern long long llabs_callee(long long i) __z88dk_callee;
-   #define llabs(a) llabs_callee(a)
+extern long long llabs(long long i);
+extern long long llabs_callee(long long i) __z88dk_callee;
+#define llabs(a) llabs_callee(a)
    
-   extern char *lltoa(long long num, char *buf, int radix);
-   extern char *lltoa_callee(long long num, char *buf, int radix) __z88dk_callee;
-   #define lltoa(a,b,c) lltoa_callee(a,b,c)
-   
-   extern char *ulltoa(unsigned long long num, char *buf, int radix);
-   extern char *ulltoa_callee(unsigned long long num, char *buf, int radix) __z88dk_callee;
-   #define ulltoa(a,b,c) ulltoa_callee(a,b,c)
+__DPROTO(,,char,*,lltoa,long long num,char *buf,int radix)
+__DPROTO(,,long long,,strtoll,char *nptr,char **endptr,int base)
+__DPROTO(,,unsigned long long,,strtoull,char *nptr,char **endptr,int base)
+__DPROTO(,,char,*,ulltoa,unsigned long long num,char *buf,int radix)
 
 #endif
 
