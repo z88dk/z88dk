@@ -32,9 +32,11 @@ error/z80/error_erange_mc
 error/z80/error_erange_zc
 error/z80/error_estat_zc
 error/z80/error_ewouldblock_zc
+error/z80/error_llmc
 error/z80/error_llmnc
 error/z80/error_llzc
 error/z80/error_llznc
+error/z80/error_lmc
 error/z80/error_lmnc
 error/z80/error_lzc
 error/z80/error_lznc
