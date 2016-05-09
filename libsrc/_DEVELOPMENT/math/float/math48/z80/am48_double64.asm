@@ -4,7 +4,7 @@ SECTION code_fp_math48
 
 PUBLIC am48_double64
 
-EXTERN am48_double64u, l_neg_dehldehl
+EXTERN am48_double64u, l_neg_64_dehldehl
 
 am48_double64:
 
@@ -20,7 +20,7 @@ am48_double64:
    or a
    jp p, am48_double64u        ; if n >= 0
 
-   call l_neg_dehldehl         ; n = |n|
+   call l_neg_64_dehldehl      ; n = |n|
    call am48_double64u
    
    exx
