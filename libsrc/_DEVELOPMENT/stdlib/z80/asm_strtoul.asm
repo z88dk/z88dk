@@ -17,7 +17,7 @@ SECTION code_stdlib
 
 PUBLIC asm_strtoul
 
-EXTERN __strtoul__, error_einval_zc, error_erange_mc
+EXTERN __strtoul__, error_einval_zc, error_erange_lmc
 
 asm_strtoul:
 
@@ -65,6 +65,5 @@ asm_strtoul:
    jp m, error_einval_zc       ; on invalid base or invalid string
    
 unsigned_overflow:
-   
-   ld de,$ffff
-   jp error_erange_mc          ; dehl = $ffffffff = ULONG_MAX
+
+   jp error_erange_lmc         ; dehl = $ffffffff = ULONG_MAX

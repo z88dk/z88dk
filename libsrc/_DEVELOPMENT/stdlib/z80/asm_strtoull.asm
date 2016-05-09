@@ -17,7 +17,7 @@ SECTION code_stdlib
 
 PUBLIC asm_strtoull
 
-EXTERN __strtoull__, error_einval_zc, error_erange_mc, error_llzc, error_llmnc
+EXTERN __strtoull__, error_einval_zc, error_erange_llmc
 
 asm_strtoull:
 
@@ -59,10 +59,8 @@ asm_strtoull:
    or a
    ret z                       ; signed underflow is not an error
    
-   call m, error_einval_zc     ; on invalid base or invalid string
-   jp c, error_llzc            ; exit with dehl'dehl = 0
+   jp m, error_einval_zc       ; on invalid base or invalid string
    
 unsigned_overflow:
    
-   call error_llmnc            ; dehl'dehl = $ffffffff ffffffff
-   jp error_erange_mc
+   jp error_erange_llmc        ; dehl'dehl = $ffffffff ffffffff

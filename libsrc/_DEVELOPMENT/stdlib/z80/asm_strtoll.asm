@@ -17,7 +17,7 @@ SECTION code_stdlib
 
 PUBLIC asm_strtoll
 
-EXTERN __strtoull__, error_erange_mc, error_erange_zc, error_einval_zc, error_llmnc, error_llzc
+EXTERN __strtoull__, error_erange_mc, error_erange_zc, error_einval_zc, error_llmc, error_llzc
 
 asm_strtoll:
 
@@ -59,13 +59,13 @@ asm_strtoll:
    ret z                       ; negative result is in range
    
    exx
-   bit 7,d                     ; if most significant bit of positive number
-   exx                         ;   is set we are out of range
+   bit 7,d                     ; if most significant bit of positive number is set we are out of range
+   exx
    ret z
    
 positive_overflow:
    
-   call error_llmnc
+   call error_llmc
    
    exx
    ld d,$7f
@@ -78,10 +78,7 @@ check_errors:
    ; what kind of error was it
    
    dec a
-   jp p, overflow
-   
-   call error_llzc
-   jp error_einval_zc          ; on invalid base or invalid string
+   jp m, error_einval_zc       ; on invalid base or invalid string
 
 overflow:
 

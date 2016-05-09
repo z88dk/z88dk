@@ -17,7 +17,7 @@ SECTION code_stdlib
 
 PUBLIC asm_strtol
 
-EXTERN __strtoul__, error_erange_mc, error_erange_zc, error_einval_zc
+EXTERN __strtoul__, error_erange_lmc, error_erange_zc, error_einval_zc
 
 asm_strtol:
 
@@ -66,8 +66,7 @@ asm_strtol:
    
 positive_overflow:
    
-   ld de,$7fff
-   jp error_erange_mc          ; dehl = $7fffffff = LONG_MAX
+   jp error_erange_lmc         ; dehl = $7fffffff = LONG_MAX
    
 check_errors:
 
