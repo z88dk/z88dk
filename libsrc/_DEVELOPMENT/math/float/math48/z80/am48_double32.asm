@@ -15,7 +15,7 @@ am48_double32:
    ; exit  : AC = AC' (AC' saved)
    ;         AC'= (double)(n)
    ;
-   ; uses  : af, bc, de, hl, af', bc', de', hl'
+   ; uses  : af, bc, de, hl, bc', de', hl'
 
    ld a,d
    or a

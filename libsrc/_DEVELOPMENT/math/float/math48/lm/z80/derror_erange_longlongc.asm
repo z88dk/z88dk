@@ -1,0 +1,9 @@
+
+SECTION code_clib
+SECTION code_fp_math48
+
+PUBLIC derror_erange_longlongc
+
+EXTERN am48_derror_erange_longlongc
+
+defc derror_erange_longlongc = am48_derror_erange_longlongc

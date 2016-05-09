@@ -1,0 +1,9 @@
+
+SECTION code_clib
+SECTION code_fp_math48
+
+PUBLIC ___fs2ulonglong_callee
+
+EXTERN cm48_sdccixp_ds2ulonglong_callee
+
+defc ___fs2ulonglong_callee = cm48_sdccixp_ds2ulonglong_callee

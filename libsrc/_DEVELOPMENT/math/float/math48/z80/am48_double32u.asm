@@ -4,7 +4,7 @@ SECTION code_fp_math48
 
 PUBLIC am48_double32u
 
-EXTERN am48_derror_znc
+EXTERN am48_double16u
 
 am48_double32u:
 
@@ -15,18 +15,36 @@ am48_double32u:
    ; exit  : AC = AC' (exx set saved)
    ;         AC'= (double)(n)
    ;
-   ; uses  : af, bc, de, hl, af', bc', de', hl'
+   ; uses  : af, bc, de, hl, bc', de', hl'
 
    ld a,d
    or e
-   or h
-   or l
-   jp z, am48_derror_znc + 1   ; if n == 0
+   jp z, am48_double16u
 
-   ld c,e
-   ld b,d                      ; bchl = n
+coarse:
+ 
+   inc d
+   dec d
+   jr nz, no_coarse
+
+yes_coarse:
+
+   ld b,e
+   ld c,h
+   ld h,l
+   ld l,0
+   
+   ld de,$80 + 24
+   jr fine
+
+no_coarse:
+
+   ld b,d
+   ld c,e                      ; bchl = n
    
    ld de,$80 + 32              ; e = exponent
+
+fine:
 
    bit 7,b
    jr nz, normalized

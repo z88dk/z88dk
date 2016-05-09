@@ -4,7 +4,7 @@ SECTION code_fp_math48
 
 PUBLIC am48_double8
 
-EXTERN am48_double16
+EXTERN am48_double8u, am48_double8u_0
 
 am48_double8:
 
@@ -17,9 +17,16 @@ am48_double8:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl'
    
-   ld a,l                      ; sign extend L into HL
-   add a,a
-   sbc a,a
-   ld h,a
+   ld a,l
+   or a
+   jp p, am48_double8u
    
-   jp am48_double16
+   neg
+   
+   call am48_double8u_0
+   
+   exx
+   set 7,b
+   exx
+   
+   ret

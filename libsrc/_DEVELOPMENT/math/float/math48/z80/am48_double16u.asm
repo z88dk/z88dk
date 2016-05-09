@@ -4,7 +4,7 @@ SECTION code_fp_math48
 
 PUBLIC am48_double16u
 
-EXTERN am48_derror_znc
+EXTERN am48_double8u
 
 am48_double16u:
 
@@ -17,22 +17,27 @@ am48_double16u:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
    
-   ld a,h                      ;Er HL=0?
-   or l
-   jp z, am48_derror_znc + 1   ;Ja => ZERO
+   ld a,h
+   or a
+   jp z, am48_double8u
    
-   ld de,$80 + 17              ; e = exponent
+   ld de,$80 + 16              ; e = exponent
 
+   bit 7,h
+   jr nz, normalized
+   
 normalize_loop:
 
    dec e
    
-   ld c,l
-   ld b,h
-   
    add hl,hl
-   jr nc, normalize_loop
-   
+   jp p, normalize_loop
+
+normalized:
+
+   ld b,h
+   ld c,l
+
    ld l,d
    ld h,d
    
