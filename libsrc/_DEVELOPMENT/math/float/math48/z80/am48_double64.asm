@@ -16,7 +16,10 @@ am48_double64:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
+   exx
    ld a,d
+   exx
+
    or a
    jp p, am48_double64u        ; if n >= 0
 
