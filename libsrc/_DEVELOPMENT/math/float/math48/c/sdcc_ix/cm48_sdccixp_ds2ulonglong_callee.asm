@@ -26,7 +26,7 @@ cm48_sdccixp_ds2ulonglong_callee:
    
    push bc                     ; save result *
    
-   cm48_sdccixp_d2m48          ; AC'= math48(x)
+   call cm48_sdccixp_d2m48     ; AC'= math48(x)
    
    call am48_dfix64u           ; dehl'dehl = 64-bit result
    
