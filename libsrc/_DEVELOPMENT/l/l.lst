@@ -146,6 +146,7 @@ l/z80/longlong/l_asr_dehldehl
 l/z80/longlong/l_cpl_64_dehldehl
 l/z80/longlong/l_cpl_64_mhl
 l/z80/longlong/l_inc_64_dehldehl
+l/z80/longlong/l_load_64_dehldehl_mbc
 l/z80/longlong/l_lsl_dehldehl
 l/z80/longlong/l_lsr_dehldehl
 l/z80/longlong/l_neg_64_dehldehl
