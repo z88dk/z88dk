@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.8 2016-05-06 14:08:30 stefano Exp $
+ *   $Id: basck.c,v 1.9 2016-05-09 07:26:56 stefano Exp $
  */
 
 unsigned char  *img;
@@ -141,7 +141,8 @@ int varend_skel[]={13, 0x22, SKIP, SKIP, 0x60, 0x69, 0x22, CATCH, CATCH, 6, 6, 0
 int arrend_skel2[]={13, 0xE1, 0x22, CATCH, CATCH, 0x60, 0x69, 0x22, SKIP, SKIP, 0x2B, 0x36, 0, SKIP_CALL};
 int varend_skel2[]={13, 0xE1, 0x22, SKIP, SKIP, 0x60, 0x69, 0x22, CATCH, CATCH, 0x2B, 0x36, 0, SKIP_CALL};
 
-int fpadd_skel[]={12, ADDR, 0x3A,  SKIP, SKIP, 0xB7, 0xC8, 0x3A,  SKIP, SKIP, 0x18, 1, 0x2F};
+int fpadd_skel[]={14, 0xCD, SKIP, ADDR, 0x3A,  SKIP, SKIP, 0xB7, 0xC8, 0x3A,  SKIP, SKIP, 0x18, 1, 0x2F};
+int fpadd_skel2[]={14, 0xCD, SKIP, ADDR, 0x78, 0xB7, 0xC8, 0x3A,  SKIP, SKIP, 0xB7, 0xCA, SKIP, SKIP, 0x90};
 
 int last_fpreg_skel[]={11, 0x3A,  CATCH, CATCH, 0xB7, 0xC8, 0x3A,  SKIP, SKIP, 0x18, 1, 0x2F};
 
@@ -160,20 +161,7 @@ int getchr_skel[]={12, ADDR, 0x23, 0x7E, 0xFE, ':', 0xD0, 0xFE, ' ', 0xCA, SKIP,
 int getchr_skel2[]={11, ADDR, 0x23, 0x7E, 0xFE, ':', 0xD0, 0xFE, ' ', 0x28, SKIP, 0xFE};
 int getchr_skel3[]={10, ADDR, 0x23, 0x7E, 0xFE, ' ', 0x28, SKIP, 0xFE, ':', 0xD0};
 int getchr_skel4[]={7, CATCH_CALL, 0xD0, 0xE5, 0xF5, 0x21, 0x98, 0x19};
-/*
-GETCHR:
-00000858:	INC HL
-00000859:	LD A,(HL)
-0000085A:	CP 20h			; ' '
-0000085C:	JR Z,-06h
-0000085E:	CP 3Ah			; ':'
-00000860:	RET NC
-00000861:	CP 30h			; '0'
-00000863:	CCF
-00000864:	INC A
-00000865:	DEC A
-00000866:	RET
-*/
+
 int getk_skel[]={12, CATCH_CALL, 0x2A, SKIP, SKIP, 0xC5, SKIP_CALL, 0xC1, 0xC0, 0x2A, SKIP, SKIP, 0x85};
 int rinput_skel[]={9, 0x3E, '?', SKIP_CALL, 0x3E, ' ', SKIP_CALL, 0xC3, CATCH, CATCH};
 int rinput_skel2[]={7, 0x3E, '?', SKIP_CALL, 0x3E, ' ', SKIP_CALL, CATCH_CALL};
@@ -195,6 +183,10 @@ int atn_skel[]={13, ADDR, SKIP_CALL, 0xFC, SKIP, SKIP, 0xFC, SKIP, SKIP, 0X3A, S
 int negaft_skel[]={12, SKIP_CALL, 0xFC, CATCH, CATCH, 0xFC, SKIP, SKIP, 0X3A, SKIP, SKIP, 0xFE, 0x81};
 int invsgn_skel[]={12, SKIP_CALL, 0xFC, SKIP, SKIP, 0xFC, CATCH, CATCH, 0X3A, SKIP, SKIP, 0xFE, 0x81};
 int invsgn_skel2[]={8, 0x16,  0x7D, SKIP_CALL, 0x2A,  SKIP, SKIP, 0xE5, CATCH_CALL};
+int atn_skel2[]={15, ADDR, 0x3A, SKIP, SKIP, 0xB7, 0xC8, 0xFC, SKIP, SKIP, 0xFE, 0x41, 0xDA, SKIP, SKIP, SKIP_CALL};
+int negaft_skel2[]={14, 0x3A, SKIP, SKIP, 0xB7, 0xC8, 0xFC, CATCH, CATCH, 0xFE, 0x41, 0xDA, SKIP, SKIP, SKIP_CALL};
+
+int dbldiv_skel2[]={16, 0xB7, 0xC8, 0xFC, SKIP, SKIP, 0xFE, 0x41, 0xDA, SKIP, SKIP, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, CATCH_CALL};
 
 int exp_skel[]={9, ADDR, SKIP_CALL, 1, 0x38, 0x81, 17, 0X3B, 0xAA, SKIP_CALL};
 int fpmult_skel[]={7, 1, 0x38, 0x81, 17, 0X3B, 0xAA, CATCH_CALL};
@@ -227,12 +219,16 @@ int log_skel2[]={10, ADDR, SKIP_CALL, 0xB7, 0xEA, SKIP, SKIP, SKIP_CALL, 1, SKIP
 int log_skel3[]={13, ADDR, SKIP_CALL, 0xB7, 0xEC, SKIP, SKIP, 33, SKIP, SKIP, 0x7E, 1, SKIP, 0x80};
 int log_skel4[]={10, ADDR, SKIP, 0xB7, 0xEA, SKIP, SKIP, SKIP_CALL, 1, SKIP, 0x80};
 int log_skel5[]={13, ADDR, SKIP, 0xB7, 0xEA, SKIP, SKIP, 33, SKIP, SKIP, 0x7E, 1, SKIP, 0x80};
+int log_skel6[]={14, ADDR, SKIP_CALL, 0xFA, SKIP, SKIP, 0xCA, SKIP, SKIP, 33, SKIP, SKIP, 0x7E, 0xF5, 0x36};
 int fcerr_skel[]={12, SKIP_CALL, 0xB7, 0xEA, CATCH, CATCH, 33, SKIP, SKIP, 0x7E, 1, SKIP, 0x80};
 int fcerr_skel2[]={12, SKIP_CALL, 0xB7, 0xEA, CATCH, CATCH, 33, SKIP, SKIP, 0x7E, 1, SKIP, 0x80};
 int fcerr_skel3[]={12, SKIP_CALL, 0xB7, 0xEC, CATCH, CATCH, 33, SKIP, SKIP, 0x7E, 1, SKIP, 0x80};
+int fcerr_skel4[]={13, SKIP_CALL, 0xFA, CATCH, CATCH, 0xCA, SKIP, SKIP, 33, SKIP, SKIP, 0x7E, 0xF5, 0x36};
 
-int fpadd_skel2[]={13, CATCH_CALL, 0xC1, 0xD1, 0x04, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 33, SKIP, SKIP, 0xCD};
-int fpadd_skel3[]={12, ADDR, 0xB7, 0xC8, 0x3A,  SKIP, SKIP, 0xB7, 0xCA,  SKIP, SKIP, 0x90, 0x30};
+
+
+int fpadd_skel3[]={13, CATCH_CALL, 0xC1, 0xD1, 0x04, SKIP_CALL, 33, SKIP, SKIP, SKIP_CALL, 33, SKIP, SKIP, 0xCD};
+int fpadd_skel4[]={12, ADDR, 0xB7, 0xC8, 0x3A,  SKIP, SKIP, 0xB7, 0xCA,  SKIP, SKIP, 0x90, 0x30};
 int dvbcde_skel[]={13, SKIP_CALL, 0xC1, 0xD1, 0x04, CATCH_CALL, 33, SKIP, SKIP, SKIP_CALL, 33, SKIP, SKIP, 0xCD};
 int unity_skel[]={13, SKIP_CALL, 0xC1, 0xD1, 0x04, SKIP_CALL, 33, CATCH, CATCH, SKIP_CALL, 33, SKIP, SKIP, 0xCD};
 int subphl_skel[]={13, SKIP_CALL, 0xC1, 0xD1, 0x04, SKIP_CALL, 33, SKIP, SKIP, CATCH_CALL, 33, SKIP, SKIP, 0xCD};
@@ -454,6 +450,9 @@ int jptab_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 9, 0x4E}
 int jptab_msbasic_skel3[]={11, 17, CATCH, CATCH, 0xD4, SKIP,SKIP, 7, 0x4f, 6, 0, 0xEB};
 int jptab_msbasic_skel2[]={12, 17, CATCH, CATCH, 0x07, 0x4F, 6, 0, 0xEB, 0x09, 0x4E, 0x23, 0x46};
 
+int else_token_skel[]={13, 0x32, SKIP, SKIP,0xF1, 0xC1, 0xD1, 0xFE, CATCH, 0xF5, 0xCC, SKIP, SKIP, 0xF1};
+
+
 
 int fnctab_msbasic_skel[]={10, 0xD5, 1, CATCH, CATCH, 9, 0x4E, 0x23, 0x66, 0x69, 0xE9};
 int fnctab_msbasic_skel2[]={9,       1, CATCH, CATCH, 9, 0x4E, 0x23, 0x66, 0x69, 0xE9};
@@ -583,7 +582,7 @@ int main(int argc, char *argv[])
 	FILE	*fpin;
 	int	c, chr;
 	int	i;
-	long res;
+	long res, res2;
 	int brand;
 	int new_tk_found;
 
@@ -645,10 +644,15 @@ int main(int argc, char *argv[])
 	if (res>0) {
 		printf("\nMicrosoft 8080/Z80 BASIC found\n");
 		
-		brand=find_skel(microsoft_extended_skel);
+		brand=find_skel(tkmsbasic_ex_skel);
 		if (brand>0)
-			printf("  Extended syntax detected\n");
-			else printf("  Earlier version\n");
+			printf("  Extended BASIC detected\n");
+			else {
+				brand=find_skel(microsoft_extended_skel);
+				if (brand>0)
+					printf("  Extended syntax detected (classic version)\n");
+					else printf("  Earlier version\n");
+			}
 
 		brand=find_skel(microsoft_defdbl_skel);
 		if (brand<0)
@@ -954,6 +958,8 @@ int main(int argc, char *argv[])
 		}
 		
 		res=find_skel(negaft_skel);
+		if (res<0)
+			res=find_skel(negaft_skel2);
 		if (res>0)
 			printf("NEGAFT = $%04X  ; Negate number\n",res);
 
@@ -966,6 +972,8 @@ int main(int argc, char *argv[])
 			res=find_skel(log_skel4);
 		if (res<0)
 			res=find_skel(log_skel5);
+		if (res<0)
+			res=find_skel(log_skel6);
 		if (res>0)
 			printf("LOG    = $%04X  ; \n",res+pos+1);
 
@@ -1018,6 +1026,8 @@ int main(int argc, char *argv[])
 			printf("TAN    = $%04X  ; \n",res+pos+1);
 
 		res=find_skel(atn_skel);
+		if (res<0)
+			res=find_skel(atn_skel2);
 		if (res>0)
 			printf("ATN    = $%04X  ; \n",res+pos+1);
 
@@ -1042,14 +1052,16 @@ int main(int argc, char *argv[])
 			printf("RND    = $%04X  ; \n",res+pos+1);
 		
 		res=find_skel(fpadd_skel);
+		if (res<0)
+			res=find_skel(fpadd_skel2);
 		if (res>0) {
 			printf("SUBCDE = $%04X  ; Subtract BCDE from FP reg\n",res+pos+1-3);
 			printf("FPADD  = $%04X  ; Add BCDE to FP reg\n",res+pos+1);
 		}
 		else {
-			res=find_skel(fpadd_skel2);
+			res=find_skel(fpadd_skel3);
 			if (res<0)
-				res=find_skel(fpadd_skel3);
+				res=find_skel(fpadd_skel4);
 			if (res>0) {
 				printf("SUBCDE = $%04X  ; Subtract BCDE from FP reg\n",res-3);
 				printf("FPADD  = $%04X  ; Add BCDE to FP reg\n",res);
@@ -1203,6 +1215,8 @@ int main(int argc, char *argv[])
 			printf("DBL_MUL    = $%04X  ; Double precision MULTIPLY\n",res+pos+1);
 		
 		res=find_skel(dbldiv_skel);
+		if (res<0)
+			res=find_skel(dbldiv_skel2);
 		if (res>0)
 			printf("DBL_DIV    = $%04X  ; Double precision DIVIDE\n",res+pos+1);
 		
@@ -1478,6 +1492,8 @@ int main(int argc, char *argv[])
 			res=find_skel(fcerr_skel2);
 		if (res<0)
 			res=find_skel(fcerr_skel3);
+		if (res<0)
+			res=find_skel(fcerr_skel4);
 		if (res>0)
 			printf("FCERR  = $%04X  ; entry for '?FC ERROR'\n",res);
 		
@@ -1507,24 +1523,41 @@ int main(int argc, char *argv[])
 		
 		if (res>0) {
 			res+=1;
-			//chr=find_skel(tkmsbasic_code_skel)+1;
 			
-			printf("\nTOKEN table position = $%04X, word list in modern encoding mode.\n",res);
+			printf("\nTOKEN table position = $%04X, word list in 'extended BASIC' mode.\n",res);			
+			
 			printf("\n-- STATEMENTS --\n");
-			chr='A';
-			printf("\n\t - %c", chr);
 			
+			res2=find_skel(else_token_skel);
+			if (res2>0)
+				printf("\n\tELSE\t\t[%d]\n",res2);
 
-			for (i=res; img[i+1]!='<'; i++) {
+			chr='A';
+			printf("\n\t%c", chr);
+			
+			for (i=res; img[i+8]!='<'; i++) {
 				if ((img[i-1]==0)&&(img[i]==0)) {chr++; i++;}
-				if (img[i-1]==0) {chr++;  printf("\t - %c", chr);}
+				if (img[i-1]==0) {chr++;  printf("\t%c", chr);}
 				c=img[i];
 				if (c>=128)	{
 					c-=128;
 					printf("%c",c);
 					i++;
-					printf("   \t[%d]\n",img[i]);
-					if (img[i+1]!=0) {printf("\t - %c", chr);}
+
+					if (jptab>0) {
+						if (img[i]>128) {
+							/* MSX/SVI: to be excluded codes between 217 and 220*/
+							/* TODO: Other cases may be different !!  (Triumph Adler..) */
+							if (img[i]<217) {
+									printf("      \t[%d]\t- $%04X\n",img[i],img[jptab+2*(img[i]-129)-pos]+256*img[jptab+2*(img[i]-129)-pos+1]);
+							} else 
+								printf("      \t[%d]\n",img[i]);
+						} else
+							printf("      \t[%d]\t- $%04X\n",img[i],img[jptab+2*(img[i]+87)-pos]+256*img[jptab+2*(img[i]+87)-pos+1]);
+					} else
+						printf("      \t[%d]\n",img[i]);
+
+					if (img[i+1]!=0) {printf("\t%c", chr);}
 				} else printf("%c",c);
 			}
 
