@@ -36,7 +36,10 @@ l0_inc_64_dehldehl:
    inc h
    jr nz, exx_ret
    
-   inc de
+   inc e                       ; need z flag set correctly so no 'inc de'
+   jr nz, exx_ret
+   
+   inc d
 
 exx_ret:
 
