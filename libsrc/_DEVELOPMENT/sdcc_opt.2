@@ -380,6 +380,21 @@
 	call	___fs2slong_callee
 	push	hl
 
+	call	___fs2slonglong
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fs2slonglong_callee
+
+	call	___fs2slonglong
+	pop	af
+	pop	af
+	ex	(sp),hl
+=
+	call	___fs2slonglong_callee
+	push	hl
+
 	call	___fs2uchar
 	pop	af
 	pop	af
@@ -417,6 +432,21 @@
 	ex	(sp),hl
 =
 	call	___fs2ulong_callee
+	push	hl
+
+	call	___fs2ulonglong
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___fs2ulonglong_callee
+
+	call	___fs2ulonglong
+	pop	af
+	pop	af
+	ex	(sp),hl
+=
+	call	___fs2ulonglong_callee
 	push	hl
 
 	call	___fsadd
@@ -584,6 +614,23 @@
 	call	___slong2fs_callee
 	push	hl
 
+	call	___slonglong2fs
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___slonglong2fs_callee
+
+	call	___slonglong2fs
+	pop	af
+	pop	af
+	pop	af
+	ex	(sp),hl
+=
+	call	___slonglong2fs_callee
+	push	hl
+
 	call	___uchar2fs
 	inc	sp
 =
@@ -611,6 +658,23 @@
 	ex	(sp),hl
 =
 	call	___ulong2fs_callee
+	push	hl
+
+	call	___ulonglong2fs
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+=
+	call	___ulonglong2fs_callee
+
+	call	___ulonglong2fs
+	pop	af
+	pop	af
+	pop	af
+	ex	(sp),hl
+=
+	call	___ulonglong2fs_callee
 	push	hl
 
 ;;
