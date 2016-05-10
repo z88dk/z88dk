@@ -276,11 +276,20 @@ defc __CLIB_OPT_PRINTF = $3fffff
 ; bit 27 = $ 8000000 = enable %F
 ; bit 28 = $10000000 = enable %g
 ; bit 29 = $20000000 = enable %G
-;
-; Setting to zero will remove the % logic from printf
-; entirely, meaning printf can only be used to output
-; format text to the stream.
 
+defc __CLIB_OPT_PRINTF_2 = $0
+
+; bit 0 =  $      01 = enable %lld
+; bit 1 =  $      02 = enable %llu
+; bit 2 =  $      04 = enable %llx
+; bit 3 =  $      08 = enable %llX
+; bit 4 =  $      10 = enable %llo
+; bit 5 =  $      20 = ignored
+; bit 6 =  $      40 = enable %lli
+
+; Setting all flag bits to zero will remove the % logic
+; from printf entirely, meaning printf can only be used
+; to output format text to the stream.
 
 ; -------------------------------------------------------------
 ; -- scanf converter selection --------------------------------
@@ -314,11 +323,20 @@ defc __CLIB_OPT_SCANF = $ffffffff
 ; bit 19 = $ 80000 = enable %lp
 ; bit 20 = $100000 = enable %lB
 ; bit 21 = $200000 = enable %[
-;
-; Setting to zero will remove the % logic from scanf
-; entirely, meaning scanf can only be used to match
-; format text against the stream.
 
+defc __CLIB_OPT_SCANF_2 = $0
+
+; bit 0 =  $      01 = enable %lld
+; bit 1 =  $      02 = enable %llu
+; bit 2 =  $      04 = enable %llx
+; bit 3 =  $      08 = enable %llX
+; bit 4 =  $      10 = enable %llo
+; bit 5 =  $      20 = ignored
+; bit 6 =  $      40 = enable %lli
+
+; Setting all flag bits to zero will remove the % logic
+; from scanf entirely, meaning scanf can only be used to
+; match format text against the stream.
 
 ; -------------------------------------------------------------
 ; -- stdlib options -------------------------------------------
