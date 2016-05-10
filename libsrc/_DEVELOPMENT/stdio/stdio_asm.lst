@@ -169,6 +169,11 @@ stdio/z80/output_helpers/__stdio_printf_ii
 stdio/z80/output_helpers/__stdio_printf_lbb
 stdio/z80/output_helpers/__stdio_printf_ld
 stdio/z80/output_helpers/__stdio_printf_li
+stdio/z80/output_helpers/__stdio_printf_lld
+stdio/z80/output_helpers/__stdio_printf_lli
+stdio/z80/output_helpers/__stdio_printf_llo
+stdio/z80/output_helpers/__stdio_printf_llu
+stdio/z80/output_helpers/__stdio_printf_llx
 stdio/z80/output_helpers/__stdio_printf_ln
 stdio/z80/output_helpers/__stdio_printf_lo
 stdio/z80/output_helpers/__stdio_printf_lp
@@ -178,6 +183,7 @@ stdio/z80/output_helpers/__stdio_printf_n
 stdio/z80/output_helpers/__stdio_printf_number_tail
 stdio/z80/output_helpers/__stdio_printf_number_tail_int
 stdio/z80/output_helpers/__stdio_printf_number_tail_long
+stdio/z80/output_helpers/__stdio_printf_number_tail_longlong
 stdio/z80/output_helpers/__stdio_printf_o
 stdio/z80/output_helpers/__stdio_printf_p
 stdio/z80/output_helpers/__stdio_printf_s
