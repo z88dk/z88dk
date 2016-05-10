@@ -23,19 +23,23 @@ am48_double16u:
    
    ld de,$80 + 16              ; e = exponent
 
-   bit 7,h
-   jr nz, normalized
+   ld a,h
+   or a
+   
+   jp m, normalized
    
 normalize_loop:
 
    dec e
    
-   add hl,hl
+   sla l
+   adc a,a
+   
    jp p, normalize_loop
 
 normalized:
 
-   ld b,h
+   ld b,a
    ld c,l
 
    ex de,hl
