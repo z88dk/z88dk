@@ -74,7 +74,7 @@ asm1_vfprintf_unlocked:
 
 asm0_vfprintf_unlocked:
 
-IF (__CLIB_OPT_PRINTF != 0) || (__CLIB_OPT_PRINTF_2 != 0)
+IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ld hl,-44
    add hl,sp
@@ -120,7 +120,7 @@ __format_loop:
    pop de
 
 
-IF (__CLIB_OPT_PRINTF = 0) && (__CLIB_OPT_PRINTF_2 = 0)
+IF (__CLIB_OPT_PRINTF = 0) && ((__CLIB_OPT_PRINTF_2 = 0) || __SCCZ80)
 
    jr c, error_stream          ; if stream error
 
@@ -157,7 +157,7 @@ format_end:
    ; de = address of format char '\0'
    ; stack = WORKSPACE_44, stack_param
 
-IF (__CLIB_OPT_PRINTF != 0) || (__CLIB_OPT_PRINTF_2 != 0)
+IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ld hl,46
    add hl,sp
@@ -175,7 +175,7 @@ ENDIF
 
 ; * AA ********************************************************
 
-IF (__CLIB_OPT_PRINTF = 0) && (__CLIB_OPT_PRINTF_2 = 0)
+IF (__CLIB_OPT_PRINTF = 0) && ((__CLIB_OPT_PRINTF_2 = 0) || __SCCZ80)
 
    ; completely disable % logic
    ; printf can only be used to output format text
@@ -191,7 +191,7 @@ ENDIF
 
 ; * BB ********************************************************
 
-IF (__CLIB_OPT_PRINTF != 0) || (__CLIB_OPT_PRINTF_2 != 0)
+IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ; regular % processing
 
@@ -436,10 +436,11 @@ ENDIF
 
    ld a,c
    and $30                     ; only pay attention to long and longlong modifiers
+   sub $10
 
    ; carry must be reset here
 
-   jr nz, long_spec            ; if long or longlong modifier selected
+   jr nc, long_spec            ; if long or longlong modifier selected
 
    ;;; without long spec
 
@@ -490,7 +491,7 @@ unrecognized:
    ld hl,50
    jp __error_stream
 
-IF __CLIB_OPT_PRINTF_2
+IF __CLIB_OPT_PRINTF_2 && __SDCC
 
    ;;; with longlong spec
 
@@ -507,10 +508,8 @@ ENDIF
    ;;; with long spec
 
 long_spec:
-
-   cp $10
    
-IF __CLIB_OPT_PRINTF_2
+IF __CLIB_OPT_PRINTF_2 && __SDCC
 
    jr nz, longlong_spec
 
@@ -553,7 +552,7 @@ printf_I:
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF_2
+IF __CLIB_OPT_PRINTF_2 && __SDCC
 
 printf_return_is_8:
 
@@ -981,7 +980,7 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF_2
+IF __CLIB_OPT_PRINTF_2 && __SDCC
 
 llcon_tbl:
 
@@ -1039,7 +1038,7 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF_2
+IF __CLIB_OPT_PRINTF_2 && __SDCC
 
 printf_return_8:
 
@@ -1074,7 +1073,7 @@ ENDIF
 
 ENDIF
 
-IF ((__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)) || (__CLIB_OPT_PRINTF_2)
+IF ((__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)) || (__CLIB_OPT_PRINTF_2 && __SDCC)
 
 printf_return_6:
 
@@ -1213,7 +1212,7 @@ ENDIF
 
 error_stream:
 
-IF __CLIB_OPT_PRINTF != 0
+IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ; de = address of format char stopped on ('%' or '\0')
    ; stack = WORKSPACE_44, stack_param
@@ -1238,7 +1237,7 @@ ENDIF
    scf                         ; indicate error
    jp l_neg_hl                 ; hl = - (chars out + 1) < 0
 
-IF __CLIB_OPT_PRINTF != 0
+IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
 error_printf_converter:
 
