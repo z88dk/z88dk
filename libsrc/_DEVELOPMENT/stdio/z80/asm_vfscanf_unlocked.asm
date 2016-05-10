@@ -555,7 +555,7 @@ ENDIF
 longlong_spec:
 
    call __spec_longlong
-   jr spec_return
+   jp spec_return
 
 __spec_longlong:
 
