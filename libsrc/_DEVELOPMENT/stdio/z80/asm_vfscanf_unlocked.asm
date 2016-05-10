@@ -75,7 +75,7 @@ asm1_vfscanf_unlocked:
 
 asm0_vfscanf_unlocked:
 
-IF __CLIB_OPT_SCANF != 0
+IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && __SDCC) 
 
    ld hl,-40
    add hl,sp
@@ -129,7 +129,7 @@ percent_join:
 
 exit_success:
 
-IF __CLIB_OPT_SCANF != 0
+IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && __SDCC)
 
    ; stack = WORKSPACE_40, stack_param
 
@@ -153,7 +153,7 @@ mismatch_error:
 
 exit_failure:
 
-IF __CLIB_OPT_SCANF != 0
+IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && _SDCC)
 
    ; stack = WORKSPACE_40, stack_param
 
@@ -208,7 +208,7 @@ stream_consume_pct:
    jr mismatch_error
 
 
-IF __CLIB_OPT_SCANF != 0
+IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && __SDCC)
 
 error_format_width:
 
@@ -235,7 +235,7 @@ possible_conversion_1:
    jr z, stream_consume_pct    ; if format string ends in %
 
 
-IF __CLIB_OPT_SCANF = 0
+IF (__CLIB_OPT_SCANF = 0) && ((__CLIB_OPT_SCANF_2 = 0) || __SCCZ80)
 
    ; completely disable % logic
    ; scanf can only match format chars to the input stream
@@ -296,7 +296,8 @@ suppressed_rejoin:
    
    ld a,c
    and $30                     ; long modifiers activated ?
-   
+   sub $10
+ 
    ld a,(de)                   ; a = conversion specifier
    inc de
 
@@ -314,16 +315,16 @@ suppressed_rejoin:
    ; de = void *buffer
    ; hl = void *p (0 for assignment suppression)
    ; bc'= char *format
-   ; nz flag set if long modifier present
+   ; nc flag set if long modifiers present
    ; stack = WORKSPACE_40, stack_param, char *format
 
    ; CONVERSION SPECIFIER
 
    ; identify conversion "B[cdiInopsux"
    ; long modifies "Bdinopux" not "[cIs"
-
-   jr nz, spec_long
-
+   
+   jr nc, spec_long
+   
    ; no long modifier
 
 IF __CLIB_OPT_SCANF & $200000
@@ -451,14 +452,11 @@ ENDIF
 
 spec_long:
 
+   jr nz, longlong_spec
+
+long_spec:
+
    ; long modifier
-
-IF __CLIB_OPT_SCANF & $200000
-
-   cp '['
-   jr z, _scanf_bkt            ; special treatment for '%['
-
-ENDIF 
 
    call __spec_long
    jr spec_return
@@ -530,7 +528,7 @@ IF __CLIB_OPT_SCANF & $100000
 ENDIF
 
    jr spec_constant
-
+   
 IF __CLIB_OPT_SCANF & $200000
 
 _scanf_bkt:
@@ -553,5 +551,58 @@ _scanf_bkt:
    jr spec_return
 
 ENDIF
+
+longlong_spec:
+
+   call __spec_longlong
+   jr spec_return
+
+__spec_longlong:
+
+IF __CLIB_OPT_SCANF_2 && __SDCC
+
+IF __CLIB_OPT_SCANF_2 & $01
+
+   cp 'd'
+   EXTERN __stdio_scanf_lld
+   jp z, __stdio_scanf_lld
+
+ENDIF
+
+IF __CLIB_OPT_SCANF_2 & $02
+   
+   cp 'u'
+   EXTERN __stdio_scanf_llu
+   jp z, __stdio_scanf_llu
+
+ENDIF
+
+IF __CLIB_OPT_SCANF_2 & $40
+   
+   cp 'i'
+   EXTERN __stdio_scanf_lli
+   jp z, __stdio_scanf_lli
+
+ENDIF
+
+IF __CLIB_OPT_SCANF_2 & $0c
+   
+   cp 'x'
+   EXTERN __stdio_scanf_llx
+   jp z, __stdio_scanf_llx
+
+ENDIF
+
+IF __CLIB_OPT_SCANF_2 & $10
+   
+   cp 'o'
+   EXTERN __stdio_scanf_llo
+   jp z, __stdio_scanf_llo
+
+ENDIF
+
+ENDIF
+
+   jr spec_constant
 
 ENDIF
