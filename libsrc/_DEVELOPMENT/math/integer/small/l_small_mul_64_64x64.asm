@@ -25,12 +25,9 @@ l_small_mul_64_64x64:
    ;
    ; exit  : ix structure unchanged
    ;         dehl' dehl = 64-bit product
-   ;         carry set = overflow
+   ;         carry reset
    ;
-   ; uses  : af, bc, de, hl, af', bc', de', hl'
-   
-   xor a
-   ex af,af'
+   ; uses  : af, bc, de, hl, bc', de', hl'
    
    xor a
    
@@ -130,8 +127,6 @@ l_small_mul_64_64x64:
    adc hl,bc
    ex de,hl
    
-   ex af,af'                   ; carry' = overflow indicator
-   
    ; dehl = LS32(B*C) + LS32(A*D)
    
    pop bc
@@ -152,7 +147,5 @@ finished:
    
    ; dehl = LS32(product) = LS32(B*D)
 
-   ret c
-   
-   ex af,af'
+   or a
    ret
