@@ -74,6 +74,8 @@ signed_join:
    ; ix = & number
    ; stack = buffer_digits, width, precision, FILE*
 
+   push de                     ; save buffer digits
+   
    exx
    push bc
    push de
@@ -88,10 +90,9 @@ signed_join:
    pop bc
    exx
    
-   push ix
    pop de                      ; de = buffer_digits
-   
    pop ix
+   
    jp __stdio_printf_number_tail
 
 zero:
