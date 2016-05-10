@@ -20,6 +20,11 @@ l_add_64_dehldehl_a:
    
    add a,l
    ld l,a
-   ret nc
-
-   jp l0_inc_64_dehldehl
+   jp c, l0_inc_64_dehldehl
+   
+   ; ensure z flag is reset
+   
+   ret nz
+   
+   inc a
+   ret
