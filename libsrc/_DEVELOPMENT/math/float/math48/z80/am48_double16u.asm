@@ -38,11 +38,12 @@ normalized:
    ld b,h
    ld c,l
 
-   ld l,d
-   ld h,d
+   ex de,hl
    
-   res 7,b
-   ex de,hl                    ; bcdehl = (float)(n)
+   ld d,h
+   ld e,h
+   
+   res 7,b                     ; bcdehl = (float)(n)
 
    exx
    ret
