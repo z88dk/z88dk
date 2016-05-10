@@ -254,7 +254,7 @@ loop:
    
    pop bc                      ; bc = char *
 
-   jr c, unsigned_overflow
+;;   jr c, unsigned_overflow
    
    pop af                      ; a = new digit
 
