@@ -74,7 +74,7 @@ asm1_vfprintf_unlocked:
 
 asm0_vfprintf_unlocked:
 
-IF __CLIB_OPT_PRINTF != 0
+IF (__CLIB_OPT_PRINTF != 0) || (__CLIB_OPT_PRINTF_2 != 0)
 
    ld hl,-44
    add hl,sp
@@ -120,7 +120,7 @@ __format_loop:
    pop de
 
 
-IF __CLIB_OPT_PRINTF = 0
+IF (__CLIB_OPT_PRINTF = 0) && (__CLIB_OPT_PRINTF_2 = 0)
 
    jr c, error_stream          ; if stream error
 
@@ -157,7 +157,7 @@ format_end:
    ; de = address of format char '\0'
    ; stack = WORKSPACE_44, stack_param
 
-IF __CLIB_OPT_PRINTF != 0
+IF (__CLIB_OPT_PRINTF != 0) || (__CLIB_OPT_PRINTF_2 != 0)
 
    ld hl,46
    add hl,sp
@@ -175,7 +175,7 @@ ENDIF
 
 ; * AA ********************************************************
 
-IF __CLIB_OPT_PRINTF = 0
+IF (__CLIB_OPT_PRINTF = 0) && (__CLIB_OPT_PRINTF_2 = 0)
 
    ; completely disable % logic
    ; printf can only be used to output format text
@@ -191,7 +191,7 @@ ENDIF
 
 ; * BB ********************************************************
 
-IF __CLIB_OPT_PRINTF != 0
+IF (__CLIB_OPT_PRINTF != 0) || (__CLIB_OPT_PRINTF_2 != 0)
 
    ; regular % processing
 
@@ -435,11 +435,11 @@ ENDIF
    ld b,a                      ; b = specifier
 
    ld a,c
-   and $30                     ; only pay attention to long modifier
+   and $30                     ; only pay attention to long and longlong modifiers
 
    ; carry must be reset here
 
-   jr nz, long_spec            ; if long modifier selected
+   jr nz, long_spec            ; if long or longlong modifier selected
 
    ;;; without long spec
 
@@ -490,9 +490,35 @@ unrecognized:
    ld hl,50
    jp __error_stream
 
+IF __CLIB_OPT_PRINTF_2
+
+   ;;; with longlong spec
+
+longlong_spec:
+
+   ld hl,llcon_tbl             ; converters with longlong spec
+   call match_con
+
+   jr c, printf_return_is_8
+   jr common_spec
+      
+ENDIF
+
    ;;; with long spec
 
 long_spec:
+
+   cp $10
+   
+IF __CLIB_OPT_PRINTF_2
+
+   jr nz, longlong_spec
+
+ELSE
+
+   jr nz, common_spec
+
+ENDIF
 
 IF __CLIB_OPT_PRINTF & $1ff000
 
@@ -524,6 +550,15 @@ printf_I:
    ld a,$80
 
    jr printf_return_is_4
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF_2
+
+printf_return_is_8:
+
+   ld bc,printf_return_8
+   jr printf_invoke_flags
 
 ENDIF
 
@@ -946,7 +981,100 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)
+IF __CLIB_OPT_PRINTF_2
+
+llcon_tbl:
+
+IF __CLIB_OPT_PRINTF_2 & $01
+
+defb 'd', $d0
+EXTERN __stdio_printf_lld
+defw __stdio_printf_lld
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF_2 & $02
+
+defb 'u', $90
+EXTERN __stdio_printf_llu
+defw __stdio_printf_llu
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF_2 & $04
+
+defb 'x', $00
+EXTERN __stdio_printf_llx
+defw __stdio_printf_llx
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF_2 & $08
+
+defb 'X', $80
+EXTERN __stdio_printf_llx
+defw __stdio_printf_llx
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF_2 & $10
+
+defb 'o', $a0
+EXTERN __stdio_printf_llo
+defw __stdio_printf_llo
+
+ENDIF
+
+IF __CLIB_OPT_PRINTF_2 & $40
+
+defb 'i', $d0
+EXTERN __stdio_printf_lld
+defw __stdio_printf_lld
+
+ENDIF
+
+defb 0
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __CLIB_OPT_PRINTF_2
+
+printf_return_8:
+
+   ; printf converters that read eight bytes from stack_param return here
+   ;
+   ; carry set if error
+   ; stack = WORKSPACE_36, char *format, void *stack_param
+
+   pop bc
+
+__return_join_8:
+
+;******************************
+IF __SDCC | __SDCC_IX | __SDCC_IY
+;******************************
+
+   inc bc
+   inc bc                      ; bc = stack_param += 2
+
+;******************************
+ELSE
+;******************************
+
+   dec bc
+   dec bc                      ; bc = stack_param += 2
+
+;******************************   
+ENDIF
+;******************************
+
+   jr _return_join_6
+
+ENDIF
+
+IF ((__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)) || (__CLIB_OPT_PRINTF_2)
 
 printf_return_6:
 
