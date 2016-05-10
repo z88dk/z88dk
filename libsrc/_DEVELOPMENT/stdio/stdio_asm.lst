@@ -132,6 +132,11 @@ stdio/z80/input_helpers/__stdio_scanf_ii
 stdio/z80/input_helpers/__stdio_scanf_lbb
 stdio/z80/input_helpers/__stdio_scanf_ld
 stdio/z80/input_helpers/__stdio_scanf_li
+stdio/z80/input_helpers/__stdio_scanf_lld
+stdio/z80/input_helpers/__stdio_scanf_lli
+stdio/z80/input_helpers/__stdio_scanf_llo
+stdio/z80/input_helpers/__stdio_scanf_llu
+stdio/z80/input_helpers/__stdio_scanf_llx
 stdio/z80/input_helpers/__stdio_scanf_ln
 stdio/z80/input_helpers/__stdio_scanf_lo
 stdio/z80/input_helpers/__stdio_scanf_lp
@@ -141,6 +146,7 @@ stdio/z80/input_helpers/__stdio_scanf_n
 stdio/z80/input_helpers/__stdio_scanf_number_head
 stdio/z80/input_helpers/__stdio_scanf_number_tail_int
 stdio/z80/input_helpers/__stdio_scanf_number_tail_long
+stdio/z80/input_helpers/__stdio_scanf_number_tail_longlong
 stdio/z80/input_helpers/__stdio_scanf_o
 stdio/z80/input_helpers/__stdio_scanf_p
 stdio/z80/input_helpers/__stdio_scanf_s
