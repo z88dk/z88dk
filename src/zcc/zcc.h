@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.33 2016-04-24 08:14:27 dom Exp $
+ * $Id: zcc.h,v 1.34 2016-05-11 04:28:16 aralbrec Exp $
  */
 
 #include "../config.h"
@@ -51,4 +51,5 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 
 enum iostyle { outimplied=1, outspecified,  filter, outspecified_flag, filter_outspecified_flag };
 
-
+/* provide an implementation of getline since it's missing on some platforms */
+static int zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream);

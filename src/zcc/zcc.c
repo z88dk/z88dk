@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.121 2016-04-25 08:57:02 dom Exp $
+ *      $Id: zcc.c,v 1.122 2016-05-11 04:28:16 aralbrec Exp $
  */
 
 
@@ -123,8 +123,8 @@ static int             gargc;
 static char          **gargv;
 /* filelist has to stay as ** because we change suffix all the time */
 static int             nfiles = 0;
-static char          **filelist;
-static char          **original_filenames;    /* Original filenames... */
+static char          **filelist = NULL;
+static char          **original_filenames = NULL;    /* Original filenames... */
 static char           *outputfile = NULL;
 static char           *c_linker_output_file = NULL;
 static char           *cpparg;
@@ -546,11 +546,6 @@ int main(int argc, char **argv)
     
     add_option_to_compiler("");
 
-    /* allocate enough pointers for all files, slight overestimate */
-    filelist = mustmalloc(sizeof(char *) * argc);
-    original_filenames =  mustmalloc(sizeof(char *) * argc);
-
-
     gc = 1;            /* Set for the first argument to scan for */
     if (argc == 1) {
         print_help_text();
@@ -709,7 +704,7 @@ int main(int argc, char **argv)
             }
         case PFILE:
             if ( compiler_type == CC_SDCC )
-			{
+            {
                switch (sdccpeepopt)
                {
                case 0:
@@ -733,7 +728,7 @@ int main(int argc, char **argv)
             {
                switch (peepholeopt)
                {
-			   case 0:
+               case 0:
                    BuildAsmLine(asmarg, sizeof(asmarg), "-easm");
                    if ( !assembleonly )
                        if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
@@ -805,9 +800,9 @@ int main(int argc, char **argv)
                 if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                     exit(1);
             break;
-	default:
-            //fprintf(stderr, "Filetype in \"%s\" unrecognized, ignoring file\n", original_filenames[i]);
-            break;
+        default:
+            fprintf(stderr, "Filetype \"%s\" unrecognized\n", original_filenames[i]);
+            exit(1);
         }
     }
 
@@ -816,9 +811,9 @@ int main(int argc, char **argv)
         outputfile = NULL;
         copy_output_files_to_destdir(".lst", 0);
         outputfile = tempofile;
-	}
-
-	if (compileonly || assembleonly) {
+    }
+    
+    if (compileonly || assembleonly) {
         if (compileonly && !assembleonly) {
             if (usetemp)
                 copy_output_files_to_destdir(c_extension, 1);
@@ -876,7 +871,7 @@ int main(int argc, char **argv)
         if (lston && copy_file(c_crt0, ".lst", "crt0", ".lst")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
             exit(1);
-		}
+        }
     }
 
     exit(0);
@@ -1130,46 +1125,108 @@ void add_option_to_compiler(char *arg)
     BuildOptions(&comparg, arg);
 }
 
+
+
+
+void gather_from_list_file(char *fname)
+{
+    FILE *in;
+    char *line;
+    unsigned int len;
+
+    if ((in = fopen(fname, "r")) == NULL)
+    {
+        fprintf(stderr, "Unable to open list file \"%s\"\n", fname);
+        exit(1);
+    }
+    
+    line = NULL;
+
+    while (zcc_getdelim(&line, &len, '\n', in) > 0)
+        add_file_to_process(line);
+
+    if (!feof(in))
+    {
+        fprintf(stderr, "Malformed line in list file \"%s\"\n", fname);
+        exit(1);
+    }
+
+    free(line);
+    fclose(in);
+}
+
 void add_file_to_process(char *arg)
 {
-    char            filen[FILENAME_MAX + 1];
-    char           *ptr;
-    int             j;
-    
-    if (isspace(arg[0]) || arg[0] == 0)
-        return;
-    
-    /* Add this file to the list of original files */
-    ptr = strdup(arg);
-    original_filenames[nfiles] = ptr;
+    char tname[FILENAME_MAX*2 + 1];
+    char *p, *q;
 
-    if (usetemp) {
-        /* Now work out the temorary filename */
-        tempname(filen);
-        j = strlen(arg);
-        while (j && arg[j] != '.')
-            j--;
-
-        if (j == 0) {
-            fprintf(stderr, "Unrecognised filetype\n");
-            return;
+    if (((p = strtok(arg, " \r\n\t")) != NULL) && *p)
+    {
+        if (*p == '@')
+        {
+            if (!isspace(*(++p)) && *p)
+                gather_from_list_file(p);
         }
-        strcat(filen, &arg[j]);
-        
-        /* Copy the file over */
-        if (!hassuffix(arg, ".c")) {
-            if (copy_file(arg, "", filen, "")) {
-                fprintf(stderr, "Cannot copy input file\n");
+        else
+        {
+            /* Expand memory for filenames */
+
+            if ((original_filenames = realloc(original_filenames, (nfiles + 1)*sizeof(char *))) == NULL)
+            {
+                fprintf(stderr, "Unable to realloc memory for input filenames\n");
                 exit(1);
             }
+
+            if ((filelist = realloc(filelist, (nfiles + 1)*sizeof(char *))) == NULL)
+            {
+                fprintf(stderr, "Unable to realloc memory for input filenames\n");
+                exit(1);
+            }
+
+            /* Add this file to the list of original files */
+
+            original_filenames[nfiles] = strdup(p);
+
+            if (usetemp)
+            {
+                /* Now work out the temporary filename */
+
+                tempname(tname);
+
+                if ((q = strrchr(p, '.')) == NULL)
+                {
+                    fprintf(stderr, "Unrecognized filetype \"%s\"\n", p);
+                    exit(1);
+                }
+
+                strcat(tname, q);
+
+                /* Copy the file over */
+
+                if (!hassuffix(p, ".c"))
+                {
+                    if (copy_file(p, "", tname, ""))
+                    {
+                        fprintf(stderr, "Cannot copy input file \"%s\"\n", p);
+                        exit(1);
+                    }
+                }
+
+                filelist[nfiles++] = strdup(tname);
+            }
+            else
+            {
+                /* Not using temporary files */
+
+                filelist[nfiles++] = strdup(p);
+                strcpy(tname, p);
+            }
         }
-        filelist[nfiles++] = strdup(filen);
-    } else {
-        /* Not using temporary files.. */
-        filelist[nfiles++] = strdup(arg);
-        strcpy(filen, arg);
     }
 }
+
+
+
 
 void print_help_config(arg_t *arg, char *val)
 {
@@ -1902,6 +1959,98 @@ static int zcc_asprintf(char **s, const char *fmt, ...)
     va_end(arg);
     return res;
 }
+
+
+
+
+/*
+ * $Id: zcc.c,v 1.122 2016-05-11 04:28:16 aralbrec Exp $
+ *
+ * Copyright (C) 2003 ETC s.r.o.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA.
+ *
+ * Written by Marcel Telka <marcel@telka.sk>, 2003.
+ *
+ */
+
+#ifndef GETDELIM_BUFFER
+#define GETDELIM_BUFFER 128
+#endif
+
+static int zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream)
+{
+
+    char *p, *np;
+    int c;
+    unsigned int len = 0;
+
+    if (!lineptr || !n)
+        return -1;
+
+    /* allocate initial buffer */
+    if (!*lineptr || !*n)
+    {
+        np = realloc(*lineptr, GETDELIM_BUFFER);
+        if (!np)
+            return -1;
+        *n = GETDELIM_BUFFER;
+        *lineptr = np;
+    }
+    
+    p = *lineptr;
+
+    /* read characters from stream */
+    while ((c = fgetc( stream )) != EOF)
+    {
+        if (len >= *n)
+        {
+            np = realloc( *lineptr, *n * 2 );
+            if (!np)
+                return -1;
+            p = np + (p - *lineptr);
+            *lineptr = np;
+            *n *= 2;
+        }
+        *p++ = (char) c;
+        len++;
+        if (delimiter == c)
+            break;
+    }
+
+    /* end of file without any bytes read */
+    if ((c == EOF) && (len == 0))
+        return -1;
+
+    /* trailing '\0' */
+    if (len >= *n)
+    {
+        np = realloc( *lineptr, *n + 1 );
+        if (!np)
+            return -1;
+        p = np + (p - *lineptr);
+        *lineptr = np;
+        *n += 1;
+    }
+    *p = '\0';
+    
+    return len;
+}
+
+
 
 /*
  * Local Variables:
