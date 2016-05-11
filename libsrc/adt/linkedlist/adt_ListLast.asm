@@ -3,8 +3,10 @@
 
 SECTION code_clib
 PUBLIC adt_ListLast
+PUBLIC _adt_ListLast
 
 .adt_ListLast
+._adt_ListLast
 
 ; enter: hl = struct adt_List *
 ; exit : no carry = list empty, hl = 0 else:

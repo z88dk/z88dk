@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC adt_ListPrev
+PUBLIC _adt_ListPrev
 EXTERN adt_ListLast, l_setmem
 
 .adt_ListPrev
+._adt_ListPrev
 
 ; enter: hl = struct adt_List *
 ; exit : no carry = list empty or current pointer is before start of list and hl = 0 else:

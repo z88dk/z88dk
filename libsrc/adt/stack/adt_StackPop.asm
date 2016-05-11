@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_StackPop
+PUBLIC _adt_StackPop
 EXTERN _u_free
 
 ; pop item off the top of stack and update stack ptr
@@ -12,6 +13,7 @@ EXTERN _u_free
 ;             carry flag also set if stack not empty
 
 .adt_StackPop
+._adt_StackPop
 
    ld a,(hl)
    dec (hl)

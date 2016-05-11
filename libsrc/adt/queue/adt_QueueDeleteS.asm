@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_QueueDeleteS
+PUBLIC _adt_QueueDeleteS
 
 EXTERN adt_QueueDeleteS_callee
 EXTERN ASMDISP_ADT_QUEUEDELETES_CALLEE
 
 .adt_QueueDeleteS
+._adt_QueueDeleteS
 
    pop bc
    pop de

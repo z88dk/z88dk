@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_QueuePopBack
+PUBLIC _adt_QueuePopBack
 EXTERN _u_free
 
 ; enter: HL = struct adt_Queue *
@@ -10,6 +11,7 @@ EXTERN _u_free
 ;           = 0 and carry reset if queue empty
 
 .adt_QueuePopBack
+._adt_QueuePopBack
 
    ld a,(hl)                 ; reduce count
    dec (hl)

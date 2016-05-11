@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_ListPrepend
+PUBLIC _adt_ListPrepend
 
 EXTERN adt_ListPrepend_callee
 EXTERN ASMDISP_ADT_LISTPREPEND_CALLEE
 
 .adt_ListPrepend
+._adt_ListPrepend
 
    pop hl
    pop bc

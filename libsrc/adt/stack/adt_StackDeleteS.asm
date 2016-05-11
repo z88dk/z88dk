@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_StackDeleteS
+PUBLIC _adt_StackDeleteS
 
 EXTERN adt_StackDeleteS_callee
 EXTERN ASMDISP_ADT_STACKDELETES_CALLEE
 
 .adt_StackDeleteS
+._adt_StackDeleteS
 
    pop bc
    pop de

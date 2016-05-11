@@ -3,8 +3,10 @@
 
 SECTION code_clib
 PUBLIC adt_QueueCount
+PUBLIC _adt_QueueCount
 
 .adt_QueueCount
+._adt_QueueCount
 
    ld a,(hl)
    inc hl

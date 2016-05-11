@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_HeapExtract
+PUBLIC _adt_HeapExtract
 
 EXTERN adt_HeapExtract_callee
 EXTERN CDISP_HEAPEXTRACT_CALLEE
 
 .adt_HeapExtract
+._adt_HeapExtract
 
    pop bc
    pop iy

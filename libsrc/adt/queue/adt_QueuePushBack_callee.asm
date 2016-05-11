@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_QueuePushBack_callee
+PUBLIC _adt_QueuePushBack_callee
 PUBLIC ASMDISP_ADT_QUEUEPUSHBACK_CALLEE
 
 EXTERN _u_malloc
 
 .adt_QueuePushBack_callee
+._adt_QueuePushBack_callee
 
    pop hl
    pop de

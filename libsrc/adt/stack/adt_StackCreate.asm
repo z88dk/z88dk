@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_StackCreate
+PUBLIC _adt_StackCreate
 
 EXTERN l_setmem
 EXTERN _u_malloc
@@ -13,6 +14,7 @@ EXTERN _u_malloc
 ;        if successful HL = new stack handle and carry set
 
 .adt_StackCreate
+._adt_StackCreate
 
    ld hl,4                     ; sizeof(struct adt_Stack)
    push hl

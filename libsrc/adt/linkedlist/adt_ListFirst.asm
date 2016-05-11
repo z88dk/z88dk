@@ -3,8 +3,10 @@
 
 SECTION code_clib
 PUBLIC adt_ListFirst
+PUBLIC _adt_ListFirst
 
 .adt_ListFirst
+._adt_ListFirst
 
 ; enter: hl = struct adt_list *
 ; exit : hl = item at start of list

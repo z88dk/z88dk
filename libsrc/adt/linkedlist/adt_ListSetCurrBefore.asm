@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_ListSetCurrBefore
+PUBLIC _adt_ListSetCurrBefore
 EXTERN l_setmem
 
 ; enter: HL = struct adt_List*
 
 .adt_ListSetCurrBefore
+._adt_ListSetCurrBefore
 
    inc hl
    inc hl

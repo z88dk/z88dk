@@ -5,11 +5,13 @@
 
 SECTION code_clib
 PUBLIC adt_ListAppend
+PUBLIC _adt_ListAppend
 
 EXTERN adt_ListAppend_callee
 EXTERN ASMDISP_ADT_LISTAPPEND_CALLEE
 
 .adt_ListAppend
+._adt_ListAppend
 
    pop hl
    pop bc

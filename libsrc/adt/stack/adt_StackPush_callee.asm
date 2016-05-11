@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_StackPush_callee
+PUBLIC _adt_StackPush_callee
 PUBLIC ASMDISP_ADT_STACKPUSH_CALLEE
 
 EXTERN _u_malloc
 
 .adt_StackPush_callee
+._adt_StackPush_callee
 
    pop hl
    pop de

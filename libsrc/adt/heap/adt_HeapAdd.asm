@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_HeapAdd
+PUBLIC _adt_HeapAdd
 
 EXTERN adt_HeapAdd_callee
 EXTERN CDISP_ADT_HEAPADD_CALLEE
 
 .adt_HeapAdd
+._adt_HeapAdd
 
    pop af
    pop iy

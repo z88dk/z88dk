@@ -3,12 +3,14 @@
 
 SECTION code_clib
 PUBLIC adt_QueueDeleteS_callee
+PUBLIC _adt_QueueDeleteS_callee
 PUBLIC ASMDISP_ADT_QUEUEDELETES_CALLEE
 
 EXTERN l_jpix
 EXTERN _u_free
 
 .adt_QueueDeleteS_callee
+._adt_QueueDeleteS_callee
 
    pop hl
    pop de

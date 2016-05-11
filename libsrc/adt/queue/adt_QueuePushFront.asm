@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_QueuePushFront
+PUBLIC _adt_QueuePushFront
 
 EXTERN adt_QueuePushFront_callee
 EXTERN ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
 
 .adt_QueuePushFront
+._adt_QueuePushFront
 
    pop bc
    pop de

@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC adt_ListRemove
+PUBLIC _adt_ListRemove
 EXTERN _u_free
 
 .adt_ListRemove
+._adt_ListRemove
 
 ; enter: hl = struct adt_list *
 ; exit : no carry = list empty or current is not INLIST and hl = 0 else:

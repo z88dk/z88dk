@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_ListConcat
+PUBLIC _adt_ListConcat
 
 EXTERN adt_ListConcat_callee
 EXTERN ASMDISP_ADT_LISTCONCAT_CALLEE
 
 .adt_ListConcat
+._adt_ListConcat
 
    pop bc
    pop hl

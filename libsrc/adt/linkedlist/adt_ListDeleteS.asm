@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_ListDeleteS
+PUBLIC _adt_ListDeleteS
 
 EXTERN adt_ListDeleteS_callee
 EXTERN ASMDISP_ADT_LISTDELETES_CALLEE
 
 .adt_ListDeleteS
+._adt_ListDeleteS
 
    pop bc
    pop de

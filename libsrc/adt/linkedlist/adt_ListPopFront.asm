@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_ListPopFront
+PUBLIC _adt_ListPopFront
 
 EXTERN l_setmem
 EXTERN _u_free
 
 .adt_ListPopFront
+._adt_ListPopFront
 
 ; enter: hl = struct adt_List *
 ; exit : no carry indicates list empty, hl = 0 else:

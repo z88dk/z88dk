@@ -3,12 +3,14 @@
 
 SECTION code_clib
 PUBLIC adt_StackDeleteS_callee
+PUBLIC _adt_StackDeleteS_callee
 PUBLIC ASMDISP_ADT_STACKDELETES_CALLEE
 
 EXTERN l_jpix
 EXTERN _u_free
 
 .adt_StackDeleteS_callee
+._adt_StackDeleteS_callee
 
    pop hl
    pop de

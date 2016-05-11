@@ -4,12 +4,14 @@
 
 SECTION code_clib
 PUBLIC adt_ListDeleteS_callee
+PUBLIC _adt_ListDeleteS_callee
 PUBLIC ASMDISP_ADT_LISTDELETES_CALLEE
 
 EXTERN l_jpix
 EXTERN _u_free
 
 .adt_ListDeleteS_callee
+._adt_ListDeleteS_callee
 
    pop bc
    pop de

@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_ListTrim
+PUBLIC _adt_ListTrim
 
 EXTERN l_setmem
 EXTERN _u_free
 
 .adt_ListTrim
+._adt_ListTrim
 
 ; enter: hl = struct adt_List *
 ; exit : no carry = list empty, hl = 0 else:

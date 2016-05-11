@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_QueueCreateS
+PUBLIC _adt_QueueCreateS
 EXTERN l_setmem
 
 ; initialize an adt_Queue
@@ -10,6 +11,7 @@ EXTERN l_setmem
 ; hl = struct adt_Queue*
 
 .adt_QueueCreateS
+._adt_QueueCreateS
 
    xor a
    jp l_setmem-11

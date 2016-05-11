@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_ListAppend_callee
+PUBLIC _adt_ListAppend_callee
 PUBLIC ASMDISP_ADT_LISTAPPEND_CALLEE
 PUBLIC ASMDISP_ADT_LISTAPPEND2
 
@@ -10,6 +11,7 @@ EXTERN ADTemptylistadd
 EXTERN _u_malloc
 
 .adt_ListAppend_callee
+._adt_ListAppend_callee
 
    pop hl
    pop bc

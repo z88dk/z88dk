@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_ListSearch_callee
+PUBLIC _adt_ListSearch_callee
 PUBLIC ASMDISP_ADT_LISTSEARCH_CALLEE
 
 EXTERN ADTListSearch, l_jpiy
 
 .adt_ListSearch_callee
+._adt_ListSearch_callee
 
    pop hl
    pop de

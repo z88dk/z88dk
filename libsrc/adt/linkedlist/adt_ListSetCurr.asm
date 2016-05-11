@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_ListSetCurr
+PUBLIC _adt_ListSetCurr
 
 EXTERN adt_ListSetCurr_callee
 EXTERN ASMDISP_ADT_LISTSETCURR_CALLEE
 
 .adt_ListSetCurr
+._adt_ListSetCurr
 
    pop af
    pop de

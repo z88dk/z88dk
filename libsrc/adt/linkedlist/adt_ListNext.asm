@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC adt_ListNext
+PUBLIC _adt_ListNext
 EXTERN adt_ListFirst
 
 .adt_ListNext
+._adt_ListNext
 
 ; enter: hl = struct adt_List *
 ; exit : no carry = list empty or current pointer is past end of list, hl = 0 else:

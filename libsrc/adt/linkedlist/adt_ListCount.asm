@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_ListCount
+PUBLIC _adt_ListCount
 
 ; Return # elements in list
 ;
@@ -11,6 +12,7 @@ PUBLIC adt_ListCount
 ; uses  : DE,HL
 
 .adt_ListCount
+._adt_ListCount
 
    ld e,(hl)
    inc hl

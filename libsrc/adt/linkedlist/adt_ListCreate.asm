@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_ListCreate
+PUBLIC _adt_ListCreate
 
 EXTERN l_setmem
 EXTERN _u_malloc
@@ -14,6 +15,7 @@ EXTERN _u_malloc
 ; used : AF,BC,DE,HL
 
 .adt_ListCreate
+._adt_ListCreate
 
    ld hl,9            ; sizeof(struct adt_List)
    push hl

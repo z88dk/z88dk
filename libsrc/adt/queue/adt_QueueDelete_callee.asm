@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_QueueDelete_callee
+PUBLIC _adt_QueueDelete_callee
 PUBLIC ASMDISP_ADT_QUEUEDELETE_CALLEE
 
 EXTERN adt_QueueDeleteS_callee
@@ -11,6 +12,7 @@ EXTERN ASMDISP_ADT_QUEUEDELETES_CALLEE
 EXTERN _u_free
 
 .adt_QueueDelete_callee
+._adt_QueueDelete_callee
 
    pop hl
    pop de

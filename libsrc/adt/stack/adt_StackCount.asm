@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_StackCount
+PUBLIC _adt_StackCount
 
 ; return number of items in stack
 ;
@@ -10,6 +11,7 @@ PUBLIC adt_StackCount
 ; exit : HL = number of items
 
 .adt_StackCount
+._adt_StackCount
    ld a,(hl)
    inc hl
    ld h,(hl)

@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC adt_ListSetCurr_callee
+PUBLIC _adt_ListSetCurr_callee
 PUBLIC ASMDISP_ADT_LISTSETCURR_CALLEE
 
 .adt_ListSetCurr_callee
+._adt_ListSetCurr_callee
 
    pop hl
    pop de

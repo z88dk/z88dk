@@ -3,8 +3,10 @@
 
 SECTION code_clib
 PUBLIC adt_ListCurr
+PUBLIC _adt_ListCurr
 
 .adt_ListCurr
+._adt_ListCurr
 
 ; enter: hl = struct adt_List *
 ; exit : no carry = list empty or current points outside list, else:

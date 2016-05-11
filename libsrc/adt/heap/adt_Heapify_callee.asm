@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC adt_Heapify_callee
+PUBLIC _adt_Heapify_callee
 EXTERN ADTHeapify, ADThcompare
 
 .adt_Heapify_callee
+._adt_Heapify_callee
 
    pop de
    pop iy

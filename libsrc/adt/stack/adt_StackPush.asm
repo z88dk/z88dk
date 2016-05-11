@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC adt_StackPush
+PUBLIC _adt_StackPush
 
 EXTERN adt_StackPush_callee
 EXTERN ASMDISP_ADT_STACKPUSH_CALLEE
 
 .adt_StackPush
+._adt_StackPush
 
    pop bc
    pop de

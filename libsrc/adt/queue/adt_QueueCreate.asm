@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC adt_QueueCreate
+PUBLIC _adt_QueueCreate
 
 EXTERN l_setmem
 EXTERN _u_malloc
@@ -11,6 +12,7 @@ EXTERN _u_malloc
 ;           = 0 and nc if fail
 
 .adt_QueueCreate
+._adt_QueueCreate
 
    ld hl,6           ; sizeof(struct adt_Queue)
    push hl
