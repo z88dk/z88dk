@@ -4,9 +4,9 @@ SECTION code_stdlib
 
 PUBLIC __strtoull__
 
-EXTERN l_valid_base, l_eat_ws, l_eat_sign, l_neg_64_dehldehl, error_llzc 
-EXTERN l_eat_base_prefix, l_char2num, error_llznc, l_eat_digits
-EXTERN l_store_64_dehldehl_mbc, l_mulu_64_64x64, l_add_64_dehldehl_a
+EXTERN l_valid_base, l_eat_ws, l_eat_sign, l_neg_64_dehldehl
+EXTERN l_eat_base_prefix, l_char2num, error_llznc, l_mulu_72_64x8
+EXTERN l_add_64_dehldehl_a, l_eat_digits, error_llzc
 
 __strtoull__:
 
@@ -37,7 +37,7 @@ __strtoull__:
    ;              a = 1 indicates negative underflow
    ;             bc = char * (& next unconsumed char following number)
    ;
-   ; uses  : af, bc, de, hl, af', bc', de', hl', ix
+   ; uses  : af, bc, de, hl, af', bc', de', hl', ixl
 
    ld a,d
    or e
@@ -48,11 +48,11 @@ __strtoull__:
    push de                     ; save char **endp
    call no_endp
    
-   ; strtoull() done, now must write endp
+   ; strtoul() done, now must write endp
    
-   ; bc = char * (first uninterpretted char)
+   ;   bc = char * (first uninterpretted char)
    ; dehl'dehl = result
-   ;  a = error code (if carry set)
+   ;    a = error code (if carry set)
    ; carry set = overflow or error
    ; stack = char **endp
    
@@ -68,81 +68,18 @@ no_endp:
 
    call l_valid_base
    
+   ld ixl,a                    ; ixl = base
    ld c,l
    ld b,h                      ; bc = original char *
-   
+ 
    jr z, valid_base            ; accept base == 0
-   jp nc, invalid_base
-
+   jr nc, invalid_base
+   
 valid_base:
 
    ; bc = original char *
    ; hl = char *
-   ;  a = base
-
-   ; create workspace on stack
-   
-   ld de,0
-   
-   push de
-   push de
-   push de
-   ld e,a
-   push de
-   
-   push de
-   push de
-   push de
-   push de
-   
-   ld ix,0
-   add ix,sp
-   
-   ; bc = original char *
-   ; hl = char *
-   ;  a = base
-   ;
-   ;      +-------------------------------
-   ;      | +15 
-   ;      | ...  radix (8 bytes)
-   ;      | + 8 
-   ;      |-------------------------------
-   ;      | + 7
-   ;      | ...  multiplicand (8 bytes)
-   ; ix = | + 0
-   ;      +-------------------------------
-   ; (stack contains ix structure)
-   
-   call complete_strtoull
-
-   ; returns here after strtoull is complete
-   ; must repair the stack
-   
-   ex af,af'                   ; save carry flag
-   
-   ld ix,16
-   add ix,sp
-   ld sp,ix
-   
-   ex af,af'                   ; restore carry flag
-   ret
-
-complete_strtoull:
-
-   ; bc = original char *
-   ; hl = char *
-   ;  e = base
-   ;
-   ;      +-------------------------------
-   ;      | +15 
-   ;      | ...  radix (8 bytes)
-   ;      | + 8 
-   ;      |-------------------------------
-   ;      | + 7
-   ;      | ...  multiplicand (8 bytes)
-   ; ix = | + 0
-   ;      +-------------------------------
-   ; (stack contains ix structure)
+   ; ixl = base
 
    call l_eat_ws               ; skip whitespace
    call l_eat_sign             ; carry set if negative
@@ -178,21 +115,11 @@ positive:
 
    ; bc = original char *
    ; hl = char *
-   ;  e = base
-   ;
-   ;      +-------------------------------
-   ;      | +15 
-   ;      | ...  radix (8 bytes)
-   ;      | + 8 
-   ;      |-------------------------------
-   ;      | + 7
-   ;      | ...  multiplicand (8 bytes)
-   ; ix = | + 0
-   ;      +-------------------------------
+   ; ixl = base
 
-   ld a,e                      ; a = base
+   ld a,ixl                    ; a = base
    call l_eat_base_prefix
-   ld (ix+8),a                 ; store base, possibly modified
+   ld ixl,a                    ; ixl = base, possibly modified
    
    ; there must be at least one valid digit
    
@@ -200,7 +127,7 @@ positive:
    call l_char2num
    jr c, invalid_input
    
-   cp (ix+8)
+   cp ixl
    jr nc, invalid_input
    
    ; use generic algorithm
@@ -214,21 +141,12 @@ positive:
    
    call error_llznc
    ld l,a                      ; dehl'dehl = initial digit
-
+     
 loop:
 
    ; bc = char *
    ; dehl'dehl = result
-   ;
-   ;      +-------------------------------
-   ;      | +15 
-   ;      | ...  radix (8 bytes)
-   ;      | + 8 
-   ;      |-------------------------------
-   ;      | + 7
-   ;      | ...  multiplicand (8 bytes)
-   ; ix = | + 0
-   ;      +-------------------------------
+   ; ixl = base
 
    ; get next digit
    
@@ -236,7 +154,7 @@ loop:
    call l_char2num             ; a = digit
    jr c, number_complete
    
-   cp (ix+8)                   ; digit in 0..base-1 ?
+   cp ixl                      ; digit in [0,base-1] ?
    jr nc, number_complete
    
    inc bc                      ; consume the char
@@ -245,40 +163,29 @@ loop:
    
    push af                     ; save new digit
    push bc                     ; save char *
-   
-   push ix
-   pop bc                      ; bc = multiplicand *
-   
-   call l_store_64_dehldehl_mbc  ; write result to address ix+0
-   call l_mulu_64_64x64        ; dehl'dehl = result * radix
+
+   ld a,ixl                    ; a = base
+   call l_mulu_72_64x8         ; a dehl'dehl = dehl'dehl * a
    
    pop bc                      ; bc = char *
-
-   jr c, unsigned_overflow
    
-   pop af                      ; a = new digit
+   or a                        ; result > 64 bits ?
+   jr nz, unsigned_overflow
 
+   pop af                      ; a = new digit
+   
    ; add digit to result
 
    call l_add_64_dehldehl_a    ; dehl'dehl += a
    jr nz, loop                 ; if no overflow
-
+   
    push af
    
 unsigned_overflow:
 
    ; bc = char * (next unconsumed char)
+   ; ixl = base
    ; stack = junk
-   ;
-   ;      +-------------------------------
-   ;      | +15 
-   ;      | ...  radix (8 bytes)
-   ;      | + 8 
-   ;      |-------------------------------
-   ;      | + 7
-   ;      | ...  multiplicand (8 bytes)
-   ; ix = | + 0
-   ;      +-------------------------------
 
    pop af
 
@@ -288,7 +195,7 @@ u_oflow:
    
    ld l,c
    ld h,b                      ; hl = char *
-   ld c,(ix+8)                 ; c = base
+   ld c,ixl                    ; c = base
    
    call l_eat_digits
 
