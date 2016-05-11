@@ -1,6 +1,7 @@
 ; void adt_HeapSiftUp(uint start, void **array, void *compare)
 ; 03.2003, 08.2005 aralbrec
 
+SECTION code_clib
 PUBLIC ADTHeapSiftUp
 EXTERN l_jpix
 

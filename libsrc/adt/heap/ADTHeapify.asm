@@ -1,6 +1,7 @@
 ; void adt_Heapify(void **array, uint n, void *compare)
 ; 08.2005 aralbrec
 
+SECTION code_clib
 PUBLIC ADTHeapify
 EXTERN ADTHeapSiftDown
 

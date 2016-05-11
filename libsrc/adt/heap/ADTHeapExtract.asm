@@ -1,6 +1,7 @@
 ; void *adt_HeapExtract(void **array, uint n, void *compare)
 ; 08.2005 aralbrec
 
+SECTION code_clib
 PUBLIC ADTHeapExtract
 EXTERN ADTHeapSiftDown
 

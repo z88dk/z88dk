@@ -1,4 +1,5 @@
 
+SECTION code_clib
 PUBLIC ADThcompare
 EXTERN l_jpiy
 
