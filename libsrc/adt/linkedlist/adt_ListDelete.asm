@@ -1,6 +1,7 @@
 ; void adt_ListDelete(struct adt_List *list, void *delete)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_ListDelete
 
 EXTERN adt_ListDelete_callee

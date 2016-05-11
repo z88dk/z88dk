@@ -2,6 +2,7 @@
 ; /* void __FASTCALL__ (*delete)(void *item) */
 ; 02.2003, 06.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListDeleteS_callee
 PUBLIC ASMDISP_ADT_LISTDELETES_CALLEE
 
@@ -25,6 +26,7 @@ EXTERN _u_free
 ; note : not multi-thread safe
 ; uses : af, bc, de, hl, ix
 
+   push ix	;preserve callers ix
    ld a,d
    or e
    jr nz, deletenotnull
@@ -42,7 +44,7 @@ EXTERN _u_free
 
    ld a,(hl)
    or a
-   ret z
+   jr z,exit
    
    inc hl
    ld l,(hl)
@@ -65,6 +67,9 @@ EXTERN _u_free
    inc hl                ; hl = NODE.next
    
    jp while
+
+.exit
+   pop ix
 
 .justret
 

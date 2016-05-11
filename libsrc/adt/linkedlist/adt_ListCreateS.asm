@@ -1,6 +1,7 @@
 ; void __FASTCALL__ adt_ListCreateS(struct adt_List *)
 ; 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListCreateS
 EXTERN l_setmem
 

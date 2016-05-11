@@ -1,5 +1,6 @@
 ; 02.2003 aralbrec
 
+SECTION code_clib
 PUBLIC ADTemptylistadd
 
 ; enter: HL = LIST.count+1

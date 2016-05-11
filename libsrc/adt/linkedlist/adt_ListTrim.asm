@@ -1,6 +1,7 @@
 ; void __FASTCALL__ *adt_ListTrim(struct adt_List *list)
 ; 02.2003, 08.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListTrim
 
 EXTERN l_setmem

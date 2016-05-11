@@ -1,6 +1,7 @@
 ; int adt_ListAppend_callee(struct adt_List *list, void *item)
 ; 02.2003, 06.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListAppend_callee
 PUBLIC ASMDISP_ADT_LISTAPPEND_CALLEE
 PUBLIC ASMDISP_ADT_LISTAPPEND2

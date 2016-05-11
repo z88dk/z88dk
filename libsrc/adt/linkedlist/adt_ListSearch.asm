@@ -1,6 +1,7 @@
 ; void *adt_ListSearch(struct adt_List *list, void *match, void *item1)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_ListSearch
 
 EXTERN adt_ListSearch_callee

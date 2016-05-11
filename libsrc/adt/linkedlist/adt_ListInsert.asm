@@ -1,6 +1,7 @@
 ; int adt_ListInsert(struct adt_List *list, void *item)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_ListInsert
 
 EXTERN adt_ListInsert_callee

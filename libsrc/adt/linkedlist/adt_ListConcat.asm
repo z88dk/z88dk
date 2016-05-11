@@ -1,6 +1,7 @@
 ; void adt_ListConcat(struct adt_List *list1, struct sp_List *list2)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_ListConcat
 
 EXTERN adt_ListConcat_callee

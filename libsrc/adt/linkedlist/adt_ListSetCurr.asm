@@ -1,6 +1,7 @@
 ; void adt_ListSetCurr(struct adt_List *list, struct adt_ListNode *n)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_ListSetCurr
 
 EXTERN adt_ListSetCurr_callee

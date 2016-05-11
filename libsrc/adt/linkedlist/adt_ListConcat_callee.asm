@@ -1,6 +1,7 @@
 ; void __CALLEE__ adt_ListConcat_callee(struct adt_List *list1, struct adt_List *list2)
 ; 02.2003, 06.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListConcat_callee
 PUBLIC ASMDISP_ADT_LISTCONCAT_CALLEE
 

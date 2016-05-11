@@ -1,6 +1,7 @@
 ; int __CALLEE__ adt_ListInsert_callee(struct adt_List *list, void *item)
 ; 08.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListInsert_callee
 PUBLIC ASMDISP_ADT_LISTINSERT_CALLEE
 

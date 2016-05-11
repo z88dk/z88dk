@@ -1,6 +1,7 @@
 ; struct adt_List *adt_ListCreate(void)
 ; 02.2003, 06.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListCreate
 
 EXTERN l_setmem

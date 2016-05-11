@@ -1,6 +1,7 @@
 ; void __CALLEE__ adt_ListSetCurr_callee(struct adt_List *list, struct adt_ListNode *n)
 ; 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListSetCurr_callee
 PUBLIC ASMDISP_ADT_LISTSETCURR_CALLEE
 

@@ -1,6 +1,7 @@
 ; void __FASTCALL__ adt_ListSetCurrBefore(struct adt_List *list)
 ; 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListSetCurrBefore
 EXTERN l_setmem
 

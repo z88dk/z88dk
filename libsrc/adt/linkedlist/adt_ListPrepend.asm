@@ -1,6 +1,7 @@
 ; int adt_ListPrepend(struct adt_List *list, void *item)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_ListPrepend
 
 EXTERN adt_ListPrepend_callee

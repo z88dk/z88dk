@@ -3,6 +3,7 @@
 
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_ListAppend
 
 EXTERN adt_ListAppend_callee

@@ -1,6 +1,7 @@
 ; int __CALLEE__ adt_ListPrepend_callee(struct adt_List *list, void *item)
 ; 02.2003, 06.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListPrepend_callee
 PUBLIC ASMDISP_ADT_LISTPREPEND_CALLEE
 PUBLIC ASMDISP_ADT_LISTPREPEND2

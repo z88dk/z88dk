@@ -1,6 +1,7 @@
 ; int adt_ListAdd_callee(struct adt_List *list, void *item)
 ; 02.2003, 06.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListAdd_callee
 PUBLIC ASMDISP_ADT_LISTADD_CALLEE
 EXTERN _u_malloc

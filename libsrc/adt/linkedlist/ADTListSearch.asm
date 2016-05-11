@@ -1,6 +1,7 @@
 ; void *adt_ListSearch(struct adt_List *list, void *match, void *item1)
 ; 02.2003, 08.2005 aralbrec
 
+SECTION code_clib
 PUBLIC ADTListSearch
 EXTERN l_jpix
 

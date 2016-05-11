@@ -2,6 +2,7 @@
 ; /* void __FASTCALL__ (*delete)(void *item) */
 ; 02.2003, 06.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_ListDelete_callee
 PUBLIC ASMDISP_ADT_LISTDELETE_CALLEE
 
