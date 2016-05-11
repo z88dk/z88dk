@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.22 2016-03-30 09:19:58 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.23 2016-05-11 20:11:27 dom Exp $
 ;
 
         MODULE  cpc_crt0
@@ -47,9 +47,6 @@
                 defc    myzorg  = $6000
         ENDIF   
                 org     myzorg
-
-
-        org     myzorg
 
 
 ;--------
