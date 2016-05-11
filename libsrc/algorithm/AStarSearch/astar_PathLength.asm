@@ -2,13 +2,16 @@
 ; return the length of the path
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC astar_PathLength
+PUBLIC _astar_PathLength
 
 ; enter : hl = struct astar_path *
 ; exit  : hl = path length
 ; uses  : af, bc, de, hl
 
 .astar_PathLength
+._astar_PathLength
 
    ld bc,3
    ld d,b

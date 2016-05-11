@@ -2,11 +2,14 @@
 ; delete paths in astar's priority queue and optional path in parameter
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC astar_CleanUp
+PUBLIC _astar_CleanUp
 EXTERN astar_DeletePath
 EXTERN _astar_queueN, _astar_queue
 
 .astar_CleanUp
+._astar_CleanUp
 
    call astar_DeletePath     ; does nothing if hl=0
 

@@ -2,13 +2,16 @@
 ; delete the path by freeing any memory associated with it
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC astar_DeletePath
+PUBLIC _astar_DeletePath
 EXTERN _u_free
 
 ; enter: hl = struct astar_path *
 ; uses : af, bc, de, hl
 
 .astar_DeletePath
+._astar_DeletePath
 
    ld a,h
    or l
