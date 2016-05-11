@@ -16,7 +16,7 @@ l_fast_mulu_40_32x8:
    ; exit  : adehl = 40-bit product
    ;         carry reset
    ;
-   ; uses  : af, bc, de, hl, (ixh if loop unrolling disabled)
+   ; uses  : af, bc, de, hl, de', hl' (ixh if loop unrolling disabled)
    
    ; try to reduce the multiplication
    
