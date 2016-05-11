@@ -1,6 +1,7 @@
 ; void __CALLEE__ adt_QueueDeleteS_callee(struct adt_Queue *q, void *delete)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueueDeleteS_callee
 PUBLIC ASMDISP_ADT_QUEUEDELETES_CALLEE
 
@@ -14,6 +15,7 @@ EXTERN _u_free
    ex (sp),hl
 
 .asmentry
+   push  ix		;save callers ix
 
 ; free all items in queue but not adt_Queue struct itself
 ;
@@ -41,7 +43,7 @@ EXTERN _u_free
 
    ld a,h
    or l
-   ret z
+   jr  z,exit
 
    ld e,(hl)
    inc hl
@@ -66,6 +68,8 @@ EXTERN _u_free
    pop hl                       ; hl = next QueueNode
    jp loop
 
+.exit
+   pop ix
 .justret
 
    ret

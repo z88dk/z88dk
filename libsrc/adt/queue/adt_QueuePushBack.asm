@@ -1,6 +1,7 @@
 ; int adt_QueuePushBack(struct adt_Queue *q, void *item)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_QueuePushBack
 
 EXTERN adt_QueuePushBack_callee

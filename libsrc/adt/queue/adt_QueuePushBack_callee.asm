@@ -1,6 +1,7 @@
 ; int __CALLEE__ adt_QueuePushBack_callee(struct adt_Queue *q, void *item)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueuePushBack_callee
 PUBLIC ASMDISP_ADT_QUEUEPUSHBACK_CALLEE
 

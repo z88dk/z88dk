@@ -1,6 +1,7 @@
 ; void adt_QueueDeleteS(struct adt_Queue *q, void *delete)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_QueueDeleteS
 
 EXTERN adt_QueueDeleteS_callee

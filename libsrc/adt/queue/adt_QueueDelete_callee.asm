@@ -1,6 +1,7 @@
 ; void __CALLEE__ adt_QueueDelete_callee(struct adt_Queue *q, void *delete)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueueDelete_callee
 PUBLIC ASMDISP_ADT_QUEUEDELETE_CALLEE
 

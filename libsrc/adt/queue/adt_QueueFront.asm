@@ -1,6 +1,7 @@
 ; void *adt_QueueFront(struct adt_Queue *q)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueueFront
 
 ; enter: HL = struct adt_Queue *

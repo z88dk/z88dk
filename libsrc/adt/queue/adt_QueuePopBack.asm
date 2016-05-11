@@ -1,6 +1,7 @@
 ; void __FASTCALL__ *adt_QueuePopBack(struct adt_Queue *q)
 ; 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueuePopBack
 EXTERN _u_free
 

@@ -1,6 +1,7 @@
 ; int __CALLEE__ adt_QueuePushFront_callee(struct adt_Queue *q, void *item)
 ; 11.2006 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueuePushFront_callee
 PUBLIC ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
 

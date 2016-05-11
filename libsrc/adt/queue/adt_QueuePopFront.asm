@@ -1,6 +1,7 @@
 ; void *adt_QueuePopFront(struct adt_Queue *q)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueuePopFront
 EXTERN _u_free
 

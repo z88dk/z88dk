@@ -1,6 +1,7 @@
 ; void *adt_QueueBack(struct adt_Queue *q)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueueBack
 EXTERN adt_QueueFront
 

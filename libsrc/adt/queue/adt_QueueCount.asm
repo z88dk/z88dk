@@ -1,6 +1,7 @@
 ; uint __FASTCALL__ adt_QueueCount(struct adt_Queue *q)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueueCount
 
 .adt_QueueCount

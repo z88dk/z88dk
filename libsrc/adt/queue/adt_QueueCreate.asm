@@ -1,6 +1,7 @@
 ; struct adt_Queue *adt_QueueCreate(void)
 ; 09.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_QueueCreate
 
 EXTERN l_setmem
