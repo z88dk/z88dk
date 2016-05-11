@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.122 2016-05-11 04:28:16 aralbrec Exp $
+ *      $Id: zcc.c,v 1.123 2016-05-11 16:41:40 aralbrec Exp $
  */
 
 
@@ -21,6 +21,9 @@
 #include        <ctype.h>
 #include        <stddef.h>
 #include        "zcc.h"
+
+/* provide an implementation of getline since it's missing on some platforms */
+static int zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream);
 
 #ifdef WIN32
 #define strcasecmp(a,b) stricmp(a,b)
@@ -1134,8 +1137,7 @@ void gather_from_list_file(char *fname)
     char *line;
     unsigned int len;
 
-    if ((in = fopen(fname, "r")) == NULL)
-    {
+    if ((in = fopen(fname, "r")) == NULL) {
         fprintf(stderr, "Unable to open list file \"%s\"\n", fname);
         exit(1);
     }
@@ -1145,8 +1147,7 @@ void gather_from_list_file(char *fname)
     while (zcc_getdelim(&line, &len, '\n', in) > 0)
         add_file_to_process(line);
 
-    if (!feof(in))
-    {
+    if (!feof(in)) {
         fprintf(stderr, "Malformed line in list file \"%s\"\n", fname);
         exit(1);
     }
@@ -1160,64 +1161,43 @@ void add_file_to_process(char *arg)
     char tname[FILENAME_MAX*2 + 1];
     char *p, *q;
 
-    if (((p = strtok(arg, " \r\n\t")) != NULL) && *p)
-    {
-        if (*p == '@')
-        {
-            if (!isspace(*(++p)) && *p)
+    if (((p = strtok(arg, " \r\n\t")) != NULL) && *p) {
+        if (*p == '@') {
+            if (*(++p) && !isspace(*p))
                 gather_from_list_file(p);
-        }
-        else
-        {
+        } else {
             /* Expand memory for filenames */
-
-            if ((original_filenames = realloc(original_filenames, (nfiles + 1)*sizeof(char *))) == NULL)
-            {
+            if ((original_filenames = realloc(original_filenames, (nfiles + 1)*sizeof(char *))) == NULL) {
                 fprintf(stderr, "Unable to realloc memory for input filenames\n");
                 exit(1);
             }
-
-            if ((filelist = realloc(filelist, (nfiles + 1)*sizeof(char *))) == NULL)
-            {
+            if ((filelist = realloc(filelist, (nfiles + 1)*sizeof(char *))) == NULL) {
                 fprintf(stderr, "Unable to realloc memory for input filenames\n");
                 exit(1);
             }
 
             /* Add this file to the list of original files */
-
             original_filenames[nfiles] = strdup(p);
 
-            if (usetemp)
-            {
+            if (usetemp) {
                 /* Now work out the temporary filename */
-
                 tempname(tname);
-
-                if ((q = strrchr(p, '.')) == NULL)
-                {
+                if ((q = strrchr(p, '.')) == NULL) {
                     fprintf(stderr, "Unrecognized filetype \"%s\"\n", p);
                     exit(1);
                 }
-
                 strcat(tname, q);
 
                 /* Copy the file over */
-
-                if (!hassuffix(p, ".c"))
-                {
-                    if (copy_file(p, "", tname, ""))
-                    {
+                if (!hassuffix(p, ".c")) {
+                    if (copy_file(p, "", tname, "")) {
                         fprintf(stderr, "Cannot copy input file \"%s\"\n", p);
                         exit(1);
                     }
                 }
-
                 filelist[nfiles++] = strdup(tname);
-            }
-            else
-            {
+            } else {
                 /* Not using temporary files */
-
                 filelist[nfiles++] = strdup(p);
                 strcpy(tname, p);
             }
@@ -1964,8 +1944,6 @@ static int zcc_asprintf(char **s, const char *fmt, ...)
 
 
 /*
- * $Id: zcc.c,v 1.122 2016-05-11 04:28:16 aralbrec Exp $
- *
  * Copyright (C) 2003 ETC s.r.o.
  *
  * This program is free software; you can redistribute it and/or
@@ -2002,8 +1980,7 @@ static int zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *st
         return -1;
 
     /* allocate initial buffer */
-    if (!*lineptr || !*n)
-    {
+    if (!*lineptr || !*n) {
         np = realloc(*lineptr, GETDELIM_BUFFER);
         if (!np)
             return -1;
@@ -2014,10 +1991,8 @@ static int zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *st
     p = *lineptr;
 
     /* read characters from stream */
-    while ((c = fgetc( stream )) != EOF)
-    {
-        if (len >= *n)
-        {
+    while ((c = fgetc( stream )) != EOF) {
+        if (len >= *n) {
             np = realloc( *lineptr, *n * 2 );
             if (!np)
                 return -1;
@@ -2036,8 +2011,7 @@ static int zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *st
         return -1;
 
     /* trailing '\0' */
-    if (len >= *n)
-    {
+    if (len >= *n){
         np = realloc( *lineptr, *n + 1 );
         if (!np)
             return -1;
