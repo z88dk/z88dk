@@ -3,6 +3,7 @@
 ; 06.2008 aralbrec
 ; redone to be more in line with modern versions of this function
 
+SECTION code_clib
 PUBLIC utoa_callee
 PUBLIC _utoa_callee
 PUBLIC ASMDISP_UTOA_CALLEE
