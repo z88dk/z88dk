@@ -1,6 +1,7 @@
 ; void adt_Heapify(void **array, uint n, void *compare)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC adt_Heapify
 EXTERN ADTHeapify, ADThcompare
 
@@ -14,5 +15,8 @@ EXTERN ADTHeapify, ADThcompare
    push hl
    push hl
    push de
+   push ix
    ld ix,ADThcompare
-   jp ADTHeapify
+   call  ADTHeapify
+   pop ix
+   ret

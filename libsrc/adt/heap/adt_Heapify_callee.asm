@@ -1,6 +1,7 @@
 ; void __LIB__ adt_Heapify_callee(void **array, uint n, void *compare)
 ; 08.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_Heapify_callee
 EXTERN ADTHeapify, ADThcompare
 
@@ -11,5 +12,8 @@ EXTERN ADTHeapify, ADThcompare
    pop hl
    pop bc
    push de
+   push ix
    ld ix,ADThcompare
-   jp ADTHeapify
+   call ADTHeapify
+   pop ix
+   ret

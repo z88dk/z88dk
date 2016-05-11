@@ -1,6 +1,7 @@
 ; void __CALLEE__ *adt_HeapExtract_callee(void **array, uint *n, void *compare)
 ; 08.2005 aralbrec
 
+SECTION code_clib
 PUBLIC adt_HeapExtract_callee
 PUBLIC CDISP_ADT_HEAPEXTRACT_CALLEE
 
@@ -15,7 +16,6 @@ EXTERN ADTHeapExtract, ADThcompare
    push bc
    
 .centry
-   
    push hl
    ld a,(hl)
    inc hl
@@ -23,9 +23,11 @@ EXTERN ADTHeapExtract, ADThcompare
    ld l,a
    push hl
    
+   push ix 	;save callers ix
    ld ix,ADThcompare
    call ADTHeapExtract
    jr nc, nothing
+   pop ix       ;restore callers ix
    
    pop de
    ld c,l
