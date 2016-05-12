@@ -5,6 +5,6 @@ lstoff
 	defc	CMD_PRINTCHAR = 1
 	defc	CMD_READKEY = 2
 
-
+        defc    CMD_GETTIME = 30
 
 lston
