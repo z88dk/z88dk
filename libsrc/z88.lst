@@ -29,9 +29,7 @@ fcntl/z88/brotherdor
 stdlib/z88/atol
 stdlib/z88/getcwd
 stdlib/z88/mkdir
-time/gmtime
-time/localtime
-time/mktime
+@time/time.lst
 time/z88/clock
 time/z88/time
 games/joystick

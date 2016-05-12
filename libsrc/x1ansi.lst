@@ -13,9 +13,7 @@ stdio/ansi/x1/f_ansi_char
 stdio/ansi/x1/f_ansi_cls
 stdio/ansi/x1/f_ansi_dline
 stdio/ansi/x1/f_ansi_scrollup
-time/gmtime
-time/localtime
-time/mktime
+@time/time.lst
 time/x1/clock
 time/x1/time
 x1/subcpu_command

@@ -2,9 +2,7 @@ stdio/cpm/fgetc_cons
 stdio/cpm/getk
 stdio/cpm/fputc_cons
 stdio/puts_cons
-time/gmtime
-time/localtime
-time/mktime
+@time/time.lst
 time/cpm/clock
 time/cpm/time
 fcntl/cpm/bios
