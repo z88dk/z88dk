@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 
 #define CHECK_FD(R) do {                 \

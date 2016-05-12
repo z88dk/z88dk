@@ -61,7 +61,7 @@ void JumpZ80(word PC)
 }
 
 
-static char *load_file(char *filename)
+static void load_file(char *filename)
 {
     FILE     *fp;
     
@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 
     hooks[CMD_EXIT] = cmd_exit;
     hook_io_init(hooks);
+    hook_misc_init(hooks);
     hook_console_init(hooks);
 
     if ( breakaddr != 65535 ) {

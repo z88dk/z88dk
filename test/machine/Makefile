@@ -1,6 +1,6 @@
 
 
-SOURCES_COMMON = main.c Z80/Debug.c hook_io.c hook_console.c
+SOURCES_COMMON = main.c Z80/Debug.c hook_io.c hook_console.c hook_misc.c
 SOURCES_Z80 = Z80/Z80.c
 OBJECTS = $(SOURCES_COMMON:.c=.o) Z80/Z80.o
 OBJECTS_RCMX = $(SOURCES_COMMON:.c=.o) Z80/Z80_rcmx.o Z80/rcmx_io.o

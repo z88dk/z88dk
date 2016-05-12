@@ -38,6 +38,8 @@ extern byte RAM[65536];
 
 extern void      hook_io_init(hook_command *cmds);
 
+extern void      hook_misc_init(hook_command *cmds);
+
 extern void      hook_console_init(hook_command *cmds);
 
 
