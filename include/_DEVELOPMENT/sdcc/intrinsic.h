@@ -29,6 +29,9 @@
 
 #endif
 
+extern void intrinsic_stub(void) __preserves_regs(a,b,c,d,e,h,l);
+
+
 extern void intrinsic_di(void) __preserves_regs(a,b,c,d,e,h,l);
 
 extern void intrinsic_ei(void) __preserves_regs(a,b,c,d,e,h,l);

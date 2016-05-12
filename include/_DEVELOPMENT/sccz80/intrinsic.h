@@ -29,6 +29,10 @@
 
 #endif
 
+extern void __LIB__ intrinsic_stub(void);
+
+
+
 extern void __LIB__ intrinsic_di(void);
 
 

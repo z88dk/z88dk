@@ -5,6 +5,12 @@
 ///////////////////////////////////////////////////////////////
 
 replace restart {
+	call	_intrinsic_stub
+} by {
+	; peephole z88dk-intrinsic-stub
+}
+
+replace restart {
 	call	_intrinsic_di
 } by {
 	di
