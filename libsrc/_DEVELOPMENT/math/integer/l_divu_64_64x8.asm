@@ -7,7 +7,7 @@ SECTION code_math
 PUBLIC l_divu_64_64x8, l0_divu_64_64x8
 
    ; compute:  dehl'dehl = dehl'dehl / c, a = dehl'dehl % c
-   ; alters :  af, b, de, hl, de', hl'
+   ; alters :  af, bc, de, hl, de', hl'
 
    ; alternate entry (l0_divu_64_64x8)
    ; skips divide by zero check
