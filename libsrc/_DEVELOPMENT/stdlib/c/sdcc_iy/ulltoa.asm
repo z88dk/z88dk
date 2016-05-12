@@ -10,19 +10,22 @@ EXTERN asm_ulltoa
 
 _ulltoa:
 
-   ld hl,10
-   add hl,sp
-   
-   ld e,(hl)
-   inc hl
-   ld d,(hl)                   ; de = buf
-   inc hl
-   
-   ld c,(hl)
-   inc hl
-   ld b,(hl)                   ; bc = radix
-   
-   ld ix,2
-   add ix,sp                   ; ix = & num
-   
+   pop af
+   pop hl
+   pop de
+   exx
+   pop hl
+   pop de
+   pop ix
+   exx
+   pop bc
+
+   push bc
+   push hl
+   push de
+   push hl
+   push de
+   push hl
+   push af
+
    jp asm_ulltoa

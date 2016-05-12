@@ -16,7 +16,7 @@ SECTION code_clib
 SECTION code_stdlib
 
 PUBLIC asm_ultoa
-PUBLIC asm0_ultoa, asm1_ultoa, asm2_ultoa, asm3_ultoa
+PUBLIC asm0_ultoa, asm1_ultoa
 
 EXTERN error_zc, l_valid_base, error_einval_zc, l0_divu_32_32x8, l_num2char
 
@@ -30,21 +30,21 @@ asm_ultoa:
    ;         carry reset no errors
    ;
    ; error : (*) if buf == 0
-   ;             carry set, dehl = 0
+   ;             carry set, hl = 0
    ;
    ;         (*) if radix is invalid
-   ;             carry set, dehl = 0, errno=EINVAL
+   ;             carry set, hl = 0, errno=EINVAL
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
    ld a,ixh                    ; check for NULL buf
    or ixl
-   jr z, exit_buf_is_null
+   jp z, error_zc
 
 asm0_ultoa:                    ; bypasses NULL check of buf
 
    call l_valid_base           ; radix in [2,36]?
-   jr nc, exit_radix_no_good
+   jp nc, error_einval_zc
       
    ; there is special code for base 2, 8, 10, 16
 
@@ -127,18 +127,6 @@ write_lp:
    
    dec hl
    ret
-
-asm2_ultoa:
-exit_buf_is_null:
-
-   ld de,0
-   jp error_zc
-
-asm3_ultoa:
-exit_radix_no_good:
-
-   ld de,0
-   jp error_einval_zc
 
 
 IF __CLIB_OPT_NUM2TXT & $40

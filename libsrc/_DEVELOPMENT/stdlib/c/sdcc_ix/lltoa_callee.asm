@@ -10,35 +10,23 @@ EXTERN asm_lltoa
 
 _lltoa_callee:
 
-   ld hl,10
-   add hl,sp
+   pop af
+   pop hl
+   pop de
+   exx
+   pop hl
+   pop de
+   pop bc
+   exx
+   pop bc
+   push af
    
-   ld e,(hl)
-   inc hl
-   ld d,(hl)                   ; de = buf
-   inc hl
-   
-   ld c,(hl)
-   inc hl
-   ld b,(hl)                   ; bc = radix
-   
-   push ix
-   
-   ld ix,4
-   add ix,sp                   ; ix = & num
+   exx
+   push bc
+   exx
+   ex (sp),ix
    
    call asm_lltoa
    
    pop ix
-   pop bc
-   
-   ex de,hl
-   
-   ld hl,12
-   add hl,sp
-   ld sp,hl
-   
-   ex de,hl
-   
-   push bc
    ret

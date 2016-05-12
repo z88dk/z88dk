@@ -5,8 +5,8 @@ SECTION code_stdio
 PUBLIC __stdio_printf_number_tail_longlong
 PUBLIC __stdio_printf_number_tail_ulonglong
 
-EXTERN l_testzero_64_mhl, l_neg_64_mhl, asm1_ulltoa
-EXTERN __stdio_printf_number_tail, __stdio_printf_number_tail_zero
+EXTERN l_testzero_64_mhl, l_neg_64_mhl, l_load_64_dehldehl_mbc
+EXTERN asm1_ulltoa, __stdio_printf_number_tail, __stdio_printf_number_tail_zero
 
 
 __stdio_printf_number_tail_longlong:
@@ -33,17 +33,18 @@ __stdio_printf_number_tail_longlong:
    dec hl
    
    bit 7,(hl)
-   jr z, signed_join           ; if integer is positive
+   jr z, signed_join           ; if positive
    
    set 7,(ix+5)                ; set negative flag
    
-   pop hl
+   pop hl                      ; hl = stack_param
    push hl
    
-   call l_neg_64_mhl           ; change to positive for conversion
+   call l_neg_64_mhl           ; make positive for conversion
+   
    jr signed_join
 
-
+   
 __stdio_printf_number_tail_ulonglong:
 
    ; enter : ix = FILE *
@@ -65,16 +66,13 @@ __stdio_printf_number_tail_ulonglong:
 
 signed_join:
 
-   ; write unsigned longlong to ascii buffer
+   pop hl
 
-   ex (sp),ix
-   
+   ; ix = FILE*
    ; bc = base
    ; de = void *buffer_digits
-   ; ix = & number
-   ; stack = buffer_digits, width, precision, FILE*
-
-   push de                     ; save buffer digits
+   ; hl = stack_param
+   ; stack = buffer_digits, width, precision
    
    exx
    push bc
@@ -82,18 +80,36 @@ signed_join:
    push hl
    exx
    
+   push de                     ; save buffer_digits
+   push de                     ; save buffer_digits
+   push bc                     ; save radix
+   
+   ld c,l
+   ld b,h                      ; bc = stack param
+   
+   call l_load_64_dehldehl_mbc ; dehl'dehl = num
+   
+   pop bc                      ; bc = radix
+   ex (sp),ix                  ; ix = buffer_digits
+   
+   ; dehl'dehl = number
+   ; bc = radix
+   ; ix = buffer_digits
+   ; stack = ..., buffer_digits, FILE*
+   
    call asm1_ulltoa
-
+   
+   pop ix                      ; ix = FILE*
+   pop de                      ; de = buffer_digits
+   
    exx
    pop hl
    pop de
    pop bc
    exx
    
-   pop de                      ; de = buffer_digits
-   pop ix
-   
    jp __stdio_printf_number_tail
+   
 
 zero:
 
