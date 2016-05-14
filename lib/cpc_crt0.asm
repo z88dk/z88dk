@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.23 2016-05-11 20:11:27 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.24 2016-05-14 01:04:42 aralbrec Exp $
 ;
 
         MODULE  cpc_crt0
@@ -54,26 +54,28 @@
 ;--------
 
 start:
-IF (startup=2)
-        ld      hl,($39)        ; Original Interrupt code
-        ld      (oldint),hl
-        ld      hl,newint       ; Point to a null handler (increase stability)
-        ld      ($39),hl
-ENDIF
+
         di
+		
+		; take over interrupts
+		
+		ld      hl,($0039)              ; original interrupt service routine
+		ld      (oldint),hl
+		
+		ld      hl,newint               ; new interrupt service routine
+		ld      ($0039),hl
+
         ld      (start1+1),sp
-        ld      hl,-6530
+		
+        ld      hl,-6530   ; que??
+		;;ld      hl,-64             ; reserve space for 32 entries on the exit stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
-        exx
-        ld      (firmware_bc),bc        ; keep BC', otherwise crash
-        exx
-        ex      af,af
-        push    af
-        pop     bc
-        ld      (firmware_af),bc        ; keep F', otherwise crash
-        ex      af,af
+		
+		call    cpc_save_fw_exx_set     ; save firmware exx set
+		
+		ei
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -114,21 +116,16 @@ IF DEFINED_ANSIstdio
         call    closeall
 ENDIF
 ENDIF
-        exx
-        ld      bc,(firmware_bc)        ; restore BC'
-        exx
-        ex      af,af
-        ld      bc,(firmware_af)        ; restore F'
-        push    bc
-        pop     af
-        ex      af,af
 
-IF (startup=2)
-        ld      hl,(oldint)
-        ld      ($39),hl
-ENDIF
+        di
+		
+		ld      hl,(oldint)
+		ld      ($0039),hl              ; restore original interrupt routine
+
+		call    cpc_load_fw_exx_set     ; restore firmware exx set
         
 start1: ld      sp,0
+
         ei
         ret
 
@@ -205,10 +202,127 @@ fasign:         defb    0
 
 ENDIF
 
-IF (startup=2)
+
+; interposer interrupt routine
+
 newint:
-        ei
-        reti
+
+   ; save process exx set
+   ; load fw exx set
+   
+   exx
+   ex af,af'
+   
+   ld (__saved_stack__),sp
+   
+   ld sp,__stored_process_exx_set__ + 8
+   
+   push af
+   push bc
+   push de
+   push hl
+   
+   ld sp,__stored_fw_exx_set__
+   
+   pop hl
+   pop de
+   pop bc
+   pop af
+   
+   ld sp,(__saved_stack__)
+   
+   ex af,af'
+   exx
+
+   ; call old interrupt service routine
+
+   defb 205
 oldint:
-        defw 0
-ENDIF
+   defw 0
+
+   ; save fw exx set
+   ; load process exx set
+   
+   di
+   
+   exx
+   ex af,af'
+   
+   ld (__saved_stack__),sp
+   
+   ld sp,__stored_fw_exx_set__ + 8
+   
+   push af
+   push bc
+   push de
+   push hl
+      
+   ld sp,__stored_process_exx_set__
+   
+   pop hl
+   pop de
+   pop bc
+   pop af
+   
+   ld sp,(__saved_stack__)
+   
+   ex af,af'
+   exx
+   
+   ei
+   ret
+
+
+; interrupts must be disabled when these routines run
+
+PUBLIC cpc_load_fw_exx_set
+   
+cpc_load_fw_exx_set:
+
+   exx
+   ex af,af'
+
+   ld (__saved_stack__),sp
+	  
+   ld sp,__stored_fw_exx_set__
+   
+   pop hl
+   pop de
+   pop bc
+   pop af
+   
+   ld sp,(__saved_stack__)
+   
+   ex af,af'
+   exx
+   
+   ret
+   
+
+PUBLIC cpc_save_fw_exx_set
+
+cpc_save_fw_exx_set:
+
+   exx
+   ex af,af'
+   
+   ld (__saved_stack__),sp
+   
+   ld sp,__stored_fw_exx_set__ + 8
+   
+   push af
+   push bc
+   push de
+   push hl
+
+   ld sp,(__saved_stack__)
+   
+   ex af,af'
+   exx
+   
+   ret
+
+   
+__saved_stack__:              defw 0
+__stored_fw_exx_set__:        defs 8
+__stored_process_exx_set__:   defs 8
