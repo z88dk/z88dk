@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.25 2016-05-14 01:38:05 aralbrec Exp $
+;       $Id: cpc_crt0.asm,v 1.26 2016-05-14 03:36:03 aralbrec Exp $
 ;
 
         MODULE  cpc_crt0
@@ -302,7 +302,7 @@ cpc_load_fw_exx_set:
    ex af,af'
 
    ld a,1
-   ld (__fw_exx_set_active__),1
+   ld (__fw_exx_set_active__),a
    
    ld hl,(__fw_exx_set_af__)
    push hl
