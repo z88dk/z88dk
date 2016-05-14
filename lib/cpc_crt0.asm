@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.24 2016-05-14 01:04:42 aralbrec Exp $
+;       $Id: cpc_crt0.asm,v 1.25 2016-05-14 01:38:05 aralbrec Exp $
 ;
 
         MODULE  cpc_crt0
@@ -60,7 +60,8 @@ start:
 		; take over interrupts
 		
 		ld      hl,($0039)              ; original interrupt service routine
-		ld      (oldint),hl
+		ld      (oldint_0),hl
+		ld      (oldint_1),hl
 		
 		ld      hl,newint               ; new interrupt service routine
 		ld      ($0039),hl
@@ -119,7 +120,7 @@ ENDIF
 
         di
 		
-		ld      hl,(oldint)
+		ld      hl,(oldint_0)
 		ld      ($0039),hl              ; restore original interrupt routine
 
 		call    cpc_load_fw_exx_set     ; restore firmware exx set
@@ -207,29 +208,48 @@ ENDIF
 
 newint:
 
+   push af
+   
+   ld a,(__fw_exx_set_active__)
+   or a
+   jr z, process_set_active
+
+firmware_set_active:
+   
+   pop af
+   
+   ; jump to old interrupt service routine
+
+   defb 195
+oldint_0:
+   defw 0
+
+process_set_active:
+
+   pop af   
+
    ; save process exx set
    ; load fw exx set
    
    exx
    ex af,af'
-   
-   ld (__saved_stack__),sp
-   
-   ld sp,__stored_process_exx_set__ + 8
-   
+
+   ld (__process_exx_set_hl__),hl
+   ld (__process_exx_set_de__),de
+   ld (__process_exx_set_bc__),bc
    push af
-   push bc
-   push de
-   push hl
-   
-   ld sp,__stored_fw_exx_set__
-   
    pop hl
-   pop de
-   pop bc
-   pop af
+   ld (__process_exx_set_af__),hl
    
-   ld sp,(__saved_stack__)
+   ld a,1
+   ld (__fw_exx_set_active__),a
+   
+   ld hl,(__fw_exx_set_af__)
+   push hl
+   pop af
+   ld bc,(__fw_exx_set_bc__)
+   ld de,(__fw_exx_set_de__)
+   ld hl,(__fw_exx_set_hl__)
    
    ex af,af'
    exx
@@ -237,7 +257,7 @@ newint:
    ; call old interrupt service routine
 
    defb 205
-oldint:
+oldint_1:
    defw 0
 
    ; save fw exx set
@@ -247,24 +267,23 @@ oldint:
    
    exx
    ex af,af'
-   
-   ld (__saved_stack__),sp
-   
-   ld sp,__stored_fw_exx_set__ + 8
-   
+
+   ld (__fw_exx_set_hl__),hl
+   ld (__fw_exx_set_de__),de
+   ld (__fw_exx_set_bc__),bc
    push af
-   push bc
-   push de
-   push hl
-      
-   ld sp,__stored_process_exx_set__
-   
    pop hl
-   pop de
-   pop bc
-   pop af
+   ld (__fw_exx_set_af__),hl
    
-   ld sp,(__saved_stack__)
+   xor a
+   ld (__fw_exx_set_active__),a
+
+   ld hl,(__process_exx_set_af__)
+   push hl
+   pop af
+   ld bc,(__process_exx_set_bc__)
+   ld de,(__process_exx_set_de__)
+   ld hl,(__process_exx_set_hl__)
    
    ex af,af'
    exx
@@ -282,16 +301,15 @@ cpc_load_fw_exx_set:
    exx
    ex af,af'
 
-   ld (__saved_stack__),sp
-	  
-   ld sp,__stored_fw_exx_set__
+   ld a,1
+   ld (__fw_exx_set_active__),1
    
-   pop hl
-   pop de
-   pop bc
+   ld hl,(__fw_exx_set_af__)
+   push hl
    pop af
-   
-   ld sp,(__saved_stack__)
+   ld bc,(__fw_exx_set_bc__)
+   ld de,(__fw_exx_set_de__)
+   ld hl,(__fw_exx_set_hl__)
    
    ex af,af'
    exx
@@ -305,24 +323,31 @@ cpc_save_fw_exx_set:
 
    exx
    ex af,af'
-   
-   ld (__saved_stack__),sp
-   
-   ld sp,__stored_fw_exx_set__ + 8
-   
-   push af
-   push bc
-   push de
-   push hl
 
-   ld sp,(__saved_stack__)
+   ld (__fw_exx_set_hl__),hl
+   ld (__fw_exx_set_de__),de
+   ld (__fw_exx_set_bc__),bc
+   push af
+   pop hl
+   ld (__fw_exx_set_af__),hl
    
+   xor a
+   ld (__fw_exx_set_active__),a
+
    ex af,af'
    exx
    
    ret
 
-   
-__saved_stack__:              defw 0
-__stored_fw_exx_set__:        defs 8
-__stored_process_exx_set__:   defs 8
+
+__fw_exx_set_active__:    defb 1
+
+__fw_exx_set_af__:        defs 2
+__fw_exx_set_bc__:        defs 2
+__fw_exx_set_de__:        defs 2
+__fw_exx_set_hl__:        defs 2
+
+__process_exx_set_af__:   defs 2
+__process_exx_set_bc__:   defs 2
+__process_exx_set_de__:   defs 2
+__process_exx_set_hl__:   defs 2
