@@ -12,11 +12,13 @@
 
 SECTION code_clib
 PUBLIC strdup
+PUBLIC _strdup
 
 EXTERN HeapAlloc_callee
 EXTERN _heap, ASMDISP_HEAPALLOC_CALLEE
 
 .strdup
+._strdup
 
    push hl
    ld bc,0

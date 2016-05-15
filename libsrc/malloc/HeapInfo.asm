@@ -2,9 +2,11 @@
 
 SECTION code_clib
 PUBLIC HeapInfo
+PUBLIC _HeapInfo
 EXTERN MAHeapInfo
 
 .HeapInfo
+._HeapInfo
 
    pop af
    pop hl

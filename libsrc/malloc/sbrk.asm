@@ -2,11 +2,13 @@
 
 SECTION code_clib
 PUBLIC sbrk
+PUBLIC _sbrk
 
 EXTERN sbrk_callee
 EXTERN ASMDISP_SBRK_CALLEE
 
 .sbrk
+._sbrk
 
    pop de
    pop bc

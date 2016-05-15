@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC mallinfo_callee
+PUBLIC _mallinfo_callee
 
 EXTERN HeapInfo_callee
 EXTERN _heap
 
 .mallinfo_callee
+._mallinfo_callee
 
    ld hl,_heap
    ex (sp),hl

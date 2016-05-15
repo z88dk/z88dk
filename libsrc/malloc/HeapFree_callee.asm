@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC HeapFree_callee
+PUBLIC _HeapFree_callee
 PUBLIC ASMDISP_HEAPFREE_CALLEE
 
 .HeapFree_callee
+._HeapFree_callee
 
    pop bc
    pop hl

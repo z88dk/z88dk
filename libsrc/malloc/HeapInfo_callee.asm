@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC HeapInfo_callee
+PUBLIC _HeapInfo_callee
 EXTERN MAHeapInfo
 
 .HeapInfo_callee
+._HeapInfo_callee
 
    pop af
    pop hl

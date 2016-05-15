@@ -3,12 +3,14 @@
 
 SECTION code_clib
 PUBLIC HeapSbrk_callee
+PUBLIC _HeapSbrk_callee
 PUBLIC ASMDISP_HEAPSBRK_CALLEE
 
 EXTERN HeapFree_callee
 EXTERN ASMDISP_HEAPFREE_CALLEE
 
 .HeapSbrk_callee
+._HeapSbrk_callee
 
    pop af
    pop bc

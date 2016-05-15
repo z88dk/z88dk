@@ -2,11 +2,13 @@
 
 SECTION code_clib
 PUBLIC HeapSbrk
+PUBLIC _HeapSbrk
 
 EXTERN HeapSbrk_callee
 EXTERN ASMDISP_HEAPSBRK_CALLEE
 
 .HeapSbrk
+._HeapSbrk
 
    pop af
    pop bc

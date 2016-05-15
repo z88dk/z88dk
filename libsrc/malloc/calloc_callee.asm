@@ -3,12 +3,14 @@
 
 SECTION code_clib
 PUBLIC calloc_callee
+PUBLIC _calloc_callee
 EXTERN ASMDISP_CALLOC_CALLEE
 
 EXTERN HeapCalloc_callee
 EXTERN _heap, ASMDISP_HEAPCALLOC_CALLEE
 
 .calloc_callee
+._calloc_callee
 
    pop hl
    pop de

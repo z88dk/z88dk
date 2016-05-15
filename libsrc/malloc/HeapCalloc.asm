@@ -2,11 +2,13 @@
 
 SECTION code_clib
 PUBLIC HeapCalloc
+PUBLIC _HeapCalloc
 
 EXTERN HeapCalloc_callee
 EXTERN ASMDISP_HEAPCALLOC_CALLEE
 
 .HeapCalloc
+._HeapCalloc
 
    pop af
    pop de

@@ -3,11 +3,13 @@
 
 SECTION code_clib
 PUBLIC malloc
+PUBLIC _malloc
 
 EXTERN HeapAlloc_callee
 EXTERN _heap, ASMDISP_HEAPALLOC_CALLEE
 
 .malloc
+._malloc
 
    ld c,l
    ld b,h

@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC HeapAlloc_callee
+PUBLIC _HeapAlloc_callee
 PUBLIC ASMDISP_HEAPALLOC_CALLEE
 
 .HeapAlloc_callee
+._HeapAlloc_callee
 
    pop hl
    pop bc

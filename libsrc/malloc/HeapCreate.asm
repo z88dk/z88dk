@@ -3,6 +3,7 @@
 
 SECTION code_clib
 PUBLIC HeapCreate
+PUBLIC _HeapCreate
 EXTERN l_setmem
 
 ; Just zero heap pointer to indicate empty heap.
@@ -11,6 +12,7 @@ EXTERN l_setmem
 ; uses  : af, hl
 
 .HeapCreate
+._HeapCreate
 
    xor a
    jp l_setmem - 7           ; four bytes: 2*4-1

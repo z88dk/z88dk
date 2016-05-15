@@ -2,11 +2,13 @@
 
 SECTION code_clib
 PUBLIC realloc
+PUBLIC _realloc
 
 EXTERN realloc_callee
 EXTERN ASMDISP_REALLOC_CALLEE
 
 .realloc
+._realloc
 
    pop de
    pop bc

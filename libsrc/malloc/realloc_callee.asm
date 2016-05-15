@@ -3,12 +3,14 @@
 
 SECTION code_clib
 PUBLIC realloc_callee
+PUBLIC _realloc_callee
 PUBLIC ASMDISP_REALLOC_CALLEE
 
 EXTERN HeapRealloc_callee
 EXTERN _heap, ASMDISP_HEAPREALLOC_CALLEE
 
 .realloc_callee
+._realloc_callee
 
    pop hl
    pop bc
