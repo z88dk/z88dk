@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.124 2016-05-15 08:10:40 aralbrec Exp $
+ *      $Id: zcc.c,v 1.125 2016-05-15 20:26:49 aralbrec Exp $
  */
 
 
@@ -38,6 +38,7 @@ typedef struct arg_s arg_t;
 /* All our function prototypes */
 
 static void            add_option_to_compiler(char *arg);
+static void            gather_from_list_file(char *filename);
 static void            add_file_to_process(char *filename);
 
 static void            SetNumber(arg_t *argument, char *arg);
@@ -1127,68 +1128,88 @@ void add_option_to_compiler(char *arg)
 
 
 
-
-void gather_from_list_file(char *fname)
+void gather_from_list_file(char *filename)
 {
     FILE *in;
-    char *line, *p, *q, *lstfile;
-    unsigned int len, ppos;
-    char tname[FILENAME_MAX + 1];
+    char *line, *p, *q;
+    unsigned int len;
+    char pathname[FILENAME_MAX + 1];
+    char outname[FILENAME_MAX*2 + 2];
 
-    if (((lstfile = strtok(fname, " \r\n\t")) != NULL) && *lstfile) {
-        // open list file for reading
-        if ((in = fopen(lstfile, "r")) == NULL) {
-            fprintf(stderr, "Unable to open list file \"%s\"\n", lstfile);
-            exit(1);
-        }
-    
-        // find path portion of list file filename
-        p = strrchr(lstfile, '/');
-        q = strrchr(lstfile, '\\');
-        if (p == NULL)
-            p = q;
-        else if (q != NULL)
-            p = ((p - lstfile) > (q - lstfile)) ? p : q;
-        p = (p == NULL) ? lstfile : p+1;
-        strncpy(tname, lstfile, p - lstfile);
-        p = tname + (p - lstfile);
+    // reject non-filenames
+    if (((filename = strtok(filename, " \r\n\t")) == NULL) || !(*filename))
+        return;
 
-        // read filenames from list file
-        line = NULL;
-        while (zcc_getdelim(&line, &len, '\n', in) > 0) {
-            if (((q = strtok(line, " \r\n\t")) != NULL) && *q) {
-                // prepend filename with path
-                if ((strlen(q) + (p - tname)) > FILENAME_MAX) {
-                    fprintf(stderr, "Filename with path \"%s\" too long\n", line);
-                    exit(1);
-                }
-                strcpy(p, q);
+    // open list file for reading
+    if ((in = fopen(filename, "r")) == NULL) {
+        fprintf(stderr, "Unable to open list file \"%s\"\n", filename);
+        exit(1);
+    }
 
-                // add file to process
-                add_file_to_process(tname);
+    // extract path from filename
+    p = strrchr(filename, '/');
+    q = strrchr(filename, '\\');
+    if ((p == NULL) || ((q != NULL) && ((q - filename) > (p - filename))))
+        p = q;
+    memset(pathname, 0, sizeof(pathname));
+    if (p != NULL)
+        strncpy(pathname, filename, p - filename + 1);
+
+    // read filenames from list file
+    line = NULL;
+    while (zcc_getdelim(&line, &len, '\n', in) > 0) {
+        if (((p = strtok(line, " \r\n\t")) != NULL) && *p) {
+            // clear output filename
+            *outname = '\0';
+
+            // prepend list file indicator if the filename is a list file
+            if (*p == '@') {
+                strcpy(outname, "@");
+                if (((p = strtok(p+1, " \r\n\t")) == NULL) || !(*p))
+                    continue;
+            }
+
+            // sanity check
+            if (strlen(p) > FILENAME_MAX) {
+                fprintf(stderr, "Filename is too long \"%s\"\n", p);
+                exit(1);
+            }
+
+            // prepend path if filename is not absolute
+            if ((*p != '/') && (*p != '\\'))
+                strcat(outname, pathname);
+
+            // append rest of filename
+            strcat(outname, p);
+
+            // add file to process
+            if (strlen(outname) < FILENAME_MAX)
+                add_file_to_process(outname);
+            else {
+                fprintf(stderr, "Filename is too long \"%s\"\n", outname);
+                exit(1);
             }
         }
-
-        if (!feof(in)) {
-            fprintf(stderr, "Malformed line in list file \"%s\"\n", fname);
-            exit(1);
-        }
-
-        free(line);
-        fclose(in);
     }
+
+    if (!feof(in)) {
+        fprintf(stderr, "Malformed line in list file \"%s\"\n", filename);
+        exit(1);
+    }
+
+    free(line);
+    fclose(in);
 }
 
-void add_file_to_process(char *arg)
+void add_file_to_process(char *filename)
 {
     char tname[FILENAME_MAX + 1];
     char *p, *q;
 
-    if (((p = strtok(arg, " \r\n\t")) != NULL) && *p) {
-        if (*p == '@') {
-            if (*(++p) && !isspace(*p))
-                gather_from_list_file(p);
-        } else {
+    if (((p = strtok(filename, " \r\n\t")) != NULL) && *p) {
+        if (*p == '@')
+            gather_from_list_file(p+1);
+        else {
             /* Expand memory for filenames */
             if ((original_filenames = realloc(original_filenames, (nfiles + 1)*sizeof(char *))) == NULL) {
                 fprintf(stderr, "Unable to realloc memory for input filenames\n");
