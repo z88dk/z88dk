@@ -134,8 +134,8 @@ divide_by_zero:
 
    ld d,(ix+7)
    ld e,(ix+6)
-   ld l,(ix+5)
-   ld h,(ix+4)
+   ld h,(ix+5)
+   ld l,(ix+4)
 
    bit 7,d
    
