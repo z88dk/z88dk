@@ -20,4 +20,8 @@
 #define __SMALLCFASTCALL
 #endif
 
+#define __CHAR_LF '\n'
+#define __CHAR_CR '\r'
+
+
 #endif
