@@ -5,13 +5,13 @@
 ;	Print character to the screen
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.7 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.8 2016-05-15 20:15:45 dom Exp $
 ;
 
 
     INCLUDE "flos.def"
-
-	PUBLIC  fputc_cons
+	SECTION code_clib
+	PUBLIC  fputc_cons_native
 	EXTERN  cursor_x
 
 ;
@@ -19,7 +19,7 @@
 ;
 
 
-.fputc_cons
+.fputc_cons_native
 	ld	hl,3
 	add	hl,sp
 
@@ -37,12 +37,25 @@
 	ld (cursor_x),a
 	ret
 .nobs
-	cp 10
-	ret z
-	cp 13
-	jr nz,nocr
-	dec (hl)	; switch CR to CRLF
-	dec (hl)
+IF STANDARDESCAPECHARS
+	cp	13
+	ret	z
+	cp	10
+	jr	nz,nocr
+	push	hl
+	call	kjt_print_string
+	pop	hl
+	ld	(hl),13
+ELSE
+	cp	10	
+	ret	z
+	cp	13
+	jr	nz,nocr
+	push	hl
+	call	kjt_print_string
+	pop	hl
+	ld	(hl),10
+ENDIF
 .nocr
 	cp 12
 	jp z,kjt_clear_screen

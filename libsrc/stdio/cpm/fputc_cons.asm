@@ -6,18 +6,16 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.8 2016-04-29 20:37:26 dom Exp $
+;	$Id: fputc_cons.asm,v 1.9 2016-05-15 20:15:45 dom Exp $
 ;
 
 	SECTION	code_clib
-          PUBLIC  fputc_cons
-          PUBLIC  _fputc_cons
+          PUBLIC  fputc_cons_native
 
 ;
 ; Entry:        hl = points to char
 ;
-.fputc_cons
-._fputc_cons
+.fputc_cons_native
 	ld      hl,2
 	add     hl,sp
 	ld	d,0

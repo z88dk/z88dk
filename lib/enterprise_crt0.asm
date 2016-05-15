@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.17 2016-04-01 09:38:14 dom Exp $
+;	$Id: enterprise_crt0.asm,v 1.18 2016-05-15 20:15:44 dom Exp $
 ;
 
 
@@ -24,6 +24,7 @@
 ; information about what we should do..
 ;
 
+	        defc    crt0 = 1
                 INCLUDE "zcc_opt.def"
 
 ;--------
@@ -242,22 +243,7 @@ ELSE
 ENDIF
 
 
-; Now, which of the vfprintf routines do we need?
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 ; ---------------
 ; Misc Variables

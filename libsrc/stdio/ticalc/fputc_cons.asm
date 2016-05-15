@@ -6,14 +6,15 @@
 ;	Stefano Bodrato - Apr 2001
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.4 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.5 2016-05-15 20:15:46 dom Exp $
 ;
 
-	PUBLIC	fputc_cons
+	SECTION code_clib
+	PUBLIC	fputc_cons_native
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
-.fputc_cons
+.fputc_cons_native
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)

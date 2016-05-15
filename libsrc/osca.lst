@@ -2,6 +2,17 @@ stdio/osca/fputc_cons
 stdio/osca/fgetc_cons
 stdio/osca/getk
 stdio/puts_cons
+stdio/ansi/f_ansi
+stdio/ansi/f_ansi_lf
+stdio/ansi/f_ansi_putc
+stdio/ansi/fputc_cons
+stdio/ansi/f_ansi_dsr6
+stdio/ansi/osca/f_ansi_attr
+stdio/ansi/osca/f_ansi_bel
+stdio/ansi/osca/f_ansi_char
+stdio/ansi/osca/f_ansi_cls
+stdio/ansi/generic/f_ansi_dline
+stdio/ansi/osca/f_ansi_scrollup
 @gfxbasew.lst
 graphics/osca/drawb
 graphics/osca/undrawb

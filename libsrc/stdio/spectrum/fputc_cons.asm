@@ -12,13 +12,12 @@
 ;       djm 3/3/2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.17 2016-03-20 19:08:24 dom Exp $
+;	$Id: fputc_cons.asm,v 1.18 2016-05-15 20:15:46 dom Exp $
 ;
 
 
 	SECTION	code_clib
-          PUBLIC  fputc_cons
-          PUBLIC  _fputc_cons
+          PUBLIC  fputc_cons_native
 
 
 	  EXTERN  call_rom3
@@ -28,8 +27,7 @@
 
 defc attr = 23693
 
-.fputc_cons
-._fputc_cons
+.fputc_cons_native
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
@@ -261,10 +259,18 @@ noscroll2:
         defw    noop    ; 7 - BEL
         defw    left    ; 8 - BS
         defw    right   ; 9 - HT
+IF STANDARDESCAPECHARS
+        defw    cr      ;13 - CR (+NL)
+ELSE
         defw    down    ;10 - LF
+ENDIF
         defw    up      ;11 - UP
         defw    cls     ;12 = FF (and HOME)
+IF STANDARDESCAPECHARS
+        defw    down    ;10 - LF
+ELSE
         defw    cr      ;13 - CR (+NL)
+ENDIF
         defw    noop    ;14
         defw    noop    ;15
         defw    setink     ;16  - ink

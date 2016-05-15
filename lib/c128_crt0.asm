@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.20 2016-03-30 09:19:58 dom Exp $
+;	$Id: c128_crt0.asm,v 1.21 2016-05-15 20:15:44 dom Exp $
 ;
 
 
@@ -11,7 +11,11 @@
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
+        defc    crt0 = 1
         INCLUDE "zcc_opt.def"
+
+; Only the ANSI terminal is available
+	defc NEED_ansiterminal = 1
 
 ;--------
 ; Some scope definitions
@@ -145,23 +149,7 @@ ELSE
         defw    -11,-12,-10
 ENDIF
 
-
-; Now, which of the vfprintf routines do we need?
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 ;Atexit routine
 

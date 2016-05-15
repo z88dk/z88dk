@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.7 2016-03-30 09:19:58 dom Exp $
+;       $Id: sos_crt0.asm,v 1.8 2016-05-15 20:15:44 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -20,6 +20,7 @@
 ; Include zcc_opt.def to find out some information
 ;-------------------------------------------------
 
+        defc    crt0 = 1
 	INCLUDE "zcc_opt.def"
 
 ;-----------------------
@@ -277,23 +278,7 @@ ELSE
 ENDIF
 
 
-;----------------------------------------
-; Work out which vfprintf routine we need
-;----------------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 
 ;-----------------------

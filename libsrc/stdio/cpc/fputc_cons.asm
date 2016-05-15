@@ -7,23 +7,32 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.5 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.6 2016-05-15 20:15:45 dom Exp $
 ;
 
-        PUBLIC	fputc_cons
+	SECTION	code_clib
+        PUBLIC	fputc_cons_native
 
         INCLUDE "cpcfirm.def"
         
 
-.fputc_cons
+.fputc_cons_native
         ld      hl,2
         add     hl,sp
         ld      a,(hl)
-        cp      13
+IF STANDARDESCAPECHARS
+        cp      10
+ELSE
+	cp	13
+ENDIF
         jr      nz,nocr
         call    firmware
         defw    txt_output
+IF STANDARDESCAPECHARS
+	ld	a,13
+ELSE
         ld      a,10
+ENDIF
 .nocr   call    firmware
         defw    txt_output
         ret

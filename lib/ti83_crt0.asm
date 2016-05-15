@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.27 2016-03-30 09:19:58 dom Exp $
+;	$Id: ti83_crt0.asm,v 1.28 2016-05-15 20:15:44 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -55,6 +55,7 @@
 ; Begin of (shell) headers
 ;-------------------------
 	LSTOFF			; Don't list these (huge) files
+        defc    crt0 = 1
 	INCLUDE "Ti83.def"	; ROM / RAM adresses on Ti83
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 	LSTON			; List again
@@ -355,23 +356,7 @@ ELSE
 ENDIF
 
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 
 ;Atexit routine

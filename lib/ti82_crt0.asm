@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.26 2016-03-30 09:19:58 dom Exp $
+;	$Id: ti82_crt0.asm,v 1.27 2016-05-15 20:15:44 dom Exp $
 ;
 ;-----------------------------------------------------
 ; Some general PUBLICs and EXTERNs needed by the assembler
@@ -38,6 +38,7 @@
 ; Begin of (shell) headers
 ;-------------------------
 
+        defc    crt0 = 1
 	INCLUDE "Ti82.def"	; ROM / RAM adresses on Ti82
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 	
@@ -135,23 +136,7 @@ ELSE
 ENDIF
 
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 
 ;Atexit routine

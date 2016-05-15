@@ -9,15 +9,13 @@
 ;
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.4 2016-03-13 18:14:13 dom Exp $
+;	$Id: fputc_cons.asm,v 1.5 2016-05-15 20:15:46 dom Exp $
 ;
 
 		SECTION	  code_clib
+                PUBLIC    fputc_cons_native	;Print char
 
-
-                PUBLIC    fputc_cons	;Print char
-
-.fputc_cons
+.fputc_cons_native
 	pop	bc
 	pop	hl
 	push	hl
@@ -37,7 +35,11 @@
 	rst	$10
 	jr	fputc_exit
 .fputc_cons1
+IF STANDARDESCAPECHARS
+	cp	10
+ELSE
 	cp	13
+ENDIF
 	jr	nz,fputc_cons2
 	ld	a,10
 	ld	c,$5b		;PUTCHAR

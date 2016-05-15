@@ -1,4 +1,5 @@
-	PUBLIC	fputc_cons
+	SECTION code_clib	
+	PUBLIC	fputc_cons_native
 	
 	INCLUDE "sms/sms.hdr"
 
@@ -6,7 +7,7 @@
 	
 	EXTERN	VRamToHL
 	
-.fputc_cons
+.fputc_cons_native
 	ld	a, (fputc_vdp_offs)
 	ld	l, a
 	ld	a, (fputc_vdp_offs+1)
@@ -19,7 +20,11 @@
 	add     hl,sp
 	ld	a,(hl)
 
+IF STANDARDESCAPECHARS
+	cp	10
+ELSE
 	cp	13
+ENDIF
 	jr	nz,nocrlf
 
 	; Line break

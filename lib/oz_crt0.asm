@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.14 2016-03-30 09:19:58 dom Exp $
+;       $Id: oz_crt0.asm,v 1.15 2016-05-15 20:15:44 dom Exp $
 ;
 ; - - - - - - -
 
@@ -25,6 +25,7 @@
 ; Include zcc_opt.def to find out information about us
 ;-------
 
+        defc    crt0 = 1
         INCLUDE "zcc_opt.def"
 
 ;-------
@@ -497,23 +498,7 @@ ELSE
 ENDIF
 
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 ;-----------
 ; Now some variables

@@ -1,7 +1,7 @@
 ;
 ;	Startup for test emulator
 ;
-;	$Id: test_crt0.asm,v 1.8 2016-04-25 12:58:31 dom Exp $
+;	$Id: test_crt0.asm,v 1.9 2016-05-15 20:15:44 dom Exp $
 
 
     module test_crt0
@@ -12,6 +12,8 @@
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
+
+        defc    crt0 = 1
         INCLUDE "zcc_opt.def"
 
 ;--------
@@ -115,23 +117,7 @@ IF NEED_floatpack
         INCLUDE         "float.asm"
 ENDIF
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-       
+              INCLUDE "crt0_runtime_selection.asm" 
 
 
     SECTION code_crt_init

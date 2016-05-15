@@ -11,15 +11,15 @@
 ;	Useful if you want to use the 3K expansion.
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.3 2016-05-15 20:15:46 dom Exp $
 ;
-
-	PUBLIC	fputc_cons
+	SECTION code_clib
+	PUBLIC	fputc_cons_native
 	EXTERN	rcmx000_cnvtab
 
 	EXTERN __sendchar
 			
-.fputc_cons
+.fputc_cons_native
 	; extern int __LIB__ fputc(int c, FILE *fp);
 
 	; int c is in register BC (i.e. C)

@@ -9,18 +9,16 @@
 ;
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.7 2016-04-29 20:35:11 dom Exp $
+;	$Id: fputc_cons.asm,v 1.8 2016-05-15 20:15:46 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
 
 		SECTION	  code_clib
 
-                PUBLIC    fputc_cons	;Print char
-                PUBLIC    _fputc_cons	;Print char
+                PUBLIC    fputc_cons_native	;Print char
 
-.fputc_cons
-._fputc_cons
+.fputc_cons_native
         ld      hl,2
         add     hl,sp
         ld      a,(hl)

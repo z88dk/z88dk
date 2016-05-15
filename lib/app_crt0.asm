@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.18 2016-04-04 18:03:07 dom Exp $
+;	$Id: app_crt0.asm,v 1.19 2016-05-15 20:15:44 dom Exp $
 
 
 ;--------
@@ -278,19 +278,7 @@ ENDIF
 ;--------
 ; Which printf core routine do we need?
 ;--------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
+        INCLUDE "crt0_runtime_selection.asm"
 
 ;-------
 ; Text to define the BASIC style window

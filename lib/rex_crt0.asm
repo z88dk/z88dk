@@ -2,11 +2,12 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.20 2016-03-11 11:19:11 dom Exp $
+;       $Id: rex_crt0.asm,v 1.21 2016-05-15 20:15:44 dom Exp $
 ;
 
 	MODULE rex_crt0
 
+        defc    crt0 = 1
 	INCLUDE "zcc_opt.def"
 
 ;--------

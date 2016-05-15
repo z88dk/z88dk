@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.10 2016-03-30 09:19:58 dom Exp $
+;	$Id: sc3000_crt0.asm,v 1.11 2016-05-15 20:15:44 dom Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -23,6 +23,7 @@
 ; information about what we should do..
 ;
 
+		defc    crt0 = 1
                 INCLUDE "zcc_opt.def"
 
 ; No matter what set up we have, main is always, always external to
@@ -273,21 +274,7 @@ l_dcal:
         jp      (hl)
 
 
-; Now, which of the vfprintf routines do we need?
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 ; ---------------
 ; MSX specific stuff

@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.30 2016-04-25 12:58:31 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.31 2016-05-15 20:15:44 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -28,6 +28,7 @@
 ; Include zcc_opt.def to find out some information
 ;-------------------------------------------------
 
+        defc    crt0 = 1
 	INCLUDE "zcc_opt.def"
 
 ;-----------------------
@@ -275,22 +276,7 @@ IF NEED_floatpack
 ENDIF
          	defm  	"Small C+ CP/M"
 
-;----------------------------------------
-; Work out which vfprintf routine we need
-;----------------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
+        INCLUDE "crt0_runtime_selection.asm"
 
     SECTION code_crt_init
 crt_init_start:

@@ -1,6 +1,6 @@
 ;       Memotech MTX CRT0 stub
 ;
-;       $Id: mtx_crt0.asm,v 1.8 2016-03-30 09:19:58 dom Exp $
+;       $Id: mtx_crt0.asm,v 1.9 2016-05-15 20:15:44 dom Exp $
 ;
 
 
@@ -10,6 +10,8 @@
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
+
+        defc    crt0 = 1
         INCLUDE "zcc_opt.def"
 
 ;--------
@@ -136,23 +138,7 @@ start1: ld      sp,0            ;Restore stack to entry value
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 ; ---------------
 ; MSX specific stuff

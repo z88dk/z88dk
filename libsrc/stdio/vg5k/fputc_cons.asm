@@ -6,10 +6,11 @@
 ;    Jun. 2014 -Joaopa, Stefano Bodrato
 ;
 ;
-;    $Id: fputc_cons.asm,v 1.5 2015-10-09 13:02:43 stefano Exp $
+;    $Id: fputc_cons.asm,v 1.6 2016-05-15 20:15:46 dom Exp $
 ;
-
-    PUBLIC  fputc_cons
+	
+	SECTION code_clib
+    PUBLIC  fputc_cons_native
 ;
 ; Entry:        char to print
 ;
@@ -22,7 +23,7 @@ defc ROW	= $4805
 defc COLUMN	= $4806
 
 
-.fputc_cons
+.fputc_cons_native
 
 	ld	ix,$47FA
 	ld	hl,2

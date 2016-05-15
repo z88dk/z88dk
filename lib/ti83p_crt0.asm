@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.28 2016-03-30 09:19:58 dom Exp $
+;	$Id: ti83p_crt0.asm,v 1.29 2016-05-15 20:15:44 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -51,6 +51,7 @@
 ;-------------------------
 
 	INCLUDE "Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
+        defc    crt0 = 1
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 	
 ;-----------------------------
@@ -242,23 +243,7 @@ ELSE
 ENDIF
 
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 
 ;Atexit routine

@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.16 2016-04-25 12:58:31 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.17 2016-05-15 20:15:44 dom Exp $
 ;
 ; - - - - - - -
 
@@ -16,6 +16,7 @@
 ; Include zcc_opt.def to find out information about us
 ;-------
 
+        defc    crt0 = 1
 	INCLUDE "zcc_opt.def"
 
 ;-------
@@ -114,23 +115,7 @@ montest: ld	a,(1)	; "T" monitor or NAS-SYS?
          defm  "Small C+ NASCOM"	;Unnecessary file signature
          defb	0
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
     SECTION code_crt_init
 crt_init_start:

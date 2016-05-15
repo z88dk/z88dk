@@ -6,14 +6,14 @@
 ;       Stefano Bodrato - Apr.2008
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.3 2016-05-15 20:15:45 dom Exp $
 ;
 
+	  SECTION code_clib
+          PUBLIC  fputc_cons_native
 
-          PUBLIC  fputc_cons
 
-
-.fputc_cons
+.fputc_cons_native
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
@@ -29,6 +29,11 @@
 	jr	setout
 .nounder
 	; Some more char remapping can stay here...
+IF STANDARDESCAPECHARS
+	cp	10
+	jr	nz,setout
+	ld	a,13
+ENDIF
 .setout
         rst	20h
 	ret

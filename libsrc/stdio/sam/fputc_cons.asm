@@ -8,21 +8,27 @@
 ;
 ;	Frode Tennebø - 29/12/2002
 ;
-;	$Id: fputc_cons.asm,v 1.4 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.5 2016-05-15 20:15:46 dom Exp $
 ;
 
-          PUBLIC  fputc_cons
+	  SECTION code_clib
+          PUBLIC  fputc_cons_native
 
 ;
 ; Entry:        char to print on stack
 ;
 
-.fputc_cons
+.fputc_cons_native
 
 		ld	hl,2
 		add	hl,sp
 		ld	a,(hl)
-	
+IF STANDARDESCAPECHARS
+		cp	10
+		jr	nz,nocr
+		ld	a,13
+ENDIF
+.nocr	
 		cp	12	; CLS ?
 		jr	nz,nocls
 		xor	a

@@ -6,10 +6,11 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.7 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.8 2016-05-15 20:15:45 dom Exp $
 ;
 
-	PUBLIC  fputc_cons
+	SECTION code_clib
+	PUBLIC  fputc_cons_native
         EXTERN	msxbios
 
 
@@ -23,18 +24,25 @@ ENDIF
 ;
 ; Entry:        hl = points to char
 ;
-.fputc_cons
+.fputc_cons_native
 	ld      hl,2
 	add     hl,sp
 	ld	a,(hl)
 
 	ld	ix,CHPUT	; Print char
-
+IF STANDARDESCAPECHARS
+	cp	10
+ELSE
 	cp	13
+ENDIF
 	jr	nz,nocrlf
 
 	call	msxbios
+IF STANDARDESCAPECHARS
+	ld	a,13
+ELSE
 	ld	a,10
+ENDIF
 
 .nocrlf
 	cp	12	; CLS ?

@@ -6,19 +6,17 @@
 ;
 ;	Stefano Bodrato - 3/4/2001
 ;
-;	$Id: puts_cons.asm,v 1.5 2016-04-04 18:31:22 dom Exp $
+;	$Id: puts_cons.asm,v 1.6 2016-05-15 20:15:45 dom Exp $
 ;
 
 		SECTION	code_clib
-		PUBLIC	puts_cons
-		PUBLIC	_puts_cons
+		PUBLIC	puts_cons_ansi
 		EXTERN	f_ansi
 
 
 ; Enter in with hl holding the address of string to print
 
-.puts_cons
-._puts_cons
+.puts_cons_ansi
 	pop	bc
 	pop	hl
 	push	hl

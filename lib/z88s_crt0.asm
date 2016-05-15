@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.16 2016-03-30 09:19:58 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.17 2016-05-15 20:15:44 dom Exp $
 
 
 
@@ -183,23 +183,7 @@ errescpressed:
         jr      cleanup		;Exit the program
 
 
-;-----------
-; Select which vfprintf routine is needed
-;-----------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 ;--------
 ; Far memory setup

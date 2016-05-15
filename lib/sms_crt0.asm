@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.12 2016-04-25 12:58:31 dom Exp $
+;	$Id: sms_crt0.asm,v 1.13 2016-05-15 20:15:44 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -19,6 +19,7 @@
 ; Include zcc_opt.def to find out information about us
 ;-------
 
+        defc    crt0 = 1
 	INCLUDE "zcc_opt.def"
 
 ;-------
@@ -236,22 +237,7 @@ _Data:
 _End:
 	
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
+        INCLUDE "crt0_runtime_selection.asm"
 
 ;--------
 ; Now, include the math routines if needed..

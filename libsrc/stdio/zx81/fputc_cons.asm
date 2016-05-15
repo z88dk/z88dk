@@ -5,12 +5,13 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: fputc_cons.asm,v 1.20 2015-12-12 03:21:44 aralbrec Exp $
+;	$Id: fputc_cons.asm,v 1.21 2016-05-15 20:15:46 dom Exp $
 ;
 ;----------------------------------------------------------------
 ;
 
-	PUBLIC	fputc_cons
+        SECTION code_clib
+	PUBLIC	fputc_cons_native
 
 	EXTERN     asctozx81
 	EXTERN     restore81
@@ -34,7 +35,7 @@ ENDIF
 ;.COLUMN	defb	0
 
 
-.fputc_cons
+.fputc_cons_native
 
 	ld	hl,2
 	add	hl,sp

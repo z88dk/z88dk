@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.41 2016-04-27 15:19:38 dom Exp $
+;       $Id: spec_crt0.asm,v 1.42 2016-05-15 20:15:44 dom Exp $
 ;
 
 
@@ -15,6 +15,8 @@
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
+
+        defc    crt0 = 1
         INCLUDE "zcc_opt.def"
 
 ;--------
@@ -105,7 +107,6 @@ init:
         ld      (hl),0
         ld      bc,42239
         ldir
-        call    zx_internal_init
         ei
 ELSE
 
@@ -213,15 +214,6 @@ zx_internal_cls:
         out     (254),a
         ret
 
-zx_internal_init:
-        ld      a,@111000       ; White PAPER, black INK
-        ld      ($5c48),a       ; BORDCR
-        ld      ($5c8d),a       ; ATTR_P
-        ld      ($5c8f),a       ; ATTR_T
-
-        ld      hl,$8080
-        ld      (fp_seed),hl
-        ret
 
 ELSE
   IF DEFINED_ZXVGS
@@ -242,23 +234,9 @@ ENDIF
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
+; Runtime selection
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-    PUBLIC  asm_vfprintf
-IF DEFINED_floatstdio
-    EXTERN  asm_vfprintf_level3
-    defc    asm_vfprintf = asm_vfprintf_level3
-ELSE
-    IF DEFINED_complexstdio
-            EXTERN  asm_vfprintf_level2
-        defc    asm_vfprintf = asm_vfprintf_level2
-    ELSE
-            EXTERN  asm_vfprintf_level1
-        defc    asm_vfprintf = asm_vfprintf_level1
-    ENDIF
-ENDIF
+	INCLUDE	"crt0_runtime_selection.asm"
 
 ;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
@@ -410,8 +388,14 @@ ENDIF
         ; Setup std* streams
 crt0_init_data:
         ; TODO: Reset the bss section
+        ld      a,@111000       ; White PAPER, black INK
+        ld      ($5c48),a       ; BORDCR
+        ld      ($5c8d),a       ; ATTR_P
+        ld      ($5c8f),a       ; ATTR_T
+IF NEED_floatpack
         ld      hl,$8080        ;Initialise floating point seed
         ld      (fp_seed),hl
+ENDIF
 IF DEFINED_ANSIstdio
         ld      hl,__sgoioblk
         ld      de,__sgoioblk+1

@@ -8,19 +8,17 @@
 ;       djm 2/4/99
 ;
 ;
-;	$Id: puts_cons.asm,v 1.7 2016-04-29 20:35:11 dom Exp $
+;	$Id: puts_cons.asm,v 1.8 2016-05-15 20:15:46 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
 
 		SECTION	  code_clib
 
-                PUBLIC    puts_cons
-                PUBLIC    _puts_cons
+                PUBLIC    puts_cons_native
 
 
-.puts_cons
-._puts_cons
+.puts_cons_native
 	pop	bc
 	pop	hl
 	push	hl

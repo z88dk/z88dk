@@ -8,17 +8,17 @@
 ;       djm 2/4/99
 ;
 ;
-;	$Id: puts_cons.asm,v 1.4 2016-03-13 18:14:13 dom Exp $
+;	$Id: puts_cons.asm,v 1.5 2016-05-15 20:15:46 dom Exp $
 ;
 
 
 
 		SECTION	  code_clib
 
-                PUBLIC    puts_cons
+                PUBLIC    puts_cons_native
 
 
-.puts_cons
+.puts_cons_native
 	pop	bc
 	pop	hl
 	push	hl

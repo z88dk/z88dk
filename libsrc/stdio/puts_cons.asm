@@ -4,24 +4,23 @@
 ;	puts(char *s) - put string to screen
 ;
 ;
-;	$Id: puts_cons.asm,v 1.5 2016-04-29 20:35:38 dom Exp $
+;	$Id: puts_cons.asm,v 1.6 2016-05-15 20:15:45 dom Exp $
 ;
 
 
 		SECTION	code_clib
-		PUBLIC	puts_cons
-		PUBLIC	_puts_cons
+		PUBLIC	puts_cons_native
 		EXTERN	fputc_cons
 
 
 ; Enter in with hl holding the address of string to print
 
-.puts_cons
-._puts_cons
+.puts_cons_native
 	pop	bc
 	pop	hl
 	push	hl
 	push	bc
+	push    ix
 .puts0
 	ld	a,(hl)
 	and	a
@@ -43,5 +42,6 @@ ENDIF
 	push	de
 	call	fputc_cons
 	pop	de
+	pop	ix
 	ret
 

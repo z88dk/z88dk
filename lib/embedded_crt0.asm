@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.11 2016-04-25 12:58:31 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.12 2016-05-15 20:15:44 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -18,6 +18,7 @@
 ; Include zcc_opt.def to find out information about us
 ;-------
 
+        defc    crt0 = 1
 	INCLUDE "zcc_opt.def"
 
 ;-------
@@ -75,22 +76,8 @@ endloop:
 l_dcal:
 	jp      (hl)
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
+
+        INCLUDE "crt0_runtime_selection.asm"
 
 ;--------
 ; Now, include the math routines if needed..

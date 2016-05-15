@@ -8,26 +8,32 @@
 ;       We can corrupt any register
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.2 2015-01-19 01:33:17 pauloscustodio Exp $
+;	$Id: fputc_cons.asm,v 1.3 2016-05-15 20:15:45 dom Exp $
 ;
 
-	PUBLIC  fputc_cons
+	SECTION	code_clib
+	PUBLIC  fputc_cons_native
 
 ;
 ; Entry:        char to print
 ;
 
 
-.fputc_cons
+.fputc_cons_native
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl); Now A contains the char to be printed
-	
-	cp	13
-	jr	nz,nocrlf
-	ld	a,13
-	call	printchar
-	ld	a,10
+IF STANDARDESCAPECHARS
+        cp      10      ; CR ?
+        jr      nz,nocrlf
+        call    printchar
+        ld      a,13
+ELSE
+        cp      13      ; CR ?
+        jr      nz,nocrlf
+        call    printchar
+        ld      a,10
+ENDIF
 .nocrlf
 
 .printchar

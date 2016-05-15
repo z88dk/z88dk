@@ -6,14 +6,14 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.3 2015-01-21 08:09:27 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.4 2016-05-15 20:15:45 dom Exp $
 ;
 
+	  SECTION code_clib
+          PUBLIC  fputc_cons_native
 
-          PUBLIC  fputc_cons
 
-
-.fputc_cons
+.fputc_cons_native
 	ld  hl,2
 	add hl,sp
 	ld  a,(hl)
@@ -38,6 +38,13 @@
 
 	jp  $8e5
 .nocls
+IF STANDARDESCAPECHARS
+	cp	13
+	ret	z
+	cp	10
+	jr	nz,setout
+	ld	a,13
+ENDIF
 
 .setout
 ;	ld  hl,$6255

@@ -42,6 +42,7 @@
 ;------------------------------
 
 	INCLUDE "Ti83p.def"	; ROM / RAM adresses on Ti83+[SE]
+        defc    crt0 = 1
 	INCLUDE "zcc_opt.def"	;Get compiler defines
 
 	org $4000
@@ -205,25 +206,7 @@ cpygraph:
 ENDIF
 tidi:	ret
 
-;---------------------------------
-; Select which printf core we want
-;---------------------------------
-_vfprintf:
-IF DEFINED_floatstdio
-        EXTERN     vfprintf_fp
-        jp      vfprintf_fp
-ELSE
-        IF DEFINED_complexstdio
-                EXTERN     vfprintf_comp
-                jp      vfprintf_comp
-        ELSE
-                IF DEFINED_ministdio
-                        EXTERN     vfprintf_mini
-                        jp      vfprintf_mini
-                ENDIF
-        ENDIF
-ENDIF
-
+        INCLUDE "crt0_runtime_selection.asm"
 
 IF !DEFINED_GRAYlib
 cpygraph:

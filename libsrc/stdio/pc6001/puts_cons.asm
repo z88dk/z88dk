@@ -6,16 +6,17 @@
 ;	Stefano Bodrato - 2013
 ;
 ;
-;	$Id: puts_cons.asm,v 1.2 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: puts_cons.asm,v 1.3 2016-05-15 20:15:46 dom Exp $
 ;
 
-	PUBLIC  puts_cons
+	SECTION code_clib
+	PUBLIC  puts_cons_native
 
 ;
 ; Entry:        hl = points text
 ;
 
-.puts_cons
+.puts_cons_native
 
 	pop	bc
 	pop	hl

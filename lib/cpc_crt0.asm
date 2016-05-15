@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.26 2016-05-14 03:36:03 aralbrec Exp $
+;       $Id: cpc_crt0.asm,v 1.27 2016-05-15 20:15:44 dom Exp $
 ;
 
         MODULE  cpc_crt0
@@ -11,6 +11,7 @@
 ;--------
 ; Include zcc_opt.def to find out some info
 ;--------
+        defc    crt0 = 1
         INCLUDE "zcc_opt.def"
 
 ;--------
@@ -142,22 +143,8 @@ ELSE
 ENDIF
 
 
-; Now, which of the vfprintf routines do we need?
-	PUBLIC	asm_vfprintf
-IF DEFINED_floatstdio
-	EXTERN	asm_vfprintf_level3
-	defc	asm_vfprintf = asm_vfprintf_level3
-ELSE
-	IF DEFINED_complexstdio
-	        EXTERN	asm_vfprintf_level2
-		defc	asm_vfprintf = asm_vfprintf_level2
-	ELSE
-	       	EXTERN	asm_vfprintf_level1
-		defc	asm_vfprintf = asm_vfprintf_level1
-	ENDIF
-ENDIF
-
-        
+               INCLUDE "crt0_runtime_selection.asm"
+ 
 
 exitsp:         defw    0       ;  atexit       
 exitcount:      defb    0
