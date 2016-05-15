@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.27 2016-05-15 20:15:44 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.28 2016-05-15 22:54:05 aralbrec Exp $
 ;
 
         MODULE  cpc_crt0
@@ -35,17 +35,17 @@
         PUBLIC    coords          ;Current xy position
 
         PUBLIC    snd_tick        ;Sound variable
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
+        PUBLIC    bit_irqstatus   ;current irq status when DI is necessary
 
-        PUBLIC    firmware_bc     ;Needed by the firmware interposer
-        PUBLIC    firmware_af     ;Needed by the firmware interposer
+        PUBLIC    cpc_enable_fw_exx_set       ;needed by firmware interposer
+        PUBLIC    cpc_enable_process_exx_set  ;needed by firmware interposer
 
 ;--------
-; Set an origin for the application (-zorg=) default to $6000
+; Set an origin for the application (-zorg=) default to $1200
 ;--------
 
         IF      !myzorg
-                defc    myzorg  = $6000
+                defc    myzorg  = $1200
         ENDIF   
                 org     myzorg
 
@@ -58,24 +58,30 @@ start:
 
         di
 		
-		; take over interrupts
+		; enable process exx set
+		; install interrupt interposer
 		
-		ld      hl,($0039)              ; original interrupt service routine
-		ld      (oldint_0),hl
-		ld      (oldint_1),hl
+		call    cpc_enable_process_exx_set
 		
-		ld      hl,newint               ; new interrupt service routine
-		ld      ($0039),hl
-
+		; move stack
+		
         ld      (start1+1),sp
 		
-        ld      hl,-6530   ; que??
-		;;ld      hl,-64             ; reserve space for 32 entries on the exit stack
+		IFNDEF STACKPTR
+		   ld sp,(0xae60)               ; set stack location to last byte of udg area
+		ELSE
+			IF STACKPTR > 0
+				ld sp,STACKPTR          ; user supplied stack location
+			ENDIF
+		ENDIF
+		
+		; make room for exit stack
+		
+		ld      hl,-64                  ; reserve space for 32 entries on the exit stack
         add     hl,sp
         ld      sp,hl
-        ld      (exitsp),sp
 		
-		call    cpc_save_fw_exx_set     ; save firmware exx set
+        ld      (exitsp),sp
 		
 		ei
 
@@ -121,17 +127,88 @@ ENDIF
 
         di
 		
-		ld      hl,(oldint_0)
-		ld      ($0039),hl              ; restore original interrupt routine
-
-		call    cpc_load_fw_exx_set     ; restore firmware exx set
-        
+		call    cpc_enable_fw_exx_set
 start1: ld      sp,0
 
         ei
         ret
 
 l_dcal: jp      (hl)
+
+
+; These subroutines make it possible to coexist with the firmware.
+; Interrupts must be disabled while these routines run.
+
+cpc_enable_fw_exx_set:
+
+   exx
+   ex af,af'
+
+   ld (__process_exx_set_hl__),hl      ; save process exx set
+   ld (__process_exx_set_de__),de
+   ld (__process_exx_set_bc__),bc
+   push af
+   pop hl
+   ld (__process_exx_set_af__),hl
+   
+   ld hl,(__fw_int_address__)
+   ld (0x0039),hl                      ; restore firmware isr
+   
+   ld bc,(__fw_exx_set_bc__)           ; restore firmware exx set
+   or a
+   
+   ex af,af'
+   exx
+   
+   ret
+
+cpc_enable_process_exx_set:
+   
+   exx
+   ex af,af'
+
+   ld (__fw_exx_set_bc__),bc           ; save firmware exx set
+   
+   ld hl,(0x0039)
+   ld (__fw_int_address__),hl          ; save firmware interrupt entry
+   
+   ld hl,__interposer_isr__
+   ld (0x0039),hl                      ; interposer receives interrupts
+   
+   ld hl,(__process_exx_set_af__)      ; restore process exx set
+   push hl
+   pop af
+   ld bc,(__process_exx_set_bc__)
+   ld de,(__process_exx_set_de__)
+   ld hl,(__process_exx_set_hl__)
+   
+   ex af,af'
+   exx
+
+   ret
+
+IF startup != 2
+
+__interposer_isr__:
+
+   call cpc_enable_fw_exx_set
+   call 0x0038
+   di
+   call cpc_enable_process_exx_set
+   ei
+   ret
+
+ENDIF
+
+__fw_exx_set_bc__:        defs 2
+
+__process_exx_set_af__:   defs 2
+__process_exx_set_bc__:   defs 2
+__process_exx_set_de__:   defs 2
+__process_exx_set_hl__:   defs 2
+
+__fw_int_address__:       defs 2
+
 
 ; Now, define some values for stdin, stdout, stderr
 
@@ -189,152 +266,3 @@ fa:             defs    6
 fasign:         defb    0
 
 ENDIF
-
-
-; interposer interrupt routine
-
-newint:
-
-   push af
-   
-   ld a,(__fw_exx_set_active__)
-   or a
-   jr z, process_set_active
-
-firmware_set_active:
-   
-   pop af
-   
-   ; jump to old interrupt service routine
-
-   defb 195
-oldint_0:
-   defw 0
-
-process_set_active:
-
-   pop af   
-
-   ; save process exx set
-   ; load fw exx set
-   
-   exx
-   ex af,af'
-
-   ld (__process_exx_set_hl__),hl
-   ld (__process_exx_set_de__),de
-   ld (__process_exx_set_bc__),bc
-   push af
-   pop hl
-   ld (__process_exx_set_af__),hl
-   
-   ld a,1
-   ld (__fw_exx_set_active__),a
-   
-   ld hl,(__fw_exx_set_af__)
-   push hl
-   pop af
-   ld bc,(__fw_exx_set_bc__)
-   ld de,(__fw_exx_set_de__)
-   ld hl,(__fw_exx_set_hl__)
-   
-   ex af,af'
-   exx
-
-   ; call old interrupt service routine
-
-   defb 205
-oldint_1:
-   defw 0
-
-   ; save fw exx set
-   ; load process exx set
-   
-   di
-   
-   exx
-   ex af,af'
-
-   ld (__fw_exx_set_hl__),hl
-   ld (__fw_exx_set_de__),de
-   ld (__fw_exx_set_bc__),bc
-   push af
-   pop hl
-   ld (__fw_exx_set_af__),hl
-   
-   xor a
-   ld (__fw_exx_set_active__),a
-
-   ld hl,(__process_exx_set_af__)
-   push hl
-   pop af
-   ld bc,(__process_exx_set_bc__)
-   ld de,(__process_exx_set_de__)
-   ld hl,(__process_exx_set_hl__)
-   
-   ex af,af'
-   exx
-   
-   ei
-   ret
-
-
-; interrupts must be disabled when these routines run
-
-PUBLIC cpc_load_fw_exx_set
-   
-cpc_load_fw_exx_set:
-
-   exx
-   ex af,af'
-
-   ld a,1
-   ld (__fw_exx_set_active__),a
-   
-   ld hl,(__fw_exx_set_af__)
-   push hl
-   pop af
-   ld bc,(__fw_exx_set_bc__)
-   ld de,(__fw_exx_set_de__)
-   ld hl,(__fw_exx_set_hl__)
-   
-   ex af,af'
-   exx
-   
-   ret
-   
-
-PUBLIC cpc_save_fw_exx_set
-
-cpc_save_fw_exx_set:
-
-   exx
-   ex af,af'
-
-   ld (__fw_exx_set_hl__),hl
-   ld (__fw_exx_set_de__),de
-   ld (__fw_exx_set_bc__),bc
-   push af
-   pop hl
-   ld (__fw_exx_set_af__),hl
-   
-   xor a
-   ld (__fw_exx_set_active__),a
-
-   ex af,af'
-   exx
-   
-   ret
-
-
-__fw_exx_set_active__:    defb 1
-
-__fw_exx_set_af__:        defs 2
-__fw_exx_set_bc__:        defs 2
-__fw_exx_set_de__:        defs 2
-__fw_exx_set_hl__:        defs 2
-
-__process_exx_set_af__:   defs 2
-__process_exx_set_bc__:   defs 2
-__process_exx_set_de__:   defs 2
-__process_exx_set_hl__:   defs 2

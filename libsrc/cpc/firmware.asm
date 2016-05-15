@@ -15,13 +15,17 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: firmware.asm,v 1.4 2016-05-14 01:02:02 aralbrec Exp $
+; $Id: firmware.asm,v 1.5 2016-05-15 22:54:18 aralbrec Exp $
 ;
 
         PUBLIC firmware
-        EXTERN cpc_load_fw_exx_set, cpc_save_fw_exx_set
+        EXTERN cpc_enable_fw_exx_set, cpc_enable_process_exx_set
  
  firmware:
+ 
+        di
+		
+		call cpc_enable_fw_exx_set
  
         exx
 		
@@ -38,16 +42,14 @@
 		
 		exx
 		
-		di
-		call    cpc_load_fw_exx_set
 		ei
-		
 		ret
 
 restore:
 
         di
-		call    cpc_save_fw_exx_set
-		ei
 		
+		call    cpc_enable_process_exx_set
+		
+		ei
 		ret
