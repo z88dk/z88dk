@@ -172,3 +172,5 @@
 ../_DEVELOPMENT/l/z80/long/l_lsr_dehl.asm
 ../_DEVELOPMENT/l/z80/long/l_minu_bc_dehl.asm
 ../_DEVELOPMENT/l/z80/long/l_neg_dehl.asm
+../_DEVELOPMENT/l/z80/l_ret.asm
+
