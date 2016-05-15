@@ -73,6 +73,7 @@ typedef unsigned char BYTE;
 #define TRUE 1
 #define FALSE 0
 
+int GET_TOK();
 
 /*****
 ; Disassembly of the file "F:\GAMES\SPECCY\A\ARTICADV\Advent_a.sna"
@@ -779,7 +780,11 @@ BOOL TSTGVAR();
 BOOL CHKCLRF();
 BOOL CHKHELD();
 
+#ifdef SCCZ80
 int *PRED_V[] = 
+#else
+BOOL (*PRED_V[])(void) =
+#endif
 {
 	 CHKROOM,					/* $00 */
 	 CHKHERE,					/* $01 */
@@ -1781,6 +1786,7 @@ RESTG	ld      hl,RESTG_M				; prompt - restore game?
       	call    PrintStr					; print it
       	pop     hl						; restore hl (points at naItemLoc)
       	call    i_GetCh
+
       	cp      'Y'
       	call    z,LCASS					; user typed 'Y', go and restore game
 
@@ -1939,11 +1945,9 @@ void SH_TELL()
 	for (;;)
 	{
 		VERB_TK = GET_TOK();
-
 		if (VERB_TK == 0xff)
 		{
 			BOOL bDont = FALSE;
-
 			if ((*pchEditLine == '\n') || (*pchEditLine == '\0'))
 				bDont = TRUE;
 			else
