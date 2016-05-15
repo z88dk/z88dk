@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.123 2016-05-11 16:41:40 aralbrec Exp $
+ *      $Id: zcc.c,v 1.124 2016-05-15 08:10:40 aralbrec Exp $
  */
 
 
@@ -21,9 +21,6 @@
 #include        <ctype.h>
 #include        <stddef.h>
 #include        "zcc.h"
-
-/* provide an implementation of getline since it's missing on some platforms */
-static int zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream);
 
 #ifdef WIN32
 #define strcasecmp(a,b) stricmp(a,b)
@@ -98,7 +95,7 @@ static char           *replace_str(const char *str, const char *old, const char 
 static void            setup_default_configuration();
 static void            print_specs();
 static int             zcc_asprintf(char **s, const char *fmt, ...);
-
+static int             zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream);
 
 
 static int             usetemp = 1;
@@ -1134,31 +1131,57 @@ void add_option_to_compiler(char *arg)
 void gather_from_list_file(char *fname)
 {
     FILE *in;
-    char *line;
-    unsigned int len;
+    char *line, *p, *q, *lstfile;
+    unsigned int len, ppos;
+    char tname[FILENAME_MAX + 1];
 
-    if ((in = fopen(fname, "r")) == NULL) {
-        fprintf(stderr, "Unable to open list file \"%s\"\n", fname);
-        exit(1);
-    }
+    if (((lstfile = strtok(fname, " \r\n\t")) != NULL) && *lstfile) {
+        // open list file for reading
+        if ((in = fopen(lstfile, "r")) == NULL) {
+            fprintf(stderr, "Unable to open list file \"%s\"\n", lstfile);
+            exit(1);
+        }
     
-    line = NULL;
+        // find path portion of list file filename
+        p = strrchr(lstfile, '/');
+        q = strrchr(lstfile, '\\');
+        if (p == NULL)
+            p = q;
+        else if (q != NULL)
+            p = ((p - lstfile) > (q - lstfile)) ? p : q;
+        p = (p == NULL) ? lstfile : p+1;
+        strncpy(tname, lstfile, p - lstfile);
+        p = tname + (p - lstfile);
 
-    while (zcc_getdelim(&line, &len, '\n', in) > 0)
-        add_file_to_process(line);
+        // read filenames from list file
+        line = NULL;
+        while (zcc_getdelim(&line, &len, '\n', in) > 0) {
+            if (((q = strtok(line, " \r\n\t")) != NULL) && *q) {
+                // prepend filename with path
+                if ((strlen(q) + (p - tname)) > FILENAME_MAX) {
+                    fprintf(stderr, "Filename with path \"%s\" too long\n", line);
+                    exit(1);
+                }
+                strcpy(p, q);
 
-    if (!feof(in)) {
-        fprintf(stderr, "Malformed line in list file \"%s\"\n", fname);
-        exit(1);
+                // add file to process
+                add_file_to_process(tname);
+            }
+        }
+
+        if (!feof(in)) {
+            fprintf(stderr, "Malformed line in list file \"%s\"\n", fname);
+            exit(1);
+        }
+
+        free(line);
+        fclose(in);
     }
-
-    free(line);
-    fclose(in);
 }
 
 void add_file_to_process(char *arg)
 {
-    char tname[FILENAME_MAX*2 + 1];
+    char tname[FILENAME_MAX + 1];
     char *p, *q;
 
     if (((p = strtok(arg, " \r\n\t")) != NULL) && *p) {
@@ -1944,6 +1967,7 @@ static int zcc_asprintf(char **s, const char *fmt, ...)
 
 
 /*
+ * zcc_getdelim()
  * Copyright (C) 2003 ETC s.r.o.
  *
  * This program is free software; you can redistribute it and/or
