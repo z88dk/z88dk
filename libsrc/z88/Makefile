@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.15 2008-03-05 20:35:48 dom Exp $
+# $Id: Makefile,v 1.16 2016-05-16 20:05:18 dom Exp $
 
 include ../Make.config
 
@@ -25,10 +25,8 @@ CFILES = \
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-all: blah z88
+all: z88
 
-blah:
-	cd fdstdio ; $(MAKE) ; cd ..
 
 z88: $(OBJECTS)
 	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/z88 @z88list
@@ -38,4 +36,3 @@ z88: $(OBJECTS)
 
 clean:
 	$(RM) *.obj *.sym *.map *.o* *~ zcc_opt.def *.i $(AFILES)
-	cd fdstdio ; $(MAKE) clean ; cd ..
