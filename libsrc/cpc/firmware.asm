@@ -15,7 +15,7 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: firmware.asm,v 1.5 2016-05-15 22:54:18 aralbrec Exp $
+; $Id: firmware.asm,v 1.6 2016-05-16 01:00:58 aralbrec Exp $
 ;
 
         PUBLIC firmware
@@ -30,15 +30,15 @@
         exx
 		
 		pop     hl               ; hl = return address
-		ld      c,(hl)
+		ld      e,(hl)
 		inc     hl
-		ld      b,(hl)
+		ld      d,(hl)
 		inc     hl
 		
 		push    hl               ; save return address
 		ld      hl,restore
 		push    hl
-		push    bc               ; save firmware address
+		push    de               ; save firmware address
 		
 		exx
 		
