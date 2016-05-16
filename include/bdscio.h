@@ -1,6 +1,6 @@
 /*
  * BDS C Compatibility
- * $Id: bdscio.h,v 1.8 2014-05-28 12:12:34 stefano Exp $
+ * $Id: bdscio.h,v 1.9 2016-05-16 20:08:26 dom Exp $
  */
 
 #ifndef __BDSCIO_H__
@@ -72,7 +72,7 @@
 #define dioinit(a,b) {}
 #define dioflush() 0
 
-#define exit() exit(0)
+//#define exit() exit(0)
 
 
 #define FALSE 0
@@ -84,7 +84,7 @@
 #define out(a) puts_cons(a)
 #define eqs(a,b) (!strcmp(a,b)==0)
 
-#define error(a) exit(puts_cons(a)&0)
+#define error(a) puts_cons(a);exit(1)
 
 #define movmem(a,b,c) memcpy(b,a,c)
 
