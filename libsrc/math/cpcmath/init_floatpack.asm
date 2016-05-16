@@ -3,7 +3,7 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: init_floatpack.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
+;	$Id: init_floatpack.asm,v 1.4 2016-05-16 20:29:12 dom Exp $
 ;
 
 		INCLUDE		"cpcfp.def"
@@ -78,36 +78,34 @@
 ;
 ; We save space by only using defb - this overflow, but no harm done there
 
-                defb    atan
-                defb    cos
-                defb    dadd
-                defb    ddiv
-                defb    deg
-                defb    deq
-                defb    dge
-                defb    dgt
-                defb    dleq
-                defb    dlt
-                defb    dmul
-                defb    dne
-                defb    dsub
-                defb    exp
-                defb    float
-                defb    floor
-                defb    fprand
-                defb    ifix
-                defb    log10
-                defb    log
-                defb    minusfa
-                defb    pi
-                defb    pow10
-                defb    pow
-                defb    rad
-                defb    sin
-                defb    sqrt
-                defb    tan
-
-
+                defb    atan % 256
+                defb    cos % 256
+                defb    dadd % 256
+                defb    ddiv % 256
+                defb    deg % 256
+                defb    deq % 256
+                defb    dge % 256
+                defb    dgt % 256
+                defb    dleq % 256
+                defb    dlt % 256
+                defb    dmul % 256
+                defb    dne % 256
+                defb    dsub % 256
+                defb    exp % 256
+                defb    float % 256
+                defb    floor % 256
+                defb    fprand % 256
+                defb    ifix % 256
+                defb    log10 % 256
+                defb    log % 256
+                defb    minusfa % 256
+                defb    pi % 256
+                defb    pow10 % 256
+                defb    pow % 256
+                defb    rad % 256
+                defb    sin % 256
+                defb    sqrt % 256
+                defb    tan % 256
 .init_floatpack
 		ld      hl,$BD65
 		ld      a,(hl)
