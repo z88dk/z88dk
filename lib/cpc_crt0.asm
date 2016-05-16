@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.29 2016-05-16 01:06:03 aralbrec Exp $
+;       $Id: cpc_crt0.asm,v 1.30 2016-05-16 03:17:54 aralbrec Exp $
 ;
 
         MODULE  cpc_crt0
@@ -39,6 +39,8 @@
 
         PUBLIC    cpc_enable_fw_exx_set       ;needed by firmware interposer
         PUBLIC    cpc_enable_process_exx_set  ;needed by firmware interposer
+		
+		GLOBAL    __interposer_isr__
 
 ;--------
 ; Set an origin for the application (-zorg=) default to $1200
@@ -63,9 +65,9 @@ start:
         ld      (start1+1),sp
 		
 		IFNDEF STACKPTR
-		   ld sp,(0xae60)               ; set stack location to last byte of udg area
+			ld sp,(0xae60)               ; set stack location to last byte of udg area
 		ELSE
-			IF STACKPTR > 0
+			IF STACKPTR > -1
 				ld sp,STACKPTR          ; user supplied stack location
 			ENDIF
 		ENDIF
