@@ -6,6 +6,8 @@
 		SECTION code_crt_init
 crt0_init_bss:
 	; TODO: Clear bss area
+        xor     a               ;Reset atexit() count
+        ld      (exitcount),a
 IF NEED_floatpack
         ld      hl,$8080	;Initialise floating point seed
         ld      (fp_seed),hl
@@ -23,6 +25,11 @@ IF DEFINED_ANSIstdio
         ld      (hl),21 ;stdout
         ld      hl,__sgoioblk+10
         ld      (hl),21 ;stderr
+ENDIF
+IF DEFINED_USING_amalloc
+                EXTERN ASMTAIL
+	ld	hl,ASMTAIL
+	ld	(_heap),hl
 ENDIF
 	; SDCC initialiation code gets placed here
 		SECTION code_crt_exit
@@ -71,7 +78,6 @@ snd_tick:        defb    0       ;Sound
 bit_irqstatus:   defw    0       ;current irq status when DI is necessary
 ENDIF
 IF DEFINED_USING_amalloc
-                EXTERN ASMTAIL
 		PUBLIC _heap
 ; The heap pointer will be wiped at startup,
 ; but first its value (based on ASMTAIL)
@@ -82,6 +88,12 @@ _heap:
 ENDIF
 
 		SECTION bss_fardata
+IF bss_fardata_start
+		org	bss_fardata_start
+ENDIF
 		SECTION bss_compiler
+IF bss_compiler_start
+		org	bss_compiler_start
+ENDIF
 		SECTION bss_clib
 		SECTION bss_error

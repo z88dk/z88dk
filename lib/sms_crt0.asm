@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.13 2016-05-15 20:15:44 dom Exp $
+;	$Id: sms_crt0.asm,v 1.14 2016-05-16 20:11:32 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -161,7 +161,7 @@ start:
 	ldir
 	ld      (exitsp),sp
 
-	call	crt0_init_data
+	call	crt0_init_bss
 	
 	call	DefaultInitialiseVDP
 	
@@ -246,45 +246,15 @@ IF NEED_floatpack
 ;        INCLUDE "float.asm"
 ENDIF
 
-SECTION code_crt_init
-crt0_init_data:
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-        ld      hl,__sgoioblk+2
-        ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
-        ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
-        ld      (hl),21 ;stderr
+	defc bss_start = RAM_Start
+IF DEFINED_defvarsaddr
+	defc bss_compiler_start = defvarsaddr
 ENDIF
-ENDIF
-        ld      hl,$8080
-        ld      (fp_seed),hl
-        xor     a
-        ld      (exitcount),a
-SECTION code_crt_exit
-        ret
-SECTION code_compiler
-SECTION code_clib
-SECTION code_crt0_sccz80
-SECTION code_l_sdcc
-SECTION data_compiler
-SECTION data_clib
-SECTION rodata_compiler
-SECTION rodata_clib
+	INCLUDE	"crt0_section.asm"
 
-SECTION bss_crt
-	org	RAM_Start
-__sgoioblk:      	defs    40      ;stdio control block
-exitsp:          	defw    0       ;atexit() stack
-exitcount:       	defb    0       ;Number of atexit() routines
-fp_seed:         	defs    6       ;Floating point seed (not used ATM)
-extra:           	defs    6       ;Floating point spare register
-fa:              	defs    6       ;Floating point accumulator
-fasign:          	defb    0       ;Floating point variable
-heapblocks:      	defw    0       ;Number of free blocks
-heaplast:        	defw    0       ;Pointer to linked blocks
+
+
+		SECTION bss_crt
 fputc_vdp_offs:		defw	0	;Current character pointer
 aPLibMemory_bits:	defb	0	;apLib support variable
 aPLibMemory_byte:	defb	0	;apLib support variable
@@ -303,11 +273,6 @@ RG5SAV:			defb	0
 RG6SAV:			defb	0
 RG7SAV:			defb	0
 
-SECTION bss_clib
-IF DEFINED_defvarsaddr
-	org	defvarsaddr
-ENDIF
-SECTION bss_compiler
 
 
 

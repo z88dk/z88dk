@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.16 2016-05-15 20:15:44 dom Exp $
+;	$Id: bas_crt0.asm,v 1.17 2016-05-16 20:11:32 dom Exp $
 
 
 ;-----------
@@ -43,6 +43,7 @@ bas_last:
 start:
 	ld	(start1+1),sp	;Save starting stack
         ld      sp,($1ffe)	;Pick up stack from OZ safe place
+        call    crt0_init_bss
         ld      hl,-64		;Make room for the atexit() table
         add     hl,sp
         ld      sp,hl
@@ -57,17 +58,6 @@ start:
 
         call    doerrhan	;Initialise a laughable error handler
 
-;-----------
-; Initialise the (ANSI) stdio descriptors so we can be called agin
-;-----------
-IF DEFINED_ANSIstdio
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
         call    _main		;Run the program
 cleanup:			;Jump back here from exit() if needed
 IF DEFINED_ANSIstdio
@@ -121,6 +111,10 @@ errescpressed:
         jr      cleanup		;Exit the program
 
 
+IF NEED_floatpack
+       INCLUDE         "float.asm"
+ENDIF
+
         INCLUDE "crt0_runtime_selection.asm"
 
 ; We can't use far stuff with BASIC cos of paging issues so
@@ -140,75 +134,9 @@ _cpfar2near:
 	ret
 
 
+        INCLUDE "crt0_section.asm"
 
-
-
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
-
-
-;-----------
-; Now some variables
-;-----------
-l_erraddr:	defw	0	; BASIC error handler address
-l_errlevel:	defb	0	; And error level
-
-
-coords:         defw	0	; Current graphics xy coordinates
-base_graphics:  defw	0	; Address of the Graphics map
-gfx_bank:       defb    0	; And the bank
-
-
-exitsp:		defw	0	; Address of where the atexit() stack is
-exitcount:	defb	0	; How many routines on the atexit() stack
-
-IF DEFINED_NEED1bitsound
-snd_asave:      defb    0	; Sound variable
-snd_tick:       defb    0	;  "      "
-bit_irqstatus:	defw	0
-ENDIF
-
-heaplast:	defw	0	; Address of last block on heap
-heapblocks:	defw 	0	; Number of blocks
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-packintrout:	defw	0	; Address of user interrupt routine
-
-
-;-----------
-; Unnecessary file signature
-;-----------
-		defm	"Small C+ z88"
-		defb	0
-
-;-----------
-; Floating point
-;-----------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-
-fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
-extra:          defs    6		; Extra register temp store
-fa:             defs    6		; ""
-fasign:         defb    0		; ""
-
-ENDIF
-
+        SECTION  bss_crt
+l_erraddr:       defw    0       ;Not sure if these are used...
+l_errlevel:      defb    0
+gfx_bank:       defb    0

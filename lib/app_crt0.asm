@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.19 2016-05-15 20:15:44 dom Exp $
+;	$Id: app_crt0.asm,v 1.20 2016-05-16 20:11:32 dom Exp $
 
 
 ;--------
@@ -148,14 +148,15 @@ init_continue:			;We had enough memory
 ;--------
 ; Now, set up some very nice variables - stream ids for std*
 ;--------
-	call	crt0_init_data
+	call	crt0_init_bss
 
-        xor     a		;Reset atexit() count
-        ld      (exitcount),a
         ld      hl,-64		;Setup atexit() stack
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
+IF DEFINED_USING_amalloc
+	INCLUDE "amalloc.def"
+ENDIF
 IF DEFINED_farheapsz
 	call	init_far	;Initialise far memory if required
 ENDIF
@@ -219,20 +220,6 @@ ENDIF
 not_quit:
         xor     a
         ret
-
-;--------
-; Far memory setup
-;--------
-IF DEFINED_farheapsz
-	EXTERN	freeall_far
-	PUBLIC	farpages
-	PUBLIC	malloc_table
-	PUBLIC	farmemspec
-	PUBLIC	pool_table
-; All far memory variables now in init_far.asm
-	INCLUDE	"init_far.asm"
-
-ENDIF
 
 ;--------
 ; This bit of code allows us to use OZ ptrs transparently
@@ -318,13 +305,6 @@ need_expanded_text:
         defb    0
 ENDIF
 
-;--------
-; Include the stdio handle defaults if we need them
-;--------
-IF DEFINED_ANSIstdio
-sgoprotos:
-	INCLUDE	"stdio_fp.asm"
-ENDIF
 
 
 
@@ -336,93 +316,39 @@ IF NEED_floatpack
 ENDIF
 
 
-
-; Memory map
-SECTION code_crt_init
-	; Setup std* streams
-crt0_init_data:
-        ld      hl,$8080	;Initialise floating point seed
-        ld      (fp_seed),hl
-IF DEFINED_ANSIstdio
-        ld      hl,sgoprotos
-        ld      de,__sgoioblk
-        ld      bc,4*10         ;4*10 FILES
-        ldir
-ELSE
-        ld      hl,-10
-        ld      (__sgoioblk+4),hl
-        dec     hl
-        ld      (__sgoioblk),hl
-        dec     hl
-        ld      (__sgoioblk+2),hl
-ENDIF
-SECTION code_crt_exit
-
-	ret
-SECTION code_compiler
-SECTION code_clib
-SECTION code_crt0_sccz80
-SECTION code_l_sdcc
-SECTION code_math
-SECTION code_error
-SECTION data_compiler
-SECTION rodata_compiler
-SECTION rodata_clib
-
-; Now the magic for z88 apps, BSS goes into low memory
-SECTION bss_crt
-; Variables need by crt0 code and some lib routines are kept in safe workspace
 IF !DEFINED_sysdefvarsaddr
 	defc sysdefvarsaddr = $1ffD-100-safedata
 ENDIF
-	org	sysdefvarsaddr
+	defc bss_start = sysdefvarsaddr
+	; Far data at 8192 to match up with CamelForth
+IF DEFINED_farheapsz
+        defc bss_fardata_start = 8192
+ENDIF
+	INCLUDE "crt0_section.asm"
 
-__sgoioblk:      defs    40      ;stdio control block
+	SECTION bss_crt
+gfx_bank:	defb	0
 l_erraddr:       defw    0       ;Not sure if these are used...
 l_errlevel:      defb    0
-coords:          defw    0       ;Graphics xy coordinates
-base_graphics:   defw    0       ;Address of graphics map
-gfx_bank:        defb    0       ;Bank that this is in
-exitsp:          defw    0       ;atexit() stack
-exitcount:       defb    0       ;Number of atexit() routines
-fp_seed:         defs    6       ;Floating point seed (not used ATM)
-extra:           defs    6       ;Floating point spare register
-fa:              defs    6       ;Floating point accumulator
-fasign:          defb    0       ;Floating point variable
-packintrout:     defw    0       ;User interrupt handler
-snd_asave:       defb    0       ;Sound
-snd_tick:        defb    0       ;Sound
-bit_irqstatus:   defw    0       ;current irq status when DI is necessary
-; If the user doesn't care where the heap variables go, dump them in safe space
-IF !userheapvar
-        defc userheapvar = 0
-ENDIF
-IF userheapvar = 1
-heapblocks:	defw	0	;Number of free blocks
-heaplast:	defw	0 	;Pointer to linked blocks
-ENDIF
 
-SECTION bss_fardata
+
+
+IF DEFINED_farheapsz
+    IF !safedata
+        SECTION crt0_init_bss
+        INCLUDE "init_far.asm"
+
+        SECTION bss_fardata
 ; If we use safedata then we can't have far memory
-IF !safedata
-        IF !DEFINED_defvarsaddr
-                DEFINE DEFINED_defvarsaddr
-                defc defvarsaddr = 8192
-        ENDIF
-	org	defvarsaddr
-	IF DEFINED_farheapsz
-	pool_table:     defs    224
-	malloc_table:	defw	0
-	farpages:	defw	1
-	farmemspec:	defb	1
-	copybuff:	defs	258
-	actual_malloc_table: defs ((farheapsz/256)+1)*2
-	ENDIF
+        PUBLIC          pool_table
+        PUBLIC          malloc_table
+        PUBLIC          farpages
+        PUBLIC          farmemspec
+        pool_table:     defs    224
+        malloc_table:   defw    0
+        farpages:       defw    1
+        farmemspec:     defb    1
+        copybuff:       defs    258
+        actual_malloc_table: defs ((farheapsz/256)+1)*2
+    ENDIF
 ENDIF
-SECTION bss_compiler
-
-
-
-
-SECTION bss_clib
-SECTION bss_error

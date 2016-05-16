@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.13 2016-04-04 17:09:25 dom Exp $
+; $Id: z88_crt0.asm,v 1.14 2016-05-16 20:11:32 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -74,9 +74,6 @@ IF DEFINED_startup
         ENDIF
         IF (startup=2)
                 INCLUDE "app_crt0.asm"
-        ENDIF
-        IF (startup=3)
-                INCLUDE "rel_crt0.asm"
         ENDIF
 	IF (startup=4)
 		INCLUDE "dev_crt0.asm"

@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.17 2016-05-15 20:15:44 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.18 2016-05-16 20:11:32 dom Exp $
 
 
 
@@ -196,20 +196,6 @@ IF DEFINED_farheapsz
         PUBLIC    pool_table
         INCLUDE "init_far.asm"
 
-; Variables that can't be place in the normal defvars
-copybuff:	defs	258
-actual_malloc-table:
-		defs	((farheapsz/256)+1)*2
-
-; Now some memory shared with Forth - same as application setup
-DEFVARS 8192
-{
-        pool_table      ds.b    224
-        malloc_table    ds.w    1
-        farpages        ds.w    1
-        farmemspec      ds.b    1
-}
-ENDIF
 
 ;--------
 ; This bit of code allows us to use OZ ptrs transparently
@@ -300,77 +286,37 @@ shellapi_back:
 	ret
 
 
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
+;--------
+; Which printf core routine do we need?
+;--------
+        INCLUDE "crt0_runtime_selection.asm"
+
+
+
+
+IF DEFINED_farheapsz
+	defc	bss_fardata_start = 8192
+	defc	bss_compiler_start = ASMTAIL_bss_crt
 ENDIF
 
-
-;-----------
-; Now some variables
-;-----------
-l_erraddr:	defw	0	; BASIC error handler address
-l_errlevel:	defb	0	; And error level
+	INCLUDE	"crt0_section.asm"
 
 
-coords:         defw	0	; Current graphics xy coordinates
-base_graphics:  defw	0	; Address of the Graphics map
-gfx_bank:       defb    0	; And the bank
+IF DEFINED_farheapsz
+	SECTION	crt0_init_bss
+	INCLUDE	"init_far.asm"
 
-
-exitsp:		defw	0	; Address of where the atexit() stack is
-exitcount:	defb	0	; How many routines on the atexit() stack
-
-IF DEFINED_NEED1bitsound
-snd_asave:      defb    0	; Sound variable
-snd_tick:       defb    0	;  "      "
-bit_irqstatus:	defw	0
-ENDIF
-
-
-heaplast:	defw	0	; Address of last block on heap
-heapblocks:	defw 	0	; Number of blocks
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-
-packintrout:	defw	0	; Address of user interrupt routine
-
-saveix:		defw	0	; Save ix for system() calls
-saveiy:		defw	0	; Save iy for system() calls
-
-
-;-----------
-; Unnecessary file signature
-;-----------
-		defm	"Small C+ z88shell"
-end:		defb	0
-
-;-----------
-; Floating point
-;-----------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-
-fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
-extra:          defs    6		; Extra register temp store
-fa:             defs    6		; ""
-fasign:         defb    0		; ""
-
+        SECTION bss_fardata
+; If we use safedata then we can't have far memory
+	PUBLIC		pool_table
+	PUBLIC		malloc_table
+	PUBLIC		farpages
+	PUBLIC		farmemspec
+        pool_table:     defs    224
+        malloc_table:   defw    0
+        farpages:       defw    1
+        farmemspec:     defb    1
+        copybuff:       defs    258
+        actual_malloc_table: defs ((farheapsz/256)+1)*2
 ENDIF
 

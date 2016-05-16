@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.17 2016-05-15 20:15:44 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.18 2016-05-16 20:11:32 dom Exp $
 ;
 ; - - - - - - -
 
@@ -116,85 +116,5 @@ montest: ld	a,(1)	; "T" monitor or NAS-SYS?
          defb	0
 
         INCLUDE "crt0_runtime_selection.asm"
-
-    SECTION code_crt_init
-crt_init_start:
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
-	xor	a
-	ld	(exitcount),a
-    ;; Code gets placed in this section
-    SECTION code_crt_exit
-    	ret
-
-    SECTION code_compiler
-    SECTION code_clib
-    SECTION code_crt0_sccz80
-    SECTION code_l_sdcc
-    SECTION code_math
-    SECTION code_error
-    SECTION data_compiler
-    SECTION data_clib
-    SECTION rodata_compiler
-    SECTION rodata_clib
-    SECTION smc_clib
-    SECTION bss_crt
-
-
-;-----------
-; Define the file table
-;-----------
-__sgoioblk:
-	INCLUDE	"stdio_fp.asm"
-
-
-;-----------
-; Now some variables
-;-----------
-coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    0       ; Address of the Graphics map
-
-
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-
-;-----------------------
-; Floating point support
-;-----------------------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-extra:          defs    6               ;FP register
-fa:             defs    6               ;FP Accumulator
-fasign:         defb    0               ;FP register
-ENDIF
-
-    SECTION bss_error
-    SECTION bss_compiler
-    SECTION bss_clib
+	INCLUDE "crt0_section.asm"
 

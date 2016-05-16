@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.31 2016-05-15 20:15:44 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.32 2016-05-16 20:11:32 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -39,30 +39,6 @@
 
 	PUBLIC    cleanup		;jp'd to by exit()
 	PUBLIC    l_dcal		;jp(hl)
-
-
-	PUBLIC    exitsp		;atexit() variables
-	PUBLIC    exitcount
-
-	PUBLIC    heaplast        ;Near malloc heap variables
-	PUBLIC    heapblocks      ;
-
-	PUBLIC    __sgoioblk	;std* control block
-
-	PUBLIC	__fcb		;file control block
-
-;-----------------------
-; Target specific labels
-;-----------------------
-
-	PUBLIC	snd_tick	; for sound code, if any
-	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
-IF !DEFINED_nogfxglobals
-	PUBLIC    _vdcDispMem	; pointer to disp. memory for C128
-	PUBLIC	RG0SAV		; keeping track of VDP register values (Einstein)
-	PUBLIC	pixelbyte	; VDP gfx driver, byte temp storage
-	PUBLIC	coords
-ENDIF
 
 
 IF (startup=2)
@@ -106,7 +82,7 @@ ENDIF
 ENDIF
 
 	ld      (start1+1),sp	;Save entry stack
-        call    crt_init_start  ;Initialise any data setup by sdcc
+        call    crt0_init_bss   ;Initialise any data setup by sdcc
 	ld	a,($80)		;byte count of length of args
 	inc	a		;we can use this since args are space separated
 	neg
@@ -124,7 +100,6 @@ ENDIF
 IF DEFINED_USING_amalloc
     INCLUDE "amalloc.def"
 ENDIF
-	call	crt_init_start
 
 
 ; Push pointers to argv[n] onto the stack now
@@ -274,121 +249,58 @@ l_dcal:	jp	(hl)		;Used for call by function ptr
 IF NEED_floatpack
         INCLUDE         "float.asm"
 ENDIF
-         	defm  	"Small C+ CP/M"
+        defm  	"Small C+ CP/M"
 
         INCLUDE "crt0_runtime_selection.asm"
 
+	INCLUDE	"crt0_section.asm"
+
     SECTION code_crt_init
-crt_init_start:
-IF !DEFINED_nostreams
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
 	ld	c,25
 	call	5
 	ld	(defltdsk),a
-ENDIF
-    ;; Code gets placed in this section
-    SECTION code_crt_exit
-    ret
-
-    SECTION code_compiler
-    SECTION code_clib
-    SECTION code_crt0_sccz80
-    SECTION code_l_sdcc
-    SECTION code_math
-    SECTION code_error
-    SECTION data_compiler
-    SECTION data_clib
-    SECTION rodata_compiler
-    SECTION rodata_clib
-    SECTION smc_clib
-    SECTION bss_crt
-
-;------------------------
-; The stdio control block
-;------------------------
+IF !DEFINED_noredir
 IF !DEFINED_nostreams
-__sgoioblk:
-	INCLUDE	"stdio_fp.asm"
+	ld	a,'w'
+	ld	(redir_fopen_flag),a
+	ld	a,'r'
+	ld	(redir_fopen_flagr),a
+ENDIF
 ENDIF
 
-
+    SECTION bss_crt
 
 ;-----------------------
 ; Some startup variables
 ;-----------------------
-
+		PUBLIC	defltdsk
 defltdsk:       defb    0	;Default disc
-exitsp:		defw	0	;Address of atexit() stack
-exitcount:	defb	0	;Number of atexit() routinens
-heaplast:	defw	0	;Pointer to last free heap block
-heapblocks:	defw	0	;Number of heap blocks available
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-	defw ASMTAIL	; Location of the last program byte
-	defw 0
-ENDIF
 
 IF !DEFINED_nofileio
+		PUBLIC	__fcb
 __fcb:		defs	420,0	;file control block (10 files) (MAXFILE)
 ENDIF
 
 
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
-
 ;-----------------------------------------------------
 ; Unneccessary file signature + target specific stuff
 ;-----------------------------------------------------
+		PUBLIC	_vdcDispMem
 _vdcDispMem:				; Label used by "c128cpm.lib" only
-base_graphics:				; various gfx drivers
 end:		defb	0		; null file name
 IF !DEFINED_nogfxglobals
+		PUBLIC	RG0SAV
+		PUBLIC	pixelbyte
 RG0SAV:		defb	0		; VDP graphics driver (Einstein)
 pixelbyte:	defb	0		; temp byte storage for VDP driver
-coords:		defw    0       ; Current graphics xy coordinates
 ENDIF
 
 
-;----------------------------------------------
-; Floating point support routines and variables
-;----------------------------------------------
-IF NEED_floatpack
-fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
-extra:          defs    6		; FP spare register
-fa:             defs    6		; FP accumulator
-fasign:         defb    0		; FP variable
-
-ENDIF
 
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-redir_fopen_flag:
-				defb 'w'
-				defb 0
-redir_fopen_flagr:
-				defb 'r'
-				defb 0
+redir_fopen_flag:		defw	0
+redir_fopen_flagr:		defw	0
 ENDIF
 ENDIF
-
-
-
-
-    SECTION bss_compiler
-    SECTION bss_clib
-    SECTION bss_error
 
