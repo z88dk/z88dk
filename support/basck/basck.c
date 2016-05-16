@@ -7,15 +7,46 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.10 2016-05-12 16:19:01 stefano Exp $
+ *   $Id: basck.c,v 1.11 2016-05-16 07:21:06 stefano Exp $
  */
 
 unsigned char  *img;
 long  len, pos, pos2;
 long  jptab;
 int  l;
+char token[1000];
+int address;
+
+/* For the SKOOL mode, refer to:  http://pythonhosted.org/skoolkit */
+/* usage example in skool mode:
+		basck -ctl p2000.bin > p2000.ctl
+		---> we look into the created file and see:  "(Detected position for ORG:  4096)"
+		python sna2skool.py p2000.bin -o 4096 -h > p2000.skool    <--  it will pick the "ctl" file automatically, use '.bin' extension for the original binary file
+		python skool2asm.py -H -c p2000.skool > p2000.asm
+		
+		
+  Getting the most from the SkoolKit automations:
+  (always use '.bin' extension for the original binary file)
+   
+	python sna2skool.py p2000.bin -g p2000.ct -o 4096 -h > /dev/null   <- prepare a control file automatically (use basck to check the position for ORG)
+	basck -ctl p2000.bin > p2000.ctl                                        <- get extra infos from the basck tools
+	cat p2000.ct >> p2000.ctl                                          <- merge it all
+	python sna2skool.py p2000.bin -o 4096 -h > p2000.skool             <- do the final run
+	python skool2asm.py -H -c p2000.skool > p2000.asm
+	
+
+  If you wish you may add more detail using the already existing z88dk DEF files, e.g.:
+	awk {'print "@ " $4 " label="$2'} /z88dk/lib/msxbios.def >> msx.ctl
+	awk -F "[=;]" {'print "D " $2 $3'}  /z88dk/lib/msxbios.def >> msx.ctl
+  
+*/
+
+
+int SKOOLMODE = -1;
+
 
 #include <stdio.h>
+#include <string.h>
 /* stdlib.h MUST be included to really open files as binary */
 #include <stdlib.h>
 #include <malloc.h>
@@ -299,7 +330,26 @@ int half_skel2[]={12, SKIP_CALL, 33, CATCH, CATCH, SKIP_CALL, 0x18, 3, SKIP_CALL
 int half_skel3[]={13, SKIP_CALL, 33, CATCH, CATCH, SKIP_CALL, 0xc3, SKIP, SKIP, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x78};
 int half_skel4[]={11, SKIP_CALL, 33, CATCH, CATCH, SKIP_CALL, 0xC1, 0xD1, SKIP_CALL, 0x28, SKIP, 0x78};
 
+int bnorm_skel[]={12, ADDR, 0x68, 0x63, 0xAF, 0x47, 0x79, 0xB7, 0xC2, SKIP, SKIP, 0x4A, 0x54};
+int bnorm_skel2[]={11, ADDR, 0x68, 0x63, 0xAF, 0x47, 0x79, 0xB7, 0x28, SKIP, 0x4A, 0x54};
+int plucde_skel[]={11, ADDR, 0x7E, 0x83, 0x5F, 0x23, 0x7E, 0x8A, 0x57, 0x23, 0x7E, 0x89};
+int compl_skel[]={12, ADDR, 33, SKIP, SKIP, 0x7E, 0x2F, 0x77, 0xAF, 0x6F, 0x90, 0x47, 0x7D};
 
+int sgnres_skel[]={11, 33, CATCH, CATCH, 0x7E, 0x2F, 0x77, 0xAF, 0x6F, 0x90, 0x47, 0x7D};
+int shrite_skel[]={13, 6, 0, 0xD6, 8, 0xDA, CATCH, CATCH, 0x43, 0x5A, 0x51, 0x0E, 0, 0xC3};
+int shrite_skel2[]={9, ADDR, 0xC6, 9, 0x6F, 0xAF, 0x2D, 0xC8, 0x79, 0x1F};
+int scale_skel[]={11, ADDR, 6, 0, 0xD6, 8, 0x38, SKIP, 0x43, 0x5A, 0x51, 0x0E, 0, 0xC3};
+int scale_skel2[]={14, ADDR, 6, 0, 0xD6, 8, 0xDA, CATCH, CATCH, 0x43, 0x5A, 0x51, 0x0E, 0, 0xC3};
+/*
+SHRITE: ADD     A,8+1           ; Adjust count
+        LD      L,A             ; Save bits to shift
+SHRLP:  XOR     A               ; Flag for all done
+        DEC     L               ; All shifting done?
+        RET     Z               ; Yes - Return
+        LD      A,C             ; Get MSB
+SHRT1:  RRA                     ; Shift it right
+
+*/
 int fpthl_skel[]={10, ADDR, 17, SKIP, SKIP, 6, 4, 0x1A, 0x77, 0x13, 0x23};
 
 /* connected to 'ASCTFP' */
@@ -515,9 +565,55 @@ int cpdehl_loc_skel2[]={7, 0xD0, 0xE5, 0xF5, 0x21, 0x98, 0x19, CATCH_CALL};
 int buffer_loc_skel[]={9,  0x21, CATCH, CATCH, 0x12, 0x13, 0x12, 0x13, 0x12, 0xC9,};
 int buffer_loc_skel2[]={10,  0x21, CATCH, CATCH, 0xAF, 0x12, 0x13, 0x12, 0x13, 0x12, 0xC9,};
 
+/* DATA label declaration */
+int dlbl(label, position, comment) {
+if (SKOOLMODE) {
+	printf("@ $%04x label=%s\n", position, label);
+	printf("D $%04x %s\n", position, comment);
+} else
+	printf("%s \t= $%04X   ; %s\n", label, position, comment);
+}
 
 
+/* CODE label declaration */
+int clbl(label, position, comment) {
+if (SKOOLMODE) {
+	printf("@ $%04x label=%s\n", position, label);
+	printf("c $%04x %s\n", position, comment);
+} else
+	printf("%s \t= $%04X   ; %s\n", label, position, comment);
+}
 
+void clear_token () {
+	//sprintf (token,"");
+    token[0]  = '\0';
+
+}
+
+void append_c(char c) {
+	int sl;
+	sl=strlen(token);
+	switch (c) {
+		case '(':
+			token[sl] = '_';
+			token[sl+1] = '\0';
+			break;
+		/*
+		case '$':
+			token[sl] = '_';
+			token[sl+1] = 'S';
+			token[sl+2] = '\0';
+			break;
+			*/
+		default:
+			token[sl] = c;
+			token[sl+1] = '\0';
+			break;
+	}
+}
+
+/* This is the core engine of the tool.. peep into the code, identify a known fingerprint, 
+   and extract its position, a value, or a referred address */
 
 int find_in_skel (int *skel, int p) {
 	int i, j, retval;
@@ -633,12 +729,28 @@ int main(int argc, char *argv[])
 	int new_tk_found;
 
 
+	if (argc !=3) {
+		printf("USAGE:\n");
+		printf("basck <-ctl|-map> basic.bin\n");
+		exit(1);
+	}
 
-	if ( (fpin=fopen(argv[1],"rb") ) == NULL ) {
+	if (!strcmp(argv[1], "-ctl"))
+		SKOOLMODE=1;
+	
+	if (!strcmp(argv[1], "-map"))
+		SKOOLMODE=0;
+	
+	if ( (fpin=fopen(argv[2],"rb") ) == NULL ) {
 		printf("Can't open input file\n");
 		exit(1);
 	}
 
+	if (SKOOLMODE<0) {
+		printf("Invalid parameter.  Usage:\n");
+		printf("basck <-ctl|-map> basic.bin\n");
+		exit(1);
+	}
 
 /*
  *	Now we try to determine the size of the file
@@ -664,13 +776,13 @@ int main(int argc, char *argv[])
 		img[i]=getc(fpin);
 	}
 
-	printf("\nFile size: %d\n",i);
+	printf("\n# File size: %d\n",i);
 
 	res=find_skel(ldir_skel);
 	if (res<0) 
 		res=find_skel(ldir_skel2);
 	if (res>0)
-		printf("\nSpecific Z80 CPU code detected\n\n");
+		printf("\n# Specific Z80 CPU code detected\n\n");
 
 	
 	
@@ -688,16 +800,16 @@ int main(int argc, char *argv[])
 	}
 
 	if (res>0) {
-		printf("\nMicrosoft 8080/Z80 BASIC found\n");
+		printf("\n# Microsoft 8080/Z80 BASIC found\n");
 		
 		brand=find_skel(tkmsbasic_ex_skel);
 		if (brand>0)
-			printf("  Extended BASIC detected\n");
+			printf("#  Extended BASIC detected\n");
 			else {
 				brand=find_skel(microsoft_extended_skel);
 				if (brand>0)
-					printf("  Extended syntax detected (classic version)\n");
-					else printf("  Earlier version\n");
+					printf("#  Extended syntax detected (classic version)\n");
+					else printf("#  Earlier version\n");
 			}
 
 		brand=find_skel(microsoft_defdbl_skel);
@@ -706,12 +818,12 @@ int main(int argc, char *argv[])
 		if (brand<0)
 			brand=find_skel(microsoft_defdbl_skel3);
 		if (brand>0)
-			printf("  Double precision maths detected\n");
+			printf("#  Double precision maths detected\n");
 
 		brand=find_skel(microsoft_skel);
 		if (brand>0)
-			printf("  Microsoft signature found\n");
-			else printf("  Microsoft signature not found\n");
+			printf("#  Microsoft signature found\n");
+			else printf("#  Microsoft signature not found\n");
 
 		
 		printf("\n");
@@ -719,17 +831,19 @@ int main(int argc, char *argv[])
 
 		/* We refer to a common ROM subroutine to determine the correct code position */
 		
-		printf("\nBASTXT = $%04X  ; BASIC program start ptr\n",res);
+		
+		printf("\n");
+		dlbl("BASTXT", res, "BASIC program start ptr");
 
 		printf("\n");
 
 		pos=find_skel(cpdehl_skel);
 		if (pos>0) {
-			printf("CPDEHL = $%04X  ; compare DE and HL",pos);
+			printf ("\n#    CPDEHL (compare DE and HL), code found at $%04X", pos);
 			/* Canon X-07 hack */
 			if (pos==0x3E44) {
 				pos=0xB000;
-				printf("\n    (Canon X-07 hack.. shifting to position $%04X,  *work in progress*)",pos);
+				printf("\n#    (Canon X-07 hack.. shifting to position $%04X,  *work in progress*)",pos);
 			}
 			else {
 				res=find_skel(cpdehl_loc_skel);
@@ -738,30 +852,12 @@ int main(int argc, char *argv[])
 				if (res>0) {
 					pos=res-pos-1;
 					if (pos>=0)
-						printf("\n    (Detected position for ORG:  $%04X)",pos);
+						printf("\n#    (Detected position for ORG:  %d)",pos);
 					else pos=0;
 				} else pos=0;
 			}
 		}
  
-		
-/*
-		res=find_skel(tstsgn_skel);
-		if (res<0)
-			res=find_skel(tstsgn_skel2);
-		if (res<0)
-			res=find_skel(tstsgn_skel3);
-		printf ("\ntstsgn_skel $%04X,  ",res);
-		pos2=find_skel(tstsgn_loc_skel);
-		if (pos2<0)
-			pos2=find_skel(tstsgn_loc_skel);
-		printf (" tstsgn_loc_skel $%04X,   ",pos2);
-		res=find_skel(dbl_tstsgn_skel);
-		if (res<0)
-			res=find_skel(dbl_tstsgn_skel2);
-		printf (" dbl_tstsgn_skel $%04X,  ",res);
-*/	
-		
 		res=find_skel(tstsgn_skel);
 		if (res<0)
 			res=find_skel(tstsgn_skel2);
@@ -772,7 +868,7 @@ int main(int argc, char *argv[])
 			pos2=find_skel(tstsgn_loc_skel);
 		if ((res>0) && (pos2>0)) {
 			pos=pos2-res-1;
-			printf("\n    (Detected position basing on TSTSGN:  $%04X)",pos);
+			printf("\n#    (Detected position basing on TSTSGN:  %d)",pos);
 			//pos=-pos;
 		}
 		
@@ -780,7 +876,7 @@ int main(int argc, char *argv[])
 		pos2=find_skel(dvbcde_org_skel);
 		if ((res>0) && (pos2>0)) {
 			pos=pos2-res+1;
-			printf("\n    (Detected position basing on DVBCDE:  $%04X)",pos);
+			printf("\n#    (Detected position basing on DVBCDE:  %d)",pos);
 		}
 		
 		if (pos==-1) pos=0;
@@ -795,7 +891,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(inport_skel3);
 		if (res>0)
-			printf("INPORT = $%04X  ; Current port for 'INP' function\n",res);
+			dlbl("INPORT", res, "Current port for 'INP' function");
 
 		res=find_skel(otport_skel);
 		if (res<0)
@@ -803,23 +899,23 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(otport_skel3);
 		if (res>0)
-			printf("OTPORT = $%04X  ; Current port for 'OUT' statement\n",res);
+			dlbl("OTPORT", res, "Current port for 'OUT' statement");
 
 		res=find_skel(ms_rnd_seed);
 		if (res>0)
-			printf("SEED   = $%04X  ; Seed for RND numbers\n",res+2);
+			dlbl("SEED", res+2, "Seed for RND numbers");
 
 		res=find_skel(ms_lstrnd);
 		if (res<0)
 			res=find_skel(ms_lstrnd2);
 		if (res>0)
-			printf("LSTRND = $%04X  ; Last RND number\n",res+2);
+			dlbl("LSTRND2", res+2, "Last RND number");
 
 		res=find_skel(buffer_loc_skel);
 		if (res<0)
 			res=find_skel(buffer_loc_skel2);
 		if (res>0)
-			printf("BUFFER = $%04X  ; Start of input buffer\n",res);
+			dlbl("BUFFER", res, "Start of input buffer");
 
 		res=find_skel(tmstpt_skel);
 		if (res<0)
@@ -829,7 +925,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(tmstpt_skel4);
 		if (res>0)
-			printf("TMSTPT = $%04X  ; Temporary string pool pointer\n",res);
+			dlbl("TMSTPT", res, "Temporary string pool pointer");
 		
 		res=find_skel(tmpstr_skel);
 		if (res<0)
@@ -837,31 +933,31 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(tmpstr_skel3);
 		if (res>0)
-			printf("TMPSTR = $%04X  ; Temporary string\n",res);
+			dlbl("TMPSTR", res, "Temporary string");
 		
 		res=find_skel(nxtopr_skel);
 		if (res<0)
 			res=find_skel(nxtopr_skel2);
 		if (res>0)
-			printf("NXTOPR = $%04X  ; Address ptr to next operator\n",res);
+			dlbl("NXTOPR", res, "Address ptr to next operator");
 
 		res=find_skel(curpos_skel);
 		if (res<0)
 			res=find_skel(curpos_skel2);
 		if (res>0)
-			printf("CURPOS = $%04X  ; Character position on line (cursor position)\n",res);
+			dlbl("CURPOS", res, "Character position on line (cursor position)");
 		
 		res=find_skel(prognd_skel);
 		if (res<0)
 			res=find_skel(prognd_skel2);
 		if (res>0)
-			printf("PROGND = $%04X  ; BASIC program end ptr\n",res);
+			dlbl("PROGND", res, "BASIC program end ptr");
 
 		res=find_skel(varend_skel);
 		if (res<0)
 			res=find_skel(varend_skel2);
 		if (res>0)
-			printf("VAREND = $%04X  ; End of variables\n",res);
+			dlbl("VAREND", res, "End of variables");
 
 		res=find_skel(arrend_skel);
 		if (res<0)
@@ -869,23 +965,27 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(arrend_skel3);
 		if (res>0)
-			printf("ARREND = $%04X  ; End of arrays (lowest free mem)\n",res);
+			dlbl("ARREND", res, "End of arrays (lowest free mem)");
+
+		res=find_skel(sgnres_skel);
+		if (res>0)
+			dlbl("SGNRES", res, "Sign of result");
 
 		
 		printf("\n");
 
-		
+
 		res=find_skel(halfpi_skel);
 		if (res<0)
 			res=find_skel(halfpi_skel2);
 		if (res<0)
 			res=find_skel(halfpi_skel3);
 		if (res>0)
-			printf("HALFPI = $%04X  ; Half PI constant ptr\n",res);
+			dlbl("HALFPI", res, "Half PI constant ptr");
 		
 		res=find_skel(unity_skel);
 		if (res>0)
-			printf("UNITY  = $%04X  ; Constant ptr for number 1 in FP\n",res);
+			dlbl("UNITY", res, "Constant ptr for number 1 in FP");
 		
 		res=find_skel(half_skel);
 		if (res<0)
@@ -895,11 +995,11 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(half_skel4);
 		if (res>0)
-			printf("HALF   = $%04X  ; Constant ptr for number 0.5 in FP\n",res);
+			dlbl("HALF", res, "Constant ptr for number 0.5 in FP");
 		
 		res=find_skel(logtab_skel);
 		if (res>0)
-			printf("LOGTAB = $%04X  ; Table used by LOG\n",res);
+			dlbl("LOGTAB", res, "Table used by LOG");
 		
 		printf("\n");
 
@@ -911,32 +1011,36 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(fpreg_skel4);
 		if (res>0)
-			printf("FPREG  = $%04X  ; Floating Point Register\n",res);
+			dlbl("FPREG", res, "Floating Point Register");
 
 		res=find_skel(last_fpreg_skel);
 		if (res<0)
 			res=find_skel(last_fpreg_skel2);
 		if (res>0)
-			printf("LAST_FPREG  = $%04X  ; Last byte in Single Precision FP Register (+sign bit)\n",res);
+			dlbl("LAST_FPREG", res, "Last byte in Single Precision FP Register (+sign bit)");
 		
 		res=find_skel(fpexp_skel);
 		if (res<0)
 			res=find_skel(fpexp_skel2);
 		if (res>0)
-			printf("FPEXP  = $%04X  ; Floating Point Exponent\n",res);
+			dlbl("FPEXP", res, "Floating Point Exponent");
 
 
 		res=find_skel(dblfpreg_skel);
 		if (res>0)
-			printf("DBL_FPREG  = $%04X  ; Double Precision Floating Point Register\n",res);
+			dlbl("DBL_FPREG", res, "Double Precision Floating Point Register");
 
 		res=find_skel(dbllast_fpreg_skel);
 		if (res>0)
-			printf("DBL_LAST_FPREG  = $%04X  ; Last byte in Double Precision FP register (+sign bit)\n",res);
+			dlbl("DBL_LAST_FPREG", res, "Last byte in Double Precision FP register (+sign bit)");
 		
 		
 		printf("\n");
 
+		res=find_skel(cpdehl_skel);
+		if (res>0)
+			clbl("CPDEHL", res+pos+1, "compare DE and HL");
+		
 		res=find_skel(getint_skel);
 		if (res<0)
 			res=find_skel(getint_skel2);
@@ -947,7 +1051,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(getint_skel5);
 		if (res>0)
-			printf("GETINT = $%04X  ; Get a number to 'A'\n",res);
+			clbl("GETINT", res, "Get a number to 'A'");
 
 		res=find_skel(getnum_skel);
 		if (res<0)
@@ -955,7 +1059,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(getnum_skel3);
 		if (res>0)
-			printf("GETNUM = $%04X  ; BASIC interpreter entry to get a number\n",res);
+			clbl("GETNUM", res, "BASIC interpreter entry to get a number");
 
 		res=find_skel(depint_skel);
 		if (res<0)
@@ -963,28 +1067,28 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(depint_skel3);
 		if (res>0)
-			printf("DEPINT = $%04X  ; Get integer variable to DE, error if negative\n",res);
+			clbl("DEPINT", res, "Get integer variable to DE, error if negative");
 
 		res=find_skel(getvar_skel);
 		if (res<0)
 			res=find_skel(getvar_skel2);
 		if (res>0)
-			printf("GETVAR = $%04X  ; Get variable address to DE\n",res);
+			clbl("GETVAR", res, "Get variable address to DE");
 
 		res=find_skel(chkstk_skel);
 		if (res>0)
-			printf("CHKSTK = $%04X  ; Check for C levels of stack\n",res);
+			clbl("CHKSTK", res, "Check for C levels of stack");
 		else {
 			res=find_skel(chkstk_skel2);
 			if (res>0)
-				printf("CHKSTK = $%04X  ; Check for C levels of stack\n",res+pos+1);
+				clbl("CHKSTK", res+pos+1, "Check for C levels of stack");
 		}
 
 		res=find_skel(oprnd_skel);
 		if (res<0)
 			res=find_skel(oprnd_skel2);
 		if (res>0)
-			printf("OPRND  = $%04X  ; Get next expression value\n",res);
+			clbl("OPRND", res, "Get next expression value");
 
 		res=find_skel(chksyn_skel);
 		if (res<0)
@@ -992,43 +1096,43 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(chksyn_skel3);
 		if (res>0)
-			printf("CHKSYN = $%04X  ; A byte follows to be compared\n",res);
+			clbl("CHKSYN", res, "A byte follows to be compared");
 
 		res=find_skel(lfrgnm_skel);
 		if (res<0)
 			res=find_skel(lfrgnm_skel2);
 		if (res>0)
-			printf("LFRGNM = $%04X  ; Get number in program listing and check for ending ')'\n",res+pos+1);
+			clbl("LFRGNM", res+pos+1, "number in program listing and check for ending ')'");
 
 		res=find_skel(fpsint_skel);
 		if (res<0)
 			res=find_skel(fpsint_skel2);
 		if (res>0) {
-			printf("FPSINT = $%04X  ; Get subscript (0-32767)\n",res+pos+1);
-			printf("POSINT = $%04X  ; Get integer 0 to 32767\n",res+pos+4);
-			printf("DEINT  = $%04X  ; Get integer variable (-32768 to 32767) to DE\n",res+pos+13);
+			clbl("FPSINT", res+pos+1, "Get subscript (0-32767)");
+			clbl("POSINT", res+pos+4, "Get integer 0 to 32767");
+			clbl("DEINT", res+pos+13, "Get integer variable (-32768 to 32767) to DE");
 		}
 		
 		res=find_skel(abpass_skel);
 		if (res<0)
 			res=find_skel(abpass_skel2);
 		if (res>0)
-			printf("ABPASS = $%04X  ; Get back from function passing an INT value in A+B registers\n",res+pos+2);
+			clbl("ABPASS", res+pos+2, "Get back from function passing an INT value in A+B registers");
 		
 		res=find_skel(hlpass_skel);
 		if (res>0)
-			printf("HLPASS = $%04X  ; Get back from function passing an INT value HL\n",res+pos+1);
+			clbl("HLPASS", res+pos+1, "Get back from function passing an INT value HL");
 
 
 		res=find_skel(midnum_skel);
 		if (res>0)
-			printf("MIDNUM = $%04X  ; Get number in program listing\n",res+pos);
+			clbl("MIDNUM", res+pos, "Get number in program listing");
 		
 		printf("\n");
 
 		res=find_skel(test_type_skel);
 		if (res>0)
-			printf("TEST_TYPE = $%04X  ; Test number (Precision mode, etc..)\n",res);
+			clbl("TEST_TYPE", res, "Test number (Precision mode, etc..)");
 		
 		res=find_skel(tstsgn_skel);
 		if (res<0)
@@ -1036,31 +1140,31 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(tstsgn_skel3);
 		if (res>0)
-			printf("TSTSGN = $%04X  ; Test sign of FPREG\n",res+pos+1);
+			clbl("TSTSGN", res+pos+1, "Test sign of FPREG");
 
 		res=find_skel(dbl_tstsgn_skel);
 		if (res<0)
 			res=find_skel(dbl_tstsgn_skel2);
 		if (res>0)
-			printf("_TSTSGN = $%04X  ; Test sign in number\n",res);
+			clbl("_TSTSGN", res, "Test sign in number");
 
 
 		res=find_skel(invsgn_skel);
 		if (res<0)
 			res=find_skel(invsgn_skel2);
 		if (res>0)
-			printf("INVSGN = $%04X  ; Invert number sign\n",res);
+			clbl("INVSGN", res, "Invert number sign");
 
 		res=find_skel(stakfp_skel);
 		if (res>0) {
-			printf("STAKFP = $%04X  ; Put FP value on stack\n",res+pos+1);
+			clbl("STAKFP", res+pos+1, "Put FP value on stack");
 		}
 		
 		res=find_skel(negaft_skel);
 		if (res<0)
 			res=find_skel(negaft_skel2);
 		if (res>0)
-			printf("NEGAFT = $%04X  ; Negate number\n",res);
+			clbl("NEGAFT", res, "Negate number");
 
 		res=find_skel(log_skel);
 		if (res<0)
@@ -1074,7 +1178,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(log_skel6);
 		if (res>0)
-			printf("LOG    = $%04X  ; \n",res+pos+1);
+			clbl("LOG", res+pos+1, "LOG");
 
 		res=find_skel(sqr_skel);
 		if (res<0)
@@ -1086,7 +1190,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(sqr_skel5);
 		if (res>0)
-			printf("SQR    = $%04X  ; \n",res+pos+1);
+			clbl("SQR", res+pos+1, "SQR");
 		
 		res=find_skel(power_skel);
 		if (res<0)
@@ -1096,11 +1200,11 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(power_skel4);
 		if (res>0)
-			printf("POWER  = $%04X  ; \n",res+pos+1);
+			clbl("POWER", res+pos+1, "POWER");
 
 		res=find_skel(exp_skel);
 		if (res>0)
-			printf("EXP    = $%04X  ; \n",res+pos+1);
+			clbl("EXP",res+pos+1, "EXP");
 
 		res=find_skel(cos_skel);
 		if (res<0)
@@ -1110,7 +1214,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(cos_skel4);
 		if (res>0)
-			printf("COS    = $%04X  ; \n",res+pos);
+			clbl("COS", res+pos, "COS");
 		
 		res=find_skel(sin_skel);
 		if (res<0)
@@ -1120,7 +1224,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(sin_skel4);
 		if (res>0)
-			printf("SIN    = $%04X  ; \n",res+pos);
+			clbl("SIN", res+pos, "SIN");
 
 		res=find_skel(tan_skel);
 		if (res<0)
@@ -1128,13 +1232,13 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(tan_skel3);
 		if (res>0)
-			printf("TAN    = $%04X  ; \n",res+pos+1);
+			clbl("TAN", res+pos+1, "TAN");
 
 		res=find_skel(atn_skel);
 		if (res<0)
 			res=find_skel(atn_skel2);
 		if (res>0)
-			printf("ATN    = $%04X  ; \n",res+pos+1);
+			clbl("ATN", res+pos+1, "ATN");
 
 		res=find_skel(abs_skel);
 		if (res<0)
@@ -1142,52 +1246,72 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(abs_skel3);
 		if (res>0)
-			printf("ABS    = $%04X  ; \n",res+pos+1);
+			clbl("ABS", res+pos+1, "ATN");
 		
 		res=find_skel(dblabs_skel);
 		if (res<0)
 			res=find_skel(dblabs_skel2);
 		if (res>0)
-			printf("DBL_ABS    = $%04X  ; \n",res+pos+1);
+			clbl("DBL_ABS", res+pos+1, "ABS (double precision BASIC variant)");
 		
 		res=find_skel(ms_rnd_skel);
 		if (res<0)
 			res=find_skel(ms_rnd_skel2);
 		if (res>0)
-			printf("RND    = $%04X  ; \n",res+pos+1);
+			clbl("RND", res+pos+1, "RND");
 		
 		res=find_skel(fpadd_skel);
 		if (res<0)
 			res=find_skel(fpadd_skel2);
 		if (res>0) {
-			printf("SUBCDE = $%04X  ; Subtract BCDE from FP reg\n",res+pos+1-3);
-			printf("FPADD  = $%04X  ; Add BCDE to FP reg\n",res+pos+1);
+			clbl("SUBCDE",res+pos+1-3, "Subtract BCDE from FP reg");
+			clbl("FPADD", res+pos+1, "Add BCDE to FP reg");
 		}
 		else {
 			res=find_skel(fpadd_skel3);
 			if (res<0)
 				res=find_skel(fpadd_skel4);
 			if (res>0) {
-				printf("SUBCDE = $%04X  ; Subtract BCDE from FP reg\n",res-3);
-				printf("FPADD  = $%04X  ; Add BCDE to FP reg\n",res);
+				clbl("SUBCDE",res-3, "Subtract BCDE from FP reg");
+				clbl("FPADD", res, "Add BCDE to FP reg");
 			}
 		}
 		
+		res=find_skel(bnorm_skel);
+		if (res<0)
+			res=find_skel(bnorm_skel2);
+		if (res>0)
+			clbl("BNORM", res+pos+1, "Normalise number");
+
+		res=find_skel(scale_skel);
+		if (res<0)
+			res=find_skel(scale_skel2);
+		if (res>0)
+			clbl("SCALE", res+pos+1, "Scale number in BCDE for A exponent (bits)");
+
+		res=find_skel(plucde_skel);
+		if (res>0)
+			clbl("PLUCDE", res+pos+1, "Add number pointed by HL to CDE");
+
+		res=find_skel(compl_skel);
+		if (res>0)
+			clbl("COMPL", res+pos+1, "Convert a negative number to positive");
+		
 		res=find_skel(fpthl_skel);
 		if (res>0)
-			printf("FPTHL  = $%04X  ; Copy number in FPREG to HL ptr\n",res+pos+1);
+			clbl("FPTHL", res+pos+1, "Copy number in FPREG to HL ptr");
 		else {
 			res=find_skel(fpthl_skel2);
 			if (res<0)
 				res=find_skel(fpthl_skel3);
 			if (res>0)
-			printf("FPTHL  = $%04X  ; Copy number in FPREG to HL ptr\n",res);
+			clbl("FPTHL", res, "Copy number in FPREG to HL ptr");
 		}
 		
 		res=find_skel(fpbcde_skel);
 		if (res>0) {
-			printf("PHLTFP = $%04X  ; Number at HL to BCDE\n",res+pos+1);
-			printf("FPBCDE = $%04X  ; Move BCDE to FPREG\n",res+pos+4);
+			clbl("PHLTFP", res+pos+1, "Number at HL to BCDE");
+			clbl("FPBCDE", res+pos+4, "Move BCDE to FPREG");
 		} else {
 			res=find_skel(fpbcde_skel2);
 			if (res<0)
@@ -1195,7 +1319,7 @@ int main(int argc, char *argv[])
 			if (res<0)
 				res=find_skel(fpbcde_skel4);
 			if (res>0)
-				printf("FPBCDE = $%04X  ; Move BCDE to FPREG\n",res);
+				clbl("FPBCDE", res, "Move BCDE to FPREG");
 			res=find_skel(phltfp_skel);
 			if (res<0)
 				res=find_skel(phltfp_skel2);
@@ -1208,7 +1332,7 @@ int main(int argc, char *argv[])
 			if (res<0)
 				res=find_skel(phltfp_skel6);
 			if (res>0)
-				printf("PHLTFP = $%04X  ; Number at HL to BCDE\n",res);
+				clbl("PHLTFP", res, "Number at HL to BCDE");
 		}
 		
 		
@@ -1218,21 +1342,21 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(addphl_skel3);
 		if (res>0)
-			printf("ADDPHL = $%04X  ; ADD number at HL to BCDE\n",res);
+			clbl("ADDPHL", res, "ADD number at HL to BCDE");
 		
 		res=find_skel(subphl_skel);
 		if (res>0)
-			printf("SUBPHL = $%04X  ; SUBTRACT number at HL from BCDE\n",res);
+			clbl("SUBPHL", res, "SUBTRACT number at HL from BCDE");
 		
 		res=find_skel(mlsp10_skel);
 		if (res<0)
 			res=find_skel(mlsp10_skel2);
 		if (res>0)
-			printf("MLSP10 = $%04X  ; Multiply number in FPREG by 10\n",res+pos+1);
+			clbl("MLSP10", res+pos+1, "Multiply number in FPREG by 10");
 
 		res=find_skel(fpmult_skel);
 		if (res>0)
-			printf("FPMULT = $%04X  ; Multiply BCDE to FP reg\n",res);
+			clbl("FPMULT", res, "Multiply BCDE to FP reg");
 
 		res=find_skel(div10_skel);
 		if (res<0)
@@ -1244,139 +1368,145 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(div10_skel5);
 		if (res>0)
-			printf("DIV10  = $%04X  ; Divide FP by 10\n",res+pos+1);
+			clbl("DIV10", res+pos+1, "Divide FP by 10");
 
 		res=find_skel(div_skel);
 		if (res>0)
-			printf("DIV    = $%04X  ; Divide FP by number on stack\n",res);
+			clbl("DIV", res, "Divide FP by number on stack");
 		else {
 			res=find_skel(div_skel2);
 			if (res>0)
-				printf("DIV    = $%04X  ; Divide FP by number on stack\n",res+pos+1);
+				clbl("DIV", res+pos+1, "Divide FP by number on stack");
 		}
 
 		res=find_skel(dvbcde_org_skel);
 		if (res>0)
-			printf("DVBCDE = $%04X  ; Divide FP by BCDE\n",res+pos+1);
+			clbl("DVBCDE", res+pos+1, "Divide FP by BCDE");
 		else {
 			res=find_skel(dvbcde_skel);
 			if (res>0)
-				printf("DVBCDE = $%04X  ; Divide FP by BCDE\n",res);
+				clbl("DVBCDE", res, "Divide FP by BCDE");
 		}
 
 		res=find_skel(dcbde_skel);
 		if (res>0)
-			printf("DCBCDE = $%04X  ; Dec FP value in BCDE\n",res+pos+1);
+			clbl("DCBCDE", res+pos+1, "Decrement FP value in BCDE");
 
 		res=find_skel(bcdefp_skel);
 		if (res>0) {
-			printf("BCDEFP = $%04X  ; Load FP reg to BCDE\n",res+pos+1);
+			clbl("BCDEFP", res+pos+1, "Load FP reg to BCDE");
 		}
-
+		
 		res=find_skel(loadfp_skel);
 		if (res>0)
-			printf("LOADFP = $%04X  ; Load FP value pointed by HL to BCDE\n",res+pos+1);
+			clbl("LOADFP", res+pos+1, "Load FP value pointed by HL to BCDE");
 		
+		res=find_skel(shrite_skel);
+		if (res>0)
+			clbl("SHRITE", res, "Shift right number in BCDE");
+		else {
+			res=find_skel(shrite_skel2);
+			if (res>0)
+				clbl("SHRITE", res+pos+1, "Shift right number in BCDE");
+		}
+
 		res=find_skel(cmpnum_skel);
 		if (res>0)
-			printf("CMPNUM = $%04X  ; Compare FP reg to BCDE\n",res);
+			clbl("CMPNUM", res, "Compare FP reg to BCDE");
 
 		res=find_skel(fpint_skel);
 		if (res>0)
-			printf("FPINT  = $%04X  ; Floating Point to Integer\n",res);
+			clbl("FPINT", res, "Floating Point to Integer");
 
 		res=find_skel(flgrel_skel);
 		if (res>0)
-			printf("FLGREL = $%04X  ; CY and A to FP, & normalise\n",res+pos+1);
+			clbl("FLGREL", res+pos+1, "CY and A to FP, & normalise");
 
 		res=find_skel(sumser_skel);
 		if (res>0)
-			printf("SUMSER = $%04X  ; Evaluate sum of series\n",res);
+			clbl("SUMSER", res, "Evaluate sum of series");
 		
 		res=find_skel(int_skel);
 		if (res>0)
-			printf("INT    = $%04X  ; \n",res+pos+1);
+			clbl("INT", res+pos+1, "INT");
 		
 		res=find_skel(dblint_skel);
 		if (res<0)
 			res=find_skel(dblint_skel2);
 		if (res>0)
-			printf("DBL_INT    = $%04X  ; \n",res+pos+1);
+			clbl("DBL_INT", res+pos+1, "INT (double precision BASIC variant)");
 		
 		res=find_skel(dblsub_skel);
 		if (res>0)
-			printf("DBL_SUB    = $%04X  ; Double precision SUB (formerly SUBCDE)\n",res+pos+1);
+			clbl("DBL_SUB", res+pos+1, "Double precision SUB (formerly SUBCDE)");
 		
 		res=find_skel(dbladd_skel);
 		if (res>0)
-			printf("DBL_ADD    = $%04X  ; Double precision ADD (formerly FPADD)\n",res+pos+1);
+			clbl("DBL_ADD", res+pos+1, "Double precision ADD (formerly FPADD)");
 		
 		res=find_skel(dblsub_skel2);
 		if (res>0) {
-			printf("DBL_SUB    = $%04X  ; Double precision SUB (formerly SUBCDE)\n",res+pos+1);
-			printf("DBL_ADD    = $%04X  ; Double precision ADD (formerly FPADD)\n",res+pos+7);
+			clbl("DBL_SUB", res+pos+1, "Double precision SUB (formerly SUBCDE)");
+			clbl("DBL_ADD", res+pos+7, "Double precision ADD (formerly FPADD)");
 		}
 
 		res=find_skel(dblmul_skel);
 		if (res>0)
-			printf("DBL_MUL    = $%04X  ; Double precision MULTIPLY\n",res+pos+1);
+			clbl("DBL_MUL", res+pos+1, "Double precision MULTIPLY");
 		
 		res=find_skel(dbldiv_skel);
 		if (res>0)
-			printf("DBL_DIV    = $%04X  ; Double precision DIVIDE\n",res);
+			clbl("DBL_DIV", res, "Double precision DIVIDE");
 		else {
 			res=find_skel(dbldiv_skel2);
 			if (res>0)
-				printf("DBL_DIV    = $%04X  ; Double precision DIVIDE\n",res+pos+1);
+				clbl("DBL_DIV", res+pos+1, "Double precision DIVIDE");
 		}
 		
 		res=find_skel(fix_skel);
 		if (res>0)
-			printf("FIX    = $%04X  ; Double Precision to Integer conversion\n",res+pos+1);
+			clbl("FIX", res+pos+1, "Double Precision to Integer conversion");
 		
 		res=find_skel(intmul_skel);
 		if (res>0)
-			printf("INT_MUL    = $%04X  ; Integer MULTIPLY\n",res+pos+1);
+			clbl("INT_MUL", res+pos+1, "Integer MULTIPLY");
 		
 		res=find_skel(mldebc_skel);
 		if (res<0)
 			res=find_skel(mldebc_skel2);
 		if (res>0)
-			printf("MLDEBC = $%04X  ; Multiply DE by BC\n",res);
+			clbl("MLDEBC", res, "Multiply DE by BC");
 		else {
 			res=find_skel(mldebc_skel3);
 			if (res>0)
-				printf("MLDEBC = $%04X  ; Multiply DE by BC\n",res+pos+1);
+				clbl("MLDEBC", res+pos+1, "Multiply DE by BC");
 		}
 
 		res=find_skel(asctfp_skel);
 		if (res<0)
 			res=find_skel(asctfp_skel2);
 		if (res>0)
-			printf("ASCTFP = $%04X  ; ASCII to FP number\n",res+pos+1);
+			clbl("_ASCTFP", res+pos+1, "ASCII to FP number");
 
 		res=find_skel(hex_asctfp_skel);
 		if (res<0)
 			res=find_skel(hex_asctfp_skel2);
 		if (res>0)
-			printf("H_ASCTFP = $%04X  ; ASCII to FP number (also '&' prefixes)\n",res+pos+1);
+			clbl("H_ASCTFP", res+pos+1, "ASCII to FP number (also '&' prefixes)");
 
 		res=find_skel(hextfp_skel);
 		if (res>0)
-			printf("HEXTFP = $%04X  ; HEX(ASCII) to FP number\n",res+pos+1);
+			clbl("HEXTFP", res+pos+1, "HEX(ASCII) to FP number");
 
 		res=find_skel(dblasctfp_skel);
 		if (res>0) {
-			printf("ASCTFP = $%04X  ; ASCII to FP number (New version)\n",res+pos+8);
-			printf("DBL_ASCTFP = $%04X  ; ASCII to Double precision FP number\n",res+pos+1);
+			clbl("ASCTFP", res+pos+8, "ASCII to FP number (New version)");
+			clbl("DBL_ASCTFP", res+pos+1, "ASCII to Double precision FP number");
 		} else {
 			res=find_skel(dblasctfp_skel2);
 			if (res>0)
-				printf("DBL_ASCTFP = $%04X  ; ASCII to Double precision FP number\n",res+pos+1);
+				clbl("DBL_ASCTFP", res+pos+1, "ASCII to Double precision FP number");
 		}
-
-		
-
 		
 		res=find_skel(prnthl_skel);
 		if (res<0)
@@ -1384,7 +1514,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(prnthl_skel3);
 		if (res>0)
-			printf("PRNTHL = $%04X  ; Print number in HL\n",res+pos+1);
+			clbl("PRNTHL", res+pos+1, "Print number in HL");
 		
 		res=find_skel(prs_skel);
 		if (res<0)
@@ -1392,17 +1522,17 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(prs_skel3);
 		if (res>0) {
-			printf("PRNUMS = $%04X  ; Print number string\n",res-1);
-			printf("PRS    = $%04X  ; Create string entry and print it\n",res);
-			printf("PRS1   = $%04X  ; Print string at HL\n",res+3);
+			clbl("PRNUMS", res-1, "Print number string");
+			clbl("PRS", res, "Create string entry and print it");
+			clbl("PRS1", res+3, "Print string at HL");
 		} else {
 			res=find_skel(prnums_skel);
 			if (res<0)
 				res=find_skel(prnums_skel2);
 			if (res>0) {
-				printf("PRNUMS = $%04X  ; Print number string\n",res+pos+1);
-				printf("PRS    = $%04X  ; Create string entry and print it\n",res+pos+2);
-				printf("PRS1   = $%04X  ; Print string at HL\n",res+pos+5);
+				clbl("PRNUMS", res+pos+1, "Print number string");
+				clbl("PRS", res+pos+2, "Create string entry and print it");
+				clbl("PRS1", res+pos+5, "Print string at HL");
 			}
 		}
 
@@ -1410,24 +1540,24 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(str_skel2);
 		if (res>0)
-			printf("STR    = $%04X  ; STR BASIC function entry\n",res+pos+1);
+			clbl("STR", res+pos+1, "STR BASIC function entry");
 
 		res=find_skel(savstr_skel);
 		if (res<0)
 			res=find_skel(savstr_skel2);
 		if (res>0)
-			printf("SAVSTR = $%04X  ; Save string in string area\n",res+pos+1);
+			clbl("SAVSTR", res+pos+1, "Save string in string area");
 
 		res=find_skel(mktmst_skel);
 		if (res>0) {
-			printf("MKTMST = $%04X  ; Make temporary string\n",res+pos+1);
-			printf("CRTMST = $%04X  ; Create a string entry\n",res+pos+1+3);
+			clbl("MKTMST", res+pos+1, "Make temporary string");
+			clbl("CRTMST", res+pos+1+3, "Create a string entry");
 		}
 		else {
 			res=find_skel(mktmst_skel2);
 			if (res>0) {
-				printf("MKTMST = $%04X  ; Make temporary string\n",res);
-				printf("CRTMST = $%04X  ; Create a string entry\n",res+3);
+				clbl("MKTMST", res, "Make temporary string");
+				clbl("CRTMST", res+3, "Create a string entry");
 			}
 		}
 
@@ -1439,7 +1569,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(for_skel4);
 		if (res>0)
-			printf("FOR    = $%04X  ; 'FOR' stmt\n",res+pos+1);
+			clbl("FOR", res+pos+1, "'FOR' BASIC instruction");
 
 		
 		res=find_skel(fdtlp_skel);
@@ -1448,7 +1578,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(fdtlp_skel3);
 		if (res>0)
-			printf("FDTLP  = $%04X  ; Find next DATA statement\n",res+pos+1);
+			clbl("FDTLP", res+pos+1, "Find next DATA statement");
 		
 		res=find_skel(data_skel);
 		if (res<0)
@@ -1456,11 +1586,11 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(data_skel3);
 		if (res>0)
-			printf("DATA   = $%04X  ; DATA statement: find next DATA program line..\n",res);
+			clbl("DATA", res, "DATA statement: find next DATA program line..");
 
 		res=find_skel(restore_skel);
 		if (res>0)
-			printf("RESTOR = $%04X  ; 'RESTORE' stmt, init ptr to DATA program line..\n",res+pos+1);
+			clbl("RESTOR", res+pos+1, "'RESTORE' stmt, init ptr to DATA program line..");
 
 		res=find_skel(new_skel);
 		if (res<0)
@@ -1468,19 +1598,19 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(new_skel3);
 		if (res>0)
-			printf("NEW    = $%04X  ; 'NEW' statement\n",res+pos+1);
+			clbl("NEW", res+pos+1, "'NEW' statement");
 
 		res=find_skel(chr_skel);
 		if (res>0)
-			printf("CHR    = $%04X  ; CHR$ \n",res+pos+1);
+			clbl("CHR", res+pos+1, "CHR$ BASIC function");
 
 		res=find_skel(makint_skel);
 		if (res>0)
-			printf("MAKINT = $%04X  ; Conve tmp string to int in A register\n",res);
+			clbl("MAKINT", res, "Convert tmp string to int in A register");
 		
 		res=find_skel(concat_skel);
 		if (res>0)
-			printf("CONCAT = $%04X  ; String concatenation\n",res+pos+1);
+			clbl("CONCAT", res+pos+1, "String concatenation");
 		
 		res=find_skel(testr_skel);
 		if (res<0)
@@ -1488,95 +1618,95 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(testr_skel3);
 		if (res>0)
-			printf("TESTR  = $%04X  ; Test if enough room for string\n",res);
+			clbl("TESTR", res, "Test if enough room for string");
 
 		res=find_skel(topool_skel);
 		if (res<0)
 			res=find_skel(topool_skel2);
 		if (res>0)
-			printf("TOPOOL = $%04X  ; Save in string pool\n",res);
+			clbl("TOPOOL", res, "Save in string pool");
 
 		res=find_skel(tstopl_skel);
 		if (res<0)
 			res=find_skel(tstopl_skel2);
 		if (res>0)
-			printf("TSTOPL = $%04X  ; Temporary string to pool\n",res+pos+1);
+			clbl("TSTOPL", res+pos+1, "Temporary string to pool");
 		else {
 			res=find_skel(tstopl_skel3);
 			if (res<0)
 				res=find_skel(tstopl_skel4);
 			if (res>0)
-				printf("TSTOPL = $%04X  ; Temporary string to pool\n",res);
+				clbl("TSTOPL", res, "Temporary string to pool");
 		}
 		
 		res=find_skel(opnpar_skel);
 		if (res>0)
-			printf("OPNPAR = $%04X  ; Chk Syntax make sure '(' follows\n",res+pos+1);
+			clbl("OPNPAR", res+pos+1, "Chk Syntax, make sure '(' follows");
 
 		res=find_skel(eval_skel);
 		if (res>0) {
-			printf("EVAL   = $%04X  ; Evaluate expression\n",res+pos+1);
-			printf("EVAL1  = $%04X  ; Save precedence and eval until precedence break\n",res+pos+1+3);
-			printf("EVAL2  = $%04X  ; Evaluate expression until precedence break\n",res+pos+1+12);
-			printf("EVAL3  = $%04X  ; Evaluate expression until precedence break\n",res+pos+1+15);
+			clbl("EVAL", res+pos+1, "Evaluate expression");
+			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+			clbl("EVAL2", res+pos+1+12, "Evaluate expression until precedence break");
+			clbl("EVAL3", res+pos+1+15, "Evaluate expression until precedence break");
 		}
 
 		res=find_skel(eval_skel2);
 		if (res>0) {
-			printf("EVAL   = $%04X  ; Evaluate expression\n",res+pos+1);
-			printf("EVAL1  = $%04X  ; Save precedence and eval until precedence break\n",res+pos+1+3);
-			printf("EVAL2  = $%04X  ; Evaluate expression until precedence break\n",res+pos+1+15);
-			printf("EVAL3  = $%04X  ; Evaluate expression until precedence break\n",res+pos+1+18);
+			clbl("EVAL", res+pos+1, "Evaluate expression");
+			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+			clbl("EVAL2", res+pos+1+15, "Evaluate expression until precedence break");
+			clbl("EVAL3", res+pos+1+18, "Evaluate expression until precedence break");
 		}
 
 		res=find_skel(eval_skel3);
 		if (res>0) {
-			printf("EVAL   = $%04X  ; Evaluate expression\n",res+pos+1);
-			printf("EVAL1  = $%04X  ; Save precedence and eval until precedence break\n",res+pos+1+3);
-			printf("EVAL2  = $%04X  ; Evaluate expression until precedence break\n",res+pos+1+19);
-			printf("EVAL3  = $%04X  ; Evaluate expression until precedence break\n",res+pos+1+22);
+			clbl("EVAL", res+pos+1, "Evaluate expression");
+			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+			clbl("EVAL2", res+pos+1+19, "Evaluate expression until precedence break");
+			clbl("EVAL3", res+pos+1+22, "Evaluate expression until precedence break");
 		}
 
 		res=find_skel(stkths_skel);
 		if (res>0)
-			printf("STKTHS = $%04X  ; Stack expression item and get next one\n",res+pos+1);
+			clbl("STKTHS", res+pos+1, "Stack expression item and get next one");
 
 		res=find_skel(crtst_skel);
 		if (res>0) {
-			printf("CRTST  = $%04X  ; Create String\n",res+pos+1);
-			printf("QTSTR  = $%04X  ; Create quote terminated String\n",res+pos+2);
-			printf("DTSTR  = $%04X  ; Create String, termination char in D\n",res+pos+5);
+			clbl("CRTST", res+pos+1, "Create String");
+			clbl("QTSTR", res+pos+2, "Create quote terminated String");
+			clbl("DTSTR", res+pos+5, "Create String, termination char in D");
 		}
 		
 		res=find_skel(baktmp_skel);
 		if (res<0)
 			res=find_skel(baktmp_skel2);
 		if (res>0)
-			printf("BAKTMP = $%04X  ; Back to last tmp-str entry\n",res+pos+1);
+			clbl("BAKTMP", res+pos+1, "Back to last tmp-str entry");
 		
 		
 		
 		res=find_skel(getstr_skel);
 		if (res>0) {
-			printf("GETSTR = $%04X  ; Get string pointed by FPREG 'Type Error' if it is not\n",res+pos+1);
-			printf("GSTRCU = $%04X  ; Get string pointed by FPREG\n",res+pos+1+3);
-			printf("GSTRHL = $%04X  ; Get string pointed by HL\n",res+pos+1+6);
-			printf("GSTRDE = $%04X  ; Get string pointed by DE\n",res+pos+1+7);
+			clbl("GETSTR", res+pos+1, "Get string pointed by FPREG 'Type Error' if it is not");
+			clbl("GSTRCU", res+pos+1+3, "Get string pointed by FPREG");
+			clbl("GSTRHL", res+pos+1+6, "Get string pointed by HL");
+			clbl("GSTRDE", res+pos+1+7, "Get string pointed by DE");
 		}
 		
 		res=find_skel(tststr_skel);
 		if (res>0)
-			printf("TSTSTR = $%04X  ; Test a string, 'Type Error' if it is not\n",res);
+			clbl("TSTSTR", res, "Test a string, 'Type Error' if it is not");
 		
 		res=find_skel(numasc_skel);
 		if (res>0)
-			printf("NUMASC = $%04X  ; Number to ASCII conversion\n",res);
+			clbl("NUMASC", res, "Number to ASCII conversion");
 
 		res=find_skel(atoh_skel);
 		if (res<0)
 			res=find_skel(atoh_skel2);
 		if (res>0)
-			printf("ATOH   = $%04X  ; ASCII to Integer, result in DE\n",res+pos+1);
+			clbl("ATOH", res+pos+1, "ASCII to Integer, result in DE");
 		
 		
 		
@@ -1588,7 +1718,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 		res=find_skel(getchr_skel2);
 		if (res>0) {
-			printf("GETCHR = $%04X  ; GETNEXT char from program listing\n",res);
+			clbl("GETCHR", res, "GETNEXT char from program listing");
 		} else {
 			res=find_skel(getchr_skel3);
 			if (res<0)
@@ -1596,19 +1726,19 @@ int main(int argc, char *argv[])
 			if (res<0)
 				res=find_skel(getchr_skel5);
 			if (res>0)
-				printf("GETCHR = $%04X  ; GETNEXT char from program listing\n",res+pos+1);
+				clbl("GETCHR", res+pos+1, "GETNEXT char from program listing");
 		}
 	
 		
 		res=find_skel(ucase_skel);
 		if (res>0) {
-			printf("UCASE_HL = $%04X  ; Get char from (HL) and make upper case\n",res+pos+1);
-			printf("UCASE  = $%04X  ; Make char in 'A' upper case\n",res+pos+2);
+			clbl("UCASE_HL", res+pos+1, "Get char from (HL) and make upper case");
+			clbl("UCASE", res+pos+2, "Make char in 'A' upper case");
 		}
 		
 		res=find_skel(getk_skel);
 		if (res>0)
-			printf("GETK   = $%04X  ; Get key in 'A'\n",res);
+			clbl("GETK", res, "Get key in 'A'");
 		
 		res=find_skel(rinput_skel);
 		if (res<0)
@@ -1616,11 +1746,11 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(rinput_skel3);
 		if (res>0)
-			printf("RINPUT = $%04X  ; Line input\n",res);
+			clbl("RINPUT", res, "Line input");
 		else {
 			res=find_skel(rinput_skel4);
 			if (res>0)
-				printf("RINPUT = $%04X  ; Line input\n",res+pos);
+				clbl("RINPUT", res+pos, "Line input");
 		}
 
 		res=find_skel(outc_skel);
@@ -1633,7 +1763,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(outc_skel5);
 		if (res>0)
-			printf("OUTC   = $%04X  ; Output char in 'A' to console\n",res);
+			clbl("OUTC", res, "Output char in 'A' to console");
 
 
 		/* MS BASIC errors */
@@ -1642,8 +1772,8 @@ int main(int argc, char *argv[])
 		
 		res=find_skel(datsnr_skel);
 		if (res>0) {
-			printf("DATSNR = $%04X  ; 'SN err' entry for Input STMT\n",res+pos+1);
-			printf("SNERR  = $%04X  ; entry for '?SN ERROR'\n",res+pos+1+6);
+			clbl("DATSNR", res+pos+1, "'SN err' entry for Input STMT");
+			clbl("SNERR", res+pos+1+6, "entry for '?SN ERROR'");
 		}
 		res=find_skel(fcerr_skel);
 		if (res<0)
@@ -1653,11 +1783,11 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(fcerr_skel4);
 		if (res>0)
-			printf("FCERR  = $%04X  ; entry for '?FC ERROR'\n",res);
+			clbl("FCERR", res, "entry for '?FC ERROR'");
 		
 		res=find_skel(ulerr_skel);
 		if (res>0)
-			printf("ULERR  = $%04X  ; entry for '?UL ERROR'\n",res);
+			clbl("ULERR", res, "entry for '?UL ERROR'");
 
 		printf("\n\n");
 
@@ -1668,13 +1798,21 @@ int main(int argc, char *argv[])
 		if (jptab<0)
 			jptab=find_skel(jptab_msbasic_skel3);
 		if (jptab>0) {
-			printf("\nJP table for statements = $%04X\n",jptab);
+			printf("\n# JP table for statements = $%04X\n",jptab);
+			if (SKOOLMODE) {
+				printf("@ $%04x label=%s\n", jptab, "FNCTAB");
+				printf("w $%04x %s\n", jptab, "Jump table for statements and functions");
+			}
+
+			printf("\n");
+
 			/* hack for PC-6001 ROM v.60 */
 			res=find_skel(pc6001_60_page);
 			if (res>0) {
 				jptab=0x134+0x61;
-				printf("\n   (applying a PC-6001 table shift hack, new pos: $%04X)\n",jptab);
+				printf("\n#   (applying a PC-6001 table shift hack, new pos: $%04X)\n",jptab);
 			}
+			
 		}
 
 		res=find_skel(tkmsbasic_ex_skel);
@@ -1682,29 +1820,36 @@ int main(int argc, char *argv[])
 		if (res>0) {
 			res+=1;
 			
-			printf("\nTOKEN table position = $%04X, word list in 'extended BASIC' mode.\n",res);			
+			printf("\n# TOKEN table position = $%04X, word list in 'extended BASIC' mode.\n",res);			
+			if (SKOOLMODE) {
+				printf("@ $%04x label=%s\n", res-1, "WORDS");
+				printf("t $%04x %s\n", res-1, "BASIC keyword list");
+			}
 			
 			token_range=find_skel(tkrange_ex_skel);
 			if (token_range>0)
-				printf("\tToken range: %d\n",token_range);
+				printf("#\tToken range: %d\n",token_range);
 			else token_range=81;
 			
-			printf("\n-- STATEMENTS --\n");
+			printf("\n# -- STATEMENTS --\n");
 			
 			res2=find_skel(else_token_skel);
 			if (res2>0)
-				printf("\n\tELSE\t\t[%d]\n",res2);
+				printf("\n#\tELSE\t\t[%d]\n",res2);
 
 			chr='A';
-			printf("\n\t%c", chr);
+			clear_token();
+			append_c(chr);
+			printf("\n#\t%c", chr);
 			
 			for (i=res; img[i+8]!='<'; i++) {
 				if ((img[i-1]==0)&&(img[i]==0)) {chr++; i++;}
-				if (img[i-1]==0) {chr++;  printf("\t%c", chr);}
+				if (img[i-1]==0) {chr++;  printf("\t%c", chr); clear_token(); append_c(chr);}
 				c=img[i];
 				if (c>=128)	{
 					c-=128;
 					printf("%c",c);
+					append_c(c);
 					i++;
 
 					if (jptab>0) {
@@ -1712,16 +1857,25 @@ int main(int argc, char *argv[])
 							/* MSX/SVI: to be excluded codes between 217 and 220 */
 							/* TODO: Other cases may be different !!  (Triumph Adler..) */
 							if (img[i]<(129+token_range)) {
-									printf("      \t[%d]\t- $%04X\n",img[i],img[jptab+2*(img[i]-129)-pos]+256*img[jptab+2*(img[i]-129)-pos+1]);
+									address=img[jptab+2*(img[i]-129)-pos]+256*img[jptab+2*(img[i]-129)-pos+1];
+									if (SKOOLMODE)
+										printf("\n@ $%04x label=__%s\n#", address, token);
+									else
+										printf("      \t[%d]\t- $%04X\n#",img[i],address);
 							} else
-								printf("      \t[%d]\n",img[i]);
-						} else
-							printf("      \t[%d]\t- $%04X\n",img[i],img[jptab+2*(img[i]+token_range-1)-pos]+256*img[jptab+2*(img[i]+token_range-1)-pos+1]);
+								printf("      \t[%d]\n#",img[i]);
+						} else {
+							address=img[jptab+2*(img[i]+token_range-1)-pos]+256*img[jptab+2*(img[i]+token_range-1)-pos+1];
+							if (SKOOLMODE)
+								printf("\n@ $%04x label=__%s\n#", address, token);
+							else
+							printf("      \t[%d]\t- $%04X\n#",img[i],address);
+						}
 					} else
-						printf("      \t[%d]\n",img[i]);
+						printf("      \t[%d]\n#",img[i]);
 
-					if (img[i+1]!=0) {printf("\t%c", chr);}
-				} else printf("%c",c);
+					if (img[i+1]!=0) {printf("\t%c", chr); clear_token(); append_c(chr);}
+				} else {printf("%c",c); append_c(c);}
 			}
 
 		} else {
@@ -1732,16 +1886,20 @@ int main(int argc, char *argv[])
 				res=find_skel(tkmsbasic_skel3);
 			if (res>0) {
 				res=res+1-pos;
-				printf("\n\n\nTOKEN table position = $%04X, word list in classic encoding mode\n",res+pos);
+				printf("\n\n\n# TOKEN table position = $%04X, word list in classic encoding mode\n",res+pos);
+				if (SKOOLMODE) {
+					printf("@ $%04x label=%s\n", res+pos-1, "WORDS");
+					printf("t $%04x %s\n", res+pos-1, "BASIC keyword list");
+				}
 				new_tk_found=0;
-				printf("\n-- STATEMENTS --\n");
-				printf("\n\t ---  ");
+				printf("\n# -- STATEMENTS --\n");
+				printf("\n#\t ---  ");
 				chr=find_skel(tkmsbasic_code_skel)+1;
 				for (i=res; img[i]!=128; i++) {
 					
 					if ((new_tk_found!=1) && (((c == 'W') && (img[i-2] == 'E') && ((img[i-3] == 'N') || (img[i-3] == ('N'+0x80)))) && (img[i+1] != 'L'))) {
 						new_tk_found=1;
-						printf("\n\n-- OPERATORS & extras --\n");
+						printf("\n\n# -- OPERATORS & extras --\n");
 					}
 					
 					if ((c == '<') && ((img[i-2] != '=') || (img[i-2] != ('='+0x80)))) {
@@ -1751,26 +1909,37 @@ int main(int argc, char *argv[])
 						if (jptab<0)
 							jptab=find_skel(fnctab_msbasic_skel3);
 						if (jptab>0) {
-							printf("\n\nJP table for functions = $%04X\n",jptab);
+							printf("\n\n# JP table for functions = $%04X\n",jptab);
+							if (SKOOLMODE) {
+								printf("@ $%04x label=%s\n", jptab, "FNCTAB_FN");
+								printf("w $%04x %s\n", jptab, "Extra jump table for functions");
+							}
 							/* hack for PC-6001 ROM v.60 */
 							res=find_skel(pc6001_60_page);
 							if (res>0) {
 								jptab=0x134+0xB7;
-								printf("\n\n   (applying a PC-6001 table shift hack, new pos: $%04X)\n\n",jptab);
+								printf("\n\n#   (applying a PC-6001 table shift hack, new pos: $%04X)\n\n",jptab);
 							}
 						}
 						new_tk_found=0;
-						printf("\n-- FUNCTIONS --\n");
+						printf("\n# -- FUNCTIONS --\n");
 					}
 					
 					c=img[i];
 					if (c>=128) {
 						c-=128; 
 						if (((jptab-pos)>0) && !(new_tk_found)) {
-							printf("\n$%04X - [%d] ", img[jptab-pos]+256*img[jptab-pos+1], chr);
+							address=img[jptab-pos]+256*img[jptab-pos+1];
+							if (SKOOLMODE)
+								printf("\n@ $%04x label=__%s", address, token);
+								//printf("t $%04x %s\n", img[jptab-pos]+256*img[jptab-pos+1], token);
+							else
+								printf("\n$%04X - [%d] ", address, chr);
+
 							jptab+=2;
-						} else
-							printf("\n\t %d  ",chr);
+						} else {
+							printf("\n#\t %d  ",chr);
+						}
 						chr++;
 					}
 					
@@ -1781,7 +1950,7 @@ int main(int argc, char *argv[])
 						|| ((img[i+2] == 'S') && (img[i+3] == 'I') && (img[i+4] == 'N') && ((img[i+5] == 'G')||(img[i+5] == 'G'+0x80)))
 						)) {
 						new_tk_found=1;
-						printf("\n\n-- OPERATORS & extras --\n");
+						printf("\n\n# -- OPERATORS & extras --\n");
 					}
 
 				}	
@@ -1790,18 +1959,22 @@ int main(int argc, char *argv[])
 				res=find_skel(tkmsbasic_old_skel);
 				if (res>0) {
 					res=res+1;
-					printf("\n\n\nTOKEN table position = $%04X, word list in earlier encoding mode.\n",res+pos);
+					printf("\n\n\n# TOKEN table position = $%04X, word list in earlier encoding mode.\n",res+pos);
 					new_tk_found=0;
-					printf("\n-- STATEMENTS --\n");
-					printf("\n\t ---  ");
+					printf("\n# -- STATEMENTS --\n");
+					printf("\n#\t ---  ");
 					chr=128;
 					
 					if ((jptab-pos)>0) {
-							printf("\n$%04X - [%d] ", img[jptab-pos]+256*img[jptab-pos+1], chr);
+							address=img[jptab-pos]+256*img[jptab-pos+1];
+							if (SKOOLMODE)
+								printf("\n@ $%04x label=__%s", address, token);
+							else
+								printf("\n$%04X - [%d] ", address, chr);
 							jptab+=2;
 					}
 					else
-							printf("\n\t %d  ",chr);
+							printf("\n#\t %d  ",chr);
 						
 					for (i=res; ((img[i]!=128)&&(img[i]!=0)); i++) {
 						c=img[i];
@@ -1813,7 +1986,7 @@ int main(int argc, char *argv[])
 							)) {
 							printf("%c",c);
 							new_tk_found=1;
-							printf("\n\n-- OPERATORS & extras --\n");
+							printf("\n\n# -- OPERATORS & extras --\n");
 						} else {
 							if ((img[i+1]  == 'S') && (img[i+2] == 'G') && ((img[i+3] == 'N') || (img[i+3] == ('N'+0x80)))) {
 								printf("%c",c);
@@ -1822,18 +1995,27 @@ int main(int argc, char *argv[])
 									jptab=find_skel(fnctab_msbasic_skel2);
 								if (jptab<0)
 									jptab=find_skel(fnctab_msbasic_skel3);
-								if ((jptab-pos)>0)
-									printf("\n\nJP table for functions = $%04X\n",jptab);
+								if ((jptab-pos)>0) {
+									printf("\n\n# JP table for functions = $%04X\n",jptab);
+									if (SKOOLMODE) {
+										printf("@ $%04x label=%s\n", jptab, "FNCTAB_FN");
+										printf("w $%04x %s\n", jptab, "Extra jump table for functions");
+									}
+								}
 								new_tk_found=0;
-								printf("\n-- FUNCTIONS --\n");
+								printf("\n# -- FUNCTIONS --\n");
 							} else	printf("%c",c);
 						}
 						if (img[i]>=128) {
 							if (((jptab-pos)>0) && !(new_tk_found)) {
-								printf("\n$%04X - [%d] ", img[jptab-pos]+256*img[jptab-pos+1], chr);
+								address=img[jptab-pos]+256*img[jptab-pos+1];
+								if (SKOOLMODE)
+									printf("\n@ $%04x label=__%s", address, token);
+								else
+									printf("\n$%04X - [%d] ", address, chr);
 								jptab+=2;
 							} else
-								printf("\n\t %d  ",chr);
+								printf("\n#\t %d  ",chr);
 							chr++;
 						}
 
