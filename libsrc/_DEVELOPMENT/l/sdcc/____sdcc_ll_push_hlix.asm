@@ -29,6 +29,8 @@ ____sdcc_ll_push_hlix:
    ldi
    ldi
    ldi
-   ldi
+   
+   ld a,(hl)
+   ld (de),a
    
    ret
