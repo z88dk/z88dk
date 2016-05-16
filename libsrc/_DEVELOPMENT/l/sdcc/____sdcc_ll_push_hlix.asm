@@ -18,6 +18,7 @@ ____sdcc_ll_push_hlix:
    pop af
    ld sp,hl
    push af
+   push bc
    
    ex de,hl
    
@@ -33,4 +34,5 @@ ____sdcc_ll_push_hlix:
    ld a,(hl)
    ld (de),a
    
+   pop bc
    ret
