@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.28 2016-05-15 22:54:05 aralbrec Exp $
+;       $Id: cpc_crt0.asm,v 1.29 2016-05-16 01:06:03 aralbrec Exp $
 ;
 
         MODULE  cpc_crt0
@@ -58,11 +58,6 @@ start:
 
         di
 		
-		; enable process exx set
-		; install interrupt interposer
-		
-		call    cpc_enable_process_exx_set
-		
 		; move stack
 		
         ld      (start1+1),sp
@@ -78,11 +73,16 @@ start:
 		; make room for exit stack
 		
 		ld      hl,-64                  ; reserve space for 32 entries on the exit stack
-        add     hl,sp
+		add     hl,sp
         ld      sp,hl
 		
         ld      (exitsp),sp
+
+		; enable process exx set
+		; install interrupt interposer
 		
+		call    cpc_enable_process_exx_set
+
 		ei
 
 ; Optional definition for auto MALLOC init
