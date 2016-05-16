@@ -5,7 +5,7 @@
 
 	EXTERN	fputc_vdp_offs
 	
-	EXTERN	VRamToHL
+	EXTERN	VRAMToHL
 	
 .fputc_cons_native
 	ld	a, (fputc_vdp_offs)
@@ -14,7 +14,7 @@
 	ld	h, a			; Loads char offset
 	ld	de, NameTableAddress
 	add	hl, de			; Calculates name table address
-	call	VRamToHL
+	call	VRAMToHL
 	
 	ld      hl,2
 	add     hl,sp
