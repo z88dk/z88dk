@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.32 2016-05-16 20:11:32 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.33 2016-05-16 20:49:05 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -255,20 +255,12 @@ ENDIF
 
 	INCLUDE	"crt0_section.asm"
 
-    SECTION code_crt_init
+	SECTION code_crt_init
 	ld	c,25
 	call	5
 	ld	(defltdsk),a
-IF !DEFINED_noredir
-IF !DEFINED_nostreams
-	ld	a,'w'
-	ld	(redir_fopen_flag),a
-	ld	a,'r'
-	ld	(redir_fopen_flagr),a
-ENDIF
-ENDIF
 
-    SECTION bss_crt
+	SECTION bss_crt
 
 ;-----------------------
 ; Some startup variables
@@ -296,11 +288,11 @@ pixelbyte:	defb	0		; temp byte storage for VDP driver
 ENDIF
 
 
-
+	SECTION  rodata_clib
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-redir_fopen_flag:		defw	0
-redir_fopen_flagr:		defw	0
+redir_fopen_flag:		defb	'w',0
+redir_fopen_flagr:		defb	'r',0
 ENDIF
 ENDIF
 
