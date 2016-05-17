@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.22 2016-05-17 21:54:00 dom Exp $
+;       $Id: rex_crt0.asm,v 1.23 2016-05-17 21:54:22 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -20,10 +20,6 @@ IF (startup=2)                 ; Library ?
 	EXTERN	_LibMain
 ENDIF
 	
-	PUBLIC	exitsp		;atexit() variables
-	PUBLIC	exitcount
-	PUBLIC	heapblocks	;malloc() variables
-	PUBLIC	heaplast
 	PUBLIC	l_dcal		;jp(hl) instruction
 	PUBLIC	cleanup
 
