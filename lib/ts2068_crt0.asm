@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.23 2016-05-15 20:15:44 dom Exp $
+;       $Id: ts2068_crt0.asm,v 1.24 2016-05-17 21:35:26 dom Exp $
 ;
 
 
@@ -23,22 +23,6 @@
         PUBLIC    cleanup         ; jp'd to by exit()
         PUBLIC    l_dcal          ; jp(hl)
 
-
-        PUBLIC    exitsp          ; atexit() variables
-        PUBLIC    exitcount
-
-       	PUBLIC	heaplast        ; Near malloc heap variables
-        PUBLIC	heapblocks
-
-        PUBLIC    __sgoioblk      ; stdio info block
-
-        PUBLIC    base_graphics   ; Graphical variables
-        PUBLIC	coords          ; Current xy position
-
-        PUBLIC	snd_tick	; Sound variable
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
-
-        PUBLIC	_RND_BLOCKSIZE;
 
         PUBLIC    call_rom3       ; Interposer
 
@@ -135,17 +119,8 @@ IF DEFINED_ZXVGS
 ENDIF
 	;ld	a,2		;open the upper display (uneeded?)
 	;call	5633 -> NOT THE TS2068 LOCATION !!
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
+
+	call	crt0_init_bss
 IF DEFINED_NEEDresidos
 	call	residos_detect
 	jp	c,cleanup_exit
@@ -179,21 +154,6 @@ ENDIF
 
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
-
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
-
-
-
-        INCLUDE "crt0_runtime_selection.asm"
 
 ;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
@@ -388,37 +348,18 @@ call_extrom_exit:
 		ei
 		ret
 
-;-----------
-; Now some variables
-;-----------
-coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    0       ; Address of the Graphics map
-                                ; probably unusef, but we keep it to extend
-                                ; COORDS for the 'wide' mode
-
-
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
+IF NEED_floatpack
+      INCLUDE   "float.asm"
 ENDIF
 
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
+	defm	"Small C+ ZX"	;Unnecessary file signature
+	defb	0
 
+	INCLUDE	"crt0_runtime_selection.asm"
+	defc	coords_size = 4
+        INCLUDE "crt0_section.asm"
+
+        SECTION bss_crt
 
 ; ZXMMC SD/MMC interface
 IF DEFINED_NEED_ZXMMC
@@ -426,6 +367,7 @@ IF DEFINED_NEED_ZXMMC
 card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
 
+        SECTION rodata_clib
 ; Default block size for "gendos.lib"
 ; every single block (up to 36) is written in a separate file
 ; the bigger RND_BLOCKSIZE, bigger can be the output file size
@@ -434,19 +376,4 @@ ENDIF
 ; in a separate file, so changing this value
 ; at runtime before creating a file is perfectly legal.
 _RND_BLOCKSIZE:	defw	1000
-
-		defm	"Small C+ ZX"	;Unnecessary file signature
-		defb	0
-
-;-----------------------
-; Floating point support
-;-----------------------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-fp_seed:        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
-extra:          defs    6		;FP register
-fa:             defs    6		;FP Accumulator
-fasign:         defb    0		;FP register
-
-ENDIF
 
