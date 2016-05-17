@@ -7,8 +7,8 @@ defc saveSScreen = $8265        ; 768 bytes free (APD buffer) $8265 / $8566
 defc _IY_TABLE   = $8567	; Where IY usually points
 
 
-;#Define		Invoke(xxxx)	CALL	xxxx
-;#Define		JMP(xxxx)	JP	xxxx
+;#defc		Invoke(xxxx)	CALL	xxxx
+;#defc		JMP(xxxx)	JP	xxxx
 ; Syntax Enhancers
 
 
@@ -31,8 +31,8 @@ DEFC		PushErx =		$46A5
 DEFC		PopErx =		$46A9
 ; Gets Rid Of Error Routine
 
-;#Define		OnError(xxxx)	LD	HL, xxxx	\	CALL	PushErr
-;#Define		OffError	CALL	PopErr
+;#defc		OnError(xxxx)	LD	HL, xxxx	\	CALL	PushErr
+;#defc		OffError	CALL	PopErr
 ; Syntax Enhancers
 
 
@@ -433,34 +433,34 @@ DEFC		asm_flag3_7 =     7
 ;
 DEFC		XSCLt =		2	; XSCALE
 DEFC		YSCLt =		3	; YSCALE
-Define		XMINt		$0A	; XMIN
-Define		XMAXt		$0B	; XMAX
-Define		YMINt		$0C	; YMIN
-Define		YMAXt		$0D	; XMAX
-Define		TMINt		$0E	; TMIN
-Define		TMAXt		$0F	; TMAX
-Define		THETMINt	$10	; THETA MIN
-Define		THETMAXt	$11	; THETA MAX
-Define		TBLMINt		$1A	; TABLE MIN
-Define		PLOTSTARTt	$1B	; PLOT START
-Define		NMAXt		$1D	; NMAX
-Define		nmint		$1F	; NMIN
-Define		TBLSTEPt	$21	; TABLE STEP
-Define		TSTEPt		$22	; T STEP
-Define		THETSTEPt	$23	; THETA STEP
-Define		DELTAXt		$26	; DELTA X
-Define		DELTAYt		$27	; DELTA Y
-Define		XFACTt		$28	; X ZOOM FACTOR
-Define		YFACTt		$29	; Y ZOOM FACTOR
-Define		FINnT		$2B	; TVM n
-Define		FINiT		$2C	; TVM i
-Define		FINpvT		$2D	; TVM pv
-Define		FINpmtT		$2E	; TVM pmt
-Define		FINfvT		$2F	; TVM fv
-Define		FINpyT		$30	; TVM p/y
-Define		FINcyT		$31	; TVM c/y
-Define		PLOTSTEPT	$34	; PLOT STEP
-Define		XREST		$36	; X RES
+defc		XMINt =		$0A	; XMIN
+defc		XMAXt =		$0B	; XMAX
+defc		YMINt =		$0C	; YMIN
+defc		YMAXt =		$0D	; XMAX
+defc		TMINt =		$0E	; TMIN
+defc		TMAXt =		$0F	; TMAX
+defc		THETMINt =	$10	; THETA MIN
+defc		THETMAXt =	$11	; THETA MAX
+defc		TBLMINt =		$1A	; TABLE MIN
+defc		PLOTSTARTt =	$1B	; PLOT START
+defc		NMAXt =		$1D	; NMAX
+defc		nmint =		$1F	; NMIN
+defc		TBLSTEPt =	$21	; TABLE STEP
+defc		TSTEPt =		$22	; T STEP
+defc		THETSTEPt =	$23	; THETA STEP
+defc		DELTAXt =		$26	; DELTA X
+defc		DELTAYt =		$27	; DELTA Y
+defc		XFACTt =		$28	; X ZOOM FACTOR
+defc		YFACTt =		$29	; Y ZOOM FACTOR
+defc		FINnT =		$2B	; TVM n
+defc		FINiT =		$2C	; TVM i
+defc		FINpvT =		$2D	; TVM pv
+defc		FINpmtT =		$2E	; TVM pmt
+defc		FINfvT =		$2F	; TVM fv
+defc		FINpyT =		$30	; TVM p/y
+defc		FINcyT =		$31	; TVM c/y
+defc		PLOTSTEPT =	$34	; PLOT STEP
+defc		XREST =		$36	; X RES
 
 ;
 ;       CHARACTER FONT EQUATES
@@ -477,8 +477,8 @@ DEFC		Lcross =		$09
 DEFC		LBOXICON =	$0A
 DEFC		LCROSSICON =	$0B
 DEFC		LDOTICON =	$0C
-Define		LsubT		$0D	; small capital T for parametric mode.
-Define		LcubeR		$0E	;slightly different 3 for cubed root.
+defc		LsubT =		$0D	; small capital T for parametric mode.
+defc		LcubeR =		$0E	;slightly different 3 for cubed root.
 DEFC		LhexF =		$0F
 DEFC		Lroot =		$10
 DEFC		Linverse =	$11
