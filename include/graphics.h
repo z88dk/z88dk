@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.16 2016-04-23 08:00:38 dom Exp $
+ *	$Id: graphics.h,v 1.17 2016-05-17 21:54:50 dom Exp $
  */
 
 #ifndef __GFX_H__
@@ -21,6 +21,8 @@
 #ifdef __TIKI100__
 #include <tiki100.h>
 #endif
+
+#pragma output graphics
 
 
 /* Structure to use when opening a window - as per usual, if graph <> 0
