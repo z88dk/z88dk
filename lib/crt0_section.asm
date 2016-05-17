@@ -57,7 +57,10 @@ ENDIF
 		PUBLIC	base_graphics
 		PUBLIC	exitsp
 		PUBLIC	exitcount
-coords:          defw    0       ;Graphics xy coordinates
+IF !coords_space
+	defc coords_space = 2
+ENDIF
+coords:          defs    coords_space       ;Graphics xy coordinates
 base_graphics:   defw    0       ;Address of graphics map
 exitsp:          defw    0       ;atexit() stack
 exitcount:       defb    0       ;Number of atexit() routines
