@@ -1,10 +1,10 @@
 ;
 ;	Startup for test emulator
 ;
-;	$Id: test_crt0.asm,v 1.9 2016-05-15 20:15:44 dom Exp $
+;	$Id: test_crt0.asm,v 1.10 2016-05-17 19:21:22 dom Exp $
 
 
-    module test_crt0
+	module test_crt0
 	org	  0x0000
 
 	INCLUDE	"test_cmds.def"
@@ -24,14 +24,6 @@
 
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
-
-
-        PUBLIC    exitsp          ;atexit() variables
-        PUBLIC    exitcount
-
-        PUBLIC    heaplast        ;Near malloc heap variables
-        PUBLIC    heapblocks
-        PUBLIC    __sgoioblk      ;stdio info block
 
 
 
@@ -104,7 +96,7 @@ program:
 	ld	sp,hl
 	ld	(exitsp),sp
     	ei
-	call    crt_init_start
+	call    crt0_init_bss
 	call	_main
 cleanup:
 	ld	a,CMD_EXIT	;exit
@@ -117,72 +109,7 @@ IF NEED_floatpack
         INCLUDE         "float.asm"
 ENDIF
 
-              INCLUDE "crt0_runtime_selection.asm" 
+	INCLUDE "crt0_runtime_selection.asm" 
+	
+	INCLUDE	"crt0_section.asm"
 
-
-    SECTION code_crt_init
-crt_init_start:
-	; TODO: Clear down bss
-IF !DEFINED_nostreams
-; Set up the std* stuff so we can be called again
-        ld      hl,__sgoioblk+2
-        ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
-        ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
-        ld      (hl),21 ;stderr
-ENDIF
-    ;; Code gets placed in this section
-    SECTION code_crt_exit
-    	ret
-
-    SECTION code_compiler
-    SECTION code_clib
-    SECTION code_crt0_sccz80
-    SECTION code_l_sdcc
-    SECTION code_math
-    SECTION code_error
-    SECTION data_compiler
-    SECTION data_clib
-    SECTION rodata_compiler
-    SECTION rodata_clib
-    SECTION smc_clib
-    SECTION bss_crt
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-;-----------
-__sgoioblk:	defs	40
-
- 
-
-;-----------
-; Now some variables
-;-----------
-coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    0       ; Address of the Graphics map
-
-
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-
-                defm    "Small C+ TEST"   ;Unnecessary file signature
-                defb    0
-
-;-----------------------
-; Floating point support
-;-----------------------
-IF NEED_floatpack
-fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-extra:          defs    6               ;FP register
-fa:             defs    6               ;FP Accumulator
-fasign:         defb    0               ;FP register
-
-ENDIF
-
-    SECTION bss_compiler
-    SECTION bss_clib
-    SECTION bss_error
