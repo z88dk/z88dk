@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.28 2016-05-15 20:15:44 dom Exp $
+;	$Id: ti85_crt0.asm,v 1.29 2016-05-17 21:12:46 dom Exp $
 ;
 ;-----------------------------------------------------
 ; Some general PUBLICs and EXTERNs needed by the assembler
@@ -16,19 +16,6 @@
 	PUBLIC	cleanup		; used by exit()
 	PUBLIC	l_dcal		; used by calculated calls = "call (hl)"
 
-	PUBLIC	exitsp		; Exit variables
-	PUBLIC	exitcount	;
-
-	PUBLIC	heaplast	;Near malloc heap variables
-	PUBLIC	heapblocks
-
-	PUBLIC	__sgoioblk	; For stdin, stdout, stder
-
-	PUBLIC	base_graphics	; Graphics stuff
-	PUBLIC	coords		;
-
-	PUBLIC	snd_tick	; Sound variable
-	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 	PUBLIC	cpygraph	; TI calc specific stuff
 	PUBLIC	tidi		;
@@ -197,6 +184,8 @@ ENDIF
 		INCLUDE "amalloc.def"
 	ENDIF
 
+	call	crt0_init_bss
+
 	EXTERN	fputc_cons
 	ld	hl,12
 	push	hl
@@ -247,60 +236,21 @@ ENDIF
 	ret
 
 
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
+IF NEED_floatpack
+	INCLUDE	"float.asm"
 ENDIF
 
-
         INCLUDE "crt0_runtime_selection.asm"
+	INCLUDE	"crt0_section.asm"
 
+	SECTION	code_crt_init
+	ld	hl,VIDEO_MEM
+	ld	(base_graphics),hl
+
+	SECTION	bss_crt
 IF Rigel
 fixuptable:
 	defb	0,0	; zero fixups, zero ZShell libs
 ENDIF
 
 
-;Atexit routine
-exitsp:		defw	0
-exitcount:	defb	0
-
-; Heap stuff
-heaplast:	defw	0
-heapblocks:	defw	0
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-; mem stuff
-base_graphics:	defw	VIDEO_MEM
-coords:		defw	0
-
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
-
-IF NEED_floatpack
-	INCLUDE	"float.asm"
-;seed for random number generator - not used yet..
-fp_seed:	defb	$80,$80,0,0,0,0
-;Floating point registers...
-extra:		defs	6
-fa:		defs	6
-fasign:		defb	0
-ENDIF
