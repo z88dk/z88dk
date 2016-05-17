@@ -446,7 +446,7 @@ doozcopyasm()
 {
 #asm
 
-        LIB     swapgfxbk
+        EXTERN	swapgfxbk
 
         call    swapgfxbk
         call    ozscrcpy

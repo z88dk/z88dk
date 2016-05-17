@@ -25,6 +25,8 @@ static char	string2[]="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static char	string3[]="The quick brown fox ";
 static char	string4[]="jumped over the lazy dog";
 
+void printfar(far unsigned char *ptr);
+
 void main()
 {
 	char	buffer[80];	/* Buffer for us to work in */
@@ -81,7 +83,7 @@ void main()
 	sleep(2);
 }
 
-printfar(far unsigned char *ptr)
+void printfar(far unsigned char *ptr)
 {
 	int i=0;
 

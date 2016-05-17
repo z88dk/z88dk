@@ -1,22 +1,17 @@
 
 all: info ansitest cube cubez88 dstar gfx
 
-all16: info anstst16 cube cubez88 dstar gfx
-
 info:
 	@echo Building examples..
 
 ansitest:
-	- zcc +z88 -lz88ansi_clib ansitest.c -o ansitest.bas
-
-anstst16:
-	- zcc +z88 -lz88ans~1 ansitest.c -o ansitest.bas
+	- zcc +z88 -clib=ansi ansitest.c -o ansitest.bas
 
 cube:
 	- zcc +z88 -lm cube.c -o cube.bas
 
 cubez88:
-	- zcc +z88 -lmz cube.c -o cubez88.bas
+	- zcc +z88 cube.c -o cubez88.bas -lmz
 
 dstar:
 	- zcc +z88 dstar.c -o dstar.bas
