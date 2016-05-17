@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.8 2016-05-15 20:15:44 dom Exp $
+;       $Id: sos_crt0.asm,v 1.9 2016-05-17 20:36:20 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -32,21 +32,6 @@
 	PUBLIC    cleanup		;jp'd to by exit()
 	PUBLIC    l_dcal		;jp(hl)
 
-	PUBLIC    exitsp		;atexit() variables
-	PUBLIC    exitcount
-
-	PUBLIC    heaplast        ;Near malloc heap variables
-	PUBLIC    heapblocks      ;
-
-	PUBLIC    __sgoioblk	;std* control block
-
-;-----------------------
-; Target specific labels
-;-----------------------
-
-	PUBLIC	snd_tick	; for sound code, if any
-	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
-	PUBLIC    _RND_BLOCKSIZE;
 
         IF      !myzorg
                 defc    myzorg  = $3000
@@ -80,18 +65,8 @@ start:
 IF DEFINED_USING_amalloc
     INCLUDE "amalloc.def"
 ENDIF
+	call	crt0_init_bss
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
 
 ; Push pointers to argv[n] onto the stack now
 ; We must start from the end 
@@ -267,47 +242,19 @@ start1:	ld      sp,0		;Pick up entry sp
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
-;------------------------
-; The stdio control block
-;------------------------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10	;Dummy values
+
+IF NEED_floatpack
+        INCLUDE         "float.asm"
 ENDIF
 
+        defm    "Small C+ SOS"
+end:    defb    0               ; null file name
 
         INCLUDE "crt0_runtime_selection.asm"
 
+	INCLUDE "crt0_section.asm"
 
-;-----------------------
-; Some startup variables
-;-----------------------
-
-exitsp:		defw	0	;Address of atexit() stack
-exitcount:	defb	0	;Number of atexit() routinens
-heaplast:	defw	0	;Pointer to last free heap block
-heapblocks:	defw	0	;Number of heap blocks available
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-	defw ASMTAIL	; Location of the last program byte
-	defw 0
-ENDIF
-
-
-
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
-
+	SECTION	data_bss
 ; Default block size for "gendos.lib"
 ; every single block (up to 36) is written in a separate file
 ; the bigger RND_BLOCKSIZE, bigger can be the output file size
@@ -315,37 +262,13 @@ ENDIF
 ; Current block size is kept in a control block (just a structure saved
 ; in a separate file, so changing this value
 ; at runtime before creating a file is perfectly legal.
+	PUBLIC    _RND_BLOCKSIZE;
 _RND_BLOCKSIZE:	defw	1000
-
-
-;-----------------------------------------------------
-; Unneccessary file signature + target specific stuff
-;-----------------------------------------------------
-end:		defb	0		; null file name
-
-
-;----------------------------------------------
-; Floating point support routines and variables
-;----------------------------------------------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-
-fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
-extra:          defs    6		; FP spare register
-fa:             defs    6		; FP accumulator
-fasign:         defb    0		; FP variable
-
-ENDIF
-
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
 IF DEFINED_ANSIstdio
-redir_fopen_flag:
-				defb 'w'
-				defb 0
-redir_fopen_flagr:
-				defb 'r'
-				defb 0
+redir_fopen_flag:	defb	'w', 0
+redir_fopen_flagr:	defb	'r', 0
 ENDIF
 ENDIF
 ENDIF
