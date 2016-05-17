@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.21 2016-05-15 20:15:44 dom Exp $
+;       $Id: rex_crt0.asm,v 1.22 2016-05-17 21:54:00 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -64,11 +64,7 @@ start:
 	ld	(hl),0
 	ldir
         ld      (exitsp),sp	;Store atexit() stack
-        xor     a
-        ld      (exitcount),a	;Setup number of atexit() routines
-
-        ld      hl,$8080	;Initialise fp seed
-        ld      (fp_seed),hl
+	call	crt0_init_bss
 ; Entry to the user code
         call    _main		;Call the users code
 cleanup:
@@ -95,11 +91,7 @@ start:
 	ld	(hl),0
 	ldir
         ld      (exitsp),sp	;Store atexit() stack
-        xor     a
-        ld      (exitcount),a	;Setup number of atexit() routines
-
-        ld      hl,$8080	;Initialise fp seed
-        ld      (fp_seed),hl
+	call	crt0_init_bss
 ; Entry to the user code
         call    _main		;Call the users code
 cleanup:
@@ -113,27 +105,11 @@ l_dcal:	jp	(hl)		;Used for call by function pointer
 ENDIF
 
 
-;--------
-; Static variables are kept in RAM in high memory
-;--------
-
-DEFVARS $f033
-{
-_std_seed	ds.w	1	;Integer seed
-exitsp		ds.w	1	;Pointer to atexit() stack
-exitcount	ds.b	1	;Number of atexit() routines registered
-fp_seed		ds.w	3	;Floating point seed, unused ATM
-extra		ds.w	3	;Floating point temp variable
-fa		ds.w	3	;Floating point accumulator
-fasign		ds.b	1	;Floating point temp store
-heapblocks	ds.w	1	;Number of malloc blocks
-heaplast	ds.w	1	;Pointer to linked list of free malloc blocks
-}
-
-;--------
-; Now, include the math routines if needed..
-;--------
-
 IF NEED_floatpack
         INCLUDE "float.asm"
 ENDIF
+;	INCLUDE	"crt0_runtime_selection.asm"
+	defc	bss_start = $f033
+	INCLUDE	"crt0_section.asm"
+
+
