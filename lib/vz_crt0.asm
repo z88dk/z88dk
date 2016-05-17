@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.20 2016-05-15 20:15:44 dom Exp $
+;       $Id: vz_crt0.asm,v 1.21 2016-05-17 20:00:12 dom Exp $
 ;
 
 
@@ -28,31 +28,14 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        PUBLIC    exitsp          ;atexit() variables
-        PUBLIC    exitcount
-
-       	PUBLIC	heaplast	;Near malloc heap variables
-       	PUBLIC	heapblocks
-
-        PUBLIC    __sgoioblk      ;stdio info block
-
-;Graphic function PUBLICS..
-
-        PUBLIC    coords          ;Current xy position
-        PUBLIC    base_graphics   ;GFX memory related variables
-        PUBLIC    gfx_bank
-
-        PUBLIC	snd_tick	; Sound variable
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
-
         IF      !myzorg
             IF (startup=3)
-				defc    myzorg  = 32768  ; clean binary block
+		defc    myzorg  = 32768  ; clean binary block
             ELSE
-				IF (startup=2)
-					defc    myzorg  = $7ae9	; BASIC startup mode
-				ELSE
-					defc    myzorg  = $7b00  ; Direct M/C mode
+		IF (startup=2)
+			defc    myzorg  = $7ae9	; BASIC startup mode
+		ELSE
+			defc    myzorg  = $7b00  ; Direct M/C mode
                 ENDIF
             ENDIF
         ENDIF
@@ -121,18 +104,7 @@ start:
 		INCLUDE "amalloc.def"
 	ENDIF
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
-
+	call	crt0_init_bss
         call    _main
 cleanup:
 ;
@@ -153,86 +125,24 @@ start1:
 l_dcal:
         jp      (hl)
 
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
-
-
-        INCLUDE "crt0_runtime_selection.asm"
-
-;-----------
-; Now some variables
-;-----------
-coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    7000h   ; Address of the Graphics map
-gfx_bank:       defb    0
-
-
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
-
-         defm  "Small C+ VZ"
-         defb   0
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
 
 IF NEED_floatpack
         INCLUDE         "float.asm"
-
-;seed for random number generator - not used yet..
-fp_seed:        defb    $80,$80,0,0,0,0
-;Floating point registers...
-extra:          defs    6
-fa:             defs    6
-fasign:         defb    0
-
 ENDIF
+
+	defm  "Small C+ VZ"
+	defb   0
+
+        INCLUDE "crt0_runtime_selection.asm"
+
+	INCLUDE "crt0_section.asm"
+
+        SECTION bss_crt
+	PUBLIC	gfx_bank
+gfx_bank:       defb    0
+
+	SECTION	code_crt_init
+	ld	hl,$7000
+	ld	(base_graphics),hl
+
 
