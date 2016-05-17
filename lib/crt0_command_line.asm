@@ -33,7 +33,7 @@ argv_loop_2:
 
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-IF !DEFINED_ansistdio
+IF DEFINED_ansistdio
 	EXTERN freopen
 	xor	a
 	add	b
