@@ -1,7 +1,7 @@
 ;
 ;       Startup for Sorcerer Exidy
 ;
-;       $Id: sorcerer_crt0.asm,v 1.9 2016-05-15 20:15:44 dom Exp $
+;       $Id: sorcerer_crt0.asm,v 1.10 2016-05-17 20:05:02 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -28,28 +28,6 @@
 
 	PUBLIC    cleanup		;jp'd to by exit()
 	PUBLIC    l_dcal		;jp(hl)
-
-	PUBLIC    exitsp		;atexit() variables
-	PUBLIC    exitcount
-
-	PUBLIC    heaplast        ;Near malloc heap variables
-	PUBLIC    heapblocks      ;
-
-	PUBLIC    __sgoioblk	;std* control block
-
-;-----------------------
-; Target specific labels
-;-----------------------
-
-	PUBLIC	snd_tick	; for sound code, if any
-	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
-
-;-----------------------
-; GFX engine
-;-----------------------
-
-	PUBLIC    base_graphics   ;Graphical variables
-	PUBLIC    coords          ;Current xy position
 
 
 ;--------
@@ -79,17 +57,8 @@ start:
 		INCLUDE "amalloc.def"
 	ENDIF
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
+
+	call	crt0_init_bss
 
         call    _main		;Call user code
 
@@ -107,64 +76,20 @@ start1:	ld      sp,0		;Pick up entry sp
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
-;------------------------
-; The stdio control block
-;------------------------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10	;Dummy values
+
+IF NEED_floatpack
+	INCLUDE         "float.asm"
 ENDIF
 
+	defm  	"Small C+ Sorcerer"
+end:	defb	0		; null file name
 
         INCLUDE "crt0_runtime_selection.asm"
 
-;-----------------------
-; Some startup variables
-;-----------------------
+	INCLUDE	"crt0_section.asm"
 
-defltdsk:       defb    0	;Default disc
-exitsp:		defw	0	;Address of atexit() stack
-exitcount:	defb	0	;Number of atexit() routinens
-heaplast:	defw	0	;Pointer to last free heap block
-heapblocks:	defw	0	;Number of heap blocks available
-
-coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    $F080   ; Address of the Graphics map
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
+	SECTION	code_crt_init
+	ld	hl,$F080
+	ld	(base_graphics),hl
 
 
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
-
-;-----------------------------------------------------
-; Unneccessary file signature + target specific stuff
-;-----------------------------------------------------
-         	defm  	"Small C+ Sorcerer"
-end:		defb	0		; null file name
-
-;----------------------------------------------
-; Floating point support routines and variables
-;----------------------------------------------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-
-fp_seed:        defb    $80,$80,0,0,0,0	; FP seed (unused ATM)
-extra:          defs    6		; FP spare register
-fa:             defs    6		; FP accumulator
-fasign:         defb    0		; FP variable
-
-ENDIF
