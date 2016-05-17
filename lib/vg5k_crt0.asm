@@ -3,7 +3,7 @@
 ;       Joaopa Jun. 2014
 ;       Stefano Bodrato Lug. 2014
 ;
-;       $Id: vg5k_crt0.asm,v 1.8 2016-05-15 20:15:44 dom Exp $
+;       $Id: vg5k_crt0.asm,v 1.9 2016-05-17 20:14:11 dom Exp $
 ;
 
 
@@ -50,41 +50,30 @@
 
 
 start:
-		xor	a
-		ld	(18434), a ;default character will be normal and black
+	xor	a
+	ld	(18434), a ;default character will be normal and black
 
-		ex		de,hl ; preserve HL
-		
+	ex		de,hl ; preserve HL
         ld      (start1+1),sp	;Save entry stack
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
         ld      (exitsp),sp
 		
-		push    de ; save HL
-		;push    ix
+	push    de ; save HL
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
-	ENDIF
+IF DEFINED_USING_amalloc
+	INCLUDE "amalloc.def"
+ENDIF
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
-		di
+	call	crt0_init_bss
+
+	di
         call    _main
-		ei
+	ei
 cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
@@ -96,75 +85,30 @@ IF DEFINED_ANSIstdio
 	call	closeall
 ENDIF
 ENDIF
-
-		;pop     ix		; We preserved HL and IX
-		pop     hl		; ..let's restore them !
-		ld		ix,$47FA
+	pop     hl		; ..let's restore them !
+	ld	ix,$47FA
 start1:
         ld      sp,0
         ret
 
 
-
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
+
+
+IF NEED_floatpack
+        INCLUDE         "float.asm"
 ENDIF
 
-
+;	defm  "Small C+ VG5000"
+;	defb	0
 
         INCLUDE "crt0_runtime_selection.asm"
 
-;-----------
-; Now some variables
-;-----------
-coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    $4000   ; Address of the Graphics map
+	INCLUDE	"crt0_section.asm"
 
-
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
-
-;		defm  "Small C+ VG5000"
-;		defb	0
-
-;-----------------------
-; Floating point support
-;-----------------------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-fp_seed:       defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
-extra:         defs    6		;FP register
-fa:            defs    6		;FP Accumulator
-fasign:        defb    0		;FP register
-
-ENDIF
+	SECTION	code_crt_init
+	ld	hl,$4000
+	ld	(base_graphics),hl
 
