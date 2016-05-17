@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 2014
 ;
-;	$Id: lynx_crt0.asm,v 1.5 2016-05-15 20:15:44 dom Exp $
+;	$Id: lynx_crt0.asm,v 1.6 2016-05-17 19:16:32 dom Exp $
 ;
 
 
@@ -21,8 +21,6 @@
 
         EXTERN    _main
 
-		PUBLIC	snd_tick
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 ;
 ; Some variables which are needed for both app and basic startup
 ;
@@ -33,26 +31,8 @@
 
 
 
-;Exit variables
-
-        PUBLIC    exitsp
-        PUBLIC    exitcount
-
-;For stdin, stdout, stder
-
-        PUBLIC    __sgoioblk
-
-       	PUBLIC	heaplast	;Near malloc heap variables
-       	PUBLIC	heapblocks
-
-; Graphics stuff
-       	PUBLIC	base_graphics
-       	PUBLIC	coords
-
-; Now, getting to the real stuff now!
-
 ;--------
-; Set an origin for the application (-zorg=) default to $4000
+; Set an origin for the application (-zorg=) default to $7000
 ;--------
 
         IF      !myzorg
@@ -79,19 +59,8 @@ start:
 	IF DEFINED_USING_amalloc
 		INCLUDE "amalloc.def"
 	ENDIF
+	call	crt0_init_bss
 
-
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
         call    _main
 cleanup:
 ;
@@ -113,82 +82,14 @@ start1:
 l_dcal:
         jp      (hl)
 
-
-        INCLUDE "crt0_runtime_selection.asm"
-
-;Atexit routine
-
-exitsp:
-                defw    0
-exitcount:
-                defb    0
-
-; Heap stuff
-
-heaplast:	defw	0
-heapblocks:	defw	0
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-; mem stuff
-
-base_graphics:
-		defw	0
-coords:		defw	0
-
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
-
-
-; Now, define some values for stdin, stdout, stderr
-
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
-
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
-
 IF NEED_floatpack
         INCLUDE         "float.asm"
-
-;seed for random number generator - not used yet..
-fp_seed:        defb    $80,$80,0,0,0,0
-;Floating point registers...
-extra:          defs    6
-fa:             defs    6
-fasign:         defb    0
-
 ENDIF
-
-;---------------------------------------------------------------------------
-ENDIF
-;---------------------------------------------------------------------------
 
 	defm  "Small C+ Lynx"
 	defb  0
+
+        INCLUDE "crt0_runtime_selection.asm"
+
+	INCLUDE	"crt0_section.asm"
+
