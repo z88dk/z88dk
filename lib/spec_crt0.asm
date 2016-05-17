@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.42 2016-05-15 20:15:44 dom Exp $
+;       $Id: spec_crt0.asm,v 1.43 2016-05-17 19:13:42 dom Exp $
 ;
 
 
@@ -27,23 +27,6 @@
 
         PUBLIC    cleanup         ; jp'd to by exit()
         PUBLIC    l_dcal          ; jp(hl)
-
-
-        PUBLIC    exitsp          ; atexit() variables
-        PUBLIC    exitcount
-
-        PUBLIC    heaplast        ; Near malloc heap variables
-        PUBLIC    heapblocks
-
-        PUBLIC    __sgoioblk      ; stdio info block
-
-        PUBLIC    base_graphics   ; Graphical variables
-        PUBLIC    coords          ; Current xy position
-
-        PUBLIC    snd_tick        ; Sound variable
-        PUBLIC    bit_irqstatus   ; current irq status when DI is necessary
-
-        PUBLIC    _RND_BLOCKSIZE;
 
         PUBLIC    call_rom3       ; Interposer
        
@@ -164,7 +147,7 @@ IF DEFINED_NEEDresidos
         call    residos_detect
         jp      c,cleanup_exit
 ENDIF
-	call	crt0_init_data
+	call	crt0_init_bss
         call    _main           ; Call user program
 cleanup:
 ;
@@ -379,105 +362,47 @@ ENDIF
         defm    "Small C+ ZX"   ;Unnecessary file signature
         defb    0
 
-;--------
-; Variables: we have two options, to keep them in the program block or to
-; locate such stuff somewhere else in RAM (to make ROMable code).
-;--------
 
-    SECTION code_crt_init
-        ; Setup std* streams
-crt0_init_data:
-        ; TODO: Reset the bss section
-        ld      a,@111000       ; White PAPER, black INK
-        ld      ($5c48),a       ; BORDCR
-        ld      ($5c8d),a       ; ATTR_P
-        ld      ($5c8f),a       ; ATTR_T
-IF NEED_floatpack
-        ld      hl,$8080        ;Initialise floating point seed
-        ld      (fp_seed),hl
-ENDIF
-IF DEFINED_ANSIstdio
-        ld      hl,__sgoioblk
-        ld      de,__sgoioblk+1
-        ld      bc,39
-        ld      (hl),0
-        ldir
-        ld      hl,__sgoioblk+2
-        ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
-        ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
-        ld      (hl),21 ;stderr
-ENDIF
-IF DEFINED_USING_amalloc
-        EXTERN ASMTAIL
-	ld	(_heap),ASMTAIL
-ENDIF
-    ; SDCC initialisation code gets placed here
-    SECTION code_crt_exit
-
-        ret
-    SECTION code_compiler
-    SECTION code_clib
-    SECTION code_crt0_sccz80
-    SECTION code_l_sdcc
-    SECTION code_math
-    SECTION code_error
-    SECTION data_compiler
-    SECTION rodata_compiler
-    SECTION rodata_clib
-
-    SECTION bss_crt
-    ; Variables need by crt0 code and some lib routines can be kept separately
 IF (startup=2) | (startup=3) ; ROM or moved system variables
         IF !DEFINED_sysdefvarsaddr
              defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
         ENDIF
-        org sysdefvarsaddr
+	defc bss_start = sysdefvarsaddr
+        IF !DEFINED_defvarsaddr
+             defc defvarsaddr = 24576   
+        ENDIF
+        defc bss_compiler_start = defvarsaddr
 ELSE
         ; For non-ROM startup move all variables together
         IF DEFINED_defvarsaddr
-            org defvarsaddr
+            defc bss_start = defvarsaddr
         ENDIF
 ENDIF
-coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    0       ; Address of the Graphics map
+	INCLUDE	"crt0_section.asm"
 
-IF !DEFINED_HAVESEED
-                PUBLIC    _std_seed        ;Integer rand() seed
-_std_seed:      defw    0       ; Seed for integer rand() routines
-ENDIF
+	SECTION	code_crt_init
+        ld      a,@111000       ; White PAPER, black INK
+        ld      ($5c48),a       ; BORDCR
+        ld      ($5c8d),a       ; ATTR_P
+        ld      ($5c8f),a       ; ATTR_T
 
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-
-
-IF DEFINED_USING_amalloc
-                EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw 0		; Initialised by code_crt_init - location of the last program byte
-                defw 0
-ENDIF
-
-IF DEFINED_NEED1bitsound
-snd_tick:       defb    0   ; Sound variable
-bit_irqstatus:  defw    0
-ENDIF
+	SECTION bss_crt
 
 ; ZXMMC SD/MMC interface
 IF DEFINED_NEED_ZXMMC
-    PUBLIC card_select
+    	PUBLIC card_select
 card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
 ENDIF
 
+
+IF startup=2
+	PUBLIC  romsvc
+romsvc:         defs    10  ; Pointer to the end of the sysdefvars
+                            ; used by the ROM version of some library
+ENDIF
+
+
+	SECTION rodata_clib
 ; Default block size for "gendos.lib"
 ; every single block (up to 36) is written in a separate file
 ; the bigger RND_BLOCKSIZE, bigger can be the output file size
@@ -486,38 +411,4 @@ ENDIF
 ; in a separate file, so changing this value
 ; at runtime before creating a file is perfectly legal.
 _RND_BLOCKSIZE: defw    1000
-
-; std* streams
-__sgoioblk:     defs    40
-
-;-----------------------
-; Floating point support
-;-----------------------
-IF NEED_floatpack
-fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-extra:          defs    6               ;FP register
-fa:             defs    6               ;FP Accumulator
-fasign:         defb    0               ;FP register
-ENDIF
-
-IF startup=2
-                PUBLIC  romsvc
-romsvc:         defs    10  ; Pointer to the end of the sysdefvars
-                            ; used by the ROM version of some library
-ENDIF
-
-    SECTION bss_compiler
-IF (startup=2) | (startup=3) ; ROM or moved system variables
-        IF !DEFINED_defvarsaddr
-             defc defvarsaddr = 24576   ; Just before the ZX system variables
-        ENDIF
-        org defvarsaddr
-ENDIF
-
-    SECTION bss_clib
-    SECTION bss_error
-
-
-
-
 
