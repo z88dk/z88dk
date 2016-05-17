@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx80_crt0.asm,v 1.9 2016-05-15 20:15:44 dom Exp $
+;       $Id: zx80_crt0.asm,v 1.10 2016-05-17 20:58:40 dom Exp $
 ;
 ; - - - - - - -
 
@@ -33,18 +33,6 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-
-        PUBLIC    exitsp          ;atexit() variables
-        PUBLIC    exitcount
-
-        PUBLIC    __sgoioblk      ;stdio info block
-
-        PUBLIC    heaplast        ;Near malloc heap variables
-        PUBLIC    heapblocks
-
-        PUBLIC    coords          ;Current xy position
-
-;;        PUBLIC    snd_tick        ;Sound variable
 
         PUBLIC    save81          ;Save ZX81 critical registers
         PUBLIC    restore81       ;Restore ZX81 critical registers
@@ -95,17 +83,7 @@ start:
 		INCLUDE "amalloc.def"
 	ENDIF
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-        ld      hl,__sgoioblk+2
-        ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
-        ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
-        ld      (hl),21 ;stderr
-ENDIF
-ENDIF
+	call	crt0_init_bss
 
         call    _main   ;Call user program
         
@@ -143,45 +121,8 @@ zx_slow:
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-        INCLUDE "stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
 
 
-        INCLUDE "crt0_runtime_selection.asm"
-
-;-----------
-; Now some variable
-;-----------
-
-coords:         defw    0       ; Current graphics xy coordinates
-
-
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-;;snd_tick:       defb    0       ; Flag for sound .. D3=out (n),a ..  DB=in a,(m)
 
 ;                defm  "Small C+ ZX80"   ;Unnecessary file signature
 ;                defb    0
@@ -208,9 +149,9 @@ ENDIF
 ;-----------------------
 IF NEED_floatpack
         INCLUDE         "float.asm"
-fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-extra:          defs    6               ;FP register
-fa:             defs    6               ;FP Accumulator
-fasign:         defb    0               ;FP register
 ENDIF
+
+        INCLUDE "crt0_runtime_selection.asm"
+	INCLUDE	"crt0_section.asm"
+
 
