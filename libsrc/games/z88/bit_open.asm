@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.5 2016-04-23 21:06:32 dom Exp $
+; $Id: bit_open.asm,v 1.6 2016-05-17 21:43:06 dom Exp $
 ;
 ; Z88 1 bit sound functions
 ;
@@ -13,7 +13,7 @@
     PUBLIC     _bit_open
     INCLUDE  "interrpt.def"
 
-    EXTERN     snd_asave
+    PUBLIC     snd_asave
     EXTERN     snd_tick
 
 .bit_open
@@ -25,3 +25,7 @@
           out  ($B0),a
           ld   (snd_tick),a
           ret
+
+    SECTION   bss_clib
+snd_asave:	defb	0
+

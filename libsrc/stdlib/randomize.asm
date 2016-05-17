@@ -7,18 +7,18 @@
 ;       void randomize() - randomize the seed for rand()
 ;
 ; -----
-; $Id: randomize.asm,v 1.6 2016-03-06 22:03:07 dom Exp $
+; $Id: randomize.asm,v 1.7 2016-05-17 21:43:06 dom Exp $
 
 SECTION code_clib
 PUBLIC randomize
 PUBLIC _randomize
-EXTERN _std_seed
+EXTERN __stdseed
 EXTERN cleanup
 
-; you must declare an integer named "std_seed" in your
+; you must declare an integer named "__stdseed" in your
 ; main.c file to hold the seed.
 ;
-; int std_seed;
+; int __stdseed;
 
 .randomize
 ._randomize
@@ -44,7 +44,7 @@ ENDIF
    xor	e
    ld	l,a
    
-   ld (_std_seed),hl
+   ld (__stdseed),hl
    ret
 
 

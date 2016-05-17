@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: window.asm,v 1.2 2016-04-04 18:02:35 dom Exp $
+;	$Id: window.asm,v 1.3 2016-05-17 21:43:06 dom Exp $
 ;
 
 ;       This function will open a window of any type (graphics/text)
@@ -41,7 +41,7 @@
                 PUBLIC    _window
                 
                 EXTERN    base_graphics
-                EXTERN    gfx_bank
+                PUBLIC	  gfx_bank
 		EXTERN	  z88_map_segment
 
 .window
@@ -107,3 +107,7 @@
 
 		SECTION	rodata_clib
 .initwind       defb    1,'7','#',0
+
+		SECTION bss_clib
+
+.gfx_bank       defb    0       ;Bank that this is in
