@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.20 2016-05-16 20:11:32 dom Exp $
+;	$Id: app_crt0.asm,v 1.21 2016-05-17 21:47:58 dom Exp $
 
 
 ;--------
@@ -327,7 +327,6 @@ ENDIF
 	INCLUDE "crt0_section.asm"
 
 	SECTION bss_crt
-gfx_bank:	defb	0
 l_erraddr:       defw    0       ;Not sure if these are used...
 l_errlevel:      defb    0
 

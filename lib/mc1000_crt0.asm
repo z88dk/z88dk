@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.14 2016-05-15 20:15:44 dom Exp $
+;       $Id: mc1000_crt0.asm,v 1.15 2016-05-17 21:47:58 dom Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -573,7 +573,6 @@ ENDIF
 pixelbyte:      defw    0       ; 
 coords:         defw    0       ; Current graphics xy coordinates
 ;base_graphics:  defw    0       ; Address of the Graphics map
-;gfx_bank:       defb    0
 
 
 exitsp:         defw    0       ; Address of where the atexit() stack is

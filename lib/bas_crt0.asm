@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.17 2016-05-16 20:11:32 dom Exp $
+;	$Id: bas_crt0.asm,v 1.18 2016-05-17 21:47:58 dom Exp $
 
 
 ;-----------
@@ -139,4 +139,3 @@ _cpfar2near:
         SECTION  bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...
 l_errlevel:      defb    0
-gfx_bank:       defb    0

@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.21 2016-05-17 20:00:12 dom Exp $
+;       $Id: vz_crt0.asm,v 1.22 2016-05-17 21:47:58 dom Exp $
 ;
 
 
@@ -137,9 +137,6 @@ ENDIF
 
 	INCLUDE "crt0_section.asm"
 
-        SECTION bss_crt
-	PUBLIC	gfx_bank
-gfx_bank:       defb    0
 
 	SECTION	code_crt_init
 	ld	hl,$7000

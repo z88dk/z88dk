@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.15 2016-05-17 21:38:21 dom Exp $
+; $Id: z88_crt0.asm,v 1.16 2016-05-17 21:47:58 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -38,8 +38,6 @@
 	EXTERN    _main		;main() is always external to crt0 code
 	PUBLIC    cleanup		;jp'd to by exit()
 	PUBLIC    l_dcal		;jp(hl)
-
-	PUBLIC    gfx_bank	;Bank for this
 
 
 	PUBLIC    processcmd	;Processing <> commands

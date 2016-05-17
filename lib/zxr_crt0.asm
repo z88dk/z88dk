@@ -1,7 +1,7 @@
 ;
 ; Startup for Residos packages
 ;
-; $Id: zxr_crt0.asm,v 1.8 2016-05-15 20:15:44 dom Exp $
+; $Id: zxr_crt0.asm,v 1.9 2016-05-17 21:47:58 dom Exp $
 ;
 
         MODULE	zxs_crt0
@@ -125,54 +125,17 @@ dodos:
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-        INCLUDE "stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
 
-
-
-        INCLUDE "crt0_runtime_selection.asm"
-
-
-;-----------
-; Now some variables
-;-----------
-coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    0       ; Address of the Graphics map
-
-
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-IF DEFINED_NEED1bitsound
-snd_asave:      defb    0	; Sound variable
-snd_tick:       defb    0	;  "      "
-bit_irqstatus:	defw	0
-ENDIF
-
-                defm    "Small C+ ZXR"   ;Unnecessary file signature
-                defb    0
-
-;-----------------------
-; Floating point support
-;-----------------------
 IF NEED_floatpack
 	defs	FLOATING_POINT_NOT_SUPPORTED_FOR_RESIDOS_PACKAGES
-        INCLUDE         "float.asm"
-fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-extra:          defs    6               ;FP register
-fa:             defs    6               ;FP Accumulator
-fasign:         defb    0               ;FP register
-
 ENDIF
 
+	defm    "Small C+ ZXR"   ;Unnecessary file signature
+	defb    0
+        INCLUDE "crt0_runtime_selection.asm"
 
-         
+	INCLUDE "crt0_section.asm"
+
+
+
 
