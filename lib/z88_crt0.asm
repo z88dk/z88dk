@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.14 2016-05-16 20:11:32 dom Exp $
+; $Id: z88_crt0.asm,v 1.15 2016-05-17 21:38:21 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -39,27 +39,15 @@
 	PUBLIC    cleanup		;jp'd to by exit()
 	PUBLIC    l_dcal		;jp(hl)
 
-	PUBLIC    coords		;Current graphics xy coords
-	PUBLIC    base_graphics	;Address of graphics map
 	PUBLIC    gfx_bank	;Bank for this
 
 
-	PUBLIC    exitsp		;Pointer to atexit() stack
-	PUBLIC    exitcount	;Number of atexit() functions registered
-
-	PUBLIC    __sgoioblk	;std* control block
-
 	PUBLIC    processcmd	;Processing <> commands
 
-	PUBLIC	heaplast	;Near malloc heap variables
-	PUBLIC	heapblocks	;
 
 	PUBLIC	_cpfar2near	;Conversion of far to near data
 
 
-	PUBLIC	snd_asave	;sound
-	PUBLIC	snd_tick	;sound
-	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 ;-------
 ; Select which particular startup we want
