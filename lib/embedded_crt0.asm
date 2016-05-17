@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.12 2016-05-15 20:15:44 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.13 2016-05-17 19:30:57 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -30,15 +30,6 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        PUBLIC    exitsp          ;Pointer to atexit() stack
-        PUBLIC    exitcount       ;Number of atexit() functions registered
-
-        PUBLIC    __sgoioblk      ;std* control block
-
-        PUBLIC    heaplast        ;Near malloc heap variables
-        PUBLIC    heapblocks      ;
-
-
 
 	org    ROM_Start
 
@@ -54,7 +45,7 @@ start:
 	ld	(hl),0
 	ldir
 	ld      (exitsp),sp
-	call	crt0_init_data
+	call	crt0_init_bss
 
 ; Entry to the user code
 	call    _main
@@ -76,58 +67,11 @@ endloop:
 l_dcal:
 	jp      (hl)
 
-
-        INCLUDE "crt0_runtime_selection.asm"
-
-;--------
-; Now, include the math routines if needed..
-;--------
 IF NEED_floatpack
         INCLUDE "float.asm"
 ENDIF
 
-SECTION code_crt_init
-crt0_init_data:
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-        ld      hl,__sgoioblk+2
-        ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
-        ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
-        ld      (hl),21 ;stderr
-ENDIF
-ENDIF
-        ld      hl,$8080
-        ld      (fp_seed),hl
-        xor     a
-        ld      (exitcount),a
-SECTION code_crt_exit
-        ret
-SECTION code_compiler
-SECTION code_clib
-SECTION code_crt0_sccz80
-SECTION code_l_sdcc
-SECTION code_error
-SECTION data_compiler
-SECTION data_clib
-SECTION rodata_compiler
-SECTION rodata_clib
+        INCLUDE "crt0_runtime_selection.asm"
 
-SECTION bss_crt
-	org	RAM_Start
-__sgoioblk:             defs    40      ;stdio control block
-exitsp:                 defw    0       ;atexit() stack
-exitcount:              defb    0       ;Number of atexit() routines
-fp_seed:                defs    6       ;Floating point seed (not used ATM)
-extra:                  defs    6       ;Floating point spare register
-fa:                     defs    6       ;Floating point accumulator
-fasign:                 defb    0       ;Floating point variable
-heapblocks:             defw    0       ;Number of free blocks
-heaplast:               defw    0       ;Pointer to linked blocks
-SECTION bss_clib
-SECTION bss_compiler
-SECTION bss_error
-
-
+	defc	bss_start = RAM_Start
+	INCLUDE	"crt0_section.asm"
