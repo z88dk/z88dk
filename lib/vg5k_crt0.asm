@@ -3,7 +3,7 @@
 ;       Joaopa Jun. 2014
 ;       Stefano Bodrato Lug. 2014
 ;
-;       $Id: vg5k_crt0.asm,v 1.9 2016-05-17 20:14:11 dom Exp $
+;       $Id: vg5k_crt0.asm,v 1.10 2016-05-17 20:16:39 dom Exp $
 ;
 
 
@@ -25,20 +25,6 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-
-        PUBLIC    exitsp          ;atexit() variables
-        PUBLIC    exitcount
-
-       	PUBLIC	heaplast	;Near malloc heap variables
-        PUBLIC	heapblocks
-
-        PUBLIC    __sgoioblk      ;stdio info block
-
-        PUBLIC    base_graphics   ;Graphical variables
-        PUBLIC	coords		;Current xy position
-
-        PUBLIC	snd_tick	;Sound variable
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 ; Now, getting to the real stuff now!
 
