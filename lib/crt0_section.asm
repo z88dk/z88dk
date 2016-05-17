@@ -41,6 +41,7 @@ ENDIF
 		SECTION code_l_sdcc
 		SECTION code_math
 		SECTION code_error
+		SECTION data_bss
 		SECTION data_compiler
 		SECTION rodata_compiler
 		SECTION rodata_clib
