@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.18 2016-05-16 20:11:32 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.19 2016-05-17 21:09:40 dom Exp $
 ;
 ; - - - - - - -
 
@@ -28,17 +28,6 @@
 	PUBLIC    cleanup         ;jp'd to by exit()
 	PUBLIC    l_dcal          ;jp(hl)
 
-
-	PUBLIC    exitsp          ;atexit() variables
-	PUBLIC    exitcount
-
-	PUBLIC    __sgoioblk      ;stdio info block
-
-	PUBLIC	heaplast	;Near malloc heap variables
-	PUBLIC	heapblocks
-
-	PUBLIC    base_graphics   ;Graphical variables (useless with NASCOM)
-	PUBLIC    coords          ;Current xy position
 
 	PUBLIC    montest         ;NASCOM: check the monitor type
 
