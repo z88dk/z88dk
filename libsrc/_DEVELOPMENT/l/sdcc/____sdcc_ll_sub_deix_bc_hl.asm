@@ -19,19 +19,21 @@ ____sdcc_ll_sub_deix_bc_hl:
 
 ____sdcc_ll_sub_deix_bc_hl_0:
 
+   ; de = bc - hl
+   
    ld a,(bc)
    sub a,(hl)
    ld (de),a
    inc bc
    inc de
    inc hl
-  
+   
    ld a,(bc)
    sbc a,(hl)
    ld (de),a
-  
+   
    call again
-
+   
 again:
 
    inc bc
@@ -40,19 +42,20 @@ again:
    ld a,(bc)
    sbc a,(hl)
    ld (de),a
-   
+
    inc bc
    inc de
    inc hl
    ld a,(bc)
    sbc a,(hl)
    ld (de),a
-   
+
    inc bc
    inc de
    inc hl
    ld a,(bc)
    sbc a,(hl)
    ld (de),a
-   
+
    ret
+

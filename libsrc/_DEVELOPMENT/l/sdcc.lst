@@ -1,11 +1,13 @@
 l/sdcc/____sdcc_ll_add_de_bc_hl
 l/sdcc/____sdcc_ll_add_deix_bc_hl
 l/sdcc/____sdcc_ll_add_deix_hlix
+l/sdcc/____sdcc_ll_add_hlix_deix_bcix
 l/sdcc/____sdcc_ll_asr_hlix_a
 l/sdcc/____sdcc_ll_asr_mbc_a
 l/sdcc/____sdcc_ll_copy_src_de_dst_hlix
 l/sdcc/____sdcc_ll_copy_src_de_dst_hlsp
 l/sdcc/____sdcc_ll_copy_src_deix_dst_hl
+l/sdcc/____sdcc_ll_copy_src_deix_dst_hlix
 l/sdcc/____sdcc_ll_copy_src_deixm_dst_hlsp
 l/sdcc/____sdcc_ll_copy_src_desp_dst_hlsp
 l/sdcc/____sdcc_ll_copy_src_hl_dst_de
@@ -20,6 +22,7 @@ l/sdcc/____sdcc_ll_push_mhl
 l/sdcc/____sdcc_ll_sub_de_bc_hl
 l/sdcc/____sdcc_ll_sub_deix_bc_hl
 l/sdcc/____sdcc_ll_sub_deix_hlix
+l/sdcc/____sdcc_ll_sub_hlix_deix_bcix
 l/sdcc/___sdcc_call_hl
 l/sdcc/___sdcc_call_iy
 l/sdcc/___sdcc_enter_ix
