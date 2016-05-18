@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: m5_crt0.asm,v 1.16 2016-05-15 20:15:44 dom Exp $
+;       $Id: m5_crt0.asm,v 1.17 2016-05-18 21:17:00 dom Exp $
 ;
 
 
@@ -31,41 +31,18 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
-
-;Exit variables
-
-        PUBLIC    exitsp
-        PUBLIC    exitcount
-
-       	PUBLIC	heaplast	;Near malloc heap variables
-        PUBLIC	heapblocks
-
-;For stdin, stdout, stder
-
-        PUBLIC    __sgoioblk
-
 ; Graphics stuff
         PUBLIC	pixelbyte	; Temp store for non-buffered mode
-        PUBLIC    base_graphics   ; Graphical variables
-        PUBLIC    coords          ; Current xy position
 
 ; MSX platform specific stuff
 ;
         PUBLIC    msxbios
 
-		PUBLIC	RG0SAV		;keeping track of VDP register values
-		PUBLIC	RG1SAV
-		PUBLIC	RG2SAV
-		PUBLIC	RG3SAV
-		PUBLIC	RG4SAV
-		PUBLIC	RG5SAV
-		PUBLIC	RG6SAV
-		PUBLIC	RG7SAV
 
 ; Now, getting to the real stuff now!
 
 IF      !myzorg
-		defc    myzorg  = $7300
+	defc    myzorg  = $7300
 ENDIF
 
         org     myzorg
@@ -89,18 +66,7 @@ start:
         exx
         push	hl
 
-
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
+	call	crt0_init_bss
 
         call    _main
         
@@ -129,49 +95,32 @@ start1:
 l_dcal:
 	jp      (hl)
 
-; Now, define some values for stdin, stdout, stderr
+; Safe BIOS call
+msxbios:
+	push	ix
+	ret
 
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
+IF NEED_floatpack
+        INCLUDE "float.asm"
 ENDIF
 
+	defm  "Small C+ SORD M5"
+	defb	0
 
         INCLUDE "crt0_runtime_selection.asm"
 
-;Seed for integer rand() routines
+        INCLUDE "crt0_section.asm"
 
-;Atexit routine
+	SECTION	bss_crt
 
-exitsp:
-                defw    0
-exitcount:
-                defb    0
-
-; Heap stuff
-
-heaplast:	defw	0
-heapblocks:	defw	0
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-; Graphics stuff
-
-base_graphics:  defw    0	; Location of current screen buffer
-coords:         defw    0       ; Current graphics xy coordinates
-pixelbyte:	defb	0
-
+	PUBLIC	RG0SAV		;keeping track of VDP register values
+	PUBLIC	RG1SAV
+	PUBLIC	RG2SAV
+	PUBLIC	RG3SAV
+	PUBLIC	RG4SAV
+	PUBLIC	RG5SAV
+	PUBLIC	RG6SAV
+	PUBLIC	RG7SAV
 RG0SAV:		defb	0	;keeping track of VDP register values
 RG1SAV:		defb	0
 RG2SAV:		defb	0
@@ -181,42 +130,4 @@ RG5SAV:		defb	0
 RG6SAV:		defb	0
 RG7SAV:		defb	0
 
-
-; ---------------
-; MSX specific stuff
-; ---------------
-
-; Safe BIOS call
-msxbios:
-	push	ix
-	ret
-
-
-    defm  "Small C+ SORD M5"
-    defb	0
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
-
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-
-;seed for random number generator - not used yet..
-fp_seed:        defb    $80,$80,0,0,0,0
-;Floating point registers...
-extra:          defs    6
-fa:             defs    6
-fasign:         defb    0
-
-ENDIF
 
