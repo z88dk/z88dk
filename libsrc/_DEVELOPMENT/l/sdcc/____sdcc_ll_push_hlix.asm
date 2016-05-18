@@ -3,6 +3,7 @@ SECTION code_clib
 SECTION code_l_sdcc
 
 PUBLIC ____sdcc_ll_push_hlix
+PUBLIC ____sdcc_ll_push_hlix_0
 
 ____sdcc_ll_push_hlix:
 
@@ -10,6 +11,9 @@ ____sdcc_ll_push_hlix:
    pop de
    
    add hl,de
+   
+____sdcc_ll_push_hlix_0:
+   
    ex de,hl
    
    ld hl,-6
@@ -22,17 +26,8 @@ ____sdcc_ll_push_hlix:
    
    ex de,hl
    
-   ldi
-   ldi
-   ldi
-   ldi
-   
-   ldi
-   ldi
-   ldi
-   
-   ld a,(hl)
-   ld (de),a
+   ld bc,8
+   ldir
    
    pop bc
    ret
