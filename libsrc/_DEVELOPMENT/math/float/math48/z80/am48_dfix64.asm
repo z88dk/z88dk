@@ -3,6 +3,7 @@ SECTION code_clib
 SECTION code_fp_math48
 
 PUBLIC am48_dfix64
+PUBLIC am48_dfix64_0
 
 EXTERN error_llznc, am48_derror_erange_longlongc
 EXTERN l_lsr_dehldehl, l_neg_64_dehldehl
