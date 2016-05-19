@@ -14,6 +14,14 @@
 	call	__divschar_callee
 	push	hl
 
+	call	__divschar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divschar_callee
+	ld	hl,%1
+	push	hl
+
 	call	__divsint
 	pop	af
 	pop	af
@@ -25,6 +33,15 @@
 	ex	(sp),hl
 =
 	call	__divsint_callee
+	push	hl
+
+	call	__divsint
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divsint_callee
+	ld	hl,%1
 	push	hl
 
 	call	__divslong
@@ -42,6 +59,17 @@
 	ex	(sp),hl
 =
 	call	__divslong_callee
+	push	hl
+
+	call	__divslong
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divslong_callee
+	ld	hl,%1
 	push	hl
 
 	call	__divslonglong
@@ -62,6 +90,14 @@
 	call	__divsuchar_callee
 	push	hl
 
+	call	__divsuchar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divsuchar_callee
+	ld	hl,%1
+	push	hl
+
 	call	__divuchar
 	pop	af
 =
@@ -71,6 +107,14 @@
 	ex	(sp),hl
 =
 	call	__divuchar_callee
+	push	hl
+
+	call	__divuchar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divuchar_callee
+	ld	hl,%1
 	push	hl
 
 	call	__divuint
@@ -84,6 +128,15 @@
 	ex	(sp),hl
 =
 	call	__divuint_callee
+	push	hl
+
+	call	__divuint
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divuint_callee
+	ld	hl,%1
 	push	hl
 
 	call	__divulong
@@ -101,6 +154,17 @@
 	ex	(sp),hl
 =
 	call	__divulong_callee
+	push	hl
+
+	call	__divulong
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divulong_callee
+	ld	hl,%1
 	push	hl
 
 	call	__divulonglong
@@ -121,6 +185,14 @@
 	call	__divuschar_callee
 	push	hl
 
+	call	__divuschar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__divuschar_callee
+	ld	hl,%1
+	push	hl
+
 	call	__modschar
 	pop	af
 =
@@ -130,6 +202,14 @@
 	ex	(sp),hl
 =
 	call	__modschar_callee
+	push	hl
+
+	call	__modschar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__modschar_callee
+	ld	hl,%1
 	push	hl
 
 	call	__modsint
@@ -143,6 +223,15 @@
 	ex	(sp),hl
 =
 	call	__modsint_callee
+	push	hl
+
+	call	__modsint
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__modsint_callee
+	ld	hl,%1
 	push	hl
 
 	call	__modslong
@@ -160,6 +249,17 @@
 	ex	(sp),hl
 =
 	call	__modslong_callee
+	push	hl
+
+	call	__modslong
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__modslong_callee
+	ld	hl,%1
 	push	hl
 
 	call	__modslonglong
@@ -180,6 +280,14 @@
 	call	__modsuchar_callee
 	push	hl
 
+	call	__modsuchar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__modsuchar_callee
+	ld	hl,%1
+	push	hl
+
 	call	__moduchar
 	pop	af
 =
@@ -189,6 +297,14 @@
 	ex	(sp),hl
 =
 	call	__moduchar_callee
+	push	hl
+
+	call	__moduchar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__moduchar_callee
+	ld	hl,%1
 	push	hl
 
 	call	__moduint
@@ -202,6 +318,15 @@
 	ex	(sp),hl
 =
 	call	__moduint_callee
+	push	hl
+
+	call	__moduint
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__moduint_callee
+	ld	hl,%1
 	push	hl
 
 	call	__modulong
@@ -219,6 +344,17 @@
 	ex	(sp),hl
 =
 	call	__modulong_callee
+	push	hl
+
+	call	__modulong
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__modulong_callee
+	ld	hl,%1
 	push	hl
 
 	call	__modulonglong
@@ -239,6 +375,14 @@
 	call	__moduschar_callee
 	push	hl
 
+	call	__moduschar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__moduschar_callee
+	ld	hl,%1
+	push	hl
+
 	call	__mulint
 	pop	af
 	pop	af
@@ -250,6 +394,15 @@
 	ex	(sp),hl
 =
 	call	__mulint_callee
+	push	hl
+
+	call	__mulint
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__mulint_callee
+	ld	hl,%1
 	push	hl
 
 	call	__mullong
@@ -267,6 +420,17 @@
 	ex	(sp),hl
 =
 	call	__mullong_callee
+	push	hl
+
+	call	__mullong
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__mullong_callee
+	ld	hl,%1
 	push	hl
 
 	call	__mullonglong
@@ -287,6 +451,14 @@
 	call	__mulschar_callee
 	push	hl
 
+	call	__mulschar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__mulschar_callee
+	ld	hl,%1
+	push	hl
+
 	call	__mulsuchar
 	pop	af
 =
@@ -298,6 +470,14 @@
 	call	__mulsuchar_callee
 	push	hl
 
+	call	__mulsuchar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__mulsuchar_callee
+	ld	hl,%1
+	push	hl
+
 	call	__muluschar
 	pop	af
 =
@@ -307,6 +487,14 @@
 	ex	(sp),hl
 =
 	call	__muluschar_callee
+	push	hl
+
+	call	__muluschar
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	__muluschar_callee
+	ld	hl,%1
 	push	hl
 
 	call	__rlslonglong
@@ -354,6 +542,15 @@
 	call	___fs2schar_callee
 	push	hl
 
+	call	___fs2schar
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fs2schar_callee
+	ld	hl,%1
+	push	hl
+
 	call	___fs2sint
 	pop	af
 	pop	af
@@ -367,6 +564,15 @@
 	call	___fs2sint_callee
 	push	hl
 
+	call	___fs2sint
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fs2sint_callee
+	ld	hl,%1
+	push	hl
+
 	call	___fs2slong
 	pop	af
 	pop	af
@@ -378,6 +584,15 @@
 	ex	(sp),hl
 =
 	call	___fs2slong_callee
+	push	hl
+
+	call	___fs2slong
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fs2slong_callee
+	ld	hl,%1
 	push	hl
 
 	call	___fs2slonglong
@@ -395,6 +610,16 @@
 	call	___fs2slonglong_callee
 	push	hl
 
+	call	___fs2slonglong
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fs2slonglong_callee
+	ld	hl,%1
+	push	hl
+
 	call	___fs2uchar
 	pop	af
 	pop	af
@@ -406,6 +631,15 @@
 	ex	(sp),hl
 =
 	call	___fs2uchar_callee
+	push	hl
+
+	call	___fs2uchar
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fs2uchar_callee
+	ld	hl,%1
 	push	hl
 
 	call	___fs2uint
@@ -421,6 +655,15 @@
 	call	___fs2uint_callee
 	push	hl
 
+	call	___fs2uint
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fs2uint_callee
+	ld	hl,%1
+	push	hl
+
 	call	___fs2ulong
 	pop	af
 	pop	af
@@ -432,6 +675,15 @@
 	ex	(sp),hl
 =
 	call	___fs2ulong_callee
+	push	hl
+
+	call	___fs2ulong
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fs2ulong_callee
+	ld	hl,%1
 	push	hl
 
 	call	___fs2ulonglong
@@ -447,6 +699,16 @@
 	ex	(sp),hl
 =
 	call	___fs2ulonglong_callee
+	push	hl
+
+	call	___fs2ulonglong
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fs2ulonglong_callee
+	ld	hl,%1
 	push	hl
 
 	call	___fsadd
@@ -466,6 +728,17 @@
 	call	___fsadd_callee
 	push	hl
 
+	call	___fsadd
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsadd_callee
+	ld	hl,%1
+	push	hl
+
 	call	___fsdiv
 	pop	af
 	pop	af
@@ -481,6 +754,17 @@
 	ex	(sp),hl
 =
 	call	___fsdiv_callee
+	push	hl
+
+	call	___fsdiv
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsdiv_callee
+	ld	hl,%1
 	push	hl
 
 	call	___fseq
@@ -500,6 +784,17 @@
 	call	___fseq_callee
 	push	hl
 
+	call	___fseq
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fseq_callee
+	ld	hl,%1
+	push	hl
+
 	call	___fsgt
 	pop	af
 	pop	af
@@ -515,6 +810,17 @@
 	ex	(sp),hl
 =
 	call	___fsgt_callee
+	push	hl
+
+	call	___fsgt
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsgt_callee
+	ld	hl,%1
 	push	hl
 
 	call	___fslt
@@ -534,6 +840,17 @@
 	call	___fslt_callee
 	push	hl
 
+	call	___fslt
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fslt_callee
+	ld	hl,%1
+	push	hl
+
 	call	___fsmul
 	pop	af
 	pop	af
@@ -549,6 +866,17 @@
 	ex	(sp),hl
 =
 	call	___fsmul_callee
+	push	hl
+
+	call	___fsmul
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsmul_callee
+	ld	hl,%1
 	push	hl
 
 	call	___fsneq
@@ -568,6 +896,17 @@
 	call	___fsneq_callee
 	push	hl
 
+	call	___fsneq
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fsneq_callee
+	ld	hl,%1
+	push	hl
+
 	call	___fssub
 	pop	af
 	pop	af
@@ -583,6 +922,17 @@
 	ex	(sp),hl
 =
 	call	___fssub_callee
+	push	hl
+
+	call	___fssub
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___fssub_callee
+	ld	hl,%1
 	push	hl
 
 	call	___schar2fs
@@ -601,6 +951,14 @@
 	call	___sint2fs_callee
 	push	hl
 
+	call	___sint2fs
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___sint2fs_callee
+	ld	hl,%1
+	push	hl
+
 	call	___slong2fs
 	pop	af
 	pop	af
@@ -612,6 +970,15 @@
 	ex	(sp),hl
 =
 	call	___slong2fs_callee
+	push	hl
+
+	call	___slong2fs
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___slong2fs_callee
+	ld	hl,%1
 	push	hl
 
 	call	___slonglong2fs
@@ -629,6 +996,17 @@
 	ex	(sp),hl
 =
 	call	___slonglong2fs_callee
+	push	hl
+
+	call	___slonglong2fs
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___slonglong2fs_callee
+	ld	hl,%1
 	push	hl
 
 	call	___uchar2fs
@@ -647,6 +1025,14 @@
 	call	___uint2fs_callee
 	push	hl
 
+	call	___uint2fs
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___uint2fs_callee
+	ld	hl,%1
+	push	hl
+
 	call	___ulong2fs
 	pop	af
 	pop	af
@@ -658,6 +1044,15 @@
 	ex	(sp),hl
 =
 	call	___ulong2fs_callee
+	push	hl
+
+	call	___ulong2fs
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___ulong2fs_callee
+	ld	hl,%1
 	push	hl
 
 	call	___ulonglong2fs
@@ -675,6 +1070,17 @@
 	ex	(sp),hl
 =
 	call	___ulonglong2fs_callee
+	push	hl
+
+	call	___ulonglong2fs
+	pop	af
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	___ulonglong2fs_callee
+	ld	hl,%1
 	push	hl
 
 ;;
@@ -697,6 +1103,16 @@
 	push	hl
 
 	call	_memcpy
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	_memcpy_callee
+	ld	hl,%1
+	push	hl
+
+	call	_memcpy
 	ld	hl,6
 	add	hl,sp
 	ld	sp,hl
@@ -716,6 +1132,15 @@
 	call	_strcpy_callee
 	push	hl
 
+	call	_strcpy
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	_strcpy_callee
+	ld	hl,%1
+	push	hl
+
 	call	_strncpy
 	pop	af
 	pop	af
@@ -729,6 +1154,16 @@
 	ex	(sp),hl
 =
 	call	_strncpy_callee
+	push	hl
+
+	call	_strncpy
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	_strncpy_callee
+	ld	hl,%1
 	push	hl
 
 	call	_strncpy
@@ -751,6 +1186,15 @@
 	call	_strchr_callee
 	push	hl
 
+	call	_strchr
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	_strchr_callee
+	ld	hl,%1
+	push	hl
+
 	call	_memset
 	pop	af
 	pop	af
@@ -764,6 +1208,16 @@
 	ex	(sp),hl
 =
 	call	_memset_callee
+	push	hl
+
+	call	_memset
+	pop	af
+	pop	af
+	ld	hl,%1
+	ex	(sp),hl
+=
+	call	_memset_callee
+	ld	hl,%1
 	push	hl
 
 	call	_memset
