@@ -2848,10 +2848,10 @@ replace restart {
 } if notUsed(%4)
 
 replace restart {
-	call	l_setmem_hl - 4-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2
+	call	____sdcc_lib_setmem_hl - 4-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2
 } by {
-	call	l_setmem_hl - 30
-	call	l_setmem_hl - 4
+	call	____sdcc_lib_setmem_hl - 30
+	call	____sdcc_lib_setmem_hl - 4
 	; peephole z88dk-code-reduction-38a
 }
 
@@ -2863,16 +2863,16 @@ replace restart {
 	inc	hl
 } by {
 	xor	a,a
-	call	l_setmem_hl - 4
+	call	____sdcc_lib_setmem_hl - 4
 	; peephole z88dk-code-reduction-38b
 }
 
 replace restart {
-	call	l_setmem_hl - %1
+	call	____sdcc_lib_setmem_hl - %1
 	ld	(hl),a
 	inc	hl
 } by {
-	call	l_setmem_hl - %1-2
+	call	____sdcc_lib_setmem_hl - %1-2
 	; peephole z88dk-code-reduction-38c
 }
 
