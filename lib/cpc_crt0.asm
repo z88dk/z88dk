@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.31 2016-05-17 19:43:39 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.32 2016-05-19 20:25:43 dom Exp $
 ;
 
         MODULE  cpc_crt0
@@ -80,7 +80,6 @@ IF NEED_floatpack
         EXTERN     init_floatpack
         call    init_floatpack
 ENDIF
-
         call    _main
 
 cleanup:
@@ -186,10 +185,6 @@ ENDIF
 	ld	(base_graphics),hl
 
 		SECTION	bss_crt
-		PUBLIC	firmware_bc
-		PUBLIC	firmware_af
-firmware_bc:    defw    0
-firmware_af:    defw    0
 __fw_exx_set_bc__:        defs 2
 __process_exx_set_af__:   defs 2
 __process_exx_set_bc__:   defs 2
