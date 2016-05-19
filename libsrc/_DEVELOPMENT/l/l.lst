@@ -142,6 +142,7 @@ l/z80/long/small/l_small_asr_dehl
 l/z80/long/small/l_small_lsl_dehl
 l/z80/long/small/l_small_lsr_dehl
 l/z80/longlong/l_add_64_dehldehl_a
+l/z80/longlong/l_add_64_mde_mbc_mhl
 l/z80/longlong/l_add_64_mde_mhl
 l/z80/longlong/l_asr_dehldehl
 l/z80/longlong/l_cpl_64_dehldehl
@@ -153,6 +154,7 @@ l/z80/longlong/l_lsr_dehldehl
 l/z80/longlong/l_neg_64_dehldehl
 l/z80/longlong/l_neg_64_mhl
 l/z80/longlong/l_store_64_dehldehl_mbc
+l/z80/longlong/l_sub_64_mde_mbc_mhl
 l/z80/longlong/l_sub_64_mde_mhl
 l/z80/longlong/l_testzero_64_mhl
 l/z80/longlong/l_testzero_64_dehldehl

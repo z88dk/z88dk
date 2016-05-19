@@ -4,6 +4,6 @@ SECTION code_l_sdcc
 
 PUBLIC ____sdcc_ll_add_de_bc_hl
 
-EXTERN ____sdcc_ll_add_deix_bc_hl_0
+EXTERN l_add_64_mde_mbc_mhl
 
-defc ____sdcc_ll_add_de_bc_hl = ____sdcc_ll_add_deix_bc_hl_0
+defc ____sdcc_ll_add_de_bc_hl = l_add_64_mde_mbc_mhl

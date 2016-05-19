@@ -2,20 +2,19 @@
 SECTION code_clib
 SECTION code_l_sdcc
 
-PUBLIC ____sdcc_ll_add_deix_bc_hl
+PUBLIC ____sdcc_ll_add_de_bc_hlix
 
 EXTERN ____sdcc_ll_add_de_bc_hl
 
-____sdcc_ll_add_deix_bc_hl:
+____sdcc_ll_add_de_bc_hlix:
 
-   push hl
+   push bc
    
    push ix
-   pop hl
+   pop bc
    
-   add hl,de
-   ex de,hl
+   add hl,bc
    
-   pop hl
-
+   pop bc
+   
    jp ____sdcc_ll_add_de_bc_hl
