@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.18 2016-05-17 21:47:58 dom Exp $
+;	$Id: bas_crt0.asm,v 1.19 2016-05-19 22:26:10 dom Exp $
 
 
 ;-----------
@@ -52,9 +52,10 @@ start:
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "amalloc.def"
-	ENDIF
+IF DEFINED_USING_amalloc
+	ld	hl,(start1+1)
+	INCLUDE "amalloc.def"
+ENDIF
 
         call    doerrhan	;Initialise a laughable error handler
 

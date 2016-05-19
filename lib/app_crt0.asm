@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.21 2016-05-17 21:47:58 dom Exp $
+;	$Id: app_crt0.asm,v 1.22 2016-05-19 22:26:10 dom Exp $
 
 
 ;--------
@@ -145,9 +145,7 @@ init_continue:			;We had enough memory
         call_oz(gn_sop)
         ld      hl,clrscr2
         call_oz(gn_sop)
-;--------
-; Now, set up some very nice variables - stream ids for std*
-;--------
+	
 	call	crt0_init_bss
 
         ld      hl,-64		;Setup atexit() stack
@@ -155,6 +153,10 @@ init_continue:			;We had enough memory
         ld      sp,hl
         ld      (exitsp),sp
 IF DEFINED_USING_amalloc
+	ld	a,reqpag	; Free space to the end of reqpag
+	or	$20
+	ld	h,a
+	ld	l,0
 	INCLUDE "amalloc.def"
 ENDIF
 IF DEFINED_farheapsz
