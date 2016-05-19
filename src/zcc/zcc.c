@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.125 2016-05-15 20:26:49 aralbrec Exp $
+ *      $Id: zcc.c,v 1.126 2016-05-19 02:11:35 aralbrec Exp $
  */
 
 
@@ -107,6 +107,7 @@ static int             cleanup = 1;
 static int             assembleonly = 0;
 static int             compileonly = 0;
 static int             c_code_in_asm = 0;
+static int             opt_code_size = 0;
 static int             verbose = 0;
 static int             peepholeopt = 0;
 static int             sdccpeepopt = 0;
@@ -223,6 +224,10 @@ static char  *c_sdccpeeph0 = NULL;
 static char  *c_sdccpeeph1 = NULL;
 static char  *c_sdccpeeph2 = NULL;
 static char  *c_sdccpeeph3 = NULL;
+static char  *c_sdccpeeph0cs = NULL;
+static char  *c_sdccpeeph1cs = NULL;
+static char  *c_sdccpeeph2cs = NULL;
+static char  *c_sdccpeeph3cs = NULL;
 static char  *c_crt0 = NULL;
 static char  *c_linkopts = NULL;
 static char  *c_asmopts = NULL;
@@ -291,7 +296,7 @@ static arg_t  config[] = {
     {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "DESTDIR/lib/z80rules.1" },
     {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2"},
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
-	{"COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "DESTDIR/lib/z80rules.9"},
+    {"COPTRULES9", 0, SetStringConfig, &c_coptrules9, NULL, "", "DESTDIR/lib/z80rules.9"},
     {"SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1"},
     {"SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2"},
     {"SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3"},
@@ -299,7 +304,11 @@ static arg_t  config[] = {
     {"SDCCPEEP1", 0, SetStringConfig, &c_sdccpeeph1, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.1"},
     {"SDCCPEEP2", 0, SetStringConfig, &c_sdccpeeph2, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.2"},
     {"SDCCPEEP3", 0, SetStringConfig, &c_sdccpeeph3, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.3"},
-	{"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
+    {"SDCCOPTSZ0", 0, SetStringConfig, &c_sdccpeeph0cs, NULL, "", " --no-peep"},
+    {"SDCCOPTSZ1", 0, SetStringConfig, &c_sdccpeeph1cs, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.1"},
+    {"SDCCOPTSZ2", 0, SetStringConfig, &c_sdccpeeph2cs, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.2"},
+    {"SDCCOPTSZ3", 0, SetStringConfig, &c_sdccpeeph3cs, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.3"},
+    {"CRT0", 0, SetStringConfig, &c_crt0, NULL, ""},
 
     {"ALTMATHLIB", 0, SetStringConfig, &c_altmathlib, NULL, "Name of the alt maths library"},
     {"ALTMATHFLG", 0, SetStringConfig, &c_altmathflags, NULL, "Additional options for non-generic maths"},
@@ -363,10 +372,11 @@ static arg_t     myargs[] = {
     {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
     {"S", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
     {"-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm/.opt files"},
+    {"-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)"},
     {"m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable"},
-	{"g", AF_BOOL_TRUE, SetBoolean, &globaldefon, NULL, "Generate a global defs file of the final executable"},
+    {"g", AF_BOOL_TRUE, SetBoolean, &globaldefon, NULL, "Generate a global defs file of the final executable"},
     {"s", AF_BOOL_TRUE, SetBoolean, &symbolson, NULL, "Generate a symbol map of the final executable"},
-	{"-list", AF_BOOL_TRUE, SetBoolean, &lston, NULL, "Generate list files"},
+    {"-list", AF_BOOL_TRUE, SetBoolean, &lston, NULL, "Generate list files"},
     {"o", AF_MORE, SetString, &outputfile, NULL, "Set the output files"},
     {"nt", 0, AddAppmake, NULL, NULL, "Set notruncate on the appmake options"},
     {"M",  AF_MORE, SetString, &c_extension_config, NULL, "Define the suffix of the object files (eg -Mo)"},
@@ -506,7 +516,7 @@ int linkthem(char *linker)
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
             (relocate && z80verbose && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
             linkargs,
-			globaldefon ? "-g " : "",
+            globaldefon ? "-g " : "",
             c_crt0,
             ext);
             
@@ -709,16 +719,16 @@ int main(int argc, char **argv)
                switch (sdccpeepopt)
                {
                case 0:
-                  add_option_to_compiler(c_sdccpeeph0);
+                  add_option_to_compiler(opt_code_size ? c_sdccpeeph0cs : c_sdccpeeph0);
                   break;
                case 1:
-                  add_option_to_compiler(c_sdccpeeph1);
+                  add_option_to_compiler(opt_code_size ? c_sdccpeeph1cs : c_sdccpeeph1);
                   break;
                case 2:
-                  add_option_to_compiler(c_sdccpeeph2);
+                  add_option_to_compiler(opt_code_size ? c_sdccpeeph2cs : c_sdccpeeph2);
                   break;
                default:
-                  add_option_to_compiler(c_sdccpeeph3);
+                  add_option_to_compiler(opt_code_size ? c_sdccpeeph3cs : c_sdccpeeph3);
                   break;
                }
             }
@@ -1424,9 +1434,7 @@ static void configure_compiler()
     /* compiler= */
     if ( strcmp(c_compiler_type,"sdcc") == 0 ) {
         compiler_type = CC_SDCC;
-        // snprintf(buf,sizeof(buf),"-mz80 --reserve-regs-iy --no-optsdcc-in-asm --c1mode --asm=%s",sdcc_assemblernames[assembler_type]);
-		// move restriction on iy to target cfg, always used asz80 with sdcc
-		snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode --emit-externs %s",c_code_in_asm ? "" : "--no-c-code-in-asm");
+        snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode --emit-externs %s %s ",(c_code_in_asm ? "" : "--no-c-code-in-asm"),(opt_code_size ? "--opt-code-size" : ""));
         add_option_to_compiler(buf);
         if ( sdccarg ) {
             add_option_to_compiler(sdccarg);
