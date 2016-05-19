@@ -46,6 +46,10 @@
 #define KEY_DEL 12
 #endif
 
+#ifdef CPC
+#define KEY_DEL 12
+#endif
+
 #ifdef Z88
 #define KEY_DEL 127
 #endif
