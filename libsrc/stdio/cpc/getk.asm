@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: getk.asm,v 1.6 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: getk.asm,v 1.7 2016-05-19 20:51:01 dom Exp $
 ;
 
         PUBLIC	getk
@@ -24,4 +24,7 @@
         ld      hl,0
         ret     nc
         ld      l,a
+	cp	127
+	ret	nz
+	ld	l,12
         ret

@@ -6,7 +6,7 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.5 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.6 2016-05-19 20:51:01 dom Exp $
 ;
 
         PUBLIC	fgetc_cons
@@ -19,5 +19,8 @@
         defw    km_wait_char
         ld      h,0
         ld      l,a
+	cp	127
+	ret	nz
+	ld	l,12
         ret
 
