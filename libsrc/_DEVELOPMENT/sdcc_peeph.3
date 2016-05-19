@@ -348,23 +348,10 @@ replace restart {
 	jp	PO,%1
 	ei
 %1:
-	ret
-} by {
-	call	asm_z80_pop_ei
-	nop
-	ret
-	; peephole z88dk-bugfix-4b-critical-close-1
-}
-
-replace restart {
-	pop	af
-	jp	PO,%1
-	ei
-%1:
 } by {
 	call	asm_z80_pop_ei
 %1:
-	; peephole z88dk-bugfix-4c-critical-close-2
+	; peephole z88dk-bugfix-4c-critical-close
 }
 
 

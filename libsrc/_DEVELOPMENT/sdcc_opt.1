@@ -424,3 +424,12 @@ __xinit_%0
 %"[^\"';(]*"0(+%1
 =
 %0(%1
+
+;;
+;; bugfixes
+;;
+
+	jp  asm_z80_pop_ei
+=
+	call	asm_z80_pop_ei
+	ret
