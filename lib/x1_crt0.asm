@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.10 2016-05-15 20:15:44 dom Exp $
+;    $Id: x1_crt0.asm,v 1.11 2016-05-19 22:17:52 dom Exp $
 ;
 
 	MODULE x1_crt0
@@ -25,18 +25,6 @@
         PUBLIC    cleanup 
         PUBLIC    l_dcal
 
-        PUBLIC    exitsp
-        PUBLIC    exitcount
-
-        PUBLIC    heaplast
-        PUBLIC    heapblocks
-        PUBLIC    __sgoioblk
-
-; X1 stdio support variables
-    PUBLIC    _x1_cursor_coords
-	PUBLIC    _x1_keyboard_io
-
-; X1 stdio support entry functions
 	PUBLIC	_wait_sub_cpu
 
 ;--------
@@ -44,7 +32,7 @@
 ;--------
 
         IF      !myzorg
-			IF (startup=2)
+ 	    IF (startup=2)
                 defc    myzorg  = 32768
             ELSE
                 defc    myzorg  = 0
@@ -59,7 +47,7 @@
 ; Execution starts here
 ;--------
 start:
-		di
+	di
         
 IF (!DEFINED_startup | (startup=1))
 
@@ -68,8 +56,8 @@ if (myzorg > 0)
 endif
 
         ld      sp,$FFFF
-		im 1
-		ei
+	im 1
+	ei
 ENDIF
 
 
@@ -79,7 +67,7 @@ if (myzorg < 32768)
         defs    ZORG_TOO_LOW
 endif
 
-    ld      sp,$FDFF
+	ld      sp,$FDFF
 
 	; re-activate IPL
 	ld bc,$1D00
@@ -122,24 +110,9 @@ ENDIF
 ;	call _x1_cls
 ;ENDIF
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-        ld      hl,__sgoioblk+2
-        ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
-        ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
-        ld      (hl),21 ;stderr
-ENDIF
-ENDIF
-
+	call	crt0_init_bss
 
 ; INIT math identify platform
-IF NEED_floatpack
-        EXTERN     init_floatpack
-        call    init_floatpack
-ENDIF
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -147,7 +120,7 @@ ENDIF
 IF DEFINED_USING_amalloc
 	ld	hl,0
 	add	hl,sp
-    INCLUDE "amalloc.def"
+	INCLUDE "amalloc.def"
 ENDIF
 
         call    _main
@@ -161,12 +134,12 @@ IF DEFINED_ANSIstdio
 ENDIF
 ENDIF
 
-		push    hl				; return code
+	push    hl				; return code
 
-		rst 0
+	rst	0
 
 cleanup_exit:
-		ret
+	ret
 
 
 IF (!DEFINED_startup | (startup=1))
@@ -219,32 +192,6 @@ _kbd_isr:
 l_dcal:
         jp      (hl)
 
-; Now, define some values for stdin, stdout, stderr
-__sgoioblk:
-IF DEFINED_ANSIstdio
-        INCLUDE "stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
-
-        INCLUDE "crt0_runtime_selection.asm"
-
-
-exitsp:    defw    $FDFF
-exitcount: defb    0
-
-; Heap stuff
-heaplast:  defw    0
-heapblocks:defw    0
-
-
-; X1 stdio support variables
-_x1_cursor_coords:
-        defw    0
-_x1_keyboard_io:
-        defw    0
-
-
 _wait_sub_cpu:
 	ld bc, $1A01
 .ii_w1	in a, (c)
@@ -252,28 +199,35 @@ _wait_sub_cpu:
 	jp nz, ii_w1
 	ret
 
-
-
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-	defw ASMTAIL	; Location of the last program byte
-	defw 0
-ENDIF
-
-
 IF NEED_floatpack
         INCLUDE         "float.asm"
-;seed for random number generator - not used yet..
-fp_seed:        defb    $80,$80,0,0,0,0
-;Floating point registers...
-extra:          defs    6
-fa:             defs    6
-fasign:         defb    0
 ENDIF
+
+        INCLUDE "crt0_runtime_selection.asm"
+
+	INCLUDE	"crt0_section.asm"
+
+
+	SECTION	code_crt_init
+	ld	hl,$FDFF
+	ld	(exitsp),hl
+IF NEED_floatpack
+        EXTERN     init_floatpack
+        call    init_floatpack
+ENDIF
+
+; X1 stdio support variables
+	SECTION	bss_crt
+	PUBLIC    _x1_cursor_coords
+	PUBLIC    _x1_keyboard_io
+_x1_cursor_coords:	defw	0
+_x1_keyboard_io:	defw	0
+
+
+
+
+
+
+
+
 
