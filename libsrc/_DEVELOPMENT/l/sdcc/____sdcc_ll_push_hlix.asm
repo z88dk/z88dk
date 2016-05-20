@@ -21,13 +21,20 @@ ____sdcc_ll_push_hlix_0:
    
    pop af
    ld sp,hl
+   
    push af
-   push bc
+   push	bc
+   
+   ld hl,7
+   add hl,sp
    
    ex de,hl
    
-   ld bc,8
-   ldir
+   ld bc,7
+   lddr
    
+   ld a,(hl)
+   ld (de),a
+
    pop bc
    ret
