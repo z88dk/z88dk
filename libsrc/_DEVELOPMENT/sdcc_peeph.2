@@ -275,6 +275,9 @@ replace restart {
 }
 
 
+barrier
+
+
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 // Z88DK BUGFIXES APPLIED TO SDCC FOR #9570
@@ -338,9 +341,54 @@ replace restart {
 	di
 	push	af
 } by {
+	push	bc
+	push	de
+	push	hl
 	call	____sdcc_z80_push_di
-	; peephole z88dk-bugfix-4a-critical-open
+	pop	hl
+	pop	de
+	pop	bc
+	; peephole z88dk-bugfix-4a-critical-open-1
 }
+
+replace restart {
+	push	%4
+	call	____sdcc_z80_push_di
+	pop	%4
+} by {
+	call	____sdcc_z80_push_di
+	; peephole z88dk-bugfix-4a-critical-open-2
+} if notUsed(%4)
+
+replace restart {
+	push	%4
+	push	%5
+	call	____sdcc_z80_push_di
+	pop	%5
+	pop	%4
+} by {
+	push	%5
+	call	____sdcc_z80_push_di
+	pop	%5
+	; peephole z88dk-bugfix-4a-critical-open-2
+} if notUsed(%4)
+
+replace restart {
+	push	%4
+	push	%5
+	push	%6
+	call	____sdcc_z80_push_di
+	pop	%6
+	pop	%5
+	pop	%4
+} by {
+	push	%5
+	push	%6
+	call	____sdcc_z80_push_di
+	pop	%6
+	pop	%5
+	; peephole z88dk-bugfix-4a-critical-open-3
+} if notUsed(%4)
 
 replace restart {
 	pop	af
@@ -348,10 +396,58 @@ replace restart {
 	ei
 %1:
 } by {
+	push	bc
+	push	de
+	push	hl
 	call	____sdcc_z80_pop_ei
+	pop	hl
+	pop	de
+	pop	bc
 %1:
-	; peephole z88dk-bugfix-4c-critical-close
+	; peephole z88dk-bugfix-4c-critical-close-1
 }
+
+replace restart {
+	push	%4
+	call	____sdcc_z80_pop_ei
+	pop	%4
+} by {
+	call	____sdcc_z80_pop_ei
+	; peephole z88dk-bugfix-4c-critical-close-2
+} if notUsed(%4)
+
+replace restart {
+	push	%4
+	push	%5
+	call	____sdcc_z80_pop_ei
+	pop	%5
+	pop	%4
+} by {
+	push	%5
+	call	____sdcc_z80_pop_ei
+	pop	%5
+	; peephole z88dk-bugfix-4c-critical-close-3
+} if notUsed(%4)
+
+replace restart {
+	push	%4
+	push	%5
+	push	%6
+	call	____sdcc_z80_pop_ei
+	pop	%6
+	pop	%5
+	pop	%4
+} by {
+	push	%5
+	push	%6
+	call	____sdcc_z80_pop_ei
+	pop	%6
+	pop	%5
+	; peephole z88dk-bugfix-4c-critical-close-4
+} if notUsed(%4)
+
+
+barrier
 
 
 ///////////////////////////////////////////////////////////////
