@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: msxbasic.def,v 1.5 2014-05-19 07:13:09 stefano Exp $
+; $Id: msxbasic.def,v 1.6 2016-05-20 12:40:23 stefano Exp $
 ;
 
 
@@ -34,31 +34,37 @@ defc LINLEN = $F3B0	;1 Width for the current text mode
 defc CRTCNT = $F3B1	;1 Number of lines on screen 
 defc CLMLST = $F3B2	;1 Column space. It’s uncertain what this address actually stores 
 
-; WORK FOR INITIALIZATION
-defc TXTNAM = $F3B3	;2 BASE(0) - SCREEN 0 name table 
-defc TXTCOL = $F3B5	;2 BASE(1) - SCREEN 0 color table 
-defc TXTCGP = $F3B7	;2 BASE(2) - SCREEN 0 character pattern table 
-defc TXTATR = $F3B9	;2 BASE(3) - SCREEN 0 Sprite Attribute Table 
-defc TXTPAT = $F3BB	;2 BASE(4) - SCREEN 0 Sprite Pattern Table 
-defc T32NAM = $F3B3	;2 BASE(5) - SCREEN 1 name table 
-defc T32COL = $F3B5	;2 BASE(6) - SCREEN 1 color table 
-defc T32CGP = $F3B7	;2 BASE(7) - SCREEN 1 character pattern table 
-defc T32ATR = $F3B9	;2 BASE(8) - SCREEN 1 sprite attribute table 
-defc T32PAT = $F3BB	;2 BASE(9) - SCREEN 1 sprite pattern table 
-defc GRPNAM = $F3B3	;2 BASE(10) - SCREEN 2 name table 
-defc GRPCOL = $F3B5	;2 BASE(11) - SCREEN 2 color table 
-defc GRPCGP = $F3B7	;2 BASE(12) - SCREEN 2 character pattern table 
-defc GRPATR = $F3B9	;2 BASE(13) - SCREEN 2 sprite attribute table 
-defc GRPPAT = $F3BB	;2 BASE(14) - SCREEN 2 sprite pattern table 
-defc MLTNAM = $F3B3	;2 BASE(15) - SCREEN 3 name table 
-defc MLTCOL = $F3B5	;2 BASE(16) - SCREEN 3 color table 
-defc MLTCGP = $F3B7	;2 BASE(17) - SCREEN 3 character pattern table 
-defc MLTATR = $F3B9	;2 BASE(18) - SCREEN 3 sprite attribute table 
-defc MLTPAT = $F3BB	;2 BASE(19) - SCREEN 3 sprite pattern table 
+
+; VIDEO VARIABLES DEPENDING ON MODE
+defc TXTNAM = $F3B3	;2 BASE(0) - SCREEN 0 name table
+defc TXTCOL = $F3B5	;2 BASE(1) - SCREEN 0 color table
+defc TXTCGP = $F3B7	;2 BASE(2) - SCREEN 0 character pattern table
+defc TXTATR = $F3B9	;2 BASE(3) - SCREEN 0 Sprite Attribute Table
+defc TXTPAT = $F3BB	;2 BASE(4) - SCREEN 0 Sprite Pattern Table
+
+defc T32NAM = $F3BD	;2 BASE(5) - SCREEN 1 name table
+defc T32COL = $F3BF	;2 BASE(6) - SCREEN 1 color table
+defc T32CGP = $F3C1	;2 BASE(7) - SCREEN 1 character pattern table
+defc T32ATR = $F3C3	;2 BASE(8) - SCREEN 1 sprite attribute table
+defc T32PAT = $F3C5	;2 BASE(9) - SCREEN 1 sprite pattern table
+
+defc GRPNAM = $F3C7	;2 BASE(10) - SCREEN 2 name table
+defc GRPCOL = $F3C9	;2 BASE(11) - SCREEN 2 color table
+defc GRPCGP = $F3CB	;2 BASE(12) - SCREEN 2 character pattern table
+defc GRPATR = $F3CD	;2 BASE(13) - SCREEN 2 sprite attribute table
+defc GRPPAT = $F3CF	;2 BASE(14) - SCREEN 2 sprite pattern table
+
+defc MLTNAM = $F3D1	;2 BASE(15) - SCREEN 3 name table
+defc MLTCOL = $F3D3	;2 BASE(16) - SCREEN 3 color table
+defc MLTCGP = $F3D5	;2 BASE(17) - SCREEN 3 character pattern table
+defc MLTATR = $F3D7	;2 BASE(18) - SCREEN 3 sprite attribute table
+defc MLTPAT = $F3D9	;2 BASE(19) - SCREEN 3 sprite pattern table
+
 defc CLIKSW = $F3DB	;press click status
-defc CSRY = $F3DC	;1 Current row-position of the cursor 
-defc CSRX = $F3DD	;1 Current column-position of the cursor 
+defc CSRY   = $F3DC	;1 Current row-position of the cursor
+defc CSRX   = $F3DD	;1 Current column-position of the cursor
 defc CNSDFG = $F3DE	;function keys status
+
 
 ; AREA TO SAVE VDP REGISTERS
 defc RG0SAV = $F3DF	;1 Content of VDP(0) register (R#0) 

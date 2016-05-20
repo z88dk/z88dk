@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.11 2016-05-16 07:21:06 stefano Exp $
+ *   $Id: basck.c,v 1.12 2016-05-20 12:41:03 stefano Exp $
  */
 
 unsigned char  *img;
@@ -477,7 +477,29 @@ int getint_skel2[]={12, CATCH_CALL, 0x32, SKIP, SKIP, 0x32, SKIP, SKIP, SKIP_CAL
 int getint_skel3[]={12, CATCH_CALL, 0x32, SKIP, SKIP, 0x32, SKIP, SKIP, SKIP_CALL, ',', 0x2B, 0x23, SKIP_CALL};
 int getint_skel4[]={14, SKIP_CALL, ADDR, SKIP, SKIP, SKIP_CALL, 0x7A, 0xB7, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
 int getint_skel5[]={13, SKIP_CALL, ADDR, SKIP, SKIP, SKIP_CALL, 0x7A, 0xB7, 0xC4, SKIP, SKIP, SKIP_CALL, 0x7B, 0xC9};
+int getint_skel6[]={12, SKIP_CALL, ADDR, SKIP, SKIP, SKIP_CALL, 0xC2, SKIP, SKIP,  0x2B, SKIP_CALL, 0x7B, 0xC9};
 
+int fndnum_skel[]={13, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x7A, 0xB7, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
+int fndnum_skel2[]={12, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x7A, 0xB7, 0xC4, SKIP, SKIP, SKIP_CALL, 0x7B, 0xC9};
+int fndnum_skel3[]={11, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xC2, SKIP, SKIP,  0x2B, SKIP_CALL, 0x7B, 0xC9};
+
+int makint_skel2[]={14, SKIP_CALL, SKIP_CALL, ADDR, SKIP, SKIP, 0x7A, 0xB7, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
+int makint_skel3[]={13, SKIP_CALL, SKIP_CALL, ADDR, SKIP, SKIP, 0x7A, 0xB7, 0xC4, SKIP, SKIP, SKIP_CALL, 0x7B, 0xC9};
+int makint_skel4[]={12, SKIP_CALL, SKIP_CALL, ADDR, SKIP, SKIP, 0xC2, SKIP, SKIP,  0x2B, SKIP_CALL, 0x7B, 0xC9};
+
+int getword_skel[]={8, CATCH_CALL, 0xD5, SKIP_CALL, ',', SKIP_CALL, 0xD1, 0x12, 0xc9};
+
+/*
+__POKE:
+  CALL L542F   ; GETWORD <--
+  PUSH DE
+  RST SYNCHR        ; Check syntax: next byte holds the byte to be found
+  INC L
+  CALL GETINT
+  POP DE
+  LD (DE),A
+  RET
+  */
 
 int inport_skel[]={13, SKIP_CALL, 0x32, CATCH, CATCH, 0x32, SKIP, SKIP, SKIP_CALL, ',', 0xC3, SKIP, SKIP, SKIP_CALL};
 int otport_skel[]={13, SKIP_CALL, 0x32, SKIP, SKIP, 0x32, CATCH, CATCH, SKIP_CALL, ',', 0xC3, SKIP, SKIP, SKIP_CALL};
@@ -833,7 +855,7 @@ int main(int argc, char *argv[])
 		
 		
 		printf("\n");
-		dlbl("BASTXT", res, "BASIC program start ptr");
+		dlbl("BASTXT", res, "BASIC program start ptr (aka TXTTAB)");
 
 		printf("\n");
 
@@ -951,7 +973,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(prognd_skel2);
 		if (res>0)
-			dlbl("PROGND", res, "BASIC program end ptr");
+			dlbl("PROGND", res, "BASIC program end ptr (aka VARTAB)");
 
 		res=find_skel(varend_skel);
 		if (res<0)
@@ -1041,6 +1063,14 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("CPDEHL", res+pos+1, "compare DE and HL");
 		
+		res=find_skel(fndnum_skel);
+		if (res<0)
+			res=find_skel(fndnum_skel2);
+		if (res<0)
+			res=find_skel(fndnum_skel3);
+		if (res>0)
+			clbl("FNDNUM", res+pos+1, "Load 'A' with the next number in BASIC program");
+
 		res=find_skel(getint_skel);
 		if (res<0)
 			res=find_skel(getint_skel2);
@@ -1050,8 +1080,14 @@ int main(int argc, char *argv[])
 			res=find_skel(getint_skel4);
 		if (res<0)
 			res=find_skel(getint_skel5);
+		if (res<0)
+			res=find_skel(getint_skel6);
 		if (res>0)
 			clbl("GETINT", res, "Get a number to 'A'");
+
+		res=find_skel(getword_skel);
+		if (res>0)
+			clbl("GETWORD", res, "Get a number to DE (0..65535)");
 
 		res=find_skel(getnum_skel);
 		if (res<0)
@@ -1096,7 +1132,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(chksyn_skel3);
 		if (res>0)
-			clbl("CHKSYN", res, "A byte follows to be compared");
+			clbl("SYNCHR", res, "Check syntax, 1 byte follows to be compared");
 
 		res=find_skel(lfrgnm_skel);
 		if (res<0)
@@ -1132,7 +1168,7 @@ int main(int argc, char *argv[])
 
 		res=find_skel(test_type_skel);
 		if (res>0)
-			clbl("TEST_TYPE", res, "Test number (Precision mode, etc..)");
+			clbl("GETYPR", res, "Test number FAC type (Precision mode, etc..)");
 		
 		res=find_skel(tstsgn_skel);
 		if (res<0)
@@ -1249,10 +1285,13 @@ int main(int argc, char *argv[])
 			clbl("ABS", res+pos+1, "ATN");
 		
 		res=find_skel(dblabs_skel);
-		if (res<0)
-			res=find_skel(dblabs_skel2);
 		if (res>0)
-			clbl("DBL_ABS", res+pos+1, "ABS (double precision BASIC variant)");
+			clbl("DBL_ABS", res, "ABS (double precision BASIC variant)");
+		else {
+			res=find_skel(dblabs_skel2);
+			if (res>0)
+				clbl("DBL_ABS", res+pos+1, "ABS (double precision BASIC variant)");
+		}
 		
 		res=find_skel(ms_rnd_skel);
 		if (res<0)
@@ -1605,6 +1644,12 @@ int main(int argc, char *argv[])
 			clbl("CHR", res+pos+1, "CHR$ BASIC function");
 
 		res=find_skel(makint_skel);
+		if (res<0)
+			res=find_skel(makint_skel2);
+		if (res<0)
+			res=find_skel(makint_skel3);
+		if (res<0)
+			res=find_skel(makint_skel4);
 		if (res>0)
 			clbl("MAKINT", res, "Convert tmp string to int in A register");
 		
@@ -1718,7 +1763,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 		res=find_skel(getchr_skel2);
 		if (res>0) {
-			clbl("GETCHR", res, "GETNEXT char from program listing");
+			clbl("CHRGTB", res, "(a.k.a. GETCHR, GETNEXT), pick next char from program");
 		} else {
 			res=find_skel(getchr_skel3);
 			if (res<0)
@@ -1726,7 +1771,7 @@ int main(int argc, char *argv[])
 			if (res<0)
 				res=find_skel(getchr_skel5);
 			if (res>0)
-				clbl("GETCHR", res+pos+1, "GETNEXT char from program listing");
+				clbl("CHRGTB", res+pos+1, "(a.k.a. GETCHR, GETNEXT), pick next char from program");
 		}
 	
 		
