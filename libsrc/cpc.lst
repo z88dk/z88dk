@@ -65,6 +65,7 @@ cpc/cpc_rsx_str
 cpc/cpc_rsx_strcpy
 cpc/cpc_rsx_strcpy_callee
 cpc/fdc_address
+cpc/cpc_setmode
 psg/cpc/set_psg
 psg/cpc/set_psg_callee
 psg/cpc/get_psg

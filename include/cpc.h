@@ -1,7 +1,7 @@
 /*
  * Headerfile for Amstrad CPC specific functions
  *
- * $Id: cpc.h,v 1.4 2010-09-19 00:24:08 dom Exp $
+ * $Id: cpc.h,v 1.5 2016-05-20 20:24:52 dom Exp $
  */
 
 #ifndef __CPC_H__
@@ -25,13 +25,15 @@ extern int  __LIB__ cpc_model(void);
 // MISC FUNCTIONS
 ///////////////////////////////////////////
 
+// Switch mode
+extern int __LIB__ __FASTCALL__ cpc_setmode(int) __SMALLCFASTCALL;
 // Tiny ROM based console gets implementation
 extern int __LIB__ cpc_gets(char *s);
 
 // Copies a string to a CPC RSX compatible one
-extern char __LIB__ __FASTCALL__ *cpc_rsx_str(char *str);    // (malloc lib is required)
-extern char __LIB__              *cpc_rsx_strcpy(char *, char *);
-extern char __LIB__ __CALLEE__   *cpc_rsx_strcpy_callee(char *, char *);
+extern char __LIB__ __FASTCALL__ *cpc_rsx_str(char *str) __SMALLCFASTCALL;    // (malloc lib is required)
+extern char __LIB__              *cpc_rsx_strcpy(char *, char *) __SMALLCDECL ;
+extern char __LIB__ __CALLEE__   *cpc_rsx_strcpy_callee(char *, char *)  __SMALLCDECL __SMALLCCALLEE;
 
 #define cpc_rsx_strcpy(a,b) cpc_rsx_strcpy_callee(a,b)
 
@@ -63,7 +65,7 @@ extern int __LIB__ cpc_rsx(char *cmd,...);
 
 
 // Hide/Show BIOS error messages
-extern void  __LIB__ __FASTCALL__ bios_msg(int flag);
+extern void  __LIB__ __FASTCALL__ bios_msg(int flag) __SMALLCFASTCALL;
 
 #define MSG_ENABLE	0
 #define MSG_DISABLE	255
