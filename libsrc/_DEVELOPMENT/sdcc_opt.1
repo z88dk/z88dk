@@ -424,12 +424,3 @@ __xinit_%0
 %"[^\"';(]*"0(+%1
 =
 %0(%1
-
-;;
-;; bugfixes: sdcc __critical
-;;
-
-	jp  ____sdcc_z80_pop_ei
-=
-	call	____sdcc_z80_pop_ei
-	ret
