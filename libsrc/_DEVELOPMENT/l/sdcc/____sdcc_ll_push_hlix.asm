@@ -25,7 +25,7 @@ ____sdcc_ll_push_hlix_0:
    push af
    push	bc
    
-   ld hl,7
+   ld hl,7+4
    add hl,sp
    
    ex de,hl
