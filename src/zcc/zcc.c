@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.126 2016-05-19 02:11:35 aralbrec Exp $
+ *      $Id: zcc.c,v 1.127 2016-05-20 00:07:47 aralbrec Exp $
  */
 
 
@@ -220,6 +220,7 @@ static char  *c_coptrules9 = NULL;
 static char  *c_sdccopt1 = NULL;
 static char  *c_sdccopt2 = NULL;
 static char  *c_sdccopt3 = NULL;
+static char  *c_sdccopt9 = NULL;
 static char  *c_sdccpeeph0 = NULL;
 static char  *c_sdccpeeph1 = NULL;
 static char  *c_sdccpeeph2 = NULL;
@@ -300,6 +301,7 @@ static arg_t  config[] = {
     {"SDCCOPT1", 0, SetStringConfig, &c_sdccopt1, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.1"},
     {"SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2"},
     {"SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3"},
+    {"SDCCOPT9", 0, SetStringConfig, &c_sdccopt9, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.9"},
     {"SDCCPEEP0", 0, SetStringConfig, &c_sdccpeeph0, NULL, "", " --no-peep"},
     {"SDCCPEEP1", 0, SetStringConfig, &c_sdccpeeph1, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.1"},
     {"SDCCPEEP2", 0, SetStringConfig, &c_sdccpeeph2, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.2"},
@@ -737,6 +739,7 @@ int main(int argc, char **argv)
         case AFILE:
             if ( compiler_type == CC_SDCC )
             {
+               /* sdcc_opt.9 implements bugfixes and code size reduction and should be applied to every sdcc compile */
                switch (peepholeopt)
                {
                case 0:
@@ -746,22 +749,18 @@ int main(int argc, char **argv)
                            exit(1);
                    break;
                case 1:
-                   if (process(".asm", ".opt", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
-                       exit(1);
-                   break;
-               case 2:
                    if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                        exit(1);
-                   if (process(".op1", ".opt", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
+                   if (process(".op1", ".opt", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
                        exit(1);
                    break;
                default:
                    if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
-                     exit(1);
-                   if (process(".op1", ".op2", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
-                     exit(1);
-                   if (process(".op2", ".opt", c_copt_exe, c_sdccopt3, filter, i, YES, NO))
-                     exit(1);
+                       exit(1);
+                   if (process(".op1", ".op2", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
+                       exit(1);
+                   if (process(".op2", ".opt", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
+                       exit(1);
                    break;
                }
             }
