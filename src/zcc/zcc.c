@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.127 2016-05-20 00:07:47 aralbrec Exp $
+ *      $Id: zcc.c,v 1.128 2016-05-31 23:02:47 aralbrec Exp $
  */
 
 
@@ -810,8 +810,10 @@ int main(int argc, char **argv)
                 if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                     exit(1);
             break;
+        case OBJFILE:
+            break;
         default:
-            fprintf(stderr, "Filetype \"%s\" unrecognized\n", original_filenames[i]);
+            fprintf(stderr, "Filetype of \"%s\" unrecognized\n", original_filenames[i]);
             exit(1);
         }
     }
@@ -928,6 +930,8 @@ int get_filetype_by_suffix(char *name)
         return AFILE;
     if (strcmp(ext, ".opt") == 0)
         return OFILE;
+    if (strcmp(ext, ".o") == 0)
+        return OBJFILE;
     return 0;
 }
 
