@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.18 2016-05-18 21:26:34 dom Exp $
+;	$Id: ace_crt0.asm,v 1.19 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -128,10 +128,8 @@ cleanup:
 ;
 	push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 	pop	bc
 start1:

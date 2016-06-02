@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.32 2016-05-19 20:25:43 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.33 2016-06-02 22:24:57 dom Exp $
 ;
 
         MODULE  cpc_crt0
@@ -88,10 +88,8 @@ cleanup:
 ;
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
         EXTERN     closeall
         call    closeall
-ENDIF
 ENDIF
 
         di

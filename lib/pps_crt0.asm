@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.15 2016-05-16 20:49:05 dom Exp $
+;       $Id: pps_crt0.asm,v 1.16 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -94,7 +94,6 @@ argv_loop_2:
 
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 
 		EXTERN freopen
 		xor a
@@ -158,7 +157,6 @@ no_redir_stdin:
 
 ENDIF
 ENDIF
-ENDIF
 
 	push	hl
 	inc	b
@@ -200,10 +198,8 @@ cleanup:
 ;
 	push	hl	;save return code
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 	pop	bc
 start1:	ld	sp,0		;Restore stack to entry value
@@ -233,10 +229,8 @@ start_prefix:   defw	0	; Entry handle from OS
 	SECTION	rodata_clib
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 redir_fopen_flag:               defb 'w',0
 redir_fopen_flagr:              defb 'r',0
-ENDIF
 ENDIF
 ENDIF
 

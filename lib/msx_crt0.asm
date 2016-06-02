@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.39 2016-05-18 20:05:09 dom Exp $
+;	$Id: msx_crt0.asm,v 1.40 2016-06-02 22:24:57 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -136,10 +136,8 @@ cleanup:
 ;
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 start1:
@@ -288,10 +286,8 @@ ENDIF
 IF (startup=2)
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 redir_fopen_flag:	defb	'w',0
 redir_fopen_flagr:	defb	'r',0
-ENDIF
 ENDIF
 ENDIF
 ENDIF 

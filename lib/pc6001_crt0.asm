@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: pc6001_crt0.asm,v 1.7 2016-05-17 21:47:58 dom Exp $
+;       $Id: pc6001_crt0.asm,v 1.8 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -106,10 +106,8 @@ cleanup:
 ;
 ;        push    hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
         EXTERN      closeall
         call    closeall
-ENDIF
 ENDIF
 ;        pop     bc
 start1:

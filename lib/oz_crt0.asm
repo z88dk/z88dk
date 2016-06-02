@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.15 2016-05-15 20:15:44 dom Exp $
+;       $Id: oz_crt0.asm,v 1.16 2016-06-02 22:24:57 dom Exp $
 ;
 ; - - - - - - -
 
@@ -209,7 +209,6 @@ ENDIF
 	ENDIF
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
 	ld	hl,__sgoioblk+2
 	ld	(hl),19	;stdin
@@ -217,7 +216,6 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stdout
 	ld	hl,__sgoioblk+10
 	ld	(hl),21	;stderr
-ENDIF
 ENDIF
 ;-------- Z88DK specific code (end) -------
 
@@ -231,10 +229,8 @@ cleanup:
 ;
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 start1:	ld	sp,0		;Restore stack to entry value
@@ -490,11 +486,9 @@ l_dcal:
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
+IF !DEFINED_nostreams
 __sgoioblk:
-IF DEFINED_ANSIstdio
 	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
 ENDIF
 
 

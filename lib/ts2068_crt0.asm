@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.24 2016-05-17 21:35:26 dom Exp $
+;       $Id: ts2068_crt0.asm,v 1.25 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -132,10 +132,8 @@ cleanup:
 ;
 	push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 IF DEFINED_ZXVGS
         POP     BC              ;let's say exit code goes to BC

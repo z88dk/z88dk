@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.14 2016-05-16 20:11:32 dom Exp $
+;	$Id: sms_crt0.asm,v 1.15 2016-06-02 22:24:57 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -177,10 +177,8 @@ cleanup:
 ;
 	push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN 	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 endloop:

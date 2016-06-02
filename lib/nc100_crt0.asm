@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.14 2016-05-15 20:15:44 dom Exp $
+;       $Id: nc100_crt0.asm,v 1.15 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -111,25 +111,14 @@ start:				;Entry point at $c2220
 		call	sbrk_callee
 	ENDIF
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
+	call	crt0_init_bss
+
         call    _main		;Call user code
 cleanup:
 	push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall	;Close all opened files
 	call	closeall
-ENDIF
 ENDIF
 	pop	bc
 start1:
@@ -138,44 +127,6 @@ start1:
 
 l_dcal:	jp	(hl)
 
-; Now, define some values for stdin, stdout, stderr
-
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ENDIF
-
-
         INCLUDE "crt0_runtime_selection.asm"
-
-;-------
-; Some variables
-;-------
-
-
-;Atexit routine
-
-exitsp:		defw	0	;atexit() stack address
-exitcount:	defb	0	;Number of atexit() routines
-heaplast:	defw	0	;heap variables
-heapblocks:	defw	0
-
-
-base_graphics:  defw	0	;Graphics variables
-coords:         defw	0
-
-		defm	"Small C+ nc100"
-		defb	0
-
-;-------
-; Floating point
-;-------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-
-fp_seed:        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
-extra:          defs    6		;FP spare register
-fa:             defs    6		;FP accumulator
-fasign:         defb    0		;FP variable
-
-ENDIF
+	UNDEFINE DEFINED_USING_amalloc
+        INCLUDE "crt0_section.asm"

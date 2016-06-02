@@ -1,6 +1,6 @@
 ;       Memotech MTX CRT0 stub
 ;
-;       $Id: mtx_crt0.asm,v 1.10 2016-05-18 21:12:17 dom Exp $
+;       $Id: mtx_crt0.asm,v 1.11 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -72,10 +72,8 @@ cleanup:
         push    hl				; return code
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
         EXTERN     closeall
         call    closeall
-ENDIF
 ENDIF
 
 

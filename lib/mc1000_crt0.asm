@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.15 2016-05-17 21:47:58 dom Exp $
+;       $Id: mc1000_crt0.asm,v 1.16 2016-06-02 22:24:57 dom Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -313,7 +313,6 @@ has48k:
 	ENDIF
 		
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
 	ld	hl,__sgoioblk+2
 	ld	(hl),19	;stdin
@@ -321,7 +320,6 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stdout
 	ld	hl,__sgoioblk+10
 	ld	(hl),21	;stderr
-ENDIF
 ENDIF
 
         call    _main
@@ -331,10 +329,8 @@ cleanup:
 ;
         push    hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
         EXTERN     closeall
         call    closeall
-ENDIF
 ENDIF
         pop     bc
 start1:
@@ -382,11 +378,9 @@ FRAMES:
 ; Define the stdin/out/err area. For the z88 we have two models - the
 ; classic (kludgey) one and "ANSI" model
 ;-----------
+IF !DEFINED_nostreams
 __sgoioblk:
-IF DEFINED_ANSIstdio
 	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
 ENDIF
 
 

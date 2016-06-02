@@ -18,7 +18,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.31 2016-05-15 20:15:44 dom Exp $
+;	$Id: osca_crt0.asm,v 1.32 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -189,7 +189,6 @@ ENDIF
         ei
         
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
 	ld	hl,__sgoioblk+2
 	ld	(hl),19	;stdin
@@ -197,7 +196,6 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stdout
 	ld	hl,__sgoioblk+10
 	ld	(hl),21	;stderr
-ENDIF
 ENDIF
 
 
@@ -242,7 +240,6 @@ ENDIF
 
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 
 		EXTERN freopen
 		xor a
@@ -306,7 +303,6 @@ no_redir_stdin:
 
 ENDIF
 ENDIF
-ENDIF
 
 		push	hl
 		inc	b
@@ -352,10 +348,8 @@ cleanup:
 ;
         push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 		; kjt_flos_display restores the text mode but makes the screen flicker
 		; if it is in text mode already
@@ -450,11 +444,9 @@ FRAMES:
 
 ; Now, define some values for stdin, stdout, stderr
 
+IF !DEFINED_nostreams
 __sgoioblk:
-IF DEFINED_ANSIstdio
 	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
 ENDIF
 
 
@@ -571,14 +563,12 @@ ENDIF
 
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 redir_fopen_flag:
 				defb 'w'
 				defb 0
 redir_fopen_flagr:
 				defb 'r'
 				defb 0
-ENDIF
 ENDIF
 ENDIF
 

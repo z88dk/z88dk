@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.16 2016-05-17 20:22:49 dom Exp $
+;       $Id: trs80_crt0.asm,v 1.17 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -65,10 +65,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
         EXTERN     closeall
         call    closeall
- ENDIF
 ENDIF
 
 cleanup_exit:

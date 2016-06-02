@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.13 2016-05-17 19:30:57 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.14 2016-06-02 22:24:57 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -56,10 +56,8 @@ cleanup:
 ;
 	push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 endloop:

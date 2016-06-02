@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: gal_crt0.asm,v 1.11 2016-05-17 20:19:11 dom Exp $
+;       $Id: gal_crt0.asm,v 1.12 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -55,10 +55,8 @@ cleanup:
 ;       Deallocate memory which has been allocated here!
 ;
 IF !DEFINED_nostreams
- IF DEFINED_ANSIstdio
         EXTERN     closeall
         call    closeall
- ENDIF
 ENDIF
 
 cleanup_exit:

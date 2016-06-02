@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.16 2016-05-17 20:16:39 dom Exp $
+;       $Id: aquarius_crt0.asm,v 1.17 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -56,10 +56,8 @@ cleanup:
 ;
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 start1:	ld	sp,0		;Restore stack to entry value

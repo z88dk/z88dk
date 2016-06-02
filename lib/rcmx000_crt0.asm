@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: rcmx000_crt0.asm,v 1.11 2016-05-15 20:15:44 dom Exp $
+;       $Id: rcmx000_crt0.asm,v 1.12 2016-06-02 22:24:57 dom Exp $
 ;
 ; - - - - - - -
 
@@ -43,33 +43,15 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        PUBLIC    exitsp          ;atexit() variables
-        PUBLIC    exitcount
-
-        PUBLIC    __sgoioblk      ;stdio info block
-
-       	PUBLIC	heaplast	;Near malloc heap variables
-	PUBLIC	heapblocks
-
 	org 0
 start:
 	; On this platform we are king of the road and may use
 	; any register for any purpose Wheee!!
 
 	include "rcmx000_boot.asm"
-	jp _main
 
-IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-ENDIF
+	call	crt0_init_bss
+
         call    _main	;Call user program
         
 cleanup:
@@ -78,10 +60,8 @@ cleanup:
 ;
 	push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 	pop	bc
@@ -91,40 +71,17 @@ start1:	ld	sp,0		;Restore stack to some sane value
 	call 8
 
 l_dcal:	jp	(hl)		;Used for function pointer calls
-        jp      (hl)
 
-
-
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-__sgoioblk:
-IF DEFINED_ANSIstdio
-	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
-ENDIF
-
-
-
-        INCLUDE "crt0_runtime_selection.asm"
-
-;-----------
-; Now some variables
-;-----------
 
 	; Here is a great place to store temp variables and stuff!!
 acme:	defw 4711 			; useless arbitrarily choosen number
 	defm  "Small C+ RCM2/3000",0	;Unnecessary file signature
 
-;-----------------------
-; Floating point support
-;-----------------------
 IF NEED_floatpack
         INCLUDE         "float.asm"
-fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-extra:          defs    6               ;FP register
-fa:             defs    6               ;FP Accumulator
-fasign:         defb    0               ;FP register
 ENDIF
+
+        INCLUDE "crt0_runtime_selection.asm"
+
+	INCLUDE "crt0_section.asm"
+

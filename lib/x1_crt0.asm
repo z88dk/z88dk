@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.11 2016-05-19 22:17:52 dom Exp $
+;    $Id: x1_crt0.asm,v 1.12 2016-06-02 22:24:57 dom Exp $
 ;
 
 	MODULE x1_crt0
@@ -128,10 +128,8 @@ ENDIF
 cleanup:
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
         EXTERN     closeall
         call    closeall
-ENDIF
 ENDIF
 
 	push    hl				; return code

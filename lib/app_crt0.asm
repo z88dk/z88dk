@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.22 2016-05-19 22:26:10 dom Exp $
+;	$Id: app_crt0.asm,v 1.23 2016-06-02 22:24:57 dom Exp $
 
 
 ;--------
@@ -165,7 +165,7 @@ ENDIF
         call    _main		;Call the users code
         xor     a		;Exit with zero 
 cleanup:			;Jump back to here from exit()
-IF DEFINED_ANSIstdio
+IF !DEFINED_nostreams
 	push	af		;Save exit value
 	EXTERN	closeall
 	call	closeall	;Close all files

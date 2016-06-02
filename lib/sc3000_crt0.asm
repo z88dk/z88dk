@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.11 2016-05-15 20:15:44 dom Exp $
+;	$Id: sc3000_crt0.asm,v 1.12 2016-06-02 22:24:57 dom Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -220,7 +220,6 @@ ENDIF
 	ENDIF
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
 	ld	hl,__sgoioblk+2
 	ld	(hl),19	;stdin
@@ -228,7 +227,6 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stdout
 	ld	hl,__sgoioblk+10
 	ld	(hl),21	;stderr
-ENDIF
 ENDIF
 
 IF (startup=2)
@@ -254,10 +252,8 @@ cleanup:
 ;
 	push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN 	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 IF (startup=2)
@@ -386,12 +382,10 @@ ELSE
 
 ; Now, define some values for stdin, stdout, stderr
 
+IF !DEFINED_nostreams
 	__sgoioblk:
-	IF DEFINED_ANSIstdio
 		INCLUDE	"stdio_fp.asm"
-	ELSE
-			defw    -11,-12,-10
-	ENDIF
+ENDIF
 
 
 	;Seed for integer rand() routines

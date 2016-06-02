@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.18 2016-05-16 20:11:32 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.19 2016-06-02 22:24:57 dom Exp $
 
 
 
@@ -53,17 +53,6 @@ start:
 	call    doerrhan	;Initialise a laughable error handler
 
 		
-;-----------
-; Initialise the (ANSI) stdio descriptors so we can be called agin
-;-----------
-IF DEFINED_ANSIstdio
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
 	;; Read in argc/argv
 	ld	hl,0		; NULL pointer at end just in case
 	push	hl
@@ -128,7 +117,7 @@ ENDIF
 	pop	bc		; kill argc
 	
 cleanup:			;Jump back here from exit() if needed
-IF DEFINED_ANSIstdio
+IF !DEFINED_nostreams
 	EXTERN	closeall
 	call	closeall	;Close any open files (fopen)
 ENDIF

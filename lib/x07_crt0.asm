@@ -1,7 +1,7 @@
 ;
 ;       Startup for Canon X-07
 ;
-;       $Id: x07_crt0.asm,v 1.8 2016-05-17 19:42:54 dom Exp $
+;       $Id: x07_crt0.asm,v 1.9 2016-06-02 22:24:57 dom Exp $
 ;
 
 	MODULE  x07_crt0
@@ -63,10 +63,8 @@ start:
 cleanup:
 ;	push	hl		;Save return value
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall	;Close any opened files
 	call	closeall
-ENDIF
 ENDIF
 ;	pop	bc		;Get exit() value into bc
 

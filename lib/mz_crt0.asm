@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
-;       $Id: mz_crt0.asm,v 1.19 2016-05-18 20:25:28 dom Exp $
+;       $Id: mz_crt0.asm,v 1.20 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -58,10 +58,8 @@ cleanup:
 ;
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 start1:

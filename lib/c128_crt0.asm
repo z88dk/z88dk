@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.22 2016-05-17 19:55:43 dom Exp $
+;	$Id: c128_crt0.asm,v 1.23 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -94,10 +94,8 @@ cleanup:
 ;
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 	;ld	bc,$d030

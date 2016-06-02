@@ -3,7 +3,7 @@
 ;
 ; This module is included by rcmx000_crt0.asm
 ;
-; $Id: rcmx000_boot.asm,v 1.5 2009-06-22 21:20:05 dom Exp $
+; $Id: rcmx000_boot.asm,v 1.6 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -11,7 +11,6 @@
 ; the boot.c utility in the support/rcmx000 section cause it makes
 ; assumptions on where the code lies in memory...
 
-	org 0
 
 __start_prog:
 

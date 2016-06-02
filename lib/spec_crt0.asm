@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.43 2016-05-17 19:13:42 dom Exp $
+;       $Id: spec_crt0.asm,v 1.44 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -155,10 +155,8 @@ cleanup:
 ;
         push    hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
         EXTERN     closeall
         call    closeall
-ENDIF
 ENDIF
 
 

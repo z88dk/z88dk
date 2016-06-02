@@ -12,7 +12,7 @@ IF NEED_floatpack
         ld      hl,$8080	;Initialise floating point seed
         ld      (fp_seed),hl
 ENDIF
-IF DEFINED_ANSIstdio
+IF !DEFINED_nostreams
 	; Setup std* streams
         ld      hl,__sgoioblk
         ld      de,__sgoioblk+1
@@ -50,7 +50,7 @@ ENDIF
 IF bss_start
 	org	bss_start
 ENDIF
-IF DEFINED_ANSIstdio
+IF !DEFINED_nostreams
 		PUBLIC	__sgoioblk
 __sgoioblk:      defs    40      ;stdio control block
 ENDIF

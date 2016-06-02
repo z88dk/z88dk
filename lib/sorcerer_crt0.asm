@@ -1,7 +1,7 @@
 ;
 ;       Startup for Sorcerer Exidy
 ;
-;       $Id: sorcerer_crt0.asm,v 1.10 2016-05-17 20:05:02 dom Exp $
+;       $Id: sorcerer_crt0.asm,v 1.11 2016-06-02 22:24:57 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -65,10 +65,8 @@ start:
 cleanup:
 	push	hl		;Save return value
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall	;Close any opened files
 	call	closeall
-ENDIF
 ENDIF
 	pop	bc		;Get exit() value into bc
 start1:	ld      sp,0		;Pick up entry sp

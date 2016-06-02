@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.19 2016-05-17 21:09:40 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.20 2016-06-02 22:24:57 dom Exp $
 ;
 ; - - - - - - -
 
@@ -76,10 +76,8 @@ cleanup:
 ;
 	push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 	pop	bc

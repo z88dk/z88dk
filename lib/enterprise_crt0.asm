@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.18 2016-05-15 20:15:44 dom Exp $
+;	$Id: enterprise_crt0.asm,v 1.19 2016-06-02 22:24:57 dom Exp $
 ;
 
 
@@ -179,7 +179,6 @@ ENDIF
 	ENDIF
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 ; Set up the std* stuff so we can be called again
 	ld	hl,__sgoioblk+2
 	ld	(hl),19	;stdin
@@ -187,7 +186,6 @@ IF DEFINED_ANSIstdio
 	ld	(hl),21	;stdout
 	ld	hl,__sgoioblk+10
 	ld	(hl),21	;stderr
-ENDIF
 ENDIF
 
         call    _main
@@ -198,10 +196,8 @@ cleanup:
 ;
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 IF (!DEFINED_startup | (startup=1))
@@ -235,11 +231,9 @@ l_dcal:
 
 ; Now, define some values for stdin, stdout, stderr
 
+IF !DEFINED_nostreams
 __sgoioblk:
-IF DEFINED_ANSIstdio
 	INCLUDE	"stdio_fp.asm"
-ELSE
-        defw    -11,-12,-10
 ENDIF
 
 

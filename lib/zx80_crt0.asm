@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx80_crt0.asm,v 1.10 2016-05-17 20:58:40 dom Exp $
+;       $Id: zx80_crt0.asm,v 1.11 2016-06-02 22:24:57 dom Exp $
 ;
 ; - - - - - - -
 
@@ -94,10 +94,8 @@ cleanup:
         push    hl		; keep return code
 
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
         EXTERN     closeall
         call    closeall
-ENDIF
 ENDIF
     ;    ld      iy,16384	; no ix/iy swap here
 	;LD      (IY+$12),2    ; set DF-SZ to 24 lines.

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato May 2000
 ;
-;       $Id: abc80_crt0.asm,v 1.15 2016-05-17 19:28:55 dom Exp $
+;       $Id: abc80_crt0.asm,v 1.16 2016-06-02 22:24:57 dom Exp $
 ;
 
                 MODULE  abc80_crt0
@@ -60,10 +60,8 @@ cleanup:
 ;
 	push	hl
 IF !DEFINED_nostreams
-IF DEFINED_ANSIstdio
 	EXTERN	closeall
 	call	closeall
-ENDIF
 ENDIF
 
 	pop	bc

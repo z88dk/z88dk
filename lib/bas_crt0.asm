@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.19 2016-05-19 22:26:10 dom Exp $
+;	$Id: bas_crt0.asm,v 1.20 2016-06-02 22:24:57 dom Exp $
 
 
 ;-----------
@@ -61,7 +61,7 @@ ENDIF
 
         call    _main		;Run the program
 cleanup:			;Jump back here from exit() if needed
-IF DEFINED_ANSIstdio
+IF !DEFINED_nostreams
 	EXTERN	closeall
 	call	closeall	;Close any open files (fopen)
 ENDIF
