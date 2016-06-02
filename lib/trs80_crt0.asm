@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.17 2016-06-02 22:24:57 dom Exp $
+;       $Id: trs80_crt0.asm,v 1.18 2016-06-02 23:14:13 dom Exp $
 ;
 
 
@@ -47,6 +47,7 @@ ENDIF
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -56,7 +57,6 @@ ENDIF
 		INCLUDE "amalloc.def"
 	ENDIF
 
-	call	crt0_init_bss
 
         call    _main           ;Call user program
 

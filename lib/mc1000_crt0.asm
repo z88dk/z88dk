@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.17 2016-06-02 22:33:48 dom Exp $
+;       $Id: mc1000_crt0.asm,v 1.18 2016-06-02 23:14:13 dom Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -292,7 +292,8 @@ has48k:
         ;out     ($80),a
         ;call    $c021      ; setup text page (ptr in HL)
         
-		ld		(exitsp),sp
+	call	crt0_init_bss
+	ld		(exitsp),sp
 		
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -301,7 +302,6 @@ has48k:
 		INCLUDE "amalloc.def"
 	ENDIF
 		
-	call	crt0_init_bss
 
         call    _main
 cleanup:

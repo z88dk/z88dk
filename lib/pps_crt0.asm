@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.16 2016-06-02 22:24:57 dom Exp $
+;       $Id: pps_crt0.asm,v 1.17 2016-06-02 23:14:13 dom Exp $
 ;
 
 
@@ -47,6 +47,7 @@ start:
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -57,7 +58,6 @@ IF DEFINED_USING_amalloc
 ENDIF
 
 	ld	(start_prefix),ix
-	call	crt0_init_bss
 
 	ld	de,0
 	ld	hl,$2350

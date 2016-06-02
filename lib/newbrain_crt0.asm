@@ -2,7 +2,7 @@
 ;       Grundy NewBrain startup code
 ;
 ;
-;       $Id: newbrain_crt0.asm,v 1.15 2016-06-02 22:39:55 dom Exp $
+;       $Id: newbrain_crt0.asm,v 1.16 2016-06-02 23:14:13 dom Exp $
 ;
 
                 MODULE  newbrain_crt0
@@ -41,7 +41,9 @@ start:
         ld      hl,-64		;Create the atexit stack
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
+
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -57,7 +59,6 @@ IF (startup=2)
 	ld	(57),hl
 ENDIF
 
-	call	crt0_init_bss
 
 
         call    _main		;Call user program

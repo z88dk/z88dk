@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.15 2016-06-02 22:24:57 dom Exp $
+;       $Id: nc100_crt0.asm,v 1.16 2016-06-02 23:14:13 dom Exp $
 ;
 
 
@@ -32,18 +32,6 @@
 		PUBLIC    cleanup		;jp'd to by exit()
 		PUBLIC    l_dcal		;jp(hl)
 
-
-
-		PUBLIC    exitsp		;atexit() variables
-		PUBLIC    exitcount
-
-		PUBLIC	heaplast	;Near malloc heap variables
-		PUBLIC	heapblocks
-
-		PUBLIC    __sgoioblk	;stdio info block
-
-		PUBLIC	base_graphics	;Graphical variables
-		PUBLIC	coords
 
 
 IF (startup=2)
@@ -86,6 +74,7 @@ start:				;Entry point at $c2220
         ld      hl,-64		;Create the atexit stack
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -111,7 +100,6 @@ start:				;Entry point at $c2220
 		call	sbrk_callee
 	ENDIF
 
-	call	crt0_init_bss
 
         call    _main		;Call user code
 cleanup:

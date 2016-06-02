@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;       $Id: svi_crt0.asm,v 1.18 2016-06-02 22:24:57 dom Exp $
+;       $Id: svi_crt0.asm,v 1.19 2016-06-02 23:14:13 dom Exp $
 ;
 
 
@@ -41,6 +41,7 @@ start:
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -50,7 +51,6 @@ IF DEFINED_USING_amalloc
 	INCLUDE "amalloc.def"
 ENDIF
 
-	call	crt0_init_bss
 	call	$53		; Hide function key menu
         call    _main
 	

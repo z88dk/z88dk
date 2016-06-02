@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.25 2016-06-02 22:24:57 dom Exp $
+;       $Id: ts2068_crt0.asm,v 1.26 2016-06-02 23:14:13 dom Exp $
 ;
 
 
@@ -72,6 +72,7 @@ ENDIF
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init; it takes
@@ -120,7 +121,6 @@ ENDIF
 	;ld	a,2		;open the upper display (uneeded?)
 	;call	5633 -> NOT THE TS2068 LOCATION !!
 
-	call	crt0_init_bss
 IF DEFINED_NEEDresidos
 	call	residos_detect
 	jp	c,cleanup_exit

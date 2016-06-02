@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.31 2016-05-17 21:18:56 dom Exp $
+;	$Id: ti86_crt0.asm,v 1.32 2016-06-02 23:14:13 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -207,11 +207,13 @@ IF !DEFINED_atexit		; Less stack use
 	ld	hl,-6		; 3 pointers (more likely value)
 	add	hl,sp
 	ld	sp,hl
+	call	crt0_init_bss
 	ld	(exitsp),sp
 ELSE
 	ld	hl,-64		; 32 pointers (ANSI standard)
 	add	hl,sp
 	ld	sp,hl
+	call	crt0_init_bss
 	ld	(exitsp),sp
 ENDIF
 
@@ -222,7 +224,6 @@ ENDIF
 		INCLUDE "amalloc.def"
 	ENDIF
 
-	call	crt0_init_bss
 
 ;  IF NONANSI
 	call	_homeup		; Set text cursor at (0,0)

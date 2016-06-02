@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.10 2016-06-02 22:24:57 dom Exp $
+;       $Id: sos_crt0.asm,v 1.11 2016-06-02 23:14:13 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -57,6 +57,7 @@ start:
         ld      hl,-65
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -65,7 +66,6 @@ start:
 IF DEFINED_USING_amalloc
     INCLUDE "amalloc.def"
 ENDIF
-	call	crt0_init_bss
 
 
 ; Push pointers to argv[n] onto the stack now

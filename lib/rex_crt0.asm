@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.23 2016-05-17 21:54:22 dom Exp $
+;       $Id: rex_crt0.asm,v 1.24 2016-06-02 23:14:13 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -59,8 +59,8 @@ start:
 	ld	bc,$ffff-$f033
 	ld	(hl),0
 	ldir
-        ld      (exitsp),sp	;Store atexit() stack
 	call	crt0_init_bss
+        ld      (exitsp),sp	;Store atexit() stack
 ; Entry to the user code
         call    _main		;Call the users code
 cleanup:

@@ -3,7 +3,7 @@
 ;       Joaopa Jun. 2014
 ;       Stefano Bodrato Lug. 2014
 ;
-;       $Id: vg5k_crt0.asm,v 1.11 2016-06-02 22:24:57 dom Exp $
+;       $Id: vg5k_crt0.asm,v 1.12 2016-06-02 23:14:13 dom Exp $
 ;
 
 
@@ -44,6 +44,7 @@ start:
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 		
 	push    de ; save HL
@@ -55,7 +56,6 @@ IF DEFINED_USING_amalloc
 	INCLUDE "amalloc.def"
 ENDIF
 
-	call	crt0_init_bss
 
 	di
         call    _main

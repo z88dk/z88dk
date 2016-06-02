@@ -1,7 +1,7 @@
 ;
 ;	Startup for test emulator
 ;
-;	$Id: test_crt0.asm,v 1.10 2016-05-17 19:21:22 dom Exp $
+;	$Id: test_crt0.asm,v 1.11 2016-06-02 23:14:13 dom Exp $
 
 
 	module test_crt0
@@ -94,9 +94,9 @@ program:
 	ld	hl,-64
 	add	hl,sp
 	ld	sp,hl
+	call    crt0_init_bss
 	ld	(exitsp),sp
     	ei
-	call    crt0_init_bss
 	call	_main
 cleanup:
 	ld	a,CMD_EXIT	;exit

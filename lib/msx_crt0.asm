@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.40 2016-06-02 22:24:57 dom Exp $
+;	$Id: msx_crt0.asm,v 1.41 2016-06-02 23:14:13 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -89,6 +89,7 @@ ENDIF
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -97,7 +98,6 @@ ENDIF
 	IF DEFINED_USING_amalloc
 		INCLUDE "amalloc.def"
 	ENDIF
-	call	crt0_init_bss
 
 ; ** IF MSXDOS mode, handle argv, argc... **
 IF (startup=2)

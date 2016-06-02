@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.14 2016-06-02 22:24:57 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.15 2016-06-02 23:14:13 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -44,8 +44,8 @@ start:
 	ld	bc,RAM_Length-1
 	ld	(hl),0
 	ldir
-	ld      (exitsp),sp
 	call	crt0_init_bss
+	ld      (exitsp),sp
 
 ; Entry to the user code
 	call    _main

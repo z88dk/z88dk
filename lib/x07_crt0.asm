@@ -1,7 +1,7 @@
 ;
 ;       Startup for Canon X-07
 ;
-;       $Id: x07_crt0.asm,v 1.9 2016-06-02 22:24:57 dom Exp $
+;       $Id: x07_crt0.asm,v 1.10 2016-06-02 23:14:13 dom Exp $
 ;
 
 	MODULE  x07_crt0
@@ -43,6 +43,7 @@ start:
 	ld      hl,-64
 	add     hl,sp
 	ld      sp,hl
+	call	crt0_init_bss
 	ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -52,7 +53,6 @@ start:
 		INCLUDE "amalloc.def"
 	ENDIF
 
-	call	crt0_init_bss
 
 	ld a,65
 	call $C1BE

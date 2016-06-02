@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 2014
 ;
-;	$Id: lynx_crt0.asm,v 1.7 2016-06-02 22:24:57 dom Exp $
+;	$Id: lynx_crt0.asm,v 1.8 2016-06-02 23:14:13 dom Exp $
 ;
 
 
@@ -51,6 +51,7 @@ start:
         add     hl,sp
         ld      sp,hl
 
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -59,7 +60,6 @@ start:
 	IF DEFINED_USING_amalloc
 		INCLUDE "amalloc.def"
 	ENDIF
-	call	crt0_init_bss
 
         call    _main
 cleanup:

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.19 2016-06-02 22:24:57 dom Exp $
+;	$Id: ace_crt0.asm,v 1.20 2016-06-02 23:14:13 dom Exp $
 ;
 
 
@@ -68,7 +68,9 @@ ELSE
         add     hl,sp
         ld      sp,hl
 ENDIF
+	call	crt0_init_bss
         ld      (exitsp),sp
+
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -77,7 +79,6 @@ ENDIF
 		INCLUDE "amalloc.def"
 	ENDIF
 
-	call	crt0_init_bss
 
 IF (startup=2)
 	ld    hl,$2c00		; character set RAM

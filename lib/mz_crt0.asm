@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
-;       $Id: mz_crt0.asm,v 1.20 2016-06-02 22:24:57 dom Exp $
+;       $Id: mz_crt0.asm,v 1.21 2016-06-02 23:14:13 dom Exp $
 ;
 
 
@@ -39,8 +39,8 @@ start:
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
-
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
@@ -48,7 +48,6 @@ start:
 		INCLUDE "amalloc.def"
 	ENDIF
 
-	call	crt0_init_bss
 
         call    _main
 

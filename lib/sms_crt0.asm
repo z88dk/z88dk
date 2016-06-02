@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.15 2016-06-02 22:24:57 dom Exp $
+;	$Id: sms_crt0.asm,v 1.16 2016-06-02 23:14:13 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -30,14 +30,6 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-
-        PUBLIC    exitsp          ;Pointer to atexit() stack
-        PUBLIC    exitcount       ;Number of atexit() functions registered
-
-        PUBLIC    __sgoioblk      ;std* control block
-
-        PUBLIC    heaplast        ;Near malloc heap variables
-        PUBLIC    heapblocks      ;
 
         
         PUBLIC	fputc_vdp_offs	;Current character pointer
@@ -159,9 +151,9 @@ start:
 	ld	bc,RAM_Length-1
 	ld	(hl),0
 	ldir
+	call	crt0_init_bss
 	ld      (exitsp),sp
 
-	call	crt0_init_bss
 	
 	call	DefaultInitialiseVDP
 	

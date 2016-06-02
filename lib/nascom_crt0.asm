@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.20 2016-06-02 22:24:57 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.21 2016-06-02 23:14:13 dom Exp $
 ;
 ; - - - - - - -
 
@@ -56,9 +56,9 @@ stackloop:
 	jr	nz,stackloop
 	ld	hl,0xe000
 	ld      sp,hl
+	call	crt0_init_bss
 	ld      (exitsp),sp
 
-        call    crt_init_start  ;Initialise any data setup by sdcc
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 

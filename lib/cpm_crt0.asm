@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.34 2016-05-17 22:20:55 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.35 2016-06-02 23:14:13 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -81,8 +81,8 @@ ELSE
 ENDIF
 ENDIF
 
-	ld      (start1+1),sp	;Save entry stack
         call    crt0_init_bss   ;Initialise any data setup by sdcc
+	ld      (start1+1),sp	;Save entry stack
 	ld	a,($80)		;byte count of length of args
 	inc	a		;we can use this since args are space separated
 	neg
