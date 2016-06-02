@@ -2,7 +2,7 @@
 ;       Grundy NewBrain startup code
 ;
 ;
-;       $Id: newbrain_crt0.asm,v 1.14 2016-06-02 22:24:57 dom Exp $
+;       $Id: newbrain_crt0.asm,v 1.15 2016-06-02 22:39:55 dom Exp $
 ;
 
                 MODULE  newbrain_crt0
@@ -23,19 +23,6 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        PUBLIC    exitsp          ;atexit() variables
-        PUBLIC    exitcount
-
-       	PUBLIC	heaplast	;Near malloc heap variables
-        PUBLIC	heapblocks
-
-        PUBLIC    __sgoioblk      ;stdio info block
-
-        PUBLIC    base_graphics   ;Graphical variables
-        PUBLIC	coords		;Current xy position
-
-        PUBLIC	snd_tick	;Sound variable
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 	PUBLIC	nbclockptr	;ptr to clock counter location
 IF (startup=2)
@@ -70,16 +57,8 @@ IF (startup=2)
 	ld	(57),hl
 ENDIF
 
+	call	crt0_init_bss
 
-IF !DEFINED_nostreams
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
 
         call    _main		;Call user program
 
@@ -106,18 +85,6 @@ start1: ld      sp,0            ;Restore stack to entry value
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-IF !DEFINED_nostreams
-__sgoioblk:
-	INCLUDE	"stdio_fp.asm"
-ENDIF
-
-
-
-        INCLUDE "crt0_runtime_selection.asm"
 
 
 ;-----------
@@ -161,48 +128,6 @@ nbclockptr:	defb	$52	; paged system clock counter
 ENDIF
 
 
-;-----------
-; Now some variables
-;-----------
+        INCLUDE "crt0_runtime_selection.asm"
 
-coords:         defw    0       ; Current graphics xy coordinates
-base_graphics:  defw    0       ; Address of the Graphics map
-
-
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
-
-		defm	"Small C+ NewBrain"	;Unnecessary file signature
-		defb	0
-
-;-----------------------
-; Floating point support
-;-----------------------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-fp_seed:        defb    $80,$80,0,0,0,0	;FP seed (unused ATM)
-extra:          defs    6		;FP register
-fa:             defs    6		;FP Accumulator
-fasign:         defb    0		;FP register
-
-ENDIF
-
+        INCLUDE "crt0_section.asm"
