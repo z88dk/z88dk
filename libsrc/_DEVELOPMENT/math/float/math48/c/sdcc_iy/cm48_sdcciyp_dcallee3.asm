@@ -20,8 +20,8 @@ cm48_sdcciyp_dcallee3:
    pop hl
    pop de
    exx
-   pop de
    pop hl
+   pop de
    exx
    
    push bc
