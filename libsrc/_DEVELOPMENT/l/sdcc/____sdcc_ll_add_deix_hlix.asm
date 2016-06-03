@@ -12,8 +12,17 @@ ____sdcc_ll_add_deix_hlix:
    
    push de                     ; save deix
    
+IFDEF __SDCC_IX
+
    push ix
    pop de                      ; de = ix
+
+ELSE
+
+   push iy
+   pop de
+   
+ENDIF
    
    add hl,de
    ex (sp),hl                  ; save hlix + ix

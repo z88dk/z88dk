@@ -7,9 +7,18 @@ PUBLIC ____sdcc_ll_copy_src_hlsp_dst_deixm
 ____sdcc_ll_copy_src_hlsp_dst_deixm:
 
    push hl
-   
+
+IFDEF __SDCC_IX
+
    push ix
    pop hl
+
+ELSE
+
+   push iy
+   pop hl
+   
+ENDIF
    
    add hl,de
    ld e,(hl)

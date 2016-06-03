@@ -10,8 +10,17 @@ EXTERN l_load_64_dehldehl_mbc, l_store_64_dehldehl_mbc
 
 ____sdcc_ll_lsl_hlix_a:
 
+IFDEF __SDCC_IX
+
    push ix
    pop bc
+   
+ELSE
+
+   push iy
+   pop bc
+   
+ENDIF
    
    add hl,bc
    

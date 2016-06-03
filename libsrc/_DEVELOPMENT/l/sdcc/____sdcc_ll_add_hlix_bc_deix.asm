@@ -10,8 +10,17 @@ ____sdcc_ll_add_hlix_bc_deix:
 
    push bc
    
+IFDEF __SDCC_IX
+
    push ix
    pop bc
+
+ELSE
+
+   push iy
+   pop bc
+   
+ENDIF
    
    add hl,bc
    ex de,hl

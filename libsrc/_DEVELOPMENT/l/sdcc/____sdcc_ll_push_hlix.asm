@@ -7,9 +7,18 @@ PUBLIC ____sdcc_ll_push_hlix_0
 
 ____sdcc_ll_push_hlix:
 
+IFDEF __SDCC_IX
+
    push ix
    pop de
+
+ELSE
+
+   push iy
+   pop de
    
+ENDIF
+
    add hl,de
    
 ____sdcc_ll_push_hlix_0:

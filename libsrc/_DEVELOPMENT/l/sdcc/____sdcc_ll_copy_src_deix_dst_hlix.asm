@@ -8,9 +8,18 @@ ____sdcc_ll_copy_src_deix_dst_hlix:
 
    push de
 
+IFDEF __SDCC_IX
+   
    push ix
    pop de
 
+ELSE
+
+   push iy
+   pop de
+   
+ENDIF
+   
    add hl,de
    ex (sp),hl
 
