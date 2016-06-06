@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: msxbasic.def,v 1.6 2016-05-20 12:40:23 stefano Exp $
+; $Id: msxbasic.def,v 1.7 2016-06-06 15:40:54 stefano Exp $
 ;
 
 
@@ -131,7 +131,7 @@ defc STKTOP = $F674  ; Top location to be used for the stack
 defc TXTTAB = $F676  ; Starting address of BASIC text area
 defc TEMPPT = $F678  ; Starting address of unused area of temporary descriptor
 defc TEMPST = $F67A  ; Temporary descriptors
-defc DSCTMP = $F698  ; String descriptor wich is the result of string fun.
+defc DSCTMP = $F698  ; String descriptor which is the result of string fun.
 defc FRETOP = $F69B  ; Starting address of unused area of string area
 defc TEMP3  = $F69D  ; Used for garbage collection or by USR function
 defc TEMP8  = $F69F  ; Used for garbage collection
@@ -181,13 +181,12 @@ defc FBUFFR = $F7C5  ; Buffer for fout
 defc DECTMP = $F7F0  ; Used to transform decimal integer to floating point number
 defc DECTM2 = $F7F2  ; Used at division routine execution
 defc DECCNT = $F7F4  ; Used at division routine execution
-defc DAC    = $F7F6  ; DECIMAL ACCUMULATOR
+;;defc DAC    = $F7F6  ; DECIMAL ACCUMULATOR
 defc FACCU  = $F7F6  ; alias for DECIMAL ACCUMULATOR
 defc FACLOW = $F7F8  ; DECIMAL ACCUMULATOR + 2
-;; defc HOLD8  = $F806  ; Registers for decimal multiplication (?)
-;; defc HOLDB  = $????  ; Registers for decimal multiplication (?)
-defc HOLD2  = $F836
-defc HOLD   = $F83E
+defc HOLD8  = $F806  ; (48 bytes) Double precision operations work area
+defc HOLD2  = $F836  ; (8 bytes)
+defc HOLD   = $F83E  ; (9 bytes)
 defc ARG    = $F847  ; Area to set the value to be calculate with DAC
 defc RNDX   = $F857  ; Last random number
 
@@ -398,5 +397,56 @@ defc N_PAINT = $266E	; (color = (A), X = (BC), Y = (DE)) -
 defc O_PAINT = $59E3	; - init: CALL 0129H (PNTINI in msxbios), then CALL PAINT (BC,DE)
 
 
+; --------------------------------------------------------------------------
+
+; TRPTBL (78) - Data table for the interrupt facilities of the MSX computer.
+; IFLG_* byte meaning:
+;                  Bit 7-3 - unused
+;                  Bit 2   - Interrupt occurred Y/N   1= Yes
+;                  Bit 1   - Interrupt STOP  Y/N      1= Yes
+;                  Bit 0   - Interrupt OFF Y/N        1= No
+
+
+defc IFLG_F1       = $FC4C  ; F1 Key - Interrupt flags
+defc IENTRY_F1     = $FC4D  ; F1 Key - Interrupt related code
+defc IFLG_F2       = $FC4F  ; F2 Key - Interrupt flags
+defc IENTRY_F2     = $FC50  ; F2 Key - Interrupt related code
+defc IFLG_F3       = $FC52  ; F3 Key - Interrupt flags
+defc IENTRY_F3     = $FC53  ; F3 Key - Interrupt related code
+defc IFLG_F4       = $FC55  ; F4 Key - Interrupt flags
+defc IENTRY_F4     = $FC56  ; F4 Key - Interrupt related code
+defc IFLG_F5       = $FC58  ; F5 Key - Interrupt flags
+defc IENTRY_F5     = $FC59  ; F5 Key - Interrupt related code
+defc IFLG_F6       = $FC5B  ; F6 Key - Interrupt flags
+defc IENTRY_F6     = $FC5C  ; F6 Key - Interrupt related code
+defc IFLG_F7       = $FC5E  ; F7 Key - Interrupt flags
+defc IENTRY_F7     = $FC5F  ; F7 Key - Interrupt related code
+defc IFLG_F8       = $FC61  ; F8 Key - Interrupt flags
+defc IENTRY_F8     = $FC62  ; F8 Key - Interrupt related code
+defc IFLG_F9       = $FC64  ; F9 Key - Interrupt flags
+defc IENTRY_F9     = $FC65  ; F9 Key - Interrupt related code
+defc IFLG_F10      = $FC67  ; F10 Key - Interrupt flags
+defc IENTRY_F10    = $FC68  ; F10 Key - Interrupt related code
+
+defc IFLG_STOP     = $FC6A  ; STOP button - Interrupt flags
+defc IENTRY_STOP   = $FC6B  ; STOP button - Interrupt related code
+defc IFLG_COLLSN   = $FC6D  ; Sprite collision - Interrupt flags
+defc IENTRY_COLLSN = $FC6E  ; Sprite collision - Interrupt related code
+
+defc IFLG_STRIG0   = $FC70  ; SPACE key trigger - Interrupt flags
+defc IENTRY_STRIG0 = $FC71  ; SPACE key trigger - Interrupt related code
+defc IFLG_STRIG1   = $FC73  ; Joystick 1, Fire 1 - Interrupt flags
+defc IENTRY_STRIG1 = $FC74  ; Joystick 1, Fire 1 - Interrupt related code
+defc IFLG_STRIG2   = $FC76  ; Joystick 2, Fire 1 - Interrupt flags
+defc IENTRY_STRIG2 = $FC77  ; Joystick 2, Fire 1 - Interrupt related code
+defc IFLG_STRIG3   = $FC79  ; Joystick 1, Fire 2 - Interrupt flags
+defc IENTRY_STRIG3 = $FC7A  ; Joystick 1, Fire 2 - Interrupt related code
+defc IFLG_STRIG4   = $FC7C  ; Joystick 2, Fire 2 - Interrupt flags
+defc IENTRY_STRIG4 = $FC7D  ; Joystick 2, Fire 2 - Interrupt related code
+
+defc IFLG_TIMER    = $FC7F  ; TIMER - Interrupt flags
+defc IENTRY_TIMER  = $FC80  ; TIMER - Interrupt related code
+
+; --------------------------------------------------------------------------
 lston
 

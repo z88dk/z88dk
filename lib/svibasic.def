@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: svibasic.def,v 1.8 2015-02-03 06:50:50 stefano Exp $
+; $Id: svibasic.def,v 1.9 2016-06-06 15:40:54 stefano Exp $
 ;
 
 
@@ -31,30 +31,13 @@ defc USR9 = $F534	;2 Address to call with Basic USR9
 ;; defc LINL40 = $????	;1 Width for SCREEN 0 (default 37) 
 ;; defc LINL32 = $????	;1 Width for SCREEN 1 (default 29) 
 defc LINLEN = $F543	;1 Width for the current text mode 
-;; defc CRTCNT = $????	;1 Number of lines on screen 
+;; defc CRTCNT = 25	; Number of lines on screen (on SVI this is hardcoded)
 ;; defc CLMLST = $????	;1 Column space. It’s uncertain what this address actually stores 
 
 ; WORK FOR INITIALIZATION
-;; defc TXTNAM = $????	;2 BASE(0) - SCREEN 0 name table 
-;; defc TXTCOL = $????	;2 BASE(1) - SCREEN 0 color table 
-;; defc TXTCGP = $0800	;2 BASE(2) - SCREEN 0 character pattern table 
-;; defc TXTATR = $????	;2 BASE(3) - SCREEN 0 Sprite Attribute Table 
-;; defc TXTPAT = $????	;2 BASE(4) - SCREEN 0 Sprite Pattern Table 
-;; defc T32NAM = $????	;2 BASE(5) - SCREEN 1 name table 
-;; defc T32COL = $????	;2 BASE(6) - SCREEN 1 color table 
-;; defc T32CGP = $????	;2 BASE(7) - SCREEN 1 character pattern table 
-;; defc T32ATR = $????	;2 BASE(8) - SCREEN 1 sprite attribute table 
-;; defc T32PAT = $????	;2 BASE(9) - SCREEN 1 sprite pattern table 
-;; defc GRPNAM = $1800	;2 BASE(10) - SCREEN 2 name table 
-;; defc GRPCOL = $2000	;2 BASE(11) - SCREEN 2 color table 
-;; defc GRPCGP = $????	;2 BASE(12) - SCREEN 2 character pattern table 
-;; defc GRPATR = $????	;2 BASE(13) - SCREEN 2 sprite attribute table 
-;; defc GRPPAT = $????	;2 BASE(14) - SCREEN 2 sprite pattern table 
-;; defc MLTNAM = $0800	;2 BASE(15) - SCREEN 3 name table 
-;; defc MLTCOL = $????	;2 BASE(16) - SCREEN 3 color table 
-;; defc MLTCGP = $????	;2 BASE(17) - SCREEN 3 character pattern table 
-;; defc MLTATR = $????	;2 BASE(18) - SCREEN 3 sprite attribute table 
-;; defc MLTPAT = $????	;2 BASE(19) - SCREEN 3 sprite pattern table 
+;;
+;; On the SVI the video is handled differently than on the MSX
+;;
 defc CLIKSW = $FA02	;press click status (CLICK)
 defc CSRY = $FA03	;1 Current row-position of the cursor 
 defc CSRX = $FA04	;1 Current column-position of the cursor 
@@ -62,15 +45,14 @@ defc CNSDFG = $FA06	;function keys status
 
 ; AREA TO SAVE VDP REGISTERS
 defc RG0SAV = $FE3C	;1 Content of VDP(0) register (R#0) 
-defc RG1SAV = $FE3D	;1 Content of VDP(1) register (R#1) 
-defc RG2SAV = $FE3E	;1 Content of VDP(2) register (R#2) 
-defc RG3SAV = $FE3F	;1 Content of VDP(3) register (R#3) 
-defc RG4SAV = $FE40	;1 Content of VDP(4) register (R#4) 
-defc RG5SAV = $FE41	;1 Content of VDP(5) register (R#5) 
-defc RG6SAV = $FE42	;1 Content of VDP(6) register (R#6) 
-defc RG7SAV = $FE43	;1 Content of VDP(7) register (R#7) 
+;; defc RG1SAV = $FE3B	;1 Content of VDP(1) register (R#1)   ( $FA07 ?? )
+defc RG1SAV = $FA07	;1 Content of VDP(1) register (R#1)
+;;
+;; On SVI the other registers do not seem to be preserved
+;;
 defc STATFL = $FE3D	;1 Content of VDP(8) status register (S#0) 
-defc TRGFLG = $FA08	;1 Information about trigger buttons and space bar state 
+defc TRGFLG = $FA08 ;1 Information about trigger buttons and space bar state 
+
 defc FORCLR = $FA0A	;1 Foreground color 
 defc BAKCLR = $FA0B	;1 Background color 
 defc BDRCLR = $FA0C	;1 Border color (BORCLR)
@@ -87,24 +69,23 @@ defc SCNCNT = $FE78	;1 Key scan timing
 defc REPCNT = $FA19	;1 This is the key repeat delay counterprin
 defc PUTPNT = $FA1A	;2 Address in the keyboard buffer where a character will be written 
 defc GETPNT = $FA1C	;2 Address in the keyboard buffer where the next character is read 
-;; defc CS120 = $????	;5 Cassette I/O parameters to use for 1200 baud 
-;; defc CS240 = $????	;5 Cassette I/O parameters to use for 2400 baud 
-;; defc LOW = $????	;2 Signal delay when writing a 0 to tape 
-;; defc HIGH = $????	;2 Signal delay when writing a 1 to tape 
-;; defc HEADER = $????	;1 Delay of tape header (sync.) block 
+;;
+;; On SVI cassette handling is different than MSX (no parameter tables exist)
+;;
 ;; defc ASPCT1 = $????	;2 Horizontal / Vertical aspect for CIRCLE command 
-;; defc ASPCT2 = $????	;2 Horizontal / Vertical aspect for CIRCLE command 
-;; defc ENDPRG = $????	;5 Pointer for the RESUME NEXT command
+;; defc ASPCT2 = $????	;2     "  On SVI the GTASPCT call returns constantly $0100 for both 
+defc ENDPRG = $F526	;5 Pointer for the RESUME NEXT command
 
 ; USED BY BASIC INTERNALLY
 defc ERRFLG = $F53F	;1 Basic Error code 
-;; defc LPTPOS = $????	;1 Position of the printer head
-;; defc PRTFLG = $????	;1 Printer output flag is read by OUTDO
-;; defc NTMSXP = $????	;1 Printer type is read by OUTDO. SCREEN ,,,n writes to this address
-;; defc RAWPRT = $????	;1 Raw printer output is read by OUTDO
+defc LPTPOS = $F541	;1 Position of the printer head
+defc PRTFLG = $F542	;1 Printer output flag is read by OUTDO
+;; defc NTMSXP = MISSING	;1 Printer type .. seems to be missing on SVI
+;; defc RAWPRT = $????	;1 Raw printer output is read by OUTDO.. seems to be missing on SVI
 defc VLZADR = $F54C	;2 Address of data that is temporarilly replaced by ‘O’ when Basic function VAL("") is running 
 defc VLZDAT = $F8E8	;1 Original value that was in the address pointed to with VLZADR 
-defc CURLIN = $F54B	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
+defc CURLIN = $F548	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
+
 defc KBUF   = $F54F
 
 defc BUFMIN = $F68D  ; used in INPUT st.
@@ -113,13 +94,13 @@ defc ENDBUF = $F790  ; Prevent overflow of BUF
 defc TTYPOS = $F791  ; Virtual cursor location internally retained by BASIC
 defc DIMFLG = $F792  ; ARRAY FLAG
 defc VALTYP = $F793  ; Type indicator
-;; defc OPRTYP = $????  ; Store operator number in the extended momentarily before operator application
-;; defc DORES  = $????  ; Indicates whether stored word can be crunched
-;; defc DONUM  = $????  ; Flag for crunch
-;; defc CONTXT = $????  ; Text address used by CNRGET
+defc OPRTYP = $F794  ; Store operator number in the extended momentarily before operator application (=DORES on SVI)
+defc DORES  = $F794  ; Indicates whether stored word can be crunched
+defc DONUM  = $F795  ; Flag for crunch
+defc CONTXT = $F796  ; Text address used by CNRGET
 defc CONSAV = $F798  ; Store token of constant after calling CHRGET
-;; defc CONTYP = $????  ; Type of stored constant
-;; defc CONLO  = $????  ; Value of stored constant
+defc CONTYP = $F799  ; Type of stored constant
+defc CONLO  = $F79A  ; Value of stored constant
 defc MEMSIZ = $F7A2  ; Highest location in memory used by BASIC
 defc STKTOP = $F546  ; Top location to be used for the stack
 defc TXTTAB = $F54A  ; Starting address of BASIC text area
@@ -130,10 +111,10 @@ defc FRETOP = $F7C7  ; Starting address of unused area of string area
 defc TEMP3  = $F7C9  ; Used for garbage collection or by USR function
 defc TEMP8  = $F7CB  ; Used for garbage collection
 defc ENDFOR = $F7CD  ; Next address of FOR st.
-;; defc DATLIN = $????  ; Line number of DATA st.read by READ st.
+defc DATLIN = $F7CF  ; Line number of DATA st.read by READ st.
 defc SUBFLG = $F7D1  ; Flag for array for USR fun.
 defc USFLG  = $F7D2
-;; defc FLGINP = $????  ; Flag for INPUT or READ
+defc FLGINP = $F7D2  ; Flag for INPUT or READ
 defc TEMP   = $F7D3  ; Location for temporary reservation for st.code
 defc PTRFLG = $F7D5  ; =0 if no line number converted to pointers
 defc AUTFLG = $F7D6  ; AUTO mode flag
@@ -141,9 +122,9 @@ defc AUTLIN = $F7D7  ; Current line number for auto
 defc AUTINC = $F7D9  ; (AUTOP) Increment for auto
 defc SAVTXT = $F7DB  ; Text pointer for resume
 defc SAVSTK = $F7DD  ; Save stack when error occurs
-;; defc ERRLIN = $????  ; Line where last error
+defc ERRLIN = $F7DF  ; Line where last error
 defc DOT    = $F7E1  ; Current line for edit & list
-;; defc ERRTXT = $????  ; Text pointer for use by RESUME
+defc ERRTXT = $F7E3  ; Text pointer for use by RESUME
 defc ONELIN = $F7E5  ; LINE to go when error
 defc ONEFLG = $F7E7  ; =1 if executing an error trap routine
 defc TEMP2  = $F7E8
@@ -161,7 +142,7 @@ defc PRMLEN = $F812  ; Number of bytes of objective table
 defc PARM1  = $F814  ; Objective prameter definition table
 defc PRMPRV = $F878  ; Pointer to previous parameter block
 defc PRMLN2 = $F87A  ; Size of parameter block
-;; defc PARM2  = $????  ; For parameter storage
+defc PARM2  = $F87C  ; For parameter storage
 defc PRMFLG = $F8E0  ; Flag to indicate whether PARM1 was searching
 defc ARYTA2 = $F7F0  ; End point of search
 defc NOFUNS = $F8E3  ; 0 if no function active
@@ -190,8 +171,8 @@ defc MAXFIL = $F98D  ; (MAXFILES) High legal file number
 defc FILTAB = $F98E  ; Starting address of of file data area
 defc NULBUF = $F992  ; Points to file 0 buffer ( used in SAVE & LOAD st.)
 defc PTRFIL = $F997  ; Points to file data of currently accessing file
-;; defc RUNFLG = $????  ; Non-zero for run after load
-defc FILNAM = $99E  ; Name for FILES, NAME & others
+defc RUNFLG = $F99E  ; Non-zero for run after load
+defc FILNAM = $F99E  ; Name for FILES, NAME & others
 defc FILNM2 = $F9A7  ; Second name for NAME
 defc NLONLY = $F9B2  ; <>0 when loading program
 defc SAVEND = $F9B4  ; End address for BSAVE
@@ -203,7 +184,7 @@ defc CGTABL = $4198
 ;; defc NAMBAS = $????  ; Base address of current pattern name table
 ;; defc CGPBAS = $????  ; Base address of current pattern generator table
 ;; defc PATBAS = $????  ; Base address of current sprite generator table
-;; defc ATRBAS = $????  ; Base address of current sprite attribute table
+defc ATRBAS = $1B00     ; Base address of current sprite attribute table (static address on SVI, PTR on MSX)
 defc CLOC   = $FAC0		; (CHKROM/CLOC)
 defc CMASK  = $FAC2
 defc MINDEL = $FAE9
@@ -301,7 +282,7 @@ defc VCBA   = $FCDA ; (VCBA/METREX)
 defc VCBB   = $FCFF
 defc VCBC   = $FD24   ; (VCCC)
 ;; defc ENSTOP = $???? ; <>0 if warm start enabled (CTRL+SHIFT+GRPH+KANA/CODE for warm start)
-defc BASROM = $0000 ; <>0 if basic is in rom (CTRL+STOP disabled)
+defc BASROM = $FD4C ; <>0 if basic is in rom (CTRL+STOP disabled)
 
 defc LINTTB = $FD4D  ; line terminator table (<>0 if line terminates)
 defc FSTPOS = $FD65  ; first position for inlin
@@ -321,6 +302,54 @@ defc SYSMEM = $FDE6	;start address of system memory
 defc HIMEM  = $FDE6 ;^
 defc TRPTBL = $FDEB
 defc RTYCNT = $FB2A
+
+; --------------------------------------------------------------------------
+
+; TRPTBL (78) - Data table for the interrupt facilities 
+
+
+defc IFLG_F1       = $FDEB  ; F1 Key - Interrupt flags
+defc IENTRY_F1     = $FDEC  ; F1 Key - Interrupt related code
+defc IFLG_F2       = $FDEE  ; F2 Key - Interrupt flags
+defc IENTRY_F2     = $FDEF  ; F2 Key - Interrupt related code
+defc IFLG_F3       = $FDF1  ; F3 Key - Interrupt flags
+defc IENTRY_F3     = $FDF2  ; F3 Key - Interrupt related code
+defc IFLG_F4       = $FDF4  ; F4 Key - Interrupt flags
+defc IENTRY_F4     = $FDF5  ; F4 Key - Interrupt related code
+defc IFLG_F5       = $FDF7  ; F5 Key - Interrupt flags
+defc IENTRY_F5     = $FDF8  ; F5 Key - Interrupt related code
+defc IFLG_F6       = $FDFA  ; F6 Key - Interrupt flags
+defc IENTRY_F6     = $FDFB  ; F6 Key - Interrupt related code
+defc IFLG_F7       = $FDFD  ; F7 Key - Interrupt flags
+defc IENTRY_F7     = $FDFE  ; F7 Key - Interrupt related code
+defc IFLG_F8       = $FE00  ; F8 Key - Interrupt flags
+defc IENTRY_F8     = $FE01  ; F8 Key - Interrupt related code
+defc IFLG_F9       = $FE03  ; F9 Key - Interrupt flags
+defc IENTRY_F9     = $FE04  ; F9 Key - Interrupt related code
+defc IFLG_F10      = $FE06  ; F10 Key - Interrupt flags
+defc IENTRY_F10    = $FE07  ; F10 Key - Interrupt related code
+
+defc IFLG_STOP     = $FE09  ; STOP button - Interrupt flags
+defc IENTRY_STOP   = $FE0A  ; STOP button - Interrupt related code
+defc IFLG_COLLSN   = $FE0C  ; Sprite collision - Interrupt flags
+defc IENTRY_COLLSN = $FE0D  ; Sprite collision - Interrupt related code
+
+defc IFLG_STRIG0   = $FE0F  ; SPACE key trigger - Interrupt flags
+defc IENTRY_STRIG0 = $FE10  ; SPACE key trigger - Interrupt related code
+defc IFLG_STRIG1   = $FE12  ; Joystick 1, Fire 1 - Interrupt flags
+defc IENTRY_STRIG1 = $FE13  ; Joystick 1, Fire 1 - Interrupt related code
+defc IFLG_STRIG2   = $FE15  ; Joystick 2, Fire 1 - Interrupt flags
+defc IENTRY_STRIG2 = $FE16  ; Joystick 2, Fire 1 - Interrupt related code
+defc IFLG_STRIG3   = $FE18  ; Joystick 1, Fire 2 - Interrupt flags
+defc IENTRY_STRIG3 = $FE19  ; Joystick 1, Fire 2 - Interrupt related code
+defc IFLG_STRIG4   = $FE1B  ; Joystick 2, Fire 2 - Interrupt flags
+defc IENTRY_STRIG4 = $FE1C  ; Joystick 2, Fire 2 - Interrupt related code
+
+defc IFLG_TIMER    = $FE1E  ; TIMER - Interrupt flags
+defc IENTRY_TIMER  = $FE1F  ; TIMER - Interrupt related code
+
+; --------------------------------------------------------------------------
+
 
 defc INTFLG = $FE2B ; This flag is set if STOP (=4) or CTRL + STOP (=3) is pressed
 defc PADY   = $FE2C ; Y-coordinate of a connected Graphics Tablet (PAD)
@@ -342,8 +371,8 @@ defc CAPST  = $FE38 ; capital status ( 00# = Off / FF# = On )
 defc FLBMEM = $FE39 ; 0 if loading basic programm
 
 defc SCRMOD = $FE3A
-;; defc OLDSCR = $???? ; old screen mode
-;; defc CASPRV = $????
+defc OLDSCR = $FDEA ; old screen mode
+defc CASPRV = $FE3E ; (does RG2SAV ezist on SVI ?)
 defc BRDATR = $FE41
 defc GXPOS  = $FE42 ; X-position
 defc GYPOS  = $FE44 ; Y-position

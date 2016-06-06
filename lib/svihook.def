@@ -1,0 +1,125 @@
+lstoff
+
+; Spectravideo SVI hook entry definition
+;
+; May 2016
+; $Id: svihook.def,v 1.1 2016-06-06 15:40:54 stefano Exp $
+;
+
+defc HKEYI = $FE79		; Interrupt handler
+defc HTIMI = $FF5A		; Hook 2 for Interrupt handler
+defc HCHPU = $FFAE	;  CHPUT(A-character;SAVE ALL)
+;; defc HDSPC = MISSING 	;  Display cursor    (no param.)
+;; defc HERAC = MISSING		;  Erase cursor      (no param.)
+defc HDSPF = $FF51		;  DSPFNK std routine(no param.)
+defc HERAF = $FF4E		;  ERAFNK std routine(no param.)
+defc HTOTE = $FFB1		;  TOTEXT std routine
+;; defc HCHGE = MISSING		;  CHGET  std routine
+defc HINIP = $FFAB		;  Copy character set to VDP
+;; defc HKEYC = MISSING		;  Keyboard decoder
+defc HKYEA = $FF7B		;  Keyboard decoder
+defc HNMI  = $FF7E		;  NMI std routine
+defc HPINL = $FF42		;  PINLIN std routine
+defc HQINL = $FF45		;  QINLIN std routine
+defc HINLI = $FF48      ;  INLIN std routine
+defc HONGO = $FF75		;  "ON DEVICE GOSUB"
+defc HDSKO = $FF8A		;  "DSKO$
+defc HSETS = $FF8D		;  "SET"
+defc HNAME = $FF90		;  "NAME"
+defc HKILL = $FF93		;  "KILL"
+defc HIPL  = $FF96		;  "IPL"
+defc HCOPY = $FF99		;  "COPY"
+defc HCMD  = $FF9C		;  "CMD"
+defc HDSKF = $FF9F		;  "DSKF"
+defc HDSKI = $FFA2		;  "DSKI$
+defc HATTR = $FFA5		;  "ATTR$
+;; defc HLSET  = MISSING		;  "LSET"
+;; defc HRSET  = MISSING		;  "RSET"
+;; defc HFIEL  = MISSING		;  "FIELD"
+;; defc HMKI_S = MISSING		;  "MKI$
+;; defc HMKS_S = MISSING		;  "MKS$
+;; defc HMKD_S = MISSING		;  "MKD$
+;; defc HCVI   = MISSING		;  "CVI"
+;; defc HCVS   = MISSING		;  "CVS"
+;; defc HCVD   = MISSING		;  "CVD"
+defc HGETP = $FEDF		;  Locate FCB
+defc HSETF = $FEE8      ;  Locate FCB
+defc HNOFO = $FED0		;  "OPEN": not found
+defc HNULO = $FEEB		;  "OPEN"
+defc HNTFL = $FEA9		;  Close I/O buffer 0
+defc HMERG = $FEC7		;  "MERGE/LOAD"
+defc HSAVE = $FEB5		;  "SAVE"
+defc HBINS = $FEF1		;  "SAVE"
+defc HBINL = $FF33		;  "MERGE/LOAD"  (slighlty different on MSX)
+defc HFILE = $FEB8		;  "FILES"
+defc HDGET = $FEF1		;  "GET/PUT"
+defc HFILO = $FE7F		;  Sequential output
+defc HINDS = $FE82		;  Sequential input
+defc HRSLF = $FE97		;  "INPUT$
+defc HSAVD = $FEB2		;"LOC",6D14"LOF",6D25"EOF",6D39"FPOS"
+defc HLOC  = $FE9A		;  "LOC"
+defc HLOF  = $FEBB		;  "LOF"
+defc HEOF  = $FECA		;  "EOF"
+defc HFPOS = $FE8B		;  "FPOS"
+defc HBAKU = $FE9D		;  "LINE INPUT#"
+defc HPARD = $FEA3		;  Parse device name
+defc HNODE = $FEC1		;  Parse device name
+defc HPOSD = $FEE5		;  Parse device name (slighlty different on MSX)
+;;  (HDEVN)
+defc HGEND = $FF0F		;  I/O function dispatcher
+defc HRUNC = $FEF7		;  Run-clear
+defc HCLEA = $FEAF		;  Run-clear
+defc HLOPD = $F7F6		;  Run-clear
+defc HSTKE = $FEA0		;  Reset stack
+defc HISFL = $FF15		;  ISFLIO std routine
+defc HOUTD = $FF09		;  OUTDO std routine (AFTER a call to ISFLIO, on MSX it happens BEFORE)
+;; defc HCRDO = MISSING		;  CR,LF to OUTDO
+defc HDSKC = $FF4B		;  Mainloop line input
+defc HDOGR = $FEC4		;  Line draw
+;; defc HPRGE = MISSING ?		;  Program end
+defc HERRP = $FF18		;  Error handler
+defc HERRF = $FF1B		;  Error handler
+defc HREAD = $FE8E		;  Mainloop "OK"
+defc HMAIN = $FE94		;  Mainloop
+defc HDIRD = $FF06		;  Mainloop direct statement
+defc HFINI = $FF30		;  Mainloop finished
+defc HFINE = $FF36		;  Mainloop finished
+defc HCRUN = $FF24		;  Tokenise
+defc HCRUS = $FF21		;  Tokenise
+defc HISRE = $FE91		;  Tokenise
+defc HNTFN = $FEAC		;  Tokenise
+defc HNOTR = $FF0C		;  Tokenise
+defc HSNGF = $FE88		;  "FOR"
+defc HNEWS = $FF54		;  Runloop new statement
+defc HGONE = $FF57		;  Runloop execute
+;; defc HCNRG = MISSING		;  CHRGTR std routine
+defc HRETU = $FEEE		;  "RETURN"
+defc HPRTF = $FE7C		;  "PRINT"
+defc HCOMP = $FF00		;  "PRINT"
+defc HFINP = $FF27		;  "PRINT"
+defc HTRMN = $FF1E		;  "READ/INPUT" error
+defc HFRME = $FF2A		;  Expression Evaluator
+defc HNTPL = $FEBE		;  Expression Evaluator
+defc HEVAL = $FEFA		;  Factor Evaluator
+defc HOKNO = $FEDC		;  Factor Evaluator
+defc HFING = $FF39		;  Factor Evaluator
+defc HISMI = $FEFD		;  Runloop execute
+defc HWIDT = $FF3F		;  "WIDTH"
+defc HLIST = $FEF4		;  "LIST"
+defc HBUFL = $FED6		;  Detokenise
+defc HFRQI = $FF03		;  Convert to integer
+defc HSCNE = $FE85		;  Line number to pointer
+defc HFRET = $FEA6		;  Free descriptor
+defc HPTRG = $FECD		;  Variable search
+;;defc HPHYD = $		;  PHYDIO std routine
+;;defc HFORM = $		;  FORMAT std routine
+;; defc HERRO = MISSING		;  Error handler
+;; defc HLPTO = MISSING		;  LPTOUT std routine
+;; defc HLPTS = MISSING		;  LPTSTT std routine
+;; defc HSCRE = MISSING		;  "SCREEN"
+;; defc HPLAY = MISSING		;  "PLAY" statement
+;;defc H_H_H = $		; ????
+;;defc HBGFD = $		; before physical operation with disk controller
+;;defc HENFD = $		; after physical operation with disk controller
+
+lston

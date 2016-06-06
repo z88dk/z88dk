@@ -2,7 +2,7 @@ lstoff
 
 ; Spectravideo SVI functions definition
 ;
-; $Id: svibios.def,v 1.5 2015-01-19 01:29:18 pauloscustodio Exp $
+; $Id: svibios.def,v 1.6 2016-06-06 15:40:54 stefano Exp $
 ;
 
 
@@ -17,9 +17,9 @@ defc SYNCHR = $0008 ; Checks if then current character pointed by
 ;; defc RDSLT  = $???? ; Reads the value of an address in another slot
 defc CHRGTB = $0010 ; Gets next character (or token) from BASIC text.
 ;; defc WRTSLT = $???? ; Writes a value to an address in another slot.
-;; defc OUTDO  = $???? ; Output to the current device.
+defc OUTDO  = $0018 ; Output to the current device.
 ;; defc CALSLT = $???? ; Performs inter-slot call to specified address.
-defc DCOMPR = $56AE ; Compare HL with DE. (??? SVI has DCOMP.. is it the same ?)
+defc DCOMPR = $0020 ; Compare HL with DE.
 ;; defc ENASLT = $???? ; Switches indicated slot at indicated page on perpetual
 defc GETYPR = $0030 ; Return the type FAC.
 ;; defc CALLF  = $???? ; Performs far_call (i.e. inter-slots call)
@@ -28,7 +28,7 @@ defc KEYINT = $0038 ; Performs hardware interrupt procedures.
 ; I/O initialization.
 
 defc INITIO = $34D9 ; Dev. initialization.
-defc INIFNK = $3498 ; Initializes function key strings.
+defc INIFNK = $0059 ; Initializes function key strings.
 
 ; Accessing to the VDP (T19918)
 
@@ -46,11 +46,11 @@ defc CHGMOD = $37D9 ; Sets the VDP mode according to SCRMOD.
 defc CHGCLR = $3750 ; Changes the color of the screen.
 defc NMI    = $0066 ; Performs non-maskable interrupt procedures.
 defc CLRSPR = $36BE ; Initializes all sprites.
-defc INITXT = $3541 ; Initializes screen for text mode (40*24) and sets the VDP.
+defc INITXT = $0047 ; Initializes screen for text mode (40*24) and sets the VDP.
 ;; defc INIT32 = $???? ; Initializes screen for text mode (32*24) and sets the VDP.
-defc INIGRP = $3610 ; Initializes screen for high-resolution mode and sets the VDP.
-defc INIMLT = $3665 ; Initializes screen for multi-color mode and sets the VDP.
-;; defc SETTXT = $???? ; Sets the VDP for text (40*24) mode.
+defc INIGRP = $004A ; Initializes screen for high-resolution mode and sets the VDP.
+defc INIMLT = $004D ; Initializes screen for multi-color mode and sets the VDP.
+defc SETTXT = $0047 ; (=INITXT on SVI) Sets the VDP for text (40*24) mode.
 ;; defc SETT32 = $???? ; Sets the VDP for text (32*24) mode.
 ;; defc SETGRP = $???? ; Sets the VDP for high-resolution mode.
 ;; defc SETMLT = $???? ; Sets the VDP for multicolor mode.
@@ -68,26 +68,26 @@ defc STRTMS = $416E ; Checks/starts background tasks for PLAY.
 
 ; Console (i.e. the keyboard and the CRT)
 
-defc CHSNS  = $3DCA ; Check the status of keyboard buffer.
-defc CHGET  = $403D ; Waits for character being input and returns the character codes.
+defc CHSNS  = $003B ; Check the status of keyboard buffer.
+defc CHGET  = $003E ; Waits for character being input and returns the character codes.
 defc CHPUT  = $394D ; Outputs a character to the console.
-;; defc LPTOUT = $???? ; Output a character to the line printer.
-;; defc LPTSTT = $???? ; Check the line priter status.
+defc LPTOUT = $0044 ; Output a character to the line printer.
+defc LPTSTT = $0041 ; Check the line priter status.
 ;; defc SNVCHR = $???? ; Check graphic header byte and converts codes.
 defc PINLIN = $6D13 ; Accepts a line from console until a CR or STOP
                     ; is typed,and stores the line in a buffer.
 defc INLIN  = $6D2F ; Same as PINLIN,exept if AUTFLO if set.
 defc QINLIN = $6D26 ; Output a '?' mark and a space then falls into the INLIN routine.
-defc BREAKX = $3512 ; Check the status of the Control-STOP key.
+defc BREAKX = $005C ; Check the status of the Control-STOP key.
 defc ISCNTC = $6495 ; Check the status of the SHIFT-STOP key.
-defc CKCNTC = $405D ; Same as ISCNTC,used by BASIC
-defc BEEP   = $40BE ; Sounds the buffer
+defc CKCNTC = $016E ; Same as ISCNTC,used by BASIC
+defc BEEP   = $0147 ; Sounds the buffer
 defc CLS    = $3777 ; Clear the screen.
 defc POSIT  = $393E ; Locate cursor at the specified position.
-defc FNKSB  = $3B95 ; Check if function key display is active. If
+defc FNKSB  = $0050 ; Check if function key display is active. If
                     ; it is,it display it,otherwise does nothing.
-defc ERAFNK = $3BB6 ; Hide the function key diplay.
-defc DSPFNK = $3B9F ; Show the function key display.
+defc ERAFNK = $0053 ; Hide the function key diplay.
+defc DSPFNK = $0056 ; Show the function key display.
 defc TOTEXT = $3768 ; Forcidly places the screen in text mode.
 
 ; Game I/O devices
@@ -151,5 +151,8 @@ defc GETVCP = $2D46 ; Returns pointer to play queue
 ;; defc GETVC2 = $???? ; Returns pointer to variable in queue number VOICEN (byte op #FB38)
 defc KILBUF = $0156 ; Clear keyboard buffer
 ;; defc CALBAS = $???? ; Executes inter-slot call to the routine in BASIC interpreter (CALBNK=$3480)
+
+defc SETBORDER = $3762		; Set border color (color in 'A')
+
 
 lston
