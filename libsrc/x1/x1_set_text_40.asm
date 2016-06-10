@@ -3,21 +3,19 @@
 ;   switch to 40 columns text mode
 ;	Uses high resolution text if available
 ;
-;	$Id: x1_set_text_40.asm,v 1.3 2015-01-19 01:33:25 pauloscustodio Exp $
+;	$Id: x1_set_text_40.asm,v 1.4 2016-06-10 23:45:21 dom Exp $
 ;
 
+	SECTION	code_clib
 	PUBLIC	x1_set_text_40
+	PUBLIC	_x1_set_text_40
 ;	LIB		x1_get_pcg_version
 	EXTERN		set_crtc_10
 	EXTERN	text_cols
 
 
-t40v1:
-	defb 37h, 28h, 2Dh, 34h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
-;t40v2:
-;	defb 35h, 28h, 2Dh, 84h, 1Bh, 02h, 19h, 1Ah, 00h, 0Fh
-
 x1_set_text_40:
+_x1_set_text_40:
 ;		call	x1_get_pcg_version
 ;		ld		a,l
 ;		dec		a
@@ -41,3 +39,9 @@ set_vmode:
 		ld		(text_cols),a
 
 		ret
+
+	SECTION rodata_clib
+t40v1:
+	defb 37h, 28h, 2Dh, 34h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
+;t40v2:
+;	defb 35h, 28h, 2Dh, 84h, 1Bh, 02h, 19h, 1Ah, 00h, 0Fh

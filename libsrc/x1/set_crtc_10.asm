@@ -6,13 +6,16 @@
 ;
 ;	Set 16 6845 CRTC registers at once
 ;
-;	$Id: set_crtc_10.asm,v 1.2 2015-01-19 01:33:25 pauloscustodio Exp $
+;	$Id: set_crtc_10.asm,v 1.3 2016-06-10 23:45:21 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	set_crtc_10
+	PUBLIC	_set_crtc_10
 	
 
 set_crtc_10:
+_set_crtc_10:
 ; __FASTCALL__ : CRTC table ptr in HL
 
 		LD DE,000Ah	

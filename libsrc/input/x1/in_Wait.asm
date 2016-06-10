@@ -5,7 +5,9 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
+	SECTION code_clib
         PUBLIC in_Wait
+        PUBLIC _in_Wait
         EXTERN t_delay
 
 ; Waits a period of time measured in milliseconds.
@@ -14,6 +16,7 @@
 ; used  : AF,BC,DE,HL
 
 .in_Wait
+._in_Wait
         ; wait 1ms in loop controlled by HL
         ; at 3.5MHz, 1ms = 3500 T states
         ld e,l

@@ -5,7 +5,9 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
+	SECTION code_clib
         PUBLIC in_Pause
+        PUBLIC _in_Pause
         EXTERN in_WaitForKey, t_delay
         EXTERN _x1_keyboard_io
 
@@ -18,6 +20,7 @@
 ; uses : AF,BC,DE,HL
 
 .in_Pause
+._in_Pause
         ld a, h
         or l
 	ld bc, _x1_keyboard_io+1

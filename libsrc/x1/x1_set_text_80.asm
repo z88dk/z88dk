@@ -3,21 +3,19 @@
 ;   switch to 80 columns text mode
 ;	Uses high resolution text if available
 ;
-;	$Id: x1_set_text_80.asm,v 1.3 2015-01-19 01:33:25 pauloscustodio Exp $
+;	$Id: x1_set_text_80.asm,v 1.4 2016-06-10 23:45:21 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	x1_set_text_80
+	PUBLIC	_x1_set_text_80
 ;	LIB		x1_get_pcg_version
 	EXTERN		set_crtc_10
 	EXTERN	text_cols
 
 
-t80v1:
-	defb 6Fh, 50h, 59h, 38h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
-;t80v2:
-;	defb 6Bh, 50h, 59h, 88h, 1Bh, 02h, 19h, 1Ah, 00h, 0Fh
-
 x1_set_text_80:
+_x1_set_text_80:
 ;		call	x1_get_pcg_version
 ;		ld		a,l
 ;		dec		a
@@ -42,3 +40,9 @@ set_vmode:
 		ld		(text_cols),a
 
 		ret
+
+	SECTION rodata_clib
+t80v1:
+	defb 6Fh, 50h, 59h, 38h, 1Fh, 02h, 19h, 1Ch, 00h, 07h
+;t80v2:
+;	defb 6Bh, 50h, 59h, 88h, 1Bh, 02h, 19h, 1Ah, 00h, 0Fh

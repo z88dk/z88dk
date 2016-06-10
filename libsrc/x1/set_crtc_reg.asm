@@ -5,13 +5,16 @@
 ;
 ;	Write data to a CRTC register
 ;
-;	$Id: set_crtc_reg.asm,v 1.2 2015-01-19 01:33:25 pauloscustodio Exp $
+;	$Id: set_crtc_reg.asm,v 1.3 2016-06-10 23:45:21 dom Exp $
 ;
 
+	SECTION	code_clib
 	PUBLIC	set_crtc_reg
+	PUBLIC	_set_crtc_reg
 	
 
 set_crtc_reg:
+_set_crtc_reg:
 	pop	hl
 	pop	de
 	pop	bc

@@ -5,7 +5,9 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
+	SECTION code_clib
         PUBLIC in_Inkey
+        PUBLIC _in_Inkey
         EXTERN _x1_keyboard_io
 
 ; exit : carry = no key registered (and HL=0)
@@ -13,6 +15,7 @@
 ; uses : AF, BC, HL
 
 .in_Inkey
+._in_Inkey
         ld hl, _x1_keyboard_io
         ld a, (hl)
         ld c, a

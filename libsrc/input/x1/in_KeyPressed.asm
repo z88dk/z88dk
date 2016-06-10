@@ -5,7 +5,9 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
+	SECTION code_clib
         PUBLIC in_KeyPressed
+        PUBLIC _in_KeyPressed
         EXTERN _x1_keyboard_io
 
 ;       Determines if a key is pressed using the key data
@@ -18,6 +20,7 @@
 ;       uses: : AF, BC, HL
 
 .in_KeyPressed
+._in_KeyPressed
         ld bc, _x1_keyboard_io
         ld a, (bc)
         cp l

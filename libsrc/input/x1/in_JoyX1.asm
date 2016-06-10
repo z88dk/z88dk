@@ -5,13 +5,16 @@
 ;       2013, Karl Von Dyson (X1s.org)
 ;
 
+	SECTION code_clib
         PUBLIC in_JoyX1
+        PUBLIC _in_JoyX1
 
 ; in   : (HL) = gamepad/joystick number
 ; exit : HL = FF00RLDU
 ; uses : AF, BC, HL
 
 .in_JoyX1
+._in_JoyX1
         ld hl,2
         add hl,sp
         ld a,(hl)

@@ -13,9 +13,12 @@
 ;       This routine does not differentiate between keys and their numeric keypad
 ;       equivalents. 
 
+	SECTION code_clib
         PUBLIC in_LookupKey
+        PUBLIC _in_LookupKey
 
 .in_LookupKey
+._in_LookupKey
         ld a, l
 
         cp 128
