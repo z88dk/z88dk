@@ -10,9 +10,12 @@
 ;	$Id:
 ;
 
+	SECTION code_clib
 	PUBLIC	trdos_installed
+	PUBLIC	_trdos_installed
 	
 trdos_installed:
+_trdos_installed:
 	ld	hl,(23635)
 	ld	de,23867
 	sbc	hl,de

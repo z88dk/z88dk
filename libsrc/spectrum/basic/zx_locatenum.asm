@@ -9,7 +9,7 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.6 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: zx_locatenum.asm,v 1.7 2016-06-10 20:02:04 dom Exp $
 ;
 ;	vars format:
 ;
@@ -18,10 +18,13 @@
 ;	for single char name:	a|$80 v vt vs (a lower case)
 ;
 
+SECTION code_clib
 	PUBLIC	zx_locatenum
+	PUBLIC	_zx_locatenum
 	EXTERN	call_rom3
 	
 zx_locatenum:
+_zx_locatenum:
 
 	;ex	de,hl
 	;ld	a,(de)

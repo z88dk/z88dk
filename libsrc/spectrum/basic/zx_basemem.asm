@@ -6,12 +6,15 @@
 ;
 ;	This function returns the base memory size in kbytes
 ;
-;	$Id: zx_basemem.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: zx_basemem.asm,v 1.3 2016-06-10 20:02:04 dom Exp $
 ;
 
+	SECTION	code_clib
 	PUBLIC	zx_basemem
+	PUBLIC	_zx_basemem
 	
 zx_basemem:
+_zx_basemem:
 	ld	a,(23733)
 	srl	a
 	inc	a

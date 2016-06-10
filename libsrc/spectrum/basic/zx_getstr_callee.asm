@@ -9,14 +9,17 @@
 ;
 ;	Debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_getstr_callee.asm,v 1.5 2015-01-19 01:33:07 pauloscustodio Exp $ 
+;	$Id: zx_getstr_callee.asm,v 1.6 2016-06-10 20:02:04 dom Exp $ 
 ;
 
+SECTION code_clib
 PUBLIC	zx_getstr_callee
+PUBLIC	_zx_getstr_callee
 PUBLIC	ASMDISP_ZX_GETSTR_CALLEE
 EXTERN	call_rom3
 
 zx_getstr_callee:
+_zx_getstr_callee:
 
 	pop	bc
 	pop	hl

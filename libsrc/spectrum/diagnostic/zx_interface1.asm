@@ -12,13 +12,16 @@
 ;
 ;	Shouldn't conflict with other interfaces.
 ;
-;	$Id: zx_interface1.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_interface1.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_interface1
+	PUBLIC	_zx_interface1
 	EXTERN	if1_installed
 	
 zx_interface1:
+_zx_interface1:
 	ld	bc,($5c3d)
 	push	bc		; save original ERR_SP
 	ld	bc,return

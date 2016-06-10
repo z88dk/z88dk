@@ -8,10 +8,12 @@
 ;	int __FASTCALL__ zx_getint(char *variable);
 ;
 ;
-;	$Id: zx_getint.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: zx_getint.asm,v 1.5 2016-06-10 20:02:04 dom Exp $
 ;	
 
+SECTION code_clib
 PUBLIC	zx_getint
+PUBLIC	_zx_getint
 EXTERN	zx_locatenum
 EXTERN	call_rom3
 
@@ -20,6 +22,7 @@ INCLUDE  "zxfp.def"
 ; hl = char *variable
 
 zx_getint:
+_zx_getint:
 
 	call	zx_locatenum
 	jr	c,error

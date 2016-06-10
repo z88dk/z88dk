@@ -12,12 +12,15 @@
 ;	- 0 (false) the BASIC is at its normal position
 ;	- 1 (true) the BASIC program has been moved
 ;
-;	$Id: zx_extsys.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: zx_extsys.asm,v 1.4 2016-06-10 20:02:04 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	zx_extsys
+	PUBLIC	_zx_extsys
 	
 zx_extsys:
+_zx_extsys:
 	ld	hl,(23635)
 	ld	de,23755
 	and	a	; clears carry

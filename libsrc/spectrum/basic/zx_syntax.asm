@@ -11,10 +11,12 @@
 ;		Terminate the string with carriage return.
 ;
 ;
-;	$Id: zx_syntax.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: zx_syntax.asm,v 1.4 2016-06-10 20:02:04 dom Exp $
 ;
 
+SECTION code_clib
 PUBLIC	zx_syntax
+PUBLIC	_zx_syntax
 EXTERN	zx_interface1
 EXTERN	call_rom3
 
@@ -22,6 +24,7 @@ EXTERN	call_rom3
 	defc	cmdlen = 20
 	
 zx_syntax:
+_zx_syntax:
 		push	hl
 		call	zx_interface1	; force IF1 activation to avoid crashes
 		call	call_rom3

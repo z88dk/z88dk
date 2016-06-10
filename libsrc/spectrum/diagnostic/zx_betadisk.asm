@@ -10,13 +10,16 @@
 ;	It has the side effect of enabling the TRDOS System variables
 ;
 ;
-;	$Id: zx_betadisk.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: zx_betadisk.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_betadisk
+	PUBLIC	_zx_betadisk
 	EXTERN	trdos_installed
 
 zx_betadisk:
+_zx_betadisk:
 
 	ld	hl,16384
 	ld	a,(hl)

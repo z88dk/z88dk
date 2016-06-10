@@ -8,12 +8,15 @@
 ;	- 1 (true) if a +3 floppy controller is found
 ;	- 0 (false) otherwise
 ;
-;	$Id: zx_plus3fdc.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_plus3fdc.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_plus3fdc
+	PUBLIC	_zx_plus3fdc
 	
 zx_plus3fdc:
+_zx_plus3fdc:
 	ld	hl,0
 	ld	de,65535
 loop:

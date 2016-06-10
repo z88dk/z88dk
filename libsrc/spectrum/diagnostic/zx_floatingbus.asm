@@ -8,12 +8,15 @@
 ;	- 1 (true) if Spectrum has floating bus
 ;	- 0 (false) otherwise
 ;
-;	$Id: zx_floatingbus.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_floatingbus.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_floatingbus
+	PUBLIC	_zx_floatingbus
 	
 zx_floatingbus:
+_zx_floatingbus:
 	ld	hl,1
 	ld	e,h
 	ld	bc,32767

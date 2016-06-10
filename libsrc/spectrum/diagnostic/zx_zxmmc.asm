@@ -8,15 +8,18 @@
 ;	- 0 (false) zxmmc interface is not present
 ;	- 1 DISCiPle is installed
 ;
-;	$Id: zx_zxmmc.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_zxmmc.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_zxmmc
+	PUBLIC	_zx_zxmmc
 	INCLUDE "zxmmc.def"
 
 fast_save:	defb	0
 	
 zx_zxmmc:
+_zx_zxmmc:
 	di
 	in a,(FASTPAGE)		; FASTPAGE register is saved
 	ld (fast_save),a

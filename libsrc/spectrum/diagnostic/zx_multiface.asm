@@ -8,12 +8,15 @@
 ;	- 1 (true) if the MultiFace is connected
 ;	- 0 (false) otherwise
 ;
-;	$Id: zx_multiface.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_multiface.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_multiface
+	PUBLIC	_zx_multiface
 	
 zx_multiface:
+_zx_multiface:
 	ld	hl,0
 	in	a,($bf)
 	in	a,($9f)

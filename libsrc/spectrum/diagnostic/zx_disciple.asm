@@ -9,12 +9,15 @@
 ;	- 1 DISCiPle is installed
 ;	- 2 +D is installer
 ;
-;	$Id: zx_disciple.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_disciple.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_disciple
+	PUBLIC	_zx_disciple
 	
 zx_disciple:
+_zx_disciple:
 	ld	a,170
 	out	($5b),a
 	in	a,($5b)

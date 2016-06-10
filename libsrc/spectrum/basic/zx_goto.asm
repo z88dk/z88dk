@@ -18,15 +18,18 @@
 ;		 or 
 ;		 9999 STOP
 ;
-;	$Id: zx_goto.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: zx_goto.asm,v 1.4 2016-06-10 20:02:04 dom Exp $
 ;
 
+SECTION code_clib
 PUBLIC	zx_goto	
+PUBLIC	_zx_goto	
 EXTERN	call_rom3
 
 ; enter : hl = line number
 
 zx_goto:
+_zx_goto:
 
 	ld	bc,($5c3d)
 	push	bc		; save original ERR_SP

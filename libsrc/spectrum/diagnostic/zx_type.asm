@@ -9,12 +9,15 @@
 ;	- 1 (true) if the spectrum is a Spectrum 128K or compatible
 ;	- 2 (true) if the spectrum is a TS2068
 ;
-;	$Id: zx_type.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_type.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_type
+	PUBLIC	_zx_type
 	
 zx_type:
+_zx_type:
 	ld	hl,0
 	ld	a,(75)
 	cp	191

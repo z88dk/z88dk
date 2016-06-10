@@ -8,12 +8,15 @@
 ;	- 1 (true) if a sound chip is present
 ;	- 0 (false) otherwise
 ;
-;	$Id: zx_soundchip.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_soundchip.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_soundchip
+	PUBLIC	_zx_soundchip
 	
 zx_soundchip:
+_zx_soundchip:
 	ld	hl,0
 	ld	bc,$fffd
 	ld	a,11		; envelope register

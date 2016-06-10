@@ -8,12 +8,15 @@
 ;	- 0 (false) ULAPlus not installed / emulated
 ;	- 1 ULAPlus 64 colour mode is available
 ;
-;	$Id: zx_ulaplus.asm,v 1.3 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_ulaplus.asm,v 1.4 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_ulaplus
+	PUBLIC	_zx_ulaplus
 
 zx_ulaplus:
+_zx_ulaplus:
 	; Enter in 64 colour mode
 	ld	bc,$bf3b
 	ld	a,64	; select mode group (01xxxxxx)

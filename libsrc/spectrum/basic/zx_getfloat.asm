@@ -7,10 +7,12 @@
 ;	float zx_getfloat(char *variable);
 ;
 ;
-;	$Id: zx_getfloat.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: zx_getfloat.asm,v 1.4 2016-06-10 20:02:04 dom Exp $
 ;	
 
+        SECTION code_clib
 PUBLIC	zx_getfloat
+PUBLIC	_zx_getfloat
 EXTERN	zx_locatenum
 EXTERN	fa
 EXTERN	call_rom3
@@ -20,6 +22,7 @@ INCLUDE  "zxfp.def"
 ; hl = char *variable
 
 zx_getfloat:
+_zx_getfloat:
 	call	zx_locatenum
 	jr	c,error
 

@@ -9,14 +9,17 @@
 ;
 ;	CPIR, debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_setstr_callee.asm,v 1.5 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: zx_setstr_callee.asm,v 1.6 2016-06-10 20:02:04 dom Exp $
 ;
 
+SECTION code_clib
 PUBLIC	zx_setstr_callee
+PUBLIC	_zx_setstr_callee
 PUBLIC	ASMDISP_ZX_SETSTR_CALLEE
 EXTERN	call_rom3
 
 zx_setstr_callee:
+_zx_setstr_callee:
 
 	pop	bc
 	pop	hl

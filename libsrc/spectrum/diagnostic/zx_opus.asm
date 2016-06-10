@@ -12,13 +12,16 @@
 ;	If so, tries the short style command LOAD *PI;"A"
 ;	Shouldn't conflict with other interfaces.
 ;
-;	$Id: zx_opus.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_opus.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_opus
+	PUBLIC	_zx_opus
 	EXTERN	zx_syntax
 
 zx_opus:
+_zx_opus:
 		ld	hl,testcmd
 		call	zx_syntax
 		xor	a

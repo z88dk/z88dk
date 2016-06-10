@@ -8,12 +8,15 @@
 ;	- 1 (true) if a Kempston mouse is present
 ;	- 0 (false) otherwise
 ;
-;	$Id: zx_kempstonmouse.asm,v 1.2 2015-01-19 01:33:08 pauloscustodio Exp $
+;	$Id: zx_kempstonmouse.asm,v 1.3 2016-06-10 20:02:05 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	zx_kempstonmouse
+	PUBLIC	_zx_kempstonmouse
 	
 zx_kempstonmouse:
+_zx_kempstonmouse:
 	ld	hl,0
 	ld	de,65535
 loop:
