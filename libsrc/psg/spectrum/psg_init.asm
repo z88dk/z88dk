@@ -7,38 +7,29 @@
 ;	Set up the PSG
 ;
 ;
-;	$Id: psg_init.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+;	$Id: psg_init.asm,v 1.3 2016-06-10 21:13:58 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	psg_init
+	PUBLIC	_psg_init
 	EXTERN		zx_fullerstick
 
-	EXTERN		set_psg_callee
-	EXTERN		get_psg
-	
-	EXTERN	psg_patch0
-	EXTERN	psg_patch1
-	
-
-; Let's force the linker to include set and get, so we can patch them
-; We're wasting a lot of bytes Alvin, I know..  :P
-call set_psg_callee
-call get_psg
-	
 
 psg_init:
-	
-	call zx_fullerstick
-	xor	a
-	or l
+_psg_init:
+	call	zx_fullerstick
+	ld	a,l
+	and	a
+	ld	hl,$fffd		; select + read
+	ld	bc,$bffd		; write
 	jr	z,nofuller
-	ld	a,$3f
-	ld  (psg_patch0+1),a
-	ld  (psg_patch2+1),a
-	ld	hl,$5f0e	; ld c,$5f
-	ld	(psg_patch1),hl
-	ld	(psg_patch3),hl
+	; fuller
+	ld	hl,$ff3f		; select + read
+	ld	bc,$ff5f		; write
 nofuller:
+	ld	(__psg_select_and_read_port),hl
+	ld	(__psg_write_port),de
 
 
 
@@ -68,11 +59,15 @@ skip:
 	ld	a,11
 
 outpsg:
-psg_patch2:
-    LD	BC,$fffd
+	ld	bc,(__psg_select_and_read_port)
 	OUT	(C),a
-psg_patch3:
-	ld b,$bf
+	ld	bc,(__psg_write_port)
 	OUT	(C),e
 	ret
 
+	SECTION	bss_clib
+	PUBLIC	__psg_select_and_read_port
+	PUBLIC	__psg_write_port
+
+__psg_select_and_read_port:	defw	0
+__psg_write_port:	defw	0	

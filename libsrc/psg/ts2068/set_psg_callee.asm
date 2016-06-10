@@ -7,10 +7,12 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg_callee.asm,v 1.3 2015-01-19 01:33:04 pauloscustodio Exp $
+;	$Id: set_psg_callee.asm,v 1.4 2016-06-10 21:13:58 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	set_psg_callee
+	PUBLIC	_set_psg_callee
 	PUBLIC	psg_patch0
 	PUBLIC	psg_patch1
 	
@@ -18,6 +20,7 @@
 
 	
 set_psg_callee:
+_set_psg_callee:
 
    pop hl
    pop de

@@ -7,12 +7,15 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg_callee.asm,v 1.3 2015-01-19 01:33:04 pauloscustodio Exp $
+;	$Id: set_psg_callee.asm,v 1.4 2016-06-10 21:13:58 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	set_psg_callee
-	PUBLIC	psg_patch0
-	PUBLIC	psg_patch1
+	PUBLIC	_set_psg_callee
+
+	EXTERN	__psg_select_and_read_port
+	EXTERN	__psg_write_port
 	
 	PUBLIC ASMDISP_SET_PSG_CALLEE
 
@@ -25,14 +28,10 @@ set_psg_callee:
 	
 .asmentry
 
-	
-psg_patch0:
-    ld bc,$fffd
-	out (c),l
-psg_patch1:
-	ld b,$bf
-	out (c),e
-
+	ld	bc,(__psg_select_and_read_port)
+    	out	(c),l
+	ld	bc,(__psg_write_port)
+	out	(c),e
 	ret
 
 DEFC ASMDISP_SET_PSG_CALLEE = # asmentry - set_psg_callee

@@ -7,10 +7,12 @@
 ;	Read the specified PSG register
 ;
 ;
-;	$Id: get_psg.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+;	$Id: get_psg.asm,v 1.3 2016-06-10 21:13:58 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	get_psg	
+	PUBLIC	_get_psg	
 
 	;;LIB     msxbios
 	
@@ -22,6 +24,7 @@ ENDIF
 
 
 get_psg:
+_get_psg:
 	ld	a,l
 	;ld	ix,RDPSG
 	;call	msxbios

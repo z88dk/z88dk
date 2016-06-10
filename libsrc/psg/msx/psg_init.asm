@@ -7,10 +7,12 @@
 ;	Init the PSG (reset sound etc..)
 ;
 ;
-;	$Id: psg_init.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+;	$Id: psg_init.asm,v 1.3 2016-06-10 21:13:58 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	psg_init
+	PUBLIC	_psg_init
 	EXTERN     msxbios
 	
 IF FORmsx
@@ -20,5 +22,6 @@ ELSE
 ENDIF
 
 psg_init:
+_psg_init:
 	ld	ix,GICINI
 	jp	msxbios

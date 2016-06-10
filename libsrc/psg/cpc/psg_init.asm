@@ -7,14 +7,17 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: psg_init.asm,v 1.3 2015-01-19 01:33:04 pauloscustodio Exp $
+;	$Id: psg_init.asm,v 1.4 2016-06-10 21:13:58 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	psg_init
+	PUBLIC	_psg_init
 	EXTERN		set_psg_callee
         EXTERN ASMDISP_SET_PSG_CALLEE
 	
 psg_init:
+_psg_init:
 
 	ld	e,@01010101
 	xor a 	; R0: Channel A frequency low bits
