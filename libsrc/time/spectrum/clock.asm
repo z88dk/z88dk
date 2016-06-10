@@ -6,9 +6,10 @@
 ;	djm 12/1/2000
 ;
 ; ------
-; $Id: clock.asm,v 1.4 2016-03-05 00:07:01 dom Exp $
+; $Id: clock.asm,v 1.5 2016-06-10 21:14:50 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	clock
 	PUBLIC	_clock
 
