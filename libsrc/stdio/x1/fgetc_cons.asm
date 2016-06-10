@@ -6,10 +6,13 @@
 ;       Karl Von Dyson (for X1s.org) - 24/10/2013
 ;
 
+	SECTION code_clib
         PUBLIC fgetc_cons
+        PUBLIC _fgetc_cons
         EXTERN _x1_keyboard_io
 
 fgetc_cons:      
+_fgetc_cons:      
         ld hl, _x1_keyboard_io+1
         ld a, (hl)
         and $40
