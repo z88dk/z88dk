@@ -1,7 +1,7 @@
 /*
  *  Sega Master System
  *
- *  $Id: sms.h,v 1.3 2010-09-19 00:24:08 dom Exp $
+ *  $Id: sms.h,v 1.4 2016-06-10 23:13:45 dom Exp $
  */
 
 #ifndef __SMS_H__
@@ -100,22 +100,22 @@ typedef union _fixed {
   UWORD w;
 } fixed;
 
-extern void __LIB__ load_palette(unsigned char *data, int index, int count);
-extern void __LIB__ load_tiles(unsigned char *data, int index, int count, int bpp);
-extern void __LIB__ set_bkg_map(unsigned int *data, int x, int y, int w, int h);
-extern void __LIB__ scroll_bkg(int x, int y);
+extern void __LIB__ load_palette(unsigned char *data, int index, int count) __SMALLCDECL;
+extern void __LIB__ load_tiles(unsigned char *data, int index, int count, int bpp) __SMALLCDECL;
+extern void __LIB__ set_bkg_map(unsigned int *data, int x, int y, int w, int h) __SMALLCDECL;
+extern void __LIB__ scroll_bkg(int x, int y) __SMALLCDECL;
 extern int __LIB__ get_vcount();
 extern int __LIB__ wait_vblank_noint();
-extern void __LIB__ set_sprite(int n, int x, int y, int tile);
+extern void __LIB__ set_sprite(int n, int x, int y, int tile) __SMALLCDECL;
 extern int __LIB__ read_joypad1();
 extern int __LIB__ read_joypad2();
-extern void __LIB__ set_vdp_reg(int reg, int value);
-extern void __LIB__ gotoxy(int x, int y);
-extern void __LIB__ aplib_depack(unsigned char *src, unsigned char *dest);
+extern void __LIB__ set_vdp_reg(int reg, int value) __SMALLCDECL;
+extern void __LIB__ gotoxy(int x, int y) __SMALLCDECL;
+extern void __LIB__ aplib_depack(unsigned char *src, unsigned char *dest) __SMALLCDECL;
 extern void __LIB__ add_raster_int(void *ptr);
 extern void __LIB__ add_pause_int(void *ptr);
-extern void __LIB__ set_sound_freq(int channel, int freq);
-extern void __LIB__ set_sound_volume(int channel, int volume);
+extern void __LIB__ set_sound_freq(int channel, int freq) __SMALLCDECL;
+extern void __LIB__ set_sound_volume(int channel, int volume) __SMALLCDECL;
 
 extern void __LIB__ standard_font();  /* Actually data *not* a function */
 
