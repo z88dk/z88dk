@@ -2,9 +2,10 @@
 ; 1/4/00 GWL
 
 ;
-; $Id: strupr_far.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: strupr_far.asm,v 1.4 2016-06-10 22:43:44 dom Exp $
 ;
 
+        SECTION   code_clib
 		EXTERN farseg1,incfar
                 PUBLIC strupr_far
 
