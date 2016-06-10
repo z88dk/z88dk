@@ -24,10 +24,12 @@
 ;    2 - Vortex FDC
 
 
-;; $Id: cpc_fdc.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
+;; $Id: cpc_fdc.asm,v 1.4 2016-06-10 21:12:36 dom Exp $
 
 
+        SECTION   code_clib
         PUBLIC cpc_fdc
+        PUBLIC _cpc_fdc
 
 ;;------------------------------------
 
@@ -35,6 +37,7 @@ defc ams_fdc_io = $fb7e         ;; I/O address for main status register of NEC76
 defc vtx_fdc_io = $fbf6         ;; I/O address for main status register of NEC765 in Vortex controller.
 
 .cpc_fdc
+._cpc_fdc
 
 ;;------------------------------------
 ;; detect amstrad floppy disc interface

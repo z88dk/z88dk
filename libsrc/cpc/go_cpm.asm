@@ -4,14 +4,16 @@
 ;
 ;       void go_cpm()
 ;
-;       $Id: go_cpm.asm,v 1.2 2009-06-22 21:44:16 dom Exp $
+;       $Id: go_cpm.asm,v 1.3 2016-06-10 21:12:36 dom Exp $
 ;
 
-        XLIB    go_cpm
+        PUBLIC	go_cpm
+        PUBLIC	_go_cpm
 
         INCLUDE "cpcfirm.def"              
 
 .go_cpm
+._go_cpm
 
 ; |CPM (no parameters)
 

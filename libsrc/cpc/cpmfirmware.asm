@@ -16,9 +16,10 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: cpmfirmware.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
+; $Id: cpmfirmware.asm,v 1.4 2016-06-10 21:12:36 dom Exp $
 ;
 
+        SECTION   code_clib
         PUBLIC firmware
 
 

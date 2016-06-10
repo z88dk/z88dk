@@ -7,14 +7,17 @@
 ;    2 - 6128
 
 
-; $Id: cpc_model.asm,v 1.6 2015-01-19 01:32:42 pauloscustodio Exp $
+; $Id: cpc_model.asm,v 1.7 2016-06-10 21:12:36 dom Exp $
 
 
         INCLUDE "cpcfirm.def"              
 
+        SECTION   code_clib
         PUBLIC cpc_model
+        PUBLIC _cpc_model
 
 .cpc_model
+._cpc_model
 	call	firmware
 	defw	kl_probe_rom	; 0B915H
 	ld	a,h		; version

@@ -4,15 +4,18 @@
 ;
 ;       char __LIB__ __CALLEE__ *cpc_rsx_strcpy(char *dst, char *src);
 ;
-;       $Id: cpc_rsx_strcpy_callee.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
+;       $Id: cpc_rsx_strcpy_callee.asm,v 1.4 2016-06-10 21:12:36 dom Exp $
 ;
 
+        SECTION   code_clib
         PUBLIC    cpc_rsx_strcpy_callee
+        PUBLIC    _cpc_rsx_strcpy_callee
         PUBLIC    ASMDISP_CPC_RSX_STRCPY_CALLEE
         EXTERN     strlen
         EXTERN     malloc
 
 .cpc_rsx_strcpy_callee
+._cpc_rsx_strcpy_callee
 
    pop hl
    pop de

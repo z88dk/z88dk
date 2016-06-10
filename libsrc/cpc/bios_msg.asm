@@ -4,15 +4,18 @@
 ;
 ;       void bios_msg(int status)
 ;
-;       $Id: bios_msg.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
+;       $Id: bios_msg.asm,v 1.4 2016-06-10 21:12:36 dom Exp $
 ;
 
+	SECTION	  code_clib
         PUBLIC    bios_msg
+        PUBLIC    _bios_msg
 
         INCLUDE "cpcfirm.def"              
 
 
 .bios_msg
+._bios_msg
 
         push    hl
         ld      hl,cmd_biosmsg
