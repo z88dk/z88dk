@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.45 2016-06-02 23:14:13 dom Exp $
+;       $Id: spec_crt0.asm,v 1.46 2016-06-10 21:28:47 dom Exp $
 ;
 
 
@@ -385,12 +385,6 @@ ENDIF
         ld      ($5c8f),a       ; ATTR_T
 
 	SECTION bss_crt
-
-; ZXMMC SD/MMC interface
-IF DEFINED_NEED_ZXMMC
-    	PUBLIC card_select
-card_select:    defb    0    ; Currently selected MMC/SD slot for ZXMMC
-ENDIF
 
 
 IF startup=2
