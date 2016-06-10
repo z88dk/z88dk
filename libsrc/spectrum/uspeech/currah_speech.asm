@@ -7,13 +7,16 @@
 ;	int currah_speech(char *text);
 ;
 ;
-;	$Id: currah_speech.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
+;	$Id: currah_speech.asm,v 1.3 2016-06-10 21:30:58 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	currah_speech
+	PUBLIC	_currah_speech
 	EXTERN	zx_setstr
 	
 currah_speech:
+_currah_speech:
 	pop	bc
 	pop	hl	; text
 	push	hl

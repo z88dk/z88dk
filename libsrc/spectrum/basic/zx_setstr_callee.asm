@@ -9,7 +9,7 @@
 ;
 ;	CPIR, debugged version by Antonio Schifano, 29/12/2008
 ;
-;	$Id: zx_setstr_callee.asm,v 1.6 2016-06-10 20:02:04 dom Exp $
+;	$Id: zx_setstr_callee.asm,v 1.7 2016-06-10 21:30:58 dom Exp $
 ;
 
 SECTION code_clib
@@ -30,7 +30,7 @@ _zx_setstr_callee:
 ;          e = char variable
 
 .asmentry
-	
+	push	ix		;save callers ix - rom may corrupt it	
 	ld	a,e
 	and	95
 	ld	d,a
@@ -101,6 +101,7 @@ store:
 	ld	(hl),c
 	inc	hl
 	ld	(hl),b
+	pop	ix			; restore callers ix
 	ld	a,b			; handle 0 lenght strings
 	or	c
 	ret	z

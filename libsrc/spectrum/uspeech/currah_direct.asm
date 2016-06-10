@@ -8,12 +8,15 @@
 ;	int currah_direct(char *allophones);
 ;
 ;
-;	$Id: currah_direct.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
+;	$Id: currah_direct.asm,v 1.3 2016-06-10 21:30:58 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	currah_direct
+	PUBLIC	_currah_direct
 	
 currah_direct:
+_currah_direct:
 	pop	bc
 	pop	hl	; text
 	push	hl

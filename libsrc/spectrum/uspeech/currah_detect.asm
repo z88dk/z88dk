@@ -8,12 +8,15 @@
 ;	int currah_detect();
 ;
 ;
-;	$Id: currah_detect.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
+;	$Id: currah_detect.asm,v 1.3 2016-06-10 21:30:58 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	currah_detect
+	PUBLIC	_currah_detect
 	
 currah_detect:
+_currah_detect:
 	
 	ld	bc,65365
 	ld	hl,0	; false
