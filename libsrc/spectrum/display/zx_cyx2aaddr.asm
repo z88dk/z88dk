@@ -1,12 +1,15 @@
 ; uchar *zx_cyx2aaddr(uchar row, uchar col)
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC zx_cyx2aaddr
+PUBLIC _zx_cyx2aaddr
 
 EXTERN zx_cyx2aaddr_callee
 EXTERN ASMDISP_ZX_CYX2AADDR_CALLEE
 
 .zx_cyx2aaddr
+._zx_cyx2aaddr
 
    pop af
    pop hl

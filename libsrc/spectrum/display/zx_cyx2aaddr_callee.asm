@@ -1,10 +1,13 @@
 ; uchar __CALLEE__ *zx_cyx2aaddr_callee(uchar row, uchar col)
 ; aralbrec 06.2007
 
+SECTION code_clib
 PUBLIC zx_cyx2aaddr_callee
+PUBLIC _zx_cyx2aaddr_callee
 PUBLIC ASMDISP_ZX_CYX2AADDR_CALLEE
 
 .zx_cyx2aaddr_callee
+._zx_cyx2aaddr_callee
 
    pop hl
    pop de

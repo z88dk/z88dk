@@ -1,9 +1,12 @@
 ; uchar __FASTCALL__ *zx_saddrcright(void *pixeladdr)
 ; aralbrec 06.2007
 
+SECTION code_clib
 PUBLIC zx_saddrcright
+PUBLIC _zx_saddrcright
 
 .zx_saddrcright
+._zx_saddrcright
 
 ; enter: hl = valid screen address
 ; exit : carry = moved off screen

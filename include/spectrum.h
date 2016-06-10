@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.39 2016-04-25 13:13:00 dom Exp $
+ * $Id: spectrum.h,v 1.40 2016-06-10 19:39:39 dom Exp $
  */
 
 #ifndef __SPECTRUM_H__
@@ -180,20 +180,20 @@ extern int  __LIB__ ula_plus_mode(void);
 extern void __LIB__ ula_normal_mode(void);
 extern void __LIB__ ula_sync(void);
 extern int __LIB__ ulaplus_set(unsigned char attribute, unsigned char rgbcolor) __SMALLCDECL;
-extern int  __LIB__ __FASTCALL__ ulaplus_get(unsigned char attribute);
+extern int  __LIB__ __FASTCALL__ ulaplus_get(unsigned char attribute) __SMALLCDECL __SMALLCFASTCALL;
 
 
 ///////////////////////////////
 // INTERFACE FOR CALLING BASIC
 ///////////////////////////////
 
-extern int  __LIB__ __FASTCALL__ zx_syntax(char *statement);
-extern int  __LIB__ __FASTCALL__ zx_goto(int line);
+extern int  __LIB__ __FASTCALL__ zx_syntax(char *statement) __SMALLCDECL __SMALLCFASTCALL;
+extern int  __LIB__ __FASTCALL__ zx_goto(int line) __SMALLCDECL __SMALLCFASTCALL;
 extern int  __LIB__              zx_getstr(char variable, char *value) __SMALLCDECL;
 extern void __LIB__              zx_setstr(char variable, char *value) __SMALLCDECL;
-extern int  __LIB__ __FASTCALL__ zx_getint(char *variable);
+extern int  __LIB__ __FASTCALL__ zx_getint(char *variable) __SMALLCDECL __SMALLCFASTCALL;
 extern void __LIB__              zx_setint(char *variable, int value) __SMALLCDECL;
-extern double __LIB__ __FASTCALL__ zx_getfloat(char *variable);
+extern double __LIB__ __FASTCALL__ zx_getfloat(char *variable) __SMALLCDECL __SMALLCFASTCALL;
 extern void __LIB__              zx_setfloat(char *variable, float value) __SMALLCDECL;
 
 extern int  __LIB__ __CALLEE__   zx_getstr_callee(char variable, char *value) __SMALLCDECL __SMALLCCALLEE;
@@ -306,9 +306,9 @@ extern void __LIB__ __CALLEE__  in_MouseKempSetPos_callee(uint xcoord, uint ycoo
 //////////////////////////
 
 // Set the border color
-extern void  __LIB__ __FASTCALL__ zx_border(uchar colour);
+extern void  __LIB__ __FASTCALL__ zx_border(uchar colour) __SMALLCDECL __SMALLCFASTCALL;
 // Quickly set the whole screen color attributes
-extern void  __LIB__ __FASTCALL__ zx_colour(uchar colour);
+extern void  __LIB__ __FASTCALL__ zx_colour(uchar colour) __SMALLCDECL __SMALLCFASTCALL;
 // Get color attribute at given position
 extern uint  __LIB__              zx_attr(uchar row, uchar col) __SMALLCDECL;
 extern uint  __LIB__              zx_screenstr(uchar row, uchar col) __SMALLCDECL;
@@ -353,28 +353,28 @@ extern uint  __LIB__ __CALLEE__   zx_screenstr_callee(uchar row, uchar col) __SM
 // DISPLAY PIXEL ADDRESS MANIPULATORS
 
 extern uchar __LIB__              *zx_cyx2saddr(uchar row, uchar col) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_cy2saddr(uchar row);           // cx assumed 0
+extern uchar __LIB__ __FASTCALL__ *zx_cy2saddr(uchar row) __SMALLCDECL __SMALLCFASTCALL;           // cx assumed 0
 
 extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord, uchar *mask) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_py2saddr(uchar ycoord);        // px assumed 0
+extern uchar __LIB__ __FASTCALL__ *zx_py2saddr(uchar ycoord) __SMALLCDECL __SMALLCFASTCALL;        // px assumed 0
 
-extern uint  __LIB__ __FASTCALL__  zx_saddr2cx(void *pixeladdr);
-extern uint  __LIB__ __FASTCALL__  zx_saddr2cy(void *pixeladdr);
+extern uint  __LIB__ __FASTCALL__  zx_saddr2cx(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
+extern uint  __LIB__ __FASTCALL__  zx_saddr2cy(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
 
 extern uint  __LIB__               zx_saddr2px(void *pixeladdr, uchar mask) __SMALLCDECL;
-extern uint  __LIB__ __FASTCALL__  zx_saddr2py(void *pixeladdr);
+extern uint  __LIB__ __FASTCALL__  zx_saddr2py(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
 
-extern uchar __LIB__ __FASTCALL__ *zx_saddr2aaddr(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddr2aaddr(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
 
-extern uchar __LIB__ __FASTCALL__ *zx_saddrcdown(void *pixeladdr);
-extern uchar __LIB__ __FASTCALL__ *zx_saddrcleft(void *pixeladdr);
-extern uchar __LIB__ __FASTCALL__ *zx_saddrcright(void *pixeladdr);
-extern uchar __LIB__ __FASTCALL__ *zx_saddrcup(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddrcdown(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
+extern uchar __LIB__ __FASTCALL__ *zx_saddrcleft(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
+extern uchar __LIB__ __FASTCALL__ *zx_saddrcright(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
+extern uchar __LIB__ __FASTCALL__ *zx_saddrcup(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
 
-extern uchar __LIB__ __FASTCALL__ *zx_saddrpdown(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddrpdown(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
 extern uchar __LIB__              *zx_saddrpleft(void *pixeladdr, uchar *mask) __SMALLCDECL;
 extern uchar __LIB__              *zx_saddrpright(void *pixeladdr, uchar *mask) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_saddrpup(void *pixeladdr);
+extern uchar __LIB__ __FASTCALL__ *zx_saddrpup(void *pixeladdr) __SMALLCDECL __SMALLCFASTCALL;
 
 extern uchar __LIB__ __CALLEE__   *zx_cyx2saddr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
 extern uchar __LIB__ __CALLEE__   *zx_pxy2saddr_callee(uchar xcoord, uchar ycoord, uchar *mask) __SMALLCDECL __SMALLCCALLEE;
@@ -391,23 +391,23 @@ extern uchar __LIB__ __CALLEE__   *zx_saddrpright_callee(void *pixeladdr, uchar 
 // DISPLAY ATTRIBUTE ADDRESS MANIPULATORS
 
 extern uchar __LIB__              *zx_cyx2aaddr(uchar row, uchar col) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row);           // cx assumed 0
+extern uchar __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row) __SMALLCDECL __SMALLCFASTCALL;           // cx assumed 0
 
 extern uchar __LIB__              *zx_pxy2aaddr(uchar xcoord, uchar ycoord) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_py2aaddr(uchar ycoord);        // px assumed 0
+extern uchar __LIB__ __FASTCALL__ *zx_py2aaddr(uchar ycoord) __SMALLCDECL __SMALLCFASTCALL;        // px assumed 0
 
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2cx(void *attraddr);
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2cy(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2cx(void *attraddr) __SMALLCDECL __SMALLCFASTCALL;
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2cy(void *attraddr) __SMALLCDECL __SMALLCFASTCALL;
  
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2px(void *attraddr);
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2py(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2px(void *attraddr) __SMALLCDECL __SMALLCFASTCALL;
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2py(void *attraddr) __SMALLCDECL __SMALLCFASTCALL;
 
-extern uchar __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *attraddr) __SMALLCDECL __SMALLCFASTCALL;
 
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcdown(void *attraddr);
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcleft(void *attraddr);
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcright(void *attraddr);
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcup(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcdown(void *attraddr) __SMALLCDECL __SMALLCFASTCALL;
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcleft(void *attraddr) __SMALLCDECL __SMALLCFASTCALL;
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcright(void *attraddr) __SMALLCDECL __SMALLCFASTCALL;
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcup(void *attraddr) __SMALLCDECL __SMALLCFASTCALL;
 
 extern uchar __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
 extern uchar __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __SMALLCDECL __SMALLCCALLEE;

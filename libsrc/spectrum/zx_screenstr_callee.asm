@@ -8,13 +8,16 @@
 ; if the bit pattern contains a mixture of inverted
 ; and non-inverted bit patterns.
 
+SECTION code_clib
 PUBLIC zx_screenstr_callee
+PUBLIC _zx_screenstr_callee
 PUBLIC ASMDISP_ZX_SCREENSTR_CALLEE
 
 EXTERN zx_cyx2saddr_callee
 EXTERN ASMDISP_ZX_CYX2SADDR_CALLEE
 
 .zx_screenstr_callee
+._zx_screenstr_callee
 
    pop hl
    pop de
