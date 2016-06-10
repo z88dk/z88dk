@@ -2,13 +2,15 @@
 
 ;020128 created by Yarek
 
-
+	SECTION code_clib
 	PUBLIC	opensound
+	PUBLIC	_opensound
 
 ;int opensound(int device,int mode)
 ;returns opened mode (0 means the device is closed)
 
 .opensound
+._opensound
 	POP	BC
 	POP	DE	;mode
 	POP	HL	;device

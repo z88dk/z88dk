@@ -2,12 +2,15 @@
 
 ;020121	(C) created by Yarek
 
+	SECTION code_clib
 	PUBLIC	loadany
+	PUBLIC	_loadany
 
 ;int loadany(char *name, int adr, int len)
 ;returns 0 if OK
 
 .loadany
+._loadany
 	POP	AF	;return address
 	POP	BC
 	POP	HL
