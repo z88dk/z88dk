@@ -1,11 +1,14 @@
-; $Id: beeper.asm,v 1.4 2013-10-21 14:23:45 stefano Exp $
+; $Id: beeper.asm,v 1.5 2016-06-10 21:37:10 dom Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
 ; Stefano Bodrato - 28/9/2001
 ;
 
-    XLIB     beeper
+	SECTION		code_clib
+
+	PUBLIC		beeper
+	PUBLIC		_beeper
 
 ;
 ; Spectrum beeper routine!!
@@ -44,14 +47,17 @@
 ; 
 ; ----------------------------------------------------------------
 
-	XREF  call_rom3
-    LIB      bit_open_di
-    LIB      bit_close_ei
+	EXTERN	call_rom3
+	EXTERN	bit_open_di
+	EXTERN	bit_open_ei
 
 .beeper
+._beeper
      call    bit_open_di
+	push	ix		;save callers ix
 	 call    call_rom3
 	 defw    949
+	pop	ix		;restore callers ix
 	 di
 	 call    bit_close_ei
 	 ret

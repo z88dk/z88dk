@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.6 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: bit_open.asm,v 1.7 2016-06-10 21:37:10 dom Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -9,10 +9,13 @@
 
     INCLUDE  "games/games.inc"
 
+    SECTION    code_clib
     PUBLIC     bit_open
+    PUBLIC     _bit_open
     EXTERN     snd_tick
 
 .bit_open
+._bit_open
         ld a,(23624)
         rra
         rra
