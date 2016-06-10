@@ -52,22 +52,22 @@ struct r_Rect16 {
 
 // Detect whether points, intervals and rectangles intersect
 
-extern int __LIB__ r_IsPtInIval8(uchar x, struct r_Ival8 *i);
-extern int __LIB__ r_IsPtInRect8(uchar x, uchar y, struct r_Rect8 *r);
-extern int __LIB__ r_IsIvalInIval8(struct r_Ival8 *i1, struct r_Ival8 *i2);
-extern int __LIB__ r_IsRectInRect8(struct r_Rect8 *r1, struct r_Rect8 *r2);
+extern int __LIB__ r_IsPtInIval8(uchar x, struct r_Ival8 *i) __SMALLCDECL;
+extern int __LIB__ r_IsPtInRect8(uchar x, uchar y, struct r_Rect8 *r) __SMALLCDECL;
+extern int __LIB__ r_IsIvalInIval8(struct r_Ival8 *i1, struct r_Ival8 *i2) __SMALLCDECL;
+extern int __LIB__ r_IsRectInRect8(struct r_Rect8 *r1, struct r_Rect8 *r2) __SMALLCDECL;
 
-extern int __LIB__ r_IsPtInIval16(uint x, struct r_Ival16 *i);
-extern int __LIB__ r_IsPtInRect16(uint x, uint y, struct r_Rect16 *r);
-extern int __LIB__ r_IsIvalInIval16(struct r_Ival16 *i1, struct r_Ival16 *i2);
-extern int __LIB__ r_IsRectInRect16(struct r_Rect16 *r1, struct r_Rect16 *r2);
+extern int __LIB__ r_IsPtInIval16(uint x, struct r_Ival16 *i) __SMALLCDECL;
+extern int __LIB__ r_IsPtInRect16(uint x, uint y, struct r_Rect16 *r) __SMALLCDECL;
+extern int __LIB__ r_IsIvalInIval16(struct r_Ival16 *i1, struct r_Ival16 *i2) __SMALLCDECL;
+extern int __LIB__ r_IsRectInRect16(struct r_Rect16 *r1, struct r_Rect16 *r2) __SMALLCDECL;
 
 // Return the result of interval and rectangle intersections
 
-extern int __LIB__ r_IntersectIval8(struct r_Ival8 *i1, struct r_Ival8 *i2, struct r_Ival8 *result);
-extern int __LIB__ r_IntersectRect8(struct r_Rect8 *r1, struct r_Rect8 *r2, struct r_Rect8 *result);
+extern int __LIB__ r_IntersectIval8(struct r_Ival8 *i1, struct r_Ival8 *i2, struct r_Ival8 *result) __SMALLCDECL;
+extern int __LIB__ r_IntersectRect8(struct r_Rect8 *r1, struct r_Rect8 *r2, struct r_Rect8 *result) __SMALLCDECL;
 
-extern int __LIB__ r_IntersectIval16(struct r_Ival16 *i1, struct r_Ival16 *i2, struct r_Ival16 *result);
-extern int __LIB__ r_IntersectRect16(struct r_Rect16 *r1, struct r_Rect16 *r2, struct r_Rect16 *result);
+extern int __LIB__ r_IntersectIval16(struct r_Ival16 *i1, struct r_Ival16 *i2, struct r_Ival16 *result) __SMALLCDECL;
+extern int __LIB__ r_IntersectRect16(struct r_Rect16 *r1, struct r_Rect16 *r2, struct r_Rect16 *result) __SMALLCDECL;
 
 #endif
