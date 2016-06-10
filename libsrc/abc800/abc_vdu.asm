@@ -7,12 +7,15 @@
 ;	int  abc_vdu(unsigned char register, unsigned char value);
 ;
 ;
-;	$Id: abc_vdu.asm,v 1.2 2015-01-19 01:32:41 pauloscustodio Exp $
+;	$Id: abc_vdu.asm,v 1.3 2016-06-10 22:55:52 dom Exp $
 ;	
 
+	SECTION		code_clib
 PUBLIC	abc_vdu
+PUBLIC	_abc_vdu
 
 abc_vdu:
+_abc_vdu:
 	pop	bc
 	pop	de
 	pop	hl
