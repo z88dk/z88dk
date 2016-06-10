@@ -4,12 +4,15 @@
 ;
 ;	int ulaplus_get(attribute);
 ;
-;	$Id: ulaplus_get.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
+;	$Id: ulaplus_get.asm,v 1.3 2016-06-10 21:14:23 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ulaplus_get
+	PUBLIC	_ulaplus_get
 
 ulaplus_get:
+_ulaplus_get:
 	;__FASTCALL__
 	ld	bc,$bf3b
 	ld	a,l

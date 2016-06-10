@@ -5,12 +5,16 @@
 ;	int ulaplus_set(attribute,rgbvalue);
 ;
 ;
-;	$Id: ulaplus_set.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $
+;	$Id: ulaplus_set.asm,v 1.3 2016-06-10 21:14:23 dom Exp $
 ;
 
+
+	SECTION code_clib
 	PUBLIC	ulaplus_set
+	PUBLIC	_ulaplus_set
 
 ulaplus_set:
+_ulaplus_set:
 	pop	bc
 	pop de
 	pop hl
