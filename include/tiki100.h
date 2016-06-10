@@ -7,7 +7,7 @@
  *		   * Added vertical scrolling library
  *
  *
- *      $Id: tiki100.h,v 1.3 2015-11-03 20:03:37 stefano Exp $
+ *      $Id: tiki100.h,v 1.4 2016-06-10 23:01:12 dom Exp $
  */
 
 #ifndef __TIKI100_H__
@@ -30,7 +30,7 @@
 		2 = 512x256x4
 		3 = 256x256x16
 */
-extern void __LIB__ __FASTCALL__ gr_defmod(int mode);
+extern void __LIB__ __FASTCALL__ gr_defmod(int mode) __SMALLCDECL __SMALLCFASTCALL;
 
 /* 
 	Set color palette ('len' must be a fraction of 16)
@@ -39,7 +39,7 @@ extern void __LIB__ __FASTCALL__ gr_defmod(int mode);
 		Bit 2-4: Green
 		Bit 0-1: Blue
 */
-extern void __LIB__ gr_setpalette(int len, char *palette);
+extern void __LIB__ gr_setpalette(int len, char *palette) __SMALLCDECL;
 
 /* 
 	Hardcopy
@@ -53,7 +53,7 @@ extern void __LIB__ gr_hardcopy();
 	gr_vscroll_abs puts the display at a given vertical position
 
 */
-extern void __LIB__ __FASTCALL__ gr_vscroll(int lines);
-extern void __LIB__ __FASTCALL__ gr_vscroll_abs(int line);
+extern void __LIB__ __FASTCALL__ gr_vscroll(int lines) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ gr_vscroll_abs(int line) __SMALLCDECL __SMALLCFASTCALL;
 
 #endif
