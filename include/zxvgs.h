@@ -3,7 +3,7 @@
 030307	added #pragma output ZXVGS and #pragma -create-app
 020128	added #ifndef; added bnkinfo and opensound
 
-   $Id: zxvgs.h,v 1.2 2010-09-19 00:24:08 dom Exp $
+   $Id: zxvgs.h,v 1.3 2016-06-10 22:34:22 dom Exp $
 */
 
 #ifndef _ZXVGS_H
@@ -20,13 +20,13 @@ extern int __LIB__ j2();
 extern int __LIB__ j3();
 
 /* sound devices */
-extern int __LIB__ opensound(int device, int mode);
+extern int __LIB__ opensound(int device, int mode) __SMALLCDECL;
 
 /* memory banks */
 extern int __LIB__ bnkfree();
 
 /* direct loading and saving files */
-extern int __LIB__ loadany(char *name, int adr, int len);
-extern int __LIB__ saveany(char *name, int adr, int len);
+extern int __LIB__ loadany(char *name, int adr, int len) __SMALLCDECL;
+extern int __LIB__ saveany(char *name, int adr, int len) __SMALLCDECL;
 
 #endif
