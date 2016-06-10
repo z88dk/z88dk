@@ -4,7 +4,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: mmc_init.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_init.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ;
 ;-----------------------------------------------------------------------------------------
@@ -22,7 +22,9 @@
 ;-----------------------------------------------------------------------------------------
 ;
 
+	SECTION	code_clib
 	PUBLIC	mmc_init
+	PUBLIC	_mmc_init
 	
 	EXTERN		cs_high
 	EXTERN		cs_low
@@ -33,6 +35,7 @@
 
 
 mmc_init:
+_mmc_init:
 	call	cs_high			; set cs high
 	ld	b,10			; sends 80 clocks
 	ld a,$FF

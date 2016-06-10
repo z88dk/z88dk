@@ -3,7 +3,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: mmc_wait_response.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_wait_response.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ;
 ;-----------------------------------------------------------------------------------------
@@ -25,13 +25,16 @@
 ;-----------------------------------------------------------------------------------------
 ;
 
+	SECTION code_clib
 	PUBLIC	mmc_wait_response
+	PUBLIC	_mmc_wait_response
 
 	INCLUDE "zxmmc.def"
 	
 
 
 mmc_wait_response:
+_mmc_wait_response:
 	push bc
 	ld bc,50		; retry counter
 l_response:

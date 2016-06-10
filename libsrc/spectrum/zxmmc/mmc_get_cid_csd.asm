@@ -4,7 +4,7 @@
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;	
 ;
-;	$Id: mmc_get_cid_csd.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_get_cid_csd.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ;--------------------------------------------------------------------------------------------------------
 ; READ MMC CID subroutine. Data is stored at address (HL), command in A (MMC_READ_CID or MMC_READ_CSD).
@@ -17,7 +17,9 @@
 ;--------------------------------------------------------------------------------------------------------
 ;
 
+	SECTION code_clib
 	PUBLIC	mmc_get_cid_csd
+	PUBLIC	_mmc_get_cid_csd
 	
 	EXTERN		mmc_waitdata_token
 	EXTERN		mmc_send_command
@@ -28,6 +30,7 @@
 
 	
 mmc_get_cid_csd:
+_mmc_get_cid_csd:
 
 	ld	(hl),0			; kill the OEM ID, just to touch the CID a little
 	push hl

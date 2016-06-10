@@ -3,7 +3,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: mmc_waitdata_token.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_waitdata_token.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ;
 ;-----------------------------------------------------------------------------------------
@@ -11,13 +11,16 @@
 ; Returns with A = code read from MMC (ok if $FE). Destroys AF.
 ;-----------------------------------------------------------------------------------------
 
+	SECTION code_clib
 	PUBLIC	mmc_waitdata_token
+	PUBLIC	_mmc_waitdata_token
 	EXTERN		mmc_wait_response
 
 	INCLUDE "zxmmc.def"
 	
 
 mmc_waitdata_token:
+_mmc_waitdata_token:
 	push bc
 	ld b,10				; retry counter
 mmc_waitl:

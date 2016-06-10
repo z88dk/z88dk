@@ -3,7 +3,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Feb 2010
 ;
-;	$Id: mmc_send_command.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_send_command.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; SEND COMMAND TO MMC subroutine with trailing CRC7 checkum
@@ -21,7 +21,9 @@
 ;-----------------------------------------------------------------------------------------
 
 
+	SECTION code_clib
 	PUBLIC	mmc_send_command
+	PUBLIC	_mmc_send_command
 	EXTERN		mmc_wait_response
 	EXTERN		cs_high
 	EXTERN		cs_low
@@ -31,6 +33,7 @@
 
 	
 mmc_send_command:
+_mmc_send_command:
 
 	ld c,a
 	call cs_high			; cs high

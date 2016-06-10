@@ -129,6 +129,7 @@ spectrum/ulaplus/ulaplus_get
 spectrum/uspeech/currah_detect
 spectrum/uspeech/currah_direct
 spectrum/uspeech/currah_speech
+spectrum/zxmmc/__mmc_card_select
 spectrum/zxmmc/clock32
 spectrum/zxmmc/cs_high
 spectrum/zxmmc/cs_low

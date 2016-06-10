@@ -4,7 +4,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Mar 2010
 ;
-;	$Id: mmc_read_multidata.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_read_multidata.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ;	extern int __LIB__ mmc_read_multidata(struct MMC mmc_descriptor, long card_address, unsigned char *address, int block_count);
 ;
@@ -26,7 +26,9 @@
 ;-----------------------------------------------------------------------------------------
 ;
 
+	SECTION  code_clib
 	PUBLIC   mmc_read_multidata
+	PUBLIC   _mmc_read_multidata
 
 	EXTERN    mmc_write_command
 	EXTERN    mmc_send_command
@@ -35,7 +37,7 @@
 	EXTERN    clock32
 	EXTERN    cs_high
 
-	EXTERN   card_select
+	EXTERN   __mmc_card_select
 
 	INCLUDE "zxmmc.def"
 
@@ -47,6 +49,7 @@ tmp_reg:	defs	7
 
 
 mmc_read_multidata:
+_mmc_read_multidata:
 
 	ld	ix,2
 	add	ix,sp
@@ -56,7 +59,7 @@ mmc_read_multidata:
 	ld	a,(hl)
 	inc	hl			; ptr to MMC mask to be used to select port
 	ld	a,(hl)
-	ld	(card_select), a
+	ld	(__mmc_card_select), a
 	
 	ld	b,(ix+0)	; block count
 	ld	l,(ix+2)

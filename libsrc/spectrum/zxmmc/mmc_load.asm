@@ -6,16 +6,18 @@
 ;	int mmc_load(slot, struct MMC mmc_descriptor)
 ;		result: 0-OK, 
 ;
-;	$Id: mmc_load.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_load.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; Init MMC interface. look for card, etc..
 ;-----------------------------------------------------------------------------------------
 ;
 
+	SECTION	code_clib
 	PUBLIC	mmc_load
+	PUBLIC	_mmc_load
 	
-	EXTERN	card_select
+	EXTERN	__mmc_card_select
 
 	EXTERN		mmc_get_cid_csd
 	EXTERN		mmc_init
@@ -25,6 +27,7 @@
 
 
 mmc_load:
+_mmc_load:
 	di
 	in a,(RXREG)		; clears UART RX register
 
@@ -49,7 +52,7 @@ encoded:
 	ld	(hl),a			; Current MMC port
 	inc	hl				; point to CID
 
-	ld (card_select),a
+	ld (__mmc_card_select),a
 
 	call sd_check		; check if SD/MMC is present
 	ei

@@ -5,29 +5,32 @@
 ;
 ;	int mmc_command(struct MMC mmc_descriptor, unsigned char command, long parameter)
 ;
-;	$Id: mmc_command.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_command.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; SEND COMMAND TO MMC
 ;-----------------------------------------------------------------------------------------
 ;
 
+	SECTION code_clib
 	PUBLIC	mmc_command
+	PUBLIC	_mmc_command
 	
 	EXTERN		mmc_send_command
-	EXTERN	card_select
+	EXTERN	__mmc_card_select
 
 	
 	INCLUDE "zxmmc.def"
 
 mmc_command:
+_mmc_command:
 	ld	ix,2
 	add	ix,sp
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	inc	hl		; ptr to MMC mask to be used to select port
 	ld	a,(hl)
-	ld	(card_select), a
+	ld	(__mmc_card_select), a
 
 ;        arg1 = addr_H.BYTE1 (H)
 ;        arg2 = addr_H.BYTE0 (L)

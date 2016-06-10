@@ -3,7 +3,7 @@
 ;	ZX Spectrum ZXMMC specific routines 
 ;	code by Stefano Bodrato,   Mar 2010
 ;
-;	$Id: mmc_size.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_size.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ; Get the size in bytes of an MMC card
 ; unsigned long mmc_size(struct MMC mmc_descriptor);
@@ -29,11 +29,13 @@ defc CSD_OFFSET = 18
 ;	return ( (unsigned long)++c_size * (unsigned long)c_size_mult * (unsigned long)block_len );
 ;	
 
-
+	SECTION	  code_clib
         PUBLIC    mmc_size
+        PUBLIC    _mmc_size
         INCLUDE "z80_crt0.hdr"
 		
 .mmc_size
+._mmc_size
 		; __FASTCALL__
 		
 		push	hl	; MMC struct

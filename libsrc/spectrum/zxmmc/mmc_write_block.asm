@@ -4,7 +4,7 @@
 ;	code by Alessandro Poppi
 ;	ported to z88dk by Stefano Bodrato - Mar 2010
 ;
-;	$Id: mmc_write_block.asm,v 1.2 2015-01-19 01:33:11 pauloscustodio Exp $ 
+;	$Id: mmc_write_block.asm,v 1.3 2016-06-10 21:28:03 dom Exp $ 
 ;
 ; Write a 512 byte data block to the MMC card
 ; extern int __LIB__ mmc_write_block(struct MMC mmc_descriptor, long card_address, unsigned char *address);
@@ -26,7 +26,9 @@
 ;-----------------------------------------------------------------------------------------
 ;
 
+	SECTION  code_clib
 	PUBLIC   mmc_write_block
+	PUBLIC   _mmc_write_block
 
 	EXTERN    mmc_write_command
 	EXTERN    mmc_write_data
@@ -35,12 +37,13 @@
 	EXTERN    clock32
 	EXTERN    cs_high
 
-	EXTERN   card_select
+	EXTERN   __mmc_card_select
 
 	INCLUDE "zxmmc.def"
 
 	
 mmc_write_block:
+_mmc_write_block:
 
 
 	ld	ix,0
@@ -51,7 +54,7 @@ mmc_write_block:
 	ld	a,(hl)
 	inc	hl			; ptr to MMC mask to be used to select port
 	ld	a,(hl)
-	ld	(card_select), a
+	ld	(__mmc_card_select), a
 	
 	ld	l,(ix+6)
 	ld	h,(ix+7)	; RAM ptr
