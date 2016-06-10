@@ -15,12 +15,15 @@
 ;	   * Use address $F04D to store graphics mode instead of dedicated byte
 ;	   * Changed 2-byte left-shifts to 1-byte add a,a
 ;
-;	$Id: gr_defmod.asm,v 1.3 2015-11-03 20:03:37 stefano Exp $
+;	$Id: gr_defmod.asm,v 1.4 2016-06-10 23:01:47 dom Exp $
 ;
 
+	SECTION code_clib
 PUBLIC gr_defmod
+PUBLIC _gr_defmod
 
 gr_defmod:
+_gr_defmod:
 	ld	a,l
 	and	3
 	add	a,a

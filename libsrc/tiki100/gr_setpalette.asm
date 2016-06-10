@@ -16,12 +16,15 @@
 ;	   * Palette register is only written to once per entry in char palette
 ;	   * Use address $F04D to store graphics mode instead of dedicated byte
 ;
-;	$Id: gr_setpalette.asm,v 1.2 2015-11-03 20:03:37 stefano Exp $
+;	$Id: gr_setpalette.asm,v 1.3 2016-06-10 23:01:47 dom Exp $
 ;
 
+SECTION code_clib
 PUBLIC gr_setpalette
+PUBLIC _gr_setpalette
 
 gr_setpalette:
+_gr_setpalette:
 	pop	bc
 	pop	hl		; *palette
 	pop	de		; len
