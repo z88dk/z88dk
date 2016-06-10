@@ -10,14 +10,13 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_attr.asm,v 1.4 2016-06-10 23:56:01 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_attr
 
-	PUBLIC	vz_inverse
-	
-.vz_inverse	defb 0
+
 
 .ansi_attr
         and     a
@@ -66,3 +65,7 @@
 .noCreverse
 
         ret
+
+        SECTION bss_clib	
+	PUBLIC	vz_inverse
+.vz_inverse	defb 0
