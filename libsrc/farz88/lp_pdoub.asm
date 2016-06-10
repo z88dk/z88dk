@@ -5,9 +5,10 @@
 ;        FA->FA+5=double
 
 ;
-; $Id: lp_pdoub.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: lp_pdoub.asm,v 1.4 2016-06-10 22:42:22 dom Exp $
 ;
 
+        SECTION   code_clib
         PUBLIC    lp_pdoub
         EXTERN    fa
 

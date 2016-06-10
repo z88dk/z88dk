@@ -3,9 +3,10 @@
 ; 30/3/00 Changed size type to long, so >64K mallocs possible
 
 ;
-; $Id: malloc_far.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: malloc_far.asm,v 1.5 2016-06-10 22:42:22 dom Exp $
 ;
 
+        SECTION   code_clib
         PUBLIC malloc_far
 
         EXTERN    malloc_table,pool_table,farpages,farmemspec

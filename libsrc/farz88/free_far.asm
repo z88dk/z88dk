@@ -1,9 +1,10 @@
 ; FREE function for far memory model
 ; 31/3/00 GWL
 ;
-; $Id: free_far.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: free_far.asm,v 1.5 2016-06-10 22:42:22 dom Exp $
 ;
 
+        SECTION code_clib
         PUBLIC    free_far
 
         PUBLIC    free_loop
