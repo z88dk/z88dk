@@ -1,4 +1,6 @@
+	SECTION code_clib	
 	PUBLIC	set_sound_volume
+	PUBLIC	_set_sound_volume
 	
 	INCLUDE "sms/sms.hdr"
 
@@ -8,6 +10,7 @@
 ; Sets the sound volume for a given channel
 ;==============================================================
 .set_sound_volume
+._set_sound_volume
 	ld	hl, 2
 	add	hl, sp
 	ld	e, (hl)		; E = Volume

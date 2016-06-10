@@ -1,4 +1,7 @@
+	
+	SECTION code_clib
 	PUBLIC	aplib_depack
+	PUBLIC	_aplib_depack
 
 	EXTERN	aPLibMemory_bits
 	EXTERN	aPLibMemory_byte
@@ -11,6 +14,7 @@
 ; Uncompresses data previously compressed with apLib
 ;==============================================================
 .aplib_depack
+._aplib_depack
 	ld	hl, 2
 	add	hl, sp
 	ld	e, (hl)		; Destination address

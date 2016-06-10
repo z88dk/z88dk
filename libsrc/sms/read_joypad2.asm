@@ -1,4 +1,6 @@
+	SECTION	code_clib	
 	PUBLIC	read_joypad2
+	PUBLIC	_read_joypad2
 	
 ;==============================================================
 ; int read_joypad2()
@@ -6,6 +8,7 @@
 ; Reads the joystick 2
 ;==============================================================
 .read_joypad2
+._read_joypad2
 	in	a, ($dc)	; Reads UP and DOWN
 	cpl			; Inverts all bits
 	rla

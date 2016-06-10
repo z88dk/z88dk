@@ -1,4 +1,7 @@
+
+	SECTION code_clib
 	PUBLIC	add_pause_int
+	PUBLIC	_add_pause_int
 	
 	EXTERN	pause_procs
 
@@ -8,6 +11,7 @@
 ; Adds a pause interrupt handler
 ;==============================================================
 .add_pause_int
+._add_pause_int
 	ld	hl, 2
 	add	hl, sp
 	ld	c, (hl)		; Proc address

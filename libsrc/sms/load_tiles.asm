@@ -1,4 +1,6 @@
+	SECTION code_clib	
 	PUBLIC	load_tiles
+	PUBLIC	_load_tiles
 
 ;==============================================================
 ; load_tiles(unsigned char *data, int index, int count, int bpp)	
@@ -6,6 +8,7 @@
 ; Loads the specified tileset into VRAM
 ;==============================================================
 .load_tiles
+._load_tiles
 	ld	hl, 2
 	add	hl, sp
 	ld	a, (hl) ; bits per pixel
@@ -24,6 +27,7 @@
 	inc	hl
 	ld	d, (hl)
 	inc	hl
+	push	ix	; save callers ix
 	push	de
 	pop	ix	; tile data
 	pop	hl	; initial index
@@ -108,4 +112,5 @@ LoadTiles:
     pop de
     pop bc
     pop af
+    pop ix		;restore callers ix
     ret

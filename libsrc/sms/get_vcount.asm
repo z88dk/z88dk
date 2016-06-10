@@ -1,4 +1,6 @@
+	SECTION code_clib	
 	PUBLIC	get_vcount
+	PUBLIC	_get_vcount
 	
 ;==============================================================
 ; int get_vcount()
@@ -8,6 +10,7 @@
 ; Returns in a *and* b
 ;==============================================================
 .get_vcount
+._get_vcount
 	in	a, ($7e)	; get VCount
 .loop	
 	ld	l,a		; store it

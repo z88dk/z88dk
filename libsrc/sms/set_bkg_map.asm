@@ -1,4 +1,6 @@
+	SECTION code_clib	
 	PUBLIC	set_bkg_map
+	PUBLIC	_set_bkg_map
 
 	INCLUDE "sms/sms.hdr"
 	
@@ -11,6 +13,7 @@
 ; ** no validations are made **
 ;==============================================================
 .set_bkg_map
+._set_bkg_map
 	ld	hl, 2
 	add	hl, sp
 	ld	b, (hl)		; Height

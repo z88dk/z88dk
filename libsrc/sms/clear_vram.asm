@@ -1,4 +1,7 @@
+	
+	SECTION code_clib
 	PUBLIC	clear_vram
+	PUBLIC	_clear_vram
 	EXTERN	VRAMToHL
 	
 ;==============================================================
@@ -7,6 +10,7 @@
 ; Sets all of VRAM to zero
 ;==============================================================
 .clear_vram
+._clear_vram
 	ld	hl,$0000
 	call	VRAMToHL
 	; Output 16KB of zeroes

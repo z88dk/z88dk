@@ -1,3 +1,4 @@
+	SECTION code_clib	
 	PUBLIC	load_palette
 
 ;==============================================================
@@ -6,6 +7,7 @@
 ; C interface for LoadPalette
 ;==============================================================
 .load_palette
+._load_palette
 	ld	hl, 2
 	add	hl, sp
 	ld	b, (hl)

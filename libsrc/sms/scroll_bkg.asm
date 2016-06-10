@@ -1,4 +1,6 @@
+	SECTION code_clib	
 	PUBLIC	scroll_bkg
+	PUBLIC	_scroll_bkg
 	
 ;==============================================================
 ; void scroll_bkg(int x, int y)
@@ -6,6 +8,7 @@
 ; Scrolls the bkg map to the specified position
 ;==============================================================
 .scroll_bkg
+._scroll_bkg
 	ld	hl, 2
 	add	hl, sp
 	ld	a, (hl)		; Y

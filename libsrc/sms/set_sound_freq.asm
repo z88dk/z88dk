@@ -1,4 +1,6 @@
+	SECTION code_clib	
 	PUBLIC	set_sound_freq
+	PUBLIC	_set_sound_freq
 	
 	INCLUDE "sms/sms.hdr"
 
@@ -8,6 +10,7 @@
 ; Sets the sound frequency for a given channel
 ;==============================================================
 .set_sound_freq
+._set_sound_freq
 	ld	hl, 2
 	add	hl, sp
 	ld	e, (hl)		; DE = Frequency

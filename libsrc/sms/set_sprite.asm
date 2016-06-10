@@ -1,4 +1,6 @@
+	SECTION code_clib	
 	PUBLIC	set_sprite
+	PUBLIC	_set_sprite
 
 ;==============================================================
 ; set_sprite(int n, int x, int y, int tile)	
@@ -6,6 +8,7 @@
 ; Loads the specified tileset into VRAM
 ;==============================================================
 .set_sprite
+._set_sprite
 	ld	hl, 2
 	add	hl, sp
 	ld	d, (hl)		; Tile

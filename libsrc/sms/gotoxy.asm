@@ -1,4 +1,6 @@
+	SECTION code_clib
 	PUBLIC	gotoxy
+	PUBLIC	_gotoxy
 	
 	INCLUDE "sms/sms.hdr"
 
@@ -11,6 +13,7 @@
 ; Supposed to be used in conjunction with stdio
 ;==============================================================
 .gotoxy
+._gotoxy
 	ld	hl, 2
 	add	hl, sp
 	ld	d, (hl)		; Y
