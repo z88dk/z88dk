@@ -2,6 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
+SECTION code_clib
 PUBLIC RIsPtInRect8
 
 ; Determine if 8-bit (x,y) point lies in an 8-bit bounding

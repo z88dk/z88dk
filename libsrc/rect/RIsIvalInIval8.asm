@@ -2,6 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
+SECTION code_clib
 PUBLIC RIsIvalInIval8
 
 ; Determine if two 8-bit intervals intersect.  Intervals

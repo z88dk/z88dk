@@ -2,12 +2,15 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
+SECTION code_clib
 PUBLIC r_IntersectRect8
+PUBLIC _r_IntersectRect8
 EXTERN RIntersectRect8
 
 ; int r_IntersectRect8(struct r_Rect8 *r1, struct r_Rect8 *r2, struct r_Rect8 *result)
 
 .r_IntersectRect8
+._r_IntersectRect8
 
    ld hl,7
    add hl,sp

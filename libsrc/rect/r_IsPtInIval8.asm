@@ -2,12 +2,15 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
+SECTION code_clib
 PUBLIC r_IsPtInIval8
+PUBLIC _r_IsPtInIval8
 EXTERN RIsPtInIval8
 
 ; int r_IsPtInIval8(uchar x, struct r_Ival8 *i)
 
 .r_IsPtInIval8
+._r_IsPtInIval8
 
    ld hl,4
    add hl,sp

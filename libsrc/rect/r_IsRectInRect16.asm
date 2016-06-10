@@ -2,12 +2,15 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
+SECTION code_clib
 PUBLIC r_IsRectInRect16
+PUBLIC _r_IsRectInRect16
 EXTERN RIsRectInRect16
 
 ; int r_IsRectInRect16(struct r_Rect16 *r1, struct r_Rect16 *r2)
 
 .r_IsRectInRect16
+._r_IsRectInRect16
 
    ld hl,5
    add hl,sp

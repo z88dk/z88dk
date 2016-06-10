@@ -2,6 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
+SECTION code_clib
 PUBLIC RIntersectIval8
 
 ; Returns the intersection of two 8-bit intervals.

@@ -2,6 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
+SECTION code_clib
 PUBLIC RIsPtInRect16
 
 ; Determine if 16-bit (x,y) point lies in a 16-bit bounding

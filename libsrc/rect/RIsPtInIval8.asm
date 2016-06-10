@@ -2,6 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
+SECTION code_clib
 PUBLIC RIsPtInIval8
 
 ; Determine if 8-bit point lies in an 8-bit interval.

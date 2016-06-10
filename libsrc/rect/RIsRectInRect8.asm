@@ -2,6 +2,7 @@
 ; Rectangle, Intervals and Points
 ; 05.2006 aralbrec
 
+SECTION code_clib
 PUBLIC RIsRectInRect8
 
 ; Determine if two 8-bit rectangles intersect.  Rectangles
