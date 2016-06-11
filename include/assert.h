@@ -12,7 +12,7 @@
  *
  *      djm 28/2/2000
  *
- *	$Id: assert.h,v 1.4 2010-09-19 00:24:08 dom Exp $
+ *	$Id: assert.h,v 1.5 2016-06-11 19:53:08 dom Exp $
  *
  */
 
@@ -22,7 +22,7 @@
 #include <sys/compiler.h>
 
 #ifndef NDEBUG
-extern void __LIB__ l_assert(int, char *, char *);
+extern void __LIB__ l_assert(int, char *, char *) __SMALLCDECL;
 #define assert(exp)     if((exp==0)) {l_assert(__LINE__, __FILE__, #exp );}
 #else
 #define assert(exp)

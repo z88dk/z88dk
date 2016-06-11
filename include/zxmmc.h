@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - Feb. 2010
  *
- *		$Id: zxmmc.h,v 1.3 2016-06-11 19:37:37 dom Exp $
+ *		$Id: zxmmc.h,v 1.4 2016-06-11 19:53:08 dom Exp $
  * 
  */
 
@@ -131,7 +131,7 @@ int				csdfoo;		// Terminate with two extra bytes, to avoid overflows.
 
 
 // Set the ROM page
-extern int __LIB__ __FASTCALL__ mmc_fastpage(unsigned char page) __SMALLCDECL __SMALLCFASTCALL;
+extern int __LIB__ __FASTCALL__ mmc_fastpage(unsigned char page) __SMALLCFASTCALL;
 
 // Initialize the MMC card (0 = OK, 1 = Card RESET ERROR, 2 = Card INIT ERROR, 3 = UNKNOWN RESPONSE)
 extern int __LIB__ mmc_load(unsigned char slot, struct MMC descriptor) __SMALLCDECL;
@@ -140,7 +140,7 @@ extern int __LIB__ mmc_load(unsigned char slot, struct MMC descriptor) __SMALLCD
 extern int __LIB__ mmc_command(struct MMC mmc_descriptor, unsigned char command, long parameter, unsigned char checksum) __SMALLCDECL;
 
 // Compute the SD/MMC card size (in bytes).  Valid only if size is <= 2GB, otherwise 0.
-extern unsigned long __LIB__ __FASTCALL__ mmc_size(struct MMC mmc_descriptor) __SMALLCDECL __SMALLCFASTCALL;
+extern unsigned long __LIB__ __FASTCALL__ mmc_size(struct MMC mmc_descriptor) __SMALLCFASTCALL;
 
 // Wait for a response code from the latest command issued to ZXMMC
 // extern int __LIB__ mmc_wait_response();  // cs_low somewhere..

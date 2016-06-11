@@ -18,20 +18,20 @@
 
 // first CALLER and FASTCALL linkage
 
-extern void __LIB__ __FASTCALL__ vz_bgrd(int n) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ vz_bgrd(int n) __SMALLCFASTCALL;
 extern void __LIB__              vz_brick(void *addr, char byte) __SMALLCDECL;
 extern void __LIB__              vz_char_draw(int x, int y, int c, char ch) __SMALLCDECL;
 extern void __LIB__              vz_clrscr(void);
-extern void __LIB__ __FASTCALL__ vz_color(int n) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ vz_color(int n) __SMALLCFASTCALL;
 extern int  __LIB__              vz_getch(void);
 extern void __LIB__              vz_gotoxy(int x, int y) __SMALLCDECL;
 extern void __LIB__              vz_inch(void);
 extern void __LIB__              vz_line(int x1, int y1, int x2, int y2, int c) __SMALLCDECL;
 extern char __LIB__             *vz_midstr(char *str, int pos) __SMALLCDECL;
-extern void __LIB__ __FASTCALL__ vz_mode(int n) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ vz_mode(int n) __SMALLCFASTCALL;
 extern void __LIB__              vz_plot(int x, int y, int c) __SMALLCDECL;
 extern void __LIB__              vz_score(void *addr, char byte) __SMALLCDECL;
-extern void __LIB__ __FASTCALL__ vz_setbase(void *start) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ vz_setbase(void *start) __SMALLCFASTCALL;
 extern void __LIB__              vz_shape(int x, int y, int w, int h, int c, char *data) __SMALLCDECL;
 extern void __LIB__              vz_sound(int freq, int cycles) __SMALLCDECL;
 extern void __LIB__              vz_soundcopy(char *dst, char *src, int size, int sound1, int sound2) __SMALLCDECL;

@@ -1,7 +1,7 @@
 /*
  *      Debugging Routines
  *
- *	$Id: debug.h,v 1.3 2010-09-19 00:24:08 dom Exp $
+ *	$Id: debug.h,v 1.4 2016-06-11 19:53:08 dom Exp $
  */
 
 #ifndef __DEBUG_H__
@@ -14,12 +14,12 @@
 
 /* Disassembles a line; returns the address for the next line 
    if MYSELF, disassembles the current program location */
-extern unsigned int __LIB__ disz80(unsigned int address, unsigned int lines);
+extern unsigned int __LIB__ disz80(unsigned int address, unsigned int lines) __SMALLCDECL;
 
 /* Dump on screen: if MYSELF address is given, displays #count stack words 
    and returns the current SP value (dump excluded), otherwise dumps memory 
    bytes and returns the address reached */
-extern unsigned int __LIB__ dump(unsigned int address,unsigned int count);
+extern unsigned int __LIB__ dump(unsigned int address,unsigned int count) __SMALLCDECL;
 
 /* TRUE if Z80 supports undocumented instructions.
    Otherwise, FALSE (or, in worst cases.. crash !) */

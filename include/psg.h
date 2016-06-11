@@ -2,7 +2,7 @@
  * Universal library for Yamaha Programmable Sound Generator
  * and similar chips
  *
- * $Id: psg.h,v 1.13 2016-06-11 19:37:37 dom Exp $
+ * $Id: psg.h,v 1.14 2016-06-11 19:53:08 dom Exp $
  *
  */
 
@@ -95,7 +95,7 @@ extern void __LIB__ __CALLEE__   set_psg_callee(unsigned char reg, unsigned char
 #define set_psg(a,b)     set_psg_callee(a,b)
 
 // Read the PSG register
-extern int __LIB__ __FASTCALL__ get_psg(int regno) __SMALLCDECL __SMALLCFASTCALL;
+extern int __LIB__ __FASTCALL__ get_psg(int regno) __SMALLCFASTCALL;
 
 // Init the PSG (reset sound etc..)
 extern void __LIB__ psg_init();

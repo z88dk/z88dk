@@ -65,24 +65,24 @@ struct adt_List {                  /* One as handle for each list */
 };
 
 extern struct adt_List __LIB__ *adt_ListCreate(void);
-extern void __LIB__ __FASTCALL__ adt_ListCreateS(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ adt_ListCreateS(struct adt_List *list) __SMALLCFASTCALL;
 extern void __LIB__  adt_ListDelete(struct adt_List *list, void *delete) __SMALLCDECL;   /* from C: del = 0 to do nothing */
 extern void __LIB__  adt_ListDeleteS(struct adt_List *list, void *delete) __SMALLCDECL;  /* from C: del = 0 to do nothing */
-extern uint __LIB__ __FASTCALL__ adt_ListCount(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_ListFirst(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_ListLast(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_ListNext(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_ListPrev(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_ListCurr(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
+extern uint __LIB__ __FASTCALL__ adt_ListCount(struct adt_List *list) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_ListFirst(struct adt_List *list) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_ListLast(struct adt_List *list) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_ListNext(struct adt_List *list) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_ListPrev(struct adt_List *list) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_ListCurr(struct adt_List *list) __SMALLCFASTCALL;
 extern int  __LIB__  adt_ListAdd(struct adt_List *list, void *item) __SMALLCDECL;
 extern int  __LIB__  adt_ListInsert(struct adt_List *list, void *item) __SMALLCDECL;
 extern int  __LIB__  adt_ListAppend(struct adt_List *list, void *item) __SMALLCDECL;
 extern int  __LIB__  adt_ListPrepend(struct adt_List *list, void *item) __SMALLCDECL;
 extern void __LIB__  adt_ListConcat(struct adt_List *list1, struct adt_List *list2) __SMALLCDECL;
-extern void __LIB__ __FASTCALL__ *adt_ListTrim(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_ListPopFront(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ adt_ListSetCurrBefore(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ adt_ListSetCurrAfter(struct adt_List *list) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_ListTrim(struct adt_List *list) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_ListPopFront(struct adt_List *list) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ adt_ListSetCurrBefore(struct adt_List *list) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ adt_ListSetCurrAfter(struct adt_List *list) __SMALLCFASTCALL;
 extern void __LIB__ adt_ListSetCurr(struct adt_List *list, struct adt_ListNode *n) __SMALLCDECL;
 extern void __LIB__ *adt_ListSearch(struct adt_List *list, void *match, void *item1) __SMALLCDECL;
 
@@ -183,14 +183,14 @@ struct adt_Queue {                    /* A single handle for each queue created 
 };
 
 extern struct adt_Queue __LIB__  *adt_QueueCreate(void);
-extern void __LIB__ __FASTCALL__ *adt_QueueCreateS(struct adt_Queue *q) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_QueueCreateS(struct adt_Queue *q) __SMALLCFASTCALL;
 extern void __LIB__ adt_QueueDelete(struct adt_Queue *q, void *delete) __SMALLCDECL;  /* from C: del = 0 to do nothing */
 extern void __LIB__ adt_QueueDeleteS(struct adt_Queue *q, void *delete) __SMALLCDECL; /* from C: del = 0 to do nothing */
-extern uint __LIB__ __FASTCALL__ adt_QueueCount(struct adt_Queue *q) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_QueueFront(struct adt_Queue *q) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_QueueBack(struct adt_Queue *q) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_QueuePopFront(struct adt_Queue *q) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_QueuePopBack(struct adt_Queue *q) __SMALLCDECL __SMALLCFASTCALL;
+extern uint __LIB__ __FASTCALL__ adt_QueueCount(struct adt_Queue *q) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_QueueFront(struct adt_Queue *q) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_QueueBack(struct adt_Queue *q) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_QueuePopFront(struct adt_Queue *q) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_QueuePopBack(struct adt_Queue *q) __SMALLCFASTCALL;
 extern int  __LIB__ adt_QueuePushFront(struct adt_Queue *q, void *item) __SMALLCDECL;
 extern int  __LIB__ adt_QueuePushBack(struct adt_Queue *q, void *item) __SMALLCDECL;
 
@@ -229,13 +229,13 @@ struct adt_Stack {
 };
 
 extern struct adt_Stack __LIB__  *adt_StackCreate(void);
-extern void __LIB__ __FASTCALL__  adt_StackCreateS(struct adt_Stack *s) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__  adt_StackCreateS(struct adt_Stack *s) __SMALLCFASTCALL;
 extern void __LIB__ adt_StackDelete(struct adt_Stack *s, void *delete) __SMALLCDECL;   /* from C: del = 0 to do nothing */
 extern void __LIB__ adt_StackDeleteS(struct adt_Stack *s, void *delete) __SMALLCDECL;  /* from C: del = 0 to do nothing */
 extern int  __LIB__ adt_StackPush(struct adt_Stack *s, void *item) __SMALLCDECL;
-extern void __LIB__ __FASTCALL__ *adt_StackPop(struct adt_Stack *s) __SMALLCDECL __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *adt_StackPeek(struct adt_Stack *s) __SMALLCDECL __SMALLCFASTCALL;
-extern uint __LIB__ __FASTCALL__  adt_StackCount(struct adt_Stack *s) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_StackPop(struct adt_Stack *s) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *adt_StackPeek(struct adt_Stack *s) __SMALLCFASTCALL;
+extern uint __LIB__ __FASTCALL__  adt_StackCount(struct adt_Stack *s) __SMALLCFASTCALL;
 
 // make CALLEE linkage default
 

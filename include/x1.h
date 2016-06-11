@@ -1,7 +1,7 @@
 /*
  * Header file for Sharp X1 specific stuff
  *
- * $Id: x1.h,v 1.10 2016-06-11 09:24:56 dom Exp $
+ * $Id: x1.h,v 1.11 2016-06-11 19:53:08 dom Exp $
  *
  */
 
@@ -32,19 +32,19 @@ extern void __LIB__ x1_set_text_80();
 extern void __LIB__ x1_set_text_80_hs();
 
 // Set 16 6845 CRTC registers at once
-extern void __FASTCALL__ __LIB__ set_crtc(void *reg_list) __SMALLCDECL __SMALLCFASTCALL;
+extern void __FASTCALL__ __LIB__ set_crtc(void *reg_list) __SMALLCFASTCALL;
 
 // Set the first 10 6845 CRTC registers
-extern void __FASTCALL__ __LIB__ set_crtc_10(void *reg_list) __SMALLCDECL __SMALLCFASTCALL;
+extern void __FASTCALL__ __LIB__ set_crtc_10(void *reg_list) __SMALLCFASTCALL;
 
 // Set a single register in the 6845 CRTC
 extern void __LIB__ set_crtc_reg(int reg, int val) __SMALLCDECL;
 
 // Send a command to the SUB-CPU
-extern void __FASTCALL__ __LIB__ subcpu_command(int command) __SMALLCDECL __SMALLCFASTCALL;
+extern void __FASTCALL__ __LIB__ subcpu_command(int command) __SMALLCFASTCALL;
 
 // Send a byte parameter to the SUB-CPU
-extern void __FASTCALL__ __LIB__ subcpu_set(int command) __SMALLCDECL __SMALLCFASTCALL;
+extern void __FASTCALL__ __LIB__ subcpu_set(int command) __SMALLCFASTCALL;
 
 // Get a byte from the SUB-CPU
 extern int __LIB__ subcpu_get();
