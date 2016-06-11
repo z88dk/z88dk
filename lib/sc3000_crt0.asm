@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.12 2016-06-02 22:24:57 dom Exp $
+;	$Id: sc3000_crt0.asm,v 1.13 2016-06-11 20:40:31 dom Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -57,28 +57,6 @@
 
 ; SEGA and MSX specific
 		PUBLIC	msxbios
-		PUBLIC	fputc_vdp_offs	;Current character pointer
-			
-		PUBLIC	aPLibMemory_bits;apLib support variable
-		PUBLIC	aPLibMemory_byte;apLib support variable
-		PUBLIC	aPLibMemory_LWM	;apLib support variable
-		PUBLIC	aPLibMemory_R0	;apLib support variable
-
-		PUBLIC	raster_procs	;Raster interrupt handlers
-		PUBLIC	pause_procs	;Pause interrupt handlers
-
-		PUBLIC	timer		;This is incremented every time a VBL/HBL interrupt happens
-		PUBLIC	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
-
-		PUBLIC	RG0SAV		;keeping track of VDP register values
-		PUBLIC	RG1SAV
-		PUBLIC	RG2SAV
-		PUBLIC	RG3SAV
-		PUBLIC	RG4SAV
-		PUBLIC	RG5SAV
-		PUBLIC	RG6SAV
-		PUBLIC	RG7SAV
-
 
 
 ; Now, getting to the real stuff now!
@@ -210,6 +188,7 @@ ENDIF
 ;    BACK TO COMMON CODE FOR ROM AND BASIC
 ;  ******************** ********************
 
+	call	crt0_init_bss
 	ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -219,24 +198,7 @@ ENDIF
 		INCLUDE "amalloc.def"
 	ENDIF
 
-IF !DEFINED_nostreams
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-
 IF (startup=2)
-;    if ROM mode, init variables in RAM
-	ld      hl,$8080
-	ld      (fp_seed),hl
-
-	xor     a
-	ld      (exitcount),a
-	
 	call	DefaultInitialiseVDP
 	
 	im	1
@@ -262,7 +224,7 @@ endloop:
 ELSE
 start1:
         ld      sp,0
-		ret
+	ret
 ENDIF
 
 
@@ -282,65 +244,19 @@ msxbios:
 	ret
 
 IF (startup=2)
- 
-	DEFVARS RAM_Start
-	{
-	__sgoioblk      	ds.b    40      ;stdio control block
-	exitsp          	ds.w    1       ;atexit() stack
-	exitcount       	ds.b    1       ;Number of atexit() routines
-	pixelbyte           ds.w    1
-	base_graphics       ds.w    1
-	coords              ds.w    1
-	snd_tick            ds.w    1
-	bit_irqstatus		ds.w	1	;current irq status when DI is necessary
-	fp_seed             ds.w    3       ;Floating point seed (not used ATM)
-	extra               ds.w    3       ;Floating point spare register
-	fa                  ds.w    3       ;Floating point accumulator
-	fasign              ds.b    1       ;Floating point variable
-	heapblocks          ds.w    1       ;Number of free blocks
-	heaplast            ds.w    1       ;Pointer to linked blocks
-	fputc_vdp_offs	    ds.w	1	;Current character pointer
-	aPLibMemory_bits    ds.b	1	;apLib support variable
-	aPLibMemory_byte    ds.b	1	;apLib support variable
-	aPLibMemory_LWM	    ds.b	1	;apLib support variable
-	aPLibMemory_R0	    ds.w	1	;apLib support variable
-	raster_procs	    ds.w	8	;Raster interrupt handlers
-	pause_procs		ds.w	8	;Pause interrupt handlers
-	timer			ds.w	1	;This is incremented every time a VBL/HBL interrupt happens
-	_pause_flag		ds.b	1	;This alternates between 0 and 1 every time pause is pressed
-	RG0SAV			ds.b	1	;keeping track of VDP register values
-	RG1SAV			ds.b	1
-	RG2SAV			ds.b	1
-	RG3SAV			ds.b	1
-	RG4SAV			ds.b	1
-	RG5SAV			ds.b	1
-	RG6SAV			ds.b	1
-	RG7SAV			ds.b	1
-	}
-
-	IF !DEFINED_defvarsaddr
-			defc defvarsaddr = RAM_Start+1024
-	ENDIF
-	
-	DEFVARS defvarsaddr
-	{
-	dummydummy        ds.b    1 
-	}
-
-
 ;---------------------------------
 ; VDP Initialization
 ;---------------------------------
 DefaultInitialiseVDP:
-    push hl
-    push bc
+	push hl
+	push bc
         ld hl,_Data
         ld b,_End-_Data
         ld c,$bf
         otir
-    pop bc
-    pop hl
-    ret
+	pop bc
+	pop hl
+	ret
 
     DEFC SpriteSet          = 0       ; 0 for sprites to use tiles 0-255, 1 for 256+
     DEFC NameTableAddress   = $3800   ; must be a multiple of $800; usually $3800; fills $700 bytes (unstretched)
@@ -375,48 +291,41 @@ _Data:
     defb $ff,$8a
     ;     ``------- Line interrupt spacing ($ff to disable)
 _End:
-
-ELSE
-     defm  "Small C+ SC-3000"
-	 defb  0
-
-; Now, define some values for stdin, stdout, stderr
-
-IF !DEFINED_nostreams
-	__sgoioblk:
-		INCLUDE	"stdio_fp.asm"
 ENDIF
 
+	defm  "Small C+ SC-3000"
+	defb  0
 
-	;Seed for integer rand() routines
-	_std_seed:      defw    0
-
-	;Atexit routine
-	exitsp:	defw    0
-	exitcount:	defb    0
-
-	; Heap stuff
-	heaplast:	defw	0
-	heapblocks:	defw	0
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
+IF (startup=2)
+	defc	bss_start = RAM_Start
 ENDIF
+	INCLUDE		"crt0_section.asm"
 
-	; mem stuff
-	pixelbyte:	defb	0
-	base_graphics:	defw	0
-	coords:		defw	0
-	snd_tick:       defb	0	; Sound variable
-	bit_irqstatus:	defw	0
-	
+
+	SECTION		bss_crt
+
+		PUBLIC	fputc_vdp_offs	;Current character pointer
+			
+		PUBLIC	aPLibMemory_bits;apLib support variable
+		PUBLIC	aPLibMemory_byte;apLib support variable
+		PUBLIC	aPLibMemory_LWM	;apLib support variable
+		PUBLIC	aPLibMemory_R0	;apLib support variable
+
+		PUBLIC	raster_procs	;Raster interrupt handlers
+		PUBLIC	pause_procs	;Pause interrupt handlers
+
+		PUBLIC	timer		;This is incremented every time a VBL/HBL interrupt happens
+		PUBLIC	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
+
+		PUBLIC	RG0SAV		;keeping track of VDP register values
+		PUBLIC	RG1SAV
+		PUBLIC	RG2SAV
+		PUBLIC	RG3SAV
+		PUBLIC	RG4SAV
+		PUBLIC	RG5SAV
+		PUBLIC	RG6SAV
+		PUBLIC	RG7SAV
+
 	; imported form the pre-existing Sega Master System libs
 	fputc_vdp_offs:		defw	0	;Current character pointer
 	aPLibMemory_bits:	defb	0	;apLib support variable
@@ -436,29 +345,3 @@ ENDIF
 	RG6SAV:		defb	0
 	RG7SAV:		defb	0
 	
-	;All the float stuff is kept in a different file...for ease of altering!
-	;It will eventually be integrated into the library
-	;
-	;Here we have a minor (minor!) problem, we've no idea if we need the
-	;float package if this is separated from main (we had this problem before
-	;but it wasn't critical..so, now we will have to read in a file from
-	;the directory (this will be produced by zcc) which tells us if we need
-	;the floatpackage, and if so what it is..kludgey, but it might just work!
-	;
-	;Brainwave time! The zcc_opt file could actually be written by the
-	;compiler as it goes through the modules, appending as necessary - this
-	;way we only include the package if we *really* need it!
-
-	IF NEED_floatpack
-			INCLUDE         "float.asm"
-
-	;seed for random number generator - not used yet..
-	fp_seed:        defb    $80,$80,0,0,0,0
-	;Floating point registers...
-	extra:          defs    6
-	fa:             defs    6
-	fasign:         defb    0
-	ENDIF
-
-ENDIF
-
