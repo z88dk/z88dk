@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.7 2016-04-23 21:06:32 dom Exp $
+; $Id: bit_open_di.asm,v 1.8 2016-06-11 20:52:26 dom Exp $
 ;
 ; Z88 1 bit sound functions
 ;
@@ -13,7 +13,7 @@
     PUBLIC     _bit_open_di
     INCLUDE  "interrpt.def"
 
-    EXTERN     bit_irqstatus
+    EXTERN     __bit_irqstatus
 
     EXTERN     snd_asave
     EXTERN     snd_tick
@@ -25,7 +25,7 @@
           call oz_di
           push af
           ex (sp),hl
-          ld (bit_irqstatus),hl
+          ld (__bit_irqstatus),hl
           pop hl
           
           ld   (snd_asave),a

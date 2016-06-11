@@ -19,4 +19,6 @@ games/bit_synth_mwr
 games/bit_frequency
 games/bit_beep
 games/beeper_mwr
+games/__bit_irqstatus
+games/__snd_tick
 @z80.lst

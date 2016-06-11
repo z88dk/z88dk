@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: bit_open_di.asm,v 1.3 2016-06-11 20:52:26 dom Exp $
 ;
 ; VG-5000 1 bit sound functions
 ;
@@ -9,7 +9,7 @@
 
     PUBLIC     bit_open_di
     EXTERN     snd_tick
-    EXTERN     bit_irqstatus
+    EXTERN     __bit_irqstatus
 
     INCLUDE  "games/games.inc"
     
@@ -20,7 +20,7 @@
         push af
         
         ex (sp),hl
-        ld (bit_irqstatus),hl
+        ld (__bit_irqstatus),hl
         pop hl
         
         ld a,8

@@ -1,4 +1,4 @@
-; $Id: bit_close_ei.asm,v 1.7 2016-04-23 21:06:32 dom Exp $
+; $Id: bit_close_ei.asm,v 1.8 2016-06-11 20:52:26 dom Exp $
 ;
 ; Z88 1 bit sound functions
 ;
@@ -13,7 +13,7 @@
     PUBLIC     _bit_close_ei
     INCLUDE  "interrpt.def"
 
-    EXTERN     bit_irqstatus
+    EXTERN     __bit_irqstatus
 
     EXTERN     snd_asave
 
@@ -21,7 +21,7 @@
 ._bit_close_ei
 
 	push hl
-	ld	hl,(bit_irqstatus)
+	ld	hl,(__bit_irqstatus)
 	ex	(sp),hl
 	pop af
 

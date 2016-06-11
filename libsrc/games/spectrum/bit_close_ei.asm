@@ -1,4 +1,4 @@
-; $Id: bit_close_ei.asm,v 1.5 2016-06-10 21:37:10 dom Exp $
+; $Id: bit_close_ei.asm,v 1.6 2016-06-11 20:52:25 dom Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -9,11 +9,11 @@
 
     SECTION     code_clib
     PUBLIC	bit_close_ei
-    EXTERN	bit_irqstatus
+    EXTERN	__bit_irqstatus
 
 .bit_close_ei
 	push hl
-	ld	hl,(bit_irqstatus)
+	ld	hl,(__bit_irqstatus)
 	ex	(sp),hl
 	pop af
 

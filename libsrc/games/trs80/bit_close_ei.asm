@@ -1,4 +1,4 @@
-; $Id: bit_close_ei.asm,v 1.3 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: bit_close_ei.asm,v 1.4 2016-06-11 20:52:25 dom Exp $
 ;
 ; TRS-80 1 bit sound functions
 ;
@@ -8,13 +8,13 @@
 ;
 
     PUBLIC     bit_close_ei
-    EXTERN     bit_irqstatus
+    EXTERN     __bit_irqstatus
 
 .bit_close_ei
           xor  a
           out  ($ff),a
 	push hl
-	ld	hl,(bit_irqstatus)
+	ld	hl,(__bit_irqstatus)
 	ex	(sp),hl
 	pop af
 

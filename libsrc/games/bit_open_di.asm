@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.4 2016-04-23 21:06:32 dom Exp $
+; $Id: bit_open_di.asm,v 1.5 2016-06-11 20:52:25 dom Exp $
 ;
 ; Generic 1 bit sound functions
 ;
@@ -11,8 +11,8 @@
     SECTION    code_clib
     PUBLIC     bit_open_di
     PUBLIC     _bit_open_di
-    EXTERN     snd_tick
-    EXTERN     bit_irqstatus
+    EXTERN     __snd_tick
+    EXTERN     __bit_irqstatus
 
     INCLUDE  "games/games.inc"
     
@@ -24,8 +24,8 @@
         push af
         
         ex (sp),hl
-        ld (bit_irqstatus),hl
+        ld (__bit_irqstatus),hl
         pop hl
         
-        ld  a,(snd_tick)
+        ld  a,(__snd_tick)
         ret

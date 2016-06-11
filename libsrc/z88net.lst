@@ -51,6 +51,8 @@ games/bit_synth
 games/bit_frequency
 games/bit_beep
 games/z88/beeper
+games/__bit_irqstatus
+games/__snd_tick
 rs232/z88/rs232_close
 rs232/z88/rs232_get
 rs232/z88/rs232_init

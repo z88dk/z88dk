@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.6 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: bit_open_di.asm,v 1.7 2016-06-11 20:52:25 dom Exp $
 ;
 ; TI calculator "Infrared port" 1 bit sound functions stub
 ;
@@ -8,7 +8,7 @@
 ;
 
     PUBLIC     bit_open_di
-    EXTERN     bit_irqstatus
+    EXTERN     __bit_irqstatus
     EXTERN     snd_tick
     
 .bit_open_di
@@ -17,7 +17,7 @@
         push af
         
         ex (sp),hl
-        ld (bit_irqstatus),hl
+        ld (__bit_irqstatus),hl
         pop hl
 	
 IF FORti82

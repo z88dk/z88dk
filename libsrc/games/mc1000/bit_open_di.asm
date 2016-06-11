@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
+; $Id: bit_open_di.asm,v 1.4 2016-06-11 20:52:25 dom Exp $
 ;
 ; CCE MC-1000 bit sound functions
 ;
@@ -12,7 +12,7 @@
     PUBLIC     bit_open_di
     EXTERN		bit_open
     EXTERN     snd_tick
-    EXTERN     bit_irqstatus
+    EXTERN     __bit_irqstatus
 
     INCLUDE  "games/games.inc"
     
@@ -23,7 +23,7 @@
         push af
         
         ex (sp),hl
-        ld (bit_irqstatus),hl
+        ld (__bit_irqstatus),hl
         pop hl
         
         call bit_open
