@@ -203,7 +203,7 @@ int main(int argc, char **argv)
                 int   value = 0;
                 ptr = skip_ws(ptr+6);
                 if ( (offs = strchr(ptr+1,'=') ) != NULL  ) {
-                    value = atoi(offs+1);
+                    value = (int)strtol(offs+1,NULL,0);
                     *offs = 0;
                 }
                 write_defined(ptr,value);
