@@ -9,12 +9,15 @@
 ;       imported by Stefano Bodrato - 29/12/2006  :o)
 ;
 ;
-;       $Id: abc_inv.asm,v 1.2 2015-01-19 01:32:41 pauloscustodio Exp $
+;       $Id: abc_inv.asm,v 1.3 2016-06-11 19:38:47 dom Exp $
 ;
 
+		SECTION code_clib
 		PUBLIC	abc_inv
+		PUBLIC	_abc_inv
 
 .abc_inv
+._abc_inv
 		ld	ix,884
 		ld	b,24
 .xorloop	push	bc
