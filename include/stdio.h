@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.36 2016-05-16 20:08:26 dom Exp $ */
+/* $Id: stdio.h,v 1.37 2016-06-11 20:55:13 dom Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -90,9 +90,6 @@
  * recompile the libs and fiddle with app_crt0.asm - best leave it!
  */
 #define FOPEN_MAX       10
-
-/* Indicate to the frontend that we want the new streams stuff */
-#pragma output ANSIstdio
 
 struct filestr {
         union f0xx {
