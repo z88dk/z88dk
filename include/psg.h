@@ -2,7 +2,7 @@
  * Universal library for Yamaha Programmable Sound Generator
  * and similar chips
  *
- * $Id: psg.h,v 1.12 2015-10-28 07:18:48 stefano Exp $
+ * $Id: psg.h,v 1.13 2016-06-11 19:37:37 dom Exp $
  *
  */
 
@@ -90,12 +90,12 @@
 
 
 // Play a sound by PSG
-extern void __LIB__ set_psg(unsigned char reg, unsigned char val);
-extern void __LIB__ __CALLEE__   set_psg_callee(unsigned char reg, unsigned char val);
+extern void __LIB__ set_psg(unsigned char reg, unsigned char val) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   set_psg_callee(unsigned char reg, unsigned char val) __SMALLCDECL __SMALLCCALLEE;
 #define set_psg(a,b)     set_psg_callee(a,b)
 
 // Read the PSG register
-extern int __LIB__ __FASTCALL__ get_psg(int regno);
+extern int __LIB__ __FASTCALL__ get_psg(int regno) __SMALLCDECL __SMALLCFASTCALL;
 
 // Init the PSG (reset sound etc..)
 extern void __LIB__ psg_init();
@@ -105,19 +105,19 @@ extern void __LIB__ psg_init();
 #define sound(reg, value) set_psg(reg, value)
 
 // Set a given tone for the channel (0-2)
-extern void __LIB__ psg_tone(unsigned char channel, int period);
+extern void __LIB__ psg_tone(unsigned char channel, int period) __SMALLCDECL;
 
 // Set the global noise period
 extern void __LIB__ psg_noise(unsigned char period);
 
 // Set channel's volume
-extern void __LIB__ psg_volume(unsigned char channel, unsigned char volume);
+extern void __LIB__ psg_volume(unsigned char channel, unsigned char volume) __SMALLCDECL;
 
 // Set the volume envelope of number \a waveform, with the given period, on a group of channels (ORed bits)
-extern void __LIB__ psg_envelope(unsigned char waveform, int period, unsigned char channels);
+extern void __LIB__ psg_envelope(unsigned char waveform, int period, unsigned char channels) __SMALLCDECL;
 
 // Set noise or tone generation on a group of channels (ORed bits)
-extern void __LIB__ psg_channels(unsigned char tone_channels, unsigned char noise_channels);
+extern void __LIB__ psg_channels(unsigned char tone_channels, unsigned char noise_channels) __SMALLCDECL;
 
 // Get the group of channels currently generating tone (ORed bits)
 extern unsigned char __LIB__ psg_tone_channels();

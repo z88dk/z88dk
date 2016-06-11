@@ -7,7 +7,7 @@
  *
  *      djm 24/4/99
  *
- *	$Id: hton.h,v 1.5 2010-09-19 00:24:08 dom Exp $
+ *	$Id: hton.h,v 1.6 2016-06-11 19:37:37 dom Exp $
  */
 
 
@@ -20,9 +20,9 @@
 #include <net/inet.h>
 
 
-extern IPADDR_T __LIB__ __FASTCALL__ htonl(IPADDR_T);
+extern IPADDR_T __LIB__ __FASTCALL__ htonl(IPADDR_T) __SMALLCDECL __SMALLCFASTCALL;
 
-extern TCPPORT_T __LIB__ __FASTCALL__ htons(TCPPORT_T);
+extern TCPPORT_T __LIB__ __FASTCALL__ htons(TCPPORT_T) __SMALLCDECL __SMALLCFASTCALL;
 
 
 #define ntohs(x) htons(x)

@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.17 2016-03-06 21:39:17 dom Exp $
+ *	$Id: fcntl.h,v 1.18 2016-06-11 19:37:37 dom Exp $
  */
 
 
@@ -42,8 +42,8 @@ extern size_t __LIB__ read(int fd, void *ptr, size_t len) __SMALLCDECL;
 extern size_t __LIB__ write(int fd, void *ptr, size_t len) __SMALLCDECL;
 extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __SMALLCDECL;
 
-extern int __LIB__ __FASTCALL__ readbyte(int fd);
-extern int __LIB__ writebyte(int fd, int c);
+extern int __LIB__ __FASTCALL__ readbyte(int fd) __SMALLDECL __SMALLCFASTCALL;
+extern int __LIB__ writebyte(int fd, int c) __SMALLCDECL;
 
 /* Open a file returning the explicit filename, with length len */
 
@@ -102,7 +102,7 @@ struct RND_FILE {
 /* The following three functions are target specific */
 extern int  __LIB__ rnd_loadblock(char *name, size_t loadstart, size_t len) __SMALLCDECL;
 extern int  __LIB__ rnd_saveblock(char *name, size_t loadstart, size_t len) __SMALLCDECL;
-extern int  __LIB__ __FASTCALL__ rnd_erase(char *name);
+extern int  __LIB__ __FASTCALL__ rnd_erase(char *name) __SMALLDECL __SMALLCFASTCALL;
 
 /* ********************************************************* */
 

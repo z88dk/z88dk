@@ -91,10 +91,10 @@
 extern uint __LIB__ in_GetKey(void);
 extern void __LIB__ in_GetKeyReset(void);
 extern uint __LIB__ in_Inkey(void);
-extern uint __LIB__ __FASTCALL__ in_KeyPressed(uint scancode);
-extern uint __LIB__ __FASTCALL__ in_LookupKey(uchar c);
-extern uint __LIB__ __FASTCALL__ in_Pause(uint msec);
-extern void __LIB__ __FASTCALL__ in_Wait(uint msec);
+extern uint __LIB__ __FASTCALL__ in_KeyPressed(uint scancode) __SMALLCDECL __SMALLCFASTCALL;
+extern uint __LIB__ __FASTCALL__ in_LookupKey(uchar c) __SMALLCDECL __SMALLCFASTCALL;
+extern uint __LIB__ __FASTCALL__ in_Pause(uint msec) __SMALLCDECL __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ in_Wait(uint msec) __SMALLCDECL __SMALLCFASTCALL;
 extern void __LIB__ in_WaitForKey(void);
 extern void __LIB__ in_WaitForNoKey(void);
 
@@ -173,7 +173,7 @@ struct in_UDK {        /* user defined keys structure         */
    uint up;
 };
 
-extern uint __LIB__ __FASTCALL__ in_JoyKeyboard(struct in_UDK *u);
+extern uint __LIB__ __FASTCALL__ in_JoyKeyboard(struct in_UDK *u) __SMALLCDECL __SMALLCFASTCALL;
 
 #ifdef SPECTRUM
    #include <spectrum.h>
@@ -296,7 +296,7 @@ extern void __LIB__ in_MouseSimInit(struct in_UDM *u);
 extern void __LIB__ in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL;
 extern void __LIB__ in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord) __SMALLCDECL;
 
-extern void __LIB__ __FASTCALL__ in_MouseSimInit_fastcall(struct in_UDM *u);
+extern void __LIB__ __FASTCALL__ in_MouseSimInit_fastcall(struct in_UDM *u) __SMALLCDECL __SMALLCFASTCALL;
 extern void __LIB__ __CALLEE__ in_MouseSim_callee(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL __SMALLCCALLEE;
 extern void __LIB__ __CALLEE__ in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uint ycoord) __SMALLCDECL __SMALLCCALLEE;
 

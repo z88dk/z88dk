@@ -13,7 +13,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.23 2016-04-23 08:00:38 dom Exp $
+ *	$Id: games.h,v 1.24 2016-06-11 19:37:37 dom Exp $
  *
  */
 
@@ -39,7 +39,7 @@ extern void __LIB__ putsprite(int ortype, int x, int y, void *sprite) __SMALLCDE
 
 
 /* Joystick (or whatever game device) control function */
-extern unsigned int __LIB__ __FASTCALL__ joystick(int game_device);
+extern unsigned int __LIB__ __FASTCALL__ joystick(int game_device) __SMALLCDECL __SMALLCFASTCALL;
 
 #define MOVE_RIGHT 1
 #define MOVE_LEFT  2

@@ -1,7 +1,7 @@
 /*
  * Headerfile for ABC800 specific stuff
  *
- * $Id: abc800.h,v 1.2 2010-09-19 00:24:08 dom Exp $
+ * $Id: abc800.h,v 1.3 2016-06-11 19:37:37 dom Exp $
  */
 
 #ifndef __ABC800_H__
@@ -16,10 +16,10 @@
 ///////////////////////////////
 
 // Set cursor shape
-extern int  __LIB__ __FASTCALL__ abc_cursor(unsigned char shape);
+extern int  __LIB__ __FASTCALL__ abc_cursor(unsigned char shape) __SMALLCDECL __SMALLCFASTCALL;
 
 // Set a parameter to CRTC control register (VDU)
-extern int  __LIB__ __FASTCALL__ abc_vdu(unsigned char register, unsigned char value);
+extern int  __LIB__ abc_vdu(unsigned char register, unsigned char value) __SMALLCDECL;
 
 /*
 	00 - Horiz. total characters

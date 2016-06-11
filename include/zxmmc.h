@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - Feb. 2010
  *
- *		$Id: zxmmc.h,v 1.2 2010-09-19 00:24:08 dom Exp $
+ *		$Id: zxmmc.h,v 1.3 2016-06-11 19:37:37 dom Exp $
  * 
  */
 
@@ -131,16 +131,16 @@ int				csdfoo;		// Terminate with two extra bytes, to avoid overflows.
 
 
 // Set the ROM page
-extern int __LIB__ __FASTCALL__ mmc_fastpage(unsigned char page);
+extern int __LIB__ __FASTCALL__ mmc_fastpage(unsigned char page) __SMALLCDECL __SMALLCFASTCALL;
 
 // Initialize the MMC card (0 = OK, 1 = Card RESET ERROR, 2 = Card INIT ERROR, 3 = UNKNOWN RESPONSE)
-extern int __LIB__ mmc_load(unsigned char slot, struct MMC descriptor);
+extern int __LIB__ mmc_load(unsigned char slot, struct MMC descriptor) __SMALLCDECL;
 
 // Send a command to the MMC card
-extern int __LIB__ mmc_command(struct MMC mmc_descriptor, unsigned char command, long parameter, unsigned char checksum);
+extern int __LIB__ mmc_command(struct MMC mmc_descriptor, unsigned char command, long parameter, unsigned char checksum) __SMALLCDECL;
 
 // Compute the SD/MMC card size (in bytes).  Valid only if size is <= 2GB, otherwise 0.
-extern unsigned long __LIB__ __FASTCALL__ mmc_size(struct MMC mmc_descriptor);
+extern unsigned long __LIB__ __FASTCALL__ mmc_size(struct MMC mmc_descriptor) __SMALLCDECL __SMALLCFASTCALL;
 
 // Wait for a response code from the latest command issued to ZXMMC
 // extern int __LIB__ mmc_wait_response();  // cs_low somewhere..
@@ -149,13 +149,13 @@ extern unsigned long __LIB__ __FASTCALL__ mmc_size(struct MMC mmc_descriptor);
 extern int __LIB__ mmc_waitdata_token();
 
 // Read multiple 512 byte data blocks from the MMC card (fastest way)
-extern int __LIB__ mmc_read_multidata(struct MMC mmc_descriptor, long card_address, unsigned char *address, int block_count);
+extern int __LIB__ mmc_read_multidata(struct MMC mmc_descriptor, long card_address, unsigned char *address, int block_count) __SMALLCDECL;
 
 // Read 512 bytes from the MMC card
-extern int __LIB__ mmc_read_block(struct MMC mmc_descriptor, long card_address, unsigned char *address);
+extern int __LIB__ mmc_read_block(struct MMC mmc_descriptor, long card_address, unsigned char *address) __SMALLCDECL;
 
 // Write a 512 byte data block to the MMC card
-extern int __LIB__ mmc_write_block(struct MMC mmc_descriptor, long card_address, unsigned char *address);
+extern int __LIB__ mmc_write_block(struct MMC mmc_descriptor, long card_address, unsigned char *address) __SMALLCDECL;
 
 
 // Asks CRT0 stub to reserve some service variables for ZXMMC

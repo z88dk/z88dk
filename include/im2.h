@@ -32,20 +32,20 @@ extern void __LIB__ __FASTCALL__ im2_Init(void *tableaddr);
  *             and assumed to be zero.
  */
 
-extern void __LIB__ *im2_InstallISR(uchar vector, void *isr);
+extern void __LIB__ *im2_InstallISR(uchar vector, void *isr) __SMALLCDECL;
 extern void __LIB__ im2_EmptyISR(void);
-extern void __LIB__ *im2_CreateGenericISR(uchar numhooks /* >=1 */, void *addr);
-extern void __LIB__ *im2_CreateGenericISRLight(uchar numhooks /* >=1 */, void *addr);
-extern void __LIB__ im2_RegHookFirst(uchar vector, void *hook);
-extern void __LIB__ im2_RegHookLast(uchar vector, void *hook);
-extern int  __LIB__ im2_RemoveHook(uchar vector, void *hook);
+extern void __LIB__ *im2_CreateGenericISR(uchar numhooks /* >=1 */, void *addr) __SMALLCDECL;
+extern void __LIB__ *im2_CreateGenericISRLight(uchar numhooks /* >=1 */, void *addr) __SMALLCDECL;
+extern void __LIB__ im2_RegHookFirst(uchar vector, void *hook) __SMALLCDECL;
+extern void __LIB__ im2_RegHookLast(uchar vector, void *hook) __SMALLCDECL;
+extern int  __LIB__ im2_RemoveHook(uchar vector, void *hook) __SMALLCDECL;
 
-extern void __LIB__ __CALLEE__ *im2_InstallISR_callee(uchar vector, void *isr);
-extern void __LIB__ __CALLEE__ *im2_CreateGenericISR_callee(uchar numhooks, void *addr);
-extern void __LIB__ __CALLEE__ *im2_CreateGenericISRLight_callee(uchar numhooks, void *addr);
-extern void __LIB__ __CALLEE__  im2_RegHookFirst_callee(uchar vector, void *hook);
-extern void __LIB__ __CALLEE__  im2_RegHookLast_callee(uchar vector, void *hook);
-extern int  __LIB__ __CALLEE__  im2_RemoveHook_callee(uchar vector, void *hook);
+extern void __LIB__ __CALLEE__ *im2_InstallISR_callee(uchar vector, void *isr) __SMALLDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__ *im2_CreateGenericISR_callee(uchar numhooks, void *addr) __SMALLDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__ *im2_CreateGenericISRLight_callee(uchar numhooks, void *addr) __SMALLDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__  im2_RegHookFirst_callee(uchar vector, void *hook) __SMALLDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__  im2_RegHookLast_callee(uchar vector, void *hook) __SMALLDECL __SMALLCCALLEE;
+extern int  __LIB__ __CALLEE__  im2_RemoveHook_callee(uchar vector, void *hook) __SMALLDECL __SMALLCCALLEE;
 
 #define im2_InstallISR(a,b)             im2_InstallISR_callee(a,b)
 #define im2_CreateGenericISR(a,b)       im2_CreateGenericISR_callee(a,b)
