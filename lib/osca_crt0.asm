@@ -18,7 +18,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.32 2016-06-02 22:24:57 dom Exp $
+;	$Id: osca_crt0.asm,v 1.33 2016-06-11 20:53:06 dom Exp $
 ;
 
 
@@ -37,8 +37,6 @@
 
         EXTERN    _main
         
-        PUBLIC	snd_tick
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 ;
 ; Some variables which are needed for both app and basic startup
@@ -474,10 +472,6 @@ ENDIF
 ; mem stuff
 base_graphics:   defw    $2000
 coords:          defw    0
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
 
 
 ;--------------------------------------------------------------------------------------------

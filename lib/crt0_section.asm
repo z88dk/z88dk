@@ -75,12 +75,6 @@ extra:           defs    6       ;Floating point spare register
 fa:              defs    6       ;Floating point accumulator
 fasign:          defb    0       ;Floating point variable
 ENDIF
-IF DEFINED_NEED1bitsound
-		PUBLIC	snd_tick
-		PUBLIC  bit_irqstatus
-snd_tick:        defb    0       ;Sound
-bit_irqstatus:   defw    0       ;current irq status when DI is necessary
-ENDIF
 IF DEFINED_USING_amalloc
 		PUBLIC _heap
 ; The heap pointer will be wiped at startup,

@@ -31,7 +31,6 @@
 	PUBLIC	base_graphics	; Graphics stuff
 	PUBLIC	coords		;
 
-	PUBLIC	snd_tick	; Sound variable
 	PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 	PUBLIC	cpygraph	; TI calc specific stuff
@@ -230,10 +229,6 @@ coords
 base_graphics
         ds.w    1	;  2 bytes
 gfx_bank
-        ds.w    1	;  2 bytes
-snd_tick
-        ds.b    1	;  2 bytes
-bit_irqstatus
         ds.w    1	;  2 bytes
 exitsp
         ds.w    1	;  2 bytes

@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.53 2016-06-02 22:24:57 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.54 2016-06-11 20:53:06 dom Exp $
 ;
 ; - - - - - - -
 
@@ -71,8 +71,6 @@ ENDIF
         PUBLIC    base_graphics   ;Graphical variables
         PUBLIC    _base_graphics  ;as above for C declarations
         PUBLIC    coords          ;Current xy position
-
-;;        PUBLIC    snd_tick        ;Sound variable
 
         PUBLIC    save81          ;Save ZX81 critical registers
         PUBLIC    restore81       ;Restore ZX81 critical registers
@@ -397,7 +395,6 @@ _heap:
                 defw 0
 ENDIF
 
-;;snd_tick:       defb    0       ; Flag for sound .. D3=out (n),a ..  DB=in a,(m)
 
 ;                defm  "Small C+ ZX81"   ;Unnecessary file signature
 ;                defb    0

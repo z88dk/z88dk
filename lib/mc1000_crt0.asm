@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.18 2016-06-02 23:14:13 dom Exp $
+;       $Id: mc1000_crt0.asm,v 1.19 2016-06-11 20:53:06 dom Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -50,8 +50,6 @@
 
         PUBLIC	FRAMES
 
-       	PUBLIC	snd_tick        ;Sound variable
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
         IF      !myzorg
 			IF (startup=2)
