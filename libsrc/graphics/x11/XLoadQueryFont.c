@@ -2,7 +2,7 @@
 	Minimal Xlib port
 	Stefano Bodrato, 5/3/2007
 	
-	$Id: XLoadQueryFont.c,v 1.1 2014-04-16 06:16:35 stefano Exp $
+	$Id: XLoadQueryFont.c,v 1.2 2016-06-11 13:36:44 dom Exp $
 */
 
 #ifdef _DEBUG_
@@ -253,7 +253,7 @@ char _Xmidfont[] = {
 
 XFontStruct Xcommon_myfont;
 
-XFontStruct XLoadQueryFont(Display *display, char *fontname) {
+XFontStruct *XLoadQueryFont(Display *display, char *fontname) {
 	int fsize;
 	
 	fsize = atoi(fontname);
