@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.128 2016-05-31 23:02:47 aralbrec Exp $
+ *      $Id: zcc.c,v 1.129 2016-06-11 04:13:20 aralbrec Exp $
  */
 
 
@@ -1472,8 +1472,10 @@ static void configure_compiler()
 void PragmaRedirect(arg_t *arg,char *val)
 {
     char *eql;
-    char *ptr = val + strlen(arg->name) + 2;
+    char *ptr = val + strlen(arg->name) + 1;
     char *value = "";
+
+    while(ispunct(*ptr)) ++ptr;
 
     if ( (eql = strchr(ptr,'=') ) != NULL ) {
         *eql = 0;
@@ -1493,13 +1495,15 @@ void PragmaRedirect(arg_t *arg,char *val)
 
 void PragmaDefine(arg_t *arg,char *val)
 {
-    char *ptr = val + strlen(arg->name) + 2;
+    char *ptr = val + strlen(arg->name) + 1;
     int   value = 0;
     char *eql;
 
+    while (ispunct(*ptr)) ++ptr;
+
     if ( (eql = strchr(ptr,'=') ) != NULL ) {
         *eql = 0;
-        value = atoi(eql+1);
+        value = (int)strtol(eql+1,NULL,0);
     }
     write_zcc_defined(ptr, value);
 }
@@ -1514,7 +1518,9 @@ void write_zcc_defined(char *name, int value)
 
 void PragmaNeed(arg_t *arg,char *val)
 {
-    char *ptr = val + strlen(arg->name) + 2;
+    char *ptr = val + strlen(arg->name) + 1;
+
+    while(ispunct(*ptr)) ++ptr;
 
     add_zccopt("\nIF !NEED_%s\n",ptr);
     add_zccopt("\tDEFINE\tNEED_%s\n",ptr);
@@ -1524,8 +1530,10 @@ void PragmaNeed(arg_t *arg,char *val)
 
 void PragmaBytes(arg_t *arg,char *val)
 {
-    char *ptr = val + strlen(arg->name) + 2;
+    char *ptr = val + strlen(arg->name) + 1;
     char *value;
+
+    while(ispunct(*ptr)) ++ptr;
 
     if ( (value = strchr(ptr,'=') ) != NULL ) {
         *value++ = 0;
