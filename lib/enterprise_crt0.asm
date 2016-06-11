@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.19 2016-06-02 22:24:57 dom Exp $
+;	$Id: enterprise_crt0.asm,v 1.20 2016-06-11 20:49:50 dom Exp $
 ;
 
 
@@ -35,10 +35,6 @@
 
         PUBLIC    cleanup
         PUBLIC    l_dcal
-
-
-        PUBLIC	snd_tick	; Sound variable
-        PUBLIC	bit_irqstatus	; current irq status when DI is necessary
 
 
         PUBLIC    exitsp
@@ -161,14 +157,14 @@ ENDIF
         rst   30h
         defb  11						; set 40x25 characters window
 
+	call	crt0_init_bss
 
         ld      hl,0
         add     hl,sp
-;        ld      (start1+1),hl
         ld      (start1+1),sp
-;        ld      hl,-64
-;        add     hl,sp
-;        ld      sp,hl
+        ld      hl,-64
+        add     hl,sp
+        ld      sp,hl
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -177,16 +173,6 @@ ENDIF
 	IF DEFINED_USING_amalloc
 		INCLUDE "amalloc.def"
 	ENDIF
-
-IF !DEFINED_nostreams
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
 
         call    _main
 	
@@ -229,78 +215,6 @@ start1:
 l_dcal:
         jp      (hl)
 
-; Now, define some values for stdin, stdout, stderr
-
-IF !DEFINED_nostreams
-__sgoioblk:
-	INCLUDE	"stdio_fp.asm"
-ENDIF
-
-
-        INCLUDE "crt0_runtime_selection.asm"
-
-; ---------------
-; Misc Variables
-; ---------------
-
-IF DEFINED_NEED1bitsound
-snd_tick:       defb	0	; Sound variable
-bit_irqstatus:	defw	0
-ENDIF
-
-
-;Atexit routine
-
-exitsp:
-                defw    0
-exitcount:
-                defb    0
-
-; Heap stuff
-
-heaplast:	defw	0
-heapblocks:	defw	0
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-; mem stuff
-
-         defm  "Small C+ Enterprise"
-end:	 defb	0
-
-;All the float stuff is kept in a different file...for ease of altering!
-;It will eventually be integrated into the library
-;
-;Here we have a minor (minor!) problem, we've no idea if we need the
-;float package if this is separated from main (we had this problem before
-;but it wasn't critical..so, now we will have to read in a file from
-;the directory (this will be produced by zcc) which tells us if we need
-;the floatpackage, and if so what it is..kludgey, but it might just work!
-;
-;Brainwave time! The zcc_opt file could actually be written by the
-;compiler as it goes through the modules, appending as necessary - this
-;way we only include the package if we *really* need it!
-
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-
-;seed for random number generator - not used yet..
-fp_seed:        defb    $80,$80,0,0,0,0
-;Floating point registers...
-extra:          defs    6
-fa:             defs    6
-fasign:         defb    0
-
-ENDIF
 
 
 set_exos_multi_variables:
@@ -410,3 +324,12 @@ __VideoVariables:
         defb  24, 40                    ; X_SIZ_VID
         defb  25, 25                    ; Y_SIZ_VID
         defb  0
+
+         defm  "Small C+ Enterprise"
+end:	 defb	0
+
+        INCLUDE "crt0_runtime_selection.asm"
+
+	INCLUDE	"crt0_section.asm"
+
+
