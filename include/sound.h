@@ -6,13 +6,12 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.20 2016-04-25 16:23:04 dom Exp $
+ *	$Id: sound.h,v 1.21 2016-06-11 20:52:49 dom Exp $
  */
 
 
 /* 1 bit sound library */
 
-#pragma output NEED1bitsound
 
 extern void  __LIB__ bit_open();
 extern void __LIB__ bit_close();
