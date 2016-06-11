@@ -1,13 +1,18 @@
 #
 # Makefile for X-Motif graphics emulation
 #
-# $Id: Makefile,v 1.5 2012-10-24 06:44:12 stefano Exp $
+# $Id: Makefile,v 1.6 2016-06-11 19:01:45 dom Exp $
 
 include ../../Make.config
 
-all:	
-	zcc +test -DMAKE_LIB $(CFLAGS) *.c
+CFILES = $(wildcard *.c)
+OFILES = $(CFILES:.c=.o)
+
+all:	$(OFILES)
 	$(LIBLINKER) -x../../$(OUTPUT_DIRECTORY)/x11 @x11.lst
+
+%.o: %.c
+	zcc +test -DMAKE_LIB $(CFLAGS) $^ -o $@
 
 debug:	
 	zcc +test -DMAKE_LIB -D_DEBUG_ $(CFLAGS) *.c
