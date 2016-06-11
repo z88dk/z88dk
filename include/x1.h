@@ -1,13 +1,14 @@
 /*
  * Header file for Sharp X1 specific stuff
  *
- * $Id: x1.h,v 1.9 2016-06-10 23:45:05 dom Exp $
+ * $Id: x1.h,v 1.10 2016-06-11 09:24:56 dom Exp $
  *
  */
 
 #ifndef __X1_H__
 #define __X1_H__
 
+#include <sys/compiler.h>
 
 // PSG register, sound, ...
 
