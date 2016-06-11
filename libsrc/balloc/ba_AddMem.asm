@@ -2,9 +2,11 @@
 
 SECTION code_clib
 PUBLIC ba_AddMem
+PUBLIC _ba_AddMem
 EXTERN BAAddMem
 
 .ba_AddMem
+._ba_AddMem
 
    ld hl,8
    add hl,sp

@@ -8,7 +8,9 @@
 
 ; ----- void vz_char_draw(int x, int y, int c, char ch)
 
+SECTION code_clib
 PUBLIC vz_char_draw
+PUBLIC _vz_char_draw
 EXTERN vz_shape
 EXTERN char_shape
 
@@ -16,8 +18,9 @@ EXTERN char_shape
 ; without fixing vz_shape -- so left as is
 
 .vz_char_draw
-
-	ld	ix, 0
+._vz_char_draw
+	push	ix		;save callers ix
+	ld	ix, 2
 	add	ix, sp
 	ld	l,(ix+8)	; get x
 	ld	h,(ix+9)
@@ -55,4 +58,5 @@ char_shape2:
 	call	vz_shape
 	pop hl
         ld      sp, hl          ; clean up stack
+	pop	ix		;restore callers ix
 	ret

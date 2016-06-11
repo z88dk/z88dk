@@ -8,10 +8,13 @@
 
 ; ----- void __CALLEE__ vz_brick_callee(void *addr, char byte)
 
+SECTION code_clib
 PUBLIC vz_brick_callee
+PUBLIC _vz_brick_callee
 PUBLIC ASMDISP_VZ_BRICK_CALLEE
 
 .vz_brick_callee
+._vz_brick_callee
 
    pop hl
    pop bc

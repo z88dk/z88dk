@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC ba_AddMem_callee
+PUBLIC _ba_AddMem_callee
 EXTERN BAAddMem
 
 .ba_AddMem_callee
+._ba_AddMem_callee
 
    pop af
    pop hl

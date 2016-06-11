@@ -8,9 +8,12 @@
 
 ; ----- int vz_getch(void)
 
+SECTION code_clib
 PUBLIC vz_getch
+PUBLIC _vz_getch
 
 .vz_getch
+._vz_getch
 
    call $0049                ; wait for keyboard
    ld l,a

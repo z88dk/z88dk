@@ -8,7 +8,9 @@
 
 ; ----- void vz_shape(int x, int y, int w, int h, int c, char *data)
 
+SECTION code_clib
 PUBLIC vz_shape
+PUBLIC _vz_shape
 PUBLIC char_shape
 EXTERN scrbase
 
@@ -16,8 +18,9 @@ EXTERN scrbase
 ; as is for another enterprising person to improve
 
 .vz_shape
-
-	ld	ix, -2          ; old compiler had an extra word on stack
+._vz_shape
+	push	ix		; save callers ix
+	ld	ix, 0           ; old compiler had an extra word on stack
 	add	ix, sp
 	ld	e, (ix+4)	; get *data
 	ld	d, (ix+5)
@@ -120,8 +123,10 @@ shape9:
 	dec	(ix+8)		; decrement h
 	jp	nz, shape1	; more rows?
 shapex:
+	pop	ix		; restore callers ix
 	ret
 
+	SECTION rodata_clib
 char_shape:
 	defb $00,$00,$00,$00,$00	; space
 	defb $20,$20,$20,$00,$20	; !

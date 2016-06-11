@@ -8,10 +8,13 @@
 
 ; ----- char __CALLEE__ *vz_midstr_callee(char *str, int pos)
 
+SECTION code_clib
 PUBLIC vz_midstr_callee
+PUBLIC _vz_midstr_callee
 PUBLIC ASMDISP_VZ_MIDSTR_CALLEE
 
 .vz_midstr_callee
+._vz_midstr_callee
 
    pop af
    pop de

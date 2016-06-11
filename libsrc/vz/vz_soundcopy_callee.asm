@@ -8,11 +8,14 @@
 
 ; ----- void __CALLEE__ vz_soundcopy_callee(char *dst, char *src, int size, int sound1, int sound2);
 
+SECTION code_clib
 PUBLIC vz_soundcopy_callee
+PUBLIC _vz_soundcopy_callee
 PUBLIC ASMDISP_VZ_SOUNDCOPY_CALLEE
 EXTERN _std_seed
 
 .vz_soundcopy_callee
+._vz_soundcopy_callee
 
    pop af
    pop bc

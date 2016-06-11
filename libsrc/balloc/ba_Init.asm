@@ -2,6 +2,7 @@
 
 SECTION code_clib
 PUBLIC ba_Init
+PUBLIC _ba_Init
 EXTERN _ba_qtbl
 
 ; Clears all memory queues to empty.
@@ -10,6 +11,7 @@ EXTERN _ba_qtbl
 ; uses : F,BC,DE,HL
 
 .ba_Init
+._ba_Init
    add hl,hl
    ld c,l
    ld b,h

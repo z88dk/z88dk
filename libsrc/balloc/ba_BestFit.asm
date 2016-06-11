@@ -2,9 +2,11 @@
 
 SECTION code_clib
 PUBLIC ba_BestFit
+PUBLIC _ba_BestFit
 EXTERN BABestFit
 
 .ba_BestFit
+._ba_BestFit
 
    ld hl,2
    add hl,sp

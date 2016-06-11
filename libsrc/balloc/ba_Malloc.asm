@@ -2,6 +2,7 @@
 
 SECTION code_clib
 PUBLIC ba_Malloc
+PUBLIC _ba_Malloc
 EXTERN _ba_qtbl
 
 ; Returns block of memory from the indicated queue.
@@ -12,6 +13,7 @@ EXTERN _ba_qtbl
 ; uses : AF,BC,DE,HL
 
 .ba_Malloc
+._ba_Malloc
    add hl,hl
    ld de,_ba_qtbl
    add hl,de

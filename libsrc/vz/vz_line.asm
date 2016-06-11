@@ -1,10 +1,13 @@
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 
+SECTION code_clib
 PUBLIC vz_line
+PUBLIC _vz_line
 EXTERN vz_line_callee
 EXTERN ASMDISP_VZ_LINE_CALLEE
 
 .vz_line
+._vz_line
 
    pop af
    pop bc

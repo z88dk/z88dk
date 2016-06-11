@@ -8,10 +8,13 @@
 
 ; ----- void __CALLEE__ vz_gotoxy_callee(int x, int y)
 
+SECTION code_clib
 PUBLIC vz_gotoxy_callee
+PUBLIC _vz_gotoxy_callee
 PUBLIC ASMDISP_VZ_GOTOXY_CALLEE
 
 .vz_gotoxy_callee
+._vz_gotoxy_callee
 
    pop bc
    pop hl

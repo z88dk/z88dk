@@ -8,9 +8,12 @@
 
 ; ----- void __FASTCALL__ vz_mode(int n)
 
+SECTION code_clib
 PUBLIC vz_mode
+PUBLIC _vz_mode
 
 .vz_mode
+._vz_mode
 
    ld a,h
    or l

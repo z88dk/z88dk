@@ -3,9 +3,11 @@
 
 SECTION code_clib
 PUBLIC ba_BestFit_callee
+PUBLIC _ba_BestFit_callee
 EXTERN BABestFit
 
 .ba_BestFit_callee
+._ba_BestFit_callee
 
    pop hl
    pop bc

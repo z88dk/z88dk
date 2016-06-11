@@ -8,10 +8,13 @@
 
 ; ----- void __CALLEE__ vz_score_callee(void *addr, char byte)
 
+SECTION code_clib
 PUBLIC vz_score_callee
+PUBLIC _vz_score_callee
 EXTERN ASMDISP_VZ_SCORE_CALLEE
 
 .vz_score_callee
+._vz_score_callee
 
    pop hl
    pop bc

@@ -2,6 +2,7 @@
 
 SECTION code_clib
 PUBLIC ba_Free
+PUBLIC _ba_Free
 EXTERN _ba_qtbl
 
 ; Frees block of memory back to queues for reuse.
@@ -10,6 +11,7 @@ EXTERN _ba_qtbl
 ; uses : AF,BC,DE,HL
 
 .ba_Free
+._ba_Free
    ld a,h
    or l
    ret z

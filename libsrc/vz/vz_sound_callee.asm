@@ -8,10 +8,13 @@
 
 ; ----- void __CALLEE__ vz_sound_callee(int freq, int cycles)
 
+SECTION code_clib
 PUBLIC vz_sound_callee
+PUBLIC _vz_sound_callee
 EXTERN ASMDISP_VZ_SOUND_CALLEE
 
 .vz_sound_callee
+._vz_sound_callee
 
    pop de
    pop bc

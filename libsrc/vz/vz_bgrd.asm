@@ -8,9 +8,12 @@
 
 ; ----- void __FASTCALL__ vz_bgrd(int n)
 
+SECTION code_clib
 PUBLIC vz_bgrd
+PUBLIC _vz_bgrd
 
 .vz_bgrd
+._vz_bgrd
 
    ld a,h
    or l

@@ -8,11 +8,14 @@
 
 ; ----- void __CALLEE__ vz_plot_callee(int x, int y, int c)
 
+SECTION code_clib
 PUBLIC vz_plot_callee
+PUBLIC _vz_plot_callee
 PUBLIC ASMDISP_VZ_PLOT_CALLEE
 EXTERN scrbase
 
 .vz_plot_callee
+._vz_plot_callee
 
    pop af
    pop bc
