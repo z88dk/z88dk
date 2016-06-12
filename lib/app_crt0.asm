@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.23 2016-06-02 22:24:57 dom Exp $
+;	$Id: app_crt0.asm,v 1.24 2016-06-12 21:27:19 dom Exp $
 
 
 ;--------
@@ -170,16 +170,18 @@ IF !DEFINED_nostreams
 	EXTERN	closeall
 	call	closeall	;Close all files
  IF DEFINED_farheapsz
+	EXTERN	freeall_far
  	call	freeall_far	;Deallocate far memory
  ENDIF
 	pop	af		;Get exit value back
-ELSE	;!ANSIstdio
+ELSE	;!nostreams
   IF DEFINED_farheapsz
 	push	af		;Deallocate far memory
+	EXTERN	freeall_far
 	call	freeall_far
 	pop	af
   ENDIF
-ENDIF	;ANSIstdio
+ENDIF	;nostreams
 
         call_oz(os_bye)		;Exit back to OZ
 
