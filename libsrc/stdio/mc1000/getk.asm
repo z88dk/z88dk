@@ -6,7 +6,7 @@
 ;	Stefano Bodrato, 2013
 ;
 ;
-;	$Id: getk.asm,v 1.6 2016-06-12 17:00:22 dom Exp $
+;	$Id: getk.asm,v 1.7 2016-06-12 17:07:44 dom Exp $
 ;
 
 ; The code at entry $c009 checks if a key has been pressed in a 7ms interval.
@@ -15,8 +15,10 @@
 
         SECTION code_clib
 	PUBLIC	getk
+	PUBLIC	_getk
 
 .getk
+._getk
 	call	$C027
 	and		a
 	jr		z,key_got

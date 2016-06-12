@@ -4,17 +4,19 @@
 ;
 ;       getk() Read key status
 ;
-;       $Id: getk.asm,v 1.5 2016-06-12 17:00:21 dom Exp $
+;       $Id: getk.asm,v 1.6 2016-06-12 17:07:43 dom Exp $
 ;
 
 
         SECTION code_clib
                 PUBLIC    getk
+                PUBLIC    _getk
                 
                 EXTERN	savecia
                 EXTERN	restorecia
 
 .getk
+._getk
         call    savecia         ; save CIA registers
 
         ld      hl,keytab

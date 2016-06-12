@@ -6,16 +6,18 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: getk.asm,v 1.8 2016-06-12 17:00:21 dom Exp $
+;	$Id: getk.asm,v 1.9 2016-06-12 17:07:43 dom Exp $
 ;
 
         SECTION code_clib
         PUBLIC	getk
+        PUBLIC	_getk
 
         INCLUDE "cpcfirm.def"
 
 
 .getk
+._getk
         call    firmware
         defw    km_read_char
         push	af

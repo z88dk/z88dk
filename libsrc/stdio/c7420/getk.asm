@@ -9,9 +9,11 @@
 ;
 
         SECTION code_clib
-		PUBLIC	getk
+	PUBLIC	getk
+	PUBLIC	_getk
 
 .getk
+._getk
 	call $a22
 	ld h,0
 	ld l,a

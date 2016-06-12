@@ -6,15 +6,17 @@
 ;	Stefano Bodrato - 2011
 ;
 ;
-;	$Id: getk.asm,v 1.3 2016-06-12 17:00:21 dom Exp $
+;	$Id: getk.asm,v 1.4 2016-06-12 17:07:44 dom Exp $
 ;
 
         SECTION code_clib
 	PUBLIC	getk
+	PUBLIC	_getk
 	EXTERN	fgetc_cons
 
 
 .getk
+._getk
 
 	ld   a,69h ; keyboard channel
 	rst  $30   ; EXOS

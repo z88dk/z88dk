@@ -5,13 +5,15 @@
 ;	getkey() Wait for keypress
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2016-06-12 17:00:21 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2016-06-12 17:07:43 dom Exp $
 ;
 
         SECTION code_clib
-		PUBLIC	fgetc_cons
+	PUBLIC	fgetc_cons
+	PUBLIC	_fgetc_cons
 
 .fgetc_cons
+._fgetc_cons
 	call $1bdf
 	or a
 	jr	z,fgetc_cons

@@ -6,7 +6,7 @@
 ;	Stefano Bodrato, 2013
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.6 2016-06-12 17:00:21 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.7 2016-06-12 17:07:44 dom Exp $
 ;
 
 ; The code at entry $c009 checks if a key has been pressed in a 7ms interval.
@@ -15,8 +15,10 @@
 
         SECTION code_clib
 	PUBLIC	fgetc_cons
+	PUBLIC	_fgetc_cons
 
 fgetc_cons:
+_fgetc_cons:
 	call $C006
 	ld l,a
 	ld h,0

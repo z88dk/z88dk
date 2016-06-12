@@ -6,11 +6,12 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: getk.asm,v 1.8 2016-06-12 17:00:22 dom Exp $
+;	$Id: getk.asm,v 1.9 2016-06-12 17:07:44 dom Exp $
 ;
 
         SECTION code_clib
 	PUBLIC	getk
+	PUBLIC	_getk
 	EXTERN	fgetc_cons
         EXTERN	msxbios
 
@@ -23,6 +24,7 @@ ENDIF
 
 
 .getk
+._getk
 	ld	ix,CHSNS
 	call	msxbios
 	ret	z		; exit if no key in buffer
