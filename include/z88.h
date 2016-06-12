@@ -5,7 +5,7 @@
  *
  *      Link using -lz88
  *
- *	$Id: z88.h,v 1.7 2016-06-11 19:53:08 dom Exp $
+ *	$Id: z88.h,v 1.8 2016-06-12 08:16:19 dom Exp $
  */
 
 #ifndef __Z88_H__
@@ -213,13 +213,13 @@ extern char __LIB__ *stripdev(char *explicitname);
 extern char __LIB__ *strippath(char *explicitname);
 
 /* Open a popup window */
-extern void __LIB__ openpopup(int wid, int tlx, int tly, int width, int height, char *name) __SMALLDECL;
+extern void __LIB__ openpopup(int wid, int tlx, int tly, int width, int height, char *name) __SMALLCDECL;
 
 /* Open a window */
-extern void __LIB__ openwindow(int wid, int tlx, int tly, int width, int height) __SMALLDECL;
+extern void __LIB__ openwindow(int wid, int tlx, int tly, int width, int height) __SMALLCDECL;
 
 /* Open a titled window */
-extern void __LIB__ opentitled(int wid, int tlx, int tly, int width, int height, char *name) __SMALLDECL;
+extern void __LIB__ opentitled(int wid, int tlx, int tly, int width, int height, char *name) __SMALLCDECL;
 
 
 #endif /* Z88_H */
