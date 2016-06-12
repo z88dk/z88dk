@@ -2,10 +2,11 @@
 ;	RCM2/3000 clock() function
 ;
 ; --------
-; $Id: clock.asm,v 1.2 2016-03-05 00:07:01 dom Exp $
+; $Id: clock.asm,v 1.3 2016-06-12 17:02:26 dom Exp $
 
 	;;  TODO:	 WRITE ME !!! use rtc in some way..
 
+        SECTION code_clib
 	PUBLIC clock
 	PUBLIC _clock
 

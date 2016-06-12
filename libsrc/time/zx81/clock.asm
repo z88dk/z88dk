@@ -4,9 +4,10 @@
 ;	Back to default FRAMES counter + 1 extra byte ;)
 ;
 ; --------
-; $Id: clock.asm,v 1.10 2016-03-05 00:07:02 dom Exp $
+; $Id: clock.asm,v 1.11 2016-06-12 17:02:26 dom Exp $
 
 
+        SECTION code_clib
 	PUBLIC	clock
 	PUBLIC	_clock
 ;	XREF	frames3
