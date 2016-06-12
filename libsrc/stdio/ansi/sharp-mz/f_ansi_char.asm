@@ -9,9 +9,10 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_char.asm,v 1.6 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
 	PUBLIC	text_cols

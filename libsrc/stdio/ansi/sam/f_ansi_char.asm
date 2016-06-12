@@ -22,9 +22,10 @@
 ;       Frode Tennebø - 29/12/2002
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
 	EXTERN	ansi_ROW
@@ -65,7 +66,6 @@
 ; ENDIF
 
 .text_rows   defb 22
-.UNDRLN     defb 0
 	
 ; .ansi_CHAR
 ;   ld (char+1),a
@@ -251,3 +251,6 @@
 ; .font
 ;         BINARY  "stdio/ansi/F4PACK.BIN"		; <- put the FONT name here !
 ; ENDIF
+
+        SECTION bss_clib
+.UNDRLN     defb 0

@@ -10,14 +10,23 @@
 ;	Stefano Bodrato - May 2000
 ;	Stefano Bodrato - Jan 2002..fixed
 ;
-;	$Id: f_ansi_attr.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_attr.asm,v 1.6 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_attr
 	PUBLIC	current_attr
 
-.current_attr	defb	$70 ; White text on black background
+	SECTION bss_clib
+
+.current_attr	defb	0 
 .mz_inverse	defb	0
+
+	SECTION code_crt_init
+	ld	a,$70	;  White text on black background
+	ld	(current_attr),a
+
+        SECTION code_clib
 
 .ansi_attr
         and     a

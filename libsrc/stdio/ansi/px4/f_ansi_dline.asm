@@ -7,10 +7,11 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.1 2015-11-05 16:08:04 stefano Exp $
+;	$Id: f_ansi_dline.asm,v 1.2 2016-06-12 16:06:43 dom Exp $
 ;
 
 
+        SECTION code_clib
 	PUBLIC	ansi_del_line
 	EXTERN	base_graphics
 

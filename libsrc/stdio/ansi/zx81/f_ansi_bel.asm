@@ -5,9 +5,10 @@
 ; 	BEL - chr(7)   Beep it out
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.3 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: f_ansi_bel.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_BEL
 
 

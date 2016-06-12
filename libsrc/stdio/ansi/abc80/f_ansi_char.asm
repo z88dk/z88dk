@@ -11,17 +11,18 @@
 ;	A slower (but working) method it commented out
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.4 2015-01-19 01:33:18 pauloscustodio Exp $
+;	$Id: f_ansi_char.asm,v 1.5 2016-06-12 16:06:42 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
-	PUBLIC	text_cols
-	PUBLIC	text_rows
 
 	EXTERN	ansi_ROW
 	EXTERN	ansi_COLUMN
 	
+	PUBLIC	text_cols
+	PUBLIC	text_rows
 .text_cols   defb 40
 .text_rows   defb 24
 

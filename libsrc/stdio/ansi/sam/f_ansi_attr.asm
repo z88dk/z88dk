@@ -14,9 +14,10 @@
 ;
 ;       Frode Tennebø - 29/12/2002
 ;
-;       $Id: f_ansi_attr.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
+;       $Id: f_ansi_attr.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
         PUBLIC    ansi_attr
         EXTERN     ansi_default
         EXTERN     ansi_restore
@@ -203,6 +204,7 @@
 .noback
         ret
 
+        SECTION bss_clib
 .BACKGR
         defb 0
 .FOREGR

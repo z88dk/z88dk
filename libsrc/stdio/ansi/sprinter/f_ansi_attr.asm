@@ -1,7 +1,7 @@
 ;
-;       Spectrum C Library
+;       Sprinter C Library
 ;
-; 	ANSI Video handling for ZX Spectrum
+; 	ANSI Video handling for Sprinter
 ;
 ; 	Text Attributes
 ;	m - Set Graphic Rendition
@@ -12,12 +12,12 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_attr.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_attr
 
-	PUBLIC	text_attr
 
 ; 0 = reset all attributes
 ; 1 = bold on
@@ -131,5 +131,15 @@
 	ld	(inverse_attr),a
 	ret
 
-.text_attr	defb	@00001111	;bright white on black
-.inverse_attr	defb	@01111000	;grey on white
+	SECTION		code_crt_init
+
+	ld	a,@00001111       ;bright white on black
+	ld	(text_attr),a
+	ld	a,@01111000       ;grey on white
+	ld	(inverse_attr),a
+
+	SECTION	bss_clib
+
+	PUBLIC	text_attr
+.text_attr	defb	0
+.inverse_attr	defb	0

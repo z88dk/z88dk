@@ -5,9 +5,10 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.8 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.9 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_SCROLLUP
 	EXTERN	ansi_del_line
 	EXTERN	base_graphics

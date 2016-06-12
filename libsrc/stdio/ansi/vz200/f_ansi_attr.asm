@@ -10,9 +10,10 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.4 2016-06-10 23:56:01 dom Exp $
+;	$Id: f_ansi_attr.asm,v 1.5 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
         SECTION code_clib
 	PUBLIC	ansi_attr
 

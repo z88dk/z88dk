@@ -9,6 +9,7 @@
 ;	Frode Tennebø - 29/12/2002
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_restore
 	
 	EXTERN    FOREGR

@@ -5,11 +5,12 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.7 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.8 2016-06-12 16:06:43 dom Exp $
 ;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
+        SECTION code_clib
 	PUBLIC	ansi_SCROLLUP
 	EXTERN	base_graphics
 	EXTERN	tidi

@@ -18,6 +18,8 @@
 ;	Display a char in location (ansi_ROW),(ansi_COLUMN)
 ;	A=char to display
 
+
+        SECTION code_clib
 	PUBLIC	ansi_CHAR
 
 	EXTERN	ansi_ROW

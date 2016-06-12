@@ -13,9 +13,10 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char85.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_char85.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_CHAR
 
 	EXTERN	ansi_ROW

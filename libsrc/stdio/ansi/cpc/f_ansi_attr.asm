@@ -10,17 +10,20 @@
 ;	Stefano Bodrato - Jul. 2004
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.5 2015-01-19 01:33:18 pauloscustodio Exp $
+;	$Id: f_ansi_attr.asm,v 1.6 2016-06-12 16:06:42 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_attr
 
     INCLUDE "cpcfirm.def"
 
-	PUBLIC	INVRS
+        SECTION bss_clib
 	PUBLIC	UNDRL
 
 .UNDRL  defb 0
+
+        SECTION code_clib
 
 .ansi_attr
         and     a

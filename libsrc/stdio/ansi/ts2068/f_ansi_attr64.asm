@@ -9,9 +9,10 @@
 ;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr64.asm,v 1.3 2015-01-23 07:07:31 stefano Exp $
+;	$Id: f_ansi_attr64.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_attr
 
 	EXTERN	INVRS

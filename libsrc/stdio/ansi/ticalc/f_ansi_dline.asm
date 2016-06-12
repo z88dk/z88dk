@@ -7,11 +7,12 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.5 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_dline.asm,v 1.6 2016-06-12 16:06:43 dom Exp $
 ;
 
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
+        SECTION code_clib
 	PUBLIC	ansi_del_line
 	EXTERN	base_graphics
 	EXTERN	cpygraph

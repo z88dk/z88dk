@@ -9,9 +9,10 @@
 ;	Frode Tennebø - 29/12/2002
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_cls.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_cls
 
 .ansi_cls

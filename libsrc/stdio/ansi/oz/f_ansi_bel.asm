@@ -8,9 +8,10 @@
 ;	Stefano Bodrato - Aug. 2002
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
+;	$Id: f_ansi_bel.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_BEL
 
 

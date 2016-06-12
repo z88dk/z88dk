@@ -10,17 +10,26 @@
 ;	Stefano Bodrato - 2014
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.3 2015-10-12 19:47:47 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_attr
 
 	PUBLIC	vg5k_attr
 	;PUBLIC	vg5k_inverse
 	
 
-.vg5k_attr		defb 7	; White on Black
+        SECTION bss_clib
+.vg5k_attr	defb 0
 .vg5k_inverse	defb 0
+
+        SECTION code_crt_init
+	ld	a,7		; White on black
+	ld	(vg5k_attr),a
+
+
+        SECTION code_clib
 
 .ansi_attr
         and     a

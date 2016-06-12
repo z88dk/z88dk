@@ -11,9 +11,10 @@
 ;	Stefano Bodrato - 2014
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2015-10-12 19:47:47 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_CHAR
 	
 	PUBLIC	text_cols

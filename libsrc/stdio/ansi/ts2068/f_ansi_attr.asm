@@ -9,8 +9,11 @@
 ;	Be careful here...
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
+;	$Id: f_ansi_attr.asm,v 1.5 2016-06-12 16:06:43 dom Exp $
 ;
+
+        SECTION code_clib
+
 IF A64COL
 	INCLUDE "stdio/ansi/ts2068/f_ansi_attr64.asm"
 ELSE

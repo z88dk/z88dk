@@ -10,14 +10,19 @@
 ;	Stefano Bodrato - Jan 2013
 ;
 ;
-;	$Id: f_ansi_attr.asm,v 1.2 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_attr.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_attr
 
+
+        SECTION bss_clib
 	PUBLIC	pc6001_attr
 	
 .pc6001_attr	defb 0
+
+        SECTION code_clib
 
 .ansi_attr
         and     a

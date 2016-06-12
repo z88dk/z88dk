@@ -5,9 +5,10 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	$Id: f_ansi_cls.asm,v 1.5 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: f_ansi_cls.asm,v 1.6 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_cls
 	EXTERN	_clg_hr		; we use the graphics CLS routine
 IF MTHRG

@@ -17,9 +17,11 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.7 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_char.asm,v 1.8 2016-06-12 16:06:43 dom Exp $
 ;
 
+
+        SECTION code_clib
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 	
 	PUBLIC	ansi_CHAR

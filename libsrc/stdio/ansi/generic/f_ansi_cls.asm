@@ -8,10 +8,10 @@
 ;	Stefano Bodrato - 2014
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.3 2016-04-04 18:31:22 dom Exp $
+;	$Id: f_ansi_cls.asm,v 1.4 2016-06-12 16:06:42 dom Exp $
 ;
 
-	SECTION  code_clib
+        SECTION code_clib
 	PUBLIC	ansi_cls
 
 	EXTERN		ansi_del_line

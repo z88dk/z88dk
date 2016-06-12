@@ -5,9 +5,10 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	$Id: f_ansi_cls.asm,v 1.4 2015-01-19 01:33:18 pauloscustodio Exp $
+;	$Id: f_ansi_cls.asm,v 1.5 2016-06-12 16:06:42 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_cls
 
 .ansi_cls

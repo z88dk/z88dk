@@ -7,19 +7,23 @@
 ;
 ;	Stefano Bodrato - 2014
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.3 2015-10-12 19:47:47 stefano Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC  ansi_SCROLLUP
 	EXTERN  ansi_del_line
 
 	DEFC	ROWS=25
 	DEFC	COLUMNS=40
 
+        SECTION bss_clib
 .ROW
 	defb 0
 .COLUMN
 	defb 0
+
+        SECTION code_clib
 	
 .ansi_SCROLLUP
 ;	ld hl,(ROW)

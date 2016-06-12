@@ -1,5 +1,6 @@
 ; We should scroll the screen up one character here
 ; Blanking the bottom row..
+        SECTION code_clib
 	PUBLIC	ansi_SCROLLUP
 	EXTERN     zx_rowtab
 

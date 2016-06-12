@@ -5,8 +5,9 @@
 ; 	Text Attributes
 ;	m - Set Graphic Rendition
 ;	
-;	$Id: f_ansi_attr.asm,v 1.4 2016-04-04 18:31:22 dom Exp $
+;	$Id: f_ansi_attr.asm,v 1.5 2016-06-12 16:06:42 dom Exp $
 ;
+
 
 	SECTION	code_clib
 	PUBLIC	ansi_attr

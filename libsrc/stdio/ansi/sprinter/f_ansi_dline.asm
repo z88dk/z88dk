@@ -1,19 +1,18 @@
 ;
-;       Spectrum C Library
+;       Sprinter C Library
 ;
-; 	ANSI Video handling for ZX Spectrum
+; 	ANSI Video handling for ZX Sprinter
 ;
 ; 	Clean a text line
 ;
-;	Stefano Bodrato - Apr. 2000
 ;
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.3 2015-01-19 01:33:19 pauloscustodio Exp $
+;	$Id: f_ansi_dline.asm,v 1.4 2016-06-12 16:06:43 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	ansi_del_line
 
 ; a = line

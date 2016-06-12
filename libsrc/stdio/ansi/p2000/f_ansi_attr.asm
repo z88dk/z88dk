@@ -10,6 +10,7 @@
 ;	$Id:
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_attr
 
 .ansi_attr

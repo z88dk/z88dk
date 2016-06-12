@@ -19,9 +19,10 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.11 2015-01-23 07:07:31 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.12 2016-06-12 16:06:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ansi_CHAR
 
 IF ROMFONT
