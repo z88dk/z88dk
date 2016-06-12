@@ -6,10 +6,11 @@
 ;	Stefano Bodrato - Apr. 2008
 ;
 ;
-;	$Id: getk.asm,v 1.2 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: getk.asm,v 1.3 2016-06-12 17:00:21 dom Exp $
 ;
 
 
+        SECTION code_clib
 		PUBLIC	getk
 
 .getk

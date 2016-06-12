@@ -6,7 +6,7 @@
 ;       We can corrupt any register
 ;
 ;
-;	$Id: fputc_cons.asm,v 1.5 2016-05-15 20:15:45 dom Exp $
+;	$Id: fputc_cons.asm,v 1.6 2016-06-12 17:00:21 dom Exp $
 ;
 
 	SECTION	code_clib
@@ -43,4 +43,5 @@ ENDIF
 	ld	(hl),a
 	jp	1a8h
 
+        SECTION bss_clib
 .mychar	defb	0

@@ -2,7 +2,7 @@
 ; 	ANSI Video handling for the Sharp OZ family
 ;	Stefano Bodrato - Nov. 2002
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2015-01-19 01:33:18 pauloscustodio Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2016-06-12 17:00:21 dom Exp $
 ;
 ; 	Handles Attributes INVERSE + UNDERLINED
 ;
@@ -16,6 +16,7 @@
 ;	.font		= font file
 ;
 
+	SECTION	code_clib
 ; The font
 ; 8 dots: MAX 29 columns
 ; 7 dots: MAX 34 columns

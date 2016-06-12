@@ -8,6 +8,7 @@
 ;	$Id:
 ;
 
+        SECTION code_clib
 		PUBLIC	getk
 
 .getk

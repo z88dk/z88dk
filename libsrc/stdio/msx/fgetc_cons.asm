@@ -6,9 +6,10 @@
 ;	Stefano Bodrato - Apr. 2001
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.7 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.8 2016-06-12 17:00:22 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	fgetc_cons
         EXTERN	msxbios
 

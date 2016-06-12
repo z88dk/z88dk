@@ -6,9 +6,10 @@
 ;	Stefano Bodrato - 8/6/2001
 ;
 ;
-;	$Id: getk.asm,v 1.7 2016-05-19 20:51:01 dom Exp $
+;	$Id: getk.asm,v 1.8 2016-06-12 17:00:21 dom Exp $
 ;
 
+        SECTION code_clib
         PUBLIC	getk
 
         INCLUDE "cpcfirm.def"

@@ -2,8 +2,9 @@
 ;	ROM Console routine for the Philips Videopac C7420
 ;	By Stefano Bodrato - 2015
 ;
-;	$Id: fputc_cons.asm,v 1.2 2016-05-15 20:15:45 dom Exp $
+;	$Id: fputc_cons.asm,v 1.3 2016-06-12 17:00:21 dom Exp $
 ;
+
 
 	SECTION	code_clib
 	PUBLIC	fputc_cons_native

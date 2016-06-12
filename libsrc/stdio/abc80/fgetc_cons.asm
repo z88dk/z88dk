@@ -6,9 +6,10 @@
 ;	Maj 2000 - Stefano Bodrato
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.4 2015-01-19 01:33:17 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.5 2016-06-12 17:00:21 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	fgetc_cons
 	
 .fgetc_cons

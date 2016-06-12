@@ -4,10 +4,11 @@
 ;
 ;       getk() Read key status
 ;
-;       $Id: getk.asm,v 1.4 2015-01-19 01:33:20 pauloscustodio Exp $
+;       $Id: getk.asm,v 1.5 2016-06-12 17:00:21 dom Exp $
 ;
 
 
+        SECTION code_clib
                 PUBLIC    getk
                 
                 EXTERN	savecia
