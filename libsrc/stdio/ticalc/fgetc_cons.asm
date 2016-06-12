@@ -6,10 +6,12 @@
 ;	Stefano Bodrato - Dec 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.8 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.9 2016-06-12 17:32:01 dom Exp $
 ;
 
+      		SECTION code_clib
 		PUBLIC	fgetc_cons
+		PUBLIC	_fgetc_cons
 		EXTERN	getk_decode
 		EXTERN	tiei
 		EXTERN	tidi
@@ -17,6 +19,7 @@
 		INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 
 .fgetc_cons
+._fgetc_cons
 		call	tiei
 
 .kloop

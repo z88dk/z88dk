@@ -5,15 +5,18 @@
 ;	getk() Read key status
 ;
 ;
-;	$Id: getk.asm,v 1.3 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: getk.asm,v 1.4 2016-06-12 17:32:01 dom Exp $
 ;
 
 
     INCLUDE "flos.def"
 
+        SECTION code_clib
 	PUBLIC	getk
+	PUBLIC	_getk
 
 .getk
+._getk
 	call kjt_get_key
 	or a
 	jr nz,knz

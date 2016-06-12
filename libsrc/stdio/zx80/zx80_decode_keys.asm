@@ -6,9 +6,10 @@
 ;	Stefano Bodrato - Jan 2013
 ;
 ;
-;	$Id: zx80_decode_keys.asm,v 1.2 2015-01-19 01:33:22 pauloscustodio Exp $
+;	$Id: zx80_decode_keys.asm,v 1.3 2016-06-12 17:32:01 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	zx80_decode_keys
 	EXTERN		zx81toasc
 

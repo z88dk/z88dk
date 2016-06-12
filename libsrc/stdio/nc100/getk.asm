@@ -9,15 +9,18 @@
 ;	On an nc100 we have to test for "yellow"
 
 ;
-;	$Id: getk.asm,v 1.3 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: getk.asm,v 1.4 2016-06-12 17:32:01 dom Exp $
 ;
 
 
-		PUBLIC	getk
+        SECTION code_clib
+	PUBLIC	getk
+	PUBLIC	_getk
 
-		EXTERN	cleanup		;in crt0
+	EXTERN	cleanup		;in crt0
 
 .getk
+._getk
 	call	$B9B3	;kmreadchar
 	ld	hl,0
 	ret	nc	;no key pressed

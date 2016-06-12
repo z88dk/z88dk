@@ -6,13 +6,16 @@
 ;	Stefano Bodrato - Dec 2011
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:22 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2016-06-12 17:32:01 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	fgetc_cons
+	PUBLIC	_fgetc_cons
 	EXTERN		zx80_decode_keys
 
 .fgetc_cons
+._fgetc_cons
 	ld      iy,16384	; no ix/iy swap here
 	;call	restore81
 	xor		a

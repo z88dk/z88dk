@@ -9,15 +9,18 @@
 ;	On an nc100 we have to test for "yellow"
 
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2016-06-12 17:32:01 dom Exp $
 ;
 
 
-		PUBLIC	fgetc_cons
+        SECTION code_clib
+	PUBLIC	fgetc_cons
+	PUBLIC	_fgetc_cons
 
-		EXTERN	cleanup		;in crt0
+	EXTERN	cleanup		;in crt0
 
 .fgetc_cons
+._fgetc_cons
 	call	$B9B3	;kmreadchar
 	jr	nc,fgetc_cons	;no key available...try again
 	ld	l,c

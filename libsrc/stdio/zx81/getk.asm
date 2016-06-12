@@ -6,15 +6,18 @@
 ;	Stefano Bodrato - 8/5/2000
 ;
 ;
-;	$Id: getk.asm,v 1.6 2015-08-04 15:33:51 stefano Exp $
+;	$Id: getk.asm,v 1.7 2016-06-12 17:32:01 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	getk
+	PUBLIC	_getk
 	EXTERN	zx81toasc
 
         EXTERN    restore81
 
 .getk
+._getk
 	call	restore81
 	
 IF FORlambda

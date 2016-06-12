@@ -5,12 +5,15 @@
 ;	getkey() Wait for keypress, blinking cursor, etc..
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.3 2015-01-19 01:33:20 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.4 2016-06-12 17:32:01 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	fgetc_cons
+	PUBLIC	_fgetc_cons
 
 .fgetc_cons
+._fgetc_cons
 
 .nokey
 	rst	20h

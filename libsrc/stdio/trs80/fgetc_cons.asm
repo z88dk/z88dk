@@ -6,13 +6,15 @@
 ;	Stefano Bodrato - Apr. 2008
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.2 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: fgetc_cons.asm,v 1.3 2016-06-12 17:32:01 dom Exp $
 ;
 
-
-		PUBLIC	fgetc_cons
+        SECTION code_clib
+	PUBLIC	fgetc_cons
+	PUBLIC	_fgetc_cons
 
 .fgetc_cons
+._fgetc_cons
         call    $2b
         ld      l,a
 	ld	h,0

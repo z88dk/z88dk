@@ -6,15 +6,18 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.7 2015-08-04 15:33:51 stefano Exp $
+;	$Id: fgetc_cons.asm,v 1.8 2016-06-12 17:32:01 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	fgetc_cons
+	PUBLIC	_fgetc_cons
 	EXTERN	zx81toasc
 
         EXTERN    restore81
 
 .fgetc_cons
+._fgetc_cons
 	call	restore81
 .fgcloop
 IF FORlambda

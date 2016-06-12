@@ -3,12 +3,15 @@
 ;
 ;	getk() Read key status
 ;
-;	$Id: getk.asm,v 1.4 2015-01-19 01:33:21 pauloscustodio Exp $
+;	$Id: getk.asm,v 1.5 2016-06-12 17:32:01 dom Exp $
 ;
 
-		PUBLIC	getk
+        SECTION code_clib
+	PUBLIC	getk
+	PUBLIC	_getk
 
 .getk
+._getk
 		ld	a,1
 		out	(11h),a
 		in	a,(10h)
