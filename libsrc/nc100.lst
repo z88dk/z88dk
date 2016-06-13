@@ -11,7 +11,6 @@ fcntl/nc100/close
 fcntl/nc100/read
 fcntl/nc100/write
 fcntl/nc100/lseek
-fcntl/nc100/open_z88
 fcntl/nc100/readbyte
 fcntl/nc100/_fsize
 fcntl/nc100/_fsizehandle

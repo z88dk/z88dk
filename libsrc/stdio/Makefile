@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.56 2016-04-29 20:35:38 dom Exp $
+# $Id: Makefile,v 1.57 2016-06-13 19:56:40 dom Exp $
 #
 
 include ../Make.config
@@ -15,7 +15,6 @@ STDCFILES = \
 	fgets.c \
 	fgets_cons.c \
 	fopen.c \
-	fopen_z88.c \
 	fputs_callee.c \
 	freopen.c \
 	fseek.c \
@@ -29,7 +28,6 @@ GENCFILES = \
 	fclose.c \
 	fgetc.c \
 	fputc_callee.c \
-	freopen_z88.c \
 	fread.c 
 
 NETCFILES = $(GENCFILES) \
@@ -55,7 +53,6 @@ net:
 	zcc +z88 $(CFLAGS) -DNET_STDIO fclose.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO fgetc.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO fputc_callee.c
-	zcc +z88 $(CFLAGS) -DNET_STDIO freopen_z88.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO fflush.c
 	zcc +z88 $(CFLAGS) -DNET_STDIO fread.c
 	cd zsock ; $(MAKE) ; cd ..
@@ -68,7 +65,6 @@ cpm:	$(GENCOBJECTS)
 	zcc +test $(CFLAGS) -D__CPM__ fclose.c
 	zcc +test $(CFLAGS) -D__CPM__ fgetc.c
 	zcc +test $(CFLAGS) -D__CPM__ fputc_callee.c
-	zcc +test $(CFLAGS) -D__CPM__ freopen_z88.c
 	zcc +test $(CFLAGS) -D__CPM__ fread.c
 	zcc +test $(CFLAGS) -D__CPM__ -Cc-standard-escape-chars puts.c
 
@@ -78,7 +74,6 @@ gen:
 	zcc +test $(CFLAGS) fclose.c
 	zcc +test $(CFLAGS) fgetc.c
 	zcc +test $(CFLAGS) fputc_callee.c
-	zcc +test $(CFLAGS) freopen_z88.c
 	zcc +test $(CFLAGS) fread.c
 	zcc +test $(CFLAGS) puts.c
 	cd 8080; $(MAKE) ; cd ..
@@ -96,7 +91,6 @@ generic_iy:
 	zcc +test $(CFLAGS) -Ca-IXIY fgets.c
 	zcc +test $(CFLAGS) -Ca-IXIY fgets_cons.c
 	zcc +test $(CFLAGS) -Ca-IXIY fopen.c
-	zcc +test $(CFLAGS) -Ca-IXIY fopen_z88.c
 	zcc +test $(CFLAGS) -Ca-IXIY fputs_callee.c
 	zcc +test $(CFLAGS) -Ca-IXIY freopen.c
 	zcc +test $(CFLAGS) -Ca-IXIY fseek.c
@@ -109,7 +103,6 @@ generic_iy:
 	zcc +test $(CFLAGS) -Ca-IXIY fclose.c
 	zcc +test $(CFLAGS) -Ca-IXIY fgetc.c
 	zcc +test $(CFLAGS) -Ca-IXIY fputc_callee.c
-	zcc +test $(CFLAGS) -Ca-IXIY freopen_z88.c
 	zcc +test $(CFLAGS) -Ca-IXIY fread.c
 
 z88_x:

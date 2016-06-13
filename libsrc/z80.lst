@@ -24,14 +24,12 @@ stdio/fgetpos
 stdio/fgets
 stdio/fgets_cons
 stdio/fopen
-stdio/fopen_z88
 stdio/fputc
 stdio/fputc_callee
 stdio/fputs
 stdio/fputs_callee
 stdio/fread
 stdio/freopen
-stdio/freopen_z88
 stdio/fseek
 stdio/ftell
 stdio/fwrite

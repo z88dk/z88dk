@@ -18,7 +18,6 @@ fcntl/cpm/fdtell
 fcntl/cpm/getfcb
 fcntl/cpm/lseek
 fcntl/cpm/open
-fcntl/cpm/open_z88
 fcntl/cpm/parsefcb
 fcntl/cpm/_putoffset
 fcntl/cpm/read

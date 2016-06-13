@@ -23,7 +23,6 @@ fcntl/sprinter/fdgetpos
 fcntl/sprinter/fdtell
 fcntl/sprinter/lseek
 fcntl/sprinter/open
-fcntl/sprinter/open_z88
 fcntl/sprinter/read
 fcntl/sprinter/readbyte
 fcntl/sprinter/remove

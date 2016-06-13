@@ -11,7 +11,6 @@ fcntl/zxvgs/lseek
 fcntl/zxvgs/fdtell
 fcntl/zxvgs/fdgetpos
 fcntl/zxvgs/open
-fcntl/zxvgs/open_z88
 fcntl/zxvgs/remove
 fcntl/zxvgs/rename
 fcntl/zxvgs/write

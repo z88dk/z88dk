@@ -14,7 +14,6 @@ fcntl/z88/fdtell
 fcntl/z88/rename
 fcntl/z88/remove
 fcntl/z88/open
-fcntl/z88/open_z88
 fcntl/z88/close
 fcntl/z88/lseek
 fcntl/z88/read

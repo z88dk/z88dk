@@ -6,7 +6,7 @@
  * djm 4/5/99
  *
  * --------
- * $Id: fopen.c,v 1.3 2002-06-08 17:15:19 dom Exp $
+ * $Id: fopen.c,v 1.4 2016-06-13 19:56:40 dom Exp $
  */
 
 #define ANSI_STDIO
@@ -15,9 +15,8 @@
 
 
 FILE *
-fopen(far char *name, unsigned char *mode)
+fopen(char *name, unsigned char *mode)
 {
-	char	buf[10];
         FILE    *fp;
 
         for (fp= _sgoioblk; fp < _sgoioblk+FOPEN_MAX ; ++fp) {
@@ -29,7 +28,7 @@ fopen(far char *name, unsigned char *mode)
 	}
 
 
-        return (freopen_z88(name,mode,fp,buf,9));
+        return (freopen(name,mode,fp));
 }
 
 
