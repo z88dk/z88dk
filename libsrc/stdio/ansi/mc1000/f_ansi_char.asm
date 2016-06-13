@@ -14,7 +14,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2016-06-12 16:06:42 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2016-06-13 21:32:52 dom Exp $
 ;
 
         SECTION code_clib
@@ -35,50 +35,11 @@
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 
-IF A128COL
-.text_cols   defb 128
-ENDIF
-
-IF A80COL
-.text_cols   defb 80
-ENDIF
-
-IF A85COL
-.text_cols   defb 85
-ENDIF
-
-IF A64COL
-.text_cols   defb 64
-ENDIF
-
-IF A51COL
-.text_cols   defb 51
-ENDIF
-
-IF A42COL
-.text_cols   defb 42
-ENDIF
-
-IF A40COL
-.text_cols   defb 40
-ENDIF
-
-IF A36COL
-.text_cols   defb 36
-ENDIF
-
-IF A32COL
-.text_cols   defb 32
-ENDIF
-
-IF A28COL
-.text_cols   defb 28
-ENDIF
-
-IF A24COL
-.text_cols   defb 24
-ENDIF
-
+        EXTERN  ansicharacter_pixelwidth
+        EXTERN  ansifont_is_packed
+        EXTERN  ansifont
+        EXTERN  ansicolumns
+.text_cols   defb ansicolumns
 .text_rows   defb 24
 
 .ansi_CHAR
@@ -141,19 +102,19 @@ ENDIF
   push hl
   pop ix
 .char
-  ld b,'A'      ; Put here the character to be printed
-
-IF PACKEDFONT
+  ld	b,'A'      ; Put here the character to be printed
+  ld	hl,ansifont - 256
+  ld	a,ansifont_is_packed
+  and	a
+  jr	z,got_font_location
   xor	a
   rr	b
   jr	c,even
   ld	a,4
 .even
   ld	(ROLL+1),a
-  ld	hl,font-128
-ELSE
-  ld hl,font-256
-ENDIF
+  ld	hl,ansifont-128
+.got_font_location
 
   ld de,8
 .LFONT
@@ -173,15 +134,17 @@ ENDIF
 .BOLD
   nop	;	rla
   nop	;	or (hl)
-  
-IF PACKEDFONT
+  ld	b,a
+  ld	a,ansifont_is_packed
+  and   a
+  ld    a,b
+  jr    z,INVRS
 .ROLL
   jr INVRS
   rla
   rla
   rla
   rla
-ENDIF
 
 .INVRS
   cpl           ; Set to CPL to disable INVERSE
@@ -197,39 +160,7 @@ ENDIF
 ; end of underlined text handling
 
 .DOTS
-IF A128COL
-  ld b,2
-ENDIF
-IF A80COL
-  ld b,3
-ENDIF
-IF A85COL
-  ld b,3
-ENDIF
-IF A64COL
-  ld b,4
-ENDIF
-IF A51COL
-  ld b,5
-ENDIF
-IF A42COL
-  ld b,6
-ENDIF
-IF A40COL
-  ld b,6
-ENDIF
-IF A36COL
-  ld b,7
-ENDIF
-IF A32COL
-  ld b,8
-ENDIF
-IF A28COL
-  ld b,8
-ENDIF
-IF A24COL
-  ld b,9
-ENDIF
+  ld b,ansicharacter_pixelwidth
 
   call pix_rl
 
@@ -250,41 +181,3 @@ ENDIF
 ; 3 dots: MAX 85 columns Just readable!
 ; 2 dots: MAX 128 columns (useful for ANSI graphics only.. maybe)
 
-.font
-IF PACKEDFONT
-		BINARY  "stdio/ansi/F4PACK.BIN"
-ELSE
-	IF A128COL
-		BINARY  "stdio/ansi/F3.BIN"
-	ENDIF
-	IF A80COL
-		BINARY  "stdio/ansi/F4.BIN"
-	ENDIF
-	IF A85COL
-		BINARY  "stdio/ansi/F4.BIN"
-	ENDIF
-	IF A64COL
-		BINARY  "stdio/ansi/F4.BIN"
-	ENDIF
-	IF A51COL
-		BINARY  "stdio/ansi/F5.BIN"
-	ENDIF
-	IF A42COL
-		BINARY  "stdio/ansi/F6.BIN"
-	ENDIF
-	IF A40COL
-		BINARY  "stdio/ansi/F6.BIN"
-	ENDIF
-	IF A36COL
-		BINARY  "stdio/ansi/F8.BIN"
-	ENDIF
-	IF A32COL
-		BINARY  "stdio/ansi/F8.BIN"
-	ENDIF
-	IF A28COL
-		BINARY  "stdio/ansi/F8.BIN"
-	ENDIF
-	IF A24COL
-		BINARY  "stdio/ansi/F8.BIN"
-	ENDIF
-ENDIF

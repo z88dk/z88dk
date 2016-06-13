@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.10 2016-04-04 18:31:23 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.11 2016-06-13 21:32:53 dom Exp $
 ;
 
 	SECTION	code_clib
@@ -34,51 +34,13 @@
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS	
 
-IF A128COL
-.text_cols   defb 128
-ENDIF
-
-IF A80COL
-.text_cols   defb 80
-ENDIF
-
-IF A85COL
-.text_cols   defb 85
-ENDIF
-
-IF A64COL
-.text_cols   defb 64
-ENDIF
-
-IF A51COL
-.text_cols   defb 51
-ENDIF
-
-IF A42COL
-.text_cols   defb 42
-ENDIF
-
-IF A40COL
-.text_cols   defb 40
-ENDIF
-
-IF A36COL
-.text_cols   defb 36
-ENDIF
-
-IF A32COL
-.text_cols   defb 32
-ENDIF
-
-IF A28COL
-.text_cols   defb 28
-ENDIF
-
-IF A24COL
-.text_cols   defb 24
-ENDIF
-
+	EXTERN	ansicolumns
+.text_cols   defb ansicolumns
 .text_rows   defb 24
+
+	EXTERN	ansicharacter_pixelwidth
+	EXTERN	ansifont_is_packed
+	EXTERN	ansifont
 
 .ansi_CHAR
   ld (char+1),a
@@ -152,23 +114,18 @@ ENDIF
   pop ix
 .char
   ld b,'A'      ; Put here the character to be printed
-
-IF ROMFONT
-  ld hl,15360
-ELSE
-	IF PACKEDFONT
-	  xor	a
-	  rr	b
-	  jr	c,even
-	  ld	a,4
-	.even
-	  ld	(ROLL+1),a
-	  ld	hl,font-128
-	ELSE
-	  ld hl,font-256
-	ENDIF
-ENDIF
-
+  ld a,ansifont_is_packed
+  ld	hl,ansifont - 256
+  and	a
+  jr    z,got_font_location
+	xor	a
+	rr	b
+	jr	c,even
+	ld	a,4
+.even
+	ld	(ROLL+1),a
+	ld	hl,ansifont-128
+.got_font_location
   ld de,8
 
 .LFONT
@@ -188,20 +145,16 @@ ENDIF
   rl (ix+0)
   djnz L1
 .DTS
+  ld a,ansifont_is_packed
+  and  a
+  jr   z,INVRS
   ld a,(hl)
-  
-IF ROMFONT
-	; nothing here !
-ELSE
-	IF PACKEDFONT
-	.ROLL
-	  jr INVRS
+.ROLL
+	jr INVRS
 	  rla
 	  rla
 	  rla
 	  rla
-	ENDIF
-ENDIF
 
 .INVRS
 ;  cpl           ; Set to NOP to disable INVERSE
@@ -217,39 +170,7 @@ ENDIF
 ; end of underlined text handling
 
 .DOTS
-IF A128COL
-  ld b,2
-ENDIF
-IF A80COL
-  ld b,3
-ENDIF
-IF A85COL
-  ld b,3
-ENDIF
-IF A64COL
-  ld b,4
-ENDIF
-IF A51COL
-  ld b,5
-ENDIF
-IF A42COL
-  ld b,6
-ENDIF
-IF A40COL
-  ld b,6
-ENDIF
-IF A36COL
-  ld b,7
-ENDIF
-IF A32COL
-  ld b,8
-ENDIF
-IF A28COL
-  ld b,8
-ENDIF
-IF A24COL
-  ld b,9
-ENDIF
+  ld b,ansicharacter_pixelwidth
 
 .L2
   rla
@@ -284,45 +205,3 @@ ENDIF
 ; 2 dots: MAX 128 columns (useful for ANSI graphics only.. maybe)
 ; Address 15360 for ROM Font
 
-.font
-IF ROMFONT
-	; nothing here !
-ELSE
-	IF PACKEDFONT
-	        BINARY  "stdio/ansi/F4PACK.BIN"
-	ELSE
-		IF A128COL
-			BINARY  "stdio/ansi/F3.BIN"
-		ENDIF
-		IF A80COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A85COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A64COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A51COL
-			BINARY  "stdio/ansi/F5.BIN"
-		ENDIF
-		IF A42COL
-			BINARY  "stdio/ansi/F6.BIN"
-		ENDIF
-		IF A40COL
-			BINARY  "stdio/ansi/F6.BIN"
-		ENDIF
-		IF A36COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A32COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A28COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A24COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-	ENDIF
-ENDIF
