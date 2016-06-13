@@ -44,6 +44,85 @@ IF NEED_ansiterminal
 	defc puts_cons = puts_cons_ansi
 	defc _fputc_cons = fputc_cons_ansi
 	defc _puts_cons = puts_cons_ansi
+
+        PUBLIC ansicolumns
+        PUBLIC ansicharacter_pixelwidth
+        PUBLIC ansifont
+        PUBLIC ansifont_is_packed
+
+        IF !DEFINED_ansicolumns
+             defc ansicolumns = 64
+        ENDIF
+
+	IF (ansicolumns = 128)
+	    defc ansicharacter_pixelwidth = 2
+            EXTERN ansifont_f4pack
+	    defc ansifont = ansifont_f4pack
+            defc ansifont_is_packed = 1
+	ENDIF
+	IF (ansicolumns = 85)
+	    defc ansicharacter_pixelwidth = 3
+            EXTERN ansifont_f4pack
+	    defc ansifont = ansifont_f4pack
+            defc ansifont_is_packed = 1
+	ENDIF
+	IF (ansicolumns = 80)
+	    defc ansicharacter_pixelwidth = 3
+            EXTERN ansifont_f4pack
+	    defc ansifont = ansifont_f4pack
+            defc ansifont_is_packed = 1
+	ENDIF
+	IF (ansicolumns = 64)
+	    defc ansicharacter_pixelwidth = 4
+            EXTERN ansifont_f4pack
+	    defc ansifont = ansifont_f4pack
+            defc ansifont_is_packed = 1
+	ENDIF
+	IF (ansicolumns = 51)
+	    defc ansicharacter_pixelwidth = 5
+            EXTERN ansifont_f5
+	    defc ansifont = ansifont_f4
+            defc ansifont_is_packed = 0
+	ENDIF
+	IF (ansicolumns = 42)
+	    defc ansicharacter_pixelwidth = 6
+            EXTERN ansifont_f6
+	    defc ansifont = ansifont_f6
+            defc ansifont_is_packed = 0
+	ENDIF
+	IF (ansicolumns = 40)
+	    defc ansicharacter_pixelwidth = 6
+            EXTERN ansifont_f6
+	    defc ansifont = ansifont_f6
+            defc ansifont_is_packed = 0
+	ENDIF
+	IF (ansicolumns = 36)
+	    defc ansicharacter_pixelwidth = 7
+            EXTERN ansifont_f8
+	    defc ansifont = ansifont_f8
+            defc ansifont_is_packed = 0
+	ENDIF
+	IF (ansicolumns = 32)
+	    defc ansicharacter_pixelwidth = 8
+            EXTERN ansifont_f8
+	    defc ansifont = ansifont_f8
+            defc ansifont_is_packed = 0
+	ENDIF
+	IF (ansicolumns = 28)
+	    defc ansicharacter_pixelwidth = 8
+            EXTERN ansifont_f8
+	    defc ansifont = ansifont_f8
+            defc ansifont_is_packed = 0
+	ENDIF
+	IF (ansicolumns = 24)
+	    defc ansicharacter_pixelwidth = 9
+            EXTERN ansifont_f8
+	    defc ansifont = ansifont_f8
+            defc ansifont_is_packed = 0
+	ENDIF
+	; + TODO: ROM FONT on spectrum
+		
+
 ENDIF
 
 ; If it's not been overridden by anybody, lets use the native output
