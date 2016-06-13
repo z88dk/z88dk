@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.37 2016-06-11 20:55:13 dom Exp $ */
+/* $Id: stdio.h,v 1.38 2016-06-13 19:57:10 dom Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -148,10 +148,8 @@ extern int __LIB__ fflush(FILE *);
 
 /* Our new and improved functions!! */
 
-extern FILE __LIB__ *fopen(far char *name, unsigned char *mode) __SMALLCDECL;
-extern FILE __LIB__ *fopen_z88(far char *name, unsigned char *mode, unsigned char *explicit, size_t len) __SMALLCDECL;
-extern FILE __LIB__ *freopen(far char *name, unsigned char *mode, FILE *fp) __SMALLCDECL;
-extern FILE __LIB__ *freopen_z88(far char *n, unsigned char *m, FILE *fp, unsigned char *explicit, size_t len) __SMALLCDECL;
+extern FILE __LIB__ *fopen(char *name, unsigned char *mode) __SMALLCDECL;
+extern FILE __LIB__ *freopen(char *name, unsigned char *mode, FILE *fp) __SMALLCDECL;
 extern FILE __LIB__ *fdopen(int fildes, unsigned char *mode) __SMALLCDECL;
 
 extern int __LIB__ fclose(FILE *fp);
