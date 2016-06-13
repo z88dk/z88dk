@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.3 2008-03-05 20:35:46 dom Exp $
+# $Id: Makefile,v 1.4 2016-06-13 19:55:46 dom Exp $
 
 include ../../Make.config
 
@@ -10,7 +10,6 @@ CFILES = \
 	cpc_openin.c \
 	cpc_openout.c \
 	open.c       \
-	open_z88.c   \
 	read.c       \
 	write.c      \
 	writebyte.c  \

@@ -17,7 +17,7 @@
  *	O_WRONLY = 1    Starts afresh?!?!?
  *	O_APPEND = 256
  *
- *	$Id: open.c,v 1.2 2014-01-20 09:15:31 stefano Exp $
+ *	$Id: open.c,v 1.3 2016-06-13 19:55:47 dom Exp $
  */
 
 #include <fcntl.h>
@@ -29,7 +29,7 @@
 #include <malloc.h>
 
 
-int open(far char *name, int flags, mode_t mode)
+int open(char *name, int flags, mode_t mode)
 {
 struct RND_FILE *myfile;
 int myfile_missing;

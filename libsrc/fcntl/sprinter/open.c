@@ -11,16 +11,40 @@
  *      All others are ignored(!)
  *
  * -----
- * $Id: open.c,v 1.1 2002-10-03 20:07:20 dom Exp $
+ * $Id: open.c,v 1.2 2016-06-13 19:55:48 dom Exp $
  */
 
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
 
-int open(far char *name, int flags, mode_t mode)
+int open(char *name, int flags, mode_t mode)
 {
-	char	buffer[10];	/* Buffer for expansion */
-
-	return (open_z88(name,flags,mode,buffer,9));
+#asm
+        INCLUDE "fileio.def"
+        
+	push	ix
+        ld      ix,2
+        add     ix,sp
+        ld      l,(ix+6)   
+        ld      h,(ix+7)
+	ld	a,(ix+4)
+	ld	c,1
+	and	a		;O_RDONLY
+	jr	z,open_forreal
+	ld	c,2
+	dec	a		;O_WRONLY
+	jr	z,open_forreal
+	ld	c,0
+	dec	a		;O_RDWR
+.open_forreal
+	ld	a,c
+	ld	c,$11		;OPEN
+	rst	$10
+	pop	ix		;restore callers
+	ld	hl,-1
+	ret	c
+	ld	l,a
+	ld	h,0
+#endasm
 }
 

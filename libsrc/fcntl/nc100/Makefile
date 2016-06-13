@@ -2,7 +2,6 @@ include ../../Make.config
 
 CFILES = \
 	lseek.c \
-	open_z88.c \
 	opendir.c
 
 AFILES  = $(CFILES:.c=.asm)

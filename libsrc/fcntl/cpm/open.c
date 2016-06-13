@@ -14,18 +14,56 @@
  *      All others are ignored(!)
  *
  * -----
- * $Id: open.c,v 1.1 2002-01-27 21:28:48 dom Exp $
+ * $Id: open.c,v 1.2 2016-06-13 19:55:47 dom Exp $
  */
 
+#include <cpm.h>
 #include <stdio.h>
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
 
-int open(far char *name, int flags, mode_t mode)
+int open(char *name, int flags, mode_t mode)
 {
-    int fd;
-    char	buffer[10];	/* Buffer for expansion */
+    struct fcb *fc;
+    unsigned char uid,pad;
+    int   fd;
 
-    return ( open_z88(name,flags,mode,buffer,9) );
+    if ( ++flags > U_RDWR )
+		flags = U_RDWR;
 
+    if ( ( fc = getfcb() ) == NULL ) {
+	return -1;
+    }
+
+    if ( setfcb(fc,name) == 0 ) {  /* We had a real file, not a device */
+		if ( flags == U_READ && bdos(CPM_VERS,0) >= 0x30 ) 
+			fc->name[5] |= 0x80;    /* read only mode */
+		uid = getuid();
+		setuid(fc->uid);
+
+		if ( (*(unsigned char *)mode) == 'w' )
+			remove(name);
+
+		if ( bdos(CPM_OPN,fc) == -1 ) {
+			clearfcb(fc);
+			setuid(uid);
+			if ( flags > U_READ ) {  /* If returned error and writer then create */
+			fd = creat(name,0);
+			if ( fd == -1 )
+				return -1;
+			fc = _fcb[fd];
+			fc->use = flags;
+			return fd;
+			}
+			return -1;   /* An error */
+		}
+
+		setuid(uid);
+		fc->use = flags;
+    }
+    fd =  ((fc - &_fcb[0])/sizeof(struct fcb));
+	if ( (*(unsigned char *)mode) == 'a' )
+		lseek(fd,0L,SEEK_END);
+
+    return fd;
 }
 

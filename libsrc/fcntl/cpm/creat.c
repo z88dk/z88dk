@@ -5,7 +5,7 @@
  *
  *  Based on Hitech C library (as usual)
  *
- *  $Id: creat.c,v 1.2 2012-06-13 11:04:29 stefano Exp $
+ *  $Id: creat.c,v 1.3 2016-06-13 19:55:46 dom Exp $
  */
 
 #include <cpm.h>
@@ -13,7 +13,7 @@
 #include <fcntl.h>
 
 
-int creat(far char *nam, mode_t mode)
+int creat(char *nam, mode_t mode)
 {
     struct fcb *fc;
     char       *name;

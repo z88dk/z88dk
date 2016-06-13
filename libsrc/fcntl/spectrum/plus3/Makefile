@@ -1,11 +1,11 @@
 #
 # Makefile for +3 file support
 #
-# $Id: Makefile,v 1.7 2007-06-04 05:54:11 stefano Exp $
+# $Id: Makefile,v 1.8 2016-06-13 19:55:47 dom Exp $
 
 include ../../../Make.config
 
-all:	close.o fabandon.o findhand.o freehand.o open.o open_z88.o \
+all:	close.o fabandon.o findhand.o freehand.o open.o \
 	read.o readbyte.o write.o writebyte.o
 	$(LIBLINKER) -x../../../$(OUTPUT_DIRECTORY)/p3 @p3list
 

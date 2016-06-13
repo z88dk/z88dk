@@ -6,13 +6,13 @@
  *      djm 27/4/99
  *
  * -----
- * $Id: creat.c,v 1.2 2016-03-13 18:14:13 dom Exp $
+ * $Id: creat.c,v 1.3 2016-06-13 19:55:48 dom Exp $
  */
 
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
 
-int creat(far char *name, mode_t mode)
+int creat(char *name, mode_t mode)
 {
 #asm
 	push	ix

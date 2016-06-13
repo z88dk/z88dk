@@ -3,9 +3,9 @@
 ;
 ; Stefano - 5/7/2006
 ;
-; int creat(far char *name, mode_t mode);
+; int creat(char *name, mode_t mode);
 ;
-; $Id: creat.asm,v 1.2 2015-01-21 08:09:27 stefano Exp $
+; $Id: creat.asm,v 1.3 2016-06-13 19:55:48 dom Exp $
 
 		PUBLIC	creat
 		EXTERN	open

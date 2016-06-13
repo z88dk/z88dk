@@ -14,13 +14,13 @@
  *	Open a file for writing - e=4, d=2 (creat)
  *	Open a file for append  - e=2, d=2
  *
- *	$Id: open.c,v 1.7 2016-03-07 13:44:48 dom Exp $
+ *	$Id: open.c,v 1.8 2016-06-13 19:55:48 dom Exp $
  */
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
 #include <spectrum.h>
 
-int open(far char *name, int flags, mode_t mode)
+int open(char *name, int flags, mode_t mode)
 {                                      
 #asm
 	INCLUDE	"p3dos.def"

@@ -14,16 +14,32 @@
  *      All others are ignored(!)
  *
  * -----
- * $Id: open.c,v 1.1 2003-09-12 16:30:43 dom Exp $
+ * $Id: open.c,v 1.2 2016-06-13 19:55:46 dom Exp $
  */
 
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
+#include "cpcfcntl.h"
 
-int open(far char *name, int flags, mode_t mode)
+int open(char *name, int flags, mode_t mode)
 {
-	char	buffer[10];	/* Buffer for expansion */
-
-	return (open_z88(name,flags,mode,buffer,9));
+	switch ( flags ) {
+	case O_RDONLY:
+		if ( cpcfile.in_used )
+			return -1;
+		if ( cpc_openin(name,strlen(name),cpcfile.in_buf) ) {
+			cpcfile.in_used = 1;
+			return 0;	/* File descriptor 0 is read */
+		}
+		return -1; 		/* Other wise just error */
+	case O_WRONLY:
+		if ( cpcfile.out_used )
+			return -1;
+		if ( cpc_openout(name,strlen(name),cpcfile.out_buf) ) {
+			cpcfile.out_used = 1;
+			return 1;	/* File descriptor 1 is write */
+		}
+		return	-1;		/* Otherwise just error */
+	}
+	return	-1;			/* No other modes supported */
 }
-

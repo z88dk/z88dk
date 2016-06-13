@@ -12,7 +12,7 @@
  *	O_WRONLY = 1    Starts afresh?!?!?
  *	O_APPEND = 256
  *
- *	$Id: open.c,v 1.2 2013-05-15 06:45:46 stefano Exp $
+ *	$Id: open.c,v 1.3 2016-06-13 19:55:47 dom Exp $
  */
 
 #include <fcntl.h>
@@ -24,7 +24,7 @@
 char flos_files[sizeof(struct flos_file)*MAX_FLOS_FILES];
 struct flos_file *flos_lastfile;
 
-int open(far char *name, int flags, mode_t mode)
+int open(char *name, int flags, mode_t mode)
 {
 int x;
 struct flos_file *flosfile;

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.7 2008-03-05 20:35:46 dom Exp $
+# $Id: Makefile,v 1.8 2016-06-13 19:55:48 dom Exp $
 
 include ../../Make.config
 
@@ -10,8 +10,6 @@ CFILES = \
 	creat.c      \
 	lseek.c      \
 	open.c       \
-	open_z88.c   \
-	nropen.c     \
 	read.c       \
 	write.c      \
 	writebyte.c  \

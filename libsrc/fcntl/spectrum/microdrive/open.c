@@ -12,7 +12,7 @@
  *	O_WRONLY = 1    Starts afresh?!?!?
  *	O_APPEND = 256
  *
- *	$Id: open.c,v 1.3 2005-03-04 08:24:41 stefano Exp $
+ *	$Id: open.c,v 1.4 2016-06-13 19:55:47 dom Exp $
  */
 
 #include <fcntl.h>
@@ -22,7 +22,7 @@
 #include <malloc.h>
 
 
-int open(far char *name, int flags, mode_t mode)
+int open(char *name, int flags, mode_t mode)
 {
 int if1_filestatus;
 struct M_CHAN *if1_file;

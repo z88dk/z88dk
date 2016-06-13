@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.13 2014-05-27 14:20:49 stefano Exp $
+# $Id: Makefile,v 1.14 2016-06-13 19:55:46 dom Exp $
 
 include ../../Make.config
 
@@ -23,7 +23,6 @@ CFILES = \
 	getfcb.c \
 	lseek.c \
 	open.c \
-	open_z88.c \
 	parsefcb.c \
 	read.c \
 	readbyte.c \

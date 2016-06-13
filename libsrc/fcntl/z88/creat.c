@@ -6,13 +6,13 @@
  *      djm 27/4/99
  *
  * -----
- * $Id: creat.c,v 1.4 2016-03-06 20:36:12 dom Exp $
+ * $Id: creat.c,v 1.5 2016-06-13 19:55:48 dom Exp $
  */
 
 
 #include <fcntl.h>      /* Or is it unistd.h, who knows! */
 
-int creat(far char *name, mode_t mode)
+int creat(char *name, mode_t mode)
 {
 #asm
         INCLUDE "fileio.def"
@@ -21,7 +21,6 @@ int creat(far char *name, mode_t mode)
         add     ix,sp
         ld      e,(ix+4)        ;lower 16 of filename
         ld      d,(ix+5)
-        ld      b,(ix+6)        ;bank for filename
         ld      a,2             ;write starts from the start?!?!?
         ld      hl,-10
         add     hl,sp
