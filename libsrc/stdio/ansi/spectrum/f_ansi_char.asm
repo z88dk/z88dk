@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.11 2016-06-13 21:32:53 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.12 2016-06-13 22:07:53 dom Exp $
 ;
 
 	SECTION	code_clib
@@ -147,8 +147,8 @@
 .DTS
   ld a,ansifont_is_packed
   and  a
-  jr   z,INVRS
   ld a,(hl)
+  jr   z,INVRS
 .ROLL
 	jr INVRS
 	  rla
