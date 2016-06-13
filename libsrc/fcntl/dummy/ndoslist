@@ -4,7 +4,6 @@ fdgetpos
 fdtell
 lseek
 open
-open_z88
 read
 readbyte
 remove
