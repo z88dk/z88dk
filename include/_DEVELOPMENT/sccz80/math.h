@@ -37,6 +37,25 @@
    
 #endif
 
+// XSI EXTENSION
+// temporary : math lib should supply these via func call
+
+#define M_E                    2.718281828459
+#define M_LOG2E                1.442695040889
+#define M_LOG10E               0.4342944819033
+#define M_LN2                  0.693147180560
+#define M_LN10                 2.302585092994
+#define M_PI                   3.141592653590
+#define M_PI_2                 1.570796326795
+#define M_PI_4                 0.7853981633974
+#define M_1_PI                 0.3183098861838
+#define M_2_PI                 0.6366197723676
+#define M_2_SQRTPI             1.128379167096
+#define M_SQRT2                1.414213562373
+#define M_SQRT1_2              0.7071067811865
+
+//
+
 #define FLT_EVAL_METHOD        1
 #define MATH_ERRNO             1
 #define MATH_ERREXCEPT         2
