@@ -6,11 +6,11 @@
 ;    Jun. 2014 -Joaopa, Stefano Bodrato
 ;
 ;
-;    $Id: fputc_cons.asm,v 1.6 2016-05-15 20:15:46 dom Exp $
+;    $Id: fputc_cons.asm,v 1.7 2016-06-16 19:40:21 dom Exp $
 ;
 	
 	SECTION code_clib
-    PUBLIC  fputc_cons_native
+	PUBLIC  fputc_cons_native
 ;
 ; Entry:        char to print
 ;
