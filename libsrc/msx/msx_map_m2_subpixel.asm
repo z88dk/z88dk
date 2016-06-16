@@ -10,14 +10,16 @@
 ;
 ;	Compute mask of a pixel given its number
 ;
-;	$Id: msx_map_m2_subpixel.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_map_m2_subpixel.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_map_m2_subpixel
+	PUBLIC	_msx_map_m2_subpixel
 	
 
 msx_map_m2_subpixel:
+_msx_map_m2_subpixel:
 	
 	ld	a,7
 	and	l

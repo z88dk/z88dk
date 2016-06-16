@@ -8,11 +8,12 @@
 ;
 ;	Get state of a specified joystick number id
 ;
-;	$Id: msx_get_stick.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_get_stick.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_get_stick
+	PUBLIC	_msx_get_stick
 	PUBLIC	_st_dir
 	
 	EXTERN	msxbios
@@ -36,13 +37,15 @@ _st_dir:
 
 
 msx_get_stick:
+_msx_get_stick:
 
 	; __FASTCALL__ : stick id is already in L
+	push	ix
 	ld	a,l
 	ld	ix,GTSTCK
 	call	msxbios
 
 	ld	h,0	
 	ld	l, a
-
+	pop	ix
 	ret

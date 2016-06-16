@@ -5,17 +5,20 @@
 ;
 ;	Fills a VRAM portion with the given value
 ;
-;	$Id: gen_vfill.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: gen_vfill.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
 
+        SECTION code_clib
 	PUBLIC	msx_vfill
+	PUBLIC	_msx_vfill
 	EXTERN     FILVRM
 	
 	INCLUDE	"msx/vdp.inc"
 
 
 msx_vfill:
+_msx_vfill:
 
 	ld      ix,2
 	add     ix,sp

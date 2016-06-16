@@ -6,9 +6,10 @@
 ;	read from joystick port
 ;
 ;
-;	$Id: svi_slstick.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: svi_slstick.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	svi_slstick
 	EXTERN	msx_readpsg
 	

@@ -8,11 +8,12 @@
 ;
 ;	get state of joystick button (trigger) number \a id, true = pressed
 ;
-;	$Id: msx_get_trigger.asm,v 1.6 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_get_trigger.asm,v 1.7 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_get_trigger
+	PUBLIC	_msx_get_trigger
 
 	EXTERN	msxbios
 
@@ -26,12 +27,13 @@ ENDIF
 msx_get_trigger:
 
 	; __FASTCALL__ : stick id is already in L
+	push	ix
 	ld	a,l
 	ld	ix,GTTRIG
 	call	msxbios
 	
 	ld	h,0
 	ld	l,a
-	
+	pop	ix	
 	ret
 

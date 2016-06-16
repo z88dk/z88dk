@@ -5,19 +5,21 @@
 ;
 ;	Transfer count bytes from VRAM to RAM
 ;
-;	$Id: gen_vread.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: gen_vread.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_vread
+	PUBLIC	_msx_vread
 	EXTERN     SETRD
 	
 	INCLUDE	"msx/vdp.inc"
 
 
 msx_vread:
-
-	ld      ix,2
+_msx_vread:
+	push	ix		;save callers ix
+	ld      ix,4
 	add     ix,sp
 
 	ld c, (ix+0)	; count
@@ -44,5 +46,6 @@ rdloop:
 	ld	a,c
 	or	b
 	jr	nz,rdloop
+	pop	ix		;restore callers
 	ret
 

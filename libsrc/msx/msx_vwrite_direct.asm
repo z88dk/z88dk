@@ -8,11 +8,12 @@
 ;
 ;	Transfer count bytes from RAM (current memory page) to VRAM
 ;
-;	$Id: msx_vwrite_direct.asm,v 1.7 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_vwrite_direct.asm,v 1.8 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_vwrite_direct
+	PUBLIC	_msx_vwrite_direct
 	
 	EXTERN     msxbios
 	
@@ -26,8 +27,9 @@ ENDIF
 
 
 msx_vwrite_direct:
-
-        ld      ix,2
+_msx_vwrite_direct:
+	push	ix
+        ld      ix,4
         add     ix,sp
 
 	ld c, (ix+0)	; count
@@ -50,5 +52,6 @@ wrtloop:
 	ld	a,c
 	or	b
 	jr	nz,wrtloop
+	pop	ix
 	ret
 

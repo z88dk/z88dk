@@ -7,16 +7,19 @@
 ;	Sets the value of a VDP register
 ;==============================================================
 ;
-;	$Id: gen_set_vdp_reg.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: gen_set_vdp_reg.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	set_vdp_reg
+	PUBLIC	_set_vdp_reg
 	EXTERN	RG0SAV
 
 	INCLUDE	"msx/vdp.inc"
 
 
 .set_vdp_reg
+._set_vdp_reg
 	ld	hl, 2
 	add	hl, sp
 	

@@ -8,15 +8,18 @@
 ;
 ;	Read the MSX video memory
 ;
-;	$Id: msx_vpeek.asm,v 1.9 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_vpeek.asm,v 1.10 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	msx_vpeek
+	PUBLIC	_msx_vpeek
 	
 	INCLUDE	"msx/vdp.inc"
 
 
 msx_vpeek:
+_msx_vpeek:
 	; (FASTCALL) -> HL = address
 
 	;ld	ix,RDVRM

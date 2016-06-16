@@ -9,9 +9,10 @@
 ;	These perhaps could be optimized when in non-MSXDOS environment.
 ;
 ;
-;	$Id: msxrompage.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msxrompage.asm,v 1.4 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	msxrompage
 	EXTERN	msxbios
 
@@ -36,7 +37,6 @@ msxrompage:
          ld     (H_NMI+1),hl ; JP <routine> in NMI hook
          ex     af,af'
          exx                 ; restore all registers
-
          ld     ix,NMI
          call	msxbios      ; call NMI-hook via NMI entry in ROMBIOS
                              ; NMI-hook will call SUBROM

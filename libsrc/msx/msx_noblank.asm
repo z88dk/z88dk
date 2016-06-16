@@ -6,15 +6,20 @@
 ;
 ;	Enable screen
 ;
-;	$Id: msx_noblank.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_noblank.asm,v 1.5 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	msx_noblank
+	PUBLIC	_msx_noblank
 	EXTERN	msxbios
 	
         INCLUDE "msxbios.def"
 
 msx_noblank:
-
+_msx_noblank:
+	push	ix
 	ld	ix,ENASCR
-	jp	msxbios
+	call	msxbios
+	pop	ix
+	ret

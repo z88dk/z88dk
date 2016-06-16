@@ -6,9 +6,10 @@
 ;	GTTRIG
 ;
 ;
-;	$Id: svi_gttrig.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: svi_gttrig.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	GTTRIG
 	
 	EXTERN	svi_slstick

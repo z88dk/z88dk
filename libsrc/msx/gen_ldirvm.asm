@@ -4,15 +4,18 @@
 ;	FILVRM
 ;
 ;
-;	$Id: gen_ldirvm.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: gen_ldirvm.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	LDIRVM
+	PUBLIC	_LDIRVM
 	EXTERN		SETWRT
 	
 	INCLUDE	"msx/vdp.inc"
 	
 LDIRVM:
+_LDIRVM:
 	ex	de,hl
 	call	SETWRT
 

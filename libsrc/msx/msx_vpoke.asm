@@ -7,16 +7,19 @@
 ;	Improved functions by Rafael de Oliveira Jannone
 ;	Originally released in 2004 for GFX - a small graphics library
 ;
-;	$Id: msx_vpoke.asm,v 1.7 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_vpoke.asm,v 1.8 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	msx_vpoke
+	PUBLIC	_msx_vpoke
 	EXTERN	msxbios
 	
 	INCLUDE	"msx/vdp.inc"
 
 
 msx_vpoke:
+_msx_vpoke:
 
 	pop	bc
 	pop	de

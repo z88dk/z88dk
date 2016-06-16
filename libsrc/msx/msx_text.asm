@@ -6,10 +6,11 @@
 ;
 ;	Switch to text mode
 ;
-;	$Id: msx_text.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_text.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
-
+        SECTION code_clib
 	PUBLIC	msx_text
+	PUBLIC	_msx_text
 	EXTERN	msxbios
 	
 IF FORmsx
@@ -19,5 +20,9 @@ ELSE
 ENDIF
 
 msx_text:
+_msx_text:
+	push	ix
 	ld	ix,TOTEXT
-	jp	msxbios
+	call	msxbios
+	pop	ix
+	ret

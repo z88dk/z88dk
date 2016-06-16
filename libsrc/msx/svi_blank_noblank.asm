@@ -6,16 +6,18 @@
 ;
 ;	Disable screen / Enable screen
 ;
-;	$Id: svi_blank_noblank.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: svi_blank_noblank.asm,v 1.4 2016-06-16 19:30:25 dom Exp $
 ;
-
+        SECTION code_clib
 	PUBLIC	msx_blank
+	PUBLIC	_msx_blank
 	PUBLIC	msx_noblank
 	
         INCLUDE "svi.def"
 
 
 msx_noblank:
+_msx_noblank:
 
 	ld	a,($FE3C+1)	; VDPReg0+1
 	or	@01000000

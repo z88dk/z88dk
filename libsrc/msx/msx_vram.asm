@@ -6,12 +6,15 @@
 ;
 ;	Detects the VRAM size (in KB)
 ;
-;	$Id: msx_vram.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_vram.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	msx_vram
+	PUBLIC	_msx_vram
 	
 msx_vram:
+_msx_vram:
 
 	ld	a,(0FAFCh)		; mode
 	and	@00000110		; extract VRAM size

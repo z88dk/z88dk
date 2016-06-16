@@ -6,11 +6,11 @@
 ;
 ;	Public pattern for variable intensity dither
 ;
-;	$Id: dithpat.asm,v 1.2 2009-01-13 17:52:06 stefano Exp $
+;	$Id: dithpat.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
-
-	XLIB	_dithpat
+	SECTION rodata_clib
+	PUBLIC	_dithpat
 	
 
 _dithpat:

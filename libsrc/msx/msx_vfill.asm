@@ -8,11 +8,12 @@
 ;
 ;	Fills a VRAM portion with the given value
 ;
-;	$Id: msx_vfill.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_vfill.asm,v 1.5 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_vfill
+	PUBLIC	_msx_vfill
 	
 	EXTERN	msxbios
 
@@ -25,8 +26,9 @@ ENDIF
 
 
 msx_vfill:
-	
-        ld      ix,2
+_msx_vfill:
+	push	ix	
+        ld      ix,4
         add     ix,sp
 
 	ld c, (ix+0)	; count
@@ -38,4 +40,6 @@ msx_vfill:
 	ld h, (ix+5)
 
 	ld ix,FILVRM
-	jp msxbios
+	call	msxbios
+	pop	ix
+	ret

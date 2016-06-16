@@ -6,10 +6,12 @@
 ;	read keyboard line for cursor keys + space
 ;
 ;
-;	$Id: svi_kbdstick.asm,v 1.2 2009-06-22 21:44:17 dom Exp $
+;	$Id: svi_kbdstick.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
-	XLIB	svi_kbdstick
+        SECTION code_clib
+	PUBLIC svi_kbdstick
+	PUBLIC _svi_kbdstick
 	
 IF FORmsx
         INCLUDE "msx.def"
@@ -19,6 +21,7 @@ ENDIF
 
 
 svi_kbdstick:
+_svi_kbdstick:
 	di
 	in	a,(PPI_C)
 	and	$f0

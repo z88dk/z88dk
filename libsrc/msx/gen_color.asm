@@ -5,10 +5,12 @@
 ;
 ;	Change the color attributes (MSX style)
 ;
-;	$Id: gen_color.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: gen_color.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	msx_color
+	PUBLIC	_msx_color
 
 	EXTERN	SETWRT
 	EXTERN	set_vdp_reg
@@ -18,7 +20,9 @@
 	INCLUDE	"msx/vdp.inc"
 
 msx_color:
-	ld	ix,0
+_msx_color:
+	push	ix		;save callers
+	ld	ix,2
 	add	ix,sp
 	
 	;ld	a,(SCRMOD)	;SCRMOD
@@ -39,6 +43,7 @@ msx_color:
 	ld      c,7
 	call    set_vdp_reg
 	pop     af
+	pop	ix		;restore callers
 	;ret     nz
 	ret
 

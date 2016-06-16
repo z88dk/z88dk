@@ -6,10 +6,12 @@
 ;
 ;	Change the MSX color attributes
 ;
-;	$Id: msx_color.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_color.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	msx_color
+	PUBLIC	_msx_color
 	EXTERN	msxbios
 	
 IF FORmsx
@@ -22,7 +24,9 @@ ENDIF
 
 
 msx_color:
-	ld	ix,0
+_msx_color:
+	push	ix
+	ld	ix,2
 	add	ix,sp
 	ld	a,(ix+2)	;border
 	ld	(BDRCLR),a
@@ -32,4 +36,6 @@ msx_color:
 	ld	(FORCLR),a
 	ld	a,(0FCAFh)	;SCRMOD
 	ld	ix,CHGCLR
-	jp	msxbios
+	call	msxbios
+	pop	ix
+	ret

@@ -8,16 +8,18 @@
 ;
 ;	set \a value at a given vram address \a addr, merging bits (OR) with the existing value
 ;
-;	$Id: msx_vmerge.asm,v 1.5 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_vmerge.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_vmerge
+	PUBLIC	_msx_vmerge
 	
 	INCLUDE	"msx/vdp.inc"
 
 
 msx_vmerge:
+_msx_vmerge:
 
 	; enter vdp address pointer
 

@@ -7,15 +7,18 @@
 ;	Restore disabled BREAK
 ;
 ;
-;	$Id: msx_breakon.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_breakon.asm,v 1.4 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	msx_breakon
+	PUBLIC	_msx_breakon
 	EXTERN	brksave
 	
         INCLUDE "msxbasic.def"
 
 msx_breakon:
+_msx_breakon:
 	ld	hl,brksave
 	ld	a,(hl)
 	cp	1

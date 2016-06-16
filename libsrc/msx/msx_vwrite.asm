@@ -8,11 +8,12 @@
 ;
 ;	Transfer count bytes from RAM to VRAM (BIOS paged version)
 ;
-;	$Id: msx_vwrite.asm,v 1.8 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_vwrite.asm,v 1.9 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_vwrite
+	PUBLIC	_msx_vwrite
 	
 	EXTERN     msxbios
 	
@@ -24,8 +25,9 @@ ENDIF
 
 
 msx_vwrite:
-
-        ld      ix,2
+_msx_vwrite:
+	push	ix
+        ld      ix,4
         add     ix,sp
 
 	ld c, (ix+0)	; count
@@ -38,5 +40,7 @@ msx_vwrite:
 	ld h, (ix+5)
 	
 	ld	ix,LDIRVM
-	jp	msxbios
+	call	msxbios
+	pop	ix
+	ret
 	

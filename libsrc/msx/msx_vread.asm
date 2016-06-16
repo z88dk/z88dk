@@ -8,11 +8,12 @@
 ;
 ;	Transfer count bytes from VRAM to RAM
 ;
-;	$Id: msx_vread.asm,v 1.6 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_vread.asm,v 1.7 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_vread
+	PUBLIC	_msx_vread
 	
 	EXTERN     msxbios
 	
@@ -27,8 +28,10 @@ ENDIF
 
 
 msx_vread:
+_msx_vread:
+	push	ix
 
-        ld      ix,2
+        ld      ix,4
         add     ix,sp
 
 	ld c, (ix+0)	; count
@@ -56,5 +59,6 @@ rdloop:
 	ld	a,c
 	or	b
 	jr	nz,rdloop
+	pop	ix
 	ret
 

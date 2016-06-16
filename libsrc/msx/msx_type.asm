@@ -6,12 +6,15 @@
 ;
 ;	The int result is 1 or two, depending on the MSX hardware being used
 ;
-;	$Id: msx_type.asm,v 1.4 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_type.asm,v 1.5 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	msx_type
+	PUBLIC	_msx_type
 	
 msx_type:
+_msx_type:
 
 	ld	a,($FAF8)		; running on MSX1?
 	and	a

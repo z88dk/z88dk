@@ -5,16 +5,18 @@
 ;
 ;	set screen mode
 ;
-;	$Id: gen_set_mode.asm,v 1.7 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: gen_set_mode.asm,v 1.8 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_set_mode
+	PUBLIC	_msx_set_mode
 	
 	INCLUDE	"msx/vdp.inc"
 
 
 msx_set_mode:
+_msx_set_mode:
 	ld	a,l
 	and	a
 	jr	z,initxt

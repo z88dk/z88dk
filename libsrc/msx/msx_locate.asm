@@ -10,11 +10,12 @@
 ;
 ;	Move the screen cursor to a given position
 ;
-;	$Id: msx_locate.asm,v 1.6 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msx_locate.asm,v 1.7 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_locate
+	PUBLIC	_msx_locate
 	
 	EXTERN	msxbios
 
@@ -26,6 +27,7 @@ ENDIF
 
 
 msx_locate:
+_msx_locate:
 	
 	pop	bc
 	pop	hl
@@ -34,6 +36,8 @@ msx_locate:
 	push	hl
 	
 	ld	h,e
-
+	push	ix
 	ld	ix,POSIT
-	jp	msxbios
+	call	msxbios
+	pop	ix
+	ret

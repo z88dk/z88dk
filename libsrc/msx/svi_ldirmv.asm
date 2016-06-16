@@ -6,9 +6,10 @@
 ;	LIDRMV
 ;
 ;
-;	$Id: svi_ldirmv.asm,v 1.3 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: svi_ldirmv.asm,v 1.4 2016-06-16 19:30:25 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	LIDRMV
 	
         INCLUDE "svi.def"

@@ -5,19 +5,21 @@
 ;
 ;	Transfer count bytes from RAM to VRAM (BIOS paged version)
 ;
-;	$Id: gen_vwrite.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: gen_vwrite.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	msx_vwrite
+	PUBLIC	_msx_vwrite
 	EXTERN     LDIRVM
 	
 	INCLUDE	"msx/vdp.inc"
 
 
 msx_vwrite:
-
-	ld      ix,2
+_msx_vwrite:
+	push	ix		;save callers
+	ld      ix,4
 	add     ix,sp
 
 	ld c, (ix+0)	; count
@@ -29,5 +31,7 @@ msx_vwrite:
 	ld l, (ix+4)	; source
 	ld h, (ix+5)
 	
-	jp	LDIRVM
+	call	LDIRVM
+	pop	ix	; resotre callers
+	ret
 	
