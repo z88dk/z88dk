@@ -7,12 +7,12 @@
 
 	Set screen to mangled mode (screen 1 + 2)
 	
-	$Id: msx_put_sprite_8.c,v 1.3 2009-04-15 21:00:58 stefano Exp $
+	$Id: msx_put_sprite_8.c,v 1.4 2016-06-16 20:54:24 dom Exp $
 */
 
 #include <msx.h>
 
-void msx_put_sprite_8(unsigned char id, int x, int y, unsigned char handle, unsigned char color) {
+void msx_put_sprite_8(unsigned int id, int x, int y, unsigned int handle, unsigned int color) {
 	sprite_t sp;
 	if (x < 0) {
 		x += 32;

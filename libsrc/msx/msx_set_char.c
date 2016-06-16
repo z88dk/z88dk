@@ -7,13 +7,13 @@
 
 	Set char \a c shape, attributes and color, all in one
 	
-	$Id: msx_set_char.c,v 1.1 2009-01-07 09:50:15 stefano Exp $
+	$Id: msx_set_char.c,v 1.2 2016-06-16 20:54:24 dom Exp $
 */
 
 #include <msx.h>
 
 
-void msx_set_char(char c, void* form, void *attr, unsigned char color, unsigned char place) {
+void msx_set_char(int c, void* form, void *attr, unsigned int color, unsigned int place) {
 	msx_set_char_form(c, form, place);
 	if (attr)
 		msx_set_char_attr(c, attr, place);

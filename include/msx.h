@@ -4,7 +4,7 @@
  * Most of the functions are based on GFX,
  * a small graphics library by Rafael de Oliveira Jannone - (C) 2004
  *
- * $Id: msx.h,v 1.23 2015-01-22 11:13:36 stefano Exp $
+ * $Id: msx.h,v 1.24 2016-06-16 20:54:11 dom Exp $
  */
 
 #ifndef __MSX_H__
@@ -21,13 +21,13 @@
 // Video related functions
 
 // Set the screen mode
-extern void __LIB__ __FASTCALL__ msx_screen(int mode);
+extern void __LIB__ __FASTCALL__ msx_screen(int mode) __SMALLCFASTCALL;
 
 // Get the screen mode
 extern int __LIB__ msx_screenmode();
 
 // Set the screen mode (alternate method)
-extern void __LIB__ __FASTCALL__ msx_set_mode(int mode);
+extern void __LIB__ __FASTCALL__ msx_set_mode(int mode) __SMALLCFASTCALL;
 
 // Video modes for set_mode
 
@@ -74,40 +74,40 @@ enum screen_map {
 // mangled mode chars
 
 // Set char \a c shape, from \a form, at the given screen map \a place
-extern void __LIB__ msx_set_char_form(char c, void* form, unsigned char place);
+extern void __LIB__ msx_set_char_form(int c, void* form, unsigned int place) __SMALLCDECL;
 
 // Set char \a c attributes, from \a attr, at the given screen map \a place
-extern void __LIB__ msx_set_char_attr(char c, void *attr, unsigned char place);
+extern void __LIB__ msx_set_char_attr(int c, void *attr, unsigned int place) __SMALLCDECL;
 
 // Set char \a c with \a color, at the given screen map \a place
-extern void __LIB__ msx_set_char_color(char c, unsigned char color, unsigned char place);
+extern void __LIB__ msx_set_char_color(int c, unsigned int color, unsigned int place) __SMALLCDECL;
 
 // Set char \a c shape, attributes and color, all in one
-extern void __LIB__ msx_set_char(char c, void* form, void *attr, unsigned char color, unsigned char place);
+extern void __LIB__ msx_set_char(int c, void* form, void *attr, unsigned int color, unsigned int place) __SMALLCDECL;
 
 
 
 // VRAM read
-extern int __LIB__ __FASTCALL__ msx_vpeek(int address);
+extern int __LIB__ __FASTCALL__ msx_vpeek(int address) __SMALLCFASTCALL;
 
 // VRAM block read
-extern void __LIB__ msx_vread(unsigned int source, char* dest, unsigned int count);
+extern void __LIB__ msx_vread(unsigned int source, char* dest, unsigned int count) __SMALLCDECL;
 
 // VRAM write
-extern void __LIB__ msx_vpoke(int address, int value);
+extern void __LIB__ msx_vpoke(int address, int value) __SMALLCDECL;
 
 // VRAM block write
-extern void __LIB__ msx_vwrite(void* source, unsigned int dest, unsigned int count);
-extern void __LIB__ msx_vwrite_direct(void* source, unsigned int dest, unsigned int count);
+extern void __LIB__ msx_vwrite(void* source, unsigned int dest, unsigned int count) __SMALLCDECL;
+extern void __LIB__ msx_vwrite_direct(void* source, unsigned int dest, unsigned int count) __SMALLCDECL;
 
 // VRAM fill
-extern void __LIB__ msx_vfill(unsigned int addr, unsigned char value, unsigned int count);
+extern void __LIB__ msx_vfill(unsigned int addr, unsigned int value, unsigned int count) __SMALLCDECL;
 
 // VRAM vertical fill
-extern void __LIB__ msx_vfill_v(unsigned int addr, unsigned char value, unsigned char count);
+extern void __LIB__ msx_vfill_v(unsigned int addr, unsigned int value, unsigned int count) __SMALLCDECL;
 
 // set \a value at a given VRAM address \a addr, merging bits (OR) with the existing value
-extern void __LIB__ msx_vmerge(unsigned int addr, unsigned char value);
+extern void __LIB__ msx_vmerge(unsigned int addr, unsigned int value) __SMALLCDECL;
 
 // screen 2 section bytecount
 #define MODE2_MAX	6144
@@ -122,21 +122,21 @@ extern void __LIB__ msx_vmerge(unsigned int addr, unsigned char value);
 #define MODE2_HEIGHT	192
 
 // Set a VDP register with a value
-extern void __LIB__ set_vdp_reg(int reg, int value);
+extern void __LIB__ set_vdp_reg(int reg, int value) __SMALLCDECL;
 #define msx_set_vdp(reg, value) set_vdp_reg(reg, value)
 
 // Get a value from a VDP register
-extern unsigned char __LIB__ __FASTCALL__ get_vdp_reg(unsigned char);
+extern unsigned int __LIB__ __FASTCALL__ get_vdp_reg(int) __SMALLCFASTCALL;
 #define msx_get_vdp(reg) get_vdp_reg(reg)
 
 // Set point at the given position on VRAM
-//extern void __LIB__ msx_pset(int x, int y);
+//extern void __LIB__ msx_pset(int x, int y) __SMALLCDECL;
 
 // Switch to text mode
 extern void __LIB__ msx_text();
 
 // Move the screen cursor to a given position
-extern void __LIB__ msx_locate(unsigned char x, unsigned char y);
+extern void __LIB__ msx_locate(unsigned int x, unsigned int y) __SMALLCDECL;
 
 // Disable screen
 extern void __LIB__ msx_blank();
@@ -145,7 +145,7 @@ extern void __LIB__ msx_blank();
 extern void __LIB__ msx_noblank();
 
 // Change the MSX color attributes
-extern int __LIB__ msx_color(int foreground, int background, int border);
+extern int __LIB__ msx_color(int foreground, int background, int border) __SMALLCDECL;
 
 #define TRANSPARENT    0x00
 #define BLACK          0x01
@@ -175,12 +175,12 @@ extern int __LIB__ msx_color(int foreground, int background, int border);
 
 /// maps a block in the screen 2 model
 //xdefine map_block(x,y)	((((y) & ~(7)) << 5) + ((x) & ~(7)))
-extern int __LIB__ msx_map_m2_block(int x, int y);
+extern int __LIB__ msx_map_m2_block(int x, int y) __SMALLCDECL;
 #define map_block(x,y)	msx_map_m2_block(x,y)
 
 /// maps a pixel coordinate to a vram address
 //xdefine map_pixel(x,y)	(map_block(x,y) + ((y) & 7))
-extern int __LIB__ msx_map_m2_pixel(int x, int y);
+extern int __LIB__ msx_map_m2_pixel(int x, int y) __SMALLCDECL;
 #define map_pixel(x,y)	msx_map_m2_pixel(x,y)
 
 /*
@@ -198,7 +198,7 @@ extern int __LIB__ msx_map_m2_pixel(int x, int y);
 
 /// maps the subpixel (bit) inside the vram byte
 #define map_subpixel(x)	(128 >> ((x) & 7))
-//extern int __LIB__ __FASTCALL__ msx_map_m2_subpixel(int x);
+//extern int __LIB__ __FASTCALL__ msx_map_m2_subpixel(int x) __SMALLCFASTCALL;
 //xdefine map_subpixel(x)	msx_map_m2_subpixel(x)
 
 /************************************************************************/
@@ -236,14 +236,14 @@ typedef struct {
 #define destroy_lookup_tables() asm("\n");
 
 
-extern void __LIB__ msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to);
-extern void __LIB__ msx_blit_ram_vram(unsigned char* source, unsigned int dest, unsigned char w, unsigned char h, int sjmp, int djmp);
-extern void __LIB__ msx_blit_fill_vram(unsigned int dest, unsigned char value, unsigned char w, unsigned char h, int djmp);
+extern void __LIB__ msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to) __SMALLCDECL;
+extern void __LIB__ msx_blit_ram_vram(unsigned char* source, unsigned int dest, unsigned int w, unsigned int h, int sjmp, int djmp) __SMALLCDECL;
+extern void __LIB__ msx_blit_fill_vram(unsigned int dest, unsigned int value, unsigned int w, unsigned int h, int djmp) __SMALLCDECL;
 
 // Hardware sprite related functions
 
 // Set the sprite mode
-extern void __LIB__ msx_set_sprite_mode(unsigned char mode);
+extern void __LIB__ msx_set_sprite_mode(unsigned int mode);
 
 // Sprite modes
 enum sprite_mode {
@@ -253,23 +253,23 @@ enum sprite_mode {
 };
 
 // Set the sprite handle with the shape from data (small size)
-extern void __LIB__ msx_set_sprite_8(unsigned char handle, void* data);
+extern void __LIB__ msx_set_sprite_8(unsigned int handle, void* data) __SMALLCDECL;
 
 // Set the sprite handle, with the shape from data (big size)
-extern void __LIB__ msx_set_sprite_16(unsigned char handle, void* data);
+extern void __LIB__ msx_set_sprite_16(unsigned int handle, void* data) __SMALLCDECL;
 
 // Put the sprite with id and shape from handle, into the given position with color (small size)
-extern void __LIB__ msx_put_sprite_8(unsigned char id, int x, int y, unsigned char handle, unsigned char color);
+extern void __LIB__ msx_put_sprite_8(unsigned int id, int x, int y, unsigned int handle, unsigned int color) __SMALLCDECL;
 	
 // Put the sprite with id and shape from handle, into the given position with color (big size)
-extern void __LIB__ msx_put_sprite_16(unsigned char id, int x, int y, unsigned char handle, unsigned char color);
+extern void __LIB__ msx_put_sprite_16(unsigned int id, int x, int y, unsigned int handle, unsigned int color) __SMALLCDECL;
 
 // Sprite data
 typedef struct {
-        unsigned char y;	///< Y position
-        unsigned char x;	///< X position
-        unsigned char handle;	///< internal vdp handle
-        unsigned char color;	///< sprite color
+        unsigned int y;	///< Y position
+        unsigned int x;	///< X position
+        unsigned int handle;	///< internal vdp handle
+        unsigned int color;	///< sprite color
 } sprite_t;
 
 
@@ -277,12 +277,12 @@ typedef struct {
 // Joystick related stuff
 
 // Get state of joystick number \a id
-extern int __FASTCALL__ __LIB__ msx_get_stick(unsigned char id);
+extern int __FASTCALL__ __LIB__ msx_get_stick(unsigned int id);
 
 // Get state of joystick button (trigger) number \a id, true = pressed
-extern int __FASTCALL__ __LIB__ msx_get_trigger(unsigned char id);
+extern int __FASTCALL__ __LIB__ msx_get_trigger(unsigned int id);
 
-extern unsigned char st_dir[];
+extern unsigned int st_dir[];
 
 enum stick_direction {
 	st_up = 1,
@@ -358,7 +358,7 @@ typedef struct {
 #define surface_line(s,x1,y1,x2,y2) surface_draw(s,x1,y1,x2,y2)
 
 /* Render an area in a specified buffer (in surface), with the specified dither intensity (0..11) */
-extern __LIB__ surface_stencil_render(surface_t *s, unsigned char *stencil, unsigned char intensity);
+extern __LIB__ surface_stencil_render(surface_t *s, unsigned char *stencil, unsigned int intensity) __SMALLCDECL;
 
 // Draw a line on video
 #define line(x1,y1,x2,y2) draw(x1,y1,x2,y2) 
@@ -367,17 +367,17 @@ extern __LIB__ surface_stencil_render(surface_t *s, unsigned char *stencil, unsi
 #define line_slow(x1,y1,x2,y2) draw(x1,y1,x2,y2) 
 
 // Draw a line on a surface
-extern void __LIB__ surface_draw(surface_t *s, int x1, int y1, int x2, int y2);
+extern void __LIB__ surface_draw(surface_t *s, int x1, int y1, int x2, int y2) __SMALLCDECL;
 
 // Draw a circle on a surface
-extern void __LIB__ surface_circle(surface_t *s, int x, int y, int radius, int skip);
+extern void __LIB__ surface_circle(surface_t *s, int x, int y, int radius, int skip) __SMALLCDECL;
 
 /// render object obj with flat-shading, requires a normalized source of light
 //extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vector_t* pbuffer, int* low, int* high, vector_t* light);
-extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vector_t* pbuffer, char* stencil, vector_t* light);
+extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vector_t* pbuffer, char* stencil, vector_t* light) __SMALLCDECL;
 
 /// render object obj with wireframes
-extern void __LIB__ object_render_wireframe(surface_t* s, object_t* obj, vector_t* pbuffer);
+extern void __LIB__ object_render_wireframe(surface_t* s, object_t* obj, vector_t* pbuffer) __SMALLCDECL;
 
 
 

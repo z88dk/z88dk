@@ -7,12 +7,12 @@
 
 	Blit - Under development
 	
-	$Id: msx_blit_fill_vram.c,v 1.1 2009-01-07 09:50:15 stefano Exp $
+	$Id: msx_blit_fill_vram.c,v 1.2 2016-06-16 20:54:24 dom Exp $
 */
 
 #include <msx.h>
 
-void msx_blit_fill_vram(unsigned int dest, unsigned char value, unsigned char w, unsigned char h, int djmp) {
+void msx_blit_fill_vram(unsigned int dest, unsigned int value, unsigned int w, unsigned int h, int djmp) {
 	while (h--) {
 		msx_vfill(dest, value, w);
 		dest += djmp;		

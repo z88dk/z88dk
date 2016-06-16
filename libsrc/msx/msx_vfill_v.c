@@ -7,12 +7,12 @@
 
 	Move the screen cursor to a given position
 	
-	$Id: msx_vfill_v.c,v 1.1 2009-01-07 09:50:15 stefano Exp $
+	$Id: msx_vfill_v.c,v 1.2 2016-06-16 20:54:25 dom Exp $
 */
 
 #include <msx.h>
 
-void msx_vfill_v(unsigned int addr, unsigned char value, unsigned char count) {
+void msx_vfill_v(unsigned int addr, unsigned int value, unsigned int count) {
 	unsigned int diff;
 
 	diff = addr & 7;

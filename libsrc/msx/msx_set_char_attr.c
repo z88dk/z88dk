@@ -7,13 +7,13 @@
 
 	Set char \a c attributes, from \a attr, at the given screen map \a place
 	
-	$Id: msx_set_char_attr.c,v 1.3 2009-04-15 21:00:58 stefano Exp $
+	$Id: msx_set_char_attr.c,v 1.4 2016-06-16 20:54:24 dom Exp $
 */
 
 #include <msx.h>
 
 
-void msx_set_char_attr(char c, void *attr, unsigned char place) {
+void msx_set_char_attr(int c, void *attr, unsigned int place) {
 	unsigned int addr = c;
 	addr <<= 3;
 	addr += MODE2_ATTR;
