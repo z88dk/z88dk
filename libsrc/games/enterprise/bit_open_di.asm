@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.4 2016-06-11 20:52:25 dom Exp $
+; $Id: bit_open_di.asm,v 1.5 2016-06-16 19:33:59 dom Exp $
 ;
 ; Enterprise 64/128 1 bit sound functions
 ;
@@ -9,7 +9,7 @@
 
 
     PUBLIC     bit_open_di
-    EXTERN     snd_tick
+    EXTERN     __snd_tick
     EXTERN     __bit_irqstatus
 
     INCLUDE  "games/games.inc"
@@ -26,5 +26,5 @@
         
 		ld      a,@00001000	; Set D/A mode on left channel
 		out     ($A7),a
-        ld  a,(snd_tick)
+        ld  a,(__snd_tick)
         ret

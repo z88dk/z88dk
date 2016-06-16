@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.7 2016-06-11 20:52:25 dom Exp $
+; $Id: bit_open_di.asm,v 1.8 2016-06-16 19:33:59 dom Exp $
 ;
 ; TI calculator "Infrared port" 1 bit sound functions stub
 ;
@@ -9,7 +9,7 @@
 
     PUBLIC     bit_open_di
     EXTERN     __bit_irqstatus
-    EXTERN     snd_tick
+    EXTERN     __snd_tick
     
 .bit_open_di
         ld a,i		; get the current status of the irq line
@@ -40,7 +40,7 @@ IF FORti86
         out	(7),a
 ENDIF
 
-        ld   (snd_tick),a
+        ld   (__snd_tick),a
 
 	ret
 

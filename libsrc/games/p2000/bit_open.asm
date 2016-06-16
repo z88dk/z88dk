@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+; $Id: bit_open.asm,v 1.3 2016-06-16 19:33:59 dom Exp $
 ;
 ; Philips P2000 1 bit sound functions
 ;
@@ -10,9 +10,9 @@
 ;
 
     PUBLIC     bit_open
-    EXTERN     snd_tick
+    EXTERN     __snd_tick
 
 .bit_open
           ld   a,1
-          ld   (snd_tick),a
+          ld   (__snd_tick),a
           ret

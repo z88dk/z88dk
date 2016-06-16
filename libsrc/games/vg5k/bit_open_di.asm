@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.3 2016-06-11 20:52:26 dom Exp $
+; $Id: bit_open_di.asm,v 1.4 2016-06-16 19:33:59 dom Exp $
 ;
 ; VG-5000 1 bit sound functions
 ;
@@ -7,13 +7,16 @@
 ; Stefano Bodrato - 2014
 ;
 
+        SECTION code_clib
     PUBLIC     bit_open_di
-    EXTERN     snd_tick
+    PUBLIC     _bit_open_di
+    EXTERN     __snd_tick
     EXTERN     __bit_irqstatus
 
     INCLUDE  "games/games.inc"
     
 .bit_open_di
+._bit_open_di
         
         ld a,i		; get the current status of the irq line
         di
@@ -24,5 +27,5 @@
         pop hl
         
         ld a,8
-        ld	(snd_tick),a
+        ld	(__snd_tick),a
         ret

@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.8 2016-06-11 20:52:26 dom Exp $
+; $Id: bit_open_di.asm,v 1.9 2016-06-16 19:34:00 dom Exp $
 ;
 ; Z88 1 bit sound functions
 ;
@@ -16,7 +16,7 @@
     EXTERN     __bit_irqstatus
 
     EXTERN     snd_asave
-    EXTERN     snd_tick
+    EXTERN     __snd_tick
 
 .bit_open_di
 ._bit_open_di
@@ -33,5 +33,5 @@
           and  63
           ld   ($4B0),a
           out  ($B0),a
-          ld   (snd_tick),a
+          ld   (__snd_tick),a
           ret

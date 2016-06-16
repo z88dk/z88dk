@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.4 2016-06-11 20:52:26 dom Exp $
+; $Id: bit_open_di.asm,v 1.5 2016-06-16 19:33:59 dom Exp $
 ;
 ; TRS-80 1 bit sound functions
 ;
@@ -8,7 +8,7 @@
 ;
 
     PUBLIC     bit_open_di
-    EXTERN     snd_tick
+    EXTERN     __snd_tick
     EXTERN     __bit_irqstatus
 
     INCLUDE  "games/games.inc"
@@ -24,6 +24,6 @@
         pop hl
         
           ld   a,1
-          ld   (snd_tick),a
+          ld   (__snd_tick),a
 
         ret

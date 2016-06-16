@@ -1,4 +1,4 @@
-; $Id: bit_open_di.asm,v 1.8 2016-06-11 20:52:25 dom Exp $
+; $Id: bit_open_di.asm,v 1.9 2016-06-16 19:33:59 dom Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -8,7 +8,7 @@
 ;
     SECTION    code_clib
     PUBLIC     bit_open_di
-    EXTERN     snd_tick
+    EXTERN     __snd_tick
     EXTERN     __bit_irqstatus
 
     INCLUDE  "games/games.inc"
@@ -31,9 +31,9 @@
         or	8
         push de
         ld	e,a
-        ld  a,(snd_tick)
+        ld  a,(__snd_tick)
         and sndbit_mask
         or e
         pop de
-        ld	(snd_tick),a
+        ld	(__snd_tick),a
         ret

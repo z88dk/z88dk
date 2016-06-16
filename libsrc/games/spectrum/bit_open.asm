@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.7 2016-06-10 21:37:10 dom Exp $
+; $Id: bit_open.asm,v 1.8 2016-06-16 19:33:59 dom Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -12,7 +12,7 @@
     SECTION    code_clib
     PUBLIC     bit_open
     PUBLIC     _bit_open
-    EXTERN     snd_tick
+    EXTERN     __snd_tick
 
 .bit_open
 ._bit_open
@@ -24,9 +24,9 @@
         or	8
         push de
         ld	e,a
-        ld  a,(snd_tick)
+        ld  a,(__snd_tick)
         and sndbit_mask
         or e
         pop de
-        ld	(snd_tick),a
+        ld	(__snd_tick),a
 	  ret

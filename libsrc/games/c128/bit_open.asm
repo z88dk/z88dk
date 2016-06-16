@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
+; $Id: bit_open.asm,v 1.4 2016-06-16 19:33:59 dom Exp $
 ;
 ; TRS-80 1 bit sound functions
 ;
@@ -8,7 +8,7 @@
 ;
 
     PUBLIC     bit_open
-    EXTERN     snd_tick
+    EXTERN     __snd_tick
 
 .bit_open
 ;-----

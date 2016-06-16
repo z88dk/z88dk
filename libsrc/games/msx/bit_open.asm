@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+; $Id: bit_open.asm,v 1.3 2016-06-16 19:33:59 dom Exp $
 ;
 ; MSX bit sound functions
 ;
@@ -8,7 +8,7 @@
 ;
 
     PUBLIC     bit_open
-    EXTERN     snd_tick
+    EXTERN     __snd_tick
 
 ;Port 0AAh, PPI Port C - Keyboard Row,LED,Cassette (Read/Write)
 ;  Bit  Name   Expl.
@@ -21,5 +21,5 @@
  
 .bit_open
           ld    a,@11110000
-          ld   (snd_tick),a
+          ld   (__snd_tick),a
           ret
