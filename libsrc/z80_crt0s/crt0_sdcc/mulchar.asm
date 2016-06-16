@@ -26,6 +26,7 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
+        SECTION code_l_sdcc
 	PUBLIC __muluchar_rrx_s
 	PUBLIC __mulsuchar_rrx_s
 	PUBLIC __muluschar_rrx_s

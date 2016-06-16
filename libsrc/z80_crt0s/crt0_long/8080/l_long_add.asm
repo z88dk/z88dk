@@ -2,10 +2,11 @@
 ;       Long functions
 ;	"8080" mode
 ;	Stefano - 29/4/2002
-;	$Id: l_long_add.asm,v 1.2 2002-05-02 07:56:02 stefano Exp $
+;	$Id: l_long_add.asm,v 1.3 2016-06-16 20:31:05 dom Exp $
 ;
 
-	XLIB    l_long_add
+                SECTION   code_crt0_sccz80
+		PUBLIC	l_long_add
 
 
 ;primary = secondary + primary

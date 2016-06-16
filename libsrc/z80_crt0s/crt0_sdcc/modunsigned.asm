@@ -25,7 +25,7 @@
 ;  not however invalidate any other reasons why the executable file
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
-
+        SECTION code_l_sdcc
 	PUBLIC __moduchar_rrx_s
 	PUBLIC __moduchar_rrx_hds
 	PUBLIC __moduint_rrx_s

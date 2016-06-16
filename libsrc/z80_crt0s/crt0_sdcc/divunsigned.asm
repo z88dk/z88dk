@@ -27,7 +27,7 @@
 ;--------------------------------------------------------------------------
 
         ;; Originally from GBDK by Pascal Felber.
-
+        SECTION code_l_sdcc
 	PUBLIC __divuint_rrx_s
 	PUBLIC __divuchar_rrx_s
 	PUBLIC __divuchar_rrx_hds

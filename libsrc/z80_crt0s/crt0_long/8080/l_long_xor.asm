@@ -4,7 +4,8 @@
 ;	Stefano - 29/4/2002
 ;
 
-                XLIB    l_long_xor
+                SECTION   code_crt0_sccz80
+                PUBLIC l_long_xor
 
 ;Logical routines for long functions    dehl
 ;first opr on stack

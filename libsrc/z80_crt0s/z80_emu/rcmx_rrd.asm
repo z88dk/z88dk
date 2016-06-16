@@ -2,6 +2,7 @@
 ; Substitute for z80 rrd instruction
 ; aralbrec 06.2007
 
+SECTION code_crt0_sccz80
 PUBLIC rcmx_rrd
 
 .rcmx_rrd

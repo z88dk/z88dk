@@ -26,6 +26,7 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
+        SECTION code_l_sdcc
 	PUBLIC __modschar_rrx_s
 	PUBLIC __modschar_rrx_hds
 	EXTERN  __div8

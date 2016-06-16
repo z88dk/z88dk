@@ -9,7 +9,8 @@
 ;       This routine is used to push longs on the stack for a 
 ;       call to a function defined as a pointer.
 
-                XLIB    lpush2
+                SECTION   code_crt0_sccz80
+                PUBLIC lpush2
 
 .lpush2 pop	bc
 	ld	(retloc+1),bc

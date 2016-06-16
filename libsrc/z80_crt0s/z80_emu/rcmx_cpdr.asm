@@ -3,6 +3,7 @@
 ; aralbrec 02.2008
 ; flag-perfect emulation of cpdr
 
+SECTION code_crt0_sccz80
 PUBLIC rcmx_cpdr
 
 .rcmx_cpdr

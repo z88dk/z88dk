@@ -1,13 +1,12 @@
 ;
 ;       Replacement for "exx"
 ;
-;       $Id: exxswap.asm,v 1.2 2014-04-26 00:03:52 pauloscustodio Exp $:
+;       $Id: exxswap.asm,v 1.3 2016-06-16 20:31:05 dom Exp $:
+
+		SECTION		code_crt0_sccz80
+		SECTION 	exxswap
 
 
-		PUBLIC	exxswap
-
-
-.altregs   defs   6
 
 .exxswap
         push	hl
@@ -29,3 +28,6 @@
 
         pop	hl
 	ret
+
+		SECTION		bss_crt
+.altregs   defs   6

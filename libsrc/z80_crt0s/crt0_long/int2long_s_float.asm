@@ -2,6 +2,7 @@
 ;
 ;       Convert signed int to long
 
+                SECTION   code_crt0_sccz80
                 PUBLIC    l_int2long_s_float
                 EXTERN		float
 

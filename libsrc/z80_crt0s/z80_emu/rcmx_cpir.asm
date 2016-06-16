@@ -3,6 +3,7 @@
 ; aralbrec 02.2008
 ; flag-perfect emulation of cpir
 
+SECTION code_crt0_sccz80
 PUBLIC rcmx_cpir
 
 .rcmx_cpir

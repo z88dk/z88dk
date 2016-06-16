@@ -1,13 +1,12 @@
 ;
 ;       Replacement for "ex af,af"
 ;
-;       $Id: afswap.asm,v 1.2 2014-04-26 00:03:52 pauloscustodio Exp $:
+;       $Id: afswap.asm,v 1.3 2016-06-16 20:31:05 dom Exp $:
 
-
+		SECTION code_crt0_sccz80
 		PUBLIC	afswap
 
 
-.af1	defw	0
 
 .afswap
         ;EX      AF,AF'
@@ -19,3 +18,6 @@
         pop	af
         pop	hl
 	ret
+
+	SECTION		bss_crt
+.af1	defw	0

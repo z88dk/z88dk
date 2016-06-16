@@ -2,7 +2,8 @@
 ;       case statement.. "8080" mode
 ;	Stefano - 29/4/2002
 
-        XLIB    l_long_case
+                SECTION   code_crt0_sccz80
+        PUBLIC l_long_case
 
 
 ;Case statement for longs
