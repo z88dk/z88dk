@@ -8,12 +8,13 @@
 ;       Reset pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.1 2015-10-09 13:02:43 stefano Exp $
+;	$Id: respixl.asm,v 1.2 2016-06-16 19:38:12 dom Exp $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
+		        SECTION code_clib
 			PUBLIC	respixel
 
 			EXTERN	div3
