@@ -2,14 +2,16 @@
 ;	ZX81 game device library
 ;	Stefano Bodrato - Dec. 2014
 ;
-;	$Id: joystick.asm,v 1.4 2015-01-19 01:32:45 pauloscustodio Exp $
+;	$Id: joystick.asm,v 1.5 2016-06-16 20:23:52 dom Exp $
 ;
 
-
+    SECTION code_clib
     PUBLIC   joystick
+    PUBLIC   _joystick
     EXTERN    restore81
 
 .joystick
+._joystick
 	;__FASTALL__ : joystick no. in HL
 		
 	ld	a,l

@@ -2,14 +2,17 @@
 ;	Game device library for the ZX Spectrum
 ;	Stefano Bodrato - 20/8/2001
 ;
-;	$Id: joystick.asm,v 1.4 2009-06-22 21:44:17 dom Exp $
+;	$Id: joystick.asm,v 1.5 2016-06-16 20:23:52 dom Exp $
 ;
 
 	INCLUDE	"zxvgs.def"
 
-        XLIB    joystick
+        SECTION code_clib
+        PUBLIC  joystick
+        PUBLIC  _joystick
 
 .joystick
+._joystick
 	;__FASTALL__ : joystick no. in HL
 		
 	ld	a,l

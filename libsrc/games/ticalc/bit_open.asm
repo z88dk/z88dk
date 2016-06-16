@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.3 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: bit_open.asm,v 1.4 2016-06-16 20:23:52 dom Exp $
 ;
 ; TI calculator "Infrared port" 1 bit sound functions stub
 ;
@@ -7,9 +7,12 @@
 ; Stefano Bodrato - 24/10/2001
 ;
 
+    SECTION code_clib
     PUBLIC     bit_open
+    PUBLIC     _bit_open
 
 .bit_open
+._bit_open
 
 IF FORti82
         ld      a,@11000000	; Set W1 and R1

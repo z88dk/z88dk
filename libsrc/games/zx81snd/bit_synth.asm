@@ -1,4 +1,4 @@
-; $Id: bit_synth.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: bit_synth.asm,v 1.3 2016-06-16 20:23:52 dom Exp $
 ;
 ; void bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4);
 ;
@@ -13,15 +13,18 @@
 ; This routine shouldn't stay in contended memory locations !!
 ;
 
+	  SECTION code_clib
           PUBLIC     bit_synth
+          PUBLIC     _bit_synth
           INCLUDE  "games/games.inc"
 
           EXTERN      bit_open_di
           EXTERN      bit_close_ei
 
 .bit_synth
-
-          ld      ix,2
+._bit_synth
+	  push    ix		;save callers ix
+          ld      ix,4
           add     ix,sp
           ld      a,(ix+8)
           ld      (LEN+1),a
@@ -140,5 +143,5 @@
           jr      nz,loop2
           djnz    loop
           call	bit_close_ei
-
+          pop 	ix		;restore callers
           ret

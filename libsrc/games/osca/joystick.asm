@@ -4,15 +4,18 @@
 ;
 ;    --fFUDLR 	Stick bit pattern (nc, nc, fire2, fire1, up, down, left, right)
 ;
-;	$Id: joystick.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: joystick.asm,v 1.3 2016-06-16 20:23:51 dom Exp $
 ;
 
+	SECTION code_clib
         PUBLIC    joystick
+        PUBLIC    _joystick
 
         INCLUDE "flos.def"
         INCLUDE "osca.def"
 
 .joystick
+._joystick
 	;__FASTCALL__ : joystick no. in HL
 		
 	ld	a,l

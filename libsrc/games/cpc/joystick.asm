@@ -2,15 +2,18 @@
 ;	Game device library for the Amstrad CPC
 ;	Stefano Bodrato - May 2008
 ;
-;	$Id: joystick.asm,v 1.4 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: joystick.asm,v 1.5 2016-06-16 20:23:51 dom Exp $
 ;
 
 
+        SECTION code_clib
         PUBLIC    joystick
+        PUBLIC    _joystick
 
         INCLUDE "cpcfirm.def"
 
 .joystick
+._joystick
 	;__FASTALL__ : joystick no. in HL
 		
 	ld	a,l

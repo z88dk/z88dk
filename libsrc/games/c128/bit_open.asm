@@ -1,4 +1,4 @@
-; $Id: bit_open.asm,v 1.4 2016-06-16 19:33:59 dom Exp $
+; $Id: bit_open.asm,v 1.5 2016-06-16 20:23:51 dom Exp $
 ;
 ; TRS-80 1 bit sound functions
 ;
@@ -7,10 +7,13 @@
 ; Stefano Bodrato - 8/4/2008
 ;
 
+    SECTION code_clib
     PUBLIC     bit_open
+    PUBLIC     _bit_open
     EXTERN     __snd_tick
 
 .bit_open
+._bit_open
 ;-----
 ; Stefano Bodrato - digiboost fix for new SID, version 8580
 

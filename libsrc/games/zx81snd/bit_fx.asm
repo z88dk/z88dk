@@ -1,4 +1,4 @@
-; $Id: bit_fx.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: bit_fx.asm,v 1.3 2016-06-16 20:23:52 dom Exp $
 ;
 ; Generic platform sound effects module.
 ;
@@ -13,8 +13,9 @@
 ;>due to the fact that it is usually in the 00xxxxxx state when we
 ;>get there
 
-
+	  SECTION code_clib
           PUBLIC     bit_fx
+          PUBLIC     _bit_fx
           INCLUDE  "games/games.inc"
 
           EXTERN      beeper
@@ -26,6 +27,7 @@
 
 
 .bit_fx
+._bit_fx
           pop  bc
           pop  de
           push de

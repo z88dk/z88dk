@@ -2,10 +2,12 @@
 ;	Game device library for the MSX
 ;       Stefano Bodrato - 3/12/2007
 ;
-;	$Id: joystick.asm,v 1.8 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: joystick.asm,v 1.9 2016-06-16 20:23:51 dom Exp $
 ;
 
+        SECTION code_clib
         PUBLIC    joystick
+        PUBLIC    _joystick
         EXTERN	msxbios
 
 IF FORmsx
@@ -17,6 +19,7 @@ ELSE
 ENDIF
 
 .joystick
+._joystick
 	;__FASTCALL__ : joystick no. in HL
 		
 	ld	a,l
@@ -61,7 +64,7 @@ IF FORmsx
 	;; and	$1F	; commented out: let's keep extra fire buttons !
 
 ELSE
-
+	push	ix		;save callers
 	ld	a,1
 	ld	($fa19),a ;REPCNT
 	
@@ -85,6 +88,7 @@ ELSE
 	jr	z,noupdown
 	xor	@01100
 .noupdown
+	pop	ix		;restore callers
 	
 ENDIF
 	ld	l,a

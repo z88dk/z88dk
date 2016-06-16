@@ -4,9 +4,12 @@
 ; ---FUDLR  Stick bit pattern (nc, nc, nc, fire, up, down, left, right)
 ;
 
+    SECTION code_clib
     PUBLIC    joystick
+    PUBLIC    _joystick
 
 .joystick
+._joystick
 
     ; __FASTCALL__ : joystick no. in HL.
     ; 1 = Player 1's joystick.

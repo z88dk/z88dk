@@ -2,16 +2,17 @@
 ;	Game device library for the Memotech MTX
 ;       Stefano Bodrato - 2011
 ;
-;	$Id: joystick.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: joystick.asm,v 1.3 2016-06-16 20:23:51 dom Exp $
 ;
 
+	SECTION code_clib
         PUBLIC    joystick
+        PUBLIC    _joystick
 
-KEYS:
-	defb	0
 
 
 .joystick
+._joystick
 	;__FASTCALL__ : joystick no. in HL
 		
 	ld	a,l
@@ -88,3 +89,7 @@ STROBE:
 	in	a,(5)
 	cp	127
 	ret
+
+	SECTION	bss_clib
+KEYS:
+	defb	0

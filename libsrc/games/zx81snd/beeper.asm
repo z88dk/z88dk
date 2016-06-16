@@ -1,11 +1,13 @@
-; $Id: beeper.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
+; $Id: beeper.asm,v 1.3 2016-06-16 20:23:52 dom Exp $
 ;
 ; ZX81 1 bit sound functions
 ;
 ; Stefano Bodrato - 11/11/2011
 ;
 
+    SECTION code_clib
     PUBLIC     beeper
+    PUBLIC     _beeper
 
     INCLUDE  "games/games.inc"
 
@@ -54,6 +56,8 @@
 
 
 .beeper
+._beeper
+	push	ix	;save callers
           ld   a,l
           srl  l
           srl  l
@@ -106,6 +110,6 @@
           inc  c
           jp   (ix)
 .be_end
-
+	  pop	ix		;restore callers
           jp   bit_close_ei
 
