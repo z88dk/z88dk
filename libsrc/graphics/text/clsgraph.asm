@@ -7,12 +7,13 @@
 ;       Clears graph screen.
 ;
 ;
-;	$Id: clsgraph.asm,v 1.5 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: clsgraph.asm,v 1.6 2016-06-16 19:53:50 dom Exp $
 ;
 
 
 			INCLUDE	"graphics/text/textgfx.inc"
 
+		        SECTION code_clib
 			PUBLIC	cleargraphics
 			EXTERN	base_graphics
 

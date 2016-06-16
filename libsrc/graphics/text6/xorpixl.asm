@@ -8,12 +8,13 @@
 ;       Invert pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.4 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: xorpixl.asm,v 1.5 2016-06-16 19:53:50 dom Exp $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
+		        SECTION code_clib
 			PUBLIC	xorpixel
 
 			EXTERN	textpixl

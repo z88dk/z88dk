@@ -7,12 +7,13 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
+;	$Id: pointxy.asm,v 1.5 2016-06-16 19:53:50 dom Exp $
 ;
 
 
 			INCLUDE	"graphics/text/textgfx.inc"
 
+                        SECTION code_clib
 			PUBLIC	pointxy
 
 			EXTERN  textpixl

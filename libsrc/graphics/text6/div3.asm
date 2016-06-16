@@ -8,10 +8,11 @@
 ;	Divide by three lookup table
 ;
 ;
-;	$Id: div3.asm,v 1.3 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: div3.asm,v 1.4 2016-06-16 19:53:50 dom Exp $
 ;
 
-			PUBLIC	div3
+        SECTION rodata_clib
+	PUBLIC	div3
 
 .div3
 		;	0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
