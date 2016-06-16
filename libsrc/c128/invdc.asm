@@ -2,14 +2,17 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: invdc.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
+;$Id: invdc.asm,v 1.3 2016-06-16 21:13:07 dom Exp $
 ;
 
 ;get vdc register
 
+	SECTION code_clib
 	PUBLIC	invdc
+	PUBLIC	_invdc
 
 invdc:
+_invdc:
         ;pop     de              ;return address
         ;pop     hl              ;vdc register to set
         ;push    hl

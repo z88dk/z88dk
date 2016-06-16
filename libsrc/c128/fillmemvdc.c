@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: fillmemvdc.c,v 1.1 2008-06-23 17:34:33 stefano Exp $
+$Id: fillmemvdc.c,v 1.2 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -11,7 +11,7 @@ $Id: fillmemvdc.c,v 1.1 2008-06-23 17:34:33 stefano Exp $
 
 /* fast fill using block writes */
 
-void fillmemvdc(ushort FillMem, ushort FillLen, uchar Filler)
+void fillmemvdc(ushort FillMem, ushort FillLen, ushort Filler)
 {
   uchar Blocks, Remain;
   register uchar I;

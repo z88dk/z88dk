@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: setcursorvdc.c,v 1.1 2008-06-23 17:34:35 stefano Exp $
+$Id: setcursorvdc.c,v 1.2 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -11,7 +11,7 @@ $Id: setcursorvdc.c,v 1.1 2008-06-23 17:34:35 stefano Exp $
 
 /* set cursor's top and bottom scan lines and mode */
 
-void setcursorvdc(uchar Top, uchar Bottom, uchar Mode)
+void setcursorvdc(ushort Top, ushort Bottom, ushort Mode)
 {
   outvdc(vdcCurStScanLine,(Top | (Mode << 5)));
   outvdc(vdcCurEndScanLine,Bottom);

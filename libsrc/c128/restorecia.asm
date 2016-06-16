@@ -1,16 +1,14 @@
 ;
-; 	Keyboard routines for the Commodore 128 (Z80 mode)
-;	By Stefano Bodrato - 27/08/2001
-;
-;	getk() Read key status
-;
-;	$Id: restorecia.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: restorecia.asm,v 1.3 2016-06-16 21:13:07 dom Exp $
 ;
 
+		SECTION code_clib
 		PUBLIC	restorecia
+		PUBLIC	_restorecia
 		EXTERN	SaveA
 
 .restorecia
+._restorecia
 
 	; restore CIA registers
 	ld	bc,$D02F

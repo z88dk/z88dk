@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: winvdc.c,v 1.1 2008-06-23 17:34:36 stefano Exp $
+$Id: winvdc.c,v 1.2 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -17,7 +17,7 @@ uchar vdcShadow = vdcAltChrSet+vdcDarkGray;
 
 /* draw window given x1, y1, x2, y2 rectangle in current page */
 
-void winvdc(uchar X1, uchar Y1, uchar X2, uchar Y2, uchar Attr, char *Title)
+void winvdc(ushort X1, ushort Y1, ushort X2, ushort Y2, ushort Attr, char *Title)
 {
   char  ChSave;
   uchar InsideLen, TitleLen;

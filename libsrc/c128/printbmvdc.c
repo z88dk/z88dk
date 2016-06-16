@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: printbmvdc.c,v 1.2 2008-07-08 13:10:25 stefano Exp $
+$Id: printbmvdc.c,v 1.3 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -19,7 +19,7 @@ extern uchar  vdcCharVert;
 
 /* bit map string print given x and y char offset in current page */
 
-void printbmvdc(uchar X, uchar Y, uchar Attr, char *TextStr)
+void printbmvdc(ushort X, ushort Y, ushort Attr, char *TextStr)
 {
   register uchar I;
   uchar  TextLen;

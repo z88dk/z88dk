@@ -2,13 +2,15 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: setpixivdc.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
+;$Id: setpixivdc.asm,v 1.3 2016-06-16 21:13:07 dom Exp $
 ;
 
 ;set pixel in 640 x 480 bit map mode.  math and local vdc i/o optimized
 ;for speed.
 
+		SECTION code_clib
 		PUBLIC	setpixivdc
+		PUBLIC	_setpixivdc
 		EXTERN	_vdcDispMem
 
 		EXTERN	vdcset
@@ -29,6 +31,7 @@
 ;defb    1
 
 setpixivdc:
+_setpixivdc:
 
         pop     hl              ;return address
         pop     de              ;y

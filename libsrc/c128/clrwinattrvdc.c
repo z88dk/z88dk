@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: clrwinattrvdc.c,v 1.1 2008-06-23 17:34:32 stefano Exp $
+$Id: clrwinattrvdc.c,v 1.2 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -15,7 +15,7 @@ extern ushort vdcAttrMem;
 
 /* clear attr window given x1, y1, x2, y2 rectangle in current page */
 
-void clrwinattrvdc(uchar X1, uchar Y1, uchar X2, uchar Y2, uchar Ch)
+void clrwinattrvdc(ushort X1, ushort Y1, ushort X2, ushort Y2, ushort Ch)
 {
   uchar XLen;
   ushort AttrOfs;

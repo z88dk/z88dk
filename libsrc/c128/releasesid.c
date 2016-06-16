@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: releasesid.c,v 1.1 2008-06-23 17:34:34 stefano Exp $
+$Id: releasesid.c,v 1.2 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -12,7 +12,7 @@ $Id: releasesid.c,v 1.1 2008-06-23 17:34:34 stefano Exp $
 
 /* start release cycle */
 
-void releasesid(ushort Voice, uchar Waveform)
+void releasesid(ushort Voice, ushort Waveform)
 {
   outp(Voice+4,Waveform);
 }

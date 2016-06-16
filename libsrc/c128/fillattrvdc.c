@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: fillattrvdc.c,v 1.1 2008-06-23 17:34:33 stefano Exp $
+$Id: fillattrvdc.c,v 1.2 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -14,7 +14,7 @@ extern ushort vdcAttrMem;
 
 /* fill attr mem given x and y offset in current page */
 
-void fillattrvdc(uchar X, uchar Y, uchar ALen, uchar Attr)
+void fillattrvdc(ushort X, ushort Y, ushort ALen, ushort Attr)
 {
   fillmemvdc(Y*vdcScrHorz+vdcAttrMem+X,ALen,Attr);
 }

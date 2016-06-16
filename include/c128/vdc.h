@@ -3,13 +3,14 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: vdc.h,v 1.2 2008-07-08 13:10:23 stefano Exp $
+$Id: vdc.h,v 1.3 2016-06-16 21:13:06 dom Exp $
 
 */
 
 #ifndef __C128VDC_H__
 #define __C128VDC_H__
 
+#include <sys/compiler.h>
 #include <graphics.h>
 
 #ifndef uchar
@@ -105,59 +106,59 @@ $Id: vdc.h,v 1.2 2008-07-08 13:10:23 stefano Exp $
 
 extern ushort vdcDispMem;
 
-extern uchar __LIB__ __FASTCALL__ invdc(uchar RegNum);
-extern void __LIB__               outvdc(uchar RegNum, uchar RegVal);
-extern void __LIB__   __CALLEE__  outvdc_callee(uchar RegNum, uchar RegVal);
+extern uchar __LIB__ __FASTCALL__ invdc(ushort RegNum) __SMALLCFASTCALL;
+extern void __LIB__               outvdc(ushort RegNum, ushort RegVal) __SMALLCDECL;
+extern void __LIB__   __CALLEE__  outvdc_callee(ushort RegNum, ushort RegVal) __SMALLCDECL __SMALLCCALLEE;
 #define outvdc(a,b) outvdc_callee(a,b)
 
 extern void __LIB__ mapvdc(void);
 extern void __LIB__ savevdc(void);
 extern void __LIB__ restorevdc(void);
 
-extern void __LIB__ fillmemvdc(ushort FillMem, ushort FillLen, uchar Filler);
-extern void __LIB__ copymemvdc(ushort SMem, ushort DMem, ushort CopyLen);
+extern void __LIB__ fillmemvdc(ushort FillMem, ushort FillLen, ushort Filler) __SMALLCDECL;
+extern void __LIB__ copymemvdc(ushort SMem, ushort DMem, ushort CopyLen) __SMALLCDECL;
 
-extern uchar __LIB__ *memtobufvdc(ushort VidMem, ushort CopyLen);
-extern void __LIB__ buftomemvdc(uchar *BufPtr, ushort VidMem, ushort CopyLen);
+extern uchar __LIB__ *memtobufvdc(ushort VidMem, ushort CopyLen) __SMALLCDECL;
+extern void __LIB__ buftomemvdc(uchar *BufPtr, ushort VidMem, ushort CopyLen) __SMALLCDECL;
 
 extern uchar __LIB__ is64kvdc(void);
 extern void __LIB__ set64kvdc(void);
 extern void __LIB__ attrsoffvdc(void);
 extern void __LIB__ attrsonvdc(void);
-extern void __LIB__ setcursorvdc(uchar Top, uchar Bottom, uchar Mode);
+extern void __LIB__ setcursorvdc(ushort Top, ushort Bottom, ushort Mode) __SMALLCDECL;
 extern void __LIB__ setcharvdc(ushort CharMem);
-extern void __LIB__ setdsppagevdc(ushort DPage, ushort APage);
+extern void __LIB__ setdsppagevdc(ushort DPage, ushort APage) __SMALLCDECL;
 
-extern void __LIB__ clrscrvdc(uchar Ch);
-extern void __LIB__ clrattrvdc(uchar Attr);
-extern void __LIB__ filldspvdc(uchar X, uchar Y, uchar CLen, uchar Ch);
-extern void __LIB__ fillattrvdc(uchar X, uchar Y, uchar ALen, uchar Attr);
-extern void __LIB__ copydspvdc(ushort SDPage, ushort SAPage, ushort DDPage, ushort DAPage);
+extern void __LIB__ clrscrvdc(ushort Ch);
+extern void __LIB__ clrattrvdc(ushort Attr);
+extern void __LIB__ filldspvdc(ushort X, ushort Y, ushort CLen, ushort Ch) __SMALLCDECL;
+extern void __LIB__ fillattrvdc(ushort X, ushort Y, ushort ALen, ushort Attr) __SMALLCDECL;
+extern void __LIB__ copydspvdc(ushort SDPage, ushort SAPage, ushort DDPage, ushort DAPage) __SMALLCDECL;
 
-extern void __LIB__ scrollupvdc(uchar X1, uchar Y1, uchar X2, uchar Y2);
-extern void __LIB__ scrolldownvdc(uchar X1, uchar Y1, uchar X2, uchar Y2);
-extern void __LIB__ clrwinvdc(uchar X1, uchar Y1, uchar X2, uchar Y2, uchar Ch);
-extern void __LIB__ clrwinattrvdc(uchar X1, uchar Y1, uchar X2, uchar Y2, uchar Ch);
-extern void __LIB__ winvdc(uchar X1, uchar Y1, uchar X2, uchar Y2, uchar Attr, char *Title);
+extern void __LIB__ scrollupvdc(ushort X1, ushort Y1, ushort X2, ushort Y2) __SMALLCDECL;
+extern void __LIB__ scrolldownvdc(ushort X1, ushort Y1, ushort X2, ushort Y2) __SMALLCDECL;
+extern void __LIB__ clrwinvdc(ushort X1, ushort Y1, ushort X2, ushort Y2, ushort Ch) __SMALLCDECL;
+extern void __LIB__ clrwinattrvdc(ushort X1, ushort Y1, ushort X2, ushort Y2, ushort Ch) __SMALLCDECL;
+extern void __LIB__ winvdc(ushort X1, ushort Y1, ushort X2, ushort Y2, ushort Attr, char *Title) __SMALLCDECL;
 
-extern void __LIB__ printstrvdc(uchar X, uchar Y, uchar Attr, char *TextStr);
+extern void __LIB__ printstrvdc(ushort X, ushort Y, ushort Attr, char *TextStr) __SMALLCDECL;
 
-extern void __LIB__ setbitmapvdc(ushort DispMem, ushort AttrMem, uchar F, uchar B);
-extern void __LIB__ clrbitmapvdc(uchar Filler);
-extern void __LIB__ setpixvdc(int X, int Y);
+extern void __LIB__ setbitmapvdc(ushort DispMem, ushort AttrMem, ushort F, ushort B) __SMALLCDECL;
+extern void __LIB__ clrbitmapvdc(ushort Filler);
+extern void __LIB__ setpixvdc(int X, int Y) __SMALLCDECL;
 //#define setpixvdc(x,y) plot(x,y)
-extern void __LIB__ linevdc(int X1, int Y1, int X2, int Y2);
+extern void __LIB__ linevdc(int X1, int Y1, int X2, int Y2) __SMALLCDECL;
 //#define linevdc(x1,y1,x2,y2) draw(x1,y1,x2,y2)
 
-extern void __LIB__ ellipsevdc(int XC, int YC, int A, int B);
-extern void __LIB__ printbmvdc(uchar X, uchar Y, uchar Attr, char *TextStr);
+extern void __LIB__ ellipsevdc(int XC, int YC, int A, int B) __SMALLCDECL;
+extern void __LIB__ printbmvdc(ushort X, ushort Y, ushort Attr, char *TextStr) __SMALLCDECL;
 
 extern void __LIB__ set80x50textvdc(void);
-extern void __LIB__ setbitmapintvdc(ushort DispMem, ushort AttrMem, uchar F, uchar B);
-extern void __LIB__ setpixivdc(int X, int Y);
-extern void __LIB__ lineivdc(int X1, int Y1, int X2, int Y2);
-extern void __LIB__ ellipseivdc(int XC, int YC, int A, int B);
-extern void __LIB__ printbmivdc(uchar X, uchar Y, char *TextStr);
+extern void __LIB__ setbitmapintvdc(ushort DispMem, ushort AttrMem, ushort F, ushort B) __SMALLCDECL;
+extern void __LIB__ setpixivdc(int X, int Y) __SMALLCDECL;
+extern void __LIB__ lineivdc(int X1, int Y1, int X2, int Y2) __SMALLCDECL;
+extern void __LIB__ ellipseivdc(int XC, int YC, int A, int B) __SMALLCDECL;
+extern void __LIB__ printbmivdc(ushort X, ushort Y, char *TextStr) __SMALLCDECL;
 
 #endif
 

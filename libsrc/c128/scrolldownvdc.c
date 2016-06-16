@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: scrolldownvdc.c,v 1.2 2008-07-08 13:10:25 stefano Exp $
+$Id: scrolldownvdc.c,v 1.3 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -16,7 +16,7 @@ extern ushort vdcAttrMem;
 
 /* scroll window down given x1, y1, x2, y2 rectangle in current page */
 
-void scrolldownvdc(uchar X1, uchar Y1, uchar X2, uchar Y2)
+void scrolldownvdc(ushort X1, ushort Y1, ushort X2, ushort Y2)
 {
   uchar XLen;
   ushort DispOfs, AttrOfs;

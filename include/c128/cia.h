@@ -3,13 +3,14 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: cia.h,v 1.1 2008-06-23 17:34:31 stefano Exp $
+$Id: cia.h,v 1.2 2016-06-16 21:13:06 dom Exp $
 
 */
 
 #ifndef __C128CIA_H__
 #define __C128CIA_H__
 
+#include <sys/compiler.h>
 
 #ifndef uchar
   #define uchar unsigned char
@@ -75,16 +76,16 @@ $Id: cia.h,v 1.1 2008-06-23 17:34:31 stefano Exp $
 //#define ciaTODStr char *
 #define ciaKeyRec unsigned char *
 
-extern void __LIB__ gettodcia (ushort C, uchar *TOD);
-extern void __LIB__ settodcia (ushort C, uchar *TOD);
-extern void __LIB__ todcharcia (uchar Bcd, char *TODStr);
-extern void __LIB__ todstrcia (uchar *TOD, char *TODStr);
+extern void __LIB__ gettodcia (ushort C, uchar *TOD) __SMALLCDECL;
+extern void __LIB__ settodcia (ushort C, uchar *TOD) __SMALLCDECL;
+extern void __LIB__ todcharcia (uchar Bcd, char *TODStr) __SMALLCDECL;
+extern void __LIB__ todstrcia (uchar *TOD, char *TODStr) __SMALLCDECL;
 
-extern void __LIB__ setintctrlcia (ushort C, uchar Icr);
+extern void __LIB__ setintctrlcia (ushort C, ushort Icr) __SMALLCDECL;
 
-extern void __LIB__ settimeracia (ushort C, ushort Latch, uchar CtrlReg);
+extern void __LIB__ settimeracia (ushort C, ushort Latch, ushort CtrlReg) __SMALLCDECL;
 extern ushort __LIB__ gettimeracia (ushort C);
-extern void __LIB__ settimerbcia (ushort C, ushort Latch, uchar CtrlReg);
+extern void __LIB__ settimerbcia (ushort C, ushort Latch, ushort CtrlReg) __SMALLCDECL;
 extern ushort __LIB__ gettimerbcia (ushort C);
 extern ushort __LIB__ timervalcia (ulong Hz);
 

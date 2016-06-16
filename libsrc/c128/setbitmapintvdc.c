@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: setbitmapintvdc.c,v 1.1 2008-06-23 17:34:34 stefano Exp $
+$Id: setbitmapintvdc.c,v 1.2 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -12,7 +12,7 @@ $Id: setbitmapintvdc.c,v 1.1 2008-06-23 17:34:34 stefano Exp $
 
 /* set 640 x 480 interlace bit map mode, background and foreground colors */
 
-void setbitmapintvdc(ushort DispMem, ushort AttrMem, uchar F, uchar B)
+void setbitmapintvdc(ushort DispMem, ushort AttrMem, ushort F, ushort B)
 {
   outvdc(vdcFgBgColor,(F << 4) | B);
   setdsppagevdc(DispMem,AttrMem);

@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: printstrvdc.c,v 1.2 2008-07-08 13:10:25 stefano Exp $
+$Id: printstrvdc.c,v 1.3 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -15,7 +15,7 @@ extern uchar  vdcScrHorz;
 
 /* fast vdc string print given x and y offset in current page */
 
-void printstrvdc(uchar X, uchar Y, uchar Attr, char *TextStr)
+void printstrvdc(ushort X, ushort Y, ushort Attr, char *TextStr)
 {
   register uchar I, TextLen;
   ushort DispOfs;

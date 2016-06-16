@@ -2,15 +2,18 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: outvdc_callee.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
+;$Id: outvdc_callee.asm,v 1.4 2016-06-16 21:13:07 dom Exp $
 ;
 
 ;set vdc register
 
+        SECTION code_clib
         PUBLIC    outvdc_callee
+        PUBLIC    _outvdc_callee
         PUBLIC    ASMDISP_OUTVDC_CALLEE
 
 outvdc_callee:
+_outvdc_callee:
         pop hl
         pop de
         ex (sp),hl

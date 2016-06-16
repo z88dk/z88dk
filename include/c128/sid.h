@@ -3,13 +3,14 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: sid.h,v 1.1 2008-06-23 17:34:31 stefano Exp $
+$Id: sid.h,v 1.2 2016-06-16 21:13:06 dom Exp $
 
 */
 
 #ifndef __C128SID_H__
 #define __C128SID_H__
 
+#include <sys/compiler.h>
 
 #ifndef uchar
   #define uchar unsigned char
@@ -58,14 +59,14 @@ extern void __LIB__ getpotssid(void);
 extern void __LIB__ getmousesid(void);
 
 extern void __LIB__ clearsid(void);
-extern void __LIB__ volumesid(uchar Amp, uchar Filter);
-extern void __LIB__ envelopesid(ushort Voice, uchar Attack, uchar Decay, uchar Sustain, uchar Release);
-extern void __LIB__ freqsid(ushort Voice, ushort Freq);
-extern void __LIB__ attacksid(ushort Voice, uchar Waveform);
-extern void __LIB__ releasesid(ushort Voice, uchar Waveform);
-extern void __LIB__ pulsewavesid(ushort Voice, ushort Width);
+extern void __LIB__ volumesid(ushort Amp, ushort Filter) __SMALLCDECL;
+extern void __LIB__ envelopesid(ushort Voice, ushort Attack, ushort Decay, ushort Sustain, ushort Release) __SMALLCDECL;
+extern void __LIB__ freqsid(ushort Voice, ushort Freq) __SMALLCDECL;
+extern void __LIB__ attacksid(ushort Voice, ushort Waveform) __SMALLCDECL;
+extern void __LIB__ releasesid(ushort Voice, ushort Waveform) __SMALLCDECL;
+extern void __LIB__ pulsewavesid(ushort Voice, ushort Width) __SMALLCDECL;
 
-extern void __LIB__ playzb4sid(uchar *SamStart, ushort SamLen);
+extern void __LIB__ playzb4sid(uchar *SamStart, ushort SamLen) __SMALLCDECL;
 
 #endif
 

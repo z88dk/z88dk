@@ -3,13 +3,14 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: pcx.h,v 1.1 2008-06-23 17:34:31 stefano Exp $
+$Id: pcx.h,v 1.2 2016-06-16 21:13:06 dom Exp $
 
 */
 
 #ifndef __C128PCX_H__
 #define __C128PCX_H__
 
+#include <sys/compiler.h>
 
 #ifndef uchar
   #define uchar unsigned char
@@ -53,11 +54,11 @@ typedef struct
 extern short __LIB__ initpcx(char *FileName);
 extern void __LIB__ donepcx(void);
 
-extern void __LIB__ decodelinepcx(ushort X, ushort Y);
-extern void __LIB__ decodefilepcx(ushort X, ushort Y);
+extern void __LIB__ decodelinepcx(ushort X, ushort Y) __SMALLCDECL;
+extern void __LIB__ decodefilepcx(ushort X, ushort Y) __SMALLCDECL;
 
-extern void __LIB__ decodelineintpcx(ushort X, ushort Y);
-extern void __LIB__ decodefileintpcx(ushort X, ushort Y);
+extern void __LIB__ decodelineintpcx(ushort X, ushort Y) __SMALLCDECL;
+extern void __LIB__ decodefileintpcx(ushort X, ushort Y) __SMALLCDECL;
 
 #endif
 

@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: volumesid.c,v 1.1 2008-06-23 17:34:36 stefano Exp $
+$Id: volumesid.c,v 1.2 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -12,7 +12,7 @@ $Id: volumesid.c,v 1.1 2008-06-23 17:34:36 stefano Exp $
 
 /* set master volume and filter select */
 
-void volumesid(uchar Amp, uchar Filter)
+void volumesid(ushort Amp, ushort Filter)
 {
   outp(sidVolume,Filter | Amp);
 }

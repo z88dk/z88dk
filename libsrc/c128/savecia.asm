@@ -4,16 +4,16 @@
 ;
 ;	getk() Read key status
 ;
-;	$Id: savecia.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: savecia.asm,v 1.3 2016-06-16 21:13:07 dom Exp $
 ;
 
-
-		PUBLIC	savecia
+		SECTION code_clib
+		PUBLIC	_savecia
 		PUBLIC	SaveA
 
-.SaveA  defw  0
 
 .savecia
+._savecia
 	; save CIA registers
 	ld	bc,$DC00+2	;cia1+ciaDataDirA
 	in	a,(c)
@@ -26,3 +26,5 @@
 	ld	(hl),a
 	ret
 
+	SECTION	bss_clib
+.SaveA  defw  0

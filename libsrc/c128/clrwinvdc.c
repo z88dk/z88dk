@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: clrwinvdc.c,v 1.2 2008-07-08 13:10:24 stefano Exp $
+$Id: clrwinvdc.c,v 1.3 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -15,7 +15,7 @@ extern uchar  vdcScrHorz;
 
 /* clear window given x1, y1, x2, y2 rectangle in current page */
 
-void clrwinvdc(uchar X1, uchar Y1, uchar X2, uchar Y2, uchar Ch)
+void clrwinvdc(ushort X1, ushort Y1, ushort X2, ushort Y2, ushort Ch)
 {
   uchar XLen;
   ushort DispOfs;

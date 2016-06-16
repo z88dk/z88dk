@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: clrscrvdc.c,v 1.2 2008-07-08 13:10:24 stefano Exp $
+$Id: clrscrvdc.c,v 1.3 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -14,7 +14,7 @@ extern ushort vdcScrSize;
 
 /* fast disp page clear with any byte */
 
-void clrscrvdc(uchar Ch)
+void clrscrvdc(ushort Ch)
 {
   fillmemvdc(vdcDispMem,vdcScrSize,Ch);
 }

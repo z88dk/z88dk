@@ -2,15 +2,18 @@
 ;Based on the SG C Tools 1.7
 ;(C) 1993 Steve Goldsmith
 ;
-;$Id: playzb4sid.asm,v 1.4 2015-01-19 01:32:42 pauloscustodio Exp $
+;$Id: playzb4sid.asm,v 1.5 2016-06-16 21:13:07 dom Exp $
 ;
 
 ; extern void __LIB__ playzb4sid(uchar *SamStart, ushort SamLen);
 ; play 4 bit pulse wave encoded data using sid master volume
 
+        SECTION code_clib
 	PUBLIC	playzb4sid
+	PUBLIC	_playzb4sid
 
 playzb4sid:
+_playzb4sid:
 
 ;call    csv
 ;ld      l,(ix+6)        ;sample start addr

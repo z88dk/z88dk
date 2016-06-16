@@ -3,7 +3,7 @@
 Based on the SG C Tools 1.7
 (C) 1993 Steve Goldsmith
 
-$Id: settimerbcia.c,v 1.1 2008-06-23 17:34:35 stefano Exp $
+$Id: settimerbcia.c,v 1.2 2016-06-16 21:13:07 dom Exp $
 
 */
 
@@ -12,7 +12,7 @@ $Id: settimerbcia.c,v 1.1 2008-06-23 17:34:35 stefano Exp $
 
 /* set cia timer b and control reg b */
 
-void settimerbcia (ushort C, ushort Latch, uchar CtrlReg)
+void settimerbcia (ushort C, ushort Latch, ushort CtrlReg)
 {
   outp(C+ciaTimerBLo,(uchar) Latch);        /* timer latch lo */
   outp(C+ciaTimerBHi,(uchar) (Latch >> 8)); /* timer latch hi */
