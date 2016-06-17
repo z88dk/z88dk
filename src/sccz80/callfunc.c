@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.11 2016-04-25 09:07:04 dom Exp $
+ *      $Id: callfunc.c,v 1.12 2016-06-17 09:05:53 dom Exp $
  */
 
 /*
@@ -287,42 +287,49 @@ int ForceArgs(char dest, char src,int expr, char functab)
 }
 
 
-/* Short routine to determine what printf version we need - mini
- * standard or floating (not written yet!)
- */
+
 
 static int SetMiniFunc(unsigned char *arg)
 {
-        char    c;
-        char    complex;
+    char    c;
+    int    complex;
 
-        complex=1;      /* mini printf */
-        while ( (c=*arg++) ) {
-                if (c != '%' ) continue;
-                if (*arg == '%' ) {arg++; continue; }
-                if ( *arg == '-' || *arg == '0' || *arg=='+' || *arg==' ' ) {
-                        if (complex <= 2 ) complex=2;  /* Switch to standard */
-                        while ( (c=*arg++) ) 
-                                if (c=='d' || c=='i' || c=='o' || c=='u' || c=='c' || c=='s' || c=='e' || c=='E' || c=='f' || c=='g' || c=='G' || c=='p' || c=='n' ) break;
-                }
-                switch(*arg) {
-                        case 'e':
-                        case 'E':
-                        case 'f':
-                        case '.':
-                        case 'g':
-                        case 'G':
-                                complex=3;
-                                break;
-                        case 'o':
-                        case 'i':
-                        case 'p':
-                        case 'n':
-                        case 'x':
-                                if (complex<=2) complex=2;
-                                break;
-                }
+    complex=1;      /* mini printf */
+    while ( (c=*arg++) ) {
+        if (c != '%' ) continue;
+        if (*arg == '%' ) 
+            arg++;
 
+        if ( *arg == '-' || *arg == '0' || *arg=='+' || *arg==' ' || *arg == '*' || *arg == '.' ) {
+            if (complex < 2 ) complex=2;  /* Switch to standard */
+	    while ( !isalpha(*arg) )
+               arg++;
+        } else if ( isnumber(*arg) ) {
+            if (complex < 2 ) complex=2;  /* Switch to standard */
+            while ( isnumber(*arg) || *arg == '.' ) {
+                arg++;
+            }
         }
-        return(complex);
+        switch(*arg) {
+        case 'e':
+        case 'E':
+        case 'f':
+        case 'g':
+        case 'G':
+            complex=3;
+            break;
+        case 'l':
+        case 'o':
+        case 'i':
+        case 'p':
+        case 'n':
+        case 'x':
+            if (complex<=2) complex=2;
+            break;
+        }
+
+    }
+    return(complex);
 }
+
+
