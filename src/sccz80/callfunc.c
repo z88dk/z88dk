@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.13 2016-06-17 09:09:58 dom Exp $
+ *      $Id: callfunc.c,v 1.14 2016-06-17 10:01:28 dom Exp $
  */
 
 /*
@@ -304,9 +304,9 @@ static int SetMiniFunc(unsigned char *arg)
             if (complex < 2 ) complex=2;  /* Switch to standard */
 	    while ( !isalpha(*arg) )
                arg++;
-        } else if ( isnumber(*arg) ) {
+        } else if ( isdigit(*arg) ) {
             if (complex < 2 ) complex=2;  /* Switch to standard */
-            while ( isnumber(*arg) || *arg == '.' ) {
+            while ( isdigit(*arg) || *arg == '.' ) {
                 arg++;
             }
         }
