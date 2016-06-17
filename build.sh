@@ -35,4 +35,4 @@ fi
 $MAKE -e
 $MAKE -C `pwd`/libsrc
 $MAKE -C `pwd`/libsrc install
-
+$MAKE -C `pwd`/libsrc/_DEVELOPMENT
