@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.237 2016-06-17 09:56:30 dom Exp $
+# $Id: Makefile,v 1.238 2016-06-17 10:33:26 dom Exp $
 
 
 include Make.config
@@ -1430,6 +1430,5 @@ clean:
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
-	cp sprites/software/sp1/*/sp1.lib ../lib/clibs
 
 
