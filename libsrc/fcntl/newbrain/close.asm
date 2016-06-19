@@ -15,15 +15,18 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: close.asm,v 1.3 2015-01-22 12:09:57 stefano Exp $
+; $Id: close.asm,v 1.4 2016-06-19 20:26:58 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	close
+	PUBLIC	_close
 	
 	EXTERN	nbhandl
 	EXTERN	nb_close
 
 .close
+._close
 	pop	bc
 	pop	hl
 	push	hl

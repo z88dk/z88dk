@@ -15,12 +15,15 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: write.asm,v 1.2 2015-01-22 12:09:57 stefano Exp $
+; $Id: write.asm,v 1.3 2016-06-19 20:26:58 dom Exp $
 
 
+        SECTION code_clib
 	PUBLIC	write
+	PUBLIC	_write
 
 	EXTERN	nb_putblock
 	
 .write
+._write
 	jp	nb_putblock

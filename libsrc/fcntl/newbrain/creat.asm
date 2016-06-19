@@ -15,14 +15,17 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: creat.asm,v 1.3 2015-01-22 12:09:57 stefano Exp $
+; $Id: creat.asm,v 1.4 2016-06-19 20:26:58 dom Exp $
 ;
 
-		PUBLIC	creat
-		EXTERN	open
-		EXTERN	close
+        SECTION code_clib
+	PUBLIC	creat
+	PUBLIC	_creat
+	EXTERN	open
+	EXTERN	close
 
 .creat
+._creat
 	pop	bc
 	pop	hl
 	push	hl

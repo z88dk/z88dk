@@ -18,9 +18,10 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: open.asm,v 1.3 2015-01-22 12:09:57 stefano Exp $
+; $Id: open.asm,v 1.4 2016-06-19 20:26:58 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	open
 	
 	EXTERN	nbhandl
@@ -29,30 +30,29 @@
 	
 
 .open
-	ld	ix,2
+._open
+	push	ix		;save callers
+	ld	ix,4
 	add	ix,sp
 
 
-	ld	b,0
+	ld	b,10
+	ld	c,0
 	ld	hl,nbhandl
 .hloop
 	ld	a,(hl)
-	cp	255
-	jr	nz,notlast
-	ld	hl,-1		; error, no more free handles
-	ret
-
 .notlast
 	and	a
 	jr	z,hfound
 	inc	hl
-	inc	b
-	jr	hloop
+	inc	c
+	djnz	hloop
+	pop	ix	;restore callers
+	ret
 .hfound
 	inc	a
 	ld	(hl),a
-	ld	c,b
-	ld	b,0
+	ld	b,0	;c = file number
 
 	ld	hl,100
 	add	hl,bc
@@ -93,7 +93,7 @@
 	pop	hl		; device
 	pop	hl		; file handle
 	pop	de
-
+	pop	ix		;restore callers
 	and	a
 	ret	z
 
