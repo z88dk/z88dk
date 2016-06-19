@@ -140,8 +140,8 @@ save_width:
 	ld	a,(hl)
 	inc	hl
 check_precision:
-	ld	(ix-7),0	;precision = 0
-	ld	(ix-8),0
+	ld	(ix-7),255	;precision = undefined
+	ld	(ix-8),255
 	cp	'.'
 	jr	nz,no_precision
 	ld	a,(hl)
@@ -354,7 +354,8 @@ do_floating_point:
 	ld	c,(ix-8)
 	ld	b,(ix-7)
 	ld	a,b
-	or	c
+	and	c
+	inc	a
 	jr	nz,set_prec
 	ld	bc,6
 set_prec:
