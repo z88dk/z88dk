@@ -5,14 +5,17 @@
 ;	toggle_exos_variable(unsigned char variable);
 ;
 ;
-;	$Id: toggle_exos_variable.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
+;	$Id: toggle_exos_variable.asm,v 1.4 2016-06-19 20:17:32 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	toggle_exos_variable
+	PUBLIC	_toggle_exos_variable
 
 ;_FASTCALL_
 
 toggle_exos_variable:
+_toggle_exos_variable:
 
 	ld	b,2		; TOGGLE mode
 	ld	c,l		; Variable

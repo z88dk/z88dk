@@ -6,12 +6,15 @@
 ;
 ;	Check if the line printer is ready (1=ready, 0 if not)
 ;
-;	$Id: lpt_ready.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
+;	$Id: lpt_ready.asm,v 1.3 2016-06-19 20:17:32 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	lpt_ready
+	PUBLIC	_lpt_ready
 	
 lpt_ready:
+_lpt_ready:
 	in	a,($b5)
 	bit	3,a
 	ld	hl,0

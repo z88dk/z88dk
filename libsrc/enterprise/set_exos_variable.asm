@@ -5,16 +5,19 @@
 ;	set_exos_variable(unsigned char variable, unsigned char value);
 ;
 ;
-;	$Id: set_exos_variable.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
+;	$Id: set_exos_variable.asm,v 1.4 2016-06-19 20:17:32 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	set_exos_variable
+	PUBLIC	_set_exos_variable
 
 	EXTERN set_exos_variable_callee
 
 EXTERN ASMDISP_SET_EXOS_VARIABLE_CALLEE
 
 set_exos_variable:
+_set_exos_variable:
 
    pop bc
    pop de

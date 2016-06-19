@@ -5,14 +5,17 @@
 ;	get_exos_variable(unsigned char variable);
 ;
 ;
-;	$Id: get_exos_variable.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
+;	$Id: get_exos_variable.asm,v 1.4 2016-06-19 20:17:32 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	get_exos_variable
+	PUBLIC	_get_exos_variable
 
 ;_FASTCALL_
 
 get_exos_variable:
+_get_exos_variable:
 
 	ld	b,0		; GET mode
 	ld	c,l		; Variable

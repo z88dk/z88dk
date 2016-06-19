@@ -5,16 +5,19 @@
 ;	exos_open_channel(unsigned char ch_number, char *device);
 ;
 ;
-;	$Id: exos_open_channel.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: exos_open_channel.asm,v 1.4 2016-06-19 20:17:32 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC    exos_open_channel
+	PUBLIC    _exos_open_channel
 
 	EXTERN     exos_open_channel_callee
 
 EXTERN ASMDISP_EXOS_OPEN_CHANNEL_CALLEE
 
 exos_open_channel:
+_exos_open_channel:
 
    pop bc
    pop de

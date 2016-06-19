@@ -5,14 +5,16 @@
 ;	exos_redirect_channel(unsigned char main_channel, unsigned char secondary_channel);
 ;
 ;
-;	$Id: exos_redirect_channel_callee.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: exos_redirect_channel_callee.asm,v 1.4 2016-06-19 20:17:32 dom Exp $
 ;
 
-
+        SECTION code_clib
 PUBLIC	exos_capture_channel_callee
+PUBLIC	_exos_capture_channel_callee
 PUBLIC 	ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE
 
 exos_redirect_channel_callee:
+_exos_redirect_channel_callee:
 
 	pop hl
 	pop de

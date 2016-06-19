@@ -5,14 +5,16 @@
 ;	exos_create_channel(unsigned char ch_number, char *device);
 ;
 ;
-;	$Id: exos_create_channel_callee.asm,v 1.4 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: exos_create_channel_callee.asm,v 1.5 2016-06-19 20:17:32 dom Exp $
 ;
 
-
+        SECTION code_clib
 PUBLIC	exos_create_channel_callee
+PUBLIC	_exos_create_channel_callee
 PUBLIC 	ASMDISP_EXOS_CREATE_CHANNEL_CALLEE
 
 exos_create_channel_callee:
+_exos_create_channel_callee:
 
 	pop hl
 	pop de

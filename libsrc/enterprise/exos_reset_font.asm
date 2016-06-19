@@ -5,14 +5,17 @@
 ;	exos_reset_font();
 ;
 ;
-;	$Id: exos_reset_font.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: exos_reset_font.asm,v 1.4 2016-06-19 20:17:32 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	exos_reset_font
+	PUBLIC	_exos_reset_font
 
 	INCLUDE "enterprise.def"
 
 exos_reset_font:
+_exos_reset_font:
 
 		; __FASTCALL_
 		ld	a,l			; channel

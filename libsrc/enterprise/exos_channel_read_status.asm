@@ -5,12 +5,15 @@
 ;	exos_channel_read_status(unsigned char ch_number);
 ;
 ;
-;	$Id: exos_channel_read_status.asm,v 1.2 2015-01-19 01:32:42 pauloscustodio Exp $
+;	$Id: exos_channel_read_status.asm,v 1.3 2016-06-19 20:17:32 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	exos_channel_read_status
+	PUBLIC	_exos_channel_read_status
 
 exos_channel_read_status:
+_exos_channel_read_status:
 
 	ld	a,l
 	rst   30h
