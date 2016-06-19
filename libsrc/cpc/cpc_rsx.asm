@@ -7,21 +7,22 @@
 ;       It accepts the command name (it will be adapted "on the fly"),
 ;       and a list of pointers to variables.
 ;
-;       $Id: cpc_rsx.asm,v 1.3 2015-01-19 01:32:42 pauloscustodio Exp $
+;       $Id: cpc_rsx.asm,v 1.4 2016-06-19 21:13:26 dom Exp $
 ;
 
+        SECTION   code_clib
         PUBLIC    cpc_rsx
 
         INCLUDE "cpcfirm.def"              
 
 
-.cmd_buff  defs 12      ; max command name lenght
 
 .cpc_rsx
         ;call    firmware
         ;defw    kl_rom_walk
+	push	ix		;save callers
 
-        ld      ix,2
+        ld      ix,4
         add     ix,sp
         push    ix
         dec     a
@@ -77,16 +78,21 @@
 .harderr
         ld	l,a
 .rsx_ok
+	pop	ix		;restore caller
         ret
 
 
-.rsx_command
-        defw 0
-        defb 0
 
 
 .notfound
         pop     bc              ; params stuff..
         pop     bc              ; ..balance stack
         ld      hl,-1           ; Error: command not found
+	pop	ix		;restore caller
         ret
+
+	SECTION	bss_clib
+.rsx_command
+        defw 0
+        defb 0
+.cmd_buff  defs 12      ; max command name lenght

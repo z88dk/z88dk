@@ -15,9 +15,10 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: firmware.asm,v 1.6 2016-05-16 01:00:58 aralbrec Exp $
+; $Id: firmware.asm,v 1.7 2016-06-19 21:13:26 dom Exp $
 ;
 
+        SECTION   code_clib
         PUBLIC firmware
         EXTERN cpc_enable_fw_exx_set, cpc_enable_process_exx_set
  

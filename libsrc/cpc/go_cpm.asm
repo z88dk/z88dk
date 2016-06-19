@@ -4,9 +4,10 @@
 ;
 ;       void go_cpm()
 ;
-;       $Id: go_cpm.asm,v 1.3 2016-06-10 21:12:36 dom Exp $
+;       $Id: go_cpm.asm,v 1.4 2016-06-19 21:13:26 dom Exp $
 ;
 
+        SECTION   code_clib
         PUBLIC	go_cpm
         PUBLIC	_go_cpm
 
@@ -33,10 +34,12 @@ rst  $18
 defw cpm_command
 ret
 
-.cpm_command
-defw 0
-defb 0
 
 
 .cmd_cpm
 defb 'C', 'P', 'M'+$80
+
+	SECTION	bss_clib
+.cpm_command
+defw 0
+defb 0
