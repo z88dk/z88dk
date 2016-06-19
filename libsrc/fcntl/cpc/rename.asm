@@ -8,10 +8,12 @@
 ;       source:  http://www.cepece.info/amstrad/source/rsxcall.html
 ;       ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
 ;
-;       $Id: rename.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
+;       $Id: rename.asm,v 1.5 2016-06-19 21:03:22 dom Exp $
 ;
 
+        SECTION   code_clib
         PUBLIC    rename
+        PUBLIC    _rename
         EXTERN	strlen
         EXTERN	cpc_rsx
         EXTERN	bios_msg
@@ -19,6 +21,7 @@
         INCLUDE "cpcfirm.def"              
 
 .rename
+._rename
 
         pop     bc
         pop     de

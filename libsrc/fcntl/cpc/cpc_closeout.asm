@@ -3,10 +3,10 @@
 ;
 ;	Donated by **_warp6_** <kbaccam@free.fr>
 ;
-;	$Id: cpc_closeout.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
+;	$Id: cpc_closeout.asm,v 1.5 2016-06-19 21:03:22 dom Exp $
 
 
-
+        SECTION   code_clib
 		PUBLIC		cpc_closeout
 
 		INCLUDE		"cpcfirm.def"
