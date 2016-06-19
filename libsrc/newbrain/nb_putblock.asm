@@ -15,17 +15,19 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_putblock.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
+; $Id: nb_putblock.asm,v 1.5 2016-06-19 20:33:40 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC nb_putblock
+	PUBLIC _nb_putblock
 	
 	EXTERN ZCALL
 
 .nb_putblock
-
-	ld	ix,2
+._nb_putblock
+	push	ix		;save callers
+	ld	ix,4
 	add	ix,sp
 
 	ld	e,(ix+4)	; stream
@@ -41,5 +43,5 @@
 	
 	ld	h,b
 	ld	l,c
-
+	pop	ix
 	ret

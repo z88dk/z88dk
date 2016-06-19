@@ -11,16 +11,19 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_open.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
+; $Id: nb_open.asm,v 1.3 2016-06-19 20:33:40 dom Exp $
 ;
 
-
+        SECTION smc_clib
 	PUBLIC nb_open
+	PUBLIC _nb_open
 	
 	EXTERN ZCALL
 
 .nb_open
-	ld	ix,2
+._nb_open
+	push	ix		;save callers
+	ld	ix,4
 	add	ix,sp
 
 	ld	a,(ix+8)	; mode
@@ -47,7 +50,7 @@
 	ld	d,(ix+2)	; port
 
 	call	ZCALL
-.openmode
+.openmode			;SMC!
 	defb	$0	; zopenin = $32; zopenout = $33;
 
 	
@@ -55,4 +58,6 @@
 	jp	nc,noerror
 	ld	l,a	; return error code
 .noerror
+	pop	ix	;restore callers
 	ret
+

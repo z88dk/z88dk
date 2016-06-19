@@ -15,17 +15,20 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_putc.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
+; $Id: nb_putc.asm,v 1.3 2016-06-19 20:33:40 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC nb_putc
+	PUBLIC _nb_putc
 	
 	EXTERN ZCALL
 
 .nb_putc
+._nb_putc
+	push	ix	;save callers
 
-	ld	ix,2
+	ld	ix,4
 	add	ix,sp
 
 	ld	a,(ix+0)	; byte
@@ -33,5 +36,5 @@
 	
 	call	ZCALL
 	defb	$30	; zoutput
-
+	pop	ix
 	ret

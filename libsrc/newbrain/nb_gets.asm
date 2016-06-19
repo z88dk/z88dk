@@ -15,17 +15,19 @@
 ; - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_gets.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
+; $Id: nb_gets.asm,v 1.3 2016-06-19 20:33:40 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC nb_gets
+	PUBLIC _nb_gets
 	
 	EXTERN ZCALL
 
 .nb_gets
-
-	ld	ix,2
+._nb_gets
+	push	ix	;save callers
+	ld	ix,4
 	add	ix,sp
 
 	ld	e,(ix+2)	; stream
@@ -51,6 +53,6 @@
 	ld	(hl),d		; with zero
 
 	pop	hl
-
+	pop	ix		;restore callers
 	ret
 	

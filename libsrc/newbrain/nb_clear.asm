@@ -15,15 +15,17 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_clear.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
+; $Id: nb_clear.asm,v 1.3 2016-06-19 20:33:40 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC nb_clear
+	PUBLIC _nb_clear
 
 	EXTERN nb_close
 	
 .nb_clear
+._nb_clear
 	ld	a,0
 .closelp
 	ld	h,0

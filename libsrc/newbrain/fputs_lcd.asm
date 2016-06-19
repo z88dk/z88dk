@@ -8,16 +8,18 @@
 ;
 ;
 ;
-; $Id: fputs_lcd.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
+; $Id: fputs_lcd.asm,v 1.4 2016-06-19 20:33:40 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC fputs_lcd
+	PUBLIC _fputs_lcd
 
 	EXTERN ZCALL
 
 
 .fputs_lcd
+._fputs_lcd
 	pop	bc
 	pop	hl
 	push	hl

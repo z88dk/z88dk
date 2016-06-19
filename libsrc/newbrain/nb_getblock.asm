@@ -15,17 +15,19 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_getblock.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
+; $Id: nb_getblock.asm,v 1.4 2016-06-19 20:33:40 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC nb_getblock
+	PUBLIC _nb_getblock
 	
 	EXTERN ZCALL
 
 .nb_getblock
-
-	ld	ix,2
+._nb_getblock
+	push	ix
+	ld	ix,4
 	add	ix,sp
 
 	ld	e,(ix+4)	; stream
@@ -44,5 +46,5 @@
 	and	a
 	pop	hl
 	sbc	hl,bc
-	
+	pop	ix	;restore caller
 	ret
