@@ -5,9 +5,10 @@
 ;	Internal function, call an EXTROM subroutine
 ;
 ;
-;	$Id: msxextrom.asm,v 1.2 2015-01-19 01:32:57 pauloscustodio Exp $
+;	$Id: msxextrom.asm,v 1.3 2016-06-19 21:00:56 dom Exp $
 ;
 
+        SECTION   code_clib
 	PUBLIC	msxextrom
 	EXTERN	msxrompage
 
