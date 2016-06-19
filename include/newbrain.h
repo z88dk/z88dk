@@ -1,7 +1,7 @@
 /*
  *      Grundy Newbrain specific functions
  *
- *      $Id: newbrain.h,v 1.9 2010-09-19 00:24:08 dom Exp $
+ *      $Id: newbrain.h,v 1.10 2016-06-19 20:37:09 dom Exp $
  */
 
 #ifndef __NEWBRAIN_H__
@@ -279,8 +279,8 @@ struct NB_DRIVER {
  * lowercase characters are not ASCII coded
  */
 
-extern void __LIB__ fputc_lcd(int position, int character);
-extern void __LIB__ __FASTCALL__ fputs_lcd( char *text );
+extern void __LIB__ fputc_lcd(int position, int character) __SMALLCDECL;
+extern void __LIB__ __FASTCALL__ fputs_lcd( char *text ) __SMALLCFASTCALL;
 
 /* 
  * Check if break has been pressed
@@ -302,16 +302,16 @@ extern void __LIB__ warm_reset();
 #define INP     0x32    /* open mode for input with 'nb_open'*/
 #define OUTP    0x33    /* open mode for output with 'nb_open'*/
 
-extern int __LIB__ nb_open( int mode, int stream, int device, int port, char *paramstr );
-extern void __LIB__ __FASTCALL__ nb_close( int stream );
+extern int __LIB__ nb_open( int mode, int stream, int device, int port, char *paramstr ) __SMALLDECL;
+extern void __LIB__ __FASTCALL__ nb_close( int stream ) __SMALLCFASTCALL;
 extern void __LIB__ nb_clear( );
-extern void __LIB__ nb_putc( int stream, char byte );
-extern void __LIB__ nb_puts( int stream, char *text );
-extern int __LIB__ nb_putblock( int stream, char *bytes, int length );
-extern void __LIB__ nb_putval( int stream, int value );
+extern void __LIB__ nb_putc( int stream, char byte ) __SMALLCDECL;
+extern void __LIB__ nb_puts( int stream, char *text ) __SMALLCDECL;
+extern int __LIB__ nb_putblock( int stream, char *bytes, int length ) __SMALLCDECL;
+extern void __LIB__ nb_putval( int stream, int value ) __SMALLCDECL;
 
-extern char __LIB__ __FASTCALL__ nb_getc( int stream );
-extern char __LIB__ *nb_gets( int stream, char *bytes, int length );
-extern int __LIB__ nb_getblock( int stream, char *bytes, int length );
+extern char __LIB__ __FASTCALL__ nb_getc( int stream ) __SMALLCFASTCALL;
+extern char __LIB__ *nb_gets( int stream, char *bytes, int length ) __SMALLCDECL;
+extern int __LIB__ nb_getblock( int stream, char *bytes, int length ) __SMALLCDECL;
 
 #endif
