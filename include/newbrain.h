@@ -1,7 +1,7 @@
 /*
  *      Grundy Newbrain specific functions
  *
- *      $Id: newbrain.h,v 1.10 2016-06-19 20:37:09 dom Exp $
+ *      $Id: newbrain.h,v 1.11 2016-06-19 20:50:33 dom Exp $
  */
 
 #ifndef __NEWBRAIN_H__
@@ -302,7 +302,7 @@ extern void __LIB__ warm_reset();
 #define INP     0x32    /* open mode for input with 'nb_open'*/
 #define OUTP    0x33    /* open mode for output with 'nb_open'*/
 
-extern int __LIB__ nb_open( int mode, int stream, int device, int port, char *paramstr ) __SMALLDECL;
+extern int __LIB__ nb_open( int mode, int stream, int device, int port, char *paramstr ) __SMALLCDECL;
 extern void __LIB__ __FASTCALL__ nb_close( int stream ) __SMALLCFASTCALL;
 extern void __LIB__ nb_clear( );
 extern void __LIB__ nb_putc( int stream, char byte ) __SMALLCDECL;
