@@ -7,14 +7,17 @@
 ;	int __CALLEE__ setcursorpos_callee(x,y);
 ;
 ;
-;	$Id: setcursorpos_callee.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: setcursorpos_callee.asm,v 1.5 2016-06-19 20:58:00 dom Exp $
 ;
 
+        SECTION   code_clib
 PUBLIC	setcursorpos_callee
+PUBLIC	_setcursorpos_callee
 PUBLIC	ASMDISP_SETCURSORPOS_CALLEE
 
 
 setcursorpos_callee:
+_setcursorpos_callee:
 	pop  bc
 	pop  hl
 	pop  de

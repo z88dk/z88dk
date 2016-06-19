@@ -4,11 +4,13 @@
 ;
 ;; void lpton()
 ;
-;       $Id: lpton.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
+;       $Id: lpton.asm,v 1.4 2016-06-19 20:58:00 dom Exp $
 ;
 
-
+        SECTION   code_clib
 PUBLIC lpton
+PUBLIC _lpton
 
 lpton:
+_lpton:
    jp	$1fd9

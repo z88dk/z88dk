@@ -1,16 +1,18 @@
 ; int setcursorpos(x,y)
 ; CALLER linkage for function pointers
 ;
-;       $Id: setcursorpos.asm,v 1.3 2015-01-19 01:33:07 pauloscustodio Exp $
+;       $Id: setcursorpos.asm,v 1.4 2016-06-19 20:58:00 dom Exp $
 ;
 
-
+        SECTION   code_clib
 PUBLIC setcursorpos
+PUBLIC _setcursorpos
 
 EXTERN setcursorpos_callee
 EXTERN ASMDISP_SETCURSORPOS_CALLEE
 
 setcursorpos:
+_setcursorpos:
    pop bc
    pop hl
    pop de

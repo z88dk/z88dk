@@ -7,15 +7,17 @@
 ;	int __CALLEE__ screen_callee(x,y);
 ;
 ;
-;	$Id: screen_callee\040.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: screen_callee\040.asm,v 1.5 2016-06-19 20:58:00 dom Exp $
 ;
 
-
+        SECTION   code_clib
 PUBLIC	screen_callee
+PUBLIC	_screen_callee
 PUBLIC	ASMDISP_screen_CALLEE
 
 
 screen_callee:
+_screen_callee:
 	pop  bc
 	pop  de
 	pop  hl

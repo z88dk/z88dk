@@ -7,15 +7,17 @@
 ;	; int sos_file(char *name,type)
 ;
 ;
-;	$Id: sos_file_callee.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: sos_file_callee.asm,v 1.5 2016-06-19 20:58:00 dom Exp $
 ;
 
-
+        SECTION   code_clib
 PUBLIC	sos_file_callee
+PUBLIC	_sos_file_callee
 PUBLIC	ASMDISP_SOS_FILE_CALLEE
 
 
 sos_file_callee:
+_sos_file_callee:
 	pop  bc
 	pop  hl
 	pop  de
