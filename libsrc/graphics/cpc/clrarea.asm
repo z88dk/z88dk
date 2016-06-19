@@ -1,11 +1,12 @@
 
+        SECTION   code_clib
 	PUBLIC	cleararea
 
         INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: clrarea.asm,v 1.3 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: clrarea.asm,v 1.4 2016-06-19 21:10:08 dom Exp $
 ;
 
 ; ***********************************************************************

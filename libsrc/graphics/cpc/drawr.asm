@@ -4,7 +4,7 @@
 ;	by Stefano Bodrato  - Jul 2004
 ;
 ;
-;	$Id: drawr.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: drawr.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
 ;
 
 ;Usage: drawr(struct *pixels)
@@ -17,8 +17,9 @@
 ;HL = Y coordinate of endpoint
 ;
 
-
+        SECTION   code_clib
         PUBLIC    drawr
+        PUBLIC    _drawr
         
         INCLUDE "cpcfirm.def"
                         
@@ -26,7 +27,9 @@
 
  
 .drawr
-		ld      ix,0
+._drawr
+		push	ix
+		ld      ix,2
 		add     ix,sp
 
 		ld      e,(ix+2)	;y1
@@ -47,4 +50,5 @@
 		rl      d
         call    firmware
         defw    gra_line_absolute
+		pop	ix
         ret

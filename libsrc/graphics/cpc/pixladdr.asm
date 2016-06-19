@@ -1,11 +1,12 @@
 
+        SECTION   code_clib
         PUBLIC	pixeladdress
 
         INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.8 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: pixladdr.asm,v 1.9 2016-06-19 21:10:08 dom Exp $
 ;
 
 ; ******************************************************************

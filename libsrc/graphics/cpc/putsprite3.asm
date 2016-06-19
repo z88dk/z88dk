@@ -13,11 +13,11 @@
 ; The XOR mode is totally untested.
 ;
 ;
-; $Id: putsprite3.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
+; $Id: putsprite3.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
 ;
 
 
-	
+        SECTION   code_clib	
         PUBLIC    putsprite
         
         INCLUDE "cpcfirm.def"
@@ -28,8 +28,8 @@
 ; sprite: (ix)
 
 .putsprite
-
-        ld      hl,2   
+	push	ix		;save callers
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -172,6 +172,7 @@
         ld      a,0	; FORCE mode (OR)
         call    firmware
         defw    scr_access
+	pop	ix
         ret
 
 

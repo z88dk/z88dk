@@ -6,10 +6,12 @@
 ; Amstrad CPC version
 ;
 ;
-; $Id: putsprite.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
+; $Id: putsprite.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
 ;
 
+        SECTION   code_clib
         PUBLIC    putsprite
+        PUBLIC    _putsprite
         EXTERN     pixeladdress
 
         INCLUDE "cpcfirm.def"
@@ -19,13 +21,11 @@
 ; sprite: (ix)
 
 
-.s_line_addr
-         defw   0
-
 
 .putsprite
-        
-        ld      hl,2   
+._putsprite
+        push	ix		;save callers
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -105,6 +105,7 @@
 
          pop      bc                ;Restore data
          djnz     _oloop
+	pop	ix
          ret
 
 ;-------------------
@@ -169,4 +170,9 @@
 
          pop      bc
          djnz     woloop
+	pop	ix
          ret
+
+	SECTION	bss_clib
+.s_line_addr
+         defw   0

@@ -4,21 +4,22 @@
 ;	by Stefano Bodrato  - Jul 2004
 ;
 ;
-;	$Id: undrawr.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: undrawr.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
 ;
 
 
-                
+        SECTION   code_clib                
         PUBLIC    undrawr
+        PUBLIC    _undrawr
 		EXTERN     drawr
 
         INCLUDE "cpcfirm.def"
 
         INCLUDE	"graphics/grafix.inc"
 
-.hlsave	defw	0
 
 .undrawr
+._undrawr
         ld      a,bcolor
         call    firmware
         defw    gra_set_pen
@@ -32,3 +33,5 @@
         defw    gra_set_pen
         ret
 
+	SECTION	bss_clib
+.hlsave	defw	0

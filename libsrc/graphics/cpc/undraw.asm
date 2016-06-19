@@ -4,20 +4,20 @@
 ;	by Stefano Bodrato  - Jul 2004
 ;
 ;
-;	$Id: undraw.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: undraw.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
 ;
 
 
-            
+        SECTION   code_clib            
         PUBLIC    undraw
+        PUBLIC    _undraw
 		EXTERN     draw
 
         INCLUDE "cpcfirm.def"
 
         INCLUDE	"graphics/grafix.inc"
 
-.hlsave	defw	0
-
+._undraw
 .undraw ld      a,bcolor
         call    firmware
         defw    gra_set_pen
@@ -30,3 +30,6 @@
         call    firmware
         defw    gra_set_pen
         ret
+
+	SECTION bss_clib
+.hlsave	defw	0

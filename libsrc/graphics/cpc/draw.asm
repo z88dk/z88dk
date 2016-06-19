@@ -5,7 +5,7 @@
 ;
 ;	Draw a line between two points
 ;
-;	$Id: draw.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: draw.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
 ;
 
 ;&BBC0 - GRA MOVE ABSOLUTE - Move to an absolute position
@@ -25,14 +25,17 @@
 
 
 
-
+        SECTION   code_clib
         PUBLIC    draw
+        PUBLIC    _draw
 
         INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 .draw
-		ld      ix,0
+._draw
+		push	ix
+		ld      ix,2
 		add     ix,sp
 		push	ix
 
@@ -76,5 +79,6 @@
 
         call    firmware
         defw    gra_line_absolute
+	pop	ix
         ret
 

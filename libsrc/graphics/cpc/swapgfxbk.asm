@@ -3,13 +3,14 @@
 ;       Doesn't really page on the Amstrad CPC.
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.5 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: swapgfxbk.asm,v 1.6 2016-06-19 21:10:08 dom Exp $
 ;
 ;	There might be something to put here; it looks like the
 ;	alternate registers and/or the index registers have to be
 ;	handled carefully
 ;
 
+        SECTION   code_clib
                 PUBLIC    swapgfxbk
 
 		PUBLIC	swapgfxbk1

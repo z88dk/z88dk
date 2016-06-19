@@ -4,7 +4,7 @@
 ;	by Stefano Bodrato  - Jul 2004
 ;
 ;
-;	$Id: plot.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: plot.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
 ;
 
 ;Usage: plot(struct *pixel)
@@ -18,14 +18,17 @@
 ;HL = Y coordinate relative to user origin
 
 
-
+        SECTION   code_clib
         PUBLIC    plot
+        PUBLIC    _plot
         
         INCLUDE "cpcfirm.def"              
         INCLUDE	"graphics/grafix.inc"
 
 
 .plot
+._plot
+		push	ix
 		ld      ix,0
 		add     ix,sp
 		ld      e,(ix+2)
@@ -42,4 +45,5 @@
 		rl      d
         call    firmware
         defw    gra_plot_absolute
+		pop	ix
         ret

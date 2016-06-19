@@ -23,13 +23,15 @@
 ;              Carry false
 ;
 ;
-;	$Id: fill.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: fill.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
 ;
 
 
 ;Usage: fill(struct *pixel)
 
+        SECTION   code_clib
         PUBLIC    fill
+        PUBLIC    _fill
 
         INCLUDE "cpcfirm.def"
         
@@ -37,7 +39,9 @@
 
 
 .fill
-		ld      ix,0
+._fill
+		push	ix
+		ld      ix,2
 		add     ix,sp
 		
 		ld      e,(ix+2)
@@ -74,4 +78,5 @@
 		ld      hl,3192		; restore the stack pointer
 		add     hl,sp
 		ld      sp,hl
+		pop	ix
 		ret

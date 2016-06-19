@@ -4,11 +4,13 @@
 ;       Amstrad CPC version by Stefano Bodrato  15/6/2001
 ;
 ;
-;	$Id: clg.asm,v 1.8 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: clg.asm,v 1.9 2016-06-19 21:10:08 dom Exp $
 ;
 
 
+        SECTION   code_clib
         PUBLIC    clg
+        PUBLIC    _clg
 
         INCLUDE "cpcfirm.def"
         
@@ -19,6 +21,7 @@
 ;
 
 .clg
+._clg
         ld      a,bcolor
         call    firmware
         defw    gra_set_paper

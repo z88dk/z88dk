@@ -4,7 +4,7 @@
 ;	by Stefano Bodrato  - Jul 2004
 ;
 ;
-;	$Id: unplot.asm,v 1.4 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: unplot.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
 ;
 
 ;Usage: unplot(struct *pixel)
@@ -20,18 +20,21 @@
 
 
 
-                
+        SECTION   code_clib                
         PUBLIC    unplot
+        PUBLIC    _unplot
 
         INCLUDE "cpcfirm.def"
         INCLUDE	"graphics/grafix.inc"
 
 
 .unplot
+._unplot
+		push	ix	;save callers
 		ld      a,bcolor
         call    firmware
         defw    gra_set_pen
-		ld      ix,0
+		ld      ix,2
 		add     ix,sp
 		
 		ld      e,(ix+2)
@@ -55,5 +58,6 @@
         ld      a,fcolor
         call    firmware
         defw    gra_set_pen
+		pop	ix
         ret
 
