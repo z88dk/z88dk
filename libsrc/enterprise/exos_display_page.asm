@@ -5,7 +5,7 @@
 ;	exos_display_page(unsigned char channel, unsigned char first_row, unsigned char rows, unsigned char first_row_position);
 ;
 ;
-;	$Id: exos_display_page.asm,v 1.4 2016-06-19 20:17:32 dom Exp $
+;	$Id: exos_display_page.asm,v 1.5 2016-06-20 08:13:22 dom Exp $
 ;
 
         SECTION code_clib
@@ -17,7 +17,7 @@
 
 exos_display_page:
 _exos_display_page:
-		puh	ix	
+		push	ix	
 		ld	ix,2
 		add	ix,sp
 		ld	e,(ix+2)
