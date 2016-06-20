@@ -6,10 +6,12 @@
 ; c128 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.3 2015-01-23 07:07:31 stefano Exp $
+; $Id: w_putsprite.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
 ;
 
+	SECTION   smc_clib
         PUBLIC    putsprite
+        PUBLIC   _putsprite
         EXTERN     w_pixeladdress
         ;EXTERN    vdcset
         ;EXTERN    vdcget
@@ -22,17 +24,10 @@
 ; sprite: (ix)
 
 
-.offsets_table
-         defb   1,2,4,8,16,32,64,128
-
-.lineaddr
-         defw   0
-.actbyte
-         defb   0
-
 .putsprite
-        
-        ld      hl,2   
+._putsprite
+	push	ix        	;save callers
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -150,6 +145,7 @@ loopa3:
 
          pop      bc                ;Restore data
          djnz     _oloop
+	pop	ix		;restore callers
          ret
          ;jp       swapgfxbk1
 
@@ -187,6 +183,7 @@ loopa3:
 
          pop      bc                ;Restore data
          djnz     woloop
+	 pop	ix		;restore callers
          ret
          ;jp       swapgfxbk1
         
@@ -200,6 +197,7 @@ loopa3:
 
          pop      bc
          djnz     woloop
+	 pop	ix		;restore callers
          ret
          ;jp       swapgfxbk1
 
@@ -362,4 +360,12 @@ loop6a:
         pop     bc
         pop     de
         ret
-;_____________________________________________________
+
+	SECTION	rodata_clib
+.offsets_table
+         defb   1,2,4,8,16,32,64,128
+	SECTION	bss_clib
+.lineaddr
+         defw   0
+.actbyte
+         defb   0

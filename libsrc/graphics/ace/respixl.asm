@@ -9,12 +9,13 @@
 ;       Reset pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.8 2015-01-19 01:32:45 pauloscustodio Exp $
+;	$Id: respixl.asm,v 1.9 2016-06-20 21:47:41 dom Exp $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
+			SECTION code_clib
 			PUBLIC	respixel
 
 			EXTERN	div3

@@ -1,5 +1,6 @@
         INCLUDE "graphics/grafix.inc"
 
+	SECTION	  code_clib
         PUBLIC    w_plotpixel
 
         EXTERN     l_cmp
@@ -8,7 +9,7 @@
         EXTERN    coords
 
 ;
-;       $Id: w_plotpixl.asm,v 1.3 2015-01-19 01:32:47 pauloscustodio Exp $
+;       $Id: w_plotpixl.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
 ;
 
 ; ******************************************************************

@@ -7,11 +7,11 @@
 ;	NOTE: we shouldn't use a table on the Galaksija,
 ;	      it is only a very quick way to get the result.
 ;
-;	$Id: textpixl6.asm,v 1.2 2015-01-19 01:32:48 pauloscustodio Exp $
+;	$Id: textpixl6.asm,v 1.3 2016-06-20 21:47:41 dom Exp $
 ;
 ;
 
-
+	SECTION rodata_clib
 	PUBLIC	textpixl
 
 

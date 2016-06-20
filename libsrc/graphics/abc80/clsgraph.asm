@@ -9,13 +9,14 @@
 ;       imported by Stefano Bodrato - 29/12/2006  :o)
 ;
 ;
-;       $Id: clsgraph.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
+;       $Id: clsgraph.asm,v 1.3 2016-06-20 21:47:41 dom Exp $
 ;
 
-
+		SECTION	  code_clib
 		PUBLIC    cleargraphics
 
 .cleargraphics
+		push	ix	;save callers
 		ld	ix,884
 		ld	b,24
 grloop:		push	bc
@@ -36,4 +37,5 @@ grloop:		push	bc
 		inc	ix
 		pop	bc
 		djnz	grloop
+		pop	ix	;restore callers
 		ret

@@ -4,14 +4,17 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: bksave.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
+; $Id: bksave.asm,v 1.6 2016-06-20 21:47:41 dom Exp $
 ;
 
+	SECTION	 code_clib
 	PUBLIC    bksave
+	PUBLIC    _bksave
 	EXTERN	pixeladdress
 
 .bksave
-        ld      hl,2
+	push	ix	;save callers
+        ld      hl,4
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -126,4 +129,5 @@
 	pop	bc
 	
 	djnz	bksavew
+	pop	ix
 	ret

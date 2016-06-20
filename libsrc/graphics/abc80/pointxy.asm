@@ -8,10 +8,10 @@
 ;       imported by Stefano Bodrato - 29/12/2006  :o)
 ;
 ;
-;	$Id: pointxy.asm,v 1.2 2015-01-19 01:32:45 pauloscustodio Exp $
+;	$Id: pointxy.asm,v 1.3 2016-06-20 21:47:41 dom Exp $
 ;
 
-
+			SECTION smc_clib
 			PUBLIC	pointxy
 			
 			EXTERN	coords

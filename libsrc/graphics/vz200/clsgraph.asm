@@ -1,10 +1,11 @@
 
+	SECTION	code_clib
 	PUBLIC	cleargraphics
 
 	EXTERN	base_graphics
 
 ;
-;	$Id: clsgraph.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: clsgraph.asm,v 1.6 2016-06-20 21:47:41 dom Exp $
 ;
 
 ; ******************************************************************

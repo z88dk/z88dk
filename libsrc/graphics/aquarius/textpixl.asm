@@ -3,11 +3,11 @@
 ;	Support char table (pseudo graph symbols) for the Mattel Aquarius
 ;	Sequence: blank, top-left, top-right, top-half, bottom-left, left-half, etc..
 ;
-;	$Id: textpixl.asm,v 1.3 2015-01-23 07:07:31 stefano Exp $
+;	$Id: textpixl.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
 ;
 ;
 
-
+	SECTION rodata_clib
 	PUBLIC	textpixl
 
 

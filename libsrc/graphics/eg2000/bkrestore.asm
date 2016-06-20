@@ -3,17 +3,19 @@
 ;		 Fast background restore
 ;
 ;
-; $Id: bkrestore.asm,v 1.1 2015-10-28 07:18:49 stefano Exp $
+; $Id: bkrestore.asm,v 1.2 2016-06-20 21:47:41 dom Exp $
 ;
 
-
+	SECTION   code_clib
 	PUBLIC    bkrestore
+	PUBLIC    _bkrestore
 	EXTERN	pixeladdress
 
 .bkrestore
+._bkrestore
 
 ; __FASTCALL__ : sprite ptr in HL
-	
+	push	ix		;save callers	
 	push	hl
 	pop	ix
 
@@ -58,6 +60,7 @@
 	
 	pop	bc
 	djnz	_sloop
+	pop	ix
 	ret
 
 .bkrestorew
@@ -102,4 +105,5 @@
 	
 	pop	bc
 	djnz	bkrestorew
+	pop	ix
 	ret

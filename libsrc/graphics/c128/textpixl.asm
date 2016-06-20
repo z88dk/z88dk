@@ -3,11 +3,11 @@
 ;	Support char table (pseudo graph symbols) for the Commodore 128
 ;	Sequence: blank, top-left, top-right, top-half, bottom-left, left-half, etc..
 ;
-;	$Id: textpixl.asm,v 1.3 2015-01-19 01:32:47 pauloscustodio Exp $
+;	$Id: textpixl.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
 ;
 ;
 
-
+	SECTION rodata_clib
 	PUBLIC	textpixl
 
 

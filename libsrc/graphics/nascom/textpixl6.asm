@@ -4,11 +4,11 @@
 ;	Version for the 2x3 graphics symbols
 ;	Sequence: blank, top-left, top-right, top-half, medium-left, top-left + medium-left, etc..
 ;
-;	$Id: textpixl6.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: textpixl6.asm,v 1.3 2016-06-20 21:47:41 dom Exp $
 ;
 ;
 
-
+	SECTION rodata_clib
 	PUBLIC	textpixl
 
 

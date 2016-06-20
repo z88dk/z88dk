@@ -4,17 +4,19 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: bkrestore.asm,v 1.6 2015-01-19 01:32:52 pauloscustodio Exp $
+; $Id: bkrestore.asm,v 1.7 2016-06-20 21:47:41 dom Exp $
 ;
 
-
+	SECTION	code_clib
 	PUBLIC    bkrestore
+	PUBLIC   _bkrestore
 	EXTERN	pixeladdress
 
 .bkrestore
+._bkrestore
 
 ; __FASTCALL__ : sprite ptr in HL
-	
+	push	ix		;save callers	
 	push	hl
 	pop	ix
 
@@ -103,4 +105,5 @@
 	
 	pop	bc
 	djnz	bkrestorew
+	pop	ix		;restore callers
 	ret

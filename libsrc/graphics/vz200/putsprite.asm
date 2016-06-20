@@ -6,22 +6,22 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: putsprite.asm,v 1.6 2015-10-28 07:18:50 stefano Exp $
+; $Id: putsprite.asm,v 1.7 2016-06-20 21:47:41 dom Exp $
 ;
 
+	SECTION	 smc_clib
 	PUBLIC    putsprite
+	PUBLIC    _putsprite
 	EXTERN	pixeladdress
 
 ; coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
-.offsets_table
-         defb	128,64,32,16,8,4,2,1
-
 .putsprite
-
-        ld      hl,2   
+._putsprite
+	push	ix	;save callers
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -94,6 +94,7 @@
          add      hl,bc
          pop      bc                ;Restore data
          djnz     _oloop
+	pop	ix		;restore callers
          ret
          
 
@@ -137,6 +138,7 @@
          add      hl,bc
          pop      bc                ;Restore data
          djnz     woloop
+	pop	ix		;restore callers
          ret
 
 .wover_1
@@ -149,5 +151,9 @@
          add      hl,bc
          pop      bc
          djnz     woloop
+	pop	ix		;restore callers
          ret
 
+	SECTION rodata_clib
+.offsets_table
+         defb	128,64,32,16,8,4,2,1
