@@ -1,5 +1,8 @@
+		SECTION code_clib		
 		PUBLIC	_fsetattr
+		PUBLIC	__fsetattr
 
+.__fgetattr
 ._fsetattr	pop de
 		pop hl
 		pop bc

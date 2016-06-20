@@ -1,9 +1,14 @@
 ;
 ;	create a file on an Amstrad NC100
 ;
-		PUBLIC creat
 
-.creat		pop de
+		SECTION code_clib
+		PUBLIC creat
+		PUBLIC _creat
+
+.creat		
+._creat		
+		pop de
 		pop bc		; don't care
 		pop hl
 		push hl

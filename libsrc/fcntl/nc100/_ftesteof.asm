@@ -1,3 +1,4 @@
+		SECTION code_clib
 		PUBLIC _ftesteof
 
 ._ftesteof	pop hl

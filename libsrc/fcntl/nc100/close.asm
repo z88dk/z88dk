@@ -1,9 +1,14 @@
 ;
 ;	Close a file handle
 ;
-		PUBLIC close
 
-.close		pop hl
+		SECTION code_clib
+		PUBLIC close
+		PUBLIC _close
+
+.close		
+._close
+		pop hl
 		pop de
 		push de
 		push hl

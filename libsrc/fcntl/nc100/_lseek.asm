@@ -3,10 +3,14 @@
 ; 	bits)
 ;
 ;	Supporting helpers
-;
-		PUBLIC nc_lseek		; can't call it fseek as the OS does
 
-.nc_lseek	pop hl
+		SECTION code_clib;
+		PUBLIC nc_lseek		; can't call it fseek as the OS does
+		PUBLIC _nc_lseek
+
+.nc_lseek
+._nc_lseek
+		pop hl
 		pop de
 		pop bc
 		push bc

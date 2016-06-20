@@ -1,16 +1,20 @@
 ;
 ;	Write a file on an Amstrad NC100
 ;
-		PUBLIC write
 
-.write		pop ix
+		SECTION code_clib
+		PUBLIC write
+		PUBLIC _write
+
+._write
+.write		pop af
 		pop de
 		pop hl
 		pop bc
 		push bc
 		push hl
 		push de
-		push ix
+		push af
 		ld a, b
 		or c
 		call nz, 0xB8AB

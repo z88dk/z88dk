@@ -1,17 +1,21 @@
 ;
 ;	open a file on an Amstrad NC100
 ;
+
+		SECTION code_clib
 		PUBLIC open
+		PUBLIC _open
 
 .open
-	pop ix			; return address
+._open
+	pop af			; return address
 	pop bc			; don't care
 	pop de			; read or write
 	pop hl			; name
 	push hl
 	push de
 	push bc
-	push ix	
+	push af	
 
 	ld d, 0
 	ld a, e			; mode bits

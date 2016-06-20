@@ -1,16 +1,20 @@
 ;
 ;	read from disk
 ;
+
+		SECTION code_clib
 		PUBLIC read
+		PUBLIC _read
 .read
-		pop ix
+._read
+		pop af
 		pop de
 		pop hl
 		pop bc
 		push bc
 		push hl
 		push de
-		push ix
+		push af
 		ld a, b
 		or c
 		call nz, 0xB896

@@ -1,6 +1,10 @@
+		
+		SECTION code_clib
 		PUBLIC rename
+		PUBLIC _rename
 
 .rename
+._rename
 		pop bc
 		pop hl
 		pop de

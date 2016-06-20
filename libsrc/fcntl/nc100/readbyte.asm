@@ -1,8 +1,12 @@
 ;
 ;	readbyte, fastcall fd is in HL
 ;
-		PUBLIC readbyte
 
+		SECTION code_clib
+		PUBLIC readbyte
+		PUBLIC _readbyte
+
+._readbyte
 .readbyte	ex de, hl
 		call 0xB899
 		jr nc, readeof
