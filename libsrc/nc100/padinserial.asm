@@ -1,7 +1,10 @@
 
+                SECTION code_clib
 		PUBLIC	padinserial
+		PUBLIC	_padinserial
 
 .padinserial
+._padinserial
 		call 0xb85d
 		jr nc, nochar
 		ld h, 0

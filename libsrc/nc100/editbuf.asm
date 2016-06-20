@@ -1,6 +1,10 @@
+		
+                SECTION code_clib
 		PUBLIC	editbuf
+		PUBLIC	_editbuf
 
 .editbuf
+._editbuf
 		pop de
 		pop hl
 		pop bc

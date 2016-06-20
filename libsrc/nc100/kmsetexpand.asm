@@ -1,6 +1,10 @@
+		
+                SECTION code_clib
 		PUBLIC	kmsetexpand
+		PUBLIC	_kmsetexpand
 
 .kmsetexpand
+._kmsetexpand
 		pop de
 		pop bc
 		pop hl

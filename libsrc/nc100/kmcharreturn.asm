@@ -1,9 +1,13 @@
+                SECTION code_clib	
 		PUBLIC	kmcharreturn
+		PUBLIC	_kmcharreturn
 
 .kmcharreturn
-		pop ix
+._kmcharreturn
+		pop af
 		pop bc
+		push	bc
+		push	af
 		call 0xB803
-		push bc
-		jp (ix)
+		ret
 

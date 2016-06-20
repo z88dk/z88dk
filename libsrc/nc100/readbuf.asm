@@ -1,6 +1,10 @@
+
+                SECTION code_clib
 		PUBLIC	readbuf
+		PUBLIC	_readbuf
 
 .readbuf
+._readbuf
 		pop de
 		pop hl
 		pop bc

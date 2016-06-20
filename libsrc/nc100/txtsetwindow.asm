@@ -1,6 +1,11 @@
-		PUBLIC	txtsetwindow
 
-.txtsetwindow	pop bc
+                SECTION code_clib
+		PUBLIC	txtsetwindow
+		PUBLIC	_txtsetwindow
+
+.txtsetwindow	
+._txtsetwindow	
+		pop bc
 		pop hl
 		pop de
 		push de

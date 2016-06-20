@@ -1,13 +1,16 @@
 #ifndef __NC_H__
 #define __NC_H__
 
+#include <sys/compiler.h>
+
+
 /* Things relevant to the C library */
 
 #define __STDIO_BINARY     1    /* We should consider binary/text differences */
 
-extern int __LIB__ __FASTCALL__ _fdatestamp(const char *filename);
-extern int __LIB__ __FASTCALL___fgetattr(const char *filename);
-extern int __LIB__ _fsetattr(const char *filename, int attr);
+extern int __LIB__ __FASTCALL__ _fdatestamp(const char *filename) __SMALLCFASTCALL;
+extern int __LIB__ __FASTCALL__ _fgetattr(const char *filename) __SMALLCFASTCALL;
+extern int __LIB__ _fsetattr(const char *filename, int attr) __SMALLCDECL;
 
 
 #define NC_FATTR_SYSTEM		1
@@ -27,13 +30,13 @@ struct nc_findfirst {
 
 typedef struct nc_findfirst nc_findfirst;
 
-extern int __LIB__ __FASTCALL__ _setdta(nc_findfirst *ptr);
+extern int __LIB__ __FASTCALL__ _setdta(nc_findfirst *ptr) __SMALLCFASTCALL;
 
-extern unsigned int __LIB__ __FASTCALL__ _fsizehandle(unsigned int handle);
-extern unsigned int __LIB__ __FASTCALL__ _fsize(const char *name);
-extern unsigned int __LIB__ __FASTCALL__ nc_ltell(unsigned int handle);
-extern unsigned int __LIB__ nc_lseek(unsigned int handle, unsigned int pos);
-extern int __LIB__ __FASTCALL__ remove(const char *name);
+extern unsigned int __LIB__ __FASTCALL__ _fsizehandle(unsigned int handle) __SMALLCFASTCALL;
+extern unsigned int __LIB__ __FASTCALL__ _fsize(const char *name) __SMALLCFASTCALL;
+extern unsigned int __LIB__ __FASTCALL__ nc_ltell(unsigned int handle) __SMALLCFASTCALL;
+extern unsigned int __LIB__ nc_lseek(unsigned int handle, unsigned int pos) __SMALLCDECL;
+extern int __LIB__ __FASTCALL__ remove(const char *name) __SMALLCFASTCALL;
 
 //extern int __LIB__ rename(const char *old, const char *new);
 
@@ -50,11 +53,11 @@ struct dirent {
 
 typedef unsigned int	 DIR;		/* compiler limit */
 
-extern DIR *opendir(const char *name);
-extern int closedir(DIR *p);
-extern struct dirent *readdir(DIR *p);
-extern long telldir(DIR *p);
-extern int seekdir(DIR *p, long v);
+extern DIR __LIB__  *opendir(const char *name);
+extern int  __LIB__ closedir(DIR *p);
+extern struct dirent  __LIB__ *readdir(DIR *p);
+extern long  __LIB__ telldir(DIR *p);
+extern int  __LIB__ seekdir(DIR *p, long v);
 
 
 #endif

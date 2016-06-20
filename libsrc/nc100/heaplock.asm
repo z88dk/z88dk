@@ -1,6 +1,9 @@
+                SECTION code_clib	
 		PUBLIC	heaplock
+		PUBLIC	_heaplock
 
 .heaplock
+._heaplock
 		pop hl
 		pop de
 		pop bc
