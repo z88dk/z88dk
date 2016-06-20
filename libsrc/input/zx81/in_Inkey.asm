@@ -4,7 +4,9 @@
 ; Read current state of keyboard but only return
 ; keypress if a single key is pressed.
 
+SECTION code_clib
 PUBLIC in_Inkey
+PUBLIC _in_Inkey
 EXTERN in_keytranstbl
 
 ; exit : carry set and HL = 0 for no keys registered
@@ -12,6 +14,7 @@ EXTERN in_keytranstbl
 ; uses : AF,BC,DE,HL
 
 .in_Inkey
+._in_Inkey
 
    ld de,0
    ld bc,$fefe
@@ -115,6 +118,7 @@ EXTERN in_keytranstbl
    ld h,0
    ret
 
+	SECTION	rodata_clib
 .rowtbl
    defb 255,255,255,255,255,255,255
    defb 255,255,255,255,255,255,255,255

@@ -4,9 +4,12 @@
 ; I would like to add lower case letters too but not
 ; sure how to go about it with just one shift key
 
+SECTION rodata_clib
 PUBLIC in_keytranstbl
+PUBLIC _in_keytranstbl
 
 .in_keytranstbl
+._in_keytranstbl
 
    ; unshifted
 
