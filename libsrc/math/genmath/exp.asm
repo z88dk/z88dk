@@ -4,17 +4,18 @@
 ; FIXME: norm4
 
 
-                PUBLIC    exp
+        SECTION code_fp
+        PUBLIC    exp
 
-                EXTERN     sgn
-                EXTERN     floor
-                EXTERN     poly
+        EXTERN     sgn
+        EXTERN     floor
+        EXTERN     poly
 
-                EXTERN     fmul
-                EXTERN     pushfa
-                EXTERN     norm4
-                EXTERN    fa
-                EXTERN     fsub
+        EXTERN     fmul
+        EXTERN     pushfa
+        EXTERN     norm4
+        EXTERN    fa
+        EXTERN     fsub
 
 ;
 
@@ -58,7 +59,7 @@
         ret     ;jp oflow
 
 ;
-
+	SECTION rodata_fp
 .EXPCOEF 
         defb     10
         defb      $CC,$D5,$45,$56,$15,$6A

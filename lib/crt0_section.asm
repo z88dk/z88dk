@@ -35,11 +35,13 @@ ENDIF
 		SECTION code_clib
 		SECTION code_crt0_sccz80
 		SECTION code_l_sdcc
+		SECTION code_fp
 		SECTION code_math
 		SECTION code_error
 		SECTION smc_clib
 		SECTION data_bss
 		SECTION data_compiler
+		SECTION rodata_fp
 		SECTION rodata_compiler
 		SECTION rodata_clib
 
@@ -71,7 +73,7 @@ _heap:
                 defw 0          ; Initialised by code_crt_init - location of the last program byte
                 defw 0
 ENDIF
-
+		SECTION bss_fp
 		SECTION bss_fardata
 IF bss_fardata_start
 		org	bss_fardata_start

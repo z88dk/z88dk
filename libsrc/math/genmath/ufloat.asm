@@ -2,9 +2,10 @@
 ;       Converts integer in hl to fp number
 
 
-                PUBLIC    ufloat
+        SECTION code_fp
+        PUBLIC    ufloat
 
-                EXTERN    float1
+        EXTERN    float1
 
 
 ;

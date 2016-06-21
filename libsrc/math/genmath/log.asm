@@ -1,40 +1,26 @@
 ;       Small C+ Math functions
 
 
+        SECTION code_fp
+        PUBLIC    log
 
-                PUBLIC    log
-
-                EXTERN	hlsub
-                EXTERN	evenpol
-                EXTERN	sgn
-                EXTERN	fdiv
-                EXTERN	fmul
-                EXTERN	fadd
-                EXTERN	norma
-                EXTERN	pushfa
+        EXTERN	hlsub
+        EXTERN	evenpol
+        EXTERN	sgn
+        EXTERN	fdiv
+        EXTERN	fmul
+        EXTERN	fadd
+        EXTERN	norma
+        EXTERN	pushfa
 
 
-                EXTERN    fa
-                EXTERN    fasign
+        EXTERN    fa
+        EXTERN    fasign
 
 ;
 ;       transcendental functions: log
 ;
 ;
-.L0F2E  DEFB    0
-;
-.ONE    DEFW      0
-        DEFW      0
-        DEFW      $8100
-;
-.LOGCOEF 
-        defb     6
-        defb      $23,$85,$AC,$C3,$11,$7F
-        defb      $53,$CB,$9E,$B7,$23,$7F
-        defb      $CC,$FE,$A6,$0D,$53,$7F
-        defb      $CB,$5C,$60,$BB,$13,$80
-        defb      $DD,$E3,$4E,$38,$76,$80
-        defb      $5C,$29,$3B,$AA,$38,$82
 
 
 ;
@@ -113,3 +99,19 @@
         XOR     A
         JR      L280C
 ;
+	SECTION bss_fp
+.L0F2E  DEFB    0
+;
+	SECTION rodata_fp
+.ONE    DEFW      0
+        DEFW      0
+        DEFW      $8100
+;
+.LOGCOEF 
+        defb     6
+        defb      $23,$85,$AC,$C3,$11,$7F
+        defb      $53,$CB,$9E,$B7,$23,$7F
+        defb      $CC,$FE,$A6,$0D,$53,$7F
+        defb      $CB,$5C,$60,$BB,$13,$80
+        defb      $DD,$E3,$4E,$38,$76,$80
+        defb      $5C,$29,$3B,$AA,$38,$82

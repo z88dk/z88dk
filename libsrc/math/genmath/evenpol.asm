@@ -1,12 +1,13 @@
 ;       Small C+ Math Library
 
 
-                PUBLIC    evenpol
-                EXTERN     poly
+        SECTION code_fp
+        PUBLIC    evenpol
+        EXTERN     poly
 
-                EXTERN	pushfa
-                EXTERN	ldbcfa
-                EXTERN	fmul
+        EXTERN	pushfa
+        EXTERN	ldbcfa
+        EXTERN	fmul
 
 ;
 ;       transcendental floating point routines: polynomial evaluation

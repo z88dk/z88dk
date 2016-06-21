@@ -2,14 +2,15 @@
 ;       ceil(x)
 
 
-                PUBLIC    floor
+        SECTION code_fp
+        PUBLIC    floor
 
 
-                EXTERN	int2
-                EXTERN	norma
+        EXTERN	int2
+        EXTERN	norma
 
 
-                EXTERN    fa
+        EXTERN    fa
 
 
 ;

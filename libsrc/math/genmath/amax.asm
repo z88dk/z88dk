@@ -1,5 +1,6 @@
 ;       Small C+ Math Library
 
+	SECTION code_fp
         PUBLIC amax
         
         EXTERN	ldbchl

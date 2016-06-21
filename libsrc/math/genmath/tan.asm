@@ -3,15 +3,17 @@
 ;       transcendental floating point routines
 ;
 
-                PUBLIC    tan
 
-                EXTERN     sin
-                EXTERN     cos
-                EXTERN     ldfabc
+        SECTION code_fp
+        PUBLIC    tan
 
-                EXTERN     pushfa
-                EXTERN    pushf2
-                EXTERN     div1
+        EXTERN     sin
+        EXTERN     cos
+        EXTERN     ldfabc
+
+        EXTERN     pushfa
+        EXTERN    pushf2
+        EXTERN     div1
 
 
 

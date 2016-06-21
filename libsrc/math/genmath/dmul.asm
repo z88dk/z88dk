@@ -3,12 +3,12 @@
 ;
 ;	
 ;
-;       $Id: dmul.asm,v 1.2 2015-01-19 01:32:56 pauloscustodio Exp $:
+;       $Id: dmul.asm,v 1.3 2016-06-21 21:16:49 dom Exp $:
 
+        SECTION code_fp
+	PUBLIC	dmul
 
-		PUBLIC	dmul
-
-		EXTERN	fmul
+	EXTERN	fmul
 
 .dmul
 	pop	hl	;ret address 

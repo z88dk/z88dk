@@ -10,6 +10,7 @@
 
         INCLUDE "stdio.def"
 
+        SECTION code_fp
         PUBLIC    sqrt
 
         EXTERN    dload
@@ -136,7 +137,7 @@
         ld      sp,hl
         ret
 
-
+	SECTION rodata_clib
 .i_1
         defb    0,0,0,0,0,0
         defb    18,-125,-64,-54,65,-128

@@ -2,12 +2,13 @@
 ;       Z88dk Generic Floating Point Math Library
 ;
 ;
-;	$Id: norma.asm,v 1.2 2015-01-19 01:32:56 pauloscustodio Exp $
+;	$Id: norma.asm,v 1.3 2016-06-21 21:16:49 dom Exp $
 
-		PUBLIC	norma
+        SECTION code_fp
+	PUBLIC	norma
 
-		EXTERN	minusbc
-		EXTERN	norm
+	EXTERN	minusbc
+	EXTERN	norm
 
 ;       reverse sign if necessary (cy set) and normalize
 ;       (sign reversal necessary because we're using

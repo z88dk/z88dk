@@ -3,15 +3,15 @@
 ;
 ;       Find exponent for product (l=0) or quotient(l=ff)
 ;
-;       $Id: div14.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $:
+;       $Id: div14.asm,v 1.4 2016-06-21 21:16:49 dom Exp $:
 
+        SECTION code_fp
+	PUBLIC	div14
 
-		PUBLIC	div14
+	EXTERN	unpack
+	EXTERN	norm4
 
-		EXTERN	unpack
-		EXTERN	norm4
-
-		EXTERN	fa
+	EXTERN	fa
 
 .div14  LD      A,B
         OR      A

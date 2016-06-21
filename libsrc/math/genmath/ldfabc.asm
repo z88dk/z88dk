@@ -4,9 +4,10 @@
 ;	FA = bc ix de
 
 
-		PUBLIC	ldfabc
+        SECTION code_fp
+	PUBLIC	ldfabc
 
-		EXTERN	fa
+	EXTERN	fa
 
 .ldfabc LD      (fa),DE
         LD      (fa+2),IX

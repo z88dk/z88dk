@@ -3,9 +3,10 @@
 ;       transcendental floating point routines
 ;
 
-                PUBLIC    pi
+        SECTION code_fp
+        PUBLIC    pi
 
-		EXTERN	ldfabc
+	EXTERN	ldfabc
 
 
 ;double pi()

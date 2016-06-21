@@ -1,10 +1,10 @@
 ;       Small C+ Math Library
 
+        SECTION code_fp
+        PUBLIC    log10
 
-                PUBLIC    log10
-
-                EXTERN     log
-                EXTERN     fmul
+        EXTERN     log
+        EXTERN     fmul
 
 
 

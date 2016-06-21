@@ -4,20 +4,20 @@
 ;       Generic rand() function
 
 
-
-                PUBLIC    fprand
+        SECTION code_fp
+        PUBLIC    fprand
                 
-                EXTERN	fmul
-                EXTERN	fadd
-                EXTERN	ldbcfa
-                EXTERN	norm
+        EXTERN	fmul
+        EXTERN	fadd
+        EXTERN	ldbcfa
+        EXTERN	norm
                 
 
-                EXTERN    fp_seed
-                EXTERN    dload
-                EXTERN    fa
-                EXTERN    fasign
-                EXTERN    dstore
+        EXTERN    fp_seed
+        EXTERN    dload
+        EXTERN    fa
+        EXTERN    fasign
+        EXTERN    dstore
 
 
 .fprand

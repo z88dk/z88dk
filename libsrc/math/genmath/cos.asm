@@ -3,11 +3,12 @@
 ;       transcendental floating point routines
 ;
 
-                PUBLIC    cos
-                EXTERN     sin
-		EXTERN	hladd
+        SECTION code_fp
+        PUBLIC    cos
+        EXTERN     sin
+	EXTERN	hladd
 
-		EXTERN	__halfpi
+	EXTERN	__halfpi
 
 
 

@@ -4,9 +4,11 @@
 ;       Set the floating point seed
 ;
 ;
-                PUBLIC    fpseed
-                EXTERN    dstore
-                EXTERN    fp_seed
+
+        SECTION code_fp
+        PUBLIC    fpseed
+        EXTERN    dstore
+        EXTERN    fp_seed
 
 
 .fpseed

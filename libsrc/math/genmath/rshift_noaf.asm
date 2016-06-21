@@ -3,12 +3,13 @@
 ;
 ;	Shift c ix de b right by a
 ;
-;       $Id: rshift_noaf.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $:
+;       $Id: rshift_noaf.asm,v 1.4 2016-06-21 21:16:49 dom Exp $:
 
 
-		PUBLIC	rshift
+        SECTION code_fp
+	PUBLIC	rshift
 
-		PUBLIC	rsh8
+	PUBLIC	rsh8
 
 
 .rshift LD      B,0

@@ -1,12 +1,12 @@
 ;       Small C+ Math Library
 
 
+        SECTION code_fp
+        PUBLIC    ifix
+        EXTERN     floor
+        EXTERN     l_long_neg
 
-                PUBLIC    ifix
-                EXTERN     floor
-                EXTERN     l_long_neg
-
-                EXTERN    fa
+        EXTERN    fa
 
 ;
 ;       convert the floating point number in FA

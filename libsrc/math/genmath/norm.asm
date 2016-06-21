@@ -5,15 +5,16 @@
 ;	current exponent in fa+5
 ;	Result -> fa +5
 ;
-;       $Id: norm.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $:
+;       $Id: norm.asm,v 1.5 2016-06-21 21:16:49 dom Exp $:
 
 
-		PUBLIC	norm
+        SECTION code_fp
+	PUBLIC	norm
 
-		EXTERN	pack
-		EXTERN	norm4
+	EXTERN	pack
+	EXTERN	norm4
 
-		EXTERN	fa
+	EXTERN	fa
 
 .norm   LD      L,B
         LD      H,E

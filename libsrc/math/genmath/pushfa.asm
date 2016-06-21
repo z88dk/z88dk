@@ -3,14 +3,15 @@
 ;
 ;       Push FA onto the stack
 ;
-;       $Id: pushfa.asm,v 1.2 2015-01-19 01:32:56 pauloscustodio Exp $:
+;       $Id: pushfa.asm,v 1.3 2016-06-21 21:16:49 dom Exp $:
 
 
-		PUBLIC	pushfa
+        SECTION code_fp
+	PUBLIC	pushfa
 
-		PUBLIC	pushf2
+	PUBLIC	pushf2
 
-		EXTERN	fa
+	EXTERN	fa
 
 .pushfa
 	ex	de,hl

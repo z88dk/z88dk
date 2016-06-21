@@ -3,20 +3,21 @@
 ;
 ;	divide bc ix de by FA, leave result in FA
 ;
-;	$Id: fdiv.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $
+;	$Id: fdiv.asm,v 1.5 2016-06-21 21:16:49 dom Exp $
 
 
 
-		PUBLIC	fdiv
+        SECTION code_fp
+	PUBLIC	fdiv
 
-		EXTERN	sgn
-		EXTERN	div14
-		EXTERN	pack2
-		EXTERN	norm4
+	EXTERN	sgn
+	EXTERN	div14
+	EXTERN	pack2
+	EXTERN	norm4
 
 
-		EXTERN	fa
-		EXTERN	extra
+	EXTERN	fa
+	EXTERN	extra
 
 
 .fdiv

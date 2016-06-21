@@ -3,20 +3,21 @@
 ;       transcendental floating point routines
 ;
 
-                PUBLIC  sin
-                EXTERN   hlsub
-                EXTERN   hladd
-                EXTERN   addhalf
+        SECTION code_fp
+        PUBLIC  sin
+        EXTERN   hlsub
+        EXTERN   hladd
+        EXTERN   addhalf
 
-                EXTERN   evenpol
-                EXTERN   floor
+        EXTERN   evenpol
+        EXTERN   floor
 
-                EXTERN   pushfa
-                EXTERN   ldfabc
-                EXTERN   fsub
-                EXTERN   sgn
-                EXTERN   minusfa
-                EXTERN   fdiv
+        EXTERN   pushfa
+        EXTERN   ldfabc
+        EXTERN   fsub
+        EXTERN   sgn
+        EXTERN   minusfa
+        EXTERN   fdiv
 
 
 
@@ -59,11 +60,11 @@
         LD      HL,SINCOEF
         JP      evenpol
 ;
+	SECTION	rodata_fp
 .KWARTER
         defw     0
         defw     0
         defw    $7F00
-
 
 .SINCOEF 
         defb     7

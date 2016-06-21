@@ -3,8 +3,8 @@
 ;
 ;	bc ix de = (hl)
 
-
-		PUBLIC	ldbchl
+        SECTION code_fp
+	PUBLIC	ldbchl
 
 .ldbchl ld      e,(hl)
         inc     hl

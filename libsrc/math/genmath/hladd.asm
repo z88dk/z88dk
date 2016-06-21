@@ -1,10 +1,11 @@
 ;       Small C+ Math Library
 ;       General "fudging routine"
 
-                PUBLIC    hladd
+        SECTION code_fp
+        PUBLIC    hladd
 
-                EXTERN	ldbchl
-                EXTERN	fadd
+        EXTERN	ldbchl
+        EXTERN	fadd
 
 
 ;

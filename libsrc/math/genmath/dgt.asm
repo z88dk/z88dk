@@ -3,13 +3,14 @@
 ;
 ;	TOS >= FA
 ;
-;       $Id: dgt.asm,v 1.2 2015-01-19 01:32:56 pauloscustodio Exp $:
+;       $Id: dgt.asm,v 1.3 2016-06-21 21:16:49 dom Exp $:
 
-		PUBLIC	dgt
+        SECTION code_fp
+	PUBLIC	dgt
 
-		EXTERN	dcompar
-		EXTERN	f_yes
-		EXTERN	f_no
+	EXTERN	dcompar
+	EXTERN	f_yes
+	EXTERN	f_no
 
 .dgt	call dcompar
 	jp	z,f_no

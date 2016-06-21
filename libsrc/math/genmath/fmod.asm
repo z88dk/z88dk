@@ -9,12 +9,13 @@
 ;       Don't know if it works correctly..let me know!
 
 
-                PUBLIC    fmod
-                EXTERN	pushfa
-                EXTERN	fdiv
-                EXTERN	floor
-                EXTERN	fsub
-                EXTERN	fmul
+        SECTION code_fp
+        PUBLIC    fmod
+        EXTERN	pushfa
+        EXTERN	fdiv
+        EXTERN	floor
+        EXTERN	fsub
+        EXTERN	fmul
 
 
 ;

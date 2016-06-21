@@ -3,25 +3,21 @@
 ;       transcendental floating point routines
 ;
 
-                PUBLIC    atan
+        SECTION code_fp
+        PUBLIC    atan
 
-                EXTERN     evenpol
-		EXTERN	hlsub
-                EXTERN	odd
+        EXTERN     evenpol
+	EXTERN	hlsub
+        EXTERN	odd
+        EXTERN	sgn
+        EXTERN	fdiv
 
-                EXTERN	sgn
-                EXTERN	fdiv
+	EXTERN	dload
+	EXTERN	fa
 
-		EXTERN	dload
-		EXTERN	fa
+	PUBLIC	__halfpi
+	PUBLIC	__pi
 
-		PUBLIC	__halfpi
-		PUBLIC	__pi
-
-.__pi  
-        DEFB    $22,$A2,$DA,$0F,$49,$82   ;pi
-.__halfpi        
-        DEFB      $22,$A2,$DA,$0F,$49,$81 ; pi/2
 
 
 
@@ -48,6 +44,11 @@
         LD      HL,__halfpi      ;may use for subtraction
 	ret
 
+		SECTION rodata_fp
+.__pi  
+        DEFB    $22,$A2,$DA,$0F,$49,$82   ;pi
+.__halfpi        
+        DEFB      $22,$A2,$DA,$0F,$49,$81 ; pi/2
 ;
 .ATNCOEF 
         defb     13               ;hmmm? $13?

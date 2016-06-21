@@ -2,13 +2,13 @@
 ;       fabs(x)
 
 
+        SECTION code_fp
+        PUBLIC    fabs
+        EXTERN     minusfa
 
-                PUBLIC    fabs
-                EXTERN     minusfa
 
-
-                EXTERN	sgn
-                EXTERN    fa
+        EXTERN	sgn
+        EXTERN    fa
 
 
 ;

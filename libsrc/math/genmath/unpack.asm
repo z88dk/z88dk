@@ -3,11 +3,13 @@
 ;
 ;       Unpack FP number
 ;
-;       $Id: unpack.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $:
+;       $Id: unpack.asm,v 1.4 2016-06-21 21:16:50 dom Exp $:
 
-		PUBLIC	unpack
 
-		EXTERN	fa
+        SECTION code_fp
+	PUBLIC	unpack
+
+	EXTERN	fa
 
 .unpack LD      HL,fa+4
         LD      A,(HL)  ;get MSB of fraction

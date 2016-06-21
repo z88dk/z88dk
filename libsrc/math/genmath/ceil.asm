@@ -1,11 +1,11 @@
 ;       Small C+ Math Library
 ;       ceil(x)
 
+        SECTION code_fp
+        PUBLIC    ceil
 
-                PUBLIC    ceil
-
-                EXTERN     floor
-                EXTERN     odd
+        EXTERN     floor
+        EXTERN     odd
 
 
 ;       return -(floor(-x))

@@ -1,8 +1,9 @@
 ;       Small C+ Math Library - Support routine
 ;       Negate a fp number push address
 
-                PUBLIC    odd
-                EXTERN     minusfa
+        SECTION code_fp
+        PUBLIC    odd
+        EXTERN     minusfa
 
 ;
 ;       negate FA, and push address of MINUSFA

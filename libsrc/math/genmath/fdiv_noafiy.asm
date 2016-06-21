@@ -3,22 +3,21 @@
 ;
 ;	divide bc ix de by FA, leave result in FA
 ;
-;	$Id: fdiv_noafiy.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
+;	$Id: fdiv_noafiy.asm,v 1.4 2016-06-21 21:16:49 dom Exp $
 
 
+        SECTION code_fp
+	PUBLIC	fdiv
 
-		PUBLIC	fdiv
+	EXTERN	sgn
+	EXTERN	div14
+	EXTERN	pack2
+	EXTERN	norm4
+	EXTERN	afswap
 
-		EXTERN	sgn
-		EXTERN	div14
-		EXTERN	pack2
-		EXTERN	norm4
-		EXTERN	afswap
+	EXTERN	fa
+	EXTERN	extra
 
-		EXTERN	fa
-		EXTERN	extra
-
-.ixsave		defw	0
 
 .fdiv
 	call	sgn
@@ -166,6 +165,8 @@
         JP      pack2
 
 
+	SECTION bss_fp
+.ixsave		defw	0
 
 
 

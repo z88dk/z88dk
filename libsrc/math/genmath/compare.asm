@@ -3,14 +3,15 @@
 ;
 ;       set flags per FA - ( bc ix de )
 ;
-;       $Id: compare.asm,v 1.4 2015-01-19 01:32:56 pauloscustodio Exp $:
+;       $Id: compare.asm,v 1.5 2016-06-21 21:16:49 dom Exp $:
 
-		PUBLIC	compare
+        SECTION code_fp
+	PUBLIC	compare
 
-		EXTERN	sgn
+	EXTERN	sgn
 
-		EXTERN	setflgs
-		EXTERN	fa
+	EXTERN	setflgs
+	EXTERN	fa
 
 .compare 
 	LD     A,B

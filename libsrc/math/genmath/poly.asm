@@ -1,14 +1,15 @@
 ;       Small C+ Math Library
 ;       More polynomial evaluation
 
-                PUBLIC    poly
+        SECTION code_fp
+        PUBLIC    poly
 
-                EXTERN     pushfa
-                EXTERN     ldbchl
-                EXTERN     fadd
-                EXTERN     fmul
+        EXTERN     pushfa
+        EXTERN     ldbchl
+        EXTERN     fadd
+        EXTERN     fmul
 
-                EXTERN    dload
+        EXTERN    dload
 
 ;
 .poly   CALL    pushfa  

@@ -2,15 +2,15 @@
 ;       For Small C+ compiler
 
 
+        SECTION code_fp
+        PUBLIC     float
 
-                PUBLIC     float
+        EXTERN     norm
+        EXTERN      l_long_neg
 
-                EXTERN     norm
-                EXTERN      l_long_neg
-
-                PUBLIC    float1
-                EXTERN    fasign
-                EXTERN    fa
+        PUBLIC    float1
+        EXTERN    fasign
+        EXTERN    fa
 
 ;
 ;       convert the integer in hl to
