@@ -98,3 +98,12 @@ crt0_long/l_long_xor
 crt0_long/long2int_s
 crt0_long/lpush2
 @sdcc.lst
+crt0_fp/__atof2
+crt0_fp/dldpsh
+crt0_fp/dload
+crt0_fp/dpush2
+crt0_fp/dstore
+crt0_fp/extra
+crt0_fp/fa
+crt0_fp/fasign
+crt0_fp/fp_seed
