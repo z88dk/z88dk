@@ -2,7 +2,7 @@
 ;
 ;       Created 1/4/99 djm
 ;
-;	$Id: bas_crt0.asm,v 1.20 2016-06-02 22:24:57 dom Exp $
+;	$Id: bas_crt0.asm,v 1.21 2016-06-21 20:49:06 dom Exp $
 
 
 ;-----------
@@ -112,9 +112,6 @@ errescpressed:
         jr      cleanup		;Exit the program
 
 
-IF NEED_floatpack
-       INCLUDE         "float.asm"
-ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 

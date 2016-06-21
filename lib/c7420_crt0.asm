@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2015
 ;
-;       $Id: c7420_crt0.asm,v 1.7 2016-06-02 23:14:13 dom Exp $
+;       $Id: c7420_crt0.asm,v 1.8 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -74,9 +74,6 @@ start1:
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 	INCLUDE	"crt0_section.asm"

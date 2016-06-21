@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 2014
 ;
-;	$Id: lynx_crt0.asm,v 1.8 2016-06-02 23:14:13 dom Exp $
+;	$Id: lynx_crt0.asm,v 1.9 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -80,9 +80,6 @@ start1:
 l_dcal:
         jp      (hl)
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
 	defm  "Small C+ Lynx"
 	defb  0

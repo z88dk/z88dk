@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.20 2016-06-02 23:14:13 dom Exp $
+;	$Id: ace_crt0.asm,v 1.21 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -145,9 +145,6 @@ ENDIF
 l_dcal:
         jp      (hl)
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
 	defm  "Small C+ J.ACE"
 	defb  0

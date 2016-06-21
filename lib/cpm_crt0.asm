@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.35 2016-06-02 23:14:13 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.36 2016-06-21 20:49:06 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -126,9 +126,6 @@ start1:	ld      sp,0		;Pick up entry sp
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
         defm  	"Small C+ CP/M"
 
         INCLUDE "crt0_runtime_selection.asm"

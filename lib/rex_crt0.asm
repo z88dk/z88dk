@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.24 2016-06-02 23:14:13 dom Exp $
+;       $Id: rex_crt0.asm,v 1.25 2016-06-21 20:49:06 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -101,9 +101,6 @@ l_dcal:	jp	(hl)		;Used for call by function pointer
 ENDIF
 
 
-IF NEED_floatpack
-        INCLUDE "float.asm"
-ENDIF
 ;	INCLUDE	"crt0_runtime_selection.asm"
 	defc	bss_start = $f033
 	INCLUDE	"crt0_section.asm"

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.41 2016-06-02 23:14:13 dom Exp $
+;	$Id: msx_crt0.asm,v 1.42 2016-06-21 20:49:06 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -247,9 +247,6 @@ ENDIF
 ;===============================================================================
 
 
-IF NEED_floatpack
-	INCLUDE   "float.asm"
-ENDIF
 
 ; Safe BIOS call
 msxbios:

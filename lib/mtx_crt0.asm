@@ -1,6 +1,6 @@
 ;       Memotech MTX CRT0 stub
 ;
-;       $Id: mtx_crt0.asm,v 1.12 2016-06-02 23:14:13 dom Exp $
+;       $Id: mtx_crt0.asm,v 1.13 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -98,9 +98,6 @@ msxbios:
 	push	ix
 	ret
 
-IF NEED_floatpack
-        INCLUDE "float.asm"
-ENDIF
 
 	defm    "Small C+ MTX"   ;Unnecessary file signature
 	defb    0

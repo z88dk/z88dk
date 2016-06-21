@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti86_crt0.asm,v 1.32 2016-06-02 23:14:13 dom Exp $
+;	$Id: ti86_crt0.asm,v 1.33 2016-06-21 20:49:07 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -291,10 +291,6 @@ cpygraph:
 l_dcal:
 	jp	(hl)
 
-
-IF NEED_floatpack
-        INCLUDE "float.asm"
-ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 	INCLUDE "crt0_section.asm"

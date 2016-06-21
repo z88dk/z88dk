@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 7/4/2014
 ;
-;       $Id: p2000_crt0.asm,v 1.9 2016-06-02 23:14:13 dom Exp $
+;       $Id: p2000_crt0.asm,v 1.10 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -97,9 +97,6 @@ start1:
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
-IF NEED_floatpack
-        INCLUDE "float.asm"
-ENDIF
 
 ;	defm  "Small C+ P2000"
 ;	defb	0

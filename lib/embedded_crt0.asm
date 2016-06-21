@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.15 2016-06-02 23:14:13 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.16 2016-06-21 20:49:06 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -65,9 +65,6 @@ endloop:
 l_dcal:
 	jp      (hl)
 
-IF NEED_floatpack
-        INCLUDE "float.asm"
-ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 

@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx80_crt0.asm,v 1.12 2016-06-02 23:14:13 dom Exp $
+;       $Id: zx80_crt0.asm,v 1.13 2016-06-21 20:49:07 dom Exp $
 ;
 ; - - - - - - -
 
@@ -142,12 +142,6 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 ;	jr	nz,zx80_cls2
 ;	jp	$747	; CLS
 
-;-----------------------
-; Floating point support
-;-----------------------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 	INCLUDE	"crt0_section.asm"

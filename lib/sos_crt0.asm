@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.11 2016-06-02 23:14:13 dom Exp $
+;       $Id: sos_crt0.asm,v 1.12 2016-06-21 20:49:07 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -237,10 +237,6 @@ start1:	ld      sp,0		;Pick up entry sp
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
-
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
         defm    "Small C+ SOS"
 end:    defb    0               ; null file name

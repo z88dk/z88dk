@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.18 2016-06-02 23:14:13 dom Exp $
+;       $Id: aquarius_crt0.asm,v 1.19 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -66,9 +66,6 @@ start1:	ld	sp,0		;Restore stack to entry value
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
 	defm	"Small C+ Aquarius"	;Unnecessary file signature
 	defb	0

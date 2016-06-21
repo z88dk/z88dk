@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.24 2016-06-02 23:14:13 dom Exp $
+;       $Id: vz_crt0.asm,v 1.25 2016-06-21 20:49:07 dom Exp $
 ;
 
 
@@ -124,9 +124,6 @@ l_dcal:
         jp      (hl)
 
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
 	defm  "Small C+ VZ"
 	defb   0

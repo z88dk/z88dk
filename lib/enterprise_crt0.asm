@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.21 2016-06-19 20:17:07 dom Exp $
+;	$Id: enterprise_crt0.asm,v 1.22 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -328,9 +328,6 @@ __VideoVariables:
          defm  "Small C+ Enterprise"
 end:	 defb	0
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 

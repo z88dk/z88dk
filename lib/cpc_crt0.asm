@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.34 2016-06-02 23:14:13 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.35 2016-06-21 20:49:06 dom Exp $
 ;
 
         MODULE  cpc_crt0
@@ -75,11 +75,6 @@ IF DEFINED_USING_amalloc
 ENDIF
 
 
-; INIT math identify platform
-IF NEED_floatpack
-        EXTERN     init_floatpack
-        call    init_floatpack
-ENDIF
         call    _main
 
 cleanup:
@@ -167,9 +162,6 @@ ENDIF
 
 
 
-IF NEED_floatpack
-		INCLUDE         "float.asm"
-ENDIF
 
                 defm    "Small C+ CPC"
                 defb    0

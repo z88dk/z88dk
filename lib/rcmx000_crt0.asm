@@ -4,7 +4,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: rcmx000_crt0.asm,v 1.12 2016-06-02 22:24:57 dom Exp $
+;       $Id: rcmx000_crt0.asm,v 1.13 2016-06-21 20:49:06 dom Exp $
 ;
 ; - - - - - - -
 
@@ -77,9 +77,6 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 acme:	defw 4711 			; useless arbitrarily choosen number
 	defm  "Small C+ RCM2/3000",0	;Unnecessary file signature
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 

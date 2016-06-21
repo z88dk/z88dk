@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.30 2016-06-02 23:14:13 dom Exp $
+;	$Id: ti83_crt0.asm,v 1.31 2016-06-21 20:49:07 dom Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -380,10 +380,6 @@ fastCopyLoop:
 	jr	nz,fastCopyAgain		; 10/1
 	ret					; 10
  ENDIF
-ENDIF
-
-IF NEED_floatpack
-	INCLUDE		"float.asm"
 ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"

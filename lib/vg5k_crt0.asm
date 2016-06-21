@@ -3,7 +3,7 @@
 ;       Joaopa Jun. 2014
 ;       Stefano Bodrato Lug. 2014
 ;
-;       $Id: vg5k_crt0.asm,v 1.12 2016-06-02 23:14:13 dom Exp $
+;       $Id: vg5k_crt0.asm,v 1.13 2016-06-21 20:49:07 dom Exp $
 ;
 
 
@@ -81,9 +81,6 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
 ;	defm  "Small C+ VG5000"
 ;	defb	0

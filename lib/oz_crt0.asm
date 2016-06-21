@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.16 2016-06-02 22:24:57 dom Exp $
+;       $Id: oz_crt0.asm,v 1.17 2016-06-21 20:49:06 dom Exp $
 ;
 ; - - - - - - -
 
@@ -528,14 +528,4 @@ saved_de:       defw	0	; Temp store for de
          	defm  "Small C+ OZ"	;Unnecessary file signature
 		defb	0
 
-;-----------------------
-; Floating point support
-;-----------------------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-extra:          defs    6               ;FP register
-fa:             defs    6               ;FP Accumulator
-fasign:         defb    0               ;FP register
-ENDIF
 

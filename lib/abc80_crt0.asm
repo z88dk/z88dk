@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato May 2000
 ;
-;       $Id: abc80_crt0.asm,v 1.17 2016-06-02 23:14:13 dom Exp $
+;       $Id: abc80_crt0.asm,v 1.18 2016-06-21 20:49:06 dom Exp $
 ;
 
                 MODULE  abc80_crt0
@@ -72,9 +72,6 @@ start1:
 l_dcal:
         jp      (hl)
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
         defm  "Small C+ ABC80"
 	defb  0

@@ -1,7 +1,7 @@
 ;
 ;       Startup for Canon X-07
 ;
-;       $Id: x07_crt0.asm,v 1.10 2016-06-02 23:14:13 dom Exp $
+;       $Id: x07_crt0.asm,v 1.11 2016-06-21 20:49:07 dom Exp $
 ;
 
 	MODULE  x07_crt0
@@ -73,9 +73,6 @@ start1:	ld  sp,0    ;Pick up entry sp
 
 l_dcal:	jp  (hl)    ;Used for call by function ptr
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
 	defm  	"Small C+ X-07"
 end:	defb	0		; null file name

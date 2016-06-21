@@ -8,10 +8,6 @@ crt0_init_bss:
 	; TODO: Clear bss area
         xor     a               ;Reset atexit() count
         ld      (exitcount),a
-IF NEED_floatpack
-        ld      hl,$8080	;Initialise floating point seed
-        ld      (fp_seed),hl
-ENDIF
 IF !DEFINED_nostreams
 	; Setup std* streams
         ld      hl,__sgoioblk
@@ -66,16 +62,6 @@ coords:          defs    coords_space       ;Graphics xy coordinates
 base_graphics:   defw    0       ;Address of graphics map
 exitsp:          defw    0       ;atexit() stack
 exitcount:       defb    0       ;Number of atexit() routines
-IF NEED_floatpack
-		PUBLIC	fp_seed
-		PUBLIC  extra
-		PUBLIC  fa
-		PUBLIC  fasign
-fp_seed:         defs    6       ;Floating point seed (not used ATM)
-extra:           defs    6       ;Floating point spare register
-fa:              defs    6       ;Floating point accumulator
-fasign:          defb    0       ;Floating point variable
-ENDIF
 IF DEFINED_USING_amalloc
 		PUBLIC _heap
 ; The heap pointer will be wiped at startup,

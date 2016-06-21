@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.18 2016-06-02 23:14:13 dom Exp $
+;       $Id: trs80_crt0.asm,v 1.19 2016-06-21 20:49:07 dom Exp $
 ;
 
 
@@ -76,10 +76,6 @@ start1: ld      sp,0            ;Restore stack to entry value
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
-
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
 	defm    "Small C+ TRS80"        ;Unnecessary file signature
 	defb    0

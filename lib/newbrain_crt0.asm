@@ -2,7 +2,7 @@
 ;       Grundy NewBrain startup code
 ;
 ;
-;       $Id: newbrain_crt0.asm,v 1.17 2016-06-19 20:37:09 dom Exp $
+;       $Id: newbrain_crt0.asm,v 1.18 2016-06-21 20:49:06 dom Exp $
 ;
 
                 MODULE  newbrain_crt0
@@ -128,9 +128,6 @@ nbclockptr:	defb	$52	; paged system clock counter
 
 ENDIF
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 

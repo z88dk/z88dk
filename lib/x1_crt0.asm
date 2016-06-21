@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.12 2016-06-02 22:24:57 dom Exp $
+;    $Id: x1_crt0.asm,v 1.13 2016-06-21 20:49:07 dom Exp $
 ;
 
 	MODULE x1_crt0
@@ -197,10 +197,6 @@ _wait_sub_cpu:
 	jp nz, ii_w1
 	ret
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
-
         INCLUDE "crt0_runtime_selection.asm"
 
 	INCLUDE	"crt0_section.asm"
@@ -209,10 +205,6 @@ ENDIF
 	SECTION	code_crt_init
 	ld	hl,$FDFF
 	ld	(exitsp),hl
-IF NEED_floatpack
-        EXTERN     init_floatpack
-        call    init_floatpack
-ENDIF
 
 ; X1 stdio support variables
 	SECTION	bss_crt

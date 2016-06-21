@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: sam_crt0.asm,v 1.19 2016-06-02 23:14:13 dom Exp $
+;       $Id: sam_crt0.asm,v 1.20 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -108,11 +108,6 @@ start1:
 l_dcal:
         jp      (hl)
 
-; Now, define some values for stdin, stdout, stderr
-
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
         defm  "Small C+ SAM Coupe"
 	defb	0

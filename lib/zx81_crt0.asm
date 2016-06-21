@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.54 2016-06-11 20:53:06 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.55 2016-06-21 20:49:07 dom Exp $
 ;
 ; - - - - - - -
 
@@ -400,14 +400,4 @@ ENDIF
 ;                defb    0
 
 
-;-----------------------
-; Floating point support
-;-----------------------
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-fp_seed:        defb    $80,$80,0,0,0,0 ;FP seed (unused ATM)
-extra:          defs    6               ;FP register
-fa:             defs    6               ;FP Accumulator
-fasign:         defb    0               ;FP register
-ENDIF
 

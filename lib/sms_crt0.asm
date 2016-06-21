@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.16 2016-06-02 23:14:13 dom Exp $
+;	$Id: sms_crt0.asm,v 1.17 2016-06-21 20:49:07 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -228,13 +228,6 @@ _End:
 	
 
         INCLUDE "crt0_runtime_selection.asm"
-
-;--------
-; Now, include the math routines if needed..
-;--------
-IF NEED_floatpack
-;        INCLUDE "float.asm"
-ENDIF
 
 	defc bss_start = RAM_Start
 IF DEFINED_defvarsaddr

@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.24 2016-06-12 21:27:19 dom Exp $
+;	$Id: app_crt0.asm,v 1.25 2016-06-21 20:49:06 dom Exp $
 
 
 ;--------
@@ -311,13 +311,6 @@ ENDIF
 
 
 
-
-;--------
-; Now, include the math routines if needed..
-;--------
-IF NEED_floatpack
-        INCLUDE "float.asm"
-ENDIF
 
 
 IF !DEFINED_sysdefvarsaddr

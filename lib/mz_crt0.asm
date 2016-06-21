@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
-;       $Id: mz_crt0.asm,v 1.21 2016-06-02 23:14:13 dom Exp $
+;       $Id: mz_crt0.asm,v 1.22 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -70,9 +70,6 @@ start1:
 l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
-IF NEED_floatpack
-        INCLUDE "float.asm"
-ENDIF
 
 	defm  "Small C+ SHARP MZ"
 	defb	0

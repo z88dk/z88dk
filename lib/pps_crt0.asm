@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.17 2016-06-02 23:14:13 dom Exp $
+;       $Id: pps_crt0.asm,v 1.18 2016-06-21 20:49:06 dom Exp $
 ;
 
 
@@ -211,9 +211,6 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 
 
 
-IF NEED_floatpack
-        INCLUDE         "float.asm"
-ENDIF
 
 	defm	"Small C+ PPS"	;Unnecessary file signature
 end:	defb	0

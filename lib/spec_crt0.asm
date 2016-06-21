@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.46 2016-06-10 21:28:47 dom Exp $
+;       $Id: spec_crt0.asm,v 1.47 2016-06-21 20:49:07 dom Exp $
 ;
 
 
@@ -353,9 +353,6 @@ ENDIF
         exx                      ; Back to the regular set
         ret
         
-IF NEED_floatpack
-      INCLUDE   "float.asm"
-ENDIF
 
         defm    "Small C+ ZX"   ;Unnecessary file signature
         defb    0

@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti82_crt0.asm,v 1.29 2016-06-02 23:14:13 dom Exp $
+;	$Id: ti82_crt0.asm,v 1.30 2016-06-21 20:49:07 dom Exp $
 ;
 ;-----------------------------------------------------
 ; Some general PUBLICs and EXTERNs needed by the assembler
@@ -113,10 +113,6 @@ tidi:	ret
 l_dcal:
 	jp	(hl)
 
-
-IF NEED_floatpack
-	INCLUDE	"float.asm"
-ENDIF
 
 IF !DEFINED_GRAYlib
 	defc cpygraph = CR_GRBCopy	; CrASH FastCopy
