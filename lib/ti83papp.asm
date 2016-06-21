@@ -214,10 +214,6 @@ cpygraph:
 ENDIF				;  plus this is safe for possible
 				;  Ti83+ Silver Edition at 15MHz
 
-IF NEED_floatpack
-	INCLUDE	"float.asm"
-ENDIF
-
 defc intuse = # IntProcEnd-IntProcStart
 
 DEFVARS $8A3A		; statVars (531 bytes of free space) See graylib83p.asm
