@@ -10,9 +10,10 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.2 2015-11-05 16:08:04 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.3 2016-06-21 20:16:35 dom Exp $
 ;
 
+		SECTION	code_clib
                 PUBLIC    swapgfxbk
 
 		PUBLIC	swapgfxbk1
@@ -20,7 +21,6 @@
 
 
 .swapgfxbk
-		ret
 .swapgfxbk1
                 ret
 

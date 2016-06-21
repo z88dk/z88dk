@@ -3,11 +3,12 @@
 ;
 ;	MSX version
 ;
-;	$Id: bksave.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: bksave.asm,v 1.6 2016-06-21 20:16:35 dom Exp $
 ;
 
-
+	SECTION   code_clib
 	PUBLIC    bksave
+	PUBLIC    _bksave
 	PUBLIC	bkpixeladdress
 
 
@@ -19,7 +20,8 @@ ENDIF
 
 	
 .bksave
-
+._bksave
+	push	ix	;save callers
         ld      hl,2   
         add     hl,sp
         ld      e,(hl)
@@ -89,7 +91,7 @@ ENDIF
 	
 	pop	bc
 	djnz	bksaves
-
+	pop	ix		;restore callers
 	ret
 
 

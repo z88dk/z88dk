@@ -3,19 +3,21 @@
 ;
 ;	MC-1000 version
 ;
-;	$Id: bksave.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: bksave.asm,v 1.5 2016-06-21 20:16:35 dom Exp $
 ;
 
-
+	SECTION	code_clib
 	PUBLIC    bksave
+	PUBLIC    _bksave
 	PUBLIC	bkpixeladdress
 	EXTERN	gfxbyte_get
 	EXTERN	pixelbyte
 
 	
 .bksave
-
-        ld      hl,2   
+._bksave
+	push	ix		;save callers
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -76,7 +78,7 @@
 	
 	pop	bc
 	djnz	bksaves
-
+	pop	ix		;restore callers
 	ret
 
 

@@ -3,11 +3,12 @@
 ;
 ;	MSX version
 ;
-;	$Id: bkrestore.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: bkrestore.asm,v 1.6 2016-06-21 20:16:35 dom Exp $
 ;
 
-
+	SECTION	code_clib
 	PUBLIC    bkrestore
+	PUBLIC    _bkrestore
 	EXTERN	bkpixeladdress
 
 
@@ -19,9 +20,10 @@ ENDIF
 
 
 .bkrestore
+._bkrestore
 
 ; __FASTCALL__ : sprite ptr in HL
-	
+	push	ix		;save callers	
 	push	hl
 	pop	ix
 
@@ -78,4 +80,5 @@ ENDIF
 	
 	pop	bc
 	djnz	bkrestores
+	pop	ix	;restore callers
 	ret

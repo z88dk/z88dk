@@ -1,10 +1,11 @@
 
+	SECTION rodata_clib
 	PUBLIC	zx_rowtab
 
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;  $Id: rowtab.asm,v 1.2 2015-11-05 16:08:04 stefano Exp $
+;  $Id: rowtab.asm,v 1.3 2016-06-21 20:16:35 dom Exp $
 ;
 ;  Screen row addresses table
 ;  by Enrico Maria Giordano

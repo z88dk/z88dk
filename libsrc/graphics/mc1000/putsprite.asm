@@ -6,10 +6,12 @@
 ; MSX version
 ;
 ;
-; $Id: putsprite.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
+; $Id: putsprite.asm,v 1.4 2016-06-21 20:16:35 dom Exp $
 ;
 
+	SECTION	smc_clib
 	PUBLIC    putsprite
+	PUBLIC    _putsprite
 	EXTERN		pixeladdress
 	EXTERN	pixelbyte
 	EXTERN	pix_return
@@ -24,15 +26,10 @@
 ; sprite: (ix)
 
 
-.offsets_table
-         defb	1,2,4,8,16,32,64,128
-
-.actcoord
-	 defw	0
-
 .putsprite
-	
-        ld      hl,2   
+._putsprite
+	push	ix		;save cllers
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -112,6 +109,7 @@
 
          pop      bc                ;Restore data
          djnz     _oloop
+	pop	ix		;restore callers
 	 jp       swapgfxbk1
 
 
@@ -148,6 +146,7 @@
 
          pop      bc                ;Restore data
          djnz     woloop
+	pop	ix		;restore callers
 	 jp       swapgfxbk1
 	
 
@@ -216,3 +215,9 @@
 	pop	af
 	ret
         
+	SECTION	rodata_clib
+.offsets_table
+         defb	1,2,4,8,16,32,64,128
+	SECTION bss_clib
+.actcoord
+	 defw	0

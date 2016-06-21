@@ -4,13 +4,14 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
+	SECTION code_clib
 	PUBLIC	surface_plotpixel
 
 	EXTERN	surface_pixeladdress
 	EXTERN	coords
 
 ;
-;	$Id: surface_plotpixl.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: surface_plotpixl.asm,v 1.6 2016-06-21 20:16:35 dom Exp $
 ;
 
 ; ******************************************************************

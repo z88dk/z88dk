@@ -1,11 +1,12 @@
 	INCLUDE	"graphics/grafix.inc"
 
+	SECTION code_clib
 	PUBLIC	pointxy
 
 	EXTERN	pixeladdress
 
 ;
-;	$Id: pointxy.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: pointxy.asm,v 1.4 2016-06-21 20:16:35 dom Exp $
 ;
 
 ; ******************************************************************

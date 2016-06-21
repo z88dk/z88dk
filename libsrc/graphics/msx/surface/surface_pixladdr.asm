@@ -2,7 +2,7 @@
 ;	MSX extension for "GFX - a small graphics library" by Jannone
 ;
 
-
+	SECTION code_clib
 	PUBLIC	surface_pixeladdress
 
 	EXTERN	base_graphics
@@ -11,7 +11,7 @@
 
 
 ;
-;	$Id: surface_pixladdr.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: surface_pixladdr.asm,v 1.5 2016-06-21 20:16:35 dom Exp $
 ;
 
 ; ******************************************************************

@@ -4,13 +4,14 @@
 ;   19/5/2014 - extended to Spectravideo SVI
 ;
 ;
-;	$Id: fill.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: fill.asm,v 1.5 2016-06-21 20:16:35 dom Exp $
 ;
 
 ;Usage: fill(struct *pixel)
 
-
+	SECTION	  code_clib
         PUBLIC    fill
+        PUBLIC    _fill
 
 	INCLUDE	"graphics/grafix.inc"
 
@@ -29,11 +30,13 @@ ENDIF
 
 
 .fill
-	ld	ix,0
+._fill
+	push	ix		;save callers
+	ld	ix,2
 	add	ix,sp
 	ld	a,(ix+2)
 	cp	maxy       ;check range for y
-	ret	nc
+	jr	nc, fill_exit
 
 	ld	l,(ix+4)   ;x
 	ld	h,0
@@ -76,8 +79,11 @@ ENDIF
 IF FORmsx
 	call	msxbasic
 pnt_done:
-	jp	msx_breakon
+	call	msx_breakon
 ELSE
-	jp	msxbios
+	call	msxbios
 ENDIF
+.fill_exit
+	pop	ix
+	ret
 

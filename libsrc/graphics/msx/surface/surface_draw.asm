@@ -14,11 +14,12 @@
 ;	Stefano Bodrato - 27/02/2009
 ;
 ;
-;	$Id: surface_draw.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: surface_draw.asm,v 1.6 2016-06-21 20:16:35 dom Exp $
 ;
 
-
+		SECTION	  code_clib
                 PUBLIC    surface_draw
+                PUBLIC    _surface_draw
                 
                 ;LIB     swapgfxbk
                 ;XREF    swapgfxbk1
@@ -30,7 +31,8 @@
 
 
 .surface_draw
-		ld	ix,0
+		push	ix	;save callers
+		ld	ix,2
 		add	ix,sp
 
 		ld	l,(ix+10)	; surface struct
@@ -55,4 +57,5 @@
                 ld      ix,surface_plotpixel
                 call    Line
                 ;jp      swapgfxbk1
+		pop	ix	;restore callers
                 ret

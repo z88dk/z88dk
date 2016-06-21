@@ -13,7 +13,9 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
+	SECTION code_clib
 	PUBLIC	surface_stencil_render
+	PUBLIC	_surface_stencil_render
 	EXTERN	base_graphics
 	EXTERN	dither_pattern
 
@@ -23,10 +25,16 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: surface_stencil_render.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: surface_stencil_render.asm,v 1.6 2016-06-21 20:16:35 dom Exp $
 ;
 
+.render_exit
+		pop	ix
+		ret
+
 .surface_stencil_render
+._surface_stencil_render
+		push	ix		;save callers
 		ld	ix,0
 		add	ix,sp
 				
@@ -46,7 +54,7 @@
 .yloop		pop	bc
 		dec	c
 		;jp	z,swapgfxbk1
-		ret	z
+		jr	z,render_exit
 		push	bc
 		
 		ld	d,0

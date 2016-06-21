@@ -5,25 +5,25 @@
 ; modified by Stefano Bodrato - Nov 2015
 ;
 
+	SECTION	smc_clib
 	PUBLIC  putsprite
+	PUBLIC  _putsprite
 	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: putsprite.asm,v 1.2 2015-11-05 16:08:04 stefano Exp $
+;	$Id: putsprite.asm,v 1.3 2016-06-21 20:16:35 dom Exp $
 ;
 
 ; coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
-.offsets_table
-         defb	128,64,32,16,8,4,2,1
-
 .putsprite
-
-        ld      hl,2   
+._putsprite
+	push	ix		;save callers
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -95,6 +95,7 @@
          add      hl,bc
          pop      bc                ;Restore data
          djnz     _oloop
+	pop	ix		;restore callers
          ret
          
 
@@ -129,6 +130,7 @@
          add      hl,bc
          pop      bc                ;Restore data
          djnz     woloop
+	pop	ix		;restore callers
          ret
 
 .wover_1 ld       c,(ix+2)
@@ -140,5 +142,9 @@
          add      hl,bc
          pop      bc
          djnz     woloop
+	pop	ix		;restore callers
          ret
 
+	SECTION rodata_clib
+.offsets_table
+         defb	128,64,32,16,8,4,2,1

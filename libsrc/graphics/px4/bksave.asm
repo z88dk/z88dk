@@ -4,16 +4,20 @@
 ; Graphics library for the Epson PX4
 ; Stefano - Nov 2015
 ;
-; $Id: bksave.asm,v 1.2 2015-11-05 16:08:04 stefano Exp $
+; $Id: bksave.asm,v 1.3 2016-06-21 20:16:35 dom Exp $
 ;
 
+	SECTION   code_clib
 	PUBLIC    bksave
+	PUBLIC    _bksave
 	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 
 .bksave
-        ld      hl,2   
+._bksave
+	push	ix		;save callers
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -68,4 +72,5 @@
 	
 	pop	bc
 	djnz	_sloop
+	pop	ix		;restore callers
 	ret

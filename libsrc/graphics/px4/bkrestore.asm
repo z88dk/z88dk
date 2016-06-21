@@ -4,18 +4,21 @@
 ; Graphics library for the Epson PX4
 ; Stefano - Nov 2015
 ;
-; $Id: bkrestore.asm,v 1.2 2015-11-05 16:08:04 stefano Exp $
+; $Id: bkrestore.asm,v 1.3 2016-06-21 20:16:35 dom Exp $
 ;
 
+	SECTION	code_clib
 	PUBLIC    bkrestore
+	PUBLIC    _bkrestore
 	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 
 .bkrestore
+._bkrestore
 
 ; __FASTCALL__ : sprite ptr in HL
-	
+	push	ix	;save callers
 	push	hl
 	pop	ix
 	
@@ -51,4 +54,5 @@
 	
 	pop	bc
 	djnz	_sloop
+	pop	ix	;restore caller
 	ret

@@ -14,11 +14,12 @@
 ;	Stefano Bodrato - 18/03/2009
 ;
 ;
-;	$Id: surface_circle.asm,v 1.3 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: surface_circle.asm,v 1.4 2016-06-21 20:16:35 dom Exp $
 ;
 
-
+		SECTION	code_clib
                 PUBLIC    surface_circle
+                PUBLIC    _surface_circle
                 
                 ;LIB     swapgfxbk
                 ;XREF    swapgfxbk1
@@ -30,7 +31,9 @@
 
 
 .surface_circle
-		ld	ix,0
+._surface_circle
+		push	ix		;save callers
+		ld	ix,2
 		add	ix,sp
 
 		ld	l,(ix+10)	; surface struct
@@ -51,4 +54,5 @@
                 ld      ix,surface_plotpixel
                 call    draw_circle
                 ;jp      swapgfxbk1
+		pop	ix		;restore callers
                 ret

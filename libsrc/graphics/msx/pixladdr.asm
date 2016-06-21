@@ -1,4 +1,5 @@
 
+	SECTION	code_clib
 	PUBLIC	pixeladdress
 
 	;XREF	base_graphics
@@ -9,7 +10,7 @@
 	INCLUDE	"msx/vdp.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.8 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: pixladdr.asm,v 1.9 2016-06-21 20:16:35 dom Exp $
 ;
 
 ; ******************************************************************

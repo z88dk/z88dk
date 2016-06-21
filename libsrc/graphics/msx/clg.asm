@@ -3,10 +3,12 @@
 ;
 ;       MSX version by Stefano Bodrato, December 2007
 ;
-;	$Id: clg.asm,v 1.9 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: clg.asm,v 1.10 2016-06-21 20:16:35 dom Exp $
 ;
 
+	SECTION	code_clib
         PUBLIC    clg
+        PUBLIC    _clg
         EXTERN	msxbios
         EXTERN	msx_color
 
@@ -23,6 +25,8 @@ ENDIF
 
 
 .clg
+._clg
+	push	ix	;save callers
 	ld	ix,CHGMOD
 IF FORmsx
 	ld	a,2		; set graphics mode
@@ -44,4 +48,6 @@ ENDIF
 	ld hl,8192
 
 	ld ix,FILVRM
-	jp msxbios
+	call	msxbios
+	pop	ix	;restore callers
+	ret

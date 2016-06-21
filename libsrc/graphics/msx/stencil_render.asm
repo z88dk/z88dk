@@ -14,8 +14,9 @@
 	INCLUDE	"graphics/grafix.inc"
 	INCLUDE	"msx/vdp.inc"
 
-
+	SECTION code_clib
 	PUBLIC	stencil_render
+	PUBLIC	_stencil_render
 	EXTERN	dither_pattern
 
 	;LIB swapgfxbk
@@ -25,11 +26,17 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.7 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: stencil_render.asm,v 1.8 2016-06-21 20:16:35 dom Exp $
 ;
 
+.stencil_exit
+		pop	ix
+		ret
+
 .stencil_render
-		ld	ix,2
+._stencil_render
+		push	ix	;save callers
+		ld	ix,4
 		add	ix,sp
 
 		;call	swapgfxbk
@@ -39,7 +46,7 @@
 .yloop		pop	bc
 		dec	c
 		;jp	z,swapgfxbk1
-		ret	z
+		jr	z,stencil_exit
 		push	bc
 		
 		ld	d,0
