@@ -46,3 +46,9 @@ stdio_new/general/stdio_ultoa_any
 stdio_new/general/stdio_utoa_any
 @strings/string.lst
 @regex/regex.lst
+stdio/ansi/ansifont_f3
+stdio/ansi/ansifont_f4
+stdio/ansi/ansifont_f4pack
+stdio/ansi/ansifont_f5
+stdio/ansi/ansifont_f6
+stdio/ansi/ansifont_f8
