@@ -1,6 +1,6 @@
 
 
-		SECTION	bss_crt
+		SECTION	bss_fp
 		PUBLIC	fa
 
 		EXTERN	init_floatpack

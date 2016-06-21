@@ -1,6 +1,6 @@
 
 
-		SECTION	bss_crt
+		SECTION	bss_fp
 		PUBLIC	fasign
 
 fasign:		defs	6

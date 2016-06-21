@@ -1,6 +1,6 @@
 
 
-		SECTION	bss_crt
+		SECTION	bss_fp
 		PUBLIC	fp_seed
 
 fp_seed:	defs	6

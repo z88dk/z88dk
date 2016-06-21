@@ -1,6 +1,6 @@
 
 
-		SECTION	bss_crt
+		SECTION	bss_fp
 		PUBLIC	extra
 
 extra:		defs	6
