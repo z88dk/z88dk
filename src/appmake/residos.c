@@ -4,7 +4,7 @@
  *      This simply adds in the length of the program
  *      
  *      
- *      $Id: residos.c,v 1.1 2014-04-22 22:53:17 dom Exp $
+ *      $Id: residos.c,v 1.2 2016-06-22 06:14:58 stefano Exp $
  */
 
 
@@ -73,7 +73,7 @@ int residos_exec(char *target)
         myexit("Could not find parameter residos_package_id (not a Residos package compile?)\n",1);
     }   
 
-    if ( ( binfile=fopen(binname, "rb") ) == NULL ) {
+	if ( (fpin=fopen_bin(binname) ) == NULL ) {
         myexit("Can't open binary file\n",1);
     }
 

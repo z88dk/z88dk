@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.50 2016-03-29 12:49:16 dom Exp $
+ *   $Id: appmake.h,v 1.51 2016-06-22 06:14:57 stefano Exp $
  */
 
 
@@ -14,6 +14,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdarg.h>
+#include <sys/stat.h>
 
 
 /* Conversion routines */
@@ -372,6 +373,7 @@ struct {
 #define myexit(buf, code) exit_log(code, buf)
 extern void         exit_log(int code, char *fmt, ...);
 extern long         parameter_search(char *filen, char *ext,char *target);
+extern FILE         *fopen_bin(char *fname);
 extern void         suffix_change(char *name, char *suffix);
 extern void         any_suffix_change(char *name, char *suffix, char schar);
 

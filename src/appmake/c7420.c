@@ -5,7 +5,7 @@
  *
  *   Stefano Bodrato - 2015
  *
- *   $Id: c7420.c,v 1.3 2016-03-29 12:49:16 dom Exp $
+ *   $Id: c7420.c,v 1.4 2016-06-22 06:14:58 stefano Exp $
  */
 
 #include "appmake.h"
@@ -76,7 +76,7 @@ int c7420_exec(char *target)
 		}
 	}
 
-	if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+	if ( (fpin=fopen_bin(binname) ) == NULL ) {
 		printf("Can't open input file\n");
 		exit(1);
 	}

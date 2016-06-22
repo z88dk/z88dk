@@ -3,7 +3,7 @@
  *      Sorcerer Exidy application packager
  * 		Kansas City Standard
  *      
- *      $Id: sorcerer.c,v 1.4 2016-03-29 12:49:17 dom Exp $
+ *      $Id: sorcerer.c,v 1.5 2016-06-22 06:14:58 stefano Exp $
  */
 
 
@@ -189,7 +189,7 @@ int sorcerer_exec(char *target)
 			}
 		}
 
-		if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+		if ( (fpin=fopen_bin(binname) ) == NULL ) {
 			fprintf(stderr,"Can't open input file %s\n",binname);
 			myexit(NULL,1);
 		}

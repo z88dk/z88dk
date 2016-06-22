@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.30 2016-03-29 12:08:55 dom Exp $
+ *   $Id: appmake.c,v 1.31 2016-06-22 06:14:57 stefano Exp $
  */
 
 
@@ -185,6 +185,32 @@ long parameter_search(char *filen, char *ext,char *target)
     }
     fclose(fp);
     return(val);
+}
+
+
+/* Check for SDCC specific binary block header and open the related file (if available)
+   Otherwise, try to open the "normal" file.
+*/
+
+FILE *fopen_bin(char *fname)
+{
+    char    name[FILENAME_MAX+1];
+    struct  stat st_file1;
+    struct  stat st_file2;
+
+	if (strlen(fname) == 0) return (NULL);
+
+    strcpy(name, fname);
+    stat(fname, &st_file1);
+
+	suffix_change(name,"_CODE.bin");
+    if (stat(name, &st_file2)<0)
+		return(fopen(fname,"rb"));
+
+	if (st_file2.st_mtime >= st_file1.st_mtime)
+		return(fopen(name,"rb"));
+
+	return(fopen(fname,"rb"));
 }
 
 

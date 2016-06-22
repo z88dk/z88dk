@@ -313,10 +313,12 @@ int cpc_exec(char *target)
           if (exec == -1) {
                exec = pos;
           }
-          if ((fpin = fopen(binname, "rb")) == NULL) {
+
+		  if ( (fpin=fopen_bin(binname) ) == NULL ) {
                fprintf(stderr, "Can't open input file %s\n", binname);
                myexit(NULL, 1);
           }
+
           /*
            * Now we try to determine the size of the file to be
            * converted

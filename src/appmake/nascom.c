@@ -4,7 +4,7 @@
  *
  *	Stefano Bodrato 30/5/2003
  *
- *	$Id: nascom.c,v 1.2 2016-04-02 22:31:58 dom Exp $
+ *	$Id: nascom.c,v 1.3 2016-06-22 06:14:58 stefano Exp $
  */
 
 
@@ -56,12 +56,10 @@ int nascom_exec(char *target)
         origin = 0x1000;
     }
 
-
-    if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+	if ( (fpin=fopen_bin(binname) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }
-
 
 /*
  *        Now we try to determine the size of the file

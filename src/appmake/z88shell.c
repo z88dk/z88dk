@@ -4,7 +4,7 @@
  *      This simply adds in the length of the program
  *      
  *      
- *      $Id: z88shell.c,v 1.6 2014-04-22 22:53:17 dom Exp $
+ *      $Id: z88shell.c,v 1.7 2016-06-22 06:14:58 stefano Exp $
  */
 
 
@@ -75,7 +75,7 @@ int z88shell_exec(char *target)
     if (memory == NULL)
         myexit("Can't allocate memory\n",1);
 
-    binfile=fopen(binname, "rb");
+    binfile=fpin=fopen_bin(binname);
     if (binfile == NULL)
         myexit("Can't open binary file\n",1);
 

@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.10 2016-03-29 12:49:17 dom Exp $
+ *      $Id: mtx.c,v 1.11 2016-06-22 06:14:58 stefano Exp $
  */
 
 
@@ -161,7 +161,7 @@ int mtx_exec(char *target)
 			}
 		}
 
-		if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+		if ( (fpin=fopen_bin(binname) ) == NULL ) {
 			fprintf(stderr,"Can't open input file %s\n",binname);
 			myexit(NULL,1);
 		}

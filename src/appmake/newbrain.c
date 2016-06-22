@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato 4/2007
  *
- *        $Id: newbrain.c,v 1.5 2014-04-15 19:53:07 dom Exp $
+ *        $Id: newbrain.c,v 1.6 2016-06-22 06:14:58 stefano Exp $
  */
 
 #include "appmake.h"
@@ -66,7 +66,7 @@ int newbrain_exec()
     }
 
 
-    if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+	if ( (fpin=fopen_bin(binname) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

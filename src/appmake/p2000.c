@@ -9,7 +9,7 @@
  *
  *   Stefano Bodrato - April 2014
  *
- *   $Id: p2000.c,v 1.2 2016-03-29 12:49:17 dom Exp $
+ *   $Id: p2000.c,v 1.3 2016-06-22 06:14:58 stefano Exp $
  */
 
 #include "appmake.h"
@@ -55,7 +55,7 @@ int p2000_exec(char *target)
         strcpy(filename,outfile);
     }
 
-    if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+	if ( (fpin=fopen_bin(binname) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

@@ -67,7 +67,7 @@ int zxvgs_exec(char *target)
     if (memory == NULL)
         myexit("Can't allocate memory\n",1);
 
-    binfile = fopen(binname, "rb");
+    binfile = fopen_bin(binname);
     if ( binfile == NULL )
         myexit("Can't open binary file\n",1);
 

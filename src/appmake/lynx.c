@@ -3,7 +3,7 @@
  *      Camputers Lynx application packager
  * 		(c) 2014 Stefano Bodrato, part of the z88dk kit
  *      
- *      $Id: lynx.c,v 1.2 2016-03-29 12:49:16 dom Exp $
+ *      $Id: lynx.c,v 1.3 2016-06-22 06:14:58 stefano Exp $
  */
 
 
@@ -79,7 +79,7 @@ int lynx_exec(char *target)
 		}
 	}
 
-	if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+	if ( (fpin=fopen_bin(binname) ) == NULL ) {
 		fprintf(stderr,"Can't open input file %s\n",binname);
 		myexit(NULL,1);
 	}

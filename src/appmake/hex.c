@@ -11,7 +11,7 @@
  *
  * djm 26/6/2001
  *
- * $Id: hex.c,v 1.5 2014-10-01 06:01:20 stefano Exp $
+ * $Id: hex.c,v 1.6 2016-06-22 06:14:58 stefano Exp $
  */
 
 #include "appmake.h"
@@ -57,7 +57,7 @@ int hex_exec(char *target)
 		}
 	}
 
-    if ( (input = fopen(binname,"rb") ) == NULL ) {
+	if ( (fpin=fopen_bin(binname) ) == NULL ) {
         perror("Error opening input file");
         myexit(NULL,1);
     }

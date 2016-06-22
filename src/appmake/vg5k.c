@@ -3,7 +3,7 @@
  *      Philips VG-5000 application packager
  * 		(c) 2014 Stefano Bodrato, part of the z88dk kit
  *      
- *      $Id: vg5k.c,v 1.3 2016-03-29 12:49:17 dom Exp $
+ *      $Id: vg5k.c,v 1.4 2016-06-22 06:14:58 stefano Exp $
  */
 
 
@@ -177,7 +177,7 @@ int vg5k_exec(char *target)
 			}
 		}
 
-		if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+		if ( (fpin=fopen_bin(binname) ) == NULL ) {
 			fprintf(stderr,"Can't open input file %s\n",binname);
 			myexit(NULL,1);
 		}

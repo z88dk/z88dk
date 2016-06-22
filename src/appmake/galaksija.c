@@ -3,7 +3,7 @@
  *
  *        Based on the original "bin2gtp" program by Tomaz Solc
  *
- *        $Id: galaksija.c,v 1.5 2016-03-29 12:49:16 dom Exp $
+ *        $Id: galaksija.c,v 1.6 2016-06-22 06:14:58 stefano Exp $
  */
 
 #include "appmake.h"
@@ -186,7 +186,7 @@ int gal_exec(char *target)
 	#endif
 
 
-		if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+		if ( (fpin=fopen_bin(binname) ) == NULL ) {
 			myexit("File open error\n",1);
 		}
 

@@ -4,7 +4,7 @@
  *
  *        WAV conversion taken from ABCcas - by Robert Juhasz, 2008
  *
- *        $Id: abc80.c,v 1.8 2015-11-26 02:23:06 aralbrec Exp $
+ *        $Id: abc80.c,v 1.9 2016-06-22 06:14:57 stefano Exp $
  */
 
 #include "appmake.h"
@@ -195,8 +195,7 @@ int abc80_exec(char *target)
 			strcpy(filename,outfile);
 		}
 
-
-		if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+		if ( (fpin=fopen_bin(binname) ) == NULL ) {
 			fprintf(stderr,"Can't open input file %s\n",binname);
 			myexit(NULL,1);
 		}

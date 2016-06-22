@@ -1,6 +1,5 @@
 
 #include "appmake.h"
-#include <sys/stat.h>
 
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
@@ -42,7 +41,7 @@ int extract_exec(char *target)
         return -1;
     else
     {
-        if ((fpin = fopen(binname, "rb")) == NULL)
+		if ( (fpin=fopen_bin(binname) ) == NULL ) {
             exit_log(1, "Can't open input file %s\n", binname);
     }
 

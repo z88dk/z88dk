@@ -4,7 +4,7 @@
  *    Harold O. Pinheiro - 2006 - pascal
  *    Dominic Morris - 02/06/2007 - rewritten and placed into appmake
  *
- *    $Id: sms.c,v 1.3 2009-06-13 19:16:42 dom Exp $
+ *    $Id: sms.c,v 1.4 2016-06-22 06:14:58 stefano Exp $
  *
  *    Figure out what this does exactly!
  */
@@ -58,12 +58,10 @@ int sms_exec(char *target)
         strcpy(filename,outfile);
     }
 
-
-    if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+	if ( (fpin=fopen_bin(binname) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }
-
 
     if (fseek(fpin,0,SEEK_END)) {
         fprintf(stderr,"Couldn't determine size of file\n");

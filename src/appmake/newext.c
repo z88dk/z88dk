@@ -3,7 +3,7 @@
  *
  *      This simply adds in the length of the program
  *      
- *      $Id: newext.c,v 1.2 2015-10-16 13:55:25 stefano Exp $
+ *      $Id: newext.c,v 1.3 2016-06-22 06:14:58 stefano Exp $
  */
 
 
@@ -62,12 +62,10 @@ int newext_exec(char *target)
         strcpy(filename,outfile);
     }
 
-    if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+	if ( (fpin=fopen_bin(binname) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }
-
- 
 
     if (fseek(fpin,0,SEEK_END)) {
         fprintf(stderr,"Couldn't determine size of file\n");

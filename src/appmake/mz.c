@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.14 2016-03-29 12:49:17 dom Exp $
+ *        $Id: mz.c,v 1.15 2016-06-22 06:14:58 stefano Exp $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -762,7 +762,7 @@ int mz_exec(char *target)
 			}
 		}
 
-		if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+		if ( (fpin=fopen_bin(binname) ) == NULL ) {
 			printf("Can't open input file %s\n",binname);
 			exit(1);
 		}

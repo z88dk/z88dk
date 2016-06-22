@@ -9,7 +9,7 @@
  *        When the program is in memory, type '/'.
  *
  *
- *        $Id: trs80.c,v 1.10 2016-03-29 12:49:17 dom Exp $
+ *        $Id: trs80.c,v 1.11 2016-06-22 06:14:58 stefano Exp $
  */
 
 #include "appmake.h"
@@ -169,7 +169,7 @@ int trs80_exec(char *target)
 			strcpy(filename,outfile);
 		}
 
-		if ( (fpin=fopen(binname,"rb") ) == NULL ) {
+		if ( (fpin=fopen_bin(binname) ) == NULL ) {
 			fprintf(stderr,"Can't open input file %s\n",binname);
 			myexit(NULL,1);
 		}
