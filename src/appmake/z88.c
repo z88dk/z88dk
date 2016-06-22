@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.5 2016-06-22 06:14:58 stefano Exp $
+ *      $Id: z88.c,v 1.6 2016-06-22 23:59:30 aralbrec Exp $
  */
 
 
@@ -158,7 +158,7 @@ int z88_exec(char *target)
     if (memory == NULL)
         myexit("Can't allocate memory\n",1);
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+    if ( (binfile = fopen_bin(binname) ) == NULL ) {
         myexit("Can't open binary file\n",1);
     }
 
