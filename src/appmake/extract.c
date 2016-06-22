@@ -41,8 +41,9 @@ int extract_exec(char *target)
         return -1;
     else
     {
-		if ( (fpin=fopen_bin(binname) ) == NULL ) {
+        if ( (fpin=fopen_bin(binname) ) == NULL ) {
             exit_log(1, "Can't open input file %s\n", binname);
+        }
     }
 
     if ( outfile == NULL )

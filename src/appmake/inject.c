@@ -1,7 +1,7 @@
 /*
  *      Short program to inject files into other files
  *      
- *      $Id: inject.c,v 1.4 2016-06-22 06:14:58 stefano Exp $
+ *      $Id: inject.c,v 1.5 2016-06-22 23:59:57 aralbrec Exp $
  */
 
 
@@ -59,7 +59,7 @@ int inject_exec(char *target)
     }
     
     if ( stat(binname, &binname_sb) < 0 ||
-         ( (fpin=fopen_bin(binname) ) == NULL ) {
+         ( (fpin=fopen_bin(binname) ) == NULL )) {
         exit_log(1,"Can't open input file %s\n",binname);
     }
     
