@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.36 2016-06-21 20:49:06 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.37 2016-06-22 21:22:04 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -102,6 +102,14 @@ IF DEFINED_USING_amalloc
 ENDIF
 
 	ld	hl,$80
+        ld      a,(hl)
+        ld      b,0
+        and     a
+        jr      z,argv_done
+        ld      c,a
+        add     hl,bc   ;now points to the end of the command line
+
+
 	INCLUDE	"crt0_command_line.asm"
 	push	bc	;argc
 	push	hl	;argv

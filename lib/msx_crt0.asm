@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.42 2016-06-21 20:49:06 dom Exp $
+;	$Id: msx_crt0.asm,v 1.43 2016-06-22 21:22:04 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -107,6 +107,12 @@ IF (startup=2)
 	ld	(defltdsk),a
 
 	ld	hl,$80
+        ld      a,(hl)
+        ld      b,0
+        and     a
+        jr      z,argv_done
+        ld      c,a
+        add     hl,bc   ;now points to the end of the command line
 	INCLUDE	"crt0_command_line.asm"
 
 	push	bc	;argc

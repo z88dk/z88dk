@@ -2,18 +2,14 @@
 
 ; Push pointers to argv[n] onto the stack now
 ; We must start from the end 
-; Entry:  hl= end or arguments
+; Entry:  hl = end of arguments
+;	   c = length of arguments
+;	   b = 0
 ; Exit:	  bc = argc
 ;         hl = argv
 
 	ld	de,0	;NULL pointer at end, just in case
 	push	de
-	ld	a,(hl)
-	ld	b,0
-	and	a
-	jr	z,argv_done
-	ld	c,a
-	add	hl,bc	;now points to the end
 ; Try to find the end of the arguments
 argv_loop_1:
 	ld	a,(hl)
@@ -33,7 +29,6 @@ argv_loop_2:
 
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-IF DEFINED_ansistdio
 	EXTERN freopen
 	xor	a
 	add	b
@@ -93,7 +88,6 @@ no_redir_stdout:
 	dec	hl
 	jr	argv_zloop
 no_redir_stdin:
-ENDIF
 ENDIF
 ENDIF
 
