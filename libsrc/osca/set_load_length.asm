@@ -10,14 +10,17 @@
 ; IX:IY = Bytes to load
 ;
 ;
-;	$Id: set_load_length.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
+;	$Id: set_load_length.asm,v 1.4 2016-06-22 22:13:09 dom Exp $
 ;
 
     INCLUDE "flos.def"
 
+        SECTION code_clib
 	PUBLIC  set_load_length
+	PUBLIC  _set_load_length
 
 set_load_length:
+_set_load_length:
 
 	;__FASTCALL__
 	;pop		hl		; sector ptr
@@ -26,9 +29,12 @@ set_load_length:
 	;push	ix
 	;push	iy
 	;push	hl
+	push	ix	;save callers
 	push hl
 	pop iy
 	push de
 	pop ix
 	
-	jp	kjt_set_load_length
+	call	kjt_set_load_length
+	pop	ix	;restore callers
+	ret

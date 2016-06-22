@@ -13,16 +13,20 @@
 ; Output Registers :  FLOS style error handling
 ;
 ;
-;	$Id: write_bytes_to_file.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
+;	$Id: write_bytes_to_file.asm,v 1.4 2016-06-22 22:13:09 dom Exp $
 ;
 
     INCLUDE "flos.def"
 
+        SECTION code_clib
 	PUBLIC  write_bytes_to_file
+	PUBLIC  _write_bytes_to_file
 	EXTERN   flos_err
 	
 write_bytes_to_file:
-	ld	ix,2
+_write_bytes_to_file:
+	push	ix	;save callers
+	ld	ix,4
 	add	ix,sp
 
 	ld	e,(ix+0)	; len
@@ -41,4 +45,5 @@ write_bytes_to_file:
 	pop ix			; address
 
 	call	kjt_write_bytes_to_file
+	pop	ix		;restore callers
 	jp		flos_err

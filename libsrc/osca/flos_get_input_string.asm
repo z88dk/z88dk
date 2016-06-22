@@ -4,14 +4,17 @@
 ;
 ;	Get line from console
 ;
-;	$Id: flos_get_input_string.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
+;	$Id: flos_get_input_string.asm,v 1.3 2016-06-22 22:13:09 dom Exp $
 ;
 
     INCLUDE "flos.def"
 
+        SECTION code_clib
 	PUBLIC  flos_get_input_string
+	PUBLIC  _flos_get_input_string
 	
 flos_get_input_string:
+_flos_get_input_string:
 	pop de
 	pop bc
 	ld	a,c

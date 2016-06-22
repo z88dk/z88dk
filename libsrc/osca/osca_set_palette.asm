@@ -4,11 +4,13 @@
 ;	extern void _FASTCALL_ osca_set_palette(char palette[256]);
 ;	set colour palette
 ;
-;	$Id: osca_set_palette.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
+;	$Id: osca_set_palette.asm,v 1.5 2016-06-22 22:13:09 dom Exp $
 ;
 
 
+        SECTION code_clib
 	PUBLIC	osca_set_palette
+	PUBLIC	_osca_set_palette
 	EXTERN     swapgfxbk
 	EXTERN    swapgfxbk1
 	
@@ -16,6 +18,7 @@
 
 
 osca_set_palette:
+_osca_set_palette:
 ; __FASTCALL__, table ptr already in HL
 
 	call swapgfxbk

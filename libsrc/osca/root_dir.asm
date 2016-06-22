@@ -4,14 +4,17 @@
 ;
 ;
 ;
-;	$Id: root_dir.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
+;	$Id: root_dir.asm,v 1.3 2016-06-22 22:13:09 dom Exp $
 ;
 
     INCLUDE "flos.def"
 
+        SECTION code_clib
 	PUBLIC  root_dir
+	PUBLIC  _root_dir
 	EXTERN   flos_err
 	
 root_dir:
+_root_dir:
 	call	kjt_root_dir
 	jp   flos_err

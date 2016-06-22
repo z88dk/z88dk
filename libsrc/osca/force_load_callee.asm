@@ -14,16 +14,19 @@
 ; Output Registers :  FLOS style error handling
 ;
 ;
-;	$Id: force_load_callee.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
+;	$Id: force_load_callee.asm,v 1.4 2016-06-22 22:13:09 dom Exp $
 ;
 
     INCLUDE "flos.def"
 
+        SECTION code_clib
 	PUBLIC  force_load_callee
+	PUBLIC  _force_load_callee
 	EXTERN   flos_err
 	PUBLIC  ASMDISP_FORCE_LOAD_CALLEE
 	
 force_load_callee:
+_force_load_callee:
 	pop de
 	pop bc	; bank
 	pop hl	; data position

@@ -6,7 +6,7 @@
 ;
 ;	Get the current sector and update the sector/cluster counters
 ;
-;	$Id: file_sector_list.asm,v 1.3 2015-01-19 01:33:00 pauloscustodio Exp $
+;	$Id: file_sector_list.asm,v 1.4 2016-06-22 22:13:09 dom Exp $
 
 ;----------------------------------------------------------------
 ; ** doc related to kjt_file_sector_list **
@@ -38,10 +38,13 @@
 
     INCLUDE "flos.def"
 
+        SECTION code_clib
 	PUBLIC  file_sector_list
+	PUBLIC  _file_sector_list
 
 
 file_sector_list:
+_file_sector_list:
 	; __FASTCALL__, HL=ptr to struct
 	ld	de,17
 	add hl,de

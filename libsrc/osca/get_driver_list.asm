@@ -4,14 +4,17 @@
 ;
 ;	Get pointer to driver table
 ;
-;	$Id: get_driver_list.asm,v 1.2 2015-01-19 01:33:00 pauloscustodio Exp $
+;	$Id: get_driver_list.asm,v 1.3 2016-06-22 22:13:09 dom Exp $
 ;
 
     INCLUDE "flos.def"
 
+        SECTION code_clib
 	PUBLIC  get_driver_list
+	PUBLIC  _get_driver_list
 	
 get_driver_list:
+_get_driver_list:
 	call	kjt_get_device_info
 	ld	h,d
 	ld	l,e

@@ -6,21 +6,25 @@
 ;
 ;	Find a file and load its properties in a structure
 ;
-;	$Id: find_file_callee.asm,v 1.4 2015-01-19 01:33:00 pauloscustodio Exp $
+;	$Id: find_file_callee.asm,v 1.5 2016-06-22 22:13:09 dom Exp $
 ;
 
     INCLUDE "flos.def"
 
+        SECTION code_clib
 	PUBLIC  find_file_callee
+	PUBLIC  _find_file_callee
 	PUBLIC  ASMDISP_FIND_FILE_CALLEE
 
 .find_file_callee
+._find_file_callee
 	pop		bc
 	pop		de	; ptr to file struct
 	pop		hl	; ptr to file name
 	push	bc
 
 .asmentry
+	push	ix		; save callers
 	push	hl
 	push	iy
 
@@ -70,6 +74,7 @@
 err:
 	pop		iy
 	pop		hl
+	pop		ix	;restore callers
 	ret	z
 
 	ld	hl,0	; flag was not zero
