@@ -12,6 +12,7 @@
 ; Set up the registers for our operation
 ; Return with main set in
 
+                SECTION  code_fp
                 PUBLIC    fsetup
 		EXTERN	fa
 

@@ -10,6 +10,7 @@
 ;double fabs(double)  
 ;Number in FA..
 
+                SECTION  code_fp
 		INCLUDE "fpp.def"
 
 

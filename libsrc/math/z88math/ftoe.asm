@@ -7,7 +7,7 @@
 ;int prec ;              /* # digits after decimal place */
 ;char *str ;             /* output string */
 
-
+                SECTION  code_fp
 		PUBLIC	ftoe
 
 		INCLUDE	"fpp.def"

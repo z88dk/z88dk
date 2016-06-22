@@ -10,6 +10,7 @@
 ;double log10(double)  
 ;Number in FA..
 
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    log10

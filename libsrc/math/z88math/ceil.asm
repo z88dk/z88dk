@@ -12,6 +12,7 @@
 ;
 ;This is implemented as  -(floor(-x))
 
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    ceil

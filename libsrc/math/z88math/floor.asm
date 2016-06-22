@@ -10,6 +10,7 @@
 ;double floor(double)  
 ;Number in FA..
 
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    floor

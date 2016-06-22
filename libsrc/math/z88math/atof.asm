@@ -9,7 +9,7 @@
 
 ;double atof(char *)     - convert string to number, leave in fa
 
-
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    atof

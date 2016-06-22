@@ -14,6 +14,7 @@
 ;y is in the FA
 ;x is on the stack +8 (+2=y) 
 
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    atan2

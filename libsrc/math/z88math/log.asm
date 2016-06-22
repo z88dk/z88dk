@@ -10,7 +10,7 @@
 ;double log(double)     - natural log
 ;Number in FA..
 
-
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    log

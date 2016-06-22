@@ -10,6 +10,7 @@
 ;double sin(double)
 ;Number in FA..
 
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    sin

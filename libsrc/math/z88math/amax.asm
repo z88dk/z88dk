@@ -13,6 +13,7 @@
 ;
 ;returns the larger of x and y
 
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    amax

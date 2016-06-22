@@ -10,6 +10,7 @@
 ;minusfa(double)  (internal function, negate number in FA)
 ;Number in FA..
 
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    minusfa

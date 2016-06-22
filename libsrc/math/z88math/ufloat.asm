@@ -11,6 +11,7 @@
 ;Convert from integer to FP..
 ;We could enter in here with a long in dehl, so, mod to compiler I think!
 
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    ufloat

@@ -10,6 +10,7 @@
 
 ;Convert fp in FA to an integer 
 
+                SECTION  code_fp
                 INCLUDE  "fpp.def"
 
                 PUBLIC    ifix
