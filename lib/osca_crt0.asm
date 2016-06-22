@@ -18,7 +18,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.34 2016-06-21 20:49:06 dom Exp $
+;	$Id: osca_crt0.asm,v 1.35 2016-06-22 21:21:02 dom Exp $
 ;
 
 
@@ -45,22 +45,6 @@
         PUBLIC    cleanup
         PUBLIC    l_dcal
 
-
-;Exit variables
-
-        PUBLIC    exitsp
-        PUBLIC    exitcount
-
-;For stdin, stdout, stder
-
-        PUBLIC    __sgoioblk
-
-       	PUBLIC	heaplast	;Near malloc heap variables
-        PUBLIC	heapblocks
-
-; Graphics stuff
-        PUBLIC	base_graphics
-        PUBLIC	coords
 
 ; FLOS system variables
         PUBLIC	sector_lba0		; keep this byte order
@@ -90,7 +74,6 @@
         PUBLIC	current_scancode
         PUBLIC	current_asciicode
 
-        PUBLIC	FRAMES
 
 ;--------
 ; OSCA / FLOS specific definitions
@@ -107,37 +90,34 @@
 ; Set an origin for the application (-zorg=) default to $5000
 ;--------
 
-        IF      !myzorg
-                defc    myzorg  = $5000
-        ENDIF
+IF      !myzorg
+	defc    myzorg  = $5000
+ENDIF
 
 
-	IF ((myzorg = $5000) | (!DEFINED_osca_bank))
-                org		myzorg
-	ELSE
-				; optional Program Location File Header
-				org		myzorg
-				defb	$ed
-				defb	$00
-				jr	start
-				defw	myzorg
-		IF DEFINED_osca_bank
-				defb	osca_bank
-		ELSE
-				defb    0
-		ENDIF
-				defb	$00 ; control byte: 1=truncate basing on next 3 bytes
-				;defw	0   ; Load length 15:0 only needed if truncate flag is set
-				;defb	0	; Load length ..bits 23:16, only needed if truncate flag is set
-	ENDIF
+IF ((myzorg = $5000) | (!DEFINED_osca_bank))
+       org	myzorg
+ELSE
+	; optional Program Location File Header
+	org	myzorg
+	defb	$ed
+	defb	$00
+	jr	start
+	defw	myzorg
+    IF DEFINED_osca_bank
+	defb	osca_bank
+    ELSE
+	defb    0
+    ENDIF
+	defb	$00 ; control byte: 1=truncate basing on next 3 bytes
+	;defw	0   ; Load length 15:0 only needed if truncate flag is set
+	;defb	0	; Load length ..bits 23:16, only needed if truncate flag is set
+ENDIF
 	
 start:
         di
-
-		;push	hl
-		;pop		bc
-		ld	b,h
-		ld	c,l
+	ld	b,h
+	ld	c,l
 
         ld      hl,0
         add     hl,sp
@@ -148,15 +128,17 @@ ELSE
         ld      sp,osca_stack
 ENDIF
         ;ld      sp,$7FFF
+	push	bc		
+	call	crt0_init_bss
+	pop	bc
         ld      (exitsp),sp
-        
-        push bc  ; keep ptr to arg list
+        push	bc  ; keep ptr to arg list
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
-    INCLUDE "amalloc.def"
+	INCLUDE "amalloc.def"
 ENDIF
 
 IF (!DEFINED_osca_notimer)
@@ -176,182 +158,54 @@ IF (!DEFINED_osca_notimer)
         ld  a,@00000100
         out  (sys_clear_irq_flags),a           ; Clear the timer IRQ flag
 ELSE
-		ld	b,255
+	ld	b,255
 .v_srand_loop
-		ld	hl,FLOSvarsaddr
-		add	(hl)
-		ld	(FRAMES),a
-		inc hl
-		djnz v_srand_loop
+	ld	hl,FLOSvarsaddr
+	add	(hl)
+	ld	(FRAMES),a
+	inc hl
+	djnz v_srand_loop
 ENDIF
         ei
         
-IF !DEFINED_nostreams
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
-
-
 	; Push pointers to argv[n] onto the stack now
 	; We must start from the end 
-		ld	hl,0    ; NULL pointer at end, just in case
-		ld	b,h     ; parameter counter
-		ld	c,h     ; character counter
-		ex	(sp),hl ; retrieve ptr to argument list / store NULL ptr
+	pop	hl	; command line back again
+	ld	bc,0
+	ld	a,(hl)
+	and	a
+	jr	z,argv_done
+	dec	hl
+find_end:
+	inc	hl
+	inc	c
+	ld	a,(hl)
+	and	a
+	jr	nz,find_end
+	dec	hl
 
-		ld	a,(hl)
-		and	a
-		jr	z,argv_done
-
-		dec hl
-	find_end:
-		inc	hl
-		inc c
-		ld	a,(hl)
-		and	a
-		jr	nz,find_end
-		dec hl
-		; now HL points to the end of command line
-		; and C holds the length of args buffer
+	INCLUDE "crt0_command_line.asm"
 		
-	; Try to find the end of the arguments
-	argv_loop_1:
-		ld	a,(hl)
-		cp	' '
-		jr	nz,argv_loop_2
-		ld	(hl),0
-		dec	hl
-		dec	c
-		jr	nz,argv_loop_1
-	; We've located the end of the last argument, try to find the start
-	argv_loop_2:
-		ld	a,(hl)
-		cp	' '
-		jr	nz,argv_loop_3
-		;ld	(hl),0
-		inc	hl
+	push	bc	;argc
+	push	hl	;argv
 
-IF !DEFINED_noredir
-IF !DEFINED_nostreams
+	call    _main		;Call user code
 
-		EXTERN freopen
-		xor a
-		add b
-		jr	nz,no_redir_stdout
-		ld	a,(hl)
-		cp  '>'
-		jr	nz,no_redir_stdout
-		push hl
-		inc hl
-		cp  (hl)
-		dec hl
-		ld	de,redir_fopen_flag	; "a" or "w"
-		jr	nz,noappendb
-		ld	a,'a'
-		ld	(de),a
-		inc hl
-noappendb:
-		inc hl
-		
-		push bc
-		push hl					; file name ptr
-		push de
-		ld	de,__sgoioblk+4		; file struct for stdout
-		push de
-		call freopen
-		pop de
-		pop de
-		pop hl
-		pop bc
-
-		pop hl
-		
-		dec hl
-		jr	argv_zloop
-no_redir_stdout:
-
-		ld	a,(hl)
-		cp  '<'
-		jr	nz,no_redir_stdin
-		push hl
-		inc hl
-		ld	de,redir_fopen_flagr
-		
-		push bc
-		push hl					; file name ptr
-		push de
-		ld	de,__sgoioblk		; file struct for stdin
-		push de
-		call freopen
-		pop de
-		pop de
-		pop hl
-		pop bc
-
-		pop hl
-		
-		dec hl
-		jr	argv_zloop
-no_redir_stdin:
-
-ENDIF
-ENDIF
-
-		push	hl
-		inc	b
-		dec	hl
-
-; skip extra blanks
-	argv_zloop:
-		ld	(hl),0
-		dec	c
-		jr	z,argv_done
-		dec	hl
-		ld	a,(hl)
-		cp	' '
-		jr	z,argv_zloop
-		inc c
-		inc hl
-
-	argv_loop_3:
-		dec	hl
-		dec	c
-		jr	nz,argv_loop_2
-
-	argv_done:
-		ld	hl,end	;name of program (NULL)
-		push	hl
-		inc	b
-		
-		ld	hl,0
-		add	hl,sp	;address of argv
-		ld	c,b
-		ld	b,0
-		push	bc	;argc
-		push	hl	;argv
-
-			call    _main		;Call user code
-
-		pop	bc	;kill argv
-		pop	bc	;kill argc
+	pop	bc	;kill argv
+	pop	bc	;kill argc
 
 cleanup:
 ;
 ;       Deallocate memory which has been allocated here!
 ;
-        push	hl
+        push	hl		;save exit value
 IF !DEFINED_nostreams
 	EXTERN	closeall
 	call	closeall
 ENDIF
-		; kjt_flos_display restores the text mode but makes the screen flicker
-		; if it is in text mode already
-		;
+	; kjt_flos_display restores the text mode but makes the screen flicker
+	; if it is in text mode already
+	;
 IF (DEFINED_osca_restoretxt)
         call	$10c4 ; kjt_flos_display (added in v547)
 ENDIF
@@ -363,16 +217,16 @@ IF (!DEFINED_osca_notimer)
         out		(sys_irq_enable),a
         ei
 ENDIF
-        pop	hl
+        pop	hl	; restore exit value
 start1:
-        ld  sp,0
-        xor a
-        or  h	; ATM we are not mamaging the 'spawn' exception
+        ld	sp,0
+        xor	a
+        or	h	; ATM we are not mamaging the 'spawn' exception
         jr	nz,cmdok
         ld	l,a
 cmdok:
-        ld  a,l	; return code (lowest byte only)
-        and a	; set Z flag to set the eventual error condition
+        ld	a,l	; return code (lowest byte only)
+        and	a	; set Z flag to set the eventual error condition
         ;xor a ; (set A and flags for RESULT=OK)
         ret
 
@@ -426,52 +280,21 @@ timer_irq_count_done:
         ret
 ENDIF
 
+	SECTION		bss_crt
 
+        PUBLIC	FRAMES
 original_irq_vector:
 	defw 0
 
-;frames_pre:
-;
-;	defb 0
-
 FRAMES:
-
 	defw 0
 	defw 0
 
 
-; Now, define some values for stdin, stdout, stderr
 
-IF !DEFINED_nostreams
-__sgoioblk:
-	INCLUDE	"stdio_fp.asm"
-ENDIF
-
-
-        INCLUDE "crt0_runtime_selection.asm"
-
-;Atexit routine
-exitsp:          defw    0
-exitcount:       defb    0
-
-; Heap stuff
-heaplast:        defw    0
-heapblocks:      defw    0
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-	defw ASMTAIL	; Location of the last program byte
-	defw 0
-ENDIF
-
-; mem stuff
-base_graphics:   defw    $2000
-coords:          defw    0
+         defm  "Small C+ OSCA"
+end:
+         defb  0
 
 
 ;--------------------------------------------------------------------------------------------
@@ -524,27 +347,27 @@ current_asciicode	ds.b 1
 
 ;--------------------------------------------------------------------------------------------
 
+        INCLUDE "crt0_runtime_selection.asm"
+	INCLUDE "crt0_section.asm"
 
-; Signature
-         defm  "Small C+ OSCA"
-end:
-         defb  0
+	SECTION  code_crt_init
+	ld	hl,$2000
+	ld	(base_graphics),hl
 
 
+        SECTION  rodata_clib
 IF !DEFINED_noredir
 IF !DEFINED_nostreams
-redir_fopen_flag:
-				defb 'w'
-				defb 0
-redir_fopen_flagr:
-				defb 'r'
-				defb 0
+redir_fopen_flag:               defb    'w',0
+redir_fopen_flagr:              defb    'r',0
 ENDIF
 ENDIF
+
+
 
 ; SD CARD interface
 IF DEFINED_NEED_SDCARD
-
+	SECTION bss_crt
 	PUBLIC card_select
 	PUBLIC sd_card_info
 
@@ -554,8 +377,12 @@ IF DEFINED_NEED_SDCARD
 card_select:		defb    0    ; Currently selected MMC/SD slot
 sd_card_info:		defb    0    ; Card type flags..
 
-sector_buffer_loc:	defw	sector_buffer
-sector_buffer:	defs 513
+sector_buffer_loc:	defw	0
+sector_buffer:		defs	513
+
+	SECTION code_crt_init
+	ld	hl,sector_buffer
+	ld	(sector_buffer_loc),hl
 
 ENDIF
 
