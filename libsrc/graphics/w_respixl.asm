@@ -1,5 +1,6 @@
         INCLUDE "graphics/grafix.inc"
 
+	SECTION	  code_clib
         PUBLIC    w_respixel
 
         EXTERN     l_cmp
@@ -8,7 +9,7 @@
         EXTERN    coords
 
 ;
-;       $Id: w_respixl.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
+;       $Id: w_respixl.asm,v 1.4 2016-06-22 22:40:19 dom Exp $
 ;
 
 ; ******************************************************************

@@ -6,10 +6,12 @@
 ; TS2068 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
+; $Id: w_putsprite.asm,v 1.5 2016-06-22 22:40:19 dom Exp $
 ;
 
+	SECTION   code_clib
         PUBLIC    putsprite
+        PUBLIC    _putsprite
         EXTERN     w_pixeladdress
 
         EXTERN     swapgfxbk
@@ -21,17 +23,10 @@
 ; sprite: (ix)
 
 
-.offsets_table
-         defb   1,2,4,8,16,32,64,128
-
-.curaddr
-         defw   0
-;.cury
-;         defw   0
-
 
 .putsprite
-        
+._putsprite
+	push	ix	;save callers        
         ld      hl,2   
         add     hl,sp
         ld      e,(hl)
@@ -133,6 +128,7 @@
         pop     de
          pop      bc                ;Restore data
          djnz     _oloop
+	pop	ix	;restore callers
          jp       swapgfxbk1
 
 
@@ -185,6 +181,7 @@
 
          pop      bc                ;Restore data
          djnz     woloop
+	pop	ix	;restore callers
          jp       swapgfxbk1
         
 
@@ -213,5 +210,12 @@
 
          pop      bc
          djnz     woloop
+	pop	ix	;restore callers
          jp       swapgfxbk1
 
+	SECTION rodata_club
+.offsets_table
+         defb   1,2,4,8,16,32,64,128
+	SECTION bss_clib
+.curaddr
+         defw   0

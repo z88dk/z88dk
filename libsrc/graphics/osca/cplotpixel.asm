@@ -3,10 +3,10 @@
 ;
 ;	HRG PLOT
 ;
-;	$Id: cplotpixel.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: cplotpixel.asm,v 1.3 2016-06-22 22:40:19 dom Exp $
 ;
 
-
+        SECTION   code_clib
 	PUBLIC   cplotpixel
 ;	LIB    y_offset_list
 	

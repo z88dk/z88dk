@@ -1,30 +1,32 @@
 	INCLUDE "graphics/grafix.inc"
+	SECTION code_clib
 	PUBLIC	undrawb
+	PUBLIC	_undrawb
 	EXTERN	w_pixeladdress
 ;	LIB	l_cmp
 
 ;
-;	$Id: undrawb.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: undrawb.asm,v 1.3 2016-06-22 22:40:19 dom Exp $
 ;
 
 ; ***********************************************************************
 ;
 ; drawbox Timex hires version
 ;
-.PIXEL
-	DEFB	0
 .undrawb
-		ld ix,0
+._undrawb
+		push	ix	;save callers ix
+		ld ix,2
 		add ix,sp
 		ld l,(ix+8)
 		ld h,(ix+9); x
 		ld a,1	; 512... range checking needs to be fixed to 320
 		cp h
-		ret c
+		jr	c,undrawb_exit
 		ld e,(ix+6); y
 		ld a,maxy
 		cp e
-		ret c
+		jr	c,undrawb_exit
 ; left vertical
 		call pixel_addr
 		call vertical
@@ -56,11 +58,11 @@
 		ld e,(ix+6);y
 		ld a,(ix+2);height
 		add a,e
-		ret c
+		jr	c,undrawb_exit
 		ld e,a
 		ld a,maxy
 		cp e
-		ret c
+		jr	c,undrawb_exit
 
 		call pixel_addr
 		; jp horizontal
@@ -73,12 +75,15 @@
 		and (hl)
 		ld (de),a
 		call incx
-		ret c
+		jr	c,undrawb_exit
 		ld a,b
 		or c
-		ret z
+		jr	z,undrawb_exit
 		dec bc
 		jr loop3
+
+.undrawb_exit
+		pop	ix
 		ret
 
 
@@ -152,3 +157,6 @@
 		djnz loop2
 		ret
 
+	SECTION bss_clib
+.PIXEL
+	DEFB	0

@@ -1,11 +1,13 @@
 	INCLUDE	"graphics/grafix.inc"
+	SECTION code_clib
 	PUBLIC	setxy
+	PUBLIC	_setxy
 	EXTERN	l_cmp
 
 	EXTERN	coords
 
 ;
-;	$Id: w_setxy.asm,v 1.3 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: w_setxy.asm,v 1.4 2016-06-22 22:40:19 dom Exp $
 ;
 
 ; ******************************************************************
@@ -26,6 +28,7 @@
 ;  af....../.... different
 ;
 .setxy
+._setxy
 
 		pop	bc
 		pop	de

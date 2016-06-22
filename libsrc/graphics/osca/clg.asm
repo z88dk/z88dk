@@ -3,19 +3,22 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: clg.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: clg.asm,v 1.5 2016-06-22 22:40:19 dom Exp $
 ;
 
     INCLUDE "flos.def"
     INCLUDE "osca.def"
 
+                SECTION   code_clib
                 PUBLIC    clg
+                PUBLIC    _clg
                 
                 EXTERN     swapgfxbk
                 EXTERN    swapgfxbk1
                 EXTERN	base_graphics
 
 .clg
+._clg
 
 ; Set up a 320x200 pixel, single bitplane
 ; display window in linear bitmap mode.

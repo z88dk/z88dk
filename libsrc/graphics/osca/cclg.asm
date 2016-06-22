@@ -3,13 +3,15 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: cclg.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: cclg.asm,v 1.3 2016-06-22 22:40:19 dom Exp $
 ;
 
     INCLUDE "flos.def"
     INCLUDE "osca.def"
 
+		SECTION   code_clib
                 PUBLIC    cclg
+                PUBLIC    _cclg
 
                 EXTERN     swapgfxbk
                 EXTERN    swapgfxbk1
@@ -20,6 +22,7 @@
 ;colours:	defw $000,$00f,$f00,$f0f,$0f0,$0ff,$ff0,$fff,$008,$800,$808,$080,$088,$880,$888
 
 cclg:
+_cclg:
 
 	ld a,0
 	ld (vreg_rasthi),a		; select y window reg

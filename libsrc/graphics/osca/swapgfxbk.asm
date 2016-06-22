@@ -13,17 +13,16 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.4 2016-03-30 19:20:19 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.5 2016-06-22 22:40:19 dom Exp $
 ;
 
 ;    INCLUDE "flos.def"
     INCLUDE "osca.def"
 
+		SECTION code_clib
 		PUBLIC    swapgfxbk
 		PUBLIC	swapgfxbk1
 
-.asave
-		defb 0
 
 .swapgfxbk
 		;call kjt_wait_vrt		; wait for last line of display
@@ -51,3 +50,6 @@
 
 		ret
 
+		SECTION bss_clib
+.asave
+		defb 0
