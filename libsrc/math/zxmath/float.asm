@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: float.asm,v 1.6 2016-04-01 09:59:13 dom Exp $
+;       $Id: float.asm,v 1.7 2016-06-22 19:59:18 dom Exp $
 ;
 
 
@@ -33,7 +33,7 @@ IF FORlambda
 		INCLUDE  "lambdafp.def"
 ENDIF
 
-
+                SECTION  code_fp
 		PUBLIC	float
 		EXTERN	stkequ
 		EXTERN	l_long_neg

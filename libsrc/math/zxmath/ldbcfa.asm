@@ -3,7 +3,7 @@
 ;
 ;	 bc ix de = FA
 
-
+                SECTION  code_fp
 		PUBLIC	ldbcfa
 
 		EXTERN	fa

@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ftoa.asm,v 1.7 2015-10-06 06:34:14 stefano Exp $
+;       $Id: ftoa.asm,v 1.8 2016-06-22 19:59:18 dom Exp $
 ;
 ;
 ;void ftoa(x,prec,str)   -> Convert double to string
@@ -25,6 +25,7 @@ IF FORlambda
 		INCLUDE  "lambdafp.def"
 ENDIF
 
+                SECTION  code_fp
                 PUBLIC    ftoa
 
 .ftoa

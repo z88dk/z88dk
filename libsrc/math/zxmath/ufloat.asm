@@ -2,6 +2,7 @@
 ;       Converts integer in hl to fp number
 
 
+                SECTION  code_fp
                 PUBLIC    ufloat
 
                 EXTERN    stkequ

@@ -4,7 +4,7 @@
 ;
 ;       8/1/03 - Stefano Bodrato
 ;
-;       $Id: minusfa.asm,v 1.6 2015-08-10 08:52:13 stefano Exp $
+;       $Id: minusfa.asm,v 1.7 2016-06-22 19:59:18 dom Exp $
 ;
 ;       Negate a floating point number
 ;
@@ -24,7 +24,7 @@ IF FORlambda
 		INCLUDE  "lambdafp.def"
 ENDIF
 
-
+                SECTION  code_fp
                 PUBLIC    minusfa
 
                 EXTERN    fa

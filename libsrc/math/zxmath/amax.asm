@@ -4,7 +4,7 @@
 ;
 ;       7/12/02 - Stefano Bodrato
 ;
-;       $Id: amax.asm,v 1.6 2015-08-10 08:52:12 stefano Exp $
+;       $Id: amax.asm,v 1.7 2016-06-22 19:59:18 dom Exp $
 ;
 
 
@@ -23,6 +23,7 @@ IF FORlambda
 		INCLUDE  "lambdafp.def"
 ENDIF
 
+                SECTION  code_fp
                 PUBLIC    amax
 
                 EXTERN	fsetup

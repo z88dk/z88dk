@@ -4,7 +4,7 @@
 ;
 ;       7/12/02 - Stefano Bodrato
 ;
-;       $Id: asin.asm,v 1.4 2015-08-10 08:52:12 stefano Exp $
+;       $Id: asin.asm,v 1.5 2016-06-22 19:59:18 dom Exp $
 ;
 
 
@@ -22,6 +22,7 @@ IF FORlambda
 		INCLUDE  "lambdafp.def"
 ENDIF
 
+                SECTION  code_fp
                 PUBLIC    asin
 
                 EXTERN	fsetup1

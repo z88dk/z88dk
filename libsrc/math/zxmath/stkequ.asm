@@ -3,12 +3,13 @@
 ;
 ;       10/12/02 - Stefano Bodrato
 ;
-;       $Id: stkequ.asm,v 1.5 2015-08-10 08:52:13 stefano Exp $
+;       $Id: stkequ.asm,v 1.6 2016-06-22 19:59:18 dom Exp $
 ;
 ; Equalise the ZX FP stack and put the calculated value into FA
 ; the "real" stack has been already fixed in fsetup.
 ;
 
+                SECTION  code_fp
 		PUBLIC	stkequ
 
 		EXTERN	fa

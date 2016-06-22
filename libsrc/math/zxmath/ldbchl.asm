@@ -3,7 +3,7 @@
 ;
 ;	bc ix de = (hl)
 
-
+                SECTION  code_fp
 		PUBLIC	ldbchl
 
 .ldbchl ld      e,(hl)
