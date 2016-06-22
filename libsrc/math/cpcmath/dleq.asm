@@ -3,9 +3,10 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: dleq.asm,v 1.5 2015-01-21 10:56:29 stefano Exp $
+;	$Id: dleq.asm,v 1.6 2016-06-22 19:50:49 dom Exp $
 ;
 
+                SECTION         code_fp
 		INCLUDE		"cpcfirm.def"
 		INCLUDE		"cpcfp.def"
 

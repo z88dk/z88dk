@@ -3,10 +3,11 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: cos.asm,v 1.3 2015-01-21 10:56:29 stefano Exp $
+;	$Id: cos.asm,v 1.4 2016-06-22 19:50:48 dom Exp $
 ;
 
-        INCLUDE		"cpcfirm.def"
+                SECTION         code_fp
+	        INCLUDE		"cpcfirm.def"
 
 		INCLUDE		"cpcfp.def"
 

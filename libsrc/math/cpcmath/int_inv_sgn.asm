@@ -3,9 +3,10 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: int_inv_sgn.asm,v 1.3 2015-01-19 01:32:56 pauloscustodio Exp $
+;	$Id: int_inv_sgn.asm,v 1.4 2016-06-22 19:50:49 dom Exp $
 ;
 
+                SECTION         code_fp
 		INCLUDE		"cpcfp.def"
 
 		PUBLIC		int_inv_sgn

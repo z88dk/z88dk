@@ -3,9 +3,10 @@
 ;
 ;	August 2003 **_|warp6|_** <kbaccam /at/ free.fr>
 ;
-;	$Id: init_floatpack.asm,v 1.4 2016-05-16 20:29:12 dom Exp $
+;	$Id: init_floatpack.asm,v 1.5 2016-06-22 19:50:49 dom Exp $
 ;
 
+                SECTION         code_fp
 		INCLUDE		"cpcfp.def"
 
 		PUBLIC		init_floatpack
@@ -72,40 +73,6 @@
                 EXTERN            sqrtc
                 EXTERN            tanc
 
-; Now, a hack around z80asm - we have to reference the .lib labels to get
-; them into scope. Ideally we'd go (libroutine+offset), but the offset may
-; change at some point and this is arguable the simplest way to do it
-;
-; We save space by only using defb - this overflow, but no harm done there
-
-                defb    atan % 256
-                defb    cos % 256
-                defb    dadd % 256
-                defb    ddiv % 256
-                defb    deg % 256
-                defb    deq % 256
-                defb    dge % 256
-                defb    dgt % 256
-                defb    dleq % 256
-                defb    dlt % 256
-                defb    dmul % 256
-                defb    dne % 256
-                defb    dsub % 256
-                defb    exp % 256
-                defb    float % 256
-                defb    floor % 256
-                defb    fprand % 256
-                defb    ifix % 256
-                defb    log10 % 256
-                defb    log % 256
-                defb    minusfa % 256
-                defb    pi % 256
-                defb    pow10 % 256
-                defb    pow % 256
-                defb    rad % 256
-                defb    sin % 256
-                defb    sqrt % 256
-                defb    tan % 256
 .init_floatpack
 		ld      hl,$BD65
 		ld      a,(hl)
