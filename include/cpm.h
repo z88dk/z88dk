@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.12 2014-05-28 12:12:34 stefano Exp $
+ *    $Id: cpm.h,v 1.13 2016-06-23 20:57:58 dom Exp $
  */
 
 #include <sys/compiler.h>
@@ -98,8 +98,8 @@ extern struct fcb  _fcb[MAXFILE];
 
 
 /* The CPM bdos call */
-extern int __LIB__ bdos(int func,int arg);
-extern int __LIB__ bios(int func,int arg,int arg2);
+extern int __LIB__ bdos(int func,int arg) __SMALLCDECL;
+extern int __LIB__ bios(int func,int arg,int arg2) __SMALLCDECL;
 
 
 /* Get a free FCB */
@@ -107,17 +107,17 @@ extern int __LIB__ bios(int func,int arg,int arg2);
 extern struct fcb __LIB__ *getfcb(void);
 
 /* Fill up the filename stuff */
-extern int __LIB__ setfcb(struct fcb *fc, unsigned char *name);
-extern void __LIB__ parsefcb(struct fcb *fc, unsigned char *name);
+extern int __LIB__ setfcb(struct fcb *fc, unsigned char *name) __SMALLCDECL;
+extern void __LIB__ parsefcb(struct fcb *fc, unsigned char *name) __SMALLCDECL;
 /* Write the file offset into the FCB */
-extern void __LIB__ putoffset(char *dest, long val);
+extern void __LIB__ putoffset(char *dest, long val) __SMALLCDECL;
 
 /* Set/get userid */
 #define setuid(u)  bdos(CPM_SUID,u)
 #define getuid()   bdos(CPM_SUID,0xFF)
 
 /* Write an offset as 3 bytes */
-extern void __LIB__ _putoffset(unsigned char *where,long offset);
+extern void __LIB__ _putoffset(unsigned char *where,long offset) __SMALLCDECL;
 
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
