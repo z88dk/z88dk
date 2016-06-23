@@ -58,14 +58,14 @@
 
 #define BAQTBL(numq)  uchar ba_qtbl[numq*2];
 
-extern void __LIB__ __FASTCALL__ ba_Init(uchar numq /* >=1 */) __SMALLCFASTCALL;
-extern void __LIB__              *ba_AddMem(uchar q, uchar numblocks /* >=1 */, uint size /* >=2 */, void *addr) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *ba_AddMem_callee(uchar q, uchar numblocks, uint size, void *addr) __SMALLCDECL __SMALLCCALLEE;
-extern uint __LIB__ __FASTCALL__ ba_BlockCount(uchar q) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *ba_Malloc(uchar q) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ ba_Init(int numq /* >=1 */) __SMALLCFASTCALL;
+extern void __LIB__              *ba_AddMem(int q, int numblocks /* >=1 */, uint size /* >=2 */, void *addr) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *ba_AddMem_callee(int q, int numblocks, uint size, void *addr) __SMALLCDECL __SMALLCCALLEE;
+extern uint __LIB__ __FASTCALL__ ba_BlockCount(int q) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__ *ba_Malloc(int q) __SMALLCFASTCALL;
 extern void __LIB__ __FASTCALL__ ba_Free(void *addr) __SMALLCFASTCALL;
-extern void __LIB__              *ba_BestFit(uchar q, uchar numq /* >=1 */) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *ba_BestFit_callee(uchar q, uchar numq) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__              *ba_BestFit(int q, int numq /* >=1 */) __SMALLCDECL;
+extern void __LIB__ __CALLEE__   *ba_BestFit_callee(int q, int numq) __SMALLCDECL __SMALLCCALLEE;
 
 #define ba_AddMem(a,b,c,d)  ba_AddMem_callee(a,b,c,d)
 #define ba_BestFit(a,b)     ba_BestFit_callee(a,b)

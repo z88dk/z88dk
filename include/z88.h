@@ -5,7 +5,7 @@
  *
  *      Link using -lz88
  *
- *	$Id: z88.h,v 1.8 2016-06-12 08:16:19 dom Exp $
+ *	$Id: z88.h,v 1.9 2016-06-23 21:11:24 dom Exp $
  */
 
 #ifndef __Z88_H__
@@ -63,7 +63,7 @@ extern void __LIB__ nameapp(char *);
 #define INT_MIN		4
 #define INT_UART	8
 
-extern int __LIB__ RegisterInt(void (*fn)(),char type , char tick) __SMALLCDECL;
+extern int __LIB__ RegisterInt(void (*fn)(),int type, int tick) __SMALLCDECL;
 extern int __LIB__ DeRegisterInt(void);
 
 /*
@@ -73,7 +73,7 @@ extern int __LIB__ DeRegisterInt(void);
  *
  */
 
-extern bool_t __LIB__ QueryPackage(char which, char major, char minor) __SMALLCDECL;
+extern bool_t __LIB__ QueryPackage(int which, int major, int minor) __SMALLCDECL;
 
 /*
  *	Get the PID of a process
@@ -105,11 +105,11 @@ extern pid_t __LIB__ getpid(void);
  */
 
 extern int __LIB__ opendor(char *filename);
-extern void __LIB__ readdor(int dor, char type, char len, void *buf) __SMALLCDECL;
+extern void __LIB__ readdor(int dor, int type, int len, void *buf) __SMALLCDECL;
 extern void __LIB__ closedor(int dor);
 
 /* These are still in z88_crt0.lib though they're not referenced */
-extern void __LIB__ writedor(int dor, char type, char len, void *buf) __SMALLCDECL;
+extern void __LIB__ writedor(int dor, int type, int len, void *buf) __SMALLCDECL;
 extern void __LIB__ deletedor(int dor);
 
 /* Return the son/brother of the dor, supply pointer to store minor type */

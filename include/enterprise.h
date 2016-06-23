@@ -1,7 +1,7 @@
 /*
  * Headerfile for Enterprise 64/128 specific stuff
  *
- * $Id: enterprise.h,v 1.8 2016-06-19 20:17:32 dom Exp $
+ * $Id: enterprise.h,v 1.9 2016-06-23 21:11:24 dom Exp $
  */
 
 #ifndef __ENTERPRISE_H__
@@ -170,44 +170,44 @@ extern unsigned int  esccmd_pd;
 
 // Kernel Functions
 
-extern int __LIB__              set_exos_variable(unsigned char variable, unsigned char value) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   set_exos_variable_callee(unsigned char variable, unsigned char value) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              set_exos_variable(int variable, int value) __SMALLCDECL;
+extern int __LIB__ __CALLEE__   set_exos_variable_callee(int variable, int value) __SMALLCDECL __SMALLCCALLEE;
 #define set_exos_variable(a,b)      set_exos_variable_callee(a,b)
 
-extern int __LIB__ __FASTCALL__ get_exos_variable(unsigned char variable) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ toggle_exos_variable(unsigned char variable) __SMALLCFASTCALL;
+extern int __LIB__ __FASTCALL__ get_exos_variable(int variable) __SMALLCFASTCALL;
+extern int __LIB__ __FASTCALL__ toggle_exos_variable(int variable) __SMALLCFASTCALL;
 extern int __LIB__ __FASTCALL__ set_exos_multi_variables(char *vlist) __SMALLCFASTCALL;
 
-extern int __LIB__              exos_capture_channel(unsigned char main_channel, unsigned char secondary_channel) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_capture_channel_callee(unsigned char main_channel, unsigned char secondary_channel) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_capture_channel(int main_channel, int secondary_channel) __SMALLCDECL;
+extern int __LIB__ __CALLEE__   exos_capture_channel_callee(int main_channel, int secondary_channel) __SMALLCDECL __SMALLCCALLEE;
 #define exos_capture_channel(a,b)   exos_capture_channel_callee(a,b)
 
-extern int __LIB__ __FASTCALL__ exos_channel_read_status(unsigned char channel) __SMALLCFASTCALL;
+extern int __LIB__ __FASTCALL__ exos_channel_read_status(int channel) __SMALLCFASTCALL;
 
-extern int __LIB__              exos_create_channel(unsigned char channel, char *device) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_create_channel_callee(unsigned char channel, char *device) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_create_channel(int channel, char *device) __SMALLCDECL;
+extern int __LIB__ __CALLEE__   exos_create_channel_callee(int channel, char *device) __SMALLCDECL __SMALLCCALLEE;
 #define exos_create_channel(a,b)    exos_create_channel_callee(a,b)
 
-extern int __LIB__              exos_open_channel(unsigned char channel, char *device) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_open_channel_callee(unsigned char channel, char *device) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_open_channel(int channel, char *device) __SMALLCDECL;
+extern int __LIB__ __CALLEE__   exos_open_channel_callee(int channel, char *device) __SMALLCDECL __SMALLCCALLEE;
 #define exos_open_channel(a,b)      exos_open_channel_callee(a,b)
 
-extern int __LIB__ __FASTCALL__ exos_close_channel(unsigned char channel) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ exos_destroy_channel(unsigned char channel) __SMALLCFASTCALL;
+extern int __LIB__ __FASTCALL__ exos_close_channel(int channel) __SMALLCFASTCALL;
+extern int __LIB__ __FASTCALL__ exos_destroy_channel(int channel) __SMALLCFASTCALL;
 
-extern int __LIB__              exos_redirect_channel(unsigned char main_channel, unsigned char secondary_channel) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_redirect_channel_callee(unsigned char main_channel, unsigned char secondary_channel) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_redirect_channel(int main_channel, int secondary_channel) __SMALLCDECL;
+extern int __LIB__ __CALLEE__   exos_redirect_channel_callee(int main_channel, int secondary_channel) __SMALLCDECL __SMALLCCALLEE;
 #define exos_redirect_channel(a,b)  exos_redirect_channel_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ exos_read_character(unsigned char channel) __SMALLCFASTCALL;
+extern int __LIB__ __FASTCALL__ exos_read_character(int channel) __SMALLCFASTCALL;
 
-extern int __LIB__              exos_write_character(unsigned char channel, unsigned char character) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_write_character_callee(unsigned char channel, unsigned char character) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_write_character(int channel, int character) __SMALLCDECL;
+extern int __LIB__ __CALLEE__   exos_write_character_callee(int channel,int character) __SMALLCDECL __SMALLCCALLEE;
 #define exos_write_character(a,b)   exos_write_character_callee(a,b)
 
-extern int __LIB__              exos_read_block(unsigned char channel, unsigned int byte_count, unsigned char *address) __SMALLCDECL;
-extern int __LIB__              exos_write_block(unsigned char channel, unsigned int byte_count, unsigned char *address) __SMALLCDECL;
+extern int __LIB__              exos_read_block(int channel, unsigned int byte_count, unsigned char *address) __SMALLCDECL;
+extern int __LIB__              exos_write_block(int channel, unsigned int byte_count, unsigned char *address) __SMALLCDECL;
 
 // Check if the line printer is ready (1=ready, 0 if not)
 extern int __LIB__ lpt_ready();
@@ -219,7 +219,7 @@ extern int __LIB__ lpt_ready();
 #define WARM_RESET           64 // De­allocate all user RAM segments
 #define COLD_RESET          128
 
-extern void __LIB__ __FASTCALL__  exos_system_reset(unsigned char flags) __SMALLCFASTCALL;
+extern void __LIB__ __FASTCALL__  exos_system_reset(int flags) __SMALLCFASTCALL;
 
 // EXOS System Information
 
@@ -294,10 +294,10 @@ extern int __LIB__ __FASTCALL__  exos_system_status(struct EXOS_INFO info) __SMA
 
 // Set video mode (see the video constants above) 
 // Size is char units y_size = 1..255 (max 27 visible at once),  x_size = 1..42
-extern void __LIB__             exos_set_vmode(unsigned char video_mode, unsigned char color_mode, unsigned char x_size, unsigned char y_size) __SMALLCDECL;
+extern void __LIB__             exos_set_vmode(int video_mode, int color_mode, int x_size, int y_size) __SMALLCDECL;
 // Set the visible boundaries for video page 
-extern int __LIB__              exos_display_page(unsigned char channel, unsigned char first_row, unsigned char rows, unsigned char first_row_position) __SMALLCDECL;
-extern int __LIB__ __FASTCALL__ exos_reset_font(unsigned char channel) __SMALLCFASTCALL;
+extern int __LIB__              exos_display_page(int channel, int first_row, int rows, int first_row_position) __SMALLCDECL;
+extern int __LIB__ __FASTCALL__ exos_reset_font(int channel) __SMALLCFASTCALL;
 
 
 
