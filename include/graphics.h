@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.17 2016-05-17 21:54:50 dom Exp $
+ *	$Id: graphics.h,v 1.18 2016-06-23 20:58:36 dom Exp $
  */
 
 #ifndef __GFX_H__
@@ -92,7 +92,7 @@ extern int __LIB__ getmaxy(void);
  */
  
 /* Set/Reset the couple of vectors being part of a "stencil" */
-extern void __LIB__ __FASTCALL__ stencil_init(unsigned char *stencil);
+extern void __LIB__ __FASTCALL__ stencil_init(unsigned char *stencil) __SMALLCFASTCALL;
 /* Add a pixel to a figure defined inside a stencil object */
 extern void __LIB__ stencil_add_point(int x, int y, unsigned char *stencil) __SMALLCDECL;
 /* Trace a relative line into a stencil object (extend shape) */
