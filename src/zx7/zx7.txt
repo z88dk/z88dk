@@ -330,6 +330,8 @@ HISTORY
 
 2016-02-12: Improved documentation once more.
 
+2016-06-10: Added command-line option "-f"
+
 
 =======
 CREDITS

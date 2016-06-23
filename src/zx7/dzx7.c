@@ -166,9 +166,24 @@ void decompress() {
 }
 
 int main(int argc, char *argv[]) {
+    int forced_mode = 0;
+    int i;
+
+    printf("DZX7: LZ77/LZSS decompression by Einar Saukas\n");
+
+    /* process hidden optional parameters */
+    for (i = 1; i < argc && *argv[i] == '-'; i++) {
+        if (!strcmp(argv[i], "-f")) {
+            forced_mode = 1;
+        } else {
+            fprintf(stderr, "Error: Invalid parameter %s\n", argv[i]);
+            exit(1);
+        }
+    }
+
     /* determine output filename */
-    if (argc == 2) {
-        input_name = argv[1];
+    if (argc == i+1) {
+        input_name = argv[i];
         input_size = strlen(input_name);
         if (input_size > 4 && !strcmp(input_name+input_size-4, ".zx7")) {
             output_name = (char *)malloc(input_size);
@@ -178,11 +193,12 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Error: Cannot infer output filename\n");
             exit(1);
         }
-    } else if (argc == 3) {
-        input_name = argv[1];
-        output_name = argv[2];
+    } else if (argc == i+2) {
+        input_name = argv[i];
+        output_name = argv[i+1];
     } else {
-        fprintf(stderr, "Usage: %s input.zx7 [output]\n", argv[0]);
+        fprintf(stderr, "Usage: %s [-f] input.zx7 [output]\n"
+                        "  -f      Force overwrite of output file\n", argv[0]);
         exit(1);
     }
 
@@ -194,7 +210,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* check output file */
-    if (fopen(output_name, "rb") != NULL) {
+    if (!forced_mode && fopen(output_name, "rb") != NULL) {
         fprintf(stderr, "Error: Already existing output file %s\n", output_name);
         exit(1);
     }
@@ -216,8 +232,7 @@ int main(int argc, char *argv[]) {
     fclose(ofp);
 
     /* done! */
-    printf("LZ77/LZSS decompression by Einar Saukas\nFile converted from %lu to %lu bytes!\n",
-        (unsigned long)input_size, (unsigned long)output_size);
+    printf("File converted from %lu to %lu bytes!\n", (unsigned long)input_size, (unsigned long)output_size);
 
     return 0;
 }

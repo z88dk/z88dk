@@ -23,11 +23,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include <errno.h>
 
 #include "zx7.h"
 
@@ -50,26 +50,29 @@ void reverse(unsigned char *first, unsigned char *last) {
 }
 
 int main(int argc, char *argv[]) {
-    FILE *ifp;
-    FILE *ofp;
+    long skip = 0;
+    int forced_mode = 0;
+    int backwards_mode = 0;
+    char *output_name;
     unsigned char *input_data;
     unsigned char *output_data;
+    FILE *ifp;
+    FILE *ofp;
     size_t input_size;
     size_t output_size;
     size_t partial_counter;
     size_t total_counter;
-    char *output_name;
     long delta;
-    long skip;
-    char backwards;
     int i;
 
+    printf("ZX7: Optimal LZ77/LZSS compression by Einar Saukas\n");
+
     /* process hidden optional parameters */
-    skip = 0;
-    backwards = 0;
     for (i = 1; i < argc && (*argv[i] == '-' || *argv[i] == '+'); i++) {
-        if (!strcmp(argv[i], "-b")) {
-            backwards = 1;
+        if (!strcmp(argv[i], "-f")) {
+            forced_mode = 1;
+        } else if (!strcmp(argv[i], "-b")) {
+            backwards_mode = 1;
         } else if ((skip = parse_long(argv[i])) <= 0) {
             fprintf(stderr, "Error: Invalid parameter %s\n", argv[i]);
             exit(1);
@@ -84,7 +87,10 @@ int main(int argc, char *argv[]) {
     } else if (argc == i+2) {
         output_name = argv[i+1];
     } else {
-        fprintf(stderr, "Usage: %s input [output.zx7]\n", argv[0]);
+        fprintf(stderr, "Usage: %s [-f] [-b] input [output.zx7]\n"
+                        "  -f      Force overwrite of output file\n"
+                        "  -b      Compress backwards\n", argv[0]);
+
         exit(1);
     }
 
@@ -133,7 +139,7 @@ int main(int argc, char *argv[]) {
     fclose(ifp);
 
     /* check output file */
-    if (fopen(output_name, "rb") != NULL) {
+    if (!forced_mode && fopen(output_name, "rb") != NULL) {
         fprintf(stderr, "Error: Already existing output file %s\n", output_name);
         exit(1);
     }
@@ -146,7 +152,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* conditionally reverse input file */
-    if (backwards) {
+    if (backwards_mode) {
         reverse(input_data, input_data+input_size-1);
     }
 
@@ -154,7 +160,7 @@ int main(int argc, char *argv[]) {
     output_data = compress(optimize(input_data, input_size, skip), input_data, input_size, skip, &output_size, &delta);
 
     /* conditionally reverse output file */
-    if (backwards) {
+    if (backwards_mode) {
         reverse(output_data, output_data+output_size-1);
     }
 
@@ -168,8 +174,8 @@ int main(int argc, char *argv[]) {
     fclose(ofp);
 
     /* done! */
-    printf("Optimal LZ77/LZSS compression by Einar Saukas\nFile%s converted%s from %lu to %lu bytes! (delta %ld)\n",
-        (skip ? " partially" : ""), (backwards ? " backwards" : ""), (unsigned long)(input_size-skip), (unsigned long)output_size, delta);
+    printf("File%s converted%s from %lu to %lu bytes! (delta %ld)\n", (skip ? " partially" : ""), (backwards_mode ? " backwards" : ""), 
+        (unsigned long)(input_size-skip), (unsigned long)output_size, delta);
 
     return 0;
 }
