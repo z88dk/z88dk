@@ -11,8 +11,8 @@
 
 int RegisterInt(func,type,tick)
 	void (*func)();
-	char type;
-	char tick;
+	int type;
+	int tick;
 {
 #pragma asm
 	INCLUDE	"packages.def"

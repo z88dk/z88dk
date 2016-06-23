@@ -8,7 +8,7 @@
 
 #include <z88.h>
 
-bool_t QueryPackage(char which, char major,char minor)
+bool_t QueryPackage(int which, int major,int minor)
 {
 #pragma asm
 	INCLUDE "packages.def"
