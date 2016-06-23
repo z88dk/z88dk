@@ -5,11 +5,14 @@
 ;
 ;       unsigned char rs232_init()
 ;
-;       $Id: rs232_init.asm,v 1.2 2015-01-21 14:00:11 stefano Exp $
+;       $Id: rs232_init.asm,v 1.3 2016-06-23 20:15:37 dom Exp $
 
+		SECTION  code_clib
                 PUBLIC   rs232_init
+                PUBLIC   _rs232_init
                 
 rs232_init:
+_rs232_init:
 		;check if CPC Booster+ is connected
 		ld bc, $FF00	;Testbytes / Reset
 		in a, (c)
@@ -31,8 +34,8 @@ rs232_init:
 		ld a, 1
 		out (c),a
 		
-        ld  hl,0        ;RS_ERR_OK;
-        ret
+    		ld  hl,0        ;RS_ERR_OK;
+        	ret
 		
 rs232_initerror:
 		ld hl,1			;RS_ERR_NOT_INITIALIZED

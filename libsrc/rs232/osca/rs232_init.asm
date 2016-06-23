@@ -5,13 +5,16 @@
 ;
 ;       unsigned char rs232_init()
 ;
-;       $Id: rs232_init.asm,v 1.2 2015-01-22 12:09:57 stefano Exp $
+;       $Id: rs232_init.asm,v 1.3 2016-06-23 20:15:37 dom Exp $
 
+		SECTION  code_clib
 		PUBLIC   rs232_init
+		PUBLIC   _rs232_init
                 
 		INCLUDE "osca.def"
 
 rs232_init:
+_rs232_init:
 
 	xor a
 	out (sys_timer),a			; timer to overflow every 0.004 secconds

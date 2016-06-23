@@ -5,14 +5,15 @@
 ;
 ;       unsigned char rs232_put(char)
 ;
-;       $Id: rs232_put.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
+;       $Id: rs232_put.asm,v 1.5 2016-06-23 20:15:37 dom Exp $
 
 ; Fastcall so implicit push
 
-
+		SECTION  code_clib
                 PUBLIC   rs232_put
 
 rs232_put:
+_rs232_put:
                 ld   bc,$f8ee
 
 wait:           in   a,(c)

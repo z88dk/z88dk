@@ -5,14 +5,17 @@
 ;
 ;       unsigned char rs232_put(char)
 ;
-;       $Id: rs232_put.asm,v 1.2 2015-01-22 12:09:57 stefano Exp $
+;       $Id: rs232_put.asm,v 1.3 2016-06-23 20:15:37 dom Exp $
 
 ; __FASTCALL__
 
-			PUBLIC   rs232_put
+		SECTION code_clib
+		PUBLIC   rs232_put
+		PUBLIC   _rs232_put
 
-			INCLUDE "osca.def"
+		INCLUDE "osca.def"
 
+rs232_put:
 rs232_put:
 
 			ld c,2
