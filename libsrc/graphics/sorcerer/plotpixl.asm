@@ -8,12 +8,12 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm,v 1.4 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: plotpixl.asm,v 1.5 2016-06-23 19:41:02 dom Exp $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
-
+			SECTION code_clib
 			PUBLIC	plotpixel
 
 			EXTERN	div3

@@ -3,12 +3,14 @@
 ;       Stefano - 10/1/2007
 ;
 ;
-;	$Id: clg.asm,v 1.3 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: clg.asm,v 1.4 2016-06-23 19:41:02 dom Exp $
 ;
 
+		SECTION code_clib
                 PUBLIC    clg
 
 .clg
+._clg
 		in	a,(255)
 		and	@11111000
 		or	@00000110

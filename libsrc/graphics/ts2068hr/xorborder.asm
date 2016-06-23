@@ -1,30 +1,32 @@
 	INCLUDE "graphics/grafix.inc"
+	SECTION code_clib
 	PUBLIC	xorborder
+	PUBLIC	_xorborder
 	EXTERN	w_pixeladdress
 ;	LIB	l_cmp
 
 ;
-;	$Id: xorborder.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: xorborder.asm,v 1.3 2016-06-23 19:41:02 dom Exp $
 ;
 
 ; ***********************************************************************
 ;
 ; drawbox Timex hires version
 ;
-.PIXEL
-	DEFB	0
 .xorborder
-		ld ix,0
+._xorborder
+		push	ix	;save callers
+		ld ix,2
 		add ix,sp
 		ld l,(ix+8)
 		ld h,(ix+9); x
 		ld a,1
 		cp h
-		ret c
+		jr	c,xorborder_exit
 		ld e,(ix+6); y
 		ld a,maxy
 		cp e
-		ret c
+		jr	c,xorborder_exit
 ; left vertical
 		call pixel_addr
 		call vertical
@@ -57,11 +59,11 @@
 		ld e,(ix+6);y
 		ld a,(ix+2);height
 		add a,e
-		ret c
+		jr	c,xorborder_exit
 		ld e,a
 		ld a,maxy
 		cp e
-		ret c
+		jr	c,xorborder_exit
 
 		call pixel_addr
 		; jp horizontal
@@ -74,12 +76,14 @@
 		xor (hl)
 		ld (de),a
 		call incx
-		ret c
+		jr	c,xorborder_exit
 		ld a,b
 		or c
-		ret z
+		jr	z,xorborder_exit
 		dec bc
 		jr loop3
+.xorborder_exit
+		pop	ix	;restore callers
 		ret
 
 
@@ -151,3 +155,6 @@
 		djnz loop2
 		ret
 
+	SECTION	bss_clib
+.PIXEL
+	DEFB	0

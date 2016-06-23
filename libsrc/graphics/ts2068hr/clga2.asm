@@ -7,7 +7,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: clga2.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: clga2.asm,v 1.3 2016-06-23 19:41:02 dom Exp $
 ;
 
 
@@ -15,20 +15,24 @@
 
 
 	INCLUDE	"graphics/grafix.inc"
+	SECTION code_clib
 	PUBLIC    clga
+	PUBLIC    _clga
 	EXTERN	w_pixeladdress
 
 .clga
-		ld	ix,0
+._clga
+		push	ix	;save callers
+		ld	ix,2
 		add	ix,sp
 		ld	h,(ix+9); x
 		ld	a,1
 		cp	h
-		ret	c
+		jr	c,clga_exit
 		ld	e,(ix+6); y
 		ld	a,maxy
 		cp	e
-		ret	c
+		jr	c,clga_exit
 
 		ld	a,(ix+2); height
 		ld	c,(ix+4); width
@@ -107,10 +111,13 @@
 		pop	de ; 2
 		pop	bc ; 1
 		dec	ixl
-		ret	z
+		jr	z,clga_exit
 		call	incy
-		ret	c
+		jr	c,clga_exit
 		jr	outer_loop
+.clga_exit
+		pop	ix
+		ret
 ; (hl) mask
 ; de - screen address
 .INC_X

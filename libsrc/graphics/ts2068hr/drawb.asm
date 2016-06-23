@@ -1,30 +1,33 @@
 	INCLUDE "graphics/grafix.inc"
+ 	SECTION code_clib
 	PUBLIC	drawb
+	PUBLIC	_drawb
+
 	EXTERN	w_pixeladdress
 ;	LIB	l_cmp
 
 ;
-;	$Id: drawb.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: drawb.asm,v 1.3 2016-06-23 19:41:02 dom Exp $
 ;
 
 ; ***********************************************************************
 ;
 ; drawbox Timex hires version
 ;
-.PIXEL
-	DEFB	0
 .drawb
-		ld ix,0
+._drawb
+		push	ix	;save callers
+		ld ix,2
 		add ix,sp
 		ld l,(ix+8)
 		ld h,(ix+9); x
 		ld a,1
 		cp h
-		ret c
+		jr	c,drawb_exit
 		ld e,(ix+6); y
 		ld a,maxy
 		cp e
-		ret c
+		jr	c,drawb_exit
 ; left vertical
 		call pixel_addr
 		call vertical
@@ -57,11 +60,11 @@
 		ld e,(ix+6);y
 		ld a,(ix+2);height
 		add a,e
-		ret c
+		jr	c,drawb_exit
 		ld e,a
 		ld a,maxy
 		cp e
-		ret c
+		jr	c,drawb_exit
 
 		call pixel_addr
 		; jp horizontal
@@ -74,12 +77,15 @@
 		or (hl)
 		ld (de),a
 		call incx
-		ret c
+		jr	c,drawb_exit
 		ld a,b
 		or c
-		ret z
+		jr	z,drawb_exit
 		dec bc
 		jr loop3
+
+.drawb_exit
+		pop	ix	;restore callers
 		ret
 
 
@@ -150,3 +156,7 @@
 		ret c
 		djnz loop2
 		ret
+
+	SECTION bss_clib
+.PIXEL
+	DEFB	0

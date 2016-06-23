@@ -13,7 +13,9 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
+	SECTION code_clib
 	PUBLIC	stencil_render
+	PUBLIC	_stencil_render
 	EXTERN	dither_pattern
 	;LIB	l_cmp
 
@@ -23,11 +25,16 @@
 	;XREF swapgfxbk1
 
 ;	
-;	$Id: w_stencil_render.asm,v 1.3 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: w_stencil_render.asm,v 1.4 2016-06-23 19:41:02 dom Exp $
 ;
 
+.stencil_render_exit
+		pop	ix	;restore callers
+		ret
 .stencil_render
-		ld	ix,2
+._stencil_render
+		push	ix	;save callers
+		ld	ix,4
 		add	ix,sp
 
 		;call	swapgfxbk
@@ -39,7 +46,7 @@
 		ld	a,b
 		and	c
 		cp 255
-		ret	z
+		jr	z,stencil_render_exit
 		push	bc
 		
 		ld	d,b

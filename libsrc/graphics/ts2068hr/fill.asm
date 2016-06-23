@@ -1,14 +1,14 @@
 	INCLUDE "graphics/grafix.inc"
+
+	SECTION code_clib
 	PUBLIC	fill
+	PUBLIC	_fill
 	EXTERN	w_pixeladdress
 ;	EXTERN	l_cmp
 
-.ws1	defw 0
-.index	defw 0
-;.sline	defs 512 * 2 * 3
-;.sline2	defs 512 * 2 * 3
 
 .fill
+._fill
 		pop bc
 		pop de  ; y
 		pop hl  ; x
@@ -46,11 +46,13 @@
 		set 2,c ; semafor = 1
 		res 3,c ; indeks_ws = 0
 		call segm
-
+		push	ix	;save callers
 .petelka
+		pop	ix	;restore callers
 		bit 3,c; indeks_ws1 == 0
 		ret z
 		res 3,c; indeks_ws1 = 0
+		push	ix	;save callers
 .dalej2
 		push hl
 		pop ix; W = ws1
@@ -364,3 +366,8 @@
 ;	drawb(20, 20, 260, 120);
 ;	fill(128, 128);
 ;}
+	SECTION bss_clib
+.ws1	defw 0
+.index	defw 0
+;.sline	defs 512 * 2 * 3
+;.sline2	defs 512 * 2 * 3

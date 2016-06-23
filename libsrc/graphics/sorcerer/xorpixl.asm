@@ -8,12 +8,13 @@
 ;       XOR pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.5 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: xorpixl.asm,v 1.6 2016-06-23 19:41:02 dom Exp $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
 
+                        SECTION code_clib
 			PUBLIC	xorpixel
 
 			EXTERN	div3
