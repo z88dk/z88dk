@@ -8,11 +8,14 @@
 ;
 ; int __LIB__ __FASTCALL__ readbyte(int handle)
 ;
-; $Id: readbyte.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
+; $Id: readbyte.asm,v 1.5 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	readbyte
+	PUBLIC	_readbyte
 	
 .readbyte
+._readbyte
 	ld	a,l
 	call	$1601
 

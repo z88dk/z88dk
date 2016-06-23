@@ -5,9 +5,11 @@
 ;
 ; int open(char *name, int flags, mode_t mode)
 ;
-; $Id: open.asm,v 1.6 2015-01-21 08:09:27 stefano Exp $
+; $Id: open.asm,v 1.7 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	open
+	PUBLIC	_open
 	
 	EXTERN	zxhandl
 	
@@ -16,11 +18,9 @@
 	EXTERN	zxgetfname
 
 
-; BASIC variable names for numeric values
-.fvar	defb 'F',0
-.svar	defb 'S',0
 
 .open
+._open
 	ld	hl,2
 	add	hl,sp
 
@@ -105,3 +105,8 @@
 	call	zx_goto
 	ld	hl,3		; force stream #3 as file handle
 	ret
+
+; BASIC variable names for numeric values
+	SECTION rodata_clib
+.fvar	defb 'F',0
+.svar	defb 'S',0

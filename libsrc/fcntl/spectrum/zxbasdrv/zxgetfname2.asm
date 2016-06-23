@@ -10,9 +10,11 @@
 ; N$ will always hold the file name
 ; The character specifying the current block is handled
 ;
-; $Id: zxgetfname2.asm,v 1.3 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: zxgetfname2.asm,v 1.4 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	zxgetfname2
+	PUBLIC	_zxgetfname2
 	
 	EXTERN	zx_setint_callee
 	EXTERN	zx_setstr_callee
@@ -20,10 +22,9 @@
 	EXTERN ASMDISP_ZX_SETSTR_CALLEE
 	EXTERN ASMDISP_ZX_SETINT_CALLEE
 
-; BASIC variable names for numeric values
-.dvar	defb 'D',0
 
 .zxgetfname2
+._zxgetfname2
 	;ld	e,(hl)		; pointer to file name
 	;inc	hl
 	;ld	d,(hl)
@@ -86,3 +87,6 @@
 	ld	(de),a
 	ret
 
+; BASIC variable names for numeric values
+	SECTION rodata_clib
+.dvar	defb 'D',0

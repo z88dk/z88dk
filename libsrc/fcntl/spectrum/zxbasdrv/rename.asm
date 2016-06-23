@@ -8,15 +8,18 @@
 ;
 ; int rename(char *oldname, char *newname)
 ;
-; $Id: rename.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
+; $Id: rename.asm,v 1.5 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	rename
+	PUBLIC	_rename
 
 	EXTERN	zx_setstr
 	EXTERN	zx_goto
 	EXTERN	zxgetfname
 
 .rename
+._rename
 	pop	bc
 	pop	de
 	pop	hl

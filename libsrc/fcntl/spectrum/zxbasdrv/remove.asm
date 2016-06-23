@@ -5,14 +5,17 @@
 ;
 ; int remove(char *name)
 ;
-; $Id: remove.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
+; $Id: remove.asm,v 1.5 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	remove
+	PUBLIC	_remove
 	
 	EXTERN	zx_goto
 	EXTERN	zxgetfname
 
 .remove
+._remove
 	pop	bc
 	pop	hl
 	push	hl

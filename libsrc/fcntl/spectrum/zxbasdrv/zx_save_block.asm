@@ -5,20 +5,20 @@
 ;
 ; int zx_save_block(char *name, void *addr, size_t len)
 ;
-; $Id: zx_save_block.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: zx_save_block.asm,v 1.3 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	zx_save_block
+	PUBLIC	_zx_save_block
 	
 	EXTERN	zx_setint
 	EXTERN	zx_goto
 	EXTERN	zxgetfname
 
 
-; BASIC variable name
-.avar	defb 'A',0
-.lvar	defb 'L',0
 
 .zx_save_block
+._zx_save_block
 
 	pop	af
 	pop	bc
@@ -69,3 +69,8 @@
 
 	dec	hl
 	ret
+
+; BASIC variable name
+	SECTION rodata_clib
+.avar	defb 'A',0
+.lvar	defb 'L',0

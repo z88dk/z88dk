@@ -5,13 +5,16 @@
 ;
 ; int creat(char *name, mode_t mode);
 ;
-; $Id: creat.asm,v 1.3 2016-06-13 19:55:48 dom Exp $
+; $Id: creat.asm,v 1.4 2016-06-23 20:40:25 dom Exp $
 
+		SECTION code_clib
 		PUBLIC	creat
+		PUBLIC	_creat
 		EXTERN	open
 		EXTERN	close
 
 .creat
+._creat
 	pop	bc
 	pop	hl
 	push	hl

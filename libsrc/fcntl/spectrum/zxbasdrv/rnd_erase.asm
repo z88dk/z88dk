@@ -5,14 +5,17 @@
 ;
 ; int remove(char *name)
 ;
-; $Id: rnd_erase.asm,v 1.2 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: rnd_erase.asm,v 1.3 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	rnd_erase
+	PUBLIC	_rnd_erase
 	
 	EXTERN	zx_goto
 	EXTERN	zxgetfname2
 
 .rnd_erase
+._rnd_erase
 	pop	bc
 	pop	hl
 	push	hl

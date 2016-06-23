@@ -6,9 +6,11 @@
 ;
 ; int close(int handle)
 ;
-; $Id: close.asm,v 1.5 2015-01-21 08:09:27 stefano Exp $
+; $Id: close.asm,v 1.6 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	close
+	PUBLIC	_close
 	
 	EXTERN	zxhandl
 	
@@ -19,6 +21,7 @@
 .svar	defb 'S',0
 
 .close
+._close
 	pop	hl
 	pop	bc
 	push	bc

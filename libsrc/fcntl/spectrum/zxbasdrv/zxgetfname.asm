@@ -9,9 +9,11 @@
 ; the 'D' BASIC variable with the drive number.
 ; N$ will always hold the file name
 ;
-; $Id: zxgetfname.asm,v 1.4 2015-01-19 01:32:43 pauloscustodio Exp $
+; $Id: zxgetfname.asm,v 1.5 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	zxgetfname
+	PUBLIC	_zxgetfname
 	
 	EXTERN	zx_setint_callee
 	EXTERN	zx_setstr_callee
@@ -20,10 +22,9 @@
 	EXTERN ASMDISP_ZX_SETINT_CALLEE
 
 
-; BASIC variable names for numeric values
-.dvar	defb 'D',0
 
 .zxgetfname
+._zxgetfname
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -87,3 +88,6 @@
 
 	ret
 
+; BASIC variable names for numeric values
+	SECTION rodata_clib
+.dvar	defb 'D',0

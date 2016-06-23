@@ -5,11 +5,14 @@
 ;
 ; int writebyte(int handle, int byte)
 ;
-; $Id: writebyte.asm,v 1.4 2015-01-21 08:09:27 stefano Exp $
+; $Id: writebyte.asm,v 1.5 2016-06-23 20:40:25 dom Exp $
 
+	SECTION code_clib
 	PUBLIC	writebyte
+	PUBLIC	_writebyte
 	
 .writebyte
+._writebyte
 	pop	bc
 	pop	de
 	pop	hl
