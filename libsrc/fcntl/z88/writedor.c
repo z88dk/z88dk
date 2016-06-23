@@ -6,13 +6,13 @@
  *	djm 13/3/2000
  *
  * -----
- * $Id: writedor.c,v 1.6 2016-03-06 20:36:13 dom Exp $
+ * $Id: writedor.c,v 1.7 2016-06-23 21:08:41 dom Exp $
  */
 
 
 #include <z88.h>
 
-void writedor(int handle, char type, char len, void *buf)
+void writedor(int handle, int type, int len, void *buf)
 {
 #asm
 	INCLUDE	"dor.def"
