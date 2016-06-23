@@ -4,14 +4,18 @@
 ; PC6001 version
 ;
 ;
-; $Id: bksave.asm,v 1.2 2015-01-19 01:32:51 pauloscustodio Exp $
+; $Id: bksave.asm,v 1.3 2016-06-23 19:53:27 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC    bksave
+	PUBLIC   _bksave
 	EXTERN	pixeladdress
 
 .bksave
-        ld      hl,2
+._bksave
+	push	ix	;save caller
+        ld      hl,4
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -77,6 +81,7 @@
 	pop	bc
 	
 	djnz	_sloop
+	pop	ix	;restore callers
 	ret
 
 .bksavew
@@ -126,4 +131,5 @@
 	pop	bc
 	
 	djnz	bksavew
+	pop	ix	;restore callers
 	ret

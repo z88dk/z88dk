@@ -6,9 +6,10 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.2 2015-01-19 01:32:50 pauloscustodio Exp $
+;	$Id: swapgfxbk.asm,v 1.3 2016-06-23 19:53:27 dom Exp $
 ;
 
+	        SECTION code_clib
                 PUBLIC    swapgfxbk
 
 		PUBLIC	swapgfxbk1

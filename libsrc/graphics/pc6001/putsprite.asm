@@ -6,10 +6,12 @@
 ; PC6001 version
 ;
 ;
-; $Id: putsprite.asm,v 1.2 2015-01-19 01:32:51 pauloscustodio Exp $
+; $Id: putsprite.asm,v 1.3 2016-06-23 19:53:27 dom Exp $
 ;
 
+        SECTION smc_clib
 	PUBLIC    putsprite
+	PUBLIC    _putsprite
 	EXTERN	cpygraph
 	EXTERN	pixeladdress
 
@@ -17,12 +19,10 @@
 ; sprite: (ix)
 
 
-.offsets_table
-         defb	128,64,32,16,8,4,2,1
-
 .putsprite
-
-        ld      hl,2   
+._putsprite
+	push	ix	;save callers
+        ld      hl,4   
         add     hl,sp
         ld      e,(hl)
         inc     hl
@@ -95,6 +95,7 @@
          add      hl,bc
          pop      bc                ;Restore data
          djnz     _oloop
+	pop	ix	;restore callers
          ret
          
 
@@ -138,6 +139,7 @@
          add      hl,bc
          pop      bc                ;Restore data
          djnz     woloop
+	pop	ix	;restore callers
          ret
 
 .wover_1
@@ -150,5 +152,9 @@
          add      hl,bc
          pop      bc
          djnz     woloop
+	pop	ix	;restore callers
          ret
 
+	SECTION rodata_clib
+.offsets_table
+         defb	128,64,32,16,8,4,2,1

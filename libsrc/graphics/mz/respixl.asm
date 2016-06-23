@@ -1,11 +1,12 @@
 
+        SECTION code_clib
 	PUBLIC	respixel
 
 	EXTERN	coords
 
 
 ;
-;	$Id: respixl.asm,v 1.5 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: respixl.asm,v 1.6 2016-06-23 19:53:27 dom Exp $
 ;
 
 ; ******************************************************************
