@@ -6,13 +6,17 @@
 ;	1	SEEK_CUR from current position
 ;	2	SEEK_END from end of file (always -ve)
 ;
-;	$Id: lseek.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: lseek.asm,v 1.3 2016-06-23 20:31:34 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	lseek
+	PUBLIC	_lseek
 
 .lseek
-	LD	IX,0	
+._lseek
+	push	ix		;save caller
+	LD	IX,4
 	ADD	IX,SP
 	LD	B,(IX+2)	;whence - range not tested
 	DEC	B
@@ -34,9 +38,11 @@
 ;end of doubtful code
 
 	LD	D,A		;zero
+	pop	ix		;restore callers
 	RET
 .l_exit
 	LD	HL,-1		;load hlde with -1L
 	LD	E,L
 	LD	D,H
+	pop	ix		;restore callers
 	RET			;error

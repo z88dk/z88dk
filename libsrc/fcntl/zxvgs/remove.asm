@@ -1,12 +1,15 @@
 ;int remove(far char *name)
 ;returns 0 when OK
 ;
-;	$Id: remove.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: remove.asm,v 1.3 2016-06-23 20:31:34 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	remove
+	PUBLIC	_remove
 
 .remove
+._remove
 	POP	BC
 	POP	DE	;filename
 	PUSH	DE

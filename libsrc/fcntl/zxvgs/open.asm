@@ -10,13 +10,17 @@
 ;no sense to test number of opened files - the limit is 255...
 ;usually one is opened...
 ;
-;	$Id: open.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: open.asm,v 1.3 2016-06-23 20:31:34 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	open
+	PUBLIC	_open
 
 .open
-	LD	IX,0
+._open
+	push	ix		;save caller
+	LD	IX,2
 	ADD	IX,SP
 	LD	E,(IX+6)	;filename
 	LD	D,(IX+7)	
@@ -29,6 +33,7 @@
 	DEC	A
 	JR	Z,open_wr
 .open_abort
+	pop	ix		;restore caller
 	LD	HL,-1		;invalid mode or open error
 	SCF
 	RET
@@ -63,4 +68,5 @@
 .open_ok
 	LD	H,D		;return handle, L has no meaning
 ;	SCF			;ZX+3 returns SCF - what for?
+	pop	ix		;resore caller
 	RET

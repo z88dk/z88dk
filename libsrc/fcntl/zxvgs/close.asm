@@ -1,12 +1,15 @@
 ;int close(int handle)
 ;returns 0 if OK
 ;
-;	$Id: close.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: close.asm,v 1.3 2016-06-23 20:31:34 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	close
+	PUBLIC	_close
 
 .close
+._close
 	POP	BC	;ret
 	POP	DE
 	PUSH	DE

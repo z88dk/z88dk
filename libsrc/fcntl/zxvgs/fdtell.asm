@@ -1,12 +1,15 @@
 ;long fdtell(int fd)
 ;returns position in file
 ;
-;	$Id: fdtell.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: fdtell.asm,v 1.3 2016-06-23 20:31:34 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	fdtell
+	PUBLIC	_fdtell
 
 .fdtell
+._fdtell
 	POP	BC	;ret
 	POP	DE
 	PUSH	DE

@@ -1,12 +1,12 @@
 #
 # Makefile for ZXVGS file support
 #
-# $Id: Makefile,v 1.3 2006-06-18 17:59:38 dom Exp $
+# $Id: Makefile,v 1.4 2016-06-23 20:31:34 dom Exp $
 
 
 include ../../Make.config
 
-all:	open_z88.o
+all:	
 
 .c.o:
 	zcc +zx $(CFLAGS) -DZXVGS $*.c

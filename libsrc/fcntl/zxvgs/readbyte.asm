@@ -4,12 +4,15 @@
 ;ZXVGS buffers bytes, when drives a disk interface.
 ;In case of cable (TMX, UPB), the byte is transmitted each time...
 ;
-;	$Id: readbyte.asm,v 1.3 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: readbyte.asm,v 1.4 2016-06-23 20:31:34 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	readbyte
+	PUBLIC	_readbyte
 
 .readbyte
+._readbyte
 	LD	D,H		;handle to D
 	LD	HL,0
 	PUSH	HL

@@ -1,19 +1,13 @@
-;int close(int handle)
+; int fdgetpos(int fd, fpos_t *posn)
 ;returns 0 if OK
 ;
-;	$Id: fdgetpos.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: fdgetpos.asm,v 1.3 2016-06-23 20:31:34 dom Exp $
 ;
 
-	PUBLIC	close
+	SECTION code_clib
+	PUBLIC	fdgetpos
+	PUBLIC	_fdgetpos
 
-.close
-	POP	BC	;ret
-	POP	DE
-	PUSH	DE
-	PUSH	BC
-	RST	8
-	DEFB	$D0
-	AND	$7F
-	LD	L,A
-	LD	H,0
-	RET
+.fdgetpos
+._fdgetpos
+	ret

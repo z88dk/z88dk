@@ -1,13 +1,17 @@
 ;size_t write(int fd, void *ptr, size_t len)
 ;returns number of written bytes
 ;
-;	$Id: write.asm,v 1.2 2015-01-19 01:32:44 pauloscustodio Exp $
+;	$Id: write.asm,v 1.3 2016-06-23 20:31:34 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	write
+	PUBLIC	_write
 
 .write
-	LD	IX,2
+._write
+	push	ix		;save callers
+	LD	IX,4
 	ADD	IX,SP
 	LD	C,(IX+0)	;len
 	LD	B,(IX+1)
@@ -18,4 +22,5 @@
 	DEFB	$D5		;exits with BC=bytes written
 	LD	L,C
 	LD	H,B
+	pop	ix
 	RET
