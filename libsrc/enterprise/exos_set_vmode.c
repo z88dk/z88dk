@@ -5,13 +5,13 @@
  *
  *	Stefano Bodrato - March 2011
  *
- *	$Id: exos_set_vmode.c,v 1.3 2011-03-18 07:12:41 stefano Exp $
+ *	$Id: exos_set_vmode.c,v 1.4 2016-06-24 05:22:42 dom Exp $
  */
 
 #include <enterprise.h>
 
 
-void exos_set_vmode(unsigned char mode, unsigned char color, unsigned char x_size, unsigned char y_size)
+void exos_set_vmode(int mode, int color, int x_size, int y_size)
 {
 
 exos_close_channel(DEFAULT_VIDEO);
