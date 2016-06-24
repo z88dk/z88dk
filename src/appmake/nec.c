@@ -6,7 +6,7 @@
  * 
  *        MC loader by Stefano Bodrato, (c) 2013
  *
- *        $Id: nec.c,v 1.7 2016-06-22 06:14:58 stefano Exp $
+ *        $Id: nec.c,v 1.8 2016-06-24 06:14:44 stefano Exp $
  */
 
 
@@ -233,7 +233,7 @@ int nec_exec(char *target)
 //	} else {
 		
 		if (origin == -1) {
-			if ( ( origin = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
+			if ( (origin = get_org_addr(crtfile)) == -1 ) {
 				fprintf(stderr,"Warning: could not get the 'myzorg' value, ORG defaults to MODE1 ($C437)\n");
 				origin = 0xC437;
 			}

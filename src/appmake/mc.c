@@ -1,7 +1,7 @@
 /*
  *        CCE MMC-1000 BIN to CAS file converter and WAV generator
  *
- *        $Id: mc.c,v 1.8 2016-06-22 06:14:58 stefano Exp $
+ *        $Id: mc.c,v 1.9 2016-06-24 06:14:44 stefano Exp $
  */
 
 #include "appmake.h"
@@ -98,7 +98,9 @@ int mc_exec(char *target)
     }
 
 	if ( origin == -1 )
-		origin = parameter_search(crtfile,".sym","myzorg");
+		if ( (origin = get_org_addr(crtfile)) == -1 ) {
+			myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+		}
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);

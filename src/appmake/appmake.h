@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.51 2016-06-22 06:14:57 stefano Exp $
+ *   $Id: appmake.h,v 1.52 2016-06-24 06:14:43 stefano Exp $
  */
 
 
@@ -374,6 +374,8 @@ struct {
 extern void         exit_log(int code, char *fmt, ...);
 extern long         parameter_search(char *filen, char *ext,char *target);
 extern FILE         *fopen_bin(char *fname);
+extern FILE         *fopen_data(char *fname);
+extern long         get_org_addr(char *crtfile);
 extern void         suffix_change(char *name, char *suffix);
 extern void         any_suffix_change(char *name, char *suffix, char schar);
 

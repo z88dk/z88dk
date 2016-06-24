@@ -3,7 +3,7 @@
  *
  *        Stefano Bodrato 4/2007
  *
- *        $Id: newbrain.c,v 1.6 2016-06-22 06:14:58 stefano Exp $
+ *        $Id: newbrain.c,v 1.7 2016-06-24 06:14:44 stefano Exp $
  */
 
 #include "appmake.h"
@@ -60,7 +60,7 @@ int newbrain_exec()
     if ( origin != -1 ) {
         pos = origin;
     } else {
-        if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
+		if ( (pos = get_org_addr(crtfile)) == -1 ) {
             myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
         }
     }

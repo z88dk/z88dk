@@ -11,7 +11,7 @@
  *
  * djm 26/6/2001
  *
- * $Id: hex.c,v 1.7 2016-06-22 23:59:57 aralbrec Exp $
+ * $Id: hex.c,v 1.8 2016-06-24 06:14:43 stefano Exp $
  */
 
 #include "appmake.h"
@@ -51,7 +51,7 @@ int hex_exec(char *target)
     }
 
 	if (origin == -1) {
-		if ( ( origin = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
+		if ( (origin = get_org_addr(crtfile)) == -1 ) {
 			fprintf(stderr,"Warning: could not get the 'myzorg' value, ORG defaults to 0\n");
 			origin = 0;
 		}

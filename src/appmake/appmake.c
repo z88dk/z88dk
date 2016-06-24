@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.31 2016-06-22 06:14:57 stefano Exp $
+ *   $Id: appmake.c,v 1.32 2016-06-24 06:14:43 stefano Exp $
  */
 
 
@@ -188,7 +188,18 @@ long parameter_search(char *filen, char *ext,char *target)
 }
 
 
-/* Check for SDCC specific binary block header and open the related file (if available)
+long get_org_addr(char *crtfile)
+{
+    long    pos;
+	
+	if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 )
+		pos = parameter_search(crtfile,".sym","__crt_org_code");
+	
+	return(pos);
+}
+
+
+/* Check for SDCC specific binary block name and open the related file (if available)
    Otherwise, try to open the "normal" file.
 */
 
@@ -207,10 +218,34 @@ FILE *fopen_bin(char *fname)
     if (stat(name, &st_file2)<0)
 		return(fopen(fname,"rb"));
 
-	if (st_file2.st_mtime >= st_file1.st_mtime)
+	if (st_file2.st_mtime >= (st_file1.st_mtime-1)) {
+		if (st_file1.st_size > 0)
+			fprintf(stderr,"WARNING: some code or data may not be assigned to sections.\n");
 		return(fopen(name,"rb"));
+	}
 
 	return(fopen(fname,"rb"));
+}
+
+
+/* Check for SDCC specific data block name and open the related file (if available)
+   Otherwise, try to open the "normal" file.
+*/
+
+FILE *fopen_data(char *fname)
+{
+    char    name[FILENAME_MAX+1];
+    struct  stat st_file;
+
+	if (strlen(fname) == 0) return (NULL);
+
+    strcpy(name, fname);
+	suffix_change(name,"_DATA.bin");
+    if (stat(name, &st_file)<0)
+		if (st_file.st_size > 0)
+			return(fopen(fname,"rb"));
+
+	return(NULL);
 }
 
 

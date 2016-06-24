@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.11 2016-06-22 06:14:58 stefano Exp $
+ *      $Id: mtx.c,v 1.12 2016-06-24 06:14:44 stefano Exp $
  */
 
 
@@ -156,7 +156,7 @@ int mtx_exec(char *target)
 		if ( origin != -1 ) {
 			pos = origin;
 		} else {
-			if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
+			if ( (pos = get_org_addr(crtfile)) == -1 ) {
 				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
 			}
 		}

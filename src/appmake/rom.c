@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.7 2016-06-22 06:14:58 stefano Exp $
+ *      $Id: rom.c,v 1.8 2016-06-24 06:14:44 stefano Exp $
  */
 
 
@@ -48,6 +48,7 @@ int rom_exec(char *target)
     int     len;
     int     fillsize;
     int     c,i;
+	int     crt_model;
 
     if ( help )
         return -1;
@@ -59,8 +60,14 @@ int rom_exec(char *target)
 	return -1;
     }
 
+	if ( ( crt_model = parameter_search(crtfile,".sym","__crt_model") ) == -1 )
+		crt_model=1;
+	
+	if (crt_model == 0)
+		fprintf(stderr,"WARNING: using appmake to create a ROM image with a RAM model binary file.\n");
+
 	if ( (ihex) && (origin == -1 )) {
-		if ( ( origin = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
+		if ( (origin = get_org_addr(crtfile)) == -1 ) {
 			fprintf(stderr,"Warning: could not get the 'myzorg' value, ORG defaults to 0\n");
 			origin = 0;
 		}

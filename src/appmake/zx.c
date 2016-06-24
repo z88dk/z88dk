@@ -39,7 +39,7 @@
  *        taken from a previously prepared audio file using the dumb/turbo options).
  * 
  *
- *        $Id: zx.c,v 1.24 2016-06-22 06:14:58 stefano Exp $
+ *        $Id: zx.c,v 1.25 2016-06-24 06:14:44 stefano Exp $
  */
 
 #include "appmake.h"
@@ -210,17 +210,32 @@ int zx_exec(char *target)
     int     i,j,blocklen;
     int     len, mlen;
     int		blockcount;
+	int		crt_model;
 
     
     unsigned char * loader;
     int		loader_len;
 
+		
     if ( help )
         return -1;
 
     if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
     }
+	
+	/*
+		crt_model:
+		0   (ram model, "*_CODE.bin" is final binary)
+		1   (rom model, append "*_DATA.bin" to "*_CODE.bin" for final binary)
+		>=2 (compressed rom model, append zx7("*_DATA.bin") to "*_CODE.bin" to form final binary
+	*/
+	if ( ( crt_model = parameter_search(crtfile,".sym","__crt_model") ) == -1 )
+		crt_model=0;
+	
+	if (crt_model == 1)
+		fprintf(stderr,"WARNING: using appmake to create a tape image with a ROM binary.\n");
+
 
 	loader = turbo_loader;
 	loader_len = sizeof(turbo_loader);
@@ -280,10 +295,10 @@ int zx_exec(char *target)
 
 		if ( origin != -1 ) {
 			pos = origin;
-		} else {
-			if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
-				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
-			}
+		} else {			
+			if ( (pos = get_org_addr(crtfile)) == -1 ) {
+					myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+				}
 		}
 
 

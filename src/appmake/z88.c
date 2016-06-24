@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.6 2016-06-22 23:59:30 aralbrec Exp $
+ *      $Id: z88.c,v 1.7 2016-06-24 06:14:44 stefano Exp $
  */
 
 
@@ -128,7 +128,8 @@ int z88_exec(char *target)
     if ( outfile == NULL )
         outfile = binname;
 
-    zorg = parameter_search(crtfile,".sym","myzorg");
+
+    zorg = get_org_addr(crtfile);
     if ( zorg == -1 ) 
         myexit("Could not find parameter ZORG (compiled as BASIC?)\n",1);
     indor = parameter_search(crtfile,".map","in_dor");

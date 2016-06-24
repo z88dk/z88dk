@@ -6,7 +6,7 @@
  *                         - Modified for the Jupiter ACE
  *	Stefano 19/5/2010 - Heavily updated
  *
- *	$Id: ace-tap.c,v 1.13 2016-06-22 06:14:57 stefano Exp $
+ *	$Id: ace-tap.c,v 1.14 2016-06-24 06:14:43 stefano Exp $
  */
 
 #include "appmake.h"
@@ -83,7 +83,7 @@ int acetap_exec(char *target)
 		if ( origin != -1 ) {
 			pos = origin;
 		} else {
-			if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
+			if ( (pos = get_org_addr(crtfile)) == -1 ) {
 				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
 			}
 		}

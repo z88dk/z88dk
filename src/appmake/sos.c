@@ -3,7 +3,7 @@
  *
  *      This simply adds in the length of the program
  *      
- *      $Id: sos.c,v 1.4 2016-06-22 06:14:58 stefano Exp $
+ *      $Id: sos.c,v 1.5 2016-06-24 06:14:44 stefano Exp $
  */
 
 
@@ -54,7 +54,7 @@ int sos_exec(char *target)
 	if ( origin != -1 ) {
 		pos = origin;
 	} else {
-		if ( ( pos = parameter_search(crtfile,".sym","myzorg") ) == -1 ) {
+		if ( (pos = get_org_addr(crtfile)) == -1 ) {
 			myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
 		}
 	}
