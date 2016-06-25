@@ -4,6 +4,12 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-06-25
+
+  Create symbol list always in file.sym; when a file.lst was requested
+  the symbol list was appended to the file.lst. This was causing problems
+  to appmake.
+
 - v **2.8.5**, 2016-03-07, pauloscustodio
 
   --sdcc option (SDCC hack) removed. It was used to search library symbols
@@ -38,7 +44,7 @@ Z88DK Z80 Macro Assembler Change Log
 
 - v **2.8.1**, 2015-09-18, pauloscustodio  
 	Maintenance release for C version. C++ version under development in 
-	<https://github.com/pauloscustodio/z80masm>
+	<https://github.com/pauloscustodio/z80asm>
 
 - 2015-08-04, pauloscustodio  
 	Use Template::Toolkit to generate files from templates - tokens.h

@@ -128,14 +128,9 @@ static void do_assemble( char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
 
-	/* create list file or symtable */
+	/* create list file */
 	if (opts.list)
-		list_open(get_lst_filename(src_filename));	/* set '.lst' extension */
-	else if (opts.symtable)
-		list_open(get_sym_filename(src_filename));	/* set '.sym' extension */
-	else
-	{
-	}													/* no list file */
+		list_open(get_lst_filename(src_filename));
 
 	/* initialize local symtab with copy of static one (-D defines) */
 	copy_static_syms();

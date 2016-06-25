@@ -149,6 +149,9 @@ Z80pass2( void )
 
     if ( ! get_num_errors() && opts.symtable )
     {
+		list_close(TRUE);
+		list_open(get_sym_filename(CURRENTMODULE->filename));
+
         WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->local_symtab );
         WriteSymbolTable( "Global Module Symbols:", global_symtab );
     }
