@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.34 2016-04-25 13:13:00 dom Exp $
+ * $Id: zx81.h,v 1.35 2016-06-26 20:36:33 dom Exp $
  */
 
 #ifndef __ZX81_H__
@@ -137,7 +137,7 @@ extern int base_graphics;
 extern void __LIB__ _clg_hr();
 
 // Change the (text or graphics) video page
-extern void __LIB__  __FASTCALL__ hrg_sync(void *addr);
+extern void __LIB__  __FASTCALL__ hrg_sync(void *addr) __SMALLCFASTCALL;
 
 // Enable/disable High Resolution Graphics mode
 // if startup=2, disables/enables the new interrupt handler (dangerous!)
@@ -163,14 +163,14 @@ extern void __LIB__ mt_hrg_on();
 // programmers should call this repedeately in their program loops
 // about every 1300ms;  'init' has to be called once at startup
 // by default the delay calibration is set to 0xE9 when '0' is passed.
-extern void __LIB__ __FASTCALL__ gen_tv_field_init(int delay);
+extern void __LIB__ __FASTCALL__ gen_tv_field_init(int delay) __SMALLCFASTCALL;
 extern void __LIB__ gen_tv_field();
 
 // Invert HRG display ("hardware" way)
 extern void __LIB__ invhrg();
 
 // Copies text to HRG screen
-extern void __LIB__ __FASTCALL__ copytxt(int ovmode);
+extern void __LIB__ __FASTCALL__ copytxt(int ovmode) __SMALLCFASTCALL;
 
 // modes for copytxt
 #define txt_and      47          // AND (HL)
@@ -201,11 +201,11 @@ extern void __LIB__ mirrortxt();
 
 // Fill text screen in text mode with specified character code
 // and position text cursor at (0;0)
-extern void __LIB__ __FASTCALL__ filltxt(char character);
+extern void __LIB__ __FASTCALL__ filltxt(char character) __SMALLCFASTCALL;
 
 // Special effect: roll all displayed text characters vertically
 // 0..7, where '0' is the 'correct' adjustment
-extern void __LIB__ __FASTCALL__ rolltxt(int offset);
+extern void __LIB__ __FASTCALL__ rolltxt(int offset) __SMALLCFASTCALL;
 
 // Scroll up text screen
 extern void __LIB__ scrolluptxt();
@@ -216,7 +216,7 @@ extern void __LIB__ scrolldowntxt();
 // Activates / Deactivates the ZX81 <-> ASCII converter,
 // used in some output routine and interfacing to the BASIC strings
 // 0=disable ASCII converter - 1=re-activates it
-extern void __LIB__ __FASTCALL__ zx_asciimode(int mode);
+extern void __LIB__ __FASTCALL__ zx_asciimode(int mode) __SMALLCFASTCALL;
 
 // ZX81 <-> ASCII char conversion
 extern char __LIB__ zx_ascii(char character);
@@ -232,8 +232,8 @@ extern void __LIB__ zx_slow();
 extern int  __LIB__ zx_break(void);
 
 // Set console cursor position, top-left=(0;0)
-extern int  __LIB__              zx_setcursorpos(int x, int y);
-extern int  __LIB__ __CALLEE__   zx_setcursorpos_callee(int x, int y);
+extern int  __LIB__              zx_setcursorpos(int x, int y) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__   zx_setcursorpos_callee(int x, int y) __SMALLCDECL __SMALLCCALLEE;
 #define zx_setcursorpos(a,b)     zx_setcursorpos_callee(a,b)
 
 
@@ -264,9 +264,9 @@ extern int  __LIB__ __CALLEE__   zx_setcursorpos_callee(int x, int y);
 #define INK_BRIGHT     0x08
 
 // Set the border color
-extern void  __LIB__ __FASTCALL__ zx_border(uchar colour);
+extern void  __LIB__ __FASTCALL__ zx_border(uchar colour) __SMALLCFASTCALL;
 // Quickly set the whole screen color attributes
-extern void  __LIB__ __FASTCALL__ zx_colour(uchar colour);
+extern void  __LIB__ __FASTCALL__ zx_colour(uchar colour) __SMALLCFASTCALL;
 // Get color attribute at given position
 extern uint  __LIB__              zx_attr(uchar row, uchar col) __SMALLCDECL;
 extern uint  __LIB__ __CALLEE__   zx_attr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
@@ -277,23 +277,23 @@ extern uint  __LIB__ __CALLEE__   zx_attr_callee(uchar row, uchar col) __SMALLCD
 // refer to 'spectrum.h' for details about the "aaddr" naming convention
 
 extern uchar __LIB__              *zx_cyx2aaddr(uchar row, uchar col) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row);           // cx assumed 0
+extern uchar __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row) __SMALLCFASTCALL;           // cx assumed 0
 
 extern uchar __LIB__              *zx_pxy2aaddr(uchar xcoord, uchar ycoord) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_py2aaddr(uchar ycoord);        // px assumed 0
+extern uchar __LIB__ __FASTCALL__ *zx_py2aaddr(uchar ycoord) __SMALLCFASTCALL;        // px assumed 0
 
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2cx(void *attraddr);
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2cy(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2cx(void *attraddr) __SMALLCFASTCALL;
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2cy(void *attraddr) __SMALLCFASTCALL;
  
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2px(void *attraddr);
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2py(void *attraddr);
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2px(void *attraddr) __SMALLCFASTCALL;
+extern uint  __LIB__ __FASTCALL__  zx_aaddr2py(void *attraddr) __SMALLCFASTCALL;
 
-extern uchar __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *attraddr) __SMALLCFASTCALL;
 
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcdown(void *attraddr);
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcleft(void *attraddr);
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcright(void *attraddr);
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcup(void *attraddr);
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcdown(void *attraddr) __SMALLCFASTCALL;
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcleft(void *attraddr) __SMALLCFASTCALL;
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcright(void *attraddr) __SMALLCFASTCALL;
+extern uchar __LIB__ __FASTCALL__ *zx_aaddrcup(void *attraddr) __SMALLCFASTCALL;
 
 extern uchar __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
 extern uchar __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __SMALLCDECL __SMALLCCALLEE;
@@ -314,20 +314,20 @@ extern int  __LIB__ zx_var_length(void);
 // INTERFACE FOR CALLING BASIC
 ///////////////////////////////
 
-// extern int  __LIB__ __FASTCALL__ zx_goto(int line);	// calls the BASIC interpreter at a single line
-extern int  __LIB__ __FASTCALL__ zx_line(int line);	// executes a single BASIC line
+// extern int  __LIB__ __FASTCALL__ zx_goto(int line) __SMALLCFASTCALL;	// calls the BASIC interpreter at a single line
+extern int  __LIB__ __FASTCALL__ zx_line(int line) __SMALLCFASTCALL;	// executes a single BASIC line
 
-extern int  __LIB__              zx_getstr(char variable, char *value);
-extern void __LIB__              zx_setstr(char variable, char *value);
-extern int  __LIB__ __FASTCALL__ zx_getint(char *variable);
-extern void __LIB__              zx_setint(char *variable, int value);
-extern double __LIB__ __FASTCALL__ zx_getfloat(char *variable);
-extern void __LIB__              zx_setfloat(char *variable, float value);
+extern int  __LIB__              zx_getstr(char variable, char *value) __SMALLCDECL;
+extern void __LIB__              zx_setstr(char variable, char *value) __SMALLCDECL;
+extern int  __LIB__ __FASTCALL__ zx_getint(char *variable) __SMALLCFASTCALL;
+extern void __LIB__              zx_setint(char *variable, int value) __SMALLCDECL;
+extern double __LIB__ __FASTCALL__ zx_getfloat(char *variable) __SMALLCFASTCALL;
+extern void __LIB__              zx_setfloat(char *variable, float value) __SMALLCDECL;
 
-extern int  __LIB__ __CALLEE__   zx_getstr_callee(char variable, char *value);
-extern void __LIB__ __CALLEE__   zx_setstr_callee(char variable, char *value);
-extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value);
-extern void __LIB__ __CALLEE__   zx_setfloat_callee(char *variable, float value);
+extern int  __LIB__ __CALLEE__   zx_getstr_callee(char variable, char *value) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   zx_setstr_callee(char variable, char *value) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__ __CALLEE__   zx_setfloat_callee(char *variable, float value) __SMALLCDECL __SMALLCCALLEE;
 
 #define zx_getstr(a,b)           zx_getstr_callee(a,b)
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)

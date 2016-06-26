@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: gen_tv_field.asm,v 1.3 2016-06-26 20:32:08 dom Exp $
+;	$Id: gen_tv_field.asm,v 1.4 2016-06-26 20:36:33 dom Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -17,10 +17,12 @@
 
 	SECTION code_clib
 	PUBLIC	gen_tv_field
+	PUBLIC	_gen_tv_field
 	PUBLIC	DFILE_PTRA
 	PUBLIC	DFILE_PTRB
 
 gen_tv_field:
+_gen_tv_field:
         OUT  ($FF),A                    ; 11        Turn off the vertical sync generator.
 
 ; Generate the top border and main display area.
