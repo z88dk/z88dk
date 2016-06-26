@@ -7,13 +7,16 @@
 ;	char zx_ascii(char character);
 ;
 ;
-;	$Id: zx_ascii.asm,v 1.4 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: zx_ascii.asm,v 1.5 2016-06-26 20:32:08 dom Exp $
 ;	
 
+SECTION code_clib
 PUBLIC	zx_ascii
+PUBLIC	_zx_ascii
 EXTERN	zx81toasc
 
 zx_ascii:
+_zx_ascii:
 	ld	hl,zx81toasc+1
 	ld	a,(hl)
 	push	af

@@ -6,10 +6,12 @@
 ; 
 ;	int __CALLEE__ zx_setint_callee(char *variable, int value); 
 ; 
-;	$Id: zx_setint_callee.asm,v 1.5 2015-08-11 07:16:36 stefano Exp $ 
+;	$Id: zx_setint_callee.asm,v 1.6 2016-06-26 20:32:09 dom Exp $ 
 ;  	
 
+SECTION code_clib
 PUBLIC	zx_setint_callee
+PUBLIC	_zx_setint_callee
 PUBLIC 	ASMDISP_ZX_SETINT_CALLEE
 
 EXTERN	zx_locatenum
@@ -21,6 +23,7 @@ ELSE
 ENDIF
 
 zx_setint_callee:
+_zx_setint_callee:
 
 	pop hl
 	pop de

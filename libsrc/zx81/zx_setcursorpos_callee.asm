@@ -7,10 +7,12 @@
 ;	int __CALLEE__ zx_setstr_callee(char variable, char *value);
 ;
 ;
-;	$Id: zx_setcursorpos_callee.asm,v 1.7 2015-08-07 06:23:58 stefano Exp $
+;	$Id: zx_setcursorpos_callee.asm,v 1.8 2016-06-26 20:32:08 dom Exp $
 ;
 
+SECTION code_clib
 PUBLIC	zx_setcursorpos_callee
+PUBLIC	_zx_setcursorpos_callee
 PUBLIC	ASMDISP_ZX_SETCURSORPOS_CALLEE
 
 EXTERN     zx_dfile_addr
@@ -24,6 +26,7 @@ ENDIF
 
 
 zx_setcursorpos_callee:
+_zx_setcursorpos_callee:
 	pop  bc
 	pop  de
 	pop  hl

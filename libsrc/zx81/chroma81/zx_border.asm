@@ -2,9 +2,12 @@
 
 ; void __FASTCALL__ zx_border(uchar colour)
 
+SECTION code_clib
 PUBLIC zx_border
+PUBLIC _zx_border
 
 zx_border:
+_zx_border:
 
 	ld a,l
 IF FORlambda

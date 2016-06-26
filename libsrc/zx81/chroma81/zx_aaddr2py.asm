@@ -1,10 +1,13 @@
 ; uint __FASTCALL__ zx_aaddr2py(void *attraddr)
 ; Stefano, 2014.12
 
+SECTION code_clib
 PUBLIC zx_aaddr2py
+PUBLIC _zx_aaddr2py
 EXTERN HRG_LineStart
 
 .zx_aaddr2py
+._zx_aaddr2py
 
    ld b,-1
 IF FORlambda

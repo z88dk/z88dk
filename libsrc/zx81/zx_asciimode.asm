@@ -9,14 +9,17 @@
 ;	int __FASTCALL__ zx_asciimode(int mode);
 ;
 ;
-;	$Id: zx_asciimode.asm,v 1.3 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: zx_asciimode.asm,v 1.4 2016-06-26 20:32:08 dom Exp $
 ;	
 
+SECTION code_clib
 PUBLIC	zx_asciimode
+PUBLIC	_zx_asciimode
 EXTERN	asctozx81
 EXTERN	zx81toasc
 
 zx_asciimode:
+_zx_asciimode:
 
 	xor	a
 	or	l

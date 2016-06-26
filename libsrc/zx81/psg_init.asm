@@ -7,13 +7,16 @@
 ;	Set up the PSG
 ;
 ;
-;	$Id: psg_init.asm,v 1.2 2013-11-18 14:00:22 stefano Exp $
+;	$Id: psg_init.asm,v 1.3 2016-06-26 20:32:08 dom Exp $
 ;
 
-	XLIB	psg_init
+        SECTION code_clib
+	PUBLIC  psg_init
+	PUBLIC _psg_init
 
 
 psg_init:
+_psg_init:
 	
 
 	ld	e,@01010101

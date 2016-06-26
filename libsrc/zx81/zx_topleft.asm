@@ -3,7 +3,7 @@
 ;
 ;----------------------------------------------------------------
 ;
-;	$Id: zx_topleft.asm,v 1.5 2015-08-07 06:23:58 stefano Exp $
+;	$Id: zx_topleft.asm,v 1.6 2016-06-26 20:32:08 dom Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -11,7 +11,9 @@
 ;
 ;----------------------------------------------------------------
 
+        SECTION code_clib
 	PUBLIC   zx_topleft
+	PUBLIC   _zx_topleft
 	EXTERN   zx_dfile_addr
 
 IF FORzx80
@@ -21,6 +23,7 @@ ELSE
 ENDIF
 
 zx_topleft:
+_zx_topleft:
 	ld  hl,$1821	; (33,24) = top left screen posn
 	ld  (COLUMN),hl
 

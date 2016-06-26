@@ -8,12 +8,15 @@
 ;	Carry flag is set on error
 ;
 ;
-;	$Id: zx_locatenum.asm,v 1.5 2015-08-11 07:16:35 stefano Exp $
+;	$Id: zx_locatenum.asm,v 1.6 2016-06-26 20:32:08 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	zx_locatenum
+	PUBLIC	_zx_locatenum
 
 zx_locatenum:
+_zx_locatenum:
 
 	ld	a,(hl)
 	

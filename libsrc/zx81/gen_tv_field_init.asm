@@ -3,7 +3,7 @@
 ;
 ;--------------------------------------------------------------
 ;
-;       $Id: gen_tv_field_init.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
+;       $Id: gen_tv_field_init.asm,v 1.3 2016-06-26 20:32:08 dom Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -13,6 +13,7 @@
 ;
 ;----------------------------------------------------------------
 
+	SECTION   code_clib
         PUBLIC    gen_tv_field_init
         EXTERN    DFILE_PTRA
         EXTERN    DFILE_PTRB

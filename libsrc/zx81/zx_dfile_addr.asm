@@ -7,10 +7,11 @@
 ; values for ROW and COLUMN
 ;----------------------------------------------------------------
 ;
-;  $Id: zx_dfile_addr.asm,v 1.5 2015-08-07 06:23:58 stefano Exp $
+;  $Id: zx_dfile_addr.asm,v 1.6 2016-06-26 20:32:08 dom Exp $
 ;
 ;----------------------------------------------------------------
 
+        SECTION code_clib
 	PUBLIC    zx_dfile_addr
 
 IF FORzx80

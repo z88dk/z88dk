@@ -8,10 +8,12 @@
 ;	int __FASTCALL__ zx_getint(char *variable);
 ;
 ;
-;	$Id: zx_getint.asm,v 1.4 2015-08-11 07:16:35 stefano Exp $
+;	$Id: zx_getint.asm,v 1.5 2016-06-26 20:32:08 dom Exp $
 ;	
 
+SECTION code_clib
 PUBLIC	zx_getint
+PUBLIC	_zx_getint
 EXTERN	zx_locatenum
 
 IF FORlambda
@@ -23,6 +25,7 @@ ENDIF
 ; hl = char *variable
 
 zx_getint:
+_zx_getint:
 
 	call	zx_locatenum
 	jr	c,error

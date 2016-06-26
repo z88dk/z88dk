@@ -7,9 +7,10 @@
 ;	Stefano Bodrato - Apr. 2000
 ;
 ;
-;	$Id: cnvtab.asm,v 1.9 2015-08-07 06:23:57 stefano Exp $
+;	$Id: cnvtab.asm,v 1.10 2016-06-26 20:32:08 dom Exp $
 ;
 
+	SECTION rodata_clib
 	PUBLIC	zx81_cnvtab
 
 

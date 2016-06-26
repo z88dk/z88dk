@@ -2,10 +2,13 @@
 
 ; void __FASTCALL__ zx_colour(uchar colour)
 
+SECTION code_clib
 PUBLIC zx_colour
+PUBLIC _zx_colour
 EXTERN HRG_LineStart
 
 .zx_colour
+._zx_colour
 		ld 	a,l
 IF FORlambda
    ld hl,8319

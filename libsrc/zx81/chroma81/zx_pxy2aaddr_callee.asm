@@ -1,11 +1,14 @@
 ; uchar __CALLEE__ *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord)
 ; Stefano, 2014.12
 
+SECTION code_clib
 PUBLIC zx_pxy2aaddr_callee
+PUBLIC _zx_pxy2aaddr_callee
 PUBLIC ASMDISP_ZX_PXY2AADDR_CALLEE
 EXTERN HRG_LineStart
 
 .zx_pxy2aaddr_callee
+._zx_pxy2aaddr_callee
 
    pop hl
    pop de

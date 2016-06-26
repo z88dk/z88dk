@@ -6,9 +6,10 @@
 ;	in: source character in (HL)
 ;	out: A = converted character
 ;
-;	$Id: asctozx81.asm,v 1.3 2015-01-19 01:33:26 pauloscustodio Exp $
+;	$Id: asctozx81.asm,v 1.4 2016-06-26 20:32:08 dom Exp $
 ;
 
+SECTION code_clib
 PUBLIC asctozx81
 EXTERN zx81_cnvtab
 

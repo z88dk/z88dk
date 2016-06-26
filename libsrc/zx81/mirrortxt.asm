@@ -5,7 +5,7 @@
 ; This code comes from the FidoNET Sinclair newsgroup
 ;--------------------------------------------------------------
 ;
-;       $Id: mirrortxt.asm,v 1.2 2015-01-19 01:33:26 pauloscustodio Exp $
+;       $Id: mirrortxt.asm,v 1.3 2016-06-26 20:32:08 dom Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -13,9 +13,12 @@
 ;
 ;----------------------------------------------------------------
 
+        SECTION code_clib
         PUBLIC    mirrortxt
+        PUBLIC    _mirrortxt
 
 mirrortxt:
+_mirrortxt:
 	
 	LD HL,(400CH) ; Puts the adress of the displayfile in HL
 	LD DE,0010H   ; This is the middle of the screen

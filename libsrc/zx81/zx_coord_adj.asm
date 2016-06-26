@@ -7,10 +7,11 @@
 ; wants it in the top-left
 ;----------------------------------------------------------------
 ;
-;  $Id: zx_coord_adj.asm,v 1.5 2015-08-07 06:23:58 stefano Exp $
+;  $Id: zx_coord_adj.asm,v 1.6 2016-06-26 20:32:08 dom Exp $
 ;
 ;----------------------------------------------------------------
 
+        SECTION code_clib
 	PUBLIC    zx_coord_adj
 
 IF FORzx80
@@ -21,7 +22,8 @@ ELSE
 	DEFC    ROW=$403A       ; S_POSN_y
 ENDIF
 
-zx_coord_adj:          ; adjust coordinates from-to ZX81 ROM style
+zx_coord_adj:      	
+			    ; adjust coordinates from-to ZX81 ROM style
 	ld  hl,$1821       ; (33,24) = top left screen posn
 	ld  de,(COLUMN)
 	and a

@@ -7,14 +7,17 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg.asm,v 1.3 2015-01-23 07:07:31 stefano Exp $
+;	$Id: set_psg.asm,v 1.4 2016-06-26 20:32:08 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	set_psg
+	PUBLIC	_set_psg
 	;PUBLIC	psg_patch0
 	;PUBLIC	psg_patch1
 	
 set_psg:
+_set_psg:
 
 	pop	bc
 	pop	de

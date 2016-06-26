@@ -8,15 +8,18 @@
 ;	Returns with BASIC error code.
 ;	0=OK,... -1=no program lines found
 ;
-;	$Id: zx_line.asm,v 1.3 2015-08-11 07:16:35 stefano Exp $
+;	$Id: zx_line.asm,v 1.4 2016-06-26 20:32:08 dom Exp $
 ;
 
+SECTION code_clib
 PUBLIC	zx_line
+PUBLIC	_zx_line
 EXTERN	restore81
 
 ; enter : hl = line number
 
 zx_line:
+_zx_line:
 IF FORlambda
         call    $0B36           ; routine LINE-ADDR (LAMBDA)
 ELSE

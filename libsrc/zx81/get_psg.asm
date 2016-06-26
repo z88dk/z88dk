@@ -8,9 +8,10 @@
 ;	does not work on original ZonX, ZXpand-AY Sound Module is required
 ;
 ;
-;	$Id: get_psg.asm,v 1.3 2015-01-23 07:07:31 stefano Exp $
+;	$Id: get_psg.asm,v 1.4 2016-06-26 20:32:08 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	get_psg
 	
 get_psg:

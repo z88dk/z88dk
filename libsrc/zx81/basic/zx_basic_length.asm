@@ -5,12 +5,15 @@
 ; 	This routine gives the length of the current BASIC program.
 ; 	Memory used by variables is not included.
 ;
-;	$Id: zx_basic_length.asm,v 1.3 2015-08-11 07:16:35 stefano Exp $
+;	$Id: zx_basic_length.asm,v 1.4 2016-06-26 20:32:08 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	zx_basic_length
+	PUBLIC	_zx_basic_length
 	
 zx_basic_length:
+_zx_basic_length:
 
 IF FORlambda
 	ld	de,$4396 	; location of BASIC program (just after system variables)

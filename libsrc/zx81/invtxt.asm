@@ -5,7 +5,7 @@
 ; This code comes from the FidoNET Sinclair newsgroup
 ;--------------------------------------------------------------
 ;
-;       $Id: invtxt.asm,v 1.3 2015-01-19 01:33:26 pauloscustodio Exp $
+;       $Id: invtxt.asm,v 1.4 2016-06-26 20:32:08 dom Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -13,9 +13,12 @@
 ;
 ;----------------------------------------------------------------
 
+        SECTION code_clib
         PUBLIC    invtxt
+        PUBLIC    _invtxt
 
 invtxt:
+_invtxt:
                 LD HL,(400CH)        ; DFILE ADDR
                 LD C,16H             ; LINES=22
 LOOP2:          LD B,20H             ; CHARS=32

@@ -1,10 +1,13 @@
 ; uint __FASTCALL__ zx_aaddr2px(void *attraddr)
 ; Stefano, 2014.12
 
+SECTION code_clib
 PUBLIC zx_aaddr2px
+PUBLIC _zx_aaddr2px
 EXTERN HRG_LineStart
 
 .zx_aaddr2px
+._zx_aaddr2px
 
 IF FORlambda
    ld hl,8319

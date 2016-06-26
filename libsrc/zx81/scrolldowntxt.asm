@@ -3,16 +3,19 @@
 ;
 ;----------------------------------------------------------------
 ;
-; $Id: scrolldowntxt.asm,v 1.5 2015-08-07 06:23:57 stefano Exp $
+; $Id: scrolldowntxt.asm,v 1.6 2016-06-26 20:32:08 dom Exp $
 ;
 ;----------------------------------------------------------------
 ; Text scrolldown.
 ;----------------------------------------------------------------
 
+        SECTION code_clib
     PUBLIC   scrolldowntxt
+    PUBLIC   _scrolldowntxt
     EXTERN    zx_topleft
 
 scrolldowntxt:
+_scrolldowntxt:
 IF FORlambda
 	ld	hl,16509 + (33*24)
 ELSE
