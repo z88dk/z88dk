@@ -20,7 +20,7 @@ __dtoe__:
    ;
    ;            bc = buffer length
    ;            de = buffer *
-   ;        (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ;        (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 1 = %g, bit 0 = precision==0
    ;        (IX-5) = iz (number of zeroes to insert before .)
    ;        (IX-4) = fz (number of zeroes to insert after .)
    ;        (IX-3) = tz (number of zeroes to append)
@@ -37,7 +37,7 @@ __dtoe__:
    ;  E     = precision
    ; HL     = buffer_dst *
    ; IX     = buffer *
-   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 1 = %g, bit 0 = precision==0
    ; (IX-5) = iz (number of zeroes to insert before .)
    ; (IX-4) = fz (number of zeroes to insert after .)
    ; (IX-3) = tz (number of zeroes to append)
@@ -62,7 +62,7 @@ normal_form:
    ; EXX    = float x
    ; IX     = buffer *
    ; STACK  = buffer *
-   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 1 = %g, bit 0 = precision==0
    ; (IX-5) = iz (number of zeroes to insert before .)
    ; (IX-4) = fz (number of zeroes to insert after .)
    ; (IX-3) = tz (number of zeroes to append)
@@ -82,7 +82,7 @@ __dtoe_join:
    ;  E    = remaining precision
    ; HL    = buffer_dst *
    ; IX    = buffer *
-   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 1 = %g, bit 0 = precision==0
    ; (IX-5) = iz (number of zeroes to insert before .)
    ; (IX-4) = fz (number of zeroes to insert after .)
    ; (IX-3) = tz (number of zeroes to append)
@@ -128,7 +128,7 @@ prune:
    ;  D    = base 10 exponent e
    ; HL    = buffer_dst *
    ; IX    = buffer *
-   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 1 = %g, bit 0 = precision==0
    ; (IX-5) = iz (number of zeroes to insert before .)
    ; (IX-4) = fz (number of zeroes to insert after .)
    ; (IX-3) = tz (number of zeroes to append)
@@ -170,7 +170,7 @@ skip_100:
 
    ; HL    = buffer_dst *
    ; IX    = buffer *
-   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 1 = %g, bit 0 = precision==0
    ; (IX-5) = iz (number of zeroes to insert before .)
    ; (IX-4) = fz (number of zeroes to insert after .)
    ; (IX-3) = tz (number of zeroes to append)

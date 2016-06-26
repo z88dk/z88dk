@@ -10,7 +10,7 @@ EXTERN l_setmem_hl, __dtoa_sgnabs
 
 __dtoa_preamble:
 
-   ; enter :  c = flags (bit 4=#, bits 7 and 0 will be modified)
+   ; enter :  c = flags (bit 4=#, bits 7, 1 and 0 will be modified)
    ;         de = precision (clipped at 255)
    ;         hl = buffer *
    ;         exx set contains double
@@ -62,7 +62,7 @@ init_buffer:
    ;  E     = precision
    ; HL     = buffer_dst *
    ; IX     = buffer *
-   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 0 = precision==0
+   ; (IX-6) = flags, bit 7 = 'N', bit 4 = '#', bit 1 = %g, bit 0 = precision==0
    ; (IX-5) = iz (number of zeroes to insert before .)
    ; (IX-4) = fz (number of zeroes to insert after .)
    ; (IX-3) = tz (number of zeroes to append)
