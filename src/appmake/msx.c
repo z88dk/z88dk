@@ -9,7 +9,7 @@
  *
  *        By Stefano Bodrato
  *
- *        $Id: msx.c,v 1.6 2016-06-22 06:14:58 stefano Exp $
+ *        $Id: msx.c,v 1.7 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 
@@ -154,7 +154,7 @@ int msx_exec(char *target)
 			strcpy(filename,outfile);
 		}
 		
-		if ( (fpin=fopen_bin(binname) ) == NULL ) {
+		if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
 			printf("Can't open input file\n");
 			exit(1);
 		}

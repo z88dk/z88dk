@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.33 2016-06-24 06:19:17 stefano Exp $
+ *   $Id: appmake.c,v 1.34 2016-06-26 00:46:54 aralbrec Exp $
  */
 
 
@@ -199,53 +199,93 @@ long get_org_addr(char *crtfile)
 }
 
 
-/* Check for SDCC specific binary block name and open the related file (if available)
+/* Check for new c lib build and construct output binary
    Otherwise, try to open the "normal" file.
 */
 
-FILE *fopen_bin(char *fname)
+FILE *fopen_bin(char *fname, char *crtfile)
 {
+    FILE   *fcode, *fdata, *fin;
     char    name[FILENAME_MAX+1];
+    char    tname[FILENAME_MAX+1];
+    char    cmdline[FILENAME_MAX*2 + 128];
     struct  stat st_file1;
     struct  stat st_file2;
+    int     crt_model;
+    int     c;
 
-	if (strlen(fname) == 0) return (NULL);
+    if (strlen(fname) == 0) return (NULL);
 
     strcpy(name, fname);
+    suffix_change(name, "_CODE.bin");
+
     stat(fname, &st_file1);
 
-	suffix_change(name,"_CODE.bin");
-    if (stat(name, &st_file2)<0)
-		return(fopen(fname,"rb"));
+    if ((stat(name, &st_file2) < 0) || (st_file2.st_mtime < st_file1.st_mtime))
+        return fopen(fname, "rb");
 
-	if (st_file2.st_mtime >= (st_file1.st_mtime-1)) {
-		if (st_file1.st_size > 0)
-			fprintf(stderr,"WARNING: some code or data may not be assigned to sections.\n");
-		return(fopen(name,"rb"));
-	}
+    // new c lib compile
 
-	return(fopen(fname,"rb"));
-}
+    if (st_file1.st_size > 0)
+        fprintf(stderr, "WARNING: some code or data may not be assigned to sections.\n");
 
+    if ((crtfile == NULL) | ((crt_model = parameter_search(crtfile,".sym", "__crt_model")) == -1))
+        crt_model = 0;
 
-/* Check for SDCC specific data block name and open the related file (if available)
-   Otherwise, try to open the "normal" file.
-*/
+    fcode = fopen(name, "rb");
 
-FILE *fopen_data(char *fname)
-{
-    char    name[FILENAME_MAX+1];
-    struct  stat st_file;
+    // 0: ram model, complete binary is "*_CODE.bin"
 
-	if (strlen(fname) == 0) return (NULL);
+    if (crt_model == 0) return fcode;
+
+    // form complete binary
+
+    get_temporary_filename(tname);
+
+    if ((fin = fopen(tname, "w+b")) == NULL)
+        exit_log(1, "ERROR: Unable to create temporary file in fopen_bin()\n");
+
+    // code portion is copied into complete binary
+
+    while ((c = fgetc(fcode)) != EOF)
+        fputc(c, fin);
+    fclose(fcode);
+
+    // data portion is appended to complete binary
 
     strcpy(name, fname);
-	suffix_change(name,"_DATA.bin");
-    if (stat(name, &st_file)<0)
-		if (st_file.st_size > 0)
-			return(fopen(fname,"rb"));
+    suffix_change(name, "_DATA.bin");
 
-	return(NULL);
+    if (crt_model == 1) {
+        
+        // 1: rom model, complete binary is "*_CODE.bin" + "*_DATA.bin"
+
+        if ((fdata = fopen(name, "rb")) == NULL)
+            exit_log(1, "ERROR: File %s not found for a rom model compile\n", name);
+
+    } else {
+
+        // 2: compressed rom model, complete binary is "*_CODE.bin" + zx7("*_DATA.bin")
+
+        get_temporary_filename(tname);
+        snprintf(cmdline, FILENAME_MAX*2 + 127, "zx7 -f %s %s", name, tname);
+
+        if (system(cmdline) != 0)
+            exit_log(1, "ERROR: Unable to compress %s\n", name);
+
+        if ((fdata = fopen(tname, "rb")) == NULL)
+            exit_log(1, "ERROR: Unable to open compressed data file %s\n", tname);
+
+    }
+
+    while ((c = fgetc(fdata)) != EOF)
+        fputc(c, fin);
+    fclose(fdata);
+
+    // return complete binary file
+
+    rewind(fin);
+    return fin;
 }
 
 

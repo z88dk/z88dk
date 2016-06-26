@@ -194,7 +194,7 @@ int tixx_exec(char *target)
     /*printf("Commentaire : %s\n", comment); */
     }
 
-    fp = fopen_bin(binname);
+    fp = fopen_bin(binname, NULL);
     if (!fp)
         die("Failed to open input file: %s\n", binname);
     n = fsize(fp);

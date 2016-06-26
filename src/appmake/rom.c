@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.8 2016-06-24 06:14:44 stefano Exp $
+ *      $Id: rom.c,v 1.9 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 
@@ -48,7 +48,6 @@ int rom_exec(char *target)
     int     len;
     int     fillsize;
     int     c,i;
-	int     crt_model;
 
     if ( help )
         return -1;
@@ -60,10 +59,7 @@ int rom_exec(char *target)
 	return -1;
     }
 
-	if ( ( crt_model = parameter_search(crtfile,".sym","__crt_model") ) == -1 )
-		crt_model=1;
-	
-	if (crt_model == 0)
+	if (parameter_search(crtfile,".sym","__crt_model") == 0)
 		fprintf(stderr,"WARNING: using appmake to create a ROM image with a RAM model binary file.\n");
 
 	if ( (ihex) && (origin == -1 )) {
@@ -95,7 +91,7 @@ int rom_exec(char *target)
        len = 0;
        fpin = NULL;
     }
-    else if ( (fpin=fopen_bin(binname) ) == NULL )
+    else if ( (fpin=fopen_bin(binname, crtfile) ) == NULL )
     {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
@@ -114,6 +110,8 @@ int rom_exec(char *target)
        fseek(fpin,0L,SEEK_SET);
     }
     
+    if (fillsize == 0) fillsize = len;
+
     if (len > fillsize) {
         fclose(fpin);
         myexit("Your binary block does not fit in the specified ROM size\n",1);

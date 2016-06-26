@@ -4,7 +4,7 @@
  *      This tool adds the location of the program at the beginning of the binary block
  *      and creates a BASIC loader; the two files must be put in a disk image
  *      
- *      $Id: c128.c,v 1.6 2016-06-24 06:14:43 stefano Exp $
+ *      $Id: c128.c,v 1.7 2016-06-26 00:46:54 aralbrec Exp $
  */
 
 
@@ -92,7 +92,7 @@ int c128_exec(char *target)
         }
     }
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

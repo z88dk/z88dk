@@ -6,7 +6,7 @@
  * 
  *        MC loader by Stefano Bodrato, (c) 2013
  *
- *        $Id: nec.c,v 1.8 2016-06-24 06:14:44 stefano Exp $
+ *        $Id: nec.c,v 1.9 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 
@@ -270,7 +270,7 @@ int nec_exec(char *target)
 			myexit(NULL,1);
 		}
 
-		if ( (fpin=fopen_bin(binname) ) == NULL ) {
+		if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
 			fprintf(stderr,"Can't open input file %s\n",binname);
 			myexit(NULL,1);
 		}

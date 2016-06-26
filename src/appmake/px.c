@@ -3,7 +3,7 @@
  *      This tool handles only the compact format (similar to the one used by BASIC)
  *      to reduce the directory size at most and leave space for our executable.
  *
- *      $Id: px.c,v 1.6 2016-06-22 06:14:58 stefano Exp $
+ *      $Id: px.c,v 1.7 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 
@@ -75,7 +75,7 @@ int px_exec(char *target)
         myexit(NULL,1);
     }
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

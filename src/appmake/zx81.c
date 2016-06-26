@@ -7,7 +7,7 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.17 2016-06-22 06:14:58 stefano Exp $
+ *        $Id: zx81.c,v 1.18 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 
@@ -108,7 +108,7 @@ int zx81_exec(char *target)
 			myexit(NULL,1);
 		}
 
-		if ( (fpin=fopen_bin(binname) ) == NULL ) {
+		if ( (fpin=fopen_bin(binname, NULL) ) == NULL ) {
 			fprintf(stderr,"Can't open input file %s\n",binname);
 			myexit(NULL,1);
 		}

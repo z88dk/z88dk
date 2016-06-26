@@ -314,7 +314,7 @@ int cpc_exec(char *target)
                exec = pos;
           }
 
-		  if ( (fpin=fopen_bin(binname) ) == NULL ) {
+		  if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
                fprintf(stderr, "Can't open input file %s\n", binname);
                myexit(NULL, 1);
           }

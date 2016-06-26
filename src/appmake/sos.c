@@ -3,7 +3,7 @@
  *
  *      This simply adds in the length of the program
  *      
- *      $Id: sos.c,v 1.5 2016-06-24 06:14:44 stefano Exp $
+ *      $Id: sos.c,v 1.6 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 
@@ -66,7 +66,7 @@ int sos_exec(char *target)
         strcpy(filename,outfile);
     }
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     } 

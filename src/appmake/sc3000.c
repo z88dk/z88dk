@@ -5,7 +5,7 @@
  *
  *        Stefano Bodrato Jun 2010
  *
- *        $Id: sc3000.c,v 1.7 2016-06-24 06:14:44 stefano Exp $
+ *        $Id: sc3000.c,v 1.8 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -144,7 +144,7 @@ int sc3000_exec(char *target)
         }
     }
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

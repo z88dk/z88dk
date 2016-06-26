@@ -3,7 +3,7 @@
  *
  *  djm 21/6/2001 after Damjan Marion
  *
- *  $Id: rex6000.c,v 1.6 2016-06-22 23:59:30 aralbrec Exp $
+ *  $Id: rex6000.c,v 1.7 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -119,7 +119,7 @@ int rex_exec(char *target)
         }
     }
 
-	if ( (binfile=fopen_bin(binname) ) == NULL ) {
+	if ( (binfile=fopen_bin(binname, NULL) ) == NULL ) {
         fprintf(stderr,"Couldn't open binary file: %s\n",binname);
         myexit(NULL,1);
     }

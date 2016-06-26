@@ -1,7 +1,7 @@
 /*
  *        Sord M5 CAS and WAV generator/converter
  *
- *        $Id: m5.c,v 1.5 2016-06-24 06:14:43 stefano Exp $
+ *        $Id: m5.c,v 1.6 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -114,7 +114,7 @@ int m5_exec(char *target)
     }
 
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

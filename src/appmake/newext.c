@@ -3,7 +3,7 @@
  *
  *      This simply adds in the length of the program
  *      
- *      $Id: newext.c,v 1.3 2016-06-22 06:14:58 stefano Exp $
+ *      $Id: newext.c,v 1.4 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 
@@ -13,6 +13,7 @@
 
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
+static char             *crtfile      = NULL;
 static char             *extfile      = ".COM";
 static char             *suffixchar   = ".";
 static char              help         = 0;
@@ -22,6 +23,7 @@ static char              help         = 0;
 option_t newext_options[] = {
     { 'h', "help",      "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",   "Linked binary file",         OPT_STR,   &binname },
+    { 'c', "crt0file",  "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",    "Name of output file",        OPT_STR,   &outfile },
     { 'e', "ext",       "Extension of output file",   OPT_STR,   &extfile },
     { 's', "delimiter", "Suffix delimiter, '.' by default.",   OPT_STR,   &suffixchar },
@@ -62,7 +64,7 @@ int newext_exec(char *target)
         strcpy(filename,outfile);
     }
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

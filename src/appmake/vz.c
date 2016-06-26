@@ -2,7 +2,7 @@
  *        Laser 200/300 VZ to CAS file converter
  *        and WAV generator (dumb mode is not necessary)
  *
- *        $Id: vz.c,v 1.6 2016-06-22 06:14:58 stefano Exp $
+ *        $Id: vz.c,v 1.7 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -108,7 +108,7 @@ int vz_exec(char *target)
     if ( blockname == NULL )
         blockname = binname;
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

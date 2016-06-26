@@ -9,7 +9,7 @@
  *
  *   Stefano Bodrato - December 2001: first release
  *
- *   $Id: aquarius.c,v 1.3 2016-06-22 06:14:57 stefano Exp $
+ *   $Id: aquarius.c,v 1.4 2016-06-26 00:46:54 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -54,7 +54,7 @@ int aquarius_exec(char *target)
         strcpy(filename,outfile);
     }
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, NULL) ) == NULL ) {
 		printf("Can't open input file\n");
 		exit(1);
 	}

@@ -4,7 +4,7 @@
  *
  *	Stefano Bodrato 30/5/2003
  *
- *	$Id: nascom.c,v 1.3 2016-06-22 06:14:58 stefano Exp $
+ *	$Id: nascom.c,v 1.4 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 
@@ -56,7 +56,7 @@ int nascom_exec(char *target)
         origin = 0x1000;
     }
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, NULL) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

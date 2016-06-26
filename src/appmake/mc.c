@@ -1,7 +1,7 @@
 /*
  *        CCE MMC-1000 BIN to CAS file converter and WAV generator
  *
- *        $Id: mc.c,v 1.9 2016-06-24 06:14:44 stefano Exp $
+ *        $Id: mc.c,v 1.10 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -112,7 +112,7 @@ int mc_exec(char *target)
     if ( blockname == NULL )
         blockname = "     \0";
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

@@ -6,7 +6,7 @@
  *                         - Modified for the Jupiter ACE
  *	Stefano 19/5/2010 - Heavily updated
  *
- *	$Id: ace-tap.c,v 1.14 2016-06-24 06:14:43 stefano Exp $
+ *	$Id: ace-tap.c,v 1.15 2016-06-26 00:46:54 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -88,7 +88,7 @@ int acetap_exec(char *target)
 			}
 		}
 		
-		if ( (fpin=fopen_bin(binname) ) == NULL ) {
+		if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
 			fprintf(stderr,"Can't open input file %s\n",binname);
 			myexit(NULL,1);
 		}

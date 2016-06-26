@@ -39,7 +39,7 @@
  *        taken from a previously prepared audio file using the dumb/turbo options).
  * 
  *
- *        $Id: zx.c,v 1.25 2016-06-24 06:14:44 stefano Exp $
+ *        $Id: zx.c,v 1.26 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -210,7 +210,6 @@ int zx_exec(char *target)
     int     i,j,blocklen;
     int     len, mlen;
     int		blockcount;
-	int		crt_model;
 
     
     unsigned char * loader;
@@ -223,19 +222,6 @@ int zx_exec(char *target)
     if ( binname == NULL || (!dumb && ( crtfile == NULL && origin == -1 )) ) {
         return -1;
     }
-	
-	/*
-		crt_model:
-		0   (ram model, "*_CODE.bin" is final binary)
-		1   (rom model, append "*_DATA.bin" to "*_CODE.bin" for final binary)
-		>=2 (compressed rom model, append zx7("*_DATA.bin") to "*_CODE.bin" to form final binary
-	*/
-	if ( ( crt_model = parameter_search(crtfile,".sym","__crt_model") ) == -1 )
-		crt_model=0;
-	
-	if (crt_model == 1)
-		fprintf(stderr,"WARNING: using appmake to create a tape image with a ROM binary.\n");
-
 
 	loader = turbo_loader;
 	loader_len = sizeof(turbo_loader);
@@ -302,7 +288,7 @@ int zx_exec(char *target)
 		}
 
 
-		if ( (fpin=fopen_bin(binname) ) == NULL ) {
+		if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
 			fprintf(stderr,"Can't open input file %s\n",binname);
 			myexit(NULL,1);
 		}

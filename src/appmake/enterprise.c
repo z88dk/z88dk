@@ -3,7 +3,7 @@
  *
  *      This simply adds in the header type and the length of the program
  *      
- *      $Id: enterprise.c,v 1.2 2016-06-22 06:14:58 stefano Exp $
+ *      $Id: enterprise.c,v 1.3 2016-06-26 00:46:54 aralbrec Exp $
  */
 
 
@@ -53,7 +53,7 @@ int enterprise_exec(char *target)
         strcpy(filename,outfile);
     }
 
-	if ( (fpin=fopen_bin(binname) ) == NULL ) {
+	if ( (fpin=fopen_bin(binname, NULL) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }

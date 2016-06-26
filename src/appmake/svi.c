@@ -5,7 +5,7 @@
  *
  *	By Stefano Bodrato
  *
- *	$Id: svi.c,v 1.8 2016-06-22 06:14:58 stefano Exp $
+ *	$Id: svi.c,v 1.9 2016-06-26 00:46:55 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -164,7 +164,7 @@ int svi_exec(char *target)
 			myexit(NULL,1);
 		}
 
-		if ( (fpin=fopen_bin(binname) ) == NULL ) {
+		if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
 			printf("Can't open input file\n");
 			exit(1);
 		}
