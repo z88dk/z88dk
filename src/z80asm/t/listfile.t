@@ -37,12 +37,6 @@ for (0..255) {
 	list_push_asm("D$label: defb $_", $_);
 }
 
-# create a reference list with more than two lines in listing file
-for (0 .. 18*3*61) {		# 18 references per line, 3 lines, 61 lines per page
-	list_push_asm("defw E1", 3, 0);
-}
-list_push_asm("defc E1 = 3");
-
 # add labels of all sizes
 for (1..255) {
 	my $label = substr("X_".sprintf("%03d", $_).('_X' x $_), 0, $_);
