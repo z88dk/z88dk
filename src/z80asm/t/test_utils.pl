@@ -10,6 +10,7 @@
 # Common utils for tests
 
 use Modern::Perl;
+use Path::Tiny;
 use File::Slurp;
 use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
@@ -204,20 +205,21 @@ sub t_z80asm {
 	if (defined($args{bin})) {
 		if ($cmd =~ / (-l|--list) /) {
 			ok   -f $_, "$line $_" for (@lst);
-			ok ! -f $_, "$line no $_" for (@sym);
-		}
-		elsif ($cmd =~ / (-ns|--no-symtable) /) {
-			ok ! -f $_, "$line no $_" for (@lst);
-			ok ! -f $_, "$line no $_" for (@sym);
 		}
 		else {
 			ok ! -f $_, "$line no $_" for (@lst);
+		}
+		
+		if ($cmd =~ / (-ns|--no-symtable) /) {
+			ok ! -f $_, "$line no $_" for (@sym);
+		}
+		else {
 			ok   -f $_, "$line $_" for (@sym);
 		}
 	}
 	elsif ($args{linkerr}) {	# asm OK but link failed
 		ok -f $_, "$line $_" for (@lst);
-		ok ! -f $_, "$line no $_" for (@sym);
+		ok -f $_, "$line $_" for (@sym);
 	}
 	else {
 		ok ! -f $_, "$line no $_" for (@lst);
@@ -668,19 +670,6 @@ sub get_copyright {
 }
 
 #------------------------------------------------------------------------------
-# get UNIX date from input text
-sub get_unix_date {
-	my($text) = @_;
-
-	$text =~ /( (Mon|Tue|Wed|Thu|Fri|Sat|Sun) \s
-				(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \s
-				\d\d \s \d\d:\d\d:\d\d \s \d\d\d\d
-			  )/x
-		or die "Date not found in $text";
-	return $1;
-}
-
-#------------------------------------------------------------------------------
 # LIST FILE HANDLING
 #------------------------------------------------------------------------------
 my $PAGE_SIZE = 61;
@@ -825,38 +814,12 @@ sub compare_list_file {
 	my @got = read_file($file);
 	chomp(@got);
 	
-	insert_headers(get_copyright(), get_unix_date($got[0]), $file, \@expected);
-	
 	eq_or_diff \@got, \@expected, "$line compare $file";
-}
-
-#------------------------------------------------------------------------------
-# insert headers every $PAGE_SIZE lines
-sub insert_headers {
-	my($copyright, $date, $file, $lines) = @_;
-	my $i = 0;
-	my $page = 1;
-	
-	while ($i <= @$lines) {
-		my @insert;
-		push @insert, "\f" if $i > 0;
-		push @insert, $copyright . " " x ($LINE_SIZE - length($copyright) - length($date)) . $date;
-		push @insert, "Page ".sprintf("%03d", $page) . " " x ($LINE_SIZE - 10 - length($file)) . "'$file'";
-		push @insert, "";
-		push @insert, "";
-		
-		splice(@$lines, $i, 0, @insert);
-		
-		$page++;
-		$i += @insert + $PAGE_SIZE;
-	}
-	push @$lines, "\f";
 }
 
 #------------------------------------------------------------------------------
 # Return list of lines of symbol table
 sub sym_lines {
-	my($show_pages) = @_;
 	my @sym;
 	
 	push @sym, "";
@@ -865,7 +828,7 @@ sub sym_lines {
 	push @sym, "";
 	
 	for (sort {$a cmp $b} keys %LABEL_ADDR) {
-		push @sym, format_sym_line($_, $show_pages) unless $LABEL_GLOBAL{$_};
+		push @sym, format_sym_line($_) unless $LABEL_GLOBAL{$_};
 	}
 	
 	push @sym, "";
@@ -874,7 +837,7 @@ sub sym_lines {
 	push @sym, "";
 	
 	for (sort {$a cmp $b} keys %LABEL_ADDR) {
-		push @sym, format_sym_line($_, $show_pages) if $LABEL_GLOBAL{$_};
+		push @sym, format_sym_line($_) if $LABEL_GLOBAL{$_};
 	}
 	
 	return @sym;
@@ -882,7 +845,7 @@ sub sym_lines {
 
 #------------------------------------------------------------------------------
 sub format_sym_line {
-	my($label, $show_pages) = @_;
+	my($label) = @_;
 	my @ret;
 	
 	my $line = $label;
@@ -892,27 +855,6 @@ sub format_sym_line {
 	}
 	$line .= sprintf("%-*s= %04X", $COLUMN_WIDTH - length($line), '', $LABEL_ADDR{$label});
 	
-	if ($show_pages) {
-		$line .= " :";
-		
-		my @pages = uniq @{$LABEL_PAGE{$label}};
-		my $first = 1;
-		while (my @block = splice(@pages, 0, 15)) {
-			my $page = shift @block;
-			$line .= sprintf("%4d%s", $page, $first ? '*' : ' ');
-			$first = 0;
-			
-			while (@block) {
-				my $page = shift @block;
-				$line .= sprintf("%4d ", $page);
-			}
-			
-			if (@pages) {
-				push @ret, $line;
-				$line = sprintf("%*s", $COLUMN_WIDTH + 2 + 8 + 2, '');
-			}
-		}
-	}
 	push @ret, $line;
 	
 	return @ret;
@@ -958,7 +900,7 @@ sub list_test {
 		);
 		ok ! -f lst_file(), "no ".lst_file();
 		ok   -f sym_file(), sym_file();
-		compare_list_file(sym_file(), sym_lines(0));
+		compare_list_file(sym_file(), sym_lines());
 	}
 	
 	for my $options ("-l", "-s -l", "-l -s") {
@@ -968,9 +910,10 @@ sub list_test {
 			options	=> $options,
 			nolist	=> 1,
 		);
-		ok   -f lst_file(), lst_file();
-		ok ! -f sym_file(), "no ".sym_file();
-		compare_list_file(lst_file(), @LIST_LST, sym_lines(1));
+		ok -f lst_file(), lst_file();
+		ok -f sym_file(), sym_file();
+		compare_list_file(lst_file(), @LIST_LST);
+		compare_list_file(sym_file(), sym_lines());
 	}
 }
 

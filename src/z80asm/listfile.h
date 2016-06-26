@@ -13,12 +13,9 @@ Handle assembly listing and symbol table listing.
 
 #include "class.h"
 #include "str.h"
-#include "symref.h"
 #include "types.h"
 
 /* Page metrics for list file (CH_0017) */
-#define PAGE_LEN		64
-#define PAGE_WIDTH		122
 #define COLUMN_WIDTH	32
 #define HEX_DUMP_WIDTH	32
 #define REF_PER_LINE	15
@@ -29,9 +26,6 @@ Handle assembly listing and symbol table listing.
 CLASS( ListFile )
 	char		*filename;				/* list file name, held in strpool */
 	FILE		*file;					/* open file */
-
-	int			 page_nr;				/* current page number */
-	int			 line_nr;				/* current line number in page */
 
 	Bool		 source_list_ended;		/* end of source listing, from now on no source lines */
 
@@ -82,11 +76,7 @@ extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, int
    2. output symbol name, reference, output reference, ...
 */
 extern void ListFile_start_table( ListFile *self, char *title );
-extern void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value,
-                             SymbolRefList *references );
-
-/* return current page number */
-extern int ListFile_get_page_nr( ListFile *self );
+extern void ListFile_symbol(ListFile *self, char *symbol_name, long symbol_value);
 
 /*-----------------------------------------------------------------------------
 *	Singleton API - all methods work on one global list object
@@ -105,6 +95,4 @@ extern void list_end_line( void );
 extern void list_end( void );
 extern void list_patch_data( long patch_pos, long value, int num_bytes );
 extern void list_start_table( char *title );
-extern void list_symbol( char *symbol_name, long symbol_value,
-                         SymbolRefList *references );
-extern int  list_get_page_nr( void );
+extern void list_symbol(char *symbol_name, long symbol_value);

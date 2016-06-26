@@ -21,21 +21,9 @@ One symbol from the assembly code - label or constant.
 *----------------------------------------------------------------------------*/
 DEF_CLASS( Symbol )
 
-void Symbol_init( Symbol *self )
-{
-    self->references = OBJ_NEW( SymbolRefList );
-    OBJ_AUTODELETE( self->references ) = FALSE;
-}
-
-void Symbol_copy( Symbol *self, Symbol *other )
-{
-    self->references = SymbolRefList_clone( other->references );
-}
-
-void Symbol_fini( Symbol *self )
-{
-    OBJ_DELETE( self->references );
-}
+void Symbol_init( Symbol *self ) {}
+void Symbol_copy( Symbol *self, Symbol *other ) {}
+void Symbol_fini( Symbol *self ) {}
 
 /*-----------------------------------------------------------------------------
 *   create a new symbol, needs to be deleted by OBJ_DELETE()
@@ -52,9 +40,6 @@ Symbol *Symbol_create(char *name, long value, sym_type_t type, sym_scope_t scope
 	self->scope = scope;
 	self->module = module;
 	self->section = section;
-
-    /* add reference */
-    add_symbol_ref( self->references, list_get_page_nr(), FALSE );
 
     return self;              						/* pointer to new symbol */
 }

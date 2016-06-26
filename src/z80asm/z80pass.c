@@ -240,7 +240,7 @@ WriteSymbolTable( char *msg, SymbolHash *symtab )
 			    (sym->scope == SCOPE_LOCAL || 
  				 sym->scope == SCOPE_PUBLIC || 
 				 (sym->scope == SCOPE_GLOBAL && sym->is_defined)))
-				list_symbol(sym->name, sym->value, sym->references);
+				list_symbol(sym->name, sym->value);
         }
     }
 }

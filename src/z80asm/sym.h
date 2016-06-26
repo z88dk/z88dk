@@ -12,7 +12,6 @@ One symbol from the assembly code - label or constant.
 #pragma once
 
 #include "class.h"
-#include "symref.h"
 #include "types.h"
 
 struct Module;
@@ -64,7 +63,6 @@ CLASS( Symbol )
 										 * a symbol table search */
 	struct Module  *module;				/* module which owns symbol (weak ref) */
 	struct Section *section;			/* section where expression is defined (weak ref) */
-	SymbolRefList  *references;			/* pointer to all found references of symbol */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------

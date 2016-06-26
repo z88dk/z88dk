@@ -186,13 +186,12 @@ depend:
 codearea.obj: codearea.h lib/array.h lib/alloc.h lib/dbg.h lib/types.h
 codearea.obj: lib/class.h lib/queue.h lib/str.h lib/classhash.h lib/strhash.h
 codearea.obj: lib/uthash.h errors.h error_func.h lib/fileutil.h lib/utarray.h
-codearea.obj: lib/init.h listfile.h symref.h lib/classlist.h options.h
-codearea.obj: options_def.h lib/strpool.h z80asm.h sym.h expr.h scan.h
-codearea.obj: tokens.h opcodes.h
+codearea.obj: lib/init.h listfile.h options.h options_def.h lib/strpool.h
+codearea.obj: z80asm.h sym.h expr.h lib/classlist.h scan.h tokens.h opcodes.h
 deffile.obj: deffile.h lib/fileutil.h lib/types.h lib/str.h lib/alloc.h
 deffile.obj: lib/dbg.h lib/utarray.h listfile.h lib/class.h lib/queue.h
-deffile.obj: symref.h lib/classlist.h options.h options_def.h symbol.h expr.h
-deffile.obj: lib/array.h scan.h tokens.h opcodes.h errors.h error_func.h
+deffile.obj: options.h options_def.h symbol.h expr.h lib/array.h
+deffile.obj: lib/classlist.h scan.h tokens.h opcodes.h errors.h error_func.h
 deffile.obj: sym.h model.h lib/list.h module.h lib/classhash.h lib/strhash.h
 deffile.obj: lib/uthash.h codearea.h symtab.h objfile.h z80asm.h
 directives.obj: codearea.h lib/array.h lib/alloc.h lib/dbg.h lib/types.h
@@ -200,8 +199,7 @@ directives.obj: lib/class.h lib/queue.h lib/str.h lib/classhash.h
 directives.obj: lib/strhash.h lib/uthash.h directives.h errors.h error_func.h
 directives.obj: lib/fileutil.h lib/utarray.h model.h lib/list.h module.h
 directives.obj: lib/classlist.h expr.h scan.h tokens.h opcodes.h options.h
-directives.obj: options_def.h sym.h symref.h symtab.h parse.h lib/strpool.h
-directives.obj: z80asm.h
+directives.obj: options_def.h sym.h symtab.h parse.h lib/strpool.h z80asm.h
 error_func.obj: errors.h error_func.h lib/str.h lib/alloc.h lib/dbg.h
 error_func.obj: lib/types.h
 errors.obj: errors.h error_func.h lib/fileutil.h lib/types.h lib/str.h
@@ -212,25 +210,24 @@ expr.obj: lib/array.h lib/alloc.h lib/dbg.h lib/types.h lib/class.h
 expr.obj: lib/queue.h lib/str.h codearea.h lib/classhash.h lib/strhash.h
 expr.obj: lib/uthash.h expr.h lib/classlist.h scan.h tokens.h opcodes.h
 expr.obj: errors.h error_func.h options.h lib/utarray.h options_def.h sym.h
-expr.obj: symref.h lib/init.h model.h lib/list.h module.h symtab.h
-expr.obj: lib/strpool.h expr_def.h
+expr.obj: lib/init.h model.h lib/list.h module.h symtab.h lib/strpool.h
+expr.obj: expr_def.h
 hist.obj: hist.h
 libfile.obj: errors.h error_func.h lib/fileutil.h lib/types.h lib/str.h
 libfile.obj: lib/alloc.h lib/dbg.h lib/utarray.h libfile.h objfile.h
 libfile.obj: lib/array.h lib/class.h lib/queue.h module.h lib/classlist.h
 libfile.obj: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h expr.h
-libfile.obj: scan.h tokens.h opcodes.h options.h options_def.h sym.h symref.h
-libfile.obj: symtab.h
+libfile.obj: scan.h tokens.h opcodes.h options.h options_def.h sym.h symtab.h
 listfile.obj: listfile.h lib/class.h lib/alloc.h lib/dbg.h lib/types.h
-listfile.obj: lib/queue.h lib/str.h symref.h lib/classlist.h lib/fileutil.h
-listfile.obj: lib/utarray.h options.h options_def.h z80asm.h sym.h expr.h
-listfile.obj: lib/array.h scan.h tokens.h opcodes.h errors.h error_func.h
-listfile.obj: hist.h lib/strpool.h codearea.h lib/classhash.h lib/strhash.h
+listfile.obj: lib/queue.h lib/str.h lib/fileutil.h lib/utarray.h options.h
+listfile.obj: options_def.h z80asm.h sym.h expr.h lib/array.h lib/classlist.h
+listfile.obj: scan.h tokens.h opcodes.h errors.h error_func.h hist.h
+listfile.obj: lib/strpool.h codearea.h lib/classhash.h lib/strhash.h
 listfile.obj: lib/uthash.h
 mapfile.obj: lib/fileutil.h lib/types.h lib/str.h lib/alloc.h lib/dbg.h
-mapfile.obj: lib/utarray.h listfile.h lib/class.h lib/queue.h symref.h
-mapfile.obj: lib/classlist.h mapfile.h options.h options_def.h lib/strpool.h
-mapfile.obj: symbol.h expr.h lib/array.h scan.h tokens.h opcodes.h errors.h
+mapfile.obj: lib/utarray.h listfile.h lib/class.h lib/queue.h mapfile.h
+mapfile.obj: options.h options_def.h lib/strpool.h symbol.h expr.h
+mapfile.obj: lib/array.h lib/classlist.h scan.h tokens.h opcodes.h errors.h
 mapfile.obj: error_func.h sym.h model.h lib/list.h module.h lib/classhash.h
 mapfile.obj: lib/strhash.h lib/uthash.h codearea.h symtab.h objfile.h
 mapfile.obj: z80asm.h
@@ -238,73 +235,70 @@ model.obj: model.h lib/list.h lib/class.h lib/alloc.h lib/dbg.h lib/types.h
 model.obj: lib/queue.h module.h lib/classlist.h lib/classhash.h lib/strhash.h
 model.obj: lib/uthash.h codearea.h lib/array.h lib/str.h expr.h scan.h
 model.obj: tokens.h opcodes.h errors.h error_func.h options.h lib/utarray.h
-model.obj: options_def.h sym.h symref.h symtab.h lib/init.h listfile.h
-model.obj: lib/srcfile.h
+model.obj: options_def.h sym.h symtab.h lib/init.h listfile.h lib/srcfile.h
 modlink.obj: lib/alloc.h lib/dbg.h lib/types.h codearea.h lib/array.h
 modlink.obj: lib/class.h lib/queue.h lib/str.h lib/classhash.h lib/strhash.h
 modlink.obj: lib/uthash.h errors.h error_func.h expr.h lib/classlist.h scan.h
 modlink.obj: tokens.h opcodes.h options.h lib/utarray.h options_def.h sym.h
-modlink.obj: symref.h lib/fileutil.h listfile.h modlink.h lib/strpool.h
-modlink.obj: symbol.h model.h lib/list.h module.h symtab.h objfile.h z80asm.h
+modlink.obj: lib/fileutil.h listfile.h modlink.h lib/strpool.h symbol.h
+modlink.obj: model.h lib/list.h module.h symtab.h objfile.h z80asm.h
 module.obj: codearea.h lib/array.h lib/alloc.h lib/dbg.h lib/types.h
 module.obj: lib/class.h lib/queue.h lib/str.h lib/classhash.h lib/strhash.h
 module.obj: lib/uthash.h lib/init.h module.h lib/classlist.h expr.h scan.h
 module.obj: tokens.h opcodes.h errors.h error_func.h options.h lib/utarray.h
-module.obj: options_def.h sym.h symref.h symtab.h lib/strpool.h
+module.obj: options_def.h sym.h symtab.h lib/strpool.h
 objfile.obj: lib/class.h lib/alloc.h lib/dbg.h lib/types.h lib/queue.h
 objfile.obj: codearea.h lib/array.h lib/str.h lib/classhash.h lib/strhash.h
 objfile.obj: lib/uthash.h errors.h error_func.h lib/fileutil.h lib/utarray.h
 objfile.obj: options.h options_def.h model.h lib/list.h module.h
-objfile.obj: lib/classlist.h expr.h scan.h tokens.h opcodes.h sym.h symref.h
-objfile.obj: symtab.h objfile.h lib/strpool.h
+objfile.obj: lib/classlist.h expr.h scan.h tokens.h opcodes.h sym.h symtab.h
+objfile.obj: objfile.h lib/strpool.h
 opcodes.obj: directives.h expr.h lib/array.h lib/alloc.h lib/dbg.h
 opcodes.obj: lib/types.h lib/class.h lib/queue.h lib/str.h lib/classlist.h
 opcodes.obj: scan.h tokens.h opcodes.h errors.h error_func.h options.h
-opcodes.obj: lib/utarray.h options_def.h sym.h symref.h codearea.h
-opcodes.obj: lib/classhash.h lib/strhash.h lib/uthash.h model.h lib/list.h
-opcodes.obj: module.h symtab.h parse.h z80asm.h
+opcodes.obj: lib/utarray.h options_def.h sym.h codearea.h lib/classhash.h
+opcodes.obj: lib/strhash.h lib/uthash.h model.h lib/list.h module.h symtab.h
+opcodes.obj: parse.h z80asm.h
 options.obj: errors.h error_func.h lib/fileutil.h lib/types.h lib/str.h
 options.obj: lib/alloc.h lib/dbg.h lib/utarray.h hist.h lib/init.h model.h
 options.obj: lib/list.h lib/class.h lib/queue.h module.h lib/classlist.h
 options.obj: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h
 options.obj: lib/array.h expr.h scan.h tokens.h opcodes.h options.h
-options.obj: options_def.h sym.h symref.h symtab.h lib/srcfile.h
-options.obj: lib/strpool.h z80asm.h
+options.obj: options_def.h sym.h symtab.h lib/srcfile.h lib/strpool.h
+options.obj: z80asm.h
 parse.obj: lib/class.h lib/alloc.h lib/dbg.h lib/types.h lib/queue.h
 parse.obj: codearea.h lib/array.h lib/str.h lib/classhash.h lib/strhash.h
 parse.obj: lib/uthash.h directives.h expr.h lib/classlist.h scan.h tokens.h
 parse.obj: opcodes.h errors.h error_func.h options.h lib/utarray.h
-parse.obj: options_def.h sym.h symref.h listfile.h model.h lib/list.h
-parse.obj: module.h symtab.h parse.h lib/strpool.h parse_rules.h
+parse.obj: options_def.h sym.h listfile.h model.h lib/list.h module.h
+parse.obj: symtab.h parse.h lib/strpool.h parse_rules.h
 scan.obj: lib/alloc.h lib/dbg.h lib/types.h errors.h error_func.h lib/init.h
 scan.obj: lib/list.h lib/class.h lib/queue.h model.h module.h lib/classlist.h
 scan.obj: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h lib/array.h
 scan.obj: lib/str.h expr.h scan.h tokens.h opcodes.h options.h lib/utarray.h
-scan.obj: options_def.h sym.h symref.h symtab.h scan_rules.h
+scan.obj: options_def.h sym.h symtab.h scan_rules.h
 sym.obj: listfile.h lib/class.h lib/alloc.h lib/dbg.h lib/types.h lib/queue.h
-sym.obj: lib/str.h symref.h lib/classlist.h options.h lib/utarray.h
-sym.obj: options_def.h lib/strpool.h sym.h symbol.h expr.h lib/array.h scan.h
-sym.obj: tokens.h opcodes.h errors.h error_func.h model.h lib/list.h module.h
+sym.obj: lib/str.h options.h lib/utarray.h options_def.h lib/strpool.h sym.h
+sym.obj: symbol.h expr.h lib/array.h lib/classlist.h scan.h tokens.h
+sym.obj: opcodes.h errors.h error_func.h model.h lib/list.h module.h
 sym.obj: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h symtab.h
 sym.obj: objfile.h
-symref.obj: options.h lib/types.h lib/utarray.h lib/dbg.h lib/alloc.h
-symref.obj: options_def.h symref.h lib/class.h lib/queue.h lib/classlist.h
 symtab.obj: errors.h error_func.h listfile.h lib/class.h lib/alloc.h
-symtab.obj: lib/dbg.h lib/types.h lib/queue.h lib/str.h symref.h
-symtab.obj: lib/classlist.h model.h lib/list.h module.h lib/classhash.h
-symtab.obj: lib/strhash.h lib/uthash.h codearea.h lib/array.h expr.h scan.h
-symtab.obj: tokens.h opcodes.h options.h lib/utarray.h options_def.h sym.h
-symtab.obj: symtab.h symbol.h objfile.h z80asm.h
+symtab.obj: lib/dbg.h lib/types.h lib/queue.h lib/str.h model.h lib/list.h
+symtab.obj: module.h lib/classlist.h lib/classhash.h lib/strhash.h
+symtab.obj: lib/uthash.h codearea.h lib/array.h expr.h scan.h tokens.h
+symtab.obj: opcodes.h options.h lib/utarray.h options_def.h sym.h symtab.h
+symtab.obj: symbol.h objfile.h z80asm.h
 z80asm.obj: deffile.h directives.h lib/fileutil.h lib/types.h lib/str.h
 z80asm.obj: lib/alloc.h lib/dbg.h lib/utarray.h libfile.h listfile.h
-z80asm.obj: lib/class.h lib/queue.h symref.h lib/classlist.h mapfile.h
-z80asm.obj: modlink.h expr.h lib/array.h scan.h tokens.h opcodes.h errors.h
-z80asm.obj: error_func.h options.h options_def.h sym.h module.h
-z80asm.obj: lib/classhash.h lib/strhash.h lib/uthash.h codearea.h symtab.h
-z80asm.obj: objfile.h parse.h lib/strpool.h symbol.h model.h lib/list.h
+z80asm.obj: lib/class.h lib/queue.h mapfile.h modlink.h expr.h lib/array.h
+z80asm.obj: lib/classlist.h scan.h tokens.h opcodes.h errors.h error_func.h
+z80asm.obj: options.h options_def.h sym.h module.h lib/classhash.h
+z80asm.obj: lib/strhash.h lib/uthash.h codearea.h symtab.h objfile.h parse.h
+z80asm.obj: lib/strpool.h symbol.h model.h lib/list.h
 z80pass.obj: listfile.h lib/class.h lib/alloc.h lib/dbg.h lib/types.h
-z80pass.obj: lib/queue.h lib/str.h symref.h lib/classlist.h modlink.h expr.h
-z80pass.obj: lib/array.h scan.h tokens.h opcodes.h errors.h error_func.h
+z80pass.obj: lib/queue.h lib/str.h modlink.h expr.h lib/array.h
+z80pass.obj: lib/classlist.h scan.h tokens.h opcodes.h errors.h error_func.h
 z80pass.obj: options.h lib/utarray.h options_def.h sym.h symbol.h model.h
 z80pass.obj: lib/list.h module.h lib/classhash.h lib/strhash.h lib/uthash.h
 z80pass.obj: codearea.h symtab.h objfile.h
@@ -333,9 +327,9 @@ t/test_codearea.obj: lib/class.h lib/queue.h lib/str.h lib/classhash.h
 t/test_codearea.obj: lib/strhash.h lib/uthash.h options.h lib/utarray.h
 t/test_codearea.obj: options_def.h
 t/test_symtab.obj: listfile.h lib/class.h lib/alloc.h lib/dbg.h lib/types.h
-t/test_symtab.obj: lib/queue.h lib/str.h symref.h lib/classlist.h model.h
-t/test_symtab.obj: lib/list.h module.h lib/classhash.h lib/strhash.h
-t/test_symtab.obj: lib/uthash.h codearea.h lib/array.h expr.h scan.h tokens.h
-t/test_symtab.obj: opcodes.h errors.h error_func.h options.h lib/utarray.h
+t/test_symtab.obj: lib/queue.h lib/str.h model.h lib/list.h module.h
+t/test_symtab.obj: lib/classlist.h lib/classhash.h lib/strhash.h lib/uthash.h
+t/test_symtab.obj: codearea.h lib/array.h expr.h scan.h tokens.h opcodes.h
+t/test_symtab.obj: errors.h error_func.h options.h lib/utarray.h
 t/test_symtab.obj: options_def.h sym.h symtab.h
 t/testlib.obj: lib/dbg.h t/testlib.h

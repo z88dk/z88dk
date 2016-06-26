@@ -199,20 +199,6 @@ sub get_copyright {
 }
 
 #------------------------------------------------------------------------------
-# get UNIX date from input text
-#------------------------------------------------------------------------------
-sub get_unix_date {
-	my($text) = @_;
-
-	$text =~ /( (Mon|Tue|Wed|Thu|Fri|Sat|Sun) \s
-				(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \s
-				\d\d \s \d\d:\d\d:\d\d \s \d\d\d\d
-			  )/x
-		or die "Date not found in $text";
-	return $1;
-}
-
-#------------------------------------------------------------------------------
 # compare result file with list of expected lines
 #------------------------------------------------------------------------------
 sub compare_list_file {
@@ -223,38 +209,13 @@ sub compare_list_file {
 	my @got = read_file($file);
 	chomp(@got);
 	
-	insert_headers(get_copyright(), get_unix_date($got[0]), $file, \@expected);
-	
 	eq_or_diff \@got, \@expected, "compare $file";
-}
-
-#------------------------------------------------------------------------------
-# insert headers every $PAGE_SIZE lines
-sub insert_headers {
-	my($copyright, $date, $file, $lines) = @_;
-	my $i = 0;
-	my $page = 1;
-	
-	while ($i <= @$lines) {
-		my @insert;
-		push @insert, "\f" if $i > 0;
-		push @insert, $copyright . " " x ($LINE_SIZE - length($copyright) - length($date)) . $date;
-		push @insert, "Page ".sprintf("%03d", $page) . " " x ($LINE_SIZE - 10 - length($file)) . "'$file'";
-		push @insert, "";
-		push @insert, "";
-		
-		splice(@$lines, $i, 0, @insert);
-		
-		$page++;
-		$i += @insert + $PAGE_SIZE;
-	}
-	push @$lines, "\f";
 }
 
 #------------------------------------------------------------------------------
 # Return list of lines of symbol table
 sub sym_lines {
-	my($self, $show_pages) = @_;
+	my($self) = @_;
 	my @sym;
 	
 	push @sym, "";
@@ -263,7 +224,7 @@ sub sym_lines {
 	push @sym, "";
 	
 	for (sort {$a cmp $b} keys %{$self->LABEL_ADDR}) {
-		push @sym, $self->format_sym_line($_, $show_pages) unless $self->LABEL_GLOBAL->{$_};
+		push @sym, $self->format_sym_line($_) unless $self->LABEL_GLOBAL->{$_};
 	}
 	
 	push @sym, "";
@@ -272,7 +233,7 @@ sub sym_lines {
 	push @sym, "";
 	
 	for (sort {$a cmp $b} keys %{$self->LABEL_ADDR}) {
-		push @sym, $self->format_sym_line($_, $show_pages) if $self->LABEL_GLOBAL->{$_};
+		push @sym, $self->format_sym_line($_) if $self->LABEL_GLOBAL->{$_};
 	}
 	
 	return @sym;
@@ -280,7 +241,7 @@ sub sym_lines {
 
 #------------------------------------------------------------------------------
 sub format_sym_line {
-	my($self, $label, $show_pages) = @_;
+	my($self, $label) = @_;
 	my @ret;
 	
 	my $line = $label;
@@ -292,27 +253,6 @@ sub format_sym_line {
 					 $COLUMN_WIDTH - length($line), '', 
 					 $self->LABEL_ADDR->{$label});
 	
-	if ($show_pages) {
-		$line .= " :";
-		
-		my @pages = uniq @{$self->LABEL_PAGE->{$label}};
-		my $first = 1;
-		while (my @block = splice(@pages, 0, 15)) {
-			my $page = shift @block;
-			$line .= sprintf("%4d%s", $page, $first ? '*' : ' ');
-			$first = 0;
-			
-			while (@block) {
-				my $page = shift @block;
-				$line .= sprintf("%4d ", $page);
-			}
-			
-			if (@pages) {
-				push @ret, $line;
-				$line = sprintf("%*s", $COLUMN_WIDTH + 2 + 8 + 2, '');
-			}
-		}
-	}
 	push @ret, $line;
 	
 	return @ret;
@@ -356,7 +296,7 @@ sub test {
 	);
 	ok ! -f "test.lst", "no test.lst file";
 	ok   -f "test.sym", "test.sym file";
-	$self->compare_list_file("test.sym", $self->sym_lines(0));
+	$self->compare_list_file("test.sym", $self->sym_lines());
 	
 	unlink('test.lst', 'test.sym');
 	z80asm(
@@ -364,9 +304,10 @@ sub test {
 		bin		=> $bin,
 		options	=> "-s -l -r0 -b",
 	);
-	ok   -f "test.lst", "test.lst file";
-	ok ! -f "test.sym", "no test.sym file";
-	$self->compare_list_file("test.lst", @{$self->LIST_LST}, $self->sym_lines(1));
+	ok -f "test.lst", "test.lst file";
+	ok -f "test.sym", "test.sym file";
+	$self->compare_list_file("test.lst", @{$self->LIST_LST});
+	$self->compare_list_file("test.sym", $self->sym_lines());
 }
 
 1;

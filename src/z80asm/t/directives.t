@@ -635,11 +635,9 @@ END
 );
 ok -f "test.lst", "test.lst exists";
 ok my @lines = read_file("test.lst");
-ok $lines[3] =~ /^ \s* $/x;
-ok $lines[4] =~ /^ 1 \s+ 0000                      \s+ lstoff          /x;
-ok $lines[5] =~ /^ 4 \s+ 0003 \s+ 21 \s+ 01 \s+ 00 \s+ ld     \s+ hl,1 /x;
-ok $lines[6] =~ /^ 5 \s+ 0006 \s* $/x;
-ok $lines[7] =~ /^ \s* $/x;
+ok $lines[0] =~ /^ 1 \s+ 0000                      \s+ lstoff          /x;
+ok $lines[1] =~ /^ 4 \s+ 0003 \s+ 21 \s+ 01 \s+ 00 \s+ ld     \s+ hl,1 /x;
+ok $lines[2] =~ /^ 5 \s+ 0006 \s* $/x;
 
 z80asm(
 	asm		=> <<'END',

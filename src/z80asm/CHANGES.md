@@ -4,6 +4,14 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-06-26
+
+  Do not create paginated list and symbol files with headers, page numbers
+  and form-feeds; keep just a list of output text.
+  
+  Do not create symbol cross-reference list - it contained page number
+  references in the list file.
+
 - 2016-06-25
 
   Create symbol list always in file.sym; when a file.lst was requested

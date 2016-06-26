@@ -114,9 +114,6 @@ Symbol *_define_sym(char *name, long value, sym_type_t type, sym_scope_t scope,
             error_symbol_redefined( name );
     }
 
-    /* add symbol references if listing */
-    add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
-
     return sym;
 }
 
@@ -143,9 +140,6 @@ Symbol *get_used_symbol( char *name )
             SymbolHash_set( & CURRENTMODULE->local_symtab, name, sym );
         }
     }
-
-    /* add page references */
-    add_symbol_ref( sym->references, list_get_page_nr(), FALSE );
 
     return sym;
 }
@@ -286,9 +280,6 @@ static Symbol *define_local_symbol(char *name, long value, sym_type_t type)
 		sym = Symbol_create(name, value, type, SCOPE_LOCAL, CURRENTMODULE, CURRENTSECTION);
 		sym->is_defined = TRUE;
 		SymbolHash_set(&CURRENTMODULE->local_symtab, name, sym);
-
-        /* First element in list is definition of symbol */
-        add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
     }
     else if ( sym->is_defined )			/* local symbol already defined */
     {
@@ -302,9 +293,6 @@ static Symbol *define_local_symbol(char *name, long value, sym_type_t type)
 		sym->is_defined = TRUE;
         sym->module  = CURRENTMODULE;						/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
-
-        /* First element in list is definition of symbol */
-        add_symbol_ref( sym->references, list_get_page_nr(), TRUE );
     }
 
 	return sym;
@@ -339,9 +327,6 @@ Symbol *define_symbol(char *name, long value, sym_type_t type)
 		sym->is_defined = TRUE;
 		sym->module = CURRENTMODULE;		/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
-
-		/* First element in list is definition of symbol */
-		add_symbol_ref(sym->references, list_get_page_nr(), TRUE);
 	}
 
 	return sym;

@@ -25,10 +25,7 @@ Handle assembly listing and symbol table listing.
 /*-----------------------------------------------------------------------------
 *   Static variables
 *----------------------------------------------------------------------------*/
-static int header_size = 0;
 static int newline_size = 0;
-static time_t list_time;		/* time   of assembly in seconds */
-static char *list_date;			/* pointer to datestring calculated from list_time */
 
 /*-----------------------------------------------------------------------------
 *   Global state variables
@@ -71,12 +68,10 @@ void ListFile_fini( ListFile *self )
 /*-----------------------------------------------------------------------------
 *	output one line to the list file
 *----------------------------------------------------------------------------*/
-static void ListFile_write_header( ListFile *self );
 static void ListFile_fprintf( ListFile *self, char *msg, ... )
 {
 	STR_DEFINE(str, STR_SIZE);
     va_list argptr;
-    char *p;
 
     if ( self->file != NULL )
     {
@@ -84,95 +79,10 @@ static void ListFile_fprintf( ListFile *self, char *msg, ... )
         str_vsprintf( str, msg, argptr );		/* ignore ret, as we dont retry */
 		va_end( argptr );
 
-        /* output to list file, advance line if newline, insert header on new page */
-        for ( p = str_data(str) ; *p ; p++ )
-        {
-            fputc( *p, self->file );
-
-            if ( *p == '\n' )
-            {
-                self->line_nr++;
-
-                if ( self->line_nr >= PAGE_LEN )
-                {
-                    fprintf( self->file, "\f\n" );    /* send FORM FEED to file */
-                    ListFile_write_header( self );
-                }
-            }
-        }
+		fputs(str_data(str), self->file);
     }
 
 	STR_DELETE(str);
-}
-
-/*-----------------------------------------------------------------------------
-*	Draw the page header
-*----------------------------------------------------------------------------*/
-static void ListFile_write_header( ListFile *self )
-{
-    long	fpos1 = 0, fpos2 = 0, fpos3 = 0;
-
-    if ( self->file != NULL )
-    {
-        /* new page */
-        self->page_nr++;
-        self->line_nr = 0;
-
-        /* compute header size and newline size on first call */
-        if ( header_size == 0 )
-        {
-            fpos1 = ftell( self->file );		/* before header */
-        }
-
-#ifdef QDOS
-        ListFile_fprintf( self, "%s %s, %s", _prog_name, _version, _copyright );
-        ListFile_fprintf( self, "%*.*s", PAGE_WIDTH - strlen( _prog_name ) - strlen( _version ) - strlen( _copyright ) - 3,
-                          strlen( list_date ), list_date );		/* list_date ends with newline */
-#else
-        ListFile_fprintf( self, "%s%*s%s",
-                          copyrightmsg,
-                          PAGE_WIDTH - strlen( copyrightmsg ) - strlen( list_date ) + 1,		/* dont count \n */
-                          "",
-                          list_date );														/* list_date ends with newline */
-#endif
-        ListFile_fprintf( self, "Page %03d%*s'%s'\n\n",
-                          self->page_nr,
-                          PAGE_WIDTH - 8 - 2 - strlen( self->filename ),
-                          "",
-                          self->filename );
-
-        /* compute header size and newline size on first call */
-        if ( header_size == 0 )
-        {
-            fpos2 = ftell( self->file );		/* before last newline */
-        }
-
-        fputc( '\n', self->file );
-
-        /* compute header size and newline size on first call */
-        if ( header_size == 0 )
-        {
-            fpos3 = ftell( self->file );		/* after header */
-
-            newline_size = ( int )( fpos3 - fpos2 );
-
-            /* header between pages has "\f\n" more */
-            header_size  = ( int )( fpos3 - fpos1 ) + 1 + newline_size;
-        }
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*	Initialize the page
-*----------------------------------------------------------------------------*/
-static void ListFile_init_page( ListFile *self )
-{
-    if ( self->file != NULL )
-    {
-        self->page_nr = 0;
-        ListFile_write_header( self );			/* Begin list file with a header */
-        self->start_line_pos = ftell( self->file );	/* Get file pos. of next line in list file */
-    }
 }
 
 /*-----------------------------------------------------------------------------
@@ -183,17 +93,17 @@ void ListFile_open( ListFile *self, char *list_file )
     /* close and discard any open list file */
     ListFile_close( self, FALSE );
 
-    /* compute time for header */
-    time( &list_time );
-    list_date = asctime( localtime( &list_time ) ); /* get current system time for date in list file */
-
     /* open the file */
     self->filename	= strpool_add( list_file );
     self->file		= myfopen( list_file, "w+" );
     self->source_list_ended = FALSE;
 
-    /* output header */
-    ListFile_init_page( self );
+    /* init '\n' size */
+	fputc('\n', self->file);
+	newline_size = (int)(ftell(self->file));
+	fseek(self->file, 0, SEEK_SET);
+
+	self->start_line_pos = 0;
 }
 
 void list_open( char *list_file )
@@ -216,7 +126,6 @@ void ListFile_close( ListFile *self, Bool keep_file )
         /* close any pending line started */
         ListFile_end( self );
 
-        fputc( '\f', self->file );     /* end listing with a FF */
         myfclose( self->file );
 
         if ( ! keep_file )
@@ -337,7 +246,6 @@ void list_append_long( long dword )
 *----------------------------------------------------------------------------*/
 long ListFile_patch_pos( ListFile *self, int byte_offset )
 {
-    int line_nr;
     int start_line_pos;
 
     if ( self->file == NULL || self->source_list_ended )
@@ -346,20 +254,11 @@ long ListFile_patch_pos( ListFile *self, int byte_offset )
     }
     else
     {
-        line_nr = self->line_nr;
         start_line_pos = self->start_line_pos;
 
         while ( byte_offset >= HEX_DUMP_WIDTH )
         {
-            line_nr++;
             start_line_pos += 5 + 1 + 4 + 2 + ( HEX_DUMP_WIDTH * 3 ) + newline_size;
-
-            if ( line_nr >= PAGE_LEN )
-            {
-                start_line_pos += header_size;
-                line_nr = 4;
-            }
-
             byte_offset -= HEX_DUMP_WIDTH;
         }
 
@@ -498,13 +397,9 @@ void list_start_table( char *title )
 /*-----------------------------------------------------------------------------
 *	output symbol
 *----------------------------------------------------------------------------*/
-void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value,
-                      SymbolRefList *references )
+void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value)
 {
     char *symbol_output;
-    int count_page_ref;
-    SymbolRefListElem *iter;
-    Bool first;
 
     if ( self->file != NULL )
     {
@@ -519,50 +414,14 @@ void ListFile_symbol( ListFile *self, char *symbol_name, long symbol_value,
             ListFile_fprintf( self, "%s\n", symbol_name );
         }
 
-        ListFile_fprintf( self, "%-*s= %04lX", COLUMN_WIDTH, symbol_output, symbol_value );
-
-        /* BUG_0028 */
-        for ( iter = SymbolRefList_first( references ), first = TRUE, count_page_ref = 0 ;
-                iter != NULL ;
-                iter = SymbolRefList_next( iter ), first = FALSE, count_page_ref++ )
-        {
-            /* output separator on first reference */
-            if ( count_page_ref == 0 )
-            {
-                ListFile_fprintf( self, " :" );
-            }
-            /* output newline after x references */
-            else if ( ( count_page_ref % REF_PER_LINE ) == 0 )
-            {
-                ListFile_fprintf( self, "\n%*s", COLUMN_WIDTH + 2 + 8 + 2, "" );
-            }
-
-            /* output page reference */
-            ListFile_fprintf( self, "%4d%c", iter->obj->page_nr, first ? '*' : ' ' );
-        }
-
-        ListFile_fprintf( self, "\n" );
+        ListFile_fprintf( self, "%-*s= %04lX\n", COLUMN_WIDTH, symbol_output, symbol_value );
     }
 }
 
-void list_symbol( char *symbol_name, long symbol_value,
-                  SymbolRefList *references )
+void list_symbol( char *symbol_name, long symbol_value)
 {
     if ( the_list != NULL )
     {
-        ListFile_symbol( the_list, symbol_name, symbol_value, references );
+		ListFile_symbol(the_list, symbol_name, symbol_value);
     }
-}
-
-/*-----------------------------------------------------------------------------
-*	get current page number
-*----------------------------------------------------------------------------*/
-int ListFile_get_page_nr( ListFile *self )
-{
-    return ( self->file != NULL && ! self->source_list_ended ) ? self->page_nr : -1;
-}
-
-int list_get_page_nr( void )
-{
-    return the_list != NULL ? ListFile_get_page_nr( the_list ) : -1;
 }
