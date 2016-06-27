@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.35 2016-06-27 23:07:15 aralbrec Exp $
+ *   $Id: appmake.c,v 1.36 2016-06-27 23:51:15 aralbrec Exp $
  */
 
 
@@ -178,8 +178,8 @@ long parameter_search(char *filen, char *ext,char *target)
 
      /* Successfully opened the file so search through it.. */
     while ( fgets(buffer,LINEMAX,fp) != NULL ) {
-        if      (strncmp(buffer,target,strlen(target)) == 0 ) {
-            sscanf(buffer,"%s%s%lx",name,name,&val);
+        if (strncmp(buffer,target,strlen(target)) == 0 ) {
+            sscanf(buffer,"%*s%*s%*[ $]%lx",&val);
             break;
         }
     }
