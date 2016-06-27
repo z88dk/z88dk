@@ -351,11 +351,23 @@ $asm = "
 	PUBLIC main
 main: ld b,10
 loop: djnz loop
+	PUBLIC last
+last:
 x31_x31_x31_x31_x31_x31_x31_x31: defb zero
 x_32_x32_x32_x32_x32_x32_x32_x32: defb zero
 ";
 my $asm2 = "
 	define not_shown
+	
+	; show DEFC alias in map file
+	PUBLIC alias_main
+	EXTERN main
+	defc alias_main = main
+	
+	PUBLIC alias_last
+	EXTERN last
+	defc alias_last = last
+
 	PUBLIC func
 func: ld b,10
 loop: djnz loop
@@ -397,9 +409,12 @@ t_z80asm(
 ok -f map_file(), map_file();
 eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
 ASMHEAD                         = $0000, G: 
+alias_main                      = $0000, G: test2
 main                            = $0000, G: test
 zero                            = $0000, L: test
 loop                            = $0002, L: test
+alias_last                      = $0004, G: test2
+last                            = $0004, G: test
 x31_x31_x31_x31_x31_x31_x31_x31 = $0004, L: test
 x_32_x32_x32_x32_x32_x32_x32_x32 = $0005, L: test
 func                            = $0006, G: test2
