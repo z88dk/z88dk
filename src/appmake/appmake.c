@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.34 2016-06-26 00:46:54 aralbrec Exp $
+ *   $Id: appmake.c,v 1.35 2016-06-27 23:07:15 aralbrec Exp $
  */
 
 
@@ -229,7 +229,7 @@ FILE *fopen_bin(char *fname, char *crtfile)
     if (st_file1.st_size > 0)
         fprintf(stderr, "WARNING: some code or data may not be assigned to sections.\n");
 
-    if ((crtfile == NULL) | ((crt_model = parameter_search(crtfile,".sym", "__crt_model")) == -1))
+    if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".sym", "__crt_model")) == -1))
         crt_model = 0;
 
     fcode = fopen(name, "rb");
