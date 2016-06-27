@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.12 2016-06-21 20:49:07 dom Exp $
+;       $Id: sos_crt0.asm,v 1.13 2016-06-27 19:34:41 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -245,7 +245,7 @@ end:    defb    0               ; null file name
 
 	INCLUDE "crt0_section.asm"
 
-	SECTION	data_bss
+	SECTION	data_crt
 ; Default block size for "gendos.lib"
 ; every single block (up to 36) is written in a separate file
 ; the bigger RND_BLOCKSIZE, bigger can be the output file size

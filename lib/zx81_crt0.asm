@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.55 2016-06-21 20:49:07 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.56 2016-06-27 19:34:41 dom Exp $
 ;
 ; - - - - - - -
 
@@ -68,9 +68,6 @@ IF (startup>=3)
 ENDIF
 ENDIF
 
-        PUBLIC    base_graphics   ;Graphical variables
-        PUBLIC    _base_graphics  ;as above for C declarations
-        PUBLIC    coords          ;Current xy position
 
         PUBLIC    save81          ;Save ZX81 critical registers
         PUBLIC    restore81       ;Restore ZX81 critical registers
@@ -101,6 +98,7 @@ ENDIF
 
         ld      a,(hl)          ; hide the first 6 bytes of REM line
         jp      start           ; invisible
+	defc	DEFINED_basegraphics = 1
 _base_graphics:                 ; Address of the Graphics map..
 base_graphics:			; it is POKEable at address 16518/16519
 IF DEFINED_hrgpage
@@ -162,29 +160,29 @@ IF (startup>100)
 ELSE
 IF (startup>=23)	; CHROMA 81
 	ld	a,32+16+7	; 32=colour enabled,  16="attribute file" mode, 7=white border
-	ld bc,7FEFh
-	out (c),a
+	ld	bc,7FEFh
+	out	(c),a
 
 	ld	a,7*16		; white paper, black ink
 	ld	hl,HRG_LineStart+2+32768
 	ld	de,(16396)
-	set 7,d
-	inc de
+	set	7,d
+	inc	de
 	ld	c,24
 .rowloop
 	ld	b,32
 .rowattr
 	ld	(hl),a
 	ld	(de),a
-	inc hl
-	inc de
+	inc	hl
+	inc	de
 	djnz rowattr
 	inc	hl
 	inc	hl
 	inc	hl
-	inc de
-	dec c
-	jr  nz,rowloop
+	inc	de
+	dec	c
+	jr	nz,rowloop
 ENDIF
 ENDIF
 
@@ -196,9 +194,10 @@ ENDIF
 IF      STACKPTR
         ld      sp,STACKPTR
 ENDIF
-		ld      hl,-8        ;Create an atexit() stack
+	ld      hl,-8        ;Create an atexit() stack
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -207,16 +206,6 @@ ENDIF
 	IF DEFINED_USING_amalloc
 		INCLUDE "amalloc.def"
 	ENDIF
-
-IF !DEFINED_nostreams
-; Set up the std* stuff so we can be called again
-        ld      hl,__sgoioblk+2
-        ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
-        ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
-        ld      (hl),21 ;stderr
-ENDIF
 
         call    _main   ;Call user program
         
@@ -234,13 +223,13 @@ ENDIF
         call    restore81
 
 IF (startup>100)
-	IF (startup=101)
-		; LAMBDA specific exit resume code (if any)
-		call	 $12A5	; SLOW
-	ENDIF
-	IF (startup=102)
+    IF (startup=101)
+	; LAMBDA specific exit resume code (if any)
+	call	 $12A5	; SLOW
+    ENDIF
+    IF (startup=102)
         call    altint_off
-	ENDIF
+    ENDIF
 ELSE
 IF (startup>=2)
  IF ((startup=3)|(startup=5)|(startup=13)|(startup=15)|(startup=23)|(startup=25))
@@ -295,24 +284,6 @@ ENDIF
         exx
         ret
 
-IF (!DEFINED_startup | (startup=1))
-a1save: 	defb    0
-ENDIF
-hl1save:	defw	0
-;bc1save:	defw	0
-de1save:	defw	0
-
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-IF !DEFINED_nostreams
-__sgoioblk:
-        INCLUDE "stdio_fp.asm"
-ENDIF
-
-
-        INCLUDE "crt0_runtime_selection.asm"
 
 ;---------------------------------------
 ; Modified IRQ handler
@@ -321,41 +292,42 @@ ENDIF
 IF (startup>100)
 	; LAMBDA modes
 	
-IF (startup=102)
+     IF (startup=102)
         INCLUDE "lambda_altint.def"
-ENDIF
-
+     ENDIF
 ELSE
 
 ; +++++ non-LAMBDA section begin +++++
 
-IF (startup=2)
+    IF (startup=2)
         INCLUDE "zx81_altint.def"
-ENDIF
+    ENDIF
 
 ;-------------------------------------------------
 ; High Resolution Graphics (Wilf Rigter WRX mode)
 ; Code my Matthias Swatosch
 ;-------------------------------------------------
 
-IF (startup>=3)
+    IF (startup>=3)
 	IF ((startup<=7)|(startup>=23))
-        INCLUDE "zx81_hrg.def"
+            INCLUDE "zx81_hrg.def"
+        ENDIF
     ENDIF
-ENDIF
 
 ;-------------------------------------------------
 ; High Resolution Graphics (Andy Rea ARX816 mode)
 ;-------------------------------------------------
 
-IF (startup>=13)
+    IF (startup>=13)
 	IF (startup>=23)
 	;
 	ELSE
-		IF (startup<=17)
-			INCLUDE "zx81_hrg_arx.def"
-		ENDIF
+	    IF (startup<=17)
+		INCLUDE "zx81_hrg_arx.def"
+	    ENDIF
 	ENDIF
+    ENDIF
+; +++++ non-LAMBDA section end +++++
 ENDIF
 
 ;-----------
@@ -372,32 +344,25 @@ _hr_rows:
  ENDIF
 ENDIF
 
-; +++++ non-LAMBDA section end +++++
-ENDIF
-
-coords:         defw    0       ; Current graphics xy coordinates
 
 
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
 
 
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
 
 
 ;                defm  "Small C+ ZX81"   ;Unnecessary file signature
 ;                defb    0
+        INCLUDE "crt0_runtime_selection.asm"
+	INCLUDE "crt0_section.asm"
+
+
+	SECTION bss_crt
+IF (!DEFINED_startup | (startup=1))
+a1save: 	defb    0
+ENDIF
+hl1save:	defw	0
+;bc1save:	defw	0
+de1save:	defw	0
 
 
 

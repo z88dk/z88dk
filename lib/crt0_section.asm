@@ -39,7 +39,7 @@ ENDIF
 		SECTION code_math
 		SECTION code_error
 		SECTION smc_clib
-		SECTION data_bss
+		SECTION data_crt
 		SECTION data_compiler
 		SECTION rodata_fp
 		SECTION rodata_compiler
@@ -61,7 +61,9 @@ IF !coords_space
 	defc coords_space = 2
 ENDIF
 coords:          defs    coords_space       ;Graphics xy coordinates
+IF !DEFINED_basegraphics
 base_graphics:   defw    0       ;Address of graphics map
+ENDIF
 exitsp:          defw    0       ;atexit() stack
 exitcount:       defb    0       ;Number of atexit() routines
 IF DEFINED_USING_amalloc
