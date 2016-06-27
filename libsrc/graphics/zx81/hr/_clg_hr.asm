@@ -8,14 +8,16 @@
 ;       Stefano - 10/1/2007
 ;
 ;
-;	$Id: _clg_hr.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: _clg_hr.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
 ;
-
+                SECTION code_clib
                 PUBLIC    _clg_hr
+                PUBLIC    __clg_hr
                 EXTERN	base_graphics
                 EXTERN	hr_rows
 
 ._clg_hr
+.__clg_hr
 ;----------------------------------------------------------------
 ;
 ; HRG_Tool_Clear

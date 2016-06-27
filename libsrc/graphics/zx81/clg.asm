@@ -1,8 +1,9 @@
-
+	SECTION code_clib
 	PUBLIC	clg
+	PUBLIC	_clg
 
 ;
-;	$Id: clg.asm,v 1.4 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: clg.asm,v 1.5 2016-06-27 20:26:32 dom Exp $
 ;
 
 ; ******************************************************************
@@ -13,6 +14,7 @@
 		EXTERN	filltxt
 
 .clg
+._clg
 		ld	l,0
 		jp	filltxt
 		

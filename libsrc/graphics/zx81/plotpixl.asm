@@ -1,10 +1,11 @@
 
+        SECTION code_clib
 	PUBLIC	plotpixel
 
 	EXTERN	coords
 
 ;
-;	$Id: plotpixl.asm,v 1.12 2015-08-07 06:23:57 stefano Exp $
+;	$Id: plotpixl.asm,v 1.13 2016-06-27 20:26:32 dom Exp $
 ;
 
 ; ******************************************************************

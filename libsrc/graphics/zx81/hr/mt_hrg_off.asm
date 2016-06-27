@@ -5,11 +5,14 @@
 ;
 ;   Set TEXT mode
 ;
-;	$Id: mt_hrg_off.asm,v 1.6 2015-07-08 05:57:53 stefano Exp $
+;	$Id: mt_hrg_off.asm,v 1.7 2016-06-27 20:26:33 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	mt_hrg_off
+	PUBLIC	_mt_hrg_off
 	PUBLIC	hrg_off
+	PUBLIC	_hrg_off
 
 	EXTERN	MTCH_P1
 	EXTERN	MTCH_P2
@@ -17,6 +20,8 @@
 
 .mt_hrg_off
 .hrg_off
+._mt_hrg_off
+._hrg_off
 
 
 ; No need to patch the shadow ROM copy back to original values

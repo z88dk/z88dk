@@ -1,10 +1,10 @@
-
+        SECTION code_clib
 	PUBLIC	pointxy
 
 	EXTERN	coords
 
 ;
-;	$Id: pointxy.asm,v 1.4 2015-08-07 06:23:57 stefano Exp $
+;	$Id: pointxy.asm,v 1.5 2016-06-27 20:26:33 dom Exp $
 ;
 
 ; ******************************************************************

@@ -1,10 +1,10 @@
-
+        SECTION code_clib
 	PUBLIC	xorpixel
 
 	EXTERN	coords
 
 ;
-;	$Id: xorpixl.asm,v 1.7 2015-08-07 06:23:57 stefano Exp $
+;	$Id: xorpixl.asm,v 1.8 2016-06-27 20:26:33 dom Exp $
 ;
 
 ; ******************************************************************

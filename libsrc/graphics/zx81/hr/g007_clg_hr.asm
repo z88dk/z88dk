@@ -5,19 +5,19 @@
 ;
 ;   Set HRG mode and clear screen
 ;
-;	$Id: g007_clg_hr.asm,v 1.4 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: g007_clg_hr.asm,v 1.5 2016-06-27 20:26:33 dom Exp $
 ;
 
+	SECTION  code_clib
 	PUBLIC    _clg_hr
+	PUBLIC    __clg_hr
 	EXTERN     hrg_on
 
 ;	XREF    base_graphics	
 ;	XREF    G007_P2
 
-
-._clg_hr
-
-	jp	hrg_on
+	defc	_clg_hr = hrg_on
+	defc	__clg_hr = hrg_on
 
 ;; if hrgpage has not been specified, then set a default value
 ;	ld      hl,(base_graphics)

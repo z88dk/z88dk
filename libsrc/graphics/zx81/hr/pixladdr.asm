@@ -3,13 +3,13 @@
 ; by Matthias Swatosch
 ;--------------------------------------------------------------
 
-
+	SECTION code_clib
 	PUBLIC	pixeladdress
 
 	EXTERN	base_graphics
 
 ;
-;	$Id: pixladdr.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: pixladdr.asm,v 1.6 2016-06-27 20:26:33 dom Exp $
 ;
 
 ; ******************************************************************

@@ -5,10 +5,12 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: mt_hrg_on.asm,v 1.8 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: mt_hrg_on.asm,v 1.9 2016-06-27 20:26:33 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	mt_hrg_on
+	PUBLIC	_mt_hrg_on
 	PUBLIC	hrgmode
 
 	EXTERN	MTCH_P1
@@ -16,12 +18,15 @@
 	EXTERN	MTCH_P3
 
 	PUBLIC	hrg_on
+	PUBLIC	_hrg_on
 	EXTERN	base_graphics
 
 hrgmode:	defb	2
 
 .mt_hrg_on
 .hrg_on
+._mt_hrg_on
+._hrg_on
 
 ; if hrgpage has not been specified, then set a default value
 	ld      hl,(base_graphics)

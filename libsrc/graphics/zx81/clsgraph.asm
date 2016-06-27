@@ -1,8 +1,8 @@
-
+        SECTION code_clib
 	PUBLIC	cleargraphics
 
 ;
-;	$Id: clsgraph.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: clsgraph.asm,v 1.6 2016-06-27 20:26:32 dom Exp $
 ;
 
 ; ******************************************************************

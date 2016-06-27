@@ -3,10 +3,10 @@
 ;
 ;	ZX 81 version By Stefano Bodrato
 ;
-;	$Id: swapgfxbk.asm,v 1.8 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: swapgfxbk.asm,v 1.9 2016-06-27 20:26:33 dom Exp $
 ;
 
-
+	        SECTION code_clib
                 PUBLIC    swapgfxbk
 
 		PUBLIC	swapgfxbk1

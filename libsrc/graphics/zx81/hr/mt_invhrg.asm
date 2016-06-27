@@ -5,15 +5,18 @@
 ;
 ;   Invert HRG video output (hardware)
 ;
-;	$Id: mt_invhrg.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: mt_invhrg.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	invhrg
+	PUBLIC	_invhrg
 	EXTERN	hrgmode
 
 	; 2=true video, 3=inverse video
 
 .invhrg
+._invhrg
 	ld	a,(hrgmode)
 	xor	1
 	ld	(hrgmode),a

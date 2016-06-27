@@ -1,10 +1,12 @@
+
+        SECTION smc_clib
 	PUBLIC	cleararea
 
 	EXTERN pixeladdress
 	EXTERN leftbitmask, rightbitmask
 
 ;
-;	$Id: clrarea_arx.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: clrarea_arx.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
 ;
 
 ; ***********************************************************************

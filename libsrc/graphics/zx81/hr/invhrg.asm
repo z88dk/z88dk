@@ -8,14 +8,17 @@
 ;       Stefano - Jan 2009
 ;
 ;
-;	$Id: invhrg.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: invhrg.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
 ;
 
+		SECTION code_clib
                 PUBLIC	invhrg
+                PUBLIC	_invhrg
 				
-				EXTERN	HRG_LineStart
+		EXTERN	HRG_LineStart
 
 invhrg:
+_invhrg:
 		ld	b,32
 		ld	hl,HRG_LineStart
 		inc	hl

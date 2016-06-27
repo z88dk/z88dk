@@ -9,12 +9,12 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
+;	$Id: pointxy.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
 ;
 
 
 			INCLUDE	"graphics/grafix.inc"
-
+                        SECTION code_clib
 			PUBLIC	pointxy
 
 			EXTERN	div3

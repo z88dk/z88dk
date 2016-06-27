@@ -6,10 +6,10 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;       $Id: clsgraph.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
+;       $Id: clsgraph.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
 ;
 
-
+		        SECTION code_clib
 			PUBLIC    cleargraphics
 			;EXTERN    loadudg6
 			EXTERN  filltxt

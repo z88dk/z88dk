@@ -5,10 +5,12 @@
 ;
 ;   Set HRG mode
 ;
-;	$Id: g007_hrg_on.asm,v 1.5 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: g007_hrg_on.asm,v 1.6 2016-06-27 20:26:33 dom Exp $
 ;
 
+	SECTION   code_clib
 	PUBLIC    hrg_on
+	PUBLIC    _hrg_on
 	EXTERN     base_graphics
 
 	EXTERN	L0292
@@ -18,6 +20,7 @@
 
 
 .hrg_on
+._hrg_on
 
 	ld		hl,($2306)		; Current HRG page (use CLS 2 / SLOW 4, in BASIC, first)
 	ld		(base_graphics),hl	
