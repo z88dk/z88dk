@@ -32,11 +32,6 @@ errors:
     message	: "\"cannot include file '%s' recursively\", filename"
 	
   # Command line parsing errors
-  - type	: ErrWarn
-    func	: warn_option_deprecated
-    args	: char *option
-    message	: "\"option '%s' is deprecated\", option"
-
   - type	: ErrError
     func	: error_no_src_file
     args	: void

@@ -6,7 +6,6 @@ extern void info_total_errors(void);
 extern void error_read_file(char *filename);
 extern void error_write_file(char *filename);
 extern void error_include_recursion(char *filename);
-extern void warn_option_deprecated(char *option);
 extern void error_no_src_file(void);
 extern void error_illegal_option(char *option);
 extern void error_illegal_src_filename(char *filename);

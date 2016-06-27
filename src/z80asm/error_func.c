@@ -42,15 +42,6 @@ void error_include_recursion(char *filename)
 	
 	STR_DELETE(msg);
 }
-void warn_option_deprecated(char *option)
-{
-	STR_DEFINE(msg, STR_SIZE);
-
-	str_append_sprintf( msg, "option '%s' is deprecated", option );
-	do_error( ErrWarn, str_data(msg) );
-	
-	STR_DELETE(msg);
-}
 void error_no_src_file(void)
 {
 	STR_DEFINE(msg, STR_SIZE);

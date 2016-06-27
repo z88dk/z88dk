@@ -638,46 +638,6 @@ t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "--swap-ix-iy");
 # -C, --line-mode : tested in directives.t
 
 #------------------------------------------------------------------------------
-# -t (deprecated)
-#------------------------------------------------------------------------------
-
-$asm = "
-	PUBLIC main
-main:	ld b,10
-loop:	djnz loop
-	ret
-";
-$bin = "\x06\x0A\x10\xFE\xC9";
-my $map = <<'END';
-ASMHEAD                         = $0000, G: 
-main                            = $0000, G: test
-loop                            = $0002, L: test
-ASMSIZE                         = $0005, G: 
-ASMTAIL                         = $0005, G: 
-END
-
-
-# no -t
-t_z80asm(
-	asm		=> $asm,
-	bin		=> $bin,
-	options	=> '-m',
-);
-ok -f map_file(), map_file();
-eq_or_diff scalar(read_file(map_file())), $map, "mapfile contents";
-
-
-# -t4
-t_z80asm(
-	asm		=> $asm,
-	bin		=> $bin,
-	options	=> '-m -t4',
-	err		=> "Warning: option '-t' is deprecated",
-);
-ok -f map_file(), map_file();
-eq_or_diff scalar(read_file(map_file())), $map, "mapfile contents";
-
-#------------------------------------------------------------------------------
 # -I, --inc-path - tested in directives.t
 #------------------------------------------------------------------------------
 

@@ -11,6 +11,9 @@ Z88DK Z80 Macro Assembler Change Log
   '$'-hex notation, e.g. $1234.
   Remove options -nm and --no-map.
   
+  Remove deprecated option -t - was used to replace spaces by tabs in the
+  map file.
+
 - 2016-06-26
 
   Do not create paginated list and symbol files with headers, page numbers

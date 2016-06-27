@@ -159,9 +159,6 @@ OPT( OptSet,	&opts.map,		"-m", 	"--map", 			OPT_HELP_MAP, "" )
 OPT( OptSet,	&opts.globaldef, "-g", 	"--globaldef", 		OPT_HELP_GLOBALDEF, "" )
 OPT( OptClear,	&opts.globaldef, "-ng", 	"--no-globaldef",	OPT_HELP_NO_GLOBALDEF, "" )
 
-
-OPT( OptDeprecated,	NULL,		"-t", 	"",					"", "" )
-
 /*-----------------------------------------------------------------------------
 *   clear macros
 *----------------------------------------------------------------------------*/

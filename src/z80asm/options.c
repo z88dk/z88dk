@@ -45,7 +45,6 @@ enum OptType
     OptClear, OptSet,
     OptCall, OptCallArg, OptCallOptArg,
     OptString, OptStringList,
-    OptDeprecated,
 };
 
 /* declare functions */
@@ -230,13 +229,6 @@ static void process_opt( int *parg, int argc, char *argv[] )
 
                 break;
 
-            case OptDeprecated:
-                if ( *opt_arg_ptr )
-                    *opt_arg_ptr = '\0';		/* delete option argument for warning message */
-
-                warn_option_deprecated( argv[II] );
-                break;
-
             default:
                 assert(0);
             }
@@ -327,9 +319,6 @@ static void show_option( enum OptType type, Bool *pflag,
 {
 	STR_DEFINE(msg, STR_SIZE);
     int count_opts = 0;
-
-    if ( type == OptDeprecated )
-        return;							/* skip deprecated options */
 
     /* show default option */
     if ( ( type == OptSet   &&   *pflag ) ||

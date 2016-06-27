@@ -109,14 +109,6 @@ t_z80asm_capture("-r0 -a ".obj_file(),
 				 1);
 
 #------------------------------------------------------------------------------
-# warn_option_deprecated
-unlink_testfiles();
-write_file(asm_file(), "");
-t_z80asm_capture("-t0 ".asm_file(), "",
-		"Warning: option '-t' is deprecated\n",
-		0);
-
-#------------------------------------------------------------------------------
 # warn_int_range / error_int_range on pass2 and multi-module assembly
 unlink_testfiles();
 
@@ -579,7 +571,7 @@ t_compile_module($init, <<'END', $objs);
 	check_count(0);
 
 	warn("Warning\n");
-	warn_option_deprecated("-t");
+	warn_deprecated("XREF", "EXTERN");
 	check_count(0);
 
 	warn("Error\n");
@@ -595,7 +587,7 @@ t_run_module([], '', <<'ERR', 0);
 Information
 0 errors occurred during assembly
 Warning
-Warning: option '-t' is deprecated
+Warning: 'XREF' is deprecated, use 'EXTERN' instead
 Error
 Error: syntax error
 File error not caught
