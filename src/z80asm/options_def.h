@@ -81,7 +81,6 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 #define OPT_HELP_MAP			"Create address map file" FILEEXT_MAP
 
 #define OPT_HELP_GLOBALDEF		"Create global definition file" FILEEXT_DEF
-#define OPT_HELP_NO_GLOBALDEF	"No global definition file"
 
 #define OPT_HELP_INC_PATH		"Add directory to include search path"
 #define OPT_HELP_LIB_PATH		"Add directory to library search path"
@@ -157,7 +156,6 @@ OPT( OptClear,	&opts.list,		"-nl", 	"--no-list",		OPT_HELP_NO_LIST, "" )
 OPT( OptSet,	&opts.map,		"-m", 	"--map", 			OPT_HELP_MAP, "" )
 
 OPT( OptSet,	&opts.globaldef, "-g", 	"--globaldef", 		OPT_HELP_GLOBALDEF, "" )
-OPT( OptClear,	&opts.globaldef, "-ng", 	"--no-globaldef",	OPT_HELP_NO_GLOBALDEF, "" )
 
 /*-----------------------------------------------------------------------------
 *   clear macros

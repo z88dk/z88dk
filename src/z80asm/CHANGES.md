@@ -10,9 +10,15 @@ Z88DK Z80 Macro Assembler Change Log
   Map file contains only one list of symbols, ordered by value, and in 
   '$'-hex notation, e.g. $1234.
   Remove options -nm and --no-map.
-  
+
   Remove deprecated option -t - was used to replace spaces by tabs in the
   map file.
+
+  Change def-file to contain also symbols computed at link time, 
+  instead of only the address-type ones, so that DEFC alias to global 
+  symbols are written out.
+
+  Remove -ng and --no-globaldef options.
 
 - 2016-06-26
 

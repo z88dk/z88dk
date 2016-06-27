@@ -410,8 +410,6 @@ static void display_options( void )
 
     if ( opts.list )							puts( OPT_HELP_LIST );
 
-    if ( opts.globaldef )    					puts( OPT_HELP_GLOBALDEF );
-
     if ( opts.lib_file )						puts( OPT_HELP_MAKE_LIB );
 
     if ( opts.make_bin )						puts( OPT_HELP_MAKE_BIN );

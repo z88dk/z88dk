@@ -123,7 +123,6 @@ Output File Options:
 * -nl, --no-list         No listing file
   -m, --map              Create address map file.map
   -g, --globaldef        Create global definition file.def
-* -ng, --no-globaldef    No global definition file
 END
 
 unlink_testfiles();
@@ -155,7 +154,6 @@ ERR
 my $verbose_text = <<'END';
 Create symbol table file.sym
 Create listing file.lst
-Create global definition file.def
 Assemble and link/relocate to file.bin
 
 Assembling 'test.asm'...
@@ -168,7 +166,6 @@ linking module(s)...
 Pass1...
 Code size of linked modules is 3 bytes ($0000 to $0002)
 Pass2...
-Creating global definition file...
 Code generation completed.
 END
 
@@ -424,20 +421,41 @@ ASMTAIL                         = $000B, G:
 END
 
 #------------------------------------------------------------------------------
-# -g, --globaldef, -ng, --no-globaldef
+# -g, --globaldef
 #------------------------------------------------------------------------------
 $asm = "
 	PUBLIC main, x31_x31_x31_x31_x31_x31_x31_x31, x_32_x32_x32_x32_x32_x32_x32_x32
 main: ld b,10
 loop: djnz loop
+	PUBLIC last
+last:
 x31_x31_x31_x31_x31_x31_x31_x31: defb 0
 x_32_x32_x32_x32_x32_x32_x32_x32: defb 0
 ";
 $asm2 = "
+
+	; show DEFC alias in map file
+	PUBLIC alias_main
+	EXTERN main
+	defc alias_main = main
+	
+	PUBLIC alias_last
+	EXTERN last
+	defc alias_last = last
+
 	PUBLIC func
 func: ret
 ";
 $bin = "\x06\x0A\x10\xFE\x00\x00\xC9";
+
+# no -g
+t_z80asm(
+	asm		=> $asm,
+	asm2	=> $asm2,
+	bin		=> $bin,
+	options	=> "",
+);
+ok ! -f def_file(), "no ".def_file();
 
 # -g
 for my $options ('-g', '--globaldef') {
@@ -450,21 +468,13 @@ for my $options ('-g', '--globaldef') {
 	ok -f def_file(), def_file();
 	eq_or_diff scalar(read_file(def_file())), <<'END', "deffile contents";
 DEFC main                            = $0000 ; Module test
+DEFC alias_main                      = $0000 ; Module test2
 DEFC x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ; Module test
+DEFC last                            = $0004 ; Module test
+DEFC alias_last                      = $0004 ; Module test2
 DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ; Module test
 DEFC func                            = $0006 ; Module test2
 END
-}
-
-# -ng
-for my $options ('-g -ng', '--globaldef --no-globaldef') {
-	t_z80asm(
-		asm		=> $asm,
-		asm2	=> $asm2,
-		bin		=> $bin,
-		options	=> $options,
-	);
-	ok ! -f def_file(), "no ".def_file();
 }
 
 #------------------------------------------------------------------------------
