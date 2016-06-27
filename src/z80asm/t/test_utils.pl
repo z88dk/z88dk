@@ -159,11 +159,11 @@ sub t_z80asm {
 		ok -f $_, "$line $_" for (@obj, bin_file());
 		
 		# map file
-		if ($cmd =~ / (-nm|--no-map) /) {
-			ok ! -f map_file(), "$line no ".map_file();
+		if ($cmd =~ / (-m|--map) /) {
+			ok   -f map_file(), "$line ".map_file();
 		}
 		else {
-			ok   -f map_file(), "$line ".map_file();
+			ok ! -f map_file(), "$line no ".map_file();
 		}
 		
 		my $binary = read_file(bin_file(), binmode => ':raw', err_mode => 'quiet');

@@ -4,6 +4,13 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-06-27
+
+  Only generate .map file if -m or --map option is given.
+  Map file contains only one list of symbols, ordered by value, and in 
+  '$'-hex notation, e.g. $1234.
+  Remove options -nm and --no-map.
+  
 - 2016-06-26
 
   Do not create paginated list and symbol files with headers, page numbers

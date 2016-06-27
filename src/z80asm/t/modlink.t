@@ -57,7 +57,7 @@ my $bin = read_binfile("test.bin");
 
 # link only
 z80asm(
-	options => "-d -b test.obj test1.obj",
+	options => "-d -b -m test.obj test1.obj",
 	bin		=> $bin,
 );
 
@@ -113,18 +113,11 @@ File test1.obj at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-ASMHEAD                         = 1234, G: 
-ASMSIZE                         = 0038, G: 
-ASMTAIL                         = 126C, G: 
-a1                              = 1247, G: test
-a2                              = 1263, G: test1
-
-
-ASMSIZE                         = 0038, G: 
-ASMHEAD                         = 1234, G: 
-a1                              = 1247, G: test
-a2                              = 1263, G: test1
-ASMTAIL                         = 126C, G: 
+ASMSIZE                         = $0038, G: 
+ASMHEAD                         = $1234, G: 
+a1                              = $1247, G: test
+a2                              = $1263, G: test1
+ASMTAIL                         = $126C, G: 
 END
 
 #------------------------------------------------------------------------------
@@ -218,7 +211,7 @@ ASM1
 
 # link only
 z80asm(
-	options => "-d -b test.obj test1.obj",
+	options => "-d -b -m test.obj test1.obj",
 	bin		=> $expected_bin,
 );
 
@@ -267,42 +260,23 @@ File test1.obj at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-ASMHEAD                         = 1234, G: 
-ASMHEAD_code                    = 1234, G: 
-ASMHEAD_data                    = 1259, G: 
-ASMSIZE                         = 0031, G: 
-ASMSIZE_code                    = 0025, G: 
-ASMSIZE_data                    = 000C, G: 
-ASMTAIL                         = 1265, G: 
-ASMTAIL_code                    = 1259, G: 
-ASMTAIL_data                    = 1265, G: 
-mes0                            = 1264, G: test1
-mes0end                         = 1265, G: test1
-mes1                            = 1259, L: test
-mes1end                         = 125E, L: test
-mes2                            = 125E, L: test
-mes2end                         = 1264, L: test
-prmes                           = 1250, G: test1
-start                           = 1234, L: test
-
-
-ASMSIZE_data                    = 000C, G: 
-ASMSIZE_code                    = 0025, G: 
-ASMSIZE                         = 0031, G: 
-ASMHEAD                         = 1234, G: 
-ASMHEAD_code                    = 1234, G: 
-start                           = 1234, L: test
-prmes                           = 1250, G: test1
-ASMHEAD_data                    = 1259, G: 
-ASMTAIL_code                    = 1259, G: 
-mes1                            = 1259, L: test
-mes1end                         = 125E, L: test
-mes2                            = 125E, L: test
-mes0                            = 1264, G: test1
-mes2end                         = 1264, L: test
-ASMTAIL                         = 1265, G: 
-ASMTAIL_data                    = 1265, G: 
-mes0end                         = 1265, G: test1
+ASMSIZE_data                    = $000C, G: 
+ASMSIZE_code                    = $0025, G: 
+ASMSIZE                         = $0031, G: 
+ASMHEAD                         = $1234, G: 
+ASMHEAD_code                    = $1234, G: 
+start                           = $1234, L: test
+prmes                           = $1250, G: test1
+ASMHEAD_data                    = $1259, G: 
+ASMTAIL_code                    = $1259, G: 
+mes1                            = $1259, L: test
+mes1end                         = $125E, L: test
+mes2                            = $125E, L: test
+mes0                            = $1264, G: test1
+mes2end                         = $1264, L: test
+ASMTAIL                         = $1265, G: 
+ASMTAIL_data                    = $1265, G: 
+mes0end                         = $1265, G: test1
 END
 
 #------------------------------------------------------------------------------

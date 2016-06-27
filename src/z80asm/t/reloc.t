@@ -73,7 +73,7 @@ my $asm = "section code\norg $code_addr\n".code_asm("").
 
 unlink_testfiles();
 write_file("test.asm", $asm);
-t_z80asm_capture("-b test.asm", "", "", 0);
+t_z80asm_capture("-b -m test.asm", "", "", 0);
 
 t_binary(read_binfile("test.bin"), "");
 t_binary(read_binfile("test.reloc"), "");
@@ -93,38 +93,21 @@ t_binary(read_binfile("test_data.bin"),
 t_binary(read_binfile("test_data.reloc"), "");
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = 0000, G: 
-ASMHEAD_code                    = 1020, G: 
-ASMHEAD_data                    = 3040, G: 
-ASMSIZE                         = 3060, G: 
-ASMSIZE_code                    = 0036, G: 
-ASMSIZE_data                    = 0020, G: 
-ASMTAIL                         = 3060, G: 
-ASMTAIL_code                    = 1056, G: 
-ASMTAIL_data                    = 3060, G: 
-start1                          = 1032, L: test
-start2                          = 1044, L: test
-start                           = 1020, L: test
-string1                         = 304A, L: test
-string2                         = 3055, L: test
-string                          = 3040, L: test
-
-
-ASMHEAD                         = 0000, G: 
-ASMSIZE_data                    = 0020, G: 
-ASMSIZE_code                    = 0036, G: 
-ASMHEAD_code                    = 1020, G: 
-start                           = 1020, L: test
-start1                          = 1032, L: test
-start2                          = 1044, L: test
-ASMTAIL_code                    = 1056, G: 
-ASMHEAD_data                    = 3040, G: 
-string                          = 3040, L: test
-string1                         = 304A, L: test
-string2                         = 3055, L: test
-ASMSIZE                         = 3060, G: 
-ASMTAIL                         = 3060, G: 
-ASMTAIL_data                    = 3060, G: 
+ASMHEAD                         = $0000, G: 
+ASMSIZE_data                    = $0020, G: 
+ASMSIZE_code                    = $0036, G: 
+ASMHEAD_code                    = $1020, G: 
+start                           = $1020, L: test
+start1                          = $1032, L: test
+start2                          = $1044, L: test
+ASMTAIL_code                    = $1056, G: 
+ASMHEAD_data                    = $3040, G: 
+string                          = $3040, L: test
+string1                         = $304A, L: test
+string2                         = $3055, L: test
+ASMSIZE                         = $3060, G: 
+ASMTAIL                         = $3060, G: 
+ASMTAIL_data                    = $3060, G: 
 ...
 
 #------------------------------------------------------------------------------
@@ -138,7 +121,7 @@ $asm = code_asm("").code_asm("1").code_asm("2").
 my @reloc = reloc_addrs($asm);
 my $reloc_header = reloc_header(@reloc);
 
-t_z80asm_capture("-b --relocatable test.asm", 
+t_z80asm_capture("-b -m --relocatable test.asm", 
 				 "Relocation header is ".length($reloc_header)." bytes.\n", <<'ERR', 0);
 Warning at module 'test': --relocatable ignores ORG at file 'test.obj', section 'code'
 Warning at module 'test': --relocatable ignores ORG at file 'test.obj', section 'data'
@@ -153,38 +136,21 @@ ok ! -f "test_data.bin";
 ok ! -f "test_data.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = 005F, G: 
-ASMHEAD_code                    = 005F, G: 
-ASMHEAD_data                    = 0095, G: 
-ASMSIZE                         = 00B5, G: 
-ASMSIZE_code                    = 0095, G: 
-ASMSIZE_data                    = 007F, G: 
-ASMTAIL                         = 00B5, G: 
-ASMTAIL_code                    = 0095, G: 
-ASMTAIL_data                    = 00B5, G: 
-start1                          = 0071, L: test
-start2                          = 0083, L: test
-start                           = 005F, L: test
-string1                         = 009F, L: test
-string2                         = 00AA, L: test
-string                          = 0095, L: test
-
-
-ASMHEAD                         = 005F, G: 
-ASMHEAD_code                    = 005F, G: 
-start                           = 005F, L: test
-start1                          = 0071, L: test
-ASMSIZE_data                    = 007F, G: 
-start2                          = 0083, L: test
-ASMHEAD_data                    = 0095, G: 
-ASMSIZE_code                    = 0095, G: 
-ASMTAIL_code                    = 0095, G: 
-string                          = 0095, L: test
-string1                         = 009F, L: test
-string2                         = 00AA, L: test
-ASMSIZE                         = 00B5, G: 
-ASMTAIL                         = 00B5, G: 
-ASMTAIL_data                    = 00B5, G: 
+ASMHEAD                         = $005F, G: 
+ASMHEAD_code                    = $005F, G: 
+start                           = $005F, L: test
+start1                          = $0071, L: test
+ASMSIZE_data                    = $007F, G: 
+start2                          = $0083, L: test
+ASMHEAD_data                    = $0095, G: 
+ASMSIZE_code                    = $0095, G: 
+ASMTAIL_code                    = $0095, G: 
+string                          = $0095, L: test
+string1                         = $009F, L: test
+string2                         = $00AA, L: test
+ASMSIZE                         = $00B5, G: 
+ASMTAIL                         = $00B5, G: 
+ASMTAIL_data                    = $00B5, G: 
 ...
 
 #------------------------------------------------------------------------------
@@ -209,7 +175,7 @@ write_file("test2.asm",
 		code_asm("2").
 		"section data\n".
 		data_asm("2"));
-t_z80asm_capture("-b test.asm test1.asm test2.asm", "", "", 0);
+t_z80asm_capture("-b -m test.asm test1.asm test2.asm", "", "", 0);
 
 t_binary(read_binfile("test.bin"), "");
 t_binary(read_binfile("test.reloc"), "");
@@ -229,38 +195,21 @@ t_binary(read_binfile("test_data.bin"),
 t_binary(read_binfile("test_data.reloc"), "");
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = 0000, G: 
-ASMHEAD_code                    = 1020, G: 
-ASMHEAD_data                    = 3040, G: 
-ASMSIZE                         = 3060, G: 
-ASMSIZE_code                    = 0036, G: 
-ASMSIZE_data                    = 0020, G: 
-ASMTAIL                         = 3060, G: 
-ASMTAIL_code                    = 1056, G: 
-ASMTAIL_data                    = 3060, G: 
-start1                          = 1032, G: test1
-start2                          = 1044, G: test2
-start                           = 1020, G: test
-string1                         = 304A, G: test1
-string2                         = 3055, G: test2
-string                          = 3040, G: test
-
-
-ASMHEAD                         = 0000, G: 
-ASMSIZE_data                    = 0020, G: 
-ASMSIZE_code                    = 0036, G: 
-ASMHEAD_code                    = 1020, G: 
-start                           = 1020, G: test
-start1                          = 1032, G: test1
-start2                          = 1044, G: test2
-ASMTAIL_code                    = 1056, G: 
-ASMHEAD_data                    = 3040, G: 
-string                          = 3040, G: test
-string1                         = 304A, G: test1
-string2                         = 3055, G: test2
-ASMSIZE                         = 3060, G: 
-ASMTAIL                         = 3060, G: 
-ASMTAIL_data                    = 3060, G: 
+ASMHEAD                         = $0000, G: 
+ASMSIZE_data                    = $0020, G: 
+ASMSIZE_code                    = $0036, G: 
+ASMHEAD_code                    = $1020, G: 
+start                           = $1020, G: test
+start1                          = $1032, G: test1
+start2                          = $1044, G: test2
+ASMTAIL_code                    = $1056, G: 
+ASMHEAD_data                    = $3040, G: 
+string                          = $3040, G: test
+string1                         = $304A, G: test1
+string2                         = $3055, G: test2
+ASMSIZE                         = $3060, G: 
+ASMTAIL                         = $3060, G: 
+ASMTAIL_data                    = $3060, G: 
 ...
 
 #------------------------------------------------------------------------------
@@ -291,7 +240,7 @@ $asm = code_asm("").code_asm("1").code_asm("2").
 @reloc = reloc_addrs($asm);
 $reloc_header = reloc_header(@reloc);
 
-t_z80asm_capture("-b --relocatable test.asm test1.asm test2.asm", 
+t_z80asm_capture("-b -m --relocatable test.asm test1.asm test2.asm", 
 				 "Relocation header is ".length($reloc_header)." bytes.\n", <<'ERR', 0);
 Warning at module 'test': --relocatable ignores ORG at file 'test.obj', section 'code'
 Warning at module 'test': --relocatable ignores ORG at file 'test.obj', section 'data'
@@ -310,38 +259,21 @@ ok ! -f "test_data.bin";
 ok ! -f "test_data.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = 005F, G: 
-ASMHEAD_code                    = 005F, G: 
-ASMHEAD_data                    = 0095, G: 
-ASMSIZE                         = 00B5, G: 
-ASMSIZE_code                    = 0095, G: 
-ASMSIZE_data                    = 007F, G: 
-ASMTAIL                         = 00B5, G: 
-ASMTAIL_code                    = 0095, G: 
-ASMTAIL_data                    = 00B5, G: 
-start1                          = 0071, G: test1
-start2                          = 0083, G: test2
-start                           = 005F, G: test
-string1                         = 009F, G: test1
-string2                         = 00AA, G: test2
-string                          = 0095, G: test
-
-
-ASMHEAD                         = 005F, G: 
-ASMHEAD_code                    = 005F, G: 
-start                           = 005F, G: test
-start1                          = 0071, G: test1
-ASMSIZE_data                    = 007F, G: 
-start2                          = 0083, G: test2
-ASMHEAD_data                    = 0095, G: 
-ASMSIZE_code                    = 0095, G: 
-ASMTAIL_code                    = 0095, G: 
-string                          = 0095, G: test
-string1                         = 009F, G: test1
-string2                         = 00AA, G: test2
-ASMSIZE                         = 00B5, G: 
-ASMTAIL                         = 00B5, G: 
-ASMTAIL_data                    = 00B5, G: 
+ASMHEAD                         = $005F, G: 
+ASMHEAD_code                    = $005F, G: 
+start                           = $005F, G: test
+start1                          = $0071, G: test1
+ASMSIZE_data                    = $007F, G: 
+start2                          = $0083, G: test2
+ASMHEAD_data                    = $0095, G: 
+ASMSIZE_code                    = $0095, G: 
+ASMTAIL_code                    = $0095, G: 
+string                          = $0095, G: test
+string1                         = $009F, G: test1
+string2                         = $00AA, G: test2
+ASMSIZE                         = $00B5, G: 
+ASMTAIL                         = $00B5, G: 
+ASMTAIL_data                    = $00B5, G: 
 ...
 
 #------------------------------------------------------------------------------
@@ -366,7 +298,7 @@ write_file("test.asm", <<"...".
 	"section data\n" .data_asm("").
 	"section data1\n".data_asm("1").
 	"section data2\n".data_asm("2"));
-t_z80asm_capture("-b test.asm", "", "", 0);
+t_z80asm_capture("-b -m test.asm", "", "", 0);
 
 t_binary(read_binfile("test.bin"), "");
 t_binary(read_binfile("test.reloc"), "");
@@ -396,62 +328,33 @@ ok ! -f "test_data2.bin";
 ok ! -f "test_data2.reloc";
 
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = 0000, G: 
-ASMHEAD_code                    = 1020, G: 
-ASMHEAD_code1                   = 1032, G: 
-ASMHEAD_code2                   = 1044, G: 
-ASMHEAD_data                    = 3040, G: 
-ASMHEAD_data1                   = 304A, G: 
-ASMHEAD_data2                   = 3055, G: 
-ASMSIZE                         = 3060, G: 
-ASMSIZE_code                    = 0012, G: 
-ASMSIZE_code1                   = 0012, G: 
-ASMSIZE_code2                   = 0012, G: 
-ASMSIZE_data                    = 000A, G: 
-ASMSIZE_data1                   = 000B, G: 
-ASMSIZE_data2                   = 000B, G: 
-ASMTAIL                         = 3060, G: 
-ASMTAIL_code                    = 1032, G: 
-ASMTAIL_code1                   = 1044, G: 
-ASMTAIL_code2                   = 1056, G: 
-ASMTAIL_data                    = 304A, G: 
-ASMTAIL_data1                   = 3055, G: 
-ASMTAIL_data2                   = 3060, G: 
-start1                          = 1032, L: test
-start2                          = 1044, L: test
-start                           = 1020, L: test
-string1                         = 304A, L: test
-string2                         = 3055, L: test
-string                          = 3040, L: test
-
-
-ASMHEAD                         = 0000, G: 
-ASMSIZE_data                    = 000A, G: 
-ASMSIZE_data1                   = 000B, G: 
-ASMSIZE_data2                   = 000B, G: 
-ASMSIZE_code                    = 0012, G: 
-ASMSIZE_code1                   = 0012, G: 
-ASMSIZE_code2                   = 0012, G: 
-ASMHEAD_code                    = 1020, G: 
-start                           = 1020, L: test
-ASMHEAD_code1                   = 1032, G: 
-ASMTAIL_code                    = 1032, G: 
-start1                          = 1032, L: test
-ASMHEAD_code2                   = 1044, G: 
-ASMTAIL_code1                   = 1044, G: 
-start2                          = 1044, L: test
-ASMTAIL_code2                   = 1056, G: 
-ASMHEAD_data                    = 3040, G: 
-string                          = 3040, L: test
-ASMHEAD_data1                   = 304A, G: 
-ASMTAIL_data                    = 304A, G: 
-string1                         = 304A, L: test
-ASMHEAD_data2                   = 3055, G: 
-ASMTAIL_data1                   = 3055, G: 
-string2                         = 3055, L: test
-ASMSIZE                         = 3060, G: 
-ASMTAIL                         = 3060, G: 
-ASMTAIL_data2                   = 3060, G: 
+ASMHEAD                         = $0000, G: 
+ASMSIZE_data                    = $000A, G: 
+ASMSIZE_data1                   = $000B, G: 
+ASMSIZE_data2                   = $000B, G: 
+ASMSIZE_code                    = $0012, G: 
+ASMSIZE_code1                   = $0012, G: 
+ASMSIZE_code2                   = $0012, G: 
+ASMHEAD_code                    = $1020, G: 
+start                           = $1020, L: test
+ASMHEAD_code1                   = $1032, G: 
+ASMTAIL_code                    = $1032, G: 
+start1                          = $1032, L: test
+ASMHEAD_code2                   = $1044, G: 
+ASMTAIL_code1                   = $1044, G: 
+start2                          = $1044, L: test
+ASMTAIL_code2                   = $1056, G: 
+ASMHEAD_data                    = $3040, G: 
+string                          = $3040, L: test
+ASMHEAD_data1                   = $304A, G: 
+ASMTAIL_data                    = $304A, G: 
+string1                         = $304A, L: test
+ASMHEAD_data2                   = $3055, G: 
+ASMTAIL_data1                   = $3055, G: 
+string2                         = $3055, L: test
+ASMSIZE                         = $3060, G: 
+ASMTAIL                         = $3060, G: 
+ASMTAIL_data2                   = $3060, G: 
 ...
 
 unlink_testfiles();

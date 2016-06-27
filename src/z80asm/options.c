@@ -429,8 +429,6 @@ static void display_options( void )
 
     if ( opts.library )							puts( OPT_HELP_USE_LIB );
 
-    if ( opts.make_bin && opts.map )			puts( OPT_HELP_MAP );
-
     if ( opts.relocatable )						puts( OPT_HELP_RELOCATABLE );
 
     putchar( '\n' );

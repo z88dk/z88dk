@@ -287,7 +287,7 @@ note "BUG_0018";
 	write_file("test".($levels+1).".prj", "");
 
 	z80asm(
-		options	=> "-r0 -b -ns -nm -otest.bin \@test.prj",
+		options	=> "-r0 -b -ns -otest.bin \@test.prj",
 		bin		=> $bin,
 	);
 }
@@ -527,10 +527,10 @@ note "BUG_0049";
 	write_file("test.prj", join("\n", @list), "\n");
 	
 	# assemble all first
-	z80asm( %args, options => '   -ns -nm -r0 -b @test.prj' );
+	z80asm( %args, options => '   -ns -r0 -b @test.prj' );
 	
 	# assemble all with -d, make lib - failed with too many open files
-	z80asm( %args, options => '-d -ns -nm -r0 -b @test.prj' );
+	z80asm( %args, options => '-d -ns -r0 -b @test.prj' );
 }
 
 #------------------------------------------------------------------------------
@@ -539,11 +539,11 @@ note "BUG_0050";
 z80asm(
 	asm1 =>	"defs 65000",
 	asm2 =>	"defs 65000",
-	options => "-ns -nm",
+	options => "-ns ",
 	ok => 1,
 );
 z80asm(
-	options => "-d -ns -nm -xtest.lib test1 test2",
+	options => "-d -ns -xtest.lib test1 test2",
 	ok => 1,
 );
 
@@ -616,39 +616,24 @@ z80asm(
 
 		defc var_2 = var_1
 ...
+	options => "-b -m",
 	bin_file => "test_AAA.bin",
 );
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = 0000, G: 
-ASMHEAD_AAA                     = 0000, G: 
-ASMHEAD_BBB                     = 0002, G: 
-ASMHEAD_CCC                     = 0003, G: 
-ASMSIZE                         = 0005, G: 
-ASMSIZE_AAA                     = 0002, G: 
-ASMSIZE_BBB                     = 0001, G: 
-ASMSIZE_CCC                     = 0002, G: 
-ASMTAIL                         = 0005, G: 
-ASMTAIL_AAA                     = 0002, G: 
-ASMTAIL_BBB                     = 0003, G: 
-ASMTAIL_CCC                     = 0005, G: 
-var_1                           = 0002, L: test
-var_2                           = 0002, L: test
-
-
-ASMHEAD                         = 0000, G: 
-ASMHEAD_AAA                     = 0000, G: 
-ASMSIZE_BBB                     = 0001, G: 
-ASMHEAD_BBB                     = 0002, G: 
-ASMSIZE_AAA                     = 0002, G: 
-ASMSIZE_CCC                     = 0002, G: 
-ASMTAIL_AAA                     = 0002, G: 
-var_1                           = 0002, L: test
-var_2                           = 0002, L: test
-ASMHEAD_CCC                     = 0003, G: 
-ASMTAIL_BBB                     = 0003, G: 
-ASMSIZE                         = 0005, G: 
-ASMTAIL                         = 0005, G: 
-ASMTAIL_CCC                     = 0005, G: 
+ASMHEAD                         = $0000, G: 
+ASMHEAD_AAA                     = $0000, G: 
+ASMSIZE_BBB                     = $0001, G: 
+ASMHEAD_BBB                     = $0002, G: 
+ASMSIZE_AAA                     = $0002, G: 
+ASMSIZE_CCC                     = $0002, G: 
+ASMTAIL_AAA                     = $0002, G: 
+var_1                           = $0002, L: test
+var_2                           = $0002, L: test
+ASMHEAD_CCC                     = $0003, G: 
+ASMTAIL_BBB                     = $0003, G: 
+ASMSIZE                         = $0005, G: 
+ASMTAIL                         = $0005, G: 
+ASMTAIL_CCC                     = $0005, G: 
 ...
 
 z80asm(
@@ -673,37 +658,22 @@ z80asm(
 		SECTION BBB
 		defc var_2 = var_1
 ...
+	options => "-b -m",
 	bin_file => "test_AAA.bin",
 );
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = 0000, G: 
-ASMHEAD_AAA                     = 0000, G: 
-ASMHEAD_BBB                     = 0002, G: 
-ASMHEAD_CCC                     = 0003, G: 
-ASMSIZE                         = 0005, G: 
-ASMSIZE_AAA                     = 0002, G: 
-ASMSIZE_BBB                     = 0001, G: 
-ASMSIZE_CCC                     = 0002, G: 
-ASMTAIL                         = 0005, G: 
-ASMTAIL_AAA                     = 0002, G: 
-ASMTAIL_BBB                     = 0003, G: 
-ASMTAIL_CCC                     = 0005, G: 
-var_1                           = 0002, L: test
-var_2                           = 0002, L: test
-
-
-ASMHEAD                         = 0000, G: 
-ASMHEAD_AAA                     = 0000, G: 
-ASMSIZE_BBB                     = 0001, G: 
-ASMHEAD_BBB                     = 0002, G: 
-ASMSIZE_AAA                     = 0002, G: 
-ASMSIZE_CCC                     = 0002, G: 
-ASMTAIL_AAA                     = 0002, G: 
-var_1                           = 0002, L: test
-var_2                           = 0002, L: test
-ASMHEAD_CCC                     = 0003, G: 
-ASMTAIL_BBB                     = 0003, G: 
-ASMSIZE                         = 0005, G: 
-ASMTAIL                         = 0005, G: 
-ASMTAIL_CCC                     = 0005, G: 
+ASMHEAD                         = $0000, G: 
+ASMHEAD_AAA                     = $0000, G: 
+ASMSIZE_BBB                     = $0001, G: 
+ASMHEAD_BBB                     = $0002, G: 
+ASMSIZE_AAA                     = $0002, G: 
+ASMSIZE_CCC                     = $0002, G: 
+ASMTAIL_AAA                     = $0002, G: 
+var_1                           = $0002, L: test
+var_2                           = $0002, L: test
+ASMHEAD_CCC                     = $0003, G: 
+ASMTAIL_BBB                     = $0003, G: 
+ASMSIZE                         = $0005, G: 
+ASMTAIL                         = $0005, G: 
+ASMTAIL_CCC                     = $0005, G: 
 ...

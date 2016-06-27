@@ -369,24 +369,14 @@ DEFC public_label                    = $0004 ; Module test
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
-ASMHEAD                         = 0004, G: 
-ASMSIZE                         = 0005, G: 
-ASMTAIL                         = 0009, G: 
-defc_var                        = 0002, G: test
-defvars_var                     = 0003, G: test
-local_label                     = 0009, L: test
-minus_d_var                     = 0001, G: test
-public_label                    = 0004, G: test
-
-
-minus_d_var                     = 0001, G: test
-defc_var                        = 0002, G: test
-defvars_var                     = 0003, G: test
-ASMHEAD                         = 0004, G: 
-public_label                    = 0004, G: test
-ASMSIZE                         = 0005, G: 
-ASMTAIL                         = 0009, G: 
-local_label                     = 0009, L: test
+minus_d_var                     = $0001, G: test
+defc_var                        = $0002, G: test
+defvars_var                     = $0003, G: test
+ASMHEAD                         = $0004, G: 
+public_label                    = $0004, G: test
+ASMSIZE                         = $0005, G: 
+ASMTAIL                         = $0009, G: 
+local_label                     = $0009, L: test
 END
 
 #------------------------------------------------------------------------------

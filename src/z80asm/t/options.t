@@ -121,8 +121,7 @@ Output File Options:
   -ns, --no-symtable     No symbol table file
   -l, --list             Create listing file.lst
 * -nl, --no-list         No listing file
-* -m, --map              Create address map file.map
-  -nm, --no-map          No address map file
+  -m, --map              Create address map file.map
   -g, --globaldef        Create global definition file.def
 * -ng, --no-globaldef    No global definition file
 END
@@ -158,7 +157,6 @@ Create symbol table file.sym
 Create listing file.lst
 Create global definition file.def
 Assemble and link/relocate to file.bin
-Create address map file.map
 
 Assembling 'test.asm'...
 Pass1...
@@ -170,7 +168,6 @@ linking module(s)...
 Pass1...
 Code size of linked modules is 3 bytes ($0000 to $0002)
 Pass2...
-Creating map...
 Creating global definition file...
 Code generation completed.
 END
@@ -345,7 +342,7 @@ for my $options ('', '-nl', '-s', '--symtable', '-nl -s', '-nl --symtable') {
 }
 
 #------------------------------------------------------------------------------
-# -m, --map, -nm, --no-map
+# -m, --map
 #------------------------------------------------------------------------------
 note "BUG_0036";
 $asm = "
@@ -366,6 +363,13 @@ loop: djnz loop
 ";
 $bin = "\x06\x0A\x10\xFE\x00\x00\x06\x0A\x10\xFE\xC9";
 
+# no -m
+t_z80asm(
+	asm		=> "ld b,10 : djnz ASMPC : defw 0",
+	asm2	=> "ld b,10 : djnz ASMPC : ret",
+	bin		=> $bin,
+);
+ok ! -f map_file(), map_file();
 
 # -m, no symbols
 for my $options ('-m', '--map') {
@@ -377,62 +381,32 @@ for my $options ('-m', '--map') {
 	);
 	ok -f map_file(), map_file();
 	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-ASMHEAD                         = 0000, G: 
-ASMSIZE                         = 000B, G: 
-ASMTAIL                         = 000B, G: 
-
-
-ASMHEAD                         = 0000, G: 
-ASMSIZE                         = 000B, G: 
-ASMTAIL                         = 000B, G: 
+ASMHEAD                         = $0000, G: 
+ASMSIZE                         = $000B, G: 
+ASMTAIL                         = $000B, G: 
 END
 }
 
 # -m
-for my $options ('-m', '--map') {
-	t_z80asm(
-		asm		=> $asm,
-		asm2	=> $asm2,
-		bin		=> $bin,
-		options	=> $options,
-	);
-	ok -f map_file(), map_file();
-	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-ASMHEAD                         = 0000, G: 
-ASMSIZE                         = 000B, G: 
-ASMTAIL                         = 000B, G: 
-func                            = 0006, G: test2
-loop                            = 0002, L: test
-loop                            = 0008, L: test2
-main                            = 0000, G: test
-x31_x31_x31_x31_x31_x31_x31_x31 = 0004, L: test
-x_32_x32_x32_x32_x32_x32_x32_x32 = 0005, L: test
-zero                            = 0000, L: test
-
-
-ASMHEAD                         = 0000, G: 
-main                            = 0000, G: test
-zero                            = 0000, L: test
-loop                            = 0002, L: test
-x31_x31_x31_x31_x31_x31_x31_x31 = 0004, L: test
-x_32_x32_x32_x32_x32_x32_x32_x32 = 0005, L: test
-func                            = 0006, G: test2
-loop                            = 0008, L: test2
-ASMSIZE                         = 000B, G: 
-ASMTAIL                         = 000B, G: 
+t_z80asm(
+	asm		=> $asm,
+	asm2	=> $asm2,
+	bin		=> $bin,
+	options	=> '-m',
+);
+ok -f map_file(), map_file();
+eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
+ASMHEAD                         = $0000, G: 
+main                            = $0000, G: test
+zero                            = $0000, L: test
+loop                            = $0002, L: test
+x31_x31_x31_x31_x31_x31_x31_x31 = $0004, L: test
+x_32_x32_x32_x32_x32_x32_x32_x32 = $0005, L: test
+func                            = $0006, G: test2
+loop                            = $0008, L: test2
+ASMSIZE                         = $000B, G: 
+ASMTAIL                         = $000B, G: 
 END
-}
-
-# -nm
-for my $options ('-m -nm', '--map --no-map') {
-	t_z80asm(
-		asm		=> $asm,
-		asm2	=> $asm2,
-		bin		=> $bin,
-		options	=> $options,
-	);
-	ok ! -f map_file(), "no ".map_file();
-}
 
 #------------------------------------------------------------------------------
 # -g, --globaldef, -ng, --no-globaldef
@@ -490,7 +464,6 @@ for my $options ('-b', '--make-bin') {
 	t_z80asm_capture("-r0 $options ".asm_file(), "", "", 0);
 	ok -f obj_file();
 	ok -f bin_file();
-	ok -f map_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0";
 }
 
@@ -501,7 +474,6 @@ for my $options ('-b -nb', '--make-bin --no-make-bin') {
 
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
 	ok -f obj_file();
-	ok ! -f map_file();
 	ok ! -f bin_file();
 }
 
@@ -677,18 +649,11 @@ loop:	djnz loop
 ";
 $bin = "\x06\x0A\x10\xFE\xC9";
 my $map = <<'END';
-ASMHEAD                         = 0000, G: 
-ASMSIZE                         = 0005, G: 
-ASMTAIL                         = 0005, G: 
-loop                            = 0002, L: test
-main                            = 0000, G: test
-
-
-ASMHEAD                         = 0000, G: 
-main                            = 0000, G: test
-loop                            = 0002, L: test
-ASMSIZE                         = 0005, G: 
-ASMTAIL                         = 0005, G: 
+ASMHEAD                         = $0000, G: 
+main                            = $0000, G: test
+loop                            = $0002, L: test
+ASMSIZE                         = $0005, G: 
+ASMTAIL                         = $0005, G: 
 END
 
 

@@ -20,7 +20,7 @@ OPT_VAR( Bool,		verbose,	FALSE	)
 OPT_VAR( Bool,		symtable,	TRUE	)
 OPT_VAR( Bool,		list,		FALSE	)	/* -l flag */
 OPT_VAR( Bool,		cur_list,	FALSE	)	/* current LSTON/LSTOFF status */
-OPT_VAR( Bool,		map,		TRUE	)
+OPT_VAR( Bool,		map,		FALSE	)
 OPT_VAR( Bool,		ti83plus,	FALSE	)
 OPT_VAR( Bool,		swap_ix_iy,	FALSE	)
 OPT_VAR( Bool,		line_mode,	FALSE	)
@@ -79,7 +79,6 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 #define OPT_HELP_NO_LIST		"No listing file"
 
 #define OPT_HELP_MAP			"Create address map file" FILEEXT_MAP
-#define OPT_HELP_NO_MAP			"No address map file"
 
 #define OPT_HELP_GLOBALDEF		"Create global definition file" FILEEXT_DEF
 #define OPT_HELP_NO_GLOBALDEF	"No global definition file"
@@ -156,7 +155,6 @@ OPT( OptSet,	&opts.list,		"-l", 	"--list", 			OPT_HELP_LIST, "" )
 OPT( OptClear,	&opts.list,		"-nl", 	"--no-list",		OPT_HELP_NO_LIST, "" )
 
 OPT( OptSet,	&opts.map,		"-m", 	"--map", 			OPT_HELP_MAP, "" )
-OPT( OptClear,	&opts.map,		"-nm", 	"--no-map",			OPT_HELP_NO_MAP, "" )
 
 OPT( OptSet,	&opts.globaldef, "-g", 	"--globaldef", 		OPT_HELP_GLOBALDEF, "" )
 OPT( OptClear,	&opts.globaldef, "-ng", 	"--no-globaldef",	OPT_HELP_NO_GLOBALDEF, "" )
