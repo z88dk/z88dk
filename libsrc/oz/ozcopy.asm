@@ -9,10 +9,12 @@
 ;
 ;
 ; ------
-; $Id: ozcopy.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozcopy.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ozcopy
+	PUBLIC	_ozcopy
 	
 defc	load_address = 0ff02h
 
@@ -34,6 +36,7 @@ ozcopy_init:
 ;;        jp      load_address
 ;; copy from hl:firstpushed to de:secondpushed, length bc
 ozcopy:
+_ozcopy:
 ozcopy_jp_address:
         jp      ozcopy_init
 

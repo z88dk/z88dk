@@ -9,9 +9,10 @@
 ;
 ;
 ; ------
-; $Id: restore_a000.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: restore_a000.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	restore_a000
 	
 restore_a000:

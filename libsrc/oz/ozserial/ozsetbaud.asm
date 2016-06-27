@@ -8,13 +8,16 @@
 ;	serial control commands
 ;
 ; ------
-; $Id: ozsetbaud.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozsetbaud.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsetbaud
+	PUBLIC	_ozsetbaud
 
 
 ozsetbaud:
+_ozsetbaud:
         ld hl,2
         add hl,sp
         in a,(43h)

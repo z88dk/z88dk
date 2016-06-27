@@ -10,10 +10,12 @@
 ;
 ;
 ; ------
-; $Id: ozintwait.asm,v 1.3 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozintwait.asm,v 1.4 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozintwait
+	PUBLIC	_ozintwait
 	EXTERN	ozcustomisr
 	
 	PUBLIC	serial_check_hook
@@ -23,6 +25,7 @@
 
 
 ozintwait:
+_ozintwait:
 
         di
 serial_check_hook:

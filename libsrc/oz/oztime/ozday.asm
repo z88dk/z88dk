@@ -11,13 +11,16 @@
 ;
 ;
 ; ------
-; $Id: ozday.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozday.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ozday
+	PUBLIC	_ozday
 	
 	EXTERN	Compute	
 
 ozday:
+_ozday:
         ld      c,38h
         jp      Compute

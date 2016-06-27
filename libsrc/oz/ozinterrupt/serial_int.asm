@@ -9,9 +9,9 @@
 ;
 ;
 ; ------
-; $Id: serial_int.asm,v 1.4 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: serial_int.asm,v 1.5 2016-06-27 21:25:36 dom Exp $
 ;
-
+	SECTION code_clib
 	PUBLIC	serial_int
 	
 	PUBLIC	serial_int_check
@@ -32,20 +32,6 @@
 	
 
 ; Don't exchange the items position !!
-
-defc	BufLen = 256
-
-ozserbufget:
-        defs 1
-ozserbufput:
-        defs 1
-SerialBuffer:
-        defs BufLen
-ozrxhandshaking:
-        defs 1
-ozrxxoff:
-        defs 1
-
 
 
 rxxoff_handler:
@@ -126,3 +112,19 @@ noXOFF:
 BufferFull:
         pop     hl
         jp      serial_hook+3
+
+	SECTION bss_clib
+defc	BufLen = 256
+ozserbufget:
+        defs 1
+ozserbufput:
+        defs 1
+SerialBuffer:
+        defs BufLen
+ozrxhandshaking:
+        defs 1
+ozrxxoff:
+        defs 1
+
+
+

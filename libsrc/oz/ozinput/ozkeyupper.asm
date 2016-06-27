@@ -9,14 +9,16 @@
 ;	returns key pressed bitmap for upper part of keyboard
 ;
 ; ------
-; $Id: ozkeyupper.asm,v 1.3 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozkeyupper.asm,v 1.4 2016-06-27 21:25:36 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	ozkeyupper
+	PUBLIC	_ozkeyupper
 
 
 ozkeyupper:
+_ozkeyupper:
         ;ld      hl,2
         ;add     hl,sp
         ;call    $gint

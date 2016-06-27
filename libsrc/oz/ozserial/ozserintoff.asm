@@ -8,10 +8,12 @@
 ;
 ;
 ; ------
-; $Id: ozserintoff.asm,v 1.3 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozserintoff.asm,v 1.4 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozserintoff
+	PUBLIC	_ozserintoff
 
 	EXTERN	ozcustomisr
 	EXTERN	serial_hook
@@ -21,6 +23,7 @@
 	EXTERN	serial_check_hook
 	
 ozserintoff:
+_ozserintoff:
         ld      hl,serial_hook+3
         ld      (serial_hook+1),hl
         ld      hl,serial_check_hook+3

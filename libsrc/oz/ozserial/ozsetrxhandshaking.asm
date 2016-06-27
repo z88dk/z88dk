@@ -8,10 +8,12 @@
 ;	buffered serial input
 ;
 ; ------
-; $Id: ozsetrxhandshaking.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozsetrxhandshaking.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsetrxhandshaking
+	PUBLIC	_ozsetrxhandshaking
 
 	EXTERN	serial_int
 	EXTERN	SerialBuffer
@@ -20,6 +22,7 @@
 
 
 ozsetrxhandshaking:
+_ozsetrxhandshaking:
         pop     hl
         pop     de
         push    de

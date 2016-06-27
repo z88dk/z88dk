@@ -11,13 +11,16 @@
 ;
 ;
 ; ------
-; $Id: ozweekday.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozweekday.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozweekday
+	PUBLIC	_ozweekday
 	
 
 ozweekday:
+_ozweekday:
         in      a,(36h)
         and     0fh
         ld      l,a

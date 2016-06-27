@@ -9,12 +9,15 @@
 ;
 ;
 ; ------
-; $Id: ozinstisr.asm,v 1.4 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozinstisr.asm,v 1.5 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozinstisr
+	PUBLIC	_ozinstisr
 	
 ozinstisr:
+_ozinstisr:
         ld      a,(0)
         cp      0F3h	;di
         jr      nz,error

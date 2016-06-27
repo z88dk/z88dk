@@ -8,14 +8,16 @@
 ;	void ozkeyboardon()
 ;
 ; ------
-; $Id: ozkbdon.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozkbdon.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	ozkbdon
+	PUBLIC	_ozkbdon
 
 
 ozkbdon:
+_ozkbdon:
         in      a,(7)
         and     0feh
         out     (7),a

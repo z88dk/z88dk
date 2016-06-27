@@ -9,13 +9,16 @@
 ;
 ;
 ; ------
-; $Id: ozsetisr.asm,v 1.4 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozsetisr.asm,v 1.5 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsetisr
+	PUBLIC	_ozsetisr
 	EXTERN	ozinstisr
 	
 ozsetisr:
+_ozsetisr:
 ;; load in interrupt handler stub
         ld     hl,ISRStub_begin
         ld     de,ISRStub_loc

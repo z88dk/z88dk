@@ -11,14 +11,17 @@
 ;
 ;
 ; ------
-; $Id: ozyear.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozyear.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozyear
+	PUBLIC	_ozyear
 	
 	EXTERN	Compute	
 
 ozyear:
+_ozyear:
         ld      c,3ch
         call    Compute
         ld      de,2000

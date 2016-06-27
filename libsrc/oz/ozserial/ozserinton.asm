@@ -8,10 +8,12 @@
 ;
 ;
 ; ------
-; $Id: ozserinton.asm,v 1.3 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozserinton.asm,v 1.4 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozserinton
+	PUBLIC	_ozserinton
 
 	EXTERN	ozcustomisr
 	EXTERN	serial_hook
@@ -25,6 +27,7 @@
 	EXTERN	rxxoff_handler
 
 ozserinton:
+_ozserinton:
         ld      hl,serial_int
         ld      (serial_hook+1),hl
         ld      hl,serial_int_check

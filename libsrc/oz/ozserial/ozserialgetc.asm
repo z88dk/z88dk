@@ -8,10 +8,12 @@
 ;	buffered serial input
 ;
 ; ------
-; $Id: ozserialgetc.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozserialgetc.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozserialgetc
+	PUBLIC	_ozserialgetc
 
 	EXTERN	serial_int
 	EXTERN	SerialBuffer
@@ -20,6 +22,7 @@
 
 
 ozserialgetc:
+_ozserialgetc:
         ld      a,(ozserbufget)
         ld      e,a
         ld      a,(ozserbufput)

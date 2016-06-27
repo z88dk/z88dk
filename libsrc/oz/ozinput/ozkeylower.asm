@@ -9,14 +9,16 @@
 ;	returns key pressed bitmap for lower part of keyboard
 ;
 ; ------
-; $Id: ozkeylower.asm,v 1.3 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozkeylower.asm,v 1.4 2016-06-27 21:25:36 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	ozkeylower
+	PUBLIC	_ozkeylower
 
 
 ozkeylower:
+_ozkeylower:
         ;ld      hl,2
         ;add     hl,sp
         ;call    $gint

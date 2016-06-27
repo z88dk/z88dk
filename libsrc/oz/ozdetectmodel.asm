@@ -14,10 +14,12 @@
 ;;   bit 2:  0 if 7xxPC and 1 if 7xxM
 ;
 ; ------
-; $Id: ozdetectmodel.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozdetectmodel.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozdetectmodel
+	PUBLIC	_ozdetectmodel
 	EXTERN	ozmodel
 	EXTERN	s_filetypetable
 	EXTERN	restore_a000
@@ -25,6 +27,7 @@
 
 
 ozdetectmodel:
+_ozdetectmodel:
 
 
         push    bc
@@ -75,6 +78,7 @@ top:
         djnz    top
         ret
 
+	SECTION rodata_clib
 String1:
         defb    89h,0c0h,19h,4dh
 String2:

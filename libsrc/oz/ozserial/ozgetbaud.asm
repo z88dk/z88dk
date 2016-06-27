@@ -8,13 +8,16 @@
 ;	serial control commands
 ;
 ; ------
-; $Id: ozgetbaud.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozgetbaud.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozgetbaud
+	PUBLIC	_ozgetbaud
 
 
 ozgetbaud:
+_ozgetbaud:
         in a,(43h)
         ld b,a
         or 80h

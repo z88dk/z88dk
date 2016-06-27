@@ -8,17 +8,19 @@
 ;	handles the click sound effect on keypress
 ;
 ; ------
-; $Id: ozclick.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozclick.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	ozclick
+	PUBLIC	_ozclick
 	PUBLIC	enable_click
 	
 	EXTERN	ozclick_setting
 
 
 ozclick:
+_ozclick:
         ld hl,2
         add hl,sp
         ld a,(hl)

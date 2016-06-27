@@ -8,17 +8,19 @@
 ;	Keyboard routines
 ;
 ; ------
-; $Id: ozkeyhit.asm,v 1.3 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozkeyhit.asm,v 1.4 2016-06-27 21:25:36 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	ozkeyhit2	; renamed (will be redefined if used)
+	PUBLIC	_ozkeyhit2	; renamed (will be redefined if used)
 	
 	EXTERN	KeyBufGetPos
 	EXTERN	EnableKeyboard
 
 
 ozkeyhit2:
+_ozkeyhit2:
     ld  de,EnableKeyboard
     ld  a,(de)
     and 0ffh-7

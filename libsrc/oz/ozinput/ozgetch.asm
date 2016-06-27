@@ -10,16 +10,18 @@
 ;
 ;
 ; ------
-; $Id: ozgetch.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozgetch.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	ozgetch2	; renamed (will be redefined if used)
+	PUBLIC	_ozgetch2	; renamed (will be redefined if used)
 
 	EXTERN	KeyBufGetPos
 	EXTERN	EnableKeyboard
 
 ozgetch2:
+_ozgetch2:
     ld	    hl,KeyBufGetPos
     ld      de,EnableKeyboard
     jr	    WaitForKey

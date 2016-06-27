@@ -11,13 +11,16 @@
 ;
 ;
 ; ------
-; $Id: ozsec.asm,v 1.2 2015-01-19 01:33:04 pauloscustodio Exp $
+; $Id: ozsec.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsec
+	PUBLIC	_ozsec
 	
 	EXTERN	Compute	
 
 ozsec:
+_ozsec:
         ld      c,31h
         jp      Compute

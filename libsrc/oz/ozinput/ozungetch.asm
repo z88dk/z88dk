@@ -9,16 +9,18 @@
 ;	puts a character back in the keyboard buffer
 ;
 ; ------
-; $Id: ozungetch.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozungetch.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	ozungetch2	; renamed (will be redefined if used)
+	PUBLIC	_ozungetch2	; renamed (will be redefined if used)
 
 	EXTERN	KeyBufGetPos
 
 
 ozungetch2:
+_ozungetch2:
 
     pop    hl
     pop    de

@@ -8,14 +8,16 @@
 ;	void ozkeyboardoff()
 ;
 ; ------
-; $Id: ozkbdoff.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozkbdoff.asm,v 1.3 2016-06-27 21:25:36 dom Exp $
 ;
 
-
+        SECTION code_clib
 	PUBLIC	ozkbdoff
+	PUBLIC	_ozkbdoff
 
 
 ozkbdoff:
+_ozkbdoff:
         in      a,(7)
         or      1
         out     (7),a
