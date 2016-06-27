@@ -154,7 +154,7 @@ test_enigma: $(TARGET)
 	echo 'Enter text to be (de)coded, finish with a .' > enigma.bmk
 	echo 'HREXLSLEOC .' >> enigma.bmk
 	diff -w enigma.bmk enigma.out
-	$(RM) zcc_opt.def enigma.bin enigma.out enigma.bmk
+	$(RM) zcc_opt.def enigma.bin enigma.out enigma.bmk enigma.reloc
 
 testzcc : $(TARGET)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
