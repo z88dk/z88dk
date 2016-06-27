@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.17 2016-06-21 20:49:06 dom Exp $
+;       $Id: oz_crt0.asm,v 1.18 2016-06-27 21:08:31 dom Exp $
 ;
 ; - - - - - - -
 
@@ -199,6 +199,7 @@ ENDIF
         ld      hl,-64
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -208,15 +209,6 @@ ENDIF
 		INCLUDE "amalloc.def"
 	ENDIF
 
-IF !DEFINED_nostreams
-; Set up the std* stuff so we can be called again
-	ld	hl,__sgoioblk+2
-	ld	(hl),19	;stdin
-	ld	hl,__sgoioblk+6
-	ld	(hl),21	;stdout
-	ld	hl,__sgoioblk+10
-	ld	(hl),21	;stderr
-ENDIF
 ;-------- Z88DK specific code (end) -------
 
         call    _main    ;call main program
@@ -452,8 +444,46 @@ EnableKeyboard: defs 1
 
 
 
-; --- settings - leave untouched ---
 
+;------------------------------------------
+;------------------------------------------
+; End of startup part, routines following
+;------------------------------------------
+;------------------------------------------
+
+l_dcal:
+	jp	(hl)
+
+
+       	defm  "Small C+ OZ"	;Unnecessary file signature
+	defb	0
+
+        INCLUDE "crt0_runtime_selection.asm"
+	INCLUDE "crt0_section.asm"
+
+
+		SECTION bss_crt
+
+saved_hl:       defw	0	; Temp store for hl
+saved_de:       defw	0	; Temp store for de
+ozactivepage:	defw 	0 ; Page number for the graph map (0400h for 0A000h)
+ozmodel:	defb    0	; Set with "ozdetectmodel" (see libraries)
+s_filetypetable: defw    0
+
+		SECTION code_crt_init
+		ld	hl,0xa000
+		ld	(base_graphics),hl
+		ld	hl,0x0400
+		ld	(ozactivepage),hl
+		ld	hl,0xc089
+		ld	(s_filetypetable),hl
+		ld	a,1
+		ld	(ozmodel),a
+
+
+
+; --- settings - leave untouched ---
+	SECTION data_crt
 ozkeyrepeatspeed:
         defb 5
 ozkeyrepeatdelay:
@@ -470,62 +500,4 @@ ozprogoptions:
         defb 0
 ;; padding (for future expansion)
 defb 0,0,0,0
-
-
-;------------------------------------------
-;------------------------------------------
-; End of startup part, routines following
-;------------------------------------------
-;------------------------------------------
-
-l_dcal:
-	jp	(hl)
-
-
-;-----------
-; Define the stdin/out/err area. For the z88 we have two models - the
-; classic (kludgey) one and "ANSI" model
-;-----------
-IF !DEFINED_nostreams
-__sgoioblk:
-	INCLUDE	"stdio_fp.asm"
-ENDIF
-
-
-        INCLUDE "crt0_runtime_selection.asm"
-
-;-----------
-; Now some variables
-;-----------
-coords:         defw    0       ; Current graphics xy coordinates
-
-base_graphics:	defw 0A000h	; Address of the Graphics map
-ozactivepage:	defw 0400h	; Page number for the graph map (0400h for 0A000h)
-ozmodel:	defb    -1	; Set with "ozdetectmodel" (see libraries)
-s_filetypetable: defw    0c089h
-
-
-exitsp:         defw    0       ; Address of where the atexit() stack is
-exitcount:      defb    0       ; How many routines on the atexit() stack
-
-heaplast:       defw    0       ; Address of last block on heap
-heapblocks:     defw    0       ; Number of blocks
-
-IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
-PUBLIC _heap
-; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
-; will be kept for sbrk() to setup the malloc area
-_heap:
-                defw ASMTAIL	; Location of the last program byte
-                defw 0
-ENDIF
-
-saved_hl:       defw	0	; Temp store for hl
-saved_de:       defw	0	; Temp store for de
-
-         	defm  "Small C+ OZ"	;Unnecessary file signature
-		defb	0
-
 
