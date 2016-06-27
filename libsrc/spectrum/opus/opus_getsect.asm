@@ -9,15 +9,18 @@
 ;
 ;	int opus_getsect(int drive, int sector, char * buffer); 
 ;
-;	$Id: opus_getsect.asm,v 1.3 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: opus_getsect.asm,v 1.4 2016-06-27 19:16:34 dom Exp $
 ;
 
+SECTION code_clib
 PUBLIC opus_getsect
+PUBLIC _opus_getsect
 ;XREF ASMDISP_OPUS_GETSECT_CALLEE
 EXTERN opus_getsect_callee
 EXTERN opus_getsect_asmentry
 
 .opus_getsect
+._opus_getsect
 
 	pop af
 	pop de		; buffer location

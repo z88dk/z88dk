@@ -5,11 +5,12 @@
 ;
 ;	int opus_getblocks (int drive);
 ;	
-;	$Id: opus_getblocks.asm,v 1.3 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: opus_getblocks.asm,v 1.4 2016-06-27 19:16:34 dom Exp $
 ;
 
-
+		SECTION code_clib
 		PUBLIC 	opus_getblocks
+		PUBLIC 	_opus_getblocks
 
 		EXTERN	opus_rommap
 
@@ -17,24 +18,27 @@
 		
 
 opus_getblocks:
-		
-		ld	ix,2
+_opus_getblocks:
+		push	ix		;save callers		
+		ld	ix,4
 		add	ix,sp
 
 		ld	hl,-1
 
 		ld	a,(ix+0)	; drive
 		and	a		; drive no. = 0 ?
-		ret	z		; yes, return -1
+		jr	z,getblocks_exit		; yes, return -1
 		dec	a
 		cp	5		; drive no. >5 ?
-		ret	nc		; yes, return -1
+		jr	nc,getblocks_exit		; yes, return -1
 
 		;call	$1708		; Page in the Discovery ROM
 		call	opus_rommap
 		ld	a,(ix+0)	; drive
 		ld	bc,$0400	; inquire disk
 		call	P_DEVICE
-		jp	$1748		; Page out the Discovery ROM
+		call	$1748		; Page out the Discovery ROM
 					; HL = number of blocks
-		;ret
+.getblocks_exit
+		pop	ix		; restore callers
+		ret

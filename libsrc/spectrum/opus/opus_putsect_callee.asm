@@ -9,11 +9,12 @@
 ;
 ;	int __CALLEE__ opus_putsect_callee(int drive, int sector, char * buffer); 
 ;
-;	$Id: opus_putsect_callee.asm,v 1.3 2015-01-19 01:33:11 pauloscustodio Exp $
+;	$Id: opus_putsect_callee.asm,v 1.4 2016-06-27 19:16:34 dom Exp $
 ;
 
-
+SECTION code_clib
 PUBLIC	opus_putsect_callee
+PUBLIC	_opus_putsect_callee
 ;XDEF	ASMDISP_OPUS_PUTSECT_CALLEE
 
 PUBLIC	opus_putsect_asmentry
@@ -22,6 +23,7 @@ PUBLIC	opus_putsect_asmentry
 	EXTERN	P_DEVICE
 
 opus_putsect_callee:
+_opus_putsect_callee:
 
 	pop	af
 	pop	de		; buffer location

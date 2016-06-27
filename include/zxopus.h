@@ -5,7 +5,7 @@
  *
  *      Stefano Bodrato - 7/6/2006
  *
- *	$Id: zxopus.h,v 1.9 2016-04-25 13:13:00 dom Exp $
+ *	$Id: zxopus.h,v 1.10 2016-06-27 19:16:33 dom Exp $
  */
 
 
@@ -143,7 +143,7 @@ extern int __LIB__ __CALLEE__ opus_putsect_callee(int drive, int sector, char * 
 #define opus_putsect(a,b,c)           opus_putsect_callee(a,b,c)
 
 // parallel port put/get byte
-extern void __LIB__ opus_lptwrite (unsigned char databyte);
+extern void __LIB__ opus_lptwrite (unsigned int databyte);
 extern unsigned char __LIB__ opus_lptread ();
 
 // Returns true if the Opus Discovery interface is present
