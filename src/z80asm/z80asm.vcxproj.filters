@@ -54,9 +54,6 @@
     <ClInclude Include="sym.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="symref.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="symtab.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -198,9 +195,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="model.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="symref.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sym.c">

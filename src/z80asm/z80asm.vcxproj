@@ -132,7 +132,6 @@
     <ClInclude Include="scan_tokens.h" />
     <ClInclude Include="sym.h" />
     <ClInclude Include="symbol.h" />
-    <ClInclude Include="symref.h" />
     <ClInclude Include="symtab.h" />
     <ClInclude Include="tokens.h" />
     <ClInclude Include="z80asm.h" />
@@ -168,7 +167,6 @@
     <ClCompile Include="parse.c" />
     <ClCompile Include="scan.c" />
     <ClCompile Include="sym.c" />
-    <ClCompile Include="symref.c" />
     <ClCompile Include="symtab.c" />
     <ClCompile Include="z80asm.c" />
     <ClCompile Include="z80pass.c" />
