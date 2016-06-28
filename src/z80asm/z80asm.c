@@ -58,7 +58,7 @@ static void do_assemble( char *src_filename );
 *----------------------------------------------------------------------------*/
 void assemble_file( char *filename )
 {
-    char *src_filename, *err_filename;
+    char *src_filename;
 	Module *module;
 
     /* normal case - assemble a asm source file */
@@ -76,9 +76,13 @@ void assemble_file( char *filename )
 	module = set_cur_module( new_module() );
 	module->filename = strpool_add( src_filename );
 
-	/* delete any old error file */
-	err_filename = get_err_filename(src_filename);
-	remove(err_filename);
+	/* remove output files, except obj */
+	remove(get_lst_filename(src_filename));
+	remove(get_bin_filename(src_filename));
+	remove(get_sym_filename(src_filename));
+	remove(get_map_filename(src_filename));
+	remove(get_reloc_filename(src_filename));
+	remove(get_def_filename(src_filename));
 
 	/* Create error file */
 	open_error_file(src_filename);
@@ -127,6 +131,9 @@ static void query_assemble( char *src_filename )
 static void do_assemble( char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
+
+	/* delete object file */
+	remove(get_obj_filename(src_filename));
 
 	/* create list file */
 	if (opts.list)
