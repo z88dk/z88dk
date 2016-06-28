@@ -6,12 +6,15 @@
 ;	divide by 256
 ;
 ; ------
-; $Id: div256.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
+; $Id: div256.asm,v 1.3 2016-06-28 19:31:42 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	div256
+	PUBLIC	_div256
 
 div256:
+_div256:
         pop     bc
         pop     hl
         pop     de

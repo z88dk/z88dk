@@ -5,13 +5,16 @@
 ;	integer to float;
 ;
 ; ------
-; $Id: i2f.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
+; $Id: i2f.asm,v 1.3 2016-06-28 19:31:42 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	i2f
+	PUBLIC	_i2f
 	
 
 .i2f
+._i2f
         ;pop     bc
         ;pop     hl
         ;push    hl

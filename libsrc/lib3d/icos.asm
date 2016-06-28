@@ -6,14 +6,17 @@
 ;	input must be between 0 and 360
 ;
 ; ------
-; $Id: icos.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
+; $Id: icos.asm,v 1.3 2016-06-28 19:31:42 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	icos
+	PUBLIC	_icos
 
 	EXTERN	isin
 
 icos:
+_icos:
 	; __FASTCALL__
 	ld	b,h
 	ld	c,l

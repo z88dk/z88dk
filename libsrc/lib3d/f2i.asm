@@ -5,13 +5,16 @@
 ;	fixed point to integer
 ;
 ; ------
-; $Id: f2i.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
+; $Id: f2i.asm,v 1.3 2016-06-28 19:31:42 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	f2i
+	PUBLIC	_f2i
 
 
 .f2i
+._f2i
         pop     bc	; RET addr.
         pop     hl
         pop     de

@@ -16,7 +16,7 @@ Copyright© 2002, Mark Hamilton
 // fixed point arithmetic
 
 /// integer to fixed-point
-extern long __LIB__ __FASTCALL__ i2f (int v);
+extern long __LIB__ __FASTCALL__ i2f (int v) __SMALLCFASTCALL;
 
 /// fixed-point to integer
 extern int __LIB__ f2i (long v);
@@ -139,8 +139,8 @@ extern void __LIB__ object_apply_transformations(object_t* obj, vector_t* pbuffe
 	(changed by Stefano, originally it was +/- 16384)
 */
 
-extern int __LIB__ __FASTCALL__ isin(unsigned int degrees); /* input must be between 0 and 360 */
-extern int __LIB__ __FASTCALL__ icos(unsigned int degrees); /* input must be between 0 and 360 */
+extern int __LIB__ __FASTCALL__ isin(unsigned int degrees) __SMALLCFASTCALL; /* input must be between 0 and 360 */
+extern int __LIB__ __FASTCALL__ icos(unsigned int degrees) __SMALLCFASTCALL; /* input must be between 0 and 360 */
 extern int __LIB__  div256(long value); /* divide by 255 */
 
 

@@ -7,13 +7,16 @@
 ;	returns value from -255 to +255
 ;
 ; ------
-; $Id: isin.asm,v 1.2 2015-01-19 01:32:54 pauloscustodio Exp $
+; $Id: isin.asm,v 1.3 2016-06-28 19:31:43 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	isin
+	PUBLIC	_isin
 
 
 isin:
+_isin:
 	; __FASTCALL__
         ld      c,l
         ld      b,h ;; save input
@@ -63,7 +66,7 @@ DontNegate:
         ex      de,hl
         ret
 
-
+	SECTION rodata_clib
 sin_table:
 
 ;; Smaller table, generated with Excel; formula (Italian language):  =INT(SEN(RADIANTI(A1))*255,4)
