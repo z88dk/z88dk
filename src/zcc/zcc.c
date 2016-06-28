@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.130 2016-06-28 01:21:27 aralbrec Exp $
+ *      $Id: zcc.c,v 1.131 2016-06-28 01:52:34 aralbrec Exp $
  */
 
 
@@ -1060,13 +1060,12 @@ void SetNumber(arg_t *argument, char *arg)
     if ( strncmp(ptr,argument->name,strlen(argument->name)) == 0) {
         ptr += strlen(argument->name);
     }
-    if ( *ptr == '=' ) {
-        ptr++;
-    }
-    val = strtol(ptr, &end, 10);
+
+    while (ispunct(*ptr)) ++ptr;
+    val = (int)strtol(ptr, &end, 0);
     
     if ( end != ptr ) {
-        *(int *)argument->data = atoi(ptr);
+        *(int *)argument->data = val;
     }
 }
 
