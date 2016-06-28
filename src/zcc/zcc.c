@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.129 2016-06-11 04:13:20 aralbrec Exp $
+ *      $Id: zcc.c,v 1.130 2016-06-28 01:21:27 aralbrec Exp $
  */
 
 
@@ -509,9 +509,9 @@ int linkthem(char *linker)
     }
 
     linkargs_mangle(linkargs);
-    len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s", 
+    len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s", 
             linker, 
-            (c_nostdlib == 0) ? c_linkopts : " -a -m -Mo ", 
+            (c_nostdlib == 0) ? c_linkopts : " -a -Mo ", 
             linker_output_separate_arg ? " " : "", 
             outputfile,
             "",
@@ -519,6 +519,8 @@ int linkthem(char *linker)
             (relocate && z80verbose && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
             linkargs,
             globaldefon ? "-g " : "",
+            mapon ? "-m " : "",
+            (createapp || symbolson) ? "-s ": "",
             c_crt0,
             ext);
             
