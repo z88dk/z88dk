@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.131 2016-06-28 01:52:34 aralbrec Exp $
+ *      $Id: zcc.c,v 1.132 2016-06-28 23:41:16 aralbrec Exp $
  */
 
 
@@ -1484,12 +1484,10 @@ void PragmaRedirect(arg_t *arg,char *val)
     }
     if ( strlen(value) ) {
         add_zccopt("\nIF !DEFINED_%s\n",ptr);
-        add_zccopt("\nIF crt0\n");
         add_zccopt("\tPUBLIC %s\n",ptr);
         add_zccopt("\tEXTERN %s\n",value);
         add_zccopt("\tdefc\tDEFINED_%s = 1\n",ptr);
         add_zccopt("\tdefc %s = %s\n",ptr,value);
-        add_zccopt("ENDIF\n\n");
         add_zccopt("ENDIF\n\n");
     }
 }

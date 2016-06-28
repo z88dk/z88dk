@@ -168,12 +168,10 @@ void write_redirect(char *sname, char *value)
         exit(1);
     }
     fprintf(fp,"\nIF !DEFINED_%s\n",sname);
-    fprintf(fp,"\tIF crt0\n");
     fprintf(fp,"\tPUBLIC %s\n",sname);
     fprintf(fp,"\tEXTERN %s\n",value);
     fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
     fprintf(fp,"\tdefc %s = %s\n",sname,value);
-    fprintf(fp,"\tENDIF\n");
     fprintf(fp,"ENDIF\n\n");
     fclose(fp);
 }
