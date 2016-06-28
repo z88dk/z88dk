@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	6. SERIAL PORT I/O
 
-	$Id: ozserial.h,v 1.1 2003-10-21 17:15:19 stefano Exp $
+	$Id: ozserial.h,v 1.2 2016-06-28 17:11:31 dom Exp $
 */
 
 #include <graphics.h>
@@ -17,18 +17,18 @@ typedef unsigned char byte;
 
 extern __LIB__ ozsnap(void);
 extern byte __LIB__ ozgetrxhandshaking(void);
-extern __LIB__ ozsetrxhandshaking(byte state);
+extern __LIB__ ozsetrxhandshaking(int state);
 extern __LIB__ ozclearserialbuffer(void);
-extern __LIB__ ozdatabits(byte databits);
+extern __LIB__ ozdatabits(int databits);
 extern int __LIB__ ozserialgetc(void);
 extern __LIB__ ozsetbaud(unsigned baud);
 extern unsigned __LIB__ ozgetbaud(void);
-extern __LIB__ ozstopbits(char stopbits);
-extern __LIB__ ozparity(byte parity);
+extern __LIB__ ozstopbits(int stopbits);
+extern __LIB__ ozparity(int parity);
 extern byte __LIB__ ozgetlcr(void);
-extern __LIB__ ozsetlcr(byte lcr);
+extern __LIB__ ozsetlcr(int lcr);
 extern int __LIB__ ozserialin(void);
-extern __LIB__ ozserialout(char c);
+extern __LIB__ ozserialout(int c);
 extern __LIB__ ozserinton(void);
 //extern __LIB__ _ozserinton(void);
 extern __LIB__ ozserintoff(void);

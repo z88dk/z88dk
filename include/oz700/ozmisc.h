@@ -1,7 +1,7 @@
 /* 
 	HTC Compatibility Library and OZ extras 
 
-	$Id: ozmisc.h,v 1.3 2003-10-27 16:56:56 stefano Exp $
+	$Id: ozmisc.h,v 1.4 2016-06-28 17:11:31 dom Exp $
 */
 
 #ifndef _OZMISC_H
@@ -20,9 +20,9 @@ byte ozgetautorun(void);
 byte ozgetmembyte(unsigned page, unsigned offset);
 
 extern __LIB__ ozfarmemcpy(unsigned dest_page,unsigned dest_offset,unsigned src_page,
-  unsigned src_offset,unsigned length);
+  unsigned src_offset,unsigned length) __SMALLCDECL;
 
-extern __LIB__ ozcopytopage(unsigned dest_page,unsigned dest_offset,byte *src,unsigned length);
+extern __LIB__ ozcopytopage(unsigned dest_page,unsigned dest_offset,byte *src,unsigned length) __SMALLCDECL;
 
 extern __LIB__ ozexitto(unsigned key);
 extern __LIB__ ozfast(void);
@@ -33,8 +33,8 @@ extern __LIB__ ozkeyclick(void);
 
 extern __LIB__ ozdelay(unsigned d);
 //void exit(int ignored_exit_code);
-extern byte __LIB__ ozportin(byte port);
-extern __LIB__ ozportout(byte port, byte value);
+extern byte __LIB__ ozportin(int port);
+extern __LIB__ ozportout(int port, int value) __SMALLCDECL;
 
 extern __LIB__ ozsound(unsigned value);
 extern __LIB__ ozquiet(void);
@@ -69,7 +69,7 @@ char __LIB__ *ozgetnextfilename(byte mode);
 
 
 byte __LIB__ ozgetpowerkeyhandling(void);
-extern __LIB__  ozsetpowerkeyhandling(byte state);
+extern __LIB__  ozsetpowerkeyhandling(int state);
 
 extern unsigned __LIB__ ozkeydelay64hz(unsigned len);
 extern __LIB__  ozdelay64hz(unsigned length);
