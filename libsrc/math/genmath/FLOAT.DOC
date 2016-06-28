@@ -1,0 +1,97 @@
+		FLOAT Library Documentation 
+ 
+FLOAT contains the floating point arithmetic routines, and some
+functions visible to the user's program.
+ 
+ 
+GENERAL INFORMATION
+ 
+These routines will execute only on a Z-80. They use the
+alternate registers and some of the undocumented instructions
+of that processor. They do not conform to the IEEE floating
+point standard. The routines were written by Neil Colvin, and
+are worth study. They are the best code I have ever seen for
+the Z-80.      - Jim Van Zandt 
+  
+ 
+FLOATING POINT FORMAT 
+ 
+Each floating point number is 6 bytes long, and consists of a
+40 bit fraction (most significant byte in the highest address)
+and an 8 bit exponent. For nonzero numbers, the fraction f has
+a value in the range 0.5 <= f < 1.0. Since its most significant
+bit would always be 1, it would carry no information and is
+replaced by the sign bit (set for a negative number). The
+exponent is 80H if the number is in the range 0.5 <= x < 1.0,
+and is increased by 1 for each place the binary point of f
+should be moved to the right. For example:
+ 
+	Representation 			Number	 
+	00h,00h,00h,00h,00h,80h		0.5	 
+	00h,00h,00h,00h,80h,80h		-0.5 
+	00h,00h,00h,00h,00h,81h		1.0 
+	00h,00h,00h,00h,00h,7fh		0.25 
+	0fah,33h,0f3h,04h,035h,80h	sqrt(.5) = .707106... 
+	38h,0a9h,0d8h,5bh,5eh,7fh	1/log(10) = .43429...
+	21h,0a2h,0dah,0fh,49h,81h	pi/2 = 1.5707... 
+ 
+ 
+ARITHMETIC OPERATIONS
+ 
+Each of the primary operations (DADD, DSUB, DMUL, and DDIV)
+takes its first operand from the stack (under the return
+address) and the second from the fixed location FA (for
+Floating point Accumulator). The result of the operation is
+left in FA. For example, we have the following C expression and
+its translation into calls to floating point operations:
+  
+	;double a,b,c,d; 
+	;main() 
+	QMAIN: 
+	;{	a=b+c/d; 
+		LD HL,QB	;get address of 1st operand 
+		CALL DLOAD	;put operand in FA  
+		CALL DPUSH	;move from FA to stack 
+		LD HL,QC	;put 2nd operand...  
+		CALL DLOAD 
+		CALL DPUSH	;...on stack 
+		LD HL,QD 
+		CALL DLOAD	;put D in FA 
+		CALL DDIV	;find c/d 
+		CALL DADD	;find b+c/d  
+		LD HL,QA	;load destination address  
+		CALL DSTORE	;save result  
+	;} 
+		RET 
+ 
+	QA:	DS 6		;declare storage space  
+	QB:	DS 6 
+	QC:	DS 6 
+	QD:	DS 6 
+ 
+ 
+FUNCTIONS 
+ 
+Each of these functions return a double: 
+ 
+amin(x,y) double x,y;	returns the smaller of x, y
+amax(x,y) double x,y;	returns the larger of x, y
+float(x); double x;	integer to floating point conversion 
+fmod(x,y); double x,y;	mod(x,y) 
+			if 0 < y then 0 <= mod(x,y) < y and  
+			x = n*y + mod(x,y) for some integer n 
+fabs(x); double x;	absolute value 
+floor(x); double x;	largest integer not greater than 
+ceil(x); double x;	smallest integer not less than 
+rand();			random number in range 0...1 
+seed(x); double x;	seed random number generator
+  
+This function returns an int: 
+  
+int ifix(x); double x;	floating point to integer 
+			(takes floor first) 
+
+The floating point package also includes the two constants:
+
+double pi, halfpi ;	constant values of pi and pi/2
+
