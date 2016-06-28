@@ -114,6 +114,7 @@ oz/ozserial/ozsetbaud
 oz/ozserial/ozgetbaud
 oz/ozserial/ozsetlcr
 oz/ozserial/ozgetlcr
+oz/emu/ozgfx/__oz_gfxend
 oz/emu/ozgfx/ozbox
 oz/emu/ozgfx/ozfilledbox
 oz/emu/ozgfx/ozcircle
