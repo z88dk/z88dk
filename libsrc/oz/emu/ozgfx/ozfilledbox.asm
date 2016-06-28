@@ -5,13 +5,15 @@
 ;	void ozfilledbox(int x, int y, int width, int height);
 ;
 ; ------
-; $Id: ozfilledbox.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozfilledbox.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ozfilledbox
+	PUBLIC	_ozfilledbox
 
         EXTERN     swapgfxbk
-        EXTERN     swapgfxbk1
+        EXTERN     __oz_gfxend
 
         EXTERN     drawbox
         EXTERN     ozplotpixel
@@ -21,7 +23,9 @@
 
 
 .ozfilledbox
-		ld	ix,0
+._ozfilledbox
+		push	ix	;save callers
+		ld	ix,2
 		add	ix,sp
 		call	ozpointcolor
 
@@ -58,4 +62,4 @@
 		dec	h
 		jr	nz,bloop2
 		
-                jp      swapgfxbk1
+                jp      __oz_gfxend

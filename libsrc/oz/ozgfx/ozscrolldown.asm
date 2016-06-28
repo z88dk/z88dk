@@ -9,16 +9,19 @@
 ;
 ;
 ; ------
-; $Id: ozscrolldown.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozscrolldown.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozscrolldown
+	PUBLIC	_ozscrolldown
 	
 	EXTERN	ozactivepage
 	EXTERN	restore_a000
 
 
 ozscrolldown:
+_ozscrolldown:
         pop     hl
         exx
 

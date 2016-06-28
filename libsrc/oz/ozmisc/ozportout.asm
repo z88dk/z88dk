@@ -7,13 +7,16 @@
 ;	void ozportout(char port, char value)
 ;
 ; ------
-; $Id: ozportout.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozportout.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozportout
+	PUBLIC	_ozportout
 	
 
 ozportout:
+_ozportout:
         push    ix
         ld      ix,4
         add     ix,sp

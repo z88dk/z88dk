@@ -13,15 +13,18 @@
 ;
 ;
 ; ------
-; $Id: ozdisplayorbyte.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozdisplayorbyte.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozdisplayorbyte
+	PUBLIC	_ozdisplayorbyte
 	
 	EXTERN	ozactivepage
 
 
 ozdisplayorbyte:
+_ozdisplayorbyte:
         ld      c,3
         in      e,(c)
         inc     c

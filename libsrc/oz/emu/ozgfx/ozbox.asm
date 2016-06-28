@@ -5,13 +5,16 @@
 ;	void ozbox(int x, int y, int width, int height);
 ;
 ; ------
-; $Id: ozbox.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozbox.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozbox
+	PUBLIC	_ozbox
 
         EXTERN     swapgfxbk
         EXTERN     swapgfxbk1
+	EXTERN	   __oz_gfxend
 
         EXTERN     drawbox
         EXTERN     plotpixel	; yes, this costs some byte, but I preferred to
@@ -20,7 +23,9 @@
 
 
 .ozbox
-		ld	ix,0
+._ozbox
+		push	ix
+		ld	ix,2
 		add	ix,sp
 		ld	c,(ix+8)
 		ld	b,(ix+6)
@@ -29,4 +34,4 @@
                 ld      ix,plotpixel
                 call    swapgfxbk
                 call    drawbox
-                jp      swapgfxbk1
+		jp	__oz_gfxend

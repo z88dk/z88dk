@@ -7,10 +7,12 @@
 ;
 ;
 ; ------
-; $Id: ozexitto.asm,v 1.3 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozexitto.asm,v 1.4 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozexitto
+	PUBLIC	_ozexitto
 	
 	EXTERN	ozkeyclear
 	EXTERN	ozungetch2
@@ -18,6 +20,7 @@
 
 
 ozexitto:
+_ozexitto:
 
 	call ozkeyclear
 	pop bc ;; retval

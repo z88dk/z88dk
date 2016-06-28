@@ -5,13 +5,15 @@
 ;	void ozline(int x,int y,int x2,int y2,byte color);
 ;
 ; ------
-; $Id: ozline.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozline.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ozline
+	PUBLIC	_ozline
 
         EXTERN     swapgfxbk
-        EXTERN     swapgfxbk1
+        EXTERN     __oz_gfxend
 
 	EXTERN     line
         EXTERN     ozplotpixel
@@ -20,7 +22,9 @@
 
 
 .ozline
-		ld	ix,0
+._ozline
+		push	ix	;save callers
+		ld	ix,2
 		add	ix,sp
 		call	ozpointcolor
 
@@ -36,4 +40,4 @@
 		pop	hl
                 ld      ix,ozplotpixel
                 call    line
-                jp      swapgfxbk1
+                jp      __oz_gfxend

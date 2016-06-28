@@ -10,10 +10,12 @@
 ;	Font Pointers
 ;
 ; ------
-; $Id: ozfontpointers.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozfontpointers.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozfontpointers
+	PUBLIC	_ozfontpointers
 
 	PUBLIC	LowerFontPage1
 	PUBLIC	LowerFontPage2
@@ -21,6 +23,7 @@
 	PUBLIC	HigherFontPage2
 	
 ozfontpointers:
+_ozfontpointers:
         defw    Font0
         defw    Font1
         defw    Font2

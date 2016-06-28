@@ -8,13 +8,16 @@
 ;	void ozdelay(unsigned d)
 ;
 ; ------
-; $Id: ozdelay.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozdelay.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ozdelay
+	PUBLIC	_ozdelay
 	
 
 ozdelay:
+_ozdelay:
         ;ld       hl,2
         ;add      hl,sp
         ;call     $gint

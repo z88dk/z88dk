@@ -12,16 +12,19 @@
 ;
 ;
 ; ------
-; $Id: ozsetlcdstate.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozsetlcdstate.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsetlcdstate
+	PUBLIC	_ozsetlcdstate
 	
 	EXTERN	s_ozlcdstatus
 
 	EXTERN	restore_a000
 
 ozsetlcdstate:
+_ozsetlcdstate:
         pop     de
         pop     hl        ;; status to set
         push    hl

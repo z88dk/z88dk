@@ -8,15 +8,18 @@
 ;	display contrast control functions
 ;
 ; ------
-; $Id: ozgetcontrast.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozgetcontrast.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozgetcontrast
+	PUBLIC	_ozgetcontrast
 	
 	EXTERN	ozcontrast
 
 
 ozgetcontrast:
+_ozgetcontrast:
         ld      a,(ozcontrast)
         ld      l,a
         ld      h,0

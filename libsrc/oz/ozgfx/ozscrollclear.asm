@@ -7,15 +7,18 @@
 ;	void ozscrollclear();
 ;
 ; ------
-; $Id: ozscrollclear.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozscrollclear.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozscrollclear
+	PUBLIC	_ozscrollclear
 	
 	EXTERN	ozactivepage
 	
 
 ozscrollclear:
+_ozscrollclear:
 	in	a,(3)
 	ld	c,a
 	in	a,(4)

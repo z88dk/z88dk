@@ -11,16 +11,19 @@
 ;
 ;
 ; ------
-; $Id: ozsetfont.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozsetfont.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsetfont
+	PUBLIC	_ozsetfont
 	;XDEF	ozfont
 	PUBLIC	ozfontniceheight
 	
 	EXTERN	ScrCharSet
 
 ozsetfont:
+_ozsetfont:
 ;ozfont:
         ld      hl,2
         add     hl,sp
@@ -34,5 +37,6 @@ large:
         ld      (ozfontniceheight),a
         ret
 
+	SECTION bss_clib
 ozfontniceheight:
-        defb    10
+        defb    0

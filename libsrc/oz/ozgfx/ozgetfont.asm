@@ -11,14 +11,17 @@
 ;
 ;
 ; ------
-; $Id: ozgetfont.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozgetfont.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozgetfont
+	PUBLIC	_ozgetfont
 	
 	EXTERN	ScrCharSet
 
 ozgetfont:
+_ozgetfont:
         ld      a,(ScrCharSet)
         ld      l,a
         ld      h,0

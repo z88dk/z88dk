@@ -7,13 +7,16 @@
 ;	char ozportin(char port)
 ;
 ; ------
-; $Id: ozportin.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozportin.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozportin
+	PUBLIC	_ozportin
 	
 	
 ozportin:
+_ozportin:
         ld      hl,2
         add     hl,sp
         ld      c,(hl)

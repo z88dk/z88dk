@@ -3,9 +3,10 @@
 ;	by Stefano Bodrato - Oct. 2003
 ;
 ; ------
-; $Id: ozplotpixel.asm,v 1.3 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozplotpixel.asm,v 1.4 2016-06-28 14:48:17 dom Exp $
 ;
 
+	SECTION smc_clib
 	PUBLIC	ozplotpixel
 	PUBLIC	put_instr
 

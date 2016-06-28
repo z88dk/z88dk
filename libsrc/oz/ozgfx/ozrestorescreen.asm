@@ -8,10 +8,12 @@
 ;
 ;
 ; ------
-; $Id: ozrestorescreen.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozrestorescreen.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ozrestorescreen
+	PUBLIC	_ozrestorescreen
 	
 	EXTERN	ozsccopy
 	
@@ -19,6 +21,7 @@
 
 
 .ozrestorescreen
+._ozrestorescreen
         ld      de,968h
         push    de
         ld      hl,0

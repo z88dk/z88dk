@@ -10,10 +10,12 @@
 ;
 ;
 ; ------
-; $Id: ozunblankscreen.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozunblankscreen.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozunblankscreen
+	PUBLIC	_ozunblankscreen
 	
 	PUBLIC	s_blanked
 	
@@ -22,12 +24,10 @@
 	EXTERN	s_ozlcdstatus
 
 
-s_blanked:
-        defb    0
-
 
 ; ozslow:
 ozunblankscreen:
+_ozunblankscreen:
         ld      hl,s_blanked
         ld      a,(hl)
         or      a
@@ -49,3 +49,6 @@ ozunblankscreen:
         ret
 
 
+	SECTION bss_clib
+s_blanked:
+        defb    0

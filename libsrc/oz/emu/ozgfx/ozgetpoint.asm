@@ -5,17 +5,21 @@
 ;	int ozgetpoint(int x, int y);
 ;
 ; ------
-; $Id: ozgetpoint.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozgetpoint.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ozgetpoint
+	PUBLIC	_ozgetpoint
 
         EXTERN     pointxy
         EXTERN     swapgfxbk
 
 
 .ozgetpoint
-		ld	ix,0
+._ozgetpoint
+		push	ix	;save callers
+		ld	ix,2
 		add	ix,sp
 		ld	l,(ix+2)
 		ld	h,(ix+4)
@@ -25,6 +29,7 @@
                 call    swapgfxbk
                 ex      af,af'
                 ld      hl,0
+		pop	ix
                 ret     z       ;pixel set
                 inc     hl
                 ret

@@ -10,11 +10,14 @@
 ;	int ozputs(int x, int y, char *string);
 ;
 ; ------
-; $Id: ozputs.asm,v 1.3 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozputs.asm,v 1.4 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION smc_clib
 	PUBLIC	ozputs
+	PUBLIC	_ozputs
 	PUBLIC	ozputsgetend
+	PUBLIC	_ozputsgetend
 	
 	EXTERN	ozdetectmodel
 	EXTERN	restore_a000
@@ -38,6 +41,7 @@
 ;; Portable if ScrCharSet is portable ;;
 
 ozputsgetend:
+_ozputsgetend:
         ;ld      hl,0  ;; self-mod
         defb	33
 s_end_s_pointer:
@@ -67,6 +71,7 @@ DoInit:
 ; int ozputs(int x, int y, char *string);
 
 ozputs:
+_ozputs:
         ld      a,(init)
         or      a
         jr      z,DoInit

@@ -5,13 +5,16 @@
 ;	by Stefano Bodrato - Oct. 2003
 ;
 ; ------
-; $Id: ozgetautorun.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozgetautorun.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozgetautorun
+	PUBLIC	_ozgetautorun
 	
 
 ozgetautorun:
+_ozgetautorun:
         in      a,(4)
         push    af
         in      a,(3)

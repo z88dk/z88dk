@@ -13,10 +13,12 @@
 ;
 ;
 ; ------
-; $Id: oztogglelight.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: oztogglelight.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	oztogglelight
+	PUBLIC	_oztogglelight
 	
 	EXTERN	ozbacklight
 	
@@ -24,6 +26,7 @@
 
 
 oztogglelight:
+_oztogglelight:
         ld      a,(ozbacklight)
         and     040h
         xor     040h

@@ -10,18 +10,18 @@
 ;	int ozputch (int x, int y, char c);
 ;
 ; ------
-; $Id: ozputch.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozputch.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozputch
+	PUBLIC	_ozputch
 
 	EXTERN	ozputs
 
-ozputchbuf:
-        defb 0	; Char to be printed
-        defb 0	; string terminator
 
 ozputch:
+_ozputch:
         ;ld   hl,6
         ld	hl,2
         add  hl,sp
@@ -32,3 +32,8 @@ ozputch:
         inc  hl
         ld   (hl),b
         jp   ozputs
+
+	SECTION bss_clib
+ozputchbuf:
+        defb 0	; Char to be printed
+        defb 0	; string terminator

@@ -11,15 +11,18 @@
 ;
 ;
 ; ------
-; $Id: ozactivatedisplaypage.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozactivatedisplaypage.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozactivatedisplaypage
+	PUBLIC	_ozactivatedisplaypage
 	
 	EXTERN	ozactivepage
 
 
 ozactivatedisplaypage:
+_ozactivatedisplaypage:
         in      a,(22h)
         ld      (ozactivepage),a
 ;       in      a,(23h)

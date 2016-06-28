@@ -8,10 +8,12 @@
 ;	display contrast control functions
 ;
 ; ------
-; $Id: ozsetcontrast.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozsetcontrast.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsetcontrast
+	PUBLIC	_ozsetcontrast
 	
 	EXTERN	ozsetlcdstate
 
@@ -20,6 +22,7 @@
 
 
 ozsetcontrast:
+_ozsetcontrast:
         pop     hl
         pop     bc
         push    bc

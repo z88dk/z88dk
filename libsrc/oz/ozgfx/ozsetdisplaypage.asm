@@ -11,13 +11,16 @@
 ;
 ;
 ; ------
-; $Id: ozsetdisplaypage.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozsetdisplaypage.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsetdisplaypage
+	PUBLIC	_ozsetdisplaypage
 
 
 ozsetdisplaypage:
+_ozsetdisplaypage:
         pop     hl
         pop     bc
         push    bc

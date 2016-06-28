@@ -12,15 +12,18 @@
 ;
 ;
 ; ------
-; $Id: ozsetactivepage.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozsetactivepage.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsetactivepage
+	PUBLIC	_ozsetactivepage
 	
 	EXTERN	ozactivepage
 
 
 ozsetactivepage:
+_ozsetactivepage:
         pop     hl
         pop     bc
         push    bc

@@ -5,13 +5,15 @@
 ;	void ozcircle(int x,int y,byte r,byte color);
 ;
 ; ------
-; $Id: ozcircle.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozcircle.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+	SECTION code_clib
 	PUBLIC	ozcircle
+	PUBLIC	_ozcircle
 
         EXTERN     swapgfxbk
-        EXTERN     swapgfxbk1
+        EXTERN     __oz_gfxend
 
 	EXTERN     draw_circle
         EXTERN     ozplotpixel
@@ -21,7 +23,9 @@
 
 
 .ozcircle
-		ld	ix,0
+._ozcircle
+		push	ix	;save callers
+		ld	ix,2
 		add	ix,sp
 		ld	a,(ix+2)
 		and	4
@@ -37,7 +41,7 @@
 		pop	af
 		jr	nz,filloop
                 call    draw_circle
-                jp      swapgfxbk1
+                jp      __oz_gfxend
 
 .filloop
 		push	bc
@@ -47,5 +51,5 @@
 		pop	bc
 		dec	d
 		jr	nz,filloop
-		jp	swapgfxbk1
+		jp	__oz_gfxend
 		

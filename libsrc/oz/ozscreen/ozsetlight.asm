@@ -13,10 +13,12 @@
 ;
 ;
 ; ------
-; $Id: ozsetlight.asm,v 1.2 2015-01-19 01:33:02 pauloscustodio Exp $
+; $Id: ozsetlight.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
 ;
 
+        SECTION code_clib
 	PUBLIC	ozsetlight
+	PUBLIC	_ozsetlight
 	
 	EXTERN	ozbacklight
 	EXTERN	ozbacklight_save
@@ -26,6 +28,7 @@
 
 
 ozsetlight:
+_ozsetlight:
         pop     hl
         pop     bc
         push    bc
