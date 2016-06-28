@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sock_waitopen
 
-
+        SECTION code_clib
 	PUBLIC	sock_waitopen
+	PUBLIC	_sock_waitopen
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_waitopen
+._sock_waitopen
 	ld	a,r_sock_waitopen
 	call_pkg(tcp_all)
 	ret	nc

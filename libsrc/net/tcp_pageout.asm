@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: tcp_pageout
 
-
+        SECTION code_clib
 	PUBLIC	tcp_pageout
+	PUBLIC	_tcp_pageout
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .tcp_pageout
+._tcp_pageout
 	pop	de	;ret address
 	pop	hl	;l holds bank to page in
 	push	hl

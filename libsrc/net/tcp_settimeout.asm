@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: tcp_settimeout
 
-
+        SECTION code_clib
 	PUBLIC	tcp_settimeout
+	PUBLIC	_tcp_settimeout
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .tcp_settimeout
+._tcp_settimeout
 	ld	a,r_tcp_settimeout
 	call_pkg(tcp_all)
 	ret	nc

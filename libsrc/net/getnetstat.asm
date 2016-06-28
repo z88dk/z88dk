@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: getnetstat
 
-
+        SECTION code_clib
 	PUBLIC	getnetstat
+	PUBLIC	_getnetstat
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .getnetstat
+._getnetstat
 	ld	a,r_getnetstat
 	call_pkg(tcp_all)
 	ret	nc

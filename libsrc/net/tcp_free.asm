@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: tcp_free
 
-
+        SECTION code_clib
 	PUBLIC	tcp_free
+	PUBLIC	_tcp_free
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .tcp_free
+._tcp_free
 	ld	a,r_tcp_free
 	call_pkg(tcp_all)
 	ret	nc

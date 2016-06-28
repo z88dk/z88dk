@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sock_setmode
 
-
+        SECTION code_clib
 	PUBLIC	sock_setmode
+	PUBLIC	_sock_setmode
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_setmode
+._sock_setmode
 	ld	a,r_sock_setmode
 	call_pkg(tcp_all)
 	ret	nc

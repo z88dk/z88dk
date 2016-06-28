@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sock_setrsize
 
-
+        SECTION code_clib
 	PUBLIC	sock_setrsize
+	PUBLIC	_sock_setrsize
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_setrsize
+._sock_setrsize
 	ld	a,r_sock_setrsize
 	call_pkg(tcp_all)
 	ret	nc

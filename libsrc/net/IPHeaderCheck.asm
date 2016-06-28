@@ -6,12 +6,14 @@
 ;	djm 12/2/2001
 ;
 
-
+        SECTION code_clib
 	PUBLIC	IPHeaderCheck
+	PUBLIC	_IPHeaderCheck
 
 
 ; void IPHeaderSum(ipheader_t *pkt)
 .IPHeaderCheck
+._IPHeaderCheck
 	pop	de
 	pop	hl
 	push	hl

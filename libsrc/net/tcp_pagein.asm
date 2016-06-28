@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: user_pagein
 
-
+        SECTION code_clib
 	PUBLIC	tcp_pagein
+	PUBLIC	_tcp_pagein
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .tcp_pagein
+._tcp_pagein
 	call_pkg(tcp_pgin)
 	ret	nc
 ; We failed..are we installed?

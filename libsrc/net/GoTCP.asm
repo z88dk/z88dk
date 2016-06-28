@@ -8,7 +8,9 @@
 ;	ZSock Lib function: device_online
 
 
+	SECTION code_clib
 	PUBLIC 	GoTCP
+	PUBLIC 	_GoTCP
 
 	EXTERN	no_zsock
 
@@ -16,6 +18,7 @@
 	INCLUDE	"zsock.def"
 
 .GoTCP
+._GoTCP
 	call_pkg(tcp_GoTCP)
 	ret	nc
 ; We failed..are we installed?

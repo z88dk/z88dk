@@ -8,7 +8,9 @@
 ;	ZSock Lib function: sock_sethandler
 
 
+        SECTION code_clib
 	PUBLIC	sock_sethandler
+	PUBLIC	_sock_sethandler
 
 	EXTERN	no_zsock
 
@@ -16,6 +18,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_sethandler
+._sock_sethandler
 	ld	a,r_sock_sethandler
 	call_pkg(tcp_all)
 	ret	nc

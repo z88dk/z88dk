@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: resolve
 
-
+        SECTION code_clib
 	PUBLIC	resolve
+	PUBLIC	_resolve
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .resolve
+._resolve
 	ld	a,r_resolve
 	call_pkg(tcp_all)
 	ret	nc

@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: tcp_malloc
 
-
+        SECTION code_clib
 	PUBLIC	tcp_malloc
+	PUBLIC	_tcp_malloc
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .tcp_malloc
+._tcp_malloc
 	ld	a,r_tcp_malloc
 	call_pkg(tcp_all)
 	ret	nc

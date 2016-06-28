@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: getdomainname
 
-
+        SECTION code_clib
 	PUBLIC	getdomainname
+	PUBLIC	_getdomainname
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .getdomainname
+._getdomainname
 	ld	a,r_getdomainname
 	call_pkg(tcp_all)
 	ret	nc

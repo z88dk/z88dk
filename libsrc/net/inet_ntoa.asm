@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: inet_ntoa
 
-
+        SECTION code_clib
 	PUBLIC	inet_ntoa
+	PUBLIC	_inet_ntoa
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .inet_ntoa
+._inet_ntoa
 	ld	a,r_inet_ntoa
 	call_pkg(tcp_all)
 	ret	nc

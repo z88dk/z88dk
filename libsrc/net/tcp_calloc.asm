@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: tcp_calloc
 
-
+        SECTION code_clib
 	PUBLIC	tcp_calloc
+	PUBLIC	_tcp_calloc
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .tcp_calloc
+._tcp_calloc
 	ld	a,r_tcp_calloc
 	call_pkg(tcp_all)
 	ret	nc

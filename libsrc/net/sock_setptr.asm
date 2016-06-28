@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sock_setptr
 
-
+        SECTION code_clib
 	PUBLIC	sock_setptr
+	PUBLIC	_sock_setptr
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_setptr
+._sock_setptr
 	ld	a,r_sock_setptr
 	call_pkg(tcp_all)
 	ret	nc

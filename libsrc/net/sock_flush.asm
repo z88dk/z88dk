@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sock_flush
 
-
+        SECTION code_clib
 	PUBLIC	sock_flush
+	PUBLIC	_sock_flush
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_flush
+._sock_flush
 	ld	a,r_sock_flush
 	call_pkg(tcp_all)
 	ret	nc

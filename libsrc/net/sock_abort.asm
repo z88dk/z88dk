@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sock_abort
 
-
+        SECTION code_clib
 	PUBLIC	sock_abort
+	PUBLIC	_sock_abort
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_abort
+._sock_abort
 	ld	a,r_sock_abort
 	call_pkg(tcp_all)
 	ret	nc

@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: tcp_chktimeout
 
-
+        SECTION code_clib
 	PUBLIC	tcp_chktimeout
+	PUBLIC	_tcp_chktimeout
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .tcp_chktimeout
+._tcp_chktimeout
 	ld	a,r_tcp_chktimeout
 	call_pkg(tcp_all)
 	ret	nc

@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: tcp_regcatchall
 
-
+        SECTION code_clib
 	PUBLIC	tcp_regcatchall
+	PUBLIC	_tcp_regcatchall
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .tcp_regcatchall
+._tcp_regcatchall
 	ld	a,r_tcp_regcatchall
 	call_pkg(tcp_all)
 	ret	nc

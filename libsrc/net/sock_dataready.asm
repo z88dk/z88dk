@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sock_dataready
 
-
+        SECTION code_clib
 	PUBLIC	sock_dataready
+	PUBLIC	_sock_dataready
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_dataready
+._sock_dataready
 	ld	a,r_sock_dataready
 	call_pkg(tcp_all)
 	ret	nc

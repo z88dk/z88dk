@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: killdaemon
 
-
+        SECTION code_clib
 	PUBLIC	killdaemon
+	PUBLIC	_killdaemon
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .killdaemon
+._killdaemon
 	ld	a,r_killdaemon
 	call_pkg(tcp_all)
 	ret	nc

@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sethostaddr
 
-
+        SECTION code_clib
 	PUBLIC	sethostaddr
+	PUBLIC	_sethostaddr
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sethostaddr
+._sethostaddr
 	ld	a,r_sethostaddr
 	call_pkg(tcp_all)
 	ret	nc

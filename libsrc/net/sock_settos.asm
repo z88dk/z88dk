@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sock_settos
 
-
+        SECTION code_clib
 	PUBLIC	sock_settos
+	PUBLIC	_sock_settos
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_settos
+._sock_settos
 	ld	a,r_sock_settos
 	call_pkg(tcp_all)
 	ret	nc

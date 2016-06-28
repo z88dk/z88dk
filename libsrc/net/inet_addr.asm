@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: inet_addr
 
-
+        SECTION code_clib
 	PUBLIC	inet_addr
+	PUBLIC	_inet_addr
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .inet_addr
+._inet_addr
 	ld	a,r_inet_addr
 	call_pkg(tcp_all)
 	ret	nc

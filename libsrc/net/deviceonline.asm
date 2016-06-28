@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: device_online
 
-
+        SECTION code_clib
 	PUBLIC 	DeviceOnline	
+	PUBLIC 	_DeviceOnline	
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .DeviceOnline
+._DeviceOnline
 	call_pkg(tcp_online)
 	ret	nc
 ; We failed..are we installed?

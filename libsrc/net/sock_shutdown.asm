@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: sock_shutdown
 
-
+        SECTION code_clib
 	PUBLIC	sock_shutdown
+	PUBLIC	_sock_shutdown
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .sock_shutdown
+._sock_shutdown
 	ld	a,r_sock_shutdown
 	call_pkg(tcp_all)
 	ret	nc

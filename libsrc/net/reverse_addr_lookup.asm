@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: reverse_addr_lookup
 
-
+        SECTION code_clib
 	PUBLIC	reverse_addr_lookup
+	PUBLIC	_reverse_addr_lookup
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .reverse_addr_lookup
+._reverse_addr_lookup
 	ld	a,r_reverse_addr_lookup
 	call_pkg(tcp_all)
 	ret	nc

@@ -4,7 +4,7 @@
 ;
 ;	djm  7/2/2001
 
-
+        SECTION code_clib
 	PUBLIC	no_zsock
 
 

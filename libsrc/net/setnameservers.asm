@@ -7,8 +7,9 @@
 ;
 ;	ZSock Lib function: setnameservers
 
-
+        SECTION code_clib
 	PUBLIC	setnameservers
+	PUBLIC	_setnameservers
 
 	EXTERN	no_zsock
 
@@ -16,6 +17,7 @@
 	INCLUDE	"zsock.def"
 
 .setnameservers
+._setnameservers
 	ld	a,r_setnameservers
 	call_pkg(tcp_all)
 	ret	nc

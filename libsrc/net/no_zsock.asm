@@ -4,7 +4,7 @@
 ;
 ;	djm 12/2/2000
 
-
+        SECTION code_clib
 	PUBLIC	no_zsock
 
 	EXTERN	exit
@@ -19,7 +19,7 @@
 	ld	hl,0
 	jp	exit
 
-
+	SECTION rodata_clib
 .message
         defb   1,'7','#','3',32+7,32+1,32+34,32+7,131     ;dialogue box
         defb   1,'2','C','3',1,'4','+','T','U','R',1,'2','J','C'
