@@ -82,13 +82,13 @@ typedef struct {
 
 
 /* protos */
-extern void __LIB__ ozrotatepointx(Vector_t *v, int rot);
-extern void __LIB__ ozrotatepointy(Vector_t *v, int rot);
-extern void __LIB__ ozrotatepointz(Vector_t *v, int rot);
-extern void __LIB__ ozplotpointcam(Vector_t *v, Cam_t *c, Point_t *p);
-extern void __LIB__ ozplotpoint(Vector_t *v, Point_t *p);
-extern void __LIB__ ozcopyvector(Vector_t *dest, Vector_t *src);
-extern void __LIB__ oztranslatevector(Vector_t *v, Vector_t *offset);
+extern void __LIB__ ozrotatepointx(Vector_t *v, int rot) __SMALLCDECL;
+extern void __LIB__ ozrotatepointy(Vector_t *v, int rot) __SMALLCDECL;
+extern void __LIB__ ozrotatepointz(Vector_t *v, int rot) __SMALLCDECL;
+extern void __LIB__ ozplotpointcam(Vector_t *v, Cam_t *c, Point_t *p) __SMALLCDECL;
+extern void __LIB__ ozplotpoint(Vector_t *v, Point_t *p) __SMALLCDECL;
+extern void __LIB__ ozcopyvector(Vector_t *dest, Vector_t *src) __SMALLCDECL;
+extern void __LIB__ oztranslatevector(Vector_t *v, Vector_t *offset) __SMALLCDECL;
 
 
 /* protos from MSX GFX lib */
@@ -97,40 +97,40 @@ extern void __LIB__ oztranslatevector(Vector_t *v, Vector_t *offset);
 extern int __LIB__ vector_length(vector_t *v);
 
 /// subtract vector v1 by v2, result in r
-extern void __LIB__ vector_subtract (vector_t *v1, vector_t *v2, vector_t *r);
+extern void __LIB__ vector_subtract (vector_t *v1, vector_t *v2, vector_t *r) __SMALLCDECL;
 
 /// normalize vector p, result in r
-extern void __LIB__ vector_normalize(vector_t *p, vector_t *r);
+extern void __LIB__ vector_normalize(vector_t *p, vector_t *r) __SMALLCDECL;
 
 /// rotate vector p by the given angles, result in r
-extern void __LIB__ vector_rotate(vector_t* p, int angle_x, int angle_y, int angle_z, vector_t* r);
+extern void __LIB__ vector_rotate(vector_t* p, int angle_x, int angle_y, int angle_z, vector_t* r) __SMALLCDECL;
 
 /// dot product of v1 by v2
-extern int __LIB__ vector_dot_product (vector_t* v1, vector_t* v2);
+extern int __LIB__ vector_dot_product (vector_t* v1, vector_t* v2) __SMALLCDECL;
 
 /// cross product of v1 by v2, result into r
-extern void __LIB__ vector_cross_product (vector_t* v1, vector_t* v2, vector_t* r);
+extern void __LIB__ vector_cross_product (vector_t* v1, vector_t* v2, vector_t* r) __SMALLCDECL;
 
 /// cross product of the z axis of v1 by v2
-extern int __LIB__ vector_cross_product_z (vector_t* v1, vector_t* v2);
+extern int __LIB__ vector_cross_product_z (vector_t* v1, vector_t* v2) __SMALLCDECL;
 
 /// scale vector v by s, result in r
-extern void __LIB__ vector_scalar(vector_t *v, int s, vector_t* r);
+extern void __LIB__ vector_scalar(vector_t *v, int s, vector_t* r) __SMALLCDECL;
 
 /// add vector v1 with v2, result in r
-extern void __LIB__ vector_add(vector_t *v1, vector_t *v2, vector_t *r);
+extern void __LIB__ vector_add(vector_t *v1, vector_t *v2, vector_t *r) __SMALLCDECL;
 
 /// distance between vectors v1 and v2
-extern int __LIB__ vector_distance (vector_t *v1, vector_t *v2);
+extern int __LIB__ vector_distance (vector_t *v1, vector_t *v2) __SMALLCDECL;
 
 /// create a new mesh with pcount points and tcount triangles
-extern mesh_t __LIB__ *mesh_new(int pcount, int tcount);
+extern mesh_t __LIB__ *mesh_new(int pcount, int tcount) __SMALLCDECL;
 
 /// deallocate mesh
-extern void __LIB__ mesh_delete(mesh_t* mesh);
+extern void __LIB__ mesh_delete(mesh_t* mesh) __SMALLCDECL;
 
 /// apply perspective transformations on object obj, centering the points around x and y
-extern void __LIB__ object_apply_transformations(object_t* obj, vector_t* pbuffer, int x, int y);
+extern void __LIB__ object_apply_transformations(object_t* obj, vector_t* pbuffer, int x, int y) __SMALLCDECL;
 
 /*
 	Integer sin functions taken from the lib3d library, OZ7xx DK
