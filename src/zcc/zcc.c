@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.132 2016-06-28 23:41:16 aralbrec Exp $
+ *      $Id: zcc.c,v 1.133 2016-06-29 03:17:44 aralbrec Exp $
  */
 
 
@@ -967,7 +967,7 @@ void BuildAsmLine(char *dest, size_t destlen, char *prefix)
         offs += snprintf(dest + offs, destlen - offs,"%s%s%s",
                         prefix,
                         z80verbose ? " -v " : " ",
-                        !symbolson ? " -ns " : " ");
+                        symbolson ? " -s " : " ");
     }
     
     snprintf(dest + offs, destlen - offs,"%s", c_asmopts);
