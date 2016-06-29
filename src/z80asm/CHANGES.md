@@ -14,6 +14,10 @@ Z88DK Z80 Macro Assembler Change Log
 
   Remove -nb and --no-make-bin options.
   
+  Remove -nd and --no-date-stamp options. 
+  
+  Remove -a and --make-updated-bin options - they are aliases to -b -d.
+  
 - 2016-06-28
 
   Only generate .sym file if -s or --symtable option is given.

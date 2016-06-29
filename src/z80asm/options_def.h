@@ -62,10 +62,7 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 #define OPT_HELP_SPLIT_BIN		"Create one binary file per section"
 
 #define OPT_HELP_DATE_STAMP		"Assemble only updated files"
-#define OPT_HELP_NO_DATE_STAMP	"Assemble all files"
 
-#define OPT_HELP_MAKE_UPDATED_BIN	\
-								"Assemble updated files and link/relocate to file" FILEEXT_BIN
 #define OPT_HELP_ORIGIN			"Relocate binary file to given address"
 
 #define OPT_HELP_RELOCATABLE	"Create relocatable code"
@@ -132,11 +129,7 @@ OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
 OPT( OptSet,	&opts.split_bin, "", "--split-bin", OPT_HELP_SPLIT_BIN, "")
 
 OPT( OptSet,	&opts.date_stamp, "-d",  "--date-stamp",    OPT_HELP_DATE_STAMP, "")
-OPT( OptClear,	&opts.date_stamp, "-nd", "--no-date-stamp",	OPT_HELP_NO_DATE_STAMP, "" )
 
-OPT( OptCall,	option_make_updated_bin,
-     "-a", 	"--make-updated-bin",
-     OPT_HELP_MAKE_UPDATED_BIN, "" )
 OPT( OptCallArg, option_origin,	"-r", 	"--origin",			OPT_HELP_ORIGIN, "ORG_HEX" )
 OPT( OptSet,	&opts.relocatable,
      "-R", 	"--relocatable",	OPT_HELP_RELOCATABLE, "" )

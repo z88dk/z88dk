@@ -103,7 +103,7 @@ unlink_testfiles();
 write_binfile(obj_file(), objfile( NAME => "test", 
 								   CODE => [["", -1, "\0\0"]], 
 								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "", "*+VAL"] ] ));
-t_z80asm_capture("-a ".obj_file(),
+t_z80asm_capture("-b -d ".obj_file(),
 				 "",
 				 "Error at file 'test.asm' line 1: syntax error in expression\n".
 				 "1 errors occurred during assembly\n",
@@ -510,7 +510,7 @@ t_z80asm_capture("-x ".asm_file(), "",
 # error_not_obj_file
 unlink_testfiles();
 write_file(obj_file(), "not an object");
-sleep 0.100;
+sleep 0.500;
 write_file(asm_file(), "nop");
 t_z80asm_capture("-b -d ".obj_file(), "", "", 0);
 t_binary(read_binfile(obj_file()), objfile(NAME => "test", 
@@ -521,7 +521,7 @@ t_binary(read_binfile(bin_file()), "\x00");
 # CreateLib uses a different error call
 unlink_testfiles();
 write_file(obj_file(), "not an object");
-sleep 0.100;
+sleep 0.500;
 write_file(asm_file(), "nop");
 t_z80asm_capture("-x".lib_file()." -d ".obj_file(), "", "", 0);
 t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", 
@@ -530,7 +530,7 @@ unlink_testfiles();
 write_binfile(obj_file(), objfile( NAME => "test", 
 								   CODE => [["", -1, "\0\0"]], 
 								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD"] ] ));
-t_z80asm_capture("-a ".obj_file(),
+t_z80asm_capture("-b -d ".obj_file(),
 				 "",
 				 "Error at module 'test': file 'test.obj' not an object file\n".
 				 "Error at module 'test': file 'test.obj' not an object file\n".

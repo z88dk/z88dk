@@ -14,6 +14,7 @@ use warnings;
 use File::Slurp;
 use File::Basename;
 use File::Copy;
+use Time::HiRes 'sleep';
 use Capture::Tiny 'capture_merged';
 use Test::Differences; 
 use Test::More;
@@ -109,8 +110,6 @@ Binary Output:
   -b, --make-bin         Assemble and link/relocate to file.bin
   --split-bin            Create one binary file per section
   -d, --date-stamp       Assemble only updated files
-* -nd, --no-date-stamp   Assemble all files
-  -a, --make-updated-bin Assemble updated files and link/relocate to file.bin
   -r, --origin=ORG_HEX   Relocate binary file to given address
   -R, --relocatable      Create relocatable code
 
@@ -168,8 +167,8 @@ END
 for my $options ('-v', '--verbose') {
 	unlink_testfiles();
 	write_file(asm_file(), " nop \n nop \n nop");
-	t_z80asm_capture("-a -s -l -g $options ".asm_file(), 
-					"Assemble only updated files\n".$verbose_text, "", 0);
+	t_z80asm_capture("-b -d -s -l -g $options ".asm_file(), 
+					$verbose_text, "", 0);
 	ok -f obj_file();
 	ok -f bin_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
@@ -177,7 +176,7 @@ for my $options ('-v', '--verbose') {
 	unlink_testfiles();
 	write_file(asm_file(), " nop \n nop \n nop");
 	t_z80asm_capture("-b -s -l -g $options ".asm_file(), 
-					"Assemble all files\n".$verbose_text, "", 0);
+					$verbose_text, "", 0);
 	ok -f obj_file();
 	ok -f bin_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
@@ -554,58 +553,17 @@ for my $options ('-d', '--date-stamp') {
 	my $date_obj = -M obj_file();
 
 	# now skips compile
-	sleep 1;		# make sure our obj is older
+	sleep 0.500;		# make sure our obj is older
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
 	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
 	is -M obj_file(), $date_obj;	# same object
 
 	# touch source
-	sleep 1;		# make sure our obj is older
+	sleep 0.500;		# make sure our obj is older
 	write_file(asm_file(), "nop");
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
 	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
-
-	isnt -M obj_file(), $date_obj;	# new object
-
-	$date_obj = -M obj_file();
-
-	# compile again
-	for my $options2 ('-nd', '--no-date-stamp') {
-		sleep 1;		# make sure our obj is older
-		t_z80asm_capture("$options $options2 ".asm_file(), "", "", 0);
-		is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
-
-		isnt -M obj_file(), $date_obj;	# new object
-	}
-}
-
-#------------------------------------------------------------------------------
-# -a, --make-updated-bin
-#------------------------------------------------------------------------------
-
-for my $options ('-a', '--make-updated-bin') {
-	# first compiles; second skips
-	unlink_testfiles();
-	write_file(asm_file(), "nop");
-
-	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is read_file(bin_file(), binmode => ':raw'), "\0";
-
-	my $date_obj = -M obj_file();
-
-	# now skips compile
-	sleep 1;		# make sure our obj is older
-	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is read_file(bin_file(), binmode => ':raw'), "\0";
-
-	is -M obj_file(), $date_obj;	# same object
-
-	# touch source
-	sleep 1;		# make sure our obj is older
-	write_file(asm_file(), "nop");
-	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is read_file(bin_file(), binmode => ':raw'), "\0";
 
 	isnt -M obj_file(), $date_obj;	# new object
 }

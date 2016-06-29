@@ -51,7 +51,6 @@ enum OptType
 static void exit_help( void );
 static void exit_copyright( void );
 static void display_options( void );
-static void option_make_updated_bin( void );
 static void option_origin( char *origin_hex );
 static void option_define( char *symbol );
 static void option_make_lib( char *library );
@@ -403,9 +402,6 @@ static void exit_copyright( void )
 
 static void display_options( void )
 {
-    if ( opts.date_stamp )						puts( OPT_HELP_DATE_STAMP );
-    else										puts( OPT_HELP_NO_DATE_STAMP );
-
     if ( opts.list )							puts( OPT_HELP_LIST );
 
     if ( opts.lib_file )						puts( OPT_HELP_MAKE_LIB );
@@ -422,11 +418,6 @@ static void display_options( void )
 /*-----------------------------------------------------------------------------
 *   Option functions called from Opts table
 *----------------------------------------------------------------------------*/
-static void option_make_updated_bin( void )
-{
-    opts.make_bin = opts.date_stamp = TRUE;
-}
-
 static void option_origin( char *origin_hex )
 {
 	char *end;
