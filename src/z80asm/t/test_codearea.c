@@ -15,6 +15,9 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include <stdio.h>
 #include <stdarg.h>
 
+int sizeof_relocroutine = 0;
+int sizeof_reloctable = 0;
+
 char *GetLibfile( char *filename ) { return ""; }
 
 static void dump_sections(char *title, int line)

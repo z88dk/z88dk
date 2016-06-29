@@ -406,8 +406,6 @@ static void display_options( void )
     if ( opts.date_stamp )						puts( OPT_HELP_DATE_STAMP );
     else										puts( OPT_HELP_NO_DATE_STAMP );
 
-    if ( opts.symtable )						puts( OPT_HELP_SYMTABLE );
-
     if ( opts.list )							puts( OPT_HELP_LIST );
 
     if ( opts.lib_file )						puts( OPT_HELP_MAKE_LIB );

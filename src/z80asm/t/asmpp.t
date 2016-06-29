@@ -453,7 +453,7 @@ sub t_asmpp_ok {
 	ok 1,"[line ".((caller)[2])."]"." t_asmpp_ok";
 	write_file("test.asm", $in);
 	unlink("test.bin");
-	my $cmd = "asmpp.pl -r0 -b $args test.asm";
+	my $cmd = "asmpp.pl -b $args test.asm";
 	ok 0 == system($cmd), $cmd;
 	t_binary(read_binfile("test.bin"), $bin);
 }
@@ -463,12 +463,12 @@ sub t_asmpp_error {
 	my($in, $args, $error) = @_;
 	ok 1,"[line ".((caller)[2])."]"." t_asmpp_error";
 	write_file("test.asm", $in);
-	my $cmd = "asmpp.pl -r0 -b $args test.asm";
+	my $cmd = "asmpp.pl -b $args test.asm";
 	my($stdout, $stderr, $return) = capture {
 		system $cmd;
 	};
 	ok $return != 0, "exit value";
-	$stdout =~ s/^z80asm -r0 -b.*\s*//;
+	$stdout =~ s/^z80asm -b.*\s*//;
 	eq_or_diff_text $stdout, "", "stdout";
 	eq_or_diff_text $stderr, $error, "stderr";
 }

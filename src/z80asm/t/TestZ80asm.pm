@@ -208,7 +208,7 @@ sub z80emu {
 
 	if ( ! $done_z80emu ) {
 		z80asm(
-			options	=> '-x'.$z80emu.' -Mo -ns '.join(' ', sort(<$z80emu_dir/*.asm>)),
+			options	=> '-x'.$z80emu.' -Mo '.join(' ', sort(<$z80emu_dir/*.asm>)),
 			ok		=> 1,
 		);
 		$done_z80emu++;

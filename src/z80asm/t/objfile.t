@@ -4447,7 +4447,7 @@ t_binary($obj, objfile(NAME => 'test2',
 				CODE => [["", -1, "\xC3\0\0"]]));
 write_binfile(obj3_file(), $obj);
 
-t_z80asm_capture(join(" ", "-r0", "-a", asm_file(), asm1_file(), asm2_file()), "", "", 0);
+t_z80asm_capture(join(" ", "", "-a", asm_file(), asm1_file(), asm2_file()), "", "", 0);
 t_binary(read_binfile(bin_file()), "\xC3\x00\x00");
 
 #------------------------------------------------------------------------------

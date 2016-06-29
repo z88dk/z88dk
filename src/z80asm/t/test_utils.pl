@@ -66,7 +66,7 @@ sub unlink_testfiles {
 #------------------------------------------------------------------------------
 # Args:
 #	asm, asm1, asm2, ... : source text, asm is main file; can use " : " to split lines
-#	org : -1 to skip -r0 option, >= 0 to define -r{org}, undef for -r0, org = decimal value
+#	org : >= 0 to define -r{org}, undef for no -r, org = decimal value
 # 	options : additional assemble options
 #   out : expected output, if any
 #   err : expected compile errors, if any
@@ -105,13 +105,7 @@ sub t_z80asm {
 	$cmd .= "-b ";
 	
 	# org
-	if (! exists $args{org}) {
-		$cmd .= "-r0 ";
-	}
-	elsif ($args{org} < 0) {
-		# no -r
-	}
-	else {
+	if ( exists($args{org}) && $args{org} > 0 ){
 		$cmd .= sprintf("-r%04X ", $args{org});
 	}
 
@@ -210,16 +204,22 @@ sub t_z80asm {
 			ok ! -f $_, "$line no $_" for (@lst);
 		}
 		
-		if ($cmd =~ / (-ns|--no-symtable) /) {
-			ok ! -f $_, "$line no $_" for (@sym);
+		if ($cmd =~ / (-s|--symtable) /) {
+			ok   -f $_, "$line $_" for (@sym);
 		}
 		else {
-			ok   -f $_, "$line $_" for (@sym);
+			ok ! -f $_, "$line no $_" for (@sym);
 		}
 	}
 	elsif ($args{linkerr}) {	# asm OK but link failed
 		ok -f $_, "$line $_" for (@lst);
-		ok -f $_, "$line $_" for (@sym);
+
+		if ($cmd =~ / (-s|--symtable) /) {
+			ok   -f $_, "$line $_" for (@sym);
+		}
+		else {
+			ok ! -f $_, "$line no $_" for (@sym);
+		}
 	}
 	else {
 		ok ! -f $_, "$line no $_" for (@lst);
@@ -521,6 +521,9 @@ sub t_compile_module {
 	$main_code = "
 #include <stdlib.h>
 #include <stdio.h>
+
+int sizeof_relocroutine = 0;
+int sizeof_reloctable = 0;
 
 ".join("\n", map {"#include \"$_\""} grep {-f $_} map {"$_.h"} sort keys %modules)."\n".'
 #undef main
@@ -868,53 +871,45 @@ sub list_test {
 
 	list_push_asm();
 	
-	for my $options ("-ns -nl", "-nl -ns") {
-		t_z80asm(
-			asm		=> $asm,
-			bin		=> $bin,
-			options	=> $options,
-			nolist	=> 1,
-		);
-		ok ! -f lst_file(), "no ".lst_file();
-		ok ! -f sym_file(), "no ".sym_file();
-	}
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> "-nl",
+		nolist	=> 1,
+	);
+	ok ! -f lst_file(), "no ".lst_file();
+	ok ! -f sym_file(), "no ".sym_file();
 	
-	for my $options ("-ns -l", "-l -ns") {
-		t_z80asm(
-			asm		=> $asm,
-			bin		=> $bin,
-			options	=> $options,
-			nolist	=> 1,
-		);
-		ok   -f lst_file(), lst_file();
-		ok ! -f sym_file(), "no ".sym_file();
-		compare_list_file(lst_file(), @LIST_LST);
-	}
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> "-l",
+		nolist	=> 1,
+	);
+	ok   -f lst_file(), lst_file();
+	ok ! -f sym_file(), "no ".sym_file();
+	compare_list_file(lst_file(), @LIST_LST);
 	
-	for my $options ("", "-nl", "-s", "-s -nl", "-nl -s") {
-		t_z80asm(
-			asm		=> $asm,
-			bin		=> $bin,
-			options	=> $options,
-			nolist	=> 1,
-		);
-		ok ! -f lst_file(), "no ".lst_file();
-		ok   -f sym_file(), sym_file();
-		compare_list_file(sym_file(), sym_lines());
-	}
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> "-s",
+		nolist	=> 1,
+	);
+	ok ! -f lst_file(), lst_file();
+	ok   -f sym_file(), "no ".sym_file();
+	compare_list_file(sym_file(), sym_lines());
 	
-	for my $options ("-l", "-s -l", "-l -s") {
-		t_z80asm(
-			asm		=> $asm,
-			bin		=> $bin,
-			options	=> $options,
-			nolist	=> 1,
-		);
-		ok -f lst_file(), lst_file();
-		ok -f sym_file(), sym_file();
-		compare_list_file(lst_file(), @LIST_LST);
-		compare_list_file(sym_file(), sym_lines());
-	}
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> "-s -l",
+		nolist	=> 1,
+	);
+	ok -f lst_file(), lst_file();
+	ok -f sym_file(), sym_file();
+	compare_list_file(lst_file(), @LIST_LST);
+	compare_list_file(sym_file(), sym_lines());
 }
 
 list_first_line();

@@ -20,6 +20,9 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include <stdarg.h>
 #include <stdio.h>
 
+int sizeof_relocroutine = 0;
+int sizeof_reloctable = 0;
+
 char *GetLibfile( char *filename ) { return ""; }
 extern Symbol *_define_sym( char *name, long value, sym_type_t sym_type, Byte type_mask,
                      Module *module, Section *section,

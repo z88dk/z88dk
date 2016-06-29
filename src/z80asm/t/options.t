@@ -35,21 +35,21 @@ write_file(asm1_file(), "defb 1");
 write_file(asm2_file(), "defb 2");
 write_file(asm3_file(), "defb 3");
 write_file(asm4_file(), "defb 4");
-t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), asm2_file(), asm3_file(), asm4_file()),
+t_z80asm_capture(join(" ", "", "-b", asm1_file(), asm2_file(), asm3_file(), asm4_file()),
 				 "", "", 0);
 t_binary(read_binfile(bin1_file()), "\1\2\3\4");
 ok unlink bin1_file();
 
 write_binfile(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
 write_binfile(asmlst2_file(), "\r\r\n\n  ".asm3_file()."  \r\r\n\n    ".asm4_file()."\n");
-t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), '@'.asmlst1_file()),
+t_z80asm_capture(join(" ", "", "-b", asm1_file(), '@'.asmlst1_file()),
 				 "", "", 0);
 t_binary(read_binfile(bin1_file()), "\1\2\3\4");
 ok unlink bin1_file();
 
 write_binfile(asmlst1_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst2_file());
 write_binfile(asmlst2_file(), "\r\r\n\n  ".asm2_file()."  \r\r\n\n  \@ ".asmlst1_file());
-t_z80asm_capture(join(" ", "-r0", "-b", asm1_file(), '@'.asmlst1_file()),
+t_z80asm_capture(join(" ", "", "-b", asm1_file(), '@'.asmlst1_file()),
 				 "", <<'ERR', 1);
 Error at file 'test2.asmlst' line 7: cannot include file 'test1.asmlst' recursively
 1 errors occurred during assembly
@@ -117,8 +117,7 @@ Binary Output:
   -R, --relocatable      Create relocatable code
 
 Output File Options:
-* -s, --symtable         Create symbol table file.sym
-  -ns, --no-symtable     No symbol table file
+  -s, --symtable         Create symbol table file.sym
   -l, --list             Create listing file.lst
 * -nl, --no-list         No listing file
   -m, --map              Create address map file.map
@@ -152,7 +151,6 @@ ERR
 # --verbose, -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
-Create symbol table file.sym
 Create listing file.lst
 Assemble and link/relocate to file.bin
 
@@ -172,7 +170,7 @@ END
 for my $options ('-v', '--verbose') {
 	unlink_testfiles();
 	write_file(asm_file(), " nop \n nop \n nop");
-	t_z80asm_capture("-r0 -a -s -l -g $options ".asm_file(), 
+	t_z80asm_capture("-a -s -l -g $options ".asm_file(), 
 					"Assemble only updated files\n".$verbose_text, "", 0);
 	ok -f obj_file();
 	ok -f bin_file();
@@ -180,7 +178,7 @@ for my $options ('-v', '--verbose') {
 	
 	unlink_testfiles();
 	write_file(asm_file(), " nop \n nop \n nop");
-	t_z80asm_capture("-r0 -b -s -l -g $options ".asm_file(), 
+	t_z80asm_capture("-b -s -l -g $options ".asm_file(), 
 					"Assemble all files\n".$verbose_text, "", 0);
 	ok -f obj_file();
 	ok -f bin_file();
@@ -208,7 +206,7 @@ unlink_testfiles();
 write_file(asm_file(), "nop");
 
 for my $options ('-nv', '--not-verbose') {
-	t_z80asm_capture("-r0 -b $options ".asm_file(), "", "", 0);
+	t_z80asm_capture("-b $options ".asm_file(), "", "", 0);
 	ok -f obj_file();
 	ok -f bin_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0";
@@ -234,13 +232,13 @@ my $base = asm_file(); $base =~ s/\.\w+$//;
 
 unlink_testfiles();
 write_file(asm_file(), "ret");
-t_z80asm_capture("-r0 -b ".$base, "", "", 0);
+t_z80asm_capture("-b ".$base, "", "", 0);
 is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 
 for my $options ('-exxx', '-e=xxx', '--asm-extxxx', '--asm-ext=xxx') {
 	unlink_testfiles();
 	write_file($base.".xxx", "ret");
-	t_z80asm_capture("-r0 -b $options $base", "", "", 0);
+	t_z80asm_capture("-b $options $base", "", "", 0);
 	is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 }
 
@@ -292,7 +290,7 @@ Error: source filename missing
 ERR
 
 #------------------------------------------------------------------------------
-# -s, --symtable, -ns, --no-symtable, -l, --list, -nl, --no-list
+# -s, --symtable
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
@@ -308,8 +306,41 @@ my $bin = pack("C*",
 	0xC9
 );
 
-# no symbol table, no list
-for my $options ('-nl -ns', '-nl --no-symtable') {
+# no symbol table
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+	options	=> "",
+);
+
+# symbol table
+for my $options ('-s', '--symtable') {
+	t_z80asm(
+		asm		=> $asm,
+		bin		=> $bin,
+		options	=> $options,
+	);
+}
+
+#------------------------------------------------------------------------------
+# -l, --list, -nl, --no-list
+#------------------------------------------------------------------------------
+unlink_testfiles();
+
+$asm = "
+	PUBLIC main
+main:	ld b,10
+loop:	djnz loop
+	ret
+";
+$bin = pack("C*", 
+	0x06, 10,
+	0x10, -2 & 0xFF,
+	0xC9
+);
+
+# no list
+for my $options ('-nl', '-nl') {
 	t_z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
@@ -318,18 +349,8 @@ for my $options ('-nl -ns', '-nl --no-symtable') {
 	);
 }
 
-# list file implies no symbol table
-for my $options ('-l', '-l -s', '-l --symtable') {
-	t_z80asm(
-		asm		=> $asm,
-		bin		=> $bin,
-		options	=> $options,
-		nolist	=> 1,
-	);
-}
-
-# no list file implies symbol table
-for my $options ('', '-nl', '-s', '--symtable', '-nl -s', '-nl --symtable') {
+# list file
+for my $options ('-l', '--list') {
 	t_z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
@@ -486,7 +507,7 @@ for my $options ('-b', '--make-bin') {
 	unlink_testfiles();
 	write_file(asm_file(), "nop");
 
-	t_z80asm_capture("-r0 $options ".asm_file(), "", "", 0);
+	t_z80asm_capture("$options ".asm_file(), "", "", 0);
 	ok -f obj_file();
 	ok -f bin_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0";
@@ -511,7 +532,7 @@ $bin = bin_file(); $bin =~ s/\.bin$/2.bin/i;
 unlink_testfiles($bin);
 write_file(asm_file(), "nop");
 
-t_z80asm_capture("-r0 -b ".asm_file(), "", "", 0);
+t_z80asm_capture("-b ".asm_file(), "", "", 0);
 ok -f bin_file();
 ok ! -f $bin;
 t_binary(read_file(bin_file(), binmode => ':raw'), "\0");
@@ -521,7 +542,7 @@ for my $options ("-o$bin", "-o=$bin", "--output$bin", "--output=$bin") {
 	unlink_testfiles($bin);
 	write_file(asm_file(), "nop");
 
-	t_z80asm_capture("-r0 -b $options ".asm_file(), "", "", 0);
+	t_z80asm_capture("-b $options ".asm_file(), "", "", 0);
 	ok ! -f bin_file();
 	ok -f $bin;
 	t_binary(read_file($bin, binmode => ':raw'), "\0");
@@ -579,14 +600,14 @@ for my $options ('-a', '--make-updated-bin') {
 	unlink_testfiles();
 	write_file(asm_file(), "nop");
 
-	t_z80asm_capture("-r0 $options ".asm_file(), "", "", 0);
+	t_z80asm_capture("$options ".asm_file(), "", "", 0);
 	is read_file(bin_file(), binmode => ':raw'), "\0";
 
 	my $date_obj = -M obj_file();
 
 	# now skips compile
 	sleep 1;		# make sure our obj is older
-	t_z80asm_capture("-r0 $options ".asm_file(), "", "", 0);
+	t_z80asm_capture("$options ".asm_file(), "", "", 0);
 	is read_file(bin_file(), binmode => ':raw'), "\0";
 
 	is -M obj_file(), $date_obj;	# same object
@@ -594,7 +615,7 @@ for my $options ('-a', '--make-updated-bin') {
 	# touch source
 	sleep 1;		# make sure our obj is older
 	write_file(asm_file(), "nop");
-	t_z80asm_capture("-r0 $options ".asm_file(), "", "", 0);
+	t_z80asm_capture("$options ".asm_file(), "", "", 0);
 	is read_file(bin_file(), binmode => ':raw'), "\0";
 
 	isnt -M obj_file(), $date_obj;	# new object
@@ -799,7 +820,7 @@ ok -f lib6_file();
 t_z80asm_capture("-x".lib7_file()." ".asm7_file(), "", "", 0); 
 ok -f lib7_file();
 
-t_z80asm_capture("-l -m -b -r0 -i".lib5_file()." -i".lib6_file()." -i".lib7_file()." ".
+t_z80asm_capture("-l -m -b -i".lib5_file()." -i".lib6_file()." -i".lib7_file()." ".
 				 asm_file()." ".asm2_file()." ".asm3_file(), "", "", 0);
 ok -f bin_file();
 t_binary(read_binfile(bin_file()), 
@@ -821,7 +842,7 @@ write_file(asm5_file(), " PUBLIC abs \nabs: ld a,2\n ret\n");
 t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
 ok -f lib5_file();
 
-t_z80asm_capture("-l -m -b -r0 -i".lib5_file()." ".asm_file()." ".asm2_file(), "", "", 0);
+t_z80asm_capture("-l -m -b -i".lib5_file()." ".asm_file()." ".asm2_file(), "", "", 0);
 ok -f bin_file();
 t_binary(read_binfile(bin_file()), 
 		pack("C*",
@@ -842,7 +863,7 @@ write_file(asm5_file(), "PUBLIC A5 \n PUBLIC A51 \n A5: \n defc A51 = 51");
 t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
 ok -f lib5_file();
 
-t_z80asm_capture("-l -m -b -r0 -i".lib5_file()." ".asm_file(), "", "", 0);
+t_z80asm_capture("-l -m -b -i".lib5_file()." ".asm_file(), "", "", 0);
 ok -f bin_file();
 t_binary(read_binfile(bin_file()), pack("C*", 51 ));
 
@@ -869,7 +890,7 @@ write_file(asm_file(),  "A0: \n ".
 write_file(asm7_file(), "PUBLIC A7 \n A7: defb 7");
 write_file(asm8_file(), "PUBLIC A8 \n A8: defb 8");
 write_file(asm9_file(), "PUBLIC A9 \n A9: defb 9");
-t_z80asm_capture("-l -b -r0 -i".lib1_file()." -i".lib2_file()." ".
+t_z80asm_capture("-l -b -i".lib1_file()." -i".lib2_file()." ".
 				 asm_file()." ".asm7_file()." ".asm8_file()." ".asm9_file(), "", "", 0);
 ok -f bin_file();
 my $binary = read_file(bin_file(), binmode => ':raw', err_mode => 'quiet');
@@ -899,12 +920,12 @@ write_file(asm2_file(), "
 ");
 
 # link object files
-t_z80asm_capture("-r0 -b ".asm2_file()." ".asm1_file(), "", "", 0);
+t_z80asm_capture("-b ".asm2_file()." ".asm1_file(), "", "", 0);
 t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 # link library files
 t_z80asm_capture("-x".lib1_file()." ".asm1_file(), "", "", 0);
-t_z80asm_capture("-r0 -b -i".lib1_file()." ".asm2_file(), "", "", 0);
+t_z80asm_capture("-b -i".lib1_file()." ".asm2_file(), "", "", 0);
 t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 #------------------------------------------------------------------------------

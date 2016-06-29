@@ -12,6 +12,7 @@
 use Modern::Perl;
 use Test::More;
 use File::Copy;
+use Time::HiRes 'sleep';
 use File::Path qw(make_path remove_tree);;
 use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
@@ -39,7 +40,7 @@ t_z80asm_error('
 
 unlink_testfiles();
 write_file(asm_file(), "nop");
-t_z80asm_capture("-r0 -b -ixxxx ".asm_file(), "", 
+t_z80asm_capture("-b -ixxxx ".asm_file(), "", 
 		"Error: cannot read file 'xxxx.lib'\n".
 		"1 errors occurred during assembly\n",
 		1);
@@ -49,7 +50,7 @@ t_z80asm_capture("-r0 -b -ixxxx ".asm_file(), "",
 unlink_testfiles();
 make_path( err_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-r0 -b ".asm_file(),
+t_z80asm_capture("-b ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.err'\n".
 				"1 errors occurred during assembly\n",
@@ -59,7 +60,7 @@ remove_tree( err_file() );
 unlink_testfiles();
 make_path( lst_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-l -r0 -b ".asm_file(),
+t_z80asm_capture("-l -b ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.lst'\n".
 				"1 errors occurred during assembly\n",
@@ -69,7 +70,7 @@ remove_tree( lst_file() );
 unlink_testfiles();
 make_path( sym_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-r0 -b ".asm_file(),
+t_z80asm_capture("-b -s ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.sym'\n".
 				"1 errors occurred during assembly\n",
@@ -79,7 +80,7 @@ remove_tree( sym_file() );
 unlink_testfiles();
 make_path( obj_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-l -r0 -b ".asm_file(),
+t_z80asm_capture("-l -b ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.obj'\n".
 				"1 errors occurred during assembly\n",
@@ -89,7 +90,7 @@ remove_tree( obj_file() );
 unlink_testfiles();
 make_path( bin_file() );
 write_file( asm_file(), 'nop' );
-t_z80asm_capture("-r0 -b ".asm_file(),
+t_z80asm_capture("-b ".asm_file(),
 				"", 
 				"Error: cannot write file 'test.bin'\n".
 				"1 errors occurred during assembly\n",
@@ -102,7 +103,7 @@ unlink_testfiles();
 write_binfile(obj_file(), objfile( NAME => "test", 
 								   CODE => [["", -1, "\0\0"]], 
 								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "", "*+VAL"] ] ));
-t_z80asm_capture("-r0 -a ".obj_file(),
+t_z80asm_capture("-a ".obj_file(),
 				 "",
 				 "Error at file 'test.asm' line 1: syntax error in expression\n".
 				 "1 errors occurred during assembly\n",
@@ -205,7 +206,7 @@ write_file(asm1_file(), <<'ASM1');
 	defc G65536  =  65536
 ASM1
 
-t_z80asm_capture("-r0 -b ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
+t_z80asm_capture("-b ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
 Warning at file 'test.asm' line 4: integer '-129' out of range
 Warning at file 'test.asm' line 19: integer '256' out of range
 Warning at file 'test.asm' line 24: integer '-129' out of range
@@ -345,7 +346,7 @@ write_file(asm_file(), "main: ret");
 t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 write_file(asm_file(), "EXTERN main \n call main");
-t_z80asm_capture("-r0 -b -i".$lib." ".asm_file(), "",
+t_z80asm_capture("-b -i".$lib." ".asm_file(), "",
 		"Error at file 'test.asm' line 2: symbol 'main' not defined\n".
 		"1 errors occurred during assembly\n", 
 		1);
@@ -402,13 +403,13 @@ write_file(asm1_file(), "defb 0xAA");
 
 write_file(asm_file(), "defs 65535, 0xAA");
 t_z80asm_capture(asm_file()." ".asm1_file(), "", "", 0);
-t_z80asm_capture("-r0 -d -b ".asm_file()." ".asm1_file(), "", "", 0);
+t_z80asm_capture("-d -b ".asm_file()." ".asm1_file(), "", "", 0);
 t_binary(read_binfile(bin_file()),
 	"\xAA" x 65536);
 
 write_file(asm_file(), "defs 65536, 0xAA");
 t_z80asm_capture(asm_file()." ".asm1_file(), "", "", 0);
-t_z80asm_capture("-r0 -d -b ".asm_file()." ".asm1_file(), "", 
+t_z80asm_capture("-d -b ".asm_file()." ".asm1_file(), "", 
 	"Error: max. code size of 65536 bytes reached\n".
 	"1 errors occurred during assembly\n", 1);
 
@@ -508,27 +509,28 @@ t_z80asm_capture("-x ".asm_file(), "",
 #------------------------------------------------------------------------------
 # error_not_obj_file
 unlink_testfiles();
-write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
-t_z80asm_capture("-r0 -b -d ".obj_file(), "", "", 0);
+sleep 0.100;
+write_file(asm_file(), "nop");
+t_z80asm_capture("-b -d ".obj_file(), "", "", 0);
 t_binary(read_binfile(obj_file()), objfile(NAME => "test", 
-										   CODE => [["", 0, "\x00"]], 
+										   CODE => [["", -1, "\x00"]], 
 										   ));
 t_binary(read_binfile(bin_file()), "\x00");
 	
 # CreateLib uses a different error call
 unlink_testfiles();
-write_file(asm_file(), "nop");
 write_file(obj_file(), "not an object");
+sleep 0.100;
+write_file(asm_file(), "nop");
 t_z80asm_capture("-x".lib_file()." -d ".obj_file(), "", "", 0);
 t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", 
 												   CODE => [["", -1, "\x00"]])));
-
 unlink_testfiles();
 write_binfile(obj_file(), objfile( NAME => "test", 
 								   CODE => [["", -1, "\0\0"]], 
 								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD"] ] ));
-t_z80asm_capture("-r0 -a ".obj_file(),
+t_z80asm_capture("-a ".obj_file(),
 				 "",
 				 "Error at module 'test': file 'test.obj' not an object file\n".
 				 "Error at module 'test': file 'test.obj' not an object file\n".
@@ -540,7 +542,7 @@ t_z80asm_capture("-r0 -a ".obj_file(),
 unlink_testfiles();
 write_file(asm_file(), "nop");
 write_file(lib_file(), "not a library");
-t_z80asm_capture("-r0 -b -i".lib_file()." ".asm_file(), "",
+t_z80asm_capture("-b -i".lib_file()." ".asm_file(), "",
 		"Error: file 'test.lib' not a library file\n".
 		"1 errors occurred during assembly\n",
 		1);

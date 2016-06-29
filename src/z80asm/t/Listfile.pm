@@ -273,7 +273,7 @@ sub test {
 	z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
-		options	=> "-ns -nl -r0 -b",
+		options	=> "-nl -b",
 	);
 	ok ! -f "test.lst", "no test.lst file";
 	ok ! -f "test.sym", "no test.sym file";
@@ -282,7 +282,7 @@ sub test {
 	z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
-		options	=> "-ns -l -r0 -b",
+		options	=> "-l -b",
 	);
 	ok   -f "test.lst", "test.lst file";
 	ok ! -f "test.sym", "no test.sym file";
@@ -292,7 +292,7 @@ sub test {
 	z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
-		options	=> "-s -nl -r0 -b",
+		options	=> "-s -nl -b",
 	);
 	ok ! -f "test.lst", "no test.lst file";
 	ok   -f "test.sym", "test.sym file";
@@ -302,7 +302,7 @@ sub test {
 	z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
-		options	=> "-s -l -r0 -b",
+		options	=> "-s -l -b",
 	);
 	ok -f "test.lst", "test.lst file";
 	ok -f "test.sym", "test.sym file";

@@ -56,7 +56,7 @@ z80asm(
 				EXTERN one
 				jp one			;; C3 03 00 3E 01 C9
 ASM
-	options => "-i -b -r0",
+	options => "-i -b",
 );
 delete $ENV{Z80_STDLIB};
 unlink_temp("test.lib");
@@ -126,7 +126,7 @@ z80asm(
 
 # use obj, dont assemble
 z80asm(
-	options	=> "-d -r0 -b test.obj",
+	options	=> "-d -b test.obj",
 	bin		=> "\xAA" x 65536,
 	ok		=> 1,
 );
@@ -162,7 +162,7 @@ z80asm(
 note "BUG_0012";
 z80asm(
 	asm		=> "nop ;; 00",
-	options	=> "-r0 -b -o".("./" x 64)."test.bin",
+	options	=> "-b -o".("./" x 64)."test.bin",
 );
 
 #------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ for my $lib (      'test',    'test.lib',
     ok -f 'test.lib', "test.lib exists, built $lib";
 	z80asm(
 		asm		=> "EXTERN main \n jp main ;; C3 03 00 C9",
-		options	=> "-r0 -b -i".$lib,
+		options	=> "-b -i".$lib,
 	);
 }
 
@@ -256,7 +256,7 @@ z80asm(
 	asm		=> <<'ASM',
 			cpi				;; ED A1
 ASM
-	options	=> "-i".z80emu()." $list -b -r0",
+	options	=> "-i".z80emu()." $list -b",
 );
 z80asm(
 	asm		=> <<'ASM',
@@ -265,7 +265,7 @@ z80asm(
 							;; B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5
 							;; E3 CB C5 18 EC
 ASM
-	options	=> "-i".z80emu()." $list -b -r0 -RCMX000",
+	options	=> "-i".z80emu()." $list -b -RCMX000",
 );
 }
 
@@ -287,7 +287,7 @@ note "BUG_0018";
 	write_file("test".($levels+1).".prj", "");
 
 	z80asm(
-		options	=> "-r0 -b -ns -otest.bin \@test.prj",
+		options	=> "-b -otest.bin \@test.prj",
 		bin		=> $bin,
 	);
 }
@@ -301,7 +301,7 @@ z80asm(
 		invalid		;; error: syntax error
 		ENDIF
 ASM
-	options	=> "-r0 -b -DCC",
+	options	=> "-b -DCC",
 );
 z80asm(
 	asm		=> <<'ASM',
@@ -310,7 +310,7 @@ z80asm(
 		ENDIF
 		defb 0		;; 00
 ASM
-	options	=> "-r0 -b",
+	options	=> "-b",
 );
 
 #------------------------------------------------------------------------------
@@ -435,36 +435,40 @@ note "BUG_0031";
 
 #------------------------------------------------------------------------------
 # BUG_0033 : -d option fails if .asm does not exist
-note "BUG_0033";
-{
-	# compile
-	my $compile = "zcc +zx -O3 -vn -make-lib -Wn43 test.c";
-	unlink("test.asm", "test.o");
+SKIP: {
+	skip "zcc needs to be fixed to not call z80asm -ns", 1;
 	
-	write_file("test.c", "int test() { return 1; }\n");
-	ok ! system($compile), $compile;
-	ok -f "test.o", "test.o exists";
+	note "BUG_0033";
+	{
+		# compile
+		my $compile = "zcc +zx -O3 -vn -make-lib -Wn43 test.c";
+		unlink("test.asm", "test.o");
+		
+		write_file("test.c", "int test() { return 1; }\n");
+		ok ! system($compile), $compile;
+		ok -f "test.o", "test.o exists";
 
-	z80asm(
-		options	=> "-d -Mo -xtest.lib test.asm",
-		ok		=> 1,
-	);
-	ok -f "test.lib", "test.lib exists";
+		z80asm(
+			options	=> "-d -Mo -xtest.lib test.asm",
+			ok		=> 1,
+		);
+		ok -f "test.lib", "test.lib exists";
 
-	unlink("zcc_opt.def");
-	
-	# only assembly
-	z80asm(
-		asm		=> "ld a,3",
-		options	=> " ",
-		ok		=> 1,
-	);
-	ok unlink("test.asm"), "unlink test.asm";
-	z80asm(
-		options	=> "-d -r0 -b test.asm",
-		bin		=> "\x3E\x03",
-	);
-}
+		unlink("zcc_opt.def");
+		
+		# only assembly
+		z80asm(
+			asm		=> "ld a,3",
+			options	=> " ",
+			ok		=> 1,
+		);
+		ok unlink("test.asm"), "unlink test.asm";
+		z80asm(
+			options	=> "-d -b test.asm",
+			bin		=> "\x3E\x03",
+		);
+	}
+};
 
 #------------------------------------------------------------------------------
 # BUG_0035 : Symbol not defined in forward references
@@ -496,7 +500,7 @@ z80asm(
 			ENDIF
 			defb NEED_floatpack		;; 01
 ASM
-	options	=> "-DNEED_floatpack -r0 -b"
+	options	=> "-DNEED_floatpack -b"
 );
 
 #------------------------------------------------------------------------------
@@ -527,10 +531,10 @@ note "BUG_0049";
 	write_file("test.prj", join("\n", @list), "\n");
 	
 	# assemble all first
-	z80asm( %args, options => '   -ns -r0 -b @test.prj' );
+	z80asm( %args, options => '-b @test.prj' );
 	
 	# assemble all with -d, make lib - failed with too many open files
-	z80asm( %args, options => '-d -ns -r0 -b @test.prj' );
+	z80asm( %args, options => '-d -b @test.prj' );
 }
 
 #------------------------------------------------------------------------------
@@ -539,11 +543,11 @@ note "BUG_0050";
 z80asm(
 	asm1 =>	"defs 65000",
 	asm2 =>	"defs 65000",
-	options => "-ns ",
+	options => "-Dxxx",		# no -b
 	ok => 1,
 );
 z80asm(
-	options => "-d -ns -xtest.lib test1 test2",
+	options => "-d -xtest.lib test1 test2",
 	ok => 1,
 );
 

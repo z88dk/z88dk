@@ -17,7 +17,7 @@ Define command line options
 #endif
 
 OPT_VAR( Bool,		verbose,	FALSE	)
-OPT_VAR( Bool,		symtable,	TRUE	)
+OPT_VAR( Bool,		symtable,	FALSE	)
 OPT_VAR( Bool,		list,		FALSE	)	/* -l flag */
 OPT_VAR( Bool,		cur_list,	FALSE	)	/* current LSTON/LSTOFF status */
 OPT_VAR( Bool,		map,		FALSE	)
@@ -73,7 +73,6 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 #define OPT_HELP_RELOCATABLE	"Create relocatable code"
 
 #define OPT_HELP_SYMTABLE		"Create symbol table file" FILEEXT_SYM
-#define OPT_HELP_NO_SYMTABLE	"No symbol table file"
 
 #define OPT_HELP_LIST			"Create listing file" FILEEXT_LST
 #define OPT_HELP_NO_LIST		"No listing file"
@@ -148,7 +147,6 @@ OPT( OptSet,	&opts.relocatable,
 
 OPT_TITLE(	"Output File Options:" )
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 		OPT_HELP_SYMTABLE, "" )
-OPT( OptClear,	&opts.symtable,	"-ns", 	"--no-symtable",	OPT_HELP_NO_SYMTABLE, "" )
 
 OPT( OptSet,	&opts.list,		"-l", 	"--list", 			OPT_HELP_LIST, "" )
 OPT( OptClear,	&opts.list,		"-nl", 	"--no-list",		OPT_HELP_NO_LIST, "" )

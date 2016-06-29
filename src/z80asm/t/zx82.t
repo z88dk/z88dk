@@ -56,7 +56,7 @@ ok close($in_src), "close $src";
 ok close($out_src), "close $patched_src";
 
 # assemble as one source file
-t_z80asm_capture("-r0 -b $patched_src", "", "", 0);
+t_z80asm_capture("-b $patched_src", "", "", 0);
 ok ! -f $err, "no $err";
 ok -f $obj, "$obj exists";
 ok -f $bin, "$bin exists";
@@ -64,7 +64,7 @@ t_binary(read_binfile($bin),
 	 read_binfile($bmk_bin));
 
 # assemble with separate modules
-t_z80asm_capture("-r0 -b \@$project", "", "", 0);
+t_z80asm_capture("-b \@$project", "", "", 0);
 for (@prj_err) { ok ! -f $_, "no $_"; }
 for (@prj_obj) { ok -f $_, "$_ exists"; }
 ok -f $prj_bin, "$prj_bin exists";
