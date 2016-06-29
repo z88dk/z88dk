@@ -18673,7 +18673,7 @@ replace restart {
 	ld	a,%4 (%5)
 	adc	a,%1
 	; peephole z88dk-434i1
-} if notSame(%1 %6)
+} if notSame(%1 %6), notSame(%6 'a')
 // notVolatile
 
 replace restart {
@@ -18687,7 +18687,7 @@ replace restart {
 	ld	a,%4 (%5)
 	add	a,%1
 	; peephole z88dk-434i2
-} if notSame(%1 %6)
+} if notSame(%1 %6), notSame(%6 'a')
 // notVolatile
 
 replace restart {
@@ -18701,7 +18701,7 @@ replace restart {
 	ld	a,%4 (%5)
 	sub	a,%1
 	; peephole z88dk-434i3
-} if notSame(%1 %6)
+} if notSame(%1 %6), notSame(%6 'a')
 // notVolatile
 
 replace restart {
@@ -18715,7 +18715,7 @@ replace restart {
 	ld	a,%4 (%5)
 	sbc	a,%1
 	; peephole z88dk-434i4
-} if notSame(%1 %6)
+} if notSame(%1 %6), notSame(%6 'a')
 // notVolatile
 
 replace restart {
