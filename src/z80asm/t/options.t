@@ -84,7 +84,6 @@ Usage:
 Help Options:
   -h, --help             Show help options
   -v, --verbose          Be verbose
-* -nv, --not-verbose     Don't be verbose
 
 Input / Output File Options:
   -e, --asm-ext=EXT      Assembly file extension excluding '.'
@@ -199,18 +198,11 @@ Error: source filename missing
 2 errors occurred during assembly
 ERR
 
-#------------------------------------------------------------------------------
-# --not-verbose, -nv
-#------------------------------------------------------------------------------
+# not verbose
 unlink_testfiles();
 write_file(asm_file(), "nop");
-
-for my $options ('-nv', '--not-verbose') {
-	t_z80asm_capture("-b $options ".asm_file(), "", "", 0);
-	ok -f obj_file();
-	ok -f bin_file();
-	is read_file(bin_file(), binmode => ':raw'), "\0";
-}
+t_z80asm_capture("-b ".asm_file(), "", "", 0);
+is read_file(bin_file(), binmode => ':raw'), "\0";
 
 # check no arguments
 t_z80asm_capture("-nv=x", 	"", 	<<'ERR', 1);

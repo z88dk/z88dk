@@ -9,6 +9,8 @@ Z88DK Z80 Macro Assembler Change Log
   Unify map-, def- and sym-files - they differ only in the filter used
   to select the labels to write, but use the same format and the same 
   output function.
+  
+  Remove -nv and --no-verbose options.
 
 - 2016-06-28
 

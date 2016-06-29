@@ -48,7 +48,6 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 *----------------------------------------------------------------------------*/
 #define OPT_HELP_HELP			"Show help options"
 #define OPT_HELP_VERBOSE		"Be verbose"
-#define OPT_HELP_NOT_VERBOSE	"Don't be verbose"
 
 #define OPT_HELP_ASM_EXT		"Assembly file extension excluding '" FILEEXT_SEPARATOR "'"
 #define OPT_HELP_OBJ_EXT		"Object file extension excluding '" FILEEXT_SEPARATOR "'"
@@ -103,7 +102,6 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 OPT_TITLE(	"Help Options:"	)
 OPT( OptCall,	exit_help,		"-h", 	"--help",			OPT_HELP_HELP, "" )
 OPT( OptSet,	&opts.verbose,	"-v", 	"--verbose", 		OPT_HELP_VERBOSE, "" )
-OPT( OptClear,	&opts.verbose,	"-nv", 	"--not-verbose",	OPT_HELP_NOT_VERBOSE, "" )
 
 OPT_TITLE(	"Input / Output File Options:"	)
 OPT( OptString,	&opts.asm_ext,	"-e", 	"--asm-ext", 		OPT_HELP_ASM_EXT, "EXT" )
