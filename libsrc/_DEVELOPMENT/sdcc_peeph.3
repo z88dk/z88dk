@@ -20209,7 +20209,7 @@ replace restart {
 	ld	a,%1
 	ld	b,h
 	; peephole z88dk-459e9
-} if notSame(%1 'b')
+} if operandsNotRelated(%1 'b')
 
 replace restart {
 	ld	c,l
@@ -20218,7 +20218,7 @@ replace restart {
 	ld	a,%1
 	ld	c,l
 	; peephole z88dk-459e10
-} if notSame(%1 'c')
+} if operandsNotRelated(%1 'c')
 
 replace restart {
 	ld	b,h
@@ -20227,7 +20227,7 @@ replace restart {
 	%1	a,%2
 	ld	b,h
 	; peephole z88dk-459e11
-} if notSame(%2 'b')
+} if operandsNotRelated(%2 'b')
 
 replace restart {
 	ld	c,l
@@ -20236,7 +20236,7 @@ replace restart {
 	%1	a,%2
 	ld	c,l
 	; peephole z88dk-459e12
-} if notSame(%2 'c')
+} if operandsNotRelated(%2 'c')
 
 replace restart {
 	ld	b,h
