@@ -58,6 +58,7 @@ extern Symbol *define_global_sym(char *name, long value, sym_type_t type);
 /* get the symbols for which the passed function returns TRUE,
    mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE() */
 extern SymbolHash *select_symbols( Bool (*cond)(Symbol *sym) );
+extern SymbolHash *select_module_symbols( struct Module *module, Bool (*cond)(Symbol *sym) );
 
 /* copy the static symbols to CURRENTMODULE->local_symtab */
 extern void copy_static_syms( void );
@@ -95,3 +96,10 @@ extern void declare_extern_symbol( char *name );
 /* sort functions for SymbolHash_sort */
 extern int SymbolHash_by_name( SymbolHashElem *a, SymbolHashElem *b );
 extern int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b );
+
+/*-----------------------------------------------------------------------------
+*   Write symbols to files
+*----------------------------------------------------------------------------*/
+extern void write_map_file(void);
+extern void write_def_file(void);
+extern void write_sym_file(struct Module *module);

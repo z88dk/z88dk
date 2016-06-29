@@ -113,11 +113,11 @@ File test1.obj at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-ASMSIZE                         = $0038, G: 
-ASMHEAD                         = $1234, G: 
-a1                              = $1247, G: test
-a2                              = $1263, G: test1
-ASMTAIL                         = $126C, G: 
+ASMSIZE                         = $0038 ; G 
+ASMHEAD                         = $1234 ; G 
+a1                              = $1247 ; G test
+a2                              = $1263 ; G test1
+ASMTAIL                         = $126C ; G 
 END
 
 #------------------------------------------------------------------------------
@@ -260,23 +260,23 @@ File test1.obj at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-ASMSIZE_data                    = $000C, G: 
-ASMSIZE_code                    = $0025, G: 
-ASMSIZE                         = $0031, G: 
-ASMHEAD                         = $1234, G: 
-ASMHEAD_code                    = $1234, G: 
-start                           = $1234, L: test
-prmes                           = $1250, G: test1
-ASMHEAD_data                    = $1259, G: 
-ASMTAIL_code                    = $1259, G: 
-mes1                            = $1259, L: test
-mes1end                         = $125E, L: test
-mes2                            = $125E, L: test
-mes0                            = $1264, G: test1
-mes2end                         = $1264, L: test
-ASMTAIL                         = $1265, G: 
-ASMTAIL_data                    = $1265, G: 
-mes0end                         = $1265, G: test1
+ASMSIZE_data                    = $000C ; G 
+ASMSIZE_code                    = $0025 ; G 
+ASMSIZE                         = $0031 ; G 
+ASMHEAD                         = $1234 ; G 
+ASMHEAD_code                    = $1234 ; G 
+start                           = $1234 ; L test
+prmes                           = $1250 ; G test1
+ASMHEAD_data                    = $1259 ; G 
+ASMTAIL_code                    = $1259 ; G 
+mes1                            = $1259 ; L test
+mes1end                         = $125E ; L test
+mes2                            = $125E ; L test
+mes0                            = $1264 ; G test1
+mes2end                         = $1264 ; L test
+ASMTAIL                         = $1265 ; G 
+ASMTAIL_data                    = $1265 ; G 
+mes0end                         = $1265 ; G test1
 END
 
 #------------------------------------------------------------------------------

@@ -7,12 +7,10 @@ License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_licens
 Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
 
-#include "deffile.h"
 #include "directives.h"
 #include "fileutil.h"
 #include "libfile.h"
 #include "listfile.h"
-#include "mapfile.h"
 #include "modlink.h"
 #include "module.h"
 #include "objfile.h"

@@ -624,20 +624,20 @@ z80asm(
 	bin_file => "test_AAA.bin",
 );
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = $0000, G: 
-ASMHEAD_AAA                     = $0000, G: 
-ASMSIZE_BBB                     = $0001, G: 
-ASMHEAD_BBB                     = $0002, G: 
-ASMSIZE_AAA                     = $0002, G: 
-ASMSIZE_CCC                     = $0002, G: 
-ASMTAIL_AAA                     = $0002, G: 
-var_1                           = $0002, L: test
-var_2                           = $0002, L: test
-ASMHEAD_CCC                     = $0003, G: 
-ASMTAIL_BBB                     = $0003, G: 
-ASMSIZE                         = $0005, G: 
-ASMTAIL                         = $0005, G: 
-ASMTAIL_CCC                     = $0005, G: 
+ASMHEAD                         = $0000 ; G 
+ASMHEAD_AAA                     = $0000 ; G 
+ASMSIZE_BBB                     = $0001 ; G 
+ASMHEAD_BBB                     = $0002 ; G 
+ASMSIZE_AAA                     = $0002 ; G 
+ASMSIZE_CCC                     = $0002 ; G 
+ASMTAIL_AAA                     = $0002 ; G 
+var_1                           = $0002 ; L test
+var_2                           = $0002 ; L test
+ASMHEAD_CCC                     = $0003 ; G 
+ASMTAIL_BBB                     = $0003 ; G 
+ASMSIZE                         = $0005 ; G 
+ASMTAIL                         = $0005 ; G 
+ASMTAIL_CCC                     = $0005 ; G 
 ...
 
 z80asm(
@@ -666,18 +666,18 @@ z80asm(
 	bin_file => "test_AAA.bin",
 );
 eq_or_diff scalar(read_file("test.map")), <<'...', "mapfile contents";
-ASMHEAD                         = $0000, G: 
-ASMHEAD_AAA                     = $0000, G: 
-ASMSIZE_BBB                     = $0001, G: 
-ASMHEAD_BBB                     = $0002, G: 
-ASMSIZE_AAA                     = $0002, G: 
-ASMSIZE_CCC                     = $0002, G: 
-ASMTAIL_AAA                     = $0002, G: 
-var_1                           = $0002, L: test
-var_2                           = $0002, L: test
-ASMHEAD_CCC                     = $0003, G: 
-ASMTAIL_BBB                     = $0003, G: 
-ASMSIZE                         = $0005, G: 
-ASMTAIL                         = $0005, G: 
-ASMTAIL_CCC                     = $0005, G: 
+ASMHEAD                         = $0000 ; G 
+ASMHEAD_AAA                     = $0000 ; G 
+ASMSIZE_BBB                     = $0001 ; G 
+ASMHEAD_BBB                     = $0002 ; G 
+ASMSIZE_AAA                     = $0002 ; G 
+ASMSIZE_CCC                     = $0002 ; G 
+ASMTAIL_AAA                     = $0002 ; G 
+var_1                           = $0002 ; L test
+var_2                           = $0002 ; L test
+ASMHEAD_CCC                     = $0003 ; G 
+ASMTAIL_BBB                     = $0003 ; G 
+ASMSIZE                         = $0005 ; G 
+ASMTAIL                         = $0005 ; G 
+ASMTAIL_CCC                     = $0005 ; G 
 ...

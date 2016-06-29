@@ -15,6 +15,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 
 #include "errors.h"
 #include "listfile.h"
+#include "fileutil.h"
 #include "model.h"
 #include "options.h"
 #include "symbol.h"
@@ -213,20 +214,31 @@ static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
 *   get the symbols for which the passed function returns TRUE,
 *   mapped NAME@MODULE -> Symbol, needs to be deleted by OBJ_DELETE()
 *----------------------------------------------------------------------------*/
+static SymbolHash *_select_module_symbols(Module *module, Bool(*cond)(Symbol *sym))
+{
+	ModuleListElem *iter;
+	SymbolHash *all_syms = OBJ_NEW(SymbolHash);
+
+	if (module == NULL) {
+		for (module = get_first_module(&iter); module != NULL; module = get_next_module(&iter))
+			copy_full_sym_names(&all_syms, module->local_symtab, cond);
+	}
+	else {
+		copy_full_sym_names(&all_syms, module->local_symtab, cond);
+	}
+	copy_full_sym_names(&all_syms, global_symtab, cond);
+
+	return all_syms;
+}
+
 SymbolHash *select_symbols( Bool (*cond)(Symbol *sym) )
 {
-    Module *module;
-	ModuleListElem *iter;
-    SymbolHash *all_syms = OBJ_NEW( SymbolHash );
+	return _select_module_symbols(NULL, cond);
+}
 
-	for ( module = get_first_module( &iter ) ; module != NULL ; 
-		  module = get_next_module( &iter ) )
-	{
-		copy_full_sym_names( &all_syms, module->local_symtab, cond );
-	}
-    copy_full_sym_names( &all_syms, global_symtab, cond );
-
-    return all_syms;
+SymbolHash *select_module_symbols(Module *module, Bool(*cond)(Symbol *sym))
+{
+	return _select_module_symbols(module, cond);
 }
 
 /*-----------------------------------------------------------------------------
@@ -554,4 +566,89 @@ int SymbolHash_by_name( SymbolHashElem *a, SymbolHashElem *b )
 int SymbolHash_by_value( SymbolHashElem *a, SymbolHashElem *b )
 {
     return ( ( Symbol * )( a->value ) )->value - ( ( Symbol * )( b->value ) )->value;
+}
+
+/*-----------------------------------------------------------------------------
+*   generate output files with lists of symbols
+*----------------------------------------------------------------------------*/
+static void _write_symbol_file(char *filename, Module *module, Bool(*cond)(Symbol *sym),
+							   char *prefix, Bool type_flag) 
+{
+	FILE *file;
+	SymbolHash *symbols;
+	SymbolHashElem *iter;
+	Symbol         *sym;
+	long			reloc_offset;
+
+	if (opts.relocatable && module == NULL)		// module is NULL in link phase
+		reloc_offset = sizeof_relocroutine + sizeof_reloctable + 4;
+	else
+		reloc_offset = 0;
+
+	file = myfopen(filename, "w");
+	if (file)
+	{
+		symbols = select_module_symbols(module, cond);
+
+		/* write symbols numerically, then alphabetical */
+		SymbolHash_sort(symbols, SymbolHash_by_name);
+		SymbolHash_sort(symbols, SymbolHash_by_value);
+
+		for (iter = SymbolHash_first(symbols); iter; iter = SymbolHash_next(iter))
+		{
+			sym = (Symbol *)iter->value;
+			fprintf(file, "%s%-*s = $%04lX ; %c %s\n",
+				prefix,
+				COLUMN_WIDTH - 1, sym->name,
+				sym->value + reloc_offset,
+				(!type_flag) ? ' ' : (sym->scope == SCOPE_LOCAL) ? 'L' : 'G',
+				(module == NULL && sym->module != NULL) ? sym->module->modname : "");
+		}
+
+		OBJ_DELETE(symbols);
+
+		myfclose(file);
+	}
+}
+
+/*-----------------------------------------------------------------------------
+*   Write symbols to files
+*----------------------------------------------------------------------------*/
+static Bool cond_all_symbols(Symbol *sym) { return TRUE; }
+
+void write_map_file(void)
+{
+	_write_symbol_file(
+		get_map_filename(get_first_module(NULL)->filename),
+		NULL, cond_all_symbols, "", TRUE);
+}
+
+static Bool cond_global_addr_symbols(Symbol *sym)
+{
+	return (sym->type == TYPE_ADDRESS || sym->type == TYPE_COMPUTED)
+		&& sym->scope != SCOPE_LOCAL;
+}
+
+void write_def_file(void)
+{
+	_write_symbol_file(
+		get_def_filename(get_first_module(NULL)->filename),
+		NULL, cond_global_addr_symbols, "DEFC ", FALSE);
+}
+
+static Bool cond_module_symbols(Symbol *sym) 
+{
+	if (sym->is_touched 
+		&& (sym->scope == SCOPE_LOCAL || sym->scope == SCOPE_PUBLIC 
+			|| (sym->scope == SCOPE_GLOBAL && sym->is_defined)))
+		return TRUE;
+	else
+		return FALSE;
+}
+
+void write_sym_file(Module *module)
+{
+	_write_symbol_file(
+		get_sym_filename(module->filename),
+		module, cond_module_symbols, "", TRUE);
 }

@@ -57,12 +57,6 @@
     <ClInclude Include="symtab.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mapfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="deffile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="options_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -204,12 +198,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="module.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mapfile.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deffile.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lib\strpool.c">

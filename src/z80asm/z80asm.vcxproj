@@ -14,6 +14,7 @@
     <ProjectGuid>{53E270D6-344C-49AB-94F2-7871479963C1}</ProjectGuid>
     <RootNamespace>z80asm</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -88,7 +89,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="codearea.h" />
-    <ClInclude Include="deffile.h" />
     <ClInclude Include="directives.h" />
     <ClInclude Include="errors.h" />
     <ClInclude Include="error_func.h" />
@@ -116,7 +116,6 @@
     <ClInclude Include="lib\uthash.h" />
     <ClInclude Include="lib\utlist.h" />
     <ClInclude Include="listfile.h" />
-    <ClInclude Include="mapfile.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="modlink.h" />
     <ClInclude Include="module.h" />
@@ -138,7 +137,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="codearea.c" />
-    <ClCompile Include="deffile.c" />
     <ClCompile Include="directives.c" />
     <ClCompile Include="errors.c" />
     <ClCompile Include="error_func.c" />
@@ -157,7 +155,6 @@
     <ClCompile Include="lib\strhash.c" />
     <ClCompile Include="lib\strpool.c" />
     <ClCompile Include="listfile.c" />
-    <ClCompile Include="mapfile.c" />
     <ClCompile Include="model.c" />
     <ClCompile Include="modlink.c" />
     <ClCompile Include="module.c" />

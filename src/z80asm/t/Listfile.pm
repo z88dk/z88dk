@@ -15,10 +15,7 @@ use Modern::Perl;
 use Object::Tiny::RW qw(
 		LINENR		
 		LINENR_STACK
-		PAGENR		
-		PAGE_LINENR	
 		ADDR 		
-		LABEL_PAGE	
 		LABEL_ADDR	
 		LABEL_GLOBAL
 		LIST_ASM	
@@ -33,8 +30,6 @@ use File::Slurp;
 use List::AllUtils 'uniq';
 
 my $LABEL_RE = qr/\b[A-Z_][A-Z0-9_]*/;
-my $PAGE_SIZE = 61;
-my $LINE_SIZE = 122;
 my $MAX_LINE = 255-2;
 my $COLUMN_WIDTH = 32;
 
@@ -51,10 +46,7 @@ sub new {
 	return bless {
 		LINENR			=> 1,
 		LINENR_STACK	=> [],
-		PAGENR			=> 1,
-		PAGE_LINENR		=> 1,
 		ADDR 			=> 0,
-		LABEL_PAGE		=> {},
 		LABEL_ADDR		=> {},
 		LABEL_GLOBAL	=> {},
 		LIST_ASM		=> [],
@@ -64,17 +56,17 @@ sub new {
 	}, $class;
 }
 
+sub line_nr {
+	my($self) = @_;
+	return $self->{LINENR};
+}
+
 #------------------------------------------------------------------------------
 # advance list line number
 #------------------------------------------------------------------------------
 sub next_line {
 	my($self) = @_;
 	$self->LINENR( $self->LINENR + 1 );
-	$self->PAGE_LINENR( $self->PAGE_LINENR + 1 );
-	if ($self->PAGE_LINENR > $PAGE_SIZE) {
-		$self->PAGE_LINENR( 1 );
-		$self->PAGENR( $self->PAGENR + 1 );
-	}
 }
 
 #------------------------------------------------------------------------------
@@ -91,18 +83,12 @@ sub push_asm {
 			unless @{$self->LINENR_STACK};			# not if inside include
 		
 		if ($asm =~ /^\s*($LABEL_RE)\s*:/) {		# define label
-			$self->LABEL_PAGE->{$1} ||= [];
-			unshift @{$self->LABEL_PAGE->{$1}}, $self->PAGENR;
 			$self->LABEL_ADDR->{$1} = $self->ADDR;
 		}
 		elsif ($asm =~ /^\s*defc\s+($LABEL_RE)\s*=\s*(.*)/) {		# define constant
-			$self->LABEL_PAGE->{$1} ||= [];
-			unshift @{$self->LABEL_PAGE->{$1}}, $self->PAGENR;
 			$self->LABEL_ADDR->{$1} = 0+eval($2);
 		}
 		elsif ($asm =~ /(?i:xdef|xlib|public)\s+($LABEL_RE)/) {	# global label
-			$self->LABEL_PAGE->{$1} ||= [];
-			push @{$self->LABEL_PAGE->{$1}}, $self->PAGENR;
 			$self->LABEL_GLOBAL->{$1}++;
 		}
 		elsif ($asm =~ /^\s*lstoff\s*$/i) {
@@ -112,10 +98,6 @@ sub push_asm {
 			$new_list_on = 1;
 		}
 		else {
-			while ($asm =~ /($LABEL_RE)/g) {	# use label
-				$self->LABEL_PAGE->{$1} ||= [];
-				push @{$self->LABEL_PAGE->{$1}}, $self->PAGENR 
-			}
 		}
 	}
 	
@@ -218,44 +200,13 @@ sub sym_lines {
 	my($self) = @_;
 	my @sym;
 	
-	push @sym, "";
-	push @sym, "";
-	push @sym, "Local Module Symbols:";
-	push @sym, "";
-	
-	for (sort {$a cmp $b} keys %{$self->LABEL_ADDR}) {
-		push @sym, $self->format_sym_line($_) unless $self->LABEL_GLOBAL->{$_};
+	for (sort {$self->LABEL_ADDR->{$a} <=> $self->LABEL_ADDR->{$b}} keys %{$self->LABEL_ADDR}) {
+		push @sym, sprintf("%-*s = \$%04X ; %s ", 
+					 $COLUMN_WIDTH - 1, $_, 
+					 $self->LABEL_ADDR->{$_},
+					 $self->LABEL_GLOBAL->{$_} ? "G" : "L");
 	}
-	
-	push @sym, "";
-	push @sym, "";
-	push @sym, "Global Module Symbols:";
-	push @sym, "";
-	
-	for (sort {$a cmp $b} keys %{$self->LABEL_ADDR}) {
-		push @sym, $self->format_sym_line($_) if $self->LABEL_GLOBAL->{$_};
-	}
-	
 	return @sym;
-}
-
-#------------------------------------------------------------------------------
-sub format_sym_line {
-	my($self, $label) = @_;
-	my @ret;
-	
-	my $line = $label;
-	if (length($line) >= $COLUMN_WIDTH) {
-		push @ret, $line;
-		$line = '';
-	}
-	$line .= sprintf("%-*s= %04X", 
-					 $COLUMN_WIDTH - length($line), '', 
-					 $self->LABEL_ADDR->{$label});
-	
-	push @ret, $line;
-	
-	return @ret;
 }
 
 #------------------------------------------------------------------------------

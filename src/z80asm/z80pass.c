@@ -16,7 +16,6 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
 /* local functions */
 void Z80pass2( void );
-void WriteSymbolTable( char *msg, SymbolHash *symtab );
 
 void
 Z80pass2( void )
@@ -148,13 +147,7 @@ Z80pass2( void )
 		write_obj_file( CURRENTMODULE->filename );
 
     if ( ! get_num_errors() && opts.symtable )
-    {
-		list_close(TRUE);
-		list_open(get_sym_filename(CURRENTMODULE->filename));
-
-        WriteSymbolTable( "Local Module Symbols:", CURRENTMODULE->local_symtab );
-        WriteSymbolTable( "Global Module Symbols:", global_symtab );
-    }
+		write_sym_file(CURRENTMODULE);
 }
 
 
@@ -215,32 +208,4 @@ Bool Pass2info(range_t range)
 	}
 
 	return Pass2infoExpr(range, expr);
-}
-
-
-void
-WriteSymbolTable( char *msg, SymbolHash *symtab )
-{
-    SymbolHashElem *iter;
-    Symbol         *sym;
-
-    /* dump all symbols sorted by name */
-    list_start_table( msg );
-
-    SymbolHash_sort( symtab, SymbolHash_by_name );
-
-    for ( iter = SymbolHash_first( symtab ); iter; iter = SymbolHash_next( iter ) )
-    {
-        sym = ( Symbol * )iter->value;
-
-        if ( sym->module == CURRENTMODULE )
-        {
-            /* Write only symbols related to current module */
-			if (sym->is_touched && 
-			    (sym->scope == SCOPE_LOCAL || 
- 				 sym->scope == SCOPE_PUBLIC || 
-				 (sym->scope == SCOPE_GLOBAL && sym->is_defined)))
-				list_symbol(sym->name, sym->value);
-        }
-    }
 }

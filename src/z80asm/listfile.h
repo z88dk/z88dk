@@ -71,13 +71,6 @@ extern void ListFile_end( ListFile *self );
 /* patch the bytes at the given patch_pos returned by ListFile_patch_pos() */
 extern void ListFile_patch_data( ListFile *self, long patch_pos, long value, int num_bytes );
 
-/* write the symbol table in two steps:
-   1. start a new table, provide title
-   2. output symbol name, reference, output reference, ...
-*/
-extern void ListFile_start_table( ListFile *self, char *title );
-extern void ListFile_symbol(ListFile *self, char *symbol_name, long symbol_value);
-
 /*-----------------------------------------------------------------------------
 *	Singleton API - all methods work on one global list object
 *	See description for corresponding method above
@@ -94,5 +87,3 @@ extern long list_patch_pos( int byte_offset );
 extern void list_end_line( void );
 extern void list_end( void );
 extern void list_patch_data( long patch_pos, long value, int num_bytes );
-extern void list_start_table( char *title );
-extern void list_symbol(char *symbol_name, long symbol_value);

@@ -4,11 +4,29 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-06-30
+
+  Unify map-, def- and sym-files - they differ only in the filter used
+  to select the labels to write, but use the same format and the same 
+  output function.
+
+- 2016-06-28
+
+  Only generate .sym file if -s or --symtable option is given.
+  Sym file contains only one list of symbols, ordered by value, and in 
+  '$'-hex notation, e.g. $1234.
+
+  Remove -ns and --no-symtable options.
+  
+  Remove all generated files at start of assembly to assure that old 
+  files of old compilations were not left arround.
+
 - 2016-06-27
 
   Only generate .map file if -m or --map option is given.
   Map file contains only one list of symbols, ordered by value, and in 
   '$'-hex notation, e.g. $1234.
+  
   Remove options -nm and --no-map.
 
   Remove deprecated option -t - was used to replace spaces by tabs in the

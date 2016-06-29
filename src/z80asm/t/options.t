@@ -411,9 +411,9 @@ for my $options ('-m', '--map') {
 	);
 	ok -f map_file(), map_file();
 	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-ASMHEAD                         = $0000, G: 
-ASMSIZE                         = $000B, G: 
-ASMTAIL                         = $000B, G: 
+ASMHEAD                         = $0000 ; G 
+ASMSIZE                         = $000B ; G 
+ASMTAIL                         = $000B ; G 
 END
 }
 
@@ -426,19 +426,19 @@ t_z80asm(
 );
 ok -f map_file(), map_file();
 eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-ASMHEAD                         = $0000, G: 
-alias_main                      = $0000, G: test2
-main                            = $0000, G: test
-zero                            = $0000, L: test
-loop                            = $0002, L: test
-alias_last                      = $0004, G: test2
-last                            = $0004, G: test
-x31_x31_x31_x31_x31_x31_x31_x31 = $0004, L: test
-x_32_x32_x32_x32_x32_x32_x32_x32 = $0005, L: test
-func                            = $0006, G: test2
-loop                            = $0008, L: test2
-ASMSIZE                         = $000B, G: 
-ASMTAIL                         = $000B, G: 
+ASMHEAD                         = $0000 ; G 
+alias_main                      = $0000 ; G test2
+main                            = $0000 ; G test
+zero                            = $0000 ; L test
+loop                            = $0002 ; L test
+alias_last                      = $0004 ; G test2
+last                            = $0004 ; G test
+x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ; L test
+x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ; L test
+func                            = $0006 ; G test2
+loop                            = $0008 ; L test2
+ASMSIZE                         = $000B ; G 
+ASMTAIL                         = $000B ; G 
 END
 
 #------------------------------------------------------------------------------
@@ -488,13 +488,13 @@ for my $options ('-g', '--globaldef') {
 	);
 	ok -f def_file(), def_file();
 	eq_or_diff scalar(read_file(def_file())), <<'END', "deffile contents";
-DEFC main                            = $0000 ; Module test
-DEFC alias_main                      = $0000 ; Module test2
-DEFC x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ; Module test
-DEFC last                            = $0004 ; Module test
-DEFC alias_last                      = $0004 ; Module test2
-DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ; Module test
-DEFC func                            = $0006 ; Module test2
+DEFC alias_main                      = $0000 ;   test2
+DEFC main                            = $0000 ;   test
+DEFC alias_last                      = $0004 ;   test2
+DEFC last                            = $0004 ;   test
+DEFC x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ;   test
+DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ;   test
+DEFC func                            = $0006 ;   test2
 END
 }
 
