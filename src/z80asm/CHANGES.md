@@ -12,6 +12,8 @@ Z88DK Z80 Macro Assembler Change Log
   
   Remove -nv and --no-verbose options.
 
+  Remove -nb and --no-make-bin options.
+  
 - 2016-06-28
 
   Only generate .sym file if -s or --symtable option is given.

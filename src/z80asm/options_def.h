@@ -59,7 +59,6 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 #define OPT_HELP_LINE_MODE		"Enable LINE directive"
 
 #define OPT_HELP_MAKE_BIN		"Assemble and link/relocate to file" FILEEXT_BIN
-#define OPT_HELP_NO_MAKE_BIN	"No binary file"
 #define OPT_HELP_SPLIT_BIN		"Create one binary file per section"
 
 #define OPT_HELP_DATE_STAMP		"Assemble only updated files"
@@ -129,7 +128,6 @@ OPT( OptCallOptArg, option_use_lib,	 "-i", 	"--use-lib", 		OPT_HELP_USE_LIB,  "[
 
 OPT_TITLE(	"Binary Output:" )
 OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
-OPT( OptClear,	&opts.make_bin,	"-nb", 	"--no-make-bin",	OPT_HELP_NO_MAKE_BIN, "" )
 
 OPT( OptSet,	&opts.split_bin, "", "--split-bin", OPT_HELP_SPLIT_BIN, "")
 

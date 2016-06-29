@@ -107,7 +107,6 @@ Libraries:
 
 Binary Output:
   -b, --make-bin         Assemble and link/relocate to file.bin
-* -nb, --no-make-bin     No binary file
   --split-bin            Create one binary file per section
   -d, --date-stamp       Assemble only updated files
 * -nd, --no-date-stamp   Assemble all files
@@ -491,8 +490,16 @@ END
 }
 
 #------------------------------------------------------------------------------
-# -b, --make-bin, -nb, --no-make-bin
+# -b, --make-bin
 #------------------------------------------------------------------------------
+
+# no -b
+unlink_testfiles();
+write_file(asm_file(), "nop");
+
+t_z80asm_capture(asm_file(), "", "", 0);
+ok -f obj_file();
+ok ! -f bin_file();
 
 # -b
 for my $options ('-b', '--make-bin') {
@@ -503,16 +510,6 @@ for my $options ('-b', '--make-bin') {
 	ok -f obj_file();
 	ok -f bin_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0";
-}
-
-# -nb
-for my $options ('-b -nb', '--make-bin --no-make-bin') {
-	unlink_testfiles();
-	write_file(asm_file(), "nop");
-
-	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	ok -f obj_file();
-	ok ! -f bin_file();
 }
 
 #------------------------------------------------------------------------------
