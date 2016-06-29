@@ -31,6 +31,14 @@ include "clib_target_constants.inc"
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ifndef CRT_FONT
+
+   PUBLIC CRT_FONT
+   EXTERN _ff_ind_Termino
+   defc CRT_FONT = _ff_ind_Termino
+
+endif
+
 
 ; When FILEs and FDSTRUCTs are instantiated labels are assigned
 ; to point at created structures.
@@ -208,7 +216,7 @@ include "clib_target_constants.inc"
    ; paper         : (0,256,0,192)
    ; cursor coord  : (0,0)
    ;
-   ; font          : _ff_ind_Termino
+   ; font          : CRT_FONT
    ; fzx draw mode : XOR
    ; left margin   : 3
    ; line spacing  : single
@@ -339,9 +347,9 @@ include "clib_target_constants.inc"
       ; font
       ; cursor (x,y)
 
-      EXTERN _ff_ind_Termino
+      EXTERN CRT_FONT
 
-      defw _ff_ind_Termino
+      defw CRT_FONT
       defw 0, 0
       
       ; paper dimensions

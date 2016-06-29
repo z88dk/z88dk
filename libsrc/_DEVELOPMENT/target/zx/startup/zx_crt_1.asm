@@ -31,6 +31,14 @@ include "clib_target_constants.inc"
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ifndef CRT_FONT
+
+   PUBLIC CRT_FONT
+   EXTERN _font_8x8_rom
+   defc CRT_FONT = _font_8x8_rom
+
+endif
+
 
 ; When FILEs and FDSTRUCTs are instantiated labels are assigned
 ; to point at created structures.
@@ -206,7 +214,7 @@ include "clib_target_constants.inc"
    ; cursor coord  : (0,0)
    ; window        : (0,32,0,24)
    ; scroll limit  : 0
-   ; font address  : _font_8x8_rom
+   ; font address  : CRT_FONT
    ; text colour   : 56
    ; text mask     : 0
    ; background    : 56
@@ -321,9 +329,9 @@ include "clib_target_constants.inc"
       ; text mask
       ; background colour
       
-      EXTERN _font_8x8_rom
+      EXTERN CRT_FONT
       
-      defw _font_8x8_rom - 256
+      defw CRT_FONT - 256
       defb 56
       defb 0
       defb 56
