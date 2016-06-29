@@ -405,7 +405,7 @@ static void _xfput_count_byte_str( FILE *file, char *str, size_t len )
     if ( len > 0xFF )
         fatal_ferr_write( file );			/* too long */
 
-    xfput_uint8( file, len );				/* byte count */
+    xfput_uint8( file, len & 0xFF );		/* byte count */
 	xfput_chars( file, str, len );			/* characters */
 }
 
