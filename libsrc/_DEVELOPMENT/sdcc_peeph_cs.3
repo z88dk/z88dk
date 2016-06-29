@@ -23507,6 +23507,31 @@ replace restart {
 	; peephole z88dk-464b
 }
 
+replace restart {
+	ld	hl,(#%1)
+	ld	%2,%3
+	ld	bc,(#%1)
+} by {
+	ld	hl,(#%1)
+	ld	%2,%3
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-465a
+} if operandsNotRelated('hl' %2)
+
+replace restart {
+	ld	hl,(#%1 + %4)
+	ld	%2,%3
+	ld	bc,(#%1 + %4)
+} by {
+	ld	hl,(#%1 + %4)
+	ld	%2,%3
+	ld	c,l
+	ld	b,h
+	; peephole z88dk-465b
+} if operandsNotRelated('hl' %2)
+
+
 
 
 
