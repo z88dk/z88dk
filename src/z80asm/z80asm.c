@@ -75,12 +75,12 @@ void assemble_file( char *filename )
 	module->filename = strpool_add( src_filename );
 
 	/* remove output files, except obj */
-	remove(get_lst_filename(src_filename));
-	remove(get_bin_filename(src_filename));
-	remove(get_sym_filename(src_filename));
-	remove(get_map_filename(src_filename));
-	remove(get_reloc_filename(src_filename));
-	remove(get_def_filename(src_filename));
+	//remove(get_lst_filename(src_filename));
+	//remove(get_bin_filename(src_filename));
+	//remove(get_sym_filename(src_filename));
+	//remove(get_map_filename(src_filename));
+	//remove(get_reloc_filename(src_filename));
+	//remove(get_def_filename(src_filename));
 
 	/* Create error file */
 	open_error_file(src_filename);
