@@ -44,7 +44,6 @@ include "clib_target_constants.inc"
 
 
 
-
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
@@ -699,8 +698,6 @@ include "clib_target_constants.inc"
 
 
 
-
-
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; create open and closed FILE lists
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1052,7 +1049,7 @@ __Restart:
    
    ; initialize sections
 
-   ;;include "../clib_init_data.inc"
+   include "../clib_init_data.inc"
    include "../clib_init_bss.inc"
 
 SECTION code_crt_init          ; user and library initialization
