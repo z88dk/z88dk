@@ -683,185 +683,18 @@ PUBLIC __Start, __Exit
 
 EXTERN _main
 
-;**************************************************************
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 IF __crt_org_code = 0
-;**************************************************************
+
+   include "../crt_page_zero.inc"
+
+ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; rst and im1 entry ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   ; address = 0x0000
-   
-   jr __Start
-   
-   defm "Z88DK"
-   defs 0x0008 - ASMPC
-   
-   ; address = 0x0008
-   
-IF (__crt_enable_rst & $02)
-
-   EXTERN _z80_rst_08h
-   jp _z80_rst_08h
-
-ELSE
-
-   ret
-
-ENDIF
-
-   defs 0x0010 - ASMPC
-
-   ; address = 0x0010
-
-IF (__crt_enable_rst & $04)
-
-   EXTERN _z80_rst_10h
-   jp _z80_rst_10h
-
-
-ELSE
-
-   ret
-
-ENDIF
-
-   defs 0x0018 - ASMPC
-
-   ; address = 0x0018
-   
-IF (__crt_enable_rst & $08)
-
-   EXTERN _z80_rst_18h
-   jp _z80_rst_18h
-
-ELSE
-
-   ret
-
-ENDIF
-
-   defs 0x0020 - ASMPC
-
-   ; address = 0x0020
-
-IF (__crt_enable_rst & $10)
-
-   EXTERN _z80_rst_20h
-   jp _z80_rst_20h
-
-ELSE
-
-   ret
-
-ENDIF
-
-   defs 0x0028 - ASMPC
-
-   ; address = 0x0028
-
-IF (__crt_enable_rst & $20)
-
-   EXTERN _z80_rst_28h
-   jp _z80_rst_28h
-
-ELSE
-
-   ret
-
-ENDIF
-
-IF __SDCC_IY
-
-   PUBLIC l_jpix
-   
-   l_jpix:
-   
-      defb $fd
-   
-   PUBLIC l_jphl
-   
-   l_jphl:
-   
-      jp (hl)
-   
-   PUBLIC l_jpiy
-   
-   l_jpiy:
-   
-      jp (ix)
-
-ELSE
-
-   PUBLIC l_jpix
-   
-   l_jpix:
-   
-      defb $dd
-   
-   PUBLIC l_jphl
-   
-   l_jphl:
-   
-      jp (hl)
-   
-   PUBLIC l_jpiy
-   
-   l_jpiy:
-   
-      jp (iy)
-
-ENDIF
-
-   defs 0x0030 - ASMPC
-
-   ; address = 0x0030
-
-IF (__crt_enable_rst & $40)
-
-   EXTERN _z80_rst_30h
-   jp _z80_rst_30h
-
-ELSE
-
-   ret
-
-ENDIF
-
-   PUBLIC l_ret
-   
-      pop hl
-      pop hl
-      pop hl
-   
-   l_ret:
-   
-      ret
-
-   defs 0x0038 - ASMPC
-
-   ; address = 0x0038
-   ; im 1 isr
-
-IF (__crt_enable_rst & $80)
-
-   EXTERN _z80_rst_38h
-   jp _z80_rst_38h
-
-ELSE
-
-   ei
-   reti
-
-ENDIF
-
-;**************************************************************
-ENDIF
-;**************************************************************
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; crt startup part 1 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __Start:
@@ -910,41 +743,6 @@ __Start:
 
    include "../clib_init_data.inc"
    include "../clib_init_bss.inc"
-
-;**************************************************************
-IF __crt_org_code = 0
-;**************************************************************
-
-   jr __Start_2
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; nmi entry ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   defs 0x0066 - ASMPC
-
-   ; address = 0x0066
-
-IF __crt_enable_nmi
-
-   EXTERN _z80_nmi
-   jp _z80_nmi
-
-ELSE
-
-   retn
-
-ENDIF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; crt startup part 2 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-__Start_2:
-
-;**************************************************************
-ENDIF
-;**************************************************************
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
