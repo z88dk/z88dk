@@ -8,6 +8,7 @@
 @fcntl/fcntl_sdcc_ix.lst
 @font/font_4x8/fonts.lst
 @font/font_8x8/fonts.lst
+@font/fzx/zx/zx_sdcc_ix.lst
 @input/cpm/input_sdcc_ix.lst
 @inttypes/inttypes_sdcc_ix.lst
 @l/l.lst
@@ -17,6 +18,7 @@
 @math/math_float_sdcc_ix.lst
 @network/network_sdcc_ix.lst
 @setjmp/setjmp_sdcc_ix.lst
+@sound/sound_sdcc_ix.lst
 @stdio/stdio_sdcc_ix.lst
 @stdlib/stdlib_sdcc_ix.lst
 @string/string_sdcc_ix.lst

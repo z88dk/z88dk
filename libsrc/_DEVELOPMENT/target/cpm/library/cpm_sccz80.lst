@@ -8,6 +8,7 @@
 @fcntl/fcntl_sccz80.lst
 @font/font_4x8/fonts.lst
 @font/font_8x8/fonts.lst
+@font/fzx/zx/zx_sccz80.lst
 @input/cpm/input_sccz80.lst
 @inttypes/inttypes_sccz80.lst
 @l/l.lst
@@ -17,6 +18,7 @@
 @math/math_float_sccz80.lst
 @network/network_sccz80.lst
 @setjmp/setjmp_sccz80.lst
+@sound/sound_sccz80.lst
 @stdio/stdio_sccz80.lst
 @stdlib/stdlib_sccz80.lst
 @string/string_sccz80.lst
