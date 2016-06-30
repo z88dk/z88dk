@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.133 2016-06-29 03:17:44 aralbrec Exp $
+ *      $Id: zcc.c,v 1.134 2016-06-30 01:13:11 aralbrec Exp $
  */
 
 
@@ -279,7 +279,7 @@ static arg_t  config[] = {
     {"ZPRAGMAEXE", 0, SetStringConfig, &c_zpragma_exe, NULL, "Name of the zpragma binary"},
 
     {"Z80EXE", 0, SetStringConfig, &c_z80asm_exe, NULL, "Name of the z80asm binary"},
-    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, NULL, "Options for z80asm as linker", "-a -m -Mo -LDESTDIR/lib/clibs -IDESTDIR/lib" },
+    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, NULL, "Options for z80asm as linker", "-b -d -m -Mo -LDESTDIR/lib/clibs -IDESTDIR/lib" },
     {"ASMOPTS", 0, SetStringConfig, &c_asmopts, NULL, "Options for z80asm as assembler", "-Mo -IDESTDIR/lib"},
     
     {"COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, NULL, "Name of sccz80 binary (use SCCZ80EXE)"},
@@ -511,7 +511,7 @@ int linkthem(char *linker)
     linkargs_mangle(linkargs);
     len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s", 
             linker, 
-            (c_nostdlib == 0) ? c_linkopts : " -a -Mo ", 
+            (c_nostdlib == 0) ? c_linkopts : " -b -d -Mo ", 
             linker_output_separate_arg ? " " : "", 
             outputfile,
             "",
