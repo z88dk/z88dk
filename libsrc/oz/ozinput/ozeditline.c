@@ -29,7 +29,7 @@ static void movecursor(void)
 }
 
 //extern int __LIB__ ozeditline(byte _x0,byte y0,char *s0,byte slen,byte xlen)
-int ozeditline(byte _x0,byte y0,char *s0,byte slen,byte xlen)
+int ozeditline(int _x0,int y0,char *s0,int slen,int xlen)
 {
     static char c;
     static byte l1,l2;

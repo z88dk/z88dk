@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	1. GRAPHICS AND DISPLAY
 
-	$Id: ozgfx.h,v 1.8 2016-06-28 17:11:31 dom Exp $
+	$Id: ozgfx.h,v 1.9 2016-06-30 09:00:12 dom Exp $
 */
 
 
@@ -122,7 +122,7 @@ int ozgetpoint(int x, int y)
 }
 
 #define _ozbox ozbox
-extern __LIB__ ozbox(int x, int y, int width, int height) _SMALLCDECL;
+extern __LIB__ ozbox(int x, int y, int width, int height) __SMALLCDECL;
 //extern __LIB__ ozbox(int x, int y, int width, int height);
 /*
 void ozbox(int x, int y, int width, int height)
