@@ -17,6 +17,10 @@ Z88DK Z80 Macro Assembler Change Log
   Remove -nd and --no-date-stamp options. 
   
   Remove -a and --make-updated-bin options - they are aliases to -b -d.
+
+  Remove -nl and --no-list options. 
+  
+  Simplify output of -v and --verbose.
   
 - 2016-06-28
 

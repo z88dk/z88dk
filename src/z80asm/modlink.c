@@ -511,9 +511,9 @@ static void define_location_symbols( void )
 	section    = get_last_section();
 	end_addr   = section->addr + get_section_size( section );
 	
-    if ( opts.verbose )
-        printf("Code size of linked modules is %d bytes ($%04X to $%04X)\n",
-		       (int)(get_sections_size()), (int)start_addr, (int)end_addr-1 );
+	if (opts.verbose)
+		printf("Code size: %d bytes ($%04X to $%04X)\n",
+			(int)(get_sections_size()), (int)start_addr, (int)end_addr - 1);
 
 	str_sprintf( name, ASMHEAD_KW, "", "" ); 
 	define_global_def_sym( str_data(name), start_addr );
@@ -533,10 +533,10 @@ static void define_location_symbols( void )
 			start_addr = section->addr;
 			end_addr   = start_addr + get_section_size( section );
 
-			if ( opts.verbose )
-				printf("Section '%s' is %d bytes ($%04X to $%04X)\n",
-					   section->name, (int)(end_addr - start_addr), 
-					   (unsigned int)start_addr, (unsigned int)end_addr-1 );
+			if (opts.verbose)
+				printf("Section '%s' size: %d bytes ($%04X to $%04X)\n",
+					section->name, (int)(end_addr - start_addr),
+					(unsigned int)start_addr, (unsigned int)end_addr - 1);
 
 			str_sprintf( name, ASMHEAD_KW, "_", section->name ); 
 			define_global_def_sym( str_data(name), start_addr );
@@ -690,9 +690,6 @@ void link_modules( void )
     opts.symtable = opts.cur_list = FALSE;
     linkhdr = NULL;
 
-    if ( opts.verbose )
-        puts( "linking module(s)...\nPass1..." );
-
     if ( opts.relocatable )
     {
         reloctable = m_new_n( char, 32768U );
@@ -771,9 +768,6 @@ void link_modules( void )
 	/* define assembly size */
 	if (!get_num_errors())
 		define_location_symbols();
-
-	if (opts.verbose)
-		puts("Pass2...");
 
 	/* collect expressions from all modules; first compute all EQU expressions,
 	then patch all other expressions
@@ -901,11 +895,6 @@ LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHash *e
 	lib_module = set_cur_module( new_module() );
 	lib_module->modname = strpool_add( modname );
 
-    if ( opts.verbose )
-    {
-        printf( "Linking library module <%s>\n", modname );
-    }
-
 	flag = LinkModule(library->libfilename, curmodule, extern_syms);       /* link module & read names */
 
     set_cur_module( tmpmodule );		/* restore previous current module */
@@ -952,9 +941,6 @@ CreateBinFile( void )
 		if (relocfile != NULL)
 			myfclose(relocfile);
 	}
-
-    if ( opts.verbose )
-        puts( "Code generation completed." );
 }
 
 

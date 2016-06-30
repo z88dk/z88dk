@@ -129,9 +129,13 @@ static void query_assemble( char *src_filename )
 static void do_assemble( char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
+	char *obj_filename = get_obj_filename(src_filename);
 
 	/* delete object file */
-	remove(get_obj_filename(src_filename));
+	if (opts.verbose)
+		puts(obj_filename);
+
+	remove(obj_filename);
 
 	/* create list file */
 	if (opts.list)
@@ -143,9 +147,6 @@ static void do_assemble( char *src_filename )
 	/* Init ASMPC */
 	set_PC(0);
 
-	if (opts.verbose)
-		printf("Assembling '%s'...\nPass1...\n", src_filename);
-
 	parse_file(src_filename);
 
 	list_end();						/* get_used_symbol will only generate page references until list_end() */
@@ -154,9 +155,6 @@ static void do_assemble( char *src_filename )
 
 	set_error_null();
 	//set_error_module( CURRENTMODULE->modname );
-
-	if (opts.verbose)
-		puts("Pass2...");
 
 	Z80pass2();						/* call pass 2 even if errors found, to issue pass2 errors */
 	
@@ -178,9 +176,6 @@ static void do_assemble( char *src_filename )
 
 	remove_all_local_syms();
 	remove_all_global_syms();
-
-	if (opts.verbose)
-		putchar('\n');    /* separate module texts */
 }
 
 

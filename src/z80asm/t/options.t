@@ -116,7 +116,6 @@ Binary Output:
 Output File Options:
   -s, --symtable         Create symbol table file.sym
   -l, --list             Create listing file.lst
-* -nl, --no-list         No listing file
   -m, --map              Create address map file.map
   -g, --globaldef        Create global definition file.def
 END
@@ -148,20 +147,9 @@ ERR
 # --verbose, -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
-Create listing file.lst
-Assemble and link/relocate to file.bin
-
-Assembling 'test.asm'...
-Pass1...
-Reading 'test.asm'...
-Pass2...
-Size of module 'test' is 3 bytes
-
-linking module(s)...
-Pass1...
-Code size of linked modules is 3 bytes ($0000 to $0002)
-Pass2...
-Code generation completed.
+test.obj
+Module 'test' size: 3 bytes
+Code size: 3 bytes ($0000 to $0002)
 END
 
 for my $options ('-v', '--verbose') {
@@ -313,7 +301,7 @@ for my $options ('-s', '--symtable') {
 }
 
 #------------------------------------------------------------------------------
-# -l, --list, -nl, --no-list
+# -l, --list
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
@@ -330,14 +318,13 @@ $bin = pack("C*",
 );
 
 # no list
-for my $options ('-nl', '-nl') {
-	t_z80asm(
-		asm		=> $asm,
-		bin		=> $bin,
-		options	=> $options,
-		nolist	=> 1,
-	);
-}
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+	options	=> "",
+	nolist	=> 1,
+);
+
 
 # list file
 for my $options ('-l', '--list') {

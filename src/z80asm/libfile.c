@@ -50,8 +50,8 @@ void make_library(char *lib_filename, UT_array *src_files)
 	if ( lib_filename == NULL )
 		return;					/* ERROR */
 
-    if ( opts.verbose )
-        printf("Creating library '%s'...\n", lib_filename );
+	if (opts.verbose)
+		puts(lib_filename);
 
 	/* write library header */
 	lib_file = myfopen_atomic( lib_filename, "w+b" );	
@@ -70,9 +70,6 @@ void make_library(char *lib_filename, UT_array *src_files)
 			myfclose_remove( lib_file );			/* error */
 			return;
 		}
-
-        if ( opts.verbose )
-            printf( "'%s' module at %08X.\n", obj_filename, fptr );
 
 		/* write file pointer of next file, or -1 if last */
 		obj_size = ByteArray_size( obj_file_data );

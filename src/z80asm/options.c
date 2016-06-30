@@ -42,7 +42,7 @@ Parse command line options
 /* types */
 enum OptType
 {
-    OptClear, OptSet,
+    OptSet,
     OptCall, OptCallArg, OptCallOptArg,
     OptString, OptStringList,
 };
@@ -50,7 +50,6 @@ enum OptType
 /* declare functions */
 static void exit_help( void );
 static void exit_copyright( void );
-static void display_options( void );
 static void option_origin( char *origin_hex );
 static void option_define( char *symbol );
 static void option_make_lib( char *library );
@@ -130,9 +129,6 @@ void parse_argv( int argc, char *argv[] )
     if ( arg >= argc )
         error_no_src_file();			/* no source file */
 
-    if ( opts.verbose )
-        display_options();				/* display status messages of select assembler options */
-
     if ( ! get_num_errors() )
         process_files( arg, argc, argv );	/* process each source file */
 }
@@ -173,14 +169,6 @@ static void process_opt( int *parg, int argc, char *argv[] )
             /* found option, opt_arg_ptr points to after option */
             switch ( opts_lu[j].type )
             {
-            case OptClear:
-                if ( *opt_arg_ptr )
-                    error_illegal_option( argv[II] );
-                else
-                    *( ( Bool * )( opts_lu[j].arg ) ) = FALSE;
-
-                break;
-
             case OptSet:
                 if ( *opt_arg_ptr )
                     error_illegal_option( argv[II] );
@@ -319,12 +307,7 @@ static void show_option( enum OptType type, Bool *pflag,
 	STR_DEFINE(msg, STR_SIZE);
     int count_opts = 0;
 
-    /* show default option */
-    if ( ( type == OptSet   &&   *pflag ) ||
-            ( type == OptClear && ! *pflag ) )
-        str_set( msg, "* " );
-    else
-        str_set( msg, "  " );
+    str_set( msg, "  " );
 
     if ( *short_opt )
     {
@@ -398,21 +381,6 @@ static void exit_copyright( void )
 {
     printf( "%s\n", copyrightmsg );
     exit( 0 );
-}
-
-static void display_options( void )
-{
-    if ( opts.list )							puts( OPT_HELP_LIST );
-
-    if ( opts.lib_file )						puts( OPT_HELP_MAKE_LIB );
-
-    if ( opts.make_bin )						puts( OPT_HELP_MAKE_BIN );
-
-    if ( opts.library )							puts( OPT_HELP_USE_LIB );
-
-    if ( opts.relocatable )						puts( OPT_HELP_RELOCATABLE );
-
-    putchar( '\n' );
 }
 
 /*-----------------------------------------------------------------------------

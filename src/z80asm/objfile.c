@@ -196,8 +196,8 @@ static long write_code( FILE *fp )
 	code_ptr  = ftell( fp );
 	code_size = fwrite_module_code( fp );
 
-    if ( opts.verbose )
-        printf( "Size of module '%s' is %ld bytes\n", CURRENTMODULE->modname, (long)code_size );
+	if (opts.verbose)
+		printf("Module '%s' size: %ld bytes\n", CURRENTMODULE->modname, (long)code_size);
 
 	if ( code_size > 0 )
 		return code_ptr;

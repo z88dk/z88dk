@@ -70,7 +70,6 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 #define OPT_HELP_SYMTABLE		"Create symbol table file" FILEEXT_SYM
 
 #define OPT_HELP_LIST			"Create listing file" FILEEXT_LST
-#define OPT_HELP_NO_LIST		"No listing file"
 
 #define OPT_HELP_MAP			"Create address map file" FILEEXT_MAP
 
@@ -138,7 +137,6 @@ OPT_TITLE(	"Output File Options:" )
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 		OPT_HELP_SYMTABLE, "" )
 
 OPT( OptSet,	&opts.list,		"-l", 	"--list", 			OPT_HELP_LIST, "" )
-OPT( OptClear,	&opts.list,		"-nl", 	"--no-list",		OPT_HELP_NO_LIST, "" )
 
 OPT( OptSet,	&opts.map,		"-m", 	"--map", 			OPT_HELP_MAP, "" )
 
