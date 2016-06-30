@@ -220,6 +220,8 @@ top_nibble:
    call l_hex_nibble_hi
    call asm_tolower
    
+   or a
+   
    ld (hl),a
    inc hl
    
@@ -240,6 +242,8 @@ lower_nibble:
    
    call l_hex_nibble_lo
    call asm_tolower
+   
+   or a
    
    ld (hl),a
    inc hl
