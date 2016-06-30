@@ -4,7 +4,7 @@ SECTION code_stdlib
 
 PUBLIC __dtoe__, __dtoe_join
 
-EXTERN __dtoa_preamble, asm_fpclassify, __dtoa_special_form, __dtoa_base10
+EXTERN __dtoa_preamble, asm_fpclassify, __dtoa_special_form, __dtoa_base10, __dtoa_adjust_prec
 EXTERN __dtoa_digits, __dtoa_round, __dtoa_remove_zeroes, __dtoa_postamble, __dtoa_exp_digit
 
 ; math library supplies asm_fpclassify, __dtoa_base10, __dtoa_digits, __dtoa_sgnabs
@@ -73,6 +73,10 @@ normal_form:
 
    pop hl                      ; hl = buffer *
    ld e,(hl)                   ; e = precision
+
+   call __dtoa_adjust_prec     ; if precision == 255, set to max sig digits - 1
+   jr nz, __dtoe_join
+   dec e
 
 __dtoe_join:
 

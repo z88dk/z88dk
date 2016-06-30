@@ -5,7 +5,7 @@ SECTION code_stdlib
 PUBLIC __dtog__
 
 EXTERN __dtoa_preamble, asm_fpclassify, __dtoa_special_form, __dtoa_prune
-EXTERN __dtoa_base10, __dtoa_join, __dtoe_join
+EXTERN __dtoa_base10, __dtoa_join, __dtoe_join, __dtoa_adjust_prec
 
 ; math library supplies asm_fpclassify, __dtoa_base10, __dtoa_digits, __dtoa_sgnabs
 
@@ -84,6 +84,8 @@ normal_form:
    pop hl                      ; hl = buffer *
    ld e,(hl)                   ; e = precision
 
+   call __dtoa_adjust_prec
+   
    ; EXX   = float in form b(*10^e), 1 <= b < 10 mantissa only
    ;  C    = remaining significant digits
    ;  D    = base 10 exponent e

@@ -6,6 +6,7 @@ PUBLIC __dtoa__, __dtoa_join, __dtoa_prune
 
 EXTERN __dtoa_preamble, asm_fpclassify, __dtoa_special_form, __dtoa_base10
 EXTERN __dtoa_digits, __dtoa_round, __dtoa_remove_zeroes, __dtoa_postamble
+EXTERN __dtoa_adjust_prec
 
 ; math library supplies asm_fpclassify, __dtoa_base10, __dtoa_digits
 
@@ -74,6 +75,8 @@ normal_form:
    pop hl                      ; hl = buffer *
    ld e,(hl)                   ; e = precision
 
+   call __dtoa_adjust_prec
+   
 __dtoa_join:
 
    ; EXX   = double in form b(*10^e), 1 <= b < 10 mantissa only

@@ -6,6 +6,7 @@ PUBLIC __dtoh__
 
 EXTERN __dtoa_preamble, asm_fpclassify, __dtoa_special_form, __dtoa_base16, asm_tolower
 EXTERN __dtoa_remove_zeroes, __dtoa_exp_digit, __dtoa_postamble, l_hex_nibble_hi, l_hex_nibble_lo
+EXTERN __dtoa_adjust_prec
 
 ; math library supplies asm_fpclassify, __dtoa_sgnabs, __dtoa_base16
 
@@ -53,13 +54,10 @@ __dtoh__:
    
    call __dtoa_base16          ; supplied by math library
    
-   ld a,e
-   inc a
+   call __dtoa_adjust_prec     ; if precision == 255, set to max sig digits - 1
    jr nz, p1
-
-   ld e,c                      ; if precision == 255, set to max sig digits - 1
    dec e
-
+   
 p1:
 
    ex af,af'

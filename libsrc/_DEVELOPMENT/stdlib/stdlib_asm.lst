@@ -45,6 +45,7 @@ stdlib/z80/asm__strtoi
 stdlib/z80/asm__strtou
 stdlib/z80/__div_store
 stdlib/z80/__dtoa__
+stdlib/z80/__dtoa_adjust_prec
 stdlib/z80/__dtoa_asm_exit
 stdlib/z80/__dtoa_count
 stdlib/z80/__dtoa_exp_digit
