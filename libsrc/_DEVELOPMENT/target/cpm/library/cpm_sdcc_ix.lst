@@ -18,7 +18,6 @@
 @math/math_float_sdcc_ix.lst
 @network/network_sdcc_ix.lst
 @setjmp/setjmp_sdcc_ix.lst
-@sound/sound_sdcc_ix.lst
 @stdio/stdio_sdcc_ix.lst
 @stdlib/stdlib_sdcc_ix.lst
 @string/string_sdcc_ix.lst
