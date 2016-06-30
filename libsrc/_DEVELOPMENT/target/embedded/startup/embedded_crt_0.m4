@@ -185,6 +185,7 @@ SECTION code_crt_return
 
       IF __crt_org_code = 0
       
+         di
          halt                  ; some tools like to see this
          jr ASMPC              ; loop forever
 
