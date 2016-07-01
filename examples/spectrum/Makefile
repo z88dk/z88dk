@@ -139,5 +139,5 @@ synthdemo:
 	zcc +zx -vn ../sound/synthdemo.c -lndos -create-app -osynthdemo.bin
 
 clean:
-	$(RM) *.bin *.i *.asm *.tap *.op* *.o *~ zcc_opt.def
+	$(RM) *.bin *.i *.asm *.tap *.op* *.o *~ zcc_opt.def *.reloc
 
