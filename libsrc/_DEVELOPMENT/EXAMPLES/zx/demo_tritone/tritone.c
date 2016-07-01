@@ -4,6 +4,7 @@
 #include <sound/bit.h>
 #include <compress/zx7.h>
 #include <input.h>
+#include <intrinsic.h>
 #include <arch/zx.h>
 #include <z80.h>
 
@@ -42,16 +43,14 @@ struct songs song_list[] = {
    {"Triceropop",              zx7_triceropop }
 };
 
-main()
+void main(void)
 {
    static void *s;
    static unsigned int i, j;
    static unsigned char *buffer;
    static unsigned int len, offset;
 
-   #asm
-   di
-   #endasm
+   intrinsic_di();
    
    zx_border(INK_MAGENTA);
    ioctl(1, IOCTL_OTERM_PAUSE, 0);
