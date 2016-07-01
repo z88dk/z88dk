@@ -2,16 +2,21 @@
 /* ANSIfied and some PDP11isms and bugs fixed for FUZIX */
 /* Borrowed from FUZIX project */
 
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 backgammon.c -o backg
-
-// zcc +zx -vn -SO3 -startup=4 -clib-sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 backgammon.c -o backg
-// appmake +zx -b backg_CODE.bin -o backg.tap --org 30000 --blockname backg
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 backgammon.c -o backg -create-app
+// zcc +zx -vn -SO3 -startup=4 -clib-sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 backgammon.c -o backg -create-app
 
 #ifdef __SPECTRUM
+
 #pragma output CRT_ORG_CODE          = 30000
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0
 #pragma output REGISTER_SP           = -1
+
 #endif
+
+#pragma output CRT_ENABLE_COMMAND_LINE = 0
+#pragma output CRT_ENABLE_CLOSE = 0
+#pragma output CLIB_EXIT_STACK_SIZE = 0
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+#pragma output CLIB_STDIO_HEAP_SIZE = 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -598,10 +603,17 @@ void prtbrd(void)
 }
 
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	int t, k, n, go[6];
 	char s[75];
+
+#ifdef __SPECTRUM
+	#asm
+	di
+	#endasm
+#endif
+
 	go[5] = NIL;
 	printf("Do you want instructions? Type 'y' for yes,\n");
 	printf("anything else means no.?? ");

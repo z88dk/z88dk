@@ -4,25 +4,28 @@
 /*  This is a free software. See "COPYING" for detail.                 */
 /*  z88dk/examples/clisp contains example functions and "COPYING"      */
 
+// zcc +cpm -vn -O3 -clib=new clisp.c -o clisp -create-app
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 clisp.c -o clisp --fsigned-char -create-app
 
-/*  $Id: clisp.c,v 1.4 2015-12-16 02:12:11 aralbrec Exp $  */
-
-// zcc +cpm -vn -O3 -clib=new clisp.c -o clisp
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 clisp.c -o clisp
-
-// zcc +zx -vn -O3 -startup=8 -clib=new clisp.c -o clisp
-// zcc +zx -vn -SO3 -startup=8 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 clisp.c -o clisp
-// appmake +zx -b clisp_CODE.bin -o clisp.tap --org 30000 --blockname clisp
+// zcc +zx -vn -O3 -startup=8 -clib=new clisp.c -o clisp -create-app
+// zcc +zx -vn -SO3 -startup=8 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 clisp.c -o clisp --fsigned-char -create-app
 
 // use "-DLARGEMEM=1200" for larger workspace
 // use "-DSCHEME" for scheme variant
 // use "-DNOINIT" to exclude predefined functions
 
 #ifdef __SPECTRUM
+
 #pragma output CRT_ORG_CODE          = 30000
 #pragma output REGISTER_SP           = -1
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+
 #endif
+
+#pragma output CRT_ENABLE_COMMAND_LINE = 0
+#pragma output CRT_ENABLE_CLOSE = 0
+#pragma output CLIB_EXIT_STACK_SIZE = 0
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+#pragma output CLIB_STDIO_HEAP_SIZE = 0
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,9 +1,8 @@
 
 // For targets with 1-bit sound
 
-// zcc +zx -vn -O3 -clib=new beepfx.c -o beepfx
-// zcc +zx -vn -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 beepfx.c -o beepfx
-// appmake +zx -b beepfx_CODE.bin -o beepfx.tap --org 32768 --blockname beepfx
+// zcc +zx -vn -O3 -clib=new beepfx.c -o beepfx -create-app
+// zcc +zx -vn -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 beepfx.c -o beepfx -create-app
 
 #include <stdio.h>
 #include <sound.h>

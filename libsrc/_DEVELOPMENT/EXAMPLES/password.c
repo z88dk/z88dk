@@ -1,10 +1,9 @@
 
-// zcc +cpm -vn -startup=4 -O3 -clib=new password.c -o password
-// zcc +cpm -vn -startup=4 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 password.c -o password
+// zcc +cpm -vn -startup=4 -O3 -clib=new password.c -o password -create-app
+// zcc +cpm -vn -startup=4 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 password.c -o password -create-app
 
-// zcc +zx -vn -startup=8 -O3 -clib=new password.c -o password
-// zcc +zx -vn -startup=8 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 password.c -o password
-// appmake +zx -b password_CODE.bin -o password.tap --org 32768 --blockname password
+// zcc +zx -vn -startup=8 -O3 -clib=new password.c -o password -create-app
+// zcc +zx -vn -startup=8 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 password.c -o password -create-app
 
 #include <stdio.h>
 #include <stropts.h>
@@ -22,9 +21,12 @@ char password[20];
 
 main()
 {
+
 #ifdef __SPECTRUM
+
    zx_border(INK_WHITE);
    ioctl(1, IOCTL_OTERM_CLS);
+
 #endif
 
    printf("USERNAME + PASSWORD QUERY\n");

@@ -1,20 +1,12 @@
 // press enter after each row, use '0' for unmarked cell
 
-// zcc +cpm -vn -O3 -clib=new sudoku.c -o sudoku
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 sudoku.c -o sudoku
+// zcc +cpm -vn -O3 -clib=new sudoku.c -o sudoku -create-app
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 sudoku.c -o sudoku -create-app
 
-// zcc +zx -vn -startup=1 -O3 -clib=new sudoku.c -o sudoku
-// zcc +zx -vn -startup=1 -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 sudoku.c -o sudoku
-// appmake +zx -b sudoku_CODE.bin -o sudoku.tap --org 32768 --blockname sudoku
+// zcc +zx -vn -startup=1 -O3 -clib=new sudoku.c -o sudoku -create-app
+// zcc +zx -vn -startup=1 -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 sudoku.c -o sudoku -create-app
 
 // use -DVERBOSE to print list of steps taken
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <adt/p_list.h>
-#include <obstack.h>
-#include <stdint.h>
 
 #pragma output REGISTER_SP = -1
 #pragma output CLIB_EXIT_STACK_SIZE = 0
@@ -22,6 +14,13 @@
 #pragma output CLIB_STDIO_HEAP_SIZE = 0
 #pragma output CLIB_FOPEN_MAX = 0
 #pragma output CLIB_OPEN_MAX = 0
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <adt/p_list.h>
+#include <obstack.h>
+#include <stdint.h>
 
 struct sudoku_cell
 {

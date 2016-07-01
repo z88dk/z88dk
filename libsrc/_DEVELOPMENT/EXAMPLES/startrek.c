@@ -29,10 +29,8 @@
 
 // The libraries must be rebuilt with %sdf enabled for printf
 
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 startrek.c -o startrek -lm
-
-// zcc +zx -vn -SO3 -startup=4 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 startrek.c -o startrek -lm
-// appmake +zx -b startrek_CODE.bin -o startrek.tap --org 30000 --blockname strek
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 startrek.c -o startrek -lm -create-app
+// zcc +zx -vn -SO3 -startup=4 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 startrek.c -o startrek -lm -create-app
 
 #pragma output CLIB_EXIT_STACK_SIZE    = 0
 #pragma output CLIB_MALLOC_HEAP_SIZE   = 0
@@ -40,8 +38,10 @@
 #pragma output CRT_ENABLE_COMMANDLINE  = 1
 
 #ifdef __SPECTRUM
+
 #pragma output CRT_ORG_CODE = 30000
 #pragma output REGISTER_SP  = -1
+
 #endif
 
 /*

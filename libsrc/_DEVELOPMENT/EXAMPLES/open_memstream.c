@@ -1,11 +1,10 @@
 // memstream test program from C technical report
 
-// zcc +cpm -vn -O3 -clib=new open_memstream.c -o openmem
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 open_memstream.c -o openmem
+// zcc +cpm -vn -O3 -clib=new open_memstream.c -o openmem -create-app
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 open_memstream.c -o openmem -create-app
 
-// zcc +zx -vn -O3 -clib=new open_memstream.c -o openmem
-// zcc +zx -vn -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 open_memstream.c -o openmem
-// appmake +zx -b openmem_CODE.bin -o openmem.tap --org 32768 --blockname openmem
+// zcc +zx -vn -O3 -clib=new open_memstream.c -o openmem -create-app
+// zcc +zx -vn -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 open_memstream.c -o openmem -create-app
 
 #include <stdio.h>
 #include <stdlib.h>

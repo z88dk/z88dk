@@ -1,13 +1,6 @@
-
-// http://home.hccnet.nl/h.g.muller/max-src2.html
-
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 umchess.c -o umchess -lm
-
-// zcc +zx -vn -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 umchess.c -o umchess -lm
-// appmake +zx -b umchess_CODE.bin -o umchess.tap --org 32768 --blockname umchess
-
 /***************************************************************************/
 /*                               micro-Max,                                */
+/*           http://home.hccnet.nl/h.g.muller/max-src2.html                */
 /* A chess program smaller than 2KB (of non-blank source), by H.G. Muller  */
 /***************************************************************************/
 /* version 1.6 (1433 non-blank characters) features:                       */
@@ -17,11 +10,14 @@
 /* - (internal) iterative deepening                                        */
 /* - best-move-first 'sorting'                                             */
 /* - full FIDE rules and move-legality checking                            */
-
 /* accepts under-promotions: type 1,2,3 (=R,B,N) after input move          */
 /* (input buffer c[] & *P made global, K and N encoding swapped for this)  */
 
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 umchess.c -o umchess -lm --fsigned-char -create-app
+// zcc +zx -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 umchess.c -o umchess -lm --fsigned-char -create-app
+
 #include <stdio.h>
+#include <intrinsic.h>
 
 #define W while
 
@@ -115,9 +111,9 @@ main()
  long k=8;
 
 #ifdef __SPECTRUM
- #asm
- di   ;; local var space large so sdcc uses iy despite being told not to
- #endasm
+
+ intrinsic_di();   // local var space large so sdcc uses iy despite being told not to
+
 #endif
 
  K=8;W(K--)
