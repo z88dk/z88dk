@@ -8,27 +8,26 @@
 ;	It is necessary to load a copy of the microdirve MAP and to pass it
 ;	putting its location into the record structure.;	
 ;	
-;	$Id: if1_write_record.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_write_record.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION code_clib
 		PUBLIC 	if1_write_record
-		
-filename:	defm	3
 
 if1_write_record:
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
 
-		ld	ix,2
+		push	ix		;save callers
+		ld	ix,4
 		add	ix,sp
 		ld	a,(ix+2)
 		ld	hl,-1
 		and	a		; drive no. = 0 ?
-		ret	z		; yes, return -1
+		jr	z,if1_write_record_exit		; yes, return -1
 		dec	a
 		cp	8		; drive no. >8 ?
-		ret	nc		; yes, return -1
+		jr	nc,if1_write_record_exit		; yes, return -1
 		inc	a
 		;push	af
 
@@ -59,5 +58,9 @@ if1_write_record:
 		xor	a
 		rst	8
 		defb	21h		; Switch microdrive motor off (a=0)
-
+if1_write_record_exit:
+		pop	ix		; restore callers
 		ret
+
+		SECTION rodata_clib	
+filename:	defm	3

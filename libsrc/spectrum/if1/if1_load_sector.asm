@@ -9,11 +9,12 @@
 ;       2/3 sector number
 ;       0/1 buffer
 ;
-;       $Id: if1_load_sector.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;       $Id: if1_load_sector.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION   code_clib
                 PUBLIC    if1_load_sector
+                PUBLIC    _if1_load_sector
 
                 EXTERN     if1_rommap
                 EXTERN    mdvbuffer
@@ -28,26 +29,20 @@
                 EXTERN    RD_BUFF
                 
 
-;; various flags
-;flags:         defb    0
-
-; parameters and variables
-driveno:        defb    0
-sector:         defb    0
-
 
 if1_load_sector:
-
-                ld      ix,2
+_if1_load_sector:
+		push	ix	;save callers
+                ld      ix,4
                 add     ix,sp
 
                 ld      a,(ix+4)
                 ld      hl,-1
                 and     a               ; drive no. = 0 ?
-                ret     z               ; yes, return -1
+                jp	z,if_load_sector_exit               ; yes, return -1
                 dec     a
                 cp      8               ; drive no. >8 ?
-                ret     nc              ; yes, return -1
+                jr	nc,if_load_sector_exit              ; yes, return -1
                 inc     a
 
                 ld      (driveno),a     ; drive number selected (d_str1)
@@ -144,6 +139,8 @@ sectread:
                 ld      a,(sector)
                 ld      l,a
                 ld      h,0             ; Return the sector number
+if_load_sector_exit:
+		pop	ix		; restore callers
                 ret
 
 sect_notfound:
@@ -152,7 +149,7 @@ error_exit:
                 call    1                       ; unpage
                 ei
                 ld      hl,-1                   ; sector not found
-                ret
+		jr	if_load_sector_exit
 
 ; close file, and go back to main
 ok_close:
@@ -161,7 +158,7 @@ ok_close:
                 ld      a,(sector)
                 ld      l,a
                 ld      h,0             ; Return the sector number
-                ret
+		jr	if_load_sector_exit
 
 ; Decrease sector counter and check if we reached zero
 next_sector:
@@ -171,3 +168,11 @@ next_sector:
                 ld      a,l
                 or      h
                 ret
+
+		SECTION bss_clib
+;; various flags
+;flags:         defb    0
+
+; parameters and variables
+driveno:        defb    0
+sector:         defb    0

@@ -7,15 +7,16 @@
 ;	Load in a Microdrive MAP array (32 bytes) 
 ;	the actual values for the specified drive.
 ;	
-;	$Id: if1_update_map.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_update_map.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION code_clib
 		PUBLIC 	if1_update_map
+		PUBLIC 	_if1_update_map
 
-filename:	defm	"!h7$"		; foo file name: it will never be written !
 
 if1_update_map:
+_if1_update_map:
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
 
@@ -25,6 +26,8 @@ if1_update_map:
 		push	bc
 		push	hl
 		push	af
+
+		push	ix	;save callers
 
 		push	hl
 		
@@ -54,5 +57,8 @@ if1_update_map:
 
 		rst	8
 		defb	2Ch		; Reclaim the channel
-		
+		pop	ix		;restore callers	
 		ret
+
+		SECTION rodata_clib
+filename:	defm	"!h7$"		; foo file name: it will never be written !

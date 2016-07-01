@@ -8,10 +8,10 @@
 ;	 - check the loaded block for integrity
 ;	 - other various checks
 ;	
-;	$Id: if1_checkblock.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_checkblock.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION code_clib
 		PUBLIC 	if1_checkblock
 		
 		EXTERN	if1_checksum
@@ -20,10 +20,6 @@
 		PUBLIC	if1_sect_read
 		PUBLIC	if1_verifymode
 
-
-status:		defb	0
-if1_sect_read:	defb	0
-if1_verifymode:	defb	0
 
 
 if1_checkblock:
@@ -85,3 +81,7 @@ chk2:
 		ret
 
 
+		SECTION bss_clib
+status:		defb	0
+if1_sect_read:	defb	0
+if1_verifymode:	defb	0

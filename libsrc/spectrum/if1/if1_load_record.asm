@@ -10,10 +10,11 @@
 ;       2/3 record:     record number
 ;       0/1 buffer
 ;
-;       $Id: if1_load_record.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;       $Id: if1_load_record.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
-
+		SECTION   code_clib
                 PUBLIC    if1_load_record
+                PUBLIC    _if1_load_record
 
                 EXTERN     if1_rommap
                 EXTERN    mdvbuffer
@@ -30,25 +31,20 @@
                 EXTERN    RD_BUFF
                 
 
-; parameters and variables
-driveno:        defb    0
-record:         defb    0
-fnlen:          defw    0
-filename:       defs    10
-
 
 if1_load_record:
-
-                ld      ix,2
+_if1_load_record:
+		push	ix		;save callers
+                ld      ix,4
                 add     ix,sp
 
                 ld      a,(ix+6)
                 ld      hl,-1
                 and     a               ; drive no. = 0 ?
-                ret     z               ; yes, return -1
+                jp	z,if_load_record_exit               ; yes, return -1
                 dec     a
                 cp      8               ; drive no. >8 ?
-                ret     nc              ; yes, return -1
+                jp	nc,if_load_record_exit              ; yes, return -1
                 inc     a
 
                 ld      (driveno),a     ; drive number selected (d_str1)
@@ -186,6 +182,8 @@ sectread:
                 ld      a,(record)
                 ld      h,0
                 ld      l,a             ; sector read OK
+if_load_record_exit:
+		pop	ix		;restore callers
                 ret
 
 sect_notfound:
@@ -196,7 +194,7 @@ error_exit:
 ;               xor     a
 ;               ld      (if1_sect_read),a       ; flag for "sector read"
                 ld      hl,-1           ; sector not found
-                ret
+		jr	if_load_record_exit
 
 ; Decrease sector counter and check if we reached zero
 next_sector:
@@ -206,3 +204,10 @@ next_sector:
                 ld      a,l
                 or      h
                 ret
+
+		SECTION bss_clib
+; parameters and variables
+driveno:        defb    0
+record:         defb    0
+fnlen:          defw    0
+filename:       defs    10

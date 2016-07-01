@@ -9,15 +9,16 @@
 ;	which sector can be written !!!.
 ;
 ;	
-;	$Id: if1_find_sector.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_find_sector.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+                SECTION   code_clib
 		PUBLIC 	if1_find_sector
+		PUBLIC 	_if1_find_sector
 
-filename:	defm	"0-!g"
 
 if1_find_sector:
+_if1_find_sector:
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
 
@@ -25,7 +26,7 @@ if1_find_sector:
 		pop	bc	;driveno
 		push	bc
 		push	af
-
+		push	ix	;save callers
 		ld	a,c
 		ld	($5cd6),a
 		
@@ -59,5 +60,9 @@ if1_find_sector:
 		defb	24h
 		
 		pop	hl
+		pop	ix		;restore callers
 		
 		ret
+
+                SECTION   rodata_clib
+filename:	defm	"0-!g"

@@ -6,13 +6,15 @@
 ;	Find the first free sector in the specified drive map
 ;
 ;	
-;	$Id: if1_find_sector_map.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_find_sector_map.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION code_clib
 		PUBLIC 	if1_find_sector_map
+		PUBLIC 	_if1_find_sector_map
 
 if1_find_sector_map:
+_if1_find_sector_map:
 		pop	af
 		pop	hl
 		push	hl

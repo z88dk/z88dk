@@ -5,12 +5,12 @@
 ;
 ;	Picks a file name from the specified location
 ;
-;	$Id: if1_getname.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_getname.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
+		SECTION code_clib
 		PUBLIC	if1_getname
 
-tempmdvname: defs 11
 
 if1_getname:
 		pop	bc	; ret addr
@@ -35,3 +35,6 @@ previous:	dec	hl
 		
 		pop	hl	; pointer to temp name
 		ret
+
+		SECTION bss_clib
+tempmdvname: defs 11

@@ -6,11 +6,12 @@
 ;	Writes the specified sector to the specified drive.
 ;
 ;	
-;	$Id: if1_write_sector.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_write_sector.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION code_clib
 		PUBLIC 	if1_write_sector
+		PUBLIC 	_if1_write_sector
 		
 		EXTERN 	if1_rommap
 		
@@ -19,18 +20,19 @@
 
 
 if1_write_sector:
+_if1_write_sector:
 
 		call	if1_rommap
-
-		ld	ix,2
+		push	ix	;save callers
+		ld	ix,4
 		add	ix,sp
 		ld	a,(ix+4)
 		ld	hl,-1
 		and	a		; drive no. = 0 ?
-		ret	z		; yes, return -1
+		jr	z,write_sector_exit		; yes, return -1
 		dec	a
 		cp	8		; drive no. >8 ?
-		ret	nc		; yes, return -1
+		jr	nc,write_sector_exit		; yes, return -1
 		inc	a
 		push	af
 
@@ -52,11 +54,11 @@ if1_write_sector:
 		call	MOTOR
 		ld	hl,-1
 IF !OLDIF1MOTOR
-		ret	nz		; microdrive not present
+		jr	nz,write_sector_exit		; microdrive not present
 ENDIF
 		in	a,($ef)
 		and	1		; test the write-protect tab
-		ret	z		; drive 'write' protected
+		jr	z,write_sector_exit		; drive 'write' protected
 
 		push	ix
 		pop	hl
@@ -88,5 +90,6 @@ mdvbuffer:	ld	hl,0
 		defb	2Ch		; Reclaim an "M" channel
 
 		ld	hl,0
-
+write_sector_exit:
+		pop	ix
 		ret

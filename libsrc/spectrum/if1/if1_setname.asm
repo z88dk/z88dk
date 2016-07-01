@@ -7,12 +7,15 @@
 ;	Truncate or fill with blanks when necessary.
 ;	Return with the file name length
 ;
-;	$Id: if1_setname.asm,v 1.3 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_setname.asm,v 1.4 2016-07-01 22:08:20 dom Exp $
 ;
 
+		SECTION code_clib
 		PUBLIC	if1_setname
+		PUBLIC	_if1_setname
 	
 if1_setname:
+_if1_setname:
 		pop	bc	; ret addr
 		pop	hl	; location
 		pop	de	; name

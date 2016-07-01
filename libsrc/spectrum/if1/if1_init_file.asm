@@ -8,17 +8,18 @@
 ;	
 ;	Open a file for writing
 ;	
-;	$Id: if1_init_file.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_init_file.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION code_clib
 		PUBLIC 	if1_init_file
+		PUBLIC 	_if1_init_file
 
 		EXTERN	if1_setname
 
-filename:	defs	10
 
 if1_init_file:
+_if1_init_file:
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
 
@@ -30,6 +31,7 @@ if1_init_file:
 		push	de
 		push	hl
 		push	af
+		push	ix	;save callers
 
 		push	hl
 		
@@ -78,5 +80,8 @@ if1_init_file:
 		; here we could check for free space
 		; and eventually give the "microdrive full" error
 		ld	hl,0
-		
+		pop	ix		;restore callers	
 		ret
+
+		SECTION bss_clib
+filename:	defs	10

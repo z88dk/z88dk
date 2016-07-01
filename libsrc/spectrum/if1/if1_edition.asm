@@ -7,13 +7,15 @@
 ;       int (if1_issue);
 ;        - detect the Interface 1 shadow rom edition version
 ;
-;       $Id: if1_edition.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;       $Id: if1_edition.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION   code_clib
                 PUBLIC    if1_edition
+                PUBLIC    _if1_edition
 
 if1_edition:     ; start creating an 'M' channel
+_if1_edition:     ; start creating an 'M' channel
 
                 rst     8
                 defb    31h             ; Create Interface 1 system vars if required

@@ -5,11 +5,12 @@
 ;
 ;	int if1_remove (int drive, char *filename);
 ;	
-;	$Id: if1_remove_file.asm,v 1.2 2015-01-19 01:33:10 pauloscustodio Exp $
+;	$Id: if1_remove_file.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION code_clib
 		PUBLIC 	if1_remove_file
+		PUBLIC 	_if1_remove_file
 
 		EXTERN	if1_setname
 		EXTERN	if1_rommap
@@ -17,10 +18,8 @@
 		EXTERN	ERASEM
 
 
-; parameters and variables
-filename:	defs	10
-
 if1_remove_file:
+_if1_remove_file:
 
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
@@ -50,3 +49,6 @@ if1_remove_file:
 		ld	hl,0
 		ret
 
+		SECTION bss_clib
+; parameters and variables
+filename:	defs	10

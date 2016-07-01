@@ -11,10 +11,10 @@
 ;       MAKE_M can't be called with the 'hook code' system because
 ;       the first issue of the interface one just doesn't have it.
 ;       
-;       $Id: if1_rommap.asm,v 1.3 2015-01-19 01:33:10 pauloscustodio Exp $
+;       $Id: if1_rommap.asm,v 1.4 2016-07-01 22:08:20 dom Exp $
 ;
 
-
+		SECTION   code_clib
                 PUBLIC    if1_rommap
 
                 PUBLIC    MAKE_M
@@ -27,8 +27,6 @@
                 PUBLIC    DEL_S_1
 
                 PUBLIC    mdvbuffer
-
-mdvbuffer:      defw    0
 
 if1_rommap:     ; start creating an 'M' channel
 
@@ -219,3 +217,5 @@ nopres:
         ret                     ; ...and return
 
 ENDIF
+		SECTION bss_clib
+mdvbuffer:      defw    0
