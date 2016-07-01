@@ -77,6 +77,7 @@ _heap:
 ENDIF
 		SECTION bss_fp
 		SECTION bss_fardata
+		SECTION bss_error
 IF bss_fardata_start
 		org	bss_fardata_start
 ENDIF
@@ -85,4 +86,4 @@ IF bss_compiler_start
 		org	bss_compiler_start
 ENDIF
 		SECTION bss_clib
-		SECTION bss_error
+		SECTION bss_tail

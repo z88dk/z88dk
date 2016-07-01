@@ -19,7 +19,7 @@
  *
  *	Packages are now supported (work for 16k packages)
  *
- *	$Id: application.h,v 1.8 2016-03-08 21:27:16 dom Exp $
+ *	$Id: application.h,v 1.9 2016-07-01 20:34:45 dom Exp $
  */
 
 #ifndef HELP1
@@ -89,7 +89,6 @@ void application_dor(void)
 #pragma asm
 ; Here we go, with lots of assembler!
         INCLUDE "dor.def"
-        INCLUDE "zcc_opt.def"   ; The universal saviour file!
 
         EXTERN    app_entrypoint  ; The real starting point for our apps
         PUBLIC    applname        ; So startup can pick it up
@@ -100,32 +99,10 @@ void application_dor(void)
 	PUBLIC	in_dor_seg2
 	PUBLIC	in_dor_seg3
 
-; How much bad memory do we actually need
-; If reqpag is defined already do nothing, else default to $20 pages
-        IF ( reqpag = 0 ) | reqpag
-        ELSE
-                defc    reqpag = $20
-        ENDIF
 
-;Safe workspace needed by app (user specifies so can have app using
-;static vars that is still good...) be careful though!
-        IF !safedata
-                defc    safedata = 0
-        ENDIF
-
-.dummy_entry
+.application_dor_entrypoint
         jp      app_entrypoint
-IF ( (reqpag=0) | (reqpag >= 32) )
-        scf            ; no bad or >8k bad needed
-        ret
-ELSE
-        ld      bc,8192+(reqpag*256)
-
-        ld      de,8192+8192
-        or      a
-        ret
-ENDIF
-
+	defs	8		;enquire_entry - written by appmake
 
 ; Initally let us consider only single bank applications
 
@@ -151,20 +128,14 @@ ENDIF
 .ininfstart     
         defw    0
         APPLBYTE(APP_KEY)
-IF reqpag = 0
-        defb    0
-ELSE 
-        IF reqpag <=32
-                defb    32
-        ELSE
-                defb    reqpag  ; contigious RAM
-        ENDIF
-ENDIF
+.in_dor_reqpag
+	defb	0		; set by appmake
         defw    0       ; overhead
         defw    0       ; unsafe workspace
-        defw    55+safedata ; safe workspace (used for startup vars)
-                            ; and user specifed safe data
-        defw    dummy_entry   ; entry point
+.in_dor_safedata
+        defw    0 	; safe workspace (used for startup vars)
+                        ; and user specifed safe data (patched by appmake)
+        defw    application_dor_entrypoint   ; entry point
 ; These are set up by appmake, but we can define top for certain
 .in_dor_seg_setup
 .in_dor_seg0

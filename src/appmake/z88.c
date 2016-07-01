@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.8 2016-06-26 00:46:55 aralbrec Exp $
+ *      $Id: z88.c,v 1.9 2016-07-01 20:34:45 dom Exp $
  */
 
 
@@ -100,7 +100,10 @@ int z88_exec(char *target)
 {
     int     pages;          /* size of card in banks */
     long     indor;          /* address of app dor */
-    long     indorseg;      /* address of seg bindings */
+    long     in_dor_seg_setup;      /* address of seg bindings */
+    long     in_dor_reqpag;
+    long     in_dor_safedata;
+    long     application_dor_entrypoint;
     FILE    *binfile;        /* Read in bin file */
     long    filesize;
     struct romheader *hdr;  /* Pointer to ROM DOR */
@@ -108,6 +111,8 @@ int z88_exec(char *target)
     int     appdoroff;      /* Offset of where the app DOR is */
     int        readlen;        /* Amount read in */
     time_t  cardidno;       /* Card ID number - construct randomly */
+    int     reqpag = 0;
+    int     safedata = 0;
 
 
     if ( help )
@@ -135,9 +140,32 @@ int z88_exec(char *target)
     indor = parameter_search(crtfile,".map","in_dor");
     if ( indor == -1 ) 
         myexit("Could not find parameter in_dor - no app dor present\n",1);
-    indorseg = parameter_search(crtfile,".map","in_dor_seg_setup");
-    if ( indorseg == -1 ) 
+    in_dor_seg_setup = parameter_search(crtfile,".map","in_dor_seg_setup");
+    if ( in_dor_seg_setup == -1 ) 
         myexit("Could not find parameter in_dor_seg_setup - no app dor present\n",1);
+
+
+    application_dor_entrypoint = parameter_search(crtfile,".map","application_dor_entrypoint");
+    if ( application_dor_entrypoint == -1 ) 
+        myexit("Could not find parameter application_dor_entrypoint- no app dor present\n",1);
+    in_dor_reqpag = parameter_search(crtfile,".map","in_dor_reqpag");
+    if ( in_dor_reqpag == -1 ) 
+        myexit("Could not find parameter in_dor_reqpag - no app dor present\n",1);
+    in_dor_safedata = parameter_search(crtfile,".map","in_dor_safedata");
+    if ( in_dor_safedata == -1 ) 
+        myexit("Could not find parameter in_dor_safedata - no app dor present\n",1);
+    reqpag = parameter_search(crtfile,".map","reqpag");
+    if ( reqpag == -1 )  {
+         int asmtail = parameter_search(crtfile,".map","ASMTAIL_bss_tail");
+         if ( asmtail == -1 ) {
+              myexit("reqpag isn't defined and can't find the end of the BSS segment\n",1);
+         }
+         reqpag = 0;
+         if ( asmtail > 0x2000 ) {
+             reqpag = ((asmtail - 0x2000) / 256) + 1;
+         }
+         printf("Application will use %d pages of bad memory\n",reqpag);
+    }
 
 
     pages = ( (65536L - (long)(zorg+1))/16384L);
@@ -231,13 +259,33 @@ int z88_exec(char *target)
     /* Now, set up the needed pages in the app DOR */
     switch(pages) {
     case 4:
-        *(memory+indorseg-zorg)=(char)60;
+        *(memory+in_dor_seg_setup-zorg)=(char)60;
     case 3:
-        *(memory+indorseg-zorg+1)=(char)61;
+        *(memory+in_dor_seg_setup-zorg+1)=(char)61;
     case 2:
-        *(memory+indorseg-zorg+2)=(char)62;
+        *(memory+in_dor_seg_setup-zorg+2)=(char)62;
     case 1:
-        *(memory+indorseg-zorg+3)=(char)63;
+        *(memory+in_dor_seg_setup-zorg+3)=(char)63;
+    }
+
+    *(memory + in_dor_reqpag - zorg) = reqpag ? (reqpag < 32 ? 32 : reqpag) : 0;
+    *(memory + in_dor_safedata - zorg) = safedata ? (safedata + 100) % 256 : 100;
+    *(memory + in_dor_safedata - zorg + 1) = safedata ? (safedata + 55) / 256 : 0;
+
+    /* Now we need to setup the enquire_entry point */
+    if ( reqpag == 0 || reqpag > 32 ) {
+        *(memory + application_dor_entrypoint - zorg + 3 ) = 0x37;  /* scf */
+        *(memory + application_dor_entrypoint - zorg + 4 ) = 0xc9;  /* ret */
+    } else {
+        /* ld bc, start, ld bc, end, and a, ret */
+        *(memory + application_dor_entrypoint - zorg + 3 ) = 0x01;  /* ld bc,nnnn */
+        *(memory + application_dor_entrypoint - zorg + 4 ) = (8192 + reqpag) % 256; 
+        *(memory + application_dor_entrypoint - zorg + 5 ) = (8192 + reqpag) / 256; 
+        *(memory + application_dor_entrypoint - zorg + 6 ) = 0x11;  /* ld de,nnnn nnnn=16384*/
+        *(memory + application_dor_entrypoint - zorg + 7 ) = 0x00;  
+        *(memory + application_dor_entrypoint - zorg + 8 ) = 0x40;  
+        *(memory + application_dor_entrypoint - zorg + 9 ) = 0xa7; /* and a */  
+        *(memory + application_dor_entrypoint - zorg + 10 ) = 0xc9;  /* ret */
     }
 
     /* Okay, now thats done, we have to save the image as banks.. */

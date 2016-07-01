@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.25 2016-06-21 20:49:06 dom Exp $
+;	$Id: app_crt0.asm,v 1.26 2016-07-01 20:34:45 dom Exp $
 
 
 ;--------
@@ -317,10 +317,12 @@ IF !DEFINED_sysdefvarsaddr
 	defc sysdefvarsaddr = $1ffD-100-safedata
 ENDIF
 	defc bss_start = sysdefvarsaddr
+	; We have to get user variables to start at 0x2000, and far
+	; data 
 	; Far data at 8192 to match up with CamelForth
-IF DEFINED_farheapsz
-        defc bss_fardata_start = 8192
-ENDIF
+        IF safedata = 0 
+            defc bss_fardata_start = 8192
+        ENDIF
 	INCLUDE "crt0_section.asm"
 
 	SECTION bss_crt

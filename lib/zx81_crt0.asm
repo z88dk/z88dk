@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.56 2016-06-27 19:34:41 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.57 2016-07-01 20:34:45 dom Exp $
 ;
 ; - - - - - - -
 
@@ -59,13 +59,6 @@
 
 IF (startup>100)
 		; LAMBDA specific definitions (if any)
-ELSE
-IF (startup>=3)
-        PUBLIC    hr_rows         ;Current number of text rows in graphics mode
-        PUBLIC    _hr_rows        ;as above for C declarations
-
-        PUBLIC    text_rows       ;as above for VT ANSI mode
-ENDIF
 ENDIF
 
 
@@ -334,6 +327,9 @@ ENDIF
 ; Now some variables
 ;-----------
 IF (startup>=3)
+	PUBLIC text_rows
+	PUBLIC hr_rows
+	PUBLIC _hr_rows
 text_rows:
 hr_rows:
 _hr_rows:
