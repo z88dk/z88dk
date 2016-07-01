@@ -3,7 +3,7 @@
  *
  *      Stefano Bodrato - 6/9/2004
  *
- *	$Id: zxinterface1.h,v 1.10 2010-09-19 00:24:08 dom Exp $
+ *	$Id: zxinterface1.h,v 1.11 2016-07-01 22:09:25 dom Exp $
  */
 
 
@@ -94,33 +94,33 @@ struct N_CHAN {
 
 
 // Load a sector identified by file name and record number
-extern int __LIB__ if1_load_record (int drive, char *filename, int record, struct M_CHAN buffer);
+extern int __LIB__ if1_load_record (int drive, char *filename, int record, struct M_CHAN buffer) __SMALLCDECL;
 
 // Load a sector identified by the sector number
-extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN buffer);
+extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN buffer) __SMALLCDECL;
 
 // Write the sector in "buffer"
-extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN buffer);
+extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN buffer) __SMALLCDECL;
 
 // Add a record containing the data in "buffer"
-extern int __LIB__ if1_write_record (int drive, struct M_CHAN buffer);
+extern int __LIB__ if1_write_record (int drive, struct M_CHAN buffer) __SMALLCDECL;
 
 // Put a 10 characters file name at the specified location; return with the file name length
-extern int __LIB__ if1_setname(char* name, char *location);
+extern int __LIB__ if1_setname(char* name, char *location) __SMALLCDECL;
 
 extern char __LIB__ *if1_getname(char *location);
 
 // Delete a file
-extern int __LIB__ if1_remove_file(int drive, char *filename);
+extern int __LIB__ if1_remove_file(int drive, char *filename) __SMALLCDECL;
 
 // Create a file if it doesn't exist
-extern int __LIB__ if1_touch_file(int drive, char *filename);
+extern int __LIB__ if1_touch_file(int drive, char *filename) __SMALLCDECL;
 
 // Create a file and return handle
-extern int __LIB__ if1_init_file (int drive, char *filename, struct M_CHAN buffer);
+extern int __LIB__ if1_init_file (int drive, char *filename, struct M_CHAN buffer) __SMALLCDECL;
 
 // Load the map values for the specified drive
-extern void __LIB__ if1_update_map (int drive, char *mdvmap);
+extern void __LIB__ if1_update_map (int drive, char *mdvmap) __SMALLCDECL;
 
 // Find a free sector
 extern int __LIB__ if1_find_sector (int drive);
