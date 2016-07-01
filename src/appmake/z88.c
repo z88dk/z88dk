@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.9 2016-07-01 20:34:45 dom Exp $
+ *      $Id: z88.c,v 1.10 2016-07-01 20:43:56 dom Exp $
  */
 
 
@@ -136,29 +136,29 @@ int z88_exec(char *target)
 
     zorg = get_org_addr(crtfile);
     if ( zorg == -1 ) 
-        myexit("Could not find parameter ZORG (compiled as BASIC?)\n",1);
+        exit_log(1, "Could not find parameter ZORG (compiled as BASIC?)\n");
     indor = parameter_search(crtfile,".map","in_dor");
     if ( indor == -1 ) 
-        myexit("Could not find parameter in_dor - no app dor present\n",1);
+        exit_log(1,"Could not find parameter in_dor - no app dor present\n");
     in_dor_seg_setup = parameter_search(crtfile,".map","in_dor_seg_setup");
     if ( in_dor_seg_setup == -1 ) 
-        myexit("Could not find parameter in_dor_seg_setup - no app dor present\n",1);
+        exit_log(1,"Could not find parameter in_dor_seg_setup - no app dor present\n");
 
 
     application_dor_entrypoint = parameter_search(crtfile,".map","application_dor_entrypoint");
     if ( application_dor_entrypoint == -1 ) 
-        myexit("Could not find parameter application_dor_entrypoint- no app dor present\n",1);
+        exit_log(1, "Could not find parameter application_dor_entrypoint- no app dor present\n");
     in_dor_reqpag = parameter_search(crtfile,".map","in_dor_reqpag");
     if ( in_dor_reqpag == -1 ) 
-        myexit("Could not find parameter in_dor_reqpag - no app dor present\n",1);
+        exit_log(1, "Could not find parameter in_dor_reqpag - no app dor present\n");
     in_dor_safedata = parameter_search(crtfile,".map","in_dor_safedata");
     if ( in_dor_safedata == -1 ) 
-        myexit("Could not find parameter in_dor_safedata - no app dor present\n",1);
+        exit_log(1, "Could not find parameter in_dor_safedata - no app dor present\n");
     reqpag = parameter_search(crtfile,".map","reqpag");
     if ( reqpag == -1 )  {
          int asmtail = parameter_search(crtfile,".map","ASMTAIL_bss_tail");
          if ( asmtail == -1 ) {
-              myexit("reqpag isn't defined and can't find the end of the BSS segment\n",1);
+              exit_log(1, "reqpag isn't defined and can't find the end of the BSS segment\n");
          }
          reqpag = 0;
          if ( asmtail > 0x2000 ) {
@@ -185,21 +185,21 @@ int z88_exec(char *target)
         memory = calloc(1,65536L);
     }
     if (memory == NULL)
-        myexit("Can't allocate memory\n",1);
+        exit_log(1, "Can't allocate memory\n");
 
     if ( (binfile = fopen_bin(binname, crtfile) ) == NULL ) {
-        myexit("Can't open binary file\n",1);
+        exit_log(1,"Can't open binary file\n");
     }
 
     if ( fseek(binfile, 0, SEEK_END) ) {
         fclose(binfile);
-        myexit("Couldn't determine the size of the file\n",1);
+        exit_log(1,"Couldn't determine the size of the file\n");
     }
 
     filesize = ftell(binfile);
     if ( filesize > 65536L ) {
         fclose(binfile);
-        myexit("The source binary is over 65,536 bytes in length.\n",1);
+        exit_log(1,"The source binary is over 65,536 bytes in length.\n");
     }
 
     fseek(binfile, 0, SEEK_SET);
@@ -213,11 +213,11 @@ int z88_exec(char *target)
 
         if ( filesize != readlen ) {
             fclose(binfile);
-            myexit("Couldn't read in binary file\n",1);
+            exit_log(1,"Couldn't read in binary file\n");
         }
     } else {
         fclose(binfile);
-        myexit("Binary file too large! Change the org!\n",1);
+        exit_log(1,"Binary file too large! Change the org!\n");
     }
     fclose(binfile);
 
@@ -311,8 +311,7 @@ static void SaveBlock(unsigned offset, char *base, char *ext)
     suffix_change(name,ext);
 
     if ( ( fp = fopen(name,"wb") ) == NULL ) {
-        sprintf(buffer,"Can't open output file %s\n",name);
-        myexit(buffer,1);
+        exit_log(1,"Can't open output file %s\n",name);
     }
     if ( (zorg-offset) < 16384 && do_truncate == FALSE  ) {
         /* Saving the segment in which the code is org'd to */
@@ -322,8 +321,7 @@ static void SaveBlock(unsigned offset, char *base, char *ext)
     }
 
     if (fwrite(memory+offset-zorg+16384-length,1,length,fp) != length ) {
-        sprintf(buffer,"Can't write to  output file %s\n",name);
-        myexit(buffer,1);
+        exit_log(1,"Can't write to  output file %s\n",name);
     }
     fclose(fp);
 }
