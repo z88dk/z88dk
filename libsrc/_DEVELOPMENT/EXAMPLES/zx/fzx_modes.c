@@ -1,7 +1,6 @@
 
-// zcc +zx -vn -startup=31 -O3 -clib=new fzx_modes.c -o fzx_modes
-// zcc +zx -vn -startup=31 -SO3 -clib=sdcc_ix --reserve-regs-iy --max-reallocs-per-node200000 fzx_modes.c -o fzx_modes
-// appmake +zx -b fzx_modes_CODE.bin -o fzx_modes.tap --org 32768 --blockname modes
+// zcc +zx -vn -startup=31 -O3 -clib=new fzx_modes.c -o fzx_modes -create-app
+// zcc +zx -vn -startup=31 -SO3 -clib=sdcc_ix --reserve-regs-iy --max-reallocs-per-node200000 fzx_modes.c -o fzx_modes -create-app
 
 #include <font/fzx.h>
 #include <rect.h>
@@ -56,7 +55,7 @@ void print_random_location(char *s)
    }
 }
 
-main()
+void main(void)
 {
    unsigned int i;
 
@@ -82,7 +81,8 @@ main()
    // or mode, fzx text printed ink-only
 
    fzx_state_init(&fs, &ff_ao_Cayeux, &screen);
-      
+
+   fs.fzx_draw = _fzx_draw_or;
    fs.fgnd_attr = INK_BLACK;
    fs.fgnd_mask = 0x38;        // do not change the paper!
 
