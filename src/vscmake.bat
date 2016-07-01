@@ -1,6 +1,6 @@
 @echo off
 
-rem $Id: vscmake.bat,v 1.8 2015-02-04 19:51:41 stefano Exp $
+rem $Id: vscmake.bat,v 1.9 2016-07-01 12:57:16 stefano Exp $
 
 cl
 if %ERRORLEVEL% == 0 goto :build
@@ -17,6 +17,7 @@ echo *
 echo *
 
 echo #define WIN32 1 > config.h
+echo #define Z88DK_VERSION "[VC_custom]" > config.h
 
 md ..\bin
 cd appmake

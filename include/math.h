@@ -4,7 +4,7 @@
 #include <sys/compiler.h>
 #include <float.h>
 
-/* $Id: math.h,v 1.16 2013-05-01 08:22:56 stefano Exp $ */
+/* $Id: math.h,v 1.17 2016-07-01 12:57:16 stefano Exp $ */
 
 
 extern double __LIB__ acos(double);  /* arc cosine */
@@ -55,6 +55,7 @@ extern double __LIB__ atof(char *);
 #define expm1(x) (exp(x)-1.)
 
 #define copysign(a,b) (b<.0?-fabs(a):fabs(a))
+#define signbit(x) (x != fabs(x))
 #define fdim(a,b) (a>b?a-b:b-a)
 #define fma(x,y,z) (x*y+z)
 
