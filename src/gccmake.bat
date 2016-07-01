@@ -1,6 +1,6 @@
 @echo off
 
-rem $Id: gccmake.bat,v 1.7 2016-07-01 12:57:16 stefano Exp $
+rem $Id: gccmake.bat,v 1.8 2016-07-01 15:10:47 stefano Exp $
 
 gcc
 if %ERRORLEVEL% == 1 goto :build
@@ -18,7 +18,7 @@ echo *
 
 set cygwin=nodosfilewarning
 echo #define WIN32 1 > config.h
-echo #define Z88DK_VERSION "[GCC_custom]" > config.h
+echo #define Z88DK_VERSION "[GCC_custom]" >> config.h
 
 md ..\bin
 cd appmake
