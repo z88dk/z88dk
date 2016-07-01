@@ -16,6 +16,10 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include <stdio.h>
 #include <stdarg.h>
 
+#ifndef va_copy
+#define va_copy(dst, src)  ((void)((dst) = (src)))
+#endif
+
 /*-----------------------------------------------------------------------------
 *   Utilities working on char *
 *----------------------------------------------------------------------------*/
