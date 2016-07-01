@@ -43,10 +43,10 @@ wall:
 	zcc +zx -vn -lndos -create-app -DJOYSTICK -DBANNERS -Dspritesize=8 -DSOUND -DCLOCK -O3 -I.. ../wall.c -owall.bin
 
 save:
-	zcc +zx -vn save.c -o save.bin -create-app
+	zcc +zx -vn save.c -o save.bin -create-app -lndos
 
 ex10b:
-	 zcc +zx -vn ex10b.c -o ex10b.bin -create-app 
+	 zcc +zx -vn ex10b.c -o ex10b.bin -create-app  -lndos
 
 gfx:
 	zcc +zx -vn gfx.c -o gfx.bin -lndos -create-app -lm
