@@ -4,7 +4,7 @@
  *	
  *	32x48 pixels.
  *
- *	$Id: zx81lowgfx.h,v 1.5 2015-01-22 11:13:36 stefano Exp $
+ *	$Id: zx81lowgfx.h,v 1.6 2016-07-02 10:19:07 dom Exp $
  */
 
 #ifndef __ZXLOGFX_H__
@@ -281,7 +281,7 @@ void cdraw(int x0, int y0, int x1, int y1, int color)
 {
 	#asm
 	EXTERN	Line
-	EXTERN	coords
+	EXTERN	__gfx_coords
 	
 	ld	ix,0
 	add	ix,sp
@@ -307,7 +307,7 @@ mod3drw:	sub	3
 	ret
 	
 csplot:
-	ld	(coords),hl
+	ld	(__gfx_coords),hl
 	push	bc
 	ld	d,0
 color:	ld	e,0

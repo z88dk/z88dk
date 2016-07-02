@@ -3,7 +3,7 @@
  *	
  *	32x48 or (defining the "ALTLOWGFX" variable) 64x24 pixels (Spectrum only).
  *
- *	$Id: zxlowgfx.h,v 1.6 2015-01-22 11:13:36 stefano Exp $
+ *	$Id: zxlowgfx.h,v 1.7 2016-07-02 10:19:07 dom Exp $
  */
 
 #ifdef __ZX81__
@@ -273,7 +273,7 @@ void cdraw(int x0, int y0, int x1, int y1, int color)
 {
 	#asm
 	EXTERN	Line
-	EXTERN	coords
+	EXTERN	__gfx_coords
 	
 	ld	ix,0
 	add	ix,sp
@@ -295,7 +295,7 @@ void cdraw(int x0, int y0, int x1, int y1, int color)
 	ret
 	
 csplot:
-	ld	(coords),hl
+	ld	(__gfx_coords),hl
 	push	bc
 color:	ld	c,0
 	call	cplotpixel
