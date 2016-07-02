@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.240 2016-07-02 14:44:33 dom Exp $
+# $Id: Makefile,v 1.241 2016-07-02 15:41:38 dom Exp $
 
 
 include Make.config
@@ -194,7 +194,7 @@ ndos.lib:
 	$(MAKE) -C fcntl/dummy 
 
 gendos.lib:
-	$(MAKE) -C fcntl lgendos 
+	$(MAKE) -C fcntl/gen_rnd
 
 # Startup code (such as division etc) common to all z80s - dom
 z80_crt0.lib:
@@ -229,7 +229,7 @@ z88_clib.lib: gfxdeps
 	@echo ''
 	@echo '--- Building Z88 Library ---'
 	@echo ''
-	$(MAKE) -C fcntl lz88 
+	$(MAKE) -C fcntl/z88
 	$(MAKE) -C stdio 
 	$(MAKE) -C stdlib TARGET=z88
 	$(MAKE) -C strings 
@@ -248,7 +248,7 @@ z88net_clib.lib: gfxdeps
 	@echo ''
 	@echo '--- Building Z88 Network Aware Library ---'
 	@echo ''
-	$(MAKE) -C fcntl lz88 
+	$(MAKE) -C fcntl/z88
 	$(MAKE) -C stdio 
 	$(MAKE) -C stdlib TARGET=z88
 	$(MAKE) -C strings 
@@ -267,7 +267,7 @@ zxfcntl:
 	@echo ''
 	@echo '--- Building ZX Spectrum fcntl libraries ---'
 	@echo ''
-	$(MAKE) -C fcntl lzx
+	$(MAKE) -C fcntl/spectrum
 
 # 64/32 column library for ZX Spectrum - dom/stefano
 # ansi flags
@@ -346,7 +346,7 @@ zxvgs.lib:
 	@echo ''
 	@echo '--- Building ZXVGS Library ---'
 	@echo ''
-	$(MAKE) -C fcntl lzxvgs
+	$(MAKE) -C fcntl/zxvgs
 	$(MAKE) -C zxvgs
 	$(LIBLINKER) -DFORzx -x$(OUTPUT_DIRECTORY)/zxvgs @$(LISTFILE_DIRECTORY)/zxvgs.lst
 
@@ -406,7 +406,7 @@ pps_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
-	$(MAKE) -C fcntl lpps
+	$(MAKE) -C fcntl/sprinter
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -687,7 +687,7 @@ cpm_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
-	$(MAKE) -C fcntl lcpm
+	$(MAKE) -C fcntl/cpm
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=cpm
@@ -862,7 +862,7 @@ msx_clib.lib:
 	@echo '--- Building MSX Library ---'
 	@echo ''
 	$(MAKE) msxdeps
-	$(MAKE) -C fcntl lcpm
+	$(MAKE) -C fcntl/cpm
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=msx
@@ -1000,7 +1000,7 @@ nc_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=nc
 	$(MAKE) -C stdio 
-	$(MAKE) -C fcntl lnc
+	$(MAKE) -C fcntl/nc100
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1013,6 +1013,7 @@ cpc_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
+	$(MAKE) -C fcntl/cpc
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=cpc
 	$(MAKE) -C stdio
@@ -1029,7 +1030,6 @@ cpcfs.lib:
 	@echo '--- Building Amstrad CPC fcntl Library ---'
 	@echo ''
 	$(MAKE) -C fcntl lcpc
-	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcfs @$(LISTFILE_DIRECTORY)/cpcfs.lst
 
 # Amstrad CPC maths libraries - Dom
 cpc_math.lib:
@@ -1092,7 +1092,7 @@ newbrain_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=newbrain
 	$(MAKE) -C stdio 
-	$(MAKE) -C fcntl lnewbrain
+	$(MAKE) -C fcntl/newbrain
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C time 
@@ -1323,7 +1323,7 @@ osca_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C sdcard clean
-	$(MAKE) -C fcntl losca
+	$(MAKE) -C fcntl/osca
 	$(LIBLINKER) -DFORosca -DSDHC_SUPPORT -x$(OUTPUT_DIRECTORY)/osca_clib.lib @$(LISTFILE_DIRECTORY)/osca.lst
 
 # Preempt multitasking library - dom

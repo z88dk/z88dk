@@ -4,12 +4,14 @@
  *
  *	Stefano Bodrato - Oct 2012
  *
- *	$Id: mkdir.c,v 1.1 2012-10-15 10:40:46 stefano Exp $
+ *	$Id: mkdir.c,v 1.2 2016-07-02 15:41:39 dom Exp $
  */
 
 //#include <stdio.h>
 #include <sys/stat.h>
 #include <flos.h>
+
+#undef mkdir
 
 
 int mkdir(char *dirname)

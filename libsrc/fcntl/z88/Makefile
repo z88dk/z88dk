@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.8 2016-06-13 19:55:48 dom Exp $
+# $Id: Makefile,v 1.9 2016-07-02 15:41:39 dom Exp $
 
 include ../../Make.config
 
@@ -26,11 +26,10 @@ CFILES = \
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-z88_fcntl: $(OBJECTS)
+all: $(OBJECTS)
 
 .c.o:
 	zcc +z88 $(CFLAGS) $*.c
-
 
 clean:
 	$(RM)  *.sym *.map zcc_opt.def *.o* *.i $(AFILES)

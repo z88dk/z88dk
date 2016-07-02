@@ -1,0 +1,12 @@
+close
+cpc_closein
+cpc_closeout
+cpc_openin
+cpc_openout
+cpc_setup_open
+open
+readbyte
+read
+rename
+writebyte
+write

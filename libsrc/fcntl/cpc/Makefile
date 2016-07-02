@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.4 2016-06-13 19:55:46 dom Exp $
+# $Id: Makefile,v 1.5 2016-07-02 15:41:38 dom Exp $
 
 include ../../Make.config
 
@@ -15,14 +15,20 @@ CFILES = \
 	writebyte.c  \
 	readbyte.c   
 
-AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-cpc_fcntl: $(OBJECTS)
+all: $(OUTPUT_DIRECTORY)/cpcfs.lib
+
+$(OUTPUT_DIRECTORY)/cpcfs.lib: $(OBJECTS) $(wildcard *.asm) cpcfs.lst
+	@echo ''
+	@echo '--- Building Amstrad CPC fcntl Library ---'
+	@echo ''
+	$(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpcfs @cpcfs.lst
+
 
 .c.o:
 	zcc +cpc $(CFLAGS)  -D__CPC__  $*.c
 
 
 clean:
-	$(RM)  *.sym *.map zcc_opt.def *.o* *.i $(AFILES)
+	$(RM)  *.sym *.map zcc_opt.def *.o* *.i $(AFILES) $(OUTPUT_DIRECTORY)/cpcfs.lib

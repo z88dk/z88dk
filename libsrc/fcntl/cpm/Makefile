@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.14 2016-06-13 19:55:46 dom Exp $
+# $Id: Makefile,v 1.15 2016-07-02 15:41:38 dom Exp $
 
 include ../../Make.config
 
@@ -35,12 +35,12 @@ CFILES = \
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-z88_fcntl: $(OBJECTS)
+all: $(OBJECTS)
 
 # It can't be +cpm, otherwise the bin output filename
 # will be forced to 'a.com' !!
 .c.o:
-	zcc +test -D__CPM__ $(CFLAGS) $*.c
+	zcc +cpm $(CFLAGS) $*.c
 
 clean:
 	$(RM) *.sym *.map zcc_opt.def *.o* *~ *.i $(AFILES)
