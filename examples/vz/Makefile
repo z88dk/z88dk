@@ -20,13 +20,16 @@ dstar_native.vz: dstar.c
 	zcc +vz -vn dstar.c -o dstar_native.vz  -lndos
 
 adv_a.vz: ../console/adv_a.c
-	zcc +vz -vn -DCOMPUTE_STORE $^ -O3 -o $@
+	zcc +vz -vn -DCOMPUTE_SCORE $^ -O3 -o $@
 
 %.vz: ../console/%.c
 	zcc +vz -vn $^ -O3 -o $@
 
 %.vz: %.c
-	zcc +vz -vn $^ -O3 -o $A@
+	zcc +vz -vn $^ -O3 -o $@
+
+%.vz: ../%.c
+	zcc +vz -vn $^ -O3 -o $@
 
 %.vz: ../%.c
 	zcc +vz -vn $^ -O3 -o $@
