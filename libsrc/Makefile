@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.241 2016-07-02 15:41:38 dom Exp $
+# $Id: Makefile,v 1.242 2016-07-02 15:49:42 dom Exp $
 
 
 include Make.config
@@ -1029,7 +1029,7 @@ cpcfs.lib:
 	@echo ''
 	@echo '--- Building Amstrad CPC fcntl Library ---'
 	@echo ''
-	$(MAKE) -C fcntl lcpc
+	$(MAKE) -C fcntl/cpc
 
 # Amstrad CPC maths libraries - Dom
 cpc_math.lib:
