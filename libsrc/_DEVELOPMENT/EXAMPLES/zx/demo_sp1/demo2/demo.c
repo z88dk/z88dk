@@ -12,6 +12,9 @@
 
  (C) 2012 Timmy
 
+http://www.worldofspectrum.org/forums/discussion/37467/a-z88dk-sp1-demo-with-source
+http://www.worldofspectrum.org/forums/discussion/comment/864043/#Comment_864043
+
 ****************************************/
 
 // zcc +zx -vn -O3 -startup=31 -clib=new demo.c graphics.asm -o demo -create-app
@@ -167,7 +170,7 @@ main()
    im2_init(0xd000);           // place z80 in im2 mode with interrupt vector table located at 0xd000
    memset(0xd000, 0xd1, 257);  // initialize 257-byte im2 vector table with all 0xd1 bytes
    
-   z80_bpoke(0xd1d1, 0xfb);    // POKE instructions at address 0xd4d4 (interrupt service routine entry)
+   z80_bpoke(0xd1d1, 0xfb);    // POKE instructions at address 0xd1d1 (interrupt service routine entry)
    z80_bpoke(0xd1d2, 0xed);
    z80_bpoke(0xd1d3, 0x4d);    // instructions for EI; RETI
    
