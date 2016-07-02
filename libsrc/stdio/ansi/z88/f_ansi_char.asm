@@ -7,11 +7,11 @@
 ;	This ain't pretty..we do far too many calls to oz for my liking..
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.6 2016-04-04 18:31:23 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.7 2016-07-02 10:24:35 dom Exp $
 ;
 
 		SECTION	code_clib
-		PUBLIC ansi_char
+		PUBLIC ansi_CHAR
 
 		INCLUDE	"stdio.def"
 
@@ -25,7 +25,7 @@
 .text_cols	defb 80
 
 
-.ansi_char
+.ansi_CHAR
 	push	af
 	ld	hl,start
 	call_oz(gn_sop)

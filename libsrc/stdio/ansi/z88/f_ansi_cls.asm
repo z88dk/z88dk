@@ -6,15 +6,15 @@
 ;	djm 6/6/2000
 ;
 ;
-;	$Id: f_ansi_cls.asm,v 1.5 2016-04-04 18:31:23 dom Exp $
+;	$Id: f_ansi_cls.asm,v 1.6 2016-07-02 10:24:35 dom Exp $
 ;
 
 		SECTION code_clib
-		PUBLIC	ansi_CLS
+		PUBLIC	ansi_cls
 
 		INCLUDE	"stdio.def"
 
-.ansi_CLS
+.ansi_cls
 	ld	a,$0c
 	call_oz(os_out)
 	ret
