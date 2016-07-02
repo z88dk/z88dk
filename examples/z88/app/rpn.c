@@ -24,7 +24,6 @@
 
 /* Compiler directives, no bad space, not expanded */
 
-#pragma -reqpag=1
 #pragma -no-expandz88
 #pragma redirect handlecmds = _rpn_handlecmds
 

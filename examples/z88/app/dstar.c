@@ -55,7 +55,6 @@
  * bad pages and we should write the .asm file in app format
  */
 #pragma -expandz88
-#pragma -reqpag=5
 #pragma redirect redrawscreen = _dstar_redrawscreen
 #pragma redirect handlecmds =  _dstar_handlecmds
 

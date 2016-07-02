@@ -8,7 +8,6 @@
 
 /* Compiler directives, no bad space, not expanded */
 
-#pragma -reqpag=0
 #pragma -no-expandz88
 
 /* Redirect OZ required callbacks to our functions */
