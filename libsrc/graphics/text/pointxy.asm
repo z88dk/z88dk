@@ -7,7 +7,7 @@
 ;       Get pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pointxy.asm,v 1.5 2016-06-16 19:53:50 dom Exp $
+;	$Id: pointxy.asm,v 1.6 2016-07-02 09:01:36 dom Exp $
 ;
 
 
@@ -17,7 +17,7 @@
 			PUBLIC	pointxy
 
 			EXTERN  textpixl
-			EXTERN  coords
+			EXTERN  __gfx_coords
 			EXTERN  base_graphics
 
 
@@ -33,7 +33,7 @@
 			push	de
 			push	hl			
 			
-			ld	(coords),hl
+			ld	(__gfx_coords),hl
 			
 			;push	bc
 

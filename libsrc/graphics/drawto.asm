@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: drawto.asm,v 1.7 2016-04-13 21:09:09 dom Exp $
+;	$Id: drawto.asm,v 1.8 2016-07-02 09:01:35 dom Exp $
 ;
 
 
@@ -19,7 +19,7 @@
                 EXTERN     swapgfxbk
                 EXTERN	__graphics_end
 
-				EXTERN	coords
+				EXTERN	__gfx_coords
 
                 EXTERN     Line
                 EXTERN     plotpixel
@@ -31,7 +31,7 @@
 		push	ix
 		ld	ix,2
 		add	ix,sp
-		ld	hl,(coords)
+		ld	hl,(__gfx_coords)
 		ld	e,(ix+2)	;y
 		ld	d,(ix+4)	;x
 

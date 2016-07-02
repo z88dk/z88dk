@@ -6,7 +6,7 @@
 ; Generic version (just a bit slow)
 ;
 ;
-; $Id: putsprite.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
+; $Id: putsprite.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
 ;
 
         SECTION code_clib
@@ -18,7 +18,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-; coords: d,e (vert-horz)
+; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
@@ -42,7 +42,7 @@
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	inc	hl
 

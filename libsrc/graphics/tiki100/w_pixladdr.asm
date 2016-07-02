@@ -2,11 +2,10 @@
 ; posted by rdk77, 11/11/2010
 
         PUBLIC    w_pixeladdress
-        PUBLIC    coords
 
         INCLUDE "graphics/grafix.inc"
 ;
-;       $Id: w_pixladdr.asm,v 1.1 2015-09-25 14:56:01 stefano Exp $
+;       $Id: w_pixladdr.asm,v 1.2 2016-07-02 09:01:36 dom Exp $
 ;
 ; ******************************************************************
 ; Get absolute  pixel address in map of virtual (x,y) coordinate.
@@ -38,5 +37,3 @@
 	
 	RET
 
-coords:         defw    0       ; Current graphics xy coordinates
-				defw    0

@@ -8,7 +8,7 @@
 ;       Invert pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.6 2016-06-20 21:47:41 dom Exp $
+;	$Id: xorpixl.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
 ;
 
 
@@ -18,7 +18,7 @@
 
 			EXTERN	textpixl
 			EXTERN	div3
-			EXTERN	coords
+			EXTERN	__gfx_coords
 			EXTERN	base_graphics
 
 .xorpixel
@@ -32,7 +32,7 @@
 			dec	a
 			dec	a
 			
-			ld	(coords),hl
+			ld	(__gfx_coords),hl
 			
 			push	bc
 

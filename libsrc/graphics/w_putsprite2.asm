@@ -9,7 +9,7 @@
 ; Uses plotpixel, respixel and xorpixel
 ;
 ;
-; $Id: w_putsprite2.asm,v 1.2 2015-01-23 07:07:31 stefano Exp $
+; $Id: w_putsprite2.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
 ;
 
 
@@ -19,7 +19,7 @@
 	EXTERN	w_respixel
 	EXTERN	w_xorpixel
 
-; coords: h,l (vert-horz)
+; __gfx_coords: h,l (vert-horz)
 ; sprite: (ix)
 
 .putsprite
@@ -36,7 +36,7 @@
         ld      e,(hl)
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	inc	hl
 

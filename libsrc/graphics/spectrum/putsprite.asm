@@ -8,7 +8,7 @@
 ; no need anymore of the row table, saving a lot of memory.
 ;
 ;
-; $Id: putsprite.asm,v 1.5 2015-01-19 01:32:51 pauloscustodio Exp $
+; $Id: putsprite.asm,v 1.6 2016-07-02 09:01:36 dom Exp $
 ;
 
 	PUBLIC    putsprite
@@ -17,7 +17,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-; coords: d,e (vert-horz)
+; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
@@ -38,7 +38,7 @@
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	inc	hl
 

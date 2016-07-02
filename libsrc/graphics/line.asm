@@ -5,10 +5,10 @@
 
 	EXTERN	Line_r
 
-	EXTERN	coords
+	EXTERN	__gfx_coords
 
 ;
-;	$Id: line.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
+;	$Id: line.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
 ;
 
 ; ******************************************************************************
@@ -57,7 +57,7 @@
 				ld	a,e
 				cp	maxy
 				jr	nc, exit_line		; y1	coordinate out	of range
-				ld	(coords),hl		; the starting	point is now default
+				ld	(__gfx_coords),hl		; the starting	point is now default
 				push	hl
 				push	de
 				ld	l,h				; L = x0

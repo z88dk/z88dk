@@ -3,7 +3,7 @@
 ;
 ;	ZX Spectrum version (speeded up with a row table)
 ;
-;	$Id: bksave.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
+;	$Id: bksave.asm,v 1.5 2016-07-02 09:01:36 dom Exp $
 ;
 
 	SECTION	  code_clib
@@ -28,7 +28,7 @@
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	ld	(ix+2),d
 	ld	(ix+3),e

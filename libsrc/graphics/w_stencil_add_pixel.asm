@@ -11,7 +11,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: w_stencil_add_pixel.asm,v 1.4 2016-04-23 20:37:40 dom Exp $
+;	$Id: w_stencil_add_pixel.asm,v 1.5 2016-07-02 09:01:35 dom Exp $
 ;
 
 ; registers changed after return:
@@ -24,7 +24,7 @@
                 PUBLIC    stencil_add_pixel
                 PUBLIC    _stencil_add_pixel
                 PUBLIC	stencil_ptr
-                EXTERN	coords
+                EXTERN	__gfx_coords
                 
                 EXTERN		l_cmp
 
@@ -44,8 +44,8 @@
 		pop     de
 		ret     c               ; Return if X overflows
 
-		ld      (coords),hl     ; store X
-		ld      (coords+2),de   ; store Y: COORDS must be 2 bytes wider
+		ld      (__gfx_coords),hl     ; store X
+		ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
 
 		push hl			; X
 		ld	hl,(stencil_ptr) ; right side vector
@@ -68,7 +68,7 @@
 		push de			; X
 		ld	de,maxy*2
 		add	hl,de		; move to the right side vector
-		;ld	de,(coords)
+		;ld	de,(__gfx_coords)
 		;push de
 		ld	e,(hl)
 		inc hl

@@ -10,7 +10,7 @@
 ;       original code by Patrick Davidson (TI 85)
 ;
 ; 
-;	$Id: putsprite_smc.asm,v 1.2 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: putsprite_smc.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
 ;
 
 
@@ -20,7 +20,7 @@
 	EXTERN	pixmode
 
 
-; coords: h,l (vert-horz)
+; __gfx_coords: h,l (vert-horz)
 ; sprite: (ix)
 
 .putsprite
@@ -37,7 +37,7 @@
         ld      e,(hl)
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	inc	hl
 

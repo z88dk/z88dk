@@ -8,13 +8,13 @@
 ;       imported by Stefano Bodrato - 29/12/2006  :o)
 ;
 ;
-;	$Id: pointxy.asm,v 1.3 2016-06-20 21:47:41 dom Exp $
+;	$Id: pointxy.asm,v 1.4 2016-07-02 09:01:35 dom Exp $
 ;
 
 			SECTION smc_clib
 			PUBLIC	pointxy
 			
-			EXTERN	coords
+			EXTERN	__gfx_coords
 
 .pointxy
 			ld	d,l
@@ -26,7 +26,7 @@
 			cp	2
 			ret	c
 
-			ld	(coords),hl
+			ld	(__gfx_coords),hl
 			
 			push	bc
 			ld	b,0

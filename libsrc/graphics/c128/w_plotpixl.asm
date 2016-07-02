@@ -6,10 +6,10 @@
         EXTERN     l_cmp
         EXTERN     w_pixeladdress
 
-        EXTERN    coords
+        EXTERN    __gfx_coords
 
 ;
-;       $Id: w_plotpixl.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
+;       $Id: w_plotpixl.asm,v 1.5 2016-07-02 09:01:35 dom Exp $
 ;
 
 ; ******************************************************************
@@ -42,8 +42,8 @@
         pop     de
         ret     c                ; Return if X overflows
         
-        ld      (coords),hl      ; store X
-        ld      (coords+2),de    ; store Y: COORDS must be 2 bytes wider
+        ld      (__gfx_coords),hl      ; store X
+        ld      (__gfx_coords+2),de    ; store Y: COORDS must be 2 bytes wider
 
 	call	w_pixeladdress
 

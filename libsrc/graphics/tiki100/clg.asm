@@ -3,12 +3,14 @@
 ;
 ;       TIKI-100 version by Stefano Bodrato, Sept 2015
 ;
-;	$Id: clg.asm,v 1.1 2015-09-25 14:56:01 stefano Exp $
+;	$Id: clg.asm,v 1.2 2016-07-02 09:01:36 dom Exp $
 ;
 
+	SECTION   code_clib
         PUBLIC    clg
+        PUBLIC    _clg
 		
-		EXTERN	gr_defmod
+	EXTERN	gr_defmod
 
         EXTERN    swapgfxbk
         EXTERN    swapgfxbk1
@@ -17,6 +19,7 @@
 
 
 .clg
+._clg
 	DI
 	LD     A,16
 	LD ($F04D),A	; Video port: copy of the value sent to the video port address 0CH

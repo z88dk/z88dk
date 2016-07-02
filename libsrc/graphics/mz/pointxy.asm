@@ -2,10 +2,10 @@
         SECTION code_clib
 	PUBLIC	pointxy
 
-	EXTERN	coords
+	EXTERN	__gfx_coords
 
 ;
-;	$Id: pointxy.asm,v 1.4 2016-06-23 19:53:27 dom Exp $
+;	$Id: pointxy.asm,v 1.5 2016-07-02 09:01:36 dom Exp $
 ;
 
 ; ******************************************************************
@@ -30,7 +30,7 @@
 				push	de
 				push	hl			
 
-				ld	(coords),hl
+				ld	(__gfx_coords),hl
 
 				;push	bc
 

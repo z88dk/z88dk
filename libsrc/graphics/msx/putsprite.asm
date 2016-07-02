@@ -6,7 +6,7 @@
 ; MSX version
 ;
 ;
-; $Id: putsprite.asm,v 1.8 2016-06-21 20:16:35 dom Exp $
+; $Id: putsprite.asm,v 1.9 2016-07-02 09:01:36 dom Exp $
 ;
 
 	SECTION   smc_clib
@@ -21,7 +21,7 @@
 	INCLUDE	"msx/vdp.inc"
 
 
-; coords: d,e (vert-horz)
+; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
@@ -40,7 +40,7 @@
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	inc	hl
 

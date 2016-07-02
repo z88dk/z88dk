@@ -6,10 +6,10 @@
         EXTERN     line
         ;EXTERN     l_cmp
 
-        EXTERN    coords
+        EXTERN    __gfx_coords
 
 ;
-;       $Id: w_liner.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
+;       $Id: w_liner.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
 ;
 
 ; ******************************************************************************
@@ -180,7 +180,7 @@
                         push    de
 ;                        ex      de,hl                   ;       D,E = inx, iny
 
-			ld	de,(coords+2)           ;       y0 = y0 + iny (range is checked by plot func.)
+			ld	de,(__gfx_coords+2)           ;       y0 = y0 + iny (range is checked by plot func.)
 			dec	l			;       iny
 			jp	z,incy
 			dec	l
@@ -190,7 +190,7 @@
 .incy			inc	de
 .zy
 			ld	a,h
-			ld	hl,(coords)             ;       x0 = x0 + inx (range is checked by plot func.)
+			ld	hl,(__gfx_coords)             ;       x0 = x0 + inx (range is checked by plot func.)
 			dec	a			;       inx
 			jp	z,incx
 			dec	a

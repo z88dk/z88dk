@@ -6,7 +6,7 @@
 ; ZX Spectrum ROM version, a bit slower
 ;
 ;
-; $Id: rom_putsprite.asm,v 1.2 2015-01-19 01:32:51 pauloscustodio Exp $
+; $Id: rom_putsprite.asm,v 1.3 2016-07-02 09:01:36 dom Exp $
 ;
 
 	PUBLIC    putsprite
@@ -17,7 +17,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-; coords: d,e (vert-horz)
+; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
@@ -38,7 +38,7 @@
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	inc	hl
 

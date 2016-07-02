@@ -2,12 +2,12 @@
         SECTION code_clib
 	PUBLIC	respixel
 
-	EXTERN	coords
+	EXTERN	__gfx_coords
 
 	EXTERN	textpixl
 
 ;
-;	$Id: respixl.asm,v 1.5 2016-06-23 19:53:27 dom Exp $
+;	$Id: respixl.asm,v 1.6 2016-07-02 09:01:36 dom Exp $
 ;
 
 ; ******************************************************************
@@ -27,7 +27,7 @@
 				cp	48
 				ret	nc		; y0	out of range
 				
-				ld	(coords),hl
+				ld	(__gfx_coords),hl
 
 				push	bc
 

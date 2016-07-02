@@ -4,7 +4,7 @@
 ; TI calculators version
 ;
 ;
-; $Id: bksave.asm,v 1.6 2015-01-19 01:32:51 pauloscustodio Exp $
+; $Id: bksave.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
 ;
 
 	PUBLIC    bksave
@@ -25,7 +25,7 @@
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	ld	h,d
 	ld	l,e

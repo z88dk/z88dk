@@ -6,7 +6,7 @@
 ; c128 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
+; $Id: w_putsprite.asm,v 1.5 2016-07-02 09:01:35 dom Exp $
 ;
 
 	SECTION   smc_clib
@@ -20,7 +20,7 @@
 
         INCLUDE "graphics/grafix.inc"
 
-; coords: d,e (vert-horz)
+; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
@@ -42,7 +42,7 @@
         inc     hl
         ld      c,(hl)
         inc     hl
-        ld      b,(hl)  ; x and y coords
+        ld      b,(hl)  ; x and y __gfx_coords
 
         inc     hl
         ld      a,(hl)  ; and/or/xor mode

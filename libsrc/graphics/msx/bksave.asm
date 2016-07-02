@@ -3,7 +3,7 @@
 ;
 ;	MSX version
 ;
-;	$Id: bksave.asm,v 1.6 2016-06-21 20:16:35 dom Exp $
+;	$Id: bksave.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
 ;
 
 	SECTION   code_clib
@@ -34,7 +34,7 @@ ENDIF
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	ld	h,d	; current x coordinate
 	ld	l,e	; current y coordinate

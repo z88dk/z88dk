@@ -4,7 +4,7 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: bksave.asm,v 1.6 2016-06-20 21:47:41 dom Exp $
+; $Id: bksave.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
 ;
 
 	SECTION	 code_clib
@@ -26,7 +26,7 @@
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	ld	h,d
 	ld	l,e

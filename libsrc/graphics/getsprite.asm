@@ -8,7 +8,7 @@
 ; Generic version (just a bit slow)
 ;
 ;
-; $Id: getsprite.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
+; $Id: getsprite.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
 ;
 
 
@@ -21,7 +21,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-; coords: d,e (vert-horz)
+; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
@@ -43,7 +43,7 @@
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	ld	h,d
 	ld	l,e

@@ -4,7 +4,7 @@
 ;	 Colour Genie EG2000 version By Stefano Bodrato
 ;
 ;
-; $Id: bksave.asm,v 1.2 2016-06-20 21:47:41 dom Exp $
+; $Id: bksave.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
 ;
 
 	SECTION   code_clib
@@ -26,7 +26,7 @@
         ld      e,(hl)  
  	inc	hl
         inc     hl
-        ld      d,(hl)	; x and y coords
+        ld      d,(hl)	; x and y __gfx_coords
 
 	ld	h,d
 	ld	l,e

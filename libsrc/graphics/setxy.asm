@@ -2,10 +2,10 @@
         SECTION code_clib
 	PUBLIC	setxy
 
-	EXTERN	coords
+	EXTERN	__gfx_coords
 
 ;
-;	$Id: setxy.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
+;	$Id: setxy.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
 ;
 
 ; ******************************************************************
@@ -32,5 +32,5 @@
 			ld	a,l
 			cp	maxy
 			ret	nc			; out of range...
-			ld	(coords),hl
+			ld	(__gfx_coords),hl
 			ret

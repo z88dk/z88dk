@@ -4,10 +4,10 @@
 
 	EXTERN	w_line_r
 
-	EXTERN	coords
+	EXTERN	__gfx_coords
 
 ;
-;	$Id: w_line.asm,v 1.1 2015-09-25 14:56:01 stefano Exp $
+;	$Id: w_line.asm,v 1.2 2016-07-02 09:01:36 dom Exp $
 ;
 
 ; ******************************************************************************
@@ -20,12 +20,12 @@
 
 .w_line
 		ex	de,hl
-		ld	bc,(coords+2)
+		ld	bc,(__gfx_coords+2)
 		or	a
 		sbc	hl,bc
 		ex	de,hl
 
-		ld	bc,(coords)
+		ld	bc,(__gfx_coords)
 		or	a
 		sbc	hl,bc
 .nocrossx

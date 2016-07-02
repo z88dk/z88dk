@@ -6,7 +6,7 @@
 ; Amstrad CPC version
 ;
 ;
-; $Id: putsprite.asm,v 1.5 2016-06-19 21:10:08 dom Exp $
+; $Id: putsprite.asm,v 1.6 2016-07-02 09:01:35 dom Exp $
 ;
 
         SECTION   code_clib
@@ -17,7 +17,7 @@
         INCLUDE "cpcfirm.def"
         INCLUDE "graphics/grafix.inc"
 
-; coords: d,e (vert-horz)
+; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 

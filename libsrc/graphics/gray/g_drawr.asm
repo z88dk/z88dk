@@ -4,14 +4,14 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_drawr.asm,v 1.6 2015-01-22 17:23:48 stefano Exp $
+;	$Id: g_drawr.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
 ;
 
 ;Usage: g_drawr(int px, int py, int GrayLevel)
 
                 PUBLIC    g_drawr
 
-		EXTERN	coords
+		EXTERN	__gfx_coords
 
                 EXTERN     Line_r
                 EXTERN     plotpixel
@@ -28,7 +28,7 @@
 		ld	l,(ix+6)	;px
 		ld	h,(ix+7)
 
-		ld	bc,(coords)
+		ld	bc,(__gfx_coords)
 		push	bc
 		push	af
 		xor	a
@@ -49,7 +49,7 @@
 		pop	af
 
 		pop	bc
-		ld	(coords),bc
+		ld	(__gfx_coords),bc
 		push	af
 		ld	a,1
 		call	graypage

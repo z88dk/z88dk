@@ -6,7 +6,7 @@
 ; TIKI-100 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.1 2015-09-25 14:56:01 stefano Exp $
+; $Id: w_putsprite.asm,v 1.2 2016-07-02 09:01:36 dom Exp $
 ;
 
         PUBLIC    putsprite
@@ -17,7 +17,7 @@
 
         INCLUDE "graphics/grafix.inc"
 
-; coords: d,e (vert-horz)
+; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
 
 
@@ -49,7 +49,7 @@
         inc     hl
         ld      c,(hl)
         inc     hl
-        ld      b,(hl)  ; x and y coords
+        ld      b,(hl)  ; x and y __gfx_coords
 
         inc     hl
         ld      a,(hl)  ; and/or/xor mode

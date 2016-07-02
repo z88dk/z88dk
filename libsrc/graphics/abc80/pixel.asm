@@ -11,7 +11,7 @@
 ;       Plot/unplot/invert pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: pixel.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
+;	$Id: pixel.asm,v 1.5 2016-07-02 09:01:35 dom Exp $
 ;
 
 
@@ -20,7 +20,7 @@
 			
 			PUBLIC	pixmode
 
-			EXTERN	coords
+			EXTERN	__gfx_coords
 
 .pixel
 			ld	d,l
@@ -32,7 +32,7 @@
 			cp	2
 			ret	c
 
-			ld	(coords),hl
+			ld	(__gfx_coords),hl
 			
 			push	bc
 			ld	b,0

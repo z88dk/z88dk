@@ -3,10 +3,10 @@
         SECTION code_clib
 	PUBLIC	Line_r
 
-	EXTERN	coords
+	EXTERN	__gfx_coords
 
 ;
-;	$Id: liner.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
+;	$Id: liner.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
 ;
 
 ; ******************************************************************************
@@ -151,7 +151,7 @@
 
 .check_plot		ex	(sp),hl			;	preserve H,L distances on stack
 				ex	de,hl			;	D,E = ix,	iy
-				ld	hl,(coords)
+				ld	hl,(__gfx_coords)
 				ld	a,l
 				add	a,e				;
 				ld	l,a				;	y0 =	y0 +	iy (y0 is	checked by plot)

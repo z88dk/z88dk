@@ -11,7 +11,7 @@
 ;       Stefano Bodrato - 13/3/2009
 ;
 ;
-;	$Id: stencil_add_pixel.asm,v 1.5 2016-04-22 20:29:51 dom Exp $
+;	$Id: stencil_add_pixel.asm,v 1.6 2016-07-02 09:01:35 dom Exp $
 ;
 
 ; registers changed after return:
@@ -24,12 +24,12 @@
                 PUBLIC    stencil_add_pixel
                 PUBLIC    _stencil_add_pixel
                 PUBLIC	stencil_ptr
-                EXTERN	coords
+                EXTERN	__gfx_coords
 
 
 .stencil_add_pixel
 ._stencil_add_pixel
-		ld	(coords),hl	; update plot coordinates
+		ld	(__gfx_coords),hl	; update plot coordinates
 		ld	d,0
 		ld	e,l
 		ld	a,h		; current X coordinate

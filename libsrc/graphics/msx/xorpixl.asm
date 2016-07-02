@@ -4,11 +4,11 @@
 	PUBLIC	xorpixel
 
 	EXTERN pixeladdress
-	EXTERN	coords
+	EXTERN	__gfx_coords
 	EXTERN	pix_return
 
 ;
-;	$Id: xorpixl.asm,v 1.7 2016-06-21 20:16:35 dom Exp $
+;	$Id: xorpixl.asm,v 1.8 2016-07-02 09:01:36 dom Exp $
 ;
 
 ; ******************************************************************
@@ -44,7 +44,7 @@
 				cp	maxy
 				ret	nc			; y0	out of range
 				
-				ld	(coords),hl
+				ld	(__gfx_coords),hl
 
 				push	bc
 				call	pixeladdress

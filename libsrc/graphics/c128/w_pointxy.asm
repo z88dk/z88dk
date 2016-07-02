@@ -6,10 +6,10 @@
         ;EXTERN     l_cmp
         EXTERN     w_pixeladdress
 
-        EXTERN    coords
+        EXTERN    __gfx_coords
 
 ;
-;       $Id: w_pointxy.asm,v 1.5 2016-06-20 21:47:41 dom Exp $
+;       $Id: w_pointxy.asm,v 1.6 2016-07-02 09:01:35 dom Exp $
 ;
 
 ; ******************************************************************
