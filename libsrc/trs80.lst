@@ -8,6 +8,7 @@ stdio/trs80/fputc_cons
 stdio/trs80/getk
 stdio/puts_cons
 @gfxbasetxt6.lst
+graphics/__gfx_coords
 graphics/trs80/textpixl6
 games/joystick
 games/trs80/bit_open

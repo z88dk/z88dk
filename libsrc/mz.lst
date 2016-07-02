@@ -15,6 +15,7 @@ stdio/ansi/sharp-mz/f_ansi_cls
 stdio/ansi/sharp-mz/f_ansi_dline
 stdio/ansi/sharp-mz/f_ansi_scrollup
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/dcircle
 graphics/clg
 graphics/mz/clsgraph

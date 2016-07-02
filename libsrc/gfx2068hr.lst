@@ -1,4 +1,5 @@
 @gfxbasew.lst
+graphics/__gfx_coords4
 graphics/ts2068hr/drawb
 graphics/ts2068hr/undrawb
 graphics/ts2068hr/xorborder

@@ -17,6 +17,7 @@ stdio/ansi/ticalc/f_ansi_dline
 stdio/ansi/ticalc/f_ansi_scrollup
 @tigray.lst
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/dcircle
 graphics/ticalc/clg
 graphics/clrarea

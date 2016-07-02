@@ -12,6 +12,7 @@ stdio/ansi/mc1000/f_ansi_attr
 stdio/ansi/mc1000/f_ansi_bel
 stdio/ansi/mc1000/f_ansi_char
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/dcircle2
 graphics/clrarea
 graphics/lftscrol

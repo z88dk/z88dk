@@ -58,6 +58,7 @@ rs232/z88/rs232_init
 rs232/z88/rs232_params
 rs232/z88/rs232_put
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/dcircle
 graphics/clg
 graphics/clsgraph

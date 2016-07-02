@@ -13,6 +13,7 @@ stdio/ansi/oz/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/oz/f_ansi_scrollup
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/dcircle
 graphics/oz/clg
 graphics/clrarea

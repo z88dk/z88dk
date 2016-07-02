@@ -3,6 +3,7 @@ stdio/gal/fputc_cons
 stdio/gal/getk
 stdio/puts_cons
 @gfxbasetxt6.lst
+graphics/__gfx_coords
 graphics/gal/textpixl6
 games/joystick
 games/gal/bit_open

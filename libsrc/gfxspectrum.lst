@@ -1,4 +1,5 @@
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/dcircle
 graphics/spectrum/clg
 graphics/clrarea2

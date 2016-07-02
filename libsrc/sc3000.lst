@@ -3,6 +3,7 @@ stdio/sc3000/fgetc_cons
 stdio/sc3000/getk
 stdio/sc3000/puts_cons
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/dcircle
 graphics/msx/gen_clg
 graphics/clrarea

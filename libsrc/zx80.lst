@@ -6,6 +6,7 @@ stdio/zx81/fputc_cons
 stdio/puts_cons
 time/zx81/clock
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/dcircle
 graphics/clg
 graphics/clrarea

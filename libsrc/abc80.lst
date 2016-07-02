@@ -16,6 +16,7 @@ stdio/ansi/abc80/f_ansi_dline
 stdio/ansi/abc80/f_ansi_scrollup
 time/abc80/clock
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/clg
 graphics/clrarea
 graphics/abc80/clsgraph

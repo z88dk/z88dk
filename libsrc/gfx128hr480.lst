@@ -1,4 +1,5 @@
 @gfxbasew.lst
+graphics/__gfx_coords4
 graphics/drawb
 graphics/drawbox
 graphics/undrawb

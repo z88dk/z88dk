@@ -1,4 +1,5 @@
 @cpcgray.lst
+graphics/__gfx_coords
 graphics/circle
 graphics/cpc/clg
 graphics/clga

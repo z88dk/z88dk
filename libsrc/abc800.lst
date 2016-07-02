@@ -3,6 +3,7 @@ stdio/abc800/fputc_cons
 stdio/abc800/getk
 stdio/puts_cons
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/clg
 graphics/clrarea
 graphics/abc80/clsgraph

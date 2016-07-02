@@ -4,6 +4,7 @@ psg/tiki100/get_psg
 psg/tiki100/psg_init
 @psg/psg.lst
 @gfxbasew.lst
+graphics/__gfx_coords4
 graphics/tiki100/clg
 graphics/tiki100/w_pixladdr
 graphics/tiki100/fill

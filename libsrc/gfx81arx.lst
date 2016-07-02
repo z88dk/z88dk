@@ -1,4 +1,5 @@
 @gfxbase.lst
+graphics/__gfx_coords
 graphics/dcircle2
 graphics/zx81/hr/clg
 graphics/zx81/hr/_clg_hr
