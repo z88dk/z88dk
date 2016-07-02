@@ -1,7 +1,7 @@
 #
 # Examples for MSX 
 #
-# $Id: Makefile,v 1.1 2009-04-29 07:43:06 stefano Exp $
+# $Id: Makefile,v 1.2 2016-07-02 10:35:16 dom Exp $
 #
 
 #include ../../libsrc/Make.config
@@ -23,7 +23,6 @@ CFILES = \
 	ex10.c \
 	ex10b.c \
 	ex11.c \
-	ex12.c \
 	showlib3d.c
 
 OBJECTS = $(CFILES:.c=.o)

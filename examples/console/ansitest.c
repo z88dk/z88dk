@@ -3,7 +3,9 @@
  *
  *	15/4/2000 Stefano Bodrato
  *
- *	Compile with zcc +zxansi ansitest.c
+ *	Compile with zcc +zx ansitest.c -create-app -lndos -pragma-need=ansiterminal -Cl-v -pragma-define:ansicolumns=64
+ *
+ * 	Columns can be 85, 80, 64, 51, 42, 40, 46, 32, 28, 24
  */
 
 

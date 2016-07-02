@@ -4,7 +4,7 @@ all: info ansitest.bas cube.bas cubez88.bas dstar.bas gfx.bas apps
 info:
 	@echo Building examples..
 
-ansitest: ansitest.c
+ansitest.bas: ansitest.c
 	zcc +z88 -clib=ansi ansitest.c -o ansitest.bas
 
 cube.bas: cube.c
@@ -27,3 +27,4 @@ apps:
 clean:
 	$(RM) ansitest.bas cube.bas cubez88.bas dstar.bas gfx.bas  *.reloc
 	$(RM) zcc_opt.def *.op* *.o *.i *.asm *.err *.map *.sym
+	$(MAKE) -C app clean
