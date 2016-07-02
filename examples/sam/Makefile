@@ -37,7 +37,7 @@ adv:
 	zcc +sam -vn adv_a.c -o adv_a -lndos
 
 ansi:
-	zcc +samansi -vn ansitest.c -o ansitest -lndos
+	zcc +sam -clib=ansi -vn ansitest.c -o ansitest -lndos
 
 
 clean:
