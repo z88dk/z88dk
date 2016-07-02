@@ -1,13 +1,13 @@
 #
 # Examples for MSX 
 #
-# $Id: Makefile,v 1.2 2016-07-02 10:35:16 dom Exp $
+# $Id: Makefile,v 1.3 2016-07-02 10:38:28 dom Exp $
 #
 
 #include ../../libsrc/Make.config
 
 CC = zcc
-CFLAGS = +msx -llib3d -lmalloc -lm -lndos -create-app
+CFLAGS = +msx -vn -llib3d -lmalloc -lm -lndos -create-app
 
 
 CFILES = \
@@ -25,12 +25,12 @@ CFILES = \
 	ex11.c \
 	showlib3d.c
 
-OBJECTS = $(CFILES:.c=.o)
+EXECFILES = $(CFILES:.c=.cas)
 
-all: $(OBJECTS)
+all: $(EXECFILES)
 
-$(OBJECTS):
+%.cas: %.c
 	$(CC) $(CFLAGS) -o$*.bin $*.c
 
 clean:
-	$(RM) *.obj *.sym *.map *.o* *.bin *.msx zcc_opt.def
+	$(RM) *.obj *.sym *.map *.o* *.bin *.msx zcc_opt.def *.reloc *.cas

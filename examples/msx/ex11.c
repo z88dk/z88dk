@@ -41,11 +41,11 @@ mesh_t* build_mesh() {
 	vector_t* points = mesh->points;
 	triangle_t* triangles = mesh->triangles;
 
-	double M_PI = 8.0 * atan(1.0);
+	double FULL_CIRCLE = 8.0 * atan(1.0);
 
 	// define the base points
 	for (p = 0; p < 4; p++) {
-		c = M_PI * p / 4.0;
+		c = FULL_CIRCLE * p / 4.0;
 		points[p].x = (int)(10.0 * cos(c) * 64.0);
 		points[p].y = (int)(10.0 * sin(c) * 64.0);
 		points[p].z = i2f(5);
