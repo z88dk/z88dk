@@ -1,4 +1,4 @@
-SUBDIRS = ace cpm embedded msx osca rex sam sms spectrum vz z88 zxvgs
+SUBDIRS = ace cpm embedded msx osca rex sam sms sos spectrum vz z88 zxvgs
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
      
