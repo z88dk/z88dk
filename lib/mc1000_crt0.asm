@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.19 2016-06-11 20:53:06 dom Exp $
+;       $Id: mc1000_crt0.asm,v 1.20 2016-07-02 09:02:20 dom Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -34,7 +34,6 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        PUBLIC    coords          ;Current xy position
         PUBLIC	pixeladdress
         PUBLIC	clg
         PUBLIC	pix_return

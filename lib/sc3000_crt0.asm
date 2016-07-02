@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.13 2016-06-11 20:40:31 dom Exp $
+;	$Id: sc3000_crt0.asm,v 1.14 2016-07-02 09:02:20 dom Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -49,7 +49,6 @@
 ; Graphics stuff
 		PUBLIC	pixelbyte	; Temp store for non-buffered mode
 		PUBLIC	base_graphics
-		PUBLIC	coords
 
 ; 1 bit sound status byte
 		PUBLIC	snd_tick

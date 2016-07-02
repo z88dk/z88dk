@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.25 2016-06-21 20:49:06 dom Exp $
+;	$Id: c128_crt0.asm,v 1.26 2016-07-02 09:02:20 dom Exp $
 ;
 
 
@@ -116,7 +116,6 @@ l_dcal:
 
         INCLUDE "crt0_runtime_selection.asm"
 
-	defc	coords_space = 4
 	INCLUDE "crt0_section.asm"
 
 	SECTION	code_crt_init

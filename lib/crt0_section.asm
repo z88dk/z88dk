@@ -53,14 +53,9 @@ IF !DEFINED_nostreams
 		PUBLIC	__sgoioblk
 __sgoioblk:      defs    40      ;stdio control block
 ENDIF
-		PUBLIC	coords
 		PUBLIC	base_graphics
 		PUBLIC	exitsp
 		PUBLIC	exitcount
-IF !coords_space
-	defc coords_space = 2
-ENDIF
-coords:          defs    coords_space       ;Graphics xy coordinates
 IF !DEFINED_basegraphics
 base_graphics:   defw    0       ;Address of graphics map
 ENDIF

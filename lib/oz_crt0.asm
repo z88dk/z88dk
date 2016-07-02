@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.18 2016-06-27 21:08:31 dom Exp $
+;       $Id: oz_crt0.asm,v 1.19 2016-07-02 09:02:20 dom Exp $
 ;
 ; - - - - - - -
 
@@ -50,7 +50,6 @@
 
         PUBLIC    base_graphics   ;Graphical variables
 
-        PUBLIC    coords          ;Current xy position
         PUBLIC	s_filetypetable
 
 	PUBLIC	saved_hl	;Temporary store used by compiler

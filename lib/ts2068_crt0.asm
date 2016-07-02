@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.27 2016-06-21 20:49:07 dom Exp $
+;       $Id: ts2068_crt0.asm,v 1.28 2016-07-02 09:02:20 dom Exp $
 ;
 
 
@@ -350,7 +350,6 @@ call_extrom_exit:
 	defb	0
 
 	INCLUDE	"crt0_runtime_selection.asm"
-	defc	coords_size = 4
         INCLUDE "crt0_section.asm"
 
         SECTION bss_crt
