@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2016-07-02 15:42:55 dom Exp $
+# $Id: Makefile,v 1.9 2016-07-02 16:15:37 dom Exp $
 
 include ../Make.config
 
@@ -8,7 +8,9 @@ CFILES = dump.c
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
-all:	$(OBJECTS)
+all: $(OUTPUT_DIRECTORY)/debug.lib
+
+$(OUTPUT_DIRECTORY)/debug.lib: $(OBJECTS) $(wildcard *.asm) debug.lst
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/debug @debug.lst
 
 .c.o:  
