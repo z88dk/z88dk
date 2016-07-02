@@ -2,7 +2,6 @@
 #include <zxvgs.h>
 #include <stdio.h>
 
-#pragma -make-app
 #define APP_NAME="INFO"
 
 int video()

@@ -1,10 +1,10 @@
 
 
-all: info
+all: info.V00
 
 
-info:
-	zcc +zx -Cz+zxvgs -v -s info.c -create-app -lzxvgs
+info.V00: info.c
+	zcc +zx -subtype=zxvgs -vn info.c -o info.bin -create-app -lzxvgs
 
 clean:
-	rm -f *.bin *.i *.asm *.op* *.o *~ zcc_opt.def
+	rm -f *.bin *.i *.asm *.op* *.o *~ zcc_opt.def *.V00
