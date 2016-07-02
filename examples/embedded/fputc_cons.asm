@@ -8,9 +8,9 @@
 
 	INCLUDE "ns16450.def"
 
-	PUBLIC  fputc_cons
+	PUBLIC  fputc_cons_native
 
-.fputc_cons
+.fputc_cons_native
 	ld      bc,UART_BASE + LSR
 loop:
 	in      a,(c)
