@@ -10,9 +10,10 @@
 ; If we can't have usleep we'll have csleep instead!
 ;
 ; -----
-; $Id: csleep.asm,v 1.8 2016-03-06 21:56:32 dom Exp $
+; $Id: csleep.asm,v 1.9 2016-07-02 15:44:16 dom Exp $
 
 
+		MODULE  csleep_z88
 		SECTION	code_clib
                 INCLUDE "time.def"
 

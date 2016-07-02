@@ -10,9 +10,10 @@
 ;		 - Return number of seconds left
 ;
 ; -----
-; $Id: sleep.asm,v 1.8 2016-03-06 21:56:32 dom Exp $
+; $Id: sleep.asm,v 1.9 2016-07-02 15:44:16 dom Exp $
 
 
+		MODULE  sleep_z88
 		INCLUDE "time.def"
 
 		SECTION	  code_clib
