@@ -1,6 +1,6 @@
 ; CALLER linkage for function pointers
 
-
+MODULE fputc
 SECTION code_clib
 PUBLIC fputc
 PUBLIC _fputc

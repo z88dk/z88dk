@@ -1,7 +1,7 @@
+@stdio/stdio.lst
 stdio/aquarius/fgetc_cons
 stdio/aquarius/getk
 stdio/aquarius/fputc_cons
-stdio/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc

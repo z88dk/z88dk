@@ -1,6 +1,6 @@
 ; CALLER linkage for function pointers
 
-
+MODULE fputs
 SECTION code_clib
 PUBLIC fputs
 EXTERN fputs_callee

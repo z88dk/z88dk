@@ -1,9 +1,9 @@
 @input/zx81.lst
+@stdio/stdio.lst
 stdio/zx80/fgetc_cons
 stdio/zx80/getk
 stdio/zx80/zx80_decode_keys
 stdio/zx81/fputc_cons
-stdio/puts_cons
 time/zx81/clock
 @gfxbase.lst
 graphics/__gfx_coords

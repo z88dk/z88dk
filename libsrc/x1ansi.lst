@@ -1,7 +1,7 @@
 @input/x1.lst
+@stdio/stdio.lst
 stdio/x1/fgetc_cons
 stdio/x1/getk
-stdio/ansi/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc

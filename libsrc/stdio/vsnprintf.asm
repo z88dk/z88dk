@@ -1,4 +1,5 @@
 
+	MODULE vsnprintf
 	SECTION	code_clib
 
 	PUBLIC	vsnprintf

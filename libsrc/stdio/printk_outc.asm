@@ -1,4 +1,4 @@
-
+	MODULE printk_outc
 	SECTION	code_clib
 
 	PUBLIC	printk_outc

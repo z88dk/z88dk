@@ -1,4 +1,5 @@
 
+	MODULE _snprintf
 	SECTION	code_clib
 
 	PUBLIC	_snprintf

@@ -1,7 +1,7 @@
+@stdio/stdio.lst
 stdio/mtx/fputc_cons
 stdio/mtx/fgetc_cons
 stdio/mtx/getk
-stdio/mtx/puts_cons
 @gfxbase.lst
 graphics/__gfx_coords
 graphics/dcircle

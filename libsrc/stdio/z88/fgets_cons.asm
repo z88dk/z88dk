@@ -12,12 +12,13 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: fgets_cons.asm,v 1.8 2016-03-06 21:36:52 dom Exp $
+;	$Id: fgets_cons.asm,v 1.9 2016-07-02 13:52:45 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
                 INCLUDE	"syspar.def"
 
+		MODULE fgets_cons_z88
 		SECTION	  code_clib
 
                 PUBLIC    fgets_cons

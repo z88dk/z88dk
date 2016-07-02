@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.238 2016-06-17 10:33:26 dom Exp $
+# $Id: Makefile,v 1.239 2016-07-02 13:52:42 dom Exp $
 
 
 include Make.config
@@ -92,7 +92,6 @@ zx81deps:
 	$(RM) -f printflike/*.o
 	$(RM) -f strings/*.o
 	$(RM) -f stdlib/*.o
-	$(RM) -f stdio/*.o
 	$(RM) -f stdio/zx81/*.o
 	$(RM) -f stdio_new/stream-general/*.o
 	$(RM) -f stdio_new/stream-out/stdio_basechar.o
@@ -231,7 +230,7 @@ z88_clib.lib: gfxdeps
 	@echo '--- Building Z88 Library ---'
 	@echo ''
 	$(MAKE) -C fcntl lz88 
-	$(MAKE) -C stdio lz88 
+	$(MAKE) -C stdio 
 	$(MAKE) -C stdlib lz88 
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
@@ -250,7 +249,7 @@ z88net_clib.lib: gfxdeps
 	@echo '--- Building Z88 Network Aware Library ---'
 	@echo ''
 	$(MAKE) -C fcntl lz88 
-	$(MAKE) -C stdio lz88net
+	$(MAKE) -C stdio 
 	$(MAKE) -C stdlib lz88 
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
@@ -282,7 +281,7 @@ zx_clib.lib:
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -307,7 +306,7 @@ ts2068_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -373,7 +372,7 @@ p2000_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -390,7 +389,7 @@ pc6001_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -406,7 +405,7 @@ pps_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl lpps
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -435,7 +434,7 @@ vz_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -452,7 +451,7 @@ zx80_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib lzx80
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -471,7 +470,7 @@ zx81_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic_iy 
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike generic_iy
 	$(MAKE) -C setjmp generic_iy
 	$(MAKE) -C assert generic_iy
@@ -490,7 +489,7 @@ lambda_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic_iy 
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike generic_iy
 	$(MAKE) -C setjmp generic_iy
 	$(MAKE) -C assert generic_iy
@@ -591,7 +590,7 @@ ti82_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -607,7 +606,7 @@ ti83_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -623,7 +622,7 @@ ti83p_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -639,7 +638,7 @@ ti85_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -655,7 +654,7 @@ ti86_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -674,7 +673,7 @@ ozansi_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -692,7 +691,7 @@ cpm_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio lcpm
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C time 
 	$(MAKE) -C setjmp
@@ -707,7 +706,7 @@ sorcerer_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -722,7 +721,7 @@ mz_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -737,7 +736,7 @@ abc80_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -752,7 +751,7 @@ abc800_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -767,7 +766,7 @@ ace_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -785,7 +784,7 @@ aquarius_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -803,7 +802,7 @@ c7420_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -830,7 +829,7 @@ sam_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -848,7 +847,7 @@ svi_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -867,14 +866,14 @@ msx_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio lcpm
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games lmsx
 	$(MAKE) -C msx
 	$(MAKE) -C psg
-	$(LIBLINKER) -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
+	$(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(LISTFILE_DIRECTORY)/msx.lst
 
 # MTX library - Stefano
 mtx_clib.lib:
@@ -885,7 +884,7 @@ mtx_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -903,7 +902,7 @@ enterprise_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C time 
@@ -951,7 +950,7 @@ m5_clib.lib:
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -968,7 +967,7 @@ mc1000_clib.lib:
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib lmc1000
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -986,7 +985,7 @@ nascom_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1000,7 +999,7 @@ nc_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl lnc
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1016,7 +1015,7 @@ cpc_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1047,7 +1046,7 @@ c128ansi_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1092,7 +1091,7 @@ newbrain_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl lnewbrain
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1121,7 +1120,7 @@ rcmx000_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1135,7 +1134,7 @@ embedded_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio gen
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1150,7 +1149,7 @@ gal_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1167,7 +1166,7 @@ lynx_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1184,7 +1183,7 @@ sms_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1201,7 +1200,7 @@ sc3000_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1217,7 +1216,7 @@ test_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1231,7 +1230,7 @@ trs80_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1255,7 +1254,7 @@ x07_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1269,7 +1268,7 @@ x1ansi_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib lx1
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C time 
 	$(MAKE) -C setjmp
@@ -1287,7 +1286,7 @@ vg5k_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio generic
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1303,7 +1302,7 @@ sos_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib generic
-	$(MAKE) -C stdio lcpm
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1318,7 +1317,7 @@ osca_clib.lib:
 	$(MAKE) -C strings
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib losca
-	$(MAKE) -C stdio lcpm
+	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C rs232 losca
 	$(MAKE) -C setjmp

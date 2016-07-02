@@ -1,4 +1,5 @@
 
+	MODULE _vfprintf
 	SECTION	code_clib
 
 	PUBLIC	_vfprintf

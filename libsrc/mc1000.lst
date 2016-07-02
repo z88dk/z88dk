@@ -1,7 +1,7 @@
+@stdio/stdio.lst
 stdio/mc1000/fgetc_cons
 stdio/mc1000/getk
 stdio/mc1000/fputc_cons
-stdio/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc

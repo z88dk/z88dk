@@ -1,4 +1,5 @@
 
+	MODULE  fabandon
 	PUBLIC	fabandon
 	PUBLIC	_fabandon
 

@@ -1,4 +1,5 @@
 
+	MODULE _printk
 	SECTION	code_clib
 
 	PUBLIC	_printk

@@ -1,5 +1,5 @@
+@stdio/stdio.lst
 stdio/sms/fputc_cons
-stdio/puts_cons
 time/spectrum/clock
 sms/clear_vram
 sms/load_palette

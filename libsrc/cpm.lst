@@ -1,7 +1,7 @@
+@stdio/stdio_cpm.lst
 stdio/cpm/fgetc_cons
 stdio/cpm/getk
 stdio/cpm/fputc_cons
-stdio/puts_cons
 @time/time.lst
 time/cpm/clock
 time/cpm/time

@@ -1,4 +1,4 @@
-
+	MODULE sprintf
 	SECTION	code_clib
 
 	PUBLIC	sprintf

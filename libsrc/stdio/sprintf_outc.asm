@@ -1,4 +1,4 @@
-
+	MODULE sprintf_outc
 	SECTION	code_clib
 
 	PUBLIC  sprintf_outc	

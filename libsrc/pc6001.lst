@@ -1,7 +1,8 @@
+stdio/pc6001/puts_cons
+@stdio/stdio.lst
 stdio/pc6001/fgetc_cons
 stdio/pc6001/getk
 stdio/pc6001/fputc_cons
-stdio/pc6001/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc

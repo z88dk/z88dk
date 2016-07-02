@@ -1,7 +1,7 @@
+@stdio/stdio.lst
 stdio/sos/fputc_cons
 stdio/sos/fgetc_cons
 stdio/sos/getk
-stdio/puts_cons
 sos/break_key.asm
 sos/lptoff.asm
 sos/lpton.asm

@@ -1,14 +1,10 @@
+stdio/z88/puts_cons
+@stdio/stdio_net.lst
 stdio/z88/fgetc_cons
 stdio/z88/fgets_cons
 stdio/z88/fputc_cons
 stdio/z88/getcmd
 stdio/z88/getk
-stdio/z88/puts_cons
-stdio/zsock/opennet
-stdio/zsock/closenet
-stdio/zsock/fgetc_net
-stdio/zsock/fputc_net
-stdio/zsock/fflush_net
 fcntl/z88/fdgetpos
 fcntl/z88/fdtell
 fcntl/z88/rename

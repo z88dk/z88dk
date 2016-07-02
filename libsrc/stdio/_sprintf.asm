@@ -1,4 +1,5 @@
 
+	MODULE _sprintf
 	SECTION	code_clib
 
 	PUBLIC	_sprintf

@@ -1,12 +1,12 @@
+@stdio/stdio.lst
+stdio/trs80/fgetc_cons
+stdio/trs80/fputc_cons
+stdio/trs80/getk
 psg/trs80/set_psg
 psg/trs80/set_psg_callee
 psg/trs80/get_psg
 psg/trs80/psg_init
 @psg/psg.lst
-stdio/trs80/fgetc_cons
-stdio/trs80/fputc_cons
-stdio/trs80/getk
-stdio/puts_cons
 @gfxbasetxt6.lst
 graphics/__gfx_coords
 graphics/trs80/textpixl6

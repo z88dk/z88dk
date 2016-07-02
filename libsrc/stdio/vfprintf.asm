@@ -1,7 +1,7 @@
 
 
 ; int vfprintf(FILE *fp, unsigned char *fmt,void *ap)
-
+		MODULE vfprintf
 		SECTION	code_clib
 		PUBLIC	vfprintf
 

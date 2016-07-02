@@ -1,8 +1,8 @@
 @input/zx81.lst
+@stdio/stdio_ixiy.lst
 stdio/zx81/fgetc_cons
 stdio/zx81/getk
 stdio/zx81/fputc_cons
-stdio/puts_cons
 stdio/ansi/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf

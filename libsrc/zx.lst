@@ -1,8 +1,8 @@
 @input/spectrum.lst
+@stdio/stdio.lst
 stdio/spectrum/fgetc_cons
 stdio/spectrum/fputc_cons
 stdio/spectrum/getk
-stdio/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc

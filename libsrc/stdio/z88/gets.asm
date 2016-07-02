@@ -12,12 +12,13 @@
 ; Now goes back to the correct print position
 ;
 ;
-;	$Id: gets.asm,v 1.6 2016-03-06 21:36:52 dom Exp $
+;	$Id: gets.asm,v 1.7 2016-07-02 13:52:45 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
                 INCLUDE	"syspar.def"
 
+		MODULE   gets_z88
 		SECTION   code_clib
 
                 PUBLIC    gets

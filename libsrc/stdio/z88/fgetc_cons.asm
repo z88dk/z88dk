@@ -6,11 +6,12 @@
 ;1/4/2000  - Renamed to fgetc_cons
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.7 2016-04-29 20:35:11 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.8 2016-07-02 13:52:45 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
 
+		MODULE fgetc_cons
 		SECTION	  code_clib
 
                 PUBLIC    fgetc_cons

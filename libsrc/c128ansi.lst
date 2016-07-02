@@ -1,3 +1,4 @@
+@stdio/stdio.lst
 stdio/c128/fgetc_cons
 stdio/c128/getk
 stdio/ansi/f_ansi

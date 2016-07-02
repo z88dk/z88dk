@@ -1,7 +1,6 @@
+@stdio/stdio.lst
 stdio/test/fgetc_cons.asm
 stdio/test/fputc_cons.asm
-stdio/fgets_cons
-stdio/puts_cons
 time/test/time
 @time/time.lst
 @z80.lst

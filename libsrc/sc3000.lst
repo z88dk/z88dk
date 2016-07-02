@@ -1,7 +1,8 @@
+stdio/sc3000/puts_cons
+@stdio/stdio.lst
 stdio/sc3000/fputc_cons
 stdio/sc3000/fgetc_cons
 stdio/sc3000/getk
-stdio/sc3000/puts_cons
 @gfxbase.lst
 graphics/__gfx_coords
 graphics/dcircle

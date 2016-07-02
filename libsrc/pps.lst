@@ -1,7 +1,8 @@
+stdio/sprinter/puts_cons
+@stdio/stdio.lst
 stdio/sprinter/fgetc_cons
 stdio/sprinter/fputc_cons
 stdio/sprinter/getk
-stdio/sprinter/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc

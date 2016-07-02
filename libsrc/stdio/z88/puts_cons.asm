@@ -8,11 +8,11 @@
 ;       djm 2/4/99
 ;
 ;
-;	$Id: puts_cons.asm,v 1.8 2016-05-15 20:15:46 dom Exp $
+;	$Id: puts_cons.asm,v 1.9 2016-07-02 13:52:45 dom Exp $
 ;
 
                 INCLUDE "stdio.def"
-
+		MODULE    puts_cons_native_z88
 		SECTION	  code_clib
 
                 PUBLIC    puts_cons_native

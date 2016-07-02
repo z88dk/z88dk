@@ -1,7 +1,7 @@
+@stdio/stdio.lst
 stdio/nascom/fgetc_cons
 stdio/nascom/getk
 stdio/nascom/fputc_cons
-stdio/puts_cons
 stdio/ansi/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf

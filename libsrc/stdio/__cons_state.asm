@@ -1,5 +1,5 @@
 
-
+MODULE __cons_state
 SECTION bss_clib
 
 PUBLIC __cons_state

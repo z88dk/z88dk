@@ -1,7 +1,7 @@
+@stdio/stdio.lst
 stdio/vg5k/fgetc_cons
 stdio/vg5k/getk
 stdio/vg5k/fputc_cons
-stdio/puts_cons
 stdio/ansi/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf

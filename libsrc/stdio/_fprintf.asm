@@ -1,4 +1,5 @@
 
+	MODULE _fprintf
 	SECTION	code_clib
 
 	PUBLIC	_fprintf

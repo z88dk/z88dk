@@ -4,10 +4,10 @@
 ;	gets(char *s) - get string from console
 ;
 ;
-;	$Id: gets.asm,v 1.13 2016-04-29 20:35:38 dom Exp $
+;	$Id: gets.asm,v 1.14 2016-07-02 13:52:42 dom Exp $
 ;
 
-
+		MODULE gets
 		SECTION	code_clib
 		PUBLIC  gets
 		PUBLIC  _gets

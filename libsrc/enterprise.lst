@@ -1,3 +1,4 @@
+@stdio/stdio.lst
 stdio/enterprise/fgetc_cons
 stdio/enterprise/getk
 stdio/enterprise/fputc_cons

@@ -1,4 +1,5 @@
 
+	MODULE printf
 	SECTION	code_clib
 
 	PUBLIC	printf

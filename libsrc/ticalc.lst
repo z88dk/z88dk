@@ -1,8 +1,8 @@
+@stdio/stdio.lst
 stdio/ticalc/fputc_cons
 stdio/ticalc/fgetc_cons
 stdio/ticalc/getk
 stdio/ticalc/getk_decode
-stdio/puts_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc
