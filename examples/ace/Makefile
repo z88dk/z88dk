@@ -6,7 +6,7 @@ dstar.tap: dstar.c dstar.h
 	zcc +ace -vn -create-app dstar.c -odstar.bin
 
 adv_a.tap: ../console/adv_a.c
-	zcc +ace -vn ../console/adv_a.c -I../console -create-app -DTAPE -DCOMPUTE_SCORE -O3 -oadva.bin
+	zcc +ace -vn ../console/adv_a.c -I../console -create-app -DTAPE -DCOMPUTE_SCORE -O3 -oadv_a.bin
 
 ansitest.tap: ../console/ansitest.c
 	zcc +ace -clib=ansi -vn  ../console/ansitest.c -create-app -oansitest.bin

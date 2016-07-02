@@ -16,7 +16,7 @@ ddir.com: ../osca/ddir.c
 	zcc +cpm -vn  $(CFLAGS) ../osca/ddir.c -O3 -create-app -oddir.com
 
 adv_a.com: ../console/adv_a.c
-	zcc +cpm -vn $(CFLAGS) ../console/adv_a.c -I../console -create-app -DDISK -DCOMPUTE_SCORE -O3 -oadva.com
+	zcc +cpm -vn $(CFLAGS) ../console/adv_a.c -I../console -create-app -DDISK -DCOMPUTE_SCORE -O3 -oadv_a.com
 
 enigma.com: ../console/enigma.c
 	zcc +cpm -vn $(CFLAGS)  ../console/enigma.c -create-app -oenigma.com
