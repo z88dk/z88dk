@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.239 2016-07-02 13:52:42 dom Exp $
+# $Id: Makefile,v 1.240 2016-07-02 14:44:33 dom Exp $
 
 
 include Make.config
@@ -231,7 +231,7 @@ z88_clib.lib: gfxdeps
 	@echo ''
 	$(MAKE) -C fcntl lz88 
 	$(MAKE) -C stdio 
-	$(MAKE) -C stdlib lz88 
+	$(MAKE) -C stdlib TARGET=z88
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C printflike
@@ -250,7 +250,7 @@ z88net_clib.lib: gfxdeps
 	@echo ''
 	$(MAKE) -C fcntl lz88 
 	$(MAKE) -C stdio 
-	$(MAKE) -C stdlib lz88 
+	$(MAKE) -C stdlib TARGET=z88
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
 	$(MAKE) -C printflike
@@ -280,7 +280,7 @@ zx_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib lzx
+	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -305,7 +305,7 @@ ts2068_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib lzx
+	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -371,7 +371,7 @@ p2000_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=p2000
 	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -388,7 +388,7 @@ pc6001_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=pc6001
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -404,7 +404,7 @@ pps_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib lzx
+	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl lpps
 	$(MAKE) -C printflike
@@ -433,7 +433,7 @@ vz_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=vz
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -450,7 +450,7 @@ zx80_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib lzx80
+	$(MAKE) -C stdlib TARGET=zx80
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -469,7 +469,7 @@ zx81_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=zx81
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike generic_iy
 	$(MAKE) -C setjmp generic_iy
@@ -488,7 +488,7 @@ lambda_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=zx81
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike generic_iy
 	$(MAKE) -C setjmp generic_iy
@@ -589,7 +589,7 @@ ti82_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=ti82
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -605,7 +605,7 @@ ti83_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=ti83
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -621,7 +621,7 @@ ti83p_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=ti83
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -637,7 +637,7 @@ ti85_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=ti85
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -653,7 +653,7 @@ ti86_clib.lib:
 	$(MAKE) tideps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=ti86
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -672,7 +672,7 @@ ozansi_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=oz
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -690,7 +690,7 @@ cpm_clib.lib:
 	$(MAKE) -C fcntl lcpm
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=cpm
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C time 
@@ -705,7 +705,7 @@ sorcerer_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=srr
 	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -720,7 +720,7 @@ mz_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=mz
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -735,7 +735,7 @@ abc80_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=abc80
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -750,7 +750,7 @@ abc800_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=abc800
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -765,7 +765,7 @@ ace_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=ace
 	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -783,7 +783,7 @@ aquarius_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=aquarius
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -801,7 +801,7 @@ c7420_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=c7420
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -815,7 +815,7 @@ rex_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=rex
 	$(MAKE) -C setjmp
 	$(MAKE) -C rex
 	$(LIBLINKER) -DFORrex -x$(OUTPUT_DIRECTORY)/rex_clib.lib @$(LISTFILE_DIRECTORY)/rex6000.lst
@@ -828,7 +828,7 @@ sam_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=sam
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -846,7 +846,7 @@ svi_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=svi
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -865,7 +865,7 @@ msx_clib.lib:
 	$(MAKE) -C fcntl lcpm
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=msx
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -883,7 +883,7 @@ mtx_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=mtx
 	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -901,7 +901,7 @@ enterprise_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=enterprise
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -949,7 +949,7 @@ m5_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=m5
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -966,7 +966,7 @@ mc1000_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib lmc1000
+	$(MAKE) -C stdlib TARGET=mc1000
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -984,7 +984,7 @@ nascom_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=nascom
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -998,7 +998,7 @@ nc_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=nc
 	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl lnc
 	$(MAKE) -C printflike
@@ -1014,7 +1014,7 @@ cpc_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=cpc
 	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1045,7 +1045,7 @@ c128ansi_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=c128
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1090,7 +1090,7 @@ newbrain_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=newbrain
 	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl lnewbrain
 	$(MAKE) -C printflike
@@ -1116,10 +1116,10 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- WARNING: RCM2/3000 is temporarily disabled - no library will be produced ---'
 	@echo ''
-	$(MAKE) -C stdlib clean
+	$(MAKE) -C stdlib 
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=rcmx000
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1133,7 +1133,7 @@ embedded_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=embedded
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1148,7 +1148,7 @@ gal_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=gal
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1165,7 +1165,7 @@ lynx_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=lynx
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1182,7 +1182,7 @@ sms_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=sms
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1199,7 +1199,7 @@ sc3000_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=sc3000
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1215,7 +1215,7 @@ test_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=test
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1229,7 +1229,7 @@ trs80_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=trs80
 	$(MAKE) -C stdio
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1253,7 +1253,7 @@ x07_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=x07
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1267,7 +1267,7 @@ x1ansi_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib lx1
+	$(MAKE) -C stdlib TARGET=x1
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C time 
@@ -1285,7 +1285,7 @@ vg5k_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=vg5k
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1301,7 +1301,7 @@ sos_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib generic
+	$(MAKE) -C stdlib TARGET=sos
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
@@ -1316,7 +1316,7 @@ osca_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
-	$(MAKE) -C stdlib losca
+	$(MAKE) -C stdlib TARGET=osca
 	$(MAKE) -C stdio 
 	$(MAKE) -C printflike
 	$(MAKE) -C rs232 losca

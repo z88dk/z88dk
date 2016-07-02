@@ -39,8 +39,10 @@ fcntl/z88/deletedor
 fcntl/z88/sondor
 fcntl/z88/brotherdor
 stdlib/z88/atol
+stdlib/z88/csleep
 stdlib/z88/getcwd
 stdlib/z88/mkdir
+stdlib/z88/sleep
 @time/time.lst
 time/z88/clock
 time/z88/time

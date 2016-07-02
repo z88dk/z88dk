@@ -4,7 +4,7 @@
  *
  *	djm 15/10/2001
  *
- *	$Id: delay.c,v 1.2 2013-11-04 08:57:56 stefano Exp $
+ *	$Id: delay.c,v 1.3 2016-07-02 14:44:33 dom Exp $
  */
 
 #include <stdlib.h>
@@ -16,17 +16,16 @@
 
 void   delay (long msecs)
 {
-    long start = clock();  
+	long start = clock();  
 	long per   = msecs * CLOCKS_PER_SEC / 1000;
 
-        while ( (clock() - start) < per )
-  #ifdef __ZX80__
-			{
-			  gen_tv_field();
-              FRAMES++;
-			}
-  #else
-	;
-  #endif
+        while ( (clock() - start) < per ) {
+#ifdef __ZX80__
+	    gen_tv_field();
+            FRAMES++;
+#else
+	    ;
+#endif
+	}
 }
 
