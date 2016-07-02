@@ -1,43 +1,44 @@
 
+#CFLAGS = -compiler=sdcc
 
-all: wc tail sort ddir adv_a enigma fib mm rpn tic sorter othello
+all: wc.com tail.com sort.com ddir.com adv_a.com enigma.com fib.com mm.com rpn.com tic.com sorter.com othello.com
 
-wc:
-	zcc +cpm -vn -DWILDCARD ../osca/wc.c -create-app -owc.bin
+wc.com: ../osca/wc.c
+	zcc +cpm -vn $(CFLAGS) -DWILDCARD ../osca/wc.c -create-app -owc.com
 
-tail:
-	zcc +cpm -vn  -lmalloc -DAMALLOC -O3 ../osca/tail.c -create-app -otail.bin
+tail.com: ../osca/tail.c
+	zcc +cpm -vn $(CFLAGS)  -lmalloc -DAMALLOC -O3 ../osca/tail.c -create-app -otail.com
 
-sort:
-	zcc +cpm -vn  -lmalloc -DAMALLOC -O3 ../osca/sort.c -create-app -osort.bin
+sort.com: ../osca/sort.c
+	zcc +cpm -vn $(CFLAGS)  -lmalloc -DAMALLOC -O3 ../osca/sort.c -create-app -osort.com
 
-ddir:
-	zcc +cpm -vn  ../osca/ddir.c -O3 -create-app -oddir.bin
+ddir.com: ../osca/ddir.c
+	zcc +cpm -vn  $(CFLAGS) ../osca/ddir.c -O3 -create-app -oddir.com
 
-adv_a:
-	zcc +cpm -vn ../console/adv_a.c -I../console -create-app -DDISK -DCOMPUTE_SCORE -O3 -oadva.bin
+adv_a.com: ../console/adv_a.c
+	zcc +cpm -vn $(CFLAGS) ../console/adv_a.c -I../console -create-app -DDISK -DCOMPUTE_SCORE -O3 -oadva.com
 
-enigma:
-	zcc +cpm -vn  ../console/enigma.c -create-app -oenigma.bin
+enigma.com: ../console/enigma.c
+	zcc +cpm -vn $(CFLAGS)  ../console/enigma.c -create-app -oenigma.com
 
-fib:
-	zcc +cpm -vn  ../console/fib.c -create-app -ofib.bin
+fib.com: ../console/fib.c
+	zcc +cpm -vn $(CFLAGS)  ../console/fib.c -create-app -ofib.com
 
-mm:
-	zcc +cpm -vn  -create-app ../console/mm.c -omm.bin
+mm.com: ../console/mm.c
+	zcc +cpm -vn  $(CFLAGS) -create-app ../console/mm.c -omm.com
 
-rpn:
-	zcc +cpm -vn  -create-app ../console/rpn.c -orpn.bin
+rpn.com: ../console/rpn.c
+	zcc +cpm -vn  $(CFLAGS) -create-app ../console/rpn.c -orpn.com
 
-tic:
-	zcc +cpm -vn  -create-app ../console/tic.c -otic.bin
+tic.com: ../console/tic.c
+	zcc +cpm -vn  $(CFLAGS) -create-app ../console/tic.c -otic.com
 
-sorter:
-	zcc +cpm -vn  -create-app ../console/sorter.c -osorter.bin
+sorter.com: ../console/sorter.c
+	zcc +cpm -vn $(CFLAGS)  -create-app ../console/sorter.c -osorter.com
 
-othello:
-	zcc +cpm -vn  -O3 -create-app ../othello.c -I.. -oothello.bin
+othello.com: ../othello.c
+	zcc +cpm -vn  $(CFLAGS) -O3 -create-app ../othello.c -I.. -oothello.com
 
 clean:
-	$(RM) *.bin *.i *.asm *.tap *.op* *.o *~ zcc_opt.def
+	$(RM) *.com *.i *.asm *.tap *.op* *.o *~ zcc_opt.def
 
