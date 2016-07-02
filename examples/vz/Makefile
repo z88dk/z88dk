@@ -104,5 +104,5 @@ synthdemo:
 	appmake +vz  -b synthdemo.vz  --audio
 
 clean:
-	$(RM) *.vz *.i *.asm *.cas *.bin *.vz *.wav *.op* *.o *~ zcc_opt.def
+	$(RM) *.vz *.i *.asm *.cas *.bin *.vz *.wav *.op* *.o *~ zcc_opt.def *.reloc
 
