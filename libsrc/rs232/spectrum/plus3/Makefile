@@ -3,7 +3,7 @@
 # This version is valid for all the Spectrum 128 versions
 # So it is now renamed to rs232plus.lib
 #
-# $Id: Makefile,v 1.10 2014-11-07 07:27:19 stefano Exp $
+# $Id: Makefile,v 1.11 2016-07-02 15:42:55 dom Exp $
 
 include ../../../Make.config
 
@@ -13,7 +13,7 @@ AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
 all:	$(OBJECTS)
-	$(LIBLINKER) -x../../../$(OUTPUT_DIRECTORY)/rs232plus @p3list
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/rs232plus @p3list
 
 .c.o:  
 	zcc +zx $(CFLAGS) $*.c

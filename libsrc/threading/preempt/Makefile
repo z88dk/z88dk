@@ -6,7 +6,7 @@ include ../../Make.config
 CFILES = $(wildcard *.c)
 OBJECTS = $(CFILES:.c=.o)
 
-DESTDIR=../../$(OUTPUT_DIRECTORY)/
+DESTDIR=$(OUTPUT_DIRECTORY)/
 
 
 all: $(DESTDIR)preempt.lib

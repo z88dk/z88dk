@@ -1,12 +1,12 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.19 2007-11-08 14:11:50 stefano Exp $
+# $Id: Makefile,v 1.20 2016-07-02 15:42:55 dom Exp $
 
 include ../Make.config
 
-default:
-	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/malloc @malllist
+default: $(wildcard *.asm) malllist
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/malloc @malllist
 
 clean:
 	cd strings ; $(RM) *.o* ; cd ..

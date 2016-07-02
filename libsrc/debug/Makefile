@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2008-03-05 20:35:46 dom Exp $
+# $Id: Makefile,v 1.8 2016-07-02 15:42:55 dom Exp $
 
 include ../Make.config
 
@@ -9,7 +9,7 @@ AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
 
 all:	$(OBJECTS)
-	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/debug @debug.lst
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/debug @debug.lst
 
 .c.o:  
 	zcc +test $(CFLAGS) $*.c

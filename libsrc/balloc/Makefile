@@ -3,8 +3,8 @@
 #
 include ../Make.config
 
-all: 
-	$(LIBLINKER)  -x../$(OUTPUT_DIRECTORY)/balloc @balloc.lst
+all: $(wildcard *.asm) balloc.lst
+	$(LIBLINKER)  -x$(OUTPUT_DIRECTORY)/balloc @balloc.lst
 
 clean:
 	$(RM) *.o* *.sym *.map zcc_opt.def

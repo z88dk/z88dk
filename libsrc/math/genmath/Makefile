@@ -1,6 +1,6 @@
 #
 # Wahey, a messed up makefile for building libraries!
-# $Id: Makefile,v 1.2 2012-04-17 16:37:46 stefano Exp $
+# $Id: Makefile,v 1.3 2016-07-02 15:42:55 dom Exp $
 #
 
 include ../../Make.config
@@ -21,7 +21,7 @@ genmath: $(OBJECTS)
 	zcc +test $(CFLAGS) pow.c
 	zcc +test $(CFLAGS) sinh.c
 	zcc +test $(CFLAGS) tanh.c
-	$(LIBLINKER) -x../../$(OUTPUT_DIRECTORY)/gen_math @genlist
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/gen_math @genlist
 
 zx81math:
 	$(RM) -f *.o
@@ -35,7 +35,7 @@ zx81math:
 	zcc +test $(CFLAGS) -Ca-IXIY pow.c
 	zcc +test $(CFLAGS) -Ca-IXIY sinh.c
 	zcc +test $(CFLAGS) -Ca-IXIY tanh.c
-	$(LIBLINKER) -x../../$(OUTPUT_DIRECTORY)/zx81_math -IXIY @zx81list
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/zx81_math -IXIY @zx81list
 	$(RM) -f *.o
 
 .c.o:

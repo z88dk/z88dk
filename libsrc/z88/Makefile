@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.16 2016-05-16 20:05:18 dom Exp $
+# $Id: Makefile,v 1.17 2016-07-02 15:42:55 dom Exp $
 
 include ../Make.config
 
@@ -29,7 +29,7 @@ all: z88
 
 
 z88: $(OBJECTS)
-	$(LIBLINKER) -x../$(OUTPUT_DIRECTORY)/z88 @z88list
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88 @z88list
 
 .c.o:
 	zcc +z88 $(CFLAGS) $*.c
