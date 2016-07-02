@@ -46,7 +46,6 @@ stdio/obj/ixiy/puts_cons.o
 stdio/obj/ixiy/snprintf.o
 stdio/obj/ixiy/sprintf.o
 stdio/obj/ixiy/sprintf_outc.o
-stdio/obj/ixiy/stdio_fp.o
 stdio/obj/ixiy/ungetc.o
 stdio/obj/ixiy/vfprintf.o
 stdio/obj/ixiy/vsnprintf.o

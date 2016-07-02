@@ -46,7 +46,6 @@ stdio/obj/cpm/puts_cons.o
 stdio/obj/cpm/snprintf.o
 stdio/obj/cpm/sprintf.o
 stdio/obj/cpm/sprintf_outc.o
-stdio/obj/cpm/stdio_fp.o
 stdio/obj/cpm/ungetc.o
 stdio/obj/cpm/vfprintf.o
 stdio/obj/cpm/vsnprintf.o

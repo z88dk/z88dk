@@ -47,7 +47,6 @@ stdio/obj/stdesc/puts_cons.o
 stdio/obj/stdesc/snprintf.o
 stdio/obj/stdesc/sprintf.o
 stdio/obj/stdesc/sprintf_outc.o
-stdio/obj/stdesc/stdio_fp.o
 stdio/obj/stdesc/ungetc.o
 stdio/obj/stdesc/vfprintf.o
 stdio/obj/stdesc/vsnprintf.o

@@ -47,7 +47,6 @@ stdio/obj/net/puts_cons.o
 stdio/obj/net/snprintf.o
 stdio/obj/net/sprintf.o
 stdio/obj/net/sprintf_outc.o
-stdio/obj/net/stdio_fp.o
 stdio/obj/net/ungetc.o
 stdio/obj/net/vfprintf.o
 stdio/obj/net/vsnprintf.o
