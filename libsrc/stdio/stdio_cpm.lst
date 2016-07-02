@@ -6,7 +6,6 @@ stdio/obj/cpm/_snprintf.o
 stdio/obj/cpm/_sprintf.o
 stdio/obj/cpm/_vfprintf.o
 stdio/obj/cpm/_vsnprintf.o
-stdio/obj/cpm/asm_printf_core.o
 stdio/obj/cpm/asm_vfprintf_level1.o
 stdio/obj/cpm/asm_vfprintf_level2.o
 stdio/obj/cpm/asm_vfprintf_level3.o

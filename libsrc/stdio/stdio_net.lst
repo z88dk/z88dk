@@ -6,7 +6,6 @@ stdio/obj/net/_snprintf.o
 stdio/obj/net/_sprintf.o
 stdio/obj/net/_vfprintf.o
 stdio/obj/net/_vsnprintf.o
-stdio/obj/net/asm_printf_core.o
 stdio/obj/net/asm_vfprintf_level1.o
 stdio/obj/net/asm_vfprintf_level2.o
 stdio/obj/net/asm_vfprintf_level3.o
