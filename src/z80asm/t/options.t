@@ -112,6 +112,7 @@ Binary Output:
   -d, --date-stamp       Assemble only updated files
   -r, --origin=ORG_HEX   Relocate binary file to given address
   -R, --relocatable      Create relocatable code
+  --reloc-info           Geneate binary file relocation information
 
 Output File Options:
   -s, --symtable         Create symbol table file.sym

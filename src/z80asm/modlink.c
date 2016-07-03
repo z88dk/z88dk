@@ -917,7 +917,7 @@ CreateBinFile( void )
 
     /* binary output to filename.bin */
     binaryfile = myfopen( filename, "wb" );
-	relocfile = opts.relocatable ? NULL : myfopen(get_reloc_filename(filename), "wb");
+	relocfile = opts.relocatable ? NULL : opts.reloc_info ? myfopen(get_reloc_filename(filename), "wb") : NULL;
 	if (binaryfile)
 	{
 		if (is_relocatable)

@@ -29,6 +29,7 @@ OPT_VAR( Bool,		make_bin,	FALSE	)
 OPT_VAR( Bool,		split_bin,	FALSE   )	/* true to split binary file per section */
 OPT_VAR( Bool,		date_stamp,	FALSE	)
 OPT_VAR( Bool,		relocatable, FALSE	)
+OPT_VAR( Bool,      reloc_info, FALSE   )	/* generate .reloc file */
 OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
 
 OPT_VAR( int, 		cpu,		CPU_Z80	)
@@ -130,9 +131,9 @@ OPT( OptSet,	&opts.split_bin, "", "--split-bin", OPT_HELP_SPLIT_BIN, "")
 OPT( OptSet,	&opts.date_stamp, "-d",  "--date-stamp",    OPT_HELP_DATE_STAMP, "")
 
 OPT( OptCallArg, option_origin,	"-r", 	"--origin",			OPT_HELP_ORIGIN, "ORG_HEX" )
-OPT( OptSet,	&opts.relocatable,
-     "-R", 	"--relocatable",	OPT_HELP_RELOCATABLE, "" )
-
+OPT(OptSet,	&opts.relocatable,	"-R", 	"--relocatable",	OPT_HELP_RELOCATABLE, "" )
+OPT(OptSet, &opts.reloc_info,		"", "--reloc-info", "Geneate binary file relocation information", "")
+	
 OPT_TITLE(	"Output File Options:" )
 OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 		OPT_HELP_SYMTABLE, "" )
 

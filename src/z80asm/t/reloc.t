@@ -73,7 +73,7 @@ my $asm = "section code\norg $code_addr\n".code_asm("").
 
 unlink_testfiles();
 write_file("test.asm", $asm);
-t_z80asm_capture("-b -m test.asm", "", "", 0);
+t_z80asm_capture("-b -m --reloc-info test.asm", "", "", 0);
 
 t_binary(read_binfile("test.bin"), "");
 t_binary(read_binfile("test.reloc"), "");
@@ -175,7 +175,7 @@ write_file("test2.asm",
 		code_asm("2").
 		"section data\n".
 		data_asm("2"));
-t_z80asm_capture("-b -m test.asm test1.asm test2.asm", "", "", 0);
+t_z80asm_capture("-b -m --reloc-info test.asm test1.asm test2.asm", "", "", 0);
 
 t_binary(read_binfile("test.bin"), "");
 t_binary(read_binfile("test.reloc"), "");
@@ -298,7 +298,7 @@ write_file("test.asm", <<"...".
 	"section data\n" .data_asm("").
 	"section data1\n".data_asm("1").
 	"section data2\n".data_asm("2"));
-t_z80asm_capture("-b -m test.asm", "", "", 0);
+t_z80asm_capture("-b -m --reloc-info test.asm", "", "", 0);
 
 t_binary(read_binfile("test.bin"), "");
 t_binary(read_binfile("test.reloc"), "");
@@ -361,8 +361,84 @@ unlink_testfiles();
 done_testing();
 
 #------------------------------------------------------------------------------
-# compute reloc header for the given list of addresses
+# test with and without -R
 #------------------------------------------------------------------------------
+sub t_reloc {
+	my($asm) = @_;
+
+	ok 1, "line ".(caller)[2];
+	
+	my($bin0, $bin1, $reloc_header, @reloc) = compute_reloc_addrs($asm);
+	
+	# -R
+	for my $options ('-R', '--relocatable', '--relocatable --reloc-info') {
+		unlink_testfiles();
+		write_file("test.asm", $asm);
+		
+		t_z80asm_capture("-b $options test.asm", 
+						 "Relocation header is ".length($reloc_header)." bytes.\n", "", 0);
+						 
+		t_binary(read_binfile("test.bin"), $reloc_header.$bin0);
+		ok ! -f "test.reloc";
+	}
+
+	# no -R, no --reloc-info
+	unlink_testfiles();
+	write_file("test.asm", "org 1\n".$asm);
+	
+	t_z80asm_capture("-b test.asm", "", "", 0);
+	t_binary(read_binfile("test.bin"), $bin1);
+	ok ! -f "test.reloc";
+	
+	# no -R, --reloc-info
+	unlink_testfiles();
+	write_file("test.asm", "org 1\n".$asm);
+	
+	t_z80asm_capture("-b --reloc-info test.asm", "", "", 0);
+	t_binary(read_binfile("test.bin"), $bin1);
+	t_binary(read_binfile("test.reloc"), pack("v*", @reloc));
+}	
+
+# compute reloc addresses and bin files at org 0 and 1
+sub reloc_addrs {
+	my($asm) = @_;
+	
+	# identify reloc addresses
+	my $bin0 = CPU::Z80::Assembler::z80asm("org 0\n".$asm);
+	my $bin1 = CPU::Z80::Assembler::z80asm("org 1\n".$asm);
+	
+	my @addrs;
+	for (my $addr = 0; $addr < length($bin0)-1; $addr++) {
+		if (substr($bin0, $addr, 1) ne substr($bin1, $addr, 1)) {
+			push @addrs, $addr;
+			$addr++;
+		}
+	}
+	
+	return @addrs;
+}
+
+sub compute_reloc_addrs {
+	my($asm) = @_;
+	
+	# identify reloc addresses
+	my $bin0 = CPU::Z80::Assembler::z80asm("org 0\n".$asm);
+	my $bin1 = CPU::Z80::Assembler::z80asm("org 1\n".$asm);
+	
+	my @addrs;
+	for (my $addr = 0; $addr < length($bin0)-1; $addr++) {
+		if (substr($bin0, $addr, 1) ne substr($bin1, $addr, 1)) {
+			push @addrs, $addr;
+			$addr++;
+		}
+	}
+	
+	my $reloc_header = reloc_header(@addrs);
+	
+	return ($bin0, $bin1, $reloc_header, @addrs);
+}
+
+# compute reloc header
 sub reloc_header {
 	my(@addrs) = @_;
 	
@@ -388,60 +464,3 @@ sub reloc_header {
 				 $reloc_data;
 	return $header;
 }
-
-#------------------------------------------------------------------------------
-# compute reloc addresses for the given code
-#------------------------------------------------------------------------------
-sub reloc_addrs {
-	my($asm) = @_;
-	
-	# identify reloc addresses
-	my $bin0 = CPU::Z80::Assembler::z80asm("org 0\n".$asm);
-	my $bin1 = CPU::Z80::Assembler::z80asm("org 1\n".$asm);
-	
-	my @addrs;
-	for (my $addr = 0; $addr < length($bin0)-1; $addr++) {
-		if (substr($bin0, $addr, 1) ne substr($bin1, $addr, 1)) {
-			push @addrs, $addr;
-			$addr++;
-		}
-	}
-	
-	return @addrs;
-}
-
-#------------------------------------------------------------------------------
-# test with and without -R
-#------------------------------------------------------------------------------
-sub t_reloc {
-	my($asm) = @_;
-
-	ok 1, "line ".(caller)[2];
-	
-	my @reloc = reloc_addrs($asm);
-	
-	my $bin0 = CPU::Z80::Assembler::z80asm("org 0\n".$asm);
-	my $bin1 = CPU::Z80::Assembler::z80asm("org 1\n".$asm);
-
-	my $reloc_header = reloc_header(@reloc);
-	
-	# -R
-	for my $options ('-R', '--relocatable') {
-		unlink_testfiles();
-		write_file("test.asm", $asm);
-		
-		t_z80asm_capture("-b $options test.asm", 
-						 "Relocation header is ".length($reloc_header)." bytes.\n", "", 0);
-						 
-		t_binary(read_binfile("test.bin"), $reloc_header.$bin0);
-		ok ! -f "test.reloc";
-	}
-
-	# not -R
-	unlink_testfiles();
-	write_file("test.asm", "org 1\n".$asm);
-	
-	t_z80asm_capture("-b test.asm", "", "", 0);
-	t_binary(read_binfile("test.bin"), $bin1);
-	t_binary(read_binfile("test.reloc"), pack("v*", @reloc));
-}	
