@@ -89,7 +89,7 @@ OPT(OptSet, &opts.reloc_info, "", "--reloc-info", "Geneate binary file relocatio
 
 OPT_TITLE("Output File Options:")
 OPT(OptSet, &opts.symtable, "-s", "--symtable", "Create symbol table file" FILEEXT_SYM, "")
-OPT(OptSet, &opts.list, "-l", "--list", "Create listing file" FILEEXT_LST, "")
+OPT(OptSet, &opts.list, "-l", "--list", "Create listing file" FILEEXT_LIST, "")
 OPT(OptSet, &opts.map, "-m", "--map", "Create address map file" FILEEXT_MAP, "")
 OPT(OptSet, &opts.globaldef, "-g", "--globaldef", "Create global definition file" FILEEXT_DEF, "")
 

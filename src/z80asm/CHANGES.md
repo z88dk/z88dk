@@ -14,6 +14,9 @@ Z88DK Z80 Macro Assembler Change Log
   of hexadecimal by default. Accept hexadecimal with a '0x' or '$' prefix,
   or with a 'h' suffix.  
 
+  Change extension of list files to .lis instead of .lst, as .lst is 
+  usualy used in @project.lst files as input to z80asm.
+
 - 2016-06-30
 
   Unify map-, def- and sym-files - they differ only in the filter used

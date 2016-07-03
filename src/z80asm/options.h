@@ -50,7 +50,7 @@ extern void parse_argv( int argc, char *argv[] );
 *	Extensions may be changed by options.
 *----------------------------------------------------------------------------*/
 extern char *get_asm_filename( char *filename );
-extern char *get_lst_filename( char *filename );
+extern char *get_list_filename( char *filename );
 extern char *get_obj_filename( char *filename );
 extern char *get_def_filename( char *filename );
 extern char *get_err_filename( char *filename );

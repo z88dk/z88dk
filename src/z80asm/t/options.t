@@ -74,7 +74,7 @@ Usage:
   File types recognized or created by z80asm:
     .asm = source file (default), or alternative -e<ext>
     .obj = object file (default), or alternative -M<ext>
-    .lst = list file
+    .lis = list file
     .bin = Z80 binary file
     .sym = symbols file
     .map = map file
@@ -116,7 +116,7 @@ Binary Output:
 
 Output File Options:
   -s, --symtable         Create symbol table file.sym
-  -l, --list             Create listing file.lst
+  -l, --list             Create listing file.lis
   -m, --map              Create address map file.map
   -g, --globaldef        Create global definition file.def
 END

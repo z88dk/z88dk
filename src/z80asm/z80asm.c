@@ -75,12 +75,12 @@ void assemble_file( char *filename )
 	module->filename = strpool_add( src_filename );
 
 	/* remove output files, except obj */
-	//remove(get_lst_filename(src_filename));
-	//remove(get_bin_filename(src_filename));
-	//remove(get_sym_filename(src_filename));
-	//remove(get_map_filename(src_filename));
-	//remove(get_reloc_filename(src_filename));
-	//remove(get_def_filename(src_filename));
+	remove(get_list_filename(src_filename));
+	remove(get_bin_filename(src_filename));
+	remove(get_sym_filename(src_filename));
+	remove(get_map_filename(src_filename));
+	remove(get_reloc_filename(src_filename));
+	remove(get_def_filename(src_filename));
 
 	/* Create error file */
 	open_error_file(src_filename);
@@ -139,7 +139,7 @@ static void do_assemble( char *src_filename )
 
 	/* create list file */
 	if (opts.list)
-		list_open(get_lst_filename(src_filename));
+		list_open(get_list_filename(src_filename));
 
 	/* initialize local symtab with copy of static one (-D defines) */
 	copy_static_syms();

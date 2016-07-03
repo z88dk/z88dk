@@ -29,7 +29,7 @@ Parse command line options
 
 /* default file name extensions */
 #define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
-#define FILEEXT_LST     FILEEXT_SEPARATOR "lst"    /* ".lst" / "_lst" */
+#define FILEEXT_LIST    FILEEXT_SEPARATOR "lis"    /* ".lis" / "_lis" */
 #define FILEEXT_OBJ     FILEEXT_SEPARATOR "obj"    /* ".obj" / "_obj" */
 #define FILEEXT_DEF     FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
 #define FILEEXT_ERR     FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
@@ -364,7 +364,7 @@ static void exit_help( void )
             FILEEXT_SEPARATOR, opts.asm_ext );
     printf( "    %s%s = object file (default), or alternative -M<ext>\n",
             FILEEXT_SEPARATOR, opts.obj_ext );
-    printf( "    %s = list file\n", FILEEXT_LST );
+    printf( "    %s = list file\n", FILEEXT_LIST );
     printf( "    %s = Z80 binary file\n", FILEEXT_BIN );
     printf( "    %s = symbols file\n", FILEEXT_SYM );
     printf( "    %s = map file\n", FILEEXT_MAP );
@@ -476,10 +476,10 @@ static char *get_opts_ext_filename( char *filename, char *opts_ext )
 	return ret;
 }
 
-char *get_lst_filename( char *filename )
+char *get_list_filename( char *filename )
 {
     init_module();
-	return path_replace_ext( filename, FILEEXT_LST );
+	return path_replace_ext( filename, FILEEXT_LIST );
 }
 
 char *get_def_filename( char *filename )

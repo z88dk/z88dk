@@ -99,7 +99,7 @@ static void test_symtab( void )
 	Symbol *sym;
 	SymbolHash *symtab, *symtab2;
 	
-	list_open("test.lst");
+	list_open("test.lis");
 	opts.symtable = TRUE;
 	opts.list     = TRUE;
 	

@@ -220,44 +220,44 @@ sub test {
 
 	$self->push_asm();
 	
-	unlink('test.lst', 'test.sym');
+	unlink('test.lis', 'test.sym');
 	z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
 		options	=> "-b",
 	);
-	ok ! -f "test.lst", "no test.lst file";
+	ok ! -f "test.lis", "no test.lis file";
 	ok ! -f "test.sym", "no test.sym file";
 
-	unlink('test.lst', 'test.sym');
+	unlink('test.lis', 'test.sym');
 	z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
 		options	=> "-l -b",
 	);
-	ok   -f "test.lst", "test.lst file";
+	ok   -f "test.lis", "test.lis file";
 	ok ! -f "test.sym", "no test.sym file";
-	$self->compare_list_file("test.lst", @{$self->LIST_LST});
+	$self->compare_list_file("test.lis", @{$self->LIST_LST});
 
-	unlink('test.lst', 'test.sym');
+	unlink('test.lis', 'test.sym');
 	z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
 		options	=> "-s -b",
 	);
-	ok ! -f "test.lst", "no test.lst file";
+	ok ! -f "test.lis", "no test.lis file";
 	ok   -f "test.sym", "test.sym file";
 	$self->compare_list_file("test.sym", $self->sym_lines());
 	
-	unlink('test.lst', 'test.sym');
+	unlink('test.lis', 'test.sym');
 	z80asm(
 		asm		=> $asm,
 		bin		=> $bin,
 		options	=> "-s -l -b",
 	);
-	ok -f "test.lst", "test.lst file";
+	ok -f "test.lis", "test.lis file";
 	ok -f "test.sym", "test.sym file";
-	$self->compare_list_file("test.lst", @{$self->LIST_LST});
+	$self->compare_list_file("test.lis", @{$self->LIST_LST});
 	$self->compare_list_file("test.sym", $self->sym_lines());
 }
 

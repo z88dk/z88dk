@@ -58,14 +58,14 @@ t_z80asm_capture("-b ".asm_file(),
 remove_tree( err_file() );
 
 unlink_testfiles();
-make_path( lst_file() );
+make_path( lis_file() );
 write_file( asm_file(), 'nop' );
 t_z80asm_capture("-l -b ".asm_file(),
 				"", 
-				"Error: cannot write file 'test.lst'\n".
+				"Error: cannot write file 'test.lis'\n".
 				"1 errors occurred during assembly\n",
 				1);
-remove_tree( lst_file() );
+remove_tree( lis_file() );
 
 unlink_testfiles();
 make_path( sym_file() );

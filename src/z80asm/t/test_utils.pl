@@ -24,7 +24,7 @@ my $test	 = "test";
 
 sub z80asm	 { $ENV{Z80ASM} || "./z80asm" }
 
-my @TEST_EXT = (qw( asm lst inc bin map obj lib sym def err 
+my @TEST_EXT = (qw( asm lis inc bin map obj lib sym def err 
 					exe c o asmlst prj i reloc ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
@@ -94,7 +94,7 @@ sub t_z80asm {
 		write_file($FILE{asm}{$id}, $asm);
 		push @asm, $FILE{asm}{$id};
 		push @obj, $FILE{obj}{$id};
-		push @lst, $FILE{lst}{$id};
+		push @lst, $FILE{lis}{$id};
 		push @sym, $FILE{sym}{$id};
 	}
 	

@@ -72,7 +72,7 @@ sub z80asm {
 			# asm[n]
 			unlink("test$id.err", "test$id.obj", 
 			       "test$id.map", "test$id.syn", 
-				   "test$id.lst", "test$id.def", 
+				   "test$id.lis", "test$id.def", 
 				   <test$id*.bin>,
 				   <test$id*.reloc>);
 			
@@ -170,7 +170,7 @@ sub unlink_temp {
 	push @temp, 
 		grep { -f $_ }
 		grep {/^ test .* \. (?: asm |
-								lst |
+								lis |
 								inc |
 								bin |
 								reloc |

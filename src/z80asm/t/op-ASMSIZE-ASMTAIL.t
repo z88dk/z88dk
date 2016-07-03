@@ -14,8 +14,8 @@ use warnings;
 use Test::More;
 require 't/test_utils.pl';
 
-my @testfiles = qw( testa.asm testa.lst testa.sym testa.obj testa.map testa.bin
-					testb.asm testb.lst testb.sym testb.obj
+my @testfiles = qw( testa.asm testa.lis testa.sym testa.obj testa.map testa.bin
+					testb.asm testb.lis testb.sym testb.obj
 				);
 
 my $asm = "

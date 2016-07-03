@@ -599,8 +599,8 @@ z80asm(
 END
 	options => "-b -l",
 );
-ok -f "test.lst", "test.lst exists";
-ok my @lines = read_file("test.lst");
+ok -f "test.lis", "test.lis exists";
+ok my @lines = read_file("test.lis");
 ok $lines[0] =~ /^ 1 \s+ 0000                      \s+ lstoff          /x;
 ok $lines[1] =~ /^ 4 \s+ 0003 \s+ 21 \s+ 01 \s+ 00 \s+ ld     \s+ hl,1 /x;
 ok $lines[2] =~ /^ 5 \s+ 0006 \s* $/x;
@@ -614,7 +614,7 @@ z80asm(
 END
 	options => "-b",
 );
-ok ! -f "test.lst", "test.lst does not exist";
+ok ! -f "test.lis", "test.lis does not exist";
 
 #------------------------------------------------------------------------------
 # LINE, -C, --line-mode
