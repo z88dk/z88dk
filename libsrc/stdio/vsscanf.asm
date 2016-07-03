@@ -1,7 +1,7 @@
-	MODULE  sscanf
+	MODULE  vsscanf
 	SECTION	code_clib
 
-	PUBLIC	sscanf
+	PUBLIC	vsscanf
 
 	EXTERN	asm_scanf
 	EXTERN	scanf_ungetc
@@ -12,22 +12,20 @@
 
 
 ; sccz80 version
-;void sscanf(char *buf, char *fmt,...)
+;void vsscanf(char *buf, char *fmt,va_arg ap)
 ;{
 ;        asm_scanf(fp, ungetc, getc, sccz80_delta, *ct,ct-1);
 ;}
-sscanf:
-	ld	l,a
-	ld	h,0
-        add     hl,hl
-	add	hl,sp		;&buf
+vsscanf:
+	ld	hl,7
+	add	hl,sp		;hl=&buf+1
 	push	ix		;save callers
-	ld	c,(hl)		;buf
-	inc	hl
-	ld	b,(hl)
+
+	ld	b,(hl)		;buf
 	dec	hl
+	ld	c,(hl)
 	dec	hl		;&fmt+1
-	ex	de,hl		;de=&fmy+1
+	ex	de,hl		;de=&fmt+1
 	ld	hl,1+2+128	;h=ungetc, l=_IOREAD|_IOSTRING|_IOUSE
 	push	hl		;
 	push	bc		;buf
@@ -45,10 +43,11 @@ sscanf:
 	dec	hl
 	ld	c,(hl)
 	push	bc
-
 	dec	hl
+	ld	b,(hl)		;ap
 	dec	hl
-	push	hl		;&ap
+	ld	c,(hl)
+	push	bc
 	call	asm_scanf
 	ex	de,hl
 	ld	hl,12+4
