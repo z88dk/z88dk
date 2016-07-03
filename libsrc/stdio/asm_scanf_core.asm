@@ -138,13 +138,19 @@ only_0_on_stream:
 	; There's only a zero on the stream, but we've read two characters from
 	; it and we can't push back two, so fudge it a little
         bit     3,(ix-3)
-	call	z,scanf_nextarg
-	push	hl		;save format
-	push	de		;save destination
-	ld	hl,0		;dehl = 0
-	ld	d,h
-	ld	e,l
-	jp	scanf_get_number_store
+	jp	nz,loop			;carry on
+	inc	(ix-1)			;number of converted arguments
+	xor	a	
+	ld	(de),a
+	inc	de
+	ld	(de),a
+	bit	1,(ix-3)
+	jp	z,loop
+	inc	de
+	ld	(de),a
+	inc	de
+	ld	(de),a
+	jp	loop
 
 handle_x_fmt_leader_found:	
 	call	scanf_getchar
