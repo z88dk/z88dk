@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.11 2016-07-03 08:59:53 aralbrec Exp $
+ *      $Id: rom.c,v 1.12 2016-07-03 17:09:15 aralbrec Exp $
  */
 
 
@@ -63,7 +63,9 @@ int rom_exec(char *target)
         else
         {
             strcpy(outname, binname);
-            suffix_change(outname, (crt_model == 0) ? ".bin" : ".rom");
+            // choose bin suffix if new c lib compile and ram model chosen or romsize is set to zero
+            // not safe to use bin suffix in classic compile since the linker's output filename ends in .bin
+            suffix_change(outname, ((crt_model == 0) || ((crt_model != -1) && (romsize == 0))) ? ".bin" : ".rom");
         }
     }
     else
