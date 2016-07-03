@@ -4,6 +4,16 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-07-03
+
+  Only generate .reloc file if --reloc-info option is given.
+  The .reloc file contains the list of all relocatable addresses in the 
+  binary file and is only required in some platforms.
+  
+  Change -r and --origin to accept the origin address in decimal instead
+  of hexadecimal by default. Accept hexadecimal with a '0x' or '$' prefix,
+  or with a 'h' suffix.  
+
 - 2016-06-30
 
   Unify map-, def- and sym-files - they differ only in the filter used
