@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.37 2016-07-03 08:14:10 aralbrec Exp $
+ *   $Id: appmake.c,v 1.38 2016-07-03 16:44:34 aralbrec Exp $
  */
 
 
@@ -343,6 +343,7 @@ static void set_option_by_type(option_t *options, type_t type, char *value)
 {
     char  *arr[2];
 
+    arr[0] = NULL;
     arr[1] = value;
     do {
         if ( options->type == type ) {
@@ -362,19 +363,30 @@ static void set_option_by_type(option_t *options, type_t type, char *value)
  */
 int option_parse(int argc, char *argv[], option_t *options)
 {
-    int     i;
+    int       i;
+    char     *equal;
     option_t *opt;
 
-    for ( i = 0 ; i < argc; i++ ) {
-        if ( argv[i][1] && argv[i][0] == '-' ) {
+    for ( i = 0 ; i < argc; i++ )
+    {
+        if ( argv[i][1] && argv[i][0] == '-' )
+        {
             opt = options;
-            do {
-                if ( opt->sopt && argv[i][2] == 0 && argv[i][1] == opt->sopt ) {
+            do
+            {
+                if ( opt->sopt && argv[i][2] == 0 && argv[i][1] == opt->sopt )
+                {
                     i = option_set(i,argc,argv,opt);
                     break;
-                } else if ( opt->lopt && argv[i][0] == '-' && argv[i][1] == '-' && strcmp(&argv[i][2],opt->lopt) == 0 ) {
-                    i = option_set(i,argc,argv,opt);
-                    break;   
+                }
+                else if (opt->lopt && (argv[i][0] == '-') && (argv[i][1] == '-'))
+                {
+                    equal = strchr(&argv[i][2], '=');
+                    if ((equal && (strncmp(&argv[i][2], opt->lopt, strlen(opt->lopt)) == 0)) || (!equal && (strcmp(&argv[i][2], opt->lopt) == 0)))
+                    {
+                        i = option_set(i,argc,argv,opt);
+                        break;   
+                    }
                 }                
                 opt++;
             } while ( opt->type != OPT_NONE );
@@ -388,31 +400,45 @@ int option_parse(int argc, char *argv[], option_t *options)
 
 static int option_set(int pos, int max, char *argv[], option_t *option)
 {
-    int     val;
-    int     ret = pos;
+    char   *param;
+    int     ret;
 
-    switch ( option->type & OPT_BASE_MASK) {
-    case OPT_BOOL:
-        *(char *)(option->dest) = TRUE;
-        ret = pos;
-        break;
-    case OPT_INT:
-        if ( pos + 1 < max ) {
-            val = (int)strtol(argv[pos+1], NULL, 0);
-            *(int *)(option->dest) = val;
-            ret = pos + 1;
-        }
-        break;
-    case OPT_STR:
-        if ( pos + 1 < max ) {
-            *(char **)(option->dest) = strdup(argv[pos+1]);
-            ret = pos + 1;
-        }
-        break;
-    case OPT_NONE:
-        ret = pos;
-        break;
+    ret = pos;
+    param = (argv[pos] == NULL) ? NULL : strchr(argv[pos], '=');
+
+    if ((param == NULL) && ((pos + 1) < max))
+    {
+        param = argv[pos+1];
+        ret = pos + 1;
     }
+    else
+    {
+        ++param;
+        ret = pos;
+    }
+
+    switch ( option->type & OPT_BASE_MASK)
+    {
+        case OPT_BOOL:
+            *(char *)(option->dest) = TRUE;
+            ret = pos;
+            break;
+
+        case OPT_INT:
+            if (param)
+                *(int *)(option->dest) = (int)strtol(param, NULL, 0);
+            break;
+
+        case OPT_STR:
+            if (param)
+                *(char **)(option->dest) = strdup(param);
+            break;
+
+        case OPT_NONE:
+            ret = pos;
+            break;
+    }
+
     return ret;
 }
 
