@@ -8,6 +8,7 @@
 	EXTERN asm_isbdigit
 	EXTERN asm_toupper
 	EXTERN l_long_mult
+	EXTERN atoi
 
 ; int vfscanf1(FILE *fp, void __CALLEE__ ungetc_func(int c, FILE *fp), void __CALLEE__ (*getchar_fn)(FILE *fp), int sccz80, unsigned char *fmt,void *ap)
 
@@ -56,12 +57,18 @@ scanf_ordinary_char:
 scanf_exit:
    ; ISO C has us exit with # conversions done
    ; or -1 if no chars were read from the input stream
-	ld	a,(ix-1)
+	ld	e,(ix-6)
+	ld	d,(ix-5)
+	ld	a,d
+	or	e
+	jr	z,scanf_exit2
+	ld	e,(ix-1)
+	ld	d,0
+scanf_exit2:
 	ld	hl,10
 	add	hl,sp
 	ld	sp,hl
-	ld	l,a
-	ld	h,0
+	ex	de,hl
 	ret
 
 consume_whitespace:
@@ -75,10 +82,35 @@ consume_whitespace:
 	
 is_percent:
 	; % {flags} [*] [width] [l] "[diouxXeEfFscpPbn"
-
-
+flagloop:
+	ld	a,(hl)
+;	cp	'a'		;network byte order
+;	jr	nz,nextflag0
+;	set	4,(ix-3)
+;	inc	hl
+;	jr	flagloop
+nextflag0:
+	cp	'*'
+	jr	nz,width
+	set	3,(ix-3)
+	inc	de
+	jr	flagloop
+width:
+	ld	a,(hl)
+	call	asm_isdigit
+	jr	c,formatchar
+	set	2,(ix-3)	;set width flag
+	call	atoi		;exits hl=number, de = non numeric in fmt
+	ex	de,hl
+	ld	(ix-4),e
+formatchar:
 	; Consider those that aren't affected by a long modifier first
 	ld	a,(hl)
+	inc	hl
+	ld	c,a
+	cp	'%'			; %% should match a single %
+	jr	z,scanf_ordinary_char
+
 	cp	'c'
 	jp	z,handle_c_fmt
 	cp	's'
@@ -89,11 +121,12 @@ is_percent:
 	jr	nz, not_long_specifier
 	inc	hl
 	set	1,(ix-3)
-not_long_specifier:
 	ld	a,(hl)
-	inc	hl
+not_long_specifier:
 	cp	'd'
 	jr	z,handle_d_fmt
+	cp	'i'
+	jp	z,handle_i_fmt
 	cp	'x'
 	jr	z,handle_x_fmt
 	cp	'X'
@@ -110,9 +143,10 @@ not_long_specifier:
 	jp	nz,loop			;unrecognised format
 handle_d_fmt:
 	call	scanf_common_start	;de=argument as necessary
-	jr	c,scanf_exit
+	jp	c,scanf_exit
+handle_d_fmt_entry_from_i:
 	call	asm_isdigit
-	jr	c,scanf_exit
+	jp	c,scanf_exit
 	; So there's a decimal number on the stream
 	ld	b,10			;radix
 parse_number:
@@ -122,17 +156,19 @@ parse_number:
 
 handle_o_fmt:
 	call	scanf_common_start	;de=argument
-	jr	c,scanf_exit
+	jp	c,scanf_exit
+handle_o_fmt_entry_from_i:
 	call	asm_isodigit		;is it actually octal?
-	jr	c,scanf_exit
+	jp	c,scanf_exit
 	ld	b,8
 	jr	parse_number
 
 handle_b_fmt:
 	call	scanf_common_start
-	jr	c,scanf_exit
+	jp	c,scanf_exit
 	cp	'%'
 	jr	nz,handle_b_fmt_nobase
+handle_b_fmt_entry_from_i:
 	call	scanf_getchar
 	jp	c,scanf_exit
 handle_b_fmt_nobase:
@@ -183,6 +219,27 @@ handle_x_fmt_nobase:
 	ld	b,16
 	jr	parse_number
 
+handle_i_fmt:
+	call	scanf_common_start
+	jp	c,scanf_exit
+	; Determine the radix if we can
+	cp	'0'
+	jr	z,handle_i_fmt_octalorhex
+	cp	'%'
+	jp	z,handle_b_fmt_entry_from_i
+	; It must be decimal
+	jp	handle_d_fmt_entry_from_i
+handle_i_fmt_octalorhex:
+	call	scanf_getchar
+	jp	c,only_0_on_stream
+	cp	'x'
+	jp	z,handle_x_fmt_leader_found
+	cp	'X'
+	jp	z,handle_x_fmt_leader_found
+	; Must be octal then
+	jp	handle_o_fmt_entry_from_i
+
+
 
 handle_c_fmt:
 	ld	b,1		;width
@@ -190,6 +247,7 @@ handle_c_fmt:
 	jr	z,c_fmt_get_buf
 	ld	b,(ix-4)	;width
 c_fmt_get_buf:
+	; TODO: Handling of *, bit 3
 	call	scanf_nextarg	;de = destination
 c_fmt_loop:
 	call	scanf_getchar
@@ -303,6 +361,9 @@ scanf_getchar_return:
 	scf
 	jr	z,scanf_getchar_return1
 	and	a	;reset carry
+	inc	(ix-6)
+	jr	nz,scanf_getchar_return1
+	inc	(ix-5)
 scanf_getchar_return1:
 	pop	ix
 	pop	hl
@@ -316,6 +377,10 @@ scanf_ungetchar:
 	push	de
 	push	hl		;fmt
 	push	ix		;frame pointer
+	dec	(ix-6)
+	jr	nc,scanf_ungetchar1
+	dec	(ix-5)
+scanf_ungetchar1:
 	ld	c,a		;character to unget
 	ld	b,0
 	push	bc
@@ -404,7 +469,7 @@ scanf_atoul_isdigit:
 	jr	scanf_atoul_loop
 scanf_atoul_exit:
 	ld	a,c		;get character back
-	jr	scanf_ungetchar
+	jp	scanf_ungetchar
 
 
 	
