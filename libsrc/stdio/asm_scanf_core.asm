@@ -8,6 +8,7 @@
 	EXTERN asm_isbdigit
 	EXTERN asm_toupper
 	EXTERN l_long_mult
+	EXTERN l_long_neg
 	EXTERN atoi
 
 ; int vfscanf1(FILE *fp, void __CALLEE__ ungetc_func(int c, FILE *fp), void __CALLEE__ (*getchar_fn)(FILE *fp), int sccz80, unsigned char *fmt,void *ap)
@@ -402,7 +403,7 @@ scanf_get_number:
 	call	scanf_atoul
 scanf_get_number_store:
 	and	a		;clear carry
-	bit	0,(ix-3)	;assignment suppressed?
+	bit	3,(ix-3)	;assignment suppressed?
 	jr	nz,scanf_getnumber_suppressed
 	ex	de,hl		;long is hlde (i.e. reversed)
 	ex	(sp),hl		;*sp =top16, hl=destination
@@ -436,7 +437,7 @@ scanf_atoul:
 
 scanf_atoul_loop:
 	call	scanf_getchar
-	ret	c
+	jr	c,scanf_atoul_exit2
 	ld	c,a
 	sub	'0'
 	jr	c,scanf_atoul_exit
@@ -468,8 +469,12 @@ scanf_atoul_isdigit:
 	inc	de
 	jr	scanf_atoul_loop
 scanf_atoul_exit:
-	ld	a,c		;get character back
-	jp	scanf_ungetchar
+	ld	a,c
+	call	scanf_ungetchar
+scanf_atoul_exit2:
+	bit	0,(ix-3)	;sign flag
+	call	nz,l_long_neg
+	ret
 
 
 	
