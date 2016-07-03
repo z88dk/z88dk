@@ -5,6 +5,7 @@
 	EXTERN asm_isdigit
 	EXTERN asm_isxdigit
 	EXTERN asm_isodigit
+	EXTERN asm_isbdigit
 	EXTERN asm_toupper
 	EXTERN l_long_mult
 
@@ -91,12 +92,20 @@ is_percent:
 not_long_specifier:
 	ld	a,(hl)
 	inc	hl
+	cp	'd'
+	jr	z,handle_d_fmt
 	cp	'x'
+	jr	z,handle_x_fmt
+	cp	'X'
+	jr	z,handle_x_fmt
+	cp	'p'
+	jr	z,handle_x_fmt
+	cp	'P'
 	jr	z,handle_x_fmt
 	cp	'o'
 	jr	z,handle_o_fmt
-	cp	'd'
-	jr	z,handle_d_fmt
+	cp	'b'
+	jr	z,handle_b_fmt
 	cp	'u'
 	jp	nz,loop			;unrecognised format
 handle_d_fmt:
@@ -119,9 +128,22 @@ handle_o_fmt:
 	ld	b,8
 	jr	parse_number
 
+handle_b_fmt:
+	call	scanf_common_start
+	jr	c,scanf_exit
+	cp	'%'
+	jr	nz,handle_b_fmt_nobase
+	call	scanf_getchar
+	jp	c,scanf_exit
+handle_b_fmt_nobase:
+	call	asm_isbdigit
+	jp	c,scanf_exit
+	ld	b,2	
+	jr	parse_number
+
 handle_x_fmt:
 	call	scanf_common_start	;de=argument as necessary
-	jr	c,scanf_exit
+	jp	c,scanf_exit
 	cp	'0'
 	jr	nz,handle_x_fmt_nobase
 	call	scanf_getchar
