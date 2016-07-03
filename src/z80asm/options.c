@@ -50,7 +50,7 @@ enum OptType
 /* declare functions */
 static void exit_help( void );
 static void exit_copyright( void );
-static void option_origin( char *origin_hex );
+static void option_origin( char *origin );
 static void option_define( char *symbol );
 static void option_make_lib( char *library );
 static void option_use_lib( char *library );
@@ -386,12 +386,33 @@ static void exit_copyright( void )
 /*-----------------------------------------------------------------------------
 *   Option functions called from Opts table
 *----------------------------------------------------------------------------*/
-static void option_origin( char *origin_hex )
+static void option_origin( char *origin )
 {
 	char *end;
-	long lorigin = strtol(origin_hex, &end, 16);
-	if (*end != '\0' || errno == ERANGE || lorigin < INT_MIN || lorigin > INT_MAX)
-		error_invalid_org_option(origin_hex);
+	char *p = origin;
+	long lorigin;
+	int radix;
+	char suffix = '\0';
+
+	if (p[0] == '$') {
+		p++;
+		radix = 16;
+	}
+	else if (p[0] == '0' && tolower(p[1]) == 'x') {
+		p += 2;
+		radix = 16;
+	}
+	else if (isdigit(p[0]) && tolower(p[strlen(p)-1]) == 'h') {
+		suffix = p[strlen(p) - 1];
+		radix = 16;
+	}
+	else {
+		radix = 10;
+	}
+
+	lorigin = strtol(p, &end, radix);
+	if (*end != suffix || errno == ERANGE || lorigin < INT_MIN || lorigin > INT_MAX)
+		error_invalid_org_option(origin);
 	else
 		set_origin_option((int)lorigin);
 }

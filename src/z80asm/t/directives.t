@@ -428,7 +428,7 @@ z80asm(
 
 # ORG defined and overridden by command line
 z80asm(
-	options	=> "-b -r1234",
+	options	=> "-b -r0x1234",
 	asm		=> "org 0x1000 \n start: jp start ;; C3 34 12",
 );
 
@@ -466,31 +466,7 @@ z80asm(
 	asm		=> "org start ;; error: symbol 'start' not defined",
 );
 
-# -r, --origin
-for my $origin (0, 0x1234) {
-	for my $options ("-r", "-r=", "--origin", "--origin=") {
-		z80asm(
-			options	=> "-b $options".sprintf("%x", $origin),
-			asm		=> "start: jp start",
-			bin		=> "\xC3" . pack("v", $origin),
-		);
-	}
-}
-
-# option out of range
-for my $origin (-1, 0x10000) {
-	my $origin_hex = ($origin < 0 ? "-" : "") . sprintf("%x", abs($origin));
-	z80asm(
-		options	=> "-b -r$origin_hex",
-		asm		=> "start: jp start",
-		error	=> "Error: integer '$origin' out of range",
-	);
-}
-z80asm(
-	options	=> "-b -r123Z",
-	asm		=> "start: jp start",
-	error	=> "Error: invalid ORG option '123Z'",
-);
+# -r, --origin -- tested in options.t
 
 # BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
 z80asm(

@@ -110,7 +110,7 @@ Binary Output:
   -b, --make-bin         Assemble and link/relocate to file.bin
   --split-bin            Create one binary file per section
   -d, --date-stamp       Assemble only updated files
-  -r, --origin=ORG_HEX   Relocate binary file to given address
+  -r, --origin=ADDR      Relocate binary file to given address (decimal or hex)
   -R, --relocatable      Create relocatable code
   --reloc-info           Geneate binary file relocation information
 
@@ -560,28 +560,33 @@ for my $options ('-d', '--date-stamp') {
 # -r, --origin
 #------------------------------------------------------------------------------
 
-for my $org ('0', '100') {
+# -r, --origin
+for my $origin (0, 0x1234) {
+	my $origin_hex = sprintf("%x", $origin);
 	for my $options ("-r", "-r=", "--origin", "--origin=") {
-		unlink_testfiles();
-		write_file(asm_file(), "start: jp start");
-
-		t_z80asm_capture("$options$org -b ".asm_file(), "", "", 0);
-		t_binary(read_file(bin_file(), binmode => ':raw'), "\xC3".pack("v", oct('0x'.$org)));
+		for my $origin_text ($origin, "0x${origin_hex}", "0X${origin_hex}", "0${origin_hex}h", "0${origin_hex}H", "\$${origin_hex}") {
+			z80asm(
+				options	=> "-b $options".$origin_text,
+				asm		=> "start: jp start",
+				bin		=> "\xC3" . pack("v", $origin),
+			);
+		}
 	}
 }
 
-for (['-1', '-1'], ['10000', '65536']) {
-	my($org_h, $org_d) = @$_;
-	
-	unlink_testfiles();
-	write_file(asm_file(), "nop");
-	t_z80asm_capture("--make-bin --origin=$org_h ".asm_file(), "", <<"ERR", 1);
-Error: integer '$org_d' out of range
-1 errors occurred during assembly
-ERR
-	ok ! -f obj_file();
-	ok ! -f bin_file();
+# option out of range
+for my $origin (-1, 0x10000) {
+	z80asm(
+		options	=> "-b -r$origin",
+		asm		=> "start: jp start",
+		error	=> "Error: integer '$origin' out of range",
+	);
 }
+z80asm(
+	options	=> "-b -r123Z",
+	asm		=> "start: jp start",
+	error	=> "Error: invalid ORG option '123Z'",
+);
 
 #------------------------------------------------------------------------------
 # -R, --relocatable - tested in reloc.t

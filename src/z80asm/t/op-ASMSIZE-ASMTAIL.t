@@ -27,20 +27,20 @@ my $asm = "
 ";
 
 #------------------------------------------------------------------------------
-t_z80asm_ok(0, $asm, "\x00\x00\x06\x00\x06\x00", "-r0000 -b");
-t_z80asm_ok(0, $asm, "\x00\xF0\x06\xF0\x06\x00", "-rF000 -b");
+t_z80asm_ok(0, $asm, "\x00\x00\x06\x00\x06\x00", "-r0x0000 -b");
+t_z80asm_ok(0, $asm, "\x00\xF0\x06\xF0\x06\x00", "-r0xF000 -b");
 
 #------------------------------------------------------------------------------
 unlink_testfiles(@testfiles);
 
 write_file('testa.asm', $asm);
 write_file('testb.asm', $asm);
-t_z80asm_capture("-b -r0000 testa.asm testb.asm", "", "", 0);
+t_z80asm_capture("-b -r0x0000 testa.asm testb.asm", "", "", 0);
 t_binary(read_binfile('testa.bin'), 
 		"\x00\x00\x0C\x00\x0C\x00".
 		"\x00\x00\x0C\x00\x0C\x00");
 
-t_z80asm_capture("-b -rF000 testa.asm testb.asm", "", "", 0);
+t_z80asm_capture("-b -r0xF000 testa.asm testb.asm", "", "", 0);
 t_binary(read_binfile('testa.bin'), 
 		"\x00\xF0\x0C\xF0\x0C\x00".
 		"\x00\xF0\x0C\xF0\x0C\x00");

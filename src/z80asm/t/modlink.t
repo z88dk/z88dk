@@ -452,7 +452,7 @@ ASM1
 		defc chain1 = chain2 - 1
 		defc chain2 = ASMPC
 ASM2
-	options => "-r1000 -b",
+	options => "-r0x1000 -b",
 	bin		=> $expected_bin,
 );
 
@@ -529,7 +529,7 @@ ASM
 	func2:	call func1
 			ret
 ASM1
-	options => "-r1000 -b",
+	options => "-r0x1000 -b",
 	bin		=> $expected_bin,
 );
 
@@ -547,7 +547,7 @@ ASM
 			PUBLIC func2
 			EXTERN func1
 ASM1
-	options => "-r1000 -b",
+	options => "-r0x1000 -b",
 	bin		=> $expected_bin,
 );
 
@@ -620,7 +620,7 @@ z80asm(
 				call asm_b_array_at		; 1004 ;; CD 00 10
 				ret						; 1007 ;; C9
 ...
-	options => "-r1000 -b",
+	options => "-r0x1000 -b",
 );
 
 # link only

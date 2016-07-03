@@ -106,7 +106,7 @@ sub t_z80asm {
 	
 	# org
 	if ( exists($args{org}) && $args{org} > 0 ){
-		$cmd .= sprintf("-r%04X ", $args{org});
+		$cmd .= "-r".$args{org}." ";
 	}
 
 	exists($args{options})

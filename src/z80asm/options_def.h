@@ -83,7 +83,7 @@ OPT_TITLE("Binary Output:")
 OPT(OptSet, &opts.make_bin, "-b", "--make-bin", "Assemble and link/relocate to file" FILEEXT_BIN, "")
 OPT(OptSet, &opts.split_bin, "", "--split-bin", "Create one binary file per section", "")
 OPT(OptSet, &opts.date_stamp, "-d", "--date-stamp", "Assemble only updated files", "")
-OPT(OptCallArg, option_origin, "-r", "--origin", "Relocate binary file to given address", "ORG_HEX")
+OPT(OptCallArg, option_origin, "-r", "--origin", "Relocate binary file to given address (decimal or hex)", "ADDR")
 OPT(OptSet, &opts.relocatable, "-R", "--relocatable", "Create relocatable code", "")
 OPT(OptSet, &opts.reloc_info, "", "--reloc-info", "Geneate binary file relocation information", "")
 
