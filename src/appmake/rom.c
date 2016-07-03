@@ -2,7 +2,7 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.10 2016-07-03 08:18:21 aralbrec Exp $
+ *      $Id: rom.c,v 1.11 2016-07-03 08:59:53 aralbrec Exp $
  */
 
 
@@ -52,8 +52,8 @@ int rom_exec(char *target)
 
     if ((binorg == -1) && ((binorg = get_org_addr(crtfile)) == -1))
     {
-        fprintf(stderr,"Warning: could not get the 'myzorg' value, binary ORG defaults to 0\n");
-        binorg = 0;
+        fprintf(stderr,"Warning: could not get the 'myzorg' value, binary ORG defaults to rombase=%d\n", rombase);
+        binorg = rombase;
     }
 
     if (romname == NULL)
