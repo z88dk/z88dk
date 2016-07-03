@@ -3,6 +3,8 @@
 
 	EXTERN asm_isspace
 	EXTERN asm_isdigit
+	EXTERN asm_isxdigit
+	EXTERN asm_isodigit
 	EXTERN asm_toupper
 	EXTERN l_long_mult
 
@@ -53,9 +55,12 @@ scanf_ordinary_char:
 scanf_exit:
    ; ISO C has us exit with # conversions done
    ; or -1 if no chars were read from the input stream
+	ld	a,(ix-1)
 	ld	hl,10
 	add	hl,sp
 	ld	sp,hl
+	ld	l,a
+	ld	h,0
 	ret
 
 consume_whitespace:
@@ -69,15 +74,89 @@ consume_whitespace:
 	
 is_percent:
 	; % {flags} [*] [width] [l] "[diouxXeEfFscpPbn"
+
+
+	; Consider those that aren't affected by a long modifier first
 	ld	a,(hl)
+	cp	'c'
+	jp	z,handle_c_fmt
+	cp	's'
+	jp	z,handle_s_fmt
+;	cp	'n'
+;	jr	z,handle_n_fmt
 	cp	'l'
 	jr	nz, not_long_specifier
 	inc	hl
+	set	1,(ix-3)
 not_long_specifier:
 	ld	a,(hl)
 	inc	hl
-	cp	'c'
-	jr	nz, check_fmt_d
+	cp	'x'
+	jr	z,handle_x_fmt
+	cp	'o'
+	jr	z,handle_o_fmt
+	cp	'd'
+	jr	z,handle_d_fmt
+	cp	'u'
+	jp	nz,loop			;unrecognised format
+handle_d_fmt:
+	call	scanf_common_start	;de=argument as necessary
+	jr	c,scanf_exit
+	call	asm_isdigit
+	jr	c,scanf_exit
+	; So there's a decimal number on the stream
+	ld	b,10			;radix
+parse_number:
+	call	scanf_ungetchar
+	call	scanf_get_number
+	jp	loop
+
+handle_o_fmt:
+	call	scanf_common_start	;de=argument
+	jr	c,scanf_exit
+	call	asm_isodigit		;is it actually octal?
+	jr	c,scanf_exit
+	ld	b,8
+	jr	parse_number
+
+handle_x_fmt:
+	call	scanf_common_start	;de=argument as necessary
+	jr	c,scanf_exit
+	cp	'0'
+	jr	nz,handle_x_fmt_nobase
+	call	scanf_getchar
+	jr	c,only_0_on_stream	;there's only a 0 on the stream
+	cp	'x'
+	jr	z,handle_x_fmt_leader_found
+	cp	'X'
+	jr	z,handle_x_fmt_leader_found
+	call	asm_isxdigit		;is it a hex digit?
+	ld	b,16			;radix
+	jr	nc,parse_number		;So parse it in - we can ignore the leading
+					;0 since it doesn't change the value
+only_0_on_stream:
+	; There's only a zero on the stream, but we've read two characters from
+	; it and we can't push back two, so fudge it a little
+        bit     3,(ix-3)
+	call	z,scanf_nextarg
+	push	hl		;save format
+	push	de		;save destination
+	ld	hl,0		;dehl = 0
+	ld	d,h
+	ld	e,l
+	jp	scanf_get_number_store
+
+handle_x_fmt_leader_found:	
+	call	scanf_getchar
+	jp	c,scanf_exit
+handle_x_fmt_nobase:
+	call	asm_isxdigit
+	jp	c,scanf_exit		;it wasn't a hex digit
+	ld	b,16
+	jr	parse_number
+
+
+handle_c_fmt:
 	ld	b,1		;width
 	bit	2,(ix-3)	;is there a width specified?
 	jr	z,c_fmt_get_buf
@@ -93,35 +172,16 @@ c_fmt_loop:
 	inc	(ix-1)		;increment number of conversions done
 	jp	loop
 
-check_fmt_d:
-	cp	'd'
-	jr	z,scanf_fmt_d
-	cp	'u'
-	jr	nz, check_fmt_s
-scanf_fmt_d:
-	call	scanf_common_start	;de=argument as necessary
-	jr	c,scanf_exit
-	call	asm_isdigit
-	jr	c,scanf_exit
-	; So there's a decimal number on the stream
-	call	scanf_ungetchar
-	ld	b,10			;radix
-	call	scanf_get_number
-	jp	loop
-
-check_fmt_s:
-	cp	's'
-	jr	nz, unrecognised_fmt_character
-; Handle s format here
+handle_s_fmt:
 	bit	3,(ix-3)
 	call	z,scanf_nextarg		;de=destination
 	ld	b,(ix-4)		;b=width
 scanf_fmt_s_width_specified:
 	call	consume_whitespace
-	jr	c,scanf_exit
+	jp	c,scanf_exit
 	call	scanf_getchar
 	jr	nc,scanf_fmt_s_join
-	jr	scanf_exit
+	jp	scanf_exit
 scanf_fmt_s_loop:
 	call	scanf_getchar
 	jr	c,scanf_fmt_s_done
@@ -148,8 +208,6 @@ scanf_fmt_s_success:
 	jr	scanf_fmt_s_done
 
 
-unrecognised_fmt_character:
-	jp	loop
 
 ; Common start code for formats
 scanf_common_start:
@@ -249,6 +307,7 @@ scanf_get_number:
 	push	hl		;save fmt
 	push	de		;save destination
 	call	scanf_atoul
+scanf_get_number_store:
 	and	a		;clear carry
 	bit	0,(ix-3)	;assignment suppressed?
 	jr	nz,scanf_getnumber_suppressed

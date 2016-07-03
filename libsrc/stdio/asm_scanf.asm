@@ -1,5 +1,5 @@
 
-
+		MODULE  asm_scanf
 		SECTION	code_clib
 		PUBLIC  asm_scanf
 
