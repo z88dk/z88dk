@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.39 2016-07-03 19:49:01 dom Exp $ */
+/* $Id: stdio.h,v 1.40 2016-07-03 22:16:06 dom Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -238,7 +238,6 @@ extern int __LIB__ vsnprintf(char *str,size_t,unsigned char *fmt,void *ap);
 
 /* Routines used by the old printf - will be removed soon */
 extern void __LIB__ printn(int number, int radix,FILE *file) __SMALLCDECL;
-extern int __LIB__ ltoa_any(long in,unsigned  char *str, int sz, unsigned int radix, int signflag) __SMALLCDECL;
 
 
 /*

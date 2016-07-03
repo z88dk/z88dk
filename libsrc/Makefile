@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.242 2016-07-02 15:49:42 dom Exp $
+# $Id: Makefile,v 1.243 2016-07-03 22:16:06 dom Exp $
 
 
 include Make.config
@@ -89,7 +89,6 @@ msxdeps:
 zx81deps:
 	$(RM) -f assert/*.o
 	$(RM) -f setjmp/*.o
-	$(RM) -f printflike/*.o
 	$(RM) -f strings/*.o
 	$(RM) -f stdlib/*.o
 	$(RM) -f stdio/zx81/*.o
@@ -234,7 +233,6 @@ z88_clib.lib: gfxdeps
 	$(MAKE) -C stdlib TARGET=z88
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
-	$(MAKE) -C printflike
 	$(MAKE) -C time
 	$(MAKE) -C rs232 lz88
 	$(MAKE) -C setjmp
@@ -253,7 +251,6 @@ z88net_clib.lib: gfxdeps
 	$(MAKE) -C stdlib TARGET=z88
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
-	$(MAKE) -C printflike
 	$(MAKE) -C time
 	$(MAKE) -C rs232 lz88
 	$(MAKE) -C setjmp
@@ -282,7 +279,6 @@ zx_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -307,7 +303,6 @@ ts2068_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C time 
@@ -373,7 +368,6 @@ p2000_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=p2000
 	$(MAKE) -C stdio
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -390,7 +384,6 @@ pc6001_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=pc6001
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C psg
@@ -407,7 +400,6 @@ pps_clib.lib:
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl/sprinter
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C time 
@@ -435,7 +427,6 @@ vz_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=vz
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -452,7 +443,6 @@ zx80_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=zx80
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -471,7 +461,6 @@ zx81_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=zx81
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike generic_iy
 	$(MAKE) -C setjmp generic_iy
 	$(MAKE) -C assert generic_iy
 	$(MAKE) gamesdeps
@@ -490,7 +479,6 @@ lambda_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=zx81
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike generic_iy
 	$(MAKE) -C setjmp generic_iy
 	$(MAKE) -C assert generic_iy
 	$(MAKE) gamesdeps
@@ -591,7 +579,6 @@ ti82_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=ti82
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -607,7 +594,6 @@ ti83_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=ti83
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -623,7 +609,6 @@ ti83p_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=ti83
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -639,7 +624,6 @@ ti85_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=ti85
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -655,7 +639,6 @@ ti86_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=ti86
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -674,7 +657,6 @@ ozansi_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=oz
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C oz 
@@ -692,7 +674,6 @@ cpm_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=cpm
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C time 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -707,7 +688,6 @@ sorcerer_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=srr
 	$(MAKE) -C stdio
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -DFORsorcerer -x$(OUTPUT_DIRECTORY)/sorcerer_clib @$(LISTFILE_DIRECTORY)/sorcerer.lst
@@ -722,7 +702,6 @@ mz_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=mz
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
@@ -737,7 +716,6 @@ abc80_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=abc80
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc80_clib @$(LISTFILE_DIRECTORY)/abc80.lst
@@ -752,7 +730,6 @@ abc800_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=abc800
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/abc800_clib @$(LISTFILE_DIRECTORY)/abc800.lst
@@ -767,7 +744,6 @@ ace_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=ace
 	$(MAKE) -C stdio
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -785,7 +761,6 @@ aquarius_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=aquarius
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -803,7 +778,6 @@ c7420_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=c7420
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -DFORc7420 -x$(OUTPUT_DIRECTORY)/c7420_clib.lib @$(LISTFILE_DIRECTORY)/c7420.lst
@@ -830,7 +804,6 @@ sam_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=sam
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C time 
@@ -848,7 +821,6 @@ svi_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=svi
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games lmsx
@@ -867,7 +839,6 @@ msx_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=msx
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games lmsx
@@ -885,7 +856,6 @@ mtx_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=mtx
 	$(MAKE) -C stdio
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C games lmsx
@@ -903,7 +873,6 @@ enterprise_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=enterprise
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C time 
 	$(MAKE) -C assert
@@ -951,7 +920,6 @@ m5_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=m5
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C msx
@@ -968,7 +936,6 @@ mc1000_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=mc1000
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -986,7 +953,6 @@ nascom_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=nascom
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -DFORnascom -x$(OUTPUT_DIRECTORY)/nascom_clib @$(LISTFILE_DIRECTORY)/nascom.lst
@@ -1001,7 +967,6 @@ nc_clib.lib:
 	$(MAKE) -C stdlib TARGET=nc
 	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl/nc100
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/nc_clib @$(LISTFILE_DIRECTORY)/nc100.lst
@@ -1017,7 +982,6 @@ cpc_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=cpc
 	$(MAKE) -C stdio
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C rs232 lcpc
@@ -1047,7 +1011,6 @@ c128ansi_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=c128
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C c128 
@@ -1093,7 +1056,6 @@ newbrain_clib.lib:
 	$(MAKE) -C stdlib TARGET=newbrain
 	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl/newbrain
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C time 
 	$(MAKE) -C assert
@@ -1121,7 +1083,6 @@ rcmx000_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=rcmx000
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	#z80asm -RCMX000 -d -ns -nm -Mo -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
@@ -1135,7 +1096,6 @@ embedded_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=embedded
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -DFORembedded -x$(OUTPUT_DIRECTORY)/embedded_clib @$(LISTFILE_DIRECTORY)/embedded.lst
@@ -1150,7 +1110,6 @@ gal_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=gal
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -1167,7 +1126,6 @@ lynx_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=lynx
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -1184,7 +1142,6 @@ sms_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=sms
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C msx
@@ -1201,7 +1158,6 @@ sc3000_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=sc3000
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C msx
@@ -1217,7 +1173,6 @@ test_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=test
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/test_clib @$(LISTFILE_DIRECTORY)/test.lst
@@ -1231,7 +1186,6 @@ trs80_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=trs80
 	$(MAKE) -C stdio
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -1255,7 +1209,6 @@ x07_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=x07
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/x07_clib @$(LISTFILE_DIRECTORY)/x07.lst
@@ -1269,7 +1222,6 @@ x1ansi_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=x1
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C time 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1287,7 +1239,6 @@ vg5k_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=vg5k
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) gamesdeps
@@ -1303,7 +1254,6 @@ sos_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=sos
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(MAKE) -C sos 
@@ -1318,7 +1268,6 @@ osca_clib.lib:
 	$(MAKE) -C regex
 	$(MAKE) -C stdlib TARGET=osca
 	$(MAKE) -C stdio 
-	$(MAKE) -C printflike
 	$(MAKE) -C rs232 losca
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
@@ -1383,7 +1332,6 @@ clean:
 	$(MAKE) -C graphics clean
 	$(MAKE) -C malloc clean
 	$(MAKE) -C net clean
-	$(MAKE) -C printflike clean
 	$(MAKE) -C rex clean
 	$(MAKE) -C rs232 clean
 	$(MAKE) -C setjmp clean

@@ -1,10 +1,5 @@
 assert/obj/assert
 @ctype/ctype.lst
-printflike/itod
-printflike/itou
-printflike/itox
-printflike/ltoa_any
-printflike/utoi
 setjmp/longjmp
 setjmp/setjmp
 @stdlib/stdlib.lst
