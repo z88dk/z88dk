@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.135 2016-07-03 18:43:43 aralbrec Exp $
+ *      $Id: zcc.c,v 1.136 2016-07-03 20:12:47 aralbrec Exp $
  */
 
 
@@ -826,7 +826,7 @@ int main(int argc, char **argv)
     if (lston && usetemp) {
         char *tempofile = outputfile;
         outputfile = NULL;
-        copy_output_files_to_destdir(".lst", 0);
+        copy_output_files_to_destdir(".lis", 0);
         outputfile = tempofile;
     }
     
@@ -885,7 +885,7 @@ int main(int argc, char **argv)
             exit(1);
         }
 
-        if (lston && copy_file(c_crt0, ".lst", "crt0", ".lst")) {
+        if (lston && copy_file(c_crt0, ".lis", "crt0", ".lis")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
             exit(1);
         }
