@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.38 2016-06-13 19:57:10 dom Exp $ */
+/* $Id: stdio.h,v 1.39 2016-07-03 19:49:01 dom Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -245,12 +245,12 @@ extern int __LIB__ ltoa_any(long in,unsigned  char *str, int sz, unsigned int ra
  * Scanf family 
  */
 
-extern int __LIB__ scanf(unsigned char *fmt,...) __SMALLCDECL;
-extern int __LIB__ fscanf(FILE *,unsigned char *fmt,...) __SMALLCDECL;
-extern int __LIB__ sscanf(char *,unsigned char *fmt,...) __SMALLCDECL;
-extern int __LIB__ vfscanf(FILE *, unsigned char *fmt, void *ap) __SMALLCDECL;
-extern int __LIB__ vsscanf(char *str, unsigned char *fmt, void *ap) __SMALLCDECL;
-#define vscanf(ctl,arg) vfscanf(stdout,ctl,arg)
+extern int __LIB__ scanf(unsigned char *fmt,...);
+extern int __LIB__ fscanf(FILE *,unsigned char *fmt,...);
+extern int __LIB__ sscanf(char *,unsigned char *fmt,...);
+extern int __LIB__ vfscanf(FILE *, unsigned char *fmt, void *ap);
+extern int __LIB__ vsscanf(char *str, unsigned char *fmt, void *ap);
+#define vscanf(ctl,arg) vfscanf(stdin,ctl,arg)
 
 
 /*
