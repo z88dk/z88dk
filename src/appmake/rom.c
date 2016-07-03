@@ -2,38 +2,35 @@
  *      Short program to pad a binary block and get a fixed size ROM
  *      Stefano Bodrato - Apr 2014
  *      
- *      $Id: rom.c,v 1.9 2016-06-26 00:46:55 aralbrec Exp $
+ *      $Id: rom.c,v 1.10 2016-07-03 08:18:21 aralbrec Exp $
  */
 
 
 #include "appmake.h"
 
-
-
-static char             *binname      = NULL;
-static char             *outfile      = NULL;
-static char             *crtfile      = NULL;
 static char              help         = 0;
-static int               filler       = 255;
-static int               size         = -1;
-static int               origin       = -1;
+static char             *binname      = NULL;
+static int               binorg       = -1;
+static char             *crtfile      = NULL;
+static char             *romname      = NULL;
+static int               romsize      = 0;
+static int               rombase      = 0;
+static int               romfill      = 255;
 static char              ihex         = 0;
-
 
 /* Options that are available for this module */
 option_t rom_options[] = {
-    { 'h', "help",      "Display this help",              OPT_BOOL,  &help},
-    { 'b', "binfile",   "Linked binary file",             OPT_STR,   &binname },
-    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
-    { 'o', "output",    "Name of output file",            OPT_STR,   &outfile },
-    { 'f', "filler",    "Filler byte (default: 0xFF)",    OPT_INT,   &filler },
-    { 's', "blocksize", "ROM size to be reached",         OPT_INT,   &size },
-    {  0 , "org",       "Origin of the binary",           OPT_INT,   &origin },
-    {  0,  "ihex",      "Get also an iHEX version",       OPT_BOOL,  &ihex },
-    {  0,  NULL,       NULL,                              OPT_NONE,  NULL }
+    { 'h', "help",      "Display this help",                OPT_BOOL,  &help    },
+    { 'b', "binfile",   "Binary file to embed",             OPT_STR,   &binname },
+    {  0 , "org",       "Origin of the embedded binary",    OPT_INT,   &binorg  },
+    { 'c', "crt0file",  "crt0 used to link binary",         OPT_STR,   &crtfile },
+    { 'o', "output",    "Name of output rom",               OPT_STR,   &romname },
+    { 's', "romsize",   "Size of output rom",               OPT_INT,   &romsize },
+    {  0,  "rombase",   "Base address of output rom",       OPT_INT,   &rombase },
+    { 'f', "filler",    "Filler byte (default: 0xFF)",      OPT_INT,   &romfill },
+    {  0,  "ihex",      "Generate an iHEX file",            OPT_BOOL,  &ihex    },
+    {  0,  NULL,        NULL,                               OPT_NONE,  NULL     }
 };
-
-
 
 
 /*
@@ -42,113 +39,96 @@ option_t rom_options[] = {
 
 int rom_exec(char *target)
 {
-    char    filename[FILENAME_MAX+1];
-    FILE   *fpin;
-    FILE   *fpout;
-    int     len;
-    int     fillsize;
-    int     c,i;
+    FILE *fpin, *fpout;
+    char outname[FILENAME_MAX+1];
+    int crt_model;
+    int pre_size, post_size, in_size;
+    int c;
 
-    if ( help )
-        return -1;
+    if (help) return -1;
+    if ((binname == NULL) && (romsize == 0)) return -1;
 
-    if ( size != -1 ) {
-        fillsize = size;
-    } else {
-        myexit("ROM block size not specified (use -s)\n",1);
-	return -1;
+    crt_model = parameter_search(crtfile, ".sym", "__crt_model");
+
+    if ((binorg == -1) && ((binorg = get_org_addr(crtfile)) == -1))
+    {
+        fprintf(stderr,"Warning: could not get the 'myzorg' value, binary ORG defaults to 0\n");
+        binorg = 0;
     }
 
-	if (parameter_search(crtfile,".sym","__crt_model") == 0)
-		fprintf(stderr,"WARNING: using appmake to create a ROM image with a RAM model binary file.\n");
-
-	if ( (ihex) && (origin == -1 )) {
-		if ( (origin = get_org_addr(crtfile)) == -1 ) {
-			fprintf(stderr,"Warning: could not get the 'myzorg' value, ORG defaults to 0\n");
-			origin = 0;
-		}
-	}
-
-    if ( outfile == NULL )
+    if (romname == NULL)
     {
-       if ( binname == NULL )
-       {
-          myexit("No destination file specified\n", 1);
-       }
-       else
-       {
-          strcpy(filename,binname);
-          suffix_change(filename,".rom");
-       }
+        if (binname == NULL)
+            exit_log(1, "No destination file specified\n");
+        else
+        {
+            strcpy(outname, binname);
+            suffix_change(outname, (crt_model == 0) ? ".bin" : ".rom");
+        }
+    }
+    else
+        strcpy(outname, romname);
+
+    if ((pre_size = (romsize == 0) ? 0 : (binorg - rombase)) < 0)
+        exit_log(1, "Binary ORG %d is less than ROM base address %d\n", binorg, rombase);
+
+    fpin = NULL;
+
+    if (binname == NULL)
+        in_size = 0;
+    else if ((fpin = fopen_bin(binname, crtfile)) == NULL)
+        exit_log(1, "Can't open input file %s\n", binname);
+    else if (fseek(fpin, 0, SEEK_END))
+    {
+        fclose(fpin);
+        exit_log(1, "Couldn't determine size of file %s\n", binname);
     }
     else
     {
-        strcpy(filename,outfile);
+        in_size = ftell(fpin);
+        rewind(fpin);
     }
 
-    if ( binname == NULL)
-    {
-       len = 0;
-       fpin = NULL;
-    }
-    else if ( (fpin=fopen_bin(binname, crtfile) ) == NULL )
-    {
-        fprintf(stderr,"Can't open input file %s\n",binname);
-        myexit(NULL,1);
-	return -1;
-    }
-    else if (fseek(fpin,0,SEEK_END))
-    {
-        fprintf(stderr,"Couldn't determine size of file\n");
-        fclose(fpin);
-        myexit(NULL,1);
-	return -1;
-    }
-    else
-    {
-       len=ftell(fpin);
-       fseek(fpin,0L,SEEK_SET);
-    }
-    
-    if (fillsize == 0) fillsize = len;
+    if ((post_size = (romsize == 0) ? 0 : (romsize - in_size - binorg + rombase)) < 0)
+        exit_log(1, "Embedded binary address range [%d,%d] exceeds ROM address range [%d,%d]\n", binorg, binorg+in_size-1, rombase, rombase+romsize-1);
 
-    if (len > fillsize) {
-        fclose(fpin);
-        myexit("Your binary block does not fit in the specified ROM size\n",1);
-    }
-
-    if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+    if ((fpout = fopen(outname, "wb")) == NULL)
+    {
         if (fpin != NULL) fclose(fpin);
-        myexit("Can't open output file\n",1);
+        exit_log(1, "Can't open output file %s for writing\n", outname);
     }
 
-    for ( i = 0; i < len; i++) {
-        c = getc(fpin);
-        writebyte(c,fpout);
-    }
-    
-    fillsize -= len;
+    while (pre_size-- > 0)
+        fputc(romfill, fpout);
 
-    for ( i = 0; i < fillsize; i++)
-        writebyte(filler,fpout);
+    if (fpin != NULL)
+        while((c = fgetc(fpin)) != EOF)
+            fputc(c, fpout);
+
+    while (post_size-- > 0)
+        fputc(romfill, fpout);
 
     if (fpin != NULL) fclose(fpin);
     fclose(fpout);
 
-	if (ihex) {
-	  if ( (fpin=fopen(filename,"rb") ) == NULL ) {
-        fprintf(stderr,"Can't open file for hex conversion  %s\n",filename);
-        myexit(NULL,1);
-      }
-	  suffix_change(filename,".ihx");
-      if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-        fprintf(stderr,"Can't open file for hex conversion  %s\n",filename);
-        myexit(NULL,1);
-      }
-      bin2hex(fpin, fpout, origin); 
-      fclose(fpin);
-      fclose(fpout);
-	}
+    if (ihex)
+    {
+        if ((fpin = fopen(outname, "rb")) == NULL)
+            exit_log(1, "Can't open %s for hex conversion\n", outname);
+
+        suffix_change(outname, ".ihx");
+
+        if ((fpout = fopen(outname, "wb")) == NULL)
+        {
+            fclose(fpin);
+            exit_log(1, "Can't create %s for hex conversion\n", outname);
+        }
+
+        bin2hex(fpin, fpout, (romsize == 0) ? binorg : rombase);
+
+        fclose(fpin);
+        fclose(fpout);
+    }
 
     return 0;
 }

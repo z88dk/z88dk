@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.53 2016-06-26 00:46:54 aralbrec Exp $
+ *   $Id: appmake.h,v 1.54 2016-07-03 08:18:21 aralbrec Exp $
  */
 
 
@@ -269,7 +269,7 @@ struct {
       NULL,
       residos_exec,    &residos_options },
     { "rompad",    "rom",       "(C) 2014 Stefano Bodrato",
-      "Expand a binary block to a given size (pad to create a ROM)",
+      "Embed a binary inside a rom, padding if necessary",
       NULL,
       rom_exec,    &rom_options },
     { "bin2srr",   "srr",       "(C) 2011 Stefano Bodrato",
