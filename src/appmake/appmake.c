@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.36 2016-06-27 23:51:15 aralbrec Exp $
+ *   $Id: appmake.c,v 1.37 2016-07-03 08:14:10 aralbrec Exp $
  */
 
 
@@ -398,7 +398,7 @@ static int option_set(int pos, int max, char *argv[], option_t *option)
         break;
     case OPT_INT:
         if ( pos + 1 < max ) {
-            val = atoi(argv[pos+1]);
+            val = (int)strtol(argv[pos+1], NULL, 0);
             *(int *)(option->dest) = val;
             ret = pos + 1;
         }
