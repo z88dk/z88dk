@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.134 2016-06-30 01:13:11 aralbrec Exp $
+ *      $Id: zcc.c,v 1.135 2016-07-03 18:43:43 aralbrec Exp $
  */
 
 
@@ -117,6 +117,7 @@ static int             mapon = 0;
 static int             globaldefon = 0;
 static int             preprocessonly = 0;
 static int             relocate = 0;
+static int             relocinfo = 0;
 static int             crtcopied = 0;    /* Copied the crt0 code over? */
 static int             c_print_specs = 0;
 static int             c_zorg = -1;
@@ -358,7 +359,8 @@ static arg_t     myargs[] = {
     {"Cs", AF_MORE, AddToArgs, &sdccarg, NULL, "Add an option to sdcc"},
 
     {"E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, NULL, "Only preprocess files"},
-    {"R", AF_BOOL_TRUE, SetBoolean, &relocate, NULL, "Generate relocatable code"},
+    {"R", AF_BOOL_TRUE, SetBoolean, &relocate, NULL, "Generate relocatable code (deprecated)"},
+    {"-reloc-info", AF_BOOL_TRUE, SetBoolean, &relocinfo, NULL, "Generate binary file relocation information"},
     {"D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option"},
     {"U", AF_MORE, AddPreProc, NULL, NULL, "Undefine a preprocessor option"},
     {"I", AF_MORE, AddPreProc, NULL, NULL, "Add an include directory for the preprocessor"},
@@ -509,7 +511,7 @@ int linkthem(char *linker)
     }
 
     linkargs_mangle(linkargs);
-    len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s", 
+    len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
             linker, 
             (c_nostdlib == 0) ? c_linkopts : " -b -d -Mo ", 
             linker_output_separate_arg ? " " : "", 
@@ -521,6 +523,7 @@ int linkthem(char *linker)
             globaldefon ? "-g " : "",
             mapon ? "-m " : "",
             (createapp || symbolson) ? "-s ": "",
+            relocinfo ? "--reloc-info " : "",
             c_crt0,
             ext);
             
