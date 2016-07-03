@@ -1,4 +1,4 @@
-	XLIB _testtxt_apk
+	PUBLIC _testtxt_apk
 
 ._testtxt_apk
 	BINARY	"testtxt.apk"

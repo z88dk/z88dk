@@ -1,4 +1,4 @@
-	XLIB _pong_graphics
+	PUBLIC _pong_graphics
 
 ._pong_graphics
 	BINARY	"numbers.til"

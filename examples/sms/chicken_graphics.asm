@@ -1,4 +1,4 @@
-	XLIB _chicken_graphics
+	PUBLIC _chicken_graphics
 
 ._chicken_graphics
 	BINARY	"road.til"
