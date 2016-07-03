@@ -54,3 +54,14 @@ stdio/obj/net/zsock/fflush_net.o
 stdio/obj/net/zsock/fgetc_net.o
 stdio/obj/net/zsock/fputc_net.o
 stdio/obj/net/zsock/opennet.o
+stdio/obj/net/scanf_ungetc
+stdio/obj/net/scanf_getc
+stdio/obj/net/asm_scanf
+stdio/obj/net/sscanf
+stdio/obj/net/vfscanf
+stdio/obj/net/scanf
+stdio/obj/net/vsscanf
+stdio/obj/net/_sscanf
+stdio/obj/net/_vfscanf
+stdio/obj/net/_scanf
+stdio/obj/net/_vsscanf

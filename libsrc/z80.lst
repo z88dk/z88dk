@@ -1,15 +1,10 @@
-assert/assert
+assert/obj/assert
 @ctype/ctype.lst
-printflike/fscanf
 printflike/itod
 printflike/itou
 printflike/itox
 printflike/ltoa_any
-printflike/scanf
-printflike/sscanf
 printflike/utoi
-printflike/vfscanf
-printflike/vsscanf
 setjmp/longjmp
 setjmp/setjmp
 @stdlib/stdlib.lst

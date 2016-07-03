@@ -48,3 +48,14 @@ stdio/obj/sprintf_outc.o
 stdio/obj/ungetc.o
 stdio/obj/vfprintf.o
 stdio/obj/vsnprintf.o
+stdio/obj/scanf_ungetc
+stdio/obj/scanf_getc
+stdio/obj/asm_scanf
+stdio/obj/sscanf
+stdio/obj/vfscanf
+stdio/obj/scanf
+stdio/obj/vsscanf
+stdio/obj/_sscanf
+stdio/obj/_vfscanf
+stdio/obj/_scanf
+stdio/obj/_vsscanf
