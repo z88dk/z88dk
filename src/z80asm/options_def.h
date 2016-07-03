@@ -45,46 +45,6 @@ OPT_VAR(UT_array *,	lib_path,	NULL )		/* path for library files */
 OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 
 /*-----------------------------------------------------------------------------
-*   define help text
-*----------------------------------------------------------------------------*/
-#define OPT_HELP_HELP			"Show help options"
-#define OPT_HELP_VERBOSE		"Be verbose"
-
-#define OPT_HELP_ASM_EXT		"Assembly file extension excluding '" FILEEXT_SEPARATOR "'"
-#define OPT_HELP_OBJ_EXT		"Object file extension excluding '" FILEEXT_SEPARATOR "'"
-#define OPT_HELP_BIN_FILE		"Output binary file"
-
-#define OPT_HELP_CPU_RCM2000	"Assemble for RCM2000/RCM3000 series of Z80-like CPU"
-#define OPT_HELP_TI83PLUS		"Interpret 'Invoke' as RST 28h"
-#define OPT_HELP_SWAP_IX_IY		"Swap IX and IY registers"
-#define OPT_HELP_LINE_MODE		"Enable LINE directive"
-
-#define OPT_HELP_MAKE_BIN		"Assemble and link/relocate to file" FILEEXT_BIN
-#define OPT_HELP_SPLIT_BIN		"Create one binary file per section"
-
-#define OPT_HELP_DATE_STAMP		"Assemble only updated files"
-
-#define OPT_HELP_ORIGIN			"Relocate binary file to given address"
-
-#define OPT_HELP_RELOCATABLE	"Create relocatable code"
-
-#define OPT_HELP_SYMTABLE		"Create symbol table file" FILEEXT_SYM
-
-#define OPT_HELP_LIST			"Create listing file" FILEEXT_LST
-
-#define OPT_HELP_MAP			"Create address map file" FILEEXT_MAP
-
-#define OPT_HELP_GLOBALDEF		"Create global definition file" FILEEXT_DEF
-
-#define OPT_HELP_INC_PATH		"Add directory to include search path"
-#define OPT_HELP_LIB_PATH		"Add directory to library search path"
-#define OPT_HELP_DEFINE			"Define a static symbol"
-
-#define OPT_HELP_MAKE_LIB		"Create a library file" FILEEXT_LIB
-#define OPT_HELP_USE_LIB		"Link library file" FILEEXT_LIB
-
-
-/*-----------------------------------------------------------------------------
 *   define options
 *----------------------------------------------------------------------------*/
 #ifndef OPT_TITLE
@@ -95,53 +55,43 @@ OPT_VAR(UT_array  *, files, 	NULL)		/* list of input files */
 #define OPT(type, arg, short_opt, long_opt, help_text, help_arg)
 #endif
 
-OPT_TITLE(	"Help Options:"	)
-OPT( OptCall,	exit_help,		"-h", 	"--help",			OPT_HELP_HELP, "" )
-OPT( OptSet,	&opts.verbose,	"-v", 	"--verbose", 		OPT_HELP_VERBOSE, "" )
+OPT_TITLE("Help Options:")
+OPT(OptCall, exit_help, "-h", "--help", "Show help options", "")
+OPT(OptSet, &opts.verbose, "-v", "--verbose", "Be verbose", "")
 
-OPT_TITLE(	"Input / Output File Options:"	)
-OPT( OptString,	&opts.asm_ext,	"-e", 	"--asm-ext", 		OPT_HELP_ASM_EXT, "EXT" )
-OPT( OptString,	&opts.obj_ext,	"-M", 	"--obj-ext", 		OPT_HELP_OBJ_EXT, "EXT" )
-OPT( OptString,	&opts.bin_file,	"-o", 	"--output", 		OPT_HELP_BIN_FILE, "FILE" )
+OPT_TITLE("Input / Output File Options:")
+OPT(OptString, &opts.asm_ext, "-e", "--asm-ext", "Assembly file extension excluding '" FILEEXT_SEPARATOR "'", "EXT")
+OPT(OptString, &opts.obj_ext, "-M", "--obj-ext", "Object file extension excluding '" FILEEXT_SEPARATOR "'", "EXT")
+OPT(OptString, &opts.bin_file, "-o", "--output", "Output binary file", "FILE")
 
-OPT_TITLE(	"Code Generation Options:" )
-OPT( OptCall,	option_cpu_RCM2000,
-     "-RCMX000", "--RCMX000",	OPT_HELP_CPU_RCM2000, "" )
-OPT( OptSet,	&opts.ti83plus,	"-plus", "--ti83plus",		OPT_HELP_TI83PLUS, "" )
-OPT( OptSet,	&opts.swap_ix_iy,
-     "-IXIY", "--swap-ix-iy",		OPT_HELP_SWAP_IX_IY, "" )
-OPT( OptSet,	&opts.line_mode,
-     "-C",	"--line-mode",		OPT_HELP_LINE_MODE, "" )
+OPT_TITLE("Code Generation Options:")
+OPT(OptCall, option_cpu_RCM2000, "-RCMX000", "--RCMX000", "Assemble for RCM2000/RCM3000 series of Z80-like CPU", "")
+OPT(OptSet, &opts.ti83plus, "-plus", "--ti83plus", "Interpret 'Invoke' as RST 28h", "")
+OPT(OptSet, &opts.swap_ix_iy, "-IXIY", "--swap-ix-iy", "Swap IX and IY registers", "")
+OPT(OptSet, &opts.line_mode, "-C", "--line-mode", "Enable LINE directive", "")
 
-OPT_TITLE(	"Environment:"	)
-OPT( OptStringList,	&opts.inc_path,	"-I", "--inc-path",		OPT_HELP_INC_PATH, "PATH" )
-OPT( OptStringList,	&opts.lib_path,	"-L", "--lib-path",		OPT_HELP_LIB_PATH, "PATH" )
-OPT( OptCallArg,	option_define,	"-D", "--define",		OPT_HELP_DEFINE, "SYMBOL" )
+OPT_TITLE("Environment:")
+OPT(OptStringList, &opts.inc_path, "-I", "--inc-path", "Add directory to include search path", "PATH")
+OPT(OptStringList, &opts.lib_path, "-L", "--lib-path", "Add directory to library search path", "PATH")
+OPT(OptCallArg, option_define, "-D", "--define", "Define a static symbol", "SYMBOL")
 
-OPT_TITLE(	"Libraries:"	)
-OPT( OptCallOptArg, option_make_lib, "-x", 	"--make-lib", 		OPT_HELP_MAKE_LIB, "[FILE]" )
-OPT( OptCallOptArg, option_use_lib,	 "-i", 	"--use-lib", 		OPT_HELP_USE_LIB,  "[FILE]" )
+OPT_TITLE("Libraries:")
+OPT(OptCallOptArg, option_make_lib, "-x", "--make-lib", "Create a library file" FILEEXT_LIB, "[FILE]")
+OPT(OptCallOptArg, option_use_lib, "-i", "--use-lib", "Link library file" FILEEXT_LIB, "[FILE]")
 
+OPT_TITLE("Binary Output:")
+OPT(OptSet, &opts.make_bin, "-b", "--make-bin", "Assemble and link/relocate to file" FILEEXT_BIN, "")
+OPT(OptSet, &opts.split_bin, "", "--split-bin", "Create one binary file per section", "")
+OPT(OptSet, &opts.date_stamp, "-d", "--date-stamp", "Assemble only updated files", "")
+OPT(OptCallArg, option_origin, "-r", "--origin", "Relocate binary file to given address", "ORG_HEX")
+OPT(OptSet, &opts.relocatable, "-R", "--relocatable", "Create relocatable code", "")
+OPT(OptSet, &opts.reloc_info, "", "--reloc-info", "Geneate binary file relocation information", "")
 
-OPT_TITLE(	"Binary Output:" )
-OPT( OptSet,	&opts.make_bin,	"-b", 	"--make-bin", 		OPT_HELP_MAKE_BIN, "" )
-
-OPT( OptSet,	&opts.split_bin, "", "--split-bin", OPT_HELP_SPLIT_BIN, "")
-
-OPT( OptSet,	&opts.date_stamp, "-d",  "--date-stamp",    OPT_HELP_DATE_STAMP, "")
-
-OPT( OptCallArg, option_origin,	"-r", 	"--origin",			OPT_HELP_ORIGIN, "ORG_HEX" )
-OPT(OptSet,	&opts.relocatable,	"-R", 	"--relocatable",	OPT_HELP_RELOCATABLE, "" )
-OPT(OptSet, &opts.reloc_info,		"", "--reloc-info", "Geneate binary file relocation information", "")
-	
-OPT_TITLE(	"Output File Options:" )
-OPT( OptSet,	&opts.symtable,	"-s", 	"--symtable", 		OPT_HELP_SYMTABLE, "" )
-
-OPT( OptSet,	&opts.list,		"-l", 	"--list", 			OPT_HELP_LIST, "" )
-
-OPT( OptSet,	&opts.map,		"-m", 	"--map", 			OPT_HELP_MAP, "" )
-
-OPT( OptSet,	&opts.globaldef, "-g", 	"--globaldef", 		OPT_HELP_GLOBALDEF, "" )
+OPT_TITLE("Output File Options:")
+OPT(OptSet, &opts.symtable, "-s", "--symtable", "Create symbol table file" FILEEXT_SYM, "")
+OPT(OptSet, &opts.list, "-l", "--list", "Create listing file" FILEEXT_LST, "")
+OPT(OptSet, &opts.map, "-m", "--map", "Create address map file" FILEEXT_MAP, "")
+OPT(OptSet, &opts.globaldef, "-g", "--globaldef", "Create global definition file" FILEEXT_DEF, "")
 
 /*-----------------------------------------------------------------------------
 *   clear macros
