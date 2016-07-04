@@ -3,26 +3,28 @@
 /* Borrowed from FUZIX project */
 
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 backgammon.c -o backg -create-app
-// zcc +zx -vn -SO3 -startup=4 -clib-sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 backgammon.c -o backg -create-app
+// zcc +zx -vn -SO3 -startup=4 -clib-sdcc_iy --max-allocs-per-node200000 backgammon.c -o backg -create-app
+
+#pragma output CLIB_OPT_PRINTF         = 0x00000401  // printf has %cd enabled only
+#pragma output CLIB_OPT_SCANF          = 0x00000001  // scanf has %d enabled only
 
 #ifdef __SPECTRUM
 
-#pragma output CRT_ORG_CODE          = 30000
-#pragma output REGISTER_SP           = -1
+#pragma output CRT_ORG_CODE = 30000                  // move ORG to 30000
+#pragma output REGISTER_SP  = -1                     // indicate crt should not modify stack location
 
 #endif
 
-#pragma output CRT_ENABLE_COMMAND_LINE = 0
-#pragma output CRT_ENABLE_CLOSE = 0
-#pragma output CLIB_EXIT_STACK_SIZE = 0
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0
-#pragma output CLIB_STDIO_HEAP_SIZE = 0
+#pragma output CLIB_EXIT_STACK_SIZE  = 0             // do not reserve space for registering atexit() functions
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0             // do not create malloc heap
+#pragma output CLIB_STDIO_HEAP_SIZE  = 0             // do not create stdio heap (cannot open files)
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <input.h>
+#include <intrinsic.h>
 
 #define NIL (-1)
 #define MAXGMOV 10
@@ -609,9 +611,7 @@ int main(void)
 	char s[75];
 
 #ifdef __SPECTRUM
-	#asm
-	di
-	#endasm
+	intrinsic_di();
 #endif
 
 	go[5] = NIL;

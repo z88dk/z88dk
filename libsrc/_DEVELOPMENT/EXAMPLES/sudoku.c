@@ -1,4 +1,5 @@
-// press enter after each row, use '0' for unmarked cell
+// SUDOKU PUZZLE SOLVER
+// press enter after each row, use '0' for empty cell
 
 // zcc +cpm -vn -O3 -clib=new sudoku.c -o sudoku -create-app
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 sudoku.c -o sudoku -create-app
@@ -8,12 +9,12 @@
 
 // use -DVERBOSE to print list of steps taken
 
-#pragma output REGISTER_SP = -1
-#pragma output CLIB_EXIT_STACK_SIZE = 0
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0
-#pragma output CLIB_STDIO_HEAP_SIZE = 0
-#pragma output CLIB_FOPEN_MAX = 0
-#pragma output CLIB_OPEN_MAX = 0
+#pragma output CRT_OPT_PRINTF        = 0x00000102    // printf has %uB enabled only
+
+#pragma output REGISTER_SP           = -1            // indicate crt should use default stack location
+#pragma output CLIB_EXIT_STACK_SIZE  = 0             // do not reserve space for registering atexit() functions
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0             // do not create malloc heap
+#pragma output CLIB_STDIO_HEAP_SIZE  = 0             // do not create stdio heap (cannot open files)
 
 #include <stdio.h>
 #include <stdlib.h>

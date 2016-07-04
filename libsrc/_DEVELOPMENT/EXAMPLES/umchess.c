@@ -13,8 +13,13 @@
 /* accepts under-promotions: type 1,2,3 (=R,B,N) after input move          */
 /* (input buffer c[] & *P made global, K and N encoding swapped for this)  */
 
+// make moves in algebraic notation as in "e2e4"
+// blank line causes computer to make a move (be patient!)
+
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 umchess.c -o umchess -lm --fsigned-char -create-app
 // zcc +zx -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 umchess.c -o umchess -lm --fsigned-char -create-app
+
+#pragma output CLIB_OPT_PRINTF = 0x00000400   // printf has %c enabled only
 
 #include <stdio.h>
 #include <intrinsic.h>

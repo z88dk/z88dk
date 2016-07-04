@@ -14,18 +14,22 @@
 // use "-DSCHEME" for scheme variant
 // use "-DNOINIT" to exclude predefined functions
 
+// more information including examples in z88dk/examples/clisp
+
+#pragma output CLIB_OPT_PRINTF         = 0x00001200   // printf has %(ld)s enabled only
+
 #ifdef __SPECTRUM
 
-#pragma output CRT_ORG_CODE          = 30000
-#pragma output REGISTER_SP           = -1
+#pragma output CRT_ORG_CODE            = 30000        // move ORG to 30000
+#pragma output REGISTER_SP             = -1           // indicate crt should not modify stack location
 
 #endif
 
 #pragma output CRT_ENABLE_COMMAND_LINE = 0
-#pragma output CRT_ENABLE_CLOSE = 0
-#pragma output CLIB_EXIT_STACK_SIZE = 0
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0
-#pragma output CLIB_STDIO_HEAP_SIZE = 0
+#pragma output CRT_ENABLE_CLOSE        = 0
+#pragma output CLIB_EXIT_STACK_SIZE    = 0
+#pragma output CLIB_MALLOC_HEAP_SIZE   = 0
+#pragma output CLIB_STDIO_HEAP_SIZE    = 0
 
 #include <stdio.h>
 #include <stdlib.h>
