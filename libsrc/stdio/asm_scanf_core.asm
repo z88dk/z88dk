@@ -10,13 +10,18 @@
 	EXTERN l_long_mult
 	EXTERN l_long_neg
 	EXTERN atoi
+	EXTERN atof
+	EXTERN fa
+	EXTERN l_cmp
+	EXTERN fgetc
+	EXTERN ungetc
 
 ; int vfscanf1(FILE *fp, void __CALLEE__ ungetc_func(int c, FILE *fp), void __CALLEE__ (*getchar_fn)(FILE *fp), int sccz80, unsigned char *fmt,void *ap)
 
 	ld	ix,0
 	add	ix,sp		; Now the frame pointer
 				; ix+2, ix+3 = arg pointer
-	ld	hl,-10		; make some space on the stack
+	ld	hl,-50		; make some space on the stack
 	add	hl,sp
 	ld	sp,hl
 
@@ -24,6 +29,7 @@
         ; -3 = flags [000a*WL0]
 	; -4 = width
 	; -5, -6 = bytes read from stream
+	; -50->-10 = fp number buffer
 	xor	a
 	ld	(ix-1),a
 	ld	(ix-2),a
@@ -33,7 +39,8 @@
         ld      l,(ix+4)        ;format pointer
         ld      h,(ix+5)
 
-loop:
+scanf_loop:
+scanf_fmt_noop:			;noop destination
 	ld	(ix-3),0	;reset flags for each loop
 	ld	a,(hl)
 	and	a
@@ -46,14 +53,14 @@ loop:
 	call	asm_isspace
 	jr	nz, scanf_ordinary_char
 	call	consume_whitespace
-	jr	loop
+	jr	scanf_loop
 
 ; It's an ordinary char
 scanf_ordinary_char:
 	call	scanf_getchar
 	jr	c,scanf_exit
 	cp	c
-	jr	z,loop
+	jr	z,scanf_loop
 	call	scanf_ungetchar
 scanf_exit:
    ; ISO C has us exit with # conversions done
@@ -66,7 +73,7 @@ scanf_exit:
 	ld	e,(ix-1)
 	ld	d,0
 scanf_exit2:
-	ld	hl,10
+	ld	hl,50
 	add	hl,sp
 	ld	sp,hl
 	ex	de,hl
@@ -116,8 +123,8 @@ formatchar:
 	jp	z,handle_c_fmt
 	cp	's'
 	jp	z,handle_s_fmt
-;	cp	'n'
-;	jr	z,handle_n_fmt
+	cp	'n'
+	jr	z,handle_n_fmt
 	cp	'l'
 	jr	nz, not_long_specifier
 	inc	hl
@@ -140,8 +147,10 @@ not_long_specifier:
 	jr	z,handle_o_fmt
 	cp	'b'
 	jr	z,handle_b_fmt
+;	cp	'f'
+;	jp	z,handle_f_fmt
 	cp	'u'
-	jp	nz,loop			;unrecognised format
+	jp	nz,scanf_loop			;unrecognised format
 handle_d_fmt:
 	call	scanf_common_start	;de=argument as necessary
 	jp	c,scanf_exit
@@ -153,7 +162,18 @@ handle_d_fmt_entry_from_i:
 parse_number:
 	call	scanf_ungetchar
 	call	scanf_get_number
-	jp	loop
+	jp	scanf_loop
+
+handle_n_fmt:
+	bit	3,(ix-3)		;suppressed?
+	jp	nz,scanf_loop
+	call	scanf_nextarg
+	ld	a,(ix-5)
+	ld	(de),a
+	inc	de
+	ld	a,(ix-6)
+	ld	(de),a
+	jp	scanf_loop
 
 handle_o_fmt:
 	call	scanf_common_start	;de=argument
@@ -197,19 +217,19 @@ only_0_on_stream:
 	; There's only a zero on the stream, but we've read two characters from
 	; it and we can't push back two, so fudge it a little
         bit     3,(ix-3)
-	jp	nz,loop			;carry on
+	jp	nz,scanf_loop			;carry on
 	inc	(ix-1)			;number of converted arguments
 	xor	a	
 	ld	(de),a
 	inc	de
 	ld	(de),a
 	bit	1,(ix-3)
-	jp	z,loop
+	jp	z,scanf_loop
 	inc	de
 	ld	(de),a
 	inc	de
 	ld	(de),a
-	jp	loop
+	jp	scanf_loop
 
 handle_x_fmt_leader_found:	
 	call	scanf_getchar
@@ -218,7 +238,7 @@ handle_x_fmt_nobase:
 	call	asm_isxdigit
 	jp	c,scanf_exit		;it wasn't a hex digit
 	ld	b,16
-	jr	parse_number
+	jp	parse_number
 
 handle_i_fmt:
 	call	scanf_common_start
@@ -257,7 +277,7 @@ c_fmt_loop:
 	inc	de
 	djnz	c_fmt_loop
 	inc	(ix-1)		;increment number of conversions done
-	jp	loop
+	jp	scanf_loop
 
 handle_s_fmt:
 	bit	3,(ix-3)
@@ -286,17 +306,19 @@ scanf_fmt_s_suppress:
 scanf_fmt_s_done:
 	xor	a
 	bit	3,(ix-1)	;suppress setting
-	jp	nz,loop		
+	jp	nz,scanf_loop		
 	ld	(de),a		;terminating \0
 	inc	(ix-1)		;increase number of conversions done
-	jp	loop
+	jp	scanf_loop
 scanf_fmt_s_success:	
 	call	scanf_ungetchar
 	jr	scanf_fmt_s_done
 
 
 
-; Common start code for formats
+
+
+; Common start code for number formats
 scanf_common_start:
 	bit	3,(ix-3)	; suppressing assignment
 	call	z,scanf_nextarg
@@ -340,20 +362,17 @@ scanf_nextarg_decrement:
 	dec	hl
 	jr	scanf_nextarg_exit
 
-	
+; Exit: a = character	
+; NB: the supplied function must save ix
 scanf_getchar:
 	push	bc		;save callers
 	push	de		;save dest
 	push	hl		;fmt
-	push	ix		;frame pointer
-	ld	c,(ix+12)	;fp
-	ld	b,(ix+13)
-	push	bc
-	ld	bc,scanf_getchar_return
-	push	bc
-	ld	l,(ix+8)
+	ld	l,(ix+8)	;fp
 	ld	h,(ix+9)
-	jp	(hl)
+	push	hl
+	call	fgetc
+	pop	bc
 scanf_getchar_return:
 	ld	a,h	
 	or	l
@@ -366,33 +385,31 @@ scanf_getchar_return:
 	jr	nz,scanf_getchar_return1
 	inc	(ix-5)
 scanf_getchar_return1:
-	pop	ix
 	pop	hl
 	pop	de
 	pop	bc
 	ret
 
 ; a=char to unget
+; NB: the supplied function must save ix
 scanf_ungetchar:
 	push	bc
 	push	de
 	push	hl		;fmt
-	push	ix		;frame pointer
 	dec	(ix-6)
 	jr	nc,scanf_ungetchar1
 	dec	(ix-5)
 scanf_ungetchar1:
-	ld	c,a		;character to unget
-	ld	b,0
+	ld	l,a		;character to unget
+	ld	h,0
+	push	hl
+	ld	c,(ix+8)	;fp
+	ld	b,(ix+9)
 	push	bc
-	ld	c,(ix+12)	;fp
-	ld	b,(ix+13)
-	push	bc
-	ld	bc,scanf_getchar_return1
-	push	bc
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	jp	(hl)
+	call	ungetc
+	pop	bc
+	pop	bc
+	jr	scanf_getchar_return1
 
 ; hl = fmt
 ; de = destination
@@ -477,4 +494,85 @@ scanf_atoul_exit2:
 	ret
 
 
-	
+IF float	
+; Floating point
+; We read from the stream into a temporary buf on the stack and then run atof() on it
+handle_f_fmt:
+	call	scanf_common_start	
+	jp	c,scanf_exit
+	call	scanf_ungetchar
+	push	de		;save destination
+	ld	hl,2
+	add	hl,sp
+	ex	de,hl		;de = our buffer for the number
+	ld	c,0		;[000000E.]
+	bit	0,(ix-3)
+	jr	z,handle_f_fmt_check_width
+	ld	a,'-'
+	ld	(de),a	
+	inc	de
+handle_f_fmt_check_width:
+	ld	a,(ix-4)	;width
+	and	a
+	jr	z,handle_f_fmt_check_width1
+	cp	39		;maximum width
+	jr	c,handle_f_fmt_setup_length
+handle_f_fmt_check_width1:
+	ld	a,39
+handle_f_fmt_setup_length:	
+	ld	b,a
+handle_f_fmt_loop:
+	call	scanf_getchar
+	jr	c,handle_f_fmt_finished_reading
+	cp	'.'
+	jr	nz,handle_f_fmt_check_exponent
+	; It was ., have we already seen one
+	bit	0,c
+	jr	nz,handle_f_fmt_error
+	set	0,c
+	jr	handle_f_fmt_store
+handle_f_fmt_check_exponent:
+	cp	'e'
+	jr	z,handle_f_fmt_check_exponent1
+	cp	'E'
+	jr	nz,handle_f_fmt_check_digit
+handle_f_fmt_check_exponent1:
+	bit	1,c			;have we seen one already?
+	jr	nz,handle_f_fmt_error
+	set	1,c
+	jr	handle_f_fmt_store
+handle_f_fmt_check_digit:
+	call	asm_isdigit
+	jr	nc,handle_f_fmt_store
+	call	scanf_ungetchar
+	jr	handle_f_fmt_finished_reading
+handle_f_fmt_store:
+	ld	(de),a
+	inc	de
+	djnz	handle_f_fmt_loop
+handle_f_fmt_finished_reading:
+	xor	a
+	ld	(de),a
+	ld	hl,2
+	add	hl,sp
+	call	l_cmp
+	jr	z,handle_f_fmt_error
+	; TODO: Check there's something there
+	ld	hl,2		;we have the destination on the stack
+	add	hl,sp
+	push	ix		;save our framepointer - fp library will disturb it
+	push	hl
+	call	atof
+	pop	bc
+	pop	ix		;get our framepointer back
+	ld	hl,fa
+	pop	de		;destination
+	ld	bc,6		;48 bits of floating point number
+	ldir
+	inc	(ix-1)		;increase number of conversions
+	jp	scanf_loop
+handle_f_fmt_error:
+	call	scanf_ungetchar
+	pop	de		;discard destinatino
+	jp	scanf_exit
+ENDIF

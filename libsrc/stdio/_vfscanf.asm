@@ -25,17 +25,11 @@ _vfscanf:
 
 	push	ix	;save callers
 	push	hl	;fp
-	ld	hl,scanf_ungetc
-	push	hl
-	ld	hl,scanf_getc
-	push	hl
 	ld	hl,0	;sdcc mode
 	push	hl
 	push	de	;fmt
 	push	bc	;ap
 	call	asm_scanf
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc

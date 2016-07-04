@@ -14,7 +14,7 @@
 ; sccz80 version
 ;void sscanf(char *buf, char *fmt,...)
 ;{
-;        asm_scanf(fp, ungetc, getc, sccz80_delta, *ct,ct-1);
+;        asm_scanf(fp, sccz80_delta, *ct,ct-1);
 ;}
 sscanf:
 	ld	l,a
@@ -34,10 +34,6 @@ sscanf:
 	ld	hl,0
 	add	hl,sp
 	push	hl		;fp
-	ld	bc,scanf_ungetc
-	push	bc
-	ld	bc,scanf_getc
-	push	bc
 	ld	bc,1		;sccz80
 	push	bc
 	ex	de,hl		;hl=&fmt+1
@@ -50,11 +46,12 @@ sscanf:
 	dec	hl
 	push	hl		;&ap
 	call	asm_scanf
-	ex	de,hl
-	ld	hl,12+4
-	add	hl,sp
-	ld	sp,hl
-	ex	de,hl
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
 	pop	ix
 	ret
 

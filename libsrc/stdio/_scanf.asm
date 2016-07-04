@@ -24,17 +24,11 @@ _scanf:
 	push	ix	;save ix
 	ld	bc,__sgoioblk	;stdin
 	push	bc
-	ld	bc,scanf_ungetc
-	push	bc
-	ld	bc,scanf_getc
-	push	bc
 	ld	bc,0	;flag
 	push	bc
 	push	de	;fmt
 	push	hl	;argument
 	call	asm_scanf
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	bc	
 	pop	bc

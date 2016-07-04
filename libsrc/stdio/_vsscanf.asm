@@ -30,10 +30,6 @@ _vsscanf:
 	ld	hl,0
 	add	hl,sp		;&fp
 	push	hl
-	ld	hl,scanf_ungetc
-	push	hl
-	ld	hl,scanf_getc
-	push	hl
 	ld	hl,0	;sdcc mode
 	push	hl
 	ex	de,hl
@@ -48,11 +44,12 @@ _vsscanf:
 	inc	hl
 	push	bc	;ap
 	call	asm_scanf
-        ex      de,hl
-        ld      hl,12 + 4
-        add     hl,sp
-        ld      sp,hl
-        ex      de,hl
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
         pop     ix
 	ret
 

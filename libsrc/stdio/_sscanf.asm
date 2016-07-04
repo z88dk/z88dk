@@ -30,10 +30,6 @@ _sscanf:
 	ld	hl,0
 	add	hl,sp
 	push	hl		;fp
-	ld	bc,scanf_ungetc
-	push	bc
-	ld	bc,scanf_getc
-	push	bc
 	ld	bc,0		;sdcc
 	push	bc
 	ex	de,hl		;hl=&fmt
@@ -44,11 +40,12 @@ _sscanf:
 	push	bc
 	push	hl		;&ap
 	call	asm_scanf
-	ex	de,hl
-	ld	hl,12+4
-	add	hl,sp
-	ld	sp,hl
-	ex	de,hl
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
 	pop	ix
 	ret
 

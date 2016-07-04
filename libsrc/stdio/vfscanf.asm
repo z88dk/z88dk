@@ -27,17 +27,11 @@ vfscanf:
 	push	ix	;save callers
 
 	push	bc	;fp
-	ld	bc,scanf_ungetc
-	push	bc
-	ld	bc,scanf_getc
-	push	bc
 	ld	bc,1		;sccz80
 	push	bc
 	push	de		;fmt
 	push	hl		;ap
 	call	asm_scanf
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc
