@@ -9,7 +9,9 @@
 ;
 ; ===============================================================
 
+IFNDEF DEFINED_CLIB_OPT_SCANF
 INCLUDE "clib_cfg.asm"
+ENDIF
 
 SECTION code_clib
 SECTION code_stdio
@@ -19,12 +21,7 @@ PUBLIC asm0_vfscanf_unlocked, asm1_vfscanf_unlocked
 
 EXTERN __stdio_verify_input, __stdio_scanf_sm_format, __stdio_recv_input_eatc
 EXTERN __stdio_scanf_sm_format_pct, error_einval_zc
-
-IF __CLIB_OPT_SCANF != 0
-
 EXTERN __stdio_nextarg_bc, __stdio_length_modifier, error_erange_zc, l_atou
-
-ENDIF
 
 asm_vfscanf_unlocked:
 
