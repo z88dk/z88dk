@@ -94,7 +94,7 @@ ENDIF
    ; de = char *format
    ; stack = WORKSPACE_40, stack_param
 
-format_loop:
+format_loop_scanf:
    
    ; MATCH STREAM CHARS UNTIL '%' OR '\0'
    
@@ -107,24 +107,24 @@ format_loop:
 
    exx
 
-percent_join:
+percent_join_scanf:
 
    ld a,(de)
-   jr c, possible_error
+   jr c, possible_error_scanf
    
    ;  a = next char of format string
    ; de = char *format (address of next char)
    ; stack = WORKSPACE_40, stack_param
       
    cp '%'
-   jr z, possible_conversion_0
+   jr z, possible_conversion_0_scanf
 
    or a
-   jr nz, mismatch_error
+   jr nz, mismatch_error_scanf
    
    ; reached end of format string
 
-exit_success:
+exit_success_scanf:
 
 IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && __SDCC)
 
@@ -144,11 +144,11 @@ ENDIF
    or a                        ; indicate success
    ret
 
-mismatch_error:
+mismatch_error_scanf:
 
    call error_einval_zc
 
-exit_failure:
+exit_failure_scanf:
 
 IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && _SDCC)
 
@@ -168,16 +168,16 @@ ENDIF
    scf                         ; indicate failure
    ret
 
-possible_error:
+possible_error_scanf:
 
    ; stream error occurred
    ; if end of format string reached no one cares
    
    or a
-   jr z, exit_success
-   jr exit_failure
+   jr z, exit_success_scanf
+   jr exit_failure_scanf
 
-possible_conversion_0:
+possible_conversion_0_scanf:
 
    ; format contains %, check for %%
    
@@ -185,11 +185,11 @@ possible_conversion_0:
    ld a,(de)
    
    cp '%'
-   jr nz, possible_conversion_1
+   jr nz, possible_conversion_1_scanf
    
    ; format contains %% so must consume % from stream
 
-stream_consume_pct:
+stream_consume_pct_scanf:
 
    ld b,1
    ld hl,__stdio_scanf_sm_format_pct  ; enter format state machine at percent
@@ -200,36 +200,36 @@ stream_consume_pct:
    call __stdio_recv_input_eatc
 
    exx
-   djnz percent_join           ; if % was seen on stream
+   djnz percent_join_scanf           ; if % was seen on stream
    
-   jr mismatch_error
+   jr mismatch_error_scanf
 
 
 IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && __SDCC)
 
-error_format_width:
+error_format_width_scanf:
 
    ; stack = WORKSPACE_40, stack_param, void *p
    
    pop hl
    call error_erange_zc
-   jr exit_failure
+   jr exit_failure_scanf
 
-assignment_suppressed:
+assignment_suppressed_scanf:
 
    inc de                      ; consume the '*'
    ld bc,0                     ; void *p = 0
-   jr suppressed_rejoin
+   jr suppressed_rejoin_scanf
 
 ENDIF
 
 
-possible_conversion_1:
+possible_conversion_1_scanf:
 
    ; only one % in format string
    
    or a
-   jr z, stream_consume_pct    ; if format string ends in %
+   jr z, stream_consume_pct_scanf    ; if format string ends in %
 
 
 IF (__CLIB_OPT_SCANF = 0) && ((__CLIB_OPT_SCANF_2 = 0) || __SCCZ80)
@@ -239,7 +239,7 @@ IF (__CLIB_OPT_SCANF = 0) && ((__CLIB_OPT_SCANF_2 = 0) || __SCCZ80)
    
    ; de = address char after % in char *format
    
-   jr mismatch_error
+   jr mismatch_error_scanf
 
 ELSE
 
@@ -255,7 +255,7 @@ ELSE
    ; CHECK FOR ASSIGNMENT SUPPRESSION
    
    cp '*'
-   jr z, assignment_suppressed
+   jr z, assignment_suppressed_scanf
 
    ; read void *p from stack params
    
@@ -264,7 +264,7 @@ ELSE
    
    push hl
 
-suppressed_rejoin:
+suppressed_rejoin_scanf:
 
    push bc
 
@@ -274,7 +274,7 @@ suppressed_rejoin:
    ; READ OPTIONAL WIDTH
    
    call l_atou
-   jr c, error_format_width    ; if overflow
+   jr c, error_format_width_scanf    ; if overflow
    
    push hl                     ; save width (0 = default)
    
@@ -320,7 +320,7 @@ suppressed_rejoin:
    ; identify conversion "B[cdiInopsux"
    ; long modifies "Bdinopux" not "[cIs"
    
-   jr nc, spec_long
+   jr nc, spec_long_scanf
    
    ; no long modifier
 
@@ -331,21 +331,21 @@ IF __CLIB_OPT_SCANF & $200000
 
 ENDIF
 
-   call spec_unmodified
+   call spec_unmodified_scanf
 
    ; RETURN FROM CONVERSION
 
    ; stack = WORKSPACE_40, stack_param, char *format
    ; carry set on error
 
-spec_return:
+spec_return_scanf:
 
    pop de                      ; de = char *format
-   jp nc, format_loop
+   jp nc, format_loop_scanf
    
-   jr exit_failure
+   jr exit_failure_scanf
 
-spec_unmodified:
+spec_unmodified_scanf:
 
 IF __CLIB_OPT_SCANF & $01
 
@@ -411,7 +411,7 @@ IF __CLIB_OPT_SCANF & $100
 
 ENDIF
 
-spec_constant:
+spec_constant_scanf:
 
 IF __CLIB_OPT_SCANF & $200
 
@@ -445,20 +445,20 @@ ENDIF
    pop de                      ; de = char *format
    
    dec de                      ; move back to unknown conversion char
-   jp mismatch_error
+   jp mismatch_error_scanf
 
-spec_long:
+spec_long_scanf:
 
-   jr nz, longlong_spec
+   jr nz, longlong_spec_scanf
 
-long_spec:
+long_spec_scanf:
 
    ; long modifier
 
-   call __spec_long
-   jr spec_return
+   call __spec_long_scanf
+   jr spec_return_scanf
 
-__spec_long:
+__spec_long_scanf:
 
 IF __CLIB_OPT_SCANF & $1000
 
@@ -524,7 +524,7 @@ IF __CLIB_OPT_SCANF & $100000
 
 ENDIF
 
-   jr spec_constant
+   jr spec_constant_scanf
    
 IF __CLIB_OPT_SCANF & $200000
 
@@ -545,16 +545,16 @@ _scanf_bkt:
    push bc                     ; replace with valid one
    exx
 
-   jr spec_return
+   jr spec_return_scanf
 
 ENDIF
 
-longlong_spec:
+longlong_spec_scanf:
 
-   call __spec_longlong
-   jp spec_return
+   call __spec_longlong_scanf
+   jp spec_return_scanf
 
-__spec_longlong:
+__spec_longlong_scanf:
 
 IF __CLIB_OPT_SCANF_2 && __SDCC
 
@@ -600,6 +600,6 @@ ENDIF
 
 ENDIF
 
-   jr spec_constant
+   jr spec_constant_scanf
 
 ENDIF

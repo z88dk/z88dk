@@ -44,7 +44,7 @@ asm_vfprintf_unlocked:
    ;
    ;            eacces = stream not open for writing
    ;            eacces = stream is in an error state
-   ;            erange = width or precision out of range
+   ;            erange = width or precision_printf out of range
    ;            einval = unknown printf conversion
    ;
    ;            more errors may be set by underlying driver
@@ -86,7 +86,7 @@ ENDIF
 ;******************************
 ; * FORMAT STRING LOOP ********
 
-format_loop:
+format_loop_printf:
 
    ; de = char *format
    ; stack = WORKSPACE_44, stack_param
@@ -94,7 +94,7 @@ format_loop:
    ld l,e
    ld h,d
 
-__format_loop:
+__format_loop_printf:
 
    ld c,'%'
    call asm_strchrnul
@@ -117,11 +117,11 @@ __format_loop:
 
 IF (__CLIB_OPT_PRINTF = 0) && ((__CLIB_OPT_PRINTF_2 = 0) || __SCCZ80)
 
-   jr c, error_stream          ; if stream error
+   jr c, error_stream_printf          ; if stream error
 
 ELSE
 
-   jp c, error_stream          ; if stream error
+   jp c, error_stream_printf          ; if stream error
 
 ENDIF
    
@@ -131,13 +131,13 @@ ENDIF
 
    ld a,(de)
    or a
-   jr z, format_end            ; if stopped on string terminator
+   jr z, format_end_printf            ; if stopped on string terminator
    
    inc de                      ; next format char to examine
    
    ld a,(de)
    cp '%'
-   jr nz, interpret
+   jr nz, interpret_printf
    
    ; %%
    
@@ -145,9 +145,9 @@ ENDIF
    ld h,d
    
    inc hl                      ; next char to examine is past %%
-   jr __format_loop
+   jr __format_loop_printf
 
-format_end:
+format_end_printf:
 
    ; de = address of format char '\0'
    ; stack = WORKSPACE_44, stack_param
@@ -175,12 +175,12 @@ IF (__CLIB_OPT_PRINTF = 0) && ((__CLIB_OPT_PRINTF_2 = 0) || __SCCZ80)
    ; completely disable % logic
    ; printf can only be used to output format text
    
-interpret:
+interpret_printf:
    
    ; de = address of format char after '%'
 
    call error_einval_zc
-;;;;   jr error_stream             ; could probably just fall through but let's be safe
+;;;;   jr error_stream_printf             ; could probably just fall through but let's be safe
 
 ENDIF
 
@@ -190,7 +190,7 @@ IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ; regular % processing
 
-flag_chars:
+flag_chars_printf:
 
    defb '+', $40
    defb ' ', $20
@@ -198,7 +198,7 @@ flag_chars:
    defb '0', $08
    defb '-', $04
 
-interpret:
+interpret_printf:
 
    dec de
    ld c,0
@@ -206,7 +206,7 @@ interpret:
 ;******************************
 ; * FLAGS FIELD ***************
 
-flags:
+flags_printf:
 
    ; consume optional flags "-+ #0"
    ; default flags is none set
@@ -219,25 +219,25 @@ flags:
       
    ld a,(de)
 
-   ld hl,flag_chars
+   ld hl,flag_chars_printf
    ld b,5
 
-flags_id:
+flags_id_printf:
 
    cp (hl)
    inc hl
    
-   jr z, flag_found
+   jr z, flag_found_printf
 
    inc hl
-   djnz flags_id
+   djnz flags_id_printf
    
    ld (ix+5),c                 ; store conversion_flags
 
 ;******************************
-; * WIDTH FIELD ***************
+; * width FIELD ***************
 
-width:
+width_printf:
 
    ; consume optional width specifier
    ; default width is zero
@@ -247,7 +247,7 @@ width:
    ; stack = WORKSPACE_44, stack_param
 
    cp '*'
-   jr nz, width_from_format
+   jr nz, width_from_format_printf
    
    ; asterisk means width comes from parameter list
    
@@ -267,14 +267,14 @@ width:
    ; stack = WORKSPACE_44, address of next format char to examine
    
    bit 7,h
-   jr z, width_positive
+   jr z, width_positive_printf
 
    ; negative field width
    
    call l_neg_hl               ; width made positive
    set 2,(ix+5)                ; '-' flag set
 
-width_positive:
+width_positive_printf:
 
    ex (sp),hl
    ex de,hl
@@ -283,18 +283,18 @@ width_positive:
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, width, stack_param
 
-   jr precision
+   jr precision_printf
 
-flag_found:
+flag_found_printf:
 
    ld a,(hl)
    
    or c
    ld c,a
    
-   jr flags
+   jr flags_printf
 
-width_from_format:
+width_from_format_printf:
 
    ; read width from format string, default = 0
 
@@ -302,40 +302,40 @@ width_from_format:
    ; stack = WORKSPACE_44, stack_param
    
    call l_atou                 ; hl = width
-   jp c, error_format_width    ; width out of range
+   jp c, error_format_width_printf    ; width out of range
 
    bit 7,h
-   jp nz, error_format_width   ; width out of range
+   jp nz, error_format_width_printf   ; width out of range
 
    ex (sp),hl
    push hl
 
 ;******************************
-; * PRECISION FIELD ***********
+; * precision_printf FIELD ***********
 
-precision:
+precision_printf:
 
-   ; consume optional precision specifier
-   ; default precision is one
+   ; consume optional precision_printf specifier
+   ; default precision_printf is one
 
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, width, stack_param
 
-   ld hl,1                     ; default precision
+   ld hl,1                     ; default precision_printf
    
    ld a,(de)
 
    cp '.'
-   jr nz, end_precision
+   jr nz, end_precision_printf
 
-   set 0,(ix+5)                ; indicate precision is specified
+   set 0,(ix+5)                ; indicate precision_printf is specified
    inc de                      ; consume '.'
    
    ld a,(de)
    cp '*'
-   jr nz, precision_from_format
+   jr nz, precision_from_format_printf
    
-   ; asterisk means precision comes from parameter list
+   ; asterisk means precision_printf comes from parameter list
 
    pop hl
    
@@ -345,48 +345,48 @@ precision:
    ; hl = stack_param
    ; stack = WORKSPACE_44, width, address of next format char to examine
    
-   call __stdio_nextarg_de     ; de = precision
+   call __stdio_nextarg_de     ; de = precision_printf
    ex de,hl
 
-   ; hl = precision
+   ; hl = precision_printf
    ; de = stack_param
    ; stack = WORKSPACE_44, width, address of next format char to examine
    
    bit 7,h
-   jr z, precision_positive
+   jr z, precision_positive_printf
 
-   ; negative precision means precision is ignored
+   ; negative precision_printf means precision_printf is ignored
    
-   ld hl,1                     ; precision takes default value
-   res 0,(ix+5)                ; indicate precision is not specified
+   ld hl,1                     ; precision_printf takes default value
+   res 0,(ix+5)                ; indicate precision_printf is not specified
 
-precision_positive:
+precision_positive_printf:
 
    ex (sp),hl
    ex de,hl
    push hl
    
    ; de = address of next format char to examine
-   ; stack = WORKSPACE_44, width, precision, stack_param
+   ; stack = WORKSPACE_44, width, precision_printf, stack_param
 
-   jr length_modifier
+   jr length_modifier_printf
 
-precision_from_format:
+precision_from_format_printf:
 
-   ; read precision from format string
+   ; read precision_printf from format string
 
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, width, stack_param
 
-   call l_atou                   ; hl = precision
-   jp c, error_format_precision  ; precision out of range
+   call l_atou                   ; hl = precision_printf
+   jp c, error_format_precision_printf  ; precision_printf out of range
 
    bit 7,h
-   jp nz, error_format_precision ; precision out of range
+   jp nz, error_format_precision_printf ; precision_printf out of range
 
-end_precision:
+end_precision_printf:
 
-   ; hl = precision
+   ; hl = precision_printf
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, width, stack_param
 
@@ -396,26 +396,26 @@ end_precision:
 ;******************************
 ; * LENGTH MODIFIER ***********
 
-length_modifier:
+length_modifier_printf:
 
    ; consume optional length modifier
 
    ; de = address of next format char to examine
-   ; stack = WORKSPACE_44, width, precision, stack_param
+   ; stack = WORKSPACE_44, width, precision_printf, stack_param
 
    call __stdio_length_modifier
 
 ;******************************
 ; * CONVERSION SPECIFIER ******
 
-converter_specifier:
+converter_specifier_printf:
 
    ; identify conversion "aABcdeEfFgGinopsuxIX"
    ; long modifies "BdinopuxX" not "aAceEfFgGsI"
    
    ; de = address of next format char to examine
    ;  c = length modifier id
-   ; stack = WORKSPACE_44, width, precision, stack_param
+   ; stack = WORKSPACE_44, width, precision_printf, stack_param
 
    ld a,(de)                   ; a = specifier
    inc de
@@ -435,32 +435,32 @@ ENDIF
 
    ; carry must be reset here
 
-   jr nc, long_spec            ; if long or longlong modifier selected
+   jr nc, long_spec_printf            ; if long or longlong modifier selected
 
    ;;; without long spec
 
 IF __CLIB_OPT_PRINTF & $1ff
 
-   ld hl,rcon_tbl              ; converters without long spec
-   call match_con
+   ld hl,rcon_tbl_printf              ; converters without long spec
+   call match_con_printf
    jr c, printf_return_is_2
 
 ENDIF
 
-common_spec:
+common_spec_printf:
 
 IF __CLIB_OPT_PRINTF & $600
 
-   ld hl,acon_tbl              ; converters independent of long spec
-   call match_con
+   ld hl,acon_tbl_printf              ; converters independent of long spec
+   call match_con_printf
    jr c, printf_return_is_2
 
 ENDIF
 
 IF __CLIB_OPT_PRINTF & $3fc00000
 
-   ld hl,fcon_tbl              ; float converters are independent of long spec
-   call match_con
+   ld hl,fcon_tbl_printf              ; float converters are independent of long spec
+   call match_con_printf
 
    IF __SDCC | __SDCC_IX | __SDCC_IY
    
@@ -476,52 +476,52 @@ ENDIF
    
    ;;; converter unrecognized
 
-unrecognized:
+unrecognized_printf:
 
    ; de = address of next format char to examine
-   ; stack = WORKSPACE_44, width, precision, stack_param
+   ; stack = WORKSPACE_44, width, precision_printf, stack_param
 
    call error_einval_zc        ; set errno
    
    ld hl,50
-   jp __error_stream
+   jp __error_stream_printf
 
 IF __CLIB_OPT_PRINTF_2 && __SDCC
 
    ;;; with longlong spec
 
-longlong_spec:
+longlong_spec_printf:
 
-   ld hl,llcon_tbl             ; converters with longlong spec
-   call match_con
+   ld hl,llcon_tbl_printf             ; converters with longlong spec
+   call match_con_printf
 
    jr c, printf_return_is_8
-   jr common_spec
+   jr common_spec_printf
       
 ENDIF
 
    ;;; with long spec
 
-long_spec:
+long_spec_printf:
    
 IF __CLIB_OPT_PRINTF_2 && __SDCC
 
-   jr nz, longlong_spec
+   jr nz, longlong_spec_printf
 
 ELSE
 
-   jr nz, common_spec
+   jr nz, common_spec_printf
 
 ENDIF
 
 IF __CLIB_OPT_PRINTF & $1ff000
 
-   ld hl,lcon_tbl              ; converters with long spec
-   call match_con
+   ld hl,lcon_tbl_printf              ; converters with long spec
+   call match_con_printf
 
 ENDIF
 
-   jr nc, common_spec
+   jr nc, common_spec_printf
 
    ;;; conversion matched
 
@@ -579,19 +579,19 @@ printf_invoke_flags:
    ; hl = & printf converter
    ; bc = return address after conversion
    ; de = address of next format char to examine
-   ; stack = WORKSPACE_44, width, precision, stack_param
+   ; stack = WORKSPACE_44, width, precision_printf, stack_param
 
    bit 5,a
-   jr z, skip_00
+   jr z, skip_00_printf
    set 1,(ix+5)                ; indicates octal conversion
 
-skip_00:
+skip_00_printf:
 
    bit 4,a
-   jr z, skip_11
+   jr z, skip_11_printf
    res 4,(ix+5)                ; suppress base indicator
 
-skip_11:
+skip_11_printf:
 
    and $c0
    ld (ix+4),a                 ; capitalize & signed conversion indicators
@@ -601,14 +601,14 @@ printf_invoke:
    ; hl = & printf_converter
    ; de = address of next format char to examine
    ; bc = return address after printf conversion
-   ; stack = WORKSPACE_44, width, precision, stack_param
+   ; stack = WORKSPACE_44, width, precision_printf, stack_param
 
    ex (sp),hl                  ; push & printf_converter
    push hl
 
    ; de = char *format
    ; bc = return address
-   ; stack = WORKSPACE_44, width, precision, & converter, stack_param
+   ; stack = WORKSPACE_44, width, precision_printf, & converter, stack_param
 
    ld hl,15
    add hl,sp
@@ -647,7 +647,7 @@ printf_invoke:
    ; ix = FILE *
    ; hl = void *stack_param
    ; de = void *buffer_digits
-   ; stack = WORKSPACE_42, return addr, buffer_digits, width, precision, & printf_conv
+   ; stack = WORKSPACE_42, return addr, buffer_digits, width, precision_printf, & printf_conv
 
    ; WORSPACE_44 low to high addresses
    ;
@@ -664,7 +664,7 @@ printf_invoke:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-match_con:
+match_con_printf:
 
    ; enter :   b = conversion specifier
    ;          hl = conversion table
@@ -688,15 +688,15 @@ match_con:
    ret z
    
    cp b
-   jr z, match_ret
+   jr z, match_ret_printf
 
    inc hl
    inc hl
    inc hl
    
-   jr match_con
+   jr match_con_printf
 
-match_ret:
+match_ret_printf:
 
    ld a,(hl)                   ; a = flags
    inc hl
@@ -713,7 +713,7 @@ match_ret:
 
 IF __CLIB_OPT_PRINTF & $600
 
-acon_tbl:
+acon_tbl_printf:
 
 IF __CLIB_OPT_PRINTF & $200
 
@@ -739,7 +739,7 @@ ENDIF
 
 IF __CLIB_OPT_PRINTF & $1ff
 
-rcon_tbl:
+rcon_tbl_printf:
 
 IF __CLIB_OPT_PRINTF & $01
 
@@ -821,7 +821,7 @@ ENDIF
 
 IF __CLIB_OPT_PRINTF & $3fc00000
 
-fcon_tbl:
+fcon_tbl_printf:
 
 IF __CLIB_OPT_PRINTF & $10000000
 
@@ -895,7 +895,7 @@ ENDIF
 
 IF __CLIB_OPT_PRINTF & $1ff000
 
-lcon_tbl:
+lcon_tbl_printf:
 
 IF __CLIB_OPT_PRINTF & $1000
 
@@ -977,7 +977,7 @@ ENDIF
 
 IF __CLIB_OPT_PRINTF_2 && __SDCC
 
-llcon_tbl:
+llcon_tbl_printf:
 
 IF __CLIB_OPT_PRINTF_2 & $01
 
@@ -1044,7 +1044,7 @@ printf_return_8:
 
    pop bc
 
-__return_join_8:
+__return_join_8_printf:
 
 ;******************************
 IF __SDCC | __SDCC_IX | __SDCC_IY
@@ -1064,7 +1064,7 @@ ELSE
 ENDIF
 ;******************************
 
-   jr _return_join_6
+   jr _return_join_6_printf
 
 ENDIF
 
@@ -1079,7 +1079,7 @@ printf_return_6:
 
    pop bc
 
-_return_join_6:
+_return_join_6_printf:
 
 ;******************************
 IF __SDCC | __SDCC_IX | __SDCC_IY
@@ -1099,7 +1099,7 @@ ELSE
 ENDIF
 ;******************************
 
-   jr _return_join_4
+   jr _return_join_4_printf
 
 ENDIF
 
@@ -1112,7 +1112,7 @@ printf_return_4:
 
    pop bc
 
-_return_join_4:
+_return_join_4_printf:
 
 ;******************************
 IF __SDCC | __SDCC_IX | __SDCC_IY
@@ -1132,7 +1132,7 @@ ELSE
 ENDIF
 ;******************************
 
-   jr _return_join_2
+   jr _return_join_2_printf
 
 printf_return_2:
 
@@ -1143,7 +1143,7 @@ printf_return_2:
 
    pop bc
 
-_return_join_2:
+_return_join_2_printf:
 
 ;******************************
 IF __SDCC | __SDCC_IX | __SDCC_IY
@@ -1165,7 +1165,7 @@ ENDIF
 
    pop de                      ; de = char *format
    
-   jr c, error_printf_converter
+   jr c, error_printf_converter_printf
    
    ld hl,-8
    add hl,sp
@@ -1173,16 +1173,16 @@ ENDIF
    
    push bc
    
-   ; format_loop expects this:
+   ; format_loop_printf expects this:
    ;
    ; de = char *format
    ; stack = WORKSPACE_44, stack_param
 
-   jp format_loop
+   jp format_loop_printf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-error_format_precision:
+error_format_precision_printf:
 
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, width, stack_param
@@ -1191,7 +1191,7 @@ error_format_precision:
    
    ; fall through
 
-error_format_width:
+error_format_width_printf:
 
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, stack_param
@@ -1205,7 +1205,7 @@ ENDIF
 ; ** AA BB ****************************************************
 ; all clib options have this code
 
-error_stream:
+error_stream_printf:
 
 IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
@@ -1214,7 +1214,7 @@ IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ld hl,46
  
-__error_stream:
+__error_stream_printf:
 
    add hl,sp
    ld sp,hl                    ; repair stack
@@ -1234,12 +1234,12 @@ ENDIF
 
 IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
-error_printf_converter:
+error_printf_converter_printf:
 
    ; de = address of next format char to examine
    ; stack = WORKSPACE_36
 
    ld hl,36
-   jr __error_stream
+   jr __error_stream_printf
 
 ENDIF
