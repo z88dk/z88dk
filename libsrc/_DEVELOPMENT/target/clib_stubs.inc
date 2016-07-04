@@ -56,8 +56,16 @@
       defc __CLIB_OPT_PRINTF = CLIB_OPT_PRINTF
       defc __CLIB_OPT_PRINTF_2 = CLIB_OPT_PRINTF_2
       
-      INCLUDE "../../stdio/z80/asm_vfprintf_unlocked.asm"
+      IF __SDCC_IY
+      
+         INCLUDE "../../stdio/z80/asm_vfprintf_unlocked_iy.asm"
+      
+      ELSE
+      
+         INCLUDE "../../stdio/z80/asm_vfprintf_unlocked.asm"
    
+      ENDIF
+      
    ENDIF
    
    ; dynamic scanf
@@ -81,6 +89,14 @@
       defc __CLIB_OPT_SCANF = CLIB_OPT_SCANF
       defc __CLIB_OPT_SCANF_2 = CLIB_OPT_SCANF_2
       
-      INCLUDE "../../stdio/z80/asm_vfscanf_unlocked.asm"
+      IF __SDCC_IY
+      
+         INCLUDE "../../stdio/z80/asm_vfscanf_unlocked_iy.asm"
+      
+      ELSE
+      
+         INCLUDE "../../stdio/z80/asm_vfscanf_unlocked.asm"
+   
+      ENDIF
    
    ENDIF
