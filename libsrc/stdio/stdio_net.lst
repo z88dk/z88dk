@@ -65,3 +65,5 @@ stdio/obj/net/_sscanf
 stdio/obj/net/_vfscanf
 stdio/obj/net/_scanf
 stdio/obj/net/_vsscanf
+stdio/obj/net/fscanf
+stdio/obj/net/_fscanf

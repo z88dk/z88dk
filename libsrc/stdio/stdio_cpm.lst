@@ -59,3 +59,5 @@ stdio/obj/cpm/_sscanf
 stdio/obj/cpm/_vfscanf
 stdio/obj/cpm/_scanf
 stdio/obj/cpm/_vsscanf
+stdio/obj/cpm/fscanf
+stdio/obj/cpm/_fscanf

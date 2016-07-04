@@ -60,3 +60,5 @@ stdio/obj/stdesc/_sscanf
 stdio/obj/stdesc/_vfscanf
 stdio/obj/stdesc/_scanf
 stdio/obj/stdesc/_vsscanf
+stdio/obj/stdesc/fscanf
+stdio/obj/stdesc/_fscanf
