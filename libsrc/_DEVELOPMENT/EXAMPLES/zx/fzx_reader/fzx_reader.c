@@ -9,14 +9,14 @@
 #include <string.h>
 #include <input.h>
 
-#pragma output REGISTER_SP = 0            // set to 0 (top of memory)
-#pragma output CRT_ENABLE_RESTART = 1     // not returning to basic
-#pragma output CRT_ENABLE_CLOSE = 0       // do not close files on exit
-#pragma output CLIB_EXIT_STACK_SIZE = 0   // no exit stack
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0  // no user heap
-#pragma output CLIB_STDIO_HEAP_SIZE = 0   // no stdio heap for fd structures
-#pragma output CLIB_FOPEN_MAX = 0         // no allocated FILE structures
-#pragma output CLIB_OPEN_MAX = 0          // no fd table
+#pragma output REGISTER_SP           = 0   // set to 0 (top of memory)
+#pragma output CRT_ENABLE_RESTART    = 1   // not returning to basic
+#pragma output CRT_ENABLE_CLOSE      = 0   // do not close files on exit
+#pragma output CLIB_EXIT_STACK_SIZE  = 0   // no exit stack
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0   // no user heap
+#pragma output CLIB_STDIO_HEAP_SIZE  = 0   // no stdio heap for fd structures
+#pragma output CLIB_FOPEN_MAX        = 0   // no allocated FILE structures
+#pragma output CLIB_OPEN_MAX         = 0   // no fd table
 
 #define FONT_CHOICE ff_ao_Orion
 

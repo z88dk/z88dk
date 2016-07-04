@@ -8,6 +8,9 @@
 #include <arch/zx.h>
 #include <z80.h>
 
+#pragma output CLIB_OPT_PRINTF       = 0x00000202   // enable %us for printf only
+#pragma output CLIB_OPT_SCANF        = 0x00000022   // enable %un for scanf only
+
 #pragma output CRT_ORG_CODE          = 40000
 #pragma output REGISTER_SP           = 0
 #pragma output CLIB_MALLOC_HEAP_SIZE = 128
@@ -75,7 +78,7 @@ void main(void)
       fflush(stdin);
       getline(&buffer, &len, stdin);
 
-      for (offset = 0; sscanf(buffer + offset, " %u%n", &i, &j) == 1; offset += j)
+      for (offset = 0; sscanf(buffer + offset, "%u%n", &i, &j) == 1; offset += j)
       {
          if ((i > 0) && (i < (sizeof(song_list) / sizeof(struct songs) + 1)))
          {            

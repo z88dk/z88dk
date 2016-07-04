@@ -39,8 +39,10 @@
 #include <arch/zx.h>
 #include <arch/zx/nirvana-.h>
 
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0   // do not create a heap
-#pragma output REGISTER_SP = -1            // do not change sp
+#pragma output CLIB_OPT_PRINTF       = 0x00000400   // enable %c for printf only
+
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0            // do not create a heap
+#pragma output REGISTER_SP           = -1           // do not change sp
 
 #define printInk(k)          printf("\x10%c", (k))
 #define printPaper(k)        printf("\x11%c", (k))
@@ -98,7 +100,7 @@ main()
                 NIRVANAM_halt();
                 NIRVANAM_fillT(0, lin, col);
             }
-        } while (!in_inkey());
+        } while (!in_test_key());  // test if a key is pressed, smaller than in_inkey()
 
         // Wait until key is released
         in_wait_nokey();
@@ -141,7 +143,7 @@ main()
                 if (col == 0 || col == 30)
                     dcol[sprite] = -dcol[sprite];
             }
-        } while (!in_inkey());
+        } while (!in_test_key());  // test if a key is pressed, smaller than in_inkey()
 
         // Wait until key is released
         in_wait_nokey();

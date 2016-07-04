@@ -1,8 +1,8 @@
 // By szeliga @ worldofspectrum.org forums
 // while running press any key to reset screen
 
-// zcc +zx -vn -clib=new -startup=31 @sp1demo.list -o sp1demo -create-app
-// zcc +zx -vn -SO3 -clib=sdcc_iy -startup=31 --max-allocs-per-node200000 @sp1demo.list -o demo -create-app
+// zcc +zx -vn -clib=new -startup=31 @sp1demo.lst -o demo -create-app
+// zcc +zx -vn -SO3 -clib=sdcc_iy -startup=31 --max-allocs-per-node200000 @sp1demo.lst -o demo -create-app
  
 #include <input.h>
 #include <sound.h>

@@ -40,8 +40,10 @@
 #include <arch/zx.h>
 #include <arch/zx/bifrost_l.h>
 
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0   // no heap
-#pragma output REGISTER_SP = -1            // do not change sp
+#pragma output CLIB_OPT_PRINTF       = 0x00000400   // enable %c for printf only
+
+#pragma output CLIB_MALLOC_HEAP_SIZE = 0            // do not create a heap
+#pragma output REGISTER_SP           = -1           // do not change sp
 
 #define printInk(k)          printf("\x10%c", (k))
 #define printPaper(k)        printf("\x11%c", (k))
