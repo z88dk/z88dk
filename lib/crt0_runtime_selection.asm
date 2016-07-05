@@ -6,9 +6,21 @@
 
 
 
+; scanf format picker
+
+IF DEFINED_floatscanf
+	PUBLIC	scanf_handle_f
+	EXTERN	__scanf_handle_f
+	defc	scanf_handle_f = __scanf_handle_f
+ELSE
+	PUBLIC	scanf_handle_f
+	EXTERN	__scanf_handle_f
+	EXTERN  __scanf_noop
+	defc	scanf_handle_f = __scanf_noop
+ENDIF
+
 ;--------
-; Which printf core routine do we need?
-;
+; Printf picker - this is classic based at present
 ;
 ;--------
         PUBLIC  asm_vfprintf
