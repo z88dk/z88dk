@@ -4,8 +4,6 @@
 	PUBLIC	scanf
 
 	EXTERN	asm_scanf
-	EXTERN	scanf_ungetc
-	EXTERN	scanf_getc
 	EXTERN	__sgoioblk
 
 
@@ -25,10 +23,6 @@ scanf:
 
 	ld	bc,__sgoioblk	;stdin
 	push	bc		;fp
-	ld	bc,scanf_ungetc
-	push	bc
-	ld	bc,scanf_getc
-	push	bc
 	ld	bc,1		;sccz80
 	push	bc
 	ld	c,(hl)		;fmt
@@ -40,9 +34,6 @@ scanf:
 	dec	hl
 	push	hl		;&ap
 	call	asm_scanf
-	pop	bc
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc
