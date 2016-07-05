@@ -48,8 +48,6 @@ stdio/obj/ixiy/sprintf_outc.o
 stdio/obj/ixiy/ungetc.o
 stdio/obj/ixiy/vfprintf.o
 stdio/obj/ixiy/vsnprintf.o
-stdio/obj/ixiy/scanf_ungetc
-stdio/obj/ixiy/scanf_getc
 stdio/obj/ixiy/asm_scanf
 stdio/obj/ixiy/sscanf
 stdio/obj/ixiy/vfscanf

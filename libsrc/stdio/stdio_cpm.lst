@@ -48,8 +48,6 @@ stdio/obj/cpm/sprintf_outc.o
 stdio/obj/cpm/ungetc.o
 stdio/obj/cpm/vfprintf.o
 stdio/obj/cpm/vsnprintf.o
-stdio/obj/cpm/scanf_ungetc
-stdio/obj/cpm/scanf_getc
 stdio/obj/cpm/asm_scanf
 stdio/obj/cpm/sscanf
 stdio/obj/cpm/vfscanf
