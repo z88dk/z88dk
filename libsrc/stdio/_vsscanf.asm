@@ -5,8 +5,6 @@
 	PUBLIC	_vsscanf
 
         EXTERN  asm_scanf
-        EXTERN  scanf_ungetc
-        EXTERN  scanf_getc
 
 
 

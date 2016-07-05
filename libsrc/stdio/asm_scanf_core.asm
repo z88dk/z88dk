@@ -1,6 +1,15 @@
 
+	MODULE	asm_scanf_core
+	PUBLIC	asm_scanf
+	PUBLIC  __scanf_noop
+	PUBLIC scanf_exit
+	PUBLIC scanf_loop
+	PUBLIC __scanf_getchar
+	PUBLIC __scanf_ungetchar
+	PUBLIC __scanf_nextarg
+	PUBLIC __scanf_consume_whitespace
 
-
+	EXTERN scanf_handle_f
 	EXTERN asm_isspace
 	EXTERN asm_isdigit
 	EXTERN asm_isxdigit
@@ -16,8 +25,8 @@
 	EXTERN fgetc
 	EXTERN ungetc
 
-; int vfscanf1(FILE *fp, void __CALLEE__ ungetc_func(int c, FILE *fp), void __CALLEE__ (*getchar_fn)(FILE *fp), int sccz80, unsigned char *fmt,void *ap)
-
+; int vfscanf1(FILE *fp, , int sccz80, unsigned char *fmt,void *ap)
+asm_scanf:
 	ld	ix,0
 	add	ix,sp		; Now the frame pointer
 				; ix+2, ix+3 = arg pointer
@@ -40,7 +49,7 @@
         ld      h,(ix+5)
 
 scanf_loop:
-scanf_fmt_noop:			;noop destination
+__scanf_noop:
 	ld	(ix-3),0	;reset flags for each loop
 	ld	a,(hl)
 	and	a
@@ -52,16 +61,16 @@ scanf_fmt_noop:			;noop destination
 	ld	c,a		;save character
 	call	asm_isspace
 	jr	nz, scanf_ordinary_char
-	call	consume_whitespace
+	call	__scanf_consume_whitespace
 	jr	scanf_loop
 
 ; It's an ordinary char
 scanf_ordinary_char:
-	call	scanf_getchar
+	call	__scanf_getchar
 	jr	c,scanf_exit
 	cp	c
 	jr	z,scanf_loop
-	call	scanf_ungetchar
+	call	__scanf_ungetchar
 scanf_exit:
    ; ISO C has us exit with # conversions done
    ; or -1 if no chars were read from the input stream
@@ -79,12 +88,12 @@ scanf_exit2:
 	ex	de,hl
 	ret
 
-consume_whitespace:
-	call	scanf_getchar
+__scanf_consume_whitespace:
+	call	__scanf_getchar
 	ret	c
 	call	asm_isspace
-	jr	z,consume_whitespace
-	call	scanf_ungetchar		;push back the non-matching character
+	jr	z,__scanf_consume_whitespace
+	call	__scanf_ungetchar		;push back the non-matching character
 	and	a
 	ret
 	
@@ -147,8 +156,8 @@ not_long_specifier:
 	jr	z,handle_o_fmt
 	cp	'b'
 	jr	z,handle_b_fmt
-;	cp	'f'
-;	jp	z,handle_f_fmt
+	cp	'f'
+	jp	z,scanf_handle_f
 	cp	'u'
 	jp	nz,scanf_loop			;unrecognised format
 handle_d_fmt:
@@ -160,14 +169,14 @@ handle_d_fmt_entry_from_i:
 	; So there's a decimal number on the stream
 	ld	b,10			;radix
 parse_number:
-	call	scanf_ungetchar
+	call	__scanf_ungetchar
 	call	scanf_get_number
 	jp	scanf_loop
 
 handle_n_fmt:
 	bit	3,(ix-3)		;suppressed?
 	jp	nz,scanf_loop
-	call	scanf_nextarg
+	call	__scanf_nextarg
 	ld	a,(ix-5)
 	ld	(de),a
 	inc	de
@@ -190,7 +199,7 @@ handle_b_fmt:
 	cp	'%'
 	jr	nz,handle_b_fmt_nobase
 handle_b_fmt_entry_from_i:
-	call	scanf_getchar
+	call	__scanf_getchar
 	jp	c,scanf_exit
 handle_b_fmt_nobase:
 	call	asm_isbdigit
@@ -203,7 +212,7 @@ handle_x_fmt:
 	jp	c,scanf_exit
 	cp	'0'
 	jr	nz,handle_x_fmt_nobase
-	call	scanf_getchar
+	call	__scanf_getchar
 	jr	c,only_0_on_stream	;there's only a 0 on the stream
 	cp	'x'
 	jr	z,handle_x_fmt_leader_found
@@ -232,7 +241,7 @@ only_0_on_stream:
 	jp	scanf_loop
 
 handle_x_fmt_leader_found:	
-	call	scanf_getchar
+	call	__scanf_getchar
 	jp	c,scanf_exit
 handle_x_fmt_nobase:
 	call	asm_isxdigit
@@ -251,7 +260,7 @@ handle_i_fmt:
 	; It must be decimal
 	jp	handle_d_fmt_entry_from_i
 handle_i_fmt_octalorhex:
-	call	scanf_getchar
+	call	__scanf_getchar
 	jp	c,only_0_on_stream
 	cp	'x'
 	jp	z,handle_x_fmt_leader_found
@@ -269,9 +278,9 @@ handle_c_fmt:
 	ld	b,(ix-4)	;width
 c_fmt_get_buf:
 	; TODO: Handling of *, bit 3
-	call	scanf_nextarg	;de = destination
+	call	__scanf_nextarg	;de = destination
 c_fmt_loop:
-	call	scanf_getchar
+	call	__scanf_getchar
 	jp	c,scanf_exit	;error occurred
 	ld	(de),a
 	inc	de
@@ -281,16 +290,16 @@ c_fmt_loop:
 
 handle_s_fmt:
 	bit	3,(ix-3)
-	call	z,scanf_nextarg		;de=destination
+	call	z,__scanf_nextarg		;de=destination
 	ld	b,(ix-4)		;b=width
 scanf_fmt_s_width_specified:
-	call	consume_whitespace
+	call	__scanf_consume_whitespace
 	jp	c,scanf_exit
-	call	scanf_getchar
+	call	__scanf_getchar
 	jr	nc,scanf_fmt_s_join
 	jp	scanf_exit
 scanf_fmt_s_loop:
-	call	scanf_getchar
+	call	__scanf_getchar
 	jr	c,scanf_fmt_s_done
 	call	asm_isspace
 	jr	z,scanf_fmt_s_success
@@ -311,7 +320,7 @@ scanf_fmt_s_done:
 	inc	(ix-1)		;increase number of conversions done
 	jp	scanf_loop
 scanf_fmt_s_success:	
-	call	scanf_ungetchar
+	call	__scanf_ungetchar
 	jr	scanf_fmt_s_done
 
 
@@ -321,15 +330,15 @@ scanf_fmt_s_success:
 ; Common start code for number formats
 scanf_common_start:
 	bit	3,(ix-3)	; suppressing assignment
-	call	z,scanf_nextarg
-	call	consume_whitespace
+	call	z,__scanf_nextarg
+	call	__scanf_consume_whitespace
 	ret	c
 	call	consume_sign
 	ret	c
-	jp	scanf_getchar
+	jp	__scanf_getchar
 
 consume_sign:
-	call	scanf_getchar
+	call	__scanf_getchar
 	ret	c
 	cp	'-'
 	jr	nz,notneg
@@ -338,10 +347,10 @@ consume_sign:
 notneg:
 	cp	'+'
 	ret	z
-	jp	scanf_ungetchar
+	jp	__scanf_ungetchar
 
 
-scanf_nextarg:
+__scanf_nextarg:
 	push	hl	;hl=fmt, save it
 	ld	l,(ix+2)
 	ld	h,(ix+3)
@@ -349,22 +358,22 @@ scanf_nextarg:
 	inc	hl
 	ld	d,(hl)		;de = buffer, hl=ap+1
 	bit	0,(ix+6)	;sccz80 flag
-	jr	nz,scanf_nextarg_decrement
+	jr	nz,__scanf_nextarg_decrement
 	inc	hl
-scanf_nextarg_exit:
+__scanf_nextarg_exit:
 	ld	(ix+2),l
 	ld	(ix+3),h
 	pop	hl	;restore fmt
 	ret
-scanf_nextarg_decrement:
+__scanf_nextarg_decrement:
 	dec	hl
 	dec	hl
 	dec	hl
-	jr	scanf_nextarg_exit
+	jr	__scanf_nextarg_exit
 
 ; Exit: a = character	
 ; NB: the supplied function must save ix
-scanf_getchar:
+__scanf_getchar:
 	push	bc		;save callers
 	push	de		;save dest
 	push	hl		;fmt
@@ -373,18 +382,18 @@ scanf_getchar:
 	push	hl
 	call	fgetc
 	pop	bc
-scanf_getchar_return:
+__scanf_getchar_return:
 	ld	a,h	
 	or	l
 	inc	a	; if eof then 0
 	ld	a,l	; set the return value
 	scf
-	jr	z,scanf_getchar_return1
+	jr	z,__scanf_getchar_return1
 	and	a	;reset carry
 	inc	(ix-6)
-	jr	nz,scanf_getchar_return1
+	jr	nz,__scanf_getchar_return1
 	inc	(ix-5)
-scanf_getchar_return1:
+__scanf_getchar_return1:
 	pop	hl
 	pop	de
 	pop	bc
@@ -392,14 +401,14 @@ scanf_getchar_return1:
 
 ; a=char to unget
 ; NB: the supplied function must save ix
-scanf_ungetchar:
+__scanf_ungetchar:
 	push	bc
 	push	de
 	push	hl		;fmt
 	dec	(ix-6)
-	jr	nc,scanf_ungetchar1
+	jr	nc,__scanf_ungetchar1
 	dec	(ix-5)
-scanf_ungetchar1:
+__scanf_ungetchar1:
 	ld	l,a		;character to unget
 	ld	h,0
 	push	hl
@@ -409,7 +418,7 @@ scanf_ungetchar1:
 	call	ungetc
 	pop	bc
 	pop	bc
-	jr	scanf_getchar_return1
+	jr	__scanf_getchar_return1
 
 ; hl = fmt
 ; de = destination
@@ -453,7 +462,7 @@ scanf_atoul:
 	ld	h,d
 
 scanf_atoul_loop:
-	call	scanf_getchar
+	call	__scanf_getchar
 	jr	c,scanf_atoul_exit2
 	ld	c,a
 	sub	'0'
@@ -487,92 +496,9 @@ scanf_atoul_isdigit:
 	jr	scanf_atoul_loop
 scanf_atoul_exit:
 	ld	a,c
-	call	scanf_ungetchar
+	call	__scanf_ungetchar
 scanf_atoul_exit2:
 	bit	0,(ix-3)	;sign flag
 	call	nz,l_long_neg
 	ret
 
-
-IF float	
-; Floating point
-; We read from the stream into a temporary buf on the stack and then run atof() on it
-handle_f_fmt:
-	call	scanf_common_start	
-	jp	c,scanf_exit
-	call	scanf_ungetchar
-	push	de		;save destination
-	ld	hl,2
-	add	hl,sp
-	ex	de,hl		;de = our buffer for the number
-	ld	c,0		;[000000E.]
-	bit	0,(ix-3)
-	jr	z,handle_f_fmt_check_width
-	ld	a,'-'
-	ld	(de),a	
-	inc	de
-handle_f_fmt_check_width:
-	ld	a,(ix-4)	;width
-	and	a
-	jr	z,handle_f_fmt_check_width1
-	cp	39		;maximum width
-	jr	c,handle_f_fmt_setup_length
-handle_f_fmt_check_width1:
-	ld	a,39
-handle_f_fmt_setup_length:	
-	ld	b,a
-handle_f_fmt_loop:
-	call	scanf_getchar
-	jr	c,handle_f_fmt_finished_reading
-	cp	'.'
-	jr	nz,handle_f_fmt_check_exponent
-	; It was ., have we already seen one
-	bit	0,c
-	jr	nz,handle_f_fmt_error
-	set	0,c
-	jr	handle_f_fmt_store
-handle_f_fmt_check_exponent:
-	cp	'e'
-	jr	z,handle_f_fmt_check_exponent1
-	cp	'E'
-	jr	nz,handle_f_fmt_check_digit
-handle_f_fmt_check_exponent1:
-	bit	1,c			;have we seen one already?
-	jr	nz,handle_f_fmt_error
-	set	1,c
-	jr	handle_f_fmt_store
-handle_f_fmt_check_digit:
-	call	asm_isdigit
-	jr	nc,handle_f_fmt_store
-	call	scanf_ungetchar
-	jr	handle_f_fmt_finished_reading
-handle_f_fmt_store:
-	ld	(de),a
-	inc	de
-	djnz	handle_f_fmt_loop
-handle_f_fmt_finished_reading:
-	xor	a
-	ld	(de),a
-	ld	hl,2
-	add	hl,sp
-	call	l_cmp
-	jr	z,handle_f_fmt_error
-	; TODO: Check there's something there
-	ld	hl,2		;we have the destination on the stack
-	add	hl,sp
-	push	ix		;save our framepointer - fp library will disturb it
-	push	hl
-	call	atof
-	pop	bc
-	pop	ix		;get our framepointer back
-	ld	hl,fa
-	pop	de		;destination
-	ld	bc,6		;48 bits of floating point number
-	ldir
-	inc	(ix-1)		;increase number of conversions
-	jp	scanf_loop
-handle_f_fmt_error:
-	call	scanf_ungetchar
-	pop	de		;discard destinatino
-	jp	scanf_exit
-ENDIF

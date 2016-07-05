@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.59 2016-07-02 16:45:14 dom Exp $
+# $Id: Makefile,v 1.60 2016-07-05 21:43:52 dom Exp $
 #
 # 8080
 
@@ -9,7 +9,7 @@ include ../Make.config
 
 CFILES = $(filter-out fflush.c, $(wildcard *.c))
 ZSFILES = $(wildcard zsock/*.c) fflush.c
-AFILES = $(filter-out asm_printf_core.asm asm_scanf_core.asm, $(wildcard *.asm))
+AFILES = $(filter-out asm_printf_core.asm, $(wildcard *.asm))
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 

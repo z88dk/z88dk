@@ -6,8 +6,6 @@
 
 	EXTERN	asm_scanf
 	EXTERN  __sgoioblk
-	EXTERN	scanf_ungetc
-	EXTERN	scanf_getc
 
 
 
