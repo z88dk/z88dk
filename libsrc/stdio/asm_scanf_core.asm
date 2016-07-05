@@ -155,7 +155,7 @@ not_long_specifier:
 	jr	z,handle_x_fmt
 	cp	'o'
 	jr	z,handle_o_fmt
-	cp	'b'
+	cp	'B'
 	jr	z,handle_b_fmt
 	cp	'f'
 	jp	z,scanf_handle_f
