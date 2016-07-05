@@ -4,6 +4,7 @@
 	PUBLIC  __scanf_noop
 	PUBLIC scanf_exit
 	PUBLIC scanf_loop
+	PUBLIC __scanf_common_start
 	PUBLIC __scanf_getchar
 	PUBLIC __scanf_ungetchar
 	PUBLIC __scanf_nextarg
@@ -161,7 +162,7 @@ not_long_specifier:
 	cp	'u'
 	jp	nz,scanf_loop			;unrecognised format
 handle_d_fmt:
-	call	scanf_common_start	;de=argument as necessary
+	call	__scanf_common_start	;de=argument as necessary
 	jp	c,scanf_exit
 handle_d_fmt_entry_from_i:
 	call	asm_isdigit
@@ -185,7 +186,7 @@ handle_n_fmt:
 	jp	scanf_loop
 
 handle_o_fmt:
-	call	scanf_common_start	;de=argument
+	call	__scanf_common_start	;de=argument
 	jp	c,scanf_exit
 handle_o_fmt_entry_from_i:
 	call	asm_isodigit		;is it actually octal?
@@ -194,7 +195,7 @@ handle_o_fmt_entry_from_i:
 	jr	parse_number
 
 handle_b_fmt:
-	call	scanf_common_start
+	call	__scanf_common_start
 	jp	c,scanf_exit
 	cp	'%'
 	jr	nz,handle_b_fmt_nobase
@@ -208,7 +209,7 @@ handle_b_fmt_nobase:
 	jr	parse_number
 
 handle_x_fmt:
-	call	scanf_common_start	;de=argument as necessary
+	call	__scanf_common_start	;de=argument as necessary
 	jp	c,scanf_exit
 	cp	'0'
 	jr	nz,handle_x_fmt_nobase
@@ -250,7 +251,7 @@ handle_x_fmt_nobase:
 	jp	parse_number
 
 handle_i_fmt:
-	call	scanf_common_start
+	call	__scanf_common_start
 	jp	c,scanf_exit
 	; Determine the radix if we can
 	cp	'0'
@@ -328,7 +329,7 @@ scanf_fmt_s_success:
 
 
 ; Common start code for number formats
-scanf_common_start:
+__scanf_common_start:
 	bit	3,(ix-3)	; suppressing assignment
 	call	z,__scanf_nextarg
 	call	__scanf_consume_whitespace
