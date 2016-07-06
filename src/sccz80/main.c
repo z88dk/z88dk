@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.39 2016-07-06 14:24:22 dom Exp $
+ *      $Id: main.c,v 1.40 2016-07-06 14:48:03 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -464,17 +464,6 @@ void dumpfns()
    }
    fclose(fp);
 
-   switch(scanf_level) {
-    case 1:  
-        WriteDefined("miniscanf",0);
-        break;
-    case 2:
-        WriteDefined("complexscanf",0);
-        break;
-    case 3:
-        WriteDefined("floatscanf",0);
-        break;
-   }
    switch(printflevel) {
     case 1:  
         WriteDefined("ministdio",0);
