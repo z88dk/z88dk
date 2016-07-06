@@ -39,7 +39,7 @@ sorter.exe: ../console/sorter.c
 	zcc +osca -vn -lndos -create-app ../console/sorter.c -osorter.bin
 
 dstar.exe: ../dstar.c ../dstar.h
-	zcc +osca -vn ../dstar.c -I.. -Dspritesize=16 -create-app -odstar.bin
+	zcc +osca -vn ../dstar.c -I.. -Dspritesize=16 -create-app -odstar.bin -lndos
 
 othello.exe: ../othello.c
 	zcc +osca -vn -lndos -O3 -create-app ../othello.c -I.. -oothello.bin
