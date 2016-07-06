@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.15 2016-07-06 14:24:22 dom Exp $
+ *      $Id: callfunc.c,v 1.16 2016-07-06 16:24:28 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -216,10 +216,11 @@ static int SetWatch(char *sym, int *type)
         if ( strcmp(sym,"vsnprintf") == 0 ) return 3;
 	*type = 1; // printf
         if ( strcmp(sym,"scanf") == 0 ) return 1;
-        if ( strcmp(sym,"sscanf") == 0 ) return 2;
-        if ( strcmp(sym,"fscanf") == 0 ) return 2;
         if ( strcmp(sym,"vscanf") == 0 ) return 1;
+        if ( strcmp(sym,"fscanf") == 0 ) return 2;
         if ( strcmp(sym,"vfscanf") == 0 ) return 2;
+        if ( strcmp(sym,"sscanf") == 0 ) return 2;
+        if ( strcmp(sym,"vsscanf") == 0 ) return 2;
         return 0;
 }
 
