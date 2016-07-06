@@ -93,15 +93,9 @@ static OptsLU opts_lu[] =
 *----------------------------------------------------------------------------*/
 DEFINE_init_module()
 {
-	char *directory;
-
 	utarray_new(opts.inc_path, &ut_str_icd);
 	utarray_new(opts.lib_path, &ut_str_icd);
 	utarray_new(opts.files, &ut_str_icd);
-
-	directory = getenv("Z80_OZFILES");
-    if ( directory )
-		utarray_push_back(opts.inc_path, &directory);
 }
 
 DEFINE_dtor_module()

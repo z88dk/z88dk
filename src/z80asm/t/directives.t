@@ -31,7 +31,6 @@ END
 # -I, --inc-path
 unlink(<test*.inc>);
 make_path("test_dir");
-delete $ENV{Z80_OZFILES};
 	write_file("test_dir/test.inc", 'ld a,10');
 	
 	# no -I, full path : OK
@@ -65,14 +64,7 @@ delete $ENV{Z80_OZFILES};
 		asm		=> 'include "test_dir/test.inc"		;; 3E 0A',
 		options	=> "-b -Itest_dir",
 	);
-	
-	# Z80_OZFILES : OK
-	$ENV{Z80_OZFILES} = "test_dir";
-	z80asm(
-		asm		=> 'include "test.inc"				;; 3E 0A',
-	);
 remove_tree("test_dir");
-delete $ENV{Z80_OZFILES};
 
 # error_read_file
 # BUG_0034 : If assembly process fails with fatal error, invalid library is kept

@@ -4,6 +4,11 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-07-06
+
+  Remove reference to the Z80_OZFILES environment variable - it was used
+  as an additional directory to search for include files.
+
 - 2016-07-03
 
   Only generate .reloc file if --reloc-info option is given.
