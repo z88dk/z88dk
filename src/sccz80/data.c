@@ -6,7 +6,7 @@
  *      I'm starting to split these up once more and stick them in
  *      the relevant files..
  *
- *      $Id: data.c,v 1.42 2016-04-25 09:07:04 dom Exp $
+ *      $Id: data.c,v 1.43 2016-07-06 14:24:22 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -181,3 +181,7 @@ int doublestrings;
 int	useframe;
 int	indexix;
 
+/* scanf format requirements */
+int      scanf_level;
+uint32_t scanf_format_option;
+uint32_t printf_format_option;

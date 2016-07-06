@@ -102,3 +102,6 @@ extern int doublestrings;
 extern int usempm;
 extern int z80asm_sections;
 extern int standard_escapes;
+extern int scanf_level;
+extern uint32_t scanf_format_option;
+extern uint32_t printf_format_option;

@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.38 2016-04-25 09:10:18 dom Exp $
+ *      $Id: main.c,v 1.39 2016-07-06 14:24:22 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -433,8 +433,48 @@ void dumpfns()
         fprintf(fp,"ENDIF\n\n");
     }
 
-    fclose(fp);
+   if ( printf_format_option ) {
+        fprintf(fp,"\nIF !DEFINED_printf_format\n");
+        fprintf(fp,"\tdefc\tDEFINED_printf_format = 1\n");
+        fprintf(fp,"\tdefc printf_format = 0x%08x\n",printf_format_option);
+	fprintf(fp,"ELSE\n");
+	fprintf(fp,"\tUNDEFINE temp_printf_format\n");
+	fprintf(fp,"\tdefc temp_printf_format = printf_format\n");
+	fprintf(fp,"\tUNDEFINE printf_format\n");
+	fprintf(fp,"\tdefc printf_format = temp_printf_format | 0x%08X\n",printf_format_option);
+	fprintf(fp,"ENDIF\n\n");
+	fprintf(fp,"\nIF !NEED_printf\n");
+	fprintf(fp,"\tDEFINE\tNEED_printf\n");
+	fprintf(fp,"ENDIF\n\n");
+   }
 
+   if ( scanf_format_option ) {
+        fprintf(fp,"\nIF !DEFINED_scanf_format\n");
+        fprintf(fp,"\tdefc\tDEFINED_scanf_format = 1\n");
+        fprintf(fp,"\tdefc scanf_format = 0x%08x\n",scanf_format_option);
+	fprintf(fp,"ELSE\n");
+	fprintf(fp,"\tUNDEFINE temp_scanf_format\n");
+	fprintf(fp,"\tdefc temp_scanf_format = scanf_format\n");
+	fprintf(fp,"\tUNDEFINE scanf_format\n");
+	fprintf(fp,"\tdefc scanf_format = temp_scanf_format | 0x%08X\n",scanf_format_option);
+	fprintf(fp,"ENDIF\n\n");
+	fprintf(fp,"\nIF !NEED_scanf\n");
+	fprintf(fp,"\tDEFINE\tNEED_scanf\n");
+	fprintf(fp,"ENDIF\n\n");
+   }
+   fclose(fp);
+
+   switch(scanf_level) {
+    case 1:  
+        WriteDefined("miniscanf",0);
+        break;
+    case 2:
+        WriteDefined("complexscanf",0);
+        break;
+    case 3:
+        WriteDefined("floatscanf",0);
+        break;
+   }
    switch(printflevel) {
     case 1:  
         WriteDefined("ministdio",0);

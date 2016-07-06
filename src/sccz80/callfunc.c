@@ -3,15 +3,17 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.14 2016-06-17 10:01:28 dom Exp $
+ *      $Id: callfunc.c,v 1.15 2016-07-06 14:24:22 dom Exp $
  */
+
+#include "ccdefs.h"
 
 /*
  * Local functions
  */
 
-static int SetWatch(char *sym);
-static int SetMiniFunc(unsigned char *arg);
+static int SetWatch(char *sym, int *isscanf);
+static int SetMiniFunc(unsigned char *arg, uint32_t *format_option_ptr);
 
 /*
  *      External variables used
@@ -30,7 +32,6 @@ extern int smartprintf;
  *      zero, will call the contents of HL
  */
 
-#include "ccdefs.h"
 
 
 
@@ -38,14 +39,16 @@ extern int smartprintf;
 
 void callfunction(SYMBOL *ptr)
 {
+    int isscanf = 0;
+    uint32_t format_option;
     int nargs, vconst, val,expr,argnumber ;
     int watcharg;   /* For watching printf etc */
-    unsigned char minifunc;  /* Call cut down version */
+    int minifunc = 0;  /* Call cut down version */
     unsigned char protoarg;
 	char preserve;	/* Preserve af when cleaningup */
 
     nargs=0;
-    preserve=argnumber=0;
+    argnumber=0;
     watcharg=minifunc=0;
     blanks();       /* already saw open paren */
 /*
@@ -60,7 +63,7 @@ void callfunction(SYMBOL *ptr)
     }
 
     if (ptr && smartprintf)
-        watcharg=SetWatch(ptr->name);
+        watcharg=SetWatch(ptr->name,&isscanf);
 
     while ( ch() != ')' ) {
         if(endst())break;
@@ -83,7 +86,7 @@ void callfunction(SYMBOL *ptr)
             } else {
                 if (argnumber==watcharg) {
                     if (ptr) debug(DBG_ARG1,"Caughtarg!! %s",litq+val+1);
-                    minifunc=SetMiniFunc(litq+val+1);
+                    minifunc=SetMiniFunc(litq+val+1, &format_option);
 
                 }
                 if (expr==DOUBLE) {
@@ -157,15 +160,13 @@ void callfunction(SYMBOL *ptr)
 			if ( (ptr->flags&SHARED) || (ptr->flags&SHAREDC)) preserve=YES;
 			if (ptr->flags&SHAREDC) zclibcallop();
             else zcallop();
-            switch(minifunc) {
-            case 1:
-                /* Mini function */
-                break;
-            case 3:
-                /* Fp function */
-                warning(W_FLTPRINTF);
+            if ( isscanf ) {
+                scanf_format_option |= format_option; 
+	        if (minifunc > scanf_level) scanf_level=minifunc;
+            } else {
+                printf_format_option |= format_option; 
+	        if (minifunc > printflevel) printflevel=minifunc;
             }
-			if (minifunc > printflevel) printflevel=minifunc;
             outname(ptr->name,dopref(ptr));
             if ( (ptr->flags&SHARED) && useshare ) outstr("_sl");
 			else if (ptr->flags&SHAREDC) outstr("_rst");
@@ -201,8 +202,9 @@ void callfunction(SYMBOL *ptr)
  * Watcharg, return number of argument to watch - for printf etc
  */
 
-static int SetWatch(char *sym)
+static int SetWatch(char *sym, int *type)
 {
+	*type = 0; // printf
         if ( strcmp(sym,"printf") == 0 ) return 1;
         if ( strcmp(sym,"printk") == 0 ) return 1;
         if ( strcmp(sym,"fprintf") == 0 ) return 2;
@@ -210,6 +212,14 @@ static int SetWatch(char *sym)
         if ( strcmp(sym,"vprintf") == 0 ) return 1;
         if ( strcmp(sym,"vfprintf") == 0 ) return 2;
         if ( strcmp(sym,"vsprintf") == 0 ) return 2;
+        if ( strcmp(sym,"snprintf") == 0 ) return 3;
+        if ( strcmp(sym,"vsnprintf") == 0 ) return 3;
+	*type = 1; // printf
+        if ( strcmp(sym,"scanf") == 0 ) return 1;
+        if ( strcmp(sym,"sscanf") == 0 ) return 2;
+        if ( strcmp(sym,"fscanf") == 0 ) return 2;
+        if ( strcmp(sym,"vscanf") == 0 ) return 1;
+        if ( strcmp(sym,"vfscanf") == 0 ) return 2;
         return 0;
 }
 
@@ -287,12 +297,41 @@ int ForceArgs(char dest, char src,int expr, char functab)
 }
 
 
+struct printf_format_s {
+	char 	  fmt;
+        char      complex;
+	uint32_t  val;
+	uint32_t  lval;
+} printf_formats[] = {
+   { 'd', 1, 0x01, 0x1000 },
+   { 'u', 1, 0x02, 0x2000 },
+   { 'x', 2, 0x0c, 0xc000 },
+   { 'o', 2, 0x10, 0x10000 },
+   { 'n', 2, 0x20, 0x20000 },
+   { 'i', 2, 0x40, 0x40000 },
+   { 'p', 2, 0x80, 0x80000 },
+   { 'B', 2, 0x100, 0x100000 },
+   { 's', 1, 0x200, 0x0 },
+   { 'c', 1, 0x400, 0x0 },
+   { 'a', 0, 0x400000, 0x0 },
+   { 'A', 0, 0x800000, 0x0 },
+   { 'e', 3, 0x1000000, 0x1000000 },
+   { 'E', 3, 0x2000000, 0x2000000 },
+   { 'f', 3, 0x4000000, 0x4000000 },
+   { 'F', 3, 0x8000000, 0x8000000 },
+   { 'g', 3, 0x10000000, 0x10000000 },
+   { 'G', 3, 0x20000000, 0x20000000 },
+   { 0, 0, 0, 0}
+};
+       
 
 
-static int SetMiniFunc(unsigned char *arg)
+static int SetMiniFunc(unsigned char *arg, uint32_t *format_option_ptr)
 {
     char    c;
-    int    complex;
+    int    complex,islong;
+    uint32_t   format_option = 0;
+    struct printf_format_s *fmt;
 
     complex=1;      /* mini printf */
     while ( (c=*arg++) ) {
@@ -310,26 +349,24 @@ static int SetMiniFunc(unsigned char *arg)
                 arg++;
             }
         }
-        switch(*arg) {
-        case 'e':
-        case 'E':
-        case 'f':
-        case 'g':
-        case 'G':
-            complex=3;
-            break;
-        case 'l':
-        case 'o':
-        case 'i':
-        case 'p':
-        case 'n':
-        case 'x':
-        case 'X':
-            if (complex<=2) complex=2;
-            break;
-        }
 
+        islong=0;
+        if ( *arg == 'l' ) {
+            if (complex < 2) complex=2;
+            arg++;
+	    islong=1;
+        }
+	fmt = &printf_formats[0];
+        while ( fmt->fmt ) {
+           if ( fmt->fmt == *arg ) {
+               if ( complex < fmt->complex ) complex = fmt->complex;
+               format_option |= islong ? fmt->lval : fmt->val;       
+               break;
+           }
+           fmt++;
+        }
     }
+    *format_option_ptr = format_option;
     return(complex);
 }
 

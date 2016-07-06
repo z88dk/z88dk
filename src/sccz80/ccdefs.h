@@ -4,7 +4,7 @@
  *      The master header file
  *      Includes everything else!!!
  *
- *      $Id: ccdefs.h,v 1.2 2009-09-06 18:58:36 dom Exp $
+ *      $Id: ccdefs.h,v 1.3 2016-07-06 14:24:22 dom Exp $
  */
 
 /*
@@ -13,6 +13,7 @@
 
 
 #include <sys/types.h>
+#include <inttypes.h>
 #include <stdint.h>
 
 #include "define.h"
