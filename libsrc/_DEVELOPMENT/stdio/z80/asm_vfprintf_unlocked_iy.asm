@@ -43,7 +43,7 @@ asm_vfprintf_unlocked:
    ;
    ;            eacces = stream not open for writing
    ;            eacces = stream is in an error state
-   ;            erange = width or precision_printf out of range
+   ;            erange = width or precision out of range
    ;            einval = unknown printf conversion
    ;
    ;            more errors may be set by underlying driver
@@ -310,31 +310,31 @@ width_from_format_printf:
    push hl
 
 ;******************************
-; * precision_printf FIELD ***********
+; * precision FIELD ***********
 
 precision_printf:
 
-   ; consume optional precision_printf specifier
-   ; default precision_printf is one
+   ; consume optional precision specifier
+   ; default precision is one
 
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, width, stack_param
 
-   ld hl,1                     ; default precision_printf
+   ld hl,1                     ; default precision
    
    ld a,(de)
 
    cp '.'
    jr nz, end_precision_printf
 
-   set 0,(iy+5)                ; indicate precision_printf is specified
+   set 0,(iy+5)                ; indicate precision is specified
    inc de                      ; consume '.'
    
    ld a,(de)
    cp '*'
    jr nz, precision_from_format_printf
    
-   ; asterisk means precision_printf comes from parameter list
+   ; asterisk means precision comes from parameter list
 
    pop hl
    
@@ -344,20 +344,20 @@ precision_printf:
    ; hl = stack_param
    ; stack = WORKSPACE_44, width, address of next format char to examine
    
-   call __stdio_nextarg_de     ; de = precision_printf
+   call __stdio_nextarg_de     ; de = precision
    ex de,hl
 
-   ; hl = precision_printf
+   ; hl = precision
    ; de = stack_param
    ; stack = WORKSPACE_44, width, address of next format char to examine
    
    bit 7,h
    jr z, precision_positive_printf
 
-   ; negative precision_printf means precision_printf is ignored
+   ; negative precision means precision is ignored
    
-   ld hl,1                     ; precision_printf takes default value
-   res 0,(iy+5)                ; indicate precision_printf is not specified
+   ld hl,1                     ; precision takes default value
+   res 0,(iy+5)                ; indicate precision is not specified
 
 precision_positive_printf:
 
@@ -366,26 +366,26 @@ precision_positive_printf:
    push hl
    
    ; de = address of next format char to examine
-   ; stack = WORKSPACE_44, width, precision_printf, stack_param
+   ; stack = WORKSPACE_44, width, precision, stack_param
 
    jr length_modifier_printf
 
 precision_from_format_printf:
 
-   ; read precision_printf from format string
+   ; read precision from format string
 
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, width, stack_param
 
-   call l_atou                   ; hl = precision_printf
-   jp c, error_format_precision_printf  ; precision_printf out of range
+   call l_atou                   ; hl = precision
+   jp c, error_format_precision_printf  ; precision out of range
 
    bit 7,h
-   jp nz, error_format_precision_printf ; precision_printf out of range
+   jp nz, error_format_precision_printf ; precision out of range
 
 end_precision_printf:
 
-   ; hl = precision_printf
+   ; hl = precision
    ; de = address of next format char to examine
    ; stack = WORKSPACE_44, width, stack_param
 
@@ -400,7 +400,7 @@ length_modifier_printf:
    ; consume optional length modifier
 
    ; de = address of next format char to examine
-   ; stack = WORKSPACE_44, width, precision_printf, stack_param
+   ; stack = WORKSPACE_44, width, precision, stack_param
 
    call __stdio_length_modifier
 
@@ -414,7 +414,7 @@ converter_specifier_printf:
    
    ; de = address of next format char to examine
    ;  c = length modifier id
-   ; stack = WORKSPACE_44, width, precision_printf, stack_param
+   ; stack = WORKSPACE_44, width, precision, stack_param
 
    ld a,(de)                   ; a = specifier
    inc de
@@ -478,7 +478,7 @@ ENDIF
 unrecognized_printf:
 
    ; de = address of next format char to examine
-   ; stack = WORKSPACE_44, width, precision_printf, stack_param
+   ; stack = WORKSPACE_44, width, precision, stack_param
 
    call error_einval_zc        ; set errno
    
@@ -578,7 +578,7 @@ printf_invoke_flags:
    ; hl = & printf converter
    ; bc = return address after conversion
    ; de = address of next format char to examine
-   ; stack = WORKSPACE_44, width, precision_printf, stack_param
+   ; stack = WORKSPACE_44, width, precision, stack_param
 
    bit 5,a
    jr z, skip_00_printf
@@ -600,14 +600,14 @@ printf_invoke:
    ; hl = & printf_converter
    ; de = address of next format char to examine
    ; bc = return address after printf conversion
-   ; stack = WORKSPACE_44, width, precision_printf, stack_param
+   ; stack = WORKSPACE_44, width, precision, stack_param
 
    ex (sp),hl                  ; push & printf_converter
    push hl
 
    ; de = char *format
    ; bc = return address
-   ; stack = WORKSPACE_44, width, precision_printf, & converter, stack_param
+   ; stack = WORKSPACE_44, width, precision, & converter, stack_param
 
    ld hl,15
    add hl,sp
@@ -646,7 +646,7 @@ printf_invoke:
    ; iy = FILE *
    ; hl = void *stack_param
    ; de = void *buffer_digits
-   ; stack = WORKSPACE_42, return addr, buffer_digits, width, precision_printf, & printf_conv
+   ; stack = WORKSPACE_42, return addr, buffer_digits, width, precision, & printf_conv
 
    ; WORSPACE_44 low to high addresses
    ;
