@@ -32,8 +32,8 @@ asm_printf:
 	; -9 = base for number conversion
 	; -10 = length of buffer
 	;
-	; -30->-11 = buffer (19 bytes)
-	ld	hl,-30
+	; -50->-11 = buffer (39 bytes)
+	ld	hl,-50
 	add	hl,sp
 	ld	sp,hl
 	ld	e,(ix+2)	;arg pointer
@@ -53,7 +53,7 @@ asm_printf:
 	inc	hl
 	and	a
 	jr	nz,cont
-	ld	hl,28		;adjust the stack
+	ld	hl,48		;adjust the stack
 	add	hl,sp
 	ld	sp,hl
 	pop	hl		;grab the number of bytes written

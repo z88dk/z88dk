@@ -13,7 +13,7 @@
 
 __printf_handle_e:
 	set	5,(ix-4)
-__printf_handle_4:
+__printf_handle_f:
         push    hl              ;save fmt
 ; If we've got %f then lets assume we've got sccz80 rather than sdcc
         dec     de

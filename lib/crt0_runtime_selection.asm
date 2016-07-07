@@ -182,6 +182,7 @@ IF NEED_printf
 	EXTERN	__printf_handle_x
 	EXTERN	__printf_handle_X
 	EXTERN	__printf_handle_p
+	EXTERN	__printf_handle_e
 	EXTERN	__printf_handle_f
 	EXTERN	__printf_handle_s
 	EXTERN	__printf_handle_c
@@ -241,7 +242,7 @@ ENDIF
 
 IF CLIB_OPT_PRINTF  & $1000000
 	defb	'e'
-	defw	__printf_handle_f
+	defw	__printf_handle_e
 ENDIF
 IF CLIB_OPT_PRINTF & $10000000
 	defb	'g'

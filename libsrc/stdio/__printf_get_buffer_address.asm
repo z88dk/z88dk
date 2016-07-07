@@ -10,6 +10,6 @@
 __printf_get_buffer_address:
         push    ix
         pop     hl
-        ld      bc,-30
+        ld      bc,-50
         add     hl,bc
         ret
