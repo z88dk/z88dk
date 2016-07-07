@@ -17,7 +17,7 @@
 ; bit 0 =  $    01 = enable %d
 ; bit 1 =  $    02 = enable %u
 ; bit 2 =  $    04 = enable %x
-; bit 3 =  $    08 = enable %x (duplicate)
+; bit 3 =  $    08 = enable %X (duplicate)
 ; bit 4 =  $    10 = enable %o
 ; bit 5 =  $    20 = enable %n
 ; bit 6 =  $    40 = enable %i
@@ -29,7 +29,7 @@
 ; bit 12 = $  1000 = enable %ld
 ; bit 13 = $  2000 = enable %lu
 ; bit 14 = $  4000 = enable %lx
-; bit 15 = $  8000 = enable %lx (duplicate)
+; bit 15 = $  8000 = enable %lX (duplicate)
 ; bit 16 = $ 10000 = enable %lo
 ; bit 17 = $ 20000 = enable %ln
 ; bit 18 = $ 40000 = enable %li
@@ -44,15 +44,16 @@
 ; bit 27 = $ 8000000 = enable %F
 ; bit 28 = $10000000 = enable %g
 ; bit 29 = $20000000 = enable %G
+; bit 31 = $80000000 = enable flags handling
 
 IF DEFINED_CLIB_OPT_SCANF
 	; User has specified the configuration level - force scanf to be included
 	UNDEFINE NEED_scanf
 	DEFINE NEED_scanf
 ELSE
-	IF DEFINED_scanf_format
+	IF DEFINED_CRT_scanf_format
 	    ;Only defined as part of sccz80
-	    defc CLIB_OPT_SCANF = scanf_format
+	    defc CLIB_OPT_SCANF = CRT_scanf_format
         ELSE
 	    ; TODO: Some default configurations
         ENDIF
@@ -147,25 +148,119 @@ ENDIF
 	defb	0	;end marker
 ENDIF
 
-;--------
-; Printf picker - this is classic based at present
 ;
-;--------
-        PUBLIC  asm_vfprintf
-IF DEFINED_floatstdio
-        EXTERN  asm_vfprintf_level3
-        defc    asm_vfprintf = asm_vfprintf_level3
+; printf format picker
+;
+
+
+IF DEFINED_CLIB_OPT_PRINTF
+	; User has specified the configuration level - force scanf to be included
+	UNDEFINE NEED_printf
+	DEFINE NEED_printf
 ELSE
-        IF DEFINED_complexstdio
-                EXTERN  asm_vfprintf_level2
-                defc    asm_vfprintf = asm_vfprintf_level2
+	IF DEFINED_CRT_printf_format
+	    ;Only defined as part of sccz80
+	    defc CLIB_OPT_PRINTF = CRT_printf_format
         ELSE
-		IF DEFINED_ministdio
-                	EXTERN  asm_vfprintf_level1
-                	defc    asm_vfprintf = asm_vfprintf_level1
-		ENDIF
+	    ; Default configurations to match old behaviour
+	    ; The built in one is roughly the old ministdio
+	    IF DEFINED_complexstdio
+                defc CLIB_OPT_PRINTF = 0x851BF7BF
+            ELSE
+                IF DEFINED_complexstdio
+		    defc CLIB_OPT_PRINTF = 0x801BF7BF
+                ENDIF
+            ENDIF
         ENDIF
 ENDIF
+
+IF NEED_printf
+	PUBLIC	__printf_format_table
+	EXTERN	__printf_handle_d
+	EXTERN	__printf_handle_u
+	EXTERN	__printf_handle_o
+	EXTERN	__printf_handle_x
+	EXTERN	__printf_handle_X
+	EXTERN	__printf_handle_p
+	EXTERN	__printf_handle_f
+	EXTERN	__printf_handle_s
+	EXTERN	__printf_handle_c
+	EXTERN	__printf_handle_n
+
+__printf_format_table:
+
+IF CLIB_OPT_PRINTF & $1001
+	defb	'u'
+	defw	__printf_handle_u
+ENDIF
+
+IF CLIB_OPT_PRINTF & $2002
+	defb	'd'
+	defw	__printf_handle_d
+ENDIF
+
+IF CLIB_OPT_PRINTF & $4004
+	defb	'x'
+	defw	__printf_handle_x
+ENDIF
+
+IF CLIB_OPT_PRINTF & $8008
+	defb	'X'
+	defw	__printf_handle_X
+ENDIF
+
+IF CLIB_OPT_PRINTF & $80080
+	defb	'p'
+	defw	__printf_handle_x
+ENDIF
+
+IF CLIB_OPT_PRINTF  & $10010
+	defb	'o'
+	defw	__printf_handle_o
+ENDIF
+
+IF CLIB_OPT_PRINTF & $20020
+	defb	'n'
+	defw	__printf_handle_n
+ENDIF
+
+IF CLIB_OPT_PRINTF & $200
+	defb	's'
+	defw	__printf_handle_s
+ENDIF
+
+IF CLIB_OPT_PRINTF & $400
+	defb	'c'
+	defw	__printf_handle_c
+ENDIF
+
+IF CLIB_OPT_PRINTF & $4000000
+	defb	'f'
+	defw	__printf_handle_f
+ENDIF
+
+IF CLIB_OPT_PRINTF  & $1000000
+	defb	'e'
+	defw	__printf_handle_f
+ENDIF
+IF CLIB_OPT_PRINTF & $10000000
+	defb	'g'
+	defw	__printf_handle_f
+ENDIF
+	defb	0	;end marker
+
+IF CLIB_OPT_PRINTF & $80000000
+	EXTERN	__printf_get_flags_impl
+	PUBLIC	__printf_get_flags
+	defc	__printf_get_flags = __printf_get_flags_impl
+ELSE
+	EXTERN	__printf_get_flags_noop
+	PUBLIC	__printf_get_flags
+	defc	__printf_get_flags = __printf_get_flags_noop
+ENDIF
+
+ENDIF
+
 
 ;--------
 ; Allow a compile time switch between native output and ANSI terminal
