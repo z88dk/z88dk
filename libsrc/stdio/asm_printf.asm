@@ -46,6 +46,8 @@ asm_printf:
 	dec	a
 	ld	(ix-5),a
 	ld	(ix-6),a
+        ld      (ix-7),a	;precision = undefined
+        ld      (ix-8),a
 .__printf_loop
 	ld	(ix-9),10		;default base
 	xor	a
