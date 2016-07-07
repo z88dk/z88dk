@@ -6,7 +6,7 @@
 		PUBLIC	vfprintf
 
 		EXTERN	fputc_callee
-		EXTERN  asm_vfprintf
+		EXTERN  asm_printf
 
 ; Cores have signature (in __smallc)
 ; int vfprintf1(FILE *fp, void (*output_fn)(FILE *fp,int c), int sccz80, unsigned char *fmt,void *ap)
@@ -30,7 +30,7 @@ vfprintf:
 	push	bc
 	push	de			;fmt
 	push	hl			;ap
-	call	asm_vfprintf
+	call	asm_printf
 	pop	bc
 	pop	bc
 	pop	bc

@@ -4,7 +4,7 @@
 
 	PUBLIC	_vsnprintf
 
-	EXTERN	asm_vfprintf
+	EXTERN	asm_printf
 	EXTERN	sprintf_outc
 
 
@@ -46,7 +46,7 @@ _vsnprintf:
 	inc	hl
 	ld	b,(hl)
         push    bc              ;ap
-        call    asm_vfprintf
+        call    asm_printf
 	ex	de,hl
 	ld	hl,10+4
 	add	hl,sp

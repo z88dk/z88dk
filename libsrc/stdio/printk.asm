@@ -4,7 +4,7 @@
 
 	PUBLIC	printk
 
-	EXTERN	asm_vfprintf
+	EXTERN	asm_printf
 	EXTERN	printk_outc
 
 
@@ -38,7 +38,7 @@ printk:
 	dec	hl
 	dec	hl
 	push	hl
-	call	asm_vfprintf
+	call	asm_printf
 	pop	bc
 	pop	bc	
 	pop	bc	

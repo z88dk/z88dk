@@ -4,7 +4,7 @@
 
 	PUBLIC	_fprintf
 
-	EXTERN	asm_vfprintf
+	EXTERN	asm_printf
 	EXTERN	fputc_callee
 
 
@@ -29,7 +29,7 @@ _fprintf:
 	push	bc
 	push	de	;fmt
 	push	hl	;argument
-	call	asm_vfprintf
+	call	asm_printf
 	pop	bc
 	pop	bc
 	pop	bc	

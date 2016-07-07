@@ -3,7 +3,7 @@
 
 	PUBLIC	snprintf
 
-	EXTERN	asm_vfprintf
+	EXTERN	asm_printf
 	EXTERN	sprintf_outc
 	EXTERN	__sgoioblk
 
@@ -52,7 +52,7 @@ snprintf:
 	dec	hl
 	dec	hl
 	push	hl		;&ap
-	call	asm_vfprintf
+	call	asm_printf
 	ex	de,hl
 	ld	hl,10+4
 	add	hl,sp

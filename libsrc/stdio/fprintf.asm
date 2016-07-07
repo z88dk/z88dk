@@ -3,7 +3,7 @@
 
 	PUBLIC	fprintf
 
-	EXTERN	asm_vfprintf
+	EXTERN	asm_printf
 	EXTERN	fputc_callee
 	EXTERN	__sgoioblk
 
@@ -43,7 +43,7 @@ fprintf:
 	dec	hl
 	dec	hl		;points too ap
 	push	hl
-	call	asm_vfprintf
+	call	asm_printf
 	pop	bc
 	pop	bc	
 	pop	bc	
