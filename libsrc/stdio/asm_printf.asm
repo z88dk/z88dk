@@ -105,5 +105,6 @@ no_format_match:
 no_format_found:
 	; No matching format character, just print it out
 	pop	hl
+	ld	a,c
 	jr	print_format_character
 
