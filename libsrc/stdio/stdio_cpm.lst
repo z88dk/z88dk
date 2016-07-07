@@ -80,6 +80,7 @@ stdio/obj/cpm/__printf_handle_o
 stdio/obj/cpm/__printf_handle_s
 stdio/obj/cpm/__printf_handle_u
 stdio/obj/cpm/__printf_handle_x
+stdio/obj/cpm/__printf_handle_B
 stdio/obj/cpm/__printf_number
 stdio/obj/cpm/__printf_print_aligned
 stdio/obj/cpm/__printf_print_the_buffer

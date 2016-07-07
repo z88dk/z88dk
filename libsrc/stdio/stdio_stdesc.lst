@@ -81,6 +81,7 @@ stdio/obj/stdesc/__printf_handle_o
 stdio/obj/stdesc/__printf_handle_s
 stdio/obj/stdesc/__printf_handle_u
 stdio/obj/stdesc/__printf_handle_x
+stdio/obj/stdesc/__printf_handle_B
 stdio/obj/stdesc/__printf_number
 stdio/obj/stdesc/__printf_print_aligned
 stdio/obj/stdesc/__printf_print_the_buffer

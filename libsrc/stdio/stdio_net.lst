@@ -86,6 +86,7 @@ stdio/obj/net/__printf_handle_o
 stdio/obj/net/__printf_handle_s
 stdio/obj/net/__printf_handle_u
 stdio/obj/net/__printf_handle_x
+stdio/obj/net/__printf_handle_B
 stdio/obj/net/__printf_number
 stdio/obj/net/__printf_print_aligned
 stdio/obj/net/__printf_print_the_buffer

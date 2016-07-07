@@ -80,6 +80,7 @@ stdio/obj/__printf_handle_o
 stdio/obj/__printf_handle_s
 stdio/obj/__printf_handle_u
 stdio/obj/__printf_handle_x
+stdio/obj/__printf_handle_B
 stdio/obj/__printf_number
 stdio/obj/__printf_print_aligned
 stdio/obj/__printf_print_the_buffer
