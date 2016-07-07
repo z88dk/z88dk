@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.17 2016-07-07 09:17:13 dom Exp $
+ *      $Id: callfunc.c,v 1.18 2016-07-07 15:41:47 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -127,7 +127,7 @@ void callfunction(SYMBOL *ptr)
             else if (expr==DOUBLE) {
                 dpush2();
                 nargs += 6;
-				swapstk();
+		mainpop();
             } else {
                 /* If we've only got one 2 byte argment, don't swap the stack */
                 if ( rcmatch(',') || nargs != 0 ) {
