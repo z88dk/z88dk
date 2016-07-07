@@ -86,12 +86,12 @@ ENDIF
 
 
 
-IF CLIB_OPT_SCANF & $1001
+IF CLIB_OPT_SCANF & $2002
 	defb	'u'
 	defw	__scanf_handle_u
 ENDIF
 
-IF CLIB_OPT_SCANF & $2002
+IF CLIB_OPT_SCANF & $1001
 	defb	'd'
 	defw	__scanf_handle_d
 ENDIF
@@ -191,12 +191,12 @@ IF NEED_printf
 
 __printf_format_table:
 
-IF CLIB_OPT_PRINTF & $1001
+IF CLIB_OPT_PRINTF & $2002
 	defb	'u'
 	defw	__printf_handle_u
 ENDIF
 
-IF CLIB_OPT_PRINTF & $2002
+IF CLIB_OPT_PRINTF & $1001
 	defb	'd'
 	defw	__printf_handle_d
 ENDIF

@@ -43,6 +43,9 @@ asm_printf:
 	xor	a
 	ld	(ix-1),a
 	ld	(ix-2),a
+	dec	a
+	ld	(ix-5),a
+	ld	(ix-6),a
 .__printf_loop
 	ld	(ix-9),10		;default base
 	xor	a
