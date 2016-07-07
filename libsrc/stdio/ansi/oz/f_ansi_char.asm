@@ -2,12 +2,12 @@
 ; 	ANSI Video handling for the Sharp OZ family
 ;	Stefano Bodrato - Nov. 2002
 ;
-;	$Id: f_ansi_char.asm,v 1.3 2016-06-12 17:00:21 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.4 2016-07-07 06:02:38 stefano Exp $
 ;
 ; 	Handles Attributes INVERSE + UNDERLINED
 ;
 ;	** alternate (smaller) 4bit font capability: 
-;	** use the -DPACKEDFONT flag
+;	** use the "ansifont_is_packed" flag
 ;
 ;	set it up with:
 ;	.text_cols	= max columns
@@ -25,13 +25,9 @@
 ; 4 dots: MAX 59 columns
 ; 3 dots: Almost 80 columns (79..+ 2 pixels)
 
-	defc columns	= 59
-	defc char_dots	= 4
+;	defc columns	= 59
 	
 	defc row_bytes  = 30
-
-.font
-        BINARY  "stdio/ansi/F4PACK.BIN"
 
 
 ;
@@ -50,14 +46,19 @@
 	PUBLIC	text_cols
 	PUBLIC	text_rows
 
-	EXTERN     swapgfxbk
-        EXTERN	swapgfxbk1
+	EXTERN  swapgfxbk
+	EXTERN	swapgfxbk1
+
+	EXTERN	ansicharacter_pixelwidth
+	EXTERN	ansifont_is_packed
+	EXTERN	ansifont
 
 	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 
-.text_cols   defb columns
+	EXTERN	ansicolumns
+.text_cols   defb ansicolumns
 .text_rows   defb 10
 
 .ansi_CHAR
@@ -131,18 +132,21 @@
 
 .char
   ld b,'A'				; Put here the character to be printed
-  
-IF PACKEDFONT
+
+  ld a,ansifont_is_packed
+  ld	hl,ansifont	- 256
+  and	a
+  jr    z,got_font_location
+
   xor	a
   rr	b
   jr	c,even
   ld	a,4
 .even
   ld	(ROLL+1),a
-  ld hl,font-128
-ELSE
-  ld hl,font
-ENDIF
+  ld hl,ansifont - 128
+
+.got_font_location
 
   ld de,8
 
@@ -167,16 +171,17 @@ ENDIF
   djnz L1
 .DTS
 
+  ld a,ansifont_is_packed
+  and  a
   ld a,(hl)
-  
-IF PACKEDFONT
+  jr   z,INVRS
+ 
 .ROLL
   jr INVRS
   rla
   rla
   rla
   rla
-ENDIF
 
 ; --- --- Inverse text handling
 .INVRS
@@ -194,7 +199,8 @@ ENDIF
 ; --- --- end of underlined text handling
 
 .DOTS
-  ld b,char_dots		; character FONT width in pixel
+  ld b,ansicharacter_pixelwidth
+
 .L2
   rla
   ;rl (ix+1)
