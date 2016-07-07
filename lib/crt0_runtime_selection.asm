@@ -193,7 +193,7 @@ IF NEED_ansiterminal
         PUBLIC ansifont_is_packed
 
 	IF !ansipixels
-		defc ansipixels	256
+		defc ansipixels = 256
 	ENDIF
 
 	IF !DEFINED_ansicolumns
