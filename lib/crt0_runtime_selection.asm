@@ -187,6 +187,7 @@ IF NEED_printf
 	EXTERN	__printf_handle_s
 	EXTERN	__printf_handle_c
 	EXTERN	__printf_handle_n
+	EXTERN	__printf_handle_B
 
 __printf_format_table:
 
@@ -213,6 +214,11 @@ ENDIF
 IF CLIB_OPT_PRINTF & $80080
 	defb	'p'
 	defw	__printf_handle_x
+ENDIF
+
+IF CLIB_OPT_PRINTF & $100100
+	defb	'B'
+	defw	__printf_handle_B
 ENDIF
 
 IF CLIB_OPT_PRINTF  & $10010
