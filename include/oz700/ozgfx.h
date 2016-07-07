@@ -2,7 +2,7 @@
 	HTC Compatibility Library and OZ extras 
 	1. GRAPHICS AND DISPLAY
 
-	$Id: ozgfx.h,v 1.9 2016-06-30 09:00:12 dom Exp $
+	$Id: ozgfx.h,v 1.10 2016-07-07 05:53:28 stefano Exp $
 */
 
 
@@ -109,8 +109,8 @@ void _ozvline(int x,int y,int len,int colour)
 }
 */
 extern __LIB__ ozdisplayorbyte(unsigned offset, int v) __SMALLCDECL;
-extern __LIB__ ozdisplayputbyte(unsigned offset, int v __SMALLCDECL);
-extern __LIB__ ozdisplayandbyte(unsigned offset, int v __SMALLCDECL);
+extern __LIB__ ozdisplayputbyte(unsigned offset, int v) __SMALLCDECL;
+extern __LIB__ ozdisplayandbyte(unsigned offset, int v) __SMALLCDECL;
 extern __LIB__ ozdisplayinbyte(unsigned offset);
 
 //#define ozgetpoint point
