@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.40 2016-07-06 14:48:03 dom Exp $
+ *      $Id: main.c,v 1.41 2016-07-07 09:17:13 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -434,14 +434,14 @@ void dumpfns()
     }
 
    if ( printf_format_option ) {
-        fprintf(fp,"\nIF !DEFINED_printf_format\n");
-        fprintf(fp,"\tdefc\tDEFINED_printf_format = 1\n");
-        fprintf(fp,"\tdefc printf_format = 0x%08x\n",printf_format_option);
+        fprintf(fp,"\nIF !DEFINED_CRT_printf_format\n");
+        fprintf(fp,"\tdefc\tDEFINED_CRT_printf_format = 1\n");
+        fprintf(fp,"\tdefc CRT_printf_format = 0x%08x\n",printf_format_option);
 	fprintf(fp,"ELSE\n");
 	fprintf(fp,"\tUNDEFINE temp_printf_format\n");
-	fprintf(fp,"\tdefc temp_printf_format = printf_format\n");
-	fprintf(fp,"\tUNDEFINE printf_format\n");
-	fprintf(fp,"\tdefc printf_format = temp_printf_format | 0x%08X\n",printf_format_option);
+	fprintf(fp,"\tdefc temp_printf_format = CRT_printf_format\n");
+	fprintf(fp,"\tUNDEFINE CRT_printf_format\n");
+	fprintf(fp,"\tdefc CRT_printf_format = temp_printf_format | 0x%08x\n",printf_format_option);
 	fprintf(fp,"ENDIF\n\n");
 	fprintf(fp,"\nIF !NEED_printf\n");
 	fprintf(fp,"\tDEFINE\tNEED_printf\n");
@@ -449,14 +449,14 @@ void dumpfns()
    }
 
    if ( scanf_format_option ) {
-        fprintf(fp,"\nIF !DEFINED_scanf_format\n");
-        fprintf(fp,"\tdefc\tDEFINED_scanf_format = 1\n");
-        fprintf(fp,"\tdefc scanf_format = 0x%08x\n",scanf_format_option);
+        fprintf(fp,"\nIF !DEFINED_CRT_scanf_format\n");
+        fprintf(fp,"\tdefc\tDEFINED_CRT_scanf_format = 1\n");
+        fprintf(fp,"\tdefc CRT_scanf_format = 0x%08x\n",scanf_format_option);
 	fprintf(fp,"ELSE\n");
 	fprintf(fp,"\tUNDEFINE temp_scanf_format\n");
-	fprintf(fp,"\tdefc temp_scanf_format = scanf_format\n");
-	fprintf(fp,"\tUNDEFINE scanf_format\n");
-	fprintf(fp,"\tdefc scanf_format = temp_scanf_format | 0x%08X\n",scanf_format_option);
+	fprintf(fp,"\tdefc temp_scanf_format = CRT_scanf_format\n");
+	fprintf(fp,"\tUNDEFINE CRT_scanf_format\n");
+	fprintf(fp,"\tdefc CRT_scanf_format = temp_scanf_format | 0x%08x\n",scanf_format_option);
 	fprintf(fp,"ENDIF\n\n");
 	fprintf(fp,"\nIF !NEED_scanf\n");
 	fprintf(fp,"\tDEFINE\tNEED_scanf\n");

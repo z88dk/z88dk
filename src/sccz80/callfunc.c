@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.16 2016-07-06 16:24:28 dom Exp $
+ *      $Id: callfunc.c,v 1.17 2016-07-07 09:17:13 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -214,7 +214,7 @@ static int SetWatch(char *sym, int *type)
         if ( strcmp(sym,"vsprintf") == 0 ) return 2;
         if ( strcmp(sym,"snprintf") == 0 ) return 3;
         if ( strcmp(sym,"vsnprintf") == 0 ) return 3;
-	*type = 1; // printf
+	*type = 1; // scanf
         if ( strcmp(sym,"scanf") == 0 ) return 1;
         if ( strcmp(sym,"vscanf") == 0 ) return 1;
         if ( strcmp(sym,"fscanf") == 0 ) return 2;
@@ -306,7 +306,8 @@ struct printf_format_s {
 } printf_formats[] = {
    { 'd', 1, 0x01, 0x1000 },
    { 'u', 1, 0x02, 0x2000 },
-   { 'x', 2, 0x0c, 0xc000 },
+   { 'x', 2, 0x04, 0x4000 },
+   { 'X', 2, 0x08, 0x8000 },
    { 'o', 2, 0x10, 0x10000 },
    { 'n', 2, 0x20, 0x20000 },
    { 'i', 2, 0x40, 0x40000 },
@@ -337,15 +338,15 @@ static int SetMiniFunc(unsigned char *arg, uint32_t *format_option_ptr)
     complex=1;      /* mini printf */
     while ( (c=*arg++) ) {
         if (c != '%' ) continue;
-        if (*arg == '%' ) 
-            arg++;
 
         if ( *arg == '-' || *arg == '0' || *arg=='+' || *arg==' ' || *arg == '*' || *arg == '.' ) {
             if (complex < 2 ) complex=2;  /* Switch to standard */
+	    format_option |= 0x80000000;
 	    while ( !isalpha(*arg) )
                arg++;
         } else if ( isdigit(*arg) ) {
             if (complex < 2 ) complex=2;  /* Switch to standard */
+	    format_option |= 0x80000000;
             while ( isdigit(*arg) || *arg == '.' ) {
                 arg++;
             }
