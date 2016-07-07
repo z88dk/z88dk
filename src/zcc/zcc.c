@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.136 2016-07-03 20:12:47 aralbrec Exp $
+ *      $Id: zcc.c,v 1.137 2016-07-07 20:15:04 aralbrec Exp $
  */
 
 
@@ -57,6 +57,7 @@ static void            PragmaDefine(arg_t *arg,char *);
 static void            PragmaRedirect(arg_t *arg,char *);
 static void            PragmaNeed(arg_t *arg,char *);
 static void            PragmaBytes(arg_t *arg,char *);
+static void            PragmaInclude(arg_t *arg,char *);
 static void            AddArray(arg_t *arg,char *);
 static void            write_zcc_defined(char *name, int value);
 
@@ -137,7 +138,8 @@ static char           *asmargs;
 static char           *appmakeargs;
 static char           *sccz80arg = NULL;
 static char           *sdccarg = NULL;
-static char           *zccopt = NULL;   /* Text to append to zcc_opt.def */
+static char           *pragincname = NULL;  /* File containing pragmas to append to zcc_opt.def */
+static char           *zccopt = NULL;       /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
 static int             c_startup = -2;
@@ -346,6 +348,7 @@ static arg_t     myargs[] = {
     {"pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
     {"pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
     {"pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
+    {"pragma-include",AF_MORE,PragmaInclude,NULL, NULL, "Process include file containing pragmas" },
     {"subtype", AF_MORE, SetString, &c_subtype, NULL, "Set the target subtype" }, 
     {"clib", AF_MORE, SetString, &c_clib, NULL, "Set the target clib type" }, 
     {"startup", AF_MORE, SetNumber, &c_startup, NULL, "Set the startup type" },
@@ -595,10 +598,6 @@ int main(int argc, char **argv)
     }
     fclose(fp);
 
-
-
-
-
     /* Now, parse the default options list */
     if (c_options != NULL) {
         parse_option(strdup(c_options));
@@ -661,6 +660,8 @@ int main(int argc, char **argv)
         BuildOptions(&linkargs, buffer);
     }
 
+
+    /* clear zcc_opt.def */
     if (preserve == NO) {
         if ((fp = fopen(DEFFILE, "w")) != NULL) {
             fclose(fp);
@@ -678,7 +679,6 @@ int main(int argc, char **argv)
          write_zcc_defined("myzorg", c_zorg);
     }
 
-
     if ((fp = fopen(DEFFILE, "a")) != NULL) {
         fprintf(fp,"%s", zccopt ? zccopt : "");
         fclose(fp);
@@ -687,6 +687,20 @@ int main(int argc, char **argv)
         exit(1);
     }
     
+    /* process pragma-include */
+    if (pragincname)
+    {
+        char cmdline[FILENAME_MAX + 128];
+
+#ifdef _WIN32
+        snprintf(cmdline, FILENAME_MAX + 127, "zpragma < %s > nul", pragincname);
+#else
+        snprintf(cmdline, FILENAME_MAX + 127, "zpragma < %s > /dev/null", pragincname);
+#endif
+        if (verbose) printf("%s\n", cmdline);
+        system(cmdline);
+    }
+
 
     if (nfiles <= 0) {
         print_help_text();
@@ -694,9 +708,6 @@ int main(int argc, char **argv)
     }
     
    
-
-
-
     /* Copy crt0 to temporary directory */
     copy_crt0_to_temp();   
 
@@ -1472,6 +1483,19 @@ static void configure_compiler()
     }
 }
 
+
+void PragmaInclude(arg_t *arg, char *val)
+{
+    char *ptr = val + strlen(arg->name) + 1;
+
+    while (ispunct(*ptr)) ++ptr;
+
+    if (strlen(ptr))
+    {
+        free(pragincname);
+        pragincname = strdup(ptr);
+    }
+}
 
 void PragmaRedirect(arg_t *arg,char *val)
 {
