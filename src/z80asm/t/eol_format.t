@@ -19,7 +19,7 @@ use File::Basename;
 find(sub {
 		return unless -f $_;
 		dos2unix($_) if /^Makefile$|\.(c|h|pl|pm|t|asm|rl|bmk|def|yaml|in|tt)$/i;
-		unix2dos($_) if /\.(bat|vcxproj(\.filters)?)$/i;
+		unix2dos($_) if /\.bat$/i;
 	}, dirname($0)."/..");
 ok 1;
 
