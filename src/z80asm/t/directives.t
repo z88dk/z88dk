@@ -44,26 +44,24 @@ make_path("test_dir");
 	);
 	
 	# -I : OK
-	z80asm(
-		asm		=> 'include "test.inc"				;; 3E 0A',
-		options	=> "-b -Itest_dir",
-	);
-	z80asm(
-		asm		=> 'include "test.inc"				;; 3E 0A',
-		options	=> "-b -I=test_dir",
-	);
-	z80asm(
-		asm		=> 'include "test.inc"				;; 3E 0A',
-		options	=> "-b --inc-path=test_dir",
-	);
-	z80asm(
-		asm		=> 'include "test.inc"				;; 3E 0A',
-		options	=> "-b --inc-pathtest_dir",
-	);
+	for my $options ('-I', '-I=', '--inc-path', '--inc-path=') {
+		z80asm(
+			asm		=> 'include "test.inc"				;; 3E 0A',
+			options	=> "-b ${options}test_dir",
+		);
+	}
 	z80asm(
 		asm		=> 'include "test_dir/test.inc"		;; 3E 0A',
 		options	=> "-b -Itest_dir",
 	);
+	
+	# directory of source file is added to include path
+	write_file("test_dir/test.asm", 'include "test.inc"');
+	unlink "test_dir/test.bin";
+	ok system("z80asm -b test_dir/test.asm") == 0;
+	ok -f "test_dir/test.bin";
+	test_binfile("test_dir/test.bin", "\x3E\x0A");
+
 remove_tree("test_dir");
 
 # error_read_file

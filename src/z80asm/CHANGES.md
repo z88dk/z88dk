@@ -4,6 +4,12 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-07-08
+
+  Add the directory of each assembly file being assembled to the end 
+  of the include path, and remove at the end of the assembly. This allows
+  the assembly file to include files relative to its location.
+
 - 2016-07-06
 
   Remove reference to the Z80_OZFILES environment variable - it was used

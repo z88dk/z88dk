@@ -56,8 +56,14 @@ static void do_assemble( char *src_filename );
 *----------------------------------------------------------------------------*/
 void assemble_file( char *filename )
 {
-    char *src_filename;
+    char *src_filename, *src_dirname;
 	Module *module;
+
+	/* append the directoy of the file being assembled to the include path 
+	   and remove it at function end */
+	src_filename = get_asm_filename(filename);      /* set '.asm' extension */
+	src_dirname  = path_dirname(src_filename);
+	utarray_push_back(opts.inc_path, &src_dirname);
 
     /* normal case - assemble a asm source file */
     opts.cur_list = opts.list;		/* initial LSTON status */
@@ -67,8 +73,6 @@ void assemble_file( char *filename )
 	   after the previous one, allocating addresses */
 	if ( ! opts.make_bin )
 		reset_codearea();
-
-    src_filename = get_asm_filename( filename );      /* set '.asm' extension */
 
     /* Create module data structures for new file */
 	module = set_cur_module( new_module() );
@@ -88,6 +92,9 @@ void assemble_file( char *filename )
 	query_assemble(src_filename);
     set_error_null();           /* no more module in error messages */
 	opts.cur_list = FALSE;
+
+	/* finished assembly, remove dirname from include path */
+	utarray_pop_back(opts.inc_path);
 }
 
 /*-----------------------------------------------------------------------------
