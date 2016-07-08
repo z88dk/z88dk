@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.19 2016-07-08 02:36:49 aralbrec Exp $
+ *      $Id: callfunc.c,v 1.20 2016-07-08 06:57:04 dom Exp $
  */
 
 #include "ccdefs.h"
@@ -341,12 +341,12 @@ static int SetMiniFunc(unsigned char *arg, uint32_t *format_option_ptr)
 
         if ( *arg == '-' || *arg == '0' || *arg=='+' || *arg==' ' || *arg == '*' || *arg == '.' ) {
             if (complex < 2 ) complex=2;  /* Switch to standard */
-	    format_option |= 0x80000000;
+	    format_option |= 0x40000000;
 	    while ( !isalpha(*arg) )
                arg++;
         } else if ( isdigit(*arg) ) {
             if (complex < 2 ) complex=2;  /* Switch to standard */
-	    format_option |= 0x80000000;
+	    format_option |= 0x40000000;
             while ( isdigit(*arg) || *arg == '.' ) {
                 arg++;
             }

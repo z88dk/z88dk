@@ -44,7 +44,7 @@
 ; bit 27 = $ 8000000 = enable %F
 ; bit 28 = $10000000 = enable %g
 ; bit 29 = $20000000 = enable %G
-; bit 31 = $80000000 = enable flags handling
+; bit 30 = $40000000 = enable flags handling
 
 IF DEFINED_CLIB_OPT_SCANF
 	; User has specified the configuration level - force scanf to be included
@@ -256,7 +256,7 @@ IF CLIB_OPT_PRINTF & $10000000
 ENDIF
 	defb	0	;end marker
 
-IF CLIB_OPT_PRINTF & $80000000
+IF CLIB_OPT_PRINTF & $40000000
 	EXTERN	__printf_get_flags_impl
 	PUBLIC	__printf_get_flags
 	defc	__printf_get_flags = __printf_get_flags_impl
