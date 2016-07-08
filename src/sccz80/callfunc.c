@@ -3,7 +3,7 @@
  *
  *      Perform a function call
  *
- *      $Id: callfunc.c,v 1.18 2016-07-07 15:41:47 dom Exp $
+ *      $Id: callfunc.c,v 1.19 2016-07-08 02:36:49 aralbrec Exp $
  */
 
 #include "ccdefs.h"
@@ -45,7 +45,7 @@ void callfunction(SYMBOL *ptr)
     int watcharg;   /* For watching printf etc */
     int minifunc = 0;  /* Call cut down version */
     unsigned char protoarg;
-	char preserve;	/* Preserve af when cleaningup */
+	char preserve = NO;   /* Preserve af when cleaningup */
 
     nargs=0;
     argnumber=0;
