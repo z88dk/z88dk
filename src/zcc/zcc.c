@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.137 2016-07-07 20:15:04 aralbrec Exp $
+ *      $Id: zcc.c,v 1.138 2016-07-08 02:35:22 aralbrec Exp $
  */
 
 
@@ -144,6 +144,7 @@ static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
 static int             c_startup = -2;
 static int             c_nostdlib = 0;
+static int             c_nocrt = 0;
 
 
 static char            filenamebuf[FILENAME_MAX + 1];
@@ -344,6 +345,7 @@ static arg_t     myargs[] = {
     {"asm", AF_MORE, SetString, &c_assembler_type, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)"},
     {"compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)"},
     {"crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
+    {"-no-crt", AF_BOOL_TRUE, SetBoolean, &c_nocrt, NULL, "Link without crt0 file" },
     {"pragma-redirect",AF_MORE,PragmaRedirect,NULL, NULL, "Redirect a function" },
     {"pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
     {"pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
@@ -527,8 +529,8 @@ int linkthem(char *linker)
             mapon ? "-m " : "",
             (createapp || symbolson) ? "-s ": "",
             relocinfo ? "--reloc-info " : "",
-            c_crt0,
-            ext);
+            (c_nocrt == 0) ? c_crt0 : "",
+            (c_nocrt == 0) ? ext : "");
             
     for ( i = 0; i < nfiles; i++ ) {
         len += strlen(filelist[i]) + 5;
