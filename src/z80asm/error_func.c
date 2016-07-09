@@ -276,15 +276,6 @@ void warn_org_ignored(char *filename, char *section_name)
 	
 	STR_DELETE(msg);
 }
-void error_env_not_defined(char *var)
-{
-	STR_DEFINE(msg, STR_SIZE);
-
-	str_append_sprintf( msg, "environment variable '%s' not defined", var );
-	do_error( ErrError, str_data(msg) );
-	
-	STR_DELETE(msg);
-}
 void error_not_obj_file(char *filename)
 {
 	STR_DEFINE(msg, STR_SIZE);

@@ -19,18 +19,14 @@ char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
 
 /*-----------------------------------------------------------------------------
 *	define a library file name from the command line
-*	if empty, use Z80_STDLIB environment variable
-*	add .lib extension
 *----------------------------------------------------------------------------*/
 static char *search_libfile( char *filename )
 {
 	if ( filename != NULL && *filename != '\0' )	/* not empty */
 		return get_lib_filename( filename );		/* add '.lib' extension */
-	else if ( (filename = getenv("Z80_STDLIB")) != NULL )
-		return filename;							/* return env var-as-is*/
 	else
 	{
-        error_env_not_defined("Z80_STDLIB");
+		error_not_lib_file(filename);
         return NULL;
 	}
 }

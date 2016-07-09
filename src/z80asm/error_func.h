@@ -32,7 +32,6 @@ extern void error_module_redefined(void);
 extern void error_org_redefined(void);
 extern void error_invalid_org_option(char *org_hex);
 extern void warn_org_ignored(char *filename, char *section_name);
-extern void error_env_not_defined(char *var);
 extern void error_not_obj_file(char *filename);
 extern void error_not_lib_file(char *filename);
 extern void warn_int_range(long value);

@@ -39,7 +39,6 @@ ASM1
 #------------------------------------------------------------------------------
 # BUG_0002 : CreateLibFile and GetLibFile: buffer overrun
 note "BUG_0002";
-$ENV{Z80_STDLIB} = "test.lib";
 z80asm(
 	asm => <<'ASM',
 				PUBLIC one
@@ -47,7 +46,7 @@ z80asm(
 				ld a,1
 				ret
 ASM
-	options => "-x",
+	options => "-xtest.lib",
 	ok		=> 1,
 );
 
@@ -56,9 +55,8 @@ z80asm(
 				EXTERN one
 				jp one			;; C3 03 00 3E 01 C9
 ASM
-	options => "-i -b",
+	options => "-itest.lib -b",
 );
-delete $ENV{Z80_STDLIB};
 unlink_temp("test.lib");
 
 #------------------------------------------------------------------------------

@@ -43,7 +43,7 @@ Parse command line options
 enum OptType
 {
     OptSet,
-    OptCall, OptCallArg, OptCallOptArg,
+    OptCall, OptCallArg, 
     OptString, OptStringList,
 };
 
@@ -185,10 +185,6 @@ static void process_opt( int *parg, int argc, char *argv[] )
                 else
                     error_illegal_option( argv[II] );
 
-                break;
-
-            case OptCallOptArg:
-                ( ( void ( * )( char * ) )( opts_lu[j].arg ) )( opt_arg_ptr );
                 break;
 
             case OptString:

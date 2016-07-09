@@ -103,8 +103,8 @@ Environment:
   -D, --define=SYMBOL    Define a static symbol
 
 Libraries:
-  -x, --make-lib=[FILE]  Create a library file.lib
-  -i, --use-lib=[FILE]   Link library file.lib
+  -x, --make-lib=FILE    Create a library file.lib
+  -i, --use-lib=FILE     Link library file.lib
 
 Binary Output:
   -b, --make-bin         Assemble and link/relocate to file.bin
@@ -691,8 +691,7 @@ unlink_testfiles();
 $lib = lib_file(); $lib =~ s/\.lib$/_lib.lib/i;
 unlink $lib;
 
-# create a library without Z80_STDLIB
-delete $ENV{Z80_STDLIB};
+# create a library
 write_file(asm_file(), "
 	PUBLIC one
 one: 
@@ -700,25 +699,17 @@ one:
 	ret
 ");
 for my $options ('-x', '-x=', '--make-lib', '--make-lib=') {
+	unlink(obj_file(), lib_file());
 	t_z80asm_capture($options.lib_file()." ".asm_file(), "", "", 0);
-	ok -f obj_file(), obj_file()." created";
-	ok -f lib_file(), lib_file()." created";
-	is unlink(obj_file(), lib_file()), 2, "delete old obj and lib";
-}
-
-# create the same library with Z80_STDLIB
-$ENV{Z80_STDLIB} = lib_file();
-for my $options ('-x', '-x=', '--make-lib', '--make-lib=') {
-	t_z80asm_capture($options." ".asm_file(), "", "", 0);
 	ok -f obj_file(), obj_file()." created";
 	ok -f lib_file(), lib_file()." created";
 }
 
 # create $lib
 ok copy(lib_file(), $lib), "create $lib";
+unlink(obj_file(), lib_file());
 
-# link with the library without Z80_STDLIB
-delete $ENV{Z80_STDLIB};
+# link with the library
 for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
 	t_z80asm_ok(0, "
 		EXTERN one
@@ -726,15 +717,6 @@ for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
 	", "\xC3\x03\x00\x3E\x01\xC9", $options.$lib);
 }
 
-# link with the library with Z80_STDLIB
-# cause the buffer overrun, detected in MSVC debug version
-$ENV{Z80_STDLIB} = $lib;
-for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
-	t_z80asm_ok(0, "
-		EXTERN one
-		jp one
-	", "\xC3\x03\x00\x3E\x01\xC9", $options);
-}
 unlink_testfiles($lib);
 
 # test BUG_0038: library modules not loaded in sequence

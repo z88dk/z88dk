@@ -199,24 +199,13 @@ char *GetLibfile( char *filename )
 
     len = strlen( filename );
 
-    if ( len )
-    {
-        found_libfilename = search_file( get_lib_filename( filename ), opts.lib_path );
-    }
-    else
-    {
-        filename = getenv( "Z80_STDLIB" );
-
-        if ( filename != NULL )
-        {
-            found_libfilename = strpool_add( filename );
-        }
-        else
-        {
-            error_env_not_defined( "Z80_STDLIB" );
-            return NULL;
-        }
-    }
+    if ( len == 0 )
+	{
+		error_not_lib_file(filename);
+		return NULL;
+	}
+	
+	found_libfilename = search_file( get_lib_filename( filename ), opts.lib_path );
 
     newlib->libfilename = m_strdup( found_libfilename );		/* freed when newlib is freed */
 

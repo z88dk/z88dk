@@ -446,66 +446,6 @@ t_z80asm_error("
 	jr loop
 ", "Error at file 'test.asm' line 3: relative jump address must be local");
 
-
-#------------------------------------------------------------------------------
-# error_env_not_defined
-unlink_testfiles();
-
-# create a lib name that is not removed by unlink_testfiles()
-$lib = lib_file(); $lib =~ s/\.lib$/lib.lib/i;
-unlink_testfiles($lib);
-
-# create a library without Z80_STDLIB
-delete $ENV{Z80_STDLIB};
-write_file(asm_file(), "
-	PUBLIC one
-one: 
-	ld a,1
-	ret
-");
-t_z80asm_capture("-x".lib_file()." ".asm_file(), "", "", 0);
-ok -f obj_file(), obj_file()." created";
-ok -f lib_file(), lib_file()." created";
-
-# save for later
-ok copy(lib_file(), $lib), "create $lib";
-
-is unlink(obj_file(), lib_file()), 2, "delete old obj and lib";
-
-# ERR_NO_ENVVAR => 30
-delete $ENV{Z80_STDLIB};
-t_z80asm_capture("-x ".asm_file(), "", 
-		"Error: environment variable 'Z80_STDLIB' not defined\n".
-		"1 errors occurred during assembly\n", "stderr",
-		1);
-
-# create the same library with Z80_STDLIB
-$ENV{Z80_STDLIB} = lib_file();
-t_z80asm_capture("-x ".asm_file(), "", "", 0);
-ok -f obj_file(), obj_file()." created";
-ok -f lib_file(), lib_file()." created";
-
-# link with the library without Z80_STDLIB
-delete $ENV{Z80_STDLIB};
-t_z80asm_ok(0, "
-	EXTERN one
-	jp one
-", "\xC3\x03\x00\x3E\x01\xC9", "-i$lib");
-
-# link with the library with Z80_STDLIB
-$ENV{Z80_STDLIB} = $lib;
-t_z80asm_ok(0, "
-	EXTERN one
-	jp one
-", "\xC3\x03\x00\x3E\x01\xC9", "-i");
-
-# ERR_NO_ENVVAR => 30
-delete $ENV{Z80_STDLIB};
-t_z80asm_capture("-x ".asm_file(), "", 
-		"Error: environment variable 'Z80_STDLIB' not defined\n".
-		"1 errors occurred during assembly\n", "stderr",
-		1);
-
 #------------------------------------------------------------------------------
 # error_not_obj_file
 unlink_testfiles();

@@ -4,6 +4,12 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-07-09
+
+  Remove reference to the Z80_STDLIB environment variable - it was used
+  as a default library for the -i and -x options - and force the options
+  to have a library file argument.
+
 - 2016-07-08
 
   Add the directory of each assembly file being assembled to the end 

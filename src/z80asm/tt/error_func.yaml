@@ -167,11 +167,6 @@ errors:
     message	: "\"--relocatable ignores ORG at file '%s', section '%s'\", filename, section_name"
 	
   - type	: ErrError
-    func	: error_env_not_defined
-    args	: char *var
-    message	: "\"environment variable '%s' not defined\", var"
-	
-  - type	: ErrError
     func	: error_not_obj_file
     args	: char *filename
     message	: "\"file '%s' not an object file\", filename"
