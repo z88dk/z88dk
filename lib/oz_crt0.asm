@@ -14,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: oz_crt0.asm,v 1.20 2016-07-07 06:02:38 stefano Exp $
+;       $Id: oz_crt0.asm,v 1.21 2016-07-09 21:18:54 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -460,6 +460,10 @@ l_dcal:
 		defb	0
 		
 		defc ansipixels = 236
+		IF !DEFINED_ansicolumns
+			 defc DEFINED_ansicolumns = 1
+			 defc ansicolumns = 59
+		ENDIF
 
 		INCLUDE "crt0_runtime_selection.asm"
 		INCLUDE "crt0_section.asm"
