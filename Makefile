@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.48 2016-04-24 08:13:44 dom Exp $
+#	$Id: Makefile,v 1.49 2016-07-09 13:55:41 pauloscustodio Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -56,8 +56,8 @@ zx7:
 	$(MAKE) -C src/zx7 PREFIX=`pwd` install
 
 z80nm:
-	$(MAKE) -C support/ar
-	$(MAKE) -C support/ar PREFIX=`pwd` install
+	$(MAKE) -C src/z80nm
+	$(MAKE) -C src/z80nm PREFIX=`pwd` install
 
 z80svg:
 	$(MAKE) -C support/graphics
@@ -114,7 +114,8 @@ clean-bins:
 	cd src/cpp ; $(MAKE) clean
 	cd src/sccz80 ; $(MAKE) clean
 	cd src/z80asm ; $(MAKE) clean
+	cd src/z80nm ; $(MAKE) clean
 	cd src/zcc ; $(MAKE) clean
-	$(MAKE) -C support/ar clean
+	rm -rf bin
 
 .PHONY: test

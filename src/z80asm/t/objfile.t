@@ -16,7 +16,7 @@ use Test::Differences;
 use Capture::Tiny::Extended 'capture';
 require 't/test_utils.pl';
 
-our $AR = -d "ar" ? "ar" : "../../support/ar";
+our $AR = -d "ar" ? "ar" : "../../src/z80nm";
 
 #------------------------------------------------------------------------------
 # test with z80nm

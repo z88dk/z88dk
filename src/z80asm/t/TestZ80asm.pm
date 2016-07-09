@@ -24,7 +24,7 @@ our @EXPORT = qw( z80asm z80emu z80nm
 our $KEEP_FILES;
 our $Z80ASM = $ENV{Z80ASM} || "./z80asm";
 
-our $AR = -d "ar" ? "ar" : "../../support/ar";
+our $AR = -d "ar" ? "ar" : "../../src/z80nm";
 
 #------------------------------------------------------------------------------
 # startup and cleanup

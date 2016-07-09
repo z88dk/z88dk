@@ -7,6 +7,7 @@
 # Start from scratch
 #make clean
 
+rm -rf bin
 mkdir bin
 PATH=`pwd`/bin:$PATH
 export PATH
