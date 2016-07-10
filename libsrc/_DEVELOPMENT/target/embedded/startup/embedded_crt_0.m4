@@ -59,6 +59,7 @@ EXTERN _main
 IF __crt_include_preamble
 
    include "crt_preamble.asm"
+   SECTION CODE
 
 ENDIF
 
@@ -78,15 +79,10 @@ ENDIF
 
 __Start:
 
+   include "../crt_start_eidi.inc"
    include "../crt_save_stack_address.inc"
 
 __Restart:
-
-   IF (!((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))) || (__crt_enable_commandline < 2)
-   
-      include "../crt_restart_eidi.inc"
-
-   ENDIF
 
    IF __register_sp != -1
    
@@ -105,12 +101,6 @@ __Restart:
    ENDIF
 
 __Restart_2:
-
-   IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8) && (__crt_enable_commandline >= 2)
-   
-      include "../crt_restart_eidi.inc"
-   
-   ENDIF
 
    IF __crt_enable_commandline >= 1
       
