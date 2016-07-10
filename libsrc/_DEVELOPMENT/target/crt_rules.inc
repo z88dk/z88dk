@@ -59,6 +59,7 @@
    
    ENDIF
    
+   
    IFDEF CRT_STACK_SIZE
    
       defc __crt_stack_size = CRT_STACK_SIZE
@@ -154,6 +155,25 @@
    ENDIF
    
    
+   IFDEF CRT_INCLUDE_PREAMBLE
+   
+      defc __crt_include_preamble = CRT_INCLUDE_PREAMBLE
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_preamble
+      
+         defc __crt_include_preamble = TAR__crt_include_preamble
+      
+      ELSE
+      
+         defc __crt_include_preamble = DEF__crt_include_preamble
+      
+      ENDIF
+      
+   ENDIF
+   
+   
    IFDEF CRT_ENABLE_COMMANDLINE
    
       defc __crt_enable_commandline = CRT_ENABLE_COMMANDLINE
@@ -205,6 +225,52 @@
       ELSE
       
          defc __crt_enable_close = DEF__crt_enable_close
+      
+      ENDIF
+   
+   ENDIF
+   
+   
+   IFDEF CRT_ENABLE_EIDI
+   
+      defc __crt_enable_eidi = CRT_ENABLE_EIDI
+      
+   ELSE
+   
+      IFDEF TAR__crt_enable_eidi
+      
+         defc __crt_enable_eidi = TAR__crt_enable_eidi
+      
+      ELSE
+      
+         defc __crt_enable_eidi = DEF__crt_enable_eidi
+         
+      ENDIF
+      
+   ENDIF
+   
+   
+   IF __crt_enable_restart
+   
+      defc __crt_on_exit = 0x10008
+   
+   ELSE
+   
+      IFDEF CRT_ON_EXIT
+      
+         defc __crt_on_exit = CRT_ON_EXIT
+      
+      ELSE
+      
+         IFDEF TAR__crt_on_exit
+         
+            defc __crt_on_exit = TAR__crt_on_exit
+            
+         ELSE
+         
+            defc __crt_on_exit = DEF__crt_on_exit
+         
+         ENDIF
       
       ENDIF
    
