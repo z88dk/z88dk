@@ -3,15 +3,35 @@
    
       IF (__crt_on_exit & 0x8)
       
-	     ; program restarts
-		 
-         IF (__register_sp = -1)
+         ; program restarts
          
-            ld sp,(__sp_or_ret)
+         IF (__crt_enable_commandline < 2)
+         
+            IF (__register_sp = -1)
+         
+               ld sp,(__sp_or_ret)
+            
+            ENDIF
+         
+            jp __Restart
+         
+         ELSE
+         
+            IF (__register_sp = -1)
+            
+               ld sp,(__sp_or_ret)
+            
+            ELSE
+            
+               ld sp,__register_sp
+               
+            ENDIF
+            
+            INCLUDE "../crt_cmdline_empty.inc"
+            
+            jp __Restart_2
             
          ENDIF
-         
-         jp __Restart
          
       ELSE
       
@@ -19,8 +39,8 @@
       
          IF (__crt_on_exit & 0x2)
          
-		    ; program returns to caller
-			
+            ; program returns to caller
+
             ld sp,(__sp_or_ret)
             ret
          
@@ -28,16 +48,16 @@
          
             IF (__crt_on_exit & 0x4)
             
-			   ; program jumps to caller
-			   
+            ; program jumps to caller
+
                ld de,(__sp_or_ret)
                push de
                ret
                
             ELSE
             
-			   ; program halts
-			   
+               ; program halts
+
                halt
                jr ASMPC
                

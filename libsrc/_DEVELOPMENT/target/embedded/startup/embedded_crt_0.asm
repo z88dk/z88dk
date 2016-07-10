@@ -336,10 +336,14 @@ ENDIF
 __Start:
 
    include "../crt_save_stack_address.inc"
-   
+
 __Restart:
 
-   include "../crt_restart_eidi.inc"
+   IF (!(__crt_on_exit & 0x10008)) || (__crt_enable_commandline < 2)
+   
+      include "../crt_restart_eidi.inc"
+
+   ENDIF
 
    IF __register_sp != -1
    
@@ -351,9 +355,15 @@ __Restart:
    
    ; command line
    
-   IF __crt_enable_commandline
+   IF __crt_enable_commandline = 1
    
       include "../crt_cmdline_empty.inc"
+   
+   ENDIF
+
+__Restart_2:
+
+   IF __crt_enable_commandline >= 1
       
       IF __SDCC | __SDCC_IX | __SDCC_IY
 
@@ -366,6 +376,12 @@ __Restart:
          push hl               ; argv
 
       ENDIF
+   
+   ENDIF
+
+   IF (__crt_on_exit & 0x10008) && (__crt_enable_commandline >= 2)
+   
+      include "../crt_restart_eidi.inc"
    
    ENDIF
 
