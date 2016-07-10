@@ -5,7 +5,7 @@
  * Lots of nice support functions here and a few defines
  * to support some functions
  *
- * $Id: stdlib.h,v 1.50 2016-03-07 13:55:55 dom Exp $
+ * $Id: stdlib.h,v 1.51 2016-07-10 20:59:19 dom Exp $
  */
 
 #include <sys/compiler.h>
@@ -27,14 +27,14 @@
 extern int  __LIB__ __FASTCALL__  atoi(char *s) __SMALLCFASTCALL;
 extern long __LIB__ __FASTCALL__  atol(char *s) __SMALLCFASTCALL;
 
-extern int  __LIB__               itoa(int n, char *s, uchar radix) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    itoa_callee(int n, char *s, uchar radix) __SMALLCDECL __SMALLCCALLEE;
-extern int  __LIB__               utoa(uint n, char *s, uchar radix) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    utoa_callee(uint n, char *s, uchar radix) __SMALLCDECL __SMALLCCALLEE;
-extern int  __LIB__               ltoa(long n, char *s, uchar radix) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    ltoa_callee(long n, char *s, uchar radix) __SMALLCDECL __SMALLCCALLEE;
-extern int  __LIB__               ultoa(unsigned long n, char *s, uchar radix) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    ultoa_callee(unsigned long n, char *s, uchar radix) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__               itoa(int n, char *s, int radix) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    itoa_callee(int n, char *s, int radix) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__               utoa(uint n, char *s, int radix) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    utoa_callee(uint n, char *s, int radix) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__               ltoa(long n, char *s, int radix) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    ltoa_callee(long n, char *s, int radix) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__               ultoa(unsigned long n, char *s, int radix) __SMALLCDECL;
+extern int  __LIB__ __CALLEE__    ultoa_callee(unsigned long n, char *s, int radix) __SMALLCDECL __SMALLCCALLEE;
 
 #define itoa(a,b,c)  itoa_callee(a,b,c)
 #define utoa(a,b,c)  utoa_callee(a,b,c)
@@ -123,8 +123,8 @@ extern void __LIB__ __CALLEE__ *l_bsearch_callee(void *key, void *base, unsigned
 extern void __LIB__            l_qsort(void *base, unsigned int size, void *cmp) __SMALLCDECL;
 extern void __LIB__ __CALLEE__ l_qsort_callee(void *base, unsigned int size, void *cmp) __SMALLCDECL __SMALLCCALLEE;
 
-extern void __LIB__            qsort(char *base, unsigned int nel, unsigned int width, void *compar) __SMALLCDECL;
-extern void __LIB__ __CALLEE__ qsort_callee(char *base, unsigned int nel, unsigned int width, void *compar) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__            qsort(void *base, unsigned int nel, unsigned int width, void *compar) __SMALLCDECL;
+extern void __LIB__ __CALLEE__ qsort_callee(void *base, unsigned int nel, unsigned int width, void *compar) __SMALLCDECL __SMALLCCALLEE;
 
 #define l_bsearch(a,b,c,d) l_bsearch_callee(a,b,c,d)
 #define qsort(a,b,c,d) qsort_callee(a,b,c,d)
