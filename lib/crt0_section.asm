@@ -60,6 +60,7 @@ ENDIF
 		SECTION code_clib
 		SECTION code_crt0_sccz80
 		SECTION code_l_sdcc
+		SECTION code_l
 		SECTION code_compress_zx7
 		SECTION code_fp
 		SECTION code_math
@@ -69,9 +70,9 @@ ENDIF
 		SECTION rodata_compiler
 		SECTION rodata_clib
 		SECTION rodata_user
-		SECTION smc_clib
 		SECTION ROMABLE_END
 IF !__crt_model
+		SECTION smc_clib
                 SECTION DATA
 		SECTION data_crt
 		SECTION data_compiler
@@ -121,6 +122,7 @@ IF __crt_model > 0
                 SECTION DATA
 		org	-1
 		defb	0		; we want this written out
+		SECTION smc_clib
                 SECTION data_crt
                 SECTION data_compiler
                 SECTION data_user

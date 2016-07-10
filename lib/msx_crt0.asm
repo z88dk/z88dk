@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.44 2016-07-10 20:15:17 dom Exp $
+;	$Id: msx_crt0.asm,v 1.45 2016-07-10 20:28:14 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -246,6 +246,13 @@ IF !DEFINED_sysdefvarsaddr
 	defc sysdefvarsaddr =  $C000   ; Static variables are kept in RAM in high memory
 ENDIF
 	defc	CRT_ORG_BSS = sysdefvarsaddr
+
+        ; If we were given a model then use it
+        IF DEFINED_CRT_MODEL
+            defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
+        ENDIF
 
 
 ;===============================================================================

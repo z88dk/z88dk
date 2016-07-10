@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.48 2016-07-10 20:15:17 dom Exp $
+;       $Id: spec_crt0.asm,v 1.49 2016-07-10 20:28:14 dom Exp $
 ;
 
 
@@ -367,6 +367,13 @@ IF (startup=2) | (startup=3) ; ROM or moved system variables
              defc defvarsaddr = 24576   
         ENDIF
         defc bss_compiler_start = defvarsaddr
+
+        ; If we were given a model then use it
+        IF DEFINED_CRT_MODEL
+            defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
+        ENDIF
 ELSE
         ; For non-ROM startup move all variables together
         IF DEFINED_defvarsaddr
