@@ -106,6 +106,12 @@ __Restart:
 
 __Restart_2:
 
+   IF (__crt_on_exit & 0x10008) && (__crt_enable_commandline >= 2)
+   
+      include "../crt_restart_eidi.inc"
+   
+   ENDIF
+
    IF __crt_enable_commandline >= 1
       
       IF __SDCC | __SDCC_IX | __SDCC_IY
@@ -119,12 +125,6 @@ __Restart_2:
          push hl               ; argv
 
       ENDIF
-   
-   ENDIF
-
-   IF (__crt_on_exit & 0x10008) && (__crt_enable_commandline >= 2)
-   
-      include "../crt_restart_eidi.inc"
    
    ENDIF
 
