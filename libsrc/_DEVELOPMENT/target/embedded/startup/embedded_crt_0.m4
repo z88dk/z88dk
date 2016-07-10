@@ -82,7 +82,7 @@ __Start:
 
 __Restart:
 
-   IF (!(__crt_on_exit & 0x10008)) || (__crt_enable_commandline < 2)
+   IF (!((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))) || (__crt_enable_commandline < 2)
    
       include "../crt_restart_eidi.inc"
 
@@ -106,7 +106,7 @@ __Restart:
 
 __Restart_2:
 
-   IF (__crt_on_exit & 0x10008) && (__crt_enable_commandline >= 2)
+   IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8) && (__crt_enable_commandline >= 2)
    
       include "../crt_restart_eidi.inc"
    
@@ -158,7 +158,7 @@ SECTION code_crt_main
 
 __Exit:
 
-   IF !(__crt_on_exit & 0x10008)
+   IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
    
       ; not restarting
       
