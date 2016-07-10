@@ -21,7 +21,7 @@ IF startup = -1
 
    IFNDEF __CRTDEF
    
-      defc __CRTDEF = 0
+      defc __CRTDEF = 2
    
    ENDIF
    
