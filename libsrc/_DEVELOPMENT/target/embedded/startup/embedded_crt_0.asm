@@ -310,10 +310,20 @@ PUBLIC __Start, __Exit
 EXTERN _main
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; USER PREAMBLE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __crt_include_preamble
+
+   include "crt_preamble.asm"
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PAGE ZERO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __crt_org_code = 0
+IF (ASMPC = 0) && (__crt_org_code = 0)
 
    include "../crt_page_zero.inc"
 
@@ -325,37 +335,25 @@ ENDIF
 
 __Start:
 
-   ; set stack address
+   include "../crt_save_stack_address.inc"
    
-   IF (__register_sp = -1) || (__crt_enable_restart = 0)
-   
-      ; save current sp if sp not supplied or returning to host
-      
-      ld (__sp),sp
-   
-   ENDIF
-
 __Restart:
+
+   include "../crt_restart_eidi.inc"
 
    IF __register_sp != -1
    
       ; crt supplies sp
-   
+      
       ld sp,__register_sp
 
    ENDIF
    
-   ; commandline
+   ; command line
    
-   IF __crt_enable_commandline = 1
+   IF __crt_enable_commandline
    
-      ld hl,0
-      push hl                  ; argv[argc] = NULL
-      add hl,sp
-      push hl                  ; argv[0] = ""
-      dec hl
-      dec hl                   ; hl = argv
-      ld bc,1                  ; bc = argc = 1
+      include "../crt_cmdline_empty.inc"
       
       IF __SDCC | __SDCC_IX | __SDCC_IY
 
@@ -379,6 +377,10 @@ __Restart:
 
    include "../clib_init_bss.inc"
 
+   ; enforce code section name
+   
+   include "../crt_enforce_code_section_name.inc"
+
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
 
@@ -397,9 +399,9 @@ SECTION code_crt_main
 
 __Exit:
 
-   IF __crt_enable_restart = 0
+   IF !(__crt_on_exit & 0x10008)
    
-      ; returning to host
+      ; not restarting
       
       push hl                  ; save return status
    
@@ -414,55 +416,17 @@ SECTION code_crt_return
 
    ; terminate
    
-   IF __crt_enable_restart
-
-      ; restart the program
-   
-      IF __register_sp = -1
-   
-         ; restore sp
-   
-         ld sp,(__sp)
-   
-      ENDIF
-      
-      IF __crt_org_code = 0
-      
-         di
-      
-      ENDIF
-      
-      jp __Restart
-
-   ELSE
-
-      ; exit program
-
-      pop hl                   ; hl = return status
-
-      IF __crt_org_code = 0
-      
-	     di
-         halt                  ; some tools like to see this
-         jr ASMPC              ; loop forever
-
-      ELSE
-
-         ld sp,(__sp)
-         ret                   ; return to host
-   
-      ENDIF
-      
-   ENDIF
+   include "../crt_exit_eidi.inc"
+   include "../crt_program_exit.inc"      
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (__register_sp = -1) || (__crt_enable_restart = 0)
+IF (__crt_on_exit & 0x1000e)
 
    SECTION BSS_UNINITIALIZED
-   __sp:  defw 0
+   __sp_or_ret:  defw 0
 
 ENDIF
 
