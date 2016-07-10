@@ -77,7 +77,7 @@ IF __CRTDEF = 1
    defc TAR__crt_enable_preamble       = 0
    
    defc TAR__crt_enable_commandline    = 0
-   defc TAR__crt_enable_restart        = 1
+   defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
 
    defc TAR__crt_enable_eidi           = 0x10
@@ -121,7 +121,7 @@ IF __CRTDEF = 2
    defc TAR__crt_enable_preamble       = 0
    
    defc TAR__crt_enable_commandline    = 0
-   defc TAR__crt_enable_restart        = 1
+   defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
 
    defc TAR__crt_enable_eidi           = 0x10
