@@ -72,6 +72,6 @@
       ; program jumps to absolute address
 	  
       pop hl                   ; hl = return status
-      jp __crt_on_exit
+      jp __crt_on_exit & 0xffff
    
    ENDIF
