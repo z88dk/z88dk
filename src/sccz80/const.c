@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.22 2016-03-30 21:22:52 dom Exp $
+ *      $Id: const.c,v 1.23 2016-07-10 10:40:59 dom Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -19,7 +19,10 @@
  */
 
 #include "ccdefs.h"
+#include <math.h>
+#include <float.h>
 
+static void dofloat(double raw, unsigned char fa[6], int mant_bytes);
 /*
  * These two variables used whilst loading constants, makes things
  * a little easier to handle - type specifiers..
@@ -84,139 +87,53 @@ int constant(LVALUE *lval)
 int fnumber(int32_t *val)
 {
     unsigned char sum[6];
-    unsigned char sum2[6];
-    unsigned char scale[6];
-    unsigned char frcn[6];
-    unsigned char dig1[6];
-    unsigned char dig2[6];
-    unsigned char dig3[6];
     int k;                  /* flag and mask */
     char minus;     /* is if negative! */
     char *start;    /* copy of pointer to starting point */
     char *s;             /* points into source code */
     char *dp1;	    /* First number after dp */
     char *end;
+    double dval;
     
 
-    if (mathz88) {             /* Z88 Representation of 0.1 */
-	frcn[0] = 0;
-	frcn[1] = 205;
-	frcn[2] = frcn[3]=204;
-	frcn[4] = 76;
-	frcn[5] = 125;
-    } else {                   /* Generic representation of 0.1 */
-	frcn[0] = 205;
-	frcn[1] = frcn[2] = frcn[3] = 204;
-	frcn[4] = 76;
-	frcn[5] = 125;            
-    }
 
     start = s = line+lptr;      /* save starting point */
-    k = 1;
+
+  k = 1;
     minus = 1;
     while(k) {
-	k=0;
-	if(*s == '+') {
-	    ++s; k=1;
-	}
-	if(*s == '-') {
-	    ++s; k=1; minus=(-minus);
-	}
+        k=0;
+        if(*s == '+') {
+            ++s; k=1;
+        }
+        if(*s == '-') {
+            ++s; k=1; minus=(-minus);
+        }
     }
-        
+
     while (*s==' ')   /* Ignore white space after sign */
-	s++;
+        s++;
 
     while ( numeric(*s) )
-	++s ;
+        ++s ;
 
     if ( *s != '.' && *s != 'e'  ) {   /* Check that it is floating point */
-	s++;
-	return 0;
+        s++;
+        return 0;
     }
     dp1 = ++s;
     while ( numeric(*s) )
-	++s ;
-    lptr = (s--) - line ;           /* save ending point */
-
+        ++s ;
     end = s;
 
-    sum[0]=sum[1]=sum[2]=sum[3]=sum[4]=sum[5]='\0';
-    sum2[0]=sum2[1]=sum2[2]=sum2[3]=sum2[4]=sum2[5]='\0';
-
-    memcpy(dig3,frcn,6);	/* Copy 0.1 dig3 */
-    s = dp1;
-    /* Deals with the decimal place */
-    while ( numeric(*s) && s <= end) {
-	qfloat((*s-'0'),dig1);   /* 0-9 */
-	fltmult(dig3,dig1);      /* * 0.1 */
-	fltadd(dig1,sum2);
-	fltmult(frcn,dig3);
-	s++;
-    }
-    s = --dp1;	/* Now points to dp */
-
-    qfloat(1,scale);              /* Now do numbers after decimal place */
-    while ( --s >= start ) {
-	qfloat((*s-'0'),dig1);
-	fltmult(scale,dig1);
-	fltadd(dig1,sum);
-	qfloat(10,dig2);
-	fltmult(dig2,scale);
-    }
-    fltadd(sum2,sum);
-
-
-    if( cmatch('e') ) {                       /* interpret exponent */
-	int neg;                        /* nonzero if exp is negative */
-	int32_t expon;                     /* the exponent */
-
-	if( number(&expon) == 0 ) {
-	    error(E_EXPON);
-	    expon=0;
-	}
-	if( expon < 0 ) {
-	    neg=1; 
-	    expon=(-expon);
-	} else {
-	    neg = 0;
-	}
-	if( expon > 38 ) {
-	    error(E_FLOATING);
-	    expon=0;
-	}
-	/* Now find the scaling factor. We find 10**expon */
-	if ( neg == 0 ) {
-	    qfloat(1,scale);
-	    k = 32;
-	    while( k ) {
-		memcpy(sum2,scale,6);	/* Copy scale */
-		fltmult(sum2,scale);    /* scale * scale */
-		if( k & expon) {
-		    qfloat(10,sum2);      /* scale *= 10 */
-		    fltmult(sum2,scale);
-		}
-		k >>= 1;
-	    }
-	} else {   /* Negative exponenent find 0.1 ** expon */
-	    memcpy(scale,frcn,6);               /* 0.1 */
-	    for ( k = 1; k < expon; k++ ) {
-		fltmult(frcn,scale);            /* *0.1 */
-	    }		   
-	    neg = 0;
-	}
-	/* Now we can just multiply to find the number */
-	fltmult(scale,sum);
-    }
-
-
-    /* Not sure if this bit is necessary - dom 26/1/2002 */
-    if ( minus != 1) 
-	sum[4]=sum[4]|128;
+    dval = strtod(start,&end);
+    if ( end == start ) return 0;
+    dofloat(dval,sum,mathz88 ? 4 : 5);
 
     /* Z88 FP numbers have exp+127, gen has +128 (bad?) */
     if (mathz88) 
 	--sum[5];
+    lptr = end - line;
 
     /* get location for result & bump litptr */
     if ( doublestrings ) {
@@ -651,4 +568,42 @@ int GetMembSize(TAG_SYMBOL *ptr)
 	return ptr2->size;
     error(E_UNMEMB,sname);
     return(0);
+}
+
+static void dofloat(double raw, unsigned char fa[6], int mant_bytes)
+{
+        double  x = fabs(raw);
+        double exp = log(x) / log(2);
+        int     i;
+
+        exp = ceil(exp);
+
+        double norm = x / pow(2,exp);
+
+        fa[5] = (int)exp + 0x80;
+
+        for ( i = 0; i < (mant_bytes * 2) + 1; i++ ) {
+            double mult = norm * 16.;
+            double res = floor(mult);
+            unsigned char bit = res;
+
+            if ( i == 0 && raw > 0 ) bit -= 8;
+            if ( i == mant_bytes * 2 ) {
+                 if ( bit > 7 ) {
+                     int carry = 1;
+                     for ( i = 5 - mant_bytes; i < 5 ; i++ ) {
+                          int res = fa[i] + carry;
+                          fa[i] = res % 256;
+                          carry = res / 256;
+                     }
+                 }
+                 break;
+            }
+            if ( i % 2 == 0 ) {
+                fa[4 - i/2] = ( bit << 4 );
+            } else {
+               fa[4 - i / 2] |= (bit & 0x0f);
+            }
+            norm = mult - res;
+        }
 }

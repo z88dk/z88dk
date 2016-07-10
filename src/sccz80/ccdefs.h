@@ -4,7 +4,7 @@
  *      The master header file
  *      Includes everything else!!!
  *
- *      $Id: ccdefs.h,v 1.3 2016-07-06 14:24:22 dom Exp $
+ *      $Id: ccdefs.h,v 1.4 2016-07-10 10:40:59 dom Exp $
  */
 
 /*
@@ -53,7 +53,6 @@
 #include "declinit.h"
 #include "error.h"
 #include "expr.h"
-#include "float.h"
 #include "io.h"
 #include "lex.h"
 #include "main.h"
