@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.50 2016-07-10 10:46:06 dom Exp $
+#	$Id: Makefile,v 1.51 2016-07-10 20:44:52 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -117,6 +117,5 @@ clean-bins:
 	cd src/z80asm ; $(MAKE) clean
 	cd src/z80nm ; $(MAKE) clean
 	cd src/zcc ; $(MAKE) clean
-	rm -rf bin
 
 .PHONY: test
