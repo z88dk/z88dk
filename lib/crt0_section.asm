@@ -77,8 +77,8 @@ _heap:
                 defw 0
 ENDIF
 		SECTION bss_fp
-		SECTION bss_fardata
 		SECTION bss_error
+		SECTION bss_fardata
 IF bss_fardata_start
 		org	bss_fardata_start
 ENDIF
