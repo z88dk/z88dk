@@ -1,7 +1,7 @@
 #
 # Makefile for sccz80
 #
-# $Id: Makefile,v 1.16 2016-07-10 15:50:03 dom Exp $
+# $Id: Makefile,v 1.17 2016-07-10 16:09:00 dom Exp $
 #
 
 INSTALL ?= install
@@ -15,7 +15,6 @@ OBJS =	callfunc.o     	\
 	declvar.o	\
 	error.o		\
 	expr.o		\
-	float.o		\
 	goto.o		\
 	io.o		\
 	lex.o		\
@@ -33,7 +32,7 @@ all: sccz80$(EXESUFFIX)
 CFLAGS +=  -Wall
 
 sccz80$(EXESUFFIX): $(OBJS)
-	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS)
+	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS) -lm
 
 install:
 	$(INSTALL) -m 755 sccz80$(EXESUFFIX) $(PREFIX)/bin/
