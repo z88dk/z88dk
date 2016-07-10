@@ -30,9 +30,14 @@ IF __CRTDEF = 0
       
    defc TAR__crt_initialize_bss        = 0
    
+   defc TAR__crt_enable_preamble       = 0
+   
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
+   
+   defc TAR__crt_enable_eidi           = 0x10
+   defc TAR__crt_on_exit               = 0x10001
    
    defc TAR__crt_enable_rst            = 0
    defc TAR__crt_enable_nmi            = 0
@@ -69,10 +74,15 @@ IF __CRTDEF = 1
       
    defc TAR__crt_initialize_bss        = 1
    
+   defc TAR__crt_enable_preamble       = 0
+   
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 1
    defc TAR__crt_enable_close          = 1
-   
+
+   defc TAR__crt_enable_eidi           = 0x10
+   defc TAR__crt_on_exit               = 0x10001
+
    defc TAR__crt_enable_rst            = 0
    defc TAR__crt_enable_nmi            = 0
    
@@ -108,10 +118,15 @@ IF __CRTDEF = 2
       
    defc TAR__crt_initialize_bss        = 1
    
+   defc TAR__crt_enable_preamble       = 0
+   
    defc TAR__crt_enable_commandline    = 0
    defc TAR__crt_enable_restart        = 1
    defc TAR__crt_enable_close          = 1
-   
+
+   defc TAR__crt_enable_eidi           = 0x10
+   defc TAR__crt_on_exit               = 0x10001
+
    defc TAR__crt_enable_rst            = 0
    defc TAR__crt_enable_nmi            = 0
    
