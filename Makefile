@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.49 2016-07-09 13:55:41 pauloscustodio Exp $
+#	$Id: Makefile,v 1.50 2016-07-10 10:46:06 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -22,6 +22,7 @@ setup:
 	echo '#define PREFIX "${prefix}$"/lib/z88dk"' > src/config.h
 	echo '#define UNIX 1' >> src/config.h
 	echo '#define Z88DK_VERSION "${version}"' >> src/config.h
+	@mkdir -p bin
 
 appmake:
 	$(MAKE) -C src/appmake
@@ -106,7 +107,7 @@ clean: clean-bins
 	cd libsrc ; $(MAKE) clean
 #	cd lib/config ; $(RM) *.cfg		# .cfg are now stored in CVS
 	cd lib/clibs ; $(RM) *.lib
-	find . -name "*.o" -type f -exec rm -f {} \;
+#	find . -name "*.o" -type f -exec rm -f {} \;
 
 clean-bins:
 	cd src/appmake ; $(MAKE) clean
