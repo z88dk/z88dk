@@ -2,7 +2,12 @@
 ;
 ; Contains the generic variables + features
 
+;
+; crt_model = 0		; everything in RAM
+; crt_model = 1		; ROM model, data section copied
+; crt_model = 2		; ROM model, data section compressed
 
+		SECTION CODE
 		SECTION code_crt_init
 crt0_init_bss:
 	; TODO: Clear bss area
@@ -23,10 +28,30 @@ IF !DEFINED_nostreams
         ld      (hl),21 ;stderr
 ENDIF
 IF DEFINED_USING_amalloc
-                EXTERN ASMTAIL
+        EXTERN ASMTAIL
 	ld	hl,ASMTAIL
 	ld	(_heap),hl
 ENDIF
+IF ( __crt_model & 1 )
+	; Just copy the DATA section
+	EXTERN	ASMTAIL_ROMABLE_END
+	EXTERN	ASMHEAD_DATA
+	EXTERN	ASMHEAD_DATA_END
+	ld	hl,ASMTAIL_ROMABLE_END
+	ld	de,ASMHEAD_DATA
+	ld	bc,ASMHEAD_DATA_END - ASMHEAD_DATA
+	ldir
+ENDIF
+IF ( __crt_model & 2 )
+	; Decompress the DATA section
+	EXTERN	ASMTAIL_ROMABLE_END
+	EXTERN	ASMHEAD_DATA
+	EXTERN	asm_dzx7_standard
+	ld	hl,ASMTAIL_ROMABLE_END
+	ld	de,ASMHEAD_DATA
+	call	asm_dzx7_standard
+ENDIF
+	
 	; SDCC initialiation code gets placed here
 		SECTION code_crt_exit
 
@@ -35,6 +60,7 @@ ENDIF
 		SECTION code_clib
 		SECTION code_crt0_sccz80
 		SECTION code_l_sdcc
+		SECTION code_compress_zx7
 		SECTION code_fp
 		SECTION code_math
 		SECTION code_error
@@ -44,15 +70,18 @@ ENDIF
 		SECTION rodata_clib
 		SECTION rodata_user
 		SECTION smc_clib
-		SECTION DATA
+		SECTION ROMABLE_END
+IF !__crt_model
+                SECTION DATA
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
 		SECTION DATA_END
+ENDIF
 
 		SECTION BSS
-IF bss_start
-	org	bss_start
+IF CRT_ORG_BSS
+		org	CRT_ORG_BSS
 ENDIF
 		SECTION bss_crt
 IF !DEFINED_nostreams
@@ -88,4 +117,13 @@ IF bss_compiler_start
 ENDIF
 		SECTION bss_clib
 		SECTION bss_user
+IF __crt_model > 0
+                SECTION DATA
+		org	-1
+		defb	0		; we want this written out
+                SECTION data_crt
+                SECTION data_compiler
+                SECTION data_user
+                SECTION DATA_END
+ENDIF
 		SECTION BSS_END

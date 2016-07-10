@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.43 2016-06-22 21:22:04 dom Exp $
+;	$Id: msx_crt0.asm,v 1.44 2016-07-10 20:15:17 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -245,7 +245,7 @@ l_dcal:	jp	(hl)		;Used for call by function pointer
 IF !DEFINED_sysdefvarsaddr
 	defc sysdefvarsaddr =  $C000   ; Static variables are kept in RAM in high memory
 ENDIF
-	defc	bss_start = sysdefvarsaddr
+	defc	CRT_ORG_BSS = sysdefvarsaddr
 
 
 ;===============================================================================

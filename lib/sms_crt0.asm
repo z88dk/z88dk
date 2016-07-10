@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.17 2016-06-21 20:49:07 dom Exp $
+;	$Id: sms_crt0.asm,v 1.18 2016-07-10 20:15:17 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -229,7 +229,7 @@ _End:
 
         INCLUDE "crt0_runtime_selection.asm"
 
-	defc bss_start = RAM_Start
+	defc CRT_ORG_BSS = RAM_Start
 IF DEFINED_defvarsaddr
 	defc bss_compiler_start = defvarsaddr
 ENDIF

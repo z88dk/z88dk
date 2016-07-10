@@ -5,7 +5,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.47 2016-06-21 20:49:07 dom Exp $
+;       $Id: spec_crt0.asm,v 1.48 2016-07-10 20:15:17 dom Exp $
 ;
 
 
@@ -362,7 +362,7 @@ IF (startup=2) | (startup=3) ; ROM or moved system variables
         IF !DEFINED_sysdefvarsaddr
              defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
         ENDIF
-	defc bss_start = sysdefvarsaddr
+	defc CRT_ORG_BSS = sysdefvarsaddr
         IF !DEFINED_defvarsaddr
              defc defvarsaddr = 24576   
         ENDIF
@@ -370,7 +370,7 @@ IF (startup=2) | (startup=3) ; ROM or moved system variables
 ELSE
         ; For non-ROM startup move all variables together
         IF DEFINED_defvarsaddr
-            defc bss_start = defvarsaddr
+            defc CRT_ORG_BSS = defvarsaddr
         ENDIF
 ENDIF
 	INCLUDE	"crt0_section.asm"

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.21 2016-06-21 20:49:06 dom Exp $
+;	$Id: ace_crt0.asm,v 1.22 2016-07-10 20:15:17 dom Exp $
 ;
 
 
@@ -161,7 +161,7 @@ ENDIF
 IF !DEFINED_defvarsaddr
         defc defvarsaddr = 24576
 ENDIF
-	defc	bss_start = sysdefvarsaddr
+	defc	CRT_ORG_BSS = sysdefvarsaddr
 	defc	bss_compiler_start = defvarsaddr
 ENDIF
 
