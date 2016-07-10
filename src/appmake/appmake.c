@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.38 2016-07-03 16:44:34 aralbrec Exp $
+ *   $Id: appmake.c,v 1.39 2016-07-10 20:10:09 dom Exp $
  */
 
 
@@ -36,6 +36,10 @@ static int          option_parse(int argc, char *argv[], option_t *options);
 static int          option_set(int pos, int max, char *argv[], option_t *opt);
 static void         option_print(char *execname, char *ident, char *copyright, char *desc, char *longdesc, option_t *opts);
 static void         get_temporary_filename(char *filen);
+static void         cleanup_temporary_files(void);
+
+static int          num_temp_files = 0;
+static char       **temp_files = NULL;
 
 
 int main(int argc, char *argv[])
@@ -59,6 +63,8 @@ int main(int argc, char *argv[])
         }
         i++;
     }
+
+    atexit(cleanup_temporary_files);
 
     /* So, let's check for + style execution */
     av = calloc(argc,sizeof(char*));
@@ -111,14 +117,8 @@ static void execute_command(char *target, int argc, char **argv, int chainmode)
             }
             
             if ( machines[i].exec(target, machines[i].ident) == -1 ) {
-                if ( strlen(chain_temp_filename) ) {
-                    remove(chain_temp_filename);
-                }
                 option_print(machines[i].execname, machines[i].ident,machines[i].copyright, machines[i].desc, machines[i].longdesc, machines[i].options);
                 exit(1);
-            }
-            if ( strlen(chain_temp_filename) ) {
-                remove(chain_temp_filename);
             }
             if ( chainmode == 1 ) {
                 strcpy(chain_temp_filename, output_file);
@@ -220,19 +220,30 @@ FILE *fopen_bin(char *fname, char *crtfile)
     suffix_change(name, "_CODE.bin");
 
     stat(fname, &st_file1);
+  
+    if ((stat(name, &st_file2) < 0) || (st_file2.st_mtime < st_file1.st_mtime)) {
+	/* classic library */
+        fcode = fopen(fname, "rb");
 
-    if ((stat(name, &st_file2) < 0) || (st_file2.st_mtime < st_file1.st_mtime))
-        return fopen(fname, "rb");
+        /* We mave a data section */
+        strcpy(name, fname);
+        suffix_change(name, "_DATA.bin");
+        if ( stat(name, &st_file2) < 0 ) {
+             /* Nope, everything was all in one file */
+             return fcode;
+        }
+    } else {
+        // new c lib compile
 
-    // new c lib compile
+        if (st_file1.st_size > 0)
+            fprintf(stderr, "WARNING: some code or data may not be assigned to sections.\n");
 
-    if (st_file1.st_size > 0)
-        fprintf(stderr, "WARNING: some code or data may not be assigned to sections.\n");
+        fcode = fopen(name, "rb");
+    }
 
     if ((crtfile == NULL) || ((crt_model = parameter_search(crtfile,".sym", "__crt_model")) == -1))
         crt_model = 0;
 
-    fcode = fopen(name, "rb");
 
     // 0: ram model, complete binary is "*_CODE.bin"
 
@@ -852,7 +863,18 @@ static void get_temporary_filename(char *filen)
     strcpy(filen, "/tmp/appmakechainXXXXXXXX");
     mktempfile(filen);
 #endif
+    num_temp_files++;
+    temp_files = realloc(temp_files, num_temp_files * sizeof(temp_files[0]));
+    temp_files[num_temp_files-1] = strdup(filen);
 }
 
 
 
+static void  cleanup_temporary_files(void)
+{
+    int   i;
+
+    for ( i = 0; i < num_temp_files; i++ ) {
+         remove(temp_files[i]);
+    }
+}
