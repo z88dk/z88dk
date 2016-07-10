@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.10 2016-07-01 20:43:56 dom Exp $
+ *      $Id: z88.c,v 1.11 2016-07-10 11:14:20 dom Exp $
  */
 
 
@@ -156,7 +156,7 @@ int z88_exec(char *target)
         exit_log(1, "Could not find parameter in_dor_safedata - no app dor present\n");
     reqpag = parameter_search(crtfile,".map","reqpag");
     if ( reqpag == -1 )  {
-         int asmtail = parameter_search(crtfile,".map","ASMTAIL_bss_tail");
+         int asmtail = parameter_search(crtfile,".map","ASMTAIL_BSS_END");
          if ( asmtail == -1 ) {
               exit_log(1, "reqpag isn't defined and can't find the end of the BSS segment\n");
          }

@@ -38,17 +38,23 @@ ENDIF
 		SECTION code_fp
 		SECTION code_math
 		SECTION code_error
-		SECTION smc_clib
-		SECTION data_crt
-		SECTION data_compiler
+		SECTION code_user
 		SECTION rodata_fp
 		SECTION rodata_compiler
 		SECTION rodata_clib
+		SECTION rodata_user
+		SECTION smc_clib
+		SECTION DATA
+		SECTION data_crt
+		SECTION data_compiler
+		SECTION data_user
+		SECTION DATA_END
 
-		SECTION bss_crt
+		SECTION BSS
 IF bss_start
 	org	bss_start
 ENDIF
+		SECTION bss_crt
 IF !DEFINED_nostreams
 		PUBLIC	__sgoioblk
 __sgoioblk:      defs    40      ;stdio control block
@@ -81,4 +87,5 @@ IF bss_compiler_start
 		org	bss_compiler_start
 ENDIF
 		SECTION bss_clib
-		SECTION bss_tail
+		SECTION bss_user
+		SECTION BSS_END
