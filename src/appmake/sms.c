@@ -4,7 +4,7 @@
  *    Harold O. Pinheiro - 2006 - pascal
  *    Dominic Morris - 02/06/2007 - rewritten and placed into appmake
  *
- *    $Id: sms.c,v 1.5 2016-06-26 00:46:55 aralbrec Exp $
+ *    $Id: sms.c,v 1.6 2016-07-11 20:30:40 dom Exp $
  *
  *    Figure out what this does exactly!
  */
@@ -15,6 +15,7 @@
 #define OFFSET 0x7ff0
 
 static char             *binname      = NULL;
+static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char              help         = 0;
 static char              noop         = 0;
@@ -26,6 +27,7 @@ static char              signature[] = "TMR SEGA";
 option_t sms_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
+    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     { 'n', "noop",     "Don't actually do anything", OPT_BOOL,  &noop },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
@@ -50,7 +52,6 @@ int sms_exec(char *target)
     if ( binname == NULL ) {
         return -1;
     }
-
     if ( outfile == NULL ) {
         strcpy(filename,binname);
         suffix_change(filename,".tmr");
@@ -58,7 +59,7 @@ int sms_exec(char *target)
         strcpy(filename,outfile);
     }
 
-	if ( (fpin=fopen_bin(binname, NULL) ) == NULL ) {
+    if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
         myexit(NULL,1);
     }
