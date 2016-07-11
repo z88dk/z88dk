@@ -139,9 +139,6 @@ static void do_assemble( char *src_filename )
 	char *obj_filename = get_obj_filename(src_filename);
 
 	/* delete object file */
-	if (opts.verbose)
-		puts(obj_filename);
-
 	remove(obj_filename);
 
 	/* create list file */
@@ -153,6 +150,9 @@ static void do_assemble( char *src_filename )
 
 	/* Init ASMPC */
 	set_PC(0);
+
+	if (opts.verbose)
+		printf("Assembling '%s' to '%s'\n", src_filename, obj_filename);
 
 	parse_file(src_filename);
 
@@ -183,6 +183,9 @@ static void do_assemble( char *src_filename )
 
 	remove_all_local_syms();
 	remove_all_global_syms();
+
+	if (opts.verbose)
+		putchar('\n');    /* separate module texts */
 }
 
 

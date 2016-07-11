@@ -451,6 +451,8 @@ Bool parse_file(char *filename)
 	int num_errors = get_num_errors();
 
 	ctx = ParseCtx_new();
+	if (opts.verbose)
+		printf("Reading '%s'\n", filename);	/* display name of file */
 
 	src_push();
 	{

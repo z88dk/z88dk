@@ -4,6 +4,14 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-07-11
+
+  Log Message:
+  Revert some of the oversimplification of verbose output:
+  - put back file being assembled and files being read
+  - put back library being created
+  - put back module being linked from library
+
 - 2016-07-09
 
   Remove reference to the Z80_STDLIB environment variable - it was used

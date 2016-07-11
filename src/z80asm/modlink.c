@@ -895,6 +895,9 @@ LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHash *e
 	lib_module = set_cur_module( new_module() );
 	lib_module->modname = strpool_add( modname );
 
+    if ( opts.verbose )
+        printf( "Linking library module '%s'\n", modname );
+
 	flag = LinkModule(library->libfilename, curmodule, extern_syms);       /* link module & read names */
 
     set_cur_module( tmpmodule );		/* restore previous current module */

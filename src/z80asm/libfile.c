@@ -46,8 +46,8 @@ void make_library(char *lib_filename, UT_array *src_files)
 	if ( lib_filename == NULL )
 		return;					/* ERROR */
 
-	if (opts.verbose)
-		puts(lib_filename);
+    if ( opts.verbose )
+        printf("Creating library '%s'\n", lib_filename );
 
 	/* write library header */
 	lib_file = myfopen_atomic( lib_filename, "w+b" );	

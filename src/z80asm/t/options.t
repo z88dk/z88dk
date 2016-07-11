@@ -148,8 +148,10 @@ ERR
 # --verbose, -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
-test.obj
+Assembling 'test.asm' to 'test.obj'
+Reading 'test.asm'
 Module 'test' size: 3 bytes
+
 Code size: 3 bytes ($0000 to $0002)
 END
 
