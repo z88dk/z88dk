@@ -3,7 +3,7 @@
 ;	Stefano Bodrato - Dec 2000
 ;			Feb 2000 - Speeded up the cpygraph
 ;
-;	$Id: ti83p_crt0.asm,v 1.32 2016-06-21 20:49:07 dom Exp $
+;	$Id: ti83p_crt0.asm,v 1.33 2016-07-11 05:58:34 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell, compatible shells
@@ -275,6 +275,12 @@ fastCopyLoop:
  ENDIF
 ENDIF
 
+		defc ansipixels = 96
+		IF !DEFINED_ansicolumns
+			 defc DEFINED_ansicolumns = 1
+			 defc ansicolumns = 32
+		ENDIF
+		
         INCLUDE "crt0_runtime_selection.asm"
 	INCLUDE	"crt0_section.asm"
 

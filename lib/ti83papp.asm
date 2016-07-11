@@ -205,7 +205,14 @@ cpygraph:
 ENDIF
 tidi:	ret
 
+		defc ansipixels = 96
+		IF !DEFINED_ansicolumns
+			 defc DEFINED_ansicolumns = 1
+			 defc ansicolumns = 32
+		ENDIF
+		
         INCLUDE "crt0_runtime_selection.asm"
+	INCLUDE	"crt0_section.asm"
 
 IF !DEFINED_GRAYlib
 cpygraph:

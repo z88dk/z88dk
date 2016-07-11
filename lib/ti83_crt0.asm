@@ -3,7 +3,7 @@
 ;	Stefano Bodrato	- Dec 2000
 ;	Henk Poley	- Apr 2001 Fixed and add some things
 ;
-;	$Id: ti83_crt0.asm,v 1.31 2016-06-21 20:49:07 dom Exp $
+;	$Id: ti83_crt0.asm,v 1.32 2016-07-11 05:58:34 stefano Exp $
 ;
 ; startup =
 ;   n - Primary shell(s); compatible shell(s)
@@ -382,8 +382,13 @@ fastCopyLoop:
  ENDIF
 ENDIF
 
+		defc ansipixels = 96
+		IF !DEFINED_ansicolumns
+			 defc DEFINED_ansicolumns = 1
+			 defc ansicolumns = 32
+		ENDIF
+		
         INCLUDE "crt0_runtime_selection.asm"
-
         INCLUDE "crt0_section.asm"
 
         SECTION code_crt_init

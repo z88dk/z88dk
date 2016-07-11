@@ -2,7 +2,7 @@
 ;
 ;	Stefano Bodrato - Dec 2000
 ;
-;	$Id: ti85_crt0.asm,v 1.31 2016-06-21 20:49:07 dom Exp $
+;	$Id: ti85_crt0.asm,v 1.32 2016-07-11 05:58:34 stefano Exp $
 ;
 ;-----------------------------------------------------
 ; Some general PUBLICs and EXTERNs needed by the assembler
@@ -72,8 +72,7 @@
 
 
 ; Offset            Example                                       Description
-;컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
-; 0000-0001          xx xx   -   A two-byte size of the string.  This is added
+;컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴?; 0000-0001          xx xx   -   A two-byte size of the string.  This is added
 ;                                by the TI-85.
 ; 0002-0003          00 xx   -   A signature word, where xx is either FD, FC,
 ;                                or FB.
@@ -103,8 +102,7 @@
 ;
 ; (if more than one library is to be linked, the last three ranges described 
 ;  are repeated as necessary.  The "number of libraries" byte denotes this).
-;컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
-
+;컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴?
 
 ;--------
 ;2 - Peak
@@ -236,6 +234,11 @@ ELSE
 ENDIF
 	ret
 
+		defc ansipixels = 128
+		IF !DEFINED_ansicolumns
+			 defc DEFINED_ansicolumns = 1
+			 defc ansicolumns = 32
+		ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 	INCLUDE	"crt0_section.asm"

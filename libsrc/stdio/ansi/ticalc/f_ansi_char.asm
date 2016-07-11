@@ -17,17 +17,43 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.8 2016-06-12 16:06:43 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.9 2016-07-11 05:58:34 stefano Exp $
 ;
 
 
-        SECTION code_clib
+	SECTION code_clib
+
+; The font
+
+; To keep the same text metrics on both calc 
+; 32 columns is a good value.
+
+; TI 82-83
+; 8 dots: MAX 12 columns
+; 7 dots: MAX 13 columns
+; 6 dots: MAX 16 columns
+; 5 dots: MAX 19 columns
+; 4 dots: MAX 24 columns
+; 3 dots: MAX 32 columns
+
+; TI 85-86
+; 8 dots: MAX 16 columns
+; 7 dots: MAX 18 columns
+; 6 dots: MAX 21 columns
+; 5 dots: MAX 25 columns
+; 4 dots: MAX 32 columns
+; 3 dots: MAX 42 columns
+
 	INCLUDE	"stdio/ansi/ticalc/ticalc.inc"
 	
 	PUBLIC	ansi_CHAR
 	
 	EXTERN	ansi_ROW
 	EXTERN	ansi_COLUMN
+
+	EXTERN	ansicharacter_pixelwidth
+	EXTERN	ansifont_is_packed
+	EXTERN	ansifont
 	
 	EXTERN	base_graphics
 	EXTERN	cpygraph
@@ -108,18 +134,21 @@
 
 .char
   ld b,'A'      ; Put here the character to be printed
-  
-IF PACKEDFONT
+ 
+  ld a,ansifont_is_packed
+  ld	hl,ansifont	- 256
+  and	a
+  jr    z,got_font_location
+
   xor	a
   rr	b
   jr	c,even
   ld	a,4
 .even
   ld	(ROLL+1),a
-  ld hl,font-128
-ELSE
-  ld hl,font
-ENDIF
+  ld hl,ansifont - 128
+
+.got_font_location
 
   ld de,8
 
@@ -143,16 +172,18 @@ ENDIF
   rl (ix+0)
   djnz L1
 .DTS
+
+  ld a,ansifont_is_packed
+  and  a
   ld a,(hl)
-  
-IF PACKEDFONT
+  jr   z,INVRS
+
 .ROLL
   jr INVRS
   rla
   rla
   rla
   rla
-ENDIF
 
 ; --- --- Inverse text handling
 .INVRS
@@ -170,7 +201,8 @@ ENDIF
 ; --- --- end of underlined text handling
 
 .DOTS
-  ld b,char_dots	; character FONT width in pixel
+  ld b,ansicharacter_pixelwidth
+
 .L2
   rla
   rl (ix+1)
@@ -196,24 +228,3 @@ ENDIF
 
 
 
-
-; The font
-
-; To keep the same text metrics on both calc 
-; families I suggest 32 or 24 columns.
-; Here we go with 32...
-
-; TI 82-83
-; 6 dots: MAX 16 columns
-; 5 dots: MAX 19 columns
-; 4 dots: MAX 24 columns
-; 3 dots: MAX 32 columns
-
-; TI 85-86
-; 6 dots: MAX 21 columns
-; 5 dots: MAX 25 columns
-; 4 dots: MAX 32 columns
-; 3 dots: MAX 42 columns
-
-.font
-        BINARY  "stdio/ansi/F4PACK.BIN"
