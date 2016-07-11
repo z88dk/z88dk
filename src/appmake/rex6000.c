@@ -3,7 +3,7 @@
  *
  *  djm 21/6/2001 after Damjan Marion
  *
- *  $Id: rex6000.c,v 1.7 2016-06-26 00:46:55 aralbrec Exp $
+ *  $Id: rex6000.c,v 1.8 2016-07-11 20:34:58 dom Exp $
  */
 
 #include "appmake.h"
@@ -52,6 +52,7 @@ static char  icon_default [5*32] = {
 static char             *application_name    = NULL;
 static char             *application_comment = NULL;
 static char             *binname             = NULL;
+static char             *crtfile             = NULL;
 static char             *outfile             = NULL;
 static char              help                = 0;
 static char              do_truncate         = 0;
@@ -65,7 +66,8 @@ option_t rex_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'n', "appname",  "Application Name",           OPT_STR,   &application_name },
-    { 'c', "comment",  "Application Comment",        OPT_STR,   &application_comment },
+    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
+    {  0, "comment",  "Application Comment",        OPT_STR,   &application_comment },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0 , "nt",       "Don't pad out to 8k addin",  OPT_BOOL,  &do_truncate },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
@@ -119,7 +121,7 @@ int rex_exec(char *target)
         }
     }
 
-	if ( (binfile=fopen_bin(binname, NULL) ) == NULL ) {
+	if ( (binfile=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Couldn't open binary file: %s\n",binname);
         myexit(NULL,1);
     }
