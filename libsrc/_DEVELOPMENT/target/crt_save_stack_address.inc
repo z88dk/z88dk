@@ -29,7 +29,7 @@
             
                ; program jumps to caller on exit
             
-               IF (__crt_enable_commandline < 2)
+               IF (__crt_enable_commandline != 2)
                
                   pop hl
                   ld (__sp_or_ret),hl
