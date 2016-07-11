@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.18 2016-07-10 20:15:17 dom Exp $
+;	$Id: sms_crt0.asm,v 1.19 2016-07-11 20:32:55 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -233,6 +233,12 @@ _End:
 IF DEFINED_defvarsaddr
 	defc bss_compiler_start = defvarsaddr
 ENDIF
+        ; If we were given a model then use it
+        IF DEFINED_CRT_MODEL
+            defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
+        ENDIF
 	INCLUDE	"crt0_section.asm"
 
 

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.22 2016-07-10 20:15:17 dom Exp $
+;	$Id: ace_crt0.asm,v 1.23 2016-07-11 20:32:55 dom Exp $
 ;
 
 
@@ -163,6 +163,12 @@ IF !DEFINED_defvarsaddr
 ENDIF
 	defc	CRT_ORG_BSS = sysdefvarsaddr
 	defc	bss_compiler_start = defvarsaddr
+        ; If we were given a model then use it
+        IF DEFINED_CRT_MODEL
+            defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
+        ENDIF
 ENDIF
 
 	INCLUDE	"crt0_section.asm"

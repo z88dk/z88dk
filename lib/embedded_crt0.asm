@@ -2,7 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.17 2016-07-10 20:15:17 dom Exp $
+;	$Id: embedded_crt0.asm,v 1.18 2016-07-11 20:32:55 dom Exp $
 ;
 ; (DM) Could this do with a cleanup to ensure rstXX functions are
 ; available?
@@ -69,4 +69,10 @@ l_dcal:
         INCLUDE "crt0_runtime_selection.asm"
 
 	defc	CRT_ORG_BSS = RAM_Start
+        ; If we were given a model then use it
+        IF DEFINED_CRT_MODEL
+            defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
+        ENDIF
 	INCLUDE	"crt0_section.asm"
