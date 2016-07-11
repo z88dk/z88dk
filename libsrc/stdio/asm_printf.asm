@@ -52,6 +52,7 @@ asm_printf:
 	ld	(ix-9),10		;default base
 	xor	a
 	ld	(ix-3),a		;upper case switch
+	ld	(ix-4),a		;flags
 	ld	(ix-10),a		;length of temp buffer
  
 	ld	a,(hl)
