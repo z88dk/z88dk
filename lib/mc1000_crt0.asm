@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.20 2016-07-02 09:02:20 dom Exp $
+;       $Id: mc1000_crt0.asm,v 1.21 2016-07-11 21:19:37 dom Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -50,18 +50,18 @@
         PUBLIC	FRAMES
 
 
-        IF      !myzorg
+        IF      !CRT_ORG_CODE
 			IF (startup=2)
-				defc    myzorg  = $100  ; Direct M/C mode, including system variables on top 100h bytes
+				defc    CRT_ORG_CODE  = $100  ; Direct M/C mode, including system variables on top 100h bytes
 			ELSE
-				defc    myzorg  = 981	; BASIC startup mode (correct location TBD)
+				defc    CRT_ORG_CODE  = 981	; BASIC startup mode (correct location TBD)
 			ENDIF
         ENDIF
 
 
 ; Now, getting to the real stuff now!
 
-		org     myzorg
+		org     CRT_ORG_CODE
 
 
 IF (startup=2)

@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.27 2016-07-10 20:15:17 dom Exp $
+;	$Id: app_crt0.asm,v 1.28 2016-07-11 21:19:37 dom Exp $
 
 
 ;--------
@@ -44,10 +44,10 @@
 ; Set an origin for the application (-zorg=) default to 49152
 ;--------
 
-        IF      !myzorg
-                defc    myzorg  = 49152
+        IF      !CRT_ORG_CODE
+                defc    CRT_ORG_CODE  = 49152
         ENDIF
-                org     myzorg
+                org     CRT_ORG_CODE
 
 ;--------
 ; Calculate the required bad memory. If we're using a near heap then the

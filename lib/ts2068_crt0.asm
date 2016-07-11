@@ -1,6 +1,6 @@
 ;       TS 2068 startup code
 ;
-;       $Id: ts2068_crt0.asm,v 1.28 2016-07-02 09:02:20 dom Exp $
+;       $Id: ts2068_crt0.asm,v 1.29 2016-07-11 21:19:38 dom Exp $
 ;
 
 
@@ -36,8 +36,8 @@
 ;--------
 
         IF DEFINED_ZXVGS
-        IF !myzorg
-                DEFC    myzorg = $5CCB    ;repleaces BASIC program
+        IF !CRT_ORG_CODE
+                DEFC    CRT_ORG_CODE = $5CCB    ;repleaces BASIC program
         ENDIF
         IF !STACKPTR
                 DEFC    STACKPTR = $FF57  ;below UDG, keep eye when using banks
@@ -45,17 +45,17 @@
         ENDIF
 
         
-        IF      !myzorg
+        IF      !CRT_ORG_CODE
         IF (startup=2)
-                defc    myzorg  = 40000
+                defc    CRT_ORG_CODE  = 40000
         ELSE
-                defc    myzorg  = 32768
+                defc    CRT_ORG_CODE  = 32768
         ENDIF
         ENDIF
         IF !STACKPTR
-                DEFC    STACKPTR = myzorg-1  ;below UDG, keep eye when using banks
+                DEFC    STACKPTR = CRT_ORG_CODE-1  ;below UDG, keep eye when using banks
         ENDIF
-                org     myzorg
+                org     CRT_ORG_CODE
 
 
 start:

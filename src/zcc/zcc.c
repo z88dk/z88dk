@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.138 2016-07-08 02:35:22 aralbrec Exp $
+ *      $Id: zcc.c,v 1.139 2016-07-11 21:19:38 dom Exp $
  */
 
 
@@ -678,7 +678,7 @@ int main(int argc, char **argv)
     }
 
     if ( c_zorg != -1 ) {
-         write_zcc_defined("myzorg", c_zorg);
+         write_zcc_defined("CRT_ORG_CODE", c_zorg);
     }
 
     if ((fp = fopen(DEFFILE, "a")) != NULL) {

@@ -228,7 +228,7 @@ int main(int argc, char **argv)
                 ol = 0;
             } else if (strncmp(ptr, "-zorg=", 6) == 0 ) {
                 /* It's an option, this may tweak something */
-                write_defined("myzorg", atoi(ptr+6));
+                write_defined("CRT_ORG_CODE", atoi(ptr+6));
             } else if ( strncmp(ptr, "-reqpag=", 8) == 0 ) {
                 write_defined("reqpag", atoi(ptr+8));
             } else if ( strncmp(ptr, "-defvars=", 8) == 0 ) {

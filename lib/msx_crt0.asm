@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.45 2016-07-10 20:28:14 dom Exp $
+;	$Id: msx_crt0.asm,v 1.46 2016-07-11 21:19:37 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -50,10 +50,10 @@ IF startup != 3
 ; Now, getting to the real stuff now!
 
 IF (!DEFINED_startup | (startup=1))
-        IF      !myzorg
-                defc    myzorg  = 40000
+        IF      !CRT_ORG_CODE
+                defc    CRT_ORG_CODE  = 40000
         ENDIF
-                org     myzorg
+                org     CRT_ORG_CODE
 ELSE
         org     $100		; MSXDOS
 ENDIF
@@ -182,8 +182,8 @@ ELSE
 ;  Main Code Entrance Point
 ;
 
-	defc  myzorg  = $4000
-	org   myzorg
+	defc  CRT_ORG_CODE  = $4000
+	org   CRT_ORG_CODE
 
 ; ROM header
 

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.16 2016-07-11 20:32:55 dom Exp $
+;	$Id: sc3000_crt0.asm,v 1.17 2016-07-11 21:19:38 dom Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -65,13 +65,13 @@
 ;--------
 
 IF (startup=2)
-	defc    myzorg  = ROM_Start
+	defc    CRT_ORG_CODE  = ROM_Start
 ELSE
-	IF      !myzorg
-		defc    myzorg  = $9817
+	IF      !CRT_ORG_CODE
+		defc    CRT_ORG_CODE  = $9817
 	ENDIF
 ENDIF
-        org     myzorg
+        org     CRT_ORG_CODE
 
 IF (startup=2)
 ;  ******************** ********************

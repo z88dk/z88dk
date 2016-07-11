@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: aquarius_crt0.asm,v 1.19 2016-06-21 20:49:06 dom Exp $
+;       $Id: aquarius_crt0.asm,v 1.20 2016-07-11 21:19:37 dom Exp $
 ;
 
 
@@ -27,11 +27,11 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        IF      !myzorg
-                defc    myzorg  = 14712
+        IF      !CRT_ORG_CODE
+                defc    CRT_ORG_CODE  = 14712
         ENDIF
 
-	org	myzorg
+	org	CRT_ORG_CODE
 
 start:
         ld      (start1+1),sp	;Save entry stack

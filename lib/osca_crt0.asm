@@ -18,7 +18,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.35 2016-06-22 21:21:02 dom Exp $
+;	$Id: osca_crt0.asm,v 1.36 2016-07-11 21:19:37 dom Exp $
 ;
 
 
@@ -90,20 +90,20 @@
 ; Set an origin for the application (-zorg=) default to $5000
 ;--------
 
-IF      !myzorg
-	defc    myzorg  = $5000
+IF      !CRT_ORG_CODE
+	defc    CRT_ORG_CODE  = $5000
 ENDIF
 
 
-IF ((myzorg = $5000) | (!DEFINED_osca_bank))
-       org	myzorg
+IF ((CRT_ORG_CODE = $5000) | (!DEFINED_osca_bank))
+       org	CRT_ORG_CODE
 ELSE
 	; optional Program Location File Header
-	org	myzorg
+	org	CRT_ORG_CODE
 	defb	$ed
 	defb	$00
 	jr	start
-	defw	myzorg
+	defw	CRT_ORG_CODE
     IF DEFINED_osca_bank
 	defb	osca_bank
     ELSE

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.19 2016-06-21 20:49:07 dom Exp $
+;       $Id: trs80_crt0.asm,v 1.20 2016-07-11 21:19:38 dom Exp $
 ;
 
 
@@ -29,15 +29,15 @@
 ; Set an origin for the application (-zorg=) default to $5200
 ;--------
 
-IF      !myzorg
+IF      !CRT_ORG_CODE
 	IF (startup=2)
-                defc    myzorg  = 22500
+                defc    CRT_ORG_CODE  = 22500
 	ELSE
-                defc    myzorg  = $5200
+                defc    CRT_ORG_CODE  = $5200
 	ENDIF
 ENDIF
 
-	org     myzorg
+	org     CRT_ORG_CODE
 
 start:
         ld      (start1+1),sp   ;Save entry stack

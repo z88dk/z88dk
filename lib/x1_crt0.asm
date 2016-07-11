@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.13 2016-06-21 20:49:07 dom Exp $
+;    $Id: x1_crt0.asm,v 1.14 2016-07-11 21:19:38 dom Exp $
 ;
 
 	MODULE x1_crt0
@@ -31,16 +31,16 @@
 ; Non-zero origins must be >=32768 (startup=2 must be used for this)
 ;--------
 
-        IF      !myzorg
+        IF      !CRT_ORG_CODE
  	    IF (startup=2)
-                defc    myzorg  = 32768
+                defc    CRT_ORG_CODE  = 32768
             ELSE
-                defc    myzorg  = 0
+                defc    CRT_ORG_CODE  = 0
             ENDIF
         ENDIF
 
 
-        org     myzorg
+        org     CRT_ORG_CODE
 
 
 ;--------
@@ -51,7 +51,7 @@ start:
         
 IF (!DEFINED_startup | (startup=1))
 
-if (myzorg > 0)
+if (CRT_ORG_CODE > 0)
         defs    ZORG_NOT_ZERO
 endif
 
@@ -63,7 +63,7 @@ ENDIF
 
 IF (startup=2)
 
-if (myzorg < 32768)
+if (CRT_ORG_CODE < 32768)
         defs    ZORG_TOO_LOW
 endif
 

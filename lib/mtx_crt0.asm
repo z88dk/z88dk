@@ -1,6 +1,6 @@
 ;       Memotech MTX CRT0 stub
 ;
-;       $Id: mtx_crt0.asm,v 1.13 2016-06-21 20:49:06 dom Exp $
+;       $Id: mtx_crt0.asm,v 1.14 2016-07-11 21:19:37 dom Exp $
 ;
 
 
@@ -32,16 +32,16 @@
 ; Set an origin for the application (-zorg=) default to 32768
 ;--------
 
-        IF !myzorg
+        IF !CRT_ORG_CODE
             IF (startup=2)                 ; ROM ?
-                defc    myzorg  = 16384+19
+                defc    CRT_ORG_CODE  = 16384+19
             ELSE
-                defc    myzorg  = 32768+19
+                defc    CRT_ORG_CODE  = 32768+19
             ENDIF
         ENDIF
 
 
-        org     myzorg
+        org     CRT_ORG_CODE
 
 
 start:

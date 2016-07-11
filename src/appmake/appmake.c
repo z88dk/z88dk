@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.39 2016-07-10 20:10:09 dom Exp $
+ *   $Id: appmake.c,v 1.40 2016-07-11 21:19:38 dom Exp $
  */
 
 
@@ -193,7 +193,7 @@ long get_org_addr(char *crtfile)
     long    pos;
 	
 	if ( ( pos = parameter_search(crtfile,".sym","__crt_org_code") ) == -1 )
-		pos = parameter_search(crtfile,".sym","myzorg");
+		pos = parameter_search(crtfile,".sym","CRT_ORG_CODE");
 	
 	return(pos);
 }

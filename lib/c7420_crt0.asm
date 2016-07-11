@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2015
 ;
-;       $Id: c7420_crt0.asm,v 1.8 2016-06-21 20:49:06 dom Exp $
+;       $Id: c7420_crt0.asm,v 1.9 2016-07-11 21:19:37 dom Exp $
 ;
 
 
@@ -27,11 +27,11 @@
 
 ; Now, getting to the real stuff now!
 
-        IF      !myzorg
-                defc    myzorg  = 35055
+        IF      !CRT_ORG_CODE
+                defc    CRT_ORG_CODE  = 35055
         ENDIF   
 
-        org     myzorg
+        org     CRT_ORG_CODE
 
 
 start:

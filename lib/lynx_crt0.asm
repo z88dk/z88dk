@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 2014
 ;
-;	$Id: lynx_crt0.asm,v 1.9 2016-06-21 20:49:06 dom Exp $
+;	$Id: lynx_crt0.asm,v 1.10 2016-07-11 21:19:37 dom Exp $
 ;
 
 
@@ -35,12 +35,12 @@
 ; Set an origin for the application (-zorg=) default to $7000
 ;--------
 
-        IF      !myzorg
-                defc    myzorg  = $7000
+        IF      !CRT_ORG_CODE
+                defc    CRT_ORG_CODE  = $7000
         ENDIF
 
 
-        org     myzorg
+        org     CRT_ORG_CODE
 
 start:
 

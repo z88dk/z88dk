@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 8/6/2000
 ;
-;       $Id: cpc_crt0.asm,v 1.35 2016-06-21 20:49:06 dom Exp $
+;       $Id: cpc_crt0.asm,v 1.36 2016-07-11 21:19:37 dom Exp $
 ;
 
         MODULE  cpc_crt0
@@ -32,10 +32,10 @@
 ; Set an origin for the application (-zorg=) default to $1200
 ;--------
 
-IF      !myzorg
-		defc    myzorg  = $1200
+IF      !CRT_ORG_CODE
+		defc    CRT_ORG_CODE  = $1200
 ENDIF   
-                org     myzorg
+                org     CRT_ORG_CODE
 
 
 ;--------

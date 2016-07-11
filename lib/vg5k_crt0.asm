@@ -3,7 +3,7 @@
 ;       Joaopa Jun. 2014
 ;       Stefano Bodrato Lug. 2014
 ;
-;       $Id: vg5k_crt0.asm,v 1.13 2016-06-21 20:49:07 dom Exp $
+;       $Id: vg5k_crt0.asm,v 1.14 2016-07-11 21:19:38 dom Exp $
 ;
 
 
@@ -28,11 +28,11 @@
 
 ; Now, getting to the real stuff now!
 
-        IF      !myzorg
-                defc    myzorg  = 20480
+        IF      !CRT_ORG_CODE
+                defc    CRT_ORG_CODE  = 20480
         ENDIF   
 
-        org     myzorg
+        org     CRT_ORG_CODE
 
 
 start:

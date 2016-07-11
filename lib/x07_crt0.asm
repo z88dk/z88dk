@@ -1,7 +1,7 @@
 ;
 ;       Startup for Canon X-07
 ;
-;       $Id: x07_crt0.asm,v 1.11 2016-06-21 20:49:07 dom Exp $
+;       $Id: x07_crt0.asm,v 1.12 2016-07-11 21:19:38 dom Exp $
 ;
 
 	MODULE  x07_crt0
@@ -28,11 +28,11 @@
 ; Set an origin for the application (-zorg=) default to 800h
 ;--------
 
-        IF      !myzorg
-                defc    myzorg  = $800
+        IF      !CRT_ORG_CODE
+                defc    CRT_ORG_CODE  = $800
         ENDIF
 
-        org     myzorg
+        org     CRT_ORG_CODE
 
 ;----------------------
 ; Execution starts here

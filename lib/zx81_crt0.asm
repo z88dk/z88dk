@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.57 2016-07-01 20:34:45 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.58 2016-07-11 21:19:38 dom Exp $
 ;
 ; - - - - - - -
 
@@ -69,17 +69,17 @@ ENDIF
         PUBLIC    _FRAMES
         defc    _FRAMES = 16436	; Timer
 
-        IF      !myzorg
+        IF      !CRT_ORG_CODE
 			IF (startup>100)
 				; ORG position for LAMBDA
-                defc    myzorg  = 17307
+                defc    CRT_ORG_CODE  = 17307
 			ELSE
-                defc    myzorg  = 16514
+                defc    CRT_ORG_CODE  = 16514
 			ENDIF
         ENDIF
 
 
-        org     myzorg
+        org     CRT_ORG_CODE
 
 
 ; Hide the mess in the REM line from BASIC program listing

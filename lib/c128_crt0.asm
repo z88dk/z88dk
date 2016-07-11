@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.26 2016-07-02 09:02:20 dom Exp $
+;	$Id: c128_crt0.asm,v 1.27 2016-07-11 21:19:37 dom Exp $
 ;
 
 
@@ -29,10 +29,10 @@
 
 ; Now, getting to the real stuff now!
 
-IF      !myzorg
-        defc    myzorg  = $3000
+IF      !CRT_ORG_CODE
+        defc    CRT_ORG_CODE  = $3000
 ENDIF
-        org     myzorg
+        org     CRT_ORG_CODE
 
 
 start:

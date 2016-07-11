@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.23 2016-07-11 20:32:55 dom Exp $
+;	$Id: ace_crt0.asm,v 1.24 2016-07-11 21:19:37 dom Exp $
 ;
 
 
@@ -34,16 +34,16 @@
 ; Set an origin for the application (-zorg=) default to $4000
 ;--------
 
-        IF      !myzorg
+        IF      !CRT_ORG_CODE
             IF (startup=2)                 ; ROM ?
-                defc    myzorg  = 0
+                defc    CRT_ORG_CODE  = 0
             ELSE
-                defc    myzorg  = $4000
+                defc    CRT_ORG_CODE  = $4000
             ENDIF
         ENDIF
 
 
-        org     myzorg
+        org     CRT_ORG_CODE
 
 start:
 IF (startup=2)

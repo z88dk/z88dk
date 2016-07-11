@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 7/4/2014
 ;
-;       $Id: p2000_crt0.asm,v 1.10 2016-06-21 20:49:06 dom Exp $
+;       $Id: p2000_crt0.asm,v 1.11 2016-07-11 21:19:38 dom Exp $
 ;
 
 
@@ -25,12 +25,12 @@
 
 ; Now, getting to the real stuff now!
 
-        IF      !myzorg
-                defc    myzorg  = $6547
+        IF      !CRT_ORG_CODE
+                defc    CRT_ORG_CODE  = $6547
         ENDIF
 
 
-        org     myzorg
+        org     CRT_ORG_CODE
 
 basic_block:
 
@@ -57,7 +57,7 @@ basic_end:
 
 ; BASIC is abt 50 bytes long
 
-	defs $6580 - myzorg - (basic_end - basic_block)
+	defs $6580 - CRT_ORG_CODE - (basic_end - basic_block)
 
 
 start:

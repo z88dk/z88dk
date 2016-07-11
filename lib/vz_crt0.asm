@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.25 2016-06-21 20:49:07 dom Exp $
+;       $Id: vz_crt0.asm,v 1.26 2016-07-11 21:19:38 dom Exp $
 ;
 
 
@@ -28,14 +28,14 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        IF      !myzorg
+        IF      !CRT_ORG_CODE
             IF (startup=3)
-		defc    myzorg  = 32768  ; clean binary block
+		defc    CRT_ORG_CODE  = 32768  ; clean binary block
             ELSE
 		IF (startup=2)
-			defc    myzorg  = $7ae9	; BASIC startup mode
+			defc    CRT_ORG_CODE  = $7ae9	; BASIC startup mode
 		ELSE
-			defc    myzorg  = $7b00  ; Direct M/C mode
+			defc    CRT_ORG_CODE  = $7b00  ; Direct M/C mode
                 ENDIF
             ENDIF
         ENDIF
@@ -44,7 +44,7 @@
 ; Now, getting to the real stuff now!
 
 
-		org     myzorg-24
+		org     CRT_ORG_CODE-24
 
 IF (startup=3)
 ;  STARTUP=3 -> plain binary block
@@ -63,7 +63,7 @@ ELSE
   defb $f1
 ENDIF
 
-  defw myzorg
+  defw CRT_ORG_CODE
 
 IF (startup=2)
   defw $7b04

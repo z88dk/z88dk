@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: pc6001_crt0.asm,v 1.10 2016-06-21 20:49:06 dom Exp $
+;       $Id: pc6001_crt0.asm,v 1.11 2016-07-11 21:19:38 dom Exp $
 ;
 
 
@@ -29,26 +29,26 @@
 
 
 IF (startup=2)
-	defc    myzorg  = $8437  ; PC6001 - 32k (Answer "2" to "How many pages?")
+	defc    CRT_ORG_CODE  = $8437  ; PC6001 - 32k (Answer "2" to "How many pages?")
 ENDIF
 
 IF (startup=3)
-	defc    myzorg  = $8037	 ; PC6001 - MK2 (Answer "2" to "How many pages?")
+	defc    CRT_ORG_CODE  = $8037	 ; PC6001 - MK2 (Answer "2" to "How many pages?")
 ENDIF
 
 IF (startup=4)
-	defc    myzorg  = $4004	 ; ROM
+	defc    CRT_ORG_CODE  = $4004	 ; ROM
 ENDIF
 
-IF      !myzorg
-	defc    myzorg  = $c437  ; PC6001 - 16K
+IF      !CRT_ORG_CODE
+	defc    CRT_ORG_CODE  = $c437  ; PC6001 - 16K
 ENDIF
 
 
 ; Now, getting to the real stuff now!
 
 
-		org     myzorg
+		org     CRT_ORG_CODE
 
 start:
 		;di
@@ -58,7 +58,7 @@ start:
 		;out	($F1),a
 
 		; on entry HL holds the current location
-;IF (myzorg=$c437)
+;IF (CRT_ORG_CODE=$c437)
 ;	; if we built a 16K program and we run in a 32k environment, then let's relocate it.
 ;		ld	a,$c4
 ;		cp	h
