@@ -84,13 +84,7 @@ __Start:
 
 __Restart:
 
-   IF __register_sp != -1
-   
-      ; crt supplies sp
-      
-      ld sp,__register_sp
-
-   ENDIF
+   include "../crt_locate_stack.inc"
    
    ; command line
    
