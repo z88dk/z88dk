@@ -3387,6 +3387,39 @@ replace restart {
 	; peephole z88dk-bugfix-4c-critical-close-4
 } if notUsed(%4)
 
+replace restart {
+	in	a,(%1)
+	in	a,(%1)
+	ld	l,a
+	in	a,(%1)
+	ld	h,a
+} by {
+	ld	hl,(%1)
+	; peephole z88dk-bugfix-5a-sdcc-2523
+}
+
+replace restart {
+	in	a,(%1)
+	in	a,(%1)
+	ld	e,a
+	in	a,(%1)
+	ld	d,a
+} by {
+	ld	de,(%1)
+	; peephole z88dk-bugfix-5b-sdcc-2523
+}
+
+replace restart {
+	in	a,(%1)
+	in	a,(%1)
+	ld	c,a
+	in	a,(%1)
+	ld	b,a
+} by {
+	ld	bc,(%1)
+	; peephole z88dk-bugfix-5c-sdcc-2523
+}
+
 
 barrier
 
