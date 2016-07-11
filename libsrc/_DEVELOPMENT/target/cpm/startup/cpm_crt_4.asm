@@ -968,12 +968,12 @@ PUBLIC __Start, __Exit
 
 EXTERN _main, asm_cpm_bdos
 
-__Start:
+Qualify:
 
    ; disqualify 8080
    
    sub a
-   jp po, __Restart
+   jp po, __Continue
 
    ld c,__CPM_PRST
    ld de,disqualify_s
@@ -986,23 +986,41 @@ disqualify_s:
    defm "z80 only"
    defb 13,10,'$'
 
+__Continue:
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; USER PREAMBLE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __crt_include_preamble
+
+   include "crt_preamble.asm"
+   SECTION CODE
+
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+__Start:
+
+   include "../crt_start_eidi.inc"
+   include "../crt_save_stack_address.inc"
+   
 __Restart:
 
-   ; locate stack
+   include "../crt_locate_stack.inc"
 
-   IF __register_sp = -1
-   
-      ld sp,(0x0006)           ; move sp underneath FBASE
-   
-   ELSE
-   
-      ld sp,__register_sp
-   
-   ENDIF
-
-   ; parse command line
+   ; command line
    
    IF __crt_enable_commandline = 1
+   
+      include "../crt_cmdline_empty.inc"
+   
+   ENDIF
+   
+   IF __crt_enable_commandline >= 3
       
       ; copy command line words from default dma buffer to stack
       ; must do this as the default dma buffer may be used by the cpm program
@@ -1035,6 +1053,12 @@ __Restart:
       
       inc c                    ; argc++
       
+   ENDIF
+
+__Restart_2:
+
+   IF __crt_enable_commandline >= 1
+
       IF __SDCC | __SDCC_IX | __SDCC_IY
       
          push hl               ; argv
@@ -1046,20 +1070,20 @@ __Restart:
          push hl               ; argv
       
       ENDIF
-
-      ;; when file io is ready
-      ;;
-      ;; exx
-      ;; ld a,b
-      ;; or c
-      ;; call nz, l_command_line_redirect
-   
+      
    ENDIF
    
-   ; initialize sections
+   ; initialize data section
 
    include "../clib_init_data.inc"
+
+   ; initialize bss section
+
    include "../clib_init_bss.inc"
+
+   ; enforce code section name
+   
+   include "../crt_enforce_code_section_name.inc"
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
@@ -1079,7 +1103,13 @@ SECTION code_crt_main
 
 __Exit:
 
-   push hl                     ; save return status
+   IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
+   
+      ; not restarting
+      
+      push hl                  ; save return status
+   
+   ENDIF
    
 SECTION code_crt_exit          ; user and library cleanup
 SECTION code_crt_return
@@ -1088,14 +1118,21 @@ SECTION code_crt_return
    
    include "../clib_close.inc"
 
-   ; exit program
-       
-   pop hl                      ; hl = return status
-   rst 0
+   ; terminate
+   
+   include "../crt_exit_eidi.inc"
+   include "../crt_program_exit.inc"   
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0xe)
+
+   SECTION BSS_UNINITIALIZED
+   __sp_or_ret:  defw 0
+
+ENDIF
 
 include "../clib_variables.inc"
 include "clib_target_variables.inc"
