@@ -23,11 +23,11 @@
             
             ELSE
             
-               ld sp,__register_sp
+               include "../crt_locate_stack.inc"
                
             ENDIF
             
-            INCLUDE "../crt_cmdline_empty.inc"
+            include "../crt_cmdline_empty.inc"
             
             jp __Restart_2
             
@@ -72,6 +72,15 @@
       ; program jumps to absolute address
 	  
       pop hl                   ; hl = return status
-      jp __crt_on_exit & 0xffff
+      
+      IF (__crt_on_exit & 0xffff)
+
+         jp __crt_on_exit & 0xffff
+      
+      ELSE
+      
+         rst 0
+         
+      ENDIF
    
    ENDIF
