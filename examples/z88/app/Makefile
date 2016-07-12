@@ -13,10 +13,10 @@ useless.63: useless.c
 	zcc +z88 -subtype=app -vn -create-app useless.c -o useless.bin
 
 wc.63: wc.c
-	zcc +z88 -subtype=app -vn -create-app wc.c -lz88 -o wc.bin
+	zcc +z88 -subtype=app -vn -create-app wc.c -o wc.bin
 
 viewer.63: viewer.c
-	zcc +z88 -subtype=app -vn -create-app viewer.c -lz88 -o viewer.bin
+	zcc +z88 -subtype=app -vn -create-app viewer.c -o viewer.bin
 
 dstar.63: dstar.c dstar.h
 	zcc +z88 -subtype=app -vn -create-app dstar.c -o dstar.bin
