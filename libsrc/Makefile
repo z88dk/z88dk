@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.243 2016-07-03 22:16:06 dom Exp $
+# $Id: Makefile,v 1.244 2016-07-12 19:41:25 dom Exp $
 
 
 include Make.config
@@ -36,7 +36,7 @@ eplibs: enterprise_clib.lib gfxep.lib gfxephr.lib
 
 cpclibs: cpc_clib.lib  cpcfs.lib cpc_math.lib
 
-z88libs: z88_math.lib z88.lib z88_clib.lib net.lib z88net_clib.lib farz88.lib 
+z88libs: z88_math.lib  z88_clib.lib net.lib z88net_clib.lib farz88.lib 
 
 tilibs: ti82_clib.lib ti83_clib.lib ti83p_clib.lib ti85_clib.lib ti86_clib.lib
 
@@ -209,12 +209,6 @@ debug.lib:
 	@echo ''
 	$(MAKE) -C debug 
 
-# Custom z88 routines for application - dom
-z88.lib:
-	@echo ''
-	@echo '--- Building Z88 Custom Library ---'
-	@echo ''
-	$(MAKE) -C z88 
 
 # ZSock API (wrappers to package calls) - dom
 net.lib:
@@ -239,6 +233,7 @@ z88_clib.lib: gfxdeps
 	$(MAKE) -C assert 
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lz88 
+	$(MAKE) -C z88 
 	$(LIBLINKER) -DFORz88 -x$(OUTPUT_DIRECTORY)/z88_clib @$(LISTFILE_DIRECTORY)/z88.lst
 
 # Network stdio - dom
