@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{48CCD8D5-4049-4C31-8C9E-80CEACAD7FE6}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>z80asm</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\z80asm\lib</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\z80asm\lib</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\z80asm\lib</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy /y $(OutDir)$(TargetName)$(TargetExt) ..\..\bin\$(TargetName)$(TargetExt)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>..\..\bin\$(TargetName)$(TargetExt)</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\z80asm\lib</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy /y $(OutDir)$(TargetName)$(TargetExt) ..\..\bin\$(TargetName)$(TargetExt)</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>..\..\bin\$(TargetName)$(TargetExt)</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\codearea.c" />
+    <ClCompile Include="..\..\src\z80asm\directives.c" />
+    <ClCompile Include="..\..\src\z80asm\errors.c" />
+    <ClCompile Include="..\..\src\z80asm\error_func.c" />
+    <ClCompile Include="..\..\src\z80asm\expr.c" />
+    <ClCompile Include="..\..\src\z80asm\hist.c" />
+    <ClCompile Include="..\..\src\z80asm\libfile.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\alloc.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\array.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\class.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\dbg.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\fileutil.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\list.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\minunit.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\srcfile.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\str.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\strhash.c" />
+    <ClCompile Include="..\..\src\z80asm\lib\strpool.c" />
+    <ClCompile Include="..\..\src\z80asm\listfile.c" />
+    <ClCompile Include="..\..\src\z80asm\model.c" />
+    <ClCompile Include="..\..\src\z80asm\modlink.c" />
+    <ClCompile Include="..\..\src\z80asm\module.c" />
+    <ClCompile Include="..\..\src\z80asm\objfile.c" />
+    <ClCompile Include="..\..\src\z80asm\opcodes.c" />
+    <ClCompile Include="..\..\src\z80asm\options.c" />
+    <ClCompile Include="..\..\src\z80asm\parse.c" />
+    <ClCompile Include="..\..\src\z80asm\scan.c" />
+    <ClCompile Include="..\..\src\z80asm\sym.c" />
+    <ClCompile Include="..\..\src\z80asm\symtab.c" />
+    <ClCompile Include="..\..\src\z80asm\z80asm.c" />
+    <ClCompile Include="..\..\src\z80asm\z80pass.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\codearea.h" />
+    <ClInclude Include="..\..\src\z80asm\directives.h" />
+    <ClInclude Include="..\..\src\z80asm\errors.h" />
+    <ClInclude Include="..\..\src\z80asm\error_func.h" />
+    <ClInclude Include="..\..\src\z80asm\expr.h" />
+    <ClInclude Include="..\..\src\z80asm\expr_def.h" />
+    <ClInclude Include="..\..\src\z80asm\hist.h" />
+    <ClInclude Include="..\..\src\z80asm\libfile.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\alloc.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\array.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\class.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\classhash.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\classlist.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\dbg.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\fileutil.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\init.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\list.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\minunit.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\queue.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\srcfile.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\str.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\strhash.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\strpool.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\types.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\utarray.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\uthash.h" />
+    <ClInclude Include="..\..\src\z80asm\lib\utlist.h" />
+    <ClInclude Include="..\..\src\z80asm\listfile.h" />
+    <ClInclude Include="..\..\src\z80asm\model.h" />
+    <ClInclude Include="..\..\src\z80asm\modlink.h" />
+    <ClInclude Include="..\..\src\z80asm\module.h" />
+    <ClInclude Include="..\..\src\z80asm\objfile.h" />
+    <ClInclude Include="..\..\src\z80asm\opcodes.h" />
+    <ClInclude Include="..\..\src\z80asm\options.h" />
+    <ClInclude Include="..\..\src\z80asm\options_def.h" />
+    <ClInclude Include="..\..\src\z80asm\parse.h" />
+    <ClInclude Include="..\..\src\z80asm\parse_rules.h" />
+    <ClInclude Include="..\..\src\z80asm\scan.h" />
+    <ClInclude Include="..\..\src\z80asm\scan_def.h" />
+    <ClInclude Include="..\..\src\z80asm\scan_rules.h" />
+    <ClInclude Include="..\..\src\z80asm\sym.h" />
+    <ClInclude Include="..\..\src\z80asm\symbol.h" />
+    <ClInclude Include="..\..\src\z80asm\symtab.h" />
+    <ClInclude Include="..\..\src\z80asm\tokens.h" />
+    <ClInclude Include="..\..\src\z80asm\z80asm.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\z80asm\parse_rules.rl" />
+    <None Include="..\..\src\z80asm\scan_rules.rl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
