@@ -2,7 +2,7 @@
 ;
 ;	Haroldo O. Pinheiro February 2006
 ;
-;	$Id: sms_crt0.asm,v 1.19 2016-07-11 20:32:55 dom Exp $
+;	$Id: sms_crt0.asm,v 1.20 2016-07-13 22:12:25 dom Exp $
 ;
 
 	DEFC	ROM_Start  = $0000
@@ -229,10 +229,7 @@ _End:
 
         INCLUDE "crt0_runtime_selection.asm"
 
-	defc CRT_ORG_BSS = RAM_Start
-IF DEFINED_defvarsaddr
-	defc bss_compiler_start = defvarsaddr
-ENDIF
+	defc __crt_org_bss = RAM_Start
         ; If we were given a model then use it
         IF DEFINED_CRT_MODEL
             defc __crt_model = CRT_MODEL

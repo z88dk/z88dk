@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.46 2016-07-11 21:19:37 dom Exp $
+;	$Id: msx_crt0.asm,v 1.47 2016-07-13 22:12:25 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -242,10 +242,10 @@ endloop:
 l_dcal:	jp	(hl)		;Used for call by function pointer
 
 
-IF !DEFINED_sysdefvarsaddr
-	defc sysdefvarsaddr =  $C000   ; Static variables are kept in RAM in high memory
+IF !DEFINED_CRT_ORG_BSS
+	defc CRT_ORG_BSS =  $C000   ; Static variables are kept in RAM in high memory
 ENDIF
-	defc	CRT_ORG_BSS = sysdefvarsaddr
+	defc	__crt_org_bss = CRT_ORG_BSS
 
         ; If we were given a model then use it
         IF DEFINED_CRT_MODEL

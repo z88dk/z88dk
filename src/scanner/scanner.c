@@ -230,11 +230,11 @@ int main(int argc, char **argv)
                 /* It's an option, this may tweak something */
                 write_defined("CRT_ORG_CODE", atoi(ptr+6));
             } else if ( strncmp(ptr, "-reqpag=", 8) == 0 ) {
-                write_defined("reqpag", atoi(ptr+8));
+                write_defined("CRT_Z88_BADPAGES", atoi(ptr+8));
             } else if ( strncmp(ptr, "-defvars=", 8) == 0 ) {
                 write_defined("defvarsaddr", atoi(ptr+8));
             } else if ( strncmp(ptr, "-safedata=", 10) == 0 ) {
-                write_defined("safedata", atoi(ptr+9));
+                write_defined("CRT_Z88_SAFEDATA", atoi(ptr+9));
             } else if ( strncmp(ptr, "-startup=", 9) == 0 ) {
                 write_defined("startup", atoi(ptr+9));
             } else if ( strncmp(ptr, "-farheap=", 9) == 0 ) {

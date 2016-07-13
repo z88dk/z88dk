@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.11 2016-07-10 11:14:20 dom Exp $
+ *      $Id: z88.c,v 1.12 2016-07-13 22:12:25 dom Exp $
  */
 
 
@@ -91,6 +91,12 @@ option_t z88_options[] = {
 /* Prototypes for our functions */
 static void SaveBlock(unsigned offset, char *base, char *ext);
 
+#define get_dor_parameter(variable, name) do { \
+	variable = parameter_search(crtfile,".map",name); \
+	if ( variable == -1 ) { \
+		exit_log(1,"Could not find parameter %s - no app dor present\n"); \
+	} \
+	} while(0)
 
 /*
  * Execution starts here
@@ -103,6 +109,9 @@ int z88_exec(char *target)
     long     in_dor_seg_setup;      /* address of seg bindings */
     long     in_dor_reqpag;
     long     in_dor_safedata;
+    long     in_dor_app_type;
+    long     crt0_reqpag_check;
+    long     crt0_reqpag_check1;
     long     application_dor_entrypoint;
     FILE    *binfile;        /* Read in bin file */
     long    filesize;
@@ -137,24 +146,23 @@ int z88_exec(char *target)
     zorg = get_org_addr(crtfile);
     if ( zorg == -1 ) 
         exit_log(1, "Could not find parameter ZORG (compiled as BASIC?)\n");
-    indor = parameter_search(crtfile,".map","in_dor");
-    if ( indor == -1 ) 
-        exit_log(1,"Could not find parameter in_dor - no app dor present\n");
-    in_dor_seg_setup = parameter_search(crtfile,".map","in_dor_seg_setup");
-    if ( in_dor_seg_setup == -1 ) 
-        exit_log(1,"Could not find parameter in_dor_seg_setup - no app dor present\n");
 
+    get_dor_parameter(indor, "in_dor");
+    get_dor_parameter(in_dor_seg_setup,"in_dor_seg_setup");
+    get_dor_parameter(application_dor_entrypoint,"application_dor_entrypoint");
+    get_dor_parameter(in_dor_reqpag, "in_dor_reqpag");
+    get_dor_parameter(in_dor_safedata,"in_dor_safedata");
+    get_dor_parameter(in_dor_app_type, "in_dor_app_type");
 
-    application_dor_entrypoint = parameter_search(crtfile,".map","application_dor_entrypoint");
-    if ( application_dor_entrypoint == -1 ) 
-        exit_log(1, "Could not find parameter application_dor_entrypoint- no app dor present\n");
-    in_dor_reqpag = parameter_search(crtfile,".map","in_dor_reqpag");
-    if ( in_dor_reqpag == -1 ) 
-        exit_log(1, "Could not find parameter in_dor_reqpag - no app dor present\n");
-    in_dor_safedata = parameter_search(crtfile,".map","in_dor_safedata");
-    if ( in_dor_safedata == -1 ) 
-        exit_log(1, "Could not find parameter in_dor_safedata - no app dor present\n");
-    reqpag = parameter_search(crtfile,".map","reqpag");
+    crt0_reqpag_check = parameter_search(crtfile,".map","crt0_reqpag_check");
+    if ( crt0_reqpag_check == -1 ) 
+        exit_log(1, "Could not find parameter crt0_reqpag_check - no app crt present\n");
+    crt0_reqpag_check1 = parameter_search(crtfile,".map","crt0_reqpag_check1");
+
+    safedata = parameter_search(crtfile,".map","__crt_z88_safedata");
+    if ( safedata == -1 )
+        exit_log(1, "Could not find parameter __crt_z88_safedata - no app crt present\n");
+    reqpag = parameter_search(crtfile,".map","CRT_Z88_BADPAGES");
     if ( reqpag == -1 )  {
          int asmtail = parameter_search(crtfile,".map","ASMTAIL_BSS_END");
          if ( asmtail == -1 ) {
@@ -164,6 +172,7 @@ int z88_exec(char *target)
          if ( asmtail > 0x2000 ) {
              reqpag = ((asmtail - 0x2000) / 256) + 1;
          }
+         
          printf("Application will use %d pages of bad memory\n",reqpag);
     }
 
@@ -269,14 +278,23 @@ int z88_exec(char *target)
     }
 
     *(memory + in_dor_reqpag - zorg) = reqpag ? (reqpag < 32 ? 32 : reqpag) : 0;
-    *(memory + in_dor_safedata - zorg) = safedata ? (safedata + 100) % 256 : 100;
-    *(memory + in_dor_safedata - zorg + 1) = safedata ? (safedata + 55) / 256 : 0;
+    *(memory + crt0_reqpag_check - zorg + 1) = reqpag;
+    if ( crt0_reqpag_check1 != -1 ) {
+        *(memory + crt0_reqpag_check1 - zorg + 2) = reqpag + 0x20;
+    }
+    printf("Safe data is %d\n",safedata);
+    *(memory + in_dor_safedata - zorg) = safedata % 256;
+    *(memory + in_dor_safedata - zorg + 1) = safedata / 256;
 
-    /* Now we need to setup the enquire_entry point */
-    if ( reqpag == 0 || reqpag > 32 ) {
+    /* Application enquire entry point.
+     * If we need no bad memory or we have more than 32 pages or we have amalloc
+     * enabled then we can't return anything
+     */
+    if ( reqpag == 0 || reqpag > 32 || crt0_reqpag_check1 != -1 ) {
         *(memory + application_dor_entrypoint - zorg + 3 ) = 0x37;  /* scf */
         *(memory + application_dor_entrypoint - zorg + 4 ) = 0xc9;  /* ret */
     } else {
+        // TODO: We should correct the application type
         /* ld bc, start, ld bc, end, and a, ret */
         *(memory + application_dor_entrypoint - zorg + 3 ) = 0x01;  /* ld bc,nnnn */
         *(memory + application_dor_entrypoint - zorg + 4 ) = (8192 + reqpag) % 256; 

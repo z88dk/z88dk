@@ -1,11 +1,14 @@
-;       Kludgey startup for Spectra
 ;       Options:
+;          startup=1  --> RAM mode
 ;          startup=2  --> ROM mode (position code at location 0 and provide minimal interrupt services)
-;          startup=3  --> Place variables in printer buffer to save memory (may be dangerous !)
+;
+;          CRT_ORG_CODE = start address
+;	   CRT_ORG_BSS = address for bss variables
+;          CRT_MODEL   = 0 (RAM), 1 = (ROM, code copied), 2 = (ROM, code compressed)
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.50 2016-07-11 21:19:38 dom Exp $
+;       $Id: spec_crt0.asm,v 1.51 2016-07-13 22:12:25 dom Exp $
 ;
 
 
@@ -33,9 +36,6 @@
         PUBLIC    _FRAMES
         defc      _FRAMES = 23672 ; Timer
 
-;--------
-; Set an origin for the application (-zorg=) default to 32768
-;--------
 
         IF DEFINED_ZXVGS
         IF !CRT_ORG_CODE
@@ -358,15 +358,12 @@ ENDIF
         defb    0
 
 
-IF (startup=2) | (startup=3) ; ROM or moved system variables
-        IF !DEFINED_sysdefvarsaddr
-             defc sysdefvarsaddr = 23552-70   ; Just before the ZX system variables
-        ENDIF
-	defc CRT_ORG_BSS = sysdefvarsaddr
-        IF !DEFINED_defvarsaddr
-             defc defvarsaddr = 24576   
-        ENDIF
-        defc bss_compiler_start = defvarsaddr
+IF (startup=2) 			;ROM
+
+	IF !DEFINED_CRT_ORG_BSS
+	    defc CRT_ORG_BSS = 24576
+	    defc DEFINED_CRT_ORG_BSS = 1
+	ENDIF
 
         ; If we were given a model then use it
         IF DEFINED_CRT_MODEL
@@ -374,12 +371,13 @@ IF (startup=2) | (startup=3) ; ROM or moved system variables
         ELSE
             defc __crt_model = 1
         ENDIF
-ELSE
-        ; For non-ROM startup move all variables together
-        IF DEFINED_defvarsaddr
-            defc CRT_ORG_BSS = defvarsaddr
-        ENDIF
 ENDIF
+
+; If we were given an address for the BSS then use it
+IF DEFINED_CRT_ORG_BSS
+	defc	__crt_org_bss = CRT_ORG_BSS
+ENDIF
+
 	INCLUDE	"crt0_section.asm"
 
 	SECTION	code_crt_init
@@ -389,8 +387,6 @@ ENDIF
         ld      ($5c8f),a       ; ATTR_T
 
 	SECTION bss_crt
-
-
 IF startup=2
 	PUBLIC  romsvc
 romsvc:         defs    10  ; Pointer to the end of the sysdefvars

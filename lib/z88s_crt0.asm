@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.19 2016-06-02 22:24:57 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.20 2016-07-13 22:12:25 dom Exp $
 
 
 
@@ -284,8 +284,8 @@ shellapi_back:
 
 
 IF DEFINED_farheapsz
-	defc	bss_fardata_start = 8192
-	defc	bss_compiler_start = ASMTAIL_bss_crt
+	defc	__crt_org_bss_fardata_start = 8192
+	defc	__crt_org_bss_compiler_start = ASMTAIL_bss_crt
 ENDIF
 
 	INCLUDE	"crt0_section.asm"
@@ -296,7 +296,6 @@ IF DEFINED_farheapsz
 	INCLUDE	"init_far.asm"
 
         SECTION bss_fardata
-; If we use safedata then we can't have far memory
 	PUBLIC		pool_table
 	PUBLIC		malloc_table
 	PUBLIC		farpages

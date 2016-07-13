@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.28 2016-07-11 21:19:37 dom Exp $
+;	$Id: app_crt0.asm,v 1.29 2016-07-13 22:12:25 dom Exp $
 
 
 ;--------
@@ -50,17 +50,6 @@
                 org     CRT_ORG_CODE
 
 ;--------
-; Calculate the required bad memory. If we're using a near heap then the
-; compiler sets it to $20+(HEAPSIZE%256)+1
-; If we reqpag == 0 or reqpag <> 0 then we don't want to define it else
-; default to $20 (8k)
-;--------
-        IF      (reqpag=0) | (reqpag)
-        ELSE 
-                defc    reqpag  = $20
-        ENDIF
-
-;--------
 ; Define the graphics map and segment for apps
 ;--------
 	EXTERN	z88_map_bank
@@ -70,10 +59,10 @@
 
 
 ;--------
-; We need a safedata def. So if not defined set to 0
+; We need a CRT_Z88_SAFEDATA def. So if not defined set to 0
 ;--------
-        IF      !safedata
-                defc    safedata = 0
+        IF      !CRT_Z88_SAFEDATA
+                defc    CRT_Z88_SAFEDATA = 0
         ENDIF
 
 
@@ -82,32 +71,26 @@
 ; memory allocated to us by OZ. 
 ;--------
 app_entrypoint:
-;-------
-; If we want to debug, then intuition is set, so call $2000
-; This assumes several things...no bad memory required, and we've
-; been blown onto an EPROM along with Intuition and our app DOR
-; has been set appropriately to page in Intuition in segment 0
-; Call intuition if that set (assumes no bad memory and DOR is setup)
-;-------
-IF (intuition <> 0 ) & (reqpag=0)
-        call    $2000
+crt0_reqpag_check:
+	ld	a,0
+	and	a
+IF (NEED_expanded=0)
+        jr      z,init_continue
+ELSE
+        jr      z,init_check_expanded
 ENDIF
-IF (reqpag <> 0)
+	add	32
+	ld	c,a
         ld      a,(ix+2)	;Check allocated bad memory if needed
-        cp      $20+reqpag
+        cp      c
         ld      hl,nomemory
-; Bit of trickery with conditional assembly here, if we don't need an
-; expanded machine, jump on success to init_continue or if failure
-; flow into init_error.
-; If we need expanded, jump on failure to init_error and flow onto
-; check for expanded
-  IF (NEED_expanded=0)			
+IF (NEED_expanded=0)			
         jr      nc,init_continue
-  ELSE
+ELSE
         jr      c,init_error
-  ENDIF
 ENDIF
 IF NEED_expanded <> 0
+init_check_expanded:
         ld      ix,-1		;Check for an expanded machine
         ld      a,FA_EOF
         call_oz(os_frm)
@@ -115,7 +98,6 @@ IF NEED_expanded <> 0
         ld      hl,need_expanded_text
 ENDIF
 
-IF (reqpag<>0) | (NEED_expanded<>0)
 init_error:			;Code to deal with an initialisation error
         push    hl		;The text that we are printing
         ld      hl,clrscr	;Clear the screen
@@ -128,7 +110,6 @@ init_error:			;Code to deal with an initialisation error
         call_oz(os_dly)		;Pause
         xor     a
         call_oz(os_bye)		;Exit
-ENDIF
 
 init_continue:			;We had enough memory
         ld   a,SC_DIS		;Disable escape 
@@ -146,17 +127,15 @@ init_continue:			;We had enough memory
         ld      hl,clrscr2
         call_oz(gn_sop)
 	
-	call	crt0_init_bss
-
         ld      hl,-64		;Setup atexit() stack
         add     hl,sp
         ld      sp,hl
+	call	crt0_init_bss
         ld      (exitsp),sp
+
 IF DEFINED_USING_amalloc
-	ld	a,reqpag	; Free space to the end of reqpag
-	or	$20
-	ld	h,a
-	ld	l,0
+crt0_reqpag_check1:
+	ld	hl,0		; reqpag  address
 	INCLUDE "amalloc.def"
 ENDIF
 IF DEFINED_farheapsz
@@ -276,36 +255,30 @@ ENDIF
 ;-------
 clrscr:		defb    1,'7','#','1',32,32,32+94,32+8,128,1,'2','C','1',0
 clrscr2:	defb    1,'2','+','S',1,'2','+','C',0
-          
 
-IF (NEED_expanded <> 0 )  | (reqpag <>0)
+
 windini:
           defb   1,'7','#','3',32+7,32+1,32+34,32+7,131     ;dialogue box
           defb   1,'2','C','3',1,'4','+','T','U','R',1,'2','J','C'
           defb   1,'3','@',32,32  ;reset to (0,0)
-          defm   "Small C+ Application"
+          defm   "z88dk Application"
           defb   1,'3','@',32,32 ,1,'2','A',32+34  ;keep settings for 10
           defb   1,'7','#','3',32+8,32+3,32+32,32+5,128     ;dialogue box
           defb   1,'2','C','3'
           defb   1,'3','@',32,32,1,'2','+','B'
           defb   0
-ENDIF
 
-IF reqpag <> 0
 nomemory:
         defb    1,'3','@',32,32,1,'2','J','C'
-        defm    "Not enough memory allocated to run application"
+        defm    "No memory available"
         defb    13,10,13,10
         defm    "Sorry, please try again later!"
         defb    0
-ENDIF
 
-IF (NEED_expanded <> 0 )
+IF NEED_expanded <> 0
 need_expanded_text:
         defb    1,'3','@',32,32,1,'2','J','C'
-        defm    "Sorry, application needs an expanded machine"
-        defb    13,10,13,10
-        defm    "Try again when you have expanded your machine"
+        defm    "Expanded machine needed!"
         defb    0
 ENDIF
 
@@ -313,23 +286,25 @@ ENDIF
 
 
 
-IF !DEFINED_sysdefvarsaddr
-	defc sysdefvarsaddr = $1ffD-100-safedata
+        ; If we were given a model then use it
+IF DEFINED_CRT_MODEL
+        defc __crt_model = CRT_MODEL
+ELSE
+        defc __crt_model = 1
 ENDIF
-	; If we were given a model then use it
-	IF DEFINED_CRT_MODEL
-	    defc __crt_model = CRT_MODEL
-        ELSE
-	    defc __crt_model = 1
-        ENDIF
-	defc CRT_ORG_BSS = sysdefvarsaddr
-	; We have to get user variables to start at 0x2000, and far
-	; data 
-	; Far data at 8192 to match up with CamelForth
-        IF safedata = 0 
-            defc bss_fardata_start = 8192
-        ENDIF
-	INCLUDE "crt0_section.asm"
+
+        ; We use a split BSS - so that some basic apps can run without needing bad memory
+	; Expose to appmake
+	PUBLIC __crt_z88_safedata
+	defc __crt_z88_safedata = 120 + CRT_Z88_SAFEDATA
+        defc __crt_org_bss = $1ffD - 100 ; __crt_z88_safedata
+
+        ; We have to get user variables to start at 0x2000, and far
+        ; data at 8192 to match up with CamelForth
+IF CRT_Z88_SAFEDATA = 0
+        defc __crt_org_bss_fardata_start = 8192
+ENDIF
+        INCLUDE "crt0_section.asm"
 
 	SECTION bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...
@@ -338,12 +313,12 @@ l_errlevel:      defb    0
 
 
 IF DEFINED_farheapsz
-    IF !safedata
-        SECTION crt0_init_bss
+    IF !CRT_Z88_SAFEDATA
+        SECTION code_crt_init
         INCLUDE "init_far.asm"
 
         SECTION bss_fardata
-; If we use safedata then we can't have far memory
+; If we use CRT_Z88_SAFEDATA then we can't have far memory
         PUBLIC          pool_table
         PUBLIC          malloc_table
         PUBLIC          farpages

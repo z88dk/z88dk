@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Jun 2010
 ;
-;	$Id: sc3000_crt0.asm,v 1.17 2016-07-11 21:19:38 dom Exp $
+;	$Id: sc3000_crt0.asm,v 1.18 2016-07-13 22:12:25 dom Exp $
 ;
 
 	; Constants for ROM mode (-startup=2)
@@ -296,7 +296,7 @@ ENDIF
 	defb  0
 
 IF (startup=2)
-	defc	CRT_ORG_BSS = RAM_Start
+	defc	__crt_org_bss = RAM_Start
         ; If we were given a model then use it
         IF DEFINED_CRT_MODEL
             defc __crt_model = CRT_MODEL

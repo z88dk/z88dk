@@ -2,7 +2,7 @@
 ;
 ;	djm 6/3/2001
 ;
-;       $Id: rex_crt0.asm,v 1.26 2016-07-10 20:15:17 dom Exp $
+;       $Id: rex_crt0.asm,v 1.27 2016-07-13 22:12:25 dom Exp $
 ;
 
 	MODULE rex_crt0
@@ -102,7 +102,7 @@ ENDIF
 
 
 ;	INCLUDE	"crt0_runtime_selection.asm"
-	defc	CRT_ORG_BSS = $f033
+	defc	__crt_org_bss = $f033
 	INCLUDE	"crt0_section.asm"
 
 

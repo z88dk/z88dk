@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Feb 2001
 ;
-;	$Id: ace_crt0.asm,v 1.24 2016-07-11 21:19:37 dom Exp $
+;	$Id: ace_crt0.asm,v 1.25 2016-07-13 22:12:25 dom Exp $
 ;
 
 
@@ -151,18 +151,17 @@ l_dcal:
         INCLUDE "crt0_runtime_selection.asm"
 
 ;---------------------------------------------------------------------------
-IF (startup=2) | (startup=3) ; ROM or moved system variables
+IF (startup=2) 
 ;---------------------------------------------------------------------------
 
+; Some extra space is available here
+;	defc sysdefvarsaddr = $2800-80   ; Close to the end of "PAD", the Forth interpreter workspace
 
-IF !DEFINED_sysdefvarsaddr
-	defc sysdefvarsaddr = $2800-80   ; Close to the end of "PAD", the Forth interpreter workspace
+IF !CRT_ORG_BSS
+	defc CRT_ORG_BSS = 24576
+	defc DEFINED_CRT_ORG_BSS = 1
 ENDIF
-IF !DEFINED_defvarsaddr
-        defc defvarsaddr = 24576
-ENDIF
-	defc	CRT_ORG_BSS = sysdefvarsaddr
-	defc	bss_compiler_start = defvarsaddr
+
         ; If we were given a model then use it
         IF DEFINED_CRT_MODEL
             defc __crt_model = CRT_MODEL
@@ -171,15 +170,9 @@ ENDIF
         ENDIF
 ENDIF
 
-	INCLUDE	"crt0_section.asm"
-
-
-IF (startup=2) | (startup=3) ; ROM or moved system variables
-	SECTION	bss_crt
-        PUBLIC	romsvc		; service space for ROM
-romsvc:	defb	0 	; Pointer to the end of the sysdefvars
-				; used by the ROM version of some library
+IF DEFINED_CRT_ORG_BSS
+	defc	__crt_org_bss = CRT_ORG_BSS
 ENDIF
 
-
+	INCLUDE	"crt0_section.asm"
 

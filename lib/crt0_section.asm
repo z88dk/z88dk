@@ -81,9 +81,11 @@ IF !__crt_model
 ENDIF
 
 		SECTION BSS
-IF CRT_ORG_BSS
-		org	CRT_ORG_BSS
+IF __crt_org_bss
+		org	__crt_org_bss
 ENDIF
+		SECTION bss_fp
+		SECTION bss_error
 		SECTION bss_crt
 IF !DEFINED_nostreams
 		PUBLIC	__sgoioblk
@@ -106,15 +108,13 @@ _heap:
                 defw 0          ; Initialised by code_crt_init - location of the last program byte
                 defw 0
 ENDIF
-		SECTION bss_fp
-		SECTION bss_error
 		SECTION bss_fardata
-IF bss_fardata_start
-		org	bss_fardata_start
+IF __crt_org_bss_fardata_start
+		org	__crt_org_bss_fardata_start
 ENDIF
 		SECTION bss_compiler
-IF bss_compiler_start
-		org	bss_compiler_start
+IF __crt_org_bss_compiler_start
+		org	__crt_org_bss_compiler_start
 ENDIF
 		SECTION bss_clib
 		SECTION bss_user
