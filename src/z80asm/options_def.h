@@ -65,8 +65,8 @@ OPT(OptString, &opts.obj_ext, "-M", "--obj-ext", "Object file extension excludin
 OPT(OptString, &opts.bin_file, "-o", "--output", "Output binary file", "FILE")
 
 OPT_TITLE("Code Generation Options:")
-OPT(OptCall, option_cpu_RCM2000, "-RCMX000", "--RCMX000", "Assemble for RCM2000/RCM3000 series of Z80-like CPU", "")
-OPT(OptSet, &opts.ti83plus, "-plus", "--ti83plus", "Interpret 'Invoke' as RST 28h", "")
+OPT(OptCall, option_cpu_RCM2000, "", "--RCMX000", "Assemble for RCM2000/RCM3000 series of Z80-like CPU", "")
+OPT(OptSet, &opts.ti83plus, "", "--ti83plus", "Interpret 'Invoke' as RST 28h", "")
 OPT(OptSet, &opts.swap_ix_iy, "-IXIY", "--swap-ix-iy", "Swap IX and IY registers", "")
 OPT(OptSet, &opts.line_mode, "-C", "--line-mode", "Enable LINE directive", "")
 

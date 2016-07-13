@@ -263,7 +263,7 @@ z80asm(
 							;; B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5
 							;; E3 CB C5 18 EC
 ASM
-	options	=> "-i".z80emu()." $list -b -RCMX000",
+	options	=> "-i".z80emu()." $list -b --RCMX000",
 );
 }
 

@@ -301,8 +301,7 @@ static void show_option( enum OptType type, Bool *pflag,
 
     if ( *short_opt )
     {
-        /* dont show short_opt if short_opt is same as long_opt, except for extra '-',
-           e.g. -RCMX000 and --RCMX000 */
+        /* dont show short_opt if short_opt is same as long_opt, except for extra '-' */
         if ( !( *long_opt && strcmp( short_opt, long_opt + 1 ) == 0 ) )
         {
             str_append_sprintf( msg, "%s", short_opt );

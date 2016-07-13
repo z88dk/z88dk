@@ -93,7 +93,7 @@ Input / Output File Options:
 
 Code Generation Options:
   --RCMX000              Assemble for RCM2000/RCM3000 series of Z80-like CPU
-  -plus, --ti83plus      Interpret 'Invoke' as RST 28h
+  --ti83plus             Interpret 'Invoke' as RST 28h
   -IXIY, --swap-ix-iy    Swap IX and IY registers
   -C, --line-mode        Enable LINE directive
 
@@ -598,15 +598,13 @@ z80asm(
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "ex (sp),hl", "\xE3");
-t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "-RCMX000");
 t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--RCMX000");
 
 #------------------------------------------------------------------------------
-# -plus, --ti83plus
+# --ti83plus
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12");
-t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "-plus");
 t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "--ti83plus");
 
 #------------------------------------------------------------------------------
