@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.139 2016-07-11 21:19:38 dom Exp $
+ *      $Id: zcc.c,v 1.140 2016-07-13 18:25:55 pauloscustodio Exp $
  */
 
 
@@ -1754,17 +1754,7 @@ void tempname(char *filen)
 #ifdef _WIN32
     char           *ptr;
 
-    /* Predefined in 32-bit MS Visual C/C++ and Borland Builder C/C++ */
-    if (ptr = getenv("TEMP")) {    /* Under Windows 95 usually
-                     * C:\WINDOWS\TEMP */
-        strcpy(filen, ptr);    /* Directory is not guaranteed to
-                     * exist */
-        tmpnam(filen + strlen(filen));    /* Adds strings like
-                         * "\s3vvrm3t.",
-                         * "\s3vvrm3t.1",
-                         * "\s3vvrm3t.2" */
-    } else
-        tmpnam(filen);
+    tmpnam(filen);
     if (ptr = strrchr(filen, '.'))
         *ptr = '_';
 #elif defined(__MSDOS__) && defined(__TURBOC__)
