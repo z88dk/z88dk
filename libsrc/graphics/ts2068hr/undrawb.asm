@@ -3,10 +3,10 @@
 	PUBLIC	undrawb
 	PUBLIC	_undrawb
 	EXTERN	w_pixeladdress
-;	LIB	l_cmp
+;	EXTERN	l_cmp
 
 ;
-;	$Id: undrawb.asm,v 1.3 2016-06-23 19:41:02 dom Exp $
+;	$Id: undrawb.asm,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 ; ***********************************************************************

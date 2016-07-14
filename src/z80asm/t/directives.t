@@ -535,7 +535,7 @@ test_binfile("test_data.bin", 	pack("v*", 0x4000));
 test_binfile("test_bss.bin", 	pack("v*", 0x4002));
 
 #------------------------------------------------------------------------------
-# EXTERN / PUBLIC / XDEF / XLIB / XREF / LIB
+# EXTERN / PUBLIC
 #------------------------------------------------------------------------------
 z80asm(
 	asm		=> <<'END',
@@ -547,10 +547,7 @@ END
 
 z80asm(
 	asm		=> <<'END',
-		public	p1,p2
-		xdef    p3			;; warn: 'XDEF' is deprecated, use 'PUBLIC' instead
-		xlib    p4			;; warn: 'XLIB' is deprecated, use 'PUBLIC' instead
-
+		public	p1,p2,p3,p4
 		global  g1, g2
 		defc g1 = 16, g3 = 48
 		global g3, g4
@@ -563,10 +560,7 @@ z80asm(
 
 END
 	asm1	=> <<'END',
-		extern p1,p2
-		xref   p3			;; warn: 'XREF' is deprecated, use 'EXTERN' instead
-		lib	   p4			;; warn: 'LIB' is deprecated, use 'EXTERN' instead
-
+		extern 	p1,p2,p3,p4
 		global  g1, g2
 		defc g2 = 32, g4 = 64
 		global g3, g4

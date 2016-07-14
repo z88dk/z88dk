@@ -7,14 +7,14 @@
 ;	Read the specified PSG register
 ;
 ;
-;	$Id: get_psg.asm,v 1.3 2016-06-10 21:13:58 dom Exp $
+;	$Id: get_psg.asm,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
         SECTION code_clib
 	PUBLIC	get_psg	
 	PUBLIC	_get_psg	
 
-	;;LIB     msxbios
+	;;EXTERN     msxbios
 	
 IF FORmsx
         INCLUDE "msx.def"

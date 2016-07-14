@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.43 2016-04-25 09:07:04 dom Exp $
+ *      $Id: codegen.c,v 1.44 2016-07-14 17:44:18 pauloscustodio Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -160,8 +160,6 @@ void DoLibHeader(void)
     } else {
         outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
         if ( noaltreg ) {
-/*          ol("XREF\tsaved_hl");
-            ol("XREF\tsaved_de"); */
             ol("EXTERN\tsaved_hl");
             ol("EXTERN\tsaved_de");
         }
@@ -2004,15 +2002,12 @@ void GlobalPrefix(char type)
     }
     switch(type) {
     case XDEF:
-    /*    ot("XDEF\t"); */
         ot("PUBLIC\t");
         break;
     case XREF:
-    /*    ot("XREF\t"); */
         ot("EXTERN\t");
         break;
     case LIB:
-    /*    ot("LIB\t"); */
         ot("EXTERN\t");
         break;
     }

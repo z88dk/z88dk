@@ -24,14 +24,14 @@
 
 	EXTERN	dither_pattern
 
-	;LIB swapgfxbk
+	;EXTERN swapgfxbk
 	EXTERN pixeladdress
 	EXTERN pixelbyte
 	EXTERN leftbitmask, rightbitmask
-	;XREF swapgfxbk1
+	;EXTERN swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.5 2016-06-21 20:16:35 dom Exp $
+;	$Id: stencil_render.asm,v 1.6 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 .stencil_exit

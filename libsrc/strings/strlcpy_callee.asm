@@ -7,7 +7,7 @@ PUBLIC _strlcpy_callee
 PUBLIC ASMDISP_STRLCPY_CALLEE
 
 IF FORrcmx000
-LIB  rcmx_cpir
+EXTERN  rcmx_cpir
 ENDIF
 
 .strlcpy_callee

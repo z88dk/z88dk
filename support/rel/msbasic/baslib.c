@@ -25,7 +25,7 @@
  *	Now try "a.tap" on your favourite Spectrum emulator !
  *
  *
- *	$Id: baslib.c,v 1.1 2007-01-05 18:10:06 stefano Exp $
+ *	$Id: baslib.c,v 1.2 2016-07-14 17:44:23 pauloscustodio Exp $
  *
  */
 
@@ -170,7 +170,7 @@ void	*tmem;
 #asm
 ; MS BASIC FP accumulator
 
-	XDEF	SAC
+	PUBLIC	SAC
 .SAC
 	defb	0,0,0,0
 #endasm

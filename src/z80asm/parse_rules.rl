@@ -273,10 +273,6 @@ Define rules for a ragel-based parser.
 			);
 	asm_DEFB = 	label? 
 				(_TK_DEFB | _TK_DEFM)
-				@{	/* if ( ctx->p->tok == TK_DEFM )
-						warn_deprecated("DEFM", "DEFB"); 
-					*/
-				}
 				asm_DEFB_iter;
 
 	/*---------------------------------------------------------------------
@@ -336,7 +332,7 @@ Define rules for a ragel-based parser.
 	*   directives with list of names argument, function called for each 
 	*	argument
 	*--------------------------------------------------------------------*/
-#foreach <OP> in GLOBAL, PUBLIC, EXTERN, XREF, LIB, XDEF, XLIB, DEFINE, UNDEFINE
+#foreach <OP> in GLOBAL, PUBLIC, EXTERN, DEFINE, UNDEFINE
 	action <OP>_action { asm_<OP>(str_data(name)); }
 	
 	asm_<OP> = _TK_<OP> name @<OP>_action
@@ -344,7 +340,6 @@ Define rules for a ragel-based parser.
 		    _TK_NEWLINE ;
 #endfor  <OP>
 	directives_names = asm_GLOBAL | asm_PUBLIC | asm_EXTERN | 
-					   asm_XREF | asm_LIB | asm_XDEF | asm_XLIB |
 					   asm_DEFINE | asm_UNDEFINE;
 
 	/*---------------------------------------------------------------------

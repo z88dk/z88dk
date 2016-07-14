@@ -17,15 +17,15 @@
 	PUBLIC	stencil_render
 	PUBLIC	_stencil_render
 	EXTERN	dither_pattern
-	;LIB	l_cmp
+	;EXTERN	l_cmp
 
-	;LIB swapgfxbk
+	;EXTERN swapgfxbk
 	EXTERN w_pixeladdress
 	EXTERN leftbitmask, rightbitmask
-	;XREF swapgfxbk1
+	;EXTERN swapgfxbk1
 
 ;	
-;	$Id: w_stencil_render.asm,v 1.4 2016-06-23 19:41:02 dom Exp $
+;	$Id: w_stencil_render.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 .stencil_render_exit

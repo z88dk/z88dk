@@ -78,15 +78,6 @@ void warn_symbol_different(char *name, char *used)
 	
 	STR_DELETE(msg);
 }
-void warn_deprecated(char *old_stmt, char *new_stmt)
-{
-	STR_DEFINE(msg, STR_SIZE);
-
-	str_append_sprintf( msg, "'%s' is deprecated, use '%s' instead", old_stmt, new_stmt );
-	do_error( ErrWarn, str_data(msg) );
-	
-	STR_DELETE(msg);
-}
 void error_syntax(void)
 {
 	STR_DEFINE(msg, STR_SIZE);

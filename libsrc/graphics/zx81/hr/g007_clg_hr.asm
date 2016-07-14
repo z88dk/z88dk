@@ -5,7 +5,7 @@
 ;
 ;   Set HRG mode and clear screen
 ;
-;	$Id: g007_clg_hr.asm,v 1.5 2016-06-27 20:26:33 dom Exp $
+;	$Id: g007_clg_hr.asm,v 1.6 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 	SECTION  code_clib
@@ -13,8 +13,8 @@
 	PUBLIC    __clg_hr
 	EXTERN     hrg_on
 
-;	XREF    base_graphics	
-;	XREF    G007_P2
+;	EXTERN    base_graphics	
+;	EXTERN    G007_P2
 
 	defc	_clg_hr = hrg_on
 	defc	__clg_hr = hrg_on

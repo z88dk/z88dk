@@ -14,15 +14,15 @@
 ;	Stefano Bodrato - 27/02/2009
 ;
 ;
-;	$Id: surface_draw.asm,v 1.6 2016-06-21 20:16:35 dom Exp $
+;	$Id: surface_draw.asm,v 1.7 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 		SECTION	  code_clib
                 PUBLIC    surface_draw
                 PUBLIC    _surface_draw
                 
-                ;LIB     swapgfxbk
-                ;XREF    swapgfxbk1
+                ;EXTERN     swapgfxbk
+                ;EXTERN    swapgfxbk1
                 
 		EXTERN	base_graphics
 

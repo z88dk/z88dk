@@ -4,8 +4,8 @@
 ; sinclair spectrum version
 ; uses rectangles library
 
-XLIB SP1IntersectRect
-LIB RIntersectRect8
+PUBLIC SP1IntersectRect
+EXTERN RIntersectRect8
 
 ; Returns the result of intersecting two 8-bit rectangles.
 ;

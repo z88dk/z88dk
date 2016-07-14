@@ -11,15 +11,15 @@
 ;
 ;	Stefano Bodrato - June 2012
 ;
-;	$Id: f_ansi_attr.asm,v 1.4 2016-06-12 16:06:42 dom Exp $
+;	$Id: f_ansi_attr.asm,v 1.5 2016-07-14 17:44:18 pauloscustodio Exp $
 ;
 
         SECTION code_clib
 	PUBLIC	ansi_attr
     INCLUDE "flos.def"
 
-	;XDEF	INVRS
-	;XDEF	UNDRL
+	;PUBLIC	INVRS
+	;PUBLIC	UNDRL
 
 ;.UNDRL  defb 0
 ;.INVRS  defb 0

@@ -14,13 +14,13 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.4 2016-06-13 21:32:52 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.5 2016-07-14 17:44:18 pauloscustodio Exp $
 ;
 
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 
-	;XREF	base_graphics
+	;EXTERN	base_graphics
 	EXTERN	pix_rl
 	EXTERN	pix_pre
 	EXTERN	pix_post

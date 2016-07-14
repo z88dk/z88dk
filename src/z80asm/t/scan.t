@@ -789,7 +789,6 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(IFDEF,		T_ALL);
 	T_OPCODE(IFNDEF,	T_ALL);
 	T_OPCODE(INCLUDE,	T_ALL);
-	T_OPCODE(LIB,		T_ALL);
 	T_OPCODE(LINE,		T_ALL);
 	T_OPCODE(LSTOFF,	T_ALL);
 	T_OPCODE(LSTON,		T_ALL);
@@ -798,9 +797,6 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(PUBLIC,	T_ALL);
 	T_OPCODE(SECTION,	T_ALL);
 	T_OPCODE(UNDEFINE,	T_ALL);
-	T_OPCODE(XDEF,		T_ALL);
-	T_OPCODE(XLIB,		T_ALL);
-	T_OPCODE(XREF,		T_ALL);
 	
 	/* assembly opcodes */
 	T_OPCODE(ADC,	T_ALL);

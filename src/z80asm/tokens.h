@@ -99,95 +99,91 @@
 #define _TK_IFDEF	94
 #define _TK_IFNDEF	95
 #define _TK_INCLUDE	96
-#define _TK_LIB	97
-#define _TK_LINE	98
-#define _TK_LSTOFF	99
-#define _TK_LSTON	100
-#define _TK_MODULE	101
-#define _TK_ORG	102
-#define _TK_PUBLIC	103
-#define _TK_SECTION	104
-#define _TK_UNDEFINE	105
-#define _TK_XDEF	106
-#define _TK_XLIB	107
-#define _TK_XREF	108
-#define _TK_DS_B	109
-#define _TK_DS_W	110
-#define _TK_DS_P	111
-#define _TK_DS_L	112
-#define _TK_ADC	113
-#define _TK_ADD	114
-#define _TK_AND	115
-#define _TK_BIT	116
-#define _TK_CALL	117
-#define _TK_CCF	118
-#define _TK_CP	119
-#define _TK_CPD	120
-#define _TK_CPDR	121
-#define _TK_CPI	122
-#define _TK_CPIR	123
-#define _TK_CPL	124
-#define _TK_DAA	125
-#define _TK_DEC	126
-#define _TK_DI	127
-#define _TK_DJNZ	128
-#define _TK_EI	129
-#define _TK_EX	130
-#define _TK_EXX	131
-#define _TK_HALT	132
-#define _TK_IM	133
-#define _TK_IN	134
-#define _TK_INC	135
-#define _TK_IND	136
-#define _TK_INDR	137
-#define _TK_INI	138
-#define _TK_INIR	139
-#define _TK_JP	140
-#define _TK_JR	141
-#define _TK_LD	142
-#define _TK_LDD	143
-#define _TK_LDDR	144
-#define _TK_LDI	145
-#define _TK_LDIR	146
-#define _TK_NEG	147
-#define _TK_NOP	148
-#define _TK_OR	149
-#define _TK_OTDR	150
-#define _TK_OTIR	151
-#define _TK_OUT	152
-#define _TK_OUTD	153
-#define _TK_OUTI	154
-#define _TK_POP	155
-#define _TK_PUSH	156
-#define _TK_RES	157
-#define _TK_RET	158
-#define _TK_RETI	159
-#define _TK_RETN	160
-#define _TK_RL	161
-#define _TK_RLA	162
-#define _TK_RLC	163
-#define _TK_RLCA	164
-#define _TK_RLD	165
-#define _TK_RR	166
-#define _TK_RRA	167
-#define _TK_RRC	168
-#define _TK_RRCA	169
-#define _TK_RRD	170
-#define _TK_RST	171
-#define _TK_SBC	172
-#define _TK_SCF	173
-#define _TK_SET	174
-#define _TK_SLA	175
-#define _TK_SLL	176
-#define _TK_SRA	177
-#define _TK_SRL	178
-#define _TK_SUB	179
-#define _TK_XOR	180
-#define _TK_CALL_OZ	181
-#define _TK_OZ	182
-#define _TK_CALL_PKG	183
-#define _TK_FPP	184
-#define _TK_INVOKE	185
+#define _TK_LINE	97
+#define _TK_LSTOFF	98
+#define _TK_LSTON	99
+#define _TK_MODULE	100
+#define _TK_ORG	101
+#define _TK_PUBLIC	102
+#define _TK_SECTION	103
+#define _TK_UNDEFINE	104
+#define _TK_DS_B	105
+#define _TK_DS_W	106
+#define _TK_DS_P	107
+#define _TK_DS_L	108
+#define _TK_ADC	109
+#define _TK_ADD	110
+#define _TK_AND	111
+#define _TK_BIT	112
+#define _TK_CALL	113
+#define _TK_CCF	114
+#define _TK_CP	115
+#define _TK_CPD	116
+#define _TK_CPDR	117
+#define _TK_CPI	118
+#define _TK_CPIR	119
+#define _TK_CPL	120
+#define _TK_DAA	121
+#define _TK_DEC	122
+#define _TK_DI	123
+#define _TK_DJNZ	124
+#define _TK_EI	125
+#define _TK_EX	126
+#define _TK_EXX	127
+#define _TK_HALT	128
+#define _TK_IM	129
+#define _TK_IN	130
+#define _TK_INC	131
+#define _TK_IND	132
+#define _TK_INDR	133
+#define _TK_INI	134
+#define _TK_INIR	135
+#define _TK_JP	136
+#define _TK_JR	137
+#define _TK_LD	138
+#define _TK_LDD	139
+#define _TK_LDDR	140
+#define _TK_LDI	141
+#define _TK_LDIR	142
+#define _TK_NEG	143
+#define _TK_NOP	144
+#define _TK_OR	145
+#define _TK_OTDR	146
+#define _TK_OTIR	147
+#define _TK_OUT	148
+#define _TK_OUTD	149
+#define _TK_OUTI	150
+#define _TK_POP	151
+#define _TK_PUSH	152
+#define _TK_RES	153
+#define _TK_RET	154
+#define _TK_RETI	155
+#define _TK_RETN	156
+#define _TK_RL	157
+#define _TK_RLA	158
+#define _TK_RLC	159
+#define _TK_RLCA	160
+#define _TK_RLD	161
+#define _TK_RR	162
+#define _TK_RRA	163
+#define _TK_RRC	164
+#define _TK_RRCA	165
+#define _TK_RRD	166
+#define _TK_RST	167
+#define _TK_SBC	168
+#define _TK_SCF	169
+#define _TK_SET	170
+#define _TK_SLA	171
+#define _TK_SLL	172
+#define _TK_SRA	173
+#define _TK_SRL	174
+#define _TK_SUB	175
+#define _TK_XOR	176
+#define _TK_CALL_OZ	177
+#define _TK_OZ	178
+#define _TK_CALL_PKG	179
+#define _TK_FPP	180
+#define _TK_INVOKE	181
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -289,94 +285,90 @@ typedef enum tokid_t
 	TK_IFDEF	= 94,
 	TK_IFNDEF	= 95,
 	TK_INCLUDE	= 96,
-	TK_LIB	= 97,
-	TK_LINE	= 98,
-	TK_LSTOFF	= 99,
-	TK_LSTON	= 100,
-	TK_MODULE	= 101,
-	TK_ORG	= 102,
-	TK_PUBLIC	= 103,
-	TK_SECTION	= 104,
-	TK_UNDEFINE	= 105,
-	TK_XDEF	= 106,
-	TK_XLIB	= 107,
-	TK_XREF	= 108,
-	TK_DS_B	= 109,
-	TK_DS_W	= 110,
-	TK_DS_P	= 111,
-	TK_DS_L	= 112,
-	TK_ADC	= 113,
-	TK_ADD	= 114,
-	TK_AND	= 115,
-	TK_BIT	= 116,
-	TK_CALL	= 117,
-	TK_CCF	= 118,
-	TK_CP	= 119,
-	TK_CPD	= 120,
-	TK_CPDR	= 121,
-	TK_CPI	= 122,
-	TK_CPIR	= 123,
-	TK_CPL	= 124,
-	TK_DAA	= 125,
-	TK_DEC	= 126,
-	TK_DI	= 127,
-	TK_DJNZ	= 128,
-	TK_EI	= 129,
-	TK_EX	= 130,
-	TK_EXX	= 131,
-	TK_HALT	= 132,
-	TK_IM	= 133,
-	TK_IN	= 134,
-	TK_INC	= 135,
-	TK_IND	= 136,
-	TK_INDR	= 137,
-	TK_INI	= 138,
-	TK_INIR	= 139,
-	TK_JP	= 140,
-	TK_JR	= 141,
-	TK_LD	= 142,
-	TK_LDD	= 143,
-	TK_LDDR	= 144,
-	TK_LDI	= 145,
-	TK_LDIR	= 146,
-	TK_NEG	= 147,
-	TK_NOP	= 148,
-	TK_OR	= 149,
-	TK_OTDR	= 150,
-	TK_OTIR	= 151,
-	TK_OUT	= 152,
-	TK_OUTD	= 153,
-	TK_OUTI	= 154,
-	TK_POP	= 155,
-	TK_PUSH	= 156,
-	TK_RES	= 157,
-	TK_RET	= 158,
-	TK_RETI	= 159,
-	TK_RETN	= 160,
-	TK_RL	= 161,
-	TK_RLA	= 162,
-	TK_RLC	= 163,
-	TK_RLCA	= 164,
-	TK_RLD	= 165,
-	TK_RR	= 166,
-	TK_RRA	= 167,
-	TK_RRC	= 168,
-	TK_RRCA	= 169,
-	TK_RRD	= 170,
-	TK_RST	= 171,
-	TK_SBC	= 172,
-	TK_SCF	= 173,
-	TK_SET	= 174,
-	TK_SLA	= 175,
-	TK_SLL	= 176,
-	TK_SRA	= 177,
-	TK_SRL	= 178,
-	TK_SUB	= 179,
-	TK_XOR	= 180,
-	TK_CALL_OZ	= 181,
-	TK_OZ	= 182,
-	TK_CALL_PKG	= 183,
-	TK_FPP	= 184,
-	TK_INVOKE	= 185,
+	TK_LINE	= 97,
+	TK_LSTOFF	= 98,
+	TK_LSTON	= 99,
+	TK_MODULE	= 100,
+	TK_ORG	= 101,
+	TK_PUBLIC	= 102,
+	TK_SECTION	= 103,
+	TK_UNDEFINE	= 104,
+	TK_DS_B	= 105,
+	TK_DS_W	= 106,
+	TK_DS_P	= 107,
+	TK_DS_L	= 108,
+	TK_ADC	= 109,
+	TK_ADD	= 110,
+	TK_AND	= 111,
+	TK_BIT	= 112,
+	TK_CALL	= 113,
+	TK_CCF	= 114,
+	TK_CP	= 115,
+	TK_CPD	= 116,
+	TK_CPDR	= 117,
+	TK_CPI	= 118,
+	TK_CPIR	= 119,
+	TK_CPL	= 120,
+	TK_DAA	= 121,
+	TK_DEC	= 122,
+	TK_DI	= 123,
+	TK_DJNZ	= 124,
+	TK_EI	= 125,
+	TK_EX	= 126,
+	TK_EXX	= 127,
+	TK_HALT	= 128,
+	TK_IM	= 129,
+	TK_IN	= 130,
+	TK_INC	= 131,
+	TK_IND	= 132,
+	TK_INDR	= 133,
+	TK_INI	= 134,
+	TK_INIR	= 135,
+	TK_JP	= 136,
+	TK_JR	= 137,
+	TK_LD	= 138,
+	TK_LDD	= 139,
+	TK_LDDR	= 140,
+	TK_LDI	= 141,
+	TK_LDIR	= 142,
+	TK_NEG	= 143,
+	TK_NOP	= 144,
+	TK_OR	= 145,
+	TK_OTDR	= 146,
+	TK_OTIR	= 147,
+	TK_OUT	= 148,
+	TK_OUTD	= 149,
+	TK_OUTI	= 150,
+	TK_POP	= 151,
+	TK_PUSH	= 152,
+	TK_RES	= 153,
+	TK_RET	= 154,
+	TK_RETI	= 155,
+	TK_RETN	= 156,
+	TK_RL	= 157,
+	TK_RLA	= 158,
+	TK_RLC	= 159,
+	TK_RLCA	= 160,
+	TK_RLD	= 161,
+	TK_RR	= 162,
+	TK_RRA	= 163,
+	TK_RRC	= 164,
+	TK_RRCA	= 165,
+	TK_RRD	= 166,
+	TK_RST	= 167,
+	TK_SBC	= 168,
+	TK_SCF	= 169,
+	TK_SET	= 170,
+	TK_SLA	= 171,
+	TK_SLL	= 172,
+	TK_SRA	= 173,
+	TK_SRL	= 174,
+	TK_SUB	= 175,
+	TK_XOR	= 176,
+	TK_CALL_OZ	= 177,
+	TK_OZ	= 178,
+	TK_CALL_PKG	= 179,
+	TK_FPP	= 180,
+	TK_INVOKE	= 181,
 } tokid_t;
 #endif

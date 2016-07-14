@@ -4,8 +4,8 @@
 ; sinclair spectrum version
 ; uses rectangles library
 
-XLIB SP1IsPt8InRect
-LIB RIsPtInRect8
+PUBLIC SP1IsPt8InRect
+EXTERN RIsPtInRect8
 
 ; Determines if a pixel coordinate lies within an 8-bit
 ; rectangle described using character coordinates.  The

@@ -235,35 +235,6 @@ write_file(asm1_file(), "EXTERN Loc, LOC \n ld a, Loc \n ld a, LOC");
 t_z80asm_capture("-l -b ".asm_file()." ".asm1_file(), "", "", 0);
 t_binary(read_binfile(bin_file()), "\x3E\x01\x3E\x02\x3E\x01\x3E\x02");
 
-# CH_0025: PUBLIC and EXTERN instead of LIB, XREF, XDEF, XLIB
-write_file(asm_file(), "
-	PUBLIC 	var1
-	DEFC 	var1 = 1
-	
-	XDEF	var2
-	DEFC 	var2 = 2
-	
-	XLIB	var3
-	DEFC 	var3 = 3
-");
-write_file(asm1_file(), "
-	EXTERN 	var1
-	DEFB 	var1
-	
-	XREF	var2
-	DEFB 	var2
-	
-	LIB		var3
-	DEFB 	var3
-");
-t_z80asm_capture("-l -b ".asm_file()." ".asm1_file(), "", <<'ERR', 0);
-Warning at file 'test.asm' line 5: 'XDEF' is deprecated, use 'PUBLIC' instead
-Warning at file 'test.asm' line 8: 'XLIB' is deprecated, use 'PUBLIC' instead
-Warning at file 'test1.asm' line 5: 'XREF' is deprecated, use 'EXTERN' instead
-Warning at file 'test1.asm' line 8: 'LIB' is deprecated, use 'EXTERN' instead
-ERR
-t_binary(read_binfile(bin_file()), "\x01\x02\x03");
-
 # delete directories and files
 unlink_testfiles();
 done_testing;

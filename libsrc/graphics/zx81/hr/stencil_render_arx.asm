@@ -16,13 +16,13 @@
 	PUBLIC	stencil_render
 	EXTERN	dither_pattern
 
-	;LIB swapgfxbk
+	;EXTERN swapgfxbk
 	EXTERN pixeladdress
 	EXTERN leftbitmask, rightbitmask
-	;XREF swapgfxbk1
+	;EXTERN swapgfxbk1
 
 ;	
-;	$Id: stencil_render_arx.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
+;	$Id: stencil_render_arx.asm,v 1.3 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 .stencil_render

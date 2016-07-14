@@ -3,10 +3,10 @@
 	PUBLIC	xorborder
 	PUBLIC	_xorborder
 	EXTERN	w_pixeladdress
-;	LIB	l_cmp
+;	EXTERN	l_cmp
 
 ;
-;	$Id: xorborder.asm,v 1.3 2016-06-22 22:40:19 dom Exp $
+;	$Id: xorborder.asm,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 ; ***********************************************************************

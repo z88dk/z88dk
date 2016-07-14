@@ -239,7 +239,7 @@ Instead you can declare the location of the heap using some
 embedded assembler:
 
    #asm
-      XDEF _heap
+      PUBLIC _heap
       DEFC _heap = 50000
    #endasm
 
@@ -306,7 +306,7 @@ The other method is to declare the location of the queue table using
 some embedded assembler:
 
    #asm
-      XDEF _ba_qtbl
+      PUBLIC _ba_qtbl
       DEFC _ba_qtbl = 50000
    #endasm
 
@@ -350,14 +350,14 @@ allocate and free small fixed size blocks.
 
 Here are the same two functions written in assembler:
 
-   XDEF _u_malloc
+   PUBLIC _u_malloc
    ._u_malloc                   ; HL = size in bytes
-      LIB malloc
+      EXTERN malloc
       jp malloc                 ; return in HL address of memory block
    
-   XDEF _u_free
+   PUBLIC _u_free
    ._u_free                     ; HL = address of memory block
-      LIB free
+      EXTERN free
       jp free
 
 Whether or not a library makes use of implicit memory allocation

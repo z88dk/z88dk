@@ -513,7 +513,7 @@ t_compile_module($init, <<'END', $objs);
 	check_count(0);
 
 	warn("Warning\n");
-	warn_deprecated("XREF", "EXTERN");
+	warn_symbol_different("main", "MAIN");
 	check_count(0);
 
 	warn("Error\n");
@@ -529,7 +529,7 @@ t_run_module([], '', <<'ERR', 0);
 Information
 0 errors occurred during assembly
 Warning
-Warning: 'XREF' is deprecated, use 'EXTERN' instead
+Warning: symbol 'main' used as 'MAIN'
 Error
 Error: syntax error
 File error not caught

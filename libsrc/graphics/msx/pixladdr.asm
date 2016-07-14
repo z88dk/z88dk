@@ -2,7 +2,7 @@
 	SECTION	code_clib
 	PUBLIC	pixeladdress
 
-	;XREF	base_graphics
+	;EXTERN	base_graphics
 	EXTERN	pixelbyte
 	PUBLIC	pix_return
 
@@ -10,7 +10,7 @@
 	INCLUDE	"msx/vdp.inc"
 
 ;
-;	$Id: pixladdr.asm,v 1.9 2016-06-21 20:16:35 dom Exp $
+;	$Id: pixladdr.asm,v 1.10 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 ; ******************************************************************
@@ -27,7 +27,7 @@
 ;  ......hl/ixiy same
 ;  afbcde../.... different
 ;
-	;;XREF	base_graphics
+	;;EXTERN	base_graphics
 
 .pixeladdress
 	

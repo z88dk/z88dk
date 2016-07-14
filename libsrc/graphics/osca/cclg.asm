@@ -3,7 +3,7 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: cclg.asm,v 1.3 2016-06-22 22:40:19 dom Exp $
+;	$Id: cclg.asm,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
     INCLUDE "flos.def"
@@ -16,8 +16,8 @@
                 EXTERN     swapgfxbk
                 EXTERN    swapgfxbk1
 
-;	LIB y_offset_list
-;	XREF	base_graphics
+;	EXTERN y_offset_list
+;	EXTERN	base_graphics
 
 ;colours:	defw $000,$00f,$f00,$f0f,$0f0,$0ff,$ff0,$fff,$008,$800,$808,$080,$088,$880,$888
 

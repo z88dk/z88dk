@@ -203,32 +203,8 @@ void asm_EXTERN(char *name)
 	declare_extern_symbol(name);
 }
 
-void asm_XREF(char *name)
-{
-	warn_deprecated("XREF", "EXTERN");
-	declare_extern_symbol(name);
-}
-
-void asm_LIB(char *name)
-{
-	warn_deprecated("LIB", "EXTERN");
-	declare_extern_symbol(name);
-}
-
 void asm_PUBLIC(char *name)
 {
-	declare_public_symbol(name);
-}
-
-void asm_XDEF(char *name)
-{
-	warn_deprecated("XDEF", "PUBLIC"); 
-	declare_public_symbol(name);
-}
-
-void asm_XLIB(char *name)
-{
-	warn_deprecated("XLIB", "PUBLIC"); 
 	declare_public_symbol(name);
 }
 

@@ -14,15 +14,15 @@
 ;	Stefano Bodrato - 18/03/2009
 ;
 ;
-;	$Id: surface_circle.asm,v 1.4 2016-06-21 20:16:35 dom Exp $
+;	$Id: surface_circle.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 		SECTION	code_clib
                 PUBLIC    surface_circle
                 PUBLIC    _surface_circle
                 
-                ;LIB     swapgfxbk
-                ;XREF    swapgfxbk1
+                ;EXTERN     swapgfxbk
+                ;EXTERN    swapgfxbk1
                 
 		EXTERN	base_graphics
 

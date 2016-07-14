@@ -3,7 +3,7 @@
 ;
 ;	ZX 81 version By Stefano Bodrato
 ;
-;	$Id: swapgfxbk.asm,v 1.9 2016-06-27 20:26:33 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.10 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 	        SECTION code_clib
@@ -11,8 +11,8 @@
 
 		PUBLIC	swapgfxbk1
 		
-		;XREF	save81
-		;XREF	restore81
+		;EXTERN	save81
+		;EXTERN	restore81
 
 .swapgfxbk
 	        ;jp	$2E7	;setfast

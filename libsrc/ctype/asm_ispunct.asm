@@ -5,7 +5,7 @@
 PUBLIC asm_ispunct
 
 IF FORrcmx000
-LIB  rcmx_cpir
+EXTERN  rcmx_cpir
 ENDIF
 
 ; determine if the char is punctuation

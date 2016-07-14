@@ -53,11 +53,6 @@ errors:
     args	: 'char *name, char *used'
     message	: "\"symbol '%s' used as '%s'\", name, used"
 	
-  - type	: ErrWarn
-    func	: warn_deprecated
-    args	: 'char *old_stmt, char *new_stmt'
-    message	: "\"'%s' is deprecated, use '%s' instead\", old_stmt, new_stmt"
-	
   # Assembly errors
   - type	: ErrError
     func	: error_syntax

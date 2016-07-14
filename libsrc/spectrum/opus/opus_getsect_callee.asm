@@ -9,13 +9,13 @@
 ;
 ;	int __CALLEE__ opus_getsect_callee(int drive, int sector, char * buffer); 
 ;
-;	$Id: opus_getsect_callee.asm,v 1.4 2016-06-27 19:16:34 dom Exp $
+;	$Id: opus_getsect_callee.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 SECTION code_clib
 PUBLIC	opus_getsect_callee
 PUBLIC	_opus_getsect_callee
-;XDEF	ASMDISP_OPUS_GETSECT_CALLEE
+;PUBLIC	ASMDISP_OPUS_GETSECT_CALLEE
 
 PUBLIC	opus_getsect_asmentry
 

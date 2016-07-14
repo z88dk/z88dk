@@ -3,11 +3,11 @@
 
         INCLUDE "graphics/grafix.inc"
 
-        ;XREF   base_graphics
+        ;EXTERN   base_graphics
         EXTERN    _vdcDispMem
 
 ;
-;       $Id: w_pixladdr.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
+;       $Id: w_pixladdr.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 ; ******************************************************************

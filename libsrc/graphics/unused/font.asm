@@ -2,10 +2,10 @@
 ;	Font for the Z88 scr
 ;
 ;
-;	$Id: font.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;	$Id: font.asm,v 1.3 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 
-		XLIB	font
+		PUBLIC	font
 
 		INCLUDE "font.bin"

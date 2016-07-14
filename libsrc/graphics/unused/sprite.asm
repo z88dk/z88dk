@@ -2,15 +2,15 @@
 ;	Print using 8x8 font to the Map
 ;
 ;
-;	$Id: sprite.asm,v 1.2 2001-04-18 13:21:38 stefano Exp $
+;	$Id: sprite.asm,v 1.3 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 
-		XLIB	sprite
+		PUBLIC	sprite
 
-		LIB	swapgfxbk
+		EXTERN	swapgfxbk
 
-		XREF	base_graphics
+		EXTERN	base_graphics
 
 ;Print a 16x16 sprite to the screen - sprites stored as characters..
 ;Entry:	hl=sprite address

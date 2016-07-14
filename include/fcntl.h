@@ -5,7 +5,7 @@
  *
  *      djm 27/4/99
  *
- *	$Id: fcntl.h,v 1.20 2016-06-13 19:57:10 dom Exp $
+ *	$Id: fcntl.h,v 1.21 2016-07-14 17:44:17 pauloscustodio Exp $
  */
 
 
@@ -70,7 +70,7 @@ extern char __LIB__ *getwd(char *buf);
 
 In the target's CRT0 stubs the following lines must exist:
 
-XDEF _RND_BLOCKSIZE
+PUBLIC _RND_BLOCKSIZE
 _RND_BLOCKSIZE:	defw	1000
 
 */

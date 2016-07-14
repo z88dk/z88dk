@@ -88,7 +88,7 @@ sub push_asm {
 		elsif ($asm =~ /^\s*defc\s+($LABEL_RE)\s*=\s*(.*)/) {		# define constant
 			$self->LABEL_ADDR->{$1} = 0+eval($2);
 		}
-		elsif ($asm =~ /(?i:xdef|xlib|public)\s+($LABEL_RE)/) {	# global label
+		elsif ($asm =~ /(?i:public)\s+($LABEL_RE)/) {	# global label
 			$self->LABEL_GLOBAL->{$1}++;
 		}
 		elsif ($asm =~ /^\s*lstoff\s*$/i) {

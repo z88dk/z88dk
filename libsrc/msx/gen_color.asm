@@ -5,7 +5,7 @@
 ;
 ;	Change the color attributes (MSX style)
 ;
-;	$Id: gen_color.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
+;	$Id: gen_color.asm,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
         SECTION code_clib
@@ -15,7 +15,7 @@
 	EXTERN	SETWRT
 	EXTERN	set_vdp_reg
 	
-	;XREF	SCRMOD
+	;EXTERN	SCRMOD
 
 	INCLUDE	"msx/vdp.inc"
 

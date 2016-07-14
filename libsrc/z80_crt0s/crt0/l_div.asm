@@ -103,8 +103,8 @@ IF ARCHAIC
 
 
 ;These are now in libraries!
-                LIB     l_deneg
-                LIB     l_bcneg
+                EXTERN     l_deneg
+                EXTERN     l_bcneg
 
 
 ; HL = DE / HL, DE = DE % HL

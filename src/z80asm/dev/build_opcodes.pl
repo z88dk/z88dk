@@ -364,7 +364,7 @@ sub write_z80pack_asm {
 			
 			# remove invalid asm, make labels local
 			for ($lib_asm) {
-				s/^\s*(PUBLIC|EXTERN|XDEF|XREF|LIB|XLIB).*//igm;
+				s/^\s*(PUBLIC|EXTERN|SECTION).*//igm;
 				while (/^\.(\w+)/im) {
 					my $label = $1;
 					my $new_label = (uc($label) eq uc($lib)) ? $label : $label.$label_n;

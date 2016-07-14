@@ -19,14 +19,14 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.12 2016-06-12 16:06:43 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.13 2016-07-14 17:44:18 pauloscustodio Exp $
 ;
 
         SECTION code_clib
 	PUBLIC	ansi_CHAR
 
 IF ROMFONT
-	LIB	asctozx81
+	EXTERN	asctozx81
 ENDIF
 	
 	EXTERN	base_graphics

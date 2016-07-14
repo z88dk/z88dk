@@ -3,7 +3,7 @@
 ; 05.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1MakeRect16Pix
+PUBLIC SP1MakeRect16Pix
 
 ; Conversion from struct_sp1_ss to struct_r_Rect16
 ; with members multiplied by 8 (change from character

@@ -3,7 +3,7 @@
 ; 05.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-XLIB SP1MakeRect8
+PUBLIC SP1MakeRect8
 
 ; A straight conversion from struct_sp1_Rect
 ; to struct_r_Rect8

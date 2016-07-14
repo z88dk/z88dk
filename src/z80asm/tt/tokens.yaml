@@ -223,7 +223,6 @@ tokens:
   - name	: IFDEF
   - name	: IFNDEF
   - name	: INCLUDE
-  - name	: LIB
   - name	: LINE
   - name	: LSTOFF
   - name	: LSTON
@@ -232,9 +231,6 @@ tokens:
   - name	: PUBLIC
   - name	: SECTION
   - name	: UNDEFINE
-  - name	: XDEF
-  - name	: XLIB
-  - name	: XREF 
   
   # DEFGROUP storage specifiers
   - name	: DS_B

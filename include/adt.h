@@ -27,7 +27,7 @@
  * }
  *
  * If implemented in assembler, use the labels _u_malloc and _u_free
- * with HL as the parameter and return value.  XDEF both labels to
+ * with HL as the parameter and return value.  PUBLIC both labels to
  * make them globals.
  *
  */

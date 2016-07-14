@@ -19,7 +19,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.4 2016-06-12 16:06:42 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.5 2016-07-14 17:44:18 pauloscustodio Exp $
 ;
 
         SECTION code_clib
@@ -32,8 +32,8 @@
 	PUBLIC	text_cols
 	PUBLIC	text_rows
 
-;	XREF	cursor_y
-;	XREF	cursor_x
+;	EXTERN	cursor_y
+;	EXTERN	cursor_x
 	
 ;.mychar   defb 0
 ;          defb 0 ; string termination

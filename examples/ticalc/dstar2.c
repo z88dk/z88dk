@@ -346,7 +346,7 @@ void MyExit(void)
 void CopyToScreen(void)
 {
 #asm
-	LIB     swapgfxbk
+	EXTERN  swapgfxbk
 
 	call    swapgfxbk
 	call    ozscrcpy

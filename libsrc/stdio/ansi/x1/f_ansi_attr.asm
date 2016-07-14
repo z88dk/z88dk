@@ -7,13 +7,13 @@
 ; 	Text Attributes
 ;	m - Set Graphic Rendition
 ;	
-;	$Id: f_ansi_attr.asm,v 1.5 2016-06-10 23:47:18 dom Exp $
+;	$Id: f_ansi_attr.asm,v 1.6 2016-07-14 17:44:18 pauloscustodio Exp $
 ;
 
 	SECTION code_clib
 	PUBLIC	ansi_attr
 
-	;XREF	INVRS
+	;EXTERN	INVRS
 	EXTERN	ATTR
 
 .ansi_attr

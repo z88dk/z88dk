@@ -5,13 +5,13 @@
 ;
 ;	set HL to ptr to buffer location, sd card addres must be requested already.
 ;
-;	$Id: sd_read_sector_main.asm,v 1.4 2012-09-20 21:13:16 stefano Exp $
+;	$Id: sd_read_sector_main.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
-	XLIB	sd_read_sector_main
+	PUBLIC	sd_read_sector_main
 
-	LIB		sd_read_bytes
-	LIB		sd_get_byte
+	EXTERN		sd_read_bytes
+	EXTERN		sd_get_byte
 
     INCLUDE "sdcard.def"
 

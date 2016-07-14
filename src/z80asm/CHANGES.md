@@ -6,9 +6,12 @@ Z88DK Z80 Macro Assembler Change Log
 
 - 2016-07-14
 
+  Remove deprecated instructions:
+  - Remove XREF and LIB, use EXTERN instead
+  - Remove XDEF and XLIB, use PUBLIC instead
+
   Change options so that long options are always prefixed by two dashes,
   modify calling code to use the two-dash form.
-  
   - Remove -RCMX000, keep only --RCMX000
   - Remove -plus, keep only--ti83plus
   - Remove -IXIY and --swap-ix-iy, keep --IXIY

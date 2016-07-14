@@ -9,13 +9,13 @@
 ;
 ;	int opus_putsect(int drive, int sector, char * buffer); 
 ;
-;	$Id: opus_putsect.asm,v 1.4 2016-06-27 19:16:34 dom Exp $
+;	$Id: opus_putsect.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 SECTION code_clib
 PUBLIC opus_putsect
 PUBLIC _opus_putsect
-;XREF ASMDISP_OPUS_PUTSECT_CALLEE
+;EXTERN ASMDISP_OPUS_PUTSECT_CALLEE
 EXTERN opus_putsect_callee
 EXTERN opus_putsect_asmentry
 

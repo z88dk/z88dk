@@ -3,12 +3,12 @@
 ; by Stefano Bodrato, Feb. 2010
 ;--------------------------------------------------------------
 ;
-;	$Id: mt_pixladdr.asm,v 1.4 2016-06-27 20:26:33 dom Exp $
+;	$Id: mt_pixladdr.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 	SECTION code_clib
 	PUBLIC	pixeladdress
 
-	;;XREF	base_graphics
+	;;EXTERN	base_graphics
 
 
 	; ******************************************************************

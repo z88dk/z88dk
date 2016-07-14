@@ -58,11 +58,7 @@ extern void asm_MODULE_default(void);
 /* directives with list of names argument, function called for each argument */
 extern void asm_GLOBAL(char *name);
 extern void asm_EXTERN(char *name);
-extern void asm_XREF(char *name);
-extern void asm_LIB(char *name);
 extern void asm_PUBLIC(char *name);
-extern void asm_XDEF(char *name);
-extern void asm_XLIB(char *name);
 extern void asm_DEFINE(char *name);
 extern void asm_UNDEFINE(char *name);
 

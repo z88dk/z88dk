@@ -4,8 +4,8 @@
 ; sinclair spectrum version
 ; uses rectangles library
 
-XLIB SP1IsRectInRect
-LIB RIsRectInRect8
+PUBLIC SP1IsRectInRect
+EXTERN RIsRectInRect8
 
 ; Determines if two 8-bit rectangles overlap.
 ;

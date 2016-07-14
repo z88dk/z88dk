@@ -7,7 +7,7 @@ PUBLIC _strlcat_callee
 PUBLIC ASMDISP_STRLCAT_CALLEE
 
 IF FORrcmx000
-LIB  rcmx_cpir
+EXTERN  rcmx_cpir
 ENDIF
 
 ; The openBSD implementation returns an oddball value when size

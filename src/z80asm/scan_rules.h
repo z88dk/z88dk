@@ -398,7 +398,7 @@ tr0:
 	break;
 	case 95:
 	{{p = ((te))-1;}
-	set_tok_opcode( TK_LIB );
+	set_tok_opcode( TK_EXTERN );
 	;
 	{p++; cs = 21; goto _out;}
 }
@@ -461,21 +461,21 @@ tr0:
 	break;
 	case 104:
 	{{p = ((te))-1;}
-	set_tok_opcode( TK_XDEF );
+	set_tok_opcode( TK_PUBLIC );
 	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
 	case 105:
 	{{p = ((te))-1;}
-	set_tok_opcode( TK_XLIB );
+	set_tok_opcode( TK_PUBLIC );
 	;
 	{p++; cs = 21; goto _out;}
 }
 	break;
 	case 106:
 	{{p = ((te))-1;}
-	set_tok_opcode( TK_XREF );
+	set_tok_opcode( TK_EXTERN );
 	;
 	{p++; cs = 21; goto _out;}
 }

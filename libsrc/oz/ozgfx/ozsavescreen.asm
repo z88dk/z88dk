@@ -8,14 +8,14 @@
 ;
 ;
 ; ------
-; $Id: ozsavescreen.asm,v 1.3 2016-06-28 14:48:17 dom Exp $
+; $Id: ozsavescreen.asm,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
 	SECTION code_clib
 	PUBLIC	ozsavescreen
 	PUBLIC	_ozsavescreen
 	
-	;LIB	ozrestorescreen
+	;EXTERN	ozrestorescreen
 	PUBLIC	ozsccopy
 	
 	EXTERN	ozactivepage
