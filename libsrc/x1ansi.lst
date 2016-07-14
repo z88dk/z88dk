@@ -6,6 +6,7 @@ stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc
 stdio/ansi/fputc_cons
+stdio/ansi/puts_cons
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/x1/f_ansi_attr
 stdio/ansi/x1/f_ansi_bel
