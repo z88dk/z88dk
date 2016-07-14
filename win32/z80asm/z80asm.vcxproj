@@ -246,6 +246,11 @@
   <ItemGroup>
     <None Include="..\..\src\z80asm\parse_rules.rl" />
     <None Include="..\..\src\z80asm\scan_rules.rl" />
+    <None Include="..\..\src\z80asm\tt\error_func.c.tt" />
+    <None Include="..\..\src\z80asm\tt\error_func.h.tt" />
+    <None Include="..\..\src\z80asm\tt\error_func.yaml" />
+    <None Include="..\..\src\z80asm\tt\tokens.h.tt" />
+    <None Include="..\..\src\z80asm\tt\tokens.yaml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

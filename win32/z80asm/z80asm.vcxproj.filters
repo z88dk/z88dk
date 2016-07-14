@@ -253,5 +253,20 @@
     <None Include="..\..\src\z80asm\scan_rules.rl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\..\src\z80asm\tt\error_func.c.tt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\tt\error_func.h.tt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\tt\error_func.yaml">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\tt\tokens.h.tt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\tt\tokens.yaml">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
