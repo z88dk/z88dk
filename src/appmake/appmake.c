@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.42 2016-07-14 12:40:22 pauloscustodio Exp $
+ *   $Id: appmake.c,v 1.43 2016-07-14 17:45:04 pauloscustodio Exp $
  */
 
 
@@ -13,7 +13,7 @@
 #define MAIN_C
 #include "appmake.h"
 #include <stdlib.h>
-
+#include <io.h>
 
 
 #if (__GNUC__ || _BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
