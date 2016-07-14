@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.43 2016-07-14 17:45:04 pauloscustodio Exp $
+ *   $Id: appmake.c,v 1.44 2016-07-14 20:16:13 aralbrec Exp $
  */
 
 
@@ -13,7 +13,6 @@
 #define MAIN_C
 #include "appmake.h"
 #include <stdlib.h>
-#include <io.h>
 
 
 #if (__GNUC__ || _BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
@@ -825,22 +824,15 @@ int bin2hex(FILE *input, FILE *output, int address)
 static void get_temporary_filename(char *filen)
 {
 #ifdef _WIN32
-	char   *ptr;
-	int		len;
+    char   *ptr;
 
-	/* get TEMP environment */
-	filen[0] = '\0';
-	if ((ptr = getenv("TEMP")) != NULL)
-		strcpy(filen, ptr);
+    if ((ptr = _tempnam(".\\", "z1d9k")) == NULL) {
+        fprintf(stderr, "Failed to create temporary filename\n");
+        exit(1);
+    }
 
-	/* append '\\' */
-	len = strlen(filen);
-	if (len == 0 || filen[len - 1] != '\\')
-		strcpy(filen + len, "\\");
-
-	/* make template and temp file */
-	strcat(filen, "tmpXXXXXXXX");
-	mktempfile(filen);
+    strcpy(filen, ptr);
+    free(ptr);
 #elif defined(__MSDOS__) && defined(__TURBOC__)
     /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
     if (ptr = getenv("TEMP")) {    /* From MS-DOS 5, C:\TEMP, C:\DOS,

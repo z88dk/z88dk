@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.141 2016-07-14 12:40:22 pauloscustodio Exp $
+ *      $Id: zcc.c,v 1.142 2016-07-14 20:15:50 aralbrec Exp $
  */
 
 
@@ -20,7 +20,6 @@
 #include        <stdarg.h>
 #include        <ctype.h>
 #include        <stddef.h>
-#include		<io.h>
 #include        "zcc.h"
 
 #ifdef WIN32
@@ -1751,25 +1750,16 @@ ShowErrors(char *filen, char *orig)
  */
 void tempname(char *filen)
 {
-
 #ifdef _WIN32
     char   *ptr;
-	int		len;
 
-	/* get TEMP environment */
-	filen[0] = '\0';
-	if ((ptr = getenv("TEMP")) != NULL)
-		strcpy(filen, ptr);
+    if ((ptr = _tempnam(".\\", "z1d9k")) == NULL) {
+        fprintf(stderr, "Failed to create temporary filename\n");
+        exit(1);
+    }
 
-	/* append '\\' */
-	len = strlen(filen);
-	if (len == 0 || filen[len - 1] != '\\')
-		strcpy(filen + len, "\\");
-
-	/* make template and temp file */
-	strcat(filen, "tmpXXXXXXXX");
-	mktempfile(filen);
-
+    strcpy(filen, ptr);
+    free(ptr);
 #elif defined(__MSDOS__) && defined(__TURBOC__)
     /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
 
@@ -1788,7 +1778,6 @@ void tempname(char *filen)
     if (ptr = strrchr(filen, '.'))    /* than once without cleaning out
                      * files. */
         *ptr = 0;    /* Don't want to risk too long filenames */
-
 #else
     strcpy(filen, "/tmp/tmpXXXXXXXX");
     mktempfile(filen);
