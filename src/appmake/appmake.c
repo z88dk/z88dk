@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.41 2016-07-13 18:25:55 pauloscustodio Exp $
+ *   $Id: appmake.c,v 1.42 2016-07-14 12:40:22 pauloscustodio Exp $
  */
 
 
@@ -825,11 +825,22 @@ int bin2hex(FILE *input, FILE *output, int address)
 static void get_temporary_filename(char *filen)
 {
 #ifdef _WIN32
-    char           *ptr;
+	char   *ptr;
+	int		len;
 
-    tmpnam(filen);
-    if (ptr = strrchr(filen, '.'))
-        *ptr = '_';
+	/* get TEMP environment */
+	filen[0] = '\0';
+	if ((ptr = getenv("TEMP")) != NULL)
+		strcpy(filen, ptr);
+
+	/* append '\\' */
+	len = strlen(filen);
+	if (len == 0 || filen[len - 1] != '\\')
+		strcpy(filen + len, "\\");
+
+	/* make template and temp file */
+	strcat(filen, "tmpXXXXXXXX");
+	mktempfile(filen);
 #elif defined(__MSDOS__) && defined(__TURBOC__)
     /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
     if (ptr = getenv("TEMP")) {    /* From MS-DOS 5, C:\TEMP, C:\DOS,

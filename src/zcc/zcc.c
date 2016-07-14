@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.140 2016-07-13 18:25:55 pauloscustodio Exp $
+ *      $Id: zcc.c,v 1.141 2016-07-14 12:40:22 pauloscustodio Exp $
  */
 
 
@@ -20,6 +20,7 @@
 #include        <stdarg.h>
 #include        <ctype.h>
 #include        <stddef.h>
+#include		<io.h>
 #include        "zcc.h"
 
 #ifdef WIN32
@@ -1752,11 +1753,23 @@ void tempname(char *filen)
 {
 
 #ifdef _WIN32
-    char           *ptr;
+    char   *ptr;
+	int		len;
 
-    tmpnam(filen);
-    if (ptr = strrchr(filen, '.'))
-        *ptr = '_';
+	/* get TEMP environment */
+	filen[0] = '\0';
+	if ((ptr = getenv("TEMP")) != NULL)
+		strcpy(filen, ptr);
+
+	/* append '\\' */
+	len = strlen(filen);
+	if (len == 0 || filen[len - 1] != '\\')
+		strcpy(filen + len, "\\");
+
+	/* make template and temp file */
+	strcat(filen, "tmpXXXXXXXX");
+	mktempfile(filen);
+
 #elif defined(__MSDOS__) && defined(__TURBOC__)
     /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
 
