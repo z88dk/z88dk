@@ -1,7 +1,7 @@
 #
 # Build the MSX target libraries
 #
-# $Id: Makefile,v 1.10 2015-10-28 07:18:50 stefano Exp $
+# $Id: Makefile,v 1.11 2016-07-14 13:30:11 pauloscustodio Exp $
 #
 
 include ../Make.config
@@ -23,13 +23,13 @@ all:    $(AOBJECTS)
 
 
 generic_iy:
-	zcc +test $(CFLAGS) -Ca-IXIY psg_channels.c
-	zcc +test $(CFLAGS) -Ca-IXIY psg_envelope.c
-	zcc +test $(CFLAGS) -Ca-IXIY psg_noise.c
-	zcc +test $(CFLAGS) -Ca-IXIY psg_noise_channels.c
-	zcc +test $(CFLAGS) -Ca-IXIY psg_tone.c
-	zcc +test $(CFLAGS) -Ca-IXIY psg_tone_channels.c
-	zcc +test $(CFLAGS) -Ca-IXIY psg_volume.c
+	zcc +test $(CFLAGS) -Ca--IXIY psg_channels.c
+	zcc +test $(CFLAGS) -Ca--IXIY psg_envelope.c
+	zcc +test $(CFLAGS) -Ca--IXIY psg_noise.c
+	zcc +test $(CFLAGS) -Ca--IXIY psg_noise_channels.c
+	zcc +test $(CFLAGS) -Ca--IXIY psg_tone.c
+	zcc +test $(CFLAGS) -Ca--IXIY psg_tone_channels.c
+	zcc +test $(CFLAGS) -Ca--IXIY psg_volume.c
 
 
 .c.o:

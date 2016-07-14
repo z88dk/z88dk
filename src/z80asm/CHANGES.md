@@ -4,13 +4,14 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
-- 2016-07-13
+- 2016-07-14
 
   Change options so that long options are always prefixed by two dashes,
   modify calling code to use the two-dash form.
   
   - Remove -RCMX000, keep only --RCMX000
   - Remove -plus, keep only--ti83plus
+  - Remove -IXIY and --swap-ix-iy, keep --IXIY
 
 - 2016-07-11
 

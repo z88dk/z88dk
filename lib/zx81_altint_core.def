@@ -3,7 +3,7 @@
 ;	Note: a swap between IX and IY happens "on the fly" during assembly !
 ; ----------------------------------------------------------------------------------------
 ;
-;       $Id: zx81_altint_core.def,v 1.7 2015-01-23 07:30:51 stefano Exp $
+;       $Id: zx81_altint_core.def,v 1.8 2016-07-14 13:30:10 pauloscustodio Exp $
 ;
 ; - - - - - - -
 
@@ -119,7 +119,7 @@ L028F:  JP      L0229           ; to DISPLAY-1
 ; ---
 
 ;; DISPLAY-3
-L0292:  POP     IY              ; return address to IX register (-IXIY swap).
+L0292:  POP     IY              ; return address to IX register (--IXIY swap).
                                 ; will be either L0281 or L028F - see above.
 ; Modified here to keep IY unchanged
 

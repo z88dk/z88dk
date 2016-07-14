@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.60 2016-07-05 21:43:52 dom Exp $
+# $Id: Makefile,v 1.61 2016-07-14 13:30:11 pauloscustodio Exp $
 #
 # 8080
 
@@ -16,10 +16,10 @@ OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/cpm/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES))
 
 obj/ixiy/%.o: %.asm
-	zcc +test $(CFLAGS) -Ca-IXIY -Ca-I../ -c -o $@ $^
+	zcc +test $(CFLAGS) -Ca--IXIY -Ca-I../ -c -o $@ $^
 
 obj/ixiy/%.o: %.c
-	zcc +test $(CFLAGS) -Ca-IXIY -c -o $@ $^
+	zcc +test $(CFLAGS) -Ca--IXIY -c -o $@ $^
 
 obj/net/%.o: %.asm
 	zcc +z88 $(CFLAGS) -DNET_STDIO -Ca-I../ -c -o $@ $^

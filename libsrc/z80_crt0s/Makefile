@@ -15,7 +15,7 @@ crt0s:
 crt0iy:
 	$(MAKE) clean
 	@$(RM) crt0_long/l_long_case.o
-	$(LIBLINKER) -I. -IXIY -DZ80S183 -x$(OUTPUT_DIRECTORY)/z80iy_crt0 @crt0list
+	$(LIBLINKER) -I. --IXIY -DZ80S183 -x$(OUTPUT_DIRECTORY)/z80iy_crt0 @crt0list
 	$(MAKE) clean
 
 crtz80s183:

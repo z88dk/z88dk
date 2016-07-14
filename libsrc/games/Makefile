@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.31 2015-10-08 17:12:22 stefano Exp $
+# $Id: Makefile,v 1.32 2016-07-14 13:30:10 pauloscustodio Exp $
 
 include	../Make.config
 
@@ -70,7 +70,7 @@ lc128:
 	zcc +test $(CFLAGS) -DC128 bit_frequency.c
 	zcc +test $(CFLAGS) -DC128 bit_play.c
 
-# -IXIY trick, interrupts sometimes disabled and few customizations
+# --IXIY trick, interrupts sometimes disabled and few customizations
 # dependencies are respected already in the main makefile
 lzx81:
 	zcc +zx81 $(CFLAGS) -DZX81 bit_frequency.c
