@@ -19,7 +19,7 @@
  *
  *	Packages are now supported (work for 16k packages)
  *
- *	$Id: application.h,v 1.9 2016-07-01 20:34:45 dom Exp $
+ *	$Id: application.h,v 1.10 2016-07-14 07:03:33 dom Exp $
  */
 
 #ifndef HELP1
@@ -146,6 +146,7 @@ void application_dor(void)
         defb    0
 .in_dor_seg3
         defb    in_bank
+.in_dor_app_type
         APPLBYTE(APP_TYPE)      ; at_bad etc
         APPLBYTE(APP_TYPE2)     ;caps lock
 .ininfend       defb    'H'     ; key to help section
