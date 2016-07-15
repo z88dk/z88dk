@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.142 2016-07-14 20:15:50 aralbrec Exp $
+ *      $Id: zcc.c,v 1.143 2016-07-15 01:20:17 pauloscustodio Exp $
  */
 
 
@@ -527,7 +527,7 @@ int linkthem(char *linker)
             linkargs,
             globaldefon ? "-g " : "",
             mapon ? "-m " : "",
-            (createapp || symbolson) ? "-s ": "",
+            "-s ", /* always need the .sym file; (createapp || symbolson) ? "-s ": "", */
             relocinfo ? "--reloc-info " : "",
             (c_nocrt == 0) ? c_crt0 : "",
             (c_nocrt == 0) ? ext : "");
