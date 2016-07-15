@@ -20,6 +20,13 @@ ASTYLE = astyle \
 #------------------------------------------------------------------------------
 # ragel parser generator
 #------------------------------------------------------------------------------
+all : scan_rules.h
+
+scan_rules.h : scan_rules.rl tokens.h scan_def.h \
+				parse_ragel.pl dev/Makefile 
+	perl parse_ragel.pl scan_rules.rl
+#	$(ASTYLE) scan_rules.h -- formatted file too big for debugger (> 65536 lines)
+	
 all : parse_rules.h
 
 parse_rules.h : parse_rules.rl tokens.h scan_def.h \
