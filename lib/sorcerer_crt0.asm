@@ -1,7 +1,7 @@
 ;
 ;       Startup for Sorcerer Exidy
 ;
-;       $Id: sorcerer_crt0.asm,v 1.14 2016-07-11 21:19:38 dom Exp $
+;       $Id: sorcerer_crt0.asm,v 1.15 2016-07-15 21:03:25 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -34,7 +34,7 @@
 ; Set an origin for the application (-zorg=) default to 100h
 ;--------
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = 100h
         ENDIF
 

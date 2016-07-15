@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Winter 2013
 ;
-;       $Id: sos_crt0.asm,v 1.14 2016-07-11 21:19:38 dom Exp $
+;       $Id: sos_crt0.asm,v 1.15 2016-07-15 21:03:25 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -33,7 +33,7 @@
 	PUBLIC    l_dcal		;jp(hl)
 
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = $3000
         ENDIF
 

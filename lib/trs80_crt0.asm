@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato 2008
 ;
-;       $Id: trs80_crt0.asm,v 1.20 2016-07-11 21:19:38 dom Exp $
+;       $Id: trs80_crt0.asm,v 1.21 2016-07-15 21:03:25 dom Exp $
 ;
 
 
@@ -29,7 +29,7 @@
 ; Set an origin for the application (-zorg=) default to $5200
 ;--------
 
-IF      !CRT_ORG_CODE
+IF      !DEFINED_CRT_ORG_CODE
 	IF (startup=2)
                 defc    CRT_ORG_CODE  = 22500
 	ELSE

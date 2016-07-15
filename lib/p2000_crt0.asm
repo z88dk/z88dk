@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 7/4/2014
 ;
-;       $Id: p2000_crt0.asm,v 1.11 2016-07-11 21:19:38 dom Exp $
+;       $Id: p2000_crt0.asm,v 1.12 2016-07-15 21:03:25 dom Exp $
 ;
 
 
@@ -25,7 +25,7 @@
 
 ; Now, getting to the real stuff now!
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = $6547
         ENDIF
 

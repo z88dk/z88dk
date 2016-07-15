@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: vz_crt0.asm,v 1.26 2016-07-11 21:19:38 dom Exp $
+;       $Id: vz_crt0.asm,v 1.27 2016-07-15 21:03:25 dom Exp $
 ;
 
 
@@ -28,7 +28,7 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
             IF (startup=3)
 		defc    CRT_ORG_CODE  = 32768  ; clean binary block
             ELSE

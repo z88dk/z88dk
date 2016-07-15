@@ -4,7 +4,7 @@
 ;       Stefano Bodrato - 2011
 ;
 ;
-;	$Id: enterprise_crt0.asm,v 1.23 2016-07-11 21:19:37 dom Exp $
+;	$Id: enterprise_crt0.asm,v 1.24 2016-07-15 21:03:25 dom Exp $
 ;
 
 
@@ -88,7 +88,7 @@
 		PUBLIC    _esccmd_pd
 
 
-IF      !CRT_ORG_CODE
+IF      !DEFINED_CRT_ORG_CODE
 		defc    CRT_ORG_CODE  = 100h
 ENDIF
 		org     CRT_ORG_CODE

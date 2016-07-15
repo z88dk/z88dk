@@ -4,7 +4,7 @@
 ;
 ;       If an error occurs eg break we just drop back to BASIC
 ;
-;       $Id: m5_crt0.asm,v 1.21 2016-07-11 21:19:37 dom Exp $
+;       $Id: m5_crt0.asm,v 1.22 2016-07-15 21:03:25 dom Exp $
 ;
 
 
@@ -41,7 +41,7 @@
 
 ; Now, getting to the real stuff now!
 
-IF      !CRT_ORG_CODE
+IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $7300
 ENDIF
 

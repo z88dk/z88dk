@@ -8,7 +8,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: spec_crt0.asm,v 1.51 2016-07-13 22:12:25 dom Exp $
+;       $Id: spec_crt0.asm,v 1.52 2016-07-15 21:03:25 dom Exp $
 ;
 
 
@@ -38,8 +38,9 @@
 
 
         IF DEFINED_ZXVGS
-        IF !CRT_ORG_CODE
+        IF !DEFINED_CRT_ORG_CODE
                 DEFC    CRT_ORG_CODE = $5CCB     ; repleaces BASIC program
+		defc	CRT_ORG_CODE = 1
         ENDIF
         IF !STACKPTR
                 DEFC    STACKPTR = $FF57   ; below UDG, keep eye when using banks
@@ -47,7 +48,7 @@
         ENDIF
 
         
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
             IF (startup=2)                 ; ROM ?
                 defc    CRT_ORG_CODE  = 0
                 defc    STACKPTR = 32767

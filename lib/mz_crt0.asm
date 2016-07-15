@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 5/5/2000
 ;
-;       $Id: mz_crt0.asm,v 1.23 2016-07-11 21:19:37 dom Exp $
+;       $Id: mz_crt0.asm,v 1.24 2016-07-15 21:03:25 dom Exp $
 ;
 
 
@@ -27,7 +27,7 @@
 
 ; Now, getting to the real stuff now!
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = $1300
         ENDIF
 

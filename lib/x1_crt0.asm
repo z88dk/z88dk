@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.14 2016-07-11 21:19:38 dom Exp $
+;    $Id: x1_crt0.asm,v 1.15 2016-07-15 21:03:25 dom Exp $
 ;
 
 	MODULE x1_crt0
@@ -31,7 +31,7 @@
 ; Non-zero origins must be >=32768 (startup=2 must be used for this)
 ;--------
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
  	    IF (startup=2)
                 defc    CRT_ORG_CODE  = 32768
             ELSE

@@ -18,7 +18,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.36 2016-07-11 21:19:37 dom Exp $
+;	$Id: osca_crt0.asm,v 1.37 2016-07-15 21:03:25 dom Exp $
 ;
 
 
@@ -90,7 +90,7 @@
 ; Set an origin for the application (-zorg=) default to $5000
 ;--------
 
-IF      !CRT_ORG_CODE
+IF      !DEFINED_CRT_ORG_CODE
 	defc    CRT_ORG_CODE  = $5000
 ENDIF
 

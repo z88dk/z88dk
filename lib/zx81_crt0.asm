@@ -25,7 +25,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx81_crt0.asm,v 1.58 2016-07-11 21:19:38 dom Exp $
+;       $Id: zx81_crt0.asm,v 1.59 2016-07-15 21:03:25 dom Exp $
 ;
 ; - - - - - - -
 
@@ -69,13 +69,13 @@ ENDIF
         PUBLIC    _FRAMES
         defc    _FRAMES = 16436	; Timer
 
-        IF      !CRT_ORG_CODE
-			IF (startup>100)
-				; ORG position for LAMBDA
+        IF      !DEFINED_CRT_ORG_CODE
+	    IF (startup>100)
+		; ORG position for LAMBDA
                 defc    CRT_ORG_CODE  = 17307
-			ELSE
+ 	    ELSE
                 defc    CRT_ORG_CODE  = 16514
-			ENDIF
+	    ENDIF
         ENDIF
 
 

@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - Apr. 2001
 ;
-;	$Id: msx_crt0.asm,v 1.47 2016-07-13 22:12:25 dom Exp $
+;	$Id: msx_crt0.asm,v 1.48 2016-07-15 21:03:25 dom Exp $
 ;
 
 ; 	There are a couple of #pragma commands which affect
@@ -50,7 +50,7 @@ IF startup != 3
 ; Now, getting to the real stuff now!
 
 IF (!DEFINED_startup | (startup=1))
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = 40000
         ENDIF
                 org     CRT_ORG_CODE

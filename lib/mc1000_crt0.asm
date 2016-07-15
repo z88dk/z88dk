@@ -3,7 +3,7 @@
 ;
 ;       Stefano Bodrato - Feb. 2013
 ;
-;       $Id: mc1000_crt0.asm,v 1.21 2016-07-11 21:19:37 dom Exp $
+;       $Id: mc1000_crt0.asm,v 1.22 2016-07-15 21:03:25 dom Exp $
 ;
 
 ; 	There are a couple of #pragma optimization directives 
@@ -50,7 +50,7 @@
         PUBLIC	FRAMES
 
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
 			IF (startup=2)
 				defc    CRT_ORG_CODE  = $100  ; Direct M/C mode, including system variables on top 100h bytes
 			ELSE

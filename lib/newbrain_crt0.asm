@@ -2,7 +2,7 @@
 ;       Grundy NewBrain startup code
 ;
 ;
-;       $Id: newbrain_crt0.asm,v 1.19 2016-07-11 21:19:37 dom Exp $
+;       $Id: newbrain_crt0.asm,v 1.20 2016-07-15 21:03:25 dom Exp $
 ;
 
                 MODULE  newbrain_crt0
@@ -30,7 +30,7 @@ IF (startup=2)
 ENDIF
 
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = 10000
         ENDIF
                 org     CRT_ORG_CODE

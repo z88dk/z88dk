@@ -10,7 +10,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: zx80_crt0.asm,v 1.14 2016-07-11 21:19:38 dom Exp $
+;       $Id: zx80_crt0.asm,v 1.15 2016-07-15 21:03:25 dom Exp $
 ;
 ; - - - - - - -
 
@@ -45,7 +45,7 @@
 
         EXTERN    filltxt        ; used by custom CLS
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = 16525
         ENDIF
 
