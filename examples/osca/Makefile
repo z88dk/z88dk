@@ -18,7 +18,7 @@ ansitest.exe: ../console/ansitest.c
 	zcc +osca -clib=ansi -vn -lndos ../console/ansitest.c -create-app -oansitest.bin
 
 adv_a.exe: ../console/adv_a.c
-	zcc +osca -vn -lflosdos ../console/adv_a.c -I../console -create-app -DDISK -DCOMPUTE_SCORE -O3 -oadva.bin
+	zcc +osca -vn -lflosdos ../console/adv_a.c -I../console -create-app -DDISK -DCOMPUTE_SCORE -O3 -oadv_a.bin
 
 enigma.exe: ../console/enigma.c
 	zcc +osca -vn -lndos ../console/enigma.c -create-app -oenigma.bin
