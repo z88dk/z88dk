@@ -18,7 +18,7 @@
 ;       At compile time:
 ;		-zorg=<location> parameter permits to specify the program position
 ;
-;	$Id: osca_crt0.asm,v 1.37 2016-07-15 21:03:25 dom Exp $
+;	$Id: osca_crt0.asm,v 1.38 2016-07-15 21:38:08 dom Exp $
 ;
 
 
@@ -185,9 +185,14 @@ find_end:
 	dec	hl
 
 	INCLUDE "crt0_command_line.asm"
-		
-	push	bc	;argc
-	push	hl	;argv
+
+IF DEFINED_Z88DK_USES_SDCC
+        push    hl      ;argv
+        push    bc      ;argc
+ELSE
+        push    bc      ;argc
+        push    hl      ;argv
+ENDIF
 
 	call    _main		;Call user code
 

@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.37 2016-06-22 21:22:04 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.38 2016-07-15 21:38:08 dom Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -111,8 +111,13 @@ ENDIF
 
 
 	INCLUDE	"crt0_command_line.asm"
+IF DEFINED_Z88DK_USES_SDCC
+	push	hl	;argv
+	push	bc	;argc
+ELSE
 	push	bc	;argc
 	push	hl	;argv
+ENDIF
         call    _main		;Call user code
 	pop	bc	;kill argv
 	pop	bc	;kill argc

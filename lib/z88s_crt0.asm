@@ -3,7 +3,7 @@
 ;
 ;       Created 12/2/2002 djm
 ;
-;	$Id: z88s_crt0.asm,v 1.20 2016-07-13 22:12:25 dom Exp $
+;	$Id: z88s_crt0.asm,v 1.21 2016-07-15 21:38:08 dom Exp $
 
 
 
@@ -101,8 +101,13 @@ argv_none:
 	ld	hl,0
 	add	hl,sp		; address of argv
 	ld	b,0
-	push	bc		; argc
-	push	hl		; argv
+IF DEFINED_Z88DK_USES_SDCC
+        push    hl      ;argv
+        push    bc      ;argc
+ELSE
+        push    bc      ;argc
+        push    hl      ;argv
+ENDIF
 	ld	hl,(shell_cmdlen)
 	ld	(shell_cmdptr),hl
 	call_oz(gn_nln)		; Start a new line...
