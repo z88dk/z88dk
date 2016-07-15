@@ -3,6 +3,7 @@
 	PUBLIC	__printf_handle_f
 	PUBLIC	__printf_handle_e
 
+	EXTERN	fa
 	EXTERN	l_jphl
 	EXTERN	dldpsh
 	EXTERN	__printf_get_buffer_address
@@ -15,7 +16,37 @@ __printf_handle_e:
 	set	5,(ix-4)
 __printf_handle_f:
         push    hl              ;save fmt
+	bit	0,(ix+6)
+	jr	nz,is_sccz80
+
+        ex      de,hl           ;hl=where tp pick up from
+        ld      e,(hl)          ;mantissa
+        inc     hl
+        ld      d,(hl)
+        inc     hl
+        ld      a,(hl)
+        inc     hl
+        ld      b,(hl)		;exponent
+        inc     hl
+        push    hl              ; save ap
+        ld      h,b
+        ld      l,a
+
+	push	ix		;save callers
+	add	hl,hl		;shift right, sign into carry
+	rr	l		;get sign into right place after shift
+	inc	h		;fix exponent bias
+	inc	h
+	; h = exponent	
+	; l = sign + mantissa
+	; d, e
+	push	hl	;get it on the stack in 6 byte format
+	push	de
+	ld	hl,0
+	push	hl
+	jr	rejoin
 ; If we've got %f then lets assume we've got sccz80 rather than sdcc
+is_sccz80:
         dec     de
         dec     de
         dec     de
@@ -27,8 +58,9 @@ __printf_handle_f:
         inc     de
 
         push    ix              ;save ix - ftoa will corrupt it
-        ex      de,hl
+        ex      de,hl		;hl=address of parameter
         call    dldpsh
+rejoin:
         ld      c,(ix-8)
         ld      b,(ix-7)
         ld      a,b
