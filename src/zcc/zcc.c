@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.143 2016-07-15 01:20:17 pauloscustodio Exp $
+ *      $Id: zcc.c,v 1.144 2016-07-15 02:59:14 pauloscustodio Exp $
  */
 
 
@@ -527,7 +527,7 @@ int linkthem(char *linker)
             linkargs,
             globaldefon ? "-g " : "",
             mapon ? "-m " : "",
-            "-s ", /* always need the .sym file; (createapp || symbolson) ? "-s ": "", */
+            (createapp || symbolson) ? "-s ": "",
             relocinfo ? "--reloc-info " : "",
             (c_nocrt == 0) ? c_crt0 : "",
             (c_nocrt == 0) ? ext : "");
@@ -823,7 +823,7 @@ int main(int argc, char **argv)
                }
             }
         case OFILE:
-            BuildAsmLine(asmarg, sizeof(asmarg), "-eopt");
+            BuildAsmLine(asmarg, sizeof(asmarg), "-s -eopt");
             if ( !assembleonly )
                 if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                     exit(1);
