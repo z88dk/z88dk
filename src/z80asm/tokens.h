@@ -86,7 +86,7 @@
 #define _TK_DEFC	81
 #define _TK_DEFGROUP	82
 #define _TK_DEFINE	83
-#define _TK_DEFL	84
+#define _TK_DEFQ	84
 #define _TK_DEFM	85
 #define _TK_DEFS	86
 #define _TK_DEFVARS	87
@@ -110,7 +110,7 @@
 #define _TK_DS_B	105
 #define _TK_DS_W	106
 #define _TK_DS_P	107
-#define _TK_DS_L	108
+#define _TK_DS_Q	108
 #define _TK_ADC	109
 #define _TK_ADD	110
 #define _TK_AND	111
@@ -272,7 +272,7 @@ typedef enum tokid_t
 	TK_DEFC	= 81,
 	TK_DEFGROUP	= 82,
 	TK_DEFINE	= 83,
-	TK_DEFL	= 84,
+	TK_DEFQ	= 84,
 	TK_DEFM	= 85,
 	TK_DEFS	= 86,
 	TK_DEFVARS	= 87,
@@ -296,7 +296,7 @@ typedef enum tokid_t
 	TK_DS_B	= 105,
 	TK_DS_W	= 106,
 	TK_DS_P	= 107,
-	TK_DS_L	= 108,
+	TK_DS_Q	= 108,
 	TK_ADC	= 109,
 	TK_ADD	= 110,
 	TK_AND	= 111,

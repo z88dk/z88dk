@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.18 2016-06-21 20:49:06 dom Exp $
+;       $Id: pps_crt0.asm,v 1.19 2016-07-15 12:45:18 pauloscustodio Exp $
 ;
 
 
@@ -32,9 +32,9 @@
 	defw	$5845		;EXE signature
 	defb	$45		;Reserved (EXE type)
 	defb	$00		;Version of EXE file
-	defl	512		;Offset to code
+	defq	512		;Offset to code
 	defw	0		;Primary loader size or 0 (no primary loader)
-	defl	0		;Reserved
+	defq	0		;Reserved
 	defw	0		;Reserved
 	defw	start		;Loading address
 	defw	start		;Starting address

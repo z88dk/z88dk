@@ -17,7 +17,7 @@ enum {
 	DEFVARS_SIZE_B = 1,
 	DEFVARS_SIZE_W = 2,
 	DEFVARS_SIZE_P = 3,
-	DEFVARS_SIZE_L = 4,
+	DEFVARS_SIZE_Q = 4,
 };
 
 /* define a label at the current location, or current location + offset */
@@ -72,6 +72,6 @@ extern void asm_DEFS(int count, int fill);
 extern void asm_DEFB_str(char *str, int length);
 extern void asm_DEFB_expr(struct Expr *expr);
 
-/* DEFW, DEFL - add 2-byte and 4-byte expressions */
+/* DEFW, DEFQ - add 2-byte and 4-byte expressions */
 extern void asm_DEFW(struct Expr *expr);
-extern void asm_DEFL(struct Expr *expr);
+extern void asm_DEFQ(struct Expr *expr);

@@ -148,11 +148,11 @@ z80asm(
 	asm		=> "defs 65534,0xAA \n ld bc, 0xAAAA ;; error: max. code size of 65536 bytes reached",
 );
 z80asm(
-	asm		=> "defs 65532,0xAA \n defl 0xAAAAAAAA",
+	asm		=> "defs 65532,0xAA \n defq 0xAAAAAAAA",
 	bin		=> "\xAA" x 65536,
 );
 z80asm(
-	asm		=> "defs 65533,0xAA \n defl 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached",
+	asm		=> "defs 65533,0xAA \n defq 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached",
 );
 
 #------------------------------------------------------------------------------
@@ -392,7 +392,7 @@ note "BUG_0029";
 	my @vars  = map {$_."1"} ('A' .. 'Z') x 10;
 
 	my $list = t::Listfile->new();
-	for ([defb => "C"], [defw => "v"], [defl => "V"]) {
+	for ([defb => "C"], [defw => "v"], [defq => "V"]) {
 		my($opcode, $pack) = @$_;
 		
 		for (0 .. $#items) {

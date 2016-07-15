@@ -4212,7 +4212,7 @@ write_file(asm_file(), "
 	ld a,  3*4
 	ld b,  (ix + 3*4)
 	ld de, 3*4
-	defl   3*4
+	defq   3*4
 ");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
@@ -4238,7 +4238,7 @@ write_file(asm_file(), "
 	ld a,  value8 * 4
 	ld b,  (ix + value8 * 4)
 	ld de, value16 * 4
-	defl   value16 * 4
+	defq   value16 * 4
 ");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());
@@ -4268,7 +4268,7 @@ write_file(asm_file(), "
 	ld a,  value8 *4
 	ld b,  (ix + value8 * 4)
 	ld de, value16 * 4
-	defl   value16 * 4
+	defq   value16 * 4
 
 	defc   value8  = 3
 	defc   value16 = 3
@@ -4307,7 +4307,7 @@ label:	ld a,  label * 4
 	include \"test.inc\"
 label2:	ld de, label2 * 4
 	include \"test.inc\"
-	defl   label2 * 6
+	defq   label2 * 6
 ");
 t_z80asm_capture(asm_file(), "", "", 0);
 $obj = read_binfile(obj_file());

@@ -4,6 +4,12 @@ Z88DK Z80 Macro Assembler Change Log
 2016
 ----
 
+- 2016-07-15
+
+  Replace DEFL by DEFQ (quad-byte) to leave DEFL free for the standard 
+  way to define text values in macros.
+  Replace DEFGROUP DS.L by DS.Q for consistency.
+
 - 2016-07-14
 
   Remove deprecated instructions:

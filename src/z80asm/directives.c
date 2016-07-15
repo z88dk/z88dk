@@ -272,14 +272,14 @@ void asm_DEFB_expr(Expr *expr)
 }
 
 /*-----------------------------------------------------------------------------
-*   DEFW, DEFL - add 2-byte and 4-byte expressions
+*   DEFW, DEFQ - add 2-byte and 4-byte expressions
 *----------------------------------------------------------------------------*/
 void asm_DEFW(Expr *expr)
 {
 	Pass2infoExpr(RANGE_WORD, expr);
 }
 
-void asm_DEFL(Expr *expr)
+void asm_DEFQ(Expr *expr)
 {
 	Pass2infoExpr(RANGE_DWORD, expr);
 }

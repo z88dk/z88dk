@@ -10,7 +10,7 @@
  * 
  *      3/2/02 djm - Unspecified structure members are now padded out
  *
- *      $Id: declinit.c,v 1.17 2016-04-26 20:01:17 dom Exp $
+ *      $Id: declinit.c,v 1.18 2016-07-15 12:45:18 pauloscustodio Exp $
  */
 
 #include "ccdefs.h"
@@ -325,7 +325,7 @@ void init(int size, int ident, int *dim, int more, int dump, int is_struct)
             if (dump) {
                 /* struct member or array of pointer to char */
                 if (size == 4) {
-/* there appears to be a bug in z80asm regarding defl */
+/* there appears to be a bug in z80asm regarding defq */
                     defbyte();
                     outdec(((uint32_t)value % 65536UL) % 256);
                     outbyte(',');

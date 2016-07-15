@@ -210,7 +210,7 @@ tokens:
   - name	: DEFC
   - name	: DEFGROUP
   - name	: DEFINE
-  - name	: DEFL
+  - name	: DEFQ
   - name	: DEFM
   - name	: DEFS
   - name	: DEFVARS
@@ -242,8 +242,8 @@ tokens:
   - name	: DS_P
     regexp	: "\"DS.P\"i"
 	
-  - name	: DS_L
-    regexp	: "\"DS.L\"i"
+  - name	: DS_Q
+    regexp	: "\"DS.Q\"i"
 	
   # Z80 opcode specifiers
   - name	: ADC

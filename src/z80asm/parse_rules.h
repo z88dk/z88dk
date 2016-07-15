@@ -10,7 +10,7 @@ static const int parser_en_main = 1;
 static const int parser_en_main_directives_assign_asm_DEFC_asm_DEFC_iter_asm_DEFC_next = 1472;
 static const int parser_en_main_directives_DEFx_asm_DEFB_asm_DEFB_iter_asm_DEFB_next = 3;
 static const int parser_en_main_directives_DEFx_asm_DEFW_asm_DEFW_iter_asm_DEFW_next = 20;
-static const int parser_en_main_directives_DEFx_asm_DEFL_asm_DEFL_iter_asm_DEFL_next = 8;
+static const int parser_en_main_directives_DEFx_asm_DEFQ_asm_DEFQ_iter_asm_DEFQ_next = 8;
 static int get_start_state(ParseCtx *ctx)
 {
  OpenStruct *open_struct;
@@ -199,7 +199,7 @@ tr114:
 tr118:
 	{ push_expr(ctx); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
-     asm_DEFL(pop_expr(ctx));
+     asm_DEFQ(pop_expr(ctx));
      if ( ctx->p->tok == TK_COMMA )
       {goto st8;}
     }
@@ -208,7 +208,7 @@ tr123:
 	{ expr_open_parens--; }
 	{ push_expr(ctx); }
 	{ if (str_len(stmt_label)) { asm_LABEL(str_data(stmt_label)); str_len(stmt_label) = 0; };
-     asm_DEFL(pop_expr(ctx));
+     asm_DEFQ(pop_expr(ctx));
      if ( ctx->p->tok == TK_COMMA )
       {goto st8;}
     }
@@ -39092,7 +39092,7 @@ tr3420:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_L, expr_value );
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_Q, expr_value );
     }
 	goto st1570;
 tr3425:
@@ -39100,7 +39100,7 @@ tr3425:
 	{ push_expr(ctx); }
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
 	{ if (! expr_error)
-    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_L, expr_value );
+    asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_Q, expr_value );
     }
 	goto st1570;
 tr3428:

@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.44 2016-07-14 17:44:18 pauloscustodio Exp $
+ *      $Id: codegen.c,v 1.45 2016-07-15 12:45:18 pauloscustodio Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -958,7 +958,10 @@ void defword(void)
 /* Print pseudo-op to dump a long */
 void deflong(void)
 {
-    ot("defl\t");
+	if ( ISASM(ASM_Z80ASM) ) 
+		ot("defq\t");
+	else
+		ot("defl\t");
 }
 
 /* Print pseudo-op to define a string */

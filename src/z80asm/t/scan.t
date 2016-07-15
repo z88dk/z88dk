@@ -742,17 +742,17 @@ t_compile_module($init, <<'END', $objs);
 	T_RPAREN();
 	T_END();
 
-	SetTemporaryLine("ds.b ds.w ds.p ds.l "
-					 "DS.B DS.W DS.P DS.L ");
+	SetTemporaryLine("ds.b ds.w ds.p ds.q "
+					 "DS.B DS.W DS.P DS.Q ");
 	T_GET(TK_DS_B, "ds.b"); 
 	T_GET(TK_DS_W, "ds.w"); 
 	T_GET(TK_DS_P, "ds.p"); 
-	T_GET(TK_DS_L, "ds.l"); 
+	T_GET(TK_DS_Q, "ds.q"); 
 
 	T_GET(TK_DS_B, "DS.B"); 
 	T_GET(TK_DS_W, "DS.W"); 
 	T_GET(TK_DS_P, "DS.P"); 
-	T_GET(TK_DS_L, "DS.L"); 
+	T_GET(TK_DS_Q, "DS.Q"); 
 	T_END();
 
 	
@@ -776,7 +776,7 @@ t_compile_module($init, <<'END', $objs);
 	T_OPCODE(DEFC,		T_ALL);
 	T_OPCODE(DEFGROUP,	T_ALL);
 	T_OPCODE(DEFINE,	T_ALL);
-	T_OPCODE(DEFL,		T_ALL);
+	T_OPCODE(DEFQ,		T_ALL);
 	T_OPCODE(DEFM,		T_ALL);
 	T_OPCODE(DEFS,		T_ALL);
 	T_OPCODE(DEFVARS,	T_ALL);

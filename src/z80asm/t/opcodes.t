@@ -80,8 +80,8 @@ END_ASM
                                         ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
-        defl 0xFFFFFFFF                 ;; FF FF FF FF
-        defl 0xFFFFFFFF+1               ;; 00 00 00 00
+        defq 0xFFFFFFFF                 ;; FF FF FF FF
+        defq 0xFFFFFFFF+1               ;; 00 00 00 00
 
 ; call out of range
         call -32768                     ;; CD 00 80
@@ -115,10 +115,10 @@ label_2: ld   a,3                       ;; 3E 03
         defw 0,-8000h                   ;; 00 00 00 80
         defw ZERO+0FFFFh,ZERO-8000h     ;; FF FF 00 80
 
-        defl 012345678h,0FFFFFFFFh      ;; 78 56 34 12 FF FF FF FF
-        defl 0,-80000000h               ;; 00 00 00 00 00 00 00 80
-        defl ZERO+0FFFFFFFFh            ;; FF FF FF FF
-        defl ZERO-80000000h             ;; 00 00 00 80
+        defq 012345678h,0FFFFFFFFh      ;; 78 56 34 12 FF FF FF FF
+        defq 0,-80000000h               ;; 00 00 00 00 00 00 00 80
+        defq ZERO+0FFFFFFFFh            ;; FF FF FF FF
+        defq ZERO-80000000h             ;; 00 00 00 80
 
         defb $FF,0xFE,0BEH,0ebh         ;; FF FE BE EB
         defb ZERO+$FF                   ;; FF
@@ -166,7 +166,7 @@ label_2: ld   a,3                       ;; 3E 03
 ; BUG_0044: binary constants with more than 8 bits not accepted
         defw %"####---###--##-#"        ;; CD F1
         defw %01111000111001101         ;; CD F1
-        defl %"#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-"
+        defq %"#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-"
                                         ;; AA AA AA AA
 
         defb 1<0,1<1,1<2                ;; 00 00 01
@@ -285,7 +285,7 @@ EACH:   djnz EACH                       ;; 10 FE
                                         ;; E8 03
 
 ;------------------------------------------------------------------------------
-; DEFB, DEFW, DEFL
+; DEFB, DEFW, DEFQ
 ;------------------------------------------------------------------------------
 
         defb 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
@@ -295,7 +295,7 @@ EACH:   djnz EACH                       ;; 10 FE
         defb "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                         ;; 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A
         defw 0,102h,203h,304h           ;; 00 00 02 01 03 02 04 03
-        defl 0,1020304h,5060708h        ;; 00 00 00 00 04 03 02 01 08 07 06 05
+        defq 0,1020304h,5060708h        ;; 00 00 00 00 04 03 02 01 08 07 06 05
 
         defm "hello",32,"","world"      ;; 68 65 6C 6C 6F 20 77 6F 72 6C 64
         defm "hello",ZERO+32,"","world" ;; 68 65 6C 6C 6F 20 77 6F 72 6C 64
@@ -2302,7 +2302,7 @@ ENDIF
           df1  ds.b 4
           df2  ds.w 2
           df3  ds.p 2
-          df4  ds.l 2
+          df4  ds.q 2
           df5
           rr
 
@@ -2641,8 +2641,8 @@ END_ASM
                                         ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
-        defl 0xFFFFFFFF                 ;; FF FF FF FF
-        defl 0xFFFFFFFF+1               ;; 00 00 00 00
+        defq 0xFFFFFFFF                 ;; FF FF FF FF
+        defq 0xFFFFFFFF+1               ;; 00 00 00 00
 
 ; call out of range
         call -32768                     ;; CD 00 80
@@ -2676,10 +2676,10 @@ label_2: ld   a,3                       ;; 3E 03
         defw 0,-8000h                   ;; 00 00 00 80
         defw ZERO+0FFFFh,ZERO-8000h     ;; FF FF 00 80
 
-        defl 012345678h,0FFFFFFFFh      ;; 78 56 34 12 FF FF FF FF
-        defl 0,-80000000h               ;; 00 00 00 00 00 00 00 80
-        defl ZERO+0FFFFFFFFh            ;; FF FF FF FF
-        defl ZERO-80000000h             ;; 00 00 00 80
+        defq 012345678h,0FFFFFFFFh      ;; 78 56 34 12 FF FF FF FF
+        defq 0,-80000000h               ;; 00 00 00 00 00 00 00 80
+        defq ZERO+0FFFFFFFFh            ;; FF FF FF FF
+        defq ZERO-80000000h             ;; 00 00 00 80
 
         defb $FF,0xFE,0BEH,0ebh         ;; FF FE BE EB
         defb ZERO+$FF                   ;; FF
@@ -2727,7 +2727,7 @@ label_2: ld   a,3                       ;; 3E 03
 ; BUG_0044: binary constants with more than 8 bits not accepted
         defw %"####---###--##-#"        ;; CD F1
         defw %01111000111001101         ;; CD F1
-        defl %"#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-"
+        defq %"#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-"
                                         ;; AA AA AA AA
 
         defb 1<0,1<1,1<2                ;; 00 00 01
@@ -2846,7 +2846,7 @@ EACH:   djnz EACH                       ;; 10 FE
                                         ;; E8 03
 
 ;------------------------------------------------------------------------------
-; DEFB, DEFW, DEFL
+; DEFB, DEFW, DEFQ
 ;------------------------------------------------------------------------------
 
         defb 1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,'!'
@@ -2856,7 +2856,7 @@ EACH:   djnz EACH                       ;; 10 FE
         defb "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                         ;; 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A
         defw 0,102h,203h,304h           ;; 00 00 02 01 03 02 04 03
-        defl 0,1020304h,5060708h        ;; 00 00 00 00 04 03 02 01 08 07 06 05
+        defq 0,1020304h,5060708h        ;; 00 00 00 00 04 03 02 01 08 07 06 05
 
         defm "hello",32,"","world"      ;; 68 65 6C 6C 6F 20 77 6F 72 6C 64
         defm "hello",ZERO+32,"","world" ;; 68 65 6C 6C 6F 20 77 6F 72 6C 64
@@ -4699,7 +4699,7 @@ ENDIF
           df1  ds.b 4
           df2  ds.w 2
           df3  ds.p 2
-          df4  ds.l 2
+          df4  ds.q 2
           df5
           rr
 

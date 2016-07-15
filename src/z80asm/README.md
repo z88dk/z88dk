@@ -35,7 +35,6 @@ TODO List
 - Assembling 
 - Linking
 - List file
-- replace DEFL by DEFDW, to allow DEFL for variable labels
 - allow EQU as synonym to DEFC
 - finish the split between front-end and back-end;
 - implement an expression parser with a parser generator, to get rid of

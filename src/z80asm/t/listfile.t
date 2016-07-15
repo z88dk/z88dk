@@ -23,12 +23,12 @@ my $list = t::Listfile->new();
 $list->push_asm("defc A1 = 1");
 $list->push_asm("defb A1", 1);
 $list->push_asm("defw A1", 1, 0);
-$list->push_asm("defl A1", 1, 0, 0, 0);
+$list->push_asm("defq A1", 1, 0, 0, 0);
 
 # use before defined, global
 $list->push_asm("defb B1", 2);
 $list->push_asm("defw B1", 2, 0);
-$list->push_asm("defl B1", 2, 0, 0, 0);
+$list->push_asm("defq B1", 2, 0, 0, 0);
 $list->push_asm("defc B1 = 2");
 $list->push_asm("PUBLIC B1");
 

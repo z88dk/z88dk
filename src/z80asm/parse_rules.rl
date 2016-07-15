@@ -229,7 +229,7 @@ Define rules for a ragel-based parser.
 		| _TK_RCURLY _TK_NEWLINE	@{ ctx->current_sm = SM_MAIN; }
 		| name _TK_NEWLINE
 		  @{ asm_DEFVARS_define_const( str_data(name), 0, 0 ); }
-#foreach <S> in B, W, P, L
+#foreach <S> in B, W, P, Q
 		| name _TK_DS_<S> const_expr _TK_NEWLINE
 		  @{ if (! expr_error) 
 				asm_DEFVARS_define_const( str_data(name), DEFVARS_SIZE_<S>, expr_value ); 
@@ -276,9 +276,9 @@ Define rules for a ragel-based parser.
 				asm_DEFB_iter;
 
 	/*---------------------------------------------------------------------
-	*   DEFW / DEFL
+	*   DEFW / DEFQ
 	*--------------------------------------------------------------------*/
-#foreach <OP> in DEFW, DEFL
+#foreach <OP> in DEFW, DEFQ
 	asm_<OP>_iter =
 			asm_<OP>_next:
 				expr (_TK_COMMA | _TK_NEWLINE)
@@ -291,7 +291,7 @@ Define rules for a ragel-based parser.
 	asm_<OP> = 	label? _TK_<OP>	asm_<OP>_iter;
 #endfor  <OP>
 
-	directives_DEFx = asm_DEFS | asm_DEFB | asm_DEFW | asm_DEFL;
+	directives_DEFx = asm_DEFS | asm_DEFB | asm_DEFW | asm_DEFQ;
 	
 	/*---------------------------------------------------------------------
 	*   directives without arguments

@@ -210,7 +210,7 @@ z80asm(asm => "xx: DEFM xx,\"\\0\\1\\2\",3	;; 00 00 01 02 03");
 # ;; warn: 'DEFM' is deprecated, use 'DEFB' instead
 
 #------------------------------------------------------------------------------
-# DEFW, DEFL - simple use tested in opcodes.t
+# DEFW, DEFQ - simple use tested in opcodes.t
 # test error messages here
 #------------------------------------------------------------------------------
 z80asm(asm => "xx: DEFW 							;; error: syntax error");
@@ -225,16 +225,16 @@ z80asm(asm => "x1: DEFS 65535,0xAA \n x2: DEFW 0xAAAA ;; error: max. code size o
 z80asm(asm => "x1: DEFS 65533,0xAA \n x2: DEFW 0xAAAA, 0xAAAA ;; error: max. code size of 65536 bytes reached");
 
 
-z80asm(asm => "xx: DEFL 							;; error: syntax error");
-z80asm(asm => "xx: DEFL xx, 						;; error: syntax error");
-z80asm(asm => "xx: DEFL xx,xx+1020304h				;; 00 00 00 00 04 03 02 01");
+z80asm(asm => "xx: DEFQ 							;; error: syntax error");
+z80asm(asm => "xx: DEFQ xx, 						;; error: syntax error");
+z80asm(asm => "xx: DEFQ xx,xx+1020304h				;; 00 00 00 00 04 03 02 01");
 
-z80asm(asm => "x1: DEFS 65532,0xAA \n x2: DEFL 0xAAAAAAAA",
+z80asm(asm => "x1: DEFS 65532,0xAA \n x2: DEFQ 0xAAAAAAAA",
 	   bin => "\xAA" x 65536);
-z80asm(asm => "x1: DEFS 65528,0xAA \n x2: DEFL 0xAAAAAAAA, 0xAAAAAAAA",
+z80asm(asm => "x1: DEFS 65528,0xAA \n x2: DEFQ 0xAAAAAAAA, 0xAAAAAAAA",
 	   bin => "\xAA" x 65536);
-z80asm(asm => "x1: DEFS 65533,0xAA \n x2: DEFL 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached");
-z80asm(asm => "x1: DEFS 65529,0xAA \n x2: DEFL 0xAAAAAAAA, 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached");
+z80asm(asm => "x1: DEFS 65533,0xAA \n x2: DEFQ 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached");
+z80asm(asm => "x1: DEFS 65529,0xAA \n x2: DEFQ 0xAAAAAAAA, 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached");
 
 
 #------------------------------------------------------------------------------
@@ -250,7 +250,7 @@ z80asm(
 		df1 ds.b 4;						; df1 = 0x80
 		df2 ds.w 2;						; df2 = 0x80 + 4 = 0x84
 		df3 ds.p 2;						; df3 = 0x84 + 2*2 = 0x88
-		df4 ds.l 2;						; df4 = 0x88 + 2*3 = 0x8E
+		df4 ds.q 2;						; df4 = 0x88 + 2*3 = 0x8E
 		df5 							; df5 = 0x8E + 2*4 = 0x96
 										
 	}									
@@ -291,8 +291,8 @@ z80asm(
 	asm 	=> <<END,
 	defvars 0
 	{
-		df1	ds.l 10
-		df2	ds.l 16383					;; error: integer '65572' out of range
+		df1	ds.q 10
+		df2	ds.q 16383					;; error: integer '65572' out of range
 	}
 END
 );
@@ -301,7 +301,7 @@ z80asm(
 	asm 	=> <<END,
 	defvars 0
 	{
-		df2	ds.l 16384					;; error: integer '65536' out of range
+		df2	ds.q 16384					;; error: integer '65536' out of range
 	}
 END
 );
@@ -330,7 +330,7 @@ z80asm(
 	asm 	=> <<END,
 	defvars undefined					;; error: symbol 'undefined' not defined
 	{
-		df2	ds.l 1
+		df2	ds.q 1
 	}
 END
 );

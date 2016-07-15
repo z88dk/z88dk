@@ -13,7 +13,7 @@
 # 
 # Added features:
 # - Assembly MACROs with named parameters and optional local symbols: MACRO .. LOCAL xx .. ENDM
-# - DEFL to redefine a symbol, maybe using the previous value - NOTE: hides z80asm's DEFL for define long
+# - DEFL to redefine a symbol, maybe using the previous value
 # - EQU to define a symbol, translated to DEFC
 # - Label fields start on column 1 and don't need dot-prefix or colon-suffix
 # - END ends the assembly
