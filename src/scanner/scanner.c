@@ -239,12 +239,10 @@ int main(int argc, char **argv)
                 write_defined("startup", atoi(ptr+9));
             } else if ( strncmp(ptr, "-farheap=", 9) == 0 ) {
                 write_defined("farheapsz", atoi(ptr+9));
-            } else if ( strncmp(ptr, "-intuition", 9) == 0 ) {
-                write_defined("intuition", 1);
             } else if ( strncmp(ptr, "-expandz88", 9) == 0 ) {
-                write_need("expanded", 1);
+                write_defined("CRT_Z88_EXPANDED", 1);
             } else if ( strncmp(ptr, "-no-expandz88", 9) == 0 ) {
-                write_need("expanded", 0);
+                write_defined("CRT_Z88_EXPANDED", 0);
             } else {
                 printf("%s\n",buf);
             }

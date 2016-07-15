@@ -19,7 +19,7 @@
 ;
 ;	6/10/2001 djm Clean up (after Henk)
 ;
-;	$Id: app_crt0.asm,v 1.29 2016-07-13 22:12:25 dom Exp $
+;	$Id: app_crt0.asm,v 1.30 2016-07-15 19:32:43 dom Exp $
 
 
 ;--------
@@ -44,10 +44,10 @@
 ; Set an origin for the application (-zorg=) default to 49152
 ;--------
 
-        IF      !CRT_ORG_CODE
+        IF      !DEFINED_CRT_ORG_CODE
                 defc    CRT_ORG_CODE  = 49152
         ENDIF
-                org     CRT_ORG_CODE
+        org     CRT_ORG_CODE
 
 ;--------
 ; Define the graphics map and segment for apps
@@ -61,10 +61,13 @@
 ;--------
 ; We need a CRT_Z88_SAFEDATA def. So if not defined set to 0
 ;--------
-        IF      !CRT_Z88_SAFEDATA
+        IF      !DEFINED_CRT_Z88_SAFEDATA
                 defc    CRT_Z88_SAFEDATA = 0
         ENDIF
 
+	IF	!DEFINED_CRT_Z88_EXPANDED
+		defc	CRT_Z88_EXPANDED = 1
+	ENDIF
 
 ;--------
 ; Start of execution. We enter with ix pointing to info table about
@@ -74,7 +77,7 @@ app_entrypoint:
 crt0_reqpag_check:
 	ld	a,0
 	and	a
-IF (NEED_expanded=0)
+IF CRT_Z88_EXPANDED=0
         jr      z,init_continue
 ELSE
         jr      z,init_check_expanded
@@ -84,12 +87,12 @@ ENDIF
         ld      a,(ix+2)	;Check allocated bad memory if needed
         cp      c
         ld      hl,nomemory
-IF (NEED_expanded=0)			
+IF CRT_Z88_EXPANDED = 0
         jr      nc,init_continue
 ELSE
         jr      c,init_error
 ENDIF
-IF NEED_expanded <> 0
+IF CRT_Z88_EXPANDED != 0
 init_check_expanded:
         ld      ix,-1		;Check for an expanded machine
         ld      a,FA_EOF
@@ -275,7 +278,7 @@ nomemory:
         defm    "Sorry, please try again later!"
         defb    0
 
-IF NEED_expanded <> 0
+IF CRT_Z88_EXPANDED != 0
 need_expanded_text:
         defb    1,'3','@',32,32,1,'2','J','C'
         defm    "Expanded machine needed!"
