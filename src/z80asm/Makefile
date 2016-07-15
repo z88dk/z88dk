@@ -67,7 +67,7 @@ TARGET =		z80asm$(EXESUFFIX)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 LOCAL_LIB :=	lib
-CFLAGS +=		-I. -I$(LOCAL_LIB) -It -Wall
+CFLAGS +=		-I. -I$(LOCAL_LIB) -It -Wall -std=c99 # -std=c++98
 
 #------------------------------------------------------------------------------
 # main
@@ -149,7 +149,7 @@ testmsvc : $(MSVC_TARGET)
 	make Z80ASM=$(MSVC_TARGET) prove
 
 test_enigma: $(TARGET)
-	zcc +cpm -oenigma.bin -vn t/data/enigma.c
+	zcc +cpm -oenigma.bin t/data/enigma.c
 	echo HELLO. | cpm enigma.bin > enigma.out
 	echo 'Enter text to be (de)coded, finish with a .' > enigma.bmk
 	echo 'HREXLSLEOC .' >> enigma.bmk
