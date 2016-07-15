@@ -16,7 +16,7 @@
 ;
 ; - - - - - - - -
 ;
-; $Id: z88_crt0.asm,v 1.16 2016-05-17 21:47:58 dom Exp $
+; $Id: z88_crt0.asm,v 1.17 2016-07-15 19:35:07 dom Exp $
 ;
 ; - - - - - - - -
 
@@ -50,7 +50,7 @@
 ;-------
 ; Select which particular startup we want
 ;-------
-IF DEFINED_startup
+
 ; User specified startup type, so do as they wish then drop out otherwise
 ; Use -startup=1 for basic      } (For sake of completeness only - don't
 ;     -startup=2 for app        } use them!)
@@ -68,10 +68,3 @@ IF DEFINED_startup
 		INCLUDE "z88s_crt0.asm"
 	ENDIF
 
-ELSE 
-        IF NEED_appstartup
-                INCLUDE "app_crt0.asm"
-        ELSE
-                INCLUDE "bas_crt0.asm"
-        ENDIF
-ENDIF
