@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.144 2016-07-15 02:59:14 pauloscustodio Exp $
+ *      $Id: zcc.c,v 1.145 2016-07-15 05:08:21 aralbrec Exp $
  */
 
 
@@ -20,6 +20,7 @@
 #include        <stdarg.h>
 #include        <ctype.h>
 #include        <stddef.h>
+#include        <time.h>
 #include        "zcc.h"
 
 #ifdef WIN32
@@ -148,6 +149,7 @@ static int             c_nocrt = 0;
 
 
 static char            filenamebuf[FILENAME_MAX + 1];
+static char            tmpnambuf[] = "zccXXXX";
 
 
 #define ASM_Z80ASM 0
@@ -562,6 +564,11 @@ int main(int argc, char **argv)
     char            asmarg[4096];    /* Hell, that should be long enough! */
     char            buffer[LINEMAX + 1];    /* For reading in option file */
     FILE           *fp;
+
+#ifdef WIN32
+    /* Randomize temporary filenames for windows */
+    snprintf(tmpnambuf+3, sizeof(tmpnambuf)-3, "%04X", ((unsigned int)time(NULL)) & 0xffff);
+#endif
 
     asmargs = linkargs = cpparg = NULL;
 
@@ -1753,11 +1760,10 @@ void tempname(char *filen)
 #ifdef _WIN32
     char   *ptr;
 
-    if ((ptr = _tempnam(".\\", "z1d9k")) == NULL) {
+    if ((ptr = _tempnam(".\\", tmpnambuf)) == NULL) {
         fprintf(stderr, "Failed to create temporary filename\n");
         exit(1);
     }
-
     strcpy(filen, ptr);
     free(ptr);
 #elif defined(__MSDOS__) && defined(__TURBOC__)

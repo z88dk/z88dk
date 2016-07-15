@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.44 2016-07-14 20:16:13 aralbrec Exp $
+ *   $Id: appmake.c,v 1.45 2016-07-15 05:08:21 aralbrec Exp $
  */
 
 
@@ -13,6 +13,7 @@
 #define MAIN_C
 #include "appmake.h"
 #include <stdlib.h>
+#include <time.h>
 
 
 #if (__GNUC__ || _BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
@@ -39,6 +40,7 @@ static void         cleanup_temporary_files(void);
 
 static int          num_temp_files = 0;
 static char       **temp_files = NULL;
+static char         tmpnambuf[] = "apmXXXX";
 
 
 int main(int argc, char *argv[])
@@ -48,6 +50,11 @@ int main(int argc, char *argv[])
     char  **av;
     char   *ptr;
     char   *target = NULL;
+
+#ifdef WIN32
+    /* Randomize temporary filenames for windows */
+    snprintf(tmpnambuf+3, sizeof(tmpnambuf)-3, "%04X", ((unsigned int)time(NULL)) & 0xffff);
+#endif
 
     chain_temp_filename[0] = 0;
 
@@ -789,9 +796,9 @@ int bin2hex(FILE *input, FILE *output, int address)
         size = 0;
         while (size < RECSIZE) {
             byte = fgetc(input);             
-	    if ( byte == EOF ) {
-		break;
-	    }
+        if ( byte == EOF ) {
+            break;
+        }
 
             inbuf[size++] = byte;
         }
@@ -826,11 +833,10 @@ static void get_temporary_filename(char *filen)
 #ifdef _WIN32
     char   *ptr;
 
-    if ((ptr = _tempnam(".\\", "z1d9k")) == NULL) {
+    if ((ptr = _tempnam(".\\", tmpnambuf)) == NULL) {
         fprintf(stderr, "Failed to create temporary filename\n");
         exit(1);
     }
-
     strcpy(filen, ptr);
     free(ptr);
 #elif defined(__MSDOS__) && defined(__TURBOC__)
