@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.145 2016-07-15 05:08:21 aralbrec Exp $
+ *      $Id: zcc.c,v 1.146 2016-07-16 02:45:14 aralbrec Exp $
  */
 
 
@@ -567,7 +567,7 @@ int main(int argc, char **argv)
 
 #ifdef WIN32
     /* Randomize temporary filenames for windows */
-    snprintf(tmpnambuf+3, sizeof(tmpnambuf)-3, "%04X", ((unsigned int)time(NULL)) & 0xffff);
+    snprintf(tmpnambuf, sizeof(tmpnambuf), "zcc%04X", ((unsigned int)time(NULL)) & 0xffff);
 #endif
 
     asmargs = linkargs = cpparg = NULL;
@@ -1499,8 +1499,7 @@ void PragmaInclude(arg_t *arg, char *val)
 
     while (ispunct(*ptr)) ++ptr;
 
-    if (strlen(ptr))
-    {
+    if (*ptr != '\0') {
         free(pragincname);
         pragincname = strdup(ptr);
     }

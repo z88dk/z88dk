@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.45 2016-07-15 05:08:21 aralbrec Exp $
+ *   $Id: appmake.c,v 1.46 2016-07-16 02:45:37 aralbrec Exp $
  */
 
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
 #ifdef WIN32
     /* Randomize temporary filenames for windows */
-    snprintf(tmpnambuf+3, sizeof(tmpnambuf)-3, "%04X", ((unsigned int)time(NULL)) & 0xffff);
+    snprintf(tmpnambuf, sizeof(tmpnambuf), "apm%04X", ((unsigned int)time(NULL)) & 0xffff);
 #endif
 
     chain_temp_filename[0] = 0;
