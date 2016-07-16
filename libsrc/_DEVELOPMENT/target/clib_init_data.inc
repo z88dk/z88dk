@@ -17,7 +17,7 @@
    
    ENDIF
    
-   IF (__crt_model = 2)
+   IF (__crt_model >= 2)
    
       ; rom model + data section is compressed
       

@@ -6,24 +6,14 @@
          ; program restarts
          
          IF (__crt_enable_commandline < 2)
-         
-            IF (__register_sp = -1)
-         
-               ld sp,(__sp_or_ret)
-            
-            ENDIF
-         
+                  
             jp __Restart
          
          ELSE
          
-            IF (__register_sp = -1)
-            
-               ld sp,(__sp_or_ret)
-            
-            ELSE
-            
-               include "../crt_locate_stack.inc"
+            IF (__register_sp != -1)
+                        
+               include "../crt_init_sp.inc"
                
             ENDIF
             
@@ -35,20 +25,17 @@
          
       ELSE
       
-         pop hl                ; hl = return status
-      
          IF (__crt_on_exit & 0x2)
          
             ; program returns to caller
 
-            ld sp,(__sp_or_ret)
             ret
          
          ELSE
          
             IF (__crt_on_exit & 0x4)
             
-            ; program jumps to caller
+               ; program jumps to caller
 
                ld de,(__sp_or_ret)
                push de
@@ -70,8 +57,6 @@
    ELSE
    
       ; program jumps to absolute address
-	  
-      pop hl                   ; hl = return status
       
       IF (__crt_on_exit & 0xffff)
 
