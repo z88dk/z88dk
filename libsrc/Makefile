@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.246 2016-07-14 13:30:10 pauloscustodio Exp $
+# $Id: Makefile,v 1.247 2016-07-16 21:53:30 dom Exp $
 
 
 include Make.config
@@ -27,7 +27,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	embedded_clib.lib test_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
 
-genlibs: z80_crt0.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
+genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
 	 im2.lib rect.lib algorithm.lib lib3d.lib x11.lib
 
 c128libs: c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib 
@@ -159,6 +159,13 @@ gen_math.lib:
 	@echo '--- Building Z80 Generic Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/genmath
+
+# Math48
+math48.lib:
+	@echo ''
+	@echo '--- Building Z80 math48 Library ---'
+	@echo ''
+	$(MAKE) -C math/math48
 
 # Z88 maths build - dom
 z88_math.lib:
@@ -1368,6 +1375,7 @@ clean:
 	$(MAKE) -C sdcard clean
 	$(MAKE) -C games clean
 	$(MAKE) -C x1 clean
+	$(MAKE) -C math clean
 	$(RM) *.lib
 
 install:
