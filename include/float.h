@@ -2,26 +2,27 @@
 #define __FLOAT_H__
 
 #include <sys/compiler.h>
+#include <sys/types.h>
 
 
 /*
  *	Some more floating point routines..I can't remember
  *	why these are separated out..
  *
- *	$Id: float.h,v 1.12 2015-10-05 05:46:39 stefano Exp $
+ *	$Id: float.h,v 1.13 2016-07-16 22:00:08 dom Exp $
  */
 
 
 
-extern double __LIB__ fmod(double,double) __SMALLCDECL;
-extern double __LIB__ amax(double,double) __SMALLCDECL;
-extern double __LIB__ fabs(double) __SMALLCDECL;
-extern double __LIB__ amin(double,double) __SMALLCDECL;
-extern double __LIB__ floor(double) __SMALLCDECL;
-extern double __LIB__ ceil(double) __SMALLCDECL;
-extern double __LIB__ fprand(void) __SMALLCDECL; /* Generic only */
-extern double __LIB__ __FASTCALL__ zfloat(int);
-extern int __LIB__ fpseed(double) __SMALLCDECL;    /* Seed random number */
+extern double_t __LIB__ fmod(double_t,double_t) __SMALLCDECL;
+extern double_t __LIB__ amax(double_t,double_t) __SMALLCDECL;
+extern double_t __LIB__ fabs(double_t) __SMALLCDECL;
+extern double_t __LIB__ amin(double_t,double_t) __SMALLCDECL;
+extern double_t __LIB__ floor(double_t) __SMALLCDECL;
+extern double_t __LIB__ ceil(double_t) __SMALLCDECL;
+extern double_t __LIB__ fprand(void) __SMALLCDECL; /* Generic only */
+extern double_t __LIB__ __FASTCALL__ zfloat(int);
+extern int __LIB__ fpseed(double_t) __SMALLCDECL;    /* Seed random number */
 
 
 #define fmax(x,y) amax(x,y)
@@ -35,17 +36,14 @@ extern int __LIB__ fpseed(double) __SMALLCDECL;    /* Seed random number */
 //#define fmod(x,y) (x-(fabs(y)*trunc(x/fabs(y))))
 #define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
 
-#ifndef _HAVE_ATOF_
-#define _HAVE_ATOF_
-extern double __LIB__ atof(char *) __SMALLCDECL;
-#endif
+extern double_t __LIB__ atof(char *) __SMALLCDECL;
 
 
 /*
  * Some support routines for floating point printf
  */
-extern void __LIB__ ftoa(double, int, char *) __SMALLCDECL;
-extern void __LIB__ ftoe(double, int, char *) __SMALLCDECL;
+extern void __LIB__ ftoa(double_t, int, char *) __SMALLCDECL;
+extern void __LIB__ ftoe(double_t, int, char *) __SMALLCDECL;
 
 /* 
  * Some constant nicked from /usr/include/math.h

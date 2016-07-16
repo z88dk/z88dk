@@ -2,37 +2,38 @@
 #define __MATH_H__
 
 #include <sys/compiler.h>
+#include <sys/types.h>
 #include <float.h>
 
-/* $Id: math.h,v 1.17 2016-07-01 12:57:16 stefano Exp $ */
+/* $Id: math.h,v 1.18 2016-07-16 22:00:08 dom Exp $ */
 
 
-extern double __LIB__ acos(double);  /* arc cosine */
-extern double __LIB__ asin(double);  /* arc cosine */
-extern double __LIB__ atan(double);  /* arc tangent */
-extern double __LIB__ atan2(double,double); /* atan2(a,b) = arc tangent of a/b */
-extern double __LIB__ cos(double);   /* cosine */
-extern double __LIB__ cosh(double);  /* hyperbolic cosine */
-extern double __LIB__ exp(double);   /* exponential */
-extern double __LIB__ log(double);   /* natural logarithm */
-extern double __LIB__ log10(double); /* log base 10 */
-extern double __LIB__ pi();          /* greek pi */
-extern double __LIB__ pow(double,double);   /* pow(x,y) = x**y */
-extern double __LIB__ sin(double);   /* sine */
-extern double __LIB__ sinh(double);  /* hyperbolic sine */
-extern double __LIB__ sqrt(double);  /* square root */
-extern double __LIB__ tan(double);   /* tangent */
-extern double __LIB__ tanh(double);  /* hyperbolic tangent */
+extern double_t __LIB__ acos(double_t);  /* arc cosine */
+extern double_t __LIB__ asin(double_t);  /* arc cosine */
+extern double_t __LIB__ atan(double_t);  /* arc tangent */
+extern double_t __LIB__ atan2(double_t,double_t); /* atan2(a,b) = arc tangent of a/b */
+extern double_t __LIB__ cos(double_t);   /* cosine */
+extern double_t __LIB__ cosh(double_t);  /* hyperbolic cosine */
+extern double_t __LIB__ exp(double_t);   /* exponential */
+extern double_t __LIB__ log(double_t);   /* natural logarithm */
+extern double_t __LIB__ log10(double_t); /* log base 10 */
+extern double_t __LIB__ pi();          /* greek pi */
+extern double_t __LIB__ pow(double_t,double_t);   /* pow(x,y) = x**y */
+extern double_t __LIB__ sin(double_t);   /* sine */
+extern double_t __LIB__ sinh(double_t);  /* hyperbolic sine */
+extern double_t __LIB__ sqrt(double_t);  /* square root */
+extern double_t __LIB__ tan(double_t);   /* tangent */
+extern double_t __LIB__ tanh(double_t);  /* hyperbolic tangent */
 #define log2(a) (log(a)/M_LN2)
 
 #ifndef _HAVE_ATOF_
 #define _HAVE_ATOF_
-extern double __LIB__ atof(char *);
+extern double_t __LIB__ atof(char *);
 #endif
 
 /* Some additional CPC only routines now */
 #if __CPC__ && __NATIVE_MATH__
-  extern double __LIB__ pow10(int x);         /* pow(10,x) - CPC only */
+  extern double_t __LIB__ pow10(int x);         /* pow(10,x) - CPC only */
   extern void __LIB__ deg();
   extern void __LIB__ rad();
 #else
@@ -59,9 +60,9 @@ extern double __LIB__ atof(char *);
 #define fdim(a,b) (a>b?a-b:b-a)
 #define fma(x,y,z) (x*y+z)
 
-//extern double __LIB__ frexp(double val, int *exp);	/* get mantissa and exponent */
-//extern int __LIB__ ilogb(double val);					/* get exponent */
-//extern int __LIB__ logb(double val);					/* get exponent */
+//extern double_t __LIB__ frexp(double_t val, int *exp);	/* get mantissa and exponent */
+//extern int __LIB__ ilogb(double_t val);					/* get exponent */
+//extern int __LIB__ logb(double_t val);					/* get exponent */
 
 #define infinity() INFINITY
 

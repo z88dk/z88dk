@@ -3,12 +3,29 @@
  * instead of the underlying base type.  By convention, all type names end 
  * with _t.
  *
- * $Id: types.h,v 1.5 2006-12-16 10:21:10 aralbrec Exp $
+ * $Id: types.h,v 1.6 2016-07-16 22:00:08 dom Exp $
  */
 
 #ifndef __SYS_TYPES_H__
 #define __SYS_TYPES_H__
 
+#ifndef _FLOAT_T
+#define _FLOAT_T
+#ifdef Z88DK_USES_SDCC
+typedef float float_t;
+#else
+typedef double float_t;
+#endif
+#endif
+
+#ifndef _DOUBLE_T
+#define _DOUBLE_T
+#ifdef Z88DK_USES_SDCC
+typedef float double_t;
+#else
+typedef double double_t;
+#endif
+#endif
 
 #ifndef _SIZE_T
 #define _SIZE_T
