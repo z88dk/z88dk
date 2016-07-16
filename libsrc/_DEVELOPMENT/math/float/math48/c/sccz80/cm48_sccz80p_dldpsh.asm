@@ -13,7 +13,7 @@ cm48_sccz80p_dldpsh:
    ;
    ; exit  : stack  = double (sccz80 format)
    ;
-   ; uses  : a, bc, de, hl, ix
+   ; uses  : af, bc, de, hl
 
    ld c,(hl)
    inc hl
@@ -28,10 +28,11 @@ cm48_sccz80p_dldpsh:
    ld h,(hl)
    ld l,a                      ; hldebc = six bytes sccz80 float
 
-   pop ix
+   pop af
 
    push hl
    push de
    push bc
-   
-   jp (ix)
+
+   push af
+   ret
