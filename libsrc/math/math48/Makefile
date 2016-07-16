@@ -4,7 +4,7 @@
 
 include ../../Make.config
 
-CFILES = ftoe.c ftoa.c atof.c
+CFILES = ftoe_impl.c ftoa_impl.c atof_impl.c
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)

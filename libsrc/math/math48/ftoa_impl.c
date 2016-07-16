@@ -15,11 +15,12 @@
 
 
 
-
-void ftoa(x,f,str)
-double x;       /* the number to be converted */
-int f;          /* number of digits to follow decimal point */
-char *str;      /* output string */
+/**
+ * \param x - The number to be converted
+ * \param f - The number of digits after the decimal point
+ * \param str - The buffer
+ */
+void ftoa_impl(double x,int f,char *str)
 {
         double scale;           /* scale factor */
         int i,                          /* copy of f, and # digits before decimal point */
@@ -65,3 +66,4 @@ char *str;      /* output string */
         }
         *str = 0;
 }
+

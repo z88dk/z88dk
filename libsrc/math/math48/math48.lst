@@ -899,5 +899,12 @@
 ../../_DEVELOPMENT/math/float/math48//z80/core/mm48_tan.asm
 ../../_DEVELOPMENT/math/float/math48//z80/core/mm48_tenf.asm
 ftoe
-ftoa
+_ftoe
+ftoe_impl
 atof
+_atof
+atof_impl
+ftoa
+_ftoa
+ftoa_impl
+

@@ -1,7 +1,6 @@
 /*
  *	Atof (generic routine)
  *
- *	Don't recompile cos we get a label clash!
  */
 
 
@@ -12,7 +11,8 @@
 
 /* decimal to (double) binary conversion */
 
-double atof(s)
+
+double atof_impl(s)
 unsigned char s[];		/* s points to a character string */
 {
 	double sum,		/* the partial result */
