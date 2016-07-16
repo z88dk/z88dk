@@ -1,6 +1,6 @@
 
 
-	SECTION	atof
+        SECTION code_fp_math48
 
 	PUBLIC	atof
 	EXTERN  _atof_impl

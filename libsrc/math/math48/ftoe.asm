@@ -1,6 +1,6 @@
 
 
-	SECTION	ftoe
+	SECTION	code_fp_math48
 
 	PUBLIC	ftoe
 	EXTERN  _ftoe_impl

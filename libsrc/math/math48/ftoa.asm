@@ -1,6 +1,6 @@
 
 
-	SECTION	ftoa
+        SECTION code_fp_math48
 
 	PUBLIC	ftoa
 	EXTERN  _ftoa_impl
