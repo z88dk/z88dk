@@ -1,0 +1,849 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - subsystems/cli_parser.hpp - A General-Purpose Command-Line Parser</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="subsystems.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>subsystems/cli_parser.hpp<br>A General-Purpose Command-Line Parser</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="cli_parser_hpp.html">Browse Header cli_parser.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#initialisation">Initialisation</a></li>
+<li class="internal"><a href="#definitions">Option Definitions</a></li>
+<li class="internal"><a href="#ini_files">Importing Defaults from Ini Files</a></li>
+<li class="internal"><a href="#command_line">Parsing the Command-Line</a></li>
+<li class="internal"><a href="#interpreting">Interpreting the Command-Line</a></li>
+<li class="internal"><a href="#usage">Usage Reports</a></li>
+<li class="internal"><a href="#exceptions">Exceptions thrown</a></li>
+<li class="internal"><a href="#examples">Examples</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The CLI parser component is a general-purpose command-line processor
+intended for simplifying the creation of command-line tools. It performs three
+functions: parsing of the command line; reading default values from an Ini
+file; implementing built-in default values.</p>
+
+<p>The parser works off a set of parameter definitions. These define the set
+of command line options and their behaviour. It also determines whether the
+command can take arguments or only options.</p>
+
+<p>Associated with each definition is a default value. These are stored in the
+command-line parser and become the initial values of the options. These may
+later be overridden from the Ini files or from the command-line itself.</p>
+
+<p>The parser can also optionally read default values from an Ini file, managed by the
+<a href="ini_manager.html">ini_manager</a> component. These are in addition to
+the built-in default values, not instead of them.</p>
+
+<p>Finally, the command-line itself is read and options specified from the
+command line added to the set of values.</p>
+
+<p>The processed command line is then accessed by indexing into an array - a
+bit like reading argv, except that options and their values are combined into
+a single element. Default values appear in this array so that default values
+are handled in the same way as command-line values. The idea is that you
+simply process the options from left to right and by doing so you
+automatically get all the options including built-in defaults, Ini-file
+defaults and user-specified options.</p>
+
+<p>The following sections will make all this clearer.</p>
+
+
+<h2 id="initialisation">Initialisation</h2>
+
+<p>The command-liner parser has a multi-stage initialisation phase. Some of
+the stages in the initialisation are compulsory and some are optional. The
+following stages are processed in the order given:</p>
+
+<dl>
+
+<dt>Set up an error handler (required)</dt>
+
+<dd><p>The CLI parser contains a reference to an error handler (see
+<a href="message_handler.html">message_handler.hpp</a>). Since this is a
+reference, it must be initialised by a constructor. The CLI parser cannot be
+used (at present) without an error handler since syntax errors in the
+command-line and Ini-files are reported using the error handler.</p></dd>
+
+<dt>Set up definitions (required)</dt>
+
+<dd><p>The set of options supported are set up in the CLI parser by passing it
+a set of definitions. There are two representations of these definitions.
+There is a C-like form which is good for declaring definitions as a static
+structure and there's a C++ form which is good for building definitions
+dynamically. Both forms support the concept of built-in default values for
+each option.</p></dd>
+
+<dt>Read default values from an ini-file (optional)</dt>
+
+<dd><p>The built-in default values can be overridden by default values
+specified in an ini-file
+(see <a href="ini_manager.html">ini_manager.hpp</a>.
+This is an optional step since not all programs require that level of
+configuration.</p></dd>
+
+<dt>Parse the command-line (optional)</dt>
+
+<dd><p>The command line, or at least a command-line-like structure is then
+parsed to check that it conforms to the syntax defined by the definitions.
+This is made optional because the CLI parser can make a convenient interface
+to configuration files, simplifying further the interface to the ini-files.</p></dd>
+
+</dl>
+
+<p>The command-line parser has a large number of constructors representing the
+most common combinations of initialisations:</p>
+
+<pre class="cpp">
+class stlplus::cli_parser
+{
+public:
+  cli_parser(stlplus::message_handler&amp; errors);
+
+  cli_parser(stlplus::cli_definitions_t, stlplus::message_handler&amp; errors) throw(stlplus::cli_mode_error);
+  cli_parser(stlplus::cli_definitions_t, const stlplus::ini_manager&amp; defaults, const std::string&amp; ini_section, stlplus::message_handler&amp; errors) throw(stlplus::cli_mode_error);
+  cli_parser(char* argv[], stlplus::cli_definitions_t, stlplus::message_handler&amp; errors) throw(stlplus::cli_mode_error);
+  cli_parser(char* argv[], stlplus::cli_definitions_t, const stlplus::ini_manager&amp; defaults, const std::string&amp; ini_section, stlplus::message_handler&amp; errors) throw(stlplus::cli_mode_error);
+
+  cli_parser(stlplus::cli_definitions, stlplus::message_handler&amp; errors) throw(stlplus::cli_mode_error);
+  cli_parser(stlplus::cli_definitions, const stlplus::ini_manager&amp; defaults, const std::string&amp; ini_section, stlplus::message_handler&amp; errors) throw(stlplus::cli_mode_error);
+  cli_parser(char* argv[], stlplus::cli_definitions, stlplus::message_handler&amp; errors) throw(stlplus::cli_mode_error);
+  cli_parser(char* argv[], stlplus::cli_definitions, const stlplus::ini_manager&amp; defaults, const std::string&amp;
+ini_section, stlplus::message_handler&amp; errors) throw(stlplus::cli_mode_error);
+};
+</pre>
+
+<p>The parser must have a <a href="message_handler.html">stlplus::message_handler</a> to
+report parsing errors and to report usage information. Therefore all
+constructors require this field. The first constructor only sets up the error
+handler but defers all other initialisations.</p>
+
+<p>All parsers must also have a set of definitions (defined in the next
+section). When using the first constructor, you must explicitly set up the
+definitions using the add_definitions or add_definition (note the plural
+versus the singular). All the other constructors include this stage.</p>
+
+<p>The second constructor does both jobs - it sets up the error handler and
+sets up the definitions. Note that if there is an error in the definitions an
+exception is thrown.</p>
+
+<p>The third constructor does these jobs but also reads default values
+from an Ini-file. You have to use the <a
+href="ini_manager.html">stlplus::ini_manager</a> class to manage the Ini files. You
+also have to state which section of the Ini file to read - Ini files are
+divided into sections, typically one for each tool in a set of tools. It is
+recommended that default command-line options are stored in an Ini-file
+section with the same name as the command, but this is a recommendation not a
+rule.</p>
+
+<p>The fourth constructor sets up the error handler, sets up the definitions
+and then parses the command line. It excludes the ini-file handling.</p>
+
+<p>The fifth constructor includes all of the stages.</p>
+
+<p>The remaining four constructors do the same job but with the C++ version of
+the definitions structure rather than the C form.</p>
+
+<p>If you wish, you can perform each task separately. In that case, you must
+set up the stlplus::message_handler first since that is required by the first
+constructor. The definitions should be added next, followed by the Ini-file
+defaults (optional) and then the comamnd-line parsing.</p>
+
+<p>Also, if you prefer to set of the definitions one by one, you can do
+so.</p>
+
+<p>The support functions for the step-by-step approach are:</p>
+
+<pre class="cpp">
+void cli_parser::add_definitions(definitions) throw(stlplus::cli_mode_error);
+unsigned cli_parser::add_definition(const definition&amp;) throw(stlplus::cli_mode_error);
+void cli_parser::set_defaults(const stlplus::ini_manager&amp; defaults, const std::string&amp; ini_section);
+bool parse(char* argv[]);
+</pre>
+
+
+<h2 id="definitions">Option Definitions</h2>
+
+<p>The command-line parser is initialised with a set of definitions for the
+options supported by the application. There are two ways of creating
+definitions - what I refer to as a C form and a C++ form.</p>
+
+<p>The C form is a C array (not a vector) of C structs. This is a form that
+can be used in a static declaration. It can also be a very compact form
+because it can be declared using the C aggregate notation. For example:</p>
+
+<pre class="cpp">
+stlplus::cli_definitions_t definitions =
+  {
+    {"help",    stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_HELP",    0},
+    {"map",     stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_MAP",     0},
+    {"create",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_CREATE",  0},
+    {"add",     stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_ADD",     0},
+    {"remove",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_REMOVE",  0},
+    {"delete",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_DELETE",  0},
+    {"work",    stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_WORK",    0},
+    {"lock",    stlplus::cli_switch_kind, stlplus::cli_multiple_mode, "VLIBRARY_USAGE_LOCK",    0},
+    {"unlock",  stlplus::cli_switch_kind, stlplus::cli_multiple_mode, "VLIBRARY_USAGE_UNLOCK",  0},
+    {"tidy",    stlplus::cli_switch_kind, stlplus::cli_multiple_mode, "VLIBRARY_USAGE_TIDY",    0},
+    {"verbose", stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_VERBOSE", 0},
+    {"version", stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_VERSION", "on"},
+    END_CLI_DEFINITIONS
+  };
+</pre>
+
+<p>The above example only contains static values and therefore could be
+declared in any static (file) scope. Note how the suffix "_t" has been used.
+This is a common convention for C types and I have used this notation to
+reinforce the C-like nature of these structures. The last element of the
+aggregate must be the macro END_CLI_DEFINITIONS so that the end of the array
+can be detected by the cli_manager.</p>
+
+<p>This C-like form is not limited to static scope however, it can also be used
+within a function, in which case it can use variables for its values:</p>
+
+<pre class="cpp">
+stlplus::cli_definitions_t definitions =
+  {
+    {"help",    stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_HELP",    0},
+    {"map",     stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_MAP",     map_file.c_str()},
+    {"create",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_CREATE",  0},
+    {"add",     stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_ADD",     0},
+    {"remove",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_REMOVE",  0},
+    {"delete",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_DELETE",  0},
+    {"work",    stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_WORK",    0},
+    {"lock",    stlplus::cli_switch_kind, stlplus::cli_multiple_mode, "VLIBRARY_USAGE_LOCK",    0},
+    {"unlock",  stlplus::cli_switch_kind, stlplus::cli_multiple_mode, "VLIBRARY_USAGE_UNLOCK",  0},
+    {"tidy",    stlplus::cli_switch_kind, stlplus::cli_multiple_mode, "VLIBRARY_USAGE_TIDY",    0},
+    {"verbose", stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_VERBOSE", 0},
+    {"version", stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_VERSION", "on"},
+    END_CLI_DEFINITIONS
+  };
+</pre>
+
+<p>Note how the default value (the last element on the line) for the "map"
+option now has its value defined by the return value from a function call.</p>
+
+<p>The C++ form comes into its own if aspects of the definitions are
+dynamically determined. This form is represented by a vector of classes. The
+vector type is called stlplus::cli_definitions and the class that it contains
+is stlplus::cli_definition (note again the plural and the singular).</p>
+
+<p>The definition class has a constructor that makes it easy to set up. For
+example:</p>
+
+<pre class="cpp">
+stlplus::cli_definitions definitions;
+definitions.push_back(stlplus::cli_definition("help",    stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_HELP",    0));
+definitions.push_back(stlplus::cli_definition("map",     stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_MAP",     map_file.c_str()));
+definitions.push_back(stlplus::cli_definition("create",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_CREATE",  0));
+definitions.push_back(stlplus::cli_definition("add",     stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_ADD",     0));
+definitions.push_back(stlplus::cli_definition("remove",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_REMOVE",  0));
+definitions.push_back(stlplus::cli_definition("delete",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_DELETE",  0));
+definitions.push_back(stlplus::cli_definition("work",    stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_WORK",    0));
+definitions.push_back(stlplus::cli_definition("lock",    stlplus::cli_switch_kind, stlplus::cli_multiple_mode, "VLIBRARY_USAGE_LOCK",    0));
+definitions.push_back(stlplus::cli_definition("unlock",  stlplus::cli_switch_kind, stlplus::cli_multiple_mode, "VLIBRARY_USAGE_UNLOCK",  0));
+definitions.push_back(stlplus::cli_definition("tidy",    stlplus::cli_switch_kind, stlplus::cli_multiple_mode, "VLIBRARY_USAGE_TIDY",    0));
+definitions.push_back(stlplus::cli_definition("verbose", stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_VERBOSE", 0));
+definitions.push_back(stlplus::cli_definition("version", stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_VERSION", "on"));
+</pre>
+
+<p>Regardless of whether you use the C form or the C++ form, the option
+definition has the same contents in the same order. Each option has five parts
+to its definition: its name; its kind (switch or value); its mode (more
+later); a message to print in the usage report (more later) and its default
+value. The default value is optional - in the C form it is omitted by giving a
+null char* as the value but in the C++ form it should be the empty string.</p>
+
+<p>The types used in declaring definitions are:</p>
+
+<pre class="cpp">
+enum stlplus::cli_kind_t {stlplus::cli_switch_kind, stlplus::cli_value_kind};
+
+enum stlplus::cli_mode_t {stlplus::cli_single_mode, stlplus::cli_multiple_mode, stlplus::cli_cumulative_mode};
+
+// The C struct for definitions
+struct stlplus::cli_definition_t
+{
+  const char* m_name;
+  stlplus::cli_kind_t m_kind;
+  stlplus::cli_mode_t m_mode;
+  const char* m_message;
+  const char* m_default;
+};
+
+// The C array of the C struct. The array must be terminated by END_CLI_DEFINITIONS.
+typedef stlplus::cli_definition_t stlplus::cli_definitions_t [];
+#define END_CLI_DEFINITIONS {0,stlplus::cli_switch_kind,stlplus::cli_single_mode,"",0}
+
+// The C++ class for definitions
+class stlplus::cli_definition
+{
+public:
+  std::string m_name;
+  stlplus::cli_kind_t m_kind;
+  stlplus::cli_mode_t m_mode;
+  std::string m_message;
+  std::string m_default;
+
+  cli_definition(const std::string&amp; name,
+                 stlplus::cli_kind_t kind,
+                 stlplus::cli_mode_t mode, 
+                 const std::string&amp; message,
+                 const std::string&amp; default_value = std::string());
+};
+
+// The C++ vector of the C++ class
+typedef std::vector&lt;stlplus::cli_definition&gt; stlplus::cli_definitions;
+</pre>
+
+<p>The first field is the name of the option. On the command line they will
+have to have a '-' prepended to indicate that this is an option, but this is
+omitted from the name field. The empty string "" is used to define the
+command-line arguments i.e. those values that are not associated with an
+option. For example, if the application was called "DoIt", then the following
+command has four arguments which will be associated with the "" option:</p>
+
+<pre class="script">
+DoIt one two three four
+</pre>
+
+<p>The following command will set the switch value "help" to its positive value:</p>
+
+<pre class="script">
+DoIt -help
+</pre>
+
+<p>There will be more on how to interpret the options later.</p>
+
+<p>The second field is the kind of the options. There are two kinds - switch
+and value. A switch is just on or off and has no following value, like the
+"help" option given in the example above. Value options have a value following
+them on the command line:</p>
+
+<pre class="script">
+DoIt -work test
+</pre>
+
+<p>In this example, the option "work" has the value "test" associated with
+it.</p>
+
+<p>The third field in the definition is the mode of the option. There are three
+modes:</p>
+
+<dl>
+
+<dt>stlplus::cli_single_mode</dt>
+<dd>Only a single instance of the option is kept. If the option appears more
+than once, either in the command line or the default values, then the later
+definition overrides the earlier ones, causing the earlier definitions to
+disappear.</dd>
+
+<dt>stlplus::cli_multiple_mode</dt>
+<dd>There can be many instances of the option. All instaces at the same level
+are kept, but instances from "higher" levels override "lower" levels. The
+highest level is the command-line, followed by Ini-file defaults and the
+lowest level is the set of built-in defaults. Thus the command-line overrides
+all other levels, whilst the Ini-file overrides just the built-in
+defaults.</dd>
+
+<dt>stlplus::cli_cumulative_mode</dt>
+<dd>There can be many instances of the option and all instances are kept
+regardless of their level.</dd>
+
+</dl>
+
+<p>The fourth field in the definition is the mnemonic for a message to be
+passed to the <a href="message_handler.html">stlplus::message_handler</a>. This is used in
+help messages to give usage information for the application. The messages used
+for this example command are:</p>
+
+<pre class="script">
+VLIBRARY_USAGE_HELP             \t-[no]help               # this help!
+VLIBRARY_USAGE_MAP              \t-map &lt;path&gt;             # set the library mapping file (.lmf) to use - default is ./moods.lmf
+VLIBRARY_USAGE_CREATE           \t-create &lt;name&gt;=&lt;path&gt;   # create a library called &lt;name&gt; in directory &lt;path&gt; and add to the list
+VLIBRARY_USAGE_ADD              \t-add &lt;path&gt;             # add the library at &lt;path&gt; to the library list
+VLIBRARY_USAGE_REMOVE           \t-remove &lt;name&gt;          # remove the library &lt;name&gt; from the library list
+VLIBRARY_USAGE_DELETE           \t-delete &lt;name&gt;          # delete the library called &lt;name&gt; and its directory
+VLIBRARY_USAGE_WORK             \t-work &lt;name&gt;            # make &lt;name&gt; the current work library
+VLIBRARY_USAGE_LOCK             \t-lock                   # lock the work library
+VLIBRARY_USAGE_UNLOCK           \t-unlock                 # unlock the work library
+VLIBRARY_USAGE_TIDY             \t-tidy                   # tidy (erase) all out-of-date units in work
+VLIBRARY_USAGE_VERBOSE          \t-[no]verbose            # verbose listing (list units in each library)
+VLIBRARY_USAGE_VERSION          \t-[no]version            # display product version
+</pre>
+
+<p>These usage messages are parameterless. Note the use of \t (tab) to indent these
+messages - it is recommended that you follow this example.</p>
+
+<p>The last field in the definition is the built-in default value of the
+option. It should be a null pointer if there is no default value, otherwise a
+string representing the default value. Switch values should be defaulted to on
+with the strings "on", "true" or "1" or to off with the strings "off", "false"
+or "0". Note how the "map" option has a default in the example,
+whereas the arguments field "" and the "work" option have no default.</p>
+
+
+<h2 id="ini_files">Importing Defaults from Ini Files</h2>
+
+<p>The command-line parser can import default values from an Ini file. This is
+handled using the <a href="ini_manager.html">stlplus::ini_manager</a> component.</p>
+
+<p>Ini files are divided into sections. When importing from an Ini file you
+need to specify which section you are importing from. Then, the cli_parser
+tests the stlplus::ini_manager to see if any of the options (except for the "" option)
+are represented by a variable of the same name in the Ini file. For example,
+the "help" option will be represented by a variable called "help" in the Ini
+file. If an option is found as a variable, then the value of
+that variable is read in as the default value.</p>
+
+<p>Taking the definitions from the last section, and using the application
+name "DoIt" as the Ini file section, here's how the default values could have
+been represented in an Ini file:</p>
+
+<pre class="script">
+[DoIt]
+help = off
+map = moods.lmf
+</pre>
+
+<p>It is possible to cancel a built-in default from an Ini file without
+specifying a new value. This is done by simply omitting the value:</p>
+
+<pre class="script">
+map =
+</pre>
+
+<p>This means that there will be no default value for the "map" option despite
+the fact that the built-in definitions provided one.</p>
+
+<p>As with built-in defaults, switch values are switched on by "on", "true" or
+"1" and off by "off", "false" and "0". These are case-insensitive. In fact,
+any other value is currently regarded as off, but this may change in the
+future so the use of one of these three values is recommended.</p>
+
+
+<h2 id="command_line">Parsing the Command-Line</h2>
+
+<p>Once the cli_parser has been set up with a set of definitions and
+optionally has had default values set drom an Ini file, the next stage is to
+parse the command-line. This is done by the parse(0 function:</p>
+
+<pre class="cpp">
+bool cli_parser::parse(char* argv[]);
+</pre>
+
+<p>This takes as its argument the argv vector from main() and parses it. If
+the parse succeeds, then the function returns true. If there are eny errors,
+they will be reported by the stlplus::message_handler set up in the constructor and then
+the parse function will return false.</p>
+
+<p>The parser works like this:</p>
+
+<p>For each argument except argument 0 (the command name), the parser first
+determines whether the argument is a value or an option. An option is
+indicated by a leading '-'.</p>
+
+<p>If the argument is a value, it is added as a value
+to the "" option if there is one. If there is no "" option defined, an error
+is reported.</p>
+
+<p>If the argument is an option, then the option is looked up in the set of
+definitions. This lookup uses substring matching, so for example the
+command-line option "-h" will match the definition for "help". The parser will
+pick the first option matching the command-line substring. The search is
+carried out in definition order, so the earliest definitions will have shorter
+abbreviations. For example, given two definitions "help" and "hello" in that
+order, both "-h", "-he" and "-hel" will match with "help" and the shortest
+abbreviation for "hello" will be "-hell".</p>
+
+<p>If a command-line option doesn't match any definition using this method,
+then it is checked to see if it is prefixed with "-no", since this is how
+options are negated. The definitions are searched again for an option without
+this prefix, so for example "-noh" will match with "help".</p>
+
+<p>If no option can be found that matches either of these searches, an error
+is produced. Otherwise there are three possibilities:</p>
+
+<p>If the definition is a switch kind, then a value is added for that option.
+The value will be on if the switch was found in its positive form (e.g. "-h", off if it
+was found in its negated form (e.g. "-noh").</p>
+
+<p>If the definition was a value kind and the option was found in its positive
+form, then the next argument from argv is read and that becomes the value of
+the option. If there are no further arguments, an error is reported.</p>
+
+<p>If the definition was a value kind and was negated, then this cancels all
+previous values of the option including ini file defaults and built-in
+defaults. This is provided so that users can override defaults from the
+command-line. Negated value options do not have a value so the next arguement
+in argv is <em>not</em> read.</p>
+
+<p>In all cases the mode determines what happens to any previous values of the
+option. If the option is single mode, then all previous values are cancelled.
+If the option is a multiple mode, any values from lower levels (i.e. Ini file
+or built-in defaults) are cancelled. If the option is cumulative mode, no
+previous values are cancelled.</p>
+
+
+<h2 id="interpreting">Interpreting the Command-Line</h2>
+
+<p>Once the command-line has been successfully parsed, the values read can be
+interpreted. The set of values available will be the built-in default values,
+plus the Ini-file default values, plus the command-line values, with the
+override rules appropriate to the option modes. This gives in effect a
+composite command line made up of the concatenation of all these values. The
+composite command-line is then read from left to right.</p>
+
+<p>An example is needed to clarify exactly what is in this composite command
+line. Take the following definitions:</p>
+
+<pre class="cpp">
+stlplus::cli_definitions definitions =
+  {
+    {"",        stlplus::cli_value_kind,  stlplus::cli_multiple_mode,   "VCOMPILE_USAGE_VALUE",   0},
+    {"help",    stlplus::cli_switch_kind, stlplus::cli_single_mode,     "VCOMPILE_USAGE_HELP",    0},
+    {"87",      stlplus::cli_switch_kind, stlplus::cli_cumulative_mode, "VCOMPILE_USAGE_87",      "off"},
+    END_CLI_DEFINITIONS
+  };
+</pre>
+
+<p>The only built-in default is for the "87" option, so the initial
+command-line options are:</p>
+
+<pre class="script">
+-no87
+</pre>
+
+<p>Now lets say that the following command-line is typed in by the user:</p>
+
+<pre class="script">
+DoIt file1.vhdl -87 file2.vhdl -no87 file3.vhdl
+</pre>
+
+<p>Since the "87" option is cumulative, the command-line does not override the
+built-in defaults. The result is that the composite options are:</p>
+
+<pre class="script">
+-no87 file1.vhdl -87 file2.vhdl -no87 file3.vhdl
+</pre>
+
+<p>Thus the composite command line will have a total of 6 options.</p>
+
+<p>Options are processed in a loop using the following access functions:</p>
+
+<pre class="cpp">
+unsigned cli_parser::size(void) const;
+std::string cli_parser::name(unsigned i) const;
+unsigned cli_parser::id(unsigned i) const;
+stlplus::cli_kind_t cli_parser::kind(unsigned i) const;
+stlplus::cli_mode_t cli_parser::mode(unsigned i) const;
+bool cli_parser::switch_value(unsigned i) const throw(stlplus::cli_mode_error);
+std::string cli_parser::string_value(unsigned i) const throw(stlplus::cli_mode_error);
+</pre>
+
+<p>The size function is used to control the for loop that processes the
+command-line. You should follow the normal C convention:</p>
+
+<pre class="cpp">
+for (unsigned i = 0; i &lt; parser.size(); i++)
+{
+  ...
+}
+</pre>
+
+<p>Note that the count goes from zero, not from one as it would if you were
+processing argv.</p>
+
+<p>Options are accessed from left to right by index. The first thing you do
+with an option is to get its name (a string) or its ID (an unsigned). The name
+is the full name of the option, not the abbreviated name entered by the user.
+If you use names, then the body of the loop will be a series of if statements
+matching the name of an option with the name of the value:</p>
+
+<pre class="cpp">
+for (unsigned i = 0; i &lt; parser.size(); i++)
+{
+  if (parser.name(i) == "help")
+    ...
+  else if (parser.name(i) == "87")
+    ...
+}
+</pre>
+
+<p>This is pretty clumsy, but readable. It is sometimes simpler to use IDs instead. Basically,
+definitions get numbered when they are added to the parser. They are numbered
+from 0 in the order in which they are added. Thus given the following
+definitions:</p>
+
+<pre class="cpp">
+stlplus::cli_parser::definitions definitions =
+  {
+    {"",        stlplus::cli_value_kind,  stlplus::cli_parser::multiple_mode,   "VCOMPILE_USAGE_VALUE",   0},
+    {"help",    stlplus::cli_switch_kind, stlplus::cli_parser::single_mode,     "VCOMPILE_USAGE_HELP",    0},
+    {"87",      stlplus::cli_switch_kind, stlplus::cli_parser::cumulative_mode, "VCOMPILE_USAGE_87",      "off"},
+    END_CLI_DEFINITIONS
+  };
+</pre>
+
+<p>Option "" is ID 0, option "help" is ID 1, and so on. Using IDs allows a
+switch statement to be used instead of a series of if statements:</p>
+
+<pre class="cpp">
+for (unsigned i = 0; i &lt; parser.size(); i++)
+{
+  switch (parser.id(i))
+  {
+  case 0:
+    ...
+    break;
+  case 1:
+    ...
+    break;
+  ...
+  }
+}
+</pre>
+
+<p>There are two methods for getting values depending on the kind of an option. Switch kinds should
+be read using cli_parser::switch_value() whilst value kind options should be read using
+cli_parser::string_value(). If you use the wrong function, the exception stlplus::cli_mode_error
+will be thrown. The switch_value() method returns a bool indicating whether the switch was on (true)
+or off (false), whilst the string_value() function returns the value of that option as a
+std::string. Note that the command line values will appear as value mode options with the name ""
+(or in the example above, ID 0).
+
+
+<h2 id="usage">Usage Reports</h2>
+
+<p>The parser can produce usage reports, for example if the parse fails and
+you want to report this to the user, or for the "help" option. The usage
+report is produced by the usage() function:</p>
+
+<pre class="cpp">
+void cli_parser::usage(void) const;
+</pre>
+
+<p>The usage report is produced using the stlplus::message_handler set up in the
+constructor and uses the message mnemonics set up in the definitions. It also
+reports the options that have been set and their origin (for example, built-in
+default or Ini file. For example:</p>
+
+<pre class="terminal">
+usage: vcompile { arguments }
+arguments:
+    &lt;file&gt;                  # one or more files to compile
+    -[no]help               # this help!
+    -map &lt;path&gt;             # set the library mapping file (.lmf) to use - default is ./moods.lmf
+    -errors &lt;number&gt;        # set the error limit to &lt;number&gt; - default 10
+    -work &lt;name&gt;            # make &lt;name&gt; the current work library
+    -[no]87                 # VHDL'87 compatibility mode - when off files are compiled in VHDL'93
+values:
+    -map moods.lmf : from builtin default
+    -errors 10 : from builtin default
+    -no87 : from builtin default
+    -help : from command line
+</pre>
+
+
+<h2 id="exceptions">Exceptions thrown</h2>
+
+<p>The CLI parser defines three exceptions that can be thrown. All of these
+are defined as subclasses of std::logic_error as described in the STLplus
+<a href="exceptions.html">exceptions philosophy</a>. This means that
+exceptions will only occur due to programming errors - that is, if you use the
+CLI parser incorrectly in your program. User errors can never cause an
+exception.</p>
+
+<p>The following exceptions are defined:</p>
+
+<dl>
+
+<dt>stlplus::cli_mode_error</dt>
+
+<dd>Subclass of std::invalid_argument. Thrown if a command-line argument is accessed with the wrong mode - i.e. attempt to get the value of a switch</dd>
+
+<dt>stlplus::cli_index_error</dt>
+
+<dd>Subclass of to std::out_of_range. Thrown for using an index out of range</dd>
+
+<dt>stlplus::cli_argument_error</dt>
+
+<dd>Subclass of std::invalid_argument. Thrown for passing an illegal argument to a method</dd>
+
+</dl>
+
+
+<h2 id="examples">Examples</h2>
+
+<p>Here's the CLI parser part of the source code for a command-line library manager called vlibrary.</p>
+
+<pre class="cpp">
+#include "cli_parser.hpp"
+#include "file_system.hpp"
+#include &lt;string&gt;
+
+int main (int argc, char* argv[])
+{
+  // work out where the program is installed on the system
+
+  // this program requires that the software is designed with the following
+  // directory structure:
+  //   &lt;top&gt;
+  //     +-bin
+  //     |  +- vlibrary.exe    // executable
+  //     +-config
+  //        +- vlibrary.ini    // Configuration (Ini) file - see stlplus::ini_manager.hpp
+  //        +- messages.txt    // Text of all error messages - see stlplus::message_handler.hpp
+
+  // the install_path function returns the folder containing the executable so
+  // the root folder is one up from that
+  std::string root = stlplus::folder_up(stlplus::install_path(argv[0]));
+
+  // set up an error handler with the one message file
+  // first initialise so that messages go to standard error, there's an error
+  // limit of 0 (infinite)
+  stlplus::message_handler messages(std::cerr, 0);
+  // now add the message file
+  messages.add_message_file(stlplus::create_filespec(stlplus::folder_down(root,"config"),"messages.txt"));
+
+  // set up an Ini file manager
+  // This sets up three files - one in the current directory, one in the HOME
+  // directory and one in the installation
+  stlplus::ini_manager ini_files;
+  ini_files.add_file("vlibrary.ini");
+  ini_files.add_file(create_filespec(folder_home(),"vlibrary.ini"));
+  ini_files.add_file(create_filespec(folder_down(root,"config"),"vlibrary.ini"));
+
+  // set up the definitions for the command-line options. Note the
+  // permutations of switch/value and single/multiple settings.
+  stlplus::stlplus::cli_definitions_t definitions =
+    {
+      {"help",    stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_HELP",    0},
+      {"create",  stlplus::cli_value_kind,  stlplus::cli_multiple_mode, "VLIBRARY_USAGE_CREATE",  0},
+      {"version", stlplus::cli_switch_kind, stlplus::cli_single_mode,   "VLIBRARY_USAGE_VERSION", "on"},
+      END_CLI_DEFINITIONS
+    };
+
+  // construct the parser, loading the definitions, the default values from
+  // the Ini files and using the error handler for parser errors
+  stlplus::cli_parser parser(definitions, ini_files, "vlibrary", messages);
+
+  // now parse the command line which builds the command-line data structure
+  // within the parser - if there are any errors, end now
+  if (!parser.parse(argv))
+  {
+    parser.usage();
+    return -1;
+  }
+
+  // now loop through the parsed command extracting the values
+  for (unsigned i = 0; i &amp;lt; parser.size(); i++)
+  {
+    if (parser.name(i) == "help")
+    {
+
+      // This demonstrates how to handle a switch-mode argument. First, detect
+      // that the option has been specified by testing the name of the option
+      // with if (parser.name(i) == "help"). Then, detect the polarity
+      // (off/on) of the switch with if (parser.switch_value(i))
+      if (parser.switch_value(i))
+      {
+        // report the command options using the built-in usage() function
+        parser.usage();
+      }
+    }
+    else if (parser.name(i) == "create")
+    {
+      // create a new library 
+
+      // This demonstrates how to handle a value-mode argument. First, detect
+      // that the option has been specified as with the above switch-mode
+      // argument, then get the value of the option with &lt;tt&gt;string path =
+      // parser.string_value(i);
+      std::string library = parser.string_value(i);
+
+      // code removed - not relevant to this example
+    }
+    else if (parser.name(i) == "version")
+    {
+      if (parser.switch_value(i))
+      {
+        // report the version of the program - use the error handler directly
+        messages.information("VLIBRARY_VERSION", "1.2");
+      }
+    }
+  }
+  return messages.error_count();
+}
+</pre>
+
+<p>In order to work correctly, the message file would need message definitions for the STLplus
+internal messages plus all the messages specific to the vlibrary command. So, given the example
+above, the message file would look like this:</p>
+
+<pre>
+# messages required by the CLI parser (taken from stlplus/messages/stlplus_messages.txt)
+CLI_VALUE_MISSING                option @0 requires a value - end of line was reached instead
+CLI_UNRECOGNISED_OPTION          @0 is not a recognised option for this command
+CLI_NO_VALUES                    argument @0 is invalid - this program doesn't take command-line arguments
+CLI_USAGE_PROGRAM                usage:\n\t@0 { arguments }
+CLI_USAGE_DEFINITIONS            arguments:
+CLI_USAGE_VALUES                 values:
+CLI_USAGE_VALUE_RESULT           \t@0 : from @1
+CLI_USAGE_SWITCH_RESULT          \t-@0 : from @1
+CLI_USAGE_OPTION_RESULT          \t-@0 @1 : from @2
+CLI_INI_HEADER                   configuration files:
+CLI_INI_FILE_PRESENT             \t@0
+CLI_INI_FILE_ABSENT              \t@0 (not found)
+
+# messages required by vlibrary itself
+VLIBRARY_USAGE_HELP             \t-[no]help               # this help!
+VLIBRARY_USAGE_CREATE           \t-create &lt;path&gt;          # create and add library in directory &lt;path&gt;
+VLIBRARY_USAGE_VERSION          \t-[no]version            # display product version
+VLIBRARY_VERSION                  vlibrary version @0 by Andy Rushton
+
+# ... other messages not needed for this example
+</pre>
+
+
+</div>
+
+</body>
+</html>

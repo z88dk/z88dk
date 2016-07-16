@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>portability/build.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>portability/build.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_BUILD
+#define STLPLUS_BUILD
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Provides a printable representation of the build characteristics in the form:
+
+//     version, platform, compiler, variant
+
+//   Where
+//     version is the version of STLplus
+//     platform is the target operating system
+//     compiler is the compilation system and version that the function was compiled with
+//     variant is the kind of build - debug or release
+
+//   Example:
+//     STLplus version 3.0, Generic Unix, gcc v3.4, debug
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;portability_fixes.hpp&quot;
+#include &lt;string&gt;
+
+namespace stlplus
+{
+
+  // STLplus version in the form &quot;STLplus version 3.0&quot; - see version.hpp for a way of getting just the version number
+  std::string stlplus_version(void);
+
+  // platform is the target operating system in the form &quot;Windows&quot; or &quot;Generic Unix&quot;
+  std::string platform(void);
+
+  // compiler_name is the short name of the compiler, e.g. &quot;gcc&quot; or &quot;MSVC&quot;
+  std::string compiler_name(void);
+  // compiler_version is the version string of the compiler e.g. &quot;3.4&quot; for gcc or &quot;15.00&quot; for MSVC
+  std::string compiler_version(void);
+  // compiler is the compilation system and version above combined into a human- readable form e.g. &quot;gcc v3.4&quot;
+  std::string compiler(void);
+
+  // variant is the kind of build - &quot;debug&quot; or &quot;release&quot;
+  std::string variant(void);
+
+  // build is all of the above combined into a human-readable string
+  std::string build(void);
+
+}
+////////////////////////////////////////////////////////////////////////////////
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

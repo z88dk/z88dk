@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>persistence/persistent_callback.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>persistence/persistent_callback.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PERSISTENT_CALLBACK
+#define STLPLUS_PERSISTENT_CALLBACK
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Persistence for pointers to polymorphic classes using the callback approach.
+
+//   This works on a set of classes. Each subclass has a set of callback
+//   (non-method) functions that enable create/dump/restore operations. Each
+//   subclass must be registered with the persistence dump/restore context so
+//   that the system knows how to handle it.
+
+//   This approach is suited to classes that cannot be modified to add
+//   persistence methods. See persistent_interface for a more C++-like way of
+//   handling polymorphism.
+
+//   Objects are always dumped/restored as pointers to the superclass T.
+
+//   Multiple pointers to the same object are handled in the same way as for
+//   simple pointers
+
+//   Only classes registered with the context can be dumped and restored as
+//   polymorphic types - see dump_context::register_callback and
+//   restore_context::register_callback. Attempting to use any unrecognised class
+//   will throw an exception.
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include &quot;persistence_fixes.hpp&quot;
+#include &quot;persistent_contexts.hpp&quot;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  template&lt;typename T&gt;
+  void dump_callback(dump_context&amp;, const T* const data)
+    throw(persistent_dump_failed);
+
+  template&lt;typename T&gt;
+  void restore_callback(restore_context&amp;, T*&amp; data)
+    throw(persistent_restore_failed);
+
+} // end namespace stlplus
+
+  ////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistent_callback.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

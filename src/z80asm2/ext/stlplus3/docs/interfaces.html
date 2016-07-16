@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - Interfaces</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>Interfaces</h1>
+</div>
+
+<div id="documentNavigation">
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#classes">Interface Classes</a></li>
+<li class="internal"><a href="#examples">Examples</a></li>
+</ul>
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>It is increasingly the case that you use generic algorithms in programming
+rather than reinvent the wheel by writing the algorithms yourself. Similarly,
+generic data structures should be used rather than reinventing data structures
+yourself.</p>
+
+<p>The generic algorithm or data structure will require the object
+supplied by you to provide certain methods with a certain set of parameters in
+order to work.</p>
+
+<p>So, the question is, if you are defining a generic algorithm or data
+structure, how do you specify the methods that the
+user must provide?</p>
+
+<p>Clearly this could be done by writing comments all over the place or
+writing documentation that specifies the methods and their parameters. Of
+course, the documentation of the generic software should indeed contain such
+information. However, a better solution is one which is expressed in C++ so
+that the interface can be seen in a header file and which enables a compiler
+to do some consistency checking.</p>
+
+<p>In Java there is a built-in concept called an interface that provides this
+functionality. What I have done therefore is to mimic the Java interface in
+C++.</p>
+
+
+<h2 id="classes">Interface Classes</h2>
+
+<p>I define a C++ interface to be a class with one or more methods, some or
+all of which are abstract. The user indicates that they are providing the
+interface by making their class a derivative of the interface class.</p>
+
+<p>An abstract method is one which has "<code>= 0</code>" placed after its
+declaration. This seems odd at first because it reads like an initial value.
+It makes more sense if you see it as meaning that the method has a null
+address.</p>
+
+<p>A class is abstract if one or more of its methods is abstract.</p>
+
+<p>It is illegal to create an object of an abstract class. You can only use it
+as a baseclass to a derivation that overloads all of the abstract methods.
+Only when all the abstract methods are overloaded by non-abstract methods does
+the derived class itself become non-abstract.</p>
+
+<p>For example, the following class is abstract:</p>
+
+<pre class="cpp">
+class printable
+{
+public:
+  void print(std::ostream&amp;) const = 0;
+};
+</pre>
+
+<p>This class is abstract because the print method is abstract. Such a class
+would define an interface to a printable object - so its name reflects its
+usage. Interface classes tend to have adjectives as names. The methods as
+usual in C++ are verbs.</p>
+
+<p>In this case, the class has only one method and it is abstract. This is a
+pure interface class. However, sometimes it is convenient to provide other
+methods in the interface class which implement composite operations by
+calling the abstract methods. This is an impure interface. For example:</p>
+
+<pre class="cpp">
+class printable
+{
+public:
+  void print(std::ostream&amp;) const = 0;
+  void print_indented(std::ostream&amp;, unsigned indent);
+};
+</pre>
+
+<p>In this case, the interface is saying that you must provide an overload of
+the abstract method <code>print</code>. Having done so, you will be able to
+call <code>print_indented</code> which has been defined in terms of the
+abstract <code>print</code> function. The point is that to implement the
+interface you only need to provide the abstract methods and having done so you
+can then use the non-abstract methods provided by the interface.</p>
+
+<p>When you derive from an interface class, the rules of C++ require you to
+provide non-abstract overloadings of all the abstract methods defined in the
+interface. It is illegal in C++ to create an object of an abstract class and
+your class will only be non-abstract if <em>all</em> of the abstract functions
+have been overloaded correctly. Therefore the compiler can confirm that all
+the methods required by the interface have been provided. If you have missed
+out a method or mis-defined it, there will still be at least one abstract
+method inherited from the interface class and therefore your class will be
+abstract too. A compiler error will be produced when you try to create an
+object of the class.</p>
+
+<h2 id="examples">Examples</h2>
+
+<p>The above printable interface is an artificial example and you will not
+find it in the STLplus library.</p>
+
+<h3>The Persistent Interface</h3>
+
+<p>This is an example taken from the STLplus library. I have defined a
+<code>persistent</code> interface for use with polymorphic types. It is only used for
+polymorphic types for which the best way of proving data persistence is
+through virtual methods.</p>
+
+<p>The <code>persistent</code> interface is defined by the following class:</p>
+
+<pre class="cpp">
+namespace stlplus
+{
+
+  class persistent
+  {
+  public:
+    virtual void dump(dump_context&amp;) const throw(persistent_dump_failed) = 0;
+    virtual void restore(restore_context&amp;) throw(persistent_restore_failed) = 0;
+    virtual persistent* clone(void) const = 0;
+  };
+
+}
+</pre>
+
+<p>Using the trivial class from the previous section; to make that class
+persistent, you derive it from the <code>persistent</code> interface:</p>
+
+<pre class="cpp">
+class base<strong> : public persistent</strong>
+{
+  int m_value;
+public:
+  base(int value = 0) : m_value(value) {}
+  virtual ~base(void) {}
+
+  virtual int value (void) const {return m_value;}
+  virtual void set(int value = 0) {m_value = value;}
+
+  <strong>void dump(dump_context&amp; context) const {stlplus::dump_int(context,m_value);}</strong>
+  <strong>void restore(restore_context&amp; context) {stlplus::restore_int(context,m_value);}</strong>
+  <strong>persistent* clone(void) const {return new base(*this);}</strong>
+};
+</pre>
+
+<p>You will need to read the 
+<a href="persistence.html">documentation on persistence</a> to find out all the
+details of how this interface is used to provide data persistence - this
+document is only concerned with the meaning of the interface class and the
+requirements that it defines.</p>
+
+</div>
+
+</body>
+</html>

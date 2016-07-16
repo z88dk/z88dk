@@ -1,0 +1,287 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - strings/string_stl.hpp - String Formatting of STL Containers</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>strings/string_stl.hpp<br>String Formatting of STL Containers</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#to_string">Conversion of STL Containers to String</a></li>
+<li class="internal"><a href="#print">Printing STL Containers</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This is a set of functions that perform string formatting and printing of a data structure such
+as a vector by simply defining formatting or printing functions for the element. They extend the
+string formatting and printing functions for <a href="string_basic.html">basic types</a> and have
+similar interfaces.</p>
+
+<p>There are two separate header files for including these functions:</p>
+
+<ul>
+<li class="external"><a href="string_stl_hpp.html">string_stl.hpp</a>: For the <em>type</em>_to_string functions</li>
+<li class="external"><a href="print_stl_hpp.html">print_stl.hpp</a>: For the print_<em>type</em> functions</li>
+</ul>
+
+<h2 id="to_string">Conversion of STL Containers to String</h2>
+
+<p>There is a set of functions which are called <em>type</em>_to_string and which are templates. They
+give a convenient way of providing string formatting for the most-commonly uses STL container
+classes. They rely on you writing a <em>type</em>_to_string or print_<em>type</em> function for the type
+contained within the container.</p>
+
+<p>The functions for formatting most data types have additional formatting parameters such as
+separators for multi-element types. Here's the print functions for creating a string representation
+of any sequence represented by a begin and end iterator, followed by a comparable function for when
+the sequence contains std::pair (such as in std::map):</p>
+
+<pre class="cpp">
+template &lt;typename I, typename S&gt;
+std::string stlplus::sequence_to_string(I begin,
+                                        I end, 
+                                        S to_string,
+                                        const std::string&amp; separator);
+
+template &lt;typename I, typename S1, typename S2&gt;
+std::string stlplus::pair_sequence_to_string(I begin,
+                                             I end,
+                                             S1 to_string_fn1,
+                                             S2 to_string_fn2,
+                                             const std::string&amp; pair_separator,
+                                             const std::string&amp; separator);
+</pre>
+
+<p>The vector, list, set and multiset functions simply call the sequence_to_string, so have a similar interface:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename S&gt;
+std::string stlplus::vector_to_string(const std::vector&lt;T&gt;&amp; values,
+                                      S to_string_fn,
+                                      const std::string&amp; separator);
+
+template&lt;typename T, typename S&gt;
+std::string stlplus::list_to_string(const std::list&lt;T&gt;&amp; values,
+                                    S to_string_fn,
+                                    const std::string&amp; separator);
+
+template&lt;typename K, typename C, typename S&gt;
+std::string stlplus::set_to_string(const std::set&lt;K,C&gt;&amp; values,
+                                   S to_string_fn,
+                                   const std::string&amp; separator);
+
+template&lt;typename K, typename C, typename S&gt;
+std::string stlplus::multiset_to_string(const std::multiset&lt;K,C&gt;&amp; values,
+                                        S to_string_fn,
+                                        const std::string&amp; separator);
+</pre>
+
+<p>The map and multimap functions are similar, but each element is a pair, which is printed by
+calling the pair_to_string function. This in turn calls a formatting function on each of the
+elements of the pair. Since a pair contains two types, two functions are required.</p>
+
+<pre class="cpp">
+template&lt;typename K, typename T, typename C, typename SK, typename ST&gt;
+std::string stlplus::map_to_string(const std::map&lt;K,T,C&gt;&amp; values,
+                                   SK key_to_string_fn,
+                                   ST value_to_string_fn,
+                                   const std::string&amp; pair_separator,
+                                   const std::string&amp; separator);
+
+template&lt;typename K, typename T, typename C, typename SK, typename ST&gt;
+std::string stlplus::multimap_to_string(const std::multimap&lt;K,T,C&gt;&amp; values,
+                                        SK key_to_string_fn,
+                                        ST value_to_string_fn,
+                                        const std::string&amp; pair_separator,
+                                        const std::string&amp; separator);
+</pre>
+
+<p>The pointer conversion routines print the type within the following format:
+&lt;prefix&gt;&lt;value&gt;&lt;suffix&gt;. Typically, prefix = "*(" and suffix = ")", so the value
+is printed like this: "*(value)". This is meant to read as "pointer to value". If the pointer is
+null, the null_string is printed instead, with no prefix or suffix.</p>
+
+<pre class="cpp">
+template &lt;typename T, typename S&gt;
+std::string stlplus::pointer_to_string(const T* value,
+                                       S to_string_fn,
+                                       const std::string&amp; null_string,
+                                       const std::string&amp; prefix,
+                                       const std::string&amp; suffix);
+</pre>
+
+<p>The shared_ptr container has a similar interface, but there is a
+  difference between an empty string and a null string:</p>
+
+<pre class="cpp">
+template &lt;typename T, typename S&gt;
+std::string stlplus::shared_ptr_to_string(const std::shared_ptr&lt;T&gt; value,
+                                          S to_string_fn,
+                                          const std::string&amp; empty_string,
+                                          const std::string&amp; null_string,
+                                          const std::string&amp; prefix,
+                                          const std::string&amp; suffix);
+</pre>
+
+
+<p>To print a template container which contains another template container,
+write a <em>type</em>_to_string function simply calling the containing <em>type</em>_to_string function. For
+example, to write a string_list_vector_to_string function for a list&lt;vector&lt;string&gt;&gt;
+you go through the following sequence:</p>
+
+<p>First, there is already a string_to_string function for type string (with a pretty
+trivial implementation!), so you have nothing to do there. However, if the
+lowest level type did not already have a <em>type</em>_to_string function you would need to
+write one.<p>
+
+<p>Now write a string_vector_to_string function for the vector&lt;string&gt; type:</p>
+
+<pre class="cpp">
+std::string string_vector_to_string(const std::vector&lt;std::string&gt;&amp; values)
+{
+  return stlplus::vector_to_string(values,stlplus::string_to_string,":");
+}
+</pre>
+
+<p>Note that this will create a colon-separated list.</p>
+
+<p>Finally, it is possible to write the top-level function for the
+list:</p>
+
+<pre class="cpp">
+std::string string_vector_list_to_string(const std::list&lt;std::vector&lt;std::string&gt;&gt;&amp; values)
+{
+  return list_to_string(values,string_vector_to_string,",");
+}
+</pre>
+
+<p>Note that this creates a comma-separated list. Thus, overall, the string will
+contain a comma-separated list of colon-separated strings.</p>
+
+<h2 id="print">Printing Functions</h2>
+
+<p>In parallel with the set of string conversion routines, there is a set of print routines for the
+same set of types. The convention is to have a print_<em>type</em> function that takes an IOStream
+output device, followed by the same parameters as the corresponding <em>type</em>_to_string function
+above.</p>
+
+<p>The set of print functions are:</p>
+
+<pre class="cpp">
+template &lt;typename T, typename S&gt;
+void print_pointer(std::ostream&amp; device,
+                   const T* value,
+                   S print_fn,
+                   const std::string&amp; null_string,
+                   const std::string&amp; prefix,
+                   const std::string&amp; suffix);
+
+template&lt;typename T, typename S&gt;
+void print_shared_ptr(std::ostream&amp; device,
+                      const std::shared_ptr&lt;T&gt;&amp; value,
+                      S print_fn,
+                      const std::string&amp; empty_string,
+                      const std::string&amp; null_string,
+                      const std::string&amp; prefix,
+                      const std::string&amp; suffix);
+
+template &lt;typename I, typename S&gt;
+void print_sequence(std::ostream&amp; device,
+                    I begin, I end, 
+                    S print_fn,
+                    const std::string&amp; separator);
+
+template &lt;typename I, typename S1, typename S2&gt;
+void print_pair_sequence(std::ostream&amp; device,
+                         I begin, I end,
+                         S1 print_fn1,
+                         S2 print_fn2,
+                         const std::string&amp; pair_separator,
+                         const std::string&amp; separator);
+
+template&lt;typename T, typename S&gt;
+void print_vector(std::ostream&amp; device,
+                  const std::vector&lt;T&gt;&amp; values,
+                  S print_fn,
+                  const std::string&amp; separator);
+
+template&lt;typename T, typename S&gt;
+void print_list(std::ostream&amp; device,
+                const std::list&lt;T&gt;&amp; values,
+                S print_fn,
+                const std::string&amp; separator);
+
+template&lt;typename K, typename C, typename S&gt;
+void print_set(std::ostream&amp; device,
+               const std::set&lt;K,C&gt;&amp; values,
+               S print_fn,
+               const std::string&amp; separator);
+
+template&lt;typename K, typename C, typename S&gt;
+void print_multiset(std::ostream&amp; device,
+                    const std::multiset&lt;K,C&gt;&amp; values,
+                    S print_fn,
+                    const std::string&amp; separator);
+
+template&lt;typename K, typename T, typename C, typename SK, typename ST&gt;
+void print_map(std::ostream&amp; device, const std::map&lt;K,T,C&gt;&amp; values,
+               SK key_print_fn,
+               ST value_print_fn,
+               const std::string&amp; pair_separator,
+               const std::string&amp; separator);
+
+template&lt;typename K, typename T, typename C, typename SK, typename ST&gt;
+void print_multimap(std::ostream&amp; device, const std::multimap&lt;K,T,C&gt;&amp; values,
+                    SK key_print_fn,
+                    ST value_print_fn,
+                    const std::string&amp; pair_separator,
+                    const std::string&amp; separator);
+
+template &lt;typename T, typename S&gt;
+void print_pointer(std::ostream&amp; device,
+                   const T* value,
+                   S print_fn,
+                   const std::string&amp; null_string,
+                   const std::string&amp; prefix,
+                   const std::string&amp; suffix);
+</pre>
+
+
+</div>
+
+</body>
+</html>

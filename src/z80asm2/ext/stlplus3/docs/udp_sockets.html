@@ -1,0 +1,560 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/udp_sockets.hpp - Platform-Independent UDP Internet Classes</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/udp_sockets.hpp<br>Platform-Independent UDP Internet Classes</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="udp_sockets_hpp.html">Browse Header udp_sockets.hpp</a></li>
+<li class="external"><a href="ip_sockets_hpp.html">Browse Header ip_sockets.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#client">UDP Client</a></li>
+<li class="internal"><a href="#server">UDP Server</a></li>
+<li class="internal"><a href="#example">Example</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>UDP is an internet protocol that is faster and simpler than the more common <a
+href="tcp_sockets.html">TCP</a>. It achieves this by being unreliable. Packets may be lost or arrive
+in a different order to that sent. Why would you use this? There are some applications where
+performance matters, but reliability doesn't. For example, a live video feed - if a frame gets lost,
+so what? The most important thing is that the picture stays as up-to-date as possible. It also
+allows you to design reliability features into your protocol that are faster then TCP's. For
+example, you could implement a backup system that fires packets to the backup server in a long
+burst, then gets back a list of all packets received, then resends any that got lost. This might be
+more efficient than a TCP-based system which has to stop every time a packet is lost whilst the
+missing packet is re-requested.
+
+<p>This package provides simple, clean and platform-independent interfaces to the Internet protocols
+provided by UDP. The motivation for writing it was to make these protocols more accessible to the
+developer. The underlying mechanisms for UDP are very low level and unnecessarily complicated. These
+classes encapsulate the essence of UDP in two very simple to use classes.</p>
+
+<p>There are two 'ends' to an internet connection, known as the client and the server. A client is a
+program that requests a connection whilst a server provides that connection. In most cases,
+developers will only be interested in the client class, since that is all that is needed to build an
+internet application. However, this package also provides the server class that would be required
+to build an internet server.</p>
+
+<p><b>Note:</b> some people might object to this description on the grounds that UDP is often
+described as "connectionless". This is a misunderstanding since all internet protocols are
+connectionless; the connection is an abstract concept, but communication is always in packet form. 
+UDP is more accurately described as "stateless" in that the protocol does not assume any
+relationships between packets and delivers each as a separate entity, rather than the ordered stream
+of TCP. In fact TCP makes the unordered Internet protocol <em>look</em> ordered by numbering the
+packets on send, sorting the packets into order on receipt and re-requesting lost packets after a
+"reasonable" wait. However, despite this, I find it is still helpful in understanding UDP (and TCP)
+to think of there being a connection from client to server.</p>
+
+<p>The UDP classes only provide the underlying transport mechanism of UDP. It does not provide the
+information protocols layered onto it. These information protocols could be provided as additional
+classes layered onto the UDP classes.</p>
+
+<p>The UDP classes are derived from the IP_socket class. This class is not documented separately
+because it is not intended to be used directly. IP_socket implements low-level socket operations in
+a platform-independent, object-orientated form. It hides the operating-system differences and the
+sheer ugliness of the socket interfaces that implement the internet protocol (IP). The UDP classes
+then inherit from that layer, implementing the UDP functionality using this platform-independent
+interface to simplify the task. The intention is that you only use the UDP classes and not the base
+class.</p>
+
+<h2 id="client">UDP Client</h2>
+
+<p>The UDP client is used to create a connection to a UDP server anywhere on the internet. The
+client is responsible for initiating an internet connection which the server then responds to. In
+fact, in the UDP protocol, there is no initial communication from client to server, the remote host
+information is simply stored ready for use. Only when packets are actually sent is a connection made
+and then only per-packet.</p>
+
+<p>The interface to the UDP_client class is shown below.</p>
+
+<pre class="cpp">
+class UDP_client
+{
+public:
+  UDP_client(void);
+  UDP_client(const std::string&amp; remote_address, unsigned short remote_port, unsigned short local_port = 0);
+  UDP_client(unsigned long remote_address, unsigned short remote_port, unsigned short local_port = 0);
+  ~UDP_client(void);
+  UDP_client(const UDP_client&amp;);
+  UDP_client&amp; operator=(const UDP_client&amp;);
+
+  unsigned long ip_lookup(const std::string&amp; remote_address);
+  bool initialise(const std::string&amp; remote_address, unsigned short remote_port, unsigned short local_port = 0);
+  bool initialise(unsigned long remote_address, unsigned short remote_port, unsigned short local_port = 0);
+  bool initialised(void) const;
+  bool close(void);
+
+  bool send_ready(unsigned wait = 0);
+  bool send (std::string&amp; packet);
+  bool receive_ready(unsigned wait = 0);
+  bool receive (std::string&amp; packet);
+
+  unsigned short local_port(void) const;
+  unsigned long remote_address(void) const;
+  unsigned short remote_port(void) const;
+
+  void clear_error (void) const;
+  int error(void) const;
+  std::string message(void) const;
+};
+</pre>
+
+<p>There are two ways of creating an initialised UDP client. You can either create an uninitialised
+client (calling the void constructor) and then initialise it later, or you can initialise the
+connection at construction time and then later test to see if it initialised correctly. In the
+former case, the initialise method will return true if the initialisation succeeded and false
+otherwise. In the latter case, constructors cannot return a result so you must call the initialised
+test to see if the connection initialised correctly. If the connection fails, the error method will
+give an error code corresponding to the cause for the failure and the message method will give a
+textual representation of the error.</p>
+
+<p>The first initialise method (and the second constructor) takes three arguments. The first is a
+string containing the internet address to connect to, either as a name (e.g. 
+stlplus.sourceforge.net) or as a number (e.g. 195.0.0.1) and the second is the port to connect to
+(e.g. 80 for the HTTP service). The third argument is the local port to connect from; if set to
+zero, the operating system will choose an 'ephemeral' port.</p>
+
+<p>The second initialise method (and the third constructor) also takes three arguments. The first is
+the internet address to connect to represented as an integer (actually an unsigned long). This
+integer is the result from the ip_lookup method. It enables the name lookup to be separated out from
+the actual connection process. The second and third argument, and indeed the operation of the
+method, is the same as the previous initialisation method.</p>
+
+<p>The UDP client class supports assignment. This is done using a <a href="smart_ptr.html">smart
+pointer</a> to the underlying data structures. Thus, when you assign UDP clients, you simply create
+multiple pointers to the same data structure. This support for assignment makes it easy to create
+data structures of UDP clients. For example, to support multiple simultaneous connections, you could
+have an STL vector of UDP_client objects. Each object could be created outside the vector,
+initialised and then only copied into to the vector if initialisation worked.</p>
+
+<p>Once a client connection is finished with, it should be closed by calling close. The destructor
+also calls close, so allowing the client object to be destroyed will close the connection
+automatically.</p>
+
+<p>The next block of methods actually perform the communication phase of the connection. All
+communications are done in non-blocking mode, so these methods will not block and therefore will not
+lock up the program. However, this means that you have to be prepared to retry.</p>
+
+<p>To send data down the connection to the server, use the send method. The string passed to send is
+consumed by the send method. In other words, if the send succeeds, the string will be empty
+afterwards. The send method returns false only if an error occurred - failure to send because the
+server is not ready does <em>not</em> class as an error. All that will happen there is that the
+method will return true but the string will still contain the same data. You should retry, possibly
+after a short delay.</p>
+
+<p>You can use the send_ready method to determine whether the server is ready to receive what you
+send and then call send to actually send the data. The send_ready method allows you to specify a time
+delay to wait for the server to become ready if it is not at the time of the call. This delay is
+specified in micro-seconds (so giving the delay the value 1000000 will cause a delay of 1s). Setting
+the delay to zero will simply test whether the server is ready <em>now</em>. This is a non-blocking
+test which will be the best choice if you are using the UDP classes as part of a bigger program such
+as a GUI where there are other things to deal with, or if you are trying to poll multiple
+connections. If the server is not ready after this time delay has expired, the send_ready method
+will return false to indicate not ready. If the server becomes available at any time during the time
+delay, the timer will be stopped and the method will return true immediately, it will not wait for
+the full delay before returning.</p>
+
+<p>A similar argument applies to the receive and receive_ready methods. Calling receive_ready checks
+whether there is any server data ready to be received by the client. If it is, then receive will
+collect it. Bear in mind that network delays mean that, even if receive_ready returns false, that
+doesn't mean all the data has been received, simply that no data has arrived within the timeout
+period. Again, receive_ready can be used with little or no timeout to prevent blocking of the
+program.</p>
+
+<p>The receive method appends data received to the string passed as its argument, so you could in
+principle allow the data to accumulate over many calls to receive. However, this may not be wise,
+since the receive order is not guaranteed, so it is recommended that each packet is read, then
+cleared from the string before the next one.</p>
+
+<p>The remote_address and remote_port methods allow access to the connection details once the
+connection has been made. The local_port method allows the local port being used for the connection
+to be retrieved. If the local port was set to zero on initialisation, this will be a port picked
+from a pool of port numbers set aside by the operating system for use by clients, and will not be
+one of the service numbers such as 80 for HTTP. Each open connection uses a different local port
+number.</p>
+
+<p>Finally, there are three error handling methods. The error method returns the latest error
+code, zero if there hasn't been an error. This is the test for no error. Then, if there is an error,
+the message method returns a string description of the error. Finally, if the error is non-fatal,
+it can be cleared by clear_error and communications can continue.
+
+<p>In typical use, bear in mind that packet delivery is not guaranteed, so do not invent protocols
+that rely on responses - they will lock up. Instead, just poll the received_ready method
+periodically to see if there is data ready to read. Send whenever send_ready says it is possible to
+do so. At the end of the communication, it is usually the client's job to close the connection,
+although some protocols allow the server to close the connection as soon as a request has been
+fulfilled.</p>
+
+<p>Since there is no actual connection, there is not really a concept of closing a connection and
+therefore no sure way of knowing that the client has finished, or that the server has been closed
+down - unlike TCP where the conceptual connection can be closed by either end of the connection. If
+the server closes down for any reason, the client will not know this unless a send fails repeatedly
+to initiate a response. Even one fail doesn't indicate a closed server because delivery isn't
+guaranteed. The close method in the client can be thought of as a de-initialise method which clears
+the socket and prevents its further use.</p>
+
+<h2 id="server">UDP Server</h2>
+
+<p>A UDP Server is a program that spends most of its time doing nothing very much. It listens to a
+port, waiting for any client to send a packet. When a packet is sent, the server can either just
+receive the data if the protocol doesn't require a response or respond to it by sending back another
+packet or packets to the client. There is no concept of a client connection and each packet is
+handled as a separate communication. The server does not know about thge client (e.g. its address or
+port) until the packet is received, containing that data. Unlike TCP, a UDP server handles the
+send/receive itself, it does not delegate communications to another port.</p>
+
+<p>The server interface is shown below:</p>
+
+<pre class="cpp">
+class UDP_server
+{
+public:
+  UDP_server(void);
+  UDP_server(unsigned short port);
+  ~UDP_server(void);
+  UDP_server(const UDP_server&amp;);
+  UDP_server&amp; operator=(const UDP_server&amp;);
+
+  unsigned long ip_lookup(const std::string&amp; remote_address);
+  bool initialise(unsigned short port);
+  bool initialised(void) const;
+  bool close(void);
+
+  bool send_ready(unsigned timeout = 0);
+  bool send(std::string&amp; packet, const std::string&amp; remote_address, unsigned short remote_port);
+  bool send(std::string&amp; packet, unsigned long remote_address, unsigned short remote_port);
+  bool receive_ready(unsigned timeout = 0);
+  bool receive(std::string&amp; packet, unsigned long&amp; remote_address, unsigned short&amp; remote_port);
+
+  unsigned short local_port(void) const;
+
+  void clear_error (void) const;
+  int error(void) const;
+  std::string message(void) const;
+};
+</pre>
+
+<p>There are two ways of creating an initialised UDP server. You can either
+create an uninitialised server (calling the void constructor) and then
+initialise it later, or you can initialise the server at construction time
+and then later test to see if the server initialised correctly. In the
+former case, the initialise method will return true if the initialisation
+succeeded and false otherwise. In the latter case, constructors cannot return
+a result so you must call the initialised test to see if the server
+initialised correctly. If the initialisation fails, the error method will give
+an error code corresponding to the cause for the failure and the message
+method will give a textual representation of the error.</p>
+
+<p>The initialise method (and the second constructor) takes one argument. This is the port number
+to listen to for requests.</p>
+
+<p>The UDP server class supports assignment. This is done using a <a href="smart_ptr.html">smart
+pointer</a> to the underlying data structures. Thus, when you assign UDP servers, you simply create
+multiple pointers to the same data structure as with the UDP client. This support for assignment
+makes it easy to create data structures of UDP servers. For example, to listen to many different
+ports, you could have a vector of UDP_server objects, one for each port being listened to. Each
+object could be created outside the vector, initialised and then only copied into to the vector if
+initialisation worked.</p>
+
+<p>Once a server is finished with, it should be closed by calling
+close. The destructor also calls close, so allowing the server object to be
+destroyed will close the listening port automatically.</p>
+
+<p>The communication methods mirror the client data exchange methods. The send method sends data to
+the client. Because UDP is stateless, the remote address and port need to be specified every time. 
+The address of the first send method is a string containing the remote address as either a name
+(e.g. stlplus.sourceforge.net) or as a dotted number (e.g. 127.0.0.1). The second send method takes
+this argument as an unsigned long encoded form of the internet address as returned by the ip_lookup
+method. The final parameter is the remote port to send to. If the send succeeds, then the sent data
+is removed from the string passed as the argument. You can optionally call send_ready to check
+whether calling send would result in something actually being sent. The send_receive method also
+gives a mechanism for allowing the program to wait a time delay before sending, since network
+traffic is typically slow compared with the CPU. This would be appropriate if you are writing a
+program that has nothing else to do but process the connection. However, if you are in a GUI or in a
+program with many connections to serve, either no wait or a very small wait should be used. If no
+wait is required there is really no point in calling send_ready since send does not fail if the
+client is not ready.</p>
+
+<p>A similar argument applies to the receive and receive_ready methods. Calling receive_ready checks
+whether there is any client data ready to be received by the server. If it is, then receive will
+collect it. At the same time, the receive method retrieves the remote address and port of the client
+sending the request, which can then be used as arguments to the second send method when responding
+to the request.</p>
+
+<p>This means that the code for responding to a request can be tightly coded:</p>
+
+<pre class="cpp">
+if (server.receive_ready())
+{
+  unsigned long remote_address = 0;
+  unsigned short remote_port = 0;
+  std::string packet;
+  server.receive(packet, remote_address, remote_port);
+  server.send(response_to(packet), remote_address, remote_port);
+}
+</pre>
+
+<p>The receive method appends data received to the string passed as its argument. On reading the
+contents of the string, you should then clear the string ready to receive the next batch of
+data.</p>
+
+<p>There is no concept of closing a connection to a server, packets just come in at arbitrary times
+and the task of the server is to respond to them. Typically the server will only close when the
+program exits. However, there is a close method which effectively de-initialises the server,
+disconnecting it from the local port. Clients trying to send to that service will thereafter get no
+response because the packets will be rejected by the operating system due to there being no listener
+on that port.</p>
+
+<h2 id="example">Example</h2>
+
+<p>The example is taken from a test program used to test the UDP sockets code. It sets up a local
+server and then runs a second program which then acts as the client.</p>
+
+<p>The server code is:</p>
+
+<pre class="cpp">
+int server(std::vector&lt;std::string&gt; values, int port, const std::string&amp; command)
+{
+  int errors = 0;
+  std::cerr &lt;&lt; "server: " &lt;&lt; stlplus::build() &lt;&lt; std::endl;
+  // this is the first-run instance and acts as the server
+  // setup a server on the shared port
+  std::cerr &lt;&lt; "server: started" &lt;&lt; std::endl;
+  stlplus::UDP_server connection(port);
+  std::cerr &lt;&lt; "server: set up UDP server on port " &lt;&lt; port &lt;&lt; std::endl;
+  // now spawn a second copy of this program
+  stlplus::async_subprocess client;
+  client.spawn(command);
+  std::cerr &lt;&lt; "server: spawned client with command: " &lt;&lt; command &lt;&lt; std::endl;
+  // UDP servers just respond immediately to incoming datagrams
+  std::cerr &lt;&lt; "server: waiting for incoming connection" &lt;&lt; std::endl;
+  for (unsigned request = 0; request &lt; values.size(); request++)
+  {
+    std::cerr &lt;&lt; "server: checking for receive ready" &lt;&lt; std::endl;
+    // check connection for incoming request
+    if (!connection.receive_ready(timeout))
+    {
+      std::cerr &lt;&lt; "server: ERROR: wait for receive timed out" &lt;&lt; std::endl;
+      ++errors;
+    }
+    else
+    {
+      // receive the request
+      std::string data;
+      unsigned long remote_address = 0;
+      unsigned short remote_port = 0;
+      if (!connection.receive(data, remote_address, remote_port))
+      {
+        std::cerr &lt;&lt; "server: ERROR: connection receive failed after receive_ready was true" &lt;&lt; std::endl;
+        ++errors;
+      }
+      else
+      {
+        // report the value and check it's correct
+        std::cerr &lt;&lt; "server: received \"" &lt;&lt; data &lt;&lt; "\" from " &lt;&lt; remote_address &lt;&lt; ":" &lt;&lt; remote_port &lt;&lt; std::endl;
+        std::string value = std::string("error");
+        if (request &lt; values.size())
+          value = values[request];
+        if (data != value)
+        {
+          std::cerr &lt;&lt; "server: ERROR: received data \"" &lt;&lt; data &lt;&lt; "\" != \"" &lt;&lt; value &lt;&lt; "\"" &lt;&lt; std::endl;
+          ++errors;
+        }
+        // now throw the same data back
+        std::cerr &lt;&lt; "server: testing for send ready" &lt;&lt; std::endl;
+        if (!connection.send_ready(timeout))
+        {
+          std::cerr &lt;&lt; "server: ERROR: wait for send timed out" &lt;&lt; std::endl;
+          ++errors;
+        }
+        else
+        {
+          std::cerr &lt;&lt; "server: sending \"" &lt;&lt; data &lt;&lt; "\"" &lt;&lt; std::endl;
+          if (!connection.send(data, remote_address, remote_port))
+          {
+            std::cerr &lt;&lt; "server: ERROR: connection send failed after send_ready was true" &lt;&lt; std::endl;
+            ++errors;
+          }
+        }
+      }            
+    }
+  }
+  std::cerr &lt;&lt; "server: exited server loop" &lt;&lt; std::endl;
+  // wait for client to exit
+  while (client.tick())
+  {
+    std::cerr &lt;&lt; "server: client has not exited - waiting" &lt;&lt; std::endl;
+    sleep(1);
+  }
+  if (client.exit_status() != 0)
+  {
+    std::cerr &lt;&lt; "server: ERROR: client has exited with status " &lt;&lt; client.exit_status() &lt;&lt; std::endl;
+    errors += client.exit_status();
+  }
+  std::cerr &lt;&lt; "server: " &lt;&lt; (errors ? "ERROR:" : "SUCCESS:") &lt;&lt; " exiting with " &lt;&lt; errors &lt;&lt; " errors" &lt;&lt; std::endl;
+  return errors;
+}
+</pre>
+
+<p>The client is run in the second instance of this program, which is spawned using the
+async_subprocess class (see the <a href="subprocesses.html">Subprocesses</a> package). The client
+function is:</p>
+
+<pre class="cpp">
+int client(std::vector&lt;std::string&gt; values, int port)
+{
+  int errors = 0;
+  // this is the second-run instance and acts as the client
+  std::cerr &lt;&lt; "client: " &lt;&lt; stlplus::build() &lt;&lt; std::endl;
+  std::cerr &lt;&lt; "client: creating connection" &lt;&lt; std::endl;
+  stlplus::UDP_client connection("localhost", port, timeout);
+  for(unsigned request = 0; request &lt; values.size(); request++)
+  {
+    std::string value = values[request];
+    // send this value
+    std::cerr &lt;&lt; "client: testing for send ready" &lt;&lt; std::endl;
+    if (!connection.send_ready(timeout))
+    {
+      std::cerr &lt;&lt; "client: ERROR: wait for send timed out" &lt;&lt; std::endl;
+      ++errors;
+    }
+    else
+    {
+      // avoid the data being consumed by the send
+      std::string data = value;
+      std::cerr &lt;&lt; "client: sending \"" &lt;&lt; data &lt;&lt; "\"" &lt;&lt; std::endl;
+      if (!connection.send(data))
+      {
+        std::cerr &lt;&lt; "client: ERROR: connection send failed after send_ready was true" &lt;&lt; std::endl;
+        ++errors;
+      }
+    }
+    // check connection for incoming request
+    std::cerr &lt;&lt; "client: testing for receive ready" &lt;&lt; std::endl;
+    if (!connection.receive_ready(timeout))
+    {
+      std::cerr &lt;&lt; "client: ERROR: wait for receive timed out" &lt;&lt; std::endl;
+      ++errors;
+    }
+    else
+    {
+      // receive the request
+      std::string data;
+      if (!connection.receive(data))
+      {
+        std::cerr &lt;&lt; "client: ERROR: connection receive failed after receive_ready was true" &lt;&lt; std::endl;
+        ++errors;
+      }
+      else
+      {
+        // report the value and check it's correct
+        std::cerr &lt;&lt; "client: received \"" &lt;&lt; data &lt;&lt; "\"" &lt;&lt; std::endl;
+        if (data != value)
+        {
+          std::cerr &lt;&lt; "client: ERROR: received data \"" &lt;&lt; data &lt;&lt; "\" != \"" &lt;&lt; value &lt;&lt; "\"" &lt;&lt; std::endl;
+          ++errors;
+        }
+      }            
+    }
+  }
+  std::cerr &lt;&lt; "client: exited communication loop" &lt;&lt; std::endl;
+  std::cerr &lt;&lt; "client: " &lt;&lt; (errors ? "ERROR:" : "SUCCESS:") &lt;&lt; " exiting with " &lt;&lt; errors &lt;&lt; " errors" &lt;&lt; std::endl;
+  return errors;
+}
+</pre>
+
+<p>Finally here is the overall program that puts all this together:</p>
+
+<pre class="cpp">
+#include "build.hpp"
+#include "udp_sockets.hpp"
+#include "string_utilities.hpp"
+#include "subprocesses.hpp"
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+// UDP test: this program is designed to be run twice - once without an
+// argument as the server, which itself runs a second copy with an argument as
+// the client. The two instances then swap information using UDP
+////////////////////////////////////////////////////////////////////////////////
+
+unsigned timeout = 10000000;
+
+////////////////////////////////////////////////////////////////////////////////
+// Server code
+// sets up a UDP server then spawns this program again in client mode
+
+&lt;server function&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+// client
+
+&lt;client function&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+// main program
+
+int main (int argc, char* argv[])
+{
+  // code common to both instances to ensure both have the same information
+  std::vector&lt;std::string&gt; values = stlplus::split("one:two:three", ":");
+  int port = 3000;
+
+  // now branch for the two instances
+  int errors = 0;
+  if (argc == 1)
+  {
+    std::string command = std::string(argv[0]) + std::string(" client");
+    errors = server(values, port, command);
+  }
+  else
+  {
+    errors = client(values, port);
+  }
+  return errors;
+}
+</pre>
+
+</div>
+
+</body>
+</html>

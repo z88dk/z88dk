@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - persistence/persistent_shortcuts.hpp - Data Persistence Shortcut Functions</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="persistence.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>persistence/persistent_shortcuts.hpp<br>Data Persistence Shortcut Functions</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#file">File-Based Persistence</a></li>
+<li class="internal"><a href="#string">String-Based Persistence</a></li>
+<li class="internal"><a href="#iostream">IOStream-Based Persistence</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<ul>
+<li class="external"><a href="persistent_shortcuts_hpp.html">Browse Header persistent_shortcuts.hpp</a></li>
+</ul>
+
+<p>There is a set of template functions defined in the persistence_shortcuts.hpp header that
+encapsulate the most common uses of persistence. The functions assume that you have built up your
+family of dump and restore functions so that an entire data structure can be dumped by simply
+calling a function called dump_<em>class</em> at the top level. Similarly the data structure can be
+restored by simply calling restore_<em>class</em> at the top level. In both cases the functions must
+take only two parameters - the context and the data.</p>
+
+<p>The shortcut functions also support the use of an installer function as described in the section
+on <a href="persistent_pointers.html#installer">Polymorphic types</a>. This reduces the process of
+dumping to common targets to a one-line function call.</p>
+
+<h2 id="file">File-Based Persistence</h2>
+
+<p>Probably the most useful shortcut functions are the pair
+dump_to_file/restore_from_file:</p>
+
+<pre class="cpp">
+template&lt;typename T, class D&gt;
+void stlplus::dump_to_file(const T&amp; source, const std::string&amp; filename, D dump_fn, dump_context::installer installer)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, class R&gt;
+void stlplus::restore_from_file(const std::string&amp; filename, T&amp; result, R restore_fn, restore_context::installer installer)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>To dump a data structure to a file, simply call dump_to_file with the first argument being the
+source data structure to be dumped, the second argument being the name of the file to dump to, the
+third argument being the dump function with two parameters and the last argument being an installer
+function for registering any polymorphic types. The last argument can be null if there are no
+polymorphic types to register.</p>
+
+<p>Similarly, to restore the same data structure, simply call restore_from_file with the name of the
+file as the first argument (conceptually, the first argument is the source and the second the
+destination), the data structure to be restored as the second and the restore function the third. 
+Again the fourth argument is an installer function for restoring polymorphic types and may be
+null.</p>
+
+<p>As an example of how to use these functions, see the <a
+href="persistent_examples.html#shortcuts">examples page</a>.</p>
+
+
+<h2 id="string">String-Based Persistence</h2>
+
+<p>Sometimes you want to create an in-memory dump of a data structure rather
+than dumping to a file. For example, this would be a starting point for a
+routine for transferring a data structure across the internet using data
+persistence as the mechanism. This is done by dumping to and restoring from a
+string:</p>
+
+<pre class="cpp">
+template&lt;typename T, class D&gt;
+void stlplus::dump_to_string(const T&amp; source, std::string&amp; result, D dump_fn, dump_context::installer installer)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, class R&gt;
+void stlplus::restore_from_string(const std::string&amp; source, T&amp; result, R restore_fn, restore_context::installer installer)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This is very similar to the previous section's file-based persistence,
+except that the target of the dump is the string itself. Note that the std::string class
+is capable of storing binary data since it does not rely on null termination
+to work properly. A C char* could not be used in this way (but its obsolete
+anyway).</p>
+
+<p>To dump a data structure to a string, simply call dump_to_string with the first argument being
+the source data structure to be dumped, the second argument being the string to dump to, the third
+being the dump funtion and the final argument being an installer function for registering any
+polymorphic types. The last argument can be null if there are no polymorphic types to register.</p>
+
+<p>Similarly, to restore the same data structure, simply call restore_from_string with the string
+containing the dumped data as the first argument, the data structure to be restored as the second
+and the restore function the third. Again the fourth argument is an installer function for restoring
+polymorphic types and may be null.</p>
+
+<h2 id="iostream">IOStream-Based Persistence</h2>
+
+<p>The above two short-cuts are in fact specialisations of the most general
+short-cut functions that dump to and restore from any IOStream device. This more
+general form is useful if you want to use other I/O devices than the most
+common ones of files and in-memory strings.</p>
+
+<p>The functions are:</p>
+
+<pre class="cpp">
+template&lt;typename T, class D&gt;
+void stlplus::dump_to_device(const T&amp; source, std::ostream&amp; result, D dump_fn, dump_context::installer installer)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, class R&gt;
+void stlplus::restore_from_device(std::istream&amp; source, T&amp; result, R restore_fn, restore_context::installer installer)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>To dump a data structure to an output device, simply call dump_to_device
+with the first argument being the source data structure to be dumped, the
+second argument being the IOStream device to dump to and the final argument
+being an installer function for registering any polymorphic types. The last
+argument can be null if there are no polymorphic types to register.</p>
+
+<p>Similarly, to restore the same data structure, simply call
+restore_from_device with the IOStream device sourcing the dumped data as the first argument
+and the data structure to be restored as the second. Again the
+third argument is an installer function for restoring polymorphic types and
+may be null.</p>
+
+
+</div>
+
+</body>
+</html>

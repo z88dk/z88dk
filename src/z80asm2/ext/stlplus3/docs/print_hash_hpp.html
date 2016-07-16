@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>strings/print_hash.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>strings/print_hash.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PRINT_HASH
+#define STLPLUS_PRINT_HASH
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Generate a string representation of a hash
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;strings_fixes.hpp&quot;
+#include &quot;hash.hpp&quot;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  template&lt;typename K, typename T, typename H, typename E, typename KS, typename TS&gt;
+  void print_hash(std::ostream&amp; device,
+                  const hash&lt;K,T,H,E&gt;&amp; values,
+                  KS key_print_fn,
+                  TS value_print_fn,
+                  const std::string&amp; pair_separator = &quot;:&quot;,
+                  const std::string&amp; separator = &quot;,&quot;);
+
+} // end namespace stlplus
+
+#include &quot;print_hash.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

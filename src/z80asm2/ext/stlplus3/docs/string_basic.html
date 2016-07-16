@@ -1,0 +1,314 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - strings/string_basic.hpp - String Formatting of Basic Types</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>strings/string_basic.hpp<br>String Formatting of Basic Types</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#radix">Integer Radix Handling</a></li>
+<li class="internal"><a href="#format">Real Format Handling</a></li>
+<li class="internal"><a href="#integer_to_string">Conversion from Integer to String</a></li>
+<li class="internal"><a href="#string_to_integer">Conversion from String to Integer</a></li>
+<li class="internal"><a href="#real_to_string">Conversion from Real to String</a></li>
+<li class="internal"><a href="#string_to_real">Conversion from String to Real</a></li>
+<li class="internal"><a href="#print">Printing Functions</a></li>
+<li class="internal"><a href="#basic_print">Printing Basic Types</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This is a set of functions that perform string conversions and printing
+routines. There are functions here for converting integers to/from string
+representations as well as floating-point types to/from string
+representations. There are supporting functions
+for printing the same types.</p>
+
+<p>There are two separate header files for including these functions:</p>
+
+<ul>
+<li class="external"><a href="string_basic_hpp.html">string_basic.hpp</a>: For the <em>type</em>_to_string functions</li>
+<li class="external"><a href="print_basic_hpp.html">print_basic.hpp</a>: For the print_<em>type</em> functions</li>
+</ul>
+
+<p>The string formatting functions in <a
+href="string_basic_hpp.html"><code>string_basic.hpp</code></a> are controlled by a set of
+enumeration types which have been separated out into the header <a
+href="format_types_hpp.html"><code>format_types.hpp</code></a>.</p>
+
+<h2 id="radix">Radix Handling</h2>
+
+<p>C is a bit limited in its ability to display different radix (base)
+numbers. Basically you can print in decimal (e.g. 1234), octal (e.g. 01234) or
+hexadecimal (e.g. 0x1234) only. Sometimes you need other radices - in
+particular, binary and base 13.</p>
+
+<p>To improve on this situation, the string formatting functions for integer
+types (but not for floating point types) support all
+radices from base 2 to base 36 using the character set [0-9a-z]. It offers three
+different formatting options for showing the radix:</p>
+
+<ul>
+<li>No radix display</li>
+<li>C-style radix display (base 8 and 16 only)</li>
+<li>Hash-style display for all bases</li>
+</ul>
+
+<p>Hash-style format starts with the base in decimal, a '#', then the
+number in the specified base. For example, 16#ff is 255 in hexadecimal. The
+advantage of this format is that it can be applied to any base. Thus 36#zz is a
+valid hash-style number. Its value is left as an exercise for the reader.</p>
+
+<p>Hash-style format is a sign-magnitude format. A negative value has the sign
+after the # character: 16#-ff represents -255 in hexadecimal.</p>
+
+<p>Each integer formatting function takes as an argument an enumeration of type
+stlplus::radix_display_t specifying which formatting style to use for the output. The
+type has the following values:</p>
+
+<dl>
+
+<dt>stlplus::radix_none</dt>
+<dd>Just print the number with no radix indicated</dd>
+
+<dt>stlplus::radix_hash_style</dt>
+<dd>none for decimal, hash style for all others</dd>
+
+<dt>stlplus::radix_hash_style_all</dt>
+<dd>hash style for all radices including decimal</dd>
+
+<dt>stlplus::radix_c_style</dt>
+<dd>C style for hex and octal, none for others</dd>
+
+<dt>stlplus::radix_c_style_or_hash</dt>
+<dd>C style for hex and octal, none for decimal, hash style for others</dd>
+
+</dl>
+
+<p>Note that the only styles that are guaranteed to give a value that can be correctly converted
+back to an integer again are: radix_hash_style, radix_hash_style_all and radix_c_style_or_hash. The
+last of these is the recommended style for all printing since it is the most natural combination -
+decimal is printed as a number (e.g. 1234), binary, octal and hex are in familiar C-style (e.g.
+0b0100100, 01234 or 0x1234) and all other bases are in hash style (e.g. 4#3210). Indeed,
+radix_c_style_or_hash is the default format for all the string formatting functions.</p>
+
+<h2 id="format">Real Format Handling</h2>
+
+<p>When formatting real numbers as strings, there are three formats supported.
+These are controlled by the enumeration type real_format_t. It has the following
+values:</p>
+
+<dl>
+<dt>stlplus::display_fixed</dt>
+<dd>This displays the real number as a fixed-point value - that is it has no
+exponent (Ennn) part, just the mantissa. This is equivalent to the C format "%f".</dd>
+
+<dt>stlplus::display_floating</dt>
+<dd>This displays the number is a floating point value for any value - that is
+it always has an exponent part, even if it is zero. This is equivalent to the C
+format "%e".</dd>
+
+<dt>stlplus::display_mixed</dt>
+<dd>This selects whichever of the above formats is most appropriate for the
+value. For small exponents, it will use fixed point format, whilst for large
+exponents (positive or negative) it will use the floating point format. This is
+equivalent to the C format "%g".</dd>
+</dl>
+
+<h2 id="integer_to_string">Conversion from Integer to String</h2>
+
+<p>There is a whole family of functions called <code><em>type</em>_to_string</code> which take an integer
+type and format it into a std::string. The parameter profile of these functions
+is:</p>
+
+<pre class="cpp">
+std::string stlplus::<em>type</em>_to_string(<em>type</em> i,
+                                    unsigned radix = 10,
+                                    stlplus::radix_display_t display = stlplus::radix_c_style_or_hash,
+                                    unsigned width = 0)
+  throw(std::invalid_argument);
+</pre>
+
+<p>In this case, <em>type</em> is any integer type - namely bool, short, unsigned short, int,
+unsigned, long and unsigned long. For two-word types such as "unsigned long", the function name uses
+an underscore to make the function name unsigned_long_to_string.</p>
+
+<p>The width parameter specifies the minimum number of digits to use to
+represent the value. The result may be larger than this if the value doesn't
+fit in the specified width. The default of 0 means use the minimum number of
+digits to represent the value. Any prefix that indicates the radix is in
+addition to this, so if you ask for, for example, zero in hexadecimal using C
+style with a width of 4, you will get 0x0000. Using hash style will give
+16#0000.</p>
+
+<p>The exception std::invalid_argument will be thrown if the radix is not in
+the range 2-36 or the display enumeration is illegal.</p>
+
+<p>The default values mean that the functions can be used with just a single
+parameter:</p>
+
+<pre class="cpp">
+std::string s = stlplus::int_to_string(i);
+</pre>
+
+<p>In this case, the output will be in decimal with no formatting codes (since
+radix_c_style_or_hash prints decimal as just a simple number).</p>
+
+<p>There is one last form of to_string in this set that is worth noting:</p>
+
+<pre class="cpp">
+std::string stlplus::address_to_string(const void*,
+                                       unsigned radix = 16,
+                                       radix_display_t display = radix_c_style_or_hash,
+                                       unsigned width = 0)
+  throw(std::invalid_argument);
+</pre>
+
+<p>This prints out an address as a number (any address, since in C any pointer can be
+treated as a void*). The default radix is set to 16 because most people expect
+addresses to be in hex.</p>
+
+<h2 id="string_to_integer">Conversion from String to Integer</h2>
+
+<p>These functions do the reverse conversion, taking a string as an argument and
+returning the integer value represented. They recognise the normal C-style
+formatting and the hash-style formatting so can read a string written in any
+base.</p>
+
+<p>The integer conversion functions are of the form:</p>
+
+<pre class="cpp">
+<em>type</em> string_to_<em>type</em>(const std::string&amp; value, unsigned radix = 0);
+  throw(std::invalid_argument);
+</pre>
+
+<p>where <em>type</em> is bool, short, unsigned short, int, unsigned int, long
+or unsigned long.</p>
+
+<p>A radix of 0 means work out the radix from the string. The default is then
+10. Any other radix will force the default to be that radix. Thus if you have a
+number which has been printed using radix_none but with a radix of 32, you can
+convert it back to integer by specifying a radix of 32. However, any number
+printed using the default radix_c_style_or_hash will be read correctly without
+specifying a conversion radix.</p>
+
+<p>The exception std::invalid_argument will be thrown if a radix is specified
+outside the range 2-36.</p>
+
+<p>And finally, there is the reverse conversion for addresses:</p>
+
+<pre class="cpp">
+void* string_to_address(const std::string&amp; value, unsigned radix = 0)
+  throw(std::invalid_argument);
+</pre>
+
+<h2 id="real_to_string">Conversion from Real to String</h2>
+
+<p>There are two <em>type</em>_to_string functions which format the two C++ real types to a
+string representation. These are:</p>
+
+<pre class="cpp">
+std::string stlplus::float_to_string(float f, 
+                                     stlplus::real_display_t display = stlplus::display_mixed,
+                                     unsigned width = 0,
+                                     unsigned precision = 6);
+
+std::string stlplus::double_to_string(double f, 
+                                      stlplus::real_display_t display = stlplus::display_mixed,
+                                      unsigned width = 0,
+                                      unsigned precision = 6);
+</pre>
+
+<p>The default values are chosen to give reasonable displays for most
+applications. The default format is display_mixed (equivalent to "%g") with a
+precision of 6 decimal places and no field width - which gives a minimum field
+width. See <a href="dprintf.html">dprintf.hpp</a> for the meanings of the
+precision and field width for floating point numbers..</p>
+
+<h2 id="string_to_real">Conversion from String to Real</h2>
+
+<p>Once again there are two conversions from string to real types, one for
+each C++ real type. These are:</p>
+
+<pre class="cpp">
+float stlplus::string_to_float(const std::string&amp; value);
+double stlplus::string_to_double(const std::string&amp; value);
+</pre>
+
+<p>These conversions will accept strings formatted in any of the formats which
+can be used by the real to_string functions, so there is symmetry here.</p>
+
+<h2 id="print">Printing Functions</h2>
+
+<p>In parallel with the set of string conversion routines, there is a set of
+print routines for the same set of types. Typically these will have the same parameters as the
+string-formatting functions, but take an extra first argument which is the IOStream output device to
+print to.</p>
+
+<h2 id="basic_print">Printing Basic Types</h2>
+
+<p>The integer print routines have the following profile:</p>
+
+<pre class="cpp">
+void stlplus::print_<em>type</em>(std::ostream&amp; str, <em>type</em> value,
+                         unsigned radix = 10,
+                         stlplus::radix_display_t display = stlplus::radix_c_style_or_hash,
+                         unsigned width = 0)
+  throw(std::invalid_argument);
+</pre>
+
+<p>In this case, <em>type</em> is any integer type - namely bool, short, unsigned
+short, int, unsigned, long and unsigned long.</p>
+
+<p>The extra parameters have the same meaning as for the to_string functions.</p>
+
+<p>Similarly, floating-point types are handled:</p>
+
+<pre class="cpp">
+void stlplus::print_<em>type</em>(std::ostream&amp; str, <em>type</em> f, 
+                         stlplus::real_display_t display = stlplus::display_mixed,
+                         unsigned width = 0,
+                         unsigned precision = 6)
+  throw(std::invalid_argument);
+</pre>
+
+
+</div>
+
+</body>
+</html>

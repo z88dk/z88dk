@@ -1,0 +1,202 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/dprintf.hpp - Printf-like Functions for Dynamic Strings</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/dprintf.hpp<br>Printf-like Functions for Dynamic Strings</h1>
+</div>
+
+<div id="documentNavigation">
+<ul>
+<li class="external"><a href="dprintf_hpp.html">Browse Header dprintf.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#interface">Interface</a></li>
+<li class="internal"><a href="#formats">Formats</a></li>
+</ul>
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>A "better" version of sprintf() and form() which provide printf-style
+formatting to the string class. In fact, they simply overcome some of the
+limitations of these functions, in particular they avoid the use of fixed char*
+buffers which can cause memory corruption or even a crash on overflow.</p>
+
+<p>It is called dprintf because the obvious name (sprintf) was already taken.
+The 'd' stands for dynamic in that it writes to a dynamic string and therefore
+has no buffer overflow problems.</p>
+
+
+<h2 id="interface">Interface</h2>
+
+<pre class="cpp">
+int dprintf (string&amp;, const char* format, ...);
+</pre>
+
+<p>This is a bit like sprintf() but acting on strings, it formats the message by
+appending to the string (using the += operator) according to the formatting
+codes in the format string. The return int is the number of characters generated
+by this call, i.e. the increase in the length of the string.</p>
+
+<p>Note: you should never use sprintf in any program, since it writes to a
+string without any check on the string length. It can therefore overflow and
+crash the program. This kind of function just isn't worth using.</p>
+
+<pre class="cpp">
+int vdprintf (string&amp; formatted, const char* format, va_list args);
+</pre>
+
+<p>As above, but using a pre-initialised va_args argument list and therefore
+like the vsprintf() function. Useful for nesting printf-style calls within
+variable argument functions.</p>
+
+<pre class="cpp">
+string dformat (const char* format, ...);
+</pre>
+
+<p>Similar to dprintf() above, except the result is formatted into a new string
+which is returned by the function. Very useful for inline calls within a TextIO
+expression. This is a replacement for the old form() function which relies on a
+fixed-size static char* which is not only prone to overflow but is also not
+thread-safe. An example of its use with TextIO:</p>
+
+<pre class="cpp">
+std::cout &lt;&lt; "Total: " &lt;&lt; dformat("%6i",t) &lt;&lt; std::endl;
+</pre>
+
+<p>This produces an integer formatted into a 6-character wide field. See the
+next section for the full set of formats provided.</p>
+
+<pre class="cpp">
+string vdformat (const char* format, va_list);
+</pre>
+
+<p>As above, but using a pre-initialised va_args argument list. Useful for
+nesting dformat calls within variable argument functions. </p>
+
+
+<h2 id="formats">Formats</h2>
+
+<p>The result supports the following "C" format codes:</p>
+
+<pre>%[flags][field][.precision][modifier][conversion]</pre>
+
+<h3>flags:</h3>
+
+<pre>
+-    - left justified
++    - print sign for +ve numbers
+' '  - leading space where + sign would be
+0    - leading zeros to width of field
+#    - alternate format
+</pre>
+
+<h3>field:</h3>
+
+<p>A numeric argument specifying the field width - default = 0 </p>
+
+<p>* means take the next va_arg as the field width - if negative then left
+justify</p>
+
+<p>For example:</p>
+
+<pre class="cpp">
+dprintf(d, "%*i", width, value);
+</pre>
+
+<p>This formats the integer in variable value in a field width defined by the
+variable width.</p>
+
+<h3>precision:</h3>
+
+<p>A numeric argument the meaning of which depends on the conversion</p>
+
+<pre>
+%s - maximum number of characters from a string - default = strlen()
+%e, %f - decimal places to be displayed - default = 6
+%g - significant digits to be displayed - default = 6
+all integer conversions - minimum digits to display - default = 0
+* means take the next va_arg as the field width - if negative then left justify
+</pre>
+
+<h3>modifier:</h3>
+
+<pre>
+h    - short or unsigned short
+l    - long or unsigned long
+L    - long double
+</pre>
+
+<h3>conversions:</h3>
+
+<pre>
+d, i - short/int/long as decimal
+u    - short/int/long as unsigned decimal
+o    - short/int/long as unsigned octal - # flag adds leading 0
+x, X - short/int/long as unsigned hexadecimal - # flag adds leading 0x
+c    - char
+s    - char*
+C    - wchar_t
+S    - wchar_t*
+f    - double/long double as fixed point
+e, E - double/long double as floating point
+g, G - double/long double as fixed point/floating point depending on value
+p    - void* as unsigned hexadecimal
+%    - literal %
+n    - int* as recipient of length of formatted string so far
+</pre>
+
+<h3>Meta-Characters</h3>
+
+<p>The result also supports the following "C" meta-characters:</p>
+
+<pre>
+\b   - backspace
+\f   - formfeed
+\n   - newline
+\r   - carriage return
+\t   - tab
+\v   - vertical tab
+\\   - backslash
+\?   - question mark
+\'   - single quote
+\&quot;   - double quote
+</pre>
+
+<p>The \000 and \x00 representations of octal and hexadecimal codes are not yet supported.</p>
+
+
+</div>
+
+</body>
+</html>

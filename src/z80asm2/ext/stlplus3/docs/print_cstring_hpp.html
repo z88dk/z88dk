@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>strings/print_cstring.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>strings/print_cstring.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PRINT_CSTRING
+#define STLPLUS_PRINT_CSTRING
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Functions for converting C/STL strings to string
+
+//   This is necessary for completeness
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;strings_fixes.hpp&quot;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+
+namespace stlplus
+{
+
+  void print_cstring(std::ostream&amp; device, const char* value);
+
+}
+
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

@@ -1,0 +1,479 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - containers/ntree.hpp - Ntree - a Rooted Tree Container</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>containers/ntree.hpp<br>a Rooted Ordered Tree Container</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="ntree_hpp.html">Browse Header ntree.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#instantiation">Instantiation</a></li>
+<li class="internal"><a href="#basics">Basics - Nodes and Iterators</a></li>
+<li class="internal"><a href="#manipulating">Manipulating Trees</a></li>
+<li class="internal"><a href="#traversal">Traversal Iterators</a></li>
+<li class="internal"><a href="#breadth">Breadth-First Traversal</a></li>
+<li class="internal"><a href="#exceptions">Exceptions</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This component is an STL-like template class which implements a tree data structure. I called it
+an ntree (short for n-ary tree) years ago due to a misunderstanding - this is in fact a <a
+href="http://en.wikipedia.org/wiki/Tree_(graph_theory)">rooted ordered tree</a>. However, the name
+has stuck because I don't want to break existing code that uses it.</p>
+
+
+<h2 id="instantiation">Instantiation</h2>
+
+<p>The ntree template takes a single type as its template argument:</p>
+
+<pre class="cpp">
+template&lt;typename T&gt; class ntree
+</pre>
+
+<p>This type is the type to be stored on each node of the tree structure. For
+example, a variable representing a tree of strings can be created like
+this:</p>
+
+<pre class="cpp">
+ntree&lt;string&gt; strings;
+</pre>
+
+
+<h2 id="basics">Basics - Nodes and Iterators</h2>
+
+<p>An ntree is a tree of nodes, each one containing the user type (represented
+by T in the template declaration). Each node also contains hidden field which
+you don't need to know about but which implement the tree structure.</p>
+
+<p>Like other STL containers, the ntree uses an iterator as a pseudo-pointer
+or handle to a node. These iterators act like pointers when they are
+dereferenced and give access to the user data (type T) associated with that
+node.</p>
+
+<p>There are two basic iterator types defined in ntree:</p>
+
+<ul>
+<li>iterator - a node iterator</li>
+<li>const_iterator - a node iterator for const ntrees</li>
+</ul>
+
+<p>These names follow the normal conventions for STL classes. An iterator is
+used to act on a non-const ntree and can modify it, whereas the const_iterator
+act on a const ntree and can only perform read-only operations on it.</p>
+
+<p>However, the iterator concept starts to break down a bit here and the
+ntree iterator does not allow increment or decrement operations to step
+through the tree. However, you should see the prefix_iterator and
+postfix_iterator defined in the next section.</p>
+
+<p>Iterators act very much like STL list iterators in that changing an ntree
+does not invalidate iterators except for those pointing to nodes that have
+been erased from the tree.</p>
+
+<p>Since there are no increment or decrement operations on an iterator, other
+methods are provided to allow tree traversal. Here's the traversal
+functions for iterators:</p>
+
+<pre class="cpp">
+iterator ntree::root(void);
+unsigned ntree::children(iterator);
+iterator ntree::child(iterator, unsigned child);
+unsigned ntree::child_offset(iterator, iterator child);
+iterator ntree::parent(iterator);
+</pre>
+
+<p>Note: These methods are members of the ntree class, not the iterator class.</p>
+
+<p>Thus, you can traverse a tree by first getting the root node, then
+  iterating through its child nodes. Alternatively, you can walk up
+  the tree from a node to the root by following the parent
+  pointers. Children are accessed by a numeric offset starting at
+  0 and ending at children()-1. The children method gives the number of children for that
+  node. Thus a node with 4 children will have offsets of 0..3 to
+  access them. A child node is accessed by getting its iterator using
+  the child method and then manipulating the child mode via that
+  iterator. The child_offset method allows an iterator to a child to
+  be converted back to a numeric offset.</p>
+
+<p>Note: child_offset uses a linear search thorough all the children
+of the node. This is efficient on trees with few children per node but
+  can be very expensive on trees with large number of children per node,
+in which case you are advised to use a different approach such as
+maintaining a map of iterators to parent/child offsets.</p>
+
+<p>There's an identical set of these functions acting on const_iterator of
+course.</p>
+
+<p>STLplus iterators are slightly different to STL iterators in that they know which container they
+belong to. When an iterator is first declared, but not assigned to, it is known as a <em>null</em>
+iterator. Then, when it is assigned to so that it points to a node in the tree, it is known as a
+<em>valid</em> iterator. If the iterator is made to point off the edge of the tree - for example the
+parent of the root node, then it becomes an <em>end</em> iterator.</p>
+
+<p>This concept is similar to STL iterators like the list iterator, where an iterator that walks off
+the end of the list becomes an end iterator. However, the STL has no concept of a null iterator and
+therefore no direct equivalent of a valid iterator.</p>
+
+<p>The iterator has a set of functions for testing these
+conditions:</p>
+
+<pre class="cpp">
+bool iterator::null(void) const;
+bool iterator::end(void) const;
+bool iterator::valid(void) const;
+</pre>
+
+<p>Note that these functions are members of the iterator class, not the ntree
+class.</p>
+
+<p>Exactly one of these conditions will always be true, since the iterator must be one of null, end
+or valid.</p>
+
+<p>Only a valid iterator can be dereferenced to access the node type T pointed to by the iterator.
+Any attempt to dereference an end or null iterator will result in an exception being thrown. See the
+section below on <a href="#exceptions">Exceptions</a> to see which.</p>
+
+<p>Example:</p>
+
+<pre class="cpp">
+ntree&lt;string&gt; data;
+...
+ntree&lt;string&gt;::iterator i = data.root();
+if (i.valid())
+{
+  for (unsigned j = 0; j &lt; data.children(i); j++)
+    ...
+}
+</pre>
+
+<p>When dereferencing an iterator, you access the user data type T. In the
+above examples, this is type std::string. A non-const iterator gives access to
+a reference to this type which can be assigned to as well as read. Thus you
+can change the contents of a node. However, a const_iterator gives access to a
+const reference which cannot be assigned to but can be read. This is how all
+STL-like iterators work.</p>
+
+
+<h2 id="manipulating">Manipulating Trees</h2>
+
+<p>When you declare an ntree, the result is an empty tree - namely a tree with
+a null root. Typically, the root has to be handled slightly
+differently to other nodes, since it does not have a parent node. This
+functionality is provided by the insert(T) function, where T is the user
+data type as usual:</p>
+
+<pre class="cpp">
+iterator ntree::insert(const T&amp;);
+</pre>
+
+<p>This clears any previous tree contents, creates a root node and assigns the
+data in type T to this node. It returns an iterator to the root node.</p>
+
+<p>Once there is a root node, other nodes are added by specifying the parent
+node to add it to and the index to add it into the child pointers. For
+example, inserting at position 0 prepends it to the list of child nodes,
+whilst inserting at the position indicated by the current number of children
+will append it to the list. For example, inserting at position 4 for a node
+with 4 children (offsets 0..3 remember) will append it to the list. For
+convenience there is an alternative append function with no child offset to make the append function
+simpler. Thus, there are two functions for adding a non-root node:</p>
+
+<pre class="cpp">
+iterator ntree::insert(iterator parent, unsigned offset, const T&amp; node_data);
+iterator ntree::append(iterator parent, const T&amp; node_data);
+</pre>
+
+<p>Once children have been added, they can be reordered. There are two reordering methods:</p>
+
+<pre class="cpp">
+void reorder(const iterator&amp; node, unsigned offset, unsigned new_offset)
+void swap(const iterator&amp; node, unsigned child1, unsigned child2)
+</pre>
+
+<p>The reorder method moves the specified child that was
+  at offset so that it is at new_offset. The siblings will be moved
+  to accommodate the move so as to preserve their
+  order except for the moved child. For example, say you have a list
+  [a,b,c,d] and the method reorder(node,1,3) is called, then child 1
+  (b) will be moved to position 3 to give: [a,c,d,b]. Note how this is
+  equivalent to removing the child, allowing all the remaining
+  children to shuffle down to fill the gap, then re-inserting the child at the specified
+  new_offset.</p>
+
+<p>The swap method swaps over two children without affecting the
+  position of any other siblings. For example, say you have a list
+  [a,b,c,d] and the method swap(node,1,3) is called, then child 1 (b)
+  will be swapped with child 3 (d) to give: [a,d,c,b].</p>
+
+<p>It is also possible to add a <em>copy</em> of another tree to the
+root or to a node, thus adding a whole subtree in one go:</p>
+
+<pre class="cpp">
+iterator ntree::insert(const ntree&lt;T&gt;&amp;);
+iterator ntree::insert(iterator, unsigned, const ntree&lt;T&gt;&amp;);
+iterator ntree::insert(iterator, const ntree&lt;T&gt;&amp;);
+</pre>
+
+<p>All of these methods copy the argument into the current tree. The
+  first method erases the current tree and then copies the argument tree into
+  the root. The second copies the tree to make it the designated child
+  of the node. The third is the same as the second but appends it to
+  the set of children.</p>
+
+<p>Another way of adding a copy of another tree as the root of this tree is done by simple
+assignment of one tree to another - assignment does a copy.</p>
+
+<p>If you want to move one tree into another tree without copying it,
+  use the move methods. Once again, there are three with similar
+  functionality to the insert functions:</p>
+
+<pre class="cpp">
+iterator ntree::move(ntree&lt;T&gt;&amp;);
+iterator ntree::move(iterator, unsigned, ntree&lt;T&gt;&amp;);
+iterator ntree::move(iterator, ntree&lt;T&gt;&amp;);
+</pre>
+
+<p>Note that the argument is non-const because it's contents are
+  moved into the destination tree, leaving the source tree empty after the move.</p>
+
+<p>The move operations also move all iterators to nodes in the tree
+  being moved so that they can continue to be used even though the
+  nodes now belong to a different tree.</p>
+
+<p>There are four erase functions:</p>
+
+<pre class="cpp">
+void ntree::erase(void);
+void ntree::erase(iterator);
+void ntree::erase_child(iterator, unsigned);
+void ntree::erase_children(iterator);
+</pre>
+
+<p>The first form erases the whole tree. The second erases the node
+pointed to by the iterator. The third form erases a single child of
+the node, where the iterator refers to the node and the child is
+indicated by the unsigned offset into the node's set of children. The
+fourth form erases all of a node's children but leaves the node. In
+all cases the whole subtree below the deleted elements is also
+deleted.</p>
+
+<p>To make a copy of a subtree of an ntree, use the subtree functions:</p>
+
+<pre class="cpp">
+ntree&lt;T&gt; ntree::subtree(void);
+ntree&lt;T&gt; ntree::subtree(iterator);
+ntree&lt;T&gt; ntree::subtree(iterator, unsigned);
+</pre>
+
+<p>The first function makes a subtree out of the whole tree, effectively
+making an exact copy of the whole tree. The second form copies the tree
+starting from the node pointed to by the iterator. Thus the resulting tree
+will have a copy of this node as its root. The third form copies the tree one
+level down from this, copying from the designated child of the pointed-to
+node.</p>
+
+<p>The final set of functions allow parts of an ntree to be cut off and made
+into new trees:</p>
+
+<pre class="cpp">
+ntree&lt;T&gt; ntree::cut(void);
+ntree&lt;T&gt; ntree::cut(iterator);
+ntree&lt;T&gt; ntree::cut(iterator, unsigned);
+</pre>
+
+<p>These are very similar to the subtree functions except that they are
+destructive. They remove part or all of the source tree. The first cuts the
+whole tree leaving it empty and creating a new tree which contains all of the
+old tree. The second cuts out the designated node and its subtree, removing it
+from its parent node's child list. The last removes a child and makes a new
+tree out of it.</p>
+
+<h2 id="traversal">Traversal Iterators</h2>
+
+<p>Earlier it was pointed out that ntree iterators are only used to point to
+nodes, they cannot be used to iterate through the tree (so making the name
+iterator a bit inappropriate, but I did that for consistency with other data
+structures). There are in fact two pairs of iterators which can be used to
+traverse an ntree. These are the prefix_iterator and the postfix_iterator. As
+usual with STL-like containers, they occur in non-const and const form, giving
+four iterators in all:</p>
+
+<ul>
+<li>prefix_iterator - traverses the tree in prefix order - i.e. visits each
+node before any of its children</li>
+<li>const_prefix_iterator - const version of the above</li>
+<li>postfix_iterator - traverses the tree in postfix order - i.e. visits each
+node after all of its children</li>
+<li>const_postfix_iterator - const version of the above</li>
+</ul>
+
+<p>These iterators are used just like other STL-like forward
+iterators. This means that ++ is used to move the iterator forward,
+  but only forward traversals are possible, by which I mean that only
+the ++ operator is provided and there is no -- oerator.</p>
+
+<p>The iteration is started by prefix_begin() for prefix iterators and
+postfix_begin() for postfix iterators. Similarly the end of iteration is
+tested by comparing with prefix_end() or postfix_end(). Specifically, the
+functions are:</p>
+
+<pre class="cpp">
+const_prefix_iterator ntree::prefix_begin(void) const;
+prefix_iterator ntree::prefix_begin(void);
+const_prefix_iterator ntree::prefix_end(void) const;
+prefix_iterator ntree::prefix_end(void);
+
+const_postfix_iterator ntree::postfix_begin(void) const;
+postfix_iterator ntree::postfix_begin(void);
+const_postfix_iterator ntree::postfix_end(void) const;
+postfix_iterator ntree::postfix_end(void);
+</pre>
+
+<p>An example:</p>
+
+<pre class="cpp">
+ntree&lt;string&gt; data;
+...
+for (ntree&lt;string&gt;::prefix_iterator i = data.prefix_begin(); i != data.prefix_end(); i++)
+{
+  ...
+}
+</pre>
+
+<p>These traversal iterators allow access to the node data just as the simple
+iterator does - by dereferencing the iterator. The iterators also have the tests for end, null and
+valid iterators, and it is only legal to dereference a valid iterator.</p>
+
+<p>However, you cannot use the traversal iterators to access other
+information from the ntree class such as the parent node or the child
+nodes, since the functions providing this information only take simple
+iterators. For this reason, all the traversal iterators have a member
+function called simplify() which returns a simple iterator from a
+  prefix or postfix iterator. For example, a prefix_iterator simplifies
+to an iterator and a const_postfix_iterator simplifies to a
+const_iterator. The full set of simplify functions are:</p>
+
+<pre class="cpp">
+iterator prefix_iterator::simplify(void) const;
+const_iterator const_prefix_iterator::simplify(void) const;
+iterator postfix_iterator::simplify(void) const;
+const_iterator const_postfix_iterator::simplify(void) const;
+</pre>
+
+<p>Once the simple iterator has been extracted, it <em>can</em> be used to access other information
+from the ntree class.</p>
+
+<p>Note: it would seem that the prefix and postfix iterators should be
+subclasses of the simple iterator which would negate the need for the
+simplify method. However, at the time of writing, it was impossible to
+combine inheritance with template classes in a way that was
+portable between compilers, so this is the compromise that was made.</p>
+
+<h2 id="breadth">Breadth-First Traversal</h2>
+
+<p>An alternative traversal order is the breadth-first traversal. In
+this, the nodes are visited in layers, starting with all nodes at
+  depth 0 (the root), then all nodes at depth 1 and so on. This is a
+complex algorithm so is not implemented using an iterator. Instead, a
+method returns a vector of iterators in breadth-first traversal order:</p>
+
+<pre class="cpp">
+const_iterator_vector breadth_first_traversal(void) const;
+iterator_vector breadth_first_traversal(void);
+</pre>
+
+<p>An iterator vector is a std::vector of iterator. A
+  const_iterator_vector is a std::vector of const_iterator.</p>
+
+<p>The vector will be empty if the tree is empty, otherwise element 0
+will be the root node, followed by its children and then their
+children etc.</p>
+
+<h2 id="exceptions">Exceptions Thrown by Ntree</h2>
+
+<p>When errors are discovered within an ntree, it resorts to throwing an
+exception to indicate that error.</p>
+
+<p>There are three standard STLplus exceptions that can be thrown by ntree, all indicating a
+misuse of the iterators:</p>
+
+<dl>
+
+<dt><strong>null_dereference</strong> - logic_error</dt>
+
+<dd>This is used to indicate that an iterator which is null has been dereferenced. You should always
+be sure that iterators are non-null before using the <code>*</code> or <code>-&gt;</code>
+operators.</dd>
+
+<dt><strong>end_dereference</strong> - logic_error</dt>
+
+<dd>This is used to indicate that an iterator that is pointing to an end element has been
+dereferenced. In line with STL conventions, the end iterator points to the element after the last
+element in a container, so dereferencing such an iterator is illegal (the memory pointed to will be
+unconstructed). In this case this happens when accessing the parent of the root node or using the
+traversal iterators and walking off the end of the tree.</dd>
+
+<dt><strong>wrong_object</strong> - logic_error</dt>
+
+<dd>This is used to indicate that an iterator which was created by one container has been used in a
+different container. For example, if you have two ntree objects in your program, create an iterator
+from one ntree and then use it in another, then this will throw the wrong_object exception.</dd>
+
+</dl>
+
+<p>These exceptions are common to all STLplus iterators and are explained in
+the STLplus <a href="exceptions.html">exceptions policy</a>.</p>
+
+<p>In addition, an ntree can throw one C++ standard exception related to
+the misuse of integer indices:</p>
+
+<dl>
+
+<dt><strong>std::out_of_range</strong> - logic_error</dt>
+
+<dd>Thrown when an integer offset is used to access a child, where the offset
+is out of range of the children.</dd>
+
+</dl>
+
+
+</div>
+
+</body>
+</html>

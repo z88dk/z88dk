@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>strings/file_utilities.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>strings/file_utilities.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_FILE_UTILITIES
+#define STLPLUS_FILE_UTILITIES
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Andy Rushton           2013 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Short-cut functions for managing text files
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include &quot;strings_fixes.hpp&quot;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+  // text is a sequence of lines separated by EOFs
+  // it is represented in memory as a vector of strings
+  typedef std::vector&lt;std::string&gt; text;
+
+  // read text from any istream
+  text read_text(std::istream&amp; device);
+  // read text from a file, given the filename
+  // throws an exception if the file does not exist
+  text read_text(std::string filename) throw(std::invalid_argument);
+
+  // write text to any ostream
+  bool write_text(const text&amp; file, std::ostream&amp; device);
+  // write text to a file, given the filename
+  // throws an exception if the file could not be created
+  bool write_text(const text&amp; file, std::string filename) throw(std::invalid_argument);
+
+}
+
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

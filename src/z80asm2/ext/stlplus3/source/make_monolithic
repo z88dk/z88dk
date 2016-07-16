@@ -1,0 +1,7 @@
+#!/bin/sh
+cp ../containers/*.?pp .
+cp ../portability/*.?pp .
+cp ../subsystems/*.?pp .
+cp ../strings/*.?pp .
+cp ../persistence/*.?pp .
+cp stlplus3.header stlplus3.hpp

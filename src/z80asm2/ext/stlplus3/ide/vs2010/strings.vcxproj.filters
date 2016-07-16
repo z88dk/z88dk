@@ -1,0 +1,344 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Template Files">
+      <UniqueIdentifier>{99ad6839-2d6e-43b0-af35-f519274a00b2}</UniqueIdentifier>
+      <Extensions>tpp</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\strings\print_bitset.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_vector.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_digraph.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_foursome.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_hash.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_list.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_map.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_matrix.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_ntree.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_pair.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_pointer.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_sequence.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_set.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_shared_ptr.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_simple_ptr.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_smart_ptr.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_triple.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\print_vector.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_bitset.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_digraph.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_foursome.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_hash.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_list.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_map.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_matrix.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_ntree.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_pair.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_pointer.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_sequence.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_set.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_shared_ptr.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_simple_ptr.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_smart_ptr.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\strings\string_triple.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\strings\file_utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\print_bool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\print_cstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\print_float.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\print_inf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\print_int.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\print_string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\print_vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\string_bool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\string_cstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\string_float.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\string_inf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\string_int.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\string_string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\string_utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\strings\string_vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\strings\file_utilities.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\format_types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_basic.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_bitset.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_bool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_cstring.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_digraph.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_float.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_foursome.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_hash.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_inf.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_int.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_list.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_map.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_matrix.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_ntree.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_pair.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_pointer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_sequence.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_set.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_shared_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_simple_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_smart_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_stl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_stlplus.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_string.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_triple.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\print_vector.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_basic.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_bitset.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_bool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_cstring.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_digraph.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_float.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_foursome.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_hash.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_inf.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_int.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_list.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_map.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_matrix.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_ntree.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_pair.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_pointer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_sequence.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_set.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_shared_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_simple_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_smart_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_stl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_stlplus.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_string.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_triple.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_utilities.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\string_vector.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\strings.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\strings\strings_fixes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

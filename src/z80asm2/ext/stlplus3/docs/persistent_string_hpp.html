@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>persistence/persistent_string.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>persistence/persistent_string.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PERSISTENT_STRING
+#define STLPLUS_PERSISTENT_STRING
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Persistence for STL strings
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistence_fixes.hpp&quot;
+#include &quot;persistent_contexts.hpp&quot;
+#include &lt;string&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  // basic_string
+
+  template&lt;typename charT, typename traits, typename allocator, typename D&gt;
+  void dump_basic_string(dump_context&amp;, const std::basic_string&lt;charT,traits,allocator&gt;&amp; data, D dump_fn)
+    throw(persistent_dump_failed);
+
+  template&lt;typename charT, typename traits, typename allocator, typename R&gt;
+  void restore_basic_string(restore_context&amp;, std::basic_string&lt;charT,traits,allocator&gt;&amp; data, R restore_fn)
+    throw(persistent_restore_failed);
+
+  // string
+
+  void dump_string(dump_context&amp;, const std::string&amp; data)
+    throw(persistent_dump_failed);
+
+  void restore_string(restore_context&amp;, std::string&amp; data) 
+    throw(persistent_restore_failed);
+
+
+  // Note: persistence of wstring not supported because it is too weakly defined and messy
+  //       decide on a byte-wide encoding of wide strings (e.g. UTF8) and use the string persistence on that
+
+} // end namespace stlplus
+
+  ////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistent_string.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

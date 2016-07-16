@@ -1,0 +1,141 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - containers/foursome.hpp - A 4-element collection</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="containers.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>containers/foursome.hpp - A 4-element collection</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="foursome_hpp.html">Browse Header foursome.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#class">Class Interface</a></li>
+<li class="internal"><a href="#utilities">Utility Functions</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The stlplus::foursome class is similar to the std::pair class except it contains four objects,
+each of which can be of a different type. This class and its family of collection classes
+pair/foursome/foursome are useful in themselves but are probably most useful in building data
+structures.</p>
+
+<p><strong>Note:</strong>This was originally called quadruple, but it turned out that both this and quad
+conflicted with some system headers on Solaris. So it eventually got renamed foursome.</p>
+
+<h2 id="class">Class Interface</h2>
+
+<p>The stlplus::foursome class looks like this:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3, typename T4&gt;
+struct stlplus::foursome
+{
+  typedef T1 first_type;
+  typedef T2 second_type;
+  typedef T3 third_type;
+  typedef T4 fourth_type;
+
+  T1 first;
+  T2 second;
+  T3 third;
+  T4 fourth;
+
+  foursome(void);
+  foursome(const T1&amp; p1, const T2&amp; p2, const T3&amp; p3, const T4&amp; p4);
+  foursome(const foursome&lt;T1,T2,T3,T4&gt;&amp; t2);
+};
+</pre>
+
+<p>The class contains four elements called first, second, third and fourth. The constructor initialises the
+four elements, either from individual values or from another foursome.</p>
+
+<p>For example</p>
+
+<pre class="cpp">
+// construct a foursome from elements
+stlplus::foursome&lt;unsigned,std::string,std::string,unsigned&gt; f1(0, "zero", "help", 28);
+
+// construct a foursome from another foursome
+stlplus::foursome&lt;unsigned,std::string,std::string&gt; f2(f1);
+
+// access the elements
+std::cout &lt;&lt; f1.first &lt;&lt; ":" &lt;&lt; f1.second &lt;&lt; ":" &lt;&lt; f1.third &lt;&lt; ":" &lt;&lt;f1.fourth &lt;&lt; std::endl;
+</pre>
+
+<h2 id="utilities">Utility Functions</h2>
+
+<p>The header also provides utilities to help create foursomes and to compare them.</p>
+
+<p>The stlplus::make_foursome is analagous to the STL's std::make_pair:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3, typename T4&gt;
+foursome&lt;T1,T2,T3,T4&gt; make_foursome(const T1&amp; first, const T2&amp; second, const T3&amp; third, const T4&amp; fourth);
+</pre>
+
+
+<p>This can be used when assigning to an existing foursome:</p>
+
+<pre class="cpp">
+stlplus::foursome&lt;unsigned,std::string,std::string,unsigned&gt; f1;
+f1 = stlplus::make_foursome(0, "zero", "null", 28);
+</pre>
+
+<p>The operator== template is provided to make it easy to compare two foursomes, provided they have
+the same element types:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3, typename T4&gt;
+bool operator == (const foursome&lt;T1,T2,T3,T4&gt;&amp; left, const foursome&lt;T1,T2,T3,T4&gt;&amp; right);
+</pre>
+
+
+<p>This can be used in any comparison:</p>
+
+<pre class="cpp">
+if (f1 == f2)
+{
+  ...
+}
+</pre>
+
+
+</div>
+
+</body>
+</html>

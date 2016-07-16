@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>portability/tcp_sockets.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>portability/tcp_sockets.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_TCP_SOCKET
+#define STLPLUS_TCP_SOCKET
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   A platform-independent (Unix and Windows anyway) interface to TCP sockets
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include &quot;portability_fixes.hpp&quot;
+#include &quot;ip_sockets.hpp&quot;
+#include &lt;string&gt;
+
+namespace stlplus
+{
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Server Classes: A server creates a listening port which waits for incoming
+  // connections. This is placed on the port number appropriate for the service
+  // - for example, a Telnet server would typically use port 23. For a new
+  // service you should of course use any port not allocated to a standard
+  // service. I believe that RFC 1700 defines the standard service port numbers.
+  // When an incoming connection is made, the server accepts it and in the
+  // process creates a new connection on a different port. This leaves the
+  // standard port listening for further connections. In effect, the server
+  // farms out the handling of the connections themselves and only takes
+  // responsibility for accepting the connection. This is reflected in the class
+  // structure. A TCP_server performs the listening and accepting roles, but
+  // creates a TCP_connection to handle the accepted connection.
+  //////////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////////
+  // connection class created by TCP_server when a connection is accepted
+  // this is then used to perform any communications with the remote client
+
+  class TCP_connection : protected IP_socket
+  {
+  private:
+    // constructor to actually initialise the class - can only be constructed by TCP_server
+    friend class TCP_server;
+    TCP_connection(const IP_socket&amp; socket);
+
+  public:
+
+    ////////////////////////////////////////////////////////////////////////////
+    // constructors/destructors
+
+    // create an uninitialised connection
+    TCP_connection(void);
+
+    ////////////////////////////////////////////////////////////////////////////
+    // initialisation, connection control
+    // Note: TCP connections can only be initialised by a TCP server
+
+    // test whether this is an initialised socket
+    // - returns whether this is initialised
+    // bool initialised(void) const;
+    using IP_socket::initialised;
+
+    // close, i.e. disconnect the socket
+    // - returns a success flag
+    // bool close(void);
+    using IP_socket::close;
+
+    ////////////////////////////////////////////////////////////////////////////
+    // sending/receiving
+
+    // test whether a socket is connected and ready to send data, returns if ready or on timeout
+    // - timeout: how long to wait in microseconds if not connected yet (blocking)
+    // - returns status
+    // bool send_ready(unsigned timeout = 0);
+    using IP_socket::send_ready;
+
+    // send data through the socket - if the data is long only part of it may
+    // be sent. The sent part is removed from the data, so the same string can
+    // be sent again and again until it is empty.
+    // - data: string containing data to be sent - any data successfully sent is removed
+    // - returns success flag
+    // bool send (std::string&amp; data);
+    using IP_socket::send;
+
+    // test whether a socket is connected and ready to receive data, returns if ready or on timeout
+    // - timeout: how long to wait in microseconds if not connected yet (blocking)
+    // - returns status
+    // bool receive_ready(unsigned timeout = 0);
+    using IP_socket::receive_ready;
+
+    // receive data through the socket - if the data is long only part of it
+    // may be received. The received data is appended to the string, building
+    // it up in stages, so the same string can be received again and again
+    // until all information has been received.
+    // - data: string receiving data from socket - any data successfully received is appended
+    // - returns success flag
+    // bool receive (std::string&amp; data);
+    using IP_socket::receive;
+
+    ////////////////////////////////////////////////////////////////////////////
+    // informational
+
+    // the local port number of the connection
+    // - returns the port number, 0 if not bound to a port
+    // unsigned short local_port(void) const;
+    using IP_socket::local_port;
+
+    // the remote address of the connection
+    // - returns the address, 0 if not connected
+    // unsigned long remote_address(void) const;
+    using IP_socket::remote_address;
+
+    // the remote port number of the connection
+    // - returns the port number, 0 if not connected to a port
+    // unsigned short remote_port(void) const;
+    using IP_socket::remote_port;
+
+    ////////////////////////////////////////////////////////////////////////////
+    // error handling
+    // errors are set internally
+    // an error code of 0 is the test for no error, don't rely on the message being an empty string
+    // an error code != 0 means an error, then there will be a message explaining the error
+
+    // if an error is set it stays set - so you must clear it before further operations
+    // void clear_error(void) const;
+    using IP_socket::clear_error;
+
+    // get the error code of the last error
+    // int error(void) const;
+    using IP_socket::error;
+
+    // get the explanatory message of the last error
+    // std::string message(void) const;
+    using IP_socket::message;
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    // deprecated version of remote_port
+    unsigned short port(void) const;
+
+    ////////////////////////////////////////////////////////////////////////////
+  };
+
+  //////////////////////////////////////////////////////////////////////////////
+  // server class that does the listening on the designated port
+  // incoming connections can be queued up to a maximum queue length specified
+  // in the constructor/initialise
+
+  class TCP_server : protected IP_socket
+  {
+  public:
+
+    // create an uninitialised server
+    TCP_server(void);
+
+    // initialise a socket and set it up to be a listening port
+    // - port: port to listen on
+    // - queue: length of backlog queue to manage - may be zero
+    // - returns success status
+    TCP_server(unsigned short port, unsigned short queue = 0);
+
+    ////////////////////////////////////////////////////////////////////////////
+    // initialisation
+
+    // initialise a socket and set it up to be a listening port
+    // - port: port to listen on
+    // - queue: length of backlog queue to manage - may be zero
+    // - returns success status
+    bool initialise(unsigned short port, unsigned short queue = 0);
+
+    // test whether this is an initialised socket
+    // - returns whether this is initialised
+    // bool initialised(void) const;
+    using IP_socket::initialised;
+
+    // close, i.e. disconnect the socket
+    // - returns a success flag
+    // bool close(void);
+    using IP_socket::close;
+
+    //////////////////////////////////////////////////////////////////////////////
+    // server operation - accepting a connection
+
+    // test for a connection on the object's socket - only applicable if it has been set up as a listening port
+    // - timeout: how long to wait in microseconds if not connected yet
+    // - returns true if a connection is ready to be accepted
+    // bool accept_ready(unsigned timeout = 0);
+    using IP_socket::accept_ready;
+
+    // accept a connection on the object's socket - only applicable if it has been set up as a listening port
+    // - returns the connection as a new socket
+    TCP_connection accept(void);
+
+    ////////////////////////////////////////////////////////////////////////////
+    // error handling
+    // errors are set internally
+    // an error code of 0 is the test for no error, don't rely on the message being an empty string
+    // an error code != 0 means an error, then there will be a message explaining the error
+
+    // if an error is set it stays set - so you must clear it before further operations
+    // void clear_error (void) const;
+    using IP_socket::clear_error;
+
+    // get the error code of the last error
+    // int error(void) const;
+    using IP_socket::error;
+
+    // get the explanatory message of the last error
+    // std::string message(void) const;
+    using IP_socket::message;
+
+    //////////////////////////////////////////////////////////////////////////////
+
+    // deprecated versions of accept_ready and accept
+    bool connection_ready(unsigned timeout = 0);
+    TCP_connection connection(void);
+
+    //////////////////////////////////////////////////////////////////////////////
+  };
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Client Class: a client is simpler in that there is no listening port - you
+  // just create a connection and get on with it. Thus the client class does the
+  // whole job - create the connection and handle communications to/from it.
+  //
+  // Blocking mode: To use the client in blocking mode, use non-zero timeout for
+  // the initialisation method. In this mode, the connection operation must
+  // complete before the call will return or an error is indicated if the
+  // timeout is reached without completion. This usage was designed for
+  // applications which either just to TCP and nothing else or which do TCP
+  // operations in a separate thread.
+  //
+  // Non-blocking mode: To use the client in non-blocking mode, use a zero
+  // timeout for the initialisation method. Instead, you can ask it if it has
+  // connected once you've initialised it. It is not an error for it to be
+  // initialised but not connected. This usage was designed so that you can poll
+  // the connection periodically to implement a timeout for as long as you like for
+  // the connection to occur without blocking the thread that uses the client.
+  //
+  // In both modes, the send_ready/receive_ready methods can be called with any
+  // timeout including zero.
+
+  class TCP_client : protected IP_socket
+  {
+  public:
+
+    // create an uninitialised client
+    TCP_client(void);
+
+    // client connect to a server
+    // - remote_address: IP name (stlplus.sourceforge.net) or dotted number (216.34.181.96)
+    // - remote_port: port number of remote host
+    // - timeout: if 0, don't wait; if &gt;0 wait for that microseconds for connection to be confirmed
+    TCP_client(const std::string&amp; remote_address, unsigned short remote_port, unsigned timeout = 0);
+
+    // client connect to a server
+    // - remote_address: IP address as a long integer - generated by stlplus::ip_lookup
+    // - remote_port: port number of remote host
+    // - timeout: if 0, don't wait; if &gt;0 wait for that microseconds for connection to be confirmed
+    TCP_client(unsigned long remote_address, unsigned short remote_port, unsigned timeout = 0);
+
+    ////////////////////////////////////////////////////////////////////////////
+    // initialisation, connection
+
+    // function for performing IP lookup (i.e. gethostbyname)
+    // could be standalone but making it a member means that it can use the socket's error handler
+    // i.e. if this fails, the sockets error code will be set - clear it to use the socket again
+    // - remote_address: IP name (stlplus.sourceforge.net) or dotted number (216.34.181.96)
+    // - returns the IP address as a long integer - zero if there's an error
+    // unsigned long ip_lookup(const std::string&amp; remote_address);
+    using IP_socket::ip_lookup;
+
+    // client connect to a server
+    // - remote_address: IP name (stlplus.sourceforge.net) or dotted number (216.34.181.96)
+    // - remote_port: port number of remote host
+    // - timeout: if 0, don't wait; if &gt;0 wait for that microseconds for connection to be confirmed
+    // - returns a success flag
+    bool initialise(const std::string&amp; remote_address, unsigned short remote_port, unsigned timeout = 0);
+
+    // client connect to a server
+    // - remote_address: IP address as a long integer - generated by stlplus::ip_lookup
+    // - remote_port: port number of remote host
+    // - timeout: if 0, don't wait; if &gt;0 wait for that microseconds for connection to be confirmed
+    // - returns a success flag
+    bool initialise(unsigned long remote_address, unsigned short remote_port, unsigned timeout = 0);
+
+    // test whether this is an initialised socket
+    // - returns whether this is initialised
+    // bool initialised(void) const;
+    using IP_socket::initialised;
+
+    // test whether a socket is connected and ready to communicate, returns on successful connect or timeout
+    // - timeout: how long to wait in microseconds if not connected yet
+    // - returns success flag
+    // bool connected(unsigned timeout = 0);
+    using IP_socket::connected;
+
+    // close, i.e. disconnect the socket
+    // - returns a success flag
+    // bool close(void);
+    using IP_socket::close;
+
+    ////////////////////////////////////////////////////////////////////////////
+    // sending/receiving
+
+    // test whether a socket is connected and ready to send data, returns if ready or on timeout
+    // - timeout: how long to wait in microseconds if not connected yet (blocking)
+    // - returns status
+    // bool send_ready(unsigned timeout = 0);
+    using IP_socket::send_ready;
+
+    // send data through the socket - if the data is long only part of it may
+    // be sent. The sent part is removed from the data, so the same string can
+    // be sent again and again until it is empty.
+    // - data: string containing data to be sent - any data successfully sent is removed
+    // - returns success flag
+    // bool send (std::string&amp; data);
+    using IP_socket::send;
+
+    // test whether a socket is connected and ready to receive data, returns if ready or on timeout
+    // - timeout: how long to wait in microseconds if not connected yet (blocking)
+    // - returns status
+    // bool receive_ready(unsigned timeout = 0);
+    using IP_socket::receive_ready;
+
+    // receive data through the socket - if the data is long only part of it
+    // may be received. The received data is appended to the string, building
+    // it up in stages, so the same string can be received again and again
+    // until all information has been received.
+    // - data: string receiving data from socket - any data successfully received is appended
+    // - returns success flag
+    // bool receive (std::string&amp; data);
+    using IP_socket::receive;
+
+    ////////////////////////////////////////////////////////////////////////////
+    // informational
+
+    // the local port number of the connection
+    // - returns the port number, 0 if not bound to a port
+    // unsigned short local_port(void) const;
+    using IP_socket::local_port;
+
+    // the remote address of the connection
+    // - returns the address, 0 if not connected
+    // unsigned long remote_address(void) const;
+    using IP_socket::remote_address;
+
+    // the remote port number of the connection
+    // - returns the port number, 0 if not connected to a port
+    // unsigned short remote_port(void) const;
+    using IP_socket::remote_port;
+
+    ////////////////////////////////////////////////////////////////////////////
+    // error handling
+    // errors are set internally
+    // an error code of 0 is the test for no error, don't rely on the message being an empty string
+    // an error code != 0 means an error, then there will be a message explaining the error
+
+    // if an error is set it stays set - so you must clear it before further operations
+    // void clear_error (void) const;
+    using IP_socket::clear_error;
+
+    // get the error code of the last error
+    // int error(void) const;
+    using IP_socket::error;
+
+    // get the explanatory message of the last error
+    // std::string message(void) const;
+    using IP_socket::message;
+
+    //////////////////////////////////////////////////////////////////////////////
+
+    // deprecated versions
+    unsigned long address(void) const;
+    unsigned short port(void) const;
+
+    //////////////////////////////////////////////////////////////////////////////
+  };
+
+  ////////////////////////////////////////////////////////////////////////////////
+
+} // end namespace stlplus
+
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

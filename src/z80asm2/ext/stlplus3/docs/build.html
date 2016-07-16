@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/build.hpp - Reporting the Program's Build Parameters</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/build.hpp<br>Reporting the Program's Build Parameters</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="build_hpp.html">Browse Header build.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#interface">Interface</a></li>
+<li class="internal"><a href="#results">Results</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This function returns a string containing a human-readable summary of the build parameters
+including the version of STLplus being used, the target platform, compiler name and version and
+whether this is a debug or release build.</p>
+
+<h2 id="interface">Interface</h2>
+
+<p>The function looks like this:</p>
+
+<pre class="cpp">
+std::string stlplus::build(void);
+</pre>
+
+<p>The return value is the string representation of the build.</p>
+
+<h2 id="results">Results</h2>
+
+<p>Provides a printable representation of the build characteristics in the form:</p>
+
+<pre>
+&lt;version&gt;, &lt;platform&gt;, &lt;compiler&gt;, &lt;variant&gt;
+</pre>
+
+<p>The meanings of these four fields are:</p>
+
+<dl>
+
+<dt>version</dt><dd>the version of STLplus</dd>
+<dt>platform</dt><dd>the target operating system</dd>
+<dt>compiler</dt><dd>the compilation system and version that the function was compiled with</dd>
+<dt>variant</dt><dd>the kind of build - debug or release</dd>
+
+</dl>
+
+<p>Example:</p>
+
+<pre>
+STLplus version 3.0, Generic Unix, gcc v3.4.5, debug
+</pre>
+
+
+</div>
+
+</body>
+</html>

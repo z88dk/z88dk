@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>strings/print_set.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>strings/print_set.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PRINT_SET
+#define STLPLUS_PRINT_SET
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Generate a string representation of a set/multiset
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;strings_fixes.hpp&quot;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+#include &lt;set&gt;
+
+namespace stlplus
+{
+
+  template&lt;typename K, typename C, typename S&gt;
+  void print_set(std::ostream&amp; device,
+                 const std::set&lt;K,C&gt;&amp; values,
+                 S print_fn,
+                 const std::string&amp; separator = &quot;,&quot;);
+
+  template&lt;typename K, typename C, typename S&gt;
+  void print_multiset(std::ostream&amp; device,
+                      const std::multiset&lt;K,C&gt;&amp; values,
+                      S print_fn,
+                      const std::string&amp; separator = &quot;,&quot;);
+
+} // end namespace stlplus
+
+#include &quot;print_set.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

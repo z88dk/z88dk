@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>persistence/persistent_contexts.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>persistence/persistent_contexts.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PERSISTENT_CONTEXTS
+#define STLPLUS_PERSISTENT_CONTEXTS
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Core context classes used to control the persistent dump/restore operations
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include &quot;persistence_fixes.hpp&quot;
+#include &quot;persistent.hpp&quot;
+#include &lt;iostream&gt;
+#include &lt;map&gt;
+#include &lt;typeinfo&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // Internals
+
+  class dump_context_body;
+  class restore_context_body;
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // The format version number currently supported
+  ////////////////////////////////////////////////////////////////////////////////
+
+  extern unsigned char PersistentVersion;
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // dump_context controls the formatting of a persistent dump
+  ////////////////////////////////////////////////////////////////////////////////
+
+  class dump_context
+  {
+    friend class persistent;
+  public:
+    //////////////////////////////////////////////////////////////////////////////
+
+    // device must be in binary mode
+    dump_context(std::ostream&amp; device, unsigned char version = PersistentVersion) throw(persistent_dump_failed);
+    ~dump_context(void);
+
+    // low level output used to dump a byte
+    void put(unsigned char data) throw(persistent_dump_failed);
+
+    // access the device, for example to check the error status
+    const std::ostream&amp; device(void) const;
+
+    // recover the version number of the dumped output
+    unsigned char version(void) const;
+
+    // test whether the current platform uses little-endian or big-endian addressing of bytes
+    // this is used in dump/restore of integers and is exported so that other routines can use it
+    bool little_endian(void) const;
+
+    // Assist functions for Pointers
+    // the return pair value is a flag saying whether this is a new pointer and the magic key to dump to file
+    std::pair&lt;bool,unsigned&gt; pointer_map(const void* const pointer);
+    // the return pair value is a flag saying whether this is a new object and the magic key to dump to file
+    std::pair&lt;bool,unsigned&gt; object_map(const void* const pointer);
+
+    // Assist functions for Polymorphous classes (i.e. subclasses) using callback approach
+    typedef void (*dump_callback)(dump_context&amp;,const void*);
+    unsigned register_callback(const std::type_info&amp; info, dump_callback);
+    bool is_callback(const std::type_info&amp; info) const;
+    typedef std::pair&lt;unsigned,dump_callback&gt; callback_data;
+    callback_data lookup_callback(const std::type_info&amp;) const throw(persistent_illegal_type);
+
+    // Assist functions for Polymorphous classes (i.e. subclasses) using interface approach
+    unsigned register_interface(const std::type_info&amp; info);
+    bool is_interface(const std::type_info&amp; info) const;
+    unsigned lookup_interface(const std::type_info&amp;) const throw(persistent_illegal_type);
+
+    // Register all Polymorphous classes using either approach by calling an installer callback
+    typedef void (*installer)(dump_context&amp;);
+    void register_all(installer);
+
+  private:
+    friend class dump_context_body;
+    dump_context_body* m_body;
+
+    // disallow copying by making assignment and copy constructor private
+    dump_context(const dump_context&amp;);
+    dump_context&amp; operator=(const dump_context&amp;);
+  };
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // restore_context controls the reading of the persistent data during a restore
+
+  class restore_context
+  {
+    friend class persistent;
+  public:
+    //////////////////////////////////////////////////////////////////////////////
+
+    // device must be in binary mode
+    restore_context(std::istream&amp; device) throw(persistent_restore_failed);
+    ~restore_context(void);
+
+    // low level input used to restore a byte
+    int get(void) throw(persistent_restore_failed);
+
+    // access the device, for example to check the error status
+    const std::istream&amp; device(void) const;
+
+    // access the version number of the input being restored
+    unsigned char version(void) const;
+
+    // test whether the current platform uses little-endian or big-endian addressing of bytes
+    // this is used in dump/restore of integers
+    bool little_endian(void) const;
+
+    // Assist functions for Pointers
+    std::pair&lt;bool,void*&gt; pointer_map(unsigned magic);
+    void pointer_add(unsigned magic, void* new_pointer);
+    std::pair&lt;bool,void*&gt; object_map(unsigned magic);
+    void object_add(unsigned magic, void* new_pointer);
+
+    // Assist functions for Polymorphous classes using the callback approach
+    typedef void* (*create_callback)(void);
+    typedef void (*restore_callback)(restore_context&amp;,void*);
+    unsigned register_callback(create_callback,restore_callback);
+    bool is_callback(unsigned) const;
+    typedef std::pair&lt;create_callback, restore_callback&gt; callback_data;
+    callback_data lookup_callback(unsigned) const throw(persistent_illegal_type);
+
+    // Assist functions for Polymorphous classes using the interface approach
+    unsigned register_interface(persistent*);
+    bool is_interface(unsigned) const;
+    persistent* lookup_interface(unsigned) const throw(persistent_illegal_type);
+
+    // Register all Polymorphous classes using either approach by calling an installer callback
+    typedef void (*installer)(restore_context&amp;);
+    void register_all(installer);
+
+  private:
+    friend class restore_context_body;
+    restore_context_body* m_body;
+
+    typedef std::pair&lt;unsigned,persistent*&gt; interface_data;
+
+    // disallow copying by making assignment and copy constructor private
+    restore_context(const restore_context&amp;);
+    restore_context&amp; operator=(const restore_context&amp;);
+  };
+
+  ////////////////////////////////////////////////////////////////////////////////
+
+} // end namespace stlplus
+
+  ////////////////////////////////////////////////////////////////////////////////
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

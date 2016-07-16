@@ -1,0 +1,840 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - subsystems/library_manager.hpp - A General-Purpose Library System</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="subsystems.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>subsystems/library_manager.hpp<br>A General-Purpose Library System</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="library_manager_hpp.html">library_manager.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#why">Why Use It?</a></li>
+<li class="internal"><a href="#concepts">Library Manager Concepts</a></li>
+<li class="internal"><a href="#creating">Creating a Library Manager</a></li>
+<li class="internal"><a href="#types">Registering a New Type</a></li>
+<li class="internal"><a href="#dummy">Dummy Types</a></li>
+<li class="internal"><a href="#mappings">Library Mappings</a></li>
+<li class="internal"><a href="#libraries">Library Management</a></li>
+<li class="internal"><a href="#work">The Work Library</a></li>
+<li class="internal"><a href="#units">Library Unit Management</a></li>
+<li class="internal"><a href="#dependencies">Dependency Checking</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This component is a general purpose library manager which allows one or more
+libraries to be managed across a file system. The purpose is to collect
+information in libraries such that it can be accessed easily, but without
+cluttering up the file system with arbitrarily-named files.</p>
+
+<p>The library manager originated from the VHDL compiler project, since VHDL is
+a library-based language. However, this STL+ version is generalised for use in
+any product which needs to manage a lot of data.</p>
+
+
+<h2 id="why">Why Use It?</h2>
+
+<p>The first question your average hacker will ask at this point is "what use is
+it". After all, if the library manager simply stores information as files in
+subdirectories, then you can do that without the library manager, can't you?</p>
+
+<p>The quick answer is that hackers never see the point of progress - similar
+questions were asked of high-level languages by assembler hackers.</p>
+
+<p>The long answer is that the library manager does more than just allow you to
+create files in directories. It provides an interface which does much more than
+that. First, it abstracts away from the file system (for example, I could create
+a version that used a database rather than individual files. The interface would
+be the same). It provides an equivalence or mapping between a data file and a
+data structure. It requires that you design your information as a persistent
+data structure, but having done that, the library manager will manage the data
+persistence for you. It provides ways of seeing the contents of a library and
+obtaining summary data in the contents without opening any of the data files and
+it provides a mechanism where a data file is only opened and read on demand (a
+kind of just-in-time loading). Above all it allows data to be handled in a
+consistent, coherent and user-friendly manner throughout a large software
+project, rather than spraying data files all over the user's workspace.</p>
+
+
+<h2 id="concepts">Library Manager Concepts</h2>
+
+<p>The library manager is presented as a C++ class with a large (and growing)
+number of access functions.</p>
+
+<p>A library manager is made unique to a product by an <em>owner</em> string. This will
+typically be the name of the product in lowercase (e.g. "moods" for the Moods
+product). A library manager can only open and manipulate libraries created by
+the owner product. This allows many products to co-exist on the same computer
+without any possibility of confusion as to which libraries are owned by which
+product.</p>
+
+<p>A library manager contains any number of libraries. Each library has a name
+(a string) and a file-system location for the directory where the library's data
+is stored. The location (or path) is only used to create and open libraries.
+Once a library is open and therefore part of the library manager, it is referred
+to by its name. Of course, all libraries managed by the library manager at any
+time must have unique names.</p>
+
+<p>The library name is stored in the library itself, so once a library has a
+name it must keep it. This is because, as will be seen later, the library
+manager also manages cross-library dependencies and these use the library name,
+not its path to represent a dependency. Allowing the library to have a different
+name each time would break the dependency management.</p>
+
+<p>A library contains a set of units. Each unit is referred to by a name and a
+type (both std::strings). A unit name must be unique within its type, but it is
+perfectly legal to have units of different types having the same name. The
+combination of name and type together are referred to as the unit-name.</p>
+
+<p>The type of a unit is used to differentiate between different data types. Every unit of the same
+type has the same data structure (presumable containing different data though). However, each type
+can have a different data structure. As an example, consider a library-based compiler: the
+compilation generates a parse tree data structure which is stored in the library manager as type
+"tree" (as in "parse tree"). The intermediate code generated by the compiler is also stored in the
+library manager, but this time using an intermediate code data structure which is stored in the
+library manager as type "object". Types are typically abbreviations although they don't have to be. 
+They currently become the extension of the data file (so type "tree" is stored as a file with a
+".tree" extension), but remember that the library manager is an abstraction and could be replaced by
+a database. Therefore the type should be thought of as a unique signature that identifies a data
+type and not as a file extension.</p>
+
+<p>Each unit contains two types of information. There is "header" information which is common to all
+types and contains information such as the unit's name, its type, its source file (if relevant) and
+its dependencies (if relevant). This header information is always available and is stored separately
+by the library manager. Then there is "body" information which is type specific - this is the data
+structure associated with that type and is stored in that data structure's file format. Body data is
+not loaded until it is requested - a policy designed to minimise the initialisation time of the
+library manager and which also minimises the memory requirements.</p>
+
+
+<h2 id="creating">Creating a Library Manager</h2>
+
+<p>The constructor to the library manager takes one required and two optional arguments:</p>
+
+<pre class="cpp">
+library_manager::library_manager(const std::string&amp; owner, bool library_case = false, bool unit_case = false);
+</pre>
+
+<p>The owner string is a unique string that identifies the product - in
+lowercase. The library manager will only recognise libraries created by the
+owner product. Thus, for example, all tools in the Moods product would use the
+owner string "moods" so that all tools recognise the set of Moods libraries.
+However, a second product Tempers would use the owner string "tempers" and
+this would not be able to access the Moods libraries, nor vice-versa.</p>
+
+<p>The case sensitivity switches determine whether library names and unit
+names are case-sensitive. </p>
+
+<p><em>Note:</em> at present there is a problem if you set <code>unit_case</code> to
+true. On Windows, filenames are case-insensitive, but the library manager uses
+the unit name to create its filenames. Thus setting the library manager to use
+case-sensitive unit names means that more than one unit name maps onto the same filename.
+For the moment, until I come up with a solution for this, you are recommended
+to use the library manager with unit_case set to false and if necessary
+find a way of mapping case-sensitive unit names onto
+case-insensitive strings. There is no such problem with setting <code>library_case</code>
+to true - library names can be case-sensitive.</p>
+
+
+<h2 id="types">Registering a New Type</h2>
+
+<p>This section will explain how to add a new type of object to the library
+manager. It is a simple process but one which needs to be explained. As an
+example, I will demonstrate the creation of a trivial data type which contains a
+single std::string.</p>
+
+<p>The first stage is to create a class which represents your data in the
+library manager. It should be derived from stlplus::lm_unit (the base class for all
+library units) and should contain the data structure which you wish to have
+managed. This class should have a constructor, destructor, a read and a write
+routine and a couple of other functions which will be explained later. For the
+example, the class will be called string_unit:</p>
+
+<pre class="cpp">
+class string_unit : public stlplus::lm_unit
+{
+private:
+  std::string m_data;
+public:
+  ...
+};
+</pre>
+
+<p>The constructor should take at least two arguments - the unit-name and a
+library pointer. These are then passed to the superclass lm_unit constructor to
+initialise the superclass data structures. The destructor should destroy only
+your own data structures if necessary.</p>
+
+<pre class="cpp">
+string_unit::string_unit(const stlplus::lm_unit_name&amp; name, stlplus::lm_library* library) : 
+  stlplus::lm_unit(name,library) {}
+
+string_unit::~string_unit(void) {}
+</pre>
+
+<p>Note that the constructor does nothing after initialising the baseclass
+because the default construction behaviour of a string is exactly what we want
+anyway.</p>
+
+<p>The destructor likewise does nothing because the default string destructor
+does what we want (deallocate the string).</p>
+
+<p>The next stage is to write the read and write methods. If you think of the
+data structure as a persistent type, these methods are the converters that go
+from the file format to the data structure and vice versa. Here are the read and
+write methods for the example:</p>
+
+<pre class="cpp">
+virtual bool string_unit::read(std::istream&amp; input, void* type_data)
+{
+  std::getline(input,m_data);
+  return !input.error();
+}
+
+virtual bool string_unit::write(std::ostream&amp; output, void* type_data)
+{
+  output &lt;&lt; m_data &lt;&lt; std::endl;
+  return !output.error();
+}
+</pre>
+
+<p>As you can see, for this trivial data structure, the read and write methods are also trivial. 
+Note that both work on IOStream devices. This is part of the abstraction. If the library manager had
+been written based on FILE* so that you could use fprintf, this would lock it into a file-based
+store and prevent the possibility of reworking the library manager to work on a database. However,
+IOStream is an abstract I/O system and so keeps that option only. Basically, the device is already
+opened by the library manager when the read or write is called, so all you have to do is the reading
+and writing of the file format. Each function should return false if it fails, true if it
+succeeds.</p>
+
+<p>The read and write methods also have a void* type data field passed to them by the library
+manager. This type data field is common to all units of the same type but can be different for
+different types. This is used to pass any extra data into the read/write routines or into the
+constructor. For example, this could be a pointer to an <a
+href="message_handler.html">stlplus::message_handler</a> which could then be used to report errors
+when reading the file, if appropriate. If an error occurs, the read/write methods should return
+false whether or not it reports any errors. It should return true on success. This allows the
+library manager to keep track of which body files have been loaded or saved successfully.</p>
+
+<p>You can optionally provide a purge method. Purging is used by the library
+manager to recover memory by clearing the in-memory representation (the body
+data) of each unit. It is optional because small data structures are not worth
+purging. However, although this is a small data structure (of course a string
+could be megabytes), I will show how to write one. Here's the string_unit purge
+routine:</p>
+
+<pre class="cpp">
+virtual bool string_unit::purge(void)
+{
+  m_data.clear();
+  return true;
+}
+</pre>
+
+<p>You are required to provide a clone method. The reason is that units are stored in the library
+manager using a smart pointer - specifically the <a
+href="smart_ptr.html">stlplus::smart_ptr_clone</a> variant. The requirement for a clone method is
+simply a work round for a limitation of C++ that makes it impossible to copy a subclass object when
+all you have is a superclass pointer. The clone method works round this by copying an object and
+returning it as a superclass pointer. Thus, for the string_unit class it look like this:</p>
+
+<pre class="cpp">
+virtual lm_unit* string_unit::clone(void) const
+{
+  return new string_unit(*this);
+}
+</pre>
+
+<p>Note that the body of the function creates a new subclass (the subclass type being string_unit),
+uses that new object's copy constructor to copy the current object (represented by *this) and
+returns the result as a superclass pointer (in this case an stlplus::lm_unit*). You don't have to
+understand all this though, just copy this example and modify to match the name of your type.</p>
+
+<p><strong>Warning:</strong> this clone function calls the copy constructor for string_unit, but I haven't
+written one. This means that the default copy constructor is used which simply copies each field
+using <em>its</em> copy constructor. The baseclass stlplus::lm_unit is designed to be copied this way,
+so no problem there. The string_unit data field is of type std::string, which copies correctly, so
+no problem there, so overall this is correct. However, beware if you have a pointer to your data
+type. Pointers do not copy safely because you end up with two pointers to the same object. When the
+two objects are destroyed, both pointers get deleted and the memory gets deallocated twice. Result:
+corrupted memory. If you have a pointer to your data structure, you must write a copy constructor
+that genuinely copies the structure pointed to. Or use the <a href="smart_ptr.html">smart_ptr</a>
+class.</p>
+
+<p>That's it for the library manager interface of the data structure, though you will probably want
+access functions to the data field (note that the string is private. So, to complete the class,
+here's the access functions:</p>
+
+<pre class="cpp">
+const std::string&amp; string_unit::data(void) const
+{
+  return m_data;
+}
+
+void string_unit::set_data(const std::string&amp; data)
+{
+  m_data = data;
+  mark();
+}
+</pre>
+
+<p>The interesting point here is the call to mark() in the set_data function.
+This concerns the unit's persistence. If you change the data structure for any
+reason, you need to call mark() to tell the library manager that the data has been
+changed. This will be used later by the library manager to determine whether to
+save the unit. If you don't call mark() after a change, the data will never be
+saved to disk. You don't have to encapsulate the call to mark in the access
+function like this, you could call it from your own code. The mark function is a
+member of the superclass stlplus::lm_unit and so is inherited by the string_unit
+class.</p>
+
+<p>Now that the data structure for the string_unit class is ready, we can tell
+the library manager about it. This is known as registering a type. There are
+three things needed to register a type: a signature (the extension
+if you like), a human readable name for the type (for printouts) and a create
+callback for the data type.</p>
+
+<p>The callback function is another work-around for C++ since it is not possible
+to create an object of a type just from its name. Thus we have to provide a
+function to create units. The callback is trivial and here's the callback for
+the string_unit class to prove it:</p>
+
+<pre class="cpp">
+stlplus::lm_unit* create_string_unit(const stlplus::lm_unit_name&amp; name,
+                                     stlplus::lm_library* library,
+                                     void* type_data)
+{
+  return new string_unit(name,library);
+}
+</pre>
+
+<p><strong>Note:</strong> the callback is <em>not</em> a member of the class, it is a
+stand-alone C++ function.</p>
+
+<p>The callback takes three arguments, the unit-name, a pointer to a library and a void* hook. The
+first two values are both generated and passed to the function by the library manager. The function
+simply creates a dynamic object of the string_unit class and constructs it using these two
+parameters (now you know why the string_unit constructor had to take these two parameters). That's
+it. The callback also receives the void* type_data field. In this case it has been ignored, but it
+could have also been passed into the constructor if extra data was required there.</p>
+
+<p>Now at last the new type can be registered with the library manager. This
+is done with the add_type member function:</p>
+
+<pre class="cpp">
+bool library_manager::add_type(const std::string&amp; type,
+                               const std::string&amp; description,
+                               stlplus::lm_create_callback fn = 0,
+                               void* type_data = 0);
+</pre>
+
+<p>The following code extract shows how this is used:</p>
+
+<pre class="cpp">
+stlplus::library_manager libraries;
+libraries.add_type("sun", "String", create_string_unit);
+</pre>
+
+<p>The first line creates a library manager which will initially be empty (no
+types and no libraries). The second statement registers the string_unit class.
+In this case, I've chosen the signature "sun" to represent a string_unit in the
+library manager. I've given it the description "String" for human readable
+printouts, and I've registered the create callback written above so that object
+of this type can be created by the library manager. Note that a function is
+passed as a parameter by just using the function's name as if it were a variable.
+This is the standard C++ way of representing a pointer to a function. Finally,
+I've left the type_data field undefined which causes it to default to null,
+because in this example it is not used.</p>
+
+
+<h2 id="dummy">Dummy Types</h2>
+
+<p>Sometimes you will want to get access to the header data for a type without
+being interested in the body data. This might be, for example, to list the
+contents of a library or to perform dependency checking on the contents of a
+library. These operations can be achieved solely from header data and
+therefore there is no need to load the units' bodies.</p>
+
+<p>To make this usage of the library manager simpler, it is possible to
+register a dummy type with the library manager. Remember how the string unit
+was registered with the library manager:</p>
+
+<pre class="cpp">
+library_manager libraries;
+libraries.add_type("sun", "String", create_string_unit);
+</pre>
+
+<p>This can be changed into registration of a dummy string unit by omitting
+the creation callback, using a null pointer instead. Indeed, the default value
+of the callback is a null pointer, so a dummy string unit can be registered
+like this:</p>
+
+<pre class="cpp">
+library_manager libraries;
+libraries.add_type("sun", "String");
+</pre>
+
+<p>This will allow you to perform any header-specific operations on the string units except for
+loading the unit itself. The unit is represented by the superclass stlplus::lm_unit rather than the
+derivative string_unit. It is illegal to try to load an stlplus::lm_unit since it has no on-disk
+representation, so any attempt to load the unit will fail (the lm_unit::load() function will return
+false). However, all the header information such as source file, dependencies, modified time etc. 
+will be available.</p>
+
+
+<h2 id="mappings">Library Mappings</h2>
+
+<p>Library mappings are the directory paths to the set of libraries that you
+wish to be loaded into the library manager. A library mapping is just a path -
+the library's name is stored in the library itself.</p>
+
+<p>There are two ways of managing library mappings - builtin and do-it-yourself.
+The builtin method is switched on by simply providing a library mapping file to
+the library manager. The following functions relate to the management of library
+mapping files:</p>
+
+<pre class="cpp">
+void library_manager::set_mapping_file(const std::string&amp; mapping_file);
+bool library_manager::load_mappings (const std::string&amp; mapping_file);
+bool library_manager::save_mappings (void) const;
+</pre>
+
+<p>The set_mapping_file method sets the library manager's mapping file field
+but does not attempt to open let alone read the file. It is used to initialise
+an empty mapping file. If the file already exists, it will eventually be
+overwritten.</p>
+
+<p>The load_mappings method sets the library mapping file and attempts to read
+it. If the file does not exist it will eventually be created. If it does exist,
+the library mappings in it will be loaded and all the libraries listed will be
+opened. The library manager has the concept of a current working library - this
+is also optionally stored in the library mapping file, so this will be set if it
+is present. It is not required.</p>
+
+<p>Finally, the save_mappings method saves the current set of libraries to the
+library mapping file. If the library mapping file has not been set, it does
+nothing.</p>
+
+<p>Of course, the set of libraries can be changed using the library management
+functions described in the next section.</p>
+
+<p>You are not obliged to use the library mapping file to manage library
+mappings. You can use your own method. To add an existing library to the set of
+libraries in the maneger, use the open function:</p>
+
+<pre class="cpp">
+stlplus::lm_library* library_manager::open(const std::string&amp; path);
+</pre>
+
+<p>The return value is a handle to the library opened. It is null if the library
+did not exist.</p>
+
+<p>Saving the set of library paths is a two stage process: get the set of
+library names, then get the path for each library:</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; library_manager::names(void) const;
+std::string library_manager::path(const std::string&amp; library) const;
+</pre>
+
+
+<h2 id="libraries">Library Management</h2>
+
+<p>This section deals with the set of methods which manipulate whole
+libraries, creating or deleting them adding them to or removing them from the
+library manager.</p>
+
+<pre class="cpp">
+static bool library_manager::is_library(const std::string&amp; path);
+stlplus::lm_library* library_manager::create(const std::string&amp; name, const std::string&amp; path, bool writable = true);
+stlplus::lm_library* library_manager::open(const std::string&amp; path);
+bool library_manager::close(const std::string&amp; name);
+bool library_manager::erase(const std::string&amp; name);
+</pre>
+
+<p>The static function is_library tests whether a particular directory
+represents a library. Because it is static, it is not necessary to create a
+library manager object to use it - you can use it in the form:</p>
+
+<pre class="cpp">
+if (stlplus::library_manager::is_library(path))
+  ...
+</pre>
+
+<p>If you try to open a path that does not represent a library, the open will
+fail anyway, so that is an alternative way of testing the validity of a
+path.</p>
+
+<p>The create method will create a library in the specified directory and give
+it the specified name. If the directory is already a library, the behaviour is
+the same as for the open method. If the directory does not exist it will be created and
+made into a library. If the directory does already exist, it will simply be made
+into a library. If the directory cannot be created, the create function fails
+and returns null. Otherwise the library is added to the library manager and a
+handle to the new library returned.</p>
+
+<p>The open method tests whether the specified directory is a library. If it
+is not, the function returns a null handle. If it
+is, that library is loaded and added to the library manager. A handle to the
+library is then returned.</p>
+
+<p>The close method closes the named library by saving it and then removing it
+from the library manager. It does not remove the directory. Thus it can be
+re-opened later. By contrast, the erase function closes the library, removes it
+from the library manager and deletes the directory.</p>
+
+<p><strong>Note:</strong> once a library has been opened, either by open or create, it is
+referred to either by its name or by its handle (the lm_library* type). It is
+possible to convert from a library name to a handle using the find function:</p>
+
+<pre class="cpp">
+stlplus::lm_library* library_manager::find(const std::string&amp; name);
+const stlplus::lm_library* library_manager::find(const std::string&amp; name) const;
+</pre>
+
+<p>It is also possible to get the name from the handle by using the lm_library's
+name method:</p>
+
+<pre class="cpp">
+const std::string&amp; lm_library::name(void) const;
+</pre>
+
+<p>This is used by dereferencing the library handle in the normal C++ way:</p>
+
+<pre class="cpp">
+stlplus::lm_library* library = libraries.open("libdir")
+if (library)
+  std::cerr &lt;&lt; "opened library " &lt;&lt; library-&gt;name() &lt;&lt; std::endl;
+</pre>
+
+<p>The set of names or handles for all the libraries in a library manager can be
+obtained by a single function call:</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; library_manager::names(void) const;
+std::vector&lt;const lm_library*&gt; library_manager::handles(void) const;
+</pre>
+
+<p>A library can be made read-only or writable. This can be done through the
+library manager or through the operating system. Each library has a flag
+stored internally which is the write status of the library. This tag can be
+set through the library manager interface. However, if the directory
+containing the library does not have write access (set from the command-line
+or Windows), this will also cause it to be treated as a read-only library. The
+difference is that this cannot be set or cleared through the library manager
+interface. It is possible to find out why a library is read-only though. The
+functions for supporting this functionality are:</p>
+
+<pre class="cpp">
+bool set_writable(const std::string&amp; library);
+bool set_read_only(const std::string&amp; library);
+bool writable(const std::string&amp; library) const;
+bool read_only(const std::string&amp; library) const;
+bool os_writable(const std::string&amp; library) const;
+bool os_read_only(const std::string&amp; library) const;
+bool lm_writable(const std::string&amp; library) const;
+bool lm_read_only(const std::string&amp; library) const;
+</pre>
+
+<p>The set_writable and set_read_only functions change the internal flag bit.
+However, if the library is read-only because of access permissions, it will
+remain read-only regardless of this internal flag. The writable and read_only
+functions allow the read-only status of the library to be tested. For
+diagnostic purposes, the os_read_only function tells you whether the library
+is read only due to the operating system (cannot be changed) and lm_read_only
+tells you whether it is read-only because of the internal flag (can be
+changed). Bear in mind that if the OS has locked the library, the internal
+flag will have no effect and cannot itself be changed.</p>
+
+<p>If a library is read-only it cannot have new units created in it, nor can
+existing units be modified (actually, I can't stop you modifying the unit in
+memory, but the library manager will refuse to save the changes to a read-only
+library).</p>
+
+<p>The final set of functions manipulate the set of all units in a library or in
+all libraries to perform system-wide operations:</p>
+
+<pre class="cpp">
+bool library_manager::save(const std::string&amp; library);
+bool library_manager::save(void);
+
+bool library_manager::load(const std::string&amp; library);
+bool library_manager::load(void);
+
+bool library_manager::purge(const std::string&amp; library);
+bool library_manager::purge(void);
+</pre>
+
+<p>The save methods save all units which have been marked for saving. The
+first form of save only acts on the named library, whilst the second acts on all
+libraries. Note that only units which have been loaded and marked as changed
+will be saved.</p>
+
+<p>The load methods are unlikely to be used in practice. They load
+the data for every single unit in the named library (first form) or in all
+libraries (second form). Generally you should load units as they are required
+(just-in-time loading).</p>
+
+<p>The purge functions save marked units and then delete
+the in-memory data structures of every unit to recover their memory. Again there
+are two forms - the first acts on a named library, the second on all
+libraries.</p>
+
+
+<h2 id="work">The Work Library</h2>
+
+<p>The concept of a 'current' library is useful in most applications. The
+library manager provides some support for this concept by allowing a library
+name to be stored as the current library. This is all it does - how this concept
+is used is down to the application. In my compiler project, the
+library actually named "work" was considered an alias of the current working
+library. The string "work" is therefore mapped onto the name of the current
+library and that name is then used to lookup information from the library. I did
+not build this mapping into the library manager, obviously, because it is too
+application-specific. Different applications will have different requirements,
+but most will have a use for the concept of a current working library.</p>
+
+<p>The support functions for the working library are:</p>
+
+<pre class="cpp">
+bool library_manager::setwork(const std::string&amp; library);
+bool library_manager::unsetwork(void);
+const lm_library* library_manager::work(void) const;
+lm_library* library_manager::work(void);
+std::string library_manager::work_name(void) const;
+</pre>
+
+<p>The setwork method sets the named library to be the current working library. If the library does
+not exist, then the function fails and returns false. The unsetwork method clears the current
+library field (if there is no work library, the string representing the work library is empty). The
+work method returns a handle to the current work library, null if there isn't one. Finally, the
+work_name method returns the name of the curring work library, an empty string if there isn't
+one.</p>
+
+
+<h2 id="units">Library Unit Management</h2>
+
+<p>The library manager provides a range of functions for manipulating units
+within a library. However, manipulation of the unit contents is done by using the
+unit's member functions. In other words, the relationship of the unit to its
+library is managed by the library manager, but the unit's internal data is
+managed by the unit. This section only details the library manager
+methods.</p>
+
+<p>Units in the library manager are characterised by two fields: the library
+name and the unit-name (remember that a unit-name is the
+combination of two strings, a name and a type). You can only manipulate units
+for a type that is registered with the library manager (see the section above on
+"Registering a New Type").</p>
+
+<p>Units are stored in the library as smart pointers to the superclass lm_unit. These smart pointers
+are referred to by the typedef stlplus::lm_unit_ptr, the typedef for which is: </p>
+
+<pre class="cpp">
+typedef stlplus::smart_ptr_clone&lt;stlplus::lm_unit&gt; stlplus::lm_unit_ptr;
+</pre>
+
+<p>Remember that in practice, this will be a pointer to a <em>subclass</em> of lm_unit,
+specifically the subclass registered for the unit's type. You can recover the
+lm_unit* type from the lm_unit_ptr by using the smart pointer's pointer()
+function, and then type convert that pointer to the correct subclass. You are
+responsible for this type conversion because there is no way I could build this
+into the library manager using C++.</p>
+
+<p>Using the string_unit example from earlier, the derivative unit type can be
+obtained from an lm_unit_ptr using an old-style C type conversion:</p>
+
+<pre class="cpp">
+stlplus::lm_unit_ptr unit = ...
+string_unit* s_unit = (string_unit*)unit.pointer();
+</pre>
+
+<p>C++ now provides a type-safe type conversion which checks that the conversion
+is legal. This is recommended, but by no means essential. It uses the
+dynamic_cast template:</p>
+
+<pre class="cpp">
+stlplus::lm_unit_ptr unit = ...
+string_unit* s_unit = dynamic_cast&lt;string_unit*&gt;(unit.pointer());
+</pre>
+
+<p>The dynamic_cast template will return null if for any reason you try to
+typecast onto the wrong derivative type.</p>
+
+<p>You can create a new unit in a library with the create function:</p>
+
+<pre class="cpp">
+stlplus::lm_unit_ptr library_manager::create(const std::string&amp; library,
+                                             const stlplus::lm_unit_name&amp; name);
+</pre>
+
+<p>This will overwrite any existing unit of the same unit-name (Note that a unit
+with the same name but different type will not be affected). It will create an
+empty unit in the named library and return the smart pointer to that unit. You
+can then type convert the unit pointer to the right derivative type and start
+filling in the data structure associated with that type.</p>
+
+<p>You can only create units of a type that has been registered with the
+library manager. If you try to create an unrecognised unit type, the create
+function will fail and will return a null pointer to indicate that failure.</p>
+
+<p>You must remember to call the mark function if you change the data
+structure so that the library manager knows to save the unit (in fact a
+created unit is pre-marked). The mark function is a member of the baseclass
+lm_unit so can be called from either the smart pointer or the typecast
+pointer:</p>
+
+<pre class="cpp">
+unit-&gt;mark();
+</pre>
+
+<p><em>or</em></p>
+
+<pre class="cpp">
+s_unit-&gt;mark();
+</pre>
+
+<p>In fact, if you refer back to the definition of string_unit, merely setting
+the string value implicitly called mark, so the unit data can be changed and the
+unit marked in one step:</p>
+
+<pre class="cpp">
+stlplus::lm_unit_ptr new_unit = libraries.create(libraries.work_name(),stlplus::lm_unit_name("hello", "sun"));
+string_unit* s_unit = dynamic_cast&lt;string_unit*&gt;(new_unit.pointer());
+if (!s_unit)
+  // report error
+else
+  s_unit-&gt;set_string("Hello World!");
+libraries.save();
+</pre>
+
+<p>This example shows a number of features of using the library manager. The
+first line creates a string_unit unit called "hello". It uses the string_unit's
+signature "sun" as the type. By the way, it is bad practice to do this with a
+string literal, ideally you should declare a global constant string containing
+this signature and then use the global constant throughout. It is then possible
+to change the signature of string_unit by changing one line of code.</p>
+
+<p>The create routine returns an stlplus::lm_unit_ptr which is then typecast onto
+string_unit* using the C++ method outlined above. This can return null under two
+conditions: the wrong type was cast to (a programming error - once you've got it
+right it will always be right) or if the create failed.</p>
+
+<p>The final stage is to set the string field of the string unit, which marks it
+for saving. Finally, I've included an explicit save call to ensure it is saved
+immediately. This is not necessary - indeed save is called by the destructor, so
+there's no need for an explicit save at all, it depends on the application.</p>
+
+<p>To access an existing unit, use the find functions:</p>
+
+<pre class="cpp">
+const stlplus::lm_unit_ptr library_manager::find(const std::string&amp; library, const stlplus::lm_unit_name&amp; name) const;
+stlplus::lm_unit_ptr library_manager::find(const std::string&amp; library, const stlplus::lm_unit_name&amp; name);
+</pre>
+
+<p>There are two variants in keeping with the normal convention that a const
+library manager returns a const unit pointer and a non-const library manager
+returns a non-const unit pointer. The find functions take the same arguments as
+the create function and return the same pointer type. If the unit does not
+exist, this pointer will be null. Alternatively, you can check whether the unit
+exists before trying to find it with the exists function:</p>
+
+<pre class="cpp">
+bool library_manager::exists(const std::string&amp; library, const stlplus::lm_unit_name&amp; name) const;
+</pre>
+
+<p>Finally, of course, it is possible to delete a unit from the library by using
+the erase function:</p>
+
+<pre class="cpp">
+bool library_manager::erase(const std::string&amp; library, const stlplus::lm_unit_name&amp; name);
+</pre>
+
+<p>Remember that a unit initially only contains header information (as explained
+in the section "Registering a New Type"). This information can be retrieved from
+the unit by dereferencing the lm_unit_ptr. Body information (i.e. the
+type-specific data structure) is not loaded until you request it. This can be
+loaded through the library manager. Body data can be removed from memory by
+calling purge and saved to file through calling save. To perform these
+operations, the following functions are provided:</p>
+
+<pre class="cpp">
+bool library_manager::loaded(const std::string&amp; library, const lm_unit_name&amp; name) const;
+bool library_manager::load(const std::string&amp; library, const lm_unit_name&amp; unit);
+bool library_manager::purge(const std::string&amp; library, const lm_unit_name&amp; unit);
+bool library_manager::save(const std::string&amp; library, const lm_unit_name&amp; unit);
+bool library_manager::mark(const std::string&amp; library, const lm_unit_name&amp; name);
+bool library_manager::unmark(const std::string&amp; library, const lm_unit_name&amp; name);
+bool library_manager::marked(const std::string&amp; library, const lm_unit_name&amp; name) const;
+</pre>
+
+<p>The loaded method tests whether a unit is already loaded. The load method
+loads it. In fact, if a unit is already loaded, the load function does nothing,
+so it is safe to call it more than once on a unit and the loaded method is
+really redundant. The purge method saves the unit if necessary and destroys
+the body data in memory. The save method saves the body data (if marked for
+saving) but keeps it in memory. The mark method marks a unit for saving,
+unmark removes that mark and marked tests to see whether a unit has been marked
+for saving and not yet saved (since the mark is cleared when the unit is saved).</p>
+
+<p>The library manager has a number of methods for accessing the set of all
+units in a library or all units of a specified type in the library. These units
+can either be accessed by unit name or by unit pointer:</p>
+
+<pre class="cpp">
+std::vector&lt;stlplus::lm_unit_name&gt; names(const std::string&amp; library) const;
+std::vector&lt;std::string&gt; names(const std::string&amp; library, const std::string&amp; type) const;
+std::vector&lt;stlplus::lm_unit_ptr&gt; handles(const std::string&amp; library) const;
+std::vector&lt;stlplus::lm_unit_ptr&gt; handles(const std::string&amp; library, const std::string&amp; type) const;
+</pre>
+
+<p>Note that if you get the set of all names in a library, you get a vector of
+unit-name since there is more than one type of unit possible in the list.
+Hoever, if you get tyhe names for a specific type in the library, the vector is
+of strings representing just the name part, since the type is already known.</p>
+
+
+<h2 id="dependencies">Dependency Checking</h2>
+
+<em>to be continued...</em>
+
+
+</div>
+
+</body>
+</html>

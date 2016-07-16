@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - Versions and the Change Log</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>Version Numbers</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#cvs">Fine-Grain Version Management for Development</a></li>
+<li class="internal"><a href="#macro">Coarse-Grain Version Control for Users</a></li>
+<li class="external"><a href="version_hpp.html">See Version Macro</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The STLplus library is an ongoing project and always will be. Therefore,
+there is a potential problem with different users using different versions of
+the library on different parts of a project - the parts may end up being
+incompatible with each other. There is also a problem whereby software will
+fail to build if the wrong version of STLplus is used.</p>
+
+<p>For these reasons, version control is used to keep track of the various
+versions of the library. In fact, there are two layers of version control used
+- one is a fine-grain control used in development of the library and then
+there is a second level which is relevant to users of the library.</p>
+
+
+<h2 id="cvs">Fine-Grain Version Management for Development</h2>
+
+<p>The library is maintained in a CVS repository for development purposes.
+This allows every modification to every file in the library to be tracked and
+versioned. It means that any version of the software at any date since the CVS
+repository was created can be reproduced. For example, if I wished to use the
+version that was current on 1 April 2002, I can do that.</p>
+
+<p>This kind of tracking can be useful for the library development but is
+rather too fine-grain for everyday users who quite frankly don't care what
+version they're using provided that it works.</p>
+
+<p>The CVS repository is tagged every time I make an official user release.
+For example, the current version of the library at the time of writing has the
+tag "stlplus-03-00". This means that checking out on this tag will give you
+the user's version 3.0 of the library - see below for more on user versions.</p>
+
+
+<h2 id="macro">Coarse-Grain Version Control for Users</h2>
+
+<p>The library contains a header in the portability library called 
+version.hpp which defines a macro that contains a version
+number. This is the coarse-grain version. For example, at the time of writing
+the macro looked like this:</p>
+
+<pre class="cpp">
+#define STLPLUS_VERSION "3.0"
+</pre>
+
+<p>This means that the current version is version 3.0. The STLPLUS_VERSION
+macro was introduced for version 1.0. If your version of the library doesn't
+have it, then it is an obsolete version, known generically as a "version zero"
+copy. I cannot support this version because I cannot trace the heritage of
+such stray copies, so if you have such a copy I recommend you discard it and use
+an official version.</p>
+
+<p><a href="version_hpp.html">See Current Version Macro</a></p>
+
+<p>The SourceForge-hosted open-source version of STLplus starts at version 2.0. Earlier
+versions were internal (Southampton University) versions. The SourceForge
+CVS repository only contains version 2.0 onwards; it is a clean start at this
+version so it is not possible to reproduce any earlier versions.</p>
+
+<p>However, the source code for a particular version number is not fixed.
+Remember that the library is an ongoing project. There are two reasons why the
+code might change and the version not:</p>
+
+<ol>
+
+<li>bug-fixes - a bug fix to a version does not change its version
+number. However, generally bug-fixes are only made on the latest (development)
+version.</li> 
+
+<li>ongoing development - its not an officially released version.</li>
+
+</ol>
+
+<p>The process that I use for making releases is as follows:</p>
+
+<p>I develop new features on a development copy of the library. This is known
+as the "latest" copy. When I am satisfied that this version has reached a
+level of stability that makes it a candidate for an official release, I freeze
+the source code and make an official release of it. This is the end of
+development for that version number excepting minor bug-fixes.</p>
+
+<p>Once an official release is made, the version number of the development
+copy of the library is incremented. This results in a new version which has
+not been released officially yet. This becomes the new development version
+which I will then use to develop more features or packages. Nevertheless, if
+you want the very latest copy of STLplus, you can get a copy of this version
+by obtaining the "latest" version. Bear in mind that this version can change a
+lot because it is the development version. It can also get broken because of
+mistakes on my part. Therefore, if you don't want to be affected by these
+changes, stick to an official release. For example, at the time of writing,
+version 3.0 was the last official release and so the development copy is
+version 3.1.</p>
+
+
+</div>
+
+</body>
+</html>

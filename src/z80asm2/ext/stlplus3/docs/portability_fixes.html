@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/portability_fixes.hpp - Macros for Fixing Compiler Differences</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>
+The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection
+</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/portability_fixes.hpp<br>Macros for Fixing Compiler Differences</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="portability_fixes_hpp.html">Browse Header portability_fixes.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#mswindows">MSWINDOWS Macro</a></li>
+<li class="internal"><a href="#warnings">Silencing Unnecessary Warnings</a></li>
+<li class="internal"><a href="#minmax">minimum/maximum Template Functions</a></li>
+<li class="internal"><a href="#sleep">Missing sleep function on Windows</a></li>
+<li class="internal"><a href="#endian">stlplus::little_endian function</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This component contains a set of macros which provide optional debug
+code. The debug code is optional in the sense that it can be entirely stripped
+out when compiling a release version of software. It is also optional in that a
+program compiled for debugging will still not produce any debug output unless it
+is switched on through the environment.</p>
+
+
+<h2 id="mswindows">MSWINDOWS Macro</h2>
+
+<p>It irritated me that I had to check for two mutually-exclusive macros when writing
+Windows-specific code - _WIN32 and _WIN32_WCE. So I have simply defined a single macro
+MSWINDOWS which is defined if either of the above macros is defined.</p>
+
+<p>You can use the same macro in your own Windows-specific code:</p>
+
+<pre class="cpp">
+#include "portability_fixes.hpp"
+...
+#ifdef MSWINDOWS
+  // Windows-specific bits
+  ... 
+#else
+  // Generic Unix bits
+  ... 
+#endif
+</pre>
+
+
+
+<h2 id="warnings">Silencing Unnecessary Warnings</h2>
+
+<p>In principle, it is a good policy to make code compile with no warnings. However, this is
+sometimes not possible because there are some compiler warnings that simply cannot be avoided. This
+is not lazy programming - I'm talking about warnings that are unfixable because of problems with the
+compiler or assumptions by compiler writers.</p>
+
+<p>In the portability_fixes header I include some pragmas for switching off these unfixable warnings
+so that it is possible to compile code warning-free.</p>
+
+<h3>Visual Studio</h3>
+
+<p>I switch off the following warnings in Visual Studio:</p>
+
+<table cellspacing="0">
+<caption>Unfixable warning in Visual Studio</caption>
+<thead>
+<tr><th>ID</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td>4275</td><td>VC6, exported class was derived from a class that was not exported</td></tr>
+<tr><td>4786</td><td>VC6, identifier string exceeded maximum allowable length and was truncated (only affects debugger)</td></tr>
+<tr><td>4305</td><td>VC6, identifier type was converted to a smaller type</td></tr>
+<tr><td>4503</td><td>VC6, decorated name was longer than the maximum the compiler allows (only affects debugger)</td></tr>
+<tr><td>4309</td><td>VC6, type conversion operation caused a constant to exceeded the space allocated for it</td></tr>
+<tr><td>4290</td><td>VC6, C++ exception specification ignored</td></tr>
+<tr><td>4800</td><td>VC6, forcing value to bool 'true' or 'false' (performance warning)</td></tr>
+<tr><td>4675</td><td>VC7.1, "change" in function overload resolution _might_ have altered program</td></tr>
+<tr><td>4996</td><td>VC8, 'xxxx' was declared deprecated</td></tr>
+</tbody>
+</table>
+
+<h3>Borland Compiler</h3>
+
+<table cellspacing="0">
+<caption>Unfixable warning in Borland</caption>
+<thead>
+<tr><th>ID</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td>8008</td><td>Condition is always true. Whenever the compiler encounters a
+constant comparison that (due to the nature of the value being compared) is always true
+or false, it issues this warning and evaluates the condition at compile time.</td></tr>
+
+<tr><td>8060</td><td>Possibly incorrect assignment. This warning is generated when the
+compiler encounters an assignment operator as the main operator of a conditional expression
+(part of an if, while, or do-while statement). This is usually a typographical error for the
+equality operator.</td></tr>
+
+<tr><td>8066</td><td>Unreachable code. A break, continue, goto, or return statement was not
+followed by a label or the end of a loop or function. The compiler checks while, do, and for
+loops with a constant test condition, and attempts to recognize loops that can't fall
+through.</td></tr>
+</tbody>
+</table>
+
+<p>All of these tend to happen a lot in template functions.</p>
+
+
+
+<h2 id="minmax">minimum/maximum Template Functions</h2>
+
+<p>The STL defines two template functions called std::min and std::max which return the
+minimum and maxuimum of two values respectively.</p>
+
+<p>However, the Windows headers up to and including Visual Studio v6 define <em>macros</em>
+called max/min which conflict with the templates std::max and std::min. To avoid conflicts,
+Microsoft removed the std::max/min from their version of the STL rather than fixing the
+problem!</p> 
+
+<p>Fortunately, from Visual Studio .NET (version 7) the STL templates have
+been added correctly.</p>
+
+<p>I could have fixed this by providing my own min/max for Visual Studio version 6, but this
+could potentially have broken the MFC headers.</p>
+
+<p>So, instead, I've created extra template function definitions minimum/maximum that avoid
+all the problems above.</p>
+
+<pre class="cpp">
+template&lt;typename T&gt; const T&amp; stlplus::maximum(const T&amp; l, const T&amp; r) {return l &gt; r ? l : r;}
+template&lt;typename T&gt; const T&amp; stlplus::minimum(const T&amp; l, const T&amp; r) {return l &lt; r ? l : r;}
+</pre>
+
+<p>Use these functions to avoid the min/max problem.</p>
+
+
+<h2 id="sleep">Missing sleep function on Windows</h2>
+
+<p>On Unix, there is a function <code>sleep(unsigned seconds)</code> That causes the program
+(actually, just the current thread) to go to sleep for the specified interval. On Windows,
+this is implemented as <code>Sleep(DWORD millseconds)</code>. To make programs just a little
+easier to write, I implemented a <code>sleep(unsigned seconds)</code> function on Windows.</p>
+
+
+<h2 id="endian">stlplus::little_endian function</h2>
+
+<p>Different machine architectures store data using different byte orders.
+This is referred to as Big- and Little-Endian Byte Ordering.</p>
+
+<p>The issue is: where does a pointer to an integer type actually point? The least-significant
+or the most-significant byte?</p>
+
+<dl>
+
+<dt>Big-Endian</dt>
+<dd>Byte 0 = The most significant byte</dd>
+
+<dt>Little-Endian</dt>
+<dd>Byte 0 = The least significant byte</dd>
+
+</dl>
+
+<p>In other words, bytes are addressed from offset 0 upwards. This means that in big-endian
+order byte 0 is the msB, whereas in little-endian order byte 0 is the lsB.</p>
+
+<p>For example, Intel-based machines store data in little-endian byte order.</p>
+
+<p>This function establishes byte order at run-time:</p>
+
+<pre class="cpp">
+bool stlplus::little_endian(void);
+</pre>
+
+
+</div>
+
+</body>
+</html>

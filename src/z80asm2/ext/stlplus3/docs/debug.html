@@ -1,0 +1,278 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/debug.hpp - Macros for Including Debug Code</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/debug.hpp<br>Macros for Including Debug Code</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="debug_hpp.html">Browse Header debug.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#control">Control</a></li>
+<li class="internal"><a href="#assert">Better Assertions</a></li>
+<li class="internal"><a href="#macros">The Macros</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This component contains a set of macros which provide optional debug
+code. The debug code is optional in the sense that it can be entirely stripped
+out when compiling a release version of software. It is also optional in that a
+program compiled for debugging will still not produce any debug output unless it
+is switched on through the environment.</p>
+
+
+<h2 id="control">Control</h2>
+
+<p>All of the debug macros are controlled by the compiler directive NDEBUG. This
+is the same compiler directive that is used by the standard C &lt;assert.h&gt;. This
+compiler directive removes all debug code when the directive is present, but
+keeps it when it is absent. Typically, release versions of software will be
+compiled with NDEBUG defined so that all debug code, including assertions, are
+stripped out of the source.</p>
+
+<p>The compilation utilities used by us (either Make files or VC++) set NDEBUG
+when compiling with release options but unset it when compiling in any other
+mode.</p>
+
+<p>Programs containing debugging code can have the debug option switched on via
+the environment variable DEBUG which takes as its value the name of the source
+file for which debugging is to be switched on. Debug code is executed for all
+functions in that file plus recursively all functions called from that file (to
+any call depth). Put another way, once debug is on at a certain level of call
+stack, it stays on for all levels deeper than that to any depth of
+recursion. Setting DEBUG to the file containing main() switches debugging on for
+the whole program.</p>
+
+<p>In other words, to switch debug options on in shell, type:</p>
+
+<pre class="script">
+export DEBUG=main.cpp
+</pre>
+
+<p>In MS-DOS:</p>
+
+<pre class="script">
+set DEBUG=main.cpp
+</pre>
+
+<p>If the variable DEBUG is present, but with an empty string as its value, this
+swiches on debugging for the whole program. This is a shortcut for switching on
+debug for main.</p>
+
+<p>In other words, to switch debug options on for the whole program in shell, type:</p>
+
+<pre class="script">
+export DEBUG=''
+</pre>
+
+<p>In MS-DOS:</p>
+
+<pre class="script">
+set DEBUG=""
+</pre>
+
+<p>To reduce the amount of debugging information, debug mode can be switched on
+for just one file. This is done by defining a variable called DEBUG_LOCAL. This
+only has to be present - the value is ignored. If DEBUG_LOCAL is present, the
+recursive nature of the debug macros is switched off so that only reports from
+the one specified file will be seen.</p>
+
+<p>In other words, to switch debug options on for just file main.cpp in shell, type:</p>
+
+<pre class="script">
+export DEBUG=main.cpp
+export DEBUG_LOCAL=''
+</pre>
+
+<p>In MS-DOS:</p>
+
+<pre class="script">
+set DEBUG=main.cpp
+set DEBUG_LOCAL=""
+</pre>
+
+
+<h2 id="assert">Better Assertions</h2>
+
+<p>The debug utilities header provides an assertion that is meant to be a
+complete replacement for the C macro assert(expr). Assertions are used in C
+and C++ code for two purposes: to test preconditions for successful
+functioning of the program are met and to communicate to a programmer reading
+the code that these are tests for preconditions which have no side-effects and
+are not part of the behaviour of the code. Assertions should only be used to
+detect programming errors that are unrecoverable. User errors should never be
+handled this way. Nevertheless it is good practice to assert every assumption
+that you make in your code. There is no overhead in that the assertions are
+only present in a debug build of the program. Release builds have all the
+assertions removed. This is done in any properly set-up development system by
+defining the macro NDEBUG for release builds. This causes all debug code to be
+removed, including assertions.</p>
+
+<p>The improved assert macro is called DEBUG_ASSERT:</p>
+
+<pre class="cpp">
+DEBUG_ASSERT(expression);
+</pre>
+
+<p>Statement Macro: If the expression evaluates to true, everything is fine
+and nothing happens. If the expression evaluates to false however, it
+indicates that there is an error. The file name, line number and function name
+are printed along with the expression that failed. The main difference is that
+the macro then throws an exception (C++ style) whereas the predefined
+assert(expression) macro calls abort() (which is archaic C style). The
+exception thrown is called assert_failed. It is a subclass of std::logic_error
+(see the STLplus <a href="exceptions.html">exceptions policy</a>).</p>
+
+
+<h2 id="macros">The Macros</h2>
+
+<pre class="cpp">
+DEBUG_TRACE;
+</pre>
+
+<p>Statement Macro: Function calls can be traced at run time if a DEBUG_TRACE macro
+call is placed at the start of each function. Tracing is switched on for the
+function if it is either on alrady from the calling function or the name of the
+source file matches the DEBUG environment variable. This results in a message printed out on
+standard error as the function is entered (or at least when the macro is
+reached). A closing message is sent when the function is exited. Thus you get a
+constant stream of function trace information. </p>
+
+<p><strong>Note:</strong> The other debug macros can only be used in functions containing the
+DEBUG_TRACE macro.</p>
+
+<pre class="cpp">
+IF_DEBUG(statements);
+</pre>
+
+<p>Statement Macro: Will execute the statements if debug is on in this function, otherwise
+ignores them. The statements in the macro argument can be any C/C++ statements
+but will usually be some kind of print statement. For example:</p>
+
+<pre class="cpp">
+IF_DEBUG(std::cerr &lt;&lt; "the final value = " &lt;&lt; result &lt;&lt; std::endl);
+</pre>
+
+<p>Note that the macro is used as a statement and so must be terminated by a
+semicolon outside of the closing parenthesis.</p>
+
+<p>Prior to executing the statements, the macro prints the source file name and
+line number, followed by the call stack depth and the function name (Gnu
+compiler only - sorry, but VC++ does not provide a function name macro) without
+a terminating newline, so ideally the print statement(s) should continue on the
+same line. Thus you get a report like this:</p>
+
+<pre class="terminal">
+main.cpp:35: [23]main: the final value = 3
+</pre>
+
+<p>Thus shows that the debug report comes from file main.cpp line 35, the call
+stack depth is 23 and the current function name is main.</p>
+
+<pre class="cpp">
+DEBUG_REPORT(str);
+</pre>
+
+<p>Statement Macro: takes a string (that is an STL string, not a char*) argument
+which is printed out on standard error. It is similar to the IF_DEBUG macro. In
+fact the equivalence is:
+
+<pre class="cpp">
+#define DEBUG_REPORT(str) IF_DEBUG(std::cerr &lt;&lt; str &lt;&lt; std::endl)
+</pre>
+
+<p>The string_utilities.hpp header can be very useful in creating string
+representations of standard types to build up the string report. For example,
+the above IF_DEBUG example could be rewritten:</p>
+
+<pre class="cpp">
+DEBUG_REPORT("the final value = " + to_string(result));
+</pre>
+
+<p>Note the use of the + operator for concatenation and the to_string() function
+to give a string represenmtation of an integer. The output is the same as the
+IF_DEBUG form:</p>
+
+<pre class="cpp">
+main.cpp:35: [23]main: the final value = 3
+</pre>
+
+<pre class="cpp">
+DEBUG_ERROR(str);
+</pre>
+
+<p>Statement Macro: similar to DEBUG_REPORT except that it shouts out that an
+error has occurred. Thus the line:</p>
+
+<pre class="cpp">
+DEBUG_ERROR("the final value = " + to_string(result));
+</pre>
+
+<p>The output now has the work ERROR tastefully inserted into the output:</p>
+
+<pre class="terminal">
+main.cpp:35: [23]main: ERROR: the final value = 3
+</pre>
+
+<pre class="cpp">
+DEBUG_ON;
+DEBUG_ON_LOCAL;
+DEBUG_OFF;
+</pre>
+
+<p>These macros allow you to hard code debug reporting on regardless of the
+state of the DEBUG environment variable. This is mainly used during development
+to switch on debugging for the code currently under development. It is different
+from normal debugging in that it only switches on debugging from the DEBUG_ON
+macro to either the DEBUG_OFF or the return from the function. It does not
+switch on debugging for functions called from that function. Thus is can be used
+to concentrate on a small section of code without getting swamped with lower
+level reports.</p>
+
+<p>DEBUG_ON switches on recusive dubugging for the function the macro appears in
+and all functions it calls, whilst DEBUG_ON_LOCAL switches on
+debugging for the current function only and there is no recursion.</p>
+
+<p>Once the code is working happily, if course these macros should be deleted
+from the code.</p>
+
+
+</div>
+
+</body>
+</html>

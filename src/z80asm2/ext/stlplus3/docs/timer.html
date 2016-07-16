@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - subsystems/timer.hpp - A CPU Timer</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="subsystems.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>subsystems/timer.hpp<br>A CPU Timer</h1>
+</div>
+
+<div id="documentNavigation">
+<ul>
+<li class="external"><a href="timer_hpp.html">Browse Header timer.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#interface">Interface</a></li>
+<li class="internal"><a href="#usage">Usage</a></li>
+</ul>
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This component is a class which can be used to keep track of both CPU and
+elapsed time for a program or a part of a program. The idea is that you can
+create a timer object at any place in the code. That object can then be used to
+print the CPU time and elapsed time since the object was created.</p>
+
+
+<h2 id="interface">Interface</h2>
+
+<pre class="cpp">
+class timer
+{
+public:
+  timer(void);
+  ~timer(void);
+
+  void reset(void);
+
+  float elapsed(void);
+  float cpu(void);
+  std::string text(void);
+};
+</pre>
+
+<p>The constructor records the current CPU and elapsed time at the point of
+construction of the object. At any subsequent time, the difference between the
+current time and the construction time can be retrieved using either the
+elapsed() function or the cpu() function. These functions return a float that
+represents the time in seconds. It is recommended that the format "%4.2f" is
+used to print these times.</p>
+
+<p>Alternatively, a pre-formatted string representation of
+the two times can be retrieved using the text() function. This has the
+format:</p>
+
+<pre class="terminal">
+2.41s CPU, 2s elapsed
+</pre>
+
+<p>At present, the elapsed time is to the nearest second, whilst the CPU time is
+platform dependent but typically in hundredths or thousandths of a second.</p>
+
+<p>The internal timers can be reset to zero by calling the reset method.</p>
+
+
+<h2 id="usage">Usage</h2>
+
+<p>To measure the time taken for a program to run, place the timer object
+declaration at the start of the program and the report at the end:</p>
+
+<pre class="cpp">
+int main(int argc, char* argv[])
+{
+  timer main_timer;
+
+  &lt;do interesting things&gt;
+
+  std::cout &lt;&lt; "run time: " &lt;&lt; main_timer.text() &lt;&lt; std::endl;
+  return status;
+}
+</pre>
+
+<p>To time different sections of a program, use multiple timers:</p>
+
+<pre class="cpp">
+int main(int argc, char* argv[])
+{
+  timer main_timer;
+
+  timer phase1_timer;
+  &lt;do phase1&gt;
+  std::cout &lt;&lt; "phase1: " &lt;&lt; phase1_timer.text() &lt;&lt; std::endl;
+
+  timer phase2_timer;
+  &lt;do phase2&gt;
+  std::cout &lt;&lt; "phase2: " &lt;&lt; phase2_timer.text() &lt;&lt; std::endl;
+
+  std::cout &lt;&lt; "run time: " &lt;&lt; main_timer.text() &lt;&lt; std::endl;
+  return status;
+}
+</pre>
+
+
+</div>
+
+</body>
+</html>

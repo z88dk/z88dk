@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - containers/matrix.hpp - A 2-Dimensional Matrix Container</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="containers.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>containers/matrix.hpp<br>A 2-Dimensional Matrix Container</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="matrix_hpp.html">Browse Header matrix.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#instantiation">Instantiation</a></li>
+<li class="internal"><a href="#resize">Resizing</a></li>
+<li class="internal"><a href="#elements">Manipulating Elements</a></li>
+<li class="internal"><a href="#fill">Fill Functions</a></li>
+<li class="internal"><a href="#transforms">Transforming Methods</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This component is a 2-dimensional rectangular matrix. It is a template
+class which is parameterised by the type stored at each element of the matrix
+in the style of the STL containers.</p>
+
+<p>The matrix is rather different from most of the 1-dimensional structures in
+the STL in that it has no iterators. However, in the future I may intruduce
+the concept of row, column and element iterators if they seem suficiently
+useful and well-defined.</p>
+
+<p>The matrix also has to introduce the concept of a 'fill' value. Basically
+the matrix forms a rectangle of rows and columns of elements. It is not
+necessary to specify all of the element values. Where elements are missing,
+there is still space allocated so this space is filled with the fill value.
+So, for example, you can enlarge the matrix and specify what fill value to use
+for the extra elements added by the expansion.</p>
+
+<p>Each operation that creates elements takes a fill value as a parameter,
+with a default value which is the value produced by the default constructor of
+the contained class. For example, the default value for the <a href="smart_ptr.html">smart_ptr</a> is a
+null pointer.</p>
+
+
+<h2 id="instantiation">Instantiation</h2>
+
+<p>The matrix template takes only one template parameter, the type to store in
+the matrix:</p>
+
+<pre class="cpp">
+template&lt;typename T&gt; class matrix
+</pre>
+
+<p>The matrix has a single constructor which takes as its arguments the size
+in rows and columns. It also takes a fill value to pre-fill the matrix with.
+For example, in a numeric matrix you might choose to fill with 0.</p>
+
+<pre class="cpp">
+matrix::matrix(unsigned rows = 0, unsigned cols = 0, const T&amp; fill = T());
+</pre>
+
+<p>All parameters
+to the constructor take default values. The default matrix is 0 rows by 0
+columns. The default fill value is that given by the contained type's default
+constructor. For example, the default value of a string is the empty
+string.</p>
+
+<p>Here's how to declare a 10x10 matrix of strings with the default value of
+".":</p>
+
+<pre class="cpp">
+matrix&lt;string&gt; string100(10, 10, ".");
+</pre>
+
+
+<h2 id="resize">Resizing</h2>
+
+<p>The resize function has the same parameters as the constructor and allows
+the matrix to be resized to a different number of rows and columns. As with
+the constructor, there is a fill value which is used to initialise any new
+elements created by the resize operation.</p>
+
+<pre class="cpp">
+void matrix::resize(unsigned rows, unsigned cols, const T&amp; fill = T());
+</pre>
+
+<p>When resizing larger, newly created elements are filled with the fill
+value. When resizing smaller, elements outside the rectangle of the new size are
+discarded but elements within the rectangle are kept. The resize operation
+works by copying all kept elements into a new matrix of the correct size and
+discarding the old one, so with large matrices or matrices containing large
+data structures it could prove expensive. In this case, it is recommended that
+smart pointers are used as the matrix elements.</p>
+
+
+<h2 id="elements">Manipulating Elements</h2>
+
+<p>A matrix is a number of elements organised as rows and columns, the
+convention being that the row comes first, the column second, so for example
+the index 2,3 refers to row 2, column 3. Both rows and columns are indexed
+using C++ conventions in that they start at 0 and count upwards. Indices are
+of type unsigned to be compatible with the STL vector. There are two ways of
+accessing an element: using a function and using an operator. The function
+first:</p>
+
+<pre class="cpp">
+const T&amp; matrix::item(unsigned row, unsigned col) const;
+T&amp; matrix::item(unsigned row, unsigned col);
+</pre>
+
+<p>The first form is picked by the compiler whenever accessing a const matrix
+- for example the right-hand side of an assignment. The second form ispicked
+by the compiler for a non-const matrix - such as the left-hand side of an
+assignment, meaning that you can assign to the element returned to update the
+element in the matrix:</p>
+
+<pre class="cpp">
+strings100.item(2,3) = strings100.item(3,2);
+</pre>
+
+<p>The operator form uses operator() as an index operator. I would have liked
+to use operator[] but the standard only allows that to have one argument.
+Unfortunately the use of operator() makes matrix accesses look like function
+calls:</p>
+
+<pre class="cpp">
+strings100(2,3) = strings100(3,2);
+</pre>
+
+<p>Accessing an element outside of the range of the matrix throws an
+exception. You don't want to do this, so interrogate the matrix first to see
+how many rows and columns it has:</p>
+
+<pre class="cpp">
+unsigned matrix::rows(void) const;
+unsigned matrix::columns(void) const;
+</pre>
+
+<p>For example, to uppercase every element of the string matrix:</p>
+
+<pre class="cpp">
+for (unsigned r = 0; r &lt; string100.rows(); r++)
+  for (unsigned c = 0; c &lt; string100.columns(); c++)
+    string100(r,c) = uppercase(string100(r,c));
+</pre>
+
+
+<h2 id="fill">Fill Functions</h2>
+
+<p>There's a set of methods that allow you to fill the whole matrix, or a
+single row, column or diagonal with a value. The full set are:</p>
+
+<pre class="cpp">
+void matrix::fill(const T&amp; item = T());
+void matrix::fill_column(unsigned col, const T&amp; item = T());
+void matrix::fill_row(unsigned row, const T&amp; item = T());
+void matrix::fill_leading_diagonal(const T&amp; item = T());
+void matrix::fill_trailing_diagonal(const T&amp; item = T());
+void matrix::make_identity(const T&amp; one, const T&amp; zero = T());
+</pre>
+
+<p>Method fill simply fills the whole matrix with the same value. If no value
+is specified, the default value created by the contained type's default
+constructor is used.</p>
+
+<p>The fill_column method just fills a single column with a value. Again, the
+value is optional and defaults to the type's default constructor. The
+fill_row method does the same for a whole row.</p>
+
+<p>The fill_leading_diagonal applies the same value to each element on the
+leading diagonal of the matrix, namely elements (0,0), (1,1) etc. It doesn't
+touch the other elements in the matrix. Similarly, fill_trailing diagonal does
+the same for the matrix's trailing diagonal. In the case of the 10x10 matrix
+this would be elements (9,0), (8,1) etc.</p>
+
+<p>The make_identity method fills the leading diagonal with the one value and
+the other elements in the matrix with the zero value. The zero value is
+optional and defaults to the type's default constructor.</p>
+
+
+<h2 id="transforms">Transforming Methods</h2>
+
+<p>The matrix only has one transform at the moment:</p>
+
+<pre class="cpp">
+void matrix::transpose(void);
+</pre>
+
+<p>This operation swaps the rows and columns of the matrix. It does so by
+creating a new matrix and copying elements from the old to the new, discarding
+the old matrix. Once again, this is expensive if the element is a large
+type.</p>
+
+</div>
+
+</body>
+</html>

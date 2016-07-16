@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>strings/string_string.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>strings/string_string.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_STRING_STRING
+#define STLPLUS_STRING_STRING
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Functions for converting C/STL strings to string
+
+//   This is necessary for completeness, e.g. for use in vector_to_string for vector&lt;string&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;strings_fixes.hpp&quot;
+#include &lt;string&gt;
+#include &lt;stdexcept&gt;
+
+namespace stlplus
+{
+
+  std::string string_to_string(const std::string&amp; value);
+
+}
+
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

@@ -1,0 +1,231 @@
+/* Style Sheet for STLplus Web Pages */
+/* http://stlplus.sourceforge.net */
+/* Author: Andy Rushton */
+/* Copyright (c) Andy Rushton 2007 */
+/* License: BSD license, see license.html */
+
+/* uncomment the following line for debugging div margins */
+/* div {border: 1px solid; margin: 1px; padding: 1px;} */
+
+/* Overall document characteristics */
+
+/* Document header */
+
+#headerBanner h1, #headerBanner p
+{
+  font-size: xx-large;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  padding: 3px 0 0 0;
+}
+
+#headerNavigation, #documentNavigation
+{
+  display: none;
+}
+
+/* Content */
+
+#document
+{
+}
+
+/* Headers */
+
+h1
+{
+  margin: 0.5em 0;
+  text-align: center;
+}
+
+h2
+{
+  margin: 0.5em 0;
+}
+
+h3
+{
+  margin: 0.5em 0;
+}
+
+/* Content */
+
+#document p
+{
+  margin: 0.5em 0;
+  padding: 0;
+}
+
+/* lists */
+
+#document ul
+{
+  margin: 0 0 0 20px;
+}
+
+#document ol
+{
+  margin: 0 0 0 20px;
+}
+
+#document li
+{
+}
+
+li.file
+{
+  list-style-type: disc;
+  list-style-image: url("file.png");
+}
+
+li.folder
+{
+  list-style-type: square;
+  list-style-image: url("folder.png");
+}
+
+li.cross
+{
+  list-style-image: url("cross.png");
+}
+
+li.tick
+{
+  list-style-image: url("tick.png");
+}
+
+li.internal
+{
+  list-style-image: url("down.png");
+}
+
+li.external
+{
+  list-style-image: url("file.png");
+}
+
+/* Links */
+
+a:link, a:visited
+{
+}
+
+a:hover, a:active
+{
+}
+
+/* Definition List */
+
+#document dl
+{
+  margin: 0.5em 10px;
+}
+
+#document dt
+{
+  font-weight: bold;
+  margin: 0.5em 1em;
+}
+
+#document dd
+{
+  margin: 0.5em 2em;
+}
+
+/* Tables */
+
+table
+{
+  margin: 10px 0px;
+  border-collapse: collapse;
+}
+
+caption
+{
+  margin: 0;
+  text-align : left;
+  font-weight: bold;
+}
+
+thead
+{
+}
+
+th, td
+{
+  text-align: left;
+  padding: 3px 5px;
+}
+
+th
+{
+  font-weight: bold;
+  border: 1px solid;
+}
+
+
+td
+{
+  border: 1px solid;
+}
+
+tr
+{
+}
+
+/* Source Code Examples */
+
+pre
+{
+  font-family: monospace;
+  font-size: small;
+  border: thin solid;
+  padding: 1em;
+  overflow: auto;
+}
+
+pre.vhdl
+{
+}
+
+pre.cpp
+{
+}
+
+pre.terminal
+{
+}
+
+pre.script
+{
+}
+
+pre.syntax
+{
+}
+
+pre.node
+{
+}
+
+/* Images */
+
+p.figure
+{ 
+  text-align: center;
+  font-weight: bold;
+  padding: 0;
+  border: thin solid;
+  margin: 20px 0;
+}
+
+p.figure>img
+{ 
+  margin: 20px;
+  padding: 0;
+  border: 0;
+}
+
+
+

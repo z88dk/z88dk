@@ -1,0 +1,574 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - persistence/persistent_stl.hpp - Data Persistence for the STL Classes</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="persistence.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>persistence/persistent_stl.hpp<br>Data Persistence for the STL Classes</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#include">Header persistent_stl.hpp</a></li>
+<li class="internal"><a href="#string">std::string</a></li>
+<li class="internal"><a href="#pair">std::pair</a></li>
+<li class="internal"><a href="#vector">std::vector</a></li>
+<li class="internal"><a href="#list">std::list</a></li>
+<li class="internal"><a href="#deque">std::deque</a></li>
+<li class="internal"><a href="#set">std::set</a></li>
+<li class="internal"><a href="#multiset">std::multiset</a></li>
+<li class="internal"><a href="#map">std::map</a></li>
+<li class="internal"><a href="#multimap">std::multimap</a></li>
+<li class="internal"><a href="#complex">std::complex</a></li>
+<li class="internal"><a href="#bitset">std::bitset</a></li>
+<li class="internal"><a href="#shared_ptr">std::shared_ptr</a></li>
+<li class="internal"><a href="#omitted">Omitted Classes - adaptors and iterators</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The template classes provided by the STL have been made persistent using template dump/restore
+functions. To avoid overload problems the functions are actually called dump_<em>class</em> and
+restore_<em>class</em> where <em>class</em> is the name of the template class. For example, the
+persistence functions for the STL map are called dump_map and restore_map.</p>
+
+<p>Also provided here are the persistence functions for the std::string type, which are not
+templatised since std::string isn't. The functions for the various classes are explained in the
+folowing sections.</p>
+
+<p>The persistence functions for templates are themselves templates, so are automatically adapted to
+the type that the container holds. For example, stlplus::dump_vector which is the dump routine for the STL
+vector, will adapt to the type being held in the vector. If the vector contains int, then the
+dump_vector function will dump ints by calling the dump function defined for int. If the vector
+contains std::strings then the dump_vector function will dump strings. The template function does
+this by taking the name of the element dump function as a parameter.</p>
+
+<p>For example:</p>
+
+<pre class="cpp">
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include "persistent_contexts.hpp"
+#include "persistent_vector.hpp"
+#include "persistent_string.hpp"
+
+void dump_string_vector(stlplus::dump_context&amp; context, const std::vector&lt;std::string&gt;&amp; data)
+{
+  stlplus::dump_vector(context, data, stlplus::dump_string);
+}
+
+void restore_string_vector(stlplus::restore_context&amp; context, std::vector&lt;std::string&gt;&amp; data)
+{
+  stlplus::restore_vector(context, data, stlplus::restore_string);
+}
+</pre>
+
+<p>The last parameter passed to the dump_vector and restore_vector functions is the name of the
+function to use to dump/restore the element type - in this case std::string.</p>
+
+<p>The same parameter profile is used for all dump/restore routines, except that for classes that
+contain more than one type, there will be more than one function name required. For example, the
+std::pair contains two different types, so requires two function names for each call:</p>
+
+<pre class="cpp">
+#include &lt;string&gt;
+#include &lt;map&gt;
+#include "persistent_contexts.hpp"
+#include "persistent_pair.hpp"
+#include "persistent_int.hpp"
+#include "persistent_string.hpp"
+
+typedef std::pair&lt;std::string,int&gt; string_int_pair;
+
+void dump_string_int_pair(stlplus::dump_context&amp; context, const string_int_pair&amp; data)
+{
+  stlplus::dump_pair(context, data, stlplus::dump_string, stlplus::dump_int);
+}
+
+void restore_string_int_pair(stlplus::restore_context&amp; context, string_int_pair&amp; data)
+{
+  stlplus::restore_pair(context, data, stlplus::restore_string, stlplus::restore_int);
+}
+</pre>
+
+<p>In this example, dump_string and dump_int manage the dumping of the two types, whilst
+restore_string and restore_int manage the restoration.</p>
+
+<p>In both of these examples, the data structure can be dumped using only functions already provided by the
+persistence library. However, I prefer to wrap the function calls into a top-level function that has a
+simple interface and hides the implementation, as in the example above, even though the
+implementation is one line of code.</p>
+
+<p><strong>Note:</strong>The function name passed as a parameter <em>must</em> have only two parameters - the
+context and the data. To pass a function that takes extra parameters, wrap those functions in a
+wrapper function, like the dump_string_int_pair and restore_string_int_pair functions above. These functions
+can be used in a higher-level data structure, whereas the stlplus::dump_pair and
+stlplus:restore_pair cannot because they take more than two parameters.</p>
+
+<h2 id="include">Header persistent_stl.hpp</h2>
+
+<ul>
+<li class="external"><a href="persistent_stl_hpp.html">Browse Header persistent_stl.hpp</a></li>
+</ul>
+
+<p>You can include all of the functions in one go by including persistent_stl.hpp. If you prefer
+however, you can include the separate headers for each class being used. The latter approach
+minimises the number of STL headers that get included indirectly.</p>
+
+<h2 id="string">persistent_string.hpp: Persistence of std::string</h2>
+
+<ul>
+<li class="external"><a href="persistent_string_hpp.html">Browse Header persistent_string.hpp</a></li>
+</ul>
+
+<p>This set of functions provides the following interface:</p>
+
+<pre class="cpp">
+// basic_string
+
+template&lt;typename charT, typename traits, typename allocator, typename D&gt;
+void stlplus::dump_basic_string(stlplus::dump_context&amp;, const std::basic_string&lt;charT,traits,allocator&gt;&amp; data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename charT, typename traits, typename allocator, typename R&gt;
+void stlplus::restore_basic_string(stlplus::restore_context&amp;, std::basic_string&lt;charT,traits,allocator&gt;&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+
+// string
+
+void stlplus::dump_string(stlplus::dump_context&amp;, const std::string&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+void stlplus::restore_string(stlplus::restore_context&amp;, std::string&amp; data) 
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>The first pair of functions are template persistence functions for the templatised class
+std::basic_string which can be used to represent strings of any character width.</p>
+
+<p>The second pair of functions are non-templatised functions for the persistence of std::string -
+the specialisation of std::basic_string for 8-bit characters.</p>
+
+<p><strong>Note:</strong>The 'standard' type std::wstring is not supported because it is too weakly defined. 
+It is ostensibly the Unicode string, which requires a minimum of 21 bits. On Windows wstring is only
+16 bits wide so is actually UTF-16 encoded Unicode. On Gnu/Linux, wstring is 32 bits wide and therefore
+is unencoded UCS-4. Since UTF-16 and UCS-4 are not compatible and are not easily convertible, it is
+not possible to implement platform-independent persistence of this type. I recommend that you
+convert wide strings into UTF-8 encoding and dump/restore them using the std::string persistence
+above.</p>
+
+<h2 id="pair">Persistence of std::pair</h2>
+
+<ul>
+<li class="external"><a href="persistent_pair_hpp.html">Browse Header persistent_pair.hpp</a></li>
+</ul>
+
+<p>This header provides persistence functions for the std::pair collection. This is defined in the
+&lt;map&gt; header but is useful enough to be regarded as a separate class in its own right.</p>
+
+<p>The header provides the following functions:</p>
+
+<pre class="cpp">
+template&lt;typename V1, typename V2, typename D1, typename D2&gt;
+void stlplus::dump_pair(stlplus::dump_context&amp;, const std::pair&lt;V1,V2&gt;&amp; data, D1 dump_fn1, D2 dump_fn2)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename V1, typename V2, typename R1, typename R2&gt;
+void stlplus::restore_pair(stlplus::restore_context&amp;, std::pair&lt;V1,V2&gt;&amp; data, R1 restore_fn1, R2 restore_fn2)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>These functions take two parameters that are names of functions: one for each element in the
+pair. For example, if you were using a pair containing a string and an int:</p>
+
+<pre class="cpp">
+#include &lt;string&gt;
+#include &lt;map&gt;
+#include "persistent_contexts.hpp"
+#include "persistent_pair.hpp"
+#include "persistent_string.hpp"
+#include "persistent_int.hpp"
+
+typedef std::pair&lt;std::string,int&gt; string_int_pair;
+
+void dump_string_int_pair(stlplus::dump_context&amp; context, const string_int_pair&amp; data)
+{
+  stlplus::dump_pair(context, data, stlplus::dump_string, stlplus::dump_int);
+}
+
+void restore_string_int_pair(stlplus::restore_context&amp; context, string_int_pair&amp; data)
+{
+  stlplus::restore_pair(context, data, stlplus::restore_string, stlplus::restore_int);
+}
+</pre>
+
+<h2 id="vector">Persistence of std::vector</h2>
+
+<ul>
+<li class="external"><a href="persistent_vector_hpp.html">Browse Header persistent_vector.hpp</a></li>
+</ul>
+
+<p>The vector contains one element type and therefore is parametrised by one element function.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename D&gt;
+void stlplus::dump_vector(stlplus::dump_context&amp;, const std::vector&lt;T&gt;&amp; data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename R&gt;
+void stlplus::restore_vector(stlplus::restore_context&amp;, std::vector&lt;T&gt;&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+
+// specialism for vector&lt;bool&gt;
+
+void stlplus::dump_vector_bool(stlplus::dump_context&amp;, const std::vector&lt;bool&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+void stlplus::restore_vector_bool(stlplus::restore_context&amp;, std::vector&lt;bool&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>The first pair of functions are templatised functions for the persistence of a vector containing
+an element of any class and takes as its third parameter the function for managing the elements. For
+example, for a vector of string, the element functions would be stlplus::dump_string and
+stlplus::restore_string.</p>
+
+<p>The second pair of functions are non-templatised functions for the persistence of a vector of
+bool, which has a specialised implementation in the STL and a slightly different interface.</p>
+
+<h2 id="list">Persistence of std::list</h2>
+
+<ul>
+<li class="external"><a href="persistent_list_hpp.html">Browse Header persistent_list.hpp</a></li>
+</ul>
+
+<p>The list contains one element type and therefore is parametrised by one element function.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename D&gt;
+void stlplus::dump_list(stlplus::dump_context&amp;, const std::list&lt;T&gt;&amp; data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename R&gt;
+void stlplus::restore_list(stlplus::restore_context&amp;, std::list&lt;T&gt;&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a list containing
+an element of any class and takes as its third parameter the function for managing the elements. For
+example, for a list of string, the element functions would be stlplus::dump_string and
+stlplus::restore_string.</p>
+
+<h2 id="deque">Persistence of std::deque</h2>
+
+<ul>
+<li class="external"><a href="persistent_deque_hpp.html">Browse Header persistent_deque.hpp</a></li>
+</ul>
+
+<p>The deque contains one element type and therefore is parametrised by one element function.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename D&gt;
+void stlplus::dump_deque(stlplus::dump_context&amp;, const std::deque&lt;T&gt;&amp; data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename R&gt;
+void stlplus::restore_deque(stlplus::restore_context&amp;, std::deque&lt;T&gt;&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a deque containing
+an element of any class and takes as its third parameter the function for managing the elements. For
+example, for a deque of string, the element functions would be stlplus::dump_string and
+stlplus::restore_string.</p>
+
+<h2 id="set">Persistence of std::set</h2>
+
+<ul>
+<li class="external"><a href="persistent_set_hpp.html">Browse Header persistent_set.hpp</a></li>
+</ul>
+
+<p>The set contains one element type and therefore is parametrised by one element function.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename K, typename P, typename D&gt;
+void stlplus::dump_set(stlplus::dump_context&amp;, const std::set&lt;K,P&gt;&amp; data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename K, typename P, typename R&gt;
+void stlplus::restore_set(stlplus::restore_context&amp;, std::set&lt;K,P&gt;&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a set containing
+an element of any class and takes as its third parameter the function for managing the elements. For
+example, for a set of string, the element functions would be stlplus::dump_string and
+stlplus::restore_string.</p>
+
+<h2 id="multiset">Persistence of std::multiset</h2>
+
+<ul>
+<li class="external"><a href="persistent_multiset_hpp.html">Browse Header persistent_multiset.hpp</a></li>
+</ul>
+
+<p>The multiset contains one element type and therefore is parametrised by one element function.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename K, typename P, typename D&gt;
+void stlplus::dump_multiset(stlplus::dump_context&amp;, const std::multiset&lt;K,P&gt;&amp; data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename K, typename P, typename R&gt;
+void stlplus::restore_multiset(stlplus::restore_context&amp;, std::multiset&lt;K,P&gt;&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a multiset containing
+an element of any class and takes as its third parameter the function for managing the elements. For
+example, for a multiset of string, the element functions would be stlplus::dump_string and
+stlplus::restore_string.</p>
+
+<h2 id="map">Persistence of std::map</h2>
+
+<ul>
+<li class="external"><a href="persistent_map_hpp.html">Browse Header persistent_map.hpp</a></li>
+</ul>
+
+<p>The map contains two element types and therefore is parametrised by two element functions.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename K, typename T, typename P, typename DK, typename DT&gt;
+void stlplus::dump_map(stlplus::dump_context&amp;, const std::map&lt;K,T,P&gt;&amp; data, DK key_dump_fn, DT val_dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename K, typename T, typename P, typename RK, typename RT&gt;
+void stlplus::restore_map(stlplus::restore_context&amp;, std::map&lt;K,T,P&gt;&amp; data, RK key_restore_fn, RT val_restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a map containing an
+element of any class and takes as its third and fourth parameters the functions for managing the key
+and value respectively. For example, for a map of ints mapped onto string, the element functions
+would be stlplus::dump_int/stlplus::dump_string and stlplus::restore_int/stlplus::restore_string.</p>
+
+<h2 id="multimap">Persistence of std::multimap</h2>
+
+<ul>
+<li class="external"><a href="persistent_multimap_hpp.html">Browse Header persistent_multimap.hpp</a></li>
+</ul>
+
+<p>The multimap contains two element types and therefore is parametrised by two element functions.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename K, typename T, typename P, typename DK, typename DT&gt;
+void stlplus::dump_multimap(stlplus::dump_context&amp;, const std::multimap&lt;K,T,P&gt;&amp; data, DK key_dump_fn, DT val_dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename K, typename T, typename P, typename RK, typename RT&gt;
+void stlplus::restore_multimap(stlplus::restore_context&amp;, std::multimap&lt;K,T,P&gt;&amp; data, RK key_restore_fn, RT val_restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a multimap containing an
+element of any class and takes as its third and fourth parameters the functions for managing the key
+and value respectively. For example, for a multimap of ints mapped onto string, the element functions
+would be stlplus::dump_int/stlplus::dump_string and stlplus::restore_int/stlplus::restore_string.</p>
+
+<h2 id="complex">Persistence of std::complex</h2>
+
+<ul>
+<li class="external"><a href="persistent_complex_hpp.html">Browse Header persistent_complex.hpp</a></li>
+</ul>
+
+<p>A std::complex is like a pair that contains two elements, except that they must be of the same
+type. For example, a complex&lt;int&gt; or complex&lt;float&gt;.</p>
+
+<pre class="cpp">
+template&lt;typename T, typename D&gt;
+void stlplus::dump_complex(stlplus::dump_context&amp;, const std::complex&lt;T&gt;&amp; data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename R&gt;
+void stlplus::restore_complex(stlplus::restore_context&amp;, std::complex&lt;T&gt;&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a complex containing an
+element of any class and takes as its third parameter the function for managing the contained type. 
+For example, for a complex of int, the element functions would be stlplus::dump_int and
+stlplus::restore_int.</p>
+
+<h2 id="bitset">Persistence of std::bitset</h2>
+
+<ul>
+<li class="external"><a href="persistent_bitset_hpp.html">Browse Header persistent_bitset.hpp</a></li>
+</ul>
+
+<p>A bitset is an array of bits where the size is set at compile time, unlike vector&lt;bool&gt; where the
+size is dynamic. A bitset is unusual in that it is templatised with the size as the template
+parameter. This means that bitsets of different sizes are in fact different types and cannot interact.</p>
+
+<pre class="cpp">
+template&lt;size_t N&gt;
+void dump_bitset(dump_context&amp;, const std::bitset&lt;N&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;size_t N&gt;
+void restore_bitset(restore_context&amp;, std::bitset&lt;N&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>These functions take two arguments, so can be used as parameters to higher-level persistence
+functions. For example:</p>
+
+<pre class="cpp">
+#include &lt;bitset&gt;
+#include &lt;vector&gt;
+#include "persistent_contexts.hpp"
+#include "persistent_bitset.hpp"
+#include "persistent_vector.hpp"
+
+typedef std::bitset&lt;100&gt; flags;
+typedef std::vector&lt;flags&gt; flags_vector;
+
+void dump_flags_vector(stlplus::dump_context&amp; context, const flags_vector&amp; data)
+{
+  stlplus::dump_vector(context, data, stlplus::dump_bitset&lt;100&gt;);
+}
+
+void restore_flags_vector(stlplus::restore_context&amp; context, flags_vector&amp; data)
+{
+  stlplus::restore_vector(context, data, stlplus::restore_bitset&lt;100&gt;);
+}
+</pre>
+
+<h2 id="shared_ptr">Persistence of std::shared_ptr</h2>
+
+<ul>
+<li class="external"><a href="persistent_shared_ptr_hpp.html">Browse Header persistent_shared_ptr.hpp</a></li>
+</ul>
+
+<p>The shared_ptr class is part of the "C++11" extensions to
+  C++. This standard has now been ratified, and some compilers
+  support some of its features. For this reason, support
+  for persistence of shared_ptr has been added to the STLplus
+  persistence library, but only for those compilers that support
+  it.</p>
+
+<p>Note: the shared_ptr class was pre-released as part of the
+  "TR1" proposed extensions which eventually became part of the
+  "C++11" standard. I do not support shared_ptr in its TR1 form
+  because it's implementation has varied between compilers too much to
+  provide a portable solution. The feature must be used in its final, standard-compliant form.</p>
+
+<p>At the time of writing the following compilers support
+  shared_ptr:</p>
+
+<dl>
+
+<dt>Microsoft Visual Studio</dt>
+<dd>From Visual Studio Express 2010 the C++11 form of shared_ptr is
+  provided by default.</dd>
+
+<dt>Gnu gcc</dt>
+<dd>The C++11 form of shared_ptr is supported in gcc from version 4,
+  provided you enable the c++11 mode with the command-line switch
+  -std=c++11. It is available in TR1 form without the switch but I do
+  not support that version.</dd>
+
+<dt>Borland (now Embarcadero) C++ Builder</dt>
+<dd>The Borland compiler does not provide shared_ptr as yet (checked
+  in v6.31). It uses the Dinkumware STL library as does Visual Studio,
+  but an older version.</dd>
+
+</dl>
+
+<p>The shared_ptr class contains a pointer to one element type and
+therefore is parametrised by one element function.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename DE&gt;
+void dump_shared_ptr(dump_context&amp;, const std::shared_ptr&lt;T&gt;&amp; data, DE dump_element)
+  throw(persistent_dump_failed);
+
+template&lt;typename T, typename RE&gt;
+void restore_shared_ptr(restore_context&amp;, std::shared_ptr&lt;T&gt;&amp; data, RE restore_element)
+  throw(persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a shared_ptr containing
+an element of the template class and takes as its third parameter the function for managing the elements. For
+example, for a pointer to a string, the element functions would be stlplus::dump_string and
+stlplus::restore_string.</p>
+
+<p>Note: the functions for implementing pointers to polymorphic
+  classes haven't been completed yet. See the discussion for
+  implementing persistence with polymorphism for the
+  <a href="persistent_pointers.html#smart_ptr">STLplus smart pointers</a> for more information.</p>
+
+<h2 id="omitted">Omitted Classes - Adaptors and Iterators</h2>
+
+<p><strong>Note:</strong> I do not support persistence of the container adaptors <code>queue</code>,
+<code>priority_queue</code> and <code>stack</code> because their interfaces are too restrictive to
+allow dump and restore routines to be written without burgling the data structure. This means that I
+will never do them because it is impossible!</p>
+
+<p>When designing a data structure to be made persistent, you need to bear this in mind and use
+containers such as <code>vector</code> and <code>list</code> rather than <code>queue</code> or
+<code>stack</code>.</p>
+
+<p>I also haven't implemented any STL iterators. The design of iterators makes it nearly impossible to
+do this without burgling the data structure, which wouldn't be portable.</p>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>persistence/persistent_xref.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>persistence/persistent_xref.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PERSISTENT_XREF
+#define STLPLUS_PERSISTENT_XREF
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Persistence for cross-references to persistent objects
+
+//   A cross-reference is a pointer to an object that has definitely been dumped
+//   already by one of dump_pointer, dump_interface or dump_callback, i.e. by
+//   one of the dump routines for pointers to objects.
+
+//   These are typically used in data structures as back-pointers or pointers
+//   between nodes.
+
+//   For example, you may have a tree with cross links. Dump the tree as the
+//   primary data structure first, then dump the cross links as cross-references
+//   afterwards. The whole tree must be dumped before any cross-references to
+//   ensure that all cross-references are known to the persistence system.
+
+//   These functions will throw an exception if the cross-reference points to
+//   something not dumped before.
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistence_fixes.hpp&quot;
+#include &quot;persistent_contexts.hpp&quot;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  template&lt;typename T&gt;
+  void dump_xref(dump_context&amp;, const T* const data)
+    throw(persistent_dump_failed);
+
+  template&lt;typename T&gt;
+  void dump_object_xref(dump_context&amp;, const T* const data)
+    throw(persistent_dump_failed);
+
+  template&lt;typename T&gt;
+  void restore_xref(restore_context&amp;, T*&amp; data)
+    throw(persistent_restore_failed);
+
+  template&lt;typename T&gt;
+  void restore_object_xref(restore_context&amp;, T*&amp; data)
+    throw(persistent_restore_failed);
+
+} // end namespace stlplus
+
+  ////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistent_xref.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

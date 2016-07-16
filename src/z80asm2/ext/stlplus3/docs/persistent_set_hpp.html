@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>persistence/persistent_set.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>persistence/persistent_set.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PERSISTENT_SET
+#define STLPLUS_PERSISTENT_SET
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Set of persistence routines for the STL classes
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistence_fixes.hpp&quot;
+#include &quot;persistent_contexts.hpp&quot;
+#include &lt;set&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  template&lt;typename K, typename P, typename D&gt;
+  void dump_set(dump_context&amp;, const std::set&lt;K,P&gt;&amp; data, D dump_fn)
+    throw(persistent_dump_failed);
+
+  template&lt;typename K, typename P, typename R&gt;
+  void restore_set(restore_context&amp;, std::set&lt;K,P&gt;&amp; data, R restore_fn)
+    throw(persistent_restore_failed);
+
+} // end namespace stlplus
+
+  ////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistent_set.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - containers/triple.hpp - A 3-element collection</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="containers.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>containers/triple.hpp - A 3-element collection</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="triple_hpp.html">Browse Header triple.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#class">Class Interface</a></li>
+<li class="internal"><a href="#utilities">Utility Functions</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The stlplus::triple class is similar to the std::pair class except it contains three objects,
+each of which can be of a different type. This class and its family of collection classes
+pair/triple/foursome are useful in themselves but are probably most useful in building data
+structures.</p>
+
+<h2 id="class">Class Interface</h2>
+
+<p>The stlplus::triple class looks like this:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3&gt;
+struct stlplus::triple
+{
+  typedef T1 first_type;
+  typedef T2 second_type;
+  typedef T3 third_type;
+
+  T1 first;
+  T2 second;
+  T3 third;
+
+  triple(void);
+  triple(const T1&amp; p1, const T2&amp; p2, const T3&amp; p3);
+  triple(const triple&lt;T1,T2,T3&gt;&amp; t2);
+};
+</pre>
+
+<p>The class contains three elements called first, second and third. The constructor initialises the
+three elements, either from individual values or from another triple.</p>
+
+<p>For example</p>
+
+<pre class="cpp">
+// construct a triple from elements
+stlplus::triple&lt;unsigned,std::string,std::string&gt; t1(0, "zero", "null");
+
+// construct a triple from another triple
+stlplus::triple&lt;unsigned,std::string,std::string&gt; t2(t1);
+
+// access the elements
+std::cout &lt;&lt; t1.first &lt;&lt; ":" &lt;&lt; t1.second &lt;&lt; ":" &lt;&lt; t1.third &lt;&lt; std::endl;
+</pre>
+
+<h2 id="utilities">Utility Functions</h2>
+
+<p>The header also provides utilities to help create triples and to compare them.</p>
+
+<p>The stlplus::make_triple is analagous to the STL's std::make_pair:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3&gt;
+triple&lt;T1,T2,T3&gt; stlplus::make_triple(const T1&amp; first, const T2&amp; second, const T3&amp; third);
+</pre>
+
+
+<p>This can be used when assigning to an existing triple:</p>
+
+<pre class="cpp">
+stlplus::triple&lt;unsigned,std::string,std::string&gt; t1;
+t1 = stlplus::make_triple(0, "zero", "null");
+</pre>
+
+<p>The operator== template is provided to make it easy to compare two triples, provided they have
+the same element types:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3&gt;
+bool operator == (const stlplus::triple&lt;T1,T2,T3&gt;&amp; left, const stlplus::triple&lt;T1,T2,T3&gt;&amp; right);
+</pre>
+
+
+<p>This can be used in any comparison:</p>
+
+<pre class="cpp">
+if (t1 == t2)
+{
+  ...
+}
+</pre>
+
+
+</div>
+
+</body>
+</html>

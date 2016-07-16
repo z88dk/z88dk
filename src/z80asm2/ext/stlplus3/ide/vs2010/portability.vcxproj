@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\portability\build.cpp" />
+    <ClCompile Include="..\..\portability\debug.cpp" />
+    <ClCompile Include="..\..\portability\dprintf.cpp" />
+    <ClCompile Include="..\..\portability\dynaload.cpp" />
+    <ClCompile Include="..\..\portability\file_system.cpp" />
+    <ClCompile Include="..\..\portability\inf.cpp" />
+    <ClCompile Include="..\..\portability\ip_sockets.cpp" />
+    <ClCompile Include="..\..\portability\portability_fixes.cpp" />
+    <ClCompile Include="..\..\portability\subprocesses.cpp" />
+    <ClCompile Include="..\..\portability\tcp_sockets.cpp" />
+    <ClCompile Include="..\..\portability\time.cpp" />
+    <ClCompile Include="..\..\portability\udp_sockets.cpp" />
+    <ClCompile Include="..\..\portability\version.cpp" />
+    <ClCompile Include="..\..\portability\wildcard.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\portability\build.hpp" />
+    <ClInclude Include="..\..\portability\debug.hpp" />
+    <ClInclude Include="..\..\portability\dprintf.hpp" />
+    <ClInclude Include="..\..\portability\dynaload.hpp" />
+    <ClInclude Include="..\..\portability\file_system.hpp" />
+    <ClInclude Include="..\..\portability\inf.hpp" />
+    <ClInclude Include="..\..\portability\ip_sockets.hpp" />
+    <ClInclude Include="..\..\portability\portability.hpp" />
+    <ClInclude Include="..\..\portability\portability_exceptions.hpp" />
+    <ClInclude Include="..\..\portability\portability_fixes.hpp" />
+    <ClInclude Include="..\..\portability\subprocesses.hpp" />
+    <ClInclude Include="..\..\portability\tcp.hpp" />
+    <ClInclude Include="..\..\portability\tcp_sockets.hpp" />
+    <ClInclude Include="..\..\portability\time.hpp" />
+    <ClInclude Include="..\..\portability\udp_sockets.hpp" />
+    <ClInclude Include="..\..\portability\version.hpp" />
+    <ClInclude Include="..\..\portability\wildcard.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C7E1F6C4-00C8-44E3-B11E-311571C43A3D}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>portability</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>$(OutDir)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>$(OutDir)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

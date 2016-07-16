@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1092279C-E362-4068-9FA4-E85BDF90BE57}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>strings</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>$(OutDir)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>$(OutDir)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\portability</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\portability</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\..\strings\print_bitset.tpp" />
+    <None Include="..\..\strings\print_digraph.tpp" />
+    <None Include="..\..\strings\print_foursome.tpp" />
+    <None Include="..\..\strings\print_hash.tpp" />
+    <None Include="..\..\strings\print_list.tpp" />
+    <None Include="..\..\strings\print_map.tpp" />
+    <None Include="..\..\strings\print_matrix.tpp" />
+    <None Include="..\..\strings\print_ntree.tpp" />
+    <None Include="..\..\strings\print_pair.tpp" />
+    <None Include="..\..\strings\print_pointer.tpp" />
+    <None Include="..\..\strings\print_sequence.tpp" />
+    <None Include="..\..\strings\print_set.tpp" />
+    <None Include="..\..\strings\print_shared_ptr.tpp" />
+    <None Include="..\..\strings\print_simple_ptr.tpp" />
+    <None Include="..\..\strings\print_smart_ptr.tpp" />
+    <None Include="..\..\strings\print_triple.tpp" />
+    <None Include="..\..\strings\print_vector.tpp" />
+    <None Include="..\..\strings\string_bitset.tpp" />
+    <None Include="..\..\strings\string_digraph.tpp" />
+    <None Include="..\..\strings\string_foursome.tpp" />
+    <None Include="..\..\strings\string_hash.tpp" />
+    <None Include="..\..\strings\string_list.tpp" />
+    <None Include="..\..\strings\string_map.tpp" />
+    <None Include="..\..\strings\string_matrix.tpp" />
+    <None Include="..\..\strings\string_ntree.tpp" />
+    <None Include="..\..\strings\string_pair.tpp" />
+    <None Include="..\..\strings\string_pointer.tpp" />
+    <None Include="..\..\strings\string_sequence.tpp" />
+    <None Include="..\..\strings\string_set.tpp" />
+    <None Include="..\..\strings\string_shared_ptr.tpp" />
+    <None Include="..\..\strings\string_simple_ptr.tpp" />
+    <None Include="..\..\strings\string_smart_ptr.tpp" />
+    <None Include="..\..\strings\string_triple.tpp" />
+    <None Include="..\..\strings\string_vector.tpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\strings\file_utilities.cpp" />
+    <ClCompile Include="..\..\strings\print_bool.cpp" />
+    <ClCompile Include="..\..\strings\print_cstring.cpp" />
+    <ClCompile Include="..\..\strings\print_float.cpp" />
+    <ClCompile Include="..\..\strings\print_inf.cpp" />
+    <ClCompile Include="..\..\strings\print_int.cpp" />
+    <ClCompile Include="..\..\strings\print_string.cpp" />
+    <ClCompile Include="..\..\strings\print_vector.cpp" />
+    <ClCompile Include="..\..\strings\string_bool.cpp" />
+    <ClCompile Include="..\..\strings\string_cstring.cpp" />
+    <ClCompile Include="..\..\strings\string_float.cpp" />
+    <ClCompile Include="..\..\strings\string_inf.cpp" />
+    <ClCompile Include="..\..\strings\string_int.cpp" />
+    <ClCompile Include="..\..\strings\string_string.cpp" />
+    <ClCompile Include="..\..\strings\string_utilities.cpp" />
+    <ClCompile Include="..\..\strings\string_vector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\strings\file_utilities.hpp" />
+    <ClInclude Include="..\..\strings\format_types.hpp" />
+    <ClInclude Include="..\..\strings\print_basic.hpp" />
+    <ClInclude Include="..\..\strings\print_bitset.hpp" />
+    <ClInclude Include="..\..\strings\print_bool.hpp" />
+    <ClInclude Include="..\..\strings\print_cstring.hpp" />
+    <ClInclude Include="..\..\strings\print_digraph.hpp" />
+    <ClInclude Include="..\..\strings\print_float.hpp" />
+    <ClInclude Include="..\..\strings\print_foursome.hpp" />
+    <ClInclude Include="..\..\strings\print_hash.hpp" />
+    <ClInclude Include="..\..\strings\print_inf.hpp" />
+    <ClInclude Include="..\..\strings\print_int.hpp" />
+    <ClInclude Include="..\..\strings\print_list.hpp" />
+    <ClInclude Include="..\..\strings\print_map.hpp" />
+    <ClInclude Include="..\..\strings\print_matrix.hpp" />
+    <ClInclude Include="..\..\strings\print_ntree.hpp" />
+    <ClInclude Include="..\..\strings\print_pair.hpp" />
+    <ClInclude Include="..\..\strings\print_pointer.hpp" />
+    <ClInclude Include="..\..\strings\print_sequence.hpp" />
+    <ClInclude Include="..\..\strings\print_set.hpp" />
+    <ClInclude Include="..\..\strings\print_shared_ptr.hpp" />
+    <ClInclude Include="..\..\strings\print_simple_ptr.hpp" />
+    <ClInclude Include="..\..\strings\print_smart_ptr.hpp" />
+    <ClInclude Include="..\..\strings\print_stl.hpp" />
+    <ClInclude Include="..\..\strings\print_stlplus.hpp" />
+    <ClInclude Include="..\..\strings\print_string.hpp" />
+    <ClInclude Include="..\..\strings\print_triple.hpp" />
+    <ClInclude Include="..\..\strings\print_vector.hpp" />
+    <ClInclude Include="..\..\strings\strings.hpp" />
+    <ClInclude Include="..\..\strings\strings_fixes.hpp" />
+    <ClInclude Include="..\..\strings\string_basic.hpp" />
+    <ClInclude Include="..\..\strings\string_bitset.hpp" />
+    <ClInclude Include="..\..\strings\string_bool.hpp" />
+    <ClInclude Include="..\..\strings\string_cstring.hpp" />
+    <ClInclude Include="..\..\strings\string_digraph.hpp" />
+    <ClInclude Include="..\..\strings\string_float.hpp" />
+    <ClInclude Include="..\..\strings\string_foursome.hpp" />
+    <ClInclude Include="..\..\strings\string_hash.hpp" />
+    <ClInclude Include="..\..\strings\string_inf.hpp" />
+    <ClInclude Include="..\..\strings\string_int.hpp" />
+    <ClInclude Include="..\..\strings\string_list.hpp" />
+    <ClInclude Include="..\..\strings\string_map.hpp" />
+    <ClInclude Include="..\..\strings\string_matrix.hpp" />
+    <ClInclude Include="..\..\strings\string_ntree.hpp" />
+    <ClInclude Include="..\..\strings\string_pair.hpp" />
+    <ClInclude Include="..\..\strings\string_pointer.hpp" />
+    <ClInclude Include="..\..\strings\string_sequence.hpp" />
+    <ClInclude Include="..\..\strings\string_set.hpp" />
+    <ClInclude Include="..\..\strings\string_shared_ptr.hpp" />
+    <ClInclude Include="..\..\strings\string_simple_ptr.hpp" />
+    <ClInclude Include="..\..\strings\string_smart_ptr.hpp" />
+    <ClInclude Include="..\..\strings\string_stl.hpp" />
+    <ClInclude Include="..\..\strings\string_stlplus.hpp" />
+    <ClInclude Include="..\..\strings\string_string.hpp" />
+    <ClInclude Include="..\..\strings\string_triple.hpp" />
+    <ClInclude Include="..\..\strings\string_utilities.hpp" />
+    <ClInclude Include="..\..\strings\string_vector.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

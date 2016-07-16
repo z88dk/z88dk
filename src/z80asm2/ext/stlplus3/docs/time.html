@@ -1,0 +1,155 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/time.hpp - Utilities for manipulating times</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/time.hpp<br>Utilities for manipulating times</h1>
+</div>
+
+<div id="documentNavigation">
+<ul>
+<li class="external"><a href="time_hpp.html">Browse Header time.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#creating">Creating times</a></li>
+<li class="internal"><a href="#human">Human times</a></li>
+<li class="internal"><a href="#printing">Printing times</a></li>
+</ul>
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Simplified access to representations of time and conversions between them.
+The motivation for this package is that the low-level system calls for
+accessing time are ugly and therefore potentially error-prone. I hope that
+this interface is much simpler and therefore easier to use and more likely
+to yield first-time right programs.</p>
+
+<p>Time is represented as the built-in integer type time_t - this is the
+standard representation of system time in computerland and represents the
+number of seconds since midnight 1 Jan 1970, believe it or not.</p>
+
+<p>Functions are provided here for converting to and from more
+human-comprehendable forms.</p>
+
+
+<h2 id="creating">Creating times</h2>
+
+<p>These functions create the time_t type from either the current time or a
+specified time. See also <a href="file_system.html">file_system.hpp</a> for
+functions to get timestamps for files.</p>
+
+<pre class="cpp">
+time_t time_now(void);
+</pre>
+
+<p>This function gets the integer representing the time now.</p>
+
+<pre class="cpp">
+time_t localtime_create(int year, int month, int day, int hour, int minute, int second);
+</pre>
+
+<p>This function gets the integer representing the requested time. Note that
+the parameters use normal human conventions, so the year would be something
+like 2002, the month is a number from 1-12 with 1=January, the day is the day
+of the month in the range 1-31, the hour uses the 24-hour clock so has the
+range 0-23 and the minutes and seconds are in the range 0-59.</p>
+
+<h2 id="human">Human times</h2>
+
+<p>There is a set of functions that allow the extraction of human-centric
+forms of the machine representation. These form the converse of the
+localtime_create() function above. It is also possible to extract extra information
+such as the day of the week.</p>
+
+<pre class="cpp">
+int localtime_year(time_t);
+</pre>
+
+<p>Extracts the year e.g. 1962.</p>
+
+<pre class="cpp">
+int localtime_month(time_t);
+</pre>
+
+<p>Extracts the month, numbered 1-12 e.g. August = 8.</p>
+
+<pre class="cpp">
+int localtime_day(time_t);
+</pre>
+
+<p>Extracts the day of the month numbered 1-31 e.g. 29.</p>
+
+<pre class="cpp">
+int localtime_hour(time_t);
+</pre>
+
+<p>Extracts the hour of day numbered 0-23.</p>
+
+<pre class="cpp">
+int localtime_minute(time_t);
+</pre>
+
+<p>Extracts the minute past the hour numbered 0-59.</p>
+
+<pre class="cpp">
+int localtime_second(time_t);
+</pre>
+
+<p>Extracts the second past the minute numbered 0-59.</p>
+
+<pre class="cpp">
+int localtime_weekday(time_t);
+</pre>
+
+<p>Extracts the day of the week numbered 0-6 with 0=Sunday.</p>
+
+<pre class="cpp">
+int localtime_yearday(time_t);
+</pre>
+
+<p>Extracts the number of days into the year. January 1 = 0.</p>
+
+<h2 id="printing">Printing times</h2>
+
+<pre class="cpp">
+std::string localtime_string(time_t);
+</pre>
+
+<p>Converts the integer representation of time to a human-readable form for
+saving to a file or printing.</p>
+
+
+</div>
+
+</body>
+</html>

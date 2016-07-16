@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>persistence/persistent_triple.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>persistence/persistent_triple.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PERSISTENT_TRIPLE
+#define STLPLUS_PERSISTENT_TRIPLE
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Persistence of STL triple
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistence_fixes.hpp&quot;
+#include &quot;persistent_contexts.hpp&quot;
+#include &quot;triple.hpp&quot;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  template&lt;typename T1, typename T2, typename T3, typename D1, typename D2, typename D3&gt;
+  void dump_triple(dump_context&amp;, const stlplus::triple&lt;T1,T2,T3&gt;&amp; data, 
+                   D1 dump_fn1, D2 dump_fn2, D3 dump_fn3)
+    throw(persistent_dump_failed);
+
+  template&lt;typename T1, typename T2, typename T3, typename R1, typename R2, typename R3&gt;
+  void restore_triple(restore_context&amp;, stlplus::triple&lt;T1,T2,T3&gt;&amp; data,
+                      R1 restore_fn1, R2 restore_fn2, R3 restore_fn3)
+    throw(persistent_restore_failed);
+
+} // end namespace stlplus
+
+  ////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistent_triple.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>persistence/persistent_int.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>persistence/persistent_int.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PERSISTENT_INT
+#define STLPLUS_PERSISTENT_INT
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Persistence of basic integer types
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistence_fixes.hpp&quot;
+#include &quot;persistent_contexts.hpp&quot;
+
+namespace stlplus
+{
+
+  void dump_char(dump_context&amp;, const char&amp; data) throw(persistent_dump_failed);
+  void restore_char(restore_context&amp;, char&amp; data) throw(persistent_restore_failed);
+
+  void dump_signed_char(dump_context&amp;, const signed char&amp; data) throw(persistent_dump_failed);
+  void restore_signed_char(restore_context&amp;, signed char&amp; data) throw(persistent_restore_failed);
+
+  void dump_unsigned_char(dump_context&amp;, const unsigned char&amp; data) throw(persistent_dump_failed);
+  void restore_unsigned_char(restore_context&amp;, unsigned char&amp; data) throw(persistent_restore_failed);
+
+  void dump_short(dump_context&amp;, const short&amp; data) throw(persistent_dump_failed);
+  void restore_short(restore_context&amp;, short&amp; data) throw(persistent_restore_failed);
+
+  void dump_unsigned_short(dump_context&amp;, const unsigned short&amp; data) throw(persistent_dump_failed);
+  void restore_unsigned_short(restore_context&amp;, unsigned short&amp; data) throw(persistent_restore_failed);
+
+  void dump_int(dump_context&amp;, const int&amp; data) throw(persistent_dump_failed);
+  void restore_int(restore_context&amp;, int&amp; data) throw(persistent_restore_failed);
+
+  void dump_unsigned(dump_context&amp;, const unsigned&amp; data) throw(persistent_dump_failed);
+  void restore_unsigned(restore_context&amp;, unsigned&amp; data) throw(persistent_restore_failed);
+
+  void dump_long(dump_context&amp;, const long&amp; data) throw(persistent_dump_failed);
+  void restore_long(restore_context&amp;, long&amp; data) throw(persistent_restore_failed);
+
+  void dump_unsigned_long(dump_context&amp;, const unsigned long&amp; data) throw(persistent_dump_failed);
+  void restore_unsigned_long(restore_context&amp;, unsigned long&amp; data) throw(persistent_restore_failed);
+
+  void dump_size_t(dump_context&amp;, const size_t&amp; data) throw(persistent_dump_failed);
+  void restore_size_t(restore_context&amp;, size_t&amp; data) throw(persistent_restore_failed);
+
+  ////////////////////////////////////////////////////////////////////////////////
+
+} // end namespace stlplus
+
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

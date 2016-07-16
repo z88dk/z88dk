@@ -1,0 +1,551 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - containers/hash.hpp - A Chained Hash Table Container</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="containers.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>containers/hash.hpp<br>A Chained Hash Table Container</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="hash_hpp.html">Browse Header hash.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#instantiation">Instantiation</a></li>
+<li class="internal"><a href="#rehashing">Rehashing</a></li>
+<li class="internal"><a href="#hash">Whole Hash Operations</a></li>
+<li class="internal"><a href="#elements">Adding, Removing, Changing and Accessing Hash Elements</a></li>
+<li class="internal"><a href="#iterators">Iterators</a></li>
+<li class="internal"><a href="#print">Diagnostic Print Routines</a></li>
+<li class="internal"><a href="#exceptions">Exceptions</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This component is an STL-like template class which implements a
+hash table data structure. It has a similar usage and interface to the STL
+map.</p>
+
+<p>The hash uses separate chaining of elements - in other words, there is a bin
+per hash value and all keys with that hash value are stored in the same bin.
+There is no collision resolution to this design, so insertions can never fail.
+However, if bins become too full, efficiency will drop. For this reason the hash
+implements rehashing.</p>
+
+<p>This document assumes you know basically what a hash table is and only deals
+with how to use the hash class.</p>
+
+
+<h2 id="instantiation">Instantiation</h2>
+
+<p>The hash template takes four types:</p>
+
+<pre class="cpp">
+namespace stlplus
+{
+  template&lt;typename K, typename T, class H, class E = equal_to&lt;K&gt; &gt; class hash
+}
+</pre>
+
+<p>The first type K is the key type which is used to access elements of the hash
+table. A hash is in effect an associative store in which the key type is used
+like the index of an array and the data type is the contents of the element.</p>
+
+<p>The second type T is the data type stored in the hash and accessed via the
+key.</p>
+
+<p>The third type is the hash function object. A function object is used in the
+same way as in the map to define the hashing operation of the hash table. An
+example of a hash function object for a string key is:</p>
+
+<pre class="cpp">
+struct hash_string
+{
+  unsigned operator()(const std::string&amp; s) const
+  {
+    ... 
+  }
+};
+</pre>
+
+<p>The convention is to define a struct or class which contains a function call
+operator (the operator()) to perform the hashing function. For the hash class,
+the hashing function takes a key type K and returns an unsigned.</p>
+
+<p>The fourth type is the equality function object. It is similar to the hash
+function object except that it takes two keys and returns a bool. The default
+value is the equal_to function object defined in the STL which simply applies
+the == operator to the two keys. You can therefore define key equality by an
+appropriate overload of the == operator for the key type. However, if that
+creates problems you can create a new function object for equality:</p>
+
+<pre class="cpp">
+struct equal_string
+{
+  bool operator()(const std::string&amp; l, const std::string&amp; r) const
+  {
+    ...
+  }
+};
+</pre>
+
+<p>Thus, to create a hash which takes a string as a key and an int as the data,
+you would declare a variable like this:</p>
+
+<pre class="cpp">
+stlplus::hash&lt;std::string,int,hash_string&gt; table;
+</pre>
+
+<p>This creates a variable called table which is a hash from string to int,
+using your hash_string function object for hashing the key, but using the
+default equal_to function object for comparisons.</p>
+
+<p>It is clearer using typedefs to define the template types:</p>
+
+<pre class="cpp">
+typedef stlplus::hash&lt;std::string,int,hash_string&gt; string_int_hash;
+string_int_hash table;
+</pre>
+
+<p>The constructor for hash takes an optional argument which defines the number
+of bins to create in the hash table. If not specified, the hash chooses the
+number of bins. However, to override it, just give an argument to the
+constructor:</p>
+
+<pre class="cpp">
+string_int_hash table(50);
+</pre>
+
+<p>This creates a table with 50 bins.</p>
+
+<p>Note that the hash function can return any unsigned value, it does not have
+to be in the range 0..bins-1, since the hash class normalises the hash value to
+this range. This means the same hash function can be used with hashes of
+different sizes.</p>
+
+
+<h2 id="rehashing">Rehashing</h2>
+
+<p>Rehashing is where the internal table in the hash is resized to better suit
+the number of data items. In other words, the number of bins is changed and that
+means the hash values of all the keys must be recalculated (thus the term
+rehash). It is a relatively expensive operation but increases the efficiency of
+the hash. It is pretty well essential if the initial data size of the hash is
+unknown.</p>
+
+<p>The hash class supports two rehashing modes: auto-rehash and
+manual-rehash.</p>
+
+<h3>Auto-rehash</h3>
+
+<p>Auto-rehash mode means that the hash itself decides when to rehash itself.
+This rehashing is only performed on insertions which increase the loading (ratio of
+data elements in the table to the number of bins) over 100%.</p>
+
+<p>Auto-rehash is enabled automatically if a hash is constructed with an
+unspecified number (or zero) bins. This tells the hash to choose the initial
+size and enable auto-rehashing. It can also be enabled explicitly using the
+auto_rehash() function.</p>
+
+<p>To leave the choice of initial size to the hash and enable auto-rehash simply
+don't give an argument to the constructor:</p>
+
+<pre class="cpp">
+string_int_hash table;
+</pre>
+
+<p>To choose the initial size yourself, but enable auto-rehashing:</p>
+
+<pre class="cpp">
+string_int_hash table(50);
+table.auto_rehash();
+</pre>
+
+<p>The main disadvantage of auto-rehashing is that performing a rehash
+invalidates all iterators. Since auto-rehash can happen at any time (well, on
+any insert), this can be unpredictable.</p>
+
+<h3>Manual-rehashing</h3>
+
+<p>Manual rehashing leaves rehashing decisions to the user, who may decide not
+to do any at all. This is appropriate for problems where the data size is known
+in advance and therefore the number of bins can be calculated before the hash is
+constructed. However, you may want to do rehashing but to make the rehashing
+decision yourself.</p>
+
+<p>Constructing a hash with a specified number of bins automatically
+switches the hash to manual-rehashing mode.</p>
+
+<pre class="cpp">
+string_int_hash table(50);
+</pre>
+
+<p>If you want to do your own rehashing, then a useful function is the loading()
+function which gives the current hash loading (size divided by number of bins)
+as a float. Thus you can choose to rehash at a specific point in your program by
+calling the rehash function explicitly when the loading gets too high:</p>
+
+<pre class="cpp">
+if (table.loading() &gt; 0.9)
+  table.rehash();
+</pre>
+
+<p>The rehash() method takes an optional integer argument. If it is missing or
+zero, this means implement the built-in calculation for the number of bins. This
+simply doubles the number of bins. If it is called with a non-zero argument,
+then the hash will be rehashed to that number of bins.</p>
+
+<p>The main disadvantage of manual hashing is where the data size is unknown and
+can grow large compared with the number of bins. Basically a loading of greater
+than 0.5 leads to efficiency creeping down and loadings of greater than 1.0 can
+really hit performance.</p>
+
+
+<h2 id="hash">Whole Hash Operations</h2>
+
+<pre class="cpp">
+hash(const hash&amp;);
+hash&amp; operator=(const hash&amp;);
+void clear(void);
+bool empty(void) const;
+unsigned size(void) const;
+</pre>
+
+<p>The hash class supports copying via the copy constructor and the assignment
+operator.</p>
+
+<p>The clear() function deletes all elements in the hash, leaving it empty, but
+still with the same number of bins as when it was created.</p>
+
+<p>The size() function gives the number of elements in the hash. This is very
+efficient since the hash keeps track of its size, so it is not necessary for it
+to count the number of elements. The empty() function tests for the special case
+of an empty hash, i.e. a hash with a size() == 0.</p>
+
+<h2 id="elements">Adding, Removing, Changing and Accessing Hash Elements</h2>
+
+<p>The hash class provides a set of operations which allow the contents of the
+hash to be created, modified and deleted. For the most common operations on a
+hash, there's typically at least two ways of doing it.</p>
+
+<pre class="cpp">
+bool present(const K&amp; key) const;
+</pre>
+
+<p>To test for the existence of a key in the hash, the present() function can be
+used. This takes a key as an argument and returns true if that key exists in the
+hash. It is also possible to test for the presence of a key using find() - see
+later.</p>
+
+<pre class="cpp">
+size_type count(const K&amp; key) const;
+</pre>
+
+<p>Counts the number of instances of the key in the hash. This can only return 0 or 1 since the hash
+only allows one instance of a key. This method is included for compatibility with std::map which has a
+count method.</p>
+
+<pre class="cpp">
+iterator insert(const K&amp; key, const T&amp; data);
+</pre>
+
+<p>This insert method adds a new key/data pair to the hash. If the key is
+already present in the hash, then the new value replaces the old value. The
+insert method returns an iterator to the new element so that it can be
+inspected or its data field modified.</p>
+
+<pre class="cpp">
+std::pair&lt;iterator, bool&gt; insert(const value_type&amp; value);
+</pre>
+
+<p>This insert method adds a new value (a key and data stored in a std::pair) to the hash. If the
+key is already present in the hash, then the new value replaces the old value. This insert method
+returns a pair containing a bool indicating success/failure and an iterator to the new element in
+the case of success so that it can be inspected or its data field modified. This insert method has
+been included for compatibility with std::map.</p>
+
+<pre class="cpp">
+iterator insert(const K&amp; key);
+</pre>
+
+<p>This insert method adds a new key/data pair to the hash, but this time with a default-contructed
+data field. If the key is already present in the hash, then the new value replaces the old value. 
+The insert method returns an iterator to the new element so that it can be inspected or its data
+field modified.</p>
+
+<pre class="cpp">
+unsigned erase(const K&amp; key);
+</pre>
+
+<p>The erase() function removes the key and its associated data from the hash. The return value is
+the number of elements erased. If the key was removed, the function returns 1. However, if the key
+wasn't present and couldn't therefore be removed, it returns 0. This return value is rarely useful
+but can also be interpreted as a boolean success/fail flag.</p>
+
+<pre class="cpp">
+iterator erase(iterator);
+</pre>
+
+<p>The alternative erase() method removes the value pointed to by the iterator. The return value is
+the iterator to the next element. This method is consistent with the std::map::erase method.</p>
+
+<p>Note: std::map also has an erase for a range denoted by two iterators. This doesn't make sense
+for hashes because they are unsorted and therefore there is no meaningful interpretation of a range
+of keys.So there is no equivalent erase method in the hash.</p>
+
+<pre class="cpp">
+const_iterator find(const K&amp; key) const;
+iterator find(const K&amp; key);
+</pre>
+
+<p>The find() functions are the most flexible way of accessing elements in a
+hash, although the use of iterators can make them a bit clumsy. The first form
+works on const hashes and returns a const_iterator, which means you can look at
+the element but not change it. The second form works on non-const hashes,
+giving a non-const iterator, thus allowing the data field (not the key) to be
+changed.</p>
+
+<p>If the key is not present in the hash, the iterator will be equal to end().
+It is illegal to try to dereference an iterator equal to end, so make this check
+first. Dereferencing an iterator accesses the value type stored in the hash,
+which is in fact the same type used in the STL map - a std::pair containing a
+const key type and a data type. Dereferencing of iterators will be dealt with in
+the section on iterators.</p>
+
+<pre class="cpp">
+const T&amp; operator[] (const K&amp; key) const throw(std::out_of_range);
+T&amp; operator[] (const K&amp; key);
+</pre>
+
+<p>The index operators take the key as an argument and return the data type.
+Thus for our example, they take a string as an argument and return an int.</p>
+
+<p>The first form is for use on const hashes and is a read-only indexing
+operator. If you try to access a key that is not present, the out_of_range
+exception is thrown. If the key is present, then the data associated with it is
+returned as a const so that it cannot be modified.</p>
+
+<p>The second form is for use on non-const hashes and can be used to read from
+or write to the hash. The behaviour is much like the [] operator for map. If the
+key is not present, then a new element is created with that key and a data field
+initialised with its default constructor. The data field is then returned. If
+the key is present, its data field is simply returned. Since the data is
+returned by reference, it can then be used as the target of an assignment to set
+the data field to a different value. For example:</p>
+
+<pre class="cpp">
+table["one"] = 1;
+table["two"] = table["one"] + 1;
+</pre>
+
+<p>It is important to remember that, as with the map, the index operator can
+change the contents of the hash. If you don't want this, either guard against
+it using present() or avoid the issue completely by using find().</p>
+
+
+<h2 id="iterators">Iterators</h2>
+
+<p>Iterators are used to access key/data pairs in the hash. Thus an iterator is
+used as the result of the find() function so that the elements can then be
+accessed as a pair via the iterator. Iterators can also be used to access all elements in
+the hash in turn.</p>
+
+<p>An iterator acts like a pointer to the hash's value_type which is a pair:</p>
+
+<pre class="cpp">
+typedef std::pair&lt;const K, T&gt;    value_type;
+</pre>
+
+<p>The key is accessed through the pair's 'first' element and the data through
+the second. For example:</p>
+
+<pre class="cpp">
+string_int_hash table(50);
+...
+string_int_hash::iterator six = table.find("six");
+if (six == table.end())
+  std::cout &lt;&lt; "key \"six\" not found in table" &lt;&lt; std::endl;
+else
+  std::cout &lt;&lt; "key \"six\" refers to " &lt;&lt; six-&gt;first &lt;&lt; " = " &lt;&lt; six-&gt;second &lt;&lt; std::endl;
+</pre>
+
+<p>Note how the iterator is dereferenced and then the pair's fields are accessed
+in the final line.</p>
+
+<p>It is legal to assign to the data field via an iterator (i.e.
+six-&gt;second), but not the key. If the key were to be changed, that would
+change the hashing value and so the hash would be broken. Therefore it is
+disallowed by making that field const.</p>
+
+<p>An iterator traversal of the hash is controlled by two functions with the same naming conventions
+as in STL classes:</p>
+
+<pre class="cpp">
+const_iterator begin(void) const;
+iterator begin(void);
+const_iterator end(void) const;
+iterator end(void);
+</pre>
+
+<p>These functions provide both const and non-const functions of the begin() and
+end() functions that can be used to visit all elements in a hash. The const
+form (using a const_iterator) should be used on a const hash, whilst the
+non-const form (using an iterator) should be used on a non-const hash. You need
+to match the type of iterator to the const-ness of the hash.</p>
+
+<p>In use the iterators are much the same as the map iterators:</p>
+
+<pre class="cpp">
+
+for (string_int_hash::iterator i = table.begin(); i != table.end(); i++)
+{
+  std::cout &lt;&lt; "Key: " &lt;&lt; i-&gt;first &lt;&lt; ", data = " &lt;&lt; i-&gt;second &lt;&lt; std::endl;
+}
+</pre>
+
+<p>The main difference between the hash and the map is that the hash will visit
+the elements in no particular order since there is no concept of a sort order
+for a hash, whereas the map is sorted. You should therefore not rely on any
+ordering when using iterators in this way.</p>
+
+<p>The hash's iterators are unidirectional - that is, you can only traverse the
+elements in a forward direction from begin() to end(). There is only a "++"
+operator and not a "--" operator for an iterator and there are no reverse
+iterators. It seems to me that since there is no such thing as a sort
+ordering on a hash, there's no need for any other iteration order.</p>
+
+<p>STLplus iterators are slightly different to STL iterators in that they know which container they
+belong to. When an iterator is first declared, but not assigned to, it is known as a <em>null</em>
+iterator. Then, when it is assigned to so that it points to a value in the hash, it is known as a
+<em>valid</em> iterator. If the iterator is made to point off the end of the hash - for example by
+incrementing to the value returned by the end() method above, then it becomes an <em>end</em> iterator.</p>
+
+<p>This concept is similar to STL iterators like the list iterator, where an iterator that walks off
+the end of the list becomes an end iterator. However, the STL has no concept of a null iterator and
+therefore no direct equivalent of a valid iterator.</p>
+
+<p>The iterator has a set of functions for testing these
+conditions:</p>
+
+<pre class="cpp">
+bool iterator::null(void) const;
+bool iterator::end(void) const;
+bool iterator::valid(void) const;
+</pre>
+
+<p>Note that these functions are members of the iterator class, not the hash
+class.</p>
+
+<p>Exactly one of these conditions will always be true, since the iterator must be one of null, end
+or valid.</p>
+
+<p>Only a valid iterator can be dereferenced to access the element pair pointed to by the iterator.
+Any attempt to dereference an end or null iterator will result in an exception being thrown. See the
+section below on <a href="#exceptions">Exceptions</a> to see which.</p>
+
+<h2 id="print">Diagnostic Print Routines</h2>
+
+<p>A hash table is very sensitive to the hashing function and the number of bins
+in the hash. To help diagnose performance problems with the hash class, there
+is a diagnostic print routine with three forms: a member function and two
+friend functions:</p>
+
+<pre class="cpp">
+void debug_report(std::ostream&amp;) const;
+</pre>
+
+<p>This method prints out a table showing the number of elements in each bin
+and some summary statistics. The table looks like this:</p>
+
+<pre class="terminal">
+------------------------------------------------------------------------
+| size:     7
+| bins:     20
+| loading:  0.35 auto-rehash
+| occupied: 7 (35.0%), min = 0, max = 1
+|-----------------------------------------------------------------------
+|  bin         0     1     2     3     4     5     6     7     8     9
+|        ---------------------------------------------------------------
+|      0 |     1     .     1     1     .     1     .     .     .     .
+|     10 |     .     .     .     1     .     .     .     1     1     .
+------------------------------------------------------------------------
+</pre>
+
+<p>The size field is the number of elements in the hash. The bins is the number of bins. Loading
+represents the ratio of elements to bins and indicates whether the hash is configured for auto or
+manual rehashing. The occupied field gives stats on the number of bins occupied as a number and as a
+percentage, followed by the minimum and maximum occupancy of any bin in the hash. Finally, the table
+reports the number if elements in each bin so that the distribution can be seen.</p>
+
+<h2 id="exceptions">Exceptions</h2>
+
+<p>There are 4 exceptions that can be thrown by hash:</p>
+
+<dl>
+
+<dt><strong>stlplus::null_dereference</strong> - logic_error</dt>
+
+<dd>This is used to indicate that an iterator which is null has been dereferenced. You should always
+be sure that iterators are non-null before using the <code>*</code> or <code>-&gt;</code>
+operators.</dd>
+
+<dt><strong>stlplus::end_dereference</strong> - logic_error</dt>
+
+<dd>This is used to indicate that an iterator that is pointing to an end element has been
+dereferenced. In line with STL conventions, the end iterator points to the element after the last
+element in a container, so dereferencing such an iterator is illegal (the memory pointed to will be
+unconstructed).</dd>
+
+<dt><strong>stlplus::wrong_object</strong> - logic_error</dt>
+
+<dd>This is used to indicate that an iterator which was created by one container has been used in a
+different container. For example, if you have two hash objects in your program, create an iterator
+from one hash and then use it in another, then this will throw the wrong_object exception.</dd>
+
+<dt><strong>std::out_of_range</strong> - logic_error</dt>
+
+<dd>This is used to indicate that the const version of the index operator[]
+has been used to try to access a value using a key that was not found in the
+hash.</dd>
+
+</dl>
+
+<p>The first three exceptions are common to all STLplus iterators and are explained in
+the STLplus <a href="exceptions.html">exceptions policy</a>.</p>
+
+
+</div>
+
+</body>
+</html>

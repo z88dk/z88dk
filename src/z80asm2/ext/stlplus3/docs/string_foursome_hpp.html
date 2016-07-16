@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>strings/string_foursome.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>strings/string_foursome.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_STRING_FOURSOME
+#define STLPLUS_STRING_FOURSOME
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Generate a string representation of a foursome
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;strings_fixes.hpp&quot;
+#include &quot;foursome.hpp&quot;
+#include &lt;string&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  template&lt;typename T1, typename T2, typename T3, typename T4, typename S1, typename S2, typename S3, typename S4&gt;
+  std::string foursome_to_string(const foursome&lt;T1,T2,T3,T4&gt;&amp; values,
+                                 S1 to_string_fn1,
+                                 S2 to_string_fn2,
+                                 S3 to_string_fn3,
+                                 S4 to_string_fn4,
+                                 const std::string&amp; separator = &quot;:&quot;);
+
+} // end namespace stlplus
+
+#include &quot;string_foursome.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

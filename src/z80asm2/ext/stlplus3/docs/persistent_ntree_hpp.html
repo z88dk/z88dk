@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>persistence/persistent_ntree.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>persistence/persistent_ntree.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PERSISTENT_NTREE
+#define STLPLUS_PERSISTENT_NTREE
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Persistence of STLplus ntree
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistence_fixes.hpp&quot;
+#include &quot;persistent_contexts.hpp&quot;
+#include &quot;ntree.hpp&quot;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  // ntree
+
+  template&lt;typename T, typename D&gt;
+  void dump_ntree(dump_context&amp;, const ntree&lt;T&gt;&amp; data, D dump_fn)
+    throw(persistent_dump_failed);
+
+  template&lt;typename T, typename R&gt;
+  void restore_ntree(restore_context&amp;, ntree&lt;T&gt;&amp; data, R restore_fn)
+    throw(persistent_restore_failed);
+
+  // iterator
+
+  template&lt;typename T, typename TRef, typename TPtr&gt;
+  void dump_ntree_iterator(dump_context&amp;, const ntree_iterator&lt;T,TRef,TPtr&gt;&amp;)
+    throw(persistent_dump_failed);
+
+  template&lt;typename T, typename TRef, typename TPtr&gt;
+  void restore_ntree_iterator(restore_context&amp;, ntree_iterator&lt;T,TRef,TPtr&gt;&amp;)
+    throw(persistent_restore_failed);
+
+  // prefix iterator
+
+  template&lt;typename T, typename TRef, typename TPtr&gt;
+  void dump_ntree_prefix_iterator(dump_context&amp;, const ntree_prefix_iterator&lt;T,TRef,TPtr&gt;&amp;)
+    throw(persistent_dump_failed);
+
+  template&lt;typename T, typename TRef, typename TPtr&gt;
+  void restore_ntree_prefix_iterator(restore_context&amp;, ntree_prefix_iterator&lt;T,TRef,TPtr&gt;&amp;)
+    throw(persistent_restore_failed);
+
+  // postfix iterator
+
+  template&lt;typename T, typename TRef, typename TPtr&gt;
+  void dump_ntree_postfix_iterator(dump_context&amp;, const ntree_postfix_iterator&lt;T,TRef,TPtr&gt;&amp;)
+    throw(persistent_dump_failed);
+
+  template&lt;typename T, typename TRef, typename TPtr&gt;
+  void restore_ntree_postfix_iterator(restore_context&amp;, ntree_postfix_iterator&lt;T,TRef,TPtr&gt;&amp;)
+    throw(persistent_restore_failed);
+
+} // end namespace stlplus
+
+  ////////////////////////////////////////////////////////////////////////////////
+#include &quot;persistent_ntree.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

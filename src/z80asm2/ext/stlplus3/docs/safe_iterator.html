@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - containers/safe_iterator.hpp - The STLplus Safe-Iterator</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>containers/safe_iterators.hpp<br>The STLplus Safe-Iterator</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="safe_iterator_hpp.html">Browse Header safe_iterator.hpp</a></li>
+<li class="internal"><a href="#philosophy">Philosophy</a></li>
+<li class="internal"><a href="#errors">Errors Caught by the Safe Iterator</a></li>
+<li class="internal"><a href="#classes">Classes Using the Safe Iterator</a></li>
+<li class="internal"><a href="#interface">Interface</a></li>
+</ul>
+
+</div>
+
+<h2 id="philosophy">Philosophy</h2>
+
+<p>Iterators in the STL are badly designed - there are several major
+pitfalls with using them as a result of their design. However, I
+wanted STLplus to feel like the STL to make it easier to use, so felt
+I should use the iterator concept despite the problems associated with
+them. Some of the STLplus components therefore also use iterators.</p>
+
+<p> The problems with STL iterators are:</p>
+
+<ul>
+
+<li>Unassigned iterators are poorly defined and can not only point to
+  random memory but have no checking to stop them from being
+  dereferenced.</li>
+
+<li>End iterators conceptually point to a location one element after
+the end of the data structure. The STL classes actually have a piece
+of unconstructed memory to represent the end - which looks like real
+memory that's been corrupted. This is extraordinarily bad
+practice. </li>
+
+<li>Iterators don't know which container created them. For
+example, in the STL, creating an iterator from one list and then
+accidentally using it in a second list can potentially corrupt the
+list.</li>
+
+<li>When an object held by a container is destroyed, iterators can
+  still point to the deallocated memory and there's nothing to stop
+  them from being dereferenced.</li>
+
+</ul>
+
+
+<h2 id="errors">Errors Caught by the Safe Iterator</h2>
+
+<p>The STLplus safe iterators were designed to solve the problems with
+  the STL iterators. The following solutions have been implemented:</p>
+
+<ul>
+
+<li>Unassigned iterators initialise to a "null" iterator. It is
+illegal to try to dereference a null iterator - the safe_iterator
+class throws a null_dereference exception.</li>
+
+<li>The end iterator concept is a property of the iterator itself and
+there is no unconstructed memory. It is illegal to dereference the end
+iterator - the safe_iterator class will throw an end_dereference
+exception.</li>
+
+<li>Iterators must be used with the container that created them. The
+safe iterator knows which object it belongs to and, if used with the
+wrong object, will throw the wrong_object exception.</li>
+
+<li>When an object held by a container is destroyed, all iterators
+pointing to the object are set to the end iterator. This prevents
+iterators being used to access deallocated memory.</li>
+
+</ul>
+
+<h2 id="classes">Classes Using the Safe Iterator</h2>
+
+<p>The following STLplus classes use safe iterators, all of them based on the safe_iterator class:</p>
+
+<ul>
+<li class="external"><a href="digraph.html">digraph</a></li>
+<li class="external"><a href="ntree.html">ntree</a></li>
+<li class="external"><a href="hash.html">hash</a></li>
+</ul>
+
+<h2 id="interface">Interface</h2>
+
+<p>Here is the user interface to the safe_iterator class:</p>
+
+<pre class="cpp">
+template&lt;typename O, typename N&gt;
+class stlplus::safe_iterator
+{
+public:
+  // construct a null iterator
+  safe_iterator(void) throw();
+
+  // construct a valid iterator from the owner node's master iterator
+  safe_iterator(const master_iterator&lt;O,N&gt;&amp;) throw();
+
+  // comparison - used to create comparison operators for putting
+  // iterators into maps and hashes
+  bool equal(const safe_iterator&lt;O,N&gt;&amp; right) const throw();
+  int compare(const safe_iterator&lt;O,N&gt;&amp; right) const throw();
+
+  // dereference
+  N&amp; operator*(void) const throw(null_dereference,end_dereference);
+  N* operator-&gt;(void) const throw(null_dereference,end_dereference);
+
+  // a null iterator is one that has not been initialised with a value yet
+  // i.e. you just declared it but didn't assign to it
+  bool null(void) const throw();
+
+  // an end iterator is one that points to the end element of the list of nodes
+  // in STL conventions this is one past the last valid element and must not be dereferenced
+  bool end(void) const throw();
+
+  // a valid iterator is one that can be dereferenced
+  // i.e. non-null and non-end
+  bool valid(void) const throw();
+
+  // called by the owner class to check the rules
+  void assert_valid(const O* owner) const throw(wrong_object,null_dereference,end_dereference);
+};
+</pre>
+
+<p>The void constructor ensures that an unassigned iterator is
+classified as a null iterator.</p>
+
+<p>The second iterator is used internally by the container object to
+create a valid iterator.</p>
+
+<p>Built-in comparison methods allow for comparison operators to be
+  written for any iterator derived from safe_iterator, for example to
+  test for the end condition in a for loop or any other
+  conditional. They also allow iterators to be added to sets (the &lt;
+  operator) and hashes (the == operator).</p>
+
+<p>The dereference operators are only legal on valid iterators - any
+attempt to dereference a null or end iterator will throw an
+exception.</p>
+
+<p>The methods null(), end() and valid() allow the programmer to test
+the validity of an iterator before dereferencing it.</p>
+
+<p>The assert_valid method is called by the owning container to check
+that the iterator belongs to it before using it. If not, it will throw
+the wrong_object exception. Also, if the owner needs to dereference
+the iterator, it will check whether it is valid and if not, throw
+either the null_dereference or end_dereference exception.</p>
+
+</div>
+
+</body>
+</html>

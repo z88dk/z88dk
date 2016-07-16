@@ -1,0 +1,498 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - persistence/persistent_pointers.hpp - Data Persistence of Pointers</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="persistence.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>persistence/persistent_pointers.hpp<br>Data Persistence of Pointers</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#include">Header persistent_pointers.hpp</a></li>
+<li class="internal"><a href="#pointer">Persistent Pointer</a></li>
+<li class="internal"><a href="#cstring">Persistent char*</a></li>
+<li class="internal"><a href="#xrefs">Persistent Cross_references</a></li>
+<li class="internal"><a href="#interfaces">Persistence of Polymorphic Classes using Interfaces</a></li>
+<li class="internal"><a href="#callback">Persistence of Polymorphic Classes using Callbacks</a></li>
+<li class="internal"><a href="#installer">Installer Functions</a></li>
+<li class="internal"><a href="#smart_ptr">Persistence of Smart Pointers</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Pointers are a special problem for persistent data types because there may be more than one
+pointer to the same object in a data structure. If this was dumped in a naive way, there would be
+two identical copies of the object in the dump, rather than one object and two pointers to it. It
+would also be impossible to dump a structure with back pointers because the dump mechanism would get
+stuck in an infinite recursion.</p>
+
+<p>The dump function for a pointer will dump the object pointed to on the first visit to the object
+along with a unique magic key that identifies the object pointed to. The second time the object is
+visited (because there's a second pointer to it), only the magic key is dumped. On restoration, on
+first encounter with the object, the object is restored and added to a map along with its magic key. 
+When the magic key is found again in the input stream, it is converted by the map into a pointer to
+the already-restored object.</p>
+
+<h2 id="include">Header persistent_pointers.hpp</h2>
+
+<ul>
+<li class="external"><a href="persistent_pointers_hpp.html">Browse Header persistent_pointers.hpp</a></li>
+</ul>
+
+<p>You can include all of the pointer-handling functions in one go by including persistent_pointers.hpp. If you prefer
+however, you can include the separate headers for each class being used.</p>
+
+<h2 id="pointer">Persistent Pointer</h2>
+
+<ul>
+<li class="external"><a href="persistent_pointer_hpp.html">Browse Header persistent_pointer.hpp</a></li>
+</ul>
+
+<p>There is a template function pair dump_pointer/restore_pointer which implements the algorithm
+described in the introduction. It assumes that a pointer points to a single object (for example, an
+int* points to an int). Pointers to arrays of objects cannot be supported in this way and will need
+to be hand-implemented (you need to know the size of the array as well to be able to dump it). You
+should be using vectors anyway!</p>
+
+<pre class="cpp">
+template&lt;typename T, typename D&gt;
+void stlplus::dump_pointer(stlplus::dump_context&amp;, const T* const data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename R&gt;
+void stlplus::restore_pointer(stlplus::restore_context&amp;, T*&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>Thus, dump_pointer will dump a magic key to the file and then, if this is the first visit, it
+will call dump on the object being pointed to. You need to provide that dump function if it doesn't
+already exist. Similarly, the restore function restores the magic key, checks to see if it is a new
+key and if it is it restores the contents of the pointer. If it is an already-restored key, then it
+is simply mapped onto its target object.</p>
+
+<h2 id="cstring">Persistent char*</h2>
+
+<p>The one exception to the handling of pointers is char* which is treated as a null terminated
+array and not a pointer to a single char. It is treated as a basic type, not a pointer type - see <a
+href="persistent_basic.html#cstring">persistence of basic types</a>. However, multiple
+pointers to the same char array will be dumped once and the same magic key method used as for
+pointers to other types.</p>
+
+<h2 id="xrefs">Persistent Cross-References</h2>
+
+<ul>
+<li class="external"><a href="persistent_xref_hpp.html">Browse Header persistent_xref.hpp</a></li>
+</ul>
+
+<p>In principle, the approach described should cope with data structures of any complexity. However, there
+may be subtle side-effects with the approach - as there tend to be with recursive algorithms - which
+means that some data structures cannot be made persistent. I recomment that you design data
+structures in a top-down way, using STL and STLplus containers rather than linking structs with
+pointers. For example, use the digraph to represent arbitrary connections between objects rather
+than having a mess of pointers.</p>
+
+<p>If you really need pointers between objects, design the data structure with a primary structure
+which is top-down and does all the memory management using containers. Then implement back- or
+up-links using pointers which are treated as cross-references, i.e. pointers that are used as simple
+addresses but which must not be deleted. The key to dumping such a structure is to determine the
+primary structure and dump that. Then, in a second pass, dump cross-references.
+
+<p>To support this situation, I provide a pair of functions for making such cross-references
+persistent. The rule is that the object referred to must be dumped before the cross-reference to it.
+In all other respects, it implements the magic key algorithm for persistence of pointers.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename T&gt;
+void stlplus::dump_xref(stlplus::dump_context&amp;, const T* const data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T&gt;
+void stlplus::restore_xref(stlplus::restore_context&amp;, T*&amp; data)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>The importance of dumping the primary structure first should be clear from this - dumping the
+primary links first causes the data structures to be dumped in this pass since each object will be
+visited for the first time. When back pointers or cross pointers are dumped, all the objects they
+are pointing to have already been dumped so only magic keys get dumped.</p>
+
+<h2 id="interfaces">Persistence of Polymorphic Classes using Interfaces</h2>
+
+<ul>
+<li class="external"><a href="persistent_interface_hpp.html">Browse Header persistent_interface.hpp</a></li>
+</ul>
+
+<p>In C++ you can define a superclass and then derive subclasses from it (some
+people prefer the terminology baseclass for superclass and derived class for
+subclass). This set of classes based on a common superclass is referred to as
+a set of Polymorphic classes.</p>
+
+<p>Polymorphic classes are manipulated through a pointer to the superclass.
+The pointer can then point to any object of any subclass of the common
+superclass. Subclass-specific operations are provided through the use of
+virtual functions.</p>
+
+<p>If this is still making no sense, you need to read a book on C++ since the
+purpose of this document is to explain the STLplus, not to teach C++ basics.
+Otherwise, the rest of this section is on how to make Polymorphic classes
+persistent.</p>
+
+<p>Polymorphic classes represent a problem for persistence. So far all the
+persistence functions have used knowledge of the exact type of the object at
+compile time to select the correct dump or restore function.
+However, with polymorphism, only the superclass is known from the type of the
+pointer. The actual subclass being pointed to is unknown at compile time and
+must be determined at run time. This means that run-time type information must
+be used to determine the type. This is usually achieved by defining virtual
+methods.</p>
+
+<p>This is the solution used to make polymorphic types persistent - although
+there is an alternative implementation that uses callback functions instead
+which is described in the <a href="#callback">next section</a>.</p>
+
+<p>The set of virtual functions used to make a class persistent is defined by an 
+<a href="interfaces.html">interface</a> called persistent. To
+make a polymorphic class persistent, the first stage is to derive the base
+class of your family of polymorphic classes from this interface.</p>
+
+<pre class="cpp">
+#include "persistent.hpp"
+
+class base : public stlplus::persistent
+</pre>
+
+<p>The persistent interface defines a set of abstract methods that you
+must provide for all subclasses to be made persistent:</p>
+
+<pre class="cpp">
+class stlplus::persistent
+{
+public:
+  virtual void dump(dump_context&amp;) const throw(persistent_dump_failed) = 0;
+  virtual void restore(restore_context&amp;) throw(persistent_restore_failed) = 0;
+  virtual persistent* clone(void) const = 0;
+  virtual ~persistent(void) {}
+};
+</pre>
+
+<p>The clone method is also required by the
+<a href="smart_ptr.html">smart_ptr_clone</a> container which is also
+used to store polymorphic classes, so once you've made a class persistent,
+you've automatically made it suitable for use in this smart pointer.</p>
+
+<p>For an example of how to use this interface, see the <a
+href="persistent_examples.html#interfaces">examples</a>.</p>
+
+<p>Persistence of Polymorphic classes requires that every derivative class be registered with the
+dump_context or restore_context before the dump or restore operation commences. Furthermore,
+where there are many polymorphic types being handled, the order
+of registration must be the same for the restore operation as it was for the dump
+operation.</p>
+
+<p>Consider first the dump operation. The stlplus::dump_context class provides
+the following method for registration:</p>
+
+<pre class="cpp">
+unsigned short dump_context::register_interface(const std::type_info&amp; info);
+</pre>
+
+<p>This is called once for each polymorphic type to be dumped.</p>
+
+<p>The std::type_info type is obtained from the typeid operator which is built-in to C++ and
+provides a means of getting the type name from a type or expression as a char*. This is mapped
+internally onto a magic key which is an integer value unique to that subclass. The return value of
+the register_interface method is a magic key for that type and is used in the dump to differentiate
+between the different classes. There's no real reason for capturing this key except maybe for
+debugging the data stream. Keys are allocated in the order of registration of class types. This is
+why class types must be registered in the same order for both the dump and restore operations.</p>
+
+<p>For the restore operation it is necessary to register a sample object of the
+class. This is because the restore operation creates objects of the class by
+cloning the sample.</p>
+
+<p>The stlplus::restore_context class provides the following registration function:</p>
+
+<pre class="cpp">
+typedef smart_ptr_clone&lt;persistent&gt; persistent_ptr;
+
+unsigned short restore_context::register_interface(const persistent_ptr&amp;);
+</pre>
+
+<p>The objects are registered in the same order as the types were registered
+into the dump context, because it is this ordering that provides the mapping
+from the unique key used in the dump to the correct sample object used in
+the restore.</p>
+
+<p>Now that the classes are registered, the actual dump and restore of a
+superclass pointer is handled by the following functions:</p>
+
+<pre class="cpp">
+template&lt;typename T&gt;
+void stlplus::dump_interface(stlplus::dump_context&amp;, const T* const data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T&gt;
+void stlplus::restore_interface(stlplus::restore_context&amp;, T*&amp; data)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+
+<p><strong>Note</strong>: since polymorphic types are handled in C++ via pointers, the
+same behaviour is implemented for multiple pointers to the same object as was
+implemented for simple pointers. When two pointers to the same object are
+dumped, they will be restored as pointers
+to the same object.</p>
+
+<h2 id="callback">Persistence of Polymorphic Classes using Callbacks</h2>
+
+<ul>
+<li class="external"><a href="persistent_callback_hpp.html">Browse Header persistent_callback.hpp</a></li>
+</ul>
+
+<p>The <a href="#interfaces">previous section</a> described how polymorphic types could be made
+persistent in an object-oriented way through inheritance and virtual methods. However, it is not
+always possible to use this approach. For example, you might want to make a class persistent that
+you cannot change. Therefore an alternative solution is needed that uses a non-intrusive approach to
+persistence. In order to achieve this non-intrusive approach, I have provided the option to use dump
+and restore <em>callbacks</em> to perform the persistence functionality and <em>not</em> virtuals. The
+callbacks are associated with the subclass, which can be determined at run time. The callbacks are
+stored in the stlplus::dump_context object during the dump and in the stlplus::restore_context
+object during a restore.</p>
+
+<p>During restore, it is also necessary to create an object of the right subclass before its restore
+callback can be called. The solution uses create callbacks rather than sample objects. A create
+callback is a function that, when called, creates an object and returns a pointer to it. In order to
+make the method as general as possible, the create callback returns this pointer as a void*.</p>
+
+<p>Thus, the non-intrusive solution to persistence of polymorphic types requires no changes to
+existing classes - no extra virtual functions for example. However, the cost of this solution is
+that it does require three callback functions to be written for each subclass to be made
+persistent.</p>
+
+<p>For an example of how to use this approach, see the <a
+href="persistent_examples.html#polymorphic">examples</a>.</p>
+
+<p>The parameter profiles of the three callbacks is:</p>
+
+<pre class="cpp">
+void dump_<em>class</em>(stlplus::dump_context&amp; context, const void* data)
+void* create_<em>class</em>(void)
+void restore_<em>class</em>(stlplus::restore_context&amp; context, void*&amp; data)
+</pre>
+
+<p>The persistence of Polymorphic classes requires that every polymorphic class be registered with
+the dump_context or restore_context before the dump or restore operation commences. Furthermore,
+where there are many polymorphic types being handled, the order of registration must be the same for
+the restore operation as it was for the dump operation.</p>
+
+<p>Consider first the dump operation. The dump_context class provides
+the following method for registration:</p>
+
+<pre class="cpp">
+unsigned short dump_context::register_type(const std::type_info&amp; info, dump_callback);
+</pre>
+
+<p>The dump_context::register_type method is called once for each polymorphic type to be dumped.</p>
+
+<p>The std::type_info type is obtained from the typeid operator which is built-in to C++ and
+provides a means of getting the type name from a type or expression as a char*. This is mapped
+internally onto a magic key which is an integer value unique to that subclass. The return value of
+the register_type method is the magic key for that type and is used in the dump to differentiate
+between the different classes. There's no real reason for capturing this key except maybe for
+debugging the data stream. Keys are allocated in the order of registration of class types. This is
+why class types must be registered in the same order for both the dump and restore operations.</p>
+
+<p>For the restore operation it is necessary to register both a create callback and a restore
+callback with the restore context. The restore_context class provides the following registration
+function:</p>
+
+<pre class="cpp">
+unsigned short restore_context::register_type(create_callback,restore_callback);
+</pre>
+
+<p>The callbacks are registered in the same order as the types were registered
+into the dump context, because it is this ordering that provides the mapping
+from the unique key used in the dump to the correct create callback used in
+the restore.</p>
+
+<p>Now that the callbacks are registered, the actual dump and restore of a
+superclass pointer is handled by the following functions:</p>
+
+<pre class="cpp">
+template&lt;typename T&gt;
+void dump_callback(dump_context&amp;, const T* const data)
+  throw(persistent_dump_failed);
+
+template&lt;typename T&gt;
+void restore_callback(restore_context&amp;, T*&amp; data)
+  throw(persistent_restore_failed);
+</pre>
+
+<p><strong>Note</strong>: since polymorphic types are handled in C++ via pointers, the
+same behaviour is implemented for multiple pointers to the same object as was
+implemented for simple pointers. When two pointers to the same object are
+dumped, they will be restored as pointers
+to the same object.</p>
+
+<h2 id="installer">Installer Functions</h2>
+
+<p>An alternative way of registering either interfaces or callbacks is to wrap their
+registration up in an installer function. This installer can then be used to
+install all classes in a single step.</p>
+
+<p>In fact, two installer functions are required - one for dumping and one for
+restoring. It is up to you to check that these installer functions install
+their callbacks in the same order. The type profiles for these installer
+functions are:</p>
+
+<pre class="cpp">
+void (*dump_context::installer)(stlplus::dump_context&amp;);
+void (*restore_context::installer)(stlplus::restore_context&amp;);
+</pre>
+
+<p>In other words, the installer type for a stlplus::dump_context is a pointer to a
+function that takes a stlplus::dump_context&amp; and returns void. Similarly the
+installer type for a stlplus::restore_context is a pointer to a function that takes a
+stlplus::restore_context&amp; and returns void. For the interface approach they might look
+like this:</p>
+
+<pre class="cpp">
+void register_dumpers(stlplus::dump_context&amp; context)
+{
+  context.register_interface(typeid(base));
+  context.register_interface(typeid(derived));
+}
+
+void register_restorers(stlplus::restore_context&amp; context)
+{
+  context.register_interface(base());
+  context.register_interface(derived());
+}
+</pre>
+
+<p>The functions can be called whatever you like. In use, after creating a dump or restore context, call the
+method register_all with the above installer function's name as the argument. For example,
+using the earlier example again, rewritten to use an installer:</p>
+
+<pre class="cpp">
+stlplus::dump_context context(output);
+context.register_all(register_dumpers);
+</pre>
+
+<p>Alternatively, an installer function can be used with the callback approach:</p>
+
+<pre class="cpp">
+void register_dumpers(stlplus::dump_context&amp; context)
+{
+  context.register_type(typeid(base),dump_base);
+  context.register_type(typeid(derived),dump_derived);
+}
+
+void register_restorers(stlplus::restore_context&amp; context)
+{
+  context.register_type(create_base,restore_base);
+  context.register_type(create_derived,restore_derived);
+}
+</pre>
+
+<h2 id="smart_ptr">Persistence of Smart Pointers</h2>
+
+<ul>
+<li class="external"><a href="persistent_smart_ptr_hpp.html">Browse Header persistent_smart_ptr.hpp</a></li>
+</ul>
+
+<p>The STLplus <a href="smart_ptr.html">smart pointer classes</a> are a
+special case of template container classes in that they contain pointers to
+objects, whereas most template containers contain objects themselves.
+Therefore, persistence of smart pointers is implemented by calling the
+persistence functions for pointers.</p>
+
+<p>There are two interpretations of pointers though: a simple pointer to an object of a known type
+and a polymorphic pointer which has the type of a pointer to a superclass but which can in fact
+point to any subclass of the pointer type. These two interpretations are handled by two variants of
+the smart pointer classes: the smart_ptr variant is intended for use with simple pointers and the
+smart_ptr_clone variant is intended for use with polymorphic pointers.</p>
+
+<p>The smart_ptr variant therefore uses the persistence functions for simple pointers (see <a
+href="#pointer">Persistent Pointer</a>).</p>
+
+<p>The smart_ptr_clone variant uses the
+persistence for polymorphic pointers. Indeed, both the interface approach (see <a
+href="#interfaces">Persistence of Polymorphic Classes using Interfaces</a>) and callback approach
+(see <a href="#callback">Persistence of Polymorphic Classes using Callbacks</a>) are implemented on
+the smart_ptr_clone class.</p>
+
+<p>This gives three different implementations of persistence for smart pointers:</p>
+
+<pre class="cpp">
+// smart_ptr - uses dump/restore_pointer on the contents
+
+template&lt;typename T, typename DE&gt;
+void stlplus::dump_smart_ptr(stlplus::dump_context&amp;, const smart_ptr&lt;T&gt;&amp; data, DE dump_element)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename RE&gt;
+void stlplus::restore_smart_ptr(stlplus::restore_context&amp;, smart_ptr&lt;T&gt;&amp; data, RE restore_element)
+  throw(stlplus::persistent_restore_failed);
+
+// smart_ptr_clone using the polymorphic callback approach - uses dump/restore_callback on the contents
+
+template&lt;typename T&gt;
+void stlplus::dump_smart_ptr_clone_callback(stlplus::dump_context&amp;, const smart_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T&gt;
+void stlplus::restore_smart_ptr_clone_callback(stlplus::restore_context&amp;, smart_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+
+// smart_ptr_clone using the interface approach - uses dump/restore_interface on the contents
+
+template&lt;typename T&gt;
+void stlplus::dump_smart_ptr_clone_interface(stlplus::dump_context&amp;, const smart_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T&gt;
+void stlplus::restore_smart_ptr_clone_interface(stlplus::restore_context&amp;, smart_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+
+</div>
+
+</body>
+</html>

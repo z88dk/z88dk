@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>strings/print_shared_ptr.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>strings/print_shared_ptr.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PRINT_SHARED_PTR
+#define STLPLUS_PRINT_SHARED_PTR
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Generate a string representation of a shared pointer
+
+////////////////////////////////////////////////////////////////////////////////
+
+#include &quot;strings_fixes.hpp&quot;
+#include &lt;memory&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  template&lt;typename T, typename S&gt;
+  void print_shared_ptr(std::ostream&amp; device,
+                        const std::shared_ptr&lt;T&gt;&amp; value,
+                        S print_fn,
+                        const std::string&amp; empty_string = &quot;&lt;empty&gt;&quot;,
+                        const std::string&amp; null_string = &quot;&lt;null&gt;&quot;,
+                        const std::string&amp; prefix = &quot;(&quot;,
+                        const std::string&amp; suffix = &quot;)&quot;);
+
+} // end namespace stlplus
+
+#include &quot;print_shared_ptr.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

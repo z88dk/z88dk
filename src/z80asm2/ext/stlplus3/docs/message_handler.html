@@ -1,0 +1,771 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - subsystems/message_handler.hpp - A General-Purpose Error Handler</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="subsystems.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>subsystems/message_handler.hpp<br>A General-Purpose Message Handler</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="message_handler_hpp.html">Browse Header message_handler.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#initialisation">Initialisation</a></li>
+<li class="internal"><a href="#message_files">Handling Message Files</a></li>
+<li class="internal"><a href="#formats">Format Control</a></li>
+<li class="internal"><a href="#position">Source File Position Specifications</a></li>
+<li class="internal"><a href="#show">Source Code Display Control</a></li>
+<li class="internal"><a href="#messages">Printing Messages</a></li>
+<li class="internal"><a href="#plaintext">Printing Plain Text</a></li>
+<li class="internal"><a href="#error_count">Handling Error Counts and Error Limit</a></li>
+<li class="internal"><a href="#context">Context Stack</a></li>
+<li class="internal"><a href="#supplement">Supplementary Messages</a></li>
+<li class="internal"><a href="#exceptions">Exceptions Thrown</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The message handler subsystem is a class which can be used to perform all message printing in an
+application. It controls the routing of messages to the current output device and does all the
+message formatting according to a set of message formats for each kind of message. The formatting is
+fully configurable.</p>
+
+<p>Messages are stored in a file rather than hard-coded into the
+application. Each message is referred to by a
+unique ID, which is a string. When a request to print a message is
+received, the message is retrieved by its ID from the message file, formatted
+according to the formatting rules in place at the time, has arguments
+substituted and then is printed to the current output device.</p>
+
+<p>This separation of the messages into a file means that it is easy to implement multi-lingual
+applications. Just select an appropriate message file according to the locale.</p>
+
+<p>The message handler supports both simple messages and positional messages. A
+positional message is one that relates to a particular position in a file, and
+would find application in a compiler for example to show where syntax errors
+occur in a source file. Simple messages are not related to a file, they are just
+plain message text.</p>
+
+<p>There are four levels of message: information, warning, error and fatal. These
+have well-defined meanings so there should be no ambiguity as to which one to
+use.</p>
+
+<p>For applications such as compilers, the message handler can keep count of the
+number of errors that have been reported and throw an exception when an error
+limit has been reached. This is user-friendly in that it prevents the user
+becoming swamped with error messages.</p>
+
+<p>For applications where processing goes through a number of deeper and deeper
+stages such that an error message would be so far removed from the user input it
+would be meaningless, the message handler supports the concept of a context stack.
+For example, if you are writing an assembler (I wonder where I get my examples
+from) and inlining a function, you could push the original function call onto
+the context stack. Then, any error messages will be printed with supplementary
+messages showing the context of the error.</p>
+
+
+<h2 id="initialisation">Initialisation</h2>
+
+<p>The message handler is implemented as a class. You create an object of that
+class and then use that object to manage all your messages. Typically, you would
+create the message handler in main() and then pass it to all functions that need
+to do message printing.</p>
+
+<p>The constructor takes 1-4 arguments to initialise the message handler.
+Start with the simplest constructor:</p>
+
+<pre class="cpp">
+message_handler::message_handler(std::ostream&amp; device,
+                                 unsigned limit = 0,
+                                 bool show = true)
+  throw();
+</pre>
+
+<p>The <em>device</em> argument is an IOStream output device which is used as the
+destination for all messages. For command-line tools it will probably be std::cout
+(standard output) or std::cerr (standard error).</p>
+
+<p>The <em>limit</em> argument is the error limit. If set to zero (the default) there is
+no limit to the number of errors that can be printed. Otherwise, if the stated
+limit of error messages is reached, the message handler will throw an error_limit
+exception which can be caught later to terminate an operation.</p>
+
+<p>The <em>show</em> argument controls whether positional messages will also display the
+original source text with an indicator showing where the error occurred. This
+will typically be true for command-line tools and false for GUI commands. For
+example, a compiler might generate the following error with show set to
+true:</p>
+
+<pre class="terminal">
+"test10.cpp" (18,12) : error : this builtin equality operator doesn't have a body
+if p1 = null then
+      ^
+</pre>
+
+<p>Setting show to false gives a reduced form of the message:</p>
+
+<pre class="terminal">
+"test10.cpp" (18,12) : error : this builtin equality operator doesn't have a body
+</pre>
+
+<p>This reduced form only makes sense within a context-sensitive editor, as might
+be found in a GUI, which would highlight line 18, column 12 of the source file
+"test10.cpp".</p>
+
+<p>So far, no message file has been loaded. There is a modified form of the
+constructor that does this for a single file, or message files (plural) can be
+added to the message handler explicitly. The latter option will be handled in the
+next section. The modified constructor looks like this:</p>
+
+<pre class="cpp">
+message_handler::message_handler(std::ostream&amp; device,
+                                 const std::string&amp; message_file,
+                                 unsigned limit = 0,
+                                 bool show = true)
+  throw(stlplus::message_handler_read_error);
+</pre>
+
+<p>The only difference is that this constructor takes the name of a message file as its second
+argument. Note also that the constructor can throw an stlplus::message_handler_read_error exception
+in the case where reading the message file fails, either because the file doesn't exist or because
+there was a format error in the file. This will be dealt with in more detail in the section on <a
+href="#message_files">Handling Message Files</a>.</p>
+
+
+<h2 id="message_files">Handling Message Files</h2>
+
+<p>The message handler can read in messages from any number of message files.
+Each file is added to the message handler by the add_message_file function:</p>
+
+<pre class="cpp">
+void message_handler::add_message_file(const std::string&amp; message_file)
+  throw(stlplus::message_handler_read_error);
+</pre>
+
+<p>The message file will be read into the message handler and the messages stored ready for use. If
+any errors are found, the stlplus::message_handler_read_error exception is thrown.</p>
+
+<p>The stlplus::message_handler_read_error exception contains an message_position field, which
+stores the file position of the error. This includes the filename, the line number and the column
+number. If the file was missing, the line number will be zero. Otherwise, the line number refers to
+the message file line number, numbered from 1. The column number refers to the character position in
+the line, numbered from 0. Incidentally, the numbering of lines from 1 and columns from 0 is a
+common, almost standard, convention.</p>
+
+<p>The message file format is very simple. Each message declaration is in the form:</p>
+
+<pre class="script">
+&lt;ID&gt; &lt;spaces&gt; &lt;text&gt;
+</pre>
+
+<p>An &lt;ID&gt; is a unique mnemonic for the error message. It starts with an alphabetic character
+and may contain alphanumerics and underscores only. It must be unique across all the message files
+loaded into the message handler. If a duplicate message ID is found, an
+stlplus::message_handler_read_error exception will be thrown containing the position of the second
+declaration.</p>
+
+<p>The &lt;spaces&gt; can be one or more space or tab characters.</p>
+
+<p>The &lt;text&gt; is the remainder of the line up to the newline and is plain text (not a quoted
+string).</p>
+
+<p>All lines starting with a non-alphabetic character are assumed to be comments and are
+ignored.</p>
+
+<p>Here's an example, trivial message:</p>
+
+<pre class="script">
+HELLO           Hello World!
+</pre>
+
+<p>This defines a message with an ID of "HELLO" and with message text "Hello
+World!".</p>
+
+<p>Simple messages like this are not much use. Most messages need to have arguments inserted into
+them. Arguments are specified in the message file by the substitution strings "@0", "@1" etc. The
+index number (0, 1 etc.) refers to the order in which the arguments are passed to the message
+printing functions. Note that they are numbered from zero, not from one. There is no limit to the
+number of arguments that can be substituted and the index number can have more than one digit (e.g. 
+"@10"). The use of numbered arguments was chosen in preference to C-style substitutions because it
+allows a message to be reworded in a different order without changing the source code. This becomes
+particularly useful for multi-lingual support since different human languages will be worded with
+arguments in a different order.</p>
+
+<p>A trivial message with a single argument is:</p>
+
+<pre class="script">
+IAM             My name is @0!
+</pre>
+
+<p>And in the French version:</p>
+
+<pre class="script">
+IAM             Je m'appelle @0!
+</pre>
+
+
+<h2 id="formats">Format Control</h2>
+
+<p>The format of messages is controlled by built-in format strings which can be customised for a
+particular application. The format strings use the same argument substitution rules as the messages
+themselves. It is possible to individually customise all message types: information, supplement,
+context, warning, error and fatal messages (see later for an explanation of context messages). There
+is yet another format string for positional messages.</p>
+
+<p>The default message formats are:</p>
+
+<ul>
+<li>information: <code>@0</code></li>
+<li>context: <code>context: @0</code></li>
+<li>supplement: <code>supplement: @0</code></li>
+<li>warning: <code>warning: @0</code></li>
+<li>error: <code>error: @0</code></li>
+<li>fatal: <code>FATAL: @0</code></li>
+<li>position: <code>"@1" (@2,@3) : @0</code></li>
+</ul>
+
+<p>The information/context/supplement/warning/error/fatal formats take a single argument which is
+the formatted message. The @0 argument will be replaced by the message from the
+error file with the arguments substituted.</p>
+
+<p>For positional messages, the simple message text created by the rules above
+is <em>further</em> substituted into a positional format string. The positional
+format string takes up to 4 arguments:</p>
+
+<ul>
+<li>@0: simple message text</li>
+<li>@1: filename</li>
+<li>@2: line number</li>
+<li>@3: column number</li>
+</ul>
+
+<p>You can miss out a part of this (e.g. the column number) by simply not including the argument
+number in the format string. For example, use the position format string "file: @1, line: @2: @0" to
+eliminate the column information. I can't think of any legitimate reason for excluding any field
+apart from the column number.</p>
+
+<p>The default formats can be overridden by the set_****_format functions:</p>
+
+<pre class="cpp">
+void message_handler::set_information_format(const std::string&amp; format) throw();
+void message_handler::set_context_format(const std::string&amp; format) throw();
+void message_handler::set_supplement_format(const std::string&amp; format) throw();
+void message_handler::set_warning_format(const std::string&amp; format) throw();
+void message_handler::set_error_format(const std::string&amp; format) throw();
+void message_handler::set_fatal_format(const std::string&amp; format) throw();
+void message_handler::set_position_format(const std::string&amp; format) throw();
+</pre>
+
+<p><strong>Note:</strong> at present there is no sanity check on the format strings. It is up to you to get
+them right. Mistakes here could lead to stlplus::message_handler_format_error being thrown when you
+try to write a message.</p>
+
+<p>Format strings can be inserted into the message file itself. The defaults are equivalent to
+having the following messages in a message file:</p>
+
+<pre class=script>
+INFORMATION  @0
+CONTEXT      context: @0
+SUPPLEMENT   supplement: @0
+WARNING      warning: @0
+ERROR        error: @0
+FATAL        FATAL: @0
+POSITION     "@1" (@2,@3) : @0
+</pre>
+
+<p>These can be overridden in your own message files. This will be necessary for multi-lingual
+support unless you are happy to have English keywords starting each message.</p>
+
+
+<h2 id="position">Source File Position Specifications</h2>
+
+<p>Many functions in the message handler require file positions to be specified. A
+file position means the combination of the source file name, a line number and a
+column number. This is encapsulated in a class in called
+stlplus::message_position:</p>
+
+<pre class="cpp">
+class message_position
+{
+public:
+  message_position(const std::string&amp; filename, unsigned line, unsigned column);
+
+  const std::string&amp; filename(void) const;
+  unsigned line(void) const;
+  unsigned column(void) const;
+
+  friend std::ostream&amp; operator &lt;&lt; (std::ostream&amp;, const position&amp;);
+};
+</pre>
+
+
+<h2 id="show">Source Code Display Control</h2>
+
+<p>This feature controls whether the message handler shows positional messages with two lines of
+supplementary text showing the source code line and an arrow showing the column that
+the message relates to. This is a boolean switch controlled by two functions:</p>
+
+<pre class="cpp">
+void message_handler::show_position(void);
+void message_handler::hide_position(void);
+</pre>
+
+
+<h2 id="messages">Printing Messages</h2>
+
+<p>There are 4 classes of message: information, warning, error, fatal. They have
+the following interpretation and behaviour:</p>
+
+<dl>
+
+<dt>information</dt>
+<dd>Used for progress messages, status messages etc.</dd>
+
+<dt>warning</dt>
+<dd>Indicates that a problem has been found but there is a sensible, well defined, way of proceeding</dd>
+
+<dt>error</dt>
+<dd>Indicates that a problem has been found and the operation will fail - processing may
+continue but only to find further errors. May throw an stlplus::message_handler_limit_error if the error
+limit is reached.</dd>
+
+<dt>fatal</dt>
+<dd>An internal (programming) error has been found and the operation is stopping
+NOW. It does this by throwing stlplus::message_handler_fatal_error.</dd>
+
+</dl>
+
+<p>In addition to this behaviour, be aware that all print functions could throw
+either an stlplus::message_handler_id_error or a stlplus::message_handler_format_error.</p>
+
+<p>There are also 2 kinds of message: simple, positional:</p>
+
+<dl>
+
+<dt>simple</dt>
+<dd>just a text message</dd>
+
+<dt>positional</dt>
+<dd>a message relating to a source file and a specific position in that
+file</dd>
+
+</dl>
+
+<p>This gives 8 variants. For each variant there is a general-purpose print
+method which takes a vector of strings as a parameter. This vector of strings
+is used as the arguments to substitute into the message. For example, here's the
+general form of the simple informational message handler:</p>
+
+<pre class="cpp">
+bool message_handler::information(const std::string&amp; id, 
+                                  const std::vector&lt;std::string&gt;&amp; args)
+  throw(stlplus::message_handler_id_error,stlplus::message_handler_format_error);
+</pre>
+
+<p>The first field is the ID of the message to print and the second is the set
+of arguments to substitute into that message. Typically this will be built up by
+using the vector::push_back function.</p>
+
+<p>This general-purpose method is a bit clumsy in practice but has the
+advantage that it has no limit on the number of arguments that can be passed. To
+make life easier in the majority of cases, short-cut forms are provided for 0
+to 3 argument messages. For informational messages these are:</p>
+
+<pre class="cpp">
+bool message_handler::information(const std::string&amp; id)
+  throw(stlplus::message_handler_id_error,stlplus::message_handler_format_error);
+
+bool message_handler::information(const std::string&amp; id,
+                                  const std::string&amp; arg1)
+  throw(stlplus::message_handler_id_error,stlplus::message_handler_format_error);
+
+bool message_handler::information(const std::string&amp; id,
+                                  const std::string&amp; arg1,
+                                  const std::string&amp; arg2)
+  throw(stlplus::message_handler_id_error,stlplus::message_handler_format_error);
+
+bool message_handler::information(const std::string&amp; id,
+                                  const std::string&amp; arg1,
+                                  const std::string&amp; arg2,
+                                  const std::string&amp; arg3)
+  throw(stlplus::message_handler_id_error,stlplus::message_handler_format_error);
+</pre>
+
+<p>Each of these functions also has a positional equivalent. The position is
+placed before the id parameter.</p>
+
+<p>For example:</p>
+
+<pre class="cpp">
+bool message_handler::information(const position&amp;,
+                                  const std::string&amp; id,
+                                  const std::vector&lt;std::string&gt;&amp; args)
+  throw(stlplus::message_handler_id_error,stlplus::message_handler_format_error);
+</pre>
+
+<p>There are similar methods for 0, 1, 2 and 3 arguments as above.</p>
+
+<p>This set of permutations is repeated for the warning, error and fatal
+message handlers.</p>
+
+<p>The error functions can throw an extra stlplus::message_handler_limit_error
+exception if the error limit is reached. The fatal functions always throw a
+stlplus::message_handler_fatal_error exception.</p> 
+
+
+<h2 id="plaintext">Printing Plain Text</h2>
+
+<p>Not all text output is in the form of messages. Sometimes you need to just
+print plain text. For example, to reprint the source text of a program to show
+where an error was found. However, it is also useful to be able to redirect this
+plain text to the same device as is being used for message reporting. This is
+done through the plaintext method:</p>
+
+<pre class="cpp">
+bool message_handler::plaintext (const std::string&amp; text);
+</pre>
+
+<p>Each plaintext method call adds a newline to the text printed (in other
+words, do not terminate the text with a newline because the method will do
+it).</p>
+
+
+<h2 id="error_count">Handling Error Counts and Error Limit</h2>
+
+<p>The section on <a href="#exceptions">exceptions</a> deals with what happens when the error limit
+is reached (an exception is thrown). This section deals with setting error counts and resetting the
+current count.</p>
+
+<p>Initially, the error limit is set by the constructor. If this is set to 0, then this means there
+is no error limit and a stlplus::message_handler_error_limit exception can never be thrown. Any
+other value sets the error limit.</p>
+
+<p>The message handler keeps count of how many error messages have been printed. This number can be
+used at the end of the program to determine whether the program succeeded (count = 0) or failed
+(count &gt; 0). It can even be used as the exit status of the program since the convention there is
+to use 0 to mean success and any other value to mean failure.</p>
+
+<p>If a program needs to perform a series of tasks in isolation, it is useful to
+be able to reset the error count before each stage.</p>
+
+<p>In all, there are four functions relating to the error count and the error
+limit:</p>
+
+<pre class="cpp">
+void message_handler::set_error_limit(unsigned limit);
+unsigned message_handler::error_limit(void) const;
+void message_handler::reset_error_count(void);
+unsigned message_handler::error_count(void) const;
+</pre>
+
+
+<h2 id="context">Context Stack</h2>
+
+<p>The idea of a context stack applies to situations where a problem requires recursion and where an
+error could become meaningless due to that recursion because any errors are so far removed from the
+original problem that they don't make sense. The example I used before was that of inlining a
+function, where an error in the inlining is far removed from the user's original source code. In
+that case, you can build up a context stack to print out with each message so that the path to the
+error can be traced. In this example, the context would be a positional message showing the original
+function call that is being inlined.</p>
+
+<p>The context stack is maintained through push and pop functions. A push
+function is similar to the message print functions above, but they don't print
+anything. Instead, the formatted message is stored in the context stack for
+future use. Then, when any message is printed, the context stack is also
+printed. Note that the context messages have a different text format to
+information/warning/error/fatal messages and that format is configurable</p>
+
+<p>The context stack functions look like the message functions with the name
+push_context. As before, there is a general purpose function which takes a
+vector of string arguments and then convenience functions that take 0-3
+arguments. There are two permutations: simple and positional. This gives 10
+permutations.</p>
+
+<p>For example:</p>
+
+<pre class="cpp">
+void message_handler::push_context (const std::string&amp; id,
+                                    const std::vector&lt;std::string&gt;&amp; args)
+  throw(stlplus::message_handler_id_error,stlplus::message_handler_format_error);
+</pre>
+
+<p>This is the general form for simple messages.</p>
+
+<p>The push_context method is called when entering the context. There is also
+a pop_context method which must be called on leaving the context:</p>
+
+<pre class="cpp">
+bool message_handler::pop_context(void);
+</pre>
+
+<p>It is your responsibility to ensure that every push_context is paired with
+a pop_context.</p>
+
+<p>This can be difficult. In fact it may not be possible if exceptions can be
+thrown. The solution is to use the auto_push_context methods. These take
+exactly the same arguments as the push_context methods, but they return an
+stlplus::message_context object. This object will automatically pop the context stack
+when it goes out of scope. An example of the auto_push_context method is:</p>
+
+<pre class="cpp">
+stlplus::message_context message_handler::auto_push_context(const std::string&amp; id,
+                                                            const std::vector&lt;std::string&gt;&amp; args)
+  throw(stlplus::message_handler_id_error,stlplus::message_handler_format_error);
+</pre>
+
+<p>In use the return object should be assigned to a local variable. When that
+local variable goes out of scope, the context stack is popped.</p>
+
+
+<h2 id="supplement">Supplementary Messages</h2>
+
+<p>The concept of supplement messages is similar to the context stack. This is
+a set of messages that are printed along with a main
+information/warning/error/fatal message to give extra information. The
+supplement messages are loaded before the main message is printed so the whole
+is printed in one block of text. The main difference is that supplement
+messages have no memory - they apply only to the next main message and then
+are discarded.</p>
+
+<p>An example use of supplement messages would be in a compiler. Say you have
+more than one possible solution to an expression because the types are
+ambiguous. The main message would say that the types are ambiguous. Then the
+supplement messages would list the possible types. There would be one
+supplement message per type.</p>
+
+<p>Here's some example code using supplement messages:</p>
+
+<pre class="cpp">
+for (unsigned i = 0; i &lt; candidates.size(); i++)
+  errors.push_supplement(candidates[i].position(), "VDK_POSSIBLE_SOLUTION");
+errors.error(current_position, "VDK_COMPONENT_AMBIGUOUS");
+</pre>
+
+<p>Although the supplemental messages are <em>loaded</em> before the main message, they are
+<em>printed</em> after it, since this is a more natural order:</p>
+
+<pre class="script">
+"test.cpp" (13,6) error: this component is ambiguous
+"comp1.cpp" (16,4) supplement: this is one possible solution
+"comp2.cpp" (24,8) supplement: this is one possible solution
+"comp3.cpp" (48,8) supplement: this is one possible solution
+</pre>
+
+
+<h2 id="exceptions">Exceptions Thrown by Message Handler</h2>
+
+<p>When errors are discovered within an message handler, it resorts to throwing an
+exception to indicate that error. The following exceptions can be thrown:</p>
+
+<dl>
+
+<dt>stlplus::message_handler_read_error</dt>
+<dd>Thrown when an error is found reading a message file.</dd>
+
+<dt>stlplus::message_handler_format_error</dt>
+<dd>Thrown when trying to write a message and a formatting error is found in the
+message text.</dd>
+
+<dt>stlplus::message_handler_id_error</dt>
+<dd>Thrown when a message ID is requested which is not present in the message files(s).</dd>
+
+<dt>stlplus::message_handler_limit_error</dt>
+<dd>Thrown when the error limit is reached (only enabled if the error limit is
+set to &gt; 0).</dd>
+
+<dt>stlplus::message_handler_fatal_error</dt>
+<dd>Thrown after a message of severity fatal is thrown. Fatal errors always
+throw this exception.</dd>
+
+</dl>
+
+<p>These exceptions can be caught individually or as a group. To catch them
+individually, you end up with quite a large catch block:</p>
+
+<pre class="cpp">
+try
+{
+}
+catch(stlplus::message_handler_read_error&amp; exception)
+{
+}
+catch(stlplus::message_handler_format_error&amp; exception)
+{
+}
+catch(stlplus::message_handler_id_error&amp; exception)
+{
+}
+catch(stlplus::message_handler_limit_error&amp; exception)
+{
+}
+catch(stlplus::message_handler_fatal_error&amp; exception)
+{
+}
+</pre>
+
+<p>The exceptions can be caught as a group because they are all derivatives of
+std::runtime_error which in turn is a derivative of std::exception. It is good
+practice anyway to catch std::exception.</p>
+
+<p>This cruder form of exception handling only requires one catch block:</p>
+
+<pre class="cpp">
+try
+{
+}
+catch(std::exception&amp; exception)
+{
+}
+</pre>
+
+<p>A good compromise is to catch specific exceptions which require special handling and then
+catching all the others in one go. For example, a stlplus::message_handler_limit_error exception
+might require different handling from all the others. This is done by putting the catch block for
+the specific errors before the general catch block:</p>
+
+<pre class="cpp">
+try
+{
+}
+catch(stlplus::message_handler_limit_error&amp; exception)
+{
+}
+catch(std::exception&amp; exception)
+{
+}
+</pre>
+
+<p>Note that catching an exception by reference preserves the subclass
+information (see "The C++ Programming Language", Bjarne Stroustrup, p359) so
+that dynamic casts could be used on a std::exception to get the
+subclass information.</p>
+
+<p>Each specific exception contains extra information on the nature of the
+exception.</p>
+
+<p>An stlplus::message_handler_read_error contains a position field:</p>
+
+<pre class="cpp">
+class stlplus::message_handler_read_error : public std::runtime_error
+{
+public:
+  message_handler_read_error(const stlplus::message_position&amp; pos);
+  const stlplus::message_position&amp; where(void) const;
+};
+</pre>
+
+<p>The position information contains the name of the message file in which the
+read failed, the line and column numbers where the read failed.</p>
+
+<p>A format error also contains position information showing the exact line and
+column in the file where the format is wrong (typically the substitution of an
+argument more than the number of arguments passed to the print function). It
+also returns the format string and the offset into that string of the error.
+This is most useful for built-in formats such as the error format or the
+position format where the file position will be empty. It tends to be redundant
+information for an error in the message file.</p>
+
+<pre class="cpp">
+class stlplus::message_handler_format_error : public std::runtime_error
+{
+public:
+  stlplus::message_handler_format_error(const std::string&amp; format, unsigned offset);
+  stlplus::message_handler_format_error(const stlplus::message_position&amp; pos, const std::string&amp; format, unsigned offset);
+  const stlplus::message_position&amp; where(void) const;
+  const std::string&amp; format(void) const;
+  unsigned offset(void) const;
+};
+</pre>
+
+<p>An stlplus::message_handler_id_error contains the name of the message ID which could not be found in
+the message file:</p>
+
+<pre class="cpp">
+class stlplus::message_handler_id_error : public std::runtime_error
+{
+public:
+  stlplus::message_handler_id_error(const std::string&amp; id);
+  const std::string&amp; id(void) const;
+};
+</pre>
+
+<p>An stlplus::message_handler_limit_error simply contains the error limit that has been reached:</p>
+
+<pre class="cpp">
+class stlplus::message_handler_limit_error : public std::runtime_error
+{
+public:
+  message_handler_limit_error(unsigned limit);
+  unsigned limit(void) const;
+};
+</pre>
+
+<p>Finally, the stlplus::message_handler_fatal_error does not contain any extra information over the
+baseclass:</p>
+
+<pre class="cpp">
+class stlplus::message_handler_fatal_error : public std::runtime_error
+{
+public:
+  message_handler_fatal_error(void);
+};
+</pre>
+
+<p>In all cases, the std:exception method what() can be used to get a string
+(well actually a char*) describing the error in words. This includes textual
+forms of the extra information above - for example the limit error will state
+that the error limit was reached and what the limit was. The what() field can be
+printed via the message_handler's plaintext method so that it is printed in the
+same place as all other message_handler messages:</p>
+
+<pre class="cpp">
+stlplus::message_handler errors(...);
+try
+{
+  ...
+}
+catch(std::exception&amp; exception)
+{
+  errors.plaintext(std::string("exception: failed with ") + std::string(exception.what()));
+}
+</pre>
+
+
+</div>
+
+</body>
+</html>

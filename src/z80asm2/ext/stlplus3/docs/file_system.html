@@ -1,0 +1,718 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/file_system.hpp - Platform-Independent Access to the File System</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/file_system.hpp<br>Platform-Independent Access to the File System</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="file_system_hpp.html">Browse Header file_system.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#terminology">Terminology</a></li>
+<li class="internal"><a href="#classifying">Classifying Functions</a></li>
+<li class="internal"><a href="#files">File Functions</a></li>
+<li class="internal"><a href="#timestamps">File Timestamp Functions</a></li>
+<li class="internal"><a href="#filespec">File Specification Functions</a></li>
+<li class="internal"><a href="#folders">Folder Functions</a></li>
+<li class="internal"><a href="#folder_contents">Folder Contents Functions</a></li>
+<li class="internal"><a href="#paths">Path Functions</a></li>
+<li class="internal"><a href="#dissection">Path Dissection Functions</a></li>
+<li class="internal"><a href="#lookup">Lookup Functions</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This header provides access to a set of operating-system independent file and
+folder handling functions. This may not seem very important if you are
+working on a Windows-only development or a Unix-only development, but the
+functions also provide a clean and simple way of handling directories and files
+which is far more usable than the conventional interface provided by the native
+OS and includes solutions to known problems with the OS interfaces. It is
+therefore a good idea to use these functions for all file-system access and
+manipulation even where portability is not an issue.</p>
+
+<p>The interface is a set of functions which manipulate file names, folder
+names and full paths as strings. There are also functions for testing existence
+of files and directories and simply testing access permissions.</p>
+
+
+<h2 id="terminology">Terminology</h2>
+
+<p>The following terminology is used both in the C++ interface and in the following descriptions.</p>
+
+<dl>
+
+<dt>filename</dt>
+
+<dd>The name of a file excluding any folder information.</dd>
+
+<dt>filespec (short for file-specification)</dt>
+
+<dd>The name of a file optionally including folder information, which may be
+in either relative or absolute form - this corresponds to the user-orientated
+view of files.</dd>
+
+<dt>folder</dt>
+
+<dd>A container for files - in fact stored on most file systems (including Unix)
+by a special kind of file and therefore shares many attributes with files. When
+it comes to manipulating file systems it is best to keep the concept
+separate.</dd>
+
+<dt>directory</dt>
+
+<dd>Synonym for folder. I have chosen to use folder throughout, just to be
+awkward.<dd>
+
+<dt>absolute path</dt>
+
+<dd>Also known as a full path, this specifies a filespec or folder in its
+fullest form i.e. relative to the root of the file system. On Unix absolute
+paths start with a '/'. On Windows they start with a drive letter such as
+C:.</dd>
+
+<dt>relative path</dt>
+
+<dd>Also known as a partial path, this specifies a filespec or folder
+relative to the current working folder. The path can include the string ".."
+to mean the folder above the current working folder.</dd>
+
+<dt>basename</dt>
+
+<dd>The filename minus any extension part. For example, the basename of
+gobbledegook.doc is gobbledegook. To change the extension of a file, take its
+basename, then add a new extension.</dd>
+
+<dt>extension</dt>
+
+<dd>The part of a filename after the '.'. The extension usually gives some clue
+as to the type or purpose of the file. Related files often have the same
+basename but different extensions. On Unix, the extension is
+optional. Furthermore, if a filename starts with a '.' this is considered part
+of the basename since this is the Unix convention for a hidden file.</dd>
+
+<dt>path</dt>
+
+<dd>A combined folder and filename. Describes the path you would trace
+through the file system to get to the specified file. Also known as a
+filespec.</dd>
+
+</dl>
+
+
+<h2 id="classifying">Classifying Functions</h2>
+
+<p>This small collection allows you to test for the existence of something and
+to further classify it as a file or a folder.</p>
+
+<pre class="cpp">
+bool stlplus::is_present (const std::string&amp; thing);
+bool stlplus::is_folder (const std::string&amp; thing);
+bool stlplus::is_file (const std::string&amp; thing);
+</pre>
+
+
+<h2 id="files">File Functions</h2>
+
+<p>This is a set of functions for manipulating files and filenames.</p>
+
+<pre class="cpp">
+bool stlplus::file_exists (const std::string&amp; filespec)
+</pre>
+
+<p>Tests to see whether there is a file with the specified name on the file
+system. Will return true if the object named does exist and is a file (rather
+than a folder or other kind of object). Will return false if either the file
+does not exist or if there is something with the given name but it is not a
+file. </p>
+
+<pre class="cpp">
+bool stlplus::file_readable (const std::string&amp; filespec)
+</pre>
+
+<p>Tests whether the file exists, and if it does whether it can be read.</p>
+
+<pre class="cpp">
+bool stlplus::file_writable (const std::string&amp; filespec)
+</pre>
+
+<p>Tests whether the file can be written to. This is true either if the file
+already exists and is writable or if the file does not exist but the folder
+is writable.</p>
+
+<pre class="cpp">
+size_t stlplus::file_size (const std::string&amp; filespec);
+</pre>
+
+<p>Gives the size of the file in bytes. Returns zero if the file does not
+exist. This is not a good test for non-existence because you can also have
+zero-sized files - so use stlplus::file_exists in conjunction with stlplus::file_size.</p>
+
+<pre class="cpp">
+bool stlplus::file_delete (const std::string&amp; filespec)
+</pre>
+
+<p>Deletes the file. Returns true if the file existed and was deleted. Returns
+false if the file did not exist or could not be deleted. Usually combined with
+stlplus::file_exists to determine the reason for failure. For example:</p>
+
+<pre class="cpp">
+if (stlplus::file_exists(file) &amp;&amp; !stlplus::file_delete(file))
+{
+// report error in deleting file
+}
+</pre>
+
+<p>This will only be true if the file existed and could not be deleted - so a suitable error can be
+generated.</p>
+
+<pre class="cpp">
+bool stlplus::file_rename (const std::string&amp; old_filespec, const std::string&amp; new_filespec);
+</pre>
+
+<p>Renames the file, returning true if the rename worked and false if it
+failed. It will fail if either the old filespec doesn't exist, or if you have
+insufficient access to move the old file or if you have insufficient access to
+create the new file.</p>
+
+<pre class="cpp">
+bool stlplus::file_copy(const std::string&amp; old_filespec, const std::string&amp; new_filespec);
+</pre>
+
+<p>Copies the file, returning true if the copy succeeded and false if it
+failed. It will fail if either the old filespec doesn't exist, or if you have
+insufficient access to read the old file or if you have insufficient access to
+create and write the new file.</p>
+
+<pre class="cpp">
+bool stlplus::file_move(const std::string&amp; old_filespec, const std::string&amp; new_filespec);
+</pre>
+
+<p>Moves the file. Tries a stlplus::file_rename, but if that fails tries a stlplus::file_copy
+followed by stlplus::file_delete of the old file. If the copy succeeds but the delete
+fails, it deletes the new file to restore the original state. Returns true if
+the old file has gone and the new one is there.</p>
+
+
+<h2 id="timestamps">File Timestamp Functions</h2>
+
+<pre class="cpp">
+time_t stlplus::file_created (const std::string&amp; filespec)
+time_t stlplus::file_modified (const std::string&amp; filespec)
+time_t stlplus::file_accessed (const std::string&amp; filespec)
+</pre>
+
+<p>Gets the various timestamps of the file using the time_t type defined in
+the system header &lt;time.h&gt;. This is the same type returned by the time()
+function. The return type is an integer type so can be used in
+comparisons. Returns 0 if the file does not exist and it is safe to rely on this
+feature.</p>
+
+<p>The created time is the time when the file was created (obviously), the
+modified time is the time last written to and the accessed time is the time
+last read or written to.</p>
+
+<p>See <a href="time.html">time.hpp</a> for some simple utilities for
+manipulating the time_t type.</p>
+
+
+<h2 id="filespec">File Specification Functions</h2>
+
+<p><strong>Note:</strong> These used to be called filespec and filename but these short
+forms tended to conflict a lot with variables, so I added the create_ prefix
+to prevent this.</p>
+
+<pre class="cpp">
+std::string create_filespec (const std::string&amp; folder, const std::string&amp; filename)
+</pre>
+
+<p>Combines a folder (optional) with a filename (optional) to form a
+filespec. This is done by simple string concatenation - no knowledge of the file
+system is used - so it can be used to form a filespec for a folder or file that
+doesn't exist yet. Main use is to automatically sort out the punctuation - for
+example if the folder is not terminated by a '/', then this will be added. If
+the folder is already terminated, then another '/' will not be added. Thus
+the result is in a regular form. Furthermore it has been ported to Windows and
+Unix.</p>
+
+<pre class="cpp">
+std::string create_filespec (const std::string&amp; folder, const std::string&amp; basename, const std::string&amp; extension)
+</pre>
+
+<p>Similar to above, but also handles the punctuation for an extension. The
+(optional) folder is added to the (optional) filename and the (optional)
+extension with the correct punctuation to make a correct filespec. Note that the
+extension should not include the '.'.</p>
+
+<pre class="cpp">
+std::string create_filename(const std::string&amp; basename, const std::string&amp; extension);
+</pre>
+
+<p>Similar to above, but only generates a filename part (no folder part) from
+a basename and an extension, correctly handling the punctuation for an extension.</p>
+
+<p>These three functions are just string manipulations so don't appear to be
+very useful. However, they do handle the punctuation of filespecs for you and
+in an operating-system independent way (for example, on Windows, the folder
+separator is '\' instead of '/'). They avoid a lot of fiddly string
+handling.</p>
+
+
+<h2 id="folders">Folder Functions</h2>
+
+<p>This is a set of functions for manipulating folders and folder names.</p>
+
+<pre class="cpp">
+bool stlplus::folder_create (const std::string&amp; folder)
+</pre>
+
+<p>Creates a new folder. Returns true if the creation succeeded. Returns
+false if the folder failed, either because it already exists or there are
+insufficient access privileges to create it.</p>
+
+<pre class="cpp">
+bool stlplus::folder_exists (const std::string&amp; folder)
+</pre>
+
+<p>Tests whether an object of the given name (which can be a path) exists and is
+a folder rather than any other kind of object. Returns true if this is the
+case. Returns false if either the object does not exist or is not a
+folder. </p>
+
+<p>To test whether an object of a certain name exists as either a folder or a
+file, you must use both stlplus::file_exists and stlplus::folder_exists tests, since stlplus::file_exists
+returns false if an object exists as a folder and stlplus::folder_exists returns false if
+the object exists as a file.</p>
+
+<pre class="cpp">
+bool stlplus::folder_readable (const std::string&amp; folder)
+</pre>
+
+<p>Tests whether it is possible to have read-only access to the contents of a
+folder. Returns true if the folder exists and has read access
+available. Returns false if the folder does not exist or does not have the
+right privileges for read-only access.</p>
+
+<pre class="cpp">
+bool stlplus::folder_writable (const std::string&amp; folder)
+</pre>
+
+<p>Tests whether it is possible to create files in the given folder. Returns
+true if the folder exists and has write access available. Returns false if
+the folder either does not exist or does not have the right privileges for
+write access.</p>
+
+<pre class="cpp">
+bool stlplus::folder_delete (const std::string&amp; folder, bool recurse = false)
+</pre>
+
+<p>Deletes the folder. If the recurse option is set, deletes the contents of
+the folder first. Returns true if the deletion succeeds. Returns false if it
+fails, either because the folder did not exist or it contained something and
+recurse was not set (you can only delete an empty folder if recurse is false)
+or recurse was set but it was not possible to delete something within the
+folder. The most common cause of failure of a recursive delete is
+insufficient access rights to delete something in the folder, which
+subsequently causes the folder delete to fail. In this case some but not all
+of the folder contents will have been deleted.</p>
+
+<pre class="cpp">
+bool stlplus::folder_rename (const std::string&amp; old_directory, const std::string&amp; new_directory);
+</pre>
+
+<p>Renames the folder, returning true if the rename worked and false if it
+failed. It will fail if either the old folder doesn't exist, or if you have
+insufficient access to move the old folder or if you have insufficient access to
+create the new folder.</p>
+
+<pre class="cpp">
+bool stlplus::folder_empty(const std::string&amp; folder);
+</pre>
+
+<p>Tests whether the folder has no files in it!</p>
+
+<pre class="cpp">
+bool stlplus::folder_set_current(const std::string&amp; folder);
+</pre>
+
+<p>Changes the current folder for the running application. Returns true if the
+change succeeded (folder exists) and false if it failed.</p>
+
+<pre class="cpp">
+std::string stlplus::folder_current (void)
+</pre>
+
+<p>The name of the current folder. This returns the shorthand relative path
+".". It is a trivial function but nevertheless should be used to hide this
+shorthand, thus giving more portable code (this shorthand does not necessarily
+apply to other operating systems).</p>
+
+<pre class="cpp">
+std::string stlplus::folder_home (void)
+</pre>
+
+<p>The name of the user's home folder. On Unix this is obtained from the
+environment variable HOME. On Windows it is obtained from environment variables
+HOME_DRIVE and HOME_PATH.</p>
+
+<pre class="cpp">
+std::string stlplus::folder_down (const std::string&amp; folder, const std::string&amp; subfolder)
+</pre>
+
+<p>Performs the string handling and the necessary punctuation handling to add a
+subfolder name to a folder path (relative or absolute) to give the path of
+the subfolder. For example, the folder "garbage/rubbish" combined with the
+subfolder "todays" gives the path "garbage/rubbish/todays". The main benefit
+is that the handling of the punctuation is hidden and will adjust, for example
+if the folder is already terminated with a '/'. It is also ported to Unix and
+Windows and uses the appropriate punctuation for the operating system.</p>
+
+<pre class="cpp">
+std::string stlplus::folder_up (const std::string&amp; folder, unsigned levels=1)
+</pre>
+
+<p>Performs the string handling and punctuation handling necessary to specify
+the parent of folder by adding the conventional shorthand ".." to the
+folder. This hides the conventional shorthand, again for portability and
+simplicity.</p>
+
+<p>The levels argument specifies the number of directory levels to go up. The
+default is 1.</p>
+
+
+<h2 id="folder_contents">Folder Contents Functions</h2>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; stlplus::folder_subdirectories (const std::string&amp; folder)
+</pre>
+
+<p>Extracts an array of subfolder names (not paths) of all the subdirectories
+found in the specified folder. Each of these names can be combined with the
+folder by stlplus::folder_down() to give the path to each subfolder.</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; stlplus::folder_files (const std::string&amp; folder)
+</pre>
+
+<p>Extracts an array of filenames (not paths) of all the files found in the
+specified folder. Each of these names can be combined with folder and
+form_filespec() to give the filespec of each file.</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; stlplus::folder_all (const std::string&amp; folder)
+</pre>
+
+<p>Extracts an array of names (not paths) of all the files and folders found in the specified
+folder. Each of these names can be combined with folder and form_filespec() to give the filespec of
+each file.</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; stlplus::folder_wildcard (const std::string&amp; folder, const std::string&amp; wildcard, bool subfolders = true, bool files = true);
+</pre>
+
+<p>Extracts an array of subfolder and file names matching the wildcard
+expression. For example, to get the set of header files in a folder, use the
+expression "*.h". Note that this is a wildcard, like that used in command
+shells, not a regular expression. The names are simple strings, not full paths,
+but can be converted into full paths by using form_filespec. The two switches
+allow filtering of subfolders or files, so for example only files matching the
+wildcard can be selected by setting the subfolders flag to false and the files
+flag to true.</p>
+
+
+<h2 id="paths">Path Functions</h2>
+
+<p>This set of functions is used for converting folder names or filespecs to
+full paths or back to relative paths. They also implement simplification
+(removal of redundant "." and ".." parts).</p>
+
+<pre class="cpp">
+bool stlplus::is_full_path(const std::string&amp; path);
+bool stlplus::is_relative_path(const std::string&amp; path);
+</pre>
+
+<p>Tests for whether a particular string represents a full or partial path.</p>
+
+<pre class="cpp">
+std::string stlplus::folder_to_path(const std::string&amp; root, const std::string&amp; folder);
+</pre>
+
+<p>Takes a folder name, which may itself be a relative or even a full path, and
+converts it to a full path. If it is a relative path, then root specifies the
+starting point of that relative path. If it is already a full path, then root is
+irrelevant. Finally, the path is simplified by removal
+of "." and ".." parts, to give a full path.</p>
+
+<pre class="cpp">
+std::string stlplus::folder_to_path (const std::string&amp; folder)
+</pre>
+
+<p>As above, but the root is assumed to be the current working directory.</p>
+
+<pre class="cpp">
+std::string stlplus::filespec_to_path(const std::string&amp; root, const std::string&amp; filespec);
+</pre>
+
+<p>Similar to stlplus::folder_to_path, but assumes the last part of the path being processed
+is a filename, not a folder. This is therefore not considered as a candidate
+for path simplification.</p>
+
+<pre class="cpp">
+std::string stlplus::filespec_to_path (const std::string&amp; filespec)
+</pre>
+
+<p>As above, but the root is assumed to be the current working directory as
+given by stlplus::folder_current().</p>
+
+<pre class="cpp">
+std::string stlplus::folder_to_relative_path(const std::string&amp; root, const std::string&amp; folder);
+</pre>
+
+<p>The complementary function to stlplus::folder_to_path, this takes a path and if that
+path is a full path, it converts it to a relative path. The root folder
+specifies where the starting point for that relative path should be.</p>
+
+<pre class="cpp">
+std::string stlplus::folder_to_relative_path(const std::string&amp; folder);
+</pre>
+
+<p>As above, but the root is assumed to be the current working directory.</p>
+
+<pre class="cpp">
+std::string stlplus::filespec_to_relative_path(const std::string&amp; root, const std::string&amp; filespec);
+</pre>
+
+<p>Similar to stlplus::folder_to_relative_path, but assumes the last part of the path being processed
+is a filename, not a folder. This is therefore not considered as a candidate
+for path simplification.</p>
+
+<pre class="cpp">
+std::string stlplus::filespec_to_relative_path(const std::string&amp; filespec);
+</pre>
+
+<p>As above, but the root is assumed to be the current working directory.</p>
+
+<pre class="cpp">
+std::string stlplus::folder_append_separator(const std::string&amp; folder);
+</pre>
+
+<p>makes sure the path ends in a separator to make absolutely clear to any
+other code that this reaslly represents a folder and not a file. For example,
+"fred/has/germs" could refer to a file or a folder called germs, but
+"fred/has/germs/" unambiguously represents a folder.</p>
+
+<pre class="cpp">
+std::string stlplus::folder_remove_end_separator(const std::string&amp; folder);
+</pre>
+
+<p>removes a separator at the end of a folder path to give a cleaner,
+  more common representation - the reverse of the above function.  For
+  example "fred/has/germs/" becomes "fred/has/germs".</p>
+
+
+<h2 id="dissection">Dissection Functions</h2>
+
+<p>This set of functions allows a filespec to be dissected into its constituent
+parts, specifically the folder part or the filename part. Furthermore the
+filename part can be further divided into its basename and its extension.</p>
+
+<p>These functions perform string manipulation only and rely on correct
+punctuation to give correct results. No knowledge of the file system is
+used.</p>
+
+<pre class="cpp">
+std::string stlplus::basename_part (const std::string&amp; filespec)
+</pre>
+
+<p>Extracts the filename part and then removes the extension to leave the
+basename. The extension is removed by finding the last '.' in the filename and
+discarding everything after that. Thus the basename of 'test/test1.vhdl' is
+'test1'. Furthermore, a '.' at the start of the filename is ignored since this is
+the Unix convention for a hidden file and therefore does not designate an
+extension (Note: this convention is also used on Windows - sometimes). Thus the
+basename part of the filename '.emacs' is '.emacs'.</p>
+
+<pre class="cpp">
+std::string stlplus::extension_part (const std::string&amp; filespec)
+</pre>
+
+<p>Complements the above. This is the string that is discarded in forming the
+basename, with the '.' removed too (when handling extensions, the '.' is always
+excluded since it is considered part of the punctuation, not part of the name
+itself). Thus the extenion part of 'test/test1.vhdl' is 'vhdl'.</p>
+
+<pre class="cpp">
+std::string stlplus::filename_part (const std::string&amp; filespec)
+</pre>
+
+<p>Extracts the end of the filespec back to the first '/' (either '/' or '\' on
+Windows) and returns the extracted string. May be empty if the filespec ends in
+'/'. May be the whole filespec if it has no '/'. Thus, the filename part of
+'test/test1.vhdl' is 'test1.vhdl'.</p>
+
+<pre class="cpp">
+std::string stlplus::folder_part (const std::string&amp; filespec)
+</pre>
+
+<p>Removes the end of the filespec back to the first '/' (either '/' or '\' on
+Windows), thus leaving the folder part of the filespec. This may be empty if
+there is no folder part. It may make no change if the filespec had no
+filename part (i.e. is terminated by a '/'). Thus the folder part of
+'test/test1.vhdl' is 'test'.</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; stlplus::folder_elements(const std::string&amp; folder);
+</pre>
+
+<p>Splits the folder path into its string elements by removing the folder
+separator character (e.g. '/' on Unix) and creates a vector containing the
+remaining string fragments.</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; stlplus::filespec_elements(const std::string&amp; filespec);
+</pre>
+
+<p>As above but for a filespec, so the last element will be the filename part.</p>
+
+
+<h2 id="lookup">Lookup Functions</h2>
+
+<p>When you type a command into a shell (whether DOS command prompt, C-shell,
+Bourne-shell or Porn-shell), the command is searched for using the values of the
+PATH environment variable.</p>
+
+<p>This PATH lookup is reproduced by the function path_lookup():</p>
+
+<pre class="cpp">
+std::string stlplus::path_lookup (const std::string&amp; command);
+</pre>
+
+<p>Give this function the name of a command and it will return the full
+path. Furthermore, the function uses the correct operating-system dependent way
+of specifying paths. On Unix, paths are separated by the ':' character, whereas
+on DOS the ';' character is used.</p>
+
+<p>To give more detail, there are some special cases to be handled. the actual
+behaviour is:</p>
+
+<ul>
+
+<li>If the command is already a path, simply return the same string, since PATH
+lookup is never carried out on full paths. However, under Windoze, the .exe
+extension will be added. The existence of the command is not
+checked if it is a full path.</li>
+
+<li>If the command is a simple name, search through the directories listed by
+PATH until the command is found and return the path constructed from that
+directory and the command name. On Windows, commands without an extension will
+also be searched for with the extension .exe.</li>
+
+<li>If the command cannot be found, return the empty string. </li>
+
+</ul>
+
+<p>This means that you should test the result to see if it is empty (using the
+std::string empty() member function) and only create the subprocess if the command
+was found.</p>
+
+<p>There is no need to test whether the command is already a path since the
+function does that for you.</p>
+
+<pre class="cpp">
+std::string stlplus::lookup (const std::string&amp; file, const std::string&amp; path, const std::string&amp; splitter = PATH_SPLITTER);
+</pre>
+
+<p>This is a generalised form of the above, which takes a second argument -
+the list to search. This can be used to do other path lookups, such as
+searching for a library in LD_LIBRARY_PATH. The third argument specifies the
+splitter used to separate values in the list - the default value of
+PATH_SPLITTER is appropriate for environment variables. Returns an empty
+std::string on failure.</p>
+
+<p>e.g.</p>
+
+<pre class="cpp">
+std::string result = stlplus::lookup("libgtk.a", getenv("LD_LIBRARY_PATH"));
+</pre>
+
+<p>The final function in this set is the install_path function:</p>
+
+<pre class="cpp">
+std::string stlplus::install_path(const std::string&amp; argv0);
+</pre>
+
+<p>This takes as its argument the argv[0] parameter passed to the main
+function by the operating system. It uses this parameter plus the PATH variable to work
+out which folder the current program was in, i.e. the location of the executable. This can be used to find data
+files associated with a program. For example, you may have a system
+distribution that looks like this:</p>
+
+<ul>
+<li class="folder">&lt;root&gt;
+<ul>
+<li class="folder">bin
+<ul>
+<li class="file">&lt;programs&gt;</li>
+</ul>
+</li>
+<li class="folder">config
+<ul>
+<li class="file">&lt;data files&gt;</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>When you run one of the programs, the install_path function will return the
+path to the bin folder. The config folder can then be found by going up a
+level and then down:</p>
+
+<pre class="cpp">
+int main(int argc, char* argv[])
+{
+  std::string install_folder = stlplus::install_path(argv[0])
+  std::string config_folder = stlplus::folder_down(stlplus::folder_up(install_folder),"config");
+  ...
+</pre>
+
+
+</div>
+
+</body>
+</html>

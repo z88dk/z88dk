@@ -1,0 +1,754 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/subprocesses.hpp - Platform-Independent SubProcess Handling</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/subprocesses.hpp<br>Platform-Independent SubProcess Handling</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="subprocesses_hpp.html">Browse Header subprocesses.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#arguments">Argument Vectors</a></li>
+<li class="internal"><a href="#environment">Environment Control</a></li>
+<li class="internal"><a href="#synchronous">Synchronous Subprocesses</a></li>
+<li class="internal"><a href="#backtick">Backtick Subprocesses</a></li>
+<li class="internal"><a href="#asynchronous">Asynchoronous Subprocesses</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This package provides a tidy interface to the OS-specific operation of
+spawning a subprocess with optional pipes connecting the child's standard input,
+output and error streams to the parent process. Just about every possible use of
+subprocesses is covered by these classes.</p>
+
+<p>There are two major motivations for having this set of classes:</p>
+
+<ol>
+
+<li>Creating processes is error prone and difficult. Creating communications
+channels through pipes is also error prone and difficult. Doing both could cost
+you weeks of development time for no productive result. The knowledge built up
+over years (well, several weeks at least) of developing multi-processing
+programs is encapsulated in these classes which provide a very easy to use
+interface.</li>
+
+<li>Subprocess handling is radically different on Unix and on Windows. These
+classes provide a completely abstract and platform-independent interface so
+using these classes ensures inherent portability of your program.</li>
+
+</ol>
+
+<p>Subprocesses are represented by objects of a subprocess class. This follows
+the C++ convention of containment, such that all recoverable resources are
+encapsulated in a class so that, for example, if an exception is thrown, the
+object destructor is called. In the case of the subprocess classes, the
+destructor kills the subprocess, thus recovering all resources associated with
+it.</p>
+
+<p>There are two basic types of subprocess supported, each represented by a
+different class. These are the synchronous and asynchronous subprocess:</p>
+
+<dl>
+
+<dt>synchronous subprocess</dt>
+
+<dd>
+<p>This is a subprocess which runs to completion before returning control to the
+parent process. In other words, you call a function to start the subprocess
+running and the function will not return until the subprocess has finished. This
+is the most common requirement for command-line tools. The synchronous process
+is made more useful by allowing one callback function to be run in the parent
+process during child execution. This callback function is typically used to
+write to the child's standard input and/or read from the child's standard output
+or (more rarely) the standard error. Synchronous subprocesses support blocking
+I/O to and from the child process.</p>
+</dd>
+
+<dt>asynchronous subprocess</dt>
+
+<dd>
+<p>This is a subprocess which runs in the background whilst the parent program
+can carry on doing other work. It is not a detached process though - you do have
+to keep checking on the status of the child process and you have to make sure
+the child is closed down correctly when it completes. This is probably the most
+common requirement for GUI tools. Asynchronous subprocesses support non-blocking
+I/O to and from the child process.</p>
+</dd>
+
+</dl>
+
+<p>In both cases the standard input, output and error streams can either be left
+connected to the console or can be redirected through pipes to the parent
+process where they can be used by the parent program to communicate with the
+child. Each of the three streams can be redirected separately.</p>
+
+<p>A common use of redirection is similar to the "backtick" operation used in
+Unix shells. This is where a command is run and its standard output captured and
+returned as a string. This common requirement is provided by a special backtick
+subprocess class which is derived from the synchronous subprocess class.</p>
+
+<p>In addition to the subprocess classes, this package provides a complete set
+of utility functions for performing creating and manipulating
+the argument and environment vectors typically used when using subprocesses.
+Furthermore, platform-independent path lookup functions are provided in
+<a href="file_system.html#paths">file_system.hpp</a></p>
+
+<p>When creating subprocesses, there are a number of different behaviours
+required. For example, sometimes you want to perform path lookup on a command
+just like the shells do it. Other times you do not need path
+lookup. Furthermore, subprocesses require the command to be executed to be
+expressed as an argument vector (like the argv parameter passed to main), not as
+a string. Also, you may wish to change the environment of the subprocess to
+modify its behaviour compared with the parent process. Most of the time, you
+just want the subprocess to inherit the same environment being used by the
+parent process.</p>
+
+<p>This package provides a set of functions and classes that allows the full set
+of permutations to be achieved when using the subprocess classes.</p>
+
+
+<h2 id="arguments">Argument Vectors</h2>
+
+<p>An argument vector is represented as a fixed C array of char*. This makes it
+difficult to manipulate, since you need to guess how big to make the array. Such
+guesswork is always bad practice since if you underestimate the size, the result
+is memory corruption and if you overkill, the result is large memory overhead
+with no benefit. To overcome this limitation, it makes sense to encapsulate the
+problem as a class that manages the argument vector and automatically resizes as
+necessary.</p>
+
+<p>The class stlplus::arg_vector does exactly this. It is a class that not only
+manipulates argument vectors, but also allows the conversion to and from command
+lines, including the typical argument quoting required by these
+conversions. Furthermore, the conversion to and from command-lines is
+operating-system specific. On Unix, the command will be treated in a
+Bourne-shell compatible way. On Windows it will be treated in a DOS-shell
+compatible way.</p>
+
+<p>The class interface is:</p>
+
+<pre class="cpp">
+class stlplus::arg_vector
+{
+public:
+  arg_vector (void);
+  arg_vector (const arg_vector&amp;);
+  arg_vector (char**);
+  arg_vector (const std::string&amp;);
+  arg_vector (const char*);
+
+  ~arg_vector (void);
+
+  arg_vector&amp; operator = (const arg_vector&amp;);
+  arg_vector&amp; operator = (char**);
+  arg_vector&amp; operator = (const std::string&amp;);
+  arg_vector&amp; operator = (const char*);
+
+  arg_vector&amp; operator += (const std::string&amp;);
+  void insert (unsigned index, const std::string&amp;);
+  void clear (unsigned index);
+  void clear (void);
+
+  operator char** (void) const;
+  char** argv (void) const;
+  unsigned size (void) const;
+  char* operator [] (unsigned index) const;
+  char* argv0 (void) const;
+
+  std::string image (void) const;
+  friend otext&amp; operator &lt;&lt; (otext&amp;, const arg_vector&amp;);
+};
+</pre>
+
+<p>There are five constructors representing the likely behaviours required
+when building an arg_vector object:</p>
+
+<pre class="cpp">
+arg_vector::arg_vector(void);
+</pre>
+
+<p>This constructor creates an empty arg_vector object which can be built up in
+stages later using the += operator.</p>
+
+<pre class="cpp">
+arg_vector::arg_vector (const stlplus::arg_vector&amp;);
+</pre>
+
+<p>This constructor copies the arg_vector object (yes it is a copy).</p>
+
+<pre class="cpp">
+arg_vector::arg_vector (char** argv);
+</pre>
+
+<p>This constructor converts from the char* argv[] format as used for example in
+the parameters to main() to the arg_vector object by copying the strings.</p>
+
+<pre class="cpp">
+arg_vector::arg_vector (const std::string&amp;);
+arg_vector::arg_vector (const char*);
+</pre>
+
+<p>These constructors convert the command string into an stlplus::arg_vector object. In the
+process it performs unquoting of arguments that are quoted, using standard
+Bourne shell rules on Unix and DOS-shell rules on Windows.</p>
+
+<p>There are also assignment operations which allow the same constructions on a
+pre-existing stlplus::arg_vector object. These assignments clear the object, then build it
+using the same type-dependent rules as the constructors.</p>
+
+<pre class="cpp">
+stlplus::arg_vector&amp; arg_vector::operator += (const std::string&amp;);
+void arg_vector::insert (unsigned index, const std::string&amp;);
+void arg_vector::clear (unsigned index);
+void arg_vector::clear (void);
+</pre>
+
+<p>These methods allow the manipulation of an arg_vector by adding and
+removing arguments. The += operator simply appends an extra argument to the
+arg_vector object. No string processing or unquoting is done on the string, it
+is simply added by copying. Insert is a generalised form of this which allows an
+argument to be inserted anywhere. The clear function either clear one argument
+at a given index or clear the whole arg_vector. Bear in mind when constructing
+an arg_vector that argument 0 is the command name and subsequent arguments are
+its parameters.</p>
+
+<pre class="cpp">
+char** arg_vector::argv (void) const;
+unsigned arg_vector::size (void) const;
+char* arg_vector::operator [] (unsigned index) const;
+char* arg_vector::argv0 (void) const;
+</pre>
+
+<p>These are four access functions which allow the arg_vector object to be
+examined. Of particular use is the argv0() function, which gives simple access
+to the first argument which is the command name. This could then be passed to
+the path_lookup() function for PATH lookup or simply passed as the first
+parameter to the subprocess fork function.</p>
+
+<p>The arg_vector::argv() method allows the stlplus::arg_vector
+class to be used as a parameter to any function that takes an argument vector as
+an argument simply by returning a pointer to the
+internal data structure.</p>
+
+<p>The operator[] is the index operator which allows each argument to be
+examined individually. The argument vector is null terminated, so you can index
+up to one item past the end of the arg_vector and test the return value being
+null to exit the loop. Alternatively you can use the size() function to find how
+many arguments are in the vector. The char* returned is a pointer to the
+internal data structure so this must not be deleted.</p>
+
+<pre class="cpp">
+std::string arg_vector::image (void) const;
+friend std::ostream&amp; arg_vector::operator &lt;&lt; (std::ostream&amp;, const stlplus::arg_vector&amp;);
+</pre>
+
+<p>The arg_vector::image() function converts the argument vector into a string
+representation that could be used as a command line or just to print out the
+command about to be executed. The function performs quoting of dodgy arguments
+in an operating system dependent way, so the resultant command will be
+compatible with Bourne shell on Unix and DOS shell on Windows.</p>
+
+<p>Finally, to complete the set, there is an output operator for printing
+out the arg_vector class, for example in debug diagnostics.</p>
+
+
+<h2 id="environment">Environment Control</h2>
+
+<p>The environment is manipulated using a similar vector structure to argument vectors. However,
+extra functionality is required to find and manipulate individual variables, since each variable is
+represented as variable=value pairs, all concatenated as one entry in the vector. Class
+stlplus::env_vector is similar to class stlplus::arg_vector but has this extra functionality.</p>
+
+<p>Furthermore, the env_vector has a different data structure on Unix (where it
+is a char**) and on Windows (where it is a char*). This difference is handled
+implicitly by the class, so you can write portable code without having to know
+the difference.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+class stlplus::env_vector
+{
+public:
+  env_vector (void);
+  env_vector (const stlplus::env_vector&amp;);
+  ~env_vector (void);
+
+  env_vector&amp; operator = (const stlplus::env_vector&amp;);
+
+  void clear (void);
+  void add (const std::string&amp; name, const std::string&amp; value);
+  bool remove (const std::string&amp; name);
+
+  std::string operator [] (const std::string&amp; name) const;
+  std::string get (const std::string&amp; name) const;
+
+  unsigned size (void) const;
+  std::pair&lt;std::string,std::string&gt; operator [] (unsigned index) const;
+  std::pair&lt;std::string,std::string&gt; get (unsigned index) const;
+
+  ENVIRON_TYPE envp (void) const;
+
+  friend std::ostream&amp; operator &lt;&lt; (std::ostream&amp;, const stlplus::env_vector&amp;);
+};
+</pre>
+
+<p>The void constructor in fact initialises the env_vector object from the
+current process, so this gives the expected behaviour when using subprocesses,
+giving the equivalent of the default rules (where child processes inherit from
+their parent). This also provides an easy way to access the current processes's
+env_vector in an operating-system independent way. The copy constructor and the
+assignment operator make copies of the env_vector.</p>
+
+<pre class="cpp">
+void env_vector::add (const std::string&amp; name, const std::string&amp; value);
+bool env_vector::remove (const std::string&amp; name);
+void env_vector::clear (void);
+</pre>
+
+<p>The env_vector is manipulated through the add and remove functions. The add
+function adds a variable as a name=value pair, whilst the remove function
+removes a variable from the environment, returning true if it existed. The clear
+function is unlikely to be used, but if it is, it removes all the variables.</p>
+
+<pre class="cpp">
+std::string env_vector::operator [] (const std::string&amp; name) const;
+std::string env_vector::get (const std::string&amp; name) const;
+
+unsigned env_vector::size (void) const;
+std::pair&lt;std::string,std::string&gt; env_vector::operator [] (unsigned index) const;
+std::pair&lt;std::string,std::string&gt; env_vector::get (unsigned index) const;
+</pre>
+
+<p>The value of a variable can be found using the first get
+method or the index operator[] which takes the variable name as an
+argument. For example, to find the PATH, use:</p>
+
+<pre class="cpp">
+stlplus::env_vector env;
+std::string path = env["PATH"];
+</pre>
+
+<p>Variables are case-sensitive on Unix but case-insensitive on Windows.</p>
+
+<p>Alternatively, the variables can be accessed by index. The env_vector::size() function
+gives the number of variables and the env_vector::get and operator[] functions with an
+unsigned argument allow access by index. Note that these return the result as an
+STL pair of strings.</p>
+
+<pre class="cpp">
+ENVIRON_TYPE envp (void) const;
+</pre>
+
+<p>This function gets the env_vector values in the class in the
+operating-system specific form expected by the subprocess classes. It is only
+really used within the subprocess classes since you are unlikely to use the raw
+data yourself. ENVIRON_TYPE is char** on Unix and char* on Windows.</p>
+
+
+<h2 id="synchronous">Synchronous Subprocesses</h2>
+
+<p>Synchronous subprocesses are created using the subprocess class. The
+interface to this class is:</p>
+
+<pre class="cpp">
+class stlplus::subprocess
+{
+public:
+  subprocess(void);
+  virtual ~subprocess(void);
+
+  void add_variable(const std::string&amp; name, const std::string&amp; value);
+  bool remove_variable(const std::string&amp; name);
+  const env_vector&amp; get_variables(void) const;
+
+  bool spawn(const std::string&amp; path, const stlplus::arg_vector&amp; argv,
+             bool connect_stdin = false, bool connect_stdout = false, bool connect_stderr = false);
+  bool spawn(const std::string&amp; command_line,
+             bool connect_stdin = false, bool connect_stdout = false, bool connect_stderr = false);
+
+  virtual bool callback(void);
+  bool kill(void);
+
+  int write_stdin(std::string&amp; buffer);
+  int read_stdout(std::string&amp; buffer);
+  int read_stderr(std::string&amp; buffer);
+
+  void close_stdin(void);
+  void close_stdout(void);
+  void close_stderr(void);
+
+  bool error(void) const;
+  std::string error_text(void) const;
+
+  int exit_status(void) const;
+};
+</pre>
+
+<p>The constructor does nothing but initialise the internal data structures. The
+actual subprocess spawn operation is deferred until the spawn() method is called.</p>
+
+<p>Prior to calling subprocess::spawn(), the set of environment variables to be used by the
+child can be modified using the subprocess::add_variable() and subprocess::remove_variable()
+methods. The initial set of variables are the same as are present in the
+parent process.</p>
+
+<p>The subprocess::spawn() methods actually create and run the subprocess. They do not
+return until the subprocess has completed (this is a synchronous
+subprocess). The return value of the spawn function is true if the spawn
+succeeded and false if it failed.</p>
+
+<p>The first form of the subprocess::spawn() function takes two main arguments - the command
+and an argument vector. This is the most flexible option since it gives more
+control over the running of the subprocess. Bear in mind that an stlplus::arg_vector is a
+platform-independent form.</p>
+
+<p>The command should be the name of the program to run. No path lookup is
+performed so this must be a full path unless the program happens to be in the
+current directory. This is the case if you have created a temporary script file,
+but is generally not the case. To perform path lookup, use the stlplus::path_lookup
+function provided by <a href="file_system.html">file_system.hpp</a>.</p>
+
+<p>The argv argument is the command name and its arguments in an stlplus::arg_vector object.</p>
+
+<p>In addition to these main arguments, there are three switches which control
+which of the standard streams are to be connected by pipes between the current
+subprocess object (known as the parent) and the subprocess (known as the
+child). If you specify, for example, that connect_stdin is true, then the
+standard input of the child will be connected to the parent object by a pipe
+which can be written to from the parent. If a switch is false, then the relevant
+standard stream will be connected to the terminal.</p>
+
+<p>The second form of subprocess::spawn() is similar, but instead of the separate main
+arguments, it takes a command line as a single string. This command line is
+executed just as if it was running in a shell. Path lookup is carried out to
+find the program to run and the program is run with the default stlplus::env_vector,
+which is the same environment as the parent process.</p>
+
+<p>In both cases, if the spawn of the subprocess is successful, the subprocess::spawn()
+method will call the parent subprocess::callback() member function, wait for it to
+complete, wait for the child to finish, then return.</p>
+
+<p>The subprocess::callback() method is made virtual because this is used to customise the
+subprocess class. The default subprocess::callback() function just closes all the pipes and
+returns. You can modify this behaviour by creating a subclass with a
+different callback() method. This is the only method you have to provide
+(although you may need to also provide a destructor if there is any closing down
+to be done).</p>
+
+<p>For example, if you wish to read the text coming from the child process's
+stdout stream, you would write a callback() function to do this. The
+stlplus::backtick_subprocess is in fact a predefined derivative which does exactly that
+and will be described later.</p>
+
+<p>Within the callback() method, the streams are manipulated using the
+provided functions. For example, to read from the standard output, use the
+subprocess::read_stdout function. These functions are written in a platform-independent
+way so that you do not need to know the different implementations of pipes used
+on different operating systems.</p>
+
+<p>The subprocess::write_stdin function takes a single argument, a buffer string. The buffer
+contains the text to be written. When text is written, the text is removed from
+the string to show this.</p>
+
+<p>The return value of subprocess::write_stdin is the number of characters written. If
+this is less than the total length of the buffer, then the pipe has filled and
+you should try writing the remainder later. Note that the subprocess::write_stdin method will have
+removed the text written from the string, so the buffer will already contain only the
+remaining text to be written. You may need to clear the
+output and error pipes first. In fact, if you are writing that much text you
+should consider using the asynchronous subprocesses instead since they are more
+suited to interleaved input and output.</p>
+
+<p>When you have finished writing to standard input, you should signal to the
+child that you have finished by closing the standard input pipe with
+subprocess::close_stdin. This is the normal convention when using pipes to indicate to
+the child process that there is no more text to process and that the child can
+finish as soon as it has processed all of its input.</p>
+
+<p>The subprocess::read_stdout and subprocess::read_stderr methods also take one argument - a buffer
+string to receive the text. The read should be called repeatedly to get the text from the child
+until the read function returns -1 indicating the end of the text. The callback() function should
+then return. To close the pipes, call one of the close functions. </p>
+
+<p><strong>Note:</strong> it is not necessary to close the output and error
+pipes yourself, just return from the parent function and the fork function will
+close them. You only need to close the input pipe to signal that the child is to
+exit.</p>
+
+<p><strong>Note:</strong> The read functions return -1 to indicate no more
+text. This may be due to end-of-file being detected or an error on the
+pipe. Test the subprocess::error() function to see which has occurred.</p>
+
+<p>The return value of your overloaded callback() method can be used to control child
+termination. If your version of callback() returns true, the child will be
+allowed to run to completion and the subprocess::spawn() function will not return until that
+has happened. If your callback() function returns false, however, the spawn
+function will kill the child process immediately and then return.</p>
+
+<p>The subprocess class keeps a record of any errors that happen during the
+execution of the child subprocess. You can test for the existence of an error
+using the subprocess::error() function, which returns true if there is an error. Some useful
+diagnostic text for printing out to the user can be obtained from the
+subprocess::error_text() function.</p>
+
+<p>Similarly, the exit status of the child process can be recovered using the
+subprocess::exit_status() function. Typically, a status of 0 indicates successful completion
+and non-zero values indicate some kind of error. This is an error in the program
+running as a child, whereas the subprocess::error() described above relates to errors in the
+parent whilst trying to run the child.</p>
+
+
+<h2 id="backtick">Backtick Subprocesses</h2>
+
+<p>There is a special derivative of the subprocess class called
+stlplus::backtick_subprocess. This is so-called because it is roughly equivalent to the
+Unix shell backtick operator. For example, in Unix shells, you can run a
+subprocess, capture its output and return this as a string like this:</p>
+
+<pre class="script">
+current_directory=`pwd`
+</pre>
+
+<p>This executes the <code>pwd</code> command, captures its output as a string and assigns
+the value to the variable <code>current_directory</code>.</p>
+
+<p>This is a very useful operation and so the stlplus::backtick_subprocess is probably
+the most useful subprocess class.</p>
+
+<p>The interface to the backtick_subprocess is:</p>
+
+<pre class="cpp">
+class stlplus::backtick_subprocess : public stlplus::subprocess
+{
+public:
+  backtick_subprocess(void);
+  virtual bool callback(void);
+  bool spawn(const std::string&amp; path, const arg_vector&amp; argv);
+  bool spawn(const std::string&amp; command_line);
+  const std::vector&lt;std::string&gt;&amp; text(void) const;
+  std::vector&lt;std::string&gt;&amp; text(void);
+};
+</pre>
+
+<p>This has slightly modified spawn methods, since the user has no control
+over which pipes are connected - the standard output of the child is
+automatically connected to the parent and the other two pipes are left
+disconnected. Apart from this they are the same as the subprocess::spawn
+commands. The only thing you need to know about this class is that when the
+spawn function returns, the text field in the class contains the output text of
+the child process and the subprocess::error method will give error status. Note that the
+return value of the spawn function is still significant - it is false if the
+spawn failed, true if the command run successfully. The text field is only valid
+if the spawn method returns true.</p>
+
+<p>Note: only the standard output is captured, just as with the shell
+equivalent. If you wish to capture the standard error, write the command so that
+it redirects standard error to standard output. Alternatively, if you want to
+write a function that reads both output and error pipes, you should use
+asynchronous subprocesses (see later) since they implement non-blocking reads on
+these two pipes, thus allowing them to be interleaved.</p>
+
+<p>The text field is a std::vector&lt;std::string&gt; so the line-breaks in the output are
+preserved. The text field contains one string for every line of output received
+from the child process.</p>
+
+<p>To make life even easier, there are pre-packaged forms of the
+stlplus::backtick_subprocess class in functions called stlplus::backtick:</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; stlplus::backtick(const std::string&amp; path, const stlplus::arg_vector&amp; argv);
+std::vector&lt;std::string&gt; stlplus::backtick(const std::string&amp; command_line);
+</pre>
+
+<p>These create an stlplus::backtick_subprocess, run the spawn method, collect the
+output and return the result, all in one function call. The only disadvantage of
+this functional form is there is no return value to test for success and no way
+to get any error messages. If the command fails, the return value will be
+empty. However, it will also be empty if the command didn't produce any output
+and you cannot tell the difference between these two outcomes. However, for
+commands which you definitely know produce output, the empty array is a safe
+test for failure.</p>
+
+
+<h2 id="asynchronous">Asynchronous Subprocesses</h2>
+
+<p>An asynchronous subprocess is one which runs in the background whilst your
+program continues with other work.</p>
+
+<p>Asynchronous subprocesses are created using the stlplus::async_subprocess class. The
+interface to this class is:</p>
+
+<pre class="cpp">
+class stlplus::async_subprocess
+{
+public:
+  async_subprocess(void);
+  virtual ~async_subprocess(void);
+
+  void add_variable(const std::string&amp; name, const std::string&amp; value);
+  bool remove_variable(const std::string&amp; name);
+  const env_vector&amp; get_variables(void) const;
+
+  bool spawn(const std::string&amp; path, const stlplus::arg_vector&amp; argv,
+             bool connect_stdin = false, bool connect_stdout = false, bool connect_stderr = false);
+  bool spawn(const std::string&amp; command_line,
+             bool connect_stdin = false, bool connect_stdout = false, bool connect_stderr = false);
+
+  virtual bool callback(void);
+  bool tick(void);
+  bool kill(void);
+
+  int write_stdin(std::string&amp; buffer);
+  int read_stdout(std::string&amp; buffer);
+  int read_stderr(std::string&amp; buffer);
+
+  void close_stdin(void);
+  void close_stdout(void);
+  void close_stderr(void);
+
+  bool error(void) const;
+  std::string error_text(void) const;
+
+  int exit_status(void) const;
+};
+</pre>
+
+<p>This is very similar to the synchronous subprocess and I will only explain
+the differences.</p>
+
+<p>The main difference is that the async_subprocess::spawn methods return immediately after the
+child starts, rather than when it finishes. The return value of async_subprocess::spawn is true if
+the child started and false if it doesn't. However, the child is left running.</p>
+
+<p>To test whether the child is still running, you need to call the async_subprocess::tick
+method periodically. The async_subprocess::tick method normally returns true, but will return
+false when the child has finished. If you don't care whether its still running
+you can just leave it running in the background. The child will terminate when
+it has finished or when the async_subprocess::kill method is called or when the async_subprocess
+object is destroyed. </p>
+
+<p>Note that destroying the class terminates the child - this class implements
+an asynchronous subprocess, not a detached process.</p>
+
+<p>Each time the async_subprocess::tick method is called, it calls async_subprocess::callback().
+This makes the callback() method different from the synchronous form in that it will be called
+many times, not just once. The callback() method can do I/O. However, you can also do I/O directly
+from outside the class using the provided read and write functions, so there is no real need to
+provide a customised callback() function. This facility has been provided for the rare cases where
+this way of working is easier to implement.</p>
+
+<p>As before, the callback() method can be used to control the child - it can
+return false, in which case the async_subprocess::tick() method will kill the child. the same can
+be done from outside the class by calling the async_subprocess::kill() method directly.</p>
+
+<p>Note: always use the async_subprocess::kill method in the class to terminate the child, which
+has been ported to Unix and Windows, not the Unix kill function which is
+non-portable to Windows.</p>
+
+<p><strong>Warning:</strong> The async_subprocess::read_stdout and async_subprocess::read_stderr
+methods implement non-blocking I/O, but the async_subprocess::write_stdin only does so on Unix. So far I
+have not found a way of doing non-blocking writes on Windows.</p>
+
+<p>Note: if you know of such a method, please tell me about it.</p>
+
+<p>This limitation has an affect on the way you use the functions - you should
+only perform a write when you know that the standard input pipe has enough
+buffer space to accept the write and that the other input/error pipes are not
+blocked by text waiting to be read. In general you should read from those pipes
+first, then write to the standard input. The final choice depends on what you
+know about the command running in the subprocess.</p>
+
+<p>When performing reads, the read functions will return immediately, they will
+not block. The return value is -1 for an error or for end-of-file. These two
+cases can be differentiated by whether there is an async_subprocess::error(). It
+will return 0 if there was no text to read and &gt;0 if text was read
+successfully. Note that the buffer is appended with the specified number of
+bytes, so the string will become longer with each successive read unless you
+explicitly erase it between reads.</p>
+
+<p>The non-blocking nature of the read operations allows you to read both
+standard output and standard error by interleaving the calls to the read
+functions.</p>
+
+<p>The main trick when using asynchronous subprocesses is to not give up reading
+the output too soon. Typically the child will finish <em>before</em> the output buffers
+have been read by the parent. Therefore a good strategy is to read the output
+until end of file is found, then keep calling async_subprocess::tick() until the subprocess
+exits. It is then poossible to test the exit status. Note that you must call
+async_subprocess::tick() until it returns false to ensure that the subprocess does exit properly
+and the status can be caught. On Unix for example, not doing this will leave
+so-called "Zombie" processes behind.</p>
+
+<p>Here's an example that does just this:</p>
+
+<pre class="cpp">
+std::string input = ...;
+std::string output;
+for(;;)
+{
+  // the input string is consumed by the write, so will be zero length when all writing is finished
+  if (input.size() == 0)
+    async.close_stdin(); // this will be called many times - no problem
+  else
+    async.write_stdin(input); // could test for error - returns -1
+  int read = async.read_stdout(output);
+  // test for end of input
+  if (read == -1)
+  {
+    // now wait for the subprocess to exit
+    while(async.tick()) ;
+    break;
+  }
+}
+if (async.error()) std::cerr &lt;&lt; "error detected - " &lt;&lt; async.error_text() &lt;&lt; std::std::endl;
+std::cerr &lt;&lt; "command exited with status " &lt;&lt; async.exit_status() &lt;&lt; std::std::endl;
+</pre>
+
+<p>Of course, in practice, the only reason for using an asynchronous subprocess
+is that you want to do other things whilst it is running, so those other
+activities would be added to the main loop. Alternatively, a single read/write
+combination could be done each time round an event loop in a GUI (or more likely
+only on idle events).</p>
+
+
+</div>
+
+</body>
+</html>

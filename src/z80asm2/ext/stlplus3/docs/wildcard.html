@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/wildcard.hpp - Platform-Independent Wildcard Matching</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/wildcard.hpp<br>Platform-Independent Wildcard Matching</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="wildcard_hpp.html">Browse Header wildcard.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#interface">Interface</a></li>
+<li class="internal"><a href="#expressions">Wildcard Expressions</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This function performs the kind of wildcard matching usually found in
+command-line tools for filename handling. Sometimes you need to do this kind of
+stuff yourself. Unfortunately, this kind of thing is not always provided by the
+operating system. For portability, then, this function should be used
+instead.</p>
+
+<h2 id="interface">Interface</h2>
+
+<p>The function looks like this:</p>
+
+<pre class="cpp">
+bool match_wildcard(const std::string&amp; wild, const std::string&amp; match);
+</pre>
+
+<p>The first argument is the wildcard expression and the second is the string to
+match against it. The function returns true (wow, surprise) if the match string
+does match the wild string.</p>
+
+<h2 id="expressions">Wildcard Expressions</h2>
+
+<p>The wildcard expression can contain any of the following:</p>
+
+<dl>
+<dt>*</dt>
+<dd>Matches 1 or more characters</dd>
+
+<dt>?</dt>
+<dd>Matches any single character (exactly 1)</dd>
+
+<dt>[a-z]</dt>
+<dd>Matches exactly 1 character in the set 'a' through 'z'. A set can contain
+any characters. The '-' character is used to specify a range, such as a-z, A-Z
+or 0-9. Special characters are escaped with a backslash '\'. This
+includes the ']' character which obviously closes the set, the '-' character
+which gives a range and the '\' character
+itself.</dd>
+
+<dt>any other</dt>
+<dd>Matches itself only</dd>
+
+</dl>
+
+<p>Thus the wildcard expression "*.vhdl" matches any string ending in the
+sequence ".vhdl".</p>
+
+
+</div>
+
+</body>
+</html>

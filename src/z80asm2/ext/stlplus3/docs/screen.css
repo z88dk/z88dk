@@ -1,0 +1,312 @@
+/* Style Sheet for STLplus Web Pages */
+/* http://stlplus.sourceforge.net */
+/* Author: Andy Rushton */
+/* Copyright (c) Andy Rushton 2007 */
+/* License: BSD license, see license.html */
+
+/* uncomment the following line for debugging div margins */
+/* div {border: 1px solid; margin: 1px; padding: 1px;} */
+
+/* Overall document characteristics */
+
+*
+{
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+body
+{
+  color: #000000;
+  background-color: #bcbbc3;
+}
+
+/* Document header */
+
+#header
+{ 
+/*  position: fixed;
+  top: 0;
+  left: 0; */
+  width: 100%;
+  color: #000000;
+  background-color: #c0c0e0;
+
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
+  -moz-box-shadow: 3px 3px 8px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 3px 3px 3px rgba(0,0,0,0.5);
+}
+
+#headerBanner 
+{
+  width: 100%;
+  height: 50px;
+  background: url(header.png) #9d9ca7 repeat-x;
+}
+
+#headerBanner h1, #headerBanner p
+{
+  font-size: xx-large;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+  padding: 3px 0 0 0;
+}
+
+#headerAuthor 
+{
+}
+#headerAuthor p
+{
+  font-size: xx-small;
+  font-style: italic;
+  text-align: right;
+  margin: 0;
+  padding: 0;
+}
+
+#headerNavigation 
+{
+  white-space: nowrap;
+}
+
+#headerNavigation p
+{
+  font-size: medium;
+  text-align: center;
+  margin: 0;
+  background: url(button.png) #9d9ca7 repeat-x;
+}
+
+#headerNavigation a 
+{
+  border-left: solid 1px #9d9ca7;
+  border-right: solid 1px #9d9ca7;
+  padding: 0 2em;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#headerNavigation a:link, #headerNavigation a:visited
+{
+  border-color: #000000;
+}
+
+#headerNavigation a:hover, #headerNavigation a:active
+{
+  border-color: #f0a0a0;
+}
+
+/* Content */
+
+#document
+{
+  margin: 30px 10%;
+  padding: 30px;
+  background-color: #ffffff;
+
+  box-shadow: 4px 4px 6px rgba(0,0,0,0.5);
+  -moz-box-shadow: 4px 4px 6px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 4px 4px 6px rgba(0,0,0,0.5);
+}
+
+/* Headers */
+
+h1
+{
+  margin: 0.5em 0;
+  text-align: center;
+}
+
+h2
+{
+  margin: 0.5em 0;
+}
+
+h3
+{
+  margin: 0.5em 0;
+}
+
+/* Content */
+
+#document p
+{
+  margin: 0.5em 0;
+  padding: 0;
+}
+
+/* lists */
+
+#document ul
+{
+  margin: 0 0 0 20px;
+}
+
+#document ol
+{
+  margin: 0 0 0 20px;
+}
+
+#document li
+{
+}
+
+li.file
+{
+  list-style-type: disc;
+  list-style-image: url("file.png");
+}
+
+li.folder
+{
+  list-style-type: square;
+  list-style-image: url("folder.png");
+}
+
+li.cross
+{
+  list-style-image: url("cross.png");
+}
+
+li.tick
+{
+  list-style-image: url("tick.png");
+}
+
+li.internal
+{
+  list-style-image: url("down.png");
+}
+
+li.external
+{
+  list-style-image: url("file.png");
+}
+
+/* Links */
+
+a:link, a:visited
+{
+  color: #000000;
+}
+
+a:hover, a:active
+{
+  color: #a07080;
+}
+
+/* Definition List */
+
+#document dl
+{
+  margin: 0.5em 10px;
+}
+
+#document dt
+{
+  font-weight: bold;
+  margin: 0.5em 1em;
+}
+
+#document dd
+{
+  margin: 0.5em 2em;
+}
+
+/* Tables */
+
+table
+{
+  margin: 10px 0px;
+  border-collapse: collapse;
+  background-color: #ffffff;
+}
+
+caption
+{
+  margin: 0;
+  text-align : left;
+  font-weight: bold;
+}
+
+thead
+{
+  background-color: #8fb5da;
+}
+
+th, td
+{
+  text-align: left;
+  padding: 3px 5px;
+}
+
+th
+{
+  font-weight: bold;
+  border: 1px solid #ffffff;
+}
+
+
+td
+{
+  border: 1px solid #8fb5da;
+}
+
+tr
+{
+}
+
+/* Source Code Examples */
+
+pre
+{
+  font-family: monospace;
+  font-size: small;
+}
+
+pre.vhdl
+{
+}
+
+pre.cpp
+{
+}
+
+pre.terminal
+{
+}
+
+pre.script
+{
+}
+
+pre.syntax
+{
+}
+
+pre.node
+{
+}
+
+/* Images */
+
+p.figure
+{ 
+  text-align: center;
+  font-weight: bold;
+  padding: 0;
+  border: thin solid #707080;
+  margin: 20px 0;
+}
+
+p.figure>img
+{ 
+  margin: 20px;
+  padding: 0;
+  border: 0;
+}
+
+
+

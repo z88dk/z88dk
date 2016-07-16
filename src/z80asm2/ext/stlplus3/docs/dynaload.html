@@ -1,0 +1,324 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/dynaload.hpp - Dynamic Library Loader</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="portability.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/dynaload.hpp<br>Dynamic Library Loader</h1>
+</div>
+
+<div id="documentNavigation">
+<ul>
+<li class="external"><a href="dynaload_hpp.html">Browse Header dynaload.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#libraries">Library Management</a></li>
+<li class="internal"><a href="#symbols">Symbol Loader Methods</a></li>
+<li class="internal"><a href="#errors">Error Handling</a></li>
+<li class="internal"><a href="#pointers">Function-Pointers</a></li>
+</ul>
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>There are two types of library in C++ (and most other language) programs. Archive libraries are
+linked into an application at link time. Dynamic libraries are usually linked at load time just
+before the application is executed. In the latter case, when the application is linked, you tell the
+linker to include a dependency on a dynamic library. Then, at run-time, the operating system links
+the dynamic library to the application and runs it. This deferred linkage is done for two main
+reasons: to allow the application to use someone else's library and to allow separate programs to
+share resources.</p>
+
+<p>However, it is also possible to load dynamic libraries during run-time on demand. In this case,
+the application has no dependency on the dynamic library and will start running without it. Indeed,
+the dynamic library can be missing. This is a powerful technique for extending applications, for
+example to implement plug-ins. Of course, the application will be more complicated because it now
+needs to deal with the situation where a dynamic library is missing and handle this error
+elegantly.</p>
+
+<p>The STLplus dynaload class manages the run-time loading of dynamic libraries - from now in
+referred to as Dynamic Loading. It is just a thin layer which hides platform-specific features.
+However, it is in the form of a class so that Dynamic Loading becomes object orientated. Dynamic
+libraries can be loaded by constructing a dynaload object, then functions loaded from the library
+and called. The library is unloaded by the destructor.</p>
+
+<h2 id="libraries">Library Management</h2>
+
+<p>This section describes the Dynamic Loading aspect of the dynaload class.</p>
+
+<pre class="cpp">
+namespace stlplus
+{
+
+  class dynaload
+  {
+  public:
+
+    ////////////////////////////////////////////////////////////////////////////
+    // library management
+
+    // construct the object but do not load
+    dynaload(void);
+
+    // construct and load
+    dynaload(const std::string&amp; library, const std::string&amp; directory = std::string());
+
+    // destroy and unload if loaded
+    ~dynaload(void);
+
+    // load the library - return success or fail
+    bool load(const std::string&amp; library, const std::string&amp; directory = std::string());
+
+    // unload the library if loaded
+    bool unload(void);
+
+    // test whether the library is loaded
+    bool loaded(void) const;
+
+    ...
+
+  };
+
+}
+</pre>
+
+<p>The first constructor creates a dynaload object but does not load the dynamic library - this is
+used in deferred loading - the library is loaded by calling the load method which has the benefit of
+returning a flag to indicate success or failure.</p>
+
+<p>The second constructor loads the dynamic library at construction time. It is equivalent to
+calling the first constructor followed by load.</p>
+
+<p>The destructor unloads the library if it is loaded by calling the unload method, otherwise it does nothing.</p>
+
+<p>The load method tries to load the dynamic library named by the
+  string parameter. The library must be the raw name of the library
+  with no prefix or extension. For example, on Unix-like operating
+  systems the library "xyz" will be mapped onto the filename libxyz.so
+  whereas on Windows it will be mapped onto xyz.dll. To keep this
+  platform independent, the dynaloader takes only the raw name,
+  i.e. "xyz".</p>
+
+<p>If the dynamic library referred to is loaded successfully then the
+method returns true. If not, the error fields are filled in and it
+  returns false - see later for details of error handling.</p>
+
+<p>The load method has an optional second argument that specifies the
+directory to load the library from (e.g. "."). If present this is the
+only place the loader looks. If absent, the loader uses the platform
+specific path lookup to find the library.</p>
+
+<p>On Gnu/Linux for example, the following is a typical search path:</p>
+
+<ul>
+  <li>the set of colon-separated directories in environment variable LD_LIBRARY_PATH</li>
+  <li>the ldconfig cache</li>
+  <li>/lib and /usr/lib</li>
+</ul>
+
+<p>On Windows, the following is a typical search path:</p>
+
+<ul>
+  <li>directory of the calling program</li>
+  <li>system directory</li>
+  <li>Windows directory</li>
+  <li>current directory</li>
+  <li>the set of colon-separated directories in environment variable PATH</li>
+</ul>
+
+<p>The unload method unloads the library if it is loaded, returning true if the unload succeeded. If
+not, the error fields are filled in and it returns false - see later for details of error
+handling.</p>
+
+<p>The loaded method can be used as a test to see if the library is currently loaded. This is useful
+if the second constructor was used to see if the load succeeded, since constructors cannot return
+success flags.</p>
+
+<h2 id="symbols">Symbol Loader Methods</h2>
+
+<p>Functions can be loaded from the dynamic library and called. When referring to loadable
+functions, the convention is to call them "symbols" and this naming convention is used in the
+interface.</p>
+
+<pre class="cpp">
+namespace stlplus
+{
+
+  class dynaload
+  {
+  public:
+
+    ...
+
+    ////////////////////////////////////////////////////////////////////////////
+    // symbol management
+
+    // test whether a function is exported by the library
+    bool present(const std::string&amp; name);
+
+    // get the function as a generic pointer
+    void* symbol(const std::string&amp; name);
+
+    ...
+
+  };
+
+}
+</pre>
+
+
+<p>The present method can be used to test whether a dynamic library exprts a symbol with the given
+name. If it does, then it is safe to load that symbol. If not, then trying to load the symbol will
+fail. It is not necessary to use this - loading a missing symbol returns null and this can then be
+tested. However, using present prevents the error fields from being filled in for when you want to
+do your own error handling.</p>
+
+<p>The symbol method loads the symbol and returns the address of the function as a C-style generic
+pointer of type void*. This pointer should be cast onto a suitable function-pointer type and then
+called. See the following section on <a href="#pointers">Function Pointers</a>.</p>
+
+
+<h2 id="errors">Error Handling</h2>
+
+<p>If an error occurs when loading or unloading a library or when getting a symbol, the error fields
+of the dynaload class get set and can then be tested by your program. An error is in two parts: an
+error code indicating which operation (load, unload, symbol) failed and a text string returned by
+the operating system to explain the error further.</p>
+
+<pre class="cpp">
+namespace stlplus
+{
+
+  class dynaload
+  {
+  public:
+
+    ...
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // error management
+
+    // enum values to indicate type of error
+    enum error_t {no_error, load_error, unload_error, symbol_error};
+
+    // test whether there has been an error
+    bool error(void) const;
+
+    // clear an error once it has been handled (or ignored)
+    void clear_error(void);
+
+    // get the type of the error as indicated by the enum error_t
+    error_t error_type(void) const;
+
+    // get the text of the error as provided by the OS
+    std::string error_text(void) const;
+
+    ...
+
+  };
+
+}
+</pre>
+
+<p>The error function tests whether there has been an error - it returns true if there has, false if
+not.</p>
+
+<p>The clear_error method clears any error information dtored in the dynaload object. This is done
+when an error has been handled and you want to be able to check for future errors.</p>
+
+<p>The error_type method returns the enumeration value indicating the type of the error. This can
+have one of 4 values:</p>
+
+<ul>
+<li>no_error: there hasn't been an error</li>
+<li>load_error: an error occurred when trying to load the dynamic library</li>
+<li>unload_error: an error occured when trying to unload the library</li>
+<li>symbol_error: an error occured when trying to get a symbol from the library</li>
+</ul>
+
+<p>The error_text method returns the error message returned by the operating system to explain the
+error. The messages cannot be listed here because they are operating-system dependent. However,
+since it comes from the operating system, it should therefore be in the local language.</p>
+
+<h2 id="pointers">Function-Pointers</h2>
+
+<p>The symbol method returns a handle to a function in the dynamic library. It gives you that handle
+in the form of a generic C-style pointer of type void*. So, how do you use this?</p>
+
+<p>The key to this is to understand how function-pointers work. A function-pointer has a type which
+is defined by the parameter profile of the function. For example, say you had a function with the
+following parameter profile:</p>
+
+<pre class="cpp">
+int minimum(int, int);
+</pre>
+
+<p>To define a function-pointer to contain the address of this type, you start with a typedef:</p>
+
+<pre class="cpp">
+typedef int (*two_int_fn)(int, int);
+</pre>
+
+<p>Note how the function profile is changed into a function-pointer type by adding the typedef
+keyword and placing (* and ) around the function name. The function name is then converted into a
+typename that describes the type in a meaningful way - in this case the type is called two_int_fn
+because it can be used to point to a function that takes two int arguments.</p>
+
+<p>You can declare a variable of this function-pointer type and then assign the address of a
+function to it. The address of a function is obtained from the dynaload class using the symbol
+method. This returns a void* which must be type-cast onto the appropriate type. So, you end up with
+code that looks like this:</p>
+
+<pre class="cpp">
+dynaload arithmetic_fns("arithmetic");
+
+two_int_fn minimum = (two_int_fn)arithmetic_fns.symbol("minimum");
+two_int_fn maximum = (two_int_fn)arithmetic_fns.symbol("maximum");
+
+if (!arithmetic_fns.error())
+{
+  // use the functions
+}
+</pre>
+
+<p>Now that you have the function-pointers, how do you call the functions? Well, the
+function-pointer variables become function names and can simply be called with the requisite number
+of parameters:</p>
+
+<pre class="cpp">
+int result = minimum(a, maximum(b, c));
+</pre>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - containers/exceptions.hpp - Exceptions Thrown by STLplus Containers</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>containers/exceptions.hpp<br>Exceptions Thrown by STLplus Containers</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="exceptions_hpp.html">Browse Header exceptions.hpp</a></li>
+<li class="internal"><a href="#philosophy">Philosophy</a></li>
+<li class="internal"><a href="#standard">The Standard Exceptions</a></li>
+<li class="internal"><a href="#common">STLplus Exceptions</a></li>
+<li class="internal"><a href="#status">Status</a></li>
+</ul>
+
+</div>
+
+<h2 id="philosophy">Philosophy</h2>
+
+<p>The STLplus library throws exceptions to indicate that a component has been
+misused in some way. It never throws an exception during normal operation with
+the notable special case of the <a href="message_handler.html">message_handler</a>
+component which can throw the message_handler_limit_error exception during
+normal execution - read the documentation for message_handler to find out why
+and how to deal with it.</p>
+
+<p>All exceptions used by STLplus are subclasses of std::exception, so all
+exceptions can be handled by simply catching this one superclass. In fact, all
+exceptions are subclasses of either std::logic_error and std::runtime_error.</p>
+
+<p>Of course, instead of just catching std:exception, you can catch particular
+exceptions if there is any special handling to be performed on that particular
+exception.</p>
+
+<p>For example, the following snippet of C++ handles the above-mentioned
+example of the message_handler's limit_error as a special case and then all
+other standard exceptions as a general case:</p>
+
+<pre class="cpp">
+message_handler errors(std::cout, 10, true);
+try
+{
+  // use the error handler
+}
+catch(message_handler_limit_error&amp; exception)
+{
+  // special handling of the error handler's limit_error
+}
+catch(std::exception&amp; exception)
+{
+  // general handling of std::exception and any of its derivatives
+}
+return errors.error_count();
+</pre>
+
+<p>Note that catching an exception by reference preserves the subclass
+information (see "The C++ Programming Language", Bjarne Stroustrup, ch14) so
+that dynamic casts could be used on a std::exception to get the
+subclass information.</p>
+
+<p>In practice, exceptions should only be caught in one or two places in the
+program - the main task of exceptions is to detect programming errors during
+software development. The what() method of the exception returns a char*
+message containing a description of the problem. The STLplus-thrown exceptions
+always indicate which component threw the exception.</p>
+
+<p>The idea is that you catch the exception - probably only in the main()
+function of the application - and print out the what() description. This will
+enable you to get a starting point for looking for the programming error that
+causes the exception to be thrown. In theory at least, release versions of
+software should not throw any exceptions (with the above-mentioned
+message_handler_limit_error being a notable special-case).</p>
+
+<p>The philosophy here is to use C++ standard
+exceptions where they are appropriate (for example std::out_of_range for an
+index that's out of range of an array). If there isn't a standard exception
+that's appropriate, then the exception will be classed as general to the
+STLplus or specific to a component. General exceptions will be collected into
+a header exceptions.hpp whilst specific exceptions will be declared in the
+specific component's header - as is already the case for components like the
+<a href="message_handler.html">message_handler</a> and
+<a href="ntree.html">ntree</a>.</p>
+
+
+<h2 id="standard">The Standard Exceptions</h2>
+
+<p>The C++ standard includes a set of predefined exceptions, defined in the
+header &lt;stdexcept&gt;. The exceptions are all based on the superclass
+std::exception and form a sub-class hierarchy:</p>
+
+<ul>
+<li class="cross"><strong>exception</strong> - Superclass of all standard exception, never thrown itself
+<ul>
+<li class="tick"><strong>bad_alloc</strong> - Thrown when new runs out of memory</li>
+<li class="tick"><strong>bad_exception</strong> - Thrown if an exception is thrown which is not listed in a function's exception specification.</li>
+<li class="tick"><strong>bad_cast</strong> - Thrown if you attempt an invalid dynamic_cast expression</li>
+<li class="tick"><strong>bad_typeid</strong> - Thrown if you use a NULL pointer in a typeid expression</li>
+<li class="cross"><strong>logic_error</strong> - Superclass for all logic errors, never thrown itself.
+<ul>
+<li class="tick"><strong>length_error</strong> - Thrown when an object is constructed that would exceed its maximum permitted size (e.g., a string instance).</li>
+<li class="tick"><strong>domain_error</strong> - Thrown to report domain errors (domain in the mathematical sense).</li>
+<li class="tick"><strong>out_of_range</strong> - Thrown if an argument has a value which is not within the expected range (e.g. boundary checks in string).</li>
+<li class="tick"><strong>invalid_argument</strong> - Thrown to report invalid arguments to functions.</li>
+</ul>
+</li>
+<li class="cross"><strong>runtime_error</strong> - Superclass for all runtime errors, never thrown itself.
+<ul>
+<li class="tick"><strong>range_error</strong> - Thrown to indicate range errors in internal computations.</li>
+<li class="tick"><strong>overflow_error</strong> - Thrown to indicate arithmetic overflow.</li>
+<li class="tick"><strong>underflow_error</strong> - Thrown to indicate arithmetic underflow.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>Note: those exceptions marked with a <img alt="tick" src="tick.png"> can be thrown themselves
+whereas those exceptions marked with a <img alt="cross" src="cross.png"> are never thrown
+themselves, but serve as intermediate classes in the hierarchy. You can catch these intermediate
+classes in which case you will catch all subclasses of them. For example, catching a runtime_error
+will catch any of range_error, overflow_error or underflow_error plus any other subclasses that may
+be defined in the future by either the standards committee or by you. It is good practice to catch
+the intermediate classes because your code will work correctly if new
+exceptions are added to the set.</p>
+
+<p>There are two sub-groups of exception: logic_error and runtime_error. These
+represent two different concepts:</p>
+
+<dl>
+
+<dt>Logic Error</dt>
+
+<dd>Logic errors represent problems in the internal logic of a program; in
+theory, these are preventable, and even detectable before the program runs
+(e.g., violations of class invariants).</dd>
+
+<dt>Runtime Error</dt>
+
+<dd>Runtime errors represent problems
+outside the scope of a program; they cannot be easily predicted and can
+generally only be caught as the program executes.</dd>
+
+</dl>
+
+
+<h2 id="common">STLplus Exceptions</h2>
+
+<p>Exceptions used in STLplus that are common to more than one component are
+collected in header <a href="exceptions_hpp.html">exceptions.hpp</a>.</p>
+
+<p>The following exceptions are defined for indicating errors in the use
+of STLplus iterators in the container classes (well, those that have
+iterators) and for indicating errors in smart pointers:</p>
+
+<dl>
+
+<dt>null_dereference : logic_error</dt>
+<dd>This is used to indicate that an iterator or smart pointer which is null
+has been dereferenced. You should always be sure that iterators and smart
+pointers are non-null before using the <code>*</code> or <code>-&gt;</code> operators.</dd>
+
+<dt>end_dereference : logic_error</dt>
+<dd>This is used to indicate that an iterator that is pointing to an end
+element has been dereferenced. In line with STL conventions, the end iterator
+points to the element after the last element in a container, so dereferencing
+such an iterator is illegal (the memory pointed to will be unconstructed).</dd>
+
+<dt>wrong_object : logic_error</dt>
+<dd>This is used to indicate that an iterator which was created by one
+container has been used in a different container. For example, if you have two
+graph objects in your program, create an iterator from one graph and then use
+it in another, then this will throw the wrong_object exception.</dd>
+
+<dt>illegal_copy : logic_error</dt> <dd>This is used to indicate that an attempt
+has been made to create a copy of an object that cannot be copied - typically when it is
+stored in a <a href="smart_ptr.html">smart_ptr_nocopy</a> object.</dd>
+
+</dl>
+
+</div>
+
+</body>
+</html>

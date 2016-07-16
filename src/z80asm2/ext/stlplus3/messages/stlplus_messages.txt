@@ -1,0 +1,14 @@
+# messages required by the CLI parser (see cli_parser.hpp)
+CLI_VALUE_MISSING                option @0 requires a value - end of line was reached instead
+CLI_UNRECOGNISED_OPTION          @0 is not a recognised option for this command
+CLI_NO_VALUES                    argument @0 is invalid - this program doesn't take command-line arguments
+CLI_USAGE_PROGRAM                usage:\n\t@0 { arguments }
+CLI_USAGE_DEFINITIONS            arguments:
+CLI_USAGE_VALUES                 values:
+CLI_USAGE_VALUE_RESULT           \t@0 : from @1
+CLI_USAGE_SWITCH_RESULT          \t-@0 : from @1
+CLI_USAGE_OPTION_RESULT          \t-@0 @1 : from @2
+CLI_INI_HEADER                   configuration files:
+CLI_INI_FILE_PRESENT             \t@0
+CLI_INI_FILE_ABSENT              \t@0 (not found)
+CLI_INI_VARIABLE                 unknown variable "@0" found in Ini file

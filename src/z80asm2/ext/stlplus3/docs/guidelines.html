@@ -1,0 +1,404 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - Coding Guidelines</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>Coding Guidelines</h1>
+</div>
+
+<div id="documentNavigation">
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#1">Use the STL</a></li>
+<li class="internal"><a href="#2">Use STLplus</a></li>
+<li class="internal"><a href="#3">Use std::string</a></li>
+<li class="internal"><a href="#4">Use IOStream</a></li>
+<li class="internal"><a href="#5">Modularise</a></li>
+<li class="internal"><a href="#6">#Include Rules</a></li>
+<li class="internal"><a href="#7">Exceptions</a></li>
+<li class="internal"><a href="#8">New/Delete versus Malloc/Free</a></li>
+<li class="internal"><a href="#9">No Static Objects</a></li>
+<li class="internal"><a href="#10">Make your code portable</a></li>
+<li class="internal"><a href="#11">Avoid the C Runtime Library</a></li>
+</ul>
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>These are a set of basic rules that I developed at a previous company that I worked for to try to
+minimise the incompatibilities in interfaces between different people's code by adopting a standard
+set of coding rules and guidelines. They are intended to be a minimum set since I don't see the
+point in dictating silly things like code layout. </p>
+
+
+<h2 id="1">1. Use the STL</h2>
+
+<p>Basic data structures should be implemented using the STL template classes
+wherever they are appropriate. Most of these are container classes
+implemented using templates but there are other less-used headers too. You
+should not write your own list structures, sets etc.</p>
+
+<p>String processing should use the STL string type in preference to
+char*. Indeed, char* should be considered obsolete.</p>
+
+<p>The STL provides:</p>
+
+<table cellspacing="0">
+<tr><td>string</td><td>dynamic string type</td></tr>
+<tr><td>vector</td><td>dynamic array container</td></tr>
+<tr><td>list</td><td>basic list container </td></tr>
+<tr><td>deque</td><td>double-ended queue container</td></tr>
+<tr><td>pair</td><td>A container for holding a collection of two related objects</td></tr>
+<tr><td>map</td><td>associative storage container</td></tr>
+<tr><td>multimap</td><td>as map container but with multiple entries per key</td></tr>
+<tr><td>set</td><td>associative storage container</td></tr>
+<tr><td>multiset</td><td>as set container but with multiple entries per key</td></tr>
+<tr><td>algorithm</td><td>sorts, searches etc. acting on containers</td></tr>
+<tr><td>functional</td><td>predicates etc. acting on containers</td></tr>
+<tr><td>iostream</td><td>I/O system - but see notes below on I/O</td></tr>
+</table>
+
+<p>There are a number of books around on using the STL. However, I can't recommend one because I
+haven't found a <em>good</em> one yet. A reasonably-useful online guide is to be found at 
+<a href="http://www.cplusplus.com/">CPlusPlus.com</a>.</p>
+
+
+<h2 id="2">2. Use STLplus</h2>
+
+<p>The STLplus library has three objectives: it extends the STL by providing
+extra template classes; it deals with portability issues as discussed in the
+section <a href="#9">"Make your code portable"</a>; and
+it provides a lot of utilities which you will find useful.</p>
+
+<p>The STLplus provides the following continer classes:</p>
+
+<table cellspacing="0">
+<tr><td>smart_ptr</td><td>A memory managing container for holding a single object</td></tr>
+<tr><td>digraph</td><td>A directed graph container</td></tr>
+<tr><td>hash</td><td>A chained hash table container with similar interface to map</td></tr>
+<tr><td>matrix</td><td>A 2-dimensional matrix container</td></tr>
+<tr><td>ntree</td><td>A rooted tree container</td></tr>
+<tr><td>triple</td><td>A container for holding a collection of three related objects</td></tr>
+<tr><td>foursome</td><td>A container for holding a collection of four related objects</td></tr>
+</table>
+
+
+<h2 id="3">3. Use std::string</h2>
+
+<p>If you look at old C programs that do string handling using char* (or char[]) buffers,
+you will find a mess - every time. There will be constant juggling of buffers, reallocation
+to avoid overflow, etc. All of this simply shows that the C-style char* is a bad choice of
+data type for string handling.</p>
+
+<p>All this hassle - and a lot of potential bugs - can be avoided by simply not using char*
+at all. All string handling should be done using std::string throughout.</p>
+
+<p>If you do need to call a C system function that has char* interfaces, then it is a good
+policy to put a C++ wrapper around it that does all the conversions to/from std::string.
+The wrapper function should have only std::string in the interface.</p>
+
+<p>A corollary of this rule is that all C runtime functions using char* interfaces should be
+considered obsolete and either not used - if there is a C++ equivalent - or wrapped in
+such a C++ layer before use.</p>
+
+
+<h2 id="4">4. Use IOStream</h2>
+
+<p>In C++ you have a choice between three I/O systems (unistd from C, stdio
+from C and iostream from C++). This can cause incompatible interfaces.
+Therefore it is good practice to standardise on one.</p>
+
+<p>This choice is simple since it is best to consider the C libraries as obsolete in general,
+although they are useful in some special circumstances. Therefore, all I/O interfaces
+should use IOStream since this is the only C++ I/O system.</p>
+
+<p>There is also support in the STLplus library for a binary dump format. This has the advantage
+that any data structure that is dumped can later be restored - it is a two-way mechanism, whereas
+text I/O is typically human-readable but one-way. See the <a href="persistence.html">persistence</a>
+functions for details.</p>
+
+
+<h2 id="5">5. Modularise</h2>
+
+<p>The recommendation is to have one subsystem declared per header. A subsystem may be a class, with
+possibly sub-classes declared in the same header. Or it could be a collection of closely-related
+functions. For that matter it could be one function. The header file should have the same name as
+the subsystem (no naff abbreviations, you're not limited to 8 letter filenames anymore and haven't
+been for decades) with the extension .hpp for C++ headers and .h for C-only headers.</p>
+
+<p>Source code should be contained in a file with the same name as the header
+but with a .cpp extension for C++ and a .c extension for C-only.</p>
+
+<p>I recommend <strong>not</strong> putting template implementations in headers since headers also
+need to be human-readable. It is amazing how many headers are not human-readable and I consider this
+incompetence. However, there is a requirement that template implementations are visible to the
+compiler in the same way as headers, so should not be put in .cpp files either. My solution to this
+is to have a third file type with a .tpp extension which contains template implementations. This I
+#include at the end of the .hpp file that declares the templates so that any code calling a template
+will have access to both declaration and implementation.</p>
+
+
+<h2 id="6">6. #Include Rules</h2>
+
+<p>Include only the minimum set of headers in a header file needed to make all
+the types used in the header available. Any additional headers needed in the
+C++ body should be included in the body file. This minimises the number of
+includes that someone including your header will inherit from you and is
+considered friendly.</p>
+
+<p>Use a sentinel within each header so that the includes in a file become
+order independent. A sentinel puts a pre-processor conditional around the
+whole header file which means that, no matter how many times it is included,
+the contents will only be included once. At the very start of the file (I mean
+lines 1 and 2), for a header called my_stuff.h, the sentinel would look like
+this:</p>
+
+<pre class="cpp">
+#ifndef MY_STUFF_H
+#define MY_STUFF_H
+</pre>
+
+<p>and at the
+very end of the file (and I mean the very last line):</p>
+
+<pre class="cpp">
+#endif
+</pre>
+
+<p>The name of the sentinel here is created by uppercasing the filename and
+changing the dot to an underscore. Some people add a double leading underscore
+on the name. This is perfectly acceptable. The aim is to ensure that all
+sentinel names are different. The second style is:</p>
+
+<pre class="cpp">
+#ifndef __MY_STUFF_H
+#define __MY_STUFF_H
+</pre>
+
+<p>Finally, never include the &quot;using namespace std&quot; clause in a
+header. All STL classes referred to in the header should have the std::
+namespace prefix added - for example, string should be referred to as
+std::string within headers. The reason for this rule is that it is considered
+unfriendly to people who may wish to include your header in their code to dump
+all of the std namespace into their code against their wishes, which is what
+the using... clause does.</p>
+
+<p>In body files, you are free to do what you like with namespaces, since
+no-one includes body files. By the way, the preferred way of including a C++
+system header is:</p>
+
+<pre class="cpp">
+#include &lt;string&gt;
+</pre>
+
+<p>Note the lack of an extension.</p>
+
+<p>Also note that for C system headers, there are two forms. The normal form
+still works:</p>
+
+<pre class="cpp">
+#include &lt;stdlib.h&gt;
+</pre>
+
+<p>This is just as in C and makes the stdlib functions and types available.
+However, you can drop the &quot;.h&quot; and add a &quot;c&quot; prefix and it
+puts the header into the std:: namespace:</p>
+
+<pre class="cpp">
+#include &lt;cstdlib&gt;
+</pre>
+
+<p>If you now add the "using namespace std" then you're back to where you
+started, but you could alternatively refer to the contents of stdlib with the
+std:: prefix. </p>
+
+
+<h2 id="7">7. Exceptions</h2>
+
+<p>Exceptions should only be used for error conditions. They should not be part of the normal
+execution path of a program. It may seem that an exception can be used to return a value of a
+different type from the declared return type of a function, but this is extremely bad practice since
+it obfuscates your code. It also has performance implications, because compiler writers are under
+absolutely no obligation whatsoever to make exception handling fast. Indeed, there is an unwritten
+rule that code optimisation should focus on speeding up the normal operation of a program, not the
+erroneous operation so the implementation of exception handling is usually designed to minimise
+impact on normal operation.</p>
+
+<p>Mere user errors or input errors should be indicated by returning an appropriate value from a
+function, setting a flag, dropping out of a loop or other 'normal' C++ operations. Only program
+failures should be handled by exceptions.</p>
+
+
+<h2 id="8">8. New/Delete versus Malloc/Free</h2>
+
+<p>You should always <code>delete</code> an object created using <code>new</code> and always <code>free</code>
+an object created using <code>malloc</code>. This is because the C++ memory manager is not guaranteed to
+be compatible with the C memory manager, even though it usually is. Note there is a difference
+between "guaranteed" and "usually". Just because "it works" with your compiler does not make it
+correct. It will probably <strong>not</strong> work with another compiler or a later edition of your
+current one.</p>
+
+<p>Furthermore, <code>realloc</code> should only be used on memory
+allocated with <code>malloc</code>, never memory created with <code>new</code>.</p>
+
+<p>You need to keep open the possibility of adding either a cached or debugging version of the
+memory manager. For example, a cached memory manager could speed up <code>new</code> and <code>delete</code>
+but in a way which could make them incompatible with <code>malloc</code> and <code>free</code>.</p>
+
+<p>The easiest way of ensuring this rule is to only use <code>new</code> and <code>delete</code> and
+consider <code>malloc</code>, <code>realloc</code> and <code>free</code> to be obsolete, which of course they
+are, along with most of the C runtime.</p>
+
+
+<h2 id="9">9. No Static Objects</h2>
+
+<p>You may wish to repackage some or all of your code as a shared library (DLL
+in Windows-speak) so all code should really be written with this possibility
+in mind. There can be problems with globals (specifically class globals which
+need to be constructed) in shared libraries and these problems vary between
+operating systems and compilers.</p>
+
+<p>My preference is to try to avoid the problem by avoiding statics
+altogether. This is easy when you start from scratch, but with legacy code it
+is not always as simple as it sounds.</p>
+
+<p>Fortunately, basic types such as bool, int and all pointers are not
+affected by this problem. Thus, if you <em>really</em> must have a global class
+object, make it a global pointer to a class object and dynamically allocate
+the object on first use:</p>
+
+<pre class="cpp">
+static my_stuff* stuff = 0;
+
+bool do_something_now(...)
+{
+  if (!stuff) stuff = new my_stuff(...);
+  ...
+}
+</pre>
+
+
+<h2 id="10">10. Make your code portable</h2>
+
+<p>I believe that <em>everyone</em> is responsible for writing portable code at all times. It is <em>not</em> an SEP
+(someone else's problem). You do not know what will happen to your code in the future - notice for
+example how Gnu/Linux is faring now against Windows. Ten years ago Unix-type OSs were seen as
+scientific-interest only - now they are mainstream. Do you want to be adaptable in the future? Then
+make your code portable!</p>
+
+<p>There are three issues relating to portability:</p>
+
+<h3>1) Portability between compilers</h3>
+
+<p>On Windows you might use Visual C++ or you might use Gnu gcc. On Gnu/Linux you'll be using
+Gnu's gcc. On Macintosh you will possibly be using gcc again, but there are other choices.
+Therefore, if there is any possibility of your code needing to be portable, all code must
+compile with both compilers. In practice this is pretty easy since there are only slight
+differences between them.</p>
+
+<h3>2) Portability between Run-time Libraries</h3>
+
+<p>You should only use standard library functions - ANSI C run-time library and the standard C++
+run-time library. You should not use any non-standard system calls. Nor should you use any extensions to
+the libraries, such as extra classes that a compiler vendor may have added to the STL. Nor should
+you use non-standard 'features' of the standard library functions.</p>
+
+<h3>3) Portability between Operating Systems</h3>
+
+<p>Rule (2) goes a long way to meeting this rule, but there are some things that you have to do
+which are different between Windows and Unix. The three specific areas that could affect your
+development are in file-system handling, internet access and in subprocess handling. These are
+solved by using the STLplus library interfaces for the <a href="file_system.html">File System</a>,
+<a href="tcp_sockets.html">TCP Sockets</a> and <a href="subprocesses.html">Subprocesses</a> respectively. These
+implement both a Windows and a Unix version of these subsystems accessed through a
+platform-independent interface.</p>
+
+<p>If you need to add other functionality that is platform-specific, then you should think about
+providing a Unix and a Windows implementation. You should encapsulate (that means hide) it behind a
+common platform-independent interface in the same way as the above STLPLus subsystems. There should
+therefore be no &quot;#ifdef WIN32&quot; or other platform-specific compiler switches anywhere else
+in your application code.</p>
+
+
+<h2 id="11">11. Avoid the C Runtime Library</h2>
+
+<p>The truth is that the C runtime library is obsolete. Yes, it is. Practically all of the
+functionality of the C runtime is provided in a better, more effective and more robust form in the
+C++ runtime library. For example, the I/O routines of stdio are superceded and vastly improved by
+iostream.</p>
+
+<p>Furthermore, there are some functions in the C runtime that are positively
+<em>dangerous</em> and should never be used. They should never have been written. Their
+use in a program is positive proof of an incompetent programmer. An example is the
+monster called <code>sprintf</code>. Let me explain why this should never, ever, ever
+<em>ever</em> be used. Ever.</p>
+
+<p>First look at the interface:</p>
+
+<pre class="cpp">
+int sprintf(char *, const char *, ...);
+</pre>
+
+<p>The first argument is a char* buffer to print into. The function prints text into this
+buffer according to the format string which is the second argument and the argument-vector
+parameters represented by the elipsis (...). What's missing is a parameter that tells
+sprintf how long the buffer is - so it doesn't know the buffer size and assumes that it is
+infinite. So, the function has no way of knowing if an overflow happens and cannot prevent
+it. If the buffer is <em>not</em> long enough, then the function quite happily runs off the end and
+corrupts other data structures in memory. This kind of memory bug is extremely difficult to
+diagnose and fix. A common bodge (yes, it is a bodge, not a solution) is to simply make the
+buffer very large. However, that just pushes the problem further away, it doesn't fix it.
+Consider the case where one of the parameters in the format string is a command-line
+argument. You as a programmer have no control over the length of this argument. Therefore
+you have no way of deciding how big the buffer should be. Any "guess" at the size is a
+bodge.</p>
+
+<p>This horror of a function is commonly exploited by virus writers who send very long requests to
+web servers so that sprintf overflows its buffer and overwrites program code, replacing it with
+virus code. If sprintf did not exist in this form, we'd probably have fewer viruses.</p>
+
+<p>IOStream provides functions for formatting text in a string (namely, a string-stream)
+that has no potential overflow problems. Therefore there is no justifiable use for
+sprintf.</p>
+
+<p>In any case, using char* for string handling is obsolete because you have to write buckets of
+code to constantly check for possible buffer overflows. You should be using std::string which
+dynamically allocates more memory as required, so you can get on with writing the real code.</p>
+
+<p>Note also that rule <a href="#7">7</a> explained why malloc/free/realloc
+are obsolete and potentially dangerous.</p>
+
+
+</div>
+
+</body>
+</html>

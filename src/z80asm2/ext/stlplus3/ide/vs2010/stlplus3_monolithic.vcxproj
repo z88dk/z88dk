@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\build.cpp" />
+    <ClCompile Include="..\..\source\cli_parser.cpp" />
+    <ClCompile Include="..\..\source\debug.cpp" />
+    <ClCompile Include="..\..\source\dprintf.cpp" />
+    <ClCompile Include="..\..\source\dynaload.cpp" />
+    <ClCompile Include="..\..\source\file_system.cpp" />
+    <ClCompile Include="..\..\source\file_utilities.cpp" />
+    <ClCompile Include="..\..\source\inf.cpp" />
+    <ClCompile Include="..\..\source\ini_manager.cpp" />
+    <ClCompile Include="..\..\source\ip_sockets.cpp" />
+    <ClCompile Include="..\..\source\library_manager.cpp" />
+    <ClCompile Include="..\..\source\message_handler.cpp" />
+    <ClCompile Include="..\..\source\persistent_bool.cpp" />
+    <ClCompile Include="..\..\source\persistent_contexts.cpp" />
+    <ClCompile Include="..\..\source\persistent_cstring.cpp" />
+    <ClCompile Include="..\..\source\persistent_exceptions.cpp" />
+    <ClCompile Include="..\..\source\persistent_float.cpp" />
+    <ClCompile Include="..\..\source\persistent_inf.cpp" />
+    <ClCompile Include="..\..\source\persistent_int.cpp" />
+    <ClCompile Include="..\..\source\persistent_string.cpp" />
+    <ClCompile Include="..\..\source\persistent_vector.cpp" />
+    <ClCompile Include="..\..\source\portability_fixes.cpp" />
+    <ClCompile Include="..\..\source\print_bool.cpp" />
+    <ClCompile Include="..\..\source\print_cstring.cpp" />
+    <ClCompile Include="..\..\source\print_float.cpp" />
+    <ClCompile Include="..\..\source\print_inf.cpp" />
+    <ClCompile Include="..\..\source\print_int.cpp" />
+    <ClCompile Include="..\..\source\print_string.cpp" />
+    <ClCompile Include="..\..\source\print_vector.cpp" />
+    <ClCompile Include="..\..\source\string_bool.cpp" />
+    <ClCompile Include="..\..\source\string_cstring.cpp" />
+    <ClCompile Include="..\..\source\string_float.cpp" />
+    <ClCompile Include="..\..\source\string_inf.cpp" />
+    <ClCompile Include="..\..\source\string_int.cpp" />
+    <ClCompile Include="..\..\source\string_string.cpp" />
+    <ClCompile Include="..\..\source\string_utilities.cpp" />
+    <ClCompile Include="..\..\source\string_vector.cpp" />
+    <ClCompile Include="..\..\source\subprocesses.cpp" />
+    <ClCompile Include="..\..\source\tcp_sockets.cpp" />
+    <ClCompile Include="..\..\source\time.cpp" />
+    <ClCompile Include="..\..\source\timer.cpp" />
+    <ClCompile Include="..\..\source\udp_sockets.cpp" />
+    <ClCompile Include="..\..\source\version.cpp" />
+    <ClCompile Include="..\..\source\wildcard.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\build.hpp" />
+    <ClInclude Include="..\..\source\cli_parser.hpp" />
+    <ClInclude Include="..\..\source\containers.hpp" />
+    <ClInclude Include="..\..\source\containers_fixes.hpp" />
+    <ClInclude Include="..\..\source\copy_functors.hpp" />
+    <ClInclude Include="..\..\source\debug.hpp" />
+    <ClInclude Include="..\..\source\digraph.hpp" />
+    <ClInclude Include="..\..\source\dprintf.hpp" />
+    <ClInclude Include="..\..\source\dynaload.hpp" />
+    <ClInclude Include="..\..\source\exceptions.hpp" />
+    <ClInclude Include="..\..\source\file_system.hpp" />
+    <ClInclude Include="..\..\source\file_utilities.hpp" />
+    <ClInclude Include="..\..\source\format_types.hpp" />
+    <ClInclude Include="..\..\source\foursome.hpp" />
+    <ClInclude Include="..\..\source\hash.hpp" />
+    <ClInclude Include="..\..\source\inf.hpp" />
+    <ClInclude Include="..\..\source\ini_manager.hpp" />
+    <ClInclude Include="..\..\source\ip_sockets.hpp" />
+    <ClInclude Include="..\..\source\library_manager.hpp" />
+    <ClInclude Include="..\..\source\matrix.hpp" />
+    <ClInclude Include="..\..\source\message_handler.hpp" />
+    <ClInclude Include="..\..\source\ntree.hpp" />
+    <ClInclude Include="..\..\source\persistence.hpp" />
+    <ClInclude Include="..\..\source\persistence_fixes.hpp" />
+    <ClInclude Include="..\..\source\persistent.hpp" />
+    <ClInclude Include="..\..\source\persistent_basic.hpp" />
+    <ClInclude Include="..\..\source\persistent_bitset.hpp" />
+    <ClInclude Include="..\..\source\persistent_bool.hpp" />
+    <ClInclude Include="..\..\source\persistent_callback.hpp" />
+    <ClInclude Include="..\..\source\persistent_complex.hpp" />
+    <ClInclude Include="..\..\source\persistent_contexts.hpp" />
+    <ClInclude Include="..\..\source\persistent_cstring.hpp" />
+    <ClInclude Include="..\..\source\persistent_deque.hpp" />
+    <ClInclude Include="..\..\source\persistent_digraph.hpp" />
+    <ClInclude Include="..\..\source\persistent_enum.hpp" />
+    <ClInclude Include="..\..\source\persistent_exceptions.hpp" />
+    <ClInclude Include="..\..\source\persistent_float.hpp" />
+    <ClInclude Include="..\..\source\persistent_foursome.hpp" />
+    <ClInclude Include="..\..\source\persistent_hash.hpp" />
+    <ClInclude Include="..\..\source\persistent_inf.hpp" />
+    <ClInclude Include="..\..\source\persistent_int.hpp" />
+    <ClInclude Include="..\..\source\persistent_interface.hpp" />
+    <ClInclude Include="..\..\source\persistent_list.hpp" />
+    <ClInclude Include="..\..\source\persistent_map.hpp" />
+    <ClInclude Include="..\..\source\persistent_matrix.hpp" />
+    <ClInclude Include="..\..\source\persistent_multimap.hpp" />
+    <ClInclude Include="..\..\source\persistent_multiset.hpp" />
+    <ClInclude Include="..\..\source\persistent_ntree.hpp" />
+    <ClInclude Include="..\..\source\persistent_pair.hpp" />
+    <ClInclude Include="..\..\source\persistent_pointer.hpp" />
+    <ClInclude Include="..\..\source\persistent_pointers.hpp" />
+    <ClInclude Include="..\..\source\persistent_set.hpp" />
+    <ClInclude Include="..\..\source\persistent_shared_ptr.hpp" />
+    <ClInclude Include="..\..\source\persistent_shortcuts.hpp" />
+    <ClInclude Include="..\..\source\persistent_simple_ptr.hpp" />
+    <ClInclude Include="..\..\source\persistent_smart_ptr.hpp" />
+    <ClInclude Include="..\..\source\persistent_stl.hpp" />
+    <ClInclude Include="..\..\source\persistent_stlplus.hpp" />
+    <ClInclude Include="..\..\source\persistent_string.hpp" />
+    <ClInclude Include="..\..\source\persistent_triple.hpp" />
+    <ClInclude Include="..\..\source\persistent_vector.hpp" />
+    <ClInclude Include="..\..\source\persistent_xref.hpp" />
+    <ClInclude Include="..\..\source\portability.hpp" />
+    <ClInclude Include="..\..\source\portability_exceptions.hpp" />
+    <ClInclude Include="..\..\source\portability_fixes.hpp" />
+    <ClInclude Include="..\..\source\print_basic.hpp" />
+    <ClInclude Include="..\..\source\print_bitset.hpp" />
+    <ClInclude Include="..\..\source\print_bool.hpp" />
+    <ClInclude Include="..\..\source\print_cstring.hpp" />
+    <ClInclude Include="..\..\source\print_digraph.hpp" />
+    <ClInclude Include="..\..\source\print_float.hpp" />
+    <ClInclude Include="..\..\source\print_foursome.hpp" />
+    <ClInclude Include="..\..\source\print_hash.hpp" />
+    <ClInclude Include="..\..\source\print_inf.hpp" />
+    <ClInclude Include="..\..\source\print_int.hpp" />
+    <ClInclude Include="..\..\source\print_list.hpp" />
+    <ClInclude Include="..\..\source\print_map.hpp" />
+    <ClInclude Include="..\..\source\print_matrix.hpp" />
+    <ClInclude Include="..\..\source\print_ntree.hpp" />
+    <ClInclude Include="..\..\source\print_pair.hpp" />
+    <ClInclude Include="..\..\source\print_pointer.hpp" />
+    <ClInclude Include="..\..\source\print_sequence.hpp" />
+    <ClInclude Include="..\..\source\print_set.hpp" />
+    <ClInclude Include="..\..\source\print_shared_ptr.hpp" />
+    <ClInclude Include="..\..\source\print_simple_ptr.hpp" />
+    <ClInclude Include="..\..\source\print_smart_ptr.hpp" />
+    <ClInclude Include="..\..\source\print_stl.hpp" />
+    <ClInclude Include="..\..\source\print_stlplus.hpp" />
+    <ClInclude Include="..\..\source\print_string.hpp" />
+    <ClInclude Include="..\..\source\print_triple.hpp" />
+    <ClInclude Include="..\..\source\print_vector.hpp" />
+    <ClInclude Include="..\..\source\safe_iterator.hpp" />
+    <ClInclude Include="..\..\source\simple_ptr.hpp" />
+    <ClInclude Include="..\..\source\smart_ptr.hpp" />
+    <ClInclude Include="..\..\source\stlplus3.hpp" />
+    <ClInclude Include="..\..\source\strings.hpp" />
+    <ClInclude Include="..\..\source\strings_fixes.hpp" />
+    <ClInclude Include="..\..\source\string_basic.hpp" />
+    <ClInclude Include="..\..\source\string_bitset.hpp" />
+    <ClInclude Include="..\..\source\string_bool.hpp" />
+    <ClInclude Include="..\..\source\string_cstring.hpp" />
+    <ClInclude Include="..\..\source\string_digraph.hpp" />
+    <ClInclude Include="..\..\source\string_float.hpp" />
+    <ClInclude Include="..\..\source\string_foursome.hpp" />
+    <ClInclude Include="..\..\source\string_hash.hpp" />
+    <ClInclude Include="..\..\source\string_inf.hpp" />
+    <ClInclude Include="..\..\source\string_int.hpp" />
+    <ClInclude Include="..\..\source\string_list.hpp" />
+    <ClInclude Include="..\..\source\string_map.hpp" />
+    <ClInclude Include="..\..\source\string_matrix.hpp" />
+    <ClInclude Include="..\..\source\string_ntree.hpp" />
+    <ClInclude Include="..\..\source\string_pair.hpp" />
+    <ClInclude Include="..\..\source\string_pointer.hpp" />
+    <ClInclude Include="..\..\source\string_sequence.hpp" />
+    <ClInclude Include="..\..\source\string_set.hpp" />
+    <ClInclude Include="..\..\source\string_shared_ptr.hpp" />
+    <ClInclude Include="..\..\source\string_simple_ptr.hpp" />
+    <ClInclude Include="..\..\source\string_smart_ptr.hpp" />
+    <ClInclude Include="..\..\source\string_stl.hpp" />
+    <ClInclude Include="..\..\source\string_stlplus.hpp" />
+    <ClInclude Include="..\..\source\string_string.hpp" />
+    <ClInclude Include="..\..\source\string_triple.hpp" />
+    <ClInclude Include="..\..\source\string_utilities.hpp" />
+    <ClInclude Include="..\..\source\string_vector.hpp" />
+    <ClInclude Include="..\..\source\subprocesses.hpp" />
+    <ClInclude Include="..\..\source\subsystems.hpp" />
+    <ClInclude Include="..\..\source\subsystems_fixes.hpp" />
+    <ClInclude Include="..\..\source\tcp.hpp" />
+    <ClInclude Include="..\..\source\tcp_sockets.hpp" />
+    <ClInclude Include="..\..\source\time.hpp" />
+    <ClInclude Include="..\..\source\timer.hpp" />
+    <ClInclude Include="..\..\source\triple.hpp" />
+    <ClInclude Include="..\..\source\udp_sockets.hpp" />
+    <ClInclude Include="..\..\source\version.hpp" />
+    <ClInclude Include="..\..\source\wildcard.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\digraph.tpp" />
+    <None Include="..\..\source\foursome.tpp" />
+    <None Include="..\..\source\hash.tpp" />
+    <None Include="..\..\source\make_monolithic.bat" />
+    <None Include="..\..\source\matrix.tpp" />
+    <None Include="..\..\source\ntree.tpp" />
+    <None Include="..\..\source\persistent_bitset.tpp" />
+    <None Include="..\..\source\persistent_callback.tpp" />
+    <None Include="..\..\source\persistent_complex.tpp" />
+    <None Include="..\..\source\persistent_deque.tpp" />
+    <None Include="..\..\source\persistent_digraph.tpp" />
+    <None Include="..\..\source\persistent_enum.tpp" />
+    <None Include="..\..\source\persistent_foursome.tpp" />
+    <None Include="..\..\source\persistent_hash.tpp" />
+    <None Include="..\..\source\persistent_interface.tpp" />
+    <None Include="..\..\source\persistent_list.tpp" />
+    <None Include="..\..\source\persistent_map.tpp" />
+    <None Include="..\..\source\persistent_matrix.tpp" />
+    <None Include="..\..\source\persistent_multimap.tpp" />
+    <None Include="..\..\source\persistent_multiset.tpp" />
+    <None Include="..\..\source\persistent_ntree.tpp" />
+    <None Include="..\..\source\persistent_pair.tpp" />
+    <None Include="..\..\source\persistent_pointer.tpp" />
+    <None Include="..\..\source\persistent_set.tpp" />
+    <None Include="..\..\source\persistent_shared_ptr.tpp" />
+    <None Include="..\..\source\persistent_shortcuts.tpp" />
+    <None Include="..\..\source\persistent_simple_ptr.tpp" />
+    <None Include="..\..\source\persistent_smart_ptr.tpp" />
+    <None Include="..\..\source\persistent_string.tpp" />
+    <None Include="..\..\source\persistent_triple.tpp" />
+    <None Include="..\..\source\persistent_vector.tpp" />
+    <None Include="..\..\source\persistent_xref.tpp" />
+    <None Include="..\..\source\print_bitset.tpp" />
+    <None Include="..\..\source\print_digraph.tpp" />
+    <None Include="..\..\source\print_foursome.tpp" />
+    <None Include="..\..\source\print_hash.tpp" />
+    <None Include="..\..\source\print_list.tpp" />
+    <None Include="..\..\source\print_map.tpp" />
+    <None Include="..\..\source\print_matrix.tpp" />
+    <None Include="..\..\source\print_ntree.tpp" />
+    <None Include="..\..\source\print_pair.tpp" />
+    <None Include="..\..\source\print_pointer.tpp" />
+    <None Include="..\..\source\print_sequence.tpp" />
+    <None Include="..\..\source\print_set.tpp" />
+    <None Include="..\..\source\print_shared_ptr.tpp" />
+    <None Include="..\..\source\print_simple_ptr.tpp" />
+    <None Include="..\..\source\print_smart_ptr.tpp" />
+    <None Include="..\..\source\print_triple.tpp" />
+    <None Include="..\..\source\print_vector.tpp" />
+    <None Include="..\..\source\safe_iterator.tpp" />
+    <None Include="..\..\source\simple_ptr.tpp" />
+    <None Include="..\..\source\smart_ptr.tpp" />
+    <None Include="..\..\source\string_bitset.tpp" />
+    <None Include="..\..\source\string_digraph.tpp" />
+    <None Include="..\..\source\string_foursome.tpp" />
+    <None Include="..\..\source\string_hash.tpp" />
+    <None Include="..\..\source\string_list.tpp" />
+    <None Include="..\..\source\string_map.tpp" />
+    <None Include="..\..\source\string_matrix.tpp" />
+    <None Include="..\..\source\string_ntree.tpp" />
+    <None Include="..\..\source\string_pair.tpp" />
+    <None Include="..\..\source\string_pointer.tpp" />
+    <None Include="..\..\source\string_sequence.tpp" />
+    <None Include="..\..\source\string_set.tpp" />
+    <None Include="..\..\source\string_shared_ptr.tpp" />
+    <None Include="..\..\source\string_simple_ptr.tpp" />
+    <None Include="..\..\source\string_smart_ptr.tpp" />
+    <None Include="..\..\source\string_triple.tpp" />
+    <None Include="..\..\source\string_vector.tpp" />
+    <None Include="..\..\source\triple.tpp" />
+    <None Include="..\..\source\unmake_monolithic.bat" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6038157C-CE8A-4694-993E-3EC78BBA79A5}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>stlplus3_monolithic</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\source\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IntDir>$(OutDir)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>stlplus3</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\source\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IntDir>$(OutDir)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>stlplus3</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent Condition="!exists('..\..\source\stlplus3.hpp')">
+      <Command>cd ..\..\source &amp;&amp; make_monolithic</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent Condition="!exists('..\..\source\stlplus3.hpp')">
+      <Command>cd ..\..\source &amp;&amp; make_monolithic</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

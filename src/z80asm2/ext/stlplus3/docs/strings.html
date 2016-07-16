@@ -1,0 +1,268 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - Strings Library</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The <span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span> C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+</div>
+
+<div id="document">
+
+<h1>Strings Library</h1>
+
+<ul>
+<li class="external"><a href="strings_hpp.html">Browse Header strings.hpp</a></li>
+<li class="internal"><a href="#contents">Contents</a></li>
+<li class="internal"><a href="#dependencies">Dependencies</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#overview">Overview</a></li>
+<li class="internal"><a href="#includes">Include Files</a></li>
+</ul>
+
+<h2 id="contents">Contents</h2>
+
+<p>The components provided are:</p>
+
+<ul>
+<li class="external"><a href="string_basic.html">string_basic.hpp: Printing Basic Types</a></li>
+<li class="external"><a href="string_stl.html">string_stl.hpp: Printing STL Containers</a></li>
+<li class="external"><a href="string_stlplus.html">string_stlplus.hpp: Printing STLplus Containers</a></li>
+<li class="external"><a href="string_utilities.html">string_utilities.hpp: Other String-Processing Utilities</a></li>
+</ul>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<p>The strings library has a soft dependency on the containers and portability libraries. This
+means that it only requires these two libraries in order to make their contents persistent. If there is
+no need for that functionality, then it is possible to compile the strings library to exclude
+them.</p>
+
+<p>To compile the strings library in stand-alone mode, you need to add the following
+pre-processor switch to the compiler setup. If you are building using the provided makefile
+system, then this can be added to the file <code>strings/Makefile</code>.</p>
+
+<pre class="script">
+CPPFLAGS += -DNO_STLPLUS_CONTAINERS
+CPPFLAGS += -DNO_STLPLUS_INF
+</pre>
+
+<p>In fact, these lines are already present in the makefile, but commented out.</p>
+
+<p>You will also need to provide these switches in any program that uses the strings library,
+since it controls what's visible in the headers that are included into your code.</p>
+
+<p>You will also need to comment out the dependencies:</p>
+
+<pre class="script">
+#LIBRARIES += ../portability
+#LIBRARIES += ../containers
+</pre>
+
+<p>Note the # comment at the start of the line to comment out these dependencies.</p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The strings library provides the ability to print or perform in-string formatting of data
+structures. It's main purpose is diagnostic printouts of data structures, since the fomatting
+available is fairly simple. However, it can be extended to use in data file generation, for example.</p>
+
+<p>The library also contains some string-processing utilities which I have found I often use but aren't
+available in a portable form in any operating system.</p>
+
+<p>The approach taken with the strings library is to provide a toolkit which makes it easy if
+not trivial to make a data structure printable. However, it is not totally automatic - C++ is too
+flexible a language to be able to take any data structure and just print it. This is why the approach
+has been to provide a toolkit out of which printing routines can be written.</p>
+
+<h2 id="overview">Overview</h2>
+
+<p>The library provides a set of functions for printing out container classes in terms of print
+functions for printing out the contained type. So, a complex data structure can be printed by
+assembling print routines in layers corresponding to the layers of the data structure. Funtions are
+provided in pairs: a print function for use with iostream and a to_string function for in-string
+formatting.</p>
+
+<p>For example, a std::vector of std::string is printed by repeatedly calling the dump routine for
+string. The elements are separated by a user-defined separator string.</p>
+
+<p>The same concept is applied to all the container classes. Therefore, to make a container
+printable, all you have to do is supply print and/or to_string functions for the contained type. If the
+contained type is a basic C or C++ type, then these functions are already provided and the data
+structure is already printable.</p>
+
+<p>The print functions for simple types are non-templates. For example,
+here is the print functions for std::string:</p>
+
+<pre class="cpp">
+void print_string(std::ostream&amp; device, const std::string&amp; value);
+</pre>
+
+<p>The name of the function is always <code>print_<em>type</em></code>.</p>
+
+<p>The in-string formatting function does not take an ostream paremeter, but instead returns the
+string representation:</p>
+
+<pre class="cpp">
+std::string string_to_string(const std::string&amp; value);
+</pre>
+
+<p>This function seems pointless - but in fact is necassary because it can then be passed to a
+higher-level print function. For example, to generate a string representation of a vector of
+strings, you use vector_to_string which has the following parameter profile:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename S&gt;
+std::string vector_to_string(const std::vector&lt;T&gt;&amp; values,
+                             S to_string_fn,
+                             const std::string&amp; separator);
+</pre>
+
+<p>So, the first parameter is the data to be formatted, the second is a pointer to a function - such
+as string_to_string - to be used to format the elements of the vector.</p>
+
+<pre class="cpp">
+std::string result = stlplus::vector_to_string(data, stlplus::string_to_string, ",");
+</pre>
+
+<p>This assembly of functions can be continued indefinitely. For example, to print a list of
+vectors of strings, simply add the next layer. The list functions are:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename S&gt;
+std::string list_to_string(const std::list&lt;T&gt;&amp; values,
+                           S to_string_fn,
+                           const std::string&amp; separator);
+</pre>
+
+<p>However, the S parameter - the to_string_fn - must be a single-parameter function.
+This means you need to wrap the existing vector_to_string call into a specialisation function:</p>
+
+<pre class="cpp">
+std::string string_vector_to_string(const std::vector&lt;std::string&gt;& data)
+{
+  return stlplus::vector_to_string(data, stlplus::string_to_string, ",");
+}
+</pre>
+
+<p>It is now possible to implement the list formatting function, and of course, this can then be
+wrapped into a two-parameter function to be used in yet another level of data structure.</p>
+
+<pre class="cpp">
+std::string string_vector_list_to_string(const std::list&lt;std::vector&lt;std::string&gt; &gt;&amp; data)
+{
+  return stlplus::list_to_string(data, stlplus::string_vector_to_string, ":");
+}
+</pre>
+
+<h2 id="includes">Include Files</h2>
+
+<table cellspacing="0">
+<caption>Print Functions</caption>
+<thead>
+<tr><th align="left">Type</th><th align="left">Library</th><th align="left">Include</th><th align="left">Function Names</th></tr>
+</thead>
+
+<tbody>
+<tr><td>bool</td>                        <td><a href="string_basic.html">C</a></td>         <td>print_bool.hpp</td>       <td>print_bool</td></tr>
+<tr><td>short</td>                       <td><a href="string_basic.html">C</a></td>         <td>print_int.hpp</td>        <td>print_short</td></tr>
+<tr><td>unsigned short</td>              <td><a href="string_basic.html">C</a></td>         <td>print_int.hpp</td>        <td>print_unsigned_short</td></tr>
+<tr><td>int</td>                         <td><a href="string_basic.html">C</a></td>         <td>print_int.hpp</td>        <td>print_int</td></tr>
+<tr><td>unsigned</td>                    <td><a href="string_basic.html">C</a></td>         <td>print_int.hpp</td>        <td>print_unsigned</td></tr>
+<tr><td>long</td>                        <td><a href="string_basic.html">C</a></td>         <td>print_int.hpp</td>        <td>print_long</td></tr>
+<tr><td>unsigned long</td>               <td><a href="string_basic.html">C</a></td>         <td>print_int.hpp</td>        <td>print_unsigned_long</td></tr>
+<tr><td>inf</td>                         <td><a href="string_stlplus.html">STLplus</a></td> <td>print_inf.hpp</td>        <td>print_inf</td></tr>
+<tr><td>float</td>                       <td><a href="string_basic.html">C</a></td>         <td>print_float.hpp</td>      <td>print_float</td></tr>
+<tr><td>double</td>                      <td><a href="string_basic.html">C</a></td>         <td>print_float.hpp</td>      <td>print_double</td></tr>
+<tr><td>T*</td>                          <td><a href="string_stl.html">C/C++</a></td>       <td>print_pointer.hpp</td>    <td>print_pointer</td></tr>
+<tr><td>shared_ptr&lt;T&gt;</td>         <td><a href="string_stl.html">STL</a></td>         <td>print_shared_ptr.hpp</td> <td>print_shared_ptr</td></tr>
+<tr><td>smart_ptr&lt;T&gt;</td>          <td><a href="string_stlplus.html">STLplus</a></td> <td>print_smart_ptr.hpp</td>  <td>print_smart_ptr</td></tr>
+<tr><td>simple_ptr&lt;T&gt;</td>         <td><a href="string_stlplus.html">STLplus</a></td> <td>print_simple_ptr.hpp</td> <td>print_simple_ptr</td></tr>
+<tr><td>char*</td>                       <td><a href="string_basic.html">C</a></td>         <td>print_cstring.hpp</td>    <td>print_cstring</td></tr>
+<tr><td>string</td>                      <td><a href="string_stl.html">STL</a></td>         <td>print_string.hpp</td>     <td>print_string</td></tr>
+<tr><td>bitset&lt;N&gt;</td>             <td><a href="string_stl.html">STL</a></td>         <td>print_bitset.hpp</td>     <td>print_bitset</td></tr>
+<tr><td>complex&lt;T&gt;</td>            <td><a href="string_stl.html">STL</a></td>         <td>print_complex.hpp</td>    <td>print_complex</td></tr>
+<tr><td>deque&lt;T&gt;</td>              <td><a href="string_stl.html">STL</a></td>         <td>print_deque.hpp</td>      <td>print_deque</td></tr>
+<tr><td>list&lt;T&gt;</td>               <td><a href="string_stl.html">STL</a></td>         <td>print_list.hpp</td>       <td>print_list</td></tr>
+<tr><td>vector&lt;T&gt;</td>             <td><a href="string_stl.html">STL</a></td>         <td>print_vector.hpp</td>     <td>print_vector</td></tr>
+<tr><td>pair&lt;T1,T2&gt;</td>           <td><a href="string_stl.html">STL</a></td>         <td>print_pair.hpp</td>       <td>print_pair</td></tr>
+<tr><td>triple&lt;T1,T2,T3&gt;</td>      <td><a href="string_stlplus.html">STLplus</a></td> <td>print_triple.hpp</td>     <td>print_triple</td></tr>
+<tr><td>foursome&lt;T1,T2,T3,T4&gt;</td> <td><a href="string_stlplus.html">STLplus</a></td> <td>print_foursome.hpp</td> <td>print_foursome</td></tr>
+<tr><td>hash&lt;K,T,H,E&gt;</td>         <td><a href="string_stlplus.html">STLplus</a></td> <td>print_hash.hpp</td>       <td>print_hash</td></tr>
+<tr><td>map&lt;K,T&gt;</td>              <td><a href="string_stl.html">STL</a></td>         <td>print_map.hpp</td>        <td>print_map</td></tr>
+<tr><td>multimap&lt;K,T&gt;</td>         <td><a href="string_stl.html">STL</a></td>         <td>print_multimap.hpp</td>   <td>print_multimap</td></tr>
+<tr><td>set&lt;T&gt;</td>                <td><a href="string_stl.html">STL</a></td>         <td>print_set.hpp</td>        <td>print_set</td></tr>
+<tr><td>multiset&lt;T&gt;</td>           <td><a href="string_stl.html">STL</a></td>         <td>print_multiset.hpp</td>   <td>print_multiset</td></tr>
+<tr><td>digraph&lt;N,A&gt;</td>          <td><a href="string_stlplus.html">STLplus</a></td> <td>print_digraph.hpp</td>    <td>print_digraph</td></tr>
+<tr><td>matrix&lt;T&gt;</td>             <td><a href="string_stlplus.html">STLplus</a></td> <td>print_matrix.hpp</td>     <td>print_matrix</td></tr>
+<tr><td>ntree&lt;T&gt;</td>              <td><a href="string_stlplus.html">STLplus</a></td> <td>print_ntree.hpp</td>      <td>print_ntree</td></tr>
+</tbody>
+
+</table>
+
+<table cellspacing="0">
+<caption>String-Formatting Functions</caption>
+<thead>
+<tr><th align="left">Type</th><th align="left">Library</th><th align="left">Include</th><th align="left">Function Names</th></tr>
+</thead>
+
+<tbody>
+<tr><td>bool</td>                        <td><a href="string_basic.html">C</a></td>         <td>string_bool.hpp</td>       <td>bool_to_string</td></tr>
+<tr><td>short</td>                       <td><a href="string_basic.html">C</a></td>         <td>string_int.hpp</td>        <td>short_to_string</td></tr>
+<tr><td>unsigned short</td>              <td><a href="string_basic.html">C</a></td>         <td>string_int.hpp</td>        <td>unsigned_short_to_string</td></tr>
+<tr><td>int</td>                         <td><a href="string_basic.html">C</a></td>         <td>string_int.hpp</td>        <td>int_to_string</td></tr>
+<tr><td>unsigned</td>                    <td><a href="string_basic.html">C</a></td>         <td>string_int.hpp</td>        <td>unsigned_to_string</td></tr>
+<tr><td>long</td>                        <td><a href="string_basic.html">C</a></td>         <td>string_int.hpp</td>        <td>long_to_string</td></tr>
+<tr><td>unsigned long</td>               <td><a href="string_basic.html">C</a></td>         <td>string_int.hpp</td>        <td>unsigned_long_to_string</td></tr>
+<tr><td>inf</td>                         <td><a href="string_stlplus.html">STLplus</a></td> <td>string_inf.hpp</td>        <td>inf_to_string</td></tr>
+<tr><td>float</td>                       <td><a href="string_basic.html">C</a></td>         <td>string_float.hpp</td>      <td>float_to_string</td></tr>
+<tr><td>double</td>                      <td><a href="string_basic.html">C</a></td>         <td>string_float.hpp</td>      <td>double_to_string</td></tr>
+<tr><td>T*</td>                          <td><a href="string_stl.html">C/C++</a></td>       <td>string_pointer.hpp</td>     <td>pointer_to_string</td></tr>
+<tr><td>shared_ptr&lt;T&gt;</td>         <td><a href="string_stl.html">STL</a></td>         <td>string_smart_ptr.hpp</td>  <td>smart_ptr_to_string</td></tr>
+<tr><td>smart_ptr&lt;T&gt;</td>          <td><a href="string_stlplus.html">STLplus</a></td> <td>string_smart_ptr.hpp</td>  <td>smart_ptr_to_string</td></tr>
+<tr><td>simple_ptr&lt;T&gt;</td>         <td><a href="string_stlplus.html">STLplus</a></td> <td>string_smart_ptr.hpp</td>  <td>smart_ptr_to_string</td></tr>
+<tr><td>char*</td>                       <td><a href="string_basic.html">C</a></td>         <td>string_cstring.hpp</td>    <td>cstring_to_string</td></tr>
+<tr><td>string</td>                      <td><a href="string_stl.html">STL</a></td>         <td>string_string.hpp</td>     <td>string_to_string</td></tr>
+<tr><td>bitset&lt;N&gt;</td>             <td><a href="string_stl.html">STL</a></td>         <td>string_bitset.hpp</td>     <td>bitset_to_string</td></tr>
+<tr><td>complex&lt;T&gt;</td>            <td><a href="string_stl.html">STL</a></td>         <td>string_complex.hpp</td>    <td>complex_to_string</td></tr>
+<tr><td>deque&lt;T&gt;</td>              <td><a href="string_stl.html">STL</a></td>         <td>string_deque.hpp</td>      <td>deque_to_string</td></tr>
+<tr><td>list&lt;T&gt;</td>               <td><a href="string_stl.html">STL</a></td>         <td>string_list.hpp</td>       <td>list_to_string</td></tr>
+<tr><td>vector&lt;T&gt;</td>             <td><a href="string_stl.html">STL</a></td>         <td>string_vector.hpp</td>     <td>vector_to_string</td></tr>
+<tr><td>pair&lt;T1,T2&gt;</td>           <td><a href="string_stl.html">STL</a></td>         <td>string_pair.hpp</td>       <td>pair_to_string</td></tr>
+<tr><td>triple&lt;T1,T2,T3&gt;</td>      <td><a href="string_stlplus.html">STLplus</a></td> <td>string_triple.hpp</td>     <td>triple_to_string</td></tr>
+<tr><td>foursome&lt;T1,T2,T3,T4&gt;</td> <td><a href="string_stlplus.html">STLplus</a></td> <td>string_foursome.hpp</td> <td>foursome_to_string</td></tr>
+<tr><td>hash&lt;K,T,H,E&gt;</td>         <td><a href="string_stlplus.html">STLplus</a></td> <td>string_hash.hpp</td>       <td>hash_to_string</td></tr>
+<tr><td>map&lt;K,T&gt;</td>              <td><a href="string_stl.html">STL</a></td>         <td>string_map.hpp</td>        <td>map_to_string</td></tr>
+<tr><td>multimap&lt;K,T&gt;</td>         <td><a href="string_stl.html">STL</a></td>         <td>string_multimap.hpp</td>   <td>multimap_to_string</td></tr>
+<tr><td>set&lt;T&gt;</td>                <td><a href="string_stl.html">STL</a></td>         <td>string_set.hpp</td>        <td>set_to_string</td></tr>
+<tr><td>multiset&lt;T&gt;</td>           <td><a href="string_stl.html">STL</a></td>         <td>string_multiset.hpp</td>   <td>multiset_to_string</td></tr>
+<tr><td>digraph&lt;N,A&gt;</td>          <td><a href="string_stlplus.html">STLplus</a></td> <td>string_digraph.hpp</td>    <td>digraph_to_string</td></tr>
+<tr><td>matrix&lt;T&gt;</td>             <td><a href="string_stlplus.html">STLplus</a></td> <td>string_matrix.hpp</td>     <td>matrix_to_string</td></tr>
+<tr><td>ntree&lt;T&gt;</td>              <td><a href="string_stlplus.html">STLplus</a></td> <td>string_ntree.hpp</td>      <td>ntree_to_string</td></tr>
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - persistence/persistent_stlplus.hpp - Data Persistence for the STLplus Containers</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="persistence.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>persistence/persistent_stlplus.hpp<br>Data Persistence for the STLplus Containers</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#include">Header persistent_stlplus.hpp</a></li>
+<li class="internal"><a href="#smart_ptr">stlplus::smart_ptr</a></li>
+<li class="internal"><a href="#simple_ptr">stlplus::simple_ptr</a></li>
+<li class="internal"><a href="#triple">stlplus::triple</a></li>
+<li class="internal"><a href="#foursome">stlplus::foursome</a></li>
+<li class="internal"><a href="#digraph">stlplus::digraph</a></li>
+<li class="internal"><a href="#hash">stlplus::hash</a></li>
+<li class="internal"><a href="#matrix">stlplus::matrix</a></li>
+<li class="internal"><a href="#ntree">stlplus::ntree</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The template classes provided by the STLplus Containers Library have been made persistent using
+template dump/restore functions. The functions are actually called
+dump_<em>class</em> and stlplus::restore_<em>class</em> where <em>class</em> is the name of the template class. For
+example, the persistence functions for the STLplus hash are called stlplus::dump_hash and stlplus::restore_hash.</p>
+
+<p>The persistence functions for templates are themselves templates, so are automatically adapted to
+the type that the container holds. For example, stlplus::dump_ntree which is the dump routine for
+the STLplus n-ary tree, will adapt to the type being held in the ntree. If the ntree contains std::string,
+then the stlplus::dump_ntree function will dump strings by calling the dump function defined for std::string. The
+template function does this by taking the name of the element dump functions as parameters.</p>
+
+<p>For example:</p>
+
+<pre class="cpp">
+#include &lt;string&gt;
+#include "persistent_contexts.hpp"
+#include "persistent_ntree.hpp"
+#include "persistent_string.hpp"
+
+void stlplus::dump_string_ntree(stlplus::dump_context&amp; context, const stlplus::ntree&lt;std::string&gt;&amp; data)
+{
+  stlplus::dump_ntree(context, data, stlplus::dump_string);
+}
+
+void stlplus::restore_string_ntree(stlplus::restore_context&amp; context, stlplus::ntree&lt;std::string&gt;&amp; data)
+{
+  stlplus::restore_ntree(context, data, stlplus::restore_string);
+}
+</pre>
+
+<p>The last parameter passed to the stlplus::dump_ntree and stlplus::restore_ntree functions is the name of the
+function to use to dump/restore the element type - in this case std::string.</p>
+
+<p>The same parameter profile is used for all dump/restore routines, except that for classes that
+contain more than one type, there will be more than one function name required. For example, the
+std::triple contains three different types, so requires three function names for each call:</p>
+
+<pre class="cpp">
+#include &lt;string&gt;
+#include "triple.hpp"
+#include "persistent_triple.hpp"
+#include "persistent_string.hpp"
+#include "persistent_int.hpp"
+
+typedef stlplus::triple&lt;std::string,int,int&gt; string_int_int_triple;
+
+void stlplus::dump_string_int_int_triple(stlplus::dump_context&amp; context, const string_int_int_triple&amp; data)
+{
+  stlplus::dump_triple(context, data, stlplus::dump_string, stlplus::dump_int, stlplus::dump_int);
+}
+
+void stlplus::restore_string_int_int_triple(stlplus::restore_context&amp; context, string_int_int_triple&amp; data)
+{
+  stlplus::restore_pair(context, data, stlplus::restore_string, stlplus::restore_int);
+}
+</pre>
+
+<p>In this example, stlplus::dump_string and stlplus::dump_int manage the dumping of the two types, whilst
+restore_string and stlplus::restore_int manage the restoration.</p>
+
+<p>In both of these examples, the data structure can be dumped using only functions already provided by the
+persistence library. However, I prefer to wrap the function calls into a top-level function that has a
+simple interface and hides the implementation, as in the example above, even though the
+implementation is one line of code.</p>
+
+<p><strong>Note:</strong>The function passed as a parameter <em>must</em> have only two parameters - the context
+and the data. To pass a function that takes extra parameters, wrap those functions in a wrapper
+function, like the stlplus::dump_string_int_int_triple and stlplus::restore_string_int_int_triple functions above. 
+These functions can be used in a higher-level data structure, whereas the stlplus::dump_pair and
+stlplus:restore_pair cannot because they take more than two parameters.</p>
+
+<h2 id="include">Header persistent_stlplus.hpp</h2>
+
+<ul>
+<li class="external"><a href="persistent_stlplus_hpp.html">Browse Header persistent_stlplus.hpp</a></li>
+</ul>
+
+<p>You can include all of the functions in one go by including persistent_stlplus.hpp. If you prefer
+however, you can include the separate headers for each class being used. The latter approach
+minimises the number of headers that get included indirectly.</p>
+
+<h2 id="smart_ptr">Persistence of stlplus::smart_ptr</h2>
+
+<ul>
+<li class="external"><a href="persistent_smart_ptr_hpp.html">Browse Header persistent_smart_ptr.hpp</a></li>
+</ul>
+
+<p>This header provides persistence functions for the <a href="smart_ptr.html">stlplus::smart_ptr and
+stlplus::smart_ptr_clone</a> classes. This set of functions provides the following interface:</p>
+
+<pre class="cpp">
+// smart_ptr
+
+template&lt;typename T, typename DE&gt;
+void stlplus::dump_smart_ptr(stlplus::dump_context&amp;, const smart_ptr&lt;T&gt;&amp; data, DE stlplus::dump_element)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename RE&gt;
+void stlplus::restore_smart_ptr(stlplus::restore_context&amp;, smart_ptr&lt;T&gt;&amp; data, RE stlplus::restore_element)
+  throw(stlplus::persistent_restore_failed);
+
+// smart_ptr_clone using callback approach
+
+template&lt;typename T&gt;
+void stlplus::dump_smart_ptr_clone_callback(stlplus::dump_context&amp;, const smart_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T&gt;
+void stlplus::restore_smart_ptr_clone_callback(stlplus::restore_context&amp;, smart_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+
+// smart_ptr_clone using interface approach
+
+template&lt;typename T&gt;
+void stlplus::dump_smart_ptr_clone_interface(stlplus::dump_context&amp;, const smart_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T&gt;
+void stlplus::restore_smart_ptr_clone_interface(stlplus::restore_context&amp;, smart_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>There are three dump/restore pairs of functions here. The first pair act on smart_ptr, which is
+the variant that uses copy constructors to perform copying. This pair of functions are templatised
+functions for the persistence of a smart_ptr containing an element of any class and takes as its
+third parameter the function for managing the elements. For example, for a smart_ptr pointing to
+std::string, the element functions would be stlplus::dump_string and stlplus::restore_string.</p>
+
+<p>The second and third pairs of functions are for smart_ptr_clone. This variant of the smart
+pointer (see the page on <a href="smart_ptr.html">smart pointers</a>) is for polymorphic class
+hierarchies. There are two approaches to making such class hierarchies persistent - known as the
+interface approach and the callback appraoch. These last two pairs of functions implement
+persistence using one or other of those two approaches. See the page on <a
+href="persistent_pointers.html">persistence of polymorphic classes</a> for more explanation.</p>
+
+<p>See also the discussion of the <a href="persistent_pointers.html">persistence of pointers</a> and
+its impact on the persistence of smart pointers.</p>
+
+<h2 id="simple_ptr">Persistence of stlplus::simple_ptr</h2>
+
+<ul>
+<li class="external"><a href="persistent_simple_ptr_hpp.html">Browse Header persistent_simple_ptr.hpp</a></li>
+</ul>
+
+<p>This header provides persistence functions for the <a href="simple_ptr.html">stlplus::simple_ptr and
+stlplus::simple_ptr_clone</a> classes. This set of functions provides the following interface:</p>
+
+<pre class="cpp">
+// simple_ptr
+
+template&lt;typename T, typename DE&gt;
+void stlplus::dump_simple_ptr(stlplus::dump_context&amp;, const simple_ptr&lt;T&gt;&amp; data, DE stlplus::dump_element)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename RE&gt;
+void stlplus::restore_simple_ptr(stlplus::restore_context&amp;, simple_ptr&lt;T&gt;&amp; data, RE stlplus::restore_element)
+  throw(stlplus::persistent_restore_failed);
+
+// simple_ptr_clone using callback approach
+
+template&lt;typename T&gt;
+void stlplus::dump_simple_ptr_clone_callback(stlplus::dump_context&amp;, const simple_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T&gt;
+void stlplus::restore_simple_ptr_clone_callback(stlplus::restore_context&amp;, simple_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+
+// simple_ptr_clone using interface approach
+
+template&lt;typename T&gt;
+void stlplus::dump_simple_ptr_clone_interface(stlplus::dump_context&amp;, const simple_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T&gt;
+void stlplus::restore_simple_ptr_clone_interface(stlplus::restore_context&amp;, simple_ptr_clone&lt;T&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>There are three dump/restore pairs of functions here. The first pair act on simple_ptr, which is
+the variant that uses copy constructors to perform copying. This pair of functions are templatised
+functions for the persistence of a simple_ptr containing an element of any class and takes as its
+third parameter the function for managing the elements. For example, for a simple_ptr pointing to
+std::string, the element functions would be stlplus::dump_string and stlplus::restore_string.</p>
+
+<p>The second and third pairs of functions are for simple_ptr_clone. This variant of the smart
+pointer (see the page on <a href="simple_ptr.html">simple pointers</a>) is for polymorphic class
+hierarchies. There are two approaches to making such class hierarchies persistent - known as the
+interface approach and the callback appraoch. These last two pairs of functions implement
+persistence using one or other of those two approaches. See the page on <a
+href="persistent_pointers.html">persistence of polymorphic classes</a> for more explanation.</p>
+
+<p>See also the discussion of the <a href="persistent_pointers.html">persistence of pointers</a> and
+its impact on the persistence of simple pointers.</p>
+
+<h2 id="triple">Persistence of stlplus::triple</h2>
+
+<ul>
+<li class="external"><a href="persistent_triple_hpp.html">Browse Header persistent_triple.hpp</a></li>
+</ul>
+
+<p>This header provides persistence functions for the <a href="triple.html">stlplus::triple</a>
+collection.</p>
+
+<p>The header provides the following functions:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3, typename D1, typename D2, typename D3&gt;
+void stlplus::dump_triple(stlplus::dump_context&amp;, const stlplus::triple&lt;T1,T2,T3&gt;&amp; data, 
+                 D1 stlplus::dump_fn1, D2 stlplus::dump_fn2, D3 stlplus::dump_fn3)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T1, typename T2, typename T3, typename R1, typename R2, typename R3&gt;
+void stlplus::restore_triple(stlplus::restore_context&amp;, stlplus::triple&lt;T1,T2,T3&gt;&amp; data,
+                    R1 stlplus::restore_fn1, R2 stlplus::restore_fn2, R3 stlplus::restore_fn3)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>These functions take three parameters that are names of functions: one for each element in the
+triple. For example, if you were using a triple containing a string and two ints:</p>
+
+<pre class="cpp">
+#include "persistent_contexts.hpp"
+#include "persistent_triple.hpp"
+#include "persistent_string.hpp"
+#include "persistent_int.hpp"
+
+typedef std::triple&lt;std::string,int,int&gt; string_int_int_triple;
+
+void stlplus::dump_string_int_int_triple(stlplus::dump_context&amp; context, const string_int_int_triple&amp; data)
+{
+  stlplus::dump_triple(context, data, stlplus::dump_string, stlplus::dump_int, stlplus::dump_int);
+}
+
+void stlplus::restore_string_int_int_triple(stlplus::restore_context&amp; context, string_int_int_triple&amp; data)
+{
+  stlplus::restore_triple(context, data, stlplus::restore_string, stlplus::restore_int, stlplus::restore_int);
+}
+</pre>
+
+<h2 id="foursome">Persistence of stlplus::foursome</h2>
+
+<ul>
+<li class="external"><a href="persistent_foursome_hpp.html">Browse Header persistent_foursome.hpp</a></li>
+</ul>
+
+<p>This header provides persistence functions for the <a href="foursome.html">stlplus::foursome</a>
+collection.</p>
+
+<p>The header provides the following functions:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3, typename T4, typename D1, typename D2, typename D3, typename D4&gt;
+void stlplus::dump_foursome(stlplus::dump_context&amp;, const stlplus::foursome&lt;T1,T2,T3,T4&gt;&amp; data, 
+                   D1 stlplus::dump_fn1, D2 stlplus::dump_fn2, D3 stlplus::dump_fn3, D4 stlplus::dump_fn4)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T1, typename T2, typename T3, typename T4, typename R1, typename R2, typename R3, typename R4&gt;
+void stlplus::restore_foursome(stlplus::restore_context&amp;, stlplus::foursome&lt;T1,T2,T3,T4&gt;&amp; data,
+                      R1 stlplus::restore_fn1, R2 stlplus::restore_fn2, R3 stlplus::restore_fn3, R4 stlplus::restore_fn4)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>These functions take four parameters that are names of functions: one for each element in the
+foursome. In all other respects it is similar to stlplus::triple.</p>
+
+<h2 id="digraph">Persistence of stlplus::digraph</h2>
+
+<ul>
+<li class="external"><a href="persistent_digraph_hpp.html">Browse Header persistent_digraph.hpp</a></li>
+</ul>
+
+<p>The <a href="digraph.html">stlplus::digraph</a> contains two element types - one on the node and
+one on the arc. So therefore it is parametrised by two element functions.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename NT, typename AT, typename DN, typename DA&gt;
+void stlplus::dump_digraph(stlplus::dump_context&amp;, const digraph&lt;NT,AT&gt;&amp; data, DN stlplus::dump_node, DA stlplus::dump_arc)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename NT, typename AT, typename RN, typename RA&gt;
+void stlplus::restore_digraph(stlplus::restore_context&amp;, digraph&lt;NT,AT&gt;&amp; data, RN stlplus::restore_node, RA stlplus::restore_arc)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a digraph containing
+an element of any class on the node (class NT) and on the arc (class AT) so the persistence
+functions take as their last two parameters the functions for managing the element classes.</p>
+
+<p>In addition to the graph itself, it is also possible to make node and arc iterators persistent.
+For example, if you have another data structure containing iterators to the graph, that other data
+structure can also be made persistent.</p>
+
+<p>The rule is that the graph <em>must</em> be dumped before any of its iterators are dumped. Failure
+to keep to this rule will result in an stlplus::persistent_dump_failed exception being thrown.</p>
+
+<p>The following functions are provided for making iterators persistent:</p>
+
+<pre class="cpp">
+// node iterator
+
+template&lt;typename NT, typename AT, typename NRef, typename NPtr&gt;
+void stlplus::dump_digraph_iterator(stlplus::dump_context&amp; str, const digraph_iterator&lt;NT,AT,NRef,NPtr&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename NT, typename AT, typename NRef, typename NPtr&gt;
+void stlplus::restore_digraph_iterator(stlplus::restore_context&amp; str, digraph_iterator&lt;NT,AT,NRef,NPtr&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+
+// arc iterator
+
+template&lt;typename NT, typename AT, typename NRef, typename NPtr&gt;
+void stlplus::dump_digraph_arc_iterator(stlplus::dump_context&amp; str, const digraph_arc_iterator&lt;NT,AT,NRef,NPtr&gt;&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename NT, typename AT, typename NRef, typename NPtr&gt;
+void stlplus::restore_digraph_arc_iterator(stlplus::restore_context&amp; str, digraph_arc_iterator&lt;NT,AT,NRef,NPtr&gt;&amp; data)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<h2 id="hash">Persistence of stlplus::hash</h2>
+
+<ul>
+<li class="external"><a href="persistent_hash_hpp.html">Browse Header persistent_hash.hpp</a></li>
+</ul>
+
+<p>The <a href="hash.html">stlplus::hash</a> is a variant on the stl::map and like the map contains
+two element types - one for the key and one for the value. So therefore it is parametrised by two
+element functions.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename K, typename T, typename H, typename E, typename DK, typename DT&gt;
+void stlplus::dump_hash(stlplus::dump_context&amp;, const hash&lt;K,T,H,E&gt;&amp; data, DK key_dump_fn, DT val_dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename K, typename T, typename H, typename E, typename RK, typename RT&gt;
+void stlplus::restore_hash(stlplus::restore_context&amp;, hash&lt;K,T,H,E&gt;&amp; data, RK key_restore_fn, RT val_restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a hash and takes as its
+third and fourth parameters the functions for managing the key and value respectively. For example,
+for a hash of ints mapped onto string, the element functions would be
+stlplus::dump_int/stlplus::dump_string and stlplus::restore_int/stlplus::restore_string.</p>
+
+<h2 id="matrix">Persistence of stlplus::matrix</h2>
+
+<ul>
+<li class="external"><a href="persistent_matrix_hpp.html">Browse Header persistent_matrix.hpp</a></li>
+</ul>
+
+<p>An <a href="matrix.html">stlplus::matrix</a> is like a vector but with two dimensions. A matrix
+can contain any type (not just numeric types) and so the persistence functions look quite like the
+vector persistence functions.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename DT&gt;
+void stlplus::dump_matrix(stlplus::dump_context&amp;, const matrix&lt;T&gt;&amp; data, DT stlplus::dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename RT&gt;
+void stlplus::restore_matrix(stlplus::restore_context&amp;, matrix&lt;T&gt;&amp; data, RT stlplus::restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<h2 id="ntree">Persistence of stlplus::ntree</h2>
+
+<ul>
+<li class="external"><a href="persistent_ntree_hpp.html">Browse Header persistent_ntree.hpp</a></li>
+</ul>
+
+<p>The <a href="ntree.html">stlplus::ntree</a> contains one element type. So therefore it is
+parametrised by one element function.</p>
+
+<p>The interface is:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename D&gt;
+void stlplus::dump_ntree(stlplus::dump_context&amp;, const ntree&lt;T&gt;&amp; data, D stlplus::dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename R&gt;
+void stlplus::restore_ntree(stlplus::restore_context&amp;, ntree&lt;T&gt;&amp; data, R stlplus::restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>This pair of functions are templatised functions for the persistence of a ntree containing an
+element of any class so the persistence functions take as their last parameter the functions for
+managing the element classes.</p>
+
+<p>In addition to the tree itself, it is also possible to make iterators persistent.
+For example, if you have another data structure containing iterators to the ntree, that other data
+structure can also be made persistent.</p>
+
+<p>The rule is that the ntree <em>must</em> be dumped before any of its iterators are dumped. Failure
+to keep to this rule will result in an stlplus::persistent_dump_failed exception being thrown.</p>
+
+<p>The following functions are provided for making iterators persistent:</p>
+
+<pre class="cpp">
+// iterator
+
+template&lt;typename T, typename TRef, typename TPtr&gt;
+void stlplus::dump_ntree_iterator(stlplus::dump_context&amp;, const ntree_iterator&lt;T,TRef,TPtr&gt;&amp;)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename TRef, typename TPtr&gt;
+void stlplus::restore_ntree_iterator(stlplus::restore_context&amp;, ntree_iterator&lt;T,TRef,TPtr&gt;&amp;)
+  throw(stlplus::persistent_restore_failed);
+
+// prefix iterator
+
+template&lt;typename T, typename TRef, typename TPtr&gt;
+void stlplus::dump_ntree_prefix_iterator(stlplus::dump_context&amp;, const ntree_prefix_iterator&lt;T,TRef,TPtr&gt;&amp;)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename TRef, typename TPtr&gt;
+void stlplus::restore_ntree_prefix_iterator(stlplus::restore_context&amp;, ntree_prefix_iterator&lt;T,TRef,TPtr&gt;&amp;)
+  throw(stlplus::persistent_restore_failed);
+
+// postfix iterator
+
+template&lt;typename T, typename TRef, typename TPtr&gt;
+void stlplus::dump_ntree_postfix_iterator(stlplus::dump_context&amp;, const ntree_postfix_iterator&lt;T,TRef,TPtr&gt;&amp;)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename TRef, typename TPtr&gt;
+void stlplus::restore_ntree_postfix_iterator(stlplus::restore_context&amp;, ntree_postfix_iterator&lt;T,TRef,TPtr&gt;&amp;)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+
+</div>
+
+</body>
+</html>

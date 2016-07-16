@@ -1,0 +1,254 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Template Files">
+      <UniqueIdentifier>{c873f5ec-512d-4294-ad36-2babaa6fe296}</UniqueIdentifier>
+      <Extensions>tpp</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\persistence\persistent_bitset.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_xref.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_callback.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_complex.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_deque.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_digraph.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_enum.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_foursome.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_hash.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_interface.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_list.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_map.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_matrix.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_multimap.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_multiset.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_ntree.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_pair.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_pointer.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_set.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_shared_ptr.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_shortcuts.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_simple_ptr.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_smart_ptr.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_string.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_triple.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+    <None Include="..\..\persistence\persistent_vector.tpp">
+      <Filter>Template Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistence.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistence_fixes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_basic.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_bitset.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_bool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_callback.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_complex.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_contexts.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_cstring.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_deque.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_digraph.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_enum.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_exceptions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_float.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_foursome.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_hash.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_inf.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_int.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_interface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_list.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_map.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_matrix.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_multimap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_multiset.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_ntree.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_pair.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_pointer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_pointers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_set.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_shared_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_shortcuts.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_simple_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_smart_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_stl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_stlplus.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_string.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_triple.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_vector.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\persistence\persistent_xref.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\persistence\persistent_bool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\persistence\persistent_contexts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\persistence\persistent_cstring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\persistence\persistent_exceptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\persistence\persistent_float.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\persistence\persistent_inf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\persistence\persistent_int.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\persistence\persistent_string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\persistence\persistent_vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

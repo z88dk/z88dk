@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - strings/string_stlplus.hpp - String Formatting of STLplus Containers</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>strings/string_stlplus.hpp<br>String Formatting of STLplus Containers</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#to_string">Conversion of STLplus Containers to String</a></li>
+<li class="internal"><a href="#print">Printing STLplus Containers</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This is a set of functions that perform string formatting and printing of an STLplus container
+such as digraph by simply defining formatting or printing functions for the elements. They extend
+the string formatting and printing functions for <a href="string_basic.html">basic types</a> and <a
+href="string_stl.html">STL containers</a> and have similar interfaces.</p>
+
+<p>There are two separate header files for including these functions:</p>
+
+<ul>
+<li class="external"><a href="string_stlplus_hpp.html">string_stlplus.hpp</a>: For the <em>type</em>_to_string functions</li>
+<li class="external"><a href="print_stlplus_hpp.html">print_stlplus.hpp</a>: For the print_<em>type</em> functions</li>
+</ul>
+
+<h2 id="to_string">Conversion of STLplus Containers to String</h2>
+
+<p>There is a set of functions which are called <em>type</em>_to_string and which are templates. They
+give a convenient way of providing string formatting for the most-commonly uses STL container
+classes. They rely on you writing a <em>type</em>_to_string or print_<em>type</em> function for the type
+contained within the container.</p>
+
+<p>The functions for formatting most STLplus containers have additional formatting parameters such as
+separators for multi-element types. The set of functions applicable to the STLplus containers is:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3, typename S1, typename S2, typename S3&gt;
+std::string stlplus::triple_to_string(const stlplus::triple&lt;T1,T2,T3&gt;&amp; values,
+                                      S1 to_string_fn1,
+                                      S2 to_string_fn2,
+                                      S3 to_string_fn3,
+                                      const std::string&amp; separator);
+
+template&lt;typename T1, typename T2, typename T3, typename T4, typename S1, typename S2, typename S3, typename S4&gt;
+std::string stlplus::foursome_to_string(const stlplus::foursome&lt;T1,T2,T3,T4&gt;&amp; values,
+                                        S1 to_string_fn1,
+                                        S2 to_string_fn2,
+                                        S3 to_string_fn3,
+                                        S4 to_string_fn4,
+                                        const std::string&amp; separator);
+
+template&lt;typename T, typename C, typename S&gt;
+std::string stlplus::smart_ptr_to_string(const stlplus::smart_ptr_base&lt;T,C&gt;&amp; value,
+                                         S to_string_fn,
+                                         const std::string&amp; null_string,
+                                         const std::string&amp; prefix,
+                                         const std::string&amp; suffix);
+
+template&lt;typename T, typename C, typename S&gt;
+std::string stlplus::simple_ptr_to_string(const stlplus::simple_ptr_base&lt;T,C&gt;&amp; value,
+                                         S to_string_fn,
+                                         const std::string&amp; null_string,
+                                         const std::string&amp; prefix,
+                                         const std::string&amp; suffix);
+
+template&lt;typename NT, typename AT, typename NS, typename AS&gt;
+std::string stlplus::digraph_to_string(const stlplus::digraph&lt;NT,AT&gt;&amp; values,
+                                       NS node_to_string_fn,
+                                       AS arc_to_string_fn,
+                                       const std::string&amp; separator);
+
+template&lt;typename K, typename T, typename H, typename E, typename KS, typename TS&gt;
+std::string stlplus::hash_to_string(const stlplus::hash&lt;K,T,H,E&gt;&amp; values,
+                                    KS key_to_string_fn,
+                                    TS value_to_string_fn,
+                                    const std::string&amp; pair_separator,
+                                    const std::string&amp; separator);
+
+template&lt;typename T, typename S&gt;
+std::string stlplus::matrix_to_string(const stlplus::matrix&lt;T&gt;&amp; values,
+                                      S to_string_fn,
+                                      const std::string&amp; column_separator,
+                                      const std::string&amp; row_separator);
+
+template&lt;typename T, typename S&gt;
+std::string stlplus::ntree_to_string(const stlplus::ntree&lt;T&gt;&amp; values,
+                                     S to_string_fn,
+                                     const std::string&amp; separator,
+                                     const std::string&amp; indent_string);
+</pre>
+
+<h2 id="print">Printing Functions</h2>
+
+<p>In parallel with the set of string conversion routines, there is a set of print routines for the
+same set of types. The convention is to have a print_<em>type</em> function that takes an IOStream
+output device, followed by the same parameters as the corresponding <em>type</em>_to_string function
+above.</p>
+
+<p>The set of print functions are:</p>
+
+<pre class="cpp">
+template&lt;typename T1, typename T2, typename T3, typename S1, typename S2, typename S3&gt;
+void stlplus::print_triple(std::ostream&amp;, const stlplus::triple&lt;T1,T2,T3&gt;&amp; values,
+                           S1 print_fn1,
+                           S2 print_fn2,
+                           S3 print_fn3,
+                           const std::string&amp; separator);
+
+template&lt;typename T1, typename T2, typename T3, typename T4, typename S1, typename S2, typename S3, typename S4&gt;
+void stlplus::print_foursome(std::ostream&amp;, const stlplus::foursome&lt;T1,T2,T3,T4&gt;&amp; values,
+                             S1 print_fn1,
+                             S2 print_fn2,
+                             S3 print_fn3,
+                             S4 print_fn4,
+                             const std::string&amp; separator);
+
+template&lt;typename T, typename C, typename S&gt;
+void stlplus::print_smart_ptr(std::ostream&amp;, const stlplus::smart_ptr_base&lt;T,C&gt;&amp; value,
+                              S print_fn,
+                              const std::string&amp; null_string,
+                              const std::string&amp; prefix,
+                              const std::string&amp; suffix);
+
+template&lt;typename T, typename C, typename S&gt;
+void stlplus::print_simple_ptr(std::ostream&amp;, const stlplus::simple_ptr_base&lt;T,C&gt;&amp; value,
+                              S print_fn,
+                              const std::string&amp; null_string,
+                              const std::string&amp; prefix,
+                              const std::string&amp; suffix);
+
+template&lt;typename NT, typename AT, typename NS, typename AS&gt;
+void stlplus::print_digraph(std::ostream&amp;, const stlplus::digraph&lt;NT,AT&gt;&amp; values,
+                            NS node_print_fn,
+                            AS arc_print_fn,
+                            const std::string&amp; separator);
+
+template&lt;typename K, typename T, typename H, typename E, typename KS, typename TS&gt;
+void stlplus::print_hash(std::ostream&amp;, const stlplus::hash&lt;K,T,H,E&gt;&amp; values,
+                         KS key_print_fn,
+                         TS value_print_fn,
+                         const std::string&amp; pair_separator,
+                         const std::string&amp; separator);
+
+template&lt;typename T, typename S&gt;
+void stlplus::print_matrix(std::ostream&amp;, const stlplus::matrix&lt;T&gt;&amp; values,
+                           S print_fn,
+                           const std::string&amp; column_separator,
+                           const std::string&amp; row_separator);
+
+template&lt;typename T, typename S&gt;
+void stlplus::print_ntree(std::ostream&amp;, const stlplus::ntree&lt;T&gt;&amp; values,
+                          S print_fn,
+                          const std::string&amp; separator,
+                          const std::string&amp; indent_string);
+</pre>
+
+
+</div>
+
+</body>
+</html>

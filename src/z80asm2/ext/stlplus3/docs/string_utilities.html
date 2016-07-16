@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - strings/string_utilities.hpp - String Handling and Formatting Functions</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>strings/string_utilities.hpp<br>String Handling and Formatting Functions</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="string_utilities_hpp.html">Browse Header string_utilities.hpp</a></li>
+<li class="internal"><a href="#padding">Padding Function</a></li>
+<li class="internal"><a href="#trimming">Trimming Functions</a></li>
+<li class="internal"><a href="#translate">Character Translating Function</a></li>
+<li class="internal"><a href="#case">Case Changing Functions</a></li>
+<li class="internal"><a href="#split_join">Split and Join Functions</a></li>
+<li class="internal"><a href="#special">Special Displays for Bytes and Seconds</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This header contains a small collection of general-purpose string processing utility functions
+which provide simple interfaces to common transformations.</p>
+
+<h2 id="padding">Padding Function</h2>
+
+<pre class="cpp">
+std::string stlplus::pad(const std::string&amp; str, stlplus::alignment_t alignment, unsigned width, char padch);
+</pre>
+
+<p>The pad function allows a string to be aligned in a fixed-width field. This is controlled by an
+enumeration of type stlplus::alignment_t which specifies how the string is to be aligned within the field. It
+has the following values:</p>
+
+<dl>
+<dt>stlplus::align_left</dt>
+<dd>aligns the string to the left hand side of the field</dd>
+
+<dt>stlplus::align_right</dt>
+<dd>aligns the string to the right hand side of the field</dd>
+
+<dt>stlplus::align_centre</dt>
+<dd>aligns the string to the centre of the field</dd>
+</dl>
+
+<p>If the field is not wide enough, the string is <em>not</em> truncated, it will
+be simply printed in full but with no padding.</p>
+
+<h2 id="trimming">Trimming Functions</h2>
+
+<pre class="cpp">
+std::string stlplus::trim_left(const std::string&amp; val);
+std::string stlplus::trim_right(const std::string&amp; val);
+std::string stlplus::trim(const std::string&amp; val);
+</pre>
+
+<p>The trim functions trim whitespace from the argument. The names are fairly
+self-explanatory - trim_left trims whitespace from the left of the string,
+trim_right from the right of the string and trim trims whitespace from both
+ends of the string. Whitespace is defined by the isspace function from
+&lt;ctype.h&gt;.
+
+<h2 id="case">Case Changing Functions</h2>
+
+<pre class="cpp">
+std::string stlplus::lowercase(const std::string&amp; val);
+std::string stlplus::uppercase(const std::string&amp; val);
+</pre>
+
+<p>The lowercase and uppercase functions are pretty self evident. Note that they
+do not modify their arguments, but return a new string which has been
+case-converted.</p>
+
+<h2 id="translate">Character Translation Function</h2>
+
+<pre class="cpp">
+std::string stlplus::translate(const std::string&amp; input, const std::string&amp; from_set, const std::string&amp; to_set);
+</pre>
+
+<p>This function was inspired by the 'tr' function from Unix. It processes the
+input string to generate the return string by replacing any character in the
+from_set with the character in the same position in the to_set. In other
+words, if a character in the input string is found at index 17 of the
+from_set, the returned string will contain the character in index 17 of the
+to_set. If the to_set is smaller than the from_set, then the extra characters
+represent characters to delete - in other words they map onto nothing. If a
+character is not present in the from_set, it will be copied to the output
+unchanged.</p>
+
+<p>For example:</p>
+
+<pre class="cpp">
+std::string result = stlplus::translate("fred123.txt", "abcdefghijklmnopqrstuvwxyz01234567890", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+</pre>
+
+<p>This example will convert lowercase letters to uppercase letters. It will
+delete digits (the from_set is longer than the to_set) and copy anything else
+unchanged to the output. The result string will therefore be "FRED.TXT".</p>
+
+<h2 id="split_join">Split and Join Functions</h2>
+
+<p>There are two functions in the Perl language which are incredibly useful for string manipulation,
+and which I therefore wanted in C++. These are the split and join functions. Basically the split
+function converts a string into a vector of strings by splitting the string at every occurrence of a
+splitter string. For example, a PATH can be split into its elements by splitting with ":" on Unix or
+";" on Windows (see the <a href="file_system.html#lookup">file_system</a> subsystem for a
+platform-independent interface for this, but yes it does use split internally). The reverse function
+is join, which converts a vector of strings into a single string by interleaving with a joiner
+string.</p>
+
+<p>The function interfaces are:</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; stlplus::split (const std::string&amp; str, const std::string&amp; splitter = "\n");
+std::string stlplus::join (const std::vector&lt;std::string&gt;&amp;, const std::string&amp; joiner = "\n", const std::string&amp; prefix = "", const std::string&amp; suffix = "");
+</pre>
+
+<p>Note that the split function considers the start and the end of the string to
+be split points. It searches from the current split point to the next split
+point and adds the intervening text to the vector. It follows that if the
+splitter appears at the beginning or end of the string, an empty string will be
+added to the vector. Similarly, if two instances of the splitter appear
+consecutively in the string, an empty string will be added to the vector. This
+is correct behaviour, not a bug!</p>
+
+<p>Note also that the join function allows you to add a prefix and a suffix to
+the resulting string, so for example a vector of values could be turned into a
+parenthesised, comma-separated string by a single call which sets the
+joiner=",", prefix="(" and suffix=")".</p>
+
+<p>Another neat use of these functions is in converting one separator into
+another by nesting the calls. For example, to convert a colon-separated string
+into a comma-separated string, simply split and then join:</p>
+
+<pre class="cpp">
+std::string value = "a:b:c:d:e";
+std::string result = stlplus::join(stlplus::split(value,":"),",");
+</pre>
+
+<h2 id="special">Special Displays for Bytes and Seconds</h2>
+
+<p>There are two functions for displaying either a byte-count or an elapsed
+time in seconds in a human-readable form.</p>
+
+<pre class=cpp>
+std::string stlplus::display_bytes(unsigned bytes);
+</pre>
+
+<p>This creates a string representation of the number of bytes, represented as
+a number in B, kB, MB or GB depending on the value. It is approximate in that
+the result is rounded to a sensible number of digits.</p>
+
+<pre class=cpp>
+std::string stlplus::display_time(unsigned seconds);
+</pre>
+
+<p>This function displays the parameter in seconds as a string representation
+in weeks, days, hours, minutes, seconds. For example, "4d 3:02:01" means 4
+days, 3 hours, 2 minutes and 1 second.</p>
+
+
+</div>
+
+</body>
+</html>

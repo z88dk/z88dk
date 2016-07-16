@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - persistence/persistent_contexts.hpp - The Persistence Infrastructure</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="persistence.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>persistence/persistent_contexts.hpp<br>The Persistence I/O Infrastructure</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="persistent_contexts_hpp.html">Browse Header persistent_contexts.hpp</a></li>
+<li class="internal"><a href="#dump">Dump Context</a></li>
+<li class="internal"><a href="#restore">Restore Context</a></li>
+<li class="internal"><a href="#functions">Persistence Functions</a></li>
+</ul>
+
+</div>
+
+<h2 id="dump">Dump Context</h2>
+
+<p>The dump operation is controlled by an object of type <code>dump_context</code> which is defined
+in <a href="persistent_contexts_hpp.html">persistent_contexts.hpp</a>.</p>
+
+<pre class="cpp">
+class stlplus::dump_context
+{
+public:
+  // constructor
+  dump_context(std::ostream&amp; device, unsigned char version = PersistentVersion) throw(persistent_dump_failed);
+  ~dump_context(void);
+
+  // low level output used to dump a byte
+  void put(unsigned char data) throw(persistent_dump_failed);
+
+  // access the device, for example to check the error status
+  const std::ostream&amp; device(void) const;
+
+  // recover the version number of the dumped output
+  unsigned char version(void) const;
+};
+</pre>
+
+<p>A <code>dump_context</code> is initialised with an output device (any derivative of ostream) and
+is then passed down through the hierarchy of <code>dump</code> routines. At the end of the dump, the
+output device can be checked to see if an output error occurred. Here's a typical example of how to
+dump a data structure:</p>
+
+<pre class="cpp">
+std::ofstream output(filename.c_str(), std::ios_base::out | std::ios_base::binary);
+dump_context dumper(output);
+dump(dumper, data);
+</pre>
+
+<p>In this example, you can see how an output file is created using IOStream. Note that the device
+must be in binary mode. Then the <code>dump_context</code> object is initialised with this output
+device. Then the <code>dump</code> function for the data structure is called. The output device
+should be closed, but this will be done by its destructor anyway.</p>
+
+<p>Be careful however to ensure that binary mode is used if you
+transmit dumped data over networks - some programs (such as FTP) may try to
+convert data that looks like line endings to the 'correct' form for the
+operating system - corrupting the persistent data irretrievably.</p>
+
+<p>Any dump operation, including the construction of the context, can throw an
+stlplus::persistent_dump_failed exception. Typically this will be because the write to the output
+file failed.</p>
+
+<p>The constructor can fail because the context writes a small amount of
+internally-required data to the file before the dump starts, so if the writing of this data fails
+the exception will be thrown.</p>
+
+<p>The persistence routines write data using the <code>put</code>method. However, you will rarely if
+ever call this yourself, instead you will call the various dump functions that are defined in the
+rest of the library. The idea is that you define the dump routine for your data structure in terms
+of the dump routines for the elements of that data structure, recursively.</p>
+
+<p>Most of the rest of the class is concerned with declaring support routines for the persistence of
+<a href="persistent_pointers.html">polymorphic types</a>. Their description will be deferred to the
+relevant section.</p>
+
+<h2 id="restore">Restore Context</h2>
+
+<p>A restore operation is controlled by a <code>restore_context</code>
+object.</p>
+
+<pre class="cpp">
+class restore_context
+{
+public:
+  //////////////////////////////////////////////////////////////////////////////
+
+  // constructor
+  restore_context(std::istream&amp; device) throw(persistent_restore_failed);
+  ~restore_context(void);
+
+  // low level input used to restore a byte
+  int get(void) throw(persistent_restore_failed);
+
+  // access the device, for example to check the error status
+  const std::istream&amp; device(void) const;
+
+  // access the version number of the input being restored
+  unsigned char version(void) const;
+};
+#endif
+</pre>
+
+<p>This is initialised with an input IOStream device. Here's an example of how to
+restore a data structure:</p>
+
+<pre class="cpp">
+std::ifstream input(filename.c_str(), std::ios_base::in | std::ios_base::binary);
+restore_context restorer(input);
+restore(restorer, data);
+</pre>
+
+<p>The TextIO device must be in binary mode for persistence to work correctly.</p>
+
+<h2 id="functions">Persistence Functions</h2>
+
+<p>The actual dump/restore of your data structure is performed by dump/restore functions which are
+built up from the persistence library routines. The following pages describe the various sets of
+functions that are available. The final page shows how to put them together.</p>
+
+<ul>
+<li class="external"><a href="persistent_basic.html">persistent_basic.hpp: Persistence of Basic Types</a></li>
+<li class="external"><a href="persistent_stl.html">persistent_stl.hpp: Persistence of STL Containers</a></li>
+<li class="external"><a href="persistent_stlplus.html">persistent_stlplus.hpp: Persistence of STLplus Containers</a></li>
+<li class="external"><a href="persistent_pointers.html">persistent_pointers.hpp: Persistence of Pointers</a></li>
+<li class="external"><a href="persistent_shortcuts.html">persistent_shortcuts.hpp: Shortcut Functions</a></li>
+<li class="external"><a href="persistent_examples.html">Examples of using Persistence</a></li>
+</ul>
+
+
+
+</div>
+
+</body>
+</html>

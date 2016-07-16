@@ -1,0 +1,333 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - Persistence Library</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The <span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span> C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+</div>
+
+<div id="document">
+
+<h1>Persistence Library</h1>
+
+<ul>
+<li class="external"><a href="persistence_hpp.html">Browse Header persistence.hpp</a></li>
+<li class="internal"><a href="#contents">Contents</a></li>
+<li class="internal"><a href="#dependencies">Dependencies</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#overview">Overview</a></li>
+<li class="internal"><a href="#subsystems">Subsystems in the Persistence Library</a></li>
+<li class="internal"><a href="#includes">Include Files</a></li>
+</ul>
+
+<h2 id="contents">Contents</h2>
+
+<p>The components provided are:</p>
+
+<ul>
+<li class="external"><a href="persistent_contexts.html">persistent_contexts.hpp: Persistence Context Classes</a></li>
+<li class="external"><a href="persistent_basic.html">persistent_basic.hpp: Persistence of Basic Types</a></li>
+<li class="external"><a href="persistent_stl.html">persistent_stl.hpp: Persistence of STL Containers</a></li>
+<li class="external"><a href="persistent_stlplus.html">persistent_stlplus.hpp: Persistence of STLplus Containers</a></li>
+<li class="external"><a href="persistent_pointers.html">persistent_pointers.hpp: Persistence of Pointers</a></li>
+<li class="external"><a href="persistent_shortcuts.html">persistent_shortcuts.hpp: Shortcut Functions</a></li>
+<li class="external"><a href="persistent_examples.html">Examples</a></li>
+</ul>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<p>The persistence library has a soft dependency on the containers and portability libraries. This
+means that it only requires these two libraries in order to make their contents persistent. If there is
+no need for that functionality, then it is possible to compile the persistence library to exclude
+them.</p>
+
+<p>To compile the persistence library in stand-alone mode, you need to add the following
+pre-processor switch to the compiler setup. If you are building using the provided makefile
+system, then this can be added to the file <code>persistence/Makefile</code>.</p>
+
+<pre class="script">
+CPPFLAGS += -DNO_STLPLUS_CONTAINERS
+CPPFLAGS += -DNO_STLPLUS_INF
+</pre>
+
+<p>In fact, these lines are already present in the makefile, but commented out.</p>
+
+<p>You will also need to provide these switches in any program that uses the persistence library,
+since it controls what's visible in the headers that are included into your code.</p>
+
+<p>You will also need to comment out the dependencies:</p>
+
+<pre class="script">
+#LIBRARIES += ../portability
+#LIBRARIES += ../containers
+</pre>
+
+<p>Note the # comment at the start of the line to comment out these dependencies.</p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Persistence is the ability to dump a data structure to a "serialised" form and then restore it later
+either in the same run of the program, a later run of a program, or even in a different program. It
+is an easy way to save a program's state or to communicate information in a structural form between
+programs.</p>
+
+<p>Persistence is not limited to disk dumps, since the same idea can be used to transfer
+information from one program to another down a pipe or even an Internet connection. In effect you
+can use persistence to communicate a data structure of any complexity between two programs even if
+they are running on different computers under different operating systems.</p>
+
+<p>At a more basic level, persistence does away with the need to design file formats. Instead, just
+design a data structure and then make that data structure persistent. The file format is designed
+for you by the persistence subsystem.</p>
+
+<p>The persistent format chosen for the STLplus is a binary format so is extremely efficient both in
+data size and in CPU time required. For example, text formats such as XML tend to be dominated by
+the processing required to convert integer values between their machine form (2's-complement binary)
+and the text form (sign-magnitude decimal). This problem doesn't occur with the persistence format
+which dumps and restores in the native binary form.</p>
+
+<p>The data format is platform-independent so that there are no problems in transferring data
+between different computers, regardless of what operating system is
+running, what compiler was used, what processor
+is being used, what convention is used to store numeric types (i.e. little-endian versus
+big-endian) or even what size of word is being used (e.g. 32-bit versus 64-bit).</p>
+
+<p>So, for example, a program compiled with Gnu's gcc on Gnu/Linux running
+  on a 32-bit big-endian processor can transfer data either as a file
+  or over the internet to a program compiled with Microsoft's Visual
+  Studio, running on a 64-bit little-endian processor.</p>
+
+<p>The approach taken with the persistence subsystem is to provide a toolkit which makes it easy if
+not trivial to make a data structure persistent. However, it is not totally automatic - C++ is too
+flexible a language to be able to take any data structure and just dump it. This is why the approach
+has been to provide a toolkit out of which persistence routines can be written.</p>
+
+<p>The toolkit provides a set of functions for dumping and restoring a wide range of types. All the
+basic C types are made persistent, as are C++ types like std::string and
+std::complex. However, the real power of the persistence functions is that template
+functions are provided for making all of the STL and STLplus container classes persistent.</p>
+
+<h2 id="overview">Overview</h2>
+
+<p>The idea is that a container is made persistent by dumping its contents using a dump routine for
+the contained data type. For example, a std::vector of std::string is dumped by dumping vector-specific
+information and then repeatedly calling the dump routine for string. The restore function restores
+the vector and then repeatedly calls the restore function for string to restore the vector's
+contents.</p>
+
+<p>The same concept is applied to all the container classes. Therefore, to make a container
+persistent, all you have to do is supply dump and restore functions for the contained type. If the
+contained type is a basic C or C++ type, then these functions are already provided and the data
+structure is already persistent.</p>
+
+<p>The core of the persistence system are the persistence contexts, which act like I/O objects.
+Indeed, the persistence contexts take an IOStream object to perform the I/O part of the dump/restore
+operation.</p>
+
+<p>The sequence of events is:</p>
+
+<ol>
+<li>Create an IOStream device for the source/target of the dump/restore</li>
+<li>Create a dump_context/restore_context for the dump/restore</li>
+<li>Use the Persistence Functions to perform the dump/restore</li>
+</ol>
+
+<p>The persistence functions are used to build up layers of recursive function calls which parallel
+the data structure being made persistent. So for example, a list of vectors of strings will use the
+persistence functions for list, calling the functions for vector, which in turn calls the functions
+for string. Two sets of functions are written, one for dumping and one for restoring.</p>
+
+<p>Persistence functions for simple types are non-templates and take two arguments. For example,
+here are the dump/restore functions for std::string:</p>
+
+<pre class="cpp">
+void stlplus::dump_string(stlplus::dump_context&amp;, const std::string&amp; data)
+  throw(stlplus::persistent_dump_failed);
+
+void stlplus::restore_string(stlplus::restore_context&amp;, std::string&amp; data) 
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>The persistence functions for container templates take an extra parameter - the name of a
+function to dump/restore the element type of the container. For example, here are the dump/restore
+functions for vector:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename D&gt;
+void stlplus::dump_vector(stlplus::dump_context&amp;, const std::vector&lt;T&gt;&amp; data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename R&gt;
+void stlplus::restore_vector(stlplus::restore_context&amp;, std::vector&lt;T&gt;&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>Note how there is a final parameter dump_fn/restore_fn. In use, these must be provided with the
+name of the function to dump/restore the element type.</p>
+
+<p>For example, to dump a vector of string, combine the above two functions:</p>
+
+<pre class="cpp">
+stlplus::dump_vector(context, data, stlplus::dump_string);
+</pre>
+
+<p>To create a list of vectors of strings, simply add the next layer. The list functions are:</p>
+
+<pre class="cpp">
+template&lt;typename T, typename D&gt;
+void stlplus::dump_list(stlplus::dump_context&amp;, const std::list&lt;T&gt;&amp; data, D dump_fn)
+  throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T, typename R&gt;
+void stlplus::restore_list(stlplus::restore_context&amp;, std::list&lt;T&gt;&amp; data, R restore_fn)
+  throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>However, the last parameter - the dump_fn and restore_fn - must be only two-parameter functions.
+This means you need to wrap the existing dump_vector call into a specialisation function:</p>
+
+<pre class="cpp">
+void dump_string_vector(stlplus::dump_context&amp;, const std::vector&lt;std::string&gt;&amp; data) throw(stlplus::persistent_dump_failed)
+{
+  stlplus::dump_vector(context, data, stlplus::dump_string);
+}
+
+void restore_string_vector(stlplus::restore_context&amp;, std::vector&lt;std::string&gt;&amp; data) throw(stlplus::persistent_restore_failed)
+{
+  stlplus::restore_vector(context, data, stlplus::restore_string);
+}
+</pre>
+
+<p>It is now possible to implement the list routines. For example, to dump a list of vectors of
+string, combine the above two functions:</p>
+
+<pre class="cpp">
+stlplus::dump_list(context, data, dump_string_vector);
+</pre>
+
+<p>And of course, this can then be wrapped into a two-parameter function to be used in yet another
+level of data structure.</p>
+
+<pre class="cpp">
+void dump_string_vector_list(stlplus::dump_context&amp;, const std::list&lt;std::vector&lt;std::string&gt; &gt;&amp; data) throw(stlplus::persistent_dump_failed)
+{
+  stlplus::dump_list(context, data, stlplus::dump_string_vector);
+}
+
+void restore_string_vector_list(stlplus::restore_context&amp;, std::list&lt;std::vector&lt;std::string&gt; &gt;&amp; data) throw(stlplus::persistent_restore_failed)
+{
+  stlplus::restore_list(context, data, stlplus::restore_string_vector);
+}
+</pre>
+
+<p>There are also some shortcut functions that perform the whole three step sequence of creating an
+IOStream device, creating a context and performing the dump/restore in a single step. For example,
+to dump to a file called data.pst:</p>
+
+<pre class="cpp">
+stlplus::dump_to_file(data, "data.pst", dump_string_vector_list, 0);
+</pre>
+
+<h2 id="subsystems">Subsystems in the Persistence Library</h2>
+
+<p>The rest of the explanation is split up into separate pages for each of the main subsystems
+within the persistence library:</p>
+
+<ul>
+<li class="external"><a href="persistent_contexts.html">persistent_contexts.hpp: Persistence Context Classes</a></li>
+<li class="external"><a href="persistent_basic.html">persistent_basic.hpp: Persistence of Basic Types</a></li>
+<li class="external"><a href="persistent_stl.html">persistent_stl.hpp: Persistence of STL Containers</a></li>
+<li class="external"><a href="persistent_stlplus.html">persistent_stlplus.hpp: Persistence of STLplus Containers</a></li>
+<li class="external"><a href="persistent_pointers.html">persistent_pointers.hpp: Persistence of Pointers</a></li>
+<li class="external"><a href="persistent_shortcuts.html">persistent_shortcuts.hpp: Shortcut Functions</a></li>
+<li class="external"><a href="persistent_examples.html">Examples</a></li>
+</ul>
+
+<h2 id="includes">Include Files</h2>
+
+<p>This section lists the types that are already made persistent by the built-in functions in the
+persistence library. In each case, the table below classifies the type and includes a link to the
+relevant page describing that subset of types. For example, all the basic (c-style) types are
+described on one page, the STL types on another and so on. Click on the "Library" column of the type
+you are interested in to go to the page for that type and others in the same category.</p>
+
+<table cellspacing="0">
+<caption>Persistence Functions</caption>
+<thead>
+<tr><th align="left">Type</th><th align="left">Library</th><th align="left">Include</th><th align="left">Function Names</th></tr>
+</thead>
+
+<tbody>
+<tr><td>bool</td>                     <td><a href="persistent_basic.html">C</a></td>      <td>persistent_bool.hpp</td>        <td>dump/restore_bool</td></tr>
+<tr><td>char</td>                     <td><a href="persistent_basic.html">C</a></td>      <td>persistent_int.hpp</td>        <td>dump/restore_char</td></tr>
+<tr><td>signed char</td>              <td><a href="persistent_basic.html">C</a></td>      <td>persistent_int.hpp</td>        <td>dump/restore_signed_char</td></tr>
+<tr><td>unsigned char</td>            <td><a href="persistent_basic.html">C</a></td>      <td>persistent_int.hpp</td>        <td>dump/restore_unsigned_char</td></tr>
+<tr><td>short</td>                    <td><a href="persistent_basic.html">C</a></td>      <td>persistent_int.hpp</td>        <td>dump/restore_short</td></tr>
+<tr><td>unsigned short</td>           <td><a href="persistent_basic.html">C</a></td>      <td>persistent_int.hpp</td>        <td>dump/restore_unsigned_short</td></tr>
+<tr><td>int</td>                      <td><a href="persistent_basic.html">C</a></td>      <td>persistent_int.hpp</td>        <td>dump/restore_int</td></tr>
+<tr><td>unsigned</td>                 <td><a href="persistent_basic.html">C</a></td>      <td>persistent_int.hpp</td>        <td>dump/restore_unsigned</td></tr>
+<tr><td>long</td>                     <td><a href="persistent_basic.html">C</a></td>      <td>persistent_int.hpp</td>        <td>dump/restore_long</td></tr>
+<tr><td>unsigned long</td>            <td><a href="persistent_basic.html">C</a></td>      <td>persistent_int.hpp</td>        <td>dump/restore_unsigned_long</td></tr>
+<tr><td>inf</td>                      <td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_inf.hpp</td>        <td>dump/restore_inf</td></tr>
+<tr><td>enum{}</td>                   <td><a href="persistent_basic.html">C</a></td>      <td>persistent_enum.hpp</td>       <td>dump/restore_enum</td></tr>
+<tr><td>float</td>                    <td><a href="persistent_basic.html">C</a></td>      <td>persistent_float.hpp</td>      <td>dump/restore_float</td></tr>
+<tr><td>double</td>                   <td><a href="persistent_basic.html">C</a></td>      <td>persistent_float.hpp</td>      <td>dump/restore_double</td></tr>
+<tr><td>T* (simple)</td>              <td><a href="persistent_pointers.html">C/C++</a></td>  <td>persistent_pointer.hpp</td>    <td>dump/restore_pointer</td></tr>
+<tr><td>T* (polymorphic, interface)</td><td><a href="persistent_pointers.html">C++</a></td>    <td>persistent_interface.hpp</td>  <td>dump/restore_interface</td></tr>
+<tr><td>T* (polymorphic, callbacks)</td><td><a href="persistent_pointers.html">C++</a></td>  <td>persistent_callback.hpp</td>   <td>dump/restore_callback</td></tr>
+<tr><td>shared_ptr&lt;T&gt; (simple)</td><td><a href="persistent_stl.html">STL</a></td><td>persistent_shared_ptr.hpp</td>  <td>dump/restore_shared_ptr</td></tr>
+<tr><td>shared_ptr&lt;T&gt; (polymophic, interface)</td><td><a href="persistent_stl.html">STL</a></td><td>persistent_shared_ptr.hpp</td><td>dump/restore_shared_ptr_interface</td></tr>
+<tr><td>shared_ptr&lt;T&gt; (polymorphic, callbacks)</td><td><a href="persistent_stl.html">STL</a></td><td>persistent_shared_ptr.hpp</td><td>dump/restore_shared_ptr_callback</td></tr>
+<tr><td>smart_ptr&lt;T&gt; (simple)</td><td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_smart_ptr.hpp</td>  <td>dump/restore_smart_ptr</td></tr>
+<tr><td>smart_ptr_clone&lt;T&gt; (polymophic, interface)</td><td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_smart_ptr.hpp</td><td>dump/restore_smart_ptr_clone_interface</td></tr>
+<tr><td>smart_ptr_clone&lt;T&gt; (polymorphic, callbacks)</td><td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_smart_ptr.hpp</td><td>dump/restore_smart_ptr_clone_callback</td></tr>
+<tr><td>simple_ptr&lt;T&gt; (simple)</td><td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_simple_ptr.hpp</td>  <td>dump/restore_simple_ptr</td></tr>
+<tr><td>simple_ptr_clone&lt;T&gt; (polymophic, interface)</td><td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_simple_ptr.hpp</td><td>dump/restore_simple_ptr_clone_interface</td></tr>
+<tr><td>simple_ptr_clone&lt;T&gt; (polymorphic, callbacks)</td><td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_simple_ptr.hpp</td><td>dump/restore_simple_ptr_clone_callback</td></tr>
+<tr><td>char*</td>                    <td><a href="persistent_basic.html">C</a></td>      <td>persistent_cstring.hpp</td>    <td>dump/restore_cstring</td></tr>
+<tr><td>string</td>                   <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_string.hpp</td>     <td>dump/restore_string</td></tr>
+<tr><td>basic_string&lt;T&gt;</td>    <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_string.hpp</td>     <td>dump/restore_basic_string</td></tr>
+<tr><td>bitset&lt;N&gt;</td>          <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_bitset.hpp</td>     <td>dump/restore_bitset</td></tr>
+<tr><td>complex&lt;T&gt;</td>         <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_complex.hpp</td>    <td>dump/restore_complex</td></tr>
+<tr><td>deque&lt;T&gt;</td>           <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_deque.hpp</td>      <td>dump/restore_deque</td></tr>
+<tr><td>list&lt;T&gt;</td>            <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_list.hpp</td>       <td>dump/restore_list</td></tr>
+<tr><td>vector&lt;T&gt;</td>          <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_vector.hpp</td>     <td>dump/restore_vector</td></tr>
+<tr><td>pair&lt;T1,T2&gt;</td>        <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_pair.hpp</td>       <td>dump/restore_pair</td></tr>
+<tr><td>triple&lt;T1,T2,T3&gt;</td>   <td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_triple.hpp</td>     <td>dump/restore_triple</td></tr>
+<tr><td>foursome&lt;T1,T2,T3,T4&gt;</td><td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_foursome.hpp</td> <td>dump/restore_foursome</td></tr>
+<tr><td>hash&lt;K,T,H,E&gt;</td>      <td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_hash.hpp</td>       <td>dump/restore_hash</td></tr>
+<tr><td>map&lt;K,T&gt;</td>           <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_map.hpp</td>        <td>dump/restore_map</td></tr>
+<tr><td>multimap&lt;K,T&gt;</td>      <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_multimap.hpp</td>   <td>dump/restore_multimap</td></tr>
+<tr><td>set&lt;T&gt;</td>             <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_set.hpp</td>        <td>dump/restore_set</td></tr>
+<tr><td>multiset&lt;T&gt;</td>        <td><a href="persistent_stl.html">STL</a></td>    <td>persistent_multiset.hpp</td>   <td>dump/restore_multiset</td></tr>
+<tr><td>digraph&lt;N,A&gt;</td>       <td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_digraph.hpp</td>    <td>dump/restore_digraph</td></tr>
+<tr><td>matrix&lt;T&gt;</td>          <td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_matrix.hpp</td>     <td>dump/restore_matrix</td></tr>
+<tr><td>ntree&lt;T&gt;</td>           <td><a href="persistent_stlplus.html">STLplus</a></td><td>persistent_ntree.hpp</td>      <td>dump/restore_ntree</td></tr>
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>

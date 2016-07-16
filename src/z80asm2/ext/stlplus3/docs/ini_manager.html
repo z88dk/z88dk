@@ -1,0 +1,228 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - subsystems/ini_manager.hpp - A Manager Class for Ini Files</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="subsystems.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>subsystems/ini_manager.hpp<br>A Manager Class for Ini Files</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="ini_manager_hpp.html">Browse Header ini_manager.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#initialise">Ini File Management</a></li>
+<li class="internal"><a href="#sections">Section Management</a></li>
+<li class="internal"><a href="#variables">Variable Management</a></li>
+<li class="internal"><a href="#diagnostics">Diagnostic Print Routines</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The Ini manager is a subsystem class which manages one or more Ini files.
+These are typically used to store default values for command-line tools and
+indeed for GUI options. A hierarchy of Ini files is supported such that, for
+example, you can have system-wide defaults and user-specified defaults in
+separate files. The most local definition is the visible one and masks values
+from lower-level files. The Ini manager handles this hierarchy for you.</p>
+
+<p>An Ini file is organised in sections and in each section there are any
+number of variables. An example of an Ini file is:</p>
+
+<pre class="script">
+[vlibrary]
+version = on
+
+[vcompile]
+version = on
+93 = on
+87 = on
+ams = on
+
+[vdump]
+version = on
+
+[libraries]
+; generated automatically by the library manager
+ieee = ../library/ieee/lib
+std = ../library/std/lib
+</pre>
+
+<p>Each section has a section title contained in brackets - for example
+"[vlibrary]". Then each variable within that section is in the form
+"&lt;variable&gt;=&lt;value&gt;". Any line starting with ';' is a comment.</p>
+
+<p>The way that you use the Ini manager is to first specify a set of files to
+manage. These are specified in hierarchy order such that the first file has
+the highest priority. This is so that, if there is a variable defined in more
+than one of the files, the highest priority variable will prevail.</p>
+
+<p>Once the set of files has been set up, values can be extracted as a string by
+specifying the section title and the variable name. Multi-values variables can
+be extracted as a vector of strings.</p>
+
+<p>The Ini manager also allows variables to be set. This is only allowed in
+the highest priority file - in other words the user's local file.</p>
+
+
+<h2 id="initialise">Ini File Management</h2>
+
+<p>Setting up the Ini manager is simply a case of constructing one and then
+initialising it with the set of Ini files to manage. The functions that
+support this are:</p>
+
+<pre class="cpp">
+class stlplus::ini_manager
+{
+public:
+  ini_manager(void);
+  bool ini_manager::add_file(const std::string&amp; filename);
+  bool ini_manager::save(void);
+  ~ini_manager(void);
+
+  ...
+};
+</pre>
+
+<p>The constructor doesn't do very much - it just initialises data structures.</p>
+
+<p>Adding a file loads the file into memory, parsing it as an Ini file. Each line
+is classified as a section header, a variable, a comment or a blank line. If
+the file was just too far away from the correct format, the function will
+return false.</p>
+
+<p>Saving the Ini manager causes any Ini files that have been changed to be
+written to disk, thus making the change persistent. The destructor also saves
+to disk.</p>
+
+
+<h2 id="sections">Section Management</h2>
+
+<p>The section management commands are rarely used since they are implicitly
+called from the variable management commands. However, some of them may prove
+useful. For example, to clear all user-specified variables for a particular
+tool, you can delete the section containing variables for that tool. This
+would be useful in a GUI which provides a configuration utility that allows a
+user to customise the interface and save the customisation for future
+runs.</p>
+
+<p>Here are the section management commands:</p>
+
+<pre class="cpp">
+bool ini_manager::section_exists(const std::string&amp; title) const;
+void ini_manager::add_section(const std::string&amp; section);
+bool ini_manager::erase_section(const std::string&amp; section);
+std::vector&lt;std::string&gt; ini_manager::section_names(void) const;
+</pre>
+
+<p>These are pretty self-explanatory. They all act only on the local Ini file,
+i.e. the first one added to the Ini manager. Thus, for example, erasing a
+section only erases it from the local file, not from the system file, so the
+section may still exist.</p>
+
+
+<h2 id="variables">Variable Management</h2>
+
+<p>These are the functions that will be used most. They allow variables within
+a section to be manipulated - either added, changed or erased. The most common
+variable functions
+are:</p>
+
+<pre class="cpp">
+bool ini_manager::variable_exists(const std::string&amp; section, const std::string variable) const;
+std::string ini_manager::variable_value(const std::string&amp; section, const std::string variable) const;
+void ini_manager::add_variable(const std::string&amp; section, const std::string&amp; variable, const std::string&amp; value);
+bool ini_manager::erase_variable(const std::string&amp; section, const std::string&amp; variable);
+</pre>
+
+<p>The variable_exists function test whether the variable is present in any of
+the files in the named section. If not the function returns false. This is
+important because if you try to fetch the value of a non-existent variable,
+you get an empty string; however, a variable that does exist can also have an
+empty value. So the variable_exists function allows you to differentiate
+between these two cases.</p>
+
+<p>The variable_value retrieves the value of the variable as a string. The
+value is the part after the '=' in the file with leading and trailing
+whitespace removed.</p>
+
+<p>The add_variable function adds a variable and its value to the local Ini
+file. If the variable already exists in that file, then it will be erased
+first. The value can be an empty string.</p>
+
+<p>The erase_variable function erases the variable from the named section of
+the local Ini file. It does not erase it from any other Ini files, so the
+variable may still exist after the erase. Effectively, erasing a variable
+makes the system-default value of the variable visible.</p>
+
+<p>Variables can be multi-values, with each value of the variable separated by
+a comma. The following two functions support the idea of a multi-valued variable.</p>
+
+<pre class="cpp">
+std::vector&lt;std::string&gt; ini_manager::variable_values(const std::string&amp; section, const std::string variable) const;
+void ini_manager::add_variable(const std::string&amp; section, const std::string&amp; variable, const std::vector&lt;std::string&gt;&amp; values);
+</pre>
+
+<p>Thus, to the user, a multi-valued variable is represented as a vector of
+strings, whereas in the Ini file it is represented as a comma-separated
+list.</p>
+
+<p>Finally, the following two functions provide extra information about variables.</p>
+
+<pre class="cpp">
+std::string variable_filename(const std::string&amp; section, const std::string variable) const;
+std::vector&lt;std::string&gt; variable_names(const std::string&amp; section) const;
+</pre>
+
+<p>The variable_filename function tells you which Ini file provides the
+visible value of a variable. In other words, the value that would be returned
+by variable_value. The variable_names function returns the set of all
+variables in a section, regardless of which Ini file they came from.</p>
+
+
+<h2 id="diagnostics">Diagnostic Print Routines</h2>
+
+<p>The print functions for the Ini manager print out the Ini manager's
+interpretation of the contents of all the Ini files that have been loaded.</p>
+
+<pre class="cpp">
+std::ostream&amp; operator &lt;&lt; (std::ostream&amp;, const ini_manager&amp;);
+</pre>
+
+
+</div>
+
+</body>
+</html>

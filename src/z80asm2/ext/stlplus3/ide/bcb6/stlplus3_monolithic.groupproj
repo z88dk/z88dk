@@ -1,0 +1,36 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{F32B7444-959E-4FE0-938E-24ABE841ED90}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="stlplus3_monolithic.cbproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="stlplus3">
+			<MSBuild Projects="stlplus3_monolithic.cbproj"/>
+		</Target>
+		<Target Name="stlplus3:Clean">
+			<MSBuild Projects="stlplus3_monolithic.cbproj" Targets="Clean"/>
+		</Target>
+		<Target Name="stlplus3:Make">
+			<MSBuild Projects="stlplus3_monolithic.cbproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="stlplus3"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="stlplus3:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="stlplus3:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>

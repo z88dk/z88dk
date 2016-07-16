@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>containers/copy_functors.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>containers/copy_functors.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_COPY_FUNCTORS
+#define STLPLUS_COPY_FUNCTORS
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   The function constructor classes below are used by the smart_ptr and the
+//   simple_ptr classes. They provide three (well ok, two) copying mechanisms.
+//   These classes have been separated from the smart_ptr header by DJDM, as
+//   the simple_ptr classes now also use them.
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;containers_fixes.hpp&quot;
+#include &quot;exceptions.hpp&quot;
+
+namespace stlplus
+{
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // copy functors implementing the three possible copy semantics
+
+  // constructor_copy uses the copy constructor of the object - used for simple types
+
+  template &lt;typename T&gt;
+  class constructor_copy
+  {
+  public:
+    T* operator() (const T&amp; from) throw()
+      {
+        return new T(from);
+      }
+  };
+
+  // clone_copy uses the clone method of the object - used for polymorphic types
+
+  template &lt;typename T&gt;
+  class clone_copy
+  {
+  public:
+    T* operator() (const T&amp; from) throw()
+      {
+        return from.clone();
+      }
+  };
+
+  // no_copy throws an exception - used for types that cannot be copied
+
+  template &lt;typename T&gt;
+  class no_copy
+  {
+  public:
+    T* operator() (const T&amp; from) throw(illegal_copy)
+      {
+        throw illegal_copy(&quot;no_copy functor called&quot;);
+        return 0;
+      }
+  };
+
+  ////////////////////////////////////////////////////////////////////////////////
+
+} // end namespace stlplus
+
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

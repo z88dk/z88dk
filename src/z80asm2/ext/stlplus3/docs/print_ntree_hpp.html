@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>strings/print_ntree.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>strings/print_ntree.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PRINT_NTREE
+#define STLPLUS_PRINT_NTREE
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Generate a string representation of an ntree
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;strings_fixes.hpp&quot;
+#include &quot;ntree.hpp&quot;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  template&lt;typename T, typename S&gt;
+  void print_ntree(std::ostream&amp; device,
+                   const ntree&lt;T&gt;&amp; values,
+                   S print_fn,
+                   const std::string&amp; separator = &quot;|&quot;,
+                   const std::string&amp; indent_string = &quot;  &quot;);
+
+} // end namespace stlplus
+
+#include &quot;print_ntree.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>

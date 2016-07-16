@@ -1,0 +1,549 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - portability/inf.hpp - An Infinite-Precision Integer Type</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>portability/inf.hpp<br>An Infinite-Precision Integer Type</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="external"><a href="inf_hpp.html">Browse Header inf.hpp</a></li>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#declaring">Declaring and Initialising inf objects</a></li>
+<li class="internal"><a href="#assignments">Assignments</a></li>
+<li class="internal"><a href="#constants">Constant Values</a></li>
+<li class="internal"><a href="#conversions">Converting an inf to an integer type</a></li>
+<li class="internal"><a href="#bits">Bit Manipulation</a></li>
+<li class="internal"><a href="#tests">Value Tests</a></li>
+<li class="internal"><a href="#comparisons">Comparisons</a></li>
+<li class="internal"><a href="#logical">Bitwise Logical Operations</a></li>
+<li class="internal"><a href="#shift">Shift Operators</a></li>
+<li class="internal"><a href="#arithmetic">Arithmetic Operations</a></li>
+<li class="internal"><a href="#increment">Increment and Decrement Operators</a></li>
+<li class="internal"><a href="#strings">String Representation and I/O</a></li>
+<li class="internal"><a href="#exceptions">Exceptions</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This component is an infinite-precision integer type which, through operator
+overloading, has been made to look as much as possible like a built-in integer
+type. Thus you can add infs with a&nbsp;+&nbsp;b and increment it using i++. It
+provides a full set of arithmetic, logical and shifting operations, type
+conversions to and from all the C++ integer types, bitwise manipulation and
+string representation and conversion in any base.</p>
+
+<p>The inf class has been written for portability more than performance.
+If you need a high-performance numeric library it is recommended that the Gnu Multi-Precision (GMP)
+library is used; it is seriously fast.</p>
+
+
+<h2 id="declaring">Declaring and Initialising inf objects</h2>
+
+<p>The inf object looks a bit like an integer type and can be declared and
+initialised in a similar way. However, there is one thing you cannot do, and
+that is simply assign an integer value to it on creation. In other words, the
+following will <strong>not</strong> work:</p>
+
+<pre class="cpp">
+inf b = 0;  // illegal
+</pre>
+
+<p>The reason for this is that, although the inf type has constructors that take
+integer arguents, I've made them <em>explicit</em> which prevents them being used
+by C++ to perform implicit type conversions (all 1-parameter constructors are
+normally considered candidates for type conversions). I was concerned that C++
+compilers can be over-keen on such type conversions and create nasty surprises
+for users. Therefore, to initialise to an integer value, use the C++ constructor
+form:</p>
+
+<pre class="cpp">
+inf c(0);
+</pre>
+
+<p>You may not realise this, but you can use this notation even with the standard
+built-in integer types.</p>
+
+<p>The other significant difference is that an
+uninitialised inf will have the value zero - there is no such thing as an
+unknown value.</p>
+
+<p>For example, here is a way of creating an inf with the value zero:</p>
+
+<pre class="cpp">
+inf a;
+</pre>
+
+<p>An inf can be initialised from an expression using any C++
+integer type - int, short, long and the unsigned variants of any of these. It
+can also be initialised from another inf.</p>
+
+<p>Typically, when using very large numbers, you will need to use string
+representations to handle the initial value. The inf type will take a string
+containing an integer value and convert it into an inf. The format of the string
+can be any of the formats defined in
+<a href="string_utilities.html">string_utilities</a>, so it can be a straight
+decimal integer ("12345"), an octal integer ("012345"), a hexadecimal integer
+("0x12345") or a hash-style integer ("12#12345"). Here's how you'd initialise an inf
+with a googol (10<sup>100</sup>):</p>
+
+<pre class="cpp">
+inf googol("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+</pre>
+
+
+<h2 id="assignments">Assignments</h2>
+
+<p>A full set of assignments is supported, from the six built-in integer types,
+from a string representation and from another inf. These assignments have the
+same characteristics as the initialisations just discussed.</p>
+
+<p>Note that assignments are handled differently from initialisation by C++, so
+you get the following strange effect:</p>
+
+<pre class="cpp">
+inf d = 0; // illegal
+d = 0;     // legal
+</pre>
+
+<p>This seems strange until you realise that the first '=' operator is an
+initialisation and in fact calls a constructor and not an assignment operator,
+whilst the second is a true assignment.</p>
+
+
+<h2 id="constants">Constant Values</h2>
+
+<p>The last sections showed how an inf can be initialised or assigned from a
+built-in integer type. However, sometimes an intermediate value of type inf is
+required. I have disallowed implicit type conversion from in integer type to an
+inf because, from experience, I know that allowing implicit type conversions
+from integer types can cause the compiler to become
+overly fond of type conversions to inf. You lose a lot of compiler checking as a
+result. Therefore, intermediate values must be explicitly created. For example,
+you <strong>cannot</strong> do this:</p>
+
+<pre class="cpp">
+a += 25;    // illegal
+</pre>
+
+<p>This is not legal because the += operator requires an inf as the argument and in this
+case we have an int. The solution is to use the temporary-constructor notation
+to form a temporary of type inf:</p>
+
+<pre class="cpp">
+a += inf(25);
+</pre>
+
+<p>This notation can be seen as the creation of an anonymous temporary object of
+type inf which is initialised with an int argument. The resultant temporary can
+then be passed as the right-hand argument of the += operator.</p>
+
+
+<h2 id="conversions">Converting an inf to an integer type</h2>
+
+<p>The inf class has a set of member functions which convert back to the basic
+C++ integer types. To
+convert to an int, use the to_int member function:</p>
+
+<pre class="cpp">
+inf a = "12345";
+int i = a.to_int();
+</pre>
+
+<p>The full set of six conversions are available (for short, int and long and
+their unsigned variants):</p>
+
+<ul>
+<li>to_short - converts to short</li>
+<li>to_ushort - converts to unsigned short</li>
+<li>to_int - converts to int</li>
+<li>to_unsigned or to_uint - converts to unsigned</li>
+<li>to_long - converts to long</li>
+<li>to_ulong - converts to unsigned long</li>
+</ul>
+
+<p>Note that the names to_unsigned and to_uint are synonyms - 
+my preference is to think of unsigned as a type rather than
+as a variant of int (I write "unsigned" not "unsigned int"). I provided the to_uint for those who
+think of unsigned as a modifier to int.</p>
+
+<p>All of these methods have a <code>bool</code> argument which tells the method whether to
+range-check the result before the conversion. For example, if the value is too big for type
+<code>short</code>, then <code>to_short</code> has two possible responses. If checking is on, then
+it will throw the exception <code>std::overflow_error</code>. If checking is off then it simply
+truncates the value to fit the type, changing its value. The default is for checking to be off. The
+method actually looks like:</p>
+
+<pre class="cpp">
+short inf::to_short(bool check = false) const throw(std::overflow_error)
+</pre>
+
+
+<h2 id="bits">Bit Manipulation</h2>
+
+<p>An inf has a 2's-complement representation with any number of bits. It
+follows the convention that bit 0 is the l.s.b. and the uppermost bit is the
+sign bit. It is possible to access the bits of an inf and to change them. First,
+you can get the number of bits in the representation and you can also set the
+number of bits:</p>
+
+<pre class="cpp">
+unsigned bits = a.bits();
+a.resize(bits + 1);
+</pre>
+
+<p>Furthermore, you can reduce the representation to the minimum size necessary
+to represent the value stored:</p>
+
+<pre class="cpp">
+a.reduce();
+</pre>
+
+<p>The bits can be examined with either the bit function or the [] operator.</p>
+
+<pre class="cpp">
+for (unsigned i = 0; i &lt; a.bits(); i++)
+  std::cout &lt;&lt; "bit " &lt;&lt; i &lt;&lt; " = " &lt;&lt; a[i] &lt;&lt; std::endl;
+</pre>
+
+<p>The result of the [] operator is a bool. The one difference with the array
+index operator is that [] cannot be used as the target of an assignment. In
+other words you <strong>cannot</strong> do this:</p>
+
+<pre class="cpp">
+a[0] = true;  // illegal
+</pre>
+
+<p>Instead, the bits of an inf can be set, cleared or preset to a bool value
+using the set, clear and preset functions. So here are two ways of setting bit 0
+to true:</p>
+
+<pre class="cpp">
+a.set(0);
+a.preset(0, true);
+</pre>
+
+<p>The preset function is particularly useful when the bool value is the result
+of an expression rather than a constant as here.</p>
+
+
+<h2 id="tests">Value Tests</h2>
+
+<p>There are a number of short-cut tests for the value of an inf so that you can
+determine whether it is zero, natural, positive or negative. These are member
+functions returning a bool:</p>
+
+<pre class="cpp">
+if (a.negative())
+  ...
+</pre>
+
+<p>There are also implicit tests for zero and non-zero for use in conditionals
+- either in if statements or in while loops (including the second field of a for
+loop):</p>
+
+<pre class="cpp">
+if (a)  // tests for a having a value, i.e. non-zero
+  ...
+if (!b) // tests for b not having a value, i.e. zero
+  ...
+</pre>
+
+
+<h2 id="comparisons">Comparisons</h2>
+
+<p>The inf type has a full set of comparison operators - ==, !=, &lt;, &lt;=,
+&gt; and &gt;=. Note however the comment earlier on the creation of intermediate
+values, so this is illegal:</p>
+
+<pre class="cpp">
+if (a == 0)
+  ...
+</pre>
+
+<p>You can fix this by either using the test for zero from the last section, or
+(especially for other non-zero values) using the temporary-constructor
+notation:</p>
+
+<pre class="cpp">
+if (a == inf(0))
+  ...
+</pre>
+
+
+<h2 id="logical">Bitwise Logical Operations</h2>
+
+<p>The inf type has a full set of bitwise logical operators which are divided
+into two sets. The first set are the composite operator-assignments or
+self-modifying operators such as &amp;=
+which modify the inf:</p>
+
+<pre class="cpp">
+a &amp;= b;
+</pre>
+
+<p>This makes a the result of bitwise-anding the values of a and b.</p>
+
+<p>The second set are the simple operators or value-returning opoerators which
+return the result of the logical operation but do not modify either argument:</p>
+
+<pre class="cpp">
+c = a &amp; b;
+</pre>
+
+<p>This makes c the result of the bitwise-anding of the values of a and b.</p>
+
+<p>These operators all normalise the result to the maximum length of the two
+arguments, sign extends the shorter argument to the length of the longer one and
+then performs the bitwise operation on these normalised values. Thus, the
+bitwise-and of an 8-bit inf with a 16-bit inf is a 16-bit inf.</p>
+
+<p>The self-modifying operations are: invert, &amp;=, |= and ^= (xor). The
+value-returning operators are: ~, &amp;, | and ^.</p>
+
+
+<h2 id="shift">Shift Operators</h2>
+
+<p>The inf type can be shifted left or right. The shift distance is in fact
+represented by an unsigned, not an inf. As with the logical operators, there are
+both self-modifying and value-returning sets of these operators. The
+self-modifying operators are: &lt;&lt;= and &gt;&gt;=. The value-returning
+operators are: &lt;&lt; and &gt;&gt;.</p>
+
+<p>Thus an inf can be shifted left by two bits using:</p>
+
+<pre class="cpp">
+a &lt;&lt; 2;
+</pre>
+
+
+<h2 id="arithmetic">Arithmetic Operations</h2>
+
+<p>The inf type has a full set of arithmetic operations. Once again (yawn) they
+are divided into self-modifying and value-returning functions. The
+self-modifying operators are: negate, abs, +=, -=, *=, /= and %=. The
+value-returning operators are: unary -, +, -, *, / and %.</p>
+
+<p>It is worthwhile differentiating between the two versions of the abs
+operation. The self-modifying form is called as a member function:</p>
+
+<pre class="cpp">
+a.abs();
+</pre>
+
+<p>This turns a into its absolute value. The value-returning form is called as a
+non-member function:</p>
+
+<pre class="cpp">
+b = abs(a);
+</pre>
+
+<p>This makes b the absolute value of a without modifying a.</p>
+
+<p>Note that the / and % operators can throw the inf::divide_by_zero
+exception.</p>
+
+
+<h2 id="increment">Increment and Decrement Operators</h2>
+
+<p>The inf type can of course be used for mundane tasks such as loop counters
+and for this purpose has a full set of increment and decrement operators. There
+are two variants of these - pre-increment/decrement (e.g. ++i) and
+post-increment/decrement (e.g. i++). The pre-increment operator increments the
+value and returns the incremented value. the post-increment increments the value
+but returns the previous non-incremented value.</p>
+
+
+<h2 id="strings">String Representation and I/O</h2>
+
+<p>An important part of the inf type is its string representation which allows
+the type to be printed to the screen and saved to and restored from a file. The
+string representation is consistent with the string representation of built-in
+integers as provided by the <a href="string_utilities.html">string_utilities</a>
+package. This supports the standard C formats of decimal ("12345"), octal
+("012345"), binary ("0b010001010") and hexadecimal ("0x12345"). It also supports the STLplus-specific
+hash format ("12#12345") which allows the use of any base from base 2 to base
+36. There are conversions to/from string:</p>
+
+<pre class="cpp">
+std::string to_string(const inf&amp; i,
+                      unsigned radix = 10,
+                      radix_display_t display = radix_c_style_or_hash,
+                      unsigned width = 0)
+  throw(std::invalid_argument);
+
+inf to_inf(const std::string&amp;, unsigned radix = 0)
+  throw(std::invalid_argument);
+</pre>
+
+<p>Note that these are non-member functions. See the string_utilities
+documentation for the meaning of the extra parameters. The default behaviour is
+a simple decimal number.</p>
+
+<p>There are also IOStream input (&gt;&gt;) and output
+(&lt;&lt;) operators
+for the inf type so that integer values can be written to and read from a file
+or other I/O device:</p>
+
+<pre class="cpp">
+inf a = "12345";
+std::cout &lt;&lt; "the value is " &lt;&lt; a &lt;&lt; std::endl;
+</pre>
+
+<p>and</p>
+
+<pre class="cpp">
+inf a;
+std::cin &gt;&gt; a;
+</pre>
+
+<p>As an example, here's the code to generate and display a googol. As you may
+know, a googol is a one followed by a hundred zeroes:</p>
+
+<pre class="cpp">
+inf googol(1);
+for (unsigned j = 0; j &lt; 100; j++)
+  googol *= inf(10);
+std::cout &lt;&lt; "a googol is:" &lt;&lt; std::endl;
+for (unsigned radix = 2; radix &lt;= 36; radix++)
+  std::cout &lt;&lt; "base " &lt;&lt; radix &lt;&lt; " = " &lt;&lt; to_string(googol, radix) &lt;&lt; std::endl;
+</pre>
+
+<p>This code prints the googol in every radix from 2 to 36. The output looks like this:</p>
+
+<pre class="terminal">
+a googol is:
+base 2 = 0b0100100100100110101101001001011001010011000011011111001110101100001011001001111000010011000100110011100000101111110011100010101100111001000000100011100010000100011010011111001010101010110010010000110000100010101000001011101000111100010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+base 3 = 3#122012210112120112111212010011100001101211222101110010100012001010011011021010111212020100220020021122002200200010101000112122102122010002012010000000120120022011020201122101010221121011200012121021202022020101
+base 4 = 4#10210212231021121103003133032230023021320103010303200233303202230321000203202010122133022222302100300202220023220330100000000000000000000000000000000000000000000000000
+base 5 = 5#102414221203323202133113331031102220100330010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+base 6 = 6#225421520555002405205021514331412332420034405541334340545305400514013453222020504101024233010145312244402025311325050123301452144
+base 7 = 7#16201341553122251063252024261246503522112115506446252526241360534151125226544036056624134325461423451523416401660341314
+base 8 = 00444465511312303371654131170230463405763425471004342043237125262206042501350742000000000000000000000000000000000
+base 9 = 9#565715515455104301354871403305033134233455210806248080603330478378102163000516264221571127534605537668211
+base 10 = 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+base 11 = 11#107611186a648903471813259295629384570114251063297959276735639698066525944868937609960a3a7a17391a1
+base 12 = 12#52377002841b241b07a24b908b19a6959ab7a08120693b00991a1299b018ab70b11144a6506633388a9046ba11054
+base 13 = 13#72c7a1051523285a7244587a82c6184b210239756b3033791a1381197a005ccbbc9a54461668a53a8589393273
+base 14 = 14#1d15ba97ca20a0b65db2c537911c9cb06dc7c31084bd85a25bdb6540a6a9b3b1347c6055a2b633cbadb09b44
+base 15 = 15#11251839c078059010e1ae8598a337dcecbec6ceb0034ed2d436ec35cac6406a2de1e31c5b3d007905ce6a
+base 16 = 0x1249ad2594c37ceb0b2784c4ce0bf38ace408e211a7caab24308a82e8f10000000000000000000000000
+base 17 = 17#22b12972d2793de45bcaaae50d2a3fgcaacgd5e6d5c4937d52g8fb8d33a2a8c6d5bgbec4e420780ff4
+base 18 = 18#6ec1bcf4688309gh806h932adcc44eeg6de0fe9fahde66dgh108c9g3623e045a0h7a95ab594ce99a
+base 19 = 19#1f6dcb713d74f8gac9c5agi2e0ecb55da61fi9ae08e7hchf2b236672e128h29gfgccc8874hhc8a9
+base 20 = 20#d4dj27751e811e02jc8j525841500000000000000000000000000000000000000000000000000
+base 21 = 21#6h307dg64gac07d579f617g0014878b0gja0e6j69ddh5h541k343520iii6f48e5cdg26dfi454
+base 22 = 22#4cflf34gchk5jcc43fa5flhb96c2jf5f3572g5afh42dj31a12ga9hdjk94ah2ck1ccl4i9j0ac
+base 23 = 23#3l6adc1kjjfb6j7eh7e9d20gdg43l07ccad1a8aea3gdebi38g5da3hhkcb9aj9e7a8jca817d
+base 24 = 24#453j58dkc2beg2k1i3m4c67bba9732e6k4jeed4eg5dh5ndfenc1f0i3301c320c0dm7adf2g
+base 25 = 25#5e9c73hh28g8i5g5ca53f100000000000000000000000000000000000000000000000000
+base 26 = 26#8oikgc2dn19n3hd0gd7ch09157j49md2mcejjlj2ak237pn1p3he8p0khnn9bomijgk20gg
+base 27 = 27#h5lefedn3491amqac395134473dn69o67h2ii3a0ehbh325300ff846jha3pg4i5g7k86a
+base 28 = 28#1b5eegphn0cfn4ae1la8logkfjiq3gk2e6nik0hfnmn26i9gckdk7bh7n1q8g3i9nepk94
+base 29 = 29#3hg0h7pl6s4qb96hp43oepi8o7helm5rf6i6ngekhbsmln09c6qle0k78ee7f8mlkjmsg
+base 30 = 30#anhmc58j7lglcg33hodnk7sndpa3aj70j1rppi9f83ktbpktjjg6oft86bqa44opkb3a
+base 31 = 31#16532c98ncbeel7rel86l7845f0bhkq3cg6dq10e9o3deb14sbclrn8efmm462nsapg5
+base 32 = 32#4i9lkip9grstc5if164po5v72me827226jslap462585q7h00000000000000000000
+base 33 = 33#jq9lr1s39q0wlawtn6vwll8ob7qaskkiupbe9fhge89wfh2tn7rllf8f5afpm2g7i1
+base 34 = 34#2sn7biwwnggi76tqbhc2muect6iraeb1f6nbcr0ahi3wxxe2hm8hxdtjqeegp6ttg4
+base 35 = 35#f4aydl5wlj4rsxp7lpc21v0vb700c5bdkncfb881jck8oo7d2x7t6m0bjhouw1cfp
+base 36 = 36#2hqbczu2ow52bala8lgc3s5y9mm5tiy0vo9tke25466gfi6ax8gs22x7kuu8l1tds
+</pre>
+
+<p>Note how hash format has been used except for base 10, which uses no
+prefix, base 2 which uses 0b, base 8 which uses 0 and base 16 which uses 0x.</p>
+
+
+<h2 id="exceptions">Exceptions</h2>
+
+<p>The inf class can throw exceptions, though of course only under exceptional
+conditions. The following exceptions can be thrown:</p>
+
+<dl>
+<dt>std::out_of_range</dt>
+<dd>Thrown by bit-index operations if the indexed bit is out of range of the
+number of bits.</dd>
+
+<dt>std::overflow_error</dt>
+<dd>Thrown by conversion functions when converting to C++ integer types if the
+inf's value will not fit</dd>
+
+<dt>std::invalid_argument</dt>
+<dd>Thrown by the string conversion functions if the string does not have the
+right format for an integer value</dd>
+
+<dt>inf::divide_by_zero</dt>
+<dd>Thrown by the divide (/) and remainder (%) operators if the right-hand
+argument is zero.</dd>
+
+</dl>
+
+<p>Note that all but the last of these are defined in the std:: namespace. This
+is because they are standard exceptions and are defined in the standard library
+header &lt;stdexcept&gt;. The last exception is declared within the inf class
+and is therefore in the inf:: namespace. This was defined because there isn't an
+appropriate standard exception for this job.</p>
+
+<p>All of the exceptions that can be thrown by inf are derivatives of the
+baseclass std::logic_error, so you can catch any of them with a single catch
+clause:</p>
+
+<pre class="cpp">
+try
+{
+  ...
+}
+catch(std::logic_error&amp; except)
+{
+  ...
+}
+</pre>
+
+<p>All logic error exceptions store a string with an error message in it. This
+can be used to give more information on the cause of the error:</p>
+
+<pre class="cpp">
+catch (std::logic_error&amp; e)
+{
+  std::cout &lt;&lt; "caught exception " &lt;&lt; e.what() &lt;&lt; std::endl;
+}
+</pre>
+
+
+</div>
+
+</body>
+</html>

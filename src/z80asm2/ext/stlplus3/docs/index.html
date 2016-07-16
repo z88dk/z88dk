@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - Contents</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The <span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span> C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+</p>
+</div>
+
+</div>
+
+<div id="document">
+
+<h1>Contents</h1>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#general">General Documents</a></li>
+<li class="internal"><a href="#containers">Containers Library</a></li>
+<li class="internal"><a href="#persistence">Persistence Library</a></li>
+<li class="internal"><a href="#portability">Portability Library</a></li>
+<li class="internal"><a href="#subsystems">Subsystems Library</a></li>
+<li class="internal"><a href="#strings">Strings Library</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>STLplus is a collection of libraries containing reusable C++ components. The library collection
+is intended for developers already familiar with the STL. It contains abstract data types to extend
+the STL, reusable subsystems, data persistence and portability components. The collection is
+general-purpose and portable between Windows and many different Unix platforms including MacOS X.</p>
+
+<p>One of my aims when writing STLplus was that it <strong>must</strong> be stand-alone. That means you do not have
+to install any other libraries or products to make it work, except of course the C++ compiler of
+choice.</p>
+
+<p>STLplus contains 5 libraries, most of which can be used independently of the other
+libraries in the collection. For details of dependencies between libraries and how to use
+libraries stand-alone, see the <a href="building.html">Building Guidelines</a>.</p>
+
+<h2 id="general">General Documents</h2>
+
+<p>These documents explain how to build and use the STLplus library collection and how to split the
+collection into stand-alone libraries. It also explains the set of platforms the libraries run on,
+the versions available and the license terms under which you can use the collection.</p>
+
+<ul>
+<li class="external"><a href="building.html">Building and Using STLplus</a></li>
+<li class="external"><a href="porting.html">Porting State</a></li>
+<li class="external"><a href="versions.html">Version Numbers</a></li>
+<li class="external"><a href="changes.html">Change Log</a></li>
+<li class="external"><a href="license.html">License</a></li>
+<li class="external"><a href="exceptions.html">Exceptions Policy</a></li>
+<li class="external"><a href="interfaces.html">Interfaces</a></li>
+<li class="external"><a href="safe_iterator.html">Safe Iterators</a></li>
+</ul>
+
+<p>The documentation for the components is designed to act mainly as a user manual. There is no
+reference manual as such - instead, read the headers which are designed to be human-readable and
+have comments. I consider writing self-documenting and human-readable headers part of the job of
+programming. I have provided colourised copies of the headers as web pages and there is a link to
+these at the top of each component's web page.</p>
+
+<h2 id="containers">Containers Library</h2>
+
+<p>The containers library contains abstract data classes which expand on the STL as the name
+STLplus suggests. The data types provided are:</p>
+
+<ul>
+<li class="external"><a href="containers.html">Introduction to the containers library</a></li>
+<li class="external"><a href="smart_ptr.html">smart_ptr.hpp: Smart Pointer</a></li>
+<li class="external"><a href="simple_ptr.html">simple_ptr.hpp: Simple Pointer</a></li>
+<li class="external"><a href="digraph.html">digraph.hpp: Directed Graph</a></li>
+<li class="external"><a href="hash.html">hash.hpp: Hash Table</a></li>
+<li class="external"><a href="ntree.html">ntree.hpp: Rooted Ordered Tree</a></li>
+<li class="external"><a href="matrix.html">matrix.hpp: 2-Dimensional Matrix</a></li>
+<li class="external"><a href="triple.html">triple.hpp: Triple</a></li>
+<li class="external"><a href="foursome.html">foursome.hpp: Foursome</a></li>
+</ul>
+
+<p>The containers library has no dependencies and so can be used as a stand-alone library. 
+Furthermore, it is an include-only library - i.e. you only need to include the headers - there is
+nothing to compile before you can use it.</p>
+
+<h2 id="persistence">Persistence Library</h2>
+
+<p>The persistence library contains a solution to the problem of data persistence for C++ data
+structures. The library allows any well-structured data structure to be dumped and restored. The
+same library can be used to store data structures in files or to transmit them over network
+connections. The persistence format is platform-independent (i.e. independent of the compiler,
+operating system and CPU architecture) and so can be used to transfer data structures between
+platforms.</p>
+
+<ul>
+<li class="external"><a href="persistence.html">Introduction to the persistence library</a></li>
+<li class="external"><a href="persistent_contexts.html">persistent_contexts.hpp: Persistence Context Classes</a></li>
+<li class="external"><a href="persistent_basic.html">persistent_basic.hpp: Persistence of Basic Types</a></li>
+<li class="external"><a href="persistent_stl.html">persistent_stl.hpp: Persistence of STL Containers</a></li>
+<li class="external"><a href="persistent_stlplus.html">persistent_stlplus.hpp: Persistence of STLplus Containers</a></li>
+<li class="external"><a href="persistent_pointers.html">persistent_pointers.hpp: Persistence of Pointers</a></li>
+<li class="external"><a href="persistent_shortcuts.html">persistent_shortcuts.hpp: Shortcut Functions</a></li>
+<li class="external"><a href="persistent_examples.html">Examples</a></li>
+</ul>
+
+<p>The persistence library has a soft dependency on the containers and portability libraries. In
+stand-alone mode it will make all C and C++ types including the STL classes persistent. If it is
+compiled with the containers library, then it will make the classes of the STLplus containers
+persistent as well as all the other types supported. If it is compiled with the portability library,
+it will make the STLplus infinite-precision integer type inf persistent.</p>
+
+<h2 id="portability">Portability Library</h2>
+
+<p>The portability library provides platform-independent interfaces to platform-specific features.
+This is so that programs can be written to be inherently portable by using this library to access
+those features. The target platforms for portability are Windows NT/2k/XP/Vista and all flavours of
+Posix-compliant Unix, including all the flavours of Gnu/Linux on PCs, MacOS X on the Apple Macintosh,
+plus Solaris, HP-UX and AIX on engineering workstations. The target architectures are either 32-bit
+or 64-bit CPUs. The target compilers are Gnu's gcc (for Gnu/Linux, MacOS and Windows) and Microsoft's
+Visual Studio (for Windows).</p>
+
+<p>The components provided are:</p>
+
+<ul>
+<li class="external"><a href="portability.html">Introduction to the portability library</a></li>
+<li class="external"><a href="portability_fixes.html">portability_fixes.hpp: Fixes for OS- & compiler-specific problems</a></li>
+<li class="external"><a href="file_system.html">file_system.hpp: File System Access</a></li>
+<li class="external"><a href="subprocesses.html">subprocesses.hpp: Subprocess Handler</a></li>
+<li class="external"><a href="tcp_sockets.html">tcp_sockets.hpp: TCP Internet classes</a></li>
+<li class="external"><a href="udp_sockets.html">udp_sockets.hpp: UDP Internet classes</a></li>
+<li class="external"><a href="dynaload.html">dynaload.hpp: Dynamic Library Loader class</a></li>
+<li class="external"><a href="dprintf.html">dprintf.hpp: Safe Printf-like String Formatting</a></li>
+<li class="external"><a href="wildcard.html">wildcard.hpp: Wildcard String Matching</a></li>
+<li class="external"><a href="time.html">time.hpp: Time Manipulation Functions</a></li>
+<li class="external"><a href="build.html">build.hpp: Program Build Reporting</a></li>
+<li class="external"><a href="inf.html">inf.hpp: Infinite Precision Integers</a></li>
+<li class="external"><a href="debug.html">debug.hpp: Debugging Utilities</a></li>
+</ul>
+
+<p>The portability library can be used as a stand-alone library since it does not use any features
+of the rest of the collection.</p>
+
+<h2 id="subsystems">Subsystems Library</h2>
+
+<p>The subsystems library contains components to build up applications in a modular way. They
+provide commonly-used functionality. The subsystems provided are:</p>
+
+<ul>
+<li class="external"><a href="subsystems.html">Introduction to the subsystems library</a></li>
+<li class="external"><a href="library_manager.html">library_manager.hpp: Library Manager</a></li>
+<li class="external"><a href="message_handler.html">message_handler.hpp: Message Handler</a></li>
+<li class="external"><a href="ini_manager.html">ini_manager.hpp: Ini File Manager</a></li>
+<li class="external"><a href="cli_parser.html">cli_parser.hpp: Command Line Parser</a></li>
+<li class="external"><a href="timer.html">timer.hpp: CPU Timer</a></li>
+</ul>
+
+<p>The subsystems library requires at least the containers and portability libraries to be
+installed. These are hard dependencies.</p>
+
+<h2 id="strings">Strings Library</h2>
+
+<p>The strings library provides a set of functions that can be used to build up string
+representations of data structures for printing or for diagnostic text dumps. They use similar
+concepts to the persistence library in that they form a kit of parts which can be assembled to print
+any data structure.</p>
+
+<ul>
+<li class="external"><a href="strings.html">Introduction to the strings library</a></li>
+<li class="external"><a href="string_basic.html">string_basic.hpp: String Formatting of Basic Types</a></li>
+<li class="external"><a href="string_stl.html">string_stl.hpp: String Formatting of STL Containers</a></li>
+<li class="external"><a href="string_stlplus.html">string_stlplus.hpp: String Formatting of STLplus Containers</a></li>
+<li class="external"><a href="string_utilities.html">string_utilities.hpp: String Utilities</a></li>
+</ul>
+
+<p>The strings library has soft dependencies on the containers and portability libraries. Without
+the containers library, the library provides string representations of all C and C++ types including
+the STL classes. With the containers library it also makes the STLplus classes in the containers
+library printable. With the portability library, it makes the STLplus infinite-precision integer
+printable.</p>
+
+</div>
+
+</body>
+</html>

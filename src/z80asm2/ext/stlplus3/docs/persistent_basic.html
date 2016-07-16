@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>STLplus Library Collection - persistence/persistent_basic.hpp - Persistence of Basic Types</title>
+<link rel="icon" href="plus.png" type="image/png"/>
+<meta name="Author" content="Andy Rushton"/>
+<link rel="stylesheet" media="screen" type="text/css" href="screen.css"/>
+<link rel="stylesheet" media="print" type="text/css" href="print.css"/>
+</head>
+<body>
+
+<div id="header">
+
+<div id="headerBanner">
+<h1>The
+<span style="color:red">S</span><span style="color:blue">T</span><span style="color:green">L</span><span style="color:#ecec80">plus</span>
+C++ Library Collection</h1>
+</div>
+
+<div id="headerNavigation">
+<p>
+<a href="http://stlplus.sourceforge.net/">Website</a>
+<a href="index.html">Collection</a>
+<a href="persistence.html">Library</a>
+</p>
+</div>
+
+
+</div>
+
+<div id="document">
+
+<div id="documentTitle">
+<h1>persistence/persistent_basic.hpp<br>Persistence of Basic Types</h1>
+</div>
+
+<div id="documentNavigation">
+
+<ul>
+<li class="internal"><a href="#introduction">Introduction</a></li>
+<li class="internal"><a href="#include">Header persistent_basic.hpp</a></li>
+<li class="internal"><a href="#bool">Persistence of bool</a></li>
+<li class="internal"><a href="#integer">Persistence of Integer Types</a></li>
+<li class="internal"><a href="#enums">Persistence of Enumeration Types</a></li>
+<li class="internal"><a href="#float">Persistence of Floating-Point Types</a></li>
+<li class="internal"><a href="#cstring">Persistence of C-Style Strings (char*)</a></li>
+</ul>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This page describes the persistence of the basic types such as integers and C-style strings
+(char*). The source code is split up into separate headers for each class of basic types. Each
+header can either be included separately or all of the headers can be included in one go by
+including <code>persistent_basic.hpp</code>.</p>
+
+<h2 id="include">Header persistent_basic.hpp</h2>
+
+<ul>
+<li class="external"><a href="persistent_basic_hpp.html">Browse Header persistent_basic.hpp</a></li>
+</ul>
+
+<p>You can include all of the functions in one go by including persistent_basic.hpp. If you prefer
+however, you can include the separate headers for each class being used. The latter approach
+minimises the number of headers that get included indirectly.</p>
+
+<h2 id="bool">Persistence of bool</h2>
+
+<ul>
+<li class="external"><a href="persistent_bool_hpp.html">Browse Header persistent_bool.hpp</a></li>
+</ul>
+
+<p>The bool type is dumped and restored as a small unsigned integer. The format is platform-independent.</p>
+
+<pre class="cpp">
+void stlplus::dump_bool(dump_context&amp;, const bool&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_bool(restore_context&amp;, bool&amp; data) throw(stlplus::persistent_restore_failed);
+</pre>
+
+<h2 id="integer">Persistence of Integer Types</h2>
+
+<ul>
+<li class="external"><a href="persistent_int_hpp.html">Browse Header persistent_int.hpp</a></li>
+</ul>
+
+<p>A separate function is defined for each of the built-in integer types in C++. This leads to the
+following family of functions:</p>
+
+<pre class="cpp">
+void stlplus::dump_char(dump_context&amp;, const char&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_char(restore_context&amp;, char&amp; data) throw(stlplus::persistent_restore_failed);
+
+void stlplus::dump_signed_char(dump_context&amp;, const signed char&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_signed_char(restore_context&amp;, signed char&amp; data) throw(stlplus::persistent_restore_failed);
+
+void stlplus::dump_unsigned_char(dump_context&amp;, const unsigned char&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_unsigned_char(restore_context&amp;, unsigned char&amp; data) throw(stlplus::persistent_restore_failed);
+
+void stlplus::dump_short(dump_context&amp;, const short&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_short(restore_context&amp;, short&amp; data) throw(stlplus::persistent_restore_failed);
+
+void stlplus::dump_unsigned_short(dump_context&amp;, const unsigned short&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_unsigned_short(restore_context&amp;, unsigned short&amp; data) throw(stlplus::persistent_restore_failed);
+
+void stlplus::dump_int(dump_context&amp;, const int&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_int(restore_context&amp;, int&amp; data) throw(stlplus::persistent_restore_failed);
+
+void stlplus::dump_unsigned(dump_context&amp;, const unsigned&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_unsigned(restore_context&amp;, unsigned&amp; data) throw(stlplus::persistent_restore_failed);
+
+void stlplus::dump_long(dump_context&amp;, const long&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_long(restore_context&amp;, long&amp; data) throw(stlplus::persistent_restore_failed);
+
+void stlplus::dump_unsigned_long(dump_context&amp;, const unsigned long&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_unsigned_long(restore_context&amp;, unsigned long&amp; data) throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>It is important to use the right dump or restore function for the type being saved.</p>
+
+<p>The underlying format is platform-independent, although it is different for signed and unsigned
+types. Issues such as different word lengths on different CPUs are handled correctly internally. For
+example, on some CPUs, the long type is 32-bits, whilst on others it is 64-bits. A data structure
+dumped with 32-bit longs will be correctly restored on a CPU with 64-bit longs. The only potential
+problem is when you dump a 64-bit long and restore to a 32-bit long. If (and only if) the
+<em>value</em> is too big to store in 32 bits, the restore function will throw an
+stlplus::persistent_restore_failed exception. It is your responsibility to use types that will store
+the possible values on all platforms you are porting to.</p>
+
+<h2 id="enums">Persistence of Enumeration Types</h2>
+
+<ul>
+<li class="external"><a href="persistent_enum_hpp.html">Browse Header persistent_enum.hpp</a></li>
+</ul>
+
+<p>Enumeration types are essentially small integers. However, each type is
+considered to be a different type by the compiler - so therefore they cannot
+actually be treated as simple integer types - you get a compilation error. The
+solution that I supply is a pair of template functions that adapt themselves
+to the type of the enum being made persistent. The functions are:</p>
+
+<pre class="cpp">
+template&lt;typename T&gt;
+void stlplus::dump_enum(dump_context&amp;, const T&amp; data) throw(stlplus::persistent_dump_failed);
+
+template&lt;typename T&gt;
+void stlplus::restore_enum(restore_context&amp;, T&amp; data) throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p>Consider the following example. The enum defines a traffic light
+sequence:</p>
+
+<pre class="cpp">
+enum traffic_lights {red, red_amber, green, amber};
+</pre>
+
+<p>This can be used with <code>dump_enum</code> and <code>restore_enum</code> directly, but is is better style to write
+<code>dump</code> and <code>restore</code> functions that call the template
+functions, thus hiding the use of the template:</p>
+
+<pre class="cpp">
+#include "persistent_contexts.hpp"
+#include "persistent_enum.hpp"
+
+void dump_traffic_lights(stlplus::dump_context&amp; context, const traffic_lights&amp; lights)
+{
+  stlplus::dump_enum(context, lights);
+}
+
+void restore_traffic_lights(stlplus::restore_context&amp; context, traffic_lights&amp; lights)
+{
+  stlplus::restore_enum(context, lights);
+}
+</pre>
+
+<h2 id="float">Persistence of Floating-Point Types</h2>
+
+<ul>
+<li class="external"><a href="persistent_float_hpp.html">Browse Header persistent_float.hpp</a></li>
+</ul>
+
+<p>Persistence of floating-point types is supported but with a warning: this is the one basic type
+for which I have not been able to find a completely portable representation. Thus there may be
+platform-specific problems with the format. If this is a problem for your application, then convert
+to a string representation and dump the string. However, the binary routines presented here are far
+more efficient and are provided for those cases where there are no portability problems and where
+performance is an issue.</p>
+
+<pre class="cpp">
+void stlplus::dump_float(dump_context&amp;, const float&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_float(restore_context&amp;, float&amp; data) throw(stlplus::persistent_restore_failed);
+
+void stlplus::dump_double(dump_context&amp;, const double&amp; data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_double(restore_context&amp;, double&amp; data) throw(stlplus::persistent_restore_failed);
+</pre>
+
+<h2 id="cstring">Persistence of C-Style Strings (char*)</h2>
+
+<ul>
+<li class="external"><a href="persistent_cstring_hpp.html">Browse Header persistent_cstring.hpp</a></li>
+</ul>
+
+<p>Usually, pointers are treated specially by the persistence functions - see the page for <a
+href="persistent_pointers.html">persistent pointers</a> for an explanation. The one exception is
+<code>char*</code> which is treated as a null terminated array and not a pointer to a single
+<code>char</code>. Multiple pointers to the same <code>char*</code> string will be dumped once and
+the same magic key method used as for pointers to other pointer types.</p>
+
+<p><strong>Warning!</strong> This means that pointers to char cannot be supported, since there is no type
+difference between a pointer to char and a C-style array of char.</p>
+
+<pre class="cpp">
+void stlplus::dump_cstring(dump_context&amp;, const char* data) throw(stlplus::persistent_dump_failed);
+void stlplus::restore_cstring(restore_context&amp;, char*&amp; data) throw(stlplus::persistent_restore_failed);
+</pre>
+
+<p><strong>Warning!</strong> The restore deletes any old value of the data parameter and allocates a new char*
+which is (just) big enough and assigns it to the data field. This is because there is no way of
+knowing how long a char* is so the passed parameter is not safe to use. The allocation is done using
+standard new. If the data field is non-null on entry it will be deleted by standard delete. Best to
+make it null in the first place.</p>
+
+<pre class="cpp">
+#include "persistent_contexts.hpp"
+#include "persistent_cstring.hpp"
+
+...
+
+char* data = 0;
+stlplus::restore_cstring(context, data);
+</pre>
+
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>strings/print_triple.hpp</title>
+<link rel="stylesheet" type="text/css" href="shCore.css"/>
+<link rel="stylesheet" type="text/css" href="shThemeSTLplus.css"/>
+<script type="text/javascript" src="shCore.js"></script>
+<script type="text/javascript" src="shBrushCpp.js"></script>
+</head>
+<body>
+<h1>strings/print_triple.hpp</h1>
+<pre class="brush: cpp">
+#ifndef STLPLUS_PRINT_TRIPLE
+#define STLPLUS_PRINT_TRIPLE
+////////////////////////////////////////////////////////////////////////////////
+
+//   Author:    Andy Rushton
+//   Copyright: (c) Southampton University 1999-2004
+//              (c) Andy Rushton           2004 onwards
+//   License:   BSD License, see ../docs/license.html
+
+//   Generate a string representation of a triple
+
+////////////////////////////////////////////////////////////////////////////////
+#include &quot;strings_fixes.hpp&quot;
+#include &quot;triple.hpp&quot;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+////////////////////////////////////////////////////////////////////////////////
+
+namespace stlplus
+{
+
+  template&lt;typename T1, typename T2, typename T3, typename S1, typename S2, typename S3&gt;
+  void print_triple(std::ostream&amp; device,
+                    const triple&lt;T1,T2,T3&gt;&amp; values,
+                    S1 print_fn1,
+                    S2 print_fn2,
+                    S3 print_fn3,
+                    const std::string&amp; separator = &quot;:&quot;);
+
+} // end namespace stlplus
+
+#include &quot;print_triple.tpp&quot;
+#endif
+</pre>
+<script type="text/javascript">SyntaxHighlighter.defaults['toolbar']=false; SyntaxHighlighter.all()</script>
+</body>
