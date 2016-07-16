@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.51 2016-07-10 20:44:52 dom Exp $
+#	$Id: Makefile,v 1.52 2016-07-16 09:40:16 pauloscustodio Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -40,9 +40,11 @@ sccz80:
 	$(MAKE) -C src/sccz80
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
+# test compile the new z80asm2, work in progress so ignore errors
 z80asm:
 	$(MAKE) -C src/z80asm
 	$(MAKE) -C src/z80asm PREFIX=`pwd` install
+	-$(MAKE) -C src/z80asm2 test
 
 zcc:
 	$(MAKE) -C src/zcc
