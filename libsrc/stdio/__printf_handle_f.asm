@@ -11,6 +11,7 @@
 	EXTERN	ftoa
 	EXTERN	ftoe
 	EXTERN	strlen
+	EXTERN	__convert_sdccf2reg
 
 __printf_handle_e:
 	set	5,(ix-4)
@@ -33,13 +34,7 @@ __printf_handle_f:
         ld      l,a
 
 	push	ix		;save callers
-	add	hl,hl		;shift right, sign into carry
-	rr	l		;get sign into right place after shift
-	inc	h		;fix exponent bias
-	inc	h
-	; h = exponent	
-	; l = sign + mantissa
-	; d, e
+	call	__convert_sdccf2reg	
 	push	hl	;get it on the stack in 6 byte format
 	push	de
 	ld	hl,0

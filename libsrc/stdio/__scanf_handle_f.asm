@@ -12,7 +12,7 @@
 	EXTERN  atof
 	EXTERN  l_cmp
 	EXTERN  asm_isdigit
-	EXTERN  fa
+	EXTERN  dstore
 
 
 ; Floating point
@@ -85,10 +85,8 @@ handle_f_fmt_finished_reading:
 	call	atof
 	pop	bc
 	pop	ix		;get our framepointer back
-	ld	hl,fa
-	pop	de		;destination
-	ld	bc,6		;48 bits of floating point number
-	ldir
+	pop	hl		;destination
+	call	dstore		;and put it there
 	inc	(ix-1)		;increase number of conversions
 	jp	scanf_loop
 handle_f_fmt_error:
