@@ -117,7 +117,7 @@ int domove(char player,char opponent)
 int human(char player,char opponent)
 {
 
-char c;
+	signed char c;
 	while (1)
 	{
 		c=10;
@@ -203,7 +203,7 @@ int main()
 
 		printboard();
 	}
-
+	return 0;
 }
 
 

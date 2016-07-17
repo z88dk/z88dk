@@ -7,7 +7,9 @@
 
 #define SIZE    100
 
-main()
+void printarray(int A[]);
+
+int main()
 {
         int A[SIZE], i, j, tmp;
 
@@ -33,10 +35,10 @@ main()
         /* Print sorted version */
         puts("After:");
         printarray(A);
-
+	return 0;
 }
 
-printarray(int A[])
+void printarray(int A[])
 {
         int i;
 

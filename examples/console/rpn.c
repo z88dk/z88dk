@@ -102,7 +102,7 @@ void main()
   sp = 0;
   pos = 0;
 
-  while((type = read_op(s)) != 0) {
+  while((type = read_op()) != 0) {
     switch(type) {
     case NUMBER:
       push(n);

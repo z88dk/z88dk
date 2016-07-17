@@ -10,7 +10,7 @@
 int fib(int n);
 unsigned results[11];
 
-main()
+int main()
 {
 	int loop;
 	for (loop=1; loop < 10; loop++)
@@ -18,6 +18,7 @@ main()
 		results[loop] = fib(loop);
 		printf("fib(%d) = %d\n",loop,results[loop]);
 	}
+	return 0;
 }
 
 int fib(int n)
