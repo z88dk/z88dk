@@ -1,0 +1,394 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4C57A3BF-7B50-47EA-B58C-D3C93A37A831}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>cxxlib</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\z80asm2\ext\stlplus3\containers;..\..\src\z80asm2\ext\stlplus3\persistence;..\..\src\z80asm2\ext\stlplus3\portability;..\..\src\z80asm2\ext\stlplus3\strings;..\..\src\z80asm2\ext\stlplus3\subsystems;..\..\src\z80asm2\ext\libtappp\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\z80asm2\ext\stlplus3\containers;..\..\src\z80asm2\ext\stlplus3\persistence;..\..\src\z80asm2\ext\stlplus3\portability;..\..\src\z80asm2\ext\stlplus3\strings;..\..\src\z80asm2\ext\stlplus3\subsystems;..\..\src\z80asm2\ext\libtappp\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\z80asm2\ext\stlplus3\containers;..\..\src\z80asm2\ext\stlplus3\persistence;..\..\src\z80asm2\ext\stlplus3\portability;..\..\src\z80asm2\ext\stlplus3\strings;..\..\src\z80asm2\ext\stlplus3\subsystems;..\..\src\z80asm2\ext\libtappp\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\z80asm2\ext\stlplus3\containers;..\..\src\z80asm2\ext\stlplus3\persistence;..\..\src\z80asm2\ext\stlplus3\portability;..\..\src\z80asm2\ext\stlplus3\strings;..\..\src\z80asm2\ext\stlplus3\subsystems;..\..\src\z80asm2\ext\libtappp\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm2\ext\libtappp\include\tap++\tap++.h" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\containers.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\containers_fixes.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\copy_functors.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\digraph.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\exceptions.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\foursome.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\hash.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\matrix.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\ntree.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\safe_iterator.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\simple_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\smart_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\triple.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistence.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistence_fixes.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_basic.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_bitset.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_bool.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_callback.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_complex.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_contexts.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_cstring.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_deque.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_digraph.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_enum.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_exceptions.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_float.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_foursome.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_hash.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_inf.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_int.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_interface.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_list.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_map.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_matrix.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_multimap.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_multiset.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_ntree.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pair.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pointer.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pointers.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_set.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_shared_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_shortcuts.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_simple_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_smart_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_stl.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_stlplus.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_string.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_triple.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_vector.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_xref.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\build.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\debug.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\dprintf.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\dynaload.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\file_system.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\inf.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\ip_sockets.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\portability.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\portability_exceptions.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\portability_fixes.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\subprocesses.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\tcp.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\tcp_sockets.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\time.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\udp_sockets.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\version.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\wildcard.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\file_utilities.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\format_types.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_basic.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_bitset.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_bool.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_cstring.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_digraph.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_float.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_foursome.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_hash.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_inf.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_int.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_list.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_map.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_matrix.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_ntree.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_pair.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_pointer.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_sequence.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_set.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_shared_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_simple_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_smart_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_stl.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_stlplus.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_string.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_triple.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_vector.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\strings.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\strings_fixes.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_basic.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_bitset.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_bool.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_cstring.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_digraph.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_float.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_foursome.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_hash.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_inf.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_int.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_list.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_map.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_matrix.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_ntree.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_pair.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_pointer.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_sequence.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_set.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_shared_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_simple_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_smart_ptr.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_stl.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_stlplus.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_string.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_triple.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_utilities.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_vector.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\cli_parser.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\ini_manager.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\library_manager.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\message_handler.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\subsystems.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\subsystems_fixes.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\timer.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm2\ext\libtappp\src\tap++.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_bool.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_contexts.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_cstring.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_exceptions.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_float.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_inf.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_int.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_string.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_vector.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\build.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\debug.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\dprintf.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\dynaload.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\file_system.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\inf.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\ip_sockets.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\portability_fixes.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\subprocesses.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\tcp_sockets.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\time.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\udp_sockets.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\version.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\wildcard.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\file_utilities.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_bool.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_cstring.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_float.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_inf.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_int.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_string.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_vector.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_bool.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_cstring.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_float.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_inf.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_int.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_string.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_utilities.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_vector.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\cli_parser.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\ini_manager.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\library_manager.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\message_handler.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\timer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\digraph.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\foursome.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\hash.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\matrix.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\ntree.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\safe_iterator.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\simple_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\smart_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\triple.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_bitset.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_callback.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_complex.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_deque.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_digraph.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_enum.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_foursome.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_hash.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_interface.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_list.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_map.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_matrix.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_multimap.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_multiset.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_ntree.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pair.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pointer.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_set.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_shared_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_shortcuts.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_simple_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_smart_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_string.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_triple.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_vector.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_xref.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_bitset.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_digraph.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_foursome.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_hash.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_list.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_map.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_matrix.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_ntree.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_pair.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_pointer.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_sequence.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_set.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_shared_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_simple_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_smart_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_triple.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_vector.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_bitset.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_digraph.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_foursome.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_hash.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_list.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_map.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_matrix.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_ntree.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_pair.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_pointer.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_sequence.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_set.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_shared_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_simple_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_smart_ptr.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_triple.tpp" />
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_vector.tpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

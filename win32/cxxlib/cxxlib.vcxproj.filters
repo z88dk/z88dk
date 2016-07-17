@@ -1,0 +1,815 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\stlplus3">
+      <UniqueIdentifier>{c115e6ac-00ac-45dc-b419-e975ffc11e0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stlplus3">
+      <UniqueIdentifier>{48ed3492-db9c-4459-b782-240a64c6c49c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\libtappp">
+      <UniqueIdentifier>{768324cb-d3a2-43ff-8042-2d1b04810662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libtappp">
+      <UniqueIdentifier>{9151cac4-904a-4e0d-8e1e-1931c7d9d380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stlplus3\containers">
+      <UniqueIdentifier>{853c6244-8250-4e99-9824-cd02e83a81b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stlplus3\containers">
+      <UniqueIdentifier>{37139bba-4c7c-4a66-965e-b6dea7621be6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stlplus3\persistence">
+      <UniqueIdentifier>{e50c797f-eefe-4c4f-afc0-905d6e1aaf27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stlplus3\persistence">
+      <UniqueIdentifier>{53728a95-3eb8-416c-8c20-ef2974ed62ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stlplus3\portability">
+      <UniqueIdentifier>{bc47dfb2-306d-44b6-b95f-2e7e61f7a0b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stlplus3\portability">
+      <UniqueIdentifier>{dee52903-8899-4be4-b370-6a9eeceda675}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stlplus3\strings">
+      <UniqueIdentifier>{cd701d9a-089e-4c31-bef6-ed5140362229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stlplus3\strings">
+      <UniqueIdentifier>{1742c50f-c8e9-45cf-bc18-ecfd0f2f28a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stlplus3\subsystems">
+      <UniqueIdentifier>{7c9be725-c960-4318-aad1-505ae9ec31cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stlplus3\subsystems">
+      <UniqueIdentifier>{6169b467-c6b8-437e-82e3-2abcaf2f1594}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm2\ext\libtappp\include\tap++\tap++.h">
+      <Filter>Header Files\libtappp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\containers.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\containers_fixes.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\copy_functors.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\digraph.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\exceptions.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\foursome.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\hash.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\matrix.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\ntree.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\safe_iterator.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\simple_ptr.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\smart_ptr.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\containers\triple.hpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\cli_parser.hpp">
+      <Filter>Header Files\stlplus3\subsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\ini_manager.hpp">
+      <Filter>Header Files\stlplus3\subsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\library_manager.hpp">
+      <Filter>Header Files\stlplus3\subsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\message_handler.hpp">
+      <Filter>Header Files\stlplus3\subsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\subsystems.hpp">
+      <Filter>Header Files\stlplus3\subsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\subsystems_fixes.hpp">
+      <Filter>Header Files\stlplus3\subsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\subsystems\timer.hpp">
+      <Filter>Header Files\stlplus3\subsystems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\file_utilities.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\format_types.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_basic.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_bitset.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_bool.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_cstring.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_digraph.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_float.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_foursome.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_hash.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_inf.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_int.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_list.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_map.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_matrix.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_ntree.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_pair.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_pointer.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_sequence.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_set.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_shared_ptr.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_simple_ptr.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_smart_ptr.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_stl.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_stlplus.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_string.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_triple.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\print_vector.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_basic.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_bitset.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_bool.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_cstring.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_digraph.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_float.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_foursome.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_hash.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_inf.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_int.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_list.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_map.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_matrix.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_ntree.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_pair.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_pointer.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_sequence.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_set.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_shared_ptr.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_simple_ptr.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_smart_ptr.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_stl.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_stlplus.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_string.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_triple.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_utilities.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\string_vector.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\strings.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\strings\strings_fixes.hpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\build.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\debug.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\dprintf.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\dynaload.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\file_system.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\inf.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\ip_sockets.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\portability.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\portability_exceptions.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\portability_fixes.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\subprocesses.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\tcp.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\tcp_sockets.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\time.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\udp_sockets.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\version.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\portability\wildcard.hpp">
+      <Filter>Header Files\stlplus3\portability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistence.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistence_fixes.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_basic.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_bitset.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_bool.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_callback.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_complex.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_contexts.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_cstring.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_deque.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_digraph.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_enum.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_exceptions.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_float.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_foursome.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_hash.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_inf.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_int.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_interface.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_list.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_map.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_matrix.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_multimap.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_multiset.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_ntree.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pair.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pointer.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pointers.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_set.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_shared_ptr.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_shortcuts.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_simple_ptr.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_smart_ptr.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_stl.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_stlplus.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_string.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_triple.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_vector.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_xref.hpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm2\ext\libtappp\src\tap++.cpp">
+      <Filter>Source Files\libtappp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\cli_parser.cpp">
+      <Filter>Source Files\stlplus3\subsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\ini_manager.cpp">
+      <Filter>Source Files\stlplus3\subsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\library_manager.cpp">
+      <Filter>Source Files\stlplus3\subsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\message_handler.cpp">
+      <Filter>Source Files\stlplus3\subsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\subsystems\timer.cpp">
+      <Filter>Source Files\stlplus3\subsystems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\file_utilities.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_bool.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_cstring.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_float.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_inf.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_int.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_string.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\print_vector.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_bool.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_cstring.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_float.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_inf.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_int.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_string.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_utilities.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\strings\string_vector.cpp">
+      <Filter>Source Files\stlplus3\strings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\build.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\debug.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\dprintf.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\dynaload.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\file_system.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\inf.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\ip_sockets.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\portability_fixes.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\subprocesses.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\tcp_sockets.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\time.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\udp_sockets.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\version.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\portability\wildcard.cpp">
+      <Filter>Source Files\stlplus3\portability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_bool.cpp">
+      <Filter>Source Files\stlplus3\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_contexts.cpp">
+      <Filter>Source Files\stlplus3\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_cstring.cpp">
+      <Filter>Source Files\stlplus3\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_exceptions.cpp">
+      <Filter>Source Files\stlplus3\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_float.cpp">
+      <Filter>Source Files\stlplus3\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_inf.cpp">
+      <Filter>Source Files\stlplus3\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_int.cpp">
+      <Filter>Source Files\stlplus3\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_string.cpp">
+      <Filter>Source Files\stlplus3\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_vector.cpp">
+      <Filter>Source Files\stlplus3\persistence</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\digraph.tpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\foursome.tpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\hash.tpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\matrix.tpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\ntree.tpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\safe_iterator.tpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\simple_ptr.tpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\smart_ptr.tpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\containers\triple.tpp">
+      <Filter>Header Files\stlplus3\containers</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_bitset.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_digraph.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_foursome.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_hash.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_list.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_map.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_matrix.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_ntree.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_pair.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_pointer.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_sequence.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_set.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_shared_ptr.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_simple_ptr.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_smart_ptr.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_triple.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\print_vector.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_bitset.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_digraph.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_foursome.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_hash.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_list.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_map.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_matrix.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_ntree.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_pair.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_pointer.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_sequence.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_set.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_shared_ptr.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_simple_ptr.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_smart_ptr.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_triple.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\strings\string_vector.tpp">
+      <Filter>Header Files\stlplus3\strings</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_bitset.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_callback.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_complex.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_deque.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_digraph.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_enum.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_foursome.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_hash.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_interface.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_list.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_map.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_matrix.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_multimap.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_multiset.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_ntree.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pair.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_pointer.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_set.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_shared_ptr.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_shortcuts.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_simple_ptr.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_smart_ptr.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_string.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_triple.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_vector.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+    <None Include="..\..\src\z80asm2\ext\stlplus3\persistence\persistent_xref.tpp">
+      <Filter>Header Files\stlplus3\persistence</Filter>
+    </None>
+  </ItemGroup>
+</Project>
