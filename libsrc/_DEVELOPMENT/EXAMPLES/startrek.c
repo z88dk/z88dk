@@ -34,13 +34,13 @@
 
 #pragma output CLIB_MALLOC_HEAP_SIZE   = 0            // do not create malloc heap
 #pragma output CLIB_STDIO_HEAP_SIZE    = 0            // do not create stdio heap (cannot open files)
-#pragma output CRT_ENABLE_COMMANDLINE  = 1            // enable command line parsing (support varies with target)
 #pragma output CLIB_EXIT_STACK_SIZE    = 0            // do not reserve space for registering atexit() functions
 
 #ifdef __SPECTRUM
 
 #pragma output CRT_ORG_CODE = 30000                   // move ORG to 30000
 #pragma output REGISTER_SP  = -1                      // indicate crt should not modify stack location
+#pragma output CRT_ENABLE_COMMANDLINE  = 1            // create an empty commandline
 
 #endif
 

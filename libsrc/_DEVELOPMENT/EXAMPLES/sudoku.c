@@ -11,7 +11,10 @@
 
 #pragma output CRT_OPT_PRINTF        = 0x00000102    // printf has %uB enabled only
 
-#pragma output REGISTER_SP           = -1            // indicate crt should use default stack location
+#ifdef __SPECTRUM
+#pragma output REGISTER_SP           = -1            // do not change stack pointer
+#endif
+
 #pragma output CLIB_EXIT_STACK_SIZE  = 0             // do not reserve space for registering atexit() functions
 #pragma output CLIB_MALLOC_HEAP_SIZE = 0             // do not create malloc heap
 #pragma output CLIB_STDIO_HEAP_SIZE  = 0             // do not create stdio heap (cannot open files)

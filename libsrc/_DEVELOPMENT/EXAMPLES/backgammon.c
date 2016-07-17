@@ -15,9 +15,10 @@
 
 #endif
 
-#pragma output CLIB_EXIT_STACK_SIZE  = 0             // do not reserve space for registering atexit() functions
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0             // do not create malloc heap
-#pragma output CLIB_STDIO_HEAP_SIZE  = 0             // do not create stdio heap (cannot open files)
+#pragma output CRT_ENABLE_COMMANDLINE = 0            // no command line parsing
+#pragma output CLIB_EXIT_STACK_SIZE   = 0            // do not reserve space for registering atexit() functions
+#pragma output CLIB_MALLOC_HEAP_SIZE  = 0            // do not create malloc heap
+#pragma output CLIB_STDIO_HEAP_SIZE   = 0            // do not create stdio heap (cannot open files)
 
 #include <stdio.h>
 #include <stdlib.h>
