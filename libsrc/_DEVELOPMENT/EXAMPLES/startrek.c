@@ -28,19 +28,20 @@
  */
 
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 startrek.c -o startrek -lm -create-app
-// zcc +zx -vn -SO3 -startup=4 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 startrek.c -o startrek -lm -create-app
+// zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 startrek.c -o startrek -lm -create-app
 
 #pragma output CLIB_OPT_PRINTF         = 0x04000201   // printf has %sdf enabled only
 
 #pragma output CLIB_MALLOC_HEAP_SIZE   = 0            // do not create malloc heap
 #pragma output CLIB_STDIO_HEAP_SIZE    = 0            // do not create stdio heap (cannot open files)
 #pragma output CLIB_EXIT_STACK_SIZE    = 0            // do not reserve space for registering atexit() functions
+#pragma output CRT_ENABLE_COMMANDLINE  = 3            // create command line
 
 #ifdef __SPECTRUM
 
-#pragma output CRT_ORG_CODE = 30000                   // move ORG to 30000
-#pragma output REGISTER_SP  = -1                      // indicate crt should not modify stack location
-#pragma output CRT_ENABLE_COMMANDLINE  = 1            // create an empty commandline
+#pragma output CRT_ORG_CODE            = 30000        // move ORG to 30000
+#pragma output REGISTER_SP             = -1           // indicate crt should not modify stack location
+#pragma output CRT_ENABLE_EIDI         = 0x01         // disable interrupts at start
 
 #endif
 

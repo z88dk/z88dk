@@ -8,7 +8,7 @@
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 clisp.c -o clisp --fsigned-char -create-app
 
 // zcc +zx -vn -O3 -startup=8 -clib=new clisp.c -o clisp -create-app
-// zcc +zx -vn -SO3 -startup=8 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 clisp.c -o clisp --fsigned-char -create-app
+// zcc +zx -vn -SO3 -startup=8 -clib=sdcc_iy --max-allocs-per-node200000 clisp.c -o clisp --fsigned-char -create-app
 
 // use "-DLARGEMEM=1200" for larger workspace
 // use "-DSCHEME" for scheme variant
@@ -22,6 +22,7 @@
 
 #pragma output CRT_ORG_CODE            = 30000        // move ORG to 30000
 #pragma output REGISTER_SP             = -1           // indicate crt should not modify stack location
+#pragma output CRT_ENABLE_EIDI         = 0x01         // disable interrupts at start
 
 #endif
 

@@ -21,8 +21,12 @@
 
 #pragma output CLIB_OPT_PRINTF = 0x00000400   // printf has %c enabled only
 
+#ifdef __SPECTRUM
+#pragma output CRT_ENABLE_EIDI = 0x01         // disable interrupts at start
+#endif
+
+
 #include <stdio.h>
-#include <intrinsic.h>
 
 #define W while
 
@@ -114,12 +118,6 @@ C:if(m>I-M|m<M-I)d=98;
 main()
 {
  long k=8;
-
-#ifdef __SPECTRUM
-
- intrinsic_di();   // local var space large so sdcc uses iy despite being told not to
-
-#endif
 
  K=8;W(K--)
  {b[K]=(b[K+112]=o[K+24]+8)+8;b[K+16]=18;b[K+96]=9;

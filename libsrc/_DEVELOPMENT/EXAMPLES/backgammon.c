@@ -10,8 +10,9 @@
 
 #ifdef __SPECTRUM
 
-#pragma output CRT_ORG_CODE = 30000                  // move ORG to 30000
-#pragma output REGISTER_SP  = -1                     // indicate crt should not modify stack location
+#pragma output CRT_ORG_CODE    = 30000               // move ORG to 30000
+#pragma output REGISTER_SP     = -1                  // indicate crt should not modify stack location
+#pragma output CRT_ENABLE_EIDI = 0x01                // disable interrupts at start
 
 #endif
 
@@ -25,7 +26,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <input.h>
-#include <intrinsic.h>
 
 #define NIL (-1)
 #define MAXGMOV 10
@@ -610,10 +610,6 @@ int main(void)
 {
 	int t, k, n, go[6];
 	char s[75];
-
-#ifdef __SPECTRUM
-	intrinsic_di();
-#endif
 
 	go[5] = NIL;
 	printf("Do you want instructions? Type 'y' for yes,\n");
