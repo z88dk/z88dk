@@ -42,8 +42,6 @@ TODO List
   a difference between two addresses is a constant;
 - add an additional step to automatically change JR into JP if the
   distance is too far;
-- cleanup the symbol table to implement the GLOBAL suggestion: declare a
-  symbol GLOBAL and it is PUBLIC if defined, or EXTERN otherwise
 - implement macros inside the assembler
 - add high level constructs (IF flag / ELSE / ENDIF, 
   DO WHILE flag, ...)
