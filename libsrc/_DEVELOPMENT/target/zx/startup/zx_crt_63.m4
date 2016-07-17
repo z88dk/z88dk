@@ -119,7 +119,7 @@ __Restart:
 
    ; command line
    
-   IF __crt_enable_commandline = 1
+   IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
    
       include "../crt_cmdline_empty.inc"
    
