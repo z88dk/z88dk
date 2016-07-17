@@ -81,9 +81,9 @@ typedef unsigned long          uintmax_t;
 
 #endif
 
-#define INT_LEAST8_MIN        -127
-#define INT_LEAST16_MIN       -32767
-#define INT_LEAST32_MIN       -2147483647L
+#define INT_LEAST8_MIN        -128
+#define INT_LEAST16_MIN       -32768
+#define INT_LEAST32_MIN       -2147483648L
 
 #define INT_LEAST8_MAX         127
 #define INT_LEAST16_MAX        32767
@@ -95,7 +95,7 @@ typedef unsigned long          uintmax_t;
 
 #ifdef __SDCC
 
-#define INT_LEAST64_MIN       -9223372036854775807LL
+#define INT_LEAST64_MIN       -9223372036854775808LL
 #define INT_LEAST64_MAX        9223372036854775807LL
 #define UINT_LEAST64_MAX       18446744073709551615ULL
 
@@ -115,31 +115,31 @@ typedef unsigned long          uintmax_t;
 
 #ifdef __SDCC
 
-#define INT_FAST64_MIN        -9223372036854775807LL
+#define INT_FAST64_MIN        -9223372036854775808LL
 #define INT_FAST64_MAX         9223372036854775807LL
 #define UINT_FAST64_MAX        18446744073709551615ULL
 
 #endif
 
-#define INTPTR_MIN            -32767
+#define INTPTR_MIN            -32768
 #define INTPTR_MAX             32767
 #define UINTPTR_MAX            65535U
 
 #ifdef _SDCC
 
-#define INTMAX_MIN            -9223372036854775807LL
+#define INTMAX_MIN            -9223372036854775808LL
 #define INTMAX_MAX             9223372036854775807LL
 #define UINTMAX_MAX            18446744073709551615ULL
 
 #else
 
-#define INTMAX_MIN            -2147483647L
+#define INTMAX_MIN            -2147483648L
 #define INTMAX_MAX             2147483647L
 #define UINTMAX_MAX            4294967295UL
 
 #endif
 
-#define PTRDIFF_MIN           -32767
+#define PTRDIFF_MIN           -32768
 #define PTRDIFF_MAX            32767
 
 // SIG_ATOMIC_MIN
