@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.46 2016-07-16 02:45:37 aralbrec Exp $
+ *   $Id: appmake.c,v 1.47 2016-07-17 01:42:44 pauloscustodio Exp $
  */
 
 
@@ -518,7 +518,7 @@ void writeword(unsigned int i, FILE *fp)
 
 void writestring(char *mystring, FILE *fp)
 {
-	int  c;
+	size_t c;
 
 	for (c=0; c < strlen(mystring); c++) {
 		writebyte(mystring[c],fp);
@@ -568,7 +568,7 @@ void writebyte_pk(unsigned char c, FILE *fp,unsigned char *p)
 
 void writestring_p(char *mystring, FILE *fp,unsigned char *p)
 {
-    int  c;
+	size_t c;
 
     for (c=0; c < strlen(mystring); c++) {
         writebyte_p(mystring[c],fp,p);
@@ -579,7 +579,7 @@ void writestring_p(char *mystring, FILE *fp,unsigned char *p)
 
 void writestring_pk(char *mystring, FILE *fp,unsigned char *p)
 {
-    int  c;
+	size_t c;
 
     for (c=0; c < strlen(mystring); c++) {
         writebyte_pk(mystring[c],fp,p);
@@ -606,7 +606,7 @@ void writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum)
 
 void writestring_cksum(char *mystring, FILE *fp, unsigned long *cksum)
 {
-	int  c;
+	size_t c;
 
 	for (c=0; c < strlen(mystring); c++) {
 		writebyte_cksum(mystring[c],fp,cksum);
