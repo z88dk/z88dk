@@ -17,7 +17,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.9 2016-07-11 05:58:34 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.10 2016-07-19 06:01:10 stefano Exp $
 ;
 
 
@@ -64,7 +64,8 @@
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 
-.text_cols   defb columns
+	EXTERN	ansicolumns
+.text_cols   defb ansicolumns
 .text_rows   defb 8
 
 .ansi_CHAR

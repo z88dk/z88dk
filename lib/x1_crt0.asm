@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.15 2016-07-15 21:03:25 dom Exp $
+;    $Id: x1_crt0.asm,v 1.16 2016-07-19 06:01:10 stefano Exp $
 ;
 
 	MODULE x1_crt0
@@ -196,6 +196,10 @@ _wait_sub_cpu:
 	bit 6, a
 	jp nz, ii_w1
 	ret
+
+	IF !DEFINED_ansicolumns
+		 defc ansicolumns = 40
+	ENDIF
 
         INCLUDE "crt0_runtime_selection.asm"
 

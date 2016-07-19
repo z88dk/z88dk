@@ -11,7 +11,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.5 2016-06-10 23:47:18 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.6 2016-07-19 06:01:10 stefano Exp $
 ;
 
         SECTION code_clib
@@ -25,8 +25,8 @@
 	EXTERN	ansi_ROW
 	EXTERN	ansi_COLUMN
 	
-	
-.text_cols   defb 40
+	EXTERN	ansicolumns	
+.text_cols   defb ansicolumns
 .text_rows   defb 25
 
 
