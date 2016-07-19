@@ -9,6 +9,7 @@
 
 #include "message_handler.hpp"
 
+// information and error messages channels
 extern stlplus::message_handler g_messages;
 extern stlplus::message_handler g_errors;
 

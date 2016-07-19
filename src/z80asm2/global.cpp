@@ -7,5 +7,6 @@
 #include "global.hpp"
 #include <iostream>
 
+// information and error messages channels
 stlplus::message_handler g_messages(std::cout);
 stlplus::message_handler g_errors(std::cerr);
