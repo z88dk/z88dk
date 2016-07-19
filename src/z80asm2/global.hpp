@@ -1,14 +1,15 @@
 //-----------------------------------------------------------------------------
-// Main executable for z80asm
+// Global data
 // Copyright (c) Paulo Custodio, 2015-2016
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include <iostream>
-#include "dummy.hpp"
+#ifndef GLOBAL_HPP
+#define GLOBAL_HPP
 
-int main(int argc, char *argv[])
-{
-	std::cout << "The answer is " << dummy() << std::endl;
-	return dummy()==42 ? 0 : -1;
-}
+#include "message_handler.hpp"
+
+extern stlplus::message_handler g_messages;
+extern stlplus::message_handler g_errors;
+
+#endif /* ndef GLOBAL_HPP */

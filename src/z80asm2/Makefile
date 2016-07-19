@@ -5,7 +5,7 @@
 #------------------------------------------------------------------------------
 
 # project
-PROJ 		:= z80asm
+PROJ 		:= z80asm2
 
 # platform - include defines needed by stlplus3
 UNAME		:= $(shell uname -s)
@@ -112,7 +112,8 @@ TEST_OBJS	:= $(TEST_SRCS:%.cpp=%.o)
 TESTS	 	:= $(TEST_SRCS:%.cpp=%)
 DEPENDS		+= $(TEST_SRCS:%.cpp=%.d)
 
-RUNTESTS	:= perl ext/libtappp/run_tests.pl
+RUNTESTS_C	:= perl ext/libtappp/run_tests.pl
+RUNTESTS_T	:= perl -S prove
 
 # do not delete intermediate targets
 .SECONDARY:
@@ -141,7 +142,9 @@ $(eval $(call make-lib,$(EXT_LIB),$(EXT_OBJS)))
 $(eval $(call make-lib,$(PROJ),$(PROJ_OBJS)))
 
 # Target: test
-test: all; $(RUNTESTS) $(TESTS)
+test: all
+	$(RUNTESTS_C) $(TESTS)
+	$(RUNTESTS_T) $(wildcard t/*.t)
 
 # Target: clean
 clean::
