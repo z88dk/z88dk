@@ -6,13 +6,13 @@
 ; in:	A = text row number
 ;
 ;
-;	$Id: f_ansi_dline.asm,v 1.6 2016-06-10 23:47:18 dom Exp $
+;	$Id: f_ansi_dline.asm,v 1.7 2016-07-20 05:45:02 stefano Exp $
 ;
 
 
         SECTION code_clib
 	PUBLIC	ansi_del_line
-	EXTERN	text_cols
+	EXTERN	ansicolumns
 	EXTERN	ATTR
 
 
@@ -21,7 +21,7 @@
 	and	a
 	jr	z,isz
 	push af
-	ld	a,(text_cols)
+	ld	a,ansicolumns
 	ld	d,l
 	ld	e,a
 	pop af

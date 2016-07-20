@@ -5,18 +5,18 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	$Id: f_ansi_cls.asm,v 1.5 2016-06-10 23:47:18 dom Exp $
+;	$Id: f_ansi_cls.asm,v 1.6 2016-07-20 05:45:02 stefano Exp $
 ;
 
         SECTION code_clib
 	PUBLIC	ansi_cls
 	EXTERN	ATTR
-	EXTERN	text_cols
+	EXTERN	ansicolumns	
 
 ansi_cls:
         ld bc, $3000
         ;ld hl, $200F	; ' ' char and attribute
-        ld	a,(text_cols)
+        ld	a,ansicolumns
         ld	d, $20
 clr2:
         ld	e,a

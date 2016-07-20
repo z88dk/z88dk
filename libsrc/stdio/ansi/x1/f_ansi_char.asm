@@ -11,7 +11,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.6 2016-07-19 06:01:10 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.7 2016-07-20 05:45:02 stefano Exp $
 ;
 
         SECTION code_clib

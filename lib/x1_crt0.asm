@@ -2,7 +2,7 @@
 ;
 ;	Karl Von Dyson (for X1s.org)
 ;
-;    $Id: x1_crt0.asm,v 1.16 2016-07-19 06:01:10 stefano Exp $
+;    $Id: x1_crt0.asm,v 1.17 2016-07-20 05:45:02 stefano Exp $
 ;
 
 	MODULE x1_crt0
@@ -198,6 +198,7 @@ _wait_sub_cpu:
 	ret
 
 	IF !DEFINED_ansicolumns
+		 defc DEFINED_ansicolumns = 1
 		 defc ansicolumns = 40
 	ENDIF
 

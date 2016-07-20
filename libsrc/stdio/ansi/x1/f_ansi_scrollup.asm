@@ -5,18 +5,22 @@
 ;	Scrollup
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.5 2016-06-10 23:47:18 dom Exp $
+;	$Id: f_ansi_scrollup.asm,v 1.6 2016-07-20 05:45:02 stefano Exp $
 ;
 
         SECTION code_clib
 	PUBLIC	ansi_SCROLLUP
 	EXTERN	ATTR
-	EXTERN	text_cols
+	
+	EXTERN	ansicolumns	
+
 
 .ansi_SCROLLUP
 	ld	de,$3000
-	ld	bc,40*24
-	ld	a,(text_cols)
+	ld	bc,ansicolumns*24
+	
+	ld	a,ansicolumns
+	
 	ld	h,d
 	ld	l,a
 	push af
@@ -52,7 +56,7 @@
 	ld	l,e
 	pop	af
 	ld	b,a
-	;ld	b,40
+
 .reslloop
 	push bc
 	ld b,h

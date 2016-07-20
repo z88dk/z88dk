@@ -17,7 +17,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.2 2016-06-12 16:06:43 dom Exp $
+;	$Id: f_ansi_char.asm,v 1.3 2016-07-20 05:45:02 stefano Exp $
 ;
 
 
@@ -27,17 +27,29 @@
 	EXTERN	ansi_ROW
 	EXTERN	ansi_COLUMN
 	
+	EXTERN	ansicharacter_pixelwidth
+	EXTERN	ansifont_is_packed
+	EXTERN	ansifont
+	
 	PUBLIC	text_cols
 	PUBLIC	text_rows
 	
 ; Dirty thing for self modifying code
 	PUBLIC	INVRS
 
-; Setting char_dots to 3 the columns number can be 80 !
-	defc char_dots = 4
-	defc PACKEDFONT = 1
-	
-.text_cols   defb 60
+
+; -pragma-need=ansiterminal -pragma-define:ansipixels=240 -pragma-define:ansicolumns=xx
+
+; 8 dots: MAX 30 columns
+; 7 dots: MAX 34 columns
+; 6 dots: MAX 40 columns
+; 5 dots: MAX 48 columns
+; 4 dots: MAX 60 columns
+; 3 dots: MAX 80 columns
+
+
+	EXTERN	ansicolumns
+.text_cols   defb ansicolumns
 .text_rows   defb 8
 
 
@@ -109,17 +121,20 @@
 .char
   ld b,'A'      ; Put here the character to be printed
   
-IF PACKEDFONT
+  ld a,ansifont_is_packed
+  ld	hl,ansifont	- 256
+  and	a
+  jr    z,got_font_location
+
   xor	a
   rr	b
   jr	c,even
   ld	a,4
 .even
   ld	(ROLL+1),a
-  ld hl,font-128
-ELSE
-  ld hl,font
-ENDIF
+  ld hl,ansifont - 128
+
+.got_font_location
 
   ld de,8
 
@@ -143,16 +158,18 @@ ENDIF
   rl (ix+0)
   djnz L1
 .DTS
-  ld a,(hl)
   
-IF PACKEDFONT
+  ld a,ansifont_is_packed
+  and  a
+  ld a,(hl)
+  jr   z,INVRS
+
 .ROLL
   jr INVRS
   rla
   rla
   rla
   rla
-ENDIF
 
 ; --- --- Inverse text handling
 .INVRS
@@ -170,7 +187,7 @@ ENDIF
 ; --- --- end of underlined text handling
 
 .DOTS
-  ld b,char_dots	; character FONT width in pixel
+  ld b,ansicharacter_pixelwidth
 .L2
   rla
   rl (ix+1)
@@ -195,8 +212,3 @@ ENDIF
   ret
 
 
-
-; The font
-
-.font
-        BINARY  "stdio/ansi/F4PACK.BIN"
