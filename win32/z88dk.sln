@@ -28,6 +28,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cxxlib", "cxxlib\cxxlib.vcxproj", "{4C57A3BF-7B50-47EA-B58C-D3C93A37A831}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm2", "z80asm2\z80asm2.vcxproj", "{440FFC54-2EE8-4A19-B170-A0FDD53E11F6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4C57A3BF-7B50-47EA-B58C-D3C93A37A831} = {4C57A3BF-7B50-47EA-B58C-D3C93A37A831}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
