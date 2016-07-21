@@ -6,43 +6,32 @@
 
 #include <iostream>
 #include <limits.h>
-
 #include "dprintf.hpp"
+#include "messages.hpp"
 #include "global.hpp"
-
-// show copyright and 1..N USAGE_xx lines
-static void usage(int max_usage_lines = INT_MAX)
-{
-	g_messages.information("COPYRIGHT");
-	g_messages.plaintext("");
-
-	bool done = false;
-	int mes_nr = 0;
-	while (!done && mes_nr < max_usage_lines) {
-		try {
-			g_messages.information(stlplus::dformat("USAGE_%02d", ++mes_nr));
-		}
-		catch (stlplus::message_handler_id_error&) {
-			done = true;
-		}
-	}
-}
 
 int main(int argc, char *argv[])
 {
-	// TODO: compute message file name based on arv[0]
-	g_messages.add_message_file("z80asm2.mes");
-	g_errors.add_message_file("z80asm2.mes");
+	init_messages();
+	init_global(argv[0]);
 
-	if (argc <= 1)
-		usage(1);
+	if (argc <= 1) {
+		g_messages.information(MES_COPYRIGHT);
+		g_messages.plaintext("");
+		g_messages.information(MES_USAGE);
+	}
 	else {
 		std::string arg1 = argv[1];
-		if (argc == 2 && (arg1 == "-h" || arg1 == "--help"))
-			usage();
+		if (argc == 2 && (arg1 == "-h" || arg1 == "--help")) {
+			g_messages.information(MES_COPYRIGHT);
+			g_messages.plaintext("");
+			g_messages.information(MES_USAGE);
+			g_messages.plaintext("");
+			g_messages.information(MES_HELP);
+		}
 		else {
 			// TODO: parse command line
-			g_errors.error("ERR_CMD_LINE_ARGS");
+			g_errors.error(ERR_CMD_LINE_ARGS);
 		}
 	}
 

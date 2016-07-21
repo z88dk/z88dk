@@ -7,10 +7,13 @@
 #ifndef GLOBAL_HPP
 #define GLOBAL_HPP
 
-#include "message_handler.hpp"
+#include <string>
 
-// information and error messages channels
-extern stlplus::message_handler g_messages;
-extern stlplus::message_handler g_errors;
+// program path and name
+extern std::string g_prog_folder;		// directory from which main() was started
+extern std::string g_prog_basename;		// program name without .exe extension
+
+// init globals dependent on argv[0]
+extern void init_global(const std::string& argv0);
 
 #endif /* ndef GLOBAL_HPP */

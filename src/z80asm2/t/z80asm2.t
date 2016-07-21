@@ -7,11 +7,13 @@
 use Modern::Perl;
 use Test::Cmd;
 use Test::More;
+use Test::Differences; 
 use Config;
 
-my $copyright = "Z80 Module Assembler 3.0-alpha, (c) Paulo Custodio 2011-2016";
-my @usage = split(/\r?\n/, <<'END');
-Usage: z80asm2 [options] { @<modulefile> | <filename> }...
+my $copyright = 'Z80 Module Assembler 3.0-alpha, (c) Paulo Custodio 2011-2016';
+my $usage = 'Usage: z80asm2 [options] { @<modulefile> | <filename> }...';
+my $help = join("\n", split(/\r?\n/, <<'END'));
+Using z80asm2:
 
   To assemble 'fred.asm' use 'fred' or 'fred.asm'
 
@@ -69,25 +71,26 @@ Output File Options:
 END
 
 my $t = Test::Cmd->new(prog => "z80asm2$Config{_exe}", workdir => '');
+my $ret;
 
 # no arguments - copyright
-my $ret = $t->run(args => '');
-is $t->stdout, join("\n", $copyright, "", $usage[0], "");
-is $t->stderr, "";
+$ret = $t->run(args => '');
+eq_or_diff_text scalar($t->stdout), join("\n", $copyright, "", $usage, "");
+eq_or_diff_text scalar($t->stderr), "";
 is $ret >> 8, 0;
 
 # help option
 for my $option ("-h", "--help") {
 	$ret = $t->run(args => $option);
-	is $t->stdout, join("\n", $copyright, "", @usage, "");
-	is $t->stderr, "";
+	eq_or_diff_text scalar($t->stdout), join("\n", $copyright, "", $usage, "", $help, "");
+	eq_or_diff_text scalar($t->stderr), "";
 	is $ret >> 8, 0;
 }
 
 # option error
-my $ret = $t->run(args => '--no-such-option');
-is $t->stdout, "";
-is $t->stderr, "error: Invalid command line argumens, run z80asm2 -h for help\n";
+$ret = $t->run(args => '--no-such-option');
+eq_or_diff_text scalar($t->stdout), "";
+eq_or_diff_text scalar($t->stderr), "error: Invalid command line argumens, run z80asm2 -h for help\n";
 is $ret >> 8, 1;
 
 done_testing;

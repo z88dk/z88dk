@@ -5,8 +5,17 @@
 //-----------------------------------------------------------------------------
 
 #include "global.hpp"
-#include <iostream>
+#include "file_system.hpp"
 
-// information and error messages channels
-stlplus::message_handler g_messages(std::cout);
-stlplus::message_handler g_errors(std::cerr);
+// program path and name
+std::string g_prog_folder;			// directory from which main() was started
+std::string g_prog_basename;		// program name without .exe extension
+
+// init globals dependent on argv[0]
+void init_global(const std::string& argv0)
+{
+	// progname
+	g_prog_folder = stlplus::install_path(argv0);
+	g_prog_basename = stlplus::basename_part(argv0);
+}
+

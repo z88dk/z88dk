@@ -119,10 +119,15 @@ RUNTESTS_T	:= perl -S prove
 .SECONDARY:
 
 # Targets
-.PHONY: all test clean install
+.PHONY: all preproc test clean install
 
 # Default: all
 all: 
+
+# preprocessed files
+preproc: messages.cpp messages.hpp
+messages.cpp messages.hpp: messages.pl
+	perl messages.pl
 
 # Build targets for each executable
 define make-exe
