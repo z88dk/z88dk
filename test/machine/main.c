@@ -50,6 +50,16 @@ void PatchZ80(Z80 *R)
     }
 }
 
+void OutZ80(register word Port,register byte Value)
+{
+}
+
+byte InZ80(register word Port)
+{
+    return 0xff;
+}
+
+
 
 /* Patching instruction:
  *
