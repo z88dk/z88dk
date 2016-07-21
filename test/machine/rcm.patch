@@ -294,8 +294,8 @@ diff -wu Z80.orig/Z80.c Z80/Z80.c
 +INLINE void WrZ80(word A, byte V) { RAM[A] = V; }
 +
 +
-+#define InZ80(a) (0xFF)
-+#define OutZ80(a,v)
++ 
++ 
 +
 +#else
 +
