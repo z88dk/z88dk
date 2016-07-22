@@ -3,8 +3,8 @@
 #include <iostream>
 #include "messages.hpp"
 
-stlplus::message_handler g_messages(std::cout);
-stlplus::message_handler g_errors(std::cerr);
+stlplus::message_handler g_messages(std::cout, 0);	// infinite error limit
+stlplus::message_handler g_errors(std::cerr, 0);	// infinite error limit
 
 const char *MES_COPYRIGHT = "MES_COPYRIGHT";
 const char *MES_USAGE = "MES_USAGE";

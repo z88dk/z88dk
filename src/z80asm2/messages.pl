@@ -71,8 +71,8 @@ path("$prog.cpp")->spew(<<END,
 #include <iostream>
 #include "$prog.hpp"
 
-stlplus::message_handler g_messages(std::cout);
-stlplus::message_handler g_errors(std::cerr);
+stlplus::message_handler g_messages(std::cout, 0);	// infinite error limit
+stlplus::message_handler g_errors(std::cerr, 0);	// infinite error limit
 
 END
 (map {"const char *".$_->id." = \"".$_->id."\";\n"} @messages), <<END,
