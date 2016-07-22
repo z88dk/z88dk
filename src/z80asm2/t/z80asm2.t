@@ -4,7 +4,8 @@
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
 
-use Modern::Perl;
+use strict;
+use warnings;
 use Test::Cmd;
 use Test::More;
 use Test::Differences; 
