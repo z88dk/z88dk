@@ -7,7 +7,7 @@
 ;	Stefano Bodrato - Mar. 2004 - removed the BS trick
 ;
 ;
-;	$Id: fgetc_cons.asm,v 1.8 2016-03-06 21:36:52 dom Exp $
+;	$Id: fgetc_cons.asm,v 1.9 2016-07-22 09:45:18 dom Exp $
 ;
 
 
@@ -23,7 +23,14 @@
 	call	5
 	and	a
 	jr	z,fgetc_cons
-
+IF STANDARDESCAPECHARS
+	cp	13
+	ld	hl,10
+	ret	z
+	cp	10
+	ld	hl,13
+	ret	z
+ENDIF
 	ld	l,a
 	ld	h,0
 	ret
