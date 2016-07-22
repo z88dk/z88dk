@@ -1,5 +1,5 @@
-Z88DK Z80 Macro Assembler Change Log
-====================================
+Z88DK Z80 Module Assembler Change Log
+=====================================
 
 2016
 ----
