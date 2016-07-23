@@ -5,42 +5,16 @@
 //-----------------------------------------------------------------------------
 
 #include <iostream>
-#include <limits.h>
-#include "dprintf.hpp"
 #include "messages.hpp"
-#include "global.hpp"
-
-static void usage()
-{
-	g_messages.information(MES_COPYRIGHT);
-	g_messages.plaintext("");
-	g_messages.information(MES_USAGE);
-}
-
-static void help()
-{
-	g_messages.information(MES_COPYRIGHT);
-	g_messages.plaintext("");
-	g_messages.information(MES_USAGE);
-	g_messages.plaintext("");
-	g_messages.information(MES_HELP);
-}
+#include "cmdline.hpp"
 
 int main(int argc, char *argv[])
 {
 	init_messages();
 	init_global(argv[0]);
 
-	if (argc <= 1)
-		usage();
-	else {
-		std::string arg1 = argv[1];
-		if (argc == 2 && (arg1 == "-h" || arg1 == "--help"))
-			help();
-		else {
-			// TODO: parse command line
-			g_errors.error(ERR_CMD_LINE_ARGS);
-		}
+	if (parse_cmdline(argc, argv, g_args)) {
+		// TODO: parse command line
 	}
 
 	return g_errors.error_count() == 0 ? 0 : 1;

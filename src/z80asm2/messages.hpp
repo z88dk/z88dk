@@ -13,7 +13,9 @@ extern stlplus::message_handler g_errors;
 extern const char *MES_COPYRIGHT;
 extern const char *MES_USAGE;
 extern const char *MES_HELP;
-extern const char *ERR_CMD_LINE_ARGS;
+extern const char *ERR_INVALID_OPTION;
+extern const char *ERR_READ_FILE;
+extern const char *ERR_READ_CONTEXT;
 
 // setup messages
 extern void init_messages();

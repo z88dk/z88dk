@@ -108,7 +108,9 @@ MES_HELP		=Using z80asm2:
 				=  To assemble 'fred.asm' use 'fred' or 'fred.asm'
 				=
 				=  <modulefile> contains list of file names of all modules to be linked,
-				=  one file or another \@modulefile per line.
+				=  one file per line. 
+				=  Empty lines or lines starting with ';' or '#' are ignored.
+				=  Lines starting with '\@' are expanded recursively.
 				=
 				=  File types recognized or created by z80asm:
 				=    .asm = source file (default), or alternative -e<ext>
@@ -159,5 +161,6 @@ MES_HELP		=Using z80asm2:
 				=  -m, --map              Create address map file.map
 				=  -g, --globaldef        Create global definition file.def
 
-ERR_CMD_LINE_ARGS	=Invalid command line argumens, run z80asm2 -h for help
-
+ERR_INVALID_OPTION	=invalid option '@0', run z80asm2 -h for help
+ERR_READ_FILE		=cannot read file '@0'
+ERR_READ_CONTEXT	=while reading file '@0'

@@ -7,6 +7,9 @@
 #include "global.hpp"
 #include "file_system.hpp"
 
+// global args produced by cmdline parsing
+args_t g_args;
+
 // program path and name
 std::string g_prog_folder;			// directory from which main() was started
 std::string g_prog_basename;		// program name without .exe extension

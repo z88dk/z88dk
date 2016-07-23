@@ -115,6 +115,8 @@ DEPENDS		+= $(TEST_SRCS:%.cpp=%.d)
 RUNTESTS_C	:= perl ext/libtappp/run_tests.pl
 RUNTESTS_T	:= perl -S prove
 
+RE2C		:= re2c -c -i --no-generation-date --no-version 
+
 # do not delete intermediate targets
 .SECONDARY:
 
@@ -122,12 +124,14 @@ RUNTESTS_T	:= perl -S prove
 .PHONY: all preproc test clean install
 
 # Default: all
-all: 
+all: preproc
 
 # preprocessed files
 preproc: messages.cpp messages.hpp
-messages.cpp messages.hpp: messages.pl
-	perl messages.pl
+messages.cpp messages.hpp: messages.pl; perl $<
+
+preproc: cmdline.cpp
+cmdline.cpp: cmdline.re messages.hpp; $(RE2C) -o $@ $<
 
 # Build targets for each executable
 define make-exe
