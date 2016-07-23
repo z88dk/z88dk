@@ -14,7 +14,14 @@ int main(int argc, char *argv[])
 	init_global(argv[0]);
 
 	if (parse_cmdline(argc, argv, g_args)) {
+		if (g_args.is_verbose)
+			g_messages.information(MES_COPYRIGHT);
+
 		// TODO: parse command line
+		for (unsigned i = 0; i < g_args.files.size(); i++) {
+			if (g_args.is_verbose)
+				g_messages.information(MES_PARSING_FILE, g_args.files[i]);
+		}
 	}
 
 	return g_errors.error_count() == 0 ? 0 : 1;

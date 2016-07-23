@@ -9,6 +9,7 @@ stlplus::message_handler g_errors(std::cerr, 0);	// infinite error limit
 const char *MES_COPYRIGHT = "MES_COPYRIGHT";
 const char *MES_USAGE = "MES_USAGE";
 const char *MES_HELP = "MES_HELP";
+const char *MES_PARSING_FILE = "MES_PARSING_FILE";
 const char *ERR_INVALID_OPTION = "ERR_INVALID_OPTION";
 const char *ERR_READ_FILE = "ERR_READ_FILE";
 const char *ERR_READ_CONTEXT = "ERR_READ_CONTEXT";
@@ -73,6 +74,7 @@ g_messages.add_message(MES_HELP, "Using z80asm2:\n"
 "  -l, --list             Create listing file.lis\n"
 "  -m, --map              Create address map file.map\n"
 "  -g, --globaldef        Create global definition file.def");
+g_messages.add_message(MES_PARSING_FILE, "parsing file '@0'");
 g_errors.add_message(ERR_INVALID_OPTION, "invalid option '@0', run z80asm2 -h for help");
 g_errors.add_message(ERR_READ_FILE, "cannot read file '@0'");
 g_errors.add_message(ERR_READ_CONTEXT, "while reading file '@0'");

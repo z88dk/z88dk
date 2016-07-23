@@ -161,6 +161,7 @@ MES_HELP		=Using z80asm2:
 				=  -m, --map              Create address map file.map
 				=  -g, --globaldef        Create global definition file.def
 
+MES_PARSING_FILE	=parsing file '@0'
 ERR_INVALID_OPTION	=invalid option '@0', run z80asm2 -h for help
 ERR_READ_FILE		=cannot read file '@0'
 ERR_READ_CONTEXT	=while reading file '@0'

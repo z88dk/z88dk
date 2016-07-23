@@ -13,6 +13,7 @@ extern stlplus::message_handler g_errors;
 extern const char *MES_COPYRIGHT;
 extern const char *MES_USAGE;
 extern const char *MES_HELP;
+extern const char *MES_PARSING_FILE;
 extern const char *ERR_INVALID_OPTION;
 extern const char *ERR_READ_FILE;
 extern const char *ERR_READ_CONTEXT;

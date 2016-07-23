@@ -103,7 +103,9 @@ $ret = $t->run(args => '@test.1');
 eq_or_diff_text scalar($t->stdout), "";
 eq_or_diff_text scalar($t->stderr), "error: cannot read file 'test.1'\n";
 is $ret >> 8, 1;
+unlink 'test.1';
 
+unlink 'test.1', 'test.2', 'test.3';
 path('test.1')->spew("\n".'@test.2');
 path('test.2')->spew('@test.3');
 $ret = $t->run(args => '@test.1');
@@ -117,5 +119,26 @@ eq_or_diff_text scalar($t->stderr),
 			"\@test.2\n".
 			" ^\n";
 is $ret >> 8, 1;
-unlink 'test.1', 'test.2';
+unlink 'test.1', 'test.2', 'test.3';
+
+# verbose flag
+path('test.1.asm')->spew("");
+path('test.2.asm')->spew("");
+
+$ret = $t->run(args => 'test.1 test.2');
+eq_or_diff_text scalar($t->stdout), "";
+eq_or_diff_text scalar($t->stderr), "";
+is $ret >> 8, 0;
+
+for my $option ("-v", "--verbose") {
+	$ret = $t->run(args => "$option test.1 test.2");
+	eq_or_diff_text scalar($t->stdout), join("\n", $copyright, 
+											"parsing file 'test.1'",
+											"parsing file 'test.2'", 
+											"");
+	eq_or_diff_text scalar($t->stderr), "";
+	is $ret >> 8, 0;
+}
+unlink 'test.1.asm', 'test.2.asm';
+
 done_testing;

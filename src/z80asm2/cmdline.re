@@ -56,7 +56,9 @@ static bool insert_file(std::string filename,
 				line_nr++;
 				stlplus::message_position pos(filename, line_nr, col_nr);
 				g_errors.push_context(pos, ERR_READ_CONTEXT, filename);
+				
 				insert_file(line, list);
+				
 				g_errors.pop_context();
 			}
 		}
@@ -100,10 +102,16 @@ bool parse_cmdline(int argc, char *argv[], args_t& out_args)
 							return false; 
 						}
 			
-			<init> "-h"     end 
-				 | "--help" end	
+			<init> "-h"     	end 
+				 | "--help" 	end	
 						{ 	help(); 
 							return false; 
+						}
+						
+			<init> "-v"     	end 
+				 | "--verbose" 	end	
+						{ 	out_args.is_verbose = true;
+							continue;
 						}
 						
 			<init> "-"	{ 	g_errors.error(ERR_INVALID_OPTION, argv[arg]); 

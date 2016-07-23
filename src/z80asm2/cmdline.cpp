@@ -5,7 +5,7 @@
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#define YYMAXFILL 7
+#define YYMAXFILL 10
 
 enum YYCONDTYPE {
 			yycinit,
@@ -61,7 +61,9 @@ static bool insert_file(std::string filename,
 				line_nr++;
 				stlplus::message_position pos(filename, line_nr, col_nr);
 				g_errors.push_context(pos, ERR_READ_CONTEXT, filename);
+				
 				insert_file(line, list);
+				
 				g_errors.pop_context();
 			}
 		}
@@ -120,6 +122,7 @@ yy7:
 			switch (yych) {
 			case '-':			goto yy9;
 			case 'h':			goto yy11;
+			case 'v':			goto yy12;
 			default:			goto yy8;
 			}
 yy8:
@@ -129,7 +132,8 @@ yy8:
 yy9:
 			yych = *++YYCURSOR;
 			switch (yych) {
-			case 'h':			goto yy12;
+			case 'h':			goto yy13;
+			case 'v':			goto yy14;
 			default:			goto yy10;
 			}
 yy10:
@@ -137,29 +141,74 @@ yy10:
 			goto yy8;
 yy11:
 			yych = *++YYCURSOR;
-			if (yych <= 0x00) goto yy13;
+			if (yych <= 0x00) goto yy15;
 			goto yy10;
 yy12:
 			yych = *++YYCURSOR;
+			if (yych <= 0x00) goto yy17;
+			goto yy10;
+yy13:
+			yych = *++YYCURSOR;
 			switch (yych) {
-			case 'e':			goto yy15;
+			case 'e':			goto yy19;
 			default:			goto yy10;
 			}
-yy13:
+yy14:
+			yych = *++YYCURSOR;
+			switch (yych) {
+			case 'e':			goto yy20;
+			default:			goto yy10;
+			}
+yy15:
 			++YYCURSOR;
 			{ 	help(); 
 							return false; 
 						}
-yy15:
+yy17:
+			++YYCURSOR;
+			{ 	out_args.is_verbose = true;
+							continue;
+						}
+yy19:
 			yych = *++YYCURSOR;
 			switch (yych) {
-			case 'l':			goto yy16;
+			case 'l':			goto yy21;
 			default:			goto yy10;
 			}
-yy16:
+yy20:
+			yych = *++YYCURSOR;
+			switch (yych) {
+			case 'r':			goto yy22;
+			default:			goto yy10;
+			}
+yy21:
+			yych = *++YYCURSOR;
+			switch (yych) {
+			case 'p':			goto yy11;
+			default:			goto yy10;
+			}
+yy22:
+			yych = *++YYCURSOR;
+			switch (yych) {
+			case 'b':			goto yy23;
+			default:			goto yy10;
+			}
+yy23:
+			yych = *++YYCURSOR;
+			switch (yych) {
+			case 'o':			goto yy24;
+			default:			goto yy10;
+			}
+yy24:
+			yych = *++YYCURSOR;
+			switch (yych) {
+			case 's':			goto yy25;
+			default:			goto yy10;
+			}
+yy25:
 			++YYCURSOR;
 			switch ((yych = *YYCURSOR)) {
-			case 'p':			goto yy11;
+			case 'e':			goto yy12;
 			default:			goto yy10;
 			}
 }

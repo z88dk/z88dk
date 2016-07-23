@@ -20,6 +20,7 @@ extern void init_global(const std::string& argv0);
 // global args produced by cmdline parsing
 struct args_t
 {
+	bool	is_verbose;					// -v, --verbose
 	std::vector<std::string> inc_path;	// list of directories to search for source files, option -I, --inc-path
 	std::vector<std::string> lib_path;	// list of directories to search for library files, option -L, --lib-path
 	std::vector<std::string> files;		// list of input files, with '@' lists already expanded
