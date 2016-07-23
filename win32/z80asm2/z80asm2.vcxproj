@@ -222,17 +222,22 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm2\cmdline.hpp" />
     <ClInclude Include="..\..\src\z80asm2\dummy.hpp" />
     <ClInclude Include="..\..\src\z80asm2\global.hpp" />
     <ClInclude Include="..\..\src\z80asm2\messages.hpp" />
+    <ClInclude Include="..\..\src\z80asm2\util.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm2\cmdline.cpp" />
     <ClCompile Include="..\..\src\z80asm2\dummy.cpp" />
     <ClCompile Include="..\..\src\z80asm2\global.cpp" />
     <ClCompile Include="..\..\src\z80asm2\messages.cpp" />
+    <ClCompile Include="..\..\src\z80asm2\util.cpp" />
     <ClCompile Include="..\..\src\z80asm2\z80asm2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\z80asm2\cmdline.re" />
     <None Include="..\..\src\z80asm2\messages.pl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
