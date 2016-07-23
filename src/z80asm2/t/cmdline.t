@@ -98,19 +98,24 @@ eq_or_diff_text scalar($t->stderr), "error: invalid option '--no-such-option', r
 is $ret >> 8, 1;
 
 # recursive lists with missing files
+unlink 'test.1';
 $ret = $t->run(args => '@test.1');
 eq_or_diff_text scalar($t->stdout), "";
 eq_or_diff_text scalar($t->stderr), "error: cannot read file 'test.1'\n";
 is $ret >> 8, 1;
 
-path('test.1')->spew('@test.2');
+path('test.1')->spew("\n".'@test.2');
 path('test.2')->spew('@test.3');
 $ret = $t->run(args => '@test.1');
 eq_or_diff_text scalar($t->stdout), "";
 eq_or_diff_text scalar($t->stderr), 
 			"error: cannot read file 'test.3'\n".
-			"context: while reading file 'test.2'\n".
-			"context: while reading file 'test.1'\n";
+			"\"test.2\" (1,1) : context: while reading file 'test.2'\n".
+			"\@test.3\n".
+			" ^\n".
+			"\"test.1\" (2,1) : context: while reading file 'test.1'\n".
+			"\@test.2\n".
+			" ^\n";
 is $ret >> 8, 1;
 unlink 'test.1', 'test.2';
 done_testing;

@@ -46,12 +46,12 @@ int main()
 	IS(args.files[7], "f6.asm");
 	IS(args.files[8], "f8.asm");
 	IS(args.files[9], "f9.asm");
-	
+
 	delete_test_file("test.1");
 	delete_test_file("test.2");
 	delete_test_file("test.3");
 	delete_test_file("test.4");
-	
+
 	done_testing();
 	return exit_status();
 }

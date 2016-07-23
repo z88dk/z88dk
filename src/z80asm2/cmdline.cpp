@@ -54,13 +54,16 @@ static bool insert_file(std::string filename,
 			return false;
 		}
 		else {
-			g_errors.push_context(ERR_READ_CONTEXT, filename);
-			{				
-				std::string line;
-				while (safeGetline(file, line)) 
-					insert_file(line, list);
+			std::string line;
+			unsigned line_nr = 0;
+			unsigned col_nr = 1;
+			while (safeGetline(file, line)) {
+				line_nr++;
+				stlplus::message_position pos(filename, line_nr, col_nr);
+				g_errors.push_context(pos, ERR_READ_CONTEXT, filename);
+				insert_file(line, list);
+				g_errors.pop_context();
 			}
-			g_errors.pop_context();
 		}
 	}
 	else {
@@ -82,11 +85,11 @@ bool parse_cmdline(int argc, char *argv[], args_t& out_args)
 	}
 
 	// parse each argument
+	int cond = yycinit;
 	for (arg = 1; arg < argc; arg++) {
 		const char *YYCURSOR = argv[arg];
 		const char *YYMARKER;
 		//const char *YYCTXMARKER;
-		int cond = yycinit;
 		
 {
 			char yych;
