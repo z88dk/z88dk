@@ -94,7 +94,7 @@ bool parse_cmdline(int argc, char *argv[], args_t& out_args)
 			re2c:define:YYGETCONDITION:naked = 1;
 			re2c:define:YYSETCONDITION = "cond = @@;";
 			re2c:define:YYSETCONDITION:naked = 1;
-			re2c:indent:string = "\t\t\t";
+			re2c:indent:string = "\t\t";
 			
 			end = "\x00";
 			

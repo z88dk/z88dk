@@ -79,14 +79,24 @@ my $ret;
 
 # no arguments - copyright
 $ret = $t->run(args => '');
-eq_or_diff_text scalar($t->stdout), join("\n", $copyright, "", $usage, "");
+eq_or_diff_text scalar($t->stdout), <<END;
+$copyright
+
+$usage
+END
 eq_or_diff_text scalar($t->stderr), "";
 is $ret >> 8, 0;
 
 # help option
 for my $option ("-h", "--help") {
 	$ret = $t->run(args => $option);
-	eq_or_diff_text scalar($t->stdout), join("\n", $copyright, "", $usage, "", $help, "");
+	eq_or_diff_text scalar($t->stdout), <<END;
+$copyright
+
+$usage
+
+$help
+END
 	eq_or_diff_text scalar($t->stderr), "";
 	is $ret >> 8, 0;
 }
@@ -94,51 +104,68 @@ for my $option ("-h", "--help") {
 # option error
 $ret = $t->run(args => '--no-such-option');
 eq_or_diff_text scalar($t->stdout), "";
-eq_or_diff_text scalar($t->stderr), "error: invalid option '--no-such-option', run z80asm2 -h for help\n";
+eq_or_diff_text scalar($t->stderr), <<END;
+error: invalid option '--no-such-option', run z80asm2 -h for help
+END
 is $ret >> 8, 1;
 
 # recursive lists with missing files
-unlink 'test.1';
-$ret = $t->run(args => '@test.1');
+unlink 'test_1';
+$ret = $t->run(args => '@test_1');
 eq_or_diff_text scalar($t->stdout), "";
-eq_or_diff_text scalar($t->stderr), "error: cannot read file 'test.1'\n";
+eq_or_diff_text scalar($t->stderr), <<END;
+error: cannot read file 'test_1'
+END
 is $ret >> 8, 1;
-unlink 'test.1';
+unlink 'test_1';
 
-unlink 'test.1', 'test.2', 'test.3';
-path('test.1')->spew("\n".'@test.2');
-path('test.2')->spew('@test.3');
-$ret = $t->run(args => '@test.1');
+unlink 'test_1', 'test_2', 'test_3';
+path('test_1')->spew("\n".'@test_2');
+path('test_2')->spew('@test_3');
+$ret = $t->run(args => '@test_1');
 eq_or_diff_text scalar($t->stdout), "";
-eq_or_diff_text scalar($t->stderr), 
-			"error: cannot read file 'test.3'\n".
-			"\"test.2\" (1,1) : context: while reading file 'test.2'\n".
-			"\@test.3\n".
-			" ^\n".
-			"\"test.1\" (2,1) : context: while reading file 'test.1'\n".
-			"\@test.2\n".
-			" ^\n";
+eq_or_diff_text scalar($t->stderr), <<END;
+error: cannot read file 'test_3'
+"test_2" (1,1) : context: while reading file 'test_2'
+\@test_3
+ ^
+"test_1" (2,1) : context: while reading file 'test_1'
+\@test_2
+ ^
+END
 is $ret >> 8, 1;
-unlink 'test.1', 'test.2', 'test.3';
+unlink 'test_1', 'test_2', 'test_3';
 
 # verbose flag
-path('test.1.asm')->spew("");
-path('test.2.asm')->spew("");
+path('test_1.asm')->spew("");
+path('test_2.asm')->spew("");
 
-$ret = $t->run(args => 'test.1 test.2');
+$ret = $t->run(args => 'test_1 test_2');
 eq_or_diff_text scalar($t->stdout), "";
 eq_or_diff_text scalar($t->stderr), "";
 is $ret >> 8, 0;
 
 for my $option ("-v", "--verbose") {
-	$ret = $t->run(args => "$option test.1 test.2");
-	eq_or_diff_text scalar($t->stdout), join("\n", $copyright, 
-											"parsing file 'test.1'",
-											"parsing file 'test.2'", 
-											"");
+	$ret = $t->run(args => "$option test_1 test_2");
+	eq_or_diff_text scalar($t->stdout), <<END;
+$copyright
+parsing file 'test_1.asm'
+parsing file 'test_2.asm'
+END
 	eq_or_diff_text scalar($t->stderr), "";
 	is $ret >> 8, 0;
 }
-unlink 'test.1.asm', 'test.2.asm';
+unlink 'test_1.asm', 'test_2.asm';
+
+# assemble some source code
+path('test.asm')->spew("nop ; test\n");
+$ret = $t->run(args => '-v test');
+eq_or_diff_text scalar($t->stdout), <<END;
+$copyright
+parsing file 'test.asm'
+END
+eq_or_diff_text scalar($t->stderr), "";
+is $ret >> 8, 0;
+#unlink 'test.asm';
 
 done_testing;
