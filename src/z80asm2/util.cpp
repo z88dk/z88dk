@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "util.hpp"
+#include "file_system.hpp"
 
 std::istream& safeGetline(std::istream& is, std::string& t)
 {
@@ -30,11 +31,28 @@ std::istream& safeGetline(std::istream& is, std::string& t)
             return is;
         case EOF:
             // Also handle the case when the last line has no line ending
-            if(t.empty())
-                is.setstate(std::ios::eofbit);
+			if (t.empty())
+				is.setstate(std::ios::eofbit);
+            
             return is;
         default:
             t += (char)c;
         }
     }
 }
+
+std::string file_lookup(const std::string& filename, const std::vector<std::string>& list)
+{
+	if (stlplus::is_file(filename))
+		return filename;
+	else {
+		for (unsigned i = 0; i < list.size(); i++) {
+			std::string test_file = stlplus::folder_append_separator(list[i]);
+			test_file += filename;
+			if (stlplus::is_file(test_file))
+				return test_file;
+		}
+		return filename;
+	}
+}
+

@@ -10,9 +10,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 // getline function that handles all three line endings ("\r", "\n" and "\r\n"):
 // http://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
 extern std::istream& safeGetline(std::istream& is, std::string& t);
+
+// search file in lookup path
+extern std::string file_lookup(const std::string& filename, const std::vector<std::string>& list);
 
 #endif /* ndef UTIL_HPP */
