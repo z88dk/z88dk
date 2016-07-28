@@ -17,8 +17,11 @@ extern const char *MES_PARSING_FILE;
 extern const char *ERR_INVALID_OPTION;
 extern const char *ERR_READ_FILE;
 extern const char *ERR_READ_CONTEXT;
+extern const char *ERR_RECURSIVE_INCLUDE;
+extern const char *ERR_SYNTAX;
+extern const char *ERR_RANGE;
 
 // setup messages
 extern void init_messages();
 
-#endif
+#endif // ndef MESSAGES_HPP

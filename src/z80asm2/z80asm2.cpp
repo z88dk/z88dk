@@ -7,6 +7,7 @@
 #include <iostream>
 #include "messages.hpp"
 #include "cmdline.hpp"
+#include "module.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -19,8 +20,9 @@ int main(int argc, char *argv[])
 
 		// TODO: parse command line
 		for (unsigned i = 0; i < g_args.files.size(); i++) {
-			if (g_args.is_verbose)
-				g_messages.information(MES_PARSING_FILE, g_args.files[i]);
+			Module module(g_args.files[i]);
+			module.parse();
+			g_args.obj_modules.push_back(module);
 		}
 	}
 

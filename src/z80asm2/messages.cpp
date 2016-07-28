@@ -13,6 +13,9 @@ const char *MES_PARSING_FILE = "MES_PARSING_FILE";
 const char *ERR_INVALID_OPTION = "ERR_INVALID_OPTION";
 const char *ERR_READ_FILE = "ERR_READ_FILE";
 const char *ERR_READ_CONTEXT = "ERR_READ_CONTEXT";
+const char *ERR_RECURSIVE_INCLUDE = "ERR_RECURSIVE_INCLUDE";
+const char *ERR_SYNTAX = "ERR_SYNTAX";
+const char *ERR_RANGE = "ERR_RANGE";
 
 void init_messages() {
 g_messages.add_message(MES_COPYRIGHT, "Z80 Module Assembler 3.0-alpha, (c) Paulo Custodio 2011-2016");
@@ -78,5 +81,8 @@ g_messages.add_message(MES_PARSING_FILE, "parsing file '@0'");
 g_errors.add_message(ERR_INVALID_OPTION, "invalid option '@0', run z80asm2 -h for help");
 g_errors.add_message(ERR_READ_FILE, "cannot read file '@0'");
 g_errors.add_message(ERR_READ_CONTEXT, "while reading file '@0'");
+g_errors.add_message(ERR_RECURSIVE_INCLUDE, "recursive include reading '@0'");
+g_errors.add_message(ERR_SYNTAX, "syntax error");
+g_errors.add_message(ERR_RANGE, "number range");
 }
 

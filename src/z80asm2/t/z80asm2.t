@@ -6,7 +6,12 @@
 
 use strict;
 use warnings;
+use Config;
+use Path::Tiny;
+use Test::Cmd;
 use Test::More;
+use Test::Differences; 
 
 ok 1;
+
 done_testing;

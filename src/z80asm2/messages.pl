@@ -58,9 +58,10 @@ END
 // setup messages
 extern void init_$prog();
 
-#endif
+#endif // ndef ${PROG}_HPP
 END
 );
+print "+ $prog.hpp\n";
 
 #------------------------------------------------------------------------------
 # write .cpp
@@ -87,6 +88,7 @@ END
 
 END
 );
+print "+ $prog.cpp\n";
 
 sub quote_c {
 	my($text) = @_;
@@ -165,3 +167,6 @@ MES_PARSING_FILE	=parsing file '@0'
 ERR_INVALID_OPTION	=invalid option '@0', run z80asm2 -h for help
 ERR_READ_FILE		=cannot read file '@0'
 ERR_READ_CONTEXT	=while reading file '@0'
+ERR_RECURSIVE_INCLUDE=recursive include reading '@0'
+ERR_SYNTAX			=syntax error
+ERR_RANGE			=number range
