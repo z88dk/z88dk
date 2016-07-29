@@ -870,7 +870,6 @@ t_compile_module($init, <<'END', $objs);
 	
 	/* Z88DK specific opcodes */
 	T_OPCODE(CALL_OZ,	T_ALL);
-	T_OPCODE(OZ,		T_ALL);
 	T_OPCODE(CALL_PKG,	T_ALL);
 	T_OPCODE(FPP,		T_ALL);
 	T_OPCODE(INVOKE,	T_ALL);

@@ -2405,13 +2405,9 @@ ENDIF
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
         call_oz 1                       ;; E7 01
-        oz   1                          ;; E7 01
         call_oz 255                     ;; E7 FF
-        oz   255                        ;; E7 FF
         call_oz 256                     ;; E7 00 01
-        oz   256                        ;; E7 00 01
         call_oz 65535                   ;; E7 FF FF
-        oz   65535                      ;; E7 FF FF
 
 IF      !RABBIT
         call_pkg 0                      ;; CF 00 00
@@ -2552,9 +2548,7 @@ IF      !RABBIT
         out  N,a                        ;; error: syntax error
 ENDIF   
         call_oz 0                       ;; error: integer '0' out of range
-        oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
-        oz   65536                      ;; error: integer '65536' out of range
 IF      !RABBIT
         call_pkg -1                     ;; error: integer '-1' out of range
         call_pkg 65536                  ;; error: integer '65536' out of range
@@ -3296,10 +3290,10 @@ IF      !RABBIT
         cpd
         cpdr
 ELSE    
-        cpi                             ;; CD 7C 0A
-        cpir                            ;; CD 99 0A
-        cpd                             ;; CD 33 0A
-        cpdr                            ;; CD 50 0A
+        cpi                             ;; CD 72 0A
+        cpir                            ;; CD 8F 0A
+        cpd                             ;; CD 29 0A
+        cpdr                            ;; CD 46 0A
 ENDIF   
 
 ;------------------------------------------------------------------------------
@@ -3808,8 +3802,8 @@ IF      !RABBIT
         rld
         rrd
 ELSE    
-        rld                             ;; CD C5 0A
-        rrd                             ;; CD E7 0A
+        rld                             ;; CD BB 0A
+        rrd                             ;; CD DD 0A
 ENDIF   
 
 ; # rotate 16 bits
@@ -4803,13 +4797,9 @@ ENDIF
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
         call_oz 1                       ;; E7 01
-        oz   1                          ;; E7 01
         call_oz 255                     ;; E7 FF
-        oz   255                        ;; E7 FF
         call_oz 256                     ;; E7 00 01
-        oz   256                        ;; E7 00 01
         call_oz 65535                   ;; E7 FF FF
-        oz   65535                      ;; E7 FF FF
 
 IF      !RABBIT
         call_pkg 0
@@ -4824,7 +4814,7 @@ ENDIF
 
         invoke 0                        ;; CD 00 00
         invoke 1                        ;; CD 01 00
-        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 58 0A 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD A1 0A 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD CC 0A 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD EE 0A 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
+        invoke 65535                    ;; CD FF FF 38 12 BE 2B 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 2B 0B F5 E3 CB C5 18 EC 30 06 CD 4E 0A 37 C9 2B 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 2B F5 E3 CB 85 CB 95 E3 F1 C9 2B F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 38 12 BE 23 0B F5 E3 CB 85 CB D5 78 B1 20 02 CB 95 E3 F1 C9 BE 23 0B F5 E3 CB C5 18 EC 30 06 CD 97 0A 37 C9 23 0B BE 28 12 0C 0D 20 F7 04 10 F4 BE 23 F5 E3 CB 85 CB 95 E3 F1 C9 23 F5 78 B1 28 F2 E3 CB 85 CB D5 E3 F1 C9 30 05 CD C2 0A 37 C9 07 07 07 07 CB 27 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 17 CB 16 CE 00 B7 C9 30 05 CD E4 0A 37 C9 CB 3F CB 1E 1F CB 1E 1F CB 1E 1F CB 1E 1F 1F 1F 1F 1F B7 C9
 END_ASM
 );
 z80asm(
@@ -5115,9 +5105,7 @@ ENDIF
 IF      !RABBIT
 ENDIF   
         call_oz 0                       ;; error: integer '0' out of range
-        oz   0                          ;; error: integer '0' out of range
         call_oz 65536                   ;; error: integer '65536' out of range
-        oz   65536                      ;; error: integer '65536' out of range
 IF      !RABBIT
 ENDIF   
         fpp  0                          ;; error: integer '0' out of range

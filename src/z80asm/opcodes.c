@@ -139,11 +139,6 @@ void add_Z88_CALL_OZ(int argument)
 		error_int_range(argument);
 }
 
-void add_Z88_OZ(int argument)
-{
-	add_Z88_CALL_OZ(argument);
-}
-
 void add_Z88_CALL_PKG(int argument)
 {
 	if (argument >= 0 && argument <= 65535)

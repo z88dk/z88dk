@@ -360,7 +360,7 @@ Define rules for a ragel-based parser.
 	/*---------------------------------------------------------------------
 	*   Z88DK specific opcodes
 	*--------------------------------------------------------------------*/
-#foreach <OP> in CALL_OZ, OZ, CALL_PKG, FPP, INVOKE
+#foreach <OP> in CALL_OZ, CALL_PKG, FPP, INVOKE
 	asm_<OP> = label? _TK_<OP> const_expr _TK_NEWLINE
 			@{	if (! expr_error) {
 					DO_STMT_LABEL();
@@ -368,7 +368,7 @@ Define rules for a ragel-based parser.
 				}
 			};
 #endfor  <OP>
-	asm_Z88DK = asm_CALL_OZ | asm_OZ | asm_CALL_PKG | asm_FPP | asm_INVOKE;
+	asm_Z88DK = asm_CALL_OZ | asm_CALL_PKG | asm_FPP | asm_INVOKE;
 
 	/*---------------------------------------------------------------------
 	*   assembly statement

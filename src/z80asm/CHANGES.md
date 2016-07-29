@@ -4,6 +4,13 @@ Z88DK Z80 Module Assembler Change Log
 2016
 ----
 
+- 2016-07-29
+
+  Remove OZ directive - it is an alias to CALL_OZ, and apparently not used
+  in the library. 
+  CALL_OZ is a macro for "RST 20h; DEFB xx" if xx < 100h, and "RST 20h, DEFW xx"
+  otherwise.
+
 - 2016-07-15
 
   Replace DEFL by DEFQ (quad-byte) to leave DEFL free for the standard 

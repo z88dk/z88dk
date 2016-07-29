@@ -33,7 +33,7 @@ copy("$FILE.rl1", "$FILE.c") or die "read $FILE.rl failed: $!\n";
 push @TEMP, "$FILE.c";
 
 # preprocess to .c -> .rl2
-my $cmd = "cc -E $FILE.c";
+my $cmd = "gcc -E $FILE.c";
 open(my $in, "$cmd |") or die "Input from '$cmd' failed: $!\n";
 open(my $out, ">", "$FILE.rl2") or die "Output to $FILE.rl2 failed: $!\n";
 push @TEMP, "$FILE.rl2";

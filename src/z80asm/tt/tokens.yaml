@@ -317,7 +317,6 @@ tokens:
   
   # Z88DK specific opcodes
   - name	: CALL_OZ
-  - name	: OZ
   - name	: CALL_PKG
   - name	: FPP
   - name	: INVOKE

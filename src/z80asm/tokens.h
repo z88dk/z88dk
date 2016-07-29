@@ -180,10 +180,9 @@
 #define _TK_SUB	175
 #define _TK_XOR	176
 #define _TK_CALL_OZ	177
-#define _TK_OZ	178
-#define _TK_CALL_PKG	179
-#define _TK_FPP	180
-#define _TK_INVOKE	181
+#define _TK_CALL_PKG	178
+#define _TK_FPP	179
+#define _TK_INVOKE	180
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -366,9 +365,8 @@ typedef enum tokid_t
 	TK_SUB	= 175,
 	TK_XOR	= 176,
 	TK_CALL_OZ	= 177,
-	TK_OZ	= 178,
-	TK_CALL_PKG	= 179,
-	TK_FPP	= 180,
-	TK_INVOKE	= 181,
+	TK_CALL_PKG	= 178,
+	TK_FPP	= 179,
+	TK_INVOKE	= 180,
 } tokid_t;
 #endif

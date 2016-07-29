@@ -45,7 +45,6 @@ extern void add_opcode_emul(int opcode, char *emul_func);
 
 /* add Z88's opcodes */
 extern void add_Z88_CALL_OZ(int argument);
-extern void add_Z88_OZ(int argument);
 extern void add_Z88_CALL_PKG(int argument);
 extern void add_Z88_FPP(int argument);
 extern void add_Z88_INVOKE(int argument);

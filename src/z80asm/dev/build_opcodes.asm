@@ -941,9 +941,9 @@ ENDIF
 ;------------------------------------------------------------------------------
 ; Z88DK specific opcodes
 ;------------------------------------------------------------------------------
-	{call_oz oz} {1 255}				;; 	rst 20h ;; defb {2}
-	{call_oz oz} {256 65535}			;; 	rst 20h ;; defw {2}
-	{call_oz oz} {0 65536}				;; error: integer '{2}' out of range
+	call_oz {1 255}						;; 	rst 20h ;; defb {1}
+	call_oz {256 65535}					;; 	rst 20h ;; defw {1}
+	call_oz {0 65536}					;; error: integer '{1}' out of range
 
 IF !RABBIT
 	call_pkg {0 1 65535}				;; 	rst 08h ;; defw {1}
