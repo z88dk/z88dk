@@ -575,7 +575,7 @@ int main (int argc, char **argv)
 	write_file("test.c", $main_code);
 
 	# build
-	my $cc = "cc $CFLAGS -o test.exe test.c $compile_args $LDFLAGS";
+	my $cc = "gcc $CFLAGS -o test.exe test.c $compile_args $LDFLAGS";
 	note "line ", (caller)[2], ": $cc";
 	
 	my $ok = (0 == system($cc));

@@ -9,6 +9,7 @@
 
 TARGET	= libclibrary.a
 
+CC		= gcc
 CFLAGS	+= -g -Wall -Wextra -I. $(OPTFLAGS)
 LDLIBS	+= $(OPTLIBS) $(TARGET)
 PREFIX  ?= /usr/local

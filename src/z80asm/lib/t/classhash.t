@@ -15,7 +15,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c strhash.c strpool.c str.c class.c alloc.c dbg.c";
+my $compile = "gcc -Wall -otest test.c strhash.c strpool.c str.c class.c alloc.c dbg.c";
 
 write_file("test.c", <<'END');
 #include "classhash.h"

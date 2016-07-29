@@ -16,7 +16,7 @@ use File::Path qw(make_path remove_tree);
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -Wno-overflow -otest test.c fileutil.c str.c alloc.c class.c list.c strpool.c dbg.c";
+my $compile = "gcc -Wall -Wno-overflow -otest test.c fileutil.c str.c alloc.c class.c list.c strpool.c dbg.c";
 
 #------------------------------------------------------------------------------
 # create directories and files

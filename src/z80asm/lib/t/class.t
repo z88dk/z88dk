@@ -15,7 +15,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -DCLASS_DEBUG -otest test.c class.c strpool.c alloc.c dbg.c";
+my $compile = "gcc -Wall -DCLASS_DEBUG -otest test.c class.c strpool.c alloc.c dbg.c";
 
 write_file("test.c", <<'END');
 #include "class.h"

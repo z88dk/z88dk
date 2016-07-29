@@ -15,7 +15,7 @@ use File::Slurp;
 use Capture::Tiny 'capture';
 use Test::Differences; 
 
-my $compile = "cc -Wall -otest test.c list.c class.c strpool.c alloc.c dbg.c";
+my $compile = "gcc -Wall -otest test.c list.c class.c strpool.c alloc.c dbg.c";
 
 write_file("test.c", <<'END');
 #include "list.h"
