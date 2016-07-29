@@ -5,7 +5,7 @@
 ;
 ;       unsigned char rs232_put(char)
 ;
-;       $Id: rs232_put.asm,v 1.3 2016-06-23 20:15:37 dom Exp $
+;       $Id: rs232_put.asm,v 1.4 2016-07-29 03:28:48 pauloscustodio Exp $
 
 ; __FASTCALL__
 
@@ -16,7 +16,7 @@
 		INCLUDE "osca.def"
 
 rs232_put:
-rs232_put:
+_rs232_put:
 
 			ld c,2
 .s_wait
