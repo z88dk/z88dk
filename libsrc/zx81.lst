@@ -11,10 +11,6 @@ stdio/ansi/fputc_cons
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/zx81/f_ansi_attr
 stdio/ansi/zx81/f_ansi_bel
-stdio/ansi/zx81/f_ansi_char
-stdio/ansi/zx81/f_ansi_cls
-stdio/ansi/zx81/f_ansi_dline
-stdio/ansi/zx81/f_ansi_scrollup
 time/zx81/clock
 games/zx81snd/joystick
 games/zx81snd/bit_open

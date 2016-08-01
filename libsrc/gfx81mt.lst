@@ -2,6 +2,7 @@
 graphics/__gfx_coords
 graphics/dcircle2
 graphics/zx81/hr/clg
+graphics/zx81/hr/mt_clg_hr
 graphics/clrarea2
 graphics/lftscrol
 graphics/liner2
@@ -16,8 +17,11 @@ graphics/stencil_render
 graphics/bksave
 graphics/bkrestore
 graphics/xorpixl
+stdio/ansi/zx81/f_ansi_char
+stdio/ansi/zx81/f_ansi_cls
+stdio/ansi/zx81/f_ansi_dline
+stdio/ansi/zx81/f_ansi_scrollup
 graphics/zx81/swapgfxbk
-graphics/zx81/hr/mt_clg_hr
 graphics/zx81/hr/mt_pixladdr
 graphics/zx81/hr/mt_hrg_on
 graphics/zx81/hr/mt_hrg_off

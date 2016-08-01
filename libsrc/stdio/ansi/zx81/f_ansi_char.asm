@@ -14,12 +14,24 @@
 ;	.text_rows	= max rows
 ;	.DOTS+1		= char size
 ;	.font		= font file
+
+; The font
+; 9 dots: MAX 28 columns
+; 8 dots: MAX 32 columns
+; 7 dots: MAX 36 columns
+; 6 dots: MAX 42 columns
+; 5 dots: MAX 51 columns
+; 4 dots: MAX 64 columns
+; 3 dots: MAX 85 columns Just readable!
+; 2 dots: MAX 128 columns (almost useless)
+; No file for ROM Font
+
 ;
 ;	Display a char in location (ansi_ROW),(ansi_COLUMN)
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.13 2016-07-14 17:44:18 pauloscustodio Exp $
+;	$Id: f_ansi_char.asm,v 1.14 2016-08-01 14:25:55 stefano Exp $
 ;
 
         SECTION code_clib
@@ -28,6 +40,10 @@
 IF ROMFONT
 	EXTERN	asctozx81
 ENDIF
+	
+	EXTERN	ansicharacter_pixelwidth
+	EXTERN	ansifont_is_packed
+	EXTERN	ansifont
 	
 	EXTERN	base_graphics
 
@@ -46,113 +62,8 @@ ENDIF
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 
-IF A136COL
-.text_cols   defb 136
-ENDIF
-
-IF A128COL
-.text_cols   defb 128
-ENDIF
-
-IF A124COL
-.text_cols   defb 124
-ENDIF
-
-IF A80COL
-.text_cols   defb 80
-ENDIF
-
-IF A82COL
-.text_cols   defb 82
-ENDIF
-
-IF A85COL
-.text_cols   defb 85
-ENDIF
-
-IF A90COL
-.text_cols   defb 90
-ENDIF
-
-IF A64COL
-.text_cols   defb 64
-ENDIF
-
-IF A62COL
-.text_cols   defb 62
-ENDIF
-
-IF A68COL
-.text_cols   defb 68
-ENDIF
-
-IF A51COL
-.text_cols   defb 51
-ENDIF
-
-IF A49COL
-.text_cols   defb 49
-ENDIF
-
-IF A54COL
-.text_cols   defb 54
-ENDIF
-
-IF A42COL
-.text_cols   defb 42
-ENDIF
-
-IF A41COL
-.text_cols   defb 41
-ENDIF
-
-IF A40COL
-.text_cols   defb 40
-ENDIF
-
-IF A45COL
-.text_cols   defb 45
-ENDIF
-
-IF A36COL
-.text_cols   defb 36
-ENDIF
-
-IF B32COL
-.text_cols   defb 32
-ENDIF
-
-IF A35COL
-.text_cols   defb 35
-ENDIF
-
-IF A38COL
-.text_cols   defb 38
-ENDIF
-
-IF A32COL
-.text_cols   defb 32
-ENDIF
-
-IF A31COL
-.text_cols   defb 31
-ENDIF
-
-IF A34COL
-.text_cols   defb 34
-ENDIF
-
-IF A28COL
-.text_cols   defb 28
-ENDIF
-
-IF A24COL
-.text_cols   defb 24
-ENDIF
-
-IF A27COL
-.text_cols   defb 27
-ENDIF
+	EXTERN	ansicolumns
+.text_cols   defb ansicolumns
 
 IF G007
 .text_rows   defb 23
@@ -273,17 +184,22 @@ IF ROMFONT
   add	b
   jr	z,NOLFONT
 ELSE
-	IF PACKEDFONT
+
+	  ld a,ansifont_is_packed
+	  ld	hl,ansifont	- 256
+	  and	a
+	  jr    z,got_font_location
+
 	  xor	a
 	  rr	b
 	  jr	c,even
 	  ld	a,4
 	.even
 	  ld	(ROLL+1),a
-	  ld	hl,font-128
-	ELSE
-	  ld hl,font-256
-	ENDIF
+	  ld hl,ansifont - 128
+
+	.got_font_location
+
 ENDIF
 
   ld de,8
@@ -334,14 +250,18 @@ ENDIF
 IF ROMFONT
 	; nothing here !
 ELSE
-	IF PACKEDFONT
-	.ROLL
-	  jr INVRS
-	  rla
-	  rla
-	  rla
-	  rla
-	ENDIF
+
+  ld a,ansifont_is_packed
+  and  a
+  ld a,(hl)
+  jr   z,INVRS
+
+.ROLL
+  jr INVRS
+  rla
+  rla
+  rla
+  rla
 ENDIF
 
 .INVRS
@@ -358,87 +278,7 @@ ENDIF
 ; end of underlined text handling
 
 .DOTS
-IF A136COL
-  ld b,2
-ENDIF
-IF A128COL
-  ld b,2
-ENDIF
-IF A124COL
-  ld b,2
-ENDIF
-IF A80COL
-  ld b,3
-ENDIF
-IF A82COL
-  ld b,3
-ENDIF
-IF A85COL
-  ld b,3
-ENDIF
-IF A90COL
-  ld b,3
-ENDIF
-IF A64COL
-  ld b,4
-ENDIF
-IF A62COL
-  ld b,4
-ENDIF
-IF A68COL
-  ld b,4
-ENDIF
-IF A51COL
-  ld b,5
-ENDIF
-IF A49COL
-  ld b,5
-ENDIF
-IF A54COL
-  ld b,5
-ENDIF
-IF A42COL
-  ld b,6
-ENDIF
-IF A41COL
-  ld b,6
-ENDIF
-IF A45COL
-  ld b,6
-ENDIF
-IF A40COL
-  ld b,6
-ENDIF
-IF A36COL
-  ld b,7
-ENDIF
-IF A35COL
-  ld b,7
-ENDIF
-IF B32COL
-  ld b,7
-ENDIF
-IF A38COL
-  ld b,7
-ENDIF
-IF A32COL
-  ld b,8
-ENDIF
-IF A31COL
-  ld b,8
-ENDIF
-IF A34COL
-  ld b,8
-ENDIF
-IF A28COL
-  ld b,8
-ENDIF
-IF A24COL
-  ld b,9
-ENDIF
-IF A27COL
-  ld b,9
-ENDIF
+  ld b,ansicharacter_pixelwidth
 
 .L2
   rla
@@ -474,104 +314,3 @@ ENDIF
   ret
 
 
-; The font
-; 9 dots: MAX 28 columns
-; 8 dots: MAX 32 columns
-; 7 dots: MAX 36 columns
-; 6 dots: MAX 42 columns
-; 5 dots: MAX 51 columns
-; 4 dots: MAX 64 columns
-; 3 dots: MAX 85 columns Just readable!
-; 2 dots: MAX 128 columns (useful for ANSI graphics only.. maybe)
-; No file for ROM Font
-
-.font
-IF ROMFONT
-	; nothing here !
-ELSE
-	IF PACKEDFONT
-	        BINARY  "stdio/ansi/F4PACK.BIN"
-	ELSE
-		IF A136COL
-			BINARY  "stdio/ansi/F3.BIN"
-		ENDIF
-		IF A128COL
-			BINARY  "stdio/ansi/F3.BIN"
-		ENDIF
-		IF A124COL
-			BINARY  "stdio/ansi/F3.BIN"
-		ENDIF
-		IF A80COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A82COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A85COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A90COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A64COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A62COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A68COL
-			BINARY  "stdio/ansi/F4.BIN"
-		ENDIF
-		IF A51COL
-			BINARY  "stdio/ansi/F5.BIN"
-		ENDIF
-		IF A49COL
-			BINARY  "stdio/ansi/F5.BIN"
-		ENDIF
-		IF A54COL
-			BINARY  "stdio/ansi/F5.BIN"
-		ENDIF
-		IF A42COL
-			BINARY  "stdio/ansi/F6.BIN"
-		ENDIF
-		IF A41COL
-			BINARY  "stdio/ansi/F6.BIN"
-		ENDIF
-		IF A45COL
-			BINARY  "stdio/ansi/F6.BIN"
-		ENDIF
-		IF A40COL
-			BINARY  "stdio/ansi/F6.BIN"
-		ENDIF
-		IF A36COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF B32COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A35COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A38COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A32COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A31COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A34COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A28COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A24COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-		IF A27COL
-			BINARY  "stdio/ansi/F8.BIN"
-		ENDIF
-	ENDIF
-ENDIF

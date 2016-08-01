@@ -17,6 +17,10 @@ graphics/zx81/hr/stencil_render_arx
 graphics/bksave
 graphics/bkrestore
 graphics/xorpixl
+stdio/ansi/zx81/f_ansi_char
+stdio/ansi/zx81/f_ansi_cls
+stdio/ansi/zx81/f_ansi_dline
+stdio/ansi/zx81/f_ansi_scrollup
 graphics/zx81/swapgfxbk
 graphics/zx81/hr/pixladdr_arx
 graphics/zx81/hr/invhrg_arx
