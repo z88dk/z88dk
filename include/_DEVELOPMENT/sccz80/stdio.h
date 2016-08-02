@@ -185,7 +185,7 @@ extern int __LIB__ __CALLEE__ getline_callee(char **lineptr,size_t *n,FILE *stre
 #define getline(a,b,c) getline_callee(a,b,c)
 
 
-extern char __LIB__ __FASTCALL__ gets(char *s);
+extern char __LIB__ __FASTCALL__ *gets(char *s);
 
 
 extern int __LIB__ obstack_printf(struct obstack *ob,char *format,...);
@@ -370,7 +370,7 @@ extern int __LIB__ __CALLEE__ getline_unlocked_callee(char **lineptr,size_t *n,F
 #define getline_unlocked(a,b,c) getline_unlocked_callee(a,b,c)
 
 
-extern char __LIB__ __FASTCALL__ gets_unlocked(char *s);
+extern char __LIB__ __FASTCALL__ *gets_unlocked(char *s);
 
 
 extern int __LIB__ printf_unlocked(char *format,...);

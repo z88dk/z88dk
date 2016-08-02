@@ -208,8 +208,8 @@ extern int getline_callee(char **lineptr,size_t *n,FILE *stream) __z88dk_callee;
 #define getline(a,b,c) getline_callee(a,b,c)
 
 
-extern char gets(char *s);
-extern char gets_fastcall(char *s) __z88dk_fastcall;
+extern char *gets(char *s);
+extern char *gets_fastcall(char *s) __z88dk_fastcall;
 #define gets(a) gets_fastcall(a)
 
 
@@ -420,8 +420,8 @@ extern int getline_unlocked_callee(char **lineptr,size_t *n,FILE *stream) __z88d
 #define getline_unlocked(a,b,c) getline_unlocked_callee(a,b,c)
 
 
-extern char gets_unlocked(char *s);
-extern char gets_unlocked_fastcall(char *s) __z88dk_fastcall;
+extern char *gets_unlocked(char *s);
+extern char *gets_unlocked_fastcall(char *s) __z88dk_fastcall;
 #define gets_unlocked(a) gets_unlocked_fastcall(a)
 
 
