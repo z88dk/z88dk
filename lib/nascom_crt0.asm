@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: nascom_crt0.asm,v 1.21 2016-06-02 23:14:13 dom Exp $
+;       $Id: nascom_crt0.asm,v 1.22 2016-08-02 06:34:26 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -31,11 +31,12 @@
 
 	PUBLIC    montest         ;NASCOM: check the monitor type
 
+	IF      !DEFINED_CRT_ORG_CODE
+			defc    CRT_ORG_CODE  = 1000h
+	ENDIF
 
-	;org	0C80h
-	org	1000h
-	;org	0E000h
-	
+	org     CRT_ORG_CODE
+
 ; NASSYS1..NASSYS3
 ;  IF (startup=1) | (startup=2) | (startup=3)
 ;
@@ -46,14 +47,6 @@ start:
 
 	ld	(start1+1),sp	;Save entry stack
 
-	; search for the top of writeble memory and set the stack pointer
-	ld	hl,0ffffh
-	ld	a,55
-stackloop:
-	ld	(hl),a
-	cp	(hl)
-	dec	hl
-	jr	nz,stackloop
 	ld	hl,0xe000
 	ld      sp,hl
 	call	crt0_init_bss
@@ -87,7 +80,6 @@ start1:	ld	sp,0		;Restore stack to entry value
 	;ret
 
 l_dcal:	jp	(hl)		;Used for function pointer calls
-        jp      (hl)
 
 
 ;------------------------------------

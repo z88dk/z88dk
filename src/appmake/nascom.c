@@ -4,7 +4,7 @@
  *
  *	Stefano Bodrato 30/5/2003
  *
- *	$Id: nascom.c,v 1.4 2016-06-26 00:46:55 aralbrec Exp $
+ *	$Id: nascom.c,v 1.5 2016-08-02 06:34:26 stefano Exp $
  */
 
 
@@ -12,6 +12,7 @@
 
 
 static char             *binname      = NULL;
+static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static int               origin       = -1;
 static char              help         = 0;
@@ -20,6 +21,7 @@ static char              help         = 0;
 option_t nascom_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
+    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
@@ -52,9 +54,16 @@ int nascom_exec(char *target)
         strcpy(filename,outfile);
     }
 
-    if ( origin == -1 ) {
+    if ( crtfile == NULL && origin == -1) {
         origin = 0x1000;
-    }
+    } else {
+		if ( origin == -1 ) {
+			if ( (origin = get_org_addr(crtfile)) == -1 ) {
+				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+			}
+		}
+	}
+
 
 	if ( (fpin=fopen_bin(binname, NULL) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
