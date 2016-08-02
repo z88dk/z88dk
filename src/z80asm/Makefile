@@ -17,7 +17,7 @@ ifndef EXESUFFIX
 endif
 
 INSTALL ?= install
-CC = gcc
+CC ?= gcc
 
 #------------------------------------------------------------------------------
 # Using GLIB - see http://www.gtk.org/
