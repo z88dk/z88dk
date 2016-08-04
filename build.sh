@@ -4,8 +4,12 @@
 # Build z88dk on unix systems
 #
 
-# Start from scratch
-#make clean
+set -e		# bail out if one of the make calls fails
+
+# Start from scratch with argument "clean"
+if [ "$1" = "clean" ]; then
+  make clean
+fi
 
 rm -rf bin
 mkdir bin
