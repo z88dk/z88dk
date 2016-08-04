@@ -11,8 +11,8 @@ PUBLIC _l_longjmp
 _l_longjmp:
 
    pop de
-   pop bc
    pop hl
+   pop bc
 
    ; bc = val
    ; hl = jmp_buf *
@@ -32,6 +32,14 @@ val_ok:
    
    push de
    pop iy
+   
+   ld e,(hl)
+   inc hl
+   ld d,(hl)
+   inc hl
+   
+   push de
+   pop ix
    
    ld e,(hl)
    inc hl

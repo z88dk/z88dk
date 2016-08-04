@@ -29,6 +29,14 @@ _l_setjmp:
    ld (hl),d
    inc hl
    
+   push ix
+   pop de
+   
+   ld (hl),e
+   inc hl
+   ld (hl),d
+   inc hl
+   
    ex de,hl
    
    ld hl,2
