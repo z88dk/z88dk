@@ -14,6 +14,7 @@ typedef struct
 {
 
    void *ix;
+   void *iy;
    void *sp;
    void *pc;
 
