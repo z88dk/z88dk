@@ -7,11 +7,11 @@
 ;	Erases pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
+;	$Id: respixl.asm,v 1.8 2016-08-05 07:04:09 stefano Exp $
 ;
 
 
-			INCLUDE	"graphics/text/textgfx.inc"
+			INCLUDE	"graphics/grafix.inc"
 
                         SECTION code_clib
 			PUBLIC	respixel

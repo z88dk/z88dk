@@ -9,7 +9,7 @@ graphics/c128/textpixl
 graphics/text/plotpixl
 graphics/text/respixl
 graphics/text/xorpixl
-graphics/pointxy
+graphics/text/pointxy
 graphics/fill
 graphics/dfill2
 graphics/putsprite2

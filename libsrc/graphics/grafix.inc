@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.47 2016-04-13 19:44:14 dom Exp $
+;	$Id: grafix.inc,v 1.48 2016-08-05 07:04:09 stefano Exp $
 ;
 
 
@@ -225,14 +225,25 @@ IF FORz88
 	defc	maxy 	= 64
 ENDIF
 
-
-; === Definitions copied from textgfx.inc ===
-
 IF FORaquarius
 	DEFINE gotgfx
 	defc maxx	= 80
 	defc maxy	= 72
 	defc blankch	= 160
+ENDIF
+
+IF FORz1013
+	DEFINE gotgfx
+	defc maxx	= 64
+	defc maxy	= 64
+	defc blankch	= 32
+ENDIF
+
+IF FORc128
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 50
+	defc blankch	= 32
 ENDIF
 
 IF FORgal
@@ -260,13 +271,6 @@ IF FOReg2000
 	DEFINE gotgfx
 	defc maxx	= 160
 	defc maxy	= 100
-ENDIF
-
-IF FORc128
-	DEFINE gotgfx
-	defc maxx	= 80
-	defc maxy	= 50
-	defc blankch	= 32
 ENDIF
 
 IF FORp2000

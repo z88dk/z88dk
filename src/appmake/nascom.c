@@ -4,7 +4,7 @@
  *
  *	Stefano Bodrato 30/5/2003
  *
- *	$Id: nascom.c,v 1.5 2016-08-02 06:34:26 stefano Exp $
+ *	$Id: nascom.c,v 1.6 2016-08-05 07:04:10 stefano Exp $
  */
 
 

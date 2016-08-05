@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.54 2016-07-03 08:18:21 aralbrec Exp $
+ *   $Id: appmake.h,v 1.55 2016-08-05 07:04:10 stefano Exp $
  */
 
 
@@ -149,6 +149,9 @@ extern option_t  vz_options;
 
 extern int       x07_exec(char *target);
 extern option_t  x07_options;
+
+extern int       z1013_exec(char *target);
+extern option_t  z1013_options;
 
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
@@ -344,6 +347,10 @@ struct {
       "Prapares a .cas file for the Canon X-07, optional WAV format",
       NULL,
       x07_exec,    &x07_options },
+    { "z1013",    "z1013",     "(C) 2016 Stefano Bodrato",
+      "Prapares a .z80 file for the Robotron Z1013, optional WAV format",
+      NULL,
+      z1013_exec,    &z1013_options },
     { "shellmak", "z88shell", "(C) 2002,2003 Dominic Morris",   
       "Patches the header to ensure that the program is recognised by the shell",
       NULL,

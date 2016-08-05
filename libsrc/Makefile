@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.248 2016-08-01 14:25:54 stefano Exp $
+# $Id: Makefile,v 1.249 2016-08-05 07:04:09 stefano Exp $
 
 
 include Make.config
@@ -24,7 +24,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib\
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
-	embedded_clib.lib test_clib.lib \
+	embedded_clib.lib test_clib.lib z1013_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
@@ -958,6 +958,20 @@ nascom_clib.lib:
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
 	$(LIBLINKER) -DFORnascom -x$(OUTPUT_DIRECTORY)/nascom_clib @$(LISTFILE_DIRECTORY)/nascom.lst
+	
+# Robotron Z1013 library - Stefano
+z1013_clib.lib:
+	@echo ''
+	@echo '--- Building Robotron Z1013 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) -C stdlib TARGET=z1013
+	$(MAKE) -C stdio 
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(LIBLINKER) -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(LISTFILE_DIRECTORY)/z1013.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
