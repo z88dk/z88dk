@@ -16,7 +16,7 @@ graphics/zx80/textpixl
 graphics/zx80/plotpixl
 graphics/zx80/respixl
 graphics/zx80/xorpixl
-graphics/pointxy
+graphics/zx80/pointxy
 graphics/putsprite3
 graphics/liner
 graphics/stencil_render
