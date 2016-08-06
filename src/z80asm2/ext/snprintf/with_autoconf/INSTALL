@@ -1,0 +1,40 @@
+HOW TO INSTALL - with autoconf:
+
+  1. Read the description of macros that control the bahaviour
+     of the program at the beginning of the file snprintf.c,
+     change the definitions in snprintf.c if necessary.
+
+     Note that snprintf.c and snprintf.h are just symbolic links
+     to a parent directory.
+
+  2. ./configure 
+     make
+     make install
+
+  3a. set up your program with autoconf along the lines of this example
+
+  dnl confirms that you have a working snprintf
+  AC_caolan_FUNC_SNPRINTF
+  if test x$ac_cv_func_snprintf = xno; then
+  	dnl will add -lsnprintf to your libs if it exists and defines HAVE_PKG_snprintf
+  	AC_caolan_CHECK_PACKAGE(snprintf,snprintf,snprintf,snprintf.h,,NO_SNPRINTF=true)
+	if test x$NO_SNPRINTF = xtrue; then
+	    AC_MSG_WARN(Couldn't find a suitable snprintf implementation!\n  Try at http://www.ijs.si/software/snprintf/)
+	fi
+  fi
+  dnl AC_caolan_FUNC_SNPRINTF and AC_caolan_CHECK_PACKAGE can be gotten 
+  dnl at http://www.csn.ul.ie/~caolan/publink/autoconf
+  dnl place then in your aclocal dir (/usr/local/share/aclocal perhaps)
+  dnl and run aclocal before running autoconf, when running autoheader
+  dnl various symbols will be missing, add the missing ones as
+  dnl #undef symbol lines into acconfig.h
+  dnl 
+  dnl you then should have in your source code...
+  dnl #ifdef HAVE_PKG_snprintf
+  dnl #include <snprintf.h>
+  dnl #endif
+  dnl I place mine in acconfig.h and include config.h in every source file.
+
+  3b. Alternatively you can not install snprintf as a library but instead
+  	move the file snprintf.o where your program will find it and work out
+	your own tests
