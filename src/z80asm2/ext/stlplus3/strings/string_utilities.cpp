@@ -13,6 +13,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "snprintf.h"
+
 namespace stlplus
 {
 
@@ -22,7 +24,7 @@ namespace stlplus
     std::string formatted;
     va_list args;
     va_start(args, format);
-#ifdef MSWINDOWS
+#if 0 // #ifdef MSWINDOWS - use vasprintf() from snprintf.h
     int length = 0;
     char* buffer = 0;
     for(int buffer_length = 256; ; buffer_length*=2)

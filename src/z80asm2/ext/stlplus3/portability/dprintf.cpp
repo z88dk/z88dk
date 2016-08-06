@@ -21,6 +21,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#include "snprintf.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace stlplus
@@ -30,7 +32,7 @@ namespace stlplus
 
   int vdprintf(std::string& formatted, const char* format, va_list args)
   {
-#ifdef MSWINDOWS
+#if 0 // #ifdef MSWINDOWS - use vasprintf() from snprintf.h
     int length = 0;
     char* buffer = 0;
     for(int buffer_length = 256; ; buffer_length*=2)
