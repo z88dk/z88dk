@@ -8,40 +8,40 @@
 PROJ 		:= z80asm2
 
 # platform - include defines needed by stlplus3
-UNAME		:= $(shell uname -s)
+UNAME		:= $(shell uname -s | tr a-z A-Z)
 
 ifeq ($(OS),Windows_NT)
   EXE		:= .exe
   ifneq ($(findstring MINGW,$(UNAME)),)
     PLATFORM := MINGW
-	CXXFLAGS += -U__STRICT_ANSI__
+	MYCXXFLAGS += -U__STRICT_ANSI__
 	LDFLAGS  += -lWs2_32 -static
   else
-    ifneq ($(findstring Cygwin,$(UNAME)),)
+    ifneq ($(findstring CYGWIN,$(UNAME)),)
       PLATFORM := CYGWIN
 	endif
   endif
 else
   EXE 		:=
-  ifneq ($(findstring Linux,$(UNAME)),)
+  ifneq ($(findstring LINUX,$(UNAME)),)
     PLATFORM  := GNULINUX
-	CXXFLAGS  += -fPIC
+	MYCXXFLAGS  += -fPIC
   else
-    ifneq ($(findstring FreeBSD,$(UNAME)),)
+    ifneq ($(findstring FREEBSD,$(UNAME)),)
       PLATFORM := FREEBSD
 	else
-	  ifneq ($(findstring OpenBSD,$(UNAME)),)
+	  ifneq ($(findstring OPENBSD,$(UNAME)),)
         PLATFORM := OPENBSD
       else
-	    ifneq ($(findstring NetBSD,$(UNAME)),)
+	    ifneq ($(findstring NETBSD,$(UNAME)),)
           PLATFORM := NETBSD
 		  LDFLAGS  += -lm
 		else
-		  ifneq ($(findstring SunOS,$(UNAME)),)
+		  ifneq ($(findstring SUNOS,$(UNAME)),)
 		    PLATFORM := SOLARIS
 			LDFLAGS  += -lsocket
 		  else
-			ifneq ($(findstring Darwin,$(UNAME)),)
+			ifneq ($(findstring DARWIN,$(UNAME)),)
 			  PLATFORM := MACOS
 			endif
 		  endif
@@ -56,18 +56,17 @@ ifeq ($(PLATFORM),)
 endif
 
 # build flags
-CXXFLAGS += \
--D$(PLATFORM) \
--pedantic \
--MMD \
--I. \
--It \
--std=c++98 \
--Wall -Wextra \
--O3
+MYCXXFLAGS += \
+		-D$(PLATFORM) \
+		-pedantic \
+		-MMD \
+		-I. \
+		-It \
+		-Wall -Wextra \
+		-O3
 
 LDFLAGS += \
--L.
+		-L.
 
 INSTALL ?= install
 
@@ -81,26 +80,35 @@ LIB_FILES	+= lib$(PROJ).a
 
 # Lib TAP C++
 EXT_SRCS	+= $(wildcard ext/libtappp/src/*.cpp)
-CXXFLAGS	+= -Iext/libtappp/include
+MYCXXFLAGS	+= -Iext/libtappp/include
 
 # Lib STL Plus 3 for C++
 EXT_SRCS	+= \
-$(wildcard ext/stlplus3/containers/*.cpp) \
-$(wildcard ext/stlplus3/persistence/*.cpp) \
-$(wildcard ext/stlplus3/portability/*.cpp) \
-$(wildcard ext/stlplus3/strings/*.cpp) \
-$(wildcard ext/stlplus3/subsystems/*.cpp)
-CXXFLAGS	+= \
--Iext/stlplus3/containers \
--Iext/stlplus3/persistence \
--Iext/stlplus3/portability \
--Iext/stlplus3/strings \
--Iext/stlplus3/subsystems
+		$(wildcard ext/stlplus3/containers/*.cpp) \
+		$(wildcard ext/stlplus3/persistence/*.cpp) \
+		$(wildcard ext/stlplus3/portability/*.cpp) \
+		$(wildcard ext/stlplus3/strings/*.cpp) \
+		$(wildcard ext/stlplus3/subsystems/*.cpp)
+MYCXXFLAGS	+= \
+		-Iext/stlplus3/containers \
+		-Iext/stlplus3/persistence \
+		-Iext/stlplus3/portability \
+		-Iext/stlplus3/strings \
+		-Iext/stlplus3/subsystems
+
+# Lib snprintf
+EXT_C_SRCS	+= \
+		$(wildcard ext/snprintf/*.c)
+MYCXXFLAGS	+= \
+		-Iext/snprintf
+
+CFLAGS		+= -std=c99   $(MYCXXFLAGS)
+CXXFLAGS	+= -std=c++98 $(MYCXXFLAGS)
 
 # external library
 EXT_LIB		:= ext
-EXT_OBJS 	:= $(EXT_SRCS:%.cpp=%.o)
-DEPENDS		+= $(EXT_SRCS:%.cpp=%.d)
+EXT_OBJS 	:= $(EXT_SRCS:%.cpp=%.o) $(EXT_C_SRCS:%.c=%.o)
+DEPENDS		+= $(EXT_SRCS:%.cpp=%.d) $(EXT_C_SRCS:%.c=%.d)
 
 LDFLAGS		+= -l$(EXT_LIB)
 LIB_FILES	+= lib$(EXT_LIB).a
