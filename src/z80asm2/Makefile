@@ -123,7 +123,7 @@ DEPENDS		+= $(TEST_SRCS:%.cpp=%.d)
 RUNTESTS_C	:= perl ext/libtappp/run_tests.pl
 RUNTESTS_T	:= perl -S prove
 
-RE2C		:= re2c -c -i --no-generation-date --no-version 
+RE2C		:= re2c -c -i --no-generation-date
 
 # do not delete intermediate targets
 .SECONDARY:
