@@ -14,8 +14,8 @@
  * Conversion to C by aralbrec@z88dk.org July 2016
  * (instructions excluded from some builds due to size)
  *
- * zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 empire.c -o empire -lm -create-app -DINSTR
- * zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 empire.c -o empire -lm -create-app
+ * zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 empire.c -o empire -lm -create-app -DINSTR --opt-code-size
+ * zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 empire.c -o empire -lm -create-app -DINSTR --opt-code-size
  *
  */
 
@@ -219,7 +219,7 @@ void player_promotion(void)
 char *udeath[] = {
    "has been assassinated by an ambitious\nnoble.\n",
    "has been killed from a fall during\nthe annual fox-hunt.\n",
-   "died of acute food poisoning.\nThe royal cook was summarily executed.\n"
+   "died of acute food poisoning.\nThe royal cook was summarily executed.\n",
    "passed away this winter from a weak heart.\n"
 };
 
@@ -1282,7 +1282,7 @@ void instructions(void)
    for (p=inst; *p != '\0'; ++p)
    {
       if (*p == '*')
-         PAUSE(5000);
+         PAUSE(1000);
       else if (*p == '@')
       {
          PAUSE(0);
@@ -1293,7 +1293,7 @@ void instructions(void)
       else
       {
          putchar(*p);
-         in_pause(300);
+         in_pause(25);
       }
    }
 }
