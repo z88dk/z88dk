@@ -1,0 +1,9 @@
+
+SECTION code_clib
+SECTION code_l_sdcc
+
+PUBLIC ____sdcc_4_ldi_save_bc
+
+EXTERN ____sdcc_4_copy_src_mhl_dst_deix_0
+
+defc ____sdcc_4_ldi_save_bc = ____sdcc_4_copy_src_mhl_dst_deix_0

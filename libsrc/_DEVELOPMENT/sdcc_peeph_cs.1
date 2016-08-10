@@ -107,11 +107,9 @@ replace restart {
 } by {
 	push	de
 	push	hl
-	push	bc
 	ld	de,#%1
 	ld	hl,#%9
 	call	____sdcc_ll_add_deix_hlix
-	pop	bc
 	pop	hl
 	pop	de
 	; peephole z88dk-code-size-reduction-4a
@@ -148,27 +146,6 @@ replace restart {
 } if notUsed(%4)
 
 replace restart {
-	push	%4
-	push	%5
-	push	%6
-	ld	de,#%1
-	ld	hl,#%9
-	call	____sdcc_ll_add_deix_hlix
-	pop	%6
-	pop	%5
-	pop	%4
-} by {
-	push	%5
-	push	%6
-	ld	de,#%1
-	ld	hl,#%9
-	call	____sdcc_ll_add_deix_hlix
-	pop	%6
-	pop	%5
-	; peephole z88dk-code-size-reduction-4d
-} if notUsed(%4)
-
-replace restart {
 	ld	a,%1 (ix)
 	sub	a, %9 (ix)
 	ld	%1 (ix),a
@@ -196,11 +173,9 @@ replace restart {
 } by {
 	push	de
 	push	hl
-	push	bc
 	ld	de,#%1
 	ld	hl,#%9
 	call	____sdcc_ll_sub_deix_hlix
-	pop	bc
 	pop	hl
 	pop	de
 	; peephole z88dk-code-size-reduction-5a
@@ -237,27 +212,6 @@ replace restart {
 } if notUsed(%4)
 
 replace restart {
-	push	%4
-	push	%5
-	push	%6
-	ld	de,#%1
-	ld	hl,#%9
-	call	____sdcc_ll_sub_deix_hlix
-	pop	%6
-	pop	%5
-	pop	%4
-} by {
-	push	%5
-	push	%6
-	ld	de,#%1
-	ld	hl,#%9
-	call	____sdcc_ll_sub_deix_hlix
-	pop	%6
-	pop	%5
-	; peephole z88dk-code-size-reduction-5d
-} if notUsed(%4)
-
-replace restart {
 	ld	a,%1 (ix)
 	push	af
 	inc	sp
@@ -283,23 +237,10 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	push	bc
 	ld	hl,#%1
 	call	____sdcc_ll_push_hlix
-	pop	bc
 	; peephole z88dk-code-size-reduction-6a
 } if notUsed('de'), notUsed('hl')
-
-replace restart {
-	push	%4
-	ld	hl,#%1
-	call	____sdcc_ll_push_hlix
-	pop	%4
-} by {
-	ld	hl,#%1
-	call	____sdcc_ll_push_hlix
-	; peephole z88dk-code-size-reduction-6b
-} if notUsed(%4)
 
 replace restart {
 	ld	e,%1 (ix)
@@ -699,9 +640,7 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	push	bc
 	call	____sdcc_ll_push_mhl
-	pop	bc
 	; peephole z88dk-code-size-reduction-13a
 } if notUsed('de'), notUsed('hl')
 
@@ -739,20 +678,9 @@ replace restart {
 	inc	sp
 } by {
 	ld	(hl),a
-	push	bc
 	call	____sdcc_ll_push_mhl
-	pop	bc
 	; peephole z88dk-code-size-reduction-13b
 } if notUsed('de'), notUsed('hl')
-
-replace restart {
-	push	%4
-	call	____sdcc_ll_push_mhl
-	pop	%4
-} by {
-	call	____sdcc_ll_push_mhl
-	; peephole z88dk-code-size-reduction-13c
-} if notUsed(%4)
 
 replace restart {
 	ld	a,%1 (ix)
@@ -2856,22 +2784,10 @@ replace restart {
 } if notUsed(%4)
 
 replace restart {
-	push	bc
-	push	de
-	call	____sdcc_lib_setmem_hl - 4-2-2-2-2-2-2-2-2-2-2-2-2-2-2-2
-	pop	de
-	pop	bc
+	call	____sdcc_lib_setmem_hl - 4-2-2-2-2-2-2-2-2-2-2-2-2-2-2-%1
 } by {
-	push	bc
-	push	de
-	call	____sdcc_lib_setmem_hl - 30
-	pop	de
-	pop	bc
-	push	bc
-	push	de
-	call	____sdcc_lib_setmem_hl - 4
-	pop	de
-	pop	bc
+	call	____sdcc_lib_setmem_hl - 28
+	call	____sdcc_lib_setmem_hl - 4-%1
 	; peephole z88dk-code-reduction-38a
 }
 
@@ -2883,56 +2799,408 @@ replace restart {
 	inc	hl
 } by {
 	xor	a,a
-	push	bc
-	push	de
 	call	____sdcc_lib_setmem_hl - 4
-	pop	de
-	pop	bc
 	; peephole z88dk-code-reduction-38b
 }
 
 replace restart {
-	push	bc
-	push	de
 	call	____sdcc_lib_setmem_hl - %1
-	pop	de
-	pop	bc
 	ld	(hl),a
 	inc	hl
 } by {
-	push	bc
-	push	de
 	call	____sdcc_lib_setmem_hl - %1-2
-	pop	de
-	pop	bc
 	; peephole z88dk-code-reduction-38c
 }
+
+replace restart {
+	call	____sdcc_lib_setmem_hl - %1
+	ld	(hl),a
+} by {
+	call	____sdcc_lib_setmem_hl - %1-2
+	; peephole z88dk-code-reduction-38d
+} if notUsed('hl')
+
+replace restart {
+	xor	a,a
+	call	____sdcc_lib_setmem_hl - %1
+	ld	(hl),#0x00
+	inc	hl
+} by {
+	xor	a,a
+	call	____sdcc_lib_setmem_hl - %1-2
+	; peephole z88dk-code-reduction-38e
+}
+
+replace restart {
+	xor	a,a
+	call	____sdcc_lib_setmem_hl - %1
+	ld	(hl),#0x00
+} by {
+	xor	a,a
+	call	____sdcc_lib_setmem_hl - %1-2
+	; peephole z88dk-code-reduction-38f
+} if notUsed('hl')
 
 
 barrier
 
 
-replace restart {
-	push	%4
-	call	____sdcc_lib_setmem_hl - %1
-	pop	%4
-} by {
-	call	____sdcc_lib_setmem_hl - %1
-	; peephole z88dk-code-reduction-term-1a
-} if notUsed(%4)
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+// Z88DK CODE SIZE REDUCTION FOR LONG AND FLOAT
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
 
 replace restart {
-	push	%4
-	push	%5
-	call	____sdcc_lib_setmem_hl - %1
-	pop	%5
-	pop	%4
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	inc	hl
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
 } by {
-	push	%5
-	call	____sdcc_lib_setmem_hl - %1
-	pop	%5
-	; peephole z88dk-code-reduction-term-1a
-} if notUsed(%4)
+	call	____sdcc_load_debc_mhl
+	; peephole z88dk-code-reduction-300a
+}
+
+replace restart {
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	inc	hl
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+} by {
+	call	____sdcc_load_hlde_mhl
+	; peephole z88dk-code-reduction-301a
+}
+
+replace restart {
+	ld	a,(hl)
+	ld	%1 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%2 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%3 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%4 (ix),a
+} by {
+	ld	de,#%1
+	call	____sdcc_4_copy_src_mhl_dst_deix
+	; peephole z88dk-code-reduction-302a
+} if notUsed('de')
+
+replace restart {
+	ld	a,(hl)
+	ld	%1 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%2 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%3 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%4 (ix),a
+} by {
+	ld	bc,#%1
+	call	____sdcc_4_copy_src_mhl_dst_bcix
+	; peephole z88dk-code-reduction-303a
+} if notUsed('bc')
+
+replace restart {
+	ld	a,(hl)
+	ld	%1 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%2 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%3 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%4 (ix),a
+} by {
+	push	de
+	ld	de,#%1
+	call	____sdcc_4_copy_src_mhl_dst_deix
+	pop	de
+	; peephole z88dk-code-reduction-304a
+}
+
+replace restart {
+	ld	(hl),c
+	inc	hl
+	ld	(hl),b
+	inc	hl
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+} by {
+	call	____sdcc_store_debc_mhl
+	; peephole z88dk-code-reduction-305a
+}
+
+replace restart {
+	ld	a,(hl)
+	ld	(bc),a
+	inc	bc
+	inc	hl
+	ld	a,(hl)
+	ld	(bc),a
+	inc	bc
+	inc	hl
+	ld	a,(hl)
+	ld	(bc),a
+	inc	bc
+	inc	hl
+	ld	a,(hl)
+	ld	(bc),a
+} by {
+	call	____sdcc_4_copy_src_mhl_dst_mbc
+	; peephole z88dk-code-reduction-306a
+}
+
+replace restart {
+	ld	hl,(#%1 + 2)
+	push	hl
+	ld	hl,(#%1)
+	push	hl
+} by {
+	ld	hl,#%1
+	call	____sdcc_4_push_mhl
+	; peephole z88dk-code-reduction-307a
+} if notUsed('hl'), notUsed('a')
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	ld	hl,#%1
+	call	____sdcc_store_debc_mhl
+} by {
+	ld	(#%1),hl
+	ld	(#%1 + 2),de
+	; peephole z88dk-code-reduction-308a
+} if notUsed('hl'), notUsed('bc')
+
+replace restart {
+	ld	c,l
+	ld	b,h
+	ld	hl,#%1
+	call	____sdcc_store_debc_mhl
+} by {
+	ld	(#%1),hl
+	ld	(#%1 + 2),de
+	ld	hl,#%1 + 3
+	; peephole z88dk-code-reduction-308b
+} if notUsed('bc')
+
+replace restart {
+	ldi
+	ldi
+	ldi
+	ld	a,(hl)
+	ld	(de),a
+} by {
+	call	____sdcc_4_ldi_save_bc
+	; peephole z88dk-code-reduction-309a
+} if notUsed('bc')
+
+replace restart {
+	ldi
+	ldi
+	ldi
+	ld	a,(hl)
+	ld	(de),a
+} by {
+	call	____sdcc_4_ldi_nosave_bc
+	; peephole z88dk-code-reduction-309b
+}
+
+replace restart {
+	ld	bc,#0x0004
+	ldir
+} by {
+	call	____sdcc_4_ldi_save_bc
+	; peephole z88dk-code-reduction-309c
+} if notUsed('a'), notUsed('bc'), notUsed('de'), notUsed('hl')
+
+replace restart {
+	ld	bc,#4
+	ldir
+} by {
+	call	____sdcc_4_ldi_save_bc
+	; peephole z88dk-code-reduction-309d
+} if notUsed('a'), notUsed('bc'), notUsed('de'), notUsed('hl')
+
+replace restart {
+	call	____sdcc_4_ldi_nosave_bc
+} by {
+	call	____sdcc_4_ldi_save_bc
+	; peephole z88dk-code-reduction-309e
+} if notUsed('bc')
+
+replace restart {
+	push	bc
+	ex	de,hl
+	ld	hl,#%1
+	add	hl,sp
+	call	____sdcc_4_ldi_save_bc
+	pop	bc
+} by {
+	ex	de,hl
+	ld	hl,#%1-2
+	add	hl,sp
+	call	____sdcc_4_ldi_save_bc
+	; peephole z88dk-code-reduction-309f
+}
+
+replace restart {
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	push	hl
+	ld	l,%3 (ix)
+	ld	h,%4 (ix)
+	push	hl
+} by {
+	ld	hl,#%3
+	call	____sdcc_4_push_hlix
+	; peephole z88dk-code-reduction-310
+} if notUsed('hl'), inSequence('1' %3 %4 %1 %2), notUsed('a')
+
+replace restart {
+	ld	%1 (ix),l
+	ld	%2 (ix),h
+	ld	%3 (ix),e
+	ld	%4 (ix),d
+} by {
+	ld	bc,#%4
+	call	____sdcc_store_dehl_bcix
+	; peephole z88dk-code-reduction-311a
+} if notUsed('bc'), inSequence('1' %1 %2 %3 %4)
+
+replace restart {
+	ld	%1 (ix),l
+	ld	%2 (ix),h
+	ld	%3 (ix),e
+	ld	%4 (ix),d
+} by {
+	push	bc
+	ld	bc,#%4
+	call	____sdcc_store_dehl_bcix
+	pop	bc
+	; peephole z88dk-code-reduction-311b
+} if inSequence('1' %1 %2 %3 %4)
+
+replace restart {
+	ld	%1 (ix),d
+	ld	%2 (ix),e
+	ld	%3 (ix),h
+	ld	%4 (ix),l
+} by {
+	ld	bc,#%1
+	call	____sdcc_store_dehl_bcix
+	; peephole z88dk-code-reduction-312a
+} if notUsed('bc'), inSequence('1' %4 %3 %2 %1)
+
+replace restart {
+	ld	%1 (ix),d
+	ld	%2 (ix),e
+	ld	%3 (ix),h
+	ld	%4 (ix),l
+} by {
+	push	bc
+	ld	bc,#%1
+	call	____sdcc_store_dehl_bcix
+	pop	bc
+	; peephole z88dk-code-reduction-312b
+} if notUsed('bc'), inSequence('1' %4 %3 %2 %1)
+
+replace restart {
+	ld	c,%1 (ix)
+	ld	b,%2 (ix)
+	ld	e,%3 (ix)
+	ld	d,%4 (ix)
+} by {
+	ld	de,#%1
+	call	____sdcc_load_debc_deix
+	; peephole z88dk-code-reduction-313
+} if inSequence('1' %1 %2 %3 %4)
+
+replace restart {
+	ld	l,%1 (ix)
+	ld	h,%2 (ix)
+	ld	e,%3 (ix)
+	ld	d,%4 (ix)
+} by {
+	ld	de,#%4
+	call	____sdcc_load_dehl_deix
+	; peephole z88dk-code-reduction-314
+} if notUsed('a'), inSequence('1' %1 %2 %3 %4)
+
+replace restart {
+	ld	%1 (ix),c
+	ld	%2 (ix),b
+	ld	%3 (ix),e
+	ld	%4 (ix),d
+} by {
+	ld	hl,#%4
+	call	____sdcc_store_debc_hlix
+	; peephole z88dk-code-reduction-315a
+} if notUsed('hl'), inSequence('1' %1 %2 %3 %4)
+
+replace restart {
+	ld	%1 (ix),c
+	ld	%2 (ix),b
+	ld	%3 (ix),e
+	ld	%4 (ix),d
+} by {
+	push	hl
+	ld	hl,#%4
+	call	____sdcc_store_debc_hlix
+	pop	hl
+	; peephole z88dk-code-reduction-315b
+} if inSequence('1' %1 %2 %3 %4)
+
+
+barrier
+
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+// Z88DK CODE SIZE REDUCTION FOR INT
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
+replace restart {
+	ld	a,(hl)
+	ld	%1 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%2 (ix),a
+} by {
+	ld	de,#%1
+	call	____sdcc_2_copy_src_mhl_dst_deix
+	; peephole z88dk-code-reduction-500a
+} if notUsed('de')
+
+replace restart {
+	ld	a,(hl)
+	ld	%1 (ix),a
+	inc	hl
+	ld	a,(hl)
+	ld	%2 (ix),a
+} by {
+	ld	bc,#%1
+	call	____sdcc_2_copy_src_mhl_dst_bcix
+	; peephole z88dk-code-reduction-500b
+} if notUsed('bc')
 
 
 barrier
