@@ -4,7 +4,7 @@
 # Build z88dk on unix systems
 #
 
-set -e		# bail out if one of the make calls fails
+set -i		# bail out if one of the make calls fails
 
 # Start from scratch with argument "clean"
 if [ "$1" = "clean" ]; then
