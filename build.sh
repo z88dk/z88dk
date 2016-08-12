@@ -4,15 +4,25 @@
 # Build z88dk on unix systems
 #
 
-set -i		# bail out if one of the make calls fails
+set -e -u 		# -e: exit on error; -u: exit on undefined variable
+				# -e can be overidden by -k option
 
-# Start from scratch with argument "clean"
-if [ "$1" = "clean" ]; then
+do_clean=0
+for arg in "$@"; do
+  case "$arg" in
+    -k) set +e					;;	# keep building ignoring errors
+	-c) do_clean=1				;;	# clean before building
+	*)  echo Usage: $0 [-k][-c]
+		exit 1 					;;
+  esac
+done
+
+if [ $do_clean = 1 ]; then
   make clean
+  rm -rf bin
 fi
 
-rm -rf bin
-mkdir bin
+mkdir -p bin
 PATH=`pwd`/bin:$PATH
 export PATH
 
