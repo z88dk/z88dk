@@ -16,6 +16,7 @@ use Time::HiRes 'sleep';
 use File::Path qw(make_path remove_tree);;
 use Capture::Tiny::Extended 'capture';
 use Test::Differences; 
+use Path::Tiny;
 require 't/test_utils.pl';
 
 #------------------------------------------------------------------------------
@@ -47,55 +48,29 @@ t_z80asm_capture("-b -ixxxx ".asm_file(), "",
 	
 #------------------------------------------------------------------------------
 # error_write_file
-unlink_testfiles();
-make_path( err_file() );
-write_file( asm_file(), 'nop' );
-t_z80asm_capture("-b ".asm_file(),
-				"", 
-				"Error: cannot write file 'test.err'\n".
-				"1 errors occurred during assembly\n",
-				1);
-remove_tree( err_file() );
+for (  ["-b",	 	err_file()],
+	 # ["-l -b",	lis_file()],	# these files are removed at start of z80asm
+	 # ["-s -b",	sym_file()],
+	 # ["-b",		obj_file()],
+	 # ["-b",		bin_file()],
+	) {
+	my($options, $file) = @$_;
+	ok 1, "$options $file";
+	
+	unlink_testfiles();
 
-unlink_testfiles();
-make_path( lis_file() );
-write_file( asm_file(), 'nop' );
-t_z80asm_capture("-l -b ".asm_file(),
-				"", 
-				"Error: cannot write file 'test.lis'\n".
-				"1 errors occurred during assembly\n",
-				1);
-remove_tree( lis_file() );
+	# create read-only file
+	path($file)->spew(""); 
+	ok chmod(0400, $file);
 
-unlink_testfiles();
-make_path( sym_file() );
-write_file( asm_file(), 'nop' );
-t_z80asm_capture("-b -s ".asm_file(),
-				"", 
-				"Error: cannot write file 'test.sym'\n".
-				"1 errors occurred during assembly\n",
-				1);
-remove_tree( sym_file() );
-
-unlink_testfiles();
-make_path( obj_file() );
-write_file( asm_file(), 'nop' );
-t_z80asm_capture("-l -b ".asm_file(),
-				"", 
-				"Error: cannot write file 'test.obj'\n".
-				"1 errors occurred during assembly\n",
-				1);
-remove_tree( obj_file() );
-
-unlink_testfiles();
-make_path( bin_file() );
-write_file( asm_file(), 'nop' );
-t_z80asm_capture("-b ".asm_file(),
-				"", 
-				"Error: cannot write file 'test.bin'\n".
-				"1 errors occurred during assembly\n",
-				1);
-remove_tree( bin_file() );
+	write_file( asm_file(), 'nop' );
+	t_z80asm_capture($options." ".asm_file(),
+					"", 
+					"Error: cannot write file '$file'\n".
+					"1 errors occurred during assembly\n",
+					1);
+	ok unlink($file);
+}
 
 #------------------------------------------------------------------------------
 # error_expression 

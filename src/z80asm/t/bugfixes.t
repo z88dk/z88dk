@@ -177,6 +177,7 @@ note "BUG_0014";
 for my $lib (      'test',    'test.lib',
 				 './test',  './test.lib',
 				'.\\test', '.\\test.lib' ) {
+	next if ($lib =~ /\\/ && $^O !~ /MSWin32/);
     unlink('test.lib');
     ok ! -f 'test.lib', "test.lib deleted, building $lib";
 	z80asm(

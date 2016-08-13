@@ -151,11 +151,12 @@ testmsvc : $(MSVC_TARGET)
 
 test_enigma: $(TARGET)
 	zcc +cpm -oenigma.bin t/data/enigma.c
-	echo HELLO. | cpm enigma.bin > enigma.out
+	echo HELLO. > enigma.in
+	cpm enigma.bin < enigma.in > enigma.out
 	echo 'Enter text to be (de)coded, finish with a .' > enigma.bmk
 	echo 'HREXLSLEOC .' >> enigma.bmk
 	diff -w enigma.bmk enigma.out
-	$(RM) zcc_opt.def enigma.bin enigma.out enigma.bmk enigma.reloc
+	$(RM) zcc_opt.def enigma.bin enigma.in enigma.out enigma.bmk enigma.reloc
 
 testzcc : $(TARGET)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
