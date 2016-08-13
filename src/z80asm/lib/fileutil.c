@@ -238,7 +238,9 @@ static void OpenFile_close( FILE *file )
 	self = get_open_file( file );
 	if ( self == NULL )
 	{
-		fclose( file );				/* not-managed file, ignore errors */
+		// do not close not-managed files 
+		// was causing double-free errors in Linux
+		// fclose( file );
 	}
 	else 
 	{												/* managed file */
