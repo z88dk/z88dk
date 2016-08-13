@@ -156,7 +156,9 @@ test_enigma: $(TARGET)
 	echo 'Enter text to be (de)coded, finish with a .' > enigma.bmk
 	echo 'HREXLSLEOC .' >> enigma.bmk
 	diff -w enigma.bmk enigma.out
-	$(RM) zcc_opt.def enigma.bin enigma.in enigma.out enigma.bmk enigma.reloc
+	
+clean::
+	$(RM) zcc_opt.def enigma.bin enigma.in enigma.out enigma.bmk
 
 testzcc : $(TARGET)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
@@ -165,10 +167,12 @@ testzcc : $(TARGET)
 	eightyone mandel.tap
 
 clean::
+	$(RM) zcc_opt.def microman.bin microman.tap
+	$(RM) zcc_opt.def mandel.bin   mandel.tap
+
+clean::
 	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
 	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/dev/*.tmp 
-	$(RM) microman.bin microman.tap mandel.bin mandel.tap zcc_opt.def
-	$(RM) enigma.* crt0.*
 
 #------------------------------------------------------------------------------
 # build with msvc - need to build manualy, devenv not available in Express
