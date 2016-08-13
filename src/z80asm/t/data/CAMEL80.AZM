@@ -1021,8 +1021,8 @@ sdiff:  ; mismatch!  undo last 'cpi' increment
         ld c,a
 snext:  next
 
-*INCLUDE camel80d.azm   ; CPU Dependencies
-*INCLUDE camel80h.azm   ; High Level words
+*INCLUDE CAMEL80D.AZM   ; CPU Dependencies
+*INCLUDE CAMEL80H.AZM   ; High Level words
 lastword EQU link   ; nfa of last word in dict.
 enddict EQU $       ; user's code starts here
         END

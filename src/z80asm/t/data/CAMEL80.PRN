@@ -2054,7 +2054,7 @@
  084B EB       +        ex de,hl
  084C E9       +        jp (hl)
                 
-                *INCLUDE camel80d.azm   ; CPU Dependencies
+                *INCLUDE CAMEL80D.AZM   ; CPU Dependencies
                 ; LISTING 3.
                 ;
                 ; ===============================================
@@ -2338,7 +2338,7 @@
                 ; rewritten if either the header structure or its
                 ; inherent assumptions are changed.
                 
-                *INCLUDE camel80h.azm   ; High Level words
+                *INCLUDE CAMEL80H.AZM   ; High Level words
                 ; LISTING 2.
                 ;
                 ; ===============================================
