@@ -715,7 +715,7 @@ write_file("test2.asm", <<'...');
 		defw func1
 		ret
 ...
-my $cmd = "z80asm -b test.asm test1.asm test2.asm";
+my $cmd = "./z80asm -b test.asm test1.asm test2.asm";
 ok 1, $cmd;
 my($stdout, $stderr, $return) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";

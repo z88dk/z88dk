@@ -438,7 +438,7 @@ t_text(scalar(read_file("test.i")), <<'...');
 #------------------------------------------------------------------------------
 # assemble Camel Forth 80
 #------------------------------------------------------------------------------
-my $cmd = "asmpp.pl --ucase -l -b -It/data CAMEL80.AZM";
+my $cmd = "perl asmpp.pl --ucase -l -b -It/data CAMEL80.AZM";
 ok 0 == system($cmd), $cmd;
 t_binary(read_binfile("CAMEL80.bin"), 
 		 read_binfile("t/data/CAMEL80.COM"));
@@ -453,7 +453,7 @@ sub t_asmpp_ok {
 	ok 1,"[line ".((caller)[2])."]"." t_asmpp_ok";
 	write_file("test.asm", $in);
 	unlink("test.bin");
-	my $cmd = "asmpp.pl -b $args test.asm";
+	my $cmd = "perl asmpp.pl -b $args test.asm";
 	ok 0 == system($cmd), $cmd;
 	t_binary(read_binfile("test.bin"), $bin);
 }
@@ -463,7 +463,7 @@ sub t_asmpp_error {
 	my($in, $args, $error) = @_;
 	ok 1,"[line ".((caller)[2])."]"." t_asmpp_error";
 	write_file("test.asm", $in);
-	my $cmd = "asmpp.pl -b $args test.asm";
+	my $cmd = "perl asmpp.pl -b $args test.asm";
 	my($stdout, $stderr, $return) = capture {
 		system $cmd;
 	};

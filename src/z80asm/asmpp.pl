@@ -5,7 +5,6 @@
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2015
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
 # Preprocessor that translates z80asm source code for CP/M's Z80MR, generates .i file with
 # standard Z80 asm code and calls z80asm. Any error message is mapped back to the original
@@ -35,6 +34,7 @@ use File::Spec;
 use Iterator::Simple qw( iter ienumerate iflatten imap igrep );
 use Iterator::Simple::Lookahead;
 use Regexp::Common;
+use FindBin;
 use Data::Dump 'dump';
 
 #------------------------------------------------------------------------------
@@ -592,6 +592,7 @@ sub assemble_file {
 	# assemble, translate error messages
 	my @cmd = ('z80asm', @OPTIONS, '-ei', $i_file);
 	print "@cmd\n";
+	$cmd[0] = $FindBin::Bin.'/z80asm';
 	my ($stdout, $stderr, $exit) = capture {
 		system @cmd;
 	};

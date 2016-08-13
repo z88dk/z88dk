@@ -58,7 +58,7 @@ make_path("test_dir");
 	# directory of source file is added to include path
 	write_file("test_dir/test.asm", 'include "test.inc"');
 	unlink "test_dir/test.bin";
-	ok system("z80asm -b test_dir/test.asm") == 0;
+	ok system("./z80asm -b test_dir/test.asm") == 0;
 	ok -f "test_dir/test.bin";
 	test_binfile("test_dir/test.bin", "\x3E\x0A");
 
