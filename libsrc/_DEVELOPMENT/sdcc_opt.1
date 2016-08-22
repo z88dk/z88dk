@@ -234,10 +234,6 @@ __sdcc_local_%0:
 =
 	SECTION IGNORE
 
-	.area _CODE_%0
-=
-	SECTION code_compiler_bank_%0
-
 	.area _CODE
 =
 	SECTION code_compiler
@@ -296,6 +292,10 @@ ENDIF
 ;--------------------------------------------------------
 ; absolute external ram data
 ;--------------------------------------------------------
+
+	.area _%0
+=
+	SECTION %0
 
 	.area %0
 =
