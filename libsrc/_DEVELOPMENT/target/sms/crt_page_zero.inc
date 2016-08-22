@@ -1,8 +1,10 @@
 
 ; address = 0x0000
 
+   di
+   im 1
+
    jp __Start
-   defm "Z88DK"
 
 ; address = 0x0008
 
@@ -19,7 +21,7 @@ ELSE
 
 ENDIF
 
-   defm "1.99B"
+   defm "Z88DK"
 
 ; address = 0x0010
 
@@ -36,6 +38,8 @@ ELSE
 
 ENDIF
 
+   defm "1.99B"
+   
 ; address = 0x0018
 
    defs 0x0018 - ASMPC
