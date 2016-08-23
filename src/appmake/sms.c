@@ -191,18 +191,18 @@ int sms_exec(char *target)
     len = 0;
     for (i = 0x02; i <= 0x1f; ++i)
     {
-        sprintf(filename, "%s_BANK_%2X.bin", binname, i);
+        sprintf(filename, "%s_BANK_%02X.bin", binname, i);
 
         if ((fpin = fopen(filename, "rb")) == NULL)
             len += 0x4000;
         else
         {
-            fprintf(stderr, ",%2X", i);
+            fprintf(stderr, ",%02X", i);
 
             while (len--)
                 fputc(romfill, fpout);
 
-            for (len = 0; ((c = fgetc(fpin) != EOF) && (len < 0x4000)); ++len)
+            for (len = 0; ((c = fgetc(fpin)) != EOF) && (len < 0x4000); ++len)
                 fputc(c, fpout);
 
             while (len++ < 0x4000)
