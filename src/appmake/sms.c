@@ -3,109 +3,214 @@
  *
  *    Harold O. Pinheiro - 2006 - pascal
  *    Dominic Morris - 02/06/2007 - rewritten and placed into appmake
- *
- *    $Id: sms.c,v 1.6 2016-07-11 20:30:40 dom Exp $
- *
- *    Figure out what this does exactly!
+ *    Alvin Albrecht - 08/2016 - modernized for current practice
  */
 
+#include <time.h>
 #include "appmake.h"
 
-
-#define OFFSET 0x7ff0
-
+static char              help         = 0;
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
-static char              help         = 0;
-static char              noop         = 0;
-
-static unsigned char     memory[32768];
-static char              signature[] = "TMR SEGA";
+static int               romfill      = 255;
 
 /* Options that are available for this module */
 option_t sms_options[] = {
-    { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
-    { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
-    { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
-    { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
-    { 'n', "noop",     "Don't actually do anything", OPT_BOOL,  &noop },
-    {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
+    { 'h', "help",      "Display this help",                OPT_BOOL,  &help    },
+    { 'b', "binfile",   "Linked binary file",               OPT_STR,   &binname },
+    { 'c', "crt0file",  "crt0 used to link binary",         OPT_STR,   &crtfile },
+    { 'o', "output",    "Name of output file",              OPT_STR,   &outfile },
+    { 'f', "filler",    "Filler byte (default: 0xFF)",      OPT_INT,   &romfill },
+    {  0,  NULL,        NULL,                               OPT_NONE,  NULL     }
 };
 
+#define SMS_HEADER_ADDR    0x7ff0
+#define SDSC_HEADER_ADDR   0x7fe0
+
+static unsigned char memory[32768];
+
+struct sms_header {
+   unsigned char signature[10];
+   unsigned int  checksum;
+   unsigned int  product_code;
+   unsigned int  version;
+   unsigned int  region;
+   unsigned int  romsize;
+};
+
+struct sdsc_header {
+   unsigned char signature[4];
+   unsigned int  version;
+   unsigned int  date;
+   unsigned int  author;
+   unsigned int  name;
+   unsigned int  description;
+};
+
+struct sms_header  sega_hdr = {"TMR SEGA  ",0,0,0,0x4,0xc};
+struct sdsc_header sdsc_hdr = {"SDSC",0,0,0xffff,0xffff,0xffff};
 
 int sms_exec(char *target)
 {
-    char    filename[FILENAME_MAX+1];
-    FILE        *fpin, *fpout;
-    int          i;
-    unsigned short checksum;
-    int        len;
+    time_t t;
+    struct tm *lt;
+    char filename[FILENAME_MAX+1];
+    FILE *fpin, *fpout;
+    int checksum, len, sdsc_present, i, c;
 
-    if ( noop ) {
-        return 0;
-    }
-
-    if ( help )
+    if ((help) || (binname == NULL))
         return -1;
 
-    if ( binname == NULL ) {
-        return -1;
+    // output filename
+
+    if (outfile == NULL)
+    {
+        strcpy(filename, binname);
+        suffix_change(filename, ".sms");
     }
-    if ( outfile == NULL ) {
-        strcpy(filename,binname);
-        suffix_change(filename,".tmr");
-    } else {
-        strcpy(filename,outfile);
+    else
+        strcpy(filename, outfile);
+
+    // gather header info
+
+    sdsc_present = 0;
+    t = time(NULL); lt = localtime(&t);
+
+    sdsc_hdr.date  = (int)num2bcd(lt->tm_mday);
+    sdsc_hdr.date += (int)num2bcd(lt->tm_mon + 1) << 8;
+    sdsc_hdr.date += (int)num2bcd(lt->tm_year + 1900) << 16;
+
+    if (crtfile != NULL)
+    {
+        if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_PRODUCT_CODE")) >= 0)
+            sega_hdr.product_code = i;
+        if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_VERSION")) >= 0)
+            sega_hdr.version = i;
+        if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_REGION")) >= 0)
+            sega_hdr.region = i;
+        if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_ROM_SIZE")) >= 0)
+            fprintf(stderr, "Notice: ROM size is always set to 32k for checksum purposes\n");
+
+        if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_VERSION")) >= 0)
+        {
+            sdsc_present = 1;
+            sdsc_hdr.version = i;
+        }
+        if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_DATE")) >= 0)
+        {
+            sdsc_present = 1;
+            sdsc_hdr.date = i;
+        }
+        if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_AUTHOR")) >= 0)
+        {
+            sdsc_present = 1;
+            sdsc_hdr.author = i;
+        }
+        if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_NAME")) >= 0)
+        {
+            sdsc_present = 1;
+            sdsc_hdr.name = i;
+        }
+        if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_DESCRIPTION")) >= 0)
+        {
+            sdsc_present = 1;
+            sdsc_hdr.description = i;
+        }
     }
 
-    if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
-        fprintf(stderr,"Can't open input file %s\n",binname);
-        myexit(NULL,1);
-    }
+    // create 32k portion of output binary
 
-    if (fseek(fpin,0,SEEK_END)) {
-        fprintf(stderr,"Couldn't determine size of file\n");
+    if ((fpin = fopen_bin(binname, crtfile)) == NULL)
+        exit_log(1, "Can't open input file %s\n", binname);
+    else if (fseek(fpin, 0, SEEK_END))
+    {
         fclose(fpin);
-        myexit(NULL,1);
+        exit_log(1, "Couldn't determine size of file %s\n", binname);
     }
-
-    len=ftell(fpin);
-
-    fseek(fpin,0L,SEEK_SET);
-
-    if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+    else if ((len = ftell(fpin)) >= SMS_HEADER_ADDR)
+    {
         fclose(fpin);
-        myexit("Can't open output file\n",1);
+        exit_log(1, "Main binary %s exceeds 32k\n", binname);
     }
 
-    memcpy(memory + OFFSET,&signature,8);
-    memory[OFFSET + 8] = 0xFF;   /* Unknown */
-    memory[OFFSET + 9] = 0xff;
-    memory[OFFSET + 10] = 0x00;  /* Checksum */
-    memory[OFFSET + 11] = 0x00;
-    memory[OFFSET + 12] = 0xff;  /* Part number */
-    memory[OFFSET + 13] = 0x42;
-    memory[OFFSET + 14] = 0x20;  /* Version */
-    memory[OFFSET + 15] = 0x4c;  /* Checksum range */
-
-    fread(&memory[0], sizeof(memory[0]), len, fpin);
-
-    for ( checksum = 0, i = 0; i < len; i++ ) {
-        checksum += memory[i];
+    if (sdsc_present && (len >= SDSC_HEADER_ADDR))
+    {
+        sdsc_present = 0;
+        fprintf(stderr, "Notice: SDSC header will not be inserted because ROM is too big\n");
     }
 
-    memory[OFFSET + 8] = checksum & 0xFF;
-    memory[OFFSET + 9] = (checksum >> 8) & 0xFF;
+    rewind(fpin);
 
-    fwrite(&memory, sizeof(memory[0]), 32768, fpout);
+    memset(memory, romfill, sizeof(memory));
+    fread(memory, sizeof(memory[0]), len, fpin);
 
     fclose(fpin);
+
+    if (sdsc_present)
+    {
+        fprintf(stderr, "Notice: SDSC header created\n");
+        memcpy(&memory[SDSC_HEADER_ADDR], sdsc_hdr.signature, 4); 
+        memory[SDSC_HEADER_ADDR+4] = (unsigned char)sdsc_hdr.version;
+        memory[SDSC_HEADER_ADDR+5] = (unsigned char)(sdsc_hdr.version >> 8);
+        memory[SDSC_HEADER_ADDR+6] = (unsigned char)sdsc_hdr.date;
+        memory[SDSC_HEADER_ADDR+7] = (unsigned char)(sdsc_hdr.date >> 8);
+        memory[SDSC_HEADER_ADDR+8] = (unsigned char)(sdsc_hdr.date >> 16);
+        memory[SDSC_HEADER_ADDR+9] = (unsigned char)(sdsc_hdr.date >> 24);
+        memory[SDSC_HEADER_ADDR+10] = (unsigned char)sdsc_hdr.author;
+        memory[SDSC_HEADER_ADDR+11] = (unsigned char)(sdsc_hdr.author >> 8);
+        memory[SDSC_HEADER_ADDR+12] = (unsigned char)sdsc_hdr.name;
+        memory[SDSC_HEADER_ADDR+13] = (unsigned char)(sdsc_hdr.name >> 8);
+        memory[SDSC_HEADER_ADDR+14] = (unsigned char)sdsc_hdr.description;
+        memory[SDSC_HEADER_ADDR+15] = (unsigned char)(sdsc_hdr.description >> 8);
+    }
+
+    memcpy(&memory[SMS_HEADER_ADDR], sega_hdr.signature, 10);
+    memory[SMS_HEADER_ADDR+12] = (unsigned char)sega_hdr.product_code;
+    memory[SMS_HEADER_ADDR+13] = (unsigned char)(sega_hdr.product_code >> 8);
+    memory[SMS_HEADER_ADDR+14] = (unsigned char)(((sega_hdr.product_code >> 12) & 0xf0) + (sega_hdr.version & 0x0f));
+    memory[SMS_HEADER_ADDR+15] = (unsigned char)(((sega_hdr.region << 4) & 0xf0) + (sega_hdr.romsize & 0x0f));
+
+    for (i = checksum = 0; i < SMS_HEADER_ADDR; ++i)
+        checksum += memory[i];
+
+    memory[SMS_HEADER_ADDR+10] = (unsigned char)checksum;
+    memory[SMS_HEADER_ADDR+11] = (unsigned char)(checksum >> 8);
+
+    // write first 32k of output file
+
+    if ((fpout = fopen(filename, "wb")) == NULL)
+        exit_log(1, "Can't create output file %s\n", filename);
+
+    fwrite(memory, sizeof(memory[0]), sizeof(memory), fpout);
+
+    // look for and append memory banks
+
+    len = 0;
+    for (i = 0x02; i <= 0x1f; ++i)
+    {
+        sprintf(filename, "%s_BANK_%2X", binname, i);
+
+        if ((fpin = fopen(filename, "rb")) == NULL)
+            len += 0x4000;
+        else
+        {
+            fprintf(stderr, "Notice: Adding bank 0x%2x\n", i);
+
+            while (len--)
+                fputc(romfill, fpout);
+
+            for (len = 0; ((c = fgetc(fpin) != EOF) && (len < 0x4000)); ++len)
+                fputc(c, fpout);
+
+            if (!feof(fpin))
+                fprintf(stderr, "Warning: %s is larger than 16k, truncating\n", filename);
+
+            len = 0;
+            fclose(fpin);
+        }
+    }
+
     fclose(fpout);
     return 0;
 }
-
-
-
-
-

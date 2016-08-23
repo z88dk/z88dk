@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.47 2016-07-17 01:42:44 pauloscustodio Exp $
+ *   $Id: appmake.c,v 1.48 2016-08-23 06:00:05 aralbrec Exp $
  */
 
 
@@ -13,6 +13,7 @@
 #define MAIN_C
 #include "appmake.h"
 #include <stdlib.h>
+#include <stdint.h>
 #include <time.h>
 
 
@@ -338,7 +339,6 @@ void main_usage(void)
 {
     int   i;
 
-
     fprintf(stderr,"appmake [+target] [options]\n\n");
     fprintf(stderr,"The z88dk application generator\n\n");
     fprintf(stderr,
@@ -499,6 +499,21 @@ static void option_print(char *execname, char *ident, char *copyright, char *des
     }
 }
 
+
+/* Number to BCD */
+uint32_t num2bcd(uint32_t num)
+{
+    int i;
+    uint32_t bcd;
+
+    for (i=0; i<4; ++i)
+    {
+        bcd += ((num%100)/10*16 + (num%100)%10) << i;
+        num /= 100;
+    }
+
+    return bcd;
+}
 
 
 /* Writing routines */

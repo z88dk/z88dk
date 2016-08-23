@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.55 2016-08-05 07:04:10 stefano Exp $
+ *   $Id: appmake.h,v 1.56 2016-08-23 06:00:05 aralbrec Exp $
  */
 
 
@@ -14,6 +14,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <sys/stat.h>
 
 
@@ -385,6 +386,8 @@ extern FILE         *fopen_data(char *fname);
 extern long         get_org_addr(char *crtfile);
 extern void         suffix_change(char *name, char *suffix);
 extern void         any_suffix_change(char *name, char *suffix, char schar);
+
+extern uint32_t     num2bcd(uint32_t num);
 
 extern void         writebyte(unsigned char c, FILE *fp);
 extern void         writeword(unsigned int i, FILE *fp);
