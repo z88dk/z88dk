@@ -64,6 +64,54 @@ IF __MMAP = 0
    SECTION BANK_0F
    org 0x8000
 
+   SECTION BANK_10
+   org 0x8000
+   
+   SECTION BANK_11
+   org 0x8000
+
+   SECTION BANK_12
+   org 0x8000
+   
+   SECTION BANK_13
+   org 0x8000
+
+   SECTION BANK_14
+   org 0x8000
+   
+   SECTION BANK_15
+   org 0x8000
+
+   SECTION BANK_16
+   org 0x8000
+   
+   SECTION BANK_17
+   org 0x8000
+
+   SECTION BANK_18
+   org 0x8000
+   
+   SECTION BANK_19
+   org 0x8000
+   
+   SECTION BANK_1A
+   org 0x8000
+   
+   SECTION BANK_1B
+   org 0x8000
+
+   SECTION BANK_1C
+   org 0x8000
+   
+   SECTION BANK_1D
+   org 0x8000
+
+   SECTION BANK_1E
+   org 0x8000
+   
+   SECTION BANK_1F
+   org 0x8000
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
 ENDIF
