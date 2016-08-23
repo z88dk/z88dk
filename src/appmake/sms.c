@@ -186,16 +186,18 @@ int sms_exec(char *target)
 
     // look for and append memory banks
 
+    fprintf(stderr, "Adding banks 00,01");
+
     len = 0;
     for (i = 0x02; i <= 0x1f; ++i)
     {
-        sprintf(filename, "%s_BANK_%2X", binname, i);
+        sprintf(filename, "%s_BANK_%2X.bin", binname, i);
 
         if ((fpin = fopen(filename, "rb")) == NULL)
             len += 0x4000;
         else
         {
-            fprintf(stderr, "Notice: Adding bank 0x%2x\n", i);
+            fprintf(stderr, ",%2X", i);
 
             while (len--)
                 fputc(romfill, fpout);
@@ -203,13 +205,18 @@ int sms_exec(char *target)
             for (len = 0; ((c = fgetc(fpin) != EOF) && (len < 0x4000)); ++len)
                 fputc(c, fpout);
 
+            while (len++ < 0x4000)
+                fputc(romfill, fpout);
+
             if (!feof(fpin))
-                fprintf(stderr, "Warning: %s is larger than 16k, truncating\n", filename);
+                fprintf(stderr, " (warning truncating %s)", filename);
 
             len = 0;
             fclose(fpin);
         }
     }
+
+    fprintf(stderr, "\n");
 
     fclose(fpout);
     return 0;
