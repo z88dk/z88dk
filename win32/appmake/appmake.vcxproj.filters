@@ -141,6 +141,9 @@
     <ClCompile Include="..\..\src\appmake\zxvgs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\appmake\z1013.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\appmake\appmake.h">
