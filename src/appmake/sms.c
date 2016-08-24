@@ -58,7 +58,6 @@ int sms_exec(char *target)
     char filename[FILENAME_MAX+1];
     FILE *fpin, *fpout;
     int checksum, len, sdsc_present, i, c;
-    int total, used;
 
     if ((help) || (binname == NULL))
         return -1;
@@ -185,9 +184,6 @@ int sms_exec(char *target)
     // look for and append memory banks
 
     fprintf(stderr, "Adding main banks 00,01 (%d bytes free)\n", sizeof(memory)-len-16-16*sdsc_present);
-
-    used = len + 16 + 16*sdsc_present;
-
 
     len = 0;
     for (i = 0x02; i <= 0x1f; ++i)
