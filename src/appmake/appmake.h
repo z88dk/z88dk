@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.56 2016-08-23 06:00:05 aralbrec Exp $
+ *   $Id: appmake.h,v 1.57 2016-08-24 05:36:40 aralbrec Exp $
  */
 
 
@@ -320,8 +320,8 @@ struct {
       "Creates a .cas file loadable with the SVI emulator",
       NULL,
       svi_exec,      &svi_options },
-    { "bin2tmr",  "sms",       "(C) 2007 Dominic Morris",
-      "Creates a .tmr file padded out to 32k ",
+    { "bin2sms",  "sms",       "(C) 2007 Dominic Morris",
+      "Creates an sms file composed of a 32k main binary and 16k expansion banks",
       NULL,
       sms_exec,      &sms_options },
     { "bin2cmd",  "trs80",    "(C) 2008 Stefano Bodrato",

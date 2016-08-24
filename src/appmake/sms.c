@@ -1,9 +1,9 @@
 /*
- *    Convert an outfile into a padded 32k file
+ *    Convert an outfile into a main 32k binary + multiple 16k expansion banks
  *
  *    Harold O. Pinheiro - 2006 - pascal
  *    Dominic Morris - 02/06/2007 - rewritten and placed into appmake
- *    Alvin Albrecht - 08/2016 - modernized for current practice
+ *    Alvin Albrecht - 08/2016 - update to sms files that support bankswitched memory
  */
 
 #include <time.h>
