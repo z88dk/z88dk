@@ -134,7 +134,7 @@ int sms_exec(char *target)
     if (sdsc_present && (len >= SDSC_HEADER_ADDR))
     {
         sdsc_present = 0;
-        fprintf(stderr, "Notice: SDSC header will not be inserted because main 32k ROM is too big\n");
+        fprintf(stderr, "Notice: SDSC header will not be inserted because main 32k ROM is too full\n");
     }
 
     rewind(fpin);
