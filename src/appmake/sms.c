@@ -58,6 +58,7 @@ int sms_exec(char *target)
     char filename[FILENAME_MAX+1];
     FILE *fpin, *fpout;
     int checksum, len, sdsc_present, i, c;
+    int total, used;
 
     if ((help) || (binname == NULL))
         return -1;
@@ -76,10 +77,7 @@ int sms_exec(char *target)
 
     sdsc_present = 0;
     t = time(NULL); lt = localtime(&t);
-
-    sdsc_hdr.date  = (int)num2bcd(lt->tm_mday);
-    sdsc_hdr.date += (int)num2bcd(lt->tm_mon + 1) << 8;
-    sdsc_hdr.date += (int)num2bcd(lt->tm_year + 1900) << 16;
+    sdsc_hdr.date = lt->tm_mday + (lt->tm_mon + 1)*100 + (lt->tm_year + 1900)*100*100;
 
     if (crtfile != NULL)
     {
@@ -137,7 +135,7 @@ int sms_exec(char *target)
     if (sdsc_present && (len >= SDSC_HEADER_ADDR))
     {
         sdsc_present = 0;
-        fprintf(stderr, "Notice: SDSC header will not be inserted because ROM is too big\n");
+        fprintf(stderr, "Notice: SDSC header will not be inserted because main 32k ROM is too big\n");
     }
 
     rewind(fpin);
@@ -151,9 +149,9 @@ int sms_exec(char *target)
     {
         fprintf(stderr, "Notice: SDSC header created\n");
         memcpy(&memory[SDSC_HEADER_ADDR], sdsc_hdr.signature, 4); 
-        memory[SDSC_HEADER_ADDR+4] = (unsigned char)sdsc_hdr.version;
-        memory[SDSC_HEADER_ADDR+5] = (unsigned char)(sdsc_hdr.version >> 8);
-        memory[SDSC_HEADER_ADDR+6] = (unsigned char)sdsc_hdr.date;
+        memory[SDSC_HEADER_ADDR+5] = (unsigned char)(sdsc_hdr.version = num2bcd(sdsc_hdr.version));
+        memory[SDSC_HEADER_ADDR+4] = (unsigned char)(sdsc_hdr.version >> 8);
+        memory[SDSC_HEADER_ADDR+6] = (unsigned char)(sdsc_hdr.date = num2bcd(sdsc_hdr.date));
         memory[SDSC_HEADER_ADDR+7] = (unsigned char)(sdsc_hdr.date >> 8);
         memory[SDSC_HEADER_ADDR+8] = (unsigned char)(sdsc_hdr.date >> 16);
         memory[SDSC_HEADER_ADDR+9] = (unsigned char)(sdsc_hdr.date >> 24);
@@ -166,9 +164,9 @@ int sms_exec(char *target)
     }
 
     memcpy(&memory[SMS_HEADER_ADDR], sega_hdr.signature, 10);
-    memory[SMS_HEADER_ADDR+12] = (unsigned char)sega_hdr.product_code;
-    memory[SMS_HEADER_ADDR+13] = (unsigned char)(sega_hdr.product_code >> 8);
     memory[SMS_HEADER_ADDR+14] = (unsigned char)(((sega_hdr.product_code >> 12) & 0xf0) + (sega_hdr.version & 0x0f));
+    memory[SMS_HEADER_ADDR+12] = (unsigned char)(sega_hdr.product_code = num2bcd(sega_hdr.product_code));
+    memory[SMS_HEADER_ADDR+13] = (unsigned char)(sega_hdr.product_code >> 8);
     memory[SMS_HEADER_ADDR+15] = (unsigned char)(((sega_hdr.region << 4) & 0xf0) + (sega_hdr.romsize & 0x0f));
 
     for (i = checksum = 0; i < SMS_HEADER_ADDR; ++i)
@@ -186,7 +184,10 @@ int sms_exec(char *target)
 
     // look for and append memory banks
 
-    fprintf(stderr, "Adding banks 00,01");
+    fprintf(stderr, "Adding main banks 00,01 (%d bytes free)\n", sizeof(memory)-len-16-16*sdsc_present);
+
+    used = len + 16 + 16*sdsc_present;
+
 
     len = 0;
     for (i = 0x02; i <= 0x1f; ++i)
@@ -197,7 +198,7 @@ int sms_exec(char *target)
             len += 0x4000;
         else
         {
-            fprintf(stderr, ",%02X", i);
+            fprintf(stderr, "Adding bank %02X", i);
 
             while (len--)
                 fputc(romfill, fpout);
@@ -205,18 +206,25 @@ int sms_exec(char *target)
             for (len = 0; ((c = fgetc(fpin)) != EOF) && (len < 0x4000); ++len)
                 fputc(c, fpout);
 
+            if (len < 0x4000)
+                fprintf(stderr, " (%d bytes free)", 0x4000 - len);
+
             while (len++ < 0x4000)
                 fputc(romfill, fpout);
 
             if (!feof(fpin))
-                fprintf(stderr, " (warning truncating %s)", filename);
+            {
+                fseek(fpin, 0, SEEK_END);
+                len = ftell(fpin);
+                fprintf(stderr, " (error truncating %d bytes from %s)", len - 0x4000, filename);
+            }
 
             len = 0;
+            fputc('\n', stderr);
+
             fclose(fpin);
         }
     }
-
-    fprintf(stderr, "\n");
 
     fclose(fpout);
     return 0;
