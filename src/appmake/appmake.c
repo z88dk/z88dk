@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.48 2016-08-23 06:00:05 aralbrec Exp $
+ *   $Id: appmake.c,v 1.49 2016-08-24 01:10:35 aralbrec Exp $
  */
 
 
@@ -506,7 +506,8 @@ uint32_t num2bcd(uint32_t num)
     int i;
     uint32_t bcd;
 
-    for (i=0; i<4; ++i)
+    bcd = 0;
+    for (i=0; i<32; i+=8)
     {
         bcd += ((num%100)/10*16 + (num%100)%10) << i;
         num /= 100;
