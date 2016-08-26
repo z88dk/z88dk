@@ -99,17 +99,17 @@ int sms_exec(char *target)
             sdsc_present = 1;
             sdsc_hdr.date = i;
         }
-        if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_AUTHOR")) >= 0)
+        if ((i = parameter_search(crtfile, ".map", "SDSC_HDR_AUTHOR")) >= 0)
         {
             sdsc_present = 1;
             sdsc_hdr.author = i;
         }
-        if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_NAME")) >= 0)
+        if ((i = parameter_search(crtfile, ".map", "SDSC_HDR_NAME")) >= 0)
         {
             sdsc_present = 1;
             sdsc_hdr.name = i;
         }
-        if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_DESCRIPTION")) >= 0)
+        if ((i = parameter_search(crtfile, ".map", "SDSC_HDR_DESCRIPTION")) >= 0)
         {
             sdsc_present = 1;
             sdsc_hdr.description = i;
@@ -163,7 +163,7 @@ int sms_exec(char *target)
     }
 
     memcpy(&memory[SMS_HEADER_ADDR], sega_hdr.signature, 10);
-    memory[SMS_HEADER_ADDR+14] = (unsigned char)(((sega_hdr.product_code >> 12) & 0xf0) + (sega_hdr.version & 0x0f));
+    memory[SMS_HEADER_ADDR+14] = (unsigned char)(((sega_hdr.product_code/10000 << 4) & 0xf0) + (sega_hdr.version & 0x0f));
     memory[SMS_HEADER_ADDR+12] = (unsigned char)(sega_hdr.product_code = num2bcd(sega_hdr.product_code));
     memory[SMS_HEADER_ADDR+13] = (unsigned char)(sega_hdr.product_code >> 8);
     memory[SMS_HEADER_ADDR+15] = (unsigned char)(((sega_hdr.region << 4) & 0xf0) + (sega_hdr.romsize & 0x0f));
