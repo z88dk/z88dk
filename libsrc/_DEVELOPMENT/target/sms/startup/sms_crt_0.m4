@@ -13,6 +13,7 @@ dnl############################################################
 include "../crt_defaults.inc"
 include "crt_target_defaults.inc"
 include "../crt_rules.inc"
+include "crt_rules_sms.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MODEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

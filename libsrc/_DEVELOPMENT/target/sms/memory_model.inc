@@ -23,94 +23,94 @@ IF __MMAP = 0
    INCLUDE "../crt_memory_model.inc"
    
    SECTION BANK_02
-   org 0x8000
+   org CRT_ORG_BANK_02
    
    SECTION BANK_03
-   org 0x8000
+   org CRT_ORG_BANK_03
 
    SECTION BANK_04
-   org 0x8000
+   org CRT_ORG_BANK_04
    
    SECTION BANK_05
-   org 0x8000
+   org CRT_ORG_BANK_05
 
    SECTION BANK_06
-   org 0x8000
+   org CRT_ORG_BANK_06
    
    SECTION BANK_07
-   org 0x8000
+   org CRT_ORG_BANK_07
 
    SECTION BANK_08
-   org 0x8000
+   org CRT_ORG_BANK_08
    
    SECTION BANK_09
-   org 0x8000
+   org CRT_ORG_BANK_09
    
    SECTION BANK_0A
-   org 0x8000
+   org CRT_ORG_BANK_0A
    
    SECTION BANK_0B
-   org 0x8000
+   org CRT_ORG_BANK_0B
 
    SECTION BANK_0C
-   org 0x8000
+   org CRT_ORG_BANK_0C
    
    SECTION BANK_0D
-   org 0x8000
+   org CRT_ORG_BANK_0D
 
    SECTION BANK_0E
-   org 0x8000
+   org CRT_ORG_BANK_0E
    
    SECTION BANK_0F
-   org 0x8000
+   org CRT_ORG_BANK_0F
 
    SECTION BANK_10
-   org 0x8000
+   org CRT_ORG_BANK_10
    
    SECTION BANK_11
-   org 0x8000
+   org CRT_ORG_BANK_11
 
    SECTION BANK_12
-   org 0x8000
+   org CRT_ORG_BANK_12
    
    SECTION BANK_13
-   org 0x8000
+   org CRT_ORG_BANK_13
 
    SECTION BANK_14
-   org 0x8000
+   org CRT_ORG_BANK_14
    
    SECTION BANK_15
-   org 0x8000
+   org CRT_ORG_BANK_15
 
    SECTION BANK_16
-   org 0x8000
+   org CRT_ORG_BANK_16
    
    SECTION BANK_17
-   org 0x8000
+   org CRT_ORG_BANK_17
 
    SECTION BANK_18
-   org 0x8000
+   org CRT_ORG_BANK_18
    
    SECTION BANK_19
-   org 0x8000
+   org CRT_ORG_BANK_19
    
    SECTION BANK_1A
-   org 0x8000
+   org CRT_ORG_BANK_1A
    
    SECTION BANK_1B
-   org 0x8000
+   org CRT_ORG_BANK_1B
 
    SECTION BANK_1C
-   org 0x8000
+   org CRT_ORG_BANK_1C
    
    SECTION BANK_1D
-   org 0x8000
+   org CRT_ORG_BANK_1D
 
    SECTION BANK_1E
-   org 0x8000
+   org CRT_ORG_BANK_1E
    
    SECTION BANK_1F
-   org 0x8000
+   org CRT_ORG_BANK_1F
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    

@@ -10,6 +10,7 @@
 include "../crt_defaults.inc"
 include "crt_target_defaults.inc"
 include "../crt_rules.inc"
+include "crt_rules_sms.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MODEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -338,7 +339,7 @@ __Start:
    include "../crt_save_sp.inc"
 
 __Restart:
-
+   
    include "../crt_init_sp.inc"
    
    ; initialize mappers
