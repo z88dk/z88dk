@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.57 2016-08-24 05:36:40 aralbrec Exp $
+ *   $Id: appmake.h,v 1.58 2016-08-26 05:34:18 aralbrec Exp $
  */
 
 
@@ -387,8 +387,6 @@ extern long         get_org_addr(char *crtfile);
 extern void         suffix_change(char *name, char *suffix);
 extern void         any_suffix_change(char *name, char *suffix, char schar);
 
-extern uint32_t     num2bcd(uint32_t num);
-
 extern void         writebyte(unsigned char c, FILE *fp);
 extern void         writeword(unsigned int i, FILE *fp);
 extern void         writelong(unsigned long i, FILE *fp);
@@ -406,16 +404,17 @@ extern void         writebyte_cksum(unsigned char c, FILE *fp, unsigned long *ck
 extern void         writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum);
 extern void         writestring_cksum(char *mystring, FILE *fp, unsigned long *cksum);
 
-extern void			raw2wav(char *rawfilename);
+extern void         raw2wav(char *rawfilename);
 
-extern void			zx_pilot(int pilot_len, FILE *fpout);
-extern void			zx_rawbit(FILE *fpout, int period);
-extern void			zx_rawout (FILE *fpout, unsigned char b, char fast);
+extern void         zx_pilot(int pilot_len, FILE *fpout);
+extern void         zx_rawbit(FILE *fpout, int period);
+extern void         zx_rawout (FILE *fpout, unsigned char b, char fast);
 
 /*  record size for bin2hex and other text encoding formats */
 #define RECSIZE 16
-extern int			bin2hex(FILE *input, FILE *output, int address);
-extern int			hexdigit(char digit);
+extern int          bin2hex(FILE *input, FILE *output, int address);
+extern int          hexdigit(char digit);
+extern uint32_t     num2bcd(uint32_t num);
 
 /* snprintf is _snprintf in _MSC_VER */
 #ifdef _MSC_VER
