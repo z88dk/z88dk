@@ -5,7 +5,7 @@
  *   This file contains the driver and routines used by multiple
  *   modules
  * 
- *   $Id: appmake.c,v 1.49 2016-08-24 01:10:35 aralbrec Exp $
+ *   $Id: appmake.c,v 1.50 2016-08-26 05:35:33 aralbrec Exp $
  */
 
 
@@ -171,8 +171,8 @@ long parameter_search(char *filen, char *ext,char *target)
     FILE    *fp;
 
     if (filen == NULL) {
-		fprintf(stderr,"Warning: CRT file name not specified (not z88dk compiled?)\n");
-		return(-1);
+        fprintf(stderr,"Warning: CRT file name not specified (not z88dk compiled?)\n");
+        return(-1);
     }
 
     /* Create the filename very quickly */
@@ -198,11 +198,11 @@ long parameter_search(char *filen, char *ext,char *target)
 long get_org_addr(char *crtfile)
 {
     long    pos;
-	
-	if ( ( pos = parameter_search(crtfile,".sym","__crt_org_code") ) == -1 )
-		pos = parameter_search(crtfile,".sym","CRT_ORG_CODE");
-	
-	return(pos);
+
+    if ( ( pos = parameter_search(crtfile,".sym","__crt_org_code") ) == -1 )
+        pos = parameter_search(crtfile,".sym","CRT_ORG_CODE");
+
+    return(pos);
 }
 
 
@@ -229,10 +229,10 @@ FILE *fopen_bin(char *fname, char *crtfile)
     stat(fname, &st_file1);
   
     if ((stat(name, &st_file2) < 0) || (st_file2.st_mtime < st_file1.st_mtime)) {
-	/* classic library */
+        /* classic library */
         fcode = fopen(fname, "rb");
 
-        /* We mave a data section */
+        /* We may have a data section */
         strcpy(name, fname);
         suffix_change(name, "_DATA.bin");
         if ( stat(name, &st_file2) < 0 ) {
@@ -320,7 +320,7 @@ void suffix_change(char *name, char *suffix)
     strcat(name,suffix);
 }
 
-/* Variant for the eneric change suffix routine */
+/* Variant for the generic change suffix routine */
 void any_suffix_change(char *name, char *suffix, char suffix_delimiter)
 {
     int j = strlen(name)-1;
@@ -534,11 +534,11 @@ void writeword(unsigned int i, FILE *fp)
 
 void writestring(char *mystring, FILE *fp)
 {
-	size_t c;
+    size_t c;
 
-	for (c=0; c < strlen(mystring); c++) {
-		writebyte(mystring[c],fp);
-	}
+    for (c=0; c < strlen(mystring); c++) {
+        writebyte(mystring[c],fp);
+    }
 }
 
 
@@ -584,7 +584,7 @@ void writebyte_pk(unsigned char c, FILE *fp,unsigned char *p)
 
 void writestring_p(char *mystring, FILE *fp,unsigned char *p)
 {
-	size_t c;
+    size_t c;
 
     for (c=0; c < strlen(mystring); c++) {
         writebyte_p(mystring[c],fp,p);
@@ -595,7 +595,7 @@ void writestring_p(char *mystring, FILE *fp,unsigned char *p)
 
 void writestring_pk(char *mystring, FILE *fp,unsigned char *p)
 {
-	size_t c;
+    size_t c;
 
     for (c=0; c < strlen(mystring); c++) {
         writebyte_pk(mystring[c],fp,p);
@@ -622,11 +622,11 @@ void writeword_cksum(unsigned int i, FILE *fp, unsigned long *cksum)
 
 void writestring_cksum(char *mystring, FILE *fp, unsigned long *cksum)
 {
-	size_t c;
+    size_t c;
 
-	for (c=0; c < strlen(mystring); c++) {
-		writebyte_cksum(mystring[c],fp,cksum);
-	}
+    for (c=0; c < strlen(mystring); c++) {
+        writebyte_cksum(mystring[c],fp,cksum);
+    }
 }
 
 
@@ -634,65 +634,65 @@ void writestring_cksum(char *mystring, FILE *fp, unsigned long *cksum)
 /* Add the WAV header to a 44100 Khz RAW sound file */
 void raw2wav(char *wavfile)
 {
-	char    rawfilename[FILENAME_MAX+1];
-	FILE    *fpin, *fpout;
-	int		c;
-	long	i, len;
+    char    rawfilename[FILENAME_MAX+1];
+    FILE    *fpin, *fpout;
+    int		c;
+    long	i, len;
 
-	strcpy(rawfilename,wavfile);
+    strcpy(rawfilename,wavfile);
 
-	if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
-		fprintf(stderr,"Can't open file %s for wave conversion\n",wavfile);
-		myexit(NULL,1);
-	}
+    if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
+        fprintf(stderr,"Can't open file %s for wave conversion\n",wavfile);
+        myexit(NULL,1);
+    }
 
-	if (fseek(fpin,0,SEEK_END)) {
-	   fclose(fpin);
-	   myexit("Couldn't determine size of file\n",1);
-	}
+    if (fseek(fpin,0,SEEK_END)) {
+       fclose(fpin);
+       myexit("Couldn't determine size of file\n",1);
+    }
 
-	len=ftell(fpin);
-	fseek(fpin,0L,SEEK_SET);
-	suffix_change(wavfile,".wav");
+    len=ftell(fpin);
+    fseek(fpin,0L,SEEK_SET);
+    suffix_change(wavfile,".wav");
 
-	if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
-		fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
-		myexit(NULL,1);
-	}
+    if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
+        fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
+        myexit(NULL,1);
+    }
 
-	/* Now let's think at the WAV file */
-	writestring("RIFF",fpout);
-	writelong(len+63,fpout);
-	writestring("WAVEfmt ",fpout);
-	writelong(0x10,fpout);
-	writeword(1,fpout);
-	writeword(1,fpout);
-	writelong(44100,fpout);
-	writelong(44100,fpout);
-	writeword(1,fpout);
-	writeword(8,fpout);
-	writestring("data",fpout);
-	writelong(len,fpout);
+    /* Now let's think at the WAV file */
+    writestring("RIFF",fpout);
+    writelong(len+63,fpout);
+    writestring("WAVEfmt ",fpout);
+    writelong(0x10,fpout);
+    writeword(1,fpout);
+    writeword(1,fpout);
+    writelong(44100,fpout);
+    writelong(44100,fpout);
+    writeword(1,fpout);
+    writeword(8,fpout);
+    writestring("data",fpout);
+    writelong(len,fpout);
 
-	for (i=0; i<63;i++) {
-	  fputc(0x20,fpout);
-	}
+    for (i=0; i<63;i++) {
+      fputc(0x20,fpout);
+    }
 
-	/*
-	//writestring(wav_table,fpout);
-	for (i=0; i<28;i++) {
-	  fputc(0x20,fpout);
-	}
-	*/
+    /*
+    //writestring(wav_table,fpout);
+    for (i=0; i<28;i++) {
+      fputc(0x20,fpout);
+    }
+    */
 
-	for (i=0; i<len;i++) {
-	  c=getc(fpin);
-	  fputc(c,fpout);
-	}
+    for (i=0; i<len;i++) {
+      c=getc(fpin);
+      fputc(c,fpout);
+    }
 
-	fclose(fpin);
-	fclose(fpout);
-	remove (rawfilename);
+    fclose(fpin);
+    fclose(fpout);
+    remove (rawfilename);
 }
 
 
@@ -708,19 +708,19 @@ void zx_pilot(int pilot_len, FILE *fpout)
   /* Then the beeeep */
   for (j=0; j<pilot_len; j++) {
     for (i=0; i < 27; i++)
-	  fputc (0x20,fpout);
+      fputc (0x20,fpout);
 
     for (i=0; i < 27; i++)
-	  fputc (0xe0,fpout);
+      fputc (0xe0,fpout);
   }
 
 
   /* Sync */
   for (i=0; i < 8; i++)
-	fputc (0x20,fpout);
+    fputc (0x20,fpout);
 
   for (i=0; i < 8; i++)
-	fputc (0xe0,fpout);
+    fputc (0xe0,fpout);
 }
 
 
@@ -729,10 +729,10 @@ void zx_rawbit(FILE *fpout, int period)
   int i;
 
   for (i=0; i < period; i++)
-	fputc (0x20,fpout);
+    fputc (0x20,fpout);
 
   for (i=0; i < period; i++)
-	fputc (0xe0,fpout);
+    fputc (0xe0,fpout);
 }
 
 
@@ -745,9 +745,9 @@ void zx_rawout (FILE *fpout, unsigned char b, char fast)
   for (i=0; i < 8; i++)
   {
     if (b & c[i])
-	  /* Experimental MIN limit is 17 */
-	  if ( fast ) period = 19; else period = 22;
-	  //period = 22;
+      /* Experimental MIN limit is 17 */
+      if ( fast ) period = 19; else period = 22;
+      //period = 22;
     else
       /* Experimental MIN limit is 7 */
       if ( fast ) period = 9; else period = 11;
