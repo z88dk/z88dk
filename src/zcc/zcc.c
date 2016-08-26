@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.146 2016-07-16 02:45:14 aralbrec Exp $
+ *      $Id: zcc.c,v 1.147 2016-08-26 05:46:16 aralbrec Exp $
  */
 
 
@@ -528,7 +528,7 @@ int linkthem(char *linker)
             (relocate && z80verbose && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
             linkargs,
             globaldefon ? "-g " : "",
-            mapon ? "-m " : "",
+            (createapp || mapon) ? "-m " : "",
             (createapp || symbolson) ? "-s ": "",
             relocinfo ? "--reloc-info " : "",
             (c_nocrt == 0) ? c_crt0 : "",
@@ -1547,6 +1547,7 @@ void write_zcc_defined(char *name, int value)
     add_zccopt("\nIF !DEFINED_%s\n",name);
     add_zccopt("\tdefc\tDEFINED_%s = 1\n",name);
     add_zccopt("\tdefc %s = %d\n",name,value);
+    add_zccopt("\tIFNDEF %s\n\tENDIF\n",name);
     add_zccopt("ENDIF\n\n");
 }
 
@@ -1988,9 +1989,9 @@ static int zcc_vasprintf(char **s, const char *fmt, va_list ap)
     size_t      req;
     char       *ret;
     
-	/* MSC Visual Studio 2010 does not have va_copy and va_list is a simple pointer */
+    /* MSC Visual Studio 2010 does not have va_copy and va_list is a simple pointer */
 #ifdef _MSC_VER
-	saveap = ap;
+    saveap = ap;
 #else
     va_copy(saveap, ap);
 #endif
