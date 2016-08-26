@@ -4,7 +4,7 @@
  *
  *      This part deals with the evaluation of a constant
  *
- *      $Id: const.c,v 1.25 2016-07-10 16:09:00 dom Exp $
+ *      $Id: const.c,v 1.26 2016-08-26 05:45:05 aralbrec Exp $
  *
  *      7/3/99 djm - fixed minor problem in fnumber, which prevented
  *      fp numbers from working properly! Also added a ifdef UNSURE
@@ -570,6 +570,7 @@ int GetMembSize(TAG_SYMBOL *ptr)
 
 static void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias)
 {
+        double norm;
         double  x = fabs(raw);
         double exp = log(x) / log(2);
         int     i;
@@ -585,7 +586,7 @@ static void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bia
            exp = ceil(exp);
         }
 
-        double norm = x / pow(2,exp);
+        norm = x / pow(2,exp);
 
         fa[5] = (int)exp + exp_bias;
         for ( i = 0; i < (mant_bytes * 2) + 1; i++ ) {
