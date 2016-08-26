@@ -54,7 +54,7 @@ void write_pragma_string(char *ptr)
         text = skip_ws(text);
         fprintf(fp,"\nIF NEED_%s\n",ptr);
         fprintf(fp,"\tdefm\t\"%s\"\n",text);
-	fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",ptr);
+        fprintf(fp,"\tdefc DEFINED_NEED_%s = 1\n",ptr);
         fprintf(fp,"ENDIF\n\n");
         fclose(fp);
     }
@@ -138,6 +138,7 @@ void write_defined(char *sname, int value)
     fprintf(fp,"\nIF !DEFINED_%s\n",sname);
     fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
     fprintf(fp,"\tdefc %s = %d\n",sname,value);
+    fprintf(fp,"\tIFNDEF %s\n\tENDIF\n",sname);
     fprintf(fp,"ENDIF\n\n");
     fclose(fp);
 }
