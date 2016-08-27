@@ -248,7 +248,7 @@ SECTION code_crt_return
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0xe)
+IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
    SECTION BSS_UNINITIALIZED
    __sp_or_ret:  defw 0
