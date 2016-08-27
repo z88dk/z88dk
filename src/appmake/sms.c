@@ -181,9 +181,23 @@ int sms_exec(char *target)
 
     fwrite(memory, sizeof(memory[0]), sizeof(memory), fpout);
 
+    // check available ram space
+
+    if ((len = parameter_search(crtfile, ".map", "ASMTAIL_BSS_END")) >= 0)
+    {
+        if ((i = parameter_search(crtfile, ".map", "ASMHEAD_DATA")) >= 0)
+        {
+            len -= i - 8;
+            if (len <= 0x2000)
+                fprintf(stderr, "Notice: Available RAM space is %d bytes not including stack space\n", 0x2000 - len);
+            else
+                fprintf(stderr, "Error: Exceeded 8k RAM by %d bytes.\n", len - 0x2000);
+        }
+    }
+
     // look for and append memory banks
 
-    fprintf(stderr, "Adding main banks 00,01 (%d bytes free)\n", sizeof(memory)-len-16-16*sdsc_present);
+    fprintf(stderr, "Adding main banks 00,01 (%d bytes free)\n", sizeof(memory)-len-16);
 
     len = 0;
     for (i = 0x02; i <= 0x1f; ++i)
