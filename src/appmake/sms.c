@@ -183,15 +183,15 @@ int sms_exec(char *target)
 
     // check available ram space
 
-    if ((len = parameter_search(crtfile, ".map", "ASMTAIL_BSS_END")) >= 0)
+    if ((c = parameter_search(crtfile, ".map", "ASMTAIL_BSS_END")) >= 0)
     {
         if ((i = parameter_search(crtfile, ".map", "ASMHEAD_DATA")) >= 0)
         {
-            len -= i - 8;
-            if (len <= 0x2000)
-                fprintf(stderr, "Notice: Available RAM space is %d bytes not including stack space\n", 0x2000 - len);
+            c -= i - 8;
+            if (c <= 0x2000)
+                fprintf(stderr, "Notice: Available RAM space is %d bytes ignoring required stack space\n", 0x2000 - c);
             else
-                fprintf(stderr, "Error: Exceeded 8k RAM by %d bytes.\n", len - 0x2000);
+                fprintf(stderr, "Error: Exceeded 8k RAM by %d bytes.\n", c - 0x2000);
         }
     }
 
