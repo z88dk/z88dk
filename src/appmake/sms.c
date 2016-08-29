@@ -28,7 +28,7 @@ option_t sms_options[] = {
 #define SMS_HEADER_ADDR    0x7ff0
 #define SDSC_HEADER_ADDR   0x7fe0
 
-static unsigned char memory[32768];
+static unsigned char memory[0xc000];
 
 struct sms_header {
    unsigned char signature[10];
@@ -57,7 +57,7 @@ int sms_exec(char *target)
     struct tm *lt;
     char filename[FILENAME_MAX+1];
     FILE *fpin, *fpout;
-    int checksum, len, sdsc_present, i, c;
+    int checksum, len, sdsc_present, sega_present, i, c, count;
 
     if ((help) || (binname == NULL))
         return -1;
@@ -74,20 +74,32 @@ int sms_exec(char *target)
 
     // gather header info
 
-    sdsc_present = 0;
+    sdsc_present = sega_present = 0;
     t = time(NULL); lt = localtime(&t);
     sdsc_hdr.date = lt->tm_mday + (lt->tm_mon + 1)*100 + (lt->tm_year + 1900)*100*100;
 
     if (crtfile != NULL)
     {
         if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_PRODUCT_CODE")) >= 0)
+        {
+            sega_present = 1;
             sega_hdr.product_code = i;
+        }
         if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_VERSION")) >= 0)
+        {
+            sega_present = 1;
             sega_hdr.version = i;
+        }
         if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_REGION")) >= 0)
+        {
+            sega_present = 1;
             sega_hdr.region = i;
+        }
         if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_ROM_SIZE")) >= 0)
+        {
+            sega_present = 1;
             fprintf(stderr, "Notice: ROM size is always set to 32k for checksum purposes\n");
+        }
 
         if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_VERSION")) >= 0)
         {
@@ -116,7 +128,7 @@ int sms_exec(char *target)
         }
     }
 
-    // create 32k portion of output binary
+    // create 32k/48k portion of output binary
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL)
         exit_log(1, "Can't open input file %s\n", binname);
@@ -125,16 +137,23 @@ int sms_exec(char *target)
         fclose(fpin);
         exit_log(1, "Couldn't determine size of file %s\n", binname);
     }
-    else if ((len = ftell(fpin)) >= SMS_HEADER_ADDR)
+
+    if ((len = ftell(fpin)) > 0xc000)
     {
         fclose(fpin);
-        exit_log(1, "Main binary %s exceeds 32k\n", binname);
+        exit_log(1, "Main output binary exceeds 48k by %d bytes\n", len - 0xc000);
     }
 
-    if (sdsc_present && (len >= SDSC_HEADER_ADDR))
+    if (sega_present && (len > SMS_HEADER_ADDR))
+    {
+        sega_present = 0;
+        fprintf(stderr, "Notice: SEGA header will not be inserted because main ROM is too large by %d bytes\n", len - SMS_HEADER_ADDR);
+    }
+
+    if (sdsc_present && (len > SDSC_HEADER_ADDR))
     {
         sdsc_present = 0;
-        fprintf(stderr, "Notice: SDSC header will not be inserted because main 32k ROM is too full\n");
+        fprintf(stderr, "Notice: SDSC header will not be inserted because main ROM is too large by %d bytes\n", len - SDSC_HEADER_ADDR);
     }
 
     rewind(fpin);
@@ -146,7 +165,6 @@ int sms_exec(char *target)
 
     if (sdsc_present)
     {
-        fprintf(stderr, "Notice: SDSC header created\n");
         memcpy(&memory[SDSC_HEADER_ADDR], sdsc_hdr.signature, 4); 
         memory[SDSC_HEADER_ADDR+5] = (unsigned char)(sdsc_hdr.version = num2bcd(sdsc_hdr.version));
         memory[SDSC_HEADER_ADDR+4] = (unsigned char)(sdsc_hdr.version >> 8);
@@ -162,24 +180,27 @@ int sms_exec(char *target)
         memory[SDSC_HEADER_ADDR+15] = (unsigned char)(sdsc_hdr.description >> 8);
     }
 
-    memcpy(&memory[SMS_HEADER_ADDR], sega_hdr.signature, 10);
-    memory[SMS_HEADER_ADDR+14] = (unsigned char)(((sega_hdr.product_code/10000 << 4) & 0xf0) + (sega_hdr.version & 0x0f));
-    memory[SMS_HEADER_ADDR+12] = (unsigned char)(sega_hdr.product_code = num2bcd(sega_hdr.product_code));
-    memory[SMS_HEADER_ADDR+13] = (unsigned char)(sega_hdr.product_code >> 8);
-    memory[SMS_HEADER_ADDR+15] = (unsigned char)(((sega_hdr.region << 4) & 0xf0) + (sega_hdr.romsize & 0x0f));
+    if (sega_present)
+    {
+        memcpy(&memory[SMS_HEADER_ADDR], sega_hdr.signature, 10);
+        memory[SMS_HEADER_ADDR+14] = (unsigned char)(((sega_hdr.product_code/10000 << 4) & 0xf0) + (sega_hdr.version & 0x0f));
+        memory[SMS_HEADER_ADDR+12] = (unsigned char)(sega_hdr.product_code = num2bcd(sega_hdr.product_code));
+        memory[SMS_HEADER_ADDR+13] = (unsigned char)(sega_hdr.product_code >> 8);
+        memory[SMS_HEADER_ADDR+15] = (unsigned char)(((sega_hdr.region << 4) & 0xf0) + (sega_hdr.romsize & 0x0f));
 
-    for (i = checksum = 0; i < SMS_HEADER_ADDR; ++i)
-        checksum += memory[i];
+        for (i = checksum = 0; i < SMS_HEADER_ADDR; ++i)
+            checksum += memory[i];
 
-    memory[SMS_HEADER_ADDR+10] = (unsigned char)checksum;
-    memory[SMS_HEADER_ADDR+11] = (unsigned char)(checksum >> 8);
+        memory[SMS_HEADER_ADDR+10] = (unsigned char)checksum;
+        memory[SMS_HEADER_ADDR+11] = (unsigned char)(checksum >> 8);
+    }
 
-    // write first 32k of output file
+    // write first 32k/48k of output file
 
     if ((fpout = fopen(filename, "wb")) == NULL)
         exit_log(1, "Can't create output file %s\n", filename);
 
-    fwrite(memory, sizeof(memory[0]), sizeof(memory), fpout);
+    fwrite(memory, sizeof(memory[0]), (len > 0x8000) ? 0xc000 : 0x8000, fpout);
 
     // check available ram space
 
@@ -191,45 +212,51 @@ int sms_exec(char *target)
             if (c <= 0x2000)
                 fprintf(stderr, "Notice: Available RAM space is %d bytes ignoring required stack space\n", 0x2000 - c);
             else
-                fprintf(stderr, "Error: Exceeded 8k RAM by %d bytes.\n", c - 0x2000);
+                fprintf(stderr, "Warning: Exceeded 8k RAM by %d bytes.\n", c - 0x2000);
         }
     }
 
     // look for and append memory banks
 
-    fprintf(stderr, "Adding main banks 00,01 (%d bytes free)\n", sizeof(memory)-len-16);
+    fprintf(stderr, "Adding main banks 00,01%s (%d bytes free)\n", (len > 0x8000) ? ",02" : "", ((len > 0x8000) ? 0xc000 : 0x8000)-len-16*(sega_present+sdsc_present));
 
-    len = 0;
+    count = 0;
     for (i = 0x02; i <= 0x1f; ++i)
     {
         sprintf(filename, "%s_BANK_%02X.bin", binname, i);
 
         if ((fpin = fopen(filename, "rb")) == NULL)
-            len += 0x4000;
+            count += 0x4000;
         else
         {
+            if (len > 0x8000)
+            {
+                fprintf(stderr, "Warning: Main binary extends into bank 02 by %d bytes\n", len - 0x8000);
+                len = 0;
+            }
+
             fprintf(stderr, "Adding bank %02X", i);
 
-            while (len--)
+            while (count--)
                 fputc(romfill, fpout);
 
-            for (len = 0; ((c = fgetc(fpin)) != EOF) && (len < 0x4000); ++len)
+            for (count = 0; ((c = fgetc(fpin)) != EOF) && (count < 0x4000); ++count)
                 fputc(c, fpout);
 
-            if (len < 0x4000)
-                fprintf(stderr, " (%d bytes free)", 0x4000 - len);
+            if (count < 0x4000)
+                fprintf(stderr, " (%d bytes free)", 0x4000 - count);
 
-            while (len++ < 0x4000)
+            while (count++ < 0x4000)
                 fputc(romfill, fpout);
 
             if (!feof(fpin))
             {
                 fseek(fpin, 0, SEEK_END);
-                len = ftell(fpin);
-                fprintf(stderr, " (error truncating %d bytes from %s)", len - 0x4000, filename);
+                count = ftell(fpin);
+                fprintf(stderr, " (error truncating %d bytes from %s)", count - 0x4000, filename);
             }
 
-            len = 0;
+            count = 0;
             fputc('\n', stderr);
 
             fclose(fpin);
