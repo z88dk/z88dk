@@ -74,32 +74,22 @@ int sms_exec(char *target)
 
     // gather header info
 
-    sdsc_present = sega_present = 0;
+    sdsc_present = 0;
+    sega_present = 1;
+
     t = time(NULL); lt = localtime(&t);
     sdsc_hdr.date = lt->tm_mday + (lt->tm_mon + 1)*100 + (lt->tm_year + 1900)*100*100;
 
     if (crtfile != NULL)
     {
         if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_PRODUCT_CODE")) >= 0)
-        {
-            sega_present = 1;
             sega_hdr.product_code = i;
-        }
         if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_VERSION")) >= 0)
-        {
-            sega_present = 1;
             sega_hdr.version = i;
-        }
         if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_REGION")) >= 0)
-        {
-            sega_present = 1;
             sega_hdr.region = i;
-        }
         if ((i = parameter_search(crtfile, ".sym", "SMS_HDR_ROM_SIZE")) >= 0)
-        {
-            sega_present = 1;
             fprintf(stderr, "Notice: ROM size is always set to 32k for checksum purposes\n");
-        }
 
         if ((i = parameter_search(crtfile, ".sym", "SDSC_HDR_VERSION")) >= 0)
         {
