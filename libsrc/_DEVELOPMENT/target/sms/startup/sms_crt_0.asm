@@ -346,7 +346,7 @@ __Restart:
    
    ld hl,0x0000
    ld (0xfffc),hl              ; (0xfffc) = $00
-   ld hl,0x0102
+   ld hl,0x0201
    ld (0xfffe),hl              ; (0xfffd) = $00, (0xfffe) = $01, (0xffff) = $02
    
    ; command line
