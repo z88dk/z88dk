@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.147 2016-08-26 05:46:16 aralbrec Exp $
+ *      $Id: zcc.c,v 1.148 2016-08-30 15:37:06 aralbrec Exp $
  */
 
 
@@ -573,7 +573,7 @@ int main(int argc, char **argv)
     asmargs = linkargs = cpparg = NULL;
 
     atexit(remove_temporary_files);
-    
+
     add_option_to_compiler("");
 
     gc = 1;            /* Set for the first argument to scan for */
@@ -664,9 +664,8 @@ int main(int argc, char **argv)
 
     if (lston) {
         /* list on so add list options to assembler and linker */
-        snprintf(buffer, sizeof(buffer), "--list ");
-        BuildOptions(&asmargs, buffer);
-        BuildOptions(&linkargs, buffer);
+        BuildOptions(&asmargs, "--list ");
+        BuildOptions(&linkargs, "--list ");
     }
 
 
@@ -719,6 +718,9 @@ int main(int argc, char **argv)
    
     /* Copy crt0 to temporary directory */
     copy_crt0_to_temp();   
+
+    /* Compiler options that must appear at front to implement defaults */
+    if ( compiler_type == CC_SDCC) BuildOptions_start(&comparg, "--constseg rodata_compiler ");
 
     /* Parse through the files, handling each one in turn */
     for (i = 0; i < nfiles; i++) {
@@ -1607,13 +1609,12 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
         } else {
             ptr2 = changesuffix(original_filenames[j], suffix);
         }
-        k = copy_file(ptr1, "", ptr2, "");
+        if (k = copy_file(ptr1, "", ptr2, ""))
+            fprintf(stderr, "Couldn't copy output file %s\n", ptr2);
         free(ptr1);
         free(ptr2);
-        if (k) {
-            fprintf(stderr, "Couldn't copy output files\n");
-            if (die_on_fail) exit(1);
-        }
+        if (k && die_on_fail)
+            exit(1);
     }
 }
 
