@@ -388,7 +388,7 @@ defc __CLIB_OPT_SORT_QSORT = $0c
 ; -- error strings --------------------------------------------
 ; -------------------------------------------------------------
 
-defc __CLIB_OPT_ERROR = $01
+defc __CLIB_OPT_ERROR = $00
 
 ; bit 0 = $01 = enable error strings
 ; bit 1 = $02 = select verbose error strings
