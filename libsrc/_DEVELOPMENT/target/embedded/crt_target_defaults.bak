@@ -44,7 +44,7 @@ IF __CRTDEF = 0
    
    ; clib defaults
    
-   defc TAR__clib_exit_stack_size      = 2
+   defc TAR__clib_exit_stack_size      = 0
    defc TAR__clib_quickexit_stack_size = 0
    
    defc TAR__clib_malloc_heap_size     = -1
@@ -88,7 +88,7 @@ IF __CRTDEF = 1
    
    ; clib defaults
    
-   defc TAR__clib_exit_stack_size      = 2
+   defc TAR__clib_exit_stack_size      = 0
    defc TAR__clib_quickexit_stack_size = 0
    
    defc TAR__clib_malloc_heap_size     = -1
@@ -132,7 +132,7 @@ IF __CRTDEF = 2
    
    ; clib defaults
    
-   defc TAR__clib_exit_stack_size      = 2
+   defc TAR__clib_exit_stack_size      = 0
    defc TAR__clib_quickexit_stack_size = 0
    
    defc TAR__clib_malloc_heap_size     = -1
