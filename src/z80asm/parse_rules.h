@@ -41111,13 +41111,9 @@ case 1559:
 	_test_eof: {}
 	_out: {}
 	}
-  if ( ctx->cs == 
-0
- )
+  if ( ctx->cs == 0 )
    return FALSE;
-  if ( ctx->cs >= 
-1560
- )
+  if ( ctx->cs >= 1560 )
    return TRUE;
   if (get_num_errors() != start_num_errors)
    break;
