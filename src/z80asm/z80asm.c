@@ -78,14 +78,6 @@ void assemble_file( char *filename )
 	module = set_cur_module( new_module() );
 	module->filename = strpool_add( src_filename );
 
-	/* remove output files, except obj */
-	remove(get_list_filename(src_filename));
-	remove(get_bin_filename(src_filename));
-	remove(get_sym_filename(src_filename));
-	remove(get_map_filename(src_filename));
-	remove(get_reloc_filename(src_filename));
-	remove(get_def_filename(src_filename));
-
 	/* Create error file */
 	open_error_file(src_filename);
 
@@ -138,8 +130,14 @@ static void do_assemble( char *src_filename )
     int start_errors = get_num_errors();     /* count errors in this source file */
 	char *obj_filename = get_obj_filename(src_filename);
 
-	/* delete object file */
+	/* we are going to create new output files; delete old ones */
 	remove(obj_filename);
+	remove(get_list_filename(src_filename));
+	remove(get_bin_filename(src_filename));
+	remove(get_sym_filename(src_filename));
+	remove(get_map_filename(src_filename));
+	remove(get_reloc_filename(src_filename));
+	remove(get_def_filename(src_filename));
 
 	/* create list file */
 	if (opts.list)
