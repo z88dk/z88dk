@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.149 2016-08-31 19:38:50 aralbrec Exp $
+ *      $Id: zcc.c,v 1.150 2016-08-31 22:15:03 aralbrec Exp $
  */
 
 
@@ -502,7 +502,7 @@ process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum i
 int linkthem(char *linker)
 {
     int             i, len, offs, status;
-    char           *temp, *cmdline;
+    char           *temp, *cmdline, *p;
     char           *asmline = ""; 
     char           *ext;
 
@@ -530,11 +530,11 @@ int linkthem(char *linker)
             linkargs,
             globaldefon ? "-g " : "",
             (createapp || mapon) ? "-m " : "",
-            (createapp || symbolson) ? "-s ": "",
+            ((createapp || symbolson) && c_nocrt) ? "-s ": "",
             relocinfo ? "--reloc-info " : "",
             (c_nocrt == 0) ? c_crt0 : "",
             (c_nocrt == 0) ? ext : "");
-            
+
     for ( i = 0; i < nfiles; i++ ) {
         len += strlen(filelist[i]) + 5;
     }
@@ -543,10 +543,15 @@ int linkthem(char *linker)
     /* So the total length we need is now in len, let's malloc and do it */
     cmdline = calloc(len, sizeof(char));
     strcpy(cmdline, temp);
-            
+    
+    if (c_nocrt) c_crt0 = NULL;
     for (i = 0; i < nfiles; ++i) {
         if (hassuffix(filelist[i], c_extension)) {
             offs += snprintf(cmdline + offs, len - offs," %s", filelist[i]);
+            if (c_crt0 == NULL) {
+                c_crt0 = strdup(filelist[i]);
+                if ((p = strrchr(c_crt0, '.')) != NULL) *p = '\0';
+            }
         }
     }
     if (verbose)
@@ -718,7 +723,7 @@ int main(int argc, char **argv)
     
    
     /* Copy crt0 to temporary directory */
-    copy_crt0_to_temp();   
+    if (c_nocrt == 0) copy_crt0_to_temp();   
 
     /* Compiler options that must appear at front to implement defaults */
     if ( compiler_type == CC_SDCC)
@@ -836,7 +841,7 @@ int main(int argc, char **argv)
         CASE_ASMFILE:
         case ASMFILE:
             if (preprocessonly || assembleonly) continue;
-            BuildAsmLine(asmarg, sizeof(asmarg), "-s -easm");
+            BuildAsmLine(asmarg, sizeof(asmarg), " -s -easm ");
             if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                 exit(1);
             break;
@@ -881,7 +886,6 @@ int main(int argc, char **argv)
         outputfile = c_linker_output_file ? c_linker_output_file : defaultout;
     }
 
-
     if (linkthem(c_linker)) {
         exit(1);
     }
@@ -900,6 +904,7 @@ int main(int argc, char **argv)
     if (usetemp) {
 
         char *oldptr;
+        int status = 0;
 
         strcpy(filenamebuf, outputfile);
         if ((oldptr = strrchr(filenamebuf, '.')))
@@ -907,23 +912,25 @@ int main(int argc, char **argv)
 
         if (mapon && copy_file(c_crt0, ".map", filenamebuf, ".map")) {
             fprintf(stderr, "Cannot copy map file\n");
-            exit(1);
+            status = 1;
         }
 
         if (symbolson && copy_file(c_crt0, ".sym", filenamebuf, ".sym")) {
             fprintf(stderr, "Cannot copy symbols file\n");
-            exit(1);
+            status = 1;
         }
 
         if (globaldefon && copy_file(c_crt0, ".def", filenamebuf, ".def")) {
             fprintf(stderr, "Cannot copy global defs file\n");
-            exit(1);
+            status = 1;
         }
 
-        if (lston && copy_file(c_crt0, ".lis", "crt0", ".lis")) {
+        if (lston && (c_nocrt == 0) && copy_file(c_crt0, ".lis", "crt0", ".lis")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
-            exit(1);
+            status = 1;
         }
+
+        if (status) exit(status);
     }
 
     exit(0);
@@ -1728,7 +1735,7 @@ void copy_crt0_to_temp(void)
      */
 
     oldptr = c_crt0;
-    if (copy_file(oldptr, ".opt", filen, ".opt") || copy_file(filen, ".opt", filen, ".asm")) {
+    if ((copy_file(oldptr, ".asm", filen, ".opt") && copy_file(oldptr, ".opt", filen, ".opt")) || copy_file(filen, ".opt", filen, ".asm")) {
         fprintf(stderr, "Cannot copy crt0 file\n");
         exit(1);
     }
