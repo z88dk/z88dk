@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.148 2016-08-30 15:37:06 aralbrec Exp $
+ *      $Id: zcc.c,v 1.149 2016-08-31 19:38:50 aralbrec Exp $
  */
 
 
@@ -21,6 +21,7 @@
 #include        <ctype.h>
 #include        <stddef.h>
 #include        <time.h>
+#include        <sys/stat.h>
 #include        "zcc.h"
 
 #ifdef WIN32
@@ -720,7 +721,8 @@ int main(int argc, char **argv)
     copy_crt0_to_temp();   
 
     /* Compiler options that must appear at front to implement defaults */
-    if ( compiler_type == CC_SDCC) BuildOptions_start(&comparg, "--constseg rodata_compiler ");
+    if ( compiler_type == CC_SDCC)
+        BuildOptions_start(&comparg, "--constseg rodata_compiler ");
 
     /* Parse through the files, handling each one in turn */
     for (i = 0; i < nfiles; i++) {
@@ -737,12 +739,8 @@ int main(int argc, char **argv)
                 if (process(".i2", ".i", c_zpragma_exe, "-sccz80", filter, i, YES, NO))
                     exit(1);
             }
-            if (preprocessonly) {
-                if (usetemp)
-                    copy_output_files_to_destdir(".i", 1);
-                exit(0);
-            }
-        case PFILE:
+        case CPPFILE:
+            if (preprocessonly) continue;
             if ( compiler_type == CC_SDCC )
             {
                switch (sdccpeepopt)
@@ -761,32 +759,31 @@ int main(int argc, char **argv)
                   break;
                }
             }
-            if (process(".i", ".asm", c_compiler, comparg, compiler_style, i, YES, NO))
+            if (process(".i", ".opt", c_compiler, comparg, compiler_style, i, YES, NO))
                exit(1);
-        case AFILE:
+        case OPTFILE:
+            if (preprocessonly) continue;
             if ( compiler_type == CC_SDCC )
             {
                /* sdcc_opt.9 implements bugfixes and code size reduction and should be applied to every sdcc compile */
                switch (peepholeopt)
                {
                case 0:
-                   BuildAsmLine(asmarg, sizeof(asmarg), "-easm");
-                   if ( !assembleonly )
-                       if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
-                           exit(1);
+                   if (process(".opt", ".asm", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
+                       exit(1);
                    break;
                case 1:
-                   if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+                   if (process(".opt", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                        exit(1);
-                   if (process(".op1", ".opt", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
+                   if (process(".op1", ".asm", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
                        exit(1);
                    break;
                default:
-                   if (process(".asm", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+                   if (process(".opt", ".op1", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                        exit(1);
                    if (process(".op1", ".op2", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
                        exit(1);
-                   if (process(".op2", ".opt", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
+                   if (process(".op2", ".asm", c_copt_exe, c_sdccopt2, filter, i, YES, NO))
                        exit(1);
                    break;
                }
@@ -797,22 +794,22 @@ int main(int argc, char **argv)
                switch (peepholeopt)
                {
                case 0:
-                   if (process(".asm", ".opt", c_copt_exe, c_coptrules9, filter, i, YES, NO))
+                   if (process(".opt", ".asm", c_copt_exe, c_coptrules9, filter, i, YES, NO))
                        exit(1);
                    break;
                case 1:
-                   if (process(".asm", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
+                   if (process(".opt", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
                        exit(1);
-                   if (process(".op1", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+                   if (process(".op1", ".asm", c_copt_exe, c_coptrules1, filter, i, YES, NO))
                        exit(1);
                    break;
                case 2:
                    /* Double optimization! */
-                   if (process(".asm", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
+                   if (process(".opt", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
                        exit(1);
                    if (process(".op1", ".op2", c_copt_exe, c_coptrules2, filter, i, YES, NO))
                        exit(1);
-                   if (process(".op2", ".opt", c_copt_exe, c_coptrules1, filter, i, YES, NO))
+                   if (process(".op2", ".asm", c_copt_exe, c_coptrules1, filter, i, YES, NO))
                        exit(1);
                    break;
                default:
@@ -820,46 +817,62 @@ int main(int argc, char **argv)
                     * Triple opt (last level adds routines but
                     * can save space..)
                     */
-                   if (process(".asm", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
+                   if (process(".opt", ".op1", c_copt_exe, c_coptrules9, filter, i, YES, NO))
                        exit(1);
                    if (process(".op1", ".op2", c_copt_exe, c_coptrules2, filter, i, YES, NO))
                        exit(1);
                    if (process(".op2", ".op3", c_copt_exe, c_coptrules1, filter, i, YES, NO))
                        exit(1);
-                   if (process(".op3", ".opt", c_copt_exe, c_coptrules3, filter, i, YES, NO))
+                   if (process(".op3", ".asm", c_copt_exe, c_coptrules3, filter, i, YES, NO))
                        exit(1);
                    break;
                }
             }
-        case OFILE:
-            BuildAsmLine(asmarg, sizeof(asmarg), "-s -eopt");
-            if ( !assembleonly )
-                if (process(".opt", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
-                    exit(1);
+            goto CASE_ASMFILE;
+        case SFILE:
+            if (preprocessonly) continue;
+            if (process(".s", ".asm", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
+                exit(1);
+        CASE_ASMFILE:
+        case ASMFILE:
+            if (preprocessonly || assembleonly) continue;
+            BuildAsmLine(asmarg, sizeof(asmarg), "-s -easm");
+            if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
+                exit(1);
             break;
         case OBJFILE:
             break;
         default:
-            fprintf(stderr, "Filetype of \"%s\" unrecognized\n", original_filenames[i]);
+            fprintf(stderr, "Filetype of %s unrecognized\n", original_filenames[i]);
             exit(1);
         }
+    }
+
+    if (preprocessonly) {
+        if (nfiles > 1) outputfile = 0;
+        if (usetemp)
+            copy_output_files_to_destdir(".i", 1);
+        exit(0);
+    }
+
+    if (assembleonly) {
+        if (nfiles > 1) outputfile = 0;
+        if (usetemp)
+            copy_output_files_to_destdir(".asm", 1);
+        exit(0);
     }
 
     if (lston && usetemp) {
         char *tempofile = outputfile;
         outputfile = NULL;
-        copy_output_files_to_destdir(".lis", 0);
+        copy_output_files_to_destdir(".lis", 1);
         outputfile = tempofile;
     }
-    
-    if (compileonly || assembleonly) {
-        if (compileonly && !assembleonly) {
-            if (usetemp)
-                copy_output_files_to_destdir(c_extension, 1);
-        } else {
-            if (usetemp)
-                copy_output_files_to_destdir(peepholeopt ? ".opt" : ".asm", 1);
-        }
+
+    if (compileonly) {
+        if (nfiles > 1) outputfile = 0;
+        if (usetemp)
+            copy_output_files_to_destdir(c_extension, 1);
         exit(0);
     }
 
@@ -952,11 +965,13 @@ int get_filetype_by_suffix(char *name)
     if (strcmp(ext, ".c") == 0)
         return CFILE;
     if (strcmp(ext, ".i") == 0)
-        return PFILE;
-    if (strcmp(ext, ".asm") == 0)
-        return AFILE;
+        return CPPFILE;
     if (strcmp(ext, ".opt") == 0)
-        return OFILE;
+        return OPTFILE;
+    if (strcmp(ext, ".s") == 0)
+        return SFILE;
+    if (strcmp(ext, ".asm") == 0)
+        return ASMFILE;
     if (strcmp(ext, ".o") == 0)
         return OBJFILE;
     return 0;
@@ -1595,29 +1610,47 @@ void KillEOL(char *str)
         *ptr = 0;
 }
 
+
 /** \brief Copy any generated output files, back to the directory they came from
  */
 void copy_output_files_to_destdir(char *suffix, int die_on_fail)
 {
-    int             j, k;
-    char           *ptr1, *ptr2;
+    int             j;
+    char           *ptr;
+    struct stat     tmp;
+    char            fname[FILENAME_MAX + 32];
 
-    for (j = 0; j < nfiles; j++) {
-        ptr1 = changesuffix(filelist[j], suffix);
-        if ( outputfile != NULL ) {
-            ptr2 = strdup(outputfile);
-        } else {
-            ptr2 = changesuffix(original_filenames[j], suffix);
+    // copy each output file having indicated extension
+    for (j = 0; j < nfiles; ++j) {
+
+        // check that original file was actually processed
+        if (((ptr = strrchr(original_filenames[j], '.')) == NULL) || (strcmp(ptr, suffix) != 0)) {
+
+            ptr = changesuffix(filelist[j], suffix);
+
+            // check that this file was generated
+            if (stat(ptr, &tmp) == 0) {
+
+                // generate output filename
+                if ( outputfile != NULL )
+                    strcpy(fname, outputfile);
+                else
+                    snprintf(fname, sizeof(fname), "%s%s", original_filenames[j], suffix);
+
+                // copy to output directory
+                if (copy_file(ptr, "", fname, "")) {
+                    fprintf(stderr, "Couldn't copy output file %s\n", fname);
+                    if (die_on_fail) {
+                        free(ptr);
+                        exit(1);
+                    }
+                }
+            }
+
+            free(ptr);
         }
-        if (k = copy_file(ptr1, "", ptr2, ""))
-            fprintf(stderr, "Couldn't copy output file %s\n", ptr2);
-        free(ptr1);
-        free(ptr2);
-        if (k && die_on_fail)
-            exit(1);
     }
 }
-
 
 
 void remove_temporary_files(void)
@@ -1637,7 +1670,6 @@ void remove_temporary_files(void)
             remove_file_with_extension(filelist[j], ".i");
             remove_file_with_extension(filelist[j], ".i2");
             remove_file_with_extension(filelist[j], ".asm");
-            remove_file_with_extension(filelist[j], ".asm2");
             remove_file_with_extension(filelist[j], ".err");
             remove_file_with_extension(filelist[j], ".op1");
             remove_file_with_extension(filelist[j], ".op2");
@@ -1649,7 +1681,6 @@ void remove_temporary_files(void)
         }
         if (crtcopied != 0) {
             remove_file_with_extension(c_crt0, ".asm");
-            remove_file_with_extension(c_crt0, ".asm2");
             remove_file_with_extension(c_crt0, ".opt");
             remove_file_with_extension(c_crt0, ".err");
             if (c_extension) remove_file_with_extension(c_crt0, c_extension);

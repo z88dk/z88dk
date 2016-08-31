@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.36 2016-05-31 23:02:47 aralbrec Exp $
+ * $Id: zcc.h,v 1.37 2016-08-31 19:38:50 aralbrec Exp $
  */
 
 #include "../config.h"
@@ -34,11 +34,12 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 
 
 
-#define CFILE   1
-#define PFILE   2
-#define AFILE   3
-#define OFILE   4
-#define OBJFILE 5
+#define CFILE     1
+#define CPPFILE   2
+#define OPTFILE   3
+#define SFILE     4
+#define ASMFILE   5
+#define OBJFILE   6
 
 #define NO      0
 #define YES     1
