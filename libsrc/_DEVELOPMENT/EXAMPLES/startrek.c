@@ -1999,7 +1999,7 @@ getline_l(char *s)
 
 **********/
 
-unsigned char *instr[] = {
+const unsigned char *instr[] = {
 "\n\n",
 "1. When you see _Command?_ printed, enter one of the legal",
 "   commands (nav, srs, lrs, pha, tor, she, dam, com, or xxx).",
