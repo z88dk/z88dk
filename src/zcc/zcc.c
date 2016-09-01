@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.152 2016-09-01 00:28:28 aralbrec Exp $
+ *      $Id: zcc.c,v 1.153 2016-09-01 01:10:26 aralbrec Exp $
  */
 
 
@@ -109,6 +109,7 @@ static int             z80verbose = 0;
 static int             cleanup = 1;
 static int             assembleonly = 0;
 static int             compileonly = 0;
+static int             makelib = 0;
 static int             c_code_in_asm = 0;
 static int             opt_code_size = 0;
 static int             verbose = 0;
@@ -383,6 +384,7 @@ static arg_t     myargs[] = {
     {"c", AF_BOOL_TRUE, SetBoolean, &compileonly, NULL, "Only compile the .c files to .o files"},
     {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
     {"S", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
+    {"x", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Make a library out of source files"},
     {"-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm/.opt files"},
     {"-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)"},
     {"m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable"},
@@ -499,17 +501,23 @@ process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum i
     return (errs);
 }
 
+
 int linkthem(char *linker)
 {
     int             i, len, offs, status;
     char           *temp, *cmdline;
     char           *asmline = ""; 
-    char           *ext;
-
-    ext = ".asm";
 
     linkargs_mangle(linkargs);
-    len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
+
+    if (makelib) {
+        len = offs = zcc_asprintf(&temp, "%s %s -Mo -x%s %s",
+            linker,
+            (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
+            outputfile,
+            linkargs);
+    } else {
+        len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
             linker, 
             (c_nostdlib == 0) ? c_linkopts : " -b -d -Mo ", 
             linker_output_separate_arg ? " " : "", 
@@ -523,11 +531,11 @@ int linkthem(char *linker)
             (createapp || symbolson) ? "-s ": "",
             relocinfo ? "--reloc-info " : "",
             (c_nocrt == 0) ? c_crt0 : filelist[0],
-            (c_nocrt == 0) ? ext : "");
-
-    for ( i = 0; i < nfiles; i++ ) {
-        len += strlen(filelist[i]) + 5;
+            (c_nocrt == 0) ? ".asm" : "");
     }
+
+    for ( i = 0; i < nfiles; i++ )
+        len += strlen(filelist[i]) + 5;
     len++;
     
     /* So the total length we need is now in len, let's malloc and do it */
@@ -827,7 +835,7 @@ int main(int argc, char **argv)
                 exit(1);
         CASE_ASMFILE:
         case ASMFILE:
-            if (preprocessonly || assembleonly || ((i == 0) && c_nocrt && !compileonly)) continue;
+            if (preprocessonly || assembleonly || ((i == 0) && c_nocrt && !compileonly && !makelib)) continue;
             BuildAsmLine(asmarg, sizeof(asmarg), " -s -easm ");
             if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                 exit(1);
@@ -878,49 +886,52 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if (createapp) {
-        /* Building an application - run the appmake command on it */
-        snprintf(buffer, sizeof(buffer), "%s %s -b %s -c %s", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, c_crt0);
-        if (verbose)
-            printf("%s\n", buffer);
-        if (system(buffer)) {
-            fprintf(stderr, "Building application code failed\n");
-            exit(1);
-        }
-    }
+    if (!makelib) {
 
-    if (usetemp) {
-
-        char *oldptr;
-        int status = 0;
-
-        strcpy(filenamebuf, outputfile);
-        if ((oldptr = strrchr(filenamebuf, '.')))
-            *oldptr = 0;
-
-        if (c_nocrt) c_crt0 = changesuffix(filelist[0], "");
-
-        if (mapon && copy_file(c_crt0, ".map", filenamebuf, ".map")) {
-            fprintf(stderr, "Cannot copy map file\n");
-            status = 1;
+        if (createapp) {
+            /* Building an application - run the appmake command on it */
+            snprintf(buffer, sizeof(buffer), "%s %s -b %s -c %s", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, c_crt0);
+            if (verbose)
+                printf("%s\n", buffer);
+            if (system(buffer)) {
+                fprintf(stderr, "Building application code failed\n");
+                exit(1);
+            }
         }
 
-        if (symbolson && copy_file(c_crt0, ".sym", filenamebuf, ".sym")) {
-            fprintf(stderr, "Cannot copy symbols file\n");
-            status = 1;
-        }
+        if (usetemp) {
 
-        if (globaldefon && copy_file(c_crt0, ".def", filenamebuf, ".def")) {
-            fprintf(stderr, "Cannot copy global defs file\n");
-            status = 1;
-        }
+            char *oldptr;
+            int status = 0;
 
-        if (lston && copy_file(c_crt0, ".lis", filenamebuf, ".lis")) {
-            fprintf(stderr, "Cannot copy crt0 list file\n");
-            status = 1;
-        }
+            strcpy(filenamebuf, outputfile);
+            if ((oldptr = strrchr(filenamebuf, '.')))
+                *oldptr = 0;
 
-        if (status) exit(status);
+            if (c_nocrt) c_crt0 = changesuffix(filelist[0], "");
+
+            if (mapon && copy_file(c_crt0, ".map", filenamebuf, ".map")) {
+                fprintf(stderr, "Cannot copy map file\n");
+                status = 1;
+            }
+
+            if (symbolson && copy_file(c_crt0, ".sym", filenamebuf, ".sym")) {
+                fprintf(stderr, "Cannot copy symbols file\n");
+                status = 1;
+            }
+
+            if (globaldefon && copy_file(c_crt0, ".def", filenamebuf, ".def")) {
+                fprintf(stderr, "Cannot copy global defs file\n");
+                status = 1;
+            }
+
+            if (lston && copy_file(c_crt0, ".lis", filenamebuf, ".lis")) {
+                fprintf(stderr, "Cannot copy crt0 list file\n");
+                status = 1;
+            }
+
+            if (status) exit(status);
+        }
     }
 
     exit(0);
