@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.154 2016-09-01 04:07:43 aralbrec Exp $
+ *      $Id: zcc.c,v 1.155 2016-09-01 15:49:18 aralbrec Exp $
  */
 
 
@@ -511,7 +511,7 @@ int linkthem(char *linker)
     linkargs_mangle(linkargs);
 
     if (makelib) {
-        len = offs = zcc_asprintf(&temp, "%s %s -Mo -x%s %s",
+        len = offs = zcc_asprintf(&temp, "%s %s -d -Mo -x%s %s",
             linker,
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
             outputfile,
