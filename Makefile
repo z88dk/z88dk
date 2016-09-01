@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.55 2016-08-07 08:57:11 pauloscustodio Exp $
+#	$Id: Makefile,v 1.56 2016-09-01 23:12:54 pauloscustodio Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -106,19 +106,23 @@ test:
 	$(MAKE) -C test
 
 clean: clean-bins
-	cd libsrc ; $(MAKE) clean
+	$(MAKE) -C libsrc clean
 #	cd lib/config ; $(RM) *.cfg		# .cfg are now stored in CVS
-	cd lib/clibs ; $(RM) *.lib
+#	cd lib/clibs ; $(RM) *.lib		# .lib are now stored in CVS
 #	find . -name "*.o" -type f -exec rm -f {} \;
 
 clean-bins:
-	cd src/appmake ; $(MAKE) clean
-	cd src/copt ; $(MAKE) clean
-	cd src/cpp ; $(MAKE) clean
-	cd src/sccz80 ; $(MAKE) clean
-	cd src/z80asm ; $(MAKE) clean
-	cd src/z80nm ; $(MAKE) clean
-	cd src/zcc ; $(MAKE) clean
+	$(MAKE) -C src/appmake clean
+	$(MAKE) -C src/copt clean
+	$(MAKE) -C src/cpp clean
+	$(MAKE) -C src/sccz80 clean
+	$(MAKE) -C src/z80asm clean
+	$(MAKE) -C src/z80nm clean
+	$(MAKE) -C src/zcc clean
+	$(MAKE) -C src/scanner clean
+	$(MAKE) -C src/ticks clean
+	$(MAKE) -C src/zx7 clean
+	$(MAKE) -C test clean
 	if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
 
 .PHONY: test
