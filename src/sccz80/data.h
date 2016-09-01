@@ -93,6 +93,7 @@ extern int  lstlab;
 extern int shareoffset;
 extern int debuglevel;
 extern int assemtype;
+extern char *outext;
 extern int indexix;
 extern int useframe;
 extern int defdenums;

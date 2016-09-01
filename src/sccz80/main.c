@@ -3,7 +3,7 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.41 2016-07-07 09:17:13 dom Exp $
+ *      $Id: main.c,v 1.42 2016-09-01 04:08:32 aralbrec Exp $
  */
 
 #include "ccdefs.h"
@@ -49,6 +49,7 @@ void    UnSetSmart(char *);
 void    SetMakeShared(char *);
 void    SetUseShared(char *);
 void SetAssembler(char *arg);
+void SetOutExt(char *arg);
 
 
 /*
@@ -141,6 +142,7 @@ int main(int argc, char **argv)
     shareoffset=SHAREOFFSET;   /* Offset for shared libs */
     debuglevel=NO;
     assemtype = ASM_Z80ASM;
+    outext = NULL;
     printflevel=0;
     indexix=YES;
     useframe=NO;
@@ -646,7 +648,7 @@ void openout()
     /* copy file name to string */
     strcpy(Filename,filen2) ;
     strcpy(Filenorig,filen2);
-    changesuffix(filen2,".asm"); /* Change appendix to .asm */
+    changesuffix(filen2, (outext == NULL) ? ".asm" : outext); /* Change appendix to .asm */
     if ( (output=fopen(filen2, "w")) == NULL && (!eof) ) {
             fprintf(stderr,"Cannot open output file: %s\n",line);
             exit(1);
@@ -801,6 +803,7 @@ struct args myargs[]= {
     {"pflevel",YES,SetPfLevel, "Set the manual printf level" },
    {"debug=",YES,SetDebug, "Enable some extra logging" },
    {"asm=",YES,SetAssembler, "Set the assembler mode to use" },
+   {"ext=",YES,SetOutExt, "Use this file extension for generated output"},
    {"asxx",NO,SetASXX, "Use asxx as the output format"},
    {"doublestr",NO,SetDoubleStrings, "Convert fp strings to values at runtime"},
    {"noaltreg",NO,SetNoAltReg, "Don't use alternate registers" },
@@ -1024,6 +1027,16 @@ void SetAssembler(char *arg)
             assemtype = ASM_GNU;
         }
     }
+}
+
+void SetOutExt(char *arg)
+{
+    char temp[10];
+
+    temp[0] = '.';
+    strncpy(temp+1, arg+4, sizeof(temp)-2);
+    temp[sizeof(temp)-1] = '\0';
+    outext = strdup(temp);
 }
 
 void DispInfo(char *arg)

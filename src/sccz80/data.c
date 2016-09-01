@@ -6,7 +6,7 @@
  *      I'm starting to split these up once more and stick them in
  *      the relevant files..
  *
- *      $Id: data.c,v 1.43 2016-07-06 14:24:22 dom Exp $
+ *      $Id: data.c,v 1.44 2016-09-01 04:08:32 aralbrec Exp $
  */
 
 #include "ccdefs.h"
@@ -152,6 +152,13 @@ int debuglevel;
  */
 
 int assemtype;
+
+/*
+ * Output file extension
+ *
+ */
+
+char *outext;
 
 /*
  * Enums defined
