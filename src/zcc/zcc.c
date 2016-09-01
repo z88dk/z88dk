@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.150 2016-08-31 22:15:03 aralbrec Exp $
+ *      $Id: zcc.c,v 1.151 2016-09-01 00:00:49 aralbrec Exp $
  */
 
 
@@ -502,21 +502,11 @@ process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum i
 int linkthem(char *linker)
 {
     int             i, len, offs, status;
-    char           *temp, *cmdline, *p;
+    char           *temp, *cmdline;
     char           *asmline = ""; 
     char           *ext;
 
-    if (peepholeopt) {
-        if (IS_ASM(ASM_Z80ASM)) {
-            asmline = "-eopt ";
-        }
-        ext = ".opt";
-    } else {
-        if (IS_ASM(ASM_Z80ASM)) {
-            asmline = "-easm ";
-        }
-        ext = ".asm";
-    }
+    ext = ".asm";
 
     linkargs_mangle(linkargs);
     len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
@@ -530,9 +520,9 @@ int linkthem(char *linker)
             linkargs,
             globaldefon ? "-g " : "",
             (createapp || mapon) ? "-m " : "",
-            ((createapp || symbolson) && c_nocrt) ? "-s ": "",
+            (createapp || symbolson) ? "-s ": "",
             relocinfo ? "--reloc-info " : "",
-            (c_nocrt == 0) ? c_crt0 : "",
+            (c_nocrt == 0) ? c_crt0 : filelist[0],
             (c_nocrt == 0) ? ext : "");
 
     for ( i = 0; i < nfiles; i++ ) {
@@ -544,21 +534,18 @@ int linkthem(char *linker)
     cmdline = calloc(len, sizeof(char));
     strcpy(cmdline, temp);
     
-    if (c_nocrt) c_crt0 = NULL;
     for (i = 0; i < nfiles; ++i) {
-        if (hassuffix(filelist[i], c_extension)) {
-            offs += snprintf(cmdline + offs, len - offs," %s", filelist[i]);
-            if (c_crt0 == NULL) {
-                c_crt0 = strdup(filelist[i]);
-                if ((p = strrchr(c_crt0, '.')) != NULL) *p = '\0';
-            }
-        }
+        if (hassuffix(filelist[i], c_extension))
+            offs += snprintf(cmdline + offs, len - offs, " %s", filelist[i]);
     }
+
     if (verbose)
         printf("%s\n", cmdline);
     status = system(cmdline);
+
     free(cmdline);
     free(temp);
+
     return (status);
 }
 
@@ -840,7 +827,7 @@ int main(int argc, char **argv)
                 exit(1);
         CASE_ASMFILE:
         case ASMFILE:
-            if (preprocessonly || assembleonly) continue;
+            if (preprocessonly || assembleonly || ((i == 0) && c_nocrt && !compileonly)) continue;
             BuildAsmLine(asmarg, sizeof(asmarg), " -s -easm ");
             if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                 exit(1);
@@ -910,6 +897,8 @@ int main(int argc, char **argv)
         if ((oldptr = strrchr(filenamebuf, '.')))
             *oldptr = 0;
 
+        if (c_nocrt) c_crt0 = changesuffix(filelist[0], "");
+
         if (mapon && copy_file(c_crt0, ".map", filenamebuf, ".map")) {
             fprintf(stderr, "Cannot copy map file\n");
             status = 1;
@@ -925,7 +914,7 @@ int main(int argc, char **argv)
             status = 1;
         }
 
-        if (lston && (c_nocrt == 0) && copy_file(c_crt0, ".lis", "crt0", ".lis")) {
+        if (lston && copy_file(c_crt0, ".lis", (c_nocrt == 0) ? "crt0" : original_filenames[0], ".lis")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
             status = 1;
         }
