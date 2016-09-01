@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.153 2016-09-01 01:10:26 aralbrec Exp $
+ *      $Id: zcc.c,v 1.154 2016-09-01 04:07:43 aralbrec Exp $
  */
 
 
@@ -1504,7 +1504,7 @@ static void configure_compiler()
         preprocarg = " -DSCCZ80 -DSMALL_C";
         BuildOptions(&cpparg, preprocarg);
         /* Indicate to sccz80 what assembler we want */
-        snprintf(buf,sizeof(buf),"-asm=%s",c_assembler_type);
+        snprintf(buf,sizeof(buf),"-asm=%s -ext=opt",c_assembler_type);
         add_option_to_compiler(buf);
         if ( sccz80arg ) {
             add_option_to_compiler(sccz80arg);
