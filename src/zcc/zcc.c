@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.156 2016-09-02 04:41:41 aralbrec Exp $
+ *      $Id: zcc.c,v 1.157 2016-09-02 16:53:05 aralbrec Exp $
  */
 
 
@@ -1641,14 +1641,14 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
 
                 // generate output filename
                 if ( outputfile != NULL )
-                    strcpy(fname, outputfile);                                               // use specified output filename
-                else  if ((strcmp(suffix, c_extension) == 0) && hassuffix(original_filenames[j], ".c")) {
-                    p = changesuffix(original_filenames[j], suffix);                         // special case for .o files generated from c source
-                    strcpy(fname, p);                                                        // use original filename with extension changed to .o
+                    strcpy(fname, outputfile);                                               // use supplied output filename
+                else  if (strcmp(suffix, c_extension) == 0) {
+                    p = changesuffix(original_filenames[j], suffix);                         // for .o, use original filename with extension changed to .o
+                    strcpy(fname, p);
                     free(p);
                 }
                 else
-                    snprintf(fname, sizeof(fname), "%s%s", original_filenames[j], suffix);   // use original filename with extension concatenated
+                    snprintf(fname, sizeof(fname), "%s%s", original_filenames[j], suffix);   // use original filename with extension appended
 
                 // copy to output directory
                 if (copy_file(ptr, "", fname, "")) {
