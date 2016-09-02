@@ -776,11 +776,27 @@ static char			/* value of symbol */
 p_b_symbol(p)
 register struct parse *p;
 {
-	register char value;
+	register char value = 0;
 
 	REQUIRE(MORE(), REG_EBRACK);
-	if (!EATTWO('[', '.'))
-		return(GETNEXT());
+
+    if (!EATTWO('[', '.')) {
+        
+        if ((PEEK() == '\\') && MORE2()) {
+            switch (PEEK2()) {
+                case 't':
+                    value = '\t';
+                    break;
+                case '\\':
+                    value = '\\';
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        return value ? (NEXT2(),value) : GETNEXT();
+    }
 
 	/* collating symbol */
 	value = p_b_coll_elem(p, '.');
