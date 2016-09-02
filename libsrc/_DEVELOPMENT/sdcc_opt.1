@@ -2,6 +2,7 @@
 =
 ; Processed by Z88DK
 ;--------------------------------------------------------
+	
 	EXTERN __divschar
 	EXTERN __divschar_callee
 	EXTERN __divsint
@@ -174,101 +175,85 @@
 ;; global labels
 ;;
 
-%0::
+%"[ \t]*"1%0::
 =
-%0:
+%1%0:
 
 ;;
 ;; labels
 ;;
 
-%"[0-9]+"0$:
+%"[ \t]*"1%"[0-9]+"0$:
 =
-__sdcc_local_%0:
+%1__sdcc_local_%0:
 
-	%"[0-9]+"0$:
+%"[ \t]*"1%0$:
 =
-	__sdcc_local_%0:
+%1%0:
 
-%0$:
+%1,%"[ \t]*"2%"[0-9]+"0$
 =
-%0:
+%1,%2__sdcc_local_%0
 
-	%0$:
+%"[ \t]*"1%"[ \tA-Za-z]+"0%"[0-9]+"2$
 =
-	%0:
+%1%0__sdcc_local_%2
 
-	%1, %"[0-9]+"0$
+%1,%"[ \t]*"2%0$
 =
-	%1, __sdcc_local_%0
+%1,%2%0
 
-	%0,%"[0-9]+"1$
+%"[ \tA-Za-z]+"0%1$
 =
-	%0,__sdcc_local_%1
-
-	%0	%"[0-9]+"1$
-=
-	%0	__sdcc_local_%1
-
-	%1, %0$
-=
-	%1, %0
-
-	%0,%1$
-=
-	%0,%1
-
-	%0	%1$
-=
-	%0	%1
+%0%1
 
 ;;
 ;; sections
 ;;
 
-	.area _XSEG
+%"[ \t]*"0.area%"[ \t]+"1_XSEG
 =
-	SECTION IGNORE
+%0SECTION%1IGNORE
 
-	.area _STACK
+%"[ \t]*"0.area%"[ \t]+"1_STACK
 =
-	SECTION IGNORE
+%0SECTION%1IGNORE
 
-	.area _CODE
+%"[ \t]*"0.area%"[ \t]+"1_CODE
 =
-	SECTION code_compiler
+%0SECTION%1code_compiler
 
-	.area _DATA
+%"[ \t]*"0.area%"[ \t]+"1_DATA
 =
-	SECTION bss_compiler
+%0SECTION%1bss_compiler
 
-	.area _RSEG (ABS)
+%"[ \t]*"0.area%"[ \t]+"1_RSEG (ABS)
 =
-	SECTION IGNORE
+%0SECTION%1IGNORE
 
-	.area _GSINIT
+%"[ \t]*"0.area%"[ \t]+"1_GSINIT
 =
-	SECTION code_crt_init
+%0SECTION%1code_crt_init
 
-	.area _GSFINAL
+%"[ \t]*"0.area%"[ \t]+"1_GSFINAL
 =
-	SECTION code_crt_exit
+%0SECTION%1code_crt_exit
 
-	.area _HOME
+%"[ \t]*"0.area%"[ \t]+"1_HOME
 =
-	SECTION IGNORE
+%0SECTION%1IGNORE
 
-	.area _CABS (ABS)
+%"[ \t]*"0.area%"[ \t]+"1_CABS (ABS)
 =
-	SECTION IGNORE
+%0SECTION%1IGNORE
 
-	.area _DABS (ABS)
+%"[ \t]*"0.area%"[ \t]+"1_DABS (ABS)
 =
-	SECTION IGNORE
+%0SECTION%1IGNORE
 
-	.area _INITIALIZER
+%"[ \t]*"0.area%"[ \t]+"1_INITIALIZER
 =
-	SECTION data_compiler
+%0SECTION%1data_compiler
 
 	.area _INITIALIZED
 =
@@ -293,137 +278,129 @@ ENDIF
 ; absolute external ram data
 ;--------------------------------------------------------
 
-	.area _%0
+%"[ \t]*"1.area%"[ \t]*"2_%0
 =
-	SECTION %0
+%1SECTION%2%0
 
-	.area %0
+%"[ \t]*"1.area%"[ \t]*"2%0
 =
-	SECTION %0
+%1SECTION%2%0
 
 ;;
 ;; assembler directives
 ;;
 
-	.ascii %0
+%"[ \t]*"1.ascii%"[ \t]+"2%0
 =
-	DEFM %0
+%1DEFM%2%0
 
-	.ds %0
+%"[ \t]*"1.asciz%"[ \t]+"2%0
 =
-	DEFS %0
+%1DEFM%2%0,0
 
-	.db %0
+%"[ \t]*"1.ds%"[ \t]+"2%0
 =
-	DEFB %0
+%1DEFS%2%0
 
-	.byte %0
+%"[ \t]*"1.db%"[ \t]+"2%0
 =
-	DEFB %0
+%1DEFB%2%0
 
-	.dw %0
+%"[ \t]*"1.byte%"[ \t]+"2%0
 =
-	DEFW %0
+%1DEFB%2%0
 
-	.globl %0
+%"[ \t]*"1.dw%"[ \t]+"2%0
 =
-	GLOBAL %0
+%1DEFW%2%0
 
-	.org %0
+%"[ \t]*"1.globl%"[ \t]+"2%0
 =
-	org %0
+%1GLOBAL%2%0
+
+%"[ \t]*"1.org%"[ \t]+"2%0
+=
+%1ORG%2%0
 
 ;;
 ;; label = PC
 ;;
 
-	%0 = .
+%"[ \t]*"1%"[A-Za-z0-9]"0%"[ \t]*"2=%"[ \t]*"3.
 =
-	%0:
+%1%0:
 
 ;;
 ;; define constants
 ;;
 
-%0	=	%1
+%"[ \t]*"2%"[A-Za-z0-9]"0%"[ \t]*"3=%"[ \t]*"4%1
 =
-defc %0	= %1
-
-	%0	=	%1
-=
-	defc %0 = %1
+%2defc %0%3=%4%1
 
 ;;
 ;; asxxx syntax for LSB / MSB
 ;;
 
-	%1#<(%0)
+%1#<(%0)
 =
-	%1#((%0) & 0xFF)
+%1#((%0) & 0xFF)
 
-	%1#>(%0)
+%1#>(%0)
 =
-	%1#((%0) / 256)
+%1#((%0) / 256)
 
-	%1(#<(%0))
+%1(#<(%0))
 =
-	%1(#((%0) & 0xFF))
+%1(#((%0) & 0xFF))
 
-	%1(#>(%0))
+%1(#>(%0))
 =
-	%1(#((%0) / 256))
+%1(#((%0) / 256))
 
-	%1<((%0))
+%1<((%0))
 =
-	%1#((%0) & 0xFF)
+%1#((%0) & 0xFF)
 
-	%1>((%0))
+%1>((%0))
 =
-	%1#((%0) / 256)
+%1#((%0) / 256)
 
-	%1(<((%0)))
+%1(<((%0)))
 =
-	%1(#((%0) & 0xFF))
+%1(#((%0) & 0xFF))
 
-	%1(>((%0)))
+%1(>((%0)))
 =
-	%1(#((%0) / 256))
+%1(#((%0) / 256))
 
 ;;
 ;; zilog syntax for index registers
 ;;
 
-	%0,%1 (ix)
+%0,%"[ \t]*"2%"[ \t+0-9-]+"1(ix)
 =
-	%0,(ix+%1)
+%0,(ix+%1)
 
-	%0, %1 (ix)
+%"[ \tA-Za-z]+"0%"[ \t+0-9-]+"1(ix)
 =
-	%0,(ix+%1)
+%0(ix+%1)
 
-	%2	%1 (ix),%0
+%"[ \tA-Za-z]+"0%"[ \t+0-9-]+"1(ix)%"[ \t]*"2,%"[ \t]*"3%4
 =
-	%2	(ix+%1),%0
+%0(ix+%1),%4
 
-	%2	%1 (ix)
+%0,%"[ \t]*"2%"[ \t+0-9-]+"1(iy)
 =
-	%2	(ix+%1)
+%0,(iy+%1)
 
-	%0,%1 (iy)
+%"[ \tA-Za-z]+"0%"[ \t+0-9-]+"1(iy)
 =
-	%0,(iy+%1)
+%0(iy+%1)
 
-	%0, %1 (iy)
+%"[ \tA-Za-z]+"0%"[ \t+0-9-]+"1(iy)%"[ \t]*"2,%"[ \t]*"3%4
 =
-	%0,(iy+%1)
-
-	%2	%1 (iy),%0
-=
-	%2	(iy+%1),%0
-
-	%2	%1 (iy)
-=
-	%2	(iy+%1)
+%0(iy+%1),%4
 
 ;;
 ;; _INITIALIZER variables made into actual variable names
@@ -437,18 +414,18 @@ __xinit_%0
 ;; asxxx immediate operator #
 ;;
 
-	%"[^\"'#;]*"0#%1
+%"[^\"'#;]*"0#%1
 =
-	%0+%1
+%0+%1
 
 ;;
 ;; beautify
 ;;
 
-	SECTION %1
-	SECTION %2
+%"[ \t]*"5SECTION%"[ \t]+"0%1
+%"[ \t]*"4SECTION%"[ \t]+"3%2
 =
-	SECTION %2
+%4SECTION%3%2
 
 %"[^\"';+]*"0+-%1
 =
@@ -461,3 +438,11 @@ __xinit_%0
 %"[^\"';(]*"0(+%1
 =
 %0(%1
+
+%"[^+-]+"0%"[+-]+"1%"[0-9][0-9+-]*"2%"[ \t]+"3)
+=
+%0%1%2)
+
+%"[^+-]+"0%"[+-]+"1%"[0-9][0-9+-]*"2%"[ \t]+"3)%4
+=
+%0%1%2)%4
