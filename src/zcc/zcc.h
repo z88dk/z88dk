@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.37 2016-08-31 19:38:50 aralbrec Exp $
+ * $Id: zcc.h,v 1.38 2016-09-03 14:25:50 pauloscustodio Exp $
  */
 
 #include "../config.h"
@@ -23,6 +23,7 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 
 #ifdef _WIN32
 /* Predefined in 32-bit MS Visual C/C++ and Borland Builder C/C++ */
+#undef PREFIX
 #define PREFIX "c:/z88dk"
 #endif
 
