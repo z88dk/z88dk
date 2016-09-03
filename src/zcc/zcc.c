@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.157 2016-09-02 16:53:05 aralbrec Exp $
+ *      $Id: zcc.c,v 1.158 2016-09-03 05:08:10 aralbrec Exp $
  */
 
 
@@ -507,6 +507,8 @@ int linkthem(char *linker)
     int             i, len, offs, status;
     char           *temp, *cmdline;
     char           *asmline = ""; 
+    char            tname[FILENAME_MAX + 1];
+    FILE           *out, *prj;
 
     linkargs_mangle(linkargs);
 
@@ -524,7 +526,7 @@ int linkthem(char *linker)
             outputfile,
             "",
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
-            (relocate && z80verbose && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
+            (relocate && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
             linkargs,
             globaldefon ? "-g " : "",
             (createapp || mapon) ? "-m " : "",
@@ -534,18 +536,54 @@ int linkthem(char *linker)
             (c_nocrt == 0) ? ".asm" : "");
     }
 
-    for ( i = 0; i < nfiles; i++ )
-        len += strlen(filelist[i]) + 5;
-    len++;
+    prj = fopen("zcc_prj.lst", "w");
+
+    if ((nfiles > 1) && IS_ASM(ASM_Z80ASM)) {
+
+        // place source files into a list file for z80asm
+
+        tempname(tname);
+        if ((out = fopen(tname, "w")) == NULL) goto USE_COMMANDLINE;
+
+        for (i = 0; i < nfiles; ++i) {
+            if (hassuffix(filelist[i], c_extension)) {
+                fprintf(out, "%s\n", filelist[i]);
+                if (prj) fprintf(prj, "%s\n", original_filenames[i]);
+            }
+        }
+
+        fclose(out);
+
+        len += strlen(tname) + 5;
+        cmdline = calloc(len, sizeof(char));
+
+        snprintf(cmdline, len, "%s @%s", temp, tname);
+
+    } else {
+
+USE_COMMANDLINE:
+
+        // place source files on the command line
+
+        for ( i = 0; i < nfiles; i++ )
+            len += strlen(filelist[i]) + 5;
+        len++;
     
-    /* So the total length we need is now in len, let's malloc and do it */
-    cmdline = calloc(len, sizeof(char));
-    strcpy(cmdline, temp);
+        /* So the total length we need is now in len, let's malloc and do it */
+
+        cmdline = calloc(len, sizeof(char));
+        strcpy(cmdline, temp);
     
-    for (i = 0; i < nfiles; ++i) {
-        if (hassuffix(filelist[i], c_extension))
-            offs += snprintf(cmdline + offs, len - offs, " %s", filelist[i]);
+        for (i = 0; i < nfiles; ++i) {
+            if (hassuffix(filelist[i], c_extension)) {
+                offs += snprintf(cmdline + offs, len - offs, " %s", filelist[i]);
+                if (prj) fprintf(prj, "%s\n", original_filenames[i]);
+            }
+        }
+
     }
+
+    if (prj) fclose(prj);
 
     if (verbose)
         printf("%s\n", cmdline);
