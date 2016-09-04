@@ -219,10 +219,10 @@ int sms_exec(char *target)
             count += 0x4000;
         else
         {
-            if (len > 0x8000)
+            if ((i == 2) && (len > 0x8000))
             {
-                fprintf(stderr, "Warning: Main binary extends into bank 02 by %d bytes\n", len - 0x8000);
-                len = 0;
+                fprintf(stderr, "Warning: BANK_02 has been omitted because the main binary extends into BANK_02 by %d bytes\n", len - 0x8000);
+                continue;
             }
 
             fprintf(stderr, "Adding bank %02X", i);
