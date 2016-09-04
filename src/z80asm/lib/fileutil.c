@@ -653,7 +653,11 @@ char *path_dirname( char *filename )
 
     str_set( dest, filename );
 	basename = _start_basename( str_data(dest) );
-	*basename = '\0';		/* remove basename */
+	*basename = '\0';					/* remove basename */
+	
+	if (str_data(dest)[0] == '\0')		/* dir is now empty */
+		str_set(dest, ".");
+
 	ret = strpool_add(str_data(dest));
 
 	STR_DELETE(dest);
@@ -663,7 +667,6 @@ char *path_dirname( char *filename )
 /* search for a file on the given directory list, return full path name */
 static void path_search_1(Str *dest, char *filename, UT_array *dir_list, Str *pathname)
 {
-	struct stat  sb;
 	char **pdir;
 	
     str_set( dest, filename );		/* default return: input file name */
@@ -673,16 +676,15 @@ static void path_search_1(Str *dest, char *filename, UT_array *dir_list, Str *pa
         return;
 
     /* check if file exists in current directory */
-    if ( stat( filename, &sb ) == 0 )
-        return;
+	if (file_exists(filename))
+		return;
 
     /* search in dir_list */
 	for (pdir = NULL; (pdir = (char **)utarray_next(dir_list, pdir)) != NULL; )
     {
 		str_sprintf(pathname, "%s/%s", *pdir, filename);
 
-        if ( stat( str_data(pathname), &sb ) == 0 )
-        {
+		if (file_exists(str_data(pathname))) {
             str_set( dest, str_data(pathname) );
             return;
         }
@@ -709,4 +711,13 @@ char *search_file( char *filename, UT_array *dir_list )
 
 	STR_DELETE(dest);
 	return ret;
+}
+
+Bool file_exists(char *filename)
+{
+	struct stat  sb;
+	if ((stat(filename, &sb) == 0)  && !(sb.st_mode & S_IFDIR))
+		return TRUE;
+	else
+		return FALSE;
 }

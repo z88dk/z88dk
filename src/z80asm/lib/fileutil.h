@@ -101,3 +101,6 @@ extern char *search_file(char *filename, UT_array *dir_list);	/* returned string
 /* return a temp file name based on the given file: dirname(file).TEMP.basename(file) 
    all files with these names are deleted on exit */
 extern char *temp_filename( char *filename );
+
+/* check if file exists */
+extern Bool file_exists(char *filename);
