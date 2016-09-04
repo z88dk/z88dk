@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.159 2016-09-04 05:36:46 aralbrec Exp $
+ *      $Id: zcc.c,v 1.160 2016-09-04 16:19:36 aralbrec Exp $
  */
 
 
@@ -108,6 +108,7 @@ static int             createapp = 0;    /* Go the next stage and create the app
 static int             z80verbose = 0;
 static int             cleanup = 1;
 static int             assembleonly = 0;
+static int             lstcwd = 0;
 static int             compileonly = 0;
 static int             makelib = 0;
 static int             c_code_in_asm = 0;
@@ -366,7 +367,6 @@ static arg_t     myargs[] = {
     {"Cz", AF_MORE, AddToArgs, &appmakeargs, NULL, "Add an option to appmake"},
     {"Cc", AF_MORE, AddToArgs, &sccz80arg, NULL, "Add an option to sccz80"},
     {"Cs", AF_MORE, AddToArgs, &sdccarg, NULL, "Add an option to sdcc"},
-
     {"E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, NULL, "Only preprocess files"},
     {"R", AF_BOOL_TRUE, SetBoolean, &relocate, NULL, "Generate relocatable code (deprecated)"},
     {"-reloc-info", AF_BOOL_TRUE, SetBoolean, &relocinfo, NULL, "Generate binary file relocation information"},
@@ -381,11 +381,12 @@ static arg_t     myargs[] = {
     {"v", AF_BOOL_TRUE, SetBoolean, &verbose, NULL, "Output all commands that are run (-vn suppresses)"},
     {"bn", AF_MORE, SetString, &c_linker_output_file, NULL, "Set the output file for the linker stage"},
     {"vn", AF_BOOL_FALSE, SetBoolean, &verbose, NULL, "Run the compile stages silently" },
-    {"c", AF_BOOL_TRUE, SetBoolean, &compileonly, NULL, "Only compile the .c files to .o files"},
-    {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
-    {"S", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile the .c files to .asm/.opt files"},
+    {"c", AF_BOOL_TRUE, SetBoolean, &compileonly, NULL, "Only compile .c .s .asm files to .o files"},
+    {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile .c .s files to .asm files"},
+    {"S", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile .c .s files to .asm files"},
+    {"-lstcwd", AF_BOOL_TRUE, SetBoolean, &lstcwd, NULL, "Files in .lst files are relative to the current working dir"},
     {"x", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Make a library out of source files"},
-    {"-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm/.opt files"},
+    {"-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm files"},
     {"-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)"},
     {"m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable"},
     {"g", AF_BOOL_TRUE, SetBoolean, &globaldefon, NULL, "Generate a global defs file of the final executable"},
@@ -662,6 +663,7 @@ int main(int argc, char **argv)
         else
             add_file_to_process(argv[gargc]);
     }
+
 
     if ( c_print_specs ) {
         print_specs();
@@ -980,8 +982,12 @@ int copy_file(char *name1, char *ext1, char *name2, char *ext2)
     char            buffer[LINEMAX + 1];
     char           *cmd;
     int             ret;
-    
+
+#ifdef WIN32
+    snprintf(buffer, sizeof(buffer), "%s %s%s %s%s > nul",c_copycmd, name1, ext1, name2, ext2);
+#else
     snprintf(buffer, sizeof(buffer), "%s %s%s %s%s",c_copycmd, name1, ext1, name2, ext2);
+#endif
 #ifdef WIN32
     /* Argh....annoying */
     if ( strcmp(c_copycmd,"copy") == 0 ) {
@@ -1276,7 +1282,7 @@ void gather_from_list_file(char *filename)
             }
 
             // prepend path if filename is not absolute
-            if ((*p != '/') && (*p != '\\'))
+            if (!lstcwd && (*p != '/') && (*p != '\\'))
                 strcat(outname, pathname);
 
             // append rest of filename
@@ -1305,6 +1311,7 @@ void add_file_to_process(char *filename)
 {
     char tname[FILENAME_MAX + 1];
     char *p, *q;
+    struct stat tmp;
 
     if (((p = strtok(filename, " \r\n\t")) != NULL) && *p) {
         if (*p == '@')
@@ -1321,29 +1328,40 @@ void add_file_to_process(char *filename)
             }
 
             /* Add this file to the list of original files */
-            original_filenames[nfiles] = strdup(p);
+            if (strrchr(p, '.') == NULL) {
+                // input file has no extension so assume .asm then .o
+                if ((original_filenames[nfiles] = malloc((strlen(p)+5)*sizeof(char))) != NULL) {
+                    strcpy(original_filenames[nfiles], p);
+                    strcat(original_filenames[nfiles], ".asm");
+                    if (stat(original_filenames[nfiles], &tmp) != 0)
+                        strcpy(strrchr(original_filenames[nfiles], '.'), ".o");
+                }
+            }
+            else
+                original_filenames[nfiles] = strdup(p);
+
+            if ((q = original_filenames[nfiles]) == NULL) {
+                fprintf(stderr, "Unable to malloc memory for filename\n");
+                exit(1);
+            }
 
             if (usetemp) {
                 /* Now work out the temporary filename */
                 tempname(tname);
-                if ((q = strrchr(p, '.')) == NULL) {
-                    fprintf(stderr, "Unrecognized filetype \"%s\"\n", p);
-                    exit(1);
-                }
-                strcat(tname, q);
+                strcat(tname, strrchr(q, '.'));
 
                 /* Copy the file over */
-                if (!hassuffix(p, ".c")) {
-                    if (copy_file(p, "", tname, "")) {
-                        fprintf(stderr, "Cannot copy input file \"%s\"\n", p);
+                if (!hassuffix(q, ".c")) {
+                    if (copy_file(q, "", tname, "")) {
+                        fprintf(stderr, "Cannot copy input file \"%s\"\n", q);
                         exit(1);
                     }
                 }
                 filelist[nfiles++] = strdup(tname);
             } else {
                 /* Not using temporary files */
-                filelist[nfiles++] = strdup(p);
-                strcpy(tname, p);
+                strcpy(tname, q);
+                filelist[nfiles++] = strdup(tname);
             }
         }
     }
