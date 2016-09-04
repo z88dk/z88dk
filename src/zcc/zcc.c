@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.160 2016-09-04 16:19:36 aralbrec Exp $
+ *      $Id: zcc.c,v 1.161 2016-09-04 19:31:59 aralbrec Exp $
  */
 
 
@@ -1329,7 +1329,12 @@ void add_file_to_process(char *filename)
 
             /* Add this file to the list of original files */
             if (strrchr(p, '.') == NULL) {
-                // input file has no extension so assume .asm then .o
+                // file without extension - see if it exists, exclude directories
+                if ((stat(p, &tmp) == 0) && (!(tmp.st_mode && S_IFDIR))) {
+                    fprintf(stderr, "Unrecognized file type %s\n", p);
+                    exit(1);
+                }
+                // input file has no extension and does not exist so assume .asm then .o
                 if ((original_filenames[nfiles] = malloc((strlen(p)+5)*sizeof(char))) != NULL) {
                     strcpy(original_filenames[nfiles], p);
                     strcat(original_filenames[nfiles], ".asm");
