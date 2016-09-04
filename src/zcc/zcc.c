@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.158 2016-09-03 05:08:10 aralbrec Exp $
+ *      $Id: zcc.c,v 1.159 2016-09-04 05:36:46 aralbrec Exp $
  */
 
 
@@ -536,7 +536,7 @@ int linkthem(char *linker)
             (c_nocrt == 0) ? ".asm" : "");
     }
 
-    prj = fopen("zcc_prj.lst", "w");
+    prj = fopen(PROJFILE, "w");
 
     if ((nfiles > 1) && IS_ASM(ASM_Z80ASM)) {
 

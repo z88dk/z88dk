@@ -3,7 +3,7 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.38 2016-09-03 14:25:50 pauloscustodio Exp $
+ * $Id: zcc.h,v 1.39 2016-09-04 05:36:46 aralbrec Exp $
  */
 
 #include "../config.h"
@@ -50,6 +50,9 @@ int snprintf(char * buffer, size_t bufsize, const char * format, ...);
 
 /* Name of the file that linking tweaks are written to */
 #define DEFFILE "zcc_opt.def"
+
+/* Name of the file that contains a list of all input files used to make a library or binary */
+#define PROJFILE "zcc_proj.lst"
 
 
 enum iostyle { outimplied=1, outspecified,  filter, outspecified_flag, filter_outspecified_flag };
