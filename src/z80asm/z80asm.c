@@ -51,17 +51,51 @@ static void do_assemble( char *src_filename );
 
 /*-----------------------------------------------------------------------------
 *   Assemble one source file
-*	If filename starts with '@', reads the file as a list of filenames
-*	and assembles each one in turn
+*	- if a .o file is given, and it exists, it is used without trying to assemble first
+*	- if the given file exists, whatever the extension, try to assembly it,
+*	  i.e. there is no more the need to pass -eopt to assemble .opt files.
+*	- if all above fail, try to replace/append the .asm extension and assemble
+*	- if all above fail, try to replace/append the .o extension and link
 *----------------------------------------------------------------------------*/
 void assemble_file( char *filename )
 {
-    char *src_filename, *src_dirname;
+    char *src_filename, *obj_filename, *src_dirname;
+	Bool load_obj_only;
 	Module *module;
 
+	/* try to load object file */
+	obj_filename = get_obj_filename(filename);
+	if (strcmp(filename, obj_filename) == 0 &&			/* input is object file */
+		file_exists(filename)							/* .o file exists */
+		) {
+		load_obj_only = TRUE;
+		src_filename = filename;
+	}
+	else {
+		load_obj_only = FALSE;
+
+		/* use input file if it exists */
+		if (file_exists(filename)) {
+			src_filename = filename;						/* use whatever extension was given */
+		}
+		else {
+			char *asm_filename = get_asm_filename(filename);
+			if (file_exists(asm_filename)) {				/* file with .asm extension exists */
+				src_filename = asm_filename;
+			}
+			else if (file_exists(obj_filename)) {
+				load_obj_only = TRUE;
+				src_filename = obj_filename;
+			}
+			else {				
+				error_read_file(filename);
+				return;
+			}
+		}
+	}
+	
 	/* append the directoy of the file being assembled to the include path 
 	   and remove it at function end */
-	src_filename = get_asm_filename(filename);      /* set '.asm' extension */
 	src_dirname  = path_dirname(src_filename);
 	utarray_push_back(opts.inc_path, &src_dirname);
 
@@ -81,8 +115,14 @@ void assemble_file( char *filename )
 	/* Create error file */
 	open_error_file(src_filename);
 
-	query_assemble(src_filename);
-    set_error_null();           /* no more module in error messages */
+	if (load_obj_only) {
+		if (!objmodule_loaded(src_filename))
+			error_not_obj_file(src_filename);	/* invalid object file */
+	}
+	else
+		query_assemble(src_filename);			/* try to assemble, check -d */
+
+    set_error_null();							/* no more module in error messages */
 	opts.cur_list = FALSE;
 
 	/* finished assembly, remove dirname from include path */
@@ -303,6 +343,8 @@ int main( int argc, char *argv[] )
 	libraryhdr = NULL;              /* initialise to no library files */
 
 	/* parse command line and call-back via assemble_file() */
+	/* If filename starts with '@', reads the file as a list of filenames
+	*	and assembles each one in turn */
 	parse_argv(argc, argv);
 	for (pfile = NULL; (pfile = (char**)utarray_next(opts.files, pfile)) != NULL; )
 		assemble_file(*pfile);

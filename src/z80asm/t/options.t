@@ -219,7 +219,13 @@ is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 for my $options ('-exxx', '-e=xxx', '--asm-extxxx', '--asm-ext=xxx') {
 	unlink_testfiles();
 	write_file($base.".xxx", "ret");
+	
+	# file is only base name
 	t_z80asm_capture("-b $options $base", "", "", 0);
+	is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+	
+	# file has extension
+	t_z80asm_capture("-b $options $base.xxx", "", "", 0);
 	is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 }
 
@@ -556,6 +562,22 @@ for my $options ('-d', '--date-stamp') {
 	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
 	isnt -M obj_file(), $date_obj;	# new object
+	
+	# remove source, give -d -> uses existing object - with extensiom
+	unlink asm_file();
+	$date_obj = -M obj_file();
+	t_z80asm_capture("$options ".asm_file(), "", "", 0);
+	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+	is -M obj_file(), $date_obj;	# new object
+	
+	# remove source, give -d -> uses existing object - without extensiom
+	unlink asm_file();
+	$date_obj = -M obj_file();
+	my $base = asm_file(); $base =~ s/\.\w+$//;
+	t_z80asm_capture("$options $base", "", "", 0);
+	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+	is -M obj_file(), $date_obj;	# new object
+	
 }
 
 #------------------------------------------------------------------------------

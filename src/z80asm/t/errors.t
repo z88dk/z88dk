@@ -427,18 +427,18 @@ unlink_testfiles();
 write_file(obj_file(), "not an object");
 sleep 0.500;
 write_file(asm_file(), "nop");
-t_z80asm_capture("-b -d ".obj_file(), "", "", 0);
+t_z80asm_capture("-b -d ".asm_file(), "", "", 0);
 t_binary(read_binfile(obj_file()), objfile(NAME => "test", 
 										   CODE => [["", -1, "\x00"]], 
 										   ));
 t_binary(read_binfile(bin_file()), "\x00");
-	
+
 # CreateLib uses a different error call
 unlink_testfiles();
 write_file(obj_file(), "not an object");
 sleep 0.500;
 write_file(asm_file(), "nop");
-t_z80asm_capture("-x".lib_file()." -d ".obj_file(), "", "", 0);
+t_z80asm_capture("-x".lib_file()." -d ".asm_file(), "", "", 0);
 t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", 
 												   CODE => [["", -1, "\x00"]])));
 unlink_testfiles();

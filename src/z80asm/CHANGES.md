@@ -4,6 +4,15 @@ Z88DK Z80 Module Assembler Change Log
 2016
 ----
 
+- 2016-09-04
+
+  Change handling of input files to make it more predictable:
+  - if a .o file is given, and it exists, it is used without trying to assemble first
+  - if the given file exists, whatever the extension, try to assembly it, 
+    i.e. there is no more the need to pass -eopt to assemble .opt files.
+  - if all above fail, try to replace/append the .asm extension and assemble
+  - if all above fail, try to replace/append the .o extension and link
+    
 - 2016-07-29
 
   Remove OZ directive - it is an alias to CALL_OZ, and apparently not used
