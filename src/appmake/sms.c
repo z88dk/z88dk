@@ -211,7 +211,7 @@ int sms_exec(char *target)
     fprintf(stderr, "Adding main banks 00,01%s (%d bytes free)\n", (len > 0x8000) ? ",02" : "", ((len > 0x8000) ? 0xc000 : 0x8000)-len-16*(sega_present+sdsc_present));
 
     count = 0;
-    for (i = 0x02; i <= 0x1f; ++i)
+    for (i = 0x02 + (len > 0x8000); i <= 0x1f; ++i)
     {
         sprintf(filename, "%s_BANK_%02X.bin", binname, i);
 
@@ -219,12 +219,10 @@ int sms_exec(char *target)
             count += 0x4000;
         else
         {
-            if ((i == 2) && (len > 0x8000))
+            if (len > 0x8000)
             {
-                fprintf(stderr, "Warning: BANK_02 has been omitted because the main binary extends into BANK_02 by %d bytes\n", len - 0x8000);
-
-                fclose(fpin);
-                continue;
+                fprintf(stderr, "Warning: The main binary extends into slot 2 by %d bytes\n", len - 0x8000);
+                len = 0;
             }
 
             fprintf(stderr, "Adding bank %02X", i);
