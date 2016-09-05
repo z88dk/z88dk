@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.161 2016-09-04 19:31:59 aralbrec Exp $
+ *      $Id: zcc.c,v 1.162 2016-09-05 00:45:48 aralbrec Exp $
  */
 
 
@@ -24,6 +24,7 @@
 #include        <sys/stat.h>
 #include        "zcc.h"
 
+
 #ifdef WIN32
 #define strcasecmp(a,b) stricmp(a,b)
 #endif
@@ -33,6 +34,7 @@
 #else
 #define mktempfile(a) mktemp(a)
 #endif
+
 
 typedef struct arg_s arg_t;
 
@@ -153,7 +155,6 @@ static int             c_nocrt = 0;
 
 static char            filenamebuf[FILENAME_MAX + 1];
 static char            tmpnambuf[] = "zccXXXX";
-
 
 #define ASM_Z80ASM 0
 #define ASM_ASXX   1
@@ -613,7 +614,6 @@ int main(int argc, char **argv)
     asmargs = linkargs = cpparg = NULL;
 
     atexit(remove_temporary_files);
-
     add_option_to_compiler("");
 
     gc = 1;            /* Set for the first argument to scan for */
@@ -989,7 +989,7 @@ int copy_file(char *name1, char *ext1, char *name2, char *ext2)
     snprintf(buffer, sizeof(buffer), "%s %s%s %s%s",c_copycmd, name1, ext1, name2, ext2);
 #endif
 #ifdef WIN32
-    /* Argh....annoying */
+    // Argh....annoying
     if ( strcmp(c_copycmd,"copy") == 0 ) {
          cmd = replace_str(buffer, "/", "\\");
     } else {
@@ -1289,12 +1289,13 @@ void gather_from_list_file(char *filename)
             strcat(outname, p);
 
             // add file to process
-            if (strlen(outname) < FILENAME_MAX)
-                add_file_to_process(outname);
-            else {
+
+            if (strlen(outname) >= FILENAME_MAX) {
                 fprintf(stderr, "Filename is too long \"%s\"\n", outname);
                 exit(1);
             }
+
+            add_file_to_process(outname);
         }
     }
 
@@ -1330,7 +1331,7 @@ void add_file_to_process(char *filename)
             /* Add this file to the list of original files */
             if (strrchr(p, '.') == NULL) {
                 // file without extension - see if it exists, exclude directories
-                if ((stat(p, &tmp) == 0) && (!(tmp.st_mode && S_IFDIR))) {
+                if ((stat(p, &tmp) == 0) && (!(tmp.st_mode & S_IFDIR))) {
                     fprintf(stderr, "Unrecognized file type %s\n", p);
                     exit(1);
                 }
