@@ -68,7 +68,7 @@ TARGET =		z80asm$(EXESUFFIX)
 MSVC_TARGET =	../../win32/Debug/$(TARGET)
 
 LOCAL_LIB :=	lib
-CFLAGS +=		-I. -I$(LOCAL_LIB) -It -Wall -std=c99 # -std=c++98
+CFLAGS +=		-I. -I$(LOCAL_LIB) -It -Wall -std=c99 # -std=c++98 -D_GNU_SOURCE
 
 #------------------------------------------------------------------------------
 # main
