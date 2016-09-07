@@ -1,0 +1,3 @@
+@compress/aplib/aplib_asm.lst
+compress/aplib/c/sccz80/aplib_depack
+compress/aplib/c/sccz80/aplib_depack_callee

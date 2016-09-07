@@ -1,0 +1,5 @@
+compress/aplib/z80/__aplib_getbit
+compress/aplib/z80/__aplib_getbitbc
+compress/aplib/z80/__aplib_getgamma
+compress/aplib/z80/__aplib_var
+compress/aplib/z80/asm_aplib_depack
