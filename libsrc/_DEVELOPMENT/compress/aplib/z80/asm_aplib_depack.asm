@@ -46,7 +46,7 @@ _apbranch2:
       ld h,d
       ld l,e
       push bc
-         ld bc,(aPLibMemory.R0)
+         ld bc,(__aplib_var_R0)
          sbc hl,bc
       pop bc
       ldir
