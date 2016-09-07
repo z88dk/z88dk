@@ -7,6 +7,7 @@
 
 // data compression / decompression
 
+#include <compress/aplib.h>
 #include <compress/zx7.h>
 
 #endif

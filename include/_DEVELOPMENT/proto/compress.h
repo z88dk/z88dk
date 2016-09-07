@@ -5,6 +5,7 @@ include(__link__.m4)
 
 // data compression / decompression
 
+#include <compress/aplib.h>
 #include <compress/zx7.h>
 
 #endif
