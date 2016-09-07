@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.162 2016-09-05 00:45:48 aralbrec Exp $
+ *      $Id: zcc.c,v 1.163 2016-09-07 16:58:48 aralbrec Exp $
  */
 
 
@@ -385,7 +385,7 @@ static arg_t     myargs[] = {
     {"c", AF_BOOL_TRUE, SetBoolean, &compileonly, NULL, "Only compile .c .s .asm files to .o files"},
     {"a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile .c .s files to .asm files"},
     {"S", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Only compile .c .s files to .asm files"},
-    {"-lstcwd", AF_BOOL_TRUE, SetBoolean, &lstcwd, NULL, "Files in .lst files are relative to the current working dir"},
+    {"-lstcwd", AF_BOOL_TRUE, SetBoolean, &lstcwd, NULL, "Paths in .lst files are relative to the current working dir"},
     {"x", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Make a library out of source files"},
     {"-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm files"},
     {"-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)"},
@@ -1860,11 +1860,13 @@ ShowErrors(char *filen, char *orig)
 
 }
 
+
 /** \brief Get a temporary filename
  */
 void tempname(char *filen)
 {
 #ifdef _WIN32
+
     char   *ptr;
 
     if ((ptr = _tempnam(".\\", tmpnambuf)) == NULL) {
@@ -1873,6 +1875,7 @@ void tempname(char *filen)
     }
     strcpy(filen, ptr);
     free(ptr);
+
 #elif defined(__MSDOS__) && defined(__TURBOC__)
     /* Both predefined by Borland's Turbo C/C++ and Borland C/C++ */
 
