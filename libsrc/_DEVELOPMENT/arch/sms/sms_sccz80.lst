@@ -1,1 +1,3 @@
 @arch/sms/sms_asm.lst
+arch/sms/c/sccz80/sms_aplib_vram_depack
+arch/sms/c/sccz80/sms_aplib_vram_depack_callee
