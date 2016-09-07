@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.163 2016-09-07 16:58:48 aralbrec Exp $
+ *      $Id: zcc.c,v 1.164 2016-09-07 19:24:48 aralbrec Exp $
  */
 
 
@@ -53,7 +53,7 @@ static void            AddPreProc(arg_t *arg,char *);
 static void            AddToArgs(arg_t *arg,char *);
 static void            AddAppmake(arg_t *arg,char *);
 static void            AddLinkLibrary(arg_t *arg,char *);
-static void            AddLinkOption(arg_t *arg,char *);
+static void            AddLinkSearchPath(arg_t *arg,char *);
 static void            print_help_config(arg_t *arg,char *);
 static void            print_help_text();
 static void            SetString(arg_t *arg,char *);
@@ -140,6 +140,7 @@ static char           *c_linker_output_file = NULL;
 static char           *cpparg;
 static char           *comparg;
 static char           *linkargs;
+static char           *linklibs;
 static char           *asmargs;
 static char           *appmakeargs;
 static char           *sccz80arg = NULL;
@@ -374,7 +375,7 @@ static arg_t     myargs[] = {
     {"D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option"},
     {"U", AF_MORE, AddPreProc, NULL, NULL, "Undefine a preprocessor option"},
     {"I", AF_MORE, AddPreProc, NULL, NULL, "Add an include directory for the preprocessor"},
-    {"L", AF_MORE, AddLinkOption, NULL, NULL, "Add a library search path"},
+    {"L", AF_MORE, AddLinkSearchPath, NULL, NULL, "Add a library search path"},
     {"l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library"},
     {"O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting for copt"},
     {"SO", AF_MORE, SetNumber, &sdccpeepopt, NULL, "Set the peephole optimiser setting for sdcc-peephole"},
@@ -515,19 +516,20 @@ int linkthem(char *linker)
     linkargs_mangle(linkargs);
 
     if (makelib) {
-        len = offs = zcc_asprintf(&temp, "%s %s -d -Mo -x%s %s",
+        len = offs = zcc_asprintf(&temp, "%s %s -d -Mo %s -x%s %s",
             linker,
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
+            linklibs,
             outputfile,
             linkargs);
     } else {
-        len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
+        len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s%s%s", 
             linker, 
             (c_nostdlib == 0) ? c_linkopts : " -b -d -Mo ", 
             linker_output_separate_arg ? " " : "", 
             outputfile,
-            "",
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
+            linklibs,
             (relocate && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
             linkargs,
             globaldefon ? "-g " : "",
@@ -611,7 +613,7 @@ int main(int argc, char **argv)
     snprintf(tmpnambuf, sizeof(tmpnambuf), "zcc%04X", ((unsigned int)time(NULL)) & 0xffff);
 #endif
 
-    asmargs = linkargs = cpparg = NULL;
+    asmargs = linkargs = linklibs = cpparg = NULL;
 
     atexit(remove_temporary_files);
     add_option_to_compiler("");
@@ -1192,12 +1194,14 @@ void AddPreProc(arg_t *argument, char *arg)
 
 void AddLinkLibrary(arg_t *argument, char *arg)
 {
-    BuildOptions_start(&linkargs, arg);
+    // maintain order of linked libraries
+    BuildOptions(&linkargs, arg);
 }
 
-void AddLinkOption(arg_t *arg, char *val)
+void AddLinkSearchPath(arg_t *arg, char *val)
 {
-    BuildOptions_start(&linkargs, val);
+    // maintain order of library search path
+    BuildOptions(&linklibs, val);
 }
 
 
@@ -1457,6 +1461,10 @@ static void configure_misc_options()
     
     if ( linkargs == NULL ) {
         linkargs = strdup("");
+    }
+
+    if (linklibs == NULL) {
+        linklibs = strdup("");
     }
 }
 
