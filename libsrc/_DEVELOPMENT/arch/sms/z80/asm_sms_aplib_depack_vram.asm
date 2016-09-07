@@ -15,7 +15,7 @@
 SECTION code_clib
 SECTION code_compress_aplib
 
-PUBLIC asm_sms_aplib_vram_depack
+PUBLIC asm_sms_aplib_depack_vram
 
 EXTERN __aplib_var_bits, __aplib_var_byte
 EXTERN __aplib_var_LWM, __aplib_var_R0
@@ -168,7 +168,7 @@ _vram_apbranch1:    ; Maxim: moved this one closer to where it's jumped from to 
   ld (__aplib_var_LWM),a
   jr _vram_aploop
 
-asm_sms_aplib_vram_depack:
+asm_sms_aplib_depack_vram:
 
    ; enter : hl = void *src
    ;         de = void *dst (in vram)

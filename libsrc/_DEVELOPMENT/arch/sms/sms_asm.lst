@@ -1,2 +1,2 @@
-arch/sms/z80/asm_sms_aplib_vram_depack
+arch/sms/z80/asm_sms_aplib_depack_vram
 arch/sms/z80/asm_sms_outi

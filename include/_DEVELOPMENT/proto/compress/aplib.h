@@ -10,8 +10,9 @@ include(__link__.m4)
 // Z80 Decompressor by Maxim                                    //
 // http://www.smspower.org/maxim/SMSSoftware/Compressors        //
 //                                                              //
-// Aplib Created by Jorgen Ibsen                                //
+// Aplib Originally Created by Jorgen Ibsen                     //
 // Copyright (C) 1998-2014 Jorgen Ibsen. All Rights Reserved.   //
+// (no source code or binaries taken from this site)            //
 // http://www.ibsensoftware.com/products_aPLib.html             //
 //                                                              //
 // Further information:                                         //
@@ -23,7 +24,7 @@ __DPROTO(,,void,,aplib_depack,void *dst,void *src)
 
 #ifdef __SMS
 
-__DPROTO(,,void,,sms_aplib_vram_depack,void *dst, void *src)
+__DPROTO(,,void,,sms_aplib_depack_vram,void *dst, void *src)
 
 #endif
 
