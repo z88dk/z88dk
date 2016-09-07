@@ -1,6 +1,9 @@
-Z80 aPLib decompressor
-http://www.smspower.org/maxim/SMSSoftware/Compressors
 ======================
+Z80 aPLib decompressor
+======================
+
+http://www.smspower.org/maxim/SMSSoftware/Compressors
+
 
 1/12/2008
 
@@ -21,7 +24,10 @@ See the Example code directory for examples of how to use it.
 Maxim
 
 
+=============================================================================
 
+From the aplib website.  No source or binaries from this site are included in
+z88dk but you will need a compressor from here to generate compressed files.
 
 
                    ______   ______   ____     ______   ____
