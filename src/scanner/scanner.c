@@ -29,6 +29,13 @@ void strip_nl(char *ptr)
     }
 }
 
+void first_word_only(char *ptr)
+{
+    while (!isspace(*ptr))
+        ++ptr;
+    *ptr = 0;
+}
+
 /*
  * Dump some text into the zcc_opt.def, this allows us to define some
  * things that the startup code might need
@@ -163,7 +170,7 @@ void write_redirect(char *sname, char *value)
 
     strip_nl(sname);
     value = skip_ws(value);
-    strip_nl(value);
+    first_word_only(value);
     if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
         fprintf(stderr,"%s:%d Cannot open zcc_opt.def file\n", filename, lineno);
         exit(1);
