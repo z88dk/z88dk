@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.164 2016-09-07 19:24:48 aralbrec Exp $
+ *      $Id: zcc.c,v 1.165 2016-09-08 03:58:24 aralbrec Exp $
  */
 
 
@@ -523,7 +523,7 @@ int linkthem(char *linker)
             outputfile,
             linkargs);
     } else {
-        len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s%s%s", 
+        len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
             linker, 
             (c_nostdlib == 0) ? c_linkopts : " -b -d -Mo ", 
             linker_output_separate_arg ? " " : "", 
@@ -1809,9 +1809,8 @@ void copy_crt0_to_temp(void)
      * Now to the copying the files over, used for both usetemp and
      * !usetemp
      */
-
     oldptr = c_crt0;
-    if ((copy_file(oldptr, ".asm", filen, ".opt") && copy_file(oldptr, ".opt", filen, ".opt")) || copy_file(filen, ".opt", filen, ".asm")) {
+    if (copy_file(oldptr, ".asm", filen, ".asm") && copy_file(oldptr, ".opt", filen, ".asm")) {
         fprintf(stderr, "Cannot copy crt0 file\n");
         exit(1);
     }
