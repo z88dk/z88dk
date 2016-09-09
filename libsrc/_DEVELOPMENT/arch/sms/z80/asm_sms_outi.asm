@@ -1,4 +1,4 @@
-
+SECTION code_clib
 SECTION code_crt_common
 
 PUBLIC asm_sms_outi
