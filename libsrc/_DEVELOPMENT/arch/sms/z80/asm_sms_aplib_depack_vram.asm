@@ -9,6 +9,7 @@
 ; void sms_aplib_vram_depack(void *dst, void *src)
 ;
 ; Decompress the compressed block at address src to vram address dst.
+; VRAM addresses are assumed to be stable.
 ;
 ; ===================================================================
 
@@ -21,25 +22,21 @@ EXTERN __aplib_var_bits, __aplib_var_byte
 EXTERN __aplib_var_LWM, __aplib_var_R0
 
 EXTERN __aplib_getbit, __aplib_getbitbc, __aplib_getgamma
+EXTERN asm_sms_ldir_vram_to_vram, asm_sms_set_vram_write_de, asm_sms_set_vram_read_hl
 
 ap_VRAMToDE_write:
 
    push af
-      ld a,e
-      out ($bf),a
-      ld a,d
-      or $40
-l0:   out ($bf),a
+   call asm_sms_set_vram_write_de
    pop af
    ret
    
 ap_VRAMToHL_read:
 
    push af
-      ld a,l
-      out ($bf),a
-      ld a,h
-      jr l0 ; space optimisation
+   call asm_sms_set_vram_read_hl
+   pop af
+   ret
       
 ap_VRAM_ldi_src_to_dest:
 
@@ -51,7 +48,7 @@ ap_VRAM_ldi_src_to_dest:
    dec bc
    inc de
    ret
-   
+
 ap_VRAM_ldir_dest_to_dest:
 
   ; This may be a major speed bottleneck
@@ -59,19 +56,10 @@ ap_VRAM_ldir_dest_to_dest:
   ; if it uses overlapping source/dest then a buffer will break it
 
    push af
-l1:   call ap_VRAMToHL_read
-      in a,($be)
-      call ap_VRAMToDE_write
-      out ($be),a
-      dec bc
-      inc de
-      inc hl
-      ld a,b
-      or c
-      jr nz, l1
+   call asm_sms_ldir_vram_to_vram
    pop af
    ret
-
+   
 _vram_apbranch2:
 
    ;use a gamma code * 256 for offset, another gamma code for length
@@ -173,7 +161,7 @@ asm_sms_aplib_depack_vram:
    ; enter : hl = void *src
    ;         de = void *dst (in vram)
    ;
-   ; uses  : af, bc, de, hl
+   ; uses  : af, bc, de, hl, af'
    ;
    ; VRAM addresses are assumed to be stable (ie. di/ei around it)
    
