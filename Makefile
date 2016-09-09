@@ -2,7 +2,7 @@
 #
 #	The impromptu compilation makefile for z88dk
 #
-#	$Id: Makefile,v 1.56 2016-09-01 23:12:54 pauloscustodio Exp $
+#	$Id: Makefile,v 1.57 2016-09-09 09:06:07 dom Exp $
 #
 
 # ---> Configurable parameters are below his point
@@ -123,6 +123,6 @@ clean-bins:
 	$(MAKE) -C src/ticks clean
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C test clean
-	if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
+	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
 
 .PHONY: test
