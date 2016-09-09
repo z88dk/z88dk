@@ -14,6 +14,10 @@ include(__link__.m4)
  * ----------------------------------------------------------------
  */
 
+#ifndef NIRVANAP_TOTAL_ROWS
+#define NIRVANAP_TOTAL_ROWS 23
+#endif
+
 // ----------------------------------------------------------------
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
@@ -41,6 +45,20 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAP_stop,void)
 // ----------------------------------------------------------------
 
 #define NIRVANAP_halt()  intrinsic_halt()
+
+// ----------------------------------------------------------------
+// Location of NIRVANA ISR hook
+// ----------------------------------------------------------------
+
+#ifdef __SDCC
+
+   __at (56698+328*NIRVANAP_TOTAL_ROWS) unsigned char NIRVANAP_isr[3];
+   
+#else
+
+   unsigned char NIRVANAP_isr[3] @ (56698+328*NIRVANAP_TOTAL_ROWS);
+   
+#endif
 
 // ----------------------------------------------------------------
 // Instantly draw tile (16x16 pixels) at specified position

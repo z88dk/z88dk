@@ -16,6 +16,10 @@
  * ----------------------------------------------------------------
  */
 
+#ifndef NIRVANAM_TOTAL_ROWS
+#define NIRVANAM_TOTAL_ROWS 22
+#endif
+
 // ----------------------------------------------------------------
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
@@ -45,6 +49,20 @@ extern void NIRVANAM_stop(void) __preserves_regs(b,c,d,e,h,l);
 // ----------------------------------------------------------------
 
 #define NIRVANAM_halt()  intrinsic_halt()
+
+// ----------------------------------------------------------------
+// Location of NIRVANA ISR hook
+// ----------------------------------------------------------------
+
+#ifdef __SDCC
+
+   __at (57670+332*NIRVANAM_TOTAL_ROWS) unsigned char NIRVANAP_isr[3];
+   
+#else
+
+   unsigned char NIRVANAP_isr[3] @ (57670+332*NIRVANAM_TOTAL_ROWS);
+   
+#endif
 
 // ----------------------------------------------------------------
 // Instantly draw tile (16x16 pixels) at specified position

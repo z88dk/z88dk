@@ -61,6 +61,20 @@ extern void BIFROSTH_stop(void) __preserves_regs(b,c,d,e,h,l);
 #define BIFROSTH_halt()  intrinsic_halt()
 
 // ----------------------------------------------------------------
+// Location of BIFROST ISR hook
+// ----------------------------------------------------------------
+
+#ifdef __SDCC
+
+   __at (64993) unsigned char BIFROSTL_isr[2];
+   
+#else
+
+   unsigned char BIFROSTL_isr[2] @ (64993);
+   
+#endif
+
+// ----------------------------------------------------------------
 // Place a multicolor tile index into the tile map. Add value
 // BIFROSTH_STATIC for static tile, otherwise it will be animated
 //

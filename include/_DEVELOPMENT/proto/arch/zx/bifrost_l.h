@@ -57,6 +57,20 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROSTL_stop,void)
 #define BIFROSTL_halt()  intrinsic_halt()
 
 // ----------------------------------------------------------------
+// Location of BIFROST ISR hook
+// ----------------------------------------------------------------
+
+#ifdef __SDCC
+
+   __at (64993) unsigned char BIFROSTL_isr[2];
+   
+#else
+
+   unsigned char BIFROSTL_isr[2] @ (64993);
+   
+#endif
+
+// ----------------------------------------------------------------
 // Place a multicolor tile index into the tile map. Add value
 // BIFROSTL_STATIC for static tile, otherwise it will be animated
 //
