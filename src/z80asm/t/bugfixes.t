@@ -11,6 +11,8 @@
 
 use Modern::Perl;
 use File::Path qw(make_path remove_tree);;
+use Path::Tiny;
+use Capture::Tiny::Extended 'capture';
 use t::TestZ80asm;
 use t::Listfile;
 
@@ -274,19 +276,19 @@ note "BUG_0018";
 {
 	my $levels = 64;
 	
-	write_file("test.prj", "\@test0.prj");
+	write_file("test.lst", "\@test0.lst");
 	my $bin = "";
 	for (0 .. $levels) {
-		write_file("test$_.prj", 
+		write_file("test$_.lst", 
 				   "test$_.asm\n",
-				   "\@test".($_+1).".prj\n");
+				   "\@test".($_+1).".lst\n");
 		write_file("test$_.asm", "defb $_");
 		$bin .= chr($_);
 	}
-	write_file("test".($levels+1).".prj", "");
+	write_file("test".($levels+1).".lst", "");
 
 	z80asm(
-		options	=> "-b -otest.bin \@test.prj",
+		options	=> "-b -otest.bin \@test.lst",
 		bin		=> $bin,
 	);
 }
@@ -516,24 +518,77 @@ ASM
 );
 
 #------------------------------------------------------------------------------
-# BUG_0049: Making a library with -d and 512 object files fails - Too many open files
+# BUG_0049: Making a library with -d and 512 (win32) object files fails - Too many open files
+# limits very per OS:
+# 509 files - when compiled with Visual Studio on Win32
+# 3197 files - when compiled with gcc on Cygwin on Win32
+# 2045 files - when compiled with gcc on Linux Subsystem for Windows
+# 1021 files - when compiled with gcc on Ubuntu
 note "BUG_0049";
 {
+	# build asm files
 	my @list;
-	my %args;
-	for (1..512) {
-		my $id = sprintf("%03d", $_);
-		unlink("test$id.asm", "test$id.obj", "test$id.bin");
+	my $bin = "";
+	for my $n (1..4096) {
+		my $id = sprintf("%04d", $n);
+		unlink("test$id.obj", "test$id.bin", "test$id.err");
+		path("test$id.asm")->spew(<<END);
+			public lbl$id
+			defw $n
+			defc lbl$id = $n
+END
 		push @list, "test$id";
-		$args{"asm$id"} = "defw $_ ;; ".sprintf("%02X %02X", $_ & 255, $_ >> 8);
+		
+		$bin .= pack("v", $n);
 	}
-	write_file("test.prj", join("\n", @list), "\n");
 	
-	# assemble all first
-	z80asm( %args, options => '-b @test.prj' );
+	# assemble
+	unlink 'test0001.bin';
+	write_file("test.lst", join("\n", @list), "\n");
+	my $cmd = './z80asm -b @test.lst';
+	ok 1, $cmd;
+	my($out, $err, $ret) = capture { system $cmd; };
+	is $out, "";
+	is $err, "";
+	is $ret, 0;
+	test_binfile('test0001.bin', $bin);
 	
-	# assemble all with -d, make lib - failed with too many open files
-	z80asm( %args, options => '-d -b @test.prj' );
+	# link only
+	unlink 'test0001.bin';
+	for (@list) { unlink "$_.asm"; }
+	ok 1, $cmd;
+	($out, $err, $ret) = capture { system $cmd; };
+	is $out, "";
+	is $err, "";
+	is $ret, 0;
+	test_binfile('test0001.bin', $bin);
+	
+	# make library
+	unlink 'test.lib';
+	$cmd = './z80asm -b -xtest @test.lst';
+	ok 1, $cmd;
+	($out, $err, $ret) = capture { system $cmd; };
+	is $out, "";
+	is $err, "";
+	is $ret, 0;
+	ok -f 'test.lib';
+	
+	# use library
+	unlink 'test.bin';
+	path('test.asm')->spew(<<'END');
+	extern lbl1234;
+	defw lbl1234;
+END
+	$cmd = './z80asm -b -itest test.asm';
+	ok 1, $cmd;
+	($out, $err, $ret) = capture { system $cmd; };
+	is $out, "";
+	is $err, "";
+	is $ret, 0;
+	test_binfile('test.bin', pack("v*", 1234, 1234));
+
+	# delete test files
+	for ('test', @list) { unlink "$_.asm", "$_.obj", "$_.bin", "$_.err", "$_.lib"; }
 }
 
 #------------------------------------------------------------------------------

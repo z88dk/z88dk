@@ -170,6 +170,7 @@ sub unlink_temp {
 	push @temp, 
 		grep { -f $_ }
 		grep {/^ test .* \. (?: asm |
+								lst |
 								lis |
 								inc |
 								bin |
