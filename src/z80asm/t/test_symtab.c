@@ -210,6 +210,8 @@ static void test_symtab( void )
 	remove_all_global_syms();
 	dump_symtab();
 	
+	list_close(FALSE);
+
 	warn("End\n");	
 
 }
