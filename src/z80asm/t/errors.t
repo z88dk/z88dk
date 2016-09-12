@@ -564,6 +564,7 @@ t_compile_module($init, <<'END', $objs);
 	
 	open_error_file("test2.err");
 	error_syntax();
+	close_error_file();
 	
 END
 
