@@ -41,9 +41,10 @@ include "clib_target_constants.inc"
 
 
 
+IF (__crt_enable_streams & 0x1)
+   
 
-
-
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
@@ -167,10 +168,33 @@ include "clib_target_constants.inc"
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ELSE
+IF (__crt_enable_streams & 0xfffe)
+   
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; FILE ABSENT
+   ; fd   : 0
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ; empty fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw 0
+   
+   ; FDSTRUCT structure
+   
+   defc __i_fcntl_fdstruct_0 = 0
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ENDIF
+ENDIF
 
+IF (__crt_enable_streams & 0x2)
+   
 
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
@@ -281,8 +305,31 @@ include "clib_target_constants.inc"
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ELSE
+IF (__crt_enable_streams & 0xfffc)
+   
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; FILE ABSENT
+   ; fd   : 1
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ; empty fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw 0
+   
+   ; FDSTRUCT structure
+   
+   defc __i_fcntl_fdstruct_1 = 0
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ENDIF
+ENDIF
+
+IF (__crt_enable_streams & 0x4)
+      
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; DUPED FILE DESCRIPTOR
    ;
@@ -354,10 +401,33 @@ include "clib_target_constants.inc"
 
       
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ELSE
+IF (__crt_enable_streams & 0xfff8)
+   
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; FILE ABSENT
+   ; fd   : 2
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ; empty fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw 0
+   
+   ; FDSTRUCT structure
+   
+   defc __i_fcntl_fdstruct_2 = 0
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ENDIF
+ENDIF
 
+IF (__crt_enable_streams & 0x8)
+   
 
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdrdr
    ;
@@ -468,10 +538,33 @@ include "clib_target_constants.inc"
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ELSE
+IF (__crt_enable_streams & 0xfff0)
+   
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; FILE ABSENT
+   ; fd   : 3
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ; empty fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw 0
+   
+   ; FDSTRUCT structure
+   
+   defc __i_fcntl_fdstruct_3 = 0
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ENDIF
+ENDIF
 
+IF (__crt_enable_streams & 0x10)
+   
 
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdpun
    ;
@@ -582,10 +675,33 @@ include "clib_target_constants.inc"
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ELSE
+IF (__crt_enable_streams & 0xffe0)
+   
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; FILE ABSENT
+   ; fd   : 4
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   ; empty fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw 0
+   
+   ; FDSTRUCT structure
+   
+   defc __i_fcntl_fdstruct_4 = 0
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ENDIF
+ENDIF
 
+IF (__crt_enable_streams & 0x20)
+   
 
+   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdlst
    ;
@@ -696,6 +812,28 @@ include "clib_target_constants.inc"
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+ELSE
+IF (__crt_enable_streams & 0xffc0)
+   
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ; FILE ABSENT
+   ; fd   : 5
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   ; empty fd table entry
+   
+   SECTION data_fcntl_fdtable_body
+   defw 0
+   
+   ; FDSTRUCT structure
+   
+   defc __i_fcntl_fdstruct_5 = 0
+   
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ENDIF
+ENDIF
 
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1119,7 +1257,7 @@ SECTION code_crt_return
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0xe)
+IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
    SECTION BSS_UNINITIALIZED
    __sp_or_ret:  defw 0

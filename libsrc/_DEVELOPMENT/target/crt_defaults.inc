@@ -16,7 +16,9 @@
    
    defc DEF__crt_initialize_bss        = 0       ;; generate code to initialize bss section at startup (only applicable if ram model in use)
    
-   defc DEF__crt_include_preamble       = 0      ;; if non-zero, user supplies code in file "crt_preamble.asm" that is inserted at the start of the binary
+   defc DEF__crt_include_preamble      = 0       ;; if non-zero, user supplies code in file "crt_preamble.asm" that is inserted at the start of the binary
+   
+   defc DEF__crt_enable_streams        = 0x7     ;; set bit enables stream, stdin/stdout/stderr enabled
    
    defc DEF__crt_enable_commandline    = 2       ;; generate argc and argv from command line (targets without command line will get argc=1, argv[0]="", argv[1]=NULL)
    defc DEF__crt_enable_restart        = 0       ;; if non-zero, restart the program on exit (correct initialization of static variables with rom models only)

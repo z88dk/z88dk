@@ -55,7 +55,8 @@ dnl#include(../../m4_file_dup.m4)dnl
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(../../m4_file_absent.m4)dnl
+dnl#include(`../../m4_file_absent.m4')dnl
+dnl#include(`../../m4_file_absent_ifelse.m4')dnl
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -64,23 +65,65 @@ dnl
 
 include(../../clib_instantiate_begin.m4)
 
-include(../driver/terminal/cpm_00_input_cons.m4)
-m4_cpm_00_input_cons(_stdin, 0x0100, 64)
+IF (__crt_enable_streams & 0x1)
+   include(../driver/terminal/cpm_00_input_cons.m4)
+   m4_cpm_00_input_cons(_stdin, 0x0100, 64)
+ELSE
+IF (__crt_enable_streams & 0xfffe)
+   include(`../../m4_file_absent_ifelse.m4')
+   m4_file_absent_ifelse
+ENDIF
+ENDIF
 
-include(../driver/terminal/cpm_00_output_cons.m4)
-m4_cpm_00_output_cons(_stdout, 0x0010)
+IF (__crt_enable_streams & 0x2)
+   include(../driver/terminal/cpm_00_output_cons.m4)
+   m4_cpm_00_output_cons(_stdout, 0x0010)
+ELSE
+IF (__crt_enable_streams & 0xfffc)
+   include(`../../m4_file_absent_ifelse.m4')
+   m4_file_absent_ifelse
+ENDIF
+ENDIF
 
-include(../../m4_file_dup.m4)dnl
-m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+IF (__crt_enable_streams & 0x4)
+   include(../../m4_file_dup.m4)dnl
+   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
+ELSE
+IF (__crt_enable_streams & 0xfff8)
+   include(`../../m4_file_absent_ifelse.m4')
+   m4_file_absent_ifelse
+ENDIF
+ENDIF
 
-include(../driver/character/cpm_00_input_reader.m4)
-m4_cpm_00_input_reader(_stdrdr, 0x0100)
+IF (__crt_enable_streams & 0x8)
+   include(../driver/character/cpm_00_input_reader.m4)
+   m4_cpm_00_input_reader(_stdrdr, 0x0100)
+ELSE
+IF (__crt_enable_streams & 0xfff0)
+   include(`../../m4_file_absent_ifelse.m4')
+   m4_file_absent_ifelse
+ENDIF
+ENDIF
 
-include(../driver/character/cpm_00_output_punch.m4)
-m4_cpm_00_output_punch(_stdpun, 0x0010)
+IF (__crt_enable_streams & 0x10)
+   include(../driver/character/cpm_00_output_punch.m4)
+   m4_cpm_00_output_punch(_stdpun, 0x0010)
+ELSE
+IF (__crt_enable_streams & 0xffe0)
+   include(`../../m4_file_absent_ifelse.m4')
+   m4_file_absent_ifelse
+ENDIF
+ENDIF
 
-include(../driver/character/cpm_00_output_list.m4)
-m4_cpm_00_output_list(_stdlst, 0x0010)
+IF (__crt_enable_streams & 0x20)
+   include(../driver/character/cpm_00_output_list.m4)
+   m4_cpm_00_output_list(_stdlst, 0x0010)
+ELSE
+IF (__crt_enable_streams & 0xffc0)
+   include(`../../m4_file_absent_ifelse.m4')
+   m4_file_absent_ifelse
+ENDIF
+ENDIF
 
 include(../../clib_instantiate_end.m4)
 

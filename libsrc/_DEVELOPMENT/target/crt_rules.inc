@@ -161,7 +161,7 @@
    
    ELSE
    
-      IFDEF TAR__crt_enable_preamble
+      IFDEF TAR__crt_include_preamble
       
          defc __crt_include_preamble = TAR__crt_include_preamble
       
@@ -172,7 +172,26 @@
       ENDIF
       
    ENDIF
+
+
+   IFDEF CRT_ENABLE_STREAMS
    
+      defc __crt_enable_streams = CRT_ENABLE_STREAMS
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_streams
+      
+         defc __crt_enable_streams = TAR__crt_enable_streams
+      
+      ELSE
+      
+         defc __crt_enable_streams = DEF__crt_enable_streams
+      
+      ENDIF
+      
+   ENDIF
+
    
    IFDEF CRT_ENABLE_COMMANDLINE
    
