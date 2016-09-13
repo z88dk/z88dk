@@ -68,11 +68,11 @@ extern void __LIB__ BIFROSTH_stop(void);
 
 #ifdef __SDCC
 
-   __at (64993) unsigned char BIFROSTH_isr[2];
+   __at (64993) static unsigned char BIFROSTH_isr[2];
    
 #else
 
-   unsigned char BIFROSTH_isr[2] @ (64993);
+   // static unsigned char BIFROSTH_isr[2] @ (64993);
    
 #endif
 

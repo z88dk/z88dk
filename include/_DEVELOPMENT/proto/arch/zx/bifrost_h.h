@@ -62,11 +62,11 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROSTH_stop,void)
 
 #ifdef __SDCC
 
-   __at (64993) unsigned char BIFROSTH_isr[2];
+   __at (64993) static unsigned char BIFROSTH_isr[2];
    
 #else
 
-   unsigned char BIFROSTH_isr[2] @ (64993);
+   // static unsigned char BIFROSTH_isr[2] @ (64993);
    
 #endif
 

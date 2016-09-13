@@ -68,11 +68,11 @@ extern void __LIB__ BIFROSTL_stop(void);
 
 #ifdef __SDCC
 
-   __at (64993) unsigned char BIFROSTL_isr[2];
+   __at (64993) static unsigned char BIFROSTL_isr[2];
    
 #else
 
-   unsigned char BIFROSTL_isr[2] @ (64993);
+   // static unsigned char BIFROSTL_isr[2] @ (64993);
    
 #endif
 

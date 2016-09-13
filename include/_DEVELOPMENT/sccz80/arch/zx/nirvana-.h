@@ -58,11 +58,11 @@ extern void __LIB__ NIRVANAM_stop(void);
 
 #ifdef __SDCC
 
-   __at (57670+332*NIRVANAM_TOTAL_ROWS) unsigned char NIRVANAM_isr[3];
+   __at (57670+332*NIRVANAM_TOTAL_ROWS) static unsigned char NIRVANAM_isr[3];
    
 #else
 
-   unsigned char NIRVANAM_isr[3] @ (57670+332*NIRVANAM_TOTAL_ROWS);
+   // static unsigned char NIRVANAM_isr[3] @ (57670+332*NIRVANAM_TOTAL_ROWS);
    
 #endif
 
