@@ -22440,7 +22440,7 @@ replace restart {
 	res	%1,(hl)
 	ld	a,(hl)
 	; peephole z88dk-448a
-} if notUsed('hl')
+} if notUsed('hl'), operandsNotRelated(%2 'bc'), operandsNotRelated(%2 'de'), operandsNotRelated(%2 'hl')
 
 replace restart {
 	ld	a,(%2)
@@ -22451,7 +22451,7 @@ replace restart {
 	set	%1,(hl)
 	ld	a,(hl)
 	; peephole z88dk-448b
-} if notUsed('hl')
+} if notUsed('hl'), operandsNotRelated(%2 'bc'), operandsNotRelated(%2 'de'), operandsNotRelated(%2 'hl')
 
 replace restart {
 	ld	a,(%2)
@@ -22462,7 +22462,7 @@ replace restart {
 	bit	%1,(hl)
 	ld	a,(hl)
 	; peephole z88dk-448c
-} if notUsed('hl')
+} if notUsed('hl'), operandsNotRelated(%2 'bc'), operandsNotRelated(%2 'de'), operandsNotRelated(%2 'hl')
 
 replace restart {
 	ld	a,(%2 + %3)
