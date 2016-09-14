@@ -4,16 +4,24 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
+; void NIRVANAP_drawW_raw(unsigned int tile, unsigned int lin, unsigned int col)
+; callee
+
 SECTION code_clib
 SECTION code_nirvanap
 
-PUBLIC asm_NIRVANAP_drawW
+PUBLIC _NIRVANAP_drawW_raw_callee
 
 EXTERN asm_NIRVANAP_drawW_raw
 
-asm_NIRVANAP_drawW:
+_NIRVANAP_drawW_raw_callee:
 
-   di
-   call asm_NIRVANAP_drawW_raw
-   ei
-   ret
+	pop hl          ; RET address
+	pop de          ; tile
+	ld a,e
+	pop de          ; lin
+	ld d,e
+	ex (sp),hl      ; col
+	ld e,l
+
+	jp asm_NIRVANAP_drawW_raw

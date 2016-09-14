@@ -1,8 +1,11 @@
 arch/zx/nirvanap/z80/asm_NIRVANAP_chars
 arch/zx/nirvanap/z80/asm_NIRVANAP_drawT
+arch/zx/nirvanap/z80/asm_NIRVANAP_drawT_raw
 arch/zx/nirvanap/z80/asm_NIRVANAP_drawW
+arch/zx/nirvanap/z80/asm_NIRVANAP_drawW_raw
 arch/zx/nirvanap/z80/asm_NIRVANAP_fillC
 arch/zx/nirvanap/z80/asm_NIRVANAP_fillT
+arch/zx/nirvanap/z80/asm_NIRVANAP_fillT_raw
 arch/zx/nirvanap/z80/asm_NIRVANAP_paintC
 arch/zx/nirvanap/z80/asm_NIRVANAP_printC
 arch/zx/nirvanap/z80/asm_NIRVANAP_spriteT

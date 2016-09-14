@@ -73,6 +73,7 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAP_stop,void)
 // ----------------------------------------------------------------
 
 __DPROTO(,,void,,NIRVANAP_drawT,unsigned int tile,unsigned int lin,unsigned int col)
+__DPROTO(,,void,,NIRVANAP_drawT_raw,unsigned int tile,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Instantly change the attributes in a tile area (16x16 pixels) to
@@ -89,6 +90,7 @@ __DPROTO(,,void,,NIRVANAP_drawT,unsigned int tile,unsigned int lin,unsigned int 
 // ----------------------------------------------------------------
 
 __DPROTO(,,void,,NIRVANAP_fillT,unsigned int attr,unsigned int lin,unsigned int col)
+__DPROTO(,,void,,NIRVANAP_fillT_raw,unsigned int attr,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Instantly print a 8x8 character at specified position, afterwards
@@ -170,6 +172,7 @@ __DPROTO(,,void,,NIRVANAP_spriteT,unsigned int sprite,unsigned int tile,unsigned
 // ----------------------------------------------------------------
 
 __DPROTO(,,void,,NIRVANAP_drawW,unsigned int tile,unsigned int lin,unsigned int col)
+__DPROTO(,,void,,NIRVANAP_drawW_raw,unsigned int tile,unsigned int lin,unsigned int col)
 
 // ----------------------------------------------------------------
 // Reconfigure NIRVANA ENGINE to read bicolor tiles (16x16 pixels)

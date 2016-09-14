@@ -4,16 +4,24 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
+; void NIRVANAP_fillT_raw(unsigned int attr, unsigned int lin, unsigned int col)
+; callee
+
 SECTION code_clib
 SECTION code_nirvanap
 
-PUBLIC asm_NIRVANAP_fillT
+PUBLIC _NIRVANAP_fillT_raw_callee
 
 EXTERN asm_NIRVANAP_fillT_raw
 
-asm_NIRVANAP_fillT:
+_NIRVANAP_fillT_raw_callee:
 
-   di
-   call asm_NIRVANAP_fillT_raw
-   ei
-   ret
+	pop hl          ; RET address
+	pop de          ; attr
+	ld a,e
+	pop de          ; lin
+	ld d,e
+	ex (sp),hl      ; col
+	ld e,l
+
+	jp asm_NIRVANAP_fillT_raw

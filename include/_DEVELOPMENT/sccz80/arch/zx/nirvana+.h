@@ -83,6 +83,11 @@ extern void __LIB__ __CALLEE__ NIRVANAP_drawT_callee(unsigned int tile,unsigned 
 #define NIRVANAP_drawT(a,b,c) NIRVANAP_drawT_callee(a,b,c)
 
 
+extern void __LIB__ NIRVANAP_drawT_raw(unsigned int tile,unsigned int lin,unsigned int col);
+extern void __LIB__ __CALLEE__ NIRVANAP_drawT_raw_callee(unsigned int tile,unsigned int lin,unsigned int col);
+#define NIRVANAP_drawT_raw(a,b,c) NIRVANAP_drawT_raw_callee(a,b,c)
+
+
 
 // ----------------------------------------------------------------
 // Instantly change the attributes in a tile area (16x16 pixels) to
@@ -101,6 +106,11 @@ extern void __LIB__ __CALLEE__ NIRVANAP_drawT_callee(unsigned int tile,unsigned 
 extern void __LIB__ NIRVANAP_fillT(unsigned int attr,unsigned int lin,unsigned int col);
 extern void __LIB__ __CALLEE__ NIRVANAP_fillT_callee(unsigned int attr,unsigned int lin,unsigned int col);
 #define NIRVANAP_fillT(a,b,c) NIRVANAP_fillT_callee(a,b,c)
+
+
+extern void __LIB__ NIRVANAP_fillT_raw(unsigned int attr,unsigned int lin,unsigned int col);
+extern void __LIB__ __CALLEE__ NIRVANAP_fillT_raw_callee(unsigned int attr,unsigned int lin,unsigned int col);
+#define NIRVANAP_fillT_raw(a,b,c) NIRVANAP_fillT_raw_callee(a,b,c)
 
 
 
@@ -202,6 +212,11 @@ extern void __LIB__ __CALLEE__ NIRVANAP_spriteT_callee(unsigned int sprite,unsig
 extern void __LIB__ NIRVANAP_drawW(unsigned int tile,unsigned int lin,unsigned int col);
 extern void __LIB__ __CALLEE__ NIRVANAP_drawW_callee(unsigned int tile,unsigned int lin,unsigned int col);
 #define NIRVANAP_drawW(a,b,c) NIRVANAP_drawW_callee(a,b,c)
+
+
+extern void __LIB__ NIRVANAP_drawW_raw(unsigned int tile,unsigned int lin,unsigned int col);
+extern void __LIB__ __CALLEE__ NIRVANAP_drawW_raw_callee(unsigned int tile,unsigned int lin,unsigned int col);
+#define NIRVANAP_drawW_raw(a,b,c) NIRVANAP_drawW_raw_callee(a,b,c)
 
 
 

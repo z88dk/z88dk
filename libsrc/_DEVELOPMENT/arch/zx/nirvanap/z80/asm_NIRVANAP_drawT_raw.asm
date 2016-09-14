@@ -7,13 +7,6 @@
 SECTION code_clib
 SECTION code_nirvanap
 
-PUBLIC asm_NIRVANAP_fillT
+PUBLIC asm_NIRVANAP_drawT_raw
 
-EXTERN asm_NIRVANAP_fillT_raw
-
-asm_NIRVANAP_fillT:
-
-   di
-   call asm_NIRVANAP_fillT_raw
-   ei
-   ret
+defc asm_NIRVANAP_drawT_raw = 64262   ; execute 'NIRVANAP_drawT'
