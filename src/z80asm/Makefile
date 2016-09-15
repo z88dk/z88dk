@@ -9,7 +9,7 @@
 ifeq ($(OS),Windows_NT)
   EXE 		:= .exe
 else
-  EXE 		:= 
+  EXE 		:= $(EXESUFFIX)
 endif
 
 CC 			?= gcc
