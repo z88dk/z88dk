@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.165 2016-09-08 03:58:24 aralbrec Exp $
+ *      $Id: zcc.c,v 1.166 2016-09-15 04:44:22 aralbrec Exp $
  */
 
 
@@ -313,11 +313,11 @@ static arg_t  config[] = {
     {"SDCCOPT2", 0, SetStringConfig, &c_sdccopt2, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.2"},
     {"SDCCOPT3", 0, SetStringConfig, &c_sdccopt3, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.3"},
     {"SDCCOPT9", 0, SetStringConfig, &c_sdccopt9, NULL, "", "DESTDIR/libsrc/_DEVELOPMENT/sdcc_opt.9"},
-    {"SDCCPEEP0", 0, SetStringConfig, &c_sdccpeeph0, NULL, "", " --no-peep"},
+    {"SDCCPEEP0", 0, SetStringConfig, &c_sdccpeeph0, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.0"},
     {"SDCCPEEP1", 0, SetStringConfig, &c_sdccpeeph1, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.1"},
     {"SDCCPEEP2", 0, SetStringConfig, &c_sdccpeeph2, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.2"},
     {"SDCCPEEP3", 0, SetStringConfig, &c_sdccpeeph3, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph.3"},
-    {"SDCCOPTSZ0", 0, SetStringConfig, &c_sdccpeeph0cs, NULL, "", " --no-peep"},
+    {"SDCCOPTSZ0", 0, SetStringConfig, &c_sdccpeeph0cs, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.0"},
     {"SDCCOPTSZ1", 0, SetStringConfig, &c_sdccpeeph1cs, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.1"},
     {"SDCCOPTSZ2", 0, SetStringConfig, &c_sdccpeeph2cs, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.2"},
     {"SDCCOPTSZ3", 0, SetStringConfig, &c_sdccpeeph3cs, NULL, "", " --no-peep --peep-file DESTDIR/libsrc/_DEVELOPMENT/sdcc_peeph_cs.3"},
