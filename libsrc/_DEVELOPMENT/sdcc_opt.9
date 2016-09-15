@@ -3,12 +3,10 @@
 ;; sdcc bugfixes
 ;;
 
-	jp  ____sdcc_z80_pop_ei
+%"[ \t]*"0jp%"[ \t]+"1____sdcc_z80_pop_ei
 =
-	call	____sdcc_z80_pop_ei
-	ret
+	jp	____sdcc_z80_pop_ei_jp
 
-	jp	____sdcc_z80_pop_ei
+%"[ \t]*"0jp%"[ \tNZCMPOE]+"1,%"[ \t]*"2____sdcc_z80_pop_ei
 =
-	call	____sdcc_z80_pop_ei
-	ret
+	jp%1, ____sdcc_z80_pop_ei_jp
