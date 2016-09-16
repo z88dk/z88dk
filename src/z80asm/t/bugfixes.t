@@ -552,7 +552,7 @@ END
 	is $err, "";
 	is $ret, 0;
 	test_binfile('test0001.bin', $bin);
-	
+
 	# link only
 	unlink 'test0001.bin';
 	for (@list) { unlink "$_.asm"; }

@@ -4,6 +4,11 @@ Z88DK Z80 Module Assembler Change Log
 2016
 ----
 
+- 2016-09-16
+
+  Remove -e, --asm-ext option. The asm file can have any extension. If the input
+  file does not exist, ".asm" is appended and checked again.
+  
 - 2016-09-04
 
   Change handling of input files to make it more predictable:

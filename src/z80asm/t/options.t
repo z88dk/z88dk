@@ -72,7 +72,7 @@ Usage:
   one module per line.
 
   File types recognized or created by z80asm:
-    .asm = source file (default), or alternative -e<ext>
+    .asm = source file
     .obj = object file (default), or alternative -M<ext>
     .lis = list file
     .bin = Z80 binary file
@@ -87,7 +87,6 @@ Help Options:
   -v, --verbose          Be verbose
 
 Input / Output File Options:
-  -e, --asm-ext=EXT      Assembly file extension excluding '.'
   -M, --obj-ext=EXT      Object file extension excluding '.'
   -o, --output=FILE      Output binary file
 
@@ -207,47 +206,26 @@ Error: source filename missing
 ERR
 
 #------------------------------------------------------------------------------
-# --asm-ext=EXT, -eEXT
+# asm extension
 #------------------------------------------------------------------------------
-my $base = asm_file(); $base =~ s/\.\w+$//;
-
-unlink_testfiles();
-write_file(asm_file(), "ret");
-t_z80asm_capture("-b ".$base, "", "", 0);
-is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
-
-for my $options ('-exxx', '-e=xxx', '--asm-extxxx', '--asm-ext=xxx') {
+for my $file ('test', 'test.asm') {
 	unlink_testfiles();
-	write_file($base.".xxx", "ret");
-	
-	# file is only base name
-	t_z80asm_capture("-b $options $base", "", "", 0);
-	is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
-	
-	# file has extension
-	t_z80asm_capture("-b $options $base.xxx", "", "", 0);
+	write_file('test.asm', "ret");
+	t_z80asm_capture("-b $file", "", "", 0);
 	is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 }
 
-unlink_testfiles($base.".xxx");
+unlink_testfiles();
+write_file('test.xxx', "ret");
+t_z80asm_capture("-b test.xxx", "", "", 0);
+is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 
-# check no arguments
-t_z80asm_capture("-e", 	"", 	<<'ERR', 1);
-Error: illegal option '-e'
-Error: source filename missing
-2 errors occurred during assembly
-ERR
-
-t_z80asm_capture("--asm-ext", 	"", 	<<'ERR', 1);
-Error: illegal option '--asm-ext'
-Error: source filename missing
-2 errors occurred during assembly
-ERR
+unlink_testfiles('test.xxx');
 
 #------------------------------------------------------------------------------
 # --obj-ext=EXT, -MEXT
 #------------------------------------------------------------------------------
-$base = asm_file(); $base =~ s/\.\w+$//;
+my $base = asm_file(); $base =~ s/\.\w+$//;
 
 unlink_testfiles();
 write_file(asm_file(), "ret");

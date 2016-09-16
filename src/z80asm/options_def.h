@@ -34,7 +34,6 @@ OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
 
 OPT_VAR( int, 		cpu,		CPU_Z80	)
 
-OPT_VAR( char *,	asm_ext,	( FILEEXT_ASM ) + 1 )	/* skip "." */
 OPT_VAR( char *,	obj_ext,	( FILEEXT_OBJ ) + 1 )	/* skip "." */
 OPT_VAR( char *,	bin_file,	NULL	)	/* set by -o */
 OPT_VAR( char *,	lib_file,	NULL	)	/* set by -x */
@@ -60,7 +59,6 @@ OPT(OptCall, exit_help, "-h", "--help", "Show help options", "")
 OPT(OptSet, &opts.verbose, "-v", "--verbose", "Be verbose", "")
 
 OPT_TITLE("Input / Output File Options:")
-OPT(OptString, &opts.asm_ext, "-e", "--asm-ext", "Assembly file extension excluding '" FILEEXT_SEPARATOR "'", "EXT")
 OPT(OptString, &opts.obj_ext, "-M", "--obj-ext", "Object file extension excluding '" FILEEXT_SEPARATOR "'", "EXT")
 OPT(OptString, &opts.bin_file, "-o", "--output", "Output binary file", "FILE")
 

@@ -341,16 +341,13 @@ static void exit_help( void )
     puts( "" );
     puts( "  [] = optional, {} = may be repeated, | = OR clause." );
     puts( "" );
-    printf( "  To assemble 'fred%s%s' use 'fred' or 'fred%s%s'\n",
-            FILEEXT_SEPARATOR, opts.asm_ext,
-            FILEEXT_SEPARATOR, opts.asm_ext );
+	printf("  To assemble 'fred%s' use 'fred' or 'fred%s'\n", FILEEXT_ASM, FILEEXT_ASM);
     puts( "" );
     puts( "  <modulefile> contains list of file names of all modules to be linked," );
     puts( "  one module per line." );
     puts( "" );
     puts( "  File types recognized or created by z80asm:" );
-    printf( "    %s%s = source file (default), or alternative -e<ext>\n",
-            FILEEXT_SEPARATOR, opts.asm_ext );
+	printf("    %s = source file\n", FILEEXT_ASM);
     printf( "    %s%s = object file (default), or alternative -M<ext>\n",
             FILEEXT_SEPARATOR, opts.obj_ext );
     printf( "    %s = list file\n", FILEEXT_LIST );
@@ -515,7 +512,7 @@ char *get_reloc_filename(char *filename)
 
 char *get_asm_filename(char *filename)
 {
-    return get_opts_ext_filename( filename, opts.asm_ext );
+	return path_replace_ext(filename, FILEEXT_ASM);
 }
 
 char *get_obj_filename( char *filename )

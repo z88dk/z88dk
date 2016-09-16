@@ -590,7 +590,7 @@ sub assemble_file {
 	close $fh;
 	
 	# assemble, translate error messages
-	my @cmd = ('z80asm', @OPTIONS, '-ei', $i_file);
+	my @cmd = ('z80asm', @OPTIONS, $i_file);
 	print "@cmd\n";
 	$cmd[0] = $FindBin::Bin.'/z80asm';
 	my ($stdout, $stderr, $exit) = capture {

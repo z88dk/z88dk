@@ -52,8 +52,7 @@ static void do_assemble( char *src_filename );
 /*-----------------------------------------------------------------------------
 *   Assemble one source file
 *	- if a .o file is given, and it exists, it is used without trying to assemble first
-*	- if the given file exists, whatever the extension, try to assembly it,
-*	  i.e. there is no more the need to pass -eopt to assemble .opt files.
+*	- if the given file exists, whatever the extension, try to assembly it
 *	- if all above fail, try to replace/append the .asm extension and assemble
 *	- if all above fail, try to replace/append the .o extension and link
 *----------------------------------------------------------------------------*/
