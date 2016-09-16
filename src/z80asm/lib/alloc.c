@@ -119,7 +119,7 @@ DEFINE_dtor_module()
 		/* skip memory leak warning if declared to destroy at exit */
 		if ( ! block->flags.destroy_atextit )
 			log_warn("memory leak (%u bytes) allocated at %s:%d",
-					 block->client_size, block->file ? block->file : "(null)", block->lineno );
+					 (unsigned)block->client_size, block->file ? block->file : "(null)", block->lineno );
 
 		/* delete from g_mem_blocks */
         memptr = CLIENT_PTR(block);
@@ -150,7 +150,7 @@ static MemBlock *new_block( size_t client_size, char *file, int lineno )
 
     block = malloc( block_size );
 	check( block, 
-		   "memory alloc (%u bytes) failed at %s:%d", client_size, file, lineno );
+		   "memory alloc (%u bytes) failed at %s:%d", (unsigned)client_size, file, lineno );
 
     /* init block */
     block->signature   = MEMBLOCK_SIGN;
@@ -294,7 +294,7 @@ void *m_realloc_( void *memptr, size_t size, char *file, int lineno )
 
     /* find the block */
     block = find_block( memptr, file, lineno );
-	check( block, "memory realloc (%u bytes) failed at %s:%d", size, file, lineno );
+	check( block, "memory realloc (%u bytes) failed at %s:%d", (unsigned)size, file, lineno );
 
     /* delete from list as realloc may move block */
 	next_block = block->next;		/* remember position */
@@ -302,11 +302,11 @@ void *m_realloc_( void *memptr, size_t size, char *file, int lineno )
 
     /* check fences */
     result = check_fences( block );
-	check( result, "memory realloc (%u bytes) failed at %s:%d", size, file, lineno );
+	check( result, "memory realloc (%u bytes) failed at %s:%d", (unsigned)size, file, lineno );
 
     /* reallocate and create new end fence */
     block = realloc( block, BLOCK_SIZE( size ) );
-	check( block, "memory realloc (%u bytes) failed at %s:%d", size, file, lineno );
+	check( block, "memory realloc (%u bytes) failed at %s:%d", (unsigned)size, file, lineno );
 	
     /* update block */
     block->client_size = size;
