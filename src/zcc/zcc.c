@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.166 2016-09-15 04:44:22 aralbrec Exp $
+ *      $Id: zcc.c,v 1.167 2016-09-16 22:41:28 pauloscustodio Exp $
  */
 
 
@@ -878,7 +878,7 @@ int main(int argc, char **argv)
         CASE_ASMFILE:
         case ASMFILE:
             if (preprocessonly || assembleonly || ((i == 0) && c_nocrt && !compileonly && !makelib)) continue;
-            BuildAsmLine(asmarg, sizeof(asmarg), " -s -easm ");
+            BuildAsmLine(asmarg, sizeof(asmarg), " -s ");
             if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                 exit(1);
             break;
