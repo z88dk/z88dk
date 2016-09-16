@@ -10526,7 +10526,7 @@ replace restart {
 	ld	%1,%2
 	ld	%3,%4
 	; peephole z88dk-333
-} if notSame(%3 %1 %2), notSame(%4 %1 %2), operandsNotRelated(%2 %3)
+} if notSame(%3 %1 %2), notSame(%4 %1 %2), operandsNotRelated(%2 %3), operandsNotRelated(%1 %3)
 // if notVolatile
 
 replace restart {
@@ -18185,7 +18185,7 @@ replace restart {
 	ld	a,%2
 	or	a,%3
 	; peephole z88dk-430a
-}
+} if notSame('a' %2)
 // notVolatile
 
 replace restart {
