@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.167 2016-09-16 22:41:28 pauloscustodio Exp $
+ *      $Id: zcc.c,v 1.168 2016-09-17 14:44:34 pauloscustodio Exp $
  */
 
 
@@ -290,8 +290,8 @@ static arg_t  config[] = {
     {"ZPRAGMAEXE", 0, SetStringConfig, &c_zpragma_exe, NULL, "Name of the zpragma binary"},
 
     {"Z80EXE", 0, SetStringConfig, &c_z80asm_exe, NULL, "Name of the z80asm binary"},
-    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, NULL, "Options for z80asm as linker", "-b -d -m -Mo -LDESTDIR/lib/clibs -IDESTDIR/lib" },
-    {"ASMOPTS", 0, SetStringConfig, &c_asmopts, NULL, "Options for z80asm as assembler", "-Mo -IDESTDIR/lib"},
+    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, NULL, "Options for z80asm as linker", "-b -d -m -LDESTDIR/lib/clibs -IDESTDIR/lib" },
+    {"ASMOPTS", 0, SetStringConfig, &c_asmopts, NULL, "Options for z80asm as assembler", "-IDESTDIR/lib"},
     
     {"COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, NULL, "Name of sccz80 binary (use SCCZ80EXE)"},
     {"SCCZ80EXE", 0, SetStringConfig, &c_sccz80_exe, NULL, "Name of sccz80 binary"},
@@ -516,16 +516,18 @@ int linkthem(char *linker)
     linkargs_mangle(linkargs);
 
     if (makelib) {
-        len = offs = zcc_asprintf(&temp, "%s %s -d -Mo %s -x%s %s",
+        len = offs = zcc_asprintf(&temp, "%s %s -d %s %s -x%s %s",
             linker,
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
+			IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
             linklibs,
             outputfile,
             linkargs);
     } else {
-        len = offs = zcc_asprintf(&temp, "%s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
+        len = offs = zcc_asprintf(&temp, "%s %s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
             linker, 
-            (c_nostdlib == 0) ? c_linkopts : " -b -d -Mo ", 
+            (c_nostdlib == 0) ? c_linkopts : " -b -d ", 
+			IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
             linker_output_separate_arg ? " " : "", 
             outputfile,
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
