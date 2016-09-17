@@ -39,7 +39,7 @@
  *        taken from a previously prepared audio file using the dumb/turbo options).
  * 
  *
- *        $Id: zx.c,v 1.26 2016-06-26 00:46:55 aralbrec Exp $
+ *        $Id: zx.c,v 1.27 2016-09-17 05:09:40 aralbrec Exp $
  */
 
 #include "appmake.h"
@@ -63,6 +63,7 @@ static char              extreme      = 0;
 static char              fast         = 0;
 static char              dumb         = 0;
 static char              noloader     = 0;
+static char              noheader     = 0;
 static unsigned char     parity = 0;
 
 
@@ -90,6 +91,7 @@ option_t zx_options[] = {
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "noloader",  "Don't create the loader block",  OPT_BOOL,  &noloader },
+    {  0,  "noheader",  "Don't create the header", OPT_BOOL, &noheader },
     {  0 , "merge",    "Merge a custom loader from external TAP file",  OPT_STR,   &merge },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0 , "blockname", "Name of the code block in tap file", OPT_STR, &blockname},
@@ -164,9 +166,9 @@ void turbo_one(FILE *fpout)
   int i;
 
   for (i=0; i < tperiod1; i++)
-	fputc (0x20,fpout);
+    fputc (0x20,fpout);
   for (i=0; i < tperiod0; i++)
-	fputc (0xe0,fpout);
+    fputc (0xe0,fpout);
 }
 
 
@@ -176,22 +178,22 @@ void turbo_rawout (FILE *fpout, unsigned char b)
   int i;
 
   if (!b && (extreme)) {
-	  /* if byte is zero then we shortcut to a single bit ! */
-	  // Experimental min limit is 14
-	  //zx_rawbit(fpout, tperiod2);
-	  zx_rawbit(fpout, tperiod1);
-	  //zx_rawbit(fpout, tperiod1);
-	  turbo_one(fpout);
+      /* if byte is zero then we shortcut to a single bit ! */
+      // Experimental min limit is 14
+      //zx_rawbit(fpout, tperiod2);
+      zx_rawbit(fpout, tperiod1);
+      //zx_rawbit(fpout, tperiod1);
+      turbo_one(fpout);
   } else {
-	  for (i=0; i < 8; i++)
-	  {
-		if (b & c[i])
-		  // Experimental min limit is 7
-		  //zx_rawbit(fpout, tperiod1);
-		  turbo_one(fpout);
-		else
-		  zx_rawbit(fpout, tperiod0);
-	  }
+      for (i=0; i < 8; i++)
+      {
+        if (b & c[i])
+          // Experimental min limit is 7
+          //zx_rawbit(fpout, tperiod1);
+          turbo_one(fpout);
+        else
+          zx_rawbit(fpout, tperiod0);
+      }
   }
 }
 
@@ -215,7 +217,7 @@ int zx_exec(char *target)
     unsigned char * loader;
     int		loader_len;
 
-		
+        
     if ( help )
         return -1;
 
@@ -223,422 +225,425 @@ int zx_exec(char *target)
         return -1;
     }
 
-	loader = turbo_loader;
-	loader_len = sizeof(turbo_loader);
+    loader = turbo_loader;
+    loader_len = sizeof(turbo_loader);
 
-	if (extreme)  {
-		//loader = xtreme_loader;
-		//loader_len = sizeof(xtreme_loader);
-		turbo=TRUE;
-		//fast=TRUE;
-	}
+    if (extreme)  {
+        //loader = xtreme_loader;
+        //loader_len = sizeof(xtreme_loader);
+        turbo=TRUE;
+        //fast=TRUE;
+    }
 
-	if (turbo)  {
-		audio = TRUE;
-		fprintf(stderr,"WARNING: 'tap' file in turbo mode is inconsistent, use the WAV audio file.\n");
-	}
-
-
-	if ((patchpos >=0) && (patchpos < loader_len) && (patchdata != NULL)) {
-		i=0;
-		fprintf(stderr,"Patching the turbo loader at position %u: ",patchpos);
-		while (patchdata[i]) {
-			if (i&1) {
-				c+=hexdigit(patchdata[i]);
-				loader[patchpos]=(unsigned char)c;
-				fprintf(stderr,"$%x ",c);
-				patchpos++;
-			} else {
-				c=16*hexdigit(patchdata[i]);
-			}
-			i++;
-		}
-		fprintf(stderr," (%i bytes)\n",i/2);
-		
-	}
-
-	if (dumb) {
-		strcpy(filename,binname);
-		if (turbo) fprintf(stderr,"WARNING: turbo option in dumb mode requires extra editing of the wav file.\n");
-		
-	} else {
-		if ( outfile == NULL ) {
-			strcpy(filename,binname);
-			suffix_change(filename,".tap");
-		} else {
-			strcpy(filename,outfile);
-		}
-
-		if ( blockname == NULL )
-			blockname = binname;
-		
-		
-		if ( strcmp(binname,filename) == 0 ) {
-			fprintf(stderr,"Input and output file names must be different\n");
-			myexit(NULL,1);
-		}
+    if (turbo)  {
+        audio = TRUE;
+        fprintf(stderr,"WARNING: 'tap' file in turbo mode is inconsistent, use the WAV audio file.\n");
+    }
 
 
-		if ( origin != -1 ) {
-			pos = origin;
-		} else {			
-			if ( (pos = get_org_addr(crtfile)) == -1 ) {
-					myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
-				}
-		}
+    if ((patchpos >=0) && (patchpos < loader_len) && (patchdata != NULL)) {
+        i=0;
+        fprintf(stderr,"Patching the turbo loader at position %u: ",patchpos);
+        while (patchdata[i]) {
+            if (i&1) {
+                c+=hexdigit(patchdata[i]);
+                loader[patchpos]=(unsigned char)c;
+                fprintf(stderr,"$%x ",c);
+                patchpos++;
+            } else {
+                c=16*hexdigit(patchdata[i]);
+            }
+            i++;
+        }
+        fprintf(stderr," (%i bytes)\n",i/2);
+        
+    }
+
+    if (dumb) {
+        strcpy(filename,binname);
+        if (turbo) fprintf(stderr,"WARNING: turbo option in dumb mode requires extra editing of the wav file.\n");
+        
+    } else {
+        if ( outfile == NULL ) {
+            strcpy(filename,binname);
+            suffix_change(filename,".tap");
+        } else {
+            strcpy(filename,outfile);
+        }
+
+        if ( blockname == NULL )
+            blockname = binname;
+        
+        
+        if ( strcmp(binname,filename) == 0 ) {
+            fprintf(stderr,"Input and output file names must be different\n");
+            myexit(NULL,1);
+        }
 
 
-		if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
-			fprintf(stderr,"Can't open input file %s\n",binname);
-			myexit(NULL,1);
-		}
+        if ( origin != -1 ) {
+            pos = origin;
+        } else {			
+            if ( (pos = get_org_addr(crtfile)) == -1 ) {
+                    myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+                }
+        }
 
 
-	/*
-	 *        Now we try to determine the size of the file
-	 *        to be converted
-	 */
-		if ( fseek(fpin,0,SEEK_END) ) {
-			fprintf(stderr,"Couldn't determine size of file\n");
-			fclose(fpin);
-			myexit(NULL,1);
-		}
-		
-		len=ftell(fpin);
-		fseek(fpin,0L,SEEK_SET);
-
-		if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-			fclose(fpin);
-			myexit("Can't open output file\n",1);
-		}
-
-		if (ts2068) {
-			if (pos<33000) 
-				printf("\nInfo: Position %u is too low, not relocating TS2068 BASIC.", (int)pos);
-			else
-				for (i=0; (i < sizeof(ts_loader)); i++)
-					fputc(ts_loader[i],fpout);
-		}
-
-		if ((pos>23700)&&(pos<24000)) {
-			if (turbo) fprintf(stderr,"WARNING: turbo has no effect in single BASIC block mode.\n");
-			/* All in a BASIC line */
-			/* Write out the BASIC header file */
-				writeword_p(19,fpout,&parity);         /* Header len */
-				writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
-				parity=0;
-				writebyte_p(0,fpout,&parity);          /* Filetype (Basic) */
-
-			/* Deal with the filename */
-				if (strlen(blockname) >= 10 ) {
-					strncpy(name,blockname,10);
-				} else {
-					strcpy(name,blockname);
-					strncat(name,"          ",10-strlen(blockname));
-				}
-				for        (i=0;i<=9;i++)
-					writebyte_p(name[i],fpout,&parity);
-				writeword_p(21 +len,fpout,&parity);    /* length */
-				writeword_p(10,fpout,&parity);         /* line for auto-start */
-				writeword_p(21 + len,fpout,&parity);   /* length (?) */
-				writebyte_p(parity,fpout,&parity);
-
-			/* Write out the 'BASIC' program */
-				writeword_p(23 + len,fpout,&parity);         /* block lenght */
-				parity=0;
-				writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
-
-				writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
-				writebyte_p(1,fpout,&parity);          /* LSB... */
-				writeword_p(2+len,fpout,&parity);      /* BASIC line length */
-				writebyte_p(0xea,fpout,&parity);       /* REM */
-				for (i=0; i<len;i++) {
-					c=getc(fpin);
-					writebyte_p(c,fpout,&parity);
-				}
-				writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
-
-				writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
-				writebyte_p(10,fpout,&parity);         /* LSB... */
-				writeword_p(11,fpout,&parity);         /* BASIC line length */
-				writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
-				writebyte_p(0xc0,fpout,&parity);       /* USR */
-				writebyte_p(0xb0,fpout,&parity);       /* VAL */
-				sprintf(mybuf,"\"%i\"",(int)pos);      /* Location for USR */
-				writestring_p(mybuf,fpout,&parity);
-				writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
-				writebyte_p(parity,fpout,&parity);
-			} else {
-			/* ===============
-				Loader block
-			   =============== */
-
-		   mlen=0;
-		   if ( !noloader ) {
-				/* If requested, merge an external loader */
-				if ( merge != NULL ) {
-					if (turbo) {
-						fprintf(stderr,"ERROR: turbo mode conflicts with the 'merge' option.\n");
-						fclose(fpin);
-						fclose(fpout);
-						myexit(NULL,1);
-					}
-
-					if ( (fpmerge=fopen(merge,"rb") ) == NULL ) {
-						fprintf(stderr,"File for 'merge' not found: %s\n",merge);
-						fclose(fpin);
-						fclose(fpout);
-						myexit(NULL,1);
-					}
-					/* check the header type (first block must be BASIC) */
-					fseek(fpmerge,3,SEEK_SET);
-					c=getc(fpmerge);
-					if ( c != 0 ) {
-						fprintf(stderr,"BASIC block not found in file %s\n",merge);
-						fclose(fpin);
-						fclose(fpout);
-						myexit(NULL,1);
-					}
-
-					fseek(fpmerge,21,SEEK_SET);
-					mlen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
-
-					fseek(fpmerge,0,SEEK_SET);
-					blocklen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
-					if ( blocklen != 19 ) {
-						fprintf(stderr,"Error locating the external loader header in file %s\n",merge);
-						fclose(fpin);
-						fclose(fpout);
-						myexit(NULL,1);
-					}
-					fseek(fpmerge,0,SEEK_SET);
-					/* Total ext. loader size (headerblock + data block) */
-					blocklen+=mlen+4;
-					/* Now import the external BASIC loader */
-					for (i=0; (i < blocklen); i++) {
-						c=getc(fpmerge);
-						writebyte_p(c,fpout,&parity);
-					}
-					fclose (fpmerge);
-
-				} else {
+        if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
+            fprintf(stderr,"Can't open input file %s\n",binname);
+            myexit(NULL,1);
+        }
 
 
-				/* BASIC loader */
-				
-					if (turbo) {
-						mlen+=22+loader_len+32;	/* extra BASIC size for REM line + turbo block + turbo caller code */
-						loader[37] = pos%256;
-						loader[38] = pos/256;
-						if (screen) {
-							turbo_loader[18] = 0xcd;		/* activate the extra screen block loading */
-							turbo_loader[19] = 0x69;
-							turbo_loader[20] = 0xff;
- 						}
-					}
+    /*
+     *        Now we try to determine the size of the file
+     *        to be converted
+     */
+        if ( fseek(fpin,0,SEEK_END) ) {
+            fprintf(stderr,"Couldn't determine size of file\n");
+            fclose(fpin);
+            myexit(NULL,1);
+        }
+        
+        len=ftell(fpin);
+        fseek(fpin,0L,SEEK_SET);
 
-					if (screen && !turbo)  mlen+=5;			/* Add the space count for -- LOAD "" SCREEN$: */
+        if ( (fpout=fopen(filename,"wb") ) == NULL ) {
+            fclose(fpin);
+            myexit("Can't open output file\n",1);
+        }
 
-				/* Write out the BASIC header file */
-					writeword_p(19,fpout,&parity);         /* Header len */
-					writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
+        if (ts2068) {
+            if (pos<33000) 
+                printf("\nInfo: Position %u is too low, not relocating TS2068 BASIC.", (int)pos);
+            else
+                for (i=0; (i < sizeof(ts_loader)); i++)
+                    fputc(ts_loader[i],fpout);
+        }
 
-					parity=0;
-					writebyte_p(0,fpout,&parity);             /* Filetype (Basic) */
-					writestring_p("Loader    ",fpout,&parity);
-					writeword_p(0x1e + mlen,fpout,&parity);   /* length */
-					writeword_p(10,fpout,&parity);            /* line for auto-start */
-					writeword_p(0x1e + mlen,fpout,&parity);   /* length (?) */
-					writebyte_p(parity,fpout,&parity);
+        if ((pos>23700)&&(pos<24000)) {
+            if (turbo) fprintf(stderr,"WARNING: turbo has no effect in single BASIC block mode.\n");
+            /* All in a BASIC line */
+            /* Write out the BASIC header file */
+                writeword_p(19,fpout,&parity);         /* Header len */
+                writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
+                parity=0;
+                writebyte_p(0,fpout,&parity);          /* Filetype (Basic) */
 
-				/* Write out the BASIC loader program */
-					writeword_p(32 + mlen,fpout,&parity);         /* block lenght */
-					parity=0;
-					writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
+            /* Deal with the filename */
+                if (strlen(blockname) >= 10 ) {
+                    strncpy(name,blockname,10);
+                } else {
+                    strcpy(name,blockname);
+                    strncat(name,"          ",10-strlen(blockname));
+                }
+                for        (i=0;i<=9;i++)
+                    writebyte_p(name[i],fpout,&parity);
+                writeword_p(21 +len,fpout,&parity);    /* length */
+                writeword_p(10,fpout,&parity);         /* line for auto-start */
+                writeword_p(21 + len,fpout,&parity);   /* length (?) */
+                writebyte_p(parity,fpout,&parity);
 
-					/* REM line is <compiled program length> + 22 bytes long */
-					if (turbo) {
-						writebyte_p(0,fpout,&parity);         /* MSB of BASIC line number for REM */
-						writebyte_p(1,fpout,&parity);         /* LSB... */
-						writeword_p(18+loader_len,fpout,&parity);         /* BASIC line length */
-						writebyte_p(0x10,fpout,&parity);         /* Cosmetics (ink) */
-						writebyte_p(7,fpout,&parity);          /* Cosmetics (white) */
-						writebyte_p(0xea,fpout,&parity);       /* REM */
-						writebyte_p(0x11,fpout,&parity);         /* Cosmetics (paper) */
-						writebyte_p(0,fpout,&parity);          /* Cosmetics (black) */
-						writestring_p(" Z88DK C+ ",fpout,&parity);
-						writebyte_p(0x11,fpout,&parity);         /* Cosmetics (paper) */
-						writebyte_p(7,fpout,&parity);          /* Cosmetics (white) */
-						for (i=0; (i < loader_len); i++)
-							writebyte_p(loader[i],fpout,&parity); 
-						writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
-					}
+            /* Write out the 'BASIC' program */
+                writeword_p(23 + len,fpout,&parity);         /* block lenght */
+                parity=0;
+                writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
 
-					writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
-					writebyte_p(10,fpout,&parity);         /* LSB... */
-					if (!turbo)
-						if (screen)
-							writeword_p(26+5,fpout,&parity);         /* BASIC line length */
-						else
-							writeword_p(26,fpout,&parity);         /* BASIC line length */
-					else
-						writeword_p(26+32,fpout,&parity);         /* BASIC line length */
-					writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
-					writebyte_p(0xb0,fpout,&parity);       /* VAL */
-					sprintf(mybuf,"\"%i\":",(int)pos-1);        /* location for CLEAR */
-					writestring_p(mybuf,fpout,&parity);
-					if (turbo) {
-						/* 36 bytes, which means 32 extra bytes */
-						writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
-						writebyte_p(0xc0,fpout,&parity);       /* USR */
-						writebyte_p('(',fpout,&parity);
-						writebyte_p(0xbe,fpout,&parity);       /* PEEK */
-						writebyte_p(0xb0,fpout,&parity);       /* VAL */
-						writestring_p("\"23635\"+",fpout,&parity);
-						writebyte_p(0xb0,fpout,&parity);       /* VAL */
-						writestring_p("\"256\"*",fpout,&parity);
-						writebyte_p(0xbe,fpout,&parity);       /* PEEK */
-						writebyte_p(0xb0,fpout,&parity);       /* VAL */
-						writestring_p("\"23636\"+",fpout,&parity);
-						writebyte_p(0xb0,fpout,&parity);       /* VAL */
-						writestring_p("\"21\"",fpout,&parity);
-						writebyte_p(')',fpout,&parity);
-					} else {
-						if (screen && !turbo) {
-							writebyte_p(0xef,fpout,&parity);       /* LOAD */
-							writebyte_p('"',fpout,&parity);
-							writebyte_p('"',fpout,&parity);
-							writebyte_p(0xaa,fpout,&parity);       /* SCREEN$ */
-							writebyte_p(':',fpout,&parity);
-						}
-						writebyte_p(0xef,fpout,&parity);       /* LOAD */
-						writebyte_p('"',fpout,&parity);
-						writebyte_p('"',fpout,&parity);
-						writebyte_p(0xaf,fpout,&parity);       /* CODE */
-					}
-					writebyte_p(':',fpout,&parity);
-					writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
-					writebyte_p(0xc0,fpout,&parity);       /* USR */
-					writebyte_p(0xb0,fpout,&parity);       /* VAL */
-					sprintf(mybuf,"\"%i\"",(int)pos);           /* Location for USR */
-					writestring_p(mybuf,fpout,&parity);
-					writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
-					writebyte_p(parity,fpout,&parity);
-				}
-			}
+                writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
+                writebyte_p(1,fpout,&parity);          /* LSB... */
+                writeword_p(2+len,fpout,&parity);      /* BASIC line length */
+                writebyte_p(0xea,fpout,&parity);       /* REM */
+                for (i=0; i<len;i++) {
+                    c=getc(fpin);
+                    writebyte_p(c,fpout,&parity);
+                }
+                writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
 
-		/* Title screen */
-			if ( screen != NULL ) {
-				
-				if ( (fpmerge=fopen(screen,"rb") ) == NULL ) {
-					fprintf(stderr,"Title screen file not found: %s\n",screen);
-					fclose(fpin);
-					fclose(fpout);
-					myexit(NULL,1);
-				}
+                writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
+                writebyte_p(10,fpout,&parity);         /* LSB... */
+                writeword_p(11,fpout,&parity);         /* BASIC line length */
+                writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
+                writebyte_p(0xc0,fpout,&parity);       /* USR */
+                writebyte_p(0xb0,fpout,&parity);       /* VAL */
+                sprintf(mybuf,"\"%i\"",(int)pos);      /* Location for USR */
+                writestring_p(mybuf,fpout,&parity);
+                writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
+                writebyte_p(parity,fpout,&parity);
+            } else {
+            /* ===============
+                Loader block
+               =============== */
 
-				if ( fseek(fpmerge,0,SEEK_END) ) {
-					fprintf(stderr,"Couldn't determine size of file\n");
-					fclose(fpin);
-					fclose(fpout);
-					fclose(fpmerge);
-					myexit(NULL,1);
-				}
+           mlen=0;
+           if ( !noloader ) {
+                /* If requested, merge an external loader */
+                if ( merge != NULL ) {
+                    if (turbo) {
+                        fprintf(stderr,"ERROR: turbo mode conflicts with the 'merge' option.\n");
+                        fclose(fpin);
+                        fclose(fpout);
+                        myexit(NULL,1);
+                    }
 
-				mlen=ftell(fpmerge);
-				if (((mlen < 6912) || (mlen >=7000)) && (mlen != 6144) && (mlen != 2048)) {
-					fprintf(stderr,"ERROR: Title screen size not recognized: %u\n",mlen);
-					fclose(fpin);
-					fclose(fpout);
-					fclose(fpmerge);
-					myexit(NULL,1);
-				}
-				
-				if (mlen <= 6912) {
-					fseek (fpmerge,0,SEEK_SET);
-					j=mlen;
-				} else {
-					fseek (fpmerge,mlen-6913,SEEK_SET);
-					j=6912;
-				}
-	
-				writeword_p(19,fpout,&parity);         /* Header len */
-				writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
-				parity=0;
-				writebyte_p(3,fpout,&parity);          /* Filetype (Code) */
-			/* Deal with the filename */
-				if (strlen(blockname) >= 10 ) {
-					strncpy(name,blockname,10);
-				} else {
-					strcpy(name,blockname);
-					strncat(name,"$         ",10-strlen(blockname));
-				}
-				for  (i=0;i<=9;i++)
-					writebyte_p(name[i],fpout,&parity);
-				
-				writeword_p(j,fpout,&parity);
-				writeword_p(16384,fpout,&parity);        /* load address */
-				writeword_p(0,fpout,&parity);          /* offset */
-				writebyte_p(parity,fpout,&parity);
+                    if ( (fpmerge=fopen(merge,"rb") ) == NULL ) {
+                        fprintf(stderr,"File for 'merge' not found: %s\n",merge);
+                        fclose(fpin);
+                        fclose(fpout);
+                        myexit(NULL,1);
+                    }
+                    /* check the header type (first block must be BASIC) */
+                    fseek(fpmerge,3,SEEK_SET);
+                    c=getc(fpmerge);
+                    if ( c != 0 ) {
+                        fprintf(stderr,"BASIC block not found in file %s\n",merge);
+                        fclose(fpin);
+                        fclose(fpout);
+                        myexit(NULL,1);
+                    }
 
-			/* Now onto the data bit */
-				writeword_p(j+2,fpout,&parity);      /* Length of next block */
-				
-				parity=0;
-				writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
-				for (i=0; i<j;i++) {
-					c=getc(fpmerge);
-					writebyte_p(c,fpout,&parity);
-				}
-				writebyte_p(parity,fpout,&parity);
+                    fseek(fpmerge,21,SEEK_SET);
+                    mlen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
 
-				fclose (fpmerge);
-			}
-		
-		/* M/C program */
+                    fseek(fpmerge,0,SEEK_SET);
+                    blocklen=getc(fpmerge)+256*getc(fpmerge);  /* get block length */
+                    if ( blocklen != 19 ) {
+                        fprintf(stderr,"Error locating the external loader header in file %s\n",merge);
+                        fclose(fpin);
+                        fclose(fpout);
+                        myexit(NULL,1);
+                    }
+                    fseek(fpmerge,0,SEEK_SET);
+                    /* Total ext. loader size (headerblock + data block) */
+                    blocklen+=mlen+4;
+                    /* Now import the external BASIC loader */
+                    for (i=0; (i < blocklen); i++) {
+                        c=getc(fpmerge);
+                        writebyte_p(c,fpout,&parity);
+                    }
+                    fclose (fpmerge);
 
-		/* Write out the code header file */
-			writeword_p(19,fpout,&parity);         /* Header len */
-			writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
-			parity=0;
-			writebyte_p(3,fpout,&parity);          /* Filetype (Code) */
-		/* Deal with the filename */
-			if (strlen(blockname) >= 10 ) {
-				strncpy(name,blockname,10);
-			} else {
-				strcpy(name,blockname);
-				strncat(name,"          ",10-strlen(blockname));
-			}
-			for        (i=0;i<=9;i++)
-				writebyte_p(name[i],fpout,&parity);
-			writeword_p(len,fpout,&parity);
-			writeword_p(pos,fpout,&parity);        /* load address */
-			writeword_p(0,fpout,&parity);          /* offset */
-			writebyte_p(parity,fpout,&parity);
+                } else {
 
-		/* Now onto the data bit */
-			writeword_p(len+2,fpout,&parity);      /* Length of next block */
-				
-			parity=0;
-			writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
-			for (i=0; i<len;i++) {
-				c=getc(fpin);
-				writebyte_p(c,fpout,&parity);
-			}
-			writebyte_p(parity,fpout,&parity);
-		}
-		fclose(fpin);
-		fclose(fpout);
-	}
 
-	/* ***************************************** */
-	/*  Now, if requested, create the audio file */
-	/* ***************************************** */
-	if ( audio ) {
-		if ( (fpin=fopen(filename,"rb") ) == NULL ) {
-			fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
-			myexit(NULL,1);
-		}
+                /* BASIC loader */
+                
+                    if (turbo) {
+                        mlen+=22+loader_len+32;	/* extra BASIC size for REM line + turbo block + turbo caller code */
+                        loader[37] = pos%256;
+                        loader[38] = pos/256;
+                        if (screen) {
+                            turbo_loader[18] = 0xcd;		/* activate the extra screen block loading */
+                            turbo_loader[19] = 0x69;
+                            turbo_loader[20] = 0xff;
+                        }
+                    }
+
+                    if (screen && !turbo)  mlen+=5;			/* Add the space count for -- LOAD "" SCREEN$: */
+
+                /* Write out the BASIC header file */
+                    writeword_p(19,fpout,&parity);         /* Header len */
+                    writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
+
+                    parity=0;
+                    writebyte_p(0,fpout,&parity);             /* Filetype (Basic) */
+                    writestring_p("Loader    ",fpout,&parity);
+                    writeword_p(0x1e + mlen,fpout,&parity);   /* length */
+                    writeword_p(10,fpout,&parity);            /* line for auto-start */
+                    writeword_p(0x1e + mlen,fpout,&parity);   /* length (?) */
+                    writebyte_p(parity,fpout,&parity);
+
+                /* Write out the BASIC loader program */
+                    writeword_p(32 + mlen,fpout,&parity);         /* block lenght */
+                    parity=0;
+                    writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
+
+                    /* REM line is <compiled program length> + 22 bytes long */
+                    if (turbo) {
+                        writebyte_p(0,fpout,&parity);         /* MSB of BASIC line number for REM */
+                        writebyte_p(1,fpout,&parity);         /* LSB... */
+                        writeword_p(18+loader_len,fpout,&parity);         /* BASIC line length */
+                        writebyte_p(0x10,fpout,&parity);         /* Cosmetics (ink) */
+                        writebyte_p(7,fpout,&parity);          /* Cosmetics (white) */
+                        writebyte_p(0xea,fpout,&parity);       /* REM */
+                        writebyte_p(0x11,fpout,&parity);         /* Cosmetics (paper) */
+                        writebyte_p(0,fpout,&parity);          /* Cosmetics (black) */
+                        writestring_p(" Z88DK C+ ",fpout,&parity);
+                        writebyte_p(0x11,fpout,&parity);         /* Cosmetics (paper) */
+                        writebyte_p(7,fpout,&parity);          /* Cosmetics (white) */
+                        for (i=0; (i < loader_len); i++)
+                            writebyte_p(loader[i],fpout,&parity); 
+                        writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
+                    }
+
+                    writebyte_p(0,fpout,&parity);          /* MSB of BASIC line number */
+                    writebyte_p(10,fpout,&parity);         /* LSB... */
+                    if (!turbo)
+                        if (screen)
+                            writeword_p(26+5,fpout,&parity);         /* BASIC line length */
+                        else
+                            writeword_p(26,fpout,&parity);         /* BASIC line length */
+                    else
+                        writeword_p(26+32,fpout,&parity);         /* BASIC line length */
+                    writebyte_p(0xfd,fpout,&parity);       /* CLEAR */
+                    writebyte_p(0xb0,fpout,&parity);       /* VAL */
+                    sprintf(mybuf,"\"%i\":",(int)pos-1);        /* location for CLEAR */
+                    writestring_p(mybuf,fpout,&parity);
+                    if (turbo) {
+                        /* 36 bytes, which means 32 extra bytes */
+                        writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
+                        writebyte_p(0xc0,fpout,&parity);       /* USR */
+                        writebyte_p('(',fpout,&parity);
+                        writebyte_p(0xbe,fpout,&parity);       /* PEEK */
+                        writebyte_p(0xb0,fpout,&parity);       /* VAL */
+                        writestring_p("\"23635\"+",fpout,&parity);
+                        writebyte_p(0xb0,fpout,&parity);       /* VAL */
+                        writestring_p("\"256\"*",fpout,&parity);
+                        writebyte_p(0xbe,fpout,&parity);       /* PEEK */
+                        writebyte_p(0xb0,fpout,&parity);       /* VAL */
+                        writestring_p("\"23636\"+",fpout,&parity);
+                        writebyte_p(0xb0,fpout,&parity);       /* VAL */
+                        writestring_p("\"21\"",fpout,&parity);
+                        writebyte_p(')',fpout,&parity);
+                    } else {
+                        if (screen && !turbo) {
+                            writebyte_p(0xef,fpout,&parity);       /* LOAD */
+                            writebyte_p('"',fpout,&parity);
+                            writebyte_p('"',fpout,&parity);
+                            writebyte_p(0xaa,fpout,&parity);       /* SCREEN$ */
+                            writebyte_p(':',fpout,&parity);
+                        }
+                        writebyte_p(0xef,fpout,&parity);       /* LOAD */
+                        writebyte_p('"',fpout,&parity);
+                        writebyte_p('"',fpout,&parity);
+                        writebyte_p(0xaf,fpout,&parity);       /* CODE */
+                    }
+                    writebyte_p(':',fpout,&parity);
+                    writebyte_p(0xf9,fpout,&parity);       /* RANDOMIZE */
+                    writebyte_p(0xc0,fpout,&parity);       /* USR */
+                    writebyte_p(0xb0,fpout,&parity);       /* VAL */
+                    sprintf(mybuf,"\"%i\"",(int)pos);           /* Location for USR */
+                    writestring_p(mybuf,fpout,&parity);
+                    writebyte_p(0x0d,fpout,&parity);       /* ENTER (end of BASIC line) */
+                    writebyte_p(parity,fpout,&parity);
+                }
+            }
+
+        /* Title screen */
+            if ( screen != NULL ) {
+                
+                if ( (fpmerge=fopen(screen,"rb") ) == NULL ) {
+                    fprintf(stderr,"Title screen file not found: %s\n",screen);
+                    fclose(fpin);
+                    fclose(fpout);
+                    myexit(NULL,1);
+                }
+
+                if ( fseek(fpmerge,0,SEEK_END) ) {
+                    fprintf(stderr,"Couldn't determine size of file\n");
+                    fclose(fpin);
+                    fclose(fpout);
+                    fclose(fpmerge);
+                    myexit(NULL,1);
+                }
+
+                mlen=ftell(fpmerge);
+                if (((mlen < 6912) || (mlen >=7000)) && (mlen != 6144) && (mlen != 2048)) {
+                    fprintf(stderr,"ERROR: Title screen size not recognized: %u\n",mlen);
+                    fclose(fpin);
+                    fclose(fpout);
+                    fclose(fpmerge);
+                    myexit(NULL,1);
+                }
+                
+                if (mlen <= 6912) {
+                    fseek (fpmerge,0,SEEK_SET);
+                    j=mlen;
+                } else {
+                    fseek (fpmerge,mlen-6913,SEEK_SET);
+                    j=6912;
+                }
+    
+                writeword_p(19,fpout,&parity);         /* Header len */
+                writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
+                parity=0;
+                writebyte_p(3,fpout,&parity);          /* Filetype (Code) */
+            /* Deal with the filename */
+                if (strlen(blockname) >= 10 ) {
+                    strncpy(name,blockname,10);
+                } else {
+                    strcpy(name,blockname);
+                    strncat(name,"$         ",10-strlen(blockname));
+                }
+                for  (i=0;i<=9;i++)
+                    writebyte_p(name[i],fpout,&parity);
+                
+                writeword_p(j,fpout,&parity);
+                writeword_p(16384,fpout,&parity);        /* load address */
+                writeword_p(0,fpout,&parity);          /* offset */
+                writebyte_p(parity,fpout,&parity);
+
+            /* Now onto the data bit */
+                writeword_p(j+2,fpout,&parity);      /* Length of next block */
+                
+                parity=0;
+                writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
+                for (i=0; i<j;i++) {
+                    c=getc(fpmerge);
+                    writebyte_p(c,fpout,&parity);
+                }
+                writebyte_p(parity,fpout,&parity);
+
+                fclose (fpmerge);
+            }
+        
+        /* M/C program */
+
+        if (!noheader) {
+            /* Write out the code header file */
+            writeword_p(19,fpout,&parity);         /* Header len */
+            writebyte_p(0,fpout,&parity);          /* Header is a type 0 block */
+            parity=0;
+            writebyte_p(3,fpout,&parity);          /* Filetype (Code) */
+
+            /* Deal with the filename */
+            if (strlen(blockname) >= 10 ) {
+                strncpy(name,blockname,10);
+            } else {
+                strcpy(name,blockname);
+                strncat(name,"          ",10-strlen(blockname));
+            }
+            for (i=0;i<=9;i++)
+                writebyte_p(name[i],fpout,&parity);
+            writeword_p(len,fpout,&parity);
+            writeword_p(pos,fpout,&parity);        /* load address */
+            writeword_p(0,fpout,&parity);          /* offset */
+            writebyte_p(parity,fpout,&parity);
+        }
+
+        /* Now onto the data bit */
+            writeword_p(len+2,fpout,&parity);      /* Length of next block */
+                
+            parity=0;
+            writebyte_p(255,fpout,&parity);        /* Data is a type 255 block */
+            for (i=0; i<len;i++) {
+                c=getc(fpin);
+                writebyte_p(c,fpout,&parity);
+            }
+            writebyte_p(parity,fpout,&parity);
+        }
+        fclose(fpin);
+        fclose(fpout);
+    }
+
+    /* ***************************************** */
+    /*  Now, if requested, create the audio file */
+    /* ***************************************** */
+    if ( audio ) {
+        if ( (fpin=fopen(filename,"rb") ) == NULL ) {
+            fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
+            myexit(NULL,1);
+        }
 
         if (fseek(fpin,0,SEEK_END)) {
            fclose(fpin);
@@ -648,102 +653,102 @@ int zx_exec(char *target)
         fseek(fpin,0L,SEEK_SET);
 
         strcpy(wavfile,filename);
-		suffix_change(wavfile,".RAW");
-		if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
-			fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
-			myexit(NULL,1);
-		}
+        suffix_change(wavfile,".RAW");
+        if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
+            fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
+            myexit(NULL,1);
+        }
 
-		blockcount = 0;
-		if (noloader) blockcount = 2;
-		
-		if ((ts2068) && (pos >= 33000))
-			blockcount-=4;
+        blockcount = 0;
+        if (noloader) blockcount = 2;
+        
+        if ((ts2068) && (pos >= 33000))
+            blockcount-=4;
 
-		/* leading silence */
-	    for (i=0; i < 0x500; i++)
-			fputc(0x80, fpout);
+        /* leading silence */
+        for (i=0; i < 0x500; i++)
+            fputc(0x80, fpout);
 
-			/* Data blocks */
-		while (ftell(fpin) < len) {
-		  blockcount++;
-		  blocklen = (getc(fpin) + 256 * getc(fpin));
-		  if (dumb) {
-			if (blocklen==19)
-				printf("\n  Header found: ");
-			else
-				printf("\n  Block found, length: %d Byte(s) ",blocklen);
-		  }
+            /* Data blocks */
+        while (ftell(fpin) < len) {
+          blockcount++;
+          blocklen = (getc(fpin) + 256 * getc(fpin));
+          if (dumb) {
+            if (blocklen==19)
+                printf("\n  Header found: ");
+            else
+                printf("\n  Block found, length: %d Byte(s) ",blocklen);
+          }
 
-		  if (dumb || !turbo || ((blockcount != 3) && (blockcount != 5))) {        /* byte block headers must be ignored in turbo mode */
+          if (dumb || !turbo || ((blockcount != 3) && (blockcount != 5))) {        /* byte block headers must be ignored in turbo mode */
 
-			  if (turbo && (dumb || (blockcount==4) || (blockcount==6))) {             /* get rid of the first byte in the data block if in turbo mode */
-					c=getc(fpin);
-					blocklen-=2; 	/* and of the parity byte too ! */
-					}
+              if (turbo && (dumb || (blockcount==4) || (blockcount==6))) {             /* get rid of the first byte in the data block if in turbo mode */
+                    c=getc(fpin);
+                    blocklen-=2; 	/* and of the parity byte too ! */
+                    }
 
-			  if (turbo && ((blockcount == 4) || (blockcount == 6)))
-				zx_pilot(500,fpout);
-			  else
-				zx_pilot(2500,fpout);
+              if (turbo && ((blockcount == 4) || (blockcount == 6)))
+                zx_pilot(500,fpout);
+              else
+                zx_pilot(2500,fpout);
 
-			  c=-1;
-			  warping=FALSE;
+              c=-1;
+              warping=FALSE;
 
-			  for (i=0; (i < blocklen); i++) {
-				d=c;
-				c=getc(fpin);
+              for (i=0; (i < blocklen); i++) {
+                d=c;
+                c=getc(fpin);
 
-				if ( (dumb) && (blocklen==19) && (c>=32) && (c<=126) && (i>1) && (i<12) )
-					printf("%c",c);
+                if ( (dumb) && (blocklen==19) && (c>=32) && (c<=126) && (i>1) && (i<12) )
+                    printf("%c",c);
 
-				if (turbo && (dumb || (blockcount==4) || (blockcount==6))) {
-					if (extreme) {
-						if (d==c) {
-							if (!warping) {
-								warping = TRUE;
-								//zx_rawbit(fpout, tperiod2);
-								zx_rawbit(fpout, tperiod1);
-								zx_rawbit(fpout, tperiod0);
-							} else
-								zx_rawbit(fpout, tperiod0);
-						} else {
-							if (warping) {
-								//zx_rawbit(fpout, tperiod1);
-								turbo_one(fpout);
-								warping = FALSE;
-							}
-							turbo_rawout(fpout,c);
-						}
-					} else
-						turbo_rawout(fpout,c);
-				} else
-					zx_rawout(fpout,c,fast);
-			}
-		  } else
-			  for (i=0; (i < blocklen); i++)		/* Skip the block we're excluding */
-				c=getc(fpin);
+                if (turbo && (dumb || (blockcount==4) || (blockcount==6))) {
+                    if (extreme) {
+                        if (d==c) {
+                            if (!warping) {
+                                warping = TRUE;
+                                //zx_rawbit(fpout, tperiod2);
+                                zx_rawbit(fpout, tperiod1);
+                                zx_rawbit(fpout, tperiod0);
+                            } else
+                                zx_rawbit(fpout, tperiod0);
+                        } else {
+                            if (warping) {
+                                //zx_rawbit(fpout, tperiod1);
+                                turbo_one(fpout);
+                                warping = FALSE;
+                            }
+                            turbo_rawout(fpout,c);
+                        }
+                    } else
+                        turbo_rawout(fpout,c);
+                } else
+                    zx_rawout(fpout,c,fast);
+            }
+          } else
+              for (i=0; (i < blocklen); i++)		/* Skip the block we're excluding */
+                c=getc(fpin);
 
-		  if ((turbo && (blockcount == 4) || (blockcount == 6) ) || (turbo && dumb)) {
-				//zx_rawout(fpout,1,fast);
-				zx_rawbit(fpout, tperiod0);
-				zx_rawbit(fpout, 75);
-				c=getc(fpin);	/* parity byte must go away */
-			}
+          if ((turbo && (blockcount == 4) || (blockcount == 6) ) || (turbo && dumb)) {
+                //zx_rawout(fpout,1,fast);
+                zx_rawbit(fpout, tperiod0);
+                zx_rawbit(fpout, 75);
+                c=getc(fpin);	/* parity byte must go away */
+            }
 
-		  if (dumb) printf("\n");
-		}
+          if (dumb) printf("\n");
+        }
 
-		/* trailing silence */
-	    for (i=0; i < 0x500; i++)
-			fputc(0x80, fpout);
+        /* trailing silence */
+        for (i=0; i < 0x500; i++)
+            fputc(0x80, fpout);
 
         fclose(fpin);
         fclose(fpout);
-		
-		/* Now let's think at the WAV format */
-		raw2wav(wavfile);
-	}
+        
+        /* Now let's think at the WAV format */
+        raw2wav(wavfile);
+    }
 
     return 0;
 }
