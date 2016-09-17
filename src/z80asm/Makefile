@@ -124,7 +124,7 @@ test_enigma: $(TARGET)
 	diff -w enigma.bmk enigma.out
 	
 clean::
-	$(RM) zcc_opt.def enigma.bin enigma.in enigma.out enigma.bmk
+	$(RM) zcc_opt.def zcc_proj.lst enigma.bin enigma.in enigma.out enigma.bmk
 
 testzcc : $(TARGET)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
