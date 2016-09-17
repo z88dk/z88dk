@@ -15,7 +15,7 @@
  *	This will extract a binary object SSMAIN.O
  *	Now link it into a Z80ASM library and copy the lib in your Z88DK tree:
  *
- *	> z80asm -d -ns -nm -Mo -xssmain ssmain.o
+ *	> z80asm -d -ns -nm -xssmain ssmain.o
  *	> copy ssmain.lib "c:\Program Files\z88dk\lib\clibs"
  *
  *	Ok, this program is the new runtime library.  
@@ -25,7 +25,7 @@
  *	Now try "a.tap" on your favourite Spectrum emulator !
  *
  *
- *	$Id: baslib.c,v 1.2 2016-07-14 17:44:23 pauloscustodio Exp $
+ *	$Id: baslib.c,v 1.3 2016-09-17 15:07:16 pauloscustodio Exp $
  *
  */
 

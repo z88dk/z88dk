@@ -23,7 +23,7 @@ rcmx000_boot.o: rcmx000_boot.asm
 	z80asm $(OPTS) rcmx000_boot.asm
 
 rcmx000_boot.bin: rcmx000_boot.o
-	z80asm $(OPTS) -a -m -Mo -orcmx000_boot.bin rcmx000_boot.o
+	z80asm $(OPTS) -a -m -orcmx000_boot.bin rcmx000_boot.o
 
 rcmx000_boot.asm:
 	ln -s ../../lib/rcmx000_boot.asm .
