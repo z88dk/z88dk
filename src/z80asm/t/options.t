@@ -72,23 +72,19 @@ Usage:
   one module per line.
 
   File types recognized or created by z80asm:
-    .asm = source file
-    .obj = object file (default), or alternative -M<ext>
-    .lis = list file
-    .bin = Z80 binary file
-    .sym = symbols file
-    .map = map file
+    .asm   = source file
+    .o     = object file
+    .lis   = list file
+    .bin   = Z80 binary file
+    .sym   = symbols file
+    .map   = map file
     .reloc = reloc file
-    .def = global address definition file
-    .err = error file
+    .def   = global address definition file
+    .err   = error file
 
 Help Options:
   -h, --help             Show help options
   -v, --verbose          Be verbose
-
-Input / Output File Options:
-  -M, --obj-ext=EXT      Object file extension excluding '.'
-  -o, --output=FILE      Output binary file
 
 Code Generation Options:
   --RCMX000              Assemble for RCM2000/RCM3000 series of Z80-like CPU
@@ -106,6 +102,7 @@ Libraries:
   -i, --use-lib=FILE     Link library file.lib
 
 Binary Output:
+  -o, --output=FILE      Output binary file
   -b, --make-bin         Assemble and link/relocate to file.bin
   --split-bin            Create one binary file per section
   -d, --date-stamp       Assemble only updated files
@@ -147,7 +144,7 @@ ERR
 # --verbose, -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
-Assembling 'test.asm' to 'test.obj'
+Assembling 'test.asm' to 'test.o'
 Reading 'test.asm'
 Module 'test' size: 3 bytes
 
@@ -159,7 +156,7 @@ for my $options ('-v', '--verbose') {
 	write_file(asm_file(), " nop \n nop \n nop");
 	t_z80asm_capture("-b -d -s -l -g $options ".asm_file(), 
 					$verbose_text, "", 0);
-	ok -f obj_file();
+	ok -f o_file();
 	ok -f bin_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
 	
@@ -167,7 +164,7 @@ for my $options ('-v', '--verbose') {
 	write_file(asm_file(), " nop \n nop \n nop");
 	t_z80asm_capture("-b -s -l -g $options ".asm_file(), 
 					$verbose_text, "", 0);
-	ok -f obj_file();
+	ok -f o_file();
 	ok -f bin_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
 	
@@ -223,36 +220,18 @@ is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 unlink_testfiles('test.xxx');
 
 #------------------------------------------------------------------------------
-# --obj-ext=EXT, -MEXT
+# o extension
 #------------------------------------------------------------------------------
-my $base = asm_file(); $base =~ s/\.\w+$//;
-
-unlink_testfiles();
-write_file(asm_file(), "ret");
-t_z80asm_capture($base, "", "", 0);
-like read_file(obj_file(), binary => ':raw'), qr/\xC9\xFF\xFF\xFF\xFF\z/, "assemble ok";
-
-for my $options ('-Mo', '-M=o', '--obj-exto', '--obj-ext=o') {
+for my $file ('test', 'test.o') {
 	unlink_testfiles();
-	write_file(asm_file(), "ret");
-	t_z80asm_capture("$options $base", "", "", 0);
-	like read_file($base.".o", binary => ':raw'), qr/\xC9\xFF\xFF\xFF\xFF\z/, "assemble ok";
+	write_file('test.asm', "ret");
+	t_z80asm_capture("-b $file", "", "", 0);
+	is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
+	
+	unlink(bin_file(), 'test.asm');
+	t_z80asm_capture("-b $file", "", "", 0);
+	is read_file(bin_file(), binary => ':raw'), "\xC9", "assemble ok";
 }
-
-unlink_testfiles($base.".o");
-
-# check no arguments
-t_z80asm_capture("-M", 	"", 	<<'ERR', 1);
-Error: illegal option '-M'
-Error: source filename missing
-2 errors occurred during assembly
-ERR
-
-t_z80asm_capture("--obj-ext", 	"", 	<<'ERR', 1);
-Error: illegal option '--obj-ext'
-Error: source filename missing
-2 errors occurred during assembly
-ERR
 
 #------------------------------------------------------------------------------
 # -s, --symtable
@@ -471,7 +450,7 @@ unlink_testfiles();
 write_file(asm_file(), "nop");
 
 t_z80asm_capture(asm_file(), "", "", 0);
-ok -f obj_file();
+ok -f o_file();
 ok ! -f bin_file();
 
 # -b
@@ -480,7 +459,7 @@ for my $options ('-b', '--make-bin') {
 	write_file(asm_file(), "nop");
 
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	ok -f obj_file();
+	ok -f o_file();
 	ok -f bin_file();
 	is read_file(bin_file(), binmode => ':raw'), "\0";
 }
@@ -522,39 +501,39 @@ for my $options ('-d', '--date-stamp') {
 	write_file(asm_file(), "nop");
 
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
-	my $date_obj = -M obj_file();
+	my $date_obj = -M o_file();
 
 	# now skips compile
 	sleep 0.500;		# make sure our obj is older
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
-	is -M obj_file(), $date_obj;	# same object
+	is -M o_file(), $date_obj;	# same object
 
 	# touch source
 	sleep 0.500;		# make sure our obj is older
 	write_file(asm_file(), "nop");
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
-	isnt -M obj_file(), $date_obj;	# new object
+	isnt -M o_file(), $date_obj;	# new object
 	
 	# remove source, give -d -> uses existing object - with extensiom
 	unlink asm_file();
-	$date_obj = -M obj_file();
+	$date_obj = -M o_file();
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
-	is -M obj_file(), $date_obj;	# new object
+	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+	is -M o_file(), $date_obj;	# new object
 	
 	# remove source, give -d -> uses existing object - without extensiom
 	unlink asm_file();
-	$date_obj = -M obj_file();
+	$date_obj = -M o_file();
 	my $base = asm_file(); $base =~ s/\.\w+$//;
 	t_z80asm_capture("$options $base", "", "", 0);
-	is substr(read_file(obj_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
-	is -M obj_file(), $date_obj;	# new object
+	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+	is -M o_file(), $date_obj;	# new object
 	
 }
 
@@ -697,15 +676,15 @@ one:
 	ret
 ");
 for my $options ('-x', '-x=', '--make-lib', '--make-lib=') {
-	unlink(obj_file(), lib_file());
+	unlink(o_file(), lib_file());
 	t_z80asm_capture($options.lib_file()." ".asm_file(), "", "", 0);
-	ok -f obj_file(), obj_file()." created";
+	ok -f o_file(), o_file()." created";
 	ok -f lib_file(), lib_file()." created";
 }
 
 # create $lib
 ok copy(lib_file(), $lib), "create $lib";
-unlink(obj_file(), lib_file());
+unlink(o_file(), lib_file());
 
 # link with the library
 for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {

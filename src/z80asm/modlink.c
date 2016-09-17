@@ -722,7 +722,7 @@ void link_modules( void )
 		set_error_null();
 		set_error_module(CURRENTMODULE->modname);
 
-		/* overwrite '.asm' extension with * '.obj' */
+		/* overwrite '.asm' extension with * '.o' */
 		obj_filename = get_obj_filename(CURRENTMODULE->filename);
 
 		/* open relocatable file for reading */

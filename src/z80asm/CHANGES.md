@@ -4,6 +4,10 @@ Z88DK Z80 Module Assembler Change Log
 2016
 ----
 
+- 2016-09-17
+
+  Remove -M, --obj-ext option. The object file has always the .o extension.
+  
 - 2016-09-16
 
   Remove -e, --asm-ext option. The asm file can have any extension. If the input

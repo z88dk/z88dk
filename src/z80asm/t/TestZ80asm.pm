@@ -65,12 +65,12 @@ sub z80asm {
 	my $err_text = "";
 	my @err_text;	# error text for each pass
 	my %err_file;
-	my %obj_file;
+	my %o_file;
 	my $num_errors;
 	for (sort keys %args) {
 		if (my($id) = /^asm(\d*)$/) {
 			# asm[n]
-			unlink("test$id.err", "test$id.obj", 
+			unlink("test$id.err", "test$id.o", 
 			       "test$id.map", "test$id.syn", 
 				   "test$id.lis", "test$id.def", 
 				   <test$id*.bin>,
@@ -79,7 +79,7 @@ sub z80asm {
 			$bin_file ||=    "test$id.bin";
 			push @asm_files, "test$id.asm"
 				unless ($args{options} || "") =~ /\@/;
-			$obj_file{"test$id.obj"} = 1;
+			$o_file{"test$id.o"} = 1;
 			write_file("test$id.asm", $args{$_});
 			
 			# parse asm code, build errors and bin
@@ -99,7 +99,7 @@ sub z80asm {
 					$num_errors++ if $type eq 'error';
 					$err_text[$pass] ||= "";
 					$err_text[$pass] .= $err;
-					delete $obj_file{"test$id.obj"} if $type eq 'error';
+					delete $o_file{"test$id.o"} if $type eq 'error';
 				}
 				if (/;;\s+note:\s+(.*)/) {
 					note($1);
@@ -147,7 +147,7 @@ sub z80asm {
 	}
 	
 	# check object file
-	for (sort keys %obj_file) {
+	for (sort keys %o_file) {
 		if ($expected_ok) {
 			ok -f $_, "$_ exists";
 		}
@@ -177,14 +177,13 @@ sub unlink_temp {
 								reloc |
 								bn\d+ |
 								map |
-								obj |
+								o |
 								lib |
 								sym |
 								def |
 								err |
 								exe |
 								c |
-								o |
 								asmlst |
 								prj |
 								i ) $/ix}
@@ -209,7 +208,7 @@ sub z80emu {
 
 	if ( ! $done_z80emu ) {
 		z80asm(
-			options	=> '-x'.$z80emu.' -Mo '.join(' ', sort(<$z80emu_dir/*.asm>)),
+			options	=> '-x'.$z80emu.' '.join(' ', sort(<$z80emu_dir/*.asm>)),
 			ok		=> 1,
 		);
 		$done_z80emu++;
@@ -255,13 +254,13 @@ sub test_binfile {
 # test with z80nm
 #------------------------------------------------------------------------------
 sub z80nm {
-	my($obj_file, $expected_out) = @_;
+	my($o_file, $expected_out) = @_;
 
 	system("make -C $AR") and die;
 
 	my $line = "[line ".((caller)[2])."]";
 	my($stdout, $stderr, $return) = capture {
-		system "$AR/z80nm -a $obj_file";
+		system "$AR/z80nm -a $o_file";
 	};
 	eq_or_diff_text $stdout, $expected_out, "$line stdout";
 	eq_or_diff_text $stderr, "", "$line stderr";

@@ -34,7 +34,6 @@ OPT_VAR( Bool,		library,	FALSE	)	/* true if linking with libs */
 
 OPT_VAR( int, 		cpu,		CPU_Z80	)
 
-OPT_VAR( char *,	obj_ext,	( FILEEXT_OBJ ) + 1 )	/* skip "." */
 OPT_VAR( char *,	bin_file,	NULL	)	/* set by -o */
 OPT_VAR( char *,	lib_file,	NULL	)	/* set by -x */
 
@@ -58,10 +57,6 @@ OPT_TITLE("Help Options:")
 OPT(OptCall, exit_help, "-h", "--help", "Show help options", "")
 OPT(OptSet, &opts.verbose, "-v", "--verbose", "Be verbose", "")
 
-OPT_TITLE("Input / Output File Options:")
-OPT(OptString, &opts.obj_ext, "-M", "--obj-ext", "Object file extension excluding '" FILEEXT_SEPARATOR "'", "EXT")
-OPT(OptString, &opts.bin_file, "-o", "--output", "Output binary file", "FILE")
-
 OPT_TITLE("Code Generation Options:")
 OPT(OptCall, option_cpu_RCM2000, "", "--RCMX000", "Assemble for RCM2000/RCM3000 series of Z80-like CPU", "")
 OPT(OptSet, &opts.ti83plus, "", "--ti83plus", "Interpret 'Invoke' as RST 28h", "")
@@ -78,6 +73,7 @@ OPT(OptCallArg, option_make_lib, "-x", "--make-lib", "Create a library file" FIL
 OPT(OptCallArg, option_use_lib, "-i", "--use-lib", "Link library file" FILEEXT_LIB, "FILE")
 
 OPT_TITLE("Binary Output:")
+OPT(OptString, &opts.bin_file, "-o", "--output", "Output binary file", "FILE")
 OPT(OptSet, &opts.make_bin, "-b", "--make-bin", "Assemble and link/relocate to file" FILEEXT_BIN, "")
 OPT(OptSet, &opts.split_bin, "", "--split-bin", "Create one binary file per section", "")
 OPT(OptSet, &opts.date_stamp, "-d", "--date-stamp", "Assemble only updated files", "")

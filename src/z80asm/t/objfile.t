@@ -23,11 +23,11 @@ our $AR = -d "ar" ? "ar" : "../../src/z80nm";
 #------------------------------------------------------------------------------
 system("make -C $AR") and die;
 sub t_z80nm {
-	my($obj_file, $expected_out) = @_;
+	my($o_file, $expected_out) = @_;
 
 	my $line = "[line ".((caller)[2])."]";
 	my($stdout, $stderr, $return) = capture {
-		system "$AR/z80nm -a $obj_file";
+		system "$AR/z80nm -a $o_file";
 	};
 	eq_or_diff_text $stdout, $expected_out, "$line stdout";
 	eq_or_diff_text $stderr, "", "$line stderr";
@@ -44,11 +44,11 @@ my $obj;
 unlink_testfiles();
 write_file(asm_file(), "");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test'));
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
 END
 
@@ -56,12 +56,12 @@ END
 unlink_testfiles();
 write_file(asm_file(), "nop");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test', 
 					   CODE => [["", -1, "\x00"]]));
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Code: 1 bytes
     C $0000: 00
@@ -71,12 +71,12 @@ END
 unlink_testfiles();
 write_file(asm_file(), "nop\n" x 0x10000);
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test', 
 					   CODE => [["", -1, "\x00" x 0x10000]]));
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Code: 65536 bytes
     C $0000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -4181,12 +4181,12 @@ END
 unlink_testfiles();
 write_file(asm_file(), "org 0 \n nop");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test', 
 					   CODE => [["", 0, "\x00"]]));
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Code: 1 bytes, ORG at $0000
     C $0000: 00
@@ -4195,12 +4195,12 @@ END
 unlink_testfiles();
 write_file(asm_file(), "org 0xFFFF \n nop");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test', 
 					   CODE => [["", 0xFFFF, "\x00"]]));
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Code: 1 bytes, ORG at $FFFF
     C $0000: 00
@@ -4215,16 +4215,16 @@ write_file(asm_file(), "
 	defq   3*4
 ");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test',
 					   CODE => [["", -1,  
 									"\x3E\x0C".
 									"\xDD\x46\x0C".
 									"\x11\x0C\x00".
 									"\x0C\x00\x00\x00"]]));
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Code: 12 bytes
     C $0000: 3E 0C DD 46 0C 11 0C 00 0C 00 00 00
@@ -4241,7 +4241,7 @@ write_file(asm_file(), "
 	defq   value16 * 4
 ");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test',
 		       SYMBOLS => [
 					["L", "C", "", 3, "value8"],
@@ -4252,9 +4252,9 @@ t_binary($obj, objfile(NAME => 'test',
 					"\xDD\x46\x0C".
 					"\x11\x0C\x00".
 					"\x0C\x00\x00\x00"]]));
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     L C $0003 value8
@@ -4274,7 +4274,7 @@ write_file(asm_file(), "
 	defc   value16 = 3
 ");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test',
 		       SYMBOLS => [
 					["L", "C", "", 3, "value8"],
@@ -4285,9 +4285,9 @@ t_binary($obj, objfile(NAME => 'test',
 					"\xDD\x46\x0C".
 					"\x11\x0C\x00".
 					"\x0C\x00\x00\x00"]]));
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     L C $0003 value8
@@ -4310,7 +4310,7 @@ label2:	ld de, label2 * 4
 	defq   label2 * 6
 ");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test',
 		       EXPR => [
 				["U", "test.asm",3,  "", 0,  1, "", "label*4"],
@@ -4329,9 +4329,9 @@ t_binary($obj, objfile(NAME => 'test',
 					"\x11\x00\x00".			# addr  8
 					"\x01\x00\x00".			# addr  11
 					"\x00\x00\x00\x00"]]));	# addr  14
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     L A $0000 label
@@ -4360,7 +4360,7 @@ global:	call extobj
 	call extlib
 ");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test',
 		       EXPR => [
 				["C", "test.asm",7, "", 1, 2, "", "extobj"],
@@ -4373,9 +4373,9 @@ t_binary($obj, objfile(NAME => 'test',
 						"\x00".
 		                "\xCD\x00\x00".
 		                "\xCD\x00\x00"]]));
-t_z80nm(obj_file(), <<'END');
+t_z80nm(o_file(), <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     L A $0000 local
@@ -4401,8 +4401,8 @@ write_file(asm2_file(), "
 div:	ret
 ");
 t_z80asm_capture("-x".lib_file()." ".asm1_file()." ".asm2_file(), "", "", 0);
-my $obj1 = read_binfile(obj1_file());
-my $obj2 = read_binfile(obj2_file());
+my $obj1 = read_binfile(o1_file());
+my $obj2 = read_binfile(o2_file());
 my $lib  = read_binfile(lib_file());
 t_binary($lib, libfile( $obj1, $obj2 ));
 t_z80nm(lib_file(), <<'END');
@@ -4429,23 +4429,23 @@ unlink_testfiles();
 
 write_file(asm_file(), "");
 t_z80asm_capture(asm_file(), "", "", 0);
-$obj = read_binfile(obj_file());
+$obj = read_binfile(o_file());
 t_binary($obj, objfile(NAME => 'test'));
 
 write_file(asm1_file(), "PUBLIC main \n main:");
 t_z80asm_capture(asm1_file(), "", "", 0);
-$obj = read_binfile(obj1_file());
+$obj = read_binfile(o1_file());
 t_binary($obj, objfile(NAME => 'test1',
 				SYMBOLS => [["G", "A", "", 0, "main"]]));
 
 write_file(asm2_file(), "EXTERN main \n jp main");
 t_z80asm_capture(asm2_file(), "", "", 0);
-$obj = read_binfile(obj2_file());
+$obj = read_binfile(o2_file());
 t_binary($obj, objfile(NAME => 'test2',
 				EXPR => [["C", "test2.asm",2, "", 0, 1, "", "main"]],
 				LIBS => ["main"],
 				CODE => [["", -1, "\xC3\0\0"]]));
-write_binfile(obj3_file(), $obj);
+write_binfile(o3_file(), $obj);
 
 t_z80asm_capture(join(" ", "", "-b -d", asm_file(), asm1_file(), asm2_file()), "", "", 0);
 t_binary(read_binfile(bin_file()), "\xC3\x00\x00");
@@ -4482,47 +4482,47 @@ t_compile_module($init, <<'END', $objs);
 	code_size = atoi(argv[1]);
 	
 	TITLE("File not found, test mode");	
-	remove("test.obj");
-	obj = OFile_test_file("test.obj"); 
+	remove("test.o");
+	obj = OFile_test_file("test.o"); 
 	ASSERT( obj == NULL );
 
 	TITLE("File not found, read mode");	
-	remove("test.obj");
-	obj = OFile_open_read("test.obj");
+	remove("test.o");
+	obj = OFile_open_read("test.o");
 	ASSERT( obj == NULL );
 
 	TITLE("Invalid short file, test mode");	
-	file = myfopen("test.obj", "wb");
+	file = myfopen("test.o", "wb");
 	myfclose(file);
-	obj = OFile_test_file("test.obj");
+	obj = OFile_test_file("test.o");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid short file, read mode");	
-	file = myfopen("test.obj", "wb");
+	file = myfopen("test.o", "wb");
 	myfclose(file);
-	obj = OFile_open_read("test.obj");
+	obj = OFile_open_read("test.o");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, test mode");	
-	file = myfopen("test.obj", "wb");
+	file = myfopen("test.o", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
 	myfclose(file);
-	obj = OFile_test_file("test.obj");
+	obj = OFile_test_file("test.o");
 	ASSERT( obj == NULL );
 	
 	TITLE("Invalid long file, read mode");	
-	file = myfopen("test.obj", "wb");
+	file = myfopen("test.o", "wb");
 	fprintf( file, "%100s", "" );		/* 100 spaces */
 	myfclose(file);
-	obj = OFile_open_read("test.obj");
+	obj = OFile_open_read("test.o");
 	ASSERT( obj == NULL );
 	
 	TITLE("test1 Object file, read mode");
-	obj = OFile_open_read("test1.obj");
+	obj = OFile_open_read("test1.o");
 	ASSERT( obj != NULL );
 	ASSERT( obj->file != NULL );
 	ASSERT( obj->start_ptr == 0 );
-	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
+	ASSERT( strcmp(obj->filename, "test1.o") == 0 );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
 	ASSERT( obj->writing == FALSE );
 	ASSERT( obj->modname_ptr != -1 );
@@ -4534,11 +4534,11 @@ t_compile_module($init, <<'END', $objs);
 	ASSERT( obj == NULL );
 	
 	TITLE("test1 Object file, test mode");
-	obj = OFile_test_file("test1.obj");
+	obj = OFile_test_file("test1.o");
 	ASSERT( obj != NULL );
 	ASSERT( obj->file != NULL );
 	ASSERT( obj->start_ptr == 0 );
-	ASSERT( strcmp(obj->filename, "test1.obj") == 0 );
+	ASSERT( strcmp(obj->filename, "test1.o") == 0 );
 	ASSERT( strcmp(obj->modname,  "test1") == 0 );
 	ASSERT( obj->writing == FALSE );
 	ASSERT( obj->modname_ptr != -1 );
@@ -4574,7 +4574,7 @@ END
 for my $code_size (0, 1, 65536) {
 	my %code = $code_size ? (CODE => [["", -1, "\x00" x $code_size]]) : ();
 	my $obj1 = objfile(NAME => "test1", %code);
-	write_binfile(obj1_file(), $obj1); 
+	write_binfile(o1_file(), $obj1); 
 	write_binfile(lib1_file(), libfile($obj1));
 
 	t_run_module([$code_size], '', <<'END', 0);
@@ -4584,21 +4584,21 @@ for my $code_size (0, 1, 65536) {
 
 ---- TEST: File not found, read mode ----
 
-Error: cannot read file 'test.obj'
+Error: cannot read file 'test.o'
 
 ---- TEST: Invalid short file, test mode ----
 
 
 ---- TEST: Invalid short file, read mode ----
 
-Error: file 'test.obj' not an object file
+Error: file 'test.o' not an object file
 
 ---- TEST: Invalid long file, test mode ----
 
 
 ---- TEST: Invalid long file, read mode ----
 
-Error: file 'test.obj' not an object file
+Error: file 'test.o' not an object file
 
 ---- TEST: test1 Object file, read mode ----
 

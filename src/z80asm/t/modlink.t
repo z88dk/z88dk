@@ -57,13 +57,13 @@ my $bin = read_binfile("test.bin");
 
 # link only
 z80asm(
-	options => "-d -b -m test.obj test1.obj",
+	options => "-d -b -m test.o test1.o",
 	bin		=> $bin,
 );
 
-z80nm("test.obj test1.obj", <<'END');
+z80nm("test.o test1.o", <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     G A $0013 a1
@@ -87,7 +87,7 @@ File test.obj at $0000: Z80RMF08
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 
-File test1.obj at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0013 a2
@@ -211,13 +211,13 @@ ASM1
 
 # link only
 z80asm(
-	options => "-d -b -m test.obj test1.obj",
+	options => "-d -b -m test.o test1.o",
 	bin		=> $expected_bin,
 );
 
-z80nm("test.obj test1.obj", <<'END');
+z80nm("test.o test1.o", <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     L A $0000 mes1 (section data)
@@ -246,7 +246,7 @@ File test.obj at $0000: Z80RMF08
   Code: 11 bytes (section data)
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64
 
-File test1.obj at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0000 prmes (section code)
@@ -308,23 +308,23 @@ ASM1
 ASM2
 	bin		=> "\1\2\3",
 );
-z80nm("test.obj test1.obj test2.obj", <<'END');
+z80nm("test.o test1.o test2.o", <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.obj at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF08
   Name: test1
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.obj at $0000: Z80RMF08
+File test2.o at $0000: Z80RMF08
   Name: test2
   Code: 1 bytes (section code)
     C $0000: 01
@@ -334,26 +334,26 @@ END
 
 # link only
 z80asm(
-	options => "-d -b test.obj test1.obj test2.obj",
+	options => "-d -b test.o test1.o test2.o",
 	bin		=> "\1\2\3",
 );
-z80nm("test.obj test1.obj test2.obj", <<'END');
+z80nm("test.o test1.o test2.o", <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Code: 0 bytes (section code)
   Code: 0 bytes (section data)
   Code: 1 bytes (section bss)
     C $0000: 03
 
-File test1.obj at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF08
   Name: test1
   Code: 0 bytes (section code)
   Code: 1 bytes (section data)
     C $0000: 02
   Code: 0 bytes (section bss)
 
-File test2.obj at $0000: Z80RMF08
+File test2.o at $0000: Z80RMF08
   Name: test2
   Code: 1 bytes (section code)
     C $0000: 01
@@ -379,13 +379,13 @@ z80asm(
 
 # link only
 z80asm(
-	options => "-d -b test.obj",
+	options => "-d -b test.o",
 	bin		=> $expected_bin,
 );
 
-z80nm("test.obj", <<'...');
+z80nm("test.o", <<'...');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     L A $0000 start
@@ -458,13 +458,13 @@ ASM2
 
 # link only
 z80asm(
-	options => "-d -b test.obj test1.obj test2.obj",
+	options => "-d -b test.o test1.o test2.o",
 	bin		=> $expected_bin,
 );
 
-z80nm("test.obj test1.obj test2.obj", <<'END');
+z80nm("test.o test1.o test2.o", <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   External names:
     U         func1_alias
@@ -479,7 +479,7 @@ File test.obj at $0000: Z80RMF08
     C $0000: CD 00 00 CD 00 00 C3 00 00
   Code: 0 bytes (section lib)
 
-File test1.obj at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0000 func1 (section lib)
@@ -490,7 +490,7 @@ File test1.obj at $0000: Z80RMF08
   Code: 1 bytes (section lib)
     C $0000: C9
 
-File test2.obj at $0000: Z80RMF08
+File test2.o at $0000: Z80RMF08
   Name: test2
   Names:
     L A $FFFFFFFF chain1 (section lib)
@@ -553,13 +553,13 @@ ASM1
 
 # link only
 z80asm(
-	options => "-d -b test.obj test1.obj test2.obj",
+	options => "-d -b test.o test1.o test2.o",
 	bin		=> $expected_bin,
 );
 
-z80nm("test.obj test1.obj", <<'END');
+z80nm("test.o test1.o", <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     G A $0000 func1
@@ -570,7 +570,7 @@ File test.obj at $0000: Z80RMF08
   Code: 4 bytes, ORG at $1000
     C $0000: CD 00 00 C9
 
-File test1.obj at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0000 func2
@@ -626,13 +626,13 @@ z80asm(
 # link only
 $expected_bin = read_binfile("test.bin");
 z80asm(
-	options => "-d -b test.obj test1.obj test2.obj",
+	options => "-d -b test.o test1.o test2.o",
 	bin		=> $expected_bin,
 );
 
-z80nm("test.obj test1.obj test2.obj", <<'...');
+z80nm("test.o test1.o test2.o", <<'...');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     G = $0000 asm_b_vector_at
@@ -641,14 +641,14 @@ File test.obj at $0000: Z80RMF08
   Expressions:
     E =  (test.asm:4) $0000 $0000: asm_b_vector_at := asm_b_array_at
 
-File test1.obj at $0000: Z80RMF08
+File test1.o at $0000: Z80RMF08
   Name: test1
   Names:
     G A $0000 asm_b_array_at
   Code: 1 bytes, ORG at $1000
     C $0000: C9
 
-File test2.obj at $0000: Z80RMF08
+File test2.o at $0000: Z80RMF08
   Name: test2
   Names:
     L A $0000 start

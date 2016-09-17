@@ -18,7 +18,7 @@ my $src = 	  "t/data/zx48.asm";
 my $bmk_bin = "t/data/zx48.rom";
 my $patched_src = "zx48.asm";
 my $err = 	  "zx48.err";
-my $obj = 	  "zx48.obj";
+my $obj = 	  "zx48.o";
 my $bin = 	  "zx48.bin";
 my $reloc =	  "zx48.reloc";
 my $map = 	  "zx48.map";
@@ -28,7 +28,7 @@ my $project =	  "t/data/zx48_01.prj";
 # get project files
 my @prj_src = split(' ', scalar(read_file($project)));
 my @prj_err = @prj_src; for (@prj_err) { s/\.asm$/.err/i }
-my @prj_obj = @prj_src; for (@prj_obj) { s/\.asm$/.obj/i }
+my @prj_obj = @prj_src; for (@prj_obj) { s/\.asm$/.o/i }
 my @prj_sym = @prj_src; for (@prj_sym) { s/\.asm$/.sym/i }
 my $prj_bin = $prj_src[0]; $prj_bin =~ s/\.asm$/.bin/i;
 my $prj_reloc = $prj_src[0]; $prj_reloc =~ s/\.asm$/.reloc/i;

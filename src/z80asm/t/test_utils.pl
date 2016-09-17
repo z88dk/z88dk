@@ -24,8 +24,8 @@ my $test	 = "test";
 
 sub z80asm	 { $ENV{Z80ASM} || "./z80asm" }
 
-my @TEST_EXT = (qw( asm lis inc bin map obj lib sym def err 
-					exe c o asmlst prj i reloc ));
+my @TEST_EXT = (qw( asm lis inc bin map o lib sym def err 
+					exe c asmlst prj i reloc ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
 my @IDS = ("", 0 .. 20);
@@ -83,7 +83,7 @@ sub t_z80asm {
 	
 	# build input files
 	my @asm; 
-	my @obj;
+	my @o;
 	my @lst;
 	my @sym;
 	for my $id (@IDS) {
@@ -93,7 +93,7 @@ sub t_z80asm {
 		
 		write_file($FILE{asm}{$id}, $asm);
 		push @asm, $FILE{asm}{$id};
-		push @obj, $FILE{obj}{$id};
+		push @o, $FILE{o}{$id};
 		push @lst, $FILE{lis}{$id};
 		push @sym, $FILE{sym}{$id};
 	}
@@ -150,7 +150,7 @@ sub t_z80asm {
 		# warning -> got_err_file
 		# ok ! -f err_file(), "$line no ".err_file();
 		
-		ok -f $_, "$line $_" for (@obj, bin_file());
+		ok -f $_, "$line $_" for (@o, bin_file());
 		
 		# map file
 		if ($cmd =~ / (-m|--map) /) {
@@ -169,7 +169,7 @@ sub t_z80asm {
 
 		ok -f err_file(), "$line ".err_file();
 
-		ok -f $_, "$line $_" for (@obj);
+		ok -f $_, "$line $_" for (@o);
 		ok ! -f $_, "$line no $_" for (bin_file(), map_file());
 		
 		if ($cmd =~ / -x(\S+)/) {
@@ -185,7 +185,7 @@ sub t_z80asm {
 
 		ok -f err_file(), "$line ".err_file();
 
-		ok ! -f $_, "$line no $_" for (@obj, bin_file(), map_file());
+		ok ! -f $_, "$line no $_" for (@o, bin_file(), map_file());
 		
 		if ($cmd =~ / -x(\S+)/) {
 			my $lib = $1;
@@ -250,7 +250,7 @@ sub t_z80asm_error {
 				"1 errors occurred during assembly\n", "$line stderr";
 	ok $return != 0, "$line exit value";
 	ok -f err_file(), "$line error file found";
-	ok ! -f obj_file(), "$line object file deleted";
+	ok ! -f o_file(), "$line object file deleted";
 	ok ! -f bin_file(), "$line binary file deleted";
 	if (defined($options) && $options =~ /-x(\S+)/) {
 		my $lib = $1;
@@ -365,68 +365,68 @@ sub objfile {
 
 	exists($args{ORG}) and die;
 	
-	my $obj = "Z80RMF".$OBJ_FILE_VERSION;
+	my $o = "Z80RMF".$OBJ_FILE_VERSION;
 
 	# store empty pointers; mark position for later
-	my $name_addr	 = length($obj); $obj .= pack("V", -1);
-	my $expr_addr	 = length($obj); $obj .= pack("V", -1);
-	my $symbols_addr = length($obj); $obj .= pack("V", -1);
-	my $lib_addr	 = length($obj); $obj .= pack("V", -1);
-	my $code_addr	 = length($obj); $obj .= pack("V", -1);
+	my $name_addr	 = length($o); $o .= pack("V", -1);
+	my $expr_addr	 = length($o); $o .= pack("V", -1);
+	my $symbols_addr = length($o); $o .= pack("V", -1);
+	my $lib_addr	 = length($o); $o .= pack("V", -1);
+	my $code_addr	 = length($o); $o .= pack("V", -1);
 
 	# store expressions
 	if ($args{EXPR}) {
-		store_ptr(\$obj, $expr_addr);
+		store_ptr(\$o, $expr_addr);
 		for (@{$args{EXPR}}) {
 			@$_ == 8 or die;
 			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $target_name, $text) = @$_;
-			$obj .= $type . pack_lstring($filename) . pack("V", $line_nr) .
+			$o .= $type . pack_lstring($filename) . pack("V", $line_nr) .
 			        pack_string($section) . pack("vv", $asmptr, $ptr) . 
 					pack_string($target_name) . pack_lstring($text);
 		}
-		$obj .= "\0";
+		$o .= "\0";
 	}
 
 	# store symbols
 	if ($args{SYMBOLS}) {
-		store_ptr(\$obj, $symbols_addr);
+		store_ptr(\$o, $symbols_addr);
 		for (@{$args{SYMBOLS}}) {
 			@$_ == 5 or die;
 			my($scope, $type, $section, $value, $name) = @$_;
-			$obj .= $scope . $type . pack_string($section) . 
+			$o .= $scope . $type . pack_string($section) . 
 					pack("V", $value) . pack_string($name);
 		}
-		$obj .= "\0";
+		$o .= "\0";
 	}
 
 	# store library
 	if ($args{LIBS}) {
-		store_ptr(\$obj, $lib_addr);
+		store_ptr(\$o, $lib_addr);
 		for my $name (@{$args{LIBS}}) {
-			$obj .= pack_string($name);
+			$o .= pack_string($name);
 		}
 	}
 
 	# store name
-	store_ptr(\$obj, $name_addr);
-	$obj .= pack_string($args{NAME});
+	store_ptr(\$o, $name_addr);
+	$o .= pack_string($args{NAME});
 
 	# store code
 	if ( $args{CODE} ) {
 		ref($args{CODE}) eq 'ARRAY' or die;
-		store_ptr(\$obj, $code_addr);
+		store_ptr(\$o, $code_addr);
 		for (@{$args{CODE}}) {
 			@$_ == 3 or die;
 			my($section, $org, $code) = @$_;
-			$obj .= pack("V", length($code)) . 
+			$o .= pack("V", length($code)) . 
 			        pack_string($section) . 
 					pack("V", $org) . 
 					$code;
 		}
-		$obj .= pack("V", -1);
+		$o .= pack("V", -1);
 	}
 
-	return $obj;
+	return $o;
 }
 
 #------------------------------------------------------------------------------
@@ -466,16 +466,16 @@ sub write_binfile {
 #------------------------------------------------------------------------------
 # return library file binary representation
 sub libfile {
-	my(@obj_files) = @_;
+	my(@o_files) = @_;
 	my $lib = "Z80LMF".$OBJ_FILE_VERSION;
-	for my $i (0 .. $#obj_files) {
-		my $obj_file = $obj_files[$i];
-		my $next_ptr = ($i == $#obj_files) ?
-						-1 : length($lib) + 4 + 4 + length($obj_file);
+	for my $i (0 .. $#o_files) {
+		my $o_file = $o_files[$i];
+		my $next_ptr = ($i == $#o_files) ?
+						-1 : length($lib) + 4 + 4 + length($o_file);
 
 		$lib .= pack("V", $next_ptr);
-		$lib .= pack("V", length($obj_file));
-		$lib .= $obj_file;
+		$lib .= pack("V", length($o_file));
+		$lib .= $o_file;
 	}
 
 	return $lib;

@@ -51,7 +51,7 @@ t_z80asm_capture("-b -ixxxx ".asm_file(), "",
 for (  ["-b",	 	err_file()],
 	 # ["-l -b",	lis_file()],	# these files are removed at start of z80asm
 	 # ["-s -b",	sym_file()],
-	 # ["-b",		obj_file()],
+	 # ["-b",		o_file()],
 	 # ["-b",		bin_file()],
 	) {
 	my($options, $file) = @$_;
@@ -75,10 +75,10 @@ for (  ["-b",	 	err_file()],
 #------------------------------------------------------------------------------
 # error_expression 
 unlink_testfiles();
-write_binfile(obj_file(), objfile( NAME => "test", 
+write_binfile(o_file(), objfile( NAME => "test", 
 								   CODE => [["", -1, "\0\0"]], 
 								   EXPR => [ ["C", "test.asm",1, "", 0, 0, "", "*+VAL"] ] ));
-t_z80asm_capture("-b -d ".obj_file(),
+t_z80asm_capture("-b -d ".o_file(),
 				 "",
 				 "Error at file 'test.asm' line 1: syntax error in expression\n".
 				 "1 errors occurred during assembly\n",
@@ -424,31 +424,31 @@ t_z80asm_error("
 #------------------------------------------------------------------------------
 # error_not_obj_file
 unlink_testfiles();
-write_file(obj_file(), "not an object");
+write_file(o_file(), "not an object");
 sleep 0.500;
 write_file(asm_file(), "nop");
 t_z80asm_capture("-b -d ".asm_file(), "", "", 0);
-t_binary(read_binfile(obj_file()), objfile(NAME => "test", 
+t_binary(read_binfile(o_file()), objfile(NAME => "test", 
 										   CODE => [["", -1, "\x00"]], 
 										   ));
 t_binary(read_binfile(bin_file()), "\x00");
 
 # CreateLib uses a different error call
 unlink_testfiles();
-write_file(obj_file(), "not an object");
+write_file(o_file(), "not an object");
 sleep 0.500;
 write_file(asm_file(), "nop");
 t_z80asm_capture("-x".lib_file()." -d ".asm_file(), "", "", 0);
 t_binary(read_binfile(lib_file()), libfile(objfile(NAME => "test", 
 												   CODE => [["", -1, "\x00"]])));
 unlink_testfiles();
-write_binfile(obj_file(), objfile( NAME => "test", 
+write_binfile(o_file(), objfile( NAME => "test", 
 								   CODE => [["", -1, "\0\0"]], 
 								   SYMBOLS => [ ["Z", "Z", "", 0, "ABCD"] ] ));
-t_z80asm_capture("-b -d ".obj_file(),
+t_z80asm_capture("-b -d ".o_file(),
 				 "",
-				 "Error at module 'test': file 'test.obj' not an object file\n".
-				 "Error at module 'test': file 'test.obj' not an object file\n".
+				 "Error at module 'test': file 'test.o' not an object file\n".
+				 "Error at module 'test': file 'test.o' not an object file\n".
 				 "2 errors occurred during assembly\n",
 				 1);
 

@@ -389,9 +389,9 @@ z80asm(
 		main: ret	;; C9
 END
 );
-z80nm("test.obj", <<'END');
+z80nm("test.o", <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: lib
   Names:
     L A $0000 main
@@ -627,9 +627,9 @@ z80asm(
 		ld hl,2121h			;; 21 21 21
 END
 );
-z80nm("test.obj", <<'END');
+z80nm("test.o", <<'END');
 
-File test.obj at $0000: Z80RMF08
+File test.o at $0000: Z80RMF08
   Name: test
   Names:
     L A $0000 __C_LINE_10

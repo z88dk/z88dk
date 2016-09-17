@@ -443,7 +443,7 @@ ok 0 == system($cmd), $cmd;
 t_binary(read_binfile("CAMEL80.bin"), 
 		 read_binfile("t/data/CAMEL80.COM"));
 
-unlink_testfiles(qw( CAMEL80.i CAMEL80.obj CAMEL80.sym CAMEL80.lis CAMEL80.map CAMEL80.bin CAMEL80.reloc ));
+unlink_testfiles(qw( CAMEL80.i CAMEL80.o CAMEL80.sym CAMEL80.lis CAMEL80.map CAMEL80.bin CAMEL80.reloc ));
 done_testing();
 exit 0;
 

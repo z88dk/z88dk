@@ -30,7 +30,7 @@ Parse command line options
 /* default file name extensions */
 #define FILEEXT_ASM     FILEEXT_SEPARATOR "asm"    /* ".asm" / "_asm" */
 #define FILEEXT_LIST    FILEEXT_SEPARATOR "lis"    /* ".lis" / "_lis" */
-#define FILEEXT_OBJ     FILEEXT_SEPARATOR "obj"    /* ".obj" / "_obj" */
+#define FILEEXT_OBJ     FILEEXT_SEPARATOR "o"	   /* ".o"   / "_o"   */
 #define FILEEXT_DEF     FILEEXT_SEPARATOR "def"    /* ".def" / "_def" */
 #define FILEEXT_ERR     FILEEXT_SEPARATOR "err"    /* ".err" / "_err" */
 #define FILEEXT_BIN     FILEEXT_SEPARATOR "bin"    /* ".bin" / "_bin" */
@@ -347,16 +347,15 @@ static void exit_help( void )
     puts( "  one module per line." );
     puts( "" );
     puts( "  File types recognized or created by z80asm:" );
-	printf("    %s = source file\n", FILEEXT_ASM);
-    printf( "    %s%s = object file (default), or alternative -M<ext>\n",
-            FILEEXT_SEPARATOR, opts.obj_ext );
-    printf( "    %s = list file\n", FILEEXT_LIST );
-    printf( "    %s = Z80 binary file\n", FILEEXT_BIN );
-    printf( "    %s = symbols file\n", FILEEXT_SYM );
-    printf( "    %s = map file\n", FILEEXT_MAP );
-	printf( "    %s = reloc file\n", FILEEXT_RELOC);
-	printf( "    %s = global address definition file\n", FILEEXT_DEF);
-    printf( "    %s = error file\n", FILEEXT_ERR );
+	printf("    %-6s = source file\n", FILEEXT_ASM);
+	printf("    %-6s = object file\n", FILEEXT_OBJ);
+    printf( "    %-6s = list file\n", FILEEXT_LIST );
+    printf( "    %-6s = Z80 binary file\n", FILEEXT_BIN );
+    printf( "    %-6s = symbols file\n", FILEEXT_SYM );
+    printf( "    %-6s = map file\n", FILEEXT_MAP );
+	printf( "    %-6s = reloc file\n", FILEEXT_RELOC);
+	printf( "    %-6s = global address definition file\n", FILEEXT_DEF);
+    printf( "    %-6s = error file\n", FILEEXT_ERR );
 
 #include "options_def.h"
 
@@ -447,21 +446,6 @@ static void option_cpu_RCM2000( void )
 *	Extensions may be changed by options.
 *----------------------------------------------------------------------------*/
 
-static char *get_opts_ext_filename( char *filename, char *opts_ext )
-{
-	STR_DEFINE(ext, FILENAME_MAX);
-	char *ret;
-
-    init_module();
-
-    str_set( ext, FILEEXT_SEPARATOR );
-    str_append( ext, opts_ext );
-	ret = path_replace_ext(filename, str_data(ext));
-
-	STR_DELETE(ext);
-	return ret;
-}
-
 char *get_list_filename( char *filename )
 {
     init_module();
@@ -517,5 +501,5 @@ char *get_asm_filename(char *filename)
 
 char *get_obj_filename( char *filename )
 {
-    return get_opts_ext_filename( filename, opts.obj_ext );
+    return path_replace_ext( filename, FILEEXT_OBJ);
 }

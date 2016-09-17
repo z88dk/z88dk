@@ -183,21 +183,6 @@ void scan_expect_operands(void)
 		sym.tok = TK_NAME;
 }
 
-/*-----------------------------------------------------------------------------
-*	scan a keyword, define as opcode or name depending on expect_opcode
-*----------------------------------------------------------------------------*/
-static void set_tok_opcode( tokid_t id )
-{
-	if (expect_opcode) {
-		sym.tok = id;
-		sym.tok_opcode = id;
-		expect_opcode = FALSE;
-	}
-	else {
-		sym.tok = TK_NAME;
-		sym.tok_opcode = id;
-	}
-}
 
 /*-----------------------------------------------------------------------------
 *	convert number to int, range warning if greater than INT_MAX

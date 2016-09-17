@@ -124,9 +124,9 @@ z80asm(
 	ok		=> 1,
 );
 
-# use obj, dont assemble
+# use .o, dont assemble
 z80asm(
-	options	=> "-d -b test.obj",
+	options	=> "-d -b test.o",
 	bin		=> "\xAA" x 65536,
 	ok		=> 1,
 );
@@ -450,7 +450,7 @@ SKIP: {
 		ok -f "test.o", "test.o exists";
 
 		z80asm(
-			options	=> "-d -Mo -xtest.lib test.asm",
+			options	=> "-d -xtest.lib test.asm",
 			ok		=> 1,
 		);
 		ok -f "test.lib", "test.lib exists";
@@ -531,7 +531,7 @@ note "BUG_0049";
 	my $bin = "";
 	for my $n (1..4096) {
 		my $id = sprintf("%04d", $n);
-		unlink("test$id.obj", "test$id.bin", "test$id.err");
+		unlink("test$id.o", "test$id.bin", "test$id.err");
 		path("test$id.asm")->spew(<<END);
 			public lbl$id
 			defw $n
@@ -588,7 +588,7 @@ END
 	test_binfile('test.bin', pack("v*", 1234, 1234));
 
 	# delete test files
-	for ('test', @list) { unlink "$_.asm", "$_.obj", "$_.bin", "$_.err", "$_.lib"; }
+	for ('test', @list) { unlink "$_.asm", "$_.o", "$_.bin", "$_.err", "$_.lib"; }
 }
 
 #------------------------------------------------------------------------------
