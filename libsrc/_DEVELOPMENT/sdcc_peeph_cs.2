@@ -3542,7 +3542,18 @@ replace restart {
 	ld	a,(#%2 + 1)
 	ld	(hl),a
 	ld	hl,#%2 + 1
-	; peephole z88dk-bugfix-3
+	; peephole z88dk-bugfix-3a
+}
+
+replace restart {
+	ld	hl,#%1
+	ld	hl,#%2
+	ld	a,(hl)
+	ld	(hl),a
+} by {
+	ld	a,(#%2)
+	ld	(#%1),a
+	; peephole z88dk-bugfix-3b
 }
 
 replace restart {
