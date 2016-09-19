@@ -3608,6 +3608,50 @@ replace restart {
 	; peephole z88dk-bugfix-5c-sdcc-2523
 }
 
+replace restart {
+	ld	a,(hl)
+	and	a,#%5
+	jp	NZ,%1
+	jp	%2
+%1:
+	jp	%3
+%2:
+	or	a, a
+	jp	NZ,%3
+} by {
+	ld	a,(hl)
+	and	a,#%5
+	jp	NZ,%1
+	jp	%2
+%1:
+	jp	%3
+%2:
+	ld	a,(hl)
+	and	a,#0x01
+	jp	NZ,%3
+	; peephole z88dk-bugfix-6a
+}
+
+replace restart {
+	ld	a,(hl)
+	and	a,#%5
+	jp	NZ,%1
+	jp	%2
+%1:
+	or	a, a
+	jp	NZ,%2
+} by {
+	ld	a,(hl)
+	and	a,#%5
+	jp	NZ,%1
+	jp	%2
+%1:
+	ld	a,(hl)
+	and	a,#0x01
+	jp	NZ,%2
+	; peephole z88dk-bugfix-6b
+}
+
 
 barrier
 
