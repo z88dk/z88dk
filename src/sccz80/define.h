@@ -1,6 +1,6 @@
 /*      Define system dependent parameters     
  *
- * $Id: define.h,v 1.17 2016-04-23 18:15:58 dom Exp $
+ * $Id: define.h,v 1.18 2016-09-19 09:17:50 dom Exp $
  */
 
 /*      Stand-alone definitions                 */
@@ -296,9 +296,6 @@ GOTO_TAB {
 
 #define MAX_LEVELS 100
 
-/* define length of names for assembler */
-
-#define ASMLEN  32
 
 #ifdef SMALL_C
 #define SYM_CAST

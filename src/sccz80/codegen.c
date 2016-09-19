@@ -3,7 +3,7 @@
  *
  *      Z80 Code Generator
  *
- *      $Id: codegen.c,v 1.45 2016-07-15 12:45:18 pauloscustodio Exp $
+ *      $Id: codegen.c,v 1.46 2016-09-19 09:17:50 dom Exp $
  *
  *      21/4/99 djm
  *      Added some conditional code for tests of zero with a char, the
@@ -180,18 +180,10 @@ void trailer(void)
  */
 void outname(char *sname,char pref)
 {
-    int i ;
-
     if (pref) {
         outstr(Z80ASM_PREFIX);
     }
-    if ( strlen(sname) > ASMLEN ) {
-        i = ASMLEN;
-        while ( i-- )
-            outbyte(toupper(*sname++));
-    }
-    else
-        outstr(sname);
+    outstr(sname);
 }
 
 /* Fetch a static memory cell into the primary register */
