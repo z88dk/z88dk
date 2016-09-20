@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.168 2016-09-17 14:44:34 pauloscustodio Exp $
+ *      $Id: zcc.c,v 1.169 2016-09-20 07:22:05 aralbrec Exp $
  */
 
 
@@ -813,7 +813,8 @@ int main(int argc, char **argv)
                switch (peepholeopt)
                {
                case 0:
-                   if (process(".opt", ".asm", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
+                   // the output will be in asz80 syntax which is stored in a .s file
+                   if (process(".opt", ".s", c_copt_exe, c_sdccopt9, filter, i, YES, NO))
                        exit(1);
                    break;
                case 1:
@@ -872,7 +873,11 @@ int main(int argc, char **argv)
                    break;
                }
             }
-            goto CASE_ASMFILE;
+            // continue processing if this is not a .s file
+            if ((compiler_type != CC_SDCC) || (peepholeopt != 0))
+                goto CASE_ASMFILE;
+            // user wants to stop at the .s file if stopping at assembly translation
+            if (assembleonly) continue;
         case SFILE:
             if (preprocessonly) continue;
             if (process(".s", ".asm", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
@@ -901,8 +906,10 @@ int main(int argc, char **argv)
 
     if (assembleonly) {
         if (nfiles > 1) outputfile = 0;
-        if (usetemp)
+        if (usetemp) {
             copy_output_files_to_destdir(".asm", 1);
+            copy_output_files_to_destdir(".s", 1);
+        }
         exit(0);
     }
 
