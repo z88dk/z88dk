@@ -60,7 +60,7 @@ extern void NIRVANAP_stop(void) __preserves_regs(b,c,d,e,h,l);
    
 #else
 
-   // static unsigned char NIRVANAP_isr[3] @ (56698+328*NIRVANAP_TOTAL_ROWS);
+//   static unsigned char NIRVANAP_isr[3] @ (56698+328*NIRVANAP_TOTAL_ROWS);
    
 #endif
 
