@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.58 2016-08-26 05:34:18 aralbrec Exp $
+ *   $Id: appmake.h,v 1.59 2016-09-21 06:20:41 stefano Exp $
  */
 
 
@@ -154,6 +154,8 @@ extern option_t  x07_options;
 extern int       z1013_exec(char *target);
 extern option_t  z1013_options;
 
+extern int       z9001_exec(char *target);
+extern option_t  z9001_options;
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
 
@@ -352,6 +354,10 @@ struct {
       "Prapares a .z80 file for the Robotron Z1013, optional WAV format",
       NULL,
       z1013_exec,    &z1013_options },
+    { "kctape",   "z9001",      "(C) 2016 Stefano Bodrato",
+      "Prapares a .TAP file for the Robotron Z9001, KC85/1, KC87",
+      NULL,
+      z9001_exec,     &z9001_options },
     { "shellmak", "z88shell", "(C) 2002,2003 Dominic Morris",   
       "Patches the header to ensure that the program is recognised by the shell",
       NULL,
