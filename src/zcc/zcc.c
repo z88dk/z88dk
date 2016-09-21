@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.169 2016-09-20 07:22:05 aralbrec Exp $
+ *      $Id: zcc.c,v 1.170 2016-09-21 04:26:56 aralbrec Exp $
  */
 
 
@@ -112,6 +112,7 @@ static int             cleanup = 1;
 static int             assembleonly = 0;
 static int             lstcwd = 0;
 static int             compileonly = 0;
+static int             consolidated_object = 0;
 static int             makelib = 0;
 static int             c_code_in_asm = 0;
 static int             opt_code_size = 0;
@@ -257,6 +258,7 @@ static char  *c_gnulinkopts = "";
 
 static char  *c_extension = NULL;
 static char  *c_assembler = NULL;
+static char  *c_asmarg = NULL;
 static char  *c_linker = NULL;
 static char  *c_compiler = NULL;
 static char **c_subtype_array = NULL;
@@ -515,19 +517,26 @@ int linkthem(char *linker)
 
     linkargs_mangle(linkargs);
 
-    if (makelib) {
+    if (consolidated_object) {
+        len = offs = zcc_asprintf(&temp, "%s --output=%s %s",
+            c_assembler,
+            outputfile,
+            c_asmarg);
+    }
+    else if (makelib) {
         len = offs = zcc_asprintf(&temp, "%s %s -d %s %s -x%s %s",
             linker,
-            (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
-			IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
+            (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v" : "",
+            IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
             linklibs,
             outputfile,
             linkargs);
-    } else {
+    }
+    else {
         len = offs = zcc_asprintf(&temp, "%s %s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
             linker, 
             (c_nostdlib == 0) ? c_linkopts : " -b -d ", 
-			IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
+            IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
             linker_output_separate_arg ? " " : "", 
             outputfile,
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
@@ -552,7 +561,7 @@ int linkthem(char *linker)
         if ((out = fopen(tname, "w")) == NULL) goto USE_COMMANDLINE;
 
         for (i = 0; i < nfiles; ++i) {
-            if (hassuffix(filelist[i], c_extension)) {
+            if ((consolidated_object && hassuffix(filelist[i], ".asm")) || (!consolidated_object && hassuffix(filelist[i], c_extension))) {
                 fprintf(out, "%s\n", filelist[i]);
                 if (prj) fprintf(prj, "%s\n", original_filenames[i]);
             }
@@ -581,7 +590,7 @@ USE_COMMANDLINE:
         strcpy(cmdline, temp);
     
         for (i = 0; i < nfiles; ++i) {
-            if (hassuffix(filelist[i], c_extension)) {
+            if ((consolidated_object && hassuffix(filelist[i], ".asm")) || (!consolidated_object && hassuffix(filelist[i], c_extension))) {
                 offs += snprintf(cmdline + offs, len - offs, " %s", filelist[i]);
                 if (prj) fprintf(prj, "%s\n", original_filenames[i]);
             }
@@ -768,6 +777,9 @@ int main(int argc, char **argv)
     if ( compiler_type == CC_SDCC)
         BuildOptions_start(&comparg, "--constseg rodata_compiler ");
 
+    /* Determine if consolidate object file is requested */
+    consolidated_object = compileonly && (nfiles > 1) && (outputfile != NULL);
+
     /* Parse through the files, handling each one in turn */
     for (i = 0; i < nfiles; i++) {
         switch (get_filetype_by_suffix(filelist[i])) {
@@ -884,7 +896,7 @@ int main(int argc, char **argv)
                 exit(1);
         CASE_ASMFILE:
         case ASMFILE:
-            if (preprocessonly || assembleonly || ((i == 0) && c_nocrt && !compileonly && !makelib)) continue;
+            if (preprocessonly || assembleonly || consolidated_object || ((i == 0) && c_nocrt && !compileonly && !makelib)) continue;
             BuildAsmLine(asmarg, sizeof(asmarg), " -s ");
             if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                 exit(1);
@@ -898,14 +910,14 @@ int main(int argc, char **argv)
     }
 
     if (preprocessonly) {
-        if (nfiles > 1) outputfile = 0;
+        if (nfiles > 1) outputfile = NULL;
         if (usetemp)
             copy_output_files_to_destdir(".i", 1);
         exit(0);
     }
 
     if (assembleonly) {
-        if (nfiles > 1) outputfile = 0;
+        if (nfiles > 1) outputfile = NULL;
         if (usetemp) {
             copy_output_files_to_destdir(".asm", 1);
             copy_output_files_to_destdir(".s", 1);
@@ -921,8 +933,17 @@ int main(int argc, char **argv)
         outputfile = tempofile;
     }
 
+    if (consolidated_object) {
+            outputfile = changesuffix(outputfile, ".o");
+            BuildAsmLine(asmarg, sizeof(asmarg), " -s ");
+            c_asmarg = asmarg;
+            if ((outputfile == NULL) || linkthem(c_linker))
+                exit(1);
+            exit(0);
+    }
+
     if (compileonly) {
-        if (nfiles > 1) outputfile = 0;
+        /* independent object files */
         if (usetemp)
             copy_output_files_to_destdir(c_extension, 1);
         exit(0);
