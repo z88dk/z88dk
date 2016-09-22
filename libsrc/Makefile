@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.250 2016-09-17 14:54:47 pauloscustodio Exp $
+# $Id: Makefile,v 1.251 2016-09-22 06:29:49 stefano Exp $
 
 
 include Make.config
@@ -24,7 +24,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib\
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
-	embedded_clib.lib test_clib.lib z1013_clib.lib \
+	embedded_clib.lib test_clib.lib z1013_clib.lib z9001_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
@@ -973,6 +973,20 @@ z1013_clib.lib:
 	$(MAKE) -C assert
 	$(LIBLINKER) -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(LISTFILE_DIRECTORY)/z1013.lst
 
+# Robotron KC85/1, Z9001 library - Stefano
+z9001_clib.lib:
+	@echo ''
+	@echo '--- Building Robotron KC85/1, KC/87, Z9001 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) -C stdlib TARGET=z9001
+	$(MAKE) -C stdio 
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(LIBLINKER) -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
+
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
 	@echo ''
@@ -1101,7 +1115,7 @@ rcmx000_clib.lib:
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
-	#z80asm --RCMX000 -d -ns -nm -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
+	#z80asm --RCMX000 -d -ns -nm -Mo -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
