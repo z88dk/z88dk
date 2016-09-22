@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.170 2016-09-21 04:26:56 aralbrec Exp $
+ *      $Id: zcc.c,v 1.171 2016-09-22 19:47:26 aralbrec Exp $
  */
 
 
@@ -67,7 +67,9 @@ static void            write_zcc_defined(char *name, int value);
 
 
 static void           *mustmalloc(size_t);
+static char           *muststrdup(const char *s);
 static int             hassuffix(char *file, char *suffix_to_check);
+static char           *stripsuffix(char *, char *);
 static char           *changesuffix(char *, char *);
 static int             process(char *, char *, char *, char *, enum iostyle, int, int, int);
 static int             linkthem(char *);
@@ -77,6 +79,7 @@ static void            parse_cmdline_arg(char *option);
 static void            BuildOptions(char **, char *);
 static void            BuildOptions_start(char **, char *);
 static void            copy_output_files_to_destdir(char *suffix, int die_on_fail);
+static void            copy_output_files_to_destdir_generated_from(char *suffix, int die_on_fail);
 static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
 static int             add_variant_args(char *wanted, int num_choices, char **choices);
@@ -112,6 +115,7 @@ static int             cleanup = 1;
 static int             assembleonly = 0;
 static int             lstcwd = 0;
 static int             compileonly = 0;
+static int             m4only = 0;
 static int             consolidated_object = 0;
 static int             makelib = 0;
 static int             c_code_in_asm = 0;
@@ -146,6 +150,7 @@ static char           *asmargs;
 static char           *appmakeargs;
 static char           *sccz80arg = NULL;
 static char           *sdccarg = NULL;
+static char           *m4arg = NULL;
 static char           *pragincname = NULL;  /* File containing pragmas to append to zcc_opt.def */
 static char           *zccopt = NULL;       /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
@@ -365,12 +370,14 @@ static arg_t     myargs[] = {
     {"startup", AF_MORE, SetNumber, &c_startup, NULL, "Set the startup type" },
     {"zorg", AF_MORE, SetNumber, &c_zorg, NULL, "Set the origin (only certain targets)" },
     {"nostdlib", AF_BOOL_TRUE, SetBoolean, &c_nostdlib, NULL, "If set ignore INCPATH, STARTUPLIB" },
+    {"Cm", AF_MORE, AddToArgs, &m4arg, NULL, "Add an option to m4"},
     {"Cp", AF_MORE, AddToArgs, &cpparg, NULL, "Add an option to the preprocessor"},
+    {"Cc", AF_MORE, AddToArgs, &sccz80arg, NULL, "Add an option to sccz80"},
+    {"Cs", AF_MORE, AddToArgs, &sdccarg, NULL, "Add an option to sdcc"},
     {"Ca", AF_MORE, AddToArgs, &asmargs, NULL, "Add an option to the assembler"},
     {"Cl", AF_MORE, AddToArgs, &linkargs, NULL, "Add an option to the linker"},
     {"Cz", AF_MORE, AddToArgs, &appmakeargs, NULL, "Add an option to appmake"},
-    {"Cc", AF_MORE, AddToArgs, &sccz80arg, NULL, "Add an option to sccz80"},
-    {"Cs", AF_MORE, AddToArgs, &sdccarg, NULL, "Add an option to sdcc"},
+    {"m4", AF_BOOL_TRUE, SetBoolean, &m4only, NULL, "Only process m4 files"},
     {"E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, NULL, "Only preprocess files"},
     {"R", AF_BOOL_TRUE, SetBoolean, &relocate, NULL, "Generate relocatable code (deprecated)"},
     {"-reloc-info", AF_BOOL_TRUE, SetBoolean, &relocinfo, NULL, "Generate binary file relocation information"},
@@ -416,6 +423,18 @@ static void *mustmalloc(size_t n)
     return (p);
 }
 
+static char *muststrdup(const char *s)
+{
+    char *r;
+
+    if ((r = strdup(s)) == NULL) {
+        fprintf(stderr, "strdup failed\n");
+        exit(1);
+    }
+    return r;
+}
+
+
 static int hassuffix(char *name, char *suffix)
 {
     int             nlen, slen;
@@ -428,9 +447,20 @@ static int hassuffix(char *name, char *suffix)
     return (strcmp(&name[nlen - slen], suffix) == 0);
 }
 
+static char *stripsuffix(char *name, char *suffix)
+{
+    char *p, *r;
+    
+    /* Recursively strip suffix */
+    r = muststrdup(name);
+    while (((p = strrchr(r, '.')) != NULL) && (strcmp(p, suffix) == 0))
+        *p = '\0';
+    return r;
+}
+
 static char *changesuffix(char *name, char *suffix)
 {
-    char           *p, *r;
+    char *p, *r;
 
     if ((p = strrchr(name, '.')) == 0) {
         r = mustmalloc(strlen(name) + strlen(suffix) + 1);
@@ -441,6 +471,7 @@ static char *changesuffix(char *name, char *suffix)
         strncat(r, name, p - name);
         strcat(r, suffix);
     }
+
     return (r);
 }
 
@@ -642,7 +673,7 @@ int main(int argc, char **argv)
 #else
         snprintf(config_filename, sizeof(config_filename),"%s/../../", ptr);
 #endif
-        c_install_dir = strdup(config_filename);
+        c_install_dir = muststrdup(config_filename);
     }
     
     setup_default_configuration();
@@ -662,7 +693,7 @@ int main(int argc, char **argv)
 
     /* Now, parse the default options list */
     if (c_options != NULL) {
-        parse_option(strdup(c_options));
+        parse_option(muststrdup(c_options));
     }
     
     
@@ -782,8 +813,35 @@ int main(int argc, char **argv)
 
     /* Parse through the files, handling each one in turn */
     for (i = 0; i < nfiles; i++) {
+REPEAT_SWITCH:
         switch (get_filetype_by_suffix(filelist[i])) {
+        case M4FILE:
+            if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, NO))
+                exit(1);
+            if (get_filetype_by_suffix(filelist[i]) == HDRFILE) {
+                /* Header file must be output immediately */
+                ptr = stripsuffix(original_filenames[i], ".m4");
+                if (copy_file(filelist[i], "", ptr, "")) {
+                    fprintf(stderr, "Couldn't copy output file %s\n", ptr);
+                    exit(1);
+                }
+                free(ptr);
+                continue;
+            }
+            else if (strrchr(filelist[i], '.') == NULL) {
+                /* Unspecified filetype so assume .asm */
+                ptr = changesuffix(filelist[i], ".asm");
+                if (copy_file(filelist[i], "", ptr, "")) {
+                    fprintf(stderr, "Couldn't copy output file %s\n", ptr);
+                    exit(1);
+                }
+                free(filelist[i]);
+                filelist[i] = ptr;
+            }
+            goto REPEAT_SWITCH;
+            break;
         case CFILE:
+            if (m4only) continue;
             if ( compiler_type == CC_SDCC ) {
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
@@ -796,7 +854,7 @@ int main(int argc, char **argv)
                     exit(1);
             }
         case CPPFILE:
-            if (preprocessonly) continue;
+            if (m4only || preprocessonly) continue;
             if ( compiler_type == CC_SDCC )
             {
                switch (sdccpeepopt)
@@ -818,7 +876,7 @@ int main(int argc, char **argv)
             if (process(".i", ".opt", c_compiler, comparg, compiler_style, i, YES, NO))
                exit(1);
         case OPTFILE:
-            if (preprocessonly) continue;
+            if (m4only || preprocessonly) continue;
             if ( compiler_type == CC_SDCC )
             {
                /* sdcc_opt.9 implements bugfixes and code size reduction and should be applied to every sdcc compile */
@@ -891,12 +949,12 @@ int main(int argc, char **argv)
             // user wants to stop at the .s file if stopping at assembly translation
             if (assembleonly) continue;
         case SFILE:
-            if (preprocessonly) continue;
+            if (m4only || preprocessonly) continue;
             if (process(".s", ".asm", c_copt_exe, c_sdccopt1, filter, i, YES, NO))
                 exit(1);
-        CASE_ASMFILE:
+CASE_ASMFILE:
         case ASMFILE:
-            if (preprocessonly || assembleonly || consolidated_object || ((i == 0) && c_nocrt && !compileonly && !makelib)) continue;
+            if (m4only || preprocessonly || assembleonly || consolidated_object || ((i == 0) && c_nocrt && !compileonly && !makelib)) continue;
             BuildAsmLine(asmarg, sizeof(asmarg), " -s ");
             if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
                 exit(1);
@@ -907,6 +965,13 @@ int main(int argc, char **argv)
             fprintf(stderr, "Filetype of %s unrecognized\n", original_filenames[i]);
             exit(1);
         }
+    }
+
+    if (m4only) {
+        if (nfiles > 1) outputfile = NULL;
+        if (usetemp)
+            copy_output_files_to_destdir_generated_from(".m4", 1);
+        exit(0);
     }
 
     if (preprocessonly) {
@@ -935,9 +1000,9 @@ int main(int argc, char **argv)
 
     if (consolidated_object) {
             outputfile = changesuffix(outputfile, ".o");
-            BuildAsmLine(asmarg, sizeof(asmarg), " -s ");
+            BuildAsmLine(asmarg, sizeof(asmarg), "");
             c_asmarg = asmarg;
-            if ((outputfile == NULL) || linkthem(c_linker))
+            if (linkthem(c_linker))
                 exit(1);
             exit(0);
     }
@@ -1025,10 +1090,10 @@ int copy_file(char *name1, char *ext1, char *name2, char *ext2)
     if ( strcmp(c_copycmd,"copy") == 0 ) {
          cmd = replace_str(buffer, "/", "\\");
     } else {
-        cmd = strdup(buffer);
+        cmd = muststrdup(buffer);
     }
 #else
-    cmd = strdup(buffer);
+    cmd = muststrdup(buffer);
 #endif
     if (verbose)
         printf("%s\n", buffer);
@@ -1058,6 +1123,10 @@ int get_filetype_by_suffix(char *name)
         return ASMFILE;
     if (strcmp(ext, ".o") == 0)
         return OBJFILE;
+    if (strcmp(ext, ".m4") == 0)
+        return M4FILE;
+    if (strcmp(ext, ".h") == 0)
+        return HDRFILE;
     return 0;
 }
 
@@ -1070,7 +1139,7 @@ int add_variant_args(char *wanted, int num_choices, char **choices)
         size_t len = strlen(wanted);
         for ( i = 0; i < num_choices ; i++ ) {
             if ( strncmp(wanted, choices[i], len) == 0 && isspace(choices[i][len]) ) {
-                parse_option(strdup(choices[i] + len));
+                parse_option(muststrdup(choices[i] + len));
                 break;
             }
         }
@@ -1121,13 +1190,13 @@ void SetString(arg_t *argument, char *arg)
     }
     
     if ( strlen(ptr) ) {
-        *(char **)argument->data = strdup(ptr);
+        *(char **)argument->data = muststrdup(ptr);
     } else {
         /* Try the next argument up */
         if ((gargc + 1) < max_argc && gargv[gargc + 1][0] != '-') {
             /* Aha...non option comes next... */
             gargc++;
-            *(char **)argument->data = strdup(gargv[gargc]);
+            *(char **)argument->data = muststrdup(gargv[gargc]);
         } else {
             // No option given..
         }
@@ -1138,7 +1207,7 @@ static char *expand_macros(char *arg)
 {
     char  *ptr, *nval;
     char  *rep, *start;
-    char  *value = strdup(arg);
+    char  *value = muststrdup(arg);
     char   varname[300];
     
     
@@ -1345,7 +1414,7 @@ void gather_from_list_file(char *filename)
 void add_file_to_process(char *filename)
 {
     char tname[FILENAME_MAX + 1];
-    char *p, *q;
+    char *p, *q, *name;
     struct stat tmp;
 
     if (((p = strtok(filename, " \r\n\t")) != NULL) && *p) {
@@ -1378,9 +1447,9 @@ void add_file_to_process(char *filename)
                 }
             }
             else
-                original_filenames[nfiles] = strdup(p);
+                original_filenames[nfiles] = muststrdup(p);
 
-            if ((q = original_filenames[nfiles]) == NULL) {
+            if ((name = original_filenames[nfiles]) == NULL) {
                 fprintf(stderr, "Unable to malloc memory for filename\n");
                 exit(1);
             }
@@ -1388,20 +1457,26 @@ void add_file_to_process(char *filename)
             if (usetemp) {
                 /* Now work out the temporary filename */
                 tempname(tname);
-                strcat(tname, strrchr(q, '.'));
+
+                /* Grab the full extension from the original filename */
+                p = strrchr(name, '/');
+                q = strrchr(name, '\\');
+                if ((p == NULL) || (q != NULL) && ((q - name) > (p - name))) p = q;
+                if (p == NULL) p = name;
+                strcat(tname, strchr(p, '.'));
 
                 /* Copy the file over */
-                if (!hassuffix(q, ".c")) {
-                    if (copy_file(q, "", tname, "")) {
-                        fprintf(stderr, "Cannot copy input file \"%s\"\n", q);
+                if (!hassuffix(name, ".c")) {
+                    if (copy_file(name, "", tname, "")) {
+                        fprintf(stderr, "Cannot copy input file %s\n", name);
                         exit(1);
                     }
                 }
-                filelist[nfiles++] = strdup(tname);
+                filelist[nfiles++] = muststrdup(tname);
             } else {
                 /* Not using temporary files */
-                strcpy(tname, q);
-                filelist[nfiles++] = strdup(tname);
+                strcpy(tname, name);
+                filelist[nfiles++] = muststrdup(tname);
             }
         }
     }
@@ -1481,20 +1556,21 @@ static void configure_misc_options()
     
     /* Setup the extension - config files just seem to specify -M, so fudge it */
     snprintf(buf,sizeof(buf),".%s",c_extension_config && strlen(c_extension_config) ? c_extension_config : "o");
-    c_extension = strdup(buf);
+    c_extension = muststrdup(buf);
     
 
     // the new c lib uses startup=-1 to mean user supplies the crt
+    // current working dir will be different than when using -crt0
     if ( c_startup >= -1 ) {
         write_zcc_defined("startup", c_startup);
     }
     
     if ( linkargs == NULL ) {
-        linkargs = strdup("");
+        linkargs = muststrdup("");
     }
 
     if (linklibs == NULL) {
-        linklibs = strdup("");
+        linklibs = muststrdup("");
     }
 }
 
@@ -1626,7 +1702,7 @@ void PragmaInclude(arg_t *arg, char *val)
 
     if (*ptr != '\0') {
         free(pragincname);
-        pragincname = strdup(ptr);
+        pragincname = muststrdup(ptr);
     }
 }
 
@@ -1719,12 +1795,12 @@ void KillEOL(char *str)
 }
 
 
-/** \brief Copy any generated output files, back to the directory they came from
+/** \brief Copy any generated output files back to the directory they came from
  */
 void copy_output_files_to_destdir(char *suffix, int die_on_fail)
 {
     int             j;
-    char           *ptr, *p;
+    char           *ptr, *p, *name;
     struct stat     tmp;
     char            fname[FILENAME_MAX + 32];
 
@@ -1741,14 +1817,22 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
 
                 // generate output filename
                 if ( outputfile != NULL )
-                    strcpy(fname, outputfile);                                               // use supplied output filename
-                else  if (strcmp(suffix, c_extension) == 0) {
-                    p = changesuffix(original_filenames[j], suffix);                         // for .o, use original filename with extension changed to .o
-                    strcpy(fname, p);
-                    free(p);
+                    strcpy(fname, outputfile);                                  // use supplied output filename
+                else {
+                    // using original filename to create output filename
+                    name = stripsuffix(original_filenames[j], ".m4");
+                    if (strcmp(suffix, c_extension) == 0) {
+                        p = changesuffix(name, suffix);                         // for .o, use original filename with extension changed to .o
+                        strcpy(fname, p);
+                        free(p);
+                    }
+                    else {
+                        p = stripsuffix(name, suffix);
+                        snprintf(fname, sizeof(fname), "%s%s", p, suffix);      // use original filename with extension appended
+                        free(p);
+                    }
+                    free(name);
                 }
-                else
-                    snprintf(fname, sizeof(fname), "%s%s", original_filenames[j], suffix);   // use original filename with extension appended
 
                 // copy to output directory
                 if (copy_file(ptr, "", fname, "")) {
@@ -1761,6 +1845,48 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
             }
 
             free(ptr);
+        }
+    }
+}
+
+
+void copy_output_files_to_destdir_generated_from(char *suffix, int die_on_fail)
+{
+    int j;
+    char *ptr, *name, *gsuffix;
+    char fname[FILENAME_MAX + 32];
+
+    for (j = 0; j < nfiles; ++j) {
+
+        // only copy output files corresponding to input files with indicated extension
+        if (((ptr = strrchr(original_filenames[j], '.')) != NULL) && (strcmp(ptr, suffix) == 0) && (strcmp(gsuffix = strrchr(filelist[j], '.'), suffix) != 0)) {
+
+            // generate output filename
+            if ( outputfile != NULL )
+                strcpy(fname, outputfile);                                   // use supplied output filename
+            else {
+                // using original filename to create output filename
+                name = stripsuffix(original_filenames[j], ".m4");
+                if (strcmp(gsuffix, c_extension) == 0) {
+                    ptr = changesuffix(name, gsuffix);                       // for .o, use original filename with extension changed to .o
+                    strcpy(fname, ptr);
+                    free(ptr);
+                }
+                else {
+                    ptr = stripsuffix(name, gsuffix);
+                    snprintf(fname, sizeof(fname), "%s%s", ptr, gsuffix);   // use original filename with extension appended
+                    free(ptr);
+                }
+                free(name);
+            }
+
+            // copy to output directory
+            if (copy_file(filelist[j], "", fname, "")) {
+                fprintf(stderr, "Couldn't copy output file %s\n", fname);
+                if (die_on_fail) {
+                    exit(1);
+                }
+            }
         }
     }
 }
@@ -1780,6 +1906,7 @@ void remove_temporary_files(void)
 
     if (cleanup && usetemp) {    /* Default is yes */
         for (j = 0; j < nfiles; j++) {
+            remove_file_with_extension(filelist[j], ".m4");
             remove_file_with_extension(filelist[j], ".i");
             remove_file_with_extension(filelist[j], ".i2");
             remove_file_with_extension(filelist[j], ".asm");
