@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.49 2016-09-22 06:29:49 stefano Exp $
+;	$Id: grafix.inc,v 1.50 2016-09-23 14:42:51 aralbrec Exp $
 ;
 
 
@@ -239,7 +239,7 @@ IF FORz1013
 	defc blankch	= 32
 ENDIF
 
-IF 9001
+IF FORz9001
 	DEFINE gotgfx
 	defc maxx	= 80
 	defc maxy	= 48
