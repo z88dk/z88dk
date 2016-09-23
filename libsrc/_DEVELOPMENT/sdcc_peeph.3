@@ -21727,11 +21727,12 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	ld	de,(#%1-1)
+	ld	a,(#%1)
+	ld	d,a
 	ld	e,%2 (%3)
 	push	de
 	; peephole z88dk-481b2
-} if notUsed('a'), notUsed('de')
+} if notUsed('de')
 
 replace restart {
 	ld	a,(#%1)
@@ -21741,11 +21742,12 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	ld	bc,(#%1-1)
+	ld	a,(#%1)
+	ld	b,a
 	ld	c,%2 (%3)
 	push	bc
 	; peephole z88dk-481b3
-} if notUsed('a'), notUsed('bc')
+} if notUsed('bc')
 
 replace restart {
 	push	de
@@ -21835,11 +21837,12 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	ld	de,(#%2)
 	ld	d,#%1
+	ld	a,(#%2)
+	ld	e,a
 	push	de
 	; peephole z88dk-481d2
-} if notUsed('a'), notUsed('de')
+} if notUsed('de')
 
 replace restart {
 	ld	a,#%1
@@ -21849,12 +21852,18 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	ld	bc,(#%2)
 	ld	b,#%1
+	ld	a,(#%2)
+	ld	c,a
 	push	bc
 	; peephole z88dk-481d3
-} if notUsed('a'), notUsed('bc')
+} if notUsed('bc')
 
+replace restart {
+	cpl
+} by {
+	; peephole z88dk-482a
+} if notUsed('a')
 
 
 
