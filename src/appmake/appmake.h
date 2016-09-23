@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.59 2016-09-21 06:20:41 stefano Exp $
+ *   $Id: appmake.h,v 1.60 2016-09-23 23:46:49 aralbrec Exp $
  */
 
 
@@ -156,6 +156,7 @@ extern option_t  z1013_options;
 
 extern int       z9001_exec(char *target);
 extern option_t  z9001_options;
+
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
 
@@ -222,10 +223,10 @@ struct {
       "Injects files within other files",
       inject_longhelp,
       inject_exec,     &inject_options },
-	{ "extract", "extract",      "(C) 2015 Alvin Albrecht",
-	  "Extracts bytes from input file",
-	  extract_longhelp,
-	  extract_exec,    &extract_options },
+    { "extract", "extract",      "(C) 2015 Alvin Albrecht",
+      "Extracts bytes from input file",
+      extract_longhelp,
+      extract_exec,    &extract_options },
     { "lynxtap",  "lynx",      "(C) 2014 Stefano Bodrato",
       "Generates a tape file for the Camputers Lynx, opt. WAV",
       NULL,

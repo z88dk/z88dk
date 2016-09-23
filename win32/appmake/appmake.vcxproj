@@ -200,6 +200,7 @@
     <ClCompile Include="..\..\src\appmake\z1013.c" />
     <ClCompile Include="..\..\src\appmake\z88.c" />
     <ClCompile Include="..\..\src\appmake\z88shell.c" />
+    <ClCompile Include="..\..\src\appmake\z9001.c" />
     <ClCompile Include="..\..\src\appmake\zx.c" />
     <ClCompile Include="..\..\src\appmake\zx81.c" />
     <ClCompile Include="..\..\src\appmake\zxvgs.c" />

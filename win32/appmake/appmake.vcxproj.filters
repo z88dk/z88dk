@@ -143,6 +143,8 @@
     </ClCompile>
     <ClCompile Include="..\..\src\appmake\z1013.c">
       <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\src\appmake\z9001.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
