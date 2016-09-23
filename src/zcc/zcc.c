@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.172 2016-09-23 02:20:25 aralbrec Exp $
+ *      $Id: zcc.c,v 1.173 2016-09-23 23:41:14 aralbrec Exp $
  */
 
 
@@ -642,7 +642,7 @@ USE_COMMANDLINE:
 
 int main(int argc, char **argv)
 {
-    int             i, gc;
+    int             i, ft, gc;
     char           *ptr;
     char            config_filename[FILENAME_MAX+1];
     char            asmarg[4096];    /* Hell, that should be long enough! */
@@ -817,8 +817,8 @@ SWITCH_REPEAT:
         case M4FILE:
             if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, NO))
                 exit(1);
-            if (get_filetype_by_suffix(filelist[i]) == HDRFILE) {
-                /* Header file must be output immediately */
+            if (((ft = get_filetype_by_suffix(filelist[i])) == HDRFILE) || (ft == INCFILE)) {
+                /* Header and Inc files must be output immediately */
                 ptr = stripsuffix(original_filenames[i], ".m4");
                 if (copy_file(filelist[i], "", ptr, "")) {
                     fprintf(stderr, "Couldn't copy output file %s\n", ptr);
@@ -842,12 +842,12 @@ SWITCH_REPEAT:
         case CFILE:
             if (m4only) continue;
             if ( compiler_type == CC_SDCC ) {
-                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
+                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, NO))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, "", filter, i, YES, NO))
                     exit(1);
             } else {
-                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
+                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, NO))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, "-sccz80", filter, i, YES, NO))
                     exit(1);
@@ -1126,6 +1126,8 @@ int get_filetype_by_suffix(char *name)
         return M4FILE;
     if (strcmp(ext, ".h") == 0)
         return HDRFILE;
+    if (strcmp(ext, ".inc") == 0)
+        return INCFILE;
     return 0;
 }
 
@@ -1465,12 +1467,12 @@ void add_file_to_process(char *filename)
                 strcat(tname, strchr(p, '.'));
 
                 /* Copy the file over */
-                if (!hassuffix(name, ".c")) {
-                    if (copy_file(name, "", tname, "")) {
-                        fprintf(stderr, "Cannot copy input file %s\n", name);
-                        exit(1);
-                    }
+                //if (!hassuffix(name, ".c")) {
+                if (copy_file(name, "", tname, "")) {
+                    fprintf(stderr, "Cannot copy input file %s\n", name);
+                    exit(1);
                 }
+                //}
                 filelist[nfiles++] = muststrdup(tname);
             } else {
                 /* Not using temporary files */
