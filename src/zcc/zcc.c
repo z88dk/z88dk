@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.171 2016-09-22 19:47:26 aralbrec Exp $
+ *      $Id: zcc.c,v 1.172 2016-09-23 02:20:25 aralbrec Exp $
  */
 
 
@@ -340,7 +340,6 @@ static arg_t  config[] = {
     {"CLIB",  0, AddArray, &c_clib_array, &c_clib_array_num, "Add a clib variant config" },
     {"", 0, NULL, NULL}
 };
-
 
 
 
@@ -813,7 +812,7 @@ int main(int argc, char **argv)
 
     /* Parse through the files, handling each one in turn */
     for (i = 0; i < nfiles; i++) {
-REPEAT_SWITCH:
+SWITCH_REPEAT:
         switch (get_filetype_by_suffix(filelist[i])) {
         case M4FILE:
             if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, NO))
@@ -838,7 +837,7 @@ REPEAT_SWITCH:
                 free(filelist[i]);
                 filelist[i] = ptr;
             }
-            goto REPEAT_SWITCH;
+            goto SWITCH_REPEAT;
             break;
         case CFILE:
             if (m4only) continue;
