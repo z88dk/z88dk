@@ -30,9 +30,6 @@ sorter:
 dstar:
 	zcc +zx -vn ../dstar.c -I.. -Dspritesize=16 -DSOUND -create-app -odstar.bin
 
-dstar_native:
-	zcc +zx -vn dstar.c -o dstar_native.bin -create-app -lndos
-
 microman:
 	zcc +zx -vn -lndos -create-app -omicroman.bin -DSOUND -DJOYSTICK_DIALOG -I.. ../microman.c
 
