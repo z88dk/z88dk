@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.173 2016-09-23 23:41:14 aralbrec Exp $
+ *      $Id: zcc.c,v 1.174 2016-09-25 04:32:45 aralbrec Exp $
  */
 
 
@@ -50,6 +50,7 @@ static void            SetStringConfig(arg_t *argument, char *arg);
 static void            parse_cmdline_arg(char *arg);
 static void            SetBoolean(arg_t *arg, char *val);
 static void            AddPreProc(arg_t *arg,char *);
+static void            AddPreProcIncPath(arg_t *arg, char *);
 static void            AddToArgs(arg_t *arg,char *);
 static void            AddAppmake(arg_t *arg,char *);
 static void            AddLinkLibrary(arg_t *arg,char *);
@@ -143,6 +144,7 @@ static char          **original_filenames = NULL;    /* Original filenames... */
 static char           *outputfile = NULL;
 static char           *c_linker_output_file = NULL;
 static char           *cpparg;
+static char           *cpparg_front;
 static char           *comparg;
 static char           *linkargs;
 static char           *linklibs;
@@ -158,7 +160,7 @@ static char           *c_clib = NULL;
 static int             c_startup = -2;
 static int             c_nostdlib = 0;
 static int             c_nocrt = 0;
-
+static int             user_compile_line_parsing = 0;
 
 static char            filenamebuf[FILENAME_MAX + 1];
 static char            tmpnambuf[] = "zccXXXX";
@@ -382,7 +384,7 @@ static arg_t     myargs[] = {
     {"-reloc-info", AF_BOOL_TRUE, SetBoolean, &relocinfo, NULL, "Generate binary file relocation information"},
     {"D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option"},
     {"U", AF_MORE, AddPreProc, NULL, NULL, "Undefine a preprocessor option"},
-    {"I", AF_MORE, AddPreProc, NULL, NULL, "Add an include directory for the preprocessor"},
+    {"I", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor"},
     {"L", AF_MORE, AddLinkSearchPath, NULL, NULL, "Add a library search path"},
     {"l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library"},
     {"O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting for copt"},
@@ -654,7 +656,8 @@ int main(int argc, char **argv)
     snprintf(tmpnambuf, sizeof(tmpnambuf), "zcc%04X", ((unsigned int)time(NULL)) & 0xffff);
 #endif
 
-    asmargs = linkargs = linklibs = cpparg = NULL;
+    user_compile_line_parsing = 0;
+    asmargs = linkargs = linklibs = cpparg = cpparg_front = NULL;
 
     atexit(remove_temporary_files);
     add_option_to_compiler("");
@@ -695,6 +698,8 @@ int main(int argc, char **argv)
         parse_option(muststrdup(c_options));
     }
     
+    /* At this point options come from the user compile line */
+    user_compile_line_parsing = 1;
     
     /* Now, let's parse the command line arguments */
     max_argc = argc;
@@ -806,6 +811,8 @@ int main(int argc, char **argv)
     /* Compiler options that must appear at front to implement defaults */
     if ( compiler_type == CC_SDCC)
         BuildOptions_start(&comparg, "--constseg rodata_compiler ");
+    if (cpparg_front)
+        BuildOptions_start(&cpparg, cpparg_front);
 
     /* Determine if consolidate object file is requested */
     consolidated_object = compileonly && (nfiles > 1) && (outputfile != NULL);
@@ -817,18 +824,17 @@ SWITCH_REPEAT:
         case M4FILE:
             if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, NO))
                 exit(1);
-            if (((ft = get_filetype_by_suffix(filelist[i])) == HDRFILE) || (ft == INCFILE)) {
-                /* Header and Inc files must be output immediately */
+            ft = get_filetype_by_suffix(filelist[i]);
+            if ((ft == CFILE) || (ft == HDRFILE) || (ft == INCFILE)) {
+                /* .c .h .inc must be output to destination directory immediately */
                 ptr = stripsuffix(original_filenames[i], ".m4");
                 if (copy_file(filelist[i], "", ptr, "")) {
                     fprintf(stderr, "Couldn't copy output file %s\n", ptr);
                     exit(1);
                 }
-                free(ptr);
-                continue;
             }
             else if (strrchr(filelist[i], '.') == NULL) {
-                /* Unspecified filetype so assume .asm */
+                /* no extension so assume .asm */
                 ptr = changesuffix(filelist[i], ".asm");
                 if (copy_file(filelist[i], "", ptr, "")) {
                     fprintf(stderr, "Couldn't copy output file %s\n", ptr);
@@ -837,17 +843,28 @@ SWITCH_REPEAT:
                 free(filelist[i]);
                 filelist[i] = ptr;
             }
+            if ((ft == HDRFILE) || (ft == INCFILE)) {
+                /* .h and .inc see no more processing */
+                free(ptr);
+                continue;
+            }
+            if (ft == CFILE) {
+                /* compile must use .c at its destination directory so that header files are correctly found */
+                free(original_filenames[i]);
+                original_filenames[i] = ptr;
+            }
+            /* process result of m4 */
             goto SWITCH_REPEAT;
             break;
         case CFILE:
             if (m4only) continue;
             if ( compiler_type == CC_SDCC ) {
-                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, NO))
+                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, "", filter, i, YES, NO))
                     exit(1);
             } else {
-                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, NO))
+                if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, "-sccz80", filter, i, YES, NO))
                     exit(1);
@@ -1286,6 +1303,14 @@ void AddToArgs(arg_t *argument, char *arg)
     BuildOptions(argument->data, arg + 3);
 }
 
+void AddPreProcIncPath(arg_t *argument, char *arg)
+{
+    if (user_compile_line_parsing)
+        BuildOptions(&cpparg_front, arg);
+    else
+        BuildOptions(&cpparg, arg);
+}
+
 void AddPreProc(arg_t *argument, char *arg)
 {
     BuildOptions(&cpparg, arg);
@@ -1467,12 +1492,12 @@ void add_file_to_process(char *filename)
                 strcat(tname, strchr(p, '.'));
 
                 /* Copy the file over */
-                //if (!hassuffix(name, ".c")) {
-                if (copy_file(name, "", tname, "")) {
-                    fprintf(stderr, "Cannot copy input file %s\n", name);
-                    exit(1);
+                if (!hassuffix(name, ".c")) {
+                    if (copy_file(name, "", tname, "")) {
+                        fprintf(stderr, "Cannot copy input file %s\n", name);
+                        exit(1);
+                    }
                 }
-                //}
                 filelist[nfiles++] = muststrdup(tname);
             } else {
                 /* Not using temporary files */
