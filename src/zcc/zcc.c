@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.174 2016-09-25 04:32:45 aralbrec Exp $
+ *      $Id: zcc.c,v 1.175 2016-09-25 04:50:56 aralbrec Exp $
  */
 
 
@@ -832,6 +832,10 @@ SWITCH_REPEAT:
                     fprintf(stderr, "Couldn't copy output file %s\n", ptr);
                     exit(1);
                 }
+                /* compile must use .c at its destination directory so that header files are correctly found */
+                /* change original filenames for .h and .inc so that they are not copied twice when -m4 is applied */
+                free(original_filenames[i]);
+                original_filenames[i] = ptr;
             }
             else if (strrchr(filelist[i], '.') == NULL) {
                 /* no extension so assume .asm */
@@ -845,13 +849,7 @@ SWITCH_REPEAT:
             }
             if ((ft == HDRFILE) || (ft == INCFILE)) {
                 /* .h and .inc see no more processing */
-                free(ptr);
                 continue;
-            }
-            if (ft == CFILE) {
-                /* compile must use .c at its destination directory so that header files are correctly found */
-                free(original_filenames[i]);
-                original_filenames[i] = ptr;
             }
             /* process result of m4 */
             goto SWITCH_REPEAT;
