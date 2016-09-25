@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.175 2016-09-25 04:50:56 aralbrec Exp $
+ *      $Id: zcc.c,v 1.176 2016-09-25 05:36:11 aralbrec Exp $
  */
 
 
@@ -822,10 +822,14 @@ int main(int argc, char **argv)
 SWITCH_REPEAT:
         switch (get_filetype_by_suffix(filelist[i])) {
         case M4FILE:
-            if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, NO))
+            if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, YES))
                 exit(1);
             ft = get_filetype_by_suffix(filelist[i]);
-            if ((ft == CFILE) || (ft == HDRFILE) || (ft == INCFILE)) {
+            if (ft == M4FILE) {
+                fprintf(stderr, "Cannot process recursive .m4 file %s\n", original_filenames[i]);
+                exit(1);
+            }
+            else if ((ft == CFILE) || (ft == HDRFILE) || (ft == INCFILE)) {
                 /* .c .h .inc must be output to destination directory immediately */
                 ptr = stripsuffix(original_filenames[i], ".m4");
                 if (copy_file(filelist[i], "", ptr, "")) {
@@ -1490,7 +1494,7 @@ void add_file_to_process(char *filename)
                 strcat(tname, strchr(p, '.'));
 
                 /* Copy the file over */
-                if (!hassuffix(name, ".c")) {
+                if (!hassuffix(name, ".c") && !hassuffix(name, ".m4")) {
                     if (copy_file(name, "", tname, "")) {
                         fprintf(stderr, "Cannot copy input file %s\n", name);
                         exit(1);
@@ -1931,6 +1935,8 @@ void remove_temporary_files(void)
     if (cleanup && usetemp) {    /* Default is yes */
         for (j = 0; j < nfiles; j++) {
             remove_file_with_extension(filelist[j], ".m4");
+            remove_file_with_extension(filelist[j], ".h");
+            remove_file_with_extension(filelist[j], ".inc");
             remove_file_with_extension(filelist[j], ".i");
             remove_file_with_extension(filelist[j], ".i2");
             remove_file_with_extension(filelist[j], ".asm");
