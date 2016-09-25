@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.176 2016-09-25 05:36:11 aralbrec Exp $
+ *      $Id: zcc.c,v 1.177 2016-09-25 17:00:02 aralbrec Exp $
  */
 
 
@@ -88,7 +88,7 @@ static int             add_variant_args(char *wanted, int num_choices, char **ch
 static void            configure_assembler();
 static void            configure_compiler();
 static void            configure_misc_options();
-static void            configure_maths_library();
+static void            configure_maths_library(char **libstring);
 
 
 static void            remove_temporary_files(void);
@@ -144,10 +144,15 @@ static char          **original_filenames = NULL;    /* Original filenames... */
 static char           *outputfile = NULL;
 static char           *c_linker_output_file = NULL;
 static char           *cpparg;
-static char           *cpparg_front;
+static char           *cpp_incpath_first;
+static char           *cpp_incpath_last;
 static char           *comparg;
 static char           *linkargs;
+static char           *linker_libpath_first;
+static char           *linker_libpath_last;
 static char           *linklibs;
+static char           *linker_linklib_first;
+static char           *linker_linklib_last;
 static char           *asmargs;
 static char           *appmakeargs;
 static char           *sccz80arg = NULL;
@@ -160,7 +165,7 @@ static char           *c_clib = NULL;
 static int             c_startup = -2;
 static int             c_nostdlib = 0;
 static int             c_nocrt = 0;
-static int             user_compile_line_parsing = 0;
+static int             processing_user_command_line_arg = 0;
 
 static char            filenamebuf[FILENAME_MAX + 1];
 static char            tmpnambuf[] = "zccXXXX";
@@ -299,7 +304,7 @@ static arg_t  config[] = {
     {"ZPRAGMAEXE", 0, SetStringConfig, &c_zpragma_exe, NULL, "Name of the zpragma binary"},
 
     {"Z80EXE", 0, SetStringConfig, &c_z80asm_exe, NULL, "Name of the z80asm binary"},
-    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, NULL, "Options for z80asm as linker", "-b -d -m -LDESTDIR/lib/clibs -IDESTDIR/lib" },
+    {"LINKOPTS", 0, SetStringConfig, &c_linkopts, NULL, "Options for z80asm as linker", " -LDESTDIR/lib/clibs -IDESTDIR/lib " },
     {"ASMOPTS", 0, SetStringConfig, &c_asmopts, NULL, "Options for z80asm as assembler", "-IDESTDIR/lib"},
     
     {"COMPILER", AF_DEPRECATED, SetStringConfig, &c_compiler, NULL, "Name of sccz80 binary (use SCCZ80EXE)"},
@@ -313,7 +318,7 @@ static arg_t  config[] = {
     {"COPTEXE", 0, SetStringConfig, &c_copt_exe, NULL, ""},
     {"COPYCMD", 0, SetStringConfig, &c_copycmd, NULL, ""},
     
-    {"INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-IDESTDIR/include" },
+    {"INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-IDESTDIR/include " },
     {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "DESTDIR/lib/z80rules.1" },
     {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2"},
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
@@ -547,6 +552,7 @@ int linkthem(char *linker)
     char            tname[FILENAME_MAX + 1];
     FILE           *out, *prj;
 
+    linkargs_mangle(linklibs);
     linkargs_mangle(linkargs);
 
     if (consolidated_object) {
@@ -556,29 +562,28 @@ int linkthem(char *linker)
             c_asmarg);
     }
     else if (makelib) {
-        len = offs = zcc_asprintf(&temp, "%s %s -d %s %s -x%s %s",
+        len = offs = zcc_asprintf(&temp, "%s %s -d %s %s -x%s",
             linker,
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v" : "",
             IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
-            linklibs,
-            outputfile,
-            linkargs);
+            linkargs,
+            outputfile);
     }
     else {
-        len = offs = zcc_asprintf(&temp, "%s %s %s -o%s%s %s%s%s%s%s%s%s%s%s%s", 
+        len = offs = zcc_asprintf(&temp, "%s -b -d %s -o%s%s %s%s%s%s%s%s%s%s%s%s%s", 
             linker, 
-            (c_nostdlib == 0) ? c_linkopts : " -b -d ", 
             IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
             linker_output_separate_arg ? " " : "", 
             outputfile,
             (z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v " : "",
-            linklibs,
             (relocate && IS_ASM(ASM_Z80ASM)) ? "-R " : "",
-            linkargs,
             globaldefon ? "-g " : "",
             (createapp || mapon) ? "-m " : "",
             (createapp || symbolson) ? "-s ": "",
             relocinfo ? "--reloc-info " : "",
+            linkargs,
+            (c_nostdlib == 0) ? c_linkopts : "",
+            linklibs,
             (c_nocrt == 0) ? c_crt0 : filelist[0],
             (c_nocrt == 0) ? ".asm" : "");
     }
@@ -656,8 +661,14 @@ int main(int argc, char **argv)
     snprintf(tmpnambuf, sizeof(tmpnambuf), "zcc%04X", ((unsigned int)time(NULL)) & 0xffff);
 #endif
 
-    user_compile_line_parsing = 0;
-    asmargs = linkargs = linklibs = cpparg = cpparg_front = NULL;
+    processing_user_command_line_arg = 0;
+
+    asmargs = linkargs = cpparg = NULL;
+    linklibs = muststrdup("");
+
+    cpp_incpath_first = cpp_incpath_last = NULL;
+    linker_libpath_first = linker_libpath_last = NULL;
+    linker_linklib_first = linker_linklib_last = NULL;
 
     atexit(remove_temporary_files);
     add_option_to_compiler("");
@@ -698,20 +709,18 @@ int main(int argc, char **argv)
         parse_option(muststrdup(c_options));
     }
     
-    /* At this point options come from the user compile line */
-    user_compile_line_parsing = 1;
-    
     /* Now, let's parse the command line arguments */
     max_argc = argc;
     gargv = argv;        /* Point argv to start of command line */
 
+    processing_user_command_line_arg = 1;
     for (gargc = gc; gargc < argc; gargc++) {
         if (argv[gargc][0] == '-')
             parse_cmdline_arg(argv[gargc]);
         else
             add_file_to_process(argv[gargc]);
     }
-
+    processing_user_command_line_arg = 0;
 
     if ( c_print_specs ) {
         print_specs();
@@ -737,17 +746,14 @@ int main(int argc, char **argv)
     configure_assembler();
     configure_compiler();
     configure_misc_options();
-
-    /* Do not apply special math lib treatment to the new c library */
-    if ((c_clib == 0) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc"))) configure_maths_library();
     
     if ( c_nostdlib == 0 ) {
         /* Add the startup library to the linker arguments */
         if ( c_startuplib && strlen(c_startuplib) ) {
             snprintf(buffer, sizeof(buffer), "-l%s ", c_startuplib);
-            BuildOptions(&linkargs, buffer);
+            AddLinkLibrary(NULL, buffer);
             /* Add the default cpp path */
-            BuildOptions(&cpparg, c_incpath);
+            AddPreProcIncPath(NULL, c_incpath);
         }
     }
 
@@ -808,13 +814,30 @@ int main(int argc, char **argv)
     /* Copy crt0 to temporary directory */
     if (c_nocrt == 0) copy_crt0_to_temp();   
 
-    /* Compiler options that must appear at front to implement defaults */
+    /* Mangle math lib name but only for classic compiles */
+    if ((c_clib == 0) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc")))
+        if (linker_linklib_first) configure_maths_library(&linker_linklib_first);   // -lm appears here
+
+    /* Options that must be sequenced in specific order */
     if ( compiler_type == CC_SDCC)
         BuildOptions_start(&comparg, "--constseg rodata_compiler ");
-    if (cpparg_front)
-        BuildOptions_start(&cpparg, cpparg_front);
 
-    /* Determine if consolidate object file is requested */
+    if (cpp_incpath_last)
+        BuildOptions(&cpp_incpath_first, cpp_incpath_last);
+    if (cpp_incpath_first)
+        BuildOptions_start(&cpparg, cpp_incpath_first);
+
+    BuildOptions(&linker_libpath_first, "-L. ");
+    if (linker_libpath_last)
+        BuildOptions(&linker_libpath_first, linker_libpath_last);
+    BuildOptions_start(&linkargs, linker_libpath_first);
+
+    if (linker_linklib_last)
+        BuildOptions(&linker_linklib_first, linker_linklib_last);
+    if (linker_linklib_first)
+        BuildOptions_start(&linklibs, linker_linklib_first);
+
+    /* Determine if consolidated object file is requested */
     consolidated_object = compileonly && (nfiles > 1) && (outputfile != NULL);
 
     /* Parse through the files, handling each one in turn */
@@ -830,13 +853,13 @@ SWITCH_REPEAT:
                 exit(1);
             }
             else if ((ft == CFILE) || (ft == HDRFILE) || (ft == INCFILE)) {
-                /* .c .h .inc must be output to destination directory immediately */
+                /* .c .h .inc must be output to original source directory immediately */
                 ptr = stripsuffix(original_filenames[i], ".m4");
                 if (copy_file(filelist[i], "", ptr, "")) {
                     fprintf(stderr, "Couldn't copy output file %s\n", ptr);
                     exit(1);
                 }
-                /* compile must use .c at its destination directory so that header files are correctly found */
+                /* preprocessor must use .c at its original source location so that header files are correctly found */
                 /* change original filenames for .h and .inc so that they are not copied twice when -m4 is applied */
                 free(original_filenames[i]);
                 original_filenames[i] = ptr;
@@ -1307,10 +1330,11 @@ void AddToArgs(arg_t *argument, char *arg)
 
 void AddPreProcIncPath(arg_t *argument, char *arg)
 {
-    if (user_compile_line_parsing)
-        BuildOptions(&cpparg_front, arg);
+    /* user-supplied inc path takes precedence over system-supplied inc path */
+    if (processing_user_command_line_arg)
+        BuildOptions(&cpp_incpath_first, arg);
     else
-        BuildOptions(&cpparg, arg);
+        BuildOptions(&cpp_incpath_last, arg);
 }
 
 void AddPreProc(arg_t *argument, char *arg)
@@ -1321,14 +1345,20 @@ void AddPreProc(arg_t *argument, char *arg)
 
 void AddLinkLibrary(arg_t *argument, char *arg)
 {
-    // maintain order of linked libraries
-    BuildOptions(&linkargs, arg);
+    /* user-supplied lib takes precedence over system-supplied lib */
+    if (processing_user_command_line_arg)
+        BuildOptions(&linker_linklib_first, arg);
+    else
+        BuildOptions(&linker_linklib_last, arg);
 }
 
-void AddLinkSearchPath(arg_t *arg, char *val)
+void AddLinkSearchPath(arg_t *argument, char *arg)
 {
-    // maintain order of library search path
-    BuildOptions(&linklibs, val);
+    /* user-supplied lib path takes precedence over system-supplied lib path */
+    if (processing_user_command_line_arg)
+        BuildOptions(&linker_libpath_first, arg);
+    else
+        BuildOptions(&linker_libpath_last, arg);
 }
 
 
@@ -1602,24 +1632,30 @@ static void configure_misc_options()
     }
 }
 
-static void configure_maths_library()
+static void configure_maths_library(char **libstring)
 {
     char   buf[1024];
     
     /* By convention, -lm refers to GENMATH, -lmz to Z88MATHLIB/ALTMATHLIB */
     
     if ( c_altmathlib ) {
-        if ( strstr(linkargs,"-lmz ") != NULL ) {
+        if ( strstr(*libstring,"-lmz ") != NULL ) {
             snprintf(buf, sizeof(buf),"-l%s ", c_altmathlib);
-            linkargs = replace_str(linkargs, "-lmz ", buf);
+            if ((*libstring = replace_str(*libstring, "-lmz ", buf)) == NULL) {
+                fprintf(stderr, "Malloc failed\n");
+                exit(1);
+            }
             parse_option(c_altmathflags);
         }
     }
     
     if ( c_genmathlib ) {
-        if ( strstr(linkargs,"-lm ") != NULL ) {
+        if ( strstr(*libstring,"-lm ") != NULL ) {
             snprintf(buf, sizeof(buf),"-l%s ", c_genmathlib);
-            linkargs = replace_str(linkargs, "-lm ", buf);
+            if ((*libstring = replace_str(*libstring, "-lm ", buf)) == NULL) {
+                fprintf(stderr, "Malloc failed\n");
+                exit(1);
+            }
         }    
     }
 }
