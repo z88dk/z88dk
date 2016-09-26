@@ -26690,7 +26690,7 @@ replace restart {
 	ld	bc,#0x0000
 	ld	%1,c
 	; peephole z88dk-606ag2
-} if notSame(%1 'b')
+} if operandsNotRelated(%1 'bc')
 
 replace restart {
 	ld	%1,#0x00
@@ -26699,7 +26699,7 @@ replace restart {
 	ld	de,#0x0000
 	ld	%1,e
 	; peephole z88dk-606ag3
-} if notSame(%1 'd')
+} if operandsNotRelated(%1 'de')
 
 replace restart {
 	ld	%1,#0x00
@@ -26708,7 +26708,7 @@ replace restart {
 	ld	hl,#0x0000
 	ld	%1,l
 	; peephole z88dk-606ag4
-} if notSame(%1 'h')
+} if operandsNotRelated(%1 'hl')
 
 replace restart {
 	xor	a,a
