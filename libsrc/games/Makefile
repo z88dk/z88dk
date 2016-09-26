@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.32 2016-07-14 13:30:10 pauloscustodio Exp $
+# $Id: Makefile,v 1.33 2016-09-26 07:05:52 stefano Exp $
 
 include	../Make.config
 
@@ -51,6 +51,10 @@ lvg5k:
 	zcc +test	$(CFLAGS) -DVZ bit_frequency.c
 	zcc +test	$(CFLAGS) -DVZ bit_play.c
 
+lz9001:
+	zcc +test	$(CFLAGS) -DZ9001 bit_frequency.c
+	zcc +test	$(CFLAGS) -DZ9001 bit_play.c
+
 # This piezo speaker has to be accessed	in its own way
 lvz:
 	zcc +test	$(CFLAGS) -DVZ bit_frequency.c
@@ -63,7 +67,7 @@ lgal:
 
 lp2000:
 	zcc +test $(CFLAGS) -DP2000 bit_frequency.c
-	zcc +test $(CFLAGS) -DDP2000 bit_play.c
+	zcc +test $(CFLAGS) -DP2000 bit_play.c
 
 # Access to SID (single bit resolution) with a full word address
 lc128:

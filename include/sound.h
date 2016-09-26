@@ -6,7 +6,7 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.21 2016-06-11 20:52:49 dom Exp $
+ *	$Id: sound.h,v 1.22 2016-09-26 07:05:52 stefano Exp $
  */
 
 
@@ -95,6 +95,10 @@ extern void __LIB__ bit_play(unsigned char melody[]);
    VZ300 has a CPU clock of 3,54 Mhz, VZ200 -> 3,58.. we stay in the middle */
 #ifdef VZ
   #define BEEP_TSTATES 442500.0  /* 3.54 Mhz */
+#endif
+
+#ifdef Z9001
+  #define BEEP_TSTATES 307200.0 /* 2.4576 Mhz */
 #endif
 
 /* We always get Z88, so it can't be a condition */

@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.251 2016-09-22 06:29:49 stefano Exp $
+# $Id: Makefile,v 1.252 2016-09-26 07:05:52 stefano Exp $
 
 
 include Make.config
@@ -985,6 +985,8 @@ z9001_clib.lib:
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
 	$(MAKE) -C assert
+	$(MAKE) gamesdeps
+	$(MAKE) -C games lz9001
 	$(LIBLINKER) -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
 
 # Untested C lib for NC100 machines - dom
