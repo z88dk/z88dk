@@ -13,7 +13,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.25 2016-06-11 19:53:08 dom Exp $
+ *	$Id: games.h,v 1.26 2016-09-30 12:23:55 stefano Exp $
  *
  */
 
@@ -127,6 +127,11 @@ extern unsigned int __LIB__ __FASTCALL__ joystick(int game_device) __SMALLCFASTC
 #ifdef __ZXVGS__
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "Joystick 2", "Joystick 3"};
 	#define GAME_DEVICES 4
+#endif
+
+#ifdef __Z9001__
+	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2"};
+	#define GAME_DEVICES 2
 #endif
 
 #ifndef GAME_DEVICES
