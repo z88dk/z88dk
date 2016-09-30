@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.252 2016-09-26 07:05:52 stefano Exp $
+# $Id: Makefile,v 1.253 2016-09-30 12:20:04 stefano Exp $
 
 
 include Make.config
@@ -988,6 +988,16 @@ z9001_clib.lib:
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lz9001
 	$(LIBLINKER) -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(LISTFILE_DIRECTORY)/z9001.lst
+	@echo ''
+	@echo '--- Building Z9001 Standard Graphics Libraires ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORz9001 -x$(OUTPUT_DIRECTORY)/gfx9001 @$(LISTFILE_DIRECTORY)/gfx9001.lst
+	@echo ''
+	@echo '--- Building Z9001 KRT High Resolution libraires ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORz9001krt -x$(OUTPUT_DIRECTORY)/gfx9001krt @$(LISTFILE_DIRECTORY)/gfx9001krt.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
