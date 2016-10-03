@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.253 2016-09-30 12:20:04 stefano Exp $
+# $Id: Makefile,v 1.254 2016-10-03 06:38:15 stefano Exp $
 
 
 include Make.config
@@ -24,7 +24,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib\
 	trs80_clib.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
-	embedded_clib.lib test_clib.lib z1013_clib.lib z9001_clib.lib \
+	embedded_clib.lib test_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
 	preempt.lib x1ansi_clib.lib zx80_clib.lib zx81libs sp1-all
 
 genlibs: z80_crt0.lib math48.lib gen_math.lib debug.lib malloc.lib gendos.lib ndos.lib adt.lib balloc.lib \
@@ -998,6 +998,20 @@ z9001_clib.lib:
 	@echo ''
 	$(MAKE) gfxdeps
 	$(LIBLINKER) -DFORz9001krt -x$(OUTPUT_DIRECTORY)/gfx9001krt @$(LISTFILE_DIRECTORY)/gfx9001krt.lst
+
+# Robotron HC900, KC85/2..KC85/5 library - Stefano
+kc_clib.lib:
+	@echo ''
+	@echo '--- Building VEB Mikroelektronik KC85/2..5 Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) -C stdlib TARGET=kc
+	$(MAKE) -C stdio 
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(LIBLINKER) -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(LISTFILE_DIRECTORY)/kc.lst
 
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:

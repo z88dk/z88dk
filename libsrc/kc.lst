@@ -1,0 +1,5 @@
+@stdio/stdio.lst
+stdio/kc/fgetc_cons
+stdio/kc/getk
+stdio/kc/fputc_cons
+@z80.lst

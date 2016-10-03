@@ -1,0 +1,73 @@
+lstoff
+
+; KC85/2 .. KC85/4 CAssette Operating System definitions
+;
+; October 2016
+; $Id: caos.def,v 1.1 2016-10-03 06:38:15 stefano Exp $
+;
+
+; jump distribution (Sprungverteiler)
+    defc	PV1       = 0xf003 ; parameter in regs, PVnr after call
+    defc	PV2       = 0xf006 ; return params in AF, PVnr on ARGC
+    defc	PV3       = 0xf009 ; like PV2, but PVnr in reg E
+    defc	PV4       = 0xf00c ; like PV3, but with IRM
+    defc	PVrel     = 0xf00f ; relavite call
+    defc	PV5       = 0xf015 ; PV3 with IRM and setting SP to  SYSP
+    defc	PV6       = 0xf01e ; like PV5, bit PVnr on ARGC
+
+; system cells
+    defc	CASS      = 0xb700 ; buffer for tape operations
+    defc	ARGC      = 0xb780 ; up nr for PV2 and PV6
+    defc	ARGN      = 0xb781 ; nr of argument
+    defc	ARG1      = 0xb782 ; argument 1
+    defc	ARG2      = 0xb784 ; argument 2
+    defc	ARG3      = 0xb786 ; argument 3
+    defc	ARG10     = 0xb794 ; argument 10
+
+    defc	CURSO_COL = 0xb7a0 ; cursor position x
+    defc	CURSO_ROW = 0xb7a1 ; cursor position y
+    defc	STBT      = 0xb7a2 ; control byte for screen
+    defc	COLOR     = 0xb7a3 ; color byte
+          
+    defc	HOR       = 0xb7d3 ; horizontal graphic position
+    defc	VERT      = 0xb7d5 ; vertical graphic position
+    defc	FARB      = 0xb7d6 ; graphic color
+
+
+; functions numbers
+    defc	FNCRT     = 0x00
+    defc	FNKBD     = 0x04
+    defc	FNKBDS    = 0x0c
+    defc	FNBYE     = 0x0d  
+    defc	FNKBDZ    = 0x0e
+    defc	FNCOLORUP = 0x0f
+    defc	FNLOOP    = 0x12
+    defc	FNWAIT    = 0x14
+    defc	FNLARG    = 0x15
+    defc	FNINLIN   = 0x17
+    defc	FNERRM    = 0x19
+    defc	FNHLHX    = 0x1a
+    defc	FNHLDE    = 0x1b
+    defc	FNAHEX    = 0x1c
+    defc	FNOSTR    = 0x23
+    defc	FNCUCP    = 0x25
+    defc	FNMODU    = 0x26
+    defc	FNJUMP    = 0x27
+    defc	FNBRKT    = 0x2a
+    defc	FNSPACE   = 0x2b
+    defc	FNCRLF    = 0x2c
+    defc	FNHOME    = 0x2d
+    defc	FNPUDE    = 0x2f
+    defc	FNPUSE    = 0x30
+    defc	FNWININ   = 0x3c
+    defc	FNWINAK   = 0x3d
+    defc	FNLINE    = 0x3e
+    defc	FNCIRCLE  = 0x3f
+    defc	FNSQR     = 0x40
+    defc	FNCSTBT   = 0x42
+    defc	FNINIEA   = 0x43
+    defc	FNINIME   = 0x44
+    defc	FNZKOUT   = 0x45
+
+
+lston
