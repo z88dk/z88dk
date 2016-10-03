@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.60 2016-09-23 23:46:49 aralbrec Exp $
+ *   $Id: appmake.h,v 1.61 2016-10-03 06:14:49 stefano Exp $
  */
 
 
@@ -157,6 +157,9 @@ extern option_t  z1013_options;
 extern int       z9001_exec(char *target);
 extern option_t  z9001_options;
 
+extern int       kc_exec(char *target);
+extern option_t  kc_options;
+
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
 
@@ -203,10 +206,6 @@ struct {
       "Creates an AMSDOS file suitable for writing to a .DSK image, opt. WAV",
       NULL,
       cpc_exec,   &cpc_options },
-    { "newext",  "newext",      "(C) 2014 Stefano Bodrato",
-      "Changes the binary file extension for CP/M and others",
-      NULL,
-      newext_exec,   &newext_options },
     { "bin2ep",   "enterprise",      "(C) 2011 Stefano Bodrato",
       "Adds a type 5 header to make a .app file",
       NULL,
@@ -219,6 +218,10 @@ struct {
       "Creates an intel hex record suitable for embedded devices",
       NULL,
       hex_exec,     &hex_options },
+    { "newext",  "newext",      "(C) 2014 Stefano Bodrato",
+      "Changes the binary file extension for CP/M and others",
+      NULL,
+      newext_exec,   &newext_options },
     { "inject",  "inject",      "(C) 2014 Dominic Morris",
       "Injects files within other files",
       inject_longhelp,
@@ -227,6 +230,10 @@ struct {
       "Extracts bytes from input file",
       extract_longhelp,
       extract_exec,    &extract_options },
+    { "kcc",      "kc",          "(C) 2016 Stefano Bodrato",
+      "Prapares a .KCC file for the Robotron KC85/2..KC85/4",
+      NULL,
+      kc_exec,       &kc_options },
     { "lynxtap",  "lynx",      "(C) 2014 Stefano Bodrato",
       "Generates a tape file for the Camputers Lynx, opt. WAV",
       NULL,

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.40 2015-11-05 16:08:04 stefano Exp $
+# $Id: Makefile,v 1.41 2016-10-03 06:14:49 stefano Exp $
 
 
 lx11:
@@ -56,6 +56,7 @@ clean:
 	$(RM) vg5k/*.o
 	$(RM) vz200/*.o
 	$(RM) z88/*.o
+	$(RM) z9001/*.o
 	$(RM) zx80/*.o
 	$(RM) time/zx81/*.o
 	$(RM) zx81/*.o

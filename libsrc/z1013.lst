@@ -33,5 +33,4 @@ graphics/putsprite3
 graphics/liner
 graphics/stencil_render
 graphics/text/swapgfxbk
-games/joystick
 @z80.lst
