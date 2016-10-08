@@ -104,7 +104,7 @@ void assemble_file( char *filename )
 	/* when building libraries need to reset codearea to allow total library size > 64K
 	   when building binary cannot reset codearea so that each module is linked
 	   after the previous one, allocating addresses */
-	if ( ! opts.make_bin )
+	if (!(opts.make_bin || opts.bin_file))
 		reset_codearea();
 
     /* Create module data structures for new file */
@@ -220,6 +220,7 @@ static void do_assemble( char *src_filename )
 
 	remove_all_local_syms();
 	remove_all_global_syms();
+	ExprList_remove_all(CURRENTMODULE->exprs);
 
 	if (opts.verbose)
 		putchar('\n');    /* separate module texts */
@@ -339,7 +340,7 @@ int main( int argc, char *argv[] )
 	char **pfile;
 
 	model_init();						/* init global data */
-	libraryhdr = NULL;              /* initialise to no library files */
+	libraryhdr = NULL;					/* initialise to no library files */
 
 	/* parse command line and call-back via assemble_file() */
 	/* If filename starts with '@', reads the file as a list of filenames
@@ -348,22 +349,35 @@ int main( int argc, char *argv[] )
 	for (pfile = NULL; (pfile = (char**)utarray_next(opts.files, pfile)) != NULL; )
 		assemble_file(*pfile);
 
-	/* Create library */
-	if (!get_num_errors() && opts.lib_file)
-		make_library(opts.lib_file, opts.files);
+	/* Create output file */
+	if (!get_num_errors()) {
+		if (opts.lib_file) {
+			make_library(opts.lib_file, opts.files);
+		}
+		else if (opts.make_bin) {
+			assert(opts.consol_obj_file == NULL);
+			link_modules();			
+			if (!get_num_errors())
+				CreateBinFile();
+		}
+		else if (opts.bin_file) {	// -o consolidated obj
+			opts.consol_obj_file = get_obj_filename(opts.bin_file);
+			opts.bin_file = NULL;
 
-	if (!get_num_errors() && opts.make_bin)
-		link_modules();
+			assert(opts.consol_obj_file != NULL);
+			link_modules();
 
-	if (!get_num_errors() && opts.make_bin)
-	{
-		if (opts.map)
-			write_map_file();
+			set_cur_module(get_first_module(NULL));
+			
+			CURRENTMODULE->filename = get_asm_filename(opts.consol_obj_file);
+			CURRENTMODULE->modname = path_remove_ext(path_basename(CURRENTMODULE->filename));
 
-		if (opts.globaldef)
-			write_def_file();
+			if (!get_num_errors())
+				write_obj_file(opts.consol_obj_file);
 
-		CreateBinFile();
+			if (!get_num_errors() && opts.symtable)
+				write_sym_file(CURRENTMODULE);
+		}
 	}
 
 	set_error_null();

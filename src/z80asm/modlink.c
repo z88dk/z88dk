@@ -25,6 +25,7 @@ Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /* external functions */
 struct libfile *NewLibrary( void );
@@ -33,10 +34,10 @@ struct libfile *NewLibrary( void );
 int LinkModule(char *filename, long fptr_base, StrHash *extern_syms);
 int LinkTracedModule( char *filename, long baseptr );
 int LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHash *extern_syms);
-char *ReadName( FILE *file );
 void CreateBinFile(void);
 void ReadNames(char *filename, FILE *file);
 void ReleaseLinkInfo( void );
+static void merge_modules();
 
 /* global variables */
 extern char Z80objhdr[];
@@ -232,7 +233,7 @@ static void read_cur_module_exprs(ExprList *exprs, FILE *file, char *filename)
 
 }
 
-/* read all the modules' expressions to the given list */
+/* read all the modules' expressions to the given list, or to the module's if NULL */
 static void read_module_exprs( ExprList *exprs )
 {
     long fptr_exprdecl;
@@ -263,7 +264,10 @@ static void read_module_exprs( ExprList *exprs )
 			if (fptr_exprdecl != -1)
 			{
 				fseek(file, fptr_base + fptr_exprdecl, SEEK_SET);
-				read_cur_module_exprs(exprs, file, curlink->objfilename);
+				if (exprs != NULL)
+					read_cur_module_exprs(exprs, file, curlink->objfilename);
+				else
+					read_cur_module_exprs(CURRENTMODULE->exprs, file, curlink->objfilename);
 			}
 
 			myfclose(file);
@@ -474,7 +478,7 @@ static void relocate_symbols_symtab( SymbolHash *symtab )
 			set_cur_module(  sym->module );
 			set_cur_section( sym->section );
 
-			base_addr = sym->section->addr;
+ 			base_addr = sym->section->addr;
 			offset    = get_cur_module_start();
 
             sym->value += base_addr + offset;	/* Absolute address */
@@ -679,15 +683,14 @@ static void link_libraries(StrHash *extern_syms)
 void link_modules( void )
 {
     char fheader[9];
-    Module *module, *first_obj_module, *last_obj_module;
+    Module *module, *first_obj_module;
 	ModuleListElem *iter;
-	Bool saw_last_obj_module;
     char *obj_filename;
 	ExprList *exprs = NULL;
 	FILE *file;
 	StrHash *extern_syms = OBJ_NEW(StrHash);
 
-    opts.symtable = opts.cur_list = FALSE;
+    opts.cur_list = FALSE;
     linkhdr = NULL;
 
     if ( opts.relocatable )
@@ -704,14 +707,11 @@ void link_modules( void )
         reloctable = NULL;
     }
 
-	/* remember current first and last modules, i.e. before adding library modules */
+	/* remember current first modules */
 	first_obj_module = get_first_module(&iter);
-	last_obj_module = get_last_module(NULL);
 
 	/* link machine code & read symbols in all modules */
-	for (module = first_obj_module, saw_last_obj_module = FALSE;
-		module != NULL && !saw_last_obj_module;
-		module = get_next_module(&iter))
+	for (module = first_obj_module; module != NULL; module = get_next_module(&iter))
 	{
 		set_cur_module(module);
 
@@ -745,23 +745,21 @@ void link_modules( void )
 
 			LinkModule(obj_filename, 0, extern_syms);       /* link code & read name definitions */
 		}
-
-		/* parse only object modules, not added library modules */
-		if (CURRENTMODULE == last_obj_module)
-			saw_last_obj_module = TRUE;
-
 	}
 
 	/* link libraries */
-	if (opts.library)
+	/* consol_obj_file do not include libraries */
+	if (!get_num_errors() && !opts.consol_obj_file && opts.library)
 		link_libraries(extern_syms);
 
 	set_error_null();
 
 	/* allocate segment addresses and compute absolute addresses of symbols */
-	if (!get_num_errors())
+	/* in consol_obj_file sections are zero-based */
+	if (!get_num_errors() && !opts.consol_obj_file)	
 		sections_alloc_addr();
 
+	/* relocate address symbols */
 	if (!get_num_errors())
 		relocate_symbols();
 
@@ -769,24 +767,43 @@ void link_modules( void )
 	if (!get_num_errors())
 		define_location_symbols();
 
-	/* collect expressions from all modules; first compute all EQU expressions,
-	then patch all other expressions
-	exprs keeps the current pending list */
-	exprs = OBJ_NEW(ExprList);
-	if (!get_num_errors())
-		read_module_exprs(exprs);
-	if (!get_num_errors())
-		compute_equ_exprs(exprs, TRUE, FALSE);
-	if (!get_num_errors())
-		patch_exprs(exprs);
-	
-	OBJ_DELETE(exprs);
+	if (opts.consol_obj_file) {
+		if (!get_num_errors())
+			merge_modules();
+
+		if (!get_num_errors() && opts.symtable)
+			write_sym_file(CURRENTMODULE);
+	}
+	else {
+		/* collect expressions from all modules */
+		exprs = OBJ_NEW(ExprList);
+		if (!get_num_errors())
+			read_module_exprs(exprs);
+
+		/* compute all EQU expressions */
+		if (!get_num_errors())
+			compute_equ_exprs(exprs, TRUE, FALSE);
+
+		/* patch all other expressions */
+		if (!get_num_errors())
+			patch_exprs(exprs);
+
+		OBJ_DELETE(exprs);
+	}
 
 	set_error_null();
 
 	ReleaseLinkInfo();              /* Release module link information */
 
 	close_error_file();
+
+	if (!get_num_errors()) {
+		if (opts.map)
+			write_map_file();
+
+		if (opts.globaldef)
+			write_def_file();
+	}
 
 	OBJ_DELETE(extern_syms);
 }
@@ -1010,4 +1027,144 @@ ReleaseLinkInfo( void )
     m_free( linkhdr );
 
     linkhdr = NULL;
+}
+
+/* Consolidate object file */
+static void replace_names(Str *result, char *input, StrHash *map)
+{
+	STR_DEFINE(key, STR_SIZE);
+	char *elem;
+	char *p0, *p1;
+	str_clear(result);
+
+	p0 = input;
+	while (*p0) {
+		if (isalnum(*p0)) {	/* /\w+/ */
+			p1 = p0 + 1;
+			while (*p1 && isalnum(*p1))
+				p1++;
+			str_set_n(key, p0, p1 - p0);
+			elem = StrHash_get(map, str_data(key));
+			if (elem)
+				str_append(result, (char *)elem);
+			else
+				str_append(result, str_data(key));
+			p0 = p1;
+		}
+		else {				/* /\W+/ */
+			p1 = p0 + 1;
+			while (*p1 && !isalnum(*p1))
+				p1++;
+			str_append_n(result, p0, p1 - p0);
+			p0 = p1;
+		}
+	}
+}
+
+static void rename_module_local_symbols(Module *module)
+{
+	Symbol *sym;
+	SymbolHashElem *sym_it;
+	StrHash *old_syms = OBJ_NEW(StrHash);
+	StrHashElem *name_it;
+	Expr *expr;
+	ExprListElem *expr_it;
+	char *old_name, *value;
+	STR_DEFINE(new_name, STR_SIZE);
+	STR_DEFINE(new_text, STR_SIZE);
+
+	/* collect list of symbol names to change - cannot iterate through symbols hash while changing it */
+	for (sym_it = SymbolHash_first(module->local_symtab); sym_it != NULL; sym_it = SymbolHash_next(sym_it)) {
+		sym = (Symbol *)sym_it->value;
+
+		old_name = strpool_add(sym->name);
+		str_sprintf(new_name, "%s_%s", module->modname, old_name);
+		StrHash_set(&old_syms, old_name, strpool_add(str_data(new_name)));
+	}
+
+	/* change symbol names */
+	for (name_it = StrHash_first(old_syms); name_it != NULL; name_it = StrHash_next(name_it)) {
+		value = strpool_add((char *)name_it->value);
+
+		sym = SymbolHash_extract(module->local_symtab, name_it->key);
+		sym->name = value;
+		SymbolHash_set(&module->local_symtab, value, sym);
+	}
+
+	/* rename symbols in expressions */
+	for (expr_it = ExprList_first(module->exprs); expr_it != NULL; expr_it = ExprList_next(expr_it)) {
+		expr = expr_it->obj;
+
+		/* rpn_ops already point to symbol table, no rename needed - change only text and target_name */
+		replace_names(new_text, str_data(expr->text), old_syms);
+		str_set(expr->text, str_data(new_text));
+
+		if (expr->target_name) {
+			replace_names(new_text, expr->target_name, old_syms);
+			expr->target_name = strpool_add(str_data(new_text));
+		}
+	}
+
+	OBJ_DELETE(old_syms);
+}
+
+static void merge_local_symbols()
+{
+	Module *module;
+	Module *first_module;
+	ModuleListElem *it;
+	Symbol *sym;
+	SymbolHashElem *sym_it;
+	Expr *expr;
+	int start;
+
+	first_module = get_first_module(NULL); assert(first_module != NULL);
+
+	for (module = get_first_module(&it); module != NULL; module = get_next_module(&it)) {
+		rename_module_local_symbols(module);
+
+		if (module != first_module) {
+			/* move local symbols */
+			while ((sym_it = SymbolHash_first(module->local_symtab)) != NULL) {
+				sym = SymbolHash_extract(module->local_symtab, sym_it->key);
+				SymbolHash_set(&first_module->local_symtab, sym->name, sym);
+			}
+
+			/* move local expressions */
+			while ((expr = ExprList_pop(module->exprs)) != NULL) {
+				ExprList_push(&first_module->exprs, expr);
+				
+				/* relocate expression address */
+				set_cur_module(expr->module);
+				set_cur_section(expr->section);
+				start = get_cur_module_start();
+				expr->asmpc += start;
+				expr->code_pos += start;
+
+				set_cur_module(first_module);
+			}
+		}
+	}
+}
+
+static void merge_codearea()
+{
+	Section *section;
+	SectionHashElem *iter;
+
+	for (section = get_first_section(&iter); section != NULL; section = get_next_section(&iter)) {
+		intArray_set_size(section->module_start, 1);		/* delete all module boundaries */
+	}
+}
+
+static void merge_modules()
+{
+	/* read each module's expression list */
+	read_module_exprs(NULL);
+
+	/* merge local symbols to avoid name clashes in merged module */
+	merge_local_symbols();
+
+	/* merge code areas */
+	merge_codearea();
 }

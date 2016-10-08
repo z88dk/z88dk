@@ -36,6 +36,7 @@ OPT_VAR( int, 		cpu,		CPU_Z80	)
 
 OPT_VAR( char *,	bin_file,	NULL	)	/* set by -o */
 OPT_VAR( char *,	lib_file,	NULL	)	/* set by -x */
+OPT_VAR( char *,    consol_obj_file, NULL)	/* set by -o and no -b */
 
 OPT_VAR(UT_array *,	inc_path,	NULL )		/* path for include files */
 OPT_VAR(UT_array *,	lib_path,	NULL )		/* path for library files */

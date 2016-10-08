@@ -725,3 +725,215 @@ is read_binfile("test.bin"), "", "test.bin";
 is read_binfile("test_bank0.bin"), "\xC9\0\0\0\0\0\0\0\xC9\xC9", "test_bank0.bin";
 is read_binfile("test_bank1.bin"), "\xCD\x08\x00\x00\x00\0\0\0\xC9\x00\xC9", "test_bank1.bin";
 is read_binfile("test_main.bin"), "\xCD\x08\x00\x09\x00\xCD\x08\x00\x0A\x00\xC9", "test_main.bin";
+
+#------------------------------------------------------------------------------
+# Test consolidated object file
+write_file("test1.asm", <<'...');
+		global main, print
+
+		section code
+	main:
+		ld hl,mess+main-main		; force main to appear in .o file
+		call print
+		ret
+		
+		section data
+	mess: defb "hello "	
+...
+
+write_file("test2.asm", <<'...');
+		global print, print1, printa
+
+		defc print = print1
+		defc printa1 = printa
+		
+		section code
+	printa:
+		ld a,(hl)
+		and a
+		ret z
+		rst 10h
+		inc hl
+		jp printa1
+		
+		section data
+	mess: defb "world"
+...
+
+write_file("test3.asm", <<'...');
+		global print1, printa
+		
+		section code
+	print1:
+		push hl
+		call printa
+		pop hl
+		ret
+		
+		section data
+	mess: defb "!", 0
+	dollar:	defw ASMPC
+...
+
+my $bincode = sub {
+	my($addr) = @_;
+	my $code;
+	my $data;
+	my $l_main = 0;
+	my $l_print = 0;
+	my $l_print1 = 0;
+	my $l_printa = 0;
+	my $l_mess = 0;
+	my $l_dollar = 0;
+	
+	for my $pass (1..2) {
+		$code = "";
+		$data = "";
+		
+		# test1.asm
+		$l_main = $addr + length($code);
+		$code .= pack("Cv", 0x21, $l_mess).
+				 pack("Cv", 0xCD, $l_print).
+				 pack("C",  0xC9);
+				 
+		$data .= "hello ";
+		
+		# test2.asm
+		$l_printa = $addr + length($code);
+		$code .= pack("C*",	0x7E,
+							0xA7,
+							0xC8,
+							0xD7,
+							0x23).
+				 pack("Cv",	0xC3, $l_printa);
+		
+		$data .= "world";
+				
+		# test3.asm
+		$l_print1 = $addr + length($code);
+		$code .= pack("C*",	0xE5).
+				 pack("Cv",	0xCD, $l_printa).
+				 pack("C*",	0xE1,
+							0xC9);
+							
+		$data .= "!\0";
+		$data .= pack("v", $l_dollar);
+		
+		if ($pass == 1) {
+			$l_mess = $addr + length($code);
+			$l_dollar = $addr + length($code) + length($data) - 2;
+			$l_print = $l_print1;
+		}
+	}
+	
+	my $bin = $code.$data;
+	return $bin;
+};
+
+$cmd = "./z80asm -s -otest.o test1.asm test2.asm test3.asm";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+
+z80nm("test.o", <<'END');
+
+File test.o at $0000: Z80RMF08
+  Name: test
+  Names:
+    L A $0000 test1_mess (section data)
+    L = $0000 test2_printa1
+    G A $0000 main (section code)
+    G = $0000 print
+    G A $0007 printa (section code)
+    G A $000F print1 (section code)
+  Expressions:
+    E Cw (test1.asm:5) $0000 $0001: test1_mess+main-main (section code)
+    E Cw (test1.asm:6) $0003 $0004: print (section code)
+    E Cw (test2.asm:13) $000C $000D: test2_printa1 (section code)
+    E =  (test2.asm:4) $0000 $0000: test2_printa1 := printa
+    E =  (test2.asm:3) $0000 $0000: print := print1
+    E Cw (test3.asm:12) $000D $000D: ASMPC (section data)
+    E Cw (test3.asm:6) $0010 $0011: printa (section code)
+  Code: 21 bytes (section code)
+    C $0000: 21 00 00 CD 00 00 C9 7E A7 C8 D7 23 C3 00 00 E5
+    C $0010: CD 00 00 E1 C9
+  Code: 15 bytes (section data)
+    C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64 21 00 00 00
+END
+
+eq_or_diff_text norm_nl(scalar(read_file("test.sym"))), norm_nl(<<'END');
+main                            = $0000 ; G 
+print                           = $0000 ; G 
+test1_mess                      = $0000 ; L 
+test2_printa1                   = $0000 ; L 
+printa                          = $0007 ; G 
+print1                          = $000F ; G 
+END
+
+# at address 0
+unlink "test.asm", "test.bin";
+
+$cmd = "./z80asm -b -m test.o";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+test_binfile("test.bin", $bincode->(0));
+
+eq_or_diff_text norm_nl(scalar(read_file("test.map"))), norm_nl(<<'END');
+ASMHEAD                         = $0000 ; G 
+ASMHEAD_code                    = $0000 ; G 
+main                            = $0000 ; G test
+printa                          = $0007 ; G test
+test2_printa1                   = $0007 ; L test
+ASMSIZE_data                    = $000F ; G 
+print1                          = $000F ; G test
+print                           = $000F ; G test
+ASMHEAD_data                    = $0015 ; G 
+ASMSIZE_code                    = $0015 ; G 
+ASMTAIL_code                    = $0015 ; G 
+test1_mess                      = $0015 ; L test
+ASMSIZE                         = $0024 ; G 
+ASMTAIL                         = $0024 ; G 
+ASMTAIL_data                    = $0024 ; G 
+END
+
+# at address 0x1234
+unlink "test.asm", "test.bin";
+
+$cmd = "./z80asm -b -m -r0x1234 test.o";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+test_binfile("test.bin", $bincode->(0x1234));
+
+eq_or_diff_text norm_nl(scalar(read_file("test.map"))), norm_nl(<<'END');
+ASMSIZE_data                    = $000F ; G 
+ASMSIZE_code                    = $0015 ; G 
+ASMSIZE                         = $0024 ; G 
+ASMHEAD                         = $1234 ; G 
+ASMHEAD_code                    = $1234 ; G 
+main                            = $1234 ; G test
+printa                          = $123B ; G test
+test2_printa1                   = $123B ; L test
+print1                          = $1243 ; G test
+print                           = $1243 ; G test
+ASMHEAD_data                    = $1249 ; G 
+ASMTAIL_code                    = $1249 ; G 
+test1_mess                      = $1249 ; L test
+ASMTAIL                         = $1258 ; G 
+ASMTAIL_data                    = $1258 ; G 
+END
+
+
+
+sub norm_nl {
+	my($text) = @_;
+	$text =~ s/\r?\n/\n/g;
+	return $text;
+}
