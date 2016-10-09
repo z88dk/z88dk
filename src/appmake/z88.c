@@ -28,7 +28,7 @@
  *        djm 12/1/2000
  *        Add option to disallow page truncation
  *      
- *      $Id: z88.c,v 1.12 2016-07-13 22:12:25 dom Exp $
+ *      $Id: z88.c,v 1.13 2016-10-09 18:44:47 pauloscustodio Exp $
  */
 
 
@@ -164,7 +164,7 @@ int z88_exec(char *target)
         exit_log(1, "Could not find parameter __crt_z88_safedata - no app crt present\n");
     reqpag = parameter_search(crtfile,".map","CRT_Z88_BADPAGES");
     if ( reqpag == -1 )  {
-         int asmtail = parameter_search(crtfile,".map","ASMTAIL_BSS_END");
+         int asmtail = parameter_search(crtfile,".map","__BSS_END_tail");
          if ( asmtail == -1 ) {
               exit_log(1, "reqpag isn't defined and can't find the end of the BSS segment\n");
          }

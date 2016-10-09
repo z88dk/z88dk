@@ -194,9 +194,9 @@ int sms_exec(char *target)
 
     // check available ram space
 
-    if ((c = parameter_search(crtfile, ".map", "ASMTAIL_BSS_END")) >= 0)
+    if ((c = parameter_search(crtfile, ".map", "__BSS_END_tail")) >= 0)
     {
-        if ((i = parameter_search(crtfile, ".map", "ASMHEAD_DATA")) >= 0)
+        if ((i = parameter_search(crtfile, ".map", "__DATA_head")) >= 0)
         {
             c -= i - 8;
             if (c <= 0x2000)
