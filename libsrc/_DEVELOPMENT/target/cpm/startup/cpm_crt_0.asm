@@ -41,10 +41,9 @@ include "clib_target_constants.inc"
 
 
 
-IF (__crt_enable_streams & 0x1)
-   
 
-   
+
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdin
    ;
@@ -168,33 +167,10 @@ IF (__crt_enable_streams & 0x1)
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ELSE
-IF (__crt_enable_streams & 0xfffe)
-   
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE ABSENT
-   ; fd   : 0
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; empty fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw 0
-   
-   ; FDSTRUCT structure
-   
-   defc __i_fcntl_fdstruct_0 = 0
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ENDIF
-ENDIF
 
-IF (__crt_enable_streams & 0x2)
-   
 
-   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdout
    ;
@@ -305,31 +281,8 @@ IF (__crt_enable_streams & 0x2)
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ELSE
-IF (__crt_enable_streams & 0xfffc)
-   
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE ABSENT
-   ; fd   : 1
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; empty fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw 0
-   
-   ; FDSTRUCT structure
-   
-   defc __i_fcntl_fdstruct_1 = 0
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ENDIF
-ENDIF
-
-IF (__crt_enable_streams & 0x4)
-      
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; DUPED FILE DESCRIPTOR
    ;
@@ -401,33 +354,10 @@ IF (__crt_enable_streams & 0x4)
 
       
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-ELSE
-IF (__crt_enable_streams & 0xfff8)
-   
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE ABSENT
-   ; fd   : 2
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; empty fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw 0
-   
-   ; FDSTRUCT structure
-   
-   defc __i_fcntl_fdstruct_2 = 0
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ENDIF
-ENDIF
 
-IF (__crt_enable_streams & 0x8)
-   
 
-   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdrdr
    ;
@@ -538,33 +468,10 @@ IF (__crt_enable_streams & 0x8)
             
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ELSE
-IF (__crt_enable_streams & 0xfff0)
-   
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE ABSENT
-   ; fd   : 3
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; empty fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw 0
-   
-   ; FDSTRUCT structure
-   
-   defc __i_fcntl_fdstruct_3 = 0
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ENDIF
-ENDIF
 
-IF (__crt_enable_streams & 0x10)
-   
 
-   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdpun
    ;
@@ -675,33 +582,10 @@ IF (__crt_enable_streams & 0x10)
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ELSE
-IF (__crt_enable_streams & 0xffe0)
-   
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE ABSENT
-   ; fd   : 4
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-   ; empty fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw 0
-   
-   ; FDSTRUCT structure
-   
-   defc __i_fcntl_fdstruct_4 = 0
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ENDIF
-ENDIF
 
-IF (__crt_enable_streams & 0x20)
-   
 
-   
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; FILE  : _stdlst
    ;
@@ -812,28 +696,6 @@ IF (__crt_enable_streams & 0x20)
          
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ELSE
-IF (__crt_enable_streams & 0xffc0)
-   
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ; FILE ABSENT
-   ; fd   : 5
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-   ; empty fd table entry
-   
-   SECTION data_fcntl_fdtable_body
-   defw 0
-   
-   ; FDSTRUCT structure
-   
-   defc __i_fcntl_fdstruct_5 = 0
-   
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-ENDIF
-ENDIF
 
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -955,9 +817,9 @@ ENDIF
       
       SECTION data_fcntl_fdtable_body
       
-      EXTERN ASMHEAD_data_fcntl_fdtable_body
+      EXTERN __data_fcntl_fdtable_body_head
       
-      defc __fcntl_fdtbl = ASMHEAD_data_fcntl_fdtable_body
+      defc __fcntl_fdtbl = __data_fcntl_fdtable_body_head
       
       IF __clib_open_max > 6
       
