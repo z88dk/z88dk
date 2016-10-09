@@ -31,7 +31,7 @@ asm_in_key_pressed:
    ;            hl = 0
    ;            carry reset
    ;
-   ; uses  : af, bc, hl
+   ; uses  : af, hl
    
    ld a,h
    and $c0
@@ -65,14 +65,11 @@ check_symshift:
 
 check_key:
 
-   ld a,h
-   and $1f                     ; a = key mask
+   ld a,l                      ; a = key row
+   in a,($fe)
    
-   ld b,l                      ; b = key row
-   ld c,$fe                    ; c = keyboard port
+   and $1f
+   and h                       ; key mask
    
-   in b,(c)
-   and b
    jp nz, error_znc            ; if key is not pressed
-   
    jp error_mc                 ; if key is pressed
