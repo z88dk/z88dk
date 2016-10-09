@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.178 2016-10-06 14:25:05 aralbrec Exp $
+ *      $Id: zcc.c,v 1.179 2016-10-09 03:31:11 aralbrec Exp $
  */
 
 
@@ -836,8 +836,29 @@ int main(int argc, char **argv)
     if (linker_linklib_first)
         BuildOptions_start(&linklibs, linker_linklib_first);
 
+    /* Peephole optimization level for sdcc */
+    if ( compiler_type == CC_SDCC )
+    {
+       switch (sdccpeepopt)
+       {
+       case 0:
+          add_option_to_compiler(opt_code_size ? c_sdccpeeph0cs : c_sdccpeeph0);
+          break;
+       case 1:
+          add_option_to_compiler(opt_code_size ? c_sdccpeeph1cs : c_sdccpeeph1);
+          break;
+       case 2:
+          add_option_to_compiler(opt_code_size ? c_sdccpeeph2cs : c_sdccpeeph2);
+          break;
+       default:
+          add_option_to_compiler(opt_code_size ? c_sdccpeeph3cs : c_sdccpeeph3);
+          break;
+       }
+    }
+
     /* Parse through the files, handling each one in turn */
     for (i = 0; i < nfiles; i++) {
+        if (verbose) printf("\nPROCESSING %s\n", original_filenames[i]);
 SWITCH_REPEAT:
         switch (get_filetype_by_suffix(filelist[i])) {
         case M4FILE:
@@ -892,24 +913,6 @@ SWITCH_REPEAT:
             }
         case CPPFILE:
             if (m4only || preprocessonly) continue;
-            if ( compiler_type == CC_SDCC )
-            {
-               switch (sdccpeepopt)
-               {
-               case 0:
-                  add_option_to_compiler(opt_code_size ? c_sdccpeeph0cs : c_sdccpeeph0);
-                  break;
-               case 1:
-                  add_option_to_compiler(opt_code_size ? c_sdccpeeph1cs : c_sdccpeeph1);
-                  break;
-               case 2:
-                  add_option_to_compiler(opt_code_size ? c_sdccpeeph2cs : c_sdccpeeph2);
-                  break;
-               default:
-                  add_option_to_compiler(opt_code_size ? c_sdccpeeph3cs : c_sdccpeeph3);
-                  break;
-               }
-            }
             if (process(".i", ".opt", c_compiler, comparg, compiler_style, i, YES, NO))
                exit(1);
         case OPTFILE:
@@ -1003,6 +1006,8 @@ CASE_ASMFILE:
             exit(1);
         }
     }
+
+    if (verbose) printf("\n");
 
     if (m4only) {
         if (nfiles > 1) outputfile = NULL;
