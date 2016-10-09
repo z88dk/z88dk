@@ -537,21 +537,19 @@ static void define_location_symbols( void )
 			start_addr = section->addr;
 			end_addr   = start_addr + get_section_size( section );
 
-			if (start_addr != end_addr) {
-				if (opts.verbose)
-					printf("Section '%s' size: %d bytes ($%04X to $%04X)\n",
-						section->name, (int)(end_addr - start_addr),
-						(unsigned int)start_addr, (unsigned int)end_addr - 1);
+			if (opts.verbose)
+				printf("Section '%s' size: %d bytes ($%04X to $%04X)\n",
+					section->name, (int)(end_addr - start_addr),
+					(unsigned int)start_addr, (unsigned int)end_addr - 1);
 
-				str_sprintf(name, ASMHEAD_KW, section->name, "_");
-				define_global_def_sym(str_data(name), start_addr);
+			str_sprintf(name, ASMHEAD_KW, section->name, "_");
+			define_global_def_sym(str_data(name), start_addr);
 
-				str_sprintf(name, ASMTAIL_KW, section->name, "_");
-				define_global_def_sym(str_data(name), end_addr);
+			str_sprintf(name, ASMTAIL_KW, section->name, "_");
+			define_global_def_sym(str_data(name), end_addr);
 
-				str_sprintf(name, ASMSIZE_KW, section->name, "_");
-				define_global_def_sym(str_data(name), end_addr - start_addr);
-			}
+			str_sprintf(name, ASMSIZE_KW, section->name, "_");
+			define_global_def_sym(str_data(name), end_addr - start_addr);
 		}
 	}
 

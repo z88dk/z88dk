@@ -395,6 +395,9 @@ ASM
 
 eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
 __code_head                     = $0000 ; G 
+__empty_head                    = $0000 ; G 
+__empty_size                    = $0000 ; G 
+__empty_tail                    = $0000 ; G 
 __head                          = $0000 ; G 
 __code_size                     = $0001 ; G 
 __code_tail                     = $0001 ; G 

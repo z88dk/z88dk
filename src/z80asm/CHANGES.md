@@ -4,12 +4,11 @@ Z88DK Z80 Module Assembler Change Log
 2016
 ----
 
-- 2016-10-09
+- 2016-10-10
 
   Rename generated constants to start with '__', prune empty sections
   Rename ASMHEAD, ASMTAIL and ASMSIZE to __head, __tail and __size respectively.
   Rename ASM<HEAD|TAIL|SIZE>_<section_name> to __<section_name>_<head|tail|size>. 
-  Do not generate these constants for empty sections.
   
 - 2016-10-08
 
