@@ -38,7 +38,7 @@ IF __CRTDEF = 0
    defc TAR__crt_enable_restart        = 0
    defc TAR__crt_enable_close          = 1
    
-   defc TAR__crt_enable_eidi           = 0
+   defc TAR__crt_enable_eidi           = 0x01     ;; disable interrupts at start
    defc TAR__crt_on_exit               = 0x30002  ;; return to basic
    
    defc TAR__crt_enable_rst            = 0
