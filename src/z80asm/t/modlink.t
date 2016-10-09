@@ -775,6 +775,13 @@ write_file("test3.asm", <<'...');
 	dollar:	defw ASMPC
 ...
 
+write_file("test4.asm", <<'...');
+		global code_end
+		
+		section code
+	code_end:
+...
+
 my $bincode = sub {
 	my($addr) = @_;
 	my $code;
@@ -830,7 +837,7 @@ my $bincode = sub {
 	return $bin;
 };
 
-$cmd = "./z80asm -s -otest.o test1.asm test2.asm test3.asm";
+$cmd = "./z80asm -s -otest.o test1.asm test2.asm test3.asm test4.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
@@ -844,10 +851,14 @@ File test.o at $0000: Z80RMF08
   Names:
     L A $0000 test1_mess (section data)
     L = $0000 test2_printa1
+    L A $0006 test2_mess (section data)
+    L A $000B test3_mess (section data)
+    L A $000D test3_dollar (section data)
     G A $0000 main (section code)
     G = $0000 print
     G A $0007 printa (section code)
     G A $000F print1 (section code)
+    G A $0015 code_end (section code)
   Expressions:
     E Cw (test1.asm:5) $0000 $0001: test1_mess+main-main (section code)
     E Cw (test1.asm:6) $0003 $0004: print (section code)
@@ -868,8 +879,12 @@ main                            = $0000 ; G
 print                           = $0000 ; G 
 test1_mess                      = $0000 ; L 
 test2_printa1                   = $0000 ; L 
+test2_mess                      = $0006 ; L 
 printa                          = $0007 ; G 
+test3_mess                      = $000B ; L 
+test3_dollar                    = $000D ; L 
 print1                          = $000F ; G 
+code_end                        = $0015 ; G 
 END
 
 # at address 0
@@ -895,7 +910,11 @@ print                           = $000F ; G test
 ASMHEAD_data                    = $0015 ; G 
 ASMSIZE_code                    = $0015 ; G 
 ASMTAIL_code                    = $0015 ; G 
+code_end                        = $0015 ; G test
 test1_mess                      = $0015 ; L test
+test2_mess                      = $001B ; L test
+test3_mess                      = $0020 ; L test
+test3_dollar                    = $0022 ; L test
 ASMSIZE                         = $0024 ; G 
 ASMTAIL                         = $0024 ; G 
 ASMTAIL_data                    = $0024 ; G 
@@ -925,11 +944,14 @@ print1                          = $1243 ; G test
 print                           = $1243 ; G test
 ASMHEAD_data                    = $1249 ; G 
 ASMTAIL_code                    = $1249 ; G 
+code_end                        = $1249 ; G test
 test1_mess                      = $1249 ; L test
+test2_mess                      = $124F ; L test
+test3_mess                      = $1254 ; L test
+test3_dollar                    = $1256 ; L test
 ASMTAIL                         = $1258 ; G 
 ASMTAIL_data                    = $1258 ; G 
 END
-
 
 
 sub norm_nl {

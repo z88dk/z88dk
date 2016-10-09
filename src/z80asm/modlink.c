@@ -770,9 +770,6 @@ void link_modules( void )
 	if (opts.consol_obj_file) {
 		if (!get_num_errors())
 			merge_modules();
-
-		if (!get_num_errors() && opts.symtable)
-			write_sym_file(CURRENTMODULE);
 	}
 	else {
 		/* collect expressions from all modules */
@@ -1157,6 +1154,29 @@ static void merge_codearea()
 	}
 }
 
+static void touch_symtab_symbols(SymbolHash *symtab)
+{
+	SymbolHashElem *iter;
+	Symbol         *sym;
+
+	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter)) {
+		sym = (Symbol *)iter->value;
+		if (sym->type == TYPE_ADDRESS)
+			sym->is_touched = TRUE;
+	}
+}
+
+static void touch_symbols()
+{
+	Module *module;
+	ModuleListElem *it;
+
+	for (module = get_first_module(&it); module != NULL; module = get_next_module(&it)) {
+		touch_symtab_symbols(module->local_symtab);
+	}
+	touch_symtab_symbols(global_symtab);
+}
+
 static void merge_modules()
 {
 	/* read each module's expression list */
@@ -1167,4 +1187,7 @@ static void merge_modules()
 
 	/* merge code areas */
 	merge_codearea();
+
+	/* touch address symbols so that they are copied to the output object file */
+	touch_symbols();
 }
