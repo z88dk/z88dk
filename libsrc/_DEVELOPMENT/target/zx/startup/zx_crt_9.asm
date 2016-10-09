@@ -577,9 +577,9 @@ endif
       
       SECTION data_fcntl_fdtable_body
       
-      EXTERN ASMHEAD_data_fcntl_fdtable_body
+      EXTERN __data_fcntl_fdtable_body_head
       
-      defc __fcntl_fdtbl = ASMHEAD_data_fcntl_fdtable_body
+      defc __fcntl_fdtbl = __data_fcntl_fdtable_body_head
       
       IF __clib_open_max > 3
       
@@ -872,7 +872,7 @@ SECTION code_crt_return
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0xe)
+IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
    SECTION BSS_UNINITIALIZED
    __sp_or_ret:  defw 0
