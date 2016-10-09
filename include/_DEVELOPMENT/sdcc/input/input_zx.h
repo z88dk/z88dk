@@ -13,8 +13,8 @@
 
 extern int in_inkey(void);
 
-extern int in_key_pressed(uint16_t scancode) __preserves_regs(d,e);
-extern int in_key_pressed_fastcall(uint16_t scancode) __preserves_regs(d,e) __z88dk_fastcall;
+extern int in_key_pressed(uint16_t scancode) __preserves_regs(b,c,d,e);
+extern int in_key_pressed_fastcall(uint16_t scancode) __preserves_regs(b,c,d,e) __z88dk_fastcall;
 #define in_key_pressed(a) in_key_pressed_fastcall(a)
 
 

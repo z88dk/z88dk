@@ -10,7 +10,7 @@ include(__link__.m4)
 ///////////
 
 __OPROTO(,,int,,in_inkey,void)
-__DPROTO(`d,e',`d,e',int,,in_key_pressed,uint16_t scancode)
+__DPROTO(`b,c,d,e',`b,c,d,e',int,,in_key_pressed,uint16_t scancode)
 __DPROTO(,,uint16_t,,in_key_scancode,int c)
 
 __DPROTO(,,uint16_t,,in_pause,uint16_t dur_ms)
