@@ -166,9 +166,9 @@ include "clib_target_constants.inc"
       
       SECTION data_fcntl_fdtable_body
       
-      EXTERN ASMHEAD_data_fcntl_fdtable_body
+      EXTERN __data_fcntl_fdtable_body_head
       
-      defc __fcntl_fdtbl = ASMHEAD_data_fcntl_fdtable_body
+      defc __fcntl_fdtbl = __data_fcntl_fdtable_body_head
       
       IF __clib_open_max > 0
       

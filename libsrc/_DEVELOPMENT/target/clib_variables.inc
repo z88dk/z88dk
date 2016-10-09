@@ -30,16 +30,16 @@ IF __clib_malloc_heap_size = -1
    
    PUBLIC __malloc_heap
 
-   EXTERN ASMHEAD_BSS_END
+   EXTERN __BSS_END_tail
 
-   __malloc_heap:              defw ASMHEAD_BSS_END
+   __malloc_heap:              defw __BSS_END_tail
    
    SECTION code_crt_init
       
    ld hl,-1                    ; ensure sp == 0 is accepted
    add hl,sp                   ; hl = top of the stack
    
-   ld de,ASMHEAD_BSS_END
+   ld de,__BSS_END_tail
    
    xor a
    sbc hl,de                   ; hl = space between top of stack and end of bss - 1
@@ -57,7 +57,7 @@ IF __clib_malloc_heap_size = -1
    ld c,l
    ld b,h                      ; bc = available heap size
    
-   ex de,hl                    ; hl = ASMHEAD_BSS_END = start of heap
+   ex de,hl                    ; hl = __BSS_END_tail = start of heap
    
    EXTERN asm_heap_init
    call asm_heap_init

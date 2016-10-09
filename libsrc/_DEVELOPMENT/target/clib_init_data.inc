@@ -6,12 +6,12 @@
    
       ; rom model + data section is not compressed
 
-      EXTERN ASMHEAD_CODE_END
-      EXTERN ASMHEAD_DATA, ASMHEAD_DATA_END
+      EXTERN __CODE_END_head
+      EXTERN __DATA_head, __DATA_END_tail
 
-      ld hl,ASMHEAD_CODE_END
-      ld de,ASMHEAD_DATA
-      ld bc,ASMHEAD_DATA_END - ASMHEAD_DATA
+      ld hl,__CODE_END_head
+      ld de,__DATA_head
+      ld bc,__DATA_END_tail - __DATA_head
       
       ldir
    
@@ -21,11 +21,10 @@
    
       ; rom model + data section is compressed
       
-      EXTERN ASMHEAD_CODE_END
-      EXTERN ASMHEAD_DATA
+      EXTERN __CODE_END_head, __DATA_head
       
-      ld hl,ASMHEAD_CODE_END
-      ld de,ASMHEAD_DATA
+      ld hl,__CODE_END_head
+      ld de,__DATA_head
       
       EXTERN asm_dzx7_standard
       call asm_dzx7_standard
