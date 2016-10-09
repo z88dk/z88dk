@@ -19,7 +19,7 @@ z80asm(
 			org $1234
 			
 			public a1
-			extern a2, ASMHEAD, ASMTAIL, ASMSIZE
+			extern a2, __head, __tail, __size
 			
 			ld	a, ASMPC -$1200	;$1234 ;; 3E 34
 			jp	ASMPC			;$1236 ;; C3 36 12
@@ -29,14 +29,14 @@ z80asm(
 			ld	bc, a1 - ASMPC	;$1241 ;; 01 06 00
 			ld	de, a2 - ASMPC	;$1244 ;; 11 1F 00
 	a1:							;$1247
-			ld	hl, ASMHEAD		;$1247 ;; 21 34 12
-			ld	de, ASMTAIL		;$124A ;; 11 6C 12
-			ld	bc, ASMSIZE		;$124D ;; 01 38 00
+			ld	hl, __head		;$1247 ;; 21 34 12
+			ld	de, __tail		;$124A ;; 11 6C 12
+			ld	bc, __size		;$124D ;; 01 38 00
 								;$1250
 ASM
 	asm1 => <<'ASM1',
 			public a2
-			extern a1, ASMHEAD, ASMTAIL, ASMSIZE
+			extern a1, __head, __tail, __size
 			
 			ld	a, ASMPC -$1200	;$1250 ;; 3E 50
 			jp	ASMPC			;$1252 ;; C3 52 12
@@ -46,9 +46,9 @@ ASM
 			ld	bc, ASMPC - a1	;$125D ;; 01 16 00
 			ld	de, a2 - ASMPC	;$1260 ;; 11 03 00
 	a2:							;$1263
-			ld	hl, ASMHEAD		;$1263 ;; 21 34 12
-			ld	de, ASMTAIL		;$1266 ;; 11 6C 12
-			ld	bc, ASMSIZE		;$1269 ;; 01 38 00
+			ld	hl, __head		;$1263 ;; 21 34 12
+			ld	de, __tail		;$1266 ;; 11 6C 12
+			ld	bc, __size		;$1269 ;; 01 38 00
 								;$126C
 ASM1
 	options => "-b -l"
@@ -69,9 +69,9 @@ File test.o at $0000: Z80RMF08
     G A $0013 a1
   External names:
     U         a2
-    U         ASMHEAD
-    U         ASMTAIL
-    U         ASMSIZE
+    U         __head
+    U         __tail
+    U         __size
   Expressions:
     E Ub (test.asm:6) $0000 $0001: ASMPC-4608
     E Cw (test.asm:7) $0002 $0003: ASMPC
@@ -80,9 +80,9 @@ File test.o at $0000: Z80RMF08
     E Cw (test.asm:10) $000A $000B: a2-a1
     E Cw (test.asm:11) $000D $000E: a1-ASMPC
     E Cw (test.asm:12) $0010 $0011: a2-ASMPC
-    E Cw (test.asm:14) $0013 $0014: ASMHEAD
-    E Cw (test.asm:15) $0016 $0017: ASMTAIL
-    E Cw (test.asm:16) $0019 $001A: ASMSIZE
+    E Cw (test.asm:14) $0013 $0014: __head
+    E Cw (test.asm:15) $0016 $0017: __tail
+    E Cw (test.asm:16) $0019 $001A: __size
   Code: 28 bytes, ORG at $1234
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
@@ -93,9 +93,9 @@ File test1.o at $0000: Z80RMF08
     G A $0013 a2
   External names:
     U         a1
-    U         ASMHEAD
-    U         ASMTAIL
-    U         ASMSIZE
+    U         __head
+    U         __tail
+    U         __size
   Expressions:
     E Ub (test1.asm:4) $0000 $0001: ASMPC-4608
     E Cw (test1.asm:5) $0002 $0003: ASMPC
@@ -104,20 +104,20 @@ File test1.o at $0000: Z80RMF08
     E Cw (test1.asm:8) $000A $000B: a2-a1
     E Cw (test1.asm:9) $000D $000E: ASMPC-a1
     E Cw (test1.asm:10) $0010 $0011: a2-ASMPC
-    E Cw (test1.asm:12) $0013 $0014: ASMHEAD
-    E Cw (test1.asm:13) $0016 $0017: ASMTAIL
-    E Cw (test1.asm:14) $0019 $001A: ASMSIZE
+    E Cw (test1.asm:12) $0013 $0014: __head
+    E Cw (test1.asm:13) $0016 $0017: __tail
+    E Cw (test1.asm:14) $0019 $001A: __size
   Code: 28 bytes, ORG at $1234
     C $0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
     C $0010: 11 00 00 21 00 00 11 00 00 01 00 00
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-ASMSIZE                         = $0038 ; G 
-ASMHEAD                         = $1234 ; G 
+__size                          = $0038 ; G 
+__head                          = $1234 ; G 
 a1                              = $1247 ; G test
 a2                              = $1263 ; G test1
-ASMTAIL                         = $126C ; G 
+__tail                          = $126C ; G 
 END
 
 #------------------------------------------------------------------------------
@@ -260,22 +260,22 @@ File test1.o at $0000: Z80RMF08
 END
 
 eq_or_diff scalar(read_file("test.map")), <<'END';
-ASMSIZE_data                    = $000C ; G 
-ASMSIZE_code                    = $0025 ; G 
-ASMSIZE                         = $0031 ; G 
-ASMHEAD                         = $1234 ; G 
-ASMHEAD_code                    = $1234 ; G 
+__data_size                     = $000C ; G 
+__code_size                     = $0025 ; G 
+__size                          = $0031 ; G 
+__code_head                     = $1234 ; G 
+__head                          = $1234 ; G 
 start                           = $1234 ; L test
 prmes                           = $1250 ; G test1
-ASMHEAD_data                    = $1259 ; G 
-ASMTAIL_code                    = $1259 ; G 
+__code_tail                     = $1259 ; G 
+__data_head                     = $1259 ; G 
 mes1                            = $1259 ; L test
 mes1end                         = $125E ; L test
 mes2                            = $125E ; L test
 mes0                            = $1264 ; G test1
 mes2end                         = $1264 ; L test
-ASMTAIL                         = $1265 ; G 
-ASMTAIL_data                    = $1265 ; G 
+__data_tail                     = $1265 ; G 
+__tail                          = $1265 ; G 
 mes0end                         = $1265 ; G test1
 END
 
@@ -899,25 +899,25 @@ ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0));
 
 eq_or_diff_text norm_nl(scalar(read_file("test.map"))), norm_nl(<<'END');
-ASMHEAD                         = $0000 ; G 
-ASMHEAD_code                    = $0000 ; G 
+__code_head                     = $0000 ; G 
+__head                          = $0000 ; G 
 main                            = $0000 ; G test
 printa                          = $0007 ; G test
 test2_printa1                   = $0007 ; L test
-ASMSIZE_data                    = $000F ; G 
+__data_size                     = $000F ; G 
 print1                          = $000F ; G test
 print                           = $000F ; G test
-ASMHEAD_data                    = $0015 ; G 
-ASMSIZE_code                    = $0015 ; G 
-ASMTAIL_code                    = $0015 ; G 
+__code_size                     = $0015 ; G 
+__code_tail                     = $0015 ; G 
+__data_head                     = $0015 ; G 
 code_end                        = $0015 ; G test
 test1_mess                      = $0015 ; L test
 test2_mess                      = $001B ; L test
 test3_mess                      = $0020 ; L test
 test3_dollar                    = $0022 ; L test
-ASMSIZE                         = $0024 ; G 
-ASMTAIL                         = $0024 ; G 
-ASMTAIL_data                    = $0024 ; G 
+__data_tail                     = $0024 ; G 
+__size                          = $0024 ; G 
+__tail                          = $0024 ; G 
 END
 
 # at address 0x1234
@@ -932,27 +932,26 @@ ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0x1234));
 
 eq_or_diff_text norm_nl(scalar(read_file("test.map"))), norm_nl(<<'END');
-ASMSIZE_data                    = $000F ; G 
-ASMSIZE_code                    = $0015 ; G 
-ASMSIZE                         = $0024 ; G 
-ASMHEAD                         = $1234 ; G 
-ASMHEAD_code                    = $1234 ; G 
+__data_size                     = $000F ; G 
+__code_size                     = $0015 ; G 
+__size                          = $0024 ; G 
+__code_head                     = $1234 ; G 
+__head                          = $1234 ; G 
 main                            = $1234 ; G test
 printa                          = $123B ; G test
 test2_printa1                   = $123B ; L test
 print1                          = $1243 ; G test
 print                           = $1243 ; G test
-ASMHEAD_data                    = $1249 ; G 
-ASMTAIL_code                    = $1249 ; G 
+__code_tail                     = $1249 ; G 
+__data_head                     = $1249 ; G 
 code_end                        = $1249 ; G test
 test1_mess                      = $1249 ; L test
 test2_mess                      = $124F ; L test
 test3_mess                      = $1254 ; L test
 test3_dollar                    = $1256 ; L test
-ASMTAIL                         = $1258 ; G 
-ASMTAIL_data                    = $1258 ; G 
+__data_tail                     = $1258 ; G 
+__tail                          = $1258 ; G 
 END
-
 
 sub norm_nl {
 	my($text) = @_;

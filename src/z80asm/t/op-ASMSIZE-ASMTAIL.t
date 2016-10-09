@@ -7,7 +7,7 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/pauloscustodio/z88dk-z80asm
 #
-# Test new ASMTAIL and ASMSIZE keywords
+# Test new __head and __size keywords
 
 use strict;
 use warnings;
@@ -19,11 +19,11 @@ my @testfiles = qw( testa.asm testa.lis testa.sym testa.o testa.map testa.bin
 				);
 
 my $asm = "
-	EXTERN ASMHEAD, ASMTAIL, ASMSIZE
+	EXTERN __head, __tail, __size
 	
-	DEFW ASMHEAD
-	DEFW ASMTAIL
-	DEFW ASMSIZE
+	DEFW __head
+	DEFW __tail
+	DEFW __size
 ";
 
 #------------------------------------------------------------------------------

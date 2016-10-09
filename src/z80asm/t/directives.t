@@ -362,11 +362,44 @@ eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
 minus_d_var                     = $0001 ; G test
 defc_var                        = $0002 ; G test
 defvars_var                     = $0003 ; G test
-ASMHEAD                         = $0004 ; G 
+__head                          = $0004 ; G 
 public_label                    = $0004 ; G test
-ASMSIZE                         = $0005 ; G 
-ASMTAIL                         = $0009 ; G 
+__size                          = $0005 ; G 
+__tail                          = $0009 ; G 
 local_label                     = $0009 ; L test
+END
+
+# Empty sections do not appear in the map file, except "" section
+z80asm(
+	asm		=> <<'ASM',
+				; empty			;; 
+ASM
+	options	=> "-b -m",
+	ok		=> 1,
+);
+
+eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
+__head                          = $0000 ; G 
+__size                          = $0000 ; G 
+__tail                          = $0000 ; G 
+END
+
+z80asm(
+	asm		=> <<'ASM',
+				section empty
+				section code
+				nop				;; 00
+ASM
+	options	=> "-b -m"
+);
+
+eq_or_diff scalar(read_file("test.map")), <<'END', "test.map";
+__code_head                     = $0000 ; G 
+__head                          = $0000 ; G 
+__code_size                     = $0001 ; G 
+__code_tail                     = $0001 ; G 
+__size                          = $0001 ; G 
+__tail                          = $0001 ; G 
 END
 
 #------------------------------------------------------------------------------

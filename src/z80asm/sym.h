@@ -20,9 +20,9 @@ struct Section;
 /*-----------------------------------------------------------------------------
 *   Special symbols
 *----------------------------------------------------------------------------*/
-#define ASMHEAD_KW	"ASMHEAD%s%s"
-#define ASMTAIL_KW	"ASMTAIL%s%s"
-#define ASMSIZE_KW	"ASMSIZE%s%s"
+#define ASMHEAD_KW	"__%s%s" "head"
+#define ASMTAIL_KW	"__%s%s" "tail"
+#define ASMSIZE_KW	"__%s%s" "size"
 
 /*-----------------------------------------------------------------------------
 *   Type of symbol

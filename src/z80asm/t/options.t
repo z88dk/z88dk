@@ -354,9 +354,9 @@ for my $options ('-m', '--map') {
 	);
 	ok -f map_file(), map_file();
 	eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-ASMHEAD                         = $0000 ; G 
-ASMSIZE                         = $000B ; G 
-ASMTAIL                         = $000B ; G 
+__head                          = $0000 ; G 
+__size                          = $000B ; G 
+__tail                          = $000B ; G 
 END
 }
 
@@ -369,7 +369,7 @@ t_z80asm(
 );
 ok -f map_file(), map_file();
 eq_or_diff scalar(read_file(map_file())), <<'END', "mapfile contents";
-ASMHEAD                         = $0000 ; G 
+__head                          = $0000 ; G 
 alias_main                      = $0000 ; G test2
 main                            = $0000 ; G test
 zero                            = $0000 ; L test
@@ -380,8 +380,8 @@ x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ; L test
 x_32_x32_x32_x32_x32_x32_x32_x32 = $0005 ; L test
 func                            = $0006 ; G test2
 loop                            = $0008 ; L test2
-ASMSIZE                         = $000B ; G 
-ASMTAIL                         = $000B ; G 
+__size                          = $000B ; G 
+__tail                          = $000B ; G 
 END
 
 #------------------------------------------------------------------------------
