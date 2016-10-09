@@ -93,7 +93,7 @@ mask_loop:
    rlca
    djnz mask_loop
    
+   or h
    ld h,a
-   
-   or a
+
    ret
