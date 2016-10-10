@@ -3,7 +3,7 @@ lstoff
 ; KC85/2 .. KC85/4 CAssette Operating System definitions
 ;
 ; October 2016
-; $Id: caos.def,v 1.1 2016-10-03 06:38:15 stefano Exp $
+; $Id: caos.def,v 1.2 2016-10-10 07:09:14 stefano Exp $
 ;
 
 ; jump distribution (Sprungverteiler)
@@ -22,6 +22,12 @@ lstoff
     defc	ARG1      = 0xb782 ; argument 1
     defc	ARG2      = 0xb784 ; argument 2
     defc	ARG3      = 0xb786 ; argument 3
+    defc	ARG4      = 0xb788 ; argument 4
+	defc	ARG5      = 0xb78a ; argument 5
+	defc	ARG6      = 0xb78c ; argument 6
+	defc	ARG7      = 0xb78e ; argument 7
+	defc	ARG8      = 0xb790 ; argument 8
+	defc	ARG9      = 0xb792 ; argument 9
     defc	ARG10     = 0xb794 ; argument 10
 
     defc	CURSO_COL = 0xb7a0 ; cursor position x
@@ -36,34 +42,67 @@ lstoff
 
 ; functions numbers
     defc	FNCRT     = 0x00
+    defc	FNMBOT    = 0x01	; Bytewise Tape-Routine
     defc	FNKBD     = 0x04
+    defc	FNMBI     = 0x05
+    defc	FNSRO     = 0x08
+    defc	FNCSRO    = 0x09
+    defc	FNSRI     = 0x0a
+    defc	FNCSRI    = 0x0b
     defc	FNKBDS    = 0x0c
     defc	FNBYE     = 0x0d  
     defc	FNKBDZ    = 0x0e
-    defc	FNCOLORUP = 0x0f
+    defc	FNCOLORUP = 0x0f	; AKA "COLOR"
+    defc	FNLOAD    = 0x10
+    defc	FNVERIFY  = 0x11
     defc	FNLOOP    = 0x12
-    defc	FNWAIT    = 0x14
+    defc	FNNORM    = 0x13
+    defc	FNWAIT    = 0x14	
     defc	FNLARG    = 0x15
+    defc	FNINTB    = 0x16
     defc	FNINLIN   = 0x17
+	defc	FNRHEX    = 0x18
     defc	FNERRM    = 0x19
     defc	FNHLHX    = 0x1a
     defc	FNHLDE    = 0x1b
     defc	FNAHEX    = 0x1c
+    defc	FNZSUCH   = 0x1d
+    defc	FNSIN     = 0x1e
+    defc	FNSOUT    = 0x1f
+    defc	FNNOUT    = 0x20
+    defc	FNNIN     = 0x21
+    defc	FNGARG    = 0x22
     defc	FNOSTR    = 0x23
+    defc	FNOCHR    = 0x24
     defc	FNCUCP    = 0x25
     defc	FNMODU    = 0x26
     defc	FNJUMP    = 0x27
+    defc	FNLDMA    = 0x28
+    defc	FNLDAM    = 0x29
     defc	FNBRKT    = 0x2a
-    defc	FNSPACE   = 0x2b
+    defc	FNSPACE   = 0x2b	; AKA "SPAC"
     defc	FNCRLF    = 0x2c
     defc	FNHOME    = 0x2d
+    defc	FNMODI    = 0x2e
     defc	FNPUDE    = 0x2f
     defc	FNPUSE    = 0x30
+    defc	FNSIXD    = 0x31
+    defc	FNDABR    = 0x32
+    defc	FNTCIF    = 0x33
+	defc	FNPADR    = 0x34	; HL = pixel (in CAOS4.x also color) address , (in CAOS3.1) DE = color address 
+	defc	FNTON     = 0x35
+	defc	FNSAVE    = 0x36
+	defc	FNMBIN    = 0x37
+	defc	FNMBOUT   = 0x38
+	defc	FNKEY     = 0x39
+	defc	FNKEYLI   = 0x3a
+	defc	FNDISPLAY = 0x3b
     defc	FNWININ   = 0x3c
     defc	FNWINAK   = 0x3d
     defc	FNLINE    = 0x3e
     defc	FNCIRCLE  = 0x3f
     defc	FNSQR     = 0x40
+    defc	FNMULT    = 0x41
     defc	FNCSTBT   = 0x42
     defc	FNINIEA   = 0x43
     defc	FNINIME   = 0x44

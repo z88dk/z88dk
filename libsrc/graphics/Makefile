@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.41 2016-10-03 06:14:49 stefano Exp $
+# $Id: Makefile,v 1.42 2016-10-10 07:09:14 stefano Exp $
 
 
 lx11:
@@ -34,6 +34,7 @@ clean:
 	$(RM) gray/ticalc/*.o
 	$(RM) gray/cpc/*.o
 	$(RM) gray/zx81/*.o
+	$(RM) kc/*.o
 	$(RM) mc1000/*.o
 	$(RM) msx/*.o
 	$(RM) msx/surface/*.o
@@ -55,6 +56,7 @@ clean:
 	$(RM) ts2068hr/*.o
 	$(RM) vg5k/*.o
 	$(RM) vz200/*.o
+	$(RM) z1013/*.o
 	$(RM) z88/*.o
 	$(RM) z9001/*.o
 	$(RM) zx80/*.o

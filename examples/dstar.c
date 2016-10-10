@@ -89,6 +89,10 @@
  *      MSX:
  *      zcc +msx -Dspritesize=16 -DSOUND -create-app dstar.c
  *
+ *      Robotron KC:
+ *      zcc +z9001 -Dspritesize=20 -DSOUND -lgfx9001krt -create-app dstar.c
+ *      zcc +kc -Dspritesize=20 -create-app dstar.c
+ *
  *      ZX81, various HRG flavours (see also the specific target version):
  *      zcc +zx81 -O3 -clib=mt  -create-app -Dspritesize=15 dstar.c
  *      zcc +zx81 -O3 -clib=g007  -create-app -Dspritesize=16 dstar.c 
@@ -130,6 +134,7 @@
 /* #define spritesize 7   -->  TI85/86, VZ200  */
 /* #define spritesize 8   -->  128x72 pixels   */
 /* #define spritesize 16  -->  Big screen mode 256x144  */
+/* #define spritesize 20  -->  Wide screen mode 320x160 */
 /* #define spritesize 21  -->  Wide screen mode 512x192 */
 /* #define spritesize 28  -->  Extra wide screen mode 1024x256 */
 
@@ -140,6 +145,10 @@
 /* Single sprite memory usage, including bytes for its size */
 #if (spritesize == 15)|(spritesize == 16))
   #define spritemem 34
+#endif
+#if (spritesize == 20)
+  #define spritemem 62
+  #define xsize 20
 #endif
 #if (spritesize == 21)
   #define spritemem 90

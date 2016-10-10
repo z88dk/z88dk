@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: z9001_crt0.asm,v 1.2 2016-09-26 07:05:52 stefano Exp $
+;       $Id: z9001_crt0.asm,v 1.3 2016-10-10 07:09:14 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -30,7 +30,7 @@
 
 
 	IF      !DEFINED_CRT_ORG_CODE
-			defc    CRT_ORG_CODE  = 2000h
+			defc    CRT_ORG_CODE  = 1000h
 	ENDIF
 
 	org     CRT_ORG_CODE
@@ -41,7 +41,11 @@ start:
 ;	ld      hl,-64
 ;	add     hl,sp
 ;	ld      sp,hl
-	ld		sp,CRT_ORG_CODE-2
+IF      STACKPTR
+	ld  sp,STACKPTR
+ELSE
+	ld	sp,CRT_ORG_CODE-2
+ENDIF
 	
 	call	crt0_init_bss
 	ld      (exitsp),sp

@@ -5,7 +5,7 @@
 ;
 ; - - - - - - -
 ;
-;       $Id: z1013_crt0.asm,v 1.1 2016-08-05 07:04:09 stefano Exp $
+;       $Id: z1013_crt0.asm,v 1.2 2016-10-10 07:09:14 stefano Exp $
 ;
 ; - - - - - - -
 
@@ -38,8 +38,11 @@
 start:
 	ld	(start1+1),sp	;Save entry stack
 
-	ld	hl,$dfff
-	ld      sp,hl
+IF      STACKPTR
+	ld  sp,STACKPTR
+ELSE
+	ld      sp,$dfff
+ENDIF
 
 ;	ld      hl,-64
 ;	add     hl,sp

@@ -10,7 +10,7 @@
 ;       See also text/textgfx.inc and text6/textgfx.inc
 ;
 ;
-;	$Id: grafix.inc,v 1.51 2016-10-03 06:14:49 stefano Exp $
+;	$Id: grafix.inc,v 1.52 2016-10-10 07:09:14 stefano Exp $
 ;
 
 
@@ -229,6 +229,12 @@ IF FORz9001krt
 	DEFINE gotgfx
 	defc maxx	= 320
 	defc maxy	= 192
+ENDIF
+
+IF FORkc
+	DEFINE gotgfx
+	defc maxx	= 320
+	defc maxy	= 256
 ENDIF
 
 IF FORaquarius

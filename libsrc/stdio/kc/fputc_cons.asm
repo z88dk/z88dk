@@ -3,7 +3,7 @@
 ;
 ;	By Stefano Bodrato - Oct. 2016
 ;
-;	$Id: fputc_cons.asm,v 1.1 2016-10-03 06:38:15 stefano Exp $
+;	$Id: fputc_cons.asm,v 1.2 2016-10-10 07:09:14 stefano Exp $
 ;
 
 	SECTION	code_clib
@@ -12,6 +12,7 @@
 	INCLUDE  "caos.def"
 
 .fputc_cons_native
+	ld	ix,$1f0
 	ld	hl,2
 	add	hl,sp
 	ld	a,(hl)
