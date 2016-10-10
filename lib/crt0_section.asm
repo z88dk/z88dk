@@ -28,28 +28,28 @@ IF !DEFINED_nostreams
         ld      (hl),21 ;stderr
 ENDIF
 IF DEFINED_USING_amalloc
-        EXTERN ASMTAIL
-	ld	hl,ASMTAIL
+    EXTERN __tail
+	ld	hl,__tail
 	ld	(_heap),hl
 ENDIF
 IF ( __crt_model & 1 )
 	; Just copy the DATA section
-	EXTERN	ASMTAIL_ROMABLE_END
-	EXTERN	ASMHEAD_DATA
-	EXTERN	ASMHEAD_DATA_END
-	ld	hl,ASMTAIL_ROMABLE_END
-	ld	de,ASMHEAD_DATA
-	ld	bc,ASMHEAD_DATA_END - ASMHEAD_DATA
+	EXTERN	__ROMABLE_END_tail
+	EXTERN	__DATA_head
+	EXTERN	__DATA_END_tail
+	ld	hl,__ROMABLE_END_tail
+	ld	de,__DATA_head
+	ld	bc,__DATA_END_tail - __DATA_head
 	ldir
 ENDIF
 IF ( __crt_model & 2 )
 	; Decompress the DATA section
-	EXTERN	ASMTAIL_ROMABLE_END
-	EXTERN	ASMHEAD_DATA
+	EXTERN	__ROMABLE_END_tail
+	EXTERN	__DATA_head
 	EXTERN	asm_dzx7_standard
-	ld	hl,ASMTAIL_ROMABLE_END
-	ld	de,ASMHEAD_DATA
-	call	asm_dzx7_standard
+	ld	hl,__ROMABLE_END_tail
+	ld	de,__DATA_head
+	call    asm_dzx7_standard
 ENDIF
 	
 	; SDCC initialiation code gets placed here
@@ -73,8 +73,8 @@ ENDIF
 		SECTION rodata_user
 		SECTION ROMABLE_END
 IF !__crt_model
-		SECTION smc_clib
-                SECTION DATA
+        SECTION DATA
+        SECTION smc_clib
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
@@ -103,7 +103,7 @@ exitcount:       defb    0       ;Number of atexit() routines
 IF DEFINED_USING_amalloc
 		PUBLIC _heap
 ; The heap pointer will be wiped at startup,
-; but first its value (based on ASMTAIL)
+; but first its value (based on __tail)
 ; will be kept for sbrk() to setup the malloc area
 _heap:
                 defw 0          ; Initialised by code_crt_init - location of the last program byte
@@ -120,13 +120,13 @@ ENDIF
 		SECTION bss_clib
 		SECTION bss_user
 IF __crt_model > 0
-                SECTION DATA
+        SECTION DATA
 		org	-1
 		defb	0		; we want this written out
 		SECTION smc_clib
-                SECTION data_crt
-                SECTION data_compiler
-                SECTION data_user
-                SECTION DATA_END
+        SECTION data_crt
+        SECTION data_compiler
+        SECTION data_user
+        SECTION DATA_END
 ENDIF
 		SECTION BSS_END
