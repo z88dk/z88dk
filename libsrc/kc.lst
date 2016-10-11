@@ -2,6 +2,7 @@
 stdio/kc/fgetc_cons
 stdio/kc/getk
 stdio/kc/fputc_cons
+games/joystick
 @gfxbasew.lst
 graphics/__gfx_coords4
 graphics/__graphics_end
