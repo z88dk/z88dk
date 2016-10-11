@@ -94,6 +94,12 @@
  *  Amstrad CPC
  *     zcc +cpc -subtype=wav -lndos -create-app -Dspritesize=8 -DJOYSTICK -DBANNERS wall.c
  *
+ *  Robotron KC85/1, KC/87 (Joystick optionally available)
+ *     zcc +z9001 -lgfx9001krt -create-app -DSOUND -DBANNERS -Dspritesize=10 -Dspritesizeh=8 wall.c
+ *
+ *  Robotron KC85/2 .. KC85/5
+ *     zcc +kc -create-app -DBANNERS -Dspritesize=10 -Dspritesizeh=8 wall.c
+ *
  *  Commodore 128
  *     zcc +c128 -lgfx128hr -create-app -zorg=13000 -DSOUND -DBANNERS  -Dspritesize=16 -Dspritesizeh=8 wall.c
  *
@@ -102,7 +108,7 @@
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.10 2015-08-10 12:09:42 stefano Exp $
+ *      $Id: wall.c,v 1.11 2016-10-11 06:28:44 stefano Exp $
  *
  * * * * * * *
  *
