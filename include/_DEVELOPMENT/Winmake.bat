@@ -18,6 +18,10 @@ for /R proto %%h in (*.h) do (
    set src=%%h
    set dst=!src:proto=sdcc!
    m4 -Dm4_SDCC "%%h" > "!dst!"
+   
+   set src=%%h
+   set dst=!src:proto=standard!
+   m4 -Dm4_STANDARD "%%h" > "!dst!"
 
    echo.
 )
