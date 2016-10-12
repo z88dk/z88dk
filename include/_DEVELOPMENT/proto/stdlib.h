@@ -179,6 +179,18 @@ __DPROTO(,,void,*,realloc_unlocked,void *p,size_t size)
 
 #endif
 
+#ifdef __LLVM
+
+extern long long atoll(char *buf);
+extern void _lldiv_(lldiv_t *ld,long long numer,long long denom);
+extern void _lldivu_(lldivu_t *ld,unsigned long long numer,unsigned long long denom);
+extern long long llabs(long long i);
+extern char *lltoa(long long num,char *buf,int radix);
+extern long long strtoll(char *nptr,char **endptr,int base);
+extern unsigned long long strtoull(char *nptr,char **endptr,int base);
+extern char *ulltoa(unsigned long long num,char *buf,int radix);
+
+#else
 #ifdef __SDCC
 
 extern long long atoll(char *buf);
@@ -197,6 +209,7 @@ __DPROTO(,,long long,,strtoll,char *nptr,char **endptr,int base)
 __DPROTO(,,unsigned long long,,strtoull,char *nptr,char **endptr,int base)
 __DPROTO(,,char,*,ulltoa,unsigned long long num,char *buf,int radix)
 
+#endif
 #endif
 
 #endif

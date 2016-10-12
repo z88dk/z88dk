@@ -29,6 +29,11 @@ include(__link__.m4)
 
 #endif
 
+#ifdef __LLVM
+
+extern intmax_t imaxabs(intmax_t j);
+
+#else
 #ifdef __SDCC
 
 extern intmax_t imaxabs(intmax_t j);
@@ -39,6 +44,7 @@ extern intmax_t imaxabs_callee(intmax_t j) __z88dk_callee;
 
 __DPROTO(`b,c',`b,c',intmax_t,,imaxabs,intmax_t j)
 
+#endif
 #endif
 
 __DPROTO(,,void,,_imaxdiv_,imaxdiv_t *md,intmax_t numer,intmax_t denom)

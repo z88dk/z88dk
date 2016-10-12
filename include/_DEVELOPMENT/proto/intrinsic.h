@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef _INTRINSIC_H
 #define _INTRINSIC_H
 
+#ifndef __LLVM
 #ifdef __SDCC
 
 // disable warnings connected to intrinsics
@@ -10,6 +11,7 @@ include(__link__.m4)
 #pragma disable_warning 84
 #pragma disable_warning 112
 
+#endif
 #endif
 
 #ifdef __SDCC

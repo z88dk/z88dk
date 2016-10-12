@@ -78,6 +78,11 @@ __DPROTO(,,char,*,strtok_r,char *s,char *delim,char **last_s)
 __DPROTO(`b,c,d,e,h,l',`b,c,d,e',char,*,strupr,char *s)
 __DPROTO(,,size_t,,strxfrm,char *dst,char *src,size_t n)
 
+#ifdef __LLVM
+
+   extern int ffsll(long long i);
+   
+#else
 #ifdef __SDCC
 
    extern int ffsll(long long i) __preserves_regs(b,c);
@@ -100,6 +105,7 @@ __DPROTO(,,size_t,,strxfrm,char *dst,char *src,size_t n)
 
    #endif
 
+#endif
 #endif
 
 #endif
