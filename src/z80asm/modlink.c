@@ -37,7 +37,7 @@ int LinkLibModule(struct libfile *library, long curmodule, char *modname, StrHas
 void CreateBinFile(void);
 void ReadNames(char *filename, FILE *file);
 void ReleaseLinkInfo( void );
-static void merge_modules();
+static void merge_modules(StrHash *extern_syms);
 
 /* global variables */
 extern char Z80objhdr[];
@@ -769,7 +769,7 @@ void link_modules( void )
 
 	if (opts.consol_obj_file) {
 		if (!get_num_errors())
-			merge_modules();
+			merge_modules(extern_syms);
 	}
 	else {
 		/* collect expressions from all modules */
@@ -1105,19 +1105,41 @@ static void rename_module_local_symbols(Module *module)
 	OBJ_DELETE(old_syms);
 }
 
-static void merge_local_symbols()
+static void merge_local_symbols(StrHash *extern_syms)
 {
 	Module *module;
 	Module *first_module;
 	ModuleListElem *it;
 	Symbol *sym;
-	SymbolHashElem *sym_it;
+	SymbolHashElem *sym_it, *next_sym;
 	Expr *expr;
+	StrHashElem *elem, *next;
 	int start;
 
 	first_module = get_first_module(NULL); assert(first_module != NULL);
 
 	for (module = get_first_module(&it); module != NULL; module = get_next_module(&it)) {
+		/* remove local symbols that are not defined */
+		for (sym_it = SymbolHash_first(module->local_symtab); sym_it != NULL; sym_it = next_sym) {
+			next_sym = SymbolHash_next(sym_it);
+			sym = (Symbol *)sym_it->value;
+			if (!sym->is_defined)
+				SymbolHash_remove_elem(module->local_symtab, sym_it);
+		}
+
+		/* remove extern_syms defined in this module */
+		for (elem = StrHash_first(extern_syms); elem != NULL; elem = next) {
+			next = StrHash_next(elem);
+
+			sym = find_local_symbol(elem->key);
+			if (sym == NULL) 
+				sym = find_global_symbol(elem->key);
+			if (sym != NULL && sym->is_defined) {		/* symbol defined */
+				StrHash_remove_elem(extern_syms, elem);
+			}
+		}
+
+		/* prepend module name to all local symbols */
 		rename_module_local_symbols(module);
 
 		if (module != first_module) {
@@ -1161,7 +1183,7 @@ static void touch_symtab_symbols(SymbolHash *symtab)
 
 	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter)) {
 		sym = (Symbol *)iter->value;
-		if (sym->type == TYPE_ADDRESS)
+		if (sym->type == TYPE_ADDRESS || sym->scope == SCOPE_EXTERN)
 			sym->is_touched = TRUE;
 	}
 }
@@ -1177,17 +1199,40 @@ static void touch_symbols()
 	touch_symtab_symbols(global_symtab);
 }
 
-static void merge_modules()
+static void create_extern_symbols(StrHash *extern_syms)
 {
+	StrHashElem *elem;
+	char *name;
+
+	for (elem = StrHash_first(extern_syms); elem != NULL; elem = StrHash_next(elem)) {
+		name = elem->key;
+		if (!find_local_symbol(name) && !find_global_symbol(name))
+			declare_extern_symbol(name);
+	}
+}
+
+static void merge_modules(StrHash *extern_syms)
+{
+	Module *first_module;
+	first_module = get_first_module(NULL); assert(first_module != NULL);
+
 	/* read each module's expression list */
+	set_cur_module(first_module);
 	read_module_exprs(NULL);
 
 	/* merge local symbols to avoid name clashes in merged module */
-	merge_local_symbols();
+	set_cur_module(first_module);
+	merge_local_symbols(extern_syms);
 
 	/* merge code areas */
+	set_cur_module(first_module);
 	merge_codearea();
 
-	/* touch address symbols so that they are copied to the output object file */
+	/* create extern symbols */
+	set_cur_module(first_module);
+	create_extern_symbols(extern_syms);
+
+	/* touch symbols so that they are copied to the output object file */
+	set_cur_module(first_module);
 	touch_symbols();
 }

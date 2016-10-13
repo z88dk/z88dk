@@ -729,12 +729,14 @@ is read_binfile("test_main.bin"), "\xCD\x08\x00\x09\x00\xCD\x08\x00\x0A\x00\xC9"
 #------------------------------------------------------------------------------
 # Test consolidated object file
 write_file("test1.asm", <<'...');
-		global main, print
+		global main, print, lib_start, lib_end
 
 		section code
 	main:
+		call lib_start
 		ld hl,mess+main-main		; force main to appear in .o file
 		call print
+		call lib_end
 		ret
 		
 		section data
@@ -782,6 +784,13 @@ write_file("test4.asm", <<'...');
 	code_end:
 ...
 
+write_file("test_lib.asm", <<'...');
+		global lib_start, lib_end
+		
+		defc lib_start = 0
+		defc lib_end   = 0
+...
+
 my $bincode = sub {
 	my($addr) = @_;
 	my $code;
@@ -799,8 +808,10 @@ my $bincode = sub {
 		
 		# test1.asm
 		$l_main = $addr + length($code);
-		$code .= pack("Cv", 0x21, $l_mess).
+		$code .= pack("Cv", 0xCD, 0).
+				 pack("Cv", 0x21, $l_mess).
 				 pack("Cv", 0xCD, $l_print).
+				 pack("Cv", 0xCD, 0).
 				 pack("C",  0xC9);
 				 
 		$data .= "hello ";
@@ -856,20 +867,25 @@ File test.o at $0000: Z80RMF08
     L A $000D test3_dollar (section data)
     G A $0000 main (section code)
     G = $0000 print
-    G A $0007 printa (section code)
-    G A $000F print1 (section code)
-    G A $0015 code_end (section code)
+    G A $000D printa (section code)
+    G A $0015 print1 (section code)
+    G A $001B code_end (section code)
+  External names:
+    U         lib_start
+    U         lib_end
   Expressions:
-    E Cw (test1.asm:5) $0000 $0001: test1_mess+main-main (section code)
-    E Cw (test1.asm:6) $0003 $0004: print (section code)
-    E Cw (test2.asm:13) $000C $000D: test2_printa1 (section code)
+    E Cw (test1.asm:5) $0000 $0001: lib_start (section code)
+    E Cw (test1.asm:6) $0003 $0004: test1_mess+main-main (section code)
+    E Cw (test1.asm:7) $0006 $0007: print (section code)
+    E Cw (test1.asm:8) $0009 $000A: lib_end (section code)
+    E Cw (test2.asm:13) $0012 $0013: test2_printa1 (section code)
     E =  (test2.asm:4) $0000 $0000: test2_printa1 := printa
     E =  (test2.asm:3) $0000 $0000: print := print1
     E Cw (test3.asm:12) $000D $000D: ASMPC (section data)
-    E Cw (test3.asm:6) $0010 $0011: printa (section code)
-  Code: 21 bytes (section code)
-    C $0000: 21 00 00 CD 00 00 C9 7E A7 C8 D7 23 C3 00 00 E5
-    C $0010: CD 00 00 E1 C9
+    E Cw (test3.asm:6) $0016 $0017: printa (section code)
+  Code: 27 bytes (section code)
+    C $0000: CD 00 00 21 00 00 CD 00 00 CD 00 00 C9 7E A7 C8
+    C $0010: D7 23 C3 00 00 E5 CD 00 00 E1 C9
   Code: 15 bytes (section data)
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64 21 00 00 00
 END
@@ -880,17 +896,18 @@ print                           = $0000 ; G
 test1_mess                      = $0000 ; L 
 test2_printa1                   = $0000 ; L 
 test2_mess                      = $0006 ; L 
-printa                          = $0007 ; G 
 test3_mess                      = $000B ; L 
+printa                          = $000D ; G 
 test3_dollar                    = $000D ; L 
-print1                          = $000F ; G 
-code_end                        = $0015 ; G 
+print1                          = $0015 ; G 
+code_end                        = $001B ; G 
 END
+
 
 # at address 0
 unlink "test.asm", "test.bin";
 
-$cmd = "./z80asm -b -m test.o";
+$cmd = "./z80asm -b -m test.o test_lib.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
@@ -901,29 +918,32 @@ test_binfile("test.bin", $bincode->(0));
 eq_or_diff_text norm_nl(scalar(read_file("test.map"))), norm_nl(<<'END');
 __code_head                     = $0000 ; G 
 __head                          = $0000 ; G 
+lib_end                         = $0000 ; G test_lib
+lib_start                       = $0000 ; G test_lib
 main                            = $0000 ; G test
-printa                          = $0007 ; G test
-test2_printa1                   = $0007 ; L test
+printa                          = $000D ; G test
+test2_printa1                   = $000D ; L test
 __data_size                     = $000F ; G 
-print1                          = $000F ; G test
-print                           = $000F ; G test
-__code_size                     = $0015 ; G 
-__code_tail                     = $0015 ; G 
-__data_head                     = $0015 ; G 
-code_end                        = $0015 ; G test
-test1_mess                      = $0015 ; L test
-test2_mess                      = $001B ; L test
-test3_mess                      = $0020 ; L test
-test3_dollar                    = $0022 ; L test
-__data_tail                     = $0024 ; G 
-__size                          = $0024 ; G 
-__tail                          = $0024 ; G 
+print1                          = $0015 ; G test
+print                           = $0015 ; G test
+__code_size                     = $001B ; G 
+__code_tail                     = $001B ; G 
+__data_head                     = $001B ; G 
+code_end                        = $001B ; G test
+test1_mess                      = $001B ; L test
+test2_mess                      = $0021 ; L test
+test3_mess                      = $0026 ; L test
+test3_dollar                    = $0028 ; L test
+__data_tail                     = $002A ; G 
+__size                          = $002A ; G 
+__tail                          = $002A ; G 
 END
+
 
 # at address 0x1234
 unlink "test.asm", "test.bin";
 
-$cmd = "./z80asm -b -m -r0x1234 test.o";
+$cmd = "./z80asm -b -m -r0x1234 test.o test_lib.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return) = capture { system $cmd; };
 eq_or_diff_text $stdout, "", "stdout";
@@ -932,25 +952,27 @@ ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0x1234));
 
 eq_or_diff_text norm_nl(scalar(read_file("test.map"))), norm_nl(<<'END');
+lib_end                         = $0000 ; G test_lib
+lib_start                       = $0000 ; G test_lib
 __data_size                     = $000F ; G 
-__code_size                     = $0015 ; G 
-__size                          = $0024 ; G 
+__code_size                     = $001B ; G 
+__size                          = $002A ; G 
 __code_head                     = $1234 ; G 
 __head                          = $1234 ; G 
 main                            = $1234 ; G test
-printa                          = $123B ; G test
-test2_printa1                   = $123B ; L test
-print1                          = $1243 ; G test
-print                           = $1243 ; G test
-__code_tail                     = $1249 ; G 
-__data_head                     = $1249 ; G 
-code_end                        = $1249 ; G test
-test1_mess                      = $1249 ; L test
-test2_mess                      = $124F ; L test
-test3_mess                      = $1254 ; L test
-test3_dollar                    = $1256 ; L test
-__data_tail                     = $1258 ; G 
-__tail                          = $1258 ; G 
+printa                          = $1241 ; G test
+test2_printa1                   = $1241 ; L test
+print1                          = $1249 ; G test
+print                           = $1249 ; G test
+__code_tail                     = $124F ; G 
+__data_head                     = $124F ; G 
+code_end                        = $124F ; G test
+test1_mess                      = $124F ; L test
+test2_mess                      = $1255 ; L test
+test3_mess                      = $125A ; L test
+test3_dollar                    = $125C ; L test
+__data_tail                     = $125E ; G 
+__tail                          = $125E ; G 
 END
 
 sub norm_nl {

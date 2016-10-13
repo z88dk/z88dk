@@ -205,8 +205,8 @@ static void copy_full_sym_names( SymbolHash **ptarget, SymbolHash *source,
     {
         sym = ( Symbol * )iter->value;
 
-		if ( cond( sym ) )
-			SymbolHash_set( ptarget, Symbol_fullname( sym ), Symbol_clone( sym ) );
+		if (sym->is_defined && cond(sym))
+			SymbolHash_set(ptarget, Symbol_fullname(sym), Symbol_clone(sym));
     }
 }
 
