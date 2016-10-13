@@ -9,7 +9,7 @@
 ;	etc NB. Values of static variables are not reinitialised on
 ;	future entry.
 ;
-;       $Id: nc100_crt0.asm,v 1.16 2016-06-02 23:14:13 dom Exp $
+;       $Id: nc100_crt0.asm,v 1.17 2016-10-13 07:47:20 stefano Exp $
 ;
 
 
@@ -45,7 +45,7 @@ ELSE
 		jp	start
 
 IF DEFINED_USING_amalloc
-EXTERN ASMTAIL
+;EXTERN ASMTAIL
 PUBLIC _heap
 ; We have 509 bytes we can use here..
 _heap:

@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.38 2016-07-15 21:38:08 dom Exp $
+;       $Id: cpm_crt0.asm,v 1.39 2016-10-13 07:47:20 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -69,10 +69,10 @@ begin:
 ENDIF
 
 IF (startup=2)
-	EXTERN ASMTAIL
+	;EXTERN ASMTAIL
 		ld	hl,$100
 		ld  de,32768
-		ld  bc,ASMTAIL-32768
+		ld  bc,$4000	; max. code size = 16K
 		ldir
 IF !DEFINED_noprotectmsdos
 		jp  32768+14
