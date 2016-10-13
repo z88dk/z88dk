@@ -16,7 +16,6 @@ stdio/ansi/generic/f_ansi_dline
 stdio/ansi/z1013/f_ansi_scrollup
 games/joystick
 @gfxbase.lst
-graphics/__gfx_coords4
 graphics/dcircle
 graphics/clg
 graphics/clrarea

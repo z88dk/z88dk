@@ -8,7 +8,6 @@ psg/trs80/get_psg
 psg/trs80/psg_init
 @psg/psg.lst
 @gfxbasetxt6.lst
-graphics/__gfx_coords
 graphics/trs80/textpixl6
 games/joystick
 games/trs80/bit_open

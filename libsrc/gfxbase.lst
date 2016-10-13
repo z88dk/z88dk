@@ -1,4 +1,5 @@
 graphics/__graphics_end
+graphics/__gfx_coords
 graphics/circle
 graphics/clga
 graphics/draw

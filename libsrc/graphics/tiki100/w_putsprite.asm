@@ -6,9 +6,10 @@
 ; TIKI-100 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.2 2016-07-02 09:01:36 dom Exp $
+; $Id: w_putsprite.asm,v 1.3 2016-10-13 06:28:57 stefano Exp $
 ;
 
+		SECTION code_clib
         PUBLIC    putsprite
         EXTERN    w_pixeladdress
 
@@ -23,13 +24,6 @@
 
 .offsets_table
          defb   1,2,4,8,16,32,64,128
-
-.oldx
-         defw   0
-;.curx
-;         defw   0
-.cury
-         defw   0
 
 
 .putsprite
@@ -217,3 +211,11 @@
          djnz     woloop
          ret
 
+
+	SECTION  bss_clib
+		 
+.oldx
+         defw   0
+		 
+.cury
+         defw   0

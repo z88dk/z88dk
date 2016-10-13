@@ -16,7 +16,6 @@ stdio/ansi/generic/f_ansi_dline
 stdio/ansi/ace/f_ansi_scrollup
 time/ace/clock
 @gfxbase.lst
-graphics/__gfx_coords
 graphics/dcircle
 graphics/clg
 graphics/clrarea

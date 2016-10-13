@@ -15,6 +15,9 @@ graphics/w_xorpixl
 graphics/lftscrol
 graphics/swapgfxbk_foo
 graphics/w_putsprite
+graphics/w_drawb
+graphics/w_undrawb
+graphics/w_clga
 graphics/draw_profile
 graphics/w_pointxy
 @z80.lst

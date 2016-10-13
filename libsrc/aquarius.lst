@@ -15,7 +15,6 @@ stdio/ansi/aquarius/f_ansi_cls
 stdio/ansi/aquarius/f_ansi_dline
 stdio/ansi/aquarius/f_ansi_scrollup
 @gfxbasetxt6.lst
-graphics/__gfx_coords
 graphics/aquarius/textpixl6
 games/bit_open
 games/bit_open_di

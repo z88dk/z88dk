@@ -15,7 +15,6 @@ stdio/ansi/osca/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 stdio/ansi/osca/f_ansi_scrollup
 @gfxbasew.lst
-graphics/__gfx_coords4
 graphics/osca/drawb
 graphics/osca/undrawb
 graphics/osca/xorborder

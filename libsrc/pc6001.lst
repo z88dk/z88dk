@@ -16,7 +16,6 @@ stdio/ansi/pc6001/f_ansi_cls
 stdio/ansi/pc6001/f_ansi_dline
 stdio/ansi/pc6001/f_ansi_scrollup
 @gfxbase.lst
-graphics/__gfx_coords
 games/pc6001/joystick
 graphics/dcircle
 graphics/clg

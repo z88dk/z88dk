@@ -3,7 +3,6 @@ stdio/sorcerer/fgetc_cons
 stdio/sorcerer/fputc_cons
 stdio/sorcerer/getk
 @gfxbase.lst
-graphics/__gfx_coords
 graphics/dcircle
 graphics/clg
 graphics/clrarea

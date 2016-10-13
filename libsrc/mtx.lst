@@ -3,7 +3,6 @@ stdio/mtx/fputc_cons
 stdio/mtx/fgetc_cons
 stdio/mtx/getk
 @gfxbase.lst
-graphics/__gfx_coords
 graphics/dcircle
 graphics/msx/gen_clg
 graphics/clrarea

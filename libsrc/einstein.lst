@@ -1,5 +1,4 @@
 @gfxbase.lst
-graphics/__gfx_coords
 graphics/dcircle
 graphics/msx/gen_clg
 graphics/clrarea

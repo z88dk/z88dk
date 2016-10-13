@@ -1,5 +1,6 @@
-graphics/circle
 graphics/__gfx_coords
+graphics/__graphics_end
+graphics/circle
 graphics/zx81/udg/clg
 graphics/zx81/clsgraph
 graphics/clga

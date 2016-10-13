@@ -1,6 +1,4 @@
 @gfxbasew.lst
-graphics/__gfx_coords4
-graphics/__graphics_end
 graphics/z9001/clg
 graphics/z9001/clga2
 graphics/z9001/w_pixladdr

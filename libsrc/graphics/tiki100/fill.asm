@@ -1,13 +1,12 @@
-	INCLUDE "graphics/grafix.inc"
+	SECTION code_clib
 	PUBLIC	fill
 	EXTERN	w_pixeladdress
 	EXTERN swapgfxbk
 	EXTERN swapgfxbk1
 
+	INCLUDE "graphics/grafix.inc"
 ;	EXTERN	l_cmp
 
-.ws1	defw 0
-.index	defw 0
 ;.sline 	defs 1024 * 2 * 3
 ;.sline2	defs 1024 * 2 * 3
 
@@ -348,3 +347,8 @@
 ;	drawb(20, 20, 260, 120);
 ;	fill(128, 128);
 ;}
+
+	SECTION  bss_clib
+
+.ws1	defw 0
+.index	defw 0

@@ -7,7 +7,7 @@
 ;	EXTERN	l_cmp
 
 ;
-;	$Id: drawb.asm,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
+;	$Id: drawb.asm,v 1.5 2016-10-13 06:28:57 stefano Exp $
 ;
 
 ; ***********************************************************************
@@ -53,21 +53,16 @@
 		call pixel_addr
 		call horizontal
 
-.next2
 ; bottom horizontal line
 		ld l,(ix+8)
-		ld h,(ix+9);x
-		ld e,(ix+6);y
+		ld h,(ix+9) ; x
+		ld e,(ix+6) ; y
 		ld a,(ix+2);height
-		add a,e
-		jr	c,drawb_exit
+		add e
 		ld e,a
-		ld a,maxy
-		cp e
-		jr	c,drawb_exit
-
+		pop af
 		call pixel_addr
-		; jp horizontal
+
 .horizontal
 		ld c,(ix+4)
 		ld b,(ix+5) ; width
@@ -80,7 +75,7 @@
 		jr	c,drawb_exit
 		ld a,b
 		or c
-		jr	z,drawb_exit
+		ret z
 		dec bc
 		jr loop3
 
@@ -103,9 +98,9 @@
 		res 5,d
 		inc e
 		ld a,e
-		and $1f
+		and $1f		; out of screen ?
 		ret nz
-		scf
+		scf			; yes
 		ret
 
 .incy
