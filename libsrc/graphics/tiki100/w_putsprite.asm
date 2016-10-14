@@ -6,7 +6,7 @@
 ; TIKI-100 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.3 2016-10-13 06:28:57 stefano Exp $
+; $Id: w_putsprite.asm,v 1.4 2016-10-14 06:40:26 stefano Exp $
 ;
 
 		SECTION code_clib
@@ -58,10 +58,10 @@
         ; @@@@@@@@@@@@
         ld      h,b
         ld      l,c
-        ;ld      (curx),hl
-        ld      (oldx),hl
-        ld      (cury),de
         call    w_pixeladdress
+	ld	(rowadr1+1),hl	; store current row
+	ld	(rowadr2+1),hl
+	ld	(rowadr3+1),hl
         ; ------
         ;ld		a,(hl)
         ; @@@@@@@@@@@@
@@ -111,20 +111,20 @@
 ._notedge djnz     _iloop
          call    swapgfxbk1
 
-        push   de
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ;ld      (curx),hl
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-;         ld      h,d
-;         ld      l,e
+.rowadr1
+		ld	hl,0	; current address
+		ex	af,af
+		ld	a,128
+		add	l
+		ld l,a
+		jr	nc,row1
+		inc h
+.row1
+		ld	(rowadr1+1),hl
         ;@@@@@@@@@@
-        pop     de
          pop      bc                ;Restore data
          djnz     _oloop
          ret
@@ -163,20 +163,20 @@
          djnz     wiloop
          call    swapgfxbk1
 
-        push   de
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ;ld      (curx),hl
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-;         ld      h,d
-;         ld      l,e
+.rowadr2
+		ld	hl,0	; current address
+		ex	af,af
+		ld	a,128
+		add	l
+		ld l,a
+		jr	nc,row2
+		inc h
+.row2
+		ld	(rowadr2+1),hl
         ;@@@@@@@@@@
-        pop     de
 
          pop      bc                ;Restore data
          djnz     woloop
@@ -192,30 +192,22 @@
          call    swapgfxbk1
          dec      ix
 
-        push   de
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-         ld      hl,(oldx)
-         ;ld      (curx),hl
-         ld      de,(cury)
-         inc     de
-         ld      (cury),de
-         call    w_pixeladdress
-;         ld      h,d
-;         ld      l,e
+.rowadr3
+		ld	hl,0	; current address
+		ex	af,af
+		ld	a,128
+		add	l
+		ld l,a
+		jr	nc,row3
+		inc h
+.row3
+		ld	(rowadr3+1),hl
         ;@@@@@@@@@@
-        pop     de
 
          pop      bc
          djnz     woloop
          ret
 
-
-	SECTION  bss_clib
-		 
-.oldx
-         defw   0
-		 
-.cury
-         defw   0

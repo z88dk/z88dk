@@ -5,13 +5,13 @@
 
         INCLUDE "graphics/grafix.inc"
 ;
-;       $Id: w_pixladdr.asm,v 1.2 2016-07-02 09:01:36 dom Exp $
+;       $Id: w_pixladdr.asm,v 1.3 2016-10-14 06:40:26 stefano Exp $
 ;
 ; ******************************************************************
 ; Get absolute  pixel address in map of virtual (x,y) coordinate.
 ; in: (x,y) coordinate of pixel (hl,de)
 ; 
-; out: de       = address of pixel byte
+; out: de = hl    = address of pixel byte
 ;          a    = bit number of byte where pixel is to be placed
 ;         fz    = 1 if bit number is 0 of pixel position
 ;
@@ -27,9 +27,11 @@
 	RR L
 	RR H
 	RR L
+	
 	SRL E
 	RR L
-	LD H,E
+	
+	LD H,E	
 	LD D,E
 	LD E,L
 

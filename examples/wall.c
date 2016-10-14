@@ -21,10 +21,11 @@
  * 
  *  Values for 'spritesize' need roughly for following resolution table:
  *	16: 512x186 (vert. sprite size is 8)
+ *	10: 320x186
  *	8: 256x186
- *  4: 128x94
- *  3: 96x72
- *  2: 64x48    spritesizeh=3: 64x72
+ *	4: 128x94
+ *	3: 96x72
+ *	2: 64x48    spritesizeh=3: 64x72
  *
  *
  *
@@ -108,7 +109,7 @@
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.11 2016-10-11 06:28:44 stefano Exp $
+ *      $Id: wall.c,v 1.12 2016-10-14 06:40:26 stefano Exp $
  *
  * * * * * * *
  *
