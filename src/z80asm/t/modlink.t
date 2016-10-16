@@ -756,7 +756,15 @@ write_file("test2.asm", <<'...');
 		ret z
 		rst 10h
 		inc hl
+		call delay
 		jp printa1
+		
+	delay:
+		ld b,0
+	delay1:
+		dec b
+		jp nz, delay1
+		ret
 		
 		section data
 	mess: defb "world"
@@ -801,6 +809,8 @@ my $bincode = sub {
 	my $l_printa = 0;
 	my $l_mess = 0;
 	my $l_dollar = 0;
+	my $l_delay = 0;
+	my $l_delay1 = 0;
 	
 	for my $pass (1..2) {
 		$code = "";
@@ -823,7 +833,16 @@ my $bincode = sub {
 							0xC8,
 							0xD7,
 							0x23).
+				 pack("Cv",	0xCD, $l_delay).
 				 pack("Cv",	0xC3, $l_printa);
+				 
+		$l_delay = $addr + length($code);
+		$code .= pack("C*",	0x06, 0x00);
+		
+		$l_delay1 = $addr + length($code);
+		$code .= pack("C*",	0x05).
+				 pack("Cv",	0xC2, $l_delay1).
+				 pack("C*",	0xC9);
 		
 		$data .= "world";
 				
@@ -862,14 +881,16 @@ File test.o at $0000: Z80RMF08
   Names:
     L A $0000 test1_mess (section data)
     L = $0000 test2_printa1
+    L A $0018 test2_delay (section code)
+    L A $001A test2_delay1 (section code)
     L A $0006 test2_mess (section data)
     L A $000B test3_mess (section data)
     L A $000D test3_dollar (section data)
     G A $0000 main (section code)
     G = $0000 print
     G A $000D printa (section code)
-    G A $0015 print1 (section code)
-    G A $001B code_end (section code)
+    G A $001F print1 (section code)
+    G A $0025 code_end (section code)
   External names:
     U         lib_start
     U         lib_end
@@ -878,14 +899,17 @@ File test.o at $0000: Z80RMF08
     E Cw (test1.asm:6) $0003 $0004: test1_mess+main-main (section code)
     E Cw (test1.asm:7) $0006 $0007: print (section code)
     E Cw (test1.asm:8) $0009 $000A: lib_end (section code)
-    E Cw (test2.asm:13) $0012 $0013: test2_printa1 (section code)
+    E Cw (test2.asm:20) $001B $001C: test2_delay1 (section code)
+    E Cw (test2.asm:14) $0015 $0016: test2_printa1 (section code)
+    E Cw (test2.asm:13) $0012 $0013: test2_delay (section code)
     E =  (test2.asm:4) $0000 $0000: test2_printa1 := printa
     E =  (test2.asm:3) $0000 $0000: print := print1
     E Cw (test3.asm:12) $000D $000D: ASMPC (section data)
-    E Cw (test3.asm:6) $0016 $0017: printa (section code)
-  Code: 27 bytes (section code)
+    E Cw (test3.asm:6) $0020 $0021: printa (section code)
+  Code: 37 bytes (section code)
     C $0000: CD 00 00 21 00 00 CD 00 00 CD 00 00 C9 7E A7 C8
-    C $0010: D7 23 C3 00 00 E5 CD 00 00 E1 C9
+    C $0010: D7 23 CD 00 00 C3 00 00 06 00 05 C2 00 00 C9 E5
+    C $0020: CD 00 00 E1 C9
   Code: 15 bytes (section data)
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64 21 00 00 00
 END
@@ -899,8 +923,10 @@ test2_mess                      = $0006 ; L
 test3_mess                      = $000B ; L 
 printa                          = $000D ; G 
 test3_dollar                    = $000D ; L 
-print1                          = $0015 ; G 
-code_end                        = $001B ; G 
+test2_delay                     = $0018 ; L 
+test2_delay1                    = $001A ; L 
+print1                          = $001F ; G 
+code_end                        = $0025 ; G 
 END
 
 
@@ -924,19 +950,21 @@ main                            = $0000 ; G test
 printa                          = $000D ; G test
 test2_printa1                   = $000D ; L test
 __data_size                     = $000F ; G 
-print1                          = $0015 ; G test
-print                           = $0015 ; G test
-__code_size                     = $001B ; G 
-__code_tail                     = $001B ; G 
-__data_head                     = $001B ; G 
-code_end                        = $001B ; G test
-test1_mess                      = $001B ; L test
-test2_mess                      = $0021 ; L test
-test3_mess                      = $0026 ; L test
-test3_dollar                    = $0028 ; L test
-__data_tail                     = $002A ; G 
-__size                          = $002A ; G 
-__tail                          = $002A ; G 
+test2_delay                     = $0018 ; L test
+test2_delay1                    = $001A ; L test
+print1                          = $001F ; G test
+print                           = $001F ; G test
+__code_size                     = $0025 ; G 
+__code_tail                     = $0025 ; G 
+__data_head                     = $0025 ; G 
+code_end                        = $0025 ; G test
+test1_mess                      = $0025 ; L test
+test2_mess                      = $002B ; L test
+test3_mess                      = $0030 ; L test
+test3_dollar                    = $0032 ; L test
+__data_tail                     = $0034 ; G 
+__size                          = $0034 ; G 
+__tail                          = $0034 ; G 
 END
 
 
@@ -955,24 +983,26 @@ eq_or_diff_text norm_nl(scalar(read_file("test.map"))), norm_nl(<<'END');
 lib_end                         = $0000 ; G test_lib
 lib_start                       = $0000 ; G test_lib
 __data_size                     = $000F ; G 
-__code_size                     = $001B ; G 
-__size                          = $002A ; G 
+__code_size                     = $0025 ; G 
+__size                          = $0034 ; G 
 __code_head                     = $1234 ; G 
 __head                          = $1234 ; G 
 main                            = $1234 ; G test
 printa                          = $1241 ; G test
 test2_printa1                   = $1241 ; L test
-print1                          = $1249 ; G test
-print                           = $1249 ; G test
-__code_tail                     = $124F ; G 
-__data_head                     = $124F ; G 
-code_end                        = $124F ; G test
-test1_mess                      = $124F ; L test
-test2_mess                      = $1255 ; L test
-test3_mess                      = $125A ; L test
-test3_dollar                    = $125C ; L test
-__data_tail                     = $125E ; G 
-__tail                          = $125E ; G 
+test2_delay                     = $124C ; L test
+test2_delay1                    = $124E ; L test
+print1                          = $1253 ; G test
+print                           = $1253 ; G test
+__code_tail                     = $1259 ; G 
+__data_head                     = $1259 ; G 
+code_end                        = $1259 ; G test
+test1_mess                      = $1259 ; L test
+test2_mess                      = $125F ; L test
+test3_mess                      = $1264 ; L test
+test3_dollar                    = $1266 ; L test
+__data_tail                     = $1268 ; G 
+__tail                          = $1268 ; G 
 END
 
 sub norm_nl {
