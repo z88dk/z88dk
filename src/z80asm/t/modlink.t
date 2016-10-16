@@ -756,14 +756,14 @@ write_file("test2.asm", <<'...');
 		ret z
 		rst 10h
 		inc hl
-		call delay
+		call _delay
 		jp printa1
 		
-	delay:
+	_delay:
 		ld b,0
-	delay1:
+	_delay_1:
 		dec b
-		jp nz, delay1
+		jp nz, _delay_1
 		ret
 		
 		section data
@@ -881,8 +881,8 @@ File test.o at $0000: Z80RMF08
   Names:
     L A $0000 test1_mess (section data)
     L = $0000 test2_printa1
-    L A $0018 test2_delay (section code)
-    L A $001A test2_delay1 (section code)
+    L A $0018 test2__delay (section code)
+    L A $001A test2__delay_1 (section code)
     L A $0006 test2_mess (section data)
     L A $000B test3_mess (section data)
     L A $000D test3_dollar (section data)
@@ -899,9 +899,9 @@ File test.o at $0000: Z80RMF08
     E Cw (test1.asm:6) $0003 $0004: test1_mess+main-main (section code)
     E Cw (test1.asm:7) $0006 $0007: print (section code)
     E Cw (test1.asm:8) $0009 $000A: lib_end (section code)
-    E Cw (test2.asm:20) $001B $001C: test2_delay1 (section code)
+    E Cw (test2.asm:20) $001B $001C: test2__delay_1 (section code)
     E Cw (test2.asm:14) $0015 $0016: test2_printa1 (section code)
-    E Cw (test2.asm:13) $0012 $0013: test2_delay (section code)
+    E Cw (test2.asm:13) $0012 $0013: test2__delay (section code)
     E =  (test2.asm:4) $0000 $0000: test2_printa1 := printa
     E =  (test2.asm:3) $0000 $0000: print := print1
     E Cw (test3.asm:12) $000D $000D: ASMPC (section data)
@@ -923,8 +923,8 @@ test2_mess                      = $0006 ; L
 test3_mess                      = $000B ; L 
 printa                          = $000D ; G 
 test3_dollar                    = $000D ; L 
-test2_delay                     = $0018 ; L 
-test2_delay1                    = $001A ; L 
+test2__delay                    = $0018 ; L 
+test2__delay_1                  = $001A ; L 
 print1                          = $001F ; G 
 code_end                        = $0025 ; G 
 END
@@ -950,8 +950,8 @@ main                            = $0000 ; G test
 printa                          = $000D ; G test
 test2_printa1                   = $000D ; L test
 __data_size                     = $000F ; G 
-test2_delay                     = $0018 ; L test
-test2_delay1                    = $001A ; L test
+test2__delay                    = $0018 ; L test
+test2__delay_1                  = $001A ; L test
 print1                          = $001F ; G test
 print                           = $001F ; G test
 __code_size                     = $0025 ; G 
@@ -990,8 +990,8 @@ __head                          = $1234 ; G
 main                            = $1234 ; G test
 printa                          = $1241 ; G test
 test2_printa1                   = $1241 ; L test
-test2_delay                     = $124C ; L test
-test2_delay1                    = $124E ; L test
+test2__delay                    = $124C ; L test
+test2__delay_1                  = $124E ; L test
 print1                          = $1253 ; G test
 print                           = $1253 ; G test
 __code_tail                     = $1259 ; G 

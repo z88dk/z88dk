@@ -1027,6 +1027,9 @@ ReleaseLinkInfo( void )
 }
 
 /* Consolidate object file */
+static inline int sym_first(int c) { return c == '_' || isalpha(c); }
+static inline int sym_next(int c)  { return c == '_' || isalnum(c); }
+
 static void replace_names(Str *result, char *input, StrHash *map)
 {
 	STR_DEFINE(key, STR_SIZE);
@@ -1036,9 +1039,9 @@ static void replace_names(Str *result, char *input, StrHash *map)
 
 	p0 = input;
 	while (*p0) {
-		if (isalnum(*p0)) {	/* /\w+/ */
+		if (sym_first(*p0)) {
 			p1 = p0 + 1;
-			while (*p1 && isalnum(*p1))
+			while (*p1 && sym_next(*p1))
 				p1++;
 			str_set_n(key, p0, p1 - p0);
 			elem = StrHash_get(map, str_data(key));
@@ -1050,7 +1053,7 @@ static void replace_names(Str *result, char *input, StrHash *map)
 		}
 		else {				/* /\W+/ */
 			p1 = p0 + 1;
-			while (*p1 && !isalnum(*p1))
+			while (*p1 && !sym_first(*p1))
 				p1++;
 			str_append_n(result, p0, p1 - p0);
 			p0 = p1;

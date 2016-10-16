@@ -4,19 +4,19 @@ Z88DK Z80 Module Assembler Change Log
 2016
 ----
 
-- 2016-10-10
-
-  Rename generated constants to start with '__', prune empty sections
-  Rename ASMHEAD, ASMTAIL and ASMSIZE to __head, __tail and __size respectively.
-  Rename ASM<HEAD|TAIL|SIZE>_<section_name> to __<section_name>_<head|tail|size>. 
-  
-- 2016-10-08
+- 2016-10-16
 
   Add consolidated object file.
   When -o objectfile is given without -b, all the object modules from the command line 
   are merged into one consolidated object file. The module local symbols are renamed 
   <module>_<symbol> to avoid clashes in the merged symbol table.
 
+- 2016-10-10
+
+  Rename generated constants to start with '__', prune empty sections
+  Rename ASMHEAD, ASMTAIL and ASMSIZE to __head, __tail and __size respectively.
+  Rename ASM<HEAD|TAIL|SIZE>_<section_name> to __<section_name>_<head|tail|size>. 
+  
 - 2016-09-17
 
   Remove -M, --obj-ext option. The object file has always the .o extension.
