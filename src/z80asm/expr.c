@@ -281,6 +281,10 @@ void ExprOp_compute(ExprOp *self, Expr *expr, Bool not_defined_error)
 		else
 		{
 			Calc_push( self->d.symbol->value );
+
+			/* check cross-section addresses to invalidade relative jumps */
+			if (self->d.symbol->section != CURRENTSECTION)
+				expr->result.cross_section_addr = TRUE;
 		}
 
 		expr->type = MAX( expr->type, self->d.symbol->type );
@@ -643,6 +647,7 @@ long Expr_eval(Expr *self, Bool not_defined_error)
 	self->result.not_evaluable		= FALSE;
 	self->result.undefined_symbol	= FALSE;
 	self->result.extern_symbol		= FALSE;
+	self->result.cross_section_addr = FALSE;
 
 	self->is_computed = TRUE;
 

@@ -103,6 +103,7 @@ CLASS( Expr )
 		Bool not_evaluable:1;		/* TRUE if expression did not retunr a value */
 		Bool undefined_symbol:1;	/* TRUE if expression contains one undefined symbol */
 		Bool extern_symbol:1;		/* TRUE if expression contains one EXTERN symbol */
+		Bool cross_section_addr:1;	/* TRUE if expression referred to symbol on another section */	
 	} result;
 
 	range_t		 range;			/* range of expression result */

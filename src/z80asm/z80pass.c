@@ -55,7 +55,7 @@ Z80pass2( void )
 		}
 		else if ( expr->range == RANGE_JR_OFFSET )
 		{
-			if ( expr->result.extern_symbol )
+			if (expr->result.extern_symbol || expr->result.cross_section_addr)
 			{
 				error_jr_not_local();	/* JR must be local */
 				do_patch = FALSE;

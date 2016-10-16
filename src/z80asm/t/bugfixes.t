@@ -735,3 +735,27 @@ __CCC_tail                      = $0005 ; G
 __size                          = $0005 ; G 
 __tail                          = $0005 ; G 
 ...
+
+#------------------------------------------------------------------------------
+# Bug report: z80asm: bug with relative jumps across sections
+# alvin (alvin_albrecht@hotmail.com) <lists@suborbital.org.uk> 	Sun, Oct 16, 2016 at 6:30 PM
+# JR across sections generate wrong code
+for my $op ("jr", "djnz", "jr nc,") {
+	write_file("test.asm", <<"...");
+		SECTION LOADER
+		$op 0+(pietro_loader)
+		
+		SECTION LOADER_CODE
+	pietro_loader:
+		ret
+...
+	my $cmd = "./z80asm -b test.asm";
+	ok 1, $cmd;
+	my($stdout, $stderr, $return) = capture { system $cmd; };
+	eq_or_diff_text $stdout, "", "stdout";
+	eq_or_diff_text $stderr, <<'...', "stderr";
+Error at file 'test.asm' line 2: relative jump address must be local
+1 errors occurred during assembly
+...
+	ok !!$return == !!1, "retval";
+}
