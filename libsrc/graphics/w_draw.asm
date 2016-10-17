@@ -7,7 +7,7 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_draw.asm,v 1.5 2016-04-14 09:13:08 dom Exp $
+;	$Id: w_draw.asm,v 1.6 2016-10-17 15:07:05 stefano Exp $
 ;
 
 
@@ -18,30 +18,44 @@
                 EXTERN     swapgfxbk1
                 EXTERN	__graphics_end
 
-                EXTERN     w_line
+                EXTERN     w_line_r
                 EXTERN     w_plotpixel
 
 
 .draw
 ._draw
 		push	ix
-		ld	ix,2
+		ld	ix,4
 		add	ix,sp
 		ld	l,(ix+6)
 		ld	h,(ix+7)
 		ld	e,(ix+4)
 		ld	d,(ix+5)
+		
+		push hl
+		push de
+		push ix
 
 		call    swapgfxbk
 		call	w_plotpixel
-                call    swapgfxbk1
+		call    swapgfxbk1
 
+		pop ix
+		ld	l,(ix+0)
+		ld	h,(ix+1)
+		pop bc
+		or a
+		sbc hl,bc
+		ex de,hl
+		
 		ld	l,(ix+2)
 		ld	h,(ix+3)
-		ld	e,(ix+0)
-		ld	d,(ix+1)
+		pop bc
+		or a
+		sbc hl,bc
 
 		call    swapgfxbk
-                ld      ix,w_plotpixel
-                call    w_line
-                jp      __graphics_end
+		ld      ix,w_plotpixel
+		call    w_line_r
+		jp      __graphics_end
+

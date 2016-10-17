@@ -8,7 +8,7 @@
 	EXTERN	__gfx_coords
 
 ;
-;	$Id: w_line.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
+;	$Id: w_line.asm,v 1.8 2016-10-17 15:07:05 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -29,5 +29,5 @@
 		ld	bc,(__gfx_coords)
 		or	a
 		sbc	hl,bc
-.nocrossx
+
 		jp	w_line_r

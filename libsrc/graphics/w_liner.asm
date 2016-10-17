@@ -9,7 +9,7 @@
         EXTERN    __gfx_coords
 
 ;
-;       $Id: w_liner.asm,v 1.9 2016-07-02 09:01:35 dom Exp $
+;       $Id: w_liner.asm,v 1.10 2016-10-17 15:07:05 stefano Exp $
 ;
 
 ; ******************************************************************************
@@ -114,6 +114,7 @@
 								or e
 								or h
 								or l
+								
 								jr      z, exit_draw        ; if x+y = 0 then return	                                
                                                             ;       else
                                 exx
@@ -151,7 +152,8 @@
 						ld	a,h
 						add	$80
 						cp	b
-						ret	nz
+						jr nz,noteq2
+						;ret	nz
 						ld	a,l
 						cp	iyl
 

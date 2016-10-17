@@ -12,6 +12,8 @@ graphics/clrarea
 graphics/w_plotpixl
 graphics/w_respixl
 graphics/w_xorpixl
+graphics/w_putsprite
+graphics/w_drawb
 graphics/lftscrol
 graphics/swapgfxbk_foo
 graphics/draw_profile

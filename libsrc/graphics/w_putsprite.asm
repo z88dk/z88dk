@@ -3,10 +3,10 @@
 ; original code by Patrick Davidson (TI 85)
 ; modified by Stefano Bodrato - nov 2010
 ;
-; TS2068 high resolution version
+; Generic high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.4 2016-07-02 09:01:35 dom Exp $
+; $Id: w_putsprite.asm,v 1.5 2016-10-17 15:07:05 stefano Exp $
 ;
 
         SECTION code_clib
