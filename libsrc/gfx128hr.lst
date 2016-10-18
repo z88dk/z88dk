@@ -1,8 +1,8 @@
 @gfxbasew.lst
-graphics/drawb
-graphics/drawbox
-graphics/undrawb
-graphics/xorborder
+graphics/w_drawb
+graphics/w_undrawb
+graphics/w_xorborder
+graphics/w_clga
 graphics/c128/clg
 graphics/clrarea
 graphics/c128/w_pixladdr
