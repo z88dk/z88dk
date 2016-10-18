@@ -1010,3 +1010,104 @@ sub norm_nl {
 	$text =~ s/\r?\n/\n/g;
 	return $text;
 }
+
+#------------------------------------------------------------------------------
+# Test library with specialized and generalized version of same function
+write_file("test_gen.asm", <<'...');
+		global putpixel
+
+	putpixel:
+		ld a, 1
+		ret
+...
+
+
+# platform 1 uses the generic putpixel
+write_file("test_plat1.asm", <<'...');
+...
+
+$cmd = "./z80asm -xtest_plat1.lib test_plat1 test_gen";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+
+
+# platform 2 uses a specific putpixel
+write_file("test_plat2.asm", <<'...');
+		global putpixel
+
+	putpixel:
+		ld a, 2
+		ret
+...
+
+$cmd = "./z80asm -xtest_plat2.lib test_plat2 test_gen";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+
+
+# generic source
+write_file("test.asm", <<'...');
+		global putpixel
+		jp putpixel
+...
+
+
+# link on platform 1
+$cmd = "./z80asm -itest_plat1.lib -b test";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 1, 0xC9));
+
+
+# link on platform 2
+$cmd = "./z80asm -itest_plat2.lib -b test";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 2, 0xC9));
+
+z80nm("test_plat1.lib", <<'END');
+
+File test_plat1.lib at $0000: Z80LMF08
+
+File test_plat1.lib at $0010: Z80RMF08
+  Name: test_plat1
+
+File test_plat1.lib at $003F: Z80RMF08
+  Name: test_gen
+  Names:
+    G A $0000 putpixel
+  Code: 3 bytes
+    C $0000: 3E 01 C9
+END
+
+
+z80nm("test_plat2.lib", <<'END');
+
+File test_plat2.lib at $0000: Z80LMF08
+
+File test_plat2.lib at $0010: Z80RMF08
+  Name: test_plat2
+  Names:
+    G A $0000 putpixel
+  Code: 3 bytes
+    C $0000: 3E 02 C9
+
+File test_plat2.lib at $0060: Z80RMF08
+  Name: test_gen
+  Names:
+    G A $0000 putpixel
+  Code: 3 bytes
+    C $0000: 3E 01 C9
+END
