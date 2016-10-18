@@ -7,7 +7,7 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_draw.asm,v 1.6 2016-10-17 15:07:05 stefano Exp $
+;	$Id: w_draw.asm,v 1.7 2016-10-18 06:52:34 stefano Exp $
 ;
 
 

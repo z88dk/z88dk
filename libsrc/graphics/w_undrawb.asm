@@ -1,18 +1,18 @@
 ;
-; Drawbox
+; Undrawbox
 ;
 ; Generic high resolution version
 ;
 ;
-; $Id: w_drawb.asm,v 1.2 2016-10-18 06:52:34 stefano Exp $
+; $Id: w_undrawb.asm,v 1.1 2016-10-18 06:52:34 stefano Exp $
 ;
 
 	INCLUDE "graphics/grafix.inc"
  	SECTION code_clib
-	PUBLIC	drawb
-	PUBLIC	_drawb
+	PUBLIC	undrawb
+	PUBLIC	_undrawb
 
-	EXTERN	w_plotpixel
+	EXTERN	w_respixel
 	EXTERN	w_line_r
 
 	EXTERN	swapgfxbk
@@ -20,8 +20,8 @@
 	EXTERN	__graphics_end
 
 	
-.drawb
-._drawb
+.undrawb
+._undrawb
 		push	ix
 		ld	ix,4
 		add	ix,sp
@@ -35,7 +35,7 @@
 		push ix
 
 		call    swapgfxbk
-		call	w_plotpixel
+		call	w_respixel
 		call    swapgfxbk1
 
 		pop ix
@@ -45,7 +45,7 @@
 		push ix
 		
 		call    swapgfxbk
-		ld      ix,w_plotpixel
+		ld      ix,w_respixel
 		call    w_line_r
 		call    swapgfxbk1
 		
@@ -56,7 +56,7 @@
 		push ix
 		
 		call    swapgfxbk
-		ld      ix,w_plotpixel
+		ld      ix,w_respixel
 		call    w_line_r
 		call    swapgfxbk1
 		
@@ -66,7 +66,7 @@
 		push ix
 		
 		call    swapgfxbk
-		call	w_plotpixel
+		call	w_respixel
 		call    swapgfxbk1
 		
 		pop ix
@@ -76,7 +76,7 @@
 		push ix
 		
 		call    swapgfxbk
-		ld      ix,w_plotpixel
+		ld      ix,w_respixel
 		call    w_line_r
 		call    swapgfxbk1
 
@@ -87,7 +87,7 @@
 		push ix
 		
 		call    swapgfxbk
-		ld      ix,w_plotpixel
+		ld      ix,w_respixel
 		call    w_line_r
 
 		jp      __graphics_end

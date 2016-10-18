@@ -1,18 +1,18 @@
 ;
-; Drawbox
+; Xorborder
 ;
 ; Generic high resolution version
 ;
 ;
-; $Id: w_drawb.asm,v 1.2 2016-10-18 06:52:34 stefano Exp $
+; $Id: w_xorborder.asm,v 1.1 2016-10-18 06:52:34 stefano Exp $
 ;
 
 	INCLUDE "graphics/grafix.inc"
  	SECTION code_clib
-	PUBLIC	drawb
-	PUBLIC	_drawb
+	PUBLIC	xorborder
+	PUBLIC	_xorborder
 
-	EXTERN	w_plotpixel
+	EXTERN	w_xorpixel
 	EXTERN	w_line_r
 
 	EXTERN	swapgfxbk
@@ -20,8 +20,8 @@
 	EXTERN	__graphics_end
 
 	
-.drawb
-._drawb
+.xorborder
+._xorborder
 		push	ix
 		ld	ix,4
 		add	ix,sp
@@ -35,7 +35,7 @@
 		push ix
 
 		call    swapgfxbk
-		call	w_plotpixel
+		call	w_xorpixel
 		call    swapgfxbk1
 
 		pop ix
@@ -45,7 +45,7 @@
 		push ix
 		
 		call    swapgfxbk
-		ld      ix,w_plotpixel
+		ld      ix,w_xorpixel
 		call    w_line_r
 		call    swapgfxbk1
 		
@@ -56,7 +56,7 @@
 		push ix
 		
 		call    swapgfxbk
-		ld      ix,w_plotpixel
+		ld      ix,w_xorpixel
 		call    w_line_r
 		call    swapgfxbk1
 		
@@ -66,7 +66,7 @@
 		push ix
 		
 		call    swapgfxbk
-		call	w_plotpixel
+		call	w_xorpixel
 		call    swapgfxbk1
 		
 		pop ix
@@ -76,7 +76,7 @@
 		push ix
 		
 		call    swapgfxbk
-		ld      ix,w_plotpixel
+		ld      ix,w_xorpixel
 		call    w_line_r
 		call    swapgfxbk1
 
@@ -87,8 +87,9 @@
 		push ix
 		
 		call    swapgfxbk
-		ld      ix,w_plotpixel
+		ld      ix,w_xorpixel
 		call    w_line_r
+		call    swapgfxbk1
 
 		jp      __graphics_end
 
