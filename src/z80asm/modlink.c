@@ -764,7 +764,7 @@ void link_modules( void )
 		relocate_symbols();
 
 	/* define assembly size */
-	if (!get_num_errors())
+	if (!get_num_errors() && !opts.consol_obj_file)
 		define_location_symbols();
 
 	if (opts.consol_obj_file) {

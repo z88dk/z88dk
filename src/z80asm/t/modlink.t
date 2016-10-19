@@ -914,7 +914,7 @@ File test.o at $0000: Z80RMF08
     C $0000: 68 65 6C 6C 6F 20 77 6F 72 6C 64 21 00 00 00
 END
 
-eq_or_diff_text norm_nl(scalar(read_file("test.sym"))), norm_nl(<<'END');
+eq_or_diff_text scalar(read_file("test.sym")), <<'END';
 main                            = $0000 ; G 
 print                           = $0000 ; G 
 test1_mess                      = $0000 ; L 
@@ -941,7 +941,7 @@ eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0));
 
-eq_or_diff_text norm_nl(scalar(read_file("test.map"))), norm_nl(<<'END');
+eq_or_diff_text scalar(read_file("test.map")), <<'END';
 __code_head                     = $0000 ; G 
 __head                          = $0000 ; G 
 lib_end                         = $0000 ; G test_lib
@@ -979,7 +979,7 @@ eq_or_diff_text $stderr, "", "stderr";
 ok !!$return == !!0, "retval";
 test_binfile("test.bin", $bincode->(0x1234));
 
-eq_or_diff_text norm_nl(scalar(read_file("test.map"))), norm_nl(<<'END');
+eq_or_diff_text scalar(read_file("test.map")), <<'END';
 lib_end                         = $0000 ; G test_lib
 lib_start                       = $0000 ; G test_lib
 __data_size                     = $000F ; G 
@@ -1004,12 +1004,6 @@ test3_dollar                    = $1266 ; L test
 __data_tail                     = $1268 ; G 
 __tail                          = $1268 ; G 
 END
-
-sub norm_nl {
-	my($text) = @_;
-	$text =~ s/\r?\n/\n/g;
-	return $text;
-}
 
 #------------------------------------------------------------------------------
 # Test library with specialized and generalized version of same function
@@ -1111,3 +1105,53 @@ File test_plat2.lib at $0060: Z80RMF08
   Code: 3 bytes
     C $0000: 3E 01 C9
 END
+
+#------------------------------------------------------------------------------
+# Bug report: alvin (alvin_albrecht@hotmail.com) <lists@suborbital.org.uk> via lists.sourceforge.net 
+# date:	Mon, Oct 17, 2016 at 8:11 AM
+# For some reason, in pietro_loader.asm, the symbols "__LOADER_head" and "__LOADER_CODE_tail" are 
+# being made public when a consolidated object is built.  It is only those two symbols despite 
+# other section symbols being used in the same file.
+write_file("test1.asm", <<'...');
+	SECTION LOADER
+	EXTERN __LOADER_head, __LOADER_tail
+	ld hl, __LOADER_tail -__LOADER_head
+...
+
+$cmd = "./z80asm test1.asm";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+
+$cmd = "../../src/z80nm/z80nm test1.o";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+$stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";
+eq_or_diff_text $stdout, <<'END', "stdout";
+    U         __LOADER_head
+    U         __LOADER_tail
+END
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+
+
+$cmd = "./z80asm --output=test1.o test1.asm";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+eq_or_diff_text $stdout, "", "stdout";
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+
+$cmd = "../../src/z80nm/z80nm test1.o";
+ok 1, $cmd;
+($stdout, $stderr, $return) = capture { system $cmd; };
+$stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";
+eq_or_diff_text $stdout, <<'END', "stdout";
+    U         __LOADER_head
+    U         __LOADER_tail
+END
+eq_or_diff_text $stderr, "", "stderr";
+ok !!$return == !!0, "retval";
+
