@@ -6,7 +6,7 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.22 2016-09-26 07:05:52 stefano Exp $
+ *	$Id: sound.h,v 1.23 2016-10-19 10:32:22 stefano Exp $
  */
 
 
@@ -49,6 +49,11 @@ extern void __LIB__ bit_play(unsigned char melody[]);
 
 #ifdef AQUARIUS
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
+#endif
+
+#ifdef BEE
+  #define BEEP_TSTATES 250000.0 /* 2 Mhz */
+  /* #define BEEP_TSTATES 421875.0 -> 3.375 Mhz */
 #endif
 
 #ifdef C128

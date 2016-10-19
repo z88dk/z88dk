@@ -5,7 +5,7 @@
 ;       based on the Dominic's sound routines
 ;
 ;
-;       $Id: games.inc,v 1.29 2016-09-26 07:05:52 stefano Exp $
+;       $Id: games.inc,v 1.30 2016-10-19 10:32:23 stefano Exp $
 ;
 
 IF FORc128
@@ -152,4 +152,10 @@ IF FORz9001
         defc sndbit_port   = 136
         defc sndbit_bit    = 7
         defc sndbit_mask   = 128
+ENDIF
+
+IF FORbee
+        defc sndbit_port   = 2
+        defc sndbit_bit    = 6
+        defc sndbit_mask   = 64
 ENDIF

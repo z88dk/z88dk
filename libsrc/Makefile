@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.255 2016-10-10 07:09:14 stefano Exp $
+# $Id: Makefile,v 1.256 2016-10-19 10:32:22 stefano Exp $
 
 
 include Make.config
@@ -15,7 +15,7 @@ include Make.config
 
 all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	abc80_clib.lib abc800_clib.lib \
-	ace_clib.lib aquarius_clib.lib c7420_clib.lib\
+	ace_clib.lib aquarius_clib.lib microbee.lib c7420_clib.lib\
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib  \
 	nascom_clib.lib  newbrain_clib.lib nc_clib.lib \
@@ -769,6 +769,15 @@ aquarius_clib.lib:
 	$(MAKE) -C psg
 	$(MAKE) -C games laquarius 
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
+
+# Applied Technology MicroBee library - Stefano
+microbee.lib:
+	@echo ''
+	@echo '--- Building MicroBee Library ---'
+	@echo ''
+	$(MAKE) gamesdeps
+	$(MAKE) -C games lbee
+	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/bee.lst
 
 # Philips Videopac C7420 library - Stefano
 c7420_clib.lib:
