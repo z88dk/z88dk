@@ -8,11 +8,19 @@ include(__link__.m4)
 #ifndef _FLOAT_T_DEFINED
 #define _FLOAT_T_DEFINED
 
+   #ifdef __LLVM
+   
+   typedef float float_t;
+   
+   #endif
+
    #ifdef __SDCC
    
    typedef float float_t;
    
-   #else
+   #endif
+   
+   #ifdef __SCCZ80
    
    typedef double float_t;
    
@@ -23,11 +31,19 @@ include(__link__.m4)
 #ifndef _DOUBLE_T_DEFINED
 #define _DOUBLE_T_DEFINED
 
+   #ifdef __LLVM
+   
+   typedef float double_t;
+   
+   #endif
+
    #ifdef __SDCC
    
    typedef float double_t;
    
-   #else
+   #endif
+   
+   #ifdef __SCCZ80
    
    typedef double double_t;
    
@@ -59,13 +75,23 @@ include(__link__.m4)
 #define MATH_ERREXCEPT         2
 #define math_errhandling       1
 
+#ifdef __LLVM
+
+#define HUGE_VAL               1.7014117331E+38
+#define HUGE_VALF              1.7014117331E+38
+#define INFINITY               1.7014117331E+38
+
+#endif
+
 #ifdef __SDCC
 
 #define HUGE_VAL               1.7014117331E+38
 #define HUGE_VALF              1.7014117331E+38
 #define INFINITY               1.7014117331E+38
 
-#else
+#endif
+
+#ifdef __SCCZ80
 
 #define HUGE_VAL               1.7014118346E+38
 #define HUGE_VALF              1.7014118346E+38

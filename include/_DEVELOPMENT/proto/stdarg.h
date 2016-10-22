@@ -3,6 +3,17 @@ include(__link__.m4)
 #ifndef _STDARG_H
 #define _STDARG_H
 
+#ifdef __LLVM
+
+typedef unsigned char * va_list;
+
+#define va_start(marker, last)  { marker = (va_list)&last + sizeof(last); }
+#define va_arg(marker, type)    *((type *)((marker += sizeof(type)) - sizeof(type)))
+#define va_copy(dest, src)      { dest = src; }
+#define va_end(marker)          { marker = (va_list) 0; };
+
+#endif
+
 #ifdef __SDCC
 
 // SDCC
@@ -44,7 +55,9 @@ typedef unsigned char * va_list;
 #define va_copy(dest, src)      { dest = src; }
 #define va_end(marker)          { marker = (va_list) 0; };
 
-#else
+#endif
+
+#ifdef __SCCZ80
 
 // SCCZ80
 // l->r parameter passing means compiler must tell us how many params are on the stack

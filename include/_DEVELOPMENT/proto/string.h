@@ -82,7 +82,8 @@ __DPROTO(,,size_t,,strxfrm,char *dst,char *src,size_t n)
 
    extern int ffsll(long long i);
    
-#else
+#endif
+
 #ifdef __SDCC
 
    extern int ffsll(long long i) __preserves_regs(b,c);
@@ -105,7 +106,6 @@ __DPROTO(,,size_t,,strxfrm,char *dst,char *src,size_t n)
 
    #endif
 
-#endif
 #endif
 
 #endif

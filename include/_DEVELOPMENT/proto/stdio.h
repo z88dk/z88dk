@@ -52,9 +52,9 @@ extern FILE *stderr;
 
 #ifdef __CPM
 
-   extern FILE *stdrdr;
-   extern FILE *stdpun;
-   extern FILE *stdlst;
+extern FILE *stdrdr;
+extern FILE *stdpun;
+extern FILE *stdlst;
 
 #endif
 

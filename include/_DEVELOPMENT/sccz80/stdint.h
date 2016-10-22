@@ -29,6 +29,19 @@ typedef unsigned int           uint_fast8_t;
 typedef unsigned int           uint_fast16_t;
 typedef unsigned long          uint_fast32_t;
 
+#ifdef __LLVM
+
+typedef long long              int64_t;
+typedef unsigned long long     uint64_t;
+
+typedef long long              int_least64_t;
+typedef unsigned long long     uint_least64_t;
+
+typedef long long              int_fast64_t;
+typedef unsigned long long     uint_fast64_t;
+
+#endif
+
 #ifdef __SDCC
 
 typedef long long              int64_t;
@@ -49,12 +62,21 @@ typedef int                    intptr_t;
 
 typedef unsigned int           uintptr_t;
 
+#ifdef __LLVM
+
+typedef long long              intmax_t;
+typedef unsigned long long     uintmax_t;
+
+#endif
+
 #ifdef __SDCC
 
 typedef long long              intmax_t;
 typedef unsigned long long     uintmax_t;
 
-#else
+#endif
+
+#ifdef __SCCZ80
 
 typedef long                   intmax_t;
 typedef unsigned long          uintmax_t;
@@ -72,6 +94,14 @@ typedef unsigned long          uintmax_t;
 #define UINT8_MAX              255U
 #define UINT16_MAX             65535U
 #define UINT32_MAX             4294967295UL
+
+#ifdef __LLVM
+
+#define INT64_MIN             -9223372036854775808LL
+#define INT64_MAX              9223372036854775807LL
+#define UINT64_MAX             18446744073709551615ULL
+
+#endif
 
 #ifdef __SDCC
 
@@ -93,6 +123,14 @@ typedef unsigned long          uintmax_t;
 #define UINT_LEAST16_MAX       65535U
 #define UINT_LEAST32_MAX       4294967295UL
 
+#ifdef __LLVM
+
+#define INT_LEAST64_MIN       -9223372036854775808LL
+#define INT_LEAST64_MAX        9223372036854775807LL
+#define UINT_LEAST64_MAX       18446744073709551615ULL
+
+#endif
+
 #ifdef __SDCC
 
 #define INT_LEAST64_MIN       -9223372036854775808LL
@@ -113,6 +151,14 @@ typedef unsigned long          uintmax_t;
 #define UINT_FAST16_MAX        65535U
 #define UINT_FAST32_MAX        4294967295UL
 
+#ifdef __LLVM
+
+#define INT_FAST64_MIN        -9223372036854775808LL
+#define INT_FAST64_MAX         9223372036854775807LL
+#define UINT_FAST64_MAX        18446744073709551615ULL
+
+#endif
+
 #ifdef __SDCC
 
 #define INT_FAST64_MIN        -9223372036854775808LL
@@ -125,13 +171,23 @@ typedef unsigned long          uintmax_t;
 #define INTPTR_MAX             32767
 #define UINTPTR_MAX            65535U
 
-#ifdef _SDCC
+#ifdef __LLVM
 
 #define INTMAX_MIN            -9223372036854775808LL
 #define INTMAX_MAX             9223372036854775807LL
 #define UINTMAX_MAX            18446744073709551615ULL
 
-#else
+#endif
+
+#ifdef __SDCC
+
+#define INTMAX_MIN            -9223372036854775808LL
+#define INTMAX_MAX             9223372036854775807LL
+#define UINTMAX_MAX            18446744073709551615ULL
+
+#endif
+
+#ifdef __SCCZ80
 
 #define INTMAX_MIN            -2147483648L
 #define INTMAX_MAX             2147483647L
@@ -161,7 +217,7 @@ typedef unsigned long          uintmax_t;
 #define UINT16_C(value)        (value##U)
 #define UINT32_C(value)        (value##UL)
 
-#ifdef __SDCC
+#ifdef __LLVM
 
 #define INT64_C(value)         (value##LL)
 #define UINT64_C(value)        (value##ULL)
@@ -170,10 +226,26 @@ typedef unsigned long          uintmax_t;
 
 #ifdef __SDCC
 
+#define INT64_C(value)         (value##LL)
+#define UINT64_C(value)        (value##ULL)
+
+#endif
+
+#ifdef __LLVM
+
 #define INTMAX_C(value)        (value##LL)
 #define UINTMAX_C(value)       (value##ULL)
 
-#else
+#endif
+
+#ifdef __SDCC
+
+#define INTMAX_C(value)        (value##LL)
+#define UINTMAX_C(value)       (value##ULL)
+
+#endif
+
+#ifdef __SCCZ80
 
 #define INTMAX_C(value)        (value##L)
 #define UINTMAX_C(value)       (value##UL)

@@ -8,6 +8,20 @@
 #define setjmp(env)         l_setjmp(&(env))
 #define longjmp(env, val)   l_longjmp(&(env), val)
 
+#ifdef __LLVM
+
+typedef struct
+{
+
+   void *ix;
+   void *iy;
+   void *sp;
+   void *pc;
+
+} jmp_buf;
+
+#endif
+
 #ifdef __SDCC
 
 typedef struct
@@ -20,7 +34,9 @@ typedef struct
 
 } jmp_buf;
 
-#else
+#endif
+
+#ifdef __SCCZ80
 
 typedef struct
 {

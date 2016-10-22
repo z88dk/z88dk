@@ -64,14 +64,16 @@ extern void BIFROSTH_stop(void) __preserves_regs(b,c,d,e,h,l);
 // Location of BIFROST ISR hook
 // ----------------------------------------------------------------
 
+#ifdef __LLVM
+   static unsigned char BIFROSTH_isr[2];
+#endif
+
 #ifdef __SDCC
-
    __at (64993) static unsigned char BIFROSTH_isr[2];
-   
-#else
+#endif
 
+#ifdef __SCCZ80
    // static unsigned char BIFROSTH_isr[2] @ (64993);
-   
 #endif
 
 // ----------------------------------------------------------------

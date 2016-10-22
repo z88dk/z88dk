@@ -50,14 +50,16 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAM_stop,void)
 // Location of NIRVANA ISR hook
 // ----------------------------------------------------------------
 
+#ifdef __LLVM
+   static unsigned char NIRVANAM_isr[3];
+#endif
+
 #ifdef __SDCC
-
    __at (57670+332*NIRVANAM_TOTAL_ROWS) static unsigned char NIRVANAM_isr[3];
-   
-#else
+#endif
 
+#ifdef __SCCZ80
    // static unsigned char NIRVANAM_isr[3] @ (57670+332*NIRVANAM_TOTAL_ROWS);
-   
 #endif
 
 // ----------------------------------------------------------------

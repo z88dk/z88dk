@@ -21,11 +21,19 @@ typedef unsigned char wchar_t;
 #ifndef _FLOAT_T_DEFINED
 #define _FLOAT_T_DEFINED
 
+   #ifdef __LLVM
+   
+   typedef float float_t;
+   
+   #endif
+
    #ifdef __SDCC
    
    typedef float float_t;
    
-   #else
+   #endif
+   
+   #ifdef __SCCZ80
    
    typedef double float_t;
    
@@ -36,11 +44,19 @@ typedef unsigned char wchar_t;
 #ifndef _DOUBLE_T_DEFINED
 #define _DOUBLE_T_DEFINED
 
+   #ifdef __LLVM
+   
+   typedef float double_t;
+   
+   #endif
+
    #ifdef __SDCC
    
    typedef float double_t;
    
-   #else
+   #endif
+   
+   #ifdef __SCCZ80
    
    typedef double double_t;
    
@@ -79,6 +95,24 @@ typedef struct
    unsigned long rem;
 
 } ldivu_t;
+
+#ifdef __LLVM
+
+   typedef struct
+   {
+      long long rem;
+      long long quot;
+   
+   } lldiv_t;
+
+   typedef struct
+   {
+      unsigned long long rem;
+      unsigned long long quot;
+
+   } lldivu_t;
+
+#endif
 
 #ifdef __SDCC
 
@@ -190,7 +224,8 @@ extern long long strtoll(char *nptr,char **endptr,int base);
 extern unsigned long long strtoull(char *nptr,char **endptr,int base);
 extern char *ulltoa(unsigned long long num,char *buf,int radix);
 
-#else
+#endif
+
 #ifdef __SDCC
 
 extern long long atoll(char *buf);
@@ -209,7 +244,6 @@ __DPROTO(,,long long,,strtoll,char *nptr,char **endptr,int base)
 __DPROTO(,,unsigned long long,,strtoull,char *nptr,char **endptr,int base)
 __DPROTO(,,char,*,ulltoa,unsigned long long num,char *buf,int radix)
 
-#endif
 #endif
 
 #endif

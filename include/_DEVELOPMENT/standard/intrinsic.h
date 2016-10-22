@@ -5,7 +5,6 @@
 #ifndef _INTRINSIC_H
 #define _INTRINSIC_H
 
-#ifndef __LLVM
 #ifdef __SDCC
 
 // disable warnings connected to intrinsics
@@ -14,6 +13,18 @@
 #pragma disable_warning 112
 
 #endif
+
+#ifdef __LLVM
+
+#define intrinsic_label(name)  { extern void intrinsic_label_##name(void); intrinsic_label_##name(); }
+#define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())
+#define intrinsic_store16(address,value)  ((unsigned int)(intrinsic_store16_address_##address(),intrinsic_store16_value_##value()))
+
+#define intrinsic_in8(port)  ((unsigned char)intrinsic_in8_port_##port())
+#define intrinsic_out8(port,value)  ((unsigned char)(intrinsic_out8_port_##port(),intrinsic_out8_value_##value()))
+#define intrinsic_in16(port)  ((unsigned char)intrinsic_in16_port_##port())
+#define intrinsic_out16(port,value)  ((unsigned char)(intrinsic_out16_port_##port(),intrinsic_out16_value_##value()))
+
 #endif
 
 #ifdef __SDCC
@@ -27,7 +38,9 @@
 #define intrinsic_in16(port)  ((unsigned char)intrinsic_in16_port_##port())
 #define intrinsic_out16(port,value)  ((unsigned char)(intrinsic_out16_port_##port(),intrinsic_out16_value_##value()))
 
-#else
+#endif
+
+#ifdef __SCCZ80
 
 #define intrinsic_label(name)  asm("name:");
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())

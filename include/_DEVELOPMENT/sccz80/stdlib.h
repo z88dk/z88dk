@@ -23,11 +23,19 @@ typedef unsigned char wchar_t;
 #ifndef _FLOAT_T_DEFINED
 #define _FLOAT_T_DEFINED
 
+   #ifdef __LLVM
+   
+   typedef float float_t;
+   
+   #endif
+
    #ifdef __SDCC
    
    typedef float float_t;
    
-   #else
+   #endif
+   
+   #ifdef __SCCZ80
    
    typedef double float_t;
    
@@ -38,11 +46,19 @@ typedef unsigned char wchar_t;
 #ifndef _DOUBLE_T_DEFINED
 #define _DOUBLE_T_DEFINED
 
+   #ifdef __LLVM
+   
+   typedef float double_t;
+   
+   #endif
+
    #ifdef __SDCC
    
    typedef float double_t;
    
-   #else
+   #endif
+   
+   #ifdef __SCCZ80
    
    typedef double double_t;
    
@@ -81,6 +97,24 @@ typedef struct
    unsigned long rem;
 
 } ldivu_t;
+
+#ifdef __LLVM
+
+   typedef struct
+   {
+      long long rem;
+      long long quot;
+   
+   } lldiv_t;
+
+   typedef struct
+   {
+      unsigned long long rem;
+      unsigned long long quot;
+
+   } lldivu_t;
+
+#endif
 
 #ifdef __SDCC
 
@@ -350,6 +384,19 @@ extern void __LIB__ __CALLEE__ *realloc_unlocked_callee(void *p,size_t size);
 #define realloc_unlocked(a,b) realloc_unlocked_callee(a,b)
 
 
+
+#endif
+
+#ifdef __LLVM
+
+extern long long atoll(char *buf);
+extern void _lldiv_(lldiv_t *ld,long long numer,long long denom);
+extern void _lldivu_(lldivu_t *ld,unsigned long long numer,unsigned long long denom);
+extern long long llabs(long long i);
+extern char *lltoa(long long num,char *buf,int radix);
+extern long long strtoll(char *nptr,char **endptr,int base);
+extern unsigned long long strtoull(char *nptr,char **endptr,int base);
+extern char *ulltoa(unsigned long long num,char *buf,int radix);
 
 #endif
 

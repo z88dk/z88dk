@@ -7,6 +7,18 @@ include(__link__.m4)
 
 // DATA STRUCTURES
 
+#ifdef __LLVM
+
+   typedef struct imaxdiv_s
+   {
+
+      long long rem;
+      long long quot;
+
+   } imaxdiv_t;
+
+#endif
+
 #ifdef __SDCC
 
    typedef struct imaxdiv_s
@@ -17,7 +29,9 @@ include(__link__.m4)
 
    } imaxdiv_t;
 
-#else
+#endif
+
+#ifdef __SCCZ80
 
    typedef struct imaxdiv_s
    {
@@ -33,18 +47,20 @@ include(__link__.m4)
 
 extern intmax_t imaxabs(intmax_t j);
 
-#else
+#endif
+
 #ifdef __SDCC
 
 extern intmax_t imaxabs(intmax_t j);
 extern intmax_t imaxabs_callee(intmax_t j) __z88dk_callee;
 #define imaxabs(a) imaxabs_callee(a)
 
-#else
+#endif
+
+#ifdef __SCCZ80
 
 __DPROTO(`b,c',`b,c',intmax_t,,imaxabs,intmax_t j)
 
-#endif
 #endif
 
 __DPROTO(,,void,,_imaxdiv_,imaxdiv_t *md,intmax_t numer,intmax_t denom)
@@ -77,7 +93,7 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 #define PRIiFAST16     "%i"
 #define PRIiFAST32     "%li"
 
-#ifdef __SDCC
+#ifdef __LLVM
 
 #define PRId64         "%lld"
 #define PRIi64         "%lli"
@@ -90,10 +106,30 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 
 #ifdef __SDCC
 
+#define PRId64         "%lld"
+#define PRIi64         "%lli"
+#define PRIdLEAST64    "%lld"
+#define PRIiLEAST64    "%lli"
+#define PRIdFAST64     "%lld"
+#define PRIiFAST64     "%lli"
+
+#endif
+
+#ifdef __LLVM
+
 #define PRIdMAX        "%lld"
 #define PRIiMAX        "%lli"
 
-#else
+#endif
+
+#ifdef __SDCC
+
+#define PRIdMAX        "%lld"
+#define PRIiMAX        "%lli"
+
+#endif
+
+#ifdef __SCCZ80
 
 #define PRIdMAX        "%ld"
 #define PRIiMAX        "%li"
@@ -118,6 +154,15 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 #define PRIX8          "%X"
 #define PRIX16         "%X"
 #define PRIX32         "%lX"
+
+#ifdef __LLVM
+
+#define PRIo64         "%llo"
+#define PRIu64         "%llu"
+#define PRIx64         "%llx"
+#define PRIX64         "%llX"
+
+#endif
 
 #ifdef __SDCC
 
@@ -144,6 +189,15 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 #define PRIXLEAST16    "%X"
 #define PRIXLEAST32    "%lX"
 
+#ifdef __LLVM
+
+#define PRIoLEAST64    "%llo"
+#define PRIuLEAST64    "%llu"
+#define PRIxLEAST64    "%llx"
+#define PRIXLEAST64    "%llX"
+
+#endif
+
 #ifdef __SDCC
 
 #define PRIoLEAST64    "%llo"
@@ -169,7 +223,7 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 #define PRIXFAST16     "%X"
 #define PRIXFAST32     "%lX"
 
-#ifdef __SDCC
+#ifdef __LLVM
 
 #define PRIoFAST64     "%llo"
 #define PRIuFAST64     "%llu"
@@ -180,12 +234,32 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 
 #ifdef __SDCC
 
+#define PRIoFAST64     "%llo"
+#define PRIuFAST64     "%llu"
+#define PRIxFAST64     "%llx"
+#define PRIXFAST64     "%llX"
+
+#endif
+
+#ifdef __LLVM
+
 #define PRIoMAX        "%llo"
 #define PRIuMAX        "%llu"
 #define PRIxMAX        "%llx"
 #define PRIXMAX        "%llX"
 
-#else
+#endif
+
+#ifdef __SDCC
+
+#define PRIoMAX        "%llo"
+#define PRIuMAX        "%llu"
+#define PRIxMAX        "%llx"
+#define PRIXMAX        "%llX"
+
+#endif
+
+#ifdef __SCCZ80
 
 #define PRIoMAX        "%lo"
 #define PRIuMAX        "%lu"
@@ -225,7 +299,7 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 #define SCNiFAST16     "%i"
 #define SCNiFAST32     "%li"
 
-#ifdef __SDCC
+#ifdef __LLVM
 
 #define SCNd64         "%lld"
 #define SCNi64         "%lli"
@@ -238,10 +312,30 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 
 #ifdef __SDCC
 
+#define SCNd64         "%lld"
+#define SCNi64         "%lli"
+#define SCNdLEAST64    "%lld"
+#define SCNiLEAST64    "%lli"
+#define SCNdFAST64     "%lld"
+#define SCNiFAST64     "%lli"
+
+#endif
+
+#ifdef __LLVM
+
 #define SCNdMAX        "%lld"
 #define SCNiMAX        "%lli"
 
-#else
+#endif
+
+#ifdef __SDCC
+
+#define SCNdMAX        "%lld"
+#define SCNiMAX        "%lli"
+
+#endif
+
+#ifdef __SCCZ80
 
 #define SCNdMAX        "%ld"
 #define SCNiMAX        "%li"
@@ -263,6 +357,14 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 #define SCNx16         "%x"
 #define SCNx32         "%lx"
 
+#ifdef __LLVM
+
+#define SCNo64         "%llo"
+#define SCNu64         "%llu"
+#define SCNx64         "%llx"
+
+#endif
+
 #ifdef __SDCC
 
 #define SCNo64         "%llo"
@@ -282,6 +384,14 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 #define SCNxLEAST8     "%x"
 #define SCNxLEAST16    "%x"
 #define SCNxLEAST32    "%lx"
+
+#ifdef __LLVM
+
+#define SCNoLEAST64    "%llo"
+#define SCNuLEAST64    "%llu"
+#define SCNxLEAST64    "%llx"
+
+#endif
 
 #ifdef __SDCC
 
@@ -303,7 +413,7 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 #define SCNxFAST16     "%x"
 #define SCNxFAST32     "%lx"
 
-#ifdef __SDCC
+#ifdef __LLVM
 
 #define SCNoFAST64     "%llo"
 #define SCNuFAST64     "%llu"
@@ -313,11 +423,29 @@ __DPROTO(,,uintmax_t,,strtoumax,const char *nptr,char **endptr,int base)
 
 #ifdef __SDCC
 
+#define SCNoFAST64     "%llo"
+#define SCNuFAST64     "%llu"
+#define SCNxFAST64     "%llx"
+
+#endif
+
+#ifdef __LLVM
+
 #define SCNoMAX        "%llo"
 #define SCNuMAX        "%llu"
 #define SCNxMAX        "%llx"
 
-#else
+#endif
+
+#ifdef __SDCC
+
+#define SCNoMAX        "%llo"
+#define SCNuMAX        "%llu"
+#define SCNxMAX        "%llx"
+
+#endif
+
+#ifdef __SCCZ80
 
 #define SCNoMAX        "%lo"
 #define SCNuMAX        "%lu"

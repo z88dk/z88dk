@@ -10,7 +10,7 @@ include(__link__.m4)
 
 #define __bool_true_false_are_defined 1
 
-#ifndef __SDCC
+#ifdef __SCCZ80
 
 // SCCZ80
 // does not have a _Bool type

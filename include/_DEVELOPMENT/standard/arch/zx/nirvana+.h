@@ -56,14 +56,16 @@ extern void NIRVANAP_stop(void);
 // Location of NIRVANA ISR hook
 // ----------------------------------------------------------------
 
+#ifdef __LLVM
+   static unsigned char NIRVANAP_isr[3];
+#endif
+
 #ifdef __SDCC
-
    __at (56698+328*NIRVANAP_TOTAL_ROWS) static unsigned char NIRVANAP_isr[3];
-   
-#else
+#endif
 
+#ifdef __SCCZ80
 //   static unsigned char NIRVANAP_isr[3] @ (56698+328*NIRVANAP_TOTAL_ROWS);
-   
 #endif
 
 // ----------------------------------------------------------------
