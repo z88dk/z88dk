@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.180 2016-10-23 18:56:29 aralbrec Exp $
+ *      $Id: zcc.c,v 1.181 2016-10-23 21:26:13 aralbrec Exp $
  */
 
 
@@ -595,6 +595,7 @@ int linkthem(char *linker)
             (c_nocrt == 0) ? ".asm" : "");
     }
 
+    tname[0] = '\0';
     prj = fopen(PROJFILE, "w");
 
     if ((nfiles > 1) && IS_ASM(ASM_Z80ASM)) {
@@ -602,6 +603,7 @@ int linkthem(char *linker)
         // place source files into a list file for z80asm
 
         tempname(tname);
+        strcat(tname, ".lst");
         if ((out = fopen(tname, "w")) == NULL) goto USE_COMMANDLINE;
 
         for (i = 0; i < nfiles; ++i) {
@@ -648,6 +650,9 @@ USE_COMMANDLINE:
     if (verbose)
         printf("%s\n", cmdline);
     status = system(cmdline);
+
+    if (cleanup && strlen(tname))
+        remove_file_with_extension(tname, ".lst");
 
     free(cmdline);
     free(temp);
@@ -830,8 +835,11 @@ int main(int argc, char **argv)
     if ( compiler_type == CC_SDCC)
         BuildOptions_start(&comparg, "--constseg rodata_compiler ");
 
-    if (cpp_incpath_last)
-        BuildOptions(&cpp_incpath_first, cpp_incpath_last);
+    BuildOptions(&clangarg, c_clangincpath);
+    if (cpp_incpath_last) {
+        BuildOptions(&cpparg, cpp_incpath_last);
+        BuildOptions(&clangarg, cpp_incpath_last);
+    }
     if (cpp_incpath_first) {
         BuildOptions_start(&cpparg, cpp_incpath_first);
         BuildOptions_start(&clangarg, cpp_incpath_first);
@@ -848,7 +856,6 @@ int main(int argc, char **argv)
         BuildOptions_start(&linklibs, linker_linklib_first);
 
     /* CLANG & LLVM options */
-    BuildOptions(&clangarg, c_clangincpath);
     BuildOptions_start(&clangarg, "-target sdcc-z80 -S -emit-llvm ");
     if (!sdcc_signed_char) BuildOptions_start(&clangarg, "-fno-signed-char ");
     BuildOptions(&llvmarg, llvmarg ? "-disable-simplify-libcalls -S " : "opt-3.8 -O2 -disable-simplify-libcalls -S ");
