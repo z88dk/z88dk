@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.181 2016-10-23 21:26:13 aralbrec Exp $
+ *      $Id: zcc.c,v 1.182 2016-10-23 21:35:12 aralbrec Exp $
  */
 
 
@@ -915,7 +915,7 @@ CASE_LLFILE:
         case LLFILE:
             if (m4only || clangonly) continue;
             // llvm translates llvm-ir to c
-            if (process(".ll", ".cbe.c", c_llvm_exe, llvmarg, compiler_style, i, YES, NO))
+            if (process(".ll", ".cbe.c", c_llvm_exe, llvmarg, outspecified_flag, i, YES, NO))
                 exit(1);
             // Write .cbe.c to original directory immediately
             ptr = changesuffix(original_filenames[i], ".cbe.c");
@@ -932,7 +932,7 @@ CASE_LLFILE:
             if (m4only) continue;
             // special treatment for clang+llvm
             if ((strcmp(c_compiler_type, "llvm") == 0) && !hassuffix(filelist[i], ".cbe.c")) {
-                if (process(".c", ".ll", c_clang_exe, clangarg, compiler_style, i, YES, NO))
+                if (process(".c", ".ll", c_clang_exe, clangarg, outspecified_flag, i, YES, NO))
                     exit(1);
                 goto CASE_LLFILE;
             }
