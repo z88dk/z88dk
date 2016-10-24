@@ -204,7 +204,7 @@ extern size_t strxfrm(char *dst,char *src,size_t n);
 
 
 
-#ifdef __LLVM
+#ifdef __CLANG
 
    extern int ffsll(long long i);
    

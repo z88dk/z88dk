@@ -78,7 +78,7 @@ __DPROTO(,,char,*,strtok_r,char *s,char *delim,char **last_s)
 __DPROTO(`b,c,d,e,h,l',`b,c,d,e',char,*,strupr,char *s)
 __DPROTO(,,size_t,,strxfrm,char *dst,char *src,size_t n)
 
-#ifdef __LLVM
+#ifdef __CLANG
 
    extern int ffsll(long long i);
    

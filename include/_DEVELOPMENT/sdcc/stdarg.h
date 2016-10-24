@@ -5,7 +5,7 @@
 #ifndef _STDARG_H
 #define _STDARG_H
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 typedef unsigned char * va_list;
 

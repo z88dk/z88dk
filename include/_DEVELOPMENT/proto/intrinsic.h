@@ -12,7 +12,7 @@ include(__link__.m4)
 
 #endif
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define intrinsic_label(name)  { extern void intrinsic_label_##name(void); intrinsic_label_##name(); }
 #define intrinsic_load16(address)  ((unsigned int)intrinsic_load16_##address())

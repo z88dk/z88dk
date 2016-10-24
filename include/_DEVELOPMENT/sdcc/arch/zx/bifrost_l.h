@@ -64,7 +64,7 @@ extern void BIFROSTL_stop(void) __preserves_regs(b,c,d,e,h,l);
 // Location of BIFROST ISR hook
 // ----------------------------------------------------------------
 
-#ifdef __LLVM
+#ifdef __CLANG
    static unsigned char BIFROSTL_isr[2];
 #endif
 

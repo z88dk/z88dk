@@ -96,8 +96,22 @@ extern void *z80_otdr_callee(void *src,uint16_t port) __preserves_regs(d,e) __z8
 #define z80_wpoke(a,b)  (*(unsigned int *)(a) = b)
 #define z80_lpoke(a,b)  (*(unsigned long *)(a) = b)
 
-#define z80_bpeek(a) (*(unsigned char *)(a))
-#define z80_wpeek(a) (*(unsigned int *)(a))
-#define z80_lpeek(a) (*(unsigned long *)(a))
+#define z80_bpeek(a)    (*(unsigned char *)(a))
+#define z80_wpeek(a)    (*(unsigned int *)(a))
+#define z80_lpeek(a)    (*(unsigned long *)(a))
+
+#ifdef __CLANG
+
+#define z80_llpoke(a,b) (*(unsigned long long *)(a) = b)
+#define z80_llpeek(a)   (*(unsigned long long *)(a))
+
+#endif
+
+#ifdef __SDCC
+
+#define z80_llpoke(a,b) (*(unsigned long long *)(a) = b)
+#define z80_llpeek(a)   (*(unsigned long long *)(a))
+
+#endif
 
 #endif

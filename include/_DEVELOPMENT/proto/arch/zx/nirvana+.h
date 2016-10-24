@@ -50,7 +50,7 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAP_stop,void)
 // Location of NIRVANA ISR hook
 // ----------------------------------------------------------------
 
-#ifdef __LLVM
+#ifdef __CLANG
    static unsigned char NIRVANAP_isr[3];
 #endif
 

@@ -60,7 +60,7 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROSTL_stop,void)
 // Location of BIFROST ISR hook
 // ----------------------------------------------------------------
 
-#ifdef __LLVM
+#ifdef __CLANG
    static unsigned char BIFROSTL_isr[2];
 #endif
 

@@ -328,7 +328,7 @@ extern size_t strxfrm_callee(char *dst,char *src,size_t n) __z88dk_callee;
 
 
 
-#ifdef __LLVM
+#ifdef __CLANG
 
    extern int ffsll(long long i);
    

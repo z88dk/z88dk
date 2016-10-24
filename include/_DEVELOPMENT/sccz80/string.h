@@ -306,7 +306,7 @@ extern size_t __LIB__ __CALLEE__ strxfrm_callee(char *dst,char *src,size_t n);
 
 
 
-#ifdef __LLVM
+#ifdef __CLANG
 
    extern int ffsll(long long i);
    

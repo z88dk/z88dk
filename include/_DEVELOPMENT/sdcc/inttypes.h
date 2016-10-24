@@ -9,7 +9,7 @@
 
 // DATA STRUCTURES
 
-#ifdef __LLVM
+#ifdef __CLANG
 
    typedef struct imaxdiv_s
    {
@@ -45,7 +45,7 @@
 
 #endif
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 extern intmax_t imaxabs(intmax_t j);
 
@@ -111,7 +111,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define PRIiFAST16     "%i"
 #define PRIiFAST32     "%li"
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define PRId64         "%lld"
 #define PRIi64         "%lli"
@@ -133,7 +133,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 
 #endif
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define PRIdMAX        "%lld"
 #define PRIiMAX        "%lli"
@@ -173,7 +173,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define PRIX16         "%X"
 #define PRIX32         "%lX"
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define PRIo64         "%llo"
 #define PRIu64         "%llu"
@@ -207,7 +207,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define PRIXLEAST16    "%X"
 #define PRIXLEAST32    "%lX"
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define PRIoLEAST64    "%llo"
 #define PRIuLEAST64    "%llu"
@@ -241,7 +241,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define PRIXFAST16     "%X"
 #define PRIXFAST32     "%lX"
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define PRIoFAST64     "%llo"
 #define PRIuFAST64     "%llu"
@@ -259,7 +259,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 
 #endif
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define PRIoMAX        "%llo"
 #define PRIuMAX        "%llu"
@@ -317,7 +317,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define SCNiFAST16     "%i"
 #define SCNiFAST32     "%li"
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define SCNd64         "%lld"
 #define SCNi64         "%lli"
@@ -339,7 +339,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 
 #endif
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define SCNdMAX        "%lld"
 #define SCNiMAX        "%lli"
@@ -375,7 +375,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define SCNx16         "%x"
 #define SCNx32         "%lx"
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define SCNo64         "%llo"
 #define SCNu64         "%llu"
@@ -403,7 +403,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define SCNxLEAST16    "%x"
 #define SCNxLEAST32    "%lx"
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define SCNoLEAST64    "%llo"
 #define SCNuLEAST64    "%llu"
@@ -431,7 +431,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 #define SCNxFAST16     "%x"
 #define SCNxFAST32     "%lx"
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define SCNoFAST64     "%llo"
 #define SCNuFAST64     "%llu"
@@ -447,7 +447,7 @@ extern uintmax_t strtoumax_callee(const char *nptr,char **endptr,int base) __z88
 
 #endif
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define SCNoMAX        "%llo"
 #define SCNuMAX        "%llu"

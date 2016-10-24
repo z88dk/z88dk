@@ -54,7 +54,7 @@ extern void NIRVANAM_stop(void) __preserves_regs(b,c,d,e,h,l);
 // Location of NIRVANA ISR hook
 // ----------------------------------------------------------------
 
-#ifdef __LLVM
+#ifdef __CLANG
    static unsigned char NIRVANAM_isr[3];
 #endif
 

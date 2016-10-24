@@ -56,7 +56,7 @@ extern void __LIB__ NIRVANAP_stop(void);
 // Location of NIRVANA ISR hook
 // ----------------------------------------------------------------
 
-#ifdef __LLVM
+#ifdef __CLANG
    static unsigned char NIRVANAP_isr[3];
 #endif
 

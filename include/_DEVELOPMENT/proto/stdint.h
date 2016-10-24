@@ -27,7 +27,7 @@ typedef unsigned int           uint_fast8_t;
 typedef unsigned int           uint_fast16_t;
 typedef unsigned long          uint_fast32_t;
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 typedef long long              int64_t;
 typedef unsigned long long     uint64_t;
@@ -60,7 +60,7 @@ typedef int                    intptr_t;
 
 typedef unsigned int           uintptr_t;
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 typedef long long              intmax_t;
 typedef unsigned long long     uintmax_t;
@@ -93,7 +93,7 @@ typedef unsigned long          uintmax_t;
 #define UINT16_MAX             65535U
 #define UINT32_MAX             4294967295UL
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define INT64_MIN             -9223372036854775808LL
 #define INT64_MAX              9223372036854775807LL
@@ -121,7 +121,7 @@ typedef unsigned long          uintmax_t;
 #define UINT_LEAST16_MAX       65535U
 #define UINT_LEAST32_MAX       4294967295UL
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define INT_LEAST64_MIN       -9223372036854775808LL
 #define INT_LEAST64_MAX        9223372036854775807LL
@@ -149,7 +149,7 @@ typedef unsigned long          uintmax_t;
 #define UINT_FAST16_MAX        65535U
 #define UINT_FAST32_MAX        4294967295UL
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define INT_FAST64_MIN        -9223372036854775808LL
 #define INT_FAST64_MAX         9223372036854775807LL
@@ -169,7 +169,7 @@ typedef unsigned long          uintmax_t;
 #define INTPTR_MAX             32767
 #define UINTPTR_MAX            65535U
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define INTMAX_MIN            -9223372036854775808LL
 #define INTMAX_MAX             9223372036854775807LL
@@ -215,7 +215,7 @@ typedef unsigned long          uintmax_t;
 #define UINT16_C(value)        (value##U)
 #define UINT32_C(value)        (value##UL)
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define INT64_C(value)         (value##LL)
 #define UINT64_C(value)        (value##ULL)
@@ -229,7 +229,7 @@ typedef unsigned long          uintmax_t;
 
 #endif
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define INTMAX_C(value)        (value##LL)
 #define UINTMAX_C(value)       (value##ULL)

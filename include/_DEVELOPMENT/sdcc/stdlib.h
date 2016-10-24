@@ -23,7 +23,7 @@ typedef unsigned char wchar_t;
 #ifndef _FLOAT_T_DEFINED
 #define _FLOAT_T_DEFINED
 
-   #ifdef __LLVM
+   #ifdef __CLANG
    
    typedef float float_t;
    
@@ -46,7 +46,7 @@ typedef unsigned char wchar_t;
 #ifndef _DOUBLE_T_DEFINED
 #define _DOUBLE_T_DEFINED
 
-   #ifdef __LLVM
+   #ifdef __CLANG
    
    typedef float double_t;
    
@@ -98,7 +98,7 @@ typedef struct
 
 } ldivu_t;
 
-#ifdef __LLVM
+#ifdef __CLANG
 
    typedef struct
    {
@@ -421,7 +421,7 @@ extern void *realloc_unlocked_callee(void *p,size_t size) __z88dk_callee;
 
 #endif
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 extern long long atoll(char *buf);
 extern void _lldiv_(lldiv_t *ld,long long numer,long long denom);

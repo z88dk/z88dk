@@ -10,7 +10,7 @@
 #ifndef _FLOAT_T_DEFINED
 #define _FLOAT_T_DEFINED
 
-   #ifdef __LLVM
+   #ifdef __CLANG
    
    typedef float float_t;
    
@@ -33,7 +33,7 @@
 #ifndef _DOUBLE_T_DEFINED
 #define _DOUBLE_T_DEFINED
 
-   #ifdef __LLVM
+   #ifdef __CLANG
    
    typedef float double_t;
    
@@ -77,7 +77,7 @@
 #define MATH_ERREXCEPT         2
 #define math_errhandling       1
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 #define HUGE_VAL               1.7014117331E+38
 #define HUGE_VALF              1.7014117331E+38

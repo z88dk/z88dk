@@ -20,8 +20,8 @@ for /R proto %%h in (*.h) do (
    m4 -Dm4_SDCC "%%h" > "!dst!"
    
    set src=%%h
-   set dst=!src:proto=standard!
-   m4 -Dm4_STANDARD "%%h" > "!dst!"
+   set dst=!src:proto=clang!
+   m4 -Dm4_CLANG "%%h" > "!dst!"
 
    echo.
 )

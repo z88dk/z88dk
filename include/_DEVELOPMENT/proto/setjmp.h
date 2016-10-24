@@ -6,7 +6,7 @@ include(__link__.m4)
 #define setjmp(env)         l_setjmp(&(env))
 #define longjmp(env, val)   l_longjmp(&(env), val)
 
-#ifdef __LLVM
+#ifdef __CLANG
 
 typedef struct
 {
