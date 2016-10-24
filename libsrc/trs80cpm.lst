@@ -1,7 +1,3 @@
-@stdio/stdio.lst
-stdio/trs80/fgetc_cons
-stdio/trs80/fputc_cons
-stdio/trs80/getk
 psg/trs80/set_psg
 psg/trs80/set_psg_callee
 psg/trs80/get_psg
@@ -24,4 +20,3 @@ games/bit_beep
 games/beeper
 games/__bit_irqstatus
 games/__snd_tick
-@z80.lst

@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.256 2016-10-19 10:32:22 stefano Exp $
+# $Id: Makefile,v 1.257 2016-10-24 08:09:44 stefano Exp $
 
 
 include Make.config
@@ -1257,6 +1257,7 @@ trs80_clib.lib:
 	$(MAKE) -C games ltrs80
 	$(MAKE) -C psg
 	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80_clib @$(LISTFILE_DIRECTORY)/trs80.lst
+	$(LIBLINKER) -DFORtrs80 -x$(OUTPUT_DIRECTORY)/trs80cpm @$(LISTFILE_DIRECTORY)/trs80cpm.lst
 	@echo ''
 	@echo '--- Building TRS 80 GFX libraires ---'
 	@echo ''
