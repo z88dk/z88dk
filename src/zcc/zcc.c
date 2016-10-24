@@ -10,7 +10,7 @@
  *      to preprocess all files and then find out there's an error
  *      at the start of the first one!
  *
- *      $Id: zcc.c,v 1.182 2016-10-23 21:35:12 aralbrec Exp $
+ *      $Id: zcc.c,v 1.183 2016-10-24 18:42:59 aralbrec Exp $
  */
 
 
@@ -328,7 +328,7 @@ static arg_t  config[] = {
     {"COPYCMD", 0, SetStringConfig, &c_copycmd, NULL, ""},
     
     {"INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-IDESTDIR/include " },
-    {"CLANGINCPATH", 0, SetStringConfig, &c_clangincpath, NULL, "", "--isystem DESTDIR/include/_DEVELOPMENT/standard " },
+    {"CLANGINCPATH", 0, SetStringConfig, &c_clangincpath, NULL, "", "--isystem DESTDIR/include/_DEVELOPMENT/clang " },
     {"COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "DESTDIR/lib/z80rules.1" },
     {"COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2"},
     {"COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0"},
@@ -391,11 +391,11 @@ static arg_t     myargs[] = {
     {"Cs", AF_MORE, AddToArgs, &sdccarg, NULL, "Add an option to sdcc"},
     {"Ca", AF_MORE, AddToArgs, &asmargs, NULL, "Add an option to the assembler"},
     {"Cl", AF_MORE, AddToArgs, &linkargs, NULL, "Add an option to the linker"},
-    {"Cv", AF_MORE, AddToArgs, &llvmarg, NULL, "Add an option to llvm"},
+    {"Cv", AF_MORE, AddToArgs, &llvmarg, NULL, "Add an option to llvm-cbe"},
     {"Cz", AF_MORE, AddToArgs, &appmakeargs, NULL, "Add an option to appmake"},
     {"m4", AF_BOOL_TRUE, SetBoolean, &m4only, NULL, "Stop after processing m4 files"},
     {"clang", AF_BOOL_TRUE, SetBoolean, &clangonly, NULL, "Stop after translating .c files to llvm ir"},
-    {"llvm", AF_BOOL_TRUE, SetBoolean, &llvmonly, NULL, "Stop after llvm generates new .cbe.c files"},
+    {"llvm", AF_BOOL_TRUE, SetBoolean, &llvmonly, NULL, "Stop after llvm-cbe generates new .cbe.c files"},
     {"E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, NULL, "Stop after preprocessing files"},
     {"R", AF_BOOL_TRUE, SetBoolean, &relocate, NULL, "Generate relocatable code (deprecated)"},
     {"-reloc-info", AF_BOOL_TRUE, SetBoolean, &relocinfo, NULL, "Generate binary file relocation information"},
@@ -931,7 +931,7 @@ CASE_LLFILE:
         case CFILE:
             if (m4only) continue;
             // special treatment for clang+llvm
-            if ((strcmp(c_compiler_type, "llvm") == 0) && !hassuffix(filelist[i], ".cbe.c")) {
+            if ((strcmp(c_compiler_type, "clang") == 0) && !hassuffix(filelist[i], ".cbe.c")) {
                 if (process(".c", ".ll", c_clang_exe, clangarg, outspecified_flag, i, YES, NO))
                     exit(1);
                 goto CASE_LLFILE;
@@ -1767,7 +1767,7 @@ static void configure_compiler()
     compiler_type = CC_SCCZ80;
     
     /* compiler= */
-    if ( (strcmp(c_compiler_type, "llvm") == 0) || (strcmp(c_compiler_type,"sdcc") == 0) ) {
+    if ( (strcmp(c_compiler_type, "clang") == 0) || (strcmp(c_compiler_type,"sdcc") == 0) ) {
         compiler_type = CC_SDCC;
         snprintf(buf,sizeof(buf),"-mz80 --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ",(sdcc_signed_char ? "--fsigned-char" : ""),(c_code_in_asm ? "" : "--no-c-code-in-asm"),(opt_code_size ? "--opt-code-size" : ""));
         add_option_to_compiler(buf);
