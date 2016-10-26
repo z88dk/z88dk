@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.39 2016-10-13 07:47:20 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.40 2016-10-26 13:03:30 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -18,7 +18,7 @@
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
 ;	#pragma output noredir   - do not insert the file redirection option while parsing the
 ;	                           command line arguments (useless if "nostreams" is set)
-;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on the TIKI-100)
+;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on the TIKI-100 and Spectrum +3)
 ;
 ;	These can cut down the size of the resultant executable
 
@@ -88,11 +88,37 @@ ENDIF
 	neg
 	ld	l,a
 	ld	h,-1		;negative number
+IF (startup=3)
+	ld      de,-64-18-18	;Add on space for atexit() stack and +3 MEM banking
+ELSE
 	ld      de,-64		;Add on space for atexit() stack
+ENDIF
 	add	hl,de
 	add     hl,sp
 	ld      sp,hl
 	ld      (exitsp),sp
+
+; Memory banking for Spectrum +3
+IF (startup=3)
+	PUBLIC    p3_poke
+	PUBLIC    p3_peek
+	
+	push hl
+	ld de,64
+	add hl,de
+	ld (p3_poke+1),hl
+	push hl
+	ld de,18
+	add hl,de
+	ld (p3_peek+1),hl
+	pop hl
+	ld d,h
+	ld e,l
+	ld hl,pokebyte_code
+	ld bc,18+18
+	ldir
+	pop hl
+ENDIF
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -138,6 +164,55 @@ start1:	ld      sp,0		;Pick up entry sp
         jp	0
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
+
+; Memory banking for Spectrum +3
+IF (startup=3)
+
+p3_poke:
+		jp 0
+
+p3_peek:
+		jp 0
+
+pokebyte_code:
+		di
+		; ..$15 00010101 -> banks 4,5,6,3
+		; ..$11 00010001 -> banks 0,1,2,3 (TPA)
+		ex  af,af
+		;ld	a,$15
+		ld	a,$05
+		ld bc,$1ffd
+		out(c),a
+		ex af,af
+		ld (hl),a
+		;ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
+		ld	a,$01
+		;ld	a,($FF01)	; saved value
+		out(c),a
+		ei
+		ret
+		; adjust code size
+		nop
+peekbyte_code:
+		di
+		; ..$15 00010101 -> banks 4,5,6,3
+		; ..$11 00010001 -> banks 0,1,2,3 (TPA)
+		;ld	a,$15
+		ld	a,$05
+		ld bc,$1ffd
+		out(c),a
+		ld a,(hl)
+		ex  af,af
+		;ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
+		ld	a,$01
+		;ld	a,($FF01)	; saved value
+		out(c),a
+		ex  af,af
+		ei
+		ret
+		; adjust code size
+		nop
+ENDIF
 
         defm  	"Small C+ CP/M"
 

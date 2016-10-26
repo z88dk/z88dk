@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.42 2016-10-10 07:09:14 stefano Exp $
+# $Id: Makefile,v 1.43 2016-10-26 13:03:30 stefano Exp $
 
 
 lx11:
@@ -48,6 +48,7 @@ clean:
 	$(RM) sam/*.o
 	$(RM) sorcerer/*.o
 	$(RM) spectrum/*.o
+	$(RM) spectrum/cpm/*.o
 	$(RM) text/*.o
 	$(RM) text6/*.o
 	$(RM) ticalc/*.o

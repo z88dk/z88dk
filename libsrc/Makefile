@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.257 2016-10-24 08:09:44 stefano Exp $
+# $Id: Makefile,v 1.258 2016-10-26 13:03:30 stefano Exp $
 
 
 include Make.config
@@ -288,6 +288,7 @@ zx_clib.lib:
 	$(MAKE) -C psg
 	$(MAKE) -C games lzx
 	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zx_clib @$(LISTFILE_DIRECTORY)/zx.lst
+	$(LIBLINKER) -DFORzx $(COLDEFS) -x$(OUTPUT_DIRECTORY)/zxcpm @$(LISTFILE_DIRECTORY)/zxcpm.lst
 
 # ZX Spectrum RS232 libraries - stefano
 zx232:

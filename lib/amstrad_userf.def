@@ -1,0 +1,50 @@
+lstoff
+
+; Amstrad CPC and ZX Spectrum +3
+; Definitions for Amstrad XBIOS 'userf' functions
+
+		defc	DD_INIT = 0080h				; Initialise the floppy disc driver.
+		defc	DD_SETUP = 0083h			; Set up the floppy disc driver.
+		defc	DD_READ_SECTOR = 0086h		; Read a floppy disc sector.
+		defc	DD_WRITE_SECTOR = 0089h		; Write a floppy disc sector.
+		defc	DD_CHECK_SECTOR = 008Ch		; Verify a floppy disc sector.
+		defc	DD_FORMAT = 008Fh			; Format a floppy disc track.
+		defc	DD_LOGIN = 0092h			; Log in a floppy disc.
+		defc	DD_SEL_FORMAT = 0095h		; Preload an XDPB with a standard format.
+		defc	DD_DRIVE_STATUS = 0098h		; Get the drive status.
+		defc	DD_READ_ID = 009Bh			; Read a sector ID.
+		defc	DD_L_DPB = 009Eh			; Initialise a DPB from a boot record.
+		defc	DD_L_XDPB = 00A1h			; Initialise an XDPB from a boot record.
+		defc	DD_L_ON_MOTOR = 00A4h		; Turn the floppy drive motors on.
+		defc	DD_L_T_OFF_MOTOR = 00A7h	; Start countdown for turning the motors off.
+		defc	DD_L_OFF_MOTOR = 00AAh		; Switch the floppy drive motors off immediately.
+		defc	DD_L_READ = 00ADh			; Execute a uPD765A read command.
+		defc	DD_L_WRITE = 00B0h			; Execute a uPD765A write, scan or format command.
+		defc	DD_L_SEEK = 00B3h			; Seek to a track.
+		
+		defc	CD_SA_INIT = 00B6h			; Initialise serial port.
+		defc	CD_SA_BAUD = 00B9h			; Set SIO baud rate.
+		defc	CD_SA_PARAMS = 00BCh		; Get SIO parameters.
+
+		defc	TE_ASK = 00BFh				; Get screen size and cursor position.
+		defc	TE_RESET = 00C2h			; Reset the terminal emulator.
+		defc	TE_STL_ASK = 00C5h			; Is the status line enabled?
+		defc	TE_STL_ON_OFF = 00C8h		; Turn the status line on or off.
+		defc	TE_SET_INK = 00CBh			; Set screen palette.
+		defc	TE_SET_BORDER = 00CEh		; Set screen border colour.
+		defc	TE_SET_SPEED = 00D1h		; Set colour flash speed.
+		
+		defc	KM_SET_EXPAND = 00D4h		; Set a keyboard expansion string.
+		defc	KM_SET_KEY = 00D7h			; Set what character a keypress translates to.
+		defc	KM_KT_GET = 00DAh			; Get a character/key number.
+		defc	KM_KT_PUT = 00DDh			; Simulate a keypress..
+		defc	KM_SET_SPEED = 00E0h		; Set the keyboard reset speed..
+
+		defc	CD_VERSION = 00E3h			; Get version numbers. Supported on the PCW16..
+		defc	CD_INFO = 00E6h				; Get system information..
+
+		defc	SCR_RUN_ROUTINE = 00E9h		; Run a routine with the screen memory visible.
+
+		defc	FIND_FID = 00ECh			; Find the address of an installable device driver.
+lston
+

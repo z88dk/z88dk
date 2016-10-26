@@ -3,7 +3,7 @@
  *   z88dk Application Generator (appmake)
  *
  *
- *   $Id: appmake.h,v 1.61 2016-10-03 06:14:49 stefano Exp $
+ *   $Id: appmake.h,v 1.62 2016-10-26 13:03:31 stefano Exp $
  */
 
 
@@ -16,6 +16,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 
 /* Conversion routines */

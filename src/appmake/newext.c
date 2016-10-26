@@ -1,9 +1,9 @@
 /*
  *      Short program to adjust a filename
+ *      It will change the filename extension and force it to uppercase
  *
- *      This simply adds in the length of the program
  *      
- *      $Id: newext.c,v 1.4 2016-06-26 00:46:55 aralbrec Exp $
+ *      $Id: newext.c,v 1.5 2016-10-26 13:03:31 stefano Exp $
  */
 
 
@@ -63,6 +63,9 @@ int newext_exec(char *target)
     } else {
         strcpy(filename,outfile);
     }
+	
+	for (i=0;i<=strlen(filename);i++)
+			filename[i]=toupper(filename[i]);
 
 	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         fprintf(stderr,"Can't open input file %s\n",binname);
@@ -74,6 +77,8 @@ int newext_exec(char *target)
         fclose(fpin);
         myexit(NULL,1);
     }
+	
+	unlink (filename);
 
     len=ftell(fpin);
 

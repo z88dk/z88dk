@@ -1,7 +1,7 @@
 #
 # Makefile for ZX Spectrum target specific lib
 #
-# $Id: Makefile,v 1.12 2013-02-19 12:46:39 stefano Exp $
+# $Id: Makefile,v 1.13 2016-10-26 13:03:31 stefano Exp $
 
 include ../Make.config
 
@@ -13,6 +13,7 @@ all:
 clean:
 	$(RM) *.o* zcc_opt.def
 	cd basic ; $(RM) *.o* ; cd ..
+	cd cpm ; $(RM) *.o* ; cd ..
 	cd diagnostic ; $(RM) *.o* ; cd ..
 	cd display ; $(RM) *.o* ; cd ..
 	cd if1 ; $(RM) *.o* ; cd ..
