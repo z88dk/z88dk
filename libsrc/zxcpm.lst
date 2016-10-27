@@ -1,7 +1,7 @@
 @gfxbase.lst
 graphics/dcircle2
 graphics/spectrum/cpm/clg
-graphics/clrarea2
+graphics/clrarea
 graphics/lftscrol
 graphics/plotpixl_smc
 graphics/respixl_smc

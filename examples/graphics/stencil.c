@@ -4,7 +4,7 @@ Demonstration on how to use the 'stencil' object.
 
 zcc +zx -vn -lndos -create-app -llib3d stencil.c -o stencil
 	
-$Id: stencil.c,v 1.2 2015-09-17 20:36:24 aralbrec Exp $
+$Id: stencil.c,v 1.3 2016-10-27 15:05:45 stefano Exp $
 
 =========================================================================*/
 
@@ -15,7 +15,7 @@ $Id: stencil.c,v 1.2 2015-09-17 20:36:24 aralbrec Exp $
 	/* When the graphics library does not use the "wide" mode functions
 	   the stencil object could be 50% smaller */
 	
-	unsigned char stencil[192*4];
+	unsigned char stencil[256*4];
 int x,y,r,p;
 
 main() {
