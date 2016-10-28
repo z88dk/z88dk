@@ -7,7 +7,7 @@ games/joystick
 graphics/kc/clg
 graphics/kc/w_pixladdr
 graphics/w_clga
-graphics/w_stencil_render
+graphics/kc/w_stencil_render
 graphics/w_putsprite
 graphics/w_plotpixl
 graphics/w_respixl

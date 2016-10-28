@@ -14,6 +14,8 @@ graphics/getsprite
 graphics/liner
 graphics/spectrum/cpm/stencil_render
 graphics/spectrum/cpm/putsprite
+graphics/spectrum/cpm/bksave
+graphics/spectrum/cpm/bkrestore
 graphics/spectrum/rowtab
 graphics/spectrum/pixladdr
 graphics/swapgfxbk_foo
