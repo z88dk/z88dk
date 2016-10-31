@@ -5,24 +5,21 @@
 ;
 ;       CPM Plus "userf" custom Amstrad calls, for Amstrad CPC & PCW and ZX Spectrum +3
 ;
-;       $Id: a_statusline.asm,v 1.2 2016-10-31 16:16:33 stefano Exp $
+;
+;       $Id: a_curx.asm,v 1.1 2016-10-31 16:16:33 stefano Exp $
 ;
 
+	SECTION code_clib
 
-        SECTION code_clib
-
-	PUBLIC    a_statusline
+	PUBLIC	a_curx
 	
 	EXTERN	subuserf
 	INCLUDE	"amstrad_userf.def"
 
-a_statusline:
-	xor a
-	or l
-	jr z,is_off
-	ld a,255
-is_off:
-
+a_curx:
 	call subuserf
-	defw	TE_STL_ON_OFF
+	defw TE_ASK
+	;ld l,h
+	ld h,0
 	ret
+

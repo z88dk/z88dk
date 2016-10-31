@@ -5,7 +5,7 @@
 ;
 ;       CPM Plus "userf" custom Amstrad calls, for Amstrad CPC & PCW and ZX Spectrum +3
 ;
-;       $Id: subuserf.asm,v 1.1 2016-10-31 13:51:06 stefano Exp $
+;       $Id: subuserf.asm,v 1.2 2016-10-31 16:16:33 stefano Exp $
 ;
 
 

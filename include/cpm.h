@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.14 2016-10-31 13:51:06 stefano Exp $
+ *    $Id: cpm.h,v 1.15 2016-10-31 16:16:32 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -148,5 +148,25 @@ extern int __LIB__ get_dir_name();
 
 /* Enable/disable the bottom status line */
 extern int __LIB__ __FASTCALL__ a_statusline(int onoff);
+/* Set keyboard speed */
+extern int __LIB__ a_keyspeed(int delay, int repeat) __SMALLCDECL;
+/* Set border color, 6 bit color encoding, (or 8 bit if ULA256.FID is installed) */
+extern int __LIB__ __FASTCALL__ a_border(int color);
+/* Set paper color, 6 bit color encoding, (OS patch needed or 8 bit if ULA256.FID is installed) */
+extern int __LIB__ __FASTCALL__ a_paper(int color);
+/* Set ink color, 6 bit color encoding, (OS patch needed or 8 bit if ULA256.FID is installed) */
+extern int __LIB__ __FASTCALL__ a_ink(int color);
+/* Get x cursor position in viewport */
+extern int __LIB__ a_curx();
+/* Get y cursor position in viewport */
+extern int __LIB__ a_cury();
+
+/* Get Machine */
+extern int __LIB__ a_machine();
+#define M_CPC        0    ; CPC6128
+#define M_PCW        1    ; PCW8000/9000/10 series
+#define M_SPECTRUM   3    ; Spectrum +3
+#define M_PCW16     65    ; (65 = 'A', ie "Anne")
+
 
 #endif

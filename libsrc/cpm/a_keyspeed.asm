@@ -5,24 +5,26 @@
 ;
 ;       CPM Plus "userf" custom Amstrad calls, for Amstrad CPC & PCW and ZX Spectrum +3
 ;
-;       $Id: a_statusline.asm,v 1.2 2016-10-31 16:16:33 stefano Exp $
+;       $Id: a_keyspeed.asm,v 1.1 2016-10-31 16:16:33 stefano Exp $
 ;
 
 
         SECTION code_clib
 
-	PUBLIC    a_statusline
+	PUBLIC    a_keyspeed
 	
 	EXTERN	subuserf
 	INCLUDE	"amstrad_userf.def"
 
-a_statusline:
-	xor a
-	or l
-	jr z,is_off
-	ld a,255
-is_off:
+a_keyspeed:
 
+	ld	hl,2
+	add	hl,sp
+	ld	a,(hl)	;subsequent delay
+	inc	hl
+	inc	hl
+	ld	h,(hl)	;initial delay
+	ld l,a
 	call subuserf
-	defw	TE_STL_ON_OFF
+	defw	KM_SET_SPEED
 	ret

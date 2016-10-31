@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.42 2016-10-31 13:51:06 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.43 2016-10-31 16:16:33 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
