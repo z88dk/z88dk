@@ -14,11 +14,18 @@ PUBLIC _zx_colour
 		ld 	a,l
 
 		push af
-		ld hl,$2171
-		call p3_poke
 		
-		;;ld  (23624),a
-		;ld  (23693),a
+;		ld	c,$0C
+;		call 5
+;		cp	$31		; Not CP/M 3.1
+;		jr	nz,not3
+;	
+;		pop af
+;		push af
+;		ld hl,$2171
+;		call p3_poke
+;
+;.not3
 
 		ld hl,16384+6144
 		ld de,768

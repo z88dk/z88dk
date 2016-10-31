@@ -5,6 +5,8 @@ stdio/cpm/fputc_cons
 @time/time.lst
 time/cpm/clock
 time/cpm/time
+cpm/subuserf
+cpm/a_statusline
 fcntl/cpm/bios
 fcntl/cpm/bdos
 fcntl/cpm/close

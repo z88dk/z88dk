@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.258 2016-10-26 13:03:30 stefano Exp $
+# $Id: Makefile,v 1.259 2016-10-31 13:51:06 stefano Exp $
 
 
 include Make.config
@@ -1389,6 +1389,7 @@ clean:
 	$(MAKE) -C ace clean
 	$(MAKE) -C assert clean
 	$(MAKE) -C c128 clean
+	$(MAKE) -C cpm clean
 	$(MAKE) -C ctype clean
 	$(MAKE) -C farz88 clean
 	$(MAKE) -C fcntl clean

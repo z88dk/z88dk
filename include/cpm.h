@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.13 2016-06-23 20:57:58 dom Exp $
+ *    $Id: cpm.h,v 1.14 2016-10-31 13:51:06 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -122,7 +122,9 @@ extern void __LIB__ _putoffset(unsigned char *where,long offset) __SMALLCDECL;
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
 
+/*******************/
 /* directory stuff */
+/*******************/
 
 extern struct fcb __LIB__ *fc_dir;
 extern char __LIB__ fc_dirpos;
@@ -138,5 +140,13 @@ extern int __LIB__ dir_get_entry_type();  // 0=normal, 1=directory
 extern int __LIB__ dir_get_entry_name();
 extern unsigned long __LIB__ dir_get_entry_size();
 extern int __LIB__ get_dir_name();
+
+
+/********************************/
+/* Amstrad CP/M Plus extensions */
+/********************************/
+
+/* Enable/disable the bottom status line */
+extern int __LIB__ __FASTCALL__ a_statusline(int onoff);
 
 #endif

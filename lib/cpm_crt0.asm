@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.41 2016-10-31 07:06:49 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.42 2016-10-31 13:51:06 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -162,6 +162,7 @@ ENDIF
 	pop	bc		;Get exit() value into bc
 start1:	ld      sp,0		;Pick up entry sp
         jp	0
+		;ret
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
@@ -179,14 +180,16 @@ pokebyte_code:
 		; ..$15 00010101 -> banks 4,5,6,3
 		; ..$11 00010001 -> banks 0,1,2,3 (TPA)
 		ex  af,af
-		;ld	a,$15
-		ld	a,$05
+		ld	a,$15
+		;ld	a,$0D
+		;ld	a,$05
 		ld bc,$1ffd
 		out(c),a
 		ex af,af
 		ld (hl),a
-		;ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
-		ld	a,$01
+		ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
+		;ld	a,$09
+		;ld	a,$01
 		;ld	a,($FF01)	; saved value
 		out(c),a
 		ei
@@ -197,14 +200,16 @@ peekbyte_code:
 		di
 		; ..$15 00010101 -> banks 4,5,6,3
 		; ..$11 00010001 -> banks 0,1,2,3 (TPA)
-		;ld	a,$15
-		ld	a,$05
+		ld	a,$15
+		;ld	a,$0D
+		;ld	a,$05
 		ld bc,$1ffd
 		out(c),a
 		ld a,(hl)
 		ex  af,af
-		;ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
-		ld	a,$01
+		ld	a,$11		; avoid using ($FF01) to be compatible with CP/M 2.2 
+		;ld	a,$09
+		;ld	a,$01
 		;ld	a,($FF01)	; saved value
 		out(c),a
 		ex  af,af
