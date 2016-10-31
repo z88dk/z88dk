@@ -14,8 +14,8 @@ PUBLIC _zx_colour
 		ld 	a,l
 
 		push af
-;		ld hl,23693
-;		call p3_poke
+		ld hl,$2171
+		call p3_poke
 		
 		;;ld  (23624),a
 		;ld  (23693),a

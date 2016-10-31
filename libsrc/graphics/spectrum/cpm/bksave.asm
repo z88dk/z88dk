@@ -3,7 +3,7 @@
 ;
 ;	ZX Spectrum version (speeded up with a row table)
 ;
-;	$Id: bksave.asm,v 1.1 2016-10-28 07:34:28 stefano Exp $
+;	$Id: bksave.asm,v 1.2 2016-10-31 07:06:49 stefano Exp $
 ;
 
 	SECTION	  code_clib

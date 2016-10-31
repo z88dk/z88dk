@@ -1,7 +1,7 @@
 /* Sample for the putsprite command.
    We draw some garbage on the screen, 
    then we put a masked arrow.
-   It can be moved using arrows; ENTER exits. 
+   It can be moved using 'q,a,o,p'; SPACE exits. 
    Improved version; the mask is drawn AFTER the sprite,
    so we reduce the flicker, and being the mask just "a border",
    it is put faster. */
@@ -120,19 +120,19 @@ char *ptr;
   while (flag!=2)
 	{
 	        switch( getk() ) {
-	                case 11:
+	                case 'q':
 	                	y=y-speed;
 	                	flag=1;
 	                        break;
-	                case 10:
+	                case 'a':
 	                	y=y+speed;
 	                	flag=1;
 	                        break;
-	                case 9:
+	                case 'p':
 	                	x++;
 	                	flag=1;
 	                        break;
-	                case 8:
+	                case 'o':
 	                	x--;
 	                	flag=1;
 	                        break;

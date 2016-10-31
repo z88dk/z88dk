@@ -6,8 +6,7 @@
 SECTION code_clib
 PUBLIC zx_border
 PUBLIC _zx_border
-	EXTERN	p3_poke
-	EXTERN	p3_peek
+	EXTERN	RG0SAV
 
 zx_border:
 _zx_border:
@@ -20,17 +19,16 @@ _zx_border:
    or l
    
    out (254),a
-;   and 7
-;   rla
-;   rla
-;   rla
-;   ld	e,a
+   and 7
+   rla
+   rla
+   rla
+   ld	e,a
    
-;   ld hl,23624
-;  call p3_peek
-   
-;   and	$c7
-;   or	e
+   ld a,(RG0SAV)
+   and	$c7
+   or	e
+   ld (RG0SAV),a
    
 ;   call p3_poke
    

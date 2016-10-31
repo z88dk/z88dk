@@ -3,7 +3,7 @@
 ;       Stefano - 2016
 ;
 ;
-;	$Id: clg.asm,v 1.1 2016-10-26 13:03:30 stefano Exp $
+;	$Id: clg.asm,v 1.2 2016-10-31 07:06:49 stefano Exp $
 ;
 
 	SECTION	  code_clib
@@ -11,6 +11,7 @@
         PUBLIC    _clg
 	EXTERN	p3_poke
 	EXTERN	zx_colour
+	EXTERN	zx_border
 	
 .clg
 ._clg
@@ -24,6 +25,9 @@ loop:
 	ld a,d
 	or e
 	jr nz,loop
+	
+	ld l,7
+	call zx_border
 	
 	ld l,7*8
 	jp 	zx_colour

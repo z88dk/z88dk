@@ -8,7 +8,7 @@
 ;			- Jan. 2001: Added in malloc routines
 ;			- Jan. 2001: File support added
 ;
-;       $Id: cpm_crt0.asm,v 1.40 2016-10-26 13:03:30 stefano Exp $
+;       $Id: cpm_crt0.asm,v 1.41 2016-10-31 07:06:49 stefano Exp $
 ;
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
@@ -248,7 +248,9 @@ end:		defb	0		; null file name
 IF !DEFINED_nogfxglobals
 		PUBLIC	RG0SAV
 		PUBLIC	pixelbyte
-RG0SAV:		defb	0		; VDP graphics driver (Einstein)
+RG0SAV:		defb	1*8		; VDP graphics driver (Einstein)
+							; Also used to remember the border color for the ZX Spectrum +3 
+							; in CP/M mode (Blue is default)
 pixelbyte:	defb	0		; temp byte storage for VDP driver
 ENDIF
 
