@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.15 2016-10-31 16:16:32 stefano Exp $
+ *    $Id: cpm.h,v 1.16 2016-11-03 09:25:26 stefano Exp $
  */
 
 #include <sys/compiler.h>
@@ -163,10 +163,21 @@ extern int __LIB__ a_cury();
 
 /* Get Machine */
 extern int __LIB__ a_machine();
-#define M_CPC        0    ; CPC6128
-#define M_PCW        1    ; PCW8000/9000/10 series
-#define M_SPECTRUM   3    ; Spectrum +3
-#define M_PCW16     65    ; (65 = 'A', ie "Anne")
+#define M_CPC        0    // CPC6128
+#define M_PCW        1    // PCW8000/9000/10 series
+#define M_SPECTRUM   3    // Spectrum +3
+#define M_PCW16     65    // (65 = 'A', ie "Anne")
 
+/* Get Machine HW version (or HW details on recent PCW versions) */
+extern int __LIB__ a_machinever();
+/* Get BIOS version */
+extern int __LIB__ a_biosver();
+
+/* Get system memory size */
+extern int __LIB__ a_memsize();
+/* 2 drives available ? */
+extern int __LIB__ a_driveb();
+/* Serial Port available ? */
+extern int __LIB__ a_serialport();
 
 #endif

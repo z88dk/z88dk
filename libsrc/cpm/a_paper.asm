@@ -12,7 +12,7 @@
 ;		In a running system this is in bank 0, two bytes after the address in 00CCh.
 ; 
 ;
-;       $Id: a_paper.asm,v 1.1 2016-10-31 16:16:33 stefano Exp $
+;       $Id: a_paper.asm,v 1.2 2016-11-03 09:25:27 stefano Exp $
 ;
 
 	SECTION code_clib

@@ -1,7 +1,7 @@
 #
 # Wahey, a messed up makefile for building libraries!
 #
-# $Id: Makefile,v 1.4 2016-10-31 16:16:33 stefano Exp $
+# $Id: Makefile,v 1.5 2016-11-03 09:25:27 stefano Exp $
 #
 
 include ../Make.config

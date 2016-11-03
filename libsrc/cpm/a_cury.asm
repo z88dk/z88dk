@@ -6,7 +6,7 @@
 ;       CPM Plus "userf" custom Amstrad calls, for Amstrad CPC & PCW and ZX Spectrum +3
 ;
 ;
-;       $Id: a_cury.asm,v 1.1 2016-10-31 16:16:33 stefano Exp $
+;       $Id: a_cury.asm,v 1.2 2016-11-03 09:25:27 stefano Exp $
 ;
 
 	SECTION code_clib

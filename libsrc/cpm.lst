@@ -13,6 +13,11 @@ cpm/a_ink
 cpm/a_curx
 cpm/a_cury
 cpm/a_machine
+cpm/a_machinever
+cpm/a_biosver
+cpm/a_memsize
+cpm/a_driveb
+cpm/a_serialport
 cpm/a_keyspeed
 fcntl/cpm/bios
 fcntl/cpm/bdos
