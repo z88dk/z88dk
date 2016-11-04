@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.260 2016-10-31 16:16:33 stefano Exp $
+# $Id: Makefile,v 1.261 2016-11-04 15:44:58 stefano Exp $
 
 
 include Make.config
@@ -776,6 +776,7 @@ microbee.lib:
 	@echo ''
 	@echo '--- Building MicroBee Library ---'
 	@echo ''
+	$(MAKE) gfxdeps
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lbee
 	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/bee.lst
