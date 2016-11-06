@@ -3,14 +3,14 @@
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)
  *
- * $Id: zcc.h,v 1.42 2016-10-23 18:56:29 aralbrec Exp $
+ * $Id: zcc.h,v 1.43 2016-11-06 05:14:02 aralbrec Exp $
  */
 
 #include "../config.h"
 
 /* Some machine specific definitions (paths etc!) */
 
-char *version = "v" Z88DK_VERSION " (C) 1998-2016 D.J.Morris\n";
+char *version = "v " Z88DK_VERSION " (C) 1998-2016 D.J.Morris\n";
 
 
 
