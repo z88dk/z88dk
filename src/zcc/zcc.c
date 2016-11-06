@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.184 2016-11-06 05:14:27 aralbrec Exp $
+*      $Id: zcc.c,v 1.185 2016-11-06 17:33:46 aralbrec Exp $
 */
 
 
@@ -850,6 +850,8 @@ int main(int argc, char **argv)
 	}
 	clangarg = replace_str(ptr = clangarg, "-I", "-idirafter ");
 	free(ptr);
+	clangarg = replace_str(ptr = clangarg, "-D__SDCC", "-D__CLANG");
+	free(ptr);
 
 	BuildOptions(&linker_libpath_first, "-L. ");
 	if (linker_libpath_last)
@@ -1410,6 +1412,7 @@ void AddPreProcIncPath(arg_t *argument, char *arg)
 void AddPreProc(arg_t *argument, char *arg)
 {
 	BuildOptions(&cpparg, arg);
+	BuildOptions(&clangarg, arg);
 }
 
 
