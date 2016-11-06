@@ -14,4 +14,4 @@ zcc +zx -vn -O3 -startup=8 -clib=new tritone.c songs.asm -o tritone
 appmake +zx -b tritone_CODE.bin -o tritone.tap --org 40000 --blockname tritone --noloader
 appmake +zx -b tritone_LOWMEM.bin -o songs.tap --org 27000 --blockname songs --noloader
 copy /B loader.tap+tritone.tap+songs.tap demo.tap
-del *.reloc *.bin *.map *.obj *.sym *.zx7 *.def MUSIC demo tritone tritone.tap songs.tap
+del *.reloc *.bin *.map *.o *.sym *.zx7 *.def MUSIC demo tritone tritone.tap songs.tap
