@@ -4,7 +4,7 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAP_drawW(unsigned int tile, unsigned int lin, unsigned int col)
+; void NIRVANAP_drawW(unsigned char tile, unsigned char lin, unsigned char col)
 
 SECTION code_clib
 SECTION code_nirvanap
@@ -19,10 +19,8 @@ _NIRVANAP_drawW:
 	add hl,sp
 	ld a,(hl)       ; tile
 	inc hl
-	inc hl
 	ld d,(hl)       ; lin
-	inc hl
 	inc hl
 	ld e,(hl)       ; col
 
-   	jp asm_NIRVANAP_drawW
+   jp asm_NIRVANAP_drawW

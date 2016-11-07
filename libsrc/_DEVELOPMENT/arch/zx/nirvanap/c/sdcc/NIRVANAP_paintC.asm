@@ -4,7 +4,7 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAP_paintC(unsigned char *attrs, unsigned int lin, unsigned int col)
+; void NIRVANAP_paintC(void *attrs, unsigned char lin, unsigned char col)
 
 SECTION code_clib
 SECTION code_nirvanap
@@ -23,7 +23,6 @@ _NIRVANAP_paintC:
 	inc hl
 	ld d,(hl)       ; lin
 	inc hl
-	inc hl
 	ld e,(hl)       ; col
 
-   	jp asm_NIRVANAP_paintC
+   jp asm_NIRVANAP_paintC

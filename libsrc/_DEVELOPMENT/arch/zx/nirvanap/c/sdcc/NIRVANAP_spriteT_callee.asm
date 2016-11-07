@@ -4,7 +4,7 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAP_spriteT(unsigned int sprite, unsigned int tile, unsigned int lin, unsigned int col)
+; void NIRVANAP_spriteT(unsigned char sprite, unsigned char tile, unsigned char lin, unsigned char col)
 ; callee
 
 SECTION code_clib
@@ -16,15 +16,14 @@ EXTERN asm_NIRVANAP_spriteT
 
 _NIRVANAP_spriteT_callee:
 
-	pop af          ; RET address
-	pop hl          ; sprite
-	pop bc          ; tile
-	pop de          ; lin
-	ld d,e
-	ld e,c
-	pop bc          ; col
-	push af
-	ld a,e
-	ld e,c
+   pop af
+   pop hl          ; l = sprite
+   pop bc
+   push af
+   
+   ld a,h          ; a = tile
+   ld h,0
+   ld d,c          ; d = lin
+   ld e,b          ; e = col
 
 	jp asm_NIRVANAP_spriteT

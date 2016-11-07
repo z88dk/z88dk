@@ -4,7 +4,7 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAP_paintC(unsigned char *attrs, unsigned int lin, unsigned int col)
+; void NIRVANAP_paintC(void *attrs, unsigned char lin, unsigned char col)
 ; callee
 
 SECTION code_clib
@@ -16,11 +16,10 @@ EXTERN asm_NIRVANAP_paintC
 
 _NIRVANAP_paintC_callee:
 
-	pop hl          ; RET address
-	pop bc          ; attrs
-	pop de          ; lin
-	ld d,e
-	ex (sp),hl      ; col
-	ld e,l
+   pop hl
+   pop bc          ; bc = attrs
+   ex (sp),hl
+   ld d,l          ; d = lin
+   ld e,h          ; e = col
 
 	jp asm_NIRVANAP_paintC

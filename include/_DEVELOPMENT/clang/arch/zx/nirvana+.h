@@ -80,10 +80,10 @@ extern void NIRVANAP_stop(void);
 //          occurs, program may crash!!! (see NIRVANAP_halt)
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_drawT(unsigned int tile,unsigned int lin,unsigned int col);
+extern void NIRVANAP_drawT(unsigned char tile,unsigned char lin,unsigned char col);
 
 
-extern void NIRVANAP_drawT_raw(unsigned int tile,unsigned int lin,unsigned int col);
+extern void NIRVANAP_drawT_raw(unsigned char tile,unsigned char lin,unsigned char col);
 
 
 
@@ -101,10 +101,10 @@ extern void NIRVANAP_drawT_raw(unsigned int tile,unsigned int lin,unsigned int c
 //          occurs, program may crash!!! (see NIRVANAhalt)
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_fillT(unsigned int attr,unsigned int lin,unsigned int col);
+extern void NIRVANAP_fillT(unsigned char attr,unsigned char lin,unsigned char col);
 
 
-extern void NIRVANAP_fillT_raw(unsigned int attr,unsigned int lin,unsigned int col);
+extern void NIRVANAP_fillT_raw(unsigned char attr,unsigned char lin,unsigned char col);
 
 
 
@@ -119,7 +119,7 @@ extern void NIRVANAP_fillT_raw(unsigned int attr,unsigned int lin,unsigned int c
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_printC(unsigned int ch,unsigned char *attrs,unsigned int lin,unsigned int col);
+extern void NIRVANAP_printC(unsigned char ch,void *attrs,unsigned char lin,unsigned char col);
 
 
 
@@ -133,7 +133,7 @@ extern void NIRVANAP_printC(unsigned int ch,unsigned char *attrs,unsigned int li
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_paintC(unsigned char *attrs,unsigned int lin,unsigned int col);
+extern void NIRVANAP_paintC(void *attrs,unsigned char lin,unsigned char col);
 
 
 
@@ -148,7 +148,7 @@ extern void NIRVANAP_paintC(unsigned char *attrs,unsigned int lin,unsigned int c
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_fillC(unsigned int attr,unsigned int lin,unsigned int col);
+extern void NIRVANAP_fillC(unsigned char attr,unsigned char lin,unsigned char col);
 
 
 
@@ -177,7 +177,7 @@ extern void NIRVANAP_fillC(unsigned int attr,unsigned int lin,unsigned int col);
 //          NIRVANAhalt)
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_spriteT(unsigned int sprite,unsigned int tile,unsigned int lin,unsigned int col);
+extern void NIRVANAP_spriteT(unsigned char sprite,unsigned char tile,unsigned char lin,unsigned char col);
 
 
 
@@ -195,10 +195,10 @@ extern void NIRVANAP_spriteT(unsigned int sprite,unsigned int tile,unsigned int 
 // WARNING: Only use this routine if NIRVANA_drawW was enabled!!!
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_drawW(unsigned int tile,unsigned int lin,unsigned int col);
+extern void NIRVANAP_drawW(unsigned char tile,unsigned char lin,unsigned char col);
 
 
-extern void NIRVANAP_drawW_raw(unsigned int tile,unsigned int lin,unsigned int col);
+extern void NIRVANAP_drawW_raw(unsigned char tile,unsigned char lin,unsigned char col);
 
 
 
@@ -210,7 +210,7 @@ extern void NIRVANAP_drawW_raw(unsigned int tile,unsigned int lin,unsigned int c
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_tiles(unsigned char *addr);
+extern void NIRVANAP_tiles(void *addr);
 
 
 
@@ -224,7 +224,7 @@ extern void NIRVANAP_tiles(unsigned char *addr);
 // WARNING: Only use this routine if NIRVANAP_drawW was enabled!!!
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_wides(unsigned char *addr);
+extern void NIRVANAP_wides(void *addr);
 
 
 
@@ -237,7 +237,7 @@ extern void NIRVANAP_wides(unsigned char *addr);
 //     addr: New character table address
 // ----------------------------------------------------------------
 
-extern void NIRVANAP_chars(unsigned char *addr);
+extern void NIRVANAP_chars(void *addr);
 
 
 

@@ -4,7 +4,7 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAP_fillT_raw(unsigned int attr, unsigned int lin, unsigned int col)
+; void NIRVANAP_fillT_raw(unsigned char attr, unsigned char lin, unsigned char col)
 ; callee
 
 SECTION code_clib
@@ -16,12 +16,11 @@ EXTERN asm_NIRVANAP_fillT_raw
 
 _NIRVANAP_fillT_raw_callee:
 
-	pop hl          ; RET address
-	pop de          ; attr
-	ld a,e
-	pop de          ; lin
-	ld d,e
-	ex (sp),hl      ; col
-	ld e,l
+   pop hl
+   pop de          ; d = lin
+   ld a,e          ; a = attr
+   dec sp
+   ex (sp),hl
+   ld e,h          ; e = col
 
 	jp asm_NIRVANAP_fillT_raw

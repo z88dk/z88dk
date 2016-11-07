@@ -4,7 +4,7 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANA_fillC(unsigned int attr, unsigned int lin, unsigned int col)
+; void NIRVANA_fillC(unsigned char attr, unsigned char lin, unsigned char col)
 
 SECTION code_clib
 SECTION code_nirvanap
@@ -19,10 +19,8 @@ _NIRVANAP_fillC:
 	add hl,sp
 	ld c,(hl)       ; attr
 	inc hl
-	inc hl
 	ld d,(hl)       ; lin
 	inc hl
-	inc hl
 	ld e,(hl)       ; col
-
-   	jp asm_NIRVANAP_fillC
+   
+   jp asm_NIRVANAP_fillC

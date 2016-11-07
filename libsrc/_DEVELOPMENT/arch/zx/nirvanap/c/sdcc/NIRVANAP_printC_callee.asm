@@ -4,7 +4,7 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAP_printC(unsigned int ch, unsigned char *attrs, unsigned int lin, unsigned int col)
+; void NIRVANAP_printC(unsigned char ch, void *attrs, unsigned char lin, unsigned char col)
 ; callee
 
 SECTION code_clib
@@ -16,13 +16,12 @@ EXTERN asm_NIRVANAP_printC
 
 _NIRVANAP_printC_callee:
 
-	pop hl          ; RET address
-	pop de          ; ch
-	ld a,e
-	pop bc          ; attrs
-	pop de          ; lin
-	ld d,e
-	ex (sp),hl      ; col
-	ld e,l
+   pop hl
+   dec sp
+   pop af          ; a = ch
+   pop bc          ; bc = attrs
+   ex (sp),hl
+   ld d,l          ; d = lin
+   ld e,h          ; e = col
 
 	jp asm_NIRVANAP_printC
