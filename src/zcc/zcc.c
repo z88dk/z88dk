@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.185 2016-11-06 17:33:46 aralbrec Exp $
+*      $Id: zcc.c,v 1.186 2016-11-08 06:00:54 aralbrec Exp $
 */
 
 
@@ -151,7 +151,7 @@ static char           *cpp_incpath_first;
 static char           *cpp_incpath_last;
 static char           *comparg;
 static char           *clangarg;
-static char           *clangcpparg = "-D\"__attribute__(x)= \" ";
+static char           *clangcpparg = "-D\"__attribute__(x)= \" -D\"__builtin_unreachable(x)= \" -D\"static inline=inline\" ";
 static char           *llvmarg;
 static char           *linkargs;
 static char           *linker_libpath_first;
@@ -864,10 +864,8 @@ int main(int argc, char **argv)
 		BuildOptions_start(&linklibs, linker_linklib_first);
 
 	/* CLANG & LLVM options */
-	// BuildOptions_start(&clangarg, "-target sdcc-z80 -S -emit-llvm ");
-	BuildOptions_start(&clangarg, "-S -emit-llvm -nobuiltininc ");
+	BuildOptions_start(&clangarg, "--target=sdcc-z80 -S -emit-llvm -nobuiltininc ");
 	if (!sdcc_signed_char) BuildOptions_start(&clangarg, "-fno-signed-char ");
-	// BuildOptions(&llvmarg, llvmarg ? "-disable-simplify-libcalls -S " : "opt-3.8 -O2 -disable-simplify-libcalls -S ");
 	BuildOptions(&llvmarg, llvmarg ? "-disable-partial-libcall-inlining " : "-O2 -disable-partial-libcall-inlining ");
 
 	/* Peephole optimization level for sdcc */
@@ -924,8 +922,11 @@ int main(int argc, char **argv)
 		CASE_LLFILE:
 		case LLFILE:
 			if (m4only || clangonly) continue;
-			// llvm translates llvm-ir to c
-			if (process(".ll", ".cbe.c", c_llvm_exe, llvmarg, outspecified_flag, i, YES, NO))
+			// optimize .ll hard-coded for now
+			if (!hassuffix(filelist[i], ".opt.ll") && process(".ll", ".opt.ll", "zllopt", "-O2 -disable-simplify-libcalls -S ", outspecified_flag, i, YES, NO))
+				exit(1);
+			// llvm-cbe translates llvm-ir to c
+			if (process(".opt.ll", ".cbe.c", c_llvm_exe, llvmarg, outspecified_flag, i, YES, NO))
 				exit(1);
 			// Write .cbe.c to original directory immediately
 			ptr = changesuffix(original_filenames[i], ".cbe.c");
