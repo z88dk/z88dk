@@ -5,6 +5,7 @@ graphics/clga
 graphics/clrarea
 graphics/dcircle2
 graphics/draw
+graphics/xordraw
 graphics/drawb
 graphics/drawr
 graphics/drawto

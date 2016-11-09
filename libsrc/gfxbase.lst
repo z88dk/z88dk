@@ -3,6 +3,7 @@ graphics/__gfx_coords
 graphics/circle
 graphics/clga
 graphics/draw
+graphics/xordraw
 graphics/draw_profile
 graphics/drawb
 graphics/drawr

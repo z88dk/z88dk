@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - 2016
 ;
 ;
-;       $Id: clsgraph.asm,v 1.1 2016-11-04 15:44:58 stefano Exp $
+;       $Id: clsgraph.asm,v 1.2 2016-11-09 11:35:58 stefano Exp $
 ;
 
 			SECTION   code_clib
@@ -19,8 +19,9 @@
 
 .cleargraphics
 
-	ld a,128	; Enable Programmable Characters Graphics (exclude ROM font if any)
-	out ($1C),a
+	di
+;	ld a,128	; Enable Programmable Characters Graphics (exclude ROM font if any)
+;	out ($1C),a
 
 	ld   c,0	; first UDG chr$ to load
 	ld	 b,64	; number of characters to load

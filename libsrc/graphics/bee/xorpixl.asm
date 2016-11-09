@@ -8,7 +8,7 @@
 ;       XOR pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.1 2016-11-04 15:44:58 stefano Exp $
+;	$Id: xorpixl.asm,v 1.2 2016-11-09 11:35:58 stefano Exp $
 ;
 
 
@@ -56,13 +56,14 @@
 
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-			ld    hl,(base_graphics)
+			;ld    hl,(base_graphics)
+			ld    hl,$F000
 
 			ld	b,a		; keep y/3
 			and	a
 			jr	z,r_zero
 
-			ld	de,64
+			ld	de,maxx/2	; microbee is 64 columns
 .r_loop
 			add	hl,de
 			dec	a

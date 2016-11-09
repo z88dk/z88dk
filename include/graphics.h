@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.18 2016-06-23 20:58:36 dom Exp $
+ *	$Id: graphics.h,v 1.19 2016-11-09 11:35:58 stefano Exp $
  */
 
 #ifndef __GFX_H__
@@ -54,6 +54,8 @@ extern int __LIB__ point(int x, int y) __SMALLCDECL;
 extern int __LIB__ multipoint(int hv, int length, int x, int y) __SMALLCDECL;
 /* Draw a line */
 extern void __LIB__ draw(int x1, int y1, int x2, int y2) __SMALLCDECL;
+/* Draw a line in 'XOR' mode */
+extern void __LIB__ xordraw(int x1, int y1, int x2, int y2) __SMALLCDECL;
 /* Remove a line */
 extern void __LIB__ undraw(int x1, int y1, int x2, int y2) __SMALLCDECL;
 /* Relative draw */
