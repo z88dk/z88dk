@@ -10,7 +10,7 @@
  *      Stefano has converted many of these routines to the new ports
  *      Some will work, some will not. djm 6/6/2000
  *
- *	$Id: graphics.h,v 1.19 2016-11-09 11:35:58 stefano Exp $
+ *	$Id: graphics.h,v 1.20 2016-11-10 07:34:54 stefano Exp $
  */
 
 #ifndef __GFX_H__
@@ -60,10 +60,14 @@ extern void __LIB__ xordraw(int x1, int y1, int x2, int y2) __SMALLCDECL;
 extern void __LIB__ undraw(int x1, int y1, int x2, int y2) __SMALLCDECL;
 /* Relative draw */
 extern void __LIB__ drawr(int px, int py) __SMALLCDECL;
+/* Relative draw in XOR mode*/
+extern void __LIB__ xordrawr(int px, int py) __SMALLCDECL;
 /* Remove a relative draw */
 extern void __LIB__ undrawr(int px, int py) __SMALLCDECL;
 /* Draw up to a sprcified point */
 extern void __LIB__ drawto(int x2, int y2) __SMALLCDECL;
+/* Draw up to a sprcified point in XOR mode*/
+extern void __LIB__ xordrawto(int x2, int y2) __SMALLCDECL;
 /* Undraw up to a sprcified point */
 extern void __LIB__ undrawto(int x2, int y2) __SMALLCDECL;
 /* Draw a box */

@@ -3,8 +3,11 @@ graphics/__graphics_end
 graphics/w_circle
 graphics/w_dcircle
 graphics/w_draw
+graphics/w_xordraw
 graphics/w_drawto
+graphics/w_xordrawto
 graphics/w_drawr
+graphics/w_xordrawr
 graphics/getmaxx
 graphics/getmaxy
 graphics/lbitmask

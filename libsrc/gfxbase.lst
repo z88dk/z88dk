@@ -7,7 +7,9 @@ graphics/xordraw
 graphics/draw_profile
 graphics/drawb
 graphics/drawr
+graphics/xordrawr
 graphics/drawto
+graphics/xordrawto
 graphics/getmaxx
 graphics/getmaxy
 graphics/lbitmask
