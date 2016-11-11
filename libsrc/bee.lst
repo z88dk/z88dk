@@ -46,6 +46,7 @@ graphics/xorplot
 graphics/setxy
 graphics/swapgfxbk_foo
 graphics/drawbox
+games/bee/joystick
 games/bit_open
 games/bit_open_di
 games/bit_close

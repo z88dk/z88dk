@@ -3,7 +3,7 @@
 
 #include <sys/compiler.h>
 
-/* $Id: stdio.h,v 1.40 2016-07-03 22:16:06 dom Exp $ */
+/* $Id: stdio.h,v 1.41 2016-11-11 07:55:37 stefano Exp $ */
 
 #undef __STDIO_BINARY      /* By default don't consider binary/text file differences */
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
@@ -223,8 +223,11 @@ extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *) __SMALLCDECL;
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
+#ifdef __STDIO_CRLF
+#define gets(x) fgets_cons(x,255)
+#else
 extern char __LIB__ *gets(char *s);
-
+#endif
 
 extern int __LIB__ printf(char *,...);
 extern int __LIB__ fprintf(FILE *,char *,...);

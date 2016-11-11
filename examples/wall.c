@@ -109,7 +109,7 @@
  *
  * * * * * * *
  *
- *      $Id: wall.c,v 1.12 2016-10-14 06:40:26 stefano Exp $
+ *      $Id: wall.c,v 1.13 2016-11-11 07:55:37 stefano Exp $
  *
  * * * * * * *
  *
@@ -466,11 +466,11 @@ void move_ball() {
 void move_left() {
 	if (a>0) {
 #if (spritesize == 2)
-		putsprite(spr_xor,(a*spritesize),(21*spritesizeh)-1,paddle);
+		putsprite(spr_and,(a*spritesize),(21*spritesizeh)-1,paddle);
 		a--;
 		putsprite(spr_or,(a*spritesize),(21*spritesizeh)-1,paddle);
 #else
-		putsprite(spr_xor,(a*spritesize),(21*spritesizeh),paddle);
+		putsprite(spr_and,(a*spritesize),(21*spritesizeh),paddle);
 		a--;
 		putsprite(spr_or,(a*spritesize),(21*spritesizeh),paddle);
 #endif
@@ -480,11 +480,11 @@ void move_left() {
 void move_right() {
 	if (a<29) {
 #if (spritesize == 2)
-		putsprite(spr_xor,(a*spritesize),(21*spritesizeh)-1,paddle);
+		putsprite(spr_and,(a*spritesize),(21*spritesizeh)-1,paddle);
 		a++;
 		putsprite(spr_or,(a*spritesize),(21*spritesizeh)-1,paddle);
 #else
-		putsprite(spr_xor,(a*spritesize),(21*spritesizeh),paddle);
+		putsprite(spr_and,(a*spritesize),(21*spritesizeh),paddle);
 		a++;
 		putsprite(spr_or,(a*spritesize),(21*spritesizeh),paddle);
 #endif
@@ -667,7 +667,7 @@ start_level:
 #ifdef SOUND
 		for (i=1; i<14; i++) {
 			bit_synth(4, 199+i, 200+i, 239+i, 240+i);
-			putsprite(spr_xor,(n*spritesize),(m*spritesizeh),ball);
+			putsprite(spr_and,(n*spritesize),(m*spritesizeh),ball);
 		}
 		bit_synth(9, 255, 254, 253, 252);
 #endif
@@ -722,7 +722,7 @@ start_level:
 			switch (k) {
 				case '2':
 					move_left();
-					break
+					break;
 				case '1':
 					move_left();
 					move_left();
