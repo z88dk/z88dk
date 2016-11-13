@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.187 2016-11-10 06:22:21 aralbrec Exp $
+*      $Id: zcc.c,v 1.188 2016-11-13 05:26:59 aralbrec Exp $
 */
 
 
@@ -871,6 +871,7 @@ int main(int argc, char **argv)
 	BuildOptions_start(&clangarg, "--target=sdcc-z80 -S -emit-llvm ");
 	if (!sdcc_signed_char) BuildOptions_start(&clangarg, "-fno-signed-char ");
 	BuildOptions(&llvmarg, llvmarg ? "-disable-partial-libcall-inlining " : "-O2 -disable-partial-libcall-inlining ");
+	BuildOptions(&llvmopt, llvmopt ? "-disable-simplify-libcalls -S " : "-O2 -disable-simplify-libcalls -S ");
 
 	/* Peephole optimization level for sdcc */
 	if (compiler_type == CC_SDCC)
@@ -927,6 +928,8 @@ int main(int argc, char **argv)
 		case LLFILE:
 			if (m4only || clangonly) continue;
 			// llvm-cbe translates llvm-ir to c
+			if (zopt && process(".ll", ".opt.ll", "zopt", llvmopt, outspecified_flag, i, YES, NO))
+                exit(1);
 			if (process(".ll", ".cbe.c", c_llvm_exe, llvmarg, outspecified_flag, i, YES, NO))
 				exit(1);
 			// Write .cbe.c to original directory immediately
@@ -944,13 +947,7 @@ int main(int argc, char **argv)
 			if (m4only) continue;
 			// special treatment for clang+llvm
 			if ((strcmp(c_compiler_type, "clang") == 0) && !hassuffix(filelist[i], ".cbe.c")) {
-				if (zopt || llvmopt) {
-					if (process(".c", ".ll2", c_clang_exe, clangarg, outspecified_flag, i, YES, NO))
-						exit(1);
-					if (process(".ll2", ".ll", "zopt", llvmopt ? llvmopt : "-O2 -disable-simplify-libcalls -S ", outspecified_flag, i, YES, NO))
-						exit(1);
-				}
-				else if (process(".c", ".ll", c_clang_exe, clangarg, outspecified_flag, i, YES, NO))
+				if (process(".c", ".ll", c_clang_exe, clangarg, outspecified_flag, i, YES, NO))
                     exit(1);
 				goto CASE_LLFILE;
 			}
