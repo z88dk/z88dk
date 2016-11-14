@@ -1,0 +1,13 @@
+target/rc2014/device/acia/__acia_bss_ctl
+target/rc2014/device/acia/__acia_bss_Rx
+target/rc2014/device/acia/__acia_bss_Tx
+target/rc2014/device/acia/__acia_need
+target/rc2014/device/acia/acia_flush_Rx
+target/rc2014/device/acia/acia_flush_Tx
+target/rc2014/device/acia/acia_getc
+target/rc2014/device/acia/acia_init
+target/rc2014/device/acia/acia_interrupt
+target/rc2014/device/acia/acia_peekc
+target/rc2014/device/acia/acia_pollc
+target/rc2014/device/acia/acia_putc
+target/rc2014/device/acia/acia_reset
