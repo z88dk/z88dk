@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.188 2016-11-13 05:26:59 aralbrec Exp $
+*      $Id: zcc.c,v 1.189 2016-11-15 02:49:53 aralbrec Exp $
 */
 
 
@@ -20,6 +20,7 @@
 #include        <stdarg.h>
 #include        <ctype.h>
 #include        <stddef.h>
+#include        <stdint.h>
 #include        <time.h>
 #include        <sys/stat.h>
 #include        "zcc.h"
@@ -104,6 +105,10 @@ static void            add_zccopt(char *fmt, ...);
 static char           *replace_str(const char *str, const char *old, const char *new);
 static void            setup_default_configuration();
 static void            print_specs();
+static int             isquote(unsigned char c);
+static char           *qstrtok(char *s, const char *delim);
+static char           *strip_inner_quotes(char *p);
+static char           *strip_outer_quotes(char *p);
 static int             zcc_asprintf(char **s, const char *fmt, ...);
 static int             zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream);
 
@@ -2225,27 +2230,26 @@ int find_zcc_config_fileFile(char *arg, int gc, char *buf, size_t buflen)
 }
 
 
-
-
-/* Parse options - rewritten to use strtok cos that's nice and easy */
+/* Parse options - rewritten to use qstrtok which is like strtok but understands quoting */
 void parse_option(char *option)
 {
 	char           *ptr;
 
 	if (option != NULL) {
-		ptr = strtok(option, " \t\r\n");
+		ptr = qstrtok(option, " \t\r\n");
 
 		while (ptr != NULL) {
 			if (ptr[0] == '-') {
-				parse_cmdline_arg(ptr);
+				parse_cmdline_arg(strip_inner_quotes(ptr));
 			}
 			else {
-				add_file_to_process(ptr);
+				add_file_to_process(strip_outer_quotes(ptr));
 			}
-			ptr = strtok(NULL, " \r\n");
+			ptr = qstrtok(NULL, " \t\r\n");
 		}
 	}
 }
+
 
 /* Check link arguments (-l) to -i for z80asm */
 void linkargs_mangle(char *linkargs)
@@ -2342,6 +2346,137 @@ static void print_specs()
 		}
 		pargs++;
 	}
+}
+
+
+static int isquote(unsigned char c)
+{
+	return ((c == '"') || (c == '\''));
+}
+
+
+/* strtok with quoting */
+static char *qstrtok(char *s, const char *delim)
+{
+	static char *start = NULL;
+	char *ret;
+	uint32_t quote_mask;
+	uint32_t quote_type;
+	int type;
+
+	// check for new string
+	if (s != NULL)
+	{
+		// clear inquote indicators
+		quote_mask = quote_type = 0;
+
+		// skip initial delimiters
+		for (start = s; *start; ++start)
+			if (strchr(delim, *start) || isquote(*start))
+				break;
+
+		if (*start == '\0') start = NULL;
+	}
+
+	// check if current string is done
+	if (start == NULL) return NULL;
+
+	// look for next token in current string
+	for (ret = start; *start; ++start)
+	{
+		if (quote_mask)
+		{
+			// inside quote, ignore delim
+			if (isquote(*start))
+			{
+				type = (*start == '"');
+				if (type == (quote_type & 0x01))
+				{
+					// undoing one level of quote
+					quote_mask >>= 1;
+					quote_type >>= 1;
+				}
+				else
+				{
+					// adding a level of quote
+					if (quote_mask & 0x80000000)
+					{
+						fprintf(stderr, "Error: Reached maximum quoting level\n");
+						exit(1);
+					}
+
+					quote_mask = (quote_mask << 1) + 1;
+					quote_type = (quote_type << 1) + type;
+				}
+			}
+		}
+		else
+		{
+			// behave like strtok, delim takes precedence over quoting
+			if (strchr(delim, *start))
+				break;
+
+			// check for quoting
+			if (isquote(*start))
+			{
+				quote_mask = 1;
+				quote_type = (*start == '"');
+			}
+		}
+	}
+
+	if (*start == '\0')
+		start = NULL;
+	else
+		*start++ = '\0';
+
+	return ret;
+}
+
+
+/* strip away first level of quotes inside string */
+static char *strip_inner_quotes(char *p)
+{
+	char *first, *last, *temp;
+	size_t len;
+
+	len = strlen(p);
+
+	first = strchr(p, '"');
+	temp = strchr(p, '\'');
+
+	if ((first == NULL) || ((temp != NULL) && (first > temp)))
+		first = temp;
+
+	last = strrchr(p, '"');
+	temp = strrchr(p, '\'');
+
+	if ((last == NULL) || ((temp != NULL) && (last < temp)))
+		last = temp;
+
+	if ((first != NULL) && (first != last) && (*first == *last))
+	{
+		memmove(first, first + 1, last - first - 1);
+		memmove(last - 1, last, p + len - last - 1);
+		p[len - 2] = '\0';
+	}
+
+	return p;
+}
+
+
+/* strip away outer quotes if string is quoted */
+static char *strip_outer_quotes(char *p)
+{
+	size_t q = strlen(p);
+
+	if (isquote(*p) && (p[0] == p[q - 1]))
+	{
+		p++;
+		p[q - 1] = '\0';
+	}
+
+	return p;
 }
 
 
