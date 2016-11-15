@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.261 2016-11-04 15:44:58 stefano Exp $
+# $Id: Makefile,v 1.262 2016-11-15 08:11:11 stefano Exp $
 
 
 include Make.config
@@ -15,7 +15,7 @@ include Make.config
 
 all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	abc80_clib.lib abc800_clib.lib \
-	ace_clib.lib aquarius_clib.lib microbee.lib c7420_clib.lib\
+	ace_clib.lib aquarius_clib.lib aussie.lib bee_clib.lib microbee.lib c7420_clib.lib\
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib  \
 	nascom_clib.lib  newbrain_clib.lib nc_clib.lib \
@@ -770,16 +770,41 @@ aquarius_clib.lib:
 	$(MAKE) -C psg
 	$(MAKE) -C games laquarius 
 	$(LIBLINKER) -DFORaquarius -x$(OUTPUT_DIRECTORY)/aquarius_clib.lib @$(LISTFILE_DIRECTORY)/aquarius.lst
+	
+# Aussie Byte library - Stefano
+aussie.lib:
+	@echo ''
+	@echo '--- Building Aussie Byte Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) gamesdeps
+	$(MAKE) -C games laussie
+	$(LIBLINKER) -DFORaussie -x$(OUTPUT_DIRECTORY)/aussie.lib @$(LISTFILE_DIRECTORY)/aussie.lst
 
 # Applied Technology MicroBee library - Stefano
-microbee.lib:
+bee_clib.lib:
 	@echo ''
 	@echo '--- Building MicroBee Library ---'
 	@echo ''
 	$(MAKE) gfxdeps
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) -C stdlib TARGET=bee
+	$(MAKE) -C stdio 
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lbee
-	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/bee.lst
+	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/bee_clib.lib @$(LISTFILE_DIRECTORY)/bee.lst
+
+microbee.lib:
+	@echo ''
+	@echo '--- Building MicroBee Library (CP/M) ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) gamesdeps
+	$(MAKE) -C games lbee
+	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
 
 # Philips Videopac C7420 library - Stefano
 c7420_clib.lib:

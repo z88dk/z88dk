@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - 2016
 ;
 ;
-;       $Id: clg.asm,v 1.2 2016-11-09 11:35:58 stefano Exp $
+;       $Id: clg.asm,v 1.3 2016-11-15 08:11:11 stefano Exp $
 ;
 
 			SECTION code_clib
@@ -24,24 +24,24 @@
 ;.vdutab		; 80x24
 ;	defb	$6b,80,$58,$37,$1b,$05,$18,$1a,$48,$0a,$2a,$0a,$20,0,0,0
 
-;.vdutab		; 80x24 / 80x25 - Peter Broughton
+.vdutab		; 80x25 - Peter Broughton
 ;	defb	$6b,$50,$5b,$37,$1b,$05,$19,$1a,$48,$0a,$2a,$0a,$20,0,0,0
-;	defb	$6b,$50,$59,$37,$1b,$05,$19,$1b,$48,$0a,$2a,$0a,$20,0,0,0
+	defb	$6b,$50,$59,$37,$1b,$05,$19,$1b,$48,$0a,$2a,$0a,$20,0,0,0
 
 
 .clg
-;
-;	LD	HL,vdutab
-;	LD  C,0
-;	LD	B,16
-;.vdloop
-;	LD	A,C
-;	OUT	($0C),A
-;	LD	A,(HL)
-;	OUT	($0D),A
-;	INC	HL
-;	INC C
-;	DJNZ	vdloop
+
+	LD	HL,vdutab
+	LD  C,0
+	LD	B,16
+.vdloop
+	LD	A,C
+	OUT	($0C),A
+	LD	A,(HL)
+	OUT	($0D),A
+	INC	HL
+	INC C
+	DJNZ	vdloop
 
 
 	

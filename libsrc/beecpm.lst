@@ -1,7 +1,3 @@
-@stdio/stdio.lst
-stdio/bee/fgetc_cons
-stdio/bee/getk
-stdio/bee/fputc_cons
 stdio/ansi/f_ansi
 stdio/ansi/f_ansi_lf
 stdio/ansi/f_ansi_putc
@@ -79,4 +75,3 @@ games/bit_beep
 games/beeper
 games/__bit_irqstatus
 games/__snd_tick
-@z80.lst
