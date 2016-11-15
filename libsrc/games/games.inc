@@ -5,7 +5,7 @@
 ;       based on the Dominic's sound routines
 ;
 ;
-;       $Id: games.inc,v 1.30 2016-10-19 10:32:23 stefano Exp $
+;       $Id: games.inc,v 1.31 2016-11-15 11:42:34 stefano Exp $
 ;
 
 IF FORc128
@@ -158,4 +158,10 @@ IF FORbee
         defc sndbit_port   = 2
         defc sndbit_bit    = 6
         defc sndbit_mask   = 64
+ENDIF
+
+IF FORaussie
+        defc sndbit_port   = 32
+        defc sndbit_bit    = 7
+        defc sndbit_mask   = 128	; bit 6 should stay 'on'
 ENDIF
