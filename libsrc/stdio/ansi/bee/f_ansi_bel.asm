@@ -7,7 +7,7 @@
 ;	Stefano Bodrato - 2016
 ;
 ;
-;	$Id: f_ansi_bel.asm,v 1.1 2016-11-15 08:11:11 stefano Exp $
+;	$Id: f_ansi_bel.asm,v 1.2 2016-11-17 09:39:03 stefano Exp $
 ;
 
         SECTION  code_clib

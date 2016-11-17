@@ -12,7 +12,7 @@
 ;	A=char to display
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.1 2016-11-15 08:11:11 stefano Exp $
+;	$Id: f_ansi_char.asm,v 1.2 2016-11-17 09:39:03 stefano Exp $
 ;
 
         SECTION  code_clib
@@ -25,9 +25,13 @@
 	EXTERN	ansi_COLUMN
 	
 	EXTERN	bee_attr
+	EXTERN	INVRS
 
 
-.text_cols   defb 80
+;.text_cols   defb 80
+	EXTERN	ansicolumns
+.text_cols   defb ansicolumns
+			 defb 0
 .text_rows   defb 25
 
 
@@ -35,13 +39,16 @@
 
 
 .setout
+	ld hl,INVRS
+	or (HL)
 	push	af
 	ld	hl,$F000
 	ld	a,(ansi_ROW)
 	and	a
 	jr	z,r_zero
+	
 	ld	b,a
-	ld	de,80
+	ld	de,(text_cols)
 .r_loop
 	add	hl,de
 	djnz	r_loop
