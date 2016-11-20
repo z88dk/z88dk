@@ -132,7 +132,7 @@ void write_bytes(char *line, int flag)
 }	
 
 
-void write_defined(char *sname, int value)
+void write_defined(char *sname, int value, int export)
 {
     FILE *fp;
 
@@ -144,6 +144,7 @@ void write_defined(char *sname, int value)
 
     fprintf(fp,"\nIF !DEFINED_%s\n",sname);
     fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
+	if (export) fprintf(fp, "\tPUBLIC\t%s\n", sname);
     fprintf(fp,"\tdefc %s = %d\n",sname,value);
     fprintf(fp,"\tIFNDEF %s\n\tENDIF\n",sname);
     fprintf(fp,"ENDIF\n\n");
@@ -204,15 +205,16 @@ int main(int argc, char **argv)
             int  ol = 1;
             ptr = skip_ws(ptr + 7);
          
-            if ( strncmp(ptr, "output",6) == 0 ) {
+            if ( ( strncmp(ptr, "output",6) == 0 ) || ( strncmp(ptr, "define",6) == 0 ) || ( strncmp(ptr, "export",6) == 0 ) ) {
                 char *offs;
                 int   value = 0;
+				int   exp = strncmp(ptr, "export", 6) == 0;
                 ptr = skip_ws(ptr+6);
                 if ( (offs = strchr(ptr+1,'=') ) != NULL  ) {
                     value = (int)strtol(offs+1,NULL,0);
                     *offs = 0;
                 }
-                write_defined(ptr,value);
+                write_defined(ptr,value,exp);
             } else if ( strncmp(ptr, "redirect",8) == 0 ) {
                 char *offs;
                 char *value = "0";
@@ -236,21 +238,21 @@ int main(int argc, char **argv)
                 ol = 0;
             } else if (strncmp(ptr, "-zorg=", 6) == 0 ) {
                 /* It's an option, this may tweak something */
-                write_defined("CRT_ORG_CODE", atoi(ptr+6));
+                write_defined("CRT_ORG_CODE", atoi(ptr+6), 0);
             } else if ( strncmp(ptr, "-reqpag=", 8) == 0 ) {
-                write_defined("CRT_Z88_BADPAGES", atoi(ptr+8));
+                write_defined("CRT_Z88_BADPAGES", atoi(ptr+8), 0);
             } else if ( strncmp(ptr, "-defvars=", 8) == 0 ) {
-                write_defined("defvarsaddr", atoi(ptr+8));
+                write_defined("defvarsaddr", atoi(ptr+8), 0);
             } else if ( strncmp(ptr, "-safedata=", 10) == 0 ) {
-                write_defined("CRT_Z88_SAFEDATA", atoi(ptr+9));
+                write_defined("CRT_Z88_SAFEDATA", atoi(ptr+9), 0);
             } else if ( strncmp(ptr, "-startup=", 9) == 0 ) {
-                write_defined("startup", atoi(ptr+9));
+                write_defined("startup", atoi(ptr+9), 0);
             } else if ( strncmp(ptr, "-farheap=", 9) == 0 ) {
-                write_defined("farheapsz", atoi(ptr+9));
+                write_defined("farheapsz", atoi(ptr+9), 0);
             } else if ( strncmp(ptr, "-expandz88", 9) == 0 ) {
-                write_defined("CRT_Z88_EXPANDED", 1);
+                write_defined("CRT_Z88_EXPANDED", 1, 0);
             } else if ( strncmp(ptr, "-no-expandz88", 9) == 0 ) {
-                write_defined("CRT_Z88_EXPANDED", 0);
+                write_defined("CRT_Z88_EXPANDED", 0, 0);
             } else {
                 printf("%s\n",buf);
             }
