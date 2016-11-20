@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.189 2016-11-15 02:49:53 aralbrec Exp $
+*      $Id: zcc.c,v 1.190 2016-11-20 17:15:19 aralbrec Exp $
 */
 
 
@@ -60,12 +60,13 @@ static void            print_help_config(arg_t *arg, char *);
 static void            print_help_text();
 static void            SetString(arg_t *arg, char *);
 static void            PragmaDefine(arg_t *arg, char *);
+static void            PragmaExport(arg_t *arg, char *);
 static void            PragmaRedirect(arg_t *arg, char *);
 static void            PragmaNeed(arg_t *arg, char *);
 static void            PragmaBytes(arg_t *arg, char *);
 static void            PragmaInclude(arg_t *arg, char *);
 static void            AddArray(arg_t *arg, char *);
-static void            write_zcc_defined(char *name, int value);
+static void            write_zcc_defined(char *name, int value, int export);
 
 
 static void           *mustmalloc(size_t);
@@ -384,6 +385,7 @@ static arg_t     myargs[] = {
 	{ "-no-crt", AF_BOOL_TRUE, SetBoolean, &c_nocrt, NULL, "Link without crt0 file" },
 	{ "pragma-redirect",AF_MORE,PragmaRedirect,NULL, NULL, "Redirect a function" },
 	{ "pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
+	{ "pragma-export",AF_MORE,PragmaExport,NULL, NULL, "Define the option in zcc_opt.def and export as public" },
 	{ "pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
 	{ "pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
 	{ "pragma-include",AF_MORE,PragmaInclude,NULL, NULL, "Process include file containing pragmas" },
@@ -804,7 +806,7 @@ int main(int argc, char **argv)
 	}
 
 	if (c_zorg != -1) {
-		write_zcc_defined("CRT_ORG_CODE", c_zorg);
+		write_zcc_defined("CRT_ORG_CODE", c_zorg, 0);
 	}
 
 	if ((fp = fopen(DEFFILE, "a")) != NULL) {
@@ -1693,7 +1695,7 @@ static void configure_misc_options()
 	// the new c lib uses startup=-1 to mean user supplies the crt
 	// current working dir will be different than when using -crt0
 	if (c_startup >= -1) {
-		write_zcc_defined("startup", c_startup);
+		write_zcc_defined("startup", c_startup, 0);
 	}
 
 	if (linkargs == NULL) {
@@ -1816,7 +1818,7 @@ static void configure_compiler()
 		c_compiler = c_sdcc_exe;
 		c_cpp_exe = c_sdcc_preproc_exe;
 		compiler_style = filter_outspecified_flag;
-		write_zcc_defined("Z88DK_USES_SDCC", 1);
+		write_zcc_defined("Z88DK_USES_SDCC", 1, 0);
 	}
 	else {
 		preprocarg = " -DSCCZ80 -DSMALL_C";
@@ -1882,13 +1884,29 @@ void PragmaDefine(arg_t *arg, char *val)
 		*eql = 0;
 		value = (int)strtol(eql + 1, NULL, 0);
 	}
-	write_zcc_defined(ptr, value);
+	write_zcc_defined(ptr, value, 0);
 }
 
-void write_zcc_defined(char *name, int value)
+void PragmaExport(arg_t *arg, char *val)
+{
+	char *ptr = val + strlen(arg->name) + 1;
+	int   value = 0;
+	char *eql;
+
+	while (ispunct(*ptr)) ++ptr;
+
+	if ((eql = strchr(ptr, '=')) != NULL) {
+		*eql = 0;
+		value = (int)strtol(eql + 1, NULL, 0);
+	}
+	write_zcc_defined(ptr, value, 1);
+}
+
+void write_zcc_defined(char *name, int value, int export)
 {
 	add_zccopt("\nIF !DEFINED_%s\n", name);
 	add_zccopt("\tdefc\tDEFINED_%s = 1\n", name);
+	if (export) add_zccopt("\tPUBLIC\t%s\n", name);
 	add_zccopt("\tdefc %s = %d\n", name, value);
 	add_zccopt("\tIFNDEF %s\n\tENDIF\n", name);
 	add_zccopt("ENDIF\n\n");
