@@ -8,7 +8,7 @@
 ;       XOR pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.2 2016-11-09 11:35:58 stefano Exp $
+;	$Id: xorpixl.asm,v 1.3 2016-11-21 11:18:38 stefano Exp $
 ;
 
 

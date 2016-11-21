@@ -8,7 +8,7 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm,v 1.1 2016-11-04 15:44:58 stefano Exp $
+;	$Id: plotpixl.asm,v 1.2 2016-11-21 11:18:38 stefano Exp $
 ;
 
 

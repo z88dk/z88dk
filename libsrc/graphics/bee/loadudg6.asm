@@ -9,7 +9,7 @@
 ;   starting from character C up to character B-1
 ;
 ;
-;	$Id: loadudg6.asm,v 1.1 2016-11-04 15:44:58 stefano Exp $
+;	$Id: loadudg6.asm,v 1.2 2016-11-21 11:18:38 stefano Exp $
 ;
 
 		        SECTION code_clib

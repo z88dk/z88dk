@@ -6,12 +6,13 @@
 ;       Stefano Bodrato - 2016
 ;
 ;
-;       $Id: clsgraph.asm,v 1.3 2016-11-15 08:11:11 stefano Exp $
+;       $Id: clsgraph.asm,v 1.4 2016-11-21 11:18:37 stefano Exp $
 ;
 
 			SECTION   code_clib
 			PUBLIC    cleargraphics
 			EXTERN     loadudg6
+			EXTERN     swapgfxbk
 			;EXTERN	base_graphics
 
 			INCLUDE	"graphics/grafix.inc"
@@ -19,9 +20,7 @@
 
 .cleargraphics
 
-	di
-;	ld a,128	; Enable Programmable Characters Graphics (exclude ROM font if any)
-;	out ($1C),a
+	call	swapgfxbk
 
 	ld   c,0	; first UDG chr$ to load
 	ld	 b,64	; number of characters to load

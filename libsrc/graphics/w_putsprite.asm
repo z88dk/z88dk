@@ -6,7 +6,7 @@
 ; Generic high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.5 2016-10-17 15:07:05 stefano Exp $
+; $Id: w_putsprite.asm,v 1.6 2016-11-21 11:18:37 stefano Exp $
 ;
 
         SECTION code_clib

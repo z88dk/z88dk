@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.262 2016-11-15 08:11:11 stefano Exp $
+# $Id: Makefile,v 1.263 2016-11-21 11:18:37 stefano Exp $
 
 
 include Make.config
@@ -799,12 +799,15 @@ bee_clib.lib:
 
 microbee.lib:
 	@echo ''
-	@echo '--- Building MicroBee Library (CP/M) ---'
+	@echo '--- Building MicroBee Library (CP/M & graphics) ---'
 	@echo ''
 	$(MAKE) gfxdeps
 	$(MAKE) gamesdeps
 	$(MAKE) -C games lbee
 	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/microbee.lib @$(LISTFILE_DIRECTORY)/beecpm.lst
+	$(LIBLINKER) -DFORbee -x$(OUTPUT_DIRECTORY)/beegfx.lib @$(LISTFILE_DIRECTORY)/beegfx.lst
+	$(MAKE) gfxdeps
+	$(LIBLINKER) -DFORbeehr -x$(OUTPUT_DIRECTORY)/beegfxhr.lib @$(LISTFILE_DIRECTORY)/beegfxhr.lst
 
 # Philips Videopac C7420 library - Stefano
 c7420_clib.lib:
