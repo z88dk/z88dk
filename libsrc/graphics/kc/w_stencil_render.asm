@@ -26,7 +26,7 @@
 	;EXTERN swapgfxbk1
 
 ;	
-;	$Id: w_stencil_render.asm,v 1.1 2016-10-28 07:34:28 stefano Exp $
+;	$Id: w_stencil_render.asm,v 1.2 2016-11-22 11:09:56 stefano Exp $
 ;
 
 .stencil_render_exit
@@ -128,7 +128,8 @@
 			 push af
 			push de
 			ld hl,(curx)
-			inc hl
+         ld      de,8
+         add     hl,de
 			ld (curx),hl
 			ld de,(cury)
 			call	w_pixeladdress		; bitpos0 = pixeladdress(x,y)
@@ -136,7 +137,6 @@
 			ld l,e
 			pop de
 			 pop af
-
 
 				ld	a,h
 				cp	d
@@ -154,7 +154,8 @@
 			 push af
 			push de
 			ld hl,(curx)
-			inc hl
+         ld      de,8
+         add     hl,de
 			ld (curx),hl
 			ld de,(cury)
 			call	w_pixeladdress		; bitpos0 = pixeladdress(x,y)
