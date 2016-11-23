@@ -1,6 +1,6 @@
 @gfxbasew.lst
-graphics/bee/w_clg
-graphics/bee/w_clsgraph
+graphics/bee/w_clg_320
+graphics/bee/w_clsgraph_320
 graphics/bee/w_pixladdr
 graphics/clrarea
 graphics/w_clga
