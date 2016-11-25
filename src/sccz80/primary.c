@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.26 2016-11-25 19:04:43 dom Exp $
+ *      $Id: primary.c,v 1.27 2016-11-25 19:46:20 dom Exp $
  */
 
 
@@ -25,10 +25,10 @@ int primary(LVALUE *lval)
         do k=heir1(lval); while (cmatch(',')) ;
         needchar(')');
         /* Not sure about doing this here..but here goes nowt!*/
-        lval->level--;
         if (lval->c_vtype) {
             docast(lval,YES);
         }
+        lval->level--;
         if (lval->c_vtype) {
             docast(lval,YES);
         }
