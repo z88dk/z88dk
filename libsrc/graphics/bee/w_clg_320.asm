@@ -6,7 +6,7 @@
 ;       Stefano Bodrato - 2016
 ;
 ;
-;       $Id: w_clg_320.asm,v 1.1 2016-11-23 14:01:13 stefano Exp $
+;       $Id: w_clg_320.asm,v 1.2 2016-11-25 14:45:01 stefano Exp $
 ;
 
 		SECTION code_clib

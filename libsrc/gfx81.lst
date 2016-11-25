@@ -1,3 +1,5 @@
+graphics/__gfx_coords
+graphics/__graphics_end
 graphics/circle
 graphics/zx81/clg
 graphics/zx81/clsgraph
@@ -6,6 +8,7 @@ graphics/clrarea
 graphics/dcircle2
 graphics/draw
 graphics/xordraw
+graphics/draw_profile_nostencil
 graphics/drawb
 graphics/drawr
 graphics/xordrawr

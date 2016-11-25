@@ -2,12 +2,15 @@
 ;       MicroBEE pseudo graphics routines
 ;		High Resolution version
 ;
+;		This module works by just cleaning the display color page
+;		and the first 8 PCG banks, so it works in both the 320 and 512 pixel versions
+;
 ;       cls ()  -- clear screen
 ;
 ;       Stefano Bodrato - 2016
 ;
 ;
-;       $Id: w_clsgraph_320.asm,v 1.1 2016-11-23 14:01:13 stefano Exp $
+;       $Id: w_clsgraph_320.asm,v 1.2 2016-11-25 14:45:01 stefano Exp $
 ;
 
 			SECTION   code_clib
@@ -42,7 +45,6 @@
 	out ($1c),a
 	call setattr
 	djnz pcg_loop
-	
 
 	jp	swapgfxbk1
 
@@ -53,7 +55,7 @@
 		ld	e,d
 		ld	b,64
 		add	hl,sp
-		ld	sp, 65535
+		ld	sp, 0
 .clgloop
 		push	de
 		push	de

@@ -7,7 +7,7 @@
 ;       Stefano Bodrato - 2016
 ;
 ;
-;       $Id: w_clsgraph.asm,v 1.1 2016-11-21 11:18:38 stefano Exp $
+;       $Id: w_clsgraph.asm,v 1.2 2016-11-25 14:45:01 stefano Exp $
 ;
 
 			SECTION   code_clib
@@ -53,7 +53,7 @@
 		ld	e,d
 		ld	b,64
 		add	hl,sp
-		ld	sp, 65535
+		ld	sp, 0
 .clgloop
 		push	de
 		push	de
