@@ -5,7 +5,7 @@
  *      This part contains various routines to deal with constants
  *      and also finds variable names in the hash tables
  *
- *      $Id: primary.c,v 1.25 2016-03-29 13:39:44 dom Exp $
+ *      $Id: primary.c,v 1.26 2016-11-25 19:04:43 dom Exp $
  */
 
 
@@ -21,17 +21,17 @@ int primary(LVALUE *lval)
     TAG_SYMBOL *cotag;
 
     if ( cmatch('(') ) {
-		lval->level++;
+        lval->level++;
         do k=heir1(lval); while (cmatch(',')) ;
         needchar(')');
-		/* Not sure about doing this here..but here goes nowt!*/
-		if (lval->c_vtype) {
-		    docast(lval,YES);
-		}
-		lval->level--;
-		if (lval->c_vtype) {
-		    docast(lval,YES);
-		}
+        /* Not sure about doing this here..but here goes nowt!*/
+        lval->level--;
+        if (lval->c_vtype) {
+            docast(lval,YES);
+        }
+        if (lval->c_vtype) {
+            docast(lval,YES);
+        }
         return k;
     }
     /* clear lval array - djm second arg was lval.. now cast, clears lval */
@@ -39,36 +39,34 @@ int primary(LVALUE *lval)
     vtype=lval->c_vtype;
     cflags=lval->c_flags;
     cotag=lval->c_tag;
-	level=lval->level;
-	clevel=lval->castlevel;
-	memset(lval,0,sizeof(LVALUE));
+    level=lval->level;
+    clevel=lval->castlevel;
+    memset(lval,0,sizeof(LVALUE));
     lval->c_id=cid;
     lval->c_vtype=vtype;
     lval->c_flags=cflags;
     lval->c_tag=cotag;
-	lval->level=level;
-	lval->castlevel = clevel;
+    lval->level=level;
+    lval->castlevel = clevel;
 
     if ( symname(sname) ) {
         if ( strcmp(sname, "sizeof") == 0 ) {
             size_of(lval) ;
             return(0) ;
-        }
-        else if ( (ptr=findloc(sname)) && ptr->ident !=GOTOLABEL ) {
-
+        } else if ( (ptr=findloc(sname)) && ptr->ident !=GOTOLABEL ) {
             lval->offset=getloc(ptr, 0);
             lval->symbol = ptr;
             lval->val_type = lval->indirect = ptr->type;
             lval->flags = ptr->flags;
             lval->ident = ptr->ident;
-			lval->storage = ptr->storage;
+            lval->storage = ptr->storage;
             lval->ptr_type=0;
             ltype=ptr->type;
             if ( ptr->type == STRUCT )
                 lval->tagsym = tagtab + ptr->tag_idx ;
             if ( ptr->ident == POINTER ) {
                 lval->ptr_type = ptr->type;
-/* djm long pointers */
+                /* djm long pointers */
                 lval->indirect=lval->val_type = (ptr->flags&FARPTR ? CPTR : CINT);
                 ltype=lval->indirect;
             }
@@ -81,7 +79,7 @@ int primary(LVALUE *lval)
             }
             else return(1);
         }
-/* djm search for local statics */
+        /* djm search for local statics */
         ptr=findstc(sname);
         if (!ptr) ptr=findglb(sname);
         if ( ptr ) {
@@ -103,7 +101,7 @@ int primary(LVALUE *lval)
                 lval->flags = ptr->flags ;
                 lval->ident = ptr->ident;
                 lval->ptr_type = 0;
-				lval->storage = ptr->storage;
+                                lval->storage = ptr->storage;
                 ltype=ptr->type;
                 if ( ptr->type == STRUCT )
                     lval->tagsym = tagtab + ptr->tag_idx ;
@@ -124,7 +122,7 @@ int primary(LVALUE *lval)
                 return(0) ;
             } else  {
                 lval->ident=FUNCTION;
-			}
+                        }
         }
         else {
 /* Check to see if we have a right bracket, if we don't assume
@@ -135,7 +133,7 @@ int primary(LVALUE *lval)
                 warning(W_FUNC_NO_PROTO);
             else {	
                 error(E_UNSYMB,sname);
-			}
+                        }
             /* assume it's a function we haven't seen yet */
             /* NB value set to 0 */
             ptr = addglb(sname,FUNCTION,CINT,0,STATIK,0,0);
@@ -179,9 +177,9 @@ void dcerror(LVALUE *lval)
  * calculate constant expression (signed values)
  */
 int calc(
-	 int left,
-	 void (*oper)(struct lvalue *),
-	 int right)
+         int left,
+         void (*oper)(struct lvalue *),
+         int right)
 {
         if (oper == zdiv)      return (left / right );
         else if (oper == zmod) return (left % right );
@@ -194,9 +192,9 @@ int calc(
 }
 
 int calcun(
-	   unsigned int left,
-	   void (*oper)(struct lvalue *),
-	   unsigned int right)
+           unsigned int left,
+           void (*oper)(struct lvalue *),
+           unsigned int right)
 {
         if (oper == zdiv)      return (left / right );
         else if (oper == zmod) return (left % right );
@@ -213,9 +211,9 @@ int calcun(
  */
 
 int CalcStand(
-	      int left,
-	      void (*oper)(struct lvalue *),
-	      int right)
+              int left,
+              void (*oper)(struct lvalue *),
+              int right)
 {
         if (oper == zor)        return (left | right) ;
         else if (oper == zxor)  return (left ^ right) ;
@@ -243,7 +241,6 @@ void force(int t1, int t2,char sign1,char sign2,int lconst)
         zcarryconv();	
     }
 
-
     if(t1==DOUBLE) {
         if(t2!=DOUBLE) {
             DoDoubConv(t2,sign2);
@@ -254,11 +251,10 @@ void force(int t1, int t2,char sign1,char sign2,int lconst)
             convdoub2int();
             return;
         }
-
     }
-/* t2 =source, t1=dest */
-/* int to long, if signed, do sign, if not ld de,0 */
-/* Check to see if constant or not... */
+    /* t2 =source, t1=dest */ 
+    /* int to long, if signed, do sign, if not ld de,0 */
+    /* Check to see if constant or not... */
     if(t1==LONG) {
         if (t2!=LONG && (!lconst)) {
             if (sign2==NO && sign1==NO && t2 != CARRY) convSint2long();
@@ -266,25 +262,23 @@ void force(int t1, int t2,char sign1,char sign2,int lconst)
         }
         return;
     }
-/* Converting long to int, not needed, if it don't fit tough!! */
-
-/* Converting between pointer types..far and near */
+   
+    /* Converting between pointer types..far and near */
     if (t1==CPTR && t2==CINT) convUint2long();
     else if (t2==CPTR && t1==CINT) warning(W_FARNR);
 
-	/* Char conversion */
-	if ( t1 == CCHAR && sign2 == NO && !lconst) {
-		if ( sign1 == NO )
-			convSint2char();
-		else
-			convUint2char();
-	} else if ( t1 == CCHAR && sign2 == YES && !lconst )  {
-		if ( sign1 == NO )
-			convSint2char();
-		else
-			convUint2char();
-	}
-		
+    /* Char conversion */
+    if ( t1 == CCHAR && sign2 == NO && !lconst) {
+        if ( sign1 == NO )
+            convSint2char();
+        else
+            convUint2char();
+    } else if ( t1 == CCHAR && sign2 == YES && !lconst )  {
+        if ( sign1 == NO )
+            convSint2char();
+        else
+            convUint2char();
+    }		
 }
 
 /*
@@ -319,8 +313,8 @@ int widen(LVALUE *lval, LVALUE *lval2)
 void widenlong(LVALUE *lval,LVALUE *lval2)
 {
     if ( lval2->val_type == CARRY ) {
-	zcarryconv();
-	lval2->val_type = CINT;
+        zcarryconv();
+        lval2->val_type = CINT;
     }
 
 
@@ -382,10 +376,10 @@ void result(LVALUE *lval,LVALUE *lval2)
 {
         if ( lval->ptr_type && lval2->ptr_type ) {
                 lval->ptr_type = 0 ;                    /* ptr-ptr => int */
-		if (lval->val_type == CPTR) lval->val_type = LONG;
-		else lval->val_type = CINT;
+                if (lval->val_type == CPTR) lval->val_type = LONG;
+                else lval->val_type = CINT;
                 lval->indirect = 0;
-		lval->ident = VARIABLE;
+                lval->ident = VARIABLE;
         }
         else if ( lval2->ptr_type ) {           /* ptr +- int => ptr */
                 lval->symbol = lval2->symbol ;
@@ -400,9 +394,9 @@ void result(LVALUE *lval,LVALUE *lval2)
 
 
 void prestep(
-	     LVALUE *lval,
-	     int n,
-	     void (*step)())
+             LVALUE *lval,
+             int n,
+             void (*step)())
 {
         if ( heira(lval) == 0 ) {
                 needlval();
@@ -411,7 +405,7 @@ void prestep(
                 if(lval->indirect) {
                         addstk(lval);
                         if (lval->flags&FARACC) lpush();
-			else zpush();
+                        else zpush();
                 }
                 rvalue(lval);
                 intcheck(lval,lval);
@@ -440,11 +434,11 @@ void prestep(
  * poststep - postincrement or postdecrement lvalue
  */
 void poststep(
-	      int k,
-	      LVALUE *lval,
-	      int n,
-	      void (*step)(), 
-	      void (*unstep)() )
+              int k,
+              LVALUE *lval,
+              int n,
+              void (*step)(), 
+              void (*unstep)() )
 {
         if ( k == 0 ) {
                 needlval() ;
@@ -453,7 +447,7 @@ void poststep(
                 if(lval->indirect) {
                         addstk(lval);
                         if (lval->flags&FARACC) lpush();
-			else zpush();
+                        else zpush();
                 }
                 rvalue(lval);
                 intcheck(lval,lval);
@@ -490,21 +484,21 @@ void poststep(
  * memory pools..
  */
 void nstep(
-	   LVALUE *lval,
-	   int n,
-	   void (*unstep)() )
+           LVALUE *lval,
+           int n,
+           void (*unstep)() )
 {
         addconst(n,1,lval->symbol->flags&FARPTR) ;
         store(lval) ;
-	if (unstep) addconst(-n,1,lval->symbol->flags&FARPTR);
+        if (unstep) addconst(-n,1,lval->symbol->flags&FARPTR);
 }
 
 
 void store(LVALUE *lval)
 {
         if (lval->indirect == 0) putmem(lval->symbol) ;
-	else 
-		 putstk(lval->indirect) ;
+        else 
+                 putstk(lval->indirect) ;
 }
 
 /*
@@ -518,9 +512,9 @@ void smartpush(LVALUE *lval,char *before)
                                                         lval->symbol->storage != STKLOC ) {
                 addstk(lval);
                 if ( (lval->flags&FARACC) || ( lval->symbol && lval->symbol->storage==FAR) ) { lpush(); }
-		else {
-			zpush();
-		}
+                else {
+                        zpush();
+                }
         }
         else {
                 switch ( lval->symbol->offset.i - Zsp ) {
@@ -532,10 +526,10 @@ void smartpush(LVALUE *lval,char *before)
                         default:
                                 addstk(lval);
                                 if (lval->symbol && lval->symbol->storage==FAR) { lpush(); }
-				else {
-					zpush();
-                		}
-		}
+                                else {
+                                        zpush();
+                                }
+                }
         }
 }
 
@@ -564,13 +558,13 @@ void smartstore(LVALUE *lval)
 
 void rvaluest(LVALUE *lval)
 {
-	if ( lval->symbol && strncmp(lval->symbol->name,"0dptr",5) == 0 )
-		lval->symbol=lval->symbol->offset.p;
+        if ( lval->symbol && strncmp(lval->symbol->name,"0dptr",5) == 0 )
+                lval->symbol=lval->symbol->offset.p;
         if( lval->symbol && lval->indirect == 0 ) 
                 getmem(lval->symbol);
         else {
-		indirect(lval);
-	}
+                indirect(lval);
+        }
 }
 
 void rvalue(LVALUE *lval)
@@ -578,11 +572,11 @@ void rvalue(LVALUE *lval)
         if( lval->symbol && lval->indirect == 0 )
                 getmem(lval->symbol);
         else {
-		indirect(lval);
-	}
+                indirect(lval);
+        }
         if ( lval->c_vtype ) {
-	    docast(lval,YES);
-	}
+            docast(lval,YES);
+        }
 #if DEBUG_SIGN
         if (lval->flags&UNSIGNED) ol("; unsigned");
         else ol("; signed");
@@ -602,8 +596,8 @@ void test(int label,int parens)
         while(1) {
                 setstage( &before, &start ) ;
                 if ( heir1(&lval) ) {
-			rvalue(&lval) ;
-		}
+                        rvalue(&lval) ;
+                }
                 if ( cmatch(',') )
                         clearstage( before, start) ;
                 else break ;
@@ -636,11 +630,11 @@ void test(int label,int parens)
         else 
         {
                 if ( lval.binop==dummy || DoTestJump(&lval)) {
-			if (lval.binop == dummy) lval.val_type=CINT; /* logical always int */			
+                        if (lval.binop == dummy) lval.val_type=CINT; /* logical always int */			
                         testjump(&lval,label);
-		} else {
+                } else {
                         jumpnc(label);
-		}
+                }
         }
         clearstage(before,start);
 }
@@ -668,9 +662,9 @@ int constexpr(int32_t *val,int flag)
  * scale constant value according to type
  */
 void cscale(
-	    int type,
-	    TAG_SYMBOL *tag,
-	    int *val)
+            int type,
+            TAG_SYMBOL *tag,
+            int *val)
 {
         switch ( type ) {
         case CINT:
@@ -736,15 +730,15 @@ void addconst(int val,int opr, char zfar)
 
 int docast(LVALUE *lval,char df)
 {
-	SYMBOL  *ptr;
+        SYMBOL  *ptr;
     char    temp_type;
     int     itag;
     char    nam[20];
 
 
 
-	debug(DBG_CAST1,"Level=%d Castlevel=%d df=%d %p",lval->level,lval->castlevel,df,lval);
-	if	(lval->level != lval->castlevel  ) return 0;
+        debug(DBG_CAST1,"Level=%d Castlevel=%d df=%d %p",lval->level,lval->castlevel,df,lval);
+        if	(lval->level != lval->castlevel  ) return 0;
 
 
     if ( lval->c_id == VARIABLE ) {
@@ -756,7 +750,7 @@ int docast(LVALUE *lval,char df)
         lval->ptr_type=0;
         lval->ident=VARIABLE;
         lval->flags= ( (lval->flags&FARACC) | (lval->c_flags&UNSIGNED) );
-		lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;
+                lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;
         lval->is_const = 0;
         return(0);
     } 
@@ -773,7 +767,7 @@ int docast(LVALUE *lval,char df)
             if (df) force(temp_type,lval->val_type,0,0,0);
             lval->val_type=temp_type;
             lval->flags=( (lval->flags&FARACC) | lval->c_flags );
-			if (df) {lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;}
+                        if (df) {lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;}
             return(1);
 
 /* All other simple pointers.. */
@@ -788,7 +782,7 @@ int docast(LVALUE *lval,char df)
             lval->val_type=temp_type;
             lval->flags=( (lval->flags&FARACC) | lval->c_flags );
             lval->ident=POINTER;
-			if (df) {lval->c_id=0; lval->c_vtype=0; lval->c_flags=0; }
+                        if (df) {lval->c_id=0; lval->c_vtype=0; lval->c_flags=0; }
             return(1);
         }
     }
@@ -800,17 +794,17 @@ int docast(LVALUE *lval,char df)
     temp_type = ( (lval->c_flags&FARPTR) ? CPTR : CINT );
     itag=0;
     if ( lval->c_tag) 
-	    itag=lval->c_tag-tagtab;
-	ptr=lval->symbol;
+            itag=lval->c_tag-tagtab;
+        ptr=lval->symbol;
     lval->symbol = addloc(nam,POINTER,temp_type,dummy_idx(lval->c_vtype,lval->c_tag),itag);
-	lval->symbol->offset.p=ptr;
+        lval->symbol->offset.p=ptr;
     if (df) 
-	    force(temp_type,lval->val_type,0,0,0);
+            force(temp_type,lval->val_type,0,0,0);
     lval->val_type=temp_type;
     lval->flags=( (lval->flags&FARACC) | lval->c_flags );
-	if (df) {
-	    lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;
-	}
+        if (df) {
+            lval->c_id=0; lval->c_vtype=0; lval->c_flags=0;
+        }
     return(1);
 
 }
@@ -862,14 +856,14 @@ int WasComp(LVALUE *lval)
 /* Generate Code to Turn integer type of signed to double, Generic now does longs */
 void DoDoubConv(char type, char zunsign)
 {
-	if (type == CINT || type==CCHAR) {
-		if (zunsign) 
-			convUint2long();
-		else
-			convSint2long();
-	}
-	if (zunsign) 
-		convUlong2doub();
-	else
-		convSlong2doub();
+        if (type == CINT || type==CCHAR) {
+                if (zunsign) 
+                        convUint2long();
+                else
+                        convSint2long();
+        }
+        if (zunsign) 
+                convUlong2doub();
+        else
+                convSlong2doub();
 }
