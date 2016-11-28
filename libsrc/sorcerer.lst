@@ -18,7 +18,7 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite3
 graphics/liner
-graphics/stencil_render
+graphics/draw_profile_nostencil
 graphics/sorcerer/swapgfxbk
 games/joystick
 @z80.lst

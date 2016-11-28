@@ -18,7 +18,7 @@ graphics/zx80/xorpixl
 graphics/zx80/pointxy
 graphics/putsprite3
 graphics/liner
-graphics/stencil_render
+graphics/draw_profile_nostencil
 graphics/text/swapgfxbk
 games/joystick
 games/zx81snd/bit_open

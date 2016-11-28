@@ -5,7 +5,7 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile.asm,v 1.9 2016-04-22 20:17:17 dom Exp $
+;	$Id: draw_profile.asm,v 1.10 2016-11-28 07:33:11 stefano Exp $
 ;
 
 
@@ -41,12 +41,31 @@ getbyte:
 
 getx:
 	ld	hl,(_vx)
-;IF (maxx > 256)
+IF maxx > 320
+	call getparmx
+ELSE
+	call getparm
+ENDIF
+;IF maxx > 320
 ;	add hl,hl	; double size for X in wide mode !
 ;ENDIF
-	call getparm
 	ret
 
+IF maxx > 320
+getparmx:		;cx=vx+percent*pic[x++]/50;  (double width)
+	push hl
+	ld	de,(_percent)
+	call	getbyte
+	ld	h,0
+	ld	l,a
+	call l_mult
+	ld	de,25	; 50/2
+	jr  perc_div
+ENDIF
+
+	
+	
+	
 gety:
 	ld	hl,(_vy)
 	call getparm
@@ -59,7 +78,8 @@ getparm:		;cx=vx+percent*pic[x++]/100;
 	ld	h,0
 	ld	l,a
 	call l_mult
-	ld	de,100
+	ld	de,50	; 100/2
+perc_div:
 	ex	de,hl
 	call l_div
 	pop	de
@@ -83,8 +103,11 @@ _draw_profile:
 	ld	l,(ix+2)
 	ld	h,(ix+3)
 	ld	(_pic),hl
-	ld	h,0
 	ld	l,(ix+4)
+	;ld	h,0
+	ld	h,(ix+5)
+	srl h
+	rr l
 	ld	(_percent),hl
 	ld	l,(ix+6)
 IF (maxx > 256)

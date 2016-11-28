@@ -8,10 +8,12 @@ graphics/clrarea
 graphics/dcircle2
 graphics/draw
 graphics/xordraw
+graphics/draw_profile_nostencil
 graphics/drawb
 graphics/drawr
 graphics/xordrawr
 graphics/drawto
+graphics/undrawto
 graphics/xordrawto
 graphics/getmaxx
 graphics/getmaxy

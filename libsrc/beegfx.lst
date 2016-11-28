@@ -11,7 +11,9 @@ graphics/xordraw
 graphics/drawb
 graphics/drawr
 graphics/xordrawr
+graphics/draw_profile_nostencil
 graphics/drawto
+graphics/undrawto
 graphics/xordrawto
 graphics/getmaxx
 graphics/getmaxy

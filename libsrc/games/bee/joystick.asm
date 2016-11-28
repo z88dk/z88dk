@@ -2,7 +2,7 @@
 ;	Game device library for the MicroBEE
 ;       Stefano Bodrato - 11/2016
 ;
-;	$Id: joystick.asm,v 1.1 2016-11-11 07:55:37 stefano Exp $
+;	$Id: joystick.asm,v 1.2 2016-11-28 07:33:11 stefano Exp $
 ;
 
 	SECTION code_clib
@@ -18,7 +18,10 @@
 	ld	a,l
 
 	dec	a
-	jr  z,arrows
+	jp  z,arrows
+	
+	dec a
+	jp  z,tc256
 	
 	dec	a
 	ret      nz
@@ -62,7 +65,7 @@
 ; MOVE_FIRE4 128
 
 .arrows
-	LD      B,A
+	LD      B,A			; zero
 	LD      A,37h           ; Space key (fire)
 	CALL    isKeyDown
 	JR      NZ,nofire
@@ -136,3 +139,52 @@ L095D:  IN      A,(0Ch)
         LD      A,C
         POP     BC
         RET
+
+
+.tc256
+	LD      B,A		; zero
+	LD      C,37h           ; Space key (fire)
+	LD		A,15
+	PUSH	BC
+	RST		28h
+	POP		BC
+	JR      NZ,tc_nofire
+	SET     4,B
+.tc_nofire
+    LD      C,3eh           ; Right arrow
+	LD		A,15
+	PUSH	BC
+	RST		28h
+	POP		BC
+	JR      NZ,tc_noright
+	SET     0,B
+.tc_noright
+    LD      C,3bh           ; Left arrow
+	LD		A,15
+	PUSH	BC
+	RST		28h
+	POP		BC
+	JR      NZ,tc_noleft
+	SET     1,B
+.tc_noleft
+    LD      C,3ah           ; Down arrow
+	LD		A,15
+	PUSH	BC
+	RST		28h
+	POP		BC
+	JR      NZ,tc_nodown
+	SET     2,B
+.tc_nodown
+    LD      C,38h           ; Up arrow
+	LD		A,15
+	PUSH	BC
+	RST		28h
+	POP		BC
+	JR      NZ,tc_noup
+	SET     3,B
+.tc_noup
+
+	ld	h,0
+	ld	l,b
+	
+	ret

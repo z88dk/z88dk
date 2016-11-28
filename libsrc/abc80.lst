@@ -31,7 +31,7 @@ graphics/fill
 graphics/dfill2
 graphics/putsprite3
 graphics/liner
-graphics/stencil_render
+graphics/draw_profile_nostencil
 graphics/swapgfxbk_foo
 games/joystick
 abc80/abc_inv

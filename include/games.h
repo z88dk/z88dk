@@ -13,7 +13,7 @@
  *
  *	Stefano, Jan 2001
  *
- *	$Id: games.h,v 1.28 2016-11-15 08:11:10 stefano Exp $
+ *	$Id: games.h,v 1.29 2016-11-28 07:33:11 stefano Exp $
  *
  */
 
@@ -80,8 +80,8 @@ extern unsigned int __LIB__ __FASTCALL__ joystick(int game_device) __SMALLCFASTC
 #endif
 
 #ifdef __BEE__
-	unsigned char *joystick_type[] = {"Arrows and SPACE", "Joystick on parallel port"};
-	#define GAME_DEVICES 2
+	unsigned char *joystick_type[] = {"Arrows and SPACE", "Arrows + SPACE (256TC)", "Joystick on parallel port"};
+	#define GAME_DEVICES 3
 #endif
 
 #ifdef __MC1000__
