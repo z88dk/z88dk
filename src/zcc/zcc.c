@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.190 2016-11-20 17:15:19 aralbrec Exp $
+*      $Id: zcc.c,v 1.191 2016-12-02 13:06:42 dom Exp $
 */
 
 
@@ -2255,7 +2255,6 @@ void parse_option(char *option)
 
 	if (option != NULL) {
 		ptr = qstrtok(option, " \t\r\n");
-
 		while (ptr != NULL) {
 			if (ptr[0] == '-') {
 				parse_cmdline_arg(strip_inner_quotes(ptr));
@@ -2378,9 +2377,9 @@ static char *qstrtok(char *s, const char *delim)
 {
 	static char *start = NULL;
 	char *ret;
-	uint32_t quote_mask;
-	uint32_t quote_type;
-	int type;
+	uint32_t quote_mask = 0;
+	uint32_t quote_type = 0;
+	int type = 0;
 
 	// check for new string
 	if (s != NULL)
@@ -2433,7 +2432,6 @@ static char *qstrtok(char *s, const char *delim)
 			// behave like strtok, delim takes precedence over quoting
 			if (strchr(delim, *start))
 				break;
-
 			// check for quoting
 			if (isquote(*start))
 			{
@@ -2447,7 +2445,6 @@ static char *qstrtok(char *s, const char *delim)
 		start = NULL;
 	else
 		*start++ = '\0';
-
 	return ret;
 }
 
