@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.191 2016-12-02 13:06:42 dom Exp $
+*      $Id: zcc.c,v 1.192 2016-12-12 00:45:03 aralbrec Exp $
 */
 
 
@@ -82,7 +82,6 @@ static void            parse_cmdline_arg(char *option);
 static void            BuildOptions(char **, char *);
 static void            BuildOptions_start(char **, char *);
 static void            copy_output_files_to_destdir(char *suffix, int die_on_fail);
-static void            copy_output_files_to_destdir_generated_from(char *suffix, int die_on_fail);
 static void            parse_configfile_line(char *config_line);
 static void            KillEOL(char *line);
 static int             add_variant_args(char *wanted, int num_choices, char **choices);
@@ -254,6 +253,7 @@ static char  *c_copycmd = "copy";
 static char  *c_extension_config = "o";
 static char  *c_incpath = NULL;
 static char  *c_clangincpath = NULL;
+static char  *c_m4opts = NULL;
 static char  *c_coptrules1 = NULL;
 static char  *c_coptrules2 = NULL;
 static char  *c_coptrules3 = NULL;
@@ -338,6 +338,7 @@ static arg_t  config[] = {
 
 	{ "INCPATH", 0, SetStringConfig, &c_incpath, NULL, "", "-IDESTDIR/include " },
 	{ "CLANGINCPATH", 0, SetStringConfig, &c_clangincpath, NULL, "", "-isystem DESTDIR/include/_DEVELOPMENT/clang " },
+	{ "M4OPTS", 0, SetStringConfig, &c_m4opts, NULL, "", " -I DESTDIR/src/m4 " },
 	{ "COPTRULES1", 0, SetStringConfig, &c_coptrules1, NULL, "", "DESTDIR/lib/z80rules.1" },
 	{ "COPTRULES2", 0, SetStringConfig, &c_coptrules2, NULL, "", "DESTDIR/lib/z80rules.2" },
 	{ "COPTRULES3", 0, SetStringConfig, &c_coptrules3, NULL, "", "DESTDIR/lib/z80rules.0" },
@@ -846,7 +847,7 @@ int main(int argc, char **argv)
 	if ((c_clib == 0) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")))
 		if (linker_linklib_first) configure_maths_library(&linker_linklib_first);   // -lm appears here
 
-																					/* Options that must be sequenced in specific order */
+    /* Options that must be sequenced in specific order */
 	if (compiler_type == CC_SDCC)
 		BuildOptions_start(&comparg, "--constseg rodata_compiler ");
 
@@ -878,7 +879,10 @@ int main(int argc, char **argv)
 	BuildOptions_start(&clangarg, "--target=sdcc-z80 -S -emit-llvm ");
 	if (!sdcc_signed_char) BuildOptions_start(&clangarg, "-fno-signed-char ");
 	BuildOptions(&llvmarg, llvmarg ? "-disable-partial-libcall-inlining " : "-O2 -disable-partial-libcall-inlining ");
-	BuildOptions(&llvmopt, llvmopt ? "-disable-simplify-libcalls -S " : "-O2 -disable-simplify-libcalls -S ");
+	BuildOptions(&llvmopt, llvmopt ? "-disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S " : "-O2 -disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S ");
+
+	/* m4 include path finds z88dk macro definition file "z88dk.m4" */
+	BuildOptions(&m4arg, c_m4opts);
 
 	/* Peephole optimization level for sdcc */
 	if (compiler_type == CC_SDCC)
@@ -2389,7 +2393,7 @@ static char *qstrtok(char *s, const char *delim)
 
 		// skip initial delimiters
 		for (start = s; *start; ++start)
-			if (strchr(delim, *start) || isquote(*start))
+			if ((strchr(delim, *start) == NULL) || isquote(*start))
 				break;
 
 		if (*start == '\0') start = NULL;
@@ -2416,7 +2420,7 @@ static char *qstrtok(char *s, const char *delim)
 				else
 				{
 					// adding a level of quote
-					if (quote_mask & 0x80000000)
+					if (quote_mask & 0x80000000UL)
 					{
 						fprintf(stderr, "Error: Reached maximum quoting level\n");
 						exit(1);
