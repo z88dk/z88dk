@@ -10,7 +10,7 @@ define(`z88dk_forarg', `ifelse(eval(`($1) <= ($2)'), `1',
 # z88dk_for(VAR, FROM, TO, STMT)
 # Output STMT for VAR varying from FROM to TO.
 
-define(`z88dk_for', `ifelse(eval(`(%2) <= ($3)'), `1',
+define(`z88dk_for', `ifelse(eval(`($2) <= ($3)'), `1',
    `pushdef(`$1')_z88dk_for(eval(`$2'), eval(`$3'),
       `define(`$1',', `)$4')popdef(`$1')')')
 
