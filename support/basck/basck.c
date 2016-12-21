@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.12 2016-05-20 12:41:03 stefano Exp $
+ *   $Id: basck.c,v 1.13 2016-12-21 08:07:17 stefano Exp $
  */
 
 unsigned char  *img;
@@ -261,6 +261,7 @@ int dblfpreg_skel[]={9, 0x2A, CATCH, CATCH, SKIP_CALL, 0x7C, 0xEE, 0x80, 0xB5, 0
 
 int dbl_tstsgn_skel[]={13, CATCH_CALL, 0xF0, SKIP, 0xFA, SKIP, SKIP  ,0xCA, SKIP, SKIP, 33, SKIP, SKIP, 0x7E};
 int dbl_tstsgn_skel2[]={9, CATCH_CALL, 0xF0, 33, SKIP, SKIP, 0x7E, 0xEE, 0x80, 0x77};
+int dbl_tstsgn_skel3[]={6, CATCH_CALL, 0x6F, 0x17, 0x9F, 0x67, 0xC3};
 
 int test_type_skel[]={9, CATCH_CALL, 0xCA, SKIP, SKIP, 0xF2, SKIP, SKIP, 0x2A, SKIP, SKIP, 0x7C, 0xB5, 0xC8 ,0x7C, 0x18};
 
@@ -548,6 +549,39 @@ int datsnr_skel[]={15, ADDR, 0x2A, SKIP, SKIP, 0x22, SKIP, SKIP, 0x1E, 2, 1, 0x1
 int ucase_skel[]={9, ADDR, 0x7E, 0xFE, 0x61, 0xD8, 0xFE, 0x7B, 0xD0, 0xE6, 0x5F, 0xC9};
 
 
+/* Later Extended BASIC versions (MSX BASIC, Otrona Attachè, Triumph Adler.. */
+
+int ttypos_skel[] ={10, 0x3A, CATCH, CATCH, 0x6F, 0xAF, 0x67, 0xC3, SKIP, SKIP, 0xCD};
+int ttypos_skel2[]={11, 0x3A, CATCH, CATCH, 0x3C, 0x6F, 0xAF, 0x67, 0xC3, SKIP, SKIP, 0xCD};
+
+int lpos_skel[] ={12, 0x3A, CATCH, CATCH, 0x18, 0x03, 0x3A, SKIP, SKIP, 0x6F, 0xAF, 0x67, 0xC3};
+int lpos_skel2[]={12, 0x3A, CATCH, CATCH, 0x18, 0x03, 0x3A, SKIP, SKIP, 0x3C, 0x6F, 0xAF, 0x67};
+
+int unsigned_a_skel[] ={10, 0x3A, SKIP, SKIP, ADDR, 0xAF, 0x67, 0xC3, SKIP, SKIP, 0xCD};
+int unsigned_a_skel2[]={11, 0x3A, SKIP, SKIP, 0x3C, ADDR, 0xAF, 0x67, 0xC3, SKIP, SKIP, 0xCD};
+	
+int int_hl_skel[] ={10, 0x3A, SKIP, SKIP, 0x6F, 0xAF, 0x67, 0xC3, CATCH, CATCH, 0xCD};
+int int_hl_skel2[]={11, 0x3A, SKIP, SKIP, 0x3C, 0x6F, 0xAF, 0x67, 0xC3, CATCH, CATCH, 0xCD};
+
+int int_a_skel[]={8, 0x77, 0xC9, SKIP_CALL, ADDR, 0x17, 0x9F, 0x67, 0xC3};
+
+int faccu_skel[]={9, 33, CATCH, CATCH, 0x7E, 0xEE, 0x80, 0x77, 0xC9, 0xCD};
+
+/*
+0000271F:	LD HL,0C0Fh
+00002722:	LD A,(HL)
+00002723:	XOR 80h
+00002725:	LD (HL),A
+00002726:	RET
+
+__SGN:
+00002727:	CALL 2731h
+0000272A:	LD L,A
+0000272B:	RLA
+0000272C:	SBC A
+0000272D:	LD H,A
+*/
+
 /* Microsoft BASIC token extraction */
 int tkmsbasic_skel[]={12, 17, CATCH, CATCH, 0x1A, 0x13, 0xB7, 0xF2, SKIP, SKIP, 0x0D, 0x20, 0xF7};
 int tkmsbasic_skel2[]={15, 33, CATCH, CATCH, 0x7E, 0xB7, 0x23, 0xF2, SKIP, SKIP, 0x1D, 0xC2, SKIP, SKIP, 0xA6, 0x7F};
@@ -560,12 +594,14 @@ int tkmsbasic_old_skel[]={8, ADDR, 'E', 'N', 0xC4, 'F', 'O', 0xd2, 'N'};
 int tkmsbasic_ex_skel[]={11, 33, CATCH, CATCH, 0x47, 0x0e, 0x40, 0x0C, 0x23, 0x54, 0x5D, 0x7E};
 int tkrange_ex_skel[]={14, 0xD6, 129, 0xDA, SKIP, SKIP, 0xFE, CATCH, 0xD2, SKIP, SKIP, 7, 0x4F, 6, 0};
 
+
+
 /*
 	TODO: Decoding tokens in modern mode (i.e. MSX machines)
 */
 
 int tkmsbasic_code_skel[]={12, 0xD5, 17, SKIP, SKIP, 0xC5, 1, SKIP, SKIP, 0xC5, 0x06, CATCH, 0x7E};
-int jptab_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 9, 0x4E};
+int jptab_msbasic_skel[]={13, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 0x09, 0x4E, 0x23, 0x46, 0xC5};
 int jptab_msbasic_skel3[]={11, 17, CATCH, CATCH, 0xD4, SKIP,SKIP, 7, 0x4f, 6, 0, 0xEB};
 int jptab_msbasic_skel2[]={12, 17, CATCH, CATCH, 0x07, 0x4F, 6, 0, 0xEB, 0x09, 0x4E, 0x23, 0x46};
 
@@ -588,7 +624,7 @@ int buffer_loc_skel[]={9,  0x21, CATCH, CATCH, 0x12, 0x13, 0x12, 0x13, 0x12, 0xC
 int buffer_loc_skel2[]={10,  0x21, CATCH, CATCH, 0xAF, 0x12, 0x13, 0x12, 0x13, 0x12, 0xC9,};
 
 /* DATA label declaration */
-int dlbl(label, position, comment) {
+int dlbl(char *label, int position, char *comment) {
 if (SKOOLMODE) {
 	printf("@ $%04x label=%s\n", position, label);
 	printf("D $%04x %s\n", position, comment);
@@ -598,7 +634,7 @@ if (SKOOLMODE) {
 
 
 /* CODE label declaration */
-int clbl(label, position, comment) {
+int clbl(char *label, int position, char *comment) {
 if (SKOOLMODE) {
 	printf("@ $%04x label=%s\n", position, label);
 	printf("c $%04x %s\n", position, comment);
@@ -609,6 +645,7 @@ if (SKOOLMODE) {
 void clear_token () {
 	//sprintf (token,"");
     token[0]  = '\0';
+    token[1]  = '\0';
 
 }
 
@@ -706,7 +743,7 @@ int find_skel (int *skel) {
 }
 
 
-int zx81char(c) {
+int zx81char(unsigned char c) {
 	int a;
 	switch (c) {
 		case 11:
@@ -966,8 +1003,18 @@ int main(int argc, char *argv[])
 		res=find_skel(curpos_skel);
 		if (res<0)
 			res=find_skel(curpos_skel2);
+		if (res<0)
+			res=find_skel(ttypos_skel);	/* Extended Basic versions..*/
+		if (res<0)
+			res=find_skel(ttypos_skel2);
 		if (res>0)
-			dlbl("CURPOS", res, "Character position on line (cursor position)");
+			dlbl("CURPOS", res, "Character position on line (TTYPOS on Ext. Basic)");
+		
+		res=find_skel(lpos_skel);	/* Extended Basic versions..*/
+		if (res<0)
+			res=find_skel(lpos_skel2);
+		if (res>0)
+			dlbl("LPTPOS", res, "Character position on printer");
 		
 		res=find_skel(prognd_skel);
 		if (res<0)
@@ -1025,7 +1072,9 @@ int main(int argc, char *argv[])
 		
 		printf("\n");
 
-		res=find_skel(fpreg_skel);
+		res=find_skel(faccu_skel);
+		if (res<0)
+			res=find_skel(fpreg_skel);
 		if (res<0)
 			res=find_skel(fpreg_skel2);
 		if (res<0)
@@ -1033,7 +1082,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(fpreg_skel4);
 		if (res>0)
-			dlbl("FPREG", res, "Floating Point Register");
+			dlbl("FPREG", res, "Floating Point Register (FACCU on Ext. BASIC)");
 
 		res=find_skel(last_fpreg_skel);
 		if (res<0)
@@ -1046,7 +1095,6 @@ int main(int argc, char *argv[])
 			res=find_skel(fpexp_skel2);
 		if (res>0)
 			dlbl("FPEXP", res, "Floating Point Exponent");
-
 
 		res=find_skel(dblfpreg_skel);
 		if (res>0)
@@ -1163,6 +1211,23 @@ int main(int argc, char *argv[])
 		res=find_skel(midnum_skel);
 		if (res>0)
 			clbl("MIDNUM", res+pos, "Get number in program listing");
+
+		res=find_skel(int_a_skel);
+		if (res>0)
+			clbl("INT_RESULT_A", res+pos, "Get back from function, result in A (signed)");
+
+		res=find_skel(int_hl_skel);
+		if (res<0)
+			res=find_skel(int_hl_skel2);
+		if (res>0)
+			clbl("INT_RESULT_HL", res, "Get back from function, result in HL");
+		
+		res=find_skel(unsigned_a_skel);
+		if (res<0)
+			res=find_skel(unsigned_a_skel2);
+		if (res>0)
+			clbl("UNSIGNED_RES_A", res+pos, "Get back from function, result in A");
+
 		
 		printf("\n");
 
@@ -1181,6 +1246,8 @@ int main(int argc, char *argv[])
 		res=find_skel(dbl_tstsgn_skel);
 		if (res<0)
 			res=find_skel(dbl_tstsgn_skel2);
+		if (res<0)
+			res=find_skel(dbl_tstsgn_skel3);
 		if (res>0)
 			clbl("_TSTSGN", res, "Test sign in number");
 
@@ -1865,11 +1932,12 @@ int main(int argc, char *argv[])
 		if (res>0) {
 			res+=1;
 			
-			printf("\n# TOKEN table position = $%04X, word list in 'extended BASIC' mode.\n",res);			
+			printf("\n# TOKEN table position = $%04X, word list in 'extended BASIC' mode.\n",res);
 			if (SKOOLMODE) {
 				printf("@ $%04x label=%s\n", res-1, "WORDS");
 				printf("t $%04x %s\n", res-1, "BASIC keyword list");
 			}
+			res-=pos;
 			
 			token_range=find_skel(tkrange_ex_skel);
 			if (token_range>0)
@@ -1889,7 +1957,11 @@ int main(int argc, char *argv[])
 			
 			for (i=res; img[i+8]!='<'; i++) {
 				if ((img[i-1]==0)&&(img[i]==0)) {chr++; i++;}
-				if (img[i-1]==0) {chr++;  printf("\t%c", chr); clear_token(); append_c(chr);}
+				if (img[i-1]==0) {
+					if (token[1]  == '\0')
+						printf("\n#");
+					chr++; printf("\t%c", chr); clear_token(); append_c(chr);
+				}
 				c=img[i];
 				if (c>=128)	{
 					c-=128;
@@ -1920,10 +1992,15 @@ int main(int argc, char *argv[])
 						printf("      \t[%d]\n#",img[i]);
 
 					if (img[i+1]!=0) {printf("\t%c", chr); clear_token(); append_c(chr);}
-				} else {printf("%c",c); append_c(c);}
+				} else if (c!=0) {printf("%c",c); append_c(c);}
 			}
-
+			
+			
+			
 		} else {
+			
+			
+			
 			res=find_skel(tkmsbasic_skel)-1;
 			if (res<0)
 				res=find_skel(tkmsbasic_skel2);
