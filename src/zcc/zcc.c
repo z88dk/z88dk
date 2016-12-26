@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.192 2016-12-12 00:45:03 aralbrec Exp $
+*      $Id: zcc.c,v 1.193 2016-12-26 06:58:23 aralbrec Exp $
 */
 
 
@@ -24,6 +24,12 @@
 #include        <time.h>
 #include        <sys/stat.h>
 #include        "zcc.h"
+
+#ifdef WIN32
+#include        <direct.h>
+#else
+#include        <unistd.h>
+#endif
 
 
 #ifdef WIN32
@@ -74,6 +80,7 @@ static char           *muststrdup(const char *s);
 static int             hassuffix(char *file, char *suffix_to_check);
 static char           *stripsuffix(char *, char *);
 static char           *changesuffix(char *, char *);
+static char           *last_path_char(char *filename);
 static int             process(char *, char *, char *, char *, enum iostyle, int, int, int);
 static int             linkthem(char *);
 static int             get_filetype_by_suffix(char *);
@@ -1061,24 +1068,61 @@ int main(int argc, char **argv)
 				exit(1);
 		CASE_ASMFILE:
 		case ASMFILE:
-			if (m4only || clangonly || llvmonly || preprocessonly || assembleonly || ((i == 0) && c_nocrt && !compileonly && !makelib)) continue;
-			// z80asm cannot output an object file by name so as temporary measure we need to copy
-			// the source .asm file to the temporary directory before assembling so as not to
-			// create temporary files in the user's source directort
-			ptr = changesuffix(temporary_filenames[i], ".asm");
-			if (strcmp(ptr, filelist[i]) != 0) {
-				if (copy_file(filelist[i], "", ptr, "")) {
-					fprintf(stderr, "Couldn't write output file %s\n", ptr);
-					exit(1);
-				}
-				free(filelist[i]);
-				filelist[i] = ptr;
-			}
-			else
-				free(ptr);
-			BuildAsmLine(asmarg, sizeof(asmarg), " -s ");
-			if (process(".asm", c_extension, c_assembler, asmarg, assembler_style, i, YES, NO))
+			if (m4only || clangonly || llvmonly || preprocessonly || assembleonly || ((i == 0) && c_nocrt && !compileonly && !makelib))
+                continue;
+
+            // z80asm is unable to output object files to an arbitrary destination directory.
+            // We don't want to assemble files in their original source directory because that would
+            // create a temporary object file there which may accidentally overwrite user files.
+            
+            // Instead the plan is to copy the asm file to the temp directory and add the original
+            // source directory to the include search path
+            
+            BuildAsmLine(asmarg, sizeof(asmarg), " -s ");
+
+            // Check if source .asm file is in the temp directory already (indicates this is an intermediate file)
+            ptr = changesuffix(temporary_filenames[i], ".asm");
+            if (strcmp(ptr, filelist[i]) == 0)
+            {
+                free(ptr);
+                ptr = muststrdup(asmarg);
+            }
+            else
+            {
+                char *p, tmp[FILENAME_MAX + 2];
+
+                // copy .asm file to temp directory
+                if (copy_file(filelist[i], "", ptr, "")) {
+                    fprintf(stderr, "Couldn't write output file %s\n", ptr);
+                    exit(1);
+                }
+
+                // grab path to original source directory
+                if ((p = last_path_char(filelist[i])) == NULL)
+                {
+#ifdef WIN32
+                    if (_getcwd(tmp, sizeof(tmp) - 1) == NULL)
+                        strcpy(tmp, ".");
+#else
+                    if (getcwd(tmp, sizeof(tmp) - 1) == NULL)
+                        strcpy(tmp, ".");
+#endif
+                }
+                else
+                    snprintf(tmp, sizeof(tmp)-1, "%.*s", p - filelist[i], filelist[i]);
+
+                // working file is now the .asm file in the temp directory
+                free(filelist[i]);
+                filelist[i] = ptr;
+
+                // add original source directory to the include path
+                ptr = mustmalloc((strlen(asmarg) + strlen(tmp) + 5) * sizeof(char));
+                sprintf(ptr, "%s -I%s ", asmarg, tmp);
+            }
+
+			if (process(".asm", c_extension, c_assembler, ptr, assembler_style, i, YES, NO))
 				exit(1);
+            free(ptr);
 			break;
 		case OBJFILE:
 			break;
@@ -1483,11 +1527,26 @@ void add_option_to_compiler(char *arg)
 }
 
 
+char *last_path_char(char *filename)
+{
+    char *p, *q;
+
+    // return pointer to last slash character in filename
+    // return NULL if no slash character found
+
+    p = strrchr(filename, '/');
+    q = strrchr(filename, '\\');
+    if ((p == NULL) || ((q != NULL) && ((q - filename) > (p - filename))))
+        p = q;
+
+    return p;
+}
+
 
 void gather_from_list_file(char *filename)
 {
 	FILE *in;
-	char *line, *p, *q;
+    char *line, *p;
 	unsigned int len;
 	char pathname[FILENAME_MAX + 1];
 	char outname[FILENAME_MAX * 2 + 2];
@@ -1503,13 +1562,10 @@ void gather_from_list_file(char *filename)
 	}
 
 	// extract path from filename
-	p = strrchr(filename, '/');
-	q = strrchr(filename, '\\');
-	if ((p == NULL) || ((q != NULL) && ((q - filename) > (p - filename))))
-		p = q;
+	p = last_path_char(filename);
 	memset(pathname, 0, sizeof(pathname));
 	if (p != NULL)
-		strncpy(pathname, filename, p - filename + 1);
+	    strncpy(pathname, filename, p - filename + 1);
 
 	// read filenames from list file
 	line = NULL;
