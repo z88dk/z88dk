@@ -8,7 +8,7 @@ PUBLIC _strnlen_callee
 
 EXTERN asm_strnlen
 
-_strnlen:
+_strnlen_callee:
 
    pop af
    pop hl
