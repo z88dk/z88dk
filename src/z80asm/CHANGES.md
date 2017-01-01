@@ -4,6 +4,30 @@ Z88DK Z80 Module Assembler Change Log
 2016
 ----
 
+- 2017-01-01
+
+  Summary of 2016 changes:
+
+[z80asm] Handle input files more predictably: link .o files; assemble any other extension; append a .asm or .o option to the file name to allow just the basename
+[z80asm] Make a consolidated object file with -o and not -b: all the object modules are merged, the module local symbols are renamed <module>_<symbol>
+[z80asm] Link the library modules in the command line sequence (it was depth-first)
+[z80asm] Add directory of assembled file to the end the include path to allow includes relative to source location
+[z80asm] Remove all generated files at start fo assembly to remove files from previous runs
+[z80asm] Remove deprecated directives: XREF and LIB (replaced by EXTERN), XDEF and XLIB (replaced by PUBLIC), OZ (keep CALL_OZ)
+[z80asm] Rename DEFL to DEFQ to reserve DEFL for macro variables; rename DS.L by DS.Q
+[z80asm] Constants for section sizes: prune empty sections, rename ASMHEAD, ASMTAIL and ASMSIZE to __head, __tail and __size respectively, rename ASM<HEAD|TAIL|SIZE>_<section_name> to __<section_name>_<head|tail|size> 
+[z80asm] Environment variables no longer used: Z80_OZFILES, Z80_STDLIB
+[z80asm] Command line option -r, --origin: accept origin in decimal or hexadecimal with '0x' or '$' prefix
+[z80asm] Command line options: -i, -x: require a library name
+[z80asm] Command line options: remove -RCMX000, keep only --RCMX000
+[z80asm] Command line options: remove -plus, keep only --ti83plus
+[z80asm] Command line options: remove -IXIY and --swap-ix-iy, keep --IXIY
+[z80asm] Command line options: remove --sdcc, -nm, --no-map, -ng, --no-globaldef, -ns, --no-symtable, -nv, --no-verbose, -nl, --no-list, -nb, --no-make-bin, -nd, --no-date-stamp, -a, --make-updated-bin, -e, --asm-ext, -M, --obj-ext, -t
+[z80asm] Make symbol files, map files and reloc files optional; do not merge symbols in the list file; do not paginate and cross-reference symbols in list file; rename list file to file.lis (@file.lst is used as project list)
+[z80asm] Unify format used in map files, symbol files and global define files, output list of symbols only once
+[z80asm] Include symbols computed at link time in the global define file
+[z80asm] Simplify output of --verbose
+
 - 2016-10-16
 
   Add consolidated object file.
