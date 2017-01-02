@@ -7,9 +7,11 @@
 ;
 
 PUBLIC tape_load_block_callee
+PUBLIC _tape_load_block_callee
 PUBLIC ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 
 .tape_load_block_callee
+._tape_load_block_callee
 
 	pop ix
 	pop bc
