@@ -8,10 +8,11 @@
 ; no need anymore of the row table, saving a lot of memory.
 ;
 ;
-; $Id: putsprite.asm,v 1.1 2016-10-26 13:03:31 stefano Exp $
+; $Id: putsprite.asm,v 1.2 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 	PUBLIC    putsprite
+   PUBLIC    _putsprite
 	EXTERN	pixeladdress
 	EXTERN	zx_saddrpdown
 	
@@ -29,6 +30,7 @@
          defb	128,64,32,16,8,4,2,1
 
 .putsprite
+._putsprite
 
 		ld      hl,2   
 		add     hl,sp

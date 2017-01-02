@@ -4,16 +4,18 @@
 ; TI calculators version
 ;
 ;
-; $Id: bkrestore.asm,v 1.8 2015-01-19 01:32:51 pauloscustodio Exp $
+; $Id: bkrestore.asm,v 1.9 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 	PUBLIC    bkrestore
+   PUBLIC    _bkrestore
 	EXTERN	cpygraph
 	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 
 .bkrestore
+._bkrestore
 
 ; __FASTCALL__ : sprite ptr in HL
 	

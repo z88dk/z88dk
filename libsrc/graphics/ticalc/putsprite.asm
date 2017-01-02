@@ -5,13 +5,14 @@
 ;
 
 	PUBLIC    putsprite
+   PUBLIC    _putsprite
 	EXTERN	cpygraph
 	EXTERN	pixeladdress
 
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: putsprite.asm,v 1.6 2016-07-02 09:01:36 dom Exp $
+;	$Id: putsprite.asm,v 1.7 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 ; __gfx_coords: d,e (vert-horz)
@@ -22,6 +23,7 @@
          defb	128,64,32,16,8,4,2,1
 
 .putsprite
+._putsprite
 
         ld      hl,2   
         add     hl,sp

@@ -10,16 +10,19 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.1 2015-09-25 14:56:01 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.2 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 		PUBLIC    swapgfxbk
+      PUBLIC    _swapgfxbk
 
 		PUBLIC    swapgfxbk1
+      PUBLIC    _swapgfxbk1
 
 
 
 .swapgfxbk
+._swapgfxbk
 	DI
 	EX AF,AF
 	LD A,($FFC8)	; Copy of system register
@@ -29,6 +32,7 @@
 	RET
 
 .swapgfxbk1
+._swapgfxbk1
 	EX AF,AF
 	LD A,($FFC8)	; Copy of system register
 	OUT ($1C),A		; System register (page-out gfx RAM)

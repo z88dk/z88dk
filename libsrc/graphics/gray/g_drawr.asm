@@ -4,12 +4,13 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_drawr.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
+;	$Id: g_drawr.asm,v 1.8 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 ;Usage: g_drawr(int px, int py, int GrayLevel)
 
                 PUBLIC    g_drawr
+                PUBLIC    _g_drawr
 
 		EXTERN	__gfx_coords
 
@@ -20,6 +21,7 @@
 
 
 .g_drawr
+._g_drawr
 		ld	ix,0
 		add	ix,sp
 		ld	a,(ix+2)	;GrayLevel

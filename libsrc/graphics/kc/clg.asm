@@ -3,11 +3,12 @@
 ;       Stefano - Sept 2016
 ;
 ;
-;	$Id: clg.asm,v 1.1 2016-10-10 07:09:14 stefano Exp $
+;	$Id: clg.asm,v 1.2 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 		SECTION code_clib
                 PUBLIC    clg
+                PUBLIC    _clg
 
 		INCLUDE  "caos.def"
 

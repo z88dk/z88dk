@@ -4,7 +4,7 @@
 ;	 Colour Genie EG2000 version By Stefano Bodrato
 ;
 ;
-; $Id: bksave.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
+; $Id: bksave.asm,v 1.4 2017-01-02 22:57:57 aralbrec Exp $
 ;
 
 	SECTION   code_clib
@@ -13,6 +13,7 @@
 	EXTERN	pixeladdress
 
 .bksave
+._bksave
 	push	ix
         ld      hl,4
         add     hl,sp

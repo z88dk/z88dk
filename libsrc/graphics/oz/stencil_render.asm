@@ -14,6 +14,7 @@
 	INCLUDE	"graphics/grafix.inc"
 
 	PUBLIC	stencil_render
+   PUBLIC   _stencil_render
 	EXTERN	dither_pattern
 
 	EXTERN swapgfxbk
@@ -22,10 +23,11 @@
 	EXTERN swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.2 2015-01-19 01:32:50 pauloscustodio Exp $
+;	$Id: stencil_render.asm,v 1.3 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 .stencil_render
+._stencil_render
 		ld	ix,2
 		add	ix,sp
 

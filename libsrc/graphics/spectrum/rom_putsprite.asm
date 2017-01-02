@@ -6,10 +6,11 @@
 ; ZX Spectrum ROM version, a bit slower
 ;
 ;
-; $Id: rom_putsprite.asm,v 1.3 2016-07-02 09:01:36 dom Exp $
+; $Id: rom_putsprite.asm,v 1.4 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 	PUBLIC    putsprite
+   PUBLIC    _putsprite
 	EXTERN	pixeladdress
 	EXTERN	zx_saddrpdown
 
@@ -25,6 +26,7 @@
          defb	128,64,32,16,8,4,2,1
 
 .putsprite
+._putsprite
 
         ld      hl,2   
         add     hl,sp

@@ -6,11 +6,13 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.3 2015-01-19 01:32:50 pauloscustodio Exp $
+;	$Id: swapgfxbk.asm,v 1.4 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
                 PUBLIC    swapgfxbk
+                PUBLIC    _swapgfxbk
 		PUBLIC	swapgfxbk1
+      PUBLIC   _swapgfxbk1
 
 		EXTERN	ozactivepage
 
@@ -18,6 +20,7 @@
 
 
 .swapgfxbk
+._swapgfxbk
 		push	bc
 	        ld      bc,(ozactivepage)
 	        ld      a,c
@@ -29,6 +32,7 @@
 		ret
 
 .swapgfxbk1
+._swapgfxbk1
 		ld      a,7
 		out     (3),a
 		ld      a,4

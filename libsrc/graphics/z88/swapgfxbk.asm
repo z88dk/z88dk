@@ -10,22 +10,26 @@
 ;       Simply does a swap...
 
 ;
-;	$Id: swapgfxbk.asm,v 1.7 2016-04-23 21:05:46 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.8 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 		SECTION   code_clib
                 PUBLIC    swapgfxbk
+                PUBLIC    _swapgfxbk
 
                 EXTERN    gfx_bank
 		EXTERN	  z88_map_bank
 
 		PUBLIC	swapgfxbk1
+      PUBLIC   _swapgfxbk1
 
 
 		INCLUDE	"graphics/grafix.inc"
 
 .swapgfxbk
+._swapgfxbk
 .swapgfxbk1
+._swapgfxbk1
                 push    hl
                 push    de
                 ld      hl,z88_map_bank       ;$4Dx

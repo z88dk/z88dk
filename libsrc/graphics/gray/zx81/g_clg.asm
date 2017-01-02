@@ -3,7 +3,7 @@
 ;
 ;       Written by Stefano Bodrato - Oct 2007
 ;
-;	$Id: g_clg.asm,v 1.2 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: g_clg.asm,v 1.3 2017-01-02 22:57:58 aralbrec Exp $
 ;
 ;
 
@@ -12,12 +12,14 @@
 
 
 		PUBLIC    g_clg
+      PUBLIC    _g_clg
 		EXTERN	base_graphics
 
 		EXTERN	graybit1
 		EXTERN	graybit2
 
 .g_clg
+._g_clg
 		pop	hl
 		pop	bc
 		ld	a,c	;GrayLevel

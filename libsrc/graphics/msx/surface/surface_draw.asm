@@ -14,7 +14,7 @@
 ;	Stefano Bodrato - 27/02/2009
 ;
 ;
-;	$Id: surface_draw.asm,v 1.7 2016-07-14 17:44:17 pauloscustodio Exp $
+;	$Id: surface_draw.asm,v 1.8 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 		SECTION	  code_clib
@@ -31,6 +31,7 @@
 
 
 .surface_draw
+._surface_draw
 		push	ix	;save callers
 		ld	ix,2
 		add	ix,sp

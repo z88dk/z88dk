@@ -1,5 +1,6 @@
 	SECTION code_clib
 	PUBLIC	fill
+   PUBLIC   _fill
 	EXTERN	w_pixeladdress
 	EXTERN swapgfxbk
 	EXTERN swapgfxbk1
@@ -11,6 +12,7 @@
 ;.sline2	defs 1024 * 2 * 3
 
 .fill
+._fill
 		pop bc
 		pop de  ; y
 		pop hl  ; x

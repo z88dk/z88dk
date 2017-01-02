@@ -4,13 +4,14 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_draw.asm,v 1.5 2015-01-22 17:23:48 stefano Exp $
+;	$Id: g_draw.asm,v 1.6 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 ;Usage: g_draw(int x1, int y1, int x2, int y2, int GrayLevel)
 
 
                 PUBLIC    g_draw
+                PUBLIC    _g_draw
 
                 EXTERN     Line
                 EXTERN     plotpixel
@@ -19,6 +20,7 @@
 
 
 .g_draw
+._g_draw
 		ld	ix,0
 		add	ix,sp
 		ld	a,(ix+2)	;GrayLevel

@@ -9,6 +9,7 @@
 ;
 
 	PUBLIC    putsprite
+   PUBLIC    _putsprite
 	EXTERN	pixeladdress
 	EXTERN     swapgfxbk
         EXTERN	swapgfxbk1
@@ -16,7 +17,7 @@
 	INCLUDE	"graphics/grafix.inc"
 
 ;
-;	$Id: putsprite.asm,v 1.4 2016-07-02 09:01:36 dom Exp $
+;	$Id: putsprite.asm,v 1.5 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 ; __gfx_coords: d,e (vert-horz)
@@ -27,6 +28,7 @@
 	defb	1,2,4,8,16,32,64,128
 	
 .putsprite
+._putsprite
 
         ld      hl,2   
         add     hl,sp

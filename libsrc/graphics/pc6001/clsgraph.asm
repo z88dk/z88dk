@@ -1,11 +1,12 @@
 
         SECTION code_clib
 	PUBLIC	cleargraphics
+   PUBLIC   _cleargraphics
 
 	EXTERN	base_graphics
 
 ;
-;	$Id: clsgraph.asm,v 1.3 2016-06-23 19:53:27 dom Exp $
+;	$Id: clsgraph.asm,v 1.4 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 ; ******************************************************************
@@ -20,6 +21,7 @@
 ;		.f....../....	different
 ;
 .cleargraphics
+._cleargraphics
 
 ;	LD HL,0101h
 ;	CALL 11CDh      ; L2A - convert location to screen address

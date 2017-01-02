@@ -4,17 +4,19 @@
 ;       TI Calc version by Stefano Bodrato  Mar - 2000
 ;
 ;
-;	$Id: clg.asm,v 1.4 2015-01-19 01:32:51 pauloscustodio Exp $
+;	$Id: clg.asm,v 1.5 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 
 	INCLUDE "graphics/grafix.inc"    ; Contains fn defs
 
 	PUBLIC    clg
+   PUBLIC    _clg
 	EXTERN	base_graphics
 	EXTERN	cpygraph
 
 .clg
+._clg
   	ld	hl,(base_graphics)
 	ld	(hl),0
 	ld	d,h

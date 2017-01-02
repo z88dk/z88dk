@@ -4,7 +4,7 @@
 ; VZ200/300 version
 ;
 ;
-; $Id: bksave.asm,v 1.7 2016-07-02 09:01:36 dom Exp $
+; $Id: bksave.asm,v 1.8 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 	SECTION	 code_clib
@@ -13,6 +13,7 @@
 	EXTERN	pixeladdress
 
 .bksave
+._bksave
 	push	ix	;save callers
         ld      hl,4
         add     hl,sp

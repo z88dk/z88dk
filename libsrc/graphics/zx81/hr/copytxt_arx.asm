@@ -7,7 +7,7 @@
 ; Original function name: "HRG_Tool_TXTcopy"
 ;--------------------------------------------------------------
 ;
-;	$Id: copytxt_arx.asm,v 1.4 2016-06-27 20:26:33 dom Exp $
+;	$Id: copytxt_arx.asm,v 1.5 2017-01-02 22:58:00 aralbrec Exp $
 ;
 ;----------------------------------------------------------------
 ;
@@ -20,10 +20,12 @@
 
 	SECTION smc_clib
 	PUBLIC	copytxt
+   PUBLIC   copytxt
 
 	EXTERN	base_graphics
 
 copytxt:
+_copytxt:
 	ld	(ovmode),hl
 	
 	ld	hl,(base_graphics)

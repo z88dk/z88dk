@@ -6,14 +6,16 @@
 ;       Stefano Bodrato - Oct 2015
 ;
 ;
-;       $Id: clsgraph.asm,v 1.2 2016-06-16 19:38:12 dom Exp $
+;       $Id: clsgraph.asm,v 1.3 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
         SECTION code_clib
         PUBLIC    cleargraphics
+        PUBLIC    _cleargraphics
 	EXTERN	base_graphics
 
 .cleargraphics
+._cleargraphics
 ;	ld d,' '
 ;	ld e,7 ; white on black
 	

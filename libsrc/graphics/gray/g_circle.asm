@@ -4,13 +4,14 @@
 ;       Written by Stefano Bodrato - Mar 2001
 ;
 ;
-;	$Id: g_circle.asm,v 1.4 2015-01-19 01:32:49 pauloscustodio Exp $
+;	$Id: g_circle.asm,v 1.5 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 ;Usage: g_circle(int x, int y, int radius, int skip, int GrayLevel)
 
 
                 PUBLIC    g_circle
+                PUBLIC    _g_circle
 
                 EXTERN     draw_circle
                 EXTERN     plotpixel
@@ -19,6 +20,7 @@
 
 
 .g_circle
+._g_circle
 		ld	ix,0
 		add	ix,sp
 		ld	a,(ix+2)	;GrayLevel

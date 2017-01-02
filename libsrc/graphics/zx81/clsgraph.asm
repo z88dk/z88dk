@@ -1,8 +1,9 @@
         SECTION code_clib
 	PUBLIC	cleargraphics
+   PUBLIC   _cleargraphics
 
 ;
-;	$Id: clsgraph.asm,v 1.6 2016-06-27 20:26:32 dom Exp $
+;	$Id: clsgraph.asm,v 1.7 2017-01-02 22:58:00 aralbrec Exp $
 ;
 
 ; ******************************************************************
@@ -13,6 +14,7 @@
 		EXTERN	filltxt
 
 .cleargraphics
+._cleargraphics
 		ld	l,0
 		jp	filltxt
 		

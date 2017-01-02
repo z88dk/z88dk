@@ -6,11 +6,12 @@
 ; TIKI-100 high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.4 2016-10-14 06:40:26 stefano Exp $
+; $Id: w_putsprite.asm,v 1.5 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 		SECTION code_clib
         PUBLIC    putsprite
+        PUBLIC    _putsprite
         EXTERN    w_pixeladdress
 
         EXTERN    swapgfxbk
@@ -27,6 +28,7 @@
 
 
 .putsprite
+._putsprite
 		
         ld      hl,2   
         add     hl,sp

@@ -31,7 +31,7 @@
 	;EXTERN swapgfxbk1
 
 ;	
-;	$Id: stencil_render.asm,v 1.6 2016-07-14 17:44:17 pauloscustodio Exp $
+;	$Id: stencil_render.asm,v 1.7 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 .stencil_exit
@@ -39,6 +39,7 @@
 		ret
 	
 .stencil_render
+._stencil_render
 		push	ix	;save callers
 		ld	ix,4
 		add	ix,sp

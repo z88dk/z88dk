@@ -3,11 +3,12 @@
 ;       Stefano - 10/1/2007
 ;
 ;
-;	$Id: clg.asm,v 1.4 2016-06-23 19:41:02 dom Exp $
+;	$Id: clg.asm,v 1.5 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 		SECTION code_clib
                 PUBLIC    clg
+                PUBLIC    _clg
 
 .clg
 ._clg

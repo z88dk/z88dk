@@ -7,7 +7,7 @@
 ;       Clears graph screen.
 ;
 ;
-;	$Id: clsgraph.asm,v 1.7 2016-08-05 07:04:09 stefano Exp $
+;	$Id: clsgraph.asm,v 1.8 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 
@@ -15,10 +15,12 @@
 
 		        SECTION code_clib
 			PUBLIC	cleargraphics
+         PUBLIC   _cleargraphics
 			EXTERN	base_graphics
 
 
 .cleargraphics
+._cleargraphics
 
 	ld	hl,(base_graphics)
 	ld	d,h

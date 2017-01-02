@@ -7,7 +7,7 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.5 2017-01-02 22:57:59 aralbrec Exp $
 ;
 ; registers changed after return:
 ;  ..bcdejl/..iy same
@@ -17,12 +17,15 @@
 
 		SECTION	  code_clib	
                 PUBLIC    swapgfxbk
+                PUBLIC    _swapgfxbk
 
 		PUBLIC	swapgfxbk1
+      PUBLIC   _swapgfxbk1
 
 
 
 .swapgfxbk
+._swapgfxbk
 		di
 		pop     iy
 		ld      (swapsp),sp
@@ -38,6 +41,7 @@
 		jp      (iy)
 
 .swapgfxbk1
+._swapgfxbk1
 		ld	a,0
 		out	(250),a
 		ld	sp,(swapsp)

@@ -5,12 +5,14 @@
 ;	CLOSEGFX - wait for keypress
 ;
 ;
-;	$Id: closegfx.asm,v 1.4 2015-01-23 07:07:31 stefano Exp $
+;	$Id: closegfx.asm,v 1.5 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 	PUBLIC    closegfx
+   PUBLIC    _closegfx
 
 .closegfx
+._closegfx
 
 IF FORti82
 ; This is called before scrolling: we wait for any keypress

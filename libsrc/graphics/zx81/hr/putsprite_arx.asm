@@ -6,10 +6,11 @@
 ; ZX81 - ARX816 mode version
 ;
 ;
-; $Id: putsprite_arx.asm,v 1.2 2015-01-19 01:32:52 pauloscustodio Exp $
+; $Id: putsprite_arx.asm,v 1.3 2017-01-02 22:58:00 aralbrec Exp $
 ;
 
 	PUBLIC    putsprite
+   PUBLIC    _putsprite
 	EXTERN	pixeladdress
 	EXTERN     swapgfxbk
         EXTERN	swapgfxbk1
@@ -28,6 +29,7 @@
 
 
 .putsprite
+._putsprite
 	
         ld      hl,2   
         add     hl,sp

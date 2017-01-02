@@ -3,19 +3,23 @@
 ;       Doesn't really page on the MSX.
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.6 2016-06-21 20:16:35 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.7 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 		SECTION   code_clib
                 PUBLIC    swapgfxbk
+                PUBLIC    _swapgfxbk
 		EXTERN	pixeladdress
 
 		PUBLIC	swapgfxbk1
+      PUBLIC   _swapgfxbk1
 
 .swapgfxbk
+._swapgfxbk
 		di
 		ret
 
 .swapgfxbk1
+._swapgfxbk1
 		ei
                 ret

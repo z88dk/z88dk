@@ -13,7 +13,7 @@
 ;       Stefano - Sept 2011
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.5 2016-06-22 22:40:19 dom Exp $
+;	$Id: swapgfxbk.asm,v 1.6 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 ;    INCLUDE "flos.def"
@@ -21,10 +21,13 @@
 
 		SECTION code_clib
 		PUBLIC    swapgfxbk
+      PUBLIC    _swapgfxbk
 		PUBLIC	swapgfxbk1
+      PUBLIC   _swapgfxbk1
 
 
 .swapgfxbk
+._swapgfxbk
 		;call kjt_wait_vrt		; wait for last line of display
 		;call kjt_page_in_video	; page video RAM in at $2000-$3fff
 		
@@ -37,6 +40,7 @@
 		ret
 
 .swapgfxbk1
+._swapgfxbk1
 		ld	 (asave),a
 		in a,(sys_mem_select)	; page in video RAM
 		and $bf

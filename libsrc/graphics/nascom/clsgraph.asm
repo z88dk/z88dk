@@ -6,11 +6,12 @@
 ;       Stefano Bodrato - June 2003
 ;
 ;
-;       $Id: clsgraph.asm,v 1.5 2016-06-20 21:47:41 dom Exp $
+;       $Id: clsgraph.asm,v 1.6 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
 	SECTION	 code_clib
         PUBLIC    cleargraphics
+        PUBLIC    _cleargraphics
         EXTERN     ansi_cls
 
 defc	vram	=	0800h
@@ -20,6 +21,7 @@ defc	vl15	=	vram+038ah
 defc	vend	=	vram+0400h
 
 .cleargraphics
+._cleargraphics
 
 ;	call	montest
 ;	jr	nz,nassys

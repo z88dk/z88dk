@@ -1,11 +1,12 @@
 
 	SECTION	code_clib
 	PUBLIC	cleargraphics
+   PUBLIC   _cleargraphics
 
 	EXTERN	base_graphics
 
 ;
-;	$Id: clsgraph.asm,v 1.6 2016-06-20 21:47:41 dom Exp $
+;	$Id: clsgraph.asm,v 1.7 2017-01-02 22:57:59 aralbrec Exp $
 ;
 
 ; ******************************************************************
@@ -20,6 +21,7 @@
 ;		.f....../....	different
 ;
 .cleargraphics
+._cleargraphics
 				push	bc
 				push	de
 				push	hl
