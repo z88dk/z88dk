@@ -40,7 +40,7 @@ apktest.sms: testtxt_apk.o apktest.c
 chicken_graphics.o: chicken_graphics.asm road.til sidewalk.til car1.til
 	z80asm -d chicken_graphics.asm
 
-chicken.bin: chicken_graphics.o chicken.c
+chicken.sms: chicken_graphics.o chicken.c
 	zcc +sms $(CFLAGS) chicken_graphics.o chicken.c -o chicken.bin  -create-app
 	echo chicken.map chicken.sym
 
