@@ -1,12 +1,12 @@
 
-all: test.sms libctest.sms pongmstr.sms pngmstr2.sms apktest.sms chicken.sms testsnd.sms
+all: test.bin libctest.bin pongmstr.bin pngmstr2.bin apktest.bin chicken.bin testsnd.bin
 
-test.sms: test.c
-	zcc +sms test.c -o test.sms -m
+test.bin: test.c
+	zcc +sms test.c -o test.bin -m
 	echo test.map test.sym
 	
-libctest.sms: libctest.c
-	zcc +sms libctest.c -o libctest.sms -m
+libctest.bin: libctest.c
+	zcc +sms libctest.c -o libctest.bin -m
 	echo libctest.map libctest.sym
 
 pong_graphics.o: pong_graphics.asm batnball.til numbers.til bkg.til icons.til
@@ -15,27 +15,27 @@ pong_graphics.o: pong_graphics.asm batnball.til numbers.til bkg.til icons.til
 testtxt_apk.o: testtxt_apk.asm testtxt.apk
 	z80asm -d testtxt_apk.asm
 
-pongmstr.sms: pong_graphics.o pongmstr.c
-	zcc +sms pong_graphics.o pongmstr.c -o pongmstr.sms -m -create-app
+pongmstr.bin: pong_graphics.o pongmstr.c
+	zcc +sms pong_graphics.o pongmstr.c -o pongmstr.bin -m -create-app
 	echo pongmstr.map pongmstr.sym
 
-pngmstr2.sms: pong_graphics.o pngmstr2.c
-	zcc +sms pong_graphics.o pngmstr2.c -o pngmstr2.sms -m -create-app
+pngmstr2.bin: pong_graphics.o pngmstr2.c
+	zcc +sms pong_graphics.o pngmstr2.c -o pngmstr2.bin -m -create-app
 	echo pngmstr2.map pngmstr2.sym
 
-apktest.sms: testtxt_apk.o apktest.c
-	zcc +sms testtxt_apk.o apktest.c -o apktest.sms -m -create-app
+apktest.bin: testtxt_apk.o apktest.c
+	zcc +sms testtxt_apk.o apktest.c -o apktest.bin -m -create-app
 	echo apktest.map apktest.sym
 
 chicken_graphics.o: chicken_graphics.asm road.til sidewalk.til car1.til
 	z80asm -d chicken_graphics.asm
 
-chicken.sms: chicken_graphics.o chicken.c
-	zcc +sms chicken_graphics.o chicken.c -o chicken.sms -m -create-app
+chicken.bin: chicken_graphics.o chicken.c
+	zcc +sms chicken_graphics.o chicken.c -o chicken.bin -m -create-app
 	echo chicken.map chicken.sym
 
-testsnd.sms: testsnd.c
-	zcc +sms testsnd.c -o testsnd.sms -m -create-app
+testsnd.bin: testsnd.c
+	zcc +sms testsnd.c -o testsnd.bin -m -create-app
 	echo testsnd.map testsnd.sym
 
 clean:
