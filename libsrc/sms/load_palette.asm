@@ -1,5 +1,6 @@
 	SECTION code_clib	
 	PUBLIC	load_palette
+	PUBLIC	_load_palette
 
 ;==============================================================
 ; void load_palette(unsigned char *data, int index, int count)
