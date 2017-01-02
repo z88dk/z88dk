@@ -9,11 +9,12 @@
 ; Uses plotpixel, respixel and xorpixel
 ;
 ;
-; $Id: w_putsprite2.asm,v 1.3 2016-07-02 09:01:35 dom Exp $
+; $Id: w_putsprite2.asm,v 1.4 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 
 	PUBLIC    putsprite
+   PUBLIC    _putsprite
 
 	EXTERN	w_plotpixel
 	EXTERN	w_respixel
@@ -23,6 +24,7 @@
 ; sprite: (ix)
 
 .putsprite
+._putsprite
 
         ld      hl,2   
         add     hl,sp

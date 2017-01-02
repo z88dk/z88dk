@@ -10,21 +10,25 @@
 ;       Simply does a swap...
 ;
 ;
-;	$Id: swapgfxbk.asm,v 1.1 2016-11-21 11:18:38 stefano Exp $
+;	$Id: swapgfxbk.asm,v 1.2 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 
 		SECTION	code_clib
                 PUBLIC    swapgfxbk
+                PUBLIC    _swapgfxbk
 
 		PUBLIC	swapgfxbk1
+      PUBLIC   _swapgfxbk1
 
 
 .swapgfxbk
+._swapgfxbk
 		di
 		ret
 
 .swapgfxbk1
+._swapgfxbk1
 	di
 ;	ld a,128		; premium graphics on
 ;	out ($1c),a

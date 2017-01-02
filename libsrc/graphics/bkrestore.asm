@@ -3,7 +3,7 @@
 ;
 ;	Generic version (just a bit slow)
 ;
-;	$Id: bkrestore.asm,v 1.8 2016-04-13 21:09:09 dom Exp $
+;	$Id: bkrestore.asm,v 1.9 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 	SECTION	 code_clib
@@ -13,6 +13,7 @@
 
 
 .bkrestore
+._bkrestore
 	push	ix
 ; __FASTCALL__ : sprite ptr in HL
 	

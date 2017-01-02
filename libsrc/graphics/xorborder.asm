@@ -1,11 +1,12 @@
 	SECTION code_clib
 	PUBLIC	xorborder
+   PUBLIC   _xorborder
 	EXTERN	xorpixel
         EXTERN     swapgfxbk
 	EXTERN	__graphics_end
 
 ;
-;	$Id: xorborder.asm,v 1.6 2016-04-23 20:37:40 dom Exp $
+;	$Id: xorborder.asm,v 1.7 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 ; ***********************************************************************
@@ -21,6 +22,7 @@
 ;
 
 .xorborder
+._xorborder
 		push	ix
 		call	swapgfxbk
 		

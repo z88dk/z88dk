@@ -6,7 +6,7 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: lscroll.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
+;	$Id: lscroll.asm,v 1.7 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 
@@ -15,12 +15,14 @@
 
         SECTION code_clib
                 PUBLIC    lscroll
+                PUBLIC    _lscroll
 
                 EXTERN     scroll_left
 
 
 
 .lscroll
+._lscroll
 		push	ix
 		ld	ix,2
 		add	ix,sp

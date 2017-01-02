@@ -9,13 +9,15 @@
 ;       imported by Stefano Bodrato - 29/12/2006  :o)
 ;
 ;
-;       $Id: clsgraph.asm,v 1.3 2016-06-20 21:47:41 dom Exp $
+;       $Id: clsgraph.asm,v 1.4 2017-01-02 21:51:23 aralbrec Exp $
 ;
 
 		SECTION	  code_clib
 		PUBLIC    cleargraphics
+      PUBLIC    _cleargraphics
 
 .cleargraphics
+._cleargraphics
 		push	ix	;save callers
 		ld	ix,884
 		ld	b,24

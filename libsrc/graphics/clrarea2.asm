@@ -1,4 +1,5 @@
 
+   SECTION  code_clib
 
 	PUBLIC	cleararea
 
@@ -6,7 +7,7 @@
 	EXTERN leftbitmask, rightbitmask
 
 ;
-;	$Id: clrarea2.asm,v 1.5 2016-04-13 21:09:09 dom Exp $
+;	$Id: clrarea2.asm,v 1.6 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 ; ***********************************************************************

@@ -7,7 +7,7 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_unplot.asm,v 1.3 2016-04-23 20:37:40 dom Exp $
+;	$Id: w_unplot.asm,v 1.4 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 ;Usage: unplot(int x, int y)
@@ -15,12 +15,14 @@
 
 	SECTION   code_clib
                 PUBLIC    unplot
+                PUBLIC    _unplot
                 EXTERN     swapgfxbk
                 EXTERN    swapgfxbk1
 
                 EXTERN     w_respixel
 
 .unplot
+._unplot
 		pop	bc
 		pop	de
 		pop	hl

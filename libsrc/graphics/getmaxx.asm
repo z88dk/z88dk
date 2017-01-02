@@ -3,7 +3,7 @@
 ;
 ;       Written around the Interlogic Standard Library
 ;
-;	$Id: getmaxx.asm,v 1.4 2016-04-13 21:09:09 dom Exp $
+;	$Id: getmaxx.asm,v 1.5 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 
@@ -12,7 +12,9 @@
 
                 SECTION         code_clib
                 PUBLIC    getmaxx
+                PUBLIC    _getmaxx
 
 .getmaxx
+._getmaxx
 		ld	hl,maxx-1
 		ret

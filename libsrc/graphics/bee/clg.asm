@@ -6,11 +6,12 @@
 ;       Stefano Bodrato - 2016
 ;
 ;
-;       $Id: clg.asm,v 1.4 2016-11-21 11:18:37 stefano Exp $
+;       $Id: clg.asm,v 1.5 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 			SECTION code_clib
 			PUBLIC  clg
+         PUBLIC  _clg
 			EXTERN  cleargraphics
 
 
@@ -30,6 +31,7 @@
 
 
 .clg
+._clg
 
 	LD	HL,vdutab
 	LD  C,0

@@ -7,7 +7,7 @@
 ;
 ;       Wide resolution (WORD based parameters) version by Stefano Bodrato
 ;
-;	$Id: w_point.asm,v 1.3 2016-04-13 21:09:09 dom Exp $
+;	$Id: w_point.asm,v 1.4 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 
@@ -17,6 +17,7 @@
 
         SECTION code_clib
                 PUBLIC    point
+                PUBLIC    _point
 
                 EXTERN     w_pointxy
                 EXTERN     swapgfxbk

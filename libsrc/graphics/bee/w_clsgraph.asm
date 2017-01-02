@@ -7,11 +7,12 @@
 ;       Stefano Bodrato - 2016
 ;
 ;
-;       $Id: w_clsgraph.asm,v 1.2 2016-11-25 14:45:01 stefano Exp $
+;       $Id: w_clsgraph.asm,v 1.3 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 			SECTION   code_clib
 			PUBLIC    cleargraphics
+         PUBLIC    _cleargraphics
 
 			EXTERN	swapgfxbk
 			EXTERN	swapgfxbk1
@@ -20,6 +21,7 @@
 
 
 .cleargraphics
+._cleargraphics
 
 	call swapgfxbk
 

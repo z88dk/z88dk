@@ -6,19 +6,21 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: rscroll.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
+;	$Id: rscroll.asm,v 1.7 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 
 
         SECTION code_clib
                 PUBLIC    rscroll
+                PUBLIC    _rscroll
 
                 EXTERN     scroll_right
 
 
 
 .rscroll
+._rscroll
 		push	ix
 		ld	ix,2
 		add	ix,sp

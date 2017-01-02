@@ -6,11 +6,12 @@
 ;       Stefano Bodrato - 2014
 ;
 ;
-;       $Id: clsgraph.asm,v 1.4 2016-06-20 21:47:41 dom Exp $
+;       $Id: clsgraph.asm,v 1.5 2017-01-02 21:51:23 aralbrec Exp $
 ;
 
 			SECTION   code_clib
 			PUBLIC    cleargraphics
+         PUBLIC    _cleargraphics
 			EXTERN     loadudg6
 			EXTERN	base_graphics
 
@@ -18,6 +19,7 @@
 
 
 .cleargraphics
+._cleargraphics
 	
 	ld   c,0	; first UDG chr$ to load
 	ld	 b,64	; number of characters to load

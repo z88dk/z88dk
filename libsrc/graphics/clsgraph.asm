@@ -2,11 +2,12 @@
 
                 SECTION         code_clib
 	PUBLIC	cleargraphics
+   PUBLIC   _cleargraphics
 
 	EXTERN	base_graphics
 
 ;
-;	$Id: clsgraph.asm,v 1.6 2016-04-13 21:09:09 dom Exp $
+;	$Id: clsgraph.asm,v 1.7 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 ; ******************************************************************
@@ -20,7 +21,9 @@
 ;		a.bcdehl/ixiy	same
 ;		.f....../....	different
 ;
-.cleargraphics		push	bc
+.cleargraphics
+._cleargraphics
+            push	bc
 				push	de
 				push	hl
 				ld	hl,(base_graphics)	; base of	graphics area

@@ -6,13 +6,13 @@
 ;       Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: xordraw.asm,v 1.2 2016-11-10 07:34:55 stefano Exp $
+;	$Id: xordraw.asm,v 1.3 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 
                 SECTION         code_clib
                 PUBLIC    xordraw
-		PUBLIC	  _draw
+		PUBLIC	  _xordraw
                 EXTERN     swapgfxbk
 		EXTERN        __graphics_end
 

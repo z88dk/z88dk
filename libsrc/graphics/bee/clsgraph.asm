@@ -6,11 +6,12 @@
 ;       Stefano Bodrato - 2016
 ;
 ;
-;       $Id: clsgraph.asm,v 1.4 2016-11-21 11:18:37 stefano Exp $
+;       $Id: clsgraph.asm,v 1.5 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
 			SECTION   code_clib
 			PUBLIC    cleargraphics
+         PUBLIC    _cleargraphics
 			EXTERN     loadudg6
 			EXTERN     swapgfxbk
 			;EXTERN	base_graphics
@@ -19,6 +20,7 @@
 
 
 .cleargraphics
+._cleargraphics
 
 	call	swapgfxbk
 

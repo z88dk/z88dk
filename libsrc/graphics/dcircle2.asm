@@ -7,9 +7,8 @@
 ;	Non IY dependent (self modifying code)
 ;	A' isn't used
 ;
-;	$Id: dcircle2.asm,v 1.5 2015-01-19 01:32:46 pauloscustodio Exp $
+;	$Id: dcircle2.asm,v 1.6 2017-01-02 21:51:24 aralbrec Exp $
 ;
-
 
                 PUBLIC    draw_circle
 
@@ -30,6 +29,7 @@ DEFVARS 0
 ;Entry:
 ;       b=x0 c=y0, d=radius, e=scale factor
 ;       ix=plot routine
+
 
 .draw_circle
 	ld	(plt+1),ix

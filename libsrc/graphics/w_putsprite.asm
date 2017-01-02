@@ -6,11 +6,12 @@
 ; Generic high resolution version
 ;
 ;
-; $Id: w_putsprite.asm,v 1.7 2016-11-25 14:45:01 stefano Exp $
+; $Id: w_putsprite.asm,v 1.8 2017-01-02 21:51:24 aralbrec Exp $
 ;
 
         SECTION code_clib
         PUBLIC    putsprite
+        PUBLIC    _putsprite
         EXTERN    w_pixeladdress
 
         EXTERN    swapgfxbk
@@ -27,6 +28,7 @@
 
 
 .putsprite
+._putsprite
         
         ld      hl,2   
         add     hl,sp
