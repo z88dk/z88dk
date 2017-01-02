@@ -15,7 +15,7 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: nb_putval.asm,v 1.3 2016-06-19 20:33:40 dom Exp $
+; $Id: nb_putval.asm,v 1.4 2017-01-02 23:31:08 aralbrec Exp $
 ;
 
         SECTION code_clib
@@ -26,6 +26,7 @@
 
 
 .nb_putval
+._nb_putval
 	push	ix		;save callers
 	ld	ix,4
 	add	ix,sp

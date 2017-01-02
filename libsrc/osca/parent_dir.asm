@@ -4,13 +4,14 @@
 ;
 ;
 ;
-;	$Id: parent_dir.asm,v 1.3 2016-06-22 22:13:09 dom Exp $
+;	$Id: parent_dir.asm,v 1.4 2017-01-02 23:35:59 aralbrec Exp $
 ;
 
     INCLUDE "flos.def"
 
 	SECTION code_clib
 	PUBLIC  parent_dir
+   PUBLIC  _parent_dir
 	EXTERN   flos_err
 
 parent_dir:
