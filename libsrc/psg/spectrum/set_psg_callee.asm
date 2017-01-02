@@ -7,7 +7,7 @@
 ;	Play a sound by PSG
 ;
 ;
-;	$Id: set_psg_callee.asm,v 1.4 2016-06-10 21:13:58 dom Exp $
+;	$Id: set_psg_callee.asm,v 1.5 2017-01-02 23:57:08 aralbrec Exp $
 ;
 
 	SECTION code_clib
@@ -21,6 +21,7 @@
 
 	
 set_psg_callee:
+_set_psg_callee:
 
    pop hl
    pop de
