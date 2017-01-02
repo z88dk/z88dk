@@ -13,15 +13,17 @@
 ;
 ;
 ; ------
-; $Id: ozputsprite.asm,v 1.2 2015-01-19 01:33:01 pauloscustodio Exp $
+; $Id: ozputsprite.asm,v 1.3 2017-01-02 23:50:32 aralbrec Exp $
 ;
 
 	PUBLIC	ozputsprite
+   PUBLIC   _ozputsprite
 
 	EXTERN	ozactivepage
 
 	
 ozputsprite:
+_ozputsprite:
 	ld      bc,TheSprite
 	;ld      hl,6
 	;add     hl,sp
