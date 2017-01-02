@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.193 2016-12-26 06:58:23 aralbrec Exp $
+*      $Id: zcc.c,v 1.194 2017-01-02 03:47:56 aralbrec Exp $
 */
 
 
@@ -81,6 +81,7 @@ static int             hassuffix(char *file, char *suffix_to_check);
 static char           *stripsuffix(char *, char *);
 static char           *changesuffix(char *, char *);
 static char           *last_path_char(char *filename);
+static int             is_path_absolute(char *filename);
 static int             process(char *, char *, char *, char *, enum iostyle, int, int, int);
 static int             linkthem(char *);
 static int             get_filetype_by_suffix(char *);
@@ -1089,7 +1090,7 @@ int main(int argc, char **argv)
             }
             else
             {
-                char *p, tmp[FILENAME_MAX + 2];
+                char *p, tmp[FILENAME_MAX*2 + 2];
 
                 // copy .asm file to temp directory
                 if (copy_file(filelist[i], "", ptr, "")) {
@@ -1097,19 +1098,32 @@ int main(int argc, char **argv)
                     exit(1);
                 }
 
-                // grab path to original source directory
-                if ((p = last_path_char(filelist[i])) == NULL)
+                // determine path to original source directory
+                p = last_path_char(filelist[i]);
+
+                if (!is_path_absolute(filelist[i]))
                 {
+                    int len;
 #ifdef WIN32
                     if (_getcwd(tmp, sizeof(tmp) - 1) == NULL)
-                        strcpy(tmp, ".");
+                        *tmp = '\0';
 #else
                     if (getcwd(tmp, sizeof(tmp) - 1) == NULL)
-                        strcpy(tmp, ".");
+                        *tmp = '\0';
 #endif
+                    if (p)
+                    {
+                        len = strlen(tmp);
+                        snprintf(tmp + len, sizeof(tmp) - len - 1, "/%.*s", p - filelist[i], filelist[i]);
+                    }
+
+                    if (*tmp == '\0')
+                        strcpy(tmp, ".");
                 }
+                else if (p)
+                    snprintf(tmp, sizeof(tmp) - 1, "%.*s", p - filelist[i], filelist[i]);
                 else
-                    snprintf(tmp, sizeof(tmp)-1, "%.*s", p - filelist[i], filelist[i]);
+                    strcpy(tmp, ".");
 
                 // working file is now the .asm file in the temp directory
                 free(filelist[i]);
@@ -1443,55 +1457,55 @@ void AddArray(arg_t *argument, char *arg)
 	char **arr = *(char ***)argument->data;
 	*argument->num_ptr = *argument->num_ptr + 1;
 	arr = realloc(arr, *argument->num_ptr * sizeof(char *));
-	arr[i] = expand_macros(arg);
-	*(char ***)argument->data = arr;
+arr[i] = expand_macros(arg);
+*(char ***)argument->data = arr;
 }
 
 
 
 void AddAppmake(arg_t *argument, char *arg)
 {
-	BuildOptions(&appmakeargs, arg);
+    BuildOptions(&appmakeargs, arg);
 }
 
 
 void AddToArgs(arg_t *argument, char *arg)
 {
-	BuildOptions(argument->data, arg + 3);
+    BuildOptions(argument->data, arg + 3);
 }
 
 void AddPreProcIncPath(arg_t *argument, char *arg)
 {
-	/* user-supplied inc path takes precedence over system-supplied inc path */
-	if (processing_user_command_line_arg)
-		BuildOptions(&cpp_incpath_first, arg);
-	else
-		BuildOptions(&cpp_incpath_last, arg);
+    /* user-supplied inc path takes precedence over system-supplied inc path */
+    if (processing_user_command_line_arg)
+        BuildOptions(&cpp_incpath_first, arg);
+    else
+        BuildOptions(&cpp_incpath_last, arg);
 }
 
 void AddPreProc(arg_t *argument, char *arg)
 {
-	BuildOptions(&cpparg, arg);
-	BuildOptions(&clangarg, arg);
+    BuildOptions(&cpparg, arg);
+    BuildOptions(&clangarg, arg);
 }
 
 
 void AddLinkLibrary(arg_t *argument, char *arg)
 {
-	/* user-supplied lib takes precedence over system-supplied lib */
-	if (processing_user_command_line_arg)
-		BuildOptions(&linker_linklib_first, arg);
-	else
-		BuildOptions(&linker_linklib_last, arg);
+    /* user-supplied lib takes precedence over system-supplied lib */
+    if (processing_user_command_line_arg)
+        BuildOptions(&linker_linklib_first, arg);
+    else
+        BuildOptions(&linker_linklib_last, arg);
 }
 
 void AddLinkSearchPath(arg_t *argument, char *arg)
 {
-	/* user-supplied lib path takes precedence over system-supplied lib path */
-	if (processing_user_command_line_arg)
-		BuildOptions(&linker_libpath_first, arg);
-	else
-		BuildOptions(&linker_libpath_last, arg);
+    /* user-supplied lib path takes precedence over system-supplied lib path */
+    if (processing_user_command_line_arg)
+        BuildOptions(&linker_libpath_first, arg);
+    else
+        BuildOptions(&linker_libpath_last, arg);
 }
 
 
@@ -1499,31 +1513,31 @@ void AddLinkSearchPath(arg_t *argument, char *arg)
 */
 void BuildOptions(char **list, char *arg)
 {
-	char           *val;
-	char           *orig = *list;
+    char           *val;
+    char           *orig = *list;
 
-	zcc_asprintf(&val, "%s%s ", orig ? orig : "", arg);
+    zcc_asprintf(&val, "%s%s ", orig ? orig : "", arg);
 
-	free(orig);
-	*list = val;
+    free(orig);
+    *list = val;
 }
 
 void BuildOptions_start(char **list, char *arg)
 {
-	char           *val;
-	char           *orig = *list;
+    char           *val;
+    char           *orig = *list;
 
-	zcc_asprintf(&val, "%s %s", arg, orig ? orig : "");
+    zcc_asprintf(&val, "%s %s", arg, orig ? orig : "");
 
-	free(orig);
-	*list = val;
+    free(orig);
+    *list = val;
 }
 
 
 
 void add_option_to_compiler(char *arg)
 {
-	BuildOptions(&comparg, arg);
+    BuildOptions(&comparg, arg);
 }
 
 
@@ -1542,6 +1556,17 @@ char *last_path_char(char *filename)
     return p;
 }
 
+int is_path_absolute(char *p)
+{
+    while (*p && isspace(*p))
+        ++p;
+
+#ifdef WIN32
+    return ((*p == '/') || (*p == '\\') || (isalpha(*p) && (*(p + 1) == ':')));
+#else
+    return (*p == '/') || (*p == '\\');
+#endif
+}
 
 void gather_from_list_file(char *filename)
 {
@@ -1588,7 +1613,7 @@ void gather_from_list_file(char *filename)
 			}
 
 			// prepend path if filename is not absolute
-			if (!lstcwd && (*p != '/') && (*p != '\\'))
+			if (!lstcwd && !is_path_absolute(p))
 				strcat(outname, pathname);
 
 			// append rest of filename
