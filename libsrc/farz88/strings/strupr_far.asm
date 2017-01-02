@@ -2,18 +2,20 @@
 ; 1/4/00 GWL
 
 ;
-; $Id: strupr_far.asm,v 1.4 2016-06-10 22:43:44 dom Exp $
+; $Id: strupr_far.asm,v 1.5 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
         SECTION   code_clib
 		EXTERN farseg1,incfar
                 PUBLIC strupr_far
+                PUBLIC _strupr_far
 
 
 ;far *strupr(far *s)
 ; converts s to uppercase
 
 .strupr_far
+._strupr_far
 	pop	hl
 	pop	bc
 	pop	de		; EBC=far pointer

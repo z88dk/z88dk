@@ -2,18 +2,20 @@
 ; 1/4/00 GWL
 
 ;
-; $Id: strlwr_far.asm,v 1.4 2016-06-10 22:43:44 dom Exp $
+; $Id: strlwr_far.asm,v 1.5 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
         SECTION   code_clib
 		EXTERN farseg1,incfar
                 PUBLIC strlwr_far
+                PUBLIC _strlwr_far
 
 
 ;far *strlwr(far *s)
 ; converts s to lowercase
 
 .strlwr_far
+._strlwr_far
 	pop	hl
 	pop	bc
 	pop	de		; EBC=far pointer

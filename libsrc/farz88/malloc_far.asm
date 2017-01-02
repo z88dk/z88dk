@@ -3,11 +3,12 @@
 ; 30/3/00 Changed size type to long, so >64K mallocs possible
 
 ;
-; $Id: malloc_far.asm,v 1.5 2016-06-10 22:42:22 dom Exp $
+; $Id: malloc_far.asm,v 1.6 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
         SECTION   code_clib
         PUBLIC malloc_far
+        PUBLIC _malloc_far
 
         EXTERN    malloc_table,pool_table,farpages,farmemspec
         EXTERN    free_loop
@@ -17,6 +18,7 @@ include "memory.def"
 ; far *malloc(long size)
 
 .malloc_far
+._malloc_far
 	pop	de
         pop     bc
         pop     hl

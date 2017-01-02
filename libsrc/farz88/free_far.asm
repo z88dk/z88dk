@@ -1,11 +1,12 @@
 ; FREE function for far memory model
 ; 31/3/00 GWL
 ;
-; $Id: free_far.asm,v 1.5 2016-06-10 22:42:22 dom Exp $
+; $Id: free_far.asm,v 1.6 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
         SECTION code_clib
         PUBLIC    free_far
+        PUBLIC    _free_far
 
         PUBLIC    free_loop
         EXTERN    malloc_table,pool_table
@@ -16,6 +17,7 @@ include "memory.def"
 ; void free(far *p);
 
 .free_far
+._free_far
         pop     hl
         pop     bc
         pop     de              ; EBC=far pointer

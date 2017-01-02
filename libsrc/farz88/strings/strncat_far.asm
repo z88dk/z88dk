@@ -2,18 +2,20 @@
 ; 31/3/00 GWL
 
 ;
-; $Id: strncat_far.asm,v 1.4 2016-06-10 22:43:44 dom Exp $
+; $Id: strncat_far.asm,v 1.5 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
         SECTION   code_clib
                 EXTERN farseg1,incfar
                 PUBLIC strncat_far
+                PUBLIC _strncat_far
 
 
 ;far *strncat(far *s1,far *s2,int n)
 ; concatenates s2 onto the end of s1 (at most n chars) & null-terminates
 
 .strncat_far
+._strncat_far
         ld      ix,2
         add     ix,sp  
         ld      c,(ix+2)

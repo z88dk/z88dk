@@ -2,18 +2,20 @@
 ; 31/3/00 GWL
 
 ;
-; $Id: strlen_far.asm,v 1.4 2016-06-10 22:43:44 dom Exp $
+; $Id: strlen_far.asm,v 1.5 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
         SECTION   code_clib
 		EXTERN farseg1,incfar
                 PUBLIC strlen_far
+                PUBLIC _strlen_far
 
 
 ;int strlen(far *s)
 ; finds length of s
 
 .strlen_far
+._strlen_far
 	pop	hl
 	pop	bc
 	pop	de		; EBC=far pointer

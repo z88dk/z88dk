@@ -4,11 +4,12 @@
 ; This function should be called as part of the tidyup
 ; code for applications or packages using far memory
 ;
-; $Id: freeall_far.asm,v 1.5 2016-06-10 22:42:22 dom Exp $
+; $Id: freeall_far.asm,v 1.6 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
         SECTION code_clib
         PUBLIC    freeall_far
+        PUBLIC    _freeall_far
 
         EXTERN    pool_table
 
@@ -18,6 +19,7 @@ include "memory.def"
 ; void freeall(void);
 
 .freeall_far
+._freeall_far
         ld      hl,pool_table
         ld      b,224
 .freeloop

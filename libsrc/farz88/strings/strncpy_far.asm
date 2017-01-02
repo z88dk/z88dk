@@ -2,18 +2,20 @@
 ; 31/3/00 GWL
 
 ;
-; $Id: strncpy_far.asm,v 1.4 2016-06-10 22:43:44 dom Exp $
+; $Id: strncpy_far.asm,v 1.5 2017-01-02 20:37:10 aralbrec Exp $
 ;
 
         SECTION   code_clib
                 EXTERN farseg1,incfar
                 PUBLIC strncpy_far
+                PUBLIC _strncpy_far
 
 
 ;far *strncpy(far *s1,far *s2,int n)
 ; copies s2 to s1 for exactly n chars, padding with nulls or truncating
 
 .strncpy_far
+._strncpy_far
         ld      ix,2
         add     ix,sp  
         ld      c,(ix+6)
