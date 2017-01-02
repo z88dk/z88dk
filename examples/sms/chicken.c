@@ -26,7 +26,7 @@ unsigned int central_strip_pattern[] = {0x0003};
 unsigned int car1_map_r[] = {0x0008, 0x0009};
 unsigned int car1_map_l[] = {0x0209, 0x0208};
 
-extern unsigned char chicken_graphics();
+extern unsigned char chicken_graphics[];
 
 
 int rand_speed() {
