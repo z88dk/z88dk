@@ -1,4 +1,4 @@
-; $Id: bit_open_di_cpm.asm,v 1.1 2016-10-31 07:08:06 stefano Exp $
+; $Id: bit_open_di_cpm.asm,v 1.2 2017-01-02 21:15:51 aralbrec Exp $
 ;
 ; ZX Spectrum 1 bit sound functions
 ;
@@ -8,6 +8,7 @@
 ;
     SECTION    code_clib
     PUBLIC     bit_open_di
+    PUBLIC     _bit_open_di
     EXTERN     __snd_tick
     EXTERN     __bit_irqstatus
 	EXTERN	RG0SAV
@@ -15,6 +16,7 @@
     INCLUDE  "games/games.inc"
     
 .bit_open_di
+._bit_open_di
         
         ld a,i		; get the current status of the irq line
         di
