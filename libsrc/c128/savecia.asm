@@ -4,10 +4,11 @@
 ;
 ;	getk() Read key status
 ;
-;	$Id: savecia.asm,v 1.3 2016-06-16 21:13:07 dom Exp $
+;	$Id: savecia.asm,v 1.4 2017-01-02 19:56:32 aralbrec Exp $
 ;
 
 		SECTION code_clib
+      PUBLIC   savecia
 		PUBLIC	_savecia
 		PUBLIC	SaveA
 

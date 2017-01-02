@@ -7,17 +7,19 @@
 ;       It accepts the command name (it will be adapted "on the fly"),
 ;       and a list of pointers to variables.
 ;
-;       $Id: cpc_rsx.asm,v 1.4 2016-06-19 21:13:26 dom Exp $
+;       $Id: cpc_rsx.asm,v 1.5 2017-01-02 19:59:39 aralbrec Exp $
 ;
 
         SECTION   code_clib
         PUBLIC    cpc_rsx
+        PUBLIC    _cpc_rsx
 
         INCLUDE "cpcfirm.def"              
 
 
 
 .cpc_rsx
+._cpc_rsx
         ;call    firmware
         ;defw    kl_rom_walk
 	push	ix		;save callers
