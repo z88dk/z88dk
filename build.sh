@@ -47,6 +47,8 @@ if [ "`uname -s`" = "SunOS" ]; then
    INSTALL="ginstall"
 fi
 
+export INSTALL
+
 $MAKE -e
 $MAKE -C `pwd`/libsrc
 $MAKE -C `pwd`/libsrc install
