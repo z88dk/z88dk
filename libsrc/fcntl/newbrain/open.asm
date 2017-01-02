@@ -18,11 +18,12 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;
 ;
-; $Id: open.asm,v 1.4 2016-06-19 20:26:58 dom Exp $
+; $Id: open.asm,v 1.5 2017-01-02 21:02:22 aralbrec Exp $
 ;
 
         SECTION code_clib
 	PUBLIC	open
+   PUBLIC   _open
 	
 	EXTERN	nbhandl
 	EXTERN	nb_open

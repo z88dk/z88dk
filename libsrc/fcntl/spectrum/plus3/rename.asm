@@ -6,17 +6,19 @@
 ;
 ;	int rename(char *source, char *dest)
 ;
-;	$Id: rename.asm,v 1.5 2016-03-07 13:44:48 dom Exp $
+;	$Id: rename.asm,v 1.6 2017-01-02 21:02:22 aralbrec Exp $
 
 
 		SECTION	code_clib
 		PUBLIC	rename
+      PUBLIC   _rename
 		EXTERN	dodos
 
 		INCLUDE "p3dos.def"
 
 
 .rename
+._rename
 	pop	bc
 	pop	de	;new filename
 	pop	hl	;old

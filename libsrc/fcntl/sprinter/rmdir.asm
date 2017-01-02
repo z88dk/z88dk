@@ -1,16 +1,18 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: rmdir.asm,v 1.3 2016-03-13 18:14:13 dom Exp $
+;	$Id: rmdir.asm,v 1.4 2017-01-02 21:02:22 aralbrec Exp $
 ;
 
 
                 SECTION   code_clib
                 PUBLIC   rmdir
+                PUBLIC   _rmdir
 
 ;int rmdir(char *path, mode_t mode)
 
 
 .rmdir	
+._rmdir
 	pop	bc
 	pop	de
 	pop	hl

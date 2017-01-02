@@ -1,10 +1,11 @@
 ;	Sprinter fcntl library
 ;
-;	$Id: fdtell.asm,v 1.3 2016-03-13 18:14:13 dom Exp $
+;	$Id: fdtell.asm,v 1.4 2017-01-02 21:02:22 aralbrec Exp $
 ;
 
 		SECTION	  code_clib
                 PUBLIC    fdtell
+                PUBLIC    _fdtell
 
 ;int fdtell(int fd)
 ;
@@ -12,6 +13,7 @@
 
 
 .fdtell
+._fdtell
 	pop	bc
 	pop	hl	;fd
 	push	hl

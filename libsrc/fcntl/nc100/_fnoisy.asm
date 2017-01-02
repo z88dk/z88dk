@@ -1,6 +1,9 @@
 			
-i		SECTION code_clib
+		SECTION code_clib
 		PUBLIC _fnoisy
+      PUBLIC __fnoisy
 ; fastcall
-_fnoisy:	ex de, hl
+_fnoisy:
+__fnoisy:
+      ex de, hl
 		jp 0xb917

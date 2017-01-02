@@ -1,7 +1,10 @@
 		SECTION code_clib
 		PUBLIC _ftesteof
+      PUBLIC __ftesteof
 
-._ftesteof	pop hl
+._ftesteof
+.__ftesteof
+      pop hl
 		pop de
 		push de
 		push hl

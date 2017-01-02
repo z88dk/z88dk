@@ -5,16 +5,18 @@
 ;
 ; Not written as yet!
 ;
-; $Id: fdtell.asm,v 1.7 2016-03-07 13:44:48 dom Exp $
+; $Id: fdtell.asm,v 1.8 2017-01-02 21:02:22 aralbrec Exp $
 
 		SECTION	code_clib
 		PUBLIC	fdtell
+      PUBLIC   _fdtell
 
 	        INCLUDE "p3dos.def"
 
 		EXTERN	dodos
 
 .fdtell
+._fdtell
 	pop	hl	;ret address
 	pop	bc	;lower 8 is file handle
 	push	bc

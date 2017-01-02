@@ -3,7 +3,8 @@
 		PUBLIC	__fsetattr
 
 .__fgetattr
-._fsetattr	pop de
+._fsetattr
+      pop de
 		pop hl
 		pop bc
 		push bc
