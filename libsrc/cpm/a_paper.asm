@@ -12,17 +12,19 @@
 ;		In a running system this is in bank 0, two bytes after the address in 00CCh.
 ; 
 ;
-;       $Id: a_paper.asm,v 1.2 2016-11-03 09:25:27 stefano Exp $
+;       $Id: a_paper.asm,v 1.3 2017-01-02 20:06:48 aralbrec Exp $
 ;
 
 	SECTION code_clib
 
 	PUBLIC	a_paper
+   PUBLIC   _a_paper
 	
 	EXTERN	subuserf
 	INCLUDE	"amstrad_userf.def"
 
 a_paper:
+_a_paper:
 	xor a
 	ld b,l
 	ld c,l

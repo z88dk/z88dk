@@ -5,18 +5,20 @@
 ;
 ;       CPM Plus "userf" custom Amstrad calls, for Amstrad CPC & PCW and ZX Spectrum +3
 ;
-;       $Id: a_keyspeed.asm,v 1.2 2016-11-03 09:25:27 stefano Exp $
+;       $Id: a_keyspeed.asm,v 1.3 2017-01-02 20:06:48 aralbrec Exp $
 ;
 
 
         SECTION code_clib
 
 	PUBLIC    a_keyspeed
+   PUBLIC    _a_keyspeed
 	
 	EXTERN	subuserf
 	INCLUDE	"amstrad_userf.def"
 
 a_keyspeed:
+_a_keyspeed:
 
 	ld	hl,2
 	add	hl,sp
