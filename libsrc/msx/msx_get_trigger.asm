@@ -8,7 +8,7 @@
 ;
 ;	get state of joystick button (trigger) number \a id, true = pressed
 ;
-;	$Id: msx_get_trigger.asm,v 1.7 2016-06-16 19:30:25 dom Exp $
+;	$Id: msx_get_trigger.asm,v 1.8 2017-01-02 23:19:02 aralbrec Exp $
 ;
 
         SECTION code_clib
@@ -25,6 +25,7 @@ ENDIF
 
 
 msx_get_trigger:
+_msx_get_trigger:
 
 	; __FASTCALL__ : stick id is already in L
 	push	ix
