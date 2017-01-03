@@ -1,6 +1,8 @@
 ; operations for memopi() and memopd()
 ; 06.2007 aralbrec
 
+SECTION code_clib
+
 PUBLIC memops
 PUBLIC _memops
 
