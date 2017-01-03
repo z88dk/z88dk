@@ -5,9 +5,11 @@
 ; Graham R. Cobb 19 May 2002
 
 	PUBLIC	findlib
+   PUBLIC   _findlib
 
 
 .findlib
+._findlib
 	pop	hl		; ret addr
 	pop	de		; &signature to look for
 	push	de

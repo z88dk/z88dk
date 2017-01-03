@@ -5,8 +5,10 @@
 ;
 
 	PUBLIC	DsFillScreen
+   PUBLIC   _DsFillScreen
 
 .DsFillScreen	
+._DsFillScreen
 ;
 ; LCD memory pattern fill
 ; C - entry point

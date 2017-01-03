@@ -1,16 +1,18 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: DbFindRecord.asm,v 1.4 2015-01-19 01:33:06 pauloscustodio Exp $
+;	$Id: DbFindRecord.asm,v 1.5 2017-01-03 00:11:31 aralbrec Exp $
 ;
 ; extern INT DbFindRecord(int, char, char,  ... );
 ;
 ; Written by Damjan Marion <dmarion@open.hr>
 
 		PUBLIC	DbFindRecord
+      PUBLIC   _DbFindRecord
 
 
 .DbFindRecord
+._DbFindRecord
 	sub	3		;except 1st 3 params
  	ld 	b,a
  	ld 	ix,2

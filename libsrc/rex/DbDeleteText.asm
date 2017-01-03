@@ -3,12 +3,14 @@
 ;
 ;	DbDeleteText
 ;
-;	$Id: DbDeleteText.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
+;	$Id: DbDeleteText.asm,v 1.4 2017-01-03 00:11:31 aralbrec Exp $
 
 		PUBLIC	DbDeleteText
+      PUBLIC   _DbDeleteText
 
 
 .DbDeleteText
+._DbDeleteText
 	ld	ix,2
 	add	ix,sp
 	

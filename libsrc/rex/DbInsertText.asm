@@ -3,12 +3,14 @@
 ;
 ;	DbInsertText
 ;
-;	$Id: DbInsertText.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
+;	$Id: DbInsertText.asm,v 1.4 2017-01-03 00:11:31 aralbrec Exp $
 
 		PUBLIC	DbInsertText
+      PUBLIC   _DbInsertText
 
 
 .DbInsertText
+._DbInsertText
 	ld	ix,2
 	add	ix,sp
 	

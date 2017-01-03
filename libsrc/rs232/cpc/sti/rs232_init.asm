@@ -5,10 +5,11 @@
 ;
 ;       unsigned char rs232_init()
 ;
-;       $Id: rs232_init.asm,v 1.4 2016-06-23 20:15:37 dom Exp $
+;       $Id: rs232_init.asm,v 1.5 2017-01-03 00:14:08 aralbrec Exp $
 
 		SECTION  code_clib
                 PUBLIC   rs232_init
+                PUBLIC   _rs232_init
                 
 rs232_init:
 _rs232_init:

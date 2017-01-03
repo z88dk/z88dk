@@ -1,16 +1,18 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: DbReadField.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
+;	$Id: DbReadField.asm,v 1.4 2017-01-03 00:11:31 aralbrec Exp $
 ;
 ; extern INT DbReadField(int, int, ... );
 ;
 ; Written by Damjan Marion <dmarion@open.hr>
 
 		PUBLIC	DbReadField
+      PUBLIC   _DbReadField
 
 
 .DbReadField
+._DbReadField
 	sub	2		;except 1st 2 params
  	ld 	b,a
  	ld 	ix,2

@@ -5,12 +5,14 @@
 ;	Unfortunately, I've found no other way to rewrite the
 ;	function for the emulator. Daniel
 ;
-;	$Id: DsPrintfe.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
+;	$Id: DsPrintfe.asm,v 1.4 2017-01-03 00:11:31 aralbrec Exp $
 
 		PUBLIC	DsPrintfe
+      PUBLIC   _DsPrintfe
 
 
 .DsPrintfe	    
+._DsPrintfe
         call    saveRegAlloc
 	DEFW	$ffb0		
         ld      c,(ix+$08)	

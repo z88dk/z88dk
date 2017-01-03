@@ -1,15 +1,17 @@
 ;
 ;	written by Waleed Hasan
 ;
-;	$Id: DsDisplayCircle.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
+;	$Id: DsDisplayCircle.asm,v 1.4 2017-01-03 00:11:31 aralbrec Exp $
 ;
 
 	PUBLIC	DsDisplayCircle
+   PUBLIC   _DsDisplayCircle
 	EXTERN	set4pix
 	EXTERN	setpixsave
 
 
 .DsDisplayCircle
+._DsDisplayCircle
 	pop	bc		;ret addr
 	pop	hl		;r
 	ld	d,l		; b=r

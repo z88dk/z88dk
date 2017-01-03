@@ -4,10 +4,12 @@
 ;	$Id;$
 
 	PUBLIC	DsGetPixelAddr
+   PUBLIC   _DsGetPixelAddr
 	EXTERN	pixaddr
 
 
 .DsGetPixelAddr
+._DsGetPixelAddr
 	pop	de		;ret addr.
 	pop	bc		;&bit	
 	pop	hl		;y

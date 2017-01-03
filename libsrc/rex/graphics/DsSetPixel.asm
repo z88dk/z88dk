@@ -4,10 +4,12 @@
 ;	$Id;$
 
 	PUBLIC	DsSetPixel
+   PUBLIC   _DsSetPixel
 	EXTERN	setpix
 
 
 .DsSetPixel
+._DsSetPixel
 	pop	bc		;ret addr.
 	pop	hl		;y
 	ld	e,l		; e=y

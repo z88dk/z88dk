@@ -3,12 +3,14 @@
 ;
 ;	DbReadText
 ;
-;	$Id: DbReadText.asm,v 1.3 2015-01-19 01:33:06 pauloscustodio Exp $
+;	$Id: DbReadText.asm,v 1.4 2017-01-03 00:11:31 aralbrec Exp $
 
 		PUBLIC	DbReadText
+      PUBLIC   _DbReadText
 
 
 .DbReadText
+._DbReadText
 	ld	ix,2
 	add	ix,sp
 	

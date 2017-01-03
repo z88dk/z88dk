@@ -1,14 +1,16 @@
 ;
 ;	System Call for REX6000
 ;
-;	$Id: DbReadRecord.asm,v 1.2 2015-01-19 01:33:06 pauloscustodio Exp $
+;	$Id: DbReadRecord.asm,v 1.3 2017-01-03 00:11:31 aralbrec Exp $
 ;
 ; extern INT DbReadRecord( int, ... );
 ;
 
 		PUBLIC	DbReadRecord
+      PUBLIC   _DbReadRecord
 
 .DbReadRecord
+._DbReadRecord
  	ld 	b,a
  	ld 	ix,2
  	add 	ix,sp

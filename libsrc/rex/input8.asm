@@ -3,12 +3,14 @@
 ;
 ;	djm 7/3/2001
 ;
-;	$Id: input8.asm,v 1.4 2015-01-19 01:33:06 pauloscustodio Exp $
+;	$Id: input8.asm,v 1.5 2017-01-03 00:11:31 aralbrec Exp $
 
 	PUBLIC	input8
+   PUBLIC   _input8
 
 
 .input8
+._input8
 	pop	hl
 	pop	bc
 	push	bc

@@ -4,8 +4,10 @@
 ;	written by Daniel Schmidt
 
 		PUBLIC	DsTrace
+      PUBLIC   _DsTrace
 
 .DsTrace
+._DsTrace
 	ld	d,a		;we need to reverse the param order first
 	ld 	b,d
  	ld 	ix,2
