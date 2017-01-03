@@ -6,7 +6,7 @@
 ;	int sd_load(slot, struct SD_INFO sd_descriptor)
 ;		result: 0-OK, 
 ;
-;	$Id: sd_load.asm,v 1.8 2015-01-19 01:33:07 pauloscustodio Exp $ 
+;	$Id: sd_load.asm,v 1.9 2017-01-03 00:27:43 aralbrec Exp $ 
 ;
 ;-----------------------------------------------------------------------------------------
 ; Init SD interface. look for card, etc..
@@ -14,6 +14,7 @@
 ;
 
 	PUBLIC	sd_load
+   PUBLIC   _sd_load
 	EXTERN		sd_initialize
 	EXTERN		sd_get_cid_csd
 
@@ -24,6 +25,7 @@
 
 
 sd_load:
+_sd_load:
 
 	pop	bc
 	pop	hl		; ptr to SD_INFO struct

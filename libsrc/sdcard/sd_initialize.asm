@@ -6,10 +6,11 @@
 ;	Init SD card communications
 ;	Input: HL = card slot number
 ;
-;	$Id: sd_initialize.asm,v 1.7 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: sd_initialize.asm,v 1.8 2017-01-03 00:27:43 aralbrec Exp $
 ;
 
 	PUBLIC	sd_initialize
+   PUBLIC   _sd_initialize
 	
 	EXTERN		sd_init_main
 	EXTERN		sd_power_off
@@ -20,6 +21,7 @@
 
 
 sd_initialize:
+_sd_initialize:
 	ld	a,l
 	call sd_init_main
 	or a				; if non-zero returned in A, there was an error

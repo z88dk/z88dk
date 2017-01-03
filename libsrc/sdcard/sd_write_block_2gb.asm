@@ -10,15 +10,17 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_write_block_2gb.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: sd_write_block_2gb.asm,v 1.5 2017-01-03 00:27:43 aralbrec Exp $
 ;
 
 	PUBLIC	sd_write_block_2gb
+   PUBLIC   _sd_write_block_2gb
 
 	EXTERN		sd_write_block_2gb_callee
 	EXTERN	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
 
-sd_write_sector:
+sd_write_block_2gb:
+_sd_write_block_2gb:
 	pop af	; ret addr
 	pop hl	; dst addr
 	exx

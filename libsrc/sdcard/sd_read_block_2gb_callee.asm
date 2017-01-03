@@ -10,10 +10,11 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_read_block_2gb_callee.asm,v 1.4 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: sd_read_block_2gb_callee.asm,v 1.5 2017-01-03 00:27:43 aralbrec Exp $
 ;
 
 	PUBLIC	sd_read_block_2gb_callee
+   PUBLIC   _sd_read_block_2gb_callee
 	PUBLIC	ASMDISP_SD_READ_BLOCK_2GB_CALLEE
 
 	EXTERN	sd_card_info
@@ -29,6 +30,7 @@
     INCLUDE "osca.def"
 
 sd_read_block_2gb_callee:
+_sd_read_block_2gb_callee:
 	pop af	; ret addr
 	pop hl	; dst addr
 	exx

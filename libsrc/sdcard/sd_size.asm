@@ -3,7 +3,7 @@
 ;	ZX Spectrum ZXMMC specific routines 
 ;	code by Stefano Bodrato,   Mar 2010
 ;
-;	$Id: sd_size.asm,v 1.2 2015-01-19 01:33:07 pauloscustodio Exp $ 
+;	$Id: sd_size.asm,v 1.3 2017-01-03 00:27:43 aralbrec Exp $ 
 ;
 ; Get the size in bytes of an MMC/SD card
 ; unsigned long sd_size(struct SD_INFO descriptor);
@@ -31,9 +31,11 @@ defc CSD_OFFSET = 19
 
 
         PUBLIC    sd_size
+        PUBLIC    _sd_size
         INCLUDE "z80_crt0.hdr"
 		
 .sd_size
+._sd_size
 		; __FASTCALL__
 		
 		push	hl	; MMC struct

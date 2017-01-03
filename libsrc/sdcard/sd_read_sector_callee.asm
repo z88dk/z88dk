@@ -10,10 +10,11 @@
 ;
 ;	on exit: 0 if all OK or error code
 ;
-;	$Id: sd_read_sector_callee.asm,v 1.5 2015-01-19 01:33:07 pauloscustodio Exp $
+;	$Id: sd_read_sector_callee.asm,v 1.6 2017-01-03 00:27:43 aralbrec Exp $
 ;
 
 	PUBLIC	sd_read_sector_callee
+   PUBLIC   _sd_read_sector_callee
 	PUBLIC	ASMDISP_SD_READ_SECTOR_CALLEE
 
 	EXTERN	sd_card_info
@@ -29,6 +30,7 @@
     INCLUDE "osca.def"
 
 sd_read_sector_callee:
+_sd_read_sector_callee:
 	pop af	; ret addr
 	pop hl	; dst addr
 	exx
