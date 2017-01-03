@@ -5,14 +5,16 @@
 ;
 ;	Picks a file name from the specified location
 ;
-;	$Id: if1_getname.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_getname.asm,v 1.4 2017-01-03 01:40:06 aralbrec Exp $
 ;
 
 		SECTION code_clib
 		PUBLIC	if1_getname
+      PUBLIC   _if1_getname
 
 
 if1_getname:
+_if1_getname:
 		pop	bc	; ret addr
 		pop	hl	; location
 		push	hl

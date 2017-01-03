@@ -7,6 +7,7 @@
 ;
 
 PUBLIC tape_load_block_callee
+PUBLIC _tape_load_block_callee
 PUBLIC ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 
 IF FORts2068
@@ -16,6 +17,7 @@ EXTERN call_rom3
 ENDIF
 
 .tape_load_block_callee
+._tape_load_block_callee
 
 	pop hl
 	pop bc

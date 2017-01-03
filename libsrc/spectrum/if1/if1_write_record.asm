@@ -8,13 +8,15 @@
 ;	It is necessary to load a copy of the microdirve MAP and to pass it
 ;	putting its location into the record structure.;	
 ;	
-;	$Id: if1_write_record.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_write_record.asm,v 1.4 2017-01-03 01:40:06 aralbrec Exp $
 ;
 
 		SECTION code_clib
 		PUBLIC 	if1_write_record
+      PUBLIC   _if1_write_record
 
 if1_write_record:
+_if1_write_record:
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
 

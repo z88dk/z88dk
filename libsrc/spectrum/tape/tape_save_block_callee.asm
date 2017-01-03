@@ -6,6 +6,7 @@
 ;      int __CALLEE__ tape_save_block_callee(void *addr, size_t len, unsigned char type)
 
 PUBLIC tape_save_block_callee
+PUBLIC _tape_save_block_callee
 PUBLIC ASMDISP_TAPE_SAVE_BLOCK_CALLEE
 
 IF FORts2068
@@ -15,6 +16,7 @@ EXTERN call_rom3
 ENDIF
 
 .tape_save_block_callee
+._tape_save_block_callee
 
 	pop hl
 	pop bc

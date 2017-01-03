@@ -5,7 +5,7 @@
 ;	
 ;	Counts the number of free sectors in the specified drive.
 ;	
-;	$Id: if1_free_sectors.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_free_sectors.asm,v 1.4 2017-01-03 01:40:06 aralbrec Exp $
 ;
 
 		SECTION code_clib
@@ -14,6 +14,7 @@
 
 
 if1_free_sectors:
+_if1_free_sectors:
 		push	hl
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required

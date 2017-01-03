@@ -6,11 +6,12 @@
 ;	returns TRUE if the current program 
 ;	has been loaded from the microdrive
 ;
-;	$Id: if1_from_mdv.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_from_mdv.asm,v 1.4 2017-01-03 01:40:06 aralbrec Exp $
 ;
 
 	SECTION code_clib
 	PUBLIC	if1_from_mdv
+   PUBLIC   _if1_from_mdv
 	
 if1_from_mdv:
 _if1_from_mdv:

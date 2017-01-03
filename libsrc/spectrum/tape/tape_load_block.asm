@@ -2,11 +2,13 @@
 ; CALLER linkage for function pointers
 
 PUBLIC tape_load_block
+PUBLIC _tape_load_block
 
 EXTERN tape_load_block_callee
 EXTERN ASMDISP_TAPE_LOAD_BLOCK_CALLEE
 
 .tape_load_block
+._tape_load_block
 
    pop hl
    pop bc
