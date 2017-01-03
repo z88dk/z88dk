@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.14 2017-01-02 07:53:49 stefano Exp $
+ *   $Id: basck.c,v 1.15 2017-01-03 08:33:47 stefano Exp $
  */
 
 unsigned char  *img;
@@ -539,6 +539,7 @@ int prnums_skel2[]={12, ADDR, 0x23, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x14, 0x15,
 int outc_skel3[]={11, 0x23, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x1C, 0x1D, 0xC8, 0x0A, CATCH_CALL, 0xFE, 13};
 int outc_skel4[]={11, 0x23, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x14, 0x15, 0xC8, 0x0A, CATCH_CALL, 0xFE, 13};
 int outc_skel5[]={6 ,0x3E, '?', CATCH_CALL, 0x3E, ' ', 0xCD};
+int outc_skel6[]={11 ,0x4F, 0xF1, 0xB7, 0x28, SKIP, 0x79, 0xFE, ' ', 0xD4, CATCH, CATCH};
 
 int numasc_skel[]={15, SKIP_CALL, CATCH_CALL, SKIP_CALL, SKIP_CALL, 1, SKIP, SKIP,  0xC5, 0x7E, 0x23, 0x23, 0xE5, SKIP_CALL, 0xE1, 0x4E};
 
@@ -587,6 +588,7 @@ int faccu_skel[]={9, 33, CATCH, CATCH, 0x7E, 0xEE, 0x80, 0x77, 0xC9, 0xCD};
 int tkmsbasic_skel[]={12, 17, CATCH, CATCH, 0x1A, 0x13, 0xB7, 0xF2, SKIP, SKIP, 0x0D, 0x20, 0xF7};
 int tkmsbasic_skel2[]={15, 33, CATCH, CATCH, 0x7E, 0xB7, 0x23, 0xF2, SKIP, SKIP, 0x1D, 0xC2, SKIP, SKIP, 0xA6, 0x7F};
 int tkmsbasic_skel3[]={12, 0xD5, 17, CATCH, CATCH, 0xC5, 1, SKIP, SKIP, 0xC5, 0x06, SKIP, 0x7E};
+int tkmsbasic_skel4[]={12, 0xC5, 33, CATCH, CATCH, 1, SKIP, SKIP, 0x1E, 0x41, 0x56, 0xED, 0xA1};
 
 /* Last resort attempt, we look for the text ! */
 int tkmsbasic_old_skel[]={8, ADDR, 'E', 'N', 0xC4, 'F', 'O', 0xd2, 'N'};
@@ -872,7 +874,7 @@ int main(int argc, char *argv[])
 		printf("\n# Microsoft 8080/Z80 BASIC found\n");
 		
 		brand=find_skel(tkmsbasic_ex_skel);
-		if (brand>0)
+		if (brand<0)
 			printf("#  Extended BASIC detected\n");
 			else {
 				brand=find_skel(microsoft_extended_skel);
@@ -920,8 +922,13 @@ int main(int argc, char *argv[])
 					res=find_skel(cpdehl_loc_skel2);
 				if (res>0) {
 					pos=res-pos-1;
-					if (pos>=0)
+					if (pos>=0) {
+						if (pos==8434) {
+							printf("\n#    ...patching MS SoftCard HR GBASIC, gap size: $%04X",pos-256);
+							pos=256;
+						}
 						printf("\n#    (Detected position for ORG:  %d)",pos);
+					}
 					else pos=0;
 				} else pos=0;
 			}
@@ -945,6 +952,8 @@ int main(int argc, char *argv[])
 		pos2=find_skel(dvbcde_org_skel);
 		if ((res>0) && (pos2>0)) {
 			pos=pos2-res+1;
+			if (pos <0)
+				pos=res-pos2+1;   // probably wrong
 			printf("\n#    (Detected position basing on DVBCDE:  %d)",pos);
 		}
 		
@@ -1951,6 +1960,8 @@ int main(int argc, char *argv[])
 			res=find_skel(outc_skel4);
 		if (res<0)
 			res=find_skel(outc_skel5);
+		if (res<0)
+			res=find_skel(outc_skel6);
 		if (res>0)
 			clbl("OUTC", res, "Output char in 'A' to console");
 
@@ -2122,7 +2133,7 @@ int main(int argc, char *argv[])
 					printf("\n@ $%04x label=__%s\n", img[res2] + 256*img[res2+1], "HEXTFP");
 					printf("w $%04x %s\n", img[res2] + 256*img[res2+1], "Convert HEX to FP");
 				} else {
-					printf("\n#\tHEX\t\t[%d]\t",img[res2]);
+					printf("\n#\t& specifier\t\t[%d]\t",img[res2]);
 					res2 += 2;
 					printf("- $%04X",img[res2] + 256*img[res2+1] );
 				}
@@ -2248,7 +2259,7 @@ int main(int argc, char *argv[])
 					if (jptab>0) {
 						if (img[i]>128) {
 							/* MSX/SVI: to be excluded codes between 217 and 220 */
-							/* TODO: Other cases may be different !!  (e.g. Triumph Adler Alphatronic..) */
+							/* Depending on "token_range" other cases may be different !!  (e.g. Triumph Adler Alphatronic..) */
 							if (img[i]<(129+token_range)) {
 									address=img[jptab+2*(img[i]-129)-pos]+256*img[jptab+2*(img[i]-129)-pos+1];
 									if (SKOOLMODE)
@@ -2282,6 +2293,8 @@ int main(int argc, char *argv[])
 				res=find_skel(tkmsbasic_skel2);
 			if (res<0)
 				res=find_skel(tkmsbasic_skel3);
+			if (res<0)
+				res=find_skel(tkmsbasic_skel4)+1;
 			if (res>0) {
 				res=res+1-pos;
 				printf("\n\n\n# TOKEN table position = $%04X, word list in classic encoding mode\n",res+pos);
@@ -2355,6 +2368,8 @@ int main(int argc, char *argv[])
 			} else {
 
 				res=find_skel(tkmsbasic_old_skel);
+				if (res<0)
+					res=find_skel(tkmsbasic_old_skel);
 				if (res>0) {
 					res=res+1;
 					printf("\n\n\n# TOKEN table position = $%04X, word list in earlier encoding mode.\n",res+pos);
