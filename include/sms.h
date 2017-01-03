@@ -1,7 +1,7 @@
 /*
  *  Sega Master System
  *
- *  $Id: sms.h,v 1.4 2016-06-10 23:13:45 dom Exp $
+ *  $Id: sms.h,v 1.5 2017-01-03 02:23:05 aralbrec Exp $
  */
 
 #ifndef __SMS_H__
@@ -117,7 +117,7 @@ extern void __LIB__ add_pause_int(void *ptr);
 extern void __LIB__ set_sound_freq(int channel, int freq) __SMALLCDECL;
 extern void __LIB__ set_sound_volume(int channel, int volume) __SMALLCDECL;
 
-extern void __LIB__ standard_font();  /* Actually data *not* a function */
+extern unsigned char standard_font[];  /* Actually data *not* a function */
 
 
 extern unsigned char pause_flag;
