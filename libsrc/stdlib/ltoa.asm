@@ -1,6 +1,7 @@
 ; CALLER linkage for function pointers
 
 PUBLIC ltoa
+PUBLIC _ltoa
 
 EXTERN ltoa_callee
 EXTERN ASMDISP_LTOA_CALLEE
