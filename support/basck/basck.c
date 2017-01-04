@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.15 2017-01-03 08:33:47 stefano Exp $
+ *   $Id: basck.c,v 1.16 2017-01-04 13:02:32 stefano Exp $
  */
 
 unsigned char  *img;
@@ -192,7 +192,6 @@ int midnum_skel[]={8, 0xEB, SKIP_CALL, ')', ADDR, 0xD1, 0xC5, 0x43, 0xC9};
 int getchr_skel3[]={12, ADDR, 0x23, 0x7E, 0xFE, ':', 0xD0, 0xFE, ' ', 0xCA, SKIP, SKIP, 0xFE};
 int getchr_skel4[]={11, ADDR, 0x23, 0x7E, 0xFE, ':', 0xD0, 0xFE, ' ', 0x28, SKIP, 0xFE};
 int getchr_skel5[]={10, ADDR, 0x23, 0x7E, 0xFE, ' ', 0x28, SKIP, 0xFE, ':', 0xD0};
-//int getchr_skel4[]={7, CATCH_CALL, 0xD0, 0xE5, 0xF5, 0x21, 0x98, 0x19};
 
 int getchr_skel[]={12,  CATCH_CALL, SKIP_CALL, SKIP_CALL, 0x7A, 0xB7, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
 int getchr_skel2[]={11, CATCH_CALL, SKIP_CALL, SKIP_CALL, 0x7A, 0xB7, 0xC4, SKIP, SKIP, SKIP_CALL, 0x7B, 0xC9};
@@ -204,7 +203,6 @@ int getnum_skel3[]={9,  SKIP_CALL, CATCH_CALL, SKIP_CALL, 0xC2, SKIP, SKIP, 0x2B
 int depint_skel[]={11,              SKIP_CALL, CATCH_CALL, 0x7A, 0xB7, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
 int depint_skel2[]={10,             SKIP_CALL, CATCH_CALL, 0x7A, 0xB7, 0xC4, SKIP, SKIP, SKIP_CALL, 0x7B, 0xC9};
 int depint_skel3[]={9,  SKIP_CALL,  SKIP_CALL, CATCH_CALL, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
-
 
 int getk_skel[]={12, CATCH_CALL, 0x2A, SKIP, SKIP, 0xC5, SKIP_CALL, 0xC1, 0xC0, 0x2A, SKIP, SKIP, 0x85};
 int rinput_skel[]={9, 0x3E, '?', SKIP_CALL, 0x3E, ' ', SKIP_CALL, 0xC3, CATCH, CATCH};
@@ -312,9 +310,9 @@ int tan_skel[]={10, ADDR, SKIP_CALL, SKIP_CALL, 0xC1, 0xE1, SKIP_CALL, 0xEB, SKI
 int tan_skel2[]={11, ADDR, SKIP_CALL, SKIP_CALL, 0xC1, 0xD1, 0xEB, SKIP_CALL, 0xEB, SKIP_CALL, SKIP_CALL, 0xC3};
 int tan_skel3[]={12, ADDR, SKIP_CALL, SKIP_CALL, 0xC1, 0xDD, 0xE1, 0xD1, SKIP_CALL, 0xEB, SKIP_CALL, SKIP_CALL, 0xC3};
 
-
-int sin_skel2[]={9, SKIP_CALL, CATCH_CALL, 0xC1, 0xE1, SKIP_CALL, 0xEB, SKIP_CALL, SKIP_CALL, 0xC3};
-int cos_skel2[]={9, SKIP_CALL, SKIP_CALL, 0xC1, 0xE1, SKIP_CALL, 0xEB, SKIP_CALL, CATCH_CALL, 0xC3};
+/* Removed to avoid false positive results */
+//int sin_skel2[]={9, SKIP_CALL, CATCH_CALL, 0xC1, 0xE1, SKIP_CALL, 0xEB, SKIP_CALL, SKIP_CALL, 0xC3};
+//int cos_skel2[]={9, SKIP_CALL, SKIP_CALL, 0xC1, 0xE1, SKIP_CALL, 0xEB, SKIP_CALL, CATCH_CALL, 0xC3};
 int div_skel[]={11, SKIP_CALL, SKIP_CALL, 0xC1, 0xE1, SKIP_CALL, 0xEB, SKIP_CALL, SKIP_CALL, 0xC3, CATCH, CATCH};
 int div_skel2[]={17, 1, 0x20, 0x84, 0xDD, 0x21, 0, 0, 17, 0, 0, 0xCD, SKIP, ADDR, 0xC1, 0xDD, 0xE1, 0xD1};
 
@@ -546,6 +544,12 @@ int numasc_skel[]={15, SKIP_CALL, CATCH_CALL, SKIP_CALL, SKIP_CALL, 1, SKIP, SKI
 int fpsint_skel[]={12, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xFA, SKIP, SKIP, 0x3A, SKIP, SKIP, 0xFE, 0x91};
 int fpsint_skel2[]={12, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xFC, SKIP, SKIP, 0x3A, SKIP, SKIP, 0xFE, 0x91};
 
+
+int ex_fpsint_skel[]={11, ADDR, SKIP_CALL, SKIP_CALL, 0xE5, SKIP_CALL, 0xEB, 0xE1, 0x7A, 0xB7, 0xC9};
+int ex_fpsint_skel2[]={14, 0xF2, SKIP, SKIP, SKIP_CALL, 0xE3, 17, 1, 0, 0x7E, 0xFE, SKIP, 0xCC, CATCH, CATCH};
+int ex_posint_skel[]={10, 0x7E, 0xFE, SKIP, 0xC0, SKIP_CALL, 0x18, SKIP, SKIP_CALL, CATCH_CALL, 0xF0};
+
+
 int abpass_skel[]={11, ADDR, 0x50, 0x1E, 0, 33, SKIP, SKIP, 0x73, 6, 0x90, 0xC3};
 int abpass_skel2[]={8, 0x47, ADDR, 0x50, 0x1E, 0, 6, 0x90, 0xC3};
 
@@ -583,6 +587,14 @@ int int_hl_skel2[]={11, 0x3A, SKIP, SKIP, 0x3C, 0x6F, 0xAF, 0x67, 0xC3, CATCH, C
 int int_a_skel[]={8, 0x77, 0xC9, SKIP_CALL, ADDR, 0x17, 0x9F, 0x67, 0xC3};
 int faccu_skel[]={9, 33, CATCH, CATCH, 0x7E, 0xEE, 0x80, 0x77, 0xC9, 0xCD};
 
+int chrgtb2_skel[]={15, 0x07, 0x4F, 6, 0, 0xEB, 33, SKIP, SKIP, 9, 0x4E, 0x23, 0x46, 0xC5, 0xEB, ADDR};
+int chrckb2_skel[]={13, ADDR, 0x7E, 0xFE, ':', 0xD0, 0xFE, ' ', 0x28, SKIP, 0x30, SKIP, 0xB7, 0xC8};
+
+int newstmt_skel[]={14, 0xFE, 0x0E, 0x28, SKIP, 0xFE, 0x0D, 0xC2, SKIP, SKIP, SKIP_CALL, 1, CATCH, CATCH, 0x18};
+int goto_skel[]={15, 0xFE, 0x0E, 0x28, SKIP, 0xFE, 0x0D, 0xC2, SKIP, SKIP, SKIP_CALL, 1, SKIP, SKIP, 0x18, ADDR};
+  
+int dim_skel[]={12, ADDR, ',', 1, SKIP, SKIP, 0xC5, 0xF6, 0xAF, 0x32, SKIP, SKIP, 0x4E};
+  
   
 /* Microsoft BASIC token extraction */
 int tkmsbasic_skel[]={12, 17, CATCH, CATCH, 0x1A, 0x13, 0xB7, 0xF2, SKIP, SKIP, 0x0D, 0x20, 0xF7};
@@ -1241,11 +1253,37 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("DEPINT", res, "Get integer variable to DE, error if negative");
 
+		res=find_skel(fpsint_skel);
+		if (res<0)
+			res=find_skel(fpsint_skel2);
+		if (res>0) {
+			clbl("FPSINT", res+pos+1, "Get subscript (0-32767)");
+			clbl("POSINT", res+pos+4, "Get integer 0 to 32767");
+			clbl("DEINT", res+pos+13, "Get integer variable (-32768 to 32767) to DE");
+		}
+		
+		res=find_skel(ex_fpsint_skel);
+		if (res>0) {
+			clbl("FPSINT", res+pos+1, "Get subscript");
+		} else {
+			res=find_skel(ex_fpsint_skel2);
+			if (res>0)
+				clbl("FPSINT", res, "Get subscript");
+		}
+		
+		res=find_skel(ex_posint_skel);
+		if (res>0)
+			clbl("POSINT", res, "Get positive integer");		
+
 		res=find_skel(getvar_skel);
 		if (res<0)
 			res=find_skel(getvar_skel2);
 		if (res>0)
 			clbl("GETVAR", res, "Get variable address to DE");
+
+		res=find_skel(dim_skel);
+		if (res>0)
+			clbl("DIM", res+pos+2, "DIM command");
 
 		res=find_skel(chkstk_skel);
 		if (res>0)
@@ -1276,15 +1314,6 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("LFRGNM", res+pos+1, "number in program listing and check for ending ')'");
 
-		res=find_skel(fpsint_skel);
-		if (res<0)
-			res=find_skel(fpsint_skel2);
-		if (res>0) {
-			clbl("FPSINT", res+pos+1, "Get subscript (0-32767)");
-			clbl("POSINT", res+pos+4, "Get integer 0 to 32767");
-			clbl("DEINT", res+pos+13, "Get integer variable (-32768 to 32767) to DE");
-		}
-		
 		res=find_skel(abpass_skel);
 		if (res<0)
 			res=find_skel(abpass_skel2);
@@ -1397,8 +1426,6 @@ int main(int argc, char *argv[])
 
 		res=find_skel(cos_skel);
 		if (res<0)
-			res=find_skel(cos_skel2);
-		if (res<0)
 			res=find_skel(cos_skel3);
 		if (res<0)
 			res=find_skel(cos_skel4);
@@ -1406,8 +1433,6 @@ int main(int argc, char *argv[])
 			clbl("COS", res+pos, "COS");
 		
 		res=find_skel(sin_skel);
-		if (res<0)
-			res=find_skel(sin_skel2);
 		if (res<0)
 			res=find_skel(sin_skel3);
 		if (res<0)
@@ -1791,6 +1816,16 @@ int main(int argc, char *argv[])
 			res=find_skel(new_skel3);
 		if (res>0)
 			clbl("NEW", res+pos+1, "'NEW' statement");
+				
+		res=find_skel(newstmt_skel);
+		if (res>0)
+			clbl("NEW_STMT", res+pos+1, "Interprete next statement");
+
+		res=find_skel(goto_skel);
+		if (res>0) {
+			res=signed_byte(img[res])+res;
+			clbl("GO_TO", res+pos+1, "Go To..");
+		}
 
 		res=find_skel(chr_skel);
 		if (res>0)
@@ -1927,6 +1962,13 @@ int main(int argc, char *argv[])
 				clbl("CHRGTB", res+pos+1, "(a.k.a. GETCHR, GETNEXT), pick next char from program");
 		}
 	
+		res=find_skel(chrgtb2_skel);
+		if (res>0)
+			clbl("_CHRGTB", res+pos, "Pick next char from program");
+
+		res=find_skel(chrckb2_skel);
+		if (res>0)
+			clbl("_CHRCKB", res+pos+1, "Pick current char (or token) on program");
 		
 		res=find_skel(ucase_skel);
 		if (res>0) {
@@ -2263,17 +2305,17 @@ int main(int argc, char *argv[])
 							if (img[i]<(129+token_range)) {
 									address=img[jptab+2*(img[i]-129)-pos]+256*img[jptab+2*(img[i]-129)-pos+1];
 									if (SKOOLMODE)
-										printf("\n@ $%04x label=__%s\n#", address+pos, token);
+										printf("\n@ $%04x label=__%s\n#", address, token);
 									else
-										printf("      \t[%d]\t- $%04X\n#",img[i],address+pos);
+										printf("      \t[%d]\t- $%04X\n#",img[i],address);
 							} else
 								printf("      \t[%d]\n#",img[i]);
 						} else {
 							address=img[jptab+2*(img[i]+token_range-1)-pos]+256*img[jptab+2*(img[i]+token_range-1)-pos+1];
 							if (SKOOLMODE)
-								printf("\n@ $%04x label=__%s\n#", address+pos, token);
+								printf("\n@ $%04x label=__%s\n#", address, token);
 							else
-							printf("      \t[%d]\t- $%04X\n#",img[i],address+pos);
+							printf("      \t[%d]\t- $%04X\n#",img[i],address);
 						}
 					} else
 						printf("      \t[%d]\n#",img[i]);
