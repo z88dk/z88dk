@@ -12,11 +12,11 @@ endif
 
 
 test.sms: test.c
-	zcc +sms $(CFLAGS) test.c -o test.bin 
+	zcc +sms $(CFLAGS) test.c -o test.bin -create-app
 	echo test.map test.sym
 	
 libctest.sms: libctest.c
-	zcc +sms $(CFLAGS) libctest.c -o libctest.bin 
+	zcc +sms $(CFLAGS) libctest.c -o libctest.bin -create-app
 	echo libctest.map libctest.sym
 
 pong_graphics.o: pong_graphics.asm batnball.til numbers.til bkg.til icons.til
