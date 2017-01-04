@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.17 2017-01-04 16:08:03 stefano Exp $
+ *   $Id: basck.c,v 1.18 2017-01-04 16:10:11 stefano Exp $
  */
 
 unsigned char  *img;
@@ -1102,7 +1102,7 @@ int main(int argc, char *argv[])
 			dlbl("FUNACT", img[res+31] + 256*img[res+30], "(word), active functions counter");
 			dlbl("PRMSTK", img[res+34] + 256*img[res+33], "(word), previous block definition on stack");
 			dlbl("SUBFLG", img[res+37] + 256*img[res+36], "(byte), flag for USR fn. array");
-			dlbl("TEMP", img[res+42] + 256*img[res+41], "(word), temp. reservation for st.code");
+			//dlbl("TEMP", img[res+42] + 256*img[res+41], "(word), temp. reservation for st.code");
 		}
 
 		res=find_skel(ex_end1_skel);
@@ -1117,24 +1117,9 @@ int main(int argc, char *argv[])
 			//dlbl("SAVTXT", img[res+30] + 256*img[res+29], "(word), prg pointer for resume");
 			//dlbl("OLDTXT", img[res+33] + 256*img[res+32], "(word), prg pointer for CONT");
 		}
-		/*
-  LD (SAVTXT),HL
-  LD HL,TEMPST
-  LD (TEMPPT),HL
-  LD HL,$FFF6
-  POP BC
-  LD HL,(CURLIN)		 ; Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
-  PUSH HL
-  PUSH AF
-  LD A,L
-  AND H
-  INC A
-  JR Z,__END_2
-  LD (OLDLIN),HL
-  LD HL,(SAVTXT)
-  LD (OLDTXT),HL
-		*/
 
+		
+		
 		printf("\n");
 
 		
