@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.16 2017-01-04 13:02:32 stefano Exp $
+ *   $Id: basck.c,v 1.17 2017-01-04 16:08:03 stefano Exp $
  */
 
 unsigned char  *img;
@@ -613,6 +613,10 @@ int lnum_tokens_skel[]={11, 17, CATCH, CATCH, 0x4F, 0x1A, 0xB7, 0x28, SKIP, 0x13
 int equal_tk_skel[]={8, 0xF1, 0xC6, 3, 0x18, SKIP, SKIP_CALL, SKIP_CALL, CATCH};
 int using_tokens_skel[]={18, 0xFE, ADDR, 0xCA, SKIP, SKIP, 0xFE, SKIP, 0xCA, SKIP, SKIP, 0xFE, SKIP, 0xCA, SKIP, SKIP, 0xE5, 0xFE, ','};
 
+int ex_warm_skel[]={17, ADDR, 0xF9, 33, SKIP, SKIP, 0x22, SKIP, SKIP, SKIP_CALL, SKIP_CALL, 0xAF, 0x67, 0x6F, 0x22, SKIP, SKIP, 0x32};
+int ex_warm_skel2[]={18, ADDR, 0xF9, 33, SKIP, SKIP, 0x22, SKIP, SKIP, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xAF, 0x67, 0x6F, 0x22, SKIP, SKIP, 0x32};
+int ex_end1_skel[]={14, ADDR, 0x22, SKIP, SKIP, 33, SKIP, SKIP, 0x22, SKIP, SKIP, 33, 0xF6, 0xFF, 0xC1};
+
 int tkmsbasic_code_skel[]={12, 0xD5, 17, SKIP, SKIP, 0xC5, 1, SKIP, SKIP, 0xC5, 0x06, CATCH, 0x7E};
 int jptab_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 9, 0x4E};
 //int jptab_msbasic_skel[]={13, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 0x09, 0x4E, 0x23, 0x46, 0xC5};
@@ -1071,9 +1075,69 @@ int main(int argc, char *argv[])
 		if (res>0)
 			dlbl("SGNRES", res, "Sign of result");
 
-		
+		res=find_skel(ex_warm_skel);
+		if (res>0) {
+			res++;
+			dlbl("TEMPST", img[res+4] + 256*img[res+3], "(word), temporary descriptors");
+			dlbl("TEMPPT", img[res+7] + 256*img[res+6], "(word), start of free area of temporary descriptor");
+			//
+			dlbl("PRMLEN", img[res+19] + 256*img[res+18], "(word), number of bytes of obj table");
+			//dlbl("NOFUNS", img[res+22] + 256*img[res+21], "(byte), 0 if no function active");
+			//dlbl("PRMLN2", img[res+25] + 256*img[res+24], "(word), size of parameter block");
+			dlbl("FUNACT", img[res+38] + 256*img[res+27], "(word), active functions counter");
+			dlbl("PRMSTK", img[res+31] + 256*img[res+30], "(word), previous block definition on stack");
+			dlbl("SUBFLG", img[res+34] + 256*img[res+33], "(byte), flag for USR fn. array");
+			//dlbl("TEMP", img[res+38] + 256*img[res+37], "(word) temp. reservation for st.code");
+		}
+
+		res=find_skel(ex_warm_skel2);
+		if (res>0) {
+			res++;
+			dlbl("TEMPST", img[res+4] + 256*img[res+3], "(word), temporary descriptors");
+			dlbl("TEMPPT", img[res+7] + 256*img[res+6], "(word), start of free area of temporary descriptor");
+			//
+			dlbl("PRMLEN", img[res+22] + 256*img[res+21], "(word), number of bytes of obj table");
+			//dlbl("NOFUNS", img[res+25] + 256*img[res+24], "(byte), 0 if no function active");
+			//dlbl("PRMLN2", img[res+28] + 256*img[res+27], "(word), size of parameter block");
+			dlbl("FUNACT", img[res+31] + 256*img[res+30], "(word), active functions counter");
+			dlbl("PRMSTK", img[res+34] + 256*img[res+33], "(word), previous block definition on stack");
+			dlbl("SUBFLG", img[res+37] + 256*img[res+36], "(byte), flag for USR fn. array");
+			dlbl("TEMP", img[res+42] + 256*img[res+41], "(word), temp. reservation for st.code");
+		}
+
+		res=find_skel(ex_end1_skel);
+		if (res>0) {
+			dlbl("SAVTXT", img[res+4] + 256*img[res+3], "(word), prg pointer for resume");
+			dlbl("TEMPST", img[res+7] + 256*img[res+6], "(word), temporary descriptors");
+			//dlbl("TEMPPT", img[res+10] + 256*img[res+9], "(word), start of free area of temporary descriptor");
+			//
+			dlbl("CURLIN", img[res+17] + 256*img[res+16], "(word), line number being interpreted");
+			//
+			//dlbl("OLDLIN", img[res+27] + 256*img[res+26], "(word), old line number set up ^C ...");
+			//dlbl("SAVTXT", img[res+30] + 256*img[res+29], "(word), prg pointer for resume");
+			//dlbl("OLDTXT", img[res+33] + 256*img[res+32], "(word), prg pointer for CONT");
+		}
+		/*
+  LD (SAVTXT),HL
+  LD HL,TEMPST
+  LD (TEMPPT),HL
+  LD HL,$FFF6
+  POP BC
+  LD HL,(CURLIN)		 ; Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
+  PUSH HL
+  PUSH AF
+  LD A,L
+  AND H
+  INC A
+  JR Z,__END_2
+  LD (OLDLIN),HL
+  LD HL,(SAVTXT)
+  LD (OLDTXT),HL
+		*/
+
 		printf("\n");
 
+		
 		res=find_skel(log10eval_skel);
 		if (res>0)
 			clbl("FP_LOG10E", res+pos+1, "Constant ptr for LOG(e)");
