@@ -7,7 +7,7 @@
  *   It works with either Sinclair or Microsoft ROMs, giving hints to set-up a brand new
  *   target port or to just extend it with an alternative shortcuts (i.e. in the FP package).
  *
- *   $Id: basck.c,v 1.18 2017-01-04 16:10:11 stefano Exp $
+ *   $Id: basck.c,v 1.19 2017-01-09 09:35:42 stefano Exp $
  */
 
 unsigned char  *img;
@@ -196,9 +196,13 @@ int getchr_skel5[]={10, ADDR, 0x23, 0x7E, 0xFE, ' ', 0x28, SKIP, 0xFE, ':', 0xD0
 int getchr_skel[]={12,  CATCH_CALL, SKIP_CALL, SKIP_CALL, 0x7A, 0xB7, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
 int getchr_skel2[]={11, CATCH_CALL, SKIP_CALL, SKIP_CALL, 0x7A, 0xB7, 0xC4, SKIP, SKIP, SKIP_CALL, 0x7B, 0xC9};
 
+/* 'EVAL' in later BASIC versions */
 int getnum_skel[]={11,             CATCH_CALL, SKIP_CALL, 0x7A, 0xB7, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
 int getnum_skel2[]={10,            CATCH_CALL, SKIP_CALL, 0x7A, 0xB7, 0xC4, SKIP, SKIP, SKIP_CALL, 0x7B, 0xC9};
 int getnum_skel3[]={9,  SKIP_CALL, CATCH_CALL, SKIP_CALL, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
+
+int eval3_ex_skel[]={13, ADDR, 0x2A, SKIP, SKIP, 0xC1, 0x7E, 0x22, SKIP, SKIP, 0xFE, SKIP, 0xD8, 0xFE};
+int eval3_body_skel[]={14, ADDR, 0x3A, SKIP, SKIP, 0xFE, 3, 0x7B, 0xCA, SKIP, SKIP, 0xFE, SKIP, 0xD0, 33};
 
 int depint_skel[]={11,              SKIP_CALL, CATCH_CALL, 0x7A, 0xB7, 0xC2, SKIP, SKIP, 0x2B, SKIP_CALL, 0x7B, 0xC9};
 int depint_skel2[]={10,             SKIP_CALL, CATCH_CALL, 0x7A, 0xB7, 0xC4, SKIP, SKIP, SKIP_CALL, 0x7B, 0xC9};
@@ -465,11 +469,14 @@ int new_skel[]={13, 0xC3, SKIP, ADDR, 0xC0, 0x2A, SKIP, SKIP, 0xAF, 0x77, 0x23, 
 int new_skel2[]={12, 0x18, ADDR, 0xC0, 0x2A, SKIP, SKIP, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22 };
 int new_skel3[]={14, ADDR, 0xC0, 0x2A, SKIP, SKIP, SKIP_CALL, 0x32, SKIP, SKIP, 0x77, 0x23, 0x77, 0x23, 0x22 };
 
+int concat_skel[]={13, ADDR, 0xC5, 0xE5, 0x2A, SKIP, SKIP, 0xE3, SKIP_CALL, 0xE3, SKIP_CALL, 0x7E, 0xE5, 0x2A};
 
 int oprnd_skel[]={12, 0xC5, 0xE5, 0x2A, SKIP, SKIP, 0xE3, CATCH_CALL, 0xE3, SKIP_CALL, 0x7E, 0xE5, 0x2A};
 int tststr_skel[]={12, 0xC5, 0xE5, 0x2A, SKIP, SKIP, 0xE3, SKIP_CALL, 0xE3, CATCH_CALL, 0x7E, 0xE5, 0x2A};
 
-int concat_skel[]={13, ADDR, 0xC5, 0xE5, 0x2A, SKIP, SKIP, 0xE3, SKIP_CALL, 0xE3, SKIP_CALL, 0x7E, 0xE5, 0x2A};
+int mktmst2_skel[]={13, CATCH_CALL, 0xD1, SKIP_CALL, 0xE3, SKIP_CALL, 0xE5, 0x2A, SKIP, SKIP, 0xEB, SKIP_CALL, SKIP_CALL, 33};
+int sstsa_skel[]={13, SKIP_CALL, 0xD1, SKIP_CALL, 0xE3, SKIP_CALL, 0xE5, 0x2A, SKIP, SKIP, 0xEB, CATCH_CALL, SKIP_CALL, 33};
+int tostra_skel[]={9, 0x46, 0x6F, ADDR, 0x2D, 0xC8, 0x0A, 0x12, 0x03, 0x13};
 
 int topool_skel[]={15, SKIP_CALL, SKIP_CALL, SKIP_CALL, SKIP_CALL, 1, CATCH, CATCH,  0xC5, 0x7E, 0x23, 0x23, 0xE5, SKIP_CALL, 0xE1, 0x4E};
 int topool_skel2[]={14, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 1, CATCH, CATCH,  0xC5, 0x7E, 0x23, 0xE5, SKIP_CALL, 0xE1, 0x4E};
@@ -612,6 +619,7 @@ int tok_ex_skel[]={12, 0x3C, 0xCA, SKIP, SKIP, 0x3D, 0xFE, ADDR, 0x28, SKIP, 0xF
 int lnum_tokens_skel[]={11, 17, CATCH, CATCH, 0x4F, 0x1A, 0xB7, 0x28, SKIP, 0x13, 0xB9, 0x20};
 int equal_tk_skel[]={8, 0xF1, 0xC6, 3, 0x18, SKIP, SKIP_CALL, SKIP_CALL, CATCH};
 int using_tokens_skel[]={18, 0xFE, ADDR, 0xCA, SKIP, SKIP, 0xFE, SKIP, 0xCA, SKIP, SKIP, 0xFE, SKIP, 0xCA, SKIP, SKIP, 0xE5, 0xFE, ','};
+int lnum_range_skel[]={9, 0x73, 0x23, 0x72, 0x18, ADDR, 17, 0, 0, 0xD5};
 
 int ex_warm_skel[]={17, ADDR, 0xF9, 33, SKIP, SKIP, 0x22, SKIP, SKIP, SKIP_CALL, SKIP_CALL, 0xAF, 0x67, 0x6F, 0x22, SKIP, SKIP, 0x32};
 int ex_warm_skel2[]={18, ADDR, 0xF9, 33, SKIP, SKIP, 0x22, SKIP, SKIP, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xAF, 0x67, 0x6F, 0x22, SKIP, SKIP, 0x32};
@@ -1077,48 +1085,57 @@ int main(int argc, char *argv[])
 
 		res=find_skel(ex_warm_skel);
 		if (res>0) {
-			res++;
-			dlbl("TEMPST", img[res+4] + 256*img[res+3], "(word), temporary descriptors");
-			dlbl("TEMPPT", img[res+7] + 256*img[res+6], "(word), start of free area of temporary descriptor");
+			dlbl("TEMPST", img[res+3] + 256*img[res+4], "(word), temporary descriptors");
+			dlbl("TEMPPT", img[res+6] + 256*img[res+7], "(word), start of free area of temporary descriptor");
 			//
-			dlbl("PRMLEN", img[res+19] + 256*img[res+18], "(word), number of bytes of obj table");
-			//dlbl("NOFUNS", img[res+22] + 256*img[res+21], "(byte), 0 if no function active");
-			//dlbl("PRMLN2", img[res+25] + 256*img[res+24], "(word), size of parameter block");
-			dlbl("FUNACT", img[res+38] + 256*img[res+27], "(word), active functions counter");
-			dlbl("PRMSTK", img[res+31] + 256*img[res+30], "(word), previous block definition on stack");
-			dlbl("SUBFLG", img[res+34] + 256*img[res+33], "(byte), flag for USR fn. array");
-			//dlbl("TEMP", img[res+38] + 256*img[res+37], "(word) temp. reservation for st.code");
+			dlbl("PRMLEN", img[res+18] + 256*img[res+19], "(word), number of bytes of obj table");
+			dlbl("NOFUNS", img[res+21] + 256*img[res+22], "(byte), 0 if no function active");
+			dlbl("PRMLN2", img[res+24] + 256*img[res+25], "(word), size of parameter block");
+			dlbl("FUNACT", img[res+27] + 256*img[res+28], "(word), active functions counter");
+			dlbl("PRMSTK", img[res+30] + 256*img[res+31], "(word), previous block definition on stack");
+			dlbl("SUBFLG", img[res+33] + 256*img[res+34], "(byte), flag for USR fn. array");
+			dlbl("TEMP", img[res+38] + 256*img[res+39], "(word) temp. reservation for st.code");
 		}
-
+		
 		res=find_skel(ex_warm_skel2);
 		if (res>0) {
-			res++;
-			dlbl("TEMPST", img[res+4] + 256*img[res+3], "(word), temporary descriptors");
-			dlbl("TEMPPT", img[res+7] + 256*img[res+6], "(word), start of free area of temporary descriptor");
+			dlbl("TEMPST", img[res+3] + 256*img[res+4], "(word), temporary descriptors");
+			dlbl("TEMPPT", img[res+6] + 256*img[res+7], "(word), start of free area of temporary descriptor");
 			//
-			dlbl("PRMLEN", img[res+22] + 256*img[res+21], "(word), number of bytes of obj table");
-			//dlbl("NOFUNS", img[res+25] + 256*img[res+24], "(byte), 0 if no function active");
-			//dlbl("PRMLN2", img[res+28] + 256*img[res+27], "(word), size of parameter block");
-			dlbl("FUNACT", img[res+31] + 256*img[res+30], "(word), active functions counter");
-			dlbl("PRMSTK", img[res+34] + 256*img[res+33], "(word), previous block definition on stack");
-			dlbl("SUBFLG", img[res+37] + 256*img[res+36], "(byte), flag for USR fn. array");
-			//dlbl("TEMP", img[res+42] + 256*img[res+41], "(word), temp. reservation for st.code");
+			dlbl("PRMLEN", img[res+21] + 256*img[res+22], "(word), number of bytes of obj table");
+			dlbl("NOFUNS", img[res+24] + 256*img[res+25], "(byte), 0 if no function active");
+			dlbl("PRMLN2", img[res+27] + 256*img[res+28], "(word), size of parameter block");
+			dlbl("FUNACT", img[res+30] + 256*img[res+31], "(word), active functions counter");
+			dlbl("PRMSTK", img[res+33] + 256*img[res+34], "(word), previous block definition on stack");
+			dlbl("SUBFLG", img[res+36] + 256*img[res+37], "(byte), flag for USR fn. array");
+			dlbl("TEMP", img[res+41] + 256*img[res+42], "(word) temp. reservation for st.code");
+		}
+
+		res=find_skel(eval3_body_skel);
+		if (res>0) {
+			dlbl("VALTYP", img[res+2] + 256*img[res+3], "(word) type indicator");
+			dlbl("PRITAB", img[res+14] + 256*img[res+15], "(word) Arithmetic precedence table");
+		}
+
+		res=find_skel(eval3_ex_skel);
+		if (res>0) {
+			dlbl("TEMP2", img[res+2] + 256*img[res+3], "(word) temp. storage used by EVAL");
+			dlbl("TEMP3", img[res+7] + 256*img[res+8], "(word) used for garbage collection or by USR function");
 		}
 
 		res=find_skel(ex_end1_skel);
 		if (res>0) {
-			dlbl("SAVTXT", img[res+4] + 256*img[res+3], "(word), prg pointer for resume");
-			dlbl("TEMPST", img[res+7] + 256*img[res+6], "(word), temporary descriptors");
-			//dlbl("TEMPPT", img[res+10] + 256*img[res+9], "(word), start of free area of temporary descriptor");
+			dlbl("SAVTXT", img[res+2] + 256*img[res+3], "(word), prg pointer for resume");
+			dlbl("TEMPST", img[res+5] + 256*img[res+6], "(word), temporary descriptors");
+			dlbl("TEMPPT", img[res+8] + 256*img[res+9], "(word), start of free area of temporary descriptor");
 			//
-			dlbl("CURLIN", img[res+17] + 256*img[res+16], "(word), line number being interpreted");
+			dlbl("CURLIN", img[res+15] + 256*img[res+16], "(word), line number being interpreted");
 			//
-			//dlbl("OLDLIN", img[res+27] + 256*img[res+26], "(word), old line number set up ^C ...");
-			//dlbl("SAVTXT", img[res+30] + 256*img[res+29], "(word), prg pointer for resume");
-			//dlbl("OLDTXT", img[res+33] + 256*img[res+32], "(word), prg pointer for CONT");
+			dlbl("OLDLIN", img[res+25] + 256*img[res+26], "(word), old line number set up ^C ...");
+			dlbl("SAVTXT", img[res+28] + 256*img[res+29], "(word), prg pointer for resume");
+			dlbl("OLDTXT", img[res+31] + 256*img[res+32], "(word), prg pointer for CONT");
 		}
 
-		
 		
 		printf("\n");
 
@@ -1231,7 +1248,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(fpreg_skel4);
 		if (res>0)
-			dlbl("FPREG", res, "Floating Point Register (FACCU on Ext. BASIC)");
+			dlbl("FPREG", res, "Floating Point Register (FACCU, FACLOW on Ext. BASIC)");
 			
 		res=find_skel(last_fpreg_skel);
 		if (res<0)
@@ -1247,7 +1264,7 @@ int main(int argc, char *argv[])
 
 		res=find_skel(dblfpreg_skel);
 		if (res>0)
-			dlbl("DBL_FPREG", res, "Double Precision Floating Point Register");
+			dlbl("DBL_FPREG", res, "Double Precision Floating Point Register (aka FACLOW)");
 
 		res=find_skel(dbllast_fpreg_skel);
 		if (res>0)
@@ -1285,14 +1302,6 @@ int main(int argc, char *argv[])
 		res=find_skel(getword_skel);
 		if (res>0)
 			clbl("GETWORD", res, "Get a number to DE (0..65535)");
-
-		res=find_skel(getnum_skel);
-		if (res<0)
-			res=find_skel(getnum_skel2);
-		if (res<0)
-			res=find_skel(getnum_skel3);
-		if (res>0)
-			clbl("GETNUM", res, "BASIC interpreter entry to get a number");
 
 		res=find_skel(depint_skel);
 		if (res<0)
@@ -1817,15 +1826,33 @@ int main(int argc, char *argv[])
 		res=find_skel(mktmst_skel);
 		if (res>0) {
 			clbl("MKTMST", res+pos+1, "Make temporary string");
-			clbl("CRTMST", res+pos+1+3, "Create a string entry");
+			clbl("CRTMST", res+pos+1+3, "Create temporary string entry");
 		}
 		else {
 			res=find_skel(mktmst_skel2);
 			if (res>0) {
 				clbl("MKTMST", res, "Make temporary string");
-				clbl("CRTMST", res+3, "Create a string entry");
+				clbl("CRTMST", res+3, "Create temporary string entry");
+			} else {
+				res=find_skel(mktmst2_skel);
+				if (res>0) {
+					clbl("MKTMST", res, "Make temporary string");
+					clbl("CRTMST", res+3, "Create temporary string entry");
+				}
 			}
 		}
+
+		res=find_skel(sstsa_skel);
+		if (res>0) {
+			clbl("SSTSA", res, "Move string on stack to string area");
+		}
+
+		res=find_skel(tostra_skel);
+		if (res>0) {
+			clbl("TOSTRA", res+pos, "Move string in BC, (len in L) to string area");
+			clbl("TSALP", res+pos+1, "TOSTRA loop");
+		}
+
 
 		res=find_skel(for_skel);
 		if (res<0)
@@ -1927,7 +1954,7 @@ int main(int argc, char *argv[])
 
 		res=find_skel(eval_skel);
 		if (res>0) {
-			clbl("EVAL", res+pos+1, "Evaluate expression");
+			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
 			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
 			clbl("EVAL2", res+pos+1+12, "Evaluate expression until precedence break");
 			clbl("EVAL3", res+pos+1+15, "Evaluate expression until precedence break");
@@ -1935,7 +1962,7 @@ int main(int argc, char *argv[])
 
 		res=find_skel(eval_skel2);
 		if (res>0) {
-			clbl("EVAL", res+pos+1, "Evaluate expression");
+			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
 			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
 			clbl("EVAL2", res+pos+1+15, "Evaluate expression until precedence break");
 			clbl("EVAL3", res+pos+1+18, "Evaluate expression until precedence break");
@@ -1943,11 +1970,28 @@ int main(int argc, char *argv[])
 
 		res=find_skel(eval_skel3);
 		if (res>0) {
-			clbl("EVAL", res+pos+1, "Evaluate expression");
+			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
 			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
 			clbl("EVAL2", res+pos+1+19, "Evaluate expression until precedence break");
 			clbl("EVAL3", res+pos+1+22, "Evaluate expression until precedence break");
 		}
+		
+		res=find_skel(getnum_skel);
+		if (res<0)
+			res=find_skel(getnum_skel2);
+		if (res<0)
+			res=find_skel(getnum_skel3);
+		if (res>0) {
+			//clbl("GETNUM", res, "BASIC interpreter entry to get a number (EVAL on recent versions)");
+			clbl("EVAL", res+pos+1, "(a.k.a. GETNUM, evaluate expression (GETNUM)");
+			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+		}
+		
+		res=find_skel(eval3_ex_skel);
+		if (res>0) {
+			clbl("EVAL3", res+pos+1+3, "Evaluate expression until precedence break");
+		}
+		
 
 		res=find_skel(stkths_skel);
 		if (res>0)
@@ -1965,8 +2009,6 @@ int main(int argc, char *argv[])
 			res=find_skel(baktmp_skel2);
 		if (res>0)
 			clbl("BAKTMP", res+pos+1, "Back to last tmp-str entry");
-		
-		
 		
 		res=find_skel(getstr_skel);
 		if (res>0) {
@@ -1989,12 +2031,14 @@ int main(int argc, char *argv[])
 			res=find_skel(atoh_skel2);
 		if (res>0)
 			clbl("ATOH", res+pos+1, "ASCII to Integer, result in DE");
-		
-		
-		
+
 		printf("\n");
-
-
+		
+		res=find_skel(lnum_range_skel);
+		if (res>0) {
+			clbl("LNUM_RANGE", res+pos+1, "Read numeric range function parameters");
+			dlbl("LNUM_PARM", img[res+9] + 256*img[res+10], "Read numeric function parameter");
+		}
 		
 		res=find_skel(getchr_skel);
 		if (res<0)
