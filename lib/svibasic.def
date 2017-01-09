@@ -3,7 +3,7 @@ lstoff
 ; MSX BASIC and SYSTEM VARIABLES definitions
 ;
 ; December 2007
-; $Id: svibasic.def,v 1.9 2016-06-06 15:40:54 stefano Exp $
+; $Id: svibasic.def,v 1.10 2017-01-09 10:20:47 stefano Exp $
 ;
 
 
@@ -106,6 +106,7 @@ defc STKTOP = $F546  ; Top location to be used for the stack
 defc TXTTAB = $F54A  ; Starting address of BASIC text area
 defc TEMPPT = $F7A4  ; Starting address of unused area of temporary descriptor
 defc TEMPST = $F7A6  ; Temporary descriptors
+defc TMPSTR = $F7C3  ; Temporary string
 defc DSCTMP = $F7C4  ; String descriptor wich is the result of string fun.
 defc FRETOP = $F7C7  ; Starting address of unused area of string area
 defc TEMP3  = $F7C9  ; Used for garbage collection or by USR function
