@@ -10,7 +10,7 @@
 *      to preprocess all files and then find out there's an error
 *      at the start of the first one!
 *
-*      $Id: zcc.c,v 1.194 2017-01-02 03:47:56 aralbrec Exp $
+*      $Id: zcc.c,v 1.195 2017-01-09 17:53:07 aralbrec Exp $
 */
 
 
@@ -1646,10 +1646,12 @@ void add_file_to_process(char *filename)
 	char *p;
 	struct stat tmp;
 
-	if (((p = strtok(filename, " \r\n\t")) != NULL) && *p) {
-		if (*p == '@')
-			gather_from_list_file(p + 1);
-		else {
+	if (((p = strtok(filename, " \r\n\t")) != NULL) && *p)
+    {
+        if (*p == '@')
+            gather_from_list_file(p + 1);
+        else if (*p != ';')  /* ignore filename leading with semicolon; these indicate a comment in lst files */
+        {
 			/* Expand memory for filenames */
 			if ((original_filenames = realloc(original_filenames, (nfiles + 1) * sizeof(char *))) == NULL) {
 				fprintf(stderr, "Unable to realloc memory for input filenames\n");
