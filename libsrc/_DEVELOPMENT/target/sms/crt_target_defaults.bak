@@ -54,7 +54,7 @@ IF __CRTDEF = 0
    
    defc TAR__clib_balloc_table_size    = 0
    
-   defc TAR__clib_fopen_max            = 0
+   defc TAR__clib_fopen_max            = -1
    defc TAR__clib_open_max             = 0
 
 ENDIF
