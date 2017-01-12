@@ -4,7 +4,7 @@
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 open_memstream.c -o openmem -create-app
 
 // zcc +zx -vn -O3 -clib=new open_memstream.c -o openmem -create-app
-// zcc +zx -vn -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 open_memstream.c -o openmem -create-app
+// zcc +zx -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 open_memstream.c -o openmem -create-app
 
 #include <stdio.h>
 #include <stdlib.h>

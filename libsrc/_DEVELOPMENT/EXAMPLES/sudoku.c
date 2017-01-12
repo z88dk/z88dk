@@ -5,11 +5,11 @@
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 sudoku.c -o sudoku -create-app
 
 // zcc +zx -vn -startup=1 -O3 -clib=new sudoku.c -o sudoku -create-app
-// zcc +zx -vn -startup=1 -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 sudoku.c -o sudoku -create-app
+// zcc +zx -vn -startup=1 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 sudoku.c -o sudoku -create-app
 
 // use -DVERBOSE to print list of steps taken
 
-#pragma output CRT_OPT_PRINTF        = 0x00000102    // printf has %uB enabled only
+#pragma output CLIB_OPT_PRINTF       = 0x00000102    // printf has %uB enabled only
 
 #ifdef __SPECTRUM
 #pragma output REGISTER_SP           = -1            // do not change stack pointer

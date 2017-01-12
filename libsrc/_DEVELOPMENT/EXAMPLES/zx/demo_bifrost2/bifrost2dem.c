@@ -11,7 +11,7 @@
  *
  * 2. SDCC + New C Library
  *
- *    zcc +zx -vn -SO3 -startup=1 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 bifrost2dem.c ctile.asm -o bifrost2dem
+ *    zcc +zx -vn -SO3 -startup=1 -clib=sdcc_iy --max-allocs-per-node200000 bifrost2dem.c ctile.asm -o bifrost2dem
  *    appmake +zx -b bifrost2dem_CODE.bin -o bifrost2dem.tap --noloader --org 32768 --blockname bifrost2dm
  *    copy /b loader2.tap+bifrost2dem.tap demo.tap
  *

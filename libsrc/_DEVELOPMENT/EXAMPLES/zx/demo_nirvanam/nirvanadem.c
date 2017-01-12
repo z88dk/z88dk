@@ -11,7 +11,7 @@
  *
  * 2. SDCC + New C Library
  *
- *    zcc +zx -vn -SO3 -startup=1 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 nirvanadem.c btile.asm -o nirvanadem
+ *    zcc +zx -vn -SO3 -startup=1 -clib=sdcc_iy --max-allocs-per-node200000 nirvanadem.c btile.asm -o nirvanadem
  *    appmake +zx -b nirvanadem_CODE.bin -o nirvanadem.tap --noloader --org 32768 --blockname nirvanadem
  *    copy /B loader.tap+nirvanadem.tap demo.tap
  *

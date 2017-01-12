@@ -11,7 +11,10 @@
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 eliza.c -o eliza -create-app
 
 // zcc +zx -vn -O3 -startup=8 -clib=new eliza.c -o eliza -create-app
-// zcc +zx -vn -SO3 -startup=8 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 eliza.c -o eliza -create-app
+// zcc +zx -vn -SO3 -startup=8 -clib=sdcc_iy --max-allocs-per-node200000 eliza.c -o eliza -create-app
+
+#pragma output CLIB_OPT_PRINTF      = 0x200    // %s only
+#pragma output CLIB_STDIO_HEAP_SIZE = 0        // cannot open files
 
 #include <stdlib.h>
 #include <stdio.h>

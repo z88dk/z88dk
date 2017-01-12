@@ -5,10 +5,10 @@
 /*  z88dk/examples/clisp contains example functions and "COPYING"      */
 
 // zcc +cpm -vn -O3 -clib=new clisp.c -o clisp -create-app
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 clisp.c -o clisp --fsigned-char -create-app
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size clisp.c -o clisp --fsigned-char -create-app
 
 // zcc +zx -vn -O3 -startup=8 -clib=new clisp.c -o clisp -create-app
-// zcc +zx -vn -SO3 -startup=8 -clib=sdcc_iy --max-allocs-per-node200000 clisp.c -o clisp --fsigned-char -create-app
+// zcc +zx -vn -SO3 -startup=8 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size clisp.c -o clisp --fsigned-char -create-app
 
 // use "-DLARGEMEM=1200" for larger workspace
 // use "-DSCHEME" for scheme variant
@@ -315,8 +315,8 @@ void
 init(void)
 {
   int  i;
-
-  /* Randomize */
+/*
+  // Randomize 
   printf("Any key to continue...\n\n");
    
   in_wait_nokey();
@@ -324,7 +324,9 @@ init(void)
 
   in_wait_nokey();
   srand(i);
-
+*/
+  srand(0x1234);
+  
   /* stack */
   t_stack_ptr = 0;
 

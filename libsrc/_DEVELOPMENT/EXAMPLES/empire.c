@@ -14,8 +14,8 @@
  * Conversion to C by aralbrec@z88dk.org July 2016
  * (instructions excluded from some builds due to size)
  *
- * zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 empire.c -o empire -lm -create-app -DINSTR --opt-code-size
- * zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 empire.c -o empire -lm -create-app -DINSTR --opt-code-size
+ * zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size empire.c -o empire -lm -create-app -DINSTR
+ * zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size empire.c -o empire -lm -create-app -DINSTR
  *
  */
 

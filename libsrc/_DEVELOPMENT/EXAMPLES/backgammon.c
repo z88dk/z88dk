@@ -2,8 +2,8 @@
 /* ANSIfied and some PDP11isms and bugs fixed for FUZIX */
 /* Borrowed from FUZIX project */
 
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 backgammon.c -o backg -create-app
-// zcc +zx -vn -SO3 -startup=4 -clib-sdcc_iy --max-allocs-per-node200000 backgammon.c -o backg -create-app
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size backgammon.c -o backg -create-app
+// zcc +zx -vn -SO3 -startup=4 -clib-sdcc_iy --max-allocs-per-node200000 --opt-code-size backgammon.c -o backg -create-app
 
 #pragma output CLIB_OPT_PRINTF         = 0x00000401  // printf has %cd enabled only
 #pragma output CLIB_OPT_SCANF          = 0x00000001  // scanf has %d enabled only

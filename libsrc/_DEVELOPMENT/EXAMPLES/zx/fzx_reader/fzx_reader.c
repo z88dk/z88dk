@@ -1,7 +1,7 @@
 // for targets supporting fzx
 
 // zcc +zx -vn -startup=31 -O3 -clib=new fzx_reader.c The_Jungle.c -o fzxr -create-app
-// zcc +zx -vn -startup=31 -SO3 -clib=sdcc_ix --reserve-regs-iy --max-allocs-per-node200000 fzx_reader.c The_Jungle.c -o fzxr -create-app
+// zcc +zx -vn -startup=31 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 fzx_reader.c The_Jungle.c -o fzxr -create-app
 
 #include <font/fzx.h>
 #include <rect.h>

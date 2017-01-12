@@ -27,8 +27,8 @@
  * - Instructions stored as text rather than loaded from disk.
  */
 
-// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 startrek.c -o startrek -lm -create-app
-// zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 startrek.c -o startrek -lm -create-app
+// zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
+// zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
 
 #pragma output CLIB_OPT_PRINTF         = 0x04000201   // printf has %sdf enabled only
 
@@ -2131,6 +2131,7 @@ showfile(char *filename)
 int
 randomize(void)
 {
+/*
    unsigned int i;
    
 //  time_t timer;
@@ -2143,6 +2144,9 @@ randomize(void)
    in_wait_nokey();
    
    return i;
+*/
+
+   return 0x1234;
 }
 
 /* Returns an integer from 1 to iSpread */
