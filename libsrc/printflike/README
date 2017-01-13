@@ -1,4 +1,0 @@
-This is the "full" printf routines - they support width specifiers,
-including the %ld/%lu types 
-
-The scanf routines have also been rejigged, but they're not tested.
