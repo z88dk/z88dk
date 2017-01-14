@@ -18,7 +18,7 @@ fdgetpos	- Get file position into mem (ptr supplied)
 
 Other routines needed from fcntl.h
 
-open_z88
+open
 close
 readbyte
 writebyte
@@ -26,6 +26,3 @@ read
 write
 lseek
 
-The _z88 routines allow the return of the explicit filename for the
-opened file. If you're porting then it might be a nice idea to
-support this concept across machines.
