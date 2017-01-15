@@ -17,7 +17,6 @@ stdio/obj/fgetpos
 stdio/obj/fgets
 stdio/obj/fgets_cons
 stdio/obj/fopen
-stdio/obj/fopen_z88
 stdio/obj/fprintf
 stdio/obj/fputc
 stdio/obj/fputc_callee
@@ -25,7 +24,6 @@ stdio/obj/fputs
 stdio/obj/fputs_callee
 stdio/obj/fread
 stdio/obj/freopen
-stdio/obj/freopen_z88
 stdio/obj/fseek
 stdio/obj/ftell
 stdio/obj/fwrite

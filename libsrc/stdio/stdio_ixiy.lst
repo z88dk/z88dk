@@ -17,7 +17,6 @@ stdio/obj/ixiy/fgetpos
 stdio/obj/ixiy/fgets
 stdio/obj/ixiy/fgets_cons
 stdio/obj/ixiy/fopen
-stdio/obj/ixiy/fopen_z88
 stdio/obj/ixiy/fprintf
 stdio/obj/ixiy/fputc
 stdio/obj/ixiy/fputc_callee
@@ -25,7 +24,6 @@ stdio/obj/ixiy/fputs
 stdio/obj/ixiy/fputs_callee
 stdio/obj/ixiy/fread
 stdio/obj/ixiy/freopen
-stdio/obj/ixiy/freopen_z88
 stdio/obj/ixiy/fseek
 stdio/obj/ixiy/ftell
 stdio/obj/ixiy/fwrite

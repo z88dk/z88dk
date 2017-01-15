@@ -18,7 +18,6 @@ stdio/obj/net/fgetpos
 stdio/obj/net/fgets
 stdio/obj/net/fgets_cons
 stdio/obj/net/fopen
-stdio/obj/net/fopen_z88
 stdio/obj/net/fprintf
 stdio/obj/net/fputc
 stdio/obj/net/fputc_callee
@@ -26,7 +25,6 @@ stdio/obj/net/fputs
 stdio/obj/net/fputs_callee
 stdio/obj/net/fread
 stdio/obj/net/freopen
-stdio/obj/net/freopen_z88
 stdio/obj/net/fseek
 stdio/obj/net/ftell
 stdio/obj/net/fwrite

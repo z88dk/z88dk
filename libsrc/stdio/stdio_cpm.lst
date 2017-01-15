@@ -17,7 +17,6 @@ stdio/obj/cpm/fgetpos
 stdio/obj/cpm/fgets
 stdio/obj/cpm/fgets_cons
 stdio/obj/cpm/fopen
-stdio/obj/cpm/fopen_z88
 stdio/obj/cpm/fprintf
 stdio/obj/cpm/fputc
 stdio/obj/cpm/fputc_callee
@@ -25,7 +24,6 @@ stdio/obj/cpm/fputs
 stdio/obj/cpm/fputs_callee
 stdio/obj/cpm/fread
 stdio/obj/cpm/freopen
-stdio/obj/cpm/freopen_z88
 stdio/obj/cpm/fseek
 stdio/obj/cpm/ftell
 stdio/obj/cpm/fwrite
