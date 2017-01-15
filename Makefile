@@ -40,11 +40,9 @@ sccz80:
 	$(MAKE) -C src/sccz80
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
-# test compile the new z80asm2, work in progress so ignore errors
 z80asm:
 	$(MAKE) -C src/z80asm
 	$(MAKE) -C src/z80asm PREFIX=`pwd` install
-	-$(MAKE) -C src/z80asm2 test
 
 zcc:
 	$(MAKE) -C src/zcc
