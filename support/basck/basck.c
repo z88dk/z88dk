@@ -551,7 +551,6 @@ int numasc_skel[]={15, SKIP_CALL, CATCH_CALL, SKIP_CALL, SKIP_CALL, 1, SKIP, SKI
 int fpsint_skel[]={12, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xFA, SKIP, SKIP, 0x3A, SKIP, SKIP, 0xFE, 0x91};
 int fpsint_skel2[]={12, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xFC, SKIP, SKIP, 0x3A, SKIP, SKIP, 0xFE, 0x91};
 
-
 int ex_fpsint_skel[]={11, ADDR, SKIP_CALL, SKIP_CALL, 0xE5, SKIP_CALL, 0xEB, 0xE1, 0x7A, 0xB7, 0xC9};
 int ex_fpsint_skel2[]={14, 0xF2, SKIP, SKIP, SKIP_CALL, 0xE3, 17, 1, 0, 0x7E, 0xFE, SKIP, 0xCC, CATCH, CATCH};
 int ex_posint_skel[]={10, 0x7E, 0xFE, SKIP, 0xC0, SKIP_CALL, 0x18, SKIP, SKIP_CALL, CATCH_CALL, 0xF0};
@@ -602,6 +601,8 @@ int goto_skel[]={15, 0xFE, 0x0E, 0x28, SKIP, 0xFE, 0x0D, 0xC2, SKIP, SKIP, SKIP_
   
 int dim_skel[]={12, ADDR, ',', 1, SKIP, SKIP, 0xC5, 0xF6, 0xAF, 0x32, SKIP, SKIP, 0x4E};
   
+int sbscpt_skel[]={13, ADDR, 0x2A, SKIP, SKIP, 0xE3, 0x57, 0xD5, 0xC5, SKIP_CALL, 0xC1, 0xF1, 0xEB, 0xE3};
+
   
 /* Microsoft BASIC token extraction */
 int tkmsbasic_skel[]={12, 17, CATCH, CATCH, 0x1A, 0x13, 0xB7, 0xF2, SKIP, SKIP, 0x0D, 0x20, 0xF7};
@@ -1111,12 +1112,17 @@ int main(int argc, char *argv[])
 			dlbl("TEMP", img[res+41] + 256*img[res+42], "(word) temp. reservation for st.code");
 		}
 
+		res=find_skel(sbscpt_skel);
+		if (res>0) {
+			dlbl("DIMFLG", img[res+2] + 256*img[res+3], "(word), aka LCRFLG (Locate/Create and Type");
+		}
+
 		res=find_skel(eval3_body_skel);
 		if (res>0) {
 			dlbl("VALTYP", img[res+2] + 256*img[res+3], "(word) type indicator");
-			dlbl("PRITAB", img[res+14] + 256*img[res+15], "(word) Arithmetic precedence table");
+			dlbl("PRITAB", img[res+14] + 256*img[res+15], "Arithmetic precedence table");
 		}
-
+		
 		res=find_skel(eval3_ex_skel);
 		if (res>0) {
 			dlbl("TEMP2", img[res+2] + 256*img[res+3], "(word) temp. storage used by EVAL");
@@ -1275,7 +1281,7 @@ int main(int argc, char *argv[])
 
 		res=find_skel(cpdehl_skel);
 		if (res>0)
-			clbl("CPDEHL", res+pos+1, "compare DE and HL");
+			clbl("CPDEHL", res+pos+1, "compare DE and HL (aka DCOMPR)");
 		
 		res=find_skel(fndnum_skel);
 		if (res<0)
@@ -1327,6 +1333,12 @@ int main(int argc, char *argv[])
 			res=find_skel(ex_fpsint_skel2);
 			if (res>0)
 				clbl("FPSINT", res, "Get subscript");
+		}
+
+		res=find_skel(sbscpt_skel);
+		if (res>0) {
+			clbl("SBSCPT", res+pos, "Sort out subscript");
+			clbl("SCPTLP", res+pos+6, "SBSCPT loop");
 		}
 		
 		res=find_skel(ex_posint_skel);
@@ -2865,4 +2877,3 @@ int main(int argc, char *argv[])
 
 	fclose(fpin);
 }
-
