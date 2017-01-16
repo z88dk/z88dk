@@ -398,75 +398,82 @@ void stowlit(int value, int size)
 /* Return current literal char & bump lptr */
 unsigned char litchar()
 {
-    int i, oct ;
+    int i, oct;
 
-    if ( ch() != 92 ) 
-	return(gch()) ;
-    if ( nch() == 0 ) 
-	return(gch()) ;
-    gch() ;
-    switch( ch() ) {
-    case 'a':  /* Bell */
-	++lptr; 
-	return 7; 
-    case 'b':  /* BS */
-	++lptr;
-	return 8; 
-    case 't':  /* HT */
-	++lptr; 
-	return 9;
-    case 'r':  /* LF */
-	++lptr;
+    if (ch() != 92)
+        return (gch());
+    if (nch() == 0)
+        return (gch());
+    gch();
+    switch (ch()) {
+    case 'a': /* Bell */
+        ++lptr;
+        return 7;
+    case 'b': /* BS */
+        ++lptr;
+        return 8;
+    case 't': /* HT */
+        ++lptr;
+        return 9;
+    case 'r': /* LF */
+        ++lptr;
         return standard_escapes ? 13 : 10;
-    case 'v':  /* VT */
-	++lptr;
-	return 11;
-    case 'f':  /* FF */
-	++lptr; 
-	return 12;
-    case 'n':  /* CR */
-	++lptr; 
+    case 'v': /* VT */
+        ++lptr;
+        return 11;
+    case 'f': /* FF */
+        ++lptr;
+        return 12;
+    case 'n': /* CR */
+        ++lptr;
         return standard_escapes ? 10 : 13;
-    case '\"' :  /* " */
-	++lptr; 
-	return 34;
-    case '\'' :  /* ' */
-	++lptr; 
-	return 39;
-    case '\\':  /* / */
-	++lptr; 
-	return '\\';
-    case '\?':  /* ? */
-	++lptr; 
-	return '\?';
-    case 'l':  /* LF (non standard)*/
-	++lptr; 
-	return 10;
+    case '\"': /* " */
+        ++lptr;
+        return 34;
+    case '\'': /* ' */
+        ++lptr;
+        return 39;
+    case '\\': /* / */
+        ++lptr;
+        return '\\';
+    case '\?': /* ? */
+        ++lptr;
+        return '\?';
+    case 'l': /* LF (non standard)*/
+        ++lptr;
+        return 10;
     }
 
-    if (ch() != 'x' && (ch()<'0' || ch()>'7')) {
-	warning(W_ESCAPE,ch());
-	return(gch());
+    if (ch() != 'x' && (ch() < '0' || ch() > '7')) {
+        warning(W_ESCAPE, ch());
+        return (gch());
     }
     if (ch() == 'x') {
-	gch();
-	oct=0; i=2;
-	while ( i-- > 0 && hex(ch()) ) {
-	    if ( ch() <= '9' )
-		oct = (oct << 4) + (gch()-'0') ;
-	    else
-		oct = (oct << 4) + ((gch()&95) - '7') ;
-	}
-	return((char)oct);
+        gch();
+        oct = 0;
+        i = 2;
+        while (i-- > 0 && hex(ch()))
+        {
+            if (ch() <= '9')
+                oct = (oct << 4) + (gch() - '0');
+            else
+                oct = (oct << 4) + ((gch() & 95) - '7');
+        }
+        if ( isxdigit(ch())) {
+            warning(W_HEXESCAPE_TOO_LONG);
+        }
+        return ((char)oct);
     }
 
-    i=3; oct=0;
-    while ( i-- > 0 && ch() >= '0' && ch() <= '7' )
-	oct=(oct<<3)+gch()-'0';
-    if( i == 2 )  
-	return(gch());
-    else {
-	return((char)oct);
+    i = 3;
+    oct = 0;
+    while (i-- > 0 && ch() >= '0' && ch() <= '7')
+        oct = (oct << 3) + gch() - '0';
+    if (i == 2)
+        return (gch());
+    else
+    {
+        return ((char)oct);
     }
 }
 
