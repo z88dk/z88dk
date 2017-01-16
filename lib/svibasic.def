@@ -32,7 +32,7 @@ defc USR9 = $F534	;2 Address to call with Basic USR9
 ;; defc LINL32 = $????	;1 Width for SCREEN 1 (default 29) 
 defc LINLEN = $F543	;1 Width for the current text mode 
 ;; defc CRTCNT = 25	; Number of lines on screen (on SVI this is hardcoded)
-;; defc CLMLST = $????	;1 Column space. It’s uncertain what this address actually stores 
+;; defc CLMLST = $????	;1 Column space. Itâ€™s uncertain what this address actually stores 
 
 ; WORK FOR INITIALIZATION
 ;;
@@ -58,7 +58,7 @@ defc BAKCLR = $FA0B	;1 Background color
 defc BDRCLR = $FA0C	;1 Border color (BORCLR)
 defc MAXUPD = $FA0D	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
 defc MINUPD = $FA10	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
-defc ATRBYT = $FA13	;1 Attribute byte (for graphical routines it’s used to read the color) 
+defc ATRBYT = $FA13	;1 Attribute byte (for graphical routines itâ€™s used to read the color) 
 
 ;WORK AREA FOR PLAY STATEMENT
 defc QUEUES = $FA17	;2 Address of the queue table 
@@ -82,7 +82,7 @@ defc LPTPOS = $F541	;1 Position of the printer head
 defc PRTFLG = $F542	;1 Printer output flag is read by OUTDO
 ;; defc NTMSXP = MISSING	;1 Printer type .. seems to be missing on SVI
 ;; defc RAWPRT = $????	;1 Raw printer output is read by OUTDO.. seems to be missing on SVI
-defc VLZADR = $F54C	;2 Address of data that is temporarilly replaced by ‘O’ when Basic function VAL("") is running 
+defc VLZADR = $F54C	;2 Address of data that is temporairly replaced by â€˜Oâ€™ when Basic function VAL("") is running 
 defc VLZDAT = $F8E8	;1 Original value that was in the address pointed to with VLZADR 
 defc CURLIN = $F548	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
 
@@ -128,7 +128,7 @@ defc DOT    = $F7E1  ; Current line for edit & list
 defc ERRTXT = $F7E3  ; Text pointer for use by RESUME
 defc ONELIN = $F7E5  ; LINE to go when error
 defc ONEFLG = $F7E7  ; =1 if executing an error trap routine
-defc TEMP2  = $F7E8
+defc NXTOPR = $F7E8  ; Next operator in EVAL
 defc OLDLIN = $F7EA  ; old line number set up ^C ...
 defc OLDTXT = $F7EC  ; Points st. to be executed next
 defc VARTAB = $F7EE  ; Pointer to start of variable space
