@@ -32,7 +32,7 @@ defc LINL40 = $F3AE	;1 Width for SCREEN 0 (default 37)
 defc LINL32 = $F3AF	;1 Width for SCREEN 1 (default 29) 
 defc LINLEN = $F3B0	;1 Width for the current text mode 
 defc CRTCNT = $F3B1	;1 Number of lines on screen 
-defc CLMLST = $F3B2	;1 Column space. It’s uncertain what this address actually stores 
+defc CLMLST = $F3B2	;1 Column space. Itâ€™s uncertain what this address actually stores 
 
 
 ; VIDEO VARIABLES DEPENDING ON MODE
@@ -82,7 +82,7 @@ defc BAKCLR = $F3EA	;1 Background color
 defc BDRCLR = $F3EB	;1 Border color 
 defc MAXUPD = $F3EC	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
 defc MINUPD = $F3EF	;3 Jump instruction used by Basic LINE command. The routines used are: RIGHTC, LEFTC, UPC and DOWNC 
-defc ATRBYT = $F3F2	;1 Attribute byte (for graphical routines it’s used to read the color) 
+defc ATRBYT = $F3F2	;1 Attribute byte (for graphical routines itâ€™s used to read the color) 
 
 ; WORK AREA FOR PLAY STATEMENT
 defc QUEUES = $F3F3	;2 Address of the queue table 
@@ -108,7 +108,7 @@ defc LPTPOS = $F415	;1 Position of the printer head
 defc PRTFLG = $F416	;1 Printer output flag is read by OUTDO
 defc NTMSXP = $F417	;1 Printer type is read by OUTDO. SCREEN ,,,n writes to this address
 defc RAWPRT = $F418	;1 Raw printer output is read by OUTDO
-defc VLZADR = $F419	;2 Address of data that is temporarilly replaced by ‘O’ when Basic function VAL("") is running 
+defc VLZADR = $F419	;2 Address of data that is temporairly replaced by â€˜Oâ€™ when Basic function VAL("") is running 
 defc VLZDAT = $F41B	;1 Original value that was in the address pointed to with VLZADR 
 defc CURLIN = $F41C	;2 Line number the Basic interpreter is working on, in direct mode it will be filled with #FFFF
 defc KBUF   = $F41F
@@ -153,7 +153,7 @@ defc DOT    = $F6B5  ; Current line for edit & list
 defc ERRTXT = $F6B7  ; Text pointer for use by RESUME
 defc ONELIN = $F6B9  ; LINE to go when error
 defc ONEFLG = $F6BB  ; =1 if executing an error trap routine
-defc TEMP2  = $F6BC
+defc NXTOPR = $F6BC  ; Next operator in EVAL
 defc OLDLIN = $F6BE  ; old line number set up ^C ...
 defc OLDTXT = $F6C0  ; Points st. to be executed next
 defc VARTAB = $F6C2  ; Pointer to start of variable space
@@ -450,4 +450,3 @@ defc IENTRY_TIMER  = $FC80  ; TIMER - Interrupt related code
 
 ; --------------------------------------------------------------------------
 lston
-
