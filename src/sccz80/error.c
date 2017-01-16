@@ -86,7 +86,8 @@ struct warnings mywarn[]={
 	{"%s%s*[] type uninitialised has no storage",0},
 	{"Unreachable code follows",0},
 	{"Unknown escape sequence \\%c",0},
-	{"Internal thingummyjob please report!!! Please!",0}
+	{"Internal thingummyjob please report!!! Please!",0},
+        {"Hex escape sequence out of range ", 0}
 };
 
 
@@ -234,8 +235,6 @@ void debug(int num,char *str,...)
 	va_end(ap);
 	fprintf(stderr,"\n");
 }
-
-
 
 
 void warning(int num, ...)
