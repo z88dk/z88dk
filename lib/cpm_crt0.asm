@@ -83,17 +83,11 @@ ENDIF
 
         call    crt0_init_bss   ;Initialise any data setup by sdcc
 	ld      (start1+1),sp	;Save entry stack
-	ld	a,($80)		;byte count of length of args
-	inc	a		;we can use this since args are space separated
-	neg
-	ld	l,a
-	ld	h,-1		;negative number
 IF (startup=3)
-	ld      de,-64-18-18	;Add on space for atexit() stack and +3 MEM banking
+	ld      hl,-64-18-18	;Add on space for atexit() stack and +3 MEM banking
 ELSE
-	ld      de,-64		;Add on space for atexit() stack
+	ld      hl,-64		;Add on space for atexit() stack
 ENDIF
-	add	hl,de
 	add     hl,sp
 	ld      sp,hl
 	ld      (exitsp),sp
@@ -127,7 +121,7 @@ IF DEFINED_USING_amalloc
     INCLUDE "amalloc.def"
 ENDIF
 
-	ld	hl,$80
+        ld	hl,$80
         ld      a,(hl)
         ld      b,0
         and     a
