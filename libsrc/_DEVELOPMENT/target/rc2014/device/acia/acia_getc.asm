@@ -49,7 +49,7 @@
         ld a, (aciaControl)         ; get the ACIA control echo byte
         and ~ACIA_TEI_MASK          ; mask out the Tx interrupt bits
         or ACIA_TDI_RTS0            ; set RTS low.
-        ld (aciaControl), a	        ; write the ACIA control echo byte back
+        ld (aciaControl), a	    ; write the ACIA control echo byte back
         out (ACIA_CTRL_ADDR), a     ; set the ACIA CTRL register
         
         call asm_z80_pop_ei         ; critical section end

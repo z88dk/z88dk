@@ -4,8 +4,8 @@
 
     PUBLIC _acia_putc
     
-    EXTERN ACIA_TX_SIZE
-    EXTERN ACIA_TEI_MASK, ACIA_TEI_RTS0, ACIA_CTRL_ADDR
+    EXTERN ACIA_STATUS_ADDR, ACIA_RDRF, ACIA_DATA_ADDR, ACIA_TX_SIZE
+    EXTERN ACIA_TDRE, ACIA_TX_SIZE, ACIA_TEI_MASK, ACIA_TEI_RTS0, ACIA_CTRL_ADDR
 
     EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer, aciaControl
     EXTERN asm_z80_push_di, asm_z80_pop_ei
@@ -18,13 +18,27 @@
         ; modifies : af, hl
 
         ld a, (aciaTxCount)         ; Get the number of bytes in the Tx buffer
+        or a                        ; check whether the buffer is empty
+        jr nz, put_buffer_tx        ; buffer not empty, so abandon immediate Tx
+        
+        in a, (ACIA_STATUS_ADDR)    ; get the status of the ACIA
+        and ACIA_TDRE               ; check whether a byte can be transmitted
+        jr z, put_buffer_tx         ; if not, so abandon immediate Tx
+        
+        ld a, l                     ; Retrieve Tx character
+        out (ACIA_DATA_ADDR), a     ; immediately output the Tx byte to the ACIA
+
+        ld l, 0                     ; indicate Tx buffer was not full
+        ret                         ; and just complete
+
+    put_buffer_tx:
+
+        ld a, (aciaTxCount)         ; Get the number of bytes in the Tx buffer
         cp ACIA_TX_SIZE             ; check whether there is space in the buffer
         ld a,l                      ; Tx byte
 
         ld l,1
         jr nc, clean_up_tx          ; buffer full, so drop the Tx byte and clean up
-
-    put_poke_tx:
 
         ld hl, (aciaTxIn)           ; get the pointer to where we poke
         ld (hl), a                  ; write the Tx byte to the aciaTxIn   

@@ -21,32 +21,28 @@
         jr z, tx_check              ; if not, go check for bytes to transmit 
 
         in a, (ACIA_DATA_ADDR)      ; Get the received byte from the ACIA 
-        push af
+        ld l, a                     ; Move Rx byte to l
 
         ld a, (aciaRxCount)         ; Get the number of bytes in the Rx buffer
         cp ACIA_RX_SIZE             ; check whether there is space in the buffer
-        jr c, poke_rx               ; not full, so go poke Rx byte
-        pop af                      ; buffer full so drop the Rx byte
-        jr tx_check                 ; check if we can send something
+        jr nc, tx_check             ; buffer full, check if we can send something
 
-    poke_rx:
-
+        ld a, l                     ; get Rx byte from l
         ld hl, (aciaRxIn)           ; get the pointer to where we poke
-        pop af                      ; get Rx byte
-        ld (hl), a                  ; write the Rx byte to the aciaRxIn
+        ld (hl), a                  ; write the Rx byte to the aciaRxIn address
 
         inc hl                      ; move the Rx pointer along
         ld a, l	                    ; move low byte of the Rx pointer
         cp (aciaRxBuffer + ACIA_RX_SIZE) & $FF
         jr nz, no_rx_wrap
         ld hl, aciaRxBuffer         ; we wrapped, so go back to start of buffer
-    	
+
     no_rx_wrap:
 
         ld (aciaRxIn), hl           ; write where the next byte should be poked
 
         ld hl, aciaRxCount
-        inc (hl)                    ; atomically increment Rx count
+        inc (hl)                    ; atomically increment Rx buffer count
 
     ; now start doing the Tx stuff
 
