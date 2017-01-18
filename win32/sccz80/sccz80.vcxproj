@@ -169,7 +169,6 @@
     <ClCompile Include="..\..\src\sccz80\declvar.c" />
     <ClCompile Include="..\..\src\sccz80\error.c" />
     <ClCompile Include="..\..\src\sccz80\expr.c" />
-    <ClCompile Include="..\..\src\sccz80\float.c" />
     <ClCompile Include="..\..\src\sccz80\goto.c" />
     <ClCompile Include="..\..\src\sccz80\io.c" />
     <ClCompile Include="..\..\src\sccz80\lex.c" />
@@ -194,7 +193,6 @@
     <ClInclude Include="..\..\src\sccz80\define.h" />
     <ClInclude Include="..\..\src\sccz80\error.h" />
     <ClInclude Include="..\..\src\sccz80\expr.h" />
-    <ClInclude Include="..\..\src\sccz80\float.h" />
     <ClInclude Include="..\..\src\sccz80\io.h" />
     <ClInclude Include="..\..\src\sccz80\lex.h" />
     <ClInclude Include="..\..\src\sccz80\lvalue.h" />
