@@ -42,8 +42,8 @@ extern int  __LIB__            tape_save(char *name, size_t loadstart,void *star
 extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type);
 extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type);
 
-extern int  __LIB__ __CALLEE__ tape_save_block_callee(void *addr, size_t len, unsigned char type);
-extern int  __LIB__ __CALLEE__ tape_load_block_callee(void *addr, size_t len, unsigned char type);
+extern int  __LIB__  tape_save_block_callee(void *addr, size_t len, unsigned char type);
+extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned char type);
 
 #define tape_save_block(a,b,c) tape_save_block_callee(a,b,c)
 #define tape_load_block(a,b,c) tape_load_block_callee(a,b,c)

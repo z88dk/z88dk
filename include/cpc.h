@@ -26,14 +26,14 @@ extern int  __LIB__ cpc_model(void);
 ///////////////////////////////////////////
 
 // Switch mode
-extern int __LIB__ __FASTCALL__ cpc_setmode(int) __SMALLCFASTCALL;
+extern int __LIB__  cpc_setmode(int) __z88dk_fastcall;
 // Tiny ROM based console gets implementation
 extern int __LIB__ cpc_gets(char *s);
 
 // Copies a string to a CPC RSX compatible one
-extern char __LIB__ __FASTCALL__ *cpc_rsx_str(char *str) __SMALLCFASTCALL;    // (malloc lib is required)
-extern char __LIB__              *cpc_rsx_strcpy(char *, char *) __SMALLCDECL ;
-extern char __LIB__ __CALLEE__   *cpc_rsx_strcpy_callee(char *, char *)  __SMALLCDECL __SMALLCCALLEE;
+extern char __LIB__  *cpc_rsx_str(char *str) __z88dk_fastcall;    // (malloc lib is required)
+extern char __LIB__              *cpc_rsx_strcpy(char *, char *) __smallc ;
+extern char __LIB__    *cpc_rsx_strcpy_callee(char *, char *)  __smallc __z88dk_callee;
 
 #define cpc_rsx_strcpy(a,b) cpc_rsx_strcpy_callee(a,b)
 
@@ -65,7 +65,7 @@ extern int __LIB__ cpc_rsx(char *cmd,...);
 
 
 // Hide/Show BIOS error messages
-extern void  __LIB__ __FASTCALL__ bios_msg(int flag) __SMALLCFASTCALL;
+extern void  __LIB__  bios_msg(int flag) __z88dk_fastcall;
 
 #define MSG_ENABLE	0
 #define MSG_DISABLE	255

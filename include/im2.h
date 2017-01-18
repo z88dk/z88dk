@@ -25,27 +25,27 @@
  *     on a particular interrupt will not be executed.
  */
 
-extern void __LIB__ __FASTCALL__ im2_Init(void *tableaddr);
+extern void __LIB__  im2_Init(void *tableaddr);
 
 /*
  * tableaddr = 16-bit address of the interrupt vector table, LSB ignored
  *             and assumed to be zero.
  */
 
-extern void __LIB__ *im2_InstallISR(uchar vector, void *isr) __SMALLCDECL;
+extern void __LIB__ *im2_InstallISR(uchar vector, void *isr) __smallc;
 extern void __LIB__ im2_EmptyISR(void);
-extern void __LIB__ *im2_CreateGenericISR(uchar numhooks /* >=1 */, void *addr) __SMALLCDECL;
-extern void __LIB__ *im2_CreateGenericISRLight(uchar numhooks /* >=1 */, void *addr) __SMALLCDECL;
-extern void __LIB__ im2_RegHookFirst(uchar vector, void *hook) __SMALLCDECL;
-extern void __LIB__ im2_RegHookLast(uchar vector, void *hook) __SMALLCDECL;
-extern int  __LIB__ im2_RemoveHook(uchar vector, void *hook) __SMALLCDECL;
+extern void __LIB__ *im2_CreateGenericISR(uchar numhooks /* >=1 */, void *addr) __smallc;
+extern void __LIB__ *im2_CreateGenericISRLight(uchar numhooks /* >=1 */, void *addr) __smallc;
+extern void __LIB__ im2_RegHookFirst(uchar vector, void *hook) __smallc;
+extern void __LIB__ im2_RegHookLast(uchar vector, void *hook) __smallc;
+extern int  __LIB__ im2_RemoveHook(uchar vector, void *hook) __smallc;
 
-extern void __LIB__ __CALLEE__ *im2_InstallISR_callee(uchar vector, void *isr) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__ *im2_CreateGenericISR_callee(uchar numhooks, void *addr) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__ *im2_CreateGenericISRLight_callee(uchar numhooks, void *addr) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__  im2_RegHookFirst_callee(uchar vector, void *hook) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__  im2_RegHookLast_callee(uchar vector, void *hook) __SMALLCDECL __SMALLCCALLEE;
-extern int  __LIB__ __CALLEE__  im2_RemoveHook_callee(uchar vector, void *hook) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__  *im2_InstallISR_callee(uchar vector, void *isr) __smallc __z88dk_callee;
+extern void __LIB__  *im2_CreateGenericISR_callee(uchar numhooks, void *addr) __smallc __z88dk_callee;
+extern void __LIB__  *im2_CreateGenericISRLight_callee(uchar numhooks, void *addr) __smallc __z88dk_callee;
+extern void __LIB__   im2_RegHookFirst_callee(uchar vector, void *hook) __smallc __z88dk_callee;
+extern void __LIB__   im2_RegHookLast_callee(uchar vector, void *hook) __smallc __z88dk_callee;
+extern int  __LIB__   im2_RemoveHook_callee(uchar vector, void *hook) __smallc __z88dk_callee;
 
 #define im2_InstallISR(a,b)             im2_InstallISR_callee(a,b)
 #define im2_CreateGenericISR(a,b)       im2_CreateGenericISR_callee(a,b)

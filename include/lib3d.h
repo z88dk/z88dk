@@ -16,7 +16,7 @@ Copyright© 2002, Mark Hamilton
 // fixed point arithmetic
 
 /// integer to fixed-point
-extern long __LIB__ __FASTCALL__ i2f (int v) __SMALLCFASTCALL;
+extern long __LIB__  i2f (int v) __z88dk_fastcall;
 
 /// fixed-point to integer
 extern int __LIB__ f2i (long v);
@@ -82,13 +82,13 @@ typedef struct {
 
 
 /* protos */
-extern void __LIB__ ozrotatepointx(Vector_t *v, int rot) __SMALLCDECL;
-extern void __LIB__ ozrotatepointy(Vector_t *v, int rot) __SMALLCDECL;
-extern void __LIB__ ozrotatepointz(Vector_t *v, int rot) __SMALLCDECL;
-extern void __LIB__ ozplotpointcam(Vector_t *v, Cam_t *c, Point_t *p) __SMALLCDECL;
-extern void __LIB__ ozplotpoint(Vector_t *v, Point_t *p) __SMALLCDECL;
-extern void __LIB__ ozcopyvector(Vector_t *dest, Vector_t *src) __SMALLCDECL;
-extern void __LIB__ oztranslatevector(Vector_t *v, Vector_t *offset) __SMALLCDECL;
+extern void __LIB__ ozrotatepointx(Vector_t *v, int rot) __smallc;
+extern void __LIB__ ozrotatepointy(Vector_t *v, int rot) __smallc;
+extern void __LIB__ ozrotatepointz(Vector_t *v, int rot) __smallc;
+extern void __LIB__ ozplotpointcam(Vector_t *v, Cam_t *c, Point_t *p) __smallc;
+extern void __LIB__ ozplotpoint(Vector_t *v, Point_t *p) __smallc;
+extern void __LIB__ ozcopyvector(Vector_t *dest, Vector_t *src) __smallc;
+extern void __LIB__ oztranslatevector(Vector_t *v, Vector_t *offset) __smallc;
 
 
 /* protos from MSX GFX lib */
@@ -97,40 +97,40 @@ extern void __LIB__ oztranslatevector(Vector_t *v, Vector_t *offset) __SMALLCDEC
 extern int __LIB__ vector_length(vector_t *v);
 
 /// subtract vector v1 by v2, result in r
-extern void __LIB__ vector_subtract (vector_t *v1, vector_t *v2, vector_t *r) __SMALLCDECL;
+extern void __LIB__ vector_subtract (vector_t *v1, vector_t *v2, vector_t *r) __smallc;
 
 /// normalize vector p, result in r
-extern void __LIB__ vector_normalize(vector_t *p, vector_t *r) __SMALLCDECL;
+extern void __LIB__ vector_normalize(vector_t *p, vector_t *r) __smallc;
 
 /// rotate vector p by the given angles, result in r
-extern void __LIB__ vector_rotate(vector_t* p, int angle_x, int angle_y, int angle_z, vector_t* r) __SMALLCDECL;
+extern void __LIB__ vector_rotate(vector_t* p, int angle_x, int angle_y, int angle_z, vector_t* r) __smallc;
 
 /// dot product of v1 by v2
-extern int __LIB__ vector_dot_product (vector_t* v1, vector_t* v2) __SMALLCDECL;
+extern int __LIB__ vector_dot_product (vector_t* v1, vector_t* v2) __smallc;
 
 /// cross product of v1 by v2, result into r
-extern void __LIB__ vector_cross_product (vector_t* v1, vector_t* v2, vector_t* r) __SMALLCDECL;
+extern void __LIB__ vector_cross_product (vector_t* v1, vector_t* v2, vector_t* r) __smallc;
 
 /// cross product of the z axis of v1 by v2
-extern int __LIB__ vector_cross_product_z (vector_t* v1, vector_t* v2) __SMALLCDECL;
+extern int __LIB__ vector_cross_product_z (vector_t* v1, vector_t* v2) __smallc;
 
 /// scale vector v by s, result in r
-extern void __LIB__ vector_scalar(vector_t *v, int s, vector_t* r) __SMALLCDECL;
+extern void __LIB__ vector_scalar(vector_t *v, int s, vector_t* r) __smallc;
 
 /// add vector v1 with v2, result in r
-extern void __LIB__ vector_add(vector_t *v1, vector_t *v2, vector_t *r) __SMALLCDECL;
+extern void __LIB__ vector_add(vector_t *v1, vector_t *v2, vector_t *r) __smallc;
 
 /// distance between vectors v1 and v2
-extern int __LIB__ vector_distance (vector_t *v1, vector_t *v2) __SMALLCDECL;
+extern int __LIB__ vector_distance (vector_t *v1, vector_t *v2) __smallc;
 
 /// create a new mesh with pcount points and tcount triangles
-extern mesh_t __LIB__ *mesh_new(int pcount, int tcount) __SMALLCDECL;
+extern mesh_t __LIB__ *mesh_new(int pcount, int tcount) __smallc;
 
 /// deallocate mesh
-extern void __LIB__ mesh_delete(mesh_t* mesh) __SMALLCDECL;
+extern void __LIB__ mesh_delete(mesh_t* mesh) __smallc;
 
 /// apply perspective transformations on object obj, centering the points around x and y
-extern void __LIB__ object_apply_transformations(object_t* obj, vector_t* pbuffer, int x, int y) __SMALLCDECL;
+extern void __LIB__ object_apply_transformations(object_t* obj, vector_t* pbuffer, int x, int y) __smallc;
 
 /*
 	Integer sin functions taken from the lib3d library, OZ7xx DK
@@ -139,8 +139,8 @@ extern void __LIB__ object_apply_transformations(object_t* obj, vector_t* pbuffe
 	(changed by Stefano, originally it was +/- 16384)
 */
 
-extern int __LIB__ __FASTCALL__ isin(unsigned int degrees) __SMALLCFASTCALL; /* input must be between 0 and 360 */
-extern int __LIB__ __FASTCALL__ icos(unsigned int degrees) __SMALLCFASTCALL; /* input must be between 0 and 360 */
+extern int __LIB__  isin(unsigned int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
+extern int __LIB__  icos(unsigned int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
 extern int __LIB__  div256(long value); /* divide by 255 */
 
 
@@ -148,19 +148,19 @@ extern int __LIB__  div256(long value); /* divide by 255 */
 /* they extend the <graphics.h> capability */
 
 /* Draw an ellipse arc delimited by 'startangle' and 'endangle' (deg) */
-extern __LIB__ ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius) __SMALLCDECL;
+extern __LIB__ ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius) __smallc;
 
 /* Draw an arc delimited by 'startangle' and 'endangle' (deg) */
 #define arc(x,y,s,e,r)  ellipse(x,y,s,e,r,r)
 
 /* Draw a polygon by a given number of corners, rotation in degrees determined by sa. */
-extern __LIB__ polygon(int cx, int cy, int corners, int r, int sa) __SMALLCDECL;
+extern __LIB__ polygon(int cx, int cy, int corners, int r, int sa) __smallc;
 
 
 
 /* As above but related to the "stencil" object */
-extern __LIB__ stencil_add_polygon(int cx, int cy, int corners, int r, int sa, unsigned char *stencil) __SMALLCDECL;
-extern __LIB__ stencil_add_ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius, unsigned char *stencil) __SMALLCDECL;
+extern __LIB__ stencil_add_polygon(int cx, int cy, int corners, int r, int sa, unsigned char *stencil) __smallc;
+extern __LIB__ stencil_add_ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius, unsigned char *stencil) __smallc;
 #define stencil_add_arc(x,y,s,e,r,t)  stencil_add_ellipse(x,y,s,e,r,r,t)
 
 

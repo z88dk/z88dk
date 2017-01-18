@@ -94,33 +94,33 @@ struct N_CHAN {
 
 
 // Load a sector identified by file name and record number
-extern int __LIB__ if1_load_record (int drive, char *filename, int record, struct M_CHAN buffer) __SMALLCDECL;
+extern int __LIB__ if1_load_record (int drive, char *filename, int record, struct M_CHAN buffer) __smallc;
 
 // Load a sector identified by the sector number
-extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN buffer) __SMALLCDECL;
+extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN buffer) __smallc;
 
 // Write the sector in "buffer"
-extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN buffer) __SMALLCDECL;
+extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN buffer) __smallc;
 
 // Add a record containing the data in "buffer"
-extern int __LIB__ if1_write_record (int drive, struct M_CHAN buffer) __SMALLCDECL;
+extern int __LIB__ if1_write_record (int drive, struct M_CHAN buffer) __smallc;
 
 // Put a 10 characters file name at the specified location; return with the file name length
-extern int __LIB__ if1_setname(char* name, char *location) __SMALLCDECL;
+extern int __LIB__ if1_setname(char* name, char *location) __smallc;
 
 extern char __LIB__ *if1_getname(char *location);
 
 // Delete a file
-extern int __LIB__ if1_remove_file(int drive, char *filename) __SMALLCDECL;
+extern int __LIB__ if1_remove_file(int drive, char *filename) __smallc;
 
 // Create a file if it doesn't exist
-extern int __LIB__ if1_touch_file(int drive, char *filename) __SMALLCDECL;
+extern int __LIB__ if1_touch_file(int drive, char *filename) __smallc;
 
 // Create a file and return handle
-extern int __LIB__ if1_init_file (int drive, char *filename, struct M_CHAN buffer) __SMALLCDECL;
+extern int __LIB__ if1_init_file (int drive, char *filename, struct M_CHAN buffer) __smallc;
 
 // Load the map values for the specified drive
-extern void __LIB__ if1_update_map (int drive, char *mdvmap) __SMALLCDECL;
+extern void __LIB__ if1_update_map (int drive, char *mdvmap) __smallc;
 
 // Find a free sector
 extern int __LIB__ if1_find_sector (int drive);
@@ -144,6 +144,6 @@ extern int __LIB__ zx_interface1();
 extern int __LIB__ if1_mdv_status(int drive);
 
 // Count the free sectors in the given drive
-extern int __LIB__  __FASTCALL__ if1_free_sectors(int drive);
+extern int __LIB__   if1_free_sectors(int drive);
 
 #endif /* _ZXINTERFACE1_H */

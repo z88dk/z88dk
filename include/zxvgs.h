@@ -20,13 +20,13 @@ extern int __LIB__ j2();
 extern int __LIB__ j3();
 
 /* sound devices */
-extern int __LIB__ opensound(int device, int mode) __SMALLCDECL;
+extern int __LIB__ opensound(int device, int mode) __smallc;
 
 /* memory banks */
 extern int __LIB__ bnkfree();
 
 /* direct loading and saving files */
-extern int __LIB__ loadany(char *name, int adr, int len) __SMALLCDECL;
-extern int __LIB__ saveany(char *name, int adr, int len) __SMALLCDECL;
+extern int __LIB__ loadany(char *name, int adr, int len) __smallc;
+extern int __LIB__ saveany(char *name, int adr, int len) __smallc;
 
 #endif

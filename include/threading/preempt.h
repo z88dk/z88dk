@@ -112,7 +112,7 @@ extern void __LIB__ thread_manager_init_real(scheduler_t *scheduler);
  *  \param stack - Address of the stack (will grow down)
  *  \param priority - Task priority
  */
-extern thread_t __LIB__ *thread_create(void (*entry)(), void *stack, int priority) __SMALLCDECL;
+extern thread_t __LIB__ *thread_create(void (*entry)(), void *stack, int priority) __smallc;
 
 /** \brief Start the thread manager 
  *

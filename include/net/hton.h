@@ -20,9 +20,9 @@
 #include <net/inet.h>
 
 
-extern IPADDR_T __LIB__ __FASTCALL__ htonl(IPADDR_T) __SMALLCDECL __SMALLCFASTCALL;
+extern IPADDR_T __LIB__  htonl(IPADDR_T) __smallc __z88dk_fastcall;
 
-extern TCPPORT_T __LIB__ __FASTCALL__ htons(TCPPORT_T) __SMALLCDECL __SMALLCFASTCALL;
+extern TCPPORT_T __LIB__  htons(TCPPORT_T) __smallc __z88dk_fastcall;
 
 
 #define ntohs(x) htons(x)

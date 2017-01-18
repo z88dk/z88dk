@@ -59,14 +59,14 @@ extern void __LIB__ getpotssid(void);
 extern void __LIB__ getmousesid(void);
 
 extern void __LIB__ clearsid(void);
-extern void __LIB__ volumesid(ushort Amp, ushort Filter) __SMALLCDECL;
-extern void __LIB__ envelopesid(ushort Voice, ushort Attack, ushort Decay, ushort Sustain, ushort Release) __SMALLCDECL;
-extern void __LIB__ freqsid(ushort Voice, ushort Freq) __SMALLCDECL;
-extern void __LIB__ attacksid(ushort Voice, ushort Waveform) __SMALLCDECL;
-extern void __LIB__ releasesid(ushort Voice, ushort Waveform) __SMALLCDECL;
-extern void __LIB__ pulsewavesid(ushort Voice, ushort Width) __SMALLCDECL;
+extern void __LIB__ volumesid(ushort Amp, ushort Filter) __smallc;
+extern void __LIB__ envelopesid(ushort Voice, ushort Attack, ushort Decay, ushort Sustain, ushort Release) __smallc;
+extern void __LIB__ freqsid(ushort Voice, ushort Freq) __smallc;
+extern void __LIB__ attacksid(ushort Voice, ushort Waveform) __smallc;
+extern void __LIB__ releasesid(ushort Voice, ushort Waveform) __smallc;
+extern void __LIB__ pulsewavesid(ushort Voice, ushort Width) __smallc;
 
-extern void __LIB__ playzb4sid(uchar *SamStart, ushort SamLen) __SMALLCDECL;
+extern void __LIB__ playzb4sid(uchar *SamStart, ushort SamLen) __smallc;
 
 #endif
 

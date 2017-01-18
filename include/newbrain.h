@@ -279,8 +279,8 @@ struct NB_DRIVER {
  * lowercase characters are not ASCII coded
  */
 
-extern void __LIB__ fputc_lcd(int position, int character) __SMALLCDECL;
-extern void __LIB__ __FASTCALL__ fputs_lcd( char *text ) __SMALLCFASTCALL;
+extern void __LIB__ fputc_lcd(int position, int character) __smallc;
+extern void __LIB__  fputs_lcd( char *text ) __z88dk_fastcall;
 
 /* 
  * Check if break has been pressed
@@ -302,16 +302,16 @@ extern void __LIB__ warm_reset();
 #define INP     0x32    /* open mode for input with 'nb_open'*/
 #define OUTP    0x33    /* open mode for output with 'nb_open'*/
 
-extern int __LIB__ nb_open( int mode, int stream, int device, int port, char *paramstr ) __SMALLCDECL;
-extern void __LIB__ __FASTCALL__ nb_close( int stream ) __SMALLCFASTCALL;
+extern int __LIB__ nb_open( int mode, int stream, int device, int port, char *paramstr ) __smallc;
+extern void __LIB__  nb_close( int stream ) __z88dk_fastcall;
 extern void __LIB__ nb_clear( );
-extern void __LIB__ nb_putc( int stream, int byte ) __SMALLCDECL;
-extern void __LIB__ nb_puts( int stream, char *text ) __SMALLCDECL;
-extern int __LIB__ nb_putblock( int stream, char *bytes, int length ) __SMALLCDECL;
-extern void __LIB__ nb_putval( int stream, int value ) __SMALLCDECL;
+extern void __LIB__ nb_putc( int stream, int byte ) __smallc;
+extern void __LIB__ nb_puts( int stream, char *text ) __smallc;
+extern int __LIB__ nb_putblock( int stream, char *bytes, int length ) __smallc;
+extern void __LIB__ nb_putval( int stream, int value ) __smallc;
 
-extern char __LIB__ __FASTCALL__ nb_getc( int stream ) __SMALLCFASTCALL;
-extern char __LIB__ *nb_gets( int stream, char *bytes, int length ) __SMALLCDECL;
-extern int __LIB__ nb_getblock( int stream, char *bytes, int length ) __SMALLCDECL;
+extern char __LIB__  nb_getc( int stream ) __z88dk_fastcall;
+extern char __LIB__ *nb_gets( int stream, char *bytes, int length ) __smallc;
+extern int __LIB__ nb_getblock( int stream, char *bytes, int length ) __smallc;
 
 #endif

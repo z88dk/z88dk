@@ -18,14 +18,14 @@
  */
 
 /* save the sprite background in another sprite */
-extern void __LIB__ bksave(int x, int y, void *sprite) __SMALLCDECL;
-extern void __LIB__ __FASTCALL__ bkrestore(void *sprite) __SMALLCFASTCALL;
+extern void __LIB__ bksave(int x, int y, void *sprite) __smallc;
+extern void __LIB__  bkrestore(void *sprite) __z88dk_fastcall;
 
 /* pick up a sprite directly from the screen */
-extern void __LIB__ getsprite(int x, int y, void *sprite) __SMALLCDECL; // This isn't still finished
+extern void __LIB__ getsprite(int x, int y, void *sprite) __smallc; // This isn't still finished
 
 /* draw a sprite of variable size */
-extern void __LIB__ putsprite(int ortype, int x, int y, void *sprite) __SMALLCDECL;
+extern void __LIB__ putsprite(int ortype, int x, int y, void *sprite) __smallc;
 
 #define spr_and  166+47*256 // CPL - AND (HL)
 #define spr_or   182 // OR (HL)
@@ -39,7 +39,7 @@ extern void __LIB__ putsprite(int ortype, int x, int y, void *sprite) __SMALLCDE
 
 
 /* Joystick (or whatever game device) control function */
-extern unsigned int __LIB__ __FASTCALL__ joystick(int game_device) __SMALLCFASTCALL;
+extern unsigned int __LIB__  joystick(int game_device) __z88dk_fastcall;
 
 #define MOVE_RIGHT 1
 #define MOVE_LEFT  2
