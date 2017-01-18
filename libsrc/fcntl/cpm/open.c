@@ -35,12 +35,12 @@ int open(char *name, int flags, mode_t mode)
     }
 
     if ( setfcb(fc,name) == 0 ) {  /* We had a real file, not a device */
-		if ( flags == U_READ && bdos(CPM_VERS,0) >= 0x30 ) 
+		if ( flags == U_READ && bdos(CPM_VERS,0) >= 0x30 )
 			fc->name[5] |= 0x80;    /* read only mode */
 		uid = getuid();
 		setuid(fc->uid);
 
-		if ( (*(unsigned char *)mode) == 'w' )
+		if ( (mode & O_WRONLY) == O_WRONLY  )
 			remove(name);
 
 		if ( bdos(CPM_OPN,fc) == -1 ) {
@@ -61,9 +61,8 @@ int open(char *name, int flags, mode_t mode)
 		fc->use = flags;
     }
     fd =  ((fc - &_fcb[0])/sizeof(struct fcb));
-	if ( (*(unsigned char *)mode) == 'a' )
+	if (mode & O_APPEND)
 		lseek(fd,0L,SEEK_END);
 
     return fd;
 }
-

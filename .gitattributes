@@ -1,1 +1,5 @@
-* text eol=lf
+*.pdf binary
+*.c text eol=lf
+*.h text eol=lf
+*.asm text eol=lf
+

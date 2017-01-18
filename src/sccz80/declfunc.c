@@ -511,6 +511,24 @@ dofnansi(SYMBOL *currfn, int32_t *addr)
             constexpr(addr,1);
         }
 
+        blanks();
+
+        while ( 1 ) {
+            if ( amatch("__z88dk_fastcall") || amatch("__FASTCALL__") ) {
+                currfn->flags |= REGCALL;
+                continue;
+            }
+            if ( amatch("__z88dk_callee") || amatch("__CALLEE__")) {
+                currfn->flags |= CALLEE;
+                continue;
+            }
+            if ( amatch("__smallc")) {
+                /* Just swallow */
+                continue;
+            }
+            break;
+        }
+
         if (cmatch(';') ) return (prevarg);
         setlocvar(prevarg,currfn);
         return (0);
