@@ -13900,7 +13900,7 @@ replace restart {
 	ld	%3,%4
 	ld	hl,#%1
 	; peephole z88dk-339a
-} if notSame(%3 'l' 'h' 'hl' '(hl)'), notSame(%4 'l' 'h' 'hl' '(hl)')
+} if operandsNotRelated(%3 'hl'), operandsNotRelated(%4 'hl')
 
 replace restart {
 	ld	hl,#%1 + %2
@@ -13909,7 +13909,7 @@ replace restart {
 	ld	%3,%4
 	ld	hl,#%1 + %2
 	; peephole z88dk-339b
-} if notSame(%3 'l' 'h' 'hl' '(hl)'), notSame(%4 'l' 'h' 'hl' '(hl)')
+} if operandsNotRelated(%3 'hl'), operandsNotRelated(%4 'hl')
 
 replace restart {
 	ld	hl,#%1
@@ -13918,7 +13918,7 @@ replace restart {
 	xor	a,%3
 	ld	hl,#%1
 	; peephole z88dk-339c
-} if notSame(%3 'l' 'h')
+} if operandsNotRelated(%3 'hl')
 
 replace restart {
 	ld	hl,#%1 + %4
@@ -13927,7 +13927,7 @@ replace restart {
 	xor	a,%3
 	ld	hl,#%1 + %4
 	; peephole z88dk-339d
-} if notSame(%3 'l' 'h')
+} if operandsNotRelated(%3 'hl')
 
 replace restart {
 	ld	hl,#%1
@@ -13936,7 +13936,7 @@ replace restart {
 	inc	%3
 	ld	hl,#%1
 	; peephole z88dk-339e
-} if notSame(%3 'hl' 'l' 'h' '(hl)')
+} if operandsNotRelated(%3 'hl')
 
 replace restart {
 	ld	hl,#%1
@@ -13945,7 +13945,7 @@ replace restart {
 	dec	%3
 	ld	hl,#%1
 	; peephole z88dk-339f
-} if notSame(%3 'hl' 'l' 'h' '(hl)')
+} if operandsNotRelated(%3 'hl')
 
 replace restart {
 	ld	hl,#%1 + %2
@@ -13954,7 +13954,7 @@ replace restart {
 	inc	%3
 	ld	hl,#%1 + %2
 	; peephole z88dk-339g
-} if notSame(%3 'hl' 'l' 'h' '(hl)')
+} if operandsNotRelated(%3 'hl')
 
 replace restart {
 	ld	hl,#%1 + %2
@@ -13963,7 +13963,7 @@ replace restart {
 	dec	%3
 	ld	hl,#%1 + %2
 	; peephole z88dk-339h
-} if notSame(%3 'hl' 'l' 'h' '(hl)')
+} if operandsNotRelated(%3 'hl')
 
 replace restart {
 	ex	de,hl
