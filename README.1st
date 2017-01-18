@@ -2,6 +2,8 @@
 Z88DK - v1.99B 10 Jan 2017
 ==========================
 
+https://sourceforge.net/projects/z88dk/
+
 Z88dk is a development kit for z80 computers that contains the tools and assembly language libraries necessary to develop code in either C or assembly language for z80-based machines.
 
 Over 50 different z80 machines have CRTs in the toolkit, allowing C programs to be compiled for them out-of-the-box.
@@ -15,7 +17,7 @@ https://www.z88dk.org/wiki/doku.php?id=temp:front#installation
 
 Home Page:
 https://www.z88dk.org/forum/
-Includes link to the nightly builds.
+Includes a link to the nightly builds where you can get an up-to-date package.
 
 Forum:
 https://www.z88dk.org/forum/forums.php
