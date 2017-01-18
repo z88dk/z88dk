@@ -526,7 +526,7 @@ dofnansi(SYMBOL *currfn, int32_t *addr)
                 /* Just swallow */
                 continue;
             }
-            if ( amatch("__preserve_regs")) {
+            if ( amatch("__preserves_regs")) {
                 int c;
                 needchar('(');
                 /* Consume what's inside, isalpha, comma, white space */
