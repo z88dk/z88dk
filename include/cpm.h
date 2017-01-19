@@ -126,7 +126,7 @@ extern void __LIB__ _putoffset(unsigned char *where,long offset) __SMALLCDECL;
 /* directory stuff */
 /*******************/
 
-extern struct fcb __LIB__ *fc_dir;
+extern struct fcb __LIB__ fc_dir;
 extern char __LIB__ fc_dirpos;
 extern char __LIB__ *fc_dirbuf;
 
