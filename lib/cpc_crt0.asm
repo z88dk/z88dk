@@ -111,8 +111,10 @@ cpc_enable_fw_exx_set:
    pop hl
    ld (__process_exx_set_af__),hl
    
+IF startup != 2
    ld hl,(__fw_int_address__)
    ld (0x0039),hl                      ; restore firmware isr
+ENDIF
    
    ld bc,(__fw_exx_set_bc__)           ; restore firmware exx set
    or a
@@ -129,11 +131,13 @@ cpc_enable_process_exx_set:
 
    ld (__fw_exx_set_bc__),bc           ; save firmware exx set
    
+IF startup != 2
    ld hl,(0x0039)
    ld (__fw_int_address__),hl          ; save firmware interrupt entry
    
    ld hl,__interposer_isr__
    ld (0x0039),hl                      ; interposer receives interrupts
+ENDIF
    
    ld hl,(__process_exx_set_af__)      ; restore process exx set
    push hl
