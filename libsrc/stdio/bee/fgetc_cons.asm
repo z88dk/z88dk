@@ -15,7 +15,7 @@
 
 .fgetc_cons
 ._fgetc_cons
-	call $BE28
+	call $803F
 	jr nz,fgetc_cons
 	ld	h,0
 	ld	l,a
