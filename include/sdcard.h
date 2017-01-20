@@ -148,38 +148,38 @@ int				csdfoo;		// Terminate with two extra bytes, to avoid overflows.
 
 
 // Initialize the SD card (Returns -1 on error, or ptr to card ID string)
-extern char __LIB__ __FASTCALL__ *sd_initialize(int slot);
+extern char __LIB__  *sd_initialize(int slot);
 
 // Initialize the SD card (0 = OK)
 extern int __LIB__ sd_load(unsigned char slot, struct SD_INFO descriptor);
 
 // Compute the SD/MMC card size (in bytes).
 //  Valid only for SD and MMC and only if size is <= 2GB, otherwise 0.
-extern unsigned long __LIB__ __FASTCALL__ sd_size(struct SD_INFO descriptor);
+extern unsigned long __LIB__  sd_size(struct SD_INFO descriptor);
 
 // Compute the SD/MMC card size (in sectors).
-extern unsigned long __LIB__ __FASTCALL__ sd_sectors(struct SD_INFO descriptor);
+extern unsigned long __LIB__  sd_sectors(struct SD_INFO descriptor);
 
 // Given a linear address, read 512 bytes from the SD or MMC card (only for cards < 2GB)
 extern int __LIB__            sd_read_block_2gb(struct SD_INFO descriptor, long sector, unsigned char *address);
-extern int __LIB__ __CALLEE__ sd_read_block_2gb_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
+extern int __LIB__  sd_read_block_2gb_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
 
 // Given a linear address, write 512 bytes to the SD or MMC  card (only for cards < 2GB)
 extern int __LIB__            sd_write_block_2gb(struct SD_INFO descriptor, long sector, unsigned char *address);
-extern int __LIB__ __CALLEE__ sd_write_block_2gb_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
+extern int __LIB__  sd_write_block_2gb_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
 
 // Read a given sector from the SD card
 extern int __LIB__            sd_read_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
-extern int __LIB__ __CALLEE__ sd_read_sector_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
+extern int __LIB__  sd_read_sector_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
 
 // Write a given sector to the SD card
 extern int __LIB__            sd_write_sector(struct SD_INFO descriptor, long sector, unsigned char *address);
-extern int __LIB__ __CALLEE__ sd_write_sector_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
+extern int __LIB__  sd_write_sector_callee(struct SD_INFO descriptor, long sector, unsigned char *address);
 
 // Unpack bits to read CID or CSD or other, bit count begins on the less signigicant position
 // of a 16 byte (128 bit) long block, thus on the rightmost bit
 extern unsigned long __LIB__             UNSTUFF_BITS(unsigned char *data, unsigned int start, unsigned int size);
-extern unsigned long __LIB__ __CALLEE__  UNSTUFF_BITS_callee(unsigned char *data, unsigned int start, unsigned int size);
+extern unsigned long __LIB__   UNSTUFF_BITS_callee(unsigned char *data, unsigned int start, unsigned int size);
 
 #define sd_read_block_2gb(a,b,c)  sd_read_block_2gb_callee(a,b,c)
 #define sd_write_block_2gb(a,b,c)  sd_write_block_2gb_callee(a,b,c)
@@ -189,7 +189,7 @@ extern unsigned long __LIB__ __CALLEE__  UNSTUFF_BITS_callee(unsigned char *data
 
 
 // Reserved functions, internal use only
-//extern void __LIB__ __FASTCALL__ sd_initialize(int card);
+//extern void __LIB__  sd_initialize(int card);
 /*
 extern void __LIB__ sd_deselect_card();
 extern void __LIB__ sd_send_eight_clocks();

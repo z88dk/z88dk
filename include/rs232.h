@@ -87,13 +87,13 @@ extern u8_t __LIB__ rs232_close();
 
 
 /* Write a byte to the serial interface */
-extern u8_t __FASTCALL__ __LIB__ rs232_put(i8_t);
+extern u8_t  __LIB__ rs232_put(i8_t);
 
 
 /* Read a byte from the serial, returns RS_ERR_NO_DATA if an error, places
    data in the pointer supplied
 */
-extern u8_t __FASTCALL__ __LIB__ rs232_get(i8_t *);
+extern u8_t  __LIB__ rs232_get(i8_t *);
 
 
 

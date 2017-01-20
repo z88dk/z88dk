@@ -4,24 +4,24 @@
 #include <sys/compiler.h>
 
 
-extern int __LIB__ __FASTCALL__ isalnum(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isalpha(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isascii(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isbdigit(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ iscntrl(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isdigit(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isgraph(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isupper(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ islower(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isodigit(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isoob(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isprint(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ ispunct(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isspace(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ isxdigit(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ toascii(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ tolower(int) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ toupper(int) __SMALLCFASTCALL;
+extern int __LIB__  isalnum(int) __z88dk_fastcall;
+extern int __LIB__  isalpha(int) __z88dk_fastcall;
+extern int __LIB__  isascii(int) __z88dk_fastcall;
+extern int __LIB__  isbdigit(int) __z88dk_fastcall;
+extern int __LIB__  iscntrl(int) __z88dk_fastcall;
+extern int __LIB__  isdigit(int) __z88dk_fastcall;
+extern int __LIB__  isgraph(int) __z88dk_fastcall;
+extern int __LIB__  isupper(int) __z88dk_fastcall;
+extern int __LIB__  islower(int) __z88dk_fastcall;
+extern int __LIB__  isodigit(int) __z88dk_fastcall;
+extern int __LIB__  isoob(int) __z88dk_fastcall;
+extern int __LIB__  isprint(int) __z88dk_fastcall;
+extern int __LIB__  ispunct(int) __z88dk_fastcall;
+extern int __LIB__  isspace(int) __z88dk_fastcall;
+extern int __LIB__  isxdigit(int) __z88dk_fastcall;
+extern int __LIB__  toascii(int) __z88dk_fastcall;
+extern int __LIB__  tolower(int) __z88dk_fastcall;
+extern int __LIB__  toupper(int) __z88dk_fastcall;
 
 #define isblank(a) isspace(a)
 

@@ -42,7 +42,7 @@ extern byte ozcustomactivefont;
 extern byte _LIB_ ozscancustomfonts(void);
 extern void _LIB_ ozsetfontpointer(byte *font);
 extern void _LIB_ ozclearcustomfontslot(int slot);
-extern void _LIB_ ozwritecustomfontbyte(int slot,unsigned offset,int value) __SMALLCDECL;
+extern void _LIB_ ozwritecustomfontbyte(int slot,unsigned offset,int value) __smallc;
 extern void _LIB_ ozwritecustomfontmem(int slot,byte *fontdata);
 
 #define MASK_CUSTOM0 1

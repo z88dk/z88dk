@@ -179,27 +179,27 @@ extern int  __LIB__ zx_ulaplus(void);
 extern int  __LIB__ ula_plus_mode(void);
 extern void __LIB__ ula_normal_mode(void);
 extern void __LIB__ ula_sync(void);
-extern int __LIB__ ulaplus_set(unsigned char attribute, unsigned char rgbcolor) __SMALLCDECL;
-extern int  __LIB__ __FASTCALL__ ulaplus_get(unsigned char attribute) __SMALLCFASTCALL;
+extern int __LIB__ ulaplus_set(unsigned char attribute, unsigned char rgbcolor) __smallc;
+extern int  __LIB__  ulaplus_get(unsigned char attribute) __z88dk_fastcall;
 
 
 ///////////////////////////////
 // INTERFACE FOR CALLING BASIC
 ///////////////////////////////
 
-extern int  __LIB__ __FASTCALL__ zx_syntax(char *statement) __SMALLCFASTCALL;
-extern int  __LIB__ __FASTCALL__ zx_goto(int line) __SMALLCFASTCALL;
-extern int  __LIB__              zx_getstr(char variable, char *value) __SMALLCDECL;
-extern void __LIB__              zx_setstr(char variable, char *value) __SMALLCDECL;
-extern int  __LIB__ __FASTCALL__ zx_getint(char *variable) __SMALLCFASTCALL;
-extern void __LIB__              zx_setint(char *variable, int value) __SMALLCDECL;
-extern double __LIB__ __FASTCALL__ zx_getfloat(char *variable) __SMALLCFASTCALL;
-extern void __LIB__              zx_setfloat(char *variable, float value) __SMALLCDECL;
+extern int  __LIB__  zx_syntax(char *statement) __z88dk_fastcall;
+extern int  __LIB__  zx_goto(int line) __z88dk_fastcall;
+extern int  __LIB__              zx_getstr(char variable, char *value) __smallc;
+extern void __LIB__              zx_setstr(char variable, char *value) __smallc;
+extern int  __LIB__  zx_getint(char *variable) __z88dk_fastcall;
+extern void __LIB__              zx_setint(char *variable, int value) __smallc;
+extern double __LIB__  zx_getfloat(char *variable) __z88dk_fastcall;
+extern void __LIB__              zx_setfloat(char *variable, float value) __smallc;
 
-extern int  __LIB__ __CALLEE__   zx_getstr_callee(char variable, char *value) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__   zx_setstr_callee(char variable, char *value) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__   zx_setint_callee(char *variable, int value) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__   zx_setfloat_callee(char *variable, float value) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__    zx_getstr_callee(char variable, char *value) __smallc __z88dk_callee;
+extern void __LIB__    zx_setstr_callee(char variable, char *value) __smallc __z88dk_callee;
+extern void __LIB__    zx_setint_callee(char *variable, int value) __smallc __z88dk_callee;
+extern void __LIB__    zx_setfloat_callee(char *variable, float value) __smallc __z88dk_callee;
 
 #define zx_getstr(a,b)           zx_getstr_callee(a,b)
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)
@@ -219,12 +219,12 @@ struct zxtapehdr {             // standard tape header
    size_t        offset;
 };
 
-extern int  __LIB__            tape_save(char *name, size_t loadstart,void *start, size_t len) __SMALLCDECL;
-extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type) __SMALLCDECL;
-extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type) __SMALLCDECL;
+extern int  __LIB__            tape_save(char *name, size_t loadstart,void *start, size_t len) __smallc;
+extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
+extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
 
-extern int  __LIB__ __CALLEE__ tape_save_block_callee(void *addr, size_t len, unsigned char type) __SMALLCDECL __SMALLCCALLEE;
-extern int  __LIB__ __CALLEE__ tape_load_block_callee(void *addr, size_t len, unsigned char type) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__  tape_save_block_callee(void *addr, size_t len, unsigned char type) __smallc __z88dk_callee;
+extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned char type) __smallc __z88dk_callee;
 
 #define tape_save_block(a,b,c) tape_save_block_callee(a,b,c)
 #define tape_load_block(a,b,c) tape_load_block_callee(a,b,c)
@@ -273,13 +273,13 @@ extern unsigned int  __LIB__ in_JoyTimex2(void);
 // To use you must declare the following global variables
 // uint in_AMXcoordX, in_AMXcoordY, in_AMXdeltaX, in_AMXdeltaY;
 
-extern void __LIB__             in_MouseAMXInit(uchar xvector, uchar yvector) __SMALLCDECL;
-extern void __LIB__             in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL;
-extern void __LIB__             in_MouseAMXSetPos(uint xcoord, uint ycoord) __SMALLCDECL;
+extern void __LIB__             in_MouseAMXInit(uchar xvector, uchar yvector) __smallc;
+extern void __LIB__             in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord) __smallc;
+extern void __LIB__             in_MouseAMXSetPos(uint xcoord, uint ycoord) __smallc;
 
-extern void __LIB__ __CALLEE__  in_MouseAMXInit_callee(uchar xvector, uchar yvector) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__  in_MouseAMX_callee(uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__  in_MouseAMXSetPos_callee(uint xcoord, uint ycoord) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__   in_MouseAMXInit_callee(uchar xvector, uchar yvector) __smallc __z88dk_callee;
+extern void __LIB__   in_MouseAMX_callee(uchar *buttons, uint *xcoord, uint *ycoord) __smallc __z88dk_callee;
+extern void __LIB__   in_MouseAMXSetPos_callee(uint xcoord, uint ycoord) __smallc __z88dk_callee;
 
 #define in_MouseAMXInit(a,b)    in_MouseAMXInit_callee(a,b)
 #define in_MouseAMX(a,b,c)      in_MouseAMX_callee(a,b,c)
@@ -291,11 +291,11 @@ extern void __LIB__ __CALLEE__  in_MouseAMXSetPos_callee(uint xcoord, uint ycoor
 // uchar in_KempcoordX, in_KempcoordY, in_KemprawX, in_KemprawY;
 
 extern void __LIB__             in_MouseKempInit(void);
-extern void __LIB__             in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL;
-extern void __LIB__             in_MouseKempSetPos(uint xcoord, uint ycoord) __SMALLCDECL;
+extern void __LIB__             in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord) __smallc;
+extern void __LIB__             in_MouseKempSetPos(uint xcoord, uint ycoord) __smallc;
 
-extern void __LIB__ __CALLEE__  in_MouseKemp_callee(uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__  in_MouseKempSetPos_callee(uint xcoord, uint ycoord) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__   in_MouseKemp_callee(uchar *buttons, uint *xcoord, uint *ycoord) __smallc __z88dk_callee;
+extern void __LIB__   in_MouseKempSetPos_callee(uint xcoord, uint ycoord) __smallc __z88dk_callee;
 
 #define in_MouseKemp(a,b,c)     in_MouseKemp_callee(a,b,c)
 #define in_MouseKempSetPos(a,b) in_MouseKempSetPos_callee(a,b)
@@ -306,15 +306,15 @@ extern void __LIB__ __CALLEE__  in_MouseKempSetPos_callee(uint xcoord, uint ycoo
 //////////////////////////
 
 // Set the border color
-extern void  __LIB__ __FASTCALL__ zx_border(uchar colour) __SMALLCFASTCALL;
+extern void  __LIB__  zx_border(uchar colour) __z88dk_fastcall;
 // Quickly set the whole screen color attributes
-extern void  __LIB__ __FASTCALL__ zx_colour(uchar colour) __SMALLCFASTCALL;
+extern void  __LIB__  zx_colour(uchar colour) __z88dk_fastcall;
 // Get color attribute at given position
-extern uint  __LIB__              zx_attr(uchar row, uchar col) __SMALLCDECL;
-extern uint  __LIB__              zx_screenstr(uchar row, uchar col) __SMALLCDECL;
+extern uint  __LIB__              zx_attr(uchar row, uchar col) __smallc;
+extern uint  __LIB__              zx_screenstr(uchar row, uchar col) __smallc;
 
-extern uint  __LIB__ __CALLEE__   zx_attr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
-extern uint  __LIB__ __CALLEE__   zx_screenstr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
+extern uint  __LIB__    zx_attr_callee(uchar row, uchar col) __smallc __z88dk_callee;
+extern uint  __LIB__    zx_screenstr_callee(uchar row, uchar col) __smallc __z88dk_callee;
 
 #define zx_attr(a,b)              zx_attr_callee(a,b)
 #define zx_screenstr(a,b)         zx_screenstr_callee(a,b)
@@ -352,35 +352,35 @@ extern uint  __LIB__ __CALLEE__   zx_screenstr_callee(uchar row, uchar col) __SM
 
 // DISPLAY PIXEL ADDRESS MANIPULATORS
 
-extern uchar __LIB__              *zx_cyx2saddr(uchar row, uchar col) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_cy2saddr(uchar row) __SMALLCFASTCALL;           // cx assumed 0
+extern uchar __LIB__              *zx_cyx2saddr(uchar row, uchar col) __smallc;
+extern uchar __LIB__  *zx_cy2saddr(uchar row) __z88dk_fastcall;           // cx assumed 0
 
-extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord, uchar *mask) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_py2saddr(uchar ycoord) __SMALLCFASTCALL;        // px assumed 0
+extern uchar __LIB__              *zx_pxy2saddr(uchar xcoord, uchar ycoord, uchar *mask) __smallc;
+extern uchar __LIB__  *zx_py2saddr(uchar ycoord) __z88dk_fastcall;        // px assumed 0
 
-extern uint  __LIB__ __FASTCALL__  zx_saddr2cx(void *pixeladdr) __SMALLCFASTCALL;
-extern uint  __LIB__ __FASTCALL__  zx_saddr2cy(void *pixeladdr) __SMALLCFASTCALL;
+extern uint  __LIB__   zx_saddr2cx(void *pixeladdr) __z88dk_fastcall;
+extern uint  __LIB__   zx_saddr2cy(void *pixeladdr) __z88dk_fastcall;
 
-extern uint  __LIB__               zx_saddr2px(void *pixeladdr, uchar mask) __SMALLCDECL;
-extern uint  __LIB__ __FASTCALL__  zx_saddr2py(void *pixeladdr) __SMALLCFASTCALL;
+extern uint  __LIB__               zx_saddr2px(void *pixeladdr, uchar mask) __smallc;
+extern uint  __LIB__   zx_saddr2py(void *pixeladdr) __z88dk_fastcall;
 
-extern uchar __LIB__ __FASTCALL__ *zx_saddr2aaddr(void *pixeladdr) __SMALLCFASTCALL;
+extern uchar __LIB__  *zx_saddr2aaddr(void *pixeladdr) __z88dk_fastcall;
 
-extern uchar __LIB__ __FASTCALL__ *zx_saddrcdown(void *pixeladdr) __SMALLCFASTCALL;
-extern uchar __LIB__ __FASTCALL__ *zx_saddrcleft(void *pixeladdr) __SMALLCFASTCALL;
-extern uchar __LIB__ __FASTCALL__ *zx_saddrcright(void *pixeladdr) __SMALLCFASTCALL;
-extern uchar __LIB__ __FASTCALL__ *zx_saddrcup(void *pixeladdr) __SMALLCFASTCALL;
+extern uchar __LIB__  *zx_saddrcdown(void *pixeladdr) __z88dk_fastcall;
+extern uchar __LIB__  *zx_saddrcleft(void *pixeladdr) __z88dk_fastcall;
+extern uchar __LIB__  *zx_saddrcright(void *pixeladdr) __z88dk_fastcall;
+extern uchar __LIB__  *zx_saddrcup(void *pixeladdr) __z88dk_fastcall;
 
-extern uchar __LIB__ __FASTCALL__ *zx_saddrpdown(void *pixeladdr) __SMALLCFASTCALL;
-extern uchar __LIB__              *zx_saddrpleft(void *pixeladdr, uchar *mask) __SMALLCDECL;
-extern uchar __LIB__              *zx_saddrpright(void *pixeladdr, uchar *mask) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_saddrpup(void *pixeladdr) __SMALLCFASTCALL;
+extern uchar __LIB__  *zx_saddrpdown(void *pixeladdr) __z88dk_fastcall;
+extern uchar __LIB__              *zx_saddrpleft(void *pixeladdr, uchar *mask) __smallc;
+extern uchar __LIB__              *zx_saddrpright(void *pixeladdr, uchar *mask) __smallc;
+extern uchar __LIB__  *zx_saddrpup(void *pixeladdr) __z88dk_fastcall;
 
-extern uchar __LIB__ __CALLEE__   *zx_cyx2saddr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
-extern uchar __LIB__ __CALLEE__   *zx_pxy2saddr_callee(uchar xcoord, uchar ycoord, uchar *mask) __SMALLCDECL __SMALLCCALLEE;
-extern uint  __LIB__ __CALLEE__    zx_saddr2px_callee(void *pixeladdr, uchar mask) __SMALLCDECL __SMALLCCALLEE;
-extern uchar __LIB__ __CALLEE__   *zx_saddrpleft_callee(void *pixeladdr, uchar *mask) __SMALLCDECL __SMALLCCALLEE;
-extern uchar __LIB__ __CALLEE__   *zx_saddrpright_callee(void *pixeladdr, uchar *mask) __SMALLCDECL __SMALLCCALLEE;
+extern uchar __LIB__    *zx_cyx2saddr_callee(uchar row, uchar col) __smallc __z88dk_callee;
+extern uchar __LIB__    *zx_pxy2saddr_callee(uchar xcoord, uchar ycoord, uchar *mask) __smallc __z88dk_callee;
+extern uint  __LIB__     zx_saddr2px_callee(void *pixeladdr, uchar mask) __smallc __z88dk_callee;
+extern uchar __LIB__    *zx_saddrpleft_callee(void *pixeladdr, uchar *mask) __smallc __z88dk_callee;
+extern uchar __LIB__    *zx_saddrpright_callee(void *pixeladdr, uchar *mask) __smallc __z88dk_callee;
 
 #define zx_cyx2saddr(a,b)          zx_cyx2saddr_callee(a,b)
 #define zx_pxy2saddr(a,b,c)        zx_pxy2saddr_callee(a,b,c)
@@ -390,27 +390,27 @@ extern uchar __LIB__ __CALLEE__   *zx_saddrpright_callee(void *pixeladdr, uchar 
 
 // DISPLAY ATTRIBUTE ADDRESS MANIPULATORS
 
-extern uchar __LIB__              *zx_cyx2aaddr(uchar row, uchar col) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_cy2aaddr(uchar row) __SMALLCFASTCALL;           // cx assumed 0
+extern uchar __LIB__              *zx_cyx2aaddr(uchar row, uchar col) __smallc;
+extern uchar __LIB__  *zx_cy2aaddr(uchar row) __z88dk_fastcall;           // cx assumed 0
 
-extern uchar __LIB__              *zx_pxy2aaddr(uchar xcoord, uchar ycoord) __SMALLCDECL;
-extern uchar __LIB__ __FASTCALL__ *zx_py2aaddr(uchar ycoord) __SMALLCFASTCALL;        // px assumed 0
+extern uchar __LIB__              *zx_pxy2aaddr(uchar xcoord, uchar ycoord) __smallc;
+extern uchar __LIB__  *zx_py2aaddr(uchar ycoord) __z88dk_fastcall;        // px assumed 0
 
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2cx(void *attraddr) __SMALLCFASTCALL;
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2cy(void *attraddr) __SMALLCFASTCALL;
+extern uint  __LIB__   zx_aaddr2cx(void *attraddr) __z88dk_fastcall;
+extern uint  __LIB__   zx_aaddr2cy(void *attraddr) __z88dk_fastcall;
  
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2px(void *attraddr) __SMALLCFASTCALL;
-extern uint  __LIB__ __FASTCALL__  zx_aaddr2py(void *attraddr) __SMALLCFASTCALL;
+extern uint  __LIB__   zx_aaddr2px(void *attraddr) __z88dk_fastcall;
+extern uint  __LIB__   zx_aaddr2py(void *attraddr) __z88dk_fastcall;
 
-extern uchar __LIB__ __FASTCALL__ *zx_aaddr2saddr(void *attraddr) __SMALLCFASTCALL;
+extern uchar __LIB__  *zx_aaddr2saddr(void *attraddr) __z88dk_fastcall;
 
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcdown(void *attraddr) __SMALLCFASTCALL;
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcleft(void *attraddr) __SMALLCFASTCALL;
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcright(void *attraddr) __SMALLCFASTCALL;
-extern uchar __LIB__ __FASTCALL__ *zx_aaddrcup(void *attraddr) __SMALLCFASTCALL;
+extern uchar __LIB__  *zx_aaddrcdown(void *attraddr) __z88dk_fastcall;
+extern uchar __LIB__  *zx_aaddrcleft(void *attraddr) __z88dk_fastcall;
+extern uchar __LIB__  *zx_aaddrcright(void *attraddr) __z88dk_fastcall;
+extern uchar __LIB__  *zx_aaddrcup(void *attraddr) __z88dk_fastcall;
 
-extern uchar __LIB__ __CALLEE__   *zx_cyx2aaddr_callee(uchar row, uchar col) __SMALLCDECL __SMALLCCALLEE;
-extern uchar __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __SMALLCDECL __SMALLCCALLEE;
+extern uchar __LIB__    *zx_cyx2aaddr_callee(uchar row, uchar col) __smallc __z88dk_callee;
+extern uchar __LIB__    *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoord) __smallc __z88dk_callee;
 
 #define zx_cyx2aaddr(a,b)          zx_cyx2aaddr_callee(a,b)
 #define zx_pxy2aaddr(a,b)          zx_pxy2aaddr_callee(a,b)
@@ -419,8 +419,8 @@ extern uchar __LIB__ __CALLEE__   *zx_pxy2aaddr_callee(uchar xcoord, uchar ycoor
 /* This routine strips the drive specifier from the filename header.
    It updates the 'D' BASIC variable with the drive number 
    and N$ with the file name  */
-extern int  __LIB__ __FASTCALL__ zxgetfname(char *zxfname);
-extern int  __LIB__ __FASTCALL__ zxgetfname2(char *zxfname);
+extern int  __LIB__  zxgetfname(char *zxfname);
+extern int  __LIB__  zxgetfname2(char *zxfname);
 
 
 #endif

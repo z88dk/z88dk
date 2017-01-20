@@ -58,14 +58,14 @@
 
 #define BAQTBL(numq)  uchar ba_qtbl[numq*2];
 
-extern void __LIB__ __FASTCALL__ ba_Init(int numq /* >=1 */) __SMALLCFASTCALL;
-extern void __LIB__              *ba_AddMem(int q, int numblocks /* >=1 */, uint size /* >=2 */, void *addr) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *ba_AddMem_callee(int q, int numblocks, uint size, void *addr) __SMALLCDECL __SMALLCCALLEE;
-extern uint __LIB__ __FASTCALL__ ba_BlockCount(int q) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *ba_Malloc(int q) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ ba_Free(void *addr) __SMALLCFASTCALL;
-extern void __LIB__              *ba_BestFit(int q, int numq /* >=1 */) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *ba_BestFit_callee(int q, int numq) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__  ba_Init(int numq /* >=1 */) __z88dk_fastcall;
+extern void __LIB__              *ba_AddMem(int q, int numblocks /* >=1 */, uint size /* >=2 */, void *addr) __smallc;
+extern void __LIB__    *ba_AddMem_callee(int q, int numblocks, uint size, void *addr) __smallc __z88dk_callee;
+extern uint __LIB__  ba_BlockCount(int q) __z88dk_fastcall;
+extern void __LIB__  *ba_Malloc(int q) __z88dk_fastcall;
+extern void __LIB__  ba_Free(void *addr) __z88dk_fastcall;
+extern void __LIB__              *ba_BestFit(int q, int numq /* >=1 */) __smallc;
+extern void __LIB__    *ba_BestFit_callee(int q, int numq) __smallc __z88dk_callee;
 
 #define ba_AddMem(a,b,c,d)  ba_AddMem_callee(a,b,c,d)
 #define ba_BestFit(a,b)     ba_BestFit_callee(a,b)

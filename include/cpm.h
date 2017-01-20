@@ -98,8 +98,8 @@ extern struct fcb  _fcb[MAXFILE];
 
 
 /* The CPM bdos call */
-extern int __LIB__ bdos(int func,int arg) __SMALLCDECL;
-extern int __LIB__ bios(int func,int arg,int arg2) __SMALLCDECL;
+extern int __LIB__ bdos(int func,int arg) __smallc;
+extern int __LIB__ bios(int func,int arg,int arg2) __smallc;
 
 
 /* Get a free FCB */
@@ -107,17 +107,17 @@ extern int __LIB__ bios(int func,int arg,int arg2) __SMALLCDECL;
 extern struct fcb __LIB__ *getfcb(void);
 
 /* Fill up the filename stuff */
-extern int __LIB__ setfcb(struct fcb *fc, unsigned char *name) __SMALLCDECL;
-extern void __LIB__ parsefcb(struct fcb *fc, unsigned char *name) __SMALLCDECL;
+extern int __LIB__ setfcb(struct fcb *fc, unsigned char *name) __smallc;
+extern void __LIB__ parsefcb(struct fcb *fc, unsigned char *name) __smallc;
 /* Write the file offset into the FCB */
-extern void __LIB__ putoffset(char *dest, long val) __SMALLCDECL;
+extern void __LIB__ putoffset(char *dest, long val) __smallc;
 
 /* Set/get userid */
 #define setuid(u)  bdos(CPM_SUID,u)
 #define getuid()   bdos(CPM_SUID,0xFF)
 
 /* Write an offset as 3 bytes */
-extern void __LIB__ _putoffset(unsigned char *where,long offset) __SMALLCDECL;
+extern void __LIB__ _putoffset(unsigned char *where,long offset) __smallc;
 
 /* Mark an FCB as being unused */
 #define clearfcb(f)  (f)->use = 0
@@ -131,7 +131,7 @@ extern char __LIB__ fc_dirpos;
 extern char __LIB__ *fc_dirbuf;
 
 /* Disk control (as for OSCA FLOS) */
-extern int __LIB__ __FASTCALL__ change_volume(int volume);
+extern int __LIB__  change_volume(int volume);
 extern int __LIB__ get_current_volume();   // Current 'drive' (0..n)
 /* Directory related commands (as for OSCA FLOS) */
 extern int __LIB__ dir_move_first();
@@ -147,15 +147,15 @@ extern int __LIB__ get_dir_name();
 /********************************/
 
 /* Enable/disable the bottom status line */
-extern int __LIB__ __FASTCALL__ a_statusline(int onoff);
+extern int __LIB__  a_statusline(int onoff);
 /* Set keyboard speed */
-extern int __LIB__ a_keyspeed(int delay, int repeat) __SMALLCDECL;
+extern int __LIB__ a_keyspeed(int delay, int repeat) __smallc;
 /* Set border color, 6 bit color encoding, (or 8 bit if ULA256.FID is installed) */
-extern int __LIB__ __FASTCALL__ a_border(int color);
+extern int __LIB__  a_border(int color);
 /* Set paper color, 6 bit color encoding, (OS patch needed or 8 bit if ULA256.FID is installed) */
-extern int __LIB__ __FASTCALL__ a_paper(int color);
+extern int __LIB__  a_paper(int color);
 /* Set ink color, 6 bit color encoding, (OS patch needed or 8 bit if ULA256.FID is installed) */
-extern int __LIB__ __FASTCALL__ a_ink(int color);
+extern int __LIB__  a_ink(int color);
 /* Get x cursor position in viewport */
 extern int __LIB__ a_curx();
 /* Get y cursor position in viewport */

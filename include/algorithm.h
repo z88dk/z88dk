@@ -36,7 +36,7 @@
 // To use A*, you must provide functions with the following
 // signatures:
 //
-// a. void [[__FASTCALL__]] astar_TestAndClose(uint node);
+// a. void [[]] astar_TestAndClose(uint node);
 //
 //    Mark the node as 'closed' and return carry flag set
 //    if the node was already closed previously.  C functions
@@ -65,7 +65,7 @@
 //    should use the z88dk keywords return_c() and return_c()
 //    to exit with known carry flag state.
 //
-// c. uint [[__FASTCALL__]] astar_DestCost(uint node)
+// c. uint [[]] astar_DestCost(uint node)
 //
 //    (optional) Estimate the cost from the node indicated to
 //    the destination node.  These nodes may be widely separated
@@ -109,13 +109,13 @@ struct astar_path {                //  7 bytes
 };
 
 extern struct astar_path __LIB__              *astar_Search(void);
-extern struct astar_path __LIB__ __FASTCALL__ *astar_SearchResume(struct astar_path *p) __SMALLCFASTCALL;
-extern struct astar_path __LIB__ __FASTCALL__ *astar_EstimateBestPath(struct astar_path *p) __SMALLCFASTCALL;
-extern uint              __LIB__ __FASTCALL__  astar_PathLength(struct astar_path *p) __SMALLCFASTCALL;
-extern uint              __LIB__              *astar_WalkPath(struct astar_path *p, uint *node_arr, uint n) __SMALLCDECL;
-extern uint              __LIB__ __CALLEE__   *astar_WalkPath_callee(struct astar_path *p, uint *node_arr, uint n) __SMALLCDECL __SMALLCCALLEE;
-extern void              __LIB__ __FASTCALL__  astar_DeletePath(struct astar_path *p) __SMALLCFASTCALL;
-extern void              __LIB__ __FASTCALL__  astar_CleanUp(struct astar_path *p) __SMALLCFASTCALL;
+extern struct astar_path __LIB__  *astar_SearchResume(struct astar_path *p) __z88dk_fastcall;
+extern struct astar_path __LIB__  *astar_EstimateBestPath(struct astar_path *p) __z88dk_fastcall;
+extern uint              __LIB__   astar_PathLength(struct astar_path *p) __z88dk_fastcall;
+extern uint              __LIB__              *astar_WalkPath(struct astar_path *p, uint *node_arr, uint n) __smallc;
+extern uint              __LIB__    *astar_WalkPath_callee(struct astar_path *p, uint *node_arr, uint n) __smallc __z88dk_callee;
+extern void              __LIB__   astar_DeletePath(struct astar_path *p) __z88dk_fastcall;
+extern void              __LIB__   astar_CleanUp(struct astar_path *p) __z88dk_fastcall;
 
 #define astar_WalkPath(a,b,c) astar_WalkPath_callee(a,b,c)
 

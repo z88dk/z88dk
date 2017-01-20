@@ -187,7 +187,7 @@
 //
 
 // change colour palette settings
-extern void __LIB__ __FASTCALL__ osca_set_palette(char *palette);
+extern void __LIB__  osca_set_palette(char *palette);
 
 
 #endif /* __OSCA_H__ */

@@ -170,44 +170,44 @@ extern unsigned int  esccmd_pd;
 
 // Kernel Functions
 
-extern int __LIB__              set_exos_variable(int variable, int value) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   set_exos_variable_callee(int variable, int value) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              set_exos_variable(int variable, int value) __smallc;
+extern int __LIB__    set_exos_variable_callee(int variable, int value) __smallc __z88dk_callee;
 #define set_exos_variable(a,b)      set_exos_variable_callee(a,b)
 
-extern int __LIB__ __FASTCALL__ get_exos_variable(int variable) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ toggle_exos_variable(int variable) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ set_exos_multi_variables(char *vlist) __SMALLCFASTCALL;
+extern int __LIB__  get_exos_variable(int variable) __z88dk_fastcall;
+extern int __LIB__  toggle_exos_variable(int variable) __z88dk_fastcall;
+extern int __LIB__  set_exos_multi_variables(char *vlist) __z88dk_fastcall;
 
-extern int __LIB__              exos_capture_channel(int main_channel, int secondary_channel) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_capture_channel_callee(int main_channel, int secondary_channel) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_capture_channel(int main_channel, int secondary_channel) __smallc;
+extern int __LIB__    exos_capture_channel_callee(int main_channel, int secondary_channel) __smallc __z88dk_callee;
 #define exos_capture_channel(a,b)   exos_capture_channel_callee(a,b)
 
-extern int __LIB__ __FASTCALL__ exos_channel_read_status(int channel) __SMALLCFASTCALL;
+extern int __LIB__  exos_channel_read_status(int channel) __z88dk_fastcall;
 
-extern int __LIB__              exos_create_channel(int channel, char *device) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_create_channel_callee(int channel, char *device) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_create_channel(int channel, char *device) __smallc;
+extern int __LIB__    exos_create_channel_callee(int channel, char *device) __smallc __z88dk_callee;
 #define exos_create_channel(a,b)    exos_create_channel_callee(a,b)
 
-extern int __LIB__              exos_open_channel(int channel, char *device) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_open_channel_callee(int channel, char *device) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_open_channel(int channel, char *device) __smallc;
+extern int __LIB__    exos_open_channel_callee(int channel, char *device) __smallc __z88dk_callee;
 #define exos_open_channel(a,b)      exos_open_channel_callee(a,b)
 
-extern int __LIB__ __FASTCALL__ exos_close_channel(int channel) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ exos_destroy_channel(int channel) __SMALLCFASTCALL;
+extern int __LIB__  exos_close_channel(int channel) __z88dk_fastcall;
+extern int __LIB__  exos_destroy_channel(int channel) __z88dk_fastcall;
 
-extern int __LIB__              exos_redirect_channel(int main_channel, int secondary_channel) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_redirect_channel_callee(int main_channel, int secondary_channel) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_redirect_channel(int main_channel, int secondary_channel) __smallc;
+extern int __LIB__    exos_redirect_channel_callee(int main_channel, int secondary_channel) __smallc __z88dk_callee;
 #define exos_redirect_channel(a,b)  exos_redirect_channel_callee(a,b)
 
 
-extern int __LIB__ __FASTCALL__ exos_read_character(int channel) __SMALLCFASTCALL;
+extern int __LIB__  exos_read_character(int channel) __z88dk_fastcall;
 
-extern int __LIB__              exos_write_character(int channel, int character) __SMALLCDECL;
-extern int __LIB__ __CALLEE__   exos_write_character_callee(int channel,int character) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__              exos_write_character(int channel, int character) __smallc;
+extern int __LIB__    exos_write_character_callee(int channel,int character) __smallc __z88dk_callee;
 #define exos_write_character(a,b)   exos_write_character_callee(a,b)
 
-extern int __LIB__              exos_read_block(int channel, unsigned int byte_count, unsigned char *address) __SMALLCDECL;
-extern int __LIB__              exos_write_block(int channel, unsigned int byte_count, unsigned char *address) __SMALLCDECL;
+extern int __LIB__              exos_read_block(int channel, unsigned int byte_count, unsigned char *address) __smallc;
+extern int __LIB__              exos_write_block(int channel, unsigned int byte_count, unsigned char *address) __smallc;
 
 // Check if the line printer is ready (1=ready, 0 if not)
 extern int __LIB__ lpt_ready();
@@ -219,7 +219,7 @@ extern int __LIB__ lpt_ready();
 #define WARM_RESET           64 // De­allocate all user RAM segments
 #define COLD_RESET          128
 
-extern void __LIB__ __FASTCALL__  exos_system_reset(int flags) __SMALLCFASTCALL;
+extern void __LIB__   exos_system_reset(int flags) __z88dk_fastcall;
 
 // EXOS System Information
 
@@ -235,7 +235,7 @@ struct EXOS_INFO {
 };
 
 // Updates status struct and returns the EXOS version number
-extern int __LIB__ __FASTCALL__  exos_system_status(struct EXOS_INFO info) __SMALLCFASTCALL;
+extern int __LIB__   exos_system_status(struct EXOS_INFO info) __z88dk_fastcall;
 
 
 // Sound functions
@@ -294,10 +294,10 @@ extern int __LIB__ __FASTCALL__  exos_system_status(struct EXOS_INFO info) __SMA
 
 // Set video mode (see the video constants above) 
 // Size is char units y_size = 1..255 (max 27 visible at once),  x_size = 1..42
-extern void __LIB__             exos_set_vmode(int video_mode, int color_mode, int x_size, int y_size) __SMALLCDECL;
+extern void __LIB__             exos_set_vmode(int video_mode, int color_mode, int x_size, int y_size) __smallc;
 // Set the visible boundaries for video page 
-extern int __LIB__              exos_display_page(int channel, int first_row, int rows, int first_row_position) __SMALLCDECL;
-extern int __LIB__ __FASTCALL__ exos_reset_font(int channel) __SMALLCFASTCALL;
+extern int __LIB__              exos_display_page(int channel, int first_row, int rows, int first_row_position) __smallc;
+extern int __LIB__  exos_reset_font(int channel) __z88dk_fastcall;
 
 
 

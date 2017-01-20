@@ -54,11 +54,11 @@ typedef struct
 extern short __LIB__ initpcx(char *FileName);
 extern void __LIB__ donepcx(void);
 
-extern void __LIB__ decodelinepcx(ushort X, ushort Y) __SMALLCDECL;
-extern void __LIB__ decodefilepcx(ushort X, ushort Y) __SMALLCDECL;
+extern void __LIB__ decodelinepcx(ushort X, ushort Y) __smallc;
+extern void __LIB__ decodefilepcx(ushort X, ushort Y) __smallc;
 
-extern void __LIB__ decodelineintpcx(ushort X, ushort Y) __SMALLCDECL;
-extern void __LIB__ decodefileintpcx(ushort X, ushort Y) __SMALLCDECL;
+extern void __LIB__ decodelineintpcx(ushort X, ushort Y) __smallc;
+extern void __LIB__ decodefileintpcx(ushort X, ushort Y) __smallc;
 
 #endif
 

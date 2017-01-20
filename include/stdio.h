@@ -148,9 +148,9 @@ extern int __LIB__ fflush(FILE *);
 
 /* Our new and improved functions!! */
 
-extern FILE __LIB__ *fopen(char *name, unsigned char *mode) __SMALLCDECL;
-extern FILE __LIB__ *freopen(char *name, unsigned char *mode, FILE *fp) __SMALLCDECL;
-extern FILE __LIB__ *fdopen(int fildes, unsigned char *mode) __SMALLCDECL;
+extern FILE __LIB__ *fopen(char *name, unsigned char *mode) __smallc;
+extern FILE __LIB__ *freopen(char *name, unsigned char *mode, FILE *fp) __smallc;
+extern FILE __LIB__ *fdopen(int fildes, unsigned char *mode) __smallc;
 
 extern int __LIB__ fclose(FILE *fp);
 
@@ -163,12 +163,12 @@ extern void __LIB__ closeall();
 /* The "8080" stdio lib is at the moment used only by the        */
 /* Rabbit Control Module, which is not fully z80 compatible      */
 
-extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp) __SMALLCDECL;
-extern int __LIB__ fputs(unsigned char *s,  FILE *fp) __SMALLCDECL;
-extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
+extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp) __smallc;
+extern int __LIB__ fputs(unsigned char *s,  FILE *fp) __smallc;
+extern int __LIB__ fputc(int c, FILE *fp) __smallc;
 extern int __LIB__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
-extern int __LIB__ ungetc(int c, FILE *) __SMALLCDECL;
+extern int __LIB__ ungetc(int c, FILE *) __smallc;
 extern int __LIB__ feof(FILE *fp);
 extern int __LIB__ puts(unsigned char *);
 
@@ -184,17 +184,17 @@ extern int __LIB__ puts(unsigned char *);
 /* --------------------------------------------------------------*/
 /* Optimized stdio uses the 'CALLEE' convention here and there   */
 
-extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp) __SMALLCDECL;
+extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp) __smallc;
 
-extern int __LIB__ fputs(unsigned char *s,  FILE *fp) __SMALLCDECL;
-extern int __LIB__ fputc(int c, FILE *fp) __SMALLCDECL;
+extern int __LIB__ fputs(unsigned char *s,  FILE *fp) __smallc;
+extern int __LIB__ fputc(int c, FILE *fp) __smallc;
 
-extern int __LIB__ __CALLEE__ fputs_callee(unsigned char *s,  FILE *fp) __SMALLCDECL __SMALLCCALLEE;
-extern int __LIB__ __CALLEE__ fputc_callee(int c, FILE *fp) __SMALLCDECL __SMALLCCALLEE;
+extern int __LIB__  fputs_callee(unsigned char *s,  FILE *fp) __smallc __z88dk_callee;
+extern int __LIB__  fputc_callee(int c, FILE *fp) __smallc __z88dk_callee;
 extern int __LIB__ fgetc(FILE *fp);
 
 #define getc(f) fgetc(f)
-extern int __LIB__ ungetc(int c, FILE *) __SMALLCDECL;
+extern int __LIB__ ungetc(int c, FILE *) __smallc;
 extern int __LIB__ feof(FILE *fp);
 extern int __LIB__ puts(unsigned char *);
 
@@ -212,14 +212,14 @@ extern int __LIB__ puts(unsigned char *);
 
 /* Routines for file positioning */
 extern fpos_t __LIB__ ftell(FILE *fp);
-extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __SMALLCDECL;
+extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
 #define fsetpos(fp,pos) fseek(fp,pos,SEEK_SET)
 #define rewind(fp) fseek(fp,0L,SEEK_SET)
-extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __SMALLCDECL;
+extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
 
 /* Block read/writing */
-extern int __LIB__ __SAVEFRAME__ fread(void *ptr, int size, int num, FILE *) __SMALLCDECL;
-extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *) __SMALLCDECL;
+extern int __LIB__ __SAVEFRAME__ fread(void *ptr, int size, int num, FILE *) __smallc;
+extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *) __smallc;
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
@@ -240,7 +240,7 @@ extern int __LIB__ vsnprintf(char *str,size_t,unsigned char *fmt,void *ap);
 #define vsprintf(buf,ctl,arg) vsnprintf(buf,65535,ctl,arg)
 
 /* Routines used by the old printf - will be removed soon */
-extern void __LIB__ printn(int number, int radix,FILE *file) __SMALLCDECL;
+extern void __LIB__ printn(int number, int radix,FILE *file) __smallc;
 
 
 /*
@@ -280,14 +280,14 @@ extern int __LIB__ fchkstd(FILE *);
 /* All functions below here are machine specific */
 extern int __LIB__ fgetc_cons();
 extern int __LIB__ fputc_cons(char c);
-extern char __LIB__ *fgets_cons(char *s, int n) __SMALLCDECL;
+extern char __LIB__ *fgets_cons(char *s, int n) __smallc;
 /* Abandon file - can be the generic version */
 extern void __LIB__ fabandon(FILE *);
 /* Get file position for file handle fd */
 extern long __LIB__ fdtell(int fd);
-extern int __LIB__ fdgetpos(int fd, fpos_t *posn) __SMALLCDECL;
+extern int __LIB__ fdgetpos(int fd, fpos_t *posn) __smallc;
 /* Rename a file */
-extern int __LIB__ rename(char *s, char *d) __SMALLCDECL;
+extern int __LIB__ rename(char *s, char *d) __smallc;
 /* Remove a file */
 extern int __LIB__ remove(char *name);
 

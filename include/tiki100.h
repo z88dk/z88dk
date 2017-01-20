@@ -30,7 +30,7 @@
 		2 = 512x256x4
 		3 = 256x256x16
 */
-extern void __LIB__ __FASTCALL__ gr_defmod(int mode) __SMALLCFASTCALL;
+extern void __LIB__  gr_defmod(int mode) __z88dk_fastcall;
 
 /* 
 	Set color palette ('len' must be a fraction of 16)
@@ -39,7 +39,7 @@ extern void __LIB__ __FASTCALL__ gr_defmod(int mode) __SMALLCFASTCALL;
 		Bit 2-4: Green
 		Bit 0-1: Blue
 */
-extern void __LIB__ gr_setpalette(int len, char *palette) __SMALLCDECL;
+extern void __LIB__ gr_setpalette(int len, char *palette) __smallc;
 
 /* 
 	Hardcopy
@@ -53,7 +53,7 @@ extern void __LIB__ gr_hardcopy();
 	gr_vscroll_abs puts the display at a given vertical position
 
 */
-extern void __LIB__ __FASTCALL__ gr_vscroll(int lines) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ gr_vscroll_abs(int line) __SMALLCFASTCALL;
+extern void __LIB__  gr_vscroll(int lines) __z88dk_fastcall;
+extern void __LIB__  gr_vscroll_abs(int line) __z88dk_fastcall;
 
 #endif

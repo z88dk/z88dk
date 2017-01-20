@@ -17,6 +17,6 @@
 #define VMOD_DFILE0  0
 #define VMOD_DFILE1  1
 
-extern void __LIB__ __FASTCALL__ ts_vmod(uchar mode);
+extern void __LIB__  ts_vmod(uchar mode);
 
 #endif

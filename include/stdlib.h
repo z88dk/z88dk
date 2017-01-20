@@ -24,17 +24,17 @@
 
 // double atof(char *s);                    /* check math library for availability */
 
-extern int  __LIB__ __FASTCALL__  atoi(char *s) __SMALLCFASTCALL;
-extern long __LIB__ __FASTCALL__  atol(char *s) __SMALLCFASTCALL;
+extern int  __LIB__   atoi(char *s) __z88dk_fastcall;
+extern long __LIB__   atol(char *s) __z88dk_fastcall;
 
-extern int  __LIB__               itoa(int n, char *s, int radix) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    itoa_callee(int n, char *s, int radix) __SMALLCDECL __SMALLCCALLEE;
-extern int  __LIB__               utoa(uint n, char *s, int radix) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    utoa_callee(uint n, char *s, int radix) __SMALLCDECL __SMALLCCALLEE;
-extern int  __LIB__               ltoa(long n, char *s, int radix) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    ltoa_callee(long n, char *s, int radix) __SMALLCDECL __SMALLCCALLEE;
-extern int  __LIB__               ultoa(unsigned long n, char *s, int radix) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__    ultoa_callee(unsigned long n, char *s, int radix) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__               itoa(int n, char *s, int radix) __smallc;
+extern int  __LIB__     itoa_callee(int n, char *s, int radix) __smallc __z88dk_callee;
+extern int  __LIB__               utoa(uint n, char *s, int radix) __smallc;
+extern int  __LIB__     utoa_callee(uint n, char *s, int radix) __smallc __z88dk_callee;
+extern int  __LIB__               ltoa(long n, char *s, int radix) __smallc;
+extern int  __LIB__     ltoa_callee(long n, char *s, int radix) __smallc __z88dk_callee;
+extern int  __LIB__               ultoa(unsigned long n, char *s, int radix) __smallc;
+extern int  __LIB__     ultoa_callee(unsigned long n, char *s, int radix) __smallc __z88dk_callee;
 
 #define itoa(a,b,c)  itoa_callee(a,b,c)
 #define utoa(a,b,c)  utoa_callee(a,b,c)
@@ -43,9 +43,9 @@ extern int  __LIB__ __CALLEE__    ultoa_callee(unsigned long n, char *s, int rad
 
 // double strtod(char *s, char **endp);     /* check math library for availability */
 
-extern long          __LIB__               strtol(char *s, char **endp, int base) __SMALLCDECL;
-extern long          __LIB__ __CALLEE__    strtol_callee(char *s, char **endp, int base) __SMALLCDECL __SMALLCCALLEE;
-extern unsigned long __LIB__               strtoul(char *s, char **endp, int base) __SMALLCDECL;
+extern long          __LIB__               strtol(char *s, char **endp, int base) __smallc;
+extern long          __LIB__     strtol_callee(char *s, char **endp, int base) __smallc __z88dk_callee;
+extern unsigned long __LIB__               strtoul(char *s, char **endp, int base) __smallc;
 
 #define strtol(a,b,c)  strtol_callee(a,b,c)
 #define strtoul(a,b,c) strtol_callee(a,b,c)
@@ -68,7 +68,7 @@ extern int std_seed;
 
 extern int  __LIB__              rand(void);
 extern void __LIB__              randomize(void);
-extern void __LIB__ __FASTCALL__ srand(unsigned int seed) __SMALLCFASTCALL;
+extern void __LIB__  srand(unsigned int seed) __z88dk_fastcall;
 
 // Not sure why Rex has it's own rand() routine using different seed?
 
@@ -95,13 +95,13 @@ extern void __LIB__ __FASTCALL__ srand(unsigned int seed) __SMALLCFASTCALL;
 #define EXIT_FAILURE   1
 #define EXIT_SUCCESS   0
 
-extern void __LIB__ __FASTCALL__ exit(int status) __SMALLCFASTCALL;
-extern int  __LIB__ __FASTCALL__ atexit(void *fcn) __SMALLCFASTCALL;
+extern void __LIB__  exit(int status) __z88dk_fastcall;
+extern int  __LIB__  atexit(void *fcn) __z88dk_fastcall;
 
 // int system(char *s);                     /* might be implemented in target's library but doubtful */
 // char *getenv(char *name);                /* might be implemented in target's library but doubtful */
 
-extern int  __LIB__  getopt (int, char **, char *) __SMALLCDECL;
+extern int  __LIB__  getopt (int, char **, char *) __smallc;
 extern   char *optarg;                      /* getopt(3) external variables */
 extern   int opterr;
 extern   int optind;
@@ -118,13 +118,13 @@ extern   int optreset;
 //
 // void *cmp == char (*cmp)(void *key, void *datum);
 
-extern void __LIB__            *l_bsearch(void *key, void *base, unsigned int n, void *cmp) __SMALLCDECL;
-extern void __LIB__ __CALLEE__ *l_bsearch_callee(void *key, void *base, unsigned int n, void *cmp) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__            l_qsort(void *base, unsigned int size, void *cmp) __SMALLCDECL;
-extern void __LIB__ __CALLEE__ l_qsort_callee(void *base, unsigned int size, void *cmp) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__            *l_bsearch(void *key, void *base, unsigned int n, void *cmp) __smallc;
+extern void __LIB__  *l_bsearch_callee(void *key, void *base, unsigned int n, void *cmp) __smallc __z88dk_callee;
+extern void __LIB__            l_qsort(void *base, unsigned int size, void *cmp) __smallc;
+extern void __LIB__  l_qsort_callee(void *base, unsigned int size, void *cmp) __smallc __z88dk_callee;
 
-extern void __LIB__            qsort(void *base, unsigned int nel, unsigned int width, void *compar) __SMALLCDECL;
-extern void __LIB__ __CALLEE__ qsort_callee(void *base, unsigned int nel, unsigned int width, void *compar) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__            qsort(void *base, unsigned int nel, unsigned int width, void *compar) __smallc;
+extern void __LIB__  qsort_callee(void *base, unsigned int nel, unsigned int width, void *compar) __smallc __z88dk_callee;
 
 #define l_bsearch(a,b,c,d) l_bsearch_callee(a,b,c,d)
 #define qsort(a,b,c,d) qsort_callee(a,b,c,d)
@@ -141,13 +141,13 @@ extern void __LIB__ __CALLEE__ qsort_callee(void *base, unsigned int nel, unsign
 //// Misc Number Functions
 //////////////////////////
 
-extern int  __LIB__ __FASTCALL__ abs(int n) __SMALLCFASTCALL;
+extern int  __LIB__  abs(int n) __z88dk_fastcall;
 extern long __LIB__              labs(long n);
-extern long __LIB__ __CALLEE__   labs_callee(long n) __SMALLCCALLEE;
+extern long __LIB__    labs_callee(long n) __z88dk_callee;
 
 #define labs(a) labs_callee(a)
 
-extern uint __LIB__ __FASTCALL__ isqrt(uint n) __SMALLCFASTCALL;
+extern uint __LIB__  isqrt(uint n) __z88dk_fastcall;
 
 
 /******************************************************/
@@ -162,9 +162,9 @@ extern uint __LIB__ __FASTCALL__ isqrt(uint n) __SMALLCFASTCALL;
 // For accessing 16-bit i/o ports from C.  The macros can be
 // used to inline code if the parameters resolve to constants.
 
-extern unsigned int  __LIB__ __FASTCALL__ inp(unsigned int port) __SMALLCFASTCALL;
-extern void          __LIB__              outp(unsigned int port, unsigned char byte) __SMALLCDECL;
-extern void          __LIB__ __CALLEE__   outp_callee(unsigned int port, unsigned char byte) __SMALLCDECL __SMALLCCALLEE;
+extern unsigned int  __LIB__  inp(unsigned int port) __z88dk_fastcall;
+extern void          __LIB__              outp(unsigned int port, unsigned char byte) __smallc;
+extern void          __LIB__    outp_callee(unsigned int port, unsigned char byte) __smallc __z88dk_callee;
 
 #define outp(a,b) outp_callee(a,b)
 
@@ -177,16 +177,16 @@ extern void          __LIB__ __CALLEE__   outp_callee(unsigned int port, unsigne
 //// Direct Memory Manipulation
 ///////////////////////////////
 
-extern void __LIB__ __FASTCALL__ *swapendian(void *addr) __SMALLCFASTCALL;
+extern void __LIB__  *swapendian(void *addr) __z88dk_fastcall;
 
 // The macros can be used to inline code if the parameters resolve to constants
 
-extern void          __LIB__              bpoke(void *addr, unsigned char byte) __SMALLCDECL;
-extern void          __LIB__ __CALLEE__   bpoke_callee(void *addr, unsigned char byte) __SMALLCDECL __SMALLCCALLEE;
-extern void          __LIB__              wpoke(void *addr, unsigned int word) __SMALLCDECL;
-extern void          __LIB__ __CALLEE__   wpoke_callee(void *addr, unsigned int word) __SMALLCDECL __SMALLCCALLEE;
-extern unsigned char __LIB__ __FASTCALL__ bpeek(void *addr) __SMALLCFASTCALL;
-extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr) __SMALLCFASTCALL;
+extern void          __LIB__              bpoke(void *addr, unsigned char byte) __smallc;
+extern void          __LIB__    bpoke_callee(void *addr, unsigned char byte) __smallc __z88dk_callee;
+extern void          __LIB__              wpoke(void *addr, unsigned int word) __smallc;
+extern void          __LIB__    wpoke_callee(void *addr, unsigned int word) __smallc __z88dk_callee;
+extern unsigned char __LIB__  bpeek(void *addr) __z88dk_fastcall;
+extern unsigned int  __LIB__  wpeek(void *addr) __z88dk_fastcall;
 
 #define bpoke(a,b) bpoke_callee(a,b)
 #define wpoke(a,b) wpoke_callee(a,b)
@@ -201,12 +201,12 @@ extern unsigned int  __LIB__ __FASTCALL__ wpeek(void *addr) __SMALLCFASTCALL;
 //////////////////////////////////////////////////
 
 // ACCURATE T-STATE DELAY
-extern void   __LIB__ __FASTCALL__   t_delay(unsigned int tstates) __SMALLCFASTCALL;   // at least 141 T
+extern void   __LIB__    t_delay(unsigned int tstates) __z88dk_fastcall;   // at least 141 T
 
-extern void   __LIB__  __FASTCALL__   sleep (int secs) __SMALLCFASTCALL;
+extern void   __LIB__     sleep (int secs) __z88dk_fastcall;
 /* Very non standard! sleep for centisecs! (z88 and others)*/
-extern void   __LIB__  __FASTCALL__  __SAVEFRAME__  csleep(unsigned int centiseconds) __SMALLCFASTCALL;
-extern void   __LIB__  __FASTCALL__   delay (long milliseconds) __SMALLCFASTCALL;
+extern void   __LIB__    __SAVEFRAME__  csleep(unsigned int centiseconds) __z88dk_fastcall;
+extern void   __LIB__     delay (long milliseconds) __z88dk_fastcall;
 
 
 
@@ -216,13 +216,13 @@ extern void   __LIB__  __FASTCALL__   delay (long milliseconds) __SMALLCFASTCALL
 
 // Non standard stdlib.h defs (mode is ignored)
 // Extract a given number of bits from a byte string (at specified bit position) and load into a long value
-extern unsigned long __LIB__             extract_bits(unsigned char *data, unsigned int start, unsigned int size) __SMALLCDECL;
-extern unsigned long __LIB__ __CALLEE__  extract_bits_callee(unsigned char *data, unsigned int start, unsigned int size) __SMALLCDECL __SMALLCCALLEE;
+extern unsigned long __LIB__             extract_bits(unsigned char *data, unsigned int start, unsigned int size) __smallc;
+extern unsigned long __LIB__   extract_bits_callee(unsigned char *data, unsigned int start, unsigned int size) __smallc __z88dk_callee;
 
 #define extract_bits(a,b,c)  extract_bits_callee(a,b,c)
 
 // Compare a file name in "8.3" format to a wildcard expression
-extern int __LIB__ wcmatch(char *wildnam, char *filnam) __SMALLCDECL;
+extern int __LIB__ wcmatch(char *wildnam, char *filnam) __smallc;
 
 // Convert a BCD encoded value to unsigned int
 extern unsigned int __LIB__ unbcd(unsigned int value);

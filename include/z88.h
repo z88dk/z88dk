@@ -18,8 +18,8 @@
  * Read and send mail
  */
 
-extern int __LIB__ readmail(char *type, char *info, int length) __SMALLCDECL;
-extern int __LIB__ sendmail(char *type, char *info, int length) __SMALLCDECL;
+extern int __LIB__ readmail(char *type, char *info, int length) __smallc;
+extern int __LIB__ sendmail(char *type, char *info, int length) __smallc;
 
 /*
  * Two defines for the system supported mail types 
@@ -63,7 +63,7 @@ extern void __LIB__ nameapp(char *);
 #define INT_MIN		4
 #define INT_UART	8
 
-extern int __LIB__ RegisterInt(void (*fn)(),int type, int tick) __SMALLCDECL;
+extern int __LIB__ RegisterInt(void (*fn)(),int type, int tick) __smallc;
 extern int __LIB__ DeRegisterInt(void);
 
 /*
@@ -73,7 +73,7 @@ extern int __LIB__ DeRegisterInt(void);
  *
  */
 
-extern bool_t __LIB__ QueryPackage(int which, int major, int minor) __SMALLCDECL;
+extern bool_t __LIB__ QueryPackage(int which, int major, int minor) __smallc;
 
 /*
  *	Get the PID of a process
@@ -105,17 +105,17 @@ extern pid_t __LIB__ getpid(void);
  */
 
 extern int __LIB__ opendor(char *filename);
-extern void __LIB__ readdor(int dor, int type, int len, void *buf) __SMALLCDECL;
+extern void __LIB__ readdor(int dor, int type, int len, void *buf) __smallc;
 extern void __LIB__ closedor(int dor);
 
 /* These are still in z88_crt0.lib though they're not referenced */
-extern void __LIB__ writedor(int dor, int type, int len, void *buf) __SMALLCDECL;
+extern void __LIB__ writedor(int dor, int type, int len, void *buf) __smallc;
 extern void __LIB__ deletedor(int dor);
 
 /* Return the son/brother of the dor, supply pointer to store minor type */
 
-extern int __LIB__ sondor(int dor, char *store) __SMALLCDECL;
-extern int __LIB__ brotherdor(int dor, char *store) __SMALLCDECL;
+extern int __LIB__ sondor(int dor, char *store) __smallc;
+extern int __LIB__ brotherdor(int dor, char *store) __smallc;
 
 /*
  * Wildcard handler routines
@@ -145,7 +145,7 @@ extern wild_t __LIB__ wcopen(far char *, int mode);
  *
  * Returns EOF if no more entries, NULL otherwise
  */
-extern int __LIB__ wcnext(wild_t hand,void *buf, size_t len, wildcard_t *st) __SMALLCDECL;
+extern int __LIB__ wcnext(wild_t hand,void *buf, size_t len, wildcard_t *st) __smallc;
 
 /* Close wildcard handler /hand/ 
  * Returns NULL if closed okay EOF otherwise
@@ -213,13 +213,13 @@ extern char __LIB__ *stripdev(char *explicitname);
 extern char __LIB__ *strippath(char *explicitname);
 
 /* Open a popup window */
-extern void __LIB__ openpopup(int wid, int tlx, int tly, int width, int height, char *name) __SMALLCDECL;
+extern void __LIB__ openpopup(int wid, int tlx, int tly, int width, int height, char *name) __smallc;
 
 /* Open a window */
-extern void __LIB__ openwindow(int wid, int tlx, int tly, int width, int height) __SMALLCDECL;
+extern void __LIB__ openwindow(int wid, int tlx, int tly, int width, int height) __smallc;
 
 /* Open a titled window */
-extern void __LIB__ opentitled(int wid, int tlx, int tly, int width, int height, char *name) __SMALLCDECL;
+extern void __LIB__ opentitled(int wid, int tlx, int tly, int width, int height, char *name) __smallc;
 
 
 #endif /* Z88_H */

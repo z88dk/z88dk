@@ -8,9 +8,9 @@
 
 #define __STDIO_BINARY     1    /* We should consider binary/text differences */
 
-extern int __LIB__ __FASTCALL__ _fdatestamp(const char *filename) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ _fgetattr(const char *filename) __SMALLCFASTCALL;
-extern int __LIB__ _fsetattr(const char *filename, int attr) __SMALLCDECL;
+extern int __LIB__  _fdatestamp(const char *filename) __z88dk_fastcall;
+extern int __LIB__  _fgetattr(const char *filename) __z88dk_fastcall;
+extern int __LIB__ _fsetattr(const char *filename, int attr) __smallc;
 
 
 #define NC_FATTR_SYSTEM		1
@@ -30,13 +30,13 @@ struct nc_findfirst {
 
 typedef struct nc_findfirst nc_findfirst;
 
-extern int __LIB__ __FASTCALL__ _setdta(nc_findfirst *ptr) __SMALLCFASTCALL;
+extern int __LIB__  _setdta(nc_findfirst *ptr) __z88dk_fastcall;
 
-extern unsigned int __LIB__ __FASTCALL__ _fsizehandle(unsigned int handle) __SMALLCFASTCALL;
-extern unsigned int __LIB__ __FASTCALL__ _fsize(const char *name) __SMALLCFASTCALL;
-extern unsigned int __LIB__ __FASTCALL__ nc_ltell(unsigned int handle) __SMALLCFASTCALL;
-extern unsigned int __LIB__ nc_lseek(unsigned int handle, unsigned int pos) __SMALLCDECL;
-extern int __LIB__ __FASTCALL__ remove(const char *name) __SMALLCFASTCALL;
+extern unsigned int __LIB__  _fsizehandle(unsigned int handle) __z88dk_fastcall;
+extern unsigned int __LIB__  _fsize(const char *name) __z88dk_fastcall;
+extern unsigned int __LIB__  nc_ltell(unsigned int handle) __z88dk_fastcall;
+extern unsigned int __LIB__ nc_lseek(unsigned int handle, unsigned int pos) __smallc;
+extern int __LIB__  remove(const char *name) __z88dk_fastcall;
 
 //extern int __LIB__ rename(const char *old, const char *new);
 
