@@ -11,6 +11,5 @@
 
 int dir_move_next()
 {
-   	bdos(CPM_SDMA,fc_dir);
 	return (fc_dirpos=bdos(CPM_FNXT,fc_dir));
 }

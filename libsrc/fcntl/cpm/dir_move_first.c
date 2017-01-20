@@ -9,19 +9,17 @@
 
 #include <cpm.h>
 
-struct fcb *fc_dir;
+struct fcb fc_dir;
 
 char fc_dirpos;
-char *fc_dirbuf
+char *fc_dirbuf;
 
-char buff[42];
 char dirbuf[132];
 
 int dir_move_first()
 {
-	fc_dirbuf=buff;
+	fc_dirbuf=dirbuf;
 	bdos(CPM_SDMA,fc_dirbuf);
-	fc_dir=buff;
 	parsefcb(fc_dir,"*.*");
 	return (fc_dirpos=bdos(CPM_FFST,fc_dir));
 }
