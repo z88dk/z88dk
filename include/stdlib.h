@@ -24,8 +24,8 @@
 
 // double atof(char *s);                    /* check math library for availability */
 
-extern int  __LIB__   atoi(char *s) __z88dk_fastcall;
-extern long __LIB__   atol(char *s) __z88dk_fastcall;
+extern int  __LIB__   atoi(const char *s) __z88dk_fastcall;
+extern long __LIB__   atol(const char *s) __z88dk_fastcall;
 
 extern int  __LIB__               itoa(int n, char *s, int radix) __smallc;
 extern int  __LIB__     itoa_callee(int n, char *s, int radix) __smallc __z88dk_callee;
@@ -43,9 +43,9 @@ extern int  __LIB__     ultoa_callee(unsigned long n, char *s, int radix) __smal
 
 // double strtod(char *s, char **endp);     /* check math library for availability */
 
-extern long          __LIB__               strtol(char *s, char **endp, int base) __smallc;
-extern long          __LIB__     strtol_callee(char *s, char **endp, int base) __smallc __z88dk_callee;
-extern unsigned long __LIB__               strtoul(char *s, char **endp, int base) __smallc;
+extern long          __LIB__               strtol(const char *s, char **endp, int base) __smallc;
+extern long          __LIB__     strtol_callee(const char *s, char **endp, int base) __smallc __z88dk_callee;
+extern unsigned long __LIB__               strtoul(const char *s, char **endp, int base) __smallc;
 
 #define strtol(a,b,c)  strtol_callee(a,b,c)
 #define strtoul(a,b,c) strtol_callee(a,b,c)
@@ -185,8 +185,8 @@ extern void          __LIB__              bpoke(void *addr, unsigned char byte) 
 extern void          __LIB__    bpoke_callee(void *addr, unsigned char byte) __smallc __z88dk_callee;
 extern void          __LIB__              wpoke(void *addr, unsigned int word) __smallc;
 extern void          __LIB__    wpoke_callee(void *addr, unsigned int word) __smallc __z88dk_callee;
-extern unsigned char __LIB__  bpeek(void *addr) __z88dk_fastcall;
-extern unsigned int  __LIB__  wpeek(void *addr) __z88dk_fastcall;
+extern unsigned char __LIB__  bpeek(const void *addr) __z88dk_fastcall;
+extern unsigned int  __LIB__  wpeek(const void *addr) __z88dk_fastcall;
 
 #define bpoke(a,b) bpoke_callee(a,b)
 #define wpoke(a,b) wpoke_callee(a,b)
@@ -228,7 +228,7 @@ extern int __LIB__ wcmatch(char *wildnam, char *filnam) __smallc;
 extern unsigned int __LIB__ unbcd(unsigned int value);
 
 #ifdef __Z88__
-extern int system(char *text);              /* should this be in the z88 library? */
+extern int system(const char *text);              /* should this be in the z88 library? */
 #endif
 
 

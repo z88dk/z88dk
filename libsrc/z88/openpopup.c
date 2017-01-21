@@ -21,7 +21,7 @@ static char  wincrn[] = "\0x5\0x1\2*L";   /* br corner string */
 #endasm
 #endif
 
-void openpopup(int wid,int tlx,int tly,int width,int height,char *name)
+void openpopup(int wid,int tlx,int tly,int width,int height,const char *name)
 {
 #asm
 	EXTERN	opwin

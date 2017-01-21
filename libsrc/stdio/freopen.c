@@ -12,7 +12,7 @@
 #include        <stdio.h>
 #include        <fcntl.h>
 
-FILE *freopen(char *name, unsigned char *mode, FILE *fp)
+FILE *freopen(const char *name, const char *mode, FILE *fp)
 {
 	int	access;
 	int	flags;

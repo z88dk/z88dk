@@ -18,8 +18,8 @@
  * Read and send mail
  */
 
-extern int __LIB__ readmail(char *type, char *info, int length) __smallc;
-extern int __LIB__ sendmail(char *type, char *info, int length) __smallc;
+extern int __LIB__ readmail(const char *type, const char *info, size_t length) __smallc;
+extern int __LIB__ sendmail(const char *type, const char *info, size_t ength) __smallc;
 
 /*
  * Two defines for the system supported mail types 
@@ -48,7 +48,7 @@ extern void __LIB__ ei(int);
  * Name an application
  */
 
-extern void __LIB__ nameapp(char *);
+extern void __LIB__ nameapp(const char *);
 
 /*
  * Some calls provided for by the packages system 
@@ -99,17 +99,12 @@ extern pid_t __LIB__ getpid(void);
 #define LIB_TFTPD       0x18
 #define LIB_EXAMPLE	0x45
 
-/*
- * These routines are located in z88_crt0.lib cos stat() uses
- * them, but this seems a good place to define them
- */
-
-extern int __LIB__ opendor(char *filename);
-extern void __LIB__ readdor(int dor, int type, int len, void *buf) __smallc;
+extern int __LIB__ opendor(const char *filename);
+extern void __LIB__ readdor(int dor, int type, size_t len, void *buf) __smallc;
 extern void __LIB__ closedor(int dor);
 
 /* These are still in z88_crt0.lib though they're not referenced */
-extern void __LIB__ writedor(int dor, int type, int len, void *buf) __smallc;
+extern void __LIB__ writedor(int dor, int type, size_t len, const void *buf) __smallc;
 extern void __LIB__ deletedor(int dor);
 
 /* Return the son/brother of the dor, supply pointer to store minor type */
@@ -192,14 +187,7 @@ extern int __LIB__ parsefile(far char *seg, wildcard_t *wild);
 #endif
 
 
-/*
- *	The call that you've all been waiting for!
- *
- *	Execute a CLI string (NULL terminated of course!)
- *
- *	Returns NULL on success
- */
-
+/* Execute a CLI string (returns 0 on success)
 extern int __LIB__ exec_cli(char *str);
 
 /*
@@ -213,13 +201,13 @@ extern char __LIB__ *stripdev(char *explicitname);
 extern char __LIB__ *strippath(char *explicitname);
 
 /* Open a popup window */
-extern void __LIB__ openpopup(int wid, int tlx, int tly, int width, int height, char *name) __smallc;
+extern void __LIB__ openpopup(int wid, int tlx, int tly, int width, int height, const char *name) __smallc;
 
 /* Open a window */
 extern void __LIB__ openwindow(int wid, int tlx, int tly, int width, int height) __smallc;
 
 /* Open a titled window */
-extern void __LIB__ opentitled(int wid, int tlx, int tly, int width, int height, char *name) __smallc;
+extern void __LIB__ opentitled(int wid, int tlx, int tly, int width, int height, const char *name) __smallc;
 
 
 #endif /* Z88_H */

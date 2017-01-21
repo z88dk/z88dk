@@ -148,9 +148,9 @@ extern int __LIB__ fflush(FILE *);
 
 /* Our new and improved functions!! */
 
-extern FILE __LIB__ *fopen(char *name, unsigned char *mode) __smallc;
-extern FILE __LIB__ *freopen(char *name, unsigned char *mode, FILE *fp) __smallc;
-extern FILE __LIB__ *fdopen(int fildes, unsigned char *mode) __smallc;
+extern FILE __LIB__ *fopen(const char *name, const char *mode) __smallc;
+extern FILE __LIB__ *freopen(const char *name, const char *mode, FILE *fp) __smallc;
+extern FILE __LIB__ *fdopen(const int fildes, const char *mode) __smallc;
 
 extern int __LIB__ fclose(FILE *fp);
 
@@ -163,14 +163,14 @@ extern void __LIB__ closeall();
 /* The "8080" stdio lib is at the moment used only by the        */
 /* Rabbit Control Module, which is not fully z80 compatible      */
 
-extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp) __smallc;
-extern int __LIB__ fputs(unsigned char *s,  FILE *fp) __smallc;
+extern char __LIB__ *fgets( char *s, int, FILE *fp) __smallc;
+extern int __LIB__ fputs( char *s,  FILE *fp) __smallc;
 extern int __LIB__ fputc(int c, FILE *fp) __smallc;
 extern int __LIB__ fgetc(FILE *fp);
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *) __smallc;
 extern int __LIB__ feof(FILE *fp);
-extern int __LIB__ puts(unsigned char *);
+extern int __LIB__ puts(char *s);
 
 /* Some standard macros */
 #define putc(bp,fp) fputc(bp,fp)
@@ -184,19 +184,19 @@ extern int __LIB__ puts(unsigned char *);
 /* --------------------------------------------------------------*/
 /* Optimized stdio uses the 'CALLEE' convention here and there   */
 
-extern char __LIB__ *fgets(unsigned char *s, int, FILE *fp) __smallc;
+extern char __LIB__ *fgets(char *s, int, FILE *fp) __smallc;
 
-extern int __LIB__ fputs(unsigned char *s,  FILE *fp) __smallc;
+extern int __LIB__ fputs(const char *s,  FILE *fp) __smallc;
 extern int __LIB__ fputc(int c, FILE *fp) __smallc;
 
-extern int __LIB__  fputs_callee(unsigned char *s,  FILE *fp) __smallc __z88dk_callee;
+extern int __LIB__  fputs_callee(const char *s,  FILE *fp) __smallc __z88dk_callee;
 extern int __LIB__  fputc_callee(int c, FILE *fp) __smallc __z88dk_callee;
 extern int __LIB__ fgetc(FILE *fp);
 
 #define getc(f) fgetc(f)
 extern int __LIB__ ungetc(int c, FILE *) __smallc;
 extern int __LIB__ feof(FILE *fp);
-extern int __LIB__ puts(unsigned char *);
+extern int __LIB__ puts(const char *);
 
 #define fputs(a,b)   fputs_callee(a,b)
 #define fputc(a,b)   fputc_callee(a,b)
@@ -218,8 +218,8 @@ extern int __LIB__ fgetpos(FILE *fp, fpos_t *pos) __smallc;
 extern int __LIB__ __SAVEFRAME__ fseek(FILE *fp, fpos_t offset, int whence) __smallc;
 
 /* Block read/writing */
-extern int __LIB__ __SAVEFRAME__ fread(void *ptr, int size, int num, FILE *) __smallc;
-extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *) __smallc;
+extern int __LIB__ __SAVEFRAME__ fread(void *ptr, size_t size, size_t num, FILE *) __smallc;
+extern int __LIB__ fwrite(const void *ptr, size_t size, size_t num, FILE *) __smallc;
 
 
 /* You shouldn't use gets. z88 gets() is limited to 255 characters */
@@ -229,12 +229,12 @@ extern int __LIB__ fwrite(void *ptr, int size, int num, FILE *) __smallc;
 extern char __LIB__ *gets(char *s);
 #endif
 
-extern int __LIB__ printf(char *,...);
-extern int __LIB__ fprintf(FILE *,char *,...);
-extern int __LIB__ sprintf(char *,char *,...);
-extern int __LIB__ snprintf(char *,size_t,char *,...);
-extern int __LIB__ vfprintf(FILE *,unsigned char *fmt,void *ap);
-extern int __LIB__ vsnprintf(char *str,size_t,unsigned char *fmt,void *ap);
+extern int __LIB__ printf(const char *fmt,...);
+extern int __LIB__ fprintf(FILE *f,const char *fmt,...);
+extern int __LIB__ sprintf(char *s,const char *fmt,...);
+extern int __LIB__ snprintf(char *s,size_t n,const char *fmt,...);
+extern int __LIB__ vfprintf(FILE *f,const char *fmt,void *ap);
+extern int __LIB__ vsnprintf(char *str, size_t n,const char *fmt,void *ap);
 
 #define vprintf(ctl,arg) vfprintf(stdout,ctl,arg)
 #define vsprintf(buf,ctl,arg) vsnprintf(buf,65535,ctl,arg)
@@ -247,11 +247,11 @@ extern void __LIB__ printn(int number, int radix,FILE *file) __smallc;
  * Scanf family 
  */
 
-extern int __LIB__ scanf(unsigned char *fmt,...);
-extern int __LIB__ fscanf(FILE *,unsigned char *fmt,...);
-extern int __LIB__ sscanf(char *,unsigned char *fmt,...);
-extern int __LIB__ vfscanf(FILE *, unsigned char *fmt, void *ap);
-extern int __LIB__ vsscanf(char *str, unsigned char *fmt, void *ap);
+extern int __LIB__ scanf(const char *fmt,...);
+extern int __LIB__ fscanf(FILE *,const char *fmt,...);
+extern int __LIB__ sscanf(char *,const char *fmt,...);
+extern int __LIB__ vfscanf(FILE *, const char *fmt, void *ap);
+extern int __LIB__ vsscanf(char *str, const char *fmt, void *ap);
 #define vscanf(ctl,arg) vfscanf(stdin,ctl,arg)
 
 
@@ -280,16 +280,16 @@ extern int __LIB__ fchkstd(FILE *);
 /* All functions below here are machine specific */
 extern int __LIB__ fgetc_cons();
 extern int __LIB__ fputc_cons(char c);
-extern char __LIB__ *fgets_cons(char *s, int n) __smallc;
+extern char __LIB__ *fgets_cons(char *s, size_t n) __smallc;
 /* Abandon file - can be the generic version */
 extern void __LIB__ fabandon(FILE *);
 /* Get file position for file handle fd */
 extern long __LIB__ fdtell(int fd);
 extern int __LIB__ fdgetpos(int fd, fpos_t *posn) __smallc;
 /* Rename a file */
-extern int __LIB__ rename(char *s, char *d) __smallc;
+extern int __LIB__ rename(const char *s, const char *d) __smallc;
 /* Remove a file */
-extern int __LIB__ remove(char *name);
+extern int __LIB__ remove(const char *name);
 
 /*
  * Non-standard, but useful for games:
@@ -302,8 +302,8 @@ extern int __LIB__ remove(char *name);
  */
 extern int __LIB__ getk();
 #define getkey() fgetc_cons()
-extern void __LIB__ puts_cons(char *message);
-extern int __LIB__ printk(char *fmt,...);
+extern void __LIB__ puts_cons(const char *message);
+extern int __LIB__ printk(const char *fmt,...);
 
 
 /*

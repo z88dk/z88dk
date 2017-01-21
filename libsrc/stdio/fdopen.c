@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 
-FILE *fdopen(int fildes, char *mode)
+FILE *fdopen(int fildes, const char *mode)
 {
 	int	flags;
         FILE    *fp;

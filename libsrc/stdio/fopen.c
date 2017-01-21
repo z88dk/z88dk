@@ -15,7 +15,7 @@
 
 
 FILE *
-fopen(char *name, unsigned char *mode)
+fopen(const char *name, const char *mode)
 {
         FILE    *fp;
 

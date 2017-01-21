@@ -15,7 +15,7 @@
 
 
 
-int fputs_callee(unsigned char *s,FILE *fp)
+int fputs_callee(const char *s,FILE *fp)
 {
 //#ifdef Z80
 #asm

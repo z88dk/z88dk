@@ -22,7 +22,7 @@
 #include <sys/compiler.h>
 
 #ifndef NDEBUG
-extern void __LIB__ l_assert(int, char *, char *) __smallc;
+extern void __LIB__ l_assert(int line, const char *file, const char *msg) __smallc;
 #define assert(exp)     if((exp==0)) {l_assert(__LINE__, __FILE__, #exp );}
 #else
 #define assert(exp)
