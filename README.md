@@ -16,6 +16,7 @@ Z88DK is a collection of software development tools that targets z80 machines.  
 
 These tools are not normally directly invoked by the user:
 
+* **M4** acts as z88dk's macro preprocessor and can optionally process files ahead of the c preprocessor or assembler.
 * **ZCPP** is the c preprocessor invoked for sccz80.
 * **ZSDCPP** is the c preprocessor invoked for zsdcc.
 * **ZPRAGMA** is used by the toolchain to process pragmas embedded in c source.
@@ -38,7 +39,9 @@ There are three ways to install z88dk.
 
 1. Use the [Most Recent Official Release](https://github.com/z88dk/z88dk/tree/github/Readme#most-recent-official-release) currently v1.99B dated 10 Jan 2017.  Follow these [installation instructions](https://www.z88dk.org/wiki/doku.php?id=temp:front#installation).
 2. Get the [Nightly Build](http://nightly.z88dk.org/).  Every night we build complete binary packages for windows and osx and source packages for everyone else.  The same [installation instructions](https://www.z88dk.org/wiki/doku.php?id=temp:front#installation) apply.  Using a nightly build means you can keep up with bugfixes and new features rather than having to wait an entire year for a release to occur.
-3. Use Github.  Using github will keep you up-to-date with the devs and will allow you to contribute to the project.  We do not store the z80 libraries or the binaries in the github repository.  Instead you will either have to build those things yourself or acquire them from the nightly build to have a working install (INSTRUCTIONS COMING).
+3. Use Github.  Using github will keep you up-to-date with the devs and will allow you to contribute to the project.  We do not store the z80 libraries or the binaries in the github repository.  Instead you will either have to build those things yourself or acquire them from the nightly build to have a working install.
+   * Build the Binaries and Z80 Libraries Yourself
+	* Copy the Binaries and Z80 Libraries Out of the Nightly Build
 
 ## USING Z88DK
 
