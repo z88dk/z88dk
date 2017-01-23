@@ -10,6 +10,7 @@ compiler:
 
 before_script: 
   - export PATH=`pwd`/bin:$PATH
+  - export ZCCCFG=`pwd`/lib/config
 
 script: 
   - make && make libs
