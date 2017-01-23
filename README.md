@@ -171,7 +171,7 @@ Z80ASM - Assembler, Linker, Librarian
 * Remove all generated files at start of assembly to remove files from previous runs.
 * Remove deprecated directives: XREF and LIB (replaced by EXTERN), XDEF and XLIB (replaced by PUBLIC), OZ keep CALL_OZ).
 * Rename DEFL to DEFQ to reserve DEFL for macro variables; rename DS.L by DS.Q
-* Constants for section sizes: prune empty sections, rename ASMHEAD, ASMTAIL and ASMSIZE to __head, __tail and __size respectively, rename `ASM<HEAD|TAIL|SIZE>_<section_name>` to `__<section_name>_<head|tail|size>`
+* Constants for section sizes: prune empty sections, rename ASMHEAD, ASMTAIL and ASMSIZE to `__head`, `__tail` and `__size` respectively, rename `ASM<HEAD|TAIL|SIZE>_<section_name>` to `__<section_name>_<head|tail|size>`
 * Environment variables no longer used: Z80_OZFILES, Z80_STDLIB
 * Command line option -r, --origin: accept origin in decimal or hexadecimal with '0x' or '$' prefix
 * Command line options: -i, -x: require a library name
