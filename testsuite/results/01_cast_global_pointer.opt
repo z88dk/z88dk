@@ -1,11 +1,13 @@
 
 
 
-	; MODULE	01_cast_global_pointer.c
+	MODULE	X01_cast_global_pointerc
 
 
 	INCLUDE "z80_crt0.hdr"
 
+
+	SECTION	code_compiler
 
 
 ._main
@@ -30,8 +32,12 @@
 
 
 
+	SECTION	bss_compiler
+
 ._a	defs	2
 ._st_main_c	defs	2
+	SECTION	code_compiler
+
 
 
 

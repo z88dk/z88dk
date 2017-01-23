@@ -1,11 +1,13 @@
 
 
 
-	; MODULE	02_addr_ptr.c
+	MODULE	X02_addr_ptrc
 
 
 	INCLUDE "z80_crt0.hdr"
 
+
+	SECTION	code_compiler
 
 
 ._main
@@ -18,6 +20,10 @@
 
 
 
+
+	SECTION	bss_compiler
+
+	SECTION	code_compiler
 
 
 
