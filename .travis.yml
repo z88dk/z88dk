@@ -1,0 +1,17 @@
+sudo: false
+
+language: c
+
+os:
+  - linux
+
+compiler:
+  - gcc
+
+before_script: 
+  - export PATH=`pwd`/bin:$PATH
+
+script: 
+  - make && make libs
+
+
