@@ -13,6 +13,4 @@ before_script:
   - export ZCCCFG=`pwd`/lib/config
 
 script: 
-  - make && make libs
-
-
+  - make && make -C libsrc && make -C libsrc install && make -C libsrc/_DEVELOPMENT && make -C examples
