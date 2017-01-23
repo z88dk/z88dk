@@ -4,64 +4,95 @@ Concise Record of Changes to Z88DK Releases
 
 z88dk v1.99B - 10.01.2017
 
-- [package] The win32 and osx packages are complete and now include the zsdcc & zsdcpp binaries.  zsdcc is z88dk's customization of the sdcc compiler.  Other users can compile zsdcc from source.
-- [package] A VS2015 solution file is now available in z88dk/win32 for building all z88dk binaries except zsdcc & zsdcpp.  Instructions for building zsdcc & zsdcpp can be found in the install instructions link above.
-- [zcc] M4 has been added as an optional macro pre-processor.  Any filename ending with extension ".m4" will automatically be passed through M4 and its output written to the original source directory with the ".m4" extension stripped prior to further processing.  The intention is to allow source files like "foo.c.m4", "foo.asm.m4", "foo.h.m4" and so on to be processed by M4 and then that result to be processed further according to the remaining file extension.
-- [zcc] In conjunction with the above, a collection of useful M4 macros has been started in "z88dk.m4" that can be included in any ".m4" file processed by zcc.  Currently macros implementing for-loops and foreach-loops are defined.
-- [zcc] List files ending with extension ".lst" can be used to specify a list of source files for the current compile, one filename per line.  The list file is specified on the compile line with prefix @ as in "@foo.lst".  List files can contain any source files of any type understood by zcc and individual lines can be commented out with a leading semicolon.  Paths of files listed in list files can be made relative to the list file itself (default) or relative to the directory where zcc was invoked (--listcwd).  List files can list other list files, identified with leading '@'.
-- [zcc] zcc now processes all files it is given to the final output file type specified.  For example, with "-E" specified, all listed .c files will be run through the C pre-processor individually and all output copied to the output directory.  Previous to this, only the first file listed was processed unless a binary was being built.
+- [package] The win32 and osx packages are complete and now include the zsdcc & zsdcpp
+binaries.
+- [package] VS2015 solution file is now available in z88dk/win32 for building all z88dk
+binaries except zsdcc & zsdcpp under Windows.
+- [zcc] M4 has been added as an optional macro pre-processor.
+- [zcc] In conjunction with the above, a collection of useful M4 macros has been started
+in "z88dk.m4" that can be included in any ".m4" file processed by zcc.
+- [zcc] List files ending with extension ".lst" can be used to specify a list of source
+files for the current compile, one filename per line.
+- [zcc] zcc now processes all files it is given to the final output file type specified.
 - [zcc] -v gives more information on what steps zcc takes to process each source file.
 - [zcc] -x now builds a library out of the source files listed.
-- [zcc] -c by itself will generate individual object files for each input source file.  However, if -c is coupled with an output filename as in "-o name", a single consolidated object file will now be built instead of individual ones.  The intention is to provide a means to generate identical code in separate compiles by allowing this single object file to be specified on different compile lines.
+- [zcc] -c coupled with an output filename "-o name" will cause a single consolidated
+object file to be generated out of all source input.
 - [zcc] Better error reporting for source files with unrecognized types.
-- [zcc] Better parsing for compile line pragmas; pragma integer parameters can now be in decimal, hexadecimal or octal.
-- [zcc] -pragma-include added to allow a list of compile time pragmas to be read from a file as in "-pragma-include:zpragma.inc".  This way projects can consolidate pragmas in one location; this is especially important for the new c library which uses pragmas extensively to customize the crt.
-- [zcc] -pragma-export added, is similar to -pragma-define but the assembly label defined as a constant on the compile line is made public so that its value is visible across all source files.
-- [zcc] --list will generate ".lis" files for each source file in a compile to a binary.  The ".lis" file is an assembly listing of source prior to input to the linker.
-- [zcc] --c-code-in-asm causes C code to be interspersed as comments in any generated assembly listing associated with C source files.
-- [zcc] ".s" files are now understood by zcc to be asz80-syntax assembly language source files.  This allows sdcc project files written in assembly language to be assembled by z88dk.  asz80 mnemonics are non-standard so zcc attempts to translate to standard zilog mnemonics before assembling.  You can see the translation to standard zilog form by using "-a" on a compile line.  This is still a work-in-progress feature.
-- [zcc] --no-crt allows compiles to proceed without using the library's supplied crt for a target.  The first file listed on a compile line will stand in as the crt and will be responsible for initialization and setting up the memory map.
-- [zcc] Temporary files are always created in the temp directory.  The option "-notemp" has been removed.
-- [zcc] Library and include search paths have been fixed to honour the order specified on the compile line.  This allows the user to override library functions when desired.
-- [zcc] Source files are now processed from their original location so that includes can be properly resolved.  Previously this was only done for .c files but this now applies to other file types.
+- [zcc] Pragma integer parameters can now be in decimal, hexadecimal or octal.
+- [zcc] -pragma-include added to allow a list of compile time pragmas to be read from a
+file as in "-pragma-include:zpragma.inc".
+- [zcc] -pragma-export added, similar to -pragma-define but the assembly label is made
+public.
+- [zcc] --list generates .lis files for each source file.  .lis files are assembly
+listings generated just prior to input to the linker.
+- [zcc] --c-code-in-asm causes C code to be interspersed as comments in any generated
+assembly listing associated with C source files.
+- [zcc] .s files are understood to be asz80-syntax assembly language source files for
+better compatibility with sdcc.  This is still a work-in-progress feature.
+- [zcc] --no-crt allows compiles to proceed without using the library's supplied crt for
+a target.
+- [zcc] Temporary files are always created in the temp directory.  The option "-notemp"
+has been removed.
+- [zcc] Library and include search paths fixed to honour the order specified on the
+compile line.
+- [zcc] All source files are processed from their original location so that includes can
+be properly resolved.
 - [zcc] clang/llvm compilation is in an experimental state.
 - [sccz80] Correct floating point constant handling.
 - [sccz80] New __SAVEFRAME__ function decorator to allow saving of ix during a function call.
 - [sccz80] -standard-escape-chars to make \n and \r output standard character codes
 - [zsdcc] Updated to SDCC 3.6.5 #9824.
-- [zsdcc] SDCC's native C pre-processor is now used so that line numbers corresponding to reported errors are accurate.
-- [zsdcc] Peephole-z80 fixed to accurately report registers affected by instructions, allowing accurate application of peephole rules.
-- [zsdcc] inSequence('stride' %1 %2 %3 ...) added as peephole rule qualifier to allow testing whether consecutive bytes in memory are being accessed.
-- [zsdcc] Peephole-z80 made aware of z88dk special functions which represent code inlined by the library.
-- [zsdcc] Approximately 300 new peephole rules added to the aggressive peephole set (-SO3).
-- [zsdcc] Peephole rules added to fix some known code generation bugs and to fix SDCC's critical sections for nmos processors.
-- [zsdcc] --opt-code-size now significantly reduces code size for programs using 32-bit longs, 64-bit longlongs and floats.
-- [zsdcc] chars have been made unsigned by default.  Use --fsigned-char to change to signed.
-- [zsdcc] For loops can now declare variables in the initializer statement.
-- [zsdcc] An rodata section has been properly implemented so that all constant data generated by sdcc is assigned there.
-- [z80asm] Handle input files more predictably: link .o files; assemble any other extension; append a .asm or .o option to the file name to allow just the basename.
-- [z80asm] Make a consolidated object file with -o and not -b: all the object modules are merged, the module local symbols are renamed <module>_<symbol>
+- [zsdcc] SDCC's native C pre-processor is now used so that line numbers corresponding to
+reported errors are accurate.
+- [zsdcc] Peephole-z80 fixed to accurately report registers affected by instructions.
+- [zsdcc] inSequence('stride' %1 %2 %3 ...) added as peephole rule qualifier.
+- [zsdcc] Peephole-z80 made aware of z88dk special functions.
+- [zsdcc] ~300 new peephole rules added to the aggressive peephole set (-SO3).
+- [zsdcc] Peephole rules added to fix some known code generation bugs and to fix SDCC's
+critical sections for nmos processors.
+- [zsdcc] --opt-code-size significantly reduces code size for programs using 32-bit
+longs, 64-bit longlongs and floats.
+- [zsdcc] chars have been made unsigned by default.
+- [zsdcc] For loops can declare variables in the initializer statement.
+- [zsdcc] rodata section has been properly implemented so that all constant data generated
+by sdcc is assigned there.
+- [z80asm] Handle input files more predictably: link .o files; assemble any other
+extension; append a .asm or .o option to the file name to allow just the basename.
+- [z80asm] Make a consolidated object file with -o and not -b: all the object modules
+are merged, the module local symbols are renamed <module>_<symbol>
 - [z80asm] Link the library modules in the command line sequence (it was depth-first).
-- [z80asm] Add directory of assembled file to the end the include path to allow includes relative to source location.
-- [z80asm] Remove all generated files at start of assembly to remove files from previous runs.
-- [z80asm] Remove deprecated directives: XREF and LIB (replaced by EXTERN), XDEF and XLIB (replaced by PUBLIC), OZ (keep CALL_OZ).
+- [z80asm] Add directory of assembled file to the end the include path to allow includes
+relative to source location.
+- [z80asm] Remove all generated files at start of assembly to remove files from previous
+runs.
+- [z80asm] Remove deprecated directives: XREF and LIB (replaced by EXTERN), XDEF and XLIB
+(replaced by PUBLIC), OZ (keep CALL_OZ).
 - [z80asm] Rename DEFL to DEFQ to reserve DEFL for macro variables; rename DS.L by DS.Q
-- [z80asm] Constants for section sizes: prune empty sections, rename ASMHEAD, ASMTAIL and ASMSIZE to __head, __tail and __size respectively, rename ASM<HEAD|TAIL|SIZE>_<section_name> to __<section_name>_<head|tail|size>
+- [z80asm] Constants for section sizes: prune empty sections, rename ASMHEAD, ASMTAIL and
+ASMSIZE to __head, __tail and __size respectively, rename
+ASM<HEAD|TAIL|SIZE>_<section_name> to __<section_name>_<head|tail|size>
 - [z80asm] Environment variables no longer used: Z80_OZFILES, Z80_STDLIB
-- [z80asm] Command line option -r, --origin: accept origin in decimal or hexadecimal with '0x' or '$' prefix
+- [z80asm] Command line option -r, --origin: accept origin in decimal or hexadecimal with
+'0x' or '$' prefix
 - [z80asm] Command line options: -i, -x: require a library name
 - [z80asm] Command line options: remove -RCMX000, keep only --RCMX000
 - [z80asm] Command line options: remove -plus, keep only --ti83plus
 - [z80asm] Command line options: remove -IXIY and --swap-ix-iy, keep --IXIY
-- [z80asm] Command line options: remove --sdcc, -nm, --no-map, -ng, --no-globaldef, -ns, --no-symtable, -nv, --no-verbose, -nl, --no-list, -nb, --no-make-bin, -nd, --no-date-stamp, -a, --make-updated-bin, -e, --asm-ext, -M, --obj-ext, -t
-- [z80asm] Make symbol files, map files and reloc files optional; do not merge symbols in the list file; do not paginate and cross-reference symbols in list file; rename list file to file.lis (@file.lst is used as project list)
-- [z80asm] Unify format used in map files, symbol files and global define files, output list of symbols only once.
+- [z80asm] Command line options: remove --sdcc, -nm, --no-map, -ng, --no-globaldef, -ns,
+--no-symtable, -nv, --no-verbose, -nl, --no-list, -nb, --no-make-bin, -nd,
+--no-date-stamp, -a, --make-updated-bin, -e, --asm-ext, -M, --obj-ext, -t
+- [z80asm] Make symbol files, map files and reloc files optional; do not merge symbols in
+the list file; do not paginate and cross-reference symbols in list file; rename list file
+to file.lis (@file.lst is used as project list)
+- [z80asm] Unify format used in map files, symbol files and global define files, output
+list of symbols only once.
 - [z80asm] Include symbols computed at link time in the global define file.
 - [z80asm] Simplify output of --verbose
 - [appmake] +rom can now generate binaries for ROM chips mapped into a specific address range.
 - [appmake] +sms now generates bankswitched .sms files as output.
 - [appmake] +zx now has option to generate headerless .tap files.
-- [appmake] Appmake now understands three compile models -- ram (destined for ram, no stored data section), rom (destined for rom, stored data section is a copy) and compressed rom (destined from rom, stored data section is compressed) -- and will form output files accordingly.
+- [appmake] Appmake now understands three compile models -- ram, rom and compressed rom.
 - [classiclib] SDCC can now be used to compile using the classic library.
 - [classiclib] Rewritten and modular printf core, added (v)snprintf.
 - [classiclib] Rewritten and modular scanf core.
@@ -76,24 +107,32 @@ z88dk v1.99B - 10.01.2017
 - [classiclib] CP/M Plus on Spectrum.
 - [classiclib] CP/M extenstions forced to upper case.
 - [classiclib] CP/M extensions improved on Aussie Byte, trs-80 and Epson PX.
-- [classiclib] GFX Library: improved the vector rendering functions, now bigger pictures can be drawn and higher resolutions are supported.  Various fixes.
-- [classiclib] Custom text configuration (font, resolution) can be done at compile time for targets with ansi VT support on graphics display. 
+- [classiclib] GFX Library: improved the vector rendering functions, now bigger pictures
+can be drawn and higher resolutions are supported.  Various fixes.
+- [classiclib] Custom text configuration (font, resolution) can be done at compile time
+for targets with ansi VT support on graphics display. 
 - [newclib] 64-bit integers are now fully supported in the library.
-- [newclib] The fprintf/fscanf cores can now have conversion specifiers individually enabled or disabled at compile time.  This allows the printf/scanf cores to be tailored to the minimum size required.
+- [newclib] The fprintf/fscanf cores can now have conversion specifiers individually
+enabled or disabled at compile time.
 - [newclib] fprintf %aefg precision formatting corrected.
-- [newclib] Intrinsics have been introduced as a method to inline assembly code without disturbing optimization.  This provides a means to insert assembly labels (whose addresses will appear in map files), simple assembly instructions such as "di" and "ei", and atomic loads/stores into C code without affecting the compiler's optimizer.  See https://www.z88dk.org/wiki/doku.php?id=libnew:intrinsic
-- [newclib] The library has had a preserves_registers attribute attached to every function that informs sdcc which registers will not be affected by a library call and allows sdcc to generate better code around library calls.
+- [newclib] Intrinsics introduced as a method to inline assembly code without disturbing
+optimization.
+- [newclib] preserves_registers attribute attached to every function in the library.
 - [newclib] aplib added as another data decompression utility.
-- [newclib] setjmp/longjmp state increased to include the value of IY for sdcc compiles.  This was necessary as sdcc sometimes requires the value of IY to be preserved at points in the program.
-- [newclib] New target: rc2014 (preliminary).  This target is still being developed by rc2014 users.
-- [newclib] New target: Sega Master System.  The target is able to automatically create bankswitched rom cartridges with signatures.
-- [newclib] ZX Spectrum target: interfaces to the bifrost and nirvana multicolour sprite engines added.
-- [newclib] The CRT startup code has been made more flexible, allowing a wide range of features to be selected via pragmas at compile time.  See https://www.z88dk.org/wiki/doku.php?id=libnew:target_embedded#crt_configuration
+- [newclib] setjmp/longjmp state increased to include the value of IY for sdcc compiles.
+- [newclib] New target: rc2014 (preliminary).
+- [newclib] New target: Sega Master System.  The target is able to automatically create
+bankswitched rom cartridges with signatures.
+- [newclib] ZX Spectrum target: interfaces to the bifrost and nirvana multicolour sprite
+engines added.
+- [newclib] The CRT startup code has been made more flexible allowing a wide range of
+features to be selected via pragmas at compile time.
 
 Known issues:
 
 * Spaces in paths or filenames can be a problem.
-* When --c-code-in-asm is active, unicode characters from .c source files appearing as comments in translated asm may cause the tools to crash.
+* When --c-code-in-asm is active, unicode characters from .c source files appearing as
+comments in translated asm may cause the tools to crash.
 
 
 z88dk v1.99A - 24.12.2015
