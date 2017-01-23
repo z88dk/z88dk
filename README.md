@@ -25,7 +25,7 @@ These tools are not normally directly invoked by the user:
 ## BENCHMARKS
 
 The assembly language libraries supplied by z88dk give it performance advantages over other z80 compilers.
-(COMPARISON RESULTS COMING)
+(COMING)
 
 * **Dhrystone 2.1**  Dhrystone was a common synthetic benchmark for measuring the integer performance of compilers in the 1980s until more modern benchmarks replaced it.  It attempts to simulate typical programs by executing a set of statements statistically determined from common programs.
 * **Pi**  Mainly measures 32-bit integer performance.
@@ -55,7 +55,7 @@ We do not maintain the zsdcc or zsdcpp source code in the repository.  Instead z
 
 The last step for installation is to set the ZCCCFG environment variable and your PATH appropriately.  You can find that information [here](https://www.z88dk.org/wiki/doku.php?id=temp:front#installation).
 
-To verify that the install was successful, try some test compiles from the examples directories in z88dk/examples (classic c lib) and z88dk/libsrc/_DEVELOPMENT/EXAMPLES (new c lib).
+To verify that the install was successful, try some test compiles from the examples directories in z88dk/examples (classic c lib) and z88dk/libsrc/_DEVELOPMENT/EXAMPLES (new c lib).  Note that zsdcc compiles with optimization turned high can be slow.
 
 ## USING Z88DK
 

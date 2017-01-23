@@ -1,4 +1,4 @@
-All the libraries are in here, to keep them separate from the header files i
+All the classic c libraries are in here, to keep them separate from the header files i
 (just makes my life easier, here's what they all are!)
 
 Z88 Libraries:
