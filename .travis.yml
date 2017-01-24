@@ -1,0 +1,16 @@
+sudo: false
+
+language: c
+
+os:
+  - linux
+
+compiler:
+  - gcc
+
+before_script: 
+  - export PATH=`pwd`/bin:$PATH
+  - export ZCCCFG=`pwd`/lib/config
+
+script: 
+  - make && make -C libsrc && make -C libsrc install && make -C libsrc/_DEVELOPMENT && make -C examples
