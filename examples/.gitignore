@@ -1,0 +1,16 @@
+**/*.cas
+**/*.bin
+**/*.tap
+**/*.wav
+**/*.vz
+**/*.com
+**/*.COM
+**/*.obj
+**/*.EXE
+**/*.sms
+**/*.63
+**/*.bas
+**/*.V00
+**/*.rex
+**/zcc_opt.def
+**/zcc_proj.lst
