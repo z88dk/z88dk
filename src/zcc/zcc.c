@@ -586,13 +586,15 @@ int linkthem(char *linker)
 	linkargs_mangle(linklibs);
 	linkargs_mangle(linkargs);
 
-	if (compileonly) {
+	if (compileonly)
+    {
 		len = offs = zcc_asprintf(&temp, "%s --output=\"%s\" %s",
 			linker,
 			outputfile,
 			linkargs);
 	}
-	else if (makelib) {
+	else if (makelib)
+    {
 		len = offs = zcc_asprintf(&temp, "%s %s -d %s %s -x\"%s\"",
 			linker,
 			(z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v" : "",
@@ -600,7 +602,8 @@ int linkthem(char *linker)
 			linkargs,
 			outputfile);
 	}
-	else {
+	else
+    {
         len = offs = zcc_asprintf(&temp, "%s -b -d %s -o%s\"%s\" %s%s%s%s%s%s%s%s%s%c%s%s%c",
             linker,
             IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
@@ -622,18 +625,20 @@ int linkthem(char *linker)
 	}
 
 	tname[0] = '\0';
-	prj = fopen(PROJFILE, "w");
+	prj = z80verbose ? fopen(PROJFILE, "w") : NULL;
 
-	if ((nfiles > 1) && IS_ASM(ASM_Z80ASM)) {
-
+	if ((nfiles > 1) && IS_ASM(ASM_Z80ASM))
+    {
 		// place source files into a list file for z80asm
 
 		tempname(tname);
 		strcat(tname, ".lst");
 		if ((out = fopen(tname, "w")) == NULL) goto USE_COMMANDLINE;
 
-		for (i = 0; i < nfiles; ++i) {
-			if (hassuffix(filelist[i], c_extension)) {
+		for (i = 0; i < nfiles; ++i)
+        {
+			if (hassuffix(filelist[i], c_extension))
+            {
 				fprintf(out, "%s\n", filelist[i]);
 				if (prj) fprintf(prj, "%s\n", original_filenames[i]);
 			}
@@ -645,10 +650,9 @@ int linkthem(char *linker)
 		cmdline = calloc(len, sizeof(char));
 
 		snprintf(cmdline, len, "%s \"@%s\"", temp, tname);
-
 	}
-	else {
-
+	else
+    {
 	USE_COMMANDLINE:
 
 		// place source files on the command line
@@ -662,13 +666,14 @@ int linkthem(char *linker)
 		cmdline = calloc(len, sizeof(char));
 		strcpy(cmdline, temp);
 
-		for (i = 0; i < nfiles; ++i) {
-			if (hassuffix(filelist[i], c_extension)) {
+		for (i = 0; i < nfiles; ++i)
+        {
+			if (hassuffix(filelist[i], c_extension))
+            {
 				offs += snprintf(cmdline + offs, len - offs, " \"%s\"", filelist[i]);
 				if (prj) fprintf(prj, "%s\n", original_filenames[i]);
 			}
 		}
-
 	}
 
 	if (prj) fclose(prj);
