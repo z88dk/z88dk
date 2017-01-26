@@ -400,7 +400,6 @@ t_z80asm_error("defs 65536, 0xAA \n defb 0xAA \n",
 # error_symbol_redefined_module	-> tested in symtab.t
 # error_symbol_decl_local  		-> tested in symtab.t
 # error_symbol_redecl			-> tested in symtab.t
-# error_module_redefined		-> tested in directives.t
 
 #------------------------------------------------------------------------------
 # error_illegal_src_filename

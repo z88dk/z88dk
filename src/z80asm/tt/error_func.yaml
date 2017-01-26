@@ -142,11 +142,6 @@ errors:
     message	: '"max. code size of %ld bytes reached", size'
 	
   - type	: ErrError
-    func	: error_module_redefined
-    args	: void
-    message	: '"module name already defined"'
-	
-  - type	: ErrError
     func	: error_org_redefined
     args	: void
     message	: '"ORG redefined"'

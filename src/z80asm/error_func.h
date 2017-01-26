@@ -27,7 +27,6 @@ extern void error_symbol_redefined_module(char *symbol, char *module);
 extern void error_symbol_decl_local(char *symbol);
 extern void error_symbol_redecl(char *symbol);
 extern void error_max_codesize(long size);
-extern void error_module_redefined(void);
 extern void error_org_redefined(void);
 extern void error_invalid_org_option(char *org_hex);
 extern void warn_org_ignored(char *filename, char *section_name);
