@@ -21,7 +21,7 @@ void closeall(void)
 {
         FILE    *fp;
 
-        for (fp= _sgoioblk; fp < _sgoioblk+FOPEN_MAX ; ++fp) {
+        for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
                 if (fp->flags) {
 			if ( fclose(fp) ) fabandon(fp);
 		}

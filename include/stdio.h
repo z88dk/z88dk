@@ -86,10 +86,7 @@
 
 #define FILENAME_MAX    128
 
-/* If you change this then you also have to pad out {zcc}/lib/stdio_fp.asm,
- * recompile the libs and fiddle with app_crt0.asm - best leave it!
- */
-#define FOPEN_MAX       10
+//#define FOPEN_MAX       10
 
 struct filestr {
         union f0xx {
@@ -129,7 +126,14 @@ DEFVARS 0 {
 #define _IOSTRING     128
 
 
-extern struct filestr _sgoioblk[FOPEN_MAX];
+/* Number of open files, this can be overridden by the crt0, but the 10 is the default for classic */
+#ifndef FOPEN_MAX
+#define FOPEN_MAX 10
+#endif
+
+
+extern struct filestr _sgoioblk[FOPEN_MAX]; 
+extern struct filestr _sgoioblk_end; 
 
 
 #define stdin  &_sgoioblk[0]

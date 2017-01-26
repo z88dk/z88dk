@@ -17,7 +17,7 @@ IF !DEFINED_nostreams
 	; Setup std* streams
         ld      hl,__sgoioblk
         ld      de,__sgoioblk+1
-        ld      bc,39
+        ld      bc,#(__sgoioblk_end - __sgoioblk) - 1
         ld      (hl),0
         ldir
         ld      hl,__sgoioblk+2
@@ -89,8 +89,14 @@ ENDIF
 		SECTION bss_error
 		SECTION bss_crt
 IF !DEFINED_nostreams
+        IF !DEFINED_CLIB_FOPEN_MAX
+                DEFC    CLIB_FOPEN_MAX = 10
+        ENDIF
 		PUBLIC	__sgoioblk
-__sgoioblk:      defs    40      ;stdio control block
+		PUBLIC	__sgoioblk_end
+		PUBLIC  _FOPEN_MAX
+__sgoioblk:      defs    CLIB_FOPEN_MAX * 10      ;stdio control block
+__sgoioblk_end:   		 ;end of stdio control block
 ENDIF
 		PUBLIC	base_graphics
 		PUBLIC	exitsp
