@@ -106,7 +106,10 @@ static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
 static void            copy_crt0_to_temp(void);
 static void            ShowErrors(char *, char *);
+static int             shell_command(char *s);
+static int             copyprepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static int             copy_file(char *src, char *src_extension, char *dest, char *dest_extension);
+static int             prepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static void            tempname(char *);
 static int             find_zcc_config_fileFile(char *arg, int argc, char *buf, size_t buflen);
 static void            parse_option(char *option);
@@ -256,9 +259,9 @@ static char  *c_zpragma_exe = "zpragma";
 static char  *c_copt_exe = "copt";
 static char  *c_appmake_exe = "appmake";
 #ifndef WIN32
-static char  *c_copycmd = "cp";
+static char  *c_copycmd = "cat";
 #else
-static char  *c_copycmd = "copy";
+static char  *c_copycmd = "type";
 #endif
 static char  *c_extension_config = "o";
 static char  *c_incpath = NULL;
@@ -1143,6 +1146,36 @@ int main(int argc, char **argv)
                 sprintf(ptr, "%s -I\"%s\" ", asmarg, tmp);
             }
 
+            // insert module directive at front of .asm file see issue #46 on github
+            // this is a bit of a hack - foo.asm is copied to foo.tmp and then foo.tmp is written back to foo.asm with module header
+
+            {
+                char *p, *q, tmp[FILENAME_MAX + 10];
+
+                p = changesuffix(temporary_filenames[i], ".tmp");
+
+                if (copy_file(filelist[i], "", p, "")) {
+                    fprintf(stderr, "Couldn't write output file %s\n", p);
+                    exit(1);
+                }
+
+                if (q = last_path_char(original_filenames[i]))
+                    q++;
+                else
+                    q = original_filenames[i];
+
+                snprintf(tmp, sizeof(tmp), "MODULE %s\n\n", q);
+                for (q = tmp+7; *q != '\n'; ++q)
+                    if (!isalnum(*q)) *q = '_';
+
+                if (prepend_file(p, "", filelist[i], "", tmp)) {
+                    fprintf(stderr, "Couldn't append output file %s\n", p);
+                    exit(1);
+                }
+
+                free(p);
+            }
+
 			if (process(".asm", c_extension, c_assembler, ptr, assembler_style, i, YES, NO))
 				exit(1);
             free(ptr);
@@ -1263,20 +1296,32 @@ int main(int argc, char **argv)
 	exit(0);
 }
 
-int copy_file(char *name1, char *ext1, char *name2, char *ext2)
+
+int copyprepend_file(char *name1, char *ext1, char *name2, char *ext2, char *prepend)
 {
+    FILE           *out;
 	char            buffer[LINEMAX + 1];
 	char           *cmd;
 	int             ret;
 
+    if (prepend == NULL) prepend = "";
+
+    snprintf(buffer, sizeof(buffer), "%s%s", name2, ext2);
+
+    if ((out = fopen(buffer, "w")) == NULL)
+        return 1;
+
+    fprintf(out, prepend);
+    fclose(out);
+
 #ifdef WIN32
-	snprintf(buffer, sizeof(buffer), "%s \"%s%s\" \"%s%s\" > nul", c_copycmd, name1, ext1, name2, ext2);
+	snprintf(buffer, sizeof(buffer), "%s \"%s%s\" >> \"%s%s\"", c_copycmd, name1, ext1, name2, ext2);
 #else
-	snprintf(buffer, sizeof(buffer), "%s \"%s%s\" \"%s%s\"", c_copycmd, name1, ext1, name2, ext2);
+	snprintf(buffer, sizeof(buffer), "%s \"%s%s\" >> \"%s%s\"", c_copycmd, name1, ext1, name2, ext2);
 #endif
 #ifdef WIN32
 	// Argh....annoying
-	if (strcmp(c_copycmd, "copy") == 0) {
+	if ((strcmp(c_copycmd, "type") == 0) || (strcmp(c_copycmd, "copy") == 0)){
 		cmd = replace_str(buffer, "/", "\\");
 	}
 	else {
@@ -1292,6 +1337,15 @@ int copy_file(char *name1, char *ext1, char *name2, char *ext2)
 	return ret;
 }
 
+int copy_file(char *name1, char *ext1, char *name2, char *ext2)
+{
+    return copyprepend_file(name1, ext1, name2, ext2, NULL);
+}
+
+int prepend_file(char *name1, char *ext1, char *name2, char *ext2, char *prepend)
+{
+    return copyprepend_file(name1, ext1, name2, ext2, prepend);
+}
 
 
 int get_filetype_by_suffix(char *name)
@@ -2159,6 +2213,7 @@ void remove_temporary_files(void)
 			remove_file_with_extension(temporary_filenames[j], ".o");
 			remove_file_with_extension(temporary_filenames[j], ".sym");
 			remove_file_with_extension(temporary_filenames[j], ".def");
+            remove_file_with_extension(temporary_filenames[j], ".tmp");
 		}
 		if (crtcopied) {
 			remove_file_with_extension(c_crt0, ".asm");
