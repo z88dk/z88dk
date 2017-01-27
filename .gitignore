@@ -1,6 +1,9 @@
-**/*.o
 **/*.d
+**/*.exe
 **/*.lib
+**/*.o
+**/*.out
+**/lib*.a
 **/zcc_opt.def
 **/zcc_proj.lst
 bin/
