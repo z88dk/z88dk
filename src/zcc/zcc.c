@@ -1164,7 +1164,14 @@ int main(int argc, char **argv)
                 else
                     q = original_filenames[i];
 
-                snprintf(tmp, sizeof(tmp), "MODULE %s\n\n", q);
+                snprintf(tmp, sizeof(tmp) - 3, "MODULE %s", q);
+
+                // be consistent with z80asm by not having the asm extension part of the module name
+                
+                if ((q = strrchr(tmp, '.')) && (strcmp(q, ".asm") == 0))
+                    *q = '\0';
+                strcat(tmp, "\n\n");
+
                 for (q = tmp+7; *q != '\n'; ++q)
                     if (!isalnum(*q)) *q = '_';
 
