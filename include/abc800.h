@@ -16,10 +16,10 @@
 ///////////////////////////////
 
 // Set cursor shape
-extern int  __LIB__ __FASTCALL__ abc_cursor(unsigned char shape) __SMALLCFASTCALL;
+extern int  __LIB__  abc_cursor(unsigned char shape) __z88dk_fastcall;
 
 // Set a parameter to CRTC control register (VDU)
-extern int  __LIB__ abc_vdu(unsigned char register, unsigned char value) __SMALLCDECL;
+extern int  __LIB__ abc_vdu(unsigned char register, unsigned char value) __smallc;
 
 /*
 	00 - Horiz. total characters

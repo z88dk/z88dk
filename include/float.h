@@ -14,15 +14,15 @@
 
 
 
-extern double_t __LIB__ fmod(double_t,double_t) __SMALLCDECL;
-extern double_t __LIB__ amax(double_t,double_t) __SMALLCDECL;
-extern double_t __LIB__ fabs(double_t) __SMALLCDECL;
-extern double_t __LIB__ amin(double_t,double_t) __SMALLCDECL;
-extern double_t __LIB__ floor(double_t) __SMALLCDECL;
-extern double_t __LIB__ ceil(double_t) __SMALLCDECL;
-extern double_t __LIB__ fprand(void) __SMALLCDECL; /* Generic only */
-extern double_t __LIB__ __FASTCALL__ zfloat(int);
-extern int __LIB__ fpseed(double_t) __SMALLCDECL;    /* Seed random number */
+extern double_t __LIB__ fmod(double_t,double_t) __smallc;
+extern double_t __LIB__ amax(double_t,double_t) __smallc;
+extern double_t __LIB__ fabs(double_t) __smallc;
+extern double_t __LIB__ amin(double_t,double_t) __smallc;
+extern double_t __LIB__ floor(double_t) __smallc;
+extern double_t __LIB__ ceil(double_t) __smallc;
+extern double_t __LIB__ fprand(void) __smallc; /* Generic only */
+extern double_t __LIB__  zfloat(int);
+extern int __LIB__ fpseed(double_t) __smallc;    /* Seed random number */
 
 
 #define fmax(x,y) amax(x,y)
@@ -36,14 +36,14 @@ extern int __LIB__ fpseed(double_t) __SMALLCDECL;    /* Seed random number */
 //#define fmod(x,y) (x-(fabs(y)*trunc(x/fabs(y))))
 #define remainder(x,y) (x-(fabs(y)*round(x/fabs(y))))
 
-extern double_t __LIB__ atof(char *) __SMALLCDECL;
+extern double_t __LIB__ atof(char *) __smallc;
 
 
 /*
  * Some support routines for floating point printf
  */
-extern void __LIB__ ftoa(double_t, int, char *) __SMALLCDECL;
-extern void __LIB__ ftoe(double_t, int, char *) __SMALLCDECL;
+extern void __LIB__ ftoa(double_t, int, char *) __smallc;
+extern void __LIB__ ftoe(double_t, int, char *) __smallc;
 
 /* 
  * Some constant nicked from /usr/include/math.h

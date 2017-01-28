@@ -173,10 +173,7 @@ void asm_BINARY(char *filename)
 *----------------------------------------------------------------------------*/
 void asm_MODULE(char *name)
 {
-	if (CURRENTMODULE->modname)
-		error_module_redefined();
-	else
-		CURRENTMODULE->modname = strpool_add(name);
+	CURRENTMODULE->modname = strpool_add(name);		/* replace previous module name */
 }
 
 void asm_MODULE_default(void)

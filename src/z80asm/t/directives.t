@@ -409,16 +409,23 @@ END
 # MODULE
 #------------------------------------------------------------------------------
 
-# error_module_redefined
+# no module directive
 z80asm(
 	asm 	=> <<'END',
-		module			;; error: syntax error
-		module aa
-		module bb		;; error: module name already defined
+		main: ret	;; C9
 END
 );
+z80nm("test.o", <<'END');
 
-# module name in object file
+File test.o at $0000: Z80RMF08
+  Name: test
+  Names:
+    L A $0000 main
+  Code: 1 bytes
+    C $0000: C9
+END
+
+# one module directive
 z80asm(
 	asm 	=> <<'END',
 		module lib
@@ -434,6 +441,26 @@ File test.o at $0000: Z80RMF08
   Code: 1 bytes
     C $0000: C9
 END
+
+# two module directive
+z80asm(
+	asm 	=> <<'END',
+		module lib1
+		module lib2
+		main: ret	;; C9
+END
+);
+z80nm("test.o", <<'END');
+
+File test.o at $0000: Z80RMF08
+  Name: lib2
+  Names:
+    L A $0000 main
+  Code: 1 bytes
+    C $0000: C9
+END
+
+
 
 #------------------------------------------------------------------------------
 # ORG

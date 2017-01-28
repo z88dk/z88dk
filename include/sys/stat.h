@@ -32,7 +32,7 @@ struct stat {
 
 extern int __LIB__ __SAVEFRAME__ stat(char *filename, struct stat *buf);
 
-extern int __LIB__ __FASTCALL__ mkdir(char *dirname);
+extern int __LIB__  mkdir(char *dirname);
 #define mkdir(a,b) mkdir(a)
 
 #define S_IFMT		0170000	/* file type mask */

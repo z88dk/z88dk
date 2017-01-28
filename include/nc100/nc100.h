@@ -5,16 +5,16 @@
 
 extern char __LIB__ *selectfile(void);
 extern void __LIB__ col1(void);
-extern void __LIB__ __FASTCALL__ col1text(const char *p) __SMALLCFASTCALL;
-extern int __LIB__ editbuf(char *p, int lenflags) __SMALLCDECL;
+extern void __LIB__  col1text(const char *p) __z88dk_fastcall;
+extern int __LIB__ editbuf(char *p, int lenflags) __smallc;
 #define EDITBUF_NOECHO	(1 << 11)
 #define EDITBUF_TRIM	(1 << 12)
 #define EDITBUF_UNLESS	(1 << 13)
 #define EDITBUF_DOTTY	(1 << 14)
-extern int __LIB__ readbuf(char *p, int lenflags) __SMALLCDECL;
-extern void __LIB__ __FASTCALL__ textout(const char *p) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ col1text(const char *p) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ textoutcount(const char *p) __SMALLCFASTCALL;
+extern int __LIB__ readbuf(char *p, int lenflags) __smallc;
+extern void __LIB__  textout(const char *p) __z88dk_fastcall;
+extern void __LIB__  col1text(const char *p) __z88dk_fastcall;
+extern int __LIB__  textoutcount(const char *p) __z88dk_fastcall;
 
 extern void __LIB__ txtboldoff(void);
 extern void __LIB__ txtboldon(void);
@@ -29,43 +29,43 @@ struct txtgetwindowdata {
   unsigned char bottom;
   unsigned char fullscreen;
 };
-extern void __LIB__ __FASTCALL__ txtgetwindow(struct txtgetwindowdata *win) __SMALLCFASTCALL;
+extern void __LIB__  txtgetwindow(struct txtgetwindowdata *win) __z88dk_fastcall;
 extern void __LIB__ txtinverseoff(void);
 extern void __LIB__ txtinverseon(void);
 extern void __LIB__ txtunderlineeoff(void);
 extern void __LIB__ txtunderlineon(void);
-extern void __LIB__ __FASTCALL__ txtoutput(int c) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ txtsetcursor(unsigned int pos) __SMALLCFASTCALL;
-extern void __LIB__ txtsetwindow(unsigned int postl, unsigned int posbr) __SMALLCDECL;
-extern void __LIB__ __FASTCALL__ txtwrchar(int c) __SMALLCFASTCALL;
+extern void __LIB__  txtoutput(int c) __z88dk_fastcall;
+extern void __LIB__  txtsetcursor(unsigned int pos) __z88dk_fastcall;
+extern void __LIB__ txtsetwindow(unsigned int postl, unsigned int posbr) __smallc;
+extern void __LIB__  txtwrchar(int c) __z88dk_fastcall;
 
 #define TXT_CURSOR_POS(x,y)  (((x) << 8) | (y))
 
-extern void __LIB__ __FASTCALL__ *heapaddress(unsigned int handle) __SMALLCFASTCALL;
-extern unsigned int __LIB__ __FASTCALL__ heapalloc(unsigned int size) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ heapfree(unsigned int handle) __SMALLCFASTCALL;
-extern void __LIB__ heaplock(unsigned int handle, unsigned int lock) __SMALLCDECL;
+extern void __LIB__  *heapaddress(unsigned int handle) __z88dk_fastcall;
+extern unsigned int __LIB__  heapalloc(unsigned int size) __z88dk_fastcall;
+extern void __LIB__  heapfree(unsigned int handle) __z88dk_fastcall;
+extern void __LIB__ heaplock(unsigned int handle, unsigned int lock) __smallc;
 #define HEAP_LOCK		1
 #define HEAP_UNLOCK		0
 extern unsigned int __LIB__ heapmaxfree(void);
-extern int __LIB__ heaprealloc(unsigned int handle, unsigned int size) __SMALLCDECL;
+extern int __LIB__ heaprealloc(unsigned int handle, unsigned int size) __smallc;
 
 #define CHAR_TO_TOK(x)	((unsigned int)((x) & 0xFF))
 extern void __LIB__ kmcharreturn(unsigned int token);
 extern int __LIB__ kmgetyellow(void);
-extern void __LIB__ __FASTCALL__ kmsetyellow(unsigned int code) __SMALLCFASTCALL;
+extern void __LIB__  kmsetyellow(unsigned int code) __z88dk_fastcall;
 extern int __LIB__ kmreadchar(void);
 extern int __LIB__ kmreadkbd(void);
-extern int __LIB__ kmsetexpand(unsigned int token, unsigned char *string) __SMALLCDECL;
-extern int __LIB__ kmsettickcount(unsigned int first, unsigned int recur) __SMALLCDECL;
+extern int __LIB__ kmsetexpand(unsigned int token, unsigned char *string) __smallc;
+extern int __LIB__ kmsettickcount(unsigned int first, unsigned int recur) __smallc;
 #define KM_TICK_PER_SEC	100
-extern void __LIB__ __FASTCALL__ kmsetyellow(unsigned int token) __SMALLCFASTCALL;
+extern void __LIB__  kmsetyellow(unsigned int token) __z88dk_fastcall;
 extern int __LIB__ kmwaitkbd(void);
 extern int __LIB__ testescape(void);
 
-extern int __LIB__ __FASTCALL__ mcprintchar(int c) __SMALLCFASTCALL;
+extern int __LIB__  mcprintchar(int c) __z88dk_fastcall;
 extern void __LIB__ mcreadyprinter(void);
-extern int __LIB__ __FASTCALL__ mcsetprinter(unsigned int type) __SMALLCFASTCALL;
+extern int __LIB__  mcsetprinter(unsigned int type) __z88dk_fastcall;
 #define PRINTER_PARALLEL 0
 #define PRINTER_SERIAL	1
 
@@ -78,22 +78,22 @@ struct nc100date {
   unsigned char minute;
   unsigned char second;
 };
-extern void __LIB__ __FASTCALL__ padgettime(struct nc100date *date) __SMALLCFASTCALL;
+extern void __LIB__  padgettime(struct nc100date *date) __z88dk_fastcall;
 extern unsigned int __LIB__ padgetversion(void);
 
 extern void __LIB__ padinitserial(void);
 extern int __LIB__ padinserial(void);
-extern int __LIB__ __FASTCALL__ padoutparallel(unsigned int code) __SMALLCFASTCALL;
-extern int __LIB__ __FASTCALL__ padoutserial(unsigned int code) __SMALLCFASTCALL;
+extern int __LIB__  padoutparallel(unsigned int code) __z88dk_fastcall;
+extern int __LIB__  padoutserial(unsigned int code) __z88dk_fastcall;
 extern int __LIB__ padreadyparallel(void);
 extern int __LIB__ padreadyserial(void);
 extern void __LIB__ padresetserial(void);
 extern int __LIB__ padserialwaiting(void);
-extern void __LIB__ __FASTCALL__ padsetalarm(struct nc100date *date) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ padsettime(struct nc100date *date) __SMALLCFASTCALL;
+extern void __LIB__  padsetalarm(struct nc100date *date) __z88dk_fastcall;
+extern void __LIB__  padsettime(struct nc100date *date) __z88dk_fastcall;
 
 extern int __LIB__ lapcat_receive(void);
-extern int __LIB__ __FASTCALL__ lapcat_send(int c) __SMALLCFASTCALL;
+extern int __LIB__  lapcat_send(int c) __z88dk_fastcall;
 
 /* Main useful system variables at 0xB000-> 0xB201 */
 struct nc100_system {

@@ -67,16 +67,16 @@
 #endif
 
 extern void __LIB__              mallinit(void);
-extern void __LIB__              sbrk(void *addr, unsigned int size) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   sbrk_callee(void *addr, unsigned int size) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__              *calloc(unsigned int nobj, unsigned int size) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *calloc_callee(unsigned int nobj, unsigned int size) __SMALLCDECL __SMALLCCALLEE; 
-extern void __LIB__ __FASTCALL__ free(void *addr) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ *malloc(unsigned int size) __SMALLCFASTCALL;
-extern void __LIB__              *realloc(void *p, unsigned int size) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *realloc_callee(void *p, unsigned int size) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__              mallinfo(unsigned int *total, unsigned int *largest) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   mallinfo_callee(unsigned int *total, unsigned int *largest) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__              sbrk(void *addr, unsigned int size) __smallc;
+extern void __LIB__    sbrk_callee(void *addr, unsigned int size) __smallc __z88dk_callee;
+extern void __LIB__              *calloc(unsigned int nobj, unsigned int size) __smallc;
+extern void __LIB__    *calloc_callee(unsigned int nobj, unsigned int size) __smallc __z88dk_callee; 
+extern void __LIB__  free(void *addr) __z88dk_fastcall;
+extern void __LIB__  *malloc(unsigned int size) __z88dk_fastcall;
+extern void __LIB__              *realloc(void *p, unsigned int size) __smallc;
+extern void __LIB__    *realloc_callee(void *p, unsigned int size) __smallc __z88dk_callee;
+extern void __LIB__              mallinfo(unsigned int *total, unsigned int *largest) __smallc;
+extern void __LIB__    mallinfo_callee(unsigned int *total, unsigned int *largest) __smallc __z88dk_callee;
 
 #define sbrk(a,b)      sbrk_callee(a,b)
 #define calloc(a,b)    calloc_callee(a,b)
@@ -128,19 +128,19 @@ extern void __LIB__ __CALLEE__   mallinfo_callee(unsigned int *total, unsigned i
 // So, for example, a call to HeapAlloc(heap,size) is equivalent
 // to a call to malloc(size).
 
-extern void __LIB__ __FASTCALL__ HeapCreate(void *heap) __SMALLCFASTCALL;
-extern void __LIB__              HeapSbrk(void *heap, void *addr, unsigned int size) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   HeapSbrk_callee(void *heap, void *addr, unsigned int size) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__              *HeapCalloc(void *heap, unsigned int nobj, unsigned int size) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *HeapCalloc_callee(void *heap, unsigned int nobj, unsigned int size) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__              HeapFree(void *heap, void *addr) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   HeapFree_callee(void *heap, void *addr) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__              *HeapAlloc(void *heap, unsigned int size) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *HeapAlloc_callee(void *heap, unsigned int size) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__              *HeapRealloc(void *heap, void *p, unsigned int size) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   *HeapRealloc_callee(void *heap, void *p, unsigned int size) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__              HeapInfo(unsigned int *total, unsigned int *largest, void *heap) __SMALLCDECL;
-extern void __LIB__ __CALLEE__   HeapInfo_callee(unsigned int *total, unsigned int *largest, void *heap) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__  HeapCreate(void *heap) __z88dk_fastcall;
+extern void __LIB__              HeapSbrk(void *heap, void *addr, unsigned int size) __smallc;
+extern void __LIB__    HeapSbrk_callee(void *heap, void *addr, unsigned int size) __smallc __z88dk_callee;
+extern void __LIB__              *HeapCalloc(void *heap, unsigned int nobj, unsigned int size) __smallc;
+extern void __LIB__    *HeapCalloc_callee(void *heap, unsigned int nobj, unsigned int size) __smallc __z88dk_callee;
+extern void __LIB__              HeapFree(void *heap, void *addr) __smallc;
+extern void __LIB__    HeapFree_callee(void *heap, void *addr) __smallc __z88dk_callee;
+extern void __LIB__              *HeapAlloc(void *heap, unsigned int size) __smallc;
+extern void __LIB__    *HeapAlloc_callee(void *heap, unsigned int size) __smallc __z88dk_callee;
+extern void __LIB__              *HeapRealloc(void *heap, void *p, unsigned int size) __smallc;
+extern void __LIB__    *HeapRealloc_callee(void *heap, void *p, unsigned int size) __smallc __z88dk_callee;
+extern void __LIB__              HeapInfo(unsigned int *total, unsigned int *largest, void *heap) __smallc;
+extern void __LIB__    HeapInfo_callee(unsigned int *total, unsigned int *largest, void *heap) __smallc __z88dk_callee;
 
 #define HeapSbrk(a,b,c)     HeapSbrk_callee(a,b,c)
 #define HeapCalloc(a,b,c)   HeapCalloc_callee(a,b,c)

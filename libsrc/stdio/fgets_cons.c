@@ -16,9 +16,9 @@
 
 extern unsigned char _cons_state;
 
-char *fgets_cons(unsigned char *str, int max)
+char *fgets_cons(char *str, size_t max)
 {   
-   unsigned char c;
+   int c;
    int ptr;
    ptr=0;
 

@@ -5,7 +5,7 @@
 
 #include <z88.h>
 
-void nameapp(char *name)
+void nameapp(const char *name)
 {
 #asm
 	INCLUDE	"director.def"

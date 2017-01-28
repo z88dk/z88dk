@@ -91,10 +91,10 @@
 extern uint __LIB__ in_GetKey(void);
 extern void __LIB__ in_GetKeyReset(void);
 extern uint __LIB__ in_Inkey(void);
-extern uint __LIB__ __FASTCALL__ in_KeyPressed(uint scancode) __SMALLCFASTCALL;
-extern uint __LIB__ __FASTCALL__ in_LookupKey(uchar c) __SMALLCFASTCALL;
-extern uint __LIB__ __FASTCALL__ in_Pause(uint msec) __SMALLCFASTCALL;
-extern void __LIB__ __FASTCALL__ in_Wait(uint msec) __SMALLCFASTCALL;
+extern uint __LIB__  in_KeyPressed(uint scancode) __z88dk_fastcall;
+extern uint __LIB__  in_LookupKey(uchar c) __z88dk_fastcall;
+extern uint __LIB__  in_Pause(uint msec) __z88dk_fastcall;
+extern void __LIB__  in_Wait(uint msec) __z88dk_fastcall;
 extern void __LIB__ in_WaitForKey(void);
 extern void __LIB__ in_WaitForNoKey(void);
 
@@ -173,7 +173,7 @@ struct in_UDK {        /* user defined keys structure         */
    uint up;
 };
 
-extern uint __LIB__ __FASTCALL__ in_JoyKeyboard(struct in_UDK *u) __SMALLCFASTCALL;
+extern uint __LIB__  in_JoyKeyboard(struct in_UDK *u) __z88dk_fastcall;
 
 #ifdef SPECTRUM
    #include <spectrum.h>
@@ -293,12 +293,12 @@ struct in_UDM {              /* user defined mouse structure                    
 };
 
 extern void __LIB__ in_MouseSimInit(struct in_UDM *u);
-extern void __LIB__ in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL;
-extern void __LIB__ in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord) __SMALLCDECL;
+extern void __LIB__ in_MouseSim(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord) __smallc;
+extern void __LIB__ in_MouseSimSetPos(struct in_UDM *u, uint xcoord, uint ycoord) __smallc;
 
-extern void __LIB__ __FASTCALL__ in_MouseSimInit_fastcall(struct in_UDM *u) __SMALLCFASTCALL;
-extern void __LIB__ __CALLEE__ in_MouseSim_callee(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord) __SMALLCDECL __SMALLCCALLEE;
-extern void __LIB__ __CALLEE__ in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uint ycoord) __SMALLCDECL __SMALLCCALLEE;
+extern void __LIB__  in_MouseSimInit_fastcall(struct in_UDM *u) __z88dk_fastcall;
+extern void __LIB__  in_MouseSim_callee(struct in_UDM *u, uchar *buttons, uint *xcoord, uint *ycoord) __smallc __z88dk_callee;
+extern void __LIB__  in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uint ycoord) __smallc __z88dk_callee;
 
 #define in_MouseSimInit(a)        in_MouseSimInit_fastcall(a)
 #define in_MouseSim(a,b,c,d)      in_MouseSim_callee(a,b,c,d)

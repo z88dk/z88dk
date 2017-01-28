@@ -76,20 +76,20 @@ extern unsigned char  SOS_MXLIN @0x1f5b;	// Display size (lines).
 #define M_SOS_GOTOXY(xpos,ypos) asm("ld\tl,"#xpos"\nld\th,"#ypos"\ncall\t$201E\n");
 
 // Set console cursor position, top-left=(0;0)
-extern void  __LIB__              setcursorpos(int x, int y) __SMALLCDECL;
-extern void  __LIB__ __CALLEE__   setcursorpos_callee(int x, int y) __SMALLCDECL __SMALLCCALLEE;
+extern void  __LIB__              setcursorpos(int x, int y) __smallc;
+extern void  __LIB__    setcursorpos_callee(int x, int y) __smallc __z88dk_callee;
 #define setcursorpos(a,b)     setcursorpos_callee(a,b)
 
 // Get character at given position, top-left=(0;0)
-extern int  __LIB__              screen(int x, int y) __SMALLCDECL;
-extern int  __LIB__ __CALLEE__   screen_callee(int x, int y) __SMALLCDECL __SMALLCCALLEE;
+extern int  __LIB__              screen(int x, int y) __smallc;
+extern int  __LIB__    screen_callee(int x, int y) __smallc __z88dk_callee;
 #define screen(a,b)     screen_callee(a,b)
 
 // Set screen size (if possible)
-extern int  __LIB__ __FASTCALL__  width(int columns) __SMALLCFASTCALL;
+extern int  __LIB__   width(int columns) __z88dk_fastcall;
 
 // Print the error message for the given code
-extern int  __LIB__ __FASTCALL__  print_error(int err_code) __SMALLCFASTCALL;
+extern int  __LIB__   print_error(int err_code) __z88dk_fastcall;
 
 #define SOS_ERR_DEV_IO            1
 #define SOS_ERR_DEV_OFFLINE       2
@@ -114,8 +114,8 @@ extern void  __LIB__ lptoff();
 extern int  __LIB__ break_key(void);
 
 // Set console cursor position, top-left=(0;0)
-extern void  __LIB__              setcursorpos(int x, int y) __SMALLCDECL;
-extern void  __LIB__ __CALLEE__   setcursorpos_callee(int x, int y) __SMALLCDECL __SMALLCCALLEE;
+extern void  __LIB__              setcursorpos(int x, int y) __smallc;
+extern void  __LIB__    setcursorpos_callee(int x, int y) __smallc __z88dk_callee;
 #define setcursorpos(a,b)     setcursorpos_callee(a,b)
 
 // Get cursor position
@@ -123,8 +123,8 @@ extern int  __LIB__     get_cursor_x();
 extern int  __LIB__     get_cursor_y();
 
 // Set file name and type
-extern void  __LIB__              sos_file(char *name, int attributes) __SMALLCDECL;
-extern void  __LIB__ __CALLEE__   sos_file_callee(char *name, int attributes) __SMALLCDECL __SMALLCCALLEE;
+extern void  __LIB__              sos_file(char *name, int attributes) __smallc;
+extern void  __LIB__    sos_file_callee(char *name, int attributes) __smallc __z88dk_callee;
 #define sos_file(a,b)     sos_file_callee(a,b)
 
 #define SOS_FILEATTR_BIN    0x01
@@ -141,10 +141,10 @@ extern int  __LIB__       sos_wrd();
 extern int  __LIB__       sos_rdd();
 
 // Block transfer for both tape and disk, work on current device (set in SOS_DSK)
-extern int  __LIB__            tape_save(char *name, size_t loadstart,void *start, size_t len) __SMALLCDECL;
-extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type) __SMALLCDECL;
-extern int  __LIB__            tape_load(char *name, size_t loadstart,void *start, size_t len) __SMALLCDECL;
-extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type) __SMALLCDECL;
+extern int  __LIB__            tape_save(char *name, size_t loadstart,void *start, size_t len) __smallc;
+extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
+extern int  __LIB__            tape_load(char *name, size_t loadstart,void *start, size_t len) __smallc;
+extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
 
 // Get S-OS version: model ID
 extern int  __LIB__     get_sos_model();

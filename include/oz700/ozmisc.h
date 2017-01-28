@@ -20,9 +20,9 @@ byte ozgetautorun(void);
 byte ozgetmembyte(unsigned page, unsigned offset);
 
 extern __LIB__ ozfarmemcpy(unsigned dest_page,unsigned dest_offset,unsigned src_page,
-  unsigned src_offset,unsigned length) __SMALLCDECL;
+  unsigned src_offset,unsigned length) __smallc;
 
-extern __LIB__ ozcopytopage(unsigned dest_page,unsigned dest_offset,byte *src,unsigned length) __SMALLCDECL;
+extern __LIB__ ozcopytopage(unsigned dest_page,unsigned dest_offset,byte *src,unsigned length) __smallc;
 
 extern __LIB__ ozexitto(unsigned key);
 extern __LIB__ ozfast(void);
@@ -34,7 +34,7 @@ extern __LIB__ ozkeyclick(void);
 extern __LIB__ ozdelay(unsigned d);
 //void exit(int ignored_exit_code);
 extern byte __LIB__ ozportin(int port);
-extern __LIB__ ozportout(int port, int value) __SMALLCDECL;
+extern __LIB__ ozportout(int port, int value) __smallc;
 
 extern __LIB__ ozsound(unsigned value);
 extern __LIB__ ozquiet(void);

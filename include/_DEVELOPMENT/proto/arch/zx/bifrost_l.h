@@ -69,7 +69,7 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROSTL_stop,void)
 #endif
 
 #ifdef __SCCZ80
-   // static unsigned char BIFROSTL_isr[2] @ (64993);
+   static unsigned char BIFROSTL_isr[2] @ (64993);
 #endif
 
 // ----------------------------------------------------------------

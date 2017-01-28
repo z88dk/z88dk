@@ -232,30 +232,30 @@ extern void __LIB__ page_in_video();
 extern void __LIB__ page_out_video();
 // Wait video HW to be ready
 extern void __LIB__ wait_vrt();
-extern int __LIB__ __FASTCALL__ flos_paper(int color);
+extern int __LIB__  flos_paper(int color);
 extern void __LIB__ set_pen(int color);
-extern int __LIB__ __FASTCALL__ get_pen(int color);
+extern int __LIB__  get_pen(int color);
 // Console input
 extern int __LIB__ flos_get_input_string(char *s,int len);
 
 // Memory bank control (range: 0 - 14)
 //	Set/Get which of the 32KB banks is mapped into address space $8000-$ffff
 extern int __LIB__ get_bank();
-extern void __LIB__ __FASTCALL__ set_bank(int bank);
+extern void __LIB__  set_bank(int bank);
 //	Activate, if possible, the nect memory bank
 extern int __LIB__ inc_bank();
 
 // Disk control
-extern int __LIB__ __FASTCALL__ change_volume(int volume);
+extern int __LIB__  change_volume(int volume);
 extern struct flos_volume __LIB__ get_volume_list();
 extern int __LIB__ get_volume_count();     // Total number of 'drives' (1..n)
 extern int __LIB__ get_current_volume();   // Current 'drive' (0..n)
 extern int __LIB__ check_volume_format();
 extern unsigned long __LIB__ get_total_sectors();
 // Directory related commands
-extern int __LIB__ __FASTCALL__ change_dir(char * dirname);
-extern int __LIB__ __FASTCALL__ make_dir(char * dirname);
-extern int __LIB__ __FASTCALL__ delete_dir(char * dirname);
+extern int __LIB__  change_dir(char * dirname);
+extern int __LIB__  make_dir(char * dirname);
+extern int __LIB__  delete_dir(char * dirname);
 extern int __LIB__ parent_dir();
 extern int __LIB__ root_dir();
 extern int __LIB__ dir_move_first();
@@ -267,19 +267,19 @@ extern void __LIB__ store_dir_position();
 extern void __LIB__ restore_dir_position();
 extern int __LIB__ get_dir_name();
 // FAT16 file handling
-extern int __LIB__ __FASTCALL__ create_file(char * filename);
-extern int __LIB__ __FASTCALL__ erase_file(char * filename);
+extern int __LIB__  create_file(char * filename);
+extern int __LIB__  erase_file(char * filename);
 extern int __LIB__ rename_file(char * filea, char * fileb);
-extern unsigned long __LIB__ __FASTCALL__ get_file_size(char * filename);
-extern unsigned int  __LIB__ __FASTCALL__ get_first_file_cluster(char * filename);
+extern unsigned long __LIB__  get_file_size(char * filename);
+extern unsigned int  __LIB__  get_first_file_cluster(char * filename);
 // Loads a struct with the file properties, points to struct or zero on error
 extern int  __LIB__ find_file (char *filename, struct flos_file file);
 // Get sector number and increment cluster and sector counters in struct
-extern unsigned long __LIB__ __FASTCALL__ file_sector_list (struct flos_file file);
+extern unsigned long __LIB__  file_sector_list (struct flos_file file);
 // Moves the read point from the start of a file (use after find file)
-extern void __LIB__ __FASTCALL__ set_file_pointer(unsigned long pointer);
+extern void __LIB__  set_file_pointer(unsigned long pointer);
 // Forces the read length of the file transfer to a certain value (use after find file)
-extern void __LIB__ __FASTCALL__ set_load_length(unsigned long length);
+extern void __LIB__  set_load_length(unsigned long length);
 // Forces a file to be loaded to a particular address / bank
 extern int  __LIB__ force_load(char *address, int bank);
 // Saves data onto a previously created/opened file
@@ -294,9 +294,9 @@ extern int __LIB__ get_device_count();
 
 // And now a list of the same non-FASTCALL functions using CALLEE linkage
 
-extern int  __LIB__ __CALLEE__ rename_file_callee(char * filea, char * fileb);
-extern int  __LIB__ __CALLEE__ find_file_callee (char *filename, struct flos_file file);
-extern int  __LIB__ __CALLEE__ force_load_callee(char *address, int bank);
+extern int  __LIB__  rename_file_callee(char * filea, char * fileb);
+extern int  __LIB__  find_file_callee (char *filename, struct flos_file file);
+extern int  __LIB__  force_load_callee(char *address, int bank);
 
 
 // And now we make CALLEE linkage default to make compiled progs shorter and faster

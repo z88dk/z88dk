@@ -73,7 +73,7 @@ extern void BIFROSTL_stop(void) __preserves_regs(b,c,d,e,h,l);
 #endif
 
 #ifdef __SCCZ80
-   // static unsigned char BIFROSTL_isr[2] @ (64993);
+   static unsigned char BIFROSTL_isr[2] @ (64993);
 #endif
 
 // ----------------------------------------------------------------

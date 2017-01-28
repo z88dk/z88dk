@@ -35,24 +35,24 @@
 typedef int mode_t;
 
 
-extern int __LIB__ open(char *name, int flags, mode_t mode) __SMALLCDECL;
-extern int __LIB__ creat(char *name, mode_t mode) __SMALLCDECL;
+extern int __LIB__ open(const char *name, int flags, mode_t mode) __smallc;
+extern int __LIB__ creat(const char *name, mode_t mode) __smallc;
 extern int __LIB__ close(int fd);
-extern size_t __LIB__ read(int fd, void *ptr, size_t len) __SMALLCDECL;
-extern size_t __LIB__ write(int fd, void *ptr, size_t len) __SMALLCDECL;
-extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __SMALLCDECL;
+extern size_t __LIB__ read(int fd, void *ptr, size_t len) __smallc;
+extern size_t __LIB__ write(int fd, const void *ptr, size_t len) __smallc;
+extern long __LIB__ __SAVEFRAME__ lseek(int fd,long posn, int whence) __smallc;
 
-extern int __LIB__ __FASTCALL__ readbyte(int fd) __SMALLCDECL __SMALLCFASTCALL;
-extern int __LIB__ writebyte(int fd, int c) __SMALLCDECL;
+extern int __LIB__  readbyte(int fd) __smallc __z88dk_fastcall;
+extern int __LIB__ writebyte(int fd, int c) __smallc;
 
 
 /* mkdir is defined in sys/stat.h */
 /* extern int __LIB__ mkdir(char *, int mode); */
 
-extern char __LIB__ *getcwd(char *buf, size_t maxlen) __SMALLCDECL;
+extern char __LIB__ *getcwd(char *buf, size_t maxlen) __smallc;
 
 /* Following two only implemented for Sprinter ATM (20.11.2002) */
-extern int  __LIB__ rmdir(char *);
+extern int  __LIB__ rmdir(const char *);
 extern char __LIB__ *getwd(char *buf);
 
 
@@ -93,9 +93,9 @@ struct RND_FILE {
 
 
 /* The following three functions are target specific */
-extern int  __LIB__ rnd_loadblock(char *name, size_t loadstart, size_t len) __SMALLCDECL;
-extern int  __LIB__ rnd_saveblock(char *name, size_t loadstart, size_t len) __SMALLCDECL;
-extern int  __LIB__ __FASTCALL__ rnd_erase(char *name) __SMALLCDECL __SMALLCFASTCALL;
+extern int  __LIB__ rnd_loadblock(char *name, size_t loadstart, size_t len) __smallc;
+extern int  __LIB__ rnd_saveblock(char *name, size_t loadstart, size_t len) __smallc;
+extern int  __LIB__  rnd_erase(char *name) __smallc __z88dk_fastcall;
 
 /* ********************************************************* */
 

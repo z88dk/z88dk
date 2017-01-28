@@ -9,6 +9,7 @@
 
 prefix = /usr/local
 prefix_share = $(prefix)/share
+git_rev = $(shell git rev-parse --short HEAD)
 version := $(shell date +%Y%m%d)
 
 # The default machine, the lib/config/DEFAULT.cfg file is copied to zcc.cfg
@@ -21,7 +22,7 @@ all: setup appmake copt zcpp sccz80 z80asm zcc zpragma zx7 z80nm ticks z80svg co
 setup:
 	echo '#define PREFIX "${prefix}$"/lib/z88dk"' > src/config.h
 	echo '#define UNIX 1' >> src/config.h
-	echo '#define Z88DK_VERSION "${version}"' >> src/config.h
+	echo '#define Z88DK_VERSION "${version}-${git_rev}"' >> src/config.h
 	@mkdir -p bin
 
 appmake:

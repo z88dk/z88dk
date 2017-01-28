@@ -75,7 +75,7 @@ extern void __LIB__ BIFROSTH_stop(void);
 #endif
 
 #ifdef __SCCZ80
-   // static unsigned char BIFROSTH_isr[2] @ (64993);
+   static unsigned char BIFROSTH_isr[2] @ (64993);
 #endif
 
 // ----------------------------------------------------------------

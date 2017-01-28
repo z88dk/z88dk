@@ -63,7 +63,7 @@ extern void NIRVANAM_stop(void) __preserves_regs(b,c,d,e,h,l);
 #endif
 
 #ifdef __SCCZ80
-   // static unsigned char NIRVANAM_isr[3] @ (57670+332*NIRVANAM_TOTAL_ROWS);
+   static unsigned char NIRVANAM_isr[3] @ (57670+332*NIRVANAM_TOTAL_ROWS);
 #endif
 
 // ----------------------------------------------------------------

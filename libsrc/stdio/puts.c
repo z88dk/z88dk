@@ -12,7 +12,7 @@
 #define ANSI_STDIO
 #include <stdio.h>
 
-int puts(char *s)
+int puts(const char *s)
 {
 	fputs(s,stdout);
 	fputs("\n",stdout);

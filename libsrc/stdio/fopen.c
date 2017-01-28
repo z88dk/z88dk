@@ -15,15 +15,15 @@
 
 
 FILE *
-fopen(char *name, unsigned char *mode)
+fopen(const char *name, const char *mode)
 {
         FILE    *fp;
 
-        for (fp= _sgoioblk; fp < _sgoioblk+FOPEN_MAX ; ++fp) {
+        for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
                 if (fp->flags == 0 ) break;
 	}
 
-        if (fp >= _sgoioblk+FOPEN_MAX) {
+        if (fp >= _sgoioblk_end) {
 		return NULL; /* No free slots */
 	}
 

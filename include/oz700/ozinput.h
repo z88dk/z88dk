@@ -36,7 +36,7 @@ extern __LIB__ ozcopytocursettings(byte *p);
 #define OZEDITLINE_ERROR  -2
 #define OZEDITLINE_CANCEL -1
 //extern int __LIB__ ozeditline(int x0,int y0,char *s,int slen,int xlen);
-extern int __LIB__ ozeditline(int x0,int y0,char *s,int slen,int xlen) __SMALLCDECL;
+extern int __LIB__ ozeditline(int x0,int y0,char *s,int slen,int xlen) __smallc;
 
 extern __LIB__ ozkbdon(void);
 extern __LIB__ ozkbdoff(void);
@@ -64,7 +64,7 @@ struct ozmenuentry
     char *label;
 };
 
-extern int __LIB__ ozmenu(int x,int y,char *title,unsigned start,unsigned num_entries, struct ozmenuentry *menu, int options) __SMALLCDECL;
+extern int __LIB__ ozmenu(int x,int y,char *title,unsigned start,unsigned num_entries, struct ozmenuentry *menu, int options) __smallc;
 #define OZMENU_NUMBERED 1
 #define OZMENU_NOEXIT   2
 #define OZMENU_NOLIGHT  4

@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 
-char *fgets(unsigned char *s,int n,FILE *f)
+char *fgets(char *s,size_t n,FILE *f)
 {
     unsigned char *p=s;
     int	k=0;

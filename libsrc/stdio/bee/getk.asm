@@ -16,7 +16,7 @@
 
 .getk
 ._getk
-	call $BE28
+	call $803F
 	jr z,got
 	xor a
 .got

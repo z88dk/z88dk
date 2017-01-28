@@ -385,9 +385,6 @@ void dumpfns()
                     nl();
                 } else {
                     if (storage == EXTERNP) {
-                        GlobalPrefix(XDEF);
-                        outname(ptr->name,1);
-                        nl();
                         outstr("\tdefc\t");
                         outname(ptr->name,1);
                         ot("=\t");

@@ -10,16 +10,16 @@
 #include <stdio.h>
 
 
-FILE *fdopen(int fildes, char *mode)
+FILE *fdopen(int fildes, const char *mode)
 {
 	int	flags;
         FILE    *fp;
 
-        for (fp= _sgoioblk; fp < _sgoioblk+FOPEN_MAX ; ++fp)
+        for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp)
                 if (fp->flags == 0 ) break;
 
 
-        if (fp >= _sgoioblk+FOPEN_MAX) return NULL; /* No free slots */
+        if (fp >= _sgoioblk_end) return NULL; /* No free slots */
 
 	switch ((unsigned char )*mode) {
 		case 'r':

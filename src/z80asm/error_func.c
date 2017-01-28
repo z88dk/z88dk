@@ -231,15 +231,6 @@ void error_max_codesize(long size)
 	
 	STR_DELETE(msg);
 }
-void error_module_redefined(void)
-{
-	STR_DEFINE(msg, STR_SIZE);
-
-	str_append_sprintf( msg, "module name already defined" );
-	do_error( ErrError, str_data(msg) );
-	
-	STR_DELETE(msg);
-}
 void error_org_redefined(void)
 {
 	STR_DEFINE(msg, STR_SIZE);

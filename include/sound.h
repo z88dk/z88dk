@@ -24,10 +24,10 @@ extern void __LIB__ bit_fx3(int effect);
 extern void __LIB__ bit_fx4(int effect);
 
 /* 1 BIT SYNTH - Polyphony and multitimbric effects */
-extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4) __SMALLCDECL;
+extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4) __smallc;
 
 /* "period": the higher value, the lower tone ! */
-extern void __LIB__ bit_beep(int duration, int period) __SMALLCDECL;
+extern void __LIB__ bit_beep(int duration, int period) __smallc;
 
 /* Real frequency !  Duration is in ms */
 extern void __LIB__ bit_frequency(float duration, float frequency);
