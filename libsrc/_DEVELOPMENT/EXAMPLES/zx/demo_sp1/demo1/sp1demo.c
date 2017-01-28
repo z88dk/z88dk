@@ -23,14 +23,8 @@
  
 #define MAX_SPRITES  10
 #define DEAD_SPRITE  100
- 
-#ifdef __SDCC
+
 extern int sp1_TestCollision(struct sp1_ss *s1, struct sp1_ss *s2, unsigned int tolerance) __z88dk_callee;
-#endif
- 
-#ifdef __SCCZ80
-extern int __CALLEE__ sp1_TestCollision(struct sp1_ss *s1, struct sp1_ss *s2, unsigned int tolerance);
-#endif
  
 // Clipping Rectangle for Sprites
  

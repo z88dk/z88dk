@@ -145,11 +145,11 @@ void setupkeyboard(void)
 {
    joyfunc = in_stick_keyboard;
 
-   joykeys.fire  = in_key_scancode(' ');
-   joykeys.left  = in_key_scancode('o');
-   joykeys.right = in_key_scancode('p');
-   joykeys.up    = in_key_scancode('q');
-   joykeys.down  = in_key_scancode('a');
+   joykeys.fire  = IN_KEY_SCANCODE_SPACE;
+   joykeys.left  = IN_KEY_SCANCODE_o;
+   joykeys.right = IN_KEY_SCANCODE_p;
+   joykeys.up    = IN_KEY_SCANCODE_q;
+   joykeys.down  = IN_KEY_SCANCODE_a;
 }
 
 
