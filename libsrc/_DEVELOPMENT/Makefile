@@ -16,7 +16,7 @@ ${jobs}: job-%:
 	-@cp target/$(target)/clib_target_cfg.asm . 2> /dev/null
 	zcc +embedded -vn -clib=new --lstcwd -x @target/$(target)/library/$(target)_sccz80.lst -o lib/sccz80/$(target)
 	zcc +embedded -vn -clib=sdcc_ix --lstcwd -x @target/$(target)/library/$(target)_sdcc_ix.lst -o lib/sdcc_ix/$(target)
-	zcc +embedded -vn -clib=sdcc_iy --lstcwd -Ca--IXIY -x @target/$(target)/library/$(target)_sdcc_iy.lst -o -xlib/sdcc_iy/$(target)
+	zcc +embedded -vn -clib=sdcc_iy --lstcwd -Ca--IXIY -x @target/$(target)/library/$(target)_sdcc_iy.lst -o lib/sdcc_iy/$(target)
 
 .PHONY: ${cleans}
 ${cleans}: clean-%:
