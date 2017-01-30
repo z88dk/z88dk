@@ -123,8 +123,6 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 	 defb	0
 	 
 
-	INCLUDE "crt0_runtime_selection.asm"
-	INCLUDE "crt0_section.asm"
 
 ;	Interrupt table
 ;	01D4..01E1	free for user
@@ -178,6 +176,8 @@ INT01EA:
 	ret
 ENDIF
 
+	INCLUDE "crt0_runtime_selection.asm"
+	INCLUDE "crt0_section.asm"
 
 	SECTION code_crt_init
 	ld	hl,$8000
