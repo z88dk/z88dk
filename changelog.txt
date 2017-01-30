@@ -1,6 +1,14 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
+z88dk vX.XX  - XX.XX.XXXX
+
+- [classic] The value of FOPEN_MAX can now be controlled at link time with
+  -pragma-define=CLIB_FOPEN_MAX=YY. The default for YY is 10.
+- [sccz80] Defining an extern variable with @ no longer exports symbol
+- [sccz80] The sdcc directives __z88dk_fastcall and __z88dk_callee are now
+  supported. Additionally, __smallc and __preserves_regs() are ignored.
+- [zcc] Spaces in filenames (and paths) are now supported.
 
 z88dk v1.99B - 10.01.2017
 
