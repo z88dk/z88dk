@@ -97,10 +97,3 @@ l_dcal:
 
 
 
-
-; Static variables kept in safe workspace
-
-DEFVARS RAM_Start
-{
-}
-
