@@ -179,10 +179,20 @@
 #define _TK_SRL	174
 #define _TK_SUB	175
 #define _TK_XOR	176
-#define _TK_CALL_OZ	177
-#define _TK_CALL_PKG	178
-#define _TK_FPP	179
-#define _TK_INVOKE	180
+#define _TK_SLP	177
+#define _TK_MLT	178
+#define _TK_IN0	179
+#define _TK_OUT0	180
+#define _TK_OTIM	181
+#define _TK_OTIMR	182
+#define _TK_OTDM	183
+#define _TK_OTDMR	184
+#define _TK_TST	185
+#define _TK_TSTIO	186
+#define _TK_CALL_OZ	187
+#define _TK_CALL_PKG	188
+#define _TK_FPP	189
+#define _TK_INVOKE	190
 
 #ifndef NO_TOKEN_ENUM
 typedef enum tokid_t
@@ -364,9 +374,19 @@ typedef enum tokid_t
 	TK_SRL	= 174,
 	TK_SUB	= 175,
 	TK_XOR	= 176,
-	TK_CALL_OZ	= 177,
-	TK_CALL_PKG	= 178,
-	TK_FPP	= 179,
-	TK_INVOKE	= 180,
+	TK_SLP	= 177,
+	TK_MLT	= 178,
+	TK_IN0	= 179,
+	TK_OUT0	= 180,
+	TK_OTIM	= 181,
+	TK_OTIMR	= 182,
+	TK_OTDM	= 183,
+	TK_OTDMR	= 184,
+	TK_TST	= 185,
+	TK_TSTIO	= 186,
+	TK_CALL_OZ	= 187,
+	TK_CALL_PKG	= 188,
+	TK_FPP	= 189,
+	TK_INVOKE	= 190,
 } tokid_t;
 #endif

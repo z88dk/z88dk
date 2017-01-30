@@ -59,6 +59,7 @@ OPT(OptCall, exit_help, "-h", "--help", "Show help options", "")
 OPT(OptSet, &opts.verbose, "-v", "--verbose", "Be verbose", "")
 
 OPT_TITLE("Code Generation Options:")
+OPT(OptCall, option_cpu_z180, "", "--cpu=z180", "Assemble for the Z180", "")
 OPT(OptCall, option_cpu_RCM2000, "", "--RCMX000", "Assemble for RCM2000/RCM3000 series of Z80-like CPU", "")
 OPT(OptSet, &opts.ti83plus, "", "--ti83plus", "Interpret 'Invoke' as RST 28h", "")
 OPT(OptSet, &opts.swap_ix_iy, "", "--IXIY", "Swap IX and IY registers", "")

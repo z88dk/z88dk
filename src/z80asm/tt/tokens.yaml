@@ -315,6 +315,18 @@ tokens:
   - name	: SUB
   - name	: XOR 
   
+  # Z180 specific opcodes
+  - name	: SLP 
+  - name	: MLT 
+  - name	: IN0
+  - name	: OUT0
+  - name	: OTIM
+  - name	: OTIMR
+  - name	: OTDM
+  - name	: OTDMR
+  - name	: TST
+  - name	: TSTIO
+
   # Z88DK specific opcodes
   - name	: CALL_OZ
   - name	: CALL_PKG
