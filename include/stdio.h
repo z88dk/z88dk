@@ -86,7 +86,6 @@
 
 #define FILENAME_MAX    128
 
-//#define FOPEN_MAX       10
 
 struct filestr {
         union f0xx {
@@ -128,11 +127,12 @@ DEFVARS 0 {
 
 /* Number of open files, this can be overridden by the crt0, but the 10 is the default for classic */
 #ifndef FOPEN_MAX
-#define FOPEN_MAX 10
+extern void *_FOPEN_MAX;
+#define FOPEN_MAX &_FOPEN_MAX
 #endif
 
 
-extern struct filestr _sgoioblk[FOPEN_MAX]; 
+extern struct filestr _sgoioblk[10]; 
 extern struct filestr _sgoioblk_end; 
 
 

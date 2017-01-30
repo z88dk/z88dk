@@ -94,8 +94,9 @@ IF !DEFINED_nostreams
         ENDIF
 		PUBLIC	__sgoioblk
 		PUBLIC	__sgoioblk_end
-		PUBLIC  _FOPEN_MAX
-__sgoioblk:      defs    CLIB_FOPEN_MAX * 10      ;stdio control block
+		PUBLIC  __FOPEN_MAX
+                defc    __FOPEN_MAX = CLIB_FOPEN_MAX
+__sgoioblk:     defs    CLIB_FOPEN_MAX * 4      ;stdio control block
 __sgoioblk_end:   		 ;end of stdio control block
 ENDIF
 		PUBLIC	base_graphics
