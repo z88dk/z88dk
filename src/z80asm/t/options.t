@@ -87,6 +87,7 @@ Help Options:
   -v, --verbose          Be verbose
 
 Code Generation Options:
+  --cpu=z180             Assemble for the Z180
   --RCMX000              Assemble for RCM2000/RCM3000 series of Z80-like CPU
   --ti83plus             Interpret 'Invoke' as RST 28h
   --IXIY                 Swap IX and IY registers
@@ -829,6 +830,128 @@ t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 #------------------------------------------------------------------------------
 # --split-bin, ORG -1: tested in directives.t
+
+#------------------------------------------------------------------------------
+# --cpu=z180
+t_z80asm_ok(0, "
+	slp
+	
+	mlt bc
+	mlt de
+	mlt hl
+	mlt sp
+	
+	in0 b,(10)
+	in0 c,(11)
+	in0 d,(12)
+	in0 e,(13)
+	in0 h,(14)
+	in0 l,(15)
+	in0 f,(16)
+	in0 a,(17)
+	
+	out0 (10),b
+	out0 (11),c
+	out0 (12),d
+	out0 (13),e
+	out0 (14),h
+	out0 (15),l
+	out0 (16),f
+	out0 (17),a
+	
+	otim
+	otimr
+	otdm
+	otdmr
+	
+	tstio 23
+	
+	tst a,b
+	tst a,c
+	tst a,d
+	tst a,e
+	tst a,h
+	tst a,l
+	tst a,(hl)
+	tst a,a
+	tst a,23
+	
+	tst b
+	tst c
+	tst d
+	tst e
+	tst h
+	tst l
+	tst (hl)
+	tst a
+	tst 23
+	
+", pack("C*", 
+	0xED, 0x76,		# slp
+	
+	0xED, 0x4C, 	# mlt
+	0xED, 0x5C, 
+	0xED, 0x6C, 
+	0xED, 0x7C, 
+	
+	0xED, 0x00, 10,	# in0
+	0xED, 0x08, 11,	
+	0xED, 0x10, 12,	
+	0xED, 0x18, 13,	
+	0xED, 0x20, 14,	
+	0xED, 0x28, 15,	
+	0xED, 0x30, 16,	
+	0xED, 0x38, 17,	
+	
+	0xED, 0x01, 10,	# out0
+	0xED, 0x09, 11,	
+	0xED, 0x11, 12,	
+	0xED, 0x19, 13,	
+	0xED, 0x21, 14,	
+	0xED, 0x29, 15,	
+	0xED, 0x31, 16,	
+	0xED, 0x39, 17,	
+	
+	0xED, 0x83,		# otxx
+	0xED, 0x93,		
+	0xED, 0x8B,		
+	0xED, 0x9B,		
+	
+	0xED, 0x74, 23,	# tstio
+	
+	0xED, 0x04,		# tst
+	0xED, 0x0C,
+	0xED, 0x14,
+	0xED, 0x1C,
+	0xED, 0x24,
+	0xED, 0x2C,
+	0xED, 0x34,
+	0xED, 0x3C,
+	0xED, 0x64, 23, 
+	
+	0xED, 0x04,		# tst
+	0xED, 0x0C,
+	0xED, 0x14,
+	0xED, 0x1C,
+	0xED, 0x24,
+	0xED, 0x2C,
+	0xED, 0x34,
+	0xED, 0x3C,
+	0xED, 0x64, 23, 
+	
+	
+), "--cpu=z180");
+
+t_z80asm_error("slp			", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("mlt bc		", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("in0 b,(10)	", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("out0 (10),b	", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("otim		", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("otimr		", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("otdm		", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("otdmr		", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("tstio 23	", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("tst b		", "Error at file 'test.asm' line 1: illegal identifier");
 
 
 unlink_testfiles();

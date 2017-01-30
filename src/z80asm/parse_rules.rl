@@ -640,6 +640,19 @@ Define rules for a ragel-based parser.
 		  @{ DO_stmt_n( Z80_<OP>_n ); }
 #endfor  <OP>
 
+#foreach <R> in B, C, D, E, H, L, A
+		| label? _TK_TST (_TK_A _TK_COMMA)? _TK_<R> _TK_NEWLINE
+		  @{ DO_stmt( Z80_TST( REG_<R> ) ); }
+#endfor  <R>
+
+		/* (hl) */
+		| label? _TK_TST (_TK_A _TK_COMMA)? _TK_IND_HL _TK_NEWLINE
+		  @{ DO_stmt( Z80_TST( REG_idx ) ); }
+
+		/* N */
+		| label? _TK_TST (_TK_A _TK_COMMA)? expr _TK_NEWLINE
+		  @{ DO_stmt_n( Z80_TST_n ); }
+
 		/*---------------------------------------------------------------------
 		*   16-bit ALU
 		*--------------------------------------------------------------------*/
@@ -658,6 +671,12 @@ Define rules for a ragel-based parser.
 		  @{ DO_stmt( Z80_<OP>16( REG_<DD> ) ); }
   #endfor  <DD>
 #endfor  <OP>
+
+#foreach <DD> in BC, DE, HL, SP
+		| label? _TK_MLT _TK_<DD> _TK_NEWLINE
+		  @{ DO_stmt( Z80_MLT( REG_<DD> ) ); }
+#endfor  <DD>
+
 
 		/*---------------------------------------------------------------------
 		*   INC / DEC
@@ -813,12 +832,23 @@ Define rules for a ragel-based parser.
 		  @{ DO_stmt( Z80_OUT_C_REG( REG_<R> ) ); }
 #endfor  <R>
 
+#foreach <R> in B, C, D, E, H, L, F, A
+		| label? _TK_IN0 _TK_<R> _TK_COMMA paren_expr _TK_NEWLINE
+		  @{ DO_stmt_n( Z80_IN0( REG_<R> ) ); }		
+
+	    | label? _TK_OUT0 paren_expr _TK_COMMA _TK_<R> _TK_NEWLINE
+		  @{ DO_stmt_n( Z80_OUT0( REG_<R> ) ); }		
+#endfor  <R>
+
 		| label? _TK_IN _TK_A _TK_COMMA paren_expr _TK_NEWLINE
 		  @{ DO_stmt_n( Z80_IN_A_n ); }
 		
 		| label? _TK_OUT paren_expr _TK_COMMA _TK_A _TK_NEWLINE 
 		  @{ DO_stmt_n( Z80_OUT_n_A ); }
 
+		| label? _TK_TSTIO expr _TK_NEWLINE
+		  @{ DO_stmt_n( Z80_TSTIO ); }
+		
 		/*---------------------------------------------------------------------
 		*   opcodes without arguments
 		*--------------------------------------------------------------------*/
@@ -828,7 +858,9 @@ Define rules for a ragel-based parser.
 				 LDI, LDIR, LDD, LDDR, \
 				 INI, INIR, IND, INDR, \
 				 RET, RETN, RETI, \
-				 OTDR, OTIR, OUTD, OUTI
+				 OTDR, OTIR, OUTD, OUTI, \
+				 SLP, \
+				 OTIM, OTIMR, OTDM, OTDMR
 		| label? _TK_<OP> _TK_NEWLINE
 		  @{ DO_stmt( Z80_<OP> ); }
 #endfor  <OP>		
