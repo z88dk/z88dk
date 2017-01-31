@@ -11,10 +11,12 @@
 
 	SECTION	code_clib
 	PUBLIC	fgetc_cons
+	PUBLIC	_fgetc_cons
 	
 	INCLUDE  "caos.def"
 
 .fgetc_cons
+._fgetc_cons
 	ld	ix,$1f0
 
     call PV1

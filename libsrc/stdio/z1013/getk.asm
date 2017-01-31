@@ -10,8 +10,10 @@
 
 		SECTION code_clib
 		PUBLIC	getk
+		PUBLIC	_getk
 
 .getk
+._getk
 
 	rst $20
 	defb 1		; 'INCH' function

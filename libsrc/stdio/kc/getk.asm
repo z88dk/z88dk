@@ -11,10 +11,12 @@
 
 	SECTION code_clib
 	PUBLIC	getk
+	PUBLIC	_getk
 	
 	INCLUDE  "caos.def"
 
 .getk
+._getk
 	ld	ix,$1f0
 ;    ld l,0
     call PV1

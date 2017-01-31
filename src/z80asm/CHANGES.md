@@ -4,6 +4,7 @@ Z88DK Z80 Module Assembler Change Log
 2017
 ----
 
+- 2016-01-30 Fix #49 implement z180 as a target
 - 2017-01-26 Fix #47 accept more that one MODULE directive
 
 2016

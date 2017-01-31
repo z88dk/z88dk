@@ -20,6 +20,8 @@
 	DEFC	snden	= $5001
 	DEFC	watchdog= $50c0
 
+        defc 	DEFINED_nostreams = 1
+
 	MODULE  pacman_crt0
 
 ;-------
@@ -85,6 +87,7 @@ start:
 	ld	bc,RAM_Length-1
 	ld	(hl),0
 	ldir
+        call    crt0_init_bss
 ; enable interrupts
 	im	1
 	ei
@@ -95,12 +98,12 @@ start:
 l_dcal:
 	jp      (hl)
 
-
-
-
-; Static variables kept in safe workspace
-
-DEFVARS RAM_Start
-{
-}
+        defc	__crt_org_bss = RAM_Start
+        ; If we were given a model then use it
+        IF DEFINED_CRT_MODEL
+            defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
+        ENDIF
+	INCLUDE	"crt0_section.asm"
 

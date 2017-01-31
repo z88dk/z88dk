@@ -12,8 +12,10 @@
 
 		SECTION code_clib
 		PUBLIC	getk
+		PUBLIC	_getk
 
 .getk
+._getk
 
     call $f006          ; const: Check if a key is waiting (0=key, 0ffh=no key)
     inc a

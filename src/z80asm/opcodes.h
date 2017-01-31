@@ -56,6 +56,9 @@ extern void add_Z88_INVOKE(int argument);
 #define _RABBIT_ONLY(x)		(!(opts.cpu & CPU_RABBIT) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
+#define _Z180_ONLY(x)		(!(opts.cpu & CPU_Z180) ? \
+								(error_illegal_ident(), 0) : \
+								(x))
 
 /* Index prefix constants */
 #define P_BC	0
@@ -71,7 +74,7 @@ enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO, FLAG_PE, FLAG_P, FLAG_M };
 #define NOT_FLAG(flag)	((flag) ^ 1)
 
 /* 8-bit registers */
-enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_idx, REG_A };
+enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_idx, REG_A, REG_F=6 };
 #define REG_IXH _Z80_ONLY(REG_H)
 #define REG_IYH _Z80_ONLY(REG_H)
 #define REG_IXL _Z80_ONLY(REG_L)
@@ -235,3 +238,16 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 
 #define Z80_LD_I_A			   _Z80_ONLY(0xED47)
 #define Z80_LD_IIR_A		_RABBIT_ONLY(0xED47)
+
+/* Z180 opcodes */
+#define Z80_SLP				_Z180_ONLY(0xED76)
+#define Z80_MLT(dd)			_Z180_ONLY(0xED4C + ((dd) << 4))
+#define Z80_IN0(r)			_Z180_ONLY(0xED00 + ((r) << 3))
+#define Z80_OUT0(r)			_Z180_ONLY(0xED01 + ((r) << 3))
+#define Z80_OTIM			_Z180_ONLY(0xED83)
+#define Z80_OTIMR			_Z180_ONLY(0xED93)
+#define Z80_OTDM			_Z180_ONLY(0xED8B)
+#define Z80_OTDMR			_Z180_ONLY(0xED9B)
+#define Z80_TSTIO			_Z180_ONLY(0xED74)
+#define Z80_TST(r)			_Z180_ONLY(0xED04 + ((r) << 3))
+#define Z80_TST_n			_Z180_ONLY(0xED64)
