@@ -16,6 +16,27 @@ include(`z88dk.m4')
 SECTION smc_clib
 SECTION smc_nirvanap
 
+IF ((__NIRVANAP_OPTIONS & 0x3) = 0x3)
+
+; ----------------------------------------------------------------
+
+; WIDE SPRITES ENABLED
+
+PUBLIC asm_NIRVANAP_drawTW
+
+asm_NIRVANAP_drawTW:
+
+; preserve stack pointer
+        ld      (exit_draw+1), sp       ; delay 20T in 4 bytes
+        ld      bc, $2e00               ; delay 10T
+delay_sprite:
+        djnz    delay_sprite            ; delay 593T
+        jp      asm_NIRVANAP_drawT      ; execute NIRVANA_drawT with delay 10T
+
+; ----------------------------------------------------------------
+		  
+ENDIF
+
 PUBLIC asm_NIRVANAP_drawT
 
 EXTERN __NIRVANAP_TILE_IMAGES

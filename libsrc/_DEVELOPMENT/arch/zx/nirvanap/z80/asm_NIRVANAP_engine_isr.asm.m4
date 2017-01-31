@@ -5,8 +5,6 @@ define(`__NIRVANAP_TOTAL_ROWS', ifdef(`__NIRVANAP_TOTAL_ROWS', __NIRVANAP_TOTAL_
 
 ; ----------------------------------------------------------------
 ; Z88DK LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
-;
-; Must be first interrupt routine run.
 ; ----------------------------------------------------------------
 
 SECTION smc_clib
@@ -15,9 +13,77 @@ SECTION smc_nirvanap
 PUBLIC asm_NIRVANAP_engine_isr
 PUBLIC __NIRVANAP_delay128k, __NIRVANAP_race_raster
 
-EXTERN asm_NIRVANAP_drawT
-
 asm_NIRVANAP_engine_isr:
+
+; preserve all registers
+        push    af
+        push    bc
+        push    de
+        push    hl
+        ex      af, af'
+        exx
+        push    af
+        push    bc
+        push    de
+        push    hl
+        push    ix
+        push    iy
+		  
+IF ((__NIRVANAP_OPTIONS & 0x3) = 0x3)
+
+; ----------------------------------------------------------------
+
+; WIDE SPRITES ENABLED
+
+EXTERN asm_NIRVANAP_drawW
+
+; draw 6 wide tiles
+        ld      de, 0                   ; D = pixel line, E = char column
+        ld      a, 0                    ; A = tile
+        call    asm_NIRVANAP_drawW
+z88dk_for(`LOOP', `1', `5', 
+`
+        ld      de, 0                   ; D = pixel line, E = char column
+        ld      a, 0                    ; A = tile
+        call    asm_NIRVANAP_drawW+4
+')
+
+        jr      skip_wide
+
+		  nop
+		  nop
+		  nop
+		  nop
+		  nop
+		  nop
+		  nop
+		  
+skip_wide:
+
+        nop                             ; extra delay
+		  nop
+		  nop
+		  nop
+		  nop
+		  nop
+		  nop
+
+; wait for the raster beam
+        ld      b, 55-22
+        jr      delay_wide
+delay_wide:
+__NIRVANAP_delay128k:
+        ld      b, 57-22
+
+; ----------------------------------------------------------------
+
+ELSE
+
+; ----------------------------------------------------------------
+
+; NORMAL SPRITE SIZE
+
+EXTERN asm_NIRVANAP_drawT
 
 ; draw 8 tiles
 z88dk_for(`LOOP', `1', `6', 
@@ -39,6 +105,11 @@ z88dk_for(`LOOP', `1', `2',
 delay_128k:
 __NIRVANAP_delay128k:
         ld      b, 57
+
+; ----------------------------------------------------------------
+
+ENDIF
+
 wait_raster:
         djnz    wait_raster
 
@@ -119,4 +190,26 @@ ENDIF
 exit_raster:
 ; restore stack pointer
         ld      sp, 0
-        ret
+ 
+SECTION 
+
+; linker inserts isr hooks here
+
+SECTION
+
+; restore all registers
+        pop     iy
+        pop     ix
+        pop     hl
+        pop     de
+        pop     bc
+        pop     af
+        exx
+        ex      af, af'
+        pop     hl
+        pop     de
+        pop     bc
+        pop     af
+
+        ei
+        reti

@@ -1,22 +1,22 @@
 ; ----------------------------------------------------------------
 ; Z88DK LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
 ;
-; Fill specified 8x8 block with attribute value (in 165T)
+; Retrieve a sequence of 4 attribute values from specified 8x8 block (in 211T)
 ;
 ; Params:
-;     C = attribute value (0-255)
 ;     D = pixel line (16-192, even values only)
 ;     E = char column (0-31)
+;     BC = attributes address
 ; ----------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_nirvanap
 
-PUBLIC asm_NIRVANAP_fillC
+PUBLIC asm_NIRVANAP_readC
 
 EXTERN __NIRVANAP_deltas, __NIRVANAP_attribs
 
-asm_NIRVANAP_fillC:
+asm_NIRVANAP_readC:
 
 ; calculate initial routine attribute address
         ld      h, 0
@@ -34,17 +34,24 @@ asm_NIRVANAP_fillC:
         ld      d, a
         ex      de, hl
 
-; update attributes
+; read attributes
         ld      de, 82
 
-        ld      (hl), c
+        ld      a, (hl)
+        ld      (bc), a
+        inc     bc
         add     hl, de
 
-        ld      (hl), c
+        ld      a, (hl)
+        ld      (bc), a
+        inc     bc
         add     hl, de
 
-        ld      (hl), c
+        ld      a, (hl)
+        ld      (bc), a
+        inc     bc
         add     hl, de
 
-        ld      (hl), c
+        ld      a, (hl)
+        ld      (bc), a
         ret

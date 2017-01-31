@@ -1,7 +1,5 @@
 ; ----------------------------------------------------------------
-; Z88DK INTERFACE LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
-;
-; See "nirvana+.h" for further details
+; Z88DK LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
 ; ----------------------------------------------------------------
 
 SECTION code_clib
