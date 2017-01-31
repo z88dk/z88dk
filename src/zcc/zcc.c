@@ -106,7 +106,6 @@ static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
 static void            copy_crt0_to_temp(void);
 static void            ShowErrors(char *, char *);
-static int             shell_command(char *s);
 static int             copyprepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static int             copy_file(char *src, char *src_extension, char *dest, char *dest_extension);
 static int             prepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
@@ -190,6 +189,7 @@ static char           *c_subtype = NULL;
 static char           *c_clib = NULL;
 static int             c_startup = -2;
 static int             c_nostdlib = 0;
+static int             mz180 = 0;
 static int             c_nocrt = 0;
 static int             processing_user_command_line_arg = 0;
 
@@ -395,6 +395,7 @@ static arg_t     myargs[] = {
 	{ "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
 	{ "asm", AF_MORE, SetString, &c_assembler_type, NULL, "Set the assembler type from the command line (z80asm, mpm, asxx, vasm, binutils)" },
 	{ "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
+    { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
 	{ "crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
 	{ "-no-crt", AF_BOOL_TRUE, SetBoolean, &c_nocrt, NULL, "Link without crt0 file" },
 	{ "pragma-redirect",AF_MORE,PragmaRedirect,NULL, NULL, "Redirect a function" },
@@ -591,24 +592,27 @@ int linkthem(char *linker)
 
 	if (compileonly)
     {
-		len = offs = zcc_asprintf(&temp, "%s --output=\"%s\" %s",
+		len = offs = zcc_asprintf(&temp, "%s %s --output=\"%s\" %s",
 			linker,
+            mz180 ? "--cpu=z180" : "",
 			outputfile,
 			linkargs);
 	}
 	else if (makelib)
     {
-		len = offs = zcc_asprintf(&temp, "%s %s -d %s %s -x\"%s\"",
+		len = offs = zcc_asprintf(&temp, "%s %s %s -d %s %s -x\"%s\"",
 			linker,
 			(z80verbose && IS_ASM(ASM_Z80ASM)) ? "-v" : "",
+            mz180 ? "--cpu=z180" : "",
 			IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
 			linkargs,
 			outputfile);
 	}
 	else
     {
-        len = offs = zcc_asprintf(&temp, "%s -b -d %s -o%s\"%s\" %s%s%s%s%s%s%s%s%s%c%s%s%c",
+        len = offs = zcc_asprintf(&temp, "%s %s -b -d %s -o%s\"%s\" %s%s%s%s%s%s%s%s%s%c%s%s%c",
             linker,
+            mz180 ? "--cpu=z180" : "",
             IS_ASM(ASM_Z80ASM) ? "" : "-Mo ",
             linker_output_separate_arg ? " " : "",
             outputfile,
@@ -1412,9 +1416,10 @@ void BuildAsmLine(char *dest, size_t destlen, char *prefix)
 	offs = snprintf(dest, destlen, "%s", asmargs ? asmargs : " ");
 
 	if (IS_ASM(ASM_Z80ASM)) {
-		offs += snprintf(dest + offs, destlen - offs, "%s%s%s",
+		offs += snprintf(dest + offs, destlen - offs, "%s%s%s%s",
 			prefix,
 			z80verbose ? " -v " : " ",
+            mz180 ? " --cpu=z180 " : " ",
 			symbolson ? " -s " : " ");
 	}
 
@@ -1984,7 +1989,8 @@ static void configure_compiler()
 	/* compiler= */
 	if ((strcmp(c_compiler_type, "clang") == 0) || (strcmp(c_compiler_type, "sdcc") == 0)) {
 		compiler_type = CC_SDCC;
-		snprintf(buf, sizeof(buf), "-mz80 --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ", \
+		snprintf(buf, sizeof(buf), "%s --no-optsdcc-in-asm --c1mode --emit-externs %s %s %s ", \
+            (mz180 ? "-mz180 --portmode=180" : "-mz80"), \
             (sdcc_signed_char ? "--fsigned-char" : ""), \
             (c_code_in_asm ? "" : "--no-c-code-in-asm"), \
             (opt_code_size ? "--opt-code-size" : ""));
