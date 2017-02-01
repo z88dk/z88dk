@@ -1,4 +1,4 @@
-# Z88DK - The Development Kit for Z80 Computers
+# Z88DK - The Development Kit for Z80 Computers ![WinXP+](doc/images/windows.png) ![MacOSX](doc/images/mac.png) ![Linux and Other](doc/images/linux.png)
 
 [![Build Status](https://travis-ci.org/z88dk/z88dk.svg?branch=master)](https://travis-ci.org/z88dk/z88dk)
 
