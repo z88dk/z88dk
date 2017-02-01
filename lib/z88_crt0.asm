@@ -56,13 +56,13 @@
 ;     -startup=2 for app        } use them!)
 ;     -startup=3 for code snippets
         IF (startup=1)
-                INCLUDE "bas_crt0.asm"
+                INCLUDE "z88b_crt0.asm"
         ENDIF
         IF (startup=2)
-                INCLUDE "app_crt0.asm"
+                INCLUDE "z88a_crt0.asm"
         ENDIF
 	IF (startup=4)
-		INCLUDE "dev_crt0.asm"
+		INCLUDE "z88d_crt0.asm"
 	ENDIF
 	IF (startup=5)
 		INCLUDE "z88s_crt0.asm"
