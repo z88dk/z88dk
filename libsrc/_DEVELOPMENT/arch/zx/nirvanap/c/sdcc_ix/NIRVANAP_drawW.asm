@@ -23,4 +23,9 @@ _NIRVANAP_drawW:
 	inc hl
 	ld e,(hl)       ; col
 
-   jp asm_NIRVANAP_drawW_di
+	push ix
+	
+   call asm_NIRVANAP_drawW_di
+
+	pop ix
+	ret

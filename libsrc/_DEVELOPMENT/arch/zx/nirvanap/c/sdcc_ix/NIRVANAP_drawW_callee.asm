@@ -23,4 +23,9 @@ _NIRVANAP_drawW_callee:
    ld d,l          ; d = lin
    ld e,h          ; e = col
 
-	jp asm_NIRVANAP_drawW_di
+	push ix
+	
+	call asm_NIRVANAP_drawW_di
+
+	pop ix
+	ret
