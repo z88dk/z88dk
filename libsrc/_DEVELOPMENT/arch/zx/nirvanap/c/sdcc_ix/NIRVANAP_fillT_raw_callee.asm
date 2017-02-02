@@ -4,25 +4,23 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANA_fillT_raw(unsigned int attr, unsigned int lin, unsigned int col)
+; void NIRVANAP_fillT_raw(unsigned char attr, unsigned char lin, unsigned char col)
+; callee
 
 SECTION code_clib
 SECTION code_nirvanap
 
-PUBLIC NIRVANAP_fillT_raw
+PUBLIC _NIRVANAP_fillT_raw_callee
 
 EXTERN asm_NIRVANAP_fillT
 
-NIRVANAP_fillT_raw:
+_NIRVANAP_fillT_raw_callee:
 
-   	ld hl,2
-   	add hl,sp
-   	ld e,(hl)       ; col
-   	inc hl
-   	inc hl
-   	ld d,(hl)       ; lin
-   	inc hl
-   	inc hl
-   	ld a,(hl)       ; attr
+   pop hl
+   pop de          ; d = lin
+   ld a,e          ; a = attr
+   dec sp
+   ex (sp),hl
+   ld e,h          ; e = col
 
-   	jp asm_NIRVANAP_fillT
+	jp asm_NIRVANAP_fillT

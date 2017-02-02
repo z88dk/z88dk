@@ -4,23 +4,23 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAP_drawT(unsigned int tile, unsigned int lin, unsigned int col)
+; void NIRVANAP_drawT(unsigned char tile, unsigned char lin, unsigned char col)
 ; callee
 
 SECTION code_clib
 SECTION code_nirvanap
 
-PUBLIC NIRVANAP_drawT_callee
+PUBLIC _NIRVANAP_drawT_callee
 
 EXTERN asm_NIRVANAP_drawT_di
 
-NIRVANAP_drawT_callee:
+_NIRVANAP_drawT_callee:
 
-        pop hl          ; RET address
-        pop de          ; col
-        pop bc
-        ld d,c          ; lin
-        ex (sp),hl      ; tile
-        ld a,l
+   pop hl
+   pop de          ; d = line
+   ld a,e          ; a = tile
+   dec sp
+   ex (sp),hl
+   ld e,h          ; e = col
 
 	jp asm_NIRVANAP_drawT_di

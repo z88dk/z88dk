@@ -12,7 +12,7 @@ SECTION code_nirvanap
 
 PUBLIC NIRVANAP_fillT_raw_callee
 
-EXTERN asm_NIRVANAP_fillT_raw
+EXTERN asm_NIRVANAP_fillT
 
 NIRVANAP_fillT_raw_callee:
 
@@ -23,4 +23,4 @@ NIRVANAP_fillT_raw_callee:
         ex (sp),hl      ; attr
         ld a,l
 
-	jp asm_NIRVANAP_fillT_raw
+	jp asm_NIRVANAP_fillT

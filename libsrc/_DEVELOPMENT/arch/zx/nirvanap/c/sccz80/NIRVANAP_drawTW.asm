@@ -4,16 +4,16 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANA_fillT(unsigned int attr, unsigned int lin, unsigned int col)
+; void NIRVANAP_drawTW(unsigned int tile, unsigned int lin, unsigned int col)
 
 SECTION code_clib
 SECTION code_nirvanap
 
-PUBLIC NIRVANAP_fillT
+PUBLIC NIRVANAP_drawTW
 
-EXTERN asm_NIRVANAP_fillT_di
+EXTERN asm_NIRVANAP_drawTW_di
 
-NIRVANAP_fillT:
+NIRVANAP_drawTW:
 
    	ld hl,2
    	add hl,sp
@@ -23,6 +23,6 @@ NIRVANAP_fillT:
    	ld d,(hl)       ; lin
    	inc hl
    	inc hl
-   	ld a,(hl)       ; attr
-
-   	jp asm_NIRVANAP_fillT_di
+   	ld a,(hl)       ; tile
+   	
+   	jp asm_NIRVANAP_drawTW_di

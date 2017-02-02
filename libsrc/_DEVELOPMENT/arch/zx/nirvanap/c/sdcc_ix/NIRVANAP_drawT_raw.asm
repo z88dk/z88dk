@@ -4,25 +4,23 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAP_drawT_raw(unsigned int tile, unsigned int lin, unsigned int col)
+; void NIRVANAP_drawT_raw(unsigned char tile, unsigned char lin, unsigned char col)
 
 SECTION code_clib
 SECTION code_nirvanap
 
-PUBLIC NIRVANAP_drawT_raw
+PUBLIC _NIRVANAP_drawT_raw
 
 EXTERN asm_NIRVANAP_drawT
 
-NIRVANAP_drawT_raw:
+_NIRVANAP_drawT_raw:
 
-   	ld hl,2
-   	add hl,sp
-   	ld e,(hl)       ; col
-   	inc hl
-   	inc hl
-   	ld d,(hl)       ; lin
-   	inc hl
-   	inc hl
-   	ld a,(hl)       ; tile
-   	
-   	jp asm_NIRVANAP_drawT
+   ld hl,2
+   add hl,sp
+   ld a,(hl)       ; tile
+   inc hl
+   ld d,(hl)       ; lin
+   inc hl
+   ld e,(hl)       ; col
+
+   jp asm_NIRVANAP_drawT

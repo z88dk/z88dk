@@ -4,16 +4,16 @@
 ; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANA_fillT(unsigned int attr, unsigned int lin, unsigned int col)
+; void NIRVANA_readC(unsigned char *attrs, unsigned int lin, unsigned int col)
 
 SECTION code_clib
 SECTION code_nirvanap
 
-PUBLIC NIRVANAP_fillT
+PUBLIC NIRVANAP_readC
 
-EXTERN asm_NIRVANAP_fillT_di
+EXTERN asm_NIRVANAP_readC
 
-NIRVANAP_fillT:
+NIRVANAP_readC:
 
    	ld hl,2
    	add hl,sp
@@ -23,6 +23,8 @@ NIRVANAP_fillT:
    	ld d,(hl)       ; lin
    	inc hl
    	inc hl
-   	ld a,(hl)       ; attr
+   	ld c,(hl)
+   	inc hl
+   	ld b,(hl)       ; attrs
 
-   	jp asm_NIRVANAP_fillT_di
+   	jp asm_NIRVANAP_readC
