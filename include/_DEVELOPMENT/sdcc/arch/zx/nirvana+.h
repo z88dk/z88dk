@@ -54,17 +54,7 @@ extern void NIRVANAP_stop(void) __preserves_regs(b,c,d,e,h,l);
 // Location of NIRVANA ISR hook
 // ----------------------------------------------------------------
 
-#ifdef __CLANG
-   static unsigned char NIRVANAP_ISR_HOOK[3];
-#endif
-
-#ifdef __SDCC
-   __at (56698+328*NIRVANAP_TOTAL_ROWS) static unsigned char NIRVANAP_ISR_HOOK[3];
-#endif
-
-#ifdef __SCCZ80
-   static unsigned char NIRVANAP_ISR_HOOK[3] @ (56698+328*NIRVANAP_TOTAL_ROWS);
-#endif
+extern unsigned char NIRVANAP_ISR_HOOK[3];
 
 // ----------------------------------------------------------------
 // Instantly draw tile (16x16 pixels) at specified position
