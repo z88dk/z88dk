@@ -14,9 +14,12 @@ target = $(firstword $(subst -, ,$*))
 ${jobs}: job-%:
 	-@cp target/$(target)/clib_cfg.asm  . 2> /dev/null
 	-@cp target/$(target)/clib_target_cfg.asm . 2> /dev/null
-	zcc +embedded -vn -clib=new --lstcwd -x @target/$(target)/library/$(target)_sccz80.lst -o lib/sccz80/$(target)
-	zcc +embedded -vn -clib=sdcc_ix --lstcwd -x @target/$(target)/library/$(target)_sdcc_ix.lst -o lib/sdcc_ix/$(target)
-	zcc +embedded -vn -clib=sdcc_iy --lstcwd -Ca--IXIY -x @target/$(target)/library/$(target)_sdcc_iy.lst -o lib/sdcc_iy/$(target)
+	ifeq ($(target),zx)
+		zcc +zx -vn -m4 arch/zx/nirvanap/z80/asm_NIRVANAP.asm.m4
+	endif
+	z80asm -xlib/sccz80/$(target) @target/$(target)/library/$(target)_sccz80.lst
+	z80asm -xlib/sdcc_ix/$(target) -D__SDCC -D__SDCC_IX @target/$(target)/library/$(target)_sdcc_ix.lst
+	z80asm --IXIY -xlib/sdcc_iy/$(target) -D__SDCC -D__SDCC_IY @target/$(target)/library/$(target)_sdcc_iy.lst
 
 .PHONY: ${cleans}
 ${cleans}: clean-%:

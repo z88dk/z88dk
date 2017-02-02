@@ -42,9 +42,13 @@ for %%t in (%targets%) do (
       copy /Y target\%%t\clib_cfg.asm . 1> nul
       copy /Y target\%%t\clib_target_cfg.asm . 1> nul
 
+      if "%%t" == "zx" (
+         zcc +zx -vn -m4 arch/zx/nirvanap/z80/asm_NIRVANAP.asm.m4
+      )
+
       echo   %%t_sccz80.lib
       
-      zcc +embedded -vn -clib=new --lstcwd -x @target/%%t/library/%%t_sccz80.lst -o %%t_sccz80
+      z80asm -x%%t_sccz80 -D__SCCZ80 @target/%%t/library/%%t_sccz80.lst
       move /Y %%t_sccz80.lib lib/sccz80/%%t.lib
 
       del /S *.o > nul 2>&1
@@ -52,7 +56,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sdcc_ix.lib
 
-      zcc +embedded -vn -clib=sdcc_ix --lstcwd -x @target/%%t/library/%%t_sdcc_ix.lst -o %%t_sdcc_ix
+      z80asm -x%%t_sdcc_ix -D__SDCC -D__SDCC_IX @target/%%t/library/%%t_sdcc_ix.lst
       move /Y %%t_sdcc_ix.lib lib/sdcc_ix/%%t.lib
 
       del /S *.o > nul 2>&1
@@ -60,7 +64,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sdcc_iy.lib
 
-      zcc +embedded -vn -clib=sdcc_iy --lstcwd -Ca--IXIY -x @target/%%t/library/%%t_sdcc_iy.lst -o %%t_sdcc_iy
+      z80asm --IXIY -x%%t_sdcc_iy -D__SDCC -D__SDCC_IY @target/%%t/library/%%t_sdcc_iy.lst
       move /Y %%t_sdcc_iy.lib lib/sdcc_iy/%%t.lib
 
       del /S *.o > nul 2>&1
