@@ -1,6 +1,23 @@
 /* ----------------------------------------------------------------
  * NIRVANA+ ENGINE DEMO - converted to z88dk C Compiler
  *
+ * Before using Nirvana+ it should be configured to select options
+ * you want.  The default options are used for this compile so
+ * nothing has to be done prior to this compile.  However in other
+ * circumstances, the file "z88dk/libsrc/_DEVELOPMENT/target/zx/
+ * clib_target_cfg.asm" would be edited to change those options
+ * and then the zx library would be rebuilt by running "Winmake zx"
+ * or "make TARGET=zx" from the "z88dk/libsrc/_DEVELOPMENT directory".
+ *
+ * If you want to target the Pentagon with this compile you must
+ * select that option in Nirvana+ by following the above steps.
+ *
+ * Note that in general use, if you enable the wide sprite or wide
+ * tiles options the ORG address for Nirvana+ will change from 56323.
+ * You can find the ORG address by compiling with the -m flag
+ * to generate the map file and then look up "org_nirvanap".
+ * In the appmake invocation below the ORG has been assumed 56323.
+ *
  * This program can be compiled as follows:
  *
  * 1. SCCZ80 + New C Library
@@ -8,17 +25,17 @@
  *    zcc +zx -vn -startup=1 -clib=new nirvanadem.c btile.asm -o nirvanadem
  *    appmake +zx -b nirvanadem_NIRVANAP.bin -o nirvanap.tap --noloader --org 56323 --blockname NIRVANAP
  *    appmake +zx -b nirvanadem_CODE.bin -o nirvanadem.tap --noloader --org 32768 --blockname nirvanadem
- *    copy /B loader.tap + nirvanap.tap + nirvanadem.tap demo.tap
+ *    copy /b loader.tap + nirvanap.tap + nirvanadem.tap demo.tap
  *
  * 2. ZSDCC + New C Library
  *
  *    zcc +zx -vn -SO3 -startup=1 -clib=sdcc_iy --max-allocs-per-node200000 nirvanadem.c btile.asm -o nirvanadem
  *    appmake +zx -b nirvanadem_NIRVANAP.bin -o nirvanap.tap --noloader --org 56323 --blockname NIRVANAP
  *    appmake +zx -b nirvanadem_CODE.bin -o nirvanadem.tap --noloader --org 32768 --blockname nirvanadem
- *    copy /B loader.tap + nirvanap.tap + nirvanadem.tap demo.tap
+ *    copy /b loader.tap + nirvanap.tap + nirvanadem.tap demo.tap
  *
- * After compiling, the binary "nirvanadem_CODE.bin" containing the program is produced and the binary
- *   "nirvanadem_NIRVANAP.bin" is produced containing the nirvana+ engine code.
+ * After compiling, the binaries "nirvanadem_CODE.bin" (containing the program) and "nirvanadem_NIRVANAP.bin"
+ * (containing the nirvana engine) are produced.
  * Appmake is run to turn those into CODE-only tap files.
  * Windows "copy" is used to append those taps to the end of "loader.tap" to form the final tap file "demo.tap"
  *
