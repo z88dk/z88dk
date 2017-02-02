@@ -15,13 +15,36 @@ defc _CLIB_TARGET_CFG_ASM_ = 1
 ;--------------------------------------------------------------
 
 defc __spectrum     = 1
-defc __model        = 0                ; 0 = 48k
+
+; 1 = spectrum 48k
+; 2 = spectrum 128k
+; 3 = pentagon
+
 defc __clock_freq   = 3500000          ; Hz
 
 defc __z80_cpu_info = $01
 
 ; bit 0 = $01 = if set indicates an nmos z80 (if unsure set it)
 ; bit 1 = $02 = allow undocumented instruction "sll r"
+
+
+;--------------------------------------------------------------
+;-- GAMES/NIRVANA+ --------------------------------------------
+;--------------------------------------------------------------
+
+defc __NIRVANAP_OPTIONS = 0
+
+; bit 0 = $01 = enable wide draw
+; bit 1 = $02 = enable wide sprites
+
+;;define(`__NIRVANAP_TOTAL_ROWS', 23)
+
+; total number of rows drawn by nirvana+ 1-23
+; do not uncomment - this is an m4 define
+
+defc __NIRVANAP_TILE_IMAGES = 48000  ; default location of bicolour tiles (16x16 pix, 48 bytes each)
+defc __NIRVANAP_WIDE_IMAGES = 54000  ; default location of wide tiles (24x16 pix, 72 bytes each)
+defc __NIRVANAP_CHAR_TABLE  = 15360  ; default location of character set (8x8 pix, 8 bytes each)
 
 
 ;--------------------------------------------------------------
