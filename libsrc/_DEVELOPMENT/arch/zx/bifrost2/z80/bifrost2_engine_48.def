@@ -1,0 +1,9 @@
+DEFC asm_BIFROST2_start              = $C9A9 ;   asm_BIFROST2
+DEFC asm_BIFROST2_stop               = $C9B2 ;   asm_BIFROST2
+DEFC asm_BIFROST2_showNext2Tiles     = $C9C2 ;   asm_BIFROST2
+DEFC asm_BIFROST2_showNextTile       = $C9C5 ;   asm_BIFROST2
+DEFC asm_BIFROST2_showTilePosH       = $C9E3 ;   asm_BIFROST2
+DEFC asm_BIFROST2_drawTileH          = $CA02 ;   asm_BIFROST2
+DEFC _BIFROST2_TILE_IMAGES           = $CA17 ;   asm_BIFROST2
+DEFC _BIFROST2_ISR_HOOK              = $FD29 ;   asm_BIFROST2
+DEFC asm_BIFROST2_fillTileAttrH      = $FD3D ;   asm_BIFROST2

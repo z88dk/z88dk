@@ -43,6 +43,10 @@ for %%t in (%targets%) do (
       copy /Y target\%%t\clib_target_cfg.asm . 1> nul
 
       if "%%t" == "zx" (
+         zcc +zx -v -clib=new --no-crt -g arch/zx/bifrost2/z80/asm_BIFROST2.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         zcc +zx -v -clib=new --no-crt -g arch/zx/bifrost2/z80/asm_BIFROST2.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
          zcc +zx -vn -m4 arch/zx/nirvanam/z80/asm_NIRVANAM.asm.m4
          zcc +zx -vn -m4 arch/zx/nirvanap/z80/asm_NIRVANAP.asm.m4
       )

@@ -30,6 +30,33 @@ defc __z80_cpu_info = $01
 
 
 ;--------------------------------------------------------------
+;-- GAMES/BIFROST*2 -------------------------------------------
+;--------------------------------------------------------------
+
+; Animation size: 2 or 4 frames per animation group
+defc __BIFROST2_ANIM_GROUP = 4
+
+; First non-animated frame
+defc __BIFROST2_STATIC_MIN = 128
+
+; Value subtracted from non-animated frames
+defc __BIFROST2_STATIC_OVERLAP = 128
+
+; Default location of multicolor tiles table (16x16 pixels, 64 bytes per tile)
+defc __BIFROST2_TILE_IMAGES = 49000
+
+; Tile rendering order (1 for sequential, 7 or 9 for distributed)
+defc __BIFROST2_TILE_ORDER = 7
+
+; Location of the tile map (11x10=110 tiles)
+defc __BIFROST2_TILE_MAP = 65281
+
+; Number of char rows rendered in multicolor (3-22)
+; (notice that addresses from 57690+332*TOTAL_ROWS to 64994 are unused)
+;;
+
+
+;--------------------------------------------------------------
 ;-- GAMES/NIRVANA- --------------------------------------------
 ;--------------------------------------------------------------
 
