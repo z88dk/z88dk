@@ -191,6 +191,7 @@ static int             c_startup = -2;
 static int             c_nostdlib = 0;
 static int             mz180 = 0;
 static int             c_nocrt = 0;
+static char           *c_nocrt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
 
 static char            filenamebuf[FILENAME_MAX + 1];
@@ -587,6 +588,14 @@ int linkthem(char *linker)
 	char            tname[FILENAME_MAX + 1];
 	FILE           *out, *prj;
 
+    // late assembly for no-crt first file
+    if (c_nocrt)
+    {
+        if (process(".asm", c_extension, c_assembler, c_nocrt_incpath ? c_nocrt_incpath : "", assembler_style, 0, YES, NO))
+            exit(1);
+        free(c_nocrt_incpath);
+    }
+
 	linkargs_mangle(linklibs);
 	linkargs_mangle(linkargs);
 
@@ -626,7 +635,7 @@ int linkthem(char *linker)
             (c_nostdlib == 0) ? c_linkopts : "",
             linklibs,
             (c_nocrt == 0) ? '"' : ' ',
-			(c_nocrt == 0) ? c_crt0 : filelist[0],
+			(c_nocrt == 0) ? c_crt0 : "",
 			(c_nocrt == 0) ? ".asm" : "",
             (c_nocrt == 0) ? '"' : ' ');
 	}
@@ -1085,7 +1094,7 @@ int main(int argc, char **argv)
 				exit(1);
 		CASE_ASMFILE:
 		case ASMFILE:
-			if (m4only || clangonly || llvmonly || preprocessonly || assembleonly || ((i == 0) && c_nocrt && !compileonly && !makelib))
+			if (m4only || clangonly || llvmonly || preprocessonly || assembleonly)
                 continue;
 
             // z80asm is unable to output object files to an arbitrary destination directory.
@@ -1185,6 +1194,13 @@ int main(int argc, char **argv)
                 }
 
                 free(p);
+            }
+
+            // must be late assembly for the first file with no-crt active
+            if (c_nocrt && (i == 0))
+            {
+                c_nocrt_incpath = ptr;
+                continue;
             }
 
 			if (process(".asm", c_extension, c_assembler, ptr, assembler_style, i, YES, NO))
