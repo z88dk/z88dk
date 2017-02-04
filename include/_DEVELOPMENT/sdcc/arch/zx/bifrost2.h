@@ -33,6 +33,12 @@ extern void BIFROST2_install(void);
 
 
 // ----------------------------------------------------------------
+// Location of BIFROST*2 ISR hook
+// ----------------------------------------------------------------
+
+extern unsigned char BIFROST2_ISR_HOOK[3];
+
+// ----------------------------------------------------------------
 // Activate multicolor rendering with BIFROST*2 ENGINE
 // ----------------------------------------------------------------
 
@@ -72,8 +78,8 @@ extern void BIFROST2_stop(void) __preserves_regs(b,c,d,e,h,l);
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-extern void BIFROST2_setTile(unsigned int px,unsigned int py,unsigned int tile);
-extern void BIFROST2_setTile_callee(unsigned int px,unsigned int py,unsigned int tile) __z88dk_callee;
+extern void BIFROST2_setTile(unsigned char px,unsigned char py,unsigned char tile) __preserves_regs(b,d);
+extern void BIFROST2_setTile_callee(unsigned char px,unsigned char py,unsigned char tile) __preserves_regs(b,d) __z88dk_callee;
 #define BIFROST2_setTile(a,b,c) BIFROST2_setTile_callee(a,b,c)
 
 
@@ -93,8 +99,8 @@ extern void BIFROST2_setTile_callee(unsigned int px,unsigned int py,unsigned int
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-extern unsigned char BIFROST2_getTile(unsigned int px,unsigned int py) __preserves_regs(d,e);
-extern unsigned char BIFROST2_getTile_callee(unsigned int px,unsigned int py) __preserves_regs(d,e) __z88dk_callee;
+extern unsigned char BIFROST2_getTile(unsigned char px,unsigned char py) __preserves_regs(b,d,e);
+extern unsigned char BIFROST2_getTile_callee(unsigned char px,unsigned char py) __preserves_regs(b,d,e) __z88dk_callee;
 #define BIFROST2_getTile(a,b) BIFROST2_getTile_callee(a,b)
 
 
@@ -111,8 +117,8 @@ extern unsigned char BIFROST2_getTile_callee(unsigned int px,unsigned int py) __
 //     Animation group for animated tile, otherwise the same tile index
 // ----------------------------------------------------------------
 
-extern unsigned char BIFROST2_getAnimGroup(unsigned int tile) __preserves_regs(b,c,d,e);
-extern unsigned char BIFROST2_getAnimGroup_fastcall(unsigned int tile) __preserves_regs(b,c,d,e) __z88dk_fastcall;
+extern unsigned char BIFROST2_getAnimGroup(unsigned char tile) __preserves_regs(b,c,d,e,h);
+extern unsigned char BIFROST2_getAnimGroup_fastcall(unsigned char tile) __preserves_regs(b,c,d,e,h) __z88dk_fastcall;
 #define BIFROST2_getAnimGroup(a) BIFROST2_getAnimGroup_fastcall(a)
 
 
@@ -129,8 +135,8 @@ extern unsigned char BIFROST2_getAnimGroup_fastcall(unsigned int tile) __preserv
 //     Memory address of the multicolor attribute
 // ----------------------------------------------------------------
 
-extern unsigned char *BIFROST2_findAttrH(unsigned int lin,unsigned int col);
-extern unsigned char *BIFROST2_findAttrH_callee(unsigned int lin,unsigned int col) __z88dk_callee;
+extern unsigned char *BIFROST2_findAttrH(unsigned char lin,unsigned char col) __preserves_regs(b);
+extern unsigned char *BIFROST2_findAttrH_callee(unsigned char lin,unsigned char col) __preserves_regs(b) __z88dk_callee;
 #define BIFROST2_findAttrH(a,b) BIFROST2_findAttrH_callee(a,b)
 
 
@@ -142,11 +148,8 @@ extern unsigned char *BIFROST2_findAttrH_callee(unsigned int lin,unsigned int co
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-extern void BIFROST2_resetTileImages(void *addr) __preserves_regs(b,c,d,e);
-extern void BIFROST2_resetTileImages_fastcall(void *addr) __preserves_regs(b,c,d,e) __z88dk_fastcall;
-#define BIFROST2_resetTileImages(a) BIFROST2_resetTileImages_fastcall(a)
-
-
+extern unsigned char BIFROST2_TILE_IMAGES[];
+#define BIFROST2_resetTileImages(addr)  intrinsic_store16(_BIFROST2_TILE_IMAGES,addr)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST*2 ENGINE to use 2 frames per animation group
@@ -194,8 +197,8 @@ extern void BIFROST2_resetAnim4Frames(void) __preserves_regs(b,c,d,e);
 //          occurs, program may crash!!! (see BIFROST2_halt)
 // ----------------------------------------------------------------
 
-extern void BIFROST2_drawTileH(unsigned int lin,unsigned int col,unsigned int tile);
-extern void BIFROST2_drawTileH_callee(unsigned int lin,unsigned int col,unsigned int tile) __z88dk_callee;
+extern void BIFROST2_drawTileH(unsigned char lin,unsigned char col,unsigned char tile);
+extern void BIFROST2_drawTileH_callee(unsigned char lin,unsigned char col,unsigned char tile) __z88dk_callee;
 #define BIFROST2_drawTileH(a,b,c) BIFROST2_drawTileH_callee(a,b,c)
 
 
@@ -212,8 +215,8 @@ extern void BIFROST2_drawTileH_callee(unsigned int lin,unsigned int col,unsigned
 //          occurs, program may crash!!! (see BIFROST2_halt)
 // ----------------------------------------------------------------
 
-extern void BIFROST2_showTilePosH(unsigned int lin,unsigned int col);
-extern void BIFROST2_showTilePosH_callee(unsigned int lin,unsigned int col) __z88dk_callee;
+extern void BIFROST2_showTilePosH(unsigned char lin,unsigned char col);
+extern void BIFROST2_showTilePosH_callee(unsigned char lin,unsigned char col) __z88dk_callee;
 #define BIFROST2_showTilePosH(a,b) BIFROST2_showTilePosH_callee(a,b)
 
 
@@ -231,6 +234,18 @@ extern void BIFROST2_showNextTile(void);
 
 
 // ----------------------------------------------------------------
+// Instantly show/animate the next two multicolor tiles currently
+// stored in the tile map position, according to a pre-established
+// drawing order
+//
+// WARNING: If this routine is under execution when interrupt
+//          occurs, program may crash!!! (see BIFROST2_halt)
+// ----------------------------------------------------------------
+
+extern void BIFROST2_showNext2Tiles(void);
+
+
+// ----------------------------------------------------------------
 // Instantly change the attributes in a tile area (16x16 pixels) to
 // the specified value (use the same INK and PAPER values to "erase"
 // a tile)
@@ -244,8 +259,8 @@ extern void BIFROST2_showNextTile(void);
 //          occurs, program may crash!!! (see BIFROST2_halt)
 // ----------------------------------------------------------------
 
-extern void BIFROST2_fillTileAttrH(unsigned int lin,unsigned int col,unsigned int attr);
-extern void BIFROST2_fillTileAttrH_callee(unsigned int lin,unsigned int col,unsigned int attr) __z88dk_callee;
+extern void BIFROST2_fillTileAttrH(unsigned char lin,unsigned char col,unsigned char attr) __preserves_regs(b);
+extern void BIFROST2_fillTileAttrH_callee(unsigned char lin,unsigned char col,unsigned char attr) __preserves_regs(b) __z88dk_callee;
 #define BIFROST2_fillTileAttrH(a,b,c) BIFROST2_fillTileAttrH_callee(a,b,c)
 
 
