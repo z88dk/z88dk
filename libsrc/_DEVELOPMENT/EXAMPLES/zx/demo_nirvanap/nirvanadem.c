@@ -1,22 +1,31 @@
 /* ----------------------------------------------------------------
  * NIRVANA+ ENGINE DEMO - converted to z88dk C Compiler
  *
- * Before using Nirvana+ it should be configured to select options
- * you want.  The default options are used for this compile so
- * nothing has to be done prior to this compile.  However in other
- * circumstances, the file "z88dk/libsrc/_DEVELOPMENT/target/zx/
- * clib_target_cfg.asm" would be edited to change those options
- * and then the zx library would be rebuilt by running "Winmake zx"
- * or "make TARGET=zx" from the "z88dk/libsrc/_DEVELOPMENT directory".
+ * Before using Nirvana+, it should be configured.
  *
- * If you want to target the Pentagon with this compile you must
- * select that option in Nirvana+ by following the above steps.
+ * The default configuration is:
  *
- * Note that in general use, if you enable the wide sprite or wide
- * tiles options the ORG address for Nirvana+ will change from 56323.
- * You can find the ORG address by compiling with the -m flag
- * to generate the map file and then look up "org_nirvanap".
- * In the appmake invocation below the ORG has been assumed 56323.
+ * - Spectrum 48/128 mode
+ * - Disable wide draw and wide sprites
+ * - Total rows = 23
+ *
+ * This program assumes the default configuration so nothing
+ * needs to be done to configure the engine prior to compiling.
+ *
+ * However in other circumstances, the zx's target configuration
+ * file should be edited to change the settings ("z88dk/libsrc/
+ * _DEVELOPMENT/target/zx/clib_target_cfg.asm") and then the
+ * zx library should be rebuilt by running "Winmake zx" (windows)
+ * or "make TARGET=zx" (other) from the "z88dk/libsrc/_DEVELOPMENT"
+ * directory.
+ *
+ * Note that if wide tiles or wide sprites are enabled, the ORG
+ * address of the Nirvana+ engine will change from 56323.  You
+ * can find the correct ORG address by compiling with the "-m"
+ * flag to generate a map file and then look up "org_nirvanap"
+ * in that file to find its value.  Because this program
+ * uses the default configuration, the appmake invocation to
+ * generate the nirvana+ tap assumes an ORG of 56323.
  *
  * This program can be compiled as follows:
  *
@@ -34,10 +43,12 @@
  *    appmake +zx -b nirvanadem_CODE.bin -o nirvanadem.tap --noloader --org 32768 --blockname nirvanadem
  *    copy /b loader.tap + nirvanap.tap + nirvanadem.tap demo.tap
  *
- * After compiling, the binaries "nirvanadem_CODE.bin" (containing the program) and "nirvanadem_NIRVANAP.bin"
- * (containing the nirvana engine) are produced.
+ * After compiling, the binaries "nirvanadem_CODE.bin"
+ *   (containing the program) and "nirvanadem_NIRVANAP.bin"
+ *   (containing the nirvana engine) are produced.
  * Appmake is run to turn those into CODE-only tap files.
- * Windows "copy" is used to append those taps to the end of "loader.tap" to form the final tap file "demo.tap"
+ * Windows "copy" is used to append those taps to the end of
+ *   "loader.tap" to form the final tap file "demo.tap"
  *
  * "loader.tap" contains this basic loader:
  *
@@ -151,7 +162,7 @@ void main(void)
                 tile = *SPRITEVAL(sprite);
                 if (sprite == 0 || sprite == 3 || sprite == 6)
                     NIRVANAP_halt();
-                NIRVANAP_fillT(0, lin, col);
+                NIRVANAP_fillT_raw(0, lin, col);
                 lin += dlin[sprite];
                 col += dcol[sprite];
                 if ((counter & 7) == sprite)
