@@ -29,6 +29,25 @@ defc __z80_cpu_info = $01
 
 
 ;--------------------------------------------------------------
+;-- GAMES/NIRVANA- --------------------------------------------
+;--------------------------------------------------------------
+
+defc __NIRVANAM_OPTIONS = 0
+
+; bit 0 = $01 = enable wide draw
+; bit 1 = $02 = enable wide sprites
+
+;;define(`__NIRVANAM_TOTAL_ROWS', 22)
+
+; total number of rows drawn by nirvana- 1-22
+; do not uncomment - this is an m4 define
+
+defc __NIRVANAM_TILE_IMAGES = 48000  ; default location of bicolour tiles (16x16 pix, 48 bytes each)
+defc __NIRVANAM_WIDE_IMAGES = 54000  ; default location of wide tiles (24x16 pix, 72 bytes each)
+defc __NIRVANAM_CHAR_TABLE  = 15360  ; default location of character set (8x8 pix, 8 bytes each)
+
+
+;--------------------------------------------------------------
 ;-- GAMES/NIRVANA+ --------------------------------------------
 ;--------------------------------------------------------------
 
