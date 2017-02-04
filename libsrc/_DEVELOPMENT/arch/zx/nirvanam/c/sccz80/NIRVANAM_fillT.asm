@@ -1,17 +1,17 @@
 ; ----------------------------------------------------------------
-; Z88DK INTERFACE LIBRARY FOR THE NIRVANA ENGINE - by Einar Saukas
+; Z88DK INTERFACE LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
 ;
-; See "nirvana-.h" for further details
+; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAM_fillT(unsigned int attr, unsigned int lin, unsigned int col)
+; void NIRVANA_fillT(unsigned int attr, unsigned int lin, unsigned int col)
 
 SECTION code_clib
 SECTION code_nirvanam
 
 PUBLIC NIRVANAM_fillT
 
-EXTERN asm_NIRVANAM_fillT
+EXTERN asm_NIRVANAM_fillT_di
 
 NIRVANAM_fillT:
 
@@ -25,4 +25,4 @@ NIRVANAM_fillT:
    	inc hl
    	ld a,(hl)       ; attr
 
-   	jp asm_NIRVANAM_fillT
+   	jp asm_NIRVANAM_fillT_di

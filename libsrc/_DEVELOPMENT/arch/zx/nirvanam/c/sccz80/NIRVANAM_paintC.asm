@@ -1,10 +1,10 @@
 ; ----------------------------------------------------------------
-; Z88DK INTERFACE LIBRARY FOR THE NIRVANA ENGINE - by Einar Saukas
+; Z88DK INTERFACE LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
 ;
-; See "nirvana-.h" for further details
+; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
-; void NIRVANAM_paintC(unsigned char *attrs, unsigned int lin, unsigned int col)
+; void NIRVANA_paintC(unsigned char *attrs, unsigned int lin, unsigned int col)
 
 SECTION code_clib
 SECTION code_nirvanam

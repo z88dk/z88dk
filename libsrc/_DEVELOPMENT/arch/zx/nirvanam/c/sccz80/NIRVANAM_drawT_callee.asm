@@ -1,7 +1,7 @@
 ; ----------------------------------------------------------------
-; Z88DK INTERFACE LIBRARY FOR THE NIRVANA ENGINE - by Einar Saukas
+; Z88DK INTERFACE LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
 ;
-; See "nirvana-.h" for further details
+; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
 ; void NIRVANAM_drawT(unsigned int tile, unsigned int lin, unsigned int col)
@@ -12,7 +12,7 @@ SECTION code_nirvanam
 
 PUBLIC NIRVANAM_drawT_callee
 
-EXTERN asm_NIRVANAM_drawT
+EXTERN asm_NIRVANAM_drawT_di
 
 NIRVANAM_drawT_callee:
 
@@ -23,4 +23,4 @@ NIRVANAM_drawT_callee:
         ex (sp),hl      ; tile
         ld a,l
 
-	jp asm_NIRVANAM_drawT
+	jp asm_NIRVANAM_drawT_di

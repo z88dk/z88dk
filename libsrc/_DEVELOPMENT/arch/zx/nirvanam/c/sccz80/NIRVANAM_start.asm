@@ -1,7 +1,7 @@
 ; ----------------------------------------------------------------
-; Z88DK INTERFACE LIBRARY FOR THE NIRVANA ENGINE - by Einar Saukas
+; Z88DK INTERFACE LIBRARY FOR NIRVANA+ ENGINE - by Einar Saukas
 ;
-; See "nirvana-.h" for further details
+; See "nirvana+.h" for further details
 ; ----------------------------------------------------------------
 
 ; void NIRVANAM_start(void)

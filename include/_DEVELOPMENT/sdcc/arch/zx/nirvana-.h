@@ -8,17 +8,13 @@
 #include <intrinsic.h>
 
 /* ----------------------------------------------------------------
- * Z88DK INTERFACE LIBRARY FOR THE NIRVANA ENGINE - by Einar Saukas
+ * Z88DK INTERFACE LIBRARY FOR NIRVANA- ENGINE - by Einar Saukas
  *
  * If you use this interface library, you must load afterwards the
- * NIRVANA ENGINE and a bicolor tile set. For a detailed sample
+ * NIRVANA+ ENGINE and a bicolor tile set. For a detailed sample
  * see file "nirvanadem.c".
  * ----------------------------------------------------------------
  */
-
-#ifndef NIRVANAM_TOTAL_ROWS
-#define NIRVANAM_TOTAL_ROWS 22
-#endif
 
 // ----------------------------------------------------------------
 // Activate NIRVANA ENGINE
@@ -54,33 +50,28 @@ extern void NIRVANAM_stop(void) __preserves_regs(b,c,d,e,h,l);
 // Location of NIRVANA ISR hook
 // ----------------------------------------------------------------
 
-#ifdef __CLANG
-   static unsigned char NIRVANAM_isr[3];
-#endif
-
-#ifdef __SDCC
-   __at (57670+332*NIRVANAM_TOTAL_ROWS) static unsigned char NIRVANAM_isr[3];
-#endif
-
-#ifdef __SCCZ80
-   static unsigned char NIRVANAM_isr[3] @ (57670+332*NIRVANAM_TOTAL_ROWS);
-#endif
+extern unsigned char NIRVANAM_ISR_HOOK[3];
 
 // ----------------------------------------------------------------
 // Instantly draw tile (16x16 pixels) at specified position
 //
 // Parameters:
 //     tile: tile index (0-255)
-//     lin: pixel line (0-192, even values only)
+//     lin: pixel line (0-200, even values only)
 //     col: char column (0-30)
 //
-// WARNING: If this routine is under execution when interrupt
+// WARNING: If the *_raw routine is under execution when interrupt
 //          occurs, program may crash!!! (see NIRVANAM_halt)
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_drawT(unsigned int tile,unsigned int lin,unsigned int col);
-extern void NIRVANAM_drawT_callee(unsigned int tile,unsigned int lin,unsigned int col) __z88dk_callee;
+extern void NIRVANAM_drawT(unsigned char tile,unsigned char lin,unsigned char col);
+extern void NIRVANAM_drawT_callee(unsigned char tile,unsigned char lin,unsigned char col) __z88dk_callee;
 #define NIRVANAM_drawT(a,b,c) NIRVANAM_drawT_callee(a,b,c)
+
+
+extern void NIRVANAM_drawT_raw(unsigned char tile,unsigned char lin,unsigned char col);
+extern void NIRVANAM_drawT_raw_callee(unsigned char tile,unsigned char lin,unsigned char col) __z88dk_callee;
+#define NIRVANAM_drawT_raw(a,b,c) NIRVANAM_drawT_raw_callee(a,b,c)
 
 
 
@@ -91,16 +82,21 @@ extern void NIRVANAM_drawT_callee(unsigned int tile,unsigned int lin,unsigned in
 //
 // Parameters:
 //     attr: attribute value (0-255), INK+8*PAPER+64*BRIGHT+128*FLASH
-//     lin: pixel line (0-192, even values only)
+//     lin: pixel line (0-200, even values only)
 //     col: char column (0-30)
 //
-// WARNING: If this routine is under execution when interrupt
+// WARNING: If the *_raw routine is under execution when interrupt
 //          occurs, program may crash!!! (see NIRVANAhalt)
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_fillT(unsigned int attr,unsigned int lin,unsigned int col);
-extern void NIRVANAM_fillT_callee(unsigned int attr,unsigned int lin,unsigned int col) __z88dk_callee;
+extern void NIRVANAM_fillT(unsigned char attr,unsigned char lin,unsigned char col);
+extern void NIRVANAM_fillT_callee(unsigned char attr,unsigned char lin,unsigned char col) __z88dk_callee;
 #define NIRVANAM_fillT(a,b,c) NIRVANAM_fillT_callee(a,b,c)
+
+
+extern void NIRVANAM_fillT_raw(unsigned char attr,unsigned char lin,unsigned char col);
+extern void NIRVANAM_fillT_raw_callee(unsigned char attr,unsigned char lin,unsigned char col) __z88dk_callee;
+#define NIRVANAM_fillT_raw(a,b,c) NIRVANAM_fillT_raw_callee(a,b,c)
 
 
 
@@ -111,12 +107,12 @@ extern void NIRVANAM_fillT_callee(unsigned int attr,unsigned int lin,unsigned in
 // Parameters:
 //     ch: character code (0-255)
 //     attrs: attributes address
-//     lin: pixel line (16-184, even values only)
-//     col: char column (1-30)
+//     lin: pixel line (16-192, even values only)
+//     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_printC(unsigned int ch,unsigned char *attrs,unsigned int lin,unsigned int col);
-extern void NIRVANAM_printC_callee(unsigned int ch,unsigned char *attrs,unsigned int lin,unsigned int col) __z88dk_callee;
+extern void NIRVANAM_printC(unsigned char ch,void *attrs,unsigned char lin,unsigned char col);
+extern void NIRVANAM_printC_callee(unsigned char ch,void *attrs,unsigned char lin,unsigned char col) __z88dk_callee;
 #define NIRVANAM_printC(a,b,c,d) NIRVANAM_printC_callee(a,b,c,d)
 
 
@@ -127,13 +123,28 @@ extern void NIRVANAM_printC_callee(unsigned int ch,unsigned char *attrs,unsigned
 //
 // Parameters:
 //     attrs: attributes address
-//     lin: pixel line (16-184, even values only)
-//     col: char column (1-30)
+//     lin: pixel line (16-192, even values only)
+//     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_paintC(unsigned char *attrs,unsigned int lin,unsigned int col);
-extern void NIRVANAM_paintC_callee(unsigned char *attrs,unsigned int lin,unsigned int col) __z88dk_callee;
+extern void NIRVANAM_paintC(void *attrs,unsigned char lin,unsigned char col);
+extern void NIRVANAM_paintC_callee(void *attrs,unsigned char lin,unsigned char col) __z88dk_callee;
 #define NIRVANAM_paintC(a,b,c) NIRVANAM_paintC_callee(a,b,c)
+
+
+
+// -----------------------------------------------------------------------------
+// Retrieve a sequence of 4 attribute values from specified 8x8 block
+//
+// Parameters:
+//     attrs: destination for read sequence
+//     lin: pixel line (16-192, even values only)
+//     col: char column (0-31)
+// -----------------------------------------------------------------------------
+
+extern void NIRVANAM_readC(void *attrs,unsigned char lin,unsigned char col);
+extern void NIRVANAM_readC_callee(void *attrs,unsigned char lin,unsigned char col) __z88dk_callee;
+#define NIRVANAM_readC(a,b,c) NIRVANAM_readC_callee(a,b,c)
 
 
 
@@ -144,12 +155,12 @@ extern void NIRVANAM_paintC_callee(unsigned char *attrs,unsigned int lin,unsigne
 //
 // Parameters:
 //     attr: attribute value (0-255), INK+8*PAPER+64*BRIGHT+128*FLASH
-//     lin: pixel line (16-184, even values only)
-//     col: char column (1-30)
+//     lin: pixel line (16-192, even values only)
+//     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_fillC(unsigned int attr,unsigned int lin,unsigned int col) __preserves_regs(b);
-extern void NIRVANAM_fillC_callee(unsigned int attr,unsigned int lin,unsigned int col) __z88dk_callee;
+extern void NIRVANAM_fillC(unsigned char attr,unsigned char lin,unsigned char col) __preserves_regs(b);
+extern void NIRVANAM_fillC_callee(unsigned char attr,unsigned char lin,unsigned char col) __preserves_regs(b) __z88dk_callee;
 #define NIRVANAM_fillC(a,b,c) NIRVANAM_fillC_callee(a,b,c)
 
 
@@ -170,38 +181,69 @@ extern void NIRVANAM_fillC_callee(unsigned int attr,unsigned int lin,unsigned in
 // Parameters:
 //     sprite: sprite number (0-7)
 //     tile: tile index (0-255)
-//     lin: pixel line (0-192, even values only)
+//     lin: pixel line (0-200, even values only)
 //     col: char column (0-30)
 //
 // WARNING: If this routine is under execution when interrupt occurs,
 //          a sprite (containing partially updated information) may
 //          be displayed at an incorrect location on screen (see
-//          NIRVANAhalt).
+//          NIRVANAhalt)
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_spriteT(unsigned int sprite,unsigned int tile,unsigned int lin,unsigned int col);
-extern void NIRVANAM_spriteT_callee(unsigned int sprite,unsigned int tile,unsigned int lin,unsigned int col) __z88dk_callee;
+extern void NIRVANAM_spriteT(unsigned char sprite,unsigned char tile,unsigned char lin,unsigned char col);
+extern void NIRVANAM_spriteT_callee(unsigned char sprite,unsigned char tile,unsigned char lin,unsigned char col) __z88dk_callee;
 #define NIRVANAM_spriteT(a,b,c,d) NIRVANAM_spriteT_callee(a,b,c,d)
 
 
 
-// ----------------------------------------------------------------
+// -----------------------------------------------------------------------
 // Instantly draw wide tile (24x16 pixels) at specified position
 //
 // Parameters:
 //     tile: wide tile index (0-255)
-//     lin: pixel line (0-192, even values only)
-//     col: char column (1-28)
+//     lin: pixel line (0-200, even values only)
+//     col: char column (0-29)
 //
-// WARNING: If this routine is under execution when interrupt
+// WARNING: If the *_raw routine is under execution when interrupt
 //          occurs, program may crash!!! (see NIRVANAhalt)
 //
-// WARNING: Only use this routine if NIRVANAM_drawW was enabled!!!
-// ----------------------------------------------------------------
+// WARNING: This routine is only available if NIRVANA_drawW was enabled!!!
+// -----------------------------------------------------------------------
 
-extern void NIRVANAM_drawW(unsigned int tile,unsigned int lin,unsigned int col);
-extern void NIRVANAM_drawW_callee(unsigned int tile,unsigned int lin,unsigned int col) __z88dk_callee;
+extern void NIRVANAM_drawW(unsigned char tile,unsigned char lin,unsigned char col);
+extern void NIRVANAM_drawW_callee(unsigned char tile,unsigned char lin,unsigned char col) __z88dk_callee;
 #define NIRVANAM_drawW(a,b,c) NIRVANAM_drawW_callee(a,b,c)
+
+
+extern void NIRVANAM_drawW_raw(unsigned char tile,unsigned char lin,unsigned char col);
+extern void NIRVANAM_drawW_raw_callee(unsigned char tile,unsigned char lin,unsigned char col) __z88dk_callee;
+#define NIRVANAM_drawW_raw(a,b,c) NIRVANAM_drawW_raw_callee(a,b,c)
+
+
+
+// ----------------------------------------------------------------------------------
+// Executes NIRVANA_drawT for wide sprites but takes as long as NIRVANA_drawW.
+// This way each wide sprite can freely switch between both without affecting timing.
+// ----------------------------------------------------------------------------------
+// Parameters:
+//     tile: tile index (0-255)
+//     lin: pixel line (0-200, even values only)
+//     col: char column (0-30)
+//
+// WARNING: If *_raw routine is under execution when interrupt
+//          occurs, program may crash!!! (see NIRVANAM_halt)
+//
+// WARNING: This routine is only available if NIRVANA_drawW was enabled!!!
+// ----------------------------------------------------------------------------------
+
+extern void NIRVANAM_drawTW(unsigned char tile,unsigned char lin,unsigned char col);
+extern void NIRVANAM_drawTW_callee(unsigned char tile,unsigned char lin,unsigned char col) __z88dk_callee;
+#define NIRVANAM_drawTW(a,b,c) NIRVANAM_drawTW_callee(a,b,c)
+
+
+extern void NIRVANAM_drawTW_raw(unsigned char tile,unsigned char lin,unsigned char col);
+extern void NIRVANAM_drawTW_raw_callee(unsigned char tile,unsigned char lin,unsigned char col) __z88dk_callee;
+#define NIRVANAM_drawTW_raw(a,b,c) NIRVANAM_drawTW_raw_callee(a,b,c)
 
 
 
@@ -213,11 +255,8 @@ extern void NIRVANAM_drawW_callee(unsigned int tile,unsigned int lin,unsigned in
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_tiles(unsigned char *addr) __preserves_regs(b,c,d,e);
-extern void NIRVANAM_tiles_fastcall(unsigned char *addr) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
-#define NIRVANAM_tiles(a) NIRVANAM_tiles_fastcall(a)
-
-
+extern unsigned char NIRVANAM_TILE_IMAGES[];
+#define NIRVANAM_tiles(addr) intrinsic_store16(_NIRVANAM_TILE_IMAGES,addr)
 
 // ----------------------------------------------------------------
 // Reconfigure NIRVANA ENGINE to read wide bicolor tiles (24x16
@@ -226,14 +265,11 @@ extern void NIRVANAM_tiles_fastcall(unsigned char *addr) __preserves_regs(a,b,c,
 // Parameters:
 //     addr: New wide tile images address
 //
-// WARNING: Only use this routine if NIRVANAP_drawW was enabled!!!
+// WARNING: Only use this routine if NIRVANAM_drawW was enabled!!!
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_wides(unsigned char *addr) __preserves_regs(b,c,d,e);
-extern void NIRVANAM_wides_fastcall(unsigned char *addr) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
-#define NIRVANAM_wides(a) NIRVANAM_wides_fastcall(a)
-
-
+extern unsigned char NIRVANAM_WIDE_IMAGES[];
+#define NIRVANAM_wides(addr) intrinsic_store16(_NIRVANAM_WIDE_IMAGES,addr)
 
 // ----------------------------------------------------------------
 // Reconfigure NIRVANA ENGINE to read character table from another
@@ -244,11 +280,8 @@ extern void NIRVANAM_wides_fastcall(unsigned char *addr) __preserves_regs(a,b,c,
 //     addr: New character table address
 // ----------------------------------------------------------------
 
-extern void NIRVANAM_chars(unsigned char *addr) __preserves_regs(b,c,d,e);
-extern void NIRVANAM_chars_fastcall(unsigned char *addr) __preserves_regs(a,b,c,d,e) __z88dk_fastcall;
-#define NIRVANAM_chars(a) NIRVANAM_chars_fastcall(a)
-
-
+extern unsigned char NIRVANAM_CHAR_TABLE[];
+#define NIRVANAM_chars(addr) intrinsic_store16(_NIRVANAM_CHAR_TABLE,addr)
 
 // ----------------------------------------------------------------
 // Advanced conversions

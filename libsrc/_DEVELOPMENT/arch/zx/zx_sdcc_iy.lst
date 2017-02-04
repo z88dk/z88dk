@@ -4,5 +4,5 @@
 @arch/zx/display/display_sdcc_iy.lst
 @arch/zx/graphics/graphics_sdcc_iy.lst
 @arch/zx/misc/misc_sdcc_iy.lst
-@arch/zx/nirvanam/nirvanam_sdcc.lst
+@arch/zx/nirvanam/nirvanam_sdcc_iy.lst
 @arch/zx/nirvanap/nirvanap_sdcc_iy.lst
