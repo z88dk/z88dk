@@ -110,6 +110,22 @@ F.A.Q.
   interrupt (as long as NIRVANA is active). In this case, all registers will be
   automatically preserved for you.
 
+  In practice, you could use this code to start playing an AY music:
+
+        halt
+        call    ay_start                ; start AY player
+        ld      hl, ay_play
+        ld      (64975),hl              ; set play address
+        ld      a, $cd                  ; instruction "CALL"
+        ld      (64974), a              ; play automatically every interrupt
+
+  And this code to stop playing the AY music:
+
+        halt
+        ld      a,$21                   ; instruction "LD HL"
+        ld      (64974),a               ; disable playing automatically
+        call    ay_stop                 ; stop AY player
+
 
   -------------------------------------------
 * HOW TO DO SOMETHING ELSE DURING TOP BORDER?
@@ -133,28 +149,22 @@ F.A.Q.
   sideways. This routine will (probably) be less frequently used, so it's
   disabled by default to save memory. If you would like to use it, you must
   recompile NIRVANA source code declaring 'ENABLE_WIDE_DRAW' at the beginning
-  of the file, then it will occupy addresses 56463 to 56700. Also if you declare
-  both 'ENABLE_WIDE_DRAW' and 'ENABLE_WIDE_SPRITE' before compiling it, then
-  "NIRVANA_spriteT" will automatically draw wide tile sprites (24x16 pixels)
-  instead of regular tile sprites (24x16 pixels), although in this case you will
-  only have 6 sprites instead of 8.
+  of the file, then it will occupy addresses 56463 to 56700.
+
+  Moreover, if you declare both 'ENABLE_WIDE_DRAW' and 'ENABLE_WIDE_SPRITE'
+  before compiling NIRVANA, then it will occupy 13 more bytes (starting at
+  address 56450), and "NIRVANA_spriteT" will automatically draw wide tile
+  sprites (24x16 pixels) instead of regular tile sprites (24x16 pixels),
+  although in this case you will only have 6 sprites instead of 8.
 
   After enabling wide sprites, you could even reconfigure separately each
-  individual sprite for drawing either a regular or wide tile. In this case, you
-  must first compile this short routine below (13 bytes) to a free address with
-  lower byte $8f (for instance $da8f) as follows:
+  individual sprite for drawing either a regular or wide tile:
+  
+  * Use "POKE 57579+sprite*8,130+(4 AND sprite<>0)" to reconfigure any specific
+    sprite to draw a regular tile
 
-    org $da8f
-    ld bc,(0)       ; delay 20T in 4 bytes
-    add hl,hl       ; delay 11T
-    ld bc,$2c00     ; delay 10T
-loop:
-    djnz loop       ; delay 567T
-    jp 57299        ; execute NIRVANA_drawT with delay 10T
-
-  Afterwards, use "POKE 57580+((sprite)<<3),$da" to reconfigure any specific
-  sprite to draw a regular tile, or "POKE 57580+((sprite)<<3),$dc" to make it
-  draw a wide tile again.
+  * Use "POKE 57579+sprite*8,143+(4 AND sprite<>0)" to make this sprite draw a 
+    wide tile again
 
 
   ---------------------------------------------------
