@@ -15,13 +15,13 @@ ${jobs}: job-%:
 	-@cp target/$(target)/clib_cfg.asm  . 2> /dev/null
 	-@cp target/$(target)/clib_target_cfg.asm . 2> /dev/null
 	@if [ "$(target)" = "zx" ]; then \
-		zcc +zx -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
-		zcc +zx -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
+		zcc +embedded -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
+		zcc +embedded -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 		zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
-		zcc +zx -vn -m4 arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4; \
-		zcc +zx -vn -m4 arch/zx/nirvanam/z80/asm_NIRVANAM.asm.m4; \
-		zcc +zx -vn -m4 arch/zx/nirvanap/z80/asm_NIRVANAP.asm.m4; \
+		zcc +embedded -vn -m4 arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4; \
+		zcc +embedded -vn -m4 arch/zx/nirvanam/z80/asm_NIRVANAM.asm.m4; \
+		zcc +embedded -vn -m4 arch/zx/nirvanap/z80/asm_NIRVANAP.asm.m4; \
 	fi;
 	z80asm -xlib/sccz80/$(target) @target/$(target)/library/$(target)_sccz80.lst
 	z80asm -xlib/sdcc_ix/$(target) -D__SDCC -D__SDCC_IX @target/$(target)/library/$(target)_sdcc_ix.lst
