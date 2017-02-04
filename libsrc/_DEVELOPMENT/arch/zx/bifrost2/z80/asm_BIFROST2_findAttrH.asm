@@ -4,8 +4,6 @@
 ; See "bifrost2.h" for further details
 ; ----------------------------------------------------------------
 
-; INCLUDED IN C INTERFACE DO NOT ADD TO LIST FILE
-
 SECTION code_clib
 SECTION code_bifrost2
 
@@ -13,8 +11,8 @@ PUBLIC asm_BIFROST2_findAttrH
 
 asm_BIFROST2_findAttrH:
 
-; HL=lin
-; BC=col
+; L=lin
+; C=col
 
         ld h,102        ; HL=lookup/2+lin
         add hl,hl       ; HL=lookup+2*lin

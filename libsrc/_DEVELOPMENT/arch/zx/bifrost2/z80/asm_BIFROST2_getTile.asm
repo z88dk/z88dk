@@ -4,8 +4,6 @@
 ; See "bifrost2.h" for further details
 ; ----------------------------------------------------------------
 
-; INCLUDED IN C INTERFACE DO NOT ADD TO LIST FILE
-
 SECTION code_clib
 SECTION code_bifrost2
 
@@ -16,7 +14,7 @@ EXTERN _BIFROST2_tilemap
 asm_BIFROST2_getTile:
 
 ; L=px
-; BC=py
+; C=py
         ld a,l          ; A=px
         add a,a         ; A=px*2
         add a,a         ; A=px*4
@@ -27,5 +25,5 @@ asm_BIFROST2_getTile:
         ld l,a
         ld h,_BIFROST2_tilemap/256
         ld l,(hl)
-        ld h,b
+        ld h,0
         ret

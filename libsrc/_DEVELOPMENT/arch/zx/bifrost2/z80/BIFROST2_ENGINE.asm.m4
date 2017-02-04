@@ -128,7 +128,7 @@ reset_lin:
 ; -----------------------------------------------------------------------------
 
 PUBLIC asm_BIFROST2_showTilePosH
-PUBLIC _BIFROST2_TILE_MAP
+PUBLIC _BIFROST2_tilemap
 
 asm_BIFROST2_showTilePosH:
 show_tile_pos:
@@ -140,7 +140,7 @@ show_tile_pos:
         sub     19                      ; A = 10*(lin/8)-20+(col+1)
         rra                             ; A = 10*(lin/16)-10+(col+1)/2
         ld      l, a
-defc _BIFROST2_TILE_MAP = __BIFROST2_TILE_MAP
+defc _BIFROST2_tilemap = __BIFROST2_TILE_MAP
         ld      h, __BIFROST2_TILE_MAP/256   ; HL = TILEMAP+10*(lin/16)-10+(col-1)/2
 
 get_tile:
@@ -326,7 +326,7 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+30
         defw      race_raster+(ROWREPT*333)+73
         defw      race_raster+(ROWREPT*333)+122
-IF SPECMODEL=3
+IFDEF PLUS3
         defw      race_raster+(ROWREPT*333)+164
 ELSE
         defw      race_raster+(ROWREPT*333)+86
@@ -376,7 +376,7 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+34
         defw      race_raster+(ROWREPT*333)+79
         defw      race_raster+(ROWREPT*333)+128
-IF SPECMODEL=3
+IFDEF PLUS3
         defw      race_raster+(ROWREPT*333)+83
 ELSE
         defw      race_raster+(ROWREPT*333)+170
@@ -495,7 +495,7 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+52
         defw      race_raster+(ROWREPT*333)+92
         defw      race_raster+(ROWREPT*333)+137
-IF SPECMODEL=3
+IFDEF PLUS3
         defw      race_raster+(ROWREPT*333)+174
 ELSE
         defw      race_raster+(ROWREPT*333)+164
@@ -522,7 +522,7 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+55
         defw      race_raster+(ROWREPT*333)+95
         defw      race_raster+(ROWREPT*333)+140
-IF SPECMODEL=3
+IFDEF PLUS3
         defw      race_raster+(ROWREPT*333)+177
 ELSE
         defw      race_raster+(ROWREPT*333)+175
@@ -549,7 +549,7 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+23
         defw      race_raster+(ROWREPT*333)+98
         defw      race_raster+(ROWREPT*333)+143
-IF SPECMODEL=3
+IFDEF PLUS3
         defw      race_raster+(ROWREPT*333)+180
 ELSE
         defw      race_raster+(ROWREPT*333)+178
@@ -646,7 +646,7 @@ ENDIF
 IF ROWREPT>17
 ; additional delay to synchronize with raster beam
 IF ROWREPT=18
-IF SPECMODEL=3
+IFDEF PLUS3
         ld      b, 36
 ELSE
         ld      b, 32
@@ -654,7 +654,7 @@ ENDIF
         djnz    ASMPC
 ELSE
 IF ROWREPT=21
-IF SPECMODEL=3
+IFDEF PLUS3
         ld      b, a
         inc     b
 ELSE
@@ -712,13 +712,13 @@ z88dk_for(`ROWREPT', `0', eval(__BIFROST2_TOTAL_ROWS-1),
         ld      hl, 0                           ; columns 1 and 2 (3)           #073
         ld      de, 0                           ; columns 3 and 4 (3)           #076
         ld      bc, 0                           ; columns 5 and 6 (3)           #079
-IF SPECMODEL=3
+IFDEF PLUS3
         ld      iy, 0                           ; columns 5 and 6 (5)           #083 (*)
 ENDIF
         push    bc                              ; columns 5 and 6
         push    de                              ; columns 3 and 4
         push    hl                              ; columns 1 and 2
-IF SPECMODEL=3
+IFDEF PLUS3
 ELSE
         ld      iy, 0                           ; columns 1 and 2 (5)           #086 (*)
 ENDIF
@@ -765,7 +765,7 @@ ENDIF
         ld      de, 0                           ; columns 11 and 12 (5)         #157
         ld      bc, 0                           ; columns 13 and 14 (5)         #160
         exx
-IF SPECMODEL=3
+IFDEF PLUS3
         ld      hl, 0                           ; columns 1 and 2 (5)           #164 (*)
         ld      de, 0                           ; columns 3 and 4 (5)           #167 (*)
         push    iy                              ; (*) columns 5 and 6
@@ -985,7 +985,7 @@ z88dk_for(`LOOP', `1', `16',
 ; -----------------------------------------------------------------------------
 ; Jump vector table at addresses $fe00-$ff00
 ; -----------------------------------------------------------------------------
-IFNDEF STRIP_VECTOR
+IFNDEF STRIPVECTOR
         defs 257, 0xfd
 ELSE
         defb    $fd
