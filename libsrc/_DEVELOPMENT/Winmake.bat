@@ -43,6 +43,7 @@ for %%t in (%targets%) do (
       copy /Y target\%%t\clib_target_cfg.asm . 1> nul
 
       if "%%t" == "zx" (
+         zcc +zx -vn -m4 arch/zx/nirvanam/z80/asm_NIRVANAM.asm.m4
          zcc +zx -vn -m4 arch/zx/nirvanap/z80/asm_NIRVANAP.asm.m4
       )
 
