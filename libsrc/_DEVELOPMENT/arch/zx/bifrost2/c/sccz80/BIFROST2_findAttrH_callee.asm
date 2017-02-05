@@ -12,10 +12,12 @@ SECTION code_bifrost2
 
 PUBLIC BIFROST2_findAttrH_callee
 
+EXTERN asm_BIFROST2_findAttrH
+
 BIFROST2_findAttrH_callee:
 
         pop hl          ; RET address
         pop bc          ; BC=col
         ex (sp),hl      ; HL=lin
 
-        INCLUDE "arch/zx/bifrost2/z80/asm_BIFROST2_findAttrH.asm"
+        jp asm_BIFROST2_findAttrH

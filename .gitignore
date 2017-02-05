@@ -51,3 +51,11 @@ win32/.vs/
 win32/z88dk.VC.VC.opendb
 libsrc/_DEVELOPMENT/arch/zx/nirvanap/z80/asm_NIRVANAP.asm
 libsrc/_DEVELOPMENT/arch/zx/nirvanam/z80/asm_NIRVANAM.asm
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_48.bin.zx7
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_48.def
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_p3.bin.zx7
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_p3.def

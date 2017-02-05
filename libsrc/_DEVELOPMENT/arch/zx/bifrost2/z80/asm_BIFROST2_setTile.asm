@@ -4,8 +4,6 @@
 ; See "bifrost2.h" for further details
 ; ----------------------------------------------------------------
 
-; INCLUDED IN C INTERFACE DO NOT ADD TO LIST FILE
-
 SECTION code_clib
 SECTION code_bifrost2
 

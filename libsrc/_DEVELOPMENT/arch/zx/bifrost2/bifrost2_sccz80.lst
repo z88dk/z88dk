@@ -11,9 +11,9 @@ arch/zx/bifrost2/c/sccz80/BIFROST2_getTile_callee
 arch/zx/bifrost2/c/sccz80/BIFROST2_install
 arch/zx/bifrost2/c/sccz80/BIFROST2_resetAnim2Frames
 arch/zx/bifrost2/c/sccz80/BIFROST2_resetAnim4Frames
-arch/zx/bifrost2/c/sccz80/BIFROST2_resetTileImages
 arch/zx/bifrost2/c/sccz80/BIFROST2_setTile
 arch/zx/bifrost2/c/sccz80/BIFROST2_setTile_callee
+arch/zx/bifrost2/c/sccz80/BIFROST2_showNext2Tiles
 arch/zx/bifrost2/c/sccz80/BIFROST2_showNextTile
 arch/zx/bifrost2/c/sccz80/BIFROST2_showTilePosH
 arch/zx/bifrost2/c/sccz80/BIFROST2_showTilePosH_callee

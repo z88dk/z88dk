@@ -12,6 +12,8 @@ SECTION code_bifrost2
 
 PUBLIC BIFROST2_setTile_callee
 
+EXTERN asm_BIFROST2_setTile
+
 BIFROST2_setTile_callee:
 
         pop hl          ; RET address
@@ -19,4 +21,4 @@ BIFROST2_setTile_callee:
         pop bc          ; C=py
         ex (sp),hl      ; L=px
 
-        INCLUDE "arch/zx/bifrost2/z80/asm_BIFROST2_setTile.asm"
+        jp asm_BIFROST2_setTile

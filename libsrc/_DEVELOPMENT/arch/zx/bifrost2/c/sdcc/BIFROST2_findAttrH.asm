@@ -4,7 +4,7 @@
 ; See "bifrost2.h" for further details
 ; ----------------------------------------------------------------
 
-; unsigned char *BIFROST2_findAttrH(unsigned int lin,unsigned int col)
+; unsigned char *BIFROST2_findAttrH(unsigned char lin,unsigned char col)
 
 SECTION code_clib
 SECTION code_bifrost2
@@ -15,14 +15,10 @@ EXTERN asm_BIFROST2_findAttrH
 
 _BIFROST2_findAttrH:
 
-   	ld hl,2
-   	ld b,h
-   	ld d,h
-   	add hl,sp
-   	ld e,(hl)       ; DE=lin
-   	inc hl
-   	inc hl
-  	ld c,(hl)       ; BC=col
-  	ex de,hl        ; HL=lin
-
-   	jp asm_BIFROST2_findAttrH
+   ld hl,3
+	add hl,sp
+	ld c,(hl)        ; C = col
+	dec hl
+	ld l,(hl)        ; L = lin
+	
+	jp asm_BIFROST2_findAttrH

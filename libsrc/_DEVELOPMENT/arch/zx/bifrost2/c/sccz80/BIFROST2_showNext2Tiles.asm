@@ -4,13 +4,13 @@
 ; See "bifrost2.h" for further details
 ; ----------------------------------------------------------------
 
+; void BIFROST2_showNext2Tiles(void)
+
 SECTION code_clib
 SECTION code_bifrost2
 
-PUBLIC asm_BIFROST2_drawTileH
+PUBLIC BIFROST2_showNext2Tiles
 
-defc asm_BIFROST2_drawTileH = 51714
+EXTERN asm_BIFROST2_showNext2Tiles
 
-   ; a = tile
-   ; e = col
-   ; d = lin
+defc BIFROST2_showNext2Tiles = asm_BIFROST2_showNext2Tiles
