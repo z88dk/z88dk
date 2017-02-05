@@ -21,4 +21,4 @@ BIFROST2_setTile_callee:
         pop bc          ; C=py
         ex (sp),hl      ; L=px
 
-        jp sm_BIFROST2_setTile.asm
+        jp asm_BIFROST2_setTile
