@@ -79,7 +79,7 @@ extern void BIFROST2_stop(void) __preserves_regs(b,c,d,e,h,l);
 // ----------------------------------------------------------------
 
 extern void BIFROST2_setTile(unsigned char px,unsigned char py,unsigned char tile) __preserves_regs(b,d);
-extern void BIFROST2_setTile_callee(unsigned char px,unsigned char py,unsigned char tile) __preserves_regs(b,d) __z88dk_callee;
+extern void BIFROST2_setTile_callee(unsigned char px,unsigned char py,unsigned char tile) __preserves_regs(b) __z88dk_callee;
 #define BIFROST2_setTile(a,b,c) BIFROST2_setTile_callee(a,b,c)
 
 
@@ -117,7 +117,7 @@ extern unsigned char BIFROST2_getTile_callee(unsigned char px,unsigned char py) 
 //     Animation group for animated tile, otherwise the same tile index
 // ----------------------------------------------------------------
 
-extern unsigned char BIFROST2_getAnimGroup(unsigned char tile) __preserves_regs(b,c,d,e,h);
+extern unsigned char BIFROST2_getAnimGroup(unsigned char tile) __preserves_regs(b,c,d,e);
 extern unsigned char BIFROST2_getAnimGroup_fastcall(unsigned char tile) __preserves_regs(b,c,d,e,h) __z88dk_fastcall;
 #define BIFROST2_getAnimGroup(a) BIFROST2_getAnimGroup_fastcall(a)
 

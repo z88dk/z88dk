@@ -73,7 +73,7 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROST2_stop,void)
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-__DPROTO(`b,d',`b,d',void,,BIFROST2_setTile,unsigned char px, unsigned char py, unsigned char tile)
+__DPROTO(`b',`b,d',void,,BIFROST2_setTile,unsigned char px, unsigned char py, unsigned char tile)
 
 #define M_BIFROST2_SETTILE(px, py, tile)  BIFROST2_tilemap[(px)*10+(py)] = (tile)
 
@@ -104,7 +104,7 @@ __DPROTO(`b,d,e',`b,d,e',unsigned char,,BIFROST2_getTile,unsigned char px,unsign
 //     Animation group for animated tile, otherwise the same tile index
 // ----------------------------------------------------------------
 
-__DPROTO(`b,c,d,e,h',`b,c,d,e,h',unsigned char,,BIFROST2_getAnimGroup,unsigned char tile)
+__DPROTO(`b,c,d,e,h',`b,c,d,e',unsigned char,,BIFROST2_getAnimGroup,unsigned char tile)
 
 // ----------------------------------------------------------------
 // Locate memory address that stores the multicolor attribute of a
