@@ -4,7 +4,7 @@
 ; See "bifrost2.h" for further details
 ; ----------------------------------------------------------------
 
-; void BIFROST2_fillTileAttrH(unsigned int lin,unsigned int col,unsigned int attr)
+; void BIFROST2_fillTileAttrH(unsigned char lin,unsigned char col,unsigned char attr)
 
 SECTION code_clib
 SECTION code_bifrost2
@@ -19,9 +19,7 @@ _BIFROST2_fillTileAttrH:
    	add hl,sp
    	ld d,(hl)       ; D=lin
    	inc hl
-   	inc hl
    	ld e,(hl)       ; E=col
-   	inc hl
    	inc hl
    	ld c,(hl)       ; C=attrib
 

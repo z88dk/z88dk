@@ -4,7 +4,7 @@
 ; See "bifrost2.h" for further details
 ; ----------------------------------------------------------------
 
-; unsigned char BIFROST2_getAnimGroup(unsigned int tile)
+; unsigned char BIFROST2_getAnimGroup(unsigned char tile)
 ; fastcall
 
 SECTION code_clib

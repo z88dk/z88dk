@@ -4,7 +4,7 @@
 ; See "bifrost2.h" for further details
 ; ----------------------------------------------------------------
 
-; void BIFROST2_drawTileH(unsigned int lin,unsigned int col,unsigned int tile)
+; void BIFROST2_drawTileH(unsigned char lin,unsigned char col,unsigned char tile)
 ; callee
 
 SECTION code_clib
@@ -16,11 +16,11 @@ EXTERN asm_BIFROST2_drawTileH
 
 _BIFROST2_drawTileH_callee:
 
-        pop hl          ; RET address
-        pop bc          ; C=lin
-        pop de          ; E=col
-        ld d,c          ; D=lin
-        ex (sp),hl      ; L=tile
-        ld a,l          ; A=tile
+   pop hl
+	dec sp
+	pop de          ; D = lin
+	ex (sp),hl
+	ld e,l          ; E = col
+	ld a,h          ; A = tile
 
-        jp asm_BIFROST2_drawTileH        ; execute 'draw_tile'
+   jp asm_BIFROST2_drawTileH
