@@ -1,7 +1,7 @@
 include(`z88dk.m4')
 include(`clib_target_cfg.asm')
 
-SECTION NIRVANAM
+SECTION BIFROST2
 org 51625
 
 PUBLIC asm_BIFROST2_start
@@ -13,12 +13,12 @@ PUBLIC asm_BIFROST2_drawTileH
 PUBLIC _BIFROST2_TILE_IMAGES
 PUBLIC _BIFROST2_ISR_HOOK
 PUBLIC asm_BIFROST2_fillTileAttrH
-PUBLIC _BIFROST2_TILE_MAP
+PUBLIC _BIFROST2_tilemap
 
 INCLUDE "bifrost2_engine_48.def"
 
 ; issue #53 on github, delete this define once fixed
-defc _BIFROST2_TILE_MAP = __BIFROST2_TILE_MAP
+defc _BIFROST2_tilemap = __BIFROST2_TILE_MAP
 
 defc DELAY_ADDR = 56541+(__BIFROST2_TOTAL_ROWS*43)-((__BIFROST2_TOTAL_ROWS/22)*10)
 
