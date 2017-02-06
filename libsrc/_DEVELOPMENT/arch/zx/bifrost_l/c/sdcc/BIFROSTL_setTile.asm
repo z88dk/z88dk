@@ -4,7 +4,7 @@
 ; See "bifrost_l.h" for further details
 ; ----------------------------------------------------------------
 
-; void BIFROSTL_setTile(unsigned int px, unsigned int py, unsigned int tile)
+; void BIFROSTL_setTile(unsigned char px, unsigned char py, unsigned char tile)
 
 SECTION code_clib
 SECTION code_bifrost_l
@@ -15,14 +15,12 @@ EXTERN asm_BIFROSTL_setTile
 
 _BIFROSTL_setTile:
 
-   	ld hl,2
-   	add hl,sp
-   	ld l,(hl)       ; L=px
-   	inc hl
-   	inc hl
-   	ld c,(hl)       ; C=py
-   	inc hl
-   	inc hl
-   	ld e,(hl)       ; E=tile
-
-   	jp asm_BIFROSTL_setTile
+   ld hl,4
+	add hl,sp
+	ld e,(hl)       ; E = tile
+	dec hl
+	ld c,(hl)       ; C = py
+	dec hl
+	ld l,(hl)       ; L = px
+	
+	jp asm_BIFROSTL_setTile

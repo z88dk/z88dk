@@ -14,6 +14,6 @@ asm_BIFROSTL_resetAnim4Frames:
         halt
         ld a,15
         ld (58780),a
-        ld hl,64+256*7
+        ld hl,64+(256*7)
         ld (58782),hl
         ret

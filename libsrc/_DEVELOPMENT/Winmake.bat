@@ -48,8 +48,9 @@ for %%t in (%targets%) do (
          zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
          zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
          zcc +embedded -vn -m4 arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4
-         zcc +embedded -vn -m4 arch/zx/nirvanam/z80/asm_NIRVANAM.asm.m4
-         zcc +embedded -vn -m4 arch/zx/nirvanap/z80/asm_NIRVANAP.asm.m4
+         zcc +embedded -vn -m4 arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm.m4
+         zcc +embedded -vn -m4 arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm.m4
+         zcc +embedded -vn -m4 arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm.m4
       )
 
       echo   %%t_sccz80.lib

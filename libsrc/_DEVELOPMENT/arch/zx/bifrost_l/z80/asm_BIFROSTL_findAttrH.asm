@@ -13,8 +13,10 @@ PUBLIC asm_BIFROSTL_findAttrH
 
 asm_BIFROSTL_findAttrH:
 
-; DE=lin
-; BC=col
+; E=lin
+; C=col
+        ld d,0
+		  ld b,d
         ld hl,$e540     ; reference 'deltas' inside BIFROST*
         add hl,bc
         ld c,(hl)       ; BC=delta

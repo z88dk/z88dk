@@ -11,8 +11,6 @@ arch/zx/bifrost_l/c/sdcc/BIFROSTL_getTile
 arch/zx/bifrost_l/c/sdcc/BIFROSTL_getTile_callee
 arch/zx/bifrost_l/c/sdcc/BIFROSTL_resetAnim2Frames
 arch/zx/bifrost_l/c/sdcc/BIFROSTL_resetAnim4Frames
-arch/zx/bifrost_l/c/sdcc/BIFROSTL_resetTileImages
-arch/zx/bifrost_l/c/sdcc/BIFROSTL_resetTileImages_fastcall
 arch/zx/bifrost_l/c/sdcc/BIFROSTL_setTile
 arch/zx/bifrost_l/c/sdcc/BIFROSTL_setTile_callee
 arch/zx/bifrost_l/c/sdcc/BIFROSTL_showNextTile

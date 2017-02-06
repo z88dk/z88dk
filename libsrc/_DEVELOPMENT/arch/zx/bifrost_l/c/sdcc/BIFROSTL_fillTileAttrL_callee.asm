@@ -4,7 +4,7 @@
 ; See "bifrost_l.h" for further details
 ; ----------------------------------------------------------------
 
-; void BIFROSTL_fillTileAttrL(unsigned int row, unsigned int col, unsigned int attr)
+; void BIFROSTL_fillTileAttrL(unsigned char row, unsigned char col, unsigned char attr)
 ; callee
 
 SECTION code_clib
@@ -16,11 +16,13 @@ EXTERN asm_BIFROSTL_fillTileAttrL
 
 _BIFROSTL_fillTileAttrL_callee:
 
-        pop hl          ; RET address
-        pop bc          ; C=row
-        pop de          ; E=col
-        ld d,c          ; D=row
-        pop bc          ; C=attrib
-        push hl           
-
-        jp asm_BIFROSTL_fillTileAttrL        ; execute 'fill_tile_attr'
+   pop de
+	pop hl
+	dec sp
+	pop bc
+	push de
+	ld c,b          ; C = attr
+	ld d,l          ; D = row
+	ld e,h          ; E = col
+	
+	jp asm_BIFROSTL_fillTileAttrL

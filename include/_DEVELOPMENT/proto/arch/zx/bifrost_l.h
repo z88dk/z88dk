@@ -60,17 +60,7 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROSTL_stop,void)
 // Location of BIFROST ISR hook
 // ----------------------------------------------------------------
 
-#ifdef __CLANG
-   static unsigned char BIFROSTL_isr[2];
-#endif
-
-#ifdef __SDCC
-   __at (64993) static unsigned char BIFROSTL_isr[2];
-#endif
-
-#ifdef __SCCZ80
-   static unsigned char BIFROSTL_isr[2] @ (64993);
-#endif
+extern unsigned char BIFROSTL_ISR_HOOK[3];
 
 // ----------------------------------------------------------------
 // Place a multicolor tile index into the tile map. Add value
@@ -84,7 +74,7 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,BIFROSTL_stop,void)
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,BIFROSTL_setTile,unsigned int px,unsigned int py,unsigned int tile)
+__DPROTO(`b',`b,d',void,,BIFROSTL_setTile,unsigned char px,unsigned char py,unsigned char tile)
 
 #define M_BIFROSTL_SETTILE(px, py, tile)  BIFROSTL_tilemap[(px)*9+(py)] = (tile)
 
@@ -101,7 +91,7 @@ __DPROTO(,,void,,BIFROSTL_setTile,unsigned int px,unsigned int py,unsigned int t
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-__DPROTO(`d,e',`d,e',unsigned char,,BIFROSTL_getTile,unsigned int px,unsigned int py)
+__DPROTO(`b,d,e',`b,d,e',unsigned char,,BIFROSTL_getTile,unsigned char px,unsigned char py)
 
 #define M_BIFROSTL_GETTILE(px, py)   BIFROSTL_tilemap[(px)*9+(py)]
 
@@ -115,7 +105,7 @@ __DPROTO(`d,e',`d,e',unsigned char,,BIFROSTL_getTile,unsigned int px,unsigned in
 //     Animation group for animated tile, otherwise the same tile index
 // ----------------------------------------------------------------
 
-__DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,,BIFROSTL_getAnimGroup,unsigned int tile)
+__DPROTO(`b,c,d,e,h',`b,c,d,e',unsigned char,,BIFROSTL_getAnimGroup,unsigned char tile)
 
 // ----------------------------------------------------------------
 // Locate memory address that stores the multicolor attribute of a
@@ -129,7 +119,7 @@ __DPROTO(`b,c,d,e',`b,c,d,e',unsigned char,,BIFROSTL_getAnimGroup,unsigned int t
 //     Memory address of the multicolor attribute
 // ----------------------------------------------------------------
 
-__DPROTO(`a',`a',unsigned char,*,BIFROSTL_findAttrH,unsigned int lin,unsigned int col)
+__DPROTO(`a',`a',unsigned char,*,BIFROSTL_findAttrH,unsigned char lin,unsigned char col)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to read tile images from another address
@@ -138,19 +128,20 @@ __DPROTO(`a',`a',unsigned char,*,BIFROSTL_findAttrH,unsigned int lin,unsigned in
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-__DPROTO(`b,c,d,e',`b,c,d,e',void,,BIFROSTL_resetTileImages,void *addr)
+extern unsigned char BIFROSTL_TILE_IMAGES[];
+#define BIFROSTL_resetTileImages(addr)   intrinsic_store16(_BIFROSTL_TILE_IMAGES,addr)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to animate at 2 frames per second
 // ----------------------------------------------------------------
 
-#define BIFROSTL_resetAnimSlow()  *((unsigned char*)59035)=254
+#define BIFROSTL_resetAnimSlow()  (*((unsigned char*)59035)=254)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to animate at 4 frames per second
 // ----------------------------------------------------------------
 
-#define BIFROSTL_resetAnimFast()  *((unsigned char*)59035)=198
+#define BIFROSTL_resetAnimFast()  (*((unsigned char*)59035)=198)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to use 2 frames per animation group
@@ -196,7 +187,7 @@ __OPROTO(`b,c,d,e',`b,c,d,e',void,,BIFROSTL_resetAnim4Frames,void)
 //          occurs, program may crash!!! (see BIFROSTL_halt)
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,BIFROSTL_drawTileL,unsigned int row,unsigned int col,unsigned int tile)
+__DPROTO(,,void,,BIFROSTL_drawTileL,unsigned char row,unsigned char col,unsigned char tile)
 
 // ----------------------------------------------------------------
 // Instantly show/animate the multicolor tile currently stored in
@@ -210,7 +201,7 @@ __DPROTO(,,void,,BIFROSTL_drawTileL,unsigned int row,unsigned int col,unsigned i
 //          occurs, program may crash!!! (see BIFROSTL_halt)
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,BIFROSTL_showTilePosL,unsigned int row,unsigned int col)
+__DPROTO(,,void,,BIFROSTL_showTilePosL,unsigned char row,unsigned char col)
 
 // ----------------------------------------------------------------
 // Instantly show/animate the next multicolor tile currently stored
@@ -234,6 +225,6 @@ __OPROTO(,,void,,BIFROSTL_showNextTile,void)
 //     attr: attribute value (0-255), INK+8*PAPER+64*BRIGHT+128*FLASH
 // ----------------------------------------------------------------
 
-__DPROTO(,,void,,BIFROSTL_fillTileAttrL,unsigned int row,unsigned int col,unsigned int attr)
+__DPROTO(,,void,,BIFROSTL_fillTileAttrL,unsigned char row,unsigned char col,unsigned char attr)
 
 #endif

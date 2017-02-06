@@ -4,7 +4,7 @@
 ; See "bifrost_l.h" for further details
 ; ----------------------------------------------------------------
 
-; unsigned char BIFROSTL_getAnimGroup(unsigned int tile)
+; unsigned char BIFROSTL_getAnimGroup(unsigned char tile)
 ; fastcall
 
 SECTION code_clib

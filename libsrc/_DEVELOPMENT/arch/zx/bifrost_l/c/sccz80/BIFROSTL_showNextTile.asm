@@ -7,7 +7,7 @@
 ; void BIFROSTL_showNextTile()
 
 SECTION code_clib
-SECTION code_bifrost_h
+SECTION code_bifrost_l
 
 PUBLIC BIFROSTL_showNextTile
 

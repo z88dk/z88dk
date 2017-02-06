@@ -12,6 +12,8 @@ SECTION code_bifrost_l
 
 PUBLIC BIFROSTL_findAttrH_callee
 
+EXTERN asm_BIFROSTL_findAttrH
+
 BIFROSTL_findAttrH_callee:
 
         pop hl          ; RET address
@@ -19,4 +21,4 @@ BIFROSTL_findAttrH_callee:
         pop de          ; DE=lin
         push hl
 
-        INCLUDE "arch/zx/bifrost_l/z80/asm_BIFROSTL_findAttrH.asm"
+        jp asm_BIFROSTL_findAttrH

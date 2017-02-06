@@ -1,32 +1,68 @@
 /* ----------------------------------------------------------------
- * BIFROST* ENGINE DEMO - converted to z88dk C Compiler
+ * BIFROST*L ENGINE DEMO - converted to z88dk C Compiler
+ *
+ * Before using Bifrost_l, it should be configured.
+ *
+ * The default configuration is:
+ *
+ *   Animation speed: 2 or 4 frames per second
+ *   defc __BIFROSTL_ANIM_SPEED = 4
+ *
+ *   Animation size: 2 or 4 frames per animation group
+ *   defc __BIFROSTL_ANIM_GROUP = 4
+ *
+ *   First non-animated frame
+ *   defc __BIFROSTL_STATIC_MIN = 128
+ *
+ *   Value subtracted from non-animated frames
+ *   defc __BIFROSTL_STATIC_OVERLAP = 128
+ *
+ *   Location of the tiles table (64 bytes per tile)
+ *   defc __BIFROSTL_TILE_IMAGES = 48500
+ *
+ *   Location of the tile map (9x9=81 tiles)
+ *   defc __BIFROSTL_TILE_MAP = 65281
+ *
+ *   Tile rendering order (1 for sequential, 7 for distributed)
+ *   defc __BIFROSTL_TILE_ORDER = 7
+ *
+ * This program assumes the default configuration so nothing
+ * needs to be done to configure the engine prior to compiling.
+ *
+ * However in other circumstances, the zx's target configuration
+ * file should be edited to change the settings ("z88dk/libsrc/
+ * _DEVELOPMENT/target/zx/clib_target_cfg.asm") and then the
+ * zx library should be rebuilt by running "Winmake zx" (windows)
+ * or "make TARGET=zx" (other) from the "z88dk/libsrc/_DEVELOPMENT"
+ * directory.
  *
  * This program can be compiled as follows:
  *
  * 1. SCCZ80 + New C Library
  *
- *    zcc +zx -vn -startup=1 -clib=new bifrostldem.c -o bifrostldem
- *    appmake +zx -b bifrostldem_CODE.bin -o bifrostldem.tap --noloader --org 32768
- *    copy /b loader_l.tap+bifrostldem.tap demo.tap
+ *    zcc +zx -vn -startup=1 -clib=new bifrostldem.c ctile.asm -o bifrostldem
+ *    appmake +zx -b bifrostldem_BIFROSTL.bin -o bifrostl.tap --noloader --org 58625 --blockname BIFROSTL
+ *    appmake +zx -b bifrostldem_CODE.bin -o bifrostldem.tap --noloader --org 32768 --blockname bifrostldem
+ *    copy /b loader.tap + bifrostl.tap + bifrostldem.tap demo.tap
  *
  * 2. SDCC + New C Library
  *
- *    zcc +zx -vn -SO3 -startup=1 -clib=sdcc_iy --max-allocs-per-node200000 bifrostldem.c -o bifrostldem
- *    appmake +zx -b bifrostldem_CODE.bin -o bifrostldem.tap --noloader --org 32768
- *    copy /B loader_l.tap+bifrostldem.tap demo.tap
+ *    zcc +zx -vn -SO3 -startup=1 -clib=sdcc_iy --max-allocs-per-node200000 bifrostldem.c ctile.asm -o bifrostldem
+ *    appmake +zx -b bifrostldem_BIFROSTL.bin -o bifrostl.tap --noloader --org 58625 --blockname BIFROSTL
+ *    appmake +zx -b bifrostldem_CODE.bin -o bifrostldem.tap --noloader --org 32768 --blockname bifrostldem
+ *    copy /b loader.tap + bifrostl.tap + bifrostldem.tap demo.tap
  *
- * After compiling, a binary "bifrostldem_CODE.bin" containing the program is produced.
- * Appmake is run to turn that portion into a CODE-only tap file.
- * Windows "copy" is used to concatenate that tap to the end of "loader_l.tap" to form the final tap file "demo.tap".
+ * After compiling, the binaries "bifrostldem_CODE.bin"
+ *   (containing the program) and "bifrostldem_BIFROSTL.bin"
+ *   (containing the bifrost*l engine) are produced.
+ * Appmake is run to turn those into CODE-only tap files.
+ * Windows "copy" is used to append those taps to the end of
+ *   "loader.tap" to form the final tap file "demo.tap"
  *
- * The loader file "loader_l.tap" above contains a BASIC loader
- * program (listed below), a code block with BIFROST* ENGINE 1.2L,
- * and another code block with multicolor tiles. The BASIC loader
- * listing is reproduced below:
+ * "loader.tap" contains this basic loader:
  *
  * 10 CLEAR VAL "32767"
- * 20 LOAD "TILES"CODE
- * 30 LOAD "BIFROST*"CODE
+ * 30 LOAD "BIFROSTL"CODE
  * 40 LOAD ""CODE
  * 50 RANDOMIZE USR VAL "32768"
  *
@@ -48,6 +84,8 @@
 #define printInk(k)          printf("\x10%c", (k))
 #define printPaper(k)        printf("\x11%c", (k))
 #define printAt(row, col)    printf("\x16%c%c", (col), (row))
+
+extern unsigned char ctiles[];
 
 void pressAnyKey() {
     in_wait_nokey();
@@ -115,11 +153,14 @@ main()
     printAt(11, 23);
     printf("z88dk!");
 
-    BIFROSTL_start();
+	 BIFROSTL_resetTileImages(_ctiles);
+	 
     for (f = 0; f < 81; ++f) {
         BIFROSTL_tilemap[f] = BIFROSTL_STATIC + f;
     }
 
+	 BIFROSTL_start();
+	 
     while (1) {
         pressAnyKey();
 

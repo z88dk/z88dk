@@ -25,4 +25,4 @@ BIFROSTL_drawTileL:
    	inc hl
    	ld d,(hl)       ; D=row
 
-        jp asm_BIFROSTL_drawTileL        ; execute 'draw_tile'
+      jp asm_BIFROSTL_drawTileL        ; execute 'draw_tile'
