@@ -4,7 +4,7 @@
 ; See "bifrost_h.h" for further details
 ; ----------------------------------------------------------------
 
-; void BIFROSTH_setTile(unsigned int px,unsigned int py,unsigned int tile)
+; void BIFROSTH_setTile(unsigned char px,unsigned char py,unsigned char tile)
 ; callee
 
 SECTION code_clib
@@ -12,12 +12,16 @@ SECTION code_bifrost_h
 
 PUBLIC _BIFROSTH_setTile_callee
 
+EXTERN asm_BIFROSTH_setTile
+
 _BIFROSTH_setTile_callee:
 
-        pop af          ; RET address
-        pop hl          ; L=px
-        pop bc          ; C=py
-        pop de          ; E=tile
-        push af
+   pop hl
+	pop de
+	dec sp
+	ex (sp),hl
+	ld l,e          ; L = px
+	ld e,h          ; E = tile
+	ld c,d          ; C = py
 
-        INCLUDE "arch/zx/bifrost_h/z80/asm_BIFROSTH_setTile.asm"
+   jp asm_BIFROSTH_setTile

@@ -16,11 +16,12 @@ EXTERN asm_BIFROSTH_fillTileAttrH
 
 _BIFROSTH_fillTileAttrH_callee:
 
-        pop hl          ; RET address
-        pop bc          ; C=lin
-        pop de          ; E=col
-        ld d,c          ; D=lin
-        pop bc          ; C=attrib
-        push hl
-
-        jp asm_BIFROSTH_fillTileAttrH        ; execute 'fill_tile_attr'
+   pop hl
+	pop bc
+	dec sp
+	ex (sp),hl
+	ld c,l          ; C = attr
+	ld d,c          ; D = lin
+	ld e,b          ; E = col
+	
+	jp asm_BIFROSTH_fillTileAttrH

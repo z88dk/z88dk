@@ -16,12 +16,10 @@ EXTERN asm_BIFROSTH_findAttrH
 BIFROSTH_findAttrH:
 
         ld hl,2
-        ld b,h
         add hl,sp
-        ld c,(hl)       ; BC=col
+        ld c,(hl)       ; C=col
         inc hl
         inc hl
-        ld l,(hl)       ; HL=lin
-        ld h,b
+        ld l,(hl)       ; L=lin
 
-   	jp asm_BIFROSTH_findAttrH
+   	  jp asm_BIFROSTH_findAttrH

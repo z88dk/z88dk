@@ -4,7 +4,7 @@
 ; See "bifrost_h.h" for further details
 ; ----------------------------------------------------------------
 
-; unsigned char BIFROSTH_getTile(unsigned int px,unsigned int py)
+; unsigned char BIFROSTH_getTile(unsigned char px,unsigned char py)
 
 SECTION code_clib
 SECTION code_bifrost_h
@@ -15,13 +15,10 @@ EXTERN asm_BIFROSTH_getTile
 
 _BIFROSTH_getTile:
 
-   	ld hl,2
-   	ld b,h          ; B=0
-   	add hl,sp
-   	ld a,(hl)       ; A=px
-   	inc hl
-   	inc hl
-   	ld c,(hl)       ; BC=py
-   	ld l,a          ; L=px
-
-   	jp asm_BIFROSTH_getTile
+   ld hl,3
+	add hl,sp
+	ld c,(hl)       ; C = py
+	dec hl
+	ld l,(hl)       ; L = px
+	
+	jp asm_BIFROSTH_getTile

@@ -16,7 +16,7 @@ EXTERN _BIFROSTH_tilemap
 asm_BIFROSTH_getTile:
 
 ; L=px
-; BC=py
+; C=py
         ld a,l
         add a,a
         add a,a
@@ -27,5 +27,5 @@ asm_BIFROSTH_getTile:
         ld l,a
         ld h,_BIFROSTH_tilemap/256
         ld l,(hl)
-        ld h,b
+        ld h,0
         ret

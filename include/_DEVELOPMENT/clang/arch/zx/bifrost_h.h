@@ -66,17 +66,7 @@ extern void BIFROSTH_stop(void);
 // Location of BIFROST ISR hook
 // ----------------------------------------------------------------
 
-#ifdef __CLANG
-   static unsigned char BIFROSTH_isr[2];
-#endif
-
-#ifdef __SDCC
-   __at (64993) static unsigned char BIFROSTH_isr[2];
-#endif
-
-#ifdef __SCCZ80
-   static unsigned char BIFROSTH_isr[2] @ (64993);
-#endif
+extern unsigned BIFROSTH_ISR_HOOK[3];
 
 // ----------------------------------------------------------------
 // Place a multicolor tile index into the tile map. Add value
@@ -90,7 +80,7 @@ extern void BIFROSTH_stop(void);
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_setTile(unsigned int px,unsigned int py,unsigned int tile);
+extern void BIFROSTH_setTile(unsigned char px,unsigned char py,unsigned char tile);
 
 
 
@@ -109,7 +99,7 @@ extern void BIFROSTH_setTile(unsigned int px,unsigned int py,unsigned int tile);
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-extern unsigned char BIFROSTH_getTile(unsigned int px,unsigned int py);
+extern unsigned char BIFROSTH_getTile(unsigned char px,unsigned char py);
 
 
 
@@ -125,7 +115,7 @@ extern unsigned char BIFROSTH_getTile(unsigned int px,unsigned int py);
 //     Animation group for animated tile, otherwise the same tile index
 // ----------------------------------------------------------------
 
-extern unsigned char BIFROSTH_getAnimGroup(unsigned int tile);
+extern unsigned char BIFROSTH_getAnimGroup(unsigned char tile);
 
 
 
@@ -141,7 +131,7 @@ extern unsigned char BIFROSTH_getAnimGroup(unsigned int tile);
 //     Memory address of the multicolor attribute
 // ----------------------------------------------------------------
 
-extern unsigned char *BIFROSTH_findAttrH(unsigned int lin,unsigned int col);
+extern unsigned char *BIFROSTH_findAttrH(unsigned char lin,unsigned char col);
 
 
 
@@ -152,21 +142,20 @@ extern unsigned char *BIFROSTH_findAttrH(unsigned int lin,unsigned int col);
 //     addr: New tile images address
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_resetTileImages(void *addr);
-
-
+extern unsigned char BIFROSTH_TILE_IMAGES[];
+#define BIFROSTH_resetTileImages(addr)   intrinsic_store16(_BIFROSTH_TILE_IMAGES,addr)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to animate at 2 frames per second
 // ----------------------------------------------------------------
 
-#define BIFROSTH_resetAnimSlow()  *((unsigned char*)59035)=254
+#define BIFROSTH_resetAnimSlow()  (*((unsigned char*)59035)=254)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to animate at 4 frames per second
 // ----------------------------------------------------------------
 
-#define BIFROSTH_resetAnimFast()  *((unsigned char*)59035)=198
+#define BIFROSTH_resetAnimFast()  (*((unsigned char*)59035)=198)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to use 2 frames per animation group
@@ -216,7 +205,7 @@ extern void BIFROSTH_resetAnim4Frames(void);
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_drawTileH(unsigned int lin,unsigned int col,unsigned int tile);
+extern void BIFROSTH_drawTileH(unsigned char lin,unsigned char col,unsigned char tile);
 
 
 
@@ -232,7 +221,7 @@ extern void BIFROSTH_drawTileH(unsigned int lin,unsigned int col,unsigned int ti
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_showTilePosH(unsigned int lin,unsigned int col);
+extern void BIFROSTH_showTilePosH(unsigned char lin,unsigned char col);
 
 
 
@@ -263,7 +252,7 @@ extern void BIFROSTH_showNextTile(void);
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_fillTileAttrH(unsigned int lin,unsigned int col,unsigned int attr);
+extern void BIFROSTH_fillTileAttrH(unsigned char lin,unsigned char col,unsigned char attr);
 
 
 
@@ -284,19 +273,11 @@ extern void BIFROSTH_fillTileAttrH(unsigned int lin,unsigned int col,unsigned in
 // second (slow)
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_enableSprites(void);
-
-
-
 #define BIFROSTH_enableSprites()  intrinsic_store16(59040,58054)
 
 // ----------------------------------------------------------------
 // Reconfigure BIFROST* ENGINE to stop drawing sprites
 // ----------------------------------------------------------------
-
-extern void BIFROSTH_disableSprites(void);
-
-
 
 #define BIFROSTH_disableSprites()  intrinsic_store16(59040,58636)
 
@@ -315,7 +296,7 @@ extern void BIFROSTH_disableSprites(void);
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_drawBackTilesH(unsigned int lin,unsigned int col,unsigned int attr);
+extern void BIFROSTH_drawBackTilesH(unsigned char lin,unsigned char col,unsigned char attr);
 
 
 
@@ -334,7 +315,7 @@ extern void BIFROSTH_drawBackTilesH(unsigned int lin,unsigned int col,unsigned i
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void BIFROSTH_drawTilePosH(unsigned int lin,unsigned int col,unsigned int attr);
+extern void BIFROSTH_drawTilePosH(unsigned char lin,unsigned char col,unsigned char attr);
 
 
 

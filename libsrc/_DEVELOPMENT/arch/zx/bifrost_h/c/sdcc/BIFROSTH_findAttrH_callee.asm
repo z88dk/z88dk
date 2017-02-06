@@ -4,7 +4,7 @@
 ; See "bifrost_h.h" for further details
 ; ----------------------------------------------------------------
 
-; unsigned char *BIFROSTH_findAttrH(unsigned int lin,unsigned int col)
+; unsigned char *BIFROSTH_findAttrH(unsigned char lin,unsigned char col)
 ; callee
 
 SECTION code_clib
@@ -12,11 +12,12 @@ SECTION code_bifrost_h
 
 PUBLIC _BIFROSTH_findAttrH_callee
 
+EXTERN asm_BIFROSTH_findAttrH
+
 _BIFROSTH_findAttrH_callee:
 
-        pop de          ; RET address
-        pop hl          ; HL=lin
-        pop bc          ; BC=col
-        push de
+   pop hl
+	ex (sp),hl      ; L = lin
+	ld c,h          ; C = col
 
-        INCLUDE "arch/zx/bifrost_h/z80/asm_BIFROSTH_findAttrH.asm"
+   jp asm_BIFROSTH_findAttrH

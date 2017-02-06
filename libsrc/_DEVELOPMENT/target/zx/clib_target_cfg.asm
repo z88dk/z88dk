@@ -29,6 +29,38 @@ defc __z80_cpu_info = $01
 
 
 ;--------------------------------------------------------------
+;-- GAMES/BIFROST_H -------------------------------------------
+;--------------------------------------------------------------
+
+; Animation speed: 2 or 4 frames per second
+defc __BIFROSTH_ANIM_SPEED = 4
+
+; Animation size: 2 or 4 frames per animation group
+defc __BIFROSTH_ANIM_GROUP = 4
+
+; First non-animated frame
+defc __BIFROSTH_STATIC_MIN = 128
+
+; Value subtracted from non-animated frames
+defc __BIFROSTH_STATIC_OVERLAP = 128
+
+; Location of the tiles table (64 bytes per tile)
+defc __BIFROSTH_TILE_IMAGES = 48500
+
+; Location of the tile map (9x9=81 tiles)
+defc __BIFROSTH_TILE_MAP = 65281
+
+; Tile rendering order (1 for sequential, 7 for distributed)
+defc __BIFROSTH_TILE_ORDER = 7
+
+; Shift screen coordinates by 0 or 4 columns to the right
+defc __BIFROSTH_SHIFT_COLUMNS = 0
+
+; Render special sprite tiles every frame?
+defc __BIFROSTH_SPRITE_MODE = 0
+
+
+;--------------------------------------------------------------
 ;-- GAMES/BIFROST_L -------------------------------------------
 ;--------------------------------------------------------------
 

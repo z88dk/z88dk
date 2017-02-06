@@ -25,4 +25,4 @@ BIFROSTH_drawTileH:
    	inc hl
    	ld d,(hl)       ; D=lin
 
-        jp asm_BIFROSTH_drawTileH        ; execute 'draw_tile'
+      jp asm_BIFROSTH_drawTileH        ; execute 'draw_tile'

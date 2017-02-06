@@ -16,9 +16,8 @@ EXTERN asm_BIFROSTH_getTile
 BIFROSTH_getTile:
 
    	ld hl,2
-   	ld b,h          ; B=0
    	add hl,sp
-   	ld c,(hl)       ; BC=py
+   	ld c,(hl)       ; C=py
    	inc hl
    	inc hl
    	ld l,(hl)       ; L=px

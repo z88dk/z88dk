@@ -13,8 +13,9 @@ PUBLIC asm_BIFROSTH_findAttrH
 
 asm_BIFROSTH_findAttrH:
 
-; HL=lin
-; BC=col
+; L=lin
+; C=col
+        ld h,0
         add hl,hl       ; HL=lin*2
         ld de,57696     ; reference 'attribs' inside BIFROST*
         add hl,de
@@ -24,6 +25,6 @@ asm_BIFROSTH_findAttrH:
         ld l,c          ; L=col
         ld h,$e4        ; reference 'deltas' inside BIFROST*
         ld l,(hl)       ; L=delta
-        ld h,b          ; HL=delta
+        ld h,0          ; HL=delta
         add hl,de       ; HL=59075 + (lin-16)*41 + delta
         ret

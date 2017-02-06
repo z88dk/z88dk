@@ -4,7 +4,7 @@
 ; See "bifrost_h.h" for further details
 ; ----------------------------------------------------------------
 
-; unsigned char BIFROSTH_getTile(unsigned int px,unsigned int py)
+; unsigned char BIFROSTH_getTile(unsigned char px,unsigned char py)
 ; callee
 
 SECTION code_clib
@@ -12,11 +12,12 @@ SECTION code_bifrost_h
 
 PUBLIC _BIFROSTH_getTile_callee
 
+EXTERN asm_BIFROSTH_getTile
+
 _BIFROSTH_getTile_callee:
 
-        pop af          ; RET address
-        pop hl          ; HL=px
-        pop bc          ; BC=py
-        push af
+   pop hl
+	ex (sp),hl      ; L = px
+	ld c,h          ; C = py
 
-        INCLUDE "arch/zx/bifrost_h/z80/asm_BIFROSTH_getTile.asm"
+   jp asm_BIFROSTH_getTile

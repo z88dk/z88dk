@@ -4,7 +4,7 @@
 ; See "bifrost_h.h" for further details
 ; ----------------------------------------------------------------
 
-; void BIFROSTH_showTilePosH(unsigned int lin,unsigned int col)
+; void BIFROSTH_showTilePosH(unsigned char lin,unsigned char col)
 ; callee
 
 SECTION code_clib
@@ -16,10 +16,9 @@ EXTERN asm_BIFROSTH_showTilePosH
 
 _BIFROSTH_showTilePosH_callee:
 
-        pop hl          ; RET address
-        pop bc          ; C=lin
-        pop de          ; E=col
-        push hl
-        ld d,c          ; D=lin
-
-        jp asm_BIFROSTH_showTilePosH        ; execute 'show_tile_pos'
+   pop hl
+	ex (sp),hl
+	ld d,l          ; D = lin
+	ld e,h          ; E = col
+	
+	jp asm_BIFROSTH_showTilePosH

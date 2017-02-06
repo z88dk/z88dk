@@ -62,3 +62,4 @@ libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_p3.def
 libsrc/_DEVELOPMENT/arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm
 libsrc/_DEVELOPMENT/arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm
 libsrc/_DEVELOPMENT/arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm
+libsrc/_DEVELOPMENT/arch/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm

@@ -1,41 +1,25 @@
+include(`z88dk.m4')
+include(`clib_target_cfg.asm')
+
 ; -----------------------------------------------------------------------------
 ; BIFROST* ENGINE by Einar Saukas - v1.2/H
 ; A Rainbow Graphics Support Engine for Animated Tiles
 ;
 ; Most 16x16 tiles created by Dave Hughes (R-Tape)
-;
-; To be compiled with PASMO - http://pasmo.speccy.org/
+; Adapted to z88dk by aralbrec
 ; -----------------------------------------------------------------------------
 
-; Animation speed: 2 or 4 frames per second
-ANIM_SPEED      EQU 4
+SECTION BIFROSTH
+org $ded7
 
-; Animation size: 2 or 4 frames per animation group
-ANIM_GROUP      EQU 4
-
-; First non-animated frame
-STATIC_MIN      EQU 128
-
-; Value subtracted from non-animated frames
-STATIC_OVERLAP  EQU 128
-
-; Location of the tiles table (64 bytes per tile)
-TILE_IMAGES     EQU 48500
-
-; Location of the tile map (9x9=81 tiles)
-TILE_MAP        EQU 65281
-
-; Tile rendering order (1 for sequential, 7 for distributed)
-TILE_ORDER      EQU 7
-
-; Shift screen coordinates by 0 or 4 columns to the right
-SHIFT_COLUMNS   EQU 0
-
-; Render special sprite tiles every frame?
-SPRITE_MODE     EQU 0
+PUBLIC _BIFROSTH_tilemap
+defc _BIFROSTH_tilemap = __BIFROSTH_TILE_MAP
 
 ; -----------------------------------------------------------------------------
-        org     $ded7
+
+PUBLIC asm_BIFROSTH_drawBackTilesH
+
+asm_BIFROSTH_drawBackTilesH:
 draw_back_tiles:
         bit     0, e
         jr      nz, draw_updown_tiles
@@ -63,6 +47,10 @@ draw_updown_tiles:
         ld      a, d
         add     a, 16
         ld      d, a
+		  
+PUBLIC asm_BIFROSTH_drawTilePosH
+
+asm_BIFROSTH_drawTilePosH:
 draw_tile_pos:
         ld      a, d
         cp      160
@@ -75,7 +63,7 @@ draw_tile_pos:
         sub     17
         rra
         ld      l, a
-        ld      h, TILE_MAP/256
+        ld      h, __BIFROSTH_TILE_MAP/256
         ld      a,(hl)
         ld      hl, get_tile+2
         cp      (hl)
@@ -84,6 +72,10 @@ draw_tile_pos:
         jp      nz, get_tile+9
 
 ; -----------------------------------------------------------------------------
+
+PUBLIC asm_BIFROSTH_fillTileAttrH
+
+asm_BIFROSTH_fillTileAttrH:
 fill_tile_attr:
         ld      (exit_draw+1), sp
 
@@ -106,19 +98,21 @@ fill_tile_attr:
         ex      de, hl
 
 ; replace attrib with value
-REPT 16
+z88dk_for(`LOOP', `1', `16',
+`
         pop     hl
         add     hl, bc
         ld      (hl), a
         add     hl, de
         ld      (hl), a
-ENDM
+')
         jp      exit_draw
 
 ; -----------------------------------------------------------------------------
 draw_at_last_col:
 ; draw multicolor attributes of a tile starting at the last column in the multicolor area
-REPT 15
+z88dk_for(`LOOP', `1', `15',
+`
         pop     hl
         ld      c, a
         add     hl, bc
@@ -126,7 +120,7 @@ REPT 15
         ldi
         inc     hl
         ex      de, hl
-ENDM
+')
         pop     hl
         ld      c, a
         add     hl, bc
@@ -136,35 +130,38 @@ ENDM
 ; -----------------------------------------------------------------------------
 bitmaps:
 ; lookup table with screen coordinates
-REPT 16
-        dw      0
-ENDM
-REPT 18, ROWREPT
-REPT 8, LINREPT
-hrow   DEFL (ROWREPT+1)/8
-lrow   DEFL (ROWREPT+1)%8
-        dw      16384 + hrow*2048 + LINREPT*256 + lrow*32 + SHIFT_COLUMNS
-ENDM
-ENDM
-REPT 16
-        dw      0
-ENDM
-
+z88dk_for(`LOOP', `1', `16',
+`
+        defw      0
+')
+z88dk_for(`ROWREPT', `0', `17',
+`
+z88dk_for(`LINREPT', `0', `7',
+`
+        defw      16384 + (((ROWREPT+1)/8)*2048) + (LINREPT*256) + (((ROWREPT+1)%8)*32) + __BIFROSTH_SHIFT_COLUMNS
+')
+')
+z88dk_for(`LOOP', `1', `16',
+`
+        defw      0
+')
 ; -----------------------------------------------------------------------------
 attribs:
 ; lookup table with multicolor attribute coordinates
-REPT 16
-        dw      0
-ENDM
-REPT 144, RACEREPT
-        dw      race_raster + (RACEREPT * 41)
-ENDM
-REPT 16
-        dw      0
-ENDM
-
+z88dk_for(`LOOP', `1', `16',
+`
+        defw      0
+')
+z88dk_for(`RACEREPT', `0', `143',
+`
+        defw      race_raster + (RACEREPT * 41)
+')
+z88dk_for(`LOOP', `1', `16',
+`
+        defw      0
+')
 ; -----------------------------------------------------------------------------
-        db      0
+        defb      0
 show_next3_delayed:
         nop                             ; extra delay
         nop                             ; extra delay
@@ -214,21 +211,22 @@ draw_at_even_col_dec:
         inc     a
         ex      af, af'
         ld      a, c
-REPT 15
+z88dk_for(`LOOP', `1', `15',
+`
         pop     hl
         ld      c, a
         add     hl, bc
         ex      de, hl
         ldi
         ex      de, hl
-        ex      af, af'
+        ex      af, af
         ld      c, a
         sbc     hl, bc
         ex      de, hl
         ldi
         ex      de, hl
-        ex      af, af'
-ENDM
+        ex      af, af
+')
         pop     hl
         ld      c, a
         add     hl, bc
@@ -244,10 +242,10 @@ ENDM
 ; -----------------------------------------------------------------------------
 deltas:
 ; lookup table with deltas (column offsets)
-IF SHIFT_COLUMNS=0
-        db      4, 4, 5, 7, 8, 10, 11, 14, 15, 17, 18, 32, 33, 28, 29, 24, 25, 20, 21, 21
+IF __BIFROSTH_SHIFT_COLUMNS=0
+        defb      4, 4, 5, 7, 8, 10, 11, 14, 15, 17, 18, 32, 33, 28, 29, 24, 25, 20, 21, 21
 ELSE
-        db      4, 4, 5, 7, 8, 10, 11, 14, 15, 33, 34, 29, 30, 24, 25, 20, 21, 17, 18, 18
+        defb      4, 4, 5, 7, 8, 10, 11, 14, 15, 33, 34, 29, 30, 24, 25, 20, 21, 17, 18, 18
 ENDIF
 
 ; -----------------------------------------------------------------------------
@@ -256,17 +254,24 @@ draw_at_even_col_inc:
         cpl
         ex      af, af'
         ld      a, c
-REPT 15
+z88dk_for(`LOOP', `1', `15',
+`
         pop     hl
-REPT 2
+
         ld      c, a
         add     hl, bc
         ex      de, hl
         ldi
         ex      de, hl
-        ex      af, af'
-ENDM
-ENDM
+        ex      af, af
+
+        ld      c, a
+        add     hl, bc
+        ex      de, hl
+        ldi
+        ex      de, hl
+        ex      af, af
+')
         pop     hl
         ld      c, a
         add     hl, bc
@@ -291,10 +296,14 @@ delay_tile:
 show_next3:
         call    show_next_tile
         call    show_next_tile
+
+PUBLIC asm_BIFROSTH_showNextTile
+
+asm_BIFROSTH_showNextTile:
 show_next_tile:
         ld      de, $1001               ; D = lin (16,32,48..144), E = col (1,3,5..17)
         ld      a, e
-        sub     (9-TILE_ORDER)*2
+        sub     (9-__BIFROSTH_TILE_ORDER)*2
         ld      e, a
         jr      nc, prev_lin
         add     a, 18
@@ -314,6 +323,10 @@ reset_lin:
         ld      (show_next_tile+1), de
 
 ; -----------------------------------------------------------------------------
+
+PUBLIC asm_BIFROSTH_showTilePosH
+
+asm_BIFROSTH_showTilePosH:
 show_tile_pos:                          ; D = lin (0..160), E = col (0..18)
         ld      a, d
         rrca
@@ -324,19 +337,19 @@ show_tile_pos:                          ; D = lin (0..160), E = col (0..18)
         sub     17
         rra
         ld      l, a
-        ld      h, TILE_MAP/256
+        ld      h, __BIFROSTH_TILE_MAP/256
 
 get_tile:
         ld      a,(hl)
-        cp      STATIC_MIN
+        cp      __BIFROSTH_STATIC_MIN
         jp      c, animate_tile
         inc     a
         jr      z, skip_tile
-        sub     1+STATIC_OVERLAP
+        sub     1+__BIFROSTH_STATIC_OVERLAP
         jr      draw_tile
 animate_tile:
         rrca
-IF ANIM_GROUP=4
+IF __BIFROSTH_ANIM_GROUP=4
         rrca
         add     a, $40
         rlca
@@ -349,6 +362,11 @@ ENDIF
         ld      (hl), a
 
 ; -----------------------------------------------------------------------------
+
+PUBLIC asm_BIFROSTH_drawTileH
+PUBLIC _BIFROSTH_TILE_IMAGES
+
+asm_BIFROSTH_drawTileH:
 draw_tile:                              ; D = lin, E = col, A = tile
 ; calculate screen bitmap lookup address
         ld      (exit_draw+1), sp
@@ -368,19 +386,20 @@ draw_tile:                              ; D = lin, E = col, A = tile
         rra
         rr      l
         ld      h, a
-        ld      de, TILE_IMAGES
+defc _BIFROSTH_TILE_IMAGES = ASMPC + 1
+        ld      de, __BIFROSTH_TILE_IMAGES
         add     hl, de
 
 ; draw bitmap lines
-REPT 16
+z88dk_for(`LOOP', `1', `16',
+`
         pop     de
         ld      a, e
         add     a, b
         ld      e, a
         ldi
         ldi
-ENDM
-
+')
 ; calculate multicolor attribute address
         ex      de, hl
         ld      hl, attribs-bitmaps-32
@@ -397,7 +416,8 @@ ENDM
 
 draw_at_odd_col:
 ; draw multicolor attributes starting at odd column
-REPT 15
+z88dk_for(`LOOP', `1', `15',
+`
         pop     hl
         ld      c, a
         add     hl, bc
@@ -405,7 +425,7 @@ REPT 15
         ldi
         ldi
         ex      de, hl
-ENDM
+')
         pop     hl
         ld      c, a
         add     hl, bc
@@ -419,6 +439,9 @@ exit_draw:
         ret
 
 ; -----------------------------------------------------------------------------
+
+PUBLIC _BIFROSTH_ISR_HOOK
+
 main_engine:
 ; preserve all registers
         push    af
@@ -435,13 +458,13 @@ main_engine:
 tile_mapping_begin:
 ; draw and animate first 3 tiles
         call    show_next3_delayed
-IF ANIM_SPEED=4
+IF __BIFROSTH_ANIM_SPEED=4
         ld      a, $c6
 ELSE
         ld      a, $fe
 ENDIF
         ld      (animate_tile+2), a
-IF SPRITE_MODE=0
+IF __BIFROSTH_SPRITE_MODE=0
 ; draw (and perhaps animate) another 3 tiles
         call    show_next3
 ELSE
@@ -469,7 +492,7 @@ sync_raster_loop:
         jr      nz, sync_raster
 
 ; wait for the raster beam
-IF SHIFT_COLUMNS=0
+IF __BIFROSTH_SHIFT_COLUMNS=0
         ld      a, (bc)                 ; extra delay
         ld      b, 4
 ELSE
@@ -484,9 +507,11 @@ wait_raster:
 
 ; race the raster beam to update attributes at the right time
 race_raster:
-REPT 18, ROWREPT
-REPT 8
-IF SHIFT_COLUMNS=0
+z88dk_for(`ROWREPT', `0', `17',
+`
+z88dk_for(`LOOP', `1', `8',
+`
+IF __BIFROSTH_SHIFT_COLUMNS=0
         ld      sp, $5833+(32*ROWREPT)
         ld      bc, 0                   ; columns 01 and 02
         ld      de, 0                   ; columns 03 and 04
@@ -531,9 +556,8 @@ ELSE
         push    de
         push    hl
 ENDIF
-ENDM
-ENDM
-
+')
+')
 exit_raster:
 ; restore stack pointer
         ld      sp, 0
@@ -548,10 +572,19 @@ exit_raster:
         pop     de
         pop     bc
         pop     af
-        jp      $38
+		  
+_BIFROSTH_ISR_HOOK:
+
+        ei
+		  reti
 
 ; -----------------------------------------------------------------------------
 ; RAND USR 64995 to activate engine
+
+PUBLIC asm_BIFROSTH_start
+
+asm_BIFROSTH_start:
+
         di
         ld      a, ($004c)
         and     2
@@ -564,6 +597,11 @@ exit_raster:
 
 ; -----------------------------------------------------------------------------
 ; RAND USR 65012 to deactivate engine
+
+PUBLIC asm_BIFROSTH_stop
+
+asm_BIFROSTH_stop:
+
         di
         ld      a, $3f
         ld      i, a
@@ -577,8 +615,5 @@ exit_raster:
 
 ; -----------------------------------------------------------------------------
 ; jump vector table at addresses $fe00-$ff00
-REPT 257
-        defb    $fd
-ENDM
-
+        defs 257, 0xfd
 ; -----------------------------------------------------------------------------

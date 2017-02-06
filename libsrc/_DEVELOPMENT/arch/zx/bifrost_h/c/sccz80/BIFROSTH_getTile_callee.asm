@@ -12,10 +12,12 @@ SECTION code_bifrost_h
 
 PUBLIC BIFROSTH_getTile_callee
 
+EXTERN asm_BIFROSTH_getTile
+
 BIFROSTH_getTile_callee:
 
         pop hl          ; RET address
         pop bc          ; BC=py
         ex (sp),hl      ; HL=px
-
-        INCLUDE "arch/zx/bifrost_h/z80/asm_BIFROSTH_getTile.asm"
+		  
+		  jp asm_BIFROSTH_getTile

@@ -4,7 +4,7 @@
 ; See "bifrost_h.h" for further details
 ; ----------------------------------------------------------------
 
-; void BIFROSTH_drawBackTilesH(unsigned int lin,unsigned int col,unsigned int attr)
+; void BIFROSTH_drawBackTilesH(unsigned char lin,unsigned char col,unsigned char attr)
 ; callee
 
 SECTION code_clib
@@ -16,11 +16,12 @@ EXTERN asm_BIFROSTH_drawBackTilesH
 
 _BIFROSTH_drawBackTilesH_callee:
 
-        pop hl          ; RET address
-        pop bc          ; C=lin
-        pop de          ; E=col
-        ld d,c          ; D=lin
-        pop bc          ; C=attrib
-        push hl
+   pop hl
+	pop bc
+	dec sp
+	ex (sp),hl
+	ld d,c          ; D = lin
+	ld e,b          ; E = col
+	ld c,h          ; C = attr
 
-        jp asm_BIFROSTH_drawBackTilesH        ; execute 'draw_back_tiles'
+	jp asm_BIFROSTH_drawBackTilesH
