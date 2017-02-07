@@ -84,9 +84,15 @@ ENDIF
 	inc	hl
 	ld	(FRAMES+2),hl
 irq_hndl:
+
 IF (startup=2)
  	call	_irq_handler
 ENDIF
+
+	xor a			; reset watchdog timer
+	ld hl,watchdog
+	ld (hl),a
+
 	pop	hl
 	pop	de
 	pop	bc
