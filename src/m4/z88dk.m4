@@ -42,17 +42,17 @@ define(`_Z88DK_FOREACHQ',
 define(`_Z88DK_FOREACHQ_',
    ``define(`$$1', `$$3')$$2`''')
 
-# Z88DK_UNIQ_LABEL(PREFIX)
+# Z88DK_ULBL([PREFIX])
 # Generate a label unique to the file using optional PREFIX
 
-define(`Z88DK_UNIQ_LABEL', `define(`_Z88DK_UNIQ_ID_$1', ifdef(`_Z88DK_UNIQ_ID_$1', incr(_Z88DK_UNIQ_ID_$1), 0))dnl
+define(`Z88DK_ULBL', `define(`_Z88DK_UNIQ_ID_$1', ifdef(`_Z88DK_UNIQ_ID_$1', `incr(_Z88DK_UNIQ_ID_$1)', 0))dnl
 ifelse($1,, __uniq_, $1_)`'eval(_Z88DK_UNIQ_ID_$1, 10, 4)')
 
-# Z88DK_CURR_LABEL(OFFSET, PREFIX)
+# Z88DK_CLBL([OFFSET][,PREFIX])
 # Generate the label with optional numerical OFFSET from the
 # last generated unique label with optional PREFIX
 
-define(`Z88DK_CURR_LABEL', `define(`_Z88DK_UNIQ_ID_$2', ifdef(`_Z88DK_UNIQ_ID_$2', _Z88DK_UNIQ_ID_$2, 0))dnl
-ifelse($2,, __uniq_, $2_)`'ifelse($1,, eval(_Z88DK_UNIQ_ID_$2, 10, 4), eval(_Z88DK_UNIQ_ID_$2 + $1, 10, 4))')
+define(`Z88DK_CLBL', `define(`_Z88DK_UNIQ_ID_$2', ifdef(`_Z88DK_UNIQ_ID_$2', _Z88DK_UNIQ_ID_$2, 0))dnl
+ifelse($2,, __uniq_, $2_)`'ifelse($1,, eval(_Z88DK_UNIQ_ID_$2, 10, 4), `eval(_Z88DK_UNIQ_ID_$2 + $1, 10, 4)')')
 
 divert`'dnl
