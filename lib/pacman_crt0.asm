@@ -31,7 +31,9 @@
 ; Include zcc_opt.def to find out information about us
 ;-------
 
-    defc    crt0 = 1
+	defc 	DEFINED_nostreams = 1
+	defc    crt0 = 1
+	
 	INCLUDE "zcc_opt.def"
 
 ;-------
@@ -126,6 +128,13 @@ l_dcal:
 
    defm    "Small C+ PacMan"   ;Unnecessary file signature
 		
+	; If we were given a model then use it
+	IF DEFINED_CRT_MODEL
+	  defc __crt_model = CRT_MODEL
+	ELSE
+	  defc __crt_model = 1
+	ENDIF
+
 	INCLUDE "crt0_runtime_selection.asm"
 	INCLUDE "crt0_section.asm"
 
