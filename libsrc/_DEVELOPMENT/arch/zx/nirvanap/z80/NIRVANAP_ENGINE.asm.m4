@@ -97,7 +97,7 @@ defc _NIRVANAP_WIDE_IMAGES = ASMPC + 1
         add     hl, de
 
 ; draw bitmap lines
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         pop     de
         ld      a, e
@@ -202,7 +202,7 @@ defc _NIRVANAP_CHAR_TABLE = ASMPC + 1
         add     hl, bc
 
 ; draw bitmap lines
-z88dk_for(`LOOP', `1', `3',
+Z88DK_FOR(`LOOP', `1', `3',
 `
         ld      a, (hl)
         ld      (de), a
@@ -313,19 +313,19 @@ IF ((__NIRVANAP_OPTIONS & 0x3) = 0x3)
         ld      de, 0                   ; D = pixel line, E = char column
         ld      a, 0                    ; A = tile
         call    asm_NIRVANAP_drawW
-z88dk_for(`LOOP', `1', `5',
+Z88DK_FOR(`LOOP', `1', `5',
 `
         ld      de, 0                   ; D = pixel line, E = char column
         ld      a, 0                    ; A = tile
         call    asm_NIRVANAP_drawW+4
 ')
         jr      skip_wide
-z88dk_for(`LOOP', `1', `7',
+Z88DK_FOR(`LOOP', `1', `7',
 `
         nop
 ')
 skip_wide:
-z88dk_for(`LOOP', `1', `7',
+Z88DK_FOR(`LOOP', `1', `7',
 `
         nop                             ; extra delay
 ')
@@ -340,13 +340,13 @@ delay_wide:
 ELSE
 
 ; draw 8 tiles
-z88dk_for(`LOOP', `1', `6',
+Z88DK_FOR(`LOOP', `1', `6',
 `
         ld      de, 0                   ; D = pixel line, E = char column
         ld      a, 0                    ; A = tile
         call    asm_NIRVANAP_drawT
 ')
-z88dk_for(`LOOP', `1', `2',
+Z88DK_FOR(`LOOP', `1', `2',
 `
         ld      de, 0                   ; D = pixel line, E = char column
         ld      a, 0                    ; A = tile
@@ -384,9 +384,9 @@ IF (__spectrum = 3)
 ; race the raster beam to update attributes on screen at the right time
 race_raster:
         ld      a, 4
-z88dk_for(`ROWREPT', `0', eval(__NIRVANAP_TOTAL_ROWS-1),
+Z88DK_FOR(`ROWREPT', `0', eval(__NIRVANAP_TOTAL_ROWS-1),
 `
-z88dk_for(`LINREPT', `0', `3',
+Z88DK_FOR(`LINREPT', `0', `3',
 `
         ld      c, a                        ; extra delay
         dec     c                           ; extra delay
@@ -437,7 +437,7 @@ ELSE
 
 ; synchronize with raster beam while updating first attribute pair of each row
 ; spectrum 48k/128k timing
-z88dk_for(`ROWREPT', `0', `22',
+Z88DK_FOR(`ROWREPT', `0', `22',
 `
 IF ((ROWREPT = 4) || (ROWREPT = 9) || (ROWREPT = 14))
         ld      b, 3
@@ -458,9 +458,9 @@ ENDIF
 
 ; race the raster beam to update attributes on screen at the right time
 race_raster:
-z88dk_for(`ROWREPT', `0', eval(__NIRVANAP_TOTAL_ROWS-1),
+Z88DK_FOR(`ROWREPT', `0', eval(__NIRVANAP_TOTAL_ROWS-1),
 `
-z88dk_for(`LINREPT', `0', `3',
+Z88DK_FOR(`LINREPT', `0', `3',
 `
         ld      ix, 0                       ; attributes for columns 14 and 15
         ld      iy, 0                       ; attributes for columns 22 and 23
@@ -584,7 +584,7 @@ defc _NIRVANAP_TILE_IMAGES = ASMPC + 1
         add     hl, de
 
 ; draw bitmap lines
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         pop     de
         ld      a, e
@@ -617,7 +617,7 @@ z88dk_for(`LOOP', `1', `8',
         ld      sp, hl
 
 ; set 1st column of routine attributes
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         pop     hl
         add     hl, bc
@@ -632,7 +632,7 @@ z88dk_for(`LOOP', `1', `8',
         ld      sp, hl
 
 ; set 2nd column of routine attributes
-z88dk_for(`LOOP', `1', `7',
+Z88DK_FOR(`LOOP', `1', `7',
 `
         pop     hl
         add     hl, bc
@@ -653,38 +653,38 @@ exit_draw:
 ; -----------------------------------------------------------------------------
 bitmaps:
 ; lookup table with screen coordinates
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
-z88dk_for(`ROWREPT', `0', eval(__NIRVANAP_TOTAL_ROWS-1),
+Z88DK_FOR(`ROWREPT', `0', eval(__NIRVANAP_TOTAL_ROWS-1),
 `
-z88dk_for(`LIN2REPT', `0', `3',
+Z88DK_FOR(`LIN2REPT', `0', `3',
 `
         defw      16384 + (((ROWREPT+1)/8)*2048) + (LIN2REPT*512) + (((ROWREPT+1)%8)*32)
 ')
 ')
 
-z88dk_for(`LOOP', `1', eval(4*(23-__NIRVANAP_TOTAL_ROWS)),
+Z88DK_FOR(`LOOP', `1', eval(4*(23-__NIRVANAP_TOTAL_ROWS)),
 `
         defw      0
 ')
 ; -----------------------------------------------------------------------------
 attribs:
 ; lookup table with render attribute coordinates
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
-z88dk_for(`RACEREPT', `0', eval(4*__NIRVANAP_TOTAL_ROWS-1),
+Z88DK_FOR(`RACEREPT', `0', eval(4*__NIRVANAP_TOTAL_ROWS-1),
 `
         defw      race_raster + (RACEREPT*82)
 ')
-z88dk_for(`LOOP', `1', eval(4*(23-__NIRVANAP_TOTAL_ROWS)),
+Z88DK_FOR(`LOOP', `1', eval(4*(23-__NIRVANAP_TOTAL_ROWS)),
 `
         defw      0
 ')
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
@@ -731,7 +731,7 @@ asm_NIRVANAP_fillT:
         ex      de, hl                  ; DE = difference between column offsets
 
 ; update attribute addresses to specified value
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         pop     hl
         add     hl, bc
