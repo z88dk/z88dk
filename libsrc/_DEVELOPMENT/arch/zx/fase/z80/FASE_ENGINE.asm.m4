@@ -202,22 +202,22 @@ Z88DK_CLBL(,save):
 ; *************************************************************
 
 ; Paolo Ferraris' shortest loader, then we move all the code to $8000
-        org     staspr+final-mapend-$
-staspr  defw    draw_sprites+1&$ffff
+        org     staspr+final-mapend-ASMPC
+staspr: defw    draw_sprites+1
         nop
         include ../mus/effx.asm
-do_sprites
-      IF  machine=1
-        ld      (drawz+1&$ffff), sp
-      ELSE
-dom     ld      hl, effx1-1
-        ld      (drawz+1&$ffff), sp
+do_sprites:
+IF  machine=1
+        ld      (drawz+1), sp
+ELSE
+dom:    ld      hl, effx1-1
+        ld      (drawz+1), sp
         ld      a, $10
-dom1    ld      b, (hl)
+dom1:   ld      b, (hl)
         cp      b
         jr      z, dom4
         out     ($fe), a
-dom2    djnz    dom2
+dom2:   djnz    dom2
         and     a
         ld      a, b
         out     ($fe), a
@@ -225,68 +225,56 @@ dom2    djnz    dom2
         ld      a, $90
         bit     7, (hl)
         jr      z, dom1
-dom3    ld      hl, (dom+1)
+dom3:   ld      hl, (dom+1)
         inc     hl
         ld      (dom+1), hl
-dom4
-      ENDIF
-      IF  machine=0             ; if 48k doing sync with the sync bar (8 lines)
-do0     ld      bc, syhi | sylo<<8
-do1     in      a, ($ff)        ; first detect the syhi byte in the floating bus
+dom4:
+ENDIF
+IF  machine=0                   ; if 48k doing sync with the sync bar (8 lines)
+do0:    ld      bc, syhi | (sylo<<8)
+do1:    in      a, ($ff)        ; first detect the syhi byte in the floating bus
         cp      b
         jp      nz, do1
         ld      b, 9            ; then wait for sylo in the next 9 readings
-do2     in      a, ($ff)
+do2:    in      a, ($ff)
         cp      c
-do3     jr      z, do5
+do3:    jr      z, do5
         djnz    do2
         jr      do0
-      ENDIF
-      IF  machine=1             ; if not 48k sync with interrupt
+ENDIF
+IF  machine=1                   ; if not 48k sync with interrupt
         ld      hl, do1
         ei
-do1     jp      (hl)
+do1:    jp      (hl)
         ld      bc, $7ffd
-      IF player
+IF player
         ld      a, $11
         out     (c), a
-      ELSE
-        ld      a, (port&$ffff) ; toggle port value between 00 and 80 every frame
+ELSE
+        ld      a, (port)       ; toggle port value between 00 and 80 every frame
         xor     $80
-        ld      (port&$ffff), a
+        ld      (port), a
         ld      a, $18          ; also toggle between bank 5 & 7 for the screen
         jr      z, do2          ; and 7 & 0 for the current paging at $c000
         dec     a               ; so we always show a screen and modify the other
-do2     out     (c), a
-      ENDIF
-do3     jr      update_complete
-      ENDIF
-      IF  machine=2
+do2:    out     (c), a
+ENDIF
+do3:    jr      update_complete
+ENDIF
+IF  machine=2
         ld      hl, do1         ; if not floating bus or 128k sync with
         ei                      ; the interrupt, so we'll have more cycles of
-do1     jp      (hl)            ; flickering
-do3     jr      update_complete
-      ENDIF
-do5     ld      a, update_complete-2-do3&$ff
+do1:    jp      (hl)            ; flickering
+do3:    jr      update_complete
+ENDIF
+do5:    ld      a, +(update_complete-2-do3)&$ff
         ld      (do3+1), a
-        jp      draw_sprites&$ffff
-      IF  machine=1
-do4     ld      a, update_complete-2-do3&$ff
+        jp      draw_sprites
+IF  machine=1
+do4     ld      a, +(update_complete-2-do3)&$ff
         ld      (do3+1), a
         jp      descd
-      ENDIF
-
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+ENDIF
 
 ;Complete background update
 update_complete:
@@ -1124,16 +1112,16 @@ ENDIF
 ENDIF
 ENDIF
 drawe:
-      IF clipdn=2
-        cp      1+((offsey+scrh*2-2)<<3)
-        jp      nc, craw1&$ffff
-      ENDIF
-    IF notabl
+IF clipdn=2
+        cp      1+((offsey+(scrh*2)-2)<<3)
+        jp      nc, craw1
+ENDIF
+IF notabl
         ld      l, a            ; A=L= RRrrrppp
-      IF offsey=0
+IF offsey=0
         cp      192
         jr      nc, drawf
-      ENDIF
+ENDIF
         rrca
         rrca
         rrca                    ; A= pppRRrrr
@@ -1142,9 +1130,9 @@ drawe:
         xor     l               ; A= RRrRRppp
         and     %00011111
         or      %01000000
-      IF offsey=0
+IF offsey=0
         jr      drawg
-drawf   rrca
+drawf:  rrca
         rrca
         rrca                    ; A= pppRRrrr
         xor     l
@@ -1152,51 +1140,51 @@ drawf   rrca
         xor     l               ; A= RRrRRppp
         and     %00011111
         or      %00100000
-      ENDIF
-drawg   ld      h, a
+ENDIF
+drawg:  ld      h, a
         ld      a, l
         rlca
         rlca
         and     $e0
-    ELSE
-        ld      (drawf+1&$ffff), a
-      IF offsey=0
+ELSE
+        ld      (drawf+1), a
+IF offsey=0
         cp      192
-drawf   ld      a, (lookt&$ffff)
+drawf:  ld      a, (lookt)
         jr      nc, drawg
-      ELSE
-drawf   ld      a, (lookt&$ffff)
-      ENDIF
+ELSE
+drawf:  ld      a, (lookt)
+ENDIF
         ld      l, a            ; A=L= rrrRRppp
         and     %00011111
         ld      h, a            ;   H= 000RRppp
         set     6, h
         xor     l               ;   A= rrr00000
-      IF offsey=0
+IF offsey=0
         jr      drawh
-drawg   ld      l, a            ; A=L= rrrRRppp
+drawg:  ld      l, a            ; A=L= rrrRRppp
         and     %00011111
         ld      h, a            ;   H= 000RRppp
         set     5, h
         xor     l               ;   A= rrr00000
-      ENDIF
-    ENDIF
-drawh   add     a, 0
-      IF  offsex != 1
+ENDIF
+ENDIF
+drawh:  add     a, 0
+IF  offsex != 1
         add     a, offsex-1
-      ENDIF
+ENDIF
         ld      l, a
-      IF  machine=1
+IF  machine=1
         ld      a, (port)
         or      h
         ld      h, a
-      ENDIF
+ENDIF
         ld      a, e
-        ld      (drawv+1&$ffff), a
-drawi
-    IF smooth=1
+        ld      (drawv+1), a
+drawi:
+IF smooth=1
         bit     0, h
-        jp      z, drawn&$ffff
+        jp      z, drawn
         ex      af, af'
         pop     de
         ld      ixl, d
@@ -1208,10 +1196,10 @@ drawi
         dec     a
         ld      l, a
         ld      a, e
-drawj   and     %00001100
+drawj:  and     %00001100
         jr      z, drawl
-        jp      po, drawm&$ffff
-drawk   pop     de
+        jp      po, drawm
+drawk:  pop     de
         ld      a, (hl)
         dec     bc
         ld      (bc), a
@@ -1235,7 +1223,7 @@ drawk   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         pop     de
         ld      a, (hl)
         dec     c
@@ -1262,8 +1250,8 @@ drawk   pop     de
         inc     h
         dec     ixl
         jr      nz, drawk
-        jp      draws&$ffff
-drawl   pop     de
+        jp      draws
+drawl:  pop     de
         ld      a, (hl)
         dec     bc
         ld      (bc), a
@@ -1279,7 +1267,7 @@ drawl   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         pop     de
         ld      a, (hl)
         dec     bc
@@ -1298,8 +1286,8 @@ drawl   pop     de
         inc     h
         dec     ixl
         jr      nz, drawl
-        jp      draws&$ffff
-drawm   pop     de
+        jp      draws
+drawm:  pop     de
         ld      a, (hl)
         dec     bc
         ld      (bc), a
@@ -1307,7 +1295,7 @@ drawm   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         pop     de
         ld      a, (hl)
         dec     c
@@ -1318,9 +1306,9 @@ drawm   pop     de
         inc     h
         dec     ixl
         jr      nz, drawm
-        jp      draws&$ffff
-    ENDIF
-drawn   ex      af, af'
+        jp      draws
+ENDIF
+drawn:  ex      af, af'
         pop     de
         ld      ixl, d
         ld      iyh, d
@@ -1331,10 +1319,10 @@ drawn   ex      af, af'
         dec     a
         ld      l, a
         ld      a, e
-drawo   and     %00001100
+drawo:  and     %00001100
         jr      z, drawq
-        jp      po, drawr&$ffff
-drawp   pop     de
+        jp      po, drawr
+drawp:  pop     de
         ld      a, (hl)
         dec     bc
         ld      (bc), a
@@ -1382,11 +1370,11 @@ drawp   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         dec     ixl
         jr      nz, drawp
         jr      draws
-drawq   pop     de
+drawq:  pop     de
         ld      a, (hl)
         dec     bc
         ld      (bc), a
@@ -1418,11 +1406,11 @@ drawq   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         dec     ixl
         jr      nz, drawq
         jr      draws
-drawr   pop     de
+drawr:  pop     de
         ld      a, (hl)
         dec     bc
         ld      (bc), a
@@ -1438,11 +1426,11 @@ drawr   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         dec     ixl
         jr      nz, drawr
-draws   ld      a, iyh
-drawt   dec     bc
+draws:  ld      a, iyh
+drawt:  dec     bc
         ld      (bc), a
         ld      a, iyl
         dec     c
@@ -1450,45 +1438,45 @@ drawt   dec     bc
         ex      af, af'
         dec     a
         jp      nz, drawi
-drawu   ld      a, h
+drawu:  ld      a, h
         dec     bc
         ld      (bc), a
         ld      a, l
         dec     c
         ld      (bc), a
-drawv   ld      a, 0
+drawv:  ld      a, 0
         dec     bc
         ld      (bc), a
         dec     c
-draww   ld      a, 0
+draww:  ld      a, 0
         add     a, 4
         cp      sprmax<<2
         jp      nz, draw9
-    IF  machine=1
+IF  machine=1
         ld      (delete_sprites+1), bc
         ld      hl, (drwout)
         ld      a, h
         inc     a
         ld      sp, screen-1
         jr      z, drawx
-        call    $162c
+***********************        call    $162c
         ld      a, ($5bff)
         xor     $ff
         jr      nz, drawx
         dec     a
         ld      (drwout+1), a
-drawx   ld      ($5bff), a
+drawx:  ld      ($5bff), a
         ld      bc, $7ffd
         ld      a, (port)
         rla
         ld      a, $10
         jr      c, drawy
         ld      a, $18
-drawy   out     (c), a
-drawz   ld      sp, 0
+drawy:  out     (c), a
+drawz:  ld      sp, 0
         ret
-    ELSE
-drawz   ld      sp, 0
+ELSE
+drawz:  ld      sp, 0
         ld      (delete_sprites+1), bc
         ld      hl, (drwout)
         ld      a, h
@@ -1497,22 +1485,22 @@ drawz   ld      sp, 0
         ld      a, $ff
         ld      (drwout+1), a
         jp      (hl)
-    ENDIF
+ENDIF
 
 ; This is a continuation of draw_sprite routine to deal with top edge clipping
-    IF clipup=2
-braw1   ld      (braw9+1&$ffff), bc  
-        ld      (braw2+1&$ffff), a
+IF clipup=2
+braw1:  ld      (braw9+1), bc  
+        ld      (braw2+1), a
         cpl
-      IF offsey>0
+IF offsey>0
         sub     -(offsey<<3)-2
         rra
-      ELSE
+ELSE
         rra
         inc     a
-      ENDIF
+ENDIF
         ld      ixh, a
-    IF notabl
+IF notabl
 braw2   ld      a, 0
         ld      l, a
         rrca
@@ -1522,43 +1510,43 @@ braw2   ld      a, 0
         and     %00011000
         xor     l               ; A= RRrRRppp
         and     %00011111
-      IF offsey=0
+IF offsey=0
         or      %00100000
-      ELSE
+ELSE
         or      %01000000
-      ENDIF
+ENDIF
         ld      h, a
         ld      a, l
         rlca
         rlca
         and     $e0
-    ELSE
-braw2   ld      a, (lookt&$ffff)
+ELSE
+braw2:  ld      a, (lookt)
         ld      l, a            ; A=L= rrrRRppp
         and     %00011111
         ld      h, a            ;   H= 000RRppp
-      IF offsey=0
+IF offsey=0
         set     5, h
-      ELSE
+ELSE
         set     6, h
-      ENDIF
+ENDIF
         xor     l               ;   A= rrr00000
-    ENDIF
+ENDIF
         ld      l, a            ;   L= rrr00000
         ld      a, (drawh+1)
-      IF  offsex != 1
+IF  offsex != 1
         add     a, offsex-1
-      ENDIF
+ENDIF
         or      l
         ld      l, a
-      IF  machine=1
+IF  machine=1
         ld      a, (port)
         or      h
         ld      h, a
-      ENDIF
+ENDIF
         ld      a, e
         ex      de, hl
-braw3   ex      af, af'
+braw3:  ex      af, af'
         pop     bc
         ld      a, c
         and     $03
@@ -1568,8 +1556,8 @@ braw3   ex      af, af'
         ld      a, c
         and     %00001100
         jr      z, braw5
-        jp      po, braw6&$ffff
-braw4   ld      hl, 12
+        jp      po, braw6
+braw4:  ld      hl, 12
         add     hl, sp
         ld      sp, hl
         inc     d
@@ -1578,7 +1566,7 @@ braw4   ld      hl, 12
         jr      z, brawa
         djnz    braw4
         jr      braw7
-braw5   ld      hl, 8
+braw5:  ld      hl, 8
         add     hl, sp
         ld      sp, hl
         inc     d
@@ -1587,59 +1575,59 @@ braw5   ld      hl, 8
         jr      z, brawa
         djnz    braw5
         jr      braw7
-braw6   pop     hl
+braw6:  pop     hl
         pop     hl
         inc     d
         inc     d
         dec     ixh
         jr      z, brawa
         djnz    braw6
-braw7   ex      af, af'
+braw7:  ex      af, af'
         dec     a
         jp      nz, braw3
-        ld      bc, (braw9+1&$ffff)
+        ld      bc, (braw9+1)
         jp      draww
-braw8   ld      ixl, b
+braw8:  ld      ixl, b
         ld      iyh, b
         ld      iyl, c
         ex      af, af'
         ld      (drawv+1), a
         ex      af, af'
         ld      a, c
-braw9   ld      bc, 0
-      IF smooth=1
+braw9:  ld      bc, 0
+IF smooth=1
         bit     0, h
         jp      nz, drawj
-      ENDIF
+ENDIF
         jp      drawo
-brawa
-      IF offsey&7
+brawa:
+IF offsey&7
         ld      hl, $f820
         add     hl, de
-      ELSE
+ELSE
         ld      a, e
         add     a, $20
         ld      l, a
         ld      h, d
-      ENDIF
+ENDIF
         djnz    braw8
-        ld      bc, (braw9+1&$ffff)
+        ld      bc, (braw9+1)
         ex      af, af'
         dec     a
         ld      (drawv+1), a
         jp      nz, drawi
         jp      draww
-    ENDIF
+ENDIF
 
 ; And this one to deal with bottom edge clipping
-    IF clipdn=2
-craw1   ld      (craw2+1&$ffff), a
+IF clipdn=2
+craw1:  ld      (craw2+1), a
         cpl
-        sub     $ff-(offsey+scrh*2<<3)
+        sub     $ff-((offsey+(scrh*2))<<3)
         rra
         ld      ixh, a
-      IF notabl
-craw2   ld      a, 0
+IF notabl
+craw2:  ld      a, 0
         ld      l, a
         rrca
         rrca
@@ -1654,29 +1642,29 @@ craw2   ld      a, 0
         rlca
         rlca
         and     $e0
-      ELSE
-craw2   ld      a, (lookt&$ffff)
+ELSE
+craw2:  ld      a, (lookt)
         ld      l, a            ; A=L= rrrRRppp
         and     %00011111
         ld      h, a            ;   H= 000RRppp
         set     6, h
         xor     l               ;   A= rrr00000
-      ENDIF
+ENDIF
         ld      l, a            ;   L= rrr00000
         ld      a, (drawh+1)
-      IF  offsex != 1
+IF  offsex != 1
         add     a, offsex-1
-      ENDIF
+ENDIF
         or      l
         ld      l, a
-      IF  machine=1
+IF  machine=1
         ld      a, (port)
         or      h
         ld      h, a
-      ENDIF
+ENDIF
         ld      a, e
         ld      (drawv+1), a
-craw3   ex      af, af'
+craw3:  ex      af, af'
         pop     de
         ld      ixl, d
         ld      iyh, d
@@ -1689,8 +1677,8 @@ craw3   ex      af, af'
         ld      a, e
         and     %00001100
         jr      z, craw5
-        jp      po, craw6&$ffff
-craw4   pop     de
+        jp      po, craw6
+craw4:  pop     de
         ld      a, (hl)
         dec     bc
         ld      (bc), a
@@ -1714,9 +1702,9 @@ craw4   pop     de
         or      e
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updcldn
-      ENDIF
+IF smooth=1
+        UPDCLDN
+ENDIF
         pop     de
         ld      a, (hl)
         dec     c
@@ -1741,17 +1729,17 @@ craw4   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updcldn
+        UPDCLDN
         dec     ixh
-        jp      z, craw8&$ffff
+        jp      z, craw8
         dec     ixl
         jr      nz, craw4
-      IF smooth=0
+IF smooth=0
         jr      craw7
-      ELSE
-        jp      craw7&$ffff
-      ENDIF
-craw5   pop     de
+ELSE
+        jp      craw7
+ENDIF
+craw5:  pop     de
         ld      a, (hl)
         dec     bc
         ld      (bc), a
@@ -1767,9 +1755,9 @@ craw5   pop     de
         or      e
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updcldn
-      ENDIF
+IF smooth=1
+        UPDCLDN
+ENDIF
         pop     de
         ld      a, (hl)
         dec     bc
@@ -1786,13 +1774,13 @@ craw5   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updcldn
+        UPDCLDN
         dec     ixh
-        jp      z, craw8&$ffff
+        jp      z, craw8
         dec     ixl
         jr      nz, craw5
         jr      craw7
-craw6   pop     de
+craw6:  pop     de
         ld      a, (hl)
         dec     bc
         ld      (bc), a
@@ -1800,9 +1788,9 @@ craw6   pop     de
         or      e
         ld      (hl), a
         inc     h
-      IF smooth=1
-        updcldn
-      ENDIF
+IF smooth=1
+        UPDCLDN
+ENDIF
         pop     de
         ld      a, (hl)
         dec     c
@@ -1811,12 +1799,12 @@ craw6   pop     de
         or      e
         ld      (hl), a
         inc     h
-        updcldn
+        UPDCLDN
         dec     ixh
-        jp      z, craw8&$ffff
+        jp      z, craw8
         dec     ixl
         jr      nz, craw6
-craw7   ld      a, iyh
+craw7:  ld      a, iyh
         dec     bc
         ld      (bc), a
         ld      a, iyl
@@ -1826,7 +1814,7 @@ craw7   ld      a, iyh
         dec     a
         jp      nz, craw3
         jp      drawu
-craw8   ld      a, 1
+craw8:  ld      a, 1
         ex      af, af'
         ld      e, a
         ld      a, (drawv+1)
@@ -1837,166 +1825,166 @@ craw8   ld      a, 1
         sub     ixl
         inc     a
         jp      drawt
-    ENDIF
+ENDIF
 
 ; Initialisation code. The user call this routine to start the engine
 ; This will paint clipping bars
 ; In 48k also paint the sync bar
 ; In 128k we copy from RAM bank 0 to RAM bank 7
-init    ld      (ini8+1&$ffff), sp
-    IF clipup=1
-        ld      hl, $5800+offsex  -cliphr+(offsey-1<<5)
-        ld      de, $5800+offsex+1-cliphr+(offsey-1<<5)
-        ld      bc, (scrw+cliphr<<1)-1
-      IF atrbar=0
+init:   ld      (ini8+1), sp
+IF clipup=1
+        ld      hl, $5800+offsex  -cliphr+((offsey-1)<<5)
+        ld      de, $5800+offsex+1-cliphr+((offsey-1)<<5)
+        ld      bc, +((scrw+cliphr)<<1)-1
+IF atrbar=0
         ld      (hl), b
-      ELSE
+ELSE
         ld      (hl), atrbar
-      ENDIF
+ENDIF
         ldir
-    ENDIF
-    IF clipdn=1
-        ld      hl, $5800+offsex  -cliphr+(offsey+2*scrh<<5)
-        ld      de, $5800+offsex+1-cliphr+(offsey+2*scrh<<5)
-      IF clipup=1
-        ld      c, (scrw+cliphr<<1)-1
-      ELSE
-        ld      bc, (scrw+cliphr<<1)-1
-      ENDIF
-      IF atrbar=0
+ENDIF
+IF clipdn=1
+        ld      hl, $5800+offsex  -cliphr+((offsey+(2*scrh))<<5)
+        ld      de, $5800+offsex+1-cliphr+((offsey+(2*scrh))<<5)
+IF clipup=1
+        ld      c, +((scrw+cliphr)<<1)-1
+ELSE
+        ld      bc, +((scrw+cliphr)<<1)-1
+ENDIF
+IF atrbar=0
         ld      (hl), b
-      ELSE
+ELSE
         ld      (hl), atrbar
-      ENDIF
+ENDIF
         ldir
-    ENDIF
-  IF  scrw=16 | cliphr=0
+ENDIF
+IF  (scrw=16) || (cliphr=0)
         xor     a
-  ELSE
-    IF  scrw=15 & offsex=1
+ELSE
+IF  (scrw=15) & (offsex=1)
         ld      de, $0020
-      IF atrbar>0
+IF atrbar>0
         ld      a, 0+atrbar
         ld      ($5800+(offsey<<5)), a
         ld      ($5a7f+(offsey<<5)), a
         ld      b, a
         ld      c, a
-      ELSE
+ELSE
         ld      b, d
         ld      c, d
-      ENDIF
-        ld      a, scrh*2-1
+ENDIF
+        ld      a, +(scrh*2)-1
         ld      hl, $5821+(offsey<<5)
-ini1    ld      sp, hl
+ini1:   ld      sp, hl
         push    bc
         add     hl, de
         dec     a
         jr      nz, ini1
-      IF atrbar=0
+IF atrbar=0
         ld      ($5800+(offsey<<5)), a
         ld      ($5a7f+(offsey<<5)), a
-      ENDIF
-    ELSE
+ENDIF
+ELSE
         ld      a, scrh*2
-        ld      de, scrw*2+1
-        ld      bc, 31-scrw*2
+        ld      de, +(scrw*2)+1
+        ld      bc, 31-(scrw*2)
         ld      hl, $5800+offsex-1+(offsey<<5)
-      IF atrbar=0
-ini1    ld      (hl), b
+IF atrbar=0
+ini1:   ld      (hl), b
         add     hl, de
         ld      (hl), b
-      ELSE
-ini1    ld      (hl), atrbar
+ELSE
+ini1:   ld      (hl), atrbar
         add     hl, de
         ld      (hl), atrbar
-      ENDIF
+ENDIF
         add     hl, bc
         dec     a
         jr      nz, ini1
-    ENDIF
-  ENDIF
-    IF  machine=0
+ENDIF
+ENDIF
+IF  machine=0
         dec     a
         ld      (screen), a
         ld      (selbeg), a
         ld      (drwout+1), a
-      IF clipdn=1
-        ld      sp, $4020+(offsey+1+2*scrh<<5&0xe0)+(offsey+1+2*scrh<<8&0x1800)
-      ELSE
-        ld      sp, $4020+(offsey+2*scrh<<5&0xe0)+(offsey+2*scrh<<8&0x1800)
-      ENDIF
+IF clipdn=1
+        ld      sp, $4020+(((offsey+1+(2*scrh))<<5)&0xe0)+(((offsey+1+(2*scrh))<<8)&0x1800)
+ELSE
+        ld      sp, $4020+(((offsey+(2*scrh))<<5)&0xe0)+(((offsey+(2*scrh))<<8)&0x1800)
+ENDIF
         ld      b, 16
-ini2    push    af
+ini2:   push    af
         djnz    ini2
-      IF clipdn=1
-        ld      sp, $4120+(offsey+1+2*scrh<<5&0xe0)+(offsey+1+2*scrh<<8&0x1800)
-      ELSE
-        ld      sp, $4120+(offsey+2*scrh<<5&0xe0)+(offsey+2*scrh<<8&0x1800)
-      ENDIF
-        ld      de, sylo | syhi<<8
+IF clipdn=1
+        ld      sp, $4120+(((offsey+1+(2*scrh))<<5)&0xe0)+(((offsey+1+(2*scrh))<<8)&0x1800)
+ELSE
+        ld      sp, $4120+(((offsey+(2*scrh))<<5)&0xe0)+(((offsey+(2*scrh))<<8)&0x1800)
+ENDIF
+        ld      de, sylo | (syhi<<8)
         ld      h, e
         ld      l, e
         ld      b, 10
-ini3    push    de
+ini3:   push    de
         djnz    ini3
         ld      b, 6
-ini4    push    hl
+ini4:   push    hl
         djnz    ini4
-      IF clipdn=1
-        ld      sp, $4220+(offsey+1+2*scrh<<5&0xe0)+(offsey+1+2*scrh<<8&0x1800)
-      ELSE
-        ld      sp, $4220+(offsey+2*scrh<<5&0xe0)+(offsey+2*scrh<<8&0x1800)
-      ENDIF
+IF clipdn=1
+        ld      sp, $4220+(((offsey+1+(2*scrh))<<5)&0xe0)+(((offsey+1+(2*scrh))<<8)&0x1800)
+ELSE
+        ld      sp, $4220+(((offsey+(2*scrh))<<5)&0xe0)+(((offsey+(2*scrh))<<8)&0x1800)
+ENDIF
         push    de
         push    de
         push    de
         ld      e, d
         ld      b, 13
-ini5    push    de
+ini5:   push    de
         djnz    ini5
-      IF clipdn=1
-        ld      sp, $4320+(offsey+1+2*scrh<<5&0xe0)+(offsey+1+2*scrh<<8&0x1800)
-      ELSE
-        ld      sp, $4320+(offsey+2*scrh<<5&0xe0)+(offsey+2*scrh<<8&0x1800)
-      ENDIF
+IF clipdn=1
+        ld      sp, $4320+(((offsey+1+(2*scrh))<<5)&0xe0)+(((offsey+1+(2*scrh))<<8)&0x1800)
+ELSE
+        ld      sp, $4320+(((offsey+(2*scrh))<<5)&0xe0)+(((offsey+(2*scrh))<<8)&0x1800)
+ENDIF
         ld      b, 16
-ini6    push    de
+ini6:   push    de
         djnz    ini6
-      IF clipdn=1
-        ld      sp, $5820+(offsey+1+2*scrh<<5)
-      ELSE
-        ld      sp, $5820+(offsey+2*scrh<<5)
-      ENDIF
+IF clipdn=1
+        ld      sp, $5820+((offsey+1+(2*scrh))<<5)
+ELSE
+        ld      sp, $5820+((offsey+(2*scrh))<<5)
+ENDIF
         ld      b, 16
-ini7    push    de
+ini7:   push    de
         djnz    ini7
         ld      a, do5-2-do3
         ld      (do3+1), a
-ini8    ld      sp, 0
+ini8:   ld      sp, 0
         ret
-    ENDIF
-    IF  machine=1
+ENDIF
+IF  machine=1
         ld      (do3+1), a
         ld      (port), a
 
         ld      sp, $fff4
         ld      l, $23
         ex      (sp), hl
-        ld      (exit+1&$ffff), hl
+        ld      (exit+1), hl
         inc     sp
         ld      hl, $c3c9
         ex      (sp), hl
         ld      a, h
-        ld      (exit1+1&$ffff), a
+        ld      (exit1+1), a
 
         ld      sp, $5c06
-        ld      hl, ini2&$ffff
+        ld      hl, ini2
         ld      de, $5b00
-      IF atrbar=0
+IF atrbar=0
         ld      c, ini5-ini2
-      ELSE
+ELSE
         ld      bc, ini5-ini2
-      ENDIF
+ENDIF
         ldir
         ld      hl, $db00
         call    $5b00
@@ -2007,13 +1995,13 @@ ini8    ld      sp, 0
 ;        dec     a
 ;        ld      i, a
 ;        im      2
-ini8    ld      sp, 0
+ini8:   ld      sp, 0
         ret
-ini2    ld      c, $ff+ini2-ini5&$ff
+ini2:   ld      c, +($ff+ini2-ini5)&$ff
         ldir
         ld      a, $17
         call    $5b00+ini4-ini2
-        ld      c, $ff+ini2-ini5&$ff
+        ld      c, +($ff+ini2-ini5)&$ff
         ex      de, hl
         dec     e
         dec     l
@@ -2021,7 +2009,7 @@ ini2    ld      c, $ff+ini2-ini5&$ff
         inc     e
         inc     l
         ex      de, hl
-        ld      c, $ff+ini2-ini5&$ff
+        ld      c, +($ff+ini2-ini5)&$ff
         add     hl, bc
         ld      a, $10
         call    $5b00+ini4-ini2
@@ -2031,22 +2019,22 @@ ini2    ld      c, $ff+ini2-ini5&$ff
         ld      de, $c000
         ld      bc, $1b00
         ldir
-ini3    xor     $07
-ini4    push    bc
+ini3:   xor     $07
+ini4:   push    bc
         ld      bc, $7ffd
         out     (c), a
         pop     bc
         ret
-ini5
-exit    ld      hl, 0
+ini5:
+exit:   ld      hl, 0
         ld      ($fff4), hl
-exit1   ld      a, 0
+exit1:  ld      a, 0
         ld      ($fff6), a
 
         ld      a, $10
         jr      ini4
-    ENDIF
-      IF  machine=2
+ENDIF
+IF  machine=2
         ld      (do3+1), a
         dec     a
         ld      (screen), a
@@ -2055,64 +2043,64 @@ exit1   ld      a, 0
         dec     a
         ld      i, a
         im      2
-ini8    ld      sp, 0
+ini8:   ld      sp, 0
         ret
-      ENDIF
+ENDIF
 
 ; This code is part of the map compressor, exactly a get bit routine
-    IF bithlf=1 & bitsym>1
-gbit1   sub     $80 - (1 << bitsym - 2)
+IF (bithlf=1) && (bitsym>1)
+gbit1:  sub     $80 - (1 << (bitsym - 2))
         defb    $da             ; second part of half bit implementation
-    ENDIF
-gbit2   ld      b, (hl)         ; load another group of 8 bits
+ENDIF
+gbit2:  ld      b, (hl)         ; load another group of 8 bits
         dec     hl
-gbit3   rl      b               ; get next bit
+gbit3:  rl      b               ; get next bit
         jr      z, gbit2        ; no more bits left?
         adc     a, a            ; put bit in a
         ret
 
 ; This code is part of the loader. It tries if floating bus exists.
 ; It's here because loader is located in contened memory
-      IF  machine=2
+IF  machine=2
         ld      c, 5
-ini9    in      a, ($ff)
+ini9:   in      a, ($ff)
         inc     a
         ret     nz
         djnz    ini9
         dec     c
         jr      nz, ini9
         ret
-      ENDIF
+ENDIF
 
 ; Map file. Generated externally with TmxCompress.c from map.tmx
-map     incbin  ../build/map_compressed.bin
-mapend
+map:    binary "../build/map_compressed.bin"
+mapend:
 
 ; Look up 256 bytes table and space to decompressor
-        block   final-$&$ffff
-    IF smooth=0
-      IF notabl=0
-lookt   incbin  asm/file1.bin
-      ENDIF
-        block   $feff-$&$ffff
+        defs    final-ASMPC
+IF smooth=0
+IF notabl=0
+lookt:  binary "asm/file1.bin"
+ENDIF
+        defs    $feff-ASMPC
         defb    $ff
-    ELSE
-        block   $7f
-      IF notabl=0
-lookt   incbin  asm/file1.bin
-      ENDIF
-        block   $100
-    ENDIF
+ELSE
+        defs    $7f
+IF notabl=0
+lookt:  binary "asm/file1.bin"
+ENDIF
+        defs    $100
+ENDIF
         defb    $ff
-        block   $fff4-$&$ffff
+        defs    $fff4-ASMPC
         inc     hl
         ret
         defb    $c9
-      IF machine=1
+IF machine=1
         defw    exit
-      ELSE
+ELSE
         defw    0
-      ENDIF
+ENDIF
         jp      do_sprites
         jp      init
         defb    $18
