@@ -355,6 +355,9 @@ ASM
 );
 
 eq_or_diff scalar(read_file("test.def")), <<'END', "test.def";
+DEFC minus_d_var                     = $0001 ;   test
+DEFC defc_var                        = $0002 ;   test
+DEFC defvars_var                     = $0003 ;   test
 DEFC public_label                    = $0004 ;   test
 END
 

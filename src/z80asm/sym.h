@@ -61,6 +61,7 @@ CLASS( Symbol )
 	Bool			is_defined : 1;		/* TRUE if symbol was defined in the current module */
 	Bool			is_touched : 1;		/* TRUE if symbol was used, e.g. returned by 
 										 * a symbol table search */
+	Bool			is_global_def : 1;	/* true for __head, __tail, __size symbols */
 	struct Module  *module;				/* module which owns symbol (weak ref) */
 	struct Section *section;			/* section where expression is defined (weak ref) */
 END_CLASS;
