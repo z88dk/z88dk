@@ -72,7 +72,7 @@ Line 2: Unit test for dbg.h
 Line 3: 
 Line 4: Based on Learn C the Hard Way book, by Zed. A. Shaw (http://c.learncodethehardway.org/book/)
 Line 5: 
-Line 6: Copyright (C) Paulo Custodio, 2011-2015
+Line 6: Copyright (C) Paulo Custodio, 2011-2017
 Line 7: 
 
 ---------- Test: test_xfopen_die ----------
