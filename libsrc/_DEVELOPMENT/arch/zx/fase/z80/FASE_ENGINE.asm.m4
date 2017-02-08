@@ -73,35 +73,37 @@ define(`UPDREMOVE',
 `
    ld a,h
 	and $07
-	jp nz, ASMPC + 13
+	jp nz, Z88DK_ULBL(_upd)
 	ld a,l
 	sub $20
 	ld l,a
-	jr c, ASMPC + 6
+	jr c, Z88DK_CLBL(,_upd)
 	ld a,h
 	add a,$08
 	ld h,a
+Z88DK_CLBL(,_upd):
 ')
 
 define(`UPDPAINT',
 `
    ld a,h
 	and $07
-	jp nz, ASMPC + 13
+	jp nz, Z88DK_ULBL(_upd)
 	ld a,l
 	add a,$20
 	ld l,a
-	jr c, ASMPC + 6
+	jr c, Z88DK_CLBL(,_upd)
 	ld a,h
 	sub $08
 	ld h,a
+Z88DK_CLBL(,_upd):
 ')
 
 define(`UPDCLDN',
 `
    ld a,h
 	and $07
-	jp nz, ASMPC + 
+	jp nz, Z88DK_ULBL(_upd)
 	IF (offsey+(scrh*2))&7
 	   ld de,$f820
 		add hl,de
@@ -109,11 +111,12 @@ define(`UPDCLDN',
 	   ld a,l
 		add a,$20
 		ld l,a
-		jr c, ASMPC + 6
+		jr c, Z88DK_CLBL(,_upd)
 		ld a,h
 		sub $08
 		ld h,a
 	ENDIF
+Z88DK_CLBL(,_upd):
 ')
 
 define(`CELLP',
@@ -156,10 +159,11 @@ define(`CELLPRIN1',
 	ld a,$1f
 	add a,l
 	ld l,a
-	jr c, ASMPC + 6
+	jr c, Z88DK_ULBL(_cell)
 	ld a,$f8
 	add a,h
 	ld h,a
+Z88DK_CLBL(,_cell):
 ')
 
 define(`CELLPRIN2',
@@ -168,20 +172,21 @@ define(`CELLPRIN2',
 	ld de,$f8e1
 	ld a,l
 	add a,e
-	jp c, ASMPC + 5
+	jp c, Z88DK_ULBL(_cell)
 	ld d,$f1
 	add hl,de
+Z88DK_CLBL(,_cell):
 ')
 
 define(`TILEPRINT',
 `
    IF offsey & 1
-	   ld (z88dk_count_inc),a
+	   ld (Z88DK_ULBL(save)+1),a
 		CELLPRINT($f901)
 		CELLPRIN1
 		CELLPRINT($f901)
 		CELLPRIN2
-
+Z88DK_CLBL(,save):
 		ld a,0
 	ELSE
 	   CELLPRINT($f901)
@@ -192,22 +197,9 @@ define(`TILEPRINT',
 ')
 
 
-
-    MACRO tileprint
-      IF offsey&1
-        ld      (.save+1), a
-        cellprint $f901
-        cellprin1
-        cellprint $f901
-        cellprin2
-.save   ld      a, 0
-      ELSE
-        cellprint $f901
-        cellprint $f91f
-        cellprint $f901
-        cellprint $f8e1
-      ENDIF
-    ENDM
+; *************************************************************
+; **  **********************************************
+; *************************************************************
 
 ; Paolo Ferraris' shortest loader, then we move all the code to $8000
         org     staspr+final-mapend-$
@@ -284,115 +276,127 @@ do4     ld      a, update_complete-2-do3&$ff
         jp      descd
       ENDIF
 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
 ;Complete background update
-update_complete
+update_complete:
         ld      hl, screen      ; compare screen variable with $ff to detect
         ld      a, (hl)         ; if the user has written on it
         inc     a
-        jp      z, delete_sprites&$ffff
+        jp      z, delete_sprites
         ld      bc, $00ff       ; in this case read the value and write $ff
         ld      (hl), c         ; to this variable
-        ld      hl, mapend+$fe&$ffff
-        ld      de, map&$ffff   ; decompression stuff
-desc1   sbc     hl, bc
+        ld      hl, mapend+$fe
+        ld      de, map         ; decompression stuff
+desc1:  sbc     hl, bc
         ex      de, hl
         ld      c, (hl)
         ex      de, hl
         inc     de
         dec     a
         jr      nz, desc1
-      IF  machine=1
+IF  machine=1
         ld      bc, $7ffd
         ld      a, (port)
         rla
         ld      e, $10
         jr      c, desc2
         ld      e, $1f
-desc2   out     (c), e
+desc2:  out     (c), e
         ld      a, do4-2-do3
         ld      (do3+1), a
         ld      a, e
         xor     $07
         out     (c), a
         inc     b
-      ELSE
+ELSE
         ld      b, $80          ; marker bit
-      ENDIF
-        ld      de, mapbuf+scrw*scrh-1
-desc3   ld      a, 256 >> bitsym
-desc4   call    gbit3&$ffff     ; load bitsym bits (literal)
+ENDIF
+        ld      de, mapbuf+(scrw*scrh)-1
+desc3:  ld      a, 256 >> bitsym
+desc4:  call    gbit3           ; load bitsym bits (literal)
         jr      nc, desc4
-    IF bithlf=1
-      IF bitsym=1
+IF bithlf=1
+IF bitsym=1
         rrca
         jr      nc, desc5
         xor     a
-        call    gbit3&$ffff
+        call    gbit3
         inc     a
-      ELSE
+ELSE
         rrca                    ; half bit implementation (ie 48 tiles)
-        call    c, gbit1&$ffff
-      ENDIF
-    ENDIF
-desc5   ld      (de), a         ; write literal
+        call    c, gbit1
+ENDIF
+ENDIF
+desc5:  ld      (de), a         ; write literal
         dec     e               ; test end of file (map is always 150 bytes)
-desc6   ld      a, e
+desc6:  ld      a, e
         cp      $3f
         jr      z, descd
-        call    gbit3&$ffff     ; read one bit
+        call    gbit3           ; read one bit
         rra
         jr      nc, desc3       ; test if literal or sequence
         push    de              ; if sequence put de in stack
         ld      a, 1            ; determine number of bits used for length
-desc7   call    nc, gbit3&$ffff ; (Elias gamma coding)
+desc7:  call    nc, gbit3       ; (Elias gamma coding)
         and     a
-        call    gbit3&$ffff
+        call    gbit3
         rra
         jr      nc, desc7       ; check end marker
         inc     a               ; adjust length
         ld      c, a            ; save lenth to c
         xor     a
         ld      de, scrw        ; initially point to scrw
-        call    gbit3&$ffff     ; get two bits
-        call    gbit3&$ffff
+        call    gbit3           ; get two bits
+        call    gbit3
         jr      z, desca        ; 00 = 1
         dec     a
-        call    gbit3&$ffff
+        call    gbit3
         jr      z, descc        ; 010 = 15
         bit     2, a
         jr      nz, desc8
-    IF  scrw>15
-        call    gbit3&$ffff     ; [011, 100, 101] xx = from 2 to 13
+IF  scrw>15
+        call    gbit3           ; [011, 100, 101] xx = from 2 to 13
         dec     a
-        call    gbit3&$ffff
+        call    gbit3
         jr      descb
-desc8   call    gbit3&$ffff     ; [110, 111] xxxxxx = from 14-15, 17-142
+desc8:  call    gbit3           ; [110, 111] xxxxxx = from 14-15, 17-142
         jr      nc, desc8
         cp      scrw-14
         sbc     a, -14
-    ELSE
-      IF  scrw=15
+ELSE
+IF  scrw=15
         add     a, $7c          ; [011, 100, 101] xx = from 2 to 13
         dec     e
-desc8   dec     e               ; [110, 111] xxxxxx = 14 and from 16 to 142
-desc9   call    gbit3&$ffff
+desc8:  dec     e               ; [110, 111] xxxxxx = 14 and from 16 to 142
+desc9:  call    gbit3
         jr      nc, desc9
         jr      z, descc
         add     a, e
-      ELSE
-        call    gbit3&$ffff     ; [011, 100, 101] xx = from 2 to 11 and from 13 to 14
-        call    gbit3&$ffff
+ELSE
+        call    gbit3           ; [011, 100, 101] xx = from 2 to 11 and from 13 to 14
+        call    gbit3
         cp      scrw+2
         sbc     a, 2
         jr      desca
-desc8   call    gbit3&$ffff     ; [110, 111] xxxxxx = from 15 to 142
+desc8:  call    gbit3           ; [110, 111] xxxxxx = from 15 to 142
         jr      nc, desc8
         add     a, 14
-      ENDIF
-    ENDIF
-desca   inc     a
-descb   ld      e, a
-descc   ld      a, b            ; save b (byte reading) on a
+ENDIF
+ENDIF
+desca:  inc     a
+descb:  ld      e, a
+descc:  ld      a, b            ; save b (byte reading) on a
         ld      b, d            ; b= 0 because lddr moves bc bytes
         ex      (sp), hl        ; store source, restore destination
         ex      de, hl          ; HL = destination + offset + 1
@@ -401,53 +405,53 @@ descc   ld      a, b            ; save b (byte reading) on a
         pop     hl              ; restore source address (compressed data)
         ld      b, a            ; restore b register
         jr      desc6           ; jump to main loop
-descd
-      IF  tmode=3
-        ld      a, mapbuf-1&$ff ; end of decompression stuff
-      ELSE
+descd:
+IF  tmode=3
+        ld      a, +(mapbuf-1)&$ff ; end of decompression stuff
+ELSE
         ld      a, mapbuf&$ff
-      ENDIF
+ENDIF
         ld      (upco2+1), a    ; fill values to produce
         ld      a, scrh         ; full background
         ld      (upco3-1), a
         ld      a, scrw
         ld      (upco4-1), a
-        ld      a, $40-scrw*2
+        ld      a, $40-(scrw*2)
         ld      (upco7+1), a
         ld      (upco8+1), a
-        ld      bc, $5800+offsex+offsey*32
-        ld      hl, $4000+offsex+(offsey<<5&0xe0)+(offsey<<8&0x1800)
-upco1                           ; from this we update a rectangular area
-      IF  machine=1             ; of tiles that can be partial if update_partial
+        ld      bc, $5800+offsex+(offsey*32)
+        ld      hl, $4000+offsex+((offsey<<5)&0xe0)+((offsey<<8)&0x1800)
+upco1:                          ; from this we update a rectangular area
+IF  machine=1                   ; of tiles that can be partial if update_partial
         ld      a, (port)       ; or complete if update_complete
         xor     b
         ld      b, a            ; if 128k put port variable into high bit of
         and     $80             ; B and H
         xor     h
         ld      h, a
-      ENDIF
+ENDIF
         exx
-      IF  tmode=3               ; save the pointer to the actual tile on BC
-upco2   ld      a, 0            ; or in upco5+1, depends if tmode is 3 or not
+IF  tmode=3                     ; save the pointer to the actual tile on BC
+upco2:  ld      a, 0            ; or in upco5+1, depends if tmode is 3 or not
         ld      (upco5+1), a
-      ELSE
-upco2   ld      bc, mapbuf&$ff00
-      ENDIF
+ELSE
+upco2:  ld      bc, mapbuf&$ff00
+ENDIF
         ld      a, 0            ; inner and outer loop, if complete update we
-upco3   ex      af, af'         ; repeat the loop scrh*scrw times
+upco3:  ex      af, af'         ; repeat the loop scrh*scrw times
         ld      a, 0
-upco4
-      IF  tmode=3
+upco4:
+IF  tmode=3
         ld      hl, upco5+1     ; increment pointer to actual tile
         inc     (hl)
-upco5   ld      hl, mapbuf
-      ELSE
+upco5:  ld      hl, mapbuf
+ELSE
         ld      h, b
         ld      l, c
-      ENDIF
+ENDIF
         ld      l, (hl)         ; read tile value
         ld      h, 0
-      IF  tmode=0
+IF  tmode=0
         ld      d, h            ; if tmode=0 multiply by 36 and print the tile
         ld      e, l
         add     hl, hl
@@ -460,9 +464,9 @@ upco5   ld      hl, mapbuf
         add     hl, de
         ld      sp, hl
         exx
-        tileprint
-      ENDIF
-      IF  tmode=1
+        TILEPRINT
+ENDIF
+IF  tmode=1
         ld      d, h            ; if tmode=1 multiply by 5
         ld      e, l            ; the first 4 bytes are attributes
         add     hl, hl          ; the last byte is a index to the bitmap
@@ -475,7 +479,7 @@ upco5   ld      hl, mapbuf
         add     hl, de
         ld      l, (hl)
         ld      h, d
-        ld      de, tiladdr+tiles*5
+        ld      de, tiladdr+(tiles*5)
         add     hl, hl
         add     hl, hl
         add     hl, hl
@@ -484,10 +488,10 @@ upco5   ld      hl, mapbuf
         add     hl, de
         ld      sp, hl
         exx
-        tileprint
-upco6   ld      sp, 0
-      ENDIF
-      IF  tmode=2
+        TILEPRINT
+upco6:  ld      sp, 0
+ENDIF
+IF  tmode=2
         ld      d, h            ; if tmode=2 multiply by 33
         ld      e, l            ; the first byte is index to attribute
         add     hl, hl          ; the last 32 bytes are the bitmap
@@ -505,14 +509,14 @@ upco6   ld      sp, 0
         ld      h, 0
         add     hl, hl
         add     hl, hl
-        ld      de, tiladdr+tiles*33
+        ld      de, tiladdr+(tiles*33)
         add     hl, de
         ld      (upco6+1), hl
         exx
-        tileprint
-upco6   ld      sp, 0
-      ENDIF
-      IF  tmode=3
+        TILEPRINT
+upco6:  ld      sp, 0
+ENDIF
+IF  tmode=3
         add     hl, hl          ; if tmode=3 we have indexed both
         ld      de, tiladdr     ; attribute and bitmap, so multiply by 2
         add     hl, de          ; to read from table and index
@@ -523,7 +527,7 @@ upco6   ld      sp, 0
         ld      d, h
         add     hl, hl
         add     hl, hl
-        ld      bc, tiladdr+tiles*2+bmaps*32
+        ld      bc, tiladdr+(tiles*2)+(bmaps*32)
         add     hl, bc
         ld      (upco6+1), hl
         ex      de, hl
@@ -532,13 +536,13 @@ upco6   ld      sp, 0
         add     hl, hl
         add     hl, hl
         add     hl, hl
-        ld      bc, tiladdr+tiles*2
+        ld      bc, tiladdr+(tiles*2)
         add     hl, bc
         ld      sp, hl
         exx
-        tileprint
-upco6   ld      sp, 0
-      ENDIF
+        TILEPRINT
+upco6:  ld      sp, 0
+ENDIF
         ex      de, hl          ; bitmap painted and sp points to attribute
         ld      h, b            ; source
         ld      l, c
@@ -558,51 +562,51 @@ upco6   ld      sp, 0
         ld      c, l
         ex      de, hl
         exx
-      IF  tmode<3
+IF  tmode<3
         inc     c
-      ENDIF
+ENDIF
         dec     a
         jp      nz, upco4
         exx
         ex      de, hl
-upco7   ld      bc, 0
+upco7:  ld      bc, 0
         add     hl, bc
         ld      b, h
         ld      c, l
         ex      de, hl
-upco8   ld      de, 0
+upco8:  ld      de, 0
         ld      a, l
         cp      $c0
         jr      c, upco9
         ld      d, 7
-upco9   add     hl, de
+upco9:  add     hl, de
         exx
         ex      af, af'
         dec     a
         jp      nz, upco3
-        jp      draw_sprites&$ffff
+        jp      draw_sprites
 
 ;Restore background behind the sprites previously stored in draw_sprites
-delete_sprites
+delete_sprites:
         ld      sp, 0
         pop     bc              ; all data is on stack, the first 2 values
         ld      ixl, b          ; pulled are BC and HL
         inc     b               ; HL is the screen position at the end of the paint
-      IF smooth=0               ; B is number of patterns
+IF smooth=0                    ; B is number of patterns
         jr      z, del7         ; C is X offset (bits 0&1) and wide (bits 2&3)
-      ELSE
-        jp      z, del7&$ffff
-      ENDIF
-del1    pop     hl
-del2    pop     bc
+ELSE
+        jp      z, del7
+ENDIF
+del1:   pop     hl
+del2:   pop     bc
         ld      a, c
-      IF smooth=1
+IF smooth=1
         bit     0, h            ; this conditional assembly is when smooth=1
-        jp      z, wel2&$ffff   ; we can save some cycles width different
+        jp      z, wel2         ; we can save some cycles width different
         and     %00001100       ; routines for even and odd lines
         jr      z, wel4
-        jp      po, wel5&$ffff
-wel3    pop     de
+        jp      po, wel5
+wel3:   pop     de
         dec     h
         ld      (hl), e
         inc     l
@@ -610,7 +614,7 @@ wel3    pop     de
         inc     l
         pop     de
         ld      (hl), e
-        updremove
+        UPDREMOVE
         dec     h
         ld      (hl), d
         dec     l
@@ -619,13 +623,13 @@ wel3    pop     de
         dec     l
         ld      (hl), d
         djnz    wel3
-        jp      del6&$ffff
-wel4    pop     de
+        jp      del6
+wel4:   pop     de
         dec     h
         ld      (hl), e
         inc     l
         ld      (hl), d
-        updremove
+        UPDREMOVE
         dec     h
         pop     de
         ld      (hl), e
@@ -633,19 +637,19 @@ wel4    pop     de
         ld      (hl), d
         djnz    wel4
         jr      del6
-wel5    pop     de
+wel5:   pop     de
         dec     h
         ld      (hl), e
-        updremove
+        UPDREMOVE
         dec     h
         ld      (hl), d
         djnz    wel5
         jr      del6
-      ENDIF
-wel2    and     %00001100       ; test wide
+ENDIF
+wel2:   and     %00001100       ; test wide
         jr      z, del4
-        jp      po, del5&$ffff
-del3    updremove               ; wide=3
+        jp      po, del5
+del3:   UPDREMOVE               ; wide=3
         pop     de
         dec     h
         ld      (hl), e
@@ -663,7 +667,7 @@ del3    updremove               ; wide=3
         ld      (hl), d
         djnz    del3
         jr      del6
-del4    updremove               ; wide=2
+del4:   UPDREMOVE               ; wide=2
         pop     de
         dec     h
         ld      (hl), e
@@ -676,72 +680,72 @@ del4    updremove               ; wide=2
         ld      (hl), d
         djnz    del4
         jr      del6
-del5    updremove               ; wide=1
+del5:   UPDREMOVE               ; wide=1
         pop     de
         dec     h
         ld      (hl), e
         dec     h
         ld      (hl), d
         djnz    del5
-del6    ld      a, c            ; add X offset to L
+del6:   ld      a, c            ; add X offset to L
         cpl
         and     $03
         add     a, l
         sub     2
         ld      l, a
         dec     ixl             ; repeat IXl times
-      IF smooth=0
+IF smooth=0
         jr      nz, del2
-      ELSE
+ELSE
         jp      nz, del2
-      ENDIF
+ENDIF
         pop     bc              ; next sprite to delete
         ld      ixl, b
         inc     b
-      IF smooth=0
+IF smooth=0
         jr      nz, del1
-      ELSE
+ELSE
         jp      nz, del1
-      ENDIF
-del7
-    IF bullet
+ENDIF
+del7:
+IF bullet
         pop     hl              ; if bullet=1 after sprites we delete the bullets
         inc     h
-      IF smooth=0
-        jr      z, update_partial&$ffff
-      ELSE
-        jp      z, update_partial&$ffff
-      ENDIF
-del8    pop     de              ; similar code but simpler than the sprites code
-        ld      (delf+1&$ffff), sp
+IF smooth=0
+        jr      z, update_partial
+ELSE
+        jp      z, update_partial
+ENDIF
+del8:   pop     de              ; similar code but simpler than the sprites code
+        ld      (delf+1), sp
         dec     h               ; in this case we need only 2 values per bullet
         ld      sp, hl          ; HL= start of the bullet in screen memory
         ex      de, hl          ; SP= points to the sprite to read structure
         pop     bc              ; no need to store info behing the bullet
         ld      ixl, c          ; because is XORed with the background
-        ld      iy, delf&$ffff
-        jp      draw_delete_bullet&$ffff
-delf    ld      sp, 0
+        ld      iy, delf
+        jp      draw_delete_bullet
+delf:   ld      sp, 0
         pop     hl
         inc     h
-      IF smooth=0
+IF smooth=0
         jr      nz, del8
-      ELSE
+ELSE
         jp      nz, del8
-      ENDIF
-    ENDIF
+ENDIF
+ENDIF
 
-update_partial
-      IF  machine=1
+update_partial:
+IF  machine=1
         jr      uppa3           ; if 128k we need to paint twice the same
-        ld      a, uppa3-update_partial-2&$ff
+        ld      a, +(uppa3-update_partial-2)&$ff
         ld      (update_partial+1), a
-uppa1   ld      l, 0            ; tile, one in each screen buffer
-uppa2   ld      c, 0
+uppa1:  ld      l, 0            ; tile, one in each screen buffer
+uppa2:  ld      c, 0
         jr      uppa5
-      ENDIF
+ENDIF
 
-uppa3   ld      hl, selend      ; test if we need to repaint a rectangular
+uppa3:  ld      hl, selend      ; test if we need to repaint a rectangular
         ld      a, (hl)         ; area of tiles
         dec     l
         ld      c, (hl)
@@ -751,7 +755,7 @@ uppa3   ld      hl, selend      ; test if we need to repaint a rectangular
 ;Partial background update
         ld      (hl), $ff
         ld      l, a
-      IF  machine=1
+IF  machine=1
         ld      h, c            ; in this code we store the read
         ld      bc, $7ffd       ; values to use in the next frame
         ld      a, (port)
@@ -759,7 +763,7 @@ uppa3   ld      hl, selend      ; test if we need to repaint a rectangular
         ld      e, $10
         jr      c, uppa4
         ld      e, $1f
-uppa4   out     (c), e
+uppa4:  out     (c), e
         ld      (update_partial+1), a
         ld      a, l
         ld      (uppa1+1), a
@@ -769,8 +773,8 @@ uppa4   out     (c), e
         xor     $07
         out     (c), a
         ld      c, h
-uppa5   ld      a, l
-      ENDIF
+uppa5:  ld      a, l
+ENDIF
         and     $0f             ; we basically extract the info
         inc     a               ; of the rectangular area that we want
         ld      (upco4-1), a    ; to repaint and fill the appropiate values
@@ -794,21 +798,21 @@ uppa5   ld      a, l
         rlca
         and     %00001111
         ld      e, a
-        mult8x8 scrw
+        MULT8X8(scrw)
         ld      a, c
         and     %00001111
         add     a, l
-      IF  tmode=3
-        add     a, mapbuf-1&$ff
-      ELSE
+IF  tmode=3
+        add     a, +(mapbuf-1)&$ff
+ELSE
         add     a, mapbuf&$ff
-      ENDIF
+ENDIF
         ld      (upco2+1), a
         ld      a, c
         and     $f0             ; A= yyyy0000
-      IF  offsey>0
+IF  offsey>0
         add     a, offsey<<3
-      ENDIF
+ENDIF
         ld      b, $58 >> 2     ; B= 00010110
         rla                     ; A= yyy00000
         rl      b               ; B= 0010110y
@@ -818,13 +822,13 @@ uppa5   ld      a, l
         xor     c        
         and     %11100001       
         xor     c               ; A= yy0xxxx0
-    IF  offsex=1
+IF  offsex=1
         inc     a
-    ELSE
-      IF  offsex>1
+ELSE
+IF  offsex>1
         add     a, offsex
-      ENDIF
-    ENDIF
+ENDIF
+ENDIF
         ld      c, a
         ld      l, a
         ld      a, b
@@ -836,54 +840,54 @@ uppa5   ld      a, l
         jp      upco1
 
 ;Draw the sprites, storing the background behind
-draw_sprites
-  IF bullet
+draw_sprites:
+IF bullet
         ld      hl, 0           ; in case of drawing first we start with bullets
-        ld      (draw5+1&$ffff), hl
+        ld      (draw5+1), hl
         ld      a, $31          ; main loop we read up to 8 bullet from $5b30 to $5b3e
-draw1   ld      (draw8+1&$ffff), a
+draw1:  ld      (draw8+1), a
         ld      l, a            ; in the bullets we only store 2 bytes, one of each
         ld      h, enems >> 8   ; coordinate (X and Y)
         ld      a, (hl)         ; read y
         cp      bulmiy&$ff      ; basically if the bullet is out of the screen
-        jp      c, draw8&$ffff  ; area we don't paint it
-        cp      11+scrh*16-2*bulmay&$ff
-        jp      nc, draw8&$ffff ; calculate the screen address
+        jp      c, draw8        ; area we don't paint it
+        cp      +(11+(scrh*16)-(2*bulmay))&$ff
+        jp      nc, draw8       ; calculate the screen address
         dec     l               ; and the source of the sprite (bullet) in SP
         ld      a, (hl)         ; read x
         add     a, 4
-      IF safehr & !cliphr
+IF safehr & (!cliphr)
         cp      8
-        jp      c, draw8&$ffff
-        cp      (scrw<<4)+1
-        jp      nc, draw8&$ffff
-      ENDIF
-      IF smooth=0
+        jp      c, draw8
+        cp      +(scrw<<4)+1
+        jp      nc, draw8
+ENDIF
+IF smooth=0
         and     $06
-      ELSE
+ELSE
         and     $07
         add     a, a
-      ENDIF
+ENDIF
         add     a, 8
-        ld      (draw2+2&$ffff), a
+        ld      (draw2+2), a
         ld      a, (hl)         ; read x
         add     a, 4
         and     $f8
         rra
         rra
         rra
-        ld      (draw4+1&$ffff), a
-draw2   ld      sp, ($5c00)
-        ld      (draw7+1&$ffff), sp
+        ld      (draw4+1), a
+draw2:  ld      sp, ($5c00)
+        ld      (draw7+1), sp
         pop     de
         ld      ixl, e
         inc     l
         ld      a, (hl)         ; read y
-      IF smooth=0
+IF smooth=0
         and     $fe
-      ENDIF
+ENDIF
         add     a, d
-    IF notabl
+IF notabl
         ld      l, a            ; A=L= RRrrrppp
         rrca
         rrca
@@ -898,33 +902,33 @@ draw2   ld      sp, ($5c00)
         rlca
         rlca
         and     $e0
-    ELSE
-        ld      (draw3+1&$ffff), a
-draw3   ld      a, (lookt&$ffff)
+ELSE
+        ld      (draw3+1), a
+draw3:  ld      a, (lookt)
         ld      l, a            ; A=L= rrrRRppp
         and     %00011111
         ld      h, a            ;   H= 000RRppp
         set     6, h
         xor     l               ;   A= rrr00000
-    ENDIF
-draw4   add     a, 0
-      IF  offsex != 1
+ENDIF
+draw4:  add     a, 0
+IF  offsex != 1
         add     a, offsex-1
-      ENDIF
+ENDIF
         ld      l, a
-      IF  machine=1
+IF  machine=1
         ld      a, (port)
         or      h
         ld      h, a
-      ENDIF
-        ld      (draw6+1&$ffff), hl
-        ld      iy, draw5&$ffff ; this is the return address after next routine
+ENDIF
+        ld      (draw6+1), hl
+        ld      iy, draw5       ; this is the return address after next routine
 
-draw_delete_bullet
-    IF smooth=1
+draw_delete_bullet:
+IF smooth=1
         bit     0, h            ; this code is the same for paint and delete
-        jp      z, drde6&$ffff  ; the bullet. We use IY as return address
-drde1   pop     bc              ; because stack is used by the routine
+        jp      z, drde6        ; the bullet. We use IY as return address
+drde1:  pop     bc              ; because stack is used by the routine
         ld      a, c
         rrca                    ; only 2 wide cases to treat
         jr      nc, drde3
@@ -932,7 +936,7 @@ drde1   pop     bc              ; because stack is used by the routine
         add     a, l
         dec     a
         ld      l, a
-drde2   pop     de
+drde2:  pop     de
         ld      a, (hl)
         xor     e
         ld      (hl), a
@@ -941,7 +945,7 @@ drde2   pop     de
         xor     d
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         pop     de
         ld      a, (hl)
         xor     e
@@ -953,26 +957,26 @@ drde2   pop     de
         inc     h
         djnz    drde2
         jr      drde5
-drde3   and     $03             ; wide=1
+drde3:  and     $03             ; wide=1
         add     a, l
         dec     a
         ld      l, a
-drde4   pop     de
+drde4:  pop     de
         ld      a, (hl)
         xor     e
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         ld      a, (hl)
         xor     d
         ld      (hl), a
         inc     h
         djnz    drde4
-drde5   dec     ixl
+drde5:  dec     ixl
         jr      nz, drde1
         jp      (iy)
-    ENDIF
-drde6   pop     bc
+ENDIF
+drde6:  pop     bc
         ld      a, c
         rrca
         jr      nc, drde8
@@ -980,7 +984,7 @@ drde6   pop     bc
         add     a, l
         dec     a
         ld      l, a
-drde7   pop     de
+drde7:  pop     de
         ld      a, (hl)
         xor     e
         ld      (hl), a
@@ -998,14 +1002,14 @@ drde7   pop     de
         xor     d
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         djnz    drde7
         jr      drdea
-drde8   and     $03
+drde8:  and     $03
         add     a, l
         dec     a
         ld      l, a
-drde9   pop     de
+drde9:  pop     de
         ld      a, (hl)
         xor     e
         ld      (hl), a
@@ -1014,21 +1018,21 @@ drde9   pop     de
         xor     d
         ld      (hl), a
         inc     h
-        updpaint
+        UPDPAINT
         djnz    drde9
-drdea   dec     ixl
+drdea:  dec     ixl
         jr      nz, drde6
         jp      (iy)            ; end of routine
 
-draw5   ld      sp, 0           ; continue here, we have painted the bullet
-draw6   ld      hl, 0           ; push the 2 calculated values
+draw5:  ld      sp, 0           ; continue here, we have painted the bullet
+draw6:  ld      hl, 0           ; push the 2 calculated values
         push    hl              ; HL= origin address in the screen
-draw7   ld      hl, 0
+draw7:  ld      hl, 0
         push    hl              ; HL= pointer to the sprite data
         ld      (draw5+1), sp
-draw8   ld      a, 0
+draw8:  ld      a, 0
         add     a, 2
-        cp      $31+bulmax*2    ; repeat the loop bulmax times (up to 8 bullets)
+        cp      $31+(bulmax*2)  ; repeat the loop bulmax times (up to 8 bullets)
         jp      nz, draw1
         ld      hl, (draw5+1)   ; these two lines are needed in case
         ld      sp, hl          ; of no bullet found
@@ -1037,89 +1041,89 @@ draw8   ld      a, 0
         add     hl, bc
         ld      b, h
         ld      c, l            ; now BC points to SP
-  ELSE
+ELSE
         ld      bc, 0           ; in case of no bullet directly start with BC
-  ENDIF
+ENDIF
         xor     a               ; end of bullet code, start of sprites code
-draw9   ld      (draww+1&$ffff), a
+draw9:  ld      (draww+1), a
         ld      l, a            ; read data from sprite table
         ld      h, enems >> 8
         ld      a, (hl)         ; first value is the sprite number
         add     a, a            ; if high bit is 1, the sprite is disabled
-        jp      c, draww&$ffff  ; so jump to draww
+        jp      c, draww        ; so jump to draww
         add     a, a            ; use the rest of the bits to found
         add     a, a            ; a pointer to the actual sprite
         inc     l               ; and then calculate the X and Y coordinates
-    IF safehr & !cliphr        ; the lower bits of X also counts to calculate
+IF safehr & (!cliphr)           ; the lower bits of X also counts to calculate
         ex      af, af          ; the actual sprite because there are
         ld      a, (hl)         ; 4 (or 8 if smooth=1) rotated versions of the
         cp      9               ; same sprite
         jr      nc, drawa
         ld      a, 8
-drawa   cp      (scrw<<4)-8
+drawa:  cp      +(scrw<<4)-8
         jr      c, drawb
-        ld      a, (scrw<<4)-8
-drawb
-      IF smooth=0
+        ld      a, +(scrw<<4)-8
+drawb:
+IF smooth=0
         and     $fe
-      ENDIF
+ENDIF
         ld      e, a
         ex      af, af
-    ELSE
+ELSE
         ld      e, (hl)
-      IF smooth=0
+IF smooth=0
         res     0, e
-      ENDIF
-    ENDIF
+ENDIF
+ENDIF
         inc     l
         xor     e
         and     $f8
         xor     e
-      IF smooth=1
+IF smooth=1
         add     a, a
-      ENDIF
-        ld      (drawc+2&$ffff), a
+ENDIF
+        ld      (drawc+2), a
         ld      a, e
         and     $f8
         rra
         rra
         rra
-        ld      (drawh+1&$ffff), a
-drawc   ld      sp, (sprites)
+        ld      (drawh+1), a
+drawc:  ld      sp, (sprites)
         pop     de
         ld      a, (hl)
-      IF smooth=0
+IF smooth=0
         and     $fe
-      ENDIF
-    IF safevr=1
-      IF clipdn=0
-        cp      scrh*16-7
+ENDIF
+IF safevr=1
+IF clipdn=0
+        cp      +(scrh*16)-7
         jr      c, drawd
-        ld      a, scrh*16-8
-      ELSE
-        cp      scrh*16+1
+        ld      a, +(scrh*16)-8
+ELSE
+        cp      +(scrh*16)+1
         jr      c, drawd
         ld      a, scrh*16
-      ENDIF
-    ENDIF
-drawd   add     a, d
-  IF clipup=0
-      IF safevr=1 & offsey>0
+ENDIF
+ENDIF
+drawd:  add     a, d
+IF clipup=0
+IF (safevr=1) && (offsey>0)
         cp      offsey<<3
         jr      nc, drawe
         ld      a, offsey<<3
-      ENDIF
-  ELSE
-    IF clipup=2
-      IF offsey=0
-        jp      nc, braw1&$ffff
-      ELSE
+ENDIF
+ELSE
+IF clipup=2
+IF offsey=0
+        jp      nc, braw1
+ELSE
         cp      offsey<<3
-        jp      c, braw1&$ffff
-      ENDIF
-    ENDIF
-  ENDIF
-drawe
+        jp      c, braw1
+ENDIF
+ENDIF
+ENDIF
+drawe:
       IF clipdn=2
         cp      1+((offsey+scrh*2-2)<<3)
         jp      nc, craw1&$ffff
