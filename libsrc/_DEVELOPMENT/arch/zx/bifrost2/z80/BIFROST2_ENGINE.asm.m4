@@ -208,7 +208,7 @@ defc _BIFROST2_TILE_IMAGES = ASMPC + 1
         add     hl, de                  ; HL = TILE_IMAGES+64*tile
 
 ; draw bitmap lines
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         pop     de
         ld      a, e
@@ -235,7 +235,7 @@ z88dk_for(`LOOP', `1', `16',
         jr      nc, draw_even_col
 
 ; draw multicolor attributes starting at odd column
-z88dk_for(`LOOP', `1', `15',
+Z88DK_FOR(`LOOP', `1', `15',
 `
         pop     de
         ldi
@@ -256,7 +256,7 @@ draw_even_col:
         jr      z, draw_last_col
 
 ; draw right side of tile
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         inc     hl
         pop     de
@@ -275,7 +275,7 @@ draw_last_col:
         ex      de, hl
 
 ; draw left side of tile
-z88dk_for(`LOOP', `1', `15',
+Z88DK_FOR(`LOOP', `1', `15',
 `
         pop     de
         inc     de
@@ -292,20 +292,20 @@ z88dk_for(`LOOP', `1', `15',
 ; Lookup tables
 ; -----------------------------------------------------------------------------
 extra_buffer:
-z88dk_for(`LOOP', `1', `22',
+Z88DK_FOR(`LOOP', `1', `22',
 `
         defw      0                               ; columns 9 and 10 (6)
         defw      0                               ; columns 7 and 8 (4)
 ')
 lookup:
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with screen coordinates
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
-z88dk_for(`LINREPT', `0', `7',
+Z88DK_FOR(`LINREPT', `0', `7',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      16384 + (((ROWREPT+1)/8)*2048) + (LINREPT*256) + (((ROWREPT+1)%8)*32)
@@ -314,12 +314,12 @@ ELSE
 ENDIF
 ')
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 1 & 2
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/19)*(3-ROWREPT)*7)+40
@@ -335,18 +335,18 @@ ENDIF
         defw      race_raster+(ROWREPT*333)+260
         defw      race_raster+(ROWREPT*333)+302
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 3 & 4
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/19)*(3-ROWREPT)*7)+36
@@ -358,18 +358,18 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+48
         defw      race_raster+(ROWREPT*333)+305
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 5 & 6
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/19)*(3-ROWREPT)*7)+30
@@ -385,18 +385,18 @@ ENDIF
         defw      race_raster+(ROWREPT*333)+256
         defw      race_raster+(ROWREPT*333)+295
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 7 & 8
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/19)*(3-ROWREPT)*7)+27
@@ -408,18 +408,18 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+278
         defw      race_raster+(ROWREPT*333)+318
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 9 & 10
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/19)*(3-ROWREPT)*7)+24
@@ -431,18 +431,18 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+240
         defw      race_raster+(ROWREPT*333)+291
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 11 & 12
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/20)*(2-ROWREPT)*7)+(((21-ROWREPT)/19)*4)+20
@@ -454,18 +454,18 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+243
         defw      race_raster+(ROWREPT*333)+282
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 13 & 14
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/20)*(2-ROWREPT)*7)+(((21-ROWREPT)/19)*4)+16
@@ -477,18 +477,18 @@ IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      race_raster+(ROWREPT*333)+246
         defw      race_raster+(ROWREPT*333)+285
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 15 & 16
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/20)*(2-ROWREPT)*7)+(((21-ROWREPT)/19)*4)+10
@@ -504,18 +504,18 @@ ENDIF
         defw      race_raster+(ROWREPT*333)+250
         defw      race_raster+(ROWREPT*333)+299
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 17 & 18
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/20)*(2-ROWREPT)*7)+(((21-ROWREPT)/19)*4)+7
@@ -531,18 +531,18 @@ ENDIF
         defw      race_raster+(ROWREPT*333)+253
         defw      race_raster+(ROWREPT*333)+322
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; lookup table with attribute coordinates for columns 19 & 20
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT < __BIFROST2_TOTAL_ROWS)
         defw      setup_raster+((__BIFROST2_TOTAL_ROWS-1-ROWREPT)*43)+(((21-ROWREPT)/20)*(2-ROWREPT)*7)+(((21-ROWREPT)/19)*4)+4
@@ -558,13 +558,13 @@ ENDIF
         defw      race_raster+(ROWREPT*333)+275
         defw      race_raster+(ROWREPT*333)+328
 ELSE
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         defw      0
 ')
 ENDIF
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
@@ -610,7 +610,7 @@ ENDIF
 ; copy in advance first line of attributes for each row
         ld      a, 8
 setup_raster:
-z88dk_for(`ROWREPT', `0', `21',
+Z88DK_FOR(`ROWREPT', `0', `21',
 `
 IF (ROWREPT>=(22-__BIFROST2_TOTAL_ROWS))
         ld      sp, $5822+((21-ROWREPT)*32)+19  ; reference columns 19 and 20
@@ -671,7 +671,7 @@ ENDIF
 ')
 ; race the raster beam to update attributes at the right time
 race_raster:
-z88dk_for(`ROWREPT', `0', eval(__BIFROST2_TOTAL_ROWS-1),
+Z88DK_FOR(`ROWREPT', `0', eval(__BIFROST2_TOTAL_ROWS-1),
 `
         ; --- prepare "push af/af" for later
         ld      sp, extra_buffer+(ROWREPT*4)    ; reference af/af values
@@ -938,7 +938,7 @@ fill_tile_attr:
         jr      nc, fill_even_col
 
 ; replace attrib with value
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         pop     hl
         ld      (hl), c
@@ -955,7 +955,7 @@ fill_even_col:
         jr      z, fill_last_col
 
 ; fill right side of tile
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         pop     hl
         ld      (hl), c
@@ -969,7 +969,7 @@ fill_last_col:
         ld      sp, hl
 
 ; fill left side of tile
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         pop     hl
         inc     hl

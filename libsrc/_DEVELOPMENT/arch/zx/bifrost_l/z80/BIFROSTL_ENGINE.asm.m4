@@ -16,7 +16,7 @@ org $e501
 
 ; -----------------------------------------------------------------------------
 attribs:
-z88dk_for(`ROWREPT', `0', `17',
+Z88DK_FOR(`ROWREPT', `0', `17',
 `
         defw      race_raster + (ROWREPT * 8 * 41)
 ')
@@ -177,7 +177,7 @@ defc _BIFROSTL_TILE_IMAGES = ASMPC + 1
         ld      h, a                    ; H = 010RR000
 
 ; draw first bitmap row
-z88dk_for(`LOOP', `1', `7',
+Z88DK_FOR(`LOOP', `1', `7',
 `
         pop     bc
         ld      (hl),c
@@ -197,7 +197,7 @@ z88dk_for(`LOOP', `1', `7',
         and     248
         ld      h, a
 ; draw second bitmap row
-z88dk_for(`LOOP', `1', `7',
+Z88DK_FOR(`LOOP', `1', `7',
 `
         pop     bc
         ld      (hl),c
@@ -228,7 +228,7 @@ z88dk_for(`LOOP', `1', `7',
 
 ; draw multicolor attribute
         ld      de, 40
-z88dk_for(`LOOP', `1', `15',
+Z88DK_FOR(`LOOP', `1', `15',
 `
         pop     bc
         ld      (hl), c
@@ -304,9 +304,9 @@ wait_raster:
 
 ; race the raster beam to update attributes at the right time
 race_raster:
-z88dk_for(`ROWREPT', `0', `17',
+Z88DK_FOR(`ROWREPT', `0', `17',
 `
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
         ld      sp, $5833+(32*ROWREPT)
         ld      bc, 0                   ; columns 01 and 02

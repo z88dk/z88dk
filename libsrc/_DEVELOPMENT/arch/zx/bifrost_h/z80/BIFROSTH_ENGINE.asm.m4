@@ -98,7 +98,7 @@ fill_tile_attr:
         ex      de, hl
 
 ; replace attrib with value
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         pop     hl
         add     hl, bc
@@ -111,7 +111,7 @@ z88dk_for(`LOOP', `1', `16',
 ; -----------------------------------------------------------------------------
 draw_at_last_col:
 ; draw multicolor attributes of a tile starting at the last column in the multicolor area
-z88dk_for(`LOOP', `1', `15',
+Z88DK_FOR(`LOOP', `1', `15',
 `
         pop     hl
         ld      c, a
@@ -130,33 +130,33 @@ z88dk_for(`LOOP', `1', `15',
 ; -----------------------------------------------------------------------------
 bitmaps:
 ; lookup table with screen coordinates
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
-z88dk_for(`ROWREPT', `0', `17',
+Z88DK_FOR(`ROWREPT', `0', `17',
 `
-z88dk_for(`LINREPT', `0', `7',
+Z88DK_FOR(`LINREPT', `0', `7',
 `
         defw      16384 + (((ROWREPT+1)/8)*2048) + (LINREPT*256) + (((ROWREPT+1)%8)*32) + __BIFROSTH_SHIFT_COLUMNS
 ')
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
 ; -----------------------------------------------------------------------------
 attribs:
 ; lookup table with multicolor attribute coordinates
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
-z88dk_for(`RACEREPT', `0', `143',
+Z88DK_FOR(`RACEREPT', `0', `143',
 `
         defw      race_raster + (RACEREPT * 41)
 ')
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         defw      0
 ')
@@ -211,7 +211,7 @@ draw_at_even_col_dec:
         inc     a
         ex      af, af'
         ld      a, c
-z88dk_for(`LOOP', `1', `15',
+Z88DK_FOR(`LOOP', `1', `15',
 `
         pop     hl
         ld      c, a
@@ -254,7 +254,7 @@ draw_at_even_col_inc:
         cpl
         ex      af, af'
         ld      a, c
-z88dk_for(`LOOP', `1', `15',
+Z88DK_FOR(`LOOP', `1', `15',
 `
         pop     hl
 
@@ -391,7 +391,7 @@ defc _BIFROSTH_TILE_IMAGES = ASMPC + 1
         add     hl, de
 
 ; draw bitmap lines
-z88dk_for(`LOOP', `1', `16',
+Z88DK_FOR(`LOOP', `1', `16',
 `
         pop     de
         ld      a, e
@@ -416,7 +416,7 @@ z88dk_for(`LOOP', `1', `16',
 
 draw_at_odd_col:
 ; draw multicolor attributes starting at odd column
-z88dk_for(`LOOP', `1', `15',
+Z88DK_FOR(`LOOP', `1', `15',
 `
         pop     hl
         ld      c, a
@@ -507,9 +507,9 @@ wait_raster:
 
 ; race the raster beam to update attributes at the right time
 race_raster:
-z88dk_for(`ROWREPT', `0', `17',
+Z88DK_FOR(`ROWREPT', `0', `17',
 `
-z88dk_for(`LOOP', `1', `8',
+Z88DK_FOR(`LOOP', `1', `8',
 `
 IF __BIFROSTH_SHIFT_COLUMNS=0
         ld      sp, $5833+(32*ROWREPT)
