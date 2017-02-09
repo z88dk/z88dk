@@ -939,8 +939,10 @@ int main(int argc, char **argv)
     /* m4 include path finds z88dk macro definition file "z88dk.m4" */
     BuildOptions(&m4arg, c_m4opts);
 
+    build_bin = !m4only && !clangonly && !llvmonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
+
     /* Activate target's crt file */
-    if ((c_nocrt == 0) && !m4only && !clangonly && !llvmonly && !preprocessonly && ! assembleonly && !compileonly && !makelib) {
+    if ((c_nocrt == 0) && build_bin) {
         // append target crt to end of filelist
         add_file_to_process(c_crt0);
         // move crt to front of filelist
@@ -957,8 +959,6 @@ int main(int argc, char **argv)
 
     /* crt file is now the first file in filelist */
     c_crt0 = temporary_filenames[0];
-
-    build_bin = !m4only && !clangonly && !llvmonly && !preprocessonly && !assembleonly && !compileonly && !makelib;
 
 	// Parse through the files, handling each one in turn
 	for (i = 0; i < nfiles; i++) {
@@ -1223,6 +1223,7 @@ int main(int argc, char **argv)
             if ((i == 0) && build_bin)
             {
                 c_crt_incpath = ptr;
+                if (verbose) printf("WILL ACT AS CRT\n");
                 continue;
             }
 
@@ -1296,7 +1297,7 @@ int main(int argc, char **argv)
 	if (linkthem(c_linker))
 		exit(1);
 
-	if (!makelib) {
+	if (build_bin) {
 
 		if (createapp) {
 			/* Building an application - run the appmake command on it */
