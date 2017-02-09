@@ -873,9 +873,6 @@ int main(int argc, char **argv)
 	}
 
 
-	/* Copy crt0 to temporary directory */
-	if (c_nocrt == 0) copy_crt0_to_temp();
-
 	/* Mangle math lib name but only for classic compiles */
 	if ((c_clib == 0) || (!strstr(c_clib, "new") && !strstr(c_clib, "sdcc") && !strstr(c_clib, "clang")))
 		if (linker_linklib_first) configure_maths_library(&linker_linklib_first);   // -lm appears here
@@ -913,6 +910,20 @@ int main(int argc, char **argv)
 	if (!sdcc_signed_char) BuildOptions_start(&clangarg, "-fno-signed-char ");
 	BuildOptions(&llvmarg, llvmarg ? "-disable-partial-libcall-inlining " : "-O2 -disable-partial-libcall-inlining ");
 	BuildOptions(&llvmopt, llvmopt ? "-disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S " : "-O2 -disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S ");
+
+    /* m4 include path points to target's home directory */
+    if ((c_crt0 != NULL) && ((ptr = last_path_char(c_crt0)) != NULL)) {
+        char *p;
+        p = mustmalloc((ptr - c_crt0 + 7) * sizeof(char));
+        sprintf(p, "-I \"%.*s\"", ptr - c_crt0, c_crt0);
+        BuildOptions(&m4arg, p);
+        free(p);
+    }
+
+    /* Copy crt0 to temporary directory */
+    if (c_nocrt == 0) {
+        copy_crt0_to_temp();
+    }
 
 	/* m4 include path finds z88dk macro definition file "z88dk.m4" */
 	BuildOptions(&m4arg, c_m4opts);
