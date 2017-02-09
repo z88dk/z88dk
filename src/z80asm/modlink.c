@@ -308,7 +308,8 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error, Bool module
 
 			/* expressions with symbols from other sections need to be passed to the link phase */
 			if (!module_relative_addr || /* link phase */
-				Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) /* or symbols from other sections */
+				(Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) &&	/* or symbols from other sections */
+				 Expr_without_addresses(expr))		/* expression with more than one address - needs to be computed at link time */
 				)
 			{
 				set_expr_env(expr, module_relative_addr);

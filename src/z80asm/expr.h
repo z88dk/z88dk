@@ -152,6 +152,10 @@ extern long Expr_eval(Expr *self, Bool not_defined_error);
    if not the expression must be passed to the link phase */
 extern Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section);
 
+/* check if the expression refers to more than one address expression; if yes, 
+   it needs to be computed at link time */
+extern Bool Expr_without_addresses(Expr *self);
+
 /*-----------------------------------------------------------------------------
 *	Stack for calculator
 *----------------------------------------------------------------------------*/
