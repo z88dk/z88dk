@@ -6,6 +6,8 @@ Z88DK Z80 Module Assembler Change Log
 
 - 2016-01-30 Fix #49 implement z180 as a target
 - 2017-01-26 Fix #47 accept more that one MODULE directive
+- 2017-02-08 Fix #53 public constants not being listed in global .def file
+- 2017-02-09 Fix #54 overflow errors in calculated constants at linking stage
 
 2016
 ----

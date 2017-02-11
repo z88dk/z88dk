@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2015
+Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
@@ -151,6 +151,10 @@ extern long Expr_eval(Expr *self, Bool not_defined_error);
    and section; if yes, the expression can be computed in phase 2 of the compile,
    if not the expression must be passed to the link phase */
 extern Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section *section);
+
+/* check if the expression refers to more than one address expression; if yes, 
+   it needs to be computed at link time */
+extern Bool Expr_without_addresses(Expr *self);
 
 /*-----------------------------------------------------------------------------
 *	Stack for calculator

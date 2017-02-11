@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2015
+Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
@@ -751,4 +751,42 @@ Bool Expr_is_local_in_section(Expr *self, struct Module *module, struct Section 
 		}
 	}
 	return TRUE;
+}
+
+Bool Expr_without_addresses(Expr *self)
+{
+	size_t i;
+	int num_addresses = 0;
+
+	for (i = 0; i < ExprOpArray_size(self->rpn_ops); i++)
+	{
+		ExprOp *expr_op = ExprOpArray_item(self->rpn_ops, i);
+
+		switch (expr_op->op_type)
+		{
+		case SYMBOL_OP:
+			if (expr_op->d.symbol->type >= TYPE_ADDRESS)
+				num_addresses++;
+			break;
+
+		case ASMPC_OP:
+			num_addresses++;
+			break;
+
+		case CONST_EXPR_OP:
+		case NUMBER_OP:
+		case UNARY_OP:
+		case BINARY_OP:
+		case TERNARY_OP:
+			break;
+
+		default:
+			assert(0);
+		}
+	}
+
+	if (num_addresses > 1)
+		return FALSE;
+	else
+		return TRUE;
 }

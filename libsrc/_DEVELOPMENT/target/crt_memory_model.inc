@@ -54,7 +54,11 @@ ELSE
 
 ENDIF
 
-defb 0
+IF __crt_enforce_snames & 2
+
+   defb 0
+
+ENDIF
 
 section smc_driver
 section smc_font
@@ -96,7 +100,11 @@ ELSE
 
 ENDIF
 
-defb 0
+IF __crt_enforce_snames & 1
+
+   defb 0
+
+ENDIF
 
 section BSS_UNINITIALIZED
 

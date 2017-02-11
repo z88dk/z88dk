@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2015
+Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
@@ -61,6 +61,7 @@ CLASS( Symbol )
 	Bool			is_defined : 1;		/* TRUE if symbol was defined in the current module */
 	Bool			is_touched : 1;		/* TRUE if symbol was used, e.g. returned by 
 										 * a symbol table search */
+	Bool			is_global_def : 1;	/* true for __head, __tail, __size symbols */
 	struct Module  *module;				/* module which owns symbol (weak ref) */
 	struct Section *section;			/* section where expression is defined (weak ref) */
 END_CLASS;

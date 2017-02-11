@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2015
+Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/pauloscustodio/z88dk-z80asm
 
@@ -160,9 +160,11 @@ Symbol *define_static_def_sym( char *name, long value )
 *----------------------------------------------------------------------------*/
 Symbol *define_global_def_sym( char *name, long value )
 {
-	return _define_sym(name, value, TYPE_CONSTANT, SCOPE_PUBLIC,
+	Symbol* sym = _define_sym(name, value, TYPE_CONSTANT, SCOPE_PUBLIC,
 						NULL, get_first_section(NULL), 
 						& global_symtab );
+	sym->is_global_def = TRUE;
+	return sym;
 }
 
 /*-----------------------------------------------------------------------------
@@ -623,17 +625,16 @@ void write_map_file(void)
 		NULL, cond_all_symbols, "", TRUE);
 }
 
-static Bool cond_global_addr_symbols(Symbol *sym)
+static Bool cond_global_symbols(Symbol *sym)
 {
-	return (sym->type == TYPE_ADDRESS || sym->type == TYPE_COMPUTED)
-		&& sym->scope != SCOPE_LOCAL;
+	return !(sym->is_global_def) && (sym->scope == SCOPE_PUBLIC || sym->scope == SCOPE_GLOBAL);
 }
 
 void write_def_file(void)
 {
 	_write_symbol_file(
 		get_def_filename(get_first_module(NULL)->filename),
-		NULL, cond_global_addr_symbols, "DEFC ", FALSE);
+		NULL, cond_global_symbols, "DEFC ", FALSE);
 }
 
 static Bool cond_module_symbols(Symbol *sym) 

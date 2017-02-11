@@ -134,7 +134,24 @@
       ENDIF
    
    ENDIF
+
+   IFDEF CRT_ENFORCE_SNAMES
    
+      defc __crt_enforce_snames = CRT_ENFORCE_SNAMES
+   
+   ELSE
+   
+      IFDEF TAR__crt_enforce_snames
+      
+         defc __crt_enforce_snames = TAR__crt_enforce_snames
+      
+      ELSE
+      
+         defc __crt_enforce_snames = DEF__crt_enforce_snames
+      
+      ENDIF
+   
+   ENDIF
    
    IFDEF CRT_INITIALIZE_BSS
    

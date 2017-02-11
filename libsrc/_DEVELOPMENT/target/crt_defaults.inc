@@ -10,6 +10,7 @@
    defc DEF__crt_org_bss               = 0       ;; org of bss section (0 or -1 means follow data, -1 means generate separate binary)
 
    defc DEF__crt_model                 = 0       ;; 0 = ram model, 1 = rom model, 2 = compressed rom model
+	defc DEF__crt_enforce_snames        = 3       ;; bit 0 set = enforce BSS name, bit 1 set = enforce DATA name
    
    defc DEF__register_sp               = 0       ;; initial value of sp (-1 = do not modify (some targets may redefine meaning), 0 = top of memory)
    defc DEF__crt_stack_size            = 512     ;; minimum size reserved for stack when automatically allocating memory for the malloc heap

@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2015
+Copyright (C) Paulo Custodio, 2011-2017
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/pauloscustodio/z88dk-z80asm
 */
@@ -308,7 +308,8 @@ static int compute_equ_exprs_once( ExprList *exprs, Bool show_error, Bool module
 
 			/* expressions with symbols from other sections need to be passed to the link phase */
 			if (!module_relative_addr || /* link phase */
-				Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) /* or symbols from other sections */
+				(Expr_is_local_in_section(expr, CURRENTMODULE, CURRENTSECTION) &&	/* or symbols from other sections */
+				 Expr_without_addresses(expr))		/* expression with more than one address - needs to be computed at link time */
 				)
 			{
 				set_expr_env(expr, module_relative_addr);
