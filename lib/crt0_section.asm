@@ -75,6 +75,7 @@ ENDIF
 IF !__crt_model
         SECTION DATA
         SECTION smc_clib
+		  SECTION smc_user
 		SECTION data_crt
 		SECTION data_compiler
 		SECTION data_user
@@ -131,6 +132,7 @@ IF __crt_model > 0
 		org	-1
 		defb	0		; we want this written out
 		SECTION smc_clib
+		SECTION smc_user
         SECTION data_crt
         SECTION data_compiler
         SECTION data_user
