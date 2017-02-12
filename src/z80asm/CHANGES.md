@@ -8,6 +8,7 @@ Z88DK Z80 Module Assembler Change Log
 - 2017-01-26 Fix #47 accept more that one MODULE directive
 - 2017-02-08 Fix #53 public constants not being listed in global .def file
 - 2017-02-09 Fix #54 overflow errors in calculated constants at linking stage
+- 2017-02-12 Fix #65 separate BSS section not generated from object file if BSS org was -1 at assembly time
 
 2016
 ----

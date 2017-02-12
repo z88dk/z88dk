@@ -432,7 +432,7 @@ ByteArray *read_obj_file_data( char *filename )
 *----------------------------------------------------------------------------*/
 static Bool objmodule_loaded_1( char *src_filename, Str *section_name )
 {
-	int code_size, origin;
+	int code_size;
 	OFile *ofile;
 	Section *section;
 
@@ -452,14 +452,10 @@ static Bool objmodule_loaded_1( char *src_filename, Str *section_name )
 				if ( code_size < 0 )
 					break;
 
-				xfget_count_byte_Str( ofile->file, section_name );
-				origin = xfget_int32( ofile->file );
-
 				/* reserve space in section */
-				section = new_section( str_data(section_name) );
-				if ( origin >= 0 )
-					section->origin = origin;
-
+				xfget_count_byte_Str(ofile->file, section_name);
+				section = new_section(str_data(section_name));
+				read_origin(ofile->file, section);
 				append_reserve( code_size );
 
 				/* advance past code block */
