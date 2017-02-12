@@ -612,16 +612,12 @@ int linkthem(char *linker)
 	}
 	else
     {
-        // Temporary workaround for #65
-        // --no-crt compiles may have include path trouble
-/*
         // late assembly for first file which acts as crt
         if (verbose) printf("\nPROCESSING CRT\n");
         if (process(".asm", c_extension, c_assembler, c_crt_incpath ? c_crt_incpath : "", assembler_style, 0, YES, NO))
             exit(1);
         if (verbose) puts("");
         free(c_crt_incpath);
-*/
 
         len = offs = zcc_asprintf(&temp, "%s %s -b -d %s -o%s\"%s\" %s%s%s%s%s%s%s%s%s",
             linker,
@@ -653,8 +649,11 @@ int linkthem(char *linker)
 
 		for (i = 0; i < nfiles; ++i)
         {
-			fprintf(out, "%s\n", filelist[i]);
-			if (prj) fprintf(prj, "%s\n", original_filenames[i]);
+            if (hassuffix(filelist[i], c_extension))
+            {
+                fprintf(out, "%s\n", filelist[i]);
+                if (prj) fprintf(prj, "%s\n", original_filenames[i]);
+            }
 		}
 
 		fclose(out);
@@ -681,8 +680,11 @@ int linkthem(char *linker)
 
 		for (i = 0; i < nfiles; ++i)
         {
-			offs += snprintf(cmdline + offs, len - offs, " \"%s\"", filelist[i]);
-			if (prj) fprintf(prj, "%s\n", original_filenames[i]);
+            if (hassuffix(filelist[i], c_extension))
+            {
+                offs += snprintf(cmdline + offs, len - offs, " \"%s\"", filelist[i]);
+                if (prj) fprintf(prj, "%s\n", original_filenames[i]);
+            }
 		}
 	}
 
