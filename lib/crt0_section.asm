@@ -85,6 +85,7 @@ ENDIF
 		SECTION BSS
 IF __crt_org_bss
 		org	__crt_org_bss
+		defb 0   ; control name of bss binary
 ENDIF
 		SECTION bss_fp
 		SECTION bss_error
@@ -130,7 +131,7 @@ ENDIF
 IF __crt_model > 0
         SECTION DATA
 		org	-1
-		defb	0		; we want this written out
+		defb	0		; control name of data binary
 		SECTION smc_clib
 		SECTION smc_user
         SECTION data_crt
