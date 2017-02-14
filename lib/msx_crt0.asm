@@ -49,14 +49,17 @@ IF startup != 3
 
 ; Now, getting to the real stuff now!
 
-IF (!DEFINED_startup | (startup=1))
-        IF      !DEFINED_CRT_ORG_CODE
-                defc    CRT_ORG_CODE  = 40000
+IF (!DEFINED_startup || (startup=1))
+        IFNDEF CRT_ORG_CODE
+                defc CRT_ORG_CODE  = 40000
         ENDIF
-                org     CRT_ORG_CODE
 ELSE
-        org     $100		; MSXDOS
+        IFNDEF CRT_ORG_CODE
+                defc CRT_ORG_CODE = $100   ; MSXDOS
+        ENDIF
 ENDIF
+
+org CRT_ORG_CODE
 
 ;----------------------
 ; Execution starts here
@@ -186,8 +189,9 @@ ELSE
 ;
 ;  Main Code Entrance Point
 ;
-
+IFNDEF CRT_ORG_CODE
 	defc  CRT_ORG_CODE  = $4000
+ENDIF
 	org   CRT_ORG_CODE
 
 ; ROM header
@@ -247,13 +251,13 @@ endloop:
 l_dcal:	jp	(hl)		;Used for call by function pointer
 
 
-IF !DEFINED_CRT_ORG_BSS
-	defc CRT_ORG_BSS =  $C000   ; Static variables are kept in RAM in high memory
+IFNDEF CRT_ORG_BSS
+	defc CRT_ORG_BSS = $C000   ; Ram variables are kept in RAM in high memory
 ENDIF
 	defc	__crt_org_bss = CRT_ORG_BSS
 
         ; If we were given a model then use it
-        IF DEFINED_CRT_MODEL
+        IFDEF CRT_MODEL
             defc __crt_model = CRT_MODEL
         ELSE
             defc __crt_model = 1
