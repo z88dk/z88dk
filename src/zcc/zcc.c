@@ -1817,12 +1817,16 @@ void add_file_to_process(char *filename)
 					fprintf(stderr, "Unrecognized file type %s\n", p);
 					exit(1);
 				}
-				// input file has no extension and does not exist so assume .asm then .o
-				original_filenames[nfiles] = mustmalloc((strlen(p) + 5) * sizeof(char));
+				// input file has no extension and does not exist so assume .asm then .o then .asm.m4
+				original_filenames[nfiles] = mustmalloc((strlen(p) + 8) * sizeof(char));
 				strcpy(original_filenames[nfiles], p);
 				strcat(original_filenames[nfiles], ".asm");
-				if (stat(original_filenames[nfiles], &tmp) != 0)
-					strcpy(strrchr(original_filenames[nfiles], '.'), ".o");
+                if (stat(original_filenames[nfiles], &tmp) != 0)
+                {
+                    strcpy(strrchr(original_filenames[nfiles], '.'), ".o");
+                    if (stat(original_filenames[nfiles], &tmp) != 0)
+                        strcpy(strrchr(original_filenames[nfiles], '.'), ".asm.m4");
+                }
 			}
 			else
 				original_filenames[nfiles] = muststrdup(p);
