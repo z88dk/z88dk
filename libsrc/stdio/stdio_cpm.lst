@@ -16,6 +16,7 @@ stdio/obj/cpm/fgetc
 stdio/obj/cpm/fgetpos
 stdio/obj/cpm/fgets
 stdio/obj/cpm/fgets_cons
+stdio/obj/cpm/fmemopen
 stdio/obj/cpm/fopen
 stdio/obj/cpm/fprintf
 stdio/obj/cpm/fputc
