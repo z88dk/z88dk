@@ -5,7 +5,7 @@
  *
  *      djm 9/1/2000
  *
- *	$Id: time.h,v 1.23 2016-03-08 10:13:15 dom Exp $
+ *	$Id: time.h,v 1.23 2016/03/08 10:13:15 dom Exp $
  */
 
 
@@ -33,6 +33,10 @@
 
 #ifdef __OSCA__
 #define CLOCKS_PER_SEC 512
+#endif
+
+#ifdef __PACMAN__
+#define CLOCKS_PER_SEC 61
 #endif
 
 #ifndef CLOCKS_PER_SEC
@@ -108,6 +112,10 @@ extern int FRAMES;
 #endif
 
 #ifdef __OSCA__
+#define time(NULL) clock()
+#endif
+
+#ifdef __PACMAN__
 #define time(NULL) clock()
 #endif
 
