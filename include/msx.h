@@ -358,7 +358,7 @@ typedef struct {
 #define surface_line(s,x1,y1,x2,y2) surface_draw(s,x1,y1,x2,y2)
 
 /* Render an area in a specified buffer (in surface), with the specified dither intensity (0..11) */
-extern __LIB__ surface_stencil_render(surface_t *s, unsigned char *stencil, unsigned int intensity) __smallc;
+extern void __LIB__ surface_stencil_render(surface_t *s, unsigned char *stencil, unsigned int intensity) __smallc;
 
 // Draw a line on video
 #define line(x1,y1,x2,y2) draw(x1,y1,x2,y2) 

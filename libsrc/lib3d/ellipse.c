@@ -16,7 +16,7 @@
 #include <lib3d.h> 
 
 
-int ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius)
+void ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius)
 {
 
 int i,k;
