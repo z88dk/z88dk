@@ -20,9 +20,9 @@ ENDIF
 
 IF startup = -1
 
-   IFNDEF __CRTDEF
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 2
+      defc __CRTCFG = 2
    
    ENDIF
    
@@ -45,9 +45,9 @@ IF startup = 0
    ; generic embedded system
    ; no files, no fds
 
-   IFNDEF __CRTDEF
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 0
+      defc __CRTCFG = 0
    
    ENDIF
    
@@ -57,7 +57,7 @@ IF startup = 0
    
    ENDIF
 
-   INCLUDE "startup/z180_crt_0.asm"
+   include(`startup/z180_crt_0.asm.m4')
 
 ENDIF
 
@@ -70,9 +70,9 @@ IF startup = 1
    ; generic embedded system
    ; no files, no fds
 
-   IFNDEF __CRTDEF
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 1
+      defc __CRTCFG = 1
    
    ENDIF
    
@@ -82,7 +82,7 @@ IF startup = 1
    
    ENDIF
 
-   INCLUDE "startup/z180_crt_0.asm"
+   include(`startup/z180_crt_0.asm.m4')
 
 ENDIF
 
@@ -95,9 +95,9 @@ IF startup = 2
    ; generic embedded system
    ; no files, no fds
 
-   IFNDEF __CRTDEF
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 2
+      defc __CRTCFG = 2
    
    ENDIF
    
@@ -107,6 +107,6 @@ IF startup = 2
    
    ENDIF
 
-   INCLUDE "startup/z180_crt_0.asm"
+   include(`startup/z180_crt_0.asm.m4')
 
 ENDIF

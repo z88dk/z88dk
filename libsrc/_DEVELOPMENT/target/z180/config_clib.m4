@@ -1,40 +1,13 @@
 divert(-1)
 
-#
-# Z180 CONFIGURATION FILE
-# recompile the libraries if changes are made
-#
-
-# 
-# TARGET CONFIGURATION
+###############################################################
+# C LIBRARY USER CONFIGURATION
+# rebuild the library if changes are made
 #
 
-; Class of Z180 being targeted
-
-define(`__Z180', 0x01)
-
-define(`__Z180_Z80180', 0x01)
-define(`__Z180_Z8L180', 0x02)
-define(`__Z180_Z8S180', 0x04)
-
-; Clock frequency in Hz
-
-define(`__CPU_CLOCK', 33000000)
-
-; CPU info
-
-define(`__CPU_INFO', 0x00)
-
-define(`__CPU_INFO_NMOS', 0x01)
-define(`__CPU_INFO_ENABLE_SLL', 0x02)
-
-#
-# C LIBRARY CONFIGURATION
-#
-
-; -------------------------------------------------------------
-; -- Multithreading -------------------------------------------
-; -------------------------------------------------------------
+; #############################################################
+; ## Multithreading ###########################################
+; #############################################################
 
 ; Enables multithreading features of the library.
 ; Multithreading features are not complete so leave disabled.
@@ -53,27 +26,27 @@ define(`__CLIB_OPT_MULTITHREAD_LOCK_FDSTR', 0x10)
 ; bit 3 = $08 = enable fcntl lock on fd_table
 ; bit 4 = $10 = enable fdstruct locks
 
-; Set to zero if you are making traditional single-threaded
+; Set to zero if you are making traditional single threaded
 ; programs.  Setting to zero will reduce code size and
 ; slightly speed up execution.
 ;
-; When multi-threading is enabled, the program can still
+; When multithreading is enabled, the program can still
 ; bypass locking by calling the _unlocked versions of functions
 ; but if there are synchronization issues, you do so at
 ; your own risk.
 ;
-; When multi-threading is disabled, there is no difference
+; When multithreading is disabled, there is no difference
 ; between the _unlocked and regular function entry points.
 ; However, the locks are still present in the data structures
 ; and, for example, FILEs can still be locked via flockfile()
-; and family.  Note that when multi-threading is disabled,
+; and family.  Note that when multithreading is disabled,
 ; the stdio functions will not be blocked by a lock but the
 ; user program can perform its own synchronization by using
 ; flockfile() appropriately.
 
-; -------------------------------------------------------------
-; -- Integer Math Options -------------------------------------
-; -------------------------------------------------------------
+; #############################################################
+; ## Integer Math Options #####################################
+; #############################################################
 
 ; This option affects how multiplications and divisions
 ; of integers and longs are performed by the compiler
@@ -137,9 +110,9 @@ define(`__CLIB_OPT_IMATH_SELECT_FAST_LSL', 0x04)
 ; bit 1 = $02 = choose fast logical shift right operator
 ; bit 2 = $04 = choose fast shift left operator
 
-; -------------------------------------------------------------
-; -- Text to Number Conversion --------------------------------
-; -------------------------------------------------------------
+; #############################################################
+; ## Text to Number Conversion ################################
+; #############################################################
 
 ; Specialized functions are available for fast conversion
 ; of binary, octal, decimal and hex numbers.
@@ -172,7 +145,7 @@ define(`__CLIB_OPT_TXT2NUM_LONG_HEX', 0x80)
 ; Note: Normally, enabling specialized long functions will also
 ; cause their integer counterparts to be pulled into the user code.
 ; This is because the specialized long functions will try to
-; perform the conversion using faster 16-bit code when it can.
+; perform the conversion using faster 16#bit code when it can.
 ; If you use a specialized long function, you may want to try
 ; enabling the specialized integer function to see if code
 ; size remains unchanged.
@@ -199,9 +172,9 @@ define(`__CLIB_OPT_TXT2NUM_SELECT_FAST_HEX', 0x08)
 ; bit 2 = $04 = choose fast decimal conversion
 ; bit 3 = $08 = choose fast hex conversion
 
-; -------------------------------------------------------------
-; -- Number to Text Conversion --------------------------------
-; -------------------------------------------------------------
+; #############################################################
+; ## Number to Text Conversion ################################
+; #############################################################
 
 ; Specialized functions are available for fast conversion
 ; of binary, octal, decimal and hex numbers.
@@ -234,7 +207,7 @@ define(`__CLIB_OPT_NUM2TXT_LONG_HEX', 0x80)
 ; Note: Normally, enabling specialized long functions will also
 ; cause their integer counterparts to be pulled into the user code.
 ; This is because the specialized long functions will try to
-; perform the conversion using faster 16-bit code when it can.
+; perform the conversion using faster 16#bit code when it can.
 ; If you use a specialized long function, you may want to try
 ; enabling the specialized integer function to see if code
 ; size remains unchanged.
@@ -256,9 +229,9 @@ define(`__CLIB_OPT_NUM2TXT_SELECT_FAST_HEX', 0x08)
 ; bit 2 = $04 = choose fast decimal conversion
 ; bit 3 = $08 = choose fast hex conversion
 
-; -------------------------------------------------------------
-; -- STDIO Options --------------------------------------------
-; -------------------------------------------------------------
+; #############################################################
+; ## STDIO Options ############################################
+; #############################################################
 
 define(`__CLIB_OPT_STDIO', 0x00)
 
@@ -284,9 +257,9 @@ define(`CHAR_CURSOR_UC', `-')
 define(`CHAR_CURSOR_LC', `_')
 define(`CHAR_PASSWORD',  `*')
 
-; -------------------------------------------------------------
-; -- PRINTF Converter Selection -------------------------------
-; -------------------------------------------------------------
+; #############################################################
+; ## PRINTF Converter Selection ###############################
+; #############################################################
 
 ; You can select which printf converters are included in
 ; the library.  Omitting unused ones can reduce code size.
@@ -376,9 +349,9 @@ define(`__CLIB_OPT_PRINTF_2_lli', 0x40)
 ; from printf entirely, meaning printf can only be used
 ; to output format text to the stream.
 
-; -------------------------------------------------------------
-; -- SCANF Converter Selection --------------------------------
-; -------------------------------------------------------------
+; #############################################################
+; ## SCANF Converter Selection ################################
+; #############################################################
 
 ; You can select which scanf converters are included in
 ; the library.  Omitting unused ones can reduce code size.
@@ -461,9 +434,9 @@ define(`__CLIB_OPT_SCANF_2_lli', 0x40)
 ; from scanf entirely, meaning scanf can only be used to
 ; match format text against the stream.
 
-; -------------------------------------------------------------
-; -- STDLIB Options -------------------------------------------
-; -------------------------------------------------------------
+; #############################################################
+; ## STDLIB Options ###########################################
+; #############################################################
 
 ; Select whether fast memset and fast memcpy are enabled.
 ; For copies of minimum size unrolled loops will be used.
@@ -480,7 +453,7 @@ define(`__CLIB_OPT_FASTCOPY_MEMCPY_SMC', 0x80)
 ; bit 1 = $02 = enable fast memset
 ; bit 5 = $20 = enable fast ldir for some library functions
 ; bit 6 = $40 = enable self-modifying fast ldir implementation for the library
-;         (faster but makes code non-reentrant)
+;         (faster but makes code non#reentrant)
 ; bit 7 = $80 = self-modifying l_fast_memcpy_smc made available for user code only
 ;         (does not enable self-modifying code for the lib; bit 6 set also makes available)
 
@@ -524,9 +497,9 @@ define(`__CLIB_OPT_SORT_QSORT_ENABLE_EQUAL', 0x08)
 ; bit  2 = $04 = enable insertion sort for small partitions
 ; bit  3 = $08 = enable equal items distribution
 
-; -------------------------------------------------------------
-; -- Error Strings --------------------------------------------
-; -------------------------------------------------------------
+; #############################################################
+; ## Error Strings ############################################
+; #############################################################
 
 define(`__CLIB_OPT_ERROR', 0x00)
 
@@ -539,30 +512,17 @@ define(`__CLIB_OPT_ERROR_VERBOSE', 0x02)
 ; Set to zero to reduce binary footprint.
 
 #
-# END USER CONFIGURATION
-#
+# END OF USER CONFIGURATION
+###############################################################
 
 divert(0)
 
-dnl
-dnl COMPILE TIME CONFIG EXPORT FOR ASSEMBLY LANGUAGE
-dnl
+dnl#
+dnl# COMPILE TIME CONFIG EXPORT FOR ASSEMBLY LANGUAGE
+dnl#
 
-ifdef(`ASM_CFG',
+ifdef(`CFG_ASM_PUB',
 `
-PUBLIC `__Z180'
-
-PUBLIC `__Z180_Z80180'
-PUBLIC `__Z180_Z8L180'
-PUBLIC `__Z180_Z8S180'
-
-PUBLIC `__CPU_CLOCK'
-
-PUBLIC `__CPU_INFO'
-
-PUBLIC `__CPU_INFO_NMOS'
-PUBLIC `__CPU_INFO_ENABLE_SLL'
-
 PUBLIC `__CLIB_OPT_MULTITHREAD'
 
 PUBLIC `__CLIB_OPT_MULTITHREAD_LOCK_HEAPS'
@@ -759,31 +719,14 @@ PUBLIC `__CLIB_OPT_ERROR'
 
 PUBLIC `__CLIB_OPT_ERROR_ENABLED'
 PUBLIC `__CLIB_OPT_ERROR_VERBOSE'
-
 ')
 
-dnl
-dnl LIBRARY BUILD TIME CONFIG FOR ASSEMBLY LANGUAGE
-dnl
+dnl#
+dnl# LIBRARY BUILD TIME CONFIG FOR ASSEMBLY LANGUAGE
+dnl#
 
-ifdef(`ASM_LIB',
+ifdef(`CFG_ASM_DEF',
 `
-IFNDEF __CONFIG_INC_
-defc __CONFIG_INC_ = 1
-
-defc `__Z180' = __Z180
-
-defc `__Z180_Z80180' = __Z180_Z80180
-defc `__Z180_Z8L180' = __Z180_Z8L180
-defc `__Z180_Z8S180' = __Z180_Z8S180
-
-defc `__CPU_CLOCK' = __CPU_CLOCK
-
-defc `__CPU_INFO' = __CPU_INFO
-
-defc `__CPU_INFO_NMOS' = __CPU_INFO_NMOS
-defc `__CPU_INFO_ENABLE_SLL' = __CPU_INFO_ENABLE_SLL
-
 defc `__CLIB_OPT_MULTITHREAD' = __CLIB_OPT_MULTITHREAD
 
 defc `__CLIB_OPT_MULTITHREAD_LOCK_HEAPS' = __CLIB_OPT_MULTITHREAD_LOCK_HEAPS
@@ -980,32 +923,14 @@ defc `__CLIB_OPT_ERROR' = __CLIB_OPT_ERROR
 
 defc `__CLIB_OPT_ERROR_ENABLED' = __CLIB_OPT_ERROR_ENABLED
 defc `__CLIB_OPT_ERROR_VERBOSE' = __CLIB_OPT_ERROR_VERBOSE
-
-ENDIF
 ')
 
-dnl
-dnl COMPILE TIME CONFIG EXPORT FOR C
-dnl
+dnl#
+dnl# COMPILE TIME CONFIG EXPORT FOR C
+dnl#
 
-ifdef(`C_CFG',
+ifdef(`CFG_C_DEF',
 `
-#ifndef __CONFIG_H_
-#define __CONFIG_H_
-
-#define `__Z180'  __Z180
-
-#define `__Z180_Z80180'  __Z180_Z80180
-#define `__Z180_Z8L180'  __Z180_Z8L180
-#define `__Z180_Z8S180'  __Z180_Z8S180
-
-#define `__CPU_CLOCK'  __CPU_CLOCK
-
-#define `__CPU_INFO'  __CPU_INFO
-
-#define `__CPU_INFO_NMOS'  __CPU_INFO_NMOS
-#define `__CPU_INFO_ENABLE_SLL'  __CPU_INFO_ENABLE_SLL
-
 #define `__CLIB_OPT_MULTITHREAD'  __CLIB_OPT_MULTITHREAD
 
 #define `__CLIB_OPT_MULTITHREAD_LOCK_HEAPS'  __CLIB_OPT_MULTITHREAD_LOCK_HEAPS
@@ -1202,6 +1127,4 @@ ifdef(`C_CFG',
 
 #define `__CLIB_OPT_ERROR_ENABLED'  __CLIB_OPT_ERROR_ENABLED
 #define `__CLIB_OPT_ERROR_VERBOSE'  __CLIB_OPT_ERROR_VERBOSE
-
-#endif
 ')
