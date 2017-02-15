@@ -114,6 +114,53 @@ defc __BIFROST2_TILE_MAP = 65281
 
 
 ;--------------------------------------------------------------
+;-- GAMES/FASE ------------------------------------------------
+;--------------------------------------------------------------
+
+; Tile mode: 0 = no index, 1 = indexed bitmap, 2 = indexed attr, 3 = fully indexed
+defc __FASE_TILE_MODE = 3
+
+; Smooth: 0 = two pixel sprite movement, 1 = one pixel sprite movement
+defc __FASE_SMOOTH = 1
+
+; Clip top: 0 = disable, 1 = clip bar, 2 = software clip
+defc __FASE_CLIP_TOP = 1
+
+; Clip bottom: 0 = disable, 1 = clip bar, 2 = software clip
+defc __FASE_CLIP_BOTTOM = 1
+
+; Clip horizontal: 0 = disable, 1 = clip bar
+defc __FASE_CLIP_HORIZONTAL = 1
+
+; Safe vertical coordinates: non-zero if y coordinate is always valid
+defc __FASE_SAFE_VCOORD = 1
+
+; Safe horizontal coordinates: non-zero if x coordinate is always valid
+defc __FASE_SAFE_HCOORD = 1
+
+; Left margin in characters
+defc __FASE_MARGIN_LEFT = 1
+
+; Top margin in characters
+defc __FASE_MARGIN_TOP = 1
+
+; Indicate if 256-byte screen address lookup should be used (faster,larger)
+defc __FASE_USE_TABLE = 1
+
+; Max number of bullets in game 0-8
+defc __FASE_NUM_BULLETS = 0
+
+; Max number of sprites in game 1-12
+defc __FASE_NUM_SPRITES = 6
+
+; Colour of sync bar: ink 0-7 + 8 for bright
+defc __FASE_SYNC_BAR_COLOR = 0
+
+; Colour of clip bar: ink 0-7 + 8 for bright
+defc __FASE_CLIP_BAR_COLOR = 0
+
+
+;--------------------------------------------------------------
 ;-- GAMES/NIRVANA- --------------------------------------------
 ;--------------------------------------------------------------
 
