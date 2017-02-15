@@ -813,7 +813,6 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 {
     long fptr_namedecl, fptr_modname, fptr_modcode, fptr_libnmdecl;
     int code_size;
-    int origin = -1;
 	FILE *file;
 	Section *section;
 
@@ -839,17 +838,14 @@ static int LinkModule_1(char *filename, long fptr_base, Str *section_name, StrHa
 				if (code_size < 0)
 					break;
 
-				xfget_count_byte_Str(file, section_name);
-				origin = xfget_int32(file);
-				
 				/* load bytes to section */
 				/* BUG_0015: was reading at current position in code area, swaping order of modules */
+				xfget_count_byte_Str(file, section_name);
 				section = new_section(str_data(section_name));
-				if (origin >= 0)
-					section->origin = origin;
+				read_origin(file, section);
 
 				/* if creating relocatable code, ignore origin */
-				if (opts.relocatable && origin >= 0) {
+				if (opts.relocatable && section->origin >= 0) {
 					warn_org_ignored(filename, str_data(section_name));
 					section->origin = -1;
 					section->section_split = FALSE;
