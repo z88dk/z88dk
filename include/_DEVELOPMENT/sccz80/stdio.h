@@ -29,7 +29,8 @@ typedef struct { unsigned char file[13];} FILE;
 
 #define EOF             (-1)
 
-#define FOPEN_MAX       8      // probably changed by target
+extern unsigned char    _clib_fopen_max[];
+#define FOPEN_MAX       ((unsigned char)(_clib_fopen_max))
 
 #define FILENAME_MAX    128
 
