@@ -3,6 +3,9 @@ include(__link__.m4)
 #ifndef _LIMITS_H
 #define _LIMITS_H
 
+extern unsigned char   _clib_open_max[];
+#define OPEN_MAX       ((unsigned char)(_clib_open_max))
+
 #define CHAR_BIT       8
 
 #define SCHAR_MIN     -128
