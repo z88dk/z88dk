@@ -5,10 +5,12 @@
 
 INCLUDE "zcc_opt.def"
 
+ifdef(`__STARTUP',, define(`__STARTUP', 2))
+
 IFNDEF startup
 
    ; startup undefined so select a default
-   
+	
    defc startup = 2
 
 ENDIF
@@ -18,8 +20,8 @@ ENDIF
 ;; user supplied crt ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = -1
-
+ifelse(`__STARTUP', `-1',
+`
    IFNDEF __CRTCFG
    
       defc __CRTCFG = 2
@@ -32,16 +34,15 @@ IF startup = -1
    
    ENDIF
    
-   INCLUDE "crt.asm"
-
-ENDIF
+   include(`crt.asm.m4')
+')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = 0
-
+ifelse(`__STARTUP', `0',
+`
    ; generic embedded system
    ; no files, no fds
 
@@ -58,15 +59,14 @@ IF startup = 0
    ENDIF
 
    include(`startup/z180_crt_0.asm.m4')
-
-ENDIF
+')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = 1
-
+ifelse(`__STARTUP', `1',
+`
    ; generic embedded system
    ; no files, no fds
 
@@ -83,15 +83,14 @@ IF startup = 1
    ENDIF
 
    include(`startup/z180_crt_0.asm.m4')
-
-ENDIF
+')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; compressed rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = 2
-
+ifelse(`__STARTUP', `2',
+`
    ; generic embedded system
    ; no files, no fds
 
@@ -108,5 +107,4 @@ IF startup = 2
    ENDIF
 
    include(`startup/z180_crt_0.asm.m4')
-
-ENDIF
+')
