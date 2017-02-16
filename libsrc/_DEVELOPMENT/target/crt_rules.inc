@@ -4,34 +4,23 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-   IFDEF myzorg
-   
-      defc __crt_org_code = myzorg
-   
+   IFDEF CRT_ORG_CODE
+      
+      defc __crt_org_code = CRT_ORG_CODE
+      
    ELSE
-   
-      IFDEF CRT_ORG_CODE
       
-         defc __crt_org_code = CRT_ORG_CODE
-      
+      IFDEF TAR__crt_org_code
+         
+         defc __crt_org_code = TAR__crt_org_code
+         
       ELSE
-      
-         IFDEF TAR__crt_org_code
          
-            defc __crt_org_code = TAR__crt_org_code
+         defc __crt_org_code = DEF__crt_org_code
          
-         ELSE
-         
-            defc __crt_org_code = DEF__crt_org_code
-         
-         ENDIF
-      
       ENDIF
       
-      defc myzorg = __crt_org_code
-         
    ENDIF
-
 
    IFDEF REGISTER_SP
    
@@ -486,6 +475,9 @@
    
    ;; public definitions
    
+	PUBLIC __clib_fopen_max
+	PUBLIC __clib_open_max
+	
    PUBLIC __exit_stack_size
    PUBLIC __quickexit_stack_size
    
