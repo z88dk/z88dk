@@ -1505,6 +1505,7 @@ clean:
 	$(MAKE) -C x1 clean
 	$(MAKE) -C math clean
 	$(RM) *.lib
+	$(RM) compress/zx7/*.o
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs

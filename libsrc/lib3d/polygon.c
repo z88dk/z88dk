@@ -15,7 +15,7 @@
 #include <lib3d.h> 
 
 
-int polygon(int cx, int cy, int corners, int r, int sa)
+void polygon(int cx, int cy, int corners, int r, int sa)
 {
 
 int i,k;
