@@ -9,7 +9,7 @@ IF __CRTCFG = -1
    ;; user supplied crt defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   INCLUDE "crtdef.inc"
+   INCLUDE "crt_cfg.inc"
 
 ENDIF
 
