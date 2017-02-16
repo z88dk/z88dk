@@ -22,9 +22,9 @@ IF !DEFINED_nostreams
         ldir
         ld      hl,__sgoioblk+2
         ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
+        ld      hl,__sgoioblk+8
         ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
+        ld      hl,__sgoioblk+14
         ld      (hl),21 ;stderr
 ENDIF
 IF DEFINED_USING_amalloc

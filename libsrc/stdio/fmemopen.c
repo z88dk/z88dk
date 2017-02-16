@@ -6,8 +6,6 @@
 FILE *fmemopen(void *buf, size_t size, const char *mode)
 {
         int     flags;
-        int fd;
-
         FILE    *fp;
 
         for (fp= _sgoioblk; fp < _sgoioblk_end; ++fp) {
@@ -17,7 +15,6 @@ FILE *fmemopen(void *buf, size_t size, const char *mode)
         if (fp >= _sgoioblk_end) {
                 return NULL; /* No free slots */
         }
-
         switch (*(unsigned char *)mode) {
                 case 'r':
                         flags=_IOREAD | _IOUSE| _IOTEXT | _IOSTRING;
@@ -35,8 +32,8 @@ FILE *fmemopen(void *buf, size_t size, const char *mode)
         if ( *(unsigned char *) (mode+1) == 'b' )
             flags ^= _IOTEXT;
 #endif
+        fp->desc.ptr  = buf; 
         fp->flags = flags;
-        fp->desc.ptr = buf; 
         fp->extra = size;
         return fp;
 }
