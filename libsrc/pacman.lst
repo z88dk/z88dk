@@ -8,6 +8,7 @@ graphics/clg
 graphics/clrarea
 graphics/pacman/clsgraph
 graphics/lftscrol
+graphics/pacman/char_address
 graphics/pacman/textpixl
 graphics/pacman/plotpixl
 graphics/pacman/respixl
