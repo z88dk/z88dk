@@ -649,11 +649,11 @@ int linkthem(char *linker)
 
 		for (i = 0; i < nfiles; ++i)
         {
-			if (hassuffix(filelist[i], c_extension))
+            if (hassuffix(filelist[i], c_extension))
             {
-				fprintf(out, "%s\n", filelist[i]);
-				if (prj) fprintf(prj, "%s\n", original_filenames[i]);
-			}
+                fprintf(out, "%s\n", filelist[i]);
+                if (prj) fprintf(prj, "%s\n", original_filenames[i]);
+            }
 		}
 
 		fclose(out);
@@ -680,11 +680,11 @@ int linkthem(char *linker)
 
 		for (i = 0; i < nfiles; ++i)
         {
-			if (hassuffix(filelist[i], c_extension))
+            if (hassuffix(filelist[i], c_extension))
             {
-				offs += snprintf(cmdline + offs, len - offs, " \"%s\"", filelist[i]);
-				if (prj) fprintf(prj, "%s\n", original_filenames[i]);
-			}
+                offs += snprintf(cmdline + offs, len - offs, " \"%s\"", filelist[i]);
+                if (prj) fprintf(prj, "%s\n", original_filenames[i]);
+            }
 		}
 	}
 

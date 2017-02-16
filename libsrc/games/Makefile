@@ -93,4 +93,6 @@ clean:
 	$(RM) ace/*.o bee/*.o c128/*.o cpc/*.o aquarius/*.o msx/*.o 
 	$(RM) sam/*.o spectrum/*.o trs80/*.o vg5k/*.o vz/*.o z88/*.o
 	$(RM) gal/*.o ticalc/*.o enterprise/*.o mtx/*.o bee/*.o aussie/*.o
-	$(RM) osca/*.o zx81snd/*.o mc1000/*.o pc6001/*.o p2000/*.o z9001/*.o 
+	$(RM) osca/*.o zx81snd/*.o mc1000/*.o pc6001/*.o p2000/*.o z9001/*.o
+	$(RM) pacman/*.o
+

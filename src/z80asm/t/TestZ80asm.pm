@@ -51,7 +51,7 @@ END {
 #		ok => 1 - needed if no binary file is generated (i.e. -x)
 #		error - additional error messages not in asm source files
 #		bin - result binary code
-# 		bin_file - name of minary file
+# 		bin_file - name of binary file
 #------------------------------------------------------------------------------
 sub z80asm {
 	my(%args) = @_;

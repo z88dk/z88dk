@@ -522,7 +522,7 @@ int fwrite_module_code(FILE *file)
 		{
 			xfput_int32(file, size);
 			xfput_count_byte_strz(file, section->name);
-			xfput_int32(file, section->origin);
+			write_origin(file, section);
 
 			if (size > 0)		/* ByteArray_item(bytes,0) creates item[0]!! */
 				xfput_chars(file, (char *)ByteArray_item(section->bytes, addr), size);
@@ -649,4 +649,31 @@ void set_origin_option(int origin)
 		default_section->origin = origin;
 		default_section->origin_opts = TRUE;
 	}
+}
+
+
+void read_origin(FILE* file, Section *section) {
+	int origin = xfget_int32(file);
+	if (origin >= 0) {
+		section->origin = origin;
+		section->section_split = FALSE;
+	}
+	else if (origin == -2) {
+		section->section_split = TRUE;
+	}
+	else {
+		section->section_split = FALSE;
+	}
+}
+
+void write_origin(FILE* file, Section *section) {
+	int origin = section->origin;
+	if (origin < 0) {
+		if (section->section_split)
+			origin = -2;			/* write -2 for section split */
+		else
+			origin = -1;			/* write -1 for not defined */
+	}
+
+	xfput_int32(file, origin);
 }

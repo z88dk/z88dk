@@ -5,7 +5,7 @@
 # Problems? Contact the person to blame(!) above the section
 # for the library
 #
-# $Id: Makefile,v 1.265 2016-11-25 14:45:01 stefano Exp $
+# $Id: Makefile,v 1.265 2016/11/25 14:45:01 stefano Exp $
 
 
 include Make.config
@@ -19,7 +19,7 @@ all: genlibs z88libs tilibs zxlibs eplibs c128libs cpclibs \
 	cpm_clib.lib einstein.lib gal_clib.lib m5_clib.lib mc1000_clib.lib \
 	msx_clib.lib mtx_clib.lib mz_clib.lib  \
 	nascom_clib.lib  newbrain_clib.lib nc_clib.lib \
-	osca_clib.lib ozansi_clib.lib p2000_clib.lib  \
+	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
 	pc6001_clib.lib pps_clib.lib px4.lib \
 	rex_clib.lib rcmx000_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
 	svi_clib.lib sam_clib.lib  sorcerer_clib.lib  sos_clib.lib tiki100.lib\
@@ -50,6 +50,12 @@ zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81
 #  short script to sort out games dependencies
 gamesdeps:
 	$(RM) -f games/*.o
+
+#  short script to sort out stdlib dependencies
+stdldeps:
+	$(RM) -f stdlib/sleep.o
+	$(RM) -f stdlib/csleep.o
+	$(RM) -f stdlib/delay.o
 
 #  short script to sort out gfx dependencies
 gfxdeps:
@@ -279,6 +285,7 @@ zx_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
+	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
@@ -304,6 +311,7 @@ ts2068_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=zx
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
@@ -360,6 +368,21 @@ mzx_tiny.lib:
 	@echo '--- Building ZX Spectrum Tiny Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/zxmath mzx_tiny
+
+# PacMan lib - Stefano
+pacman_clib.lib:
+	@echo ''
+	@echo '--- Building PacMan HW Library ---'
+	@echo ''
+	$(MAKE) gfxdeps
+	$(MAKE) -C strings
+	$(MAKE) -C regex
+	$(MAKE) stdldeps
+	$(MAKE) -C stdlib TARGET=pacman
+	$(MAKE) -C stdio
+	$(MAKE) -C setjmp
+	$(MAKE) -C assert
+	$(LIBLINKER) -DFORpacman -x$(OUTPUT_DIRECTORY)/pacman_clib @$(LISTFILE_DIRECTORY)/pacman.lst
 
 # Philips P2000 lib - Stefano
 p2000_clib.lib:
@@ -444,6 +467,7 @@ zx80_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=zx80
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
@@ -462,6 +486,7 @@ zx81_clib.lib:
 	$(MAKE) zx81deps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=zx81
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp generic_iy
@@ -916,6 +941,7 @@ enterprise_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=enterprise
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
@@ -979,6 +1005,7 @@ mc1000_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings 
 	$(MAKE) -C regex
+	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=mc1000
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
@@ -1152,6 +1179,7 @@ newbrain_clib.lib:
 	$(MAKE) gfxdeps
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=newbrain
 	$(MAKE) -C stdio 
 	$(MAKE) -C fcntl/newbrain
@@ -1177,9 +1205,9 @@ rcmx000_clib.lib:
 	@echo ''
 	@echo '--- WARNING: RCM2/3000 is temporarily disabled - no library will be produced ---'
 	@echo ''
-	$(MAKE) -C stdlib 
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=rcmx000
 	$(MAKE) -C stdio 
 	$(MAKE) -C setjmp
@@ -1366,6 +1394,7 @@ osca_clib.lib:
 	@echo ''
 	$(MAKE) -C strings
 	$(MAKE) -C regex
+	$(MAKE) stdldeps
 	$(MAKE) -C stdlib TARGET=osca
 	$(MAKE) -C stdio 
 	$(MAKE) -C rs232 losca
@@ -1476,6 +1505,7 @@ clean:
 	$(MAKE) -C x1 clean
 	$(MAKE) -C math clean
 	$(RM) *.lib
+	$(RM) compress/zx7/*.o
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs

@@ -370,8 +370,15 @@ void dump_code( FILE *fp, char *filename, long fp_start )
 				org = -1;
 
 			printf("  Code: %d bytes", code_size );
-			if ( org >= 0 )
+			if (org >= 0) {
 				printf(", ORG at $%04X", org );
+			}
+			else if (org == -2) {
+				printf(", section split");
+			}
+			else {
+			}
+
 			print_section_name( section_name );
 			printf("\n");
 
