@@ -76,6 +76,7 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
+#undef  `__Z180'
 #define `__Z180'  __Z180
 
 #define `__Z180_Z80180'  __Z180_Z80180

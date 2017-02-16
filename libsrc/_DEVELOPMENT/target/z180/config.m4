@@ -36,9 +36,9 @@ dnl############################################################
 dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
+include(`config_target.m4')
 include(`config_cpu.m4')
 include(`config_clib.m4')
-include(`config_target.m4')
 
 dnl############################################################
 dnl# END IF GUARDS
