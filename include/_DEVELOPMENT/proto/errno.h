@@ -3,28 +3,28 @@ include(__link__.m4)
 #ifndef _ERRNO_H
 #define _ERRNO_H
 
+#include <arch.h>
+
 extern int errno;
 
-// keep consistent with "clib_constants.inc"
+#define EOK            __EOK
+#define EACCES         __EACCES
+#define EBADF          __EBADF
+#define EBDFD          __EBDFD
+#define EDOM           __EDOM
+#define EFBIG          __EFBIG
+#define EINVAL         __EINVAL
+#define EMFILE         __EMFILE
+#define ENFILE         __ENFILE
+#define ENOLCK         __ENOLCK
+#define ENOMEM         __ENOMEM
+#define ENOTSUP        __ENOTSUP
+#define EOVERFLOW      __EOVERFLOW
+#define ERANGE         __ERANGE
+#define ESTAT          __ESTAT
+#define EWOULDBLOCK    __EWOULDBLOCK
+#define EAGAIN         __EAGAIN
 
-#define EOK            0
-#define EACCES         1
-#define EBADF          2
-#define EBDFD          3
-#define EDOM           4
-#define EFBIG          5
-#define EINVAL         6
-#define EMFILE         7
-#define ENFILE         8
-#define ENOLCK         9
-#define ENOMEM        10
-#define ENOTSUP       11
-#define EOVERFLOW     12
-#define ERANGE        13
-#define ESTAT         14
-#define EWOULDBLOCK   15
-#define EAGAIN        15
-
-// target specific errors included below
+// target specific errors below
 
 #endif
