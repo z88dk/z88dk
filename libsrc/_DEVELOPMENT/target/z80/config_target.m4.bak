@@ -7,7 +7,6 @@ divert(-1)
 
 # Announce target
 
-include(`../z88dk_version.m4')
 define(`__EMBEDDED_Z80', 1)
 
 #
@@ -22,7 +21,6 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
-PUBLIC `__Z88DK'
 PUBLIC `__EMBEDDED_Z80'
 ')
 
@@ -32,7 +30,6 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
-defc `__Z88DK' = __Z88DK
 defc `__EMBEDDED_Z80' = __EMBEDDED_Z80
 ')
 
@@ -42,9 +39,6 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#undef  `__Z88DK'
-#define `__Z88DK'  __Z88DK
-
 #undef  `__EMBEDDED_Z80'
 #define `__EMBEDDED_Z80'  __EMBEDDED_Z80
 ')

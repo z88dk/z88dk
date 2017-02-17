@@ -7,7 +7,7 @@ divert(-1)
 
 # Class of Z180 being targeted
 
-define(`__Z180', 0x01)
+define(`__Z180', 0x04)
 
 define(`__Z180_Z80180', 0x01)
 define(`__Z180_Z8L180', 0x02)

@@ -36,9 +36,11 @@ dnl############################################################
 dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
+include(`../z88dk_version.m4')
 include(`config_target.m4')
 include(`config_cpu.m4')
 include(`config_clib.m4')
+include(`config_clib_const.m4')
 
 dnl############################################################
 dnl# END IF GUARDS
