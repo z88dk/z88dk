@@ -21,8 +21,7 @@ define(`__CPU_CLOCK', 33000000)
 
 define(`__CPU_INFO', 0x00)
 
-define(`__CPU_INFO_NMOS', 0x01)
-define(`__CPU_INFO_ENABLE_SLL', 0x02)
+define(`__CPU_INFO_ENABLE_SLL', 0x01)
 
 #
 # END OF USER CONFIGURATION
@@ -46,7 +45,6 @@ PUBLIC `__CPU_CLOCK'
 
 PUBLIC `__CPU_INFO'
 
-PUBLIC `__CPU_INFO_NMOS'
 PUBLIC `__CPU_INFO_ENABLE_SLL'
 ')
 
@@ -66,7 +64,6 @@ defc `__CPU_CLOCK' = __CPU_CLOCK
 
 defc `__CPU_INFO' = __CPU_INFO
 
-defc `__CPU_INFO_NMOS' = __CPU_INFO_NMOS
 defc `__CPU_INFO_ENABLE_SLL' = __CPU_INFO_ENABLE_SLL
 ')
 
@@ -87,6 +84,5 @@ ifdef(`CFG_C_DEF',
 
 #define `__CPU_INFO'  __CPU_INFO
 
-#define `__CPU_INFO_NMOS'  __CPU_INFO_NMOS
 #define `__CPU_INFO_ENABLE_SLL'  __CPU_INFO_ENABLE_SLL
 ')
