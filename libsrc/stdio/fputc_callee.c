@@ -59,6 +59,18 @@ PUBLIC ASMDISP_FPUTC_CALLEE
 	ld	a,(ix+fp_flags)
 	and	_IOSTRING
 	jr	z,no_string
+	ld	e,(ix+fp_extra)
+	ld	d,(ix+fp_extra+1)
+	ld	a,d
+	or	e
+	jr	nz,print_char_to_buf
+	ex	de,hl		;hl = 0
+	dec	hl		;hl = -1, EOF
+	ret
+.print_char_to_buf
+	dec	de
+	ld	(ix+fp_extra),e
+	ld	(ix+fp_extra+1),d
 	ld	l,(ix+fp_desc)
 	ld	h,(ix+fp_desc+1)
 	ld	(hl),c
