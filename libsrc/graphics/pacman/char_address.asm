@@ -38,18 +38,18 @@
 			dec c
 			jr z,hrow
 			
+			dec c
 			ld hl,0x43A0
 			ld d,0
 			ld e,c
 			add hl,de
 			
-;			xor a
-			cp b	; column at 0 position
-			jr z,address_found
+			inc b
 			ld de,0x20
 .xpos
 			sbc hl,de
 			djnz xpos
+			add hl,de
 			jr	address_found
 			
 .hrow
