@@ -3,12 +3,16 @@ include(__link__.m4)
 #ifndef _ARCH_CPM_H
 #define _ARCH_CPM_H
 
+#include <arch.h>
+
 /*
  * Hitech C was used as reference for many definitions
  */
 
 // BDOS FUNCTION NUMBERS
+// For reference only - actual definitions come from arch.h
 
+/*
 #define CPM_RCON 1               // read console
 #define CPM_WCON 2               // write console
 #define CPM_RRDR 3               // read reader
@@ -39,6 +43,7 @@ include(__link__.m4)
 #define CPM_WRAN 34              // write random record
 #define CPM_CFS  35              // compute file size
 #define CPM_DSEG 51              // set DMA segment
+*/
 
 // CPM FILE CONTROL BLOCK (FCB)
 
