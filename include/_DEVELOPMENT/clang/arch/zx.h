@@ -5,6 +5,8 @@
 #ifndef _ARCH_ZX_H
 #define _ARCH_ZX_H
 
+#include <arch.h>
+
 #include <stddef.h>
 #include <rect.h>
 
