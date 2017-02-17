@@ -5,10 +5,12 @@
 
 INCLUDE "zcc_opt.def"
 
+ifdef(`__STARTUP',, define(`__STARTUP', 2))
+
 IFNDEF startup
 
    ; startup undefined so select a default
-   
+	
    defc startup = 2
 
 ENDIF
@@ -18,11 +20,11 @@ ENDIF
 ;; user supplied crt ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = -1
-
-   IFNDEF __CRTDEF
+ifelse(`__STARTUP', `-1',
+`
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 2
+      defc __CRTCFG = 2
    
    ENDIF
    
@@ -32,22 +34,21 @@ IF startup = -1
    
    ENDIF
    
-   INCLUDE "crt.asm"
-
-ENDIF
+   include(`crt.asm.m4')
+')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = 0
-
+ifelse(`__STARTUP', `0',
+`
    ; generic embedded system
    ; no files, no fds
 
-   IFNDEF __CRTDEF
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 0
+      defc __CRTCFG = 0
    
    ENDIF
    
@@ -57,22 +58,21 @@ IF startup = 0
    
    ENDIF
 
-   INCLUDE "startup/embedded_crt_0.asm"
-
-ENDIF
+   include(`startup/z80_crt_0.asm.m4')
+')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = 1
-
+ifelse(`__STARTUP', `1',
+`
    ; generic embedded system
    ; no files, no fds
 
-   IFNDEF __CRTDEF
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 1
+      defc __CRTCFG = 1
    
    ENDIF
    
@@ -82,22 +82,21 @@ IF startup = 1
    
    ENDIF
 
-   INCLUDE "startup/embedded_crt_0.asm"
-
-ENDIF
+   include(`startup/z80_crt_0.asm.m4')
+')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; compressed rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = 2
-
+ifelse(`__STARTUP', `2',
+`
    ; generic embedded system
    ; no files, no fds
 
-   IFNDEF __CRTDEF
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 2
+      defc __CRTCFG = 2
    
    ENDIF
    
@@ -107,6 +106,5 @@ IF startup = 2
    
    ENDIF
 
-   INCLUDE "startup/embedded_crt_0.asm"
-
-ENDIF
+   include(`startup/z80_crt_0.asm.m4')
+')
