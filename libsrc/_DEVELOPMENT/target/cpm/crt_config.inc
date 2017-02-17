@@ -3,17 +3,17 @@
 ;; crt target defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CRTDEF = -1
+IF __CRTCFG = -1
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; user supplied crt defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   INCLUDE "crtdef.inc"
+   INCLUDE "crt_cfg.inc"
 
 ENDIF
 
-IF __CRTDEF = 0
+IF __CRTCFG = 0
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; cpm ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -31,7 +31,7 @@ IF __CRTDEF = 0
    defc TAR__crt_initialize_bss        = 0
    
    defc TAR__crt_include_preamble      = 0
-
+   
    defc TAR__crt_enable_streams        = 0x3f
    
    defc TAR__crt_enable_commandline    = 3
