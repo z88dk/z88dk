@@ -820,7 +820,7 @@ defc __BIFROST2_TILE_MAP       = 65281
 defc __BIFROST2_TOTAL_ROWS     = 22
 defc __BIFROST2_HOLE           = 64839
 defc _BIFROST2_HOLE            = 64839
-defc __BIFROST2_HOLE_SIZE      = -10
+defc __BIFROST2_HOLE_SIZE      = 0
 
 
 
