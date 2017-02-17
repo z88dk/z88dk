@@ -22,9 +22,9 @@ IF !DEFINED_nostreams
         ldir
         ld      hl,__sgoioblk+2
         ld      (hl),19 ;stdin
-        ld      hl,__sgoioblk+6
+        ld      hl,__sgoioblk+8
         ld      (hl),21 ;stdout
-        ld      hl,__sgoioblk+10
+        ld      hl,__sgoioblk+14
         ld      (hl),21 ;stderr
 ENDIF
 IF DEFINED_USING_amalloc
@@ -98,7 +98,7 @@ IF !DEFINED_nostreams
 		PUBLIC	__sgoioblk_end
 		PUBLIC  __FOPEN_MAX
                 defc    __FOPEN_MAX = CLIB_FOPEN_MAX
-__sgoioblk:     defs    CLIB_FOPEN_MAX * 4      ;stdio control block
+__sgoioblk:     defs    CLIB_FOPEN_MAX * 6      ;stdio control block
 __sgoioblk_end:   		 ;end of stdio control block
 ENDIF
 		PUBLIC	base_graphics

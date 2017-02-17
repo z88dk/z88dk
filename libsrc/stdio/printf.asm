@@ -27,7 +27,7 @@ printf:
 	add	hl,sp
 
 	push	ix		;save callers
-	ld	bc,__sgoioblk+4
+	ld	bc,__sgoioblk+6
 	push	bc
 	ld	bc,fputc_callee		;printf_outc
 	push	bc

@@ -21,7 +21,7 @@ _printf:
 	push	de
 	push	bc
 	push	ix	;save ix
-	ld	bc,__sgoioblk+4	;file
+	ld	bc,__sgoioblk+6	;file
 	push	bc
 	ld	bc,fputc_callee
 	push	bc
