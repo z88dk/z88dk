@@ -36,10 +36,11 @@ dnl############################################################
 dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
+include(`../z88dk_version.m4')
 include(`config_target.m4')
 include(`config_cpu.m4')
 include(`config_clib.m4')
-include(`config_ioctl.m4')
+include(`config_clib_const.m4')
 include(`config_bifrost_2.m4')
 include(`config_bifrost_h.m4')
 include(`config_bifrost_l.m4')

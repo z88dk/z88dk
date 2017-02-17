@@ -5,10 +5,6 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
-# Announce target
-
-include(`../z88dk_version.m4')
-
 # Spectrum model
 
 define(`__SPECTRUM', 1)
@@ -34,8 +30,6 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
-PUBLIC `__Z88DK'
-
 PUBLIC `__SPECTRUM'
 
 PUBLIC `__SPECTRUM_48'
@@ -54,8 +48,6 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
-defc `__Z88DK' = __Z88DK
-
 defc `__SPECTRUM'          = __SPECTRUM
 
 defc `__SPECTRUM_48'       = __SPECTRUM_48
@@ -74,9 +66,6 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#undef  `__Z88DK'
-#define `__Z88DK'  __Z88DK
-
 #undef  `__SPECTRUM'
 #define `__SPECTRUM'  __SPECTRUM
 

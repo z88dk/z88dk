@@ -14,21 +14,20 @@ dnl############################################################
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 include "../crt_defaults.inc"
-include "crt_target_defaults.inc"
+include "crt_config.inc"
 include "../crt_rules.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MODEL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "memory_model.inc"
+include "crt_memory_map.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GLOBAL SYMBOLS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../clib_constants.inc"
-include "clib_target_constants.inc"
+include "config_zx_public.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; INSTANTIATE DRIVERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -40,25 +39,25 @@ dnl############################################################
 dnl
 dnl## input terminals
 dnl
-dnl#include(../driver/terminal/zx_01_input_kbd_inkey.m4)dnl
-dnl#include(../driver/terminal/zx_01_input_kbd_lastk.m4)dnl
+dnl#include(`driver/terminal/zx_01_input_kbd_inkey.m4')dnl
+dnl#include(`driver/terminal/zx_01_input_kbd_lastk.m4')dnl
 dnl
 dnl## output terminals
 dnl
-dnl#include(../driver/terminal/zx_01_output_char_32.m4)dnl
-dnl#include(../driver/terminal/zx_01_output_char_32_tty_z88dk.m4)dnl
-dnl#include(../driver/terminal/zx_01_output_char_64.m4)dnl
-dnl#include(../driver/terminal/zx_01_output_char_64_tty_z88dk.m4)dnl
-dnl#include(../driver/terminal/zx_01_output_fzx.m4)dnl
-dnl#include(../driver/terminal/zx_01_output_fzx_tty_z88dk.m4)dnl
+dnl#include(`driver/terminal/zx_01_output_char_32.m4')dnl
+dnl#include(`driver/terminal/zx_01_output_char_32_tty_z88dk.m4')dnl
+dnl#include(`driver/terminal/zx_01_output_char_64.m4')dnl
+dnl#include(`driver/terminal/zx_01_output_char_64_tty_z88dk.m4')dnl
+dnl#include(`driver/terminal/zx_01_output_fzx.m4')dnl
+dnl#include(`driver/terminal/zx_01_output_fzx_tty_z88dk.m4')dnl
 dnl
 dnl## file dup
 dnl
-dnl#include(../../m4_file_dup.m4)dnl
+dnl#include(`../m4_file_dup.m4')dnl
 dnl
 dnl## empty fd slot
 dnl
-dnl#include(../../m4_file_absent.m4)dnl
+dnl#include(`../m4_file_absent.m4')dnl
 dnl
 dnl############################################################
 dnl## INSTANTIATE DRIVERS #####################################
@@ -72,18 +71,18 @@ ifndef CRT_FONT
 
 endif
 
-include(../../clib_instantiate_begin.m4)
+include(`../clib_instantiate_begin.m4')
 
-include(../driver/terminal/zx_01_input_kbd_inkey.m4)dnl
+include(`driver/terminal/zx_01_input_kbd_inkey.m4')dnl
 m4_zx_01_input_kbd_inkey(_stdin, __i_fcntl_fdstruct_1, 0x03b0, 64, 1, 500, 15)dnl
 
-include(../driver/terminal/zx_01_output_char_64_tty_z88dk.m4)dnl
+include(`driver/terminal/zx_01_output_char_64_tty_z88dk.m4')dnl
 m4_zx_01_output_char_64_tty_z88dk(_stdout, 0x2370, 0, 0, 0, 64, 0, 24, 0, CRT_FONT, 56, 0, 56)dnl
 
-include(../../m4_file_dup.m4)dnl
+include(`../m4_file_dup.m4')dnl
 m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)dnl
 
-include(../../clib_instantiate_end.m4)
+include(`../clib_instantiate_end.m4')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STARTUP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -255,9 +254,7 @@ IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8)
 
 ENDIF
 
-
 include "../clib_variables.inc"
-include "clib_target_variables.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CLIB STUBS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
