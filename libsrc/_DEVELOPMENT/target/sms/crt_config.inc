@@ -3,17 +3,17 @@
 ;; crt target defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CRTDEF = -1
+IF __CRTCFG = -1
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; user supplied crt defaults ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   INCLUDE "crtdef.inc"
+   INCLUDE "crt_cfg.inc"
 
 ENDIF
 
-IF __CRTDEF = 0
+IF __CRTCFG = 0
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; sms standard model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -54,7 +54,7 @@ IF __CRTDEF = 0
    
    defc TAR__clib_balloc_table_size    = 0
    
-   defc TAR__clib_fopen_max            = -1
+   defc TAR__clib_fopen_max            = 0
    defc TAR__clib_open_max             = 0
 
 ENDIF

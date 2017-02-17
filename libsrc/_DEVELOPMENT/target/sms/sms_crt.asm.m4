@@ -5,6 +5,8 @@
 
 INCLUDE "zcc_opt.def"
 
+ifdef(`__STARTUP',, define(`__STARTUP', 0))
+
 IFNDEF startup
 
    ; startup undefined so select a default
@@ -18,11 +20,11 @@ ENDIF
 ;; user supplied crt ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = -1
-
-   IFNDEF __CRTDEF
+ifelse(`__STARTUP', `-1',
+`
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 0
+      defc __CRTCFG = 0
    
    ENDIF
    
@@ -32,22 +34,21 @@ IF startup = -1
    
    ENDIF
    
-   INCLUDE "crt.asm"
-
-ENDIF
+   include(`crt.asm.m4')
+')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; sms standard model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF startup = 0
-
+ifelse(`__STARTUP', `0',
+`
    ; sms standard model
    ; no files, no fds
 
-   IFNDEF __CRTDEF
+   IFNDEF __CRTCFG
    
-      defc __CRTDEF = 0
+      defc __CRTCFG = 0
    
    ENDIF
    
@@ -57,6 +58,5 @@ IF startup = 0
    
    ENDIF
 
-   INCLUDE "startup/sms_crt_0.asm"
-
-ENDIF
+   include(`startup/sms_crt_0.asm.m4')
+')

@@ -46,24 +46,6 @@ IF __MMAP = 0
    SECTION BANK_09
    org CRT_ORG_BANK_09
    
-   SECTION BANK_0A
-   org CRT_ORG_BANK_0A
-   
-   SECTION BANK_0B
-   org CRT_ORG_BANK_0B
-
-   SECTION BANK_0C
-   org CRT_ORG_BANK_0C
-   
-   SECTION BANK_0D
-   org CRT_ORG_BANK_0D
-
-   SECTION BANK_0E
-   org CRT_ORG_BANK_0E
-   
-   SECTION BANK_0F
-   org CRT_ORG_BANK_0F
-
    SECTION BANK_10
    org CRT_ORG_BANK_10
    
@@ -93,24 +75,42 @@ IF __MMAP = 0
    
    SECTION BANK_19
    org CRT_ORG_BANK_19
-   
-   SECTION BANK_1A
-   org CRT_ORG_BANK_1A
-   
-   SECTION BANK_1B
-   org CRT_ORG_BANK_1B
 
-   SECTION BANK_1C
-   org CRT_ORG_BANK_1C
+   SECTION BANK_20
+   org CRT_ORG_BANK_20
    
-   SECTION BANK_1D
-   org CRT_ORG_BANK_1D
+   SECTION BANK_21
+   org CRT_ORG_BANK_21
 
-   SECTION BANK_1E
-   org CRT_ORG_BANK_1E
+   SECTION BANK_22
+   org CRT_ORG_BANK_22
    
-   SECTION BANK_1F
-   org CRT_ORG_BANK_1F
+   SECTION BANK_23
+   org CRT_ORG_BANK_23
+
+   SECTION BANK_24
+   org CRT_ORG_BANK_24
+   
+   SECTION BANK_25
+   org CRT_ORG_BANK_25
+   
+   SECTION BANK_26
+   org CRT_ORG_BANK_26
+   
+   SECTION BANK_27
+   org CRT_ORG_BANK_27
+
+   SECTION BANK_28
+   org CRT_ORG_BANK_28
+   
+   SECTION BANK_29
+   org CRT_ORG_BANK_29
+
+   SECTION BANK_30
+   org CRT_ORG_BANK_30
+   
+   SECTION BANK_31
+   org CRT_ORG_BANK_31
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
