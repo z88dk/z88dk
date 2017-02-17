@@ -213,7 +213,7 @@ int sms_exec(char *target)
     count = 0;
     for (i = 0x02 + (len > 0x8000); i <= 0x1f; ++i)
     {
-        sprintf(filename, "%s_BANK_%02X.bin", binname, i);
+        sprintf(filename, "%s_BANK_%02u.bin", binname, i);
 
         if ((fpin = fopen(filename, "rb")) == NULL)
             count += 0x4000;
@@ -225,7 +225,7 @@ int sms_exec(char *target)
                 len = 0;
             }
 
-            fprintf(stderr, "Adding bank %02X", i);
+            fprintf(stderr, "Adding bank %02u", i);
 
             while (count--)
                 fputc(romfill, fpout);
