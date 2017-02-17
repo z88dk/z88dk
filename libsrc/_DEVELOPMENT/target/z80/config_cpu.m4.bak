@@ -1,7 +1,7 @@
 divert(-1)
 
 ###############################################################
-# Z180 CPU USER CONFIGURATION
+# Z80 CPU USER CONFIGURATION
 # rebuild the library if changes are made
 #
 
