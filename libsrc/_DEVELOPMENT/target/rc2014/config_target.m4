@@ -39,6 +39,6 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#undef  `__RC2014'
-#define `__RC2014'  __RC2014
+`#undef'  `__RC2014'
+`#define' `__RC2014'  __RC2014
 ')

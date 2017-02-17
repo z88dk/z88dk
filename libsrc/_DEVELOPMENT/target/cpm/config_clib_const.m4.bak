@@ -1,13 +1,13 @@
 define(`__count__', 0)
 define(`__ECOUNT__', `__count__`'define(`__count__', eval(__count__+1))')
 
-###############################################################
-# C LIBRARY CONSTANTS - MESSAGES AND IOCTL
+dnl############################################################
+dnl# C LIBRARY CONSTANTS - MESSAGES AND IOCTL
 
-include(`../clib_const.m4')
+include(`target/clib_const.m4')
 
-# NO USER CONFIGURATION, MUST APPEAR FIRST
-###############################################################
+dnl# NO USER CONFIGURATION, MUST APPEAR FIRST
+dnl############################################################
 
 divert(-1)
 
@@ -140,37 +140,37 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#define `CPM_RCON'  CPM_RCON
-#define `CPM_WCON'  CPM_WCON
-#define `CPM_RRDR'  CPM_RRDR
-#define `CPM_WPUN'  CPM_WPUN
-#define `CPM_WLST'  CPM_WLST
-#define `CPM_DCIO'  CPM_DCIO
-#define `CPM_GIOB'  CPM_GIOB
-#define `CPM_SIOB'  CPM_SIOB
-#define `CPM_PRST'  CPM_PRST
-#define `CPM_RCOB'  CPM_RCOB
-#define `CPM_ICON'  CPM_ICON
-#define `CPM_VERS'  CPM_VERS
-#define `CPM_RDS'   CPM_RDS
-#define `CPM_LGIN'  CPM_LGIN
-#define `CPM_OPN'   CPM_OPN
-#define `CPM_CLS'   CPM_CLS
-#define `CPM_FFST'  CPM_FFST
-#define `CPM_FNXT'  CPM_FNXT
-#define `CPM_DEL'   CPM_DEL
-#define `CPM_READ'  CPM_READ
-#define `CPM_WRIT'  CPM_WRIT
-#define `CPM_MAKE'  CPM_MAKE
-#define `CPM_REN'   CPM_REN
-#define `CPM_ILOG'  CPM_ILOG
-#define `CPM_IDRV'  CPM_IDRV
-#define `CPM_SDMA'  CPM_SDMA
-#define `CPM_SUID'  CPM_SUID
-#define `CPM_RRAN'  CPM_RRAN
-#define `CPM_WRAN'  CPM_WRAN
-#define `CPM_CFS'   CPM_CFS
-#define `CPM_DSEG'  CPM_DSEG
+`#define' `CPM_RCON'  CPM_RCON
+`#define' `CPM_WCON'  CPM_WCON
+`#define' `CPM_RRDR'  CPM_RRDR
+`#define' `CPM_WPUN'  CPM_WPUN
+`#define' `CPM_WLST'  CPM_WLST
+`#define' `CPM_DCIO'  CPM_DCIO
+`#define' `CPM_GIOB'  CPM_GIOB
+`#define' `CPM_SIOB'  CPM_SIOB
+`#define' `CPM_PRST'  CPM_PRST
+`#define' `CPM_RCOB'  CPM_RCOB
+`#define' `CPM_ICON'  CPM_ICON
+`#define' `CPM_VERS'  CPM_VERS
+`#define' `CPM_RDS'   CPM_RDS
+`#define' `CPM_LGIN'  CPM_LGIN
+`#define' `CPM_OPN'   CPM_OPN
+`#define' `CPM_CLS'   CPM_CLS
+`#define' `CPM_FFST'  CPM_FFST
+`#define' `CPM_FNXT'  CPM_FNXT
+`#define' `CPM_DEL'   CPM_DEL
+`#define' `CPM_READ'  CPM_READ
+`#define' `CPM_WRIT'  CPM_WRIT
+`#define' `CPM_MAKE'  CPM_MAKE
+`#define' `CPM_REN'   CPM_REN
+`#define' `CPM_ILOG'  CPM_ILOG
+`#define' `CPM_IDRV'  CPM_IDRV
+`#define' `CPM_SDMA'  CPM_SDMA
+`#define' `CPM_SUID'  CPM_SUID
+`#define' `CPM_RRAN'  CPM_RRAN
+`#define' `CPM_WRAN'  CPM_WRAN
+`#define' `CPM_CFS'   CPM_CFS
+`#define' `CPM_DSEG'  CPM_DSEG
 ')
 
 undefine(`__count__')

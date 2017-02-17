@@ -39,6 +39,6 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#undef  `__EMBEDDED_Z180'
-#define `__EMBEDDED_Z180'  __EMBEDDED_Z180
+`#undef'  `__EMBEDDED_Z180'
+`#define' `__EMBEDDED_Z180'  __EMBEDDED_Z180
 ')

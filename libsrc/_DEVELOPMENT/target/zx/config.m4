@@ -4,7 +4,7 @@ divert(-1)
 # MASTER CONFIGURATION FILE
 # user edits are applied to config_*.m4 files in the directory
 
-ifdef(`CFG_ASM_PUB', define(`CFG_ASM_DEF', 1))
+ifdef(`CFG_ASM_PUB', `define(`CFG_ASM_DEF', 1)')
 
 ###############################################################
 
@@ -36,18 +36,18 @@ dnl############################################################
 dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
-include(`../z88dk_version.m4')
-include(`config_target.m4')
-include(`config_cpu.m4')
-include(`config_clib.m4')
-include(`config_clib_const.m4')
-include(`config_bifrost_2.m4')
-include(`config_bifrost_h.m4')
-include(`config_bifrost_l.m4')
-include(`config_nirvanam.m4')
-include(`config_nirvanap.m4')
-include(`config_sound_bit.m4')
-include(`config_sp1.m4')
+include(`target/z88dk_version.m4')
+include(`target/zx/config_target.m4')
+include(`target/zx/config_cpu.m4')
+include(`target/zx/config_clib.m4')
+include(`target/zx/config_clib_const.m4')
+include(`target/zx/config_bifrost_2.m4')
+include(`target/zx/config_bifrost_h.m4')
+include(`target/zx/config_bifrost_l.m4')
+include(`target/zx/config_nirvanam.m4')
+include(`target/zx/config_nirvanap.m4')
+include(`target/zx/config_sound_bit.m4')
+include(`target/zx/config_sp1.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

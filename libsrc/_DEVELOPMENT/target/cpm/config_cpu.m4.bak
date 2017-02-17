@@ -70,15 +70,15 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#undef  `__Z80'
-#define `__Z80'  __Z80
+`#undef'  `__Z80'
+`#define' `__Z80'  __Z80
 
-#define `__Z80_NMOS'  __Z80_NMOS
-#define `__Z80_CMOS'  __Z80_CMOS
+`#define' `__Z80_NMOS'  __Z80_NMOS
+`#define' `__Z80_CMOS'  __Z80_CMOS
 
-#define `__CPU_CLOCK'  __CPU_CLOCK
+`#define' `__CPU_CLOCK'  __CPU_CLOCK
 
-#define `__CPU_INFO'  __CPU_INFO
+`#define' `__CPU_INFO'  __CPU_INFO
 
-#define `__CPU_INFO_ENABLE_SLL'  __CPU_INFO_ENABLE_SLL
+`#define' `__CPU_INFO_ENABLE_SLL'  __CPU_INFO_ENABLE_SLL
 ')

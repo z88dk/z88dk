@@ -1,13 +1,13 @@
 define(`__count__', 0)
 define(`__ECOUNT__', `__count__`'define(`__count__', eval(__count__+1))')
 
-###############################################################
-# C LIBRARY CONSTANTS - MESSAGES AND IOCTL
+dnl############################################################
+dnl# C LIBRARY CONSTANTS - MESSAGES AND IOCTL
 
-include(`../clib_const.m4')
+include(`target/clib_const.m4')
 
-# NO USER CONFIGURATION, MUST APPEAR FIRST
-###############################################################
+dnl# NO USER CONFIGURATION, MUST APPEAR FIRST
+dnl############################################################
 
 divert(-1)
 

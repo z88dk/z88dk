@@ -39,6 +39,6 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#undef  `__SMS'
-#define `__SMS'  __SMS
+`#undef'  `__SMS'
+`#define' `__SMS'  __SMS
 ')

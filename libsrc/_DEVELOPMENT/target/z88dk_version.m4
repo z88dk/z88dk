@@ -39,6 +39,6 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#undef  `__Z88DK'
-#define `__Z88DK'  __Z88DK
+`#undef'  `__Z88DK'
+`#define' `__Z88DK'  __Z88DK
 ')

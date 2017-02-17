@@ -4,7 +4,7 @@ divert(-1)
 # MASTER CONFIGURATION FILE
 # user edits are applied to config_*.m4 files in the directory
 
-ifdef(`CFG_ASM_PUB', define(`CFG_ASM_DEF', 1))
+ifdef(`CFG_ASM_PUB', `define(`CFG_ASM_DEF', 1)')
 
 ###############################################################
 
@@ -36,11 +36,11 @@ dnl############################################################
 dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
-include(`../z88dk_version.m4')
-include(`config_target.m4')
-include(`config_cpu.m4')
-include(`config_clib.m4')
-include(`config_clib_const.m4')
+include(`target/z88dk_version.m4')
+include(`target/z180/config_target.m4')
+include(`target/z180/config_cpu.m4')
+include(`target/z180/config_clib.m4')
+include(`target/z180/config_clib_const.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

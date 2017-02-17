@@ -4,7 +4,7 @@ define(`__ECOUNT__', `__count__`'define(`__count__', eval(__count__+1))')
 ###############################################################
 # C LIBRARY CONSTANTS - MESSAGES AND IOCTL
 
-include(`../clib_const.m4')
+include(`target/clib_const.m4')
 
 # NO USER CONFIGURATION, MUST APPEAR FIRST
 ###############################################################
@@ -82,14 +82,14 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#define `IOCTL_ITERM_GET_DELAY'  IOCTL_ITERM_GET_DELAY
-#define `IOCTL_ITERM_SET_DELAY'  IOCTL_ITERM_SET_DELAY
+`#define' `IOCTL_ITERM_GET_DELAY'  IOCTL_ITERM_GET_DELAY
+`#define' `IOCTL_ITERM_SET_DELAY'  IOCTL_ITERM_SET_DELAY
 
-#define `IOCTL_ITERM_LASTK'      IOCTL_ITERM_LASTK
+`#define' `IOCTL_ITERM_LASTK'      IOCTL_ITERM_LASTK
 
-#define `IOCTL_OTERM_FCOLOR'     IOCTL_OTERM_FCOLOR
-#define `IOCTL_OTERM_FMASK'      IOCTL_OTERM_FMASK
-#define `IOCTL_OTERM_BCOLOR'     IOCTL_OTERM_BCOLOR
+`#define' `IOCTL_OTERM_FCOLOR'     IOCTL_OTERM_FCOLOR
+`#define' `IOCTL_OTERM_FMASK'      IOCTL_OTERM_FMASK
+`#define' `IOCTL_OTERM_BCOLOR'     IOCTL_OTERM_BCOLOR
 ')
 
 undefine(`__count__')

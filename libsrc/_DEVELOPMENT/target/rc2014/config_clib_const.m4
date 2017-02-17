@@ -1,13 +1,13 @@
 define(`__count__', 0)
 define(`__ECOUNT__', `__count__`'define(`__count__', eval(__count__+1))')
 
-###############################################################
-# C LIBRARY CONSTANTS - MESSAGES AND IOCTL
+dnl############################################################
+dnl# C LIBRARY CONSTANTS - MESSAGES AND IOCTL
 
-include(`../clib_const.m4')
+include(`target/clib_const.m4')
 
-# NO USER CONFIGURATION, MUST APPEAR FIRST
-###############################################################
+dnl# NO USER CONFIGURATION, MUST APPEAR FIRST
+dnl############################################################
 
 divert(-1)
 
@@ -166,45 +166,45 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#define `ACIA_CTRL_ADDR'    ACIA_CTRL_ADDR
-#define `ACIA_STATUS_ADDR'  ACIA_STATUS_ADDR
-#define `ACIA_DATA_ADDR'    ACIA_DATA_ADDR
+`#define' `ACIA_CTRL_ADDR'    ACIA_CTRL_ADDR
+`#define' `ACIA_STATUS_ADDR'  ACIA_STATUS_ADDR
+`#define' `ACIA_DATA_ADDR'    ACIA_DATA_ADDR
 
-#define `ACIA_CLK_DIV_01'   ACIA_CLK_DIV_01
-#define `ACIA_CLK_DIV_16'   ACIA_CLK_DIV_16
-#define `ACIA_CLK_DIV_64'   ACIA_CLK_DIV_64
-#define `ACIA_RESET'        ACIA_RESET
+`#define' `ACIA_CLK_DIV_01'   ACIA_CLK_DIV_01
+`#define' `ACIA_CLK_DIV_16'   ACIA_CLK_DIV_16
+`#define' `ACIA_CLK_DIV_64'   ACIA_CLK_DIV_64
+`#define' `ACIA_RESET'        ACIA_RESET
 
-#define `ACIA_7E2'          ACIA_7E2
-#define `ACIA_7O2'          ACIA_7O2
-#define `ACIA_7E1'          ACIA_7E1
-#define `ACIA_7O1'          ACIA_7O1
-#define `ACIA_8N2'          ACIA_8N2
-#define `ACIA_8N1'          ACIA_8N1
-#define `ACIA_8E1'          ACIA_8E1
-#define `ACIA_8O1'          ACIA_8O1
+`#define' `ACIA_7E2'          ACIA_7E2
+`#define' `ACIA_7O2'          ACIA_7O2
+`#define' `ACIA_7E1'          ACIA_7E1
+`#define' `ACIA_7O1'          ACIA_7O1
+`#define' `ACIA_8N2'          ACIA_8N2
+`#define' `ACIA_8N1'          ACIA_8N1
+`#define' `ACIA_8E1'          ACIA_8E1
+`#define' `ACIA_8O1'          ACIA_8O1
 
-#define `ACIA_TDI_RTS0'     ACIA_TDI_RTS0
-#define `ACIA_TEI_RTS0'     ACIA_TEI_RTS0
-#define `ACIA_TDI_RTS1'     ACIA_TDI_RTS1
-#define `ACIA_TDI_BRK'      ACIA_TDI_BRK
+`#define' `ACIA_TDI_RTS0'     ACIA_TDI_RTS0
+`#define' `ACIA_TEI_RTS0'     ACIA_TEI_RTS0
+`#define' `ACIA_TDI_RTS1'     ACIA_TDI_RTS1
+`#define' `ACIA_TDI_BRK'      ACIA_TDI_BRK
    
-#define `ACIA_TEI_MASK'     ACIA_TEI_MASK
+`#define' `ACIA_TEI_MASK'     ACIA_TEI_MASK
 
-#define `ACIA_REI'          ACIA_REI
+`#define' `ACIA_REI'          ACIA_REI
 
-#define `ACIA_RDRF'         ACIA_RDRF
-#define `ACIA_TDRE'         ACIA_TDRE
-#define `ACIA_DCD'          ACIA_DCD
-#define `ACIA_CTS'          ACIA_CTS
-#define `ACIA_FE'           ACIA_FE
-#define `ACIA_OVRN'         ACIA_OVRN
-#define `ACIA_PE'           ACIA_PE
-#define `ACIA_IRQ'          ACIA_IRQ
+`#define' `ACIA_RDRF'         ACIA_RDRF
+`#define' `ACIA_TDRE'         ACIA_TDRE
+`#define' `ACIA_DCD'          ACIA_DCD
+`#define' `ACIA_CTS'          ACIA_CTS
+`#define' `ACIA_FE'           ACIA_FE
+`#define' `ACIA_OVRN'         ACIA_OVRN
+`#define' `ACIA_PE'           ACIA_PE
+`#define' `ACIA_IRQ'          ACIA_IRQ
 
-#define `ACIA_RX_SIZE'      ACIA_RX_SIZE
-#define `ACIA_RX_FULLISH'   ACIA_RX_FULLISH
-#define `ACIA_TX_SIZE'      ACIA_TX_SIZE
+`#define' `ACIA_RX_SIZE'      ACIA_RX_SIZE
+`#define' `ACIA_RX_FULLISH'   ACIA_RX_FULLISH
+`#define' `ACIA_TX_SIZE'      ACIA_TX_SIZE
 ')
 
 undefine(`__count__')

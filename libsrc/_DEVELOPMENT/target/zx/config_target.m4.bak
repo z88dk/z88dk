@@ -66,15 +66,15 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#undef  `__SPECTRUM'
-#define `__SPECTRUM'  __SPECTRUM
+`#undef'  `__SPECTRUM'
+`#define' `__SPECTRUM'  __SPECTRUM
 
-#define `__SPECTRUM_48'        __SPECTRUM_48
-#define `__SPECTRUM_128'       __SPECTRUM_128
-#define `__SPECTRUM_128_P2'    __SPECTRUM_128_P2
-#define `__SPECTRUM_128_P2A'   __SPECTRUM_128_P2A
-#define `__SPECTRUM_128_P3'    __SPECTRUM_128_P3
-#define `__SPECTRUM_PENTAGON'  __SPECTRUM_PENTAGON
+`#define' `__SPECTRUM_48'        __SPECTRUM_48
+`#define' `__SPECTRUM_128'       __SPECTRUM_128
+`#define' `__SPECTRUM_128_P2'    __SPECTRUM_128_P2
+`#define' `__SPECTRUM_128_P2A'   __SPECTRUM_128_P2A
+`#define' `__SPECTRUM_128_P3'    __SPECTRUM_128_P3
+`#define' `__SPECTRUM_PENTAGON'  __SPECTRUM_PENTAGON
 
-#define `__SPECTRUM_128_MASK'  __SPECTRUM_128_MASK
+`#define' `__SPECTRUM_128_MASK'  __SPECTRUM_128_MASK
 ')

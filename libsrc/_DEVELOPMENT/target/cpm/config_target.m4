@@ -39,6 +39,6 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-#undef  `__CPM'
-#define `__CPM'  __CPM
+`#undef'  `__CPM'
+`#define' `__CPM'  __CPM
 ')
