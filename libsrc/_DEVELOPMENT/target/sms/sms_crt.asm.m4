@@ -5,7 +5,7 @@
 
 INCLUDE "zcc_opt.def"
 
-ifdef(`__STARTUP',, define(`__STARTUP', 0))
+ifdef(`__STARTUP',,`define(`__STARTUP', 0)')
 
 IFNDEF startup
 
@@ -20,7 +20,7 @@ ENDIF
 ;; user supplied crt ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `-1',
+ifelse(__STARTUP, -1,
 `
    IFNDEF __CRTCFG
    
@@ -41,7 +41,7 @@ ifelse(`__STARTUP', `-1',
 ;; sms standard model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `0',
+ifelse(__STARTUP, 0,
 `
    ; sms standard model
    ; no files, no fds

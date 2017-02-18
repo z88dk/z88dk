@@ -5,7 +5,7 @@
 
 INCLUDE "zcc_opt.def"
 
-ifdef(`__STARTUP',, define(`__STARTUP', 0))
+ifdef(`__STARTUP',,`define(`__STARTUP', 0)')
 
 IFNDEF startup
 
@@ -19,7 +19,7 @@ ENDIF
 ;; user supplied crt ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `-1',
+ifelse(__STARTUP, -1,
 `
    IFNDEF __CRTCFG
    
@@ -40,7 +40,7 @@ ifelse(`__STARTUP', `-1',
 ;; zx48 ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `0',
+ifelse(__STARTUP, 0,
 `
    ; standard 32 column display
    ;
@@ -63,7 +63,7 @@ ifelse(`__STARTUP', `0',
    include(`startup/zx_crt_0.asm.m4')
 ')
 
-ifelse(`__STARTUP', `1',
+ifelse(__STARTUP, 1,
 `
    ; standard 32 column display tty_z88dk terminal
    ;
@@ -86,7 +86,7 @@ ifelse(`__STARTUP', `1',
    include(`startup/zx_crt_1.asm.m4')
 ')
 
-ifelse(`__STARTUP', `4',
+ifelse(__STARTUP, 4,
 `
    ; 64 column display using fixed width 4x8 font
    ;
@@ -109,7 +109,7 @@ ifelse(`__STARTUP', `4',
    include(`startup/zx_crt_4.asm.m4')
 ')
 
-ifelse(`__STARTUP', `5',
+ifelse(__STARTUP, 5,
 `
    ; 64 column display using fixed width 4x8 font tty_z88dk terminal
    ;
@@ -132,7 +132,7 @@ ifelse(`__STARTUP', `5',
    include(`startup/zx_crt_5.asm.m4')
 ')
 
-ifelse(`__STARTUP', `8',
+ifelse(__STARTUP, 8,
 `
    ; fzx terminal using ff_ind_Termino font
    ;
@@ -155,7 +155,7 @@ ifelse(`__STARTUP', `8',
    include(`startup/zx_crt_8.asm.m4')
 ')
 
-ifelse(`__STARTUP', `9',
+ifelse(__STARTUP, 9,
 `
    ; fzx terminal using ff_ind_Termino font tty_z88dk terminal
    ;
@@ -178,7 +178,7 @@ ifelse(`__STARTUP', `9',
    include(`startup/zx_crt_9.asm.m4')
 ')
 
-ifelse(`__STARTUP', `31',
+ifelse(__STARTUP, 31,
 `
    ; no instantiated FILEs
 
@@ -201,7 +201,7 @@ ifelse(`__STARTUP', `31',
 ;; if 2 cartridge ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `32',
+ifelse(__STARTUP, 32,
 `
    ; if 2 cartridge
    ; standard 32 column display
@@ -225,7 +225,7 @@ ifelse(`__STARTUP', `32',
    include(`startup/zx_crt_32.asm.m4')
 ')
 
-ifelse(`__STARTUP', `33',
+ifelse(__STARTUP, 33,
 `
    ; if 2 cartridge
    ; standard 32 column display tty_z88dk terminal
@@ -249,7 +249,7 @@ ifelse(`__STARTUP', `33',
    include(`startup/zx_crt_33.asm.m4')
 ')
 
-ifelse(`__STARTUP', `36',
+ifelse(__STARTUP, 36,
 `
    ; if 2 cartridge
    ; 64 column display using fixed width 4x8 font
@@ -273,7 +273,7 @@ ifelse(`__STARTUP', `36',
    include(`startup/zx_crt_36.asm.m4')
 ')
 
-ifelse(`__STARTUP', `37',
+ifelse(__STARTUP, 37,
 `
    ; if 2 cartridge
    ; 64 column display using fixed width 4x8 font tty_z88dk terminal
@@ -297,7 +297,7 @@ ifelse(`__STARTUP', `37',
    include(`startup/zx_crt_37.asm.m4')
 ')
 
-ifelse(`__STARTUP', `40',
+ifelse(__STARTUP, 40,
 `
    ; if 2 cartridge
    ; fzx terminal using ff_ind_Termino font
@@ -321,7 +321,7 @@ ifelse(`__STARTUP', `40',
    include(`startup/zx_crt_40.asm.m4')
 ')
 
-ifelse(`__STARTUP', `41',
+ifelse(__STARTUP, 41,
 `
    ; if 2 cartridge
    ; fzx terminal using ff_ind_Termino font tty_z88dk terminal
@@ -345,7 +345,7 @@ ifelse(`__STARTUP', `41',
    include(`startup/zx_crt_41.asm.m4')
 ')
 
-ifelse(`__STARTUP', `63',
+ifelse(__STARTUP, 63,
 `
    ; if 2 cartridge
    ; no instantiated FILEs

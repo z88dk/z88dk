@@ -5,7 +5,7 @@
 
 INCLUDE "zcc_opt.def"
 
-ifdef(`__STARTUP',, define(`__STARTUP', 0))
+ifdef(`__STARTUP',,`define(`__STARTUP', 0)')
 
 IFNDEF startup
 
@@ -20,7 +20,7 @@ ENDIF
 ;; user supplied crt ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `-1',
+ifelse(__STARTUP, -1,
 `
    IFNDEF __CRTCFG
    
@@ -41,7 +41,7 @@ ifelse(`__STARTUP', `-1',
 ;; cp/m native console ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `0',
+ifelse(__STARTUP, 0,
 `
    IFNDEF __CRTCFG
    
@@ -69,7 +69,7 @@ ifelse(`__STARTUP', `0',
 ;; cp/m z88dk console (one window) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `4',
+ifelse(__STARTUP, 4,
 `
    IFNDEF __CRTCFG
    

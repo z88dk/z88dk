@@ -5,7 +5,7 @@
 
 INCLUDE "zcc_opt.def"
 
-ifdef(`__STARTUP',, define(`__STARTUP', 2))
+ifdef(`__STARTUP',,`define(`__STARTUP', 2)')
 
 IFNDEF startup
 
@@ -20,7 +20,7 @@ ENDIF
 ;; user supplied crt ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `-1',
+ifelse(__STARTUP, -1,
 `
    IFNDEF __CRTCFG
    
@@ -41,7 +41,7 @@ ifelse(`__STARTUP', `-1',
 ;; ram model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `0',
+ifelse(__STARTUP, 0,
 `
    ; generic embedded system
    ; no files, no fds
@@ -65,7 +65,7 @@ ifelse(`__STARTUP', `0',
 ;; rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `1',
+ifelse(__STARTUP, 1,
 `
    ; generic embedded system
    ; no files, no fds
@@ -89,7 +89,7 @@ ifelse(`__STARTUP', `1',
 ;; compressed rom model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-ifelse(`__STARTUP', `2',
+ifelse(__STARTUP, 2,
 `
    ; generic embedded system
    ; no files, no fds
