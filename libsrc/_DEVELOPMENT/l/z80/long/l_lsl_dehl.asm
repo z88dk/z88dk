@@ -4,7 +4,7 @@ SECTION code_l
 
 PUBLIC l_lsl_dehl
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
    ; logical shift left 32-bit number
    ;

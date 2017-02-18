@@ -1,7 +1,7 @@
 
 ; int getc_fastcall(FILE *stream)
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_stdio

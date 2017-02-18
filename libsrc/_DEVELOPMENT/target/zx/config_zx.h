@@ -92,9 +92,6 @@
 
 #define __CLIB_OPT_IMATH  0
 
-#define __CLIB_OPT_IMATH_SMALL  0
-#define __CLIB_OPT_IMATH_FAST  0x0f
-
 #define __CLIB_OPT_IMATH_FAST  0x0f
 
 #define __CLIB_OPT_IMATH_FAST_DIV_UNROLL  0x01
@@ -155,6 +152,7 @@
 #define CHAR_LF  10
 #define CHAR_BS  12
 #define CHAR_ESC  27
+#define CHAR_CAPS  6
 #define CHAR_BELL  7
 #define CHAR_CTRL_C  3
 #define CHAR_CTRL_D  4

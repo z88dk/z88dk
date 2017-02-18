@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC _bitfx_9
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 _bitfx_9:
 
@@ -20,7 +20,7 @@ ss_loop:
    push hl
    push af
    
-   ld a,__sound_bit_toggle
+   ld a,__SOUND_BIT_TOGGLE
    ld h,0
    and (hl)
    ld l,a
@@ -32,7 +32,7 @@ ss_loop:
 
    pop hl
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 ss_FR_1:
@@ -44,7 +44,7 @@ ss_jump:
    dec l
    jr nz, ss_loop
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 ss_FR_2:

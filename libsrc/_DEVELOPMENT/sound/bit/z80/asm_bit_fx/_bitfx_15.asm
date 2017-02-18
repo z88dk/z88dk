@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC _bitfx_15
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 _bitfx_15:
 
@@ -17,7 +17,7 @@ expl:
    push hl
    push af
    
-   ld a,__sound_bit_toggle
+   ld a,__SOUND_BIT_TOGGLE
    ld h,0
    and (hl)
    ld l,a

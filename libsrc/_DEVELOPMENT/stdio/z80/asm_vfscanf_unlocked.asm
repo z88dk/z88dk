@@ -10,7 +10,7 @@
 ; ===============================================================
 
 IFNDEF CLIB_OPT_SCANF
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 defc CLIB_OPT_SCANF   = __CLIB_OPT_SCANF
 defc CLIB_OPT_SCANF_2 = __CLIB_OPT_SCANF_2

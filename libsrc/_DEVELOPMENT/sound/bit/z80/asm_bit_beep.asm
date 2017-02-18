@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_sound_bit
@@ -42,10 +42,10 @@ asm0_bit_beep:
 
    push hl                     ; save cycle_dur
    
-   ld de,+(__clock_freq / 8) / 65536
-   ld hl,+(__clock_freq / 8) % 65536
+   ld de,+(__CPU_CLOCK / 8) / 65536
+   ld hl,+(__CPU_CLOCK / 8) % 65536
    
-   call l0_divu_32_32x16       ; dehl = dehl / bc = __clock_freq / (note_freq * 8)
+   call l0_divu_32_32x16       ; dehl = dehl / bc = __CPU_CLOCK / (note_freq * 8)
    
    or a
    ld de,30

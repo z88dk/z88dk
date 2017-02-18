@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC _bitfx_6
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 _bitfx_6:
 
@@ -14,7 +14,7 @@ zap3_1:
 
    push bc
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push af
@@ -30,7 +30,7 @@ zap3_2:
    nop
    djnz zap3_2
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    pop bc

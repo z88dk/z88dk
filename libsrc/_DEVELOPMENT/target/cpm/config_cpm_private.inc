@@ -77,9 +77,6 @@ defc __CLIB_OPT_MULTITHREAD_LOCK_FDSTR = 0x10
 
 defc __CLIB_OPT_IMATH = 0
 
-defc __CLIB_OPT_IMATH_SMALL = 0
-defc __CLIB_OPT_IMATH_FAST = 0x0f
-
 defc __CLIB_OPT_IMATH_FAST = 0x0f
 
 defc __CLIB_OPT_IMATH_FAST_DIV_UNROLL = 0x01
@@ -140,6 +137,7 @@ defc CHAR_CR = 13
 defc CHAR_LF = 10
 defc CHAR_BS = 12
 defc CHAR_ESC = 27
+defc CHAR_CAPS = 6
 defc CHAR_BELL = 7
 defc CHAR_CTRL_C = 3
 defc CHAR_CTRL_D = 4
@@ -415,37 +413,37 @@ defc IOCTL_OCHAR_CRLF = 0xc014
 
 
 
-defc CPM_RCON = 1
-defc CPM_WCON = 2
-defc CPM_RRDR = 3
-defc CPM_WPUN = 4
-defc CPM_WLST = 5
-defc CPM_DCIO = 6
-defc CPM_GIOB = 7
-defc CPM_SIOB = 8
-defc CPM_PRST = 9
-defc CPM_RCOB = 10
-defc CPM_ICON = 11
-defc CPM_VERS = 12
-defc CPM_RDS  = 13
-defc CPM_LGIN = 14
-defc CPM_OPN  = 15
-defc CPM_CLS  = 16
-defc CPM_FFST = 17
-defc CPM_FNXT = 18
-defc CPM_DEL  = 19
-defc CPM_READ = 20
-defc CPM_WRIT = 21
-defc CPM_MAKE = 22
-defc CPM_REN  = 23
-defc CPM_ILOG = 24
-defc CPM_IDRV = 25
-defc CPM_SDMA = 26
-defc CPM_SUID = 32
-defc CPM_RRAN = 33
-defc CPM_WRAN = 34
-defc CPM_CFS  = 35
-defc CPM_DSEG = 51
+defc __CPM_RCON = 1
+defc __CPM_WCON = 2
+defc __CPM_RRDR = 3
+defc __CPM_WPUN = 4
+defc __CPM_WLST = 5
+defc __CPM_DCIO = 6
+defc __CPM_GIOB = 7
+defc __CPM_SIOB = 8
+defc __CPM_PRST = 9
+defc __CPM_RCOB = 10
+defc __CPM_ICON = 11
+defc __CPM_VERS = 12
+defc __CPM_RDS  = 13
+defc __CPM_LGIN = 14
+defc __CPM_OPN  = 15
+defc __CPM_CLS  = 16
+defc __CPM_FFST = 17
+defc __CPM_FNXT = 18
+defc __CPM_DEL  = 19
+defc __CPM_READ = 20
+defc __CPM_WRIT = 21
+defc __CPM_MAKE = 22
+defc __CPM_REN  = 23
+defc __CPM_ILOG = 24
+defc __CPM_IDRV = 25
+defc __CPM_SDMA = 26
+defc __CPM_SUID = 32
+defc __CPM_RRAN = 33
+defc __CPM_WRAN = 34
+defc __CPM_CFS  = 35
+defc __CPM_DSEG = 51
 
 
 

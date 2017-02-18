@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_fcntl
@@ -18,7 +18,7 @@ PUBLIC asm_close, asm0_close
 
 EXTERN __fcntl_fdstruct_from_fd_2, __fcntl_fdchain_descend
 EXTERN error_mc, error_znc, __stdio_heap, asm_heap_free
-EXTERN STDIO_MSG_CLOS, STDIO_MSG_FLSH, l_jpix
+EXTERN l_jpix
 
 asm_close:
 

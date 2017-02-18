@@ -86,9 +86,6 @@ defc __CLIB_OPT_MULTITHREAD_LOCK_FDSTR = 0x10
 
 defc __CLIB_OPT_IMATH = 0
 
-defc __CLIB_OPT_IMATH_SMALL = 0
-defc __CLIB_OPT_IMATH_FAST = 0x0f
-
 defc __CLIB_OPT_IMATH_FAST = 0x0f
 
 defc __CLIB_OPT_IMATH_FAST_DIV_UNROLL = 0x01
@@ -149,6 +146,7 @@ defc CHAR_CR = 13
 defc CHAR_LF = 10
 defc CHAR_BS = 12
 defc CHAR_ESC = 27
+defc CHAR_CAPS = 6
 defc CHAR_BELL = 7
 defc CHAR_CTRL_C = 3
 defc CHAR_CTRL_D = 4
@@ -458,6 +456,8 @@ defc __BIFROST2_HOLE           = 64839
 defc _BIFROST2_HOLE            = 64839
 defc __BIFROST2_HOLE_SIZE      = 0
 
+; define(`__BIFROST2_TOTAL_ROWS', 22)
+
 
 
 
@@ -523,6 +523,8 @@ defc __NIRVANAM_TILE_IMAGES = 48000
 defc __NIRVANAM_WIDE_IMAGES = 54000
 defc __NIRVANAM_CHAR_TABLE  = 15360
 
+; define(`__NIRVANAM_TOTAL_ROWS', 22)
+
 
 
 
@@ -547,6 +549,8 @@ defc __NIRVANAP_HOLE_SIZE   = 0
 defc __NIRVANAP_TILE_IMAGES = 48000
 defc __NIRVANAP_WIDE_IMAGES = 54000
 defc __NIRVANAP_CHAR_TABLE  = 15360
+
+; define(`__NIRVANAP_TOTAL_ROWS', 23)
 
 
 

@@ -83,9 +83,6 @@
 
 #define __CLIB_OPT_IMATH  0
 
-#define __CLIB_OPT_IMATH_SMALL  0
-#define __CLIB_OPT_IMATH_FAST  0x0f
-
 #define __CLIB_OPT_IMATH_FAST  0x0f
 
 #define __CLIB_OPT_IMATH_FAST_DIV_UNROLL  0x01
@@ -146,6 +143,7 @@
 #define CHAR_LF  10
 #define CHAR_BS  12
 #define CHAR_ESC  27
+#define CHAR_CAPS  6
 #define CHAR_BELL  7
 #define CHAR_CTRL_C  3
 #define CHAR_CTRL_D  4
@@ -285,23 +283,23 @@
 
 
 
-#define EOK  0
-#define EACCES  1
-#define EBADF  2
-#define EBDFD  3
-#define EDOM  4
-#define EFBIG  5
-#define EINVAL  6
-#define EMFILE  7
-#define ENFILE  8
-#define ENOLCK  9
-#define ENOMEM  10
-#define ENOTSUP  11
-#define EOVERFLOW  12
-#define ERANGE  13
-#define ESTAT  14
-#define EAGAIN  15
-#define EWOULDBLOCK  15
+#define __EOK  0
+#define __EACCES  1
+#define __EBADF  2
+#define __EBDFD  3
+#define __EDOM  4
+#define __EFBIG  5
+#define __EINVAL  6
+#define __EMFILE  7
+#define __ENFILE  8
+#define __ENOLCK  9
+#define __ENOMEM  10
+#define __ENOTSUP  11
+#define __EOVERFLOW  12
+#define __ERANGE  13
+#define __ESTAT  14
+#define __EAGAIN  15
+#define __EWOULDBLOCK  15
 
 #define __ERROR_NEXT  50
 

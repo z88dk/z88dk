@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC _bitfx_23
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 _bitfx_23:
 
@@ -17,7 +17,7 @@ fx71:
    push hl
    push af
    
-   ld a,__sound_bit_toggle
+   ld a,__SOUND_BIT_TOGGLE
    and l
    ld l,a
    

@@ -9,14 +9,13 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC asm_vioctl, asm_vioctl_driver
 
-EXTERN STDIO_MSG_ICTL
 EXTERN l_jpix, __stdio_nextarg_bc, __fcntl_fdstruct_from_fd_2
 EXTERN error_enotsup_mc, error_mc, __fcntl_fdchain_descend
 

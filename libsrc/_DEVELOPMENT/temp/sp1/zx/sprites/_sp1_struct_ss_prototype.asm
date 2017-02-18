@@ -1,5 +1,5 @@
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_temp_sp1

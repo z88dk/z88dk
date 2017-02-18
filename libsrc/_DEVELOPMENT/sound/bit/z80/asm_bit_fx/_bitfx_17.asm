@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC _bitfx_17
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 _bitfx_17:
 
@@ -16,7 +16,7 @@ blrp:
 
    push af
    
-   ld a,__sound_bit_toggle
+   ld a,__SOUND_BIT_TOGGLE
    ld h,0
    ld l,b
    and (hl)
@@ -43,7 +43,7 @@ dlyb:
    
    pop bc
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push bc

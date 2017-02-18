@@ -83,9 +83,6 @@
 
 #define __CLIB_OPT_IMATH  0
 
-#define __CLIB_OPT_IMATH_SMALL  0
-#define __CLIB_OPT_IMATH_FAST  0x0f
-
 #define __CLIB_OPT_IMATH_FAST  0x0f
 
 #define __CLIB_OPT_IMATH_FAST_DIV_UNROLL  0x01
@@ -146,6 +143,7 @@
 #define CHAR_LF  10
 #define CHAR_BS  12
 #define CHAR_ESC  27
+#define CHAR_CAPS  6
 #define CHAR_BELL  7
 #define CHAR_CTRL_C  3
 #define CHAR_CTRL_D  4
@@ -285,23 +283,23 @@
 
 
 
-#define EOK  0
-#define EACCES  1
-#define EBADF  2
-#define EBDFD  3
-#define EDOM  4
-#define EFBIG  5
-#define EINVAL  6
-#define EMFILE  7
-#define ENFILE  8
-#define ENOLCK  9
-#define ENOMEM  10
-#define ENOTSUP  11
-#define EOVERFLOW  12
-#define ERANGE  13
-#define ESTAT  14
-#define EAGAIN  15
-#define EWOULDBLOCK  15
+#define __EOK  0
+#define __EACCES  1
+#define __EBADF  2
+#define __EBDFD  3
+#define __EDOM  4
+#define __EFBIG  5
+#define __EINVAL  6
+#define __EMFILE  7
+#define __ENFILE  8
+#define __ENOLCK  9
+#define __ENOMEM  10
+#define __ENOTSUP  11
+#define __EOVERFLOW  12
+#define __ERANGE  13
+#define __ESTAT  14
+#define __EAGAIN  15
+#define __EWOULDBLOCK  15
 
 #define __ERROR_NEXT  50
 
@@ -421,37 +419,37 @@
 
 
 
-#define CPM_RCON  1
-#define CPM_WCON  2
-#define CPM_RRDR  3
-#define CPM_WPUN  4
-#define CPM_WLST  5
-#define CPM_DCIO  6
-#define CPM_GIOB  7
-#define CPM_SIOB  8
-#define CPM_PRST  9
-#define CPM_RCOB  10
-#define CPM_ICON  11
-#define CPM_VERS  12
-#define CPM_RDS   13
-#define CPM_LGIN  14
-#define CPM_OPN   15
-#define CPM_CLS   16
-#define CPM_FFST  17
-#define CPM_FNXT  18
-#define CPM_DEL   19
-#define CPM_READ  20
-#define CPM_WRIT  21
-#define CPM_MAKE  22
-#define CPM_REN   23
-#define CPM_ILOG  24
-#define CPM_IDRV  25
-#define CPM_SDMA  26
-#define CPM_SUID  32
-#define CPM_RRAN  33
-#define CPM_WRAN  34
-#define CPM_CFS   35
-#define CPM_DSEG  51
+#define __CPM_RCON  1
+#define __CPM_WCON  2
+#define __CPM_RRDR  3
+#define __CPM_WPUN  4
+#define __CPM_WLST  5
+#define __CPM_DCIO  6
+#define __CPM_GIOB  7
+#define __CPM_SIOB  8
+#define __CPM_PRST  9
+#define __CPM_RCOB  10
+#define __CPM_ICON  11
+#define __CPM_VERS  12
+#define __CPM_RDS   13
+#define __CPM_LGIN  14
+#define __CPM_OPN   15
+#define __CPM_CLS   16
+#define __CPM_FFST  17
+#define __CPM_FNXT  18
+#define __CPM_DEL   19
+#define __CPM_READ  20
+#define __CPM_WRIT  21
+#define __CPM_MAKE  22
+#define __CPM_REN   23
+#define __CPM_ILOG  24
+#define __CPM_IDRV  25
+#define __CPM_SDMA  26
+#define __CPM_SUID  32
+#define __CPM_RRAN  33
+#define __CPM_WRAN  34
+#define __CPM_CFS   35
+#define __CPM_DSEG  51
 
 
 

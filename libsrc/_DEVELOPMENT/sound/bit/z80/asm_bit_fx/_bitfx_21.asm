@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC _bitfx_21
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 _bitfx_21:
 
@@ -24,7 +24,7 @@ hdesc2:
    
    jr nc, hdesc3
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 hdesc3:

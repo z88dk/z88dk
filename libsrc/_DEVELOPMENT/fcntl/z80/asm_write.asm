@@ -9,14 +9,14 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC asm_write
 
-EXTERN __fcntl_fdstruct_from_fd_2, STDIO_MSG_WRIT, l_jpix
+EXTERN __fcntl_fdstruct_from_fd_2, l_jpix
 EXTERN error_znc, error_mc, error_eacces_mc
 
 asm_write:

@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_z80
@@ -36,7 +36,7 @@ ms_loop:
    or e
    jr z, last_ms
 
-   ld hl,+(__clock_freq / 1000) - 43
+   ld hl,+(__CPU_CLOCK / 1000) - 43
    call asm_z80_delay_tstate
 
    jr ms_loop
@@ -45,5 +45,5 @@ last_ms:
 
    ; we will be exact
    
-   ld hl,+(__clock_freq / 1000) - 54
+   ld hl,+(__CPU_CLOCK / 1000) - 54
    jp asm_z80_delay_tstate

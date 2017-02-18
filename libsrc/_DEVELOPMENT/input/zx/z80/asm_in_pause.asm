@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_input
@@ -52,7 +52,7 @@ pause_loop:
 
    ; wait for one millisecond
    
-   ld hl,+(__clock_freq / 1000) - 74 - 29
+   ld hl,+(__CPU_CLOCK / 1000) - 74 - 29
    call asm_z80_delay_tstate
    
    dec de

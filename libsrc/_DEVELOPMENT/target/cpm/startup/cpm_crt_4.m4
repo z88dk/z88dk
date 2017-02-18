@@ -100,7 +100,7 @@ Qualify:
    sub a
    jp po, __Continue
 
-   ld c,CPM_PRST
+   ld c,__CPM_PRST
    ld de,disqualify_s
    
    call asm_cpm_bdos

@@ -18,37 +18,37 @@ divert(-1)
 
 # BDOS
 
-define(`CPM_RCON', 1)       # read console
-define(`CPM_WCON', 2)       # write console
-define(`CPM_RRDR', 3)       # read reader
-define(`CPM_WPUN', 4)       # write punch
-define(`CPM_WLST', 5)       # write list
-define(`CPM_DCIO', 6)       # direct console I/O
-define(`CPM_GIOB', 7)       # get I/O byte
-define(`CPM_SIOB', 8)       # set I/O byte
-define(`CPM_PRST', 9)       # print string
-define(`CPM_RCOB', 10)      # read console buffered
-define(`CPM_ICON', 11)      # interrogate console ready
-define(`CPM_VERS', 12)      # return version number
-define(`CPM_RDS',  13)      # reset disk system
-define(`CPM_LGIN', 14)      # log in and select disk
-define(`CPM_OPN',  15)      # open file
-define(`CPM_CLS',  16)      # close file
-define(`CPM_FFST', 17)      # find first
-define(`CPM_FNXT', 18)      # find next
-define(`CPM_DEL',  19)      # delete file
-define(`CPM_READ', 20)      # read next record
-define(`CPM_WRIT', 21)      # write next record
-define(`CPM_MAKE', 22)      # create file
-define(`CPM_REN',  23)      # rename file
-define(`CPM_ILOG', 24)      # get bit map of logged in disks
-define(`CPM_IDRV', 25)      # interrogate drive number
-define(`CPM_SDMA', 26)      # set DMA address for i/o
-define(`CPM_SUID', 32)      # set/get user id
-define(`CPM_RRAN', 33)      # read random record
-define(`CPM_WRAN', 34)      # write random record
-define(`CPM_CFS',  35)      # compute file size
-define(`CPM_DSEG', 51)      # set DMA segment
+define(`__CPM_RCON', 1)       # read console
+define(`__CPM_WCON', 2)       # write console
+define(`__CPM_RRDR', 3)       # read reader
+define(`__CPM_WPUN', 4)       # write punch
+define(`__CPM_WLST', 5)       # write list
+define(`__CPM_DCIO', 6)       # direct console I/O
+define(`__CPM_GIOB', 7)       # get I/O byte
+define(`__CPM_SIOB', 8)       # set I/O byte
+define(`__CPM_PRST', 9)       # print string
+define(`__CPM_RCOB', 10)      # read console buffered
+define(`__CPM_ICON', 11)      # interrogate console ready
+define(`__CPM_VERS', 12)      # return version number
+define(`__CPM_RDS',  13)      # reset disk system
+define(`__CPM_LGIN', 14)      # log in and select disk
+define(`__CPM_OPN',  15)      # open file
+define(`__CPM_CLS',  16)      # close file
+define(`__CPM_FFST', 17)      # find first
+define(`__CPM_FNXT', 18)      # find next
+define(`__CPM_DEL',  19)      # delete file
+define(`__CPM_READ', 20)      # read next record
+define(`__CPM_WRIT', 21)      # write next record
+define(`__CPM_MAKE', 22)      # create file
+define(`__CPM_REN',  23)      # rename file
+define(`__CPM_ILOG', 24)      # get bit map of logged in disks
+define(`__CPM_IDRV', 25)      # interrogate drive number
+define(`__CPM_SDMA', 26)      # set DMA address for i/o
+define(`__CPM_SUID', 32)      # set/get user id
+define(`__CPM_RRAN', 33)      # read random record
+define(`__CPM_WRAN', 34)      # write random record
+define(`__CPM_CFS',  35)      # compute file size
+define(`__CPM_DSEG', 51)      # set DMA segment
 
 #
 # END OF USER CONFIGURATION
@@ -62,37 +62,37 @@ dnl#
 
 ifdef(`CFG_ASM_PUB',
 `
-PUBLIC `CPM_RCON'
-PUBLIC `CPM_WCON'
-PUBLIC `CPM_RRDR'
-PUBLIC `CPM_WPUN'
-PUBLIC `CPM_WLST'
-PUBLIC `CPM_DCIO'
-PUBLIC `CPM_GIOB'
-PUBLIC `CPM_SIOB'
-PUBLIC `CPM_PRST'
-PUBLIC `CPM_RCOB'
-PUBLIC `CPM_ICON'
-PUBLIC `CPM_VERS'
-PUBLIC `CPM_RDS'
-PUBLIC `CPM_LGIN'
-PUBLIC `CPM_OPN'
-PUBLIC `CPM_CLS'
-PUBLIC `CPM_FFST'
-PUBLIC `CPM_FNXT'
-PUBLIC `CPM_DEL'
-PUBLIC `CPM_READ'
-PUBLIC `CPM_WRIT'
-PUBLIC `CPM_MAKE'
-PUBLIC `CPM_REN'
-PUBLIC `CPM_ILOG'
-PUBLIC `CPM_IDRV'
-PUBLIC `CPM_SDMA'
-PUBLIC `CPM_SUID'
-PUBLIC `CPM_RRAN'
-PUBLIC `CPM_WRAN'
-PUBLIC `CPM_CFS'
-PUBLIC `CPM_DSEG'
+PUBLIC `__CPM_RCON'
+PUBLIC `__CPM_WCON'
+PUBLIC `__CPM_RRDR'
+PUBLIC `__CPM_WPUN'
+PUBLIC `__CPM_WLST'
+PUBLIC `__CPM_DCIO'
+PUBLIC `__CPM_GIOB'
+PUBLIC `__CPM_SIOB'
+PUBLIC `__CPM_PRST'
+PUBLIC `__CPM_RCOB'
+PUBLIC `__CPM_ICON'
+PUBLIC `__CPM_VERS'
+PUBLIC `__CPM_RDS'
+PUBLIC `__CPM_LGIN'
+PUBLIC `__CPM_OPN'
+PUBLIC `__CPM_CLS'
+PUBLIC `__CPM_FFST'
+PUBLIC `__CPM_FNXT'
+PUBLIC `__CPM_DEL'
+PUBLIC `__CPM_READ'
+PUBLIC `__CPM_WRIT'
+PUBLIC `__CPM_MAKE'
+PUBLIC `__CPM_REN'
+PUBLIC `__CPM_ILOG'
+PUBLIC `__CPM_IDRV'
+PUBLIC `__CPM_SDMA'
+PUBLIC `__CPM_SUID'
+PUBLIC `__CPM_RRAN'
+PUBLIC `__CPM_WRAN'
+PUBLIC `__CPM_CFS'
+PUBLIC `__CPM_DSEG'
 ')
 
 dnl#
@@ -101,37 +101,37 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
-defc `CPM_RCON' = CPM_RCON
-defc `CPM_WCON' = CPM_WCON
-defc `CPM_RRDR' = CPM_RRDR
-defc `CPM_WPUN' = CPM_WPUN
-defc `CPM_WLST' = CPM_WLST
-defc `CPM_DCIO' = CPM_DCIO
-defc `CPM_GIOB' = CPM_GIOB
-defc `CPM_SIOB' = CPM_SIOB
-defc `CPM_PRST' = CPM_PRST
-defc `CPM_RCOB' = CPM_RCOB
-defc `CPM_ICON' = CPM_ICON
-defc `CPM_VERS' = CPM_VERS
-defc `CPM_RDS'  = CPM_RDS
-defc `CPM_LGIN' = CPM_LGIN
-defc `CPM_OPN'  = CPM_OPN
-defc `CPM_CLS'  = CPM_CLS
-defc `CPM_FFST' = CPM_FFST
-defc `CPM_FNXT' = CPM_FNXT
-defc `CPM_DEL'  = CPM_DEL
-defc `CPM_READ' = CPM_READ
-defc `CPM_WRIT' = CPM_WRIT
-defc `CPM_MAKE' = CPM_MAKE
-defc `CPM_REN'  = CPM_REN
-defc `CPM_ILOG' = CPM_ILOG
-defc `CPM_IDRV' = CPM_IDRV
-defc `CPM_SDMA' = CPM_SDMA
-defc `CPM_SUID' = CPM_SUID
-defc `CPM_RRAN' = CPM_RRAN
-defc `CPM_WRAN' = CPM_WRAN
-defc `CPM_CFS'  = CPM_CFS
-defc `CPM_DSEG' = CPM_DSEG
+defc `__CPM_RCON' = __CPM_RCON
+defc `__CPM_WCON' = __CPM_WCON
+defc `__CPM_RRDR' = __CPM_RRDR
+defc `__CPM_WPUN' = __CPM_WPUN
+defc `__CPM_WLST' = __CPM_WLST
+defc `__CPM_DCIO' = __CPM_DCIO
+defc `__CPM_GIOB' = __CPM_GIOB
+defc `__CPM_SIOB' = __CPM_SIOB
+defc `__CPM_PRST' = __CPM_PRST
+defc `__CPM_RCOB' = __CPM_RCOB
+defc `__CPM_ICON' = __CPM_ICON
+defc `__CPM_VERS' = __CPM_VERS
+defc `__CPM_RDS'  = __CPM_RDS
+defc `__CPM_LGIN' = __CPM_LGIN
+defc `__CPM_OPN'  = __CPM_OPN
+defc `__CPM_CLS'  = __CPM_CLS
+defc `__CPM_FFST' = __CPM_FFST
+defc `__CPM_FNXT' = __CPM_FNXT
+defc `__CPM_DEL'  = __CPM_DEL
+defc `__CPM_READ' = __CPM_READ
+defc `__CPM_WRIT' = __CPM_WRIT
+defc `__CPM_MAKE' = __CPM_MAKE
+defc `__CPM_REN'  = __CPM_REN
+defc `__CPM_ILOG' = __CPM_ILOG
+defc `__CPM_IDRV' = __CPM_IDRV
+defc `__CPM_SDMA' = __CPM_SDMA
+defc `__CPM_SUID' = __CPM_SUID
+defc `__CPM_RRAN' = __CPM_RRAN
+defc `__CPM_WRAN' = __CPM_WRAN
+defc `__CPM_CFS'  = __CPM_CFS
+defc `__CPM_DSEG' = __CPM_DSEG
 ')
 
 dnl#
@@ -140,37 +140,37 @@ dnl#
 
 ifdef(`CFG_C_DEF',
 `
-`#define' `CPM_RCON'  CPM_RCON
-`#define' `CPM_WCON'  CPM_WCON
-`#define' `CPM_RRDR'  CPM_RRDR
-`#define' `CPM_WPUN'  CPM_WPUN
-`#define' `CPM_WLST'  CPM_WLST
-`#define' `CPM_DCIO'  CPM_DCIO
-`#define' `CPM_GIOB'  CPM_GIOB
-`#define' `CPM_SIOB'  CPM_SIOB
-`#define' `CPM_PRST'  CPM_PRST
-`#define' `CPM_RCOB'  CPM_RCOB
-`#define' `CPM_ICON'  CPM_ICON
-`#define' `CPM_VERS'  CPM_VERS
-`#define' `CPM_RDS'   CPM_RDS
-`#define' `CPM_LGIN'  CPM_LGIN
-`#define' `CPM_OPN'   CPM_OPN
-`#define' `CPM_CLS'   CPM_CLS
-`#define' `CPM_FFST'  CPM_FFST
-`#define' `CPM_FNXT'  CPM_FNXT
-`#define' `CPM_DEL'   CPM_DEL
-`#define' `CPM_READ'  CPM_READ
-`#define' `CPM_WRIT'  CPM_WRIT
-`#define' `CPM_MAKE'  CPM_MAKE
-`#define' `CPM_REN'   CPM_REN
-`#define' `CPM_ILOG'  CPM_ILOG
-`#define' `CPM_IDRV'  CPM_IDRV
-`#define' `CPM_SDMA'  CPM_SDMA
-`#define' `CPM_SUID'  CPM_SUID
-`#define' `CPM_RRAN'  CPM_RRAN
-`#define' `CPM_WRAN'  CPM_WRAN
-`#define' `CPM_CFS'   CPM_CFS
-`#define' `CPM_DSEG'  CPM_DSEG
+`#define' `__CPM_RCON'  __CPM_RCON
+`#define' `__CPM_WCON'  __CPM_WCON
+`#define' `__CPM_RRDR'  __CPM_RRDR
+`#define' `__CPM_WPUN'  __CPM_WPUN
+`#define' `__CPM_WLST'  __CPM_WLST
+`#define' `__CPM_DCIO'  __CPM_DCIO
+`#define' `__CPM_GIOB'  __CPM_GIOB
+`#define' `__CPM_SIOB'  __CPM_SIOB
+`#define' `__CPM_PRST'  __CPM_PRST
+`#define' `__CPM_RCOB'  __CPM_RCOB
+`#define' `__CPM_ICON'  __CPM_ICON
+`#define' `__CPM_VERS'  __CPM_VERS
+`#define' `__CPM_RDS'   __CPM_RDS
+`#define' `__CPM_LGIN'  __CPM_LGIN
+`#define' `__CPM_OPN'   __CPM_OPN
+`#define' `__CPM_CLS'   __CPM_CLS
+`#define' `__CPM_FFST'  __CPM_FFST
+`#define' `__CPM_FNXT'  __CPM_FNXT
+`#define' `__CPM_DEL'   __CPM_DEL
+`#define' `__CPM_READ'  __CPM_READ
+`#define' `__CPM_WRIT'  __CPM_WRIT
+`#define' `__CPM_MAKE'  __CPM_MAKE
+`#define' `__CPM_REN'   __CPM_REN
+`#define' `__CPM_ILOG'  __CPM_ILOG
+`#define' `__CPM_IDRV'  __CPM_IDRV
+`#define' `__CPM_SDMA'  __CPM_SDMA
+`#define' `__CPM_SUID'  __CPM_SUID
+`#define' `__CPM_RRAN'  __CPM_RRAN
+`#define' `__CPM_WRAN'  __CPM_WRAN
+`#define' `__CPM_CFS'   __CPM_CFS
+`#define' `__CPM_DSEG'  __CPM_DSEG
 ')
 
 undefine(`__count__')

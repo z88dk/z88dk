@@ -46,15 +46,16 @@ for %%t in (%targets%) do (
       copy /Y target\%%t\config_%%t_private.inc config_private.inc 1> nul
 
       if "%%t" == "zx" (
-         zcc +embedded -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         zcc +embedded -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
          zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
          zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
       )
 
-      echo   %%t_macro.m4
-
-@rem      zcc +embedded -vn -m4 @target/%%t/library/%%t_macro.lst
+      if exist target\%%t\library\%%t_macro.lst (
+         echo   %%t_macro.m4
+         zcc +z80 -vn -clib=new -m4 --lstcwd @target/%%t/library/%%t_macro.lst
+      )
 
       echo   %%t_sccz80.lib
       

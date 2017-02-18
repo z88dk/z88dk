@@ -78,9 +78,6 @@ defc __CLIB_OPT_MULTITHREAD_LOCK_FDSTR = 0x10
 
 defc __CLIB_OPT_IMATH = 0
 
-defc __CLIB_OPT_IMATH_SMALL = 0
-defc __CLIB_OPT_IMATH_FAST = 0x0f
-
 defc __CLIB_OPT_IMATH_FAST = 0x0f
 
 defc __CLIB_OPT_IMATH_FAST_DIV_UNROLL = 0x01
@@ -141,6 +138,7 @@ defc CHAR_CR = 13
 defc CHAR_LF = 10
 defc CHAR_BS = 12
 defc CHAR_ESC = 27
+defc CHAR_CAPS = 6
 defc CHAR_BELL = 7
 defc CHAR_CTRL_C = 3
 defc CHAR_CTRL_D = 4

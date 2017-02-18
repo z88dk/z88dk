@@ -10,7 +10,7 @@
 ; ===============================================================
 
 IFNDEF CLIB_OPT_PRINTF
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 defc CLIB_OPT_PRINTF   = __CLIB_OPT_PRINTF
 defc CLIB_OPT_PRINTF_2 = __CLIB_OPT_PRINTF_2

@@ -4,7 +4,7 @@ SECTION smc_sound_bit
 
 PUBLIC _bitfx_14
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 EXTERN asm_bit_open
 
@@ -34,7 +34,7 @@ qi_loop:
    
    pop af
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 qi_FR_1:
@@ -54,7 +54,7 @@ qi_jump:
    
    pop af
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 qi_FR_2:

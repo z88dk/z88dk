@@ -1,7 +1,7 @@
 
 ; void *heap_alloc(void *heap, size_t size)
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_alloc_malloc

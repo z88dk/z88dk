@@ -70,6 +70,8 @@ defc `__BIFROST2_TOTAL_ROWS'     = __BIFROST2_TOTAL_ROWS
 defc `__BIFROST2_HOLE'           = __BIFROST2_HOLE
 defc `_BIFROST2_HOLE'            = __BIFROST2_HOLE
 defc `__BIFROST2_HOLE_SIZE'      = __BIFROST2_HOLE_SIZE
+
+; `define(`__BIFROST2_TOTAL_ROWS',' __BIFROST2_TOTAL_ROWS)
 ')
 
 dnl#

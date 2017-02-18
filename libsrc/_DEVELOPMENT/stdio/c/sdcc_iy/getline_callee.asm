@@ -1,7 +1,7 @@
 
 ; size_t getline_callee(char **lineptr, size_t *n, FILE *stream)
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_stdio

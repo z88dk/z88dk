@@ -49,14 +49,13 @@
 ;
 ;    8..13                  mutex
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_driver
 SECTION code_driver_character_input
 
 PUBLIC rc_00_input_acia
 
-EXTERN ICHAR_MSG_GETC, STDIO_MSG_FLSH
 EXTERN _acia_pollc, _acia_getc, _acia_flush_Rx_di
 EXTERN character_00_input, error_znc, error_mc
 

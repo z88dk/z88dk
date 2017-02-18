@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC _bitfx_29
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 EXTERN asm_bit_beep_raw
 
