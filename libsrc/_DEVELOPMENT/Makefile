@@ -22,7 +22,7 @@ ${jobs}: job-%:
 		zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 	fi;
-	@if [ -f "target\$(target)\library\$(target)_macro.lst" ]; then \
+	@if [ -f target\$(target)\library\$(target)_macro.lst ]; then \
 		zcc +z80 -vn -clib=new -m4 --lstcwd @target/$(target)/library/$(target)_macro.lst; \
 	fi;
 	z80asm -xlib/sccz80/$(target) @target/$(target)/library/$(target)_sccz80.lst
