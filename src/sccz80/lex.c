@@ -47,11 +47,12 @@ int astreq(char* str1, char* str2)
 
 int match(char* lit)
 {
-    int k;
+    int k,i;
 
     blanks();
     if ((k = streq(line + lptr, lit))) {
-        if ( buffer_fp ) fprintf(buffer_fp,"%s",lit);
+        for ( i = 0; i < buffer_fps_num; i++ )
+             fprintf(buffer_fps[i],"%s",lit);
         lptr += k;
         return 1;
     }
@@ -60,11 +61,16 @@ int match(char* lit)
 
 int cmatch(char lit)
 {
+	static int x = 0;
+    int  i;
     blanks();
     if (eof)
         error(E_EOF);
     if (line[lptr] == lit) {
-        if ( buffer_fp ) fprintf(buffer_fp,"%c",line[lptr]);
+	x++;
+        for ( i = 0; i < buffer_fps_num; i++ ) {
+             fprintf(buffer_fps[i],"%c",lit);
+	}
         ++lptr;
         return 1;
     }
@@ -74,10 +80,12 @@ int cmatch(char lit)
 /* Get the next character, don't skip spaces */
 int acmatch(char lit)
 {
+    int  i;
     if (eof)
         error(E_EOF);
     if (line[lptr] == lit) {
-        if ( buffer_fp ) fprintf(buffer_fp,"%c",line[lptr]);
+        for ( i = 0; i < buffer_fps_num; i++ )
+             fprintf(buffer_fps[i],"%c",line[lptr]);
         ++lptr;
         return 1;
     }

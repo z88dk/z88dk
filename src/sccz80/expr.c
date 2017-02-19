@@ -511,8 +511,8 @@ int heira(LVALUE* lval)
     /*
  * djm, check for a cast
  */
-    if (cmatch('(')) {
-        klptr = lptr - 1; /* -1 takes care of ( */
+    if (rcmatch('(')) {
+        klptr = lptr; //  - 1; /* -1 takes care of ( */
         otag = GetVarID(&var, NO);
         var.sflag = ((var.sign & UNSIGNED) | (var.zfar & FARPTR));
         if (var.type != NO) {

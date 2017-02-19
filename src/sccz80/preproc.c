@@ -36,9 +36,11 @@ char nch()
 
 char gch()
 {
+    int i;
     if (ch())
-        if ( buffer_fp != NULL  )
-            fprintf(buffer_fp,"%c", line[lptr]);
+        for ( i = 0; i < buffer_fps_num; i++ )  {
+            fprintf(buffer_fps[i],"%c", line[lptr]);
+        }
         return line[lptr++];
     return 0;
 }
@@ -405,19 +407,37 @@ void defmac(char* text)
 
 void set_temporary_input(FILE *temp)
 {
+    struct parser_stack *stack = mymalloc(sizeof(*stack));
     /* Save the current positions */
-    memcpy(sline, line, LINESIZE);
-    slineno = lineno;
-    slptr = lptr;
-    sinput = input;
+    memcpy(stack->sline, line, LINESIZE);
+    stack->slineno = lineno;
+    stack->slptr = lptr;
+    stack->sinput = input;
+    stack->next = pstack;
+    pstack = stack;
     input = temp;
     preprocess();
 }
 
 void restore_input(void)
 {
-    memcpy(line, sline, LINESIZE);
-    lineno = slineno;
-    lptr = slptr;
-    input = sinput;
+    struct parser_stack *stack = pstack;
+    if ( stack ) {
+        pstack = stack->next;
+        memcpy(line, stack->sline, LINESIZE);
+        lineno = stack->slineno;
+        lptr = stack->slptr;
+        input = stack->sinput;
+        free(stack);
+     }
+}
+
+void push_buffer_fp(FILE *fp)
+{
+    buffer_fps[buffer_fps_num++] = fp;
+}
+
+void pop_buffer_fp()
+{
+    buffer_fps_num--;
 }

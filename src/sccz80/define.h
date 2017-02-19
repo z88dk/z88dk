@@ -359,3 +359,14 @@ struct varid {
 #define ASM_GNU     3
 
 #define ISASM(x) ( assemtype == (x) )
+
+struct parser_stack;
+
+struct parser_stack {
+    FILE *sinput;
+    FILE *buffer_fp;
+    char sline[LINESIZE]; /* copy of line when swapping out */
+    int  slptr;           /* copy of the save line pointer when swapping out */
+    int  slineno;
+    struct parser_stack *next;
+};

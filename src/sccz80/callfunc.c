@@ -41,6 +41,7 @@ void callfunction(SYMBOL* ptr)
     char preserve = NO; /* Preserve af when cleaningup */
     FILE *tmpfiles[100];  // 100 arguments enough I guess */
     int   i;
+    int   save_fps_num;
    
     memset(tmpfiles, 0, sizeof(tmpfiles)); 
     nargs = 0;
@@ -62,13 +63,14 @@ void callfunction(SYMBOL* ptr)
         if (endst())
             break;
         argnumber++;
-        buffer_fp = tmpfiles[argnumber] = tmpfile();
+        tmpfiles[argnumber] = tmpfile();
+        push_buffer_fp(tmpfiles[argnumber]);
 
         setstage(&before, &start);
         expr = expression(&vconst, &val);
         clearstage(before, start);  // Wipe out everything we did
         fprintf(tmpfiles[argnumber],";\n");
-        buffer_fp = NULL;
+        pop_buffer_fp();
 
         if (cmatch(',') == 0)
             break;
@@ -84,7 +86,9 @@ void callfunction(SYMBOL* ptr)
     }
     argnumber = 0;
 
-    // Now we need to go through the arguments, lets do normal sccz80 ordree
+    save_fps_num = buffer_fps_num;
+    buffer_fps_num = 0;
+
     while ( tmpfiles[argnumber+1] ) {
         argnumber++;
         rewind(tmpfiles[argnumber]);
@@ -153,6 +157,7 @@ void callfunction(SYMBOL* ptr)
         restore_input();
         fclose(tmpfiles[argnumber]);
     }
+    buffer_fps_num = save_fps_num ;
     
     if (ptr)
         debug(DBG_ARG2, "arg %d proto %d", argnumber, ptr->args[1]);

@@ -132,7 +132,11 @@ int fnumber(int32_t* val)
         return 0;
     dofloat(dval, sum, mathz88 ? 4 : 5, mathz88 ? 127 : 128);
 
-    if ( buffer_fp ) { fprintf(buffer_fp, "%.*s", end-start, start); }
+    {
+         int  i;
+         for ( i = 0; i < buffer_fps_num; i++ ) 
+            fprintf(buffer_fps[i], "%.*s", end-start, start);
+    }
     lptr = end - line;
 
     /* get location for result & bump litptr */

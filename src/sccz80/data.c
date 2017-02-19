@@ -188,9 +188,7 @@ int scanf_level;
 uint32_t scanf_format_option;
 uint32_t printf_format_option;
 
+FILE *buffer_fps[200];
+int   buffer_fps_num = 0 ;
 
-FILE *buffer_fp;    /**< File for saving input temporarily (actually a memory buffer */
-char sline[LINESIZE]; /* copy of line when swapping out */
-int  slptr;           /* copy of the save line pointer when swapping out */
-int  slineno;
-FILE *sinput;
+struct parser_stack *pstack; /**< Stack of previous saved parsers */
