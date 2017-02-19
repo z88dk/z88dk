@@ -51,6 +51,7 @@ int match(char* lit)
 
     blanks();
     if ((k = streq(line + lptr, lit))) {
+        if ( buffer_fp ) fprintf(buffer_fp,"%s",lit);
         lptr += k;
         return 1;
     }
@@ -63,6 +64,7 @@ int cmatch(char lit)
     if (eof)
         error(E_EOF);
     if (line[lptr] == lit) {
+        if ( buffer_fp ) fprintf(buffer_fp,"%c",line[lptr]);
         ++lptr;
         return 1;
     }
@@ -75,6 +77,7 @@ int acmatch(char lit)
     if (eof)
         error(E_EOF);
     if (line[lptr] == lit) {
+        if ( buffer_fp ) fprintf(buffer_fp,"%c",line[lptr]);
         ++lptr;
         return 1;
     }

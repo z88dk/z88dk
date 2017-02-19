@@ -21,6 +21,7 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
 
 extern int smartprintf;
 
+
 /*
  *      Perform a function call
  *
@@ -38,7 +39,10 @@ void callfunction(SYMBOL* ptr)
     int minifunc = 0; /* Call cut down version */
     unsigned char protoarg;
     char preserve = NO; /* Preserve af when cleaningup */
-
+    FILE *tmpfiles[100];  // 100 arguments enough I guess */
+    int   i;
+   
+    memset(tmpfiles, 0, sizeof(tmpfiles)); 
     nargs = 0;
     argnumber = 0;
     watcharg = minifunc = 0;
@@ -54,9 +58,37 @@ void callfunction(SYMBOL* ptr)
         watcharg = SetWatch(ptr->name, &isscanf);
 
     while (ch() != ')') {
+        char *before, *start;
         if (endst())
             break;
         argnumber++;
+        buffer_fp = tmpfiles[argnumber] = tmpfile();
+
+        setstage(&before, &start);
+        expr = expression(&vconst, &val);
+        clearstage(before, start);  // Wipe out everything we did
+        fprintf(tmpfiles[argnumber],";\n");
+        buffer_fp = NULL;
+
+        if (cmatch(',') == 0)
+            break;
+    }
+    needchar(')'); 
+
+    if ( ptr && (ptr->flags & SMALLC) == 0 ) {
+        for ( i = 1; argnumber >= i ; argnumber--, i++) {
+            FILE *tmp = tmpfiles[i];
+            tmpfiles[i] = tmpfiles[argnumber];
+            tmpfiles[argnumber] = tmp;
+        }
+    }
+    argnumber = 0;
+
+    // Now we need to go through the arguments, lets do normal sccz80 ordree
+    while ( tmpfiles[argnumber+1] ) {
+        argnumber++;
+        rewind(tmpfiles[argnumber]);
+        set_temporary_input(tmpfiles[argnumber]);
         if (ptr) {
             /* ordinary call */
             expr = expression(&vconst, &val);
@@ -112,17 +144,16 @@ void callfunction(SYMBOL* ptr)
                 mainpop();
             } else {
                 /* If we've only got one 2 byte argment, don't swap the stack */
-                if (rcmatch(',') || nargs != 0) {
+                if ( tmpfiles[argnumber+1] != NULL  || nargs != 0) {
                     swapstk();
                 }
                 nargs += 2;
             }
         }
-        if (cmatch(',') == 0)
-            break;
+        restore_input();
+        fclose(tmpfiles[argnumber]);
     }
-    needchar(')');
-
+    
     if (ptr)
         debug(DBG_ARG2, "arg %d proto %d", argnumber, ptr->args[1]);
 
@@ -137,9 +168,11 @@ void callfunction(SYMBOL* ptr)
     if (ptr) {
         /* Check to see if we have a variable number of arguments */
         if ((ptr->prototyped) && ptr->args[1] == PELLIPSES) {
-            loadargc(nargs);
+            if ( ptr && (ptr->flags & SMALLC) == 0 ) {
+                loadargc(nargs);
+            }
         }
-        if (strcmp(ptr->name, "__builtin_strcmp") == 0) {
+        if ( strcmp(ptr->name,"__builtin_strcmp") == 0) {
             gen_builtin_strcmp();
         } else if (watcharg || (ptr->flags & SHARED) || (ptr->flags & SHAREDC)) {
             if ((ptr->flags & SHARED) || (ptr->flags & SHAREDC))
@@ -180,7 +213,7 @@ void callfunction(SYMBOL* ptr)
     if ((ptr && ptr->flags & CALLEE) || (compactcode && ptr == NULL) || (compactcode && ((ptr->flags & LIBRARY) == 0))) {
         Zsp += nargs;
     } else {
-/* If we have a frame pointer then ix holds it */
+        /* If we have a frame pointer then ix holds it */
 #ifdef USEFRAME
         if (useframe) {
             if (nargs)
@@ -249,16 +282,12 @@ int ForceArgs(char dest, char src, int expr, char functab)
     sisfar = (src & 128);
     sissign = (src & 64);
 
-    /*
- *      These checks need to be slightly more comprehensive me thinks
- */
+
     if (did == VARIABLE) {
         if (sid == VARIABLE) {
             force(dtype, stype, dissign, sissign, 0);
         } else {
-            /*
- * Converting pointer to integer/long
- */
+            /* Converting pointer to integer/long */
             warning(W_PTRINT);
             /* Pointer is always unsigned */
             force(dtype, ((sisfar) ? CPTR : CINT), dissign, 0, 0);

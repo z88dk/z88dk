@@ -15,3 +15,6 @@ extern void delmac(void);
 extern char putmac(char c);
 extern int findmac(char *sname);
 extern void defmac(char *text);
+extern void set_temporary_input(FILE *temp);
+extern void restore_input(void);
+

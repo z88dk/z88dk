@@ -106,3 +106,8 @@ extern int standard_escapes;
 extern int scanf_level;
 extern uint32_t scanf_format_option;
 extern uint32_t printf_format_option;
+extern FILE * buffer_fp;
+extern char sline[];
+extern int slptr;
+extern int slineno;
+extern FILE *sinput;

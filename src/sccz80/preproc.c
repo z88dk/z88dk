@@ -37,6 +37,8 @@ char nch()
 char gch()
 {
     if (ch())
+        if ( buffer_fp != NULL  )
+            fprintf(buffer_fp,"%c", line[lptr]);
         return line[lptr++];
     return 0;
 }
@@ -398,4 +400,24 @@ void defmac(char* text)
     /* make addition to table */
     lptr = 0;
     addmac();
+}
+
+
+void set_temporary_input(FILE *temp)
+{
+    /* Save the current positions */
+    memcpy(sline, line, LINESIZE);
+    slineno = lineno;
+    slptr = lptr;
+    sinput = input;
+    input = temp;
+    preprocess();
+}
+
+void restore_input(void)
+{
+    memcpy(line, sline, LINESIZE);
+    lineno = slineno;
+    lptr = slptr;
+    input = sinput;
 }
