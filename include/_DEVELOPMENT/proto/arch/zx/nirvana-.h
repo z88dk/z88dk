@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef __NIRVANA_MINUS_H__
 #define __NIRVANA_MINUS_H__
 
+#include <arch.h>
 #include <intrinsic.h>
 
 /* ----------------------------------------------------------------
@@ -47,6 +48,16 @@ __OPROTO(`b,c,d,e,h,l',`b,c,d,e,h,l',void,,NIRVANAM_stop,void)
 // ----------------------------------------------------------------
 
 extern unsigned char NIRVANAM_ISR_HOOK[3];
+
+// ----------------------------------------------------------------
+// Location of NIRVANA hole
+// ----------------------------------------------------------------
+
+#define NIRVANAM_HOLE_SIZE __NIRVANAM_HOLE_SIZE
+
+#if NIRVANAM_HOLE_SIZE > 0
+extern unsigned char NIRVANAM_HOLE[NIRVANAM_HOLE_SIZE];
+#endif
 
 // ----------------------------------------------------------------
 // Instantly draw tile (16x16 pixels) at specified position

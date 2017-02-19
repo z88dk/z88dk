@@ -1,7 +1,7 @@
 
    ; initialize bss section
 
-   IF (__crt_model | __crt_initialize_bss)
+   IF __crt_initialize_bss
 
          EXTERN asm_memset
          EXTERN __BSS_UNINITIALIZED_tail, __BSS_END_tail

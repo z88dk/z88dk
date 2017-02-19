@@ -15,7 +15,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_sound_bit
@@ -34,12 +34,12 @@ asm_bit_beepfx:
    
    call asm_bit_open
    
-   and ~__sound_bit_toggle
+   and ~__SOUND_BIT_TOGGLE
    ld h,a                      ; h'= sound_bit_state with output bit = 0
 
-   IF __sound_bit_method = 2
+   IF __SOUND_BIT_METHOD = 2
 
-      ld bc,__sound_bit_port
+      ld bc,__SOUND_BIT_PORT
    
    ENDIF
 
@@ -89,7 +89,7 @@ sfx_routine_sample:
 
    exx
    
-   ld l,__sound_bit_toggle
+   ld l,__SOUND_BIT_TOGGLE
    push de
    
    exx
@@ -239,7 +239,7 @@ tone_loop_1:
    cp l
    sbc a,a                     ; time_count >= duty_count ?
    
-   and __sound_bit_toggle      ; set toggle bit if yes
+   and __SOUND_BIT_TOGGLE      ; set toggle bit if yes
    or h                        ; mix with bit_state
 
    INCLUDE "sound/bit/z80/output_bit_device_1.inc"
@@ -334,7 +334,7 @@ sfx_routine_noise:
    ld l,d
    
    exx
-   ld l,__sound_bit_toggle
+   ld l,__SOUND_BIT_TOGGLE
    exx
 
    ; ix = & block descriptor

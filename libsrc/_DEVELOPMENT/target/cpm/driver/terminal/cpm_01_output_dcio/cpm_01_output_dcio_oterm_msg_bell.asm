@@ -1,5 +1,5 @@
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_driver
 SECTION code_driver_terminal_output
@@ -7,7 +7,6 @@ SECTION code_driver_terminal_output
 PUBLIC cpm_01_output_dcio_oterm_msg_bell
 PUBLIC cpm_01_output_dcio_oterm_msg_bell_0
 
-EXTERN __CPM_DCIO
 EXTERN asm_cpm_bdos_alt
 
 cpm_01_output_dcio_oterm_msg_bell:

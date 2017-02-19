@@ -5,6 +5,7 @@
 #ifndef __BIFROST2_H__
 #define __BIFROST2_H__
 
+#include <arch.h>
 #include <intrinsic.h>
 
 /* ----------------------------------------------------------------
@@ -38,6 +39,16 @@ extern void __LIB__ BIFROST2_install(void);
 // ----------------------------------------------------------------
 
 extern unsigned char BIFROST2_ISR_HOOK[3];
+
+// ----------------------------------------------------------------
+// Location of BIFROST*2 hole
+// ----------------------------------------------------------------
+
+#define BIFROST2_HOLE_SIZE __BIFROST2_HOLE_SIZE
+
+#if BIFROST2_HOLE_SIZE > 0
+extern unsigned char BIFROST2_HOLE[BIFROST2_HOLE_SIZE];
+#endif
 
 // ----------------------------------------------------------------
 // Activate multicolor rendering with BIFROST*2 ENGINE

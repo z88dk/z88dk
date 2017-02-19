@@ -5,6 +5,7 @@
 #ifndef __NIRVANA_PLUS_H__
 #define __NIRVANA_PLUS_H__
 
+#include <arch.h>
 #include <intrinsic.h>
 
 /* ----------------------------------------------------------------
@@ -51,6 +52,16 @@ extern void NIRVANAP_stop(void) __preserves_regs(b,c,d,e,h,l);
 // ----------------------------------------------------------------
 
 extern unsigned char NIRVANAP_ISR_HOOK[3];
+
+// ----------------------------------------------------------------
+// Location and size of NIRVANA hole
+// ----------------------------------------------------------------
+
+#define NIRVANAP_HOLE_SIZE  __NIRVANAP_HOLE_SIZE
+
+#if NIRVANAP_HOLE_SIZE > 0
+extern unsigned char NIRVANAP_HOLE[NIRVANAP_HOLE_SIZE];
+#endif
 
 // ----------------------------------------------------------------
 // Instantly draw tile (16x16 pixels) at specified position

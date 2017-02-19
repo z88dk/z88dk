@@ -8,7 +8,7 @@
 ; Clear any stream error and execute fseek(stream, 0L, SEEK_SET)
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_stdio
@@ -17,7 +17,6 @@ PUBLIC asm_rewind_unlocked
 PUBLIC asm0_rewind_unlocked
 
 EXTERN asm0_fseek_unlocked
-EXTERN STDIO_SEEK_SET
 
 asm_rewind_unlocked:
 

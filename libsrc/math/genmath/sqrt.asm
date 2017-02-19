@@ -8,7 +8,6 @@
 ;
 ;       But still not working!
 
-        INCLUDE "stdio.def"
 
         SECTION code_fp
         PUBLIC    sqrt

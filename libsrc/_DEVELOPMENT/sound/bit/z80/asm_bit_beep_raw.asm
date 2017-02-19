@@ -10,7 +10,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_sound_bit
@@ -32,10 +32,10 @@ asm_bit_beep_raw:
    
    dec de
 
-   IF __sound_bit_method = 2
+   IF __SOUND_BIT_METHOD = 2
    
       exx
-      ld bc,__sound_bit_port
+      ld bc,__SOUND_BIT_PORT
       exx
    
    ENDIF
@@ -73,13 +73,13 @@ behllp:
    dec b
    jp nz, behllp
 
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
    
    ld b,h
    ld c,a
    
-   bit __sound_bit_toggle_pos,a
+   bit __SOUND_BIT_TOGGLE_POS,a
    jr nz, be_again
    
    ld a,d

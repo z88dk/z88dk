@@ -4,7 +4,7 @@ SECTION code_l
 
 PUBLIC l_asr_dehldehl
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
    ; arithmetic shift right 64-bit signed long
    ;

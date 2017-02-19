@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC _bitfx_8
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 _bitfx_8:
 
@@ -17,7 +17,7 @@ ds_loop:
    dec h
    jr nz, ds_jump
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push bc
@@ -29,7 +29,7 @@ loosetime1:
    
    pop bc
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 ds_FR_1:
@@ -41,7 +41,7 @@ ds_jump:
    dec l
    jr nz, ds_loop
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push bc
@@ -54,7 +54,7 @@ loosetime2:
    
    pop bc
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 ds_FR_2:

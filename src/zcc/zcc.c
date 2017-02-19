@@ -1817,12 +1817,16 @@ void add_file_to_process(char *filename)
 					fprintf(stderr, "Unrecognized file type %s\n", p);
 					exit(1);
 				}
-				// input file has no extension and does not exist so assume .asm then .o
-				original_filenames[nfiles] = mustmalloc((strlen(p) + 5) * sizeof(char));
+				// input file has no extension and does not exist so assume .asm then .o then .asm.m4
+				original_filenames[nfiles] = mustmalloc((strlen(p) + 8) * sizeof(char));
 				strcpy(original_filenames[nfiles], p);
 				strcat(original_filenames[nfiles], ".asm");
-				if (stat(original_filenames[nfiles], &tmp) != 0)
-					strcpy(strrchr(original_filenames[nfiles], '.'), ".o");
+                if (stat(original_filenames[nfiles], &tmp) != 0)
+                {
+                    strcpy(strrchr(original_filenames[nfiles], '.'), ".o");
+                    if (stat(original_filenames[nfiles], &tmp) != 0)
+                        strcpy(strrchr(original_filenames[nfiles], '.'), ".asm.m4");
+                }
 			}
 			else
 				original_filenames[nfiles] = muststrdup(p);
@@ -1926,7 +1930,11 @@ static void configure_misc_options()
 	// the new c lib uses startup=-1 to mean user supplies the crt
 	// current working dir will be different than when using -crt0
 	if (c_startup >= -1) {
+        char tmp[64];
 		write_zcc_defined("startup", c_startup, 0);
+        snprintf(tmp, sizeof(tmp), "--define=__STARTUP=%d", c_startup);
+        tmp[sizeof(tmp) - 1] = 0;
+        BuildOptions(&m4arg, tmp);
 	}
 
 	if (linkargs == NULL) {

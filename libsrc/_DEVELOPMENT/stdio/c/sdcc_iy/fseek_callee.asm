@@ -1,7 +1,7 @@
 
 ; int fseek_callee(FILE *stream, long offset, int whence)
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_stdio

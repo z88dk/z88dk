@@ -1,7 +1,7 @@
 
 ; int fsetpos_callee(FILE *stream, const fpos_t *pos)
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_stdio

@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_sound_bit
@@ -24,12 +24,12 @@ asm_bit_click:
    
    ld a,(__sound_bit_state)
    
-   and __sound_bit_read_mask
-   xor __sound_bit_toggle
+   and __SOUND_BIT_READ_MASK
+   xor __SOUND_BIT_TOGGLE
    
-   IF __sound_bit_method = 2
+   IF __SOUND_BIT_METHOD = 2
    
-      ld bc,__sound_bit_port
+      ld bc,__SOUND_BIT_PORT
    
    ENDIF
    
@@ -38,7 +38,7 @@ asm_bit_click:
    ld c,a
    ld a,(__sound_bit_state)
    
-   and __sound_bit_write_mask
+   and __SOUND_BIT_WRITE_MASK
    or c
    
    ld (__sound_bit_state),a

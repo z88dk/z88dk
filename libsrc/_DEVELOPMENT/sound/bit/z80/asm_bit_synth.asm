@@ -16,7 +16,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION smc_clib
 SECTION smc_sound_bit
@@ -37,7 +37,7 @@ asm_bit_synth:
 
    ; write parameters into synth code
 
-   ld c,__sound_bit_toggle
+   ld c,__SOUND_BIT_TOGGLE
 
 duration:
 
@@ -97,10 +97,10 @@ fr4_blank:
    
    ; begin synthesis
 
-   IF __sound_bit_method = 2
+   IF __SOUND_BIT_METHOD = 2
    
       exx
-      ld bc,__sound_bit_port
+      ld bc,__SOUND_BIT_PORT
       exx
    
    ENDIF
@@ -127,7 +127,7 @@ loop2:
    
 FR1_tick:
 
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
    
 FR_1:
@@ -141,7 +141,7 @@ jump:
 
 FR2_tick:
 
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 FR_2:
@@ -155,7 +155,7 @@ jump2:
 
 FR3_tick:
 
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
    
 FR_3:
@@ -169,7 +169,7 @@ jump3:
 
 FR4_tick:
 
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 FR_4:

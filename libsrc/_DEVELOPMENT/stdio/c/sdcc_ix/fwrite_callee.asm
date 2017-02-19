@@ -1,7 +1,7 @@
 
 ; size_t fwrite_callee(void *ptr, size_t size, size_t nmemb, FILE *stream)
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_stdio

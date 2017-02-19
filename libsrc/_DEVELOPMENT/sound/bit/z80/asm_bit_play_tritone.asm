@@ -25,7 +25,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION smc_clib
 SECTION smc_sound_bit
@@ -49,7 +49,7 @@ asm_bit_play_tritone:
    ld (stack_ptr + 1),sp
    
    call asm_bit_open
-   and ~__sound_bit_toggle
+   and ~__SOUND_BIT_TOGGLE
    
    ld (bit_state_0 + 1),a
    ld (bit_state_1 + 1),a
@@ -58,10 +58,10 @@ asm_bit_play_tritone:
    ld (bit_state_4 + 1),a
    ld (bit_state_5 + 1),a
    
-   IF __sound_bit_method = 2
+   IF __SOUND_BIT_METHOD = 2
    
       exx
-      ld bc,__sound_bit_port
+      ld bc,__SOUND_BIT_PORT
       exx
    
    ENDIF
@@ -251,7 +251,7 @@ smc_skip_drum: scf
  
                ; ld de,-150
                
-               IF __sound_bit_method = 2
+               IF __SOUND_BIT_METHOD = 2
                
                   ld de,-82              ; guesswork: method is 25% slower than others
                
@@ -319,7 +319,7 @@ drum_tone:
 
                ld bc,2
 bit_state_4:   ld a,$00
-               ld de,+(__sound_bit_toggle * 256) + 1
+               ld de,+(__SOUND_BIT_TOGGLE * 256) + 1
                ld l,(ix+0)
 
 dtone_loop_0:
@@ -359,7 +359,7 @@ drum_noise:
 bit_state_5:   ld c,$00
                ld h,b
                ld l,b
-               ld de,+(__sound_bit_toggle * 256) + 1
+               ld de,+(__SOUND_BIT_TOGGLE * 256) + 1
 
 dnoise_loop_0:
 
@@ -406,18 +406,18 @@ drum_settings_table:
    
    ; 24 (drum selection = 14)
    
-   defb ~__sound_bit_toggle,$02
-   defb ~__sound_bit_toggle,$02
+   defb ~__SOUND_BIT_TOGGLE,$02
+   defb ~__SOUND_BIT_TOGGLE,$02
    defb $ff,$01                  ; noise, highest
    defb $ff,$02
    defb $ff,$04
    defb $ff,$08
    defb $ff,$10
-   defb ~__sound_bit_toggle,$01
-   defb ~__sound_bit_toggle,$02
-   defb ~__sound_bit_toggle,$04
-   defb ~__sound_bit_toggle,$08
-   defb ~__sound_bit_toggle,$10
+   defb ~__SOUND_BIT_TOGGLE,$01
+   defb ~__SOUND_BIT_TOGGLE,$02
+   defb ~__SOUND_BIT_TOGGLE,$04
+   defb ~__SOUND_BIT_TOGGLE,$08
+   defb ~__SOUND_BIT_TOGGLE,$10
 
 
 ; *************************************************************
@@ -483,7 +483,7 @@ channel_0:     add hl,bc
                exx
 duty_0:        cp 128
                sbc a,a
-               and __sound_bit_toggle
+               and __SOUND_BIT_TOGGLE
 bit_state_0:   or $00
                INCLUDE "sound/bit/z80/output_bit_device_1.inc"
 
@@ -509,11 +509,11 @@ channel_1:     add ix,de
                ld a,ixh
 duty_1:        cp 128
                sbc a,a
-               and __sound_bit_toggle
+               and __SOUND_BIT_TOGGLE
 bit_state_1:   or $00
                INCLUDE "sound/bit/z80/output_bit_device_1.inc"
                
-IFDEF __spectrum
+IFDEF __SPECTRUM
 
    ; 8T between OUTs for zx
    
@@ -534,7 +534,7 @@ channel_2:     add hl,sp
                ld a,h
 duty_2:        cp 128
                sbc a,a
-               and __sound_bit_toggle
+               and __SOUND_BIT_TOGGLE
 bit_state_2:   or $00
                exx
                dec e
@@ -549,7 +549,7 @@ bit_state_2:   or $00
 
                exx
 
-IFDEF __spectrum
+IFDEF __SPECTRUM
 
                ; 8T between OUTs for zx
                jr nz, sound_loop

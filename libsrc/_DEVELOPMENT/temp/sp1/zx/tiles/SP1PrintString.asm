@@ -2,7 +2,7 @@
 ; 05.2006, 12.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_temp_sp1

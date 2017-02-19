@@ -1,5 +1,5 @@
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_driver
 SECTION code_driver_terminal_output
@@ -7,9 +7,7 @@ SECTION code_driver_terminal_output
 PUBLIC cpm_01_output_dcio_oterm_msg_putc
 PUBLIC cpm_01_output_dcio_oterm_msg_putc_raw
 
-EXTERN __CPM_DCIO
 EXTERN l_jpix, asm_cpm_bdos_alt
-EXTERN OTERM_MSG_TTY, OTERM_MSG_BELL
 
 cpm_01_output_dcio_oterm_msg_putc:
 

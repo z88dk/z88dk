@@ -9,19 +9,22 @@ CFILES = \
 	sinh.c \
 	tanh.c 
 
-AFILES  = $(CFILES:.c=.asm)
-OBJECTS = $(CFILES:.c=.o)
+AFILES  = $(wildcard *.asm)
+OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
 
-all: z88math
+all: $(OUTPUT_DIRECTORY)/z88_math.lib
 
 
-z88math: $(OBJECTS)
+$(OUTPUT_DIRECTORY)/z88_math.lib: $(OBJECTS)
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/z88_math @z88list
 
-.c.o:
-	zcc +zx $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $*.c
+%.o: %.c
+	zcc +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
+
+%.o: %.asm
+	zcc +z88 $(CFLAGS) -math-z88 -D__Z88__ -D__NATIVE_MATH__ $^
 
 
 clean:
-	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i $(AFILES)
+	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i 

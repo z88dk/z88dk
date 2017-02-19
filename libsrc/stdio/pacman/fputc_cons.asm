@@ -59,7 +59,7 @@ NoLF:
 		pop af
 		
 ;			- - - - - - -
-			ld c,15	; orange
+			ld c,31	; white
 ;			- - - - - - -
 			
 			ld b,a
@@ -77,17 +77,22 @@ noend:
 			jr nz,maploop
 			dec de
 			ld a,(de)
+			jr nolower
 mapend:
+;			ld c,15	; white
 ;			- - - - - - -
 
 			cp $60
 			jr c,nolower
-			ld c,7	; white
+			ld c,7	; orange
 			sub $20
 nolower:
 ;			- - - - - - -
 			ld (hl),a		; put current symbol on screen
-			
+;			cp 0xc0
+;			jr c,nosym
+;			ld c,7	; white
+;nosym:
 			ld de,$400
 			add hl,de
 			ld a,c			; color
@@ -104,11 +109,12 @@ map:
 defb ' ', $40, '!', $5b, '.', $25, '"', 0x26 
 defb '/', 0x3A, '-', 0x3B, '+', 0x12, '*', 0x10
 defb '>', 0x3C, '<', 0x3e, '_', 0xCE, 127, 0x5c ; Copyright symbol
-defb "'", 0x27, 0
+defb "'", 0xaa, '=', 0xdc, '(', 0xE9, ')', 0xE8
+defb '[', 0xD2, ']', 0xD3, ':', 0xAE, ',', 0xF6
+defb 0
 
 	
 		SECTION bss_crt
 ROW:      defb    0       ;Address of row
 COLUMN:   defb    0       ;Address of column
-
 

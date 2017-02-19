@@ -1,13 +1,13 @@
 
    ; write to bit device
 
-   IF __sound_bit_method = 1
+   IF __SOUND_BIT_METHOD = 1
    
-      out (__sound_bit_port),a
+      out (__SOUND_BIT_PORT),a
    
    ENDIF
    
-   IF __sound_bit_method = 2
+   IF __SOUND_BIT_METHOD = 2
 
       exx
       out (c),a
@@ -15,8 +15,8 @@
    
    ENDIF
    
-   IF __sound_bit_method = 3
+   IF __SOUND_BIT_METHOD = 3
    
-      ld (__sound_bit_port),a
+      ld (__SOUND_BIT_PORT),a
    
    ENDIF

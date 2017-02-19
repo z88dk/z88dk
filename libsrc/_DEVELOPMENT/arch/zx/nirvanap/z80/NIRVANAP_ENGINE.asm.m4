@@ -1,7 +1,5 @@
 include(`z88dk.m4')
-include(`clib_target_cfg.asm')
-
-define(`__NIRVANAP_TOTAL_ROWS', ifdef(`__NIRVANAP_TOTAL_ROWS', __NIRVANAP_TOTAL_ROWS, 23))
+include(`config_private.inc')
 
 ; -----------------------------------------------------------------------------
 ; NIRVANA+ ENGINE (32 columns) - by Einar Saukas

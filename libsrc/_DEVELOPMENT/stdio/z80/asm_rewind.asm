@@ -8,7 +8,7 @@
 ; Clear any stream error and execute fseek(stream, 0L, SEEK_SET)
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_stdio

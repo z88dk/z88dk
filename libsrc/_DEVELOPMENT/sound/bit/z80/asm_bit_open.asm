@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC asm_bit_open
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 EXTERN __sound_bit_state
 
@@ -15,6 +15,6 @@ asm_bit_open:
    ; uses : af
    
    ld a,(__sound_bit_state)
-   and __sound_bit_read_mask
+   and __SOUND_BIT_READ_MASK
    
    ret

@@ -4,7 +4,7 @@ SECTION code_l
 
 PUBLIC l_asr_hl
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
    ; arithmetic shift right 16-bit signed int
    ;

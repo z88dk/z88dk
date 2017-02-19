@@ -1,7 +1,7 @@
 
 ; int fzx_puts(struct fzx_state *fs, char *s)
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_font
 SECTION code_font_fzx
