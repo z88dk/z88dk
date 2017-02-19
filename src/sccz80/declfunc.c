@@ -535,6 +535,7 @@ dofnansi(SYMBOL* currfn, int32_t* addr)
             continue;
         }
         if (amatch("__smallc")) {
+            currfn->flags |= SMALLC;
             /* Just swallow */
             continue;
         }

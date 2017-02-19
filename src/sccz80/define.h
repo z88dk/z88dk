@@ -74,7 +74,7 @@ SYMBOL {
         char prototyped;
         unsigned char args[MAXARGS];       /* arguments */
         unsigned char tagarg[MAXARGS];   /* ptrs to tagsymbol entries*/
-        unsigned int flags ;         /* djm, various flags:
+        int flags ;         /* djm, various flags:
                                 bit 0 = unsigned
                                 bit 1 = far data/pointer
                                 bit 2 = access via far methods
@@ -165,6 +165,7 @@ SYMBOL {
 #define CALLEE  64	/* Called function pops regs */
 #define LIBRARY 128	/* Lib routine */
 #define SAVEFRAME 256     /* Save framepointer */
+#define SMALLC   512    /* L->R calling order */
 
 /*
  * MKDEF is for masking unsigned and far
