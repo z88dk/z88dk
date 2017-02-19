@@ -139,7 +139,7 @@ void callfunction(SYMBOL* ptr)
         if ((ptr->prototyped) && ptr->args[1] == PELLIPSES) {
             loadargc(nargs);
         }
-        if ( strcmp(ptr->name,"__builtin_strcmp") == 0) {
+        if (strcmp(ptr->name, "__builtin_strcmp") == 0) {
             gen_builtin_strcmp();
         } else if (watcharg || (ptr->flags & SHARED) || (ptr->flags & SHAREDC)) {
             if ((ptr->flags & SHARED) || (ptr->flags & SHAREDC))
@@ -180,7 +180,7 @@ void callfunction(SYMBOL* ptr)
     if ((ptr && ptr->flags & CALLEE) || (compactcode && ptr == NULL) || (compactcode && ((ptr->flags & LIBRARY) == 0))) {
         Zsp += nargs;
     } else {
-        /* If we have a frame pointer then ix holds it */
+/* If we have a frame pointer then ix holds it */
 #ifdef USEFRAME
         if (useframe) {
             if (nargs)

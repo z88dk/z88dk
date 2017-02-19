@@ -25,11 +25,10 @@
  *      with 'EXTERN' and 'PUBLIC'.
  */
 
-
 #include "ccdefs.h"
 #include <time.h>
 
-extern int WasComp(LVALUE *lval);
+extern int WasComp(LVALUE* lval);
 extern char Filenorig[];
 
 /*
@@ -38,43 +37,48 @@ extern char Filenorig[];
 
 int donelibheader;
 
-static char *current_section = "";  /**< Name of the current section */
-
-
+static char* current_section = ""; /**< Name of the current section */
 
 /* Begin a comment line for the assembler */
 
 void comment(void)
 {
-        outbyte(';');
+    outbyte(';');
 }
 
 /* Put out assembler info before any code is generated */
 
 void header(void)
 {
-    time_t  tim;
-    char    *timestr;
-    char    *assembler = "z80 Module Assembler";
+    time_t tim;
+    char* timestr;
+    char* assembler = "z80 Module Assembler";
 
-    comment();      outstr(Banner);         nl();
-    comment();      outstr(Version);        nl();
-    comment();                              nl();
+    comment();
+    outstr(Banner);
+    nl();
+    comment();
+    outstr(Version);
+    nl();
+    comment();
+    nl();
     if (ISASM(ASM_ASXX)) {
         assembler = "asxx";
-    } else if ( ISASM(ASM_VASM) ) {
+    } else if (ISASM(ASM_VASM)) {
         assembler = "vasm";
-    } else if ( ISASM(ASM_GNU) ) {
+    } else if (ISASM(ASM_GNU)) {
         assembler = "binutils";
     }
-        
+
     outfmt(";\tReconstructed for %s\n", assembler);
 
-    donelibheader=0;
-    if ( (tim=time(NULL) ) != -1 ) {
-        timestr=ctime(&tim);
-        comment(); nl();
-        comment(); outstr("\tModule compile time: ");
+    donelibheader = 0;
+    if ((tim = time(NULL)) != -1) {
+        timestr = ctime(&tim);
+        comment();
+        nl();
+        comment();
+        outstr("\tModule compile time: ");
         outstr(timestr);
         nl();
     }
@@ -87,86 +91,89 @@ void header(void)
 
 void DoLibHeader(void)
 {
-    char    filen[FILENAME_LEN+1];
-    char    *incdir;    
-    char    *segment;
+    char filen[FILENAME_LEN + 1];
+    char* incdir;
+    char* segment;
 
-    if (donelibheader) return;
+    if (donelibheader)
+        return;
     /*
      * Copy filename over (obtained by preprocessor), carefully skipping
      * over the quotes!
      */
-    strncpy(filen,Filename+1,strlen(Filename)-2);
-    filen[strlen(Filename)-1]='\0';
-    changesuffix(filen,"");
-    if ( 1 ) { 
-    char *ptr = filen;
-        if ( !isalpha(*ptr) && *ptr != '_' ) {
-         memmove(ptr+1,ptr,strlen(ptr));
-             *ptr = 'X';
+    strncpy(filen, Filename + 1, strlen(Filename) - 2);
+    filen[strlen(Filename) - 1] = '\0';
+    changesuffix(filen, "");
+    if (1) {
+        char* ptr = filen;
+        if (!isalpha(*ptr) && *ptr != '_') {
+            memmove(ptr + 1, ptr, strlen(ptr));
+            *ptr = 'X';
         }
-    while ( *ptr ) {
-        if (!isalnum(*ptr) ) {
-            *ptr = '_';
-        }
-        ptr++;
+        while (*ptr) {
+            if (!isalnum(*ptr)) {
+                *ptr = '_';
+            }
+            ptr++;
         }
         /* Compiling a program */
         if (ISASM(ASM_ASXX)) {
             outstr("\n\t.module\t");
-        } else if ( ISASM(ASM_Z80ASM) ) {
-            outstr ("\n\tMODULE\t"); 
+        } else if (ISASM(ASM_Z80ASM)) {
+            outstr("\n\tMODULE\t");
         } else {
             outstr("\n;\t module\t");
         }
-        if (strlen (filen) && strncmp(filen,"<stdin>",7) ) {
-            if ( (segment=strrchr(filen,'/')) ) /* Unix */
+        if (strlen(filen) && strncmp(filen, "<stdin>", 7)) {
+            if ((segment = strrchr(filen, '/'))) /* Unix */
                 ++segment;
-            else if ( (segment=strrchr(filen,'\\')) ) /*DOG*/
+            else if ((segment = strrchr(filen, '\\'))) /*DOG*/
                 segment++;
-            else if ( (segment=strrchr(filen,':')) )/*Amiga*/
+            else if ((segment = strrchr(filen, ':'))) /*Amiga*/
                 segment++;
-            else segment=filen;
+            else
+                segment = filen;
             outstr(segment);
         } else {
             /* This handles files produced by a filter cpp */
-            strcpy(filen,Filenorig);
-            if ( (segment=strrchr(filen,'/')) ) /* Unix */
+            strcpy(filen, Filenorig);
+            if ((segment = strrchr(filen, '/'))) /* Unix */
                 ++segment;
-            else if ( (segment=strrchr(filen,'\\')) ) /*DOG*/
+            else if ((segment = strrchr(filen, '\\'))) /*DOG*/
                 segment++;
-            else if ( (segment=strrchr(filen,':')) )/*Amiga*/
+            else if ((segment = strrchr(filen, ':'))) /*Amiga*/
                 segment++;
-            else segment=filen;
-            changesuffix(filen,".c");
-            outstr("scp_");  /* alpha id incase tmpfile is numeric */
+            else
+                segment = filen;
+            changesuffix(filen, ".c");
+            outstr("scp_"); /* alpha id incase tmpfile is numeric */
             outstr(segment);
         }
         nl();
-    } 
+    }
     if (ISASM(ASM_ASXX)) {
-        incdir=getenv("Z80_OZFILES");
+        incdir = getenv("Z80_OZFILES");
         outstr("\n\n\t.include \"");
-        if (incdir) outstr(incdir);
+        if (incdir)
+            outstr(incdir);
         outstr("z80_crt0.hdx\"\n\n");
         ol(".area _CODE\n");
         ol(".radix d\n");
-        if ( noaltreg ) {
+        if (noaltreg) {
             ol(".globl\tsaved_hl");
             ol(".globl\tsaved_de");
         }
-    } else if (ISASM(ASM_GNU) ) {
+    } else if (ISASM(ASM_GNU)) {
 
     } else {
         outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
-        if ( noaltreg ) {
+        if (noaltreg) {
             ol("EXTERN\tsaved_hl");
             ol("EXTERN\tsaved_de");
         }
     }
-    donelibheader=1;
+    donelibheader = 1;
 }
-
 
 /* Print any assembler stuff needed after all code */
 void trailer(void)
@@ -178,7 +185,7 @@ void trailer(void)
 /* Print out a name such that it won't annoy the assembler
  *      (by matching anything reserved, like opcodes.)
  */
-void outname(char *sname,char pref)
+void outname(char* sname, char pref)
 {
     if (pref) {
         outstr(Z80ASM_PREFIX);
@@ -191,99 +198,111 @@ void outname(char *sname,char pref)
  * able to just check for far to see if we need to pick up second
  * bit of long pointer (check for type POINTER as well...
  */
-void getmem(SYMBOL *sym)
+void getmem(SYMBOL* sym)
 {
 
-        
-    if( sym->ident != POINTER && sym->type == CCHAR ) {
-        if (!(sym->flags&UNSIGNED)) {
+    if (sym->ident != POINTER && sym->type == CCHAR) {
+        if (!(sym->flags & UNSIGNED)) {
 #ifdef PREAPR00
-            ot("ld\ta,("); outname(sym->name,dopref(sym));
+            ot("ld\ta,(");
+            outname(sym->name, dopref(sym));
             outstr(")\n");
             callrts("l_sxt");
 #else
-            ot("ld\thl,"); outname(sym->name,dopref(sym));
+            ot("ld\thl,");
+            outname(sym->name, dopref(sym));
             nl();
             callrts("l_gchar");
 #endif
 
         } else {
-/* Unsigned char - new method - allows more optimizations! */
-            ot("ld\thl,"); outname(sym->name,dopref(sym));
+            /* Unsigned char - new method - allows more optimizations! */
+            ot("ld\thl,");
+            outname(sym->name, dopref(sym));
             nl();
             ol("ld\tl,(hl)");
             ol("ld\th,0");
         }
 #ifdef OLDLOADCHAR
-        ot("ld\ta,("); outname(sym->name,dopref(sym));
+        ot("ld\ta,(");
+        outname(sym->name, dopref(sym));
         outstr(")\n");
-        if (!(sym->flags&UNSIGNED))
+        if (!(sym->flags & UNSIGNED))
             callrts("l_sxt");
         else {
             ol("ld\tl,a");
             ol("ld\th,0");
         }
-                
+
 #endif
-    }
-    else if( sym->ident != POINTER && sym->type == DOUBLE ) {
+    } else if (sym->ident != POINTER && sym->type == DOUBLE) {
         address(sym);
         callrts("dload");
-    }
-    else if (sym->ident !=POINTER && sym->type == LONG ) {
-        ot("ld\thl,(");outname(sym->name,dopref(sym)); outstr(")\n");
-        ot("ld\tde,(");outname(sym->name,dopref(sym)); outstr("+2)\n");
-    }
-    else {
-/* this is for CINT and get pointer..will need to change! */
-        ot("ld\thl,("); outname(sym->name,dopref(sym)); outstr(")\n"); 
-/* For long pointers...load de with name+2, then d,0 */
-        if (sym->type==CPTR || (sym->ident==POINTER && sym->flags&FARPTR)) { ot("ld\tde,("); outname(sym->name,dopref(sym)); outstr("+2)\n\tld\td,0\n"); }
+    } else if (sym->ident != POINTER && sym->type == LONG) {
+        ot("ld\thl,(");
+        outname(sym->name, dopref(sym));
+        outstr(")\n");
+        ot("ld\tde,(");
+        outname(sym->name, dopref(sym));
+        outstr("+2)\n");
+    } else {
+        /* this is for CINT and get pointer..will need to change! */
+        ot("ld\thl,(");
+        outname(sym->name, dopref(sym));
+        outstr(")\n");
+        /* For long pointers...load de with name+2, then d,0 */
+        if (sym->type == CPTR || (sym->ident == POINTER && sym->flags & FARPTR)) {
+            ot("ld\tde,(");
+            outname(sym->name, dopref(sym));
+            outstr("+2)\n\tld\td,0\n");
+        }
     }
 }
 
 /* Fetch the address of the specified symbol (from stack)
  */
-int getloc(SYMBOL *sym, int off)
+int getloc(SYMBOL* sym, int off)
 {
     int offs;
-    offs=sym->offset.i-Zsp+off;
+    offs = sym->offset.i - Zsp + off;
     vconst(offs);
     ol("add\thl,sp");
     return (offs);
-
 }
 
 /* Store the primary register into the specified */
 /*      static memory cell */
-void putmem(SYMBOL *sym)
+void putmem(SYMBOL* sym)
 {
-    if( sym->ident != POINTER && sym->type == DOUBLE ) {
+    if (sym->ident != POINTER && sym->type == DOUBLE) {
         address(sym);
         callrts("dstore");
-    }
-    else {
-        if( sym->ident != POINTER && sym->type == CCHAR ) {
+    } else {
+        if (sym->ident != POINTER && sym->type == CCHAR) {
             LoadAccum();
             ot("ld\t(");
-            outname(sym->name,dopref(sym)); outstr("),a\n");
-        }
-        else if (sym ->ident != POINTER && sym->type == LONG ) {
+            outname(sym->name, dopref(sym));
+            outstr("),a\n");
+        } else if (sym->ident != POINTER && sym->type == LONG) {
             ot("ld\t(");
-            outname(sym->name,dopref(sym)); outstr("),hl\n");
+            outname(sym->name, dopref(sym));
+            outstr("),hl\n");
             ot("ld\t(");
-            outname(sym->name,dopref(sym)); outstr("+2),de\n");
-        }
-        else if (sym->ident == POINTER && sym->flags&FARPTR) {
+            outname(sym->name, dopref(sym));
+            outstr("+2),de\n");
+        } else if (sym->ident == POINTER && sym->flags & FARPTR) {
             ot("ld\t(");
-            outname(sym->name,dopref(sym)); outstr("),hl\n");
+            outname(sym->name, dopref(sym));
+            outstr("),hl\n");
             ol("ld\ta,e");
             ot("ld\t(");
-            outname(sym->name,dopref(sym)); outstr("+2),a\n");
- 
+            outname(sym->name, dopref(sym));
+            outstr("+2),a\n");
+
         } else {
             ot("ld\t(");
-            outname(sym->name,dopref(sym)); outstr("),hl\n");
+            outname(sym->name, dopref(sym));
+            outstr("),hl\n");
         }
     }
 }
@@ -309,7 +328,7 @@ void StoreTOS(char typeobj)
     case DOUBLE:
         dpush();
         return;
-/* CPTR..untested */
+    /* CPTR..untested */
     case CPTR:
         ol("dec\tsp");
         ol("ld\ta,e");
@@ -322,10 +341,9 @@ void StoreTOS(char typeobj)
     default:
         zpush();
         return;
-            
     }
-}   
-            
+}
+
 /*
  * Store the object at the frame position marked by offset
  * We already know that it's in range
@@ -335,10 +353,10 @@ void StoreTOS(char typeobj)
 
 void PutFrame(char typeobj, int offset)
 {
-    SYMBOL *ptr;
-    char    flags;
-    ptr=retrstk(&flags);    /* Not needed but.. */
-    switch(typeobj) {
+    SYMBOL* ptr;
+    char flags;
+    ptr = retrstk(&flags); /* Not needed but.. */
+    switch (typeobj) {
     case CCHAR:
         ot("ld\t");
         OutIndex(offset);
@@ -349,7 +367,7 @@ void PutFrame(char typeobj, int offset)
         OutIndex(offset);
         outstr(",l\n");
         ot("ld\t");
-        OutIndex(offset+1);
+        OutIndex(offset + 1);
         outstr(",h\n");
         break;
     case CPTR:
@@ -358,45 +376,45 @@ void PutFrame(char typeobj, int offset)
         OutIndex(offset);
         outstr(",l\n");
         ot("ld\t");
-        OutIndex(offset+1);
+        OutIndex(offset + 1);
         outstr(",h\n");
         ot("ld\t");
-        OutIndex(offset+2);
+        OutIndex(offset + 2);
         outstr(",e\n");
         ot("ld\t");
         if (typeobj == LONG) {
-            OutIndex(offset+3);
+            OutIndex(offset + 3);
             outstr(",d\n");
         }
     }
 }
 #endif
 
-
-
-
 /* Store the specified object type in the primary register */
 /*      at the address on the top of the stack */
 void putstk(char typeobj)
 {
-    SYMBOL *ptr;
+    SYMBOL* ptr;
     char flags;
-/* Store via long pointer... */
-    ptr=retrstk(&flags);
-    if ( flags&FARACC ) {
-/* exx pop hl, pop de, exx */
-        doexx(); mainpop(); zpop(); doexx();
-        switch( typeobj ) {
+    /* Store via long pointer... */
+    ptr = retrstk(&flags);
+    if (flags & FARACC) {
+        /* exx pop hl, pop de, exx */
+        doexx();
+        mainpop();
+        zpop();
+        doexx();
+        switch (typeobj) {
         case DOUBLE:
             callrts("lp_pdoub");
             break;
-        case CPTR :
+        case CPTR:
             callrts("lp_pptr");
             break;
-        case LONG :
+        case LONG:
             callrts("lp_plong");
             break;
-        case CCHAR :
+        case CCHAR:
             callrts("lp_pchar");
             break;
         default:
@@ -405,26 +423,26 @@ void putstk(char typeobj)
         return;
     }
 
-    switch ( typeobj ) {
-    case DOUBLE :
+    switch (typeobj) {
+    case DOUBLE:
         mainpop();
         callrts("dstore");
-        break ;
-    case CPTR :
+        break;
+    case CPTR:
         zpopbc();
         callrts("l_putptr");
         break;
-    case LONG :
+    case LONG:
         zpopbc();
         callrts("l_plong");
-        break ;
-    case CCHAR :
+        break;
+    case CCHAR:
         zpop();
         LoadAccum();
         ol("ld\t(de),a");
-        break ; 
-    default :
-        zpop(); 
+        break;
+    default:
+        zpop();
         if (doinline) {
             LoadAccum();
             ol("ld\t(de),a");
@@ -473,7 +491,6 @@ void put2tos(void)
     ol("push\tde");
 }
 
-
 /*
  * loadargc - load accumulator with number of words of stack
  *            if n=0 then emit xor a instead of ld a,0 
@@ -482,33 +499,34 @@ void put2tos(void)
 void loadargc(int n)
 {
     n >>= 1;
-    if ( n ) {
-        ot("ld\ta," ) ;
-        outdec(n) ;
+    if (n) {
+        ot("ld\ta,");
+        outdec(n);
         nl();
-    } else  ol("xor\ta");
+    } else
+        ol("xor\ta");
 }
-
 
 /* Fetch the specified object type indirect through the */
 /*      primary register into the primary register */
-void indirect(LVALUE *lval)
+void indirect(LVALUE* lval)
 {
-    char     sign;
-    char    typeobj, flags;
+    char sign;
+    char typeobj, flags;
 
-    typeobj=lval->indirect;
-    flags=lval->flags;
+    typeobj = lval->indirect;
+    flags = lval->flags;
 
-    sign=flags&UNSIGNED;
+    sign = flags & UNSIGNED;
 
     /* Fetch from far pointer */
-    if (flags&FARACC) {             /* Access via far method */
-        switch(typeobj) {
-        case CCHAR :
+    if (flags & FARACC) { /* Access via far method */
+        switch (typeobj) {
+        case CCHAR:
             callrts("lp_gchar");
-            if (!sign) callrts("l_sxt");
-/*                        else ol("ld\th,0"); */
+            if (!sign)
+                callrts("l_sxt");
+            /*                        else ol("ld\th,0"); */
             break;
         case CPTR:
             callrts("lp_gptr");
@@ -523,12 +541,10 @@ void indirect(LVALUE *lval)
             callrts("lp_gint");
         }
         return;
-                
     }
 
-
-    switch ( typeobj ) {
-    case CCHAR :
+    switch (typeobj) {
+    case CCHAR:
         if (!sign) {
 #ifdef PREAPR00
             ol("ld\ta,(hl)");
@@ -540,17 +556,17 @@ void indirect(LVALUE *lval)
             ol("ld\tl,(hl)");
             ol("ld\th,0");
         }
-        break ;
-    case CPTR :
+        break;
+    case CPTR:
         callrts("l_getptr");
         break;
-    case LONG :
+    case LONG:
         callrts("l_glong");
         break;
-    case DOUBLE :
+    case DOUBLE:
         callrts("dload");
-        break ;
-    default :
+        break;
+    default:
         if (doinline) {
             ol("ld\ta,(hl)");
             ol("inc\thl");
@@ -578,7 +594,7 @@ void swap(void)
 /*      into the primary register */
 void immed(void)
 {
-    if (ISASM(ASM_ASXX)) 
+    if (ISASM(ASM_ASXX))
         ot("ld\thl,#");
     else
         ot("ld\thl,");
@@ -602,7 +618,6 @@ void immedlit(int lab)
     outbyte('+');
 }
 
-
 /* Push long onto stack */
 
 void lpush(void)
@@ -614,7 +629,7 @@ void lpush(void)
 void lpush2(void)
 {
     callrts("lpush2");
-    Zsp-=4;
+    Zsp -= 4;
 }
 
 /* Push and pop flags (used for ? operator) */
@@ -622,18 +637,16 @@ void lpush2(void)
 void zpushflags(void)
 {
     ol("push\taf");
-    Zsp -=2;
+    Zsp -= 2;
 }
 
 void zpopflags(void)
 {
     ol("pop\taf");
-    Zsp +=2;
+    Zsp += 2;
 }
 
-
 /* Push secondary register/high work of long onto the stack */
-
 
 void zpushde(void)
 {
@@ -702,7 +715,6 @@ void doexx(void)
     ol("exx");
 }
 
-
 /* Swap the primary register and the top of the stack */
 void swapstk(void)
 {
@@ -712,8 +724,10 @@ void swapstk(void)
 /* process switch statement */
 void sw(char type)
 {
-    if (type==LONG || type==CPTR) callrts("l_long_case");
-    else callrts("l_case");
+    if (type == LONG || type == CPTR)
+        callrts("l_long_case");
+    else
+        callrts("l_case");
 }
 
 /* Call a shared library routine FIXME!!!!
@@ -725,13 +739,12 @@ void zclibcallop()
     ol("rst\t8");
     defword();
 }
-    
 
 /* Call the specified subroutine name */
-void zcall(SYMBOL *sname)
+void zcall(SYMBOL* sname)
 {
     zcallop();
-    outname(sname->name,dopref(sname));
+    outname(sname->name, dopref(sname));
     nl();
 }
 
@@ -742,25 +755,24 @@ void zcallop(void)
     ot("call\t");
 }
 
-
 /* djm (move this!) Decide whether to print a prefix or not 
  * This uses new flags bit LIBRARY
  */
 
-char dopref(SYMBOL *sym)
+char dopref(SYMBOL* sym)
 {
-    if (sym->flags&LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) return(0);
-    return(1);
+    if (sym->flags & LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP))
+        return (0);
+    return (1);
 }
 
 /* Call a run-time library routine */
-void callrts(char *sname)
+void callrts(char* sname)
 {
     ot("call\t");
     outstr(sname);
     nl();
 }
-
 
 /* Return from subroutine */
 void zret(void)
@@ -776,50 +788,48 @@ void zret(void)
  */
 void callstk(int n)
 {
-    if ( n == 2 ) {
+    if (n == 2) {
         /* At this point, TOS = function, hl = argument */
-        int  label = getlabel();
-        ol("pop\tde");   /* function */
-        outstr("\tld\tbc,");   /* ret address */
+        int label = getlabel();
+        ol("pop\tde"); /* function */
+        outstr("\tld\tbc,"); /* ret address */
         printlabel(label);
         nl();
         /* Argument in hl, on stack */
         ol("push\thl");
-        ol("push\tbc");  /* Return address */
+        ol("push\tbc"); /* Return address */
         ol("push\tde");
         loadargc(n);
         ol("ret");
         postlabel(label);
     } else {
-        loadargc(n) ;
-        callrts( "l_jphl" ) ;
+        loadargc(n);
+        callrts("l_jphl");
     }
 }
 
-void jump0(LVALUE *lval,int label)
+void jump0(LVALUE* lval, int label)
 {
-    opjump("",label);
+    opjump("", label);
 }
-
 
 /* Jump to specified internal label number */
 void jump(int label)
 {
-    opjump("",label);
+    opjump("", label);
 }
 
 /* Jump relative to specified internal label */
 void jumpr(int label)
 {
-    opjumpr("",label);
+    opjumpr("", label);
 }
-
 
 /*
  * Output the jump code, with conditions as needed
  */
 
-void opjump(char *cc, int label)
+void opjump(char* cc, int label)
 {
     ot("jp\t");
     outstr(cc);
@@ -827,7 +837,7 @@ void opjump(char *cc, int label)
     nl();
 }
 
-void opjumpr(char *cc, int label)
+void opjumpr(char* cc, int label)
 {
     ot("jr\t");
     outstr(cc);
@@ -837,84 +847,87 @@ void opjumpr(char *cc, int label)
 
 void jumpc(int label)
 {
-    opjump("c,",label);
+    opjump("c,", label);
 }
 
 void jumpnc(int label)
 {
-    opjump("nc,",label);
+    opjump("nc,", label);
 }
 
 void setcond(int val)
 {
-    if (val == 1 ) ol("scf");
-    else ol("and\ta");
+    if (val == 1)
+        ol("scf");
+    else
+        ol("and\ta");
 }
 
-
-
 /* Test the primary register and jump if false to label */
-void testjump(LVALUE *lval,int label)
+void testjump(LVALUE* lval, int label)
 {
     int type;
     ol("ld\ta,h");
     ol("or\tl");
-    if ( lval->oldval_type == LONG ) {
-    ol("or\td");
-    ol("or\te");
+    if (lval->oldval_type == LONG) {
+        ol("or\td");
+        ol("or\te");
     }
     type = lval->oldval_type;
-    if ( lval->binop == NULL )
+    if (lval->binop == NULL)
         type = lval->val_type;
 
-    if ( type == LONG && WasComp(lval) ) { ol("or\td"); ol("or\te"); }
-    if ( type == CPTR && WasComp(lval) ) { ol("or\te"); }
-    opjump("z,",label);
+    if (type == LONG && WasComp(lval)) {
+        ol("or\td");
+        ol("or\te");
+    }
+    if (type == CPTR && WasComp(lval)) {
+        ol("or\te");
+    }
+    opjump("z,", label);
 }
 
 /* test primary register against zero and jump if false */
 /* Special conditions for testing char here */
 void zerojump(
-    void (*oper)(LVALUE *,int),
+    void (*oper)(LVALUE*, int),
     int label,
-    LVALUE *lval)
+    LVALUE* lval)
 {
-    clearstage(lval->stage_add, 0) ;                /* purge conventional code */
+    clearstage(lval->stage_add, 0); /* purge conventional code */
 #ifdef CHARCOMP0
-    if      (lval->oldval_type == CCHAR ) {
-        if (oper==testjump ) { /* !=0 or >=0U */
+    if (lval->oldval_type == CCHAR) {
+        if (oper == testjump) { /* !=0 or >=0U */
             LoadAccum();
             ol("and\ta");
-            opjump("z,",label);
+            opjump("z,", label);
             return;
-        } else if (oper==le0) { /* <=0 */
+        } else if (oper == le0) { /* <=0 */
             LoadAccum();
             ol("and\ta");
-            if ( IS_ASM(ASM_Z80ASM) ) {
+            if (IS_ASM(ASM_Z80ASM)) {
                 ol("jr\tz,ASMPC+5");
             } else {
                 ol("jr\tz,$+5");
             }
-            opjump("p,",label);
+            opjump("p,", label);
             return;
-        } else if (oper==ge0 ) { /* > 0 */
+        } else if (oper == ge0) { /* > 0 */
             LoadAccum();
             ol("and\ta");
-            opjump("m,",label);
+            opjump("m,", label);
             return;
-        } else if (oper==gt0 ) {
+        } else if (oper == gt0) {
             LoadAccum();
             ol("and\ta");
-            opjump("m,",label);
-            opjump("z,",label);
+            opjump("m,", label);
+            opjump("z,", label);
             return;
         }
-
     }
 #endif
-    (*oper)(lval,label) ;
+    (*oper)(lval, label);
 }
-
 
 /* Print pseudo-op to define a byte */
 void defbyte(void)
@@ -930,13 +943,12 @@ void defstorage(void)
 {
     if (ISASM(ASM_ASXX))
         ot(".ds\t");
-    else if ( ISASM(ASM_Z80ASM) ) {
-            ot("defs\t");
+    else if (ISASM(ASM_Z80ASM)) {
+        ot("defs\t");
     } else {
         ot("defs\t");
     }
 }
-
 
 /* Print pseudo-op to define a word */
 void defword(void)
@@ -950,10 +962,10 @@ void defword(void)
 /* Print pseudo-op to dump a long */
 void deflong(void)
 {
-	if ( ISASM(ASM_Z80ASM) ) 
-		ot("defq\t");
-	else
-		ot("defl\t");
+    if (ISASM(ASM_Z80ASM))
+        ot("defq\t");
+    else
+        ot("defl\t");
 }
 
 /* Print pseudo-op to define a string */
@@ -975,42 +987,44 @@ void point(void)
 }
 
 /* Modify the stack pointer to the new value indicated */
-int modstk(int newsp,int save,int saveaf)
-/*  newsp - if true save hl;  save - preserve contents of af */ 
+int modstk(int newsp, int save, int saveaf)
+/*  newsp - if true save hl;  save - preserve contents of af */
 {
-    int k,flag=NO;
+    int k, flag = NO;
 
-    k = newsp - Zsp ;
+    k = newsp - Zsp;
 
-    if ( k == 0 ) return newsp ;
+    if (k == 0)
+        return newsp;
 #ifdef USEFRAME
-    if (useframe) goto modstkcht;
+    if (useframe)
+        goto modstkcht;
 #endif
-    if ( k > 0 ) {
-        if ( k < 11 ) {
-            if ( k & 1 ) {
-                ol("inc\tsp") ;
-                --k ;
+    if (k > 0) {
+        if (k < 11) {
+            if (k & 1) {
+                ol("inc\tsp");
+                --k;
             }
-            while ( k ) {
+            while (k) {
                 ol("pop\tbc");
-                k -= 2 ;
+                k -= 2;
             }
             return newsp;
         }
     }
-    if ( k < 0 ) {
-        if ( k > -11 ) {
-            if ( k & 1 ) {
-                flag=YES;
-                ++k ;
+    if (k < 0) {
+        if (k > -11) {
+            if (k & 1) {
+                flag = YES;
+                ++k;
             }
-            while ( k ) {
+            while (k) {
                 ol("push\tbc");
-                k += 2 ;
+                k += 2;
             }
             if (flag)
-                ol("dec\tsp") ;
+                ol("dec\tsp");
             return newsp;
         }
     }
@@ -1022,7 +1036,7 @@ int modstk(int newsp,int save,int saveaf)
 modstkcht:
 #endif
     if (saveaf) {
-        if ( noaltreg ) {
+        if (noaltreg) {
             zpushflags();
             zpopbc();
         } else {
@@ -1031,27 +1045,35 @@ modstkcht:
     }
 #ifdef USEFRAME
     if (useframe) {
-        ot("ld\t"); FrameP(); outstr(","); outdec(k); nl();
+        ot("ld\t");
+        FrameP();
+        outstr(",");
+        outdec(k);
+        nl();
         ot("add\t");
         FrameP();
         outstr(",sp\n");
         RestoreSP(NO);
-    } else {        
-        if ( save ) doexx() ;
-        vconst(k) ;
+    } else {
+        if (save)
+            doexx();
+        vconst(k);
         ol("add\thl,sp");
         ol("ld\tsp,hl");
-        if ( save ) doexx() ;
+        if (save)
+            doexx();
     }
 #else
-    if ( save ) doexx() ;
-    vconst(k) ;
+    if (save)
+        doexx();
+    vconst(k);
     ol("add\thl,sp");
     ol("ld\tsp,hl");
-    if ( save ) doexx() ;
+    if (save)
+        doexx();
 #endif
     if (saveaf) {
-        if ( noaltreg ) {
+        if (noaltreg) {
             ol("push\tbc");
             Zsp -= 2;
             zpopflags();
@@ -1059,90 +1081,91 @@ modstkcht:
             doexaf();
         }
     }
-    return newsp ;
+    return newsp;
 }
 
 /* Multiply the primary register by the length of some variable */
-void scale(int type,TAG_SYMBOL *tag)
+void scale(int type, TAG_SYMBOL* tag)
 {
-    switch ( type ) {
-    case CINT :
-        doublereg() ;
-        break ;
-    case CPTR :
-        threereg() ;
-        break ;
-    case LONG :
+    switch (type) {
+    case CINT:
+        doublereg();
+        break;
+    case CPTR:
+        threereg();
+        break;
+    case LONG:
         doublereg();
         doublereg();
         break;
-    case DOUBLE :
-        sixreg() ;
-        break ;
-    case STRUCT :
+    case DOUBLE:
+        sixreg();
+        break;
+    case STRUCT:
         /* try to avoid multiplying if possible */
-        quikmult(tag->size,YES);
+        quikmult(tag->size, YES);
     }
 }
 
-
-void quikmult(int size,char preserve)
+void quikmult(int size, char preserve)
 {
     switch (size) {
-    case 16 :
-        doublereg() ;
-    case 8 :
-        doublereg() ;
-    case 4 :
-        doublereg() ;
-    case 2 :
-        doublereg() ;
-        break ;
-    case 12 :
-        doublereg() ;
-    case 6 :
-        sixreg() ;
-        break ;
-    case 9 :
-        threereg() ;
-    case 3 :
-        threereg() ;
-        break ;
-    case 15 :
-        threereg() ;
-    case 5 :
-        fivereg() ;
-        break ;
-    case 10 :
-        fivereg() ;
-        doublereg() ;
-        break ;
-    case 14 :
-        doublereg() ;
-    case 7 :
-        sixreg() ;
-        addbc() ;       /* BC contains original value */
-        break ;
-    default :
-        if (preserve) ol("push\tde") ;
-        const2(size) ;
+    case 16:
+        doublereg();
+    case 8:
+        doublereg();
+    case 4:
+        doublereg();
+    case 2:
+        doublereg();
+        break;
+    case 12:
+        doublereg();
+    case 6:
+        sixreg();
+        break;
+    case 9:
+        threereg();
+    case 3:
+        threereg();
+        break;
+    case 15:
+        threereg();
+    case 5:
+        fivereg();
+        break;
+    case 10:
+        fivereg();
+        doublereg();
+        break;
+    case 14:
+        doublereg();
+    case 7:
+        sixreg();
+        addbc(); /* BC contains original value */
+        break;
+    default:
+        if (preserve)
+            ol("push\tde");
+        const2(size);
         callrts("l_mult"); /* WATCH OUT!! */
-        if (preserve) ol("pop\tde") ;
-        break ;
+        if (preserve)
+            ol("pop\tde");
+        break;
     }
 }
 
 /* add BC to the primary register */
 void addbc(void)
 {
-    ol("add\thl,bc") ;
+    ol("add\thl,bc");
 }
 
 /* load BC from the primary register */
 void ldbc(void)
 {
-    ol("ld\tb,h") ;
-    ol("ld\tc,l") ;
+    ol("ld\tb,h");
+    ol("ld\tc,l");
 }
 
 /* Double the primary register */
@@ -1154,25 +1177,25 @@ void doublereg(void)
 /* Multiply the primary register by three */
 void threereg(void)
 {
-    ldbc() ;
-    addbc() ;
-    addbc() ;
+    ldbc();
+    addbc();
+    addbc();
 }
 
 /* Multiply the primary register by five */
 void fivereg(void)
 {
-    ldbc() ;
-    doublereg() ;
-    doublereg() ;
-    addbc() ;
+    ldbc();
+    doublereg();
+    doublereg();
+    addbc();
 }
-        
+
 /* Multiply the primary register by six */
 void sixreg(void)
 {
-    threereg() ;
-    doublereg() ;
+    threereg();
+    doublereg();
 }
 
 /*
@@ -1181,15 +1204,14 @@ void sixreg(void)
  * out well..honest!
  */
 
-
 /* Add the primary and secondary registers (result in primary) */
-void zadd(LVALUE *lval)
+void zadd(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_long_add");
-        Zsp +=4;
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("dadd");
@@ -1200,18 +1222,15 @@ void zadd(LVALUE *lval)
     }
 }
 
-
-
-
 /* Subtract the primary register from the secondary */
 /*      (results in primary) */
-void zsub(LVALUE *lval)
+void zsub(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_long_sub");
-        Zsp +=4;
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("dsub");
@@ -1224,13 +1243,13 @@ void zsub(LVALUE *lval)
 
 /* Multiply the primary and secondary registers */
 /*      (results in primary */
-void mult(LVALUE *lval)
+void mult(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_long_mult");
-        Zsp +=4;
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("dmul");
@@ -1243,52 +1262,55 @@ void mult(LVALUE *lval)
 
 /* Divide the secondary register by the primary */
 /*      (quotient in primary, remainder in secondary) */
-void zdiv(LVALUE *lval)
+void zdiv(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
-        if (utype(lval)) callrts("l_long_div_u");
-        else callrts("l_long_div");
-        Zsp +=4;
+        if (utype(lval))
+            callrts("l_long_div_u");
+        else
+            callrts("l_long_div");
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("ddiv");
         Zsp += 6;
         break;
     default:
-        if (utype(lval)) callrts("l_div_u");
-        else callrts("l_div");
+        if (utype(lval))
+            callrts("l_div_u");
+        else
+            callrts("l_div");
     }
 }
-
 
 /* Compute remainder (mod) of secondary register divided
  *      by the primary
  *      (remainder in primary, quotient in secondary)
  */
-void zmod(LVALUE *lval)
+void zmod(LVALUE* lval)
 {
-    if ( noaltreg && ( lval->val_type == LONG || lval->val_type == CPTR ) ) {
+    if (noaltreg && (lval->val_type == LONG || lval->val_type == CPTR)) {
         callrts("l_long_mod2");
     } else {
         zdiv(lval);
-        if (lval->val_type == LONG || lval->val_type==CPTR) 
+        if (lval->val_type == LONG || lval->val_type == CPTR)
             doexx();
-        else 
+        else
             swap();
     }
 }
 
 /* Inclusive 'or' the primary and secondary */
 /*      (results in primary) */
-void zor(LVALUE *lval)
+void zor(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_long_or");
-        Zsp +=4;
+        Zsp += 4;
         break;
     default:
         callrts("l_or");
@@ -1297,29 +1319,28 @@ void zor(LVALUE *lval)
 
 /* Exclusive 'or' the primary and secondary */
 /*      (results in primary) */
-void zxor(LVALUE *lval)
+void zxor(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_long_xor");
-        Zsp +=4;
+        Zsp += 4;
         break;
     default:
         callrts("l_xor");
     }
 }
 
-
 /* 'And' the primary and secondary */
 /*      (results in primary) */
-void zand(LVALUE *lval)
+void zand(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_long_and");
-        Zsp +=4;
+        Zsp += 4;
         break;
     default:
         callrts("l_and");
@@ -1328,31 +1349,34 @@ void zand(LVALUE *lval)
 
 /* Arithmetic shift right the secondary register number of */
 /*      times in primary (results in primary) */
-void asr(LVALUE *lval)
+void asr(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
-        if (utype(lval)) callrts("l_long_asr_u");
-        else callrts("l_long_asr");
-        Zsp +=4;
+        if (utype(lval))
+            callrts("l_long_asr_u");
+        else
+            callrts("l_long_asr");
+        Zsp += 4;
         break;
     default:
-        if (utype(lval)) callrts("l_asr_u");
-        else callrts("l_asr");
+        if (utype(lval))
+            callrts("l_asr_u");
+        else
+            callrts("l_asr");
     }
 }
 
-
 /* Arithmetic left shift the secondary register number of */
 /*      times in primary (results in primary) */
-void asl(LVALUE *lval)
+void asl(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_long_asl");
-        Zsp +=4;
+        Zsp += 4;
         break;
     default:
         callrts("l_asl");
@@ -1360,10 +1384,10 @@ void asl(LVALUE *lval)
 }
 
 /* Form logical negation of primary register */
-void lneg(LVALUE *lval)
+void lneg(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         lval->val_type = CINT;
@@ -1382,9 +1406,9 @@ void lneg(LVALUE *lval)
 }
 
 /* Form two's complement of primary register */
-void neg(LVALUE *lval)
+void neg(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_long_neg");
@@ -1398,9 +1422,9 @@ void neg(LVALUE *lval)
 }
 
 /* Form one's complement of primary register */
-void com(LVALUE *lval)
+void com(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_long_com");
@@ -1420,9 +1444,9 @@ void ccf(void)
  * Increment value held in main register
  */
 
-void inc(LVALUE *lval)
+void inc(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_inclong");
@@ -1436,9 +1460,9 @@ void inc(LVALUE *lval)
  * Decrement value held in main register
  */
 
-void dec(LVALUE *lval)
+void dec(LVALUE* lval)
 {
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         callrts("l_declong");
@@ -1448,23 +1472,21 @@ void dec(LVALUE *lval)
     }
 }
 
-
 /* Following are the conditional operators */
 /* They compare the secondary register against the primary */
 /* and put a literal 1 in the primary if the condition is */
 /* true, otherwise they clear the primary register */
 
-
-void dummy(LVALUE *lval, int label)
+void dummy(LVALUE* lval, int label)
 {
-/* Dummy function to allows us to check for c/nc at end of if clause */
+    /* Dummy function to allows us to check for c/nc at end of if clause */
 }
 
 /* test for equal to zero */
-void eq0(LVALUE *lval,int label)
+void eq0(LVALUE* lval, int label)
 {
     WasComp(lval);
-    switch(lval->oldval_type) {
+    switch (lval->oldval_type) {
 #ifdef CHARCOMP0
     case CCHAR:
         ol("ld\ta,l");
@@ -1486,13 +1508,12 @@ void eq0(LVALUE *lval,int label)
         ol("ld\ta,h");
         ol("or\tl");
     }
-    opjump("nz,",label);
+    opjump("nz,", label);
 }
 
-
-void lt0(LVALUE *lval, int label)
+void lt0(LVALUE* lval, int label)
 {
-    switch(lval->oldval_type) {
+    switch (lval->oldval_type) {
 #ifdef CHARCOMP0
     case CCHAR:
         ol("xor\ta");
@@ -1511,40 +1532,49 @@ void lt0(LVALUE *lval, int label)
         ol("xor\ta");
         ol("or\th");
     }
-    opjump("p,",label);
+    opjump("p,", label);
 }
 
 /* Test for less than or equal to zero */
-void le0(LVALUE *lval, int label)
+void le0(LVALUE* lval, int label)
 {
-    ol("ld\ta,h") ;
+    ol("ld\ta,h");
     ol("or\tl");
-    if (lval->oldval_type==LONG) { ol("or\td"); ol("or\te"); }
-    if (lval->oldval_type==CPTR) { ol("or\te"); }
-    if ( ISASM(ASM_Z80ASM) ) {
+    if (lval->oldval_type == LONG) {
+        ol("or\td");
+        ol("or\te");
+    }
+    if (lval->oldval_type == CPTR) {
+        ol("or\te");
+    }
+    if (ISASM(ASM_Z80ASM)) {
         ol("jr\tz,ASMPC+7");
     } else {
         ol("jr\tz,$+7");
     }
-    lt0(lval,label);
+    lt0(lval, label);
 }
 
 /* test for greater than zero */
-void gt0(LVALUE *lval,int label)
+void gt0(LVALUE* lval, int label)
 {
-    ge0(lval,label) ;
-    if (lval->oldval_type==LONG) { ol("or\th"); ol("or\te"); }
-    if (lval->oldval_type==CPTR) { ol("or\th"); }
+    ge0(lval, label);
+    if (lval->oldval_type == LONG) {
+        ol("or\th");
+        ol("or\te");
+    }
+    if (lval->oldval_type == CPTR) {
+        ol("or\th");
+    }
     ol("or\tl");
-    opjump("z,",label);
+    opjump("z,", label);
 }
 
-
 /* test for greater than or equal to zero */
-void ge0(LVALUE *lval, int label)
+void ge0(LVALUE* lval, int label)
 {
-    ol("xor\ta") ;
-    switch(lval->oldval_type) {
+    ol("xor\ta");
+    switch (lval->oldval_type) {
     case LONG:
         ol("or\td");
         break;
@@ -1554,70 +1584,66 @@ void ge0(LVALUE *lval, int label)
     default:
         ol("or\th");
     }
-    opjump("m,",label);
+    opjump("m,", label);
 }
 
-
-
-
 /* Test for equal */
-void zeq(LVALUE *lval)
+void zeq(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         lval->val_type = CARRY;
         callrts("l_long_eq");
-        Zsp+=4;
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("deq");
-        Zsp+=6;
-        break; 
+        Zsp += 6;
+        break;
     case CCHAR:
-        if ( doinline ) {
+        if (doinline) {
             lval->val_type = CARRY;
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
-            if ( ISASM(ASM_Z80ASM) ) {
+            if (ISASM(ASM_Z80ASM)) {
                 ol("jr\tnz,ASMPC+3");
             } else {
                 ol("jr\tnz,$+3");
             }
             ol("scf");
             break;
-        }   
+        }
     default:
         lval->val_type = CARRY;
         callrts("l_eq");
     }
 }
 
-
 /* Test for not equal */
-void zne(LVALUE *lval)
+void zne(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         lval->val_type = CARRY;
         callrts("l_long_ne");
-        Zsp+=4;
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("dne");
-        Zsp+=6;
+        Zsp += 6;
         break;
     case CCHAR:
-        if ( doinline ) {
+        if (doinline) {
             lval->val_type = CARRY;
             ol("ld\ta,l");
             ol("sub\te");
             ol("and\ta");
-            if ( ISASM(ASM_Z80ASM) ) {
+            if (ISASM(ASM_Z80ASM)) {
                 ol("jr\tz,ASMPC+3");
             } else {
                 ol("jr\tz,$+3");
@@ -1632,25 +1658,27 @@ void zne(LVALUE *lval)
 }
 
 /* Test for less than*/
-void zlt(LVALUE *lval)
+void zlt(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
 
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         lval->val_type = CARRY;
-        if (utype(lval)) callrts("l_long_ult");
-        else callrts("l_long_lt");
-        Zsp+=4;
+        if (utype(lval))
+            callrts("l_long_ult");
+        else
+            callrts("l_long_lt");
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("dlt");
-        Zsp+=6;
+        Zsp += 6;
         break;
     case CCHAR:
-        if ( doinline ) { 
-            if ( utype(lval) ) {
+        if (doinline) {
+            if (utype(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
             } else {
@@ -1666,38 +1694,41 @@ void zlt(LVALUE *lval)
         }
     default:
         lval->val_type = CARRY;
-        if (utype(lval)) callrts("l_ult");
-        else callrts("l_lt");
+        if (utype(lval))
+            callrts("l_ult");
+        else
+            callrts("l_lt");
     }
 }
 
-
 /* Test for less than or equal to (signed/unsigned) */
-void zle(LVALUE *lval)
+void zle(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
 
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         lval->val_type = CARRY;
-        if (utype(lval)) callrts("l_long_ule");
-        else callrts("l_long_le");
-        Zsp+=4;
+        if (utype(lval))
+            callrts("l_long_ule");
+        else
+            callrts("l_long_le");
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("dleq");
-        Zsp+=6;
+        Zsp += 6;
         break;
     case CCHAR:
-        if ( doinline ) {
-            if ( utype(lval) ) { /* unsigned */
+        if (doinline) {
+            if (utype(lval)) { /* unsigned */
                 ol("ld\ta,e");
-                ol("sub\tl");          /* If l < e then carry set */
-                if ( ISASM(ASM_Z80ASM) ) {
-                    ol("jr\tnz,ASMPC+3");  /* If zero, then set carry */
+                ol("sub\tl"); /* If l < e then carry set */
+                if (ISASM(ASM_Z80ASM)) {
+                    ol("jr\tnz,ASMPC+3"); /* If zero, then set carry */
                 } else {
-                    ol("jr\tnz,$+3");  /* If zero, then set carry */
+                    ol("jr\tnz,$+3"); /* If zero, then set carry */
                 }
                 ol("scf");
             } else {
@@ -1706,7 +1737,7 @@ void zle(LVALUE *lval)
                 ol("sub\tl");
                 ol("rra");
                 ol("scf");
-                opjumpr("z,",label);
+                opjumpr("z,", label);
                 ol("xor\te");
                 ol("xor\tl");
                 ol("rlca");
@@ -1717,39 +1748,41 @@ void zle(LVALUE *lval)
         }
     default:
         lval->val_type = CARRY;
-        if (utype(lval)) callrts("l_ule");
-        else callrts("l_le");
+        if (utype(lval))
+            callrts("l_ule");
+        else
+            callrts("l_le");
     }
 }
 
-
-
 /* Test for greater than (signed/unsigned) */
-void zgt(LVALUE *lval)
+void zgt(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
 
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         lval->val_type = CARRY;
-        if (utype(lval)) callrts("l_long_ugt");
-        else callrts("l_long_gt");
-        Zsp+=4;
+        if (utype(lval))
+            callrts("l_long_ugt");
+        else
+            callrts("l_long_gt");
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("dgt");
-        Zsp+=6;
+        Zsp += 6;
         break;
     case CCHAR:
-        if ( doinline ) {
-            if ( utype(lval) ) {
+        if (doinline) {
+            if (utype(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
-                if ( ISASM(ASM_Z80ASM) ) {
-                    ol("jr\tz,ASMPC+3");  /* If zero, nc */
+                if (ISASM(ASM_Z80ASM)) {
+                    ol("jr\tz,ASMPC+3"); /* If zero, nc */
                 } else {
-                    ol("jr\tz,$+3");  /* If zero, nc */
+                    ol("jr\tz,$+3"); /* If zero, nc */
                 }
                 ol("ccf");
             } else {
@@ -1759,41 +1792,45 @@ void zgt(LVALUE *lval)
                 ol("xor\te");
                 ol("xor\tl");
                 ol("rlca");
-                ccf();  
+                ccf();
             }
             lval->val_type = CARRY;
             break;
         }
     default:
         lval->val_type = CARRY;
-        if (utype(lval)) callrts("l_ugt");
-        else callrts("l_gt");
+        if (utype(lval))
+            callrts("l_ugt");
+        else
+            callrts("l_gt");
     }
 }
 
 /* Test for greater than or equal to */
-void zge(LVALUE *lval)
+void zge(LVALUE* lval)
 {
     lval->oldval_type = lval->val_type;
 
-    switch(lval->val_type) {
+    switch (lval->val_type) {
     case LONG:
     case CPTR:
         lval->val_type = CARRY;
-        if (utype(lval)) callrts("l_long_uge");
-        else callrts("l_long_ge");
-        Zsp+=4;
+        if (utype(lval))
+            callrts("l_long_uge");
+        else
+            callrts("l_long_ge");
+        Zsp += 4;
         break;
     case DOUBLE:
         callrts("dge");
-        Zsp+=6;
+        Zsp += 6;
         break;
     case CCHAR:
-        if ( doinline ) {
-            if ( utype(lval) ) {
+        if (doinline) {
+            if (utype(lval)) {
                 ol("ld\ta,l");
-                ol("sub\te");         /* If l > e, carry set */
-                if ( ISASM(ASM_Z80ASM) ) {
+                ol("sub\te"); /* If l > e, carry set */
+                if (ISASM(ASM_Z80ASM)) {
                     ol("jr\tnz,ASMPC+3"); /* If l == e then we need to set carry */
                 } else {
                     ol("jr\tnz,$+3"); /* If l == e then we need to set carry */
@@ -1805,7 +1842,7 @@ void zge(LVALUE *lval)
                 ol("sub\tl");
                 ol("rra");
                 ol("scf");
-                opjumpr("z,",label);
+                opjumpr("z,", label);
                 ol("xor\te");
                 ol("xor\tl");
                 ol("rlca");
@@ -1817,8 +1854,10 @@ void zge(LVALUE *lval)
         }
     default:
         lval->val_type = CARRY;
-        if (utype(lval)) callrts("l_uge");
-        else callrts("l_ge");
+        if (utype(lval))
+            callrts("l_uge");
+        else
+            callrts("l_ge");
     }
 }
 
@@ -1827,7 +1866,6 @@ void zcarryconv(void)
     vconst(0);
     ol("rl\tl");
 }
-
 
 /*
  *      Routines for conversion between different types, kept in this
@@ -1844,7 +1882,6 @@ void convSint2char(void)
     ol("ld\ta,l");
     callrts("l_sxt");
 }
-    
 
 /* Unsigned int to long */
 void convUint2long(void)
@@ -1896,7 +1933,6 @@ void DoubSwap(void)
     callrts("dswap");
 }
 
-
 /*
  * Load long into hl and de 
  * Takes respect of sign, so if signed and high word=0 then
@@ -1909,28 +1945,27 @@ void DoubSwap(void)
 
 void vlongconst(uint32_t val)
 {
-    vconst(val%65536);
-    const2(val/65536);
+    vconst(val % 65536);
+    const2(val / 65536);
 }
 
 void vlongconst_noalt(uint32_t val)
 {
-    constbc(val%65536);
+    constbc(val % 65536);
     ol("push\tbc");
-    constbc(val/65536);
+    constbc(val / 65536);
     ol("push\tbc");
 }
-
 
 /*
  * load constant into primary register
  */
 void vconst(int32_t val)
 {
-    if ( val < 0 )
+    if (val < 0)
         val += 65536;
     immed();
-    outdec(val%65536);
+    outdec(val % 65536);
     ot(";const\n");
 }
 
@@ -1939,7 +1974,7 @@ void vconst(int32_t val)
  */
 void const2(int32_t val)
 {
-    if ( val < 0 )
+    if (val < 0)
         val += 65536;
     immed2();
     outdec(val);
@@ -1948,7 +1983,7 @@ void const2(int32_t val)
 
 void constbc(int32_t val)
 {
-    if ( val < 0 )
+    if (val < 0)
         val += 65536;
     ot("ld\tbc,");
     outdec(val);
@@ -1978,7 +2013,6 @@ void CpCharVal(int val)
     outstr("% 256)\n");
 }
 
-
 /*
  *      Print prefix for global defintion
  */
@@ -1988,14 +2022,14 @@ void GlobalPrefix(char type)
     if (ISASM(ASM_ASXX)) {
         ot(".globl\t");
         return;
-    } else if ( ISASM(ASM_VASM) ) {
+    } else if (ISASM(ASM_VASM)) {
         ot("GLOBAL\t");
         return;
-    } else if ( ISASM(ASM_GNU) ) {
+    } else if (ISASM(ASM_GNU)) {
         ot(".global\t");
         return;
     }
-    switch(type) {
+    switch (type) {
     case XDEF:
         ot("PUBLIC\t");
         break;
@@ -2015,7 +2049,7 @@ void GlobalPrefix(char type)
 
 void EmitLine(int line)
 {
-    if (ISASM(ASM_Z80ASM) && ctext ) {
+    if (ISASM(ASM_Z80ASM) && ctext) {
         ot("LINE\t");
         outdec(line);
         nl();
@@ -2049,8 +2083,8 @@ void restorede(void)
 void prefix()
 {
     if (ISASM(ASM_Z80ASM)) {
-            outbyte('.');
-        }
+        outbyte('.');
+    }
 }
 
 /* Print specified number as label */
@@ -2072,31 +2106,33 @@ void col()
         outbyte(58);
 }
 
-void function_appendix(SYMBOL *func)
+void function_appendix(SYMBOL* func)
 {
     /* Asz80 needs a label at the end to sort out local symbols */
     if (ISASM(ASM_ASXX)) {
-        nl();prefix();
+        nl();
+        prefix();
         outstr("smce_");
-        outname(func->name,NO);
-        col();nl();
+        outname(func->name, NO);
+        col();
+        nl();
     }
 }
 
-void output_section(char *section_name)
+void output_section(char* section_name)
 {
     /* If the same section don't do anything */
-    if ( strcmp(section_name, current_section) == 0 ) {
+    if (strcmp(section_name, current_section) == 0) {
         return;
     }
-    if ( ISASM(ASM_ASXX) ) {
-        outfmt("\t.area\t%s\n\n",section_name);
-    } else if ( ISASM(ASM_Z80ASM) ) {
-        outfmt("\tSECTION\t%s\n\n",section_name);
-    } else if ( ISASM(ASM_VASM) ) {
-        outfmt("\tSECTION\t%s\n",section_name);
-    } else if ( ISASM(ASM_GNU) ) {
-        outfmt("\t.section\t%s\n",section_name);
+    if (ISASM(ASM_ASXX)) {
+        outfmt("\t.area\t%s\n\n", section_name);
+    } else if (ISASM(ASM_Z80ASM)) {
+        outfmt("\tSECTION\t%s\n\n", section_name);
+    } else if (ISASM(ASM_VASM)) {
+        outfmt("\tSECTION\t%s\n", section_name);
+    } else if (ISASM(ASM_GNU)) {
+        outfmt("\t.section\t%s\n", section_name);
     }
     current_section = section_name;
 }
@@ -2105,13 +2141,13 @@ void output_section(char *section_name)
 /*
  * Check offset is within range for frame pointer
  */
-        
+
 int CheckOffset(int val)
 {
-    if (val>=-126 && val<=127 ) return 1;
+    if (val >= -126 && val <= 127)
+        return 1;
     return 0;
 }
-
 
 /*
  *  Output offset to index register
@@ -2121,39 +2157,43 @@ int CheckOffset(int val)
 
 void OutIndex(int val)
 {
-    if  (ISASM(ASM_ASXX))) {
-        outdec(val);
-        if (indexix)
-            outstr("(ix)");
-        else
-            outstr("(iy)");
-    } else {
+    if (ISASM(ASM_ASXX)))
+        {
+            outdec(val);
+            if (indexix)
+                outstr("(ix)");
+            else
+                outstr("(iy)");
+        }
+    else {
         outstr("(");
         if (indexix)
             outstr("ix ");
         else
             outstr("iy ");
-        if (val >= 0 )
+        if (val >= 0)
             outstr("+");
         outdec(val);
         outstr(")");
     }
 }
 
-
 void RestoreSP(char saveaf)
 {
-    if (saveaf) doexaf();
+    if (saveaf)
+        doexaf();
     ot("ld\tsp,");
     FrameP();
     nl();
-    if (saveaf) doexaf();
+    if (saveaf)
+        doexaf();
 }
 
 void setframe(void)
 {
 #ifdef USEFRAME
-    if (!useframe) return;
+    if (!useframe)
+        return;
     ot("ld\t");
     FrameP();
     outstr(",0\n");
@@ -2163,30 +2203,28 @@ void setframe(void)
 #endif
 }
 
-
-
 #endif
 
 void FrameP(void)
 {
-    outstr( indexix ? "ix" : "iy");
+    outstr(indexix ? "ix" : "iy");
 }
 
 void pushframe(void)
 {
-    if ( useframe || (currfn->flags&SAVEFRAME) ) {
-    ot("push\t");
-    FrameP();
-    nl();
+    if (useframe || (currfn->flags & SAVEFRAME)) {
+        ot("push\t");
+        FrameP();
+        nl();
     }
 }
 
 void popframe(void)
 {
-    if ( useframe || (currfn->flags&SAVEFRAME) ) {
-    ot("pop\t");
-    FrameP();
-    nl();
+    if (useframe || (currfn->flags & SAVEFRAME)) {
+        ot("pop\t");
+        FrameP();
+        nl();
     }
 }
 
@@ -2201,10 +2239,11 @@ void gen_builtin_strcmp()
     ol("ld\ta,(hl)");
     ol("ldi");
     ol("or\ta");
-    outstr("\tjp\tnz,"); printlabel(label); nl();
+    outstr("\tjp\tnz,");
+    printlabel(label);
+    nl();
     ol("pop\thl");
 }
-
 
 /*
  * Local Variables:
@@ -2218,4 +2257,3 @@ void gen_builtin_strcmp()
  *  eval: (c-set-offset 'class-close 4)
  * End:
  */
-

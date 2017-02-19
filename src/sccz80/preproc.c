@@ -10,84 +10,93 @@
 
 void junk()
 {
-        if(an(inbyte()))
-                while(an(ch()))gch();
-        else while(an(ch())==0) {
-                if(ch()==0)break;
-                gch();
+    if (an(inbyte()))
+        while (an(ch()))
+            gch();
+    else
+        while (an(ch()) == 0) {
+            if (ch() == 0)
+                break;
+            gch();
         }
-        blanks();
+    blanks();
 }
-
-
 
 char ch()
 {
-        return line[lptr] ;
+    return line[lptr];
 }
 
 char nch()
 {
-        if ( ch() )
-                return line[lptr+1] ;
-        return 0;
+    if (ch())
+        return line[lptr + 1];
+    return 0;
 }
 
 char gch()
 {
-        if ( ch() )
-                return line[lptr++] ;
-        return 0;
+    if (ch())
+        return line[lptr++];
+    return 0;
 }
 
 void clear()
 {
-        lptr = 0 ;
-        line[0] = 0 ;
+    lptr = 0;
+    line[0] = 0;
 }
 
 char inbyte()
 {
-        while(ch()==0) {
-                if (eof) return 0;
-                preprocess();
-        }
-        return gch();
+    while (ch() == 0) {
+        if (eof)
+            return 0;
+        preprocess();
+    }
+    return gch();
 }
-
 
 void vinline()
 {
-        FILE *unit ;
-        int k ;
+    FILE* unit;
+    int k;
 
-        while(1) {
-                if ( input == NULL_FD ) openin() ;
-                if ( eof ) return ;
-                if( (unit=inpt2) == NULL_FD ) unit = input ;
-                clear() ;
-                while ( (k=getc(unit)) > 0 ) {
-                        if ( k == '\n' || k == '\r' || lptr >= LINEMAX ) break;
-                        line[lptr++]=k;
-                }
-                line[lptr] = 0 ;        /* append null */
-                if (k != '\r') 
-		    ++lineno ;      /* read one more line */
-                if ( k <= 0 ) {
-                        fclose(unit);
-                        if ( inpt2  != NULL_FD ) endinclude() ;
-                                else { input = 0; eof=1; }
-                }
-                if ( lptr ) {
-                        if( ctext && cmode ) {
-                                comment();
-                                outstr(line);
-                                nl();
-                        }
-                        lptr=0;
-                        return;
-                }
+    while (1) {
+        if (input == NULL_FD)
+            openin();
+        if (eof)
+            return;
+        if ((unit = inpt2) == NULL_FD)
+            unit = input;
+        clear();
+        while ((k = getc(unit)) > 0) {
+            if (k == '\n' || k == '\r' || lptr >= LINEMAX)
+                break;
+            line[lptr++] = k;
         }
+        line[lptr] = 0; /* append null */
+        if (k != '\r')
+            ++lineno; /* read one more line */
+        if (k <= 0) {
+            fclose(unit);
+            if (inpt2 != NULL_FD)
+                endinclude();
+            else {
+                input = 0;
+                eof = 1;
+            }
+        }
+        if (lptr) {
+            if (ctext && cmode) {
+                comment();
+                outstr(line);
+                nl();
+            }
+            lptr = 0;
+            return;
+        }
+    }
 }
 
 /*
@@ -95,101 +104,105 @@ void vinline()
  */
 void ifline()
 {
-        char sname[NAMESIZE] ;
-        endasm=0;
+    char sname[NAMESIZE];
+    endasm = 0;
 
-        while ( 1 ) {
+    while (1) {
 
-                vinline() ;
-                if ( eof ) return ;
+        vinline();
+        if (eof)
+            return;
 
-                if ( ch() == '#' ) {
+        if (ch() == '#') {
 
-                        if ( match("#pragma") ) {
-                                dopragma();
-                                if (endasm) break;
-                                continue ;
-                        }
+            if (match("#pragma")) {
+                dopragma();
+                if (endasm)
+                    break;
+                continue;
+            }
 
-                        if ( match("#undef") ) {
-                                delmac() ;
-                                continue ;
-                        }
+            if (match("#undef")) {
+                delmac();
+                continue;
+            }
 
-                        if ( match("#ifdef") ) {
-                                ++iflevel ;
-                                if ( skiplevel ) continue ;
-                                symname(sname) ;
-                                if ( findmac(sname) == 0 )
-                                        skiplevel = iflevel ;
-                                continue ;
-                        }
+            if (match("#ifdef")) {
+                ++iflevel;
+                if (skiplevel)
+                    continue;
+                symname(sname);
+                if (findmac(sname) == 0)
+                    skiplevel = iflevel;
+                continue;
+            }
 
-                        if ( match("#ifndef") ) {
-                                ++iflevel ;
-                                if ( skiplevel ) continue ;
-                                symname(sname) ;
-                                if ( findmac(sname) )
-                                        skiplevel = iflevel ;
-                                continue ;
-                        }
+            if (match("#ifndef")) {
+                ++iflevel;
+                if (skiplevel)
+                    continue;
+                symname(sname);
+                if (findmac(sname))
+                    skiplevel = iflevel;
+                continue;
+            }
 
-                        if ( match("#else") ) {
-                                if ( iflevel ) {
-                                        if ( skiplevel == iflevel )
-                                                skiplevel = 0 ;
-                                        else if ( skiplevel == 0 )
-                                                skiplevel = iflevel ;
-                                }
-                                else
-                                        noiferr() ;
-                                continue ;
-                        }
+            if (match("#else")) {
+                if (iflevel) {
+                    if (skiplevel == iflevel)
+                        skiplevel = 0;
+                    else if (skiplevel == 0)
+                        skiplevel = iflevel;
+                } else
+                    noiferr();
+                continue;
+            }
 
-                        if ( match("#endif") ) {
-                                if ( iflevel ) {
-                                        if ( skiplevel == iflevel )
-                                                skiplevel = 0 ;
-                                        --iflevel ;
-                                }
-                                else
-                                        noiferr() ;
-                                continue ;
-                        }
-                        if ( match("# ") || match("#line") ) {
-                                int     num=0;
-                                char    string[FILENAME_LEN+1];
-                                string[0]=0;
-                                sscanf(line+lptr,"%d %s",&num,string);
-                                if   (num) lineno=--num;
-                                if      (strlen(string)) strcpy(Filename,string);
-                                if (lineno==0) DoLibHeader();
-                                continue;
-                        }
-
-                }
-
-                if ( skiplevel )
-                        continue ;
-
-                if ( ch() == 0 )
-                        continue ;
-
-                break ;
+            if (match("#endif")) {
+                if (iflevel) {
+                    if (skiplevel == iflevel)
+                        skiplevel = 0;
+                    --iflevel;
+                } else
+                    noiferr();
+                continue;
+            }
+            if (match("# ") || match("#line")) {
+                int num = 0;
+                char string[FILENAME_LEN + 1];
+                string[0] = 0;
+                sscanf(line + lptr, "%d %s", &num, string);
+                if (num)
+                    lineno = --num;
+                if (strlen(string))
+                    strcpy(Filename, string);
+                if (lineno == 0)
+                    DoLibHeader();
+                continue;
+            }
         }
+
+        if (skiplevel)
+            continue;
+
+        if (ch() == 0)
+            continue;
+
+        break;
+    }
 }
 
 void noiferr()
 {
-        error(E_MISSIF) ;
+    error(E_MISSIF);
 }
 
 void keepch(char c)
 {
-        mline[mptr] = c ;
-        if ( mptr < MPMAX ) ++mptr ;
+    mline[mptr] = c;
+    if (mptr < MPMAX)
+        ++mptr;
 }
-
 
 /* The preprocessor here is pants, and messes up all sorts of
    things - best leave it to the external preprocessor to do all
@@ -202,8 +215,8 @@ void preprocess()
         int k;
 #endif
 
-        ifline() ;
-	return;
+    ifline();
+    return;
 #if 0
         if ( eof || cmode == 0 ) {
                 /* while passing through assembler, only do #if, etc */
@@ -312,20 +325,22 @@ void preprocess()
 #endif
 }
 
-
 void addmac()
 {
-        char sname[NAMESIZE];
+    char sname[NAMESIZE];
 
-        if ( symname(sname) == 0 ) {
-                illname(sname);
-                clear();
-                return;
-        }
-        addglb(sname, MACRO, 0, macptr, STATIK, 0, 0) ;
-        while ( ch()==' ' || ch()=='\t' ) gch() ;
-        while ( putmac(gch()) ) ;
-        if ( macptr >= MACMAX ) error(E_MACOV) ;
+    if (symname(sname) == 0) {
+        illname(sname);
+        clear();
+        return;
+    }
+    addglb(sname, MACRO, 0, macptr, STATIK, 0, 0);
+    while (ch() == ' ' || ch() == '\t')
+        gch();
+    while (putmac(gch()))
+        ;
+    if (macptr >= MACMAX)
+        error(E_MACOV);
 }
 
 /*
@@ -334,30 +349,31 @@ void addmac()
 
 void delmac()
 {
-        char sname[NAMESIZE] ;
-        SYMBOL *ptr ;
+    char sname[NAMESIZE];
+    SYMBOL* ptr;
 
-        if ( symname(sname) ) {
-                if ( (ptr=findglb(sname)) ) {
-                        /* invalidate name */
-                        ptr->name[0] = '0' ;
-                }
+    if (symname(sname)) {
+        if ((ptr = findglb(sname))) {
+            /* invalidate name */
+            ptr->name[0] = '0';
         }
+    }
 }
 
 char putmac(char c)
 {
-        macq[macptr] = c ;
-        if ( macptr < MACMAX ) ++macptr ;
-        return (c) ;
+    macq[macptr] = c;
+    if (macptr < MACMAX)
+        ++macptr;
+    return (c);
 }
 
-int findmac(char *sname)
+int findmac(char* sname)
 {
-        if( findglb(sname) != 0 && glbptr->ident == MACRO ) {
-                return (glbptr->offset.i) ;
-        }
-        return (0) ;
+    if (findglb(sname) != 0 && glbptr->ident == MACRO) {
+        return (glbptr->offset.i);
+    }
+    return (0);
 }
 
 /*
@@ -367,21 +383,19 @@ int findmac(char *sname)
  *          up conditions for addmac().
  */
 
-
-void defmac(char *text)
+void defmac(char* text)
 {
-        char *p ;
+    char* p;
 
-        /* copy macro name into line buffer */
-        p = line ;
-        while ( *text != '=' && *text ) {
-                *p++ = *text++ ;
-        }
-        *p++ = ' ' ;
-        /* copy value or "1" into line buffer */
-        strcpy(p, (*text++) ? text : "1") ;
-        /* make addition to table */
-        lptr = 0 ;
-        addmac() ;
+    /* copy macro name into line buffer */
+    p = line;
+    while (*text != '=' && *text) {
+        *p++ = *text++;
+    }
+    *p++ = ' ';
+    /* copy value or "1" into line buffer */
+    strcpy(p, (*text++) ? text : "1");
+    /* make addition to table */
+    lptr = 0;
+    addmac();
 }
- 
