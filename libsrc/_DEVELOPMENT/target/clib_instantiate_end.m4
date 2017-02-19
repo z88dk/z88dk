@@ -10,6 +10,8 @@ dnl############################################################
    ; __I_STDIO_NUM_FILE = number of static FILEs instantiated in crt
    ; __i_stdio_file_n   = address of static FILE structure #n (0..I_STDIO_FILE_NUM-1)
 
+	PUBLIC __MAX_FOPEN
+	
    SECTION data_clib
    SECTION data_stdio
 
@@ -54,6 +56,8 @@ dnl############################################################
    
       IF __clib_fopen_max > __I_STDIO_NUM_FILE
 
+		   defc __MAX_FOPEN = __clib_fopen_max
+		
          ; create extra FILE structures
      
          SECTION bss_clib
@@ -82,13 +86,19 @@ dnl############################################################
          
             dec l
             jr nz, loop
+				
+      ELSE
 
+         defc __MAX_FOPEN = __I_STDIO_NUM_FILE
+				
       ENDIF   
 
    ENDIF
 
    IF (__clib_fopen_max = 0) && (__I_STDIO_NUM_FILE = 0)
    
+      defc __MAX_FOPEN = 0
+	
       ; create empty file lists
       
       SECTION bss_clib
@@ -105,13 +115,19 @@ dnl############################################################
 
    ENDIF
 
+   IF (__clib_fopen_max < 0) && (__I_STDIO_NUM_FILE = 0)
+
+      defc __MAX_FOPEN = 0
+
+   ENDIF
+
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; create fd table
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    ; __clib_open_max  = max number of open fds specified by user
    ; __I_FCNTL_NUM_FD = number of static file descriptors created
-
+	
    PUBLIC __fcntl_fdtbl
    PUBLIC __fcntl_fdtbl_size
    
@@ -161,6 +177,9 @@ dnl############################################################
    
    ENDIF
    
+	PUBLIC __MAX_OPEN
+	defc   __MAX_OPEN = __fcntl_fdtbl_size
+	
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; finalize stdio heap
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
