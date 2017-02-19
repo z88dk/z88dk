@@ -5,7 +5,7 @@ setlocal ENABLEDELAYEDEXPANSION
 
 @rem must have leading and trailing space
 
-set alltargets= embedded cpm m rc2014 sms z180 zx 
+set alltargets= z80 cpm m rc2014 sms z180 zx 
 
 if "%1" == "" (
    echo.
@@ -39,19 +39,22 @@ for %%t in (%targets%) do (
       echo.
       echo target = %%t
 
-      copy /Y target\%%t\clib_cfg.asm . 1> nul
-      copy /Y target\%%t\clib_target_cfg.asm . 1> nul
+      m4 -DCFG_ASM_DEF target/%%t/config.m4 > target/%%t/config_%%t_private.inc
+      m4 -DCFG_ASM_PUB target/%%t/config.m4 > target/%%t/config_%%t_public.inc
+      m4 -DCFG_C_DEF target/%%t/config.m4 > target/%%t/config_%%t.h
+
+      copy /Y target\%%t\config_%%t_private.inc config_private.inc 1> nul
 
       if "%%t" == "zx" (
-         zcc +embedded -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         zcc +embedded -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
          zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
          zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
-         zcc +embedded -vn -m4 arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4
-         zcc +embedded -vn -m4 arch/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm.m4
-         zcc +embedded -vn -m4 arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm.m4
-         zcc +embedded -vn -m4 arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm.m4
-         zcc +embedded -vn -m4 arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm.m4
+      )
+
+      if exist target\%%t\library\%%t_macro.lst (
+         echo   %%t_macro.m4
+         zcc +z80 -vn -clib=new -m4 --lstcwd @target/%%t/library/%%t_macro.lst
       )
 
       echo   %%t_sccz80.lib
@@ -78,9 +81,9 @@ for %%t in (%targets%) do (
       del /S *.o > nul 2>&1
       del /S *.err > nul 2>&1
       
-      del clib_cfg.asm > nul 2>&1
-      del clib_target_cfg.asm > nul 2>&1
-      
+      del config_private.inc > nul 2>&1
+      del zcc_opt.def > nul 2>&1
+
    ) else (
 
       echo.

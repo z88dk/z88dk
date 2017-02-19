@@ -1,15 +1,10 @@
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_driver
 SECTION code_driver_terminal_input
 
 PUBLIC console_01_input_proc_getc
-
-EXTERN ITERM_MSG_GETC, ITERM_MSG_READLINE_BEGIN, ITERM_MSG_READLINE_END
-EXTERN ITERM_MSG_PRINT_CURSOR, ITERM_MSG_ERASE_CURSOR, ITERM_MSG_BS
-EXTERN ITERM_MSG_BS_PWD, ITERM_MSG_BELL, ITERM_MSG_ERASE_CURSOR_PWD
-EXTERN ITERM_MSG_INTERRUPT
 
 EXTERN console_01_input_proc_echo, l_setmem_hl, asm_b_array_clear
 EXTERN console_01_input_proc_oterm, l_inc_sp, l_jpix, l_offset_ix_de

@@ -28,33 +28,21 @@
    ;; dynamically generated functions
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-   IF !DEFINED_CLIB_OPT_STDIO
-      defc DEFINED_CLIB_OPT_STDIO = 1
-      defc CLIB_OPT_STDIO = 0
-   ENDIF
-   
-   defc __CLIB_OPT_STDIO = CLIB_OPT_STDIO
-   
    ; dynamic printf
-   
-   IF DEFINED_CLIB_OPT_PRINTF
-      IF !DEFINED_CLIB_OPT_PRINTF_2
-         defc DEFINED_CLIB_OPT_PRINTF_2 = 1
+
+   IFNDEF CLIB_OPT_PRINTF
+      IFDEF CLIB_OPT_PRINTF_2
+         defc CLIB_OPT_PRINTF = 0
+      ENDIF
+   ENDIF
+
+   IFNDEF CLIB_OPT_PRINTF_2
+      IFDEF CLIB_OPT_PRINTF
          defc CLIB_OPT_PRINTF_2 = 0
       ENDIF
    ENDIF
    
-   IF DEFINED_CLIB_OPT_PRINTF_2
-      IF !DEFINED_CLIB_OPT_PRINTF
-         defc DEFINED_CLIB_OPT_PRINTF = 1
-         defc CLIB_OPT_PRINTF = 0
-      ENDIF
-   ENDIF
-   
-   IF DEFINED_CLIB_OPT_PRINTF
-   
-      defc __CLIB_OPT_PRINTF = CLIB_OPT_PRINTF
-      defc __CLIB_OPT_PRINTF_2 = CLIB_OPT_PRINTF_2
+   IFDEF CLIB_OPT_PRINTF
       
       IF __SDCC_IY
       
@@ -70,24 +58,19 @@
    
    ; dynamic scanf
 
-   IF DEFINED_CLIB_OPT_SCANF
-      IF !DEFINED_CLIB_OPT_SCANF_2
-         defc DEFINED_CLIB_OPT_SCANF_2 = 1
+   IFNDEF CLIB_OPT_SCANF
+      IFDEF CLIB_OPT_SCANF_2
+         defc CLIB_OPT_SCANF = 0
+      ENDIF
+   ENDIF
+
+   IFNDEF CLIB_OPT_SCANF_2
+      IFDEF CLIB_OPT_SCANF
          defc CLIB_OPT_SCANF_2 = 0
       ENDIF
    ENDIF
    
-   IF DEFINED_CLIB_OPT_SCANF_2
-      IF !DEFINED_CLIB_OPT_SCANF
-         defc DEFINED_CLIB_OPT_SCANF = 1
-         defc CLIB_OPT_SCANF = 0
-      ENDIF
-   ENDIF
-   
-   IF DEFINED_CLIB_OPT_SCANF
-   
-      defc __CLIB_OPT_SCANF = CLIB_OPT_SCANF
-      defc __CLIB_OPT_SCANF_2 = CLIB_OPT_SCANF_2
+   IFDEF CLIB_OPT_SCANF
       
       IF __SDCC_IY
       

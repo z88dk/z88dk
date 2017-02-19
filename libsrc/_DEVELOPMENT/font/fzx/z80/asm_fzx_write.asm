@@ -1,7 +1,7 @@
 
 ; int fzx_write(struct fzx_state *fs, char *buf, uint16_t buflen)
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_font
 SECTION code_font_fzx

@@ -4,7 +4,7 @@ SECTION smc_sound_bit
 
 PUBLIC _bitfx_12
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 EXTERN asm_bit_open
 
@@ -26,7 +26,7 @@ t2_loop:
    dec h
    jr nz, t2_jump
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push bc
@@ -38,7 +38,7 @@ wait1:
    
    pop bc
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 ts_FR_1:
@@ -58,7 +58,7 @@ t2_jump:
    
    pop af
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
    push bc
@@ -70,7 +70,7 @@ wait2:
    
    pop bc
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    INCLUDE "sound/bit/z80/output_bit_device_2.inc"
 
 ts_FR_2:

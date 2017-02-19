@@ -1,12 +1,11 @@
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_driver
 SECTION code_driver_terminal_output
 
 PUBLIC cpm_01_output_dcio_iterm_msg_bs
 
-EXTERN __CPM_DCIO
 EXTERN asm_cpm_bdos_alt
 
 cpm_01_output_dcio_iterm_msg_bs:

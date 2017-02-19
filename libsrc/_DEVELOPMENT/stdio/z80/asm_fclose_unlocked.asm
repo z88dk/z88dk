@@ -9,7 +9,7 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_stdio
@@ -17,7 +17,7 @@ SECTION code_stdio
 PUBLIC asm_fclose_unlocked, asm0_fclose_unlocked, asm1_fclose_unlocked
 
 EXTERN __stdio_open_file_list, asm_p_forward_list_remove, error_ebadf_mc
-EXTERN STDIO_MSG_FLSH, STDIO_MSG_CLOS, l_jpix, __fcntl_fd_from_fdstruct
+EXTERN l_jpix, __fcntl_fd_from_fdstruct
 EXTERN asm0_close, __stdio_file_destructor, error_znc, asm_heap_free, __stdio_heap
 EXTERN __stdio_closed_file_list, asm_p_forward_list_alt_push_back
 

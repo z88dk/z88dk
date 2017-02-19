@@ -1,12 +1,12 @@
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_driver
 SECTION code_driver_character_input
 
 PUBLIC character_00_input_stdio_msg_read
 
-EXTERN STDIO_MSG_GETC, l_jpix
+EXTERN l_jpix
 
 character_00_input_stdio_msg_read:
 

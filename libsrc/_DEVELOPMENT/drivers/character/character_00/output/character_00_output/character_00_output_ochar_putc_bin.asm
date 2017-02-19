@@ -1,12 +1,10 @@
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_driver
 SECTION code_driver_character_output
 
 PUBLIC character_00_output_ochar_msg_putc_bin
-
-EXTERN OCHAR_MSG_PUTC
 
 character_00_output_ochar_msg_putc_bin:
 

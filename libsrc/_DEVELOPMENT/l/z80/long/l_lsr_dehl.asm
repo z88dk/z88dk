@@ -4,7 +4,7 @@ SECTION code_l
 
 PUBLIC l_lsr_dehl
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
    ; logical shift right 32-bit unsigned long
    ;

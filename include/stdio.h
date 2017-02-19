@@ -2,6 +2,7 @@
 #define __STDIO_H__
 
 #include <sys/compiler.h>
+#include <stdint.h>
 
 /* $Id: stdio.h,v 1.41 2016-11-11 07:55:37 stefano Exp $ */
 
@@ -89,11 +90,12 @@
 
 struct filestr {
         union f0xx {
-                int     fd;
-                u8_t    *ptr;
+                int         fd;
+                uint8_t    *ptr;
         } desc;
-        u8_t    flags;
-        u8_t    ungetc;
+        uint8_t  flags;
+        uint8_t   ungetc;
+        intptr_t extra;
 };
 
 /* For asm routines kinda handy to have a nice DEFVARS of the structure*/
@@ -103,6 +105,7 @@ DEFVARS 0 {
 	fp_desc		ds.w	1
 	fp_flags	ds.b	1
 	fp_ungetc	ds.b	1
+	fp_extra        ds.w	1
 }
 #endasm
 #endif
@@ -141,8 +144,6 @@ extern struct filestr _sgoioblk_end;
 #define stderr &_sgoioblk[2]
 
 
-/* Macros for things we don't use */
-
 #define clearerr(f)
 #ifdef NET_STDIO
 extern int __LIB__ fflush(FILE *);
@@ -155,6 +156,7 @@ extern int __LIB__ fflush(FILE *);
 extern FILE __LIB__ *fopen(const char *name, const char *mode) __smallc;
 extern FILE __LIB__ *freopen(const char *name, const char *mode, FILE *fp) __smallc;
 extern FILE __LIB__ *fdopen(const int fildes, const char *mode) __smallc;
+extern FILE __LIB__ *fmemopen(void *buf, size_t size, const char *mode) __smallc;
 
 extern int __LIB__ fclose(FILE *fp);
 

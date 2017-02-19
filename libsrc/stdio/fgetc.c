@@ -48,12 +48,20 @@ int fgetc(FILE *fp)
 	ld	l,a
 	ld	h,0
 	ld	(ix+fp_ungetc),h
-        jr      fgetc_end
+        jp      fgetc_end
 .no_ungetc
 ; Now do strings
 	ld	a,(ix+fp_flags)
 	and	_IOSTRING
 	jr	z,no_string	;not a string
+	ld	e,(ix+fp_extra)	; check the length
+	ld	d,(ix+fp_extra+1)
+	ld	a,d
+	or	e
+	jr	z,is_eof
+	dec	de
+	ld	(ix+fp_extra),e
+	ld	(ix+fp_extra+1),d
 	ld	e,(ix+fp_desc)
 	ld	d,(ix+fp_desc+1)
 	ld	a,(de)

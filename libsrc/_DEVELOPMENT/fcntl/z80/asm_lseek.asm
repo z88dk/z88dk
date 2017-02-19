@@ -10,14 +10,14 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_fcntl
 
 PUBLIC asm_lseek
 
-EXTERN __fcntl_fdstruct_from_fd_2, STDIO_MSG_SEEK, l_jpix
+EXTERN __fcntl_fdstruct_from_fd_2, l_jpix
 EXTERN error_einval_lmc, error_lmc
 
 asm_lseek:

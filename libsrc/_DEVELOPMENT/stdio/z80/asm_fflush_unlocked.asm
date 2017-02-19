@@ -14,15 +14,13 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_clib
 SECTION code_stdio
 
 PUBLIC asm_fflush_unlocked
 PUBLIC asm0_fflush_unlocked, asm1_fflush_unlocked
-
-EXTERN STDIO_SEEK_CUR, STDIO_MSG_SEEK, STDIO_MSG_FLSH
 
 EXTERN asm__fflushall_unlocked, l_jpix, error_mc, error_znc
 

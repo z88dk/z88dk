@@ -17,7 +17,7 @@
 #include <lib3d.h> 
 
 
-int stencil_add_ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius, unsigned char *stencil)
+void stencil_add_ellipse(int cx, int cy, int sa, int ea, int xradius, int yradius, unsigned char *stencil)
 {
 int i,k;
 

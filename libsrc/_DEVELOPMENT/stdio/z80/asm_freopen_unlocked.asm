@@ -9,13 +9,13 @@
 ;
 ; ===============================================================
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 PUBLIC asm_freopen_unlocked, asm0_freopen_unlocked
 
 EXTERN __stdio_verify_valid, asm1_fclose_unlocked, __stdio_parse_mode
 EXTERN error_zc, error_enotsup_zc, error_einval_zc, l_inc_sp
-EXTERN asm0_vopen, __stdio_file_init, STDIO_MSG_FLSH, l_jpix
+EXTERN asm0_vopen, __stdio_file_init, l_jpix
 EXTERN __stdio_open_file_list, asm_p_forward_list_remove
 EXTERN __stdio_closed_file_list, asm_p_forward_list_alt_push_back
 

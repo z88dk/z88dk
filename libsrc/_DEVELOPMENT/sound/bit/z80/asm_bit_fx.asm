@@ -14,7 +14,7 @@ SECTION code_sound_bit
 
 PUBLIC asm_bit_fx
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 EXTERN l_jphl, asm_bit_open, asm_bit_close
 

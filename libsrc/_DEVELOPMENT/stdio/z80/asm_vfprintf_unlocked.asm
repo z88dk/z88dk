@@ -9,8 +9,12 @@
 ;
 ; ===============================================================
 
-IFNDEF DEFINED_CLIB_OPT_PRINTF
-INCLUDE "clib_cfg.asm"
+IFNDEF CLIB_OPT_PRINTF
+INCLUDE "config_private.inc"
+
+defc CLIB_OPT_PRINTF   = __CLIB_OPT_PRINTF
+defc CLIB_OPT_PRINTF_2 = __CLIB_OPT_PRINTF_2
+
 ENDIF
 
 SECTION code_clib
@@ -69,7 +73,7 @@ asm1_vfprintf_unlocked:
 
 asm0_vfprintf_unlocked:
 
-IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
+IF (CLIB_OPT_PRINTF != 0) || ((CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ld hl,-44
    add hl,sp
@@ -115,7 +119,7 @@ __format_loop_printf:
    pop de
 
 
-IF (__CLIB_OPT_PRINTF = 0) && ((__CLIB_OPT_PRINTF_2 = 0) || __SCCZ80)
+IF (CLIB_OPT_PRINTF = 0) && ((CLIB_OPT_PRINTF_2 = 0) || __SCCZ80)
 
    jr c, error_stream_printf          ; if stream error
 
@@ -152,7 +156,7 @@ format_end_printf:
    ; de = address of format char '\0'
    ; stack = WORKSPACE_44, stack_param
 
-IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
+IF (CLIB_OPT_PRINTF != 0) || ((CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ld hl,46
    add hl,sp
@@ -170,7 +174,7 @@ ENDIF
 
 ; * AA ********************************************************
 
-IF (__CLIB_OPT_PRINTF = 0) && ((__CLIB_OPT_PRINTF_2 = 0) || __SCCZ80)
+IF (CLIB_OPT_PRINTF = 0) && ((CLIB_OPT_PRINTF_2 = 0) || __SCCZ80)
 
    ; completely disable % logic
    ; printf can only be used to output format text
@@ -186,7 +190,7 @@ ENDIF
 
 ; * BB ********************************************************
 
-IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
+IF (CLIB_OPT_PRINTF != 0) || ((CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ; regular % processing
 
@@ -420,7 +424,7 @@ converter_specifier_printf:
    ld a,(de)                   ; a = specifier
    inc de
 
-IF __CLIB_OPT_PRINTF & $800
+IF CLIB_OPT_PRINTF & $800
 
    cp 'I'
    jr z, printf_I              ; converter does not fit tables
@@ -439,7 +443,7 @@ ENDIF
 
    ;;; without long spec
 
-IF __CLIB_OPT_PRINTF & $1ff
+IF CLIB_OPT_PRINTF & $1ff
 
    ld hl,rcon_tbl_printf              ; converters without long spec
    call match_con_printf
@@ -449,7 +453,7 @@ ENDIF
 
 common_spec_printf:
 
-IF __CLIB_OPT_PRINTF & $600
+IF CLIB_OPT_PRINTF & $600
 
    ld hl,acon_tbl_printf              ; converters independent of long spec
    call match_con_printf
@@ -457,7 +461,7 @@ IF __CLIB_OPT_PRINTF & $600
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $3fc00000
+IF CLIB_OPT_PRINTF & $3fc00000
 
    ld hl,fcon_tbl_printf              ; float converters are independent of long spec
    call match_con_printf
@@ -486,7 +490,7 @@ unrecognized_printf:
    ld hl,50
    jp __error_stream_printf
 
-IF __CLIB_OPT_PRINTF_2 && __SDCC
+IF CLIB_OPT_PRINTF_2 && __SDCC
 
    ;;; with longlong spec
 
@@ -504,7 +508,7 @@ ENDIF
 
 long_spec_printf:
    
-IF __CLIB_OPT_PRINTF_2 && __SDCC
+IF CLIB_OPT_PRINTF_2 && __SDCC
 
    jr nz, longlong_spec_printf
 
@@ -514,7 +518,7 @@ ELSE
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $1ff000
+IF CLIB_OPT_PRINTF & $1ff000
 
    ld hl,lcon_tbl_printf              ; converters with long spec
    call match_con_printf
@@ -525,7 +529,7 @@ ENDIF
 
    ;;; conversion matched
 
-IF (__CLIB_OPT_PRINTF & $1ff800) || ((__SDCC) && (__CLIB_OPT_PRINTF & $3fc00000))
+IF (CLIB_OPT_PRINTF & $1ff800) || ((__SDCC) && (CLIB_OPT_PRINTF & $3fc00000))
 
 printf_return_is_4:
 
@@ -534,7 +538,7 @@ printf_return_is_4:
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $800
+IF CLIB_OPT_PRINTF & $800
 
 printf_I:
 
@@ -547,7 +551,7 @@ printf_I:
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF_2 && __SDCC
+IF CLIB_OPT_PRINTF_2 && __SDCC
 
 printf_return_is_8:
 
@@ -556,7 +560,7 @@ printf_return_is_8:
 
 ENDIF
 
-IF (__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)
+IF (__SCCZ80 | __ASM) && (CLIB_OPT_PRINTF & $3fc00000)
 
 printf_return_is_6:
 
@@ -565,7 +569,7 @@ printf_return_is_6:
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $7ff
+IF CLIB_OPT_PRINTF & $7ff
 
 printf_return_is_2:
 
@@ -711,11 +715,11 @@ match_ret_printf:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF & $600
+IF CLIB_OPT_PRINTF & $600
 
 acon_tbl_printf:
 
-IF __CLIB_OPT_PRINTF & $200
+IF CLIB_OPT_PRINTF & $200
 
 defb 's', $80
 EXTERN __stdio_printf_s
@@ -723,7 +727,7 @@ defw __stdio_printf_s
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $400
+IF CLIB_OPT_PRINTF & $400
 
 defb 'c', $80
 EXTERN __stdio_printf_c
@@ -737,11 +741,11 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF & $1ff
+IF CLIB_OPT_PRINTF & $1ff
 
 rcon_tbl_printf:
 
-IF __CLIB_OPT_PRINTF & $01
+IF CLIB_OPT_PRINTF & $01
 
 defb 'd', $d0
 EXTERN __stdio_printf_d
@@ -749,7 +753,7 @@ defw __stdio_printf_d
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $02
+IF CLIB_OPT_PRINTF & $02
 
 defb 'u', $90
 EXTERN __stdio_printf_u
@@ -757,7 +761,7 @@ defw __stdio_printf_u
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $04
+IF CLIB_OPT_PRINTF & $04
 
 defb 'x', $00
 EXTERN __stdio_printf_x
@@ -765,7 +769,7 @@ defw __stdio_printf_x
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $08
+IF CLIB_OPT_PRINTF & $08
 
 defb 'X', $80
 EXTERN __stdio_printf_x
@@ -773,7 +777,7 @@ defw __stdio_printf_x
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $10
+IF CLIB_OPT_PRINTF & $10
 
 defb 'o', $a0
 EXTERN __stdio_printf_o
@@ -781,7 +785,7 @@ defw __stdio_printf_o
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $20
+IF CLIB_OPT_PRINTF & $20
 
 defb 'n', $80
 EXTERN __stdio_printf_n
@@ -789,7 +793,7 @@ defw __stdio_printf_n
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $40
+IF CLIB_OPT_PRINTF & $40
 
 defb 'i', $d0
 EXTERN __stdio_printf_d
@@ -797,7 +801,7 @@ defw __stdio_printf_d
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $80
+IF CLIB_OPT_PRINTF & $80
 
 defb 'p', $80
 EXTERN __stdio_printf_p
@@ -805,7 +809,7 @@ defw __stdio_printf_p
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $100
+IF CLIB_OPT_PRINTF & $100
 
 defb 'B', $90
 EXTERN __stdio_printf_bb
@@ -819,11 +823,11 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF & $3fc00000
+IF CLIB_OPT_PRINTF & $3fc00000
 
 fcon_tbl_printf:
 
-IF __CLIB_OPT_PRINTF & $10000000
+IF CLIB_OPT_PRINTF & $10000000
 
 defb 'g', $00
 EXTERN __stdio_printf_g
@@ -831,7 +835,7 @@ defw __stdio_printf_g
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $20000000
+IF CLIB_OPT_PRINTF & $20000000
 
 defb 'G', $80
 EXTERN __stdio_printf_g
@@ -839,7 +843,7 @@ defw __stdio_printf_g
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $4000000
+IF CLIB_OPT_PRINTF & $4000000
 
 defb 'f', $00
 EXTERN __stdio_printf_f
@@ -847,7 +851,7 @@ defw __stdio_printf_f
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $8000000
+IF CLIB_OPT_PRINTF & $8000000
 
 defb 'F', $80
 EXTERN __stdio_printf_f
@@ -855,7 +859,7 @@ defw __stdio_printf_f
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $1000000
+IF CLIB_OPT_PRINTF & $1000000
 
 defb 'e', $00
 EXTERN __stdio_printf_e
@@ -863,7 +867,7 @@ defw __stdio_printf_e
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $2000000
+IF CLIB_OPT_PRINTF & $2000000
 
 defb 'E', $80
 EXTERN __stdio_printf_e
@@ -871,7 +875,7 @@ defw __stdio_printf_e
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $400000
+IF CLIB_OPT_PRINTF & $400000
 
 defb 'a', $00
 EXTERN __stdio_printf_a
@@ -879,7 +883,7 @@ defw __stdio_printf_a
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $800000
+IF CLIB_OPT_PRINTF & $800000
 
 defb 'A', $80
 EXTERN __stdio_printf_a
@@ -893,11 +897,11 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF & $1ff000
+IF CLIB_OPT_PRINTF & $1ff000
 
 lcon_tbl_printf:
 
-IF __CLIB_OPT_PRINTF & $1000
+IF CLIB_OPT_PRINTF & $1000
 
 defb 'd', $d0
 EXTERN __stdio_printf_ld
@@ -905,7 +909,7 @@ defw __stdio_printf_ld
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $2000
+IF CLIB_OPT_PRINTF & $2000
 
 defb 'u', $90
 EXTERN __stdio_printf_lu
@@ -913,7 +917,7 @@ defw __stdio_printf_lu
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $4000
+IF CLIB_OPT_PRINTF & $4000
 
 defb 'x', $00
 EXTERN __stdio_printf_lx
@@ -921,7 +925,7 @@ defw __stdio_printf_lx
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $8000
+IF CLIB_OPT_PRINTF & $8000
 
 defb 'X', $80
 EXTERN __stdio_printf_lx
@@ -929,7 +933,7 @@ defw __stdio_printf_lx
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $10000
+IF CLIB_OPT_PRINTF & $10000
 
 defb 'o', $a0
 EXTERN __stdio_printf_lo
@@ -937,7 +941,7 @@ defw __stdio_printf_lo
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $20000
+IF CLIB_OPT_PRINTF & $20000
 
 defb 'n', $80
 EXTERN __stdio_printf_ln
@@ -945,7 +949,7 @@ defw __stdio_printf_ln
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $40000
+IF CLIB_OPT_PRINTF & $40000
 
 defb 'i', $d0
 EXTERN __stdio_printf_ld
@@ -953,7 +957,7 @@ defw __stdio_printf_ld
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $80000
+IF CLIB_OPT_PRINTF & $80000
 
 defb 'p', $80
 EXTERN __stdio_printf_lp
@@ -961,7 +965,7 @@ defw __stdio_printf_lp
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF & $100000
+IF CLIB_OPT_PRINTF & $100000
 
 defb 'B', $90
 EXTERN __stdio_printf_lbb
@@ -975,11 +979,11 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF_2 && __SDCC
+IF CLIB_OPT_PRINTF_2 && __SDCC
 
 llcon_tbl_printf:
 
-IF __CLIB_OPT_PRINTF_2 & $01
+IF CLIB_OPT_PRINTF_2 & $01
 
 defb 'd', $d0
 EXTERN __stdio_printf_lld
@@ -987,7 +991,7 @@ defw __stdio_printf_lld
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF_2 & $02
+IF CLIB_OPT_PRINTF_2 & $02
 
 defb 'u', $90
 EXTERN __stdio_printf_llu
@@ -995,7 +999,7 @@ defw __stdio_printf_llu
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF_2 & $04
+IF CLIB_OPT_PRINTF_2 & $04
 
 defb 'x', $00
 EXTERN __stdio_printf_llx
@@ -1003,7 +1007,7 @@ defw __stdio_printf_llx
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF_2 & $08
+IF CLIB_OPT_PRINTF_2 & $08
 
 defb 'X', $80
 EXTERN __stdio_printf_llx
@@ -1011,7 +1015,7 @@ defw __stdio_printf_llx
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF_2 & $10
+IF CLIB_OPT_PRINTF_2 & $10
 
 defb 'o', $a0
 EXTERN __stdio_printf_llo
@@ -1019,7 +1023,7 @@ defw __stdio_printf_llo
 
 ENDIF
 
-IF __CLIB_OPT_PRINTF_2 & $40
+IF CLIB_OPT_PRINTF_2 & $40
 
 defb 'i', $d0
 EXTERN __stdio_printf_lld
@@ -1033,7 +1037,7 @@ ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __CLIB_OPT_PRINTF_2 && __SDCC
+IF CLIB_OPT_PRINTF_2 && __SDCC
 
 printf_return_8:
 
@@ -1068,7 +1072,7 @@ ENDIF
 
 ENDIF
 
-IF ((__SCCZ80 | __ASM) && (__CLIB_OPT_PRINTF & $3fc00000)) || (__CLIB_OPT_PRINTF_2 && __SDCC)
+IF ((__SCCZ80 | __ASM) && (CLIB_OPT_PRINTF & $3fc00000)) || (CLIB_OPT_PRINTF_2 && __SDCC)
 
 printf_return_6:
 
@@ -1207,7 +1211,7 @@ ENDIF
 
 error_stream_printf:
 
-IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
+IF (CLIB_OPT_PRINTF != 0) || ((CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
    ; de = address of format char stopped on ('%' or '\0')
    ; stack = WORKSPACE_44, stack_param
@@ -1232,7 +1236,7 @@ ENDIF
    scf                         ; indicate error
    jp l_neg_hl                 ; hl = - (chars out + 1) < 0
 
-IF (__CLIB_OPT_PRINTF != 0) || ((__CLIB_OPT_PRINTF_2 != 0) && __SDCC)
+IF (CLIB_OPT_PRINTF != 0) || ((CLIB_OPT_PRINTF_2 != 0) && __SDCC)
 
 error_printf_converter_printf:
 

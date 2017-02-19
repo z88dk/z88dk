@@ -16,7 +16,7 @@
 #include <lib3d.h> 
 
 
-int stencil_add_polygon(int cx, int cy, int corners, int r, int sa, unsigned char *stencil)
+void stencil_add_polygon(int cx, int cy, int corners, int r, int sa, unsigned char *stencil)
 {
 
 int i,k;

@@ -4,7 +4,7 @@ SECTION code_sound_bit
 
 PUBLIC _bitfx_18
 
-INCLUDE "clib_target_cfg.asm"
+INCLUDE "config_private.inc"
 
 _bitfx_18:
 
@@ -16,7 +16,7 @@ coff2:
 
    push af
    
-   xor __sound_bit_toggle
+   xor __SOUND_BIT_TOGGLE
    and (hl)
    ld b,a
    

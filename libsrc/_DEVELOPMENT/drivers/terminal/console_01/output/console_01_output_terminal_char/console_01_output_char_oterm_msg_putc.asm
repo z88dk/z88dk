@@ -1,5 +1,5 @@
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_driver
 SECTION code_driver_terminal_output
@@ -10,8 +10,6 @@ PUBLIC console_01_output_char_oterm_msg_putc_raw
 EXTERN l_jpix
 EXTERN console_01_output_char_proc_putchar_scroll
 EXTERN console_01_output_char_proc_linefeed
-
-EXTERN OTERM_MSG_TTY, OTERM_MSG_PRINTC, OTERM_MSG_BELL
 
 console_01_output_char_oterm_msg_putc:
 

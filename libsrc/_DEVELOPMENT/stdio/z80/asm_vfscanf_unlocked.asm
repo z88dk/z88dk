@@ -9,8 +9,12 @@
 ;
 ; ===============================================================
 
-IFNDEF DEFINED_CLIB_OPT_SCANF
-INCLUDE "clib_cfg.asm"
+IFNDEF CLIB_OPT_SCANF
+INCLUDE "config_private.inc"
+
+defc CLIB_OPT_SCANF   = __CLIB_OPT_SCANF
+defc CLIB_OPT_SCANF_2 = __CLIB_OPT_SCANF_2
+
 ENDIF
 
 SECTION code_clib
@@ -72,7 +76,7 @@ asm1_vfscanf_unlocked:
 
 asm0_vfscanf_unlocked:
 
-IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && __SDCC) 
+IF (CLIB_OPT_SCANF != 0) || ((CLIB_OPT_SCANF_2 != 0) && __SDCC) 
 
    ld hl,-40
    add hl,sp
@@ -126,7 +130,7 @@ percent_join_scanf:
 
 exit_success_scanf:
 
-IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && __SDCC)
+IF (CLIB_OPT_SCANF != 0) || ((CLIB_OPT_SCANF_2 != 0) && __SDCC)
 
    ; stack = WORKSPACE_40, stack_param
 
@@ -150,7 +154,7 @@ mismatch_error_scanf:
 
 exit_failure_scanf:
 
-IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && _SDCC)
+IF (CLIB_OPT_SCANF != 0) || ((CLIB_OPT_SCANF_2 != 0) && _SDCC)
 
    ; stack = WORKSPACE_40, stack_param
 
@@ -205,7 +209,7 @@ stream_consume_pct_scanf:
    jr mismatch_error_scanf
 
 
-IF (__CLIB_OPT_SCANF != 0) || ((__CLIB_OPT_SCANF_2 != 0) && __SDCC)
+IF (CLIB_OPT_SCANF != 0) || ((CLIB_OPT_SCANF_2 != 0) && __SDCC)
 
 error_format_width_scanf:
 
@@ -232,7 +236,7 @@ possible_conversion_1_scanf:
    jr z, stream_consume_pct_scanf    ; if format string ends in %
 
 
-IF (__CLIB_OPT_SCANF = 0) && ((__CLIB_OPT_SCANF_2 = 0) || __SCCZ80)
+IF (CLIB_OPT_SCANF = 0) && ((CLIB_OPT_SCANF_2 = 0) || __SCCZ80)
 
    ; completely disable % logic
    ; scanf can only match format chars to the input stream
@@ -324,7 +328,7 @@ suppressed_rejoin_scanf:
    
    ; no long modifier
 
-IF __CLIB_OPT_SCANF & $200000
+IF CLIB_OPT_SCANF & $200000
 
    cp '['
    jr z, _scanf_bkt            ; special treatment for '%['
@@ -347,7 +351,7 @@ spec_return_scanf:
 
 spec_unmodified_scanf:
 
-IF __CLIB_OPT_SCANF & $01
+IF CLIB_OPT_SCANF & $01
 
    cp 'd'
    EXTERN __stdio_scanf_d
@@ -355,7 +359,7 @@ IF __CLIB_OPT_SCANF & $01
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $02
+IF CLIB_OPT_SCANF & $02
    
    cp 'u'
    EXTERN __stdio_scanf_u
@@ -363,7 +367,7 @@ IF __CLIB_OPT_SCANF & $02
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $40
+IF CLIB_OPT_SCANF & $40
    
    cp 'i'
    EXTERN __stdio_scanf_i
@@ -371,7 +375,7 @@ IF __CLIB_OPT_SCANF & $40
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $c0
+IF CLIB_OPT_SCANF & $c0
    
    cp 'x'
    EXTERN __stdio_scanf_x
@@ -379,7 +383,7 @@ IF __CLIB_OPT_SCANF & $c0
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $10
+IF CLIB_OPT_SCANF & $10
    
    cp 'o'
    EXTERN __stdio_scanf_o
@@ -387,7 +391,7 @@ IF __CLIB_OPT_SCANF & $10
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $80
+IF CLIB_OPT_SCANF & $80
    
    cp 'p'
    EXTERN __stdio_scanf_p
@@ -395,7 +399,7 @@ IF __CLIB_OPT_SCANF & $80
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $20
+IF CLIB_OPT_SCANF & $20
    
    cp 'n'
    EXTERN __stdio_scanf_n
@@ -403,7 +407,7 @@ IF __CLIB_OPT_SCANF & $20
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $100
+IF CLIB_OPT_SCANF & $100
    
    cp 'B'
    EXTERN __stdio_scanf_bb
@@ -413,7 +417,7 @@ ENDIF
 
 spec_constant_scanf:
 
-IF __CLIB_OPT_SCANF & $200
+IF CLIB_OPT_SCANF & $200
 
    cp 's'
    EXTERN __stdio_scanf_s
@@ -421,7 +425,7 @@ IF __CLIB_OPT_SCANF & $200
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $400
+IF CLIB_OPT_SCANF & $400
    
    cp 'c'
    EXTERN __stdio_scanf_c
@@ -429,7 +433,7 @@ IF __CLIB_OPT_SCANF & $400
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $800
+IF CLIB_OPT_SCANF & $800
    
    cp 'I'
    EXTERN __stdio_scanf_ii
@@ -460,7 +464,7 @@ long_spec_scanf:
 
 __spec_long_scanf:
 
-IF __CLIB_OPT_SCANF & $1000
+IF CLIB_OPT_SCANF & $1000
 
    cp 'd'
    EXTERN __stdio_scanf_ld
@@ -468,7 +472,7 @@ IF __CLIB_OPT_SCANF & $1000
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $2000
+IF CLIB_OPT_SCANF & $2000
    
    cp 'u'
    EXTERN __stdio_scanf_lu
@@ -476,7 +480,7 @@ IF __CLIB_OPT_SCANF & $2000
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $40000
+IF CLIB_OPT_SCANF & $40000
    
    cp 'i'
    EXTERN __stdio_scanf_li
@@ -484,7 +488,7 @@ IF __CLIB_OPT_SCANF & $40000
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $c000
+IF CLIB_OPT_SCANF & $c000
    
    cp 'x'
    EXTERN __stdio_scanf_lx
@@ -492,7 +496,7 @@ IF __CLIB_OPT_SCANF & $c000
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $10000
+IF CLIB_OPT_SCANF & $10000
    
    cp 'o'
    EXTERN __stdio_scanf_lo
@@ -500,7 +504,7 @@ IF __CLIB_OPT_SCANF & $10000
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $80000
+IF CLIB_OPT_SCANF & $80000
    
    cp 'p'
    EXTERN __stdio_scanf_lp
@@ -508,7 +512,7 @@ IF __CLIB_OPT_SCANF & $80000
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $20000
+IF CLIB_OPT_SCANF & $20000
    
    cp 'n'
    EXTERN __stdio_scanf_ln
@@ -516,7 +520,7 @@ IF __CLIB_OPT_SCANF & $20000
 
 ENDIF
 
-IF __CLIB_OPT_SCANF & $100000
+IF CLIB_OPT_SCANF & $100000
    
    cp 'B'
    EXTERN __stdio_scanf_lbb
@@ -526,7 +530,7 @@ ENDIF
 
    jr spec_constant_scanf
    
-IF __CLIB_OPT_SCANF & $200000
+IF CLIB_OPT_SCANF & $200000
 
 _scanf_bkt:
 
@@ -556,9 +560,9 @@ longlong_spec_scanf:
 
 __spec_longlong_scanf:
 
-IF __CLIB_OPT_SCANF_2 && __SDCC
+IF CLIB_OPT_SCANF_2 && __SDCC
 
-IF __CLIB_OPT_SCANF_2 & $01
+IF CLIB_OPT_SCANF_2 & $01
 
    cp 'd'
    EXTERN __stdio_scanf_lld
@@ -566,7 +570,7 @@ IF __CLIB_OPT_SCANF_2 & $01
 
 ENDIF
 
-IF __CLIB_OPT_SCANF_2 & $02
+IF CLIB_OPT_SCANF_2 & $02
    
    cp 'u'
    EXTERN __stdio_scanf_llu
@@ -574,7 +578,7 @@ IF __CLIB_OPT_SCANF_2 & $02
 
 ENDIF
 
-IF __CLIB_OPT_SCANF_2 & $40
+IF CLIB_OPT_SCANF_2 & $40
    
    cp 'i'
    EXTERN __stdio_scanf_lli
@@ -582,7 +586,7 @@ IF __CLIB_OPT_SCANF_2 & $40
 
 ENDIF
 
-IF __CLIB_OPT_SCANF_2 & $0c
+IF CLIB_OPT_SCANF_2 & $0c
    
    cp 'x'
    EXTERN __stdio_scanf_llx
@@ -590,7 +594,7 @@ IF __CLIB_OPT_SCANF_2 & $0c
 
 ENDIF
 
-IF __CLIB_OPT_SCANF_2 & $10
+IF CLIB_OPT_SCANF_2 & $10
    
    cp 'o'
    EXTERN __stdio_scanf_llo

@@ -1,5 +1,6 @@
 **/*.d
 **/*.exe
+**/*.err
 **/*.lib
 **/*.o
 **/*.out
@@ -63,3 +64,9 @@ libsrc/_DEVELOPMENT/arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm
 libsrc/_DEVELOPMENT/arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm
 libsrc/_DEVELOPMENT/arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm
 libsrc/_DEVELOPMENT/arch/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm
+libsrc/_DEVELOPMENT/target/cpm/cpm_crt.asm
+libsrc/_DEVELOPMENT/target/rc2014/rc2014_crt.asm
+libsrc/_DEVELOPMENT/target/sms/sms_crt.asm
+libsrc/_DEVELOPMENT/target/z180/z180_crt.asm
+libsrc/_DEVELOPMENT/target/z80/z80_crt.asm
+libsrc/_DEVELOPMENT/target/zx/zx_crt.asm

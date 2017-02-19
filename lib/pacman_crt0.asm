@@ -31,7 +31,7 @@
 ; Include zcc_opt.def to find out information about us
 ;-------
 
-	defc 	DEFINED_nostreams = 1
+	;defc 	DEFINED_nostreams = 1
 	defc    crt0 = 1
 	
 	INCLUDE "zcc_opt.def"

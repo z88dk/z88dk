@@ -1,12 +1,11 @@
 
-INCLUDE "clib_cfg.asm"
+INCLUDE "config_private.inc"
 
 SECTION code_driver
 SECTION code_driver_character_input
 
 PUBLIC cpm_00_input_reader_ichar_msg_getc
 
-EXTERN __CPM_RRDR
 EXTERN asm_cpm_bdos_alt, error_mc
 
 cpm_00_input_reader_ichar_msg_getc:

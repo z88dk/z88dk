@@ -1,5 +1,5 @@
 include(`z88dk.m4')
-include(`clib_target_cfg.asm')
+include(`config_private.inc')
 
 SECTION BIFROST2
 org 51625
