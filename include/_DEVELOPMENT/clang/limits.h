@@ -6,7 +6,7 @@
 #define _LIMITS_H
 
 extern unsigned char   _MAX_OPEN[];
-#define OPEN_MAX       ((int)_MAX_OPEN)
+#define OPEN_MAX       ((unsigned int)_MAX_OPEN)
 
 #define CHAR_BIT       8
 
