@@ -30,16 +30,16 @@ extern void __LIB__ __FASTCALL__ ba_stack_destroy(ba_stack_t *s);
 extern int __LIB__ __FASTCALL__ ba_stack_empty(ba_stack_t *s);
 
 
-extern ba_stack_t __LIB__ *ba_stack_init(void *p,void *data,size_t capacity);
-extern ba_stack_t __LIB__ __CALLEE__ *ba_stack_init_callee(void *p,void *data,size_t capacity);
+extern ba_stack_t __LIB__ *ba_stack_init(void *p,void *data,size_t capacity) __smallc;
+extern ba_stack_t __LIB__ __CALLEE__ *ba_stack_init_callee(void *p,void *data,size_t capacity) __smallc;
 #define ba_stack_init(a,b,c) ba_stack_init_callee(a,b,c)
 
 
 extern int __LIB__ __FASTCALL__ ba_stack_pop(ba_stack_t *s);
 
 
-extern int __LIB__ ba_stack_push(ba_stack_t *s,int c);
-extern int __LIB__ __CALLEE__ ba_stack_push_callee(ba_stack_t *s,int c);
+extern int __LIB__ ba_stack_push(ba_stack_t *s,int c) __smallc;
+extern int __LIB__ __CALLEE__ ba_stack_push_callee(ba_stack_t *s,int c) __smallc;
 #define ba_stack_push(a,b) ba_stack_push_callee(a,b)
 
 

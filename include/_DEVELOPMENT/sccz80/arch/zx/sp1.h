@@ -181,18 +181,18 @@ extern void    SP1_DRAW_LOAD2RBIM(void);    // load sprite 2-byte definition (ma
 extern void    SP1_DRAW_ATTR(void);         // pixels are not drawn, only attributes
 
 
-extern struct sp1_ss __LIB__ *sp1_CreateSpr(void *drawf,uint16_t type,uint16_t height,int graphic,uint16_t plane);
-extern struct sp1_ss __LIB__ __CALLEE__ *sp1_CreateSpr_callee(void *drawf,uint16_t type,uint16_t height,int graphic,uint16_t plane);
+extern struct sp1_ss __LIB__ *sp1_CreateSpr(void *drawf,uint16_t type,uint16_t height,int graphic,uint16_t plane) __smallc;
+extern struct sp1_ss __LIB__ __CALLEE__ *sp1_CreateSpr_callee(void *drawf,uint16_t type,uint16_t height,int graphic,uint16_t plane) __smallc;
 #define sp1_CreateSpr(a,b,c,d,e) sp1_CreateSpr_callee(a,b,c,d,e)
 
 
-extern uint16_t __LIB__ sp1_AddColSpr(struct sp1_ss *s,void *drawf,uint16_t type,int graphic,uint16_t plane);
-extern uint16_t __LIB__ __CALLEE__ sp1_AddColSpr_callee(struct sp1_ss *s,void *drawf,uint16_t type,int graphic,uint16_t plane);
+extern uint16_t __LIB__ sp1_AddColSpr(struct sp1_ss *s,void *drawf,uint16_t type,int graphic,uint16_t plane) __smallc;
+extern uint16_t __LIB__ __CALLEE__ sp1_AddColSpr_callee(struct sp1_ss *s,void *drawf,uint16_t type,int graphic,uint16_t plane) __smallc;
 #define sp1_AddColSpr(a,b,c,d,e) sp1_AddColSpr_callee(a,b,c,d,e)
 
 
-extern void __LIB__ sp1_ChangeSprType(struct sp1_cs *c,void *drawf);
-extern void __LIB__ __CALLEE__ sp1_ChangeSprType_callee(struct sp1_cs *c,void *drawf);
+extern void __LIB__ sp1_ChangeSprType(struct sp1_cs *c,void *drawf) __smallc;
+extern void __LIB__ __CALLEE__ sp1_ChangeSprType_callee(struct sp1_cs *c,void *drawf) __smallc;
 #define sp1_ChangeSprType(a,b) sp1_ChangeSprType_callee(a,b)
 
 
@@ -200,62 +200,62 @@ extern void __LIB__ __FASTCALL__ sp1_DeleteSpr(struct sp1_ss *s);
 
 // only call after sprite is removed from screen
 
-extern void __LIB__ sp1_MoveSprAbs(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t row,uint16_t col,uint16_t vrot,uint16_t hrot);
-extern void __LIB__ __CALLEE__ sp1_MoveSprAbs_callee(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t row,uint16_t col,uint16_t vrot,uint16_t hrot);
+extern void __LIB__ sp1_MoveSprAbs(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t row,uint16_t col,uint16_t vrot,uint16_t hrot) __smallc;
+extern void __LIB__ __CALLEE__ sp1_MoveSprAbs_callee(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t row,uint16_t col,uint16_t vrot,uint16_t hrot) __smallc;
 #define sp1_MoveSprAbs(a,b,c,d,e,f,g) sp1_MoveSprAbs_callee(a,b,c,d,e,f,g)
 
 
-extern void __LIB__ sp1_MoveSprRel(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,int rel_row,int rel_col,int rel_vrot,int rel_hrot);
-extern void __LIB__ __CALLEE__ sp1_MoveSprRel_callee(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,int rel_row,int rel_col,int rel_vrot,int rel_hrot);
+extern void __LIB__ sp1_MoveSprRel(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,int rel_row,int rel_col,int rel_vrot,int rel_hrot) __smallc;
+extern void __LIB__ __CALLEE__ sp1_MoveSprRel_callee(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,int rel_row,int rel_col,int rel_vrot,int rel_hrot) __smallc;
 #define sp1_MoveSprRel(a,b,c,d,e,f,g) sp1_MoveSprRel_callee(a,b,c,d,e,f,g)
 
 
-extern void __LIB__ sp1_MoveSprPix(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t x,uint16_t y);
-extern void __LIB__ __CALLEE__ sp1_MoveSprPix_callee(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t x,uint16_t y);
+extern void __LIB__ sp1_MoveSprPix(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t x,uint16_t y) __smallc;
+extern void __LIB__ __CALLEE__ sp1_MoveSprPix_callee(struct sp1_ss *s,struct sp1_Rect *clip,void *frame,uint16_t x,uint16_t y) __smallc;
 #define sp1_MoveSprPix(a,b,c,d,e) sp1_MoveSprPix_callee(a,b,c,d,e)
 
 
 
-extern void __LIB__ sp1_IterateSprChar(struct sp1_ss *s,void *hook1);
-extern void __LIB__ __CALLEE__ sp1_IterateSprChar_callee(struct sp1_ss *s,void *hook1);
+extern void __LIB__ sp1_IterateSprChar(struct sp1_ss *s,void *hook1) __smallc;
+extern void __LIB__ __CALLEE__ sp1_IterateSprChar_callee(struct sp1_ss *s,void *hook1) __smallc;
 #define sp1_IterateSprChar(a,b) sp1_IterateSprChar_callee(a,b)
 
 
-extern void __LIB__ sp1_IterateUpdateSpr(struct sp1_ss *s,void *hook2);
-extern void __LIB__ __CALLEE__ sp1_IterateUpdateSpr_callee(struct sp1_ss *s,void *hook2);
+extern void __LIB__ sp1_IterateUpdateSpr(struct sp1_ss *s,void *hook2) __smallc;
+extern void __LIB__ __CALLEE__ sp1_IterateUpdateSpr_callee(struct sp1_ss *s,void *hook2) __smallc;
 #define sp1_IterateUpdateSpr(a,b) sp1_IterateUpdateSpr_callee(a,b)
 
 
 
-extern void __LIB__ sp1_GetSprClrAddr(struct sp1_ss *s,uint8_t **sprdest);
-extern void __LIB__ __CALLEE__ sp1_GetSprClrAddr_callee(struct sp1_ss *s,uint8_t **sprdest);
+extern void __LIB__ sp1_GetSprClrAddr(struct sp1_ss *s,uint8_t **sprdest) __smallc;
+extern void __LIB__ __CALLEE__ sp1_GetSprClrAddr_callee(struct sp1_ss *s,uint8_t **sprdest) __smallc;
 #define sp1_GetSprClrAddr(a,b) sp1_GetSprClrAddr_callee(a,b)
 
 
-extern void __LIB__ sp1_PutSprClr(uint8_t **sprdest,struct sp1_ap *src,uint16_t n);
-extern void __LIB__ __CALLEE__ sp1_PutSprClr_callee(uint8_t **sprdest,struct sp1_ap *src,uint16_t n);
+extern void __LIB__ sp1_PutSprClr(uint8_t **sprdest,struct sp1_ap *src,uint16_t n) __smallc;
+extern void __LIB__ __CALLEE__ sp1_PutSprClr_callee(uint8_t **sprdest,struct sp1_ap *src,uint16_t n) __smallc;
 #define sp1_PutSprClr(a,b,c) sp1_PutSprClr_callee(a,b,c)
 
 
-extern void __LIB__ sp1_GetSprClr(uint8_t **sprsrc,struct sp1_ap *dest,uint16_t n);
-extern void __LIB__ __CALLEE__ sp1_GetSprClr_callee(uint8_t **sprsrc,struct sp1_ap *dest,uint16_t n);
+extern void __LIB__ sp1_GetSprClr(uint8_t **sprsrc,struct sp1_ap *dest,uint16_t n) __smallc;
+extern void __LIB__ __CALLEE__ sp1_GetSprClr_callee(uint8_t **sprsrc,struct sp1_ap *dest,uint16_t n) __smallc;
 #define sp1_GetSprClr(a,b,c) sp1_GetSprClr_callee(a,b,c)
 
 
 
-extern void __LIB__ *sp1_PreShiftSpr(uint16_t flag,uint16_t height,uint16_t width,void *srcframe,void *destframe,uint16_t rshift);
-extern void __LIB__ __CALLEE__ *sp1_PreShiftSpr_callee(uint16_t flag,uint16_t height,uint16_t width,void *srcframe,void *destframe,uint16_t rshift);
+extern void __LIB__ *sp1_PreShiftSpr(uint16_t flag,uint16_t height,uint16_t width,void *srcframe,void *destframe,uint16_t rshift) __smallc;
+extern void __LIB__ __CALLEE__ *sp1_PreShiftSpr_callee(uint16_t flag,uint16_t height,uint16_t width,void *srcframe,void *destframe,uint16_t rshift) __smallc;
 #define sp1_PreShiftSpr(a,b,c,d,e,f) sp1_PreShiftSpr_callee(a,b,c,d,e,f)
 
 
 
-extern void __LIB__ sp1_InitCharStruct(struct sp1_cs *cs,void *drawf,uint16_t type,void *graphic,uint16_t plane);
-extern void __LIB__ __CALLEE__ sp1_InitCharStruct_callee(struct sp1_cs *cs,void *drawf,uint16_t type,void *graphic,uint16_t plane);
+extern void __LIB__ sp1_InitCharStruct(struct sp1_cs *cs,void *drawf,uint16_t type,void *graphic,uint16_t plane) __smallc;
+extern void __LIB__ __CALLEE__ sp1_InitCharStruct_callee(struct sp1_cs *cs,void *drawf,uint16_t type,void *graphic,uint16_t plane) __smallc;
 #define sp1_InitCharStruct(a,b,c,d,e) sp1_InitCharStruct_callee(a,b,c,d,e)
 
 
-extern void __LIB__ sp1_InsertCharStruct(struct sp1_update *u,struct sp1_cs *cs);
-extern void __LIB__ __CALLEE__ sp1_InsertCharStruct_callee(struct sp1_update *u,struct sp1_cs *cs);
+extern void __LIB__ sp1_InsertCharStruct(struct sp1_update *u,struct sp1_cs *cs) __smallc;
+extern void __LIB__ __CALLEE__ sp1_InsertCharStruct_callee(struct sp1_update *u,struct sp1_cs *cs) __smallc;
 #define sp1_InsertCharStruct(a,b) sp1_InsertCharStruct_callee(a,b)
 
 
@@ -276,67 +276,67 @@ extern void __LIB__ __FASTCALL__ sp1_RemoveCharStruct(struct sp1_cs *cs);
 #define SP1_PSSFLAG_YINC        0x04
 #define SP1_PSSFLAG_YWRAP       0x08
 
-extern void __LIB__ *sp1_TileEntry(uint16_t c,void *def);
-extern void __LIB__ __CALLEE__ *sp1_TileEntry_callee(uint16_t c,void *def);
+extern void __LIB__ *sp1_TileEntry(uint16_t c,void *def) __smallc;
+extern void __LIB__ __CALLEE__ *sp1_TileEntry_callee(uint16_t c,void *def) __smallc;
 #define sp1_TileEntry(a,b) sp1_TileEntry_callee(a,b)
 
 
 
-extern void __LIB__ sp1_PrintAt(uint16_t row,uint16_t col,uint16_t colour,uint16_t tile);
-extern void __LIB__ __CALLEE__ sp1_PrintAt_callee(uint16_t row,uint16_t col,uint16_t colour,uint16_t tile);
+extern void __LIB__ sp1_PrintAt(uint16_t row,uint16_t col,uint16_t colour,uint16_t tile) __smallc;
+extern void __LIB__ __CALLEE__ sp1_PrintAt_callee(uint16_t row,uint16_t col,uint16_t colour,uint16_t tile) __smallc;
 #define sp1_PrintAt(a,b,c,d) sp1_PrintAt_callee(a,b,c,d)
 
 
-extern void __LIB__ sp1_PrintAtInv(uint16_t row,uint16_t col,uint16_t colour,uint16_t tile);
-extern void __LIB__ __CALLEE__ sp1_PrintAtInv_callee(uint16_t row,uint16_t col,uint16_t colour,uint16_t tile);
+extern void __LIB__ sp1_PrintAtInv(uint16_t row,uint16_t col,uint16_t colour,uint16_t tile) __smallc;
+extern void __LIB__ __CALLEE__ sp1_PrintAtInv_callee(uint16_t row,uint16_t col,uint16_t colour,uint16_t tile) __smallc;
 #define sp1_PrintAtInv(a,b,c,d) sp1_PrintAtInv_callee(a,b,c,d)
 
 
-extern uint16_t __LIB__ sp1_ScreenStr(uint16_t row,uint16_t col);
-extern uint16_t __LIB__ __CALLEE__ sp1_ScreenStr_callee(uint16_t row,uint16_t col);
+extern uint16_t __LIB__ sp1_ScreenStr(uint16_t row,uint16_t col) __smallc;
+extern uint16_t __LIB__ __CALLEE__ sp1_ScreenStr_callee(uint16_t row,uint16_t col) __smallc;
 #define sp1_ScreenStr(a,b) sp1_ScreenStr_callee(a,b)
 
 
-extern uint16_t __LIB__ sp1_ScreenAttr(uint16_t row,uint16_t col);
-extern uint16_t __LIB__ __CALLEE__ sp1_ScreenAttr_callee(uint16_t row,uint16_t col);
+extern uint16_t __LIB__ sp1_ScreenAttr(uint16_t row,uint16_t col) __smallc;
+extern uint16_t __LIB__ __CALLEE__ sp1_ScreenAttr_callee(uint16_t row,uint16_t col) __smallc;
 #define sp1_ScreenAttr(a,b) sp1_ScreenAttr_callee(a,b)
 
 
 
-extern void __LIB__ sp1_PrintString(struct sp1_pss *ps,uint8_t *s);
-extern void __LIB__ __CALLEE__ sp1_PrintString_callee(struct sp1_pss *ps,uint8_t *s);
+extern void __LIB__ sp1_PrintString(struct sp1_pss *ps,uint8_t *s) __smallc;
+extern void __LIB__ __CALLEE__ sp1_PrintString_callee(struct sp1_pss *ps,uint8_t *s) __smallc;
 #define sp1_PrintString(a,b) sp1_PrintString_callee(a,b)
 
 
-extern void __LIB__ sp1_SetPrintPos(struct sp1_pss *ps,uint16_t row,uint16_t col);
-extern void __LIB__ __CALLEE__ sp1_SetPrintPos_callee(struct sp1_pss *ps,uint16_t row,uint16_t col);
+extern void __LIB__ sp1_SetPrintPos(struct sp1_pss *ps,uint16_t row,uint16_t col) __smallc;
+extern void __LIB__ __CALLEE__ sp1_SetPrintPos_callee(struct sp1_pss *ps,uint16_t row,uint16_t col) __smallc;
 #define sp1_SetPrintPos(a,b,c) sp1_SetPrintPos_callee(a,b,c)
 
 
 
-extern void __LIB__ sp1_GetTiles(struct sp1_Rect *r,struct sp1_tp *dest);
-extern void __LIB__ __CALLEE__ sp1_GetTiles_callee(struct sp1_Rect *r,struct sp1_tp *dest);
+extern void __LIB__ sp1_GetTiles(struct sp1_Rect *r,struct sp1_tp *dest) __smallc;
+extern void __LIB__ __CALLEE__ sp1_GetTiles_callee(struct sp1_Rect *r,struct sp1_tp *dest) __smallc;
 #define sp1_GetTiles(a,b) sp1_GetTiles_callee(a,b)
 
 
-extern void __LIB__ sp1_PutTiles(struct sp1_Rect *r,struct sp1_tp *src);
-extern void __LIB__ __CALLEE__ sp1_PutTiles_callee(struct sp1_Rect *r,struct sp1_tp *src);
+extern void __LIB__ sp1_PutTiles(struct sp1_Rect *r,struct sp1_tp *src) __smallc;
+extern void __LIB__ __CALLEE__ sp1_PutTiles_callee(struct sp1_Rect *r,struct sp1_tp *src) __smallc;
 #define sp1_PutTiles(a,b) sp1_PutTiles_callee(a,b)
 
 
-extern void __LIB__ sp1_PutTilesInv(struct sp1_Rect *r,struct sp1_tp *src);
-extern void __LIB__ __CALLEE__ sp1_PutTilesInv_callee(struct sp1_Rect *r,struct sp1_tp *src);
+extern void __LIB__ sp1_PutTilesInv(struct sp1_Rect *r,struct sp1_tp *src) __smallc;
+extern void __LIB__ __CALLEE__ sp1_PutTilesInv_callee(struct sp1_Rect *r,struct sp1_tp *src) __smallc;
 #define sp1_PutTilesInv(a,b) sp1_PutTilesInv_callee(a,b)
 
 
 
-extern void __LIB__ sp1_ClearRect(struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag);
-extern void __LIB__ __CALLEE__ sp1_ClearRect_callee(struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag);
+extern void __LIB__ sp1_ClearRect(struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag) __smallc;
+extern void __LIB__ __CALLEE__ sp1_ClearRect_callee(struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag) __smallc;
 #define sp1_ClearRect(a,b,c,d) sp1_ClearRect_callee(a,b,c,d)
 
 
-extern void __LIB__ sp1_ClearRectInv(struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag);
-extern void __LIB__ __CALLEE__ sp1_ClearRectInv_callee(struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag);
+extern void __LIB__ sp1_ClearRectInv(struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag) __smallc;
+extern void __LIB__ __CALLEE__ sp1_ClearRectInv_callee(struct sp1_Rect *r,uint16_t colour,uint16_t tile,uint16_t rflag) __smallc;
 #define sp1_ClearRectInv(a,b,c,d) sp1_ClearRectInv_callee(a,b,c,d)
 
 
@@ -351,27 +351,27 @@ extern void __LIB__ __CALLEE__ sp1_ClearRectInv_callee(struct sp1_Rect *r,uint16
 
 // void *hook  <->  void [ __FASTCALL__ ] (*hook)(struct sp1_update *u)
 
-extern void __LIB__ sp1_Initialize(uint16_t iflag,uint16_t colour,uint16_t tile);
-extern void __LIB__ __CALLEE__ sp1_Initialize_callee(uint16_t iflag,uint16_t colour,uint16_t tile);
+extern void __LIB__ sp1_Initialize(uint16_t iflag,uint16_t colour,uint16_t tile) __smallc;
+extern void __LIB__ __CALLEE__ sp1_Initialize_callee(uint16_t iflag,uint16_t colour,uint16_t tile) __smallc;
 #define sp1_Initialize(a,b,c) sp1_Initialize_callee(a,b,c)
 
 
-extern void __LIB__ sp1_UpdateNow(void);
+extern void __LIB__ sp1_UpdateNow(void) __smallc;
 
 
 
-extern struct sp1_update __LIB__ *sp1_GetUpdateStruct(uint16_t row,uint16_t col);
-extern struct sp1_update __LIB__ __CALLEE__ *sp1_GetUpdateStruct_callee(uint16_t row,uint16_t col);
+extern struct sp1_update __LIB__ *sp1_GetUpdateStruct(uint16_t row,uint16_t col) __smallc;
+extern struct sp1_update __LIB__ __CALLEE__ *sp1_GetUpdateStruct_callee(uint16_t row,uint16_t col) __smallc;
 #define sp1_GetUpdateStruct(a,b) sp1_GetUpdateStruct_callee(a,b)
 
 
-extern void __LIB__ sp1_IterateUpdateArr(struct sp1_update **ua,void *hook);
-extern void __LIB__ __CALLEE__ sp1_IterateUpdateArr_callee(struct sp1_update **ua,void *hook);
+extern void __LIB__ sp1_IterateUpdateArr(struct sp1_update **ua,void *hook) __smallc;
+extern void __LIB__ __CALLEE__ sp1_IterateUpdateArr_callee(struct sp1_update **ua,void *hook) __smallc;
 #define sp1_IterateUpdateArr(a,b) sp1_IterateUpdateArr_callee(a,b)
 
 // zero terminated array
-extern void __LIB__ sp1_IterateUpdateRect(struct sp1_Rect *r,void *hook);
-extern void __LIB__ __CALLEE__ sp1_IterateUpdateRect_callee(struct sp1_Rect *r,void *hook);
+extern void __LIB__ sp1_IterateUpdateRect(struct sp1_Rect *r,void *hook) __smallc;
+extern void __LIB__ __CALLEE__ sp1_IterateUpdateRect_callee(struct sp1_Rect *r,void *hook) __smallc;
 #define sp1_IterateUpdateRect(a,b) sp1_IterateUpdateRect_callee(a,b)
 
 

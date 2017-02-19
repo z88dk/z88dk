@@ -21,7 +21,7 @@
 // Activate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_start(void);
+extern void __LIB__ NIRVANAP_start(void) __smallc;
 
 
 
@@ -29,7 +29,7 @@ extern void __LIB__ NIRVANAP_start(void);
 // Deactivate NIRVANA ENGINE
 // ----------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_stop(void);
+extern void __LIB__ NIRVANAP_stop(void) __smallc;
 
 
 
@@ -77,13 +77,13 @@ extern unsigned char NIRVANAP_HOLE[NIRVANAP_HOLE_SIZE];
 //          occurs, program may crash!!! (see NIRVANAP_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_drawT(unsigned char tile,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_drawT_callee(unsigned char tile,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_drawT(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_drawT_callee(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_drawT(a,b,c) NIRVANAP_drawT_callee(a,b,c)
 
 
-extern void __LIB__ NIRVANAP_drawT_raw(unsigned char tile,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_drawT_raw_callee(unsigned char tile,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_drawT_raw(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_drawT_raw_callee(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_drawT_raw(a,b,c) NIRVANAP_drawT_raw_callee(a,b,c)
 
 
@@ -102,13 +102,13 @@ extern void __LIB__ __CALLEE__ NIRVANAP_drawT_raw_callee(unsigned char tile,unsi
 //          occurs, program may crash!!! (see NIRVANAhalt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_fillT(unsigned char attr,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_fillT_callee(unsigned char attr,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_fillT(unsigned char attr,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_fillT_callee(unsigned char attr,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_fillT(a,b,c) NIRVANAP_fillT_callee(a,b,c)
 
 
-extern void __LIB__ NIRVANAP_fillT_raw(unsigned char attr,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_fillT_raw_callee(unsigned char attr,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_fillT_raw(unsigned char attr,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_fillT_raw_callee(unsigned char attr,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_fillT_raw(a,b,c) NIRVANAP_fillT_raw_callee(a,b,c)
 
 
@@ -124,8 +124,8 @@ extern void __LIB__ __CALLEE__ NIRVANAP_fillT_raw_callee(unsigned char attr,unsi
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_printC(unsigned char ch,void *attrs,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_printC_callee(unsigned char ch,void *attrs,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_printC(unsigned char ch,void *attrs,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_printC_callee(unsigned char ch,void *attrs,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_printC(a,b,c,d) NIRVANAP_printC_callee(a,b,c,d)
 
 
@@ -140,8 +140,8 @@ extern void __LIB__ __CALLEE__ NIRVANAP_printC_callee(unsigned char ch,void *att
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_paintC(void *attrs,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_paintC_callee(void *attrs,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_paintC(void *attrs,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_paintC_callee(void *attrs,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_paintC(a,b,c) NIRVANAP_paintC_callee(a,b,c)
 
 
@@ -155,8 +155,8 @@ extern void __LIB__ __CALLEE__ NIRVANAP_paintC_callee(void *attrs,unsigned char 
 //     col: char column (0-31)
 // -----------------------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_readC(void *attrs,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_readC_callee(void *attrs,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_readC(void *attrs,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_readC_callee(void *attrs,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_readC(a,b,c) NIRVANAP_readC_callee(a,b,c)
 
 
@@ -172,8 +172,8 @@ extern void __LIB__ __CALLEE__ NIRVANAP_readC_callee(void *attrs,unsigned char l
 //     col: char column (0-31)
 // ----------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_fillC(unsigned char attr,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_fillC_callee(unsigned char attr,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_fillC(unsigned char attr,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_fillC_callee(unsigned char attr,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_fillC(a,b,c) NIRVANAP_fillC_callee(a,b,c)
 
 
@@ -203,8 +203,8 @@ extern void __LIB__ __CALLEE__ NIRVANAP_fillC_callee(unsigned char attr,unsigned
 //          NIRVANAhalt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_spriteT(unsigned char sprite,unsigned char tile,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_spriteT_callee(unsigned char sprite,unsigned char tile,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_spriteT(unsigned char sprite,unsigned char tile,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_spriteT_callee(unsigned char sprite,unsigned char tile,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_spriteT(a,b,c,d) NIRVANAP_spriteT_callee(a,b,c,d)
 
 
@@ -223,13 +223,13 @@ extern void __LIB__ __CALLEE__ NIRVANAP_spriteT_callee(unsigned char sprite,unsi
 // WARNING: This routine is only available if NIRVANA_drawW was enabled!!!
 // -----------------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_drawW(unsigned char tile,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_drawW_callee(unsigned char tile,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_drawW(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_drawW_callee(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_drawW(a,b,c) NIRVANAP_drawW_callee(a,b,c)
 
 
-extern void __LIB__ NIRVANAP_drawW_raw(unsigned char tile,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_drawW_raw_callee(unsigned char tile,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_drawW_raw(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_drawW_raw_callee(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_drawW_raw(a,b,c) NIRVANAP_drawW_raw_callee(a,b,c)
 
 
@@ -249,13 +249,13 @@ extern void __LIB__ __CALLEE__ NIRVANAP_drawW_raw_callee(unsigned char tile,unsi
 // WARNING: This routine is only available if NIRVANA_drawW was enabled!!!
 // ----------------------------------------------------------------------------------
 
-extern void __LIB__ NIRVANAP_drawTW(unsigned char tile,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_drawTW_callee(unsigned char tile,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_drawTW(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_drawTW_callee(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_drawTW(a,b,c) NIRVANAP_drawTW_callee(a,b,c)
 
 
-extern void __LIB__ NIRVANAP_drawTW_raw(unsigned char tile,unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ NIRVANAP_drawTW_raw_callee(unsigned char tile,unsigned char lin,unsigned char col);
+extern void __LIB__ NIRVANAP_drawTW_raw(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ NIRVANAP_drawTW_raw_callee(unsigned char tile,unsigned char lin,unsigned char col) __smallc;
 #define NIRVANAP_drawTW_raw(a,b,c) NIRVANAP_drawTW_raw_callee(a,b,c)
 
 

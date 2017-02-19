@@ -35,8 +35,8 @@ extern void __LIB__ __FASTCALL__ bv_priority_queue_destroy(bv_priority_queue_t *
 extern int __LIB__ __FASTCALL__ bv_priority_queue_empty(bv_priority_queue_t *q);
 
 
-extern bv_priority_queue_t __LIB__ *bv_priority_queue_init(void *p,size_t capacity,size_t max_size,void *compar);
-extern bv_priority_queue_t __LIB__ __CALLEE__ *bv_priority_queue_init_callee(void *p,size_t capacity,size_t max_size,void *compar);
+extern bv_priority_queue_t __LIB__ *bv_priority_queue_init(void *p,size_t capacity,size_t max_size,void *compar) __smallc;
+extern bv_priority_queue_t __LIB__ __CALLEE__ *bv_priority_queue_init_callee(void *p,size_t capacity,size_t max_size,void *compar) __smallc;
 #define bv_priority_queue_init(a,b,c,d) bv_priority_queue_init_callee(a,b,c,d)
 
 
@@ -46,18 +46,18 @@ extern size_t __LIB__ __FASTCALL__ bv_priority_queue_max_size(bv_priority_queue_
 extern int __LIB__ __FASTCALL__ bv_priority_queue_pop(bv_priority_queue_t *q);
 
 
-extern int __LIB__ bv_priority_queue_push(bv_priority_queue_t *q,int c);
-extern int __LIB__ __CALLEE__ bv_priority_queue_push_callee(bv_priority_queue_t *q,int c);
+extern int __LIB__ bv_priority_queue_push(bv_priority_queue_t *q,int c) __smallc;
+extern int __LIB__ __CALLEE__ bv_priority_queue_push_callee(bv_priority_queue_t *q,int c) __smallc;
 #define bv_priority_queue_push(a,b) bv_priority_queue_push_callee(a,b)
 
 
-extern int __LIB__ bv_priority_queue_reserve(bv_priority_queue_t *q,size_t n);
-extern int __LIB__ __CALLEE__ bv_priority_queue_reserve_callee(bv_priority_queue_t *q,size_t n);
+extern int __LIB__ bv_priority_queue_reserve(bv_priority_queue_t *q,size_t n) __smallc;
+extern int __LIB__ __CALLEE__ bv_priority_queue_reserve_callee(bv_priority_queue_t *q,size_t n) __smallc;
 #define bv_priority_queue_reserve(a,b) bv_priority_queue_reserve_callee(a,b)
 
 
-extern int __LIB__ bv_priority_queue_resize(bv_priority_queue_t *q,size_t n);
-extern int __LIB__ __CALLEE__ bv_priority_queue_resize_callee(bv_priority_queue_t *q,size_t n);
+extern int __LIB__ bv_priority_queue_resize(bv_priority_queue_t *q,size_t n) __smallc;
+extern int __LIB__ __CALLEE__ bv_priority_queue_resize_callee(bv_priority_queue_t *q,size_t n) __smallc;
 #define bv_priority_queue_resize(a,b) bv_priority_queue_resize_callee(a,b)
 
 

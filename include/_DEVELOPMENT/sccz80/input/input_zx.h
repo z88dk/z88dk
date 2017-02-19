@@ -58,7 +58,7 @@
 #define IN_KEY_SCANCODE_8      0x04ef
 #define IN_KEY_SCANCODE_9      0x02ef
 
-extern int __LIB__ in_inkey(void);
+extern int __LIB__ in_inkey(void) __smallc;
 
 
 extern int __LIB__ __FASTCALL__ in_key_pressed(uint16_t scancode);
@@ -71,13 +71,13 @@ extern uint16_t __LIB__ __FASTCALL__ in_key_scancode(int c);
 extern uint16_t __LIB__ __FASTCALL__ in_pause(uint16_t dur_ms);
 
 
-extern int __LIB__ in_test_key(void);
+extern int __LIB__ in_test_key(void) __smallc;
 
 
-extern void __LIB__ in_wait_key(void);
+extern void __LIB__ in_wait_key(void) __smallc;
 
 
-extern void __LIB__ in_wait_nokey(void);
+extern void __LIB__ in_wait_nokey(void) __smallc;
 
 
 
@@ -89,19 +89,19 @@ extern uint16_t __LIB__ __FASTCALL__ in_stick_keyboard(udk_t *u);
 
 
 
-extern uint16_t __LIB__ in_stick_cursor(void);
+extern uint16_t __LIB__ in_stick_cursor(void) __smallc;
 
 
-extern uint16_t __LIB__ in_stick_fuller(void);
+extern uint16_t __LIB__ in_stick_fuller(void) __smallc;
 
 
-extern uint16_t __LIB__ in_stick_kempston(void);
+extern uint16_t __LIB__ in_stick_kempston(void) __smallc;
 
 
-extern uint16_t __LIB__ in_stick_sinclair1(void);
+extern uint16_t __LIB__ in_stick_sinclair1(void) __smallc;
 
 
-extern uint16_t __LIB__ in_stick_sinclair2(void);
+extern uint16_t __LIB__ in_stick_sinclair2(void) __smallc;
 
 
 
@@ -109,51 +109,51 @@ extern uint16_t __LIB__ in_stick_sinclair2(void);
 // mouse
 ////////
 
-extern void __LIB__ in_mouse_amx_init(uint16_t x_vector,uint16_t y_vector);
-extern void __LIB__ __CALLEE__ in_mouse_amx_init_callee(uint16_t x_vector,uint16_t y_vector);
+extern void __LIB__ in_mouse_amx_init(uint16_t x_vector,uint16_t y_vector) __smallc;
+extern void __LIB__ __CALLEE__ in_mouse_amx_init_callee(uint16_t x_vector,uint16_t y_vector) __smallc;
 #define in_mouse_amx_init(a,b) in_mouse_amx_init_callee(a,b)
 
 
-extern void __LIB__ in_mouse_amx_reset(void);
+extern void __LIB__ in_mouse_amx_reset(void) __smallc;
 
 
-extern void __LIB__ in_mouse_amx_setpos(uint16_t x,uint16_t y);
-extern void __LIB__ __CALLEE__ in_mouse_amx_setpos_callee(uint16_t x,uint16_t y);
+extern void __LIB__ in_mouse_amx_setpos(uint16_t x,uint16_t y) __smallc;
+extern void __LIB__ __CALLEE__ in_mouse_amx_setpos_callee(uint16_t x,uint16_t y) __smallc;
 #define in_mouse_amx_setpos(a,b) in_mouse_amx_setpos_callee(a,b)
 
 
-extern void __LIB__ in_mouse_amx(uint8_t *buttons,uint16_t *x,uint16_t *y);
-extern void __LIB__ __CALLEE__ in_mouse_amx_callee(uint8_t *buttons,uint16_t *x,uint16_t *y);
+extern void __LIB__ in_mouse_amx(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc;
+extern void __LIB__ __CALLEE__ in_mouse_amx_callee(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc;
 #define in_mouse_amx(a,b,c) in_mouse_amx_callee(a,b,c)
 
 
-extern uint16_t __LIB__ in_mouse_amx_wheel(void);
+extern uint16_t __LIB__ in_mouse_amx_wheel(void) __smallc;
 
 
-extern int16_t __LIB__ in_mouse_amx_wheel_delta(void);
+extern int16_t __LIB__ in_mouse_amx_wheel_delta(void) __smallc;
 
 
 
-extern void __LIB__ in_mouse_kempston_init(void);
+extern void __LIB__ in_mouse_kempston_init(void) __smallc;
 
 
-extern void __LIB__ in_mouse_kempston_reset(void);
+extern void __LIB__ in_mouse_kempston_reset(void) __smallc;
 
 
-extern void __LIB__ in_mouse_kempston_setpos(uint16_t x,uint16_t y);
-extern void __LIB__ __CALLEE__ in_mouse_kempston_setpos_callee(uint16_t x,uint16_t y);
+extern void __LIB__ in_mouse_kempston_setpos(uint16_t x,uint16_t y) __smallc;
+extern void __LIB__ __CALLEE__ in_mouse_kempston_setpos_callee(uint16_t x,uint16_t y) __smallc;
 #define in_mouse_kempston_setpos(a,b) in_mouse_kempston_setpos_callee(a,b)
 
 
-extern void __LIB__ in_mouse_kempston(uint8_t *buttons,uint16_t *x,uint16_t *y);
-extern void __LIB__ __CALLEE__ in_mouse_kempston_callee(uint8_t *buttons,uint16_t *x,uint16_t *y);
+extern void __LIB__ in_mouse_kempston(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc;
+extern void __LIB__ __CALLEE__ in_mouse_kempston_callee(uint8_t *buttons,uint16_t *x,uint16_t *y) __smallc;
 #define in_mouse_kempston(a,b,c) in_mouse_kempston_callee(a,b,c)
 
 
-extern uint16_t __LIB__ in_mouse_kempston_wheel(void);
+extern uint16_t __LIB__ in_mouse_kempston_wheel(void) __smallc;
 
 
-extern int16_t __LIB__ in_mouse_kempston_wheel_delta(void);
+extern int16_t __LIB__ in_mouse_kempston_wheel_delta(void) __smallc;
 
 
 
