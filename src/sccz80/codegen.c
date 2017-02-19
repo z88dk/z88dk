@@ -2190,6 +2190,21 @@ void popframe(void)
     }
 }
 
+void gen_builtin_strcmp()
+{
+    int label;
+    ol("pop\tde");
+    ol("pop\thl");
+    ol("push\tde");
+    label = getlabel();
+    postlabel(label);
+    ol("ld\ta,(hl)");
+    ol("ldi");
+    ol("or\ta");
+    outstr("\tjp\tnz,"); printlabel(label); nl();
+    ol("pop\thl");
+}
+
 
 /*
  * Local Variables:
