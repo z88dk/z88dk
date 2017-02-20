@@ -414,47 +414,47 @@ unsigned char litchar()
 {
     int i, oct;
 
-    if (ch() != 92)
+    if (ch() != '\\')
         return (gch());
     if (nch() == 0)
         return (gch());
     gch();
     switch (ch()) {
     case 'a': /* Bell */
-        ++lptr;
+        gch();
         return 7;
     case 'b': /* BS */
-        ++lptr;
+        gch();
         return 8;
     case 't': /* HT */
-        ++lptr;
+        gch();
         return 9;
     case 'r': /* LF */
-        ++lptr;
+        gch();
         return standard_escapes ? 13 : 10;
     case 'v': /* VT */
-        ++lptr;
+        gch();
         return 11;
     case 'f': /* FF */
-        ++lptr;
+        gch();
         return 12;
     case 'n': /* CR */
-        ++lptr;
+        gch();
         return standard_escapes ? 10 : 13;
     case '\"': /* " */
-        ++lptr;
+        gch();
         return 34;
     case '\'': /* ' */
-        ++lptr;
+        gch();
         return 39;
     case '\\': /* / */
-        ++lptr;
+        gch();
         return '\\';
     case '\?': /* ? */
-        ++lptr;
+        gch();
         return '\?';
     case 'l': /* LF (non standard)*/
-        ++lptr;
+        gch();
         return 10;
     }
 

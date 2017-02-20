@@ -69,7 +69,7 @@ int cmatch(char lit)
     if (line[lptr] == lit) {
 	x++;
         for ( i = 0; i < buffer_fps_num; i++ ) {
-             fprintf(buffer_fps[i],"%c",lit);
+             fprintf(buffer_fps[i],"%c",line[lptr]);
 	}
         ++lptr;
         return 1;
@@ -143,16 +143,26 @@ int rcmatch(char lit)
     return 0;
 }
 
-int amatch(char* lit)
+int amatch_impl(char* lit,int buffer)
 {
     int k;
 
     blanks();
     if ((k = astreq(line + lptr, lit))) {
         lptr += k;
+        if ( buffer ) {
+            for ( k = 0; k < buffer_fps_num; k++ ) {
+                fprintf(buffer_fps[k],"%s",lit);
+            }
+        }
         return 1;
     }
     return 0;
+}
+
+int amatch(char* lit)
+{
+    return amatch_impl(lit,1);
 }
 
 /*
@@ -161,5 +171,6 @@ int amatch(char* lit)
 
 int swallow(char* lit)
 {
-    return (amatch(lit));
+    return amatch_impl(lit,0);
 }
+

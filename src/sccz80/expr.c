@@ -508,11 +508,13 @@ int heira(LVALUE* lval)
     struct varid var;
     char ident;
     int klptr;
-    /*
- * djm, check for a cast
- */
-    if (rcmatch('(')) {
-        klptr = lptr; //  - 1; /* -1 takes care of ( */
+    int save_fps_num;
+
+    /* Cast check, little kludge here */
+    save_fps_num = buffer_fps_num;
+    buffer_fps_num = 0;
+    if (cmatch('(')) {
+        klptr = lptr -1;
         otag = GetVarID(&var, NO);
         var.sflag = ((var.sign & UNSIGNED) | (var.zfar & FARPTR));
         if (var.type != NO) {
@@ -528,15 +530,16 @@ int heira(LVALUE* lval)
             lval->c_flags = var.sflag;
             lval->castlevel = lval->level;
             needchar(')');
-            /*
- * Reenter ourselves..gosh, recursion is fun! 
- * Is this right? I think so..
- */
+            for ( j = 0; j < save_fps_num; j++ ) {
+                 fprintf(buffer_fps[j],"%.*s",lptr-klptr,line+klptr);
+            }
+            buffer_fps_num = save_fps_num;
             return (heira(lval));
         } else {
             lptr = klptr;
         }
     }
+    buffer_fps_num = save_fps_num;
 
     if (match("++")) {
         prestep(lval, 1, inc);
