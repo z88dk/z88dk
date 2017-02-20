@@ -302,9 +302,9 @@ int pstr(int32_t* val)
     conssign = dosigned;
     if (cmatch('\'')) {
         k = 0;
-        while (ch() != 39)
+        while (ch() && ch() != '\'')
             k = (k & 255) * 256 + litchar();
-        ++lptr;
+        gch();
         *val = k;
         return (1);
     }
