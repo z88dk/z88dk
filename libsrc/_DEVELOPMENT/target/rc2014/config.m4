@@ -39,6 +39,7 @@ dnl############################################################
 include(`target/z88dk_version.m4')
 include(`target/rc2014/config_target.m4')
 include(`target/rc2014/config_cpu.m4')
+include(`target/rc2014/config_acia.m4')
 include(`target/rc2014/config_clib.m4')
 include(`target/rc2014/config_clib_const.m4')
 
