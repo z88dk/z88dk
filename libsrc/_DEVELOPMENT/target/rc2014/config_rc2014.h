@@ -73,6 +73,57 @@
 
 
 
+#define ACIA_CTRL_ADDR    0x80
+#define ACIA_STATUS_ADDR  0x80
+#define ACIA_DATA_ADDR    0x81
+
+#define ACIA_CLK_DIV_01   0x00
+#define ACIA_CLK_DIV_16   0x01
+#define ACIA_CLK_DIV_64   0x02
+#define ACIA_RESET        0x03
+
+#define ACIA_7E2          0x00
+#define ACIA_7O2          0x04
+#define ACIA_7E1          0x08
+#define ACIA_7O1          0x0C
+#define ACIA_8N2          0x10
+#define ACIA_8N1          0x14
+#define ACIA_8E1          0x18
+#define ACIA_8O1          0x1C
+
+#define ACIA_TDI_RTS0     0x00
+#define ACIA_TEI_RTS0     0x20
+#define ACIA_TDI_RTS1     0x40
+#define ACIA_TDI_BRK      0x60
+   
+#define ACIA_TEI_MASK     0x60
+
+#define ACIA_REI          0x80
+
+#define ACIA_RDRF         0x01
+#define ACIA_TDRE         0x02
+#define ACIA_DCD          0x04
+#define ACIA_CTS          0x08
+#define ACIA_FE           0x10
+#define ACIA_OVRN         0x20
+#define ACIA_PE           0x40
+#define ACIA_IRQ          0x80
+
+#define ACIA_RX_SIZE      0x80
+#define ACIA_RX_FULLISH   124
+#define ACIA_TX_SIZE      0x80
+
+
+
+
+
+
+
+
+
+
+
+
 #define __CLIB_OPT_MULTITHREAD  0x00
 
 #define __CLIB_OPT_MULTITHREAD_LOCK_HEAPS  0x01
@@ -419,45 +470,6 @@
 
 
 
-#define ACIA_CTRL_ADDR    0x80
-#define ACIA_STATUS_ADDR  0x80
-#define ACIA_DATA_ADDR    0x81
-
-#define ACIA_CLK_DIV_01   0x00
-#define ACIA_CLK_DIV_16   0x01
-#define ACIA_CLK_DIV_64   0x02
-#define ACIA_RESET        0x03
-
-#define ACIA_7E2          0x00
-#define ACIA_7O2          0x04
-#define ACIA_7E1          0x08
-#define ACIA_7O1          0x0C
-#define ACIA_8N2          0x10
-#define ACIA_8N1          0x14
-#define ACIA_8E1          0x18
-#define ACIA_8O1          0x1C
-
-#define ACIA_TDI_RTS0     0x00
-#define ACIA_TEI_RTS0     0x20
-#define ACIA_TDI_RTS1     0x40
-#define ACIA_TDI_BRK      0x60
-   
-#define ACIA_TEI_MASK     0x60
-
-#define ACIA_REI          0x80
-
-#define ACIA_RDRF         0x01
-#define ACIA_TDRE         0x02
-#define ACIA_DCD          0x04
-#define ACIA_CTS          0x08
-#define ACIA_FE           0x10
-#define ACIA_OVRN         0x20
-#define ACIA_PE           0x40
-#define ACIA_IRQ          0x80
-
-#define ACIA_RX_SIZE      0x80
-#define ACIA_RX_FULLISH   124
-#define ACIA_TX_SIZE      0x80
 
 
 

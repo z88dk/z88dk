@@ -50,10 +50,10 @@ typedef struct
 
 // must not use callee or fastcall linkage
 
-extern int __LIB__ l_setjmp(jmp_buf *env);
+extern int __LIB__ l_setjmp(jmp_buf *env) __smallc;
 
 
-extern void __LIB__ l_longjmp(jmp_buf *env,int val);
+extern void __LIB__ l_longjmp(jmp_buf *env,int val) __smallc;
 
 
 

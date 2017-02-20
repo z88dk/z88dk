@@ -62,13 +62,13 @@ struct cpm_fcb
     unsigned char    uid;          // user id belonging to this file
 };
 
-extern int __LIB__ cpm_bdos(unsigned int func,unsigned int arg);
-extern int __LIB__ __CALLEE__ cpm_bdos_callee(unsigned int func,unsigned int arg);
+extern int __LIB__ cpm_bdos(unsigned int func,unsigned int arg) __smallc;
+extern int __LIB__ __CALLEE__ cpm_bdos_callee(unsigned int func,unsigned int arg) __smallc;
 #define cpm_bdos(a,b) cpm_bdos_callee(a,b)
 
 
-extern int __LIB__ cpm_bdos_hl(unsigned int func,unsigned int arg);
-extern int __LIB__ __CALLEE__ cpm_bdos_hl_callee(unsigned int func,unsigned int arg);
+extern int __LIB__ cpm_bdos_hl(unsigned int func,unsigned int arg) __smallc;
+extern int __LIB__ __CALLEE__ cpm_bdos_hl_callee(unsigned int func,unsigned int arg) __smallc;
 #define cpm_bdos_hl(a,b) cpm_bdos_hl_callee(a,b)
 
 
@@ -79,8 +79,8 @@ extern int __LIB__ __CALLEE__ cpm_bdos_hl_callee(unsigned int func,unsigned int 
 extern unsigned long __LIB__ __FASTCALL__ cpm_get_offset(void *p);
 
 
-extern void __LIB__ cpm_set_offset(void *p,unsigned long offset);
-extern void __LIB__ __CALLEE__ cpm_set_offset_callee(void *p,unsigned long offset);
+extern void __LIB__ cpm_set_offset(void *p,unsigned long offset) __smallc;
+extern void __LIB__ __CALLEE__ cpm_set_offset_callee(void *p,unsigned long offset) __smallc;
 #define cpm_set_offset(a,b) cpm_set_offset_callee(a,b)
 
 

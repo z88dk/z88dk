@@ -51,26 +51,26 @@ extern int __LIB__ __FASTCALL__ close(int fd);
 extern int __LIB__ __FASTCALL__ dup(int fd);
 
 
-extern int __LIB__ dup2(int fd,int fd2);
-extern int __LIB__ __CALLEE__ dup2_callee(int fd,int fd2);
+extern int __LIB__ dup2(int fd,int fd2) __smallc;
+extern int __LIB__ __CALLEE__ dup2_callee(int fd,int fd2) __smallc;
 #define dup2(a,b) dup2_callee(a,b)
 
 
 extern void __LIB__ __FASTCALL__ _exit(int status);
 
 
-extern off_t __LIB__ lseek(int fd,off_t offset,int whence);
-extern off_t __LIB__ __CALLEE__ lseek_callee(int fd,off_t offset,int whence);
+extern off_t __LIB__ lseek(int fd,off_t offset,int whence) __smallc;
+extern off_t __LIB__ __CALLEE__ lseek_callee(int fd,off_t offset,int whence) __smallc;
 #define lseek(a,b,c) lseek_callee(a,b,c)
 
 
-extern ssize_t __LIB__ read(int fd,void *buf,size_t nbyte);
-extern ssize_t __LIB__ __CALLEE__ read_callee(int fd,void *buf,size_t nbyte);
+extern ssize_t __LIB__ read(int fd,void *buf,size_t nbyte) __smallc;
+extern ssize_t __LIB__ __CALLEE__ read_callee(int fd,void *buf,size_t nbyte) __smallc;
 #define read(a,b,c) read_callee(a,b,c)
 
 
-extern ssize_t __LIB__ write(int fd,const void *buf,size_t nbyte);
-extern ssize_t __LIB__ __CALLEE__ write_callee(int fd,const void *buf,size_t nbyte);
+extern ssize_t __LIB__ write(int fd,const void *buf,size_t nbyte) __smallc;
+extern ssize_t __LIB__ __CALLEE__ write_callee(int fd,const void *buf,size_t nbyte) __smallc;
 #define write(a,b,c) write_callee(a,b,c)
 
 

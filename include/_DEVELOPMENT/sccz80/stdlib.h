@@ -155,38 +155,38 @@ typedef struct
 
 // FUNCTIONS
 
-extern void __LIB__ _div_(div_t *d,int numer,int denom);
-extern void __LIB__ __CALLEE__ _div__callee(div_t *d,int numer,int denom);
+extern void __LIB__ _div_(div_t *d,int numer,int denom) __smallc;
+extern void __LIB__ __CALLEE__ _div__callee(div_t *d,int numer,int denom) __smallc;
 #define _div_(a,b,c) _div__callee(a,b,c)
 
 
-extern void __LIB__ _divu_(divu_t *d,unsigned int numer,unsigned int denom);
-extern void __LIB__ __CALLEE__ _divu__callee(divu_t *d,unsigned int numer,unsigned int denom);
+extern void __LIB__ _divu_(divu_t *d,unsigned int numer,unsigned int denom) __smallc;
+extern void __LIB__ __CALLEE__ _divu__callee(divu_t *d,unsigned int numer,unsigned int denom) __smallc;
 #define _divu_(a,b,c) _divu__callee(a,b,c)
 
 
-extern void __LIB__ _ldiv_(ldiv_t *ld,long numer,long denom);
-extern void __LIB__ __CALLEE__ _ldiv__callee(ldiv_t *ld,long numer,long denom);
+extern void __LIB__ _ldiv_(ldiv_t *ld,long numer,long denom) __smallc;
+extern void __LIB__ __CALLEE__ _ldiv__callee(ldiv_t *ld,long numer,long denom) __smallc;
 #define _ldiv_(a,b,c) _ldiv__callee(a,b,c)
 
 
-extern void __LIB__ _ldivu_(ldivu_t *ld,unsigned long numer,unsigned long denom);
-extern void __LIB__ __CALLEE__ _ldivu__callee(ldivu_t *ld,unsigned long numer,unsigned long denom);
+extern void __LIB__ _ldivu_(ldivu_t *ld,unsigned long numer,unsigned long denom) __smallc;
+extern void __LIB__ __CALLEE__ _ldivu__callee(ldivu_t *ld,unsigned long numer,unsigned long denom) __smallc;
 #define _ldivu_(a,b,c) _ldivu__callee(a,b,c)
 
 
-extern void __LIB__ _insertion_sort_(void *base,size_t nmemb,size_t size,void *compar);
-extern void __LIB__ __CALLEE__ _insertion_sort__callee(void *base,size_t nmemb,size_t size,void *compar);
+extern void __LIB__ _insertion_sort_(void *base,size_t nmemb,size_t size,void *compar) __smallc;
+extern void __LIB__ __CALLEE__ _insertion_sort__callee(void *base,size_t nmemb,size_t size,void *compar) __smallc;
 #define _insertion_sort_(a,b,c,d) _insertion_sort__callee(a,b,c,d)
 
 
-extern void __LIB__ _quicksort_(void *base,size_t nmemb,size_t size,void *compar);
-extern void __LIB__ __CALLEE__ _quicksort__callee(void *base,size_t nmemb,size_t size,void *compar);
+extern void __LIB__ _quicksort_(void *base,size_t nmemb,size_t size,void *compar) __smallc;
+extern void __LIB__ __CALLEE__ _quicksort__callee(void *base,size_t nmemb,size_t size,void *compar) __smallc;
 #define _quicksort_(a,b,c,d) _quicksort__callee(a,b,c,d)
 
 
-extern void __LIB__ _shellsort_(void *base,size_t nmemb,size_t size,void *compar);
-extern void __LIB__ __CALLEE__ _shellsort__callee(void *base,size_t nmemb,size_t size,void *compar);
+extern void __LIB__ _shellsort_(void *base,size_t nmemb,size_t size,void *compar) __smallc;
+extern void __LIB__ __CALLEE__ _shellsort__callee(void *base,size_t nmemb,size_t size,void *compar) __smallc;
 #define _shellsort_(a,b,c,d) _shellsort__callee(a,b,c,d)
 
 
@@ -199,17 +199,17 @@ extern uint32_t __LIB__ __FASTCALL__ _random_uniform_xor_32_(uint32_t *seed);
 extern uint16_t __LIB__ __FASTCALL__ _random_uniform_xor_8_(uint32_t *seed);
 
 
-extern int __LIB__ _strtoi_(char *nptr,char **endptr,int base);
-extern int __LIB__ __CALLEE__ _strtoi__callee(char *nptr,char **endptr,int base);
+extern int __LIB__ _strtoi_(char *nptr,char **endptr,int base) __smallc;
+extern int __LIB__ __CALLEE__ _strtoi__callee(char *nptr,char **endptr,int base) __smallc;
 #define _strtoi_(a,b,c) _strtoi__callee(a,b,c)
 
 
-extern uint16_t __LIB__ _strtou_(char *nptr,char **endptr,int base);
-extern uint16_t __LIB__ __CALLEE__ _strtou__callee(char *nptr,char **endptr,int base);
+extern uint16_t __LIB__ _strtou_(char *nptr,char **endptr,int base) __smallc;
+extern uint16_t __LIB__ __CALLEE__ _strtou__callee(char *nptr,char **endptr,int base) __smallc;
 #define _strtou_(a,b,c) _strtou__callee(a,b,c)
 
 
-extern void __LIB__ abort(void);
+extern void __LIB__ abort(void) __smallc;
 
 
 extern int __LIB__ __FASTCALL__ abs(int j);
@@ -230,124 +230,124 @@ extern int __LIB__ __FASTCALL__ atoi(char *buf);
 extern long __LIB__ __FASTCALL__ atol(char *buf);
 
 
-extern void __LIB__ bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar);
-extern void __LIB__ __CALLEE__ bsearch_callee(void *key,void *base,size_t nmemb,size_t size,void *compar);
+extern void __LIB__ bsearch(void *key,void *base,size_t nmemb,size_t size,void *compar) __smallc;
+extern void __LIB__ __CALLEE__ bsearch_callee(void *key,void *base,size_t nmemb,size_t size,void *compar) __smallc;
 #define bsearch(a,b,c,d,e) bsearch_callee(a,b,c,d,e)
 
 
-extern size_t __LIB__ dtoa(double_t x,void *buf,uint16_t prec,uint16_t flags);
-extern size_t __LIB__ __CALLEE__ dtoa_callee(double_t x,void *buf,uint16_t prec,uint16_t flags);
+extern size_t __LIB__ dtoa(double_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
+extern size_t __LIB__ __CALLEE__ dtoa_callee(double_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
 #define dtoa(a,b,c,d) dtoa_callee(a,b,c,d)
 
 
-extern size_t __LIB__ dtoe(double_t x,void *buf,uint16_t prec,uint16_t flags);
-extern size_t __LIB__ __CALLEE__ dtoe_callee(double_t x,void *buf,uint16_t prec,uint16_t flags);
+extern size_t __LIB__ dtoe(double_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
+extern size_t __LIB__ __CALLEE__ dtoe_callee(double_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
 #define dtoe(a,b,c,d) dtoe_callee(a,b,c,d)
 
 
-extern size_t __LIB__ dtog(double_t x,void *buf,uint16_t prec,uint16_t flags);
-extern size_t __LIB__ __CALLEE__ dtog_callee(double_t x,void *buf,uint16_t prec,uint16_t flags);
+extern size_t __LIB__ dtog(double_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
+extern size_t __LIB__ __CALLEE__ dtog_callee(double_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
 #define dtog(a,b,c,d) dtog_callee(a,b,c,d)
 
 
-extern size_t __LIB__ dtoh(double_t x,void *buf,uint16_t prec,uint16_t flags);
-extern size_t __LIB__ __CALLEE__ dtoh_callee(double_t x,void *buf,uint16_t prec,uint16_t flags);
+extern size_t __LIB__ dtoh(double_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
+extern size_t __LIB__ __CALLEE__ dtoh_callee(double_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
 #define dtoh(a,b,c,d) dtoh_callee(a,b,c,d)
 
 
 extern void __LIB__ __FASTCALL__ exit(int status);
 
 
-extern size_t __LIB__ ftoa(float_t x,void *buf,uint16_t prec,uint16_t flags);
-extern size_t __LIB__ __CALLEE__ ftoa_callee(float_t x,void *buf,uint16_t prec,uint16_t flags);
+extern size_t __LIB__ ftoa(float_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
+extern size_t __LIB__ __CALLEE__ ftoa_callee(float_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
 #define ftoa(a,b,c,d) ftoa_callee(a,b,c,d)
 
 
-extern size_t __LIB__ ftoe(float_t x,void *buf,uint16_t prec,uint16_t flags);
-extern size_t __LIB__ __CALLEE__ ftoe_callee(float_t x,void *buf,uint16_t prec,uint16_t flags);
+extern size_t __LIB__ ftoe(float_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
+extern size_t __LIB__ __CALLEE__ ftoe_callee(float_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
 #define ftoe(a,b,c,d) ftoe_callee(a,b,c,d)
 
 
-extern size_t __LIB__ ftog(float_t x,void *buf,uint16_t prec,uint16_t flags);
-extern size_t __LIB__ __CALLEE__ ftog_callee(float_t x,void *buf,uint16_t prec,uint16_t flags);
+extern size_t __LIB__ ftog(float_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
+extern size_t __LIB__ __CALLEE__ ftog_callee(float_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
 #define ftog(a,b,c,d) ftog_callee(a,b,c,d)
 
 
-extern size_t __LIB__ ftoh(float_t x,void *buf,uint16_t prec,uint16_t flags);
-extern size_t __LIB__ __CALLEE__ ftoh_callee(float_t x,void *buf,uint16_t prec,uint16_t flags);
+extern size_t __LIB__ ftoh(float_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
+extern size_t __LIB__ __CALLEE__ ftoh_callee(float_t x,void *buf,uint16_t prec,uint16_t flags) __smallc;
 #define ftoh(a,b,c,d) ftoh_callee(a,b,c,d)
 
 
-extern char __LIB__ *itoa(int num,char *buf,int radix);
-extern char __LIB__ __CALLEE__ *itoa_callee(int num,char *buf,int radix);
+extern char __LIB__ *itoa(int num,char *buf,int radix) __smallc;
+extern char __LIB__ __CALLEE__ *itoa_callee(int num,char *buf,int radix) __smallc;
 #define itoa(a,b,c) itoa_callee(a,b,c)
 
 
 extern long __LIB__ __FASTCALL__ labs(long j);
 
 
-extern char __LIB__ *ltoa(long num,char *buf,int radix);
-extern char __LIB__ __CALLEE__ *ltoa_callee(long num,char *buf,int radix);
+extern char __LIB__ *ltoa(long num,char *buf,int radix) __smallc;
+extern char __LIB__ __CALLEE__ *ltoa_callee(long num,char *buf,int radix) __smallc;
 #define ltoa(a,b,c) ltoa_callee(a,b,c)
 
 
-extern void __LIB__ qsort(void *base,size_t nmemb,size_t size,void *compar);
-extern void __LIB__ __CALLEE__ qsort_callee(void *base,size_t nmemb,size_t size,void *compar);
+extern void __LIB__ qsort(void *base,size_t nmemb,size_t size,void *compar) __smallc;
+extern void __LIB__ __CALLEE__ qsort_callee(void *base,size_t nmemb,size_t size,void *compar) __smallc;
 #define qsort(a,b,c,d) qsort_callee(a,b,c,d)
 
 
 extern void __LIB__ __FASTCALL__ quick_exit(int status);
 
 
-extern int __LIB__ rand(void);
+extern int __LIB__ rand(void) __smallc;
 
 
 extern void __LIB__ __FASTCALL__ srand(uint16_t seed);
 
 
-extern double_t __LIB__ strtod(char *nptr,char **endptr);
-extern double_t __LIB__ __CALLEE__ strtod_callee(char *nptr,char **endptr);
+extern double_t __LIB__ strtod(char *nptr,char **endptr) __smallc;
+extern double_t __LIB__ __CALLEE__ strtod_callee(char *nptr,char **endptr) __smallc;
 #define strtod(a,b) strtod_callee(a,b)
 
 
-extern float_t __LIB__ strtof(char *nptr,char **endptr);
-extern float_t __LIB__ __CALLEE__ strtof_callee(char *nptr,char **endptr);
+extern float_t __LIB__ strtof(char *nptr,char **endptr) __smallc;
+extern float_t __LIB__ __CALLEE__ strtof_callee(char *nptr,char **endptr) __smallc;
 #define strtof(a,b) strtof_callee(a,b)
 
 
-extern long __LIB__ strtol(char *nptr,char **endptr,int base);
-extern long __LIB__ __CALLEE__ strtol_callee(char *nptr,char **endptr,int base);
+extern long __LIB__ strtol(char *nptr,char **endptr,int base) __smallc;
+extern long __LIB__ __CALLEE__ strtol_callee(char *nptr,char **endptr,int base) __smallc;
 #define strtol(a,b,c) strtol_callee(a,b,c)
 
 
-extern uint32_t __LIB__ strtoul(char *nptr,char **endptr,int base);
-extern uint32_t __LIB__ __CALLEE__ strtoul_callee(char *nptr,char **endptr,int base);
+extern uint32_t __LIB__ strtoul(char *nptr,char **endptr,int base) __smallc;
+extern uint32_t __LIB__ __CALLEE__ strtoul_callee(char *nptr,char **endptr,int base) __smallc;
 #define strtoul(a,b,c) strtoul_callee(a,b,c)
 
 
 extern int __LIB__ __FASTCALL__ system(char *s);
 
 
-extern char __LIB__ *ultoa(uint32_t num,char *buf,int radix);
-extern char __LIB__ __CALLEE__ *ultoa_callee(uint32_t num,char *buf,int radix);
+extern char __LIB__ *ultoa(uint32_t num,char *buf,int radix) __smallc;
+extern char __LIB__ __CALLEE__ *ultoa_callee(uint32_t num,char *buf,int radix) __smallc;
 #define ultoa(a,b,c) ultoa_callee(a,b,c)
 
 
-extern char __LIB__ *utoa(uint16_t num,char *buf,int radix);
-extern char __LIB__ __CALLEE__ *utoa_callee(uint16_t num,char *buf,int radix);
+extern char __LIB__ *utoa(uint16_t num,char *buf,int radix) __smallc;
+extern char __LIB__ __CALLEE__ *utoa_callee(uint16_t num,char *buf,int radix) __smallc;
 #define utoa(a,b,c) utoa_callee(a,b,c)
 
 
 
 #ifndef _ALLOC_MALLOC_H
 
-extern void __LIB__ *aligned_alloc(size_t alignment,size_t size);
-extern void __LIB__ __CALLEE__ *aligned_alloc_callee(size_t alignment,size_t size);
+extern void __LIB__ *aligned_alloc(size_t alignment,size_t size) __smallc;
+extern void __LIB__ __CALLEE__ *aligned_alloc_callee(size_t alignment,size_t size) __smallc;
 #define aligned_alloc(a,b) aligned_alloc_callee(a,b)
 
 
-extern void __LIB__ *calloc(size_t nmemb,size_t size);
-extern void __LIB__ __CALLEE__ *calloc_callee(size_t nmemb,size_t size);
+extern void __LIB__ *calloc(size_t nmemb,size_t size) __smallc;
+extern void __LIB__ __CALLEE__ *calloc_callee(size_t nmemb,size_t size) __smallc;
 #define calloc(a,b) calloc_callee(a,b)
 
 
@@ -357,19 +357,19 @@ extern void __LIB__ __FASTCALL__ free(void *p);
 extern void __LIB__ __FASTCALL__ *malloc(size_t size);
 
 
-extern void __LIB__ *realloc(void *p,size_t size);
-extern void __LIB__ __CALLEE__ *realloc_callee(void *p,size_t size);
+extern void __LIB__ *realloc(void *p,size_t size) __smallc;
+extern void __LIB__ __CALLEE__ *realloc_callee(void *p,size_t size) __smallc;
 #define realloc(a,b) realloc_callee(a,b)
 
 
 
-extern void __LIB__ *aligned_alloc_unlocked(size_t alignment,size_t size);
-extern void __LIB__ __CALLEE__ *aligned_alloc_unlocked_callee(size_t alignment,size_t size);
+extern void __LIB__ *aligned_alloc_unlocked(size_t alignment,size_t size) __smallc;
+extern void __LIB__ __CALLEE__ *aligned_alloc_unlocked_callee(size_t alignment,size_t size) __smallc;
 #define aligned_alloc_unlocked(a,b) aligned_alloc_unlocked_callee(a,b)
 
 
-extern void __LIB__ *calloc_unlocked(size_t nmemb,size_t size);
-extern void __LIB__ __CALLEE__ *calloc_unlocked_callee(size_t nmemb,size_t size);
+extern void __LIB__ *calloc_unlocked(size_t nmemb,size_t size) __smallc;
+extern void __LIB__ __CALLEE__ *calloc_unlocked_callee(size_t nmemb,size_t size) __smallc;
 #define calloc_unlocked(a,b) calloc_unlocked_callee(a,b)
 
 
@@ -379,8 +379,8 @@ extern void __LIB__ __FASTCALL__ free_unlocked(void *p);
 extern void __LIB__ __FASTCALL__ *malloc_unlocked(size_t size);
 
 
-extern void __LIB__ *realloc_unlocked(void *p,size_t size);
-extern void __LIB__ __CALLEE__ *realloc_unlocked_callee(void *p,size_t size);
+extern void __LIB__ *realloc_unlocked(void *p,size_t size) __smallc;
+extern void __LIB__ __CALLEE__ *realloc_unlocked_callee(void *p,size_t size) __smallc;
 #define realloc_unlocked(a,b) realloc_unlocked_callee(a,b)
 
 
@@ -406,13 +406,13 @@ extern long long atoll(char *buf);
 extern long long atoll_callee(char *buf) __z88dk_callee;
 #define atoll(a) atoll_callee(a)
 
-extern void __LIB__ _lldiv_(lldiv_t *ld,long long numer,long long denom);
-extern void __LIB__ __CALLEE__ _lldiv__callee(lldiv_t *ld,long long numer,long long denom);
+extern void __LIB__ _lldiv_(lldiv_t *ld,long long numer,long long denom) __smallc;
+extern void __LIB__ __CALLEE__ _lldiv__callee(lldiv_t *ld,long long numer,long long denom) __smallc;
 #define _lldiv_(a,b,c) _lldiv__callee(a,b,c)
 
 
-extern void __LIB__ _lldivu_(lldivu_t *ld,unsigned long long numer,unsigned long long denom);
-extern void __LIB__ __CALLEE__ _lldivu__callee(lldivu_t *ld,unsigned long long numer,unsigned long long denom);
+extern void __LIB__ _lldivu_(lldivu_t *ld,unsigned long long numer,unsigned long long denom) __smallc;
+extern void __LIB__ __CALLEE__ _lldivu__callee(lldivu_t *ld,unsigned long long numer,unsigned long long denom) __smallc;
 #define _lldivu_(a,b,c) _lldivu__callee(a,b,c)
 
 
@@ -421,23 +421,23 @@ extern long long llabs(long long i);
 extern long long llabs_callee(long long i) __z88dk_callee;
 #define llabs(a) llabs_callee(a)
    
-extern char __LIB__ *lltoa(long long num,char *buf,int radix);
-extern char __LIB__ __CALLEE__ *lltoa_callee(long long num,char *buf,int radix);
+extern char __LIB__ *lltoa(long long num,char *buf,int radix) __smallc;
+extern char __LIB__ __CALLEE__ *lltoa_callee(long long num,char *buf,int radix) __smallc;
 #define lltoa(a,b,c) lltoa_callee(a,b,c)
 
 
-extern long long __LIB__ strtoll(char *nptr,char **endptr,int base);
-extern long long __LIB__ __CALLEE__ strtoll_callee(char *nptr,char **endptr,int base);
+extern long long __LIB__ strtoll(char *nptr,char **endptr,int base) __smallc;
+extern long long __LIB__ __CALLEE__ strtoll_callee(char *nptr,char **endptr,int base) __smallc;
 #define strtoll(a,b,c) strtoll_callee(a,b,c)
 
 
-extern unsigned long long __LIB__ strtoull(char *nptr,char **endptr,int base);
-extern unsigned long long __LIB__ __CALLEE__ strtoull_callee(char *nptr,char **endptr,int base);
+extern unsigned long long __LIB__ strtoull(char *nptr,char **endptr,int base) __smallc;
+extern unsigned long long __LIB__ __CALLEE__ strtoull_callee(char *nptr,char **endptr,int base) __smallc;
 #define strtoull(a,b,c) strtoull_callee(a,b,c)
 
 
-extern char __LIB__ *ulltoa(unsigned long long num,char *buf,int radix);
-extern char __LIB__ __CALLEE__ *ulltoa_callee(unsigned long long num,char *buf,int radix);
+extern char __LIB__ *ulltoa(unsigned long long num,char *buf,int radix) __smallc;
+extern char __LIB__ __CALLEE__ *ulltoa_callee(unsigned long long num,char *buf,int radix) __smallc;
 #define ulltoa(a,b,c) ulltoa_callee(a,b,c)
 
 

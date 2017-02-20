@@ -35,16 +35,16 @@ typedef unsigned long off_t;
 #define SEEK_END        2
 #endif
 
-extern int __LIB__ creat(char *path,mode_t mode);
-extern int __LIB__ __CALLEE__ creat_callee(char *path,mode_t mode);
+extern int __LIB__ creat(char *path,mode_t mode) __smallc;
+extern int __LIB__ __CALLEE__ creat_callee(char *path,mode_t mode) __smallc;
 #define creat(a,b) creat_callee(a,b)
 
 
-extern int __LIB__ open(char *path,int oflag,...);
+extern int __LIB__ open(char *path,int oflag,...) __smallc;
 
 
-extern int __LIB__ vopen(char *path,int oflag,void *arg);
-extern int __LIB__ __CALLEE__ vopen_callee(char *path,int oflag,void *arg);
+extern int __LIB__ vopen(char *path,int oflag,void *arg) __smallc;
+extern int __LIB__ __CALLEE__ vopen_callee(char *path,int oflag,void *arg) __smallc;
 #define vopen(a,b,c) vopen_callee(a,b,c)
 
 

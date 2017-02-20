@@ -67,6 +67,57 @@ defc __CPU_INFO_ENABLE_SLL = 0x01
 
 
 
+defc ACIA_CTRL_ADDR   = 0x80
+defc ACIA_STATUS_ADDR = 0x80
+defc ACIA_DATA_ADDR   = 0x81
+
+defc ACIA_CLK_DIV_01  = 0x00
+defc ACIA_CLK_DIV_16  = 0x01
+defc ACIA_CLK_DIV_64  = 0x02
+defc ACIA_RESET       = 0x03
+
+defc ACIA_7E2         = 0x00
+defc ACIA_7O2         = 0x04
+defc ACIA_7E1         = 0x08
+defc ACIA_7O1         = 0x0C
+defc ACIA_8N2         = 0x10
+defc ACIA_8N1         = 0x14
+defc ACIA_8E1         = 0x18
+defc ACIA_8O1         = 0x1C
+
+defc ACIA_TDI_RTS0    = 0x00
+defc ACIA_TEI_RTS0    = 0x20
+defc ACIA_TDI_RTS1    = 0x40
+defc ACIA_TDI_BRK     = 0x60
+   
+defc ACIA_TEI_MASK    = 0x60
+
+defc ACIA_REI         = 0x80
+
+defc ACIA_RDRF        = 0x01
+defc ACIA_TDRE        = 0x02
+defc ACIA_DCD         = 0x04
+defc ACIA_CTS         = 0x08
+defc ACIA_FE          = 0x10
+defc ACIA_OVRN        = 0x20
+defc ACIA_PE          = 0x40
+defc ACIA_IRQ         = 0x80
+
+defc ACIA_RX_SIZE     = 0x80
+defc ACIA_RX_FULLISH  = 124
+defc ACIA_TX_SIZE     = 0x80
+
+
+
+
+
+
+
+
+
+
+
+
 defc __CLIB_OPT_MULTITHREAD = 0x00
 
 defc __CLIB_OPT_MULTITHREAD_LOCK_HEAPS = 0x01
@@ -413,45 +464,6 @@ defc IOCTL_OCHAR_CRLF = 0xc014
 
 
 
-defc ACIA_CTRL_ADDR   = 0x80
-defc ACIA_STATUS_ADDR = 0x80
-defc ACIA_DATA_ADDR   = 0x81
-
-defc ACIA_CLK_DIV_01  = 0x00
-defc ACIA_CLK_DIV_16  = 0x01
-defc ACIA_CLK_DIV_64  = 0x02
-defc ACIA_RESET       = 0x03
-
-defc ACIA_7E2         = 0x00
-defc ACIA_7O2         = 0x04
-defc ACIA_7E1         = 0x08
-defc ACIA_7O1         = 0x0C
-defc ACIA_8N2         = 0x10
-defc ACIA_8N1         = 0x14
-defc ACIA_8E1         = 0x18
-defc ACIA_8O1         = 0x1C
-
-defc ACIA_TDI_RTS0    = 0x00
-defc ACIA_TEI_RTS0    = 0x20
-defc ACIA_TDI_RTS1    = 0x40
-defc ACIA_TDI_BRK     = 0x60
-   
-defc ACIA_TEI_MASK    = 0x60
-
-defc ACIA_REI         = 0x80
-
-defc ACIA_RDRF        = 0x01
-defc ACIA_TDRE        = 0x02
-defc ACIA_DCD         = 0x04
-defc ACIA_CTS         = 0x08
-defc ACIA_FE          = 0x10
-defc ACIA_OVRN        = 0x20
-defc ACIA_PE          = 0x40
-defc ACIA_IRQ         = 0x80
-
-defc ACIA_RX_SIZE     = 0x80
-defc ACIA_RX_FULLISH  = 124
-defc ACIA_TX_SIZE     = 0x80
 
 
 

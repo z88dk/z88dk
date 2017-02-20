@@ -45,8 +45,8 @@ dnl
 extern `$3' __LIB__ __FASTCALL__ `$4'``$5''`'(`$6');
 
 ,dnl
-extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
-extern `$3' __LIB__ __CALLEE__ `$4'``$5''_callee`'(`shift(shift(shift(shift(shift($@)))))');
+extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))') __smallc;
+extern `$3' __LIB__ __CALLEE__ `$4'``$5''_callee`'(`shift(shift(shift(shift(shift($@)))))') __smallc;
 `#define' `$5'`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-11))) `$5'_callee`'(substr(`a,b,c,d,e,f,g,h,i,j',0,eval($#+$#-11)))
 
 )',dnl
@@ -65,7 +65,7 @@ extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))') __preserves_
 )dnl
 ,dnl
 `ifdef(`m4_SCCZ80',dnl
-extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
+extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))') __smallc;
 
 ,dnl
 extern `$3' `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
@@ -83,7 +83,7 @@ extern `$3' `$4'```$5'''`'(`shift(shift(shift(shift(shift($@)))))') __preserves_
 )dnl
 
 ,`ifdef(`m4_SCCZ80',dnl
-extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');
+extern `$3' __LIB__ `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))') __smallc;
 
 ,dnl
 extern `$3' `$4'``$5''`'(`shift(shift(shift(shift(shift($@)))))');

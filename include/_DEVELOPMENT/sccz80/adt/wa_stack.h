@@ -30,16 +30,16 @@ extern void __LIB__ __FASTCALL__ wa_stack_destroy(wa_stack_t *s);
 extern int __LIB__ __FASTCALL__ wa_stack_empty(wa_stack_t *s);
 
 
-extern wa_stack_t __LIB__ *wa_stack_init(void *p,void *data,size_t capacity);
-extern wa_stack_t __LIB__ __CALLEE__ *wa_stack_init_callee(void *p,void *data,size_t capacity);
+extern wa_stack_t __LIB__ *wa_stack_init(void *p,void *data,size_t capacity) __smallc;
+extern wa_stack_t __LIB__ __CALLEE__ *wa_stack_init_callee(void *p,void *data,size_t capacity) __smallc;
 #define wa_stack_init(a,b,c) wa_stack_init_callee(a,b,c)
 
 
 extern void __LIB__ __FASTCALL__ *wa_stack_pop(wa_stack_t *s);
 
 
-extern int __LIB__ wa_stack_push(wa_stack_t *s,void *item);
-extern int __LIB__ __CALLEE__ wa_stack_push_callee(wa_stack_t *s,void *item);
+extern int __LIB__ wa_stack_push(wa_stack_t *s,void *item) __smallc;
+extern int __LIB__ __CALLEE__ wa_stack_push_callee(wa_stack_t *s,void *item) __smallc;
 #define wa_stack_push(a,b) wa_stack_push_callee(a,b)
 
 

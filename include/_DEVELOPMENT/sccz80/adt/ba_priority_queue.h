@@ -34,21 +34,21 @@ extern void __LIB__ __FASTCALL__ ba_priority_queue_destroy(ba_priority_queue_t *
 extern int __LIB__ __FASTCALL__ ba_priority_queue_empty(ba_priority_queue_t *q);
 
 
-extern ba_priority_queue_t __LIB__ *ba_priority_queue_init(void *p,void *data,size_t capacity,void *compar);
-extern ba_priority_queue_t __LIB__ __CALLEE__ *ba_priority_queue_init_callee(void *p,void *data,size_t capacity,void *compar);
+extern ba_priority_queue_t __LIB__ *ba_priority_queue_init(void *p,void *data,size_t capacity,void *compar) __smallc;
+extern ba_priority_queue_t __LIB__ __CALLEE__ *ba_priority_queue_init_callee(void *p,void *data,size_t capacity,void *compar) __smallc;
 #define ba_priority_queue_init(a,b,c,d) ba_priority_queue_init_callee(a,b,c,d)
 
 
 extern int __LIB__ __FASTCALL__ ba_priority_queue_pop(ba_priority_queue_t *q);
 
 
-extern int __LIB__ ba_priority_queue_push(ba_priority_queue_t *q,int c);
-extern int __LIB__ __CALLEE__ ba_priority_queue_push_callee(ba_priority_queue_t *q,int c);
+extern int __LIB__ ba_priority_queue_push(ba_priority_queue_t *q,int c) __smallc;
+extern int __LIB__ __CALLEE__ ba_priority_queue_push_callee(ba_priority_queue_t *q,int c) __smallc;
 #define ba_priority_queue_push(a,b) ba_priority_queue_push_callee(a,b)
 
 
-extern int __LIB__ ba_priority_queue_resize(ba_priority_queue_t *q,size_t n);
-extern int __LIB__ __CALLEE__ ba_priority_queue_resize_callee(ba_priority_queue_t *q,size_t n);
+extern int __LIB__ ba_priority_queue_resize(ba_priority_queue_t *q,size_t n) __smallc;
+extern int __LIB__ __CALLEE__ ba_priority_queue_resize_callee(ba_priority_queue_t *q,size_t n) __smallc;
 #define ba_priority_queue_resize(a,b) ba_priority_queue_resize_callee(a,b)
 
 

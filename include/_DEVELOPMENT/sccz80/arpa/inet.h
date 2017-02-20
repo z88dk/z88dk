@@ -8,16 +8,16 @@
 #include <intrinsic.h>
 #include <netinet/in.h>
 
-extern unsigned long __LIB__ htonl(unsigned long);
+extern unsigned long __LIB__ htonl(unsigned long) __smallc;
 
 
-extern unsigned int __LIB__ htons(unsigned int);
+extern unsigned int __LIB__ htons(unsigned int) __smallc;
 
 
-extern unsigned long __LIB__ ntohl(unsigned long);
+extern unsigned long __LIB__ ntohl(unsigned long) __smallc;
 
 
-extern unsigned int __LIB__ ntohs(unsigned int);
+extern unsigned int __LIB__ ntohs(unsigned int) __smallc;
 
 
 

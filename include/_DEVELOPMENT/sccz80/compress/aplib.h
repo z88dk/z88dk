@@ -22,16 +22,16 @@
 //                                                              //
 //////////////////////////////////////////////////////////////////
 
-extern void __LIB__ aplib_depack(void *dst,void *src);
-extern void __LIB__ __CALLEE__ aplib_depack_callee(void *dst,void *src);
+extern void __LIB__ aplib_depack(void *dst,void *src) __smallc;
+extern void __LIB__ __CALLEE__ aplib_depack_callee(void *dst,void *src) __smallc;
 #define aplib_depack(a,b) aplib_depack_callee(a,b)
 
 
 
 #ifdef __SMS
 
-extern void __LIB__ sms_aplib_depack_vram(void *dst,void *src);
-extern void __LIB__ __CALLEE__ sms_aplib_depack_vram_callee(void *dst,void *src);
+extern void __LIB__ sms_aplib_depack_vram(void *dst,void *src) __smallc;
+extern void __LIB__ __CALLEE__ sms_aplib_depack_vram_callee(void *dst,void *src) __smallc;
 #define sms_aplib_depack_vram(a,b) sms_aplib_depack_vram_callee(a,b)
 
 

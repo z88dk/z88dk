@@ -365,7 +365,7 @@ wait_raster:
 ; preserve stack pointer
         ld      (exit_raster+1), sp
 
-IF (__spectrum = 3)
+IF (__SPECTRUM & __SPECTRUM_PENTAGON)
 
 ; synchronize with raster beam
 ; pentagon timing
@@ -752,7 +752,7 @@ PUBLIC asm_NIRVANAP_start
 
 asm_NIRVANAP_start:
         di
-IF (__spectrum != 3)
+IF ((__SPECTRUM & __SPECTRUM_PENTAGON) = 0)
         ld      a, ($004c)
         and     2
         ld      (delay_128k-1), a
@@ -800,7 +800,7 @@ defs 0xfdfd - org_nirvanap - ASMPC
 
 ; -----------------------------------------------------------------------------
 deltas:
-IF (__spectrum = 3)
+IF (__SPECTRUM & __SPECTRUM_PENTAGON)
 ; lookup table with deltas (column offsets)
 ; pentagon
         defb      21, 22, 33, 34, 24, 25, 27, 28, 58, 59, 61, 62, 64, 65, 11, 12
