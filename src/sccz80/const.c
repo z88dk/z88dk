@@ -88,7 +88,7 @@ int constant(LVALUE* lval)
 int fnumber(int32_t* val)
 {
     unsigned char sum[6];
-    int k; /* flag and mask */
+    int i,k; /* flag and mask */
     char minus; /* is if negative! */
     char* start; /* copy of pointer to starting point */
     char* s; /* points into source code */
@@ -132,11 +132,8 @@ int fnumber(int32_t* val)
         return 0;
     dofloat(dval, sum, mathz88 ? 4 : 5, mathz88 ? 127 : 128);
 
-    {
-         int  i;
-         for ( i = 0; i < buffer_fps_num; i++ ) 
-            fprintf(buffer_fps[i], "%.*s", end-start, start);
-    }
+    for ( i = 0; i < buffer_fps_num; i++ ) 
+        fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);
     lptr = end - line;
 
     /* get location for result & bump litptr */

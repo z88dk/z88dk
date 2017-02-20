@@ -556,6 +556,9 @@ dofnansi(SYMBOL* currfn, int32_t* addr)
         }
         break;
     }
+    if ( use_r2l_calling_convention == NO ) {
+        currfn->flags |= SMALLC;
+    }
 
     if (cmatch(';'))
         return (prevarg);

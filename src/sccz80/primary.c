@@ -124,9 +124,9 @@ int primary(LVALUE* lval)
             }
         } else {
             /* Check to see if we have a right bracket, if we don't assume
- * it's a function then we can break an awful lot of code, do it
- * this way and it's safer... we're not GNU after all!
- */
+             * it's a function then we can break an awful lot of code, do it
+             * this way and it's safer... we're not GNU after all!
+             */
             if (rcmatch('('))
                 warning(W_FUNC_NO_PROTO);
             else {
@@ -138,6 +138,7 @@ int primary(LVALUE* lval)
             ptr->size = 0;
             ptr->prototyped = 0; /* No parameters known */
             ptr->args[0] = CalcArgValue(CINT, FUNCTION, 0);
+            ptr->flags |= use_r2l_calling_convention == YES ? 0 : SMALLC;
         }
         lval->symbol = ptr;
         lval->indirect = 0;

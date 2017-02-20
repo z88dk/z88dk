@@ -77,7 +77,7 @@ void callfunction(SYMBOL* ptr)
     }
     needchar(')'); 
 
-    if ( ptr && (ptr->flags & SMALLC) == 0 ) {
+    if ( use_r2l_calling_convention == YES || ( ptr && (ptr->flags & SMALLC) == 0) ) {
         for ( i = 1; argnumber >= i ; argnumber--, i++) {
             FILE *tmp = tmpfiles[i];
             tmpfiles[i] = tmpfiles[argnumber];

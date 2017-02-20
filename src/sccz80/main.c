@@ -46,6 +46,7 @@ void SetMakeShared(char*);
 void SetUseShared(char*);
 void SetAssembler(char* arg);
 void SetOutExt(char* arg);
+static void set_default_r2l(char *arg);
 
 /*
  *
@@ -140,6 +141,7 @@ int main(int argc, char** argv)
     printflevel = 0;
     indexix = YES;
     useframe = NO;
+    use_r2l_calling_convention = NO;
 
     setup_sym(); /* define some symbols */
     /* Parse the command line options */
@@ -795,6 +797,7 @@ struct args myargs[] = {
     { "noframe", NO, SetNoFrame },
 #endif
     { "standard-escape-chars", NO, SetStandardEscape, "Use standard mappings for escape codes" },
+    { "set-r2l-by-default", NO, set_default_r2l, "Use r2l calling by default"},
     /* Compatibility Modes.. */
     { "f", NO, SetUnsigned, NULL },
     { "", 0, NULL, NULL }
@@ -1035,6 +1038,12 @@ void SetVerbose(char* arg)
 void ShowNotFunc(char* arg)
 {
     fprintf(stderr, "Flag -%s is currently non-functional\n", arg);
+}
+
+
+static void set_default_r2l(char *arg)
+{
+    use_r2l_calling_convention = YES;
 }
 
 void ParseArgs(char* arg)
