@@ -12,12 +12,13 @@
  * This program assumes the default configuration so nothing
  * needs to be done to configure the engine prior to compiling.
  *
- * However in other circumstances, the zx's target configuration
- * file should be edited to change the settings ("z88dk/libsrc/
- * _DEVELOPMENT/target/zx/clib_target_cfg.asm") and then the
- * zx library should be rebuilt by running "Winmake zx" (windows)
- * or "make TARGET=zx" (other) from the "z88dk/libsrc/_DEVELOPMENT"
- * directory.
+ * However in other circumstances, the zx's nirvana+ target
+ * configuration file should be edited to change the settings
+ * ("z88dk/libsrc/_DEVELOPMENT/target/zx/config_nirvanap.m4")
+ * and then the zx library should be rebuilt by running
+ * "Winmake zx" (windows) or "make TARGET=zx" (other) from the
+ * "z88dk/libsrc/_DEVELOPMENT" directory.  To run on a pentagon
+ * machine, also edit "target/zx/config_target.m4".
  *
  * Note that if wide tiles or wide sprites are enabled, the ORG
  * address of the Nirvana+ engine will change from 56323.  You

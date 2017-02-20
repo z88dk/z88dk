@@ -35,12 +35,12 @@
  * This program assumes the default configuration so nothing
  * needs to be done to configure the engine prior to compiling.
  *
- * However in other circumstances, the zx's target configuration
- * file should be edited to change the settings ("z88dk/libsrc/
- * _DEVELOPMENT/target/zx/clib_target_cfg.asm") and then the
- * zx library should be rebuilt by running "Winmake zx" (windows)
- * or "make TARGET=zx" (other) from the "z88dk/libsrc/_DEVELOPMENT"
- * directory.
+ * However in other circumstances, the zx's bifrost_h target
+ * configuration file should be edited to change the settings
+ * ("z88dk/libsrc/_DEVELOPMENT/target/zx/config_bifrost_h.m4")
+ * and then the zx library should be rebuilt by running
+ * "Winmake zx" (windows) or "make TARGET=zx" (other) from the
+ * "z88dk/libsrc/_DEVELOPMENT" directory.
  *
  * This program can be compiled as follows:
  *
