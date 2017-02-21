@@ -40,6 +40,7 @@ void callfunction(SYMBOL* ptr)
     unsigned char protoarg;
     char preserve = NO; /* Preserve af when cleaningup */
     FILE *tmpfiles[100];  // 100 arguments enough I guess */
+    FILE *save_fps;
     int   i;
     int   save_fps_num;
    
@@ -60,8 +61,9 @@ void callfunction(SYMBOL* ptr)
 
     while (ch() != ')') {
         char *before, *start;
-        if (endst())
+        if (endst()) {
             break;
+        }
         argnumber++;
         tmpfiles[argnumber] = tmpfile();
         push_buffer_fp(tmpfiles[argnumber]);
@@ -86,9 +88,11 @@ void callfunction(SYMBOL* ptr)
     }
     argnumber = 0;
 
+    /* Don't rewrite expressions whilst we are evaluating */
     save_fps_num = buffer_fps_num;
+    save_fps = mymalloc(buffer_fps_num * sizeof(buffer_fps[0]));
+    memcpy(save_fps, buffer_fps, save_fps_num * sizeof(buffer_fps[0]));
     buffer_fps_num = 0;
-
     while ( tmpfiles[argnumber+1] ) {
         argnumber++;
         rewind(tmpfiles[argnumber]);
@@ -157,8 +161,10 @@ void callfunction(SYMBOL* ptr)
         restore_input();
         fclose(tmpfiles[argnumber]);
     }
+    memcpy(buffer_fps, save_fps, save_fps_num * sizeof(buffer_fps[0]));
     buffer_fps_num = save_fps_num ;
-    
+    free(save_fps);
+
     if (ptr)
         debug(DBG_ARG2, "arg %d proto %d", argnumber, ptr->args[1]);
 

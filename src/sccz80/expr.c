@@ -513,8 +513,9 @@ int heira(LVALUE* lval)
     /* Cast check, little kludge here */
     save_fps_num = buffer_fps_num;
     buffer_fps_num = 0;
-    if (cmatch('(')) {
-        klptr = lptr -1;
+    if (rcmatch('(')) {
+        klptr = lptr;
+        lptr++;
         otag = GetVarID(&var, NO);
         var.sflag = ((var.sign & UNSIGNED) | (var.zfar & FARPTR));
         if (var.type != NO) {
@@ -720,7 +721,7 @@ int heirb(LVALUE* lval)
                 ptr = deref(lval, YES);
                 k = 1;
             } else if (cmatch('(')) {
-                if (ptr == 0) {
+                if (ptr == NULL) {
                     callfunction(NULL_SYM);
                     /* Bugger knows what ya doing..stop SEGV */
                     ptr = dummy_sym[VOID];

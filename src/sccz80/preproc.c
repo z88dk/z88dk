@@ -439,5 +439,6 @@ void push_buffer_fp(FILE *fp)
 
 void pop_buffer_fp()
 {
+    buffer_fps[buffer_fps_num] = NULL;
     buffer_fps_num--;
 }

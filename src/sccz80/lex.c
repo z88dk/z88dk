@@ -1,5 +1,5 @@
 /*
- *      Small C+ Compiler
+ /      Small C+ Compiler
  *
  *      Lexical routines - string matching etc
  *
@@ -61,13 +61,11 @@ int match(char* lit)
 
 int cmatch(char lit)
 {
-	static int x = 0;
     int  i;
     blanks();
     if (eof)
         error(E_EOF);
     if (line[lptr] == lit) {
-	x++;
         for ( i = 0; i < buffer_fps_num; i++ ) {
              fprintf(buffer_fps[i],"%c",line[lptr]);
 	}
