@@ -179,6 +179,23 @@
       
    ENDIF
 
+   IFDEF CRT_GENERATE_VECTOR_TABLE
+   
+      defc __crt_generate_vector_table = CRT_GENERATE_VECTOR_TABLE
+   
+   ELSE
+   
+      IFDEF TAR__crt_generate_vector_table
+      
+         defc __crt_generate_vector_table = TAR__crt_generate_vector_table
+      
+      ELSE
+      
+         defc __crt_generate_vector_table = DEF__crt_generate_vector_table
+      
+      ENDIF
+      
+   ENDIF
 
    IFDEF CRT_ENABLE_STREAMS
    

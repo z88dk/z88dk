@@ -1,4 +1,3 @@
-
 ; address = 0x0000
 
    jp __Start
@@ -259,3 +258,265 @@ ELSE
    retn
 
 ENDIF
+
+IF __crt_generate_vector_table
+
+; address = 0x0069 or 0x0068
+; about 151 bytes to pad, let's make it count!
+
+PUBLIC l_inc_sp
+   
+   inc sp
+   inc sp
+   
+   inc sp
+   inc sp
+   
+   inc sp
+   inc sp
+   
+   inc sp
+   inc sp
+
+l_inc_sp:
+
+   ret
+
+PUBLIC l_setmem_de
+
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+   ld (de),a
+   inc de
+
+l_setmem_de:
+
+   ret
+
+PUBLIC l_neg_hl
+
+l_neg_hl:
+
+   ld a,l
+   cpl
+   ld l,a
+   
+   ld a,h
+   cpl
+   ld h,a
+   
+   inc hl
+   ret
+
+PUBLIC l_neg_de
+
+l_neg_de:
+
+   ld a,e
+   cpl 
+   ld e,a
+   
+   ld a,d
+   cpl
+   ld d,a
+   
+   inc de
+   ret
+
+PUBLIC l_neg_bc
+
+l_neg_bc:
+   
+   ld a,c
+   cpl
+   ld c,a
+   
+   ld a,b
+   cpl
+   ld b,a
+   
+   inc bc
+   ret
+
+PUBLIC error_mc
+
+   pop hl
+   pop hl
+   pop hl
+
+error_mc:
+   
+   ld hl,-1
+   scf
+   ret
+
+PUBLIC error_mnc
+
+   pop hl
+   pop hl
+   pop hl
+
+error_mnc:
+   
+   ld hl,-1
+   
+   scf
+   ccf
+   
+   ret
+
+PUBLIC error_zc
+
+   pop hl
+   pop hl
+   pop hl
+   pop hl
+
+error_zc:
+   
+   ld hl,0
+   scf
+   ret
+
+PUBLIC error_znc
+
+   pop hl
+   pop hl
+   pop hl
+   
+error_znc:
+   
+   ld hl,0
+   
+   scf
+   ccf
+   
+   ret
+
+PUBLIC error_lzc
+
+   pop hl
+
+error_lzc:
+   
+   ld de,0
+   jp error_zc
+
+PUBLIC error_lznc
+
+   pop hl
+
+error_lznc:
+   
+   ld de,0
+   jp error_znc
+
+PUBLIC error_lmc
+
+   pop hl
+
+error_lmc:
+   
+   ld de,-1
+   jp error_mc
+
+PUBLIC error_lmnc
+
+   pop hl
+
+error_lmnc:
+   
+   ld de,-1
+   jp error_mnc
+
+PUBLIC error_oc
+
+   pop hl
+
+error_oc:
+   
+   ld hl,1
+   scf
+   
+   ret
+
+PUBLIC error_onc
+
+   pop hl
+   pop hl
+   pop hl
+
+error_onc:
+   
+   ld hl,1
+   
+   scf
+   ccf
+   
+   ret
+
+PUBLIC l_readword_hl
+
+   inc hl
+   inc hl
+
+   inc hl
+   inc hl
+
+   inc hl
+   inc hl
+   
+   inc hl
+   inc hl
+
+l_readword_hl:
+   
+   ld a,(hl)
+   inc hl
+   ld h,(hl)
+   ld l,a
+   
+   ret
+
+PUBLIC l_offset_ix_de
+
+l_offset_ix_de:
+
+   push ix
+   pop de
+   
+   add hl,de
+   ret
+
+PUBLIC l_offset_ix_bc
+
+l_offset_ix_bc:
+
+   push ix
+   pop bc
+   
+   add hl,bc
+   ret
+
+; address = 0x100
+
+   defs 0x100 - ASMPC
+
+section code_crt_start
+
+ENDIF
+
+defc __page_zero_present = 1

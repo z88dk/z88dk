@@ -25,7 +25,8 @@ define(`__CPU_INFO_ENABLE_SLL', 0x01)
 
 # I/O BASE ADDRESS OF INTERNAL PERIPHERALS
 
-define(`__IO_BASE_ADDRESS', 0x0)
+define(`__IO_BASE_ADDRESS', 0x00)
+define(`__IO_BASE_ADDRESS', eval(__IO_BASE_ADDRESS & 0xc0))
 
 ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 `
