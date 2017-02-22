@@ -68,17 +68,14 @@ int main(int argc, char** argv)
     dubq = mymalloc(FNLITQ); /* Doubles */
     tempq = mymalloc(LITABSZ); /* Temp strings... */
     glbq = mymalloc(LITABSZ); /* Used for glb lits, dumped now */
-    symtab = SYM_CAST mymalloc(NUMGLBS * sizeof(SYMBOL));
-    loctab = SYM_CAST mymalloc(NUMLOC * sizeof(SYMBOL));
-    wqueue = WQ_CAST mymalloc(NUMWHILE * sizeof(WHILE_TAB));
-    gotoq = (GOTO_TAB*)calloc(NUMGOTO, sizeof(GOTO_TAB));
-    if (gotoq == NULL)
-        OutOfMem();
+    symtab = mymalloc(NUMGLBS * sizeof(SYMBOL));
+    loctab = mymalloc(NUMLOC * sizeof(SYMBOL));
+    wqueue = mymalloc(NUMWHILE * sizeof(WHILE_TAB));
+    gotoq = mymalloc(NUMGOTO * sizeof(GOTO_TAB));
+    tagptr = tagtab =  mymalloc(NUMTAG * sizeof(TAG_SYMBOL));
+    membptr = membtab =  mymalloc(NUMMEMB * sizeof(SYMBOL));
 
-    tagptr = tagtab = TAG_CAST mymalloc(NUMTAG * sizeof(TAG_SYMBOL));
-    membptr = membtab = SYM_CAST mymalloc(NUMMEMB * sizeof(SYMBOL));
-
-    swnext = SW_CAST mymalloc(NUMCASE * sizeof(SW_TAB));
+    swnext = mymalloc(NUMCASE * sizeof(SW_TAB));
     swend = swnext + (NUMCASE - 1);
 
     stage = mymalloc(STAGESIZE);
@@ -112,14 +109,14 @@ int main(int argc, char** argv)
         infunc = /* not in function now */
         0; /*  ...all set to zero.... */
 
-    stagenext = NULL_CHAR; /* direct output mode */
+    stagenext = NULL; /* direct output mode */
 
     input = /* no input file */
         inpt2 = /* or include file */
         saveout = /* no diverted output */
-        output = NULL_FD; /* no open units */
+        output = NULL; /* no open units */
 
-    currfn = NULL_SYM; /* no function yet */
+    currfn = NULL; /* no function yet */
     macptr = cmode = 1; /* clear macro pool and enable preprocessing */
     ncomp = doinline = mathz88 = incfloat = compactcode = 0;
     cppcom = 0;
@@ -187,9 +184,9 @@ int main(int argc, char** argv)
  */
 void ccabort()
 {
-    if (inpt2 != NULL_FD)
+    if (inpt2 != NULL)
         endinclude();
-    if (input != NULL_FD)
+    if (input != NULL)
         fclose(input);
     closeout();
     fprintf(stderr, "Compilation aborted\n");
@@ -207,12 +204,12 @@ void parse()
 {
     while (eof == 0) { /* do until no more input */
         if (amatch("extern")) {
-            dodeclare(EXTERNAL, NULL_TAG, 0);
+            dodeclare(EXTERNAL, NULL, 0);
         } else if (amatch("static")) {
-            dodeclare(LSTATIC, NULL_TAG, 0);
+            dodeclare(LSTATIC, NULL, 0);
         } else if (amatch("typedef")) {
-            dodeclare(TYPDEF, NULL_TAG, 0);
-        } else if (dodeclare(STATIK, NULL_TAG, 0)) {
+            dodeclare(TYPDEF, NULL, 0);
+        } else if (dodeclare(STATIK, NULL, 0)) {
             ;
         } else if (ch() == '#') {
             if (match("#asm")) {
@@ -235,12 +232,7 @@ void parse()
 /*
  *      Report errors for user
  */
-
-#ifndef SMALL_C
-void
-#endif
-
-errsummary()
+void errsummary()
 {
     /* see if anything left hanging... */
     if (ncmp) {
@@ -268,13 +260,13 @@ char *nextarg(int n, char* s, int size)
     int i;
 
     if (n < 1 || n >= gargc)
-        return NULL_CHAR;
+        return NULL;
     i = 0;
     str = str2 = gargv[n];
     while (++i < size && (*s++ = *str++))
         ;
     if (*str2 == '\0')
-        return NULL_CHAR;
+        return NULL;
     return s;
 }
 
@@ -621,7 +613,7 @@ void openout()
     FILE* fp;
     clear(); /* erase line */
     output = 0; /* start with none */
-    if (nextarg(filenum, filen2, FILENAME_LEN) == NULL_CHAR)
+    if (nextarg(filenum, filen2, FILENAME_LEN) == NULL)
         return;
     if ((fp = fopen(filen2, "r")) == NULL) {
         fprintf(stderr, "Cannot open source file: %s\n", filen2);

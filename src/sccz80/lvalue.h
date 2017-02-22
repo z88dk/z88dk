@@ -4,7 +4,9 @@
  * $Id: lvalue.h,v 1.4 2009-09-06 18:58:37 dom Exp $
  */
 
-struct lvalue {
+typedef struct lvalue_s LVALUE;
+
+struct lvalue_s {
     SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
     int indirect ;                  /* type of indirect object, 0 for static object */
     int ptr_type ;                  /* type of pointer or array, 0 for other idents */
@@ -19,7 +21,7 @@ struct lvalue {
     char oflags;                    /* Needed for deref of far str*/
     int type;                       /* type (from symbol table) */
     int ident;                      /* ident (from symbol table) */
-	char storage;			/* storage (from sym tab) */
+	enum storage_type storage;			/* storage (from sym tab) */
     char c_id;                      /* ident of cast        */
     char c_vtype;                   /* type of value calc if cast */
     char c_flags;                   /* flags for casting */
@@ -29,4 +31,3 @@ struct lvalue {
     TAG_SYMBOL *c_tag;               
 } ;
 
-#define LVALUE struct lvalue

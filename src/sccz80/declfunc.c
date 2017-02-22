@@ -61,7 +61,7 @@ void StoreFunctionSignature(SYMBOL* ptr)
 int AddNewFunc(
     char* sname,
     int type,
-    int storage,
+    enum storage_type storage,
     char zfar,
     char sign,
     TAG_SYMBOL* otag,
@@ -152,12 +152,7 @@ void newfunc()
  *      and also from AddNewFunc(), returns 0 if added a real
  *      function (code etc)
  */
-
-#ifndef SMALL_C
-SYMBOL*
-#endif
-
-AddFuncCode(char* n, char type, enum ident_type ident, char sign, char zfar, int storage, int more, char check, char simple, TAG_SYMBOL* otag, int32_t* addr)
+SYMBOL *AddFuncCode(char* n, char type, enum ident_type ident, char sign, char zfar, enum storage_type storage, int more, char check, char simple, TAG_SYMBOL* otag, int32_t* addr)
 {
     unsigned char tvalue; /* Used to hold protot value */
     char typ; /* Temporary type */
@@ -307,7 +302,7 @@ void DoFnKR(
         } else if (var.type || regit) {
             if (regit && var.type == NO)
                 var.type = CINT;
-            getarg(var.type, NULL_TAG, NO, 0, var.sign, var.zfar, NO);
+            getarg(var.type, NULL, NO, 0, var.sign, var.zfar, NO);
         } else {
             error(E_BADARG);
             break;
@@ -461,10 +456,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
 }
 
 /* djm Declare a function in the ansi style! */
-#ifndef SMALL_C
-SYMBOL*
-#endif
-dofnansi(SYMBOL* currfn, int32_t* addr)
+SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
 {
     SYMBOL* prevarg; /* ptr to symbol table entry of most recent argument */
     SYMBOL* argptr; /* Temporary holder.. */
@@ -501,7 +493,7 @@ dofnansi(SYMBOL* currfn, int32_t* addr)
         if (var.type == STRUCT) {
             prevarg = getarg(STRUCT, otag, YES, prevarg, 0, var.zfar, proto);
         } else if (var.type) {
-            prevarg = getarg(var.type, NULL_TAG, YES, prevarg, var.sign, var.zfar, proto);
+            prevarg = getarg(var.type, NULL, YES, prevarg, var.sign, var.zfar, proto);
 
         } else {
             warning(W_EXPARG);
@@ -585,10 +577,7 @@ int CheckANSI()
  * called from "newfunc" this routine adds an entry in the
  *      local symbol table for each named argument
  */
-#ifndef SMALL_C
-SYMBOL*
-#endif
-getarg(
+SYMBOL *getarg(
     int typ, /* typ = CCHAR, CINT, DOUBLE or STRUCT */
     TAG_SYMBOL* otag, /* structure tag for STRUCT type objects */
     int deftype, /* YES=ANSI -> addloc NO=K&R -> findloc */

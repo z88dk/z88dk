@@ -64,7 +64,7 @@ int statement()
         } else if (var.type || regit) {
             if (regit && var.type == NO)
                 var.type = CINT;
-            declloc(var.type, NULL_TAG, var.sign, locstatic, var.zfar);
+            declloc(var.type, NULL, var.sign, locstatic, var.zfar);
             return (lastst);
         }
 

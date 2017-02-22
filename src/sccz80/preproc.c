@@ -67,11 +67,11 @@ void vinline()
     int k;
 
     while (1) {
-        if (input == NULL_FD)
+        if (input == NULL)
             openin();
         if (eof)
             return;
-        if ((unit = inpt2) == NULL_FD)
+        if ((unit = inpt2) == NULL)
             unit = input;
         clear();
         while ((k = getc(unit)) > 0) {
@@ -84,7 +84,7 @@ void vinline()
             ++lineno; /* read one more line */
         if (k <= 0) {
             fclose(unit);
-            if (inpt2 != NULL_FD)
+            if (inpt2 != NULL)
                 endinclude();
             else {
                 input = 0;

@@ -32,7 +32,7 @@
  */
 
 int dodeclare(
-    int storage,
+    enum storage_type storage,
     TAG_SYMBOL* mtag, /* tag of struct whose members are being declared, or zero */
     int is_struct /* TRUE if struct member is being declared,                                    zero for union */
     )
@@ -54,7 +54,7 @@ int dodeclare(
         declglb(STRUCT, storage, mtag, otag, is_struct, var.sign, var.zfar);
         return (1);
     } else {
-        declglb(var.type, storage, mtag, NULL_TAG, is_struct, var.sign, var.zfar);
+        declglb(var.type, storage, mtag, NULL, is_struct, var.sign, var.zfar);
         return (1);
     }
 }
@@ -65,7 +65,7 @@ int dodeclare(
  */
 
 TAG_SYMBOL*
-defstruct(char* sname, int storage, int is_struct)
+defstruct(char* sname, enum storage_type storage, int is_struct)
 {
     int itag; /* index of tag in tag symbol table */
     char nam[20]; /* Dummy name */
@@ -120,7 +120,7 @@ defstruct(char* sname, int storage, int is_struct)
  * declare an enum, ATP we have to parse between the curly brackets
  */
 
-void defenum(char* sname, char storage)
+void defenum(char* sname, enum storage_type storage)
 {
     SYMBOL* ptr;
     char name[NAMEMAX];
@@ -181,7 +181,7 @@ int dummy_idx(int typ, TAG_SYMBOL* otag)
  */
 void declglb(
     int typ, /* typ is CCHAR, CINT, DOUBLE, STRUCT, LONG, */
-    int storage,
+    enum storage_type storage,
     TAG_SYMBOL* mtag, /* tag of struct whose members are being declared, or zero */
     TAG_SYMBOL* otag, /* tag of struct for object being declared */
     int is_struct, /* TRUE if struct member being declared, zero if union */
@@ -757,7 +757,7 @@ int needsub(void)
  *      djm 18/3/99
  */
 
-TAG_SYMBOL* GetVarID(struct varid* var, char storage)
+TAG_SYMBOL* GetVarID(struct varid* var, enum storage_type storage)
 {
     TAG_SYMBOL* otag = NULL;
     char sname[NAMEMAX];

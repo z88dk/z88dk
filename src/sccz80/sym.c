@@ -117,7 +117,7 @@ SYMBOL* findmemb(TAG_SYMBOL* tag, char* sname)
 
 SYMBOL* addglb(
     char* sname, enum ident_type id, char typ,
-    int value, int storage, int more, int itag)
+    int value, enum storage_type storage, int more, int itag)
 {
     SYMBOL* ptr;
     if ((ptr = findglb(sname))) {
@@ -179,7 +179,7 @@ SYMBOL* addmemb(
     enum ident_type id,
     char typ,
     int value,
-    int storage,
+    enum storage_type storage,
     int more,
     int itag)
 {
@@ -202,7 +202,7 @@ void addsym(
     char* sname,
     enum ident_type id,
     char typ,
-    int storage,
+    enum storage_type storage,
     int more,
     int itag)
 {

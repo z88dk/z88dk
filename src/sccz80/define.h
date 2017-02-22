@@ -7,13 +7,7 @@
 
 #define NO              0
 #define YES             1
-#ifndef NULL
-#define NULL            0
-#endif
-#define NULL_FD 0
 
-#define NULL_FN 0
-#define NULL_CHAR 0
 
 #define alloc malloc
 
@@ -51,7 +45,7 @@
 #define ENDLOC          (STARTLOC+NUMLOC)
 
 enum ident_type {
-    VARIABLE,
+    VARIABLE = 1,
     ARRAY,
     POINTER,
     FUNCTION,
@@ -63,16 +57,35 @@ enum ident_type {
     PTR_TO_PTR,
     PTR_TO_FNP
 };
+
+enum storage_type {
+    UNKNOWN = 0,
+    STATIK,
+    STKLOC,
+    EXTERNAL,
+    EXTERNP,
+    DECLEXTN,
+    LSTATIC,
+    FAR,
+    LSTKEXT,
+    TYPDEF,
+    PORT8,
+    PORT16
+};
+
+
+
 /*      Define symbol table entry format        */
 
-#define SYMBOL struct symb
-#define TAG_SYMBOL struct tag_symbol
+typedef struct tagsymbol_s TAG_SYMBOL;
+typedef struct symbol_s SYMBOL;
 
-SYMBOL {
+
+struct symbol_s {
         char name[NAMESIZE] ;
         enum ident_type ident;
         char type ;          /* DOUBLE, CINT, CCHAR, STRUCT */
-        char storage ;       /* STATIK, STKLOC, EXTERNAL */
+        enum storage_type storage ;       /* STATIK, STKLOC, EXTERNAL */
         union xx  {          /* offset has a number of interpretations: */
                 int i ;      /* local symbol:  offset into stack */
                              /* struct member: offset into struct */
@@ -93,15 +106,7 @@ SYMBOL {
                                 bit 2 = access via far methods
                               */
 
-} ;
-
-#ifdef SMALL_C
-#define NULL_SYM 0
-#else
-#define NULL_SYM (SYMBOL *)0
-#endif
-
-/*      Define possible entries for "ident"     */
+};
 
 
 /*      Define possible entries for "type"      */
@@ -144,16 +149,8 @@ SYMBOL {
 
 /*      Define possible entries for "storage"   */
 
-#define STATIK  1
-#define STKLOC  2
-#define EXTERNAL 3
-#define EXTERNP  4
-#define DECLEXTN 5
-#define LSTATIC 6
-#define FAR     7
-#define LSTKEXT 8
-#define TYPDEF  9
-#define PORT    10
+
+
 
 
 /*      Flags */
@@ -183,7 +180,7 @@ SYMBOL {
 #define STARTTAG        tagtab
 #define ENDTAG          tagtab+NUMTAG
 
-struct tag_symbol {
+struct tagsymbol_s {
         char name[NAMESIZE] ;     /* structure tag name */
         int size ;                /* size of struct in bytes */
 	char weak; 		  /* Not fully defined */
@@ -192,12 +189,6 @@ struct tag_symbol {
 } ;
 
 
-
-#ifdef SMALL_C
-#define NULL_TAG 0
-#else
-#define NULL_TAG (TAG_SYMBOL *)0
-#endif
 
 /*      Define the structure member table parameters */
 
@@ -300,33 +291,16 @@ GOTO_TAB {
 #define MAX_LEVELS 100
 
 
-#ifdef SMALL_C
-#define SYM_CAST
-#define TAG_CAST
-#define WQ_CAST
-#define SW_CAST
-#else
-#define SYM_CAST (SYMBOL *)
-#define TAG_CAST (TAG_SYMBOL *)
-#define WQ_CAST (WHILE_TAB *)
-#define SW_CAST (SW_TAB *)
-#endif
-
-
 
 /*
  * djm, function for variable definitions now
  */
-
-#define APPFUNC 1
-#define LIBFUNC 2
 
 struct varid {
         unsigned char type;
         unsigned char zfar;
         unsigned char sign;
         unsigned char sflag;
-        unsigned char defstatus; /* APPFUNC, LIBFUNC etc */
         enum ident_type ident;
         int     more;
 };

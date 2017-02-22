@@ -87,7 +87,7 @@ int primary(LVALUE* lval)
                 if (ptr->ident == ENUM)
                     error(E_UNSYMB, sname);
                 if (ptr->type == ENUM) {
-                    lval->symbol = NULL_SYM;
+                    lval->symbol = NULL;
                     lval->indirect = 0;
                     lval->is_const = 1;
                     lval->const_val = ptr->size;
@@ -148,7 +148,7 @@ int primary(LVALUE* lval)
         return (0);
     }
     if (constant(lval)) {
-        lval->symbol = NULL_SYM;
+        lval->symbol = NULL;
         lval->indirect = 0;
         lval->ident = VARIABLE;
         return (0);
@@ -175,7 +175,7 @@ void dcerror(LVALUE* lval)
  */
 int calc(
     int left,
-    void (*oper)(struct lvalue*),
+    void (*oper)(LVALUE *),
     int right)
 {
     if (oper == zdiv)
@@ -198,7 +198,7 @@ int calc(
 
 int calcun(
     unsigned int left,
-    void (*oper)(struct lvalue*),
+    void (*oper)(LVALUE *),
     unsigned int right)
 {
     if (oper == zdiv)
@@ -225,7 +225,7 @@ int calcun(
 
 int CalcStand(
     int left,
-    void (*oper)(struct lvalue*),
+    void (*oper)(LVALUE *),
     int right)
 {
     if (oper == zor)

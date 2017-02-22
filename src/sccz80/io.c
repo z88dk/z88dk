@@ -46,20 +46,6 @@ int symname(char* sname)
 {
     int k;
 
-#ifdef SMALL_C
-    {
-        char* p;
-        char c;
-
-        /* this is about as deep as nesting goes, check memory left */
-        p = alloc(1);
-        /* &c is top of stack, p is end of heap */
-        if ((k = &c - p) < minavail)
-            minavail = k;
-        free(p);
-    }
-#endif
-
     blanks();
     if (alpha(ch()) == 0)
         return (*sname = 0);
@@ -198,7 +184,7 @@ void clearstage(char* before, char* start)
     if ((stagenext = before))
         return;
     if (start) {
-        if (output != NULL_FD) {
+        if (output != NULL) {
 #ifdef INBUILT_OPTIMIZER
             if (infunc)
                 AddBuffer(start);
@@ -235,7 +221,7 @@ void tofile()
 int outbyte(char c)
 {
     if (c) {
-        if (output != NULL_FD) {
+        if (output != NULL) {
             if (stagenext) {
                 return (outstage(c));
             } else {

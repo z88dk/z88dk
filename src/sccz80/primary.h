@@ -1,9 +1,9 @@
 /* primary.c */
 extern int primary(LVALUE *lval);
 extern void dcerror(LVALUE *lval);
-extern int calc(int left, void (*oper)(struct lvalue *), int right);
-extern int calcun(unsigned int left, void (*oper)(struct lvalue *),unsigned int right);
-extern int CalcStand(int left, void (*oper)(struct lvalue *), int right);
+extern int calc(int left, void (*oper)(LVALUE *), int right);
+extern int calcun(unsigned int left, void (*oper)(LVALUE *),unsigned int right);
+extern int CalcStand(int left, void (*oper)(LVALUE *), int right);
 extern void intcheck(LVALUE *lval, LVALUE *lval2);
 extern void force(int t1, int t2, char sign1, char sign2, int lconst);
 extern int widen(LVALUE *lval, LVALUE *lval2);
@@ -21,7 +21,7 @@ extern void rvalload(LVALUE  *lval);
 extern void rvalue(LVALUE *lval);
 extern void test(int label, int parens);
 extern int constexpr(int32_t *val,int flag);
-extern void cscale(int type, struct tag_symbol *tag, int *val);
+extern void cscale(int type, TAG_SYMBOL *tag, int *val);
 extern void addconst(int val, int opr, char zfar);
 extern int docast(LVALUE *lval,char df);
 extern void DoDoubConv(char type, char zunsign);

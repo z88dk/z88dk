@@ -456,12 +456,7 @@ int heir9(LVALUE* lval)
 /* djm, I can't make this routine distinguish between ptr->ptr and ptr
  * so if address loads dummy de,0 to ensure everything works out
  */
-
-#ifndef SMALL_C
-SYMBOL*
-#endif
-
-deref(LVALUE* lval, char isaddr)
+SYMBOL *deref(LVALUE* lval, char isaddr)
 {
     char flags;
     flags = lval->flags;
@@ -482,7 +477,7 @@ deref(LVALUE* lval, char isaddr)
         // else flags &= ~FARACC;
         lval->val_type = lval->indirect = lval->symbol->type;
         lval->flags = flags;
-        lval->symbol = NULL_SYM; /* forget symbol table entry */
+        lval->symbol = NULL; /* forget symbol table entry */
         lval->ptr_type = 0; /* flag as not symbol or array */
         lval->ident = VARIABLE; /* We're now a variable! */
     } else {
@@ -554,7 +549,7 @@ int heira(LVALUE* lval)
         intcheck(lval, lval);
         com(lval);
         lval->const_val = ~lval->const_val;
-        lval->stage_add = NULL_CHAR;
+        lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {
         if (heira(lval))
@@ -562,7 +557,7 @@ int heira(LVALUE* lval)
         lneg(lval);
         lval->binop = lneg;
         lval->const_val = !lval->const_val;
-        lval->stage_add = NULL_CHAR;
+        lval->stage_add = NULL;
         return 0;
     } else if (cmatch('-')) {
         if (heira(lval))
@@ -570,7 +565,7 @@ int heira(LVALUE* lval)
         neg(lval);
         if (lval->val_type != DOUBLE)
             lval->const_val = -lval->const_val;
-        lval->stage_add = NULL_CHAR;
+        lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */
         if (heira(lval))
@@ -722,14 +717,14 @@ int heirb(LVALUE* lval)
                 k = 1;
             } else if (cmatch('(')) {
                 if (ptr == NULL) {
-                    callfunction(NULL_SYM);
+                    callfunction(NULL);
                     /* Bugger knows what ya doing..stop SEGV */
                     ptr = dummy_sym[VOID];
                     warning(W_INTERNAL);
                 } else if (ptr->ident != FUNCTION) {
                     if (k && lval->const_val == 0)
                         rvalue(lval);
-                    callfunction(NULL_SYM);
+                    callfunction(NULL);
                 } else
                     callfunction(ptr);
                 k = lval->is_const = lval->const_val = 0;
@@ -801,9 +796,9 @@ int heirb(LVALUE* lval)
                 lval->indirect = lval->val_type = ptr->type;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
                 lval->ident = VARIABLE;
-                lval->stage_add = NULL_CHAR;
-                lval->tagsym = NULL_TAG;
-                lval->binop = NULL_FN;
+                lval->stage_add = NULL;
+                lval->tagsym = NULL;
+                lval->binop = NULL;
                 if (ptr->type == STRUCT)
                     lval->tagsym = tagtab + ptr->tag_idx;
                 if (ptr->ident == POINTER) {

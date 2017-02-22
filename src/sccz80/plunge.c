@@ -41,7 +41,7 @@ int skim(char* opstr, void (*testfuncz)(), void (*testfuncq)(), int dropval, int
             postlabel(endlab);
             lval->val_type = lval->oldval_type = CINT; /* stops the carry stuff coming in */
             lval->indirect = lval->ptr_type = lval->is_const = lval->const_val = 0;
-            lval->stage_add = NULL_CHAR;
+            lval->stage_add = NULL;
             lval->binop = dummy;
             return (0);
         } else

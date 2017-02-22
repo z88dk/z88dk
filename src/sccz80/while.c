@@ -26,11 +26,8 @@ void delwhile()
         --wqptr;
 }
 
-#ifndef SMALL_C
-WHILE_TAB*
-#endif
 
-readwhile(WHILE_TAB* ptr)
+WHILE_TAB *readwhile(WHILE_TAB *ptr)
 {
     if (ptr <= wqueue) {
         error(E_CONTEXT);
