@@ -754,7 +754,7 @@ int needsub(void)
  *      djm 18/3/99
  */
 
-TAG_SYMBOL* GetVarID(struct varid* var, enum storage_type storage)
+TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
 {
     TAG_SYMBOL* otag = NULL;
     char sname[NAMEMAX];

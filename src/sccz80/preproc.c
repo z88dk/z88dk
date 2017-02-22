@@ -208,125 +208,11 @@ void keepch(char c)
         ++mptr;
 }
 
-/* The preprocessor here is pants, and messes up all sorts of
-   things - best leave it to the external preprocessor to do all
-   the dirty work
-*/
+/* Preprocessing is minimal - we need an external preprocessor */
 void preprocess()
 {
-#if 0
-        char c,sname[NAMESIZE];
-        int k;
-#endif
-
     ifline();
     return;
-#if 0
-        if ( eof || cmode == 0 ) {
-                /* while passing through assembler, only do #if, etc */
-                return ;
-        }
-        mptr = lptr = 0 ;
-        while ( ch() ) {
-                if ( ch()==' ' || ch()=='\t' ) {
-                        keepch(' ');
-                        while ( ch()==' ' || ch()=='\t' )
-                                gch();
-                }
-                else if(ch()=='"') {
-                        keepch(ch());
-                        gch();
-			do {
-                          while ( ch()!='"' || (line[lptr-1]==92 && line[lptr-2]!=92 ) ) {
-                                if(ch()==0) {
-                                        warning(W_EXPQT);
-                                        break;
-                                }
-                                keepch(gch());
-                          }
-			} while (gch() && cmatch('"')  );
-                        keepch('"');
-                }
-                else if(ch()==39) {
-                        keepch(39);
-                        gch();
-                        while ( ch()!=39 || (line[lptr-1]==92 && line[lptr-2]!=92) ) {
-                                if(ch()==0) {
-                                        warning(W_EXPAPO);
-                                        break;
-                                }
-                                keepch(gch());
-                        }
-                        gch();
-                        keepch(39);
-                }
-/*
-                else if (amatch("typedef"))
-                        {
-                                        warning(W_TYPEDEF);
-                                        junk();
-                                        vinline();
-                                        if (eof) break;
-                        }
- */
-                else if (ch()=='/' && nch()=='/' && (cppcom))
-                        {
-                                        junk();
-                                        vinline();
-                                        if (eof) break;
-                        }
-                else if ( ch()=='/' && nch()=='*' ) {
-                        lptr += 2;
-                        while ( ch()!='*' || nch()!='/' ) {
-                                if ( ch() ) {
-                                        ++lptr;
-                                }
-                                else {
-                                        vinline() ;
-                                        if(eof)break;
-                                }
-                        }
-                        lptr += 2;
-                }
-/*
- * Some preprocessor directives, if they get this far then we are running
- * the compiler directly, so we need the quotes around filename
- */
-                else if ( amatch("__LINE__")){
-                        sprintf(sname,"%d",lineno);
-                        for (k=0 ; k<strlen(sname) ; k++ )
-                                keepch(sname[k]);
-                }
-                else if ( amatch("__FILE__") ) {
-                        keepch('"');
-                        for (k=0 ; k<strlen(Filename) ; k++ )
-                                keepch(Filename[k]);
-                        keepch('"');
-                }
-                else if ( alpha(ch()) ) {
-                        k = 0 ;
-                        while ( an(ch()) ) {
-                                if ( k < NAMEMAX )
-                                        sname[k++] = ch() ;
-                                gch();
-                        }
-                        sname[k]=0;
-                        if( (k=findmac(sname)) )
-                                while( (c=macq[k++]) )
-                                        keepch(c);
-                        else {
-                                k=0;
-                                while( (c=sname[k++]) )
-                                        keepch(c);
-                        }
-                }
-                else keepch(gch());
-        }
-        keepch(0);
-        if ( mptr >= MPMAX ) error(E_TOOLONG) ;
-        strcpy(line, mline) ;
-        lptr = 0 ;
-#endif
 }
 
 void addmac()
@@ -347,10 +233,7 @@ void addmac()
         error(E_MACOV);
 }
 
-/*
- * delete macro from symbol table, but leave entry so hashing still works
- */
-
+/* delete macro from symbol table, but leave entry so hashing still works */
 void delmac()
 {
     char sname[NAMESIZE];

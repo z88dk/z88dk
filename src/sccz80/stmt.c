@@ -16,8 +16,8 @@
 
 extern void dogoto(void);
 extern int dolabel(void);
-int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
-int lastline = 0;
+static int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
+static int lastline = 0;
 
 /*
  *      Statement parser
