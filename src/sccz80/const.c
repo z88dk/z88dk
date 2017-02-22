@@ -92,7 +92,6 @@ int fnumber(int32_t* val)
     char minus; /* is if negative! */
     char* start; /* copy of pointer to starting point */
     char* s; /* points into source code */
-    char* dp1; /* First number after dp */
     char* end;
     double dval;
 
@@ -122,7 +121,6 @@ int fnumber(int32_t* val)
         s++;
         return 0;
     }
-    dp1 = ++s;
     while (numeric(*s))
         ++s;
     lptr = (s--) - line; /* save ending point */
@@ -317,9 +315,8 @@ int pstr(int32_t* val)
 
 int tstr(int32_t* val)
 {
-    int k, j;
+    int k = 0;
 
-    j = k = 0;
     if (cmatch('"') == 0)
         return (0);
     do {
@@ -495,7 +492,7 @@ void size_of(LVALUE* lval)
     TAG_SYMBOL* otag;
     SYMBOL* ptr;
     struct varid var;
-    char ident;
+    enum ident_type ident;
 
     needchar('(');
     otag = GetVarID(&var, NO);

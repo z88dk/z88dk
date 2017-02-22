@@ -394,8 +394,9 @@ void PutFrame(char typeobj, int offset)
 /*      at the address on the top of the stack */
 void putstk(char typeobj)
 {
-    SYMBOL* ptr;
     char flags;
+    SYMBOL *ptr;
+
     /* Store via long pointer... */
     ptr = retrstk(&flags);
     if (flags & FARACC) {

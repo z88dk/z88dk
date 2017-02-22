@@ -65,7 +65,7 @@ int AddNewFunc(
     char zfar,
     char sign,
     TAG_SYMBOL* otag,
-    int ident,
+    enum ident_type ident,
     int32_t* addr)
 {
     SYMBOL* ptr;
@@ -157,7 +157,7 @@ void newfunc()
 SYMBOL*
 #endif
 
-AddFuncCode(char* n, char type, char ident, char sign, char zfar, int storage, int more, char check, char simple, TAG_SYMBOL* otag, int32_t* addr)
+AddFuncCode(char* n, char type, enum ident_type ident, char sign, char zfar, int storage, int more, char check, char simple, TAG_SYMBOL* otag, int32_t* addr)
 {
     unsigned char tvalue; /* Used to hold protot value */
     char typ; /* Temporary type */

@@ -116,7 +116,7 @@ SYMBOL* findmemb(TAG_SYMBOL* tag, char* sname)
 }
 
 SYMBOL* addglb(
-    char* sname, char id, char typ,
+    char* sname, enum ident_type id, char typ,
     int value, int storage, int more, int itag)
 {
     SYMBOL* ptr;
@@ -151,7 +151,7 @@ SYMBOL* addglb(
 
 SYMBOL* addloc(
     char* sname,
-    char id,
+    enum ident_type id,
     char typ,
     int more,
     int itag)
@@ -176,7 +176,7 @@ SYMBOL* addloc(
  */
 SYMBOL* addmemb(
     char* sname,
-    char id,
+    enum ident_type id,
     char typ,
     int value,
     int storage,
@@ -200,7 +200,7 @@ SYMBOL* addmemb(
 void addsym(
     SYMBOL* ptr,
     char* sname,
-    char id,
+    enum ident_type id,
     char typ,
     int storage,
     int more,

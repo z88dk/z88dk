@@ -50,6 +50,19 @@
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
 
+enum ident_type {
+    VARIABLE,
+    ARRAY,
+    POINTER,
+    FUNCTION,
+    MACRO,
+    FUNCTIONP,
+    GOTOLABEL,
+    /* Only used is processing, not in symbol table */
+    PTR_TO_FN,
+    PTR_TO_PTR,
+    PTR_TO_FNP
+};
 /*      Define symbol table entry format        */
 
 #define SYMBOL struct symb
@@ -57,7 +70,7 @@
 
 SYMBOL {
         char name[NAMESIZE] ;
-        char ident ;         /*VARIABLE, ARRAY, POINTER, FUNCTION, MACRO */
+        enum ident_type ident;
         char type ;          /* DOUBLE, CINT, CCHAR, STRUCT */
         char storage ;       /* STATIK, STKLOC, EXTERNAL */
         union xx  {          /* offset has a number of interpretations: */
@@ -72,7 +85,7 @@ SYMBOL {
         int  size ;          /* djm, storage reqd! */
         char handled;        /* djm, whether we've written the type or not */
         char prototyped;
-        unsigned char args[MAXARGS];       /* arguments */
+        uint32_t  args[MAXARGS];       /* arguments */
         unsigned char tagarg[MAXARGS];   /* ptrs to tagsymbol entries*/
         int flags ;         /* djm, various flags:
                                 bit 0 = unsigned
@@ -90,18 +103,6 @@ SYMBOL {
 
 /*      Define possible entries for "ident"     */
 
-#define VARIABLE        1
-#define ARRAY           2
-#define POINTER         3
-#define FUNCTION        4
-#define MACRO           5
-/* function returning pointer */
-#define FUNCTIONP       6
-#define GOTOLABEL       9
-/* the following only used in processing, not in symbol table */
-#define PTR_TO_FN       7
-#define PTR_TO_PTR      8
-#define PTR_TO_FNP     10
 
 /*      Define possible entries for "type"      */
 
@@ -152,6 +153,7 @@ SYMBOL {
 #define FAR     7
 #define LSTKEXT 8
 #define TYPDEF  9
+#define PORT    10
 
 
 /*      Flags */
@@ -325,7 +327,7 @@ struct varid {
         unsigned char sign;
         unsigned char sflag;
         unsigned char defstatus; /* APPFUNC, LIBFUNC etc */
-        unsigned char ident;
+        enum ident_type ident;
         int     more;
 };
 
