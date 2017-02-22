@@ -124,12 +124,12 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    define(`__TDR1', eval(__IO_BASE_ADDRESS + 0x07))
    define(`__RDR0', eval(__IO_BASE_ADDRESS + 0x08))
    define(`__RDR1', eval(__IO_BASE_ADDRESS + 0x09))
-	define(`__ASEXT0', eval(__IO_BASE_ADDRESS + 0x12))
-	define(`__ASEXT1', eval(__IO_BASE_ADDRESS + 0x13))
-	define(`__ASTC0L', eval(__IO_BASE_ADDRESS + 0x1a))
-	define(`__ASTC0H', eval(__IO_BASE_ADDRESS + 0x1b))
-	define(`__ASTC1L', eval(__IO_BASE_ADDRESS + 0x1c))
-	define(`__ASTC1H', eval(__IO_BASE_ADDRESS + 0x1d))
+   define(`__ASEXT0', eval(__IO_BASE_ADDRESS + 0x12))
+   define(`__ASEXT1', eval(__IO_BASE_ADDRESS + 0x13))
+   define(`__ASTC0L', eval(__IO_BASE_ADDRESS + 0x1a))
+   define(`__ASTC0H', eval(__IO_BASE_ADDRESS + 0x1b))
+   define(`__ASTC1L', eval(__IO_BASE_ADDRESS + 0x1c))
+   define(`__ASTC1H', eval(__IO_BASE_ADDRESS + 0x1d))
 
    # CSI/O
 
@@ -151,8 +151,8 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    # Others
 
    define(`__FRC', eval(__IO_BASE_ADDRESS + 0x18))
-	define(`__CMR', eval(__IO_BASE_ADDRESS + 0x1e))
-	define(`__CCR', eval(__IO_BASE_ADDRESS + 0x1f))
+   define(`__CMR', eval(__IO_BASE_ADDRESS + 0x1e))
+   define(`__CCR', eval(__IO_BASE_ADDRESS + 0x1f))
 
    # DMA
 
@@ -169,7 +169,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    define(`__MAR1B', eval(__IO_BASE_ADDRESS + 0x2a))
    define(`__IAR1L', eval(__IO_BASE_ADDRESS + 0x2b))
    define(`__IAR1H', eval(__IO_BASE_ADDRESS + 0x2c))
-	define(`__IAR1B', eval(__IO_BASE_ADDRESS + 0x2d))
+   define(`__IAR1B', eval(__IO_BASE_ADDRESS + 0x2d))
    define(`__BCR1L', eval(__IO_BASE_ADDRESS + 0x2e))
    define(`__BCR1H', eval(__IO_BASE_ADDRESS + 0x2f))
    define(`__DSTAT', eval(__IO_BASE_ADDRESS + 0x30))
@@ -297,12 +297,12 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    PUBLIC `TDR1'
    PUBLIC `RDR0'
    PUBLIC `RDR1'
-	PUBLIC `ASEXT0'
-	PUBLIC `ASEXT1'
-	PUBLIC `ASTC0L'
-	PUBLIC `ASTC0H'
-	PUBLIC `ASTC1L'
-	PUBLIC `ASTC1H'
+   PUBLIC `ASEXT0'
+   PUBLIC `ASEXT1'
+   PUBLIC `ASTC0L'
+   PUBLIC `ASTC0H'
+   PUBLIC `ASTC1L'
+   PUBLIC `ASTC1H'
 
    PUBLIC `CNTR'
    PUBLIC `TRD'
@@ -318,8 +318,8 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    PUBLIC `RLDR1H'
 
    PUBLIC `FRC'
-	PUBLIC `CMR'
-	PUBLIC `CCR'
+   PUBLIC `CMR'
+   PUBLIC `CCR'
 
    PUBLIC `SAR0L'
    PUBLIC `SAR0H'
@@ -334,7 +334,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    PUBLIC `MAR1B'
    PUBLIC `IAR1L'
    PUBLIC `IAR1H'
-	PUBLIC `IAR1B'
+   PUBLIC `IAR1B'
    PUBLIC `BCR1L'
    PUBLIC `BCR1H'
    PUBLIC `DSTAT'
@@ -449,12 +449,12 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    defc `TDR1' = __TDR1
    defc `RDR0' = __RDR0
    defc `RDR1' = __RDR1
-	defc `ASEXT0' = __ASEXT0
-	defc `ASEXT1' = __ASEXT1
-	defc `ASTC0L' = __ASTC0L
-	defc `ASTC0H' = __ASTC0H
-	defc `ASTC1L' = __ASTC1L
-	defc `ASTC1H' = __ASTC1H
+   defc `ASEXT0' = __ASEXT0
+   defc `ASEXT1' = __ASEXT1
+   defc `ASTC0L' = __ASTC0L
+   defc `ASTC0H' = __ASTC0H
+   defc `ASTC1L' = __ASTC1L
+   defc `ASTC1H' = __ASTC1H
 
    defc `CNTR' = __CNTR
    defc `TRD' = __TRD
@@ -470,8 +470,8 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    defc `RLDR1H' = __RLDR1H
 
    defc `FRC' = __FRC
-	defc `CMR' = __CMR
-	defc `CCR' = __CCR
+   defc `CMR' = __CMR
+   defc `CCR' = __CCR
 
    defc `SAR0L' = __SAR0L
    defc `SAR0H' = __SAR0H
@@ -486,7 +486,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    defc `MAR1B' = __MAR1B
    defc `IAR1L' = __IAR1L
    defc `IAR1H' = __IAR1H
-	defc `IAR1B' = __IAR1B
+   defc `IAR1B' = __IAR1B
    defc `BCR1L' = __BCR1L
    defc `BCR1H' = __BCR1H
    defc `DSTAT' = __DSTAT
@@ -604,12 +604,12 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    `#define' `TDR1'  __TDR1
    `#define' `RDR0'  __RDR0
    `#define' `RDR1'  __RDR1
-	`#define' `ASEXT0'  __ASEXT0
-	`#define' `ASEXT1'  __ASEXT1
-	`#define' `ASTC0L'  __ASTC0L
-	`#define' `ASTC0H'  __ASTC0H
-	`#define' `ASTC1L'  __ASTC1L
-	`#define' `ASTC1H'  __ASTC1H
+   `#define' `ASEXT0'  __ASEXT0
+   `#define' `ASEXT1'  __ASEXT1
+   `#define' `ASTC0L'  __ASTC0L
+   `#define' `ASTC0H'  __ASTC0H
+   `#define' `ASTC1L'  __ASTC1L
+   `#define' `ASTC1H'  __ASTC1H
 
    `#define' `CNTR'  __CNTR
    `#define' `TRD'  __TRD
@@ -625,8 +625,8 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    `#define' `RLDR1H'  __RLDR1H
 
    `#define' `FRC'  __FRC
-	`#define' `CMR'  __CMR
-	`#define' `CCR'  __CCR
+   `#define' `CMR'  __CMR
+   `#define' `CCR'  __CCR
 
    `#define' `SAR0L'  __SAR0L
    `#define' `SAR0H'  __SAR0H
@@ -641,7 +641,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    `#define' `MAR1B'  __MAR1B
    `#define' `IAR1L'  __IAR1L
    `#define' `IAR1H'  __IAR1H
-	`#define' `IAR1B'  __IAR1B
+   `#define' `IAR1B'  __IAR1B
    `#define' `BCR1L'  __BCR1L
    `#define' `BCR1H'  __BCR1H
    `#define' `DSTAT'  __DSTAT
@@ -739,12 +739,12 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    __sfr __at __TDR1 `TDR1'
    __sfr __at __RDR0 `RDR0'
    __sfr __at __RDR1 `RDR1'
-	__sfr __at __ASEXT0 `ASEXT0'
-	__sfr __at __ASEXT1 `ASEXT1'
-	__sfr __at __ASTC0L `ASTC0L'
-	__sfr __at __ASTC0H `ASTC0H'
-	__sfr __at __ASTC1L `ASTC1L'
-	__sfr __at __ASTC1H `ASTC1H'
+   __sfr __at __ASEXT0 `ASEXT0'
+   __sfr __at __ASEXT1 `ASEXT1'
+   __sfr __at __ASTC0L `ASTC0L'
+   __sfr __at __ASTC0H `ASTC0H'
+   __sfr __at __ASTC1L `ASTC1L'
+   __sfr __at __ASTC1H `ASTC1H'
 
    __sfr __at __CNTR `CNTR'
    __sfr __at __TRD `TRD'
@@ -760,8 +760,8 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    __sfr __at __RLDR1H `RLDR1H'
 
    __sfr __at __FRC `FRC'
-	__sfr __at __CMR `CMR'
-	__sfr __at __CCR `CCR'
+   __sfr __at __CMR `CMR'
+   __sfr __at __CCR `CCR'
 
    __sfr __at __SAR0L `SAR0L'
    __sfr __at __SAR0H `SAR0H'
@@ -776,7 +776,7 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
    __sfr __at __MAR1B `MAR1B'
    __sfr __at __IAR1L `IAR1L'
    __sfr __at __IAR1H `IAR1H'
-	__sfr __at __IAR1B `IAR1B'
+   __sfr __at __IAR1B `IAR1B'
    __sfr __at __BCR1L `BCR1L'
    __sfr __at __BCR1H `BCR1H'
    __sfr __at __DSTAT `DSTAT'
