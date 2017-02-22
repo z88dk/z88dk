@@ -467,7 +467,7 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
         if (flags & FARPTR)
             flags |= FARACC;
         else
-            flags &= MKFARA;
+            flags &= ~FARACC;
     }
     /* NB it has already been determind that lval->symbol is non-zero */
     if (lval->symbol->more == 0) {

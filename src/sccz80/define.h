@@ -9,8 +9,6 @@
 #define YES             1
 
 
-#define alloc malloc
-
 /* Offset to stack params for shared lib funcs */
 
 #define SHAREOFFSET   4
@@ -74,6 +72,21 @@ enum storage_type {
 };
 
 
+/* Symbol flags, | against each other */
+enum symbol_flags {
+        UNSIGNED = 1,
+        FARPTR = 2,
+        FARACC = 4,
+        REGCALL = 8,     /* for certain lib calls only */
+        SHARED = 16,     /* Call via shared library method (append _s) */
+        SHAREDC = 32,     /* Call via rst (library is C code) */
+        CALLEE = 64,      /* Called function pops regs */
+        LIBRARY = 128,    /* Lib routine */
+        SAVEFRAME = 256,  /* Save framepointer */
+        SMALLC = 512      /* L->R calling order */
+};
+
+
 
 /*      Define symbol table entry format        */
 
@@ -96,11 +109,10 @@ struct symbol_s {
         int  more ;          /* index of linked entry in dummy_sym */
         char tag_idx ;       /* index of struct tag in tag table */
         int  size ;          /* djm, storage reqd! */
-        char handled;        /* djm, whether we've written the type or not */
         char prototyped;
         uint32_t  args[MAXARGS];       /* arguments */
         unsigned char tagarg[MAXARGS];   /* ptrs to tagsymbol entries*/
-        int flags ;         /* djm, various flags:
+        enum symbol_flags flags ;         /* djm, various flags:
                                 bit 0 = unsigned
                                 bit 1 = far data/pointer
                                 bit 2 = access via far methods
@@ -153,26 +165,9 @@ struct symbol_s {
 
 
 
-/*      Flags */
 
-#define UNSIGNED  1
-#define FARPTR  2
-#define FARACC  4
-#define REGCALL 8       /* for certain lib calls only */
-#define SHARED  16      /* Call via shared library method (append _s) */
-#define SHAREDC 32	/* Call via rst (library is C code) */
-#define CALLEE  64	/* Called function pops regs */
-#define LIBRARY 128	/* Lib routine */
-#define SAVEFRAME 256     /* Save framepointer */
-#define SMALLC   512    /* L->R calling order */
 
-/*
- * MKDEF is for masking unsigned and far
- */
-#define MKDEF   3
-#define MKSIGN 254
-#define MKFARP 253
-#define MKFARA 251
+
 
 /*      Define the structure tag table parameters */
 
@@ -200,29 +195,33 @@ struct tagsymbol_s {
 
 #define NUMCASE 256
 
-struct sw_tab {
+typedef struct switchtab_s SW_TAB;
+
+struct switchtab_s {
         int label ;             /* label for start of case */
         int32_t value ;             /* value associated with case */
 } ;
 
-#define SW_TAB struct sw_tab
 
 /*      Define the "while" statement queue      */
 
 #define NUMWHILE        20
 #define WQMAX           wqueue+(NUMWHILE-1)
-#define WHILE_TAB struct while_tab
 
-struct while_tab {
+
+typedef struct whiletab_s WHILE_TAB;
+
+struct whiletab_s {
         int sp ;                /* stack pointer */
         int loop ;              /* label for top of loop */
         int exit ;              /* label at end of loop */
 } ;
 
 #define NUMGOTO         100
-#define GOTO_TAB        struct goto_tab
 
-GOTO_TAB {
+typedef struct gototab_s GOTO_TAB;
+
+struct gototab_s {
         int     sp;             /* Stack pointer to correct to */
         SYMBOL *sym;            /* Pointer to goto label       */
         int     lineno;         /* line where goto was         */

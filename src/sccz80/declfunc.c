@@ -420,7 +420,6 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
         where += lgh; /* calculate next offset */
     }
     pushframe();
-    currfn->handled = YES;
     if (currfn->prototyped == 1 && (currfn->flags & REGCALL)) {
         /*
          * Fast call routine..

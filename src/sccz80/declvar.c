@@ -417,7 +417,6 @@ void declglb(
             }
             /* Make library routines so.. */
             if (storage == EXTERNAL && ident == FUNCTION) {
-                myptr->handled = 0;
                 myptr->flags &= (~LIBRARY);
                 if (libdef)
                     myptr->flags |= LIBRARY;
@@ -617,13 +616,13 @@ void declloc(
  *      bits 0-2 = type ; 3-5 = ident, 7-8=flags (signed & zfar)
  */
 
-unsigned char CalcArgValue(char type, char ident, char flags)
+uint32_t CalcArgValue(char type, char ident, enum symbol_flags flags)
 {
     if (type == ELLIPSES)
         return PELLIPSES;
     if (type == VOID)
-        flags &= MKSIGN; /* remove sign from void */
-    return (type + (ident * 8) + ((flags & MKDEF) * 64));
+        flags &= ~UNSIGNED; /* remove sign from void */
+    return (type + (ident * 8) + ((flags & (UNSIGNED|FARPTR)) * 64));
 }
 
 /*
@@ -671,9 +670,7 @@ char* ExpandType(int type, char** dosign, char tagidx)
  *      is..
  */
 
-char*
-
-ExpandArgValue(unsigned char value, char* buffer, char tagidx)
+char *ExpandArgValue(uint32_t value, char* buffer, char tagidx)
 {
     char ident, type, isfar, issigned;
     char *id, *typ, *dofar, *dosign;

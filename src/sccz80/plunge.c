@@ -211,9 +211,9 @@ void plnge2a(int (*heir)(), LVALUE* lval, LVALUE* lval2, void (*oper)(), void (*
          * problems if we allow specifiers after numbers
          */
         if (lval->is_const)
-            lval->flags = (lval->flags & MKSIGN) | (lval2->flags & UNSIGNED);
+            lval->flags = (lval->flags & ~UNSIGNED) | (lval2->flags & UNSIGNED);
         if (lval2->is_const)
-            lval2->flags = (lval2->flags & MKSIGN) | (lval->flags & UNSIGNED);
+            lval2->flags = (lval2->flags & ~UNSIGNED) | (lval->flags & UNSIGNED);
 
         if ((lval->flags & UNSIGNED) != (lval2->flags & UNSIGNED) && (oper == zmod || oper == mult || oper == zdiv))
             warning(W_OPSG);

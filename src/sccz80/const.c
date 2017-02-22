@@ -64,7 +64,7 @@ int constant(LVALUE* lval)
             constype = LONG;
 
         lval->val_type = constype;
-        lval->flags = (lval->flags & MKSIGN) | conssign;
+        lval->flags = (lval->flags & (~UNSIGNED)) | conssign;
         if (constype == LONG)
             vlongconst(lval->const_val);
         else
