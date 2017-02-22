@@ -57,7 +57,9 @@ defc __CPU_INFO = 0x00
 
 defc __CPU_INFO_ENABLE_SLL = 0x01
 
-defc __IO_BASE_ADDRESS = 0x0
+defc __IO_VECTOR_BASE = 0
+
+defc __IO_BASE_ADDRESS = 0
 
 
    ; Z8S180 / Z8L180 CLASS
@@ -72,12 +74,12 @@ defc __IO_BASE_ADDRESS = 0x0
    defc TDR1 = 7
    defc RDR0 = 8
    defc RDR1 = 9
-	defc ASEXT0 = 18
-	defc ASEXT1 = 19
-	defc ASTC0L = 26
-	defc ASTC0H = 27
-	defc ASTC1L = 28
-	defc ASTC1H = 29
+   defc ASEXT0 = 18
+   defc ASEXT1 = 19
+   defc ASTC0L = 26
+   defc ASTC0H = 27
+   defc ASTC1L = 28
+   defc ASTC1H = 29
 
    defc CNTR = 10
    defc TRD = 11
@@ -93,8 +95,8 @@ defc __IO_BASE_ADDRESS = 0x0
    defc RLDR1H = 23
 
    defc FRC = 24
-	defc CMR = 30
-	defc CCR = 31
+   defc CMR = 30
+   defc CCR = 31
 
    defc SAR0L = 32
    defc SAR0H = 33
@@ -109,7 +111,7 @@ defc __IO_BASE_ADDRESS = 0x0
    defc MAR1B = 42
    defc IAR1L = 43
    defc IAR1H = 44
-	defc IAR1B = 45
+   defc IAR1B = 45
    defc BCR1L = 46
    defc BCR1H = 47
    defc DSTAT = 48

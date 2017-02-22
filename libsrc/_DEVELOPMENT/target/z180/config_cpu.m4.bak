@@ -23,6 +23,11 @@ define(`__CPU_INFO', 0x00)
 
 define(`__CPU_INFO_ENABLE_SLL', 0x01)
 
+# INTERRUPT VECTOR TABLE BASE ADDRESS
+
+define(`__IO_VECTOR_BASE', 0x00)
+define(`__IO_VECTOR_BASE', eval(__IO_VECTOR_BASE & 0xe0))
+
 # I/O BASE ADDRESS OF INTERNAL PERIPHERALS
 
 define(`__IO_BASE_ADDRESS', 0x00)
@@ -221,6 +226,8 @@ PUBLIC `__CPU_INFO'
 
 PUBLIC `__CPU_INFO_ENABLE_SLL'
 
+PUBLIC `__IO_VECTOR_BASE'
+
 PUBLIC `__IO_BASE_ADDRESS'
 
 ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
@@ -372,6 +379,8 @@ defc `__CPU_CLOCK' = __CPU_CLOCK
 defc `__CPU_INFO' = __CPU_INFO
 
 defc `__CPU_INFO_ENABLE_SLL' = __CPU_INFO_ENABLE_SLL
+
+defc `__IO_VECTOR_BASE' = __IO_VECTOR_BASE
 
 defc `__IO_BASE_ADDRESS' = __IO_BASE_ADDRESS
 
@@ -526,6 +535,8 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__CPU_INFO_ENABLE_SLL'  __CPU_INFO_ENABLE_SLL
 
+`#define' `__IO_VECTOR_BASE'  __IO_VECTOR_BASE
+
 `#define' `__IO_BASE_ADDRESS'  __IO_BASE_ADDRESS
 
 #ifdef __SCCZ80
@@ -669,131 +680,131 @@ ifelse(eval((__Z180 & __Z180_Z80180) != 0), 1,
 `
    ; Z80180 CLASS
 
-   __sfr __at __CNTLA0 `CNTLA0'
-   __sfr __at __CNTLA1 `CNTLA1'
-   __sfr __at __CNTLB0 `CNTLB0'
-   __sfr __at __CNTLB1 `CNTLB1'
-   __sfr __at __STAT0 `STAT0'
-   __sfr __at __STAT1 `STAT1'
-   __sfr __at __TDR0 `TDR0'
-   __sfr __at __TDR1 `TDR1'
-   __sfr __at __RDR0 `RDR0'
-   __sfr __at __RDR1 `RDR1'
+   __sfr __at __CNTLA0 `CNTLA0';
+   __sfr __at __CNTLA1 `CNTLA1';
+   __sfr __at __CNTLB0 `CNTLB0';
+   __sfr __at __CNTLB1 `CNTLB1';
+   __sfr __at __STAT0 `STAT0';
+   __sfr __at __STAT1 `STAT1';
+   __sfr __at __TDR0 `TDR0';
+   __sfr __at __TDR1 `TDR1';
+   __sfr __at __RDR0 `RDR0';
+   __sfr __at __RDR1 `RDR1';
 
-   __sfr __at __CNTR `CNTR'
-   __sfr __at __TRD `TRD'
+   __sfr __at __CNTR `CNTR';
+   __sfr __at __TRD `TRD';
 
-   __sfr __at __TMDR0L `TMDR0L'
-   __sfr __at __TMDR0H `TMDR0H'
-   __sfr __at __RLDR0L `RLDR0L'
-   __sfr __at __RLDR0H `RLDR0H'
-   __sfr __at __TCR `TCR'
-   __sfr __at __TMDR1L `TMDR1L'
-   __sfr __at __TMDR1H `TMDR1H'
-   __sfr __at __RLDR1L `RLDR1L'
-   __sfr __at __RLDR1H `RLDR1H'
+   __sfr __at __TMDR0L `TMDR0L';
+   __sfr __at __TMDR0H `TMDR0H';
+   __sfr __at __RLDR0L `RLDR0L';
+   __sfr __at __RLDR0H `RLDR0H';
+   __sfr __at __TCR `TCR';
+   __sfr __at __TMDR1L `TMDR1L';
+   __sfr __at __TMDR1H `TMDR1H';
+   __sfr __at __RLDR1L `RLDR1L';
+   __sfr __at __RLDR1H `RLDR1H';
 
-   __sfr __at __FRC `FRC'
+   __sfr __at __FRC `FRC';
 
-   __sfr __at __SAR0L `SAR0L'
-   __sfr __at __SAR0H `SAR0H'
-   __sfr __at __SAR0B `SAR0B'
-   __sfr __at __DAR0L `DAR0L'
-   __sfr __at __DAR0H `DAR0H'
-   __sfr __at __DAR0B `DAR0B'
-   __sfr __at __BCR0L `BCR0L'
-   __sfr __at __BCR0H `BCR0H'
-   __sfr __at __MAR1L `MAR1L'
-   __sfr __at __MAR1H `MAR1H'
-   __sfr __at __MAR1B `MAR1B'
-   __sfr __at __IAR1L `IAR1L'
-   __sfr __at __IAR1H `IAR1H'
-   __sfr __at __BCR1L `BCR1L'
-   __sfr __at __BCR1H `BCR1H'
-   __sfr __at __DSTAT `DSTAT'
-   __sfr __at __DMODE `DMODE'
-   __sfr __at __DCNTL `DCNTL'
+   __sfr __at __SAR0L `SAR0L';
+   __sfr __at __SAR0H `SAR0H';
+   __sfr __at __SAR0B `SAR0B';
+   __sfr __at __DAR0L `DAR0L';
+   __sfr __at __DAR0H `DAR0H';
+   __sfr __at __DAR0B `DAR0B';
+   __sfr __at __BCR0L `BCR0L';
+   __sfr __at __BCR0H `BCR0H';
+   __sfr __at __MAR1L `MAR1L';
+   __sfr __at __MAR1H `MAR1H';
+   __sfr __at __MAR1B `MAR1B';
+   __sfr __at __IAR1L `IAR1L';
+   __sfr __at __IAR1H `IAR1H';
+   __sfr __at __BCR1L `BCR1L';
+   __sfr __at __BCR1H `BCR1H';
+   __sfr __at __DSTAT `DSTAT';
+   __sfr __at __DMODE `DMODE';
+   __sfr __at __DCNTL `DCNTL';
 
-   __sfr __at __IL `IL'
-   __sfr __at __ITC `ITC'
+   __sfr __at __IL `IL';
+   __sfr __at __ITC `ITC';
 
-   __sfr __at __RCR `RCR'
+   __sfr __at __RCR `RCR';
 
-   __sfr __at __CBR `CBR'
-   __sfr __at __BBR `BBR'
-   __sfr __at __CBAR `CBAR'
+   __sfr __at __CBR `CBR';
+   __sfr __at __BBR `BBR';
+   __sfr __at __CBAR `CBAR';
 
-   __sfr __at __OMCR `OMCR'
-   __sfr __at __ICR `ICR'
+   __sfr __at __OMCR `OMCR';
+   __sfr __at __ICR `ICR';
 ',
 `
    ; Z8S180 / Z8L180 CLASS
 
-   __sfr __at __CNTLA0 `CNTLA0'
-   __sfr __at __CNTLA1 `CNTLA1'
-   __sfr __at __CNTLB0 `CNTLB0'
-   __sfr __at __CNTLB1 `CNTLB1'
-   __sfr __at __STAT0 `STAT0'
-   __sfr __at __STAT1 `STAT1'
-   __sfr __at __TDR0 `TDR0'
-   __sfr __at __TDR1 `TDR1'
-   __sfr __at __RDR0 `RDR0'
-   __sfr __at __RDR1 `RDR1'
-   __sfr __at __ASEXT0 `ASEXT0'
-   __sfr __at __ASEXT1 `ASEXT1'
-   __sfr __at __ASTC0L `ASTC0L'
-   __sfr __at __ASTC0H `ASTC0H'
-   __sfr __at __ASTC1L `ASTC1L'
-   __sfr __at __ASTC1H `ASTC1H'
+   __sfr __at __CNTLA0 `CNTLA0';
+   __sfr __at __CNTLA1 `CNTLA1';
+   __sfr __at __CNTLB0 `CNTLB0';
+   __sfr __at __CNTLB1 `CNTLB1';
+   __sfr __at __STAT0 `STAT0';
+   __sfr __at __STAT1 `STAT1';
+   __sfr __at __TDR0 `TDR0';
+   __sfr __at __TDR1 `TDR1';
+   __sfr __at __RDR0 `RDR0';
+   __sfr __at __RDR1 `RDR1';
+   __sfr __at __ASEXT0 `ASEXT0';
+   __sfr __at __ASEXT1 `ASEXT1';
+   __sfr __at __ASTC0L `ASTC0L';
+   __sfr __at __ASTC0H `ASTC0H';
+   __sfr __at __ASTC1L `ASTC1L';
+   __sfr __at __ASTC1H `ASTC1H';
 
-   __sfr __at __CNTR `CNTR'
-   __sfr __at __TRD `TRD'
+   __sfr __at __CNTR `CNTR';
+   __sfr __at __TRD `TRD';
 
-   __sfr __at __TMDR0L `TMDR0L'
-   __sfr __at __TMDR0H `TMDR0H'
-   __sfr __at __RLDR0L `RLDR0L'
-   __sfr __at __RLDR0H `RLDR0H'
-   __sfr __at __TCR `TCR'
-   __sfr __at __TMDR1L `TMDR1L'
-   __sfr __at __TMDR1H `TMDR1H'
-   __sfr __at __RLDR1L `RLDR1L'
-   __sfr __at __RLDR1H `RLDR1H'
+   __sfr __at __TMDR0L `TMDR0L';
+   __sfr __at __TMDR0H `TMDR0H';
+   __sfr __at __RLDR0L `RLDR0L';
+   __sfr __at __RLDR0H `RLDR0H';
+   __sfr __at __TCR `TCR';
+   __sfr __at __TMDR1L `TMDR1L';
+   __sfr __at __TMDR1H `TMDR1H';
+   __sfr __at __RLDR1L `RLDR1L';
+   __sfr __at __RLDR1H `RLDR1H';
 
-   __sfr __at __FRC `FRC'
-   __sfr __at __CMR `CMR'
-   __sfr __at __CCR `CCR'
+   __sfr __at __FRC `FRC';
+   __sfr __at __CMR `CMR';
+   __sfr __at __CCR `CCR';
 
-   __sfr __at __SAR0L `SAR0L'
-   __sfr __at __SAR0H `SAR0H'
-   __sfr __at __SAR0B `SAR0B'
-   __sfr __at __DAR0L `DAR0L'
-   __sfr __at __DAR0H `DAR0H'
-   __sfr __at __DAR0B `DAR0B'
-   __sfr __at __BCR0L `BCR0L'
-   __sfr __at __BCR0H `BCR0H'
-   __sfr __at __MAR1L `MAR1L'
-   __sfr __at __MAR1H `MAR1H'
-   __sfr __at __MAR1B `MAR1B'
-   __sfr __at __IAR1L `IAR1L'
-   __sfr __at __IAR1H `IAR1H'
-   __sfr __at __IAR1B `IAR1B'
-   __sfr __at __BCR1L `BCR1L'
-   __sfr __at __BCR1H `BCR1H'
-   __sfr __at __DSTAT `DSTAT'
-   __sfr __at __DMODE `DMODE'
-   __sfr __at __DCNTL `DCNTL'
+   __sfr __at __SAR0L `SAR0L';
+   __sfr __at __SAR0H `SAR0H';
+   __sfr __at __SAR0B `SAR0B';
+   __sfr __at __DAR0L `DAR0L';
+   __sfr __at __DAR0H `DAR0H';
+   __sfr __at __DAR0B `DAR0B';
+   __sfr __at __BCR0L `BCR0L';
+   __sfr __at __BCR0H `BCR0H';
+   __sfr __at __MAR1L `MAR1L';
+   __sfr __at __MAR1H `MAR1H';
+   __sfr __at __MAR1B `MAR1B';
+   __sfr __at __IAR1L `IAR1L';
+   __sfr __at __IAR1H `IAR1H';
+   __sfr __at __IAR1B `IAR1B';
+   __sfr __at __BCR1L `BCR1L';
+   __sfr __at __BCR1H `BCR1H';
+   __sfr __at __DSTAT `DSTAT';
+   __sfr __at __DMODE `DMODE';
+   __sfr __at __DCNTL `DCNTL';
 
-   __sfr __at __IL `IL'
-   __sfr __at __ITC `ITC'
+   __sfr __at __IL `IL';
+   __sfr __at __ITC `ITC';
 
-   __sfr __at __RCR `RCR'
+   __sfr __at __RCR `RCR';
 
-   __sfr __at __CBR `CBR'
-   __sfr __at __BBR `BBR'
-   __sfr __at __CBAR `CBAR'
+   __sfr __at __CBR `CBR';
+   __sfr __at __BBR `BBR';
+   __sfr __at __CBAR `CBAR';
 
-   __sfr __at __OMCR `OMCR'
-   __sfr __at __ICR `ICR'
+   __sfr __at __OMCR `OMCR';
+   __sfr __at __ICR `ICR';
 ')
 
 ENDIF

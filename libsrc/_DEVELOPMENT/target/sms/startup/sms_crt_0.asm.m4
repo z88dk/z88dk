@@ -76,7 +76,7 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __Start:
-
+	
    include "../crt_start_eidi.inc"
    include "../crt_save_sp.inc"
 

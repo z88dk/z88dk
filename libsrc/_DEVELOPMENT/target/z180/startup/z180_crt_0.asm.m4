@@ -78,6 +78,18 @@ ENDIF
 
 __Start:
 
+   IF __page_zero_present
+   
+      ld a,__IO_BASE_ADDRESS
+      out0 (0x3f),a
+
+   ENDIF
+
+   EXTERN __code_vector_head
+   
+   ld a,__code_vector_head/256
+   ld i,a
+   
    include "../crt_start_eidi.inc"
    include "../crt_save_sp.inc"
 

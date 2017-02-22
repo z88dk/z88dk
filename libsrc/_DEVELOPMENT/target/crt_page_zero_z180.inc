@@ -1,7 +1,7 @@
 ; address = 0x0000
 
-   ld a,__IO_BASE_ADDRESS
-	out0 (0x3f),a
+   ld a,__IO_VECTOR_BASE
+   out0 (0x33),a
 
    jp __Start
 
@@ -263,7 +263,7 @@ ELSE
 
 ENDIF
 
-IF __crt_generate_vector_table
+IF __crt_org_vector_table < 0
 
 ; address = 0x0069 or 0x0068
 ; about 151 bytes to pad, let's make it count!

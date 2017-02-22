@@ -179,19 +179,19 @@
       
    ENDIF
 
-   IFDEF CRT_GENERATE_VECTOR_TABLE
+   IFDEF CRT_ORG_VECTOR_TABLE
    
-      defc __crt_generate_vector_table = CRT_GENERATE_VECTOR_TABLE
+      defc __crt_org_vector_table = CRT_ORG_VECTOR_TABLE
    
    ELSE
    
-      IFDEF TAR__crt_generate_vector_table
+      IFDEF TAR__crt_org_vector_table
       
-         defc __crt_generate_vector_table = TAR__crt_generate_vector_table
+         defc __crt_org_vector_table = TAR__crt_org_vector_table
       
       ELSE
       
-         defc __crt_generate_vector_table = DEF__crt_generate_vector_table
+         defc __crt_org_vector_table = DEF__crt_org_vector_table
       
       ENDIF
       

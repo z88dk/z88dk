@@ -9,7 +9,7 @@ SECTION COMMON0
 
 org __crt_org_code
 
-IF __crt_generate_vector_table
+IF __crt_org_vector_table < 0
 
 section code_vector
 section code_crt_start
@@ -127,10 +127,10 @@ SECTION BSS_END
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-IF __crt_generate_vector_table = 0
+IF __crt_org_vector_table >= 0
 
 SECTION code_vector
-org 0
+org __crt_org_vector_table
 
 ENDIF
 

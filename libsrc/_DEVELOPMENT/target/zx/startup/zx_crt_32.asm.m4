@@ -121,6 +121,16 @@ ENDIF
 
 __Start:
 
+   IF __crt_org_vector_table != 0
+   
+      EXTERN __code_vector_head
+      
+      ld a,__code_vector_head/256
+      ld i,a
+      im 2
+      
+   ENDIF
+	
    include "../crt_start_eidi.inc"
    include "../crt_save_sp.inc"
 

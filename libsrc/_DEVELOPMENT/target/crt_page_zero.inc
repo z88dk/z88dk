@@ -1,7 +1,8 @@
 ; address = 0x0000
 
+   di
+	im 1
    jp __Start
-   defm "Z88DK"
 
 ; address = 0x0008
 
@@ -18,7 +19,7 @@ ELSE
 
 ENDIF
 
-   defm "1.99C"
+   defm "Z88DK"
 
 ; address = 0x0010
 
@@ -34,6 +35,8 @@ ELSE
    ret
 
 ENDIF
+
+   defm "1.99C"
 
 ; address = 0x0018
 
@@ -259,7 +262,7 @@ ELSE
 
 ENDIF
 
-IF __crt_generate_vector_table
+IF __crt_org_vector_table < 0
 
 ; address = 0x0069 or 0x0068
 ; about 151 bytes to pad, let's make it count!
