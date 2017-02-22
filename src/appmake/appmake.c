@@ -226,6 +226,12 @@ FILE *fopen_bin(char *fname, char *crtfile)
     strcpy(name, fname);
     suffix_change(name, "_CODE.bin");
 
+    if (stat(name, &st_file2) < 0)
+    {
+        strcpy(name, fname);
+        suffix_change(name, "_COMMON0.bin");
+    }
+
     stat(fname, &st_file1);
   
     if ((stat(name, &st_file2) < 0) || (st_file2.st_mtime < st_file1.st_mtime)) {
