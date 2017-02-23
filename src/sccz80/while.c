@@ -8,34 +8,33 @@
 
 #include "ccdefs.h"
 
-
-
-void addwhile(WHILE_TAB *ptr)
+void addwhile(WHILE_TAB* ptr)
 {
-        wqptr->sp = ptr->sp = Zsp ;                             /* record stk ptr */
-        wqptr->loop = ptr->loop = getlabel() ;  /* and looping label */
-        wqptr->exit = ptr->exit = getlabel() ;  /* and exit label */
-        if ( wqptr >= WQMAX ) {
-                error(E_WHILE);
-                return;
-        }
-        ++wqptr ;
+    wqptr->sp = ptr->sp = Zsp; /* record stk ptr */
+    wqptr->loop = ptr->loop = getlabel(); /* and looping label */
+    wqptr->exit = ptr->exit = getlabel(); /* and exit label */
+    if (wqptr >= WQMAX) {
+        error(E_WHILE);
+        return;
+    }
+    ++wqptr;
 }
 
 void delwhile()
 {
-        if ( wqptr > wqueue ) --wqptr ;
+    if (wqptr > wqueue)
+        --wqptr;
 }
 
 #ifndef SMALL_C
-WHILE_TAB *
+WHILE_TAB*
 #endif
 
-readwhile(WHILE_TAB *ptr)
+readwhile(WHILE_TAB* ptr)
 {
-        if ( ptr <= wqueue ) {
-                error(E_CONTEXT);
-                return 0;
-        }
-        else return (ptr-1) ;
+    if (ptr <= wqueue) {
+        error(E_CONTEXT);
+        return 0;
+    } else
+        return (ptr - 1);
 }
