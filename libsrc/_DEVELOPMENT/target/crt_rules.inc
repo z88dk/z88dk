@@ -489,14 +489,29 @@
       
    ENDIF
    
+   IFDEF CRT_ENABLE_TRAP
+   
+      defc __crt_enable_trap = CRT_ENABLE_TRAP
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_trap
+      
+         defc __crt_enable_trap = TAR__crt_enable_trap
+      
+      ELSE
+      
+         defc __crt_enable_trap = DEF__crt_enable_trap
+      
+      ENDIF
+      
+   ENDIF
    
    ;; public definitions
 
-   PUBLIC __crt_org_vector_table
-
-	PUBLIC __clib_fopen_max
-	PUBLIC __clib_open_max
-	
+   PUBLIC __clib_fopen_max
+   PUBLIC __clib_open_max
+   
    PUBLIC __exit_stack_size
    PUBLIC __quickexit_stack_size
    
