@@ -106,3 +106,7 @@ extern int standard_escapes;
 extern int scanf_level;
 extern uint32_t scanf_format_option;
 extern uint32_t printf_format_option;
+extern FILE * buffer_fps[];
+extern int buffer_fps_num;
+extern struct parser_stack *pstack;
+extern int use_r2l_calling_convention;
