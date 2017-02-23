@@ -79,14 +79,16 @@ ENDIF
 __Start:
 
    include "../crt_start_di.inc"
-
-   IF __page_zero_present
    
-      ld a,__IO_BASE_ADDRESS
-      out0 (0x3f),a
-
+   IF __page_zero_present
+      
+      ld a,__IO_VECTOR_BASE
+      out0 (IL),a
+      
+      im 2
+      
    ENDIF
-
+   
    EXTERN __code_vector_head
    
    ld a,__code_vector_head/256
