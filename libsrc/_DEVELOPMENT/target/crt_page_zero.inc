@@ -1,7 +1,7 @@
 ; address = 0x0000
 
    di
-	im 1
+   im 1
    jp __Start
 
 ; address = 0x0008
@@ -262,10 +262,52 @@ ELSE
 
 ENDIF
 
-IF __crt_org_vector_table < 0
+IF __crt_org_vector_table = -0x0080
 
-; address = 0x0069 or 0x0068
-; about 151 bytes to pad, let's make it count!
+; place vector table at address 0x0080
+
+; current address = 0x0069 or 0x0068
+; that is 23 bytes to pad, make it count!
+
+PUBLIC error_mc
+
+   pop hl
+   pop hl
+   pop hl
+
+error_mc:
+   
+   ld hl,-1
+   scf
+   ret
+
+PUBLIC error_zc
+
+   pop hl
+   pop hl
+   pop hl
+   pop hl
+
+error_zc:
+   
+   ld hl,0
+   scf
+   ret
+
+; address = 0x80
+
+   defs 0x80 - ASMPC
+
+section code_crt_start
+
+ENDIF
+
+IF (__crt_org_vector_table = -0x0100) || (__crt_org_vector_table = -1)
+
+; place vector table at address 0x0100
+
+; current address = 0x0069 or 0x0068
+; that is 151 bytes to pad, make it count!
 
 PUBLIC l_inc_sp
    
