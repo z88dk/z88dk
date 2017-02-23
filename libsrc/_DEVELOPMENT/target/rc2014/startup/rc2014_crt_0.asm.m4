@@ -107,6 +107,8 @@ ENDIF
 
 __Start:
 
+   include "../crt_start_di.inc"
+
    IF __crt_org_vector_table != 0
    
       EXTERN __code_vector_head
@@ -116,8 +118,7 @@ __Start:
       im 2
       
    ENDIF
-	
-   include "../crt_start_eidi.inc"
+
    include "../crt_save_sp.inc"
 
 __Restart:
@@ -169,6 +170,8 @@ SECTION code_crt_init          ; user and library initialization
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 SECTION code_crt_main
+
+   include "../crt_start_ei.inc"
 
    ; call user program
    

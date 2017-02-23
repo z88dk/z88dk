@@ -109,6 +109,8 @@ ENDIF
 
 __Start:
 
+   include "../crt_start_di.inc"
+
    IF __crt_org_vector_table != 0
    
       EXTERN __code_vector_head
@@ -118,8 +120,6 @@ __Start:
       im 2
       
    ENDIF
-	
-   include "../crt_start_eidi.inc"
    
    IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0x20000) && (!(__crt_on_exit & 0x8)) && (__crt_on_exit & 0x2)
    
@@ -183,6 +183,8 @@ __Restart_2:
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
+
+   include "../crt_start_ei.inc"
 
    ; call user program
    
