@@ -564,12 +564,6 @@ void declloc(
                 cptr->size = size;
             }
             if (rcmatch('=')) {
-                /*
-                 *      Insert the jump in... (remove this z80asm hack)
-                 */
-                if (lstdecl++ == 0 && ISASM(ASM_Z80ASM)) {
-                    jump(lstlab = getlabel());
-                }
                 initials(sname2, type, ident, dsize, more, otag, zfar);
                 ns();
                 cptr->storage = LSTKEXT;
@@ -592,9 +586,6 @@ void declloc(
                     char *before, *start;
                     if ((typ == STRUCT && ident != POINTER) || ident == ARRAY)
                         error(E_AUTOASSIGN, sname);
-                    if (lstdecl)
-                        postlabel(lstlab);
-                    lstdecl = 0;
                     Zsp = modstk(Zsp - (declared - size), NO, NO);
                     declared = 0;
                     setstage(&before, &start);

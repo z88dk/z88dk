@@ -125,12 +125,6 @@ int opertype; /* Saves a lot of code! Reference in cc6 to grab
                            long type operations! */
 
 /*
- * A couple of variables for dealing with local statics
- */
-
-int lstdecl, lstlab;
-
-/*
  * Variable for the offset to a shared library routine
  */
 

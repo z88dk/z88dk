@@ -70,9 +70,6 @@ int statement()
 
         /* not a definition */
         if (declared >= 0) {
-            if (lstdecl)
-                postlabel(lstlab);
-            lstdecl = 0;
             Zsp = modstk(Zsp - declared, NO, NO);
             declared = -1;
         }

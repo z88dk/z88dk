@@ -88,8 +88,6 @@ extern char fnargvalue;
 extern int ltype;
 extern int opertype;
 extern char margtag;
-extern int  lstdecl;
-extern int  lstlab;
 extern int shareoffset;
 extern int debuglevel;
 extern int assemtype;

@@ -436,11 +436,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     }
 
     stackargs = where;
-    lstdecl = 0; /* Set number of local statics to zero */
     if (statement() != STRETURN) {
-        if (lstdecl)
-            postlabel(lstlab);
-        lstdecl = 0;
         /* do a statement, but if it's a return, skip */
         /* cleaning up the stack */
         leave(NO, NO);
