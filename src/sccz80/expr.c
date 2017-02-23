@@ -192,7 +192,7 @@ int heir1a(LVALUE* lval)
             /*
  * Always evaluated as an integer, so fake it temporarily
  */
-            force(CINT, lval->val_type, dosigned, lval->flags & UNSIGNED, 0);
+            force(CINT, lval->val_type, c_default_unsigned, lval->flags & UNSIGNED, 0);
             temptype = lval->val_type;
             lval->val_type = CINT; /* Force to integer */
             testjump(lval, falselab = getlabel());

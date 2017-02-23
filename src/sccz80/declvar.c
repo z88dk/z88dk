@@ -27,6 +27,10 @@
 
 #include "ccdefs.h"
 
+static TAG_SYMBOL *defstruct(char *sname, enum storage_type storage, int is_struct);
+static int      needsub(void);
+static void     swallow_bitfield(void);
+
 /*
  * test for global declarations/structure member declarations
  */
@@ -429,7 +433,7 @@ void declglb(
 
         } else if (is_struct) {
             if (type == CINT && ident == VARIABLE)
-                BitFieldSwallow();
+                swallow_bitfield();
             /* are adding structure member, mtag->size is offset */
             myptr = addmemb(sname, ident, type, mtag->size, storage, more, itag);
             myptr--; /* addmemb returns myptr+1 */
@@ -721,7 +725,7 @@ void ptrerror(int ident)
  *      this routine makes subscript the absolute
  *      size of the array.
  */
-int needsub(void)
+static int needsub(void)
 {
     int32_t num;
 
@@ -752,7 +756,7 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
     char sname[NAMEMAX];
     SYMBOL* ptr;
 
-    var->sign = dosigned;
+    var->sign = c_default_unsigned;
     var->zfar = NO;
     var->type = NO;
     var->sflag = NO;
@@ -788,7 +792,7 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
         swallow("int");
         var->type = CINT;
     } else if (amatch("float") || amatch("double")) {
-        incfloat = 1;
+        need_floatpack = 1;
         var->type = DOUBLE;
     } else if (amatch("void"))
         var->type = VOID;
@@ -799,7 +803,7 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
         if (ptr == 0) /* not defined */
             defenum(sname, storage);
         var->type = CINT;
-        var->sign = dosigned;
+        var->sign = c_default_unsigned;
     } else if ((var->sflag = amatch("struct")) || amatch("union")) {
         var->type = STRUCT;
         /* find structure tag */
@@ -840,11 +844,7 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
     return (0);
 }
 
-/*
- *      Swallow bitfield definition 
- */
-
-void BitFieldSwallow(void)
+static void swallow_bitfield(void)
 {
     int32_t val;
     if (cmatch(':')) {

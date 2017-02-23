@@ -118,9 +118,8 @@ int main(int argc, char** argv)
 
     currfn = NULL; /* no function yet */
     macptr = cmode = 1; /* clear macro pool and enable preprocessing */
-    ncomp = doinline = mathz88 = incfloat = compactcode = 0;
-    cppcom = 0;
-    dosigned = NO;
+    ncomp = doinline = mathz88 = need_floatpack = compactcode = 0;
+    c_default_unsigned = NO;
     useshare = makeshare = sharedfile = NO;
     smartprintf = YES;
     nxtlab = /* start numbers at lowest possible */
@@ -383,7 +382,7 @@ void dumpfns()
         error(E_ZCCOPT);
     }
 
-    if (incfloat) {
+    if (need_floatpack) {
         fprintf(fp, "\nIF !NEED_floatpack\n");
         fprintf(fp, "\tDEFINE\tNEED_floatpack\n");
         fprintf(fp, "ENDIF\n\n");
@@ -755,7 +754,6 @@ struct args {
 struct args myargs[] = {
     { "math-z88", NO, SetMathZ88, "Enable machine native maths mode" },
     { "unsigned", NO, SetUnsigned, "Make all types unsigned" },
-    { "//", NO, SetCppComm, "Accept C++ style // comments" },
     { "do-inline", NO, SetDoInline, "Inline certain common functions" },
     { "stop-error", NO, SetStopError, "Stop when an error is received" },
     { "make-shared", NO, SetMakeShared, "This Library file is shared" },
@@ -905,7 +903,7 @@ void SetMathZ88(char* arg)
 
 void SetUnsigned(char* arg)
 {
-    dosigned = YES;
+    c_default_unsigned = YES;
 }
 
 void SetNoWarn(char* arg)
@@ -922,10 +920,6 @@ void SetAllWarn(char* arg)
         mywarn[i].suppress = 0;
 }
 
-void SetCppComm(char* arg)
-{
-    cppcom = YES;
-}
 
 void SetDoInline(char* arg)
 {
@@ -1074,42 +1068,18 @@ void ParseArgs(char* arg)
 
 void MemCleanup()
 {
-    if (litq) {
-        free(litq);
-    }
-    if (dubq) {
-        free(dubq);
-    }
-    if (tempq) {
-        free(tempq);
-    }
-    if (glbq) {
-        free(glbq);
-    }
-    if (symtab) {
-        free(symtab);
-    }
-    if (loctab) {
-        free(loctab);
-    }
-    if (wqueue) {
-        free(wqueue);
-    }
-    if (tagtab) {
-        free(tagtab);
-    }
-    if (membtab) {
-        free(membtab);
-    }
-    if (swnext) {
-        free(swnext);
-    }
-    if (stage) {
-        free(stage);
-    }
-    if (gotoq) {
-        free(gotoq);
-    }
+    FREENULL(litq);
+    FREENULL(dubq);
+    FREENULL(tempq);
+    FREENULL(glbq);
+    FREENULL(symtab);
+    FREENULL(loctab);
+    FREENULL(wqueue);
+    FREENULL(tagtab);
+    FREENULL(membtab);
+    FREENULL(swnext);
+    FREENULL(stage);
+    FREENULL(gotoq);
 }
 
 void* mymalloc(size_t size)

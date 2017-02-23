@@ -41,7 +41,7 @@ char conssign;
 int constant(LVALUE* lval)
 {
     constype = CINT;
-    conssign = dosigned;
+    conssign = c_default_unsigned;
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(&lval->const_val)) {
         lval->val_type = DOUBLE;
@@ -299,7 +299,7 @@ int pstr(int32_t* val)
     int k;
 
     constype = CINT;
-    conssign = dosigned;
+    conssign = c_default_unsigned;
     if (cmatch('\'')) {
         k = 0;
         while (ch() && ch() != '\'')

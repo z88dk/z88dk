@@ -23,7 +23,7 @@ SYMBOL *symtab, *loctab; /* global and local symbol tables */
 SYMBOL *glbptr, *locptr; /* ptrs to next entries */
 int glbcnt; /* number of globals used */
 
-SYMBOL* dummy_sym[NTYPE + NUMTAG + 1];
+SYMBOL *dummy_sym[NTYPE + NUMTAG + 1];
 
 WHILE_TAB* wqueue; /* start of while queue */
 WHILE_TAB* wqptr; /* ptr to next entry */
@@ -38,11 +38,11 @@ int gltptr, litptr, dubptr; /* index of next entry */
 char macq[MACQSIZE]; /* macro string buffer */
 int macptr; /* and its index */
 
-TAG_SYMBOL* tagtab; /* start of structure tag table */
-TAG_SYMBOL* tagptr; /* ptr to next entry */
+TAG_SYMBOL *tagtab; /* start of structure tag table */
+TAG_SYMBOL *tagptr; /* ptr to next entry */
 
-SYMBOL* membtab; /* structure member table */
-SYMBOL* membptr; /* ptr to next member */
+SYMBOL *membtab; /* structure member table */
+SYMBOL *membptr; /* ptr to next member */
 
 char* stage; /* staging buffer */
 char* stagenext; /* next address in stage */
@@ -60,13 +60,13 @@ char Filename[FILENAME_LEN + 1]; /* output file name */
 
 /* My stuff for LIB of long common functions */
 
-int incfloat, cppcom, doinline, ncomp;
+int need_floatpack, doinline, ncomp;
 
 int stackargs;
 
-int defstatic, appz88, filenum; /* next argument to be used */
+int defstatic, filenum; /* next argument to be used */
 
-char dosigned, makelib, fnflags, mathz88, compactcode;
+char c_default_unsigned, fnflags, mathz88, compactcode;
 
 int nxtlab, /* next avail label # */
     dublab, /* label # relative to double pool */
@@ -101,17 +101,15 @@ int nxtlab, /* next avail label # */
                                         where local[0] is 1st word on stack after ret addr  */
     fname; /* label for name of current fct  */
 
-FILE *input, /* iob # for input file */
-    *output, /* iob # for output file (if any) */
-    *inpt2, /* iob # for "include" file */
-    *saveout; /* holds output ptr when diverted to console */
+FILE    *input; /* iob # for input file */
+FILE    *output; /* iob # for output file (if any) */
+FILE    *inpt2; /* iob # for "include" file */
+FILE    *saveout; /* holds output ptr when diverted to console */
 
-#ifdef SMALL_C
-int minavail = 32000; /* minimum memory available */
-#endif
 
-SYMBOL *currfn, /* ptr to symtab entry for current fn. */
-    *savecurr; /* copy of currfn for #include */
+
+SYMBOL  *currfn; /* ptr to symtab entry for current fn. */
+SYMBOL  *savecurr; /* copy of currfn for #include */
 
 int gargc; /* global copies of command line args */
 char** gargv;
@@ -121,8 +119,7 @@ char endasm;
 char margtag; /* Struct tag number for arg value */
 char fnargvalue; /* Type of argument value (as per proto) */
 int ltype; /* Long? */
-int opertype; /* Saves a lot of code! Reference in cc6 to grab
-                           long type operations! */
+
 
 /*
  * Variable for the offset to a shared library routine
@@ -155,11 +152,6 @@ char* outext;
 
 int defdenums;
 
-/*
- * Size of far heap in bytes/units/twiddle
- */
-
-int farheapsz;
 
 /*
  * Max level for printf (i.e. what routine do we want?)

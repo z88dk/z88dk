@@ -144,7 +144,7 @@ void newfunc()
         return;
     }
     warning(W_RETINT);
-    AddFuncCode(n, CINT, FUNCTION, dosigned, 0, STATIK, 0, 1, NO, 0, &addr);
+    AddFuncCode(n, CINT, FUNCTION, c_default_unsigned, 0, STATIK, 0, 1, NO, 0, &addr);
 }
 
 /*
@@ -587,11 +587,11 @@ SYMBOL *getarg(
     /*
  * This is of dubious need since prototyping came about, we could
  * inadvertently include fp packages if the user includes <math.h> but
- * didn't actually use them, we'll save the incfloat business for
+ * didn't actually use them, we'll save the need_floatpack business for
  * static doubles and definitions of local doubles
  *
  *      if (typ == DOUBLE)
- *              incfloat=1;
+ *              need_floatpack=1;
  */
     argptr = NULL;
 

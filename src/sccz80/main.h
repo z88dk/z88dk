@@ -20,7 +20,6 @@ extern void closeout(void);
 extern void SetNoWarn(char *arg);
 extern void SetMathZ88(char *arg);
 extern void SetUnsigned(char *arg);
-extern void SetCppComm(char *arg);
 extern void SetMakeApp(char *arg);
 extern void SetDoInline(char *arg);
 extern void SetStopError(char *arg);

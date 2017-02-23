@@ -486,11 +486,11 @@ void doreturn(char type)
     if (endst() == 0) {
         if (currfn->more) {
             /* return pointer to value */
-            force(CINT, doexpr(), YES, dosigned, 0);
+            force(CINT, doexpr(), YES, c_default_unsigned, 0);
             leave(CINT, type);
         } else {
             /* return actual value */
-            force(currfn->type, doexpr(), currfn->flags & UNSIGNED, dosigned, 0);
+            force(currfn->type, doexpr(), currfn->flags & UNSIGNED, c_default_unsigned, 0);
             leave(currfn->type, type);
         }
     } else
