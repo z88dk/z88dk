@@ -29,7 +29,15 @@
 #include <time.h>
 
 extern int WasComp(LVALUE* lval);
+
+
 extern char Filenorig[];
+
+
+static void threereg(void);
+static void fivereg(void);
+static void sixreg(void);
+
 
 /*
  * Data for this module
@@ -1090,14 +1098,14 @@ void scale(int type, TAG_SYMBOL* tag)
 {
     switch (type) {
     case CINT:
-        doublereg();
+        ol("add\thl,hl");;
         break;
     case CPTR:
         threereg();
         break;
     case LONG:
-        doublereg();
-        doublereg();
+        ol("add\thl,hl");;
+        ol("add\thl,hl");;
         break;
     case DOUBLE:
         sixreg();
@@ -1112,16 +1120,16 @@ void quikmult(int size, char preserve)
 {
     switch (size) {
     case 16:
-        doublereg();
+        ol("add\thl,hl");;
     case 8:
-        doublereg();
+        ol("add\thl,hl");;
     case 4:
-        doublereg();
+        ol("add\thl,hl");;
     case 2:
-        doublereg();
+        ol("add\thl,hl");;
         break;
     case 12:
-        doublereg();
+        ol("add\thl,hl");;
     case 6:
         sixreg();
         break;
@@ -1137,13 +1145,13 @@ void quikmult(int size, char preserve)
         break;
     case 10:
         fivereg();
-        doublereg();
+        ol("add\thl,hl");;
         break;
     case 14:
-        doublereg();
+        ol("add\thl,hl");;
     case 7:
         sixreg();
-        addbc(); /* BC contains original value */
+        ol("add\thl,bc");  /* BC contains original value */
         break;
     default:
         if (preserve)
@@ -1156,47 +1164,34 @@ void quikmult(int size, char preserve)
     }
 }
 
-/* add BC to the primary register */
-void addbc(void)
-{
-    ol("add\thl,bc");
-}
 
-/* load BC from the primary register */
-void ldbc(void)
+
+
+
+/* Multiply the primary register by three */
+static void threereg(void)
 {
     ol("ld\tb,h");
     ol("ld\tc,l");
-}
-
-/* Double the primary register */
-void doublereg(void)
-{
-    ol("add\thl,hl");
-}
-
-/* Multiply the primary register by three */
-void threereg(void)
-{
-    ldbc();
-    addbc();
-    addbc();
+    ol("add\thl,bc");
+    ol("add\thl,bc");
 }
 
 /* Multiply the primary register by five */
-void fivereg(void)
+static void fivereg(void)
 {
-    ldbc();
-    doublereg();
-    doublereg();
-    addbc();
+    ol("ld\tb,h");
+    ol("ld\tc,l");
+    ol("add\thl,hl");;
+    ol("add\thl,hl");;
+    ol("add\thl,bc");
 }
 
 /* Multiply the primary register by six */
-void sixreg(void)
+static void sixreg(void)
 {
     threereg();
-    doublereg();
+    ol("add\thl,hl");;
 }
 
 /*
@@ -1396,7 +1391,7 @@ void lneg(LVALUE* lval)
         break;
     case CARRY:
         lval->val_type = CARRY;
-        ccf();
+        ol("ccf");
         break;
     case DOUBLE:
         convdoub2int();
@@ -1435,11 +1430,6 @@ void com(LVALUE* lval)
     }
 }
 
-/* Complement the carry flag (used after arithmetic before !) */
-void ccf(void)
-{
-    ol("ccf");
-}
 
 /*
  * Increment value held in main register
@@ -1793,7 +1783,7 @@ void zgt(LVALUE* lval)
                 ol("xor\te");
                 ol("xor\tl");
                 ol("rlca");
-                ccf();
+                ol("ccf");
             }
             lval->val_type = CARRY;
             break;
@@ -1847,7 +1837,7 @@ void zge(LVALUE* lval)
                 ol("xor\te");
                 ol("xor\tl");
                 ol("rlca");
-                ccf();
+                ol("ccf");
                 postlabel(label);
             }
             lval->val_type = CARRY;
