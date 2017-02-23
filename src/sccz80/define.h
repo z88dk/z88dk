@@ -3,6 +3,15 @@
  * $Id: define.h,v 1.18 2016-09-19 09:17:50 dom Exp $
  */
 
+
+ #ifndef DEFINE_H
+ #define DEFINE_H
+
+
+#define MALLOC(x)   mymalloc(x)
+#define CALLOC(x,y) mymalloc(x * y)
+#define FREENULL(x) do { if  (x != NULL ) { free(x); x = NULL; } } while (0)
+
 /*      Stand-alone definitions                 */
 
 #define NO              0
@@ -23,7 +32,7 @@
  #define NAMEMAX 126
 #endif
 
-#define MAXARGS 10
+#define MAXARGS 20
 
 /*      Define the symbol table parameters      */
 
@@ -123,6 +132,7 @@ struct symbol_s {
 
 /*      Define possible entries for "type"      */
 
+
 #define DOUBLE  1
 #define CINT    2
 #define CCHAR   3
@@ -158,14 +168,6 @@ struct symbol_s {
  */
 
 #define NTYPE   15
-
-/*      Define possible entries for "storage"   */
-
-
-
-
-
-
 
 
 
@@ -205,10 +207,8 @@ struct switchtab_s {
 
 /*      Define the "while" statement queue      */
 
-#define NUMWHILE        20
+#define NUMWHILE        100
 #define WQMAX           wqueue+(NUMWHILE-1)
-
-
 typedef struct whiletab_s WHILE_TAB;
 
 struct whiletab_s {
@@ -345,3 +345,10 @@ struct parser_stack {
     int  slineno;
     struct parser_stack *next;
 };
+
+
+
+#define WEM_FATAL    1
+#define WEM_SUPPRESS 2
+
+#endif

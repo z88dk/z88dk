@@ -122,10 +122,10 @@ t_buffer* currentbuffer = NULL;
 
 t_buffer* startbuffer(int blocks)
 {
-    t_buffer* buf = (t_buffer*)mymalloc(sizeof(t_buffer));
+    t_buffer* buf = (t_buffer*)MALLOC(sizeof(t_buffer));
     int size = blocks * STAGESIZE;
     buf->size = size;
-    buf->start = (char*)mymalloc(size);
+    buf->start = (char*)MALLOC(size);
     buf->end = buf->start + blocks * size - 1;
     buf->next = buf->start;
     buf->before = currentbuffer; /* <-- DON'T USE NULL HERE TO SUPPRESS WARNING !!  */
@@ -147,18 +147,18 @@ void clearbuffer(t_buffer* buf)
         currentbuffer = (t_buffer*)currentbuffer->before;
     *buf->next = '\0';
     outstr(buf->start);
-    free(buf->start);
+    FREENULL(buf->start);
     buf->start = buf->next = 0;
-    free(buf);
+    FREENULL(buf);
 }
 
 int outbuffer(char c)
 {
     if (currentbuffer->next == currentbuffer->end) {
         size_t size = currentbuffer->size * 2;
-        char* tmp = (char*)mymalloc(size);
+        char* tmp = (char*)MALLOC(size);
         memcpy(tmp, currentbuffer->start, currentbuffer->size);
-        free(currentbuffer->start);
+        FREENULL(currentbuffer->start);
         currentbuffer->next = tmp + (currentbuffer->start - currentbuffer->next);
         currentbuffer->start = tmp;
         currentbuffer->end = tmp + size - 1;

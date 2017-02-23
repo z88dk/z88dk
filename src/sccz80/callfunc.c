@@ -90,7 +90,7 @@ void callfunction(SYMBOL* ptr)
 
     /* Don't rewrite expressions whilst we are evaluating */
     save_fps_num = buffer_fps_num;
-    save_fps = mymalloc(buffer_fps_num * sizeof(buffer_fps[0]));
+    save_fps = MALLOC(buffer_fps_num * sizeof(buffer_fps[0]));
     memcpy(save_fps, buffer_fps, save_fps_num * sizeof(buffer_fps[0]));
     buffer_fps_num = 0;
     while ( tmpfiles[argnumber+1] ) {
@@ -163,7 +163,7 @@ void callfunction(SYMBOL* ptr)
     }
     memcpy(buffer_fps, save_fps, save_fps_num * sizeof(buffer_fps[0]));
     buffer_fps_num = save_fps_num ;
-    free(save_fps);
+    FREENULL(save_fps);
 
     if (ptr)
         debug(DBG_ARG2, "arg %d proto %d", argnumber, ptr->args[1]);

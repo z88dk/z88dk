@@ -54,5 +54,4 @@ extern void SetFrameIX(char *);
 extern void SetFrameIY(char *);
 extern void SetStandardEscape(char *);
 extern void SetNoFrame(char *);
-extern void OutOfMem(void);
 extern void SetPfLevel(char *);

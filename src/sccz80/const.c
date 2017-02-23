@@ -165,7 +165,7 @@ int stash_double_str(char* start, char* end)
     strncpy(buf, start, len);
     *(buf + len) = 0;
     storeq(len + 1, (unsigned char*)buf, &val);
-    free(buf);
+    FREENULL(buf);
     return (val);
 }
 

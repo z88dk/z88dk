@@ -527,7 +527,6 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
         }
         if (amatch("__smallc")) {
             currfn->flags |= SMALLC;
-            /* Just swallow */
             continue;
         }
         if (amatch("__preserves_regs")) {

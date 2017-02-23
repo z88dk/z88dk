@@ -290,7 +290,7 @@ void defmac(char* text)
 
 void set_temporary_input(FILE *temp)
 {
-    struct parser_stack *stack = mymalloc(sizeof(*stack));
+    struct parser_stack *stack = MALLOC(sizeof(*stack));
     /* Save the current positions */
     memcpy(stack->sline, line, LINESIZE);
     stack->slineno = lineno;
@@ -311,7 +311,7 @@ void restore_input(void)
         lineno = stack->slineno;
         lptr = stack->slptr;
         input = stack->sinput;
-        free(stack);
+        FREENULL(stack);
      }
 }
 

@@ -64,21 +64,21 @@ int main(int argc, char** argv)
     gargv = argv;
 
     /* allocate space for arrays */
-    litq = mymalloc(FNLITQ); /* literals, these 2 dumped end */
-    dubq = mymalloc(FNLITQ); /* Doubles */
-    tempq = mymalloc(LITABSZ); /* Temp strings... */
-    glbq = mymalloc(LITABSZ); /* Used for glb lits, dumped now */
-    symtab = mymalloc(NUMGLBS * sizeof(SYMBOL));
-    loctab = mymalloc(NUMLOC * sizeof(SYMBOL));
-    wqueue = mymalloc(NUMWHILE * sizeof(WHILE_TAB));
-    gotoq = mymalloc(NUMGOTO * sizeof(GOTO_TAB));
-    tagptr = tagtab =  mymalloc(NUMTAG * sizeof(TAG_SYMBOL));
-    membptr = membtab =  mymalloc(NUMMEMB * sizeof(SYMBOL));
+    litq = MALLOC(FNLITQ); /* literals, these 2 dumped end */
+    dubq = MALLOC(FNLITQ); /* Doubles */
+    tempq = MALLOC(LITABSZ); /* Temp strings... */
+    glbq = MALLOC(LITABSZ); /* Used for glb lits, dumped now */
+    symtab = MALLOC(NUMGLBS * sizeof(SYMBOL));
+    loctab = MALLOC(NUMLOC * sizeof(SYMBOL));
+    wqueue = MALLOC(NUMWHILE * sizeof(WHILE_TAB));
+    gotoq = MALLOC(NUMGOTO * sizeof(GOTO_TAB));
+    tagptr = tagtab =  MALLOC(NUMTAG * sizeof(TAG_SYMBOL));
+    membptr = membtab =  MALLOC(NUMMEMB * sizeof(SYMBOL));
 
-    swnext = mymalloc(NUMCASE * sizeof(SW_TAB));
+    swnext = MALLOC(NUMCASE * sizeof(SW_TAB));
     swend = swnext + (NUMCASE - 1);
 
-    stage = mymalloc(STAGESIZE);
+    stage = MALLOC(STAGESIZE);
     stagelast = stage + STAGELIMIT;
 
     /* empty symbol table */
@@ -1076,59 +1076,41 @@ void MemCleanup()
 {
     if (litq) {
         free(litq);
-        litq = 0;
     }
     if (dubq) {
         free(dubq);
-        dubq = 0;
     }
     if (tempq) {
         free(tempq);
-        tempq = 0;
     }
     if (glbq) {
         free(glbq);
-        glbq = 0;
     }
     if (symtab) {
         free(symtab);
-        symtab = 0;
     }
     if (loctab) {
         free(loctab);
-        loctab = 0;
     }
     if (wqueue) {
         free(wqueue);
-        wqueue = 0;
     }
     if (tagtab) {
         free(tagtab);
-        tagtab = 0;
     }
     if (membtab) {
         free(membtab);
-        membtab = 0;
     }
     if (swnext) {
         free(swnext);
-        swnext = 0;
     }
     if (stage) {
         free(stage);
-        stage = 0;
     }
     if (gotoq) {
         free(gotoq);
-        gotoq = 0;
     }
 }
-
-/*
- *   Routine to keep DOG happy and avoid nastiness
- *   should really do this any case..so I'll let it
- *   pass!
- */
 
 void* mymalloc(size_t size)
 {
@@ -1136,13 +1118,9 @@ void* mymalloc(size_t size)
 
     if ((ptr = calloc(size, 1)) != NULL)
         return ptr;
-    else
-        OutOfMem();
+    else {
+        fprintf(stderr, "Out of memory...\n");
+        exit(1);
+    }
     return 0; /* Sigh */
-}
-
-void OutOfMem()
-{
-    fprintf(stderr, "Out of memory...\n");
-    exit(1);
 }
