@@ -1320,7 +1320,7 @@ void zor(LVALUE* lval)
 
 /* Exclusive 'or' the primary and secondary */
 /*      (results in primary) */
-void zxor(LVALUE* lval)
+void zxor(LVALUE *lval)
 {
     switch (lval->val_type) {
     case LONG:
@@ -1478,7 +1478,7 @@ void dec(LVALUE* lval)
 /* and put a literal 1 in the primary if the condition is */
 /* true, otherwise they clear the primary register */
 
-void dummy(LVALUE* lval, int label)
+void dummy(LVALUE *lval)
 {
     /* Dummy function to allows us to check for c/nc at end of if clause */
 }

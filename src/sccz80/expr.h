@@ -5,7 +5,7 @@ extern int heir1(LVALUE *lval);
 extern int heir1a(LVALUE *lval);
 extern int heir2a(LVALUE *lval);
 extern int heir2b(LVALUE *lval);
-extern int heir234(LVALUE *lval, int (*heir)(), char opch, void (*oper)());
+extern int heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval));
 extern int heir2(LVALUE *lval);
 extern int heir3(LVALUE *lval);
 extern int heir4(LVALUE *lval);

@@ -17,7 +17,7 @@
 /*
  * skim over text adjoining || and && operators
  */
-int skim(char* opstr, void (*testfuncz)(), void (*testfuncq)(), int dropval, int endval, int (*heir)(), LVALUE* lval)
+int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int dropval, int endval, int (*heir)(LVALUE* lval), LVALUE* lval)
 {
     int droplab, endlab, hits, k;
 
@@ -52,7 +52,7 @@ int skim(char* opstr, void (*testfuncz)(), void (*testfuncq)(), int dropval, int
 /*
  * test for early dropout from || or && evaluations
  */
-void dropout(int k, void (*testfuncz)(), void (*testfuncq)(), int exit1, LVALUE* lval)
+void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int exit1, LVALUE* lval)
 {
     if (k)
         rvalue(lval);
@@ -75,7 +75,7 @@ void dropout(int k, void (*testfuncz)(), void (*testfuncq)(), int exit1, LVALUE*
 /*
  * unary plunge to lower level
  */
-int plnge1(int (*heir)(), LVALUE* lval)
+int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
 {
     char *before, *start;
     int k;
@@ -92,7 +92,7 @@ int plnge1(int (*heir)(), LVALUE* lval)
 /*
  * binary plunge to lower level (not for +/-)
  */
-void plnge2a(int (*heir)(), LVALUE* lval, LVALUE* lval2, void (*oper)(), void (*doper)())
+void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(), void (*doper)())
 {
     char *before, *start;
 
@@ -233,7 +233,7 @@ void plnge2a(int (*heir)(), LVALUE* lval, LVALUE* lval2, void (*oper)(), void (*
 /*
  * binary plunge to lower level (for +/-)
  */
-void plnge2b(int (*heir)(), LVALUE* lval, LVALUE* lval2, void (*oper)())
+void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval))
 {
     char *before, *start, *before1, *start1;
     int val, oldsp = Zsp;

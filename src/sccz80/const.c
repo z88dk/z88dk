@@ -22,6 +22,8 @@
 
 #include <math.h>
 
+static int get_member_size(TAG_SYMBOL *ptr);;
+static int32_t search_litq_for_doublestr(unsigned char *num);;
 static void dofloat(double raw, unsigned char fa[6], int mant_bytes, int exp_bias);
 
 /*
@@ -139,7 +141,7 @@ int fnumber(int32_t* val)
         *val = stash_double_str(start, lptr + line);
         return (1);
     } else {
-        *val = searchdub(sum);
+        *val = search_litq_for_doublestr(sum);
     }
     return (1); /* report success */
 }
@@ -173,7 +175,7 @@ int stash_double_str(char* start, char* end)
  * number - saves space etc etc
  */
 
-int32_t searchdub(unsigned char* num)
+static int32_t search_litq_for_doublestr(unsigned char* num)
 {
     unsigned char* tempdub;
     int dubleft, k, match;
@@ -521,7 +523,7 @@ void size_of(LVALUE* lval)
                 lval->const_val = 6;
                 break;
             case STRUCT:
-                lval->const_val = GetMembSize(otag);
+                lval->const_val = get_member_size(otag);
                 if (lval->const_val == 0)
                     lval->const_val = otag->size;
             }
@@ -540,7 +542,7 @@ void size_of(LVALUE* lval)
                 if (ptr->type != STRUCT) {
                     lval->const_val = ptr->size;
                 } else {
-                    lval->const_val = GetMembSize(tagtab + ptr->tag_idx);
+                    lval->const_val = get_member_size(tagtab + ptr->tag_idx);
                     if (lval->const_val == 0)
                         lval->const_val = ptr->size;
                 }
@@ -566,7 +568,7 @@ void size_of(LVALUE* lval)
     vconst(lval->const_val);
 }
 
-int GetMembSize(TAG_SYMBOL* ptr)
+static int get_member_size(TAG_SYMBOL* ptr)
 {
     char sname[NAMEMAX];
     SYMBOL* ptr2;

@@ -61,7 +61,7 @@ int heir1(LVALUE* lval)
 {
     char *before, *start;
     LVALUE lval2, lval3;
-    void (*oper)(), (*doper)();
+    void (*oper)(LVALUE *lval), (*doper)(LVALUE *lval);
     int k;
 
     ClearCast(&lval2);
@@ -269,7 +269,7 @@ int heir2b(LVALUE* lval)
     return skim("&&", testjump, jumpnc, 0, 1, heir2, lval);
 }
 
-int heir234(LVALUE* lval, int (*heir)(), char opch, void (*oper)())
+int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval))
 {
     LVALUE lval2;
     int k;

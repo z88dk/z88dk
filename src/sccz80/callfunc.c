@@ -14,6 +14,7 @@
 
 static int SetWatch(char* sym, int* isscanf);
 static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
+static int ForceArgs(char dest, char src, int expr, char functab);
 
 /*
  *      External variables used
@@ -277,7 +278,7 @@ static int SetWatch(char* sym, int* type)
  *      djm routine to force arguments to switch type
  */
 
-int ForceArgs(char dest, char src, int expr, char functab)
+static int ForceArgs(char dest, char src, int expr, char functab)
 {
     char did, dtype, disfar, dissign;
     char sid, stype, sisfar, sissign;

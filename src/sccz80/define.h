@@ -39,7 +39,6 @@
 /* Stefano  - doubled the global symbol table size */
 /* Aralbrec - doubled the global symbol table size again! */
 #define NUMGLBS         2048
-#define MASKGLBS        2047
 #define STARTGLB        symtab
 #define ENDGLB          (STARTGLB+NUMGLBS)
 
@@ -347,6 +346,36 @@ struct parser_stack {
     int  slineno;
     struct parser_stack *next;
 };
+
+
+
+typedef struct lvalue_s LVALUE;
+
+struct lvalue_s {
+        SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
+        int indirect ;                  /* type of indirect object, 0 for static object */
+        int ptr_type ;                  /* type of pointer or array, 0 for other idents */
+        int is_const ;                  /* true if constant expression */
+        int32_t const_val ;                        /* value of constant expression (& other uses) */
+        TAG_SYMBOL *tagsym ;    /* tag symbol address, 0 if not struct */
+        void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
+        char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
+        int val_type ;                  /* type of value calculated */
+	int oldval_type;		/* What the valtype was */
+        enum symbol_flags flags ;                    /* As per symbol */
+        char oflags;                    /* Needed for deref of far str*/
+        int type;                       /* type (from symbol table) */
+        int ident;                      /* ident (from symbol table) */
+        enum storage_type storage;			/* storage (from sym tab) */
+        char c_id;                      /* ident of cast        */
+        char c_vtype;                   /* type of value calc if cast */
+        char c_flags;                   /* flags for casting */
+	int  level;		/* Parenth level (cast) */
+	int  castlevel;
+	int  offset;
+    TAG_SYMBOL *c_tag;               
+} ;
+
 
 
 #endif

@@ -8,14 +8,17 @@
 
 #include "ccdefs.h"
 
-int hash(char* sname)
+static int hash(char *sname);
+static void initialise_sym(SYMBOL *ptr, char *sname, enum ident_type id, char typ, enum storage_type storage, int more, int itag);
+
+static int hash(char* sname)
 {
     int c, h;
 
     h = *sname;
     while ((c = *(++sname)))
         h = (h << 1) + c;
-    return (h & MASKGLBS);
+    return (h & (NUMGLBS-1));
 }
 
 /* djm
@@ -143,7 +146,7 @@ SYMBOL* addglb(
         error(E_GLBOV);
         return 0;
     }
-    addsym(glbptr, sname, id, typ, storage, more, itag);
+    initialise_sym(glbptr, sname, id, typ, storage, more, itag);
     glbptr->offset.i = value;
     ++glbcnt;
     return (glbptr);
@@ -167,7 +170,7 @@ SYMBOL* addloc(
         return 0;
     }
     cptr = locptr++;
-    addsym(cptr, sname, id, typ, STKLOC, more, itag);
+    initialise_sym(cptr, sname, id, typ, STKLOC, more, itag);
     return cptr;
 }
 
@@ -187,7 +190,7 @@ SYMBOL* addmemb(
         error(E_MEMOV);
         return 0;
     }
-    addsym(membptr, sname, id, typ, storage, more, itag);
+    initialise_sym(membptr, sname, id, typ, storage, more, itag);
     membptr->offset.i = value;
     ++membptr;
     return (membptr);
@@ -197,7 +200,7 @@ SYMBOL* addmemb(
  * insert values into symbol table
  */
 
-void addsym(
+static void initialise_sym(
     SYMBOL* ptr,
     char* sname,
     enum ident_type id,

@@ -108,7 +108,7 @@ extern void jumpc(int);
 extern void jumpr(int);
 extern void opjumpr(char *, int);
 extern void setcond(int);
-extern void dummy(LVALUE *, int);
+extern void dummy(LVALUE *);
 extern void LoadAccum(void);
 extern void CpCharVal(int);
 extern void EmitLine(int);

@@ -417,7 +417,7 @@ void result(LVALUE* lval, LVALUE* lval2)
 void prestep(
     LVALUE* lval,
     int n,
-    void (*step)())
+    void (*step)(LVALUE *lval))
 {
     if (heira(lval) == 0) {
         needlval();
@@ -459,8 +459,8 @@ void poststep(
     int k,
     LVALUE* lval,
     int n,
-    void (*step)(),
-    void (*unstep)())
+    void (*step)(LVALUE *lval),
+    void (*unstep)(LVALUE *lval))
 {
     if (k == 0) {
         needlval();
@@ -510,7 +510,7 @@ void poststep(
 void nstep(
     LVALUE* lval,
     int n,
-    void (*unstep)())
+    void (*unstep)(LVALUE *lval))
 {
     addconst(n, 1, lval->symbol->flags & FARPTR);
     store(lval);
