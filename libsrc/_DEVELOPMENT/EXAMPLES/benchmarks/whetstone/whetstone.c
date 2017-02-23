@@ -99,13 +99,13 @@ C**********************************************************************
 
 /* map the FORTRAN math functions, etc. to the C versions */
 
-#define DSIN	sin
-#define DCOS	cos
-#define DATAN	atan
-#define DLOG	log
-#define DEXP	exp
-#define DSQRT	sqrt
-#define IF	if
+#define DSIN   sin
+#define DCOS   cos
+#define DATAN  atan
+#define DLOG   log
+#define DEXP   exp
+#define DSQRT  sqrt
+#define IF     if
 
 /* function prototypes */
 
