@@ -257,8 +257,9 @@ char putmac(char c)
 
 int findmac(char* sname)
 {
-    if (findglb(sname) != 0 && glbptr->ident == MACRO) {
-        return (glbptr->offset.i);
+    SYMBOL *ptr;
+    if ( ( ptr = findglb(sname)) != NULL && ptr->ident == MACRO) {
+        return (ptr->offset.i);
     }
     return (0);
 }

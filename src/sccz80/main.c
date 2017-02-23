@@ -68,7 +68,7 @@ int main(int argc, char** argv)
     dubq = MALLOC(FNLITQ); /* Doubles */
     tempq = MALLOC(LITABSZ); /* Temp strings... */
     glbq = MALLOC(LITABSZ); /* Used for glb lits, dumped now */
-    symtab = MALLOC(NUMGLBS * sizeof(SYMBOL));
+    symtab = NULL;
     loctab = MALLOC(NUMLOC * sizeof(SYMBOL));
     wqueue = MALLOC(NUMWHILE * sizeof(WHILE_TAB));
     gotoq = MALLOC(NUMGOTO * sizeof(GOTO_TAB));
@@ -81,12 +81,6 @@ int main(int argc, char** argv)
     stage = MALLOC(STAGESIZE);
     stagelast = stage + STAGELIMIT;
 
-    /* empty symbol table */
-    glbptr = STARTGLB;
-    while (glbptr < ENDGLB) {
-        glbptr->name[0] = 0;
-        ++glbptr;
-    }
 
     glbcnt = 0; /* clear global symbols */
     locptr = STARTLOC; /* clear local symbols */
@@ -318,11 +312,7 @@ void dumpfns()
     if (!glbcnt)
         return;
 
-    /* Start at the start! */
-    glbptr = STARTGLB;
-
-    ptr = STARTGLB;
-    while (ptr < ENDGLB) {
+    for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
         if (ptr->name[0] != 0 && ptr->name[0] != '0') {
             ident = ptr->ident;
             if (ident == FUNCTIONP)
@@ -375,7 +365,6 @@ void dumpfns()
                 }
             }
         }
-        ++ptr;
     }
 
     if ((fp = fopen("zcc_opt.def", "a")) == NULL) {
@@ -484,14 +473,12 @@ void dumpvars()
         return;
 
     /* Start at the start! */
-    glbptr = STARTGLB;
     outstr("; --- Start of Static Variables ---\n\n");
 
     output_section("bss_compiler"); // output_section("bss");
 
-    ptr = STARTGLB;
-    while (ptr < ENDGLB) {
-        if (ptr->name[0] != 0 && ptr->name[0] != '0') {
+    for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
+        if (ptr->name[0] != '0') {
             ident = ptr->ident;
             type = ptr->type;
             storage = ptr->storage;
@@ -504,7 +491,6 @@ void dumpvars()
                 nl();
             }
         }
-        ++ptr;
     }
 
     /* Switch back to standard section */
@@ -1072,7 +1058,6 @@ void MemCleanup()
     FREENULL(dubq);
     FREENULL(tempq);
     FREENULL(glbq);
-    FREENULL(symtab);
     FREENULL(loctab);
     FREENULL(wqueue);
     FREENULL(tagtab);

@@ -6,7 +6,6 @@ extern char Version[];
 extern char Overflow[];
 extern SYMBOL *symtab;
 extern SYMBOL *loctab;
-extern SYMBOL *glbptr;
 extern SYMBOL *locptr;
 extern int glbcnt;
 extern SYMBOL *dummy_sym[];

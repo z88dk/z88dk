@@ -8,25 +8,16 @@
 
 #include "ccdefs.h"
 
-static int hash(char *sname);
 static void initialise_sym(SYMBOL *ptr, char *sname, enum ident_type id, char typ, enum storage_type storage, int more, int itag);
 
-static int hash(char* sname)
-{
-    int c, h;
 
-    h = *sname;
-    while ((c = *(++sname)))
-        h = (h << 1) + c;
-    return (h & (NUMGLBS-1));
-}
 
 /* djm
  * Find a local static variable - uses findglb after first kludging the
  * name to a hopefully unique identifier!
  */
 
-SYMBOL* findstc(char* sname)
+SYMBOL *findstc(char* sname)
 {
     char sname2[3 * NAMESIZE]; /* Should be enuff! */
     strcpy(sname2, "st_");
@@ -46,27 +37,24 @@ SYMBOL* findstc(char* sname)
 
 SYMBOL* findenum(char* sname)
 {
-    SYMBOL* ptr;
-    if ((ptr = findglb(sname))) {
-        if (ptr->ident == ENUM)
-            return (ptr);
-        else
-            error(E_ENUMDEF);
+    SYMBOL *ptr = findglb(sname);
+
+    if ( ptr != NULL ) {
+        if ( ptr->ident == ENUM ) {
+            return ptr;
+        }
+        error(E_ENUMDEF);
     }
-    return (0);
+    return NULL;
 }
 
 SYMBOL* findglb(char* sname)
 {
-    glbptr = STARTGLB + hash(sname);
-    while (strcmp(sname, glbptr->name)) {
-        if (glbptr->name[0] == 0)
-            return 0;
-        ++glbptr;
-        if (glbptr == ENDGLB)
-            glbptr = STARTGLB;
-    }
-    return glbptr;
+    SYMBOL *ptr;
+
+    HASH_FIND_STR(symtab, sname, ptr);
+
+    return ptr;
 }
 
 SYMBOL* findloc(char* sname)
@@ -140,16 +128,14 @@ SYMBOL* addglb(
         }
 
         multidef();
-        return (glbptr);
+        return (ptr);
     }
-    if (glbcnt >= NUMGLBS - 1) {
-        error(E_GLBOV);
-        return 0;
-    }
-    initialise_sym(glbptr, sname, id, typ, storage, more, itag);
-    glbptr->offset.i = value;
+    ptr = CALLOC(1, sizeof(*ptr));
+    initialise_sym(ptr, sname, id, typ, storage, more, itag);
+    ptr->offset.i = value;
+    HASH_ADD_STR(symtab, name, ptr);   
     ++glbcnt;
-    return (glbptr);
+    return (ptr);
 }
 
 SYMBOL* addloc(

@@ -823,9 +823,8 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
         return (otag);
     } else {
         SYMBOL* ptr;
-        ptr = STARTGLB;
-        while (ptr < ENDGLB) {
-            if (ptr->name[0] && ptr->storage == TYPDEF && amatch(ptr->name)) {
+        for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
+            if (ptr->storage == TYPDEF && amatch(ptr->name)) {
                 /* Found a typedef match */
                 var->sign = ptr->flags & UNSIGNED;
                 var->zfar = ptr->flags & FARPTR;
@@ -833,15 +832,14 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
                 if (var->type == STRUCT)
                     return (tagtab + ptr->tag_idx);
                 else
-                    return (0);
+                    return NULL;
             }
-            ++ptr;
         }
     }
     if (swallow("const")) {
         //        warning(W_CONST);
     }
-    return (0);
+    return NULL;
 }
 
 static void swallow_bitfield(void)

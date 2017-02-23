@@ -7,6 +7,8 @@
  #ifndef DEFINE_H
  #define DEFINE_H
 
+ #include "lib/uthash.h"
+
 
 #define MALLOC(x)   mymalloc(x)
 #define CALLOC(x,y) mymalloc(x * y)
@@ -38,9 +40,7 @@
 
 /* Stefano  - doubled the global symbol table size */
 /* Aralbrec - doubled the global symbol table size again! */
-#define NUMGLBS         2048
-#define STARTGLB        symtab
-#define ENDGLB          (STARTGLB+NUMGLBS)
+
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
 #define NUMLOC          33
@@ -128,6 +128,7 @@ struct symbol_s {
                                 bit 1 = far data/pointer
                                 bit 2 = access via far methods
                               */
+        UT_hash_handle  hh;
 
 };
 

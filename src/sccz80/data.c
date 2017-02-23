@@ -20,7 +20,7 @@ char Banner[] = "* * * * *  Small-C/Plus z88dk * * * * *";
 char Version[] = "  Version: " Z88DK_VERSION;
 
 SYMBOL *symtab, *loctab; /* global and local symbol tables */
-SYMBOL *glbptr, *locptr; /* ptrs to next entries */
+SYMBOL *locptr; /* ptrs to next entries */
 int glbcnt; /* number of globals used */
 
 SYMBOL *dummy_sym[NTYPE + NUMTAG + 1];
