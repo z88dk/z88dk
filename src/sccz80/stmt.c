@@ -59,12 +59,12 @@ int statement()
         otag = GetVarID(&var, STATIK);
 
         if (var.type == STRUCT) {
-            declloc(STRUCT, otag, var.sign, locstatic, var.zfar);
+            declloc(STRUCT, otag, locstatic, &var);
             return (lastst);
         } else if (var.type || regit) {
             if (regit && var.type == NO)
                 var.type = CINT;
-            declloc(var.type, NULL, var.sign, locstatic, var.zfar);
+            declloc(var.type, NULL, locstatic, &var);
             return (lastst);
         }
 

@@ -520,6 +520,9 @@ void nstep(
 
 void store(LVALUE* lval)
 {
+    if ( lval->symbol && lval->symbol->isconst ) {
+        error(E_CHANGING_CONST, lval->symbol);
+    }
     if (lval->indirect == 0)
         putmem(lval->symbol);
     else
@@ -564,14 +567,20 @@ void smartpush(LVALUE* lval, char* before)
  */
 void smartstore(LVALUE* lval)
 {
-    if (lval->indirect != CINT || lval->symbol == 0 || lval->symbol->storage != STKLOC)
+    if (lval->indirect != CINT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         store(lval);
-    else {
+    } else {
         switch (lval->symbol->offset.i - Zsp) {
         case 0:
+            if ( lval->symbol->isconst ) {
+                error(E_CHANGING_CONST, lval->symbol);
+            }
             puttos();
             break;
         case 2:
+            if ( lval->symbol->isconst ) {
+                error(E_CHANGING_CONST, lval->symbol);
+            }
             put2tos();
             break;
         default:

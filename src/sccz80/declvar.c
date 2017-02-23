@@ -51,10 +51,10 @@ int dodeclare(
             return (0); /* fail */
     }
     if (var.type == STRUCT) {
-        declglb(STRUCT, storage, mtag, otag, is_struct, var.sign, var.zfar);
+        declglb(STRUCT, storage, mtag, otag, is_struct, &var);
         return (1);
     } else {
-        declglb(var.type, storage, mtag, NULL, is_struct, var.sign, var.zfar);
+        declglb(var.type, storage, mtag, NULL, is_struct, &var);
         return (1);
     }
 }
@@ -185,8 +185,7 @@ void declglb(
     TAG_SYMBOL* mtag, /* tag of struct whose members are being declared, or zero */
     TAG_SYMBOL* otag, /* tag of struct for object being declared */
     int is_struct, /* TRUE if struct member being declared, zero if union */
-    char sign, /* TRUE if need signed */
-    char zfar) /* TRUE if far */
+    struct varid *var)
 {
     char sname[NAMESIZE];
     int size, ident, more, itag, type, size_st;
@@ -250,7 +249,7 @@ void declglb(
         if (ident == PTR_TO_FNP) {
             /* function returning pointer needs dummy symbol */
             more = dummy_idx(typ, otag);
-            type = (zfar ? CPTR : CINT);
+            type = (var->zfar ? CPTR : CINT);
             size = 0;
             ptrtofn = YES;
         } else if (ident == PTR_TO_FN) {
@@ -269,7 +268,7 @@ void declglb(
              * since they can't contain functions, only pointers to functions
              * this, understandably(!) makes the work here a lot, lot easier!
              */
-            storage = AddNewFunc(sname, type, storage, zfar, sign, otag, ident, &addr);
+            storage = AddNewFunc(sname, type, storage, var->zfar, var->sign, otag, ident, &addr);
             /*
              *      On return from AddNewFunc, storage will be:
              *      EXTERNP  = external pointer, in which case addr will be set
@@ -330,7 +329,7 @@ void declglb(
                 if (ident == POINTER) {
                     /* function returning pointer needs dummy symbol */
                     more = dummy_idx(typ, otag);
-                    type = (zfar ? CPTR : CINT);
+                    type = (var->zfar ? CPTR : CINT);
                     ident = FUNCTIONP;
                 } else {
                     ident = FUNCTION;
@@ -343,7 +342,7 @@ void declglb(
             if (ident == POINTER) {
                 /* array of pointers needs dummy symbol */
                 more = dummy_idx(typ, otag);
-                type = (zfar ? CPTR : CINT);
+                type = (var->zfar ? CPTR : CINT);
             }
             size = needsub(); /* get size */
             if (size == 0 && ident == POINTER)
@@ -356,7 +355,7 @@ void declglb(
         } else if (ident == PTR_TO_PTR) {
             ident = POINTER;
             more = dummy_idx(typ, otag);
-            type = (zfar ? CPTR : CINT);
+            type = (var->zfar ? CPTR : CINT);
         }
 
         if (cmatch('@')) {
@@ -365,9 +364,9 @@ void declglb(
         }
         /* Check to see if far has been defined when we haven't got a pointer */
 
-        if (zfar && !(ident == POINTER || (ident == ARRAY && more) || (ident == FUNCTIONP && more))) {
+        if (var->zfar && !(ident == POINTER || (ident == ARRAY && more) || (ident == FUNCTIONP && more))) {
             warning(W_FAR);
-            zfar = NO;
+            var->zfar = NO;
         }
 
         if (otag) {
@@ -384,7 +383,8 @@ void declglb(
             myptr = addglb(sname, ident, type, 0, storage, more, itag);
             /* What happens if we have an array which will be initialised? */
 
-            myptr->flags = (sign | zfar | fastcall);
+            myptr->flags = (var->sign | var->zfar | fastcall);
+            myptr->isconst = var->isconst;
 
             /* initialise variable (allocate storage space) */
             /* defstatic to prevent repetition of def for declared statics */
@@ -398,7 +398,7 @@ void declglb(
                     myptr->tagarg[0] = itag;
             }
             if (storage != EXTERNAL && ident != FUNCTION) {
-                size_st = initials(sname, type, ident, size, more, otag, zfar);
+                size_st = initials(sname, type, ident, size, more, otag, var->zfar, var->isconst);
 
                 if (storage == EXTERNP)
                     myptr->size = addr;
@@ -433,14 +433,14 @@ void declglb(
             /* are adding structure member, mtag->size is offset */
             myptr = addmemb(sname, ident, type, mtag->size, storage, more, itag);
             myptr--; /* addmemb returns myptr+1 */
-            myptr->flags = ((sign & UNSIGNED) | (zfar & FARPTR));
+            myptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
             myptr->size = size;
 
             /* store (correctly scaled) size of member in tag table entry */
             /* 15/2/99 djm - screws up sizing of arrays -
                quite obviously!! - removing */
             if (ident == POINTER) { /* || ident== ARRAY ) { */
-                type = (zfar ? CPTR : CINT);
+                type = (var->zfar ? CPTR : CINT);
             }
 
             cscale(type, otag, &size);
@@ -450,13 +450,13 @@ void declglb(
             /* are adding union member, offset is always zero */
             myptr = addmemb(sname, ident, type, 0, storage, more, itag);
             myptr--;
-            myptr->flags = ((sign & UNSIGNED) | (zfar & FARPTR));
+            myptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
             myptr->size = size;
 
             /* store maximum member size in tag table entry */
             /* 2/11/2002 djm - fix from above */
             if (ident == POINTER /* || ident==ARRAY */) {
-                type = (zfar ? CPTR : CINT);
+                type = (var->zfar ? CPTR : CINT);
             }
             cscale(type, otag, &size);
             if (mtag->size < size)
@@ -476,9 +476,8 @@ void declglb(
 void declloc(
     int typ, /* typ is CCHAR, CINT DOUBLE or STRUCT, LONG  */
     TAG_SYMBOL* otag, /* tag of struct for object being declared */
-    char sign, /* Are we signed or not? */
-    char locstatic, /* Is this as static local variable? */
-    char zfar) /* Far pointer thing.. */
+    char locstatic, 
+    struct varid *var)
 {
     char sname[NAMESIZE];
     char sname2[3 * NAMESIZE]; /* More than enuff overhead! */
@@ -505,8 +504,8 @@ void declloc(
             needtoken(")()");
             /* function returning pointer needs dummy symbol */
             more = dummy_idx(typ, otag);
-            type = (zfar ? CPTR : CINT);
-            dsize = size = (zfar ? 3 : 2);
+            type = (var->zfar ? CPTR : CINT);
+            dsize = size = (var->zfar ? 3 : 2);
         }
 
         if (ident == PTR_TO_FN) {
@@ -519,7 +518,7 @@ void declloc(
             if (ident == POINTER) {
                 /* array of pointers needs dummy symbol */
                 more = dummy_idx(typ, otag);
-                type = (zfar ? CPTR : CINT);
+                type = (var->zfar ? CPTR : CINT);
             }
             dsize = size = needsub();
             ident = ARRAY; /* null subscript array is NOT a pointer */
@@ -527,15 +526,15 @@ void declloc(
         } else if (ident == PTR_TO_PTR) {
             ident = POINTER;
             more = dummy_idx(typ, otag);
-            type = (zfar ? CPTR : CINT);
-            dsize = size = (zfar ? 3 : 2);
+            type = (var->zfar ? CPTR : CINT);
+            dsize = size = (var->zfar ? 3 : 2);
         } else {
             size = get_type_size(type, otag);
         }
         /* Check to see if far has been defined when we haven't got a pointer */
-        if (zfar && !(ident == POINTER || (ident == ARRAY && more))) {
+        if (var->zfar && !(ident == POINTER || (ident == ARRAY && more))) {
             warning(W_FAR);
-            zfar = NO;
+            var->zfar = NO;
         }
         if (typ == VOID && ident != FUNCTION && ident != POINTER) {
 
@@ -543,8 +542,8 @@ void declloc(
             typ = type = CINT;
         }
         if (ident == POINTER) {
-            decltype = (zfar ? CPTR : CINT);
-            size = (zfar ? 3 : 2);
+            decltype = (var->zfar ? CPTR : CINT);
+            size = (var->zfar ? 3 : 2);
         }
 
         /*                declared += size ; Moved down djm */
@@ -560,11 +559,12 @@ void declloc(
             strcat(sname2, sname);
             cptr = addglb(sname2, ident, type, 0, LSTATIC, more, itag);
             if (cptr) {
-                cptr->flags = ((sign & UNSIGNED) | (zfar & FARPTR));
+                cptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
                 cptr->size = size;
+                cptr->isconst = var->isconst;
             }
             if (rcmatch('=')) {
-                initials(sname2, type, ident, dsize, more, otag, zfar);
+                initials(sname2, type, ident, dsize, more, otag, var->zfar, var->isconst);
                 ns();
                 cptr->storage = LSTKEXT;
                 return;
@@ -580,7 +580,8 @@ void declloc(
             if (cptr) {
                 cptr->size = size;
                 cptr->offset.i = Zsp - declared;
-                cptr->flags = ((sign & UNSIGNED) | (zfar & FARPTR));
+                cptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
+                cptr->isconst = var->isconst;
                 if (cmatch('=')) {
                     int vconst, val, expr;
                     char *before, *start;
@@ -755,8 +756,10 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
     var->zfar = NO;
     var->type = NO;
     var->sflag = NO;
+    var->isconst = NO;
 
     if (swallow("const")) {
+        var->isconst = YES;
         //        warning(W_CONST);
     } else if (swallow("volatile"))
         warning(W_VOLATILE);

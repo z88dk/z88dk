@@ -67,17 +67,17 @@ enum ident_type {
 
 enum storage_type {
     UNKNOWN = 0,
-    STATIK,
-    STKLOC,
-    EXTERNAL,
-    EXTERNP,
-    DECLEXTN,
-    LSTATIC,
-    FAR,
-    LSTKEXT,
-    TYPDEF,
-    PORT8,
-    PORT16
+    STATIK = 1,
+    STKLOC = 2,
+    EXTERNAL = 3,
+    EXTERNP = 4,
+    DECLEXTN = 5,
+    LSTATIC = 6,
+    FAR = 7 ,
+    LSTKEXT = 8,
+    TYPDEF = 9,
+    PORT8 = 10,
+    PORT16 = 11,
 };
 
 
@@ -119,6 +119,7 @@ struct symbol_s {
         char tag_idx ;       /* index of struct tag in tag table */
         int  size ;          /* djm, storage reqd! */
         char prototyped;
+        char isconst;        /* Set if const, affects the section the data goes into */
         uint32_t  args[MAXARGS];       /* arguments */
         unsigned char tagarg[MAXARGS];   /* ptrs to tagsymbol entries*/
         enum symbol_flags flags ;         /* djm, various flags:
@@ -300,6 +301,7 @@ struct varid {
         unsigned char zfar;
         unsigned char sign;
         unsigned char sflag;
+        unsigned char isconst;
         enum ident_type ident;
         int     more;
 };
@@ -346,9 +348,5 @@ struct parser_stack {
     struct parser_stack *next;
 };
 
-
-
-#define WEM_FATAL    1
-#define WEM_SUPPRESS 2
 
 #endif

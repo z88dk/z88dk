@@ -20,7 +20,7 @@
  */
 int initials(char* sname,
     int type, int ident, int dim, int more,
-    TAG_SYMBOL* tag, char zfar)
+    TAG_SYMBOL* tag, char zfar, char isconst)
 {
     int size, desize = 0;
     int olddim = dim;
@@ -44,7 +44,11 @@ int initials(char* sname,
             size = 2;
         }
 
-        output_section("data_compiler"); // output_section("text");
+        if ( isconst ) {
+            output_section("rodata_compiler");
+        } else {
+            output_section("data_compiler"); // output_section("text");
+        }
         prefix();
         outname(sname, YES);
         col();

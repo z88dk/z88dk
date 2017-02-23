@@ -68,5 +68,7 @@ enum errorct {
 
         E_MISSIF, E_MAXLEVELS, E_MAXGOTO, E_UNGOTO, E_AUTOASSIGN,
 
+        E_CHANGING_CONST,
+
         E_MAXIMUM
 };
