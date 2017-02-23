@@ -1,6 +1,6 @@
 
 // zcc +zx -vn -startup=31 -O3 -clib=new fzx_modes.c -o fzx_modes -create-app
-// zcc +zx -vn -startup=31 -SO3 -clib=sdcc_iy --max-reallocs-per-node200000 fzx_modes.c -o fzx_modes -create-app
+// zcc +zx -vn -startup=31 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 fzx_modes.c -o fzx_modes -create-app
 
 #include <font/fzx.h>
 #include <rect.h>
