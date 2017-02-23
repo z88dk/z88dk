@@ -91,7 +91,7 @@ int primary(LVALUE* lval)
                     lval->indirect = 0;
                     lval->is_const = 1;
                     lval->const_val = ptr->size;
-                    lval->flags = 0;
+                    lval->flags = FLAGS_NONE;
                     lval->ident = VARIABLE;
                     return (0);
                 }
@@ -143,7 +143,7 @@ int primary(LVALUE* lval)
         lval->symbol = ptr;
         lval->indirect = 0;
         lval->val_type = CINT; /* Null function, always int */
-        lval->flags = 0; /* Assume signed, no far */
+        lval->flags = FLAGS_NONE; /* Assume signed, no far */
         lval->ident = FUNCTION;
         return (0);
     }

@@ -58,7 +58,7 @@ int constant(LVALUE* lval)
             callrts("dload");
         }
         lval->is_const = 0; /*  floating point not constant */
-        lval->flags = 0;
+        lval->flags = FLAGS_NONE;
         return (1);
     } else if (number(&lval->const_val) || pstr(&lval->const_val)) {
         /* Insert int32_t stuff/int32_t pointer here? */
@@ -76,7 +76,7 @@ int constant(LVALUE* lval)
         lval->is_const = 0; /* string address not constant */
         lval->ptr_type = CCHAR; /* djm 9/3/99 */
         lval->val_type = CINT;
-        lval->flags = 0;
+        lval->flags = FLAGS_NONE;
         immedlit(litlab);
     } else {
         lval->is_const = 0;

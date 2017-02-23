@@ -51,6 +51,7 @@
 #define ENDLOC          (STARTLOC+NUMLOC)
 
 enum ident_type {
+    NO_IDENT = 0,
     VARIABLE = 1,
     ARRAY,
     POINTER,
@@ -82,6 +83,7 @@ enum storage_type {
 
 /* Symbol flags, | against each other */
 enum symbol_flags {
+        FLAGS_NONE = 0,
         UNSIGNED = 1,
         FARPTR = 2,
         FARACC = 4,
@@ -362,18 +364,18 @@ struct lvalue_s {
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         int val_type ;                  /* type of value calculated */
 	int oldval_type;		/* What the valtype was */
-        enum symbol_flags flags ;                    /* As per symbol */
+        enum symbol_flags flags;        /* As per symbol */
         char oflags;                    /* Needed for deref of far str*/
         int type;                       /* type (from symbol table) */
-        int ident;                      /* ident (from symbol table) */
-        enum storage_type storage;			/* storage (from sym tab) */
+        enum ident_type ident;          /* ident (from symbol table) */
+        enum storage_type storage;	/* storage (from sym tab) */
         char c_id;                      /* ident of cast        */
         char c_vtype;                   /* type of value calc if cast */
         char c_flags;                   /* flags for casting */
 	int  level;		/* Parenth level (cast) */
 	int  castlevel;
 	int  offset;
-    TAG_SYMBOL *c_tag;               
+        TAG_SYMBOL *c_tag;               
 } ;
 
 

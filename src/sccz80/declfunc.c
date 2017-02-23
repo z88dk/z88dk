@@ -266,7 +266,7 @@ void DoFnKR(
         /* any legal name bumps arg count */
         if (symname(n)) {
             /* add link to argument chain */
-            if ((cptr = addloc(n, 0, CINT, 0, 0)))
+            if ((cptr = addloc(n, NO_IDENT, CINT, 0, 0)))
                 cptr->offset.p = prevarg;
             prevarg = cptr;
             ++undeclared;
@@ -478,7 +478,7 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
             if (proto == 1)
                 warning(W_ELLIP);
             needchar(')');
-            argptr = addloc("ellp", 0, ELLIPSES, 0, 0);
+            argptr = addloc("ellp", NO_IDENT, ELLIPSES, 0, 0);
             argptr->offset.p = prevarg;
             prevarg = argptr;
             break;
@@ -636,7 +636,7 @@ SYMBOL *getarg(
  * temporary
  */
             if (deftype) {
-                argptr = addloc(n, 0, CINT, 0, 0);
+                argptr = addloc(n, NO_IDENT, CINT, 0, 0);
                 argptr->offset.p = prevarg;
             }
             /*

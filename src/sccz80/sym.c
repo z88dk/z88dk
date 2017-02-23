@@ -215,5 +215,5 @@ static void initialise_sym(
     ptr->storage = storage;
     ptr->more = more;
     ptr->tag_idx = itag;
-    ptr->flags = 0;
+    ptr->flags = FLAGS_NONE;
 }
