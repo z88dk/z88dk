@@ -491,7 +491,9 @@
    
    
    ;; public definitions
-   
+
+   PUBLIC __crt_org_vector_table
+
 	PUBLIC __clib_fopen_max
 	PUBLIC __clib_open_max
 	
