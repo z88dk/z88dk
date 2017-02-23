@@ -203,7 +203,7 @@ void callfunction(SYMBOL* ptr)
                     printflevel = minifunc;
             }
             outname(ptr->name, dopref(ptr));
-            if ((ptr->flags & SHARED) && useshare)
+            if ((ptr->flags & SHARED) && c_useshared)
                 outstr("_sl");
             else if (ptr->flags & SHAREDC)
                 outstr("_rst");
@@ -218,11 +218,11 @@ void callfunction(SYMBOL* ptr)
      *
      *	We should modify stack if:
      *	- __CALLEE__ isn't set
-     *	- Function is __LIB__ even if compactcode is set
-     *	- compactcode isn't set and __CALLEE__ isn't set
+     *	- Function is __LIB__ even if c_compact_code is set
+     *	- c_compact_code isn't set and __CALLEE__ isn't set
      */
 
-    if ((ptr && ptr->flags & CALLEE) || (compactcode && ptr == NULL) || (compactcode && ((ptr->flags & LIBRARY) == 0))) {
+    if ((ptr && ptr->flags & CALLEE) || (c_compact_code && ptr == NULL) || (c_compact_code && ((ptr->flags & LIBRARY) == 0))) {
         Zsp += nargs;
     } else {
         /* If we have a frame pointer then ix holds it */

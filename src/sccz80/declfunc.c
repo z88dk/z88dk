@@ -344,7 +344,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     /*
      *      Dump some info about defining the function etc
      */
-    if (verbose) {
+    if (c_verbose) {
         toconsole();
         outstr("Defining function: ");
         outstr(currfn->name);
@@ -370,7 +370,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     infunc = 1; /* In a function for sure! */
     copyarg = prevarg;
 
-    if (((currfn->flags & SHARED) && makeshare) || sharedfile) {
+    if (((currfn->flags & SHARED) && c_makeshare) || c_shared_file) {
         /* Shared library definition, offset the stack */
         where = 2 + shareoffset;
     } else

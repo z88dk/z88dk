@@ -167,7 +167,7 @@ void DoLibHeader(void)
         outstr("z80_crt0.hdx\"\n\n");
         ol(".area _CODE\n");
         ol(".radix d\n");
-        if (noaltreg) {
+        if (c_notaltreg) {
             ol(".globl\tsaved_hl");
             ol(".globl\tsaved_de");
         }
@@ -175,7 +175,7 @@ void DoLibHeader(void)
 
     } else {
         outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
-        if (noaltreg) {
+        if (c_notaltreg) {
             ol("EXTERN\tsaved_hl");
             ol("EXTERN\tsaved_de");
         }
@@ -452,7 +452,7 @@ void putstk(char typeobj)
         break;
     default:
         zpop();
-        if (doinline) {
+        if (c_doinline) {
             LoadAccum();
             ol("ld\t(de),a");
             ol("inc\tde");
@@ -576,7 +576,7 @@ void indirect(LVALUE* lval)
         callrts("dload");
         break;
     default:
-        if (doinline) {
+        if (c_doinline) {
             ol("ld\ta,(hl)");
             ol("inc\thl");
             ol("ld\th,(hl)");
@@ -1045,7 +1045,7 @@ int modstk(int newsp, int save, int saveaf)
 modstkcht:
 #endif
     if (saveaf) {
-        if (noaltreg) {
+        if (c_notaltreg) {
             zpushflags();
             zpopbc();
         } else {
@@ -1082,7 +1082,7 @@ modstkcht:
         doexx();
 #endif
     if (saveaf) {
-        if (noaltreg) {
+        if (c_notaltreg) {
             ol("push\tbc");
             Zsp -= 2;
             zpopflags();
@@ -1287,7 +1287,7 @@ void zdiv(LVALUE* lval)
  */
 void zmod(LVALUE* lval)
 {
-    if (noaltreg && (lval->val_type == LONG || lval->val_type == CPTR)) {
+    if (c_notaltreg && (lval->val_type == LONG || lval->val_type == CPTR)) {
         callrts("l_long_mod2");
     } else {
         zdiv(lval);
@@ -1594,7 +1594,7 @@ void zeq(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             lval->val_type = CARRY;
             ol("ld\ta,l");
             ol("sub\te");
@@ -1629,7 +1629,7 @@ void zne(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             lval->val_type = CARRY;
             ol("ld\ta,l");
             ol("sub\te");
@@ -1668,7 +1668,7 @@ void zlt(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             if (utype(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
@@ -1712,7 +1712,7 @@ void zle(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             if (utype(lval)) { /* unsigned */
                 ol("ld\ta,e");
                 ol("sub\tl"); /* If l < e then carry set */
@@ -1766,7 +1766,7 @@ void zgt(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             if (utype(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
@@ -1817,7 +1817,7 @@ void zge(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             if (utype(lval)) {
                 ol("ld\ta,l");
                 ol("sub\te"); /* If l > e, carry set */

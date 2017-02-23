@@ -511,7 +511,7 @@ void leave(int vartype, char type)
     else if (vartype == DOUBLE)
         vartype = NO;
 
-    if (noaltreg) {
+    if (c_notaltreg) {
         if (vartype == LONG)
             savehl();
         modstk(0, 0, NO);
@@ -519,7 +519,7 @@ void leave(int vartype, char type)
         modstk(0, vartype, NO);
     }
 
-    if ((compactcode || currfn->flags & CALLEE) && (stackargs > 2)) {
+    if ((c_compact_code || currfn->flags & CALLEE) && (stackargs > 2)) {
         /* 
          * We're exiting a function and we want to clean up after ourselves
          * (so calling function doesn't have to do this) (first of all we
@@ -527,7 +527,7 @@ void leave(int vartype, char type)
          */
         savesp = Zsp;
 
-        if (noaltreg) {
+        if (c_notaltreg) {
             if (vartype == LONG) /* If long, then dump de somewhere */
                 savede();
         } else if (vartype == LONG) {
@@ -537,7 +537,7 @@ void leave(int vartype, char type)
         Zsp -= stackargs;
         modstk(0, NO, NO);
         zpushde(); /* return address back on stack */
-        if (noaltreg) {
+        if (c_notaltreg) {
             if (vartype == LONG)
                 restorede();
         } else if (vartype == LONG) {
@@ -546,7 +546,7 @@ void leave(int vartype, char type)
         Zsp = savesp;
     }
     popframe(); /* Restore previous frame pointer */
-    if (noaltreg && vartype == LONG)
+    if (c_notaltreg && vartype == LONG)
         restorehl();
     if (type)
         setcond(type);

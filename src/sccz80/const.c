@@ -130,7 +130,7 @@ int fnumber(int32_t* val)
     dval = strtod(start, &end);
     if (end == start)
         return 0;
-    dofloat(dval, sum, mathz88 ? 4 : 5, mathz88 ? 127 : 128);
+    dofloat(dval, sum, c_mathz88 ? 4 : 5, c_mathz88 ? 127 : 128);
 
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);

@@ -250,7 +250,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
         if (lval->val_type == LONG) {
             widenlong(lval, lval2);
-            if (noaltreg) {
+            if (c_notaltreg) {
                 vlongconst_noalt(val);
             } else {
                 doexx();

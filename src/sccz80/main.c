@@ -21,14 +21,14 @@ char Filenorig[FILENAME_LEN + 1];
 unsigned int zorg; /* Origin for applications */
 
 int smartprintf; /* Map printf -> miniprintf */
-int makeshare; /* Do we want to make a shared library? */
-int useshare; /* Use shared lib routines? */
-int sharedfile; /* File contains routines which are to be
+int c_makeshare; /* Do we want to make a shared library? */
+int c_useshared; /* Use shared lib routines? */
+int c_shared_file; /* File contains routines which are to be
           * called via lib package - basically jimmy
           * the stack but that's it..
           */
 
-int noaltreg; /* No alternate registers */
+int c_notaltreg; /* No alternate registers */
 int standard_escapes = 0; /* \n = 10, \r = 13 */
 
 /*
@@ -112,18 +112,18 @@ int main(int argc, char** argv)
 
     currfn = NULL; /* no function yet */
     macptr = cmode = 1; /* clear macro pool and enable preprocessing */
-    ncomp = doinline = mathz88 = need_floatpack = compactcode = 0;
+    ncomp = c_doinline = c_mathz88 = need_floatpack = c_compact_code = 0;
     c_default_unsigned = NO;
-    useshare = makeshare = sharedfile = NO;
+    c_useshared = c_makeshare = c_shared_file = NO;
     smartprintf = YES;
     nxtlab = /* start numbers at lowest possible */
         ctext = /* don't include the C text as comments */
         errstop = /* don't stop after errors */
-        verbose = 0;
+        c_verbose = 0;
     gotocnt = 0;
     defdenums = 0;
     doublestrings = 0;
-    noaltreg = NO;
+    c_notaltreg = NO;
     shareoffset = SHAREOFFSET; /* Offset for shared libs */
     debuglevel = NO;
     assemtype = ASM_Z80ASM;
@@ -232,7 +232,7 @@ void errsummary()
         error(E_BRACKET);
         nl();
     }
-    if (verbose) {
+    if (c_verbose) {
         printf("Symbol table usage: %d\n", glbcnt);
         printf("Structures defined: %ld\n", (long)(tagptr - tagtab));
         printf("Members defined:    %ld\n", (long)(membptr - membtab));
@@ -326,7 +326,7 @@ void dumpfns()
                     if (storage == EXTERNAL) {
                         if (ptr->flags & LIBRARY) {
                             GlobalPrefix(LIB);
-                            if ((ptr->flags & SHARED) && useshare) {
+                            if ((ptr->flags & SHARED) && c_useshared) {
                                 outstr(ptr->name);
                                 outstr("_sl\n");
                                 GlobalPrefix(LIB);
@@ -376,9 +376,9 @@ void dumpfns()
         fprintf(fp, "\tDEFINE\tNEED_floatpack\n");
         fprintf(fp, "ENDIF\n\n");
     }
-    if (mathz88) {
-        fprintf(fp, "\nIF !NEED_mathz88\n");
-        fprintf(fp, "\tDEFINE\tNEED_mathz88\n");
+    if (c_mathz88) {
+        fprintf(fp, "\nIF !NEED_c_mathz88\n");
+        fprintf(fp, "\tDEFINE\tNEED_c_mathz88\n");
         fprintf(fp, "ENDIF\n\n");
     }
     /*
@@ -637,7 +637,7 @@ void openin()
             fprintf(stderr, "Can't open: %s\n", Filename);
             exit(1);
         } else {
-            if (verbose)
+            if (c_verbose)
                 fprintf(stderr, "Compiling: %s\n", Filename);
             ncomp++;
             newfile();
@@ -665,7 +665,7 @@ void doinclude()
     char name[FILENAME_LEN + 1], *cp;
 
     blanks(); /* skip over to name */
-    if (verbose) {
+    if (c_verbose) {
         toconsole();
         outstr(line);
         nl();
@@ -704,7 +704,7 @@ void doinclude()
  */
 void endinclude()
 {
-    if (verbose) {
+    if (c_verbose) {
         toconsole();
         outstr("#end include\n");
         tofile();
@@ -811,7 +811,7 @@ void SetDoubleStrings(char* arg)
 
 void SetNoAltReg(char* arg)
 {
-    noaltreg = YES;
+    c_notaltreg = YES;
 }
 
 void SetASXX(char* arg)
@@ -884,7 +884,7 @@ void SetWarning(char* arg)
 
 void SetMathZ88(char* arg)
 {
-    mathz88 = YES;
+    c_mathz88 = YES;
 }
 
 void SetUnsigned(char* arg)
@@ -909,7 +909,7 @@ void SetAllWarn(char* arg)
 
 void SetDoInline(char* arg)
 {
-    doinline = YES;
+    c_doinline = YES;
 }
 
 void SetStopError(char* arg)
@@ -919,22 +919,22 @@ void SetStopError(char* arg)
 
 void SetUseShared(char* arg)
 {
-    useshare = YES;
+    c_useshared = YES;
 }
 
 void SetSharedFile(char* arg)
 {
-    sharedfile = YES;
+    c_shared_file = YES;
 }
 
 void SetMakeShared(char* arg)
 {
-    makeshare = YES;
+    c_makeshare = YES;
 }
 
 void SetCompactCode(char* arg)
 {
-    compactcode = YES;
+    c_compact_code = YES;
 }
 
 void SetCCode(char* arg)
@@ -1004,7 +1004,7 @@ void DispVersion(char* arg)
 
 void SetVerbose(char* arg)
 {
-    verbose = YES;
+    c_verbose = YES;
 }
 
 void ShowNotFunc(char* arg)

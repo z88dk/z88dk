@@ -60,13 +60,13 @@ char Filename[FILENAME_LEN + 1]; /* output file name */
 
 /* My stuff for LIB of long common functions */
 
-int need_floatpack, doinline, ncomp;
+int need_floatpack, c_doinline, ncomp;
 
 int stackargs;
 
 int defstatic, filenum; /* next argument to be used */
 
-char c_default_unsigned, fnflags, mathz88, compactcode;
+char c_default_unsigned, fnflags, c_mathz88, c_compact_code;
 
 int nxtlab, /* next avail label # */
     dublab, /* label # relative to double pool */
@@ -94,7 +94,7 @@ int nxtlab, /* next avail label # */
     saveinfn, /* copy of infunc  "    " */
     swactive, /* true inside a switch */
     swdefault, /* default label number, else 0 */
-    verbose, /* Verbose to screen */
+    c_verbose, /* Verbose to screen */
     caller, /* stack offset for caller links...
                                         local[caller] points to name of current fct
                                         local[caller-1] points to link for calling fct,
