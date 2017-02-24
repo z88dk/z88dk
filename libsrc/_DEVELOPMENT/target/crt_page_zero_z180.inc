@@ -575,7 +575,7 @@ IF __crt_enable_trap
    in0 a,(ITC)
    and $80
 
-   jr z, __Start
+   jr z, __Test_Trap_Fail
    
    pop af
    
@@ -583,6 +583,21 @@ IF __crt_enable_trap
    jp     _z180_trap
 
 ENDIF
+
+__Test_Trap_Fail:
+
+   include "../crt_start_di.inc"
+
+   IF REGISTER_SP = -1
+   
+   pop af
+   
+   ENDIF
+   
+   ld a,__IO_VECTOR_BASE
+   out0 (IL),a
+   
+   im 2
 
 ;; fall through to __Start
 
