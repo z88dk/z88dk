@@ -28,10 +28,8 @@
 
 #if defined(__MSDOS__) && defined(__TURBOC__)
  #define NAMESIZE 33
- #define NAMEMAX  32 
 #else
  #define NAMESIZE 127
- #define NAMEMAX 126
 #endif
 
 #define MAXARGS 20

@@ -52,7 +52,7 @@ int symname(char* sname)
     k = 0;
     while (an(ch())) {
         sname[k] = gch();
-        if (k < NAMEMAX)
+        if (k < (NAMESIZE-1))
             ++k;
     }
     sname[k] = 0;

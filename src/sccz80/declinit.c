@@ -254,7 +254,7 @@ void init(int size, int ident, int* dim, int more, int dump, int is_struct)
         }
     } else {
         /* djm, catch label names in structures (for (*name)() initialisation */
-        char sname[NAMEMAX + 1];
+        char sname[NAMESIZE];
         SYMBOL *ptr;
         if (symname(sname) && strcmp(sname, "sizeof")) { /* We have got something.. */
             if ((ptr = findglb(sname))) {

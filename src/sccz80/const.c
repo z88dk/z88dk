@@ -570,7 +570,7 @@ void size_of(LVALUE* lval)
 
 static int get_member_size(TAG_SYMBOL* ptr)
 {
-    char sname[NAMEMAX];
+    char sname[NAMESIZE];
     SYMBOL* ptr2;
     if (cmatch('.') == NO && match("->") == NO)
         return (0);

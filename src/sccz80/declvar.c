@@ -127,7 +127,7 @@ defstruct(char* sname, enum storage_type storage, int is_struct)
 void defenum(char* sname, enum storage_type storage)
 {
     SYMBOL* ptr;
-    char name[NAMEMAX];
+    char name[NAMESIZE];
     int32_t value;
     /* Add it into the symbol table, we do not need to keep track of the
      * tag because we treat enums as constants
@@ -553,9 +553,7 @@ void declloc(
         /*                declared += size ; Moved down djm */
         if (otag)
             itag = otag - tagtab;
-        /* djm, add in local statics - use the global symbol table to ensure
-         * that they will be placed in RAM and not in ROM
-         */
+
         if (locstatic) {
             strcpy(sname2, "st_");
             strcat(sname2, currfn->name);
@@ -577,7 +575,6 @@ void declloc(
                 typ = ExpandType(more, &dosign, otag - tagtab);
                 warning(W_NULLARRAY, dosign, typ);
             }
-
         } else {
             declared += size;
             cptr = addloc(sname, ident, type, more, itag);
@@ -627,7 +624,7 @@ uint32_t CalcArgValue(char type, char ident, enum symbol_flags flags)
 
 char* ExpandType(int type, char** dosign, char tagidx)
 {
-    char* typ;
+    char  *typ;
 
     switch (type) {
     case DOUBLE:
@@ -753,7 +750,7 @@ static int needsub(void)
 TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
 {
     TAG_SYMBOL* otag = NULL;
-    char sname[NAMEMAX];
+    char sname[NAMESIZE];
     SYMBOL* ptr;
     static int num_enums_defined = 0;
 

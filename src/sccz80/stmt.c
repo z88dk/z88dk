@@ -634,7 +634,7 @@ void doasmfunc(char wantbr)
 
 void doasm()
 {
-    char label[NAMEMAX];
+    char label[NAMESIZE];
     int k;
     char lab = 0; /* Got an good asm label */
     SYMBOL* myptr;
