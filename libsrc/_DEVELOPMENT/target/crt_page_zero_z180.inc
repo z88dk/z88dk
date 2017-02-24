@@ -2,13 +2,7 @@
 ; must decide if this is a power on reset or a trap
 
    push af
-   
-   ; move i/o base address back to 0
-   ; harmless on power up when ICR is not mapped yet
-   ; note that this resets the IOSTOP bit
-   
-   xor a
-   out0 (ICR),a
+   ld a,__IO_BASE_ADDRESS
 
    jp __Test_Trap
    
@@ -574,7 +568,6 @@ ENDIF
 
 __Test_Trap:
 
-   ld a,__IO_BASE_ADDRESS
    out0 (0x3f),a
 
 IF __crt_enable_trap

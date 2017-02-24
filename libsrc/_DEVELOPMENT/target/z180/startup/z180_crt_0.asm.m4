@@ -85,14 +85,13 @@ __Start:
       ld a,__IO_VECTOR_BASE
       out0 (IL),a
       
-      im 2
-      
    ENDIF
    
    EXTERN __code_vector_head
    
    ld a,__code_vector_head/256
    ld i,a
+	im 2
 
    include "../crt_save_sp.inc"
 
