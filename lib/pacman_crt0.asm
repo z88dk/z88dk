@@ -103,7 +103,7 @@ ENDIF
 
 	defs	NMI_Start-ASMPC
 ; nmi
-	reti
+	retn
 
 start:
 	ld a,$ff		; set up the interrupt vector (0x38)

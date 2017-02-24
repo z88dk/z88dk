@@ -63,7 +63,9 @@
 
 #define __CPU_INFO_ENABLE_SLL  0x01
 
-#define __IO_BASE_ADDRESS  0x0
+#define __IO_VECTOR_BASE  128
+
+#define __IO_BASE_ADDRESS  0
 
 #ifdef __SCCZ80
 
@@ -80,12 +82,12 @@
    #define TDR1  7
    #define RDR0  8
    #define RDR1  9
-	#define ASEXT0  18
-	#define ASEXT1  19
-	#define ASTC0L  26
-	#define ASTC0H  27
-	#define ASTC1L  28
-	#define ASTC1H  29
+   #define ASEXT0  18
+   #define ASEXT1  19
+   #define ASTC0L  26
+   #define ASTC0H  27
+   #define ASTC1L  28
+   #define ASTC1H  29
 
    #define CNTR  10
    #define TRD  11
@@ -101,8 +103,8 @@
    #define RLDR1H  23
 
    #define FRC  24
-	#define CMR  30
-	#define CCR  31
+   #define CMR  30
+   #define CCR  31
 
    #define SAR0L  32
    #define SAR0H  33
@@ -117,7 +119,7 @@
    #define MAR1B  42
    #define IAR1L  43
    #define IAR1H  44
-	#define IAR1B  45
+   #define IAR1B  45
    #define BCR1L  46
    #define BCR1H  47
    #define DSTAT  48
@@ -154,12 +156,12 @@ IFDEF __SDCC
    __sfr __at 7 TDR1;
    __sfr __at 8 RDR0;
    __sfr __at 9 RDR1;
-	__sfr __at 18 ASEXT0;
-	__sfr __at 19 ASEXT1;
-	__sfr __at 26 ASTC0L;
-	__sfr __at 27 ASTC0H;
-	__sfr __at 28 ASTC1L;
-	__sfr __at 29 ASTC1H;
+   __sfr __at 18 ASEXT0;
+   __sfr __at 19 ASEXT1;
+   __sfr __at 26 ASTC0L;
+   __sfr __at 27 ASTC0H;
+   __sfr __at 28 ASTC1L;
+   __sfr __at 29 ASTC1H;
 
    __sfr __at 10 CNTR;
    __sfr __at 11 TRD;
@@ -175,8 +177,8 @@ IFDEF __SDCC
    __sfr __at 23 RLDR1H;
 
    __sfr __at 24 FRC;
-	__sfr __at 30 CMR;
-	__sfr __at 31 CCR;
+   __sfr __at 30 CMR;
+   __sfr __at 31 CCR;
 
    __sfr __at 32 SAR0L;
    __sfr __at 33 SAR0H;
@@ -191,7 +193,7 @@ IFDEF __SDCC
    __sfr __at 42 MAR1B;
    __sfr __at 43 IAR1L;
    __sfr __at 44 IAR1H;
-	__sfr __at 45 IAR1B;
+   __sfr __at 45 IAR1B;
    __sfr __at 46 BCR1L;
    __sfr __at 47 BCR1H;
    __sfr __at 48 DSTAT;

@@ -45,7 +45,7 @@ include(`../clib_instantiate_end.m4')
 ;; STARTUP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SECTION CODE
+SECTION COMMON0
 
 PUBLIC __Start, __Exit
 
@@ -58,7 +58,7 @@ EXTERN _main
 IF __crt_include_preamble
 
    include "crt_preamble.asm"
-   SECTION CODE
+   SECTION COMMON0
 
 ENDIF
 
@@ -78,7 +78,18 @@ ENDIF
 
 __Start:
 
-   include "../crt_start_eidi.inc"
+   IF __page_zero_present = 0
+   
+      include "../crt_start_di.inc"
+   
+   ENDIF
+
+   EXTERN __code_vector_head
+   
+   ld a,__code_vector_head/256
+   ld i,a
+
+   include "../crt_set_interrupt_mode.inc"
    include "../crt_save_sp.inc"
 
 __Restart:
@@ -125,6 +136,8 @@ __Restart_2:
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
+
+   include "../crt_start_ei.inc"
 
    ; call user program
    

@@ -1,7 +1,7 @@
 
    ; ensure code section is named "CODE"
    
-   IF ASMPC = 0
+   IF (__page_zero_present != 1) && (ASMPC = 0)
    
       nop
    

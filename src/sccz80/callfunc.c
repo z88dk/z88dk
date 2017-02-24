@@ -180,7 +180,7 @@ void callfunction(SYMBOL* ptr)
     if (ptr) {
         /* Check to see if we have a variable number of arguments */
         if ((ptr->prototyped) && ptr->args[1] == PELLIPSES) {
-            if ( ptr && (ptr->flags & SMALLC) == 0 ) {
+            if ( ptr && (ptr->flags & SMALLC) == SMALLC ) {
                 loadargc(nargs);
             }
         }
