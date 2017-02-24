@@ -337,7 +337,7 @@ struct varid {
 #define ASM_VASM    2
 #define ASM_GNU     3
 
-#define ISASM(x) ( assemtype == (x) )
+#define ISASM(x) ( c_assembler_type == (x) )
 
 struct parser_stack;
 

@@ -89,17 +89,9 @@ int nxtlab, /* next avail label # */
     fnstart, /* line# of start of current fn. */
     lineno, /* line# in current file */
     infunc, /* "inside function" flag */
-    savestart, /* copy of fnstart "    " */
-    saveline, /* copy of lineno  "    " */
-    saveinfn, /* copy of infunc  "    " */
     swactive, /* true inside a switch */
     swdefault, /* default label number, else 0 */
-    c_verbose, /* Verbose to screen */
-    caller, /* stack offset for caller links...
-                                        local[caller] points to name of current fct
-                                        local[caller-1] points to link for calling fct,
-                                        where local[0] is 1st word on stack after ret addr  */
-    fname; /* label for name of current fct  */
+    c_verbose; /* Verbose to screen */
 
 FILE    *input; /* iob # for input file */
 FILE    *output; /* iob # for output file (if any) */
@@ -109,10 +101,8 @@ FILE    *saveout; /* holds output ptr when diverted to console */
 
 
 SYMBOL  *currfn; /* ptr to symtab entry for current fn. */
-SYMBOL  *savecurr; /* copy of currfn for #include */
 
-int gargc; /* global copies of command line args */
-char** gargv;
+
 
 char endasm;
 
@@ -137,20 +127,9 @@ int debuglevel;
  * Assembler type
  */
 
-int assemtype;
+int c_assembler_type;
 
-/*
- * Output file extension
- *
- */
 
-char* outext;
-
-/*
- * Enums defined
- */
-
-int defdenums;
 
 
 /*
@@ -161,13 +140,13 @@ int printflevel;
 
 /* Doubles stored as strings? */
 
-int doublestrings;
+int c_double_strings;
 
 /*
  *	Framepointer stuff - tis broken!
  */
-int useframe;
-int indexix;
+int c_useframepointer;
+int c_framepointer_is_ix;
 
 
 int use_r2l_calling_convention;

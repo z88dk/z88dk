@@ -755,6 +755,8 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
     TAG_SYMBOL* otag = NULL;
     char sname[NAMEMAX];
     SYMBOL* ptr;
+    static int num_enums_defined = 0;
+
 
     var->sign = c_default_unsigned;
     var->zfar = NO;
@@ -798,9 +800,9 @@ TAG_SYMBOL* GetVarID(struct varid *var, enum storage_type storage)
         var->type = VOID;
     else if (amatch("enum")) {
         if (symname(sname) == 0)
-            sprintf(sname, "sc_i_enumb%d", defdenums++);
+            sprintf(sname, "sc_i_enumb%d", num_enums_defined++);
         ptr = findenum(sname);
-        if (ptr == 0) /* not defined */
+        if (ptr == NULL) /* not defined */
             defenum(sname, storage);
         var->type = CINT;
         var->sign = c_default_unsigned;

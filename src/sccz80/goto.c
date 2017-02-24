@@ -31,21 +31,19 @@
 
 #include "ccdefs.h"
 
-int dolabel(void);
-void dogoto(void);
-int AddGoto(SYMBOL*);
-void ChaseGoto(SYMBOL* ptr);
-void CleanGoto(void);
-GOTO_TAB* SearchGoto(SYMBOL* ptr);
-SYMBOL* findgoto(char*);
-SYMBOL* addgotosym(char*);
+
+static int AddGoto(SYMBOL*);
+static void ChaseGoto(SYMBOL* ptr);
+static GOTO_TAB* SearchGoto(SYMBOL* ptr);
+static SYMBOL* findgoto(char*);
+static SYMBOL* addgotosym(char*);
 
 /*
  * Some nice variables for us!
  */
 
 GOTO_TAB* gotoq;
-int gotocnt = 0;
+static int gotocnt = 0;
 
 /*
  *      Endeavour to find a label for a goto statement
@@ -198,7 +196,7 @@ void ChaseGoto(SYMBOL* ptr)
  *      Should remedy all stack problems etc(!)
  */
 
-void CleanGoto(void)
+void goto_cleanup(void)
 {
     int i;
     GOTO_TAB* gptr;

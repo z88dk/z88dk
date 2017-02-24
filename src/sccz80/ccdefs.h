@@ -52,6 +52,10 @@ extern void     callfunction(SYMBOL *ptr);
 #include "declinit.h"
 #include "error.h"
 #include "expr.h"
+extern GOTO_TAB *gotoq; /* Pointer for gotoq */
+extern int      dolabel(void);
+extern void     dogoto(void);
+extern void     goto_cleanup(void);
 #include "io.h"
 #include "lex.h"
 #include "main.h"

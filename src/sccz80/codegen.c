@@ -467,7 +467,7 @@ void putstk(char typeobj)
 void puttos(void)
 {
 #ifdef USEFRAME
-    if (useframe) {
+    if (c_useframepointer) {
         ot("ld\t");
         OutIndex(0);
         outstr(",l\n");
@@ -485,7 +485,7 @@ void puttos(void)
 void put2tos(void)
 {
 #ifdef USEFRAME
-    if (useframe) {
+    if (c_useframepointer) {
         ot("ld\t");
         OutIndex(2);
         outstr(",l\n");
@@ -584,7 +584,7 @@ void indirect(LVALUE* lval)
         } else {
             ot("call\tl_gint\t;");
 #ifdef USEFRAME
-            if (useframe && CheckOffset(lval->offset)) {
+            if (c_useframepointer && CheckOffset(lval->offset)) {
                 OutIndex(lval->offset);
             }
 #endif
@@ -1006,7 +1006,7 @@ int modstk(int newsp, int save, int saveaf)
     if (k == 0)
         return newsp;
 #ifdef USEFRAME
-    if (useframe)
+    if (c_useframepointer)
         goto modstkcht;
 #endif
     if (k > 0) {
@@ -1053,7 +1053,7 @@ modstkcht:
         }
     }
 #ifdef USEFRAME
-    if (useframe) {
+    if (c_useframepointer) {
         ot("ld\t");
         FrameP();
         outstr(",");
@@ -2151,14 +2151,14 @@ void OutIndex(int val)
     if (ISASM(ASM_ASXX)))
         {
             outdec(val);
-            if (indexix)
+            if (c_framepointer_is_ix)
                 outstr("(ix)");
             else
                 outstr("(iy)");
         }
     else {
         outstr("(");
-        if (indexix)
+        if (c_framepointer_is_ix)
             outstr("ix ");
         else
             outstr("iy ");
@@ -2183,7 +2183,7 @@ void RestoreSP(char saveaf)
 void setframe(void)
 {
 #ifdef USEFRAME
-    if (!useframe)
+    if (!c_useframepointer)
         return;
     ot("ld\t");
     FrameP();
@@ -2198,12 +2198,12 @@ void setframe(void)
 
 void FrameP(void)
 {
-    outstr(indexix ? "ix" : "iy");
+    outstr(c_framepointer_is_ix ? "ix" : "iy");
 }
 
 void pushframe(void)
 {
-    if (useframe || (currfn->flags & SAVEFRAME)) {
+    if (c_useframepointer || (currfn->flags & SAVEFRAME)) {
         ot("push\t");
         FrameP();
         nl();
@@ -2212,7 +2212,7 @@ void pushframe(void)
 
 void popframe(void)
 {
-    if (useframe || (currfn->flags & SAVEFRAME)) {
+    if (c_useframepointer || (currfn->flags & SAVEFRAME)) {
         ot("pop\t");
         FrameP();
         nl();

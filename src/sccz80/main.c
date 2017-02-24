@@ -13,12 +13,18 @@
 extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. */
 #endif
 
-/* 
- *      Data used in this file only
- */
+static char   *c_output_extension = ".asm";
+
+
+static int      gargc; /* global copies of command line args */
+static char   **gargv;
+static SYMBOL  *savecurr;    /* copy of currfn for #include */
+static int      saveline;    /* copy of lineno  "    " */
+static int      saveinfn;    /* copy of infunc  "    " */
+static int      savestart;   /* copy of fnstart "    " */
+
 
 char Filenorig[FILENAME_LEN + 1];
-unsigned int zorg; /* Origin for applications */
 
 int smartprintf; /* Map printf -> miniprintf */
 int c_makeshare; /* Do we want to make a shared library? */
@@ -29,14 +35,12 @@ int c_shared_file; /* File contains routines which are to be
           */
 
 int c_notaltreg; /* No alternate registers */
-int standard_escapes = 0; /* \n = 10, \r = 13 */
+int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 
 /*
  * Some external data
  */
 
-extern int gotocnt; /* No of gotos */
-extern GOTO_TAB* gotoq; /* Pointer for gotoq */
 
 void DispVersion(char*);
 void SetMPM(char*);
@@ -120,17 +124,14 @@ int main(int argc, char** argv)
         ctext = /* don't include the C text as comments */
         errstop = /* don't stop after errors */
         c_verbose = 0;
-    gotocnt = 0;
-    defdenums = 0;
-    doublestrings = 0;
+    c_double_strings = 0;
     c_notaltreg = NO;
     shareoffset = SHAREOFFSET; /* Offset for shared libs */
     debuglevel = NO;
-    assemtype = ASM_Z80ASM;
-    outext = NULL;
+    c_assembler_type = ASM_Z80ASM;
     printflevel = 0;
-    indexix = YES;
-    useframe = NO;
+    c_framepointer_is_ix = YES;
+    c_useframepointer = NO;
     use_r2l_calling_convention = NO;
 
     setup_sym(); /* define some symbols */
@@ -609,7 +610,7 @@ void openout()
     /* copy file name to string */
     strcpy(Filename, filen2);
     strcpy(Filenorig, filen2);
-    changesuffix(filen2, (outext == NULL) ? ".asm" : outext); /* Change appendix to .asm */
+    changesuffix(filen2, c_output_extension); /* Change appendix to .asm */
     if ((output = fopen(filen2, "w")) == NULL && (!eof)) {
         fprintf(stderr, "Cannot open output file: %s\n", line);
         exit(1);
@@ -782,31 +783,31 @@ struct args myargs[] = {
 #ifdef USEFRAME
 void SetNoFrame(char* arg)
 {
-    useframe = NO;
-    indexix = NO;
+    c_useframepointer = NO;
+    c_framepointer_is_ix = NO;
 }
 
 void SetFrameIX(char* arg)
 {
-    useframe = YES;
-    indexix = YES;
+    c_useframepointer = YES;
+    c_framepointer_is_ix = YES;
 }
 
 void SetFrameIY(char* arg)
 {
-    useframe = YES;
-    indexix = NO;
+    c_useframepointer = YES;
+    c_framepointer_is_ix = NO;
 }
 #endif
 
 void SetStandardEscape(char* arg)
 {
-    standard_escapes = YES;
+    c_standard_escapecodes = YES;
 }
 
 void SetDoubleStrings(char* arg)
 {
-    doublestrings = YES;
+    c_double_strings = YES;
 }
 
 void SetNoAltReg(char* arg)
@@ -816,7 +817,7 @@ void SetNoAltReg(char* arg)
 
 void SetASXX(char* arg)
 {
-    assemtype = ASM_ASXX;
+    c_assembler_type = ASM_ASXX;
 }
 
 /* debug= */
@@ -959,13 +960,13 @@ void SetAssembler(char* arg)
 
     if (1 == sscanf(arg + 4, "%s", assembler)) {
         if (strcmp(assembler, "z80asm") == 0 || strcmp(assembler, "mpm") == 0) {
-            assemtype = ASM_Z80ASM;
+            c_assembler_type = ASM_Z80ASM;
         } else if (strcmp(assembler, "asxx") == 0) {
-            assemtype = ASM_ASXX;
+            c_assembler_type = ASM_ASXX;
         } else if (strcmp(assembler, "vasm") == 0) {
-            assemtype = ASM_VASM;
+            c_assembler_type = ASM_VASM;
         } else if (strcmp(assembler, "gnu") == 0) {
-            assemtype = ASM_GNU;
+            c_assembler_type = ASM_GNU;
         }
     }
 }
@@ -977,7 +978,7 @@ void SetOutExt(char* arg)
     temp[0] = '.';
     strncpy(temp + 1, arg + 4, sizeof(temp) - 2);
     temp[sizeof(temp) - 1] = '\0';
-    outext = strdup(temp);
+    c_output_extension = strdup(temp);
 }
 
 void DispInfo(char* arg)

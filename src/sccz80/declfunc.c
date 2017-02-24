@@ -7,7 +7,6 @@
 
 #include "ccdefs.h"
 
-extern void CleanGoto(void);
 
 /** \brief Given an argument train, add in signature information to currfn
  *
@@ -378,7 +377,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
     /* If we use frame pointer we preserve previous framepointer on entry
      * to each function
      */
-    if (useframe || (currfn->flags & SAVEFRAME))
+    if (c_useframepointer || (currfn->flags & SAVEFRAME))
         where += 2;
     while (prevarg) {
         lgh = 2; /* Default length */
@@ -441,7 +440,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
         /* cleaning up the stack */
         leave(NO, NO);
     }
-    CleanGoto();
+    goto_cleanup();
     function_appendix(currfn);
 
 #ifdef INBUILT_OPTIMIZER

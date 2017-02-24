@@ -45,7 +45,7 @@ int constant(LVALUE* lval)
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(&lval->const_val)) {
         lval->val_type = DOUBLE;
-        if (doublestrings) {
+        if (c_double_strings) {
             immedlit(litlab);
             outdec(lval->const_val);
             nl();
@@ -137,7 +137,7 @@ int fnumber(int32_t* val)
     lptr = end - line;
 
     /* get location for result & bump litptr */
-    if (doublestrings) {
+    if (c_double_strings) {
         *val = stash_double_str(start, lptr + line);
         return (1);
     } else {
@@ -427,7 +427,7 @@ unsigned char litchar()
         return 9;
     case 'r': /* LF */
         gch();
-        return standard_escapes ? 13 : 10;
+        return c_standard_escapecodes ? 13 : 10;
     case 'v': /* VT */
         gch();
         return 11;
@@ -436,7 +436,7 @@ unsigned char litchar()
         return 12;
     case 'n': /* CR */
         gch();
-        return standard_escapes ? 10 : 13;
+        return c_standard_escapecodes ? 10 : 13;
     case '\"': /* " */
         gch();
         return 34;
