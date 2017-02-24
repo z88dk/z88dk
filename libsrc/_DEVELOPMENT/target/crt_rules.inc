@@ -197,6 +197,24 @@
       
    ENDIF
 
+   IFDEF CRT_INTERRUPT_MODE
+   
+      defc __crt_interrupt_mode = CRT_INTERRUPT_MODE
+   
+   ELSE
+   
+      IFDEF TAR__crt_interrupt_mode
+      
+         defc __crt_interrupt_mode = TAR__crt_interrupt_mode
+      
+      ELSE
+      
+         defc __crt_interrupt_mode = DEF__crt_interrupt_mode
+      
+      ENDIF
+      
+   ENDIF
+
    IFDEF CRT_ENABLE_STREAMS
    
       defc __crt_enable_streams = CRT_ENABLE_STREAMS

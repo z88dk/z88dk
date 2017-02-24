@@ -129,9 +129,10 @@ __Start:
       
       ld a,__code_vector_head/256
       ld i,a
-      im 2
       
    ENDIF
+
+   include "../crt_set_interrupt_mode.inc"
    
    IF (__crt_on_exit & 0x10000) && (__crt_on_exit & 0x20000) && (!(__crt_on_exit & 0x8)) && (__crt_on_exit & 0x2)
    

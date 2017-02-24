@@ -596,8 +596,6 @@ __Test_Trap_Fail:
    
    ld a,__IO_VECTOR_BASE
    out0 (IL),a
-   
-   im 2
 
 ;; fall through to __Start
 

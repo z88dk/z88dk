@@ -80,15 +80,16 @@ __Start:
 
    IF __page_zero_present = 0
    
-   include "../crt_start_di.inc"
+      include "../crt_start_di.inc"
    
    ENDIF
-   
+
    EXTERN __code_vector_head
    
    ld a,__code_vector_head/256
    ld i,a
 
+   include "../crt_set_interrupt_mode.inc"
    include "../crt_save_sp.inc"
 
 __Restart:

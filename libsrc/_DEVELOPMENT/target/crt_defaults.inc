@@ -18,13 +18,15 @@
    defc DEF__crt_initialize_bss        = 0       ;; generate code to initialize bss section at startup
    
    defc DEF__crt_include_preamble      = 0       ;; if non-zero, user supplies code in file "crt_preamble.asm" that is inserted at the start of the binary
+
    defc DEF__crt_org_vector_table      = 0       ;; if negative and Z88DK supplies page zero code, creates a section "code_vector" aligned to a page boundary to hold int vectors
-   
+   defc DEF__crt_interrupt_mode        = -1      ;; if 0-2 crt inserts appropriate im x instruction
+
    defc DEF__crt_enable_commandline    = 2       ;; generate argc and argv from command line (targets without command line will get argc=1, argv[0]="", argv[1]=NULL)
    defc DEF__crt_enable_restart        = 0       ;; if non-zero, restart the program on exit (correct initialization of static variables with rom models only)
    defc DEF__crt_enable_close          = 1       ;; if non-zero, close files on exit
    
-   defc DEF__crt_enable_eidi           = 0       ;; bit flags: 0x01 = di on restart, 0x02 = ei on restart, 0x10 = di on exit, 0x20 = ei on exit
+   defc DEF__crt_enable_eidi           = 0       ;; bit flags: 0x01 = di on start, 0x02 = ei on start, 0x10 = di on exit, 0x20 = ei on exit
    defc DEF__crt_on_exit               = 0x10001 ;; halt on exit (see documentation for other exit behaviours)
    
    defc DEF__crt_enable_rst            = 0       ;; if non-zero and in some crts with code org = 0, set bits indicate which rst locations are implemented with user code

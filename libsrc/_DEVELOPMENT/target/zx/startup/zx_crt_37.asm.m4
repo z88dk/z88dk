@@ -129,11 +129,10 @@ __Start:
       
       ld a,__code_vector_head/256
       ld i,a
-      im 2
       
    ENDIF
-	
-   include "../crt_start_eidi.inc"
+
+   include "../crt_set_interrupt_mode.inc"
    include "../crt_save_sp.inc"
 
 __Restart:
