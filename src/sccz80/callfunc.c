@@ -80,7 +80,7 @@ void callfunction(SYMBOL* ptr)
     }
     needchar(')'); 
 
-    if ( use_r2l_calling_convention == YES || ( ptr && (ptr->flags & SMALLC) == 0) ) {
+    if ( c_use_r2l_calling_convention == YES || ( ptr && (ptr->flags & SMALLC) == 0) ) {
         for ( i = 1; argnumber >= i ; argnumber--, i++) {
             FILE *tmp = tmpfiles[i];
             tmpfiles[i] = tmpfiles[argnumber];
@@ -99,18 +99,27 @@ void callfunction(SYMBOL* ptr)
         rewind(tmpfiles[argnumber]);
         set_temporary_input(tmpfiles[argnumber]);
         if (ptr) {
+
             /* ordinary call */
             expr = expression(&vconst, &val);
             if (expr == CARRY) {
                 zcarryconv();
                 expr = CINT;
             }
+
             if (ptr->prototyped && (ptr->prototyped >= argnumber)) {
-                protoarg = ptr->args[ptr->prototyped - argnumber + 1];
+                int proto_argnumber;
+                if ( c_use_r2l_calling_convention == NO || ( (ptr->flags & SMALLC) == SMALLC) ) {
+                    proto_argnumber = ptr->prototyped - argnumber + 1;
+                } else {
+                    proto_argnumber = argnumber;
+                }
+
+                protoarg = ptr->args[proto_argnumber];
                 if ((protoarg != PELLIPSES) && ((protoarg != fnargvalue) || ((protoarg & 7) == STRUCT)))
-                    expr = ForceArgs(protoarg, fnargvalue, expr, ptr->tagarg[ptr->prototyped - argnumber + 1]);
+                    expr = ForceArgs(protoarg, fnargvalue, expr, ptr->tagarg[proto_argnumber]);
             }
-            if ((ptr->flags & REGCALL) && ptr->prototyped == 1) {
+            if ((ptr->flags & FASTCALL) && ptr->prototyped == 1) {
                 /* fastcall of single expression */
 
             } else {

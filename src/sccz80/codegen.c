@@ -770,8 +770,10 @@ void zcallop(void)
 
 char dopref(SYMBOL* sym)
 {
-    if (sym->flags & LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP))
-        return (0);
+    if (sym->flags & LIBRARY && (sym->ident == FUNCTION || sym->ident == FUNCTIONP)) {
+        if ( (sym->flags & SMALLC) || c_use_r2l_calling_convention == NO )
+            return (0);
+    }
     return (1);
 }
 
