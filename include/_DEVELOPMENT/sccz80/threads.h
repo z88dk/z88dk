@@ -26,24 +26,24 @@ typedef uint16_t       once_flag;
 
 // mutex
 
-extern void __LIB__ call_once(once_flag *flag,void *func);
-extern void __LIB__ __CALLEE__ call_once_callee(once_flag *flag,void *func);
+extern void __LIB__ call_once(once_flag *flag,void *func) __smallc;
+extern void __LIB__ __CALLEE__ call_once_callee(once_flag *flag,void *func) __smallc;
 #define call_once(a,b) call_once_callee(a,b)
 
 
 extern void __LIB__ __FASTCALL__ mtx_destroy(mtx_t *m);
 
 
-extern int __LIB__ mtx_init(mtx_t *m,int type);
-extern int __LIB__ __CALLEE__ mtx_init_callee(mtx_t *m,int type);
+extern int __LIB__ mtx_init(mtx_t *m,int type) __smallc;
+extern int __LIB__ __CALLEE__ mtx_init_callee(mtx_t *m,int type) __smallc;
 #define mtx_init(a,b) mtx_init_callee(a,b)
 
 
 extern int __LIB__ __FASTCALL__ mtx_lock(mtx_t *m);
 
 
-extern int __LIB__ mtx_timedlock(mtx_t *m,struct timespec *ts);
-extern int __LIB__ __CALLEE__ mtx_timedlock_callee(mtx_t *m,struct timespec *ts);
+extern int __LIB__ mtx_timedlock(mtx_t *m,struct timespec *ts) __smallc;
+extern int __LIB__ __CALLEE__ mtx_timedlock_callee(mtx_t *m,struct timespec *ts) __smallc;
 #define mtx_timedlock(a,b) mtx_timedlock_callee(a,b)
 
 

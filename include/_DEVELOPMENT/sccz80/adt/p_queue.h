@@ -34,8 +34,8 @@ extern void __LIB__ __FASTCALL__ p_queue_init(void *p);
 extern void __LIB__ __FASTCALL__ *p_queue_pop(p_queue_t *q);
 
 
-extern void __LIB__ p_queue_push(p_queue_t *q,void *item);
-extern void __LIB__ __CALLEE__ p_queue_push_callee(p_queue_t *q,void *item);
+extern void __LIB__ p_queue_push(p_queue_t *q,void *item) __smallc;
+extern void __LIB__ __CALLEE__ p_queue_push_callee(p_queue_t *q,void *item) __smallc;
 #define p_queue_push(a,b) p_queue_push_callee(a,b)
 
 

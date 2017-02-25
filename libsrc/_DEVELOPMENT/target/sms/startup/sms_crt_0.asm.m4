@@ -76,8 +76,8 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 __Start:
-
-   include "../crt_start_eidi.inc"
+	
+   include "../crt_start_di.inc"
    include "../crt_save_sp.inc"
 
 __Restart:
@@ -131,6 +131,8 @@ __Restart_2:
 
 SECTION code_crt_init          ; user and library initialization
 SECTION code_crt_main
+
+   include "../crt_start_ei.inc"
 
    ; call user program
    

@@ -23,8 +23,8 @@ extern void __LIB__ __FASTCALL__ p_stack_init(void *p);
 extern void __LIB__ __FASTCALL__ *p_stack_pop(p_stack_t *s);
 
 
-extern void __LIB__ p_stack_push(p_stack_t *s,void *item);
-extern void __LIB__ __CALLEE__ p_stack_push_callee(p_stack_t *s,void *item);
+extern void __LIB__ p_stack_push(p_stack_t *s,void *item) __smallc;
+extern void __LIB__ __CALLEE__ p_stack_push_callee(p_stack_t *s,void *item) __smallc;
 #define p_stack_push(a,b) p_stack_push_callee(a,b)
 
 

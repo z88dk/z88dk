@@ -9,6 +9,13 @@ SECTION CODE
 
 org __crt_org_code
 
+IF __crt_org_vector_table < 0
+
+section code_vector
+section code_crt_start
+
+ENDIF
+
 section code_crt_init
 section code_crt_main
 section code_crt_exit
@@ -117,5 +124,14 @@ section bss_compiler
 section bss_user
 
 SECTION BSS_END
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+IF __crt_org_vector_table >= 0
+
+SECTION code_vector
+org __crt_org_vector_table
+
+ENDIF
 
 ;; end memory model ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

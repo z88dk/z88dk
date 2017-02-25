@@ -15,6 +15,7 @@
 #include <sys/types.h>
 //#include <inttypes.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "define.h"
 #include "lvalue.h"

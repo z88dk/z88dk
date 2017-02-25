@@ -58,6 +58,80 @@ PUBLIC __CPU_INFO
 
 PUBLIC __CPU_INFO_ENABLE_SLL
 
+PUBLIC __IO_VECTOR_BASE
+
+PUBLIC __IO_BASE_ADDRESS
+
+
+   ; Z8S180 / Z8L180 CLASS
+
+   PUBLIC CNTLA0
+   PUBLIC CNTLA1
+   PUBLIC CNTLB0
+   PUBLIC CNTLB1
+   PUBLIC STAT0
+   PUBLIC STAT1
+   PUBLIC TDR0
+   PUBLIC TDR1
+   PUBLIC RDR0
+   PUBLIC RDR1
+   PUBLIC ASEXT0
+   PUBLIC ASEXT1
+   PUBLIC ASTC0L
+   PUBLIC ASTC0H
+   PUBLIC ASTC1L
+   PUBLIC ASTC1H
+
+   PUBLIC CNTR
+   PUBLIC TRD
+
+   PUBLIC TMDR0L
+   PUBLIC TMDR0H
+   PUBLIC RLDR0L
+   PUBLIC RLDR0H
+   PUBLIC TCR
+   PUBLIC TMDR1L
+   PUBLIC TMDR1H
+   PUBLIC RLDR1L
+   PUBLIC RLDR1H
+
+   PUBLIC FRC
+   PUBLIC CMR
+   PUBLIC CCR
+
+   PUBLIC SAR0L
+   PUBLIC SAR0H
+   PUBLIC SAR0B
+   PUBLIC DAR0L
+   PUBLIC DAR0H
+   PUBLIC DAR0B
+   PUBLIC BCR0L
+   PUBLIC BCR0H
+   PUBLIC MAR1L
+   PUBLIC MAR1H
+   PUBLIC MAR1B
+   PUBLIC IAR1L
+   PUBLIC IAR1H
+   PUBLIC IAR1B
+   PUBLIC BCR1L
+   PUBLIC BCR1H
+   PUBLIC DSTAT
+   PUBLIC DMODE
+   PUBLIC DCNTL
+
+   PUBLIC IL
+   PUBLIC ITC
+
+   PUBLIC RCR
+
+   PUBLIC CBR
+   PUBLIC BBR
+   PUBLIC CBAR
+
+   PUBLIC OMCR
+   PUBLIC ICR
+
+
 
 
 
@@ -72,6 +146,80 @@ defc __CPU_CLOCK = 33000000
 defc __CPU_INFO = 0x00
 
 defc __CPU_INFO_ENABLE_SLL = 0x01
+
+defc __IO_VECTOR_BASE = 128
+
+defc __IO_BASE_ADDRESS = 0
+
+
+   ; Z8S180 / Z8L180 CLASS
+
+   defc CNTLA0 = 0
+   defc CNTLA1 = 1
+   defc CNTLB0 = 2
+   defc CNTLB1 = 3
+   defc STAT0 = 4
+   defc STAT1 = 5
+   defc TDR0 = 6
+   defc TDR1 = 7
+   defc RDR0 = 8
+   defc RDR1 = 9
+   defc ASEXT0 = 18
+   defc ASEXT1 = 19
+   defc ASTC0L = 26
+   defc ASTC0H = 27
+   defc ASTC1L = 28
+   defc ASTC1H = 29
+
+   defc CNTR = 10
+   defc TRD = 11
+
+   defc TMDR0L = 12
+   defc TMDR0H = 13
+   defc RLDR0L = 14
+   defc RLDR0H = 15
+   defc TCR = 16
+   defc TMDR1L = 20
+   defc TMDR1H = 21
+   defc RLDR1L = 22
+   defc RLDR1H = 23
+
+   defc FRC = 24
+   defc CMR = 30
+   defc CCR = 31
+
+   defc SAR0L = 32
+   defc SAR0H = 33
+   defc SAR0B = 34
+   defc DAR0L = 35
+   defc DAR0H = 36
+   defc DAR0B = 37
+   defc BCR0L = 38
+   defc BCR0H = 39
+   defc MAR1L = 40
+   defc MAR1H = 41
+   defc MAR1B = 42
+   defc IAR1L = 43
+   defc IAR1H = 44
+   defc IAR1B = 45
+   defc BCR1L = 46
+   defc BCR1H = 47
+   defc DSTAT = 48
+   defc DMODE = 49
+   defc DCNTL = 50
+
+   defc IL = 51
+   defc ITC = 52
+
+   defc RCR = 54
+
+   defc CBR = 56
+   defc BBR = 57
+   defc CBAR = 58
+
+   defc OMCR = 62
+   defc ICR = 63
+
 
 
 

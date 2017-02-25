@@ -62,84 +62,84 @@ extern void _fzx_draw_xor(void);       // XOR fzx pixels into display
 
 // FUNCTIONS
 
-extern void __LIB__ fzx_state_init(struct fzx_state *fs,struct fzx_font *ff,struct r_Rect16 *window);
-extern void __LIB__ __CALLEE__ fzx_state_init_callee(struct fzx_state *fs,struct fzx_font *ff,struct r_Rect16 *window);
+extern void __LIB__ fzx_state_init(struct fzx_state *fs,struct fzx_font *ff,struct r_Rect16 *window) __smallc;
+extern void __LIB__ __CALLEE__ fzx_state_init_callee(struct fzx_state *fs,struct fzx_font *ff,struct r_Rect16 *window) __smallc;
 #define fzx_state_init(a,b,c) fzx_state_init_callee(a,b,c)
 
 
 
-extern void __LIB__ fzx_at(struct fzx_state *fs,uint16_t x,uint16_t y);
-extern void __LIB__ __CALLEE__ fzx_at_callee(struct fzx_state *fs,uint16_t x,uint16_t y);
+extern void __LIB__ fzx_at(struct fzx_state *fs,uint16_t x,uint16_t y) __smallc;
+extern void __LIB__ __CALLEE__ fzx_at_callee(struct fzx_state *fs,uint16_t x,uint16_t y) __smallc;
 #define fzx_at(a,b,c) fzx_at_callee(a,b,c)
 
 
-extern int __LIB__ fzx_putc(struct fzx_state *fs,int c);
-extern int __LIB__ __CALLEE__ fzx_putc_callee(struct fzx_state *fs,int c);
+extern int __LIB__ fzx_putc(struct fzx_state *fs,int c) __smallc;
+extern int __LIB__ __CALLEE__ fzx_putc_callee(struct fzx_state *fs,int c) __smallc;
 #define fzx_putc(a,b) fzx_putc_callee(a,b)
 
 
 
-extern char __LIB__ *fzx_char_metrics(struct fzx_font *ff,struct fzx_cmetric *fm,int c);
-extern char __LIB__ __CALLEE__ *fzx_char_metrics_callee(struct fzx_font *ff,struct fzx_cmetric *fm,int c);
+extern char __LIB__ *fzx_char_metrics(struct fzx_font *ff,struct fzx_cmetric *fm,int c) __smallc;
+extern char __LIB__ __CALLEE__ *fzx_char_metrics_callee(struct fzx_font *ff,struct fzx_cmetric *fm,int c) __smallc;
 #define fzx_char_metrics(a,b,c) fzx_char_metrics_callee(a,b,c)
 
 
-extern uint16_t __LIB__ fzx_glyph_width(struct fzx_font *ff,int c);
-extern uint16_t __LIB__ __CALLEE__ fzx_glyph_width_callee(struct fzx_font *ff,int c);
+extern uint16_t __LIB__ fzx_glyph_width(struct fzx_font *ff,int c) __smallc;
+extern uint16_t __LIB__ __CALLEE__ fzx_glyph_width_callee(struct fzx_font *ff,int c) __smallc;
 #define fzx_glyph_width(a,b) fzx_glyph_width_callee(a,b)
 
 
 
-extern uint16_t __LIB__ fzx_string_extent(struct fzx_font *ff,char *s);
-extern uint16_t __LIB__ __CALLEE__ fzx_string_extent_callee(struct fzx_font *ff,char *s);
+extern uint16_t __LIB__ fzx_string_extent(struct fzx_font *ff,char *s) __smallc;
+extern uint16_t __LIB__ __CALLEE__ fzx_string_extent_callee(struct fzx_font *ff,char *s) __smallc;
 #define fzx_string_extent(a,b) fzx_string_extent_callee(a,b)
 
 
-extern char __LIB__ *fzx_string_partition(struct fzx_font *ff,char *s,uint16_t allowed_width);
-extern char __LIB__ __CALLEE__ *fzx_string_partition_callee(struct fzx_font *ff,char *s,uint16_t allowed_width);
+extern char __LIB__ *fzx_string_partition(struct fzx_font *ff,char *s,uint16_t allowed_width) __smallc;
+extern char __LIB__ __CALLEE__ *fzx_string_partition_callee(struct fzx_font *ff,char *s,uint16_t allowed_width) __smallc;
 #define fzx_string_partition(a,b,c) fzx_string_partition_callee(a,b,c)
 
 
-extern char __LIB__ *fzx_string_partition_ww(struct fzx_font *ff,char *s,uint16_t allowed_width);
-extern char __LIB__ __CALLEE__ *fzx_string_partition_ww_callee(struct fzx_font *ff,char *s,uint16_t allowed_width);
+extern char __LIB__ *fzx_string_partition_ww(struct fzx_font *ff,char *s,uint16_t allowed_width) __smallc;
+extern char __LIB__ __CALLEE__ *fzx_string_partition_ww_callee(struct fzx_font *ff,char *s,uint16_t allowed_width) __smallc;
 #define fzx_string_partition_ww(a,b,c) fzx_string_partition_ww_callee(a,b,c)
 
 
 
-extern uint16_t __LIB__ fzx_buffer_extent(struct fzx_font *ff,char *buf,uint16_t buflen);
-extern uint16_t __LIB__ __CALLEE__ fzx_buffer_extent_callee(struct fzx_font *ff,char *buf,uint16_t buflen);
+extern uint16_t __LIB__ fzx_buffer_extent(struct fzx_font *ff,char *buf,uint16_t buflen) __smallc;
+extern uint16_t __LIB__ __CALLEE__ fzx_buffer_extent_callee(struct fzx_font *ff,char *buf,uint16_t buflen) __smallc;
 #define fzx_buffer_extent(a,b,c) fzx_buffer_extent_callee(a,b,c)
 
 
-extern char __LIB__ *fzx_buffer_partition(struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width);
-extern char __LIB__ __CALLEE__ *fzx_buffer_partition_callee(struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width);
+extern char __LIB__ *fzx_buffer_partition(struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width) __smallc;
+extern char __LIB__ __CALLEE__ *fzx_buffer_partition_callee(struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width) __smallc;
 #define fzx_buffer_partition(a,b,c,d) fzx_buffer_partition_callee(a,b,c,d)
 
 
-extern char __LIB__ *fzx_buffer_partition_ww(struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width);
-extern char __LIB__ __CALLEE__ *fzx_buffer_partition_ww_callee(struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width);
+extern char __LIB__ *fzx_buffer_partition_ww(struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width) __smallc;
+extern char __LIB__ __CALLEE__ *fzx_buffer_partition_ww_callee(struct fzx_font *ff,char *buf,uint16_t buflen,uint16_t allowed_width) __smallc;
 #define fzx_buffer_partition_ww(a,b,c,d) fzx_buffer_partition_ww_callee(a,b,c,d)
 
 
 
-extern int __LIB__ fzx_puts(struct fzx_state *fs,char *s);
-extern int __LIB__ __CALLEE__ fzx_puts_callee(struct fzx_state *fs,char *s);
+extern int __LIB__ fzx_puts(struct fzx_state *fs,char *s) __smallc;
+extern int __LIB__ __CALLEE__ fzx_puts_callee(struct fzx_state *fs,char *s) __smallc;
 #define fzx_puts(a,b) fzx_puts_callee(a,b)
 
 
-extern int __LIB__ fzx_puts_justified(struct fzx_state *fs,char *s,uint16_t allowed_width);
-extern int __LIB__ __CALLEE__ fzx_puts_justified_callee(struct fzx_state *fs,char *s,uint16_t allowed_width);
+extern int __LIB__ fzx_puts_justified(struct fzx_state *fs,char *s,uint16_t allowed_width) __smallc;
+extern int __LIB__ __CALLEE__ fzx_puts_justified_callee(struct fzx_state *fs,char *s,uint16_t allowed_width) __smallc;
 #define fzx_puts_justified(a,b,c) fzx_puts_justified_callee(a,b,c)
 
 
 
-extern int __LIB__ fzx_write(struct fzx_state *fs,char *buf,uint16_t buflen);
-extern int __LIB__ __CALLEE__ fzx_write_callee(struct fzx_state *fs,char *buf,uint16_t buflen);
+extern int __LIB__ fzx_write(struct fzx_state *fs,char *buf,uint16_t buflen) __smallc;
+extern int __LIB__ __CALLEE__ fzx_write_callee(struct fzx_state *fs,char *buf,uint16_t buflen) __smallc;
 #define fzx_write(a,b,c) fzx_write_callee(a,b,c)
 
 
-extern int __LIB__ fzx_write_justified(struct fzx_state *fs,char *buf,uint16_t buflen,uint16_t allowed_width);
-extern int __LIB__ __CALLEE__ fzx_write_justified_callee(struct fzx_state *fs,char *buf,uint16_t buflen,uint16_t allowed_width);
+extern int __LIB__ fzx_write_justified(struct fzx_state *fs,char *buf,uint16_t buflen,uint16_t allowed_width) __smallc;
+extern int __LIB__ __CALLEE__ fzx_write_justified_callee(struct fzx_state *fs,char *buf,uint16_t buflen,uint16_t allowed_width) __smallc;
 #define fzx_write_justified(a,b,c,d) fzx_write_justified_callee(a,b,c,d)
 
 

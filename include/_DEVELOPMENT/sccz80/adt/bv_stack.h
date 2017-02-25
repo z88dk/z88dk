@@ -31,8 +31,8 @@ extern void __LIB__ __FASTCALL__ bv_stack_destroy(bv_stack_t *s);
 extern int __LIB__ __FASTCALL__ bv_stack_empty(bv_stack_t *s);
 
 
-extern bv_stack_t __LIB__ *bv_stack_init(void *p,size_t capacity,size_t max_size);
-extern bv_stack_t __LIB__ __CALLEE__ *bv_stack_init_callee(void *p,size_t capacity,size_t max_size);
+extern bv_stack_t __LIB__ *bv_stack_init(void *p,size_t capacity,size_t max_size) __smallc;
+extern bv_stack_t __LIB__ __CALLEE__ *bv_stack_init_callee(void *p,size_t capacity,size_t max_size) __smallc;
 #define bv_stack_init(a,b,c) bv_stack_init_callee(a,b,c)
 
 
@@ -42,13 +42,13 @@ extern size_t __LIB__ __FASTCALL__ bv_stack_max_size(bv_stack_t *s);
 extern int __LIB__ __FASTCALL__ bv_stack_pop(bv_stack_t *s);
 
 
-extern int __LIB__ bv_stack_push(bv_stack_t *s,int c);
-extern int __LIB__ __CALLEE__ bv_stack_push_callee(bv_stack_t *s,int c);
+extern int __LIB__ bv_stack_push(bv_stack_t *s,int c) __smallc;
+extern int __LIB__ __CALLEE__ bv_stack_push_callee(bv_stack_t *s,int c) __smallc;
 #define bv_stack_push(a,b) bv_stack_push_callee(a,b)
 
 
-extern int __LIB__ bv_stack_reserve(bv_stack_t *s,size_t n);
-extern int __LIB__ __CALLEE__ bv_stack_reserve_callee(bv_stack_t *s,size_t n);
+extern int __LIB__ bv_stack_reserve(bv_stack_t *s,size_t n) __smallc;
+extern int __LIB__ __CALLEE__ bv_stack_reserve_callee(bv_stack_t *s,size_t n) __smallc;
 #define bv_stack_reserve(a,b) bv_stack_reserve_callee(a,b)
 
 

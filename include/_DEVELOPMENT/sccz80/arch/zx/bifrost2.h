@@ -30,7 +30,7 @@ extern unsigned char BIFROST2_tilemap[81];
 // Install BIFROST*2 ENGINE
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_install(void);
+extern void __LIB__ BIFROST2_install(void) __smallc;
 
 
 
@@ -54,7 +54,7 @@ extern unsigned char BIFROST2_HOLE[BIFROST2_HOLE_SIZE];
 // Activate multicolor rendering with BIFROST*2 ENGINE
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_start(void);
+extern void __LIB__ BIFROST2_start(void) __smallc;
 
 
 
@@ -62,7 +62,7 @@ extern void __LIB__ BIFROST2_start(void);
 // Deactivate multicolor rendering with BIFROST*2 ENGINE
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_stop(void);
+extern void __LIB__ BIFROST2_stop(void) __smallc;
 
 
 
@@ -92,8 +92,8 @@ extern void __LIB__ BIFROST2_stop(void);
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_setTile(unsigned char px,unsigned char py,unsigned char tile);
-extern void __LIB__ __CALLEE__ BIFROST2_setTile_callee(unsigned char px,unsigned char py,unsigned char tile);
+extern void __LIB__ BIFROST2_setTile(unsigned char px,unsigned char py,unsigned char tile) __smallc;
+extern void __LIB__ __CALLEE__ BIFROST2_setTile_callee(unsigned char px,unsigned char py,unsigned char tile) __smallc;
 #define BIFROST2_setTile(a,b,c) BIFROST2_setTile_callee(a,b,c)
 
 
@@ -113,8 +113,8 @@ extern void __LIB__ __CALLEE__ BIFROST2_setTile_callee(unsigned char px,unsigned
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-extern unsigned char __LIB__ BIFROST2_getTile(unsigned char px,unsigned char py);
-extern unsigned char __LIB__ __CALLEE__ BIFROST2_getTile_callee(unsigned char px,unsigned char py);
+extern unsigned char __LIB__ BIFROST2_getTile(unsigned char px,unsigned char py) __smallc;
+extern unsigned char __LIB__ __CALLEE__ BIFROST2_getTile_callee(unsigned char px,unsigned char py) __smallc;
 #define BIFROST2_getTile(a,b) BIFROST2_getTile_callee(a,b)
 
 
@@ -147,8 +147,8 @@ extern unsigned char __LIB__ __FASTCALL__ BIFROST2_getAnimGroup(unsigned char ti
 //     Memory address of the multicolor attribute
 // ----------------------------------------------------------------
 
-extern unsigned char __LIB__ *BIFROST2_findAttrH(unsigned char lin,unsigned char col);
-extern unsigned char __LIB__ __CALLEE__ *BIFROST2_findAttrH_callee(unsigned char lin,unsigned char col);
+extern unsigned char __LIB__ *BIFROST2_findAttrH(unsigned char lin,unsigned char col) __smallc;
+extern unsigned char __LIB__ __CALLEE__ *BIFROST2_findAttrH_callee(unsigned char lin,unsigned char col) __smallc;
 #define BIFROST2_findAttrH(a,b) BIFROST2_findAttrH_callee(a,b)
 
 
@@ -167,7 +167,7 @@ extern unsigned char BIFROST2_TILE_IMAGES[];
 // Reconfigure BIFROST*2 ENGINE to use 2 frames per animation group
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_resetAnim2Frames(void);
+extern void __LIB__ BIFROST2_resetAnim2Frames(void) __smallc;
 
 
 
@@ -175,7 +175,7 @@ extern void __LIB__ BIFROST2_resetAnim2Frames(void);
 // Reconfigure BIFROST*2 ENGINE to use 4 frames per animation group
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_resetAnim4Frames(void);
+extern void __LIB__ BIFROST2_resetAnim4Frames(void) __smallc;
 
 
 
@@ -211,8 +211,8 @@ extern void __LIB__ BIFROST2_resetAnim4Frames(void);
 //          occurs, program may crash!!! (see BIFROST2_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_drawTileH(unsigned char lin,unsigned char col,unsigned char tile);
-extern void __LIB__ __CALLEE__ BIFROST2_drawTileH_callee(unsigned char lin,unsigned char col,unsigned char tile);
+extern void __LIB__ BIFROST2_drawTileH(unsigned char lin,unsigned char col,unsigned char tile) __smallc;
+extern void __LIB__ __CALLEE__ BIFROST2_drawTileH_callee(unsigned char lin,unsigned char col,unsigned char tile) __smallc;
 #define BIFROST2_drawTileH(a,b,c) BIFROST2_drawTileH_callee(a,b,c)
 
 
@@ -229,8 +229,8 @@ extern void __LIB__ __CALLEE__ BIFROST2_drawTileH_callee(unsigned char lin,unsig
 //          occurs, program may crash!!! (see BIFROST2_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_showTilePosH(unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ BIFROST2_showTilePosH_callee(unsigned char lin,unsigned char col);
+extern void __LIB__ BIFROST2_showTilePosH(unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ BIFROST2_showTilePosH_callee(unsigned char lin,unsigned char col) __smallc;
 #define BIFROST2_showTilePosH(a,b) BIFROST2_showTilePosH_callee(a,b)
 
 
@@ -244,7 +244,7 @@ extern void __LIB__ __CALLEE__ BIFROST2_showTilePosH_callee(unsigned char lin,un
 //          occurs, program may crash!!! (see BIFROST2_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_showNextTile(void);
+extern void __LIB__ BIFROST2_showNextTile(void) __smallc;
 
 
 
@@ -257,7 +257,7 @@ extern void __LIB__ BIFROST2_showNextTile(void);
 //          occurs, program may crash!!! (see BIFROST2_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_showNext2Tiles(void);
+extern void __LIB__ BIFROST2_showNext2Tiles(void) __smallc;
 
 
 
@@ -275,8 +275,8 @@ extern void __LIB__ BIFROST2_showNext2Tiles(void);
 //          occurs, program may crash!!! (see BIFROST2_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROST2_fillTileAttrH(unsigned char lin,unsigned char col,unsigned char attr);
-extern void __LIB__ __CALLEE__ BIFROST2_fillTileAttrH_callee(unsigned char lin,unsigned char col,unsigned char attr);
+extern void __LIB__ BIFROST2_fillTileAttrH(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ BIFROST2_fillTileAttrH_callee(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
 #define BIFROST2_fillTileAttrH(a,b,c) BIFROST2_fillTileAttrH_callee(a,b,c)
 
 

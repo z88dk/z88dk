@@ -63,6 +63,158 @@
 
 #define __CPU_INFO_ENABLE_SLL  0x01
 
+#define __IO_VECTOR_BASE  128
+
+#define __IO_BASE_ADDRESS  0
+
+#ifdef __SCCZ80
+
+
+   ; Z8S180 / Z8L180 CLASS
+
+   #define CNTLA0  0
+   #define CNTLA1  1
+   #define CNTLB0  2
+   #define CNTLB1  3
+   #define STAT0  4
+   #define STAT1  5
+   #define TDR0  6
+   #define TDR1  7
+   #define RDR0  8
+   #define RDR1  9
+   #define ASEXT0  18
+   #define ASEXT1  19
+   #define ASTC0L  26
+   #define ASTC0H  27
+   #define ASTC1L  28
+   #define ASTC1H  29
+
+   #define CNTR  10
+   #define TRD  11
+
+   #define TMDR0L  12
+   #define TMDR0H  13
+   #define RLDR0L  14
+   #define RLDR0H  15
+   #define TCR  16
+   #define TMDR1L  20
+   #define TMDR1H  21
+   #define RLDR1L  22
+   #define RLDR1H  23
+
+   #define FRC  24
+   #define CMR  30
+   #define CCR  31
+
+   #define SAR0L  32
+   #define SAR0H  33
+   #define SAR0B  34
+   #define DAR0L  35
+   #define DAR0H  36
+   #define DAR0B  37
+   #define BCR0L  38
+   #define BCR0H  39
+   #define MAR1L  40
+   #define MAR1H  41
+   #define MAR1B  42
+   #define IAR1L  43
+   #define IAR1H  44
+   #define IAR1B  45
+   #define BCR1L  46
+   #define BCR1H  47
+   #define DSTAT  48
+   #define DMODE  49
+   #define DCNTL  50
+
+   #define IL  51
+   #define ITC  52
+
+   #define RCR  54
+
+   #define CBR  56
+   #define BBR  57
+   #define CBAR  58
+
+   #define OMCR  62
+   #define ICR  63
+
+
+ENDIF
+
+IFDEF __SDCC
+
+
+   ; Z8S180 / Z8L180 CLASS
+
+   __sfr __at 0 CNTLA0;
+   __sfr __at 1 CNTLA1;
+   __sfr __at 2 CNTLB0;
+   __sfr __at 3 CNTLB1;
+   __sfr __at 4 STAT0;
+   __sfr __at 5 STAT1;
+   __sfr __at 6 TDR0;
+   __sfr __at 7 TDR1;
+   __sfr __at 8 RDR0;
+   __sfr __at 9 RDR1;
+   __sfr __at 18 ASEXT0;
+   __sfr __at 19 ASEXT1;
+   __sfr __at 26 ASTC0L;
+   __sfr __at 27 ASTC0H;
+   __sfr __at 28 ASTC1L;
+   __sfr __at 29 ASTC1H;
+
+   __sfr __at 10 CNTR;
+   __sfr __at 11 TRD;
+
+   __sfr __at 12 TMDR0L;
+   __sfr __at 13 TMDR0H;
+   __sfr __at 14 RLDR0L;
+   __sfr __at 15 RLDR0H;
+   __sfr __at 16 TCR;
+   __sfr __at 20 TMDR1L;
+   __sfr __at 21 TMDR1H;
+   __sfr __at 22 RLDR1L;
+   __sfr __at 23 RLDR1H;
+
+   __sfr __at 24 FRC;
+   __sfr __at 30 CMR;
+   __sfr __at 31 CCR;
+
+   __sfr __at 32 SAR0L;
+   __sfr __at 33 SAR0H;
+   __sfr __at 34 SAR0B;
+   __sfr __at 35 DAR0L;
+   __sfr __at 36 DAR0H;
+   __sfr __at 37 DAR0B;
+   __sfr __at 38 BCR0L;
+   __sfr __at 39 BCR0H;
+   __sfr __at 40 MAR1L;
+   __sfr __at 41 MAR1H;
+   __sfr __at 42 MAR1B;
+   __sfr __at 43 IAR1L;
+   __sfr __at 44 IAR1H;
+   __sfr __at 45 IAR1B;
+   __sfr __at 46 BCR1L;
+   __sfr __at 47 BCR1H;
+   __sfr __at 48 DSTAT;
+   __sfr __at 49 DMODE;
+   __sfr __at 50 DCNTL;
+
+   __sfr __at 51 IL;
+   __sfr __at 52 ITC;
+
+   __sfr __at 54 RCR;
+
+   __sfr __at 56 CBR;
+   __sfr __at 57 BBR;
+   __sfr __at 58 CBAR;
+
+   __sfr __at 62 OMCR;
+   __sfr __at 63 ICR;
+
+
+ENDIF
+
 
 
 

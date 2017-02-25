@@ -35,7 +35,7 @@ extern unsigned char BIFROSTH_tilemap[81];
 // Activate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_start(void);
+extern void __LIB__ BIFROSTH_start(void) __smallc;
 
 
 
@@ -43,7 +43,7 @@ extern void __LIB__ BIFROSTH_start(void);
 // Deactivate multicolor rendering with BIFROST* ENGINE
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_stop(void);
+extern void __LIB__ BIFROSTH_stop(void) __smallc;
 
 
 
@@ -80,8 +80,8 @@ extern unsigned BIFROSTH_ISR_HOOK[3];
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_setTile(unsigned char px,unsigned char py,unsigned char tile);
-extern void __LIB__ __CALLEE__ BIFROSTH_setTile_callee(unsigned char px,unsigned char py,unsigned char tile);
+extern void __LIB__ BIFROSTH_setTile(unsigned char px,unsigned char py,unsigned char tile) __smallc;
+extern void __LIB__ __CALLEE__ BIFROSTH_setTile_callee(unsigned char px,unsigned char py,unsigned char tile) __smallc;
 #define BIFROSTH_setTile(a,b,c) BIFROSTH_setTile_callee(a,b,c)
 
 
@@ -101,8 +101,8 @@ extern void __LIB__ __CALLEE__ BIFROSTH_setTile_callee(unsigned char px,unsigned
 // Obs: Also available as inline macro (for constant parameters)
 // ----------------------------------------------------------------
 
-extern unsigned char __LIB__ BIFROSTH_getTile(unsigned char px,unsigned char py);
-extern unsigned char __LIB__ __CALLEE__ BIFROSTH_getTile_callee(unsigned char px,unsigned char py);
+extern unsigned char __LIB__ BIFROSTH_getTile(unsigned char px,unsigned char py) __smallc;
+extern unsigned char __LIB__ __CALLEE__ BIFROSTH_getTile_callee(unsigned char px,unsigned char py) __smallc;
 #define BIFROSTH_getTile(a,b) BIFROSTH_getTile_callee(a,b)
 
 
@@ -135,8 +135,8 @@ extern unsigned char __LIB__ __FASTCALL__ BIFROSTH_getAnimGroup(unsigned char ti
 //     Memory address of the multicolor attribute
 // ----------------------------------------------------------------
 
-extern unsigned char __LIB__ *BIFROSTH_findAttrH(unsigned char lin,unsigned char col);
-extern unsigned char __LIB__ __CALLEE__ *BIFROSTH_findAttrH_callee(unsigned char lin,unsigned char col);
+extern unsigned char __LIB__ *BIFROSTH_findAttrH(unsigned char lin,unsigned char col) __smallc;
+extern unsigned char __LIB__ __CALLEE__ *BIFROSTH_findAttrH_callee(unsigned char lin,unsigned char col) __smallc;
 #define BIFROSTH_findAttrH(a,b) BIFROSTH_findAttrH_callee(a,b)
 
 
@@ -167,7 +167,7 @@ extern unsigned char BIFROSTH_TILE_IMAGES[];
 // Reconfigure BIFROST* ENGINE to use 2 frames per animation group
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_resetAnim2Frames(void);
+extern void __LIB__ BIFROSTH_resetAnim2Frames(void) __smallc;
 
 
 
@@ -175,7 +175,7 @@ extern void __LIB__ BIFROSTH_resetAnim2Frames(void);
 // Reconfigure BIFROST* ENGINE to use 4 frames per animation group
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_resetAnim4Frames(void);
+extern void __LIB__ BIFROSTH_resetAnim4Frames(void) __smallc;
 
 
 
@@ -211,8 +211,8 @@ extern void __LIB__ BIFROSTH_resetAnim4Frames(void);
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_drawTileH(unsigned char lin,unsigned char col,unsigned char tile);
-extern void __LIB__ __CALLEE__ BIFROSTH_drawTileH_callee(unsigned char lin,unsigned char col,unsigned char tile);
+extern void __LIB__ BIFROSTH_drawTileH(unsigned char lin,unsigned char col,unsigned char tile) __smallc;
+extern void __LIB__ __CALLEE__ BIFROSTH_drawTileH_callee(unsigned char lin,unsigned char col,unsigned char tile) __smallc;
 #define BIFROSTH_drawTileH(a,b,c) BIFROSTH_drawTileH_callee(a,b,c)
 
 
@@ -229,8 +229,8 @@ extern void __LIB__ __CALLEE__ BIFROSTH_drawTileH_callee(unsigned char lin,unsig
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_showTilePosH(unsigned char lin,unsigned char col);
-extern void __LIB__ __CALLEE__ BIFROSTH_showTilePosH_callee(unsigned char lin,unsigned char col);
+extern void __LIB__ BIFROSTH_showTilePosH(unsigned char lin,unsigned char col) __smallc;
+extern void __LIB__ __CALLEE__ BIFROSTH_showTilePosH_callee(unsigned char lin,unsigned char col) __smallc;
 #define BIFROSTH_showTilePosH(a,b) BIFROSTH_showTilePosH_callee(a,b)
 
 
@@ -244,7 +244,7 @@ extern void __LIB__ __CALLEE__ BIFROSTH_showTilePosH_callee(unsigned char lin,un
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_showNextTile(void);
+extern void __LIB__ BIFROSTH_showNextTile(void) __smallc;
 
 
 
@@ -262,8 +262,8 @@ extern void __LIB__ BIFROSTH_showNextTile(void);
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_fillTileAttrH(unsigned char lin,unsigned char col,unsigned char attr);
-extern void __LIB__ __CALLEE__ BIFROSTH_fillTileAttrH_callee(unsigned char lin,unsigned char col,unsigned char attr);
+extern void __LIB__ BIFROSTH_fillTileAttrH(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ BIFROSTH_fillTileAttrH_callee(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
 #define BIFROSTH_fillTileAttrH(a,b,c) BIFROSTH_fillTileAttrH_callee(a,b,c)
 
 
@@ -308,8 +308,8 @@ extern void __LIB__ __CALLEE__ BIFROSTH_fillTileAttrH_callee(unsigned char lin,u
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_drawBackTilesH(unsigned char lin,unsigned char col,unsigned char attr);
-extern void __LIB__ __CALLEE__ BIFROSTH_drawBackTilesH_callee(unsigned char lin,unsigned char col,unsigned char attr);
+extern void __LIB__ BIFROSTH_drawBackTilesH(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ BIFROSTH_drawBackTilesH_callee(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
 #define BIFROSTH_drawBackTilesH(a,b,c) BIFROSTH_drawBackTilesH_callee(a,b,c)
 
 
@@ -329,8 +329,8 @@ extern void __LIB__ __CALLEE__ BIFROSTH_drawBackTilesH_callee(unsigned char lin,
 //          occurs, program may crash!!! (see BIFROSTH_halt)
 // ----------------------------------------------------------------
 
-extern void __LIB__ BIFROSTH_drawTilePosH(unsigned char lin,unsigned char col,unsigned char attr);
-extern void __LIB__ __CALLEE__ BIFROSTH_drawTilePosH_callee(unsigned char lin,unsigned char col,unsigned char attr);
+extern void __LIB__ BIFROSTH_drawTilePosH(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
+extern void __LIB__ __CALLEE__ BIFROSTH_drawTilePosH_callee(unsigned char lin,unsigned char col,unsigned char attr) __smallc;
 #define BIFROSTH_drawTilePosH(a,b,c) BIFROSTH_drawTilePosH_callee(a,b,c)
 
 
