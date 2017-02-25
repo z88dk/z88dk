@@ -34,3 +34,21 @@ REGEX2.H line 49-68 changed to
  #define OBOW (19L<<OPSHIFT) /* begin word -   */
  #define OEOW (20L<<OPSHIFT) /* end word -   */
 
+CHANGES MADE BY Z88DK
+
+To accept \t as tab and \\ as single \ character
+https://github.com/z88dk/z88dk/commit/29777342c67b61d95e88696055a5845181f20ce6
+
+Some documentation for using regex:
+
+regcomp
+http://www.mkssoftware.com/docs/man3/regcomp.3.asp
+
+regexec
+http://www.mkssoftware.com/docs/man3/regexec.3.asp
+
+regerror
+http://www.mkssoftware.com/docs/man3/regerror.3.asp
+
+regfree
+http://www.mkssoftware.com/docs/man3/regfree.3.asp
