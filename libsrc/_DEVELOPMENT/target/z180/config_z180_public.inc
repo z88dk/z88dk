@@ -147,7 +147,7 @@ defc __CPU_INFO = 0x00
 
 defc __CPU_INFO_ENABLE_SLL = 0x01
 
-defc __IO_VECTOR_BASE = 0
+defc __IO_VECTOR_BASE = 128
 
 defc __IO_BASE_ADDRESS = 0
 

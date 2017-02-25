@@ -15,21 +15,19 @@
 
 #include "ccdefs.h"
 
-
 /*
  * initialise global object
  */
-int initials(char *sname,
-             int type, int ident, int dim, int more,
-             TAG_SYMBOL * tag, char zfar)
+int initials(char* sname,
+    int type, int ident, int dim, int more,
+    TAG_SYMBOL* tag, char zfar)
 {
     int size, desize = 0;
     int olddim = dim;
 
-
     if (cmatch('=')) {
         /* initialiser present */
-        defstatic = 1;		/* So no 2nd redefine djm */
+        defstatic = 1; /* So no 2nd redefine djm */
         gltptr = 0;
         glblab = getlabel();
         if (dim == 0)
@@ -45,8 +43,8 @@ int initials(char *sname,
         default:
             size = 2;
         }
-	    
-        output_section("data_compiler");  // output_section("text");
+
+        output_section("data_compiler"); // output_section("text");
         prefix();
         outname(sname, YES);
         col();
@@ -56,7 +54,8 @@ int initials(char *sname,
             /* aggregate initialiser */
             if ((ident == POINTER || ident == VARIABLE) && type == STRUCT) {
                 /* aggregate is structure or pointer to structure */
-                dim = 0; olddim = 1;
+                dim = 0;
+                olddim = 1;
                 if (ident == POINTER)
                     point();
                 str_init(tag);
@@ -70,30 +69,29 @@ int initials(char *sname,
             init(size, ident, &dim, more, 0, 0);
         }
 
-
         /* dump literal queue and fill tail of array with zeros */
         if ((ident == ARRAY && more == CCHAR) || type == STRUCT) {
             if (type == STRUCT) {
                 dumpzero(tag->size, dim);
-                desize = dim < 0 ? abs(dim+1)*tag->size : olddim * tag->size;
+                desize = dim < 0 ? abs(dim + 1) * tag->size : olddim * tag->size;
             } else { /* Handles unsized arrays of chars */
                 dumpzero(size, dim);
-                dim = dim < 0 ? abs(dim+1) : olddim;
-                cscale(type,tag,&dim);
+                dim = dim < 0 ? abs(dim + 1) : olddim;
+                cscale(type, tag, &dim);
                 desize = dim;
             }
             dumplits(0, YES, gltptr, glblab, glbq);
         } else {
             if (!(ident == POINTER && type == CCHAR)) {
-                dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab,glbq);
-                if ( type != CCHAR )  /* Already dumped by init? */
+                dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab, glbq);
+                if (type != CCHAR) /* Already dumped by init? */
                     desize = dumpzero(size, dim);
-                dim = dim < 0 ? abs(dim+1) : olddim;
-                cscale(type,tag,&dim);
+                dim = dim < 0 ? abs(dim + 1) : olddim;
+                cscale(type, tag, &dim);
                 desize = dim;
-            }             
+            }
         }
-        output_section("code_compiler");  // output_section("code");
+        output_section("code_compiler"); // output_section("code");
     } else {
         char *dosign, *typ;
         dosign = "";
@@ -110,40 +108,36 @@ int initials(char *sname,
     return (desize);
 }
 
-
-
-
-
 /*
  * initialise structure
  */
-int str_init(TAG_SYMBOL *tag)
+int str_init(TAG_SYMBOL* tag)
 {
     int dim, flag;
     int sz, usz, numelements = 0;
-    SYMBOL *ptr;
-    int     nodata = NO;
+    SYMBOL* ptr;
+    int nodata = NO;
 
     ptr = tag->ptr;
     while (ptr < tag->end) {
         numelements++;
         dim = ptr->size;
-        sz = getstsize(ptr,NO);
-        if ( nodata == NO ) {
-            if ( rcmatch('{') ) {
+        sz = getstsize(ptr, NO);
+        if (nodata == NO) {
+            if (rcmatch('{')) {
                 needchar('{');
                 while (dim) {
-                    if ( ptr->type == STRUCT ) {
-                        if ( ptr->ident == ARRAY )
-                        /* array of struct */
+                    if (ptr->type == STRUCT) {
+                        if (ptr->ident == ARRAY)
+                            /* array of struct */
                             needchar('{');
                         str_init(tag);
-                        if ( ptr->ident == ARRAY ) {
+                        if (ptr->ident == ARRAY) {
                             --dim;
                             needchar('}');
                         }
                     } else {
-                        init(sz, ptr->ident, &dim, 1, 1,1);
+                        init(sz, ptr->ident, &dim, 1, 1, 1);
                     }
 
                     if (cmatch(',') == 0)
@@ -151,29 +145,26 @@ int str_init(TAG_SYMBOL *tag)
                     blanks();
                 }
                 needchar('}');
-                dumpzero(sz,dim);
+                dumpzero(sz, dim);
             } else {
                 init(sz, ptr->ident, &dim, ptr->more, 1, 1);
             }
             /* Pad out afterwards */
-        } else {  /* Run out of data for this initialisation, set blank */ 
+        } else { /* Run out of data for this initialisation, set blank */
             defstorage();
-            outdec(dim * getstsize(ptr,YES));
-            nl();		
+            outdec(dim * getstsize(ptr, YES));
+            nl();
         }
 
-
-
-        usz = (ptr->size ? ptr->size : 1 ) * getstsize(ptr,YES);
+        usz = (ptr->size ? ptr->size : 1) * getstsize(ptr, YES);
         ++ptr;
         flag = NO;
         while (ptr->offset.i == 0 && ptr < tag->end) {
-            if (getstsize(ptr,YES) * (ptr->size ? ptr->size : 1 )  > usz) {
-                usz = getstsize(ptr,YES) * (ptr->size ? ptr->size : 1 ) ;
+            if (getstsize(ptr, YES) * (ptr->size ? ptr->size : 1) > usz) {
+                usz = getstsize(ptr, YES) * (ptr->size ? ptr->size : 1);
                 flag = YES;
             }
             ++ptr;
-
         }
 
         /* Pad out the union */
@@ -183,7 +174,7 @@ int str_init(TAG_SYMBOL *tag)
             nl();
         }
         if (cmatch(',') == 0 && ptr != tag->end) {
-            nodata = YES;	   
+            nodata = YES;
         }
     }
     return numelements;
@@ -192,25 +183,24 @@ int str_init(TAG_SYMBOL *tag)
 /*
  * initialise aggregate
  */
-void agg_init(int size, int type, int ident, int *dim, int more, TAG_SYMBOL *tag)
+void agg_init(int size, int type, int ident, int* dim, int more, TAG_SYMBOL* tag)
 {
     while (*dim) {
-	if (ident == ARRAY && type == STRUCT) {
-	    /* array of struct */
-	    needchar('{');
-	    str_init(tag);
-	    --*dim;
-	    needchar('}');
-	} else {
-	    init(size, ident, dim, more, (ident == ARRAY && more == CCHAR),0);
-	}
-	
-	if (cmatch(',') == 0)
-	    break;	
-	blanks();
+        if (ident == ARRAY && type == STRUCT) {
+            /* array of struct */
+            needchar('{');
+            str_init(tag);
+            --*dim;
+            needchar('}');
+        } else {
+            init(size, ident, dim, more, (ident == ARRAY && more == CCHAR), 0);
+        }
+
+        if (cmatch(',') == 0)
+            break;
+        blanks();
     }
 }
-
 
 /*
  * evaluate one initialiser
@@ -220,17 +210,17 @@ void agg_init(int size, int type, int ident, int *dim, int more, TAG_SYMBOL *tag
  * this is used for structures and arrays of pointers to char, so that the
  * struct or array is built immediately and the char strings are dumped later
  */
-void init(int size, int ident, int *dim, int more, int dump, int is_struct)
+void init(int size, int ident, int* dim, int more, int dump, int is_struct)
 {
     int32_t value;
-    int     sz;			/* number of chars in queue */
-/*
+    int sz; /* number of chars in queue */
+    /*
  * djm 14/3/99 We have to rewrite this bit (ugh!) so that we store
  * our literal in a temporary queue, then if needed, we then dump
  * it out..
  */
 
-    if ((sz = qstr(&value)) != -1 ) {
+    if ((sz = qstr(&value)) != -1) {
         sz++;
 #if 0
         if (ident == VARIABLE || (size != 1 && more != CCHAR))
@@ -250,17 +240,17 @@ void init(int size, int ident, int *dim, int more, int dump, int is_struct)
         nl();
 #endif
         if (ident == ARRAY && more == 0) {
-/*
+            /*
  * Dump the literals where they are, padding out as appropriate
  */
             if (*dim != -1 && sz > *dim) {
-/*
+                /*
  * Ooops, initialised to long a string!
  */
                 warning(W_INIT2LONG);
                 sz = *dim;
                 gltptr = sz;
-                *(glbq + sz - 1) = '\0';	/* Terminate string */
+                *(glbq + sz - 1) = '\0'; /* Terminate string */
             }
             dumplits(((size == 1) ? 0 : size), NO, gltptr, glblab, glbq);
             *dim -= sz;
@@ -268,7 +258,7 @@ void init(int size, int ident, int *dim, int more, int dump, int is_struct)
             dumpzero(size, *dim);
             return;
         } else {
-/*
+            /*
  * Store the literals in the queue!
  */
             storeq(sz, glbq, &value);
@@ -282,13 +272,13 @@ void init(int size, int ident, int *dim, int more, int dump, int is_struct)
             return;
         }
     }
-/*
+    /*
  * djm, catch label names in structures (for (*name)() initialisation
  */
     else {
         char sname[NAMEMAX + 1];
-        SYMBOL *ptr;
-        if (symname(sname)  && strcmp(sname,"sizeof") ) {	/* We have got something.. */
+        SYMBOL* ptr;
+        if (symname(sname) && strcmp(sname, "sizeof")) { /* We have got something.. */
             if ((ptr = findglb(sname))) {
                 /* Actually found sommat..very good! */
                 if (ident == POINTER || (ident == ARRAY && more)) {
@@ -311,7 +301,7 @@ void init(int size, int ident, int *dim, int more, int dump, int is_struct)
         } else if (constexpr(&value, 1)) {
         constdecl:
             if (ident == POINTER) {
-                /* 24/1/03 dom - We want to be able to assign values to
+/* 24/1/03 dom - We want to be able to assign values to
                    pointers or they're a bit useless..
                 */
 #if 0
@@ -325,7 +315,7 @@ void init(int size, int ident, int *dim, int more, int dump, int is_struct)
             if (dump) {
                 /* struct member or array of pointer to char */
                 if (size == 4) {
-/* there appears to be a bug in z80asm regarding defq */
+                    /* there appears to be a bug in z80asm regarding defq */
                     defbyte();
                     outdec(((uint32_t)value % 65536UL) % 256);
                     outbyte(',');
@@ -343,8 +333,8 @@ void init(int size, int ident, int *dim, int more, int dump, int is_struct)
                 }
                 nl();
                 /* Dump out a train of zeros as appropriate */
-                if (ident == ARRAY && more == 0) {		 
-                    dumpzero(size,(*dim)-1);
+                if (ident == ARRAY && more == 0) {
+                    dumpzero(size, (*dim) - 1);
                 }
 
             } else
@@ -356,33 +346,33 @@ void init(int size, int ident, int *dim, int more, int dump, int is_struct)
 
 /* Find the size of a member of a union/structure */
 
-int getstsize(SYMBOL * ptr,char real)
+int getstsize(SYMBOL* ptr, char real)
 {
-    TAG_SYMBOL *tag;
-    int         ptrsize;
+    TAG_SYMBOL* tag;
+    int ptrsize;
 
     tag = tagtab + ptr->tag_idx;
 
-    ptrsize = ptr->flags&FARPTR ? 3 : 2;
+    ptrsize = ptr->flags & FARPTR ? 3 : 2;
 
 #if 1
-    if ( ptr->ident == POINTER && real)
-	return ptrsize;
+    if (ptr->ident == POINTER && real)
+        return ptrsize;
 #endif
 
     switch (ptr->type) {
     case STRUCT:
 
-	return (tag->size);
+        return (tag->size);
     case DOUBLE:
-	return (6);
+        return (6);
     case LONG:
-	return (4);
+        return (4);
     case CPTR:
-	return (3);
+        return (3);
     case CINT:
-	return (2);
+        return (2);
     default:
-	return (1);
+        return (1);
     }
 }

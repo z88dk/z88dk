@@ -1,18 +1,19 @@
 ; address = 0x0000
+; must decide if this is a power on reset or a trap
 
-   ld a,__IO_VECTOR_BASE
-   out0 (0x33),a
+   push af
+   ld a,__IO_BASE_ADDRESS
 
-   jp __Start
-
+   jp __Test_Trap
+   
 ; address = 0x0008
 
    defs 0x0008 - ASMPC
 
 IF (__crt_enable_rst & $02)
 
-   EXTERN _z80_rst_08h
-   jp _z80_rst_08h
+   EXTERN _z180_rst_08h
+   jp _z180_rst_08h
 
 ELSE
 
@@ -28,8 +29,8 @@ ENDIF
 
 IF (__crt_enable_rst & $04)
 
-   EXTERN _z80_rst_10h
-   jp _z80_rst_10h
+   EXTERN _z180_rst_10h
+   jp _z180_rst_10h
 
 ELSE
 
@@ -45,8 +46,8 @@ ENDIF
    
 IF (__crt_enable_rst & $08)
 
-   EXTERN _z80_rst_18h
-   jp _z80_rst_18h
+   EXTERN _z180_rst_18h
+   jp _z180_rst_18h
 
 ELSE
 
@@ -70,8 +71,8 @@ l_dec_de:
 
 IF (__crt_enable_rst & $10)
 
-   EXTERN _z80_rst_20h
-   jp _z80_rst_20h
+   EXTERN _z180_rst_20h
+   jp _z180_rst_20h
 
 ELSE
 
@@ -95,8 +96,8 @@ l_dec_bc:
 
 IF (__crt_enable_rst & $20)
 
-   EXTERN _z80_rst_28h
-   jp _z80_rst_28h
+   EXTERN _z180_rst_28h
+   jp _z180_rst_28h
 
 ELSE
 
@@ -120,8 +121,8 @@ l_ret:
 
 IF (__crt_enable_rst & $40)
 
-   EXTERN _z80_rst_30h
-   jp _z80_rst_30h
+   EXTERN _z180_rst_30h
+   jp _z180_rst_30h
 
 ELSE
 
@@ -178,8 +179,8 @@ ENDIF
 
 IF (__crt_enable_rst & $80)
 
-   EXTERN _z80_rst_38h
-   jp _z80_rst_38h
+   EXTERN _z180_rst_38h
+   jp _z180_rst_38h
 
 ELSE
 
@@ -254,8 +255,8 @@ l_inc_hl:
 
 IF __crt_enable_nmi
 
-   EXTERN _z80_nmi
-   jp _z80_nmi
+   EXTERN _z180_nmi
+   jp _z180_nmi
 
 ELSE
 
@@ -263,10 +264,52 @@ ELSE
 
 ENDIF
 
-IF __crt_org_vector_table < 0
+IF __crt_org_vector_table = -0x0080
 
-; address = 0x0069 or 0x0068
-; about 151 bytes to pad, let's make it count!
+; place vector table at address 0x0080
+
+; current address = 0x0069 or 0x0068
+; that is 23 bytes to pad, make it count!
+
+PUBLIC error_mc
+
+   pop hl
+   pop hl
+   pop hl
+
+error_mc:
+   
+   ld hl,-1
+   scf
+   ret
+
+PUBLIC error_zc
+
+   pop hl
+   pop hl
+   pop hl
+   pop hl
+
+error_zc:
+   
+   ld hl,0
+   scf
+   ret
+
+; address = 0x80
+
+   defs 0x80 - ASMPC
+
+section code_crt_start
+
+ENDIF
+
+IF (__crt_org_vector_table = -0x0100) || (__crt_org_vector_table = -1)
+
+; place vector table at address 0x0100
+
+; current address = 0x0069 or 0x0068
+; that is 151 bytes to pad, make it count!
 
 PUBLIC l_inc_sp
    
@@ -522,5 +565,38 @@ l_offset_ix_bc:
 section code_crt_start
 
 ENDIF
+
+__Test_Trap:
+
+   out0 (0x3f),a
+
+IF __crt_enable_trap
+
+   in0 a,(ITC)
+   and $80
+
+   jr z, __Test_Trap_Fail
+   
+   pop af
+   
+   EXTERN _z180_trap
+   jp     _z180_trap
+
+ENDIF
+
+__Test_Trap_Fail:
+
+   include "../crt_start_di.inc"
+
+   IF REGISTER_SP = -1
+   
+   pop af
+   
+   ENDIF
+   
+   ld a,__IO_VECTOR_BASE
+   out0 (IL),a
+
+;; fall through to __Start
 
 defc __page_zero_present = 1
