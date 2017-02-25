@@ -87,11 +87,11 @@ int primary(LVALUE* lval)
                 if (ptr->ident == ENUM)
                     error(E_UNSYMB, sname);
                 if (ptr->type == ENUM) {
-                    lval->symbol = NULL_SYM;
+                    lval->symbol = NULL;
                     lval->indirect = 0;
                     lval->is_const = 1;
                     lval->const_val = ptr->size;
-                    lval->flags = 0;
+                    lval->flags = FLAGS_NONE;
                     lval->ident = VARIABLE;
                     return (0);
                 }
@@ -143,12 +143,12 @@ int primary(LVALUE* lval)
         lval->symbol = ptr;
         lval->indirect = 0;
         lval->val_type = CINT; /* Null function, always int */
-        lval->flags = 0; /* Assume signed, no far */
+        lval->flags = FLAGS_NONE; /* Assume signed, no far */
         lval->ident = FUNCTION;
         return (0);
     }
     if (constant(lval)) {
-        lval->symbol = NULL_SYM;
+        lval->symbol = NULL;
         lval->indirect = 0;
         lval->ident = VARIABLE;
         return (0);
@@ -175,7 +175,7 @@ void dcerror(LVALUE* lval)
  */
 int calc(
     int left,
-    void (*oper)(struct lvalue*),
+    void (*oper)(LVALUE *),
     int right)
 {
     if (oper == zdiv)
@@ -198,7 +198,7 @@ int calc(
 
 int calcun(
     unsigned int left,
-    void (*oper)(struct lvalue*),
+    void (*oper)(LVALUE *),
     unsigned int right)
 {
     if (oper == zdiv)
@@ -225,7 +225,7 @@ int calcun(
 
 int CalcStand(
     int left,
-    void (*oper)(struct lvalue*),
+    void (*oper)(LVALUE *),
     int right)
 {
     if (oper == zor)
@@ -417,7 +417,7 @@ void result(LVALUE* lval, LVALUE* lval2)
 void prestep(
     LVALUE* lval,
     int n,
-    void (*step)())
+    void (*step)(LVALUE *lval))
 {
     if (heira(lval) == 0) {
         needlval();
@@ -459,8 +459,8 @@ void poststep(
     int k,
     LVALUE* lval,
     int n,
-    void (*step)(),
-    void (*unstep)())
+    void (*step)(LVALUE *lval),
+    void (*unstep)(LVALUE *lval))
 {
     if (k == 0) {
         needlval();
@@ -510,7 +510,7 @@ void poststep(
 void nstep(
     LVALUE* lval,
     int n,
-    void (*unstep)())
+    void (*unstep)(LVALUE *lval))
 {
     addconst(n, 1, lval->symbol->flags & FARPTR);
     store(lval);
@@ -520,6 +520,12 @@ void nstep(
 
 void store(LVALUE* lval)
 {
+    if ( lval->symbol && lval->symbol->isconst ) {
+        if ( lval->symbol->isassigned ) 
+            error(E_CHANGING_CONST, lval->symbol);
+        else
+            lval->symbol->isassigned = YES;
+    }
     if (lval->indirect == 0)
         putmem(lval->symbol);
     else
@@ -564,14 +570,24 @@ void smartpush(LVALUE* lval, char* before)
  */
 void smartstore(LVALUE* lval)
 {
-    if (lval->indirect != CINT || lval->symbol == 0 || lval->symbol->storage != STKLOC)
+    if (lval->indirect != CINT || lval->symbol == NULL || lval->symbol->storage != STKLOC) {
         store(lval);
-    else {
+    } else {
         switch (lval->symbol->offset.i - Zsp) {
         case 0:
+            if ( lval->symbol->isconst && lval->symbol->isassigned ) {
+                error(E_CHANGING_CONST, lval->symbol);
+            } else {
+                lval->symbol->isassigned = YES;
+            }
             puttos();
             break;
         case 2:
+            if ( lval->symbol->isconst && lval->symbol->isassigned ) {
+                error(E_CHANGING_CONST, lval->symbol);
+            } else {
+                lval->symbol->isassigned = YES;
+            }
             put2tos();
             break;
         default:

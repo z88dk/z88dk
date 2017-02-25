@@ -176,6 +176,8 @@ struct errors {
     { "Unknown goto label: %s at line %d", 1 },
     { "Cannot assign to compound auto variable \'%s\'", 1 },
 
+    { "Attempt to modify const lvalue \'%s\''", 1},
+
 };
 
 /*

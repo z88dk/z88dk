@@ -17,7 +17,7 @@
 /*
  * skim over text adjoining || and && operators
  */
-int skim(char* opstr, void (*testfuncz)(), void (*testfuncq)(), int dropval, int endval, int (*heir)(), LVALUE* lval)
+int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int dropval, int endval, int (*heir)(LVALUE* lval), LVALUE* lval)
 {
     int droplab, endlab, hits, k;
 
@@ -41,7 +41,7 @@ int skim(char* opstr, void (*testfuncz)(), void (*testfuncq)(), int dropval, int
             postlabel(endlab);
             lval->val_type = lval->oldval_type = CINT; /* stops the carry stuff coming in */
             lval->indirect = lval->ptr_type = lval->is_const = lval->const_val = 0;
-            lval->stage_add = NULL_CHAR;
+            lval->stage_add = NULL;
             lval->binop = dummy;
             return (0);
         } else
@@ -52,7 +52,7 @@ int skim(char* opstr, void (*testfuncz)(), void (*testfuncq)(), int dropval, int
 /*
  * test for early dropout from || or && evaluations
  */
-void dropout(int k, void (*testfuncz)(), void (*testfuncq)(), int exit1, LVALUE* lval)
+void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int exit1, LVALUE* lval)
 {
     if (k)
         rvalue(lval);
@@ -75,7 +75,7 @@ void dropout(int k, void (*testfuncz)(), void (*testfuncq)(), int exit1, LVALUE*
 /*
  * unary plunge to lower level
  */
-int plnge1(int (*heir)(), LVALUE* lval)
+int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
 {
     char *before, *start;
     int k;
@@ -92,7 +92,7 @@ int plnge1(int (*heir)(), LVALUE* lval)
 /*
  * binary plunge to lower level (not for +/-)
  */
-void plnge2a(int (*heir)(), LVALUE* lval, LVALUE* lval2, void (*oper)(), void (*doper)())
+void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(), void (*doper)())
 {
     char *before, *start;
 
@@ -211,9 +211,9 @@ void plnge2a(int (*heir)(), LVALUE* lval, LVALUE* lval2, void (*oper)(), void (*
          * problems if we allow specifiers after numbers
          */
         if (lval->is_const)
-            lval->flags = (lval->flags & MKSIGN) | (lval2->flags & UNSIGNED);
+            lval->flags = (lval->flags & ~UNSIGNED) | (lval2->flags & UNSIGNED);
         if (lval2->is_const)
-            lval2->flags = (lval2->flags & MKSIGN) | (lval->flags & UNSIGNED);
+            lval2->flags = (lval2->flags & ~UNSIGNED) | (lval->flags & UNSIGNED);
 
         if ((lval->flags & UNSIGNED) != (lval2->flags & UNSIGNED) && (oper == zmod || oper == mult || oper == zdiv))
             warning(W_OPSG);
@@ -233,7 +233,7 @@ void plnge2a(int (*heir)(), LVALUE* lval, LVALUE* lval2, void (*oper)(), void (*
 /*
  * binary plunge to lower level (for +/-)
  */
-void plnge2b(int (*heir)(), LVALUE* lval, LVALUE* lval2, void (*oper)())
+void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval))
 {
     char *before, *start, *before1, *start1;
     int val, oldsp = Zsp;
@@ -250,7 +250,7 @@ void plnge2b(int (*heir)(), LVALUE* lval, LVALUE* lval2, void (*oper)())
         }
         if (lval->val_type == LONG) {
             widenlong(lval, lval2);
-            if (noaltreg) {
+            if (c_notaltreg) {
                 vlongconst_noalt(val);
             } else {
                 doexx();

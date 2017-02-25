@@ -46,27 +46,13 @@ int symname(char* sname)
 {
     int k;
 
-#ifdef SMALL_C
-    {
-        char* p;
-        char c;
-
-        /* this is about as deep as nesting goes, check memory left */
-        p = alloc(1);
-        /* &c is top of stack, p is end of heap */
-        if ((k = &c - p) < minavail)
-            minavail = k;
-        free(p);
-    }
-#endif
-
     blanks();
     if (alpha(ch()) == 0)
         return (*sname = 0);
     k = 0;
     while (an(ch())) {
         sname[k] = gch();
-        if (k < NAMEMAX)
+        if (k < (NAMESIZE-1))
             ++k;
     }
     sname[k] = 0;
@@ -136,10 +122,10 @@ t_buffer* currentbuffer = NULL;
 
 t_buffer* startbuffer(int blocks)
 {
-    t_buffer* buf = (t_buffer*)mymalloc(sizeof(t_buffer));
+    t_buffer* buf = (t_buffer*)MALLOC(sizeof(t_buffer));
     int size = blocks * STAGESIZE;
     buf->size = size;
-    buf->start = (char*)mymalloc(size);
+    buf->start = (char*)MALLOC(size);
     buf->end = buf->start + blocks * size - 1;
     buf->next = buf->start;
     buf->before = currentbuffer; /* <-- DON'T USE NULL HERE TO SUPPRESS WARNING !!  */
@@ -161,18 +147,18 @@ void clearbuffer(t_buffer* buf)
         currentbuffer = (t_buffer*)currentbuffer->before;
     *buf->next = '\0';
     outstr(buf->start);
-    free(buf->start);
+    FREENULL(buf->start);
     buf->start = buf->next = 0;
-    free(buf);
+    FREENULL(buf);
 }
 
 int outbuffer(char c)
 {
     if (currentbuffer->next == currentbuffer->end) {
         size_t size = currentbuffer->size * 2;
-        char* tmp = (char*)mymalloc(size);
+        char* tmp = (char*)MALLOC(size);
         memcpy(tmp, currentbuffer->start, currentbuffer->size);
-        free(currentbuffer->start);
+        FREENULL(currentbuffer->start);
         currentbuffer->next = tmp + (currentbuffer->start - currentbuffer->next);
         currentbuffer->start = tmp;
         currentbuffer->end = tmp + size - 1;
@@ -198,7 +184,7 @@ void clearstage(char* before, char* start)
     if ((stagenext = before))
         return;
     if (start) {
-        if (output != NULL_FD) {
+        if (output != NULL) {
 #ifdef INBUILT_OPTIMIZER
             if (infunc)
                 AddBuffer(start);
@@ -235,7 +221,7 @@ void tofile()
 int outbyte(char c)
 {
     if (c) {
-        if (output != NULL_FD) {
+        if (output != NULL) {
             if (stagenext) {
                 return (outstage(c));
             } else {
