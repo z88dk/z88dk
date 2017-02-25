@@ -567,6 +567,7 @@ void declloc(
             }
             if (rcmatch('=')) {
                 initials(sname2, type, ident, dsize, more, otag, var->zfar, var->isconst);
+                cptr->isassigned = YES;
                 ns();
                 cptr->storage = LSTKEXT;
                 return;
@@ -593,6 +594,7 @@ void declloc(
                     setstage(&before, &start);
                     expr = expression(&vconst, &val);
                     clearstage(before, start);
+                    cptr->isassigned = YES;
                     //conv type
                     force(decltype, expr, 0, 0, 0);
                     StoreTOS(decltype);

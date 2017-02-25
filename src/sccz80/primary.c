@@ -521,7 +521,10 @@ void nstep(
 void store(LVALUE* lval)
 {
     if ( lval->symbol && lval->symbol->isconst ) {
-        error(E_CHANGING_CONST, lval->symbol);
+        if ( lval->symbol->isassigned ) 
+            error(E_CHANGING_CONST, lval->symbol);
+        else
+            lval->symbol->isassigned = YES;
     }
     if (lval->indirect == 0)
         putmem(lval->symbol);
@@ -572,14 +575,18 @@ void smartstore(LVALUE* lval)
     } else {
         switch (lval->symbol->offset.i - Zsp) {
         case 0:
-            if ( lval->symbol->isconst ) {
+            if ( lval->symbol->isconst && lval->symbol->isassigned ) {
                 error(E_CHANGING_CONST, lval->symbol);
+            } else {
+                lval->symbol->isassigned = YES;
             }
             puttos();
             break;
         case 2:
-            if ( lval->symbol->isconst ) {
+            if ( lval->symbol->isconst && lval->symbol->isassigned ) {
                 error(E_CHANGING_CONST, lval->symbol);
+            } else {
+                lval->symbol->isassigned = YES;
             }
             put2tos();
             break;
