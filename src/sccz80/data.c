@@ -132,11 +132,6 @@ int c_assembler_type;
 
 
 
-/*
- * Max level for printf (i.e. what routine do we want?)
- */
-
-int printflevel;
 
 /* Doubles stored as strings? */
 
@@ -152,7 +147,6 @@ int c_framepointer_is_ix;
 int c_use_r2l_calling_convention;
 
 /* scanf format requirements */
-int scanf_level;
 uint32_t scanf_format_option;
 uint32_t printf_format_option;
 

@@ -16,12 +16,6 @@ static int SetWatch(char* sym, int* isscanf);
 static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr);
 static int ForceArgs(char dest, char src, int expr, char functab);
 
-/*
- *      External variables used
- */
-
-extern int smartprintf;
-
 
 /*
  *      Perform a function call
@@ -57,7 +51,7 @@ void callfunction(SYMBOL* ptr)
         return;
     }
 
-    if (ptr && smartprintf)
+    if (ptr )
         watcharg = SetWatch(ptr->name, &isscanf);
 
     while (ch() != ')') {
@@ -204,12 +198,8 @@ void callfunction(SYMBOL* ptr)
                 zcallop();
             if (isscanf) {
                 scanf_format_option |= format_option;
-                if (minifunc > scanf_level)
-                    scanf_level = minifunc;
             } else {
                 printf_format_option |= format_option;
-                if (minifunc > printflevel)
-                    printflevel = minifunc;
             }
             outname(ptr->name, dopref(ptr));
             if ((ptr->flags & SHARED) && c_useshared)

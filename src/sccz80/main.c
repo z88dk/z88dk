@@ -26,7 +26,6 @@ static int      savestart;   /* copy of fnstart "    " */
 
 char Filenorig[FILENAME_LEN + 1];
 
-int smartprintf; /* Map printf -> miniprintf */
 int c_makeshare; /* Do we want to make a shared library? */
 int c_useshared; /* Use shared lib routines? */
 int c_shared_file; /* File contains routines which are to be
@@ -119,7 +118,6 @@ int main(int argc, char** argv)
     ncomp = c_doinline = c_mathz88 = need_floatpack = c_compact_code = 0;
     c_default_unsigned = NO;
     c_useshared = c_makeshare = c_shared_file = NO;
-    smartprintf = YES;
     nxtlab = /* start numbers at lowest possible */
         ctext = /* don't include the C text as comments */
         errstop = /* don't stop after errors */
@@ -129,7 +127,6 @@ int main(int argc, char** argv)
     shareoffset = SHAREOFFSET; /* Offset for shared libs */
     debuglevel = NO;
     c_assembler_type = ASM_Z80ASM;
-    printflevel = 0;
     c_framepointer_is_ix = YES;
     c_useframepointer = NO;
     c_use_r2l_calling_convention = NO;
@@ -432,17 +429,6 @@ void dumpfns()
     }
     fclose(fp);
 
-    switch (printflevel) {
-    case 1:
-        WriteDefined("ministdio", 0);
-        break;
-    case 2:
-        WriteDefined("complexstdio", 0);
-        break;
-    case 3:
-        WriteDefined("floatstdio", 0);
-        break;
-    }
 
     outstr("\n\n; --- End of Scope Defns ---\n\n");
 }
@@ -764,9 +750,6 @@ struct args myargs[] = {
     { "W", YES, SetWarning, "Set a warning" },
     { "shareoffset=", YES, SetShareOffset, "Define the shared offset (use with -make-shared" },
     { "version", NO, DispVersion, "Display the version of sccz80" },
-    { "smartpf", NO, SetSmart, "Enable smart printf format handling" },
-    { "no-smartpf", NO, UnSetSmart, "Disable smart printf format handling" },
-    { "pflevel", YES, SetPfLevel, "Set the manual printf level" },
     { "debug=", YES, SetDebug, "Enable some extra logging" },
     { "asm=", YES, SetAssembler, "Set the assembler mode to use" },
     { "ext=", YES, SetOutExt, "Use this file extension for generated output" },
@@ -847,28 +830,6 @@ void SetShareOffset(char* arg)
         shareoffset = num;
 }
 
-/* Flag whether we want to do "smart" mapping of printf -> miniprintf */
-
-void UnSetSmart(char* arg)
-{
-    smartprintf = NO;
-    printflevel = 2; /* Complex */
-}
-
-void SetSmart(char* arg)
-{
-    smartprintf = YES;
-}
-
-/* pflevel= */
-void SetPfLevel(char* arg)
-{
-    int num;
-    num = 0;
-    sscanf(arg + 8, "%d", &num);
-    if (num >= 1 && num <= 3)
-        printflevel = num;
-}
 
 void UnSetWarning(char* arg)
 {
