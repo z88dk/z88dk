@@ -227,12 +227,12 @@ int heir1a(LVALUE* lval)
             rvalue(lval);
         /* check types of expressions and widen if necessary */
         if (lval2.val_type == DOUBLE && lval->val_type != DOUBLE) {
-            DoDoubConv(lval->val_type, lval->flags & UNSIGNED);
+            convert_int_to_double(lval->val_type, lval->flags & UNSIGNED);
             postlabel(endlab);
         } else if (lval2.val_type != DOUBLE && lval->val_type == DOUBLE) {
             jump(skiplab = getlabel());
             postlabel(endlab);
-            DoDoubConv(lval2.val_type, lval2.flags & UNSIGNED);
+            convert_int_to_double(lval2.val_type, lval2.flags & UNSIGNED);
             postlabel(skiplab);
         }
         /* 12/8/98 Mod by djm to convert long types - it's nice when someone
