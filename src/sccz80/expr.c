@@ -61,7 +61,7 @@ int heir1(LVALUE* lval)
 {
     char *before, *start;
     LVALUE lval2, lval3;
-    void (*oper)(), (*doper)();
+    void (*oper)(LVALUE *lval), (*doper)(LVALUE *lval);
     int k;
 
     ClearCast(&lval2);
@@ -192,7 +192,7 @@ int heir1a(LVALUE* lval)
             /*
  * Always evaluated as an integer, so fake it temporarily
  */
-            force(CINT, lval->val_type, dosigned, lval->flags & UNSIGNED, 0);
+            force(CINT, lval->val_type, c_default_unsigned, lval->flags & UNSIGNED, 0);
             temptype = lval->val_type;
             lval->val_type = CINT; /* Force to integer */
             testjump(lval, falselab = getlabel());
@@ -269,7 +269,7 @@ int heir2b(LVALUE* lval)
     return skim("&&", testjump, jumpnc, 0, 1, heir2, lval);
 }
 
-int heir234(LVALUE* lval, int (*heir)(), char opch, void (*oper)())
+int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval))
 {
     LVALUE lval2;
     int k;
@@ -456,12 +456,7 @@ int heir9(LVALUE* lval)
 /* djm, I can't make this routine distinguish between ptr->ptr and ptr
  * so if address loads dummy de,0 to ensure everything works out
  */
-
-#ifndef SMALL_C
-SYMBOL*
-#endif
-
-deref(LVALUE* lval, char isaddr)
+SYMBOL *deref(LVALUE* lval, char isaddr)
 {
     char flags;
     flags = lval->flags;
@@ -472,7 +467,7 @@ deref(LVALUE* lval, char isaddr)
         if (flags & FARPTR)
             flags |= FARACC;
         else
-            flags &= MKFARA;
+            flags &= ~FARACC;
     }
     /* NB it has already been determind that lval->symbol is non-zero */
     if (lval->symbol->more == 0) {
@@ -482,7 +477,7 @@ deref(LVALUE* lval, char isaddr)
         // else flags &= ~FARACC;
         lval->val_type = lval->indirect = lval->symbol->type;
         lval->flags = flags;
-        lval->symbol = NULL_SYM; /* forget symbol table entry */
+        lval->symbol = NULL; /* forget symbol table entry */
         lval->ptr_type = 0; /* flag as not symbol or array */
         lval->ident = VARIABLE; /* We're now a variable! */
     } else {
@@ -554,7 +549,7 @@ int heira(LVALUE* lval)
         intcheck(lval, lval);
         com(lval);
         lval->const_val = ~lval->const_val;
-        lval->stage_add = NULL_CHAR;
+        lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {
         if (heira(lval))
@@ -562,7 +557,7 @@ int heira(LVALUE* lval)
         lneg(lval);
         lval->binop = lneg;
         lval->const_val = !lval->const_val;
-        lval->stage_add = NULL_CHAR;
+        lval->stage_add = NULL;
         return 0;
     } else if (cmatch('-')) {
         if (heira(lval))
@@ -570,7 +565,7 @@ int heira(LVALUE* lval)
         neg(lval);
         if (lval->val_type != DOUBLE)
             lval->const_val = -lval->const_val;
-        lval->stage_add = NULL_CHAR;
+        lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */
         if (heira(lval))
@@ -722,14 +717,14 @@ int heirb(LVALUE* lval)
                 k = 1;
             } else if (cmatch('(')) {
                 if (ptr == NULL) {
-                    callfunction(NULL_SYM);
+                    callfunction(NULL);
                     /* Bugger knows what ya doing..stop SEGV */
                     ptr = dummy_sym[VOID];
                     warning(W_INTERNAL);
                 } else if (ptr->ident != FUNCTION) {
                     if (k && lval->const_val == 0)
                         rvalue(lval);
-                    callfunction(NULL_SYM);
+                    callfunction(NULL);
                 } else
                     callfunction(ptr);
                 k = lval->is_const = lval->const_val = 0;
@@ -801,9 +796,9 @@ int heirb(LVALUE* lval)
                 lval->indirect = lval->val_type = ptr->type;
                 lval->ptr_type = lval->is_const = lval->const_val = 0;
                 lval->ident = VARIABLE;
-                lval->stage_add = NULL_CHAR;
-                lval->tagsym = NULL_TAG;
-                lval->binop = NULL_FN;
+                lval->stage_add = NULL;
+                lval->tagsym = NULL;
+                lval->binop = NULL;
                 if (ptr->type == STRUCT)
                     lval->tagsym = tagtab + ptr->tag_idx;
                 if (ptr->ident == POINTER) {

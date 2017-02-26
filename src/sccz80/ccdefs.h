@@ -7,18 +7,15 @@
  *      $Id: ccdefs.h,v 1.5 2016-08-26 05:44:47 aralbrec Exp $
  */
 
-/*
- *      System wide definitions
- */
 
+#ifndef CCDEFS_H
+#define CCDEFS_H
 
 #include <sys/types.h>
-//#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 
 #include "define.h"
-#include "lvalue.h"
 
 /*
  * 	Now the fix for HP-UX
@@ -45,7 +42,8 @@
  *      Prototypes
  */
 
-#include "callfunc.h"
+extern void     callfunction(SYMBOL *ptr);
+
 #include "codegen.h"
 #include "const.h"
 #include "data.h"
@@ -54,14 +52,26 @@
 #include "declinit.h"
 #include "error.h"
 #include "expr.h"
+extern GOTO_TAB *gotoq; /* Pointer for gotoq */
+extern int      dolabel(void);
+extern void     dogoto(void);
+extern void     goto_cleanup(void);
 #include "io.h"
 #include "lex.h"
 #include "main.h"
 #include "misc.h"
-#include "plunge.h"
+
+/* plunge.c */
+extern int      skim(char *opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int dropval, int endval, int (*heir)(LVALUE* lval), LVALUE *lval);
+extern void     dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int exit1, LVALUE *lval);
+extern int      plnge1(int (*heir)(LVALUE* lval), LVALUE *lval);
+extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval));
+extern void     plnge2b(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval));
+
 #include "preproc.h"
 #include "primary.h"
 #include "stmt.h"
 #include "sym.h"
 #include "while.h"
 
+#endif

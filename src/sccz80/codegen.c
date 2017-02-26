@@ -29,7 +29,15 @@
 #include <time.h>
 
 extern int WasComp(LVALUE* lval);
+
+
 extern char Filenorig[];
+
+
+static void threereg(void);
+static void fivereg(void);
+static void sixreg(void);
+
 
 /*
  * Data for this module
@@ -159,7 +167,7 @@ void DoLibHeader(void)
         outstr("z80_crt0.hdx\"\n\n");
         ol(".area _CODE\n");
         ol(".radix d\n");
-        if (noaltreg) {
+        if (c_notaltreg) {
             ol(".globl\tsaved_hl");
             ol(".globl\tsaved_de");
         }
@@ -167,7 +175,7 @@ void DoLibHeader(void)
 
     } else {
         outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
-        if (noaltreg) {
+        if (c_notaltreg) {
             ol("EXTERN\tsaved_hl");
             ol("EXTERN\tsaved_de");
         }
@@ -394,8 +402,9 @@ void PutFrame(char typeobj, int offset)
 /*      at the address on the top of the stack */
 void putstk(char typeobj)
 {
-    SYMBOL* ptr;
     char flags;
+    SYMBOL *ptr;
+
     /* Store via long pointer... */
     ptr = retrstk(&flags);
     if (flags & FARACC) {
@@ -443,7 +452,7 @@ void putstk(char typeobj)
         break;
     default:
         zpop();
-        if (doinline) {
+        if (c_doinline) {
             LoadAccum();
             ol("ld\t(de),a");
             ol("inc\tde");
@@ -458,7 +467,7 @@ void putstk(char typeobj)
 void puttos(void)
 {
 #ifdef USEFRAME
-    if (useframe) {
+    if (c_useframepointer) {
         ot("ld\t");
         OutIndex(0);
         outstr(",l\n");
@@ -476,7 +485,7 @@ void puttos(void)
 void put2tos(void)
 {
 #ifdef USEFRAME
-    if (useframe) {
+    if (c_useframepointer) {
         ot("ld\t");
         OutIndex(2);
         outstr(",l\n");
@@ -567,7 +576,7 @@ void indirect(LVALUE* lval)
         callrts("dload");
         break;
     default:
-        if (doinline) {
+        if (c_doinline) {
             ol("ld\ta,(hl)");
             ol("inc\thl");
             ol("ld\th,(hl)");
@@ -575,7 +584,7 @@ void indirect(LVALUE* lval)
         } else {
             ot("call\tl_gint\t;");
 #ifdef USEFRAME
-            if (useframe && CheckOffset(lval->offset)) {
+            if (c_useframepointer && CheckOffset(lval->offset)) {
                 OutIndex(lval->offset);
             }
 #endif
@@ -997,7 +1006,7 @@ int modstk(int newsp, int save, int saveaf)
     if (k == 0)
         return newsp;
 #ifdef USEFRAME
-    if (useframe)
+    if (c_useframepointer)
         goto modstkcht;
 #endif
     if (k > 0) {
@@ -1036,7 +1045,7 @@ int modstk(int newsp, int save, int saveaf)
 modstkcht:
 #endif
     if (saveaf) {
-        if (noaltreg) {
+        if (c_notaltreg) {
             zpushflags();
             zpopbc();
         } else {
@@ -1044,7 +1053,7 @@ modstkcht:
         }
     }
 #ifdef USEFRAME
-    if (useframe) {
+    if (c_useframepointer) {
         ot("ld\t");
         FrameP();
         outstr(",");
@@ -1073,7 +1082,7 @@ modstkcht:
         doexx();
 #endif
     if (saveaf) {
-        if (noaltreg) {
+        if (c_notaltreg) {
             ol("push\tbc");
             Zsp -= 2;
             zpopflags();
@@ -1089,14 +1098,14 @@ void scale(int type, TAG_SYMBOL* tag)
 {
     switch (type) {
     case CINT:
-        doublereg();
+        ol("add\thl,hl");;
         break;
     case CPTR:
         threereg();
         break;
     case LONG:
-        doublereg();
-        doublereg();
+        ol("add\thl,hl");;
+        ol("add\thl,hl");;
         break;
     case DOUBLE:
         sixreg();
@@ -1111,16 +1120,16 @@ void quikmult(int size, char preserve)
 {
     switch (size) {
     case 16:
-        doublereg();
+        ol("add\thl,hl");;
     case 8:
-        doublereg();
+        ol("add\thl,hl");;
     case 4:
-        doublereg();
+        ol("add\thl,hl");;
     case 2:
-        doublereg();
+        ol("add\thl,hl");;
         break;
     case 12:
-        doublereg();
+        ol("add\thl,hl");;
     case 6:
         sixreg();
         break;
@@ -1136,13 +1145,13 @@ void quikmult(int size, char preserve)
         break;
     case 10:
         fivereg();
-        doublereg();
+        ol("add\thl,hl");;
         break;
     case 14:
-        doublereg();
+        ol("add\thl,hl");;
     case 7:
         sixreg();
-        addbc(); /* BC contains original value */
+        ol("add\thl,bc");  /* BC contains original value */
         break;
     default:
         if (preserve)
@@ -1155,47 +1164,34 @@ void quikmult(int size, char preserve)
     }
 }
 
-/* add BC to the primary register */
-void addbc(void)
-{
-    ol("add\thl,bc");
-}
 
-/* load BC from the primary register */
-void ldbc(void)
+
+
+
+/* Multiply the primary register by three */
+static void threereg(void)
 {
     ol("ld\tb,h");
     ol("ld\tc,l");
-}
-
-/* Double the primary register */
-void doublereg(void)
-{
-    ol("add\thl,hl");
-}
-
-/* Multiply the primary register by three */
-void threereg(void)
-{
-    ldbc();
-    addbc();
-    addbc();
+    ol("add\thl,bc");
+    ol("add\thl,bc");
 }
 
 /* Multiply the primary register by five */
-void fivereg(void)
+static void fivereg(void)
 {
-    ldbc();
-    doublereg();
-    doublereg();
-    addbc();
+    ol("ld\tb,h");
+    ol("ld\tc,l");
+    ol("add\thl,hl");;
+    ol("add\thl,hl");;
+    ol("add\thl,bc");
 }
 
 /* Multiply the primary register by six */
-void sixreg(void)
+static void sixreg(void)
 {
     threereg();
-    doublereg();
+    ol("add\thl,hl");;
 }
 
 /*
@@ -1291,7 +1287,7 @@ void zdiv(LVALUE* lval)
  */
 void zmod(LVALUE* lval)
 {
-    if (noaltreg && (lval->val_type == LONG || lval->val_type == CPTR)) {
+    if (c_notaltreg && (lval->val_type == LONG || lval->val_type == CPTR)) {
         callrts("l_long_mod2");
     } else {
         zdiv(lval);
@@ -1319,7 +1315,7 @@ void zor(LVALUE* lval)
 
 /* Exclusive 'or' the primary and secondary */
 /*      (results in primary) */
-void zxor(LVALUE* lval)
+void zxor(LVALUE *lval)
 {
     switch (lval->val_type) {
     case LONG:
@@ -1395,7 +1391,7 @@ void lneg(LVALUE* lval)
         break;
     case CARRY:
         lval->val_type = CARRY;
-        ccf();
+        ol("ccf");
         break;
     case DOUBLE:
         convdoub2int();
@@ -1434,11 +1430,6 @@ void com(LVALUE* lval)
     }
 }
 
-/* Complement the carry flag (used after arithmetic before !) */
-void ccf(void)
-{
-    ol("ccf");
-}
 
 /*
  * Increment value held in main register
@@ -1477,7 +1468,7 @@ void dec(LVALUE* lval)
 /* and put a literal 1 in the primary if the condition is */
 /* true, otherwise they clear the primary register */
 
-void dummy(LVALUE* lval, int label)
+void dummy(LVALUE *lval)
 {
     /* Dummy function to allows us to check for c/nc at end of if clause */
 }
@@ -1603,7 +1594,7 @@ void zeq(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             lval->val_type = CARRY;
             ol("ld\ta,l");
             ol("sub\te");
@@ -1638,7 +1629,7 @@ void zne(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             lval->val_type = CARRY;
             ol("ld\ta,l");
             ol("sub\te");
@@ -1677,7 +1668,7 @@ void zlt(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             if (utype(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
@@ -1721,7 +1712,7 @@ void zle(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             if (utype(lval)) { /* unsigned */
                 ol("ld\ta,e");
                 ol("sub\tl"); /* If l < e then carry set */
@@ -1775,7 +1766,7 @@ void zgt(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             if (utype(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
@@ -1792,7 +1783,7 @@ void zgt(LVALUE* lval)
                 ol("xor\te");
                 ol("xor\tl");
                 ol("rlca");
-                ccf();
+                ol("ccf");
             }
             lval->val_type = CARRY;
             break;
@@ -1826,7 +1817,7 @@ void zge(LVALUE* lval)
         Zsp += 6;
         break;
     case CCHAR:
-        if (doinline) {
+        if (c_doinline) {
             if (utype(lval)) {
                 ol("ld\ta,l");
                 ol("sub\te"); /* If l > e, carry set */
@@ -1846,7 +1837,7 @@ void zge(LVALUE* lval)
                 ol("xor\te");
                 ol("xor\tl");
                 ol("rlca");
-                ccf();
+                ol("ccf");
                 postlabel(label);
             }
             lval->val_type = CARRY;
@@ -2160,14 +2151,14 @@ void OutIndex(int val)
     if (ISASM(ASM_ASXX)))
         {
             outdec(val);
-            if (indexix)
+            if (c_framepointer_is_ix)
                 outstr("(ix)");
             else
                 outstr("(iy)");
         }
     else {
         outstr("(");
-        if (indexix)
+        if (c_framepointer_is_ix)
             outstr("ix ");
         else
             outstr("iy ");
@@ -2192,7 +2183,7 @@ void RestoreSP(char saveaf)
 void setframe(void)
 {
 #ifdef USEFRAME
-    if (!useframe)
+    if (!c_useframepointer)
         return;
     ot("ld\t");
     FrameP();
@@ -2207,12 +2198,12 @@ void setframe(void)
 
 void FrameP(void)
 {
-    outstr(indexix ? "ix" : "iy");
+    outstr(c_framepointer_is_ix ? "ix" : "iy");
 }
 
 void pushframe(void)
 {
-    if (useframe || (currfn->flags & SAVEFRAME)) {
+    if (c_useframepointer || (currfn->flags & SAVEFRAME)) {
         ot("push\t");
         FrameP();
         nl();
@@ -2221,7 +2212,7 @@ void pushframe(void)
 
 void popframe(void)
 {
-    if (useframe || (currfn->flags & SAVEFRAME)) {
+    if (c_useframepointer || (currfn->flags & SAVEFRAME)) {
         ot("pop\t");
         FrameP();
         nl();
