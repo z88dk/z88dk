@@ -18,9 +18,12 @@
 
 	and	a
 	sbc	hl,de
-	ccf
+	scf
+	inc hl
 	ret z
-	and     a
+	xor	a
+	ld	l,a
+	ld	h,a
 	ret
 	
 IF 0
