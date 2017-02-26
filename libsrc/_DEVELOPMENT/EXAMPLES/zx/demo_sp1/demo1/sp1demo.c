@@ -73,6 +73,8 @@ main()
    static struct sp1_ss *s;
    static struct sprentry *se;
  
+   intrinsic_di();
+ 
    // Initialize SP1.LIB
  
    zx_border(INK_BLACK);
