@@ -4,8 +4,9 @@
 ;
 ;       6/9/98  djm
 
-                SECTION   code_crt0_sccz80
-                PUBLIC    l_ult
+SECTION   code_crt0_sccz80
+PUBLIC    l_ult
+EXTERN    l_compare_result
 
 ;
 ; DE < HL [unsigned]
@@ -15,8 +16,7 @@
 
    ld a,d
    cp h
-   ret nz
+   jp nz, l_compare_result
    ld a,e
    cp l
-   ret
-
+   jp l_compare_result

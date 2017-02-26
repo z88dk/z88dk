@@ -11,6 +11,7 @@ crt0/l_cmp
 crt0/l_cm_bc
 crt0/l_cm_de
 crt0/l_com
+crt0/l_compare_result
 crt0/l_deneg
 crt0/l_div
 crt0/l_div_u

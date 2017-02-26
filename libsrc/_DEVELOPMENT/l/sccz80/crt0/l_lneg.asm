@@ -12,11 +12,13 @@ PUBLIC l_lneg
 l_lneg:
 
    ; HL = !HL
-   ; set carry if result true
+   ; set carry if result is zero
 
    ld a,h
    or l
+	ld hl,0
    ret nz
    
    scf
+	inc l
    ret

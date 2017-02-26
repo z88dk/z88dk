@@ -10,6 +10,7 @@ l/sccz80/crt0/l_cm_bc
 l/sccz80/crt0/l_cm_de
 l/sccz80/crt0/l_cmp
 l/sccz80/crt0/l_com
+l/sccz80/crt0/l_compare_result
 l/sccz80/crt0/l_deneg
 l/sccz80/crt0/l_div
 l/sccz80/crt0/l_div_u

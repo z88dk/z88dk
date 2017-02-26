@@ -6,8 +6,9 @@
 ;
 ;       13/5/99 djm, inverted carry conditions
 
-                SECTION   code_crt0_sccz80
+SECTION   code_crt0_sccz80
 PUBLIC    l_uge
+EXTERN    l_compare_result
 
 ;
 ; DE >= HL [unsigned]
@@ -19,11 +20,11 @@ PUBLIC    l_uge
    ld a,d
    cp h
    ccf
-   ret nz
+   jp nz, l_compare_result
    ld a,e
    cp l
    ccf
-   ret
+   jp l_compare_result
 
 ;        call    l_ucmp
 ;        ccf
