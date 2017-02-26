@@ -40,16 +40,47 @@ int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
  * Some external data
  */
 
-
-void DispVersion(char*);
-void SetMPM(char*);
-void SetSmart(char*);
-void UnSetSmart(char*);
-void SetMakeShared(char*);
-void SetUseShared(char*);
-void SetAssembler(char* arg);
-void SetOutExt(char* arg);
+static void dumpfns(void);
+static void dumpvars(void);
+static void DispVersion(char*);
+static void SetMakeShared(char*);
+static void SetUseShared(char*);
+static void SetAssembler(char* arg);
+static void SetOutExt(char* arg);
+static void parse(void);
+static void errsummary(void);
+static char *nextarg(int n, char *s, int size);
+static void setup_sym(void);
+static void info(void);
+static void openout(void);
+static void SetNoWarn(char *arg);
+static void SetMathZ88(char *arg);
+static void SetUnsigned(char *arg);
+static void SetDoInline(char *arg);
+static void SetStopError(char *arg);
+static void SetCompactCode(char *arg);
+static void SetCCode(char *arg);
+static void SetDefine(char *arg);
+static void SetUndefine(char *arg);
+static void DispInfo(char *arg);
+static void SetVerbose(char *arg);
+static void UnSetWarning(char *arg);
+static void SetWarning(char *arg);
+static void SetAllWarn(char *arg);
+static void SetShareOffset(char *);
+static void SetDoubleStrings(char *);
+static void SetNoAltReg(char *);
+static void SetSharedFile(char *);
+static void SetDebug(char *);
+static void SetASXX(char *);
+#ifdef USE_FRAME
+static void SetFrameIX(char *);
+static void SetFrameIY(char *);
+static void SetNoFrame(char *);
+#endif
+static void SetStandardEscape(char *);
 static void set_default_r2l(char *arg);
+static void atexit_deallocate(void);
 
 /*
  *
@@ -94,7 +125,7 @@ int main(int argc, char** argv)
 
     Zsp = /* stack ptr (relative) */
         errcnt = /* no errors */
-        errstop = /* keep going after an error */
+        c_errstop = /* keep going after an error */
         eof = /* not eof yet */
         swactive = /* not in switch */
         skiplevel = /* #if not encountered */
@@ -118,13 +149,13 @@ int main(int argc, char** argv)
     ncomp = c_doinline = c_mathz88 = need_floatpack = c_compact_code = 0;
     c_default_unsigned = NO;
     c_useshared = c_makeshare = c_shared_file = NO;
-    nxtlab = /* start numbers at lowest possible */
-        ctext = /* don't include the C text as comments */
-        errstop = /* don't stop after errors */
-        c_verbose = 0;
+    nxtlab = 0;/* start numbers at lowest possible */
+    c_intermix_ccode = 0; /* don't include the C text as comments */
+    c_errstop =0;  /* don't stop after errors */
+    c_verbose = 0;
     c_double_strings = 0;
     c_notaltreg = NO;
-    shareoffset = SHAREOFFSET; /* Offset for shared libs */
+    c_share_offset = SHAREOFFSET; /* Offset for shared libs */
     debuglevel = NO;
     c_assembler_type = ASM_Z80ASM;
     c_framepointer_is_ix = YES;
@@ -133,7 +164,7 @@ int main(int argc, char** argv)
 
     setup_sym(); /* define some symbols */
     /* Parse the command line options */
-    atexit(MemCleanup); /* To free everything */
+    atexit(atexit_deallocate); /* To free everything */
     clear();
     filenum = 0;
     for (n = 1; n < argc; n++) {
@@ -299,7 +330,7 @@ void info()
  ***********************************************************************
  */
 
-void dumpfns()
+static void dumpfns()
 {
     int ident, type, storage;
     SYMBOL* ptr;
@@ -748,7 +779,7 @@ struct args myargs[] = {
     { "Wall", NO, SetAllWarn, "Enable all warnings" },
     { "Wn", YES, UnSetWarning, "Unset a warning" },
     { "W", YES, SetWarning, "Set a warning" },
-    { "shareoffset=", YES, SetShareOffset, "Define the shared offset (use with -make-shared" },
+    { "c_share_offset=", YES, SetShareOffset, "Define the shared offset (use with -make-shared" },
     { "version", NO, DispVersion, "Display the version of sccz80" },
     { "debug=", YES, SetDebug, "Enable some extra logging" },
     { "asm=", YES, SetAssembler, "Set the assembler mode to use" },
@@ -819,7 +850,7 @@ void SetDebug(char* arg)
         debuglevel = num;
 }
 
-/* shareoffset= */
+/* c_share_offset= */
 
 void SetShareOffset(char* arg)
 {
@@ -827,7 +858,7 @@ void SetShareOffset(char* arg)
     num = 0;
     sscanf(arg + 12, "%d", &num);
     if (num != 0)
-        shareoffset = num;
+        c_share_offset = num;
 }
 
 
@@ -881,7 +912,7 @@ void SetDoInline(char* arg)
 
 void SetStopError(char* arg)
 {
-    errstop = YES;
+    c_errstop = YES;
 }
 
 void SetUseShared(char* arg)
@@ -906,7 +937,7 @@ void SetCompactCode(char* arg)
 
 void SetCCode(char* arg)
 {
-    ctext = 1;
+    c_intermix_ccode = 1;
 }
 
 void SetDefine(char* arg)
@@ -1019,7 +1050,7 @@ void ParseArgs(char* arg)
  *      This routine called via atexit to clean up memory
  */
 
-void MemCleanup()
+void atexit_deallocate()
 {
     FREENULL(litq);
     FREENULL(dubq);

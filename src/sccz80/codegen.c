@@ -2042,7 +2042,7 @@ void GlobalPrefix(char type)
 
 void EmitLine(int line)
 {
-    if (ISASM(ASM_Z80ASM) && ctext) {
+    if (ISASM(ASM_Z80ASM) && c_intermix_ccode) {
         ot("LINE\t");
         outdec(line);
         nl();

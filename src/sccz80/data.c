@@ -77,9 +77,9 @@ int nxtlab, /* next avail label # */
     undeclared, /* # function arguments not yet declared */
     ncmp, /* # open compound statements */
     errcnt, /* # errors in compilation */
-    errstop, /* stop on error */
+    c_errstop, /* stop on error */
     eof, /* set non-zero on final input eof */
-    ctext, /* non-zero to intermix c-source */
+    c_intermix_ccode, /* non-zero to intermix c-source */
     cmode, /* non-zero while parsing c-code */
     /* zero when passing assembly code */
     declared, /* number of local bytes declared, else -1 when done */
@@ -115,7 +115,7 @@ int ltype; /* Long? */
  * Variable for the offset to a shared library routine
  */
 
-int shareoffset;
+int c_share_offset;
 
 /*
  * Doms debug variable

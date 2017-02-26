@@ -257,7 +257,7 @@ void error(int num, ...)
     if (myerrors[num].fatal != 0)
         ccabort();
     ++errcnt;
-    if (errstop) {
+    if (c_errstop) {
         fprintf(stderr, "Continue (Y\\N) ?\n");
         if ((toupper(getchar()) == 'N'))
             ccabort();

@@ -420,7 +420,7 @@ void setlocvar(SYMBOL* prevarg, SYMBOL* currfn)
 
     if (((currfn->flags & SHARED) && c_makeshare) || c_shared_file) {
         /* Shared library definition, offset the stack */
-        where = 2 + shareoffset;
+        where = 2 + c_share_offset;
     } else
         where = 2;
     /* If we use frame pointer we preserve previous framepointer on entry
