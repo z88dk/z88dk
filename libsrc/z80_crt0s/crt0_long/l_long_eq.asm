@@ -31,6 +31,7 @@ PUBLIC    l_long_eq
    jp nz, notequal1
    
    scf
+	ld hl,1
    jp (ix)
 
 .notequal0
@@ -39,7 +40,9 @@ PUBLIC    l_long_eq
 
 .notequal1
 
-   or a
+   xor a
+	ld l,a
+	ld h,a
    jp (ix)
 
    

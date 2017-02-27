@@ -18,7 +18,9 @@ l_ne:
    sbc hl,de
    
    scf
+	ld hl,1
    ret nz
    
    or a
+	dec l
    ret

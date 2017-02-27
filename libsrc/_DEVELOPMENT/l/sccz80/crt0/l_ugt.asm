@@ -8,7 +8,14 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_ugt
+EXTERN l_compare_result
 
-EXTERN l_ltu_hl_de
+l_ugt:
 
-defc l_ugt = l_ltu_hl_de
+   ld a,h
+   cp d
+   jp nz, l_compare_result
+   
+   ld a,l
+   cp e
+   jp l_compare_result

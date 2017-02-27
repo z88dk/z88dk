@@ -8,6 +8,7 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_lt
+EXTERN l_compare_result
 
 l_lt:
 
@@ -23,9 +24,9 @@ l_lt:
    add a,$80
    
    cp b
-   ret nz
+   jp nz, l_compare_result
    
    ld a,e
    cp l
    
-   ret
+   jp l_compare_result

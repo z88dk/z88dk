@@ -39,6 +39,7 @@ l_long_eq:
 equal:
 
    scf
+	ld hl,1
    jp (ix)
 
 notequal_0:
@@ -47,5 +48,7 @@ notequal_0:
 
 notequal_1:
 
-   or a
+   xor a
+	ld l,a
+	ld h,a
    jp (ix)

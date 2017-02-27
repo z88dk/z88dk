@@ -8,6 +8,7 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_le
+EXTERN l_compare_result
 
 l_le:
 
@@ -24,10 +25,10 @@ l_le:
    
    cp b
    ccf
-   ret nz
+   jp nz, l_compare_result
    
    ld a,l
    cp e
    ccf
    
-   ret
+   jp l_compare_result
