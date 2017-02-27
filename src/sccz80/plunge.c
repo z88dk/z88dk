@@ -124,6 +124,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             dpush();
         } else if (lval->val_type == CARRY) {
             force(CINT, CARRY, 0, 0, 0);
+            setstage(&before, &start);
             lval->val_type = CINT;
             zpush();
         } else {
