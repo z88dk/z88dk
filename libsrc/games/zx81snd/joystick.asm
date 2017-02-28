@@ -2,7 +2,7 @@
 ;	ZX81 game device library
 ;	Stefano Bodrato - Dec. 2014
 ;
-;	$Id: joystick.asm,v 1.5 2016-06-16 20:23:52 dom Exp $
+;	$Id: joystick.asm,v 1.6 Stefano Exp, Feb 2017 $
 ;
 
     SECTION code_clib
@@ -71,8 +71,10 @@
 ; a = 11111011 11111101
 	ld	a,l
 	rla
-	and @00001100
-	cp	12
+	
+	and 12	;@00001100
+	xor 12
+	cp  12
 	jr	z,doop
 	or	d
 	ld	d,a
@@ -116,11 +118,11 @@
 .no9
 	bit	5,h
 	jr	nz,no6
-	set	3,l
+	set	2,l
 .no6
 	bit	4,h
 	jr	nz,no7
-	set	2,l
+	set	3,l
 .no7
 	bit	3,h
 	jr	nz,no8
