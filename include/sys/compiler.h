@@ -9,6 +9,9 @@
 #define __LIB__
 #define __SAVEFRAME__
 #define far
+#define __vasmallc
+#else
+#define __vasmallc __smallc
 #endif
 
 #define __CHAR_LF '\n'
