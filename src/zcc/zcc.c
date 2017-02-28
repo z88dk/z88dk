@@ -24,6 +24,7 @@
 #include        <time.h>
 #include        <sys/stat.h>
 #include        "zcc.h"
+#include        "regex/regex.h"
 
 #ifdef WIN32
 #include        <direct.h>
@@ -66,6 +67,7 @@ static void            AddLinkSearchPath(arg_t *arg, char *);
 static void            print_help_config(arg_t *arg, char *);
 static void            print_help_text();
 static void            SetString(arg_t *arg, char *);
+static void            GlobalDefc(arg_t *argument, char *);
 static void            PragmaDefine(arg_t *arg, char *);
 static void            PragmaExport(arg_t *arg, char *);
 static void            PragmaRedirect(arg_t *arg, char *);
@@ -78,6 +80,7 @@ static void            write_zcc_defined(char *name, int value, int export);
 
 static void           *mustmalloc(size_t);
 static char           *muststrdup(const char *s);
+static char           *strstrip(char *s);
 static int             hassuffix(char *file, char *suffix_to_check);
 static char           *stripsuffix(char *, char *);
 static char           *changesuffix(char *, char *);
@@ -109,6 +112,7 @@ static void            ShowErrors(char *, char *);
 static int             copyprepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static int             copy_file(char *src, char *src_extension, char *dest, char *dest_extension);
 static int             prepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
+static int             copy_defc_file(char *name1, char *ext1, char *name2, char *ext2);
 static void            tempname(char *);
 static int             find_zcc_config_fileFile(char *arg, int argc, char *buf, size_t buflen);
 static void            parse_option(char *option);
@@ -147,6 +151,7 @@ static int             symbolson = 0;
 static int             lston = 0;
 static int             mapon = 0;
 static int             globaldefon = 0;
+static char           *globaldefrefile = NULL;
 static int             preprocessonly = 0;
 static int             relocate = 0;
 static int             relocinfo = 0;
@@ -447,7 +452,7 @@ static arg_t     myargs[] = {
 	{ "-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)" },
 	{ "zopt", AF_BOOL_TRUE, SetBoolean, &zopt, NULL, "Enable llvm-optimizer (clang only)" },
 	{ "m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable" },
-	{ "g", AF_BOOL_TRUE, SetBoolean, &globaldefon, NULL, "Generate a global defs file of the final executable" },
+	{ "g", AF_MORE, GlobalDefc, &globaldefrefile, &globaldefon, "Generate a global defc file of the final executable (-g, -gp, -gpf filename)" },
 	{ "s", AF_BOOL_TRUE, SetBoolean, &symbolson, NULL, "Generate a symbol map of the final executable" },
 	{ "-list", AF_BOOL_TRUE, SetBoolean, &lston, NULL, "Generate list files" },
 	{ "o", AF_MORE, SetString, &outputfile, NULL, "Set the output files" },
@@ -482,7 +487,17 @@ static char *muststrdup(const char *s)
 	return r;
 }
 
+static char *strstrip(char *s)
+{
+    char *p;
 
+    while (isspace(*s)) ++s;
+
+    for (p = s + strlen(s); p != s; *p = 0)
+        if (!isspace(*--p)) break;
+
+    return s;
+}
 static int hassuffix(char *name, char *suffix)
 {
 	int             nlen, slen;
@@ -1328,8 +1343,8 @@ int main(int argc, char **argv)
 				status = 1;
 			}
 
-			if (globaldefon && copy_file(c_crt0, ".def", filenamebuf, ".def")) {
-				fprintf(stderr, "Cannot copy global defs file\n");
+			if (globaldefon && copy_defc_file(c_crt0, ".def", filenamebuf, ".def")) {
+				fprintf(stderr, "Cannot create global defc file\n");
 				status = 1;
 			}
 
@@ -1346,6 +1361,151 @@ int main(int argc, char **argv)
 }
 
 
+/* Filter global defc file as it is written to the destination directory.
+ * 
+ * (globaldefon     &   0x2) = make symbols PUBLIC
+ * (globaldefrefile != NULL) = file holding one regular expression per line with
+ *                             leading +- indicating acceptance or rejection for matches
+*/
+
+typedef struct gfilter_s {
+    int      accept;
+    regex_t  preg;
+} GFILTER;
+
+void gdf_cleanup(GFILTER *filter, int nfilter)
+{
+    while (nfilter > 1)
+        regfree(&filter[--nfilter].preg);
+    free(filter);
+}
+
+int copy_defc_file(char *name1, char *ext1, char *name2, char *ext2)
+{
+    FILE *in, *out, *rules;
+    char buffer[LINEMAX + 1];
+    char *line, *ptr;
+    GFILTER *filter;
+    regmatch_t pmatch[3];
+    int nfilter, errcode, lineno, len;
+
+    // the first regular expression is used to parse a z80asm generated defc line
+    filter  = mustmalloc(sizeof(*filter));
+    nfilter = 1;
+    if (regcomp(&filter->preg, "(defc|DEFC)[\t ]+([^\t =]+)", REG_EXTENDED))
+    {
+        fprintf(stderr, "Cannot create regular expressions\n");
+        return 1;
+    }
+
+    // read the filters from the regular expression file
+    if (globaldefrefile)
+    {
+        if ((rules = fopen(globaldefrefile, "r")) == NULL)
+        {
+            fprintf(stderr, "Cannot open rules file %s\n", globaldefrefile);
+            gdf_cleanup(filter, nfilter);
+            return 1;
+        }
+
+        line = NULL;
+        for (lineno = 1; zcc_getdelim(&line, &len, '\n', rules) > 0; ++lineno)
+        {
+            ptr = strstrip(line);
+            if ((*ptr == 0) || (*ptr == ';')) continue;
+            if ((filter = realloc(filter, (nfilter + 1) * sizeof(*filter))) == NULL)
+            {
+                fprintf(stderr, "Cannot realloc global defc filter\n");
+                gdf_cleanup(filter, nfilter);
+                free(line);
+                fclose(rules);
+                return 1;
+            }
+            filter[nfilter].accept = !(*ptr == '-');
+            if ((*ptr == '+') || (*ptr == '-')) ++ptr;
+            while (isspace(*ptr)) ++ptr;
+            if (errcode = regcomp(&filter[nfilter].preg, ptr, REG_EXTENDED))
+            {
+                regerror(errcode, &filter[nfilter].preg, buffer, sizeof(buffer));
+                fprintf(stderr, "Ignoring %s line %u: %s", globaldefrefile, lineno, buffer);
+                regfree(&filter[nfilter].preg);
+                continue;
+            }
+            ++nfilter;
+        }
+        free(line);
+        fclose(rules);
+    }
+
+    // open the defc file generated by z80asm
+    buffer[sizeof(LINEMAX)] = 0;
+    snprintf(buffer, sizeof(buffer) - 1, "%s%s", name1, ext1);
+    if ((in = fopen(buffer, "r")) == NULL)
+    {
+        gdf_cleanup(filter, nfilter);
+        return 1;
+    }
+
+    // create the output defc file
+    snprintf(buffer, sizeof(buffer) - 1, "%s%s", name2, ext2);
+    if ((out = fopen(buffer, "w")) == NULL)
+    {
+        gdf_cleanup(filter, nfilter);
+        fclose(in);
+        return 1;
+    }
+
+    line = NULL;
+    while(zcc_getdelim(&line, &len, '\n', in) > 0)
+    {
+        // determine symbol name
+        if (regexec(&filter->preg, line, sizeof(pmatch)/sizeof(pmatch[0]), pmatch, 0) != 0)
+        {
+            fprintf(stderr, "Cannot find symbol name in:\n%s", line);
+            gdf_cleanup(filter, nfilter);
+            free(line);
+            fclose(in);
+            fclose(out);
+            return 1;
+        }
+        snprintf(buffer, sizeof(buffer) - 1, "%.*s", pmatch[2].rm_eo - pmatch[2].rm_so, &line[pmatch[2].rm_so]);
+
+        // accept or reject
+        if (globaldefrefile)
+        {
+            for (lineno = 1; lineno < nfilter; ++lineno)
+            {
+                if (regexec(&filter[lineno].preg, buffer, 0, NULL, 0) == 0)
+                {
+                    // symbol name matches rule
+                    if (filter[lineno].accept)
+                    {
+                        if (globaldefon & 0x2)
+                            fprintf(out, "\nPUBLIC %s\n", buffer);
+                        fprintf(out, "%s", line);
+                    }
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (globaldefon & 0x2)
+                fprintf(out, "\nPUBLIC %s\n", buffer);
+            fprintf(out, "%s", line);
+        }
+    }
+
+    gdf_cleanup(filter, nfilter);
+    free(line);
+
+    fclose(in);
+    fclose(out);
+
+    return 0;
+}
+
+
 int copyprepend_file(char *name1, char *ext1, char *name2, char *ext2, char *prepend)
 {
     FILE           *out;
@@ -1355,7 +1515,8 @@ int copyprepend_file(char *name1, char *ext1, char *name2, char *ext2, char *pre
 
     if (prepend == NULL) prepend = "";
 
-    snprintf(buffer, sizeof(buffer), "%s%s", name2, ext2);
+    buffer[sizeof(LINEMAX)] = 0;
+    snprintf(buffer, sizeof(buffer) - 1, "%s%s", name2, ext2);
 
     if ((out = fopen(buffer, "w")) == NULL)
         return 1;
@@ -1503,6 +1664,48 @@ void SetString(arg_t *argument, char *arg)
 		}
 	}
 }
+
+void GlobalDefc(arg_t *argument, char *arg)
+{
+    char *ptr = arg + 1;
+
+    if (*ptr++ == 'g')
+    {
+        // global defc is on
+        *argument->num_ptr = 0x1;
+
+        if (*ptr == 'p')
+        {
+            // make defc symbols public
+            *argument->num_ptr |= 0x2;
+            ++ptr;
+        }
+
+        if (*ptr == 'f')
+        {
+            // filename containing regular expressions
+            if (*++ptr == '=') ++ptr;
+            while (isspace(*ptr)) ++ptr;
+
+            if (*ptr != 0)
+                *(char **)argument->data = muststrdup(ptr);
+            else
+            {
+                // try following argument for filename
+                if ((gargc + 1) < max_argc && gargv[gargc + 1][0] != '-')
+                {
+                    /* Aha...non option comes next... */
+                    gargc++;
+                    *(char **)argument->data = muststrdup(gargv[gargc]);
+                }
+                else {
+                    // No option given..
+                }
+            }
+        }
+    }
+}
+
 
 static char *expand_macros(char *arg)
 {
