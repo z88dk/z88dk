@@ -9,6 +9,7 @@
 	
 	EXTERN	savecia
 	EXTERN	restorecia
+	EXTERN	getk
 
 .joystick
 ._joystick
@@ -25,15 +26,16 @@
     ld    a,l
     cp    1
     jr    z,j_p1
+    cp    3
+    jr    z,keyb
     cp    2
-	ld    a,0
+    ld    a,255
     jr    nz,j_done
 	
 ;  outp(cia1+ciaDataDirA,0x00);
 ;  ciaJoy2 = inp(cia1+ciaDataA) & ciaNone;
 
-        push	bc
-        dec     bc              ;cia1+ciaDataDirA
+        dec     bc              ; cia1+ciaDataDirA
         xor	a
         out     (c),a
 
@@ -48,7 +50,7 @@
 ;  outp(cia1+ciaDataDirB,0x00);
 ;  ciaJoy1 = inp(cia1+ciaDataB) & ciaNone;
 
-        pop	bc		;cia1+ciaDataDirB
+		; bc = cia1+ciaDataDirB
         xor	a
         out     (c),a
 
@@ -57,6 +59,7 @@
 
 
 .jpp
+		cpl
 		ld h,a
 		ld l,0
 		rra		; R
@@ -83,3 +86,54 @@
 	pop hl
 	
     ret
+
+; Keyboard scan
+.keyb
+	ld	l,0
+	ld      bc,$dc00
+    ld      a,@01111111
+	out     (c),a
+	inc     bc
+	in      a,(c)
+	dec     bc
+	and		@01000000	; Q
+	jr		nz,no_up
+	set	3,l
+.no_up
+    ld      a,@11111101
+	out     (c),a
+	inc     bc
+	in      a,(c)
+	dec     bc
+	and		@00000100	; A
+	jr	nz,no_down
+	set	2,l
+.no_down
+
+    ld      a,@11011111
+	out     (c),a
+	inc     bc
+	in      a,(c)
+	dec     bc
+	and		@00000010	; P
+	jr	nz,no_right
+	set	0,l
+.no_right
+
+    ld      a,@11101111
+	out     (c),a
+	inc     bc
+	in      a,(c)
+	ld	e,a
+	and		@01000000	; O
+	jr	nz,no_left
+	set	1,l
+.no_left
+
+	ld	a,@00010000	; M
+	and e
+	xor @00010000
+	or l
+	jr j_done
+	
+
