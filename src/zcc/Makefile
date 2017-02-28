@@ -27,5 +27,3 @@ clean:
 
 
 #Dependencies
-
-zcc.o: zcc.c zcc.h
