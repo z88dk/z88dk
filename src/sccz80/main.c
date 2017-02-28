@@ -360,11 +360,6 @@ static void dumpfns()
                                 outstr("_sl\n");
                                 GlobalPrefix(LIB);
                             }
-                            /* Temporary change during r2l transition to reference both library names */
-                            if ( (ptr->flags & SMALLC) == 0 || c_use_r2l_calling_convention == YES ) {
-                                outname(ptr->name, !dopref(ptr)); nl();
-                                GlobalPrefix(LIB);
-                            }
                         } else {
                             GlobalPrefix(XREF);
                         }
