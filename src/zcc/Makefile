@@ -16,7 +16,7 @@ zcc$(EXESUFFIX):	$(OBJS)
 	${CC} -o zcc$(EXESUFFIX) ${CFLAGS} ${CCOPT} ${OBJS}
 
 %.o: %.c
-	$(CC) -c -o $@ $(CFLAGS) $^
+	$(CC) -c -o $@ $(CFLAGS) $(INCLUDES) $^
 
 install:
 	$(INSTALL) zcc$(EXESUFFIX) $(PREFIX)/bin/
