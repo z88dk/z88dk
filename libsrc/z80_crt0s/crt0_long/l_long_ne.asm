@@ -37,12 +37,14 @@ PUBLIC    l_long_ne
 
 .equal
 
+   ld hl,0
    jp (ix)
 
 .notequal0
 
    pop bc                      ; clear secondary MSW from stack
    scf
+	ld hl,1
    jp (ix)
 
 

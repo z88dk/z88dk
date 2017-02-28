@@ -54,6 +54,11 @@ extern unsigned int __LIB__  joystick(int game_device) __z88dk_fastcall;
 
 #ifndef MAKE_LIB
 
+#ifdef __C128__
+	unsigned char *joystick_type[] = {"Joystick 1", "Joystick 2", "QAOP-MN"};
+	#define GAME_DEVICES 3
+#endif
+
 #ifdef __CPC__
 	unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "QAOP-MN"};
 	#define GAME_DEVICES 3

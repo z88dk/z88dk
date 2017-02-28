@@ -19,7 +19,10 @@ l_eq:
    sbc hl,de
    
    scf
+	inc hl
    ret z
-   
-   or a
+	
+   xor a
+   ld l,a
+   ld h,a
    ret

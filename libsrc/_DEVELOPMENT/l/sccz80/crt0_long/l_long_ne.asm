@@ -36,6 +36,7 @@ l_long_ne:
 
 equal:
 
+   ld hl,0
    jp (ix)
 
 notequal_0:
@@ -45,4 +46,5 @@ notequal_0:
 notequal_1:
 
    scf
+   ld hl,1
    jp (ix)

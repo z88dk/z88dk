@@ -18,8 +18,10 @@
    or a
    sbc hl,de
    scf
+	ld hl,1
    ret nz
    ccf
+	dec l
    ret
 
 ;        call    l_cmp

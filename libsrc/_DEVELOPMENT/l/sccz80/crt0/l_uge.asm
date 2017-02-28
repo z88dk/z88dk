@@ -10,6 +10,7 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_uge
+EXTERN l_compare_result
 
 l_uge:
 
@@ -21,10 +22,10 @@ l_uge:
    cp h
    
    ccf
-   ret nz
+   jp nz, l_compare_result
    
    ld a,e
    cp l
    
    ccf
-   ret
+   jp l_compare_result
