@@ -35,10 +35,10 @@
     <ClInclude Include="..\..\src\zcc\zcc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\copt\regex\cname.h">
+    <ClInclude Include="..\..\src\copt\regex\cclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\copt\regex\cclass.h">
+    <ClInclude Include="..\..\src\copt\regex\cname.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\copt\regex\engine.h">
