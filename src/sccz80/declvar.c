@@ -414,6 +414,9 @@ void declglb(
                 }
             }
 
+            if ( storage == EXTERNAL)
+                myptr->isassigned = YES;
+
             /*
              *      Set the return type of the function
              */
