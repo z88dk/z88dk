@@ -329,6 +329,7 @@ static int setup_function_parameter(SYMBOL *argument, int argnumber)
     if ((argument->flags & FARPTR) == FARPTR && argument->ident == POINTER)
         lgh = 4;
     argument->size = lgh;
+    argument->isassigned = YES;
     /*
         * Check the definition against prototypes here...
         */
