@@ -8,7 +8,7 @@
 ;       Plot pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: plotpixl.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
+;	$Id: plotpixl.asm,v 1.3 2016/06/27 20:26:33 dom Exp $
 ;
 
 
@@ -17,7 +17,7 @@
 			PUBLIC	plotpixel
 
 			EXTERN	div3
-			EXTERN	coords
+			EXTERN	__gfx_coords
 
 .plotpixel
 			ld	a,h
@@ -29,7 +29,7 @@
 
 			dec	a
 			
-			ld	(coords),hl
+			ld	(__gfx_coords),hl
 			
 			push	bc
 
