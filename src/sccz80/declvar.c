@@ -103,6 +103,7 @@ defstruct(char* sname, enum storage_type storage, int is_struct)
         tag->size = 0;
         tag->ptr = tag->end = membptr; /* Set so no member searches done.. */
         dummy_sym[NTYPE + 1 + itag] = addglb(nam, POINTER, STRUCT, 0, STATIK, 0, itag);
+        dummy_sym[NTYPE + 1 + itag]->isassigned = YES;
         tag->weak = 1;
     }
 
@@ -440,6 +441,7 @@ void declglb(
             myptr--; /* addmemb returns myptr+1 */
             myptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
             myptr->size = size;
+            myptr->isassigned = YES;  // Pretend that it is
 
             /* store (correctly scaled) size of member in tag table entry */
             /* 15/2/99 djm - screws up sizing of arrays -
@@ -457,6 +459,7 @@ void declglb(
             myptr--;
             myptr->flags = ((var->sign & UNSIGNED) | (var->zfar & FARPTR));
             myptr->size = size;
+            myptr->isassigned = YES;  // Pretend that it is
 
             /* store maximum member size in tag table entry */
             /* 2/11/2002 djm - fix from above */

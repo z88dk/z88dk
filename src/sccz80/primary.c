@@ -523,9 +523,9 @@ void store(LVALUE* lval)
     if ( lval->symbol && lval->symbol->isconst ) {
         if ( lval->symbol->isassigned ) 
             error(E_CHANGING_CONST, lval->symbol);
-        else
-            lval->symbol->isassigned = YES;
     }
+    if ( lval->symbol ) 
+        lval->symbol->isassigned = YES;
     if (lval->indirect == 0)
         putmem(lval->symbol);
     else

@@ -304,11 +304,17 @@ void setup_sym()
     /* note that the symbol names are not valid C variables */
     dummy_sym[0] = 0;
     dummy_sym[CCHAR] = addglb("0ch", POINTER, CCHAR, 0, STATIK, 0, 0);
+    dummy_sym[CCHAR]->isassigned = YES;
     dummy_sym[CINT] = addglb("0int", POINTER, CINT, 0, STATIK, 0, 0);
+    dummy_sym[CINT]->isassigned = YES;
     dummy_sym[DOUBLE] = addglb("0dbl", POINTER, DOUBLE, 0, STATIK, 0, 0);
+    dummy_sym[DOUBLE]->isassigned = YES;
     dummy_sym[LONG] = addglb("0lng", POINTER, LONG, 0, STATIK, 0, 0);
+    dummy_sym[LONG]->isassigned = YES;
     dummy_sym[CPTR] = addglb("0cpt", POINTER, CPTR, 0, STATIK, 0, 0);
+    dummy_sym[CPTR]->isassigned = YES;
     dummy_sym[VOID] = addglb("0vd", POINTER, VOID, 0, STATIK, 0, 0);
+    dummy_sym[VOID]->isassigned = YES;
 }
 
 void info()
