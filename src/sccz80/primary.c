@@ -138,7 +138,7 @@ int primary(LVALUE* lval)
             ptr->size = 0;
             ptr->prototyped = 0; /* No parameters known */
             ptr->args[0] = CalcArgValue(CINT, FUNCTION, 0);
-            ptr->flags |= use_r2l_calling_convention == YES ? 0 : SMALLC;
+            ptr->flags |= c_use_r2l_calling_convention == YES ? 0 : SMALLC;
         }
         lval->symbol = ptr;
         lval->indirect = 0;

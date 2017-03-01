@@ -132,7 +132,7 @@ int main(int argc, char** argv)
     printflevel = 0;
     c_framepointer_is_ix = YES;
     c_useframepointer = NO;
-    use_r2l_calling_convention = NO;
+    c_use_r2l_calling_convention = NO;
 
     setup_sym(); /* define some symbols */
     /* Parse the command line options */
@@ -330,6 +330,11 @@ void dumpfns()
                             if ((ptr->flags & SHARED) && c_useshared) {
                                 outstr(ptr->name);
                                 outstr("_sl\n");
+                                GlobalPrefix(LIB);
+                            }
+                            /* Temporary change during r2l transition to reference both library names */
+                            if ( (ptr->flags & SMALLC) == 0 || c_use_r2l_calling_convention == YES ) {
+                                outname(ptr->name, !dopref(ptr)); nl();
                                 GlobalPrefix(LIB);
                             }
                         } else {
@@ -1016,7 +1021,7 @@ void ShowNotFunc(char* arg)
 
 static void set_default_r2l(char *arg)
 {
-    use_r2l_calling_convention = YES;
+    c_use_r2l_calling_convention = YES;
 }
 
 void ParseArgs(char* arg)

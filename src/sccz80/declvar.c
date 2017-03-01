@@ -221,7 +221,7 @@ void declglb(
             }
             if (amatch("__FASTCALL__")) {
                 match = YES;
-                fastcall = REGCALL;
+                fastcall = FASTCALL;
             }
             if (amatch("__SHARED__")) {
                 match = YES;

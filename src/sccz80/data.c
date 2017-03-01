@@ -149,7 +149,7 @@ int c_useframepointer;
 int c_framepointer_is_ix;
 
 
-int use_r2l_calling_convention;
+int c_use_r2l_calling_convention;
 
 /* scanf format requirements */
 int scanf_level;

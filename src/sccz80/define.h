@@ -85,7 +85,7 @@ enum symbol_flags {
         UNSIGNED = 1,
         FARPTR = 2,
         FARACC = 4,
-        REGCALL = 8,     /* for certain lib calls only */
+        FASTCALL = 8,     /* for certain lib calls only */
         SHARED = 16,     /* Call via shared library method (append _s) */
         SHAREDC = 32,     /* Call via rst (library is C code) */
         CALLEE = 64,      /* Called function pops regs */

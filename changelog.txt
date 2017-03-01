@@ -7,7 +7,9 @@ z88dk vX.XX  - XX.XX.XXXX
   -pragma-define=CLIB_FOPEN_MAX=YY. The default for YY is 10.
 - [sccz80] Defining an extern variable with @ no longer exports symbol
 - [sccz80] The sdcc directives __z88dk_fastcall and __z88dk_callee are now
-  supported. Additionally, __smallc and __preserves_regs() are ignored.
+  supported. Additionally __preserves_regs() are ignored.
+- [sccz80] Now supports const for assigning read-only data to ROM
+- [sccz80] Right to left parameter passing is now support
 - [zcc] Spaces in filenames (and paths) are now supported.
 
 z88dk v1.99B - 10.01.2017
