@@ -9,7 +9,7 @@
 ;       Reset pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: respixl.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
+;	$Id: respixl.asm,v 1.3 2016/06/27 20:26:33 dom Exp $
 ;
 
 
@@ -18,7 +18,7 @@
 			PUBLIC	respixel
 
 			EXTERN	div3
-			EXTERN	coords
+			EXTERN	__gfx_coords
 
 .respixel
 			ld	a,h
@@ -30,7 +30,7 @@
 
 			dec	a
 			
-			ld	(coords),hl
+			ld	(__gfx_coords),hl
 			
 			push	bc
 
