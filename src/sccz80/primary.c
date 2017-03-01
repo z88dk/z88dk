@@ -598,20 +598,28 @@ void smartstore(LVALUE* lval)
 
 void rvaluest(LVALUE* lval)
 {
+    if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
+        warning(W_UNINITIALISED_VARIABLE, lval->symbol->name);
+    }
     if (lval->symbol && strncmp(lval->symbol->name, "0dptr", 5) == 0)
         lval->symbol = lval->symbol->offset.p;
-    if (lval->symbol && lval->indirect == 0)
+    if (lval->symbol && lval->indirect == 0) {
+       
         getmem(lval->symbol);
-    else {
+    } else {
         indirect(lval);
     }
 }
 
 void rvalue(LVALUE* lval)
 {
-    if (lval->symbol && lval->indirect == 0)
+    if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
+        warning(W_UNINITIALISED_VARIABLE, lval->symbol->name);
+    }
+    if (lval->symbol && lval->indirect == 0) { 
         getmem(lval->symbol);
-    else {
+    } else {
+            
         indirect(lval);
     }
     if (lval->c_vtype) {

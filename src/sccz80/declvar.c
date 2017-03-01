@@ -403,13 +403,14 @@ void declglb(
             }
             if (storage != EXTERNAL && ident != FUNCTION) {
                 size_st = initials(sname, type, ident, size, more, otag, var->zfar, var->isconst);
-
                 if (storage == EXTERNP)
                     myptr->size = addr;
                 else
                     myptr->size = size_st;
-                if (defstatic)
+                if (defstatic) {
+                    myptr->isassigned = YES;
                     myptr->storage = DECLEXTN;
+                }
             }
 
             /*
