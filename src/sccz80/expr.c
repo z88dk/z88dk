@@ -606,7 +606,7 @@ int heira(LVALUE* lval)
         if (lval->symbol) {
             lval->ptr_type = lval->symbol->type;
             lval->val_type = (lval->flags & FARACC ? CPTR : CINT);
-
+            lval->symbol->isassigned = YES;
         } else {
             warning(W_BUG1);
             warning(W_BUG2);
