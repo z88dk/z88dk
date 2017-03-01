@@ -8,7 +8,7 @@
 ;       XOR pixel at (x,y) coordinate.
 ;
 ;
-;	$Id: xorpixl.asm,v 1.3 2016-06-27 20:26:33 dom Exp $
+;	$Id: xorpixl.asm,v 1.3 2016/06/27 20:26:33 dom Exp, 3/2017 Stefano Exp $
 ;
 
 
@@ -17,7 +17,7 @@
 			PUBLIC	xorpixel
 
 			EXTERN	div3
-			EXTERN	coords
+			EXTERN	__gfx_coords
 
 .xorpixel
 			ld	a,h
@@ -29,7 +29,7 @@
 
 			dec	a
 			
-			ld	(coords),hl
+			ld	(__gfx_coords),hl
 			
 			push	bc
 
