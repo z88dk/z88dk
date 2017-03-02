@@ -627,21 +627,20 @@ SYMBOL *getarg(
     SYMBOL* argptr;
     int legalname, ident, more;
     int brkflag; /* Needed to correctly break out for K&R*/
-
+    int ptrtofn;
     argptr = NULL;
 
     /* Only need while loop if K&R defs */
 
     while (undeclared) {
+        ptrtofn = NO;
         ident = get_ident();
         more = 0;
         if ((legalname = symname(n)) == 0) {
             if (!proto) {
                 illname(n);
             } else {
-                /*
- * Obligatory silly fake name
- */
+                /* Obligatory silly fake name */
                 sprintf(n, "sg6p_%d", proto);
                 legalname = 1;
             }
@@ -651,9 +650,11 @@ SYMBOL *getarg(
             /* function returning pointer needs dummy symbol */
             more = dummy_idx(typ, otag);
             typ = (zfar ? CPTR : CINT);
+            ptrtofn = YES;
         } else if (ident == PTR_TO_FN) {
             needtoken(")()");
             ident = POINTER;
+            ptrtofn = YES;
         }
         if (cmatch('[')) { /* pointer ? */
             ptrerror(ident);
@@ -694,6 +695,9 @@ SYMBOL *getarg(
                 argptr->tag_idx = otag - tagtab;
                 argptr->ident = POINTER;
                 argptr->type = STRUCT;
+            }
+            if ( ptrtofn && argptr ) {
+                check_trailing_modifiers(argptr);
             }
         }
         brkflag = 0;
