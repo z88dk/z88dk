@@ -114,7 +114,7 @@ int AddNewFunc(
      */
     ptr = AddFuncCode(sname, type, ident, sign, zfar, storage, more, NO, simple, otag, addr);
 
-    if (ptr == 0) { /* Defined a function */
+    if (ptr == NULL ) { /* Defined a function */
         /* trap external int blah() { } things */
         if (currfn->storage == EXTERNAL)
             currfn->storage = STATIK;
@@ -582,12 +582,7 @@ SYMBOL *dofnansi(SYMBOL* currfn, int32_t* addr)
     }
 
     blanks();
-
-
     check_trailing_modifiers(currfn);
-
-
-
 
     if (cmatch(';'))
         return (prevarg);
@@ -646,13 +641,19 @@ SYMBOL *getarg(
             }
         }
         if (ident == FUNCTIONP) {
-            needtoken(")()");
+            needchar(')');
+            needchar('(');
+            // TODO: Arguments
+            needchar(')');
             /* function returning pointer needs dummy symbol */
             more = dummy_idx(typ, otag);
             typ = (zfar ? CPTR : CINT);
             ptrtofn = YES;
         } else if (ident == PTR_TO_FN) {
-            needtoken(")()");
+            needchar(')');
+            needchar('(');
+            // TODO: Arguments
+            needchar(')');
             ident = POINTER;
             ptrtofn = YES;
         }

@@ -195,7 +195,7 @@ void declglb(
     char sname[NAMESIZE];
     int size, ident, more, itag, type, size_st;
     int32_t addr = -1;
-    char flagdef, match, ptrtofn;
+    char match, ptrtofn;
     char fastcall, callee;
     unsigned int libdef;
     SYMBOL* myptr;
@@ -208,14 +208,13 @@ void declglb(
         size = 1; /* assume 1 element */
         more = /* assume dummy symbol not required */
             itag = 0; /* just for tidiness */
-        flagdef = libdef = fastcall = callee = NO;
+        libdef = fastcall = callee = NO;
         libdef = 0;
 
         match = ptrtofn = NO;
 
         while (blanks(), rcmatch('_')) {
             match = NO;
-            //            if (amatch("__APPFUNC__") ) { match=YES; flagdef=1; }
             if (amatch("__LIB__") /* && libdef==0 */) {
                 match = YES;
                 libdef |= LIBRARY;
@@ -286,10 +285,6 @@ void declglb(
              *      against a K&R style function definition () so carry on
              *      as normal!
              *
-             *      If we had our function prefixed with __APPFUNC__ then we want
-             *      to write it out to the zcc_opt.def file (this bloody thing
-             *      is becoming invaluable for messaging!
-             *
              *	__SHARED__ indicates in a library so preserve carry flag
              * 	(so we can test with iferror)
              *
@@ -299,15 +294,8 @@ void declglb(
              *	__SHAREDC__ is indicates call by rst 8 but is unused..
              *	(old idea unused, but may yet be useful)
              */
-            if (flagdef)
-                WriteDefined(sname, 0);
             if (currfn) {
-                /* djm 1/2/03 - since we can override lib functions don't reset the library
-                   flag
-                   currfn->flags&=(~LIBRARY);
-                */
                 if (libdef) {
-                    //		currfn->flags|=LIBRARY;
                     currfn->flags |= libdef;
                 }
                 if (callee && (libdef & SHARED) != SHARED && (libdef & SHAREDC) != SHAREDC)
@@ -353,10 +341,17 @@ void declglb(
             if (size == 0 && ident == POINTER)
                 size = 0;
             ident = ARRAY;
-            if (ptrtofn)
-                needtoken(")()");
+            if (ptrtofn) {
+                needchar(')');
+                needchar('(');
+                // TODO: Arguments
+                needchar(')');
+            }
         } else if (ptrtofn) {
-            needtoken(")()");
+            needchar(')');
+            needchar('(');
+            // TODO: arguments
+            needchar(')');
         } else if (ident == PTR_TO_PTR) {
             ident = POINTER;
             more = dummy_idx(typ, otag);
@@ -517,7 +512,10 @@ void declloc(
             illname(sname);
 
         if (ident == FUNCTIONP) {
-            needtoken(")()");
+            needchar(')');
+            needchar('(');
+            // TODO: Arguments
+            needchar(')');
             /* function returning pointer needs dummy symbol */
             more = dummy_idx(typ, otag);
             type = (var->zfar ? CPTR : CINT);
@@ -527,7 +525,10 @@ void declloc(
         }
 
         if (ident == PTR_TO_FN) {
-            needtoken(")()");
+            needchar(')');
+            needchar('(');
+            // TODO: Arguments
+            needchar(')');
             ident = POINTER;
             ptrtofn = YES;
         }
