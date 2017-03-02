@@ -1,7 +1,7 @@
 /*
 
 	Z88DK base graphics libraries examples
-	3D Globe, inspired to a program by José Baume
+	3D Globe, inspired to a program by JosÃ© Baume
 	
 	Set up the view with
 	B = 0.0 .. 360.0   <- globe rotation
@@ -10,7 +10,10 @@
 	to build:  zcc +<target> <stdio options> -lm -create-app globe.c
 	
 	Examples:
-	  zcc +zx -lndos -create-app -lm -DGFXMENU globe.c
+	
+	  zcc +c128 -create-app -lgfx128hr -lm -Dhires globe.c
+	  
+	  zcc +zx -lndos -create-app -lm globe.c
 	  
 	  zcc +ts2068 -lgfx2068hr -lm -Dhires -create-app globe.c
 	  
